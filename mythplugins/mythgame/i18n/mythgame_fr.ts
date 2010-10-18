@@ -58,10 +58,6 @@
         <translation>Donner le statut de favori</translation>
     </message>
     <message>
-        <source>Edit Metadata</source>
-        <translation type="obsolete">Éditer les méta-données</translation>
-    </message>
-    <message>
         <location filename="../mythgame/gameui.cpp" line="615"/>
         <source>Game Search</source>
         <translation>Rechercher un jeu</translation>
@@ -178,17 +174,17 @@
         <translation>Réglages MythGame -- Général</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="159"/>
         <location filename="../mythgame/gamehandler.cpp" line="160"/>
         <location filename="../mythgame/gamehandler.cpp" line="161"/>
         <location filename="../mythgame/gamehandler.cpp" line="162"/>
         <location filename="../mythgame/gamehandler.cpp" line="163"/>
-        <location filename="../mythgame/gamehandler.cpp" line="424"/>
+        <location filename="../mythgame/gamehandler.cpp" line="164"/>
         <location filename="../mythgame/gamehandler.cpp" line="425"/>
-        <location filename="../mythgame/gamehandler.cpp" line="428"/>
+        <location filename="../mythgame/gamehandler.cpp" line="426"/>
         <location filename="../mythgame/gamehandler.cpp" line="429"/>
         <location filename="../mythgame/gamehandler.cpp" line="430"/>
-        <location filename="../mythgame/gamehandler.cpp" line="436"/>
+        <location filename="../mythgame/gamehandler.cpp" line="431"/>
+        <location filename="../mythgame/gamehandler.cpp" line="437"/>
         <source>Unknown</source>
         <translation>Inconnu</translation>
     </message>
@@ -378,58 +374,58 @@
         <translation>Nom de ce jeu et/ou émulateur</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="158"/>
-        <location filename="../mythgame/gamehandler.cpp" line="427"/>
+        <location filename="../mythgame/gamehandler.cpp" line="159"/>
+        <location filename="../mythgame/gamehandler.cpp" line="428"/>
         <source>19xx</source>
         <translation>19xx</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="164"/>
-        <location filename="../mythgame/gamehandler.cpp" line="431"/>
+        <location filename="../mythgame/gamehandler.cpp" line="165"/>
+        <location filename="../mythgame/gamehandler.cpp" line="432"/>
         <source>0</source>
         <translation>0</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="225"/>
-        <location filename="../mythgame/gamehandler.cpp" line="607"/>
+        <location filename="../mythgame/gamehandler.cpp" line="226"/>
+        <location filename="../mythgame/gamehandler.cpp" line="608"/>
         <source>No</source>
         <translation>Non</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="226"/>
+        <location filename="../mythgame/gamehandler.cpp" line="227"/>
         <source>No to all</source>
         <translation>Non à tout</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="227"/>
-        <location filename="../mythgame/gamehandler.cpp" line="608"/>
+        <location filename="../mythgame/gamehandler.cpp" line="228"/>
+        <location filename="../mythgame/gamehandler.cpp" line="609"/>
         <source>Yes</source>
         <translation>Oui</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="228"/>
+        <location filename="../mythgame/gamehandler.cpp" line="229"/>
         <source>Yes to all</source>
         <translation>Oui à tout</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="233"/>
+        <location filename="../mythgame/gamehandler.cpp" line="234"/>
         <source>File Missing</source>
         <translation>Fichier manquant</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="234"/>
+        <location filename="../mythgame/gamehandler.cpp" line="235"/>
         <source>%1 appears to be missing.
 Remove it from the database?</source>
         <translation>%1 semble être manquant.
 L&apos;enlever de la base de données ?</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="612"/>
+        <location filename="../mythgame/gamehandler.cpp" line="613"/>
         <source>Are you sure?</source>
         <translation>Étes-vous sûr ?</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="613"/>
+        <location filename="../mythgame/gamehandler.cpp" line="614"/>
         <source>This will clear all Game Meta Data
 from the database. Are you sure you
 want to do this?</source>
@@ -453,17 +449,17 @@ de jeu de la base de données.
         <translation>GAMEGEAR</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="398"/>
+        <location filename="../mythgame/gamehandler.cpp" line="399"/>
         <source>Updating %1(%2) ROM database</source>
         <translation>Met à jour la base de données de ROM %1 (%2)</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="516"/>
+        <location filename="../mythgame/gamehandler.cpp" line="517"/>
         <source>Verifying %1 files</source>
         <translation>Vérifie %1 fichier(s)</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="719"/>
+        <location filename="../mythgame/gamehandler.cpp" line="720"/>
         <source>Scanning for %1 game(s)...</source>
         <translation>Analyse %1 jeu(x)...</translation>
     </message>
@@ -711,10 +707,6 @@ de jeu de la base de données.
         <source>ROM Path:</source>
         <translatorcomment>vérifier la longueur</translatorcomment>
         <translation>Chemin d&apos;accès à la ROM :</translation>
-    </message>
-    <message>
-        <source>Video Manager</source>
-        <translation type="obsolete">Gestion video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="40"/>
