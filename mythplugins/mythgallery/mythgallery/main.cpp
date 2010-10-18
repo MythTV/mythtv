@@ -8,7 +8,6 @@
 // myth
 #include <mythcontext.h>
 #include <mythversion.h>
-#include <mythdialogs.h>
 #include <mythmediamonitor.h>
 #include <mythpluginapi.h>
 

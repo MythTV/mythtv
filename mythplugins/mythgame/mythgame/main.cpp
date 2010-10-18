@@ -19,7 +19,6 @@ using namespace std;
 #include <myththemedmenu.h>
 #include <mythpluginapi.h>
 #include <mythuihelper.h>
-#include <mythdialogs.h>
 
 #define LOC_ERR QString("MythGame:MAIN Error: ")
 #define LOC QString("MythGame:MAIN: ")
