@@ -33,12 +33,12 @@ void bd_set_debug_handler(BD_LOG_FUNC f)
     log_func = f;
 }
 
-void bd_set_debug_mask(debug_mask_t mask)
+void bd_set_debug_mask(uint32_t mask)
 {
     debug_mask = mask;
 }
 
-debug_mask_t bd_get_debug_mask(void)
+uint32_t bd_get_debug_mask(void)
 {
     return debug_mask;
 }

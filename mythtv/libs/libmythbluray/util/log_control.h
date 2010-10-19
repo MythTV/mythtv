@@ -39,6 +39,7 @@ enum debug_mask_enum {
     DBG_CRIT = 2048,         // this is libbluray's default debug mask so use this if you want to display critical info
     DBG_HDMV = 4096,
     DBG_BDJ = 8192,
+    DBG_STREAM = 16384,
 };
 
 typedef enum debug_mask_enum debug_mask_t;
@@ -51,8 +52,8 @@ typedef void (*BD_LOG_FUNC)(const char *);
 
 void bd_set_debug_handler(BD_LOG_FUNC);
 
-void bd_set_debug_mask(debug_mask_t mask);
-debug_mask_t bd_get_debug_mask(void);
+void bd_set_debug_mask(uint32_t mask);
+uint32_t bd_get_debug_mask(void);
 
 
 #endif /* BD_LOG_CONTROL_H_ */
