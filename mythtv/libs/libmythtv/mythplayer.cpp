@@ -1845,6 +1845,9 @@ void MythPlayer::DisplayPauseFrame(void)
         return;
     }
 
+    // clear the buffering state
+    buffering = false;
+
     if (needNewPauseFrame)
     {
         if (videoOutput->ValidVideoFrames())
@@ -1922,6 +1925,9 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
 {
     if (allpaused || (check_prebuffer && !PrebufferEnoughFrames()))
         return;
+
+    // clear the buffering state
+    buffering = false;
 
     videoOutput->StartDisplayingFrame();
     VideoFrame *frame = videoOutput->GetLastShownFrame();
