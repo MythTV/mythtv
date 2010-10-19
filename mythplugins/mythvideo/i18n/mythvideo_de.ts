@@ -1390,14 +1390,19 @@ Wenn Sie &quot;Standard-Player benutzen&quot; auswählen wird das Abspielkommand
         <translation>Gesehen:</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="159"/>
+        <source>Video Browser</source>
+        <translation>Video Browser</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="164"/>
         <source>File Associations</source>
-        <translation type="unfinished"></translation>
+        <translation>Dateiverknüpfungen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="165"/>
         <source>Video Filters</source>
-        <translation type="unfinished"></translation>
+        <translation>Videofilter</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="191"/>
