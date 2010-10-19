@@ -15,37 +15,32 @@
 MythLocale::MythLocale(QString localeName) :
     m_defaultsLoaded(false)
 {
-    QLocale locale; // Initialised to system()
-
     QString dbLanguage = GetMythDB()->GetSetting("Language", "");
     QString dbCountry = GetMythDB()->GetSetting("Country", "");
 
     if (!localeName.isEmpty())
-        locale = QLocale(localeName);
+    {
+        m_localeCode = localeName;
+    }
     else if (!dbLanguage.isEmpty() &&
              !dbCountry.isEmpty())
     {
         QString langcode = dbLanguage.section('_',0,0);
-        QString localecode = QString("%1_%2").arg(langcode)
-                                             .arg(dbCountry.toUpper());
-        locale = QLocale(localecode);
+        m_localeCode = QString("%1_%2").arg(langcode)
+                                       .arg(dbCountry.toUpper());
     }
-
-    if (locale.name().isEmpty() || locale.name() == "C")
+    else
     {
-        locale = QLocale::system();
+        QLocale locale = QLocale::system();
 
         if (locale.name().isEmpty() || locale.name() == "C")
         {
             // If all else has failed use the US locale
-            locale = QLocale("en_US");
+            m_localeCode = "en_US";
         }
+        else
+            m_localeCode = locale.name();
     }
-
-    m_localeCode = locale.name();
-    m_country = locale.country();
-    m_language = locale.language();
-
 }
 
 QString MythLocale::GetCountryCode(void) const
@@ -53,6 +48,11 @@ QString MythLocale::GetCountryCode(void) const
     QString isoCountry = m_localeCode.section('_', 1, 1);
 
     return isoCountry;
+}
+
+QString MythLocale::GetCountry() const
+{
+    return GetISO3166EnglishCountryName(GetCountryCode());
 }
 
 QString MythLocale::GetNativeCountry(void) const
@@ -65,6 +65,11 @@ QString MythLocale::GetLanguageCode(void) const
     QString isoLanguage = m_localeCode.section('_', 0, 0);
 
     return isoLanguage;
+}
+
+QString MythLocale::GetLanguage() const
+{
+    return GetISO639EnglishLanguageName(GetLanguageCode());
 }
 
 QString MythLocale::GetNativeLanguage(void) const
