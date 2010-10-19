@@ -59,7 +59,7 @@ class MythDVDPlayer : public MythPlayer
     virtual void ChangeSpeed(void);
 
     // Playback
-    virtual void AVSync(bool limit_delay = false);
+    virtual void AVSync(VideoFrame *buffer, bool limit_delay = false);
     virtual void DisplayPauseFrame(void);
     virtual void PreProcessNormalFrame(void);
     virtual bool VideoLoop(void);
