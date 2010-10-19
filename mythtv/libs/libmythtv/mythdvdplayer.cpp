@@ -78,15 +78,6 @@ bool MythDVDPlayer::DecoderGetFrameREW(void)
            (player_ctx->buffer->DVD()->GetCurrentTime() < 2));
 }
 
-void MythDVDPlayer::DisplayNormalFrame(bool allow_pause)
-{
-    bool allow = player_ctx->buffer->isDVD() &&
-                (!player_ctx->buffer->InDVDMenuOrStillFrame() ||
-                (player_ctx->buffer->DVD()->NumMenuButtons() > 0 &&
-                 player_ctx->buffer->DVD()->GetChapterLength() > 3));
-    MythPlayer::DisplayNormalFrame(allow);
-}
-
 void MythDVDPlayer::PreProcessNormalFrame(void)
 {
     DisplayDVDButton();

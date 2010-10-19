@@ -374,7 +374,7 @@ class MPUBLIC MythPlayer
 
     // Playback
     virtual void DisplayPauseFrame(void);
-    virtual void DisplayNormalFrame(bool allow_pause = true);
+    virtual void DisplayNormalFrame(bool check_prebuffer = true);
     virtual void PreProcessNormalFrame(void);
     virtual void VideoStart(void);
     virtual bool VideoLoop(void);
