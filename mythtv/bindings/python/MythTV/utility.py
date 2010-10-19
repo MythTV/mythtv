@@ -4,7 +4,7 @@
 from __future__ import with_statement
 
 from logging import MythLog
-from exceptions import MythDBError
+from exceptions import MythDBError, MythError
 
 from cStringIO import StringIO
 from select import select
@@ -351,7 +351,14 @@ class deadlinesocket( socket.socket ):
                 return u''
 
             # append response to buffer
-            buff.write(self.recv(bufsize-buff.tell(), flags))
+            p = buff.tell()
+            try:
+                buff.write(self.recv(bufsize-buff.tell(), flags))
+            except socket.error, e:
+                raise MythError(MythError.SOCKET, e.args)
+            if buff.tell() == p:
+               # no data read from a 'ready' socket, connection terminated
+                raise MythError(MythError.SOCKET, (54, 'Connection reset by peer'))
 
             if timeout == 0:
                 break
@@ -376,7 +383,14 @@ class deadlinesocket( socket.socket ):
                 return ''
 
             # append response to buffer
-            buff.write(self.recv(100, flags))
+            p = buff.tell()
+            try:
+                buff.write(self.recv(100, flags))
+            except socket.error, e:
+                raise MythError(MythError.SOCKET, e.args)
+            if buff.tell() == p:
+                # no data read from a 'ready' socket, connection terminated
+                raise MythError(MythError.CLOSEDSOCKET)
 
             if timeout == 0:
                 break
@@ -387,10 +401,7 @@ class deadlinesocket( socket.socket ):
         Loop recv listening for an amount of data provided
             in the first 8 bytes.
         """
-        try:
-            size = int(self.dlrecv(8, flags, deadline))
-        except:
-            return ''
+        size = int(self.dlrecv(8, flags, deadline))
         data = self.dlrecv(size, flags, deadline)
         self.log(MythLog.SOCKET|MythLog.NETWORK, \
                             'read <-- %d' % size, data)
@@ -398,10 +409,13 @@ class deadlinesocket( socket.socket ):
 
     def sendheader(self, data, flags=0):
         """Send data, prepending the length in the first 8 bytes."""
-        self.log(MythLog.SOCKET|MythLog.NETWORK, \
-                            'write --> %d' % len(data), data)
-        data = '%-8d%s' % (len(data), data)
-        self.send(data, flags)
+        try:
+            self.log(MythLog.SOCKET|MythLog.NETWORK, \
+                                'write --> %d' % len(data), data)
+            data = '%-8d%s' % (len(data), data)
+            self.send(data, flags)
+        except socket.error, e:
+            raise MythError(MythError.SOCKET, e.args)
 
 class MARKUPLIST( object ):
     """

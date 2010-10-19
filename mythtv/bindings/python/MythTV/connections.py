@@ -320,18 +320,21 @@ class BEConnection( object ):
         self.connected = True
         self.check_version()
         self.announce()
+        if len(self._regevents) and (not self.threadrunning):
+            start_new_thread(self.eventloop, ())
 
-    def disconnect(self):
+    def disconnect(self, hard=False):
         if not self.connected:
             return
         self.log(MythLog.SOCKET|MythLog.NETWORK,
                 "Terminating connection to %s:%d" % (self.host, self.port))
-        self.backendCommand('DONE',0)
+        if not hard:
+            self.backendCommand('DONE',0)
         self.connected = False
         self.socket.shutdown(1)
         self.socket.close()
 
-    def reconnect(self, force=False):
+    def reconnect(self, force=False, hard=False):
         # compute new connection options
         opts = self.BEConnOpts()
         for o in self._regusers.values():
@@ -339,7 +342,7 @@ class BEConnection( object ):
         if (True in (opts^self.opts).values()) or force:
             # options have changed, reconnect
             self.opts = opts
-            self.disconnect()
+            self.disconnect(hard)
             self.connect()
 
     def announce(self):
@@ -393,37 +396,46 @@ class BEConnection( object ):
         if deadline < 1000:
             deadline += time()
 
-        # send command string
         if data is not None:
             # flush socket
             self.backendCommand(deadline=0.)
-            self.socket.sendheader(data.encode('utf-8'))
 
-        # lock socket access
-        with self._socklock:
-            # loop waiting for proper response
-            while True:
-                # wait timeout for data to be received on the socket
-                t = time()
-                timeout = (deadline-t) if (deadline-t>0) else 0.0
-                if len(select([self.socket],[],[], timeout)[0]) == 0:
-                    # no data, return
-                    return u''
-                event = self.socket.recvheader(deadline=deadline)
+        try:
+            # lock socket access
+            with self._socklock:
+                # send command string
+                if data is not None:
+                    self.socket.sendheader(data.encode('utf-8'))
+                # loop waiting for proper response
+                while True:
+                    # wait timeout for data to be received on the socket
+                    t = time()
+                    timeout = (deadline-t) if (deadline-t>0) else 0.0
+                    if len(select([self.socket],[],[], timeout)[0]) == 0:
+                        # no data, return
+                        return u''
+                    event = self.socket.recvheader(deadline=deadline)
 
-                # convert to unicode
-                try:
-                    event = unicode(''.join([event]), 'utf8')
-                except:
-                    event = u''.join([event])
+                    # convert to unicode
+                    try:
+                        event = unicode(''.join([event]), 'utf8')
+                    except:
+                        event = u''.join([event])
 
-                if event[:15] == 'BACKEND_MESSAGE':
-                    self.eventqueue.put(event)
-                else:
-                    return event
+                    if event[:15] == 'BACKEND_MESSAGE':
+                        self.eventqueue.put(event)
+                    else:
+                        return event
 
-                if timeout == 0:
-                    return u''
+                    if timeout == 0:
+                        return u''
+        except MythError, e:
+            if e.sockcode == 54:
+                # remote has closed connection, attempt reconnect
+                self.reconnect(True, True)
+                return self.backendCommand(data, deadline)
+            else:
+                raise
 
     def registeruser(self, uuid, opts):
         self._regusers[uuid] = opts
