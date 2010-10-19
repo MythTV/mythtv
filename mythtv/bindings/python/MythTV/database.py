@@ -10,7 +10,7 @@ from static import MythSchema
 from altdict import OrdDict, DictData
 from logging import MythLog
 from msearch import MSearch
-from utility import datetime
+from utility import datetime, _donothing
 from exceptions import MythError, MythDBError
 from connections import DBConnection, LoggedCursor, XMLConnection
 
@@ -68,18 +68,24 @@ class DBData( DictData, MythSchema ):
         db = DBCache(db)
         log = MythLog('DBData Setup (%s)' % cls.__name__)
         if cls._table is None:
+            # pull table name from class name
             cls._table = cls.__name__.lower()
             log(log.DATABASE|log.EXTRA,
                 'set _table to %s' % cls._table)
+
         if cls._logmodule is None:
+            # pull log module from class name
             cls._logmodule = 'Python %s' % cls.__name__
             log(log.DATABASE|log.EXTRA,
                 'set _logmodule to %s' % cls._logmodule)
+
         if cls._field_order == []:
+            # pull field order from database
             cls._field_order = db.tablefields[cls._table]
 
         if (cls._setwheredat is None) or (cls._where is None):
             if cls._key is None:
+                # pull primary key fields from database
                 with db.cursor(log) as cursor:
                     cursor.execute("""SHOW KEYS FROM %s
                                       WHERE Key_name='PRIMARY'""" \
@@ -95,6 +101,9 @@ class DBData( DictData, MythSchema ):
                 'set _where to %s' % cls._where)
             log(log.DATABASE|log.EXTRA,
                 'set _setwheredat to %s' % cls._setwheredat)
+
+        # class has been processed, turn method into no-op
+        cls._setClassDefs = classmethod(_donothing)
 
     @classmethod
     def getAllEntries(cls, db=None):
@@ -458,18 +467,24 @@ class DBDataRef( list ):
                 data.append(dat)
         return self.fromCopy(data)
 
-    def __init__(self, where, db=None, bypass=False):
-        list.__init__(self)
-        if bypass: return
-        self._db = DBCache(db)
-        self._refdat = where
-
-        fields = list(self._db.tablefields[self._table])
-        for f in self._ref:
+    @classmethod
+    def _setClassDefs(cls, db=None):
+        db = DBCache(db)
+        fields = list(db.tablefields[cls._table])
+        for f in cls._ref:
             if f in fields:
                 fields.remove(f)
-        self._datfields = fields
-        self._data = None
+        cls._datfields = fields
+
+        cls._setClassDefs = classmethod(_donothing)
+
+    def __init__(self, where, db=None, bypass=False):
+        list.__init__(self)
+        self._db = DBCache(db)
+        self._setClassDefs(self._db)
+        if bypass: return
+
+        self._refdat = where
         self._populated = False
 
     def _populate(self, force=False, data=None):
@@ -582,7 +597,7 @@ class DBDataRef( list ):
 
 class DBDataCRef( DBDataRef ):
     """
-    DBDataRef.__init__(where, db=None) --> DBDataRef object
+    DBDataCRef.__init__(where, db=None) --> DBDataRef object
 
     Class for managing lists of referenced data, such as recordedmarkup
     Subclasses must provide:
@@ -597,23 +612,31 @@ class DBDataCRef( DBDataRef ):
     class SubData( DBDataRef.SubData ):
         _localvars = DBDataRef.SubData._localvars+['_cref']
 
-    def __init__(self, where, db=None, bypass=False):
-        list.__init__(self)
-        if bypass: return
-        self._db = DBCache(db)
-        self._refdat = list(where)
+    @classmethod
+    def _setClassDefs(cls, db=None):
+        db = DBCache(db)
+        rfields = list(db.tablefields[cls._table[0]])
+        crfields = list(db.tablefields[cls._table[1]])
 
-        rfields = list(self._db.tablefields[self._table[0]])
-        crfields = list(self._db.tablefields[self._table[1]])
-        for f in self._ref+self._cref[:1]:
+        for f in cls._ref+[cls._cref[-1]]:
             if f in rfields:
                 rfields.remove(f)
-        if self._cref[-1] in crfields:
-            crfields.remove(self._cref[-1])
+        if cls._cref[-1] in crfields:
+            crfields.remove(cls._cref[-1])
 
-        self._rdatfields = rfields
-        self._crdatfields = crfields
-        self._datfields = crfields+rfields
+        cls._rdatfields = rfields
+        cls._crdatfields = crfields
+        cls._datfields = crfields+rfields
+
+        cls._setClassDefs = classmethod(_donothing)
+
+    def __init__(self, where, db=None, bypass=False):
+        list.__init__(self)
+        self._db = DBCache(db)
+        self._setClassDefs(self._db)
+        if bypass: return
+
+        self._refdat = list(where)
         self._populated = False
 
     def _populate(self, force=False, data=None):

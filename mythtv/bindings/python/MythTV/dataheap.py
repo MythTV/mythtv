@@ -12,7 +12,7 @@ from altdict import DictData, DictInvertCI
 from database import *
 from system import Grabber, InternetMetadata, VideoMetadata
 from mythproto import ftopen, FileOps, Program
-from utility import CMPRecord, CMPVideo, MARKUPLIST, datetime
+from utility import CMPRecord, CMPVideo, MARKUPLIST, datetime, ParseSet
 
 import re
 import locale
@@ -198,6 +198,10 @@ class Recorded( DBDataWrite, CMPRecord ):
     def fromProgram(cls, program):
         return cls((program.chanid, program.recstartts), program._db)
 
+    @classmethod
+    def fromJob(cls, job):
+        return cls((job.chanid, job.starttime), job._db)
+
     def _push(self):
         DBDataWrite._push(self)
         self.cast.commit()
@@ -309,7 +313,6 @@ class Recorded( DBDataWrite, CMPRecord ):
                 be.downloadTo(image.url, group, image.filename)
             exists[image.type] = True
 
-
         self.update()
 
     def __getstate__(self):
@@ -365,6 +368,11 @@ class RecordedProgram( DBDataWrite, CMPRecord ):
             if None not in data:
                 data = [data[0], datetime.duck(data[1])]
         DBDataWrite.__init__(self, data, db)
+
+    def _postinit(self):
+        self.AudioProp = ParseSet(self, 'audioprop')
+        self.VideoProp = ParseSet(self, 'videoprop')
+        self.SubtitleTypes = ParseSet(self, 'subtitletypes')
 
     @classmethod
     def fromRecorded(cls, recorded):
@@ -485,7 +493,12 @@ class Guide( DBData, CMPRecord ):
                     (prog.starttime == self.starttime):
                 return prog.recstatus
         return 0
-        
+
+    def _postinit(self):
+        self.AudioProp = ParseSet(self, 'audioprop', False)
+        self.VideoProp = ParseSet(self, 'videoprop', False)
+        self.SubtitleTypes = ParseSet(self, 'subtitletypes', False)
+
     @classmethod
     def fromEtree(cls, etree, db=None):
         dat = {'chanid':etree[0]}

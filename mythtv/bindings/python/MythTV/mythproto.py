@@ -13,7 +13,7 @@ from logging import MythLog
 from altdict import DictData
 from connections import BEConnection
 from database import DBCache
-from utility import SplitInt, CMPRecord, datetime
+from utility import SplitInt, CMPRecord, datetime, ParseEnum
 
 from datetime import date
 from time import sleep
@@ -158,16 +158,14 @@ def findfile(filename, sgroup, db=None):
     db = DBCache(db)
     for sg in db.getStorageGroup(groupname=sgroup):
         # search given group
-        if not sg.local:
-            continue
-        if os.access(sg.dirname+filename, os.F_OK):
-            return sg
+        if sg.local:
+            if os.access(sg.dirname+filename, os.F_OK):
+                return sg
     for sg in db.getStorageGroup():
         # not found, search all other groups
-        if not sg.local:
-            continue
-        if os.access(sg.dirname+filename, os.F_OK):
-            return sg
+        if sg.local:
+            if os.access(sg.dirname+filename, os.F_OK):
+                return sg
     return None
 
 def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
@@ -780,6 +778,9 @@ class Program( DictData, RECSTATUS, AUDIO_PROPS, VIDEO_PROPS, \
     def __init__(self, raw, db=None):
         DictData.__init__(self, raw)
         self._db = db
+        self.AudioProps = ParseEnum(self, 'audio_props', AUDIO_PROPS, False)
+        self.VideoProps = ParseEnum(self, 'video_props', VIDEO_PROPS, False)
+        self.SubtitleType = ParseEnum(self, 'subtitle_type', SUBTITLE_TYPES, False)
 
     @classmethod
     def fromEtree(cls, etree, db=None):

@@ -606,12 +606,19 @@ class MythDB( DBCache ):
 
         if init:
             # table and join descriptor
-            return ('recorded', Recorded, ('livetv',),
-                    ('recordedprogram','recorded',('chanid','starttime')),  #1
-                    ('recordedcredits','recorded',
-                                            ('chanid','starttime'),
-                                            ('chanid','progstart')),        #2
-                    ('people','recordedcredits',('person',)))               #4
+            init.table = 'recorded'
+            init.handler = Recorded
+            init.required = ('livetv,')
+            init.joins = (init.Join(table='recordedprogram',
+                                    tableto='recorded',
+                                    fields=('chanid','starttime')),
+                          init.Join(table='recordedcredits',
+                                    tableto='recorded',
+                                    fieldsfrom=('chanid','starttime'),
+                                    fieldsto=('chanid','progstart')),
+                          init.Join(table='people',
+                                    tableto='recordedcredits',
+                                    fields=('person',)))
 
         # local table matches
         if key in ('title','subtitle','chanid',
@@ -658,7 +665,9 @@ class MythDB( DBCache ):
         """
 
         if init:
-            return ('oldrecorded', OldRecorded, ())
+            init.table = 'recorded'
+            init.handler = Recorded
+
         if key in ('title','subtitle','chanid',
                         'category','seriesid','programid','station',
                         'duplicate','generic','recstatus'):
@@ -678,8 +687,12 @@ class MythDB( DBCache ):
             title,      subtitle,   flags,      olderthan,  newerthan
         """
         if init:
-            return ('jobqueue', Job, (),
-                    ('recorded','jobqueue',('chanid','starttime')))
+            init.table = 'jobqueue'
+            init.handler = Job
+            init.joins = (init.Join(table='recorded',
+                                    tableto='jobqueue',
+                                    fields=('chanid','starttime')),)
+
         if key in ('chanid','type','status','hostname'):
             return ('jobqueue.%s=%%s' % key, value, 0)
         if key in ('title','subtitle'):
@@ -710,9 +723,15 @@ class MythDB( DBCache ):
             endbefore,  endafter
         """
         if init:
-            return ('program', Guide, (),
-                    ('credits','program',('chanid','starttime')),
-                    ('people','credits',('person',)))
+            init.table = 'program'
+            init.handler = Guide
+            init.joins = (init.Join(table='credits',
+                                    tableto='program',
+                                    fields=('chanid','starttime')),
+                          init.Join(table='people',
+                                    tableto='credits',
+                                    fields=('person',)))
+
         if key in ('chanid','title','subtitle',
                         'category','airdate','stars','previouslyshown','stereo',
                         'subtitled','hdtv','closecaptioned','partnumber',
@@ -754,7 +773,9 @@ class MythDB( DBCache ):
             recgroup,   station,    seriesid,   programid,  playgroup
         """
         if init:
-            return ('record', Record, ())
+            init.table = 'record'
+            init.handler = Record
+
         if key in ('type','chanid','starttime','startdate','endtime','enddate',
                         'title','subtitle','category','profile','recgroup',
                         'station','seriesid','programid','playgroup'):
@@ -774,7 +795,9 @@ class MythDB( DBCache ):
             country,    description
         """
         if init:
-            return ('internetcontentarticles', InternetContentArticles, ())
+            init.table = 'internetcontentarticles'
+            init.handler = InternetContentArticles
+
         if key in ('feedtitle','title','subtitle','season','episode','url',
                         'type','author','rating','player','width','height',
                         'language','podcast','downloadable', 'description'):
@@ -1070,21 +1093,37 @@ class MythVideo( VideoSchema, DBCache ):
         """
 
         if init:
-            return ('videometadata', Video, (),
-                    ('videometadatacast','videometadata',
-                                            ('idvideo',),('intid',)),   #1
-                    ('videocast','videometadatacast',
-                                            ('intid',),('idcast',)),    #2
-                    ('videometadatagenre','videometadata',
-                                            ('idvideo',),('intid',)),   #4
-                    ('videogenre','videometadatagenre',
-                                            ('intid',),('idgenre',)),   #8
-                    ('videometadatacountry','videometadata',
-                                            ('idvideo',),('intid',)),   #16
-                    ('videocountry','videometadatacountry',
-                                            ('intid',),('idcountry',)), #32
-                    ('videocategory','videometadata',
-                                            ('intid',),('category',)))  #64
+            init.table = 'videometadata'
+            init.handler = Video
+            init.joins = (init.Join(table='videometadatacast',
+                                    tableto='videometadata',
+                                    fieldsfrom=('idvideo',),
+                                    fieldsto=('intid',)),
+                          init.Join(table='videocast',
+                                    tableto='videometadatacast',
+                                    fieldsfrom=('intid',),
+                                    fieldsto=('idcast',)),
+                          init.Join(table='videometadatagenre',
+                                    tableto='videometadata',
+                                    fieldsfrom=('idvideo',),
+                                    fieldsto=('intid',)),
+                          init.Join(table='videogenre',
+                                    tableto='videometadatagenre',
+                                    fieldsfrom=('intid',),
+                                    fieldsto=('idgenre',)),
+                          init.Join(table='videometadatacountry',
+                                    tableto='videometadata',
+                                    fieldsfrom=('idvideo',),
+                                    fieldsto=('intid',)),
+                          init.Join(table='videocountry',
+                                    tableto='videometadatacountry',
+                                    fieldsfrom=('intid',),
+                                    fieldsto=('idcountry',)),
+                          init.Join(table='videocategory',
+                                    tableto='videometadata',
+                                    fieldsfrom=('intid',),
+                                    fieldsto=('category',)))
+
         if key in ('title','subtitle','season','episode','host',
                         'director','year'):
             return('videometadata.%s=%%s' % key, value, 0)
@@ -1106,14 +1145,6 @@ class MythVideo( VideoSchema, DBCache ):
             return ('videometadata.insertdate>%s', value, 0)
         return None
 
-    def getVideo(self, **kwargs):
-        """legacy - do not use"""
-        videos = self.searchVideos(**kwargs)
-        try:
-            return videos.next()
-        except StopIteration:            
-            return None
-
 class MythMusic( MusicSchema, DBCache ):
     """
     Provides convenient methods to access the MythTV MythMusic database.
@@ -1128,10 +1159,18 @@ class MythMusic( MusicSchema, DBCache ):
             genre, rating, format,      sample_rate, bitrate
         """
         if init:
-            return ('music_songs', Song, (),
-                    ('music_artists','music_songs',('artist_id',)), #1
-                    ('music_albums', 'music_songs',('album_id',)),  #2
-                    ('music_genres', 'music_songs',('genre_id',)))  #4
+            init.table = 'music_songs'
+            init.handler = Song
+            init.joins = (init.Join(table='music_artists',
+                                    tableto='music_songs',
+                                    fields=('artist_id',)),
+                          init.Join(table='music_albums',
+                                    tableto='music_songs',
+                                    fields=('album_id',)),
+                          init.Join(table='music_genres',
+                                    tableto='music_songs',
+                                    fields=('genre_id',)))
+
         if key in ('name','track','disc_number','rating',
                         'format','sample_rate','bitrate'):
             return ('music_songs.%s=%%s' % key, value, 0)
