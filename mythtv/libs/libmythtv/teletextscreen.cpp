@@ -39,7 +39,8 @@ static char cvt_char(char ch, int lang)
     return ch;
 }
 
-TeletextScreen::TeletextScreen(MythPlayer *player, const char * name) :
+TeletextScreen::TeletextScreen(MythPlayer *player, const char * name,
+                               int fontStretch) :
     MythScreenType((MythScreenType*)NULL, name),
     m_player(player),           m_safeArea(QRect()),
     m_colSize(10),              m_rowSize(10),
@@ -49,7 +50,7 @@ TeletextScreen::TeletextScreen(MythPlayer *player, const char * name) :
     m_curpage_showheader(true), m_curpage_issubtitle(false),
     m_transparent(false),       m_revealHidden(false),
     m_displaying(false),        m_header_changed(false),
-    m_page_changed(false)
+    m_page_changed(false),      m_fontStretch(fontStretch)
 {
     memset(m_pageinput, 0, sizeof(m_pageinput));
     memset(m_header,    0, sizeof(m_header));
@@ -158,7 +159,7 @@ void TeletextScreen::OptimiseDisplayedArea(void)
 
 void TeletextScreen::Pulse(void)
 {
-    if (!InitialiseFont() || !m_displaying)
+    if (!InitialiseFont(m_fontStretch) || !m_displaying)
         return;
 
     if (m_player && m_player->getVideoOutput())
@@ -1239,7 +1240,7 @@ const TeletextSubPage *TeletextScreen::FindSubPageInternal(
     return res;
 }
 
-bool TeletextScreen::InitialiseFont(void)
+bool TeletextScreen::InitialiseFont(int fontStretch)
 {
     static bool initialised = false;
     QString font = gCoreContext->GetSetting("OSDSubFont", "FreeSans");
@@ -1255,6 +1256,7 @@ bool TeletextScreen::InitialiseFont(void)
     {
         QFont newfont(font);
         font.detach();
+        newfont.setStretch(fontStretch);
         mythfont->SetFace(newfont);
         gTTFont = mythfont;
     }

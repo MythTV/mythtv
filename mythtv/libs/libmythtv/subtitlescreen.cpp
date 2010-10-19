@@ -16,12 +16,14 @@
 static MythFontProperties* gTextSubFont;
 static QHash<int, MythFontProperties*> gCC708Fonts;
 
-SubtitleScreen::SubtitleScreen(MythPlayer *player, const char * name) :
+SubtitleScreen::SubtitleScreen(MythPlayer *player, const char * name,
+                               int fontStretch) :
     MythScreenType((MythScreenType*)NULL, name),
     m_player(player),  m_subreader(NULL),   m_608reader(NULL),
     m_708reader(NULL), m_safeArea(QRect()), m_useBackground(false),
     m_removeHTML(QRegExp("</?.+>")),        m_subtitleType(kDisplayNone),
-    m_textFontZoom(100),                    m_refreshArea(false)
+    m_textFontZoom(100),                    m_refreshArea(false),
+    m_fontStretch(fontStretch)
 {
     m_708fontSizes[0] = 36;
     m_708fontSizes[1] = 45;
@@ -297,7 +299,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
 
 void SubtitleScreen::DisplayTextSubtitles(void)
 {
-    if (!InitialiseFont() || !m_player || !m_subreader)
+    if (!InitialiseFont(m_fontStretch) || !m_player || !m_subreader)
         return;
 
     bool changed = false;
@@ -374,7 +376,7 @@ void SubtitleScreen::DisplayTextSubtitles(void)
 
 void SubtitleScreen::DisplayRawTextSubtitles(void)
 {
-    if (!InitialiseFont() || !m_player || !m_subreader)
+    if (!InitialiseFont(m_fontStretch) || !m_player || !m_subreader)
         return;
 
     uint64_t duration;
@@ -465,7 +467,7 @@ void SubtitleScreen::DrawTextSubtitles(QStringList &wrappedsubs,
                 m_expireTimes.insert(shape, start + duration);
         }
         MythUIText* text = new MythUIText(subtitle, *gTextSubFont, rect,
-                                rect, this,QString("tsub%1%2").arg(x).arg(y));
+                                rect, this, QString("tsub%1%2").arg(x).arg(y));
         if (text)
             text->SetJustification(Qt::AlignCenter);
         y += height;
@@ -552,7 +554,7 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
         Qt::blue,    Qt::magenta, Qt::cyan,  Qt::white,
     };
 
-    if (!InitialiseFont() || !m_608reader)
+    if (!InitialiseFont(m_fontStretch) || !m_608reader)
         return;
 
     bool changed = false;
@@ -655,7 +657,7 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
         return;
     }
 
-    if (!Initialise708Fonts())
+    if (!Initialise708Fonts(m_fontStretch))
         return;
 
     for (uint i = 0; i < 8; i++)
@@ -906,7 +908,7 @@ void SubtitleScreen::AddScaledImage(QImage &img, QRect &pos)
     }
 }
 
-bool SubtitleScreen::InitialiseFont(void)
+bool SubtitleScreen::InitialiseFont(int fontStretch)
 {
     static bool initialised = false;
     QString font = gCoreContext->GetSetting("OSDSubFont", "FreeSans");
@@ -921,6 +923,7 @@ bool SubtitleScreen::InitialiseFont(void)
     if (mythfont)
     {
         QFont newfont(font);
+        newfont.setStretch(fontStretch);
         font.detach();
         mythfont->SetFace(newfont);
         gTextSubFont = mythfont;
@@ -934,7 +937,7 @@ bool SubtitleScreen::InitialiseFont(void)
     return true;
 }
 
-bool SubtitleScreen::Initialise708Fonts(void)
+bool SubtitleScreen::Initialise708Fonts(int fontStretch)
 {
     static bool initialised = false;
     if (initialised)
@@ -962,6 +965,7 @@ bool SubtitleScreen::Initialise708Fonts(void)
         if (mythfont)
         {
             QFont newfont(font);
+            newfont.setStretch(fontStretch);
             font.detach();
             mythfont->SetFace(newfont);
             gCC708Fonts.insert(count, mythfont);
