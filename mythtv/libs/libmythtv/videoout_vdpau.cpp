@@ -471,13 +471,13 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
     VdpVideoMixerPictureStructure field =
         VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME;
 
-    if (scan == kScan_Interlaced && m_deinterlacing)
+    if (scan == kScan_Interlaced && m_deinterlacing && frame)
     {
         field = frame->top_field_first ?
                 VDP_VIDEO_MIXER_PICTURE_STRUCTURE_TOP_FIELD :
                 VDP_VIDEO_MIXER_PICTURE_STRUCTURE_BOTTOM_FIELD;
     }
-    else if (scan == kScan_Intr2ndField && m_deinterlacing)
+    else if (scan == kScan_Intr2ndField && m_deinterlacing && frame)
     {
         field = frame->top_field_first ?
                 VDP_VIDEO_MIXER_PICTURE_STRUCTURE_BOTTOM_FIELD :
