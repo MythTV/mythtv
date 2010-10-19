@@ -4254,8 +4254,12 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                 av_init_packet(pkt);
             }
 
-            if (!ic || (av_read_frame(ic, pkt) < 0))
+            int retval;
+            if (!ic || ((retval = av_read_frame(ic, pkt)) < 0))
             {
+                if (retval == -EAGAIN)
+                    continue;
+
                 ateof = true;
                 m_parent->SetEof();
                 delete pkt;
