@@ -1,6 +1,8 @@
 #ifndef TELETEXTSCREEN_H
 #define TELETEXTSCREEN_H
 
+#include <QFont>
+
 #include "mythscreentype.h"
 #include "teletextdecoder.h"
 #include "mythplayer.h"
@@ -90,10 +92,10 @@ class TeletextMagazine
 
 class TeletextScreen: public MythScreenType, public TeletextViewer
 {
-    static bool  InitialiseFont(void);
+    static bool  InitialiseFont(int fontStretch = QFont::Unstretched);
 
   public:
-    TeletextScreen(MythPlayer *player, const char * name);
+    TeletextScreen(MythPlayer *player, const char * name, int fontStretch);
     virtual ~TeletextScreen();
 
     // MythScreenType methods
@@ -169,6 +171,7 @@ class TeletextScreen: public MythScreenType, public TeletextViewer
     TeletextMagazine m_magazines[8];
     unsigned char    m_bitswap[256];
     QHash<int, QImage*> m_rowImages;
+    int          m_fontStretch;
 
   public:
     static const QColor kColorBlack;

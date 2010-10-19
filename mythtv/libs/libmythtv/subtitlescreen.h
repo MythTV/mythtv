@@ -1,17 +1,19 @@
 #ifndef SUBTITLESCREEN_H
 #define SUBTITLESCREEN_H
 
+#include <QFont>
+
 #include "mythscreentype.h"
 #include "subtitlereader.h"
 #include "mythplayer.h"
 
 class SubtitleScreen : public MythScreenType
 {
-    static bool InitialiseFont(void);
-    static bool Initialise708Fonts(void);
+    static bool InitialiseFont(int fontStretch = QFont::Unstretched);
+    static bool Initialise708Fonts(int fontStretch = QFont::Unstretched);
 
   public:
-    SubtitleScreen(MythPlayer *player, const char * name);
+    SubtitleScreen(MythPlayer *player, const char * name, int fontStretch);
     virtual ~SubtitleScreen();
 
     void EnableSubtitles(int type);
@@ -55,6 +57,7 @@ class SubtitleScreen : public MythScreenType
     int                m_textFontZoom;
     bool               m_refreshArea;
     QHash<int,QList<MythUIType*> > m_708imageCache;
+    int                m_fontStretch;
 };
 
 #endif // SUBTITLESCREEN_H
