@@ -146,9 +146,18 @@ class databaseSearch( object ):
         self.__name__ = self.func.__name__
         self.__module__ = self.func.__module__
 
-        # process joins
+        # set defaults
+        self.table = None
+        self.handler = None
         self.require = ()
+        self.joins = ()
+
+        # pull in properties
         self.func(self, self)
+
+        # sanity check
+        if (self.table is None) or (self.handler is None):
+            raise MythError('Improperly configured databaseSearch class')
 
     def __get__(self, inst, own):
         # set instance and return self

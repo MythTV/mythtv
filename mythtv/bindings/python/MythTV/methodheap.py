@@ -665,8 +665,8 @@ class MythDB( DBCache ):
         """
 
         if init:
-            init.table = 'recorded'
-            init.handler = Recorded
+            init.table = 'oldrecorded'
+            init.handler = OldRecorded
 
         if key in ('title','subtitle','chanid',
                         'category','seriesid','programid','station',
