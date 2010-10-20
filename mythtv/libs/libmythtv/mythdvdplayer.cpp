@@ -101,7 +101,7 @@ bool MythDVDPlayer::VideoLoop(void)
     // completely drain the video buffers for certain situations
     bool release_all = player_ctx->buffer->DVD()->DVDWaitingForPlayer() &&
                       (nbframes > 0);
-    bool release_one = (nbframes > 1) && videoPaused &&
+    bool release_one = (nbframes > 1) && videoPaused && !allpaused &&
                        (!videoOutput->EnoughFreeFrames() ||
                         player_ctx->buffer->DVD()->IsWaiting() ||
                         player_ctx->buffer->DVD()->InStillFrame());
