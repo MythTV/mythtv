@@ -145,6 +145,11 @@ bool MythDVDPlayer::VideoLoop(void)
         if (player_ctx->buffer->DVD()->IsInMenu() &&
            !player_ctx->buffer->DVD()->InStillFrame())
         {
+            // ensure we refresh the pause frame
+            if (!dvd_stillframe_showing)
+                needNewPauseFrame = true;
+            RefreshPauseFrame();
+            dvd_stillframe_showing = true;
             DisplayLastFrame();
             return !IsErrored();
         }

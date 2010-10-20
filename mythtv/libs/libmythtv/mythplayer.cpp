@@ -1836,6 +1836,22 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     }
 }
 
+void MythPlayer::RefreshPauseFrame(void)
+{
+    if (needNewPauseFrame)
+    {
+        if (videoOutput->ValidVideoFrames())
+        {
+            videoOutput->UpdatePauseFrame();
+            needNewPauseFrame = false;
+        }
+        else
+        {
+            decodeOneFrame = true;
+        }
+    }
+}
+
 void MythPlayer::DisplayPauseFrame(void)
 {
     if (!videoOutput || ! videosync)
@@ -1850,18 +1866,7 @@ void MythPlayer::DisplayPauseFrame(void)
     // clear the buffering state
     buffering = false;
 
-    if (needNewPauseFrame)
-    {
-        if (videoOutput->ValidVideoFrames())
-        {
-            videoOutput->UpdatePauseFrame();
-            needNewPauseFrame = false;
-        }
-        else
-        {
-            decodeOneFrame = true;
-        }
-    }
+    RefreshPauseFrame();
 
     videofiltersLock.lock();
     videoOutput->ProcessFrame(NULL, osd, videoFilters, pip_players);
