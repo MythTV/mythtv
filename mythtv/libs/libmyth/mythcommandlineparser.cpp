@@ -146,6 +146,7 @@ bool MythCommandLineParser::PreParse(
             cerr << "Missing argument to --setverbose option\n";
             return BACKEND_EXIT_INVALID_CMDLINE;
         }
+        return true;
     }
     else if ((parseTypes & kCLPHelp) &&
              (!strcmp(argv[argpos],"-h") ||
