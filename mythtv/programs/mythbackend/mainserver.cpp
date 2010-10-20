@@ -182,8 +182,6 @@ MainServer::MainServer(bool master, int port,
     m_sched(sched), m_expirer(expirer), deferredDeleteTimer(NULL),
     autoexpireUpdateTimer(NULL), m_exitCode(BACKEND_EXIT_OK)
 {
-    AutoExpire::Update(true);
-
     PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
         PreviewGenerator::kLocalAndRemote, ~0, 0);
     PreviewGeneratorQueue::AddListener(this);
@@ -228,15 +226,17 @@ MainServer::MainServer(bool master, int port,
             SLOT(deferredDeleteSlot()));
     deferredDeleteTimer->start(30 * 1000);
 
+    if (sched)
+        sched->SetMainServer(this);
+    if (expirer)
+        expirer->SetMainServer(this);
+
     autoexpireUpdateTimer = new QTimer(this);
     connect(autoexpireUpdateTimer, SIGNAL(timeout()), this,
             SLOT(autoexpireUpdate()));
     autoexpireUpdateTimer->setSingleShot(true);
 
-    if (sched)
-        sched->SetMainServer(this);
-    if (expirer)
-        expirer->SetMainServer(this);
+    AutoExpire::Update(true);
 }
 
 MainServer::~MainServer()
