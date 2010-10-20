@@ -214,7 +214,7 @@ bool MythDVDPlayer::VideoLoop(void)
 void MythDVDPlayer::DisplayLastFrame(void)
 {
     // clear the buffering state
-    buffering = false;
+    SetBuffering(false);
 
     DisplayDVDButton();
 
