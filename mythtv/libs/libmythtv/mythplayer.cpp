@@ -1918,19 +1918,10 @@ bool MythPlayer::PrebufferEnoughFrames(bool pause_audio, int min_buffers)
     return true;
 }
 
-void MythPlayer::DisplayNormalFrame(bool allow_pause)
+void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
 {
-    if (allow_pause && (allpaused || !PrebufferEnoughFrames()))
-    {
-        // When going to switch channels
-        if (allpaused)
-        {
-            usleep(frame_interval);
-            if (player_ctx && !player_ctx->IsPIP())
-                DisplayPauseFrame();
-        }
+    if (allpaused || (check_prebuffer && !PrebufferEnoughFrames()))
         return;
-    }
 
     videoOutput->StartDisplayingFrame();
     VideoFrame *frame = videoOutput->GetLastShownFrame();
