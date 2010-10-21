@@ -3895,6 +3895,7 @@ void ProgramInfo::SubstituteMatches(QString &str)
     str.replace(QString("%RECGROUP%"), recgroup);
     str.replace(QString("%PLAYGROUP%"), playgroup);
     str.replace(QString("%CHANID%"), QString::number(chanid));
+    str.replace(QString("%ORIGINALAIRDATE%"), originalAirDate.toString(Qt::ISODate));
     static const char *time_str[] =
         { "STARTTIME", "ENDTIME", "PROGSTART", "PROGEND", };
     const QDateTime *time_dtr[] =
