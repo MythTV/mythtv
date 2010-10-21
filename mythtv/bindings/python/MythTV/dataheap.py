@@ -430,6 +430,9 @@ class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
     """
     _table = 'jobqueue'
     _logmodule = 'Python Jobqueue'
+    _defaults = {'id':None,     'inserttime':datetime.now(),
+                 'hostname':'', 'status':JOBSTATUS.QUEUED,
+                 'comment':'',  'schedruntime':datetime.now()}
 
     def __str__(self):
         if self._wheredat is None:
