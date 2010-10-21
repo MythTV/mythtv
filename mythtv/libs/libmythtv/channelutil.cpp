@@ -28,7 +28,9 @@ static uint get_dtv_multiplex(uint     db_source_id,  QString sistandard,
                               uint     transport_id,
                               // tsid exists with other sistandards,
                               // but we only trust it in dvb-land.
-                              uint     network_id)
+                              uint     network_id,
+                              // must check polarity for dvb-s
+                              signed char polarity)
 {
     QString qstr =
         "SELECT mplexid "
@@ -42,7 +44,9 @@ static uint get_dtv_multiplex(uint     db_source_id,  QString sistandard,
     {
         qstr += "AND transportid  = :TRANSPORTID ";
         qstr += "AND networkid    = :NETWORKID   ";
+        qstr += "AND polarity     = :POLARITY    ";
     }
+
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(qstr);
@@ -51,11 +55,12 @@ static uint get_dtv_multiplex(uint     db_source_id,  QString sistandard,
     query.bindValue(":SISTANDARD",        sistandard);
 
     if (sistandard.toLower() != "dvb")
-        query.bindValue(":FREQUENCY", QString::number(frequency));
+        query.bindValue(":FREQUENCY",   QString::number(frequency));
     else
     {
-        query.bindValue(":TRANSPORTID",   transport_id);
-        query.bindValue(":NETWORKID",     network_id);
+        query.bindValue(":TRANSPORTID", transport_id);
+        query.bindValue(":NETWORKID",   network_id);
+        query.bindValue(":POLARITY",    QString(polarity));
     }
 
     if (!query.exec() || !query.isActive())
@@ -89,14 +94,16 @@ static uint insert_dtv_multiplex(
     uint mplex = get_dtv_multiplex(
         db_source_id,  sistandard,    frequency,
         // DVB specific
-        transport_id,  network_id);
+        transport_id,  network_id, polarity);
 
     VERBOSE(VB_CHANSCAN, QString(
-                "insert_dtv_multiplex(%1, '%2', %3, %4, %5, %6...) mplexid:%7")
+                "insert_dtv_multiplex(db_source_id: %1, sistandard: '%2', "
+                "frequency: %3, modulation: %4, transport_id: %5, "
+                "network_id: %6, polarity: %7...) mplexid:%8")
             .arg(db_source_id).arg(sistandard)
             .arg(frequency).arg(modulation)
             .arg(transport_id).arg(network_id)
-            .arg(mplex));
+            .arg(polarity).arg(mplex));
 
     bool isDVB = (sistandard.toLower() == "dvb");
 
@@ -142,6 +149,7 @@ static uint insert_dtv_multiplex(
         "      sistandard  = :SISTANDARD    AND ";
 
     updateStr += (isDVB) ?
+        " polarity     = :WHEREPOLARITY      AND "
         " transportid = :TRANSPORTID AND networkid = :NETWORKID " :
         " frequency = :FREQUENCY2 ";
 
@@ -200,6 +208,7 @@ static uint insert_dtv_multiplex(
         {
             query.bindValue(":TRANSPORTID",   transport_id);
             query.bindValue(":NETWORKID",    network_id);
+            query.bindValue(":WHEREPOLARITY", QString(polarity));
         }
         else
         {
@@ -259,7 +268,7 @@ static uint insert_dtv_multiplex(
     mplex = get_dtv_multiplex(
         db_source_id,  sistandard,    frequency,
         // DVB specific
-        transport_id,  network_id);
+        transport_id,  network_id, polarity);
 
     VERBOSE(VB_CHANSCAN, QString("insert_dtv_multiplex -- ") +
             QString("inserted %1").arg(mplex));
