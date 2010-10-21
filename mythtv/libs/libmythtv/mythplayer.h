@@ -508,7 +508,7 @@ class MPUBLIC MythPlayer
     // Private A/V Sync Stuff
     void  WrapTimecode(int64_t &timecode, TCTypes tc_type);
     void  InitAVSync(void);
-    virtual void AVSync(bool limit_delay = false);
+    virtual void AVSync(VideoFrame *buffer, bool limit_delay = false);
     void  FallbackDeint(void);
     void  CheckExtraAudioDecode(void);
 

@@ -1638,10 +1638,20 @@ void MythPlayer::InitAVSync(void)
 
 #define MAXDIVERGE  3.0f
 #define DIVERGELIMIT 30.0f
-void MythPlayer::AVSync(bool limit_delay)
+void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
 {
+    int repeat_pict  = 0;
+    int64_t timecode = audio.GetAudioTime();
+
+    if (buffer)
+    {
+        repeat_pict = buffer->repeat_pict;
+        timecode    = buffer->timecode;
+    }
+
     float diverge = 0.0f;
     int frameDelay = m_double_framerate ? frame_interval / 2 : frame_interval;
+
     // attempt to reduce fps for standalone PIP
     if (player_ctx->IsPIP() && framesPlayed % 2)
     {
@@ -1651,12 +1661,6 @@ void MythPlayer::AVSync(bool limit_delay)
         return;
     }
 
-    VideoFrame *buffer = videoOutput->GetLastShownFrame();
-    if (!buffer)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "AVSync: No video buffer");
-        return;
-    }
     if (videoOutput->IsErrored())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "AVSync: "
@@ -1685,7 +1689,7 @@ void MythPlayer::AVSync(bool limit_delay)
         // Reset A/V Sync
         lastsync = true;
 
-        if (buffer && !using_null_videoout &&
+        if (!using_null_videoout &&
             videoOutput->hasHWAcceleration() &&
            !videoOutput->IsSyncLocked())
         {
@@ -1706,8 +1710,7 @@ void MythPlayer::AVSync(bool limit_delay)
     else if (!using_null_videoout)
     {
         // if we get here, we're actually going to do video output
-        if (buffer)
-            videoOutput->PrepareFrame(buffer, ps, osd);
+        videoOutput->PrepareFrame(buffer, ps, osd);
 
         VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, QString("AVSync waitforframe %1 %2")
                 .arg(avsync_adjustment).arg(m_double_framerate));
@@ -1737,15 +1740,14 @@ void MythPlayer::AVSync(bool limit_delay)
                 videofiltersLock.unlock();
             }
 
-            if (buffer)
-                videoOutput->PrepareFrame(buffer, ps, osd);
+            videoOutput->PrepareFrame(buffer, ps, osd);
 
             // Display the second field
             videosync->WaitForFrame(frameDelay + avsync_adjustment);
             videoOutput->Show(ps);
         }
 
-        repeat_delay = frame_interval * buffer->repeat_pict * 0.5;
+        repeat_delay = frame_interval * repeat_pict * 0.5;
 
         if (repeat_delay)
             VERBOSE(VB_TIMESTAMP, QString("A/V repeat_pict, adding %1 repeat "
@@ -1779,18 +1781,18 @@ void MythPlayer::AVSync(bool limit_delay)
                     "A/V timecodes audio %1 video %2 frameinterval %3 "
                     "avdel %4 avg %5 tcoffset %6")
                 .arg(currentaudiotime)
-                .arg(buffer->timecode)
+                .arg(timecode)
                 .arg(frame_interval)
-                .arg(buffer->timecode - currentaudiotime)
+                .arg(timecode - currentaudiotime)
                 .arg(avsync_avg)
                 .arg(tc_wrap[TC_AUDIO])
                  );
-        if (currentaudiotime != 0 && buffer->timecode != 0)
+        if (currentaudiotime != 0 && timecode != 0)
         { // currentaudiotime == 0 after a seek
             // The time at the start of this frame (ie, now) is given by
             // last->timecode
-            int delta = (int)((buffer->timecode - prevtc)/play_speed) - (frame_interval / 1000);
-            prevtc = buffer->timecode;
+            int delta = (int)((timecode - prevtc)/play_speed) - (frame_interval / 1000);
+            prevtc = timecode;
             //cerr << delta << " ";
 
             // If the timecode is off by a frame (dropped frame) wait to sync
@@ -1801,9 +1803,9 @@ void MythPlayer::AVSync(bool limit_delay)
                 // wait an extra frame interval
                 avsync_adjustment += frame_interval;
             }
-            prevrp = buffer->repeat_pict;
+            prevrp = repeat_pict;
 
-            avsync_delay = (buffer->timecode - currentaudiotime) * 1000;//usec
+            avsync_delay = (timecode - currentaudiotime) * 1000;//usec
             // prevents major jitter when pts resets during dvd title
             if (avsync_delay > 2000000 && limit_delay)
                 avsync_delay = 90000;
@@ -1945,7 +1947,7 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     videoOutput->ProcessFrame(frame, osd, videoFilters, pip_players, ps);
     videofiltersLock.unlock();
 
-    AVSync();
+    AVSync(frame, 0);
     videoOutput->DoneDisplayingFrame(frame);
 }
 

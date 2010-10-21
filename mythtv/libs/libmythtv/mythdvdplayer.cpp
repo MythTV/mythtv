@@ -211,23 +211,14 @@ void MythDVDPlayer::DisplayLastFrame(void)
     // clear the buffering state
     buffering = false;
 
-    videoOutput->StartDisplayingFrame();
-    VideoFrame *frame = videoOutput->GetLastShownFrame();
-    frame->timecode = audio.GetAudioTime();
     DisplayDVDButton();
 
-    AutoDeint(frame);
-    detect_letter_box->SwitchTo(frame);
-
-    FrameScanType ps = m_scan;
-    if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
-        ps = kScan_Progressive;
-
     videofiltersLock.lock();
-    videoOutput->ProcessFrame(frame, osd, videoFilters, pip_players, ps);
+    videoOutput->ProcessFrame(NULL, osd, videoFilters, pip_players,
+                              kScan_Progressive);
     videofiltersLock.unlock();
 
-    AVSync();
+    AVSync(NULL, true);
 }
 
 bool MythDVDPlayer::FastForward(float seconds)
@@ -383,9 +374,9 @@ void MythDVDPlayer::ChangeSpeed(void)
         player_ctx->buffer->DVD()->SetDVDSpeed();
 }
 
-void MythDVDPlayer::AVSync(bool limit_delay)
+void MythDVDPlayer::AVSync(VideoFrame *frame, bool limit_delay)
 {
-    MythPlayer::AVSync(true);
+    MythPlayer::AVSync(frame, true);
 }
 
 long long MythDVDPlayer::CalcMaxFFTime(long long ff, bool setjump) const
