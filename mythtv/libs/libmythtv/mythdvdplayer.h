@@ -14,10 +14,6 @@ class MythDVDPlayer : public MythPlayer
     virtual void ReleaseNextVideoFrame(VideoFrame *buffer, int64_t timecode,
                                        bool wrap = true);
 
-    // Public Closed caption and teletext stuff
-    virtual void DisableCaptions(uint mode, bool osd_msg=true); // FIXME - protect
-    virtual void EnableCaptions(uint mode, bool osd_msg=true);  // FIXME - protect
-
     // Add data
     virtual bool PrepareAudioSample(int64_t &timecode);
 
@@ -83,6 +79,10 @@ class MythDVDPlayer : public MythPlayer
     virtual bool FastForward(float seconds);
     virtual bool Rewind(float seconds);
     virtual bool JumpToFrame(uint64_t frame);
+
+    // Private Closed caption and teletext stuff
+    virtual void DisableCaptions(uint mode, bool osd_msg=true);
+    virtual void EnableCaptions(uint mode, bool osd_msg=true);
 
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
     virtual int  SetTrack(uint type, int trackNo);

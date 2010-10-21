@@ -202,7 +202,6 @@ class MPUBLIC MythPlayer
     bool    HasTVChainNext(void) const;
 
     // Non-const gets
-    OSD         *GetOSD(void)                 { return osd; } // FIXME - protect
     VideoOutput *getVideoOutput(void)         { return videoOutput; }
     virtual char *GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
                                        int &buflen, int &vw, int &vh, float &ar);
@@ -260,12 +259,9 @@ class MPUBLIC MythPlayer
     CC608Reader* GetCC608Reader(void)  { return &cc608; }
     SubtitleReader* GetSubReader(void) { return &subReader; }
 
-    void SetCaptionsEnabled(bool, bool osd_msg=true);           // FIXME - protect
-    virtual void DisableCaptions(uint mode, bool osd_msg=true); // FIXME - protect
-    virtual void EnableCaptions(uint mode, bool osd_msg=true);  // FIXME - protect
-
-    // Public Audio/Subtitle/EIA-608/EIA-708 stream selection
+    // Public Audio/Subtitle/EIA-608/EIA-708 stream selection - thread safe
     void TracksChanged(uint trackType);
+    void EnableSubtitles(bool enable);
 
     // Public MHEG/MHI stream selection
     bool SetAudioByComponentTag(int tag);
@@ -331,6 +327,7 @@ class MPUBLIC MythPlayer
     MuteState IncrMuteState(void)           { return audio.IncrMuteState();      }
 
     // Non-const gets
+    OSD         *GetOSD(void) { return osd; }
     virtual void SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
                                    bool absolute);
 
@@ -418,6 +415,9 @@ class MPUBLIC MythPlayer
     bool ToggleCaptions(void);
     bool ToggleCaptions(uint mode);
     bool HasTextSubtitles(void)        { return subReader.HasTextSubtitles(); }
+    void SetCaptionsEnabled(bool, bool osd_msg=true);
+    virtual void DisableCaptions(uint mode, bool osd_msg=true);
+    virtual void EnableCaptions(uint mode, bool osd_msg=true);
 
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
     QStringList GetTracks(uint type);
@@ -633,7 +633,8 @@ class MPUBLIC MythPlayer
     /// This allows us to enable captions/subtitles later if the streams
     /// are not immediately available when the video starts playing.
     bool      textDesired;
-    bool      tracksChanged;
+    bool      enableCaptions;
+    bool      disableCaptions;
     bool      initTeletext;
 
     // CC608/708

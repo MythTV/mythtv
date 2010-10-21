@@ -2162,13 +2162,13 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             if (captionmode == kDisplayAVSubtitle &&
                 (trackNo < 0 || trackNo >= trackcount))
             {
-                m_parent->SetCaptionsEnabled(false, false);
+                m_parent->EnableSubtitles(false);
             }
             else if (trackNo >= 0 && trackNo < trackcount &&
                     !ringBuffer->InDVDMenuOrStillFrame())
             {
                     SetTrack(kTrackTypeSubtitle, trackNo);
-                    m_parent->SetCaptionsEnabled(true, false);
+                    m_parent->EnableSubtitles(true);
             }
         }
     }

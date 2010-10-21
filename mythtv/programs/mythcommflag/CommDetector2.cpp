@@ -542,7 +542,7 @@ bool CommDetector2::go(void)
         return false;
     }
 
-    player->SetCaptionsEnabled(false);
+    player->EnableSubtitles(false);
 
     QTime totalFlagTime;
     totalFlagTime.start();
