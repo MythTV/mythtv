@@ -200,7 +200,7 @@ MythPlayer::MythPlayer(bool muted)
       m_scan_tracker(0),            m_scan_initialized(false),
       keyframedist(30),             noVideoTracks(false),
       // Prebuffering
-      buffering(false), buffering_start(),
+      buffering(false),
       // General Caption/Teletext/Subtitle support
       textDisplayMode(kDisplayNone),
       prevTextDisplayMode(kDisplayNone),
@@ -1864,7 +1864,7 @@ void MythPlayer::DisplayPauseFrame(void)
     }
 
     // clear the buffering state
-    buffering = false;
+    SetBuffering(false);
 
     RefreshPauseFrame();
 
@@ -1877,24 +1877,33 @@ void MythPlayer::DisplayPauseFrame(void)
     videosync->Start();
 }
 
+void MythPlayer::SetBuffering(bool new_buffering, bool pause_audio)
+{
+    if (!buffering && new_buffering)
+    {
+        VERBOSE(VB_PLAYBACK, LOC + "Waiting for video buffers...");
+        buffering = true;
+        audio.Pause(pause_audio);
+        buffering_start = QTime::currentTime();
+    }
+    else if (buffering && !new_buffering)
+    {
+        buffering = false;
+        audio.Pause(false);
+    }
+}
+
 bool MythPlayer::PrebufferEnoughFrames(bool pause_audio, int min_buffers)
 {
     if (!videoOutput)
         return false;
 
-    bool was_buffering = buffering;
     if (!(min_buffers ? (videoOutput->ValidVideoFrames() >= min_buffers) :
                         (videoOutput->hasHWAcceleration() ?
                             videoOutput->EnoughPrebufferedFrames() :
                             videoOutput->EnoughDecodedFrames())))
     {
-        if (!buffering)
-        {
-            VERBOSE(VB_PLAYBACK, LOC + "Waiting for video buffers...");
-            buffering = true;
-            audio.Pause(pause_audio);
-            buffering_start = QTime::currentTime();
-        }
+        SetBuffering(true, pause_audio);
         usleep(frame_interval >> 3);
         int waited_for = buffering_start.msecsTo(QTime::currentTime());
         if ((waited_for & 100) == 100)
@@ -1922,9 +1931,8 @@ bool MythPlayer::PrebufferEnoughFrames(bool pause_audio, int min_buffers)
             videosync->Start();
         return false;
     }
-    buffering = false;
-    if (was_buffering)
-        audio.Pause(false);
+
+    SetBuffering(false);
     return true;
 }
 
@@ -1934,7 +1942,7 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
         return;
 
     // clear the buffering state
-    buffering = false;
+    SetBuffering(false);
 
     videoOutput->StartDisplayingFrame();
     VideoFrame *frame = videoOutput->GetLastShownFrame();
