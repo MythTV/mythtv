@@ -373,6 +373,7 @@ class MPUBLIC MythPlayer
     void JumpChapter(int chapter);
 
     // Playback
+    void         RefreshPauseFrame(void);
     virtual void DisplayPauseFrame(void);
     virtual void DisplayNormalFrame(bool check_prebuffer = true);
     virtual void PreProcessNormalFrame(void);
