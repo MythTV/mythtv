@@ -618,7 +618,7 @@ class DBDataCRef( DBDataRef ):
         rfields = list(db.tablefields[cls._table[0]])
         crfields = list(db.tablefields[cls._table[1]])
 
-        for f in cls._ref+[cls._cref[-1]]:
+        for f in cls._ref+cls._cref[:1]:
             if f in rfields:
                 rfields.remove(f)
         if cls._cref[-1] in crfields:
