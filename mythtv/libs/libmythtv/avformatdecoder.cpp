@@ -902,7 +902,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     }
     if (ringBuffer->isDVD())
     {
-        ringBuffer->DVD()->StartFromBeginning();
+        if (!ringBuffer->DVD()->StartFromBeginning())
+            return -1;
         ringBuffer->DVD()->IgnoreStillOrWait(false);
     }
     if (ret < 0)

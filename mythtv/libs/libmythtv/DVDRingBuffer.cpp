@@ -234,16 +234,34 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
     }
 }
 
-void DVDRingBufferPriv::StartFromBeginning(void)
+bool DVDRingBufferPriv::StartFromBeginning(void)
 {
-    if (m_dvdnav)
+    if (!m_dvdnav)
+        return false;
+
+    VERBOSE(VB_IMPORTANT, LOC + "Resetting DVD device.");
+
+    // if a DVDNAV_STOP event has been emitted, dvdnav_reset does not
+    // seem to restore the state, hence we need to re-create
+    if (m_gotStop)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Resetting DVD device.");
-        QMutexLocker lock(&m_seekLock);
-        dvdnav_reset(m_dvdnav);
-        dvdnav_title_play(m_dvdnav, 0);
-        m_audioStreamsChanged = true;
+        VERBOSE(VB_IMPORTANT, LOC +
+                "DVD errored after initial scan - trying again");
+        CloseDVD();
+        m_gotStop = false;
+        OpenFile(m_dvdFilename);
+        if (!m_dvdnav)
+        {
+            VERBOSE(VB_IMPORTANT, LOC + "Failed to re-open DVD.");
+            return false;
+        }
     }
+
+    QMutexLocker lock(&m_seekLock);
+    dvdnav_reset(m_dvdnav);
+    dvdnav_title_play(m_dvdnav, 0);
+    m_audioStreamsChanged = true;
+    return true;
 }
 
 /** \brief returns current position in the PGC.
