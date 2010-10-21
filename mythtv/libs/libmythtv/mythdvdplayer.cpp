@@ -251,6 +251,20 @@ void MythDVDPlayer::EventStart(void)
 {
     if (player_ctx->buffer->DVD())
         player_ctx->buffer->DVD()->SetParent(this);
+
+    player_ctx->LockPlayingInfo(__FILE__, __LINE__);
+    if (player_ctx->playingInfo)
+    {
+        QString name;
+        QString serialid;
+        if (player_ctx->playingInfo->GetTitle().isEmpty() &&
+            player_ctx->buffer->DVD()->GetNameAndSerialNum(name, serialid))
+        {
+            player_ctx->playingInfo->SetTitle(name);
+        }
+    }
+    player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+
     MythPlayer::EventStart();
 }
 
