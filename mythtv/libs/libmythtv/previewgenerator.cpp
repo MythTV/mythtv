@@ -611,7 +611,11 @@ bool PreviewGenerator::LocalPreviewRun(void)
     {
         captime = programInfo.QueryBookmark();
         if (captime > 0)
+        {
             timeInSeconds = false;
+            VERBOSE(VB_IMPORTANT,
+                    QString("Preview from bookmark (frame %1)").arg(captime));
+        }
         else
             captime = -1;
     }
@@ -645,6 +649,8 @@ bool PreviewGenerator::LocalPreviewRun(void)
         if (captime < 0)
             captime = 600;
         captime += preroll;
+        VERBOSE(VB_IMPORTANT, QString("Preview at calculated offset "
+                                      "(%1 seconds)").arg(captime));
     }
 
     width = height = sz = 0;
