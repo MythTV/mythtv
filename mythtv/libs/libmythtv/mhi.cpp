@@ -78,7 +78,7 @@ bool MHIContext::LoadFont(QString name)
     if (!errorA)
         return true;
 
-    QString fullnameB = GetShareDir() + "fonts/" + name;
+    QString fullnameB = GetFontsDir() + name;
     QByteArray fnameB = fullnameB.toAscii();
     FT_Error errorB = FT_New_Face(ft_library, fnameB.constData(), 0, &m_face);
     if (!errorB)
