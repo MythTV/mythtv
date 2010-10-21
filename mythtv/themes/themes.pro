@@ -14,8 +14,8 @@ themes.files += Terra defaultmenu mediacentermenu
 themes.files += MythCenter MythCenter-wide
 themes.files += mythuitheme.dtd
 
-fonts.path = $${PREFIX}/share/mythtv/fonts
-fonts.files = FreeSans.ttf FreeSansBold.ttf FreeMono.ttf
+fonts.path = $${PREFIX}/share/mythtv/
+fonts.files = fonts
 
 INSTALLS += themes fonts
 
