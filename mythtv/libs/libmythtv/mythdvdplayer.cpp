@@ -208,6 +208,9 @@ bool MythDVDPlayer::VideoLoop(void)
 
 void MythDVDPlayer::DisplayLastFrame(void)
 {
+    // clear the buffering state
+    buffering = false;
+
     videoOutput->StartDisplayingFrame();
     VideoFrame *frame = videoOutput->GetLastShownFrame();
     frame->timecode = audio.GetAudioTime();
