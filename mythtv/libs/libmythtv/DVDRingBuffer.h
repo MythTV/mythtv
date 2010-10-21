@@ -88,7 +88,7 @@ class MPUBLIC DVDRingBufferPriv
     bool OpenFile(const QString &filename);
     void PlayTitleAndPart(int _title, int _part)
         { dvdnav_part_play(m_dvdnav, _title, _part); }
-    void StartFromBeginning(void);
+    bool StartFromBeginning(void);
     void CloseDVD(void);
     bool nextTrack(void);
     void prevTrack(void);
