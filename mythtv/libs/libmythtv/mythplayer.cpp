@@ -208,7 +208,8 @@ MythPlayer::MythPlayer(bool muted)
       vbimode(VBIMode::None),
       ttPageNum(0x888),
       // Support for captions, teletext, etc. decoded by libav
-      textDesired(false), tracksChanged(false), initTeletext(false),
+      textDesired(false), enableCaptions(false), disableCaptions(false),
+      initTeletext(false),
       // CC608/708
       db_prefer708(true), cc608(this), cc708(this),
       // MHEG/MHI Interactive TV visible in OSD
@@ -1420,7 +1421,7 @@ void MythPlayer::SetupTeletextViewer(void)
 
 void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
 {
-    tracksChanged = false;
+    enableCaptions = disableCaptions = false;
     uint origMode = textDisplayMode;
 
     textDesired = enable;
@@ -1504,8 +1505,16 @@ void MythPlayer::TracksChanged(uint trackType)
     if (trackType >= kTrackTypeSubtitle &&
         trackType <= kTrackTypeTeletextCaptions && textDesired)
     {
-        tracksChanged = true;
+        enableCaptions = true;
     }
+}
+
+void MythPlayer::EnableSubtitles(bool enable)
+{
+    if (enable)
+        enableCaptions = true;
+    else
+        disableCaptions = true;
 }
 
 int MythPlayer::GetTrack(uint type)
@@ -2482,8 +2491,10 @@ void MythPlayer::EventLoop(void)
         ReinitOSD();
 
     // reselect subtitle tracks if triggered by the decoder
-    if (tracksChanged)
+    if (enableCaptions)
         SetCaptionsEnabled(true, false);
+    if (disableCaptions)
+        SetCaptionsEnabled(false, false);
 
     // (re)initialise the teletext viewer
     if (initTeletext)
