@@ -50,7 +50,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
                      QString tmptable, Scheduler *master_sched) :
     recordTable(tmptable),
     priorityTable("powerpriority"),
-    reclist_lock(NULL),
+    schedLock(),
     reclist_changed(false),
     specsched(master_sched),
     schedMoveHigher(false),
@@ -91,8 +91,6 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
 
     fsInfoCacheFillTime = QDateTime::currentDateTime().addSecs(-1000);
 
-    reclist_lock = new QMutex(QMutex::Recursive);
-
     if (runthread)
     {
         int err = pthread_create(&schedThread, NULL, SchedulerThread, this);
@@ -127,8 +125,6 @@ Scheduler::~Scheduler()
         pthread_cancel(schedThread);
         pthread_join(schedThread, NULL);
     }
-
-    delete reclist_lock;
 }
 
 void Scheduler::SetMainServer(MainServer *ms)
@@ -214,6 +210,7 @@ bool Scheduler::VerifyCards(void)
 static inline bool Recording(const RecordingInfo *p)
 {
     return (p->GetRecordingStatus() == rsRecording ||
+            p->GetRecordingStatus() == rsTuning ||
             p->GetRecordingStatus() == rsWillRecord);
 }
 
@@ -289,8 +286,10 @@ static QDateTime schedTime;
 
 static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
 {
-    int arec = (a->GetRecordingStatus() != rsRecording);
-    int brec = (b->GetRecordingStatus() != rsRecording);
+    int arec = (a->GetRecordingStatus() != rsRecording &&
+                a->GetRecordingStatus() != rsTuning);
+    int brec = (b->GetRecordingStatus() != rsRecording &&
+                b->GetRecordingStatus() != rsTuning);
 
     if (arec != brec)
         return arec < brec;
@@ -337,13 +336,15 @@ static bool comp_timechannel(RecordingInfo *a, RecordingInfo *b)
     return a->GetChanNum() < b->GetChanNum();
 }
 
-bool Scheduler::FillRecordList(void)
+bool Scheduler::FillRecordList(bool doLock)
 {
     schedMoveHigher = (bool)gCoreContext->GetNumSetting("SchedMoveHigher");
     schedTime = QDateTime::currentDateTime();
 
     VERBOSE(VB_SCHEDULE, "BuildWorkList...");
     BuildWorkList();
+    if (doLock)
+        schedLock.unlock();
     VERBOSE(VB_SCHEDULE, "AddNewRecords...");
     AddNewRecords();
     VERBOSE(VB_SCHEDULE, "AddNotListed...");
@@ -364,6 +365,8 @@ bool Scheduler::FillRecordList(void)
     SchedPreserveLiveTV();
     VERBOSE(VB_SCHEDULE, "ClearListMaps...");
     ClearListMaps();
+    if (doLock)
+        schedLock.lock();
 
     VERBOSE(VB_SCHEDULE, "Sort by time...");
     SORT_RECLIST(worklist, comp_redundant);
@@ -423,7 +426,7 @@ void Scheduler::FillRecordListFromDB(int recordid)
                  (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
 
     gettimeofday(&fillstart, NULL);
-    FillRecordList();
+    FillRecordList(false);
     gettimeofday(&fillend, NULL);
     placeTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
                  (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
@@ -449,7 +452,7 @@ void Scheduler::FillRecordListFromMaster(void)
     bool dummy;
     LoadFromScheduler(schedList, dummy);
 
-    QMutexLocker lockit(reclist_lock);
+    QMutexLocker lockit(&schedLock);
 
     RecordingList::iterator it = schedList.begin();
     for (; it != schedList.end(); ++it)
@@ -519,7 +522,7 @@ void Scheduler::PrintRec(const RecordingInfo *p, const char *prefix)
 
 void Scheduler::UpdateRecStatus(RecordingInfo *pginfo)
 {
-    QMutexLocker lockit(reclist_lock);
+    QMutexLocker lockit(&schedLock);
 
     RecIter dreciter = reclist.begin();
     for (; dreciter != reclist.end(); ++dreciter)
@@ -529,9 +532,27 @@ void Scheduler::UpdateRecStatus(RecordingInfo *pginfo)
         {
             if (p->GetRecordingStatus() != pginfo->GetRecordingStatus())
             {
+                VERBOSE(VB_IMPORTANT, 
+                    QString("Updating status for %1 on cardid %2 (%3 => %4)")
+                        .arg(p->toString(ProgramInfo::kTitleSubtitle))
+                        .arg(p->GetCardID())
+                        .arg(toString(p->GetRecordingStatus(), 
+                                      p->GetRecordingRuleType()))
+                        .arg(toString(pginfo->GetRecordingStatus(), 
+                                      p->GetRecordingRuleType())));
+                bool resched = 
+                    ((p->GetRecordingStatus() != rsRecording &&
+                      p->GetRecordingStatus() != rsTuning) ||
+                     (pginfo->GetRecordingStatus() != rsRecording &&
+                      pginfo->GetRecordingStatus() != rsTuning));
                 p->SetRecordingStatus(pginfo->GetRecordingStatus());
                 reclist_changed = true;
-                p->AddHistory(true);
+                p->AddHistory(false);
+                if (resched)
+                {
+                    reschedQueue.enqueue(0);
+                    reschedWait.wakeOne();
+                }
             }
             return;
         }
@@ -543,7 +564,7 @@ void Scheduler::UpdateRecStatus(uint cardid, uint chanid,
                                 RecStatusType recstatus,
                                 const QDateTime &recendts)
 {
-    QMutexLocker lockit(reclist_lock);
+    QMutexLocker lockit(&schedLock);
 
     RecIter dreciter = reclist.begin();
     for (; dreciter != reclist.end(); ++dreciter)
@@ -556,9 +577,27 @@ void Scheduler::UpdateRecStatus(uint cardid, uint chanid,
 
             if (p->GetRecordingStatus() != recstatus)
             {
+                VERBOSE(VB_IMPORTANT, 
+                    QString("Updating status for %1 on cardid %2 (%3 => %4)")
+                        .arg(p->toString(ProgramInfo::kTitleSubtitle))
+                        .arg(p->GetCardID())
+                        .arg(toString(p->GetRecordingStatus(), 
+                                      p->GetRecordingRuleType()))
+                        .arg(toString(recstatus, 
+                                      p->GetRecordingRuleType())));
+                bool resched = 
+                    ((p->GetRecordingStatus() != rsRecording &&
+                      p->GetRecordingStatus() != rsTuning) ||
+                     (recstatus != rsRecording &&
+                      recstatus != rsTuning));
                 p->SetRecordingStatus(recstatus);
                 reclist_changed = true;
-                p->AddHistory(true);
+                p->AddHistory(false);
+                if (resched)
+                {
+                    reschedQueue.enqueue(0);
+                    reschedWait.wakeOne();
+                }
             }
             return;
         }
@@ -567,7 +606,7 @@ void Scheduler::UpdateRecStatus(uint cardid, uint chanid,
 
 bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
 {
-    QMutexLocker lockit(reclist_lock);
+    QMutexLocker lockit(&schedLock);
 
     if (reclist_changed)
         return false;
@@ -623,7 +662,7 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
 
 void Scheduler::SlaveConnected(RecordingList &slavelist)
 {
-    QMutexLocker lockit(reclist_lock);
+    QMutexLocker lockit(&schedLock);
 
     RecordingList::iterator it = slavelist.begin();
     for (; it != slavelist.end(); ++it)
@@ -644,14 +683,14 @@ void Scheduler::SlaveConnected(RecordingList &slavelist)
                 if (sp->GetCardID() == rp->GetCardID())
                 {
                     found = true;
-                    rp->SetRecordingStatus(rsRecording);
+                    rp->SetRecordingStatus(sp->GetRecordingStatus());
                     reclist_changed = true;
                     rp->AddHistory(false);
-                    VERBOSE(VB_IMPORTANT, QString("setting %1/%2/\"%3\" as "
-                                                  "recording")
+                    VERBOSE(VB_IMPORTANT, QString("setting %1/%2/\"%3\" as %4")
                             .arg(sp->GetCardID())
                             .arg(sp->GetChannelSchedulingID())
-                            .arg(sp->GetTitle()));
+                            .arg(sp->GetTitle())
+                            .arg(toUIState(sp->GetRecordingStatus())));
                 }
                 else
                 {
@@ -664,7 +703,8 @@ void Scheduler::SlaveConnected(RecordingList &slavelist)
                 }
             }
             else if (sp->GetCardID() == rp->GetCardID() &&
-                     rp->GetRecordingStatus() == rsRecording)
+                     (rp->GetRecordingStatus() == rsRecording ||
+                      rp->GetRecordingStatus() == rsTuning))
             {
                 rp->SetRecordingStatus(rsAborted);
                 reclist_changed = true;
@@ -691,7 +731,7 @@ void Scheduler::SlaveConnected(RecordingList &slavelist)
 
 void Scheduler::SlaveDisconnected(uint cardid)
 {
-    QMutexLocker lockit(reclist_lock);
+    QMutexLocker lockit(&schedLock);
 
     RecIter ri = reclist.begin();
     for ( ; ri != reclist.end(); ++ri)
@@ -699,7 +739,8 @@ void Scheduler::SlaveDisconnected(uint cardid)
         RecordingInfo *rp = *ri;
 
         if (rp->GetCardID() == cardid &&
-            rp->GetRecordingStatus() == rsRecording)
+            (rp->GetRecordingStatus() == rsRecording ||
+             rp->GetRecordingStatus() == rsTuning))
         {
             rp->SetRecordingStatus(rsAborted);
             reclist_changed = true;
@@ -713,22 +754,20 @@ void Scheduler::SlaveDisconnected(uint cardid)
 
 void Scheduler::BuildWorkList(void)
 {
-    QMutexLocker lockit(reclist_lock);
     reclist_changed = false;
 
     RecIter i = reclist.begin();
     for (; i != reclist.end(); ++i)
     {
         RecordingInfo *p = *i;
-        if (p->GetRecordingStatus() == rsRecording)
+        if (p->GetRecordingStatus() == rsRecording ||
+            p->GetRecordingStatus() == rsTuning)
             worklist.push_back(new RecordingInfo(*p));
     }
 }
 
 bool Scheduler::ClearWorkList(void)
 {
-    QMutexLocker lockit(reclist_lock);
-
     RecordingInfo *p;
 
     if (reclist_changed)
@@ -806,6 +845,7 @@ void Scheduler::BuildListMaps(void)
     {
         RecordingInfo *p = *i;
         if (p->GetRecordingStatus() == rsRecording ||
+            p->GetRecordingStatus() == rsTuning ||
             p->GetRecordingStatus() == rsWillRecord ||
             p->GetRecordingStatus() == rsUnknown)
         {
@@ -1024,7 +1064,8 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
 {
     PrintRec(p, "     >");
 
-    if (p->GetRecordingStatus() == rsRecording)
+    if (p->GetRecordingStatus() == rsRecording ||
+        p->GetRecordingStatus() == rsTuning)
         return false;
 
     RecList *showinglist = &titlelistmap[p->GetTitle()];
@@ -1171,7 +1212,8 @@ void Scheduler::SchedNewRecords(void)
     while (i != worklist.end())
     {
         RecordingInfo *p = *i;
-        if (p->GetRecordingStatus() == rsRecording)
+        if (p->GetRecordingStatus() == rsRecording ||
+            p->GetRecordingStatus() == rsTuning)
             MarkOtherShowings(p);
         else if (p->GetRecordingStatus() == rsUnknown)
         {
@@ -1304,6 +1346,7 @@ void Scheduler::PruneRedundants(void)
         // Delete anything that has already passed since we can't
         // change history, can we?
         if (p->GetRecordingStatus() != rsRecording &&
+            p->GetRecordingStatus() != rsTuning &&
             p->GetScheduledEndTime() < schedTime &&
             p->GetRecordingEndTime() < schedTime)
         {
@@ -1441,7 +1484,7 @@ void Scheduler::getConflicting(RecordingInfo *pginfo, QStringList &strlist)
 
 void Scheduler::getConflicting(RecordingInfo *pginfo, RecList *retlist)
 {
-    QMutexLocker lockit(reclist_lock);
+    QMutexLocker lockit(&schedLock);
 
     RecConstIter i = reclist.begin();
     for (; FindNextConflict(reclist, pginfo, i); ++i)
@@ -1451,9 +1494,9 @@ void Scheduler::getConflicting(RecordingInfo *pginfo, RecList *retlist)
     }
 }
 
-bool Scheduler::getAllPending(RecList *retList) const
+bool Scheduler::getAllPending(RecList *retList)
 {
-    QMutexLocker lockit(reclist_lock);
+    QMutexLocker lockit(&schedLock);
 
     bool hasconflicts = false;
 
@@ -1470,31 +1513,33 @@ bool Scheduler::getAllPending(RecList *retList) const
     return hasconflicts;
 }
 
-QMap<QString,ProgramInfo*> Scheduler::GetRecording(void) const
+QMap<QString,ProgramInfo*> Scheduler::GetRecording(void)
 {
-    QMutexLocker lockit(reclist_lock);
+    QMutexLocker lockit(&schedLock);
 
     QMap<QString,ProgramInfo*> recMap;
     RecConstIter it = reclist.begin();
     for (; it != reclist.end(); ++it)
     {
-        if (rsRecording == (*it)->GetRecordingStatus())
+        if (rsRecording == (*it)->GetRecordingStatus() ||
+            rsTuning == (*it)->GetRecordingStatus())
             recMap[(*it)->MakeUniqueKey()] = new ProgramInfo(**it);
     }
 
     return recMap;
 }
 
-RecStatusType Scheduler::GetRecStatus(const ProgramInfo &pginfo) const
+RecStatusType Scheduler::GetRecStatus(const ProgramInfo &pginfo)
 {
-    QMutexLocker lockit(reclist_lock);
+    QMutexLocker lockit(&schedLock);
 
     for (RecConstIter it = reclist.begin(); it != reclist.end(); ++it)
     {
         if (pginfo.IsSameRecording(**it))
         {
-            return (rsRecording == (**it).GetRecordingStatus()) ?
-                rsRecording : pginfo.GetRecordingStatus();
+            return (rsRecording == (**it).GetRecordingStatus() ||
+                    rsTuning == (**it).GetRecordingStatus()) ?
+                (**it).GetRecordingStatus() : pginfo.GetRecordingStatus();
         }
     }
 
@@ -1537,7 +1582,7 @@ void Scheduler::getAllScheduled(QStringList &strList)
 
 void Scheduler::Reschedule(int recordid)
 {
-    QMutexLocker locker(&reschedLock);
+    QMutexLocker locker(&schedLock);
 
     if (recordid == -1)
         reschedQueue.clear();
@@ -1550,7 +1595,7 @@ void Scheduler::Reschedule(int recordid)
 
 void Scheduler::AddRecording(const RecordingInfo &pi)
 {
-    QMutexLocker lockit(reclist_lock);
+    QMutexLocker lockit(&schedLock);
 
     VERBOSE(VB_GENERAL, LOC +
             QString("AddRecording() recid: %1")
@@ -1584,7 +1629,8 @@ void Scheduler::AddRecording(const RecordingInfo &pi)
     new_pi->GetRecordingRule();
 
     // Trigger reschedule..
-    ScheduledRecording::signalChange(pi.GetRecordingRuleID());
+    reschedQueue.enqueue(pi.GetRecordingRuleID());
+    reschedWait.wakeOne();
 }
 
 bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
@@ -1632,7 +1678,7 @@ void Scheduler::RunScheduler(void)
 {
     int prerollseconds = 0;
     int wakeThreshold = gCoreContext->GetNumSetting("WakeUpThreshold", 300);
-    int secsleft = 0;
+    int secsleft;
     EncoderLink *nexttv = NULL;
 
     RecordingInfo *nextRecording = NULL;
@@ -1642,8 +1688,6 @@ void Scheduler::RunScheduler(void)
     QDateTime curtime;
     QDateTime lastupdate = QDateTime::currentDateTime().addDays(-1);
     QDateTime lastSleepCheck = QDateTime::currentDateTime().addDays(-1);
-
-    RecIter startIter = reclist.begin();
 
     bool blockShutdown = gCoreContext->GetNumSetting("blockSDWUwithoutClient", 1);
     QDateTime idleSince = QDateTime();
@@ -1662,16 +1706,22 @@ void Scheduler::RunScheduler(void)
     // if possible, after the slaves connect and we start scheduling.
     MSqlQuery query(dbConn);
     query.prepare("UPDATE oldrecorded SET recstatus = :RSABORTED "
-                  "  WHERE recstatus = :RSRECORDING");
+                  "  WHERE recstatus = :RSRECORDING OR recstatus = :RSTUNING");
     query.bindValue(":RSABORTED", rsAborted);
     query.bindValue(":RSRECORDING", rsRecording);
+    query.bindValue(":RSTUNING", rsTuning);
     if (!query.exec())
         MythDB::DBError("UpdateAborted", query);
 
     // wait for slaves to connect
     sleep(3);
 
-    Reschedule(-1);
+    QMutexLocker lockit(&schedLock);
+
+    reschedQueue.clear();
+    reschedQueue.enqueue(-1);
+
+    RecIter startIter = reclist.begin();
 
     while (1)
     {
@@ -1680,16 +1730,17 @@ void Scheduler::RunScheduler(void)
 
         if ((startIter != reclist.end() &&
              curtime.secsTo((*startIter)->GetRecordingStartTime()) < 30))
+        {
+            schedLock.unlock();
             sleep(1);
+            schedLock.lock();
+        }
         else
         {
-            reschedLock.lock();
             if (reschedQueue.empty())
-                reschedWait.wait(&reschedLock, 1000);
-            bool queue_empty = reschedQueue.empty();
-            reschedLock.unlock();
+                reschedWait.wait(&schedLock, 1000);
 
-            if (!queue_empty)
+            if (!reschedQueue.empty())
             {
                 // We might have been inactive for a long time, so make
                 // sure our DB connection is fresh before continuing.
@@ -1698,11 +1749,9 @@ void Scheduler::RunScheduler(void)
                 gettimeofday(&fillstart, NULL);
                 QString msg;
 
-                reschedLock.lock();
                 while (!reschedQueue.empty())
                 {
                     int recordid = reschedQueue.dequeue();
-                    reschedLock.unlock();
 
                     VERBOSE(VB_GENERAL,
                             QString("Reschedule requested for id %1.")
@@ -1711,19 +1760,15 @@ void Scheduler::RunScheduler(void)
                     if (recordid != 0)
                     {
                         if (recordid == -1)
-                        {
-                            reschedLock.lock();
                             reschedQueue.clear();
-                            reschedLock.unlock();
-                        }
 
-                        QMutexLocker locker(&recordmatchLock);
+                        schedLock.unlock();
+                        recordmatchLock.lock();
                         UpdateMatches(recordid);
+                        recordmatchLock.unlock();
+                        schedLock.lock();
                     }
-
-                    reschedLock.lock();
                 }
-                reschedLock.unlock();
 
                 gettimeofday(&fillend, NULL);
 
@@ -1731,7 +1776,7 @@ void Scheduler::RunScheduler(void)
                              (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
 
                 gettimeofday(&fillstart, NULL);
-                bool worklistused = FillRecordList();
+                bool worklistused = FillRecordList(true);
                 gettimeofday(&fillend, NULL);
                 if (worklistused)
                 {
@@ -1741,7 +1786,7 @@ void Scheduler::RunScheduler(void)
                 else
                 {
                     VERBOSE(VB_GENERAL, "Reschedule interrupted, will retry");
-                    Reschedule(0);
+                    reschedQueue.enqueue(0);;
                     continue;
                 }
 
@@ -1880,7 +1925,7 @@ void Scheduler::RunScheduler(void)
 
                 if (!WakeUpSlave(nexttv->GetHostName()))
                 {
-                    Reschedule(0);
+                    reschedQueue.enqueue(0);;
                     continue;
                 }
             }
@@ -1894,7 +1939,7 @@ void Scheduler::RunScheduler(void)
                         .arg(nexttv->GetHostName()));
                 if (!WakeUpSlave(nexttv->GetHostName(), false))
                 {
-                    Reschedule(0);
+                    reschedQueue.enqueue(0);;
                     continue;
                 }
             }
@@ -1918,7 +1963,7 @@ void Scheduler::RunScheduler(void)
                         enc->SetSleepStatus(sStatus_Undefined);
                 }
 
-                Reschedule(0);
+                reschedQueue.enqueue(0);;
             }
         }
 
@@ -1929,37 +1974,34 @@ void Scheduler::RunScheduler(void)
 
             nextRecording = *recIter;
 
-            if (nextRecording->GetRecordingStatus() != rsTuning)
+            if (nextRecording->GetRecordingStatus() != rsWillRecord)
             {
-                if (nextRecording->GetRecordingStatus() != rsWillRecord)
-                {
-                    if (nextRecording->GetRecordingStatus() !=
-                        nextRecording->oldrecstatus &&
-                        nextRecording->GetRecordingStartTime() <= curtime)
-                        nextRecording->AddHistory(false);
-                    continue;
-                }
-
-                nextrectime = nextRecording->GetRecordingStartTime();
-                secsleft = curtime.secsTo(nextrectime);
-                schedid = nextRecording->MakeUniqueSchedulerKey();
-
-                if (secsleft - prerollseconds < 60)
-                {
-                    if (!recPendingList.contains(schedid))
-                    {
-                        recPendingList[schedid] = false;
-
-                        livetvTime = (livetvTime < nextrectime) ?
-                                     nextrectime : livetvTime;
-
-                        Reschedule(0);
-                    }
-                }
-
-                if (secsleft - prerollseconds > 35)
-                    break;
+                if (nextRecording->GetRecordingStatus() !=
+                    nextRecording->oldrecstatus &&
+                    nextRecording->GetRecordingStartTime() <= curtime)
+                    nextRecording->AddHistory(false);
+                continue;
             }
+
+            nextrectime = nextRecording->GetRecordingStartTime();
+            secsleft = curtime.secsTo(nextrectime);
+            schedid = nextRecording->MakeUniqueSchedulerKey();
+
+            if (secsleft - prerollseconds < 60)
+            {
+                if (!recPendingList.contains(schedid))
+                {
+                    recPendingList[schedid] = false;
+
+                    livetvTime = (livetvTime < nextrectime) ?
+                                 nextrectime : livetvTime;
+
+                    reschedQueue.enqueue(0);
+                }
+            }
+
+            if (secsleft - prerollseconds > 35)
+                break;
 
             if (m_tvList->find(nextRecording->GetCardID()) == m_tvList->end())
             {
@@ -1968,9 +2010,9 @@ void Scheduler::RunScheduler(void)
                       .arg(nextRecording->GetTitle());
                 VERBOSE(VB_GENERAL, msg);
 
-                QMutexLocker lockit(reclist_lock);
                 nextRecording->SetRecordingStatus(rsTunerBusy);
-                nextRecording->AddHistory(true);
+                nextRecording->AddHistory(false);
+                reschedQueue.enqueue(0);
                 statuschanged = true;
                 continue;
             }
@@ -1979,138 +2021,101 @@ void Scheduler::RunScheduler(void)
             // cerr << "nexttv = " << nextRecording->GetCardID();
             // cerr << " title: " << nextRecording->GetTitle() << endl;
 
-            if (nextRecording->GetRecordingStatus() != rsTuning)
+            if (nexttv->IsTunerLocked())
             {
-                if (nexttv->IsTunerLocked())
-                {
-                    msg = QString("SUPPRESSED recording \"%1\" on channel: "
-                                  "%2 on cardid: %3, sourceid %4. Tuner "
-                                  "is locked by an external application.")
-                          .arg(nextRecording->GetTitle())
-                          .arg(nextRecording->GetChanID())
-                          .arg(nextRecording->GetCardID())
-                          .arg(nextRecording->GetSourceID());
-                    QByteArray amsg = msg.toLocal8Bit();
-                    VERBOSE(VB_GENERAL, msg.constData());
+                msg = QString("SUPPRESSED recording \"%1\" on channel: "
+                              "%2 on cardid: %3, sourceid %4. Tuner "
+                              "is locked by an external application.")
+                      .arg(nextRecording->GetTitle())
+                      .arg(nextRecording->GetChanID())
+                      .arg(nextRecording->GetCardID())
+                      .arg(nextRecording->GetSourceID());
+                QByteArray amsg = msg.toLocal8Bit();
+                VERBOSE(VB_GENERAL, msg.constData());
 
-                    QMutexLocker lockit(reclist_lock);
-                    nextRecording->SetRecordingStatus(rsTunerBusy);
-                    nextRecording->AddHistory(true);
-                    statuschanged = true;
-                    continue;
-                }
-
-                if (!IsBusyRecording(nextRecording))
-                {
-                    // Will use pre-roll settings only if no other
-                    // program is currently being recorded
-                    secsleft -= prerollseconds;
-                }
-
-                //VERBOSE(VB_GENERAL, secsleft << " seconds until " << nextRecording->GetTitle());
-
-                if (secsleft > 30)
-                    continue;
-
-                if (nexttv->IsWaking())
-                {
-                    if (secsleft > 0)
-                    {
-                        VERBOSE(VB_SCHEDULE,
-                                QString("WARNING: Slave Backend %1 has NOT come "
-                                        "back from sleep yet.  Recording can "
-                                        "not begin yet for: %2")
-                                .arg(nexttv->GetHostName())
-                                .arg(nextRecording->GetTitle()));
-                    }
-                    else if (nexttv->GetLastWakeTime().secsTo(curtime) > 300)
-                    {
-                        VERBOSE(VB_SCHEDULE,
-                                QString("WARNING: Slave Backend %1 has NOT come "
-                                        "back from sleep yet. Setting slave "
-                                        "status to unknown and attempting "
-                                        "to reschedule around its tuners.")
-                                .arg(nexttv->GetHostName()));
-
-                        QMap<int, EncoderLink *>::Iterator enciter =
-                            m_tvList->begin();
-                        for (; enciter != m_tvList->end(); ++enciter)
-                        {
-                            EncoderLink *enc = *enciter;
-                            if (enc->GetHostName() == nexttv->GetHostName())
-                                enc->SetSleepStatus(sStatus_Undefined);
-                        }
-
-                        Reschedule(0);
-                    }
-
-                    continue;
-                }
-
-                if (nextRecording->GetPathname().isEmpty())
-                {
-                    QMutexLocker lockit(reclist_lock);
-                    QString recording_dir;
-                    fsID = FillRecordingDir(
-                                            nextRecording->GetTitle(),
-                                            nextRecording->GetHostname(),
-                                            nextRecording->GetStorageGroup(),
-                                            nextRecording->GetRecordingStartTime(),
-                                            nextRecording->GetRecordingEndTime(),
-                                            nextRecording->GetCardID(),
-                                            recording_dir,
-                                            reclist);
-                    nextRecording->SetPathname(recording_dir);
-                }
-
-                if (!recPendingList[schedid])
-                {
-                    nexttv->RecordPending(nextRecording, max(secsleft, 0),
-                                          hasLaterList.contains(schedid));
-                    recPendingList[schedid] = true;
-                }
-
-                if (secsleft > -2)
-                    continue;
-
-                QDateTime recstartts = mythCurrentDateTime().addSecs(30);
-                recstartts.setTime
-                    (QTime(recstartts.time().hour(), recstartts.time().minute()));
-                nextRecording->SetRecordingStartTime(recstartts);
-            } // if (nextRecording->GetRecordingStatus() != rsTuning)
-
-            if (schedulingEnabled && nexttv->IsConnected())
-            {
-                RecStatusTypes recStatus;
-
-                if (nextRecording->GetRecordingStatus() == rsWillRecord)
-                {
-                    recStatus = nexttv->StartRecording(nextRecording);
-                    nextRecording->AddHistory(false);
-                    if (expirer)
-                    {
-                        // activate auto expirer
-                        expirer->Update(nextRecording->GetCardID(), fsID, true);
-                    }
-                }
-                else
-                    recStatus = nexttv->GetRecordingStatus();
-
-                nextRecording->SetRecordingStatus(recStatus);
-                if (recStatus == rsTuning)
-                    continue;
+                nextRecording->SetRecordingStatus(rsTunerBusy);
+                nextRecording->AddHistory(false);
+                reschedQueue.enqueue(0);
+                statuschanged = true;
+                continue;
             }
-            else
-                nextRecording->SetRecordingStatus(rsOffLine);
 
-            bool doSchedAfterStart =
-                nextRecording->GetRecordingStatus() != rsRecording ||
-                schedAfterStartMap[nextRecording->GetRecordingRuleID()] ||
-                (nextRecording->GetParentRecordingRuleID() &&
-                 schedAfterStartMap[nextRecording->GetParentRecordingRuleID()]);
-            nextRecording->AddHistory(doSchedAfterStart);
+            if (!IsBusyRecording(nextRecording))
+            {
+                // Will use pre-roll settings only if no other
+                // program is currently being recorded
+                secsleft -= prerollseconds;
+            }
 
-            statuschanged = true;
+            //VERBOSE(VB_GENERAL, secsleft << " seconds until " << nextRecording->GetTitle());
+
+            if (secsleft > 30)
+                continue;
+
+            if (nexttv->IsWaking())
+            {
+                if (secsleft > 0)
+                {
+                    VERBOSE(VB_SCHEDULE,
+                            QString("WARNING: Slave Backend %1 has NOT come "
+                                    "back from sleep yet.  Recording can "
+                                    "not begin yet for: %2")
+                            .arg(nexttv->GetHostName())
+                            .arg(nextRecording->GetTitle()));
+                }
+                else if (nexttv->GetLastWakeTime().secsTo(curtime) > 300)
+                {
+                    VERBOSE(VB_SCHEDULE,
+                            QString("WARNING: Slave Backend %1 has NOT come "
+                                    "back from sleep yet. Setting slave "
+                                    "status to unknown and attempting "
+                                    "to reschedule around its tuners.")
+                            .arg(nexttv->GetHostName()));
+
+                    QMap<int, EncoderLink *>::Iterator enciter =
+                        m_tvList->begin();
+                    for (; enciter != m_tvList->end(); ++enciter)
+                    {
+                        EncoderLink *enc = *enciter;
+                        if (enc->GetHostName() == nexttv->GetHostName())
+                            enc->SetSleepStatus(sStatus_Undefined);
+                    }
+
+                    reschedQueue.enqueue(0);
+                }
+
+                continue;
+            }
+
+            if (nextRecording->GetPathname().isEmpty())
+            {
+                QString recording_dir;
+                fsID = FillRecordingDir(
+                                        nextRecording->GetTitle(),
+                                        nextRecording->GetHostname(),
+                                        nextRecording->GetStorageGroup(),
+                                        nextRecording->GetRecordingStartTime(),
+                                        nextRecording->GetRecordingEndTime(),
+                                        nextRecording->GetCardID(),
+                                        recording_dir,
+                                        reclist);
+                nextRecording->SetPathname(recording_dir);
+            }
+
+            if (!recPendingList[schedid])
+            {
+                nexttv->RecordPending(nextRecording, max(secsleft, 0),
+                                      hasLaterList.contains(schedid));
+                recPendingList[schedid] = true;
+            }
+
+            if (secsleft > -2)
+                continue;
+
+            QDateTime recstartts = mythCurrentDateTime().addSecs(30);
+            recstartts.setTime
+                (QTime(recstartts.time().hour(), recstartts.time().minute()));
+            nextRecording->SetRecordingStartTime(recstartts);
 
             details = QString("%1: channel %2 on cardid %3, sourceid %4")
                       .arg(nextRecording->toString(ProgramInfo::kTitleSubtitle))
@@ -2118,7 +2123,35 @@ void Scheduler::RunScheduler(void)
                       .arg(nextRecording->GetCardID())
                       .arg(nextRecording->GetSourceID());
 
-            bool is_rec = (nextRecording->GetRecordingStatus() == rsRecording);
+            if (schedulingEnabled && nexttv->IsConnected())
+            {
+                nextRecording->SetRecordingStatus
+                    (nexttv->StartRecording(nextRecording));
+                nextRecording->SetReactivated(false);
+
+                nextRecording->AddHistory(false);
+                if (expirer)
+                {
+                    // activate auto expirer
+                    expirer->Update(nextRecording->GetCardID(), fsID, true);
+                }
+            }
+            else
+                nextRecording->SetRecordingStatus(rsOffLine);
+            bool doSchedAfterStart =
+                (nextRecording->GetRecordingStatus() != rsRecording &&
+                 nextRecording->GetRecordingStatus() != rsTuning) ||
+                schedAfterStartMap[nextRecording->GetRecordingRuleID()] ||
+                (nextRecording->GetParentRecordingRuleID() &&
+                 schedAfterStartMap[nextRecording->GetParentRecordingRuleID()]);
+            nextRecording->AddHistory(false);
+            if (doSchedAfterStart)
+                reschedQueue.enqueue(0);
+
+            statuschanged = true;
+
+            bool is_rec = (nextRecording->GetRecordingStatus() == rsRecording ||
+                           nextRecording->GetRecordingStatus() == rsTuning);
             msg = is_rec ?
                   QString("Started recording") :
                   QString("Canceled recording (%1)")
@@ -2445,6 +2478,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
         RecordingInfo *pginfo = *recIter;
 
         if ((pginfo->GetRecordingStatus() != rsRecording) &&
+            (pginfo->GetRecordingStatus() != rsTuning) &&
             (pginfo->GetRecordingStatus() != rsWillRecord))
             continue;
 
@@ -3848,7 +3882,7 @@ static bool comp_storage_disk_io(FileSystemInfo *a, FileSystemInfo *b)
 
 void Scheduler::GetNextLiveTVDir(uint cardid)
 {
-    QMutexLocker lockit(reclist_lock);
+    QMutexLocker lockit(&schedLock);
 
     EncoderLink *tv = (*m_tvList)[cardid];
 
