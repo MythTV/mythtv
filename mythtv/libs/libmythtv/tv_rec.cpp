@@ -3657,7 +3657,8 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
         if (request.flags & kFlagCloseRec)
             FinishedRecording(lastTuningRequest.program);
 
-        if (HasFlags(kFlagRecorderRunning))
+        if (HasFlags(kFlagRecorderRunning) ||
+            (curRecording && curRecording->GetRecordingStatus() == rsFailed))
         {
             stateChangeLock.unlock();
             TeardownRecorder(request.flags & kFlagKillRec);
