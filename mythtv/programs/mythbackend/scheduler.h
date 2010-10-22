@@ -54,9 +54,9 @@ class Scheduler : public QObject
                          const QDateTime &startts, RecStatusType recstatus,
                          const QDateTime &recendts);
 
-    bool getAllPending(RecList *retList) const;
+    bool getAllPending(RecList *retList);
     void getAllPending(QStringList &strList);
-    QMap<QString,ProgramInfo*> GetRecording(void) const;
+    QMap<QString,ProgramInfo*> GetRecording(void);
 
     void getAllScheduled(QStringList &strList);
 
@@ -80,7 +80,7 @@ class Scheduler : public QObject
 
     bool WasStartedAutomatically();
 
-    RecStatusType GetRecStatus(const ProgramInfo &pginfo) const;
+    RecStatusType GetRecStatus(const ProgramInfo &pginfo);
 
     int GetError(void) const { return error; }
 
@@ -94,7 +94,7 @@ class Scheduler : public QObject
 
     bool VerifyCards(void);
 
-    bool FillRecordList(void);
+    bool FillRecordList(bool doLock);
     void UpdateMatches(int recordid);
     void UpdateManuals(int recordid);
     void BuildWorkList(void);
@@ -149,7 +149,7 @@ class Scheduler : public QObject
     void FillDirectoryInfoCache(bool force = false);
 
     MythDeque<int> reschedQueue;
-    QMutex reschedLock;
+    QMutex schedLock;
     QMutex recordmatchLock;
     QWaitCondition reschedWait;
     RecList reclist;
@@ -160,7 +160,6 @@ class Scheduler : public QObject
     QMap<QString, RecList> titlelistmap;
     InputGroupMap igrp;
 
-    QMutex *reclist_lock;
     bool reclist_changed;
 
     bool specsched;
