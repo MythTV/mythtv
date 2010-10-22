@@ -622,8 +622,9 @@ void MythPlayer::ReinitOSD(void)
 #ifdef USING_MHEG
         if (GetInteractiveTV())
         {
+            QMutexLocker locker(&itvLock);
             total = videoOutput->GetMHEGBounds();
-            GetInteractiveTV()->Reinit(total);
+            interactiveTV->Reinit(total);
             itvVisible = false;
         }
 #endif // USING_MHEG
@@ -1977,7 +1978,7 @@ void MythPlayer::PreProcessNormalFrame(void)
 {
 #ifdef USING_MHEG
     // handle Interactive TV
-    if (GetInteractiveTV() && decoder)
+    if (GetInteractiveTV())
     {
         QMutexLocker locker(&itvLock);
 
@@ -2014,8 +2015,9 @@ void MythPlayer::VideoStart(void)
 #ifdef USING_MHEG
         if (GetInteractiveTV())
         {
+            QMutexLocker locker(&itvLock);
             total = videoOutput->GetMHEGBounds();
-            GetInteractiveTV()->Reinit(total);
+            interactiveTV->Reinit(total);
         }
 #endif // USING_MHEG
 
@@ -4385,28 +4387,27 @@ InteractiveTV *MythPlayer::GetInteractiveTV(void)
 {
 #ifdef USING_MHEG
     if (!interactiveTV && osd && itvEnabled)
+    {
+        QMutexLocker locker(&itvLock);
         interactiveTV = new InteractiveTV(this);
+    }
 #endif // USING_MHEG
     return interactiveTV;
 }
 
 bool MythPlayer::ITVHandleAction(const QString &action)
 {
+    bool result = false;
+
 #ifdef USING_MHEG
     if (!GetInteractiveTV())
-        return false;
+        return result;
 
-    QMutexLocker locker(&decoder_change_lock);
-
-    if (decoder)
-    {
-        QMutexLocker locker(&itvLock);
-        if (GetInteractiveTV())
-            return interactiveTV->OfferKey(action);
-    }
+    QMutexLocker locker(&itvLock);
+    result = interactiveTV->OfferKey(action);
 #endif // USING_MHEG
 
-    return false;
+    return result;
 }
 
 /** \fn MythPlayer::ITVRestart(uint chanid, uint cardid, bool isLive)
@@ -4415,20 +4416,12 @@ bool MythPlayer::ITVHandleAction(const QString &action)
 void MythPlayer::ITVRestart(uint chanid, uint cardid, bool isLiveTV)
 {
 #ifdef USING_MHEG
-    QMutexLocker locker(&decoder_change_lock);
-
-    OSD *osd = GetOSD();
-    if (!decoder || !osd)
+    if (!GetInteractiveTV())
         return;
 
-    {
-        QMutexLocker locker(&itvLock);
-        if (GetInteractiveTV())
-        {
-            interactiveTV->Restart(chanid, cardid, isLiveTV);
-            itvVisible = false;
-        }
-    }
+    QMutexLocker locker(&itvLock);
+    interactiveTV->Restart(chanid, cardid, isLiveTV);
+    itvVisible = false;
 #endif // USING_MHEG
 }
 
