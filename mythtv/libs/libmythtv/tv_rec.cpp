@@ -3866,18 +3866,12 @@ void TVRec::TuningFrequency(const TuningRequest &request)
  */
 MPEGStreamData *TVRec::TuningSignalCheck(void)
 {
-    pendingRecLock.lock();
-    if (m_recStatus == rsTuning && signalMonitor->IsTuned())
-    {
-        // Channel has been changed.
-        // Note: SM could still be running waiting for a valid signal
-        m_recStatus = rsRecording;
-    }
-    pendingRecLock.unlock();
-
     if (signalMonitor->IsAllGood())
     {
         VERBOSE(VB_RECORD, LOC + "Got good signal");
+        pendingRecLock.lock();
+        m_recStatus = rsRecording;
+        pendingRecLock.unlock();
     }
     else if (signalMonitor->IsErrored())
     {
@@ -3898,6 +3892,14 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
     }
     else
         return NULL;
+
+    MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
+                 .arg(curRecording->GetCardID())
+                 .arg(curRecording->GetChanID())
+                 .arg(curRecording->GetScheduledStartTime(ISODate))
+                 .arg(m_recStatus)
+                 .arg(curRecording->GetRecordingEndTime(ISODate)));
+    gCoreContext->dispatch(me);
 
     // grab useful data from DTV signal monitor before we kill it...
     MPEGStreamData *streamData = NULL;
