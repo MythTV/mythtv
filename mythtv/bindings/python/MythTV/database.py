@@ -773,7 +773,7 @@ class DBCache( MythSchema ):
         def __iter__(self): return self.iterkeys()
         def __init__(self, db, log):
             OrdDict.__init__(self)
-            self._db = db
+            self._db = weakref.proxy(db)
             self._log = log
 
         def __getitem__(self,key):
@@ -872,7 +872,7 @@ class DBCache( MythSchema ):
         def __iter__(self): return self.iterkeys()
         def __init__(self, db, log):
             OrdDict.__init__(self)
-            self._db = db
+            self._db = weakref.proxy(db)
             self._log = log
 
         def __getitem__(self, key):
