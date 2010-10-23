@@ -83,6 +83,10 @@ class OrdDict( dict ):
                 pass
         return c
 
+    def clear(self):
+        dict.clear(self)
+        self._field_order = []
+
 class DictData( OrdDict ):
     """
     DictData.__init__(raw) --> DictData object
