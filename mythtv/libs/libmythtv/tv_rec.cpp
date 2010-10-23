@@ -3893,13 +3893,16 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
     else
         return NULL;
 
-    MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
-                 .arg(curRecording->GetCardID())
-                 .arg(curRecording->GetChanID())
-                 .arg(curRecording->GetScheduledStartTime(ISODate))
-                 .arg(m_recStatus)
-                 .arg(curRecording->GetRecordingEndTime(ISODate)));
-    gCoreContext->dispatch(me);
+    if (curRecording)
+    {
+        MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
+                    .arg(curRecording->GetCardID())
+                    .arg(curRecording->GetChanID())
+                    .arg(curRecording->GetScheduledStartTime(ISODate))
+                    .arg(m_recStatus)
+                    .arg(curRecording->GetRecordingEndTime(ISODate)));
+        gCoreContext->dispatch(me);
+    }
 
     // grab useful data from DTV signal monitor before we kill it...
     MPEGStreamData *streamData = NULL;
