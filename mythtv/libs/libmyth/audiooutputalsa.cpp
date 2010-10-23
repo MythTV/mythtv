@@ -238,6 +238,7 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
         if ((err = snd_pcm_hw_params_any(pcm_handle, params)) < 0)
         {
             AERROR("No playback configurations available");
+            snd_pcm_close(pcm_handle);
             pcm_handle = NULL;
             delete settings;
             return NULL;
