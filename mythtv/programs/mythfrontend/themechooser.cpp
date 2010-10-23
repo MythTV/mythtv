@@ -5,6 +5,7 @@
 // Qt headers
 #include <QCoreApplication>
 #include <QThreadPool>
+#include <QRegExp>
 
 // MythTV headers
 #include "mythverbose.h"
@@ -29,6 +30,7 @@
 
 // Use this to determine what directories to look in on the download site
 extern const char *myth_source_path;
+extern const char *myth_binary_version;
 
 /*!
 * \class RemoteFileDownloadThread
@@ -138,12 +140,17 @@ bool ThemeChooser::Create(void)
 
 void ThemeChooser::Load(void)
 {
-    QStringList parts = QString(myth_source_path).split("/");
-    QString MythVersion = parts[parts.size() - 1];
+    QString MythVersion = myth_source_path;
     QStringList themesSeen;
     QDir themes(GetConfDir() + "/themes");
     themes.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
     themes.setSorting(QDir::Name | QDir::IgnoreCase);
+
+    if (MythVersion != "trunk")
+    {
+        MythVersion = myth_binary_version; // Example: 0.25.20101017-1
+        MythVersion.replace(QRegExp("\\.[0-9]{8,}.*"), "");
+    }
 
     m_infoList = themes.entryInfoList();
 
