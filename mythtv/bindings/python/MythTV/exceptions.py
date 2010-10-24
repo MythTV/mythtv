@@ -156,20 +156,20 @@ class MythFileError( MythError ):
         if args[0] == self.FILE_ERROR:
             self.ename = 'FILE_ERROR'
             self.ecode, self.reason = args
-            self.args = ("Error accessing file: " % self.reason,)
+            self.args = ("Error accessing file: %s" % self.reason,)
         elif args[0] == self.FILE_FAILED_READ:
             self.ename = 'FILE_FAILED_READ'
             self.ecode, self.file = args
-            self.args = ("Error accessing %s" %(self.file,self.mode),)
+            self.args = ("Error accessing '%s'" % self.file,)
         elif args[0] == self.FILE_FAILED_WRITE:
             self.ename = 'FILE_FAILED_WRITE'
             self.ecode, self.file, self.reason = args
-            self.args = ("Error writing to %s, %s" % \
+            self.args = ("Error writing to '%s', %s" % \
                     (self.file, self.reason),)
         elif args[0] == self.FILE_FAILED_SEEK:
             self.ename = 'FILE_FAILED_SEEK'
             self.ecode, self.file, self.offset, self.whence = args
-            self.args = ("Error seeking %s to %d,%d" % \
+            self.args = ("Error seeking '%s' to %d,%d" % \
                     (self.file, self.offset, self.whence),)
         MythError.__init__(self, *args)
 
