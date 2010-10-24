@@ -301,14 +301,14 @@ class FileTransfer( BEEvent ):
 
         def announce(self):
             if self.mode == 'r':
-                write = False
+                cmd = 'ANN FileTransfer %s 0 0 2000'
             elif self.mode == 'w':
-                write = True
+                cmd = 'ANN FileTransfer %s 1'
 
-            res = self.backendCommand('ANN FileTransfer %s %d %d %s' \
-                      % (self.localname, write, False,
-                         BACKEND_SEP.join(
-                                ['2000', self.filename, self.sgroup])))
+            res = self.backendCommand(
+                    BACKEND_SEP.join([cmd % self.localname,
+                                      self.filename,
+                                      self.sgroup]))
             if res.split(BACKEND_SEP)[0] != 'OK':
                 raise MythBEError(MythError.PROTO_ANNOUNCE,
                                   self.host, self.port, res)
@@ -913,6 +913,7 @@ class Program( DictData, RECSTATUS, AUDIO_PROPS, VIDEO_PROPS, \
                     'category','recgroup','playgroup','parentid','findid',
                     'recstatus','rectype'):
             cmd = cmd.replace('%%%s%%' % tag.upper(), str(self[tag]))
+        cmd = cmd.replace('%ORIGINALAIRDATE%', self.airdate.isoformat())
         for (tag, data) in (('STARTTIME','recstartts'),('ENDTIME','recendts'),
                             ('PROGSTART','starttime'),('PROGEND','endtime')):
             t = self[data]

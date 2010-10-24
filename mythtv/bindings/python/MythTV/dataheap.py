@@ -452,6 +452,44 @@ class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
         self.status = status
         self.update()
 
+    @classmethod
+    def fromRecorded(cls, rec, type, status=None, schedruntime=None,
+                               hostname=None, args=None, flags=None):
+        job = cls(db=rec._db)
+        job.chanid = rec.chanid
+        job.starttime = rec.starttime
+        if status:
+            job.status = status
+        if schedruntime:
+            job.schedruntime = schedruntime
+        if hostname:
+            job.hostname = hostname
+        if args:
+            job.args = args
+        if flags:
+            job.flags = flags
+        job.create()
+
+    @classmethod
+    def fromProgram(cls, prog, type, status=None, schedruntime=None,
+                                hostname=None, args=None, flags=None);
+        if prog.rectype != prog.rsRecorded:
+            raise MythError('Invalid recording type for Job.')
+        job = cls(db=prog._db)
+        job.chanid = prog.chanid
+        job.starttime = prog.recstartts
+        if status:
+            job.status = status
+        if schedruntime:
+            job.schedruntime = schedruntime
+        if hostname:
+            job.hostname = hostname
+        if args:
+            job.args = args
+        if flags:
+            job.flags = flags
+        job.create()
+
 class Channel( DBDataWrite ):
     """Channel(chanid=None, db=None) -> Channel object"""
     _defaults = {'icon':'none',          'videofilters':'',  'callsign':u'',

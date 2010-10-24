@@ -343,6 +343,13 @@ class MythBE( FileOps ):
         except ValueError:
             return None
 
+    def clearSettings(self):
+        """
+        Triggers an event to clear the settings cache on all active systems.
+        """
+        self.backendCommand('MESSAGE%sCLEAR_SETTINGS_CACHE' % BACKEND_SEP)
+        self.db.settings.clear()
+
 class BEEventMonitor( BEEvent ):
     def _listhandlers(self):
         return [self.eventMonitor]
