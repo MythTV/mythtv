@@ -1061,7 +1061,7 @@ class MusicDirectory( MusicSchema, DBDataWrite ):
     def fromPath(cls, path, db=None):
         db = MythDB(db)
         c = db.cursor()
-        count = c.execute("""SELECT * FROM %s WHERE path=%s""" \
+        count = c.execute("""SELECT * FROM %s WHERE path=%%s""" \
                                     % cls._table, path)
         if count > 1:
             raise MythDBError('Multiple matches for MusicDirectory.fromPath')
