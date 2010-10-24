@@ -472,7 +472,7 @@ class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
 
     @classmethod
     def fromProgram(cls, prog, type, status=None, schedruntime=None,
-                                hostname=None, args=None, flags=None);
+                                hostname=None, args=None, flags=None):
         if prog.rectype != prog.rsRecorded:
             raise MythError('Invalid recording type for Job.')
         job = cls(db=prog._db)
