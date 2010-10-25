@@ -1,4 +1,4 @@
-#ifndef BD_RING_BUFFER_H_
+	#ifndef BD_RING_BUFFER_H_
 #define BD_RING_BUFFER_H_
 
 #define BD_BLOCK_SIZE 6144LL
@@ -28,7 +28,7 @@ class MPUBLIC BDRingBufferPriv
 
     uint32_t GetNumTitles(void) const { return m_numTitles; }
     int      GetCurrentTitle(void) const;
-    uint64_t GetCurrentAngle(void) const { return m_currentAngle; };
+    uint64_t GetCurrentAngle(void) const { return m_currentAngle; }
     int      GetTitleDuration(int title) const;
     // Get the size in bytes of the current title (playlist item).
     uint64_t GetTitleSize(void) const { return m_titlesize; }
@@ -38,11 +38,11 @@ class MPUBLIC BDRingBufferPriv
     uint64_t GetReadPosition(void);
     uint64_t GetTotalReadPosition(void);
     uint32_t GetNumChapters(void);
-    uint64_t GetNumAngles(void) { return m_currentTitleAngleCount; };
+    uint64_t GetNumAngles(void) { return m_currentTitleAngleCount; }
     uint64_t GetChapterStartTime(uint32_t chapter);
     uint64_t GetChapterStartFrame(uint32_t chapter);
-    bool IsOpen(void)        const { return bdnav; };
-    bool IsHDMVNavigation(void) const { return m_is_hdmv_navigation; };
+    bool IsOpen(void)        const { return bdnav; }
+    bool IsHDMVNavigation(void) const { return m_is_hdmv_navigation; }
 
     void GetDescForPos(QString &desc) const;
     double GetFrameRate(void);
