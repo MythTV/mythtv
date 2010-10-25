@@ -345,11 +345,11 @@
     </message>
     <message>
         <source>Show Unknown File Types</source>
-        <translation type="obsolete">Visualizar ficheros de tipo desconocido</translation>
+        <translation type="obsolete">Visualizar archivos de tipo desconocido</translation>
     </message>
     <message>
         <source>If set, all files below the Myth Video directory will be displayed unless their extension is explicitly set to be ignored. </source>
-        <translation type="obsolete">Si esta activo, todos los ficheros por debajo del directorio de MythVideo serán visualizados excepto los que tengan una extensión que explícitamente los oculte.</translation>
+        <translation type="obsolete">Si esta activo, todos los archivos por debajo del directorio de MythVideo serán visualizados excepto los que tengan una extensión que explícitamente los oculte.</translation>
     </message>
     <message>
         <source>Player Settings</source>
@@ -375,11 +375,11 @@
     </message>
     <message>
         <source>Newly scanned files are browsable by default</source>
-        <translation type="obsolete">Los ficheros nuevos son listados por defecto</translation>
+        <translation type="obsolete">Los archivos nuevos son listados por defecto</translation>
     </message>
     <message>
         <source>If set, newly scanned files in the Video Manager will be marked as browsable and will appear in the &apos;Browse&apos; menu.</source>
-        <translation type="obsolete">Si está activado, los nuevos ficheros serán marcados como listables y aparecerán en el menú &apos;Navegación&apos;.</translation>
+        <translation type="obsolete">Si está activado, los nuevos archivos serán marcados como listables y aparecerán en el menú &apos;Navegación&apos;.</translation>
     </message>
     <message>
         <source>Command to search for movie listings</source>
@@ -438,7 +438,7 @@
     </message>
     <message>
         <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
-        <translation type="obsolete">Este es el comando usado para cualquier fichero cuya extensión no esté específicamente definida. También puedes ingresar el nombre de uno de los plugins internos como &apos;Internal&apos;.</translation>
+        <translation type="obsolete">Este es el comando usado para cualquier archivo cuya extensión no esté específicamente definida. También puedes ingresar el nombre de uno de los plugins internos como &apos;Internal&apos;.</translation>
     </message>
     <message>
         <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
@@ -502,7 +502,7 @@
     <message>
         <location filename="../mythvideo/videofilter.cpp" line="812"/>
         <source>Filename</source>
-        <translation>Nombre del fichero</translation>
+        <translation>Nombre del archivo</translation>
     </message>
     <message>
         <location filename="../mythvideo/videofilter.cpp" line="814"/>
@@ -2064,7 +2064,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="181"/>
         <source>File Paths and general options</source>
-        <translation>Ruta de Ficheros y opciones generales</translation>
+        <translation>Ruta de archivos y opciones generales</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="182"/>
@@ -2544,7 +2544,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3737"/>
         <source>Failed to delete file</source>
-        <translation>No se puedo borrar el fichero</translation>
+        <translation>No se puedo borrar el archivo</translation>
     </message>
     <message>
         <source>%1 download finished: %2 %3</source>
@@ -2591,11 +2591,11 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <name>VideoScannerThread</name>
     <message>
         <source>Searching for video files</source>
-        <translation type="obsolete">Buscando ficheros de video</translation>
+        <translation type="obsolete">Buscando archivos de video</translation>
     </message>
     <message>
         <source>Verifying video files</source>
-        <translation type="obsolete">Verificando ficheros de video</translation>
+        <translation type="obsolete">Verificando archivos de video</translation>
     </message>
     <message>
         <source>Updating video database</source>
