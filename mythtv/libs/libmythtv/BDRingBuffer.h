@@ -16,6 +16,8 @@
  *   A class to allow a RingBuffer to read from BDs.
  */
 
+extern "C" void HandleOverlayCallback(void*, const bd_overlay_s*);
+
 class NuppelVideoPlayer;
 
 class MPUBLIC BDRingBufferPriv
@@ -39,7 +41,8 @@ class MPUBLIC BDRingBufferPriv
     uint64_t GetNumAngles(void) { return m_currentTitleAngleCount; };
     uint64_t GetChapterStartTime(uint32_t chapter);
     uint64_t GetChapterStartFrame(uint32_t chapter);
-    bool IsOpen(void)        const { return bdnav; }
+    bool IsOpen(void)        const { return bdnav; };
+    bool IsHDMVNavigation(void) const { return m_is_hdmv_navigation; };
 
     void GetDescForPos(QString &desc) const;
     double GetFrameRate(void);
@@ -58,12 +61,13 @@ class MPUBLIC BDRingBufferPriv
     int  safe_read(void *data, unsigned sz);
     uint64_t Seek(uint64_t pos);
 
+    void HandleBDEvent(BD_EVENT *event);
+
     // navigation
     void PressButton(int32_t key, int64_t pts);
 
   protected:
     BLURAY            *bdnav;
-    bd_overlay_proc_f  m_overlay;
     bool               m_is_hdmv_navigation;
     BD_EVENT          *m_currentEvent;
     uint32_t           m_numTitles;
