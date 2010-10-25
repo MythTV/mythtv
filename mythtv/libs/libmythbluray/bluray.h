@@ -370,6 +370,32 @@ uint64_t bd_tell(BLURAY *bd);
 uint64_t bd_tell_time(BLURAY *bd);
 
 /*
+ * Disc info
+ */
+
+typedef struct {
+    uint8_t  bluray_detected;
+
+    uint8_t  first_play_supported;
+    uint8_t  top_menu_supported;
+
+    uint32_t num_hdmv_titles;
+    uint32_t num_bdj_titles;
+    uint32_t num_unsupported_titles;
+
+    uint8_t  aacs_detected;
+    uint8_t  libaacs_detected;
+    uint8_t  aacs_handled;
+
+    uint8_t  bdplus_detected;
+    uint8_t  libbdplus_detected;
+    uint8_t  bdplus_handled;
+
+} BLURAY_DISC_INFO;
+
+const BLURAY_DISC_INFO *bd_get_disc_info(BLURAY*);
+
+/*
  * player settings
  */
 

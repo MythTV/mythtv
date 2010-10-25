@@ -365,6 +365,7 @@ static void _user_input(GRAPHICS_CONTROLLER *gc, bd_vk_key_e key, GC_NAV_CMDS *c
     if (!page) {
         ERROR("_user_input(): unknown page id %d (have %d pages)\n",
               page_id, s->ics->interactive_composition.num_pages);
+        return;
     }
 
     for (ii = 0; ii < page->num_bogs; ii++) {
@@ -498,9 +499,11 @@ static void _set_button_page(GRAPHICS_CONTROLLER *gc, uint32_t param, GC_NAV_CMD
 
 void gc_run(GRAPHICS_CONTROLLER *gc, gc_ctrl_e ctrl, uint32_t param, GC_NAV_CMDS *cmds)
 {
-    cmds->num_nav_cmds = 0;
-    cmds->nav_cmds     = NULL;
-    cmds->sound_id_ref = -1;
+    if (cmds) {
+        cmds->num_nav_cmds = 0;
+        cmds->nav_cmds     = NULL;
+        cmds->sound_id_ref = -1;
+    }
 
     if (!gc || !gc->igs || !gc->igs->ics) {
         ERROR("gc_run(): no interactive composition\n");
@@ -532,9 +535,15 @@ void gc_run(GRAPHICS_CONTROLLER *gc, gc_ctrl_e ctrl, uint32_t param, GC_NAV_CMDS
             /* fall thru */
 
         case GC_CTRL_NOP:
-            _render_page(gc,
-                         0xffff,
-                         cmds);
+            _render_page(gc, 0xffff, cmds);
+            break;
+
+        case GC_CTRL_RESET:
+            _gc_reset(gc);
+            break;
+
+        case GC_CTRL_IG_END:
+            _render_page(gc, 0xffff, cmds);
             break;
 
         case GC_CTRL_ENABLE_BUTTON:

@@ -46,6 +46,8 @@ typedef enum {
     GC_CTRL_DISABLE_BUTTON,  /* param: button_id */
     GC_CTRL_SET_BUTTON_PAGE,
     GC_CTRL_POPUP,           /* param: on/off */
+    GC_CTRL_IG_END,          /* execution of IG object is complete */
+    GC_CTRL_RESET,           /* reset graphics controller */
 } gc_ctrl_e;
 
 typedef struct {
