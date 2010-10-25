@@ -83,13 +83,17 @@ class MythDBPrivate
     /// Settings which should be written to the database as soon as it becomes
     /// available
     QList<SingleSetting> delayedSettings;
+
+    bool haveDBConnection;
+    bool haveSchema;
 };
 
 static const int settings_reserve = 61;
 
 MythDBPrivate::MythDBPrivate()
     : m_settings(new Settings()),
-      ignoreDatabase(false), suppressDBMessages(true), useSettingsCache(false)
+      ignoreDatabase(false), suppressDBMessages(true), useSettingsCache(false),
+      haveDBConnection(false), haveSchema(false)
 {
     m_localhostname.clear();
     settingsCache.reserve(settings_reserve);
@@ -258,7 +262,7 @@ bool MythDB::SaveSettingOnHost(const QString &key,
         return true;
     }
 
-    if (d->m_DBparams.dbHostName.isEmpty())  // Bootstrapping without database?
+    if (!HaveValidDatabase())  // Bootstrapping without database?
     {
         if (host.toLower() == d->m_localhostname)
             OverrideSettingForSession(key, newValue);
@@ -843,10 +847,53 @@ void MythDB::ActivateSettingsCache(bool activate)
 
 void MythDB::WriteDelayedSettings(void)
 {
-     while (!d->delayedSettings.isEmpty() &&
-            !d->m_DBparams.dbHostName.isEmpty())
-     {
+    if (!HaveValidDatabase())
+        return;
+
+    while (!d->delayedSettings.isEmpty())
+    {
         SingleSetting setting = d->delayedSettings.takeFirst();
         SaveSettingOnHost(setting.key, setting.value, setting.host);
-     }
+    }
+}
+
+/**
+ *  \brief Set a flag indicating we have successfully connected to the database
+ */
+void MythDB::SetHaveDBConnection(bool connected)
+{
+    d->haveDBConnection = connected;
+}
+
+/**
+ *  \brief Set a flag indicating that we have discovered tables
+ *         and that this therefore not a new empty database
+ */
+void MythDB::SetHaveSchema(bool schema)
+{
+    d->haveSchema = schema;
+}
+
+/**
+ *  \brief Get a flag indicating that we have discovered tables
+ *         and that this therefore not a new empty database
+ *
+ *  This flag is set only once on startup, it is assumed that
+ *  the tables won't be deleted out from under a running application
+ */
+bool MythDB::HaveSchema(void) const
+{
+    return d->haveSchema;
+}
+
+/**
+ *  \brief Returns true if we have successfully connected to the database and
+ *         that database has tables
+ *
+ *  This  does not indicate that we have a database connection or valid schema
+ *  at this precise moment, only that it was true at the last check
+ */
+bool MythDB::HaveValidDatabase(void) const
+{
+    return (d->haveDBConnection && d->haveSchema);
 }

@@ -73,6 +73,11 @@ class MPUBLIC MythDB
 
     void WriteDelayedSettings(void);
 
+    void SetHaveDBConnection(bool connected);
+    void SetHaveSchema(bool schema);
+    bool HaveSchema(void) const;
+    bool HaveValidDatabase(void) const;
+
     static MythDB *getMythDB();
     static void destroyMythDB();
     static QString toCommaList(const QMap<QString, QVariant> &bindings,
