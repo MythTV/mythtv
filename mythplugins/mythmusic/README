@@ -56,7 +56,7 @@ Optionally:
 Phew.  Lotta stuff required. If you're having problems, please check both
 the documentation and the mailing list archives at http://www.mythtv.org
 
-Ok.  Once you've got all the prerequisites installed, on to compiling.
+OK.  Once you've got all the prerequisites installed, on to compiling.
 There's a configure script in the main distribution directory, but it does
 not check for all of the above packages. It's just a tiny little script that
 lets you turn on and off support for the fftw, OpenGL, and SDL libraries. Run it

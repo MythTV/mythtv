@@ -17,7 +17,7 @@ done, don't even bother with this, as it won't work.
 Compiling:
 ----------
 
-Ok, on to compiling.
+OK, on to compiling.
 
 1) Configure the package by typing ./configure in the main
 distribution directory. You can enable OpenGL support using
