@@ -82,10 +82,10 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
                                   "Number of BD-J Titles: %4\n"
                                   "Number of Unsupported Titles: %5\n"
                                   "AACS present on disc: %6\n"
-                                  "libaacs detected: %7\n"
+                                  "libaacs used: %7\n"
                                   "AACS handled: %8\n"
                                   "BD+ present on disc: %9\n"
-                                  "libbdplus detected: %10\n"
+                                  "libbdplus used: %10\n"
                                   "BD+ handled: %11")
                                   .arg(discinfo->first_play_supported ? "yes" : "no")
                                   .arg(discinfo->top_menu_supported ? "yes" : "no")
