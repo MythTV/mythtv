@@ -1460,12 +1460,7 @@ bool MpegRecorder::PauseAndWait(int timeout)
     {
         VERBOSE(VB_RECORD, LOC + "PauseAndWait unpause");
 
-        if (driver == "hdpvr")
-        {
-            m_h264_parser.Reset();
-            _wait_for_keyframe_option = true;
-            _seen_sps = false;
-        }
+        ResetStreamParser();
 
         // Some drivers require streaming to be disabled before
         // an input switch and other channel format setting.
@@ -1531,12 +1526,7 @@ bool MpegRecorder::StartEncoding(int fd)
 
     if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) == 0)
     {
-        if (driver == "hdpvr")
-        {
-            m_h264_parser.Reset();
-            _wait_for_keyframe_option = true;
-            _seen_sps = false;
-        }
+        ResetStreamParser();
 
         VERBOSE(VB_RECORD, LOC + "Encoding started");
         return true;
@@ -1698,4 +1688,16 @@ void MpegRecorder::HandleResolutionChanges(void)
 
         SetBitrate(bitrate, maxbitrate, "New");
     }
+}
+
+void MpegRecorder::ResetStreamParser(void)               
+{        
+    if (driver == "hdpvr")      
+    {
+        m_h264_parser.Reset();
+        _wait_for_keyframe_option = true;
+        _seen_sps = false;
+    }
+
+    RecorderBase::ResetStreamParser();
 }
