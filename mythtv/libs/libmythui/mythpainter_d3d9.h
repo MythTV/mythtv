@@ -37,7 +37,6 @@ class MythD3D9Painter : public MythPainter
                                const QColor &fillColor, bool drawLine,
                                int lineWidth, const QColor &lineColor);
     virtual void DeleteFormatImage(MythImage *im);
-    virtual MythImage *GetFormatImage();
 
   protected:
     bool InitD3D9(QPaintDevice *parent);

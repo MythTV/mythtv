@@ -404,11 +404,6 @@ void MythOpenGLPainter::DrawRoundRect(const QRect &area, int radius,
     im->DownRef();
 }
 
-MythImage *MythOpenGLPainter::GetFormatImage()
-{
-    return new MythImage(this);
-}
-
 void MythOpenGLPainter::DeleteFormatImage(MythImage *im)
 {
     if (m_ImageIntMap.contains(im))

@@ -411,11 +411,6 @@ MythImage *MythQImagePainter::GetImageFromString(const QString &msg,
     return im;
 }
 
-MythImage *MythQImagePainter::GetFormatImage()
-{
-    return new MythImage(this);
-}
-
 void MythQImagePainter::DeleteFormatImage(MythImage *im)
 {
 }
