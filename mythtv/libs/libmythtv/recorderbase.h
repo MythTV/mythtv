@@ -213,11 +213,6 @@ class MPUBLIC RecorderBase
      */
     virtual void CheckForRingBufferSwitch(void);
 
-    /** \brief Inherited method for the stream parser to be reset after
-               a ringbuffer change. Used mainly in mpegrecorder for H264Parser.
-     */
-    virtual void ResetStreamParser(void) { };
-
     /** \brief Save the seektable to the DB
      */
     void SavePositionMap(bool force = false);

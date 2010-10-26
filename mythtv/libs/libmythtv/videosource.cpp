@@ -1878,7 +1878,6 @@ MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &a_parent) :
     addChild(device);
     addChild(cardinfo);
     addChild(input);
-    addChild(new ChannelTimeout(parent, 12000, 2000));
 
     connect(device, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  probeCard(   const QString&)));
@@ -1974,7 +1973,6 @@ HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent) :
     addChild(cardinfo);
     addChild(videoinput);
     addChild(audioinput);
-    addChild(new ChannelTimeout(parent, 12000, 2000));
 
     connect(device, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  probeCard(   const QString&)));

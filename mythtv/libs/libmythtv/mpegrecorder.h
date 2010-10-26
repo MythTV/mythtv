@@ -62,9 +62,6 @@ class MpegRecorder : public DTVRecorder,
     // ReaderPausedCB
     virtual void ReaderPaused(int fd) { pauseWait.wakeAll(); }
 
-    // Reset stream parsers when necessary
-    virtual void ResetStreamParser(void);
-
   private:
     void SetIntOption(RecordingProfile *profile, const QString &name);
     void SetStrOption(RecordingProfile *profile, const QString &name);

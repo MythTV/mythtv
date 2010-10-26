@@ -240,8 +240,6 @@ void RecorderBase::CheckForRingBufferSwitch(void)
         rb_changed = true;
 
         StartNewFile();
-
-        ResetStreamParser();
     }
     nextRingBufferLock.unlock();
 

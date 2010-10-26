@@ -1013,7 +1013,6 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
     {
 #ifdef USING_HDPVR
         recorder = new MpegRecorder(this);
-        ringBuffer->SetWriteBufferSize(4*1024*1024);
 #endif // USING_HDPVR
     }
     else if (genOpt.cardtype == "FIREWIRE")
