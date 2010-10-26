@@ -80,8 +80,7 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
                                   "Top Menu Supported: %2\n"
                                   "Number of HDMV Titles: %3\n"
                                   "Number of BD-J Titles: %4\n"
-                                  "Number of Unsupported Titles: %5\n\n"
-                                  "Encryption:\n"
+                                  "Number of Unsupported Titles: %5\n"
                                   "AACS present on disc: %6\n"
                                   "libaacs detected: %7\n"
                                   "AACS handled: %8\n"
@@ -97,6 +96,7 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
                                   .arg(discinfo->libaacs_detected ? "yes" : "no")
                                   .arg(discinfo->aacs_handled ? "yes" : "no")
                                   .arg(discinfo->bdplus_detected ? "yes" : "no")
+                                  .arg(discinfo->libbdplus_detected ? "yes" : "no")
                                   .arg(discinfo->bdplus_handled ? "yes" : "no"));
 
     // The following settings affect HDMV navigation (default audio track selection,
