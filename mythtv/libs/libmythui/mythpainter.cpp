@@ -16,7 +16,13 @@ int MythPainter::m_MaxCacheSize = 1024 * 1024 * 64;
 
 MythPainter::~MythPainter(void)
 {
-    m_allocatedImages.clear();
+    if (m_allocatedImages.isEmpty())
+        return;
+
+    VERBOSE(VB_GENERAL, QString("MythPainter: %1 images not yet de-allocated.")
+        .arg(m_allocatedImages.size()));
+    while (!m_allocatedImages.isEmpty())
+        m_allocatedImages.takeLast()->SetParent(NULL);
 }
 
 void MythPainter::SetClipRect(const QRect &)
