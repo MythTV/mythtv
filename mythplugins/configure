@@ -191,7 +191,7 @@ MythNetvision related options:
   --enable-mythnetvision      build the mythnetvision plugin [$netvision]
 
 EOF
-exit 1
+exit 0
 fi
 if [ -e config.log ] ; then
     PCONF=`cat config.log | tail -n 1 | grep configure`
