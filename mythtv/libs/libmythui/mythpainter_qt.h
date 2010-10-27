@@ -39,7 +39,7 @@ class MythQtPainter : public MythPainter
                                bool drawLine, int lineWidth, const QColor &lineColor);
 
     virtual MythImage *GetFormatImage();
-    virtual void DeleteFormatImage(MythImage *im);
+    virtual void DeleteFormatImagePriv(MythImage *im);
 
   protected:
 

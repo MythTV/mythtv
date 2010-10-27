@@ -145,7 +145,7 @@ int MythOpenGLPainter::GetTextureFromCache(MythImage *im)
         }
         else
         {
-            DeleteFormatImage(im);
+            DeleteFormatImagePriv(im);
         }
     }
 
@@ -174,7 +174,7 @@ int MythOpenGLPainter::GetTextureFromCache(MythImage *im)
     {
         MythImage *expiredIm = m_ImageExpireList.front();
         m_ImageExpireList.pop_front();
-        DeleteFormatImage(expiredIm);
+        DeleteFormatImagePriv(expiredIm);
         DeleteTextures();
     }
 
@@ -404,7 +404,7 @@ void MythOpenGLPainter::DrawRoundRect(const QRect &area, int radius,
     im->DownRef();
 }
 
-void MythOpenGLPainter::DeleteFormatImage(MythImage *im)
+void MythOpenGLPainter::DeleteFormatImagePriv(MythImage *im)
 {
     if (m_ImageIntMap.contains(im))
     {

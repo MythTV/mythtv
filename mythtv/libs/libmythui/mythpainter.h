@@ -23,7 +23,7 @@ class MPUBLIC MythPainter
 {
   public:
     MythPainter() : m_Parent(0), m_CacheSize(0) { }
-    virtual ~MythPainter() { }
+    virtual ~MythPainter();
 
     virtual QString GetName(void) = 0;
     virtual bool SupportsAnimation(void) = 0;
@@ -59,15 +59,17 @@ class MPUBLIC MythPainter
     virtual MythImage *GetFormatImage();
 
     // make friend so only callable from image
-    virtual void DeleteFormatImage(MythImage *im) = 0;
+    virtual void DeleteFormatImage(MythImage *im);
 
   protected:
+    virtual void DeleteFormatImagePriv(MythImage *im) { }
     void IncreaseCacheSize(QSize size);
     void DecreaseCacheSize(QSize size);
 
-    QPaintDevice *m_Parent;
-    int           m_CacheSize;
-    static int    m_MaxCacheSize;
+    QPaintDevice     *m_Parent;
+    int               m_CacheSize;
+    static int        m_MaxCacheSize;
+    QList<MythImage*> m_allocatedImages;
 };
 
 #endif

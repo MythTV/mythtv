@@ -14,6 +14,11 @@
 
 int MythPainter::m_MaxCacheSize = 1024 * 1024 * 64;
 
+MythPainter::~MythPainter(void)
+{
+    m_allocatedImages.clear();
+}
+
 void MythPainter::SetClipRect(const QRect &)
 {
 }
@@ -46,7 +51,17 @@ void MythPainter::DrawImage(const QPoint &topLeft, MythImage *im, int alpha)
 
 MythImage *MythPainter::GetFormatImage()
 {
-    return new MythImage(this);
+    MythImage *result = new MythImage(this);
+    m_allocatedImages.append(result);
+    return result;
+}
+
+void MythPainter::DeleteFormatImage(MythImage *im)
+{
+    DeleteFormatImagePriv(im);
+
+    while (m_allocatedImages.contains(im))
+        m_allocatedImages.removeOne(im);
 }
 
 // the following assume graphics hardware operates natively at 32bpp

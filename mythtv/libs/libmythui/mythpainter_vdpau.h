@@ -39,9 +39,8 @@ class MPUBLIC MythVDPAUPainter : public MythPainter
                                bool drawFill, const QColor &fillColor,
                                bool drawLine, int lineWidth, const QColor &lineColor);
 
-    virtual void DeleteFormatImage(MythImage *im);
-
   protected:
+    virtual void DeleteFormatImagePriv(MythImage *im);
     bool InitVDPAU(QPaintDevice *parent);
     void Teardown(void);
     void ClearCache(void);

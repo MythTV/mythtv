@@ -36,9 +36,9 @@ class MythD3D9Painter : public MythPainter
     virtual void DrawRoundRect(const QRect &area, int radius, bool drawFill,
                                const QColor &fillColor, bool drawLine,
                                int lineWidth, const QColor &lineColor);
-    virtual void DeleteFormatImage(MythImage *im);
 
   protected:
+    virtual void DeleteFormatImagePriv(MythImage *im);
     bool InitD3D9(QPaintDevice *parent);
     void Teardown(void);
     void ClearCache(void);
