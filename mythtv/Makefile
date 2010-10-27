@@ -79,6 +79,6 @@ distclean: $(addsuffix _distclean,$(SUBDIRS))
 install: $(addsuffix _install,$(SUBDIRS))
 
 uninstall: $(addsuffix _uninstall,$(SUBDIRS))
-	-rmdir $(INSTALL_ROOT)/$prefix/include/mythtv
-	-rmdir $(INSTALL_ROOT)/$prefix/lib/mythtv
-	-rmdir $(INSTALL_ROOT)/$prefix/share/mythtv
+	-rmdir $(INSTALL_ROOT)/${PREFIX}/include/mythtv
+	-rmdir $(INSTALL_ROOT)/${PREFIX}/lib/mythtv
+	-rmdir $(INSTALL_ROOT)/${PREFIX}/share/mythtv
