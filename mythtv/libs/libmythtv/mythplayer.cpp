@@ -1231,20 +1231,20 @@ void MythPlayer::WindowResized(const QSize &new_size)
 
 void MythPlayer::EnableTeletext(int page)
 {
-    if (!GetOSD())
+    if (!osd)
         return;
 
-    GetOSD()->EnableTeletext(true, page);
+    osd->EnableTeletext(true, page);
     prevTextDisplayMode = textDisplayMode;
     textDisplayMode = kDisplayTeletextMenu;
 }
 
 void MythPlayer::DisableTeletext(void)
 {
-    if (!GetOSD())
+    if (!osd)
         return;
 
-    GetOSD()->EnableTeletext(false, 0);
+    osd->EnableTeletext(false, 0);
     textDisplayMode = kDisplayNone;
 
     /* If subtitles are enabled before the teletext menu was displayed,
@@ -1255,9 +1255,9 @@ void MythPlayer::DisableTeletext(void)
 
 void MythPlayer::ResetTeletext(void)
 {
-    if (!GetOSD())
+    if (!osd)
         return;
-    GetOSD()->TeletextReset();
+    osd->TeletextReset();
 }
 
 /** \fn MythPlayer::SetTeletextPage(uint)
@@ -1276,7 +1276,7 @@ void MythPlayer::SetTeletextPage(uint page)
 
 bool MythPlayer::HandleTeletextAction(const QString &action)
 {
-    if (!(textDisplayMode & kDisplayTeletextMenu) || !GetOSD())
+    if (!(textDisplayMode & kDisplayTeletextMenu) || !osd)
         return false;
 
     bool handled = true;
@@ -1284,20 +1284,20 @@ bool MythPlayer::HandleTeletextAction(const QString &action)
     if (action == "MENU" || action == "TOGGLETT" || action == "ESCAPE")
         DisableTeletext();
     else
-        handled = GetOSD()->TeletextAction(action);
+        handled = osd->TeletextAction(action);
 
     return handled;
 }
 
 void MythPlayer::ResetCaptions(void)
 {
-    if (GetOSD() && ((textDisplayMode & kDisplayAVSubtitle)      ||
+    if (osd && ((textDisplayMode & kDisplayAVSubtitle)      ||
                      (textDisplayMode & kDisplayTextSubtitle)    ||
                      (textDisplayMode & kDisplayRawTextSubtitle) ||
                      (textDisplayMode & kDisplayDVDButton)       ||
                      (textDisplayMode & kDisplayCC608)           ||
                      (textDisplayMode & kDisplayCC708)))
-        GetOSD()->ClearSubtitles();
+        osd->ClearSubtitles();
 }
 
 // caller has decoder_changed_lock
@@ -1409,7 +1409,7 @@ void MythPlayer::SetupTeletextViewer(void)
         return;
     }
 
-    if (GetOSD())
+    if (osd)
     {
         TeletextViewer* ttview =  (TeletextViewer*)osd->InitTeletext();
         if (ttview && decoder)
@@ -1981,8 +1981,6 @@ void MythPlayer::PreProcessNormalFrame(void)
     if (GetInteractiveTV())
     {
         QMutexLocker locker(&itvLock);
-
-        OSD *osd = GetOSD();
         if (osd && videoOutput->GetOSDPainter())
         {
             InteractiveScreen *window =
