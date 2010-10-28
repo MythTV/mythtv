@@ -647,7 +647,7 @@ void MythUIGuideGrid::LoadImage(int recType, const QString &file)
 
     if (pix)
     {
-        m_recImages[recType] = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+        m_recImages[recType] = GetPainter()->GetFormatImage();
         m_recImages[recType]->Assign(*pix);
         delete pix;
     }
@@ -662,7 +662,7 @@ void MythUIGuideGrid::SetArrow(int direction, const QString &file)
 
     if (pix)
     {
-        m_arrowImages[direction] = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+        m_arrowImages[direction] = GetPainter()->GetFormatImage();
         m_arrowImages[direction]->Assign(*pix);
         delete pix;
     }

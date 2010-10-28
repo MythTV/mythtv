@@ -38,8 +38,8 @@ MythScreenStack::~MythScreenStack()
 
 void MythScreenStack::EnableEffects(void)
 {
-    m_DoTransitions = (GetMythPainter()->SupportsAlpha() &&
-                       GetMythPainter()->SupportsAnimation());
+    m_DoTransitions = (GetPainter()->SupportsAlpha() &&
+                       GetPainter()->SupportsAnimation());
 }
 
 int MythScreenStack::TotalScreens(void) const
@@ -364,4 +364,9 @@ QString MythScreenStack::GetLocation(bool fullPath) const
     }
 
     return QString();
+}
+
+MythPainter* MythScreenStack::GetPainter(void)
+{
+    return GetMythPainter();
 }

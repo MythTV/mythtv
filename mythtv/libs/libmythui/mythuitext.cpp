@@ -511,7 +511,7 @@ void MythUIText::Pulse(void)
 
 void MythUIText::CycleColor(QColor startColor, QColor endColor, int numSteps)
 {
-    if (!GetMythPainter()->SupportsAnimation())
+    if (!GetPainter()->SupportsAnimation())
         return;
 
     m_startColor = startColor;
@@ -663,7 +663,7 @@ bool MythUIText::ParseElement(
     }
     else if (element.tagName() == "colorcycle")
     {
-        if (GetMythPainter()->SupportsAnimation())
+        if (GetPainter()->SupportsAnimation())
         {
             QString tmp = element.attribute("start");
             if (!tmp.isEmpty())
@@ -685,7 +685,7 @@ bool MythUIText::ParseElement(
     }
     else if (element.tagName() == "scroll")
     {
-        if (GetMythPainter()->SupportsAnimation())
+        if (GetPainter()->SupportsAnimation())
         {
             QString tmp = element.attribute("direction");
             if (!tmp.isEmpty())

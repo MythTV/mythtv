@@ -119,10 +119,11 @@ class MythOSDWindow : public MythScreenType
 class OSD
 {
   public:
-    OSD(MythPlayer *player, QObject *parent);
+    OSD(MythPlayer *player, QObject *parent, MythPainter *painter);
    ~OSD();
 
     bool    Init(const QRect &rect, float font_aspect);
+    void    SetPainter(MythPainter *painter);
     QRect   Bounds(void) { return m_Rect; }
     int     GetFontStretch(void) { return m_fontStretch; }
     void    OverrideUIScale(void);
@@ -187,8 +188,9 @@ class OSD
     void SendHideEvent(void);
 
   private:
-    MythPlayer *m_parent;
+    MythPlayer     *m_parent;
     QObject        *m_ParentObject;
+    MythPainter    *m_CurrentPainter;
     QRect           m_Rect;
     bool            m_Effects;
     int             m_FadeTime;

@@ -1424,6 +1424,7 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
 }
 
 MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
+                                        MythPainter *painter,
                                         ImageCacheMode cacheMode)
 {
     VERBOSE(VB_GUI|VB_FILE, LOC +
@@ -1481,10 +1482,10 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
             // Check Memory Cache
             ret = GetImageFromCache(label);
 
-            if (!ret && (cacheMode == kCacheNormal))
+            if (!ret && (cacheMode == kCacheNormal) && painter)
             {
                 // Load file from disk cache to memory cache
-                ret = GetMythPainter()->GetFormatImage();
+                ret = painter->GetFormatImage();
                 if (!ret->Load(cachefilepath, false))
                 {
                     VERBOSE(VB_GUI|VB_FILE, LOC_WARN +

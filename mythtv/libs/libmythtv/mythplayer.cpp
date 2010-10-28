@@ -606,6 +606,7 @@ void MythPlayer::ReinitOSD(void)
         float aspect, scaling;
         if (osd)
         {
+            osd->SetPainter(videoOutput->GetOSDPainter());
             videoOutput->GetOSDBounds(total, visible, aspect,
                                       scaling, 1.0f);
             if (osd->Bounds() != visible)
@@ -662,6 +663,8 @@ void MythPlayer::ReinitVideo(void)
 
         // We need to tell it this for automatic deinterlacer settings
         videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
+        if (osd)
+            osd->SetPainter(videoOutput->GetOSDPainter());
         ReinitOSD();
     }
 
@@ -2027,7 +2030,7 @@ void MythPlayer::VideoStart(void)
         float aspect, scaling;
 
         osdLock.lock();
-        osd = new OSD(this, m_tv);
+        osd = new OSD(this, m_tv, videoOutput->GetOSDPainter());
 
         videoOutput->GetOSDBounds(total, visible, aspect, scaling, 1.0f);
         osd->Init(visible, aspect);

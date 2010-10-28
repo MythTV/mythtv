@@ -66,7 +66,8 @@ class MPUBLIC MythImage : public QImage
      * @param end The ending colour.
      * @return A MythImage filled with a gradient.
      */
-    static MythImage *Gradient(const QSize & size, const QColor &begin,
+    static MythImage *Gradient(MythPainter *painter,
+                               const QSize & size, const QColor &beg,
                                const QColor &end, uint alpha,
                                FillDirection direction = FillTopToBottom);
 
