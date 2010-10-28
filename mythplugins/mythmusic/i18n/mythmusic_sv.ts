@@ -102,7 +102,7 @@
         <location filename="../mythmusic/databasebox.cpp" line="101"/>
         <location filename="../mythmusic/databasebox.cpp" line="391"/>
         <source>OK</source>
-        <translation>Ok</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../mythmusic/databasebox.cpp" line="356"/>
@@ -290,7 +290,7 @@
         <location filename="../mythmusic/importmusic.cpp" line="844"/>
         <location filename="../mythmusic/importmusic.cpp" line="1008"/>
         <source>Inlay</source>
-        <translation>Lägga in</translation>
+        <translation>Inlägg</translation>
     </message>
     <message>
         <location filename="../mythmusic/importmusic.cpp" line="846"/>
@@ -537,47 +537,47 @@ Kunde inte kopiera fil till: %1</translation>
         <translation>Strömmen färdigspelad.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1008"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1006"/>
         <source>Decoder error.</source>
         <translation>Avkodningsfel.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1033"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1029"/>
         <source>Sync List With Current Track</source>
         <translation>Synkronisera lista med nuvarande spår</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1037"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1033"/>
         <source>Remove Selected Track</source>
         <translation>Ta bort markerat spår</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1049"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1045"/>
         <source>Remove All Tracks</source>
         <translation>Ta bort alla spår</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1053"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1049"/>
         <source>Save As New Playlist</source>
         <translation>Spara som ny spellista</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1057"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1053"/>
         <source>Switch To Move Mode</source>
         <translation>Växla till Flyttaläge</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1064"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1060"/>
         <source>Switch To Select Mode</source>
         <translation>Växla till väljläge</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1074"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1070"/>
         <source>No - Exit, Stop Playing</source>
         <translation>Nej - Avsluta och sluta spela nu</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1080"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1076"/>
         <source>Yes - Exit, Continue Playing</source>
         <translation>Ja - Avsluta och fortsätt spela</translation>
     </message>
@@ -636,7 +636,7 @@ Kunde inte kopiera fil till: %1</translation>
     <message>
         <location filename="../mythmusic/main.cpp" line="497"/>
         <source>Fast forward</source>
-        <translation>Snabbspola frammåt</translation>
+        <translation>Snabbspola framåt</translation>
     </message>
     <message>
         <location filename="../mythmusic/main.cpp" line="499"/>
@@ -762,139 +762,139 @@ Kunde inte kopiera fil till: %1</translation>
         <translation>4 Visualisera</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1931"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1932"/>
         <source>Playing stream.</source>
         <translation>Spelar ström.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1936"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1937"/>
         <source>Buffering stream.</source>
         <translation>Buffrar ström.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1940"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1941"/>
         <source>Stream paused.</source>
         <translation>Ström pausad.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1976"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1977"/>
         <source>kbps</source>
         <translation>kbps</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1976"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1982"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1977"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1983"/>
         <source>kHz</source>
         <translation>kHz</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1976"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1982"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1977"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1983"/>
         <source>ch</source>
         <translation>ch</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2003"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2004"/>
         <source>Output error.</source>
         <translation>Utmatningsfel.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2018"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2019"/>
         <source>Stream stopped.</source>
         <translation>Ström stoppad.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2023"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2024"/>
         <source>Finished playing stream.</source>
         <translation>Strömmen färdigspelad.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2032"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2033"/>
         <source>Decoder error.</source>
         <translation>Avkodningsfel.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="621"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="622"/>
         <source>Smart playlists</source>
         <translation>Smarta spellistor</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="635"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="636"/>
         <source>All Tracks</source>
         <translation>Alla låtar</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="639"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="640"/>
         <source>Tracks by current Artist</source>
         <translation>Låtar av aktuell artist</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="641"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="642"/>
         <source>Tracks from current Album</source>
         <translation>Låtar från aktuellt album</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="643"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="644"/>
         <source>Tracks from current Genre</source>
         <translation>Låtar från aktuell genre</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="645"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="646"/>
         <source>Tracks from current Year</source>
         <translation>Låtar från aktuellt år</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="631"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="632"/>
         <source>Search</source>
         <translation>Sök</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="633"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="634"/>
         <source>From CD</source>
         <translation>Från CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="617"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="618"/>
         <source>Change Filter</source>
         <translation>Ändra filter</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2354"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2355"/>
         <source>Update Playlist Options</source>
         <translation>Uppdatera spellistinställningar</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2357"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2358"/>
         <source>Replace</source>
         <translation>Ersätt</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2358"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2359"/>
         <source>Insert after current track</source>
         <translation>Infoga efter aktuell låt</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2359"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2360"/>
         <source>Append to end</source>
         <translation>Lägg till slutet</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2374"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2375"/>
         <source>Continue playing current track</source>
         <translation>Fortsätt spela upp aktuell låt</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2375"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2376"/>
         <source>Play first track</source>
         <translation>Spela första låten</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2376"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2377"/>
         <source>Play first new track</source>
         <translation>Spela första nya låt</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2382"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2383"/>
         <source>Remove Duplicates</source>
         <translation>Ta bort dubbletter</translation>
     </message>
@@ -926,62 +926,62 @@ Vill du fortsätta att spela musik i bakgrunden?</translation>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="647"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="648"/>
         <source>Tracks with same Title</source>
         <translation>Låtar med samma titel</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1305"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1306"/>
         <source>Speed: </source>
         <translation>Hastighet:</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1614"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1615"/>
         <source>Smart</source>
         <translation>smart</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1619"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1620"/>
         <source>Rand</source>
         <translation>Slumpvis</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1624"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1625"/>
         <source>Album</source>
         <translation>Album</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1629"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1630"/>
         <source>Artist</source>
         <translation>Artist</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1634"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1723"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1635"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1724"/>
         <source>None</source>
         <translation>Inget</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1646"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1649"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1653"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1647"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1650"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1654"/>
         <source>Shuffle</source>
         <translation>Slumpvis</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1713"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1714"/>
         <source>All</source>
         <translation>Alla</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1718"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1719"/>
         <source>Track</source>
         <translation>Låt</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1736"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1739"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1743"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1737"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1740"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1744"/>
         <source>Repeat</source>
         <translation>Repetera</translation>
     </message>
@@ -1538,12 +1538,12 @@ Vill du fortsätta att spela musik i bakgrunden?</translation>
     </message>
     <message>
         <location filename="../mythmusic/metadata.cpp" line="1677"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1033"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1034"/>
         <source>Rebuilding music tree</source>
         <translation>Återuppbygger musikträd</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1155"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1156"/>
         <source>Loading Music</source>
         <translation>Laddar musik</translation>
     </message>
@@ -1724,7 +1724,7 @@ Vill du fortsätta att spela musik i bakgrunden?</translation>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="482"/>
         <source>Edit the list of visualizations to use during playback.</source>
-        <translation>Redigera listan visualiseringslistan att använda under uppspelning.</translation>
+        <translation>Redigera visualiseringslistan att använda under uppspelning.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="556"/>
@@ -1807,7 +1807,7 @@ Vill du fortsätta att spela musik i bakgrunden?</translation>
         <translation>Artister</translation>
     </message>
     <message>
-        <location filename="../mythmusic/avfdecoder.cpp" line="530"/>
+        <location filename="../mythmusic/avfdecoder.cpp" line="534"/>
         <source>Internal Decoder</source>
         <translation>Intern avkodare</translation>
     </message>
@@ -1895,7 +1895,7 @@ Check the URL is correct.</source>
         <location filename="../mythmusic/cdrip.cpp" line="1572"/>
         <source>The encoder failed to create the file.
 Do you have write permissions for the music directory?</source>
-        <translation>Kodaren misslyckades att skapa fil. Har du skriv tillåtelse för musik katalogen?</translation>
+        <translation>Kodaren misslyckades att skapa filen. Har du skrivrättigheter för musikkatalogen?</translation>
     </message>
 </context>
 <context>
@@ -1971,7 +1971,7 @@ Vill du ta bort det existerande spåret?</translation>
     <message>
         <location filename="../mythmusic/search.cpp" line="21"/>
         <source>Search Music Database</source>
-        <translation>Sök musikdatabasen</translation>
+        <translation>Sök i musikdatabasen</translation>
     </message>
     <message>
         <location filename="../mythmusic/search.cpp" line="51"/>
@@ -1986,7 +1986,7 @@ Vill du ta bort det existerande spåret?</translation>
     <message>
         <location filename="../mythmusic/search.cpp" line="224"/>
         <source>Search Music Database (%1 matches)</source>
-        <translation>Sök musikdatabasen (%1 träffar)</translation>
+        <translation>Sök i musikdatabasen (%1 träffar)</translation>
     </message>
 </context>
 <context>
@@ -2264,7 +2264,7 @@ Vill du ta bort det existerande spåret?</translation>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="940"/>
         <source>Title:</source>
-        <translation>Titel: </translation>
+        <translation>Titel:</translation>
     </message>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="952"/>
@@ -2367,7 +2367,7 @@ Vill du ta bort det existerande spåret?</translation>
     <message>
         <location filename="themestrings.h" line="7"/>
         <source>Album:</source>
-        <translation>Album: </translation>
+        <translation>Album:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>
@@ -2471,7 +2471,7 @@ Vill du ta bort det existerande spåret?</translation>
     <message>
         <location filename="themestrings.h" line="33"/>
         <source>Track is part of a compilation</source>
-        <translation>Spår är en del av en samling</translation>
+        <translation>Spåret är en del av en samling</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="34"/>
@@ -2746,7 +2746,7 @@ Vill du ta bort det existerande spåret?</translation>
     <message>
         <location filename="themestrings.h" line="87"/>
         <source>Music playback options</source>
-        <translation>Uppspelnings inställningar</translation>
+        <translation>Uppspelningsinställningar</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="89"/>
@@ -2816,7 +2816,7 @@ Vill du ta bort det existerande spåret?</translation>
     <message>
         <location filename="themestrings.h" line="93"/>
         <source>Music Settings</source>
-        <translation>Musikinställningar</translation>
+        <translation>Musik</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="94"/>
