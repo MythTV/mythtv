@@ -50,9 +50,6 @@ class MPUBLIC MythImage : public QImage
     void Assign(const QImage &img);
     void Assign(const QPixmap &pix);
 
-    // *NOTE* *DELETES* img!
-    static MythImage *FromQImage(QImage **img);
-
     bool Load(MythImageReader &reader);
     bool Load(const QString &filename, bool scale = true);
 

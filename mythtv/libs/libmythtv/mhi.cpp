@@ -824,8 +824,6 @@ void MHIContext::DrawImage(int x, int y, const QRect &clipRect,
 
     if (displayRect == imageRect) // No clipping required
     {
-        // LoadFromQImage seems to have a problem with non-32 bit images.
-        // We need to work around that and force 32 bits.
         QImage q_scaled =
             qImage.scaled(
                 SCALED_X(displayRect.width()),
