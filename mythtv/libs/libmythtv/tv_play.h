@@ -259,7 +259,6 @@ class MPUBLIC TV : public QThread
     // Non-const queries
     OSD *GetOSDL(const char *, int);
     OSD *GetOSDL(const PlayerContext*,const char *, int);
-    void ReturnOSDLock(OSD*&);
     void ReturnOSDLock(const PlayerContext*,OSD*&);
 
     bool ActiveHandleAction(PlayerContext*,
