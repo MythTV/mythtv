@@ -284,7 +284,7 @@
     <message>
         <location filename="themestrings.h" line="40"/>
         <source>Show Live View</source>
-        <translation type="unfinished">Direktvisning</translation>
+        <translation>Direktvisning</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
@@ -375,7 +375,8 @@
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="127"/>
         <source>Can&apos;t show live view.
 You don&apos;t have any monitors defined!</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte visa direktsändning.
+Du har inte några skärmar definierade!</translation>
     </message>
 </context>
 <context>

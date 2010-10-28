@@ -6,22 +6,22 @@
     <message>
         <location filename="../mythnews/main.cpp" line="47"/>
         <source>RSS News feed reader</source>
-        <translation type="unfinished">RSS-läsare</translation>
+        <translation>Läs nyheter via RSS-flöden</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="51"/>
         <source>Update news items</source>
-        <translation type="unfinished">Uppdatera nyheter</translation>
+        <translation>Uppdatera nyheter</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="53"/>
         <source>Force update news items</source>
-        <translation type="unfinished">Tvinga nyhetsuppdatering</translation>
+        <translation>Tvinga nyhetsuppdatering</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="55"/>
         <source>Cancel news item updating</source>
-        <translation type="unfinished">Avbryt nyhetsuppdatering</translation>
+        <translation>Avbryt nyhetsuppdatering</translation>
     </message>
 </context>
 <context>
@@ -83,12 +83,12 @@
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
         <source>Edit Site Details</source>
-        <translation type="unfinished">Redigera nyhetsplats</translation>
+        <translation>Redigera nyhetsplatsen</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
         <source>Enter Site Details</source>
-        <translation type="unfinished">Redigera nyhetsplats</translation>
+        <translation>Fyll i detaljer för nyhetsplatsen</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="85"/>
@@ -108,7 +108,7 @@
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="91"/>
         <source>Podcast:</source>
-        <translation type="unfinished">Podd-sändning:</translation>
+        <translation>Podd-tv:</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="93"/>
@@ -142,7 +142,7 @@
     <message>
         <location filename="../mythnews/newssite.cpp" line="226"/>
         <source>No Cached News.</source>
-        <translation type="unfinished">Inga cachade nyheter.</translation>
+        <translation>Inga hämtade nyheter.</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="245"/>
@@ -152,7 +152,7 @@
     <message>
         <location filename="../mythnews/newssite.cpp" line="253"/>
         <source>Showing Cached News.</source>
-        <translation type="unfinished">Visar cachade nyheter.</translation>
+        <translation>Visar hämtade nyheter.</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="274"/>
@@ -178,7 +178,7 @@
     <message>
         <location filename="themestrings.h" line="3"/>
         <source>Edit RSS News Feeds</source>
-        <translation type="unfinished">Redigera RSS-flöde</translation>
+        <translation>Redigera RSS-flöde</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="4"/>
@@ -197,7 +197,7 @@ Välj &quot;OK&quot; eller &quot;Avbryt&quot; för att fortsätta.</translation>
     <message>
         <location filename="themestrings.h" line="6"/>
         <source>URL:</source>
-        <translation type="unfinished">URL:</translation>
+        <translation>URL:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="7"/>
@@ -207,7 +207,7 @@ Välj &quot;OK&quot; eller &quot;Avbryt&quot; för att fortsätta.</translation>
     <message>
         <location filename="themestrings.h" line="8"/>
         <source>Podcast:</source>
-        <translation type="unfinished">Podd-sändning:</translation>
+        <translation>Podd-tv:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
@@ -217,7 +217,7 @@ Välj &quot;OK&quot; eller &quot;Avbryt&quot; för att fortsätta.</translation>
     <message>
         <location filename="themestrings.h" line="10"/>
         <source>Channel:</source>
-        <translation type="unfinished">Kanal:</translation>
+        <translation>Kanal:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="11"/>
@@ -242,7 +242,7 @@ Välj &quot;OK&quot; eller &quot;Avbryt&quot; för att fortsätta.</translation>
     <message>
         <location filename="themestrings.h" line="16"/>
         <source>News Settings</source>
-        <translation>Nyhetsinställningar</translation>
+        <translation>Nyheter</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="17"/>
@@ -257,7 +257,7 @@ Välj &quot;OK&quot; eller &quot;Avbryt&quot; för att fortsätta.</translation>
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>Web Site</source>
-        <translation type="unfinished">Websajt</translation>
+        <translation>Webbsajt</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
@@ -271,7 +271,7 @@ Välj &quot;OK&quot; eller &quot;Avbryt&quot; för att fortsätta.</translation>
     <message>
         <location filename="themestrings.h" line="21"/>
         <source>Contexts</source>
-        <translation type="unfinished">Sammanhang</translation>
+        <translation>Sammanhang</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="22"/>

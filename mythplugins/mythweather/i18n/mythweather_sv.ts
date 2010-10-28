@@ -125,7 +125,7 @@
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="252"/>
         <source>Units: </source>
-        <translation>Enheter:</translation>
+        <translation>Enheter: </translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="254"/>
@@ -142,7 +142,7 @@
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="260"/>
         <source>Location: </source>
-        <translation>Plats:</translation>
+        <translation>Plats: </translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="261"/>
@@ -153,7 +153,7 @@
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="263"/>
         <source>Source: </source>
-        <translation>Källa:</translation>
+        <translation>Källa: </translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="267"/>
@@ -168,7 +168,7 @@
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="271"/>
         <source>change units; </source>
-        <translation>ändra enheter;</translation>
+        <translation>ändra enheter; </translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="272"/>
@@ -220,10 +220,10 @@
         <translation>Söker efter skript</translation>
     </message>
     <message>
-        <location filename="../mythweather/sourceManager.cpp" line="301"/>
+        <location filename="../mythweather/sourceManager.cpp" line="302"/>
         <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
         <translatorcomment>Debugutskrift.. Ska inte översättas.</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</translation>
     </message>
 </context>
 <context>
@@ -414,7 +414,7 @@
     <message>
         <location filename="strings.h" line="58"/>
         <source>AM Rain/Snow Showers</source>
-        <translation>FM Regn/Snöbyar</translation>
+        <translation>FM regn/snöbyar</translation>
     </message>
     <message>
         <location filename="strings.h" line="59"/>
@@ -454,7 +454,7 @@
     <message>
         <location filename="strings.h" line="66"/>
         <source>PM T-Storms</source>
-        <translation>EM Åska</translation>
+        <translation>EM åska</translation>
     </message>
     <message>
         <location filename="strings.h" line="67"/>
@@ -469,7 +469,7 @@
     <message>
         <location filename="strings.h" line="69"/>
         <source>AM Thunderstorms</source>
-        <translation>FM Åska</translation>
+        <translation>FM åska</translation>
     </message>
     <message>
         <location filename="strings.h" line="70"/>
@@ -494,7 +494,7 @@
     <message>
         <location filename="strings.h" line="74"/>
         <source>AM Showers/Wind</source>
-        <translation>FM Skurar/blåst</translation>
+        <translation>FM skurar/blåst</translation>
     </message>
     <message>
         <location filename="strings.h" line="75"/>
@@ -504,7 +504,7 @@
     <message>
         <location filename="strings.h" line="76"/>
         <source>Snow to Ice/Wind</source>
-        <translation>Snö till Is/blåst</translation>
+        <translation>Snö till is/blåst</translation>
     </message>
     <message>
         <location filename="strings.h" line="77"/>
@@ -606,7 +606,7 @@
         <location filename="strings.h" line="96"/>
         <location filename="strings.h" line="132"/>
         <source>Hvy Rain/Freezing Rain</source>
-        <translation>Kraftigt regn/Underkylt regn</translation>
+        <translation>Kraftigt regn/underkylt regn</translation>
     </message>
     <message>
         <location filename="strings.h" line="97"/>
@@ -616,7 +616,7 @@
     <message>
         <location filename="strings.h" line="99"/>
         <source>Rain/Freezing Rain</source>
-        <translation>Regn/Underkylt regn</translation>
+        <translation>Regn/underkylt regn</translation>
     </message>
     <message>
         <location filename="strings.h" line="100"/>
@@ -651,7 +651,7 @@
     <message>
         <location filename="strings.h" line="106"/>
         <source>Snow to Wintry Mix</source>
-        <translation>Snö till Snöblandat regn</translation>
+        <translation>Snö till snöblandat regn</translation>
     </message>
     <message>
         <location filename="strings.h" line="107"/>
@@ -671,12 +671,12 @@
     <message>
         <location filename="strings.h" line="110"/>
         <source>AM Rain/Ice</source>
-        <translation>FM Regn/Is</translation>
+        <translation>FM regn/is</translation>
     </message>
     <message>
         <location filename="strings.h" line="111"/>
         <source>AM Snow Showers/Wind</source>
-        <translation>FM Snöbyar/blåst</translation>
+        <translation>FM snöbyar/blåst</translation>
     </message>
     <message>
         <location filename="strings.h" line="112"/>
@@ -706,17 +706,17 @@
     <message>
         <location filename="strings.h" line="117"/>
         <source>PM Snow Shower</source>
-        <translation>EM Snöbyar</translation>
+        <translation>EM snöbyar</translation>
     </message>
     <message>
         <location filename="strings.h" line="118"/>
         <source>Snow to Rain/Wind</source>
-        <translation>Snö till Regn/blåst</translation>
+        <translation>Snö till regn/blåst</translation>
     </message>
     <message>
         <location filename="strings.h" line="119"/>
         <source>PM Light Rain/Ice</source>
-        <translation>EM Lätt regn/Is</translation>
+        <translation>EM lätt regn/Is</translation>
     </message>
     <message>
         <location filename="strings.h" line="120"/>
@@ -726,7 +726,7 @@
     <message>
         <location filename="strings.h" line="121"/>
         <source>Snow to Ice</source>
-        <translation>Snö till Is</translation>
+        <translation>Snö till is</translation>
     </message>
     <message>
         <location filename="strings.h" line="122"/>
@@ -816,7 +816,7 @@
     <message>
         <location filename="strings.h" line="142"/>
         <source>Light Snow Shower/ Windy</source>
-        <translation>Lätta snöbyar/Blåsigt</translation>
+        <translation>Lätta snöbyar/blåsigt</translation>
     </message>
     <message>
         <location filename="strings.h" line="143"/>
@@ -1071,7 +1071,7 @@
 When you are done configuring the Weather Plugin, click &quot;Finish&quot; to continue.</source>
         <translation>Denna skärm styr väderskärmarnas uppförande.  Du kan aktivera en väderuppdatering i bakgrunder vilket kommer att köras oberoende om väderskärmen visas, samt ändra antalet sekunder varje skärm ska visas.
 
-När du är färdig avslutar du med att klicka på &quot;Färdig&quot;.</translation>
+När du är färdig avslutar du med att klicka på &quot;Slutför&quot;.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
@@ -1110,7 +1110,7 @@ När du är färdig avslutar du med att klicka på &quot;Färdig&quot;.</transla
 When you have completed your changes, click &quot;Finish&quot; to continue.</source>
         <translation>Denna skärm styr individuella skripts uppförande. Välj det skript för vilket du vill ändra uppförandet och tryck HÖGER PIL. Förändra det intervall vilket data hämtas och väntetiden vid kontakt med sajten.
 
-När du är färdig avslutar du med att klicka på &quot;Färdig&quot;.</translation>
+När du är färdig avslutar du med att klicka på &quot;Slutför&quot;.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="25"/>

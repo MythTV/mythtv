@@ -155,7 +155,7 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1343"/>
         <source>Failed to rename file</source>
-        <translation>Misslyckades att ändra namn på  fil</translation>
+        <translation>Misslyckades att ändra namn på fil</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="876"/>
@@ -185,7 +185,7 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="925"/>
         <source>Marking Options</source>
-        <translation>Betygsinställningar</translation>
+        <translation>Markeringsinställningar</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="942"/>
@@ -217,113 +217,113 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythgallery/main.cpp" line="69"/>
+        <location filename="../mythgallery/main.cpp" line="68"/>
         <source>Image viewer / slideshow</source>
         <translation>Bildvisare / bildspel</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="72"/>
+        <location filename="../mythgallery/main.cpp" line="71"/>
         <source>Start/Stop Slideshow</source>
         <translation>Starta/stoppa bildspel</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="74"/>
+        <location filename="../mythgallery/main.cpp" line="73"/>
         <source>Go to the first image in thumbnail view</source>
-        <translation>Gå till första bilen i vyn för miniatyrbilder</translation>
+        <translation>Gå till första bilden i vyn för miniatyrbilder</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="76"/>
+        <location filename="../mythgallery/main.cpp" line="75"/>
         <source>Go to the last image in thumbnail view</source>
-        <translation>Gå till sista bildern i vyn för miniatyrbilder</translation>
+        <translation>Gå till sista bilden i vyn för miniatyrbilder</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="78"/>
+        <location filename="../mythgallery/main.cpp" line="77"/>
         <source>Start Slideshow in thumbnail view</source>
         <translation>Starta bildspel i vyn för miniatyrbilder</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="80"/>
+        <location filename="../mythgallery/main.cpp" line="79"/>
         <source>Start Random Slideshow in thumbnail view</source>
         <translation>Starta slumpmässig bildspel i vyn för miniatyrbilder</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="83"/>
+        <location filename="../mythgallery/main.cpp" line="82"/>
         <source>Rotate image right 90 degrees</source>
         <translation>Rotera bilden 90 grader åt höger</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="85"/>
+        <location filename="../mythgallery/main.cpp" line="84"/>
         <source>Rotate image left 90 degrees</source>
         <translation>Rotera bilden 90 grader åt vänster</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="87"/>
+        <location filename="../mythgallery/main.cpp" line="86"/>
         <source>Zoom image out</source>
         <translation>Zooma ut bilden</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="89"/>
+        <location filename="../mythgallery/main.cpp" line="88"/>
         <source>Zoom image in</source>
         <translation>Zooma in bilden</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="91"/>
+        <location filename="../mythgallery/main.cpp" line="90"/>
         <source>Scroll image up</source>
         <translation>Skrolla bilden upp</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="93"/>
+        <location filename="../mythgallery/main.cpp" line="92"/>
         <source>Scroll image left</source>
         <translation>Skrolla bilden vänster</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="95"/>
+        <location filename="../mythgallery/main.cpp" line="94"/>
         <source>Scroll image right</source>
         <translation>Skrolla bilden höger</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="97"/>
+        <location filename="../mythgallery/main.cpp" line="96"/>
         <source>Scroll image down</source>
         <translation>Skrolla bilden ner</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="99"/>
+        <location filename="../mythgallery/main.cpp" line="98"/>
         <source>Recenter image</source>
         <translation>Centrera bilden</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="101"/>
+        <location filename="../mythgallery/main.cpp" line="100"/>
         <source>Full-size (un-zoom) image</source>
         <translation>Fullstor (icke-zoomad) bild</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="103"/>
+        <location filename="../mythgallery/main.cpp" line="102"/>
         <source>Go to the upper-left corner of the image</source>
         <translation>Gå till övre vänstra hörnet av bilden</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="105"/>
+        <location filename="../mythgallery/main.cpp" line="104"/>
         <source>Go to the lower-right corner of the image</source>
         <translation>Gå till nedre högra hörnet av bilden</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="107"/>
+        <location filename="../mythgallery/main.cpp" line="106"/>
         <source>Mark image</source>
         <translation>Markera bild</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="109"/>
+        <location filename="../mythgallery/main.cpp" line="108"/>
         <source>Toggle scale to fullscreen/scale to fit</source>
-        <translatorcomment>Har inget bättre förslag för &quot;scale-to-fi&quot; än &quot;fyll ut&quot;</translatorcomment>
+        <translatorcomment>Har inget bättre förslag för &quot;scale-to-fit&quot; än &quot;fyll ut&quot;</translatorcomment>
         <translation>Växla skala till fullskärm/fyll ut</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="111"/>
+        <location filename="../mythgallery/main.cpp" line="110"/>
         <source>MythGallery Media Handler 1/2</source>
         <translation>MythGallery mediahanterare 1/2</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="114"/>
+        <location filename="../mythgallery/main.cpp" line="113"/>
         <source>MythGallery Media Handler 2/2</source>
         <translation>MythGallery mediahanterare 2/2</translation>
     </message>
@@ -448,7 +448,7 @@
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="45"/>
         <source>This is the sort order for the displayed picture thumbnails.</source>
-        <translation>Detta är sorteringsordningen för de visade miniatyrerbilderna.</translation>
+        <translation>Detta är sorteringsordningen för de visade miniatyrbilderna.</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="117"/>
@@ -466,7 +466,7 @@
         <translation>Inställningar för galleriet (allmänt)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="45"/>
+        <location filename="../mythgallery/main.cpp" line="44"/>
         <source>MythGallery cannot find its start directory.
 %1
 Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>

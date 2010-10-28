@@ -34,7 +34,7 @@
 <context>
     <name>BookmarkManager</name>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="158"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="175"/>
         <source>No bookmarks defined.
 
 Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
@@ -43,57 +43,57 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 Använd &apos;Lägg till bokmärke&apos;-menyn för att lägga till nya bokmärken</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="267"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="284"/>
         <source>Actions</source>
         <translation>Åtgärder</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="282"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="299"/>
         <source>Add Bookmark</source>
         <translation>Lägg till bokmärke</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="286"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="303"/>
         <source>Edit Bookmark</source>
         <translation>Redigera bokmärke</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="287"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="304"/>
         <source>Delete Bookmark</source>
         <translation>Ta bort bokmärke</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="288"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="305"/>
         <source>Show Bookmark</source>
         <translation>Visa bokmärke</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="293"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="310"/>
         <source>Delete Marked</source>
         <translation>Ta bort markerade</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="294"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="311"/>
         <source>Show Marked</source>
         <translation>Visa markerade</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="295"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="312"/>
         <source>Clear Marked</source>
         <translation>Rensa markering</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="298"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="315"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="475"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="492"/>
         <source>Are you sure you want to delete the selected bookmark</source>
         <translation>Är du säker på att du vill ta bort det valda bokmärket?</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="519"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="536"/>
         <source>Are you sure you want to delete the marked bookmarks</source>
         <translation>Är du säker på att du vill ta bort de markerade bokmärkena?</translation>
     </message>
@@ -101,7 +101,7 @@ Använd &apos;Lägg till bokmärke&apos;-menyn för att lägga till nya bokmärk
 <context>
     <name>BrowserConfig</name>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="42"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="46"/>
         <source>MythBrowser Settings</source>
         <translation>MythBrowser-inställningar</translation>
     </message>
@@ -114,22 +114,27 @@ Använd &apos;Lägg till bokmärke&apos;-menyn för att lägga till nya bokmärk
         <translation type="obsolete">Avbryt</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="115"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="129"/>
         <source>This is the command that will be used to show the web browser. Use &apos;Internal&apos; to use the built in web browser&apos;. %ZOOM% and %URL% will be replaced with the zoom level and URL list.</source>
-        <translation type="unfinished">Detta kommando kommer att användas för att visa webbläsaren. Använd &apos;Internal&apos; för att använda den inbyggda webbläsaren. %ZOOM% och %URL% kommer att ersättas med zoom-nivå och URL-lista.</translation>
+        <translation>Detta kommando kommer att användas för att visa webbläsaren. Använd &apos;Internal&apos; för att använda den inbyggda webbläsaren. %ZOOM% och %URL% kommer att ersättas med zoom-nivå och URL-lista.</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="119"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="133"/>
         <source>This is the default text size that will be used. Valid values for the Internal browser are from 0.3 to 5.0 with 1.0 being normal size less than 1 is smaller and greater than 1 is larger than normal size.</source>
-        <translation type="unfinished">Detta är standardstorleken som kommer att användas. Giltiga värden för den interna webbläsaren är 0,3 till 5,0 med 1,0 som normal storlek. Mindre än 1 är mindre än, och större än 1 är större än normal storlek.</translation>
+        <translation>Detta är standardstorleken som kommer att användas. Giltiga värden för den interna webbläsaren är 0,3 till 5,0 med 1,0 som normal storlek. Mindre än 1 är mindre än, och större än 1 är större än normal storlek.</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="124"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="138"/>
+        <source>If checked this will enable browser plugins if the &apos;Internal&apos; browser is being used.</source>
+        <translation>Om markerad kommer insticksprogram att aktiveras i den interna webbläsaren.</translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="141"/>
         <source>Exit without saving settings</source>
         <translation>Avsluta utan att spara inställningar</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="126"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="143"/>
         <source>Save settings and Exit</source>
         <translation>Spara inställningar och avsluta</translation>
     </message>
@@ -196,17 +201,17 @@ Använd &apos;Lägg till bokmärke&apos;-menyn för att lägga till nya bokmärk
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="47"/>
+        <location filename="../mythbrowser/main.cpp" line="46"/>
         <source>Move to next browser tab</source>
         <translation>Gå till nästa webbläsarflik</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="49"/>
+        <location filename="../mythbrowser/main.cpp" line="48"/>
         <source>Move to previous browser tab</source>
         <translation>Gå till föregående webbläsarflik</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="52"/>
+        <location filename="../mythbrowser/main.cpp" line="51"/>
         <source>Internal Web Browser</source>
         <translation>Intern webbläsare</translation>
     </message>
@@ -214,32 +219,32 @@ Använd &apos;Lägg till bokmärke&apos;-menyn för att lägga till nya bokmärk
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Bookmark Manager</source>
         <translation>Bokmärkeshanterare</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Category</source>
         <translation>Kategori</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="20"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Name</source>
         <translation>Namn</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="22"/>
         <source>URL</source>
-        <translation>Adress</translation>
+        <translation>URL</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Category:</source>
         <translation>Kategori:</translation>
     </message>
@@ -251,7 +256,7 @@ Använd &apos;Lägg till bokmärke&apos;-menyn för att lägga till nya bokmärk
     <message>
         <location filename="themestrings.h" line="3"/>
         <source>Web Bookmarks</source>
-        <translation type="unfinished">Webbokmärken</translation>
+        <translation>Webbokmärken</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="4"/>
@@ -264,17 +269,22 @@ Använd &apos;Lägg till bokmärke&apos;-menyn för att lägga till nya bokmärk
         <translation>Webbläsare:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="7"/>
+        <source>Enable browser plugins (Flash, etc):</source>
+        <translation>Aktivera insticksprogram (Flash, etc) för webbläsaren:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="9"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Configure Web Browser</source>
         <translation>Konfigurera webbläsare</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="11"/>
         <source>You can edit the name, URL, and category for the selected Web Site on this screen.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
@@ -283,42 +293,47 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
 Välj &quot;OK&quot; eller &quot;Avbryt&quot; för att fortsätta.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Genre:</source>
         <translation>Genre:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Channel:</source>
-        <translation type="unfinished">Kanal:</translation>
+        <translation>Kanal:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Click to choose from existing categories...</source>
         <translation>Klicka för att välja bland tillgängliga kategorier...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Find</source>
         <translation>Sök</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="26"/>
+        <source>Enable plugins:</source>
+        <translation>Aktivera insticksprogram:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="24"/>
         <source>Find...</source>
         <translation>Sök...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Name:</source>
         <translation>Namn:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="14"/>
         <source>URL:</source>
-        <translation>Adress:</translation>
+        <translation>URL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
@@ -327,7 +342,7 @@ Välj &quot;OK&quot; eller &quot;Avbryt&quot; för att fortsätta.</translation>
         <translation type="obsolete">Ok</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Browser Command:</source>
         <translation>Webbläsarkommando:</translation>
     </message>

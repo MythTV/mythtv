@@ -17,58 +17,58 @@
 <context>
     <name>NetSearch</name>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="222"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="223"/>
         <source>Search Options</source>
         <translation>Sökalternativ</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="243"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="244"/>
         <source>Open Web Link</source>
         <translation>Öppna webbadress</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="257"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="258"/>
         <source>Play</source>
         <translation>Spela upp</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="266"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="267"/>
         <source>Delete</source>
         <translation>Ta bort</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="259"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="260"/>
         <source>Save This Video</source>
         <translation>Spara denna video</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="271"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="272"/>
         <source>Previous Page</source>
         <translation>Föregående sida</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="273"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="274"/>
         <source>Next Page</source>
         <translation>Nästa sida</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="275"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="276"/>
         <source>Manage Search Scripts</source>
         <translation>Hantera sökskript</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="357"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="358"/>
         <source>Searching %1 for &quot;%2&quot;...</source>
         <translation>Söker efter &quot;%2&quot; på %1...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="380"/>
-        <location filename="../mythnetvision/netsearch.cpp" line="398"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="381"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="399"/>
         <source>Changing to page %1 of search &quot;%2&quot;...</source>
         <translation>Byter till sida %1 av sökningen efter &quot;%2&quot;...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="465"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="466"/>
         <source>Timed out waiting for query to finish.  API might be down.</source>
         <translation>Sökningen misslyckades.  Tjänsten kanske inte är tillgänglig.</translation>
     </message>
@@ -81,12 +81,12 @@
         <translation type="obsolete">Nedladdningsbar</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="572"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="573"/>
         <source>No browser command set! MythNetVision needs MythBrowser installed to display the video.</source>
         <translation>Inget webbläsarkommando angivet! MythNetVision kräver MythBrowser för att spela upp videon.</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="616"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="617"/>
         <source>Are you sure you want to delete this file?</source>
         <translation>Är du säker på att du vill ta bort den här filen?</translation>
     </message>
@@ -95,7 +95,7 @@
         <translation type="obsolete">Nedladdning pågår redan. Försök igen när nedladdningen är avslutad.</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="707"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="708"/>
         <source>This file already downloaded to:
 %1</source>
         <translation>Den här filen finns redan nedladdad till:
@@ -125,100 +125,100 @@
         <translation type="obsolete">Nedladdningsbar</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="490"/>
+        <location filename="../mythnetvision/nettree.cpp" line="491"/>
         <source>Playback/Download Options</source>
         <translation>Alternativ för uppspelning/nedladdning</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="512"/>
+        <location filename="../mythnetvision/nettree.cpp" line="513"/>
         <source>Open Web Link</source>
         <translation>Öppna webbadress</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="515"/>
+        <location filename="../mythnetvision/nettree.cpp" line="516"/>
         <source>Save This Video</source>
         <translation>Spara den här videon</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="518"/>
+        <location filename="../mythnetvision/nettree.cpp" line="519"/>
         <source>Scan/Manage Subscriptions</source>
         <translation>Hantera prenumerationer</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="519"/>
+        <location filename="../mythnetvision/nettree.cpp" line="520"/>
         <source>Change View</source>
         <translation>Byt vy</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="533"/>
+        <location filename="../mythnetvision/nettree.cpp" line="534"/>
         <source>View Options</source>
         <translation>Vyinställningar</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="545"/>
+        <location filename="../mythnetvision/nettree.cpp" line="546"/>
         <source>Switch to List View</source>
         <translation>Byt till listvy</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="547"/>
+        <location filename="../mythnetvision/nettree.cpp" line="548"/>
         <source>Switch to Gallery View</source>
         <translation>Byt till gallerivy</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="549"/>
+        <location filename="../mythnetvision/nettree.cpp" line="550"/>
         <source>Switch to Browse View</source>
         <translation>Byt till katalogvy</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="561"/>
+        <location filename="../mythnetvision/nettree.cpp" line="562"/>
         <source>Subscription Management</source>
         <translation>Hantera prenumerationer</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="572"/>
+        <location filename="../mythnetvision/nettree.cpp" line="573"/>
         <source>Update Site Maps</source>
         <translation>Uppdatera sajter</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="573"/>
+        <location filename="../mythnetvision/nettree.cpp" line="574"/>
         <source>Update RSS</source>
         <translation>Uppdatera RSS</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="574"/>
+        <location filename="../mythnetvision/nettree.cpp" line="575"/>
         <source>Manage Site Subscriptions</source>
         <translation>Hantera sajtprenumerationer</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="575"/>
+        <location filename="../mythnetvision/nettree.cpp" line="576"/>
         <source>Manage RSS Subscriptions</source>
         <translation>Hantera RSS-prenumerationer</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="577"/>
+        <location filename="../mythnetvision/nettree.cpp" line="578"/>
         <source>Enable Automatic Site Updates</source>
         <translation>Aktivera automatiska sajtuppdateringar</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="579"/>
+        <location filename="../mythnetvision/nettree.cpp" line="580"/>
         <source>Disable Automatic Site Updates</source>
         <translation>Inaktivera automatiska sajtuppdateringar</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="646"/>
-        <location filename="../mythnetvision/nettree.cpp" line="665"/>
-        <location filename="../mythnetvision/nettree.cpp" line="703"/>
-        <location filename="../mythnetvision/nettree.cpp" line="747"/>
+        <location filename="../mythnetvision/nettree.cpp" line="647"/>
+        <location filename="../mythnetvision/nettree.cpp" line="666"/>
+        <location filename="../mythnetvision/nettree.cpp" line="704"/>
+        <location filename="../mythnetvision/nettree.cpp" line="748"/>
         <source>Back</source>
         <translation>Tillbaka</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="839"/>
+        <location filename="../mythnetvision/nettree.cpp" line="840"/>
         <source>No browser command set! MythNetTree needs MythBrowser installed to display the video.</source>
         <translation>Inget webbläsarkommando angivet! MythNetVision kräver MythBrowser för att spela upp videon.</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="893"/>
+        <location filename="../mythnetvision/nettree.cpp" line="894"/>
         <source>Are you sure you want to delete this file?</source>
         <translation>Är du säker på att du vill ta bort den här filen?</translation>
     </message>
@@ -227,12 +227,12 @@
         <translation type="obsolete">Nedladdning pågår redan. Försök igen när nedladdningen är avslutad.</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="1225"/>
+        <location filename="../mythnetvision/nettree.cpp" line="1226"/>
         <source>Updating RSS.  This could take a while...</source>
         <translation>Uppdaterar RSS. Detta kan ta en stund...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="1240"/>
+        <location filename="../mythnetvision/nettree.cpp" line="1241"/>
         <source>Updating Site Maps.  This could take a while...</source>
         <translation>Uppdaterar sajter. Detta kan ta en stund...</translation>
     </message>
@@ -289,7 +289,7 @@
     <message>
         <location filename="../mythnetvision/searcheditor.cpp" line="87"/>
         <source>Querying Backend for Internet Content Sources...</source>
-        <translation type="unfinished">Hämtar källor med internetinnehåll...</translation>
+        <translation>Hämtar källor med internetinnehåll...</translation>
     </message>
 </context>
 <context>
@@ -543,7 +543,7 @@ För nya prenumerationer räcker det med att ange URL och trycka på &quot;Spara
     <message>
         <location filename="../mythnetvision/treeeditor.cpp" line="95"/>
         <source>Querying Backend for Internet Content Sources...</source>
-        <translation type="unfinished">Hämtar källor med internetinnehåll...</translation>
+        <translation>Hämtar källor med internetinnehåll...</translation>
     </message>
 </context>
 </TS>
