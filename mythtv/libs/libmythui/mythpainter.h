@@ -4,6 +4,7 @@
 #include <QString>
 #include <QWidget>
 #include <QPaintDevice>
+#include <QMutex>
 
 class QRect;
 class QRegion;
@@ -70,6 +71,7 @@ class MPUBLIC MythPainter
     int               m_CacheSize;
     static int        m_MaxCacheSize;
     QList<MythImage*> m_allocatedImages;
+    QMutex            m_allocationLock;
 };
 
 #endif

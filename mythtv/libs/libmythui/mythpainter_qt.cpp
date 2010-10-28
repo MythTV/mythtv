@@ -260,8 +260,10 @@ void MythQtPainter::DrawRoundRect(const QRect &area, int radius,
 
 MythImage *MythQtPainter::GetFormatImage()
 {
+    m_allocationLock.lock();
     MythImage *result = new MythQtImage(this);
     m_allocatedImages.append(result);
+    m_allocationLock.unlock();
     return result;
 }
 
