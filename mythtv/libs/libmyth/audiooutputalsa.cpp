@@ -22,8 +22,10 @@ using namespace std;
 #define CHANNELS_MIN 1
 #define CHANNELS_MAX 8
 
-#define OPEN_FLAGS SND_PCM_NO_AUTO_RESAMPLE|SND_PCM_NO_AUTO_FORMAT|\
-                   SND_PCM_NO_AUTO_CHANNELS
+#define OPEN_FLAGS (SND_PCM_NO_AUTO_RESAMPLE|SND_PCM_NO_AUTO_FORMAT|    \
+                    SND_PCM_NO_AUTO_CHANNELS)
+
+#define FILTER_FLAGS ~(SND_PCM_NO_AUTO_FORMAT)
 
 #define AERROR(str)   VBERROR(str + QString(": %1").arg(snd_strerror(err)))
 #define CHECKERR(str) { if (err < 0) { AERROR(str); return err; } }
@@ -224,11 +226,25 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
 
     if ((err = snd_pcm_hw_params_any(pcm_handle, params)) < 0)
     {
-        AERROR("No playback configurations available");
         snd_pcm_close(pcm_handle);
-        pcm_handle = NULL;
-        delete settings;
-        return NULL;
+        if((err = snd_pcm_open(&pcm_handle, dev_ba.constData(),
+                               SND_PCM_STREAM_PLAYBACK, OPEN_FLAGS&FILTER_FLAGS
+                               )) < 0)
+        {
+            AERROR(QString("snd_pcm_open(\"%1\")").arg(real_device));
+            delete settings;
+            return NULL;
+        }
+        if ((err = snd_pcm_hw_params_any(pcm_handle, params)) < 0)
+        {
+            AERROR("No playback configurations available");
+            snd_pcm_close(pcm_handle);
+            pcm_handle = NULL;
+            delete settings;
+            return NULL;
+        }
+        Warn("Supported audio format detection will be inacurrate "
+             "(using plugin?)");
     }
 
     while ((rate = settings->GetNextRate()))
@@ -319,7 +335,7 @@ bool AudioOutputALSA::OpenDevice()
 
     QByteArray dev_ba = real_device.toAscii();
     if ((err = snd_pcm_open(&pcm_handle, dev_ba.constData(),
-                            SND_PCM_STREAM_PLAYBACK, OPEN_FLAGS)) < 0)
+                            SND_PCM_STREAM_PLAYBACK, OPEN_FLAGS&FILTER_FLAGS)) < 0)
     {
         AERROR(QString("snd_pcm_open(%1)").arg(real_device));
         if (pcm_handle)
