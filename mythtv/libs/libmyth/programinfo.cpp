@@ -1503,7 +1503,8 @@ uint ProgramInfo::GetSecondsInRecording(void) const
 }
 
 
-QString ProgramInfo::toString(const Verbosity v, QString sep) const
+QString ProgramInfo::toString(const Verbosity v, QString sep, QString grp)
+    const
 {
     QString str;
     switch (v)
@@ -1517,11 +1518,12 @@ QString ProgramInfo::toString(const Verbosity v, QString sep) const
             break;
         case kTitleSubtitle:
             str = title.contains(' ') ?
-                QString("\"%1\"").arg(title) : title;
+                QString("%1%2%3").arg(grp).arg(title).arg(grp) : title;
             if (!subtitle.isEmpty())
             {
                 str += subtitle.contains(' ') ?
-                    QString("%1\"%2\"").arg(sep).arg(subtitle) :
+                    QString("%1%2%3%4").arg(sep)
+                        .arg(grp).arg(subtitle).arg(grp) :
                     QString("%1%2").arg(sep).arg(subtitle);
             }
             break;

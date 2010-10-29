@@ -495,7 +495,7 @@ void Scheduler::PrintRec(const RecordingInfo *p, const char *prefix)
     if (prefix)
         cout << prefix;
 
-    QString episode = p->toString(ProgramInfo::kTitleSubtitle, " - ");
+    QString episode = p->toString(ProgramInfo::kTitleSubtitle, " - ", "");
     episode = episode.leftJustified(34 - (prefix ? strlen(prefix) : 0),
                                     ' ', true);
 
