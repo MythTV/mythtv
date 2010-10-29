@@ -163,6 +163,7 @@ int MythOpenGLPainter::GetTextureFromCache(MythImage *im)
         return tx_id;
     }
 
+    im->SetParent(this);
     IncreaseCacheSize(realRender->GetTextureSize(tx_id));
     realRender->GetTextureBuffer(tx_id, false);
     realRender->UpdateTexture(tx_id, tx.bits());

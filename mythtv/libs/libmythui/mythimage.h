@@ -32,6 +32,7 @@ class MPUBLIC MythImage : public QImage
   public:
     MythImage(MythPainter *parent);
 
+    void SetParent(MythPainter *parent) { m_Parent = parent; }
     void UpRef(void);
     bool DownRef(void);
 
