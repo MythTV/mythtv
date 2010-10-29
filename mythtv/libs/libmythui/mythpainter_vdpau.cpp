@@ -238,11 +238,6 @@ void MythVDPAUPainter::DrawRoundRect(const QRect &area, int radius,
     DrawImage(area, im, QRect(0, 0, area.width(), area.height()), 255);
 }
 
-MythImage *MythVDPAUPainter::GetFormatImage()
-{
-    return new MythImage(this);
-}
-
 void MythVDPAUPainter::DeleteFormatImage(MythImage *im)
 {
     if (m_ImageBitmapMap.contains(im))

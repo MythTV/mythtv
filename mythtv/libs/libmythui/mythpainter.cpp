@@ -44,6 +44,11 @@ void MythPainter::DrawImage(const QPoint &topLeft, MythImage *im, int alpha)
     DrawImage(topLeft.x(), topLeft.y(), im, alpha);
 }
 
+MythImage *MythPainter::GetFormatImage()
+{
+    return new MythImage(this);
+}
+
 // the following assume graphics hardware operates natively at 32bpp
 void MythPainter::IncreaseCacheSize(QSize size)
 {

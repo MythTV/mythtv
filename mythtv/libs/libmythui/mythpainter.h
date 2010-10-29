@@ -56,7 +56,7 @@ class MPUBLIC MythPainter
                                bool drawFill, const QColor &fillColor,
                                bool drawLine, int lineWidth, const QColor &lineColor) = 0;
 
-    virtual MythImage *GetFormatImage() = 0;
+    virtual MythImage *GetFormatImage();
 
     // make friend so only callable from image
     virtual void DeleteFormatImage(MythImage *im) = 0;

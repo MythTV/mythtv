@@ -241,11 +241,6 @@ void MythD3D9Painter::DrawRoundRect(const QRect &area, int radius,
     DrawImage(area, im, QRect(0, 0, area.width(), area.height()), 255);
 }
 
-MythImage *MythD3D9Painter::GetFormatImage()
-{
-    return new MythImage(this);
-}
-
 void MythD3D9Painter::DeleteFormatImage(MythImage *im)
 {
     if (m_ImageBitmapMap.contains(im))
