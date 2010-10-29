@@ -11925,9 +11925,13 @@ OSD *TV::GetOSDL(const PlayerContext *ctx, const char *file, int location)
     mctx->LockDeletePlayer(file, location);
     if (mctx->player && (ctx->IsPIP() || mctx->IsOSDFullScreen()))
     {
+        mctx->LockOSD();
         OSD *osd = mctx->player->GetOSD();
         if (!osd)
+        {
+            mctx->UnlockOSD();
             mctx->UnlockDeletePlayer(file, location);
+        }
         else
             osd_lctx[osd] = mctx;
         return osd;
@@ -11937,9 +11941,13 @@ OSD *TV::GetOSDL(const PlayerContext *ctx, const char *file, int location)
     ctx->LockDeletePlayer(file, location);
     if (ctx->player && !ctx->IsPIP())
     {
+        ctx->LockOSD();
         OSD *osd = ctx->player->GetOSD();
         if (!osd)
+        {
+            ctx->UnlockOSD();
             ctx->UnlockDeletePlayer(file, location);
+        }
         else
             osd_lctx[osd] = ctx;
         return osd;
@@ -11949,23 +11957,12 @@ OSD *TV::GetOSDL(const PlayerContext *ctx, const char *file, int location)
     return NULL;
 }
 
-void TV::ReturnOSDLock(OSD *&osd)
-{
-    if (!osd)
-        return;
-
-    // we already have the player lock because we have an osd pointer..
-    osd_lctx[osd]->UnlockDeletePlayer(__FILE__, __LINE__);
-    ReturnPlayerLock(osd_lctx[osd]);
-
-    osd = NULL;
-}
-
 void TV::ReturnOSDLock(const PlayerContext *ctx, OSD *&osd)
 {
     if (!ctx || !osd)
         return;
 
+    osd_lctx[osd]->UnlockOSD();
     osd_lctx[osd]->UnlockDeletePlayer(__FILE__, __LINE__);
 
     osd = NULL;

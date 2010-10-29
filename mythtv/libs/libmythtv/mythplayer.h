@@ -296,6 +296,10 @@ class MPUBLIC MythPlayer
     bool PosMapFromEnc(unsigned long long          start,
                        QMap<long long, long long> &posMap);
 
+    // OSD locking for TV class
+    void LockOSD(void)   { osdLock.lock();   }
+    void UnlockOSD(void) { osdLock.unlock(); }
+
   protected:
     // Initialization
     void OpenDummy(void);
@@ -651,6 +655,7 @@ class MPUBLIC MythPlayer
     // OSD stuff
     OSD  *osd;
     bool  reinit_osd;
+    QMutex osdLock;
 
     // Audio stuff
     AudioPlayer audio;
