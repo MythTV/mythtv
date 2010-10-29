@@ -429,7 +429,8 @@ class MPUBLIC ProgramInfo
         kRecordingKey,
         kSchedulingKey,
     } Verbosity;
-    QString toString(Verbosity v = kLongDescription, QString sep = ":") const;
+    QString toString(Verbosity v = kLongDescription, QString sep = ":",
+                     QString grp = "\"") const;
 
     // Quick sets
     void SetTitle(const QString &t) { title = t; title.detach(); }
