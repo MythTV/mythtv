@@ -248,18 +248,6 @@ void MythImage::ToGreyscale()
     }
 }
 
-MythImage *MythImage::FromQImage(QImage **img)
-{
-    if (!img || !*img)
-        return NULL;
-
-    MythImage *ret = GetMythPainter()->GetFormatImage();
-    ret->Assign(**img);
-    delete *img;
-    *img = NULL;
-    return ret;
-}
-
 bool MythImage::Load(MythImageReader &reader)
 {
     if (!reader.canRead())
