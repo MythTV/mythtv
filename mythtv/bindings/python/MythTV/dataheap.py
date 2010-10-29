@@ -309,7 +309,6 @@ class Recorded( DBDataWrite, CMPRecord ):
                 be.downloadTo(image.url, group, image.filename)
             exists[image.type] = True
 
-
         self.update()
 
     def __getstate__(self):
@@ -422,8 +421,8 @@ class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
     """
     _table = 'jobqueue'
     _logmodule = 'Python Jobqueue'
-    _defaults =  {'id':None,     'inserttime':datetime.now(), 
-                  'hostname':'', 'status':JOBSTATUS.QUEUED, 
+    _defaults =  {'id':None,     'inserttime':datetime.now(),
+                  'hostname':'', 'status':JOBSTATUS.QUEUED,
                   'comment':'',  'schedruntime':datetime.now()}
 
     def __str__(self):
@@ -488,7 +487,7 @@ class Guide( DBData, CMPRecord ):
                     (prog.starttime == self.starttime):
                 return prog.recstatus
         return 0
-        
+
     @classmethod
     def fromEtree(cls, etree, db=None):
         dat = {'chanid':etree[0]}
