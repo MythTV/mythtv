@@ -272,8 +272,7 @@ uint MythVDPAUPainter::GetTextureFromCache(MythImage *im)
 
     if (newbitmap)
     {
-        if (!im->GetParent())
-            im->SetParent(this);
+        CheckFormatImage(im);
         m_render->UploadMythImage(newbitmap, im);
         m_ImageBitmapMap[im] = newbitmap;
         m_ImageExpireList.push_back(im);

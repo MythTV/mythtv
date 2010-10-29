@@ -275,8 +275,7 @@ D3D9Image* MythD3D9Painter::GetImageFromCache(MythImage *im)
 
     if (newimage && newimage->IsValid())
     {
-        if (!im->GetParent())
-            im->SetParent(this);
+        CheckFormatImage(im);
         IncreaseCacheSize(newimage->GetSize());
         newimage->UpdateImage(im);
         m_ImageBitmapMap[im] = newimage;

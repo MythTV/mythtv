@@ -75,6 +75,17 @@ void MythPainter::DeleteFormatImage(MythImage *im)
     m_allocationLock.unlock();
 }
 
+void MythPainter::CheckFormatImage(MythImage *im)
+{
+    if (im && !im->GetParent())
+    {
+        m_allocationLock.lock();
+        m_allocatedImages.append(im);
+        im->SetParent(this);
+        m_allocationLock.unlock();
+    }
+}
+
 // the following assume graphics hardware operates natively at 32bpp
 void MythPainter::IncreaseCacheSize(QSize size)
 {
