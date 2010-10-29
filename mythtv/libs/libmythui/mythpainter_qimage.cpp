@@ -411,10 +411,6 @@ MythImage *MythQImagePainter::GetImageFromString(const QString &msg,
     return im;
 }
 
-void MythQImagePainter::DeleteFormatImage(MythImage *im)
-{
-}
-
 void MythQImagePainter::ExpireImages(uint max)
 {
     while (m_StringExpireList.size() > max)

@@ -39,9 +39,8 @@ class MPUBLIC MythOpenGLPainter : public MythPainter
                                bool drawFill, const QColor &fillColor, 
                                bool drawLine, int lineWidth, const QColor &lineColor);
 
-    virtual void DeleteFormatImage(MythImage *im);
-
   protected:
+    virtual void DeleteFormatImagePriv(MythImage *im);
     void       ExpireImages(uint max = 0);
     void       ClearCache(void);
     void       DeleteTextures(void);

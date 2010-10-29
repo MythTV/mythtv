@@ -46,8 +46,6 @@ class MPUBLIC MythQImagePainter : public MythPainter
                                bool drawLine, int lineWidth,
                                const QColor &lineColor);
 
-    virtual void DeleteFormatImage(MythImage *im);
-
   protected:
     void       CheckPaintMode(const QRect &area);
     void       ExpireImages(uint max = 0);
