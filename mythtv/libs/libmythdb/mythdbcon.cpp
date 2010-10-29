@@ -72,7 +72,7 @@ bool MSqlDatabase::OpenDatabase()
         m_db.setPassword(dbparms.dbPassword);
         m_db.setHostName(dbparms.dbHostName);
 
-        if (!dbparms.dbHostName.length())  // Bootstrapping without a database?
+        if (dbparms.dbHostName.isEmpty())  // Bootstrapping without a database?
         {
             connected = true;              // Pretend to be connected
             return true;                   // to reduce errors
@@ -119,12 +119,18 @@ bool MSqlDatabase::OpenDatabase()
                     QString("Connected to database '%1' at host: %2")
                             .arg(m_db.databaseName()).arg(m_db.hostName()));
 
+            // WriteDelayed depends on SetHaveDBConnection() and SetHaveSchema()
+            // both being called with true, so order is important here.
+            GetMythDB()->SetHaveDBConnection(true);
+            if (!GetMythDB()->HaveSchema())
+                GetMythDB()->SetHaveSchema(m_db.tables().count() > 1);
             GetMythDB()->WriteDelayedSettings();
         }
     }
 
     if (!connected)
     {
+        GetMythDB()->SetHaveDBConnection(false);
         VERBOSE(VB_IMPORTANT, "Unable to connect to database!");
         VERBOSE(VB_IMPORTANT, MythDB::DBErrorMessage(m_db.lastError()));
     }
