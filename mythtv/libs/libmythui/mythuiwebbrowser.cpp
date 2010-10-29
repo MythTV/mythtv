@@ -303,7 +303,7 @@ void MythUIWebBrowser::Init(void)
     }
     
     QImage image = QImage(m_Area.size(), QImage::Format_ARGB32);
-    m_image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+    m_image = GetPainter()->GetFormatImage();
     m_image->Assign(image);
 
     SetBackgroundColor(m_bgColor);

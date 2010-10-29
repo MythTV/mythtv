@@ -57,6 +57,7 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
 
     m_Fonts = new FontMap();
     m_focusOrder = 0;
+    m_Painter = NULL;
 }
 
 MythUIType::~MythUIType()
@@ -322,7 +323,7 @@ void MythUIType::SetCanTakeFocus(bool set)
  */
 void MythUIType::HandleMovementPulse(void)
 {
-    if (!GetMythPainter()->SupportsAnimation())
+    if (!GetPainter()->SupportsAnimation())
         return;
 
     if (!m_Moving)
@@ -369,8 +370,8 @@ void MythUIType::HandleMovementPulse(void)
  */
 void MythUIType::HandleAlphaPulse(void)
 {
-    if (!GetMythPainter()->SupportsAlpha() ||
-        !GetMythPainter()->SupportsAnimation())
+    if (!GetPainter()->SupportsAlpha() ||
+        !GetPainter()->SupportsAnimation())
         return;
 
     if (m_AlphaChangeMode == 0)
@@ -645,7 +646,7 @@ bool MythUIType::IsVisible(bool recurse) const
 
 void MythUIType::MoveTo(QPoint destXY, QPoint speedXY)
 {
-    if (!GetMythPainter()->SupportsAnimation())
+    if (!GetPainter()->SupportsAnimation())
         return;
 
     if (destXY.x() == m_Area.x() && destXY.y() == m_Area.y())
@@ -660,7 +661,7 @@ void MythUIType::MoveTo(QPoint destXY, QPoint speedXY)
 void MythUIType::AdjustAlpha(int mode, int alphachange, int minalpha,
                              int maxalpha)
 {
-    if (!GetMythPainter()->SupportsAlpha())
+    if (!GetPainter()->SupportsAlpha())
         return;
 
     m_AlphaChangeMode = mode;
@@ -1007,3 +1008,11 @@ bool MythUIType::ContainsPoint(const QPoint &point) const
     return false;
 }
 
+MythPainter* MythUIType::GetPainter(void)
+{
+    if (m_Painter)
+        return m_Painter;
+    if (m_Parent)
+        return m_Parent->GetPainter();
+    return GetMythPainter();
+}

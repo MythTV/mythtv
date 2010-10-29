@@ -142,6 +142,9 @@ class MPUBLIC MythUIType : public QObject, public XMLParseBase
 
     bool ContainsPoint(const QPoint &point) const;
 
+    virtual MythPainter *GetPainter(void);
+    void SetPainter(MythPainter *painter) { m_Painter = painter; }
+
   protected:
     virtual void customEvent(QEvent *);
 
@@ -214,6 +217,7 @@ class MPUBLIC MythUIType : public QObject, public XMLParseBase
     FontMap *m_Fonts;
 
     MythUIType *m_Parent;
+    MythPainter *m_Painter;
 
     QString m_helptext;
 

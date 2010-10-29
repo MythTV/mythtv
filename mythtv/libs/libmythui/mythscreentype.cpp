@@ -521,3 +521,12 @@ void MythScreenType::CreateCopy(MythUIType *)
 {
     VERBOSE(VB_IMPORTANT, "CreateCopy called on screentype - bad.");
 }
+
+MythPainter* MythScreenType::GetPainter(void)
+{
+    if (m_Painter)
+        return m_Painter;
+    if (m_ScreenStack)
+        return m_ScreenStack->GetPainter();
+    return GetMythPainter();
+}

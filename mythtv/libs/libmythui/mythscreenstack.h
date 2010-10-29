@@ -10,6 +10,7 @@ class QString;
 
 class MythScreenType;
 class MythMainWindow;
+class MythPainter;
 
 class MPUBLIC MythScreenStack : public QObject
 {
@@ -36,6 +37,8 @@ class MPUBLIC MythScreenStack : public QObject
     void EnableEffects(void);
 
     QString GetLocation(bool fullPath) const;
+
+    MythPainter *GetPainter(void);
 
   private slots:
     void doInit(void);

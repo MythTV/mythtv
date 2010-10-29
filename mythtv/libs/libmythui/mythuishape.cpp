@@ -130,7 +130,7 @@ void MythUIShape::DrawRect(const QRect &area,const QBrush &fillBrush,
 
     painter.end();
 
-    m_image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+    m_image = GetPainter()->GetFormatImage();
     m_image->UpRef();
     m_image->Assign(image);
 }
@@ -166,7 +166,7 @@ void MythUIShape::DrawRoundRect(const QRect &area, int radius,
 
     painter.end();
 
-    m_image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+    m_image = GetPainter()->GetFormatImage();
     m_image->UpRef();
     m_image->Assign(image);
 }
@@ -196,7 +196,7 @@ void MythUIShape::DrawEllipse(const QRect &area,const QBrush &fillBrush,
 
     painter.end();
 
-    m_image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+    m_image = GetPainter()->GetFormatImage();
     m_image->UpRef();
     m_image->Assign(image);
 }

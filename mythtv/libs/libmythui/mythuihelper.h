@@ -14,6 +14,7 @@
 #define FALLBACK_UI_THEME "MythCenter-wide"
 
 class MythUIHelperPrivate;
+class MythPainter;
 class MythImage;
 class QImage;
 class QWidget;
@@ -81,6 +82,7 @@ class MPUBLIC MythUIHelper
     QPixmap *LoadScalePixmap(QString filename, bool fromcache = true);
     QImage *LoadScaleImage(QString filename, bool fromcache = true);
     MythImage *LoadCacheImage(QString srcfile, QString label,
+                              MythPainter *painter,
                               ImageCacheMode cacheMode = kCacheNormal);
 
     void ThemeWidget(QWidget *widget);

@@ -77,6 +77,8 @@ class MPUBLIC MythScreenType : public MythUIType
     void SetTextFromMap(QHash<QString, QString> &infoMap);
     void ResetMap(QHash<QString, QString> &infoMap);
 
+    virtual MythPainter *GetPainter(void);
+
   public slots:
     virtual void Close();
 

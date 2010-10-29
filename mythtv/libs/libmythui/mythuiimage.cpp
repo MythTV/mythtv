@@ -645,7 +645,8 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
 
 
         if ((allowLoadInBackground) &&
-            (!GetMythUI()->LoadCacheImage(filename, imagelabel, cacheMode)) &&
+            (!GetMythUI()->LoadCacheImage(filename, imagelabel,
+                                          GetPainter(), cacheMode)) &&
             (!getenv("DISABLETHREADEDMYTHUIIMAGE")))
         {
             VERBOSE(VB_GUI|VB_FILE|VB_EXTRA, LOC + QString(
@@ -764,7 +765,7 @@ MythImage *MythUIImage::LoadImage(
     if (!imageReader.supportsAnimation())
     {
         image = GetMythUI()->LoadCacheImage(
-            filename, imagelabel, (ImageCacheMode) cacheMode);
+            filename, imagelabel, GetPainter(), (ImageCacheMode) cacheMode);
     }
 
     if (image)
@@ -794,7 +795,7 @@ MythImage *MythUIImage::LoadImage(
             else
                 gradsize = QSize(10, 10);
 
-            image = MythImage::Gradient(gradsize, m_gradientStart,
+            image = MythImage::Gradient(GetPainter(), gradsize, m_gradientStart,
                                         m_gradientEnd, m_gradientAlpha,
                                         m_gradientDirection);
             image->UpRef();
@@ -805,7 +806,7 @@ MythImage *MythUIImage::LoadImage(
                     QString("LoadImage Not Found in cache. "
                             "Loading Directly :%1:").arg(filename));
 
-            image = GetMythPainter()->GetFormatImage();
+            image = GetPainter()->GetFormatImage();
             image->UpRef();
             bool ok = false;
             if (imageReader.supportsAnimation())
@@ -1237,7 +1238,7 @@ bool MythUIImage::ParseElement(
             m_maskImage = NULL;
         }
 
-        m_maskImage = GetMythPainter()->GetFormatImage();
+        m_maskImage = GetPainter()->GetFormatImage();
         m_maskImage->UpRef();
         if (m_maskImage->Load(maskfile))
             m_isMasked = true;

@@ -148,10 +148,10 @@ void ChannelEditor::sendResult(int result)
     QCoreApplication::postEvent(m_retObject, dce);
 }
 
-OSD::OSD(MythPlayer *player, QObject *parent)
-  : m_parent(player), m_ParentObject(parent), m_Rect(QRect()),
-    m_Effects(true),  m_FadeTime(kOSDFadeTime), m_Dialog(NULL),
-    m_PulsedDialogText(QString()),            m_NextPulseUpdate(QDateTime()),
+OSD::OSD(MythPlayer *player, QObject *parent, MythPainter *painter)
+  : m_parent(player), m_ParentObject(parent), m_CurrentPainter(painter),
+    m_Rect(QRect()), m_Effects(true), m_FadeTime(kOSDFadeTime), m_Dialog(NULL),
+    m_PulsedDialogText(QString()), m_NextPulseUpdate(QDateTime()),
     m_Refresh(false),   m_UIScaleOverride(false),
     m_SavedWMult(1.0f), m_SavedHMult(1.0f),   m_SavedUIRect(QRect()),
     m_fontStretch(100),
@@ -192,6 +192,20 @@ bool OSD::Init(const QRect &rect, float font_aspect)
                          .arg(m_Rect.left()).arg(m_Rect.top()));
     HideAll(false);
     return true;
+}
+
+void OSD::SetPainter(MythPainter *painter)
+{
+    if (painter == m_CurrentPainter)
+        return;
+
+    m_CurrentPainter = painter;
+    QHashIterator<QString, MythScreenType*> it(m_Children);
+    while (it.hasNext())
+    {
+        it.next();
+        it.value()->SetPainter(m_CurrentPainter);
+    }
 }
 
 void OSD::OverrideUIScale(void)
@@ -284,6 +298,7 @@ void OSD::LoadWindows(void)
         MythOSDWindow *win = new MythOSDWindow(NULL, window, true);
         if (win && win->Create())
         {
+            win->SetPainter(m_CurrentPainter);
             PositionWindow(win);
             VERBOSE(VB_PLAYBACK, LOC + QString("Loaded window %1").arg(window));
             m_Children.insert(window, win);
@@ -778,6 +793,7 @@ MythScreenType *OSD::GetWindow(const QString &window)
 
     if (new_window && new_window->Create())
     {
+        new_window->SetPainter(m_CurrentPainter);
         m_Children.insert(window, new_window);
         VERBOSE(VB_PLAYBACK, LOC + QString("Created window %1").arg(window));
         return new_window;
@@ -886,6 +902,7 @@ void OSD::DialogShow(const QString &window, const QString &text, int updatefor)
 
         if (dialog && dialog->Create())
         {
+            dialog->SetPainter(m_CurrentPainter);
             PositionWindow(dialog);
             m_Dialog = dialog;
             MythDialogBox *dbox = dynamic_cast<MythDialogBox*>(m_Dialog);
@@ -961,6 +978,7 @@ TeletextScreen* OSD::InitTeletext(void)
         {
             if (tt->Create())
             {
+                tt->SetPainter(m_CurrentPainter);
                 m_Children.insert(OSD_WIN_TELETEXT, tt);
             }
             else
@@ -1066,6 +1084,7 @@ SubtitleScreen* OSD::InitSubtitles(void)
         {
             if (sub->Create())
             {
+                sub->SetPainter(m_CurrentPainter);
                 m_Children.insert(OSD_WIN_SUBTITLE, sub);
             }
             else
