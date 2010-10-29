@@ -169,7 +169,7 @@ bool setupTVs(bool ismaster, bool &error)
             if (host == localhostname)
             {
                 TVRec *tv = TVRec::GetTVRec(cardid);
-                if (tv->Init())
+                if (tv && tv->Init())
                 {
                     EncoderLink *enc = new EncoderLink(cardid, tv);
                     tvList[cardid] = enc;
@@ -191,7 +191,7 @@ bool setupTVs(bool ismaster, bool &error)
             if (host == localhostname)
             {
                 TVRec *tv = TVRec::GetTVRec(cardid);
-                if (tv->Init())
+                if (tv && tv->Init())
                 {
                     EncoderLink *enc = new EncoderLink(cardid, tv);
                     tvList[cardid] = enc;
