@@ -16,6 +16,7 @@ int MythPainter::m_MaxCacheSize = 1024 * 1024 * 64;
 
 MythPainter::~MythPainter(void)
 {
+    QMutexLocker locker(&m_allocationLock);
     if (m_allocatedImages.isEmpty())
         return;
 
@@ -57,17 +58,21 @@ void MythPainter::DrawImage(const QPoint &topLeft, MythImage *im, int alpha)
 
 MythImage *MythPainter::GetFormatImage()
 {
+    m_allocationLock.lock();
     MythImage *result = new MythImage(this);
     m_allocatedImages.append(result);
+    m_allocationLock.unlock();
     return result;
 }
 
 void MythPainter::DeleteFormatImage(MythImage *im)
 {
+    m_allocationLock.lock();
     DeleteFormatImagePriv(im);
 
     while (m_allocatedImages.contains(im))
         m_allocatedImages.removeOne(im);
+    m_allocationLock.unlock();
 }
 
 // the following assume graphics hardware operates natively at 32bpp
