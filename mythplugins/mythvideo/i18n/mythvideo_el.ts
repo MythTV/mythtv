@@ -422,12 +422,12 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="234"/>
         <source>Enable automatic Parental Level from rating</source>
-        <translation>Χρήση αυτόματου Γονικού Ελέγχου βάσει ταξινόμησης</translation>
+        <translation>Χρήση αυτόματου Γονικού Ελέγχου βάσει αξιολόγησης</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="237"/>
         <source>If enabled, searches will automatically set the Parental Level to the one matching the rating below.</source>
-        <translation>Αν επιλεγεί, οι αναζητήσεις θα θέσουν αυτόματα το Επίπεδο Γονικού Ελέγχου ίδιο με αυτό που φαίνεται πιο κάτω στην ταξινόμηση.</translation>
+        <translation>Αν επιλεγεί, οι αναζητήσεις θα θέσουν αυτόματα το Επίπεδο Γονικού Ελέγχου ίδιο με αυτό που φαίνεται πιο κάτω στην αξιολόγηση.</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="261"/>
@@ -437,7 +437,7 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="262"/>
         <source>Ratings containing these strings (separated by :) will be assigned to Parental Level %1.</source>
-        <translation>Ταξινομήσεις που περιέχουν αυτές τις λέξεις (χωρισμένες με :) θα καταχωρούνται στο Γονικό Επίπεδο %1.</translation>
+        <translation>Οι αξιολογήσεις που περιέχουν αυτές τις λέξεις (χωρισμένες με :) θα καταχωρούνται στο Γονικό Επίπεδο %1.</translation>
     </message>
     <message>
         <location filename="../mythvideo/dbcheck.cpp" line="39"/>
@@ -452,7 +452,7 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="115"/>
         <source>Directory that holds movie/TV Banners</source>
-        <translation>Φάκελος με εξώφυλλα ταινιών/τηλεόρασης</translation>
+        <translation>Φάκελος με αφίσσες ταινιών/τηλεόρασης</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="126"/>
@@ -588,7 +588,7 @@
     <message>
         <location filename="themestrings.h" line="128"/>
         <source>Rated:</source>
-        <translation>Ταξινόμηση:</translation>
+        <translation>Χαρακτηρισμός:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="44"/>
@@ -723,7 +723,7 @@
     <message>
         <location filename="themestrings.h" line="144"/>
         <source>User Rating :</source>
-        <translation>Ταξινόμηση χρήστη :</translation>
+        <translation>Αξιολόγηση χρήστη :</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="145"/>
@@ -748,7 +748,7 @@
     <message>
         <location filename="themestrings.h" line="107"/>
         <source>User Rating</source>
-        <translation>Ταξινόμηση Χρήστη</translation>
+        <translation>Αξιολόγηση Χρήστη</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="43"/>
@@ -774,7 +774,7 @@
     <message>
         <location filename="themestrings.h" line="42"/>
         <source>User Rating:</source>
-        <translation>Ταξινόμηση Χρήστη:</translation>
+        <translation>Αξιολόγηση Χρήστη:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="90"/>
@@ -854,7 +854,7 @@
     <message>
         <location filename="themestrings.h" line="3"/>
         <source>User Rating: %1</source>
-        <translation>Ταξινόμηση Χρήστη: %1</translation>
+        <translation>Αξιολόγηση Χρήστη: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="4"/>
@@ -943,7 +943,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="26"/>
         <source>Rating:</source>
-        <translation>Αξιολόγηση:</translation>
+        <translation>Χαρακτηρισμός:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
@@ -953,12 +953,12 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="32"/>
         <source>Banner:</source>
-        <translation>Εξώφυλλο:</translation>
+        <translation>Αφίσσα:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="33"/>
         <source>Fanart:</source>
-        <translation></translation>
+        <translation>Φωτό:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="34"/>
@@ -978,7 +978,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="37"/>
         <source>Watched:</source>
-        <translation>Το είδα:</translation>
+        <translation>Το έχω δει:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="46"/>
@@ -1008,12 +1008,12 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="51"/>
         <source>Click here to search existing banners...</source>
-        <translation>Πατήστε εδώ για αναζήτηση σε υπάρχοντα εξώφυλλα...</translation>
+        <translation>Πατήστε εδώ για αναζήτηση σε υπάρχουσες αφίσσες...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="52"/>
         <source>Click to select from online banners...</source>
-        <translation>Πατήστε για επιλογή εξωφύλλων στο internet...</translation>
+        <translation>Πατήστε για επιλογή αφισσών στο internet...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="53"/>
@@ -1033,7 +1033,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="56"/>
         <source>Filter Videos</source>
-        <translation>Φίλτρα Ταινιών</translation>
+        <translation>Κριτήρια Εμφάνισης</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="57"/>
@@ -1458,7 +1458,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="174"/>
         <source>Banners</source>
-        <translation>Εξώφυλλα</translation>
+        <translation>Αφίσσες</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="175"/>
@@ -1624,7 +1624,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2444"/>
         <source>Play Folder</source>
-        <translation>Προβολή Φακέλου</translation>
+        <translation>Προβολή Ταινιών Φακέλου</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2458"/>
@@ -1666,7 +1666,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2508"/>
         <source>Filter Display</source>
-        <translation>Εμφάνιση Φίλτρων</translation>
+        <translation>Κριτήρια Εμφάνισης</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2510"/>
@@ -1752,7 +1752,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2672"/>
         <source>User Rating</source>
-        <translation>Ταξινόμηση Χρήστη</translation>
+        <translation>Αξιολόγηση Χρήστη</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2676"/>
@@ -1767,7 +1767,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2698"/>
         <source>View Full Plot</source>
-        <translation>Προβολή Πλήρους Πλοκής</translation>
+        <translation>Προβολή Υπόθεσης</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2704"/>
@@ -1787,7 +1787,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2757"/>
         <source>Manually Enter Video #</source>
-        <translation>Εισαγωγή Προσαρμοσμένου # ταινίας</translation>
+        <translation>Εισαγωγή # ταινίας</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3004"/>
@@ -1859,7 +1859,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2706"/>
         <source>View Homepage</source>
-        <translation>Αρχική Σελίδα</translation>
+        <translation>Προβολή Ιστοσελίδας</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2744"/>

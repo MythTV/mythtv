@@ -440,47 +440,47 @@ Could not copy file to: %1</source>
         <translation>Τέλος αναπαραγωγής ροής.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1008"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1006"/>
         <source>Decoder error.</source>
         <translation>Σφάλμα αποκωδικοποιητή.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1033"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1029"/>
         <source>Sync List With Current Track</source>
         <translation>Συγχρ. Λίστας με το Παρόν Κομμάτι</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1037"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1033"/>
         <source>Remove Selected Track</source>
         <translation>Αφαίρεση Επιλεγμένου Κομματιού</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1049"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1045"/>
         <source>Remove All Tracks</source>
         <translation>Αφαίρεση όλων των Κομματιών</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1053"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1049"/>
         <source>Save As New Playlist</source>
         <translation>Αποθήκευση ως νέα Λίστα</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1057"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1053"/>
         <source>Switch To Move Mode</source>
         <translation>Αλλαγή σε Κατάσταση Μετακίνησης</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1064"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1060"/>
         <source>Switch To Select Mode</source>
         <translation>Αλλαγή σε Κατάσταση Επιλογής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1074"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1070"/>
         <source>No - Exit, Stop Playing</source>
         <translation>Όχι - Έξοδος και Διακοπή Μουσικής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1080"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1076"/>
         <source>Yes - Exit, Continue Playing</source>
         <translation>Ναι - Έξοδος και Συνέχιση Μουσικής</translation>
     </message>
@@ -692,199 +692,199 @@ Do you want to continue playing in the background?</source>
         <translation>Ακύρωση</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="617"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="618"/>
         <source>Change Filter</source>
         <translation>Αλλαγή Φίλτρου</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="621"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="622"/>
         <source>Smart playlists</source>
         <translation>Έξυπνες λίστες αναπαραγωγής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="631"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="632"/>
         <source>Search</source>
         <translation>Αναζήτηση</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="633"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="634"/>
         <source>From CD</source>
         <translation>Από CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="635"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="636"/>
         <source>All Tracks</source>
         <translation>Όλα τα Τραγούδια</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="639"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="640"/>
         <source>Tracks by current Artist</source>
         <translation>Τραγούδια από τον παρόν Καλλιτέχνη</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="641"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="642"/>
         <source>Tracks from current Album</source>
         <translation>Τραγούδια από τον Τρέχων Δίσκο</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="643"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="644"/>
         <source>Tracks from current Genre</source>
         <translation>Τραγούδια από το τρέχον Είδος</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="645"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="646"/>
         <source>Tracks from current Year</source>
         <translation>Τραγούδια από το τρέχον Έτος</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="647"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="648"/>
         <source>Tracks with same Title</source>
         <translation>Τραγούδια με ίδιο Τίτλο</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1305"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1306"/>
         <source>Speed: </source>
         <translation>Ταχύτητα:</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1614"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1615"/>
         <source>Smart</source>
         <translation>Έξυπνο</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1619"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1620"/>
         <source>Rand</source>
         <translation>Τυχαίο</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1624"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1625"/>
         <source>Album</source>
         <translation>Δίσκος</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1629"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1630"/>
         <source>Artist</source>
         <translation>Καλλιτέχνης</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1634"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1723"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1635"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1724"/>
         <source>None</source>
         <translation>Όχι</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1646"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1649"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1653"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1647"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1650"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1654"/>
         <source>Shuffle</source>
         <translation>Ανακ.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1713"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1714"/>
         <source>All</source>
         <translation>Όλα</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1718"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1719"/>
         <source>Track</source>
         <translation>Τραγούδι</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1736"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1739"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1743"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1737"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1740"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1744"/>
         <source>Repeat</source>
         <translation>Επαν.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1931"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1932"/>
         <source>Playing stream.</source>
         <translation>Σειρά αναπαραγωγής.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1936"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1937"/>
         <source>Buffering stream.</source>
         <translation>Ροοθηκεύω τη ροή.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1940"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1941"/>
         <source>Stream paused.</source>
         <translation>Η ροή είναι σε παύση.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1976"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1977"/>
         <source>kbps</source>
         <translation>kbps</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1976"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1982"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1977"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1983"/>
         <source>kHz</source>
         <translation>kHz</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1976"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1982"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1977"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1983"/>
         <source>ch</source>
         <translation>ch</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2003"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2004"/>
         <source>Output error.</source>
         <translation>Σφάλμα εξόδου.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2018"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2019"/>
         <source>Stream stopped.</source>
         <translation>Η ροή διακόπηκε.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2023"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2024"/>
         <source>Finished playing stream.</source>
         <translation>Τέλος αναπαραγωγής ροής.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2032"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2033"/>
         <source>Decoder error.</source>
         <translation>Σφάλμα αποκωδικοποιητή.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2354"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2355"/>
         <source>Update Playlist Options</source>
         <translation>Επιλογές Ενημέρωσης Λίστας Αναπαραγωγής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2357"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2358"/>
         <source>Replace</source>
         <translation>Αντικατάσταση</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2358"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2359"/>
         <source>Insert after current track</source>
         <translation>Εισαγωγή μετά το τρέχον κομμάτι</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2359"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2360"/>
         <source>Append to end</source>
         <translation>Προσθήκη στο τέλος</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2374"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2375"/>
         <source>Continue playing current track</source>
         <translation>Συνέχιση αναπαραγωγής του τρέχοντος κομματιού</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2375"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2376"/>
         <source>Play first track</source>
         <translation>Αναπαραγωγή του πρώτου κομματιού</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2376"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2377"/>
         <source>Play first new track</source>
         <translation>Αναπαραγωγή του πρώτου νέου κομματιού</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2382"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2383"/>
         <source>Remove Duplicates</source>
         <translation>Αφαίρεση Διπλότυπων</translation>
     </message>
@@ -892,7 +892,7 @@ Do you want to continue playing in the background?</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythmusic/avfdecoder.cpp" line="530"/>
+        <location filename="../mythmusic/avfdecoder.cpp" line="534"/>
         <source>Internal Decoder</source>
         <translation>Εσωτερικός Αποκωδικοποιητής</translation>
     </message>
@@ -996,7 +996,7 @@ Do you want to continue playing in the background?</source>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="75"/>
         <source>MythTV can upconvert stereo tracks to 5.1 audio. Set this option to enable it by default. You can enable or disable the upconversion during playback at anytime.</source>
-        <translation>Το MythTV μπορεί να μετατρέψει στερεοφωνικά τραγούδια σε 5.1. Επιλέξτε την επιλογή για να το θέσετε ως προεπιλογή. Μπορείτε να ενεργοποιείτε ή απενεργοποιείτε τη μετατροπή κατά την αναπαραγωγή μουσικής κατά βούληση.</translation>
+        <translation>Το MythTV μπορεί να μετατρέψει τα στερεοφωνικά τραγούδια σε 5.1. Επιλέξτε το για να το ενεργοποιήσετε ως προεπιλογή. Μπορείτε να ενεργοποιείτε ή απενεργοποιείτε τη μετατροπή κατά την αναπαραγωγή μουσικής κατά βούληση.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="84"/>
@@ -1016,7 +1016,7 @@ Do you want to continue playing in the background?</source>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="95"/>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation>Η σειρά ταξινόμησης του Μουσικού Δένδρου. Πιθανές τιμές είναι μια λίστα χωρισμένη με κενό από genre, splitartist, splitartist1, artist, album και title Ή τη λέξη &quot;directory&apos; που θα σημαίνει πως οι εμφανιζόμενη λίστα αντικατοπτρίζει το σύστημα αρχείων.</translation>
+        <translation>Η σειρά ταξινόμησης του Μουσικού Δένδρου. Πιθανές τιμές είναι μια λίστα χωρισμένη με κενό από genre, splitartist, splitartist1, artist, album και title ή τη λέξη &quot;directory&quot; που θα σημαίνει πως η εμφανιζόμενη λίστα αντικατοπτρίζει το σύστημα αρχείων.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="106"/>
@@ -1026,7 +1026,7 @@ Do you want to continue playing in the background?</source>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="108"/>
         <source>If present this script will be executed after a CD Rip is completed.</source>
-        <translation>Εάν δηλωθεί, το σκριπτάκι θα εκτελεστεί μετά από την αντιγραφή κάποιου CD.</translation>
+        <translation>Εάν οριστεί, το σκριπτάκι θα εκτελεστεί μετά από την αντιγραφή κάποιου CD.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="116"/>
@@ -1036,7 +1036,7 @@ Do you want to continue playing in the background?</source>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="118"/>
         <source>Directory and filename Format used to grab information if no ID3 information is found. Accepts GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE and TRACK_TITLE.</source>
-        <translation>Μορφή φακέλου και αρχείου για χρήση εάν δεν βρεθούν πληροφορίες ID3. Δέχεται GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE και TRACK_TITLE.</translation>
+        <translation>Η μορφή του φακέλου και αρχείου για ανάκτηση στοιχείων εάν δεν βρεθούν πληροφορίες ID3. Δέχεται GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE και TRACK_TITLE.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="129"/>
@@ -1061,17 +1061,17 @@ Do you want to continue playing in the background?</source>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="143"/>
         <source>UTF-8</source>
-        <translation></translation>
+        <translation>UTF-8</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="144"/>
         <source>ASCII</source>
-        <translation></translation>
+        <translation>ASCII</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="145"/>
         <source>Some mp3 players don&apos;t understand tags encoded in UTF8 or UTF16, this setting allows you to change the encoding format used. Currently applies only to ID3 tags.</source>
-        <translation>Μερικοί αναπαραγωγείς mp3 δεν καταλαβαίνουν ετικέτες κωδικοποιημένες κατά UTF8 ή UTF16, αυτή η ρύθμιση σας επιτρέπει να αλλάξετε τη χρησιμοποιούμενη μορφή. Επί του παρόντως εφαρμόζεται μόνο σε ετικέτες ID3.</translation>
+        <translation>Μερικοί αναπαραγωγείς mp3 δεν καταλαβαίνουν ετικέτες κωδικοποιημένες κατά UTF8 ή UTF16, αυτή η ρύθμιση σας επιτρέπει να αλλάξετε τη χρησιμοποιούμενη μορφή. Επί του παρόντος εφαρμόζεται μόνο σε ετικέτες ID3.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="152"/>
@@ -1121,7 +1121,7 @@ Do you want to continue playing in the background?</source>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="189"/>
         <source>Audio encoder to use for CD ripping. Note that the quality level &apos;Perfect&apos; will use the FLAC encoder.</source>
-        <translation>Ο κωδικοποιητής ήχου προς χρήση κατά την αντιγραφή CD. Σημειώστε πως αν επιλέξετε ως ποιότητα &apos;Τέλεια&apos;, θα γίνει κωδικοποίηση με FLAC.</translation>
+        <translation>Η κωδικοποίηση του ήχου κατά την αντιγραφή CD. Σημειώστε πως αν επιλέξετε ως ποιότητα &apos;Τέλεια&apos;, θα γίνει κωδικοποίηση με FLAC.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="198"/>
@@ -1161,7 +1161,7 @@ Do you want to continue playing in the background?</source>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="212"/>
         <source>If set, the MP3 encoder will use variable bitrates (VBR) except for the low quality setting. The Ogg encoder will always use variable bitrates.</source>
-        <translation>Εάν επιλεγεί, ο κωδικοποιητής MP3 θα χρησιμοποιεί μεταβλητή δειγματοληψία (VBR), εκτός από την επιλογή Χαμηλής Ποιότητας. Ο κωδικοποιητής Ogg χρησιμοποιεί πάντα μεταβλητή δειγματοληψία.</translation>
+        <translation>Εάν επιλεγεί, ο κωδικοποιητής MP3 θα χρησιμοποιεί μεταβλητή δειγματοληψία (VBR), με εξαίρεση τη Χαμηλή Ποιότητα. Ο κωδικοποιητής Ogg χρησιμοποιεί πάντα μεταβλητή δειγματοληψία.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="221"/>
@@ -1216,22 +1216,22 @@ Do you want to continue playing in the background?</source>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="264"/>
         <source>Rating Weight</source>
-        <translation>Βάρος Αξιολόγησης</translation>
+        <translation>Βαρύτητα Αξιολόγησης</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="266"/>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to your rating of a given track when ordering a group of songs.</source>
-        <translation>Χρησιμοποιείται κατά το  &quot;Έξυπνο&quot; Ανακάτεμα. Επηρεάζει πόσο βάρος θα έχει η αξιολόγηση που δίνετε σε κάποιο τραγούδι κατά την ταξινόμηση της ομάδας τραγουδιών.</translation>
+        <translation>Χρησιμοποιείται κατά το &quot;Έξυπνο&quot; Ανακάτεμα. Επηρεάζει πόση σημασία θα έχει η αξιολόγηση που δίνετε σε κάποιο τραγούδι κατά την ταξινόμηση της ομάδας τραγουδιών.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="276"/>
         <source>Play Count Weight</source>
-        <translation>Βάρος Επαναλήψεων Αναπαραγωγής</translation>
+        <translation>Βαρύτητα Επαναλήψεων Αναπαραγωγής</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="278"/>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how many times a given track has been played when ordering a group of songs.</source>
-        <translation>Χρησιμοποιείται κατά το  &quot;Έξυπνο&quot; Ανακάτεμα. Επηρεάζει πόσο βάρος δίνεται στο πόσες φορές έχει παιχτεί κάποιο τραγούδι κατά την ταξινόμηση της ομάδας τραγουδιών.</translation>
+        <translation>Χρησιμοποιείται κατά το &quot;Έξυπνο&quot; Ανακάτεμα. Επηρεάζει πόσο βάρος δίνεται στο πόσες φορές έχει παιχτεί κάποιο τραγούδι κατά την ταξινόμηση της ομάδας τραγουδιών.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="288"/>
@@ -1241,17 +1241,17 @@ Do you want to continue playing in the background?</source>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="290"/>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how long it has been since a given track was played when ordering a group of songs.</source>
-        <translation>Χρησιμοποιείται κατά το  &quot;Έξυπνο&quot; Ανακάτεμα. Επηρεάζει πόσο βάρος θα έχει ο χρόνος που πέρασε από την τελευταία φορά που ακούστηκε κάποιο τραγούδι κατά την ταξινόμηση της ομάδας τραγουδιών.</translation>
+        <translation>Χρησιμοποιείται κατά το &quot;Έξυπνο&quot; Ανακάτεμα. Επηρεάζει πόση σημασία θα έχει ο χρόνος που πέρασε από την τελευταία φορά που ακούστηκε κάποιο τραγούδι κατά την ταξινόμηση της ομάδας τραγουδιών.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="300"/>
         <source>Random Weight</source>
-        <translation>Τυχαίο Βάρος</translation>
+        <translation>Βαρύτητα Τυχαιότητας</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="302"/>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to good old (peudo-)randomness when ordering a group of songs.</source>
-        <translation>Χρησιμοποιείται κατά το  &quot;Έξυπνο&quot; Ανακάτεμα. Επηρεάζει πόσο βάρος θα έχει η αξιολόγηση που δίνετε στον βαθμό τυχαιότητας κατά την ταξινόμηση της ομάδας τραγουδιών.</translation>
+        <translation>Χρησιμοποιείται κατά το &quot;Έξυπνο&quot; Ανακάτεμα. Επηρεάζει πόση σημασία θα έχει η αξιολόγηση που δίνετε στον βαθμό τυχαιότητας κατά την ταξινόμηση της ομάδας τραγουδιών.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="312"/>
@@ -1606,7 +1606,7 @@ Do you want to continue playing in the background?</source>
     </message>
     <message>
         <location filename="../mythmusic/metadata.cpp" line="1677"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1033"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1034"/>
         <source>Rebuilding music tree</source>
         <translation>Αναδημιουργεία Μουσικού Δένδρου</translation>
     </message>
@@ -1690,7 +1690,7 @@ Do you want to continue playing in the background?</source>
         <translation>κάλυμα</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1155"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1156"/>
         <source>Loading Music</source>
         <translation>Φόρτωση Μουσικής</translation>
     </message>
