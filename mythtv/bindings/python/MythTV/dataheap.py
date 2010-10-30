@@ -41,7 +41,7 @@ class Record( DBDataWrite, RECTYPE, CMPRecord ):
 
     def create(self, data=None, wait=False):
         """Record.create(data=None) -> Record object"""
-        DBDataWrite.create(self, data)
+        DBDataWrite._create_autoincrement(self, data)
         FileOps(db=self._db).reschedule(self.recordid, wait)
         return self
 
@@ -608,6 +608,12 @@ class Video( VideoSchema, DBDataWrite, CMPVideo ):
                                     mode, False, nooverwrite, self.inst._db)
 
     @classmethod
+    def _setClassDefs(cls, db=None):
+        db = DBCache(db)
+        super(Video, cls)._setClassDefs(db)
+        cls._fill_cm(db)
+
+    @classmethod
     def _getGroup(cls, host, groupname=None, db=None):
         db = DBCache(db)
         metadata = ['coverart','fanart','banner','screenshot']
@@ -631,19 +637,27 @@ class Video( VideoSchema, DBDataWrite, CMPVideo ):
         else:
             raise MythError('Invalid Video StorageGroup name.')
 
-    def _fill_cm(self):
-        if len(self._cm_toid) > 1:
-            return
-        with self._db.cursor(self._log) as cursor:
+    @classmethod
+    def _fill_cm(cls, db=None):
+        db = DBCache(db)
+        with db.cursor() as cursor:
             cursor.execute("""SELECT * FROM videocategory""")
             for row in cursor:
-                self._cm_toname[row[0]] = row[1]
+                cls._cm_toname[row[0]] = row[1]
 
     def _cat_toname(self):
         if self.category is not None:
             try:
                 self.category = self._cm_toname[int(self.category)]
-            except: pass
+            except ValueError:
+                # already a named category
+                pass
+            except KeyError:
+                self._fill_cm(self._db)
+                if int(self.category) in self._cm_toname:
+                    self.category = self._cm_toname[int(self.category)]
+                else:
+                    raise MythDBError('Video defined with unknown category id')
         else:
             self.category = 'none'
 
@@ -651,13 +665,16 @@ class Video( VideoSchema, DBDataWrite, CMPVideo ):
         if self.category is not None:
             try:
                 if self.category.lower() not in self._cm_toid:
+                    self._fill_cm(self._db)
+                if self.category.lower() not in self._cm_toid:
                     with self._db.cursor(self._log) as cursor:
                         cursor.execute("""INSERT INTO videocategory
                                           SET category=%s""",
                                       self.category)
-                    self._cm_toid[self.category] = cursor.lastrowid
+                        self._cm_toid[self.category] = cursor.lastrowid
                 self.category = self._cm_toid[self.category]
-            except:
+            except AttributeError:
+                # already an integer category
                 pass
         else:
             self.category = 0
@@ -713,7 +730,7 @@ class Video( VideoSchema, DBDataWrite, CMPVideo ):
         # create new entry
         self._import(data)
         self._cat_toid()
-        return DBDataWrite.create(self)
+        return DBDataWrite._create_autoincrement(self)
 
     class _Cast( DBDataCRef ):
         _table = ['videometadatacast','videocast']
