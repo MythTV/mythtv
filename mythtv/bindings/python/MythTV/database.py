@@ -242,14 +242,16 @@ class DBDataWrite( DBData ):
         super(DBDataWrite, cls)._setClassDefs(db)
         if cls._defaults is None:
             cls._defaults = {}
+        create = cls._create_normal
         if cls._key is not None:
             if len(cls._key) == 1:
                 if 'auto_increment' in \
                         db.tablefields[cls._table][cls._key[0]].extra:
-                    cls.create = cls._create_autoincrement
+                    create = cls._create_autoincrement
                     cls._defaults[cls._key[0]] = None
                     return
-        cls.create = cls._create_normal
+        if not hasattr(cls, 'create'):
+            cls.create = create
 
     def _sanitize(self, data, fill=True):
         """Remove fields from dictionary that are not in database table."""
