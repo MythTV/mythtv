@@ -723,7 +723,7 @@ class Video( VideoSchema, DBDataWrite, CMPVideo ):
                 if cursor.execute("""SELECT intid FROM videometadata
                                      WHERE hash=%s""", self.hash) > 0:
                     id = cursor.fetchone()[0]
-                    self._setwheredat([id])
+                    self._evalwheredat([id])
                     self._pull()
                     return self
 
