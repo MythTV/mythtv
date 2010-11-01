@@ -993,6 +993,12 @@ int main(int argc, char *argv[])
 
     SendMythSystemEvent("MYTHFILLDATABASE_RAN");
 
+    // BEGIN HACK HACK HACK
+    // We get a segfault on the response to CLEAR_SETTINGS_CACHE
+    // if MythContext is partially deleted when it arrives.
+    sleep(1);
+    // END HACK HACK HACK
+
     VERBOSE(VB_IMPORTANT, "mythfilldatabase run complete.");
 
     return FILLDB_EXIT_OK;
