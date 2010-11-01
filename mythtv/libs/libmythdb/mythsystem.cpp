@@ -361,8 +361,11 @@ void myth_system_post_flags(uint &flags)
 #ifndef USING_MINGW
 pid_t myth_system_fork(const QString &command, uint &result)
 {
-    QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(command);
-    VERBOSE(VB_GENERAL, QString("Launching: %1") .arg(command));
+    const char *cmdargs = command.toUtf8().constData();
+    QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(cmdargs);
+    const char *locerr  = (const char *)LOC_ERR.constData();
+
+    VERBOSE(VB_GENERAL, QString("Launching: %1") .arg(cmdargs));
 
     pid_t child = fork();
 
@@ -392,29 +395,27 @@ pid_t myth_system_fork(const QString &command, uint &result)
             if (dup2(fd, 0) < 0)
             {
                 // Can't use VERBOSE due to locking fun.
-		        QString message = LOC_ERR + 
-                        "Cannot redirect /dev/null to standard input,"
-                        "\n\t\t\tfailed to duplicate file descriptor." + ENO;
-                cerr << message.constData() << endl;
+                cerr << locerr 
+                     << "Cannot redirect /dev/null to standard input,"
+                        "\n\t\t\tfailed to duplicate file descriptor: "
+                     << strerror(errno) << endl;
             }
             close(fd);
         }
         else
         {
             // Can't use VERBOSE due to locking fun.
-            QString message = LOC_ERR + "Cannot redirect /dev/null "
-                    "to standard input, failed to open." + ENO;
-            cerr << message.constData() << endl;
+            cerr << locerr 
+                 << "Cannot redirect /dev/null to standard input, failed to "
+                    "open: " << strerror(errno) << endl;
         }
 
         /* Run command */
-        execl("/bin/sh", "sh", "-c", command.toUtf8().constData(), (char *)0);
+        execl("/bin/sh", "sh", "-c", cmdargs, (char *)0);
         if (errno)
         {
             // Can't use VERBOSE due to locking fun.
-            QString message = LOC_ERR + QString("execl() failed because %1")
-                    .arg(strerror(errno));
-            cerr << message.constData() << endl;
+            cerr << locerr << "execl() failed: " << strerror(errno) << endl;
         }
 
         /* Failed to exec */
