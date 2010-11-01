@@ -227,7 +227,7 @@ void AudioOutputPulseAudio::WriteAudio(uchar *aubuf, int size)
     pa_stream_state_t sstate = pa_stream_get_state(pstream);
 
     // Do not write anything to pulse server if we are in pause mode
-    if (actually_paused)
+    if (IsPaused())
         return;
 
     VBAUDIOTS(fn_log_tag + QString("writing %1 bytes").arg(size));

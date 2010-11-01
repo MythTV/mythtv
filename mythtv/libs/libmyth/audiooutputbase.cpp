@@ -1259,7 +1259,7 @@ void AudioOutputBase::OutputAudioLoop(void)
 
             // only send zeros if card doesn't already have at least one
             // fragment of zeros -dag
-            WriteAudio(zeros, fragment_size);
+            WriteAudio(zeros, zero_fragment_size);
             continue;
         }
         else
