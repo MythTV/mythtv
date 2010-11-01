@@ -30,7 +30,7 @@ The source of all cover art and screen shots are from those downloaded and maint
 Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
 '''
 
-__version__=u"v0.6.3"
+__version__=u"v0.6.4"
 # 0.1.0 Initial development
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -187,6 +187,7 @@ __version__=u"v0.6.3"
 # 0.6.1 Modifications to support MythTV python bindings changes
 # 0.6.2 Trapped possible unicode errors which would hang the MiroBridge process
 # 0.6.3 Pull hostname from python bindings instead of socket libraries
+# 0.6.4 MythTV python bindings changes
 
 examples_txt=u'''
 For examples, please see the Mirobridge's wiki page at http://www.mythtv.org/wiki/MiroBridge
@@ -1951,10 +1952,11 @@ def updateMythVideo(items):
             logger.info(u"Simulation: Create videometadata record for (%s - %s)" % (item[u'channelTitle'], item[u'title']))
         else:  # Check for duplicates
             if not local_only and videometadata[u'filename'][0] != u'/':
-                intid = mythvideo.getVideo(exactfile=videometadata[u'filename'], host=localhostname.lower())
+                intid = list(mythvideo.searchVideos(exactfile=videometadata[u'filename'], host=localhostname.lower()))
             else:
-                intid = mythvideo.getVideo(exactfile=videometadata[u'filename'])
-            if intid == None:
+                intid = list(mythvideo.searchVideos(exactfile=videometadata[u'filename']))
+
+            if intid == []: # Check for an empty array
                 try:
                     intid = Video(db=mythvideo).create(videometadata).intid
                 except MythError, e:

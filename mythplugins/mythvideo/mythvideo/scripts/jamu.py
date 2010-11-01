@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.7.7"
+__version__=u"v0.7.8"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -306,6 +306,7 @@ __version__=u"v0.7.7"
  # 0.7.5 Added the TMDB MovieRating as videometadata table "rating" field
  # 0.7.6 Modifications to support MythTV python bindings changes
  # 0.7.7 Pull hostname from python bindings instead of socket libraries
+ # 0.7.8 Replace uses of MythVideo.getVideo()
 
 
 usage_txt=u'''
@@ -4331,32 +4332,27 @@ class MythTvMetaData(VideoFiles):
                         tmp_path = src+cfile['filepath'].replace(dst, u'')
                         video_file = self.rtnRelativePath(self.movie_file_format % (tmp_path, cfile['filename'], cfile['ext']), 'mythvideo')
                         tmp_filename = self.rtnRelativePath(self.movie_file_format % (cfile['filepath'], cfile['filename'], cfile['ext']), 'mythvideo')
-                        result = mythvideo.getVideo(exactfile=video_file)
-                        if result == None:
-                            intid = result
-                        else:
-                            intid = result.intid
-                        if not intid:
-                            result = mythvideo.getVideo(exactfile=self.movie_file_format % (tmp_path, cfile['filename'], cfile['ext']), host=localhostname.lower())
-                            if result == None:
-                                intid = result
-                            else:
-                                intid = result.intid
-                        if intid:
-                            metadata = Video(intid, db=mythvideo)
-                            if tmp_filename[0] == '/':
-                                host = u''
-                                self.absolutepath = True
-                            else:
-                                host = localhostname.lower()
-                                self.absolutepath = False
+                        try:
+                            metadata = mythvideo.searchVideos(exactfile=video_file).next()
+                        except StopIteration:
+                            try:
+                                metadata = mythvideo.searchVideos(exactfile=self.movie_file_format % (tmp_path, cfile['filename'], cfile['ext']), host=localhostname.lower()).next()
+                            except StopIteration:
+                                continue
 
-                            if self.config['simulation']:
-                                sys.stdout.write(u"Simulation Mythdb update for old file:\n(%s) new:\n(%s)\n" % (video_file, tmp_filename))
-                            else:
-                                self._displayMessage(u"Mythdb update for old file:\n(%s) new:\n(%s)\n" % (video_file, tmp_filename))
-                                Video(intid, db=mythvideo).update({'filename': tmp_filename, 'host': host})
-                            num_mythdb_updates+=1
+                        if tmp_filename[0] == '/':
+                            host = u''
+                            self.absolutepath = True
+                        else:
+                            host = localhostname.lower()
+                            self.absolutepath = False
+
+                        if self.config['simulation']:
+                            sys.stdout.write(u"Simulation Mythdb update for old file:\n(%s) new:\n(%s)\n" % (video_file, tmp_filename))
+                        else:
+                            self._displayMessage(u"Mythdb update for old file:\n(%s) new:\n(%s)\n" % (video_file, tmp_filename))
+                            metadata.update({'filename': tmp_filename, 'host': host})
+                        num_mythdb_updates += 1
                     break
             else:
                 pass
@@ -4438,41 +4434,39 @@ class MythTvMetaData(VideoFiles):
                     num_renamed_files+=1
                     video_file = self.rtnRelativePath(self.movie_file_format % (cfile['filepath'], cfile['filename'], cfile['ext']), 'mythvideo')
                     tmp_filename = self.rtnRelativePath(self.movie_file_format % (cfile['filepath'], new_filename, cfile['ext']), 'mythvideo')
-                    result = mythvideo.getVideo(exactfile=video_file)
-                    if result == None:
-                        intid = result
-                    else:
-                        intid = result.intid
-                    if not intid:
-                        result = mythvideo.getVideo(exactfile=self.movie_file_format % (cfile['filepath'], cfile['filename'], cfile['ext']), host=localhostname.lower())
-                        if result == None:
-                            intid = result
-                        else:
-                            intid = result.intid
+
+                    try:
+                        metadata = mythvideo.searchVideos(exactfile=video_file).next()
+                    except StopIteration:
+                        try:
+                            metadata = mythvideo.searchVideos(exactfile=self.movie_file_format % (cfile['filepath'], cfile['filename'], cfile['ext']), host=localhostname.lower()).next()
+                        except StopIteration:
+                            metadata = Video(db=mythvideo)
+
                     if tmp_filename[0] == '/':
                         host = u''
                         self.absolutepath = True
                     else:
                         host = localhostname.lower()
                         self.absolutepath = False
-                    if intid:
-                        metadata = Video(intid, db=mythvideo)
+
+                    if metadata.intid:
                         if self.config['simulation']:
                             sys.stdout.write(u"Simulation Mythdb update for renamed file(%s)\n" % (tmp_filename))
                         else:
                             self._displayMessage(u"Mythdb update for renamed file(%s)\n" % (tmp_filename))
-                            Video(intid, db=mythvideo).update({'filename': tmp_filename, 'host': host})
+                            metadata.update({'filename': tmp_filename, 'host': host})
                     else:
                         if self.config['simulation']:
                             sys.stdout.write(u"Simulation Mythdb add for renamed file(%s)\n" % (tmp_filename))
                         else:
                             self._displayMessage(u"Adding Mythdb record for file(%s)\n" % (tmp_filename))
-                            initrec = {}
-                            initrec[u'title'] = cfile['file_seriesname']
-                            initrec[u'filename'] = tmp_filename
-                            initrec[u'host'] = host
-                            initrec[u'inetref'] = inetref
-                            Video(db=mythvideo).create(initrec)
+                            metadata.title = cfile['file_seriesname']
+                            metadata.filename = tmp_filename
+                            metadata.host = host
+                            metadata.inetref = inetref
+                            metadata.create()
+
                     cfile_array[index]['filename'] = new_filename
 
         if self.config['simulation']:
@@ -4517,29 +4511,18 @@ class MythTvMetaData(VideoFiles):
                 videopath = os.path.join(unicode(cfile['filepath'],'utf8'), unicode(cfile['filename'],'utf8')+u'.'+cfile['ext'])
 
             # Find the MythTV meta data
-            result = mythvideo.getVideo(exactfile=videopath)
-            if result == None:
-                intid = result
-            else:
-                intid = result.intid
-            if not intid:
-                result = mythvideo.getVideo(exactfile=self.rtnRelativePath(videopath, 'mythvideo'), host=localhostname.lower())
-                if result == None:
-                    intid = result
-                else:
-                    intid = result.intid
-            if intid == None:
-                missing_list.append(cfile)
-            else:
-                meta_dict = Video(intid, db=mythvideo)
-                if self.config['video_dir']:
-                    if not mythvideo.getVideo(exactfile=meta_dict[u'filename'], host=meta_dict[u'host']):
-                        missing_list.append(cfile)
-                        continue
-                # There must be an Internet reference number. Get one for new records.
-                if _can_int(meta_dict['inetref']) and not meta_dict['inetref'] == u'00000000'  and not meta_dict['inetref'] == '':
-                    continue
-                missing_list.append(cfile)
+            try:
+                metadata = mythvideo.searchVideos(exactfile=videopath).next()
+            except StopIteration:
+                try:
+                    if not self.config['video_dir']:
+                        metadata = mythvideo.searchVideos(exactfile=self.rtnRelativePath(videopath, 'mythvideo'), host=localhostname.lower()).next()
+                        if _can_int(metadata.inetref) and (metadata.inetref != u'00000000'):
+                            continue
+                except StopIteration:
+                    pass
+
+            missing_list.append(cfile)
 
         return missing_list
     # end _findMissingInetref
@@ -5616,58 +5599,36 @@ class MythTvMetaData(VideoFiles):
             self._displayMessage(u"\nNow processing video file (%s)(%s)(%s)\n" % (cfile['filename'], cfile['seasno'], cfile['epno']))
             num_processed+=1
 
-            videopath = tv_series_format % (cfile['filepath'], cfile['filename'], cfile['ext'])
             # Find the MythTV meta data
-            result = mythvideo.getVideo(exactfile=videopath)
-            if result == None:
-                intid = result
-            else:
-                intid = result.intid
-            if not intid:
-                result = mythvideo.getVideo(exactfile=self.rtnRelativePath(videopath, u'mythvideo'), host=localhostname.lower())
-                if result == None:
-                    intid = result
-                    has_metadata = False
-                else:
-                    intid = result.intid
-                    if result.category == 'none' and result.year == 1895:
-                        has_metadata = False
-                    else:
-                        has_metadata = True
-            else:
-                if result.category == 'none' and result.year == 1895:
-                    has_metadata = False
-                else:
-                    has_metadata = True
+            videopath = tv_series_format % (cfile['filepath'], cfile['filename'], cfile['ext'])
+            try:
+                metadata = mythvideo.searchVideos(exactfile=videopath).next()
+            except StopIteration:
+                try:
+                    metadata = mythvideo.searchVideos(exactfile=self.rtnRelativePath(videopath, u'mythvideo'), host=localhostname.lower()).next()
+                except StopIteration:
+                    # create new empty entry
+                    if not self.config['interactive'] and not self.config['mythtv_guess']:
+                        continue
+                    sys.stdout.write(u"\n\nEntry does not exist in MythDB.  Adding (%s).\n" % cfile['filename'])
+                    metadata = Video().create({'title':cfile['file_seriesname'], 'filename':''})
 
-            if intid == None:
-                # Unless explicitly requested with options -MI or -MG do not add missing videos to DB
-                if not self.config['interactive'] and not self.config['mythtv_guess']:
-                    continue
-                # Create a new empty entry
-                sys.stdout.write(u"\n\nEntry does not exist in MythDB.  Adding (%s).\n" % cfile['filename'])
-                new_rec = {'title': cfile['file_seriesname'], 'filename': self.rtnRelativePath(videopath, u'mythvideo')}
-                videopath = self.rtnRelativePath(videopath, u'mythvideo')
-                if videopath[0] == '/':
-                    intid = Video(db=mythvideo).create(new_rec).intid
-                else:
-                    new_rec['host'] = localhostname.lower()
-                    intid = Video(db=mythvideo).create(new_rec).intid
-            elif not has_metadata:
-                sys.stdout.write(u"\n\nEntry exists in MythDB but category is 0 and year is 1895 (default values).\nUpdating (%s).\n" % cfile['filename'])
+            if (metadata.category == 'none') and (metadata.year == 1895):
+                sys.stdout.write(u"\n\nEntry is set to default values.\nUpdating (%s).\n" % cfile['filename'])
                 filename = self.rtnRelativePath(videopath, u'mythvideo')
-                if filename[0] == u'/':
-                    Video(intid, db=mythvideo).update({'filename': filename, u'host': u''})
+                if filename.startswith('/'):
+                    metadata.update({'filename': filename, u'host': u''})
                 else:
-                    Video(intid, db=mythvideo).update({'filename': filename, u'host': localhostname.lower()})
-            if cfile['seasno'] == 0 and cfile['epno'] == 0:
-                movie=True
+                    metadata.update({'filename': filename, u'host': localhostname.lower()})
+
+            if (cfile['seasno'] == 0) and (cfile['epno'] == 0):
+                movie = True
             else:
-                movie=False
+                movie = False
 
             # Get a dictionary of the existing meta data plus a copy for update comparison
             meta_dict={}
-            vim = Video(intid, db=mythvideo)
+            vim = Video(metadata.intid, db=mythvideo)
             for key in vim.keys():
                 meta_dict[key] = vim[key]
 
@@ -5707,7 +5668,7 @@ class MythTvMetaData(VideoFiles):
                         continue
                     # Only update the reference number
                     if self.config['mythtv_ref_num'] or inetref == '99999999':
-                        Video(intid, db=mythvideo).update({'inetref': inetref})
+                        Video(metadata.intid, db=mythvideo).update({'inetref': inetref})
                         num_mythdb_updates+=1
                         videos_updated_metadata.append(cfile['filename'])
                         self._displayMessage(u"\nReference number (%s) added for (%s) \n" % (inetref, cfile['filename']))
@@ -5727,9 +5688,9 @@ class MythTvMetaData(VideoFiles):
                     # Only update the reference number and title
                     if self.config['mythtv_ref_num'] or inetref == '99999999':
                         if inetref == u'99999999':
-                            Video(intid, db=mythvideo).update({'inetref': inetref})
+                            Video(metadata.intid, db=mythvideo).update({'inetref': inetref})
                         else:
-                            Video(intid, db=mythvideo).update({'inetref': inetref, 'title': tmp_dict['title']})
+                            Video(metadata.intid, db=mythvideo).update({'inetref': inetref, 'title': tmp_dict['title']})
                         num_mythdb_updates+=1
                         videos_updated_metadata.append(cfile['filename'])
                         self._displayMessage(u"\nReference number (%s) added for (%s) \n" % (inetref, cfile['filename']))
@@ -6170,14 +6131,14 @@ class MythTvMetaData(VideoFiles):
                 # Clean up a few fields before updating Mythdb
                 if available_metadata['showlevel'] == 0:    # Allows mythvideo to display this video
                     available_metadata['showlevel'] = 1
-                Video(intid, db=mythvideo).update(available_metadata)
+                Video(metadata.intid, db=mythvideo).update(available_metadata)
                 num_mythdb_updates+=1
                 videos_updated_metadata.append(cfile['filename'])
                 for key in ['genres', 'cast', 'countries']:
                     if key == 'genres' and len(cfile['categories']):
                         genres_cast[key]+=cfile['categories']
                     if genres_cast.has_key(key):
-                        self._addCastGenreCountry( genres_cast[key], Video(intid, db=mythvideo), key)
+                        self._addCastGenreCountry( genres_cast[key], Video(metadata.intid, db=mythvideo), key)
                 self._displayMessage(
                     u"Updated Mythdb for video file(%s)\n" % cfile['filename']
                 )
