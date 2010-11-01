@@ -30,7 +30,7 @@ The source of all cover art and screen shots are from those downloaded and maint
 Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
 '''
 
-__version__=u"v0.6.4"
+__version__=u"v0.6.5"
 # 0.1.0 Initial development
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -188,6 +188,8 @@ __version__=u"v0.6.4"
 # 0.6.2 Trapped possible unicode errors which would hang the MiroBridge process
 # 0.6.3 Pull hostname from python bindings instead of socket libraries
 # 0.6.4 MythTV python bindings changes
+# 0.6.5 Added support for Miro v3.5.x
+#       Small internal document changes
 
 examples_txt=u'''
 For examples, please see the Mirobridge's wiki page at http://www.mythtv.org/wiki/MiroBridge
@@ -376,9 +378,12 @@ try:
     elif config.get(prefs.APP_VERSION) < u"3.0":
         logger.info("Using mirobridge_interpreter_2_5_2")
         from mirobridge.mirobridge_interpreter_2_5_2 import MiroInterpreter
-    else:
+    elif config.get(prefs.APP_VERSION) < u"3.5":
         logger.info("Using mirobridge_interpreter_3_0_0")
         from mirobridge.mirobridge_interpreter_3_0_0 import MiroInterpreter
+    else:
+        logger.info("Using mirobridge_interpreter_3_5_0")
+        from mirobridge.mirobridge_interpreter_3_5_0 import MiroInterpreter
 except Exception, e:
     logger.critical(u"Importing mirobridge functions has failed. The following mirobridge files must be in the subdirectory 'mirobridge'.\n'mirobridge_interpreter_2_0_3.py' and 'mirobridge_interpreter_2_5_2.py', error(%s)" % e)
     sys.exit(1)
@@ -2006,7 +2011,7 @@ def main():
     parser = OptionParser(usage=u"%prog usage: mirobridge -huevstdociVHSCWM [parameters]\n")
 
     parser.add_option(  "-e", "--examples", action="store_true", default=False, dest="examples",
-                        help=u"Display examples for executing the jamu script")
+                        help=u"Display examples for executing the mirobridge script")
     parser.add_option(  "-v", "--version", action="store_true", default=False, dest="version",
                         help=u"Display version and author information")
     parser.add_option(  "-s", "--simulation", action="store_true", default=False, dest="simulation",
@@ -2261,7 +2266,6 @@ def main():
         app.renderer = app.cli_interpreter
     else:
         app.movie_data_program_info = app.cli_interpreter.movie_data_program_info
-
 
     #
     # Attempt to import an opml file
