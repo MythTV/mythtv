@@ -212,7 +212,7 @@ class DBConnection( object ):
 
     def _callback(self, ref):
         refid = id(ref)
-        connid = self._refs[refid][1]
+        ref, connid = self._refs.pop(refid)
         if connid in self._inuse:
             self.release(connid)
 
