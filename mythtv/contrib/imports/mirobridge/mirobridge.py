@@ -181,6 +181,7 @@ __version__=u"v0.5.8"
 #       and termination of MiroBridge with an appropriate error message has been added.
 #       Added better system error messages when an IOError exception occurs
 # 0.5.8 Add support for Miro version 3.0
+# Add support for Miro version 3.5.x
 
 
 examples_txt=u'''
@@ -371,9 +372,12 @@ try:
     elif config.get(prefs.APP_VERSION) < u"3.0":
         logger.info("Using mirobridge_interpreter_2_5_2")
         from mirobridge.mirobridge_interpreter_2_5_2 import MiroInterpreter
-    else:
+    elif config.get(prefs.APP_VERSION) < u"3.5":
         logger.info("Using mirobridge_interpreter_3_0_0")
         from mirobridge.mirobridge_interpreter_3_0_0 import MiroInterpreter
+    else:
+        logger.info("Using mirobridge_interpreter_3_5_0")
+        from mirobridge.mirobridge_interpreter_3_5_0 import MiroInterpreter
 except Exception, e:
     logger.critical(u"Importing mirobridge functions has failed. The following mirobridge files must be in the subdirectory 'mirobridge'.\n'mirobridge_interpreter_2_0_3.py' and 'mirobridge_interpreter_2_5_2.py', error(%s)" % e)
     sys.exit(1)
