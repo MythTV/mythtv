@@ -68,7 +68,7 @@ static class MythSystemReaper *reaper = NULL;
 
 void MythSystemReaper::run(void)
 {
-    VERBOSE(VB_GENERAL, "Starting reaper thread");
+    VERBOSE(VB_GENERAL | VB_EXTRA, "Starting reaper thread");
 
     // gCoreContext is set to NULL during shutdown, and we need this thread to
     // exit during shutdown.
@@ -101,7 +101,8 @@ void MythSystemReaper::run(void)
 
             next = m_pidMap.erase(i);
             pidData->result = GENERIC_EXIT_TIMEOUT;
-            VERBOSE(VB_GENERAL, QString("Child PID %1 timed out, killing")
+            VERBOSE(VB_GENERAL | VB_EXTRA, 
+                QString("Child PID %1 timed out, killing")
                 .arg(pid));
             kill(pid, SIGTERM);
             usleep(500);
@@ -121,7 +122,8 @@ void MythSystemReaper::run(void)
         if (pid <= 0)
         {
             if (pid < 0)
-                VERBOSE(VB_GENERAL, QString("waitpid() failed because %1")
+                VERBOSE(VB_GENERAL | VB_EXTRA, 
+                    QString("waitpid() failed because %1")
                     .arg(strerror(errno)));
             continue;
         }
@@ -129,7 +131,8 @@ void MythSystemReaper::run(void)
         m_mapLock.lock();
         if (!m_pidMap.contains(pid))
         {
-            VERBOSE(VB_GENERAL, QString("Child PID %1 not found in map!")
+            VERBOSE(VB_GENERAL | VB_EXTRA, 
+                QString("Child PID %1 not found in map!")
                 .arg(pid));
             m_mapLock.unlock();
             continue;
@@ -142,20 +145,23 @@ void MythSystemReaper::run(void)
         if( WIFEXITED(status) )
         {
             pidData->result = WEXITSTATUS(status);
-            VERBOSE(VB_GENERAL, QString("PID %1: exited: status=%2, result=%3")
+            VERBOSE(VB_GENERAL | VB_EXTRA, 
+                QString("PID %1: exited: status=%2, result=%3")
                 .arg(pid) .arg(status) .arg(pidData->result));
         }
         else if( WIFSIGNALED(status) )
         {
             pidData->result = GENERIC_EXIT_SIGNALLED;
-            VERBOSE(VB_GENERAL, QString("PID %1: signal: status=%2, result=%3, signal=%4")
+            VERBOSE(VB_GENERAL | VB_EXTRA, 
+                QString("PID %1: signal: status=%2, result=%3, signal=%4")
                 .arg(pid) .arg(status) .arg(pidData->result) 
                 .arg(WTERMSIG(status)));
         }
         else
         {
             pidData->result = GENERIC_EXIT_NOT_OK;
-            VERBOSE(VB_GENERAL, QString("PID %1: other: status=%2, result=%3")
+            VERBOSE(VB_GENERAL | VB_EXTRA, 
+                QString("PID %1: other: status=%2, result=%3")
                 .arg(pid) .arg(status) .arg(pidData->result));
         }
 
@@ -209,7 +215,7 @@ uint MythSystemReaper::abortPid( pid_t pid )
     m_mapLock.lock();
     if (!m_pidMap.contains(pid))
     {
-        VERBOSE(VB_GENERAL, QString("Child PID %1 not found in map!")
+        VERBOSE(VB_GENERAL | VB_EXTRA, QString("Child PID %1 not found in map!")
             .arg(pid));
         m_mapLock.unlock();
         return GENERIC_EXIT_NOT_OK;
@@ -221,7 +227,8 @@ uint MythSystemReaper::abortPid( pid_t pid )
 
     delete pidData;
 
-    VERBOSE(VB_GENERAL, QString("Child PID %1 aborted, killing") .arg(pid));
+    VERBOSE(VB_GENERAL | VB_EXTRA, 
+        QString("Child PID %1 aborted, killing") .arg(pid));
     kill(pid, SIGTERM);
     usleep(500);
     kill(pid, SIGKILL);
@@ -244,7 +251,7 @@ uint myth_system(const QString &command, uint flags, uint timeout)
 
     if( !(flags & kMSRunBackground) && command.endsWith("&") )
     {
-        VERBOSE(VB_GENERAL, "Adding background flag");
+        VERBOSE(VB_GENERAL | VB_EXTRA, "Adding background flag");
         flags |= kMSRunBackground;
     }
 
@@ -270,20 +277,21 @@ uint myth_system(const QString &command, uint flags, uint timeout)
     if (!::CreateProcessA(NULL, cmd.toUtf8().data(), NULL, NULL,
                           FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
     {
-        VERBOSE(VB_GENERAL, (LOC_ERR + "CreateProcess() failed because %1")
+        VERBOSE(VB_GENERAL | VB_EXTRA, 
+                (LOC_ERR + "CreateProcess() failed because %1")
                 .arg(::GetLastError()));
         result = MYTHSYSTEM__EXIT__EXECL_ERROR;
     }
     else
     {
         if (::WaitForSingleObject(pi.hProcess, INFINITE) == WAIT_FAILED)
-            VERBOSE(VB_GENERAL,
+            VERBOSE(VB_GENERAL | VB_EXTRA,
                     (LOC_ERR + "WaitForSingleObject() failed because %1")
                     .arg(::GetLastError()));
         DWORD exitcode = GENERIC_EXIT_OK;
         if (!GetExitCodeProcess(pi.hProcess, &exitcode))
-            VERBOSE(VB_GENERAL, (LOC_ERR + 
-                    "GetExitCodeProcess() failed because %1")
+            VERBOSE(VB_GENERAL | VB_EXTRA, 
+                    (LOC_ERR + "GetExitCodeProcess() failed because %1")
                     .arg(::GetLastError()));
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
@@ -365,14 +373,14 @@ pid_t myth_system_fork(const QString &command, uint &result)
     QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(cmdargs);
     const char *locerr  = (const char *)LOC_ERR.constData();
 
-    VERBOSE(VB_GENERAL, QString("Launching: %1") .arg(cmdargs));
+    VERBOSE(VB_GENERAL | VB_EXTRA, QString("Launching: %1") .arg(cmdargs));
 
     pid_t child = fork();
 
     if (child < 0)
     {
         /* Fork failed, still in parent */
-        VERBOSE(VB_GENERAL, (LOC_ERR + "fork() failed because %1")
+        VERBOSE(VB_GENERAL | VB_EXTRA, (LOC_ERR + "fork() failed because %1")
                 .arg(strerror(errno)));
         result = GENERIC_EXIT_NOT_OK;
         return -1;
@@ -435,7 +443,7 @@ uint myth_system_wait(pid_t pid, uint timeout, bool background,
         reaper = new MythSystemReaper;
         reaper->start();
     }
-    VERBOSE(VB_GENERAL, QString("PID %1: launched%2") .arg(pid)
+    VERBOSE(VB_GENERAL | VB_EXTRA, QString("PID %1: launched%2") .arg(pid)
         .arg(background ? " in the background, not waiting" : ""));
     return reaper->waitPid(pid, timeout, background, processEvents);
 }
@@ -447,7 +455,7 @@ uint myth_system_abort(pid_t pid)
         reaper = new MythSystemReaper;
         reaper->start();
     }
-    VERBOSE(VB_GENERAL, QString("PID %1: aborted") .arg(pid));
+    VERBOSE(VB_GENERAL | VB_EXTRA, QString("PID %1: aborted") .arg(pid));
     return reaper->abortPid(pid);
 }
 #endif
