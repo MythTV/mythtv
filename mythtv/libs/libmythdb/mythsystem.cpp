@@ -369,9 +369,13 @@ void myth_system_post_flags(uint &flags)
 #ifndef USING_MINGW
 pid_t myth_system_fork(const QString &command, uint &result)
 {
-    const char *cmdargs = command.toUtf8().constData();
+    static char cmdargs[1024];
+    strncpy(cmdargs, command.toUtf8().constData(), 1024);
+
     QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(cmdargs);
-    const char *locerr  = (const char *)LOC_ERR.constData();
+
+    static char locerr[1024];
+    strncpy(locerr, (const char *)LOC_ERR.constData(), 1024);
 
     VERBOSE(VB_GENERAL | VB_EXTRA, QString("Launching: %1") .arg(cmdargs));
 
