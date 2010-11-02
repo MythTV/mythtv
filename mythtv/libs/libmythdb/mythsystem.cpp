@@ -367,15 +367,18 @@ void myth_system_post_flags(uint &flags)
 
 
 #ifndef USING_MINGW
+#define MAX_BUFLEN 1024
 pid_t myth_system_fork(const QString &command, uint &result)
 {
-    static char cmdargs[1024];
-    strncpy(cmdargs, command.toUtf8().constData(), 1024);
+    char cmdargs[MAX_BUFLEN];
+    strncpy(cmdargs, command.toUtf8().constData(), MAX_BUFLEN);
+    cmdargs[MAX_BUFLEN-1] = '\0';
 
     QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(cmdargs);
 
-    static char locerr[1024];
-    strncpy(locerr, (const char *)LOC_ERR.constData(), 1024);
+    char locerr[MAX_BUFLEN];
+    strncpy(locerr, (const char *)LOC_ERR.constData(), MAX_BUFLEN);
+    locerr[MAX_BUFLEN-1] = '\0';
 
     VERBOSE(VB_GENERAL | VB_EXTRA, QString("Launching: %1") .arg(cmdargs));
 
