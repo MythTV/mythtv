@@ -27,25 +27,11 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
     """
     def __init__(self, connection):
         self.log = None
-        self._releaseCallback = None
-        self.id = id(connection)
         MySQLdb.cursors.Cursor.__init__(self, connection)
-        self.ping = self._ping121
+        self.ping = weakref.ref(self._ping121)
         if MySQLdb.version_info >= ('1','2','2'):
-            self.ping = self._ping122
+            self.ping = weakref.ref(self._ping122)
         self.ping()
-
-    def __del__(self):
-        self._release()
-        MySQLdb.cursors.Cursor.__del__(self)
-
-    def close(self):
-        self._release()
-        MySQLdb.cursors.Cursor.close(self)
-
-    def _release(self):
-        if self._releaseCallback is not None:
-            self._releaseCallback(self.id, self.connection)
 
     def _ping121(self): self.connection.ping(True)
     def _ping122(self): self.connection.ping()
@@ -99,8 +85,16 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
         except Exception, e:
             raise MythDBError(MythDBError.DB_RAW, e.args)
 
+    def commit(self): self.connection.commit()
+    def rollback(self): self.connection.rollback()
+
     def __enter__(self): return self
-    def __exit__(self, type, value, traceback): self.close()
+    def __exit__(self, type, value, traceback):
+        if type:
+            self.rollback()
+        else:
+            self.commit()
+        self.close()
 
 class DBConnection( object ):
     """
@@ -143,6 +137,7 @@ class DBConnection( object ):
         self._pool = []
         self._inuse = {}
         self._stack = {}
+        self._refs = {}
         self._poolsize = self._defpoolsize
         self.dbconn = dbconn
 
@@ -188,19 +183,14 @@ class DBConnection( object ):
             conn = self.connect()
         return conn
 
-    def release(self, id, conn):
+    def release(self, id):
         """
         Release a connection back to the pool to allow reuse.
         """
-        try:
-            conn = self._inuse.pop(id)
-            self._pool.append(conn)
-            self.log(MythLog.DATABASE|MythLog.EXTRA,
-                        'Releasing database connection to pool')
-        except KeyError:
-            conn.close()
-            self.log(MythLog.DATABASE|MythLog.EXTRA,
-                        'Closing spare database connection')
+        conn = self._inuse.pop(id)
+        self._pool.append(conn)
+        self.log(MythLog.DATABASE|MythLog.EXTRA,
+                    'Releasing database connection to pool')
 
     def cursor(self, log=None, type=LoggedCursor):
         """
@@ -211,10 +201,20 @@ class DBConnection( object ):
         """
         if log is None:
             log = self.log
-        cursor = self.acquire().cursor(type)
-        cursor._releaseCallback = self.release
+        conn = self.acquire()
+        cursor = conn.cursor(type)
         cursor.log = log
+
+        r = weakref.ref(cursor, self._callback)
+        self._refs[id(r)] = (r, id(conn))
+
         return cursor
+
+    def _callback(self, ref):
+        refid = id(ref)
+        connid = self._refs[refid][1]
+        if connid in self._inuse:
+            self.release(connid)
 
     def __enter__(self):
         cursor = self.cursor()
@@ -229,6 +229,10 @@ class DBConnection( object ):
         if ident not in self._stack:
             raise MythError('Missing context stack in DBConnection')
         cursor = self._stack[ident].pop()
+        if type:
+            cursor.rollback()
+        else:
+            cursor.commit()
         cursor.close()
 
 class BEConnection( object ):
