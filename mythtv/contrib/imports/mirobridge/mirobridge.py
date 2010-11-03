@@ -187,6 +187,7 @@ __version__=u"v0.6.3"
 # 0.6.1 Modifications to support MythTV python bindings changes
 # 0.6.2 Trapped possible unicode errors which would hang the MiroBridge process
 # 0.6.3 Pull hostname from python bindings instead of socket libraries
+# Add support for Miro version 3.5.x
 
 examples_txt=u'''
 For examples, please see the Mirobridge's wiki page at http://www.mythtv.org/wiki/MiroBridge
@@ -375,9 +376,12 @@ try:
     elif config.get(prefs.APP_VERSION) < u"3.0":
         logger.info("Using mirobridge_interpreter_2_5_2")
         from mirobridge.mirobridge_interpreter_2_5_2 import MiroInterpreter
-    else:
+    elif config.get(prefs.APP_VERSION) < u"3.5":
         logger.info("Using mirobridge_interpreter_3_0_0")
         from mirobridge.mirobridge_interpreter_3_0_0 import MiroInterpreter
+    else:
+        logger.info("Using mirobridge_interpreter_3_5_0")
+        from mirobridge.mirobridge_interpreter_3_5_0 import MiroInterpreter
 except Exception, e:
     logger.critical(u"Importing mirobridge functions has failed. The following mirobridge files must be in the subdirectory 'mirobridge'.\n'mirobridge_interpreter_2_0_3.py' and 'mirobridge_interpreter_2_5_2.py', error(%s)" % e)
     sys.exit(1)
@@ -2004,7 +2008,7 @@ def main():
     parser = OptionParser(usage=u"%prog usage: mirobridge -huevstdociVHSCWM [parameters]\n")
 
     parser.add_option(  "-e", "--examples", action="store_true", default=False, dest="examples",
-                        help=u"Display examples for executing the jamu script")
+                        help=u"Display examples for executing the mirobridge script")
     parser.add_option(  "-v", "--version", action="store_true", default=False, dest="version",
                         help=u"Display version and author information")
     parser.add_option(  "-s", "--simulation", action="store_true", default=False, dest="simulation",
