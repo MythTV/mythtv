@@ -811,14 +811,17 @@
 
         <button name="ok_button" from="basebutton">
             <position>12,440</position>
+            <value>OK</value>
         </button>
 
         <button name="delete_button" from="basebutton">
             <position>173,440</position>
+            <value>Delete</value>
         </button>
 
         <button name="record_button" from="basebutton">
             <position>333,440</position>
+            <value>Record</value>
         </button>
 
     </window>
@@ -847,6 +850,7 @@
 
         <button name="ok_button" from="basebutton">
             <position>220,115</position>
+            <value>OK</value>
         </button>
 
     </window>
@@ -890,14 +894,17 @@
 
         <button name="edit_button" from="basebutton">
             <position>12,440</position>
+            <value>Edit</value>
         </button>
 
         <button name="delete_button" from="basebutton">
             <position>173,440</position>
+            <value>Delete</value>
         </button>
 
         <button name="record_button" from="basebutton">
             <position>333,440</position>
+            <value>Record</value>
         </button>
 
     </window>
@@ -961,6 +968,7 @@
 
         <button name="ok_button" from="basebutton">
             <position>170,490</position>
+            <value>OK</value>
         </button>
 
     </window>
