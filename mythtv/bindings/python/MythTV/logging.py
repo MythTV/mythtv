@@ -9,6 +9,7 @@ from sys import version_info, stdout
 from datetime import datetime
 from thread import allocate_lock
 from cStringIO import StringIO
+from traceback import format_exc
 
 class MythLog( LOGLEVEL ):
     """
@@ -153,6 +154,16 @@ class MythLog( LOGLEVEL ):
         else:
             return bool(level&self.LEVEL)
 
+    def logTB(self, level):
+        """
+        MythLog.logTB(level) -> None
+
+        'level' sets the bitwise log level, to be matched against the log
+                    filter. If any bits match true, the message will be logged.
+            This will log the latest traceback.
+        """
+        self.log(level, format_exc())
+
     def log(self, level, message, detail=None):
         """
         MythLog.log(level, message, detail=None) -> None
@@ -167,24 +178,23 @@ class MythLog( LOGLEVEL ):
         if self._testLevel(level):
             buff = StringIO()
             buff.write('%s %s: ' % (self.time(), self.module))
-            pad = buff.tell()
-            linect = 0
 
-            for line in message.split('\n'):
-                if linect > 0:
-                    buff.write('\n')
-                    buff.write(' '*pad)
-                buff.write(line)
-                linect += 1
+            multiline = False
+            if '\n' in message:
+                multiline = True
+            elif detail:
+                if '\n' in detail:
+                    multiline = True
 
-            if detail:
-                if (linect > 1) or (detail.find('\n') > -1):
-                    pad += 4
+            if multiline:
+                for line in message.split('\n'):
+                    buff.write('\n    %s' % line)
+                if detail:
                     for line in detail.split('\n'):
-                        buff.write('\n')
-                        buff.write(' '*pad)
-                        buff.write(line)
-                else:
+                        buff.write('\n        %s' % line)
+            else:
+                buff.write(message)
+                if detail:
                     buff.write(' -- %s' % detail)
 
             buff.write('\n')

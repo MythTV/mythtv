@@ -300,6 +300,7 @@ class BEConnection( object ):
         try:
             self.connect()
         except socket.error, e:
+            self.log.logTB(MythLog.SOCKET|MythLog.EXTRA)
             self.connected = False
             self.log(MythLog.IMPORTANT|MythLog.SOCKET,
                     "Couldn't connect to backend %s:%d" \
