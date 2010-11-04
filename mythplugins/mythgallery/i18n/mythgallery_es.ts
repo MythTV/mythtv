@@ -431,7 +431,7 @@
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="63"/>
         <source>Overlay caption</source>
-        <translation>Leyenda sobreescrita</translation>
+        <translation>Leyenda sobrepuesta</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="65"/>
