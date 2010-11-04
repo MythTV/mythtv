@@ -98,6 +98,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
     save_timer.start();
 
     DecoderGetFrame(kDecodeNothing,true);
+
     if (showPercentage)
     {
         if (totalFrames)
@@ -109,8 +110,6 @@ bool MythCommFlagPlayer::RebuildSeekTable(
 
     while (!eof)
     {
-        myFramesPlayed++;
-
         if (inuse_timer.elapsed() > 2534)
         {
             inuse_timer.restart();
@@ -167,7 +166,8 @@ bool MythCommFlagPlayer::RebuildSeekTable(
             }
         }
 
-        DecoderGetFrame(kDecodeNothing,true);
+        if (DecoderGetFrame(kDecodeNothing,true))
+            myFramesPlayed++;
     }
 
     if (showPercentage)
@@ -182,7 +182,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
     killdecoder = true;
 
     QThreadPool::globalInstance()->start(
-        new RebuildSaver(GetDecoder(), pmap_first, pmap_last));
+        new RebuildSaver(GetDecoder(), pmap_first, myFramesPlayed));
     RebuildSaver::Wait(GetDecoder());
 
     return true;
