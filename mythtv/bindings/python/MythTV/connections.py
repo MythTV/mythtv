@@ -246,8 +246,8 @@ class BEConnection( object ):
         def __init__(self, noshutdown=False, systemevents=False,
                            generalevents=False):
             OrdDict.__init__(self, (('noshutdown',noshutdown),
-                                          ('systemevents',systemevents),
-                                          ('generalevents',generalevents)))
+                                    ('systemevents',systemevents),
+                                    ('generalevents',generalevents)))
         def __and__(self, other):
             res = self.__class__()
             for key in self._field_order:
@@ -304,10 +304,7 @@ class BEConnection( object ):
             self.log(MythLog.IMPORTANT|MythLog.SOCKET,
                     "Couldn't connect to backend %s:%d" \
                     % (self.host, self.port))
-            raise
             raise MythBEError(MythError.PROTO_CONNECTION, self.host, self.port)
-        except:
-            raise
 
     def __del__(self):
         self.disconnect()
