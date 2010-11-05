@@ -2705,7 +2705,7 @@ void MythPlayer::EventLoop(void)
 
     // Handle cutlist skipping
     if (deleteMap.TrackerWantsToJump(framesPlayed, totalFrames, jumpto) &&
-        (ffrew_skip == 1) && !deleteMap.IsEditing())
+        (ffrew_skip == 1))
     {
         if (jumpto == totalFrames)
         {
@@ -3155,7 +3155,7 @@ void MythPlayer::ChangeSpeed(void)
     {
         skip_changed = (ffrew_skip != 1);
         frame_interval = (int) (1000000.0f / video_frame_rate / temp_speed);
-        ffrew_skip = 1;
+        ffrew_skip = (play_speed != 0.0f);
     }
     else
     {
