@@ -2415,11 +2415,6 @@ Quer remover a faixa que existe?</translation>
         <translation>Acabou</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="43"/>
         <source>Quality:</source>
         <translation>Qualidade:</translation>
