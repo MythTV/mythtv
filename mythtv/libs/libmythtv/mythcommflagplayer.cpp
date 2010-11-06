@@ -126,11 +126,11 @@ bool MythCommFlagPlayer::RebuildSeekTable(
                 usleep(200 * 1000);
 
             // If we're already saving, just save a larger block next time..
-            if (RebuildSaver::GetCount(GetDecoder()) < 1)
+            if (RebuildSaver::GetCount(decoder) < 1)
             {
                 pmap_last = myFramesPlayed;
                 QThreadPool::globalInstance()->start(
-                    new RebuildSaver(GetDecoder(), pmap_first, pmap_last));
+                    new RebuildSaver(decoder, pmap_first, pmap_last));
                 pmap_first = pmap_last + 1;
             }
 
@@ -167,7 +167,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
         }
 
         if (DecoderGetFrame(kDecodeNothing,true))
-            myFramesPlayed++;
+            myFramesPlayed = decoder->GetFramesRead();
     }
 
     if (showPercentage)
@@ -182,8 +182,8 @@ bool MythCommFlagPlayer::RebuildSeekTable(
     killdecoder = true;
 
     QThreadPool::globalInstance()->start(
-        new RebuildSaver(GetDecoder(), pmap_first, myFramesPlayed));
-    RebuildSaver::Wait(GetDecoder());
+        new RebuildSaver(decoder, pmap_first, myFramesPlayed));
+    RebuildSaver::Wait(decoder);
 
     return true;
 }
