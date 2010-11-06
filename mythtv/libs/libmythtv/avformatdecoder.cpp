@@ -2940,7 +2940,7 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     if (exitafterdecoded)
         gotvideo = 1;
 
-    return on_frame;
+    return true;
 }
 
 bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
