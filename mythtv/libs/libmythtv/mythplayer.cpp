@@ -112,7 +112,7 @@ bool PlayerTimer::event(QEvent *e)
     {
         // TODO this may fail if events are lost and the queue size is wrong
         m_queue_size--;
-        int max_queue = m_mp->GetFFRewSkip() == 1 ? 3 : 1;
+        uint max_queue = m_mp->GetFFRewSkip() == 1 ? 3 : 1;
         while (m_queue_size < max_queue)
             PostNextEvent();
 
