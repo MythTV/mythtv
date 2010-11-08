@@ -898,7 +898,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
         AVFrame mpa_pic;
         av_init_packet(&pkt);
         pkt.data = lstrm;
-        pkt.size = frameheader->packetlength + FF_INPUT_BUFFER_PADDING_SIZE;
+        pkt.size = frameheader->packetlength;
 
         {
             QMutexLocker locker(avcodeclock);
