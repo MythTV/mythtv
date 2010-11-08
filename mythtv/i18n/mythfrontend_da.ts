@@ -1549,7 +1549,7 @@
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1673"/>
         <source>Recording Options</source>
-        <translation>Optagelsesindstillinger</translation>
+        <translation>Optageindstillinger</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1658"/>
@@ -2532,7 +2532,7 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="623"/>
         <source>Toggle Teletext Captions</source>
-        <translation>Tekst TV undertekster til/fra</translation>
+        <translation>Tekst-TV undertekster til/fra</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="625"/>
@@ -2552,7 +2552,7 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="631"/>
         <source>Toggle Teletext Menu</source>
-        <translation>Tekst TV menu til/fra</translation>
+        <translation>Tekst-TV menu til/fra</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="633"/>
@@ -2752,7 +2752,7 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="722"/>
         <source>Toggle the Sleep Timer</source>
-        <translation>Aktiver/deaktiver sove funktionen</translation>
+        <translation>Sovefunktion til/fra</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="724"/>
@@ -2896,7 +2896,7 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="786"/>
         <source>Toggle Teletext</source>
-        <translation>Tekst TV til/fra</translation>
+        <translation>Tekst-TV til/fra</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="796"/>
@@ -4188,7 +4188,7 @@ Er du sikker på at du vil slette den:</translation>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2588"/>
         <source>Toggle playlist for this Group</source>
-        <translation>Aktiver/deaktiver afspilningsliste for denne gruppe</translation>
+        <translation>Afspilningsliste for denne gruppe til/fra</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2617"/>
@@ -4791,7 +4791,7 @@ Er du sikker på at du vil slette den:</translation>
         <location filename="../programs/mythfrontend/progfind.cpp" line="237"/>
         <location filename="../programs/mythfrontend/progfind.cpp" line="300"/>
         <source>Toggle Record</source>
-        <translation>Aktiver/deaktiver optagelse</translation>
+        <translation>Optagelse til/fra</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="238"/>
@@ -10390,12 +10390,12 @@ De fleste DVB-S transponders overfører med 27,5 millioner symboler pr. sekund.<
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="258"/>
         <source>Auto Detect (Default Off)</source>
-        <translation>Autodetekter (Som standard slået fra)</translation>
+        <translation>Autodetekter (Standard: Fra)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="261"/>
         <source>Auto Detect (Default Half)</source>
-        <translation>Autodetekter (Som standard en halv)</translation>
+        <translation>Autodetekter (Standard: Halv)</translation>
     </message>
     <message>
         <location filename="../programs/mythfilldatabase/filldata.cpp" line="221"/>
@@ -10772,7 +10772,7 @@ De fleste DVB-S transponders overfører med 27,5 millioner symboler pr. sekund.<
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="99"/>
         <source>The VBI (Vertical Blanking Interval) is used to carry Teletext or Closed Captioning data.</source>
-        <translation>VBI (Vertical Blanking Interval) benyttes til at bære Tekst TV eller &apos;Closed Captioning&apos; data.</translation>
+        <translation>VBI (Vertical Blanking Interval) benyttes til at transportere Tekst-TV eller &apos;Closed Captioning&apos; data.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="113"/>
@@ -13936,7 +13936,7 @@ må ikke være blankt.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1895"/>
         <source>PAL teletext</source>
-        <translation>PAL tekst TV</translation>
+        <translation>PAL tekst-TV</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1896"/>
@@ -16693,7 +16693,7 @@ fra opbevaringsgruppen?</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10254"/>
         <source>Toggle Teletext Menu</source>
-        <translation>Aktiver/deaktiver menu for undertekster</translation>
+        <translation>Tekst-TV til/fra</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10723"/>
@@ -17093,7 +17093,7 @@ Vælg en aktuel optagelse</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10222"/>
         <source>Toggle Subtitles</source>
-        <translation>Aktiver/deaktiver undertekster</translation>
+        <translation>Undertekster til/fra</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10231"/>
@@ -17105,7 +17105,7 @@ Vælg en aktuel optagelse</translation>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10249"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10308"/>
         <source>Select Teletext CC</source>
-        <translation>Vælg tekst TV CC</translation>
+        <translation>Vælg tekst-TV CC</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10346"/>
@@ -17150,7 +17150,7 @@ Vælg en aktuel optagelse</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10006"/>
         <source>Toggle Audio Upmixer</source>
-        <translation>Aktiver/deaktiver lyd upmixer</translation>
+        <translation>Lyd upmixer til/fra</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10711"/>
@@ -17980,7 +17980,7 @@ Når du har færdiggjort din konfiguration, så tryk &quot;OK&quot; for at søge
     <message>
         <location filename="../themes/themestrings.h" line="151"/>
         <source>Select how the recording file should be treated.</source>
-        <translation>Vælg hvordan optagelsesfilen  skal behandles.</translation>
+        <translation>Vælg hvordan optagelsesfilen skal behandles.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="152"/>
@@ -18409,7 +18409,7 @@ For at planlægge en optagelse, forlad denne menu og vælg &quot;Programguide&qu
     <message>
         <location filename="../themes/themestrings.h" line="316"/>
         <source>Air Date:</source>
-        <translation>Udsendelsesdato:</translation>
+        <translation>Sendetid:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="318"/>
@@ -18424,12 +18424,12 @@ For at planlægge en optagelse, forlad denne menu og vælg &quot;Programguide&qu
     <message>
         <location filename="../themes/themestrings.h" line="320"/>
         <source>Rec Profile:</source>
-        <translation>Optageprofil:</translation>
+        <translation>Opt. profil:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="321"/>
         <source>Rec Group:</source>
-        <translation>Optagelsesgruppe:</translation>
+        <translation>Opt. gruppe:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="322"/>
