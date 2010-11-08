@@ -1250,7 +1250,7 @@ void MythPlayer::DisableTeletext(void)
     if (!osd)
         return;
 
-    osdLock.unlock();
+    osdLock.lock();
     osd->EnableTeletext(false, 0);
     textDisplayMode = kDisplayNone;
 

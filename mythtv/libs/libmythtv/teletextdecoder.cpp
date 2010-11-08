@@ -50,8 +50,14 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
     int err = 0, latin1 = -1, zahl1, pagenum, subpagenum, lang, flags;
     uint magazine, packet, header;
 
+    if (!m_player)
+        return;
+
+    m_player->LockOSD();
+
     if (!m_teletextviewer && m_player)
     {
+        m_player->UnlockOSD();
         m_player->SetupTeletextViewer();
         return;
     }
@@ -59,6 +65,7 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
     if (!m_teletextviewer)
     {
         VERBOSE(VB_VBI, "TeletextDecoder: No Teletext Viewer defined!");
+        m_player->UnlockOSD();
         return;
     }
 
@@ -70,7 +77,10 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
             header = hamm16(buf, &err);
 
             if (err & 0xf000)
+            {
+                m_player->UnlockOSD();
                 return; // error in data header
+            }
 
             magazine = header & 7;
             packet = (header >> 3) & 0x1f;
@@ -103,12 +113,16 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
                 packet += 16;
 
             if (err == 1)
+            {
+                m_player->UnlockOSD();
                 return;  // error in data header
+            }
 
             buf += 2;
             break;
 
         default:
+            m_player->UnlockOSD();
             return; // error in vbimode
     }
 
@@ -124,7 +138,10 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
                     b3 = hamm16(buf+4, &err);// subpage number + flags
                     b4 = hamm16(buf+6, &err);// language code + more flags
                     if (err & 0xf000)
+                    {
+                        m_player->UnlockOSD();
                         return;
+                    }
 
                     break;
 
@@ -135,11 +152,15 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
                     b3 = hamm84(buf+5, &err)*16+hamm84(buf+4, &err);
                     b4 = hamm84(buf+7, &err)*16+hamm84(buf+6, &err);
                     if (err == 1)
+                    {
+                        m_player->UnlockOSD();
                         return;
+                    }
 
                     break;
 
                 default:
+                    m_player->UnlockOSD();
                     return; // error in vbimode
             }
 
@@ -164,4 +185,5 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
                                               buf, vbimode);
             break;
     }
+    m_player->UnlockOSD();
 }
