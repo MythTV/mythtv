@@ -135,7 +135,13 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
                 .arg(info.fwVersion.fwMajor)
                 .arg(info.fwVersion.fwMinor)
                 .arg(info.fwVersion.version));
-        }
+    }
+
+    if (BC_70012 == m_device_type)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "BCM70012 device is currently unsupported.");
+        return false;
+    }
 
     BC_HW_CAPS hw_caps;
     uint32_t codecs;
