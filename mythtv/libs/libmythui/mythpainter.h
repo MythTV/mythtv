@@ -63,7 +63,7 @@ class MPUBLIC MythPainter
     virtual void DeleteFormatImage(MythImage *im);
 
   protected:
-    virtual void DeleteFormatImagePriv(MythImage *im) { }
+    virtual void DeleteFormatImagePriv(MythImage *im) { (void) im; }
     void CheckFormatImage(MythImage *im);
     void IncreaseCacheSize(QSize size);
     void DecreaseCacheSize(QSize size);
