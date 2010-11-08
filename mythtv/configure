@@ -4740,8 +4740,8 @@ cat <<EOF >> $MYTH_CONFIG_MAK
 #       -L from early in the link line, to ignore any old installed libmyth*
 # Note: Qt uses QMAKE_INCDIR_QT to build an absolute path for include
 #       directories, it cannot be modified.
-QMAKE_LIBDIR_QT-=$libdir
-LATE_LIBS+=-L$libdir
+QMAKE_LIBDIR_QT-=${sysroot}${libdir}
+LATE_LIBS+=-L${sysroot}${libdir}
 EOF
 
 #echo "endif # FFMPEG_CONFIG_MAK" >> config.mak
