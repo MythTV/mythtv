@@ -228,6 +228,7 @@ MythPlayer::MythPlayer(bool muted)
       videoFilters(NULL),           FiltMan(new FilterManager()),
 
       forcePositionMapSync(false),  pausedBeforeEdit(false),
+      speedBeforeEdit(1.0f),
       // Playback (output) speed control
       decoder_lock(QMutex::Recursive),
       next_play_speed(1.0f),        next_normal_speed(true),
@@ -3526,6 +3527,7 @@ bool MythPlayer::EnableEdit(void)
         return false;
 
     osdLock.lock();
+    speedBeforeEdit = play_speed;
     pausedBeforeEdit = Pause();
     deleteMap.SetEditing(true);
     osd->DialogQuit();
@@ -3558,7 +3560,7 @@ void MythPlayer::DisableEdit(bool save)
         player_ctx->playingInfo->SaveEditing(false);
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     if (!pausedBeforeEdit)
-        Play();
+        Play(speedBeforeEdit);
     else
         SetOSDStatus(QObject::tr("Paused"), kOSDTimeout_None);
     osdLock.unlock();
