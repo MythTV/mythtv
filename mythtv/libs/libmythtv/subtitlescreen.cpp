@@ -581,6 +581,7 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
         return;
     if (textlist && textlist->buffers.empty())
     {
+        SetRedraw();
         textlist->lock.unlock();
         return;
     }
