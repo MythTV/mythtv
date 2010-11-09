@@ -10622,11 +10622,12 @@ void TV::FillOSDMenuJobs(const PlayerContext *ctx, OSD *osd,
 {
     TVState state    = ctx->GetState();
     bool islivetv    = StateIsLiveTV(state);
-    bool isrecording = state ==  kState_WatchingPreRecorded;
+    bool isrecorded  = state == kState_WatchingPreRecorded;
+    bool isrecording = state == kState_WatchingRecording;
 
     if (category == "MAIN")
     {
-        if (islivetv || isrecording)
+        if (islivetv || isrecording || isrecorded)
         {
             osd->DialogAddButton(tr("Jobs"), "DIALOG_MENU_JOBS_0",
                                  true, selected == "JOBS");
@@ -10649,11 +10650,16 @@ void TV::FillOSDMenuJobs(const PlayerContext *ctx, OSD *osd,
         {
             osd->DialogAddButton(tr("Edit Channel"),   "EDIT");
         }
-        else if (isrecording)
+
+        if (isrecorded || isrecording)
         {
             osd->DialogAddButton(tr("Edit Recording"), "EDIT");
             osd->DialogAddButton(is_on ? tr("Turn Auto-Expire OFF") :
                                  tr("Turn Auto-Expire ON"), "TOGGLEAUTOEXPIRE");
+        }
+
+        if (isrecorded)
+        {
             if (transcoding)
             {
                 osd->DialogAddButton(tr("Stop Transcoding"), "QUEUETRANSCODE");
