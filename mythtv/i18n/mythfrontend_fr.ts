@@ -20076,7 +20076,8 @@ Une fois votre règle terminée, vous pourrez la tester, l&apos;activer immédia
     <message>
         <location filename="../themes/themestrings.h" line="430"/>
         <source>ZoneMinder Settings</source>
-        <translation>Réglages Zone Minder</translation>
+        <translatorcomment>Enlever espace redondant</translatorcomment>
+        <translation>Réglages ZoneMinder</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="431"/>
@@ -20466,7 +20467,8 @@ Une fois votre règle terminée, vous pourrez la tester, l&apos;activer immédia
     <message>
         <location filename="../themes/themestrings.h" line="496"/>
         <source>Zone Minder</source>
-        <translation>Zone Minder</translation>
+        <translatorcomment>Enlever espace redondant</translatorcomment>
+        <translation>ZoneMinder</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="32"/>

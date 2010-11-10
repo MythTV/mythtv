@@ -1690,7 +1690,8 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="398"/>
         <source>Specify what action to take when exiting mythmusic plugin.</source>
-        <translation>Spécifie l&apos;action à entreprendre lorsque l&apos;on quitte Mythmusic.</translation>
+        <translatorcomment>Capitalise correctement MythMusic</translatorcomment>
+        <translation>Spécifie l&apos;action à entreprendre lorsque l&apos;on quitte MythMusic.</translation>
     </message>
     <message>
         <location filename="../mythmusic/avfdecoder.cpp" line="534"/>
