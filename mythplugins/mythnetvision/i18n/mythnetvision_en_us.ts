@@ -86,7 +86,8 @@
         <location filename="../mythnetvision/netsearch.cpp" line="707"/>
         <source>This file already downloaded to:
 %1</source>
-        <translation>This file already downloaded to:
+        <translatorcomment>Add missing is...</translatorcomment>
+        <translation>This file is already downloaded to:
 %1</translation>
     </message>
 </context>
@@ -296,7 +297,8 @@ For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;<
     <message>
         <location filename="themestrings.h" line="17"/>
         <source>You haven&apos;t added any Sites/RSS Feeds yet!  To add a site, press MENU, then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
-        <translation>You haven&apos;t added any Sites/RSS Feeds yet!  To add a site, press MENU, then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</translation>
+        <translatorcomment>Fix case on sites...</translatorcomment>
+        <translation>You haven&apos;t added any sites/RSS Feeds yet!  To add a site, press MENU, then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="2"/>

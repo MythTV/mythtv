@@ -19252,7 +19252,8 @@ Finally, you can test, immediately activate, store, or cancel your rule.</transl
     <message>
         <location filename="../themes/themestrings.h" line="496"/>
         <source>Zone Minder</source>
-        <translation>Zone Minder</translation>
+        <translatorcomment>Redundant space</translatorcomment>
+        <translation>ZoneMinder</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="32"/>
