@@ -4,8 +4,6 @@
 Provides connection cache and data handlers for accessing the backend.
 """
 
-from __future__ import with_statement
-
 from static import PROTO_VERSION, BACKEND_SEP, RECSTATUS, AUDIO_PROPS, \
                    VIDEO_PROPS, SUBTITLE_TYPES
 from exceptions import MythError, MythDBError, MythBEError, MythFileError

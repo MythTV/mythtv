@@ -2,8 +2,6 @@
 # -*- coding: UTF-8 -*-
 #----------------------
 
-from __future__ import with_statement
-
 from urllib import urlopen
 from time import time
 from thread import start_new_thread, allocate_lock

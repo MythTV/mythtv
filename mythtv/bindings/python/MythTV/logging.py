@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Provides managed logging."""
 
-from __future__ import with_statement
-
 from static import LOGLEVEL
 
 from sys import version_info, stdout
@@ -90,9 +88,6 @@ class MythLog( LOGLEVEL ):
             self._setlevel(lstr, lbit)
         self.module = module
         self.db = db
-        self.time = self._time25
-        if version_info >= (2,6): # 2.6 or newer
-            self.time = self._time26
 
     @classmethod
     def _setlevel(cls, lstr=None, lbit=None):
@@ -143,8 +138,7 @@ class MythLog( LOGLEVEL ):
                     level.append(v)
             return ','.join(level)
 
-    def _time25(self): return datetime.now().strftime('%Y-%m-%d %H:%M:%S.000')
-    def _time26(self): return datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+    def time(self): return datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
     def _testLevel(self, level):
         if level&self.EXTRA:

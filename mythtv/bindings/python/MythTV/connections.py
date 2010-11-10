@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Provides basic connection classes."""
 
-from __future__ import with_statement
-
 from static import SCHEMA_VERSION, PROTO_VERSION, PROTO_TOKEN, BACKEND_SEP
 from msearch import MSearch
 from logging import MythLog
@@ -30,13 +28,9 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
         self._releaseCallback = None
         self.id = id(connection)
         MySQLdb.cursors.Cursor.__init__(self, connection)
-        self.ping = weakref.ref(self._ping121)
-        if MySQLdb.version_info >= ('1','2','2'):
-            self.ping = weakref.ref(self._ping122)
         self.ping()
 
-    def _ping121(self): self.connection.ping(True)
-    def _ping122(self): self.connection.ping()
+    def ping(self): self.connection.ping()
 
     def log_query(self, query, args):
         self.log(self.log.DATABASE, ' '.join(query.split()), str(args))

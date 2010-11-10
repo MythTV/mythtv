@@ -4,8 +4,6 @@
 Provides connection cache and data handlers for accessing the database.
 """
 
-from __future__ import with_statement
-
 from static import MythSchema
 from altdict import OrdDict, DictData
 from logging import MythLog
