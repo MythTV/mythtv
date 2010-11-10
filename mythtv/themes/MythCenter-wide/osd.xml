@@ -432,5 +432,130 @@
         </editbar>
     </window>
 
+    <window name="ChannelEditor">
+        <fontdef name="basesmall" face="Droid Sans">
+            <pixelsize>22</pixelsize>
+            <color>#EEEEEE</color>
+            <weight>bold</weight>
+        </fontdef>
+        <area>100,-1,500,500</area>
+        <imagetype name="backimg">
+            <area>0,0,500,500</area>
+            <filename>mythdialogbox-background.png</filename>
+        </imagetype>
+
+        <textarea name="title">
+            <font>basesmall</font>
+            <area>12,14,470,85</area>
+            <align>allcenter</align>
+            <value>Channel Editor</value>
+        </textarea>
+
+        <textarea name="callsign_label">
+            <area>12,85,200,83</area>
+            <font>basesmall</font>
+            <align>allcenter</align>
+            <value>Callsign</value>
+        </textarea>
+        <textedit name="callsign">
+            <area>224,105,259,42</area>
+            <statetype name="background">
+                <area>0,0,100%,100%</area>
+                <state name="active">
+                    <area>0,0,100%,100%</area>
+                    <shape name="background">
+                        <area>0,0,100%,100%</area>
+                        <fill color="#444444" />
+                        <line color="#555555" width="1" />
+                    </shape>
+                </state>
+                <state name="selected" from="active">
+                    <shape name="background">
+                        <area>0,0,100%,100%</area>
+                        <fill color="#555555" />
+                        <line color="#ffffff" width="1" />
+                    </shape>
+                </state>
+                <state name="inactive" from="active"/>
+            </statetype>
+
+            <imagetype name="cursor">
+                <filename>cursor.png</filename>
+            </imagetype>
+            <textarea name="text">
+                <font>basesmall</font>
+                <align>left,vcenter</align>
+            </textarea>
+        </textedit>
+
+        <textarea name="channum_label" from="callsign_label">
+            <position>12,168</position>
+            <value>Channel Number</value>
+        </textarea>
+        <textedit name="channum" from="callsign">
+            <area>224,188,259,42</area>
+        </textedit>
+
+        <textarea name="name_label" from="callsign_label">
+            <position>12,251</position>
+            <value>Channel Name</value>
+        </textarea>
+        <textedit name="channame" from="callsign">
+            <area>224,271,259,42</area>
+        </textedit>
+
+        <textarea name="xmltv_label" from="callsign_label">
+            <position>12,334</position>
+            <value>XMLTV ID</value>
+        </textarea>
+        <textedit name="XMLTV" from="callsign">
+            <area>224,354,259,42</area>
+        </textedit>
+
+        <button name="probe">
+            <area>100,430,100,50</area>
+            <value>Probe</value>
+            <statetype name="buttonstate">
+                <area>0,0,100%,100%</area>
+                <state name="active">
+                    <area>0,0,100%,100%</area>
+                    <shape name="background">
+                        <area>0,0,100%,100%</area>
+                        <fill color="#555555" />
+                        <line color="#888888" width="1" />
+                    </shape>
+                    <textarea name="text">
+                        <font>basesmall</font>
+                        <area>0,0,100%,100%</area>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <shape name="background">
+                        <fill color="#555555" />
+                        <line color="#ffffff" width="1" />
+                    </shape>
+                </state>
+                <state name="disabled" from="active" />
+                <state name="pushed" from="active">
+                    <shape name="background">
+                        <fill color="#222222" />
+                        <line color="#555555" width="1" />
+                    </shape>
+                    <textarea name="text">
+                        <font>basesmall</font>
+                        <area>0,0,100%,100%</area>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+            </statetype>
+        </button>
+
+        <button name="ok" from="probe">
+            <area>300,430,100,50</area>
+            <value>OK</value>
+        </button>
+    </window>
+
 </mythuitheme>
 
