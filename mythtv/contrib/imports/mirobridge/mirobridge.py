@@ -30,7 +30,7 @@ The source of all cover art and screen shots are from those downloaded and maint
 Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
 '''
 
-__version__=u"v0.6.5"
+__version__=u"v0.6.6"
 # 0.1.0 Initial development
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -190,6 +190,8 @@ __version__=u"v0.6.5"
 # 0.6.4 MythTV python bindings changes
 # 0.6.5 Added support for Miro v3.5.x
 #       Small internal document changes
+# 0.6.6 Fixed screenshot code due to changes in ffmpeg. First
+#       noticed in Ubuntu 10.10 (ffmepg v 0.6-4:0.6-2ubuntu6)
 
 examples_txt=u'''
 For examples, please see the Mirobridge's wiki page at http://www.mythtv.org/wiki/MiroBridge
@@ -858,7 +860,8 @@ def getVideoDetails(videofilename, screenshot=False):
     video = re.compile(u' Video: ')
     video_HDTV_small = re.compile(u' 1280x', re.UNICODE)
     video_HDTV_large = re.compile(u' 1920x', re.UNICODE)
-    width_height = re.compile(u'''^(.+?)[ ]\[?([0-9]+)x([0-9]+)[^\\/]*$''', re.UNICODE)
+    width_height = re.compile(u'''^(.+?)\[?([0-9]+)x([0-9]+)\\,[^\\/]''', re.UNICODE)
+
     audio = re.compile(u' Audio: ', re.UNICODE)
     audio_stereo = re.compile(u' stereo,', re.UNICODE)
     audio_mono = re.compile(u' mono,', re.UNICODE)
@@ -965,7 +968,7 @@ def takeScreenShot(videofile, screenshot_filename, size_limit=False, just_demens
         else:
             delay = 60 # For a large videos take screenshot at the 1 minute mark
 
-    cmd = u'ffmpeg -i "%s" -y -f image2 -ss %d -sameq -t 0.001 -s %d*%d "%s"'
+    cmd = u'ffmpeg -i "%s" -y -f image2 -ss %d -sameq -vframes 1 -s %d*%d "%s"'
 
     width = int(ffmpeg_details[u'width'])
     height = int(ffmpeg_details[u'height'])
@@ -978,7 +981,6 @@ def takeScreenShot(videofile, screenshot_filename, size_limit=False, just_demens
         return u"%dx%d" % (width, height)
 
     cmd2 = cmd % (videofile, delay, width, height, screenshot_filename)
-
     return subprocess.call(u'%s > /dev/null' % cmd2, shell=True)
 # end takeScreenShot()
 
