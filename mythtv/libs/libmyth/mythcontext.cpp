@@ -16,7 +16,6 @@ using namespace std;
 #include "oldsettings.h"
 #include "util.h"
 #include "remotefile.h"
-#include "mythdialogs.h"
 #include "mythplugin.h"
 #include "backendselect.h"
 #include "dbsettings.h"
@@ -307,6 +306,15 @@ bool MythContextPrivate::Init(const bool gui, UPnp *UPnPclient,
 
     // ---- keep all DB-using stuff below this line ----
 
+    // Prompt for language if this is a first time install and
+    // we didn't already do so.
+    if (m_gui && !gCoreContext->GetDB()->HaveSchema())
+    {
+        TempMainWindow(false);
+        LanguageSelection::prompt();
+        MythTranslation::load("mythfrontend");
+        EndTempWindow();
+    }
     gCoreContext->InitLocale();
     gCoreContext->SaveLocaleDefaults();
 
@@ -950,8 +958,6 @@ int MythContextPrivate::ChooseBackend(const QString &error)
             delete BEsel;
             return -1;
     }
-    //BEsel->hide();
-    //BEsel->deleteLater();
 
     QStringList buttons;
     QString     message;
@@ -1327,8 +1333,7 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
         if (gui)
         {
             d->TempMainWindow(false);
-            MythPopupBox::showOkPopup(GetMythMainWindow(),
-                                      "Library version error", warning);
+            ShowOkPopup(warning);
         }
         VERBOSE(VB_IMPORTANT, warning);
 
@@ -1363,8 +1368,7 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
         if (gui)
         {
             d->TempMainWindow(false);
-            MythPopupBox::showOkPopup(GetMythMainWindow(), "HOME error",
-                                      warning);
+            ShowOkPopup(warning);
         }
         VERBOSE(VB_IMPORTANT, warning);
 
