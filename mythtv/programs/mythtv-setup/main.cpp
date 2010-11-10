@@ -39,6 +39,8 @@ using namespace std;
 ExitPrompter   *exitPrompt  = NULL;
 StartPrompter  *startPrompt = NULL;
 
+static MythThemedMenu *menu;
+
 static void SetupMenuCallback(void* data, QString& selection)
 {
     (void)data;
@@ -103,10 +105,10 @@ static void SetupMenuCallback(void* data, QString& selection)
         VERBOSE(VB_IMPORTANT, "Unknown menu action: " + selection);
 }
 
-static bool SetupMenu(QString themedir, QString themename)
+static bool RunMenu(QString themedir, QString themename)
 {
     QByteArray tmp = themedir.toLocal8Bit();
-    MythThemedMenu *menu = new MythThemedMenu(
+    menu = new MythThemedMenu(
         QString(tmp.constData()), "setup.xml",
         GetMythMainWindow()->GetMainStack(), "mainmenu", false);
 
@@ -146,7 +148,37 @@ static bool resetTheme(QString themedir, const QString badtheme)
 
     GetMythMainWindow()->ReinitDone();
 
-    return SetupMenu(themedir, themename);
+    return RunMenu(themedir, themename);
+}
+
+static int reloadTheme(void)
+{
+    QString themename = gCoreContext->GetSetting("Theme", DEFAULT_UI_THEME);
+    QString themedir = GetMythUI()->FindThemeDir(themename);
+    if (themedir.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme '%1'")
+                .arg(themename));
+        return FRONTEND_BUGGY_EXIT_NO_THEME;
+    }
+
+    MythTranslation::reload();
+
+    GetMythMainWindow()->SetEffectsEnabled(false);
+
+    GetMythUI()->LoadQtConfig();
+
+    menu->Close();
+    GetMythMainWindow()->Init();
+
+    GetMythMainWindow()->ReinitDone();
+
+    GetMythMainWindow()->SetEffectsEnabled(true);
+
+    if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
+        return FRONTEND_BUGGY_EXIT_NO_THEME;
+
+    return 0;
 }
 
 static void print_usage()
@@ -410,15 +442,8 @@ int main(int argc, char *argv[])
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
     std::auto_ptr<MythContext> contextScopeDelete(gContext);
-
-    if (!gContext->Init(use_display))
-    {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        return GENERIC_EXIT_NO_MYTHCONTEXT;
-    }
-
-    gCoreContext->SetAppName(binname);
-
+    // Override settings as early as possible to cover bootstrapped screens
+    // such as the language prompt
     if (settingsOverride.size())
     {
         QMap<QString, QString>::iterator it;
@@ -430,16 +455,19 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (!MSqlQuery::testDBConnection())
+    if (!gContext->Init(use_display)) // No Upnp, Prompt for db
     {
-        cerr << "Unable to open database.\n";
-        //     << "Driver error was:" << endl
-        //     << db->lastError().driverText() << endl
-        //     << "Database error was:" << endl
-        //     << db->lastError().databaseText() << endl;
-
-        return GENERIC_EXIT_DB_ERROR;
+        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
+
+    if (!GetMythDB()->HaveSchema())
+    {
+        if (!InitializeMythSchema())
+            return GENERIC_EXIT_DB_ERROR;
+    }
+
+    gCoreContext->SetAppName(binname);
 
     if (use_display)
     {
@@ -578,12 +606,29 @@ int main(int argc, char *argv[])
         return BACKEND_EXIT_OK;
     }
 
+    MythTranslation::load("mythfrontend");
+
+    QString themename = gCoreContext->GetSetting("Theme", DEFAULT_UI_THEME);
+    QString themedir = GetMythUI()->FindThemeDir(themename);
+    if (themedir.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme '%1'")
+                .arg(themename));
+        return FRONTEND_BUGGY_EXIT_NO_THEME;
+    }
+
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
     mainWindow->setWindowTitle(QObject::tr("MythTV Setup"));
 
-    LanguageSelection::prompt();
-    MythTranslation::load("mythfrontend");
+    // We must reload the translation after a language change and this
+    // also means clearing the cached/loaded theme strings, so reload the
+    // theme which also triggers a translation reload
+    if (LanguageSelection::prompt())
+    {
+        if (!reloadTheme())
+            return FRONTEND_BUGGY_EXIT_NO_THEME;
+    }
 
     if (!UpgradeTVDatabaseSchema(true))
     {
@@ -599,17 +644,8 @@ int main(int argc, char *argv[])
         startPrompt = new StartPrompter();
     startPrompt->handleStart();
 
-    QString themename = gCoreContext->GetSetting("Theme", DEFAULT_UI_THEME);
-    QString themedir = GetMythUI()->FindThemeDir(themename);
-    if (themedir.isEmpty())
-    {
-        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme '%1'")
-                .arg(themename));
-        return FRONTEND_BUGGY_EXIT_NO_THEME;
-    }
-
     // Let the user select buttons, type values, scan for channels, etc.
-    if (!SetupMenu(themedir, themename) && !resetTheme(themedir, themename))
+    if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
         return FRONTEND_BUGGY_EXIT_NO_THEME;
 
     ExpertSettingsEditor *expertEditor = NULL;

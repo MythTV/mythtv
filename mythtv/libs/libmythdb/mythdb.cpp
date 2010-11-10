@@ -351,7 +351,7 @@ QString MythDB::GetSetting(const QString &_key, const QString &defaultval)
     }
     d->settingsCacheLock.unlock();
 
-    if (d->ignoreDatabase)
+    if (d->ignoreDatabase || !HaveValidDatabase())
         return value;
 
     MSqlQuery query(MSqlQuery::InitCon());

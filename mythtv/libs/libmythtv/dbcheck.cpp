@@ -25,7 +25,6 @@ const QString currentDatabaseVersion = "1264";
 static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver);
 static bool performActualUpdate(
     const char **updates, const char *version, QString &dbver);
-static bool InitializeDatabase(void);
 static bool doUpgradeTVDatabaseSchema(void);
 
 /** \defgroup db_schema MythTV Database Schema
@@ -545,7 +544,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (DBUtil::IsNewDatabase())
     {
-        if (!InitializeDatabase())
+        if (!InitializeMythSchema())
             return false;
         dbver = gCoreContext->GetSetting("DBSchemaVer");
     }
@@ -5535,7 +5534,7 @@ NULL
  * don't forget to delete host specific data
  *
  */
-bool InitializeDatabase(void)
+bool InitializeMythSchema(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SHOW TABLES;");
