@@ -188,6 +188,8 @@ __version__=u"v0.6.3"
 # 0.6.2 Trapped possible unicode errors which would hang the MiroBridge process
 # 0.6.3 Pull hostname from python bindings instead of socket libraries
 # Add support for Miro version 3.5.x
+# Fixed screenshot code due to changes in ffmpeg. First
+# noticed in Ubuntu 10.10 (ffmepg v 0.6-4:0.6-2ubuntu6)
 
 examples_txt=u'''
 For examples, please see the Mirobridge's wiki page at http://www.mythtv.org/wiki/MiroBridge
@@ -856,7 +858,7 @@ def getVideoDetails(videofilename, screenshot=False):
     video = re.compile(u' Video: ')
     video_HDTV_small = re.compile(u' 1280x', re.UNICODE)
     video_HDTV_large = re.compile(u' 1920x', re.UNICODE)
-    width_height = re.compile(u'''^(.+?)[ ]\[?([0-9]+)x([0-9]+)[^\\/]*$''', re.UNICODE)
+    width_height = re.compile(u'''^(.+?)\[?([0-9]+)x([0-9]+)\\,[^\\/]''', re.UNICODE)
     audio = re.compile(u' Audio: ', re.UNICODE)
     audio_stereo = re.compile(u' stereo,', re.UNICODE)
     audio_mono = re.compile(u' mono,', re.UNICODE)
@@ -963,7 +965,7 @@ def takeScreenShot(videofile, screenshot_filename, size_limit=False, just_demens
         else:
             delay = 60 # For a large videos take screenshot at the 1 minute mark
 
-    cmd = u'ffmpeg -i "%s" -y -f image2 -ss %d -sameq -t 0.001 -s %d*%d "%s"'
+    cmd = u'ffmpeg -i "%s" -y -f image2 -ss %d -sameq -vframes 1 -s %d*%d "%s"'
 
     width = int(ffmpeg_details[u'width'])
     height = int(ffmpeg_details[u'height'])
