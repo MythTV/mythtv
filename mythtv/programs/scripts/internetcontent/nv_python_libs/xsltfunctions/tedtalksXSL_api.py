@@ -21,8 +21,9 @@ See this link for the specifications:
 http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format
 '''
 
-__version__="v0.1.0"
+__version__="v0.1.1"
 # 0.1.0 Initial development
+# 0.1.1 Fixed URL of Flash player due to web site change
 
 
 # Specify the class names that have XPath extention functions
@@ -101,7 +102,7 @@ class xpathFunctions(object):
         self.descriptionFilter = etree.XPath('//p[@id="tagline"]', namespaces=self.namespaces)
         self.durationFilter = etree.XPath('//dl[@class="talkMedallion  clearfix"]//em[@class="date"]/text()', namespaces=self.namespaces)
         self.persistence = {}
-        self.flvPlayerLink = u'http://www.hd-trailers.net/mediaplayer/player.swf?autostart=true&backcolor=000000&frontcolor=999999&lightcolor=000000&screencolor=000000&controlbar=over&file=%s'
+        self.flvPlayerLink = u'http://static.hd-trailers.net/mediaplayer/player.swf?autostart=true&backcolor=000000&frontcolor=999999&lightcolor=000000&screencolor=000000&controlbar=over&file=%s'
 
     # end __init__()
 
