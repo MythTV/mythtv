@@ -3008,16 +3008,6 @@ PIPLocation MythPlayer::GetNextPIPLocation(void) const
 
 void MythPlayer::WrapTimecode(int64_t &timecode, TCTypes tc_type)
 {
-    if ((tc_type == TC_AUDIO) && (tc_wrap[TC_AUDIO] == INT64_MIN))
-    {
-        int64_t newaudio;
-        newaudio = tc_lastval[TC_VIDEO];
-        tc_wrap[TC_AUDIO] = newaudio - timecode;
-        timecode = newaudio;
-        tc_lastval[TC_AUDIO] = timecode;
-        VERBOSE(VB_IMPORTANT, "Manual Resync AV sync values");
-    }
-
     timecode += tc_wrap[tc_type];
 }
 
@@ -3229,7 +3219,7 @@ void MythPlayer::ChangeSpeed(void)
 bool MythPlayer::DoRewind(uint64_t frames, bool override_seeks,
                           bool seeks_wanted)
 {
-    SaveAudioTimecodeOffset(GetAudioTimecodeOffset());
+    SaveAudioTimecodeOffset();
 
     uint64_t number = frames + 1;
     uint64_t desiredFrame = (framesPlayed > number) ? framesPlayed - number : 0;
@@ -3385,7 +3375,7 @@ bool MythPlayer::IsNearEnd(int64_t margin)
 bool MythPlayer::DoFastForward(uint64_t frames, bool override_seeks,
                                bool seeks_wanted)
 {
-    SaveAudioTimecodeOffset(GetAudioTimecodeOffset());
+    SaveAudioTimecodeOffset();
 
     uint64_t number = frames - 1;
     uint64_t desiredFrame = framesPlayed + number;
@@ -4427,7 +4417,7 @@ bool MythPlayer::DoJumpChapter(int chapter)
         return false;
     }
 
-    SaveAudioTimecodeOffset(GetAudioTimecodeOffset());
+    SaveAudioTimecodeOffset();
     DoJumpToFrame(desiredFrame);
     jumpchapter = 0;
     return true;
