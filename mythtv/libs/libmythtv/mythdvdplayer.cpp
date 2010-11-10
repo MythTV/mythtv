@@ -469,7 +469,7 @@ void MythDVDPlayer::ChangeDVDTrack(bool ffw)
 
 void MythDVDPlayer::DoChangeDVDTrack(void)
 {
-    SaveAudioTimecodeOffset(GetAudioTimecodeOffset());
+    SaveAudioTimecodeOffset();
     if (decoder)
         decoder->ChangeDVDTrack(need_change_dvd_track > 0);
     ClearAfterSeek(!player_ctx->buffer->InDVDMenuOrStillFrame());

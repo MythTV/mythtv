@@ -442,15 +442,9 @@ class MPUBLIC MythPlayer
 
     // Time Code adjustment stuff
     int64_t AdjustAudioTimecodeOffset(int64_t v)
-        { tc_wrap[TC_AUDIO] += v;  return tc_wrap[TC_AUDIO]; }
-    int64_t ResetAudioTimecodeOffset(void)
-        { tc_wrap[TC_AUDIO] = 0LL; return tc_wrap[TC_AUDIO]; }
-    int64_t ResyncAudioTimecodeOffset(void)
-        { tc_wrap[TC_AUDIO] = INT64_MIN; return 0L; }
+        { tc_wrap[TC_AUDIO] += v; return tc_wrap[TC_AUDIO]; }
     int64_t GetAudioTimecodeOffset(void) const
         { return tc_wrap[TC_AUDIO]; }
-    void SaveAudioTimecodeOffset(int64_t v)
-        { savedAudioTimecodeOffset = v; }
 
     // Playback (output) zoom automation
     DetectLetterbox *detect_letter_box;
@@ -523,6 +517,10 @@ class MPUBLIC MythPlayer
 
     void calcSliderPosPriv(osdInfo &info, bool paddedFields,
                            int playbackLen, float secsplayed, bool islive);
+
+    // Private Time Code adjustment stuff
+    void SaveAudioTimecodeOffset(void)
+        { savedAudioTimecodeOffset = tc_wrap[TC_AUDIO]; }
 
   protected:
     DecoderBase   *decoder;

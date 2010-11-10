@@ -876,7 +876,7 @@ TV::TV(void)
       switchToInputId(0),
       wantsToQuit(true),
       stretchAdjustment(false),
-      audiosyncAdjustment(false), audiosyncBaseline(LLONG_MIN),
+      audiosyncAdjustment(false),
       editmode(false),     zoomMode(false),
       sigMonMode(false),
       endOfRecording(false),
@@ -3950,10 +3950,6 @@ bool TV::AudioSyncHandleAction(PlayerContext *ctx,
         ChangeAudioSync(ctx, -10);
     else if (has_action("DOWN", actions))
         ChangeAudioSync(ctx, 10);
-    else if (has_action("1", actions))
-        ChangeAudioSync(ctx, 1000000);
-    else if (has_action("0", actions))
-        ChangeAudioSync(ctx, -1000000);
     else if (has_action("TOGGLEAUDIOSYNC", actions))
         ClearOSD(ctx);
     else
@@ -5750,12 +5746,6 @@ bool TV::DoPlayerSeek(PlayerContext *ctx, float time)
         PauseAudioUntilBuffered(ctx);
 
     bool res = false;
-
-    if (LLONG_MIN != audiosyncBaseline)
-    {
-        int64_t aud_tc = ctx->player->GetAudioTimecodeOffset();
-        ctx->player->SaveAudioTimecodeOffset(aud_tc - audiosyncBaseline);
-    }
 
     if (time > 0.0f)
     {
@@ -8029,7 +8019,7 @@ void TV::ToggleUpmix(PlayerContext *ctx)
 }
 
 // dir in 10ms jumps
-void TV::ChangeAudioSync(PlayerContext *ctx, int dir, bool allowEdit)
+void TV::ChangeAudioSync(PlayerContext *ctx, int dir)
 {
     long long newval;
 
@@ -8040,43 +8030,14 @@ void TV::ChangeAudioSync(PlayerContext *ctx, int dir, bool allowEdit)
         return;
     }
 
-    if (!audiosyncAdjustment && LLONG_MIN == audiosyncBaseline)
-        audiosyncBaseline = ctx->player->GetAudioTimecodeOffset();
-
-    audiosyncAdjustment = allowEdit;
-
-    if (dir == 1000000)
-    {
-        newval = ctx->player->ResyncAudioTimecodeOffset() -
-                 audiosyncBaseline;
-        audiosyncBaseline = ctx->player->GetAudioTimecodeOffset();
-    }
-    else if (dir == -1000000)
-    {
-        newval = ctx->player->ResetAudioTimecodeOffset() -
-                 audiosyncBaseline;
-        audiosyncBaseline = ctx->player->GetAudioTimecodeOffset();
-    }
-    else
-    {
-        newval = ctx->player->AdjustAudioTimecodeOffset(dir*10) -
-                 audiosyncBaseline;
-    }
+    audiosyncAdjustment = true;
+    newval = ctx->player->AdjustAudioTimecodeOffset(dir * 10);
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
     if (!browsehelper->IsBrowsing())
     {
-        QString text;
         int val = (int)newval;
-        if (dir == 1000000 || dir == -1000000)
-        {
-            text = tr("Audio Resync");
-            val = 0;
-        }
-        else
-            text = tr("Audio Sync");
-
-        UpdateOSDStatus(ctx, tr("Adjust Audio Sync"), text,
+        UpdateOSDStatus(ctx, tr("Adjust Audio Sync"), tr("Audio Sync"),
                         QString::number(val),
                         kOSDFunctionalType_AudioSyncAdjust,
                         "ms", (val/2) + 500, kOSDTimeout_Med);

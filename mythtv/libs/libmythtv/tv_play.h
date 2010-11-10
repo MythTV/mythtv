@@ -435,7 +435,7 @@ class MPUBLIC TV : public QThread
                                  const QStringList &actions);
 
     void ToggleUpmix(PlayerContext*);
-    void ChangeAudioSync(PlayerContext*, int dir, bool allowEdit = true);
+    void ChangeAudioSync(PlayerContext*, int dir);
     bool AudioSyncHandleAction(PlayerContext*, const QStringList &actions);
 
     float StopFFRew(PlayerContext*);
@@ -690,7 +690,6 @@ class MPUBLIC TV : public QThread
     mutable bool wantsToQuit;
     bool stretchAdjustment; ///< True if time stretch is turned on
     bool audiosyncAdjustment; ///< True if audiosync is turned on
-    int64_t audiosyncBaseline;
     bool editmode;          ///< Are we in video editing mode
     bool zoomMode;
     bool sigMonMode;     ///< Are we in signal monitoring mode?
