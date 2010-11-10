@@ -204,7 +204,6 @@ MythPlayer::MythPlayer(bool muted)
       disp_timecode(0),             avsync_audiopaused(false),
       // Time Code stuff
       prevtc(0),                    prevrp(0),
-      savedAudioTimecodeOffset(0),
       // LiveTVChain stuff
       m_tv(NULL),                   isDummy(false),
       // Debugging variables
@@ -221,6 +220,7 @@ MythPlayer::MythPlayer(bool muted)
 
     bzero(&tc_lastval, sizeof(tc_lastval));
     bzero(&tc_wrap,    sizeof(tc_wrap));
+    tc_wrap[TC_AUDIO] = gCoreContext->GetNumSetting("AudioSyncOffset", 0);
 
     // Get VBI page number
     QString mypage = gCoreContext->GetSetting("VBIpageNr", "888");
@@ -3006,6 +3006,13 @@ PIPLocation MythPlayer::GetNextPIPLocation(void) const
     return kPIP_END;
 }
 
+int64_t MythPlayer::AdjustAudioTimecodeOffset(int64_t v)
+{
+    tc_wrap[TC_AUDIO] += v;
+    gCoreContext->SaveSetting("AudioSyncOffset", tc_wrap[TC_AUDIO]);
+    return tc_wrap[TC_AUDIO];
+}
+
 void MythPlayer::WrapTimecode(int64_t &timecode, TCTypes tc_type)
 {
     timecode += tc_wrap[tc_type];
@@ -3219,8 +3226,6 @@ void MythPlayer::ChangeSpeed(void)
 bool MythPlayer::DoRewind(uint64_t frames, bool override_seeks,
                           bool seeks_wanted)
 {
-    SaveAudioTimecodeOffset();
-
     uint64_t number = frames + 1;
     uint64_t desiredFrame = (framesPlayed > number) ? framesPlayed - number : 0;
 
@@ -3375,8 +3380,6 @@ bool MythPlayer::IsNearEnd(int64_t margin)
 bool MythPlayer::DoFastForward(uint64_t frames, bool override_seeks,
                                bool seeks_wanted)
 {
-    SaveAudioTimecodeOffset();
-
     uint64_t number = frames - 1;
     uint64_t desiredFrame = framesPlayed + number;
 
@@ -3475,14 +3478,12 @@ void MythPlayer::ClearAfterSeek(bool clearvideobuffers)
     if (clearvideobuffers && videoOutput)
         videoOutput->ClearAfterSeek();
 
+    int64_t savedAudioTimecodeOffset = tc_wrap[TC_AUDIO];
+
     for (int j = 0; j < TCTYPESMAX; j++)
         tc_wrap[j] = tc_lastval[j] = 0;
 
-    if (savedAudioTimecodeOffset)
-    {
-        tc_wrap[TC_AUDIO] = savedAudioTimecodeOffset;
-        savedAudioTimecodeOffset = 0;
-    }
+    tc_wrap[TC_AUDIO] = savedAudioTimecodeOffset;
 
     audio.Reset();
     ResetCaptions();
@@ -4417,7 +4418,6 @@ bool MythPlayer::DoJumpChapter(int chapter)
         return false;
     }
 
-    SaveAudioTimecodeOffset();
     DoJumpToFrame(desiredFrame);
     jumpchapter = 0;
     return true;
