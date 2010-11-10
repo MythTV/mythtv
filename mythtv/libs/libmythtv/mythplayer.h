@@ -441,8 +441,7 @@ class MPUBLIC MythPlayer
     void SetTeletextPage(uint page);
 
     // Time Code adjustment stuff
-    int64_t AdjustAudioTimecodeOffset(int64_t v)
-        { tc_wrap[TC_AUDIO] += v; return tc_wrap[TC_AUDIO]; }
+    int64_t AdjustAudioTimecodeOffset(int64_t v);
     int64_t GetAudioTimecodeOffset(void) const
         { return tc_wrap[TC_AUDIO]; }
 
@@ -517,10 +516,6 @@ class MPUBLIC MythPlayer
 
     void calcSliderPosPriv(osdInfo &info, bool paddedFields,
                            int playbackLen, float secsplayed, bool islive);
-
-    // Private Time Code adjustment stuff
-    void SaveAudioTimecodeOffset(void)
-        { savedAudioTimecodeOffset = tc_wrap[TC_AUDIO]; }
 
   protected:
     DecoderBase   *decoder;
@@ -710,7 +705,6 @@ class MPUBLIC MythPlayer
     int        prevrp;        ///< repeat_pict of last frame
     int64_t    tc_wrap[TCTYPESMAX];
     int64_t    tc_lastval[TCTYPESMAX];
-    int64_t    savedAudioTimecodeOffset;
 
     // LiveTV
     TV *m_tv;
