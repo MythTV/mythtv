@@ -32,12 +32,14 @@
     <message>
         <location filename="../mythzoneminder/zmsettings.cpp" line="17"/>
         <source>IP address of the mythzoneminder server</source>
-        <translation>IP address of the mythzoneminder server</translation>
+        <translatorcomment>Properly capitalize MythZoneMinder</translatorcomment>
+        <translation>IP address of the MythZoneMinder server</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmsettings.cpp" line="19"/>
         <source>Enter the IP address of the mythzoneminder server that this frontend should connect to.</source>
-        <translation>Enter the IP address of the mythzoneminder server that this frontend should connect to.</translation>
+        <translatorcomment>Properly capitalize MythZoneMinder</translatorcomment>
+        <translation>Enter the IP address of the MythZoneMinder server that this frontend should connect to.</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmsettings.cpp" line="27"/>
@@ -100,7 +102,8 @@
     <message>
         <location filename="themestrings.h" line="4"/>
         <source>Zone Minder Console</source>
-        <translation>Zone Minder Console</translation>
+        <translatorcomment>Remove the space in ZoneMinder.</translatorcomment>
+        <translation>ZoneMinder Console</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="5"/>
@@ -150,7 +153,8 @@
     <message>
         <location filename="themestrings.h" line="14"/>
         <source>Zone Minder Events</source>
-        <translation>Zone Minder Events</translation>
+        <translatorcomment>Remove the space in ZoneMinder.</translatorcomment>
+        <translation>ZoneMinder Events</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="15"/>
@@ -200,7 +204,8 @@
     <message>
         <location filename="themestrings.h" line="24"/>
         <source>Zone Minder Event Player</source>
-        <translation>Zone Minder Event Player</translation>
+        <translatorcomment>Remove the space in ZoneMinder.</translatorcomment>
+        <translation>ZoneMinder Event Player</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="25"/>
@@ -250,7 +255,8 @@
     <message>
         <location filename="themestrings.h" line="34"/>
         <source>Zone Minder Live Player</source>
-        <translation>Zone Minder Live Player</translation>
+        <translatorcomment>Remove the space in ZoneMinder.</translatorcomment>
+        <translation>ZoneMinder Live Player</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="35"/>

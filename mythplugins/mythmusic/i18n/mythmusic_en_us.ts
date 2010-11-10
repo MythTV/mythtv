@@ -1251,7 +1251,8 @@ Do you want to continue playing in the background?</translation>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="302"/>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to good old (peudo-)randomness when ordering a group of songs.</source>
-        <translation>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to good old (peudo-)randomness when ordering a group of songs.</translation>
+        <translatorcomment>Typo in original string (peudo).</translatorcomment>
+        <translation>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to good old (pseudo-)randomness when ordering a group of songs.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="312"/>
@@ -1397,7 +1398,8 @@ Do you want to continue playing in the background?</translation>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="398"/>
         <source>Specify what action to take when exiting mythmusic plugin.</source>
-        <translation>Specify what action to take when exiting mythmusic plugin.</translation>
+        <translatorcomment>Capitalize properly MythMusic</translatorcomment>
+        <translation>Specify what action to take when exiting MythMusic plugin.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="405"/>

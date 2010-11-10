@@ -251,7 +251,8 @@ want to do this?</translation>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="27"/>
         <source>Order in which to sort the games - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation>Order in which to sort the games - this is for all systems. Available choices: system, year, genre and gamename</translation>
+        <translatorcomment>Missing space...</translatorcomment>
+        <translation>Order in which to sort the games - this is for all systems. Available choices: system, year, genre and game name</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="36"/>
@@ -262,8 +263,8 @@ want to do this?</translation>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="38"/>
         <source>Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translatorcomment>Original string is in British English.</translatorcomment>
-        <translation>Order in which to sort the games marked as favorites - this is for all systems. Available choices: system, year, genre and gamename</translation>
+        <translatorcomment>Original string is in British English and missing space.</translatorcomment>
+        <translation>Order in which to sort the games marked as favorites - this is for all systems. Available choices: system, year, genre and game name</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="48"/>
@@ -273,17 +274,20 @@ want to do this?</translation>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="49"/>
         <source>Enabling this causes a game scan to gather crc values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a gamescan takes based on the amount of games scanned.</source>
-        <translation>Enabling this causes a game scan to gather crc values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a gamescan takes based on the amount of games scanned.</translation>
+        <translatorcomment>Capitalize CRC</translatorcomment>
+        <translation>Enabling this causes a game scan to gather CRC values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a gamescan takes based on the amount of games scanned.</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="58"/>
         <source>Prompt for removal of deleted rom(s)</source>
-        <translation>Prompt for removal of deleted rom(s)</translation>
+        <translatorcomment>Capitalize ROM</translatorcomment>
+        <translation>Prompt for removal of deleted ROM(s)</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="59"/>
         <source>This enables a prompt for removing deleted roms from the database during a  gamescan</source>
-        <translation>This enables a prompt for removing deleted roms from the database during a  gamescan</translation>
+        <translatorcomment>Capitalize ROM</translatorcomment>
+        <translation>This enables a prompt for removing deleted ROMs from the database during a  gamescan</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="69"/>
@@ -293,7 +297,8 @@ want to do this?</translation>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="70"/>
         <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up gamename</source>
-        <translation>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up gamename</translation>
+        <translatorcomment>Missing space...</translatorcomment>
+        <translation>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up game name</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="77"/>
@@ -343,7 +348,8 @@ want to do this?</translation>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="160"/>
         <source>Allow games to span multiple roms/disks</source>
-        <translation>Allow games to span multiple roms/disks</translation>
+        <translatorcomment>Capitalize ROM</translatorcomment>
+        <translation>Allow games to span multiple ROMs/disks</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="161"/>
@@ -358,8 +364,8 @@ want to do this?</translation>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="172"/>
         <source>Binary and optional parameters. Multiple commands seperated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
-        <translatorcomment>Typo in original string (s(e|a)parated)</translatorcomment>
-        <translation>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</translation>
+        <translatorcomment>Typo in original string (s(e|a)parated) and capitalize ROM.</translatorcomment>
+        <translation>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the ROM name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="182"/>
@@ -374,7 +380,8 @@ want to do this?</translation>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="198"/>
         <source>Rom Path</source>
-        <translation>Rom Path</translation>
+        <translatorcomment>Capitalize ROM</translatorcomment>
+        <translation>ROM Path</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="199"/>
@@ -656,7 +663,8 @@ want to do this?</translation>
     <message>
         <location filename="themestrings.h" line="35"/>
         <source>Rompath:</source>
-        <translation>Rompath:</translation>
+        <translatorcomment>Capitalize ROM</translatorcomment>
+        <translation>ROMpath:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="36"/>

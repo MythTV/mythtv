@@ -983,9 +983,10 @@
         <source>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
 
 When you are done configuring the Weather Plugin, click &quot;Finish&quot; to continue.</source>
+        <translatorcomment>Change Weather Plugin for MythWeather</translatorcomment>
         <translation>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
 
-When you are done configuring the Weather Plugin, click &quot;Finish&quot; to continue.</translation>
+When you are done configuring MythWeather, click &quot;Finish&quot; to continue.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
@@ -1184,7 +1185,8 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</tra
     <message>
         <location filename="themestrings.h" line="53"/>
         <source>General weather plugin options</source>
-        <translation>General weather plugin options</translation>
+        <translatorcomment>Change Weather Plugin for MythWeather</translatorcomment>
+        <translation>General MythWeather options</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="54"/>

@@ -355,7 +355,8 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="155"/>
         <source>Display mythdvd menu</source>
-        <translation>Display mythdvd menu</translation>
+        <translatorcomment>Properly capitalize MythDVD</translatorcomment>
+        <translation>Display MythDVD menu</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="156"/>
