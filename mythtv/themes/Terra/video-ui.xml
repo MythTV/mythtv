@@ -860,33 +860,33 @@
         </textarea>
 
         <textarea name="breadcrumbs" from="basetextarea">
-            <area>50,20,700,40</area>
+            <area>50,50,700,40</area>
             <font>basemedium</font>
         </textarea>
 
         <buttontree name="videos">
-            <area>40,50,720,260</area>
+            <area>40,80,720,260</area>
             <numlists>3</numlists>
             <spacing>10</spacing>
             <buttonlist name="listtemplate" from="basebuttonlist" />
         </buttontree>
 
         <textarea name="title" from="basetextarea">
-            <area>40,330,530,40</area>
+            <area>40,360,530,40</area>
             <font>baselarge</font>
         </textarea>
 
         <textarea name="director" from="basetextarea">
-            <area>50,367,450,30</area>
+            <area>50,397,450,30</area>
         </textarea>
 
         <textarea name="year" from="basetextarea">
-            <area>500,367,80,30</area>
+            <area>500,397,80,30</area>
             <align>right</align>
         </textarea>
 
         <textarea name="description" from="basetextarea">
-            <area>40,395,530,80</area>
+            <area>40,425,530,80</area>
             <align>left,top</align>
             <multiline>yes</multiline>
             <cutdown>yes</cutdown>
@@ -898,31 +898,31 @@
         </textarea>
 
         <textarea name="cast" from="basetextarea">
-            <area>60,480,505,70</area>
+            <area>60,510,505,70</area>
             <align>left,top</align>
             <multiline>yes</multiline>
             <cutdown>no</cutdown>
         </textarea>
 
         <textarea name="position" from="basetextarea">
-            <area>266,555,266,40</area>
+            <area>266,585,266,40</area>
             <font>basemedium</font>
             <align>hcenter,vcenter</align>
         </textarea>
 
         <imagetype name="coverart">
-            <area>624,335,140,212</area>
+            <area>624,365,140,212</area>
             <preserveaspect>yes</preserveaspect>
         </imagetype>
 
         <textarea name="level_label" from="basetextarea">
-            <area>600,560,130,30</area>
+            <area>600,590,130,30</area>
             <value>Parental Level</value>
             <align>right,vcenter</align>
         </textarea>
 
         <statetype name="parentallevel">
-            <position>740,553</position>
+            <position>740,583</position>
             <state name="None">
                 <imagetype name="icon">
                     <filename>mv_level_none.png</filename>
