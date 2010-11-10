@@ -32,12 +32,14 @@
     <message>
         <location filename="../mythzoneminder/zmsettings.cpp" line="17"/>
         <source>IP address of the mythzoneminder server</source>
-        <translation>Adresse IP du serveur mythzoneminder</translation>
+        <translatorcomment>Capitaliser correctement MythZoneMinder</translatorcomment>
+        <translation>Adresse IP du serveur MythZoneMinder</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmsettings.cpp" line="19"/>
         <source>Enter the IP address of the mythzoneminder server that this frontend should connect to.</source>
-        <translation>Entrez l&apos;adresse IP du serveur mythzoneminder auquel ce frontal devrait se connecter.</translation>
+        <translatorcomment>Capitaliser correctement MythZoneMinder</translatorcomment>
+        <translation>Entrez l&apos;adresse IP du serveur MythZoneMinder auquel ce frontal devrait se connecter.</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmsettings.cpp" line="27"/>
