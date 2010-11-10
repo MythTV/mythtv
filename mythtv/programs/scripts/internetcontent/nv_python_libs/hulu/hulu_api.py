@@ -20,10 +20,11 @@ provided by Hulu (http://www.hulu.com/). The specific Hulu RSS feeds that are pr
 "~/.mythtv/MythNetvision/userGrabberPrefs/hulu.xml"
 '''
 
-__version__="v0.1.2"
+__version__="v0.1.3"
 # 0.1.0 Initial development
 # 0.1.1 Changed the logger to only output to stderr rather than a file
 # 0.1.2 Removed the need for python MythTV bindings and added "%SHAREDIR%" to icon directory path
+# 0.1.3 Dealt with a lack of description for a Hulu video
 
 import os, struct, sys, re, time, datetime, shutil, urllib
 from string import capitalize
@@ -616,7 +617,10 @@ class Videos(object):
                         huluItem.find('author').text = u'Hulu'
                     huluItem.find('pubDate').text = pubdate
                     description = etree.HTML(etree.tostring(descriptionFilter(itemData)[0], method="text", encoding=unicode).strip())
-                    huluItem.find('description').text = self.common.massageText(descFilter2(description)[0].text.strip())
+                    if descFilter2(description)[0].text != None:
+                        huluItem.find('description').text = self.common.massageText(descFilter2(description)[0].text.strip())
+                    else:
+                        huluItem.find('description').text = u''
                     for e in descFilter2(description)[1]:
                         eText = etree.tostring(e, method="text", encoding=unicode)
                         if not eText:

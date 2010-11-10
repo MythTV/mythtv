@@ -40,7 +40,7 @@
                     <author><xsl:value-of select="normalize-space(itunes:author)"/></author>
                     <pubDate><xsl:value-of select="mnvXpath:pubDate(string(pubDate), '%A, %d %B %Y %H:%M:%S GMT')"/></pubDate>
                     <description><xsl:value-of select="normalize-space(description)"/></description>
-                    <link><xsl:value-of select="concat('http://www.hd-trailers.net/mediaplayer/player.swf?autostart=true&amp;backcolor=000000&amp;frontcolor=999999&amp;lightcolor=000000&amp;screencolor=000000&amp;controlbar=over&amp;file=', normalize-space(enclosure/@url))"/></link>
+                    <link><xsl:value-of select="concat('http://static.hd-trailers.net/mediaplayer/player.swf?autostart=true&amp;backcolor=000000&amp;frontcolor=999999&amp;lightcolor=000000&amp;screencolor=000000&amp;controlbar=over&amp;file=', normalize-space(enclosure/@url))"/></link>
                     <xsl:element name="media:group">
                         <xsl:element name="media:thumbnail">
                             <xsl:attribute name="url"><xsl:value-of select="normalize-space(../itunes:image/@href)"/></xsl:attribute>

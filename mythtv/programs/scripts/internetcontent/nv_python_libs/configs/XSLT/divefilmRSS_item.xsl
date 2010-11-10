@@ -49,7 +49,7 @@
                         <pubDate><xsl:value-of select="mnvXpath:pubDate(string(pubDate), '%a, %d %b %Y %H:%M:%S')"/></pubDate>
                         <description><xsl:value-of select="normalize-space(itunes:subtitle)"/></description>
                         <!-- There is no Web page link the media must played througha flash player -->
-                        <link><xsl:value-of select="concat('http://www.hd-trailers.net/mediaplayer/player.swf?autostart=true&amp;file=', normalize-space(guid))"/></link>
+                        <link><xsl:value-of select="concat('http://static.hd-trailers.net/mediaplayer/player.swf?autostart=true&amp;file=', normalize-space(guid))"/></link>
                         <xsl:element name="media:group">
                             <xsl:element name="media:thumbnail">
                                 <xsl:attribute name="url"><xsl:value-of select="normalize-space(../itunes:image/@href)"/></xsl:attribute>
