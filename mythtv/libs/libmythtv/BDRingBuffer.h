@@ -61,7 +61,8 @@ class MPUBLIC BDRingBufferPriv
     int  safe_read(void *data, unsigned sz);
     uint64_t Seek(uint64_t pos);
 
-    void HandleBDEvent(BD_EVENT *event);
+    bool HandleBDEvents(void);
+    void HandleBDEvent(BD_EVENT &event);
 
     // navigation
     void PressButton(int32_t key, int64_t pts);
@@ -69,14 +70,40 @@ class MPUBLIC BDRingBufferPriv
   protected:
     BLURAY            *bdnav;
     bool               m_is_hdmv_navigation;
-    BD_EVENT          *m_currentEvent;
     uint32_t           m_numTitles;
     uint32_t           m_mainTitle; // Index number of main title
     uint64_t           m_currentTitleLength; // Selected title's duration, in ticks (90Khz)
     BLURAY_TITLE_INFO *m_currentTitleInfo; // Selected title info from struct in bluray.h
     uint64_t           m_titlesize;
-    uint64_t           m_currentAngle;
     uint64_t           m_currentTitleAngleCount;
     uint64_t           m_currentTime;
+
+    int                m_currentAngle;
+    int                m_currentTitle;
+    int                m_currentPlaylist;
+    int                m_currentPlayitem;
+    int                m_currentChapter;
+
+    int                m_currentMenuPage;
+    int                m_currentButton;
+
+    int                m_currentAudioStream;
+    int                m_currentIGStream;
+    int                m_currentPGTextSTStream;
+    int                m_currentSecondaryAudioStream;
+    int                m_currentSecondaryVideoStream;
+
+    bool               m_PGTextSTEnabled;
+    bool               m_secondaryAudioEnabled;
+    bool               m_secondaryVideoEnabled;
+    bool               m_secondaryVideoIsFullscreen;
+
+    bool               m_isStill;
+
+    // These probably ought to be handled in functions
+    int                m_enableButton;
+    int                m_disableButton;
+    bool               m_popupOff;
+
 };
 #endif
