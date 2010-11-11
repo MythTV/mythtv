@@ -58,4 +58,19 @@ typedef struct bd_uo_mask_table_s
     uint8_t         pip_pg_change : 1;
 } BD_UO_MASK;
 
+static inline BD_UO_MASK bd_uo_mask_combine(BD_UO_MASK a, BD_UO_MASK b)
+{
+    BD_UO_MASK o;
+    uint8_t   *pa = (uint8_t*)&a;
+    uint8_t   *pb = (uint8_t*)&b;
+    uint8_t   *po = (uint8_t*)&o;
+    unsigned   i;
+
+    for (i = 0; i < sizeof(BD_UO_MASK); i++) {
+        po[i] = pa[i] & pb[i];
+    }
+
+    return o;
+}
+
 #endif // _BD_UO_MASK_TABLE_H_
