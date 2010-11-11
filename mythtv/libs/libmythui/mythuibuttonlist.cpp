@@ -2831,11 +2831,6 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
     buttonstate->SetVisible(true);
     buttonstate->Reset();
 
-    MythUIImage *buttonbackground = dynamic_cast<MythUIImage *>
-                                    (buttonstate->GetChild("buttonbackground"));
-    if (buttonbackground && buttonbackground->IsGradient())
-        buttonbackground->ForceSize(buttonstate->GetArea().size());
-
     MythUIText *buttontext = dynamic_cast<MythUIText *>
                                         (buttonstate->GetChild("buttontext"));
     if (buttontext)

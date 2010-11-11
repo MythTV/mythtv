@@ -250,19 +250,13 @@ void MythUIImage::Init(void)
     m_reflectAxis = ReflectVertical;
     m_reflectSpacing = 0;
 
-    m_gradient = false;
-    m_gradientStart = QColor("#505050");
-    m_gradientEnd = QColor("#000000");
-    m_gradientAlpha = 100;
-    m_gradientDirection = FillTopToBottom;
-
     m_isMasked = false;
     m_maskImage = NULL;
 
     m_isGreyscale = false;
 
     m_preserveAspect = false;
-    
+
     m_animationCycle = kCycleStart;
     m_animationReverse = false;
     m_animatedImage = false;
@@ -383,17 +377,6 @@ void MythUIImage::SetImage(MythImage *img)
 void MythUIImage::SetImages(QVector<MythImage *> &images)
 {
     Clear();
-
-    // HACK: This is just a workaround for the buttonlist inheritance problem
-    //       until the image cache is completed.
-    d->m_UpdateLock.lockForRead();
-    if (m_gradient)
-    {
-        d->m_UpdateLock.unlock();
-        Load();
-        return;
-    }
-    d->m_UpdateLock.unlock();
 
     QWriteLocker updateLocker(&d->m_UpdateLock);
     QSize aSize = GetArea().size();
@@ -555,7 +538,7 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
 
     QString filename = bFilename;
 
-    if (bFilename.isEmpty() && (!m_gradient))
+    if (bFilename.isEmpty())
     {
         Clear();
         SetRedraw();
@@ -582,45 +565,6 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
             h = bForceSize.height();
     }
 
-    if (m_gradient)
-    {
-        int gradWidth = 10;
-        int gradHeight = 10;
-
-        if (!m_Area.isEmpty())
-        {
-            gradWidth  = GetArea().size().width();
-            gradHeight = GetArea().size().height();
-        }
-        else if ((w > 0) && (h > 0))
-        {
-            gradWidth = w;
-            gradHeight = h;
-        }
-
-        int sr, sg, sb;
-        m_gradientStart.getRgb(&sr, &sg, &sb);
-
-        int er, eg, eb;
-        m_gradientEnd.getRgb(&er, &eg, &eb);
-
-        d->m_UpdateLock.lockForWrite();
-        m_Filename =
-            QString("gradient-%1x%2-%3-%4-%5-%6-%7-%8-%9-%10")
-                    .arg(gradWidth).arg(gradHeight)
-                    .arg(sr).arg(sg).arg(sb).arg(er).arg(eg).arg(eb)
-                    .arg(m_gradientAlpha).arg(m_gradientDirection);
-        bFilename = m_Filename;
-        bFilename.detach();
-        d->m_UpdateLock.unlock();
-
-        filename = bFilename;
-
-        VERBOSE(VB_GUI|VB_FILE|VB_EXTRA, LOC +
-                QString("Auto-generated gradient filename of '%1'")
-                .arg(bFilename));
-    }
-
     QString imagelabel;
 
     int j = 0;
@@ -634,12 +578,10 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
         // Only load in the background if allowed and the image is
         // not already in our mem cache
         ImageCacheMode cacheMode = kCacheCheckMemoryOnly;
-        if (m_gradient)
-            cacheMode = kCacheIgnoreDisk;
-        else if (forceStat)
+        if (forceStat)
             cacheMode = (ImageCacheMode)
                 ((int)kCacheCheckMemoryOnly | (int)kCacheForceStat);
-        
+
         ImageCacheMode cacheMode2 = (!forceStat) ? kCacheNormal :
             (ImageCacheMode) ((int)kCacheNormal | (int)kCacheForceStat);
 
@@ -783,48 +725,28 @@ MythImage *MythUIImage::LoadImage(
     }
     else
     {
-        if (m_gradient)
-        {
-            VERBOSE(VB_GUI|VB_FILE, LOC +
-                    QString("LoadImage Not Found in cache. "
-                            "Creating Gradient :%1:").arg(filename));
+        VERBOSE(VB_GUI|VB_FILE, LOC +
+                QString("LoadImage Not Found in cache. "
+                        "Loading Directly :%1:").arg(filename));
 
-            QSize gradsize;
-            if (!m_Area.isEmpty())
-                gradsize = GetArea().size();
-            else
-                gradsize = QSize(10, 10);
-
-            image = MythImage::Gradient(GetPainter(), gradsize, m_gradientStart,
-                                        m_gradientEnd, m_gradientAlpha,
-                                        m_gradientDirection);
-            image->UpRef();
-        }
+        image = GetPainter()->GetFormatImage();
+        image->UpRef();
+        bool ok = false;
+        if (imageReader.supportsAnimation())
+            ok = image->Load(imageReader);
         else
+            ok = image->Load(filename);
+
+        if (!ok)
         {
-            VERBOSE(VB_GUI|VB_FILE, LOC +
-                    QString("LoadImage Not Found in cache. "
-                            "Loading Directly :%1:").arg(filename));
+            image->DownRef();
 
-            image = GetPainter()->GetFormatImage();
-            image->UpRef();
-            bool ok = false;
-            if (imageReader.supportsAnimation())
-                ok = image->Load(imageReader);
-            else
-                ok = image->Load(filename);
+            m_loadingImagesLock.lock();
+            m_loadingImages.remove(filename);
+            m_loadingImagesCond.wakeAll();
+            m_loadingImagesLock.unlock();
 
-            if (!ok)
-            {
-                image->DownRef();
-
-                m_loadingImagesLock.lock();
-                m_loadingImages.remove(filename);
-                m_loadingImagesCond.wakeAll();
-                m_loadingImagesLock.unlock();
-
-                return NULL;
-            }
+            return NULL;
         }
     }
 
@@ -1016,7 +938,7 @@ void MythUIImage::Pulse(void)
             else
                 ++m_CurPos;
         }
-             
+
         m_ImagesLock.unlock();
 
         SetRedraw();
@@ -1147,20 +1069,6 @@ bool MythUIImage::ParseElement(
         tmp = element.attribute("cycle", "start");
         if (tmp == "reverse")
             m_animationCycle = kCycleReverse;
-    }
-    else if (element.tagName() == "gradient")
-    {
-        VERBOSE(VB_GENERAL, LOC_WARN + "Use of gradient in an imagetype is "
-                            "deprecated, see shape gradients instead.");
-        m_gradient = true;
-        m_gradientStart = QColor(element.attribute("start", "#505050"));
-        m_gradientEnd = QColor(element.attribute("end", "#000000"));
-        m_gradientAlpha = element.attribute("alpha", "100").toInt();
-        QString direction = element.attribute("direction", "vertical");
-        if (direction == "vertical")
-            m_gradientDirection = FillTopToBottom;
-        else
-            m_gradientDirection = FillLeftToRight;
     }
     else if (element.tagName() == "area")
     {
@@ -1305,12 +1213,6 @@ void MythUIImage::CopyFrom(MythUIType *base)
     m_maskImage = im->m_maskImage;
     if (m_maskImage)
         m_maskImage->UpRef();
-
-    m_gradient = im->m_gradient;
-    m_gradientStart = im->m_gradientStart;
-    m_gradientEnd = im->m_gradientEnd;
-    m_gradientAlpha = im->m_gradientAlpha;
-    m_gradientDirection = im->m_gradientDirection;
 
     m_preserveAspect = im->m_preserveAspect;
 

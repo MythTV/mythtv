@@ -55,8 +55,6 @@ class MPUBLIC MythUIImage : public MythUIType
     void Reset(void);
     bool Load(bool allowLoadInBackground = true, bool forceStat = false);
 
-    bool IsGradient(void) const { return m_gradient; }
-
     virtual void Pulse(void);
 
     virtual void LoadNow(void);
@@ -121,12 +119,6 @@ class MPUBLIC MythUIImage : public MythUIType
 
     MythImage *m_maskImage;
     bool m_isMasked;
-
-    bool m_gradient;
-    QColor m_gradientStart;
-    QColor m_gradientEnd;
-    uint m_gradientAlpha;
-    FillDirection m_gradientDirection;
 
     bool m_preserveAspect;
 
