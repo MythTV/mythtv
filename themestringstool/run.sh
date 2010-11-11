@@ -16,6 +16,7 @@ set -e
 
 TS=`pwd`/themestrings
 MYTHTHEMES=`ls ../myththemes/ --file-type |grep "/$"`
+MYTHTHEMES_CORE=`ls ../mythtv/themes/ --file-type |grep "/$"`
 MYTHTHEMES_DL="http://themes.mythtv.org/themes/repository/trunk/themes.zip"
 XMLPLUGINS="browser-ui.xml gallery-ui.xml game-ui.xml music-ui.xml \
          mytharchive-ui.xml mythburn-ui.xml netvision-ui.xml \
@@ -47,6 +48,15 @@ pushd ..
     done
 popd > /dev/null
 
+# Also exclude the plugin-related theme files in the mythtv core themes.
+pushd ../mythtv/themes
+    for I in ${MYTHTHEMES_CORE}; do
+        for J in ${XMLPLUGINS}; do
+            [ -e ${I}${J} ] && chmod a-r ${I}${J}
+        done
+    done
+popd > /dev/null
+
 # Download third party themes to extract their description
 mkdir temp_download
 wget ${MYTHTHEMES_DL} -O temp_download/themes.zip
@@ -64,6 +74,7 @@ echo "...until this point"
 echo "-------------------------------------------------------------------------"
 rm -rf temp_download
 
+# Restore file permissions
 pushd ..
     chmod a+x mythplugins
     for I in ${MYTHTHEMES}; do
@@ -73,18 +84,25 @@ pushd ..
     done
 popd > /dev/null
 
+pushd ../mythtv/themes
+    for I in ${MYTHTHEMES_CORE}; do
+        for J in ${XMLPLUGINS}; do
+            [ -e ${I}${J} ] && chmod a+r ${I}${J}
+        done
+    done
+popd > /dev/null
 
 # updateplugin plugindir [xml file] [xml file]
 function updateplugin {
     pushd ../mythplugins/$1
     mkdir temp_themestrings > /dev/null 2>&1
     COUNT=0
-    [ -n "$2" ] && for i in `echo ../../myththemes/*/${2}`; do
+    [ -n "$2" ] && for i in `ls ../../myththemes/*/${2} ../../mythtv/themes/*/${2} 2>/dev/null`; do
         cp $i temp_themestrings/${COUNT}-${2}
         COUNT=$((COUNT+1))
     done
 
-    [ -n "$3" ] && for i in `echo ../../myththemes/*/${3}`; do
+    [ -n "$3" ] && for i in `ls ../../myththemes/*/${3} ../../mythtv/themes/*/${3} 2>/dev/null`; do
         cp $i temp_themestrings/${COUNT}-${3}
         COUNT=$((COUNT+1))
     done
@@ -105,7 +123,7 @@ updateplugin mythnetvision netvision-ui.xml
 updateplugin mythnews news-ui.xml
 updateplugin mythvideo video-ui.xml
 updateplugin mythweather weather-ui.xml
-#updateplugin mythzoneminder zoneminder-ui.xml  #zoneminder-ui.xml doesn't exist at the moment, but it's included for future use
+updateplugin mythzoneminder zoneminder-ui.xml
 
 pushd .. > /dev/null
     svn st
