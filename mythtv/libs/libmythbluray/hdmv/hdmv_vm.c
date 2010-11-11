@@ -533,6 +533,9 @@ static void _set_button_page(HDMV_VM *p, uint32_t dst, uint32_t src)
 
          _queue_event(p, HDMV_EVENT_SET_BUTTON_PAGE, param);
 
+         /* terminate */
+         p->pc = 1 << 17;
+
         return;
     }
 
