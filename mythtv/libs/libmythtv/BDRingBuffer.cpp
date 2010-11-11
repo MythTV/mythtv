@@ -150,12 +150,9 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
     m_secondaryVideoEnabled = false;
     m_secondaryVideoIsFullscreen = false;
     m_isStill = false;
-
-    // These probably ought to be handled in functions
-    int                m_enableButton;
-    int                m_disableButton;
-    bool               m_popupOff;
-
+    m_enableButton = 0;
+    m_disableButton = 0;
+    m_popupOff = 0;
 
     VERBOSE(VB_IMPORTANT, LOC + QString("Found %1 relevant titles.")
             .arg(m_numTitles));
