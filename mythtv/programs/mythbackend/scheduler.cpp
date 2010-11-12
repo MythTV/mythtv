@@ -3861,6 +3861,22 @@ static bool comp_storage_combination(FileSystemInfo *a, FileSystemInfo *b)
 }
 
 // prefer dirs with more free space over dirs with less
+static bool comp_storage_perc_free_space(FileSystemInfo *a, FileSystemInfo *b)
+{
+    if (a->totalSpaceKB == 0)
+        return false;
+
+    if (b->totalSpaceKB == 0)
+        return true;
+
+    if ((a->freeSpaceKB * 100.0) / a->totalSpaceKB > 
+        (b->freeSpaceKB * 100.0) / b->totalSpaceKB)
+        return true;
+
+    return false;
+}
+
+// prefer dirs with more free space over dirs with less
 static bool comp_storage_free_space(FileSystemInfo *a, FileSystemInfo *b)
 {
     if (a->freeSpaceKB > b->freeSpaceKB)
@@ -4165,6 +4181,8 @@ int Scheduler::FillRecordingDir(
 
     if (storageScheduler == "BalancedFreeSpace")
         fsInfoList.sort(comp_storage_free_space);
+    else if (storageScheduler == "BalancedPercFreeSpace")
+        fsInfoList.sort(comp_storage_perc_free_space);
     else if (storageScheduler == "BalancedDiskIO")
         fsInfoList.sort(comp_storage_disk_io);
     else // default to using original method

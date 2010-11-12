@@ -170,6 +170,7 @@ static GlobalComboBox *StorageScheduler()
     GlobalComboBox *gc = new GlobalComboBox("StorageScheduler");
     gc->setLabel(QObject::tr("Storage Group disk scheduler"));
     gc->addSelection(QObject::tr("Balanced free space"), "BalancedFreeSpace");
+    gc->addSelection(QObject::tr("Balanced percent free space"), "BalancedPercFreeSpace");
     gc->addSelection(QObject::tr("Balanced disk I/O"), "BalancedDiskIO");
     gc->addSelection(QObject::tr("Combination"), "Combination");
     gc->setValue("BalancedFreeSpace");
