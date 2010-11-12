@@ -23,6 +23,22 @@ class System( DBCache ):
     """
     logmodule = 'Python system call handler'
 
+    @classmethod
+    def system(cls, command, db=None):
+        path = command.split()[0]
+        try:
+            s = cls(path, db=db)
+            res = s._runcmd(command)
+            if len(res):
+                s.log(MythLog.FILE|MythLog.EXTRA, '---- Output ----', res)
+            if len(s.stderr):
+                s.log(MythLog.FILE|MythLog.EXTRA, '---- Error  ----', s.stderr)
+            return 0
+        except (MythDBError,MythFileError):
+            return -1
+        except MythError:
+            return s.returncode
+
     def __init__(self, path=None, setting=None, db=None):
         DBCache.__init__(self, db=db)
         self.log = MythLog(self.logmodule, db=self)
@@ -36,8 +52,9 @@ class System( DBCache ):
             if path is None:
                 raise MythError('Invalid input to System()')
             self.path = path
-        if not os.access(self.path, os.F_OK):
-            raise MythFileError('Defined grabber path does not exist.')
+        if self.path.startswith('/'):
+            if not os.access(self.path.split()[0], os.F_OK):
+                raise MythFileError('Defined grabber path does not exist.')
         self.returncode = 0
         self.stderr = ''
 
