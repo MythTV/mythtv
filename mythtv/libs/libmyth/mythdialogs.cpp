@@ -811,6 +811,20 @@ QString MythPopupBox::showPasswordPopup(MythMainWindow *parent,
     return password;
 }
 
+DialogCode MythPopupBox::Show2ButtonPopup(
+    MythMainWindow *parent,
+    const QString &title, const QString &message,
+    const QString &button1msg, const QString &button2msg,
+    DialogCode default_button)
+{
+    QStringList buttonmsgs;
+    buttonmsgs += (button1msg.isEmpty()) ?
+        QString("Button 1") : button1msg;
+    buttonmsgs += (button2msg.isEmpty()) ?
+        QString("Button 2") : button2msg;
+    return ShowButtonPopup(
+        parent, title, message, buttonmsgs, default_button);
+}
 
 DialogCode MythPopupBox::ShowButtonPopup(
     MythMainWindow    *parent,
