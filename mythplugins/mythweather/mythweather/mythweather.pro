@@ -18,12 +18,10 @@ INCLUDEPATH += $${PREFIX}/include/mythtv/libmythui
 
 datafiles.path = $${PREFIX}/share/mythtv/mythweather/
 datafiles.files = weather-screens.xml
-installscripts.path = $${PREFIX}/share/mythtv/mythweather/scripts
-installscripts.files = scripts/*
-INSTALLS += datafiles installscripts
+
+INSTALLS += datafiles
 
 # Input
-
 HEADERS += weather.h weatherSource.h sourceManager.h weatherScreen.h dbcheck.h
 HEADERS += weatherSetup.h weatherUtils.h
 SOURCES += main.cpp weather.cpp weatherSource.cpp sourceManager.cpp weatherScreen.cpp
