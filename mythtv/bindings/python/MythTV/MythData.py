@@ -31,7 +31,7 @@ def ftopen(file, type, forceremote=False, nooverwrite=False, db=None):
     db = MythDBBase(db)
     log = MythLog('Python File Transfer', db=db)
     reuri = re.compile(\
-        'myth://((?P<group>.*)@)?(?P<host>[a-zA-Z0-9\.]*)(:[0-9]*)?/(?P<file>.*)')
+        'myth://((?P<group>.*)@)?(?P<host>[a-zA-Z0-9_\-\.]*)(:[0-9]*)?/(?P<file>.*)')
     reip = re.compile('(?:\d{1,3}\.){3}\d{1,3}')
 
     if type not in ('r','w'):
