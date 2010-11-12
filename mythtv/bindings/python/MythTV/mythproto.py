@@ -188,7 +188,7 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
     db = DBCache(db)
     log = MythLog('Python File Transfer', db=db)
     reuri = re.compile(\
-        'myth://((?P<group>.*)@)?(?P<host>[a-zA-Z0-9_\.]*)(:[0-9]*)?/(?P<file>.*)')
+        'myth://((?P<group>.*)@)?(?P<host>[a-zA-Z0-9_\-\.]*)(:[0-9]*)?/(?P<file>.*)')
     reip = re.compile('(?:\d{1,3}\.){3}\d{1,3}')
 
     if mode not in ('r','w'):
