@@ -212,7 +212,12 @@ class InternetMetadata( Metadata ):
 
 class Grabber( System ):
     def _processMetadata(self, xml):
-        for item in etree.fromstring(xml).getiterator('item'):
+        try:
+            xml = etree.fromstring(xml)
+        except:
+            raise StopIteration
+
+        for item in xml.getiterator('item'):
             yield self.cls(item)
  
     def command(self, *args):
