@@ -945,7 +945,7 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket, uint timeout_ms,
     {
         VERBOSE(VB_GENERAL, QString("Protocol version or token mismatch "
                                     "(frontend=%1/%2,"
-                                    "backend=%3/??)\n")
+                                    "backend=%3/\?\?)\n")
                                     .arg(MYTH_PROTO_VERSION)
                                     .arg(MYTH_PROTO_TOKEN)
                                     .arg(strlist[1]));
