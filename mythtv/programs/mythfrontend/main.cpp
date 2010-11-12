@@ -74,6 +74,7 @@ static MythThemedMenu *menu;
 
 static QString         logfile;
 static MediaRenderer  *g_pUPnp   = NULL;
+static MythPluginManager *pmanager = NULL;
 
 static void handleExit(void);
 
@@ -153,6 +154,12 @@ namespace
             VERBOSE(VB_GENERAL, "Deleting UPnP client...");
             delete g_pUPnp;
             g_pUPnp = NULL;
+        }
+
+        if (pmanager)
+        {
+            delete pmanager;
+            pmanager = NULL;
         }
 
         delete gContext;
@@ -1409,7 +1416,7 @@ int main(int argc, char **argv)
 
     CleanupMyOldInUsePrograms();
 
-    MythPluginManager *pmanager = new MythPluginManager();
+    pmanager = new MythPluginManager();
     gContext->SetPluginManager(pmanager);
 
     if (pluginname.size())
