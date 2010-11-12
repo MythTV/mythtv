@@ -4,6 +4,7 @@
 #include "bdnav/mpls_parse.h"
 #include "bdnav/navigation.h"
 #include "bdnav/bdparse.h"
+#include "decoders/overlay.h"
 
 #include "iso639.h"
 #include "BDRingBuffer.h"
@@ -15,8 +16,22 @@
 
 #define LOC     QString("BDRingBuffer: ")
 
-extern "C" void HandleOverlayCallback(void *data, const bd_overlay_s *overlay)
+static void HandleOverlayCallback(void *data, const bd_overlay_s * const overlay)
 {
+    BDRingBufferPriv *bdpriv = (BDRingBufferPriv*) data;
+
+    if (!overlay || overlay->plane == 1)
+        bdpriv->m_inMenu = false;
+
+    if (!overlay->img)
+        return;
+
+    const BD_PG_RLE_ELEM *rlep = overlay->img;
+    unsigned pixels = overlay->w * overlay->h;
+    VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + QString("In Menu Callback, ready to draw "
+                        "an overlay of %1x%2 at %3,%4 (%5 pixels).")
+                        .arg(overlay->w).arg(overlay->h).arg(overlay->x)
+                        .arg(overlay->y).arg(pixels));
 }
 
 BDRingBufferPriv::BDRingBufferPriv()
@@ -176,20 +191,24 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
 
     bd_free_title_info(titleInfo);
 
+    SwitchTitle(m_mainTitle);
+
+#if 0
     // First, attempt to initialize the disc in HDMV navigation mode.
     // If this fails, fall back to the traditional built-in title switching
     // mode.
-//    if (bd_play(bdnav) < 0)
+    if (bd_play(bdnav) < 0)
           SwitchTitle(m_mainTitle);
-//    else
-//    {
-//        m_is_hdmv_navigation = true;
-          // Initialize the HDMV event queue
-//        HandleBDEvents();
+    else
+    {
+        m_is_hdmv_navigation = true;
+        // Initialize the HDMV event queue
+        HandleBDEvents();
 
         // Register the Menu Overlay Callback
-//        bd_register_overlay_proc(bdnav, &m_handle, HandleOverlayCallback);
-//    }
+        bd_register_overlay_proc(bdnav, this, HandleOverlayCallback);
+    }
+#endif
 
     return true;
 }
@@ -324,9 +343,9 @@ int BDRingBufferPriv::safe_read(void *data, unsigned sz)
     else
     {
         bd_read(bdnav, (unsigned char *)data, sz);
-        m_currentTime = bd_tell(bdnav);
     }
 
+    m_currentTime = bd_tell(bdnav);
     return sz;
 }
 
@@ -439,7 +458,10 @@ bool BDRingBufferPriv::GoToMenu(const QString str)
         if (bd_menu_call(bdnav) < 0)
             return false;
         else
+        {
+            m_inMenu = !m_inMenu;
             return true;
+        }
     }
     else
         return false;

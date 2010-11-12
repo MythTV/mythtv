@@ -16,8 +16,6 @@
  *   A class to allow a RingBuffer to read from BDs.
  */
 
-extern "C" void HandleOverlayCallback(void*, const bd_overlay_s*);
-
 class NuppelVideoPlayer;
 
 class MPUBLIC BDRingBufferPriv
@@ -100,6 +98,7 @@ class MPUBLIC BDRingBufferPriv
     bool               m_secondaryVideoEnabled;
     bool               m_secondaryVideoIsFullscreen;
 
+  public:
     bool               m_still;
     bool               m_inMenu;
 
