@@ -634,7 +634,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
 {
     if (ringBuffer->isDVD())
     {
-        if (ringBuffer->InDVDMenuOrStillFrame() ||
+        if (ringBuffer->InDiscMenuOrStillFrame() ||
             newKey == 0)
             return;
     }
@@ -1796,7 +1796,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         if (dec.left(4) == "xvmc")
                             dvd_xvmc_enabled = true;
 
-                        if (ringBuffer->InDVDMenuOrStillFrame() &&
+                        if (ringBuffer->InDiscMenuOrStillFrame() &&
                             dvd_xvmc_enabled)
                         {
                             force_xv = true;
@@ -2165,7 +2165,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 m_parent->EnableSubtitles(false);
             }
             else if (trackNo >= 0 && trackNo < trackcount &&
-                    !ringBuffer->InDVDMenuOrStillFrame())
+                    !ringBuffer->InDiscMenuOrStillFrame())
             {
                     SetTrack(kTrackTypeSubtitle, trackNo);
                     m_parent->EnableSubtitles(true);
@@ -3644,7 +3644,7 @@ int AvFormatDecoder::AutoSelectTrack(uint type)
     if (kTrackTypeAudio == type)
         return AutoSelectAudioTrack();
 
-    if (ringBuffer->InDVDMenuOrStillFrame())
+    if (ringBuffer->InDiscMenuOrStillFrame())
         return -1;
 
     return DecoderBase::AutoSelectTrack(type);
@@ -4099,7 +4099,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
         total_decoded_audio += data_size;
 
-        allowedquit |= ringBuffer->InDVDMenuOrStillFrame();
+        allowedquit |= ringBuffer->InDiscMenuOrStillFrame();
         // Audio can expand by a factor of 6 in audiooutputbase's audiobuffer
         allowedquit |= !(decodetype & kDecodeVideo) &&
                        ((ofill + total_decoded_audio * 6) > othresh);
@@ -4222,7 +4222,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             else if (lowbuffers && ((decodetype & kDecodeAV) == kDecodeAV) &&
                      storedPackets.count() < max_video_queue_size &&
                      lastapts < lastvpts + 100 &&
-                     !ringBuffer->InDVDMenuOrStillFrame())
+                     !ringBuffer->InDiscMenuOrStillFrame())
             {
                 storevideoframes = true;
             }
@@ -4307,13 +4307,13 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                         dvd_xvmc_active = true;
                     }
 
-                    bool indvdmenu   = ringBuffer->InDVDMenuOrStillFrame();
-                    if ((indvdmenu && dvd_xvmc_active) ||
-                        ((!indvdmenu && !dvd_xvmc_active)))
+                    bool indiscmenu   = ringBuffer->InDiscMenuOrStillFrame();
+                    if ((indiscmenu && dvd_xvmc_active) ||
+                        ((!indiscmenu && !dvd_xvmc_active)))
                     {
                         VERBOSE(VB_PLAYBACK, LOC + QString("DVD Codec Change "
-                                    "indvdmenu %1 dvd_xvmc_active %2")
-                                .arg(indvdmenu).arg(dvd_xvmc_active));
+                                    "indiscmenu %1 dvd_xvmc_active %2")
+                                .arg(indiscmenu).arg(dvd_xvmc_active));
                         dvd_video_codec_changed = true;
                     }
                 }

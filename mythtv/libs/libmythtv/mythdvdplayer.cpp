@@ -25,7 +25,7 @@ void MythDVDPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
                                           int64_t timecode, bool wrap)
 {
     MythPlayer::ReleaseNextVideoFrame(buffer, timecode,
-                        !player_ctx->buffer->InDVDMenuOrStillFrame());
+                        !player_ctx->buffer->InDiscMenuOrStillFrame());
 }
 
 void MythDVDPlayer::DisableCaptions(uint mode, bool osd_msg)
@@ -60,7 +60,7 @@ void MythDVDPlayer::DecoderPauseCheck(void)
 
 bool MythDVDPlayer::PrebufferEnoughFrames(bool pause_audio, int  min_buffers)
 {
-    bool instill = player_ctx->buffer->InDVDMenuOrStillFrame();
+    bool instill = player_ctx->buffer->InDiscMenuOrStillFrame();
     return MythPlayer::PrebufferEnoughFrames(!instill, 1);
 }
 
@@ -318,7 +318,7 @@ void MythDVDPlayer::EventEnd(void)
 
 bool MythDVDPlayer::PrepareAudioSample(int64_t &timecode)
 {
-    if (!player_ctx->buffer->InDVDMenuOrStillFrame())
+    if (!player_ctx->buffer->InDiscMenuOrStillFrame())
         WrapTimecode(timecode, TC_AUDIO);
 
     if (player_ctx->buffer->isDVD() &&
@@ -329,7 +329,7 @@ bool MythDVDPlayer::PrepareAudioSample(int64_t &timecode)
 
 void MythDVDPlayer::SetBookmark(void)
 {
-    if (player_ctx->buffer->InDVDMenuOrStillFrame())
+    if (player_ctx->buffer->InDiscMenuOrStillFrame())
         SetDVDBookmark(0);
     else
     {
@@ -471,7 +471,7 @@ void MythDVDPlayer::DoChangeDVDTrack(void)
 {
     if (decoder)
         decoder->ChangeDVDTrack(need_change_dvd_track > 0);
-    ClearAfterSeek(!player_ctx->buffer->InDVDMenuOrStillFrame());
+    ClearAfterSeek(!player_ctx->buffer->InDiscMenuOrStillFrame());
 }
 
 void MythDVDPlayer::DisplayDVDButton(void)
@@ -556,7 +556,7 @@ void MythDVDPlayer::SetDVDBookmark(uint64_t frame)
         return;
     }
 
-    if (!player_ctx->buffer->InDVDMenuOrStillFrame() &&
+    if (!player_ctx->buffer->InDiscMenuOrStillFrame() &&
         player_ctx->buffer->DVD()->GetTotalTimeOfTitle() > 120 && frame > 0)
     {
         audiotrack = GetTrack(kTrackTypeAudio);

@@ -89,10 +89,12 @@ class MPUBLIC RingBuffer : protected QThread
 
     // DVDRingBuffer proxies
     bool IsDVD(void) const;
-    bool InDVDMenuOrStillFrame(void);
 
     // BDRingBuffer proxies
     bool IsBD(void) const;
+
+    // Universal still frame/menu check
+    bool InDiscMenuOrStillFrame(void);
 
     long long SetAdjustFilesize(void);
 

@@ -2277,7 +2277,7 @@ bool RingBuffer::IsDVD(void) const
  * Due to the lack of locking is only safe to call once OpenFile()
  * has completed.
  */
-bool RingBuffer::InDVDMenuOrStillFrame(void)
+bool RingBuffer::InDiscMenuOrStillFrame(void)
 {
     //rwlock.lockForRead();
     bool ret = false;

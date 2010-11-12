@@ -3061,7 +3061,7 @@ bool TV::HandleLCDTimerEvent(void)
         if (actx->buffer && actx->buffer->isDVD())
         {
             ShowLCDDVDInfo(actx);
-            showProgress = !actx->buffer->InDVDMenuOrStillFrame();
+            showProgress = !actx->buffer->InDiscMenuOrStillFrame();
         }
 
         if (showProgress)
@@ -3724,7 +3724,9 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
     handled = false;
 
     bool isDVD = actx->buffer && actx->buffer->isDVD();
-    bool isDVDStill = isDVD && actx->buffer->InDVDMenuOrStillFrame();
+    bool isDVDStill = isDVD && actx->buffer->InDiscMenuOrStillFrame();
+    bool isBD = actx->buffer && actx->buffer->isBD();
+    bool isBDStill = isBD && actx->buffer->InDiscMenuOrStillFrame();
 
     handled = handled || BrowseHandleAction(actx, actions);
     handled = handled || ManualZoomHandleAction(actx, actions);
@@ -4711,7 +4713,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
     }
     else if (tokens.size() >= 3 && tokens[1] == "SEEK" && ctx->HasPlayer())
     {
-        if (ctx->buffer && ctx->buffer->InDVDMenuOrStillFrame())
+        if (ctx->buffer && ctx->buffer->InDiscMenuOrStillFrame())
             return;
 
         ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -5650,7 +5652,7 @@ float TV::DoTogglePauseStart(PlayerContext *ctx)
     if (!ctx)
         return 0.0f;
 
-    if (ctx->buffer && ctx->buffer->InDVDMenuOrStillFrame())
+    if (ctx->buffer && ctx->buffer->InDiscMenuOrStillFrame())
         return 0.0f;
 
     ctx->ff_rew_speed = 0;
@@ -5689,7 +5691,7 @@ void TV::DoTogglePauseFinish(PlayerContext *ctx, float time, bool showOSD)
     if (!ctx || !ctx->HasPlayer())
         return;
 
-    if (ctx->buffer && ctx->buffer->InDVDMenuOrStillFrame())
+    if (ctx->buffer && ctx->buffer->InDiscMenuOrStillFrame())
         return;
 
     if (ctx->paused)
@@ -11355,7 +11357,7 @@ void TV::DVDJumpBack(PlayerContext *ctx)
     if (!ctx->HasPlayer() || !ctx->buffer || !ctx->buffer->isDVD())
         return;
 
-    if (ctx->buffer->InDVDMenuOrStillFrame())
+    if (ctx->buffer->InDiscMenuOrStillFrame())
     {
         UpdateOSDSeekMessage(ctx, tr("Skip Back Not Allowed"), kOSDTimeout_Med);
     }
