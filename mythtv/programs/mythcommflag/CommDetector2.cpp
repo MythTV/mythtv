@@ -446,6 +446,7 @@ void CommDetector2::reportState(int elapsedms, long long frameno,
         long long nframes, unsigned int passno, unsigned int npasses)
 {
     float fps = elapsedms ? (float)frameno * 1000 / elapsedms : 0;
+    int prevpercent = -1;
 
     /* Assume that 0-th pass is negligible in terms of computational cost. */
     int percentage = passno == 0 ? 0 :
@@ -475,6 +476,13 @@ void CommDetector2::reportState(int elapsedms, long long frameno,
     {
         emit statusUpdate(QObject::tr("%1 Frames Completed @ %2 fps.")
                 .arg(frameno).arg(fps));
+    }
+
+    if (percentage % 10 == 0 && prevpercent != percentage)
+    {
+        prevpercent = percentage;
+        VERBOSE(VB_GENERAL|VB_EXTRA, QString("%1% Completed @ %2 fps.")
+            .arg(percentage) .arg(fps));
     }
 }
 

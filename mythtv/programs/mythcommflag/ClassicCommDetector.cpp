@@ -392,6 +392,7 @@ bool ClassicCommDetector::go()
     long long  currentFrameNumber;
     float aspect = player->GetVideoAspect();
     float newAspect = aspect;
+    int prevpercent = -1;
 
     SetVideoParams(aspect);
 
@@ -524,6 +525,13 @@ bool ClassicCommDetector::go()
             else
                 emit statusUpdate(QObject::tr("%1 Frames Completed @ %2 fps.")
                                   .arg(currentFrameNumber).arg(flagFPS));
+
+            if (percentage % 10 == 0 && prevpercent != percentage)
+            {
+                prevpercent = percentage;
+                VERBOSE(VB_GENERAL|VB_EXTRA, QString("%1% Completed @ %2 fps.")
+                    .arg(percentage) .arg(flagFPS));
+            }
         }
 
         ProcessFrame(currentFrame, currentFrameNumber);

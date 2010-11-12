@@ -220,6 +220,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
     float flagFPS;
     int requiredBuffer = 30;
     long long currentFrameNumber;
+    int prevpercent = -1;
 
     if(startFrame > 0)
         startFrame--;
@@ -334,6 +335,13 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
             else
                 emit statusUpdate(QObject::tr("%1 Frames Completed @ %2 fps.")
                                   .arg((long)currentFrameNumber).arg(flagFPS));
+
+            if (percentage % 10 == 0 && prevpercent != percentage)
+            {
+                prevpercent = percentage;
+                VERBOSE(VB_GENERAL|VB_EXTRA, QString("%1% Completed @ %2 fps.")
+                    .arg(percentage) .arg(flagFPS));
+            }
         }
 
         ProcessFrame(currentFrame, currentFrameNumber);
