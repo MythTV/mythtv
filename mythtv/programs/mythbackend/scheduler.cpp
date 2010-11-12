@@ -3860,7 +3860,7 @@ static bool comp_storage_combination(FileSystemInfo *a, FileSystemInfo *b)
     return false;
 }
 
-// prefer dirs with more free space over dirs with less
+// prefer dirs with more percentage free space over dirs with less
 static bool comp_storage_perc_free_space(FileSystemInfo *a, FileSystemInfo *b)
 {
     if (a->totalSpaceKB == 0)
@@ -3876,7 +3876,7 @@ static bool comp_storage_perc_free_space(FileSystemInfo *a, FileSystemInfo *b)
     return false;
 }
 
-// prefer dirs with more free space over dirs with less
+// prefer dirs with more absolute free space over dirs with less
 static bool comp_storage_free_space(FileSystemInfo *a, FileSystemInfo *b)
 {
     if (a->freeSpaceKB > b->freeSpaceKB)
