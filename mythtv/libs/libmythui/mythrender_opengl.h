@@ -43,7 +43,8 @@ typedef enum
     kGLAppleRGB422 = 0x0200,
     kGLMipMaps     = 0x0400,
     kGLSL          = 0x0800,
-    kGLMaxFeat     = 0x1000,
+    kGLVertexArray = 0x1000,
+    kGLMaxFeat     = 0x2000,
 } GLFeatures;
 
 class MythGLTexture;
@@ -148,6 +149,8 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     bool ValidateShaderObject(uint obj);
     bool CheckObjectStatus(uint obj);
 
+    bool UpdateTextureVertices(uint tex, const QRect *src, const QRect *dst);
+    bool UpdateTextureVertices(uint tex, const QRectF *src, const QRectF *dst);
     bool ClearTexture(uint tex);
     uint GetBufferSize(QSize size, uint fmt, uint type);
     void InitFragmentParams(uint fp, float a, float b, float c, float d);

@@ -66,6 +66,8 @@ class MythGLTexture
         m_filter(GL_LINEAR), m_wrap(GL_CLAMP_TO_EDGE),
         m_size(0,0), m_act_size(0,0)
     {
+        memset(&m_vertices, 0, sizeof(m_vertices));
+        memset(&m_texcoords, 0, sizeof(m_texcoords));
     }
 
     ~MythGLTexture()
@@ -83,6 +85,8 @@ class MythGLTexture
     GLuint  m_wrap;
     QSize   m_size;
     QSize   m_act_size;
+    GLfloat m_vertices[8];
+    GLfloat m_texcoords[8];
 };
 
 OpenGLLocker::OpenGLLocker(MythRenderOpenGL *render) : m_render(render)
@@ -327,6 +331,74 @@ void MythRenderOpenGL::UpdateTexture(uint tex, void *buf)
     }
 
     doneCurrent();
+}
+
+bool MythRenderOpenGL::UpdateTextureVertices(uint tex, const QRect *src,
+                                             const QRect *dst)
+{
+    if (!m_textures.contains(tex))
+        return false;
+
+    m_textures[tex].m_texcoords[0] = src->left();
+    m_textures[tex].m_texcoords[1] = src->top() + src->height();
+
+    m_textures[tex].m_texcoords[6] = src->left() + src->width();
+    m_textures[tex].m_texcoords[7] = src->top();
+
+    if (!IsRectTexture(m_textures[tex].m_type))
+    {
+        m_textures[tex].m_texcoords[0] /= (float)m_textures[tex].m_size.width();
+        m_textures[tex].m_texcoords[6] /= (float)m_textures[tex].m_size.width();
+        m_textures[tex].m_texcoords[1] /= (float)m_textures[tex].m_size.height();
+        m_textures[tex].m_texcoords[7] /= (float)m_textures[tex].m_size.height();
+    }
+
+    m_textures[tex].m_texcoords[2] = m_textures[tex].m_texcoords[0];
+    m_textures[tex].m_texcoords[3] = m_textures[tex].m_texcoords[7];
+    m_textures[tex].m_texcoords[4] = m_textures[tex].m_texcoords[6];
+    m_textures[tex].m_texcoords[5] = m_textures[tex].m_texcoords[1];
+
+    m_textures[tex].m_vertices[2] = m_textures[tex].m_vertices[0] = dst->left();
+    m_textures[tex].m_vertices[5] = m_textures[tex].m_vertices[1] = dst->top();
+    m_textures[tex].m_vertices[4] = m_textures[tex].m_vertices[6] =
+        dst->left() + std::min(src->width(), dst->width());
+    m_textures[tex].m_vertices[3] = m_textures[tex].m_vertices[7] =
+        dst->top() + std::min(src->height(), dst->height());
+
+    return true;
+}
+
+bool MythRenderOpenGL::UpdateTextureVertices(uint tex, const QRectF *src,
+                                             const QRectF *dst)
+{
+    if (!m_textures.contains(tex))
+        return false;
+
+    m_textures[tex].m_texcoords[0] = src->left();
+    m_textures[tex].m_texcoords[1] = src->top() + src->height();
+
+    m_textures[tex].m_texcoords[6] = src->left() + src->width();
+    m_textures[tex].m_texcoords[7] = src->top();
+
+    if (!IsRectTexture(m_textures[tex].m_type))
+    {
+        m_textures[tex].m_texcoords[0] /= (float)m_textures[tex].m_size.width();
+        m_textures[tex].m_texcoords[6] /= (float)m_textures[tex].m_size.width();
+        m_textures[tex].m_texcoords[1] /= (float)m_textures[tex].m_size.height();
+        m_textures[tex].m_texcoords[7] /= (float)m_textures[tex].m_size.height();
+    }
+
+    m_textures[tex].m_texcoords[2] = m_textures[tex].m_texcoords[0];
+    m_textures[tex].m_texcoords[3] = m_textures[tex].m_texcoords[7];
+    m_textures[tex].m_texcoords[4] = m_textures[tex].m_texcoords[6];
+    m_textures[tex].m_texcoords[5] = m_textures[tex].m_texcoords[1];
+
+    m_textures[tex].m_vertices[2] = m_textures[tex].m_vertices[0] = dst->left();
+    m_textures[tex].m_vertices[5] = m_textures[tex].m_vertices[1] = dst->top();
+    m_textures[tex].m_vertices[4] = m_textures[tex].m_vertices[6] = dst->left() + dst->width();
+    m_textures[tex].m_vertices[3] = m_textures[tex].m_vertices[7] = dst->top() + dst->height();
+
+    return true;
 }
 
 int MythRenderOpenGL::GetTextureType(bool &rect)
@@ -890,48 +962,33 @@ void MythRenderOpenGL::DrawBitmap(uint tex, uint target, const QRect *src,
     if (prog && !m_programs.contains(prog))
         prog = 0;
 
-    double srcx1, srcx2, srcy1, srcy2;
-
-    if (tex && !IsRectTexture(m_textures[tex].m_type))
-    {
-        srcx1 = src->x() / (double)m_textures[tex].m_size.width();
-        srcx2 = srcx1 + src->width() / (double)m_textures[tex].m_size.width();
-        srcy1 = src->y() / (double)m_textures[tex].m_size.height();
-        srcy2 = srcy1 + src->height() / (double)m_textures[tex].m_size.height();
-    }
-    else
-    {
-        srcx1 = src->x();
-        srcx2 = srcx1 + src->width();
-        srcy1 = src->y();
-        srcy2 = srcy1 + src->height();
-    }
-
-    int width = std::min(src->width(), dst->width());
-    int height = std::min(src->height(), dst->height());
-
     makeCurrent();
 
     BindFramebuffer(target);
     EnableFragmentProgram(prog);
     SetBlend(true);
     SetColor(red, green, blue, alpha);
+
     if (tex)
     {
         EnableTextures(tex);
         glBindTexture(m_textures[tex].m_type, tex);
+        UpdateTextureVertices(tex, src, dst);
+        glVertexPointer(2, GL_FLOAT, 0, &m_textures[tex].m_vertices);
+        glTexCoordPointer(2, GL_FLOAT, 0, &m_textures[tex].m_texcoords);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
     else
     {
         DisableTextures();
+        GLfloat vertices[8];
+        vertices[2] = vertices[0] = dst->left();
+        vertices[5] = vertices[1] = dst->top();
+        vertices[4] = vertices[6] = dst->left() + dst->width();
+        vertices[3] = vertices[7] = dst->top() + dst->height();
+        glVertexPointer(2, GL_FLOAT, 0, &vertices);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
-
-    glBegin(GL_QUADS);
-    glTexCoord2f(srcx1, srcy2); glVertex2f(dst->x(), dst->y());
-    glTexCoord2f(srcx2, srcy2); glVertex2f(dst->x() + width, dst->y());
-    glTexCoord2f(srcx2, srcy1); glVertex2f(dst->x() + width, dst->y() + height);
-    glTexCoord2f(srcx1, srcy1); glVertex2f(dst->x(), dst->y()+height);
-    glEnd();
 
     doneCurrent();
 }
@@ -950,25 +1007,9 @@ void MythRenderOpenGL::DrawBitmap(uint *textures, uint texture_count,
     if (prog && !m_programs.contains(prog))
         prog = 0;
 
-    float srcx1, srcx2, srcy1, srcy2;
+    makeCurrent();
 
     uint first = textures[0];
-    if (!IsRectTexture(m_textures[first].m_type))
-    {
-        srcx1 = src->x() / m_textures[first].m_size.width();
-        srcx2 = srcx1 + src->width() / m_textures[first].m_size.width();
-        srcy1 = src->y() / m_textures[first].m_size.height();
-        srcy2 = srcy1 + src->height() / m_textures[first].m_size.height();
-    }
-    else
-    {
-        srcx1 = src->x();
-        srcx2 = srcx1 + src->width();
-        srcy1 = src->y();
-        srcy2 = srcy1 + src->height();
-    }
-
-    makeCurrent();
 
     BindFramebuffer(target);
     EnableFragmentProgram(prog);
@@ -992,16 +1033,10 @@ void MythRenderOpenGL::DrawBitmap(uint *textures, uint texture_count,
         }
     }
 
-    glBegin(GL_QUADS);
-    glTexCoord2f(srcx1, srcy1);
-    glVertex2f(dst->x(), dst->y());
-    glTexCoord2f(srcx2, srcy1);
-    glVertex2f(dst->x() + dst->width(), dst->y());
-    glTexCoord2f(srcx2, srcy2);
-    glVertex2f(dst->x() + dst->width(), dst->y() + dst->height());
-    glTexCoord2f(srcx1, srcy2);
-    glVertex2f(dst->x(), dst->y() + dst->height());
-    glEnd();
+    UpdateTextureVertices(first, src, dst);
+    glVertexPointer(2, GL_FLOAT, 0, &m_textures[first].m_vertices);
+    glTexCoordPointer(2, GL_FLOAT, 0, &m_textures[first].m_texcoords);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     ActiveTexture(GL_TEXTURE0);
     doneCurrent();
@@ -1025,30 +1060,29 @@ void MythRenderOpenGL::DrawRect(const QRect &area, bool drawFill,
     SetBlend(true);
     DisableTextures();
 
+    GLfloat vertices[8];
+    vertices[2] = vertices[0] = area.left();
+    vertices[5] = vertices[1] = area.top();
+    vertices[4] = vertices[6] = area.left() + area.width();
+    vertices[3] = vertices[7] = area.top() + area.height();
+
     if (drawFill)
     {
         SetColor(fillColor.red(), fillColor.green(),
                  fillColor.blue(), fillColor.alpha());
-        glRectf(area.x(), area.y(), area.x() + area.width(),
-                area.y() + area.height());
+        glVertexPointer(2, GL_FLOAT, 0, &vertices);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 
     if (drawLine)
     {
+        vertices[7] = vertices[1];
+        vertices[5] = vertices[3];
         SetColor(lineColor.red(), lineColor.green(),
                  lineColor.blue(), lineColor.alpha());
         glLineWidth(lineWidth);
-
-        glBegin(GL_LINES);
-        glVertex2f(area.x(), area.y());
-        glVertex2f(area.x() + area.width(), area.y());
-        glVertex2f(area.x() + area.width(), area.y());
-        glVertex2f(area.x() + area.width(), area.y() + area.height());
-        glVertex2f(area.x() + area.width(), area.y() + area.height());
-        glVertex2f(area.x(), area.y() + area.height());
-        glVertex2f(area.x(), area.y() + area.height());
-        glVertex2f(area.x(), area.y());
-        glEnd();
+        glVertexPointer(2, GL_FLOAT, 0, &vertices);
+        glDrawArrays(GL_LINE_LOOP, 0, 4);
     }
 
     doneCurrent();
@@ -1116,6 +1150,8 @@ void MythRenderOpenGL::Init2DState(void)
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     Flush(true);
 }
 
@@ -1234,6 +1270,17 @@ void MythRenderOpenGL::InitFeatures(void)
         VERBOSE(VB_IMPORTANT, LOC_ERR +
             QString("Multi-texturing not supported. "
                     "Certain OpenGL features will not work"));
+    }
+
+    if (m_extensions.contains("GL_EXT_vertex_array"))
+    {
+        m_exts_supported += kGLVertexArray;
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+            QString("GL_EXT_vertex_array extension not supported. "
+                    "This may not work"));
     }
 
     if (m_extensions.contains("GL_ARB_fragment_program") &&
