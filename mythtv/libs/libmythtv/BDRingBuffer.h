@@ -44,7 +44,7 @@ class MPUBLIC BDRingBufferPriv
     bool IsOpen(void)        const { return bdnav; }
     bool IsHDMVNavigation(void) const { return m_is_hdmv_navigation; }
     bool IsInMenu(void) const { return m_inMenu; }
-    bool IsInStillFrame(void) { return m_still > 0; }
+    bool InStillFrame(void) { return m_still > 0; }
 
     void GetDescForPos(QString &desc) const;
     double GetFrameRate(void);
