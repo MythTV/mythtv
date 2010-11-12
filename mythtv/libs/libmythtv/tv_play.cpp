@@ -41,6 +41,7 @@ using namespace std;
 #include "livetvchain.h"
 #include "playgroup.h"
 #include "DVDRingBuffer.h"
+#include "BDRingBuffer.h"
 #include "datadirect.h"
 #include "sourceutil.h"
 #include "cardutil.h"
@@ -3733,7 +3734,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
     handled = handled || PictureAttributeHandleAction(actx, actions);
     handled = handled || TimeStretchHandleAction(actx, actions);
     handled = handled || AudioSyncHandleAction(actx, actions);
-    handled = handled || DVDMenuHandleAction(actx, actions, isDVD, isDVDStill);
+    handled = handled || DiscMenuHandleAction(actx, actions, isDVD, isDVDStill, isBD);
     handled = handled || ActiveHandleAction(actx, actions, isDVD, isDVDStill);
     handled = handled || ToggleHandleAction(actx, actions, isDVD);
     handled = handled || PxPHandleAction(actx, actions);
@@ -3960,9 +3961,10 @@ bool TV::AudioSyncHandleAction(PlayerContext *ctx,
     return handled;
 }
 
-bool TV::DVDMenuHandleAction(PlayerContext *ctx,
+bool TV::DiscMenuHandleAction(PlayerContext *ctx,
                              const QStringList &actions,
-                             bool isDVD, bool isDVDStill)
+                             bool isDVD, bool isDVDStill,
+                             bool isBD)
 {
     bool handled = false;
 
@@ -3998,6 +4000,85 @@ bool TV::DVDMenuHandleAction(PlayerContext *ctx,
             ctx->LockDeletePlayer(__FILE__, __LINE__);
             ctx->buffer->DVD()->ActivateButton();
             ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+        }
+        else
+            handled = false;
+    }
+    if (isBD)
+    {
+        int64_t pts = 0;
+        VideoOutput *output = ctx->player->getVideoOutput();
+        if (output)
+        {
+            VideoFrame *frame = output->GetLastShownFrame();
+            if (frame)
+               pts = frame->timecode;
+        }
+
+        handled = true;
+        if (has_action("UP", actions) ||
+            has_action("CHANNELUP", actions))
+        {
+            ctx->buffer->BD()->PressButton(BD_VK_UP, pts);
+        }
+        else if (has_action("DOWN", actions) ||
+                 has_action("CHANNELDOWN", actions))
+        {
+            ctx->buffer->BD()->PressButton(BD_VK_DOWN, pts);
+        }
+        else if (has_action("LEFT", actions) ||
+                 has_action("SEEKRWND", actions))
+        {
+            ctx->buffer->BD()->PressButton(BD_VK_LEFT, pts);
+        }
+        else if (has_action("RIGHT", actions) ||
+                 has_action("SEEKFFWD", actions))
+        {
+            ctx->buffer->BD()->PressButton(BD_VK_RIGHT, pts);
+        }
+        else if (has_action("0", actions))
+        {
+            ctx->buffer->BD()->PressButton(BD_VK_0, pts);
+        }
+        else if (has_action("1", actions))
+        {
+            ctx->buffer->BD()->PressButton(BD_VK_1, pts);
+        }
+        else if (has_action("2", actions))
+        {
+            ctx->buffer->BD()->PressButton(BD_VK_2, pts);
+        }
+        else if (has_action("3", actions))
+        {
+            ctx->buffer->BD()->PressButton(BD_VK_3, pts);
+        }
+        else if (has_action("4", actions))
+        {
+            ctx->buffer->BD()->PressButton(BD_VK_4, pts);
+        }
+        else if (has_action("5", actions))
+        {
+            ctx->buffer->BD()->PressButton(BD_VK_5, pts);
+        }
+        else if (has_action("6", actions))
+        {
+            ctx->buffer->BD()->PressButton(BD_VK_6, pts);
+        }
+        else if (has_action("7", actions))
+        {
+            ctx->buffer->BD()->PressButton(BD_VK_7, pts);
+        }
+        else if (has_action("8", actions))
+        {
+            ctx->buffer->BD()->PressButton(BD_VK_8, pts);
+        }
+        else if (has_action("9", actions))
+        {
+            ctx->buffer->BD()->PressButton(BD_VK_9, pts);
+        }
+        else if (has_action("SELECT", actions))
+        {
+            ctx->buffer->BD()->PressButton(BD_VK_ENTER, pts);
         }
         else
             handled = false;
