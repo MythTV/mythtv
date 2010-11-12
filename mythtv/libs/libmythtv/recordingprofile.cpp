@@ -1166,8 +1166,7 @@ class RecordingProfilePopup
     }
 };
 
-// id and name are new'ed objects, but will be deleted by
-// ConfigurationGroup's destructor
+// id and name will be deleted by ConfigurationGroup's destructor
 RecordingProfile::RecordingProfile(QString profName)
     : id(new ID()),        name(new Name(*this)),
       imageSize(NULL),     videoSettings(NULL),
