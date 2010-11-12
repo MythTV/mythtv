@@ -46,7 +46,8 @@ uint64_t BDRingBufferPriv::Seek(uint64_t pos)
 {
     VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + QString("Seeking to %1.")
                 .arg(pos));
-    bd_seek_time(bdnav, pos);
+    if (!m_is_hdmv_navigation)
+        bd_seek_time(bdnav, pos);
 
     return GetReadPosition();
 }
@@ -328,7 +329,7 @@ int BDRingBufferPriv::safe_read(void *data, unsigned sz)
 
 double BDRingBufferPriv::GetFrameRate(void)
 {
-    if (bdnav)
+    if (bdnav && m_currentTitleInfo)
     {
         uint8_t rate = m_currentTitleInfo->clips->video_streams->rate;
         switch (rate)
