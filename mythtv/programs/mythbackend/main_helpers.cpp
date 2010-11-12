@@ -230,8 +230,6 @@ bool setup_context(const MythCommandLineParser &cmdline)
     if (!gContext->Init(false))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext.");
-        delete gContext;
-        gContext = NULL;
         return false;
     }
     gCoreContext->SetBackend(!cmdline.HasBackendCommand());

@@ -244,8 +244,6 @@ int main(int argc, char **argv)
     if (!gContext->Init(false))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext.");
-        delete gContext;
-        gContext = NULL;
         return PREVIEWGEN_EXIT_NO_MYTHCONTEXT;
     }
     gCoreContext->SetBackend(false); // TODO Required?
