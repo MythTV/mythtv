@@ -43,6 +43,8 @@ class MPUBLIC BDRingBufferPriv
     uint64_t GetChapterStartFrame(uint32_t chapter);
     bool IsOpen(void)        const { return bdnav; }
     bool IsHDMVNavigation(void) const { return m_is_hdmv_navigation; }
+    bool IsInMenu(void) const { return m_inMenu; }
+    bool IsInStillFrame(void) { return m_still > 0; }
 
     void GetDescForPos(QString &desc) const;
     double GetFrameRate(void);
@@ -98,7 +100,8 @@ class MPUBLIC BDRingBufferPriv
     bool               m_secondaryVideoEnabled;
     bool               m_secondaryVideoIsFullscreen;
 
-    bool               m_isStill;
+    bool               m_still;
+    bool               m_inMenu;
 
     // These probably ought to be handled in functions
     int                m_enableButton;

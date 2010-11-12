@@ -150,7 +150,8 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
     m_secondaryAudioEnabled = false;
     m_secondaryVideoEnabled = false;
     m_secondaryVideoIsFullscreen = false;
-    m_isStill = false;
+    m_still = false;
+    m_inMenu = false;
     m_enableButton = 0;
     m_disableButton = 0;
     m_popupOff = 0;
@@ -183,6 +184,8 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
 //    else
 //    {
 //        m_is_hdmv_navigation = true;
+          // Initialize the HDMV event queue
+//        HandleBDEvents();
 
         // Register the Menu Overlay Callback
 //        bd_register_overlay_proc(bdnav, &m_handle, HandleOverlayCallback);
@@ -512,7 +515,7 @@ void BDRingBufferPriv::HandleBDEvent(BD_EVENT &ev)
         case BD_EVENT_STILL:
             VERBOSE(VB_PLAYBACK|VB_EXTRA,
                     QString("BDRingBuf: EVENT_STILL %1").arg(ev.param));
-            m_isStill = ev.param;
+            m_still = ev.param;
             break;
         case BD_EVENT_ENABLE_BUTTON:
             VERBOSE(VB_PLAYBACK|VB_EXTRA,
