@@ -2284,6 +2284,8 @@ bool RingBuffer::InDiscMenuOrStillFrame(void)
 #ifdef USING_FRONTEND
     if (dvdPriv)
         ret = (dvdPriv->IsInMenu() || dvdPriv->InStillFrame());
+    else if (bdPriv)
+        ret = (bdPriv->IsInMenu() || bdPriv->InStillFrame());
 #endif // USING_FRONTEND
     //rwlock.unlock();
     return ret;
