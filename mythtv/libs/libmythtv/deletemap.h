@@ -24,6 +24,7 @@ class DeleteMap
     void SetFileEditing(PlayerContext *ctx, bool edit);
     bool IsFileEditing(PlayerContext *ctx);
     bool IsEmpty(void);
+    bool IsSaved(PlayerContext *ctx);
 
     void SetMap(const frm_dir_map_t &map);
     void LoadCommBreakMap(uint64_t total, frm_dir_map_t &map);

@@ -406,6 +406,7 @@ class MPUBLIC MythPlayer
     uint64_t GetNearestMark(uint64_t frame, bool right);
     bool IsTemporaryMark(uint64_t frame);
     bool HasTemporaryMark(void);
+    bool IsCutListSaved(PlayerContext *ctx) { return deleteMap.IsSaved(ctx); }
 
     // Reinit
     void ReinitOSD(void);

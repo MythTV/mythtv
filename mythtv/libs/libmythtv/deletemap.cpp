@@ -695,3 +695,29 @@ uint64_t DeleteMap::GetLastFrame(uint64_t total)
         result = it.key();
     return result;
 }
+
+/**
+ * \brief Compares the current cut list with the saved cut list
+ */
+bool DeleteMap::IsSaved(PlayerContext *ctx)
+{
+    if (!ctx || !ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
+        return true;
+
+    frm_dir_map_t currentMap(m_deleteMap);
+    frm_dir_map_t savedMap;
+    ctx->LockPlayingInfo(__FILE__, __LINE__);
+    ctx->playingInfo->QueryCutList(savedMap);
+    ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+
+    // Remove temporary placeholder marks from currentMap
+    QMutableMapIterator<uint64_t, MarkTypes> it(currentMap);
+    while (it.hasNext())
+    {
+        it.next();
+        if (MARK_PLACEHOLDER == it.value())
+            it.remove();
+    }
+
+    return currentMap == savedMap;
+}

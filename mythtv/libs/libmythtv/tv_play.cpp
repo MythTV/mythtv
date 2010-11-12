@@ -3632,7 +3632,15 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
             }
             if (has_action("ESCAPE", actions))
             {
-                ShowOSDCutpoint(actx, "EXIT_EDIT_MODE");
+                if (!actx->player->IsCutListSaved(actx))
+                    ShowOSDCutpoint(actx, "EXIT_EDIT_MODE");
+                else
+                {
+                    actx->LockDeletePlayer(__FILE__, __LINE__);
+                    if (actx->player)
+                        actx->player->DisableEdit(false);
+                    actx->UnlockDeletePlayer(__FILE__, __LINE__);
+                }
                 handled = true;
             }
             else
