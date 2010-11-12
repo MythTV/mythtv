@@ -86,7 +86,7 @@ class BECache( SplitInt ):
             with self.db.cursor(self.log) as cursor:
                 if cursor.execute("""SELECT hostname FROM settings
                                      WHERE value='BackendServerIP'
-                                     AND data=%s""", self.host) == 0:
+                                     AND data=?""", [self.host]) == 0:
                     # no match found
                     raise MythDBError(MythError.DB_SETTING, 'BackendServerIP',
                                             self.host)

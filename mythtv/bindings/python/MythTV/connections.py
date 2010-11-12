@@ -12,93 +12,29 @@ from time import sleep, time
 from select import select
 from urllib import urlopen
 from thread import start_new_thread, allocate_lock, get_ident
-import MySQLdb, MySQLdb.cursors
 import lxml.etree as etree
 import weakref
 import socket
 import Queue
 import re
 
-class LoggedCursor( MySQLdb.cursors.Cursor ):
+try:
+    import _conn_oursql as dbmodule
+    from   _conn_oursql import LoggedCursor
+except:
+    try:
+        import _conn_mysqldb as dbmodule
+        from   _conn_mysqldb import LoggedCursor
+    except:
+        raise MythError("No viable database module found.")
+
+class _Connection_Pool( object ):
     """
-    Custom cursor, offering logging and error handling
-    """
-    def __init__(self, connection):
-        self.log = None
-        self._releaseCallback = None
-        self.id = id(connection)
-        MySQLdb.cursors.Cursor.__init__(self, connection)
-        self.ping()
-
-    def ping(self): self.connection.ping()
-
-    def log_query(self, query, args):
-        self.log(self.log.DATABASE, ' '.join(query.split()), str(args))
-
-    def execute(self, query, args=None):
-        """
-        Execute a query.
-
-        query -- string, query to execute on server
-        args -- optional sequence or mapping, parameters to use with query.
-
-        Note: If args is a sequence, then %s must be used as the
-        parameter placeholder in the query. If a mapping is used,
-        %(key)s must be used as the placeholder.
-
-        Returns long integer rows affected, if any
-        """
-        self.ping()
-        self.log_query(query, args)
-        try:
-            if args is None:
-                return MySQLdb.cursors.Cursor.execute(self, query)
-            return MySQLdb.cursors.Cursor.execute(self, query, args)
-        except Exception, e:
-            raise MythDBError(MythDBError.DB_RAW, e.args)
-
-    def executemany(self, query, args):
-        """
-        Execute a multi-row query.
-
-        query -- string, query to execute on server
-
-        args
-
-            Sequence of sequences or mappings, parameters to use with
-            query.
-
-        Returns long integer rows affected, if any.
-
-        This method improves performance on multiple-row INSERT and
-        REPLACE. Otherwise it is equivalent to looping over args with
-        execute().
-        """
-        self.ping()
-        self.log_query(query, args)
-        try:
-            return MySQLdb.cursors.Cursor.executemany(self, query, args)
-        except Exception, e:
-            raise MythDBError(MythDBError.DB_RAW, e.args)
-
-    def commit(self): self.connection.commit()
-    def rollback(self): self.connection.rollback()
-
-    def __enter__(self): return self
-    def __exit__(self, type, value, traceback):
-        if type:
-            self.rollback()
-        else:
-            self.commit()
-        self.close()
-
-class DBConnection( object ):
-    """
-    This is the basic database connection object.
-    You dont want to use this directly.
+    Provides a scaling connection pool to access a shared resource.
     """
 
     _defpoolsize = 2
+    _logmode = MythLog.SOCKET
     @classmethod
     def setDefaultSize(cls, size):
         """
@@ -115,7 +51,7 @@ class DBConnection( object ):
 
         while diff:
             if diff > 0:
-                self._pool.append(self.connect())
+                self._pool.append(self._connect())
                 diff -= 1
             else:
                 try:
@@ -126,44 +62,21 @@ class DBConnection( object ):
                     conn.close()
                 diff += 1
 
-    def __init__(self, dbconn):
-        self.log = MythLog('Python Database Connection')
-        self.tablefields = None
-        self.settings = None
+    def __init__(self):
         self._pool = []
         self._inuse = {}
+        self._refs  = {}
         self._stack = {}
-        self._refs = {}
         self._poolsize = self._defpoolsize
-        self.dbconn = dbconn
 
-        try:
-            self.log(MythLog.DATABASE, "Attempting connection", 
-                '\n'.join(["'%s': '%s'" % (k,v) for k,v in dbconn.items()]))
-            for i in range(self._poolsize):
-                self._pool.append(self.connect())
-        except:
-            raise MythDBError(MythError.DB_CONNECTION, dbconn)
+        for i in range(self._poolsize):
+            self._pool.append(self._connect())
 
     def __del__(self):
         for conn in self._pool:
             conn.close()
         for id,conn in self._inuse.items():
             conn.close()
-
-    def connect(self):
-        self.log(MythLog.DATABASE|MythLog.EXTRA,
-                        'Spawning new database connection')
-        dbconn = self.dbconn
-        db = MySQLdb.connect(  user=   dbconn['DBUserName'],
-                               host=   dbconn['DBHostName'],
-                               passwd= dbconn['DBPassword'],
-                               db=     dbconn['DBName'],
-                               port=   dbconn['DBPort'],
-                               use_unicode=True,
-                               charset='utf8')
-        db.autocommit(True)
-        return db
 
     def acquire(self):
         """
@@ -173,10 +86,10 @@ class DBConnection( object ):
         try:
             conn = self._pool.pop(0)
             self._inuse[id(conn)] = conn
-            self.log(MythLog.DATABASE|MythLog.EXTRA,
-                        'Acquiring database connection from pool')
+            self.log(self._logmode|MythLog.EXTRA,
+                        'Acquiring connection from pool')
         except IndexError:
-            conn = self.connect()
+            conn = self._connect()
         return conn
 
     def release(self, id):
@@ -185,8 +98,33 @@ class DBConnection( object ):
         """
         conn = self._inuse.pop(id)
         self._pool.append(conn)
-        self.log(MythLog.DATABASE|MythLog.EXTRA,
-                    'Releasing database connection to pool')
+        self.log(self._logmode|MythLog.EXTRA,
+                    'Releasing connection to pool')
+
+class DBConnection( _Connection_Pool ):
+    """
+    This is the basic database connection object.
+    You dont want to use this directly.
+    """
+
+    _logmode = MythLog.DATABASE
+
+    def _connect(self):
+        return dbmodule.dbconnect(self.dbconn, self.log)
+
+    def __init__(self, dbconn):
+        self.log = MythLog('Python Database Connection')
+        self.tablefields = None
+        self.settings = None
+        self.dbconn = dbconn
+        self._refs = {}
+
+        self.log(MythLog.DATABASE, "Attempting connection",
+            '\n'.join(["'%s': '%s'" % (k,v) for k,v in dbconn.items()]))
+        try:
+            _Connection_Pool.__init__(self)
+        except:
+            raise MythDBError(MythError.DB_CONNECTION, dbconn)
 
     def cursor(self, log=None, type=LoggedCursor):
         """
@@ -207,6 +145,9 @@ class DBConnection( object ):
         return cursor
 
     def _callback(self, ref):
+        self.log(MythLog.DATABASE|MythLog.EXTRA, \
+                    'database callback received',\
+                     str(hex(id(ref))))
         refid = id(ref)
         ref, connid = self._refs.pop(refid)
         if connid in self._inuse:
@@ -302,6 +243,8 @@ class BEConnection( object ):
                     "Couldn't connect to backend %s:%d" \
                     % (self.host, self.port))
             raise MythBEError(MythError.PROTO_CONNECTION, self.host, self.port)
+        except:
+            raise
 
     def __del__(self):
         self.disconnect()

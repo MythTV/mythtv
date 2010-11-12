@@ -93,7 +93,7 @@ class DBData( DictData, MythSchema ):
                 log(log.DATABASE|log.EXTRA,
                     'set _key to %s' % str(cls._key))
             gen = lambda j,s,l: j.join([s % k for k in l])
-            cls._where = gen(' AND ', '%s=%%s', cls._key)
+            cls._where = gen(' AND ', '%s=?', cls._key)
             cls._setwheredat = gen('', 'self.%s,', cls._key)
             log(log.DATABASE|log.EXTRA,
                 'set _where to %s' % cls._where)
@@ -170,13 +170,14 @@ class DBData( DictData, MythSchema ):
     def _pull(self):
         """Updates table with data pulled from database."""
         with self._db.cursor(self._log) as cursor:
-            count = cursor.execute("""SELECT * FROM %s WHERE %s""" \
-                               % (self._table, self._where), self._wheredat)
-            if count == 0:
+            cursor.execute("""SELECT * FROM %s WHERE %s""" \
+                       % (self._table, self._where), self._wheredat)
+            res = cursor.fetchall()
+            if len(res) == 0:
                 raise MythError('DBData() could not read from database')
-            elif count > 1:
+            elif len(res) > 1:
                 raise MythError('DBData() could not find unique entry')
-            data = cursor.fetchone()
+            data = res[0]
         DictData.update(self, self._process(data))
 
     def copy(self):
@@ -295,7 +296,7 @@ class DBDataWrite( DBData ):
             data = self._sanitize(data, False)
             dict.update(self, data)
 
-    def _create(self, data=None):
+    def _create(self, data=None, cursor=None):
         """
         obj._create(data=None) -> new database row
 
@@ -306,18 +307,20 @@ class DBDataWrite( DBData ):
             raise MythError('DBDataWrite object already bound to '+\
                                                     'existing instance')
 
+        if cursor is None:
+            with self._db.cursor(self._log) as cursor:
+                self._create(data, cursor)
+            return
+
         self._import(data)
         data = self._sanitize(dict(self))
         for key in data.keys():
             if data[key] is None:
                 del data[key]
         fields = ', '.join(data.keys())
-        format_string = ', '.join(['%s' for d in data.values()])
-        with self._db.cursor(self._log) as cursor:
-            cursor.execute("""INSERT INTO %s (%s) VALUES(%s)""" \
-                        % (self._table, fields, format_string), data.values())
-            intid = cursor.lastrowid
-        return intid
+        format_string = ', '.join(['?' for d in data.values()])
+        cursor.execute("""INSERT INTO %s (%s) VALUES(%s)""" \
+                    % (self._table, fields, format_string), data.values())
 
     def _create_normal(self, data=None):
         """
@@ -339,8 +342,10 @@ class DBDataWrite( DBData ):
         Creates a new database entry using the given information.
         Will only function on an uninitialized object.
         """
-        intid = self._create(data)
-        self._evalwheredat([intid])
+        with self._db.cursor(self._log) as cursor:
+            self._create(data, cursor)
+            intid = cursor.lastrowid
+        self._evalwheredat(intid)
         self._pull()
         self._postinit()
         return self
@@ -360,7 +365,7 @@ class DBDataWrite( DBData ):
         if len(data) == 0:
             # no updates
             return
-        format_string = ', '.join(['%s = %%s' % d for d in data])
+        format_string = ', '.join(['%s = ?' % d for d in data])
         sql_values = data.values()
         sql_values.extend(self._wheredat)
         with self._db.cursor(self._log) as cursor:
@@ -406,6 +411,8 @@ class DBDataRef( list ):
         _ref
             list of fields for WHERE argument in lookup
     """
+    _readonly = False
+
     class SubData( OrdDict ):
         # this is one matching entry
         _localvars = ['_field_order', '_changed', '_hash']
@@ -476,6 +483,9 @@ class DBDataRef( list ):
                 fields.remove(f)
         cls._datfields = fields
 
+        if cls._readonly:
+            cls.commit = _donothing
+
         cls._setClassDefs = classmethod(_donothing)
 
     def __init__(self, where, db=None, bypass=False):
@@ -495,7 +505,7 @@ class DBDataRef( list ):
                 cursor.execute("""SELECT %s FROM %s WHERE %s""" % \
                             (','.join(self._datfields),
                              self._table,
-                             ' AND '.join(['%s=%%s' % f for f in self._ref])),
+                             ' AND '.join(['%s=?' % f for f in self._ref])),
                          self._refdat)
                 for row in cursor:
                     list.append(self, self.SubData(zip(self._datfields, row)))
@@ -550,9 +560,9 @@ class DBDataRef( list ):
                 wf = []
                 for i,v in enumerate(data):
                     if v is None:
-                        wf.append('%s IS %%s' % fields[i])
+                        wf.append('%s IS ?' % fields[i])
                     else:
-                        wf.append('%s=%%s' % fields[i])
+                        wf.append('%s=?' % fields[i])
                 cursor.execute("""DELETE FROM %s WHERE %s""" % \
                                    (self._table, ' AND '.join(wf)), data)
 
@@ -565,7 +575,7 @@ class DBDataRef( list ):
                 cursor.executemany("""INSERT INTO %s (%s) VALUES(%s)""" % \
                                     (self._table,
                                      ','.join(fields),
-                                     ','.join(['%s' for a in fields])), data)
+                                     ','.join(['?' for a in fields])), data)
         self._origdata = self.deepcopy()
 
     def append(self, *data):
@@ -654,7 +664,7 @@ class DBDataCRef( DBDataRef ):
                              '%s.%s=%s.%s' % \
                                     (self._table[0], self._cref[0],
                                      self._table[1], self._cref[-1]),
-                             ' AND '.join(['%s=%%s' % f for f in self._ref])),
+                             ' AND '.join(['%s=?' % f for f in self._ref])),
                         self._refdat)
 
                 for row in cursor:
@@ -684,17 +694,20 @@ class DBDataCRef( DBDataRef ):
             for d in newdata:
                 data = [d[a] for a in self._crdatfields]
                 fields = self._crdatfields
-                if cursor.execute("""SELECT %s FROM %s WHERE %s""" % \
+                cursor.execute("""SELECT %s FROM %s WHERE %s""" % \
                             (self._cref[-1], self._table[1],
-                             ' AND '.join(['%s=%%s' % f for f in fields])),
-                        data):
+                             ' AND '.join(['%s=?' % f for f in fields])),
+                        data)
+                res = cursor.fetchone()
+                if res is not None:
                     # match found
-                    d._cref = cursor.fetchone()[0]
+                    d._cref = res[0]
+                    cursor.nextset()
                 else:
                     cursor.execute("""INSERT INTO %s (%s) VALUES(%s)""" % \
                             (self._table[1],
                              ','.join(self._crdatfields),
-                             ','.join(['%s' for a in data])),
+                             ','.join(['?' for a in data])),
                         data)
                     d._cref = cursor.lastrowid
             # add new references
@@ -704,7 +717,7 @@ class DBDataCRef( DBDataRef ):
                 cursor.execute("""INSERT INTO %s (%s) VALUES(%s)""" % \
                         (self._table[0],
                          ','.join(fields),
-                         ','.join(['%s' for a in data])),
+                         ','.join(['?' for a in data])),
                     data)
 
             # remove old references
@@ -715,15 +728,16 @@ class DBDataCRef( DBDataRef ):
                 fields = self._rdatfields+self._cref[:1]+self._ref
                 cursor.execute("""DELETE FROM %s WHERE %s""" % \
                         (self._table[0],
-                         ' AND '.join(['%s=%%s' % f for f in fields])),
+                         ' AND '.join(['%s=?' % f for f in fields])),
                     data)
             # remove unused cross-references
             for cr in crefs:
-                cursor.execute("""SELECT COUNT(1) FROM %s WHERE %s=%%s""" % \
-                        (self._table[0], self._cref[0]), cr)
+                cursor.execute("""SELECT COUNT(1) FROM %s WHERE %s=?""" % \
+                        (self._table[0], self._cref[0]), [cr])
                 if cursor.fetchone()[0] == 0:
-                    cursor.execute("""DELETE FROM %s WHERE %s=%%s""" % \
-                            (self._table[1], self._cref[-1]), cr)
+                    cursor.execute("""DELETE FROM %s WHERE %s=?""" % \
+                            (self._table[1], self._cref[-1]), [cr])
+                cursor.nextset()
 
         self._origdata = self.deepcopy()
 
@@ -827,23 +841,23 @@ class DBCache( MythSchema ):
                 if host is 'NULL':
                     self._insert = """INSERT INTO settings
                                              (value, data, hostname)
-                                      VALUES (%s, %s, NULL)"""
+                                      VALUES (?, ?, NULL)"""
                     self._where = """hostname IS NULL"""
                 else:
                     self._insert = """INSERT INTO settings
                                              (value, data, hostname)
-                                      VALUES (%%s, %%s, '%s')""" % host
+                                      VALUES (?, ?, '%s')""" % host
                     self._where = """hostname='%s'""" % host
 
             def __getitem__(self, key):
                 if key not in self:
                     with self._db.cursor(self._log) as cursor:
-                        if cursor.execute("""SELECT data FROM settings
-                                             WHERE value=%%s
-                                             AND %s LIMIT 1""" \
-                                         % self._where, key):
-                            OrdDict.__setitem__(self, key, \
-                                                cursor.fetchone()[0])
+                        cursor.execute("""SELECT data FROM settings
+                                          WHERE value=? AND %s
+                                          LIMIT 1""" % self._where, (key,))
+                        res = cursor.fetchone()
+                        if res is not None:
+                            OrdDict.__setitem__(self, key, res[0])
                         else:
                             return None
                 return OrdDict.__getitem__(self, key)
@@ -857,8 +871,8 @@ class DBCache( MythSchema ):
                     with self._db.cursor(self._log) as cursor:
                         if self[key] is not None:
                             cursor.execute("""UPDATE settings
-                                              SET data=%%s
-                                              WHERE value=%%s
+                                              SET data=?
+                                              WHERE value=?
                                               AND %s""" \
                                     % self._where, (value, key))
                         else:
@@ -870,7 +884,7 @@ class DBCache( MythSchema ):
                     return
                 with self._db.cursor(self._log) as cursor:
                     cursor.execute("""DELETE FROM settings
-                                      WHERE value=%%s
+                                      WHERE value=?
                                       AND %s""" \
                             % self._where, (key,))
                 OrdDict.__delitem__(self, key)
@@ -1050,7 +1064,7 @@ class DBCache( MythSchema ):
             with self.cursor(self.log) as cursor:
                 if cursor.execute("""SELECT data
                                      FROM settings
-                                     WHERE value LIKE(%s)""",
+                                     WHERE value LIKE(?)""",
                                 (value,)) == 0:
                     raise MythDBError(MythError.DB_SETTING, value)
 
@@ -1080,10 +1094,10 @@ class DBCache( MythSchema ):
         where = []
         wheredat = []
         if groupname:
-            where.append("groupname=%s")
+            where.append("groupname=?")
             wheredat.append(groupname)
         if hostname:
-            where.append("hostname=%s")
+            where.append("hostname=?")
             wheredat.append(hostname)
         with self.cursor(self.log) as cursor:
             if len(where):
@@ -1120,6 +1134,7 @@ class DBCache( MythSchema ):
         
         if args is None:
             return query
+
         args = list(args)
         for i, arg in enumerate(args):
             for k,v in conv.items():
@@ -1129,6 +1144,7 @@ class DBCache( MythSchema ):
             else:
                 args[i] = str(arg)
 
+        query = query.replace('?', '%s')
         return query % tuple(args)
 
     def cursor(self, log=None):

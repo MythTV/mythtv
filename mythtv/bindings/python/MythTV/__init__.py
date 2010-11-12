@@ -29,21 +29,19 @@ __all__             = ['static', 'MSearch', 'MythLog', 'StorageGroup']\
                         +__all_data__\
                         +__all_method__
 
-import warnings
-with warnings.catch_warnings():
-    warnings.simplefilter('ignore')
-    import static
-    from exceptions import *
-    from logging import *
-    from msearch import *
-    from utility import *
-    from connections import MySQLdb
-    from database import *
-    from system import *
-    from mythproto import *
-    from dataheap import *
-    from methodheap import *
+import static
+from exceptions import *
+from logging import *
+from msearch import *
+from utility import *
+from connections import dbmodule
+from database import *
+from system import *
+from mythproto import *
+from dataheap import *
+from methodheap import *
+
 
 __version__ = OWN_VERSION
-static.mysqldb = MySQLdb.version_info
+static.dbmodule = dbmodule.__version__
 

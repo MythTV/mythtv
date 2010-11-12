@@ -173,8 +173,8 @@ class databaseSearch( object ):
             else:
                 cursor.execute(query)
 
-        for row in cursor:
-            yield self.handler.fromRaw(row, db=self.inst)
+            for row in cursor:
+                yield self.handler.fromRaw(row, db=self.inst)
 
     def parseInp(self, kwargs):
         where = []
@@ -219,7 +219,7 @@ class databaseSearch( object ):
                     (self.buildQuery(
                         (   self.joins[res[3]].buildWhere(),
                             '(%s)' % \
-                                 ' OR '.join(['%s=%%s' % res[0] \
+                                 ' OR '.join(['%s=?' % res[0] \
                                                     for f in lval])),
                         'COUNT( DISTINCT %s )' % res[0],
                         res[1],
