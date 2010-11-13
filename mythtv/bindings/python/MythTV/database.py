@@ -345,7 +345,7 @@ class DBDataWrite( DBData ):
         with self._db.cursor(self._log) as cursor:
             self._create(data, cursor)
             intid = cursor.lastrowid
-        self._evalwheredat(intid)
+        self._evalwheredat([intid])
         self._pull()
         self._postinit()
         return self
