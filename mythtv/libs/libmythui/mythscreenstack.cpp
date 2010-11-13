@@ -16,11 +16,10 @@ MythScreenStack::MythScreenStack(MythMainWindow *parent, const QString &name,
                                  bool mainstack)
                : QObject(parent)
 {
-    assert(parent);
-
     setObjectName(name);
 
-    parent->AddScreenStack(this, mainstack);
+    if (parent)
+        parent->AddScreenStack(this, mainstack);
 
     m_newTop = NULL;
     m_topScreen = NULL;
@@ -67,7 +66,8 @@ void MythScreenStack::AddScreen(MythScreenType *screen, bool allowFade)
     }
     else
     {
-        reinterpret_cast<MythMainWindow *>(parent())->update();
+        if (parent())
+            reinterpret_cast<MythMainWindow *>(parent())->update();
         RecalculateDrawOrder();
         if (!screen->IsInitialized())
             m_DoInit = true;
