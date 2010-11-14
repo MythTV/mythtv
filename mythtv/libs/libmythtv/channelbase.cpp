@@ -727,6 +727,8 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
     uint  flags = kMSNone;
     uint result;
 
+    // This is being done using the class rather than the myth_system wrapper
+    // to accomodate use of Term in TeardownAll
     m_changer = new MythSystem(command, flags);
     m_changer->Run(30);
     result = m_changer->Wait();
