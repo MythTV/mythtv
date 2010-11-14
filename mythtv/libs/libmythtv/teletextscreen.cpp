@@ -469,6 +469,9 @@ void TeletextScreen::AddPageHeader(int page, int subpage,
                                     const uint8_t * buf,
                                     int vbimode, int lang, int flags)
 {
+    if (!m_displaying)
+        return;
+
     QMutexLocker locker(&m_lock);
 
     int magazine = MAGAZINE(page);
@@ -547,6 +550,9 @@ void TeletextScreen::AddPageHeader(int page, int subpage,
 void TeletextScreen::AddTeletextData(int magazine, int row,
                                       const uint8_t * buf, int vbimode)
 {
+    if (!m_displaying)
+        return;
+
     QMutexLocker locker(&m_lock);
 
     int b1, b2, b3, err = 0;
