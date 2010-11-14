@@ -1,6 +1,11 @@
 #ifndef __MYTH_EXIT_CODES__
 #define __MYTH_EXIT_CODES__
 
+// ALL statuses that are not to be mapped directly to an exit code *must*
+// be > 256 for sanity's sakes.  The functionality of 
+// mythwelcome/welcomedialog.cpp depends on being able to use exit code as an
+// 8-bit masked integer.
+
 #define GENERIC_EXIT_OK                             0
 #define GENERIC_EXIT_NOT_OK                       255
 #define GENERIC_EXIT_NO_MYTHCONTEXT               254
