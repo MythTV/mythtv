@@ -90,8 +90,11 @@ void MythSystemManager::run(void)
             }
 
             // handle forced exit
-            else if( WIFSIGNALED(status) )
+            else if( WIFSIGNALED(status) && 
+                     ms->m_status != GENERIC_EXIT_TIMEOUT )
             {
+                // Don't override a timed out process which gets killed, but
+                // otherwise set the return status appropriately
                 int sig = WTERMSIG(status);
                 if( sig == 9 )
                     ms->m_status = GENERIC_EXIT_ABORTED;
