@@ -141,7 +141,7 @@ static int TimezoneToInt (QString timezone)
             else
             {
                 result += min;
-                if (timezone.left(1) == '-')
+                if (timezone.left(1) == "-")
                     result *= -1;
             }
         }
