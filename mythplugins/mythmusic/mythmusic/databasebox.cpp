@@ -19,6 +19,7 @@ using namespace std;
 #include <uitypes.h>
 #include <uilistbtntype.h>
 #include <mythmediamonitor.h>
+#include <mythsystem.h>
 
 // mythmusic
 #include "metadata.h"
@@ -438,15 +439,10 @@ void DatabaseBox::BlankCDRW()
 
     record_progress->setProgress(1);
 
-    QString cmd = QString("cdrecord -v  dev= %1 -blank=%2")
+    QString cmd = QString("cdrecord -v dev=%1 -blank=%2")
         .arg(scsidev).arg(blanktype);
 
-    VERBOSE(VB_GENERAL, QString("DatabaseBox::BlankCDRW()") +
-            QString(" cmd: '%1'").arg(cmd));
-
-    QByteArray command = cmd.toAscii();
-    errno = 0;
-    if (system(command.constData()) < 0 && errno)
+    if (!myth_system(cmd))
     {
         VERBOSE(VB_IMPORTANT, QString("DatabaseBox::BlankCDRW()") +
                 QString(" cmd: '%1' Failed!").arg(cmd));
