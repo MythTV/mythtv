@@ -13,23 +13,6 @@
 #include <fcntl.h>
 #include <errno.h>
 
-# ifdef linux
-#   include <sys/vfs.h>
-#   include <sys/statvfs.h>
-#   include <sys/sysinfo.h>
-# else
-#   ifdef __FreeBSD__
-#     include <sys/param.h>
-#     include <sys/mount.h>
-#   endif
-#   if CONFIG_CYGWIN
-#     include <sys/statfs.h>
-#   endif
-#   ifndef _WIN32
-#     include <sys/sysctl.h>
-#   endif
-# endif
-
 // Qt headers
 #include <QApplication>
 #include <QRegExp>
@@ -45,14 +28,8 @@
 #include "mythdirs.h"
 #include "mythevent.h"
 #include "mythsocket.h"
+#include "mythsystem.h"
 
-// Necessary for codec icon support
-
-#ifndef _MSC_VER
-extern "C" {
-#include <stdint.h>
-}
-#endif
 
 static QString LOC = "lcddevice: ";
 
@@ -161,11 +138,8 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
     }
 
     // check if the 'mythlcdserver' is running
-    int res = system("ret=`ps cax | grep -c mythlcdserver`; exit $ret");
-    if (WIFEXITED(res))
-        res = WEXITSTATUS(res);
-
-    if (res == 0)
+    unsigned int res = myth_system("ps ch -C mythlcdserver -o pid > /dev/null");
+    if (res == 1)
     {
         // we need to start the mythlcdserver
         VERBOSE(VB_GENERAL, "Starting mythlcdserver");
