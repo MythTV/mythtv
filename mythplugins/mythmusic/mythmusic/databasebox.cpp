@@ -44,6 +44,7 @@ DatabaseBox::DatabaseBox(MythMainWindow *parent,
     {
         VERBOSE(VB_IMPORTANT, "We are not going to get very far with a null "
                 "pointer to metadata");
+	// TODO: is this OK?
         exit(0);
     }
 
