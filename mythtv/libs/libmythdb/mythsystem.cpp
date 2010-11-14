@@ -243,7 +243,7 @@ void MythSystemManager::append(MythSystem *ms)
 
 MythSystem::MythSystem(const QString &command, uint flags)
 {
-    setCommand(command, flags);
+    SetCommand(command, flags);
 }
 
 /** \fn MythSystem::setCommand(const QString &command) 
@@ -262,7 +262,7 @@ void MythSystem::SetCommand(const QString &command, uint flags)
 MythSystem::MythSystem(const QString &command, 
                        const QStringList &args, uint flags)
 {
-    setCommand(command, args, flags);
+    SetCommand(command, args, flags);
 }
 
 /** \fn MythSystem::setCommand(const QString &command, 
