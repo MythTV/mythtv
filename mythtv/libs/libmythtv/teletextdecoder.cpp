@@ -53,7 +53,19 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
     if (!m_player)
         return;
 
-    m_player->LockOSD();
+    int mode = m_player->GetCaptionMode();
+    if (!((mode == kDisplayNUVTeletextCaptions) ||
+          (mode == kDisplayTeletextCaptions) ||
+          (mode == kDisplayTeletextMenu)))
+    {
+        return;
+    }
+
+    if (!m_player->TryLockOSD())
+    {
+        VERBOSE(VB_PLAYBACK, "TeletextDecoder: Failed to get OSD lock.");
+        return;
+    }
 
     if (!m_teletextviewer && m_player)
     {

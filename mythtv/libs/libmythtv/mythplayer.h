@@ -297,8 +297,9 @@ class MPUBLIC MythPlayer
                        QMap<long long, long long> &posMap);
 
     // OSD locking for TV class
-    void LockOSD(void)   { osdLock.lock();   }
-    void UnlockOSD(void) { osdLock.unlock(); }
+    bool TryLockOSD(void) { return osdLock.tryLock(50); }
+    void LockOSD(void)    { osdLock.lock();   }
+    void UnlockOSD(void)  { osdLock.unlock(); }
 
   protected:
     // Initialization
