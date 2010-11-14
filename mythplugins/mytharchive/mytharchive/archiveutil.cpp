@@ -1,6 +1,7 @@
 // POSIX headers
-#include <sys/wait.h> // for WIF macros
+#include <sys/stat.h>
 #include <unistd.h>
+#include <errno.h>
 
 // ANSI C headers
 #include <cstdlib>
@@ -101,36 +102,36 @@ void checkTempDirectory()
     if (!dir.exists())
     {
         dir.mkdir(tempDir);
-        int res = system(qPrintable("chmod 777 " + tempDir));
-        if (!WIFEXITED(res) || WEXITSTATUS(res))
-            VERBOSE(VB_IMPORTANT, "Failed to change permissions on archive directory");
+        if( !chmod(qPrintable(tempDir), 0777) )
+            VERBOSE(VB_IMPORTANT, QString("Failed to change permissions on archive directory")
+                .arg(strerror(errno)));
     }
 
     dir = QDir(workDir);
     if (!dir.exists())
     {
         dir.mkdir(workDir);
-        int res = system(qPrintable("chmod 777 " + workDir));
-        if (!WIFEXITED(res) || WEXITSTATUS(res))
-            VERBOSE(VB_IMPORTANT, "Failed to change permissions on archive work directory");
+        if( !chmod(qPrintable(workDir), 0777) )
+            VERBOSE(VB_IMPORTANT, QString("Failed to change permissions on archive work directory")
+                .arg(strerror(errno)));
     }
 
     dir = QDir(logDir);
     if (!dir.exists())
     {
         dir.mkdir(logDir);
-        int res = system(qPrintable("chmod 777 " + logDir));
-        if (!WIFEXITED(res) || WEXITSTATUS(res))
-            VERBOSE(VB_IMPORTANT, "Failed to change permissions on archive log directory");
+        if( !chmod(qPrintable(logDir), 0777) )
+            VERBOSE(VB_IMPORTANT, QString("Failed to change permissions on archive log directory")
+                .arg(strerror(errno)));
 
     }
     dir = QDir(configDir);
     if (!dir.exists())
     {
         dir.mkdir(configDir);
-        int res = system(qPrintable("chmod 777 " + configDir));
-        if (!WIFEXITED(res) || WEXITSTATUS(res))
-            VERBOSE(VB_IMPORTANT, "Failed to change permissions on archive config directory");
+        if( !chmod(qPrintable(configDir), 0777) )
+            VERBOSE(VB_IMPORTANT, QString("Failed to change permissions on archive config directory")
+                .arg(strerror(errno)));
     }
 }
 

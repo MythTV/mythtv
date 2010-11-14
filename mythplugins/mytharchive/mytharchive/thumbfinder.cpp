@@ -25,10 +25,12 @@
  */
 
 // c
+#include <sys/stat.h>
 #include <math.h>
-#include <cstdlib>
+#include <errno.h>
 
 // c++
+#include <cstdlib>
 #include <iostream>
 
 // qt
@@ -350,9 +352,9 @@ QString ThumbFinder::createThumbDir(void)
     if (!dir.exists())
     {
         dir.mkdir(thumbDir);
-        int res = system(qPrintable("chmod 777 " + thumbDir));
-        if (!WIFEXITED(res) || WEXITSTATUS(res))
-            VERBOSE(VB_IMPORTANT, "ThumbFinder: Failed to change permissions on thumb directory");
+        if( !chmod(qPrintable(thumbDir), 0777) )
+            VERBOSE(VB_IMPORTANT, QString("ThumbFinder: Failed to change permissions on thumb directory")
+                .arg(strerror(errno)));
     }
 
     int x = 0;
@@ -365,9 +367,9 @@ QString ThumbFinder::createThumbDir(void)
     } while (dir.exists());
 
     dir.mkdir(path);
-    int res = system(qPrintable("chmod 777 " + path));
-    if (!WIFEXITED(res) || WEXITSTATUS(res))
-        VERBOSE(VB_IMPORTANT, "ThumbFinder: Failed to change permissions on thumb directory");
+    if( !chmod(qPrintable(path), 0777) )
+        VERBOSE(VB_IMPORTANT, QString("ThumbFinder: Failed to change permissions on thumb directory")
+            .arg(strerror(errno)));
 
     return path;
 }
