@@ -353,7 +353,7 @@ QString ThumbFinder::createThumbDir(void)
     {
         dir.mkdir(thumbDir);
         if( !chmod(qPrintable(thumbDir), 0777) )
-            VERBOSE(VB_IMPORTANT, QString("ThumbFinder: Failed to change permissions on thumb directory")
+            VERBOSE(VB_IMPORTANT, QString("ThumbFinder: Failed to change permissions on thumb directory: %1")
                 .arg(strerror(errno)));
     }
 
@@ -368,7 +368,7 @@ QString ThumbFinder::createThumbDir(void)
 
     dir.mkdir(path);
     if( !chmod(qPrintable(path), 0777) )
-        VERBOSE(VB_IMPORTANT, QString("ThumbFinder: Failed to change permissions on thumb directory")
+        VERBOSE(VB_IMPORTANT, QString("ThumbFinder: Failed to change permissions on thumb directory: %1")
             .arg(strerror(errno)));
 
     return path;

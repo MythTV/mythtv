@@ -103,7 +103,7 @@ void checkTempDirectory()
     {
         dir.mkdir(tempDir);
         if( !chmod(qPrintable(tempDir), 0777) )
-            VERBOSE(VB_IMPORTANT, QString("Failed to change permissions on archive directory")
+            VERBOSE(VB_IMPORTANT, QString("Failed to change permissions on archive directory: %1")
                 .arg(strerror(errno)));
     }
 
@@ -112,7 +112,7 @@ void checkTempDirectory()
     {
         dir.mkdir(workDir);
         if( !chmod(qPrintable(workDir), 0777) )
-            VERBOSE(VB_IMPORTANT, QString("Failed to change permissions on archive work directory")
+            VERBOSE(VB_IMPORTANT, QString("Failed to change permissions on archive work directory: %1")
                 .arg(strerror(errno)));
     }
 
@@ -121,7 +121,7 @@ void checkTempDirectory()
     {
         dir.mkdir(logDir);
         if( !chmod(qPrintable(logDir), 0777) )
-            VERBOSE(VB_IMPORTANT, QString("Failed to change permissions on archive log directory")
+            VERBOSE(VB_IMPORTANT, QString("Failed to change permissions on archive log directory: %1")
                 .arg(strerror(errno)));
 
     }
@@ -130,7 +130,7 @@ void checkTempDirectory()
     {
         dir.mkdir(configDir);
         if( !chmod(qPrintable(configDir), 0777) )
-            VERBOSE(VB_IMPORTANT, QString("Failed to change permissions on archive config directory")
+            VERBOSE(VB_IMPORTANT, QString("Failed to change permissions on archive config directory: %1")
                 .arg(strerror(errno)));
     }
 }
