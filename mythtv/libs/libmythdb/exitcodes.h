@@ -20,11 +20,14 @@
 #define GENERIC_EXIT_ABORTED                      240
 #define GENERIC_EXIT_RUNNING                      239
 #define GENERIC_EXIT_START                        239
+#define GENERIC_EXIT_PIPE_FAILURE                 238
+#define GENERIC_EXIT_TERMINATED                   237
 #define GENERIC_EXIT_CMD_NOT_FOUND                127
 
 // libmyth
 #define MYTHSYSTEM__EXIT__EXECL_ERROR             GENERIC_EXIT_EXECL_ERROR
 #define MYTHSYSTEM__EXIT__CMD_NOT_FOUND           GENERIC_EXIT_CMD_NOT_FOUND
+#define MYTHSYSTEM__EXIT__PIPE_FAILURE            GENERIC_EXIT_PIPE_FAILURE
 
 // libmythtv
 #define CHANNEL__EXIT__EXECL_ERROR                GENERIC_EXIT_EXECL_ERROR
