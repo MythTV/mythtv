@@ -141,7 +141,7 @@ static int TimezoneToInt (QString timezone)
             else
             {
                 result += min;
-                if (timezone.left(1) == "-")
+                if (timezone.left(1) == '-')
                     result *= -1;
             }
         }
@@ -425,20 +425,14 @@ ProgInfo *XMLTVParser::parseProgram(
             {
                 parseCredits(info, pginfo);
             }
-            else if (info.tagName() == "subtitles" &&
-                     info.attribute("type") == "teletext")
+            else if (info.tagName() == "subtitles")
             {
-                pginfo->subtitleType |= SUB_NORMAL;
-            }
-            else if (info.tagName() == "subtitles" &&
-                     info.attribute("type") == "onscreen")
-            {
-                pginfo->subtitleType |= SUB_ONSCREEN;
-            }
-            else if (info.tagName() == "subtitles" &&
-                     info.attribute("type") == "deaf-signed")
-            {
-                pginfo->subtitleType |= SUB_SIGNED;
+                if (info.attribute("type") == "teletext")
+                    pginfo->subtitleType |= SUB_NORMAL;
+                else if (info.attribute("type") == "onscreen")
+                    pginfo->subtitleType |= SUB_ONSCREEN;
+                else if (info.attribute("type") == "deaf-signed")
+                    pginfo->subtitleType |= SUB_SIGNED;
             }
             else if (info.tagName() == "audio")
             {
@@ -448,70 +442,70 @@ ProgInfo *XMLTVParser::parseProgram(
             {
                 parseVideo(info, pginfo);
             }
-            else if (info.tagName() == "episode-num" &&
-                     info.attribute("system") == "dd_progid")
+            else if (info.tagName() == "episode-num")
             {
-                QString episodenum(getFirstText(info));
-                // if this field includes a dot, strip it out
-                int idx = episodenum.indexOf('.');
-                if (idx != -1)
-                    episodenum.remove(idx, 1);
-                pginfo->programId = episodenum;
-                dd_progid_done = 1;
-            }
-            else if (info.tagName() == "episode-num" &&
-                     info.attribute("system") == "xmltv_ns")
-            {
-                int tmp;
-                QString episodenum(getFirstText(info));
-                episode = episodenum.section('.',1,1);
-                episode = episode.section('/',0,0).trimmed();
-                season = episodenum.section('.',0,0).trimmed();
-                QString part(episodenum.section('.',2,2));
-                QString partnumber(part.section('/',0,0).trimmed());
-                QString parttotal(part.section('/',1,1).trimmed());
-
-                pginfo->categoryType = kCategorySeries;
-
-                if (!episode.isEmpty())
+                if (info.attribute("system") == "dd_progid")
                 {
-                    tmp = episode.toInt() + 1;
-                    episode = QString::number(tmp);
-                    pginfo->syndicatedepisodenumber = QString('E' + episode);
+                    QString episodenum(getFirstText(info));
+                    // if this field includes a dot, strip it out
+                    int idx = episodenum.indexOf('.');
+                    if (idx != -1)
+                        episodenum.remove(idx, 1);
+                    pginfo->programId = episodenum;
+                    dd_progid_done = 1;
                 }
-
-                if (!season.isEmpty())
+                else if (info.attribute("system") == "xmltv_ns")
                 {
-                    tmp = season.toInt() + 1;
-                    season = QString::number(tmp);
-                    pginfo->syndicatedepisodenumber.append(QString('S' + season));
-                }
+                    int tmp;
+                    QString episodenum(getFirstText(info));
+                    episode = episodenum.section('.',1,1);
+                    episode = episode.section('/',0,0).trimmed();
+                    season = episodenum.section('.',0,0).trimmed();
+                    QString part(episodenum.section('.',2,2));
+                    QString partnumber(part.section('/',0,0).trimmed());
+                    QString parttotal(part.section('/',1,1).trimmed());
 
-                uint partno = 0;
-                if (!partnumber.isEmpty())
-                {
-                    bool ok;
-                    partno = partnumber.toUInt(&ok) + 1;
-                    partno = (ok) ? partno : 0;
-                }
+                    pginfo->categoryType = kCategorySeries;
 
-                if (!parttotal.isEmpty() && partno > 0)
-                {
-                    bool ok;
-                    uint partto = parttotal.toUInt(&ok) + 1;
-                    if (ok && partnumber <= parttotal)
+                    if (!episode.isEmpty())
                     {
-                        pginfo->parttotal  = partto;
-                        pginfo->partnumber = partno;
+                        tmp = episode.toInt() + 1;
+                        episode = QString::number(tmp);
+                        pginfo->syndicatedepisodenumber = QString('E' + episode);
+                    }
+
+                    if (!season.isEmpty())
+                    {
+                        tmp = season.toInt() + 1;
+                        season = QString::number(tmp);
+                        pginfo->syndicatedepisodenumber.append(QString('S' + season));
+                    }
+
+                    uint partno = 0;
+                    if (!partnumber.isEmpty())
+                    {
+                        bool ok;
+                        partno = partnumber.toUInt(&ok) + 1;
+                        partno = (ok) ? partno : 0;
+                    }
+
+                    if (!parttotal.isEmpty() && partno > 0)
+                    {
+                        bool ok;
+                        uint partto = parttotal.toUInt(&ok) + 1;
+                        if (ok && partnumber <= parttotal)
+                        {
+                            pginfo->parttotal  = partto;
+                            pginfo->partnumber = partno;
+                        }
                     }
                 }
-            }
-            else if (info.tagName() == "episode-num" &&
-                     info.attribute("system") == "onscreen" &&
-                     pginfo->subtitle.isEmpty())
-            {
-                pginfo->categoryType = kCategorySeries;
-                pginfo->subtitle = getFirstText(info);
+                else if (info.attribute("system") == "onscreen" &&
+                        pginfo->subtitle.isEmpty())
+                {
+                    pginfo->categoryType = kCategorySeries;
+                    pginfo->subtitle = getFirstText(info);
+                }
             }
         }
     }
