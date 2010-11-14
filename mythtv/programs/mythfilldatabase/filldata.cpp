@@ -26,6 +26,7 @@ using namespace std;
 #include "util.h"
 #include "mythdirs.h"
 #include "mythdb.h"
+#include "mythsystem.h"
 
 // libmythtv headers
 #include "videosource.h" // for is_grabber..
@@ -428,10 +429,10 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
     VERBOSE(VB_XMLTV,
             "----------------- Start of XMLTV output -----------------");
 
-    QByteArray tmp = command.toAscii();
-    int systemcall_status = system(tmp.constData());
-    bool succeeded = WIFEXITED(systemcall_status) &&
-         WEXITSTATUS(systemcall_status) == 0;
+    unsigned int systemcall_status;
+
+    systemcall_status = myth_system(command);
+    bool succeeded = (systemcall_status == 0);
 
     VERBOSE(VB_XMLTV,
             "------------------ End of XMLTV output ------------------");
@@ -442,9 +443,9 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
 
     if (!succeeded)
     {
-        if (WIFSIGNALED(systemcall_status) &&
-            (WTERMSIG(systemcall_status) == SIGINT
-            || WTERMSIG(systemcall_status) == SIGQUIT))
+        if (systemcall_status == GENERIC_EXIT_SIGNALLED ||
+            systemcall_status == GENERIC_EXIT_ABORTED ||
+            systemcall_status == GENERIC_EXIT_TERMINATED)
         {
             interrupted = true;
             status = QString(QObject::tr("FAILED: xmltv ran but was interrupted."));
