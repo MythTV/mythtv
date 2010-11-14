@@ -14,6 +14,7 @@
 #include "inputinfo.h"
 #include "mythsystem.h"
 #include "tv.h"
+#include "mythsystem.h"
 
 class TVRec;
 class ChannelBase;
@@ -172,7 +173,7 @@ class ChannelBase
     Status      m_tuneStatus;
     QMutex      m_thread_lock;
     bool        m_abort_change;
-    MythSystem  m_changer;
+    MythSystem *m_changer;
 };
 
 #endif

@@ -50,7 +50,7 @@ ChannelBase::ChannelBase(TVRec *parent)
     :
     m_pParent(parent), m_curchannelname(""),
     m_currentInputID(-1), m_commfree(false), m_cardid(0),
-    m_abort_change(false)
+    m_abort_change(false), m_changer(NULL)
 {
     m_tuneStatus = changeUnknown;
     m_tuneThread.tuner = this;
@@ -60,6 +60,8 @@ ChannelBase::~ChannelBase(void)
 {
     ClearInputMap();
     TeardownAll();
+    if( m_changer )
+        delete m_changer;
 }
 
 void ChannelBase::TeardownAll(void)
@@ -68,7 +70,9 @@ void ChannelBase::TeardownAll(void)
     {
         m_thread_lock.lock();
         m_abort_change = true;
-        m_changer.Term(true);
+	if( m_changer )
+            m_changer->Term(true);
+        
         m_tuneCond.wakeAll();
         m_thread_lock.unlock();
         m_tuneThread.wait();
@@ -723,9 +727,9 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
     uint  flags = kMSNone;
     uint result;
 
-    m_changer = MythSystem(command.const(), flags);
-    m_changer.Run(30);
-    result = m_changer.Wait();
+    m_changer = new MythSystem(command, flags);
+    m_changer->Run(30);
+    result = m_changer->Wait();
 
     return( result == 0 );
 #endif // !USING_MINGW

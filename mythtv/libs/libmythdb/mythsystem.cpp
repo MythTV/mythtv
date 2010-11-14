@@ -19,28 +19,10 @@
 #include <QCoreApplication>
 #include <QThread>
 #include <QMutex>
-#include <QSemaphore>
 #include <QMap>
-#include <QBuffer>
 #include <QString>
 #include <QStringList>
 #include <QVector>
-
-# ifdef linux
-#   include <sys/vfs.h>
-#   include <sys/statvfs.h>
-#   include <sys/sysinfo.h>
-# else
-#   ifdef __FreeBSD__
-#     include <sys/mount.h>
-#   endif
-#   if CONFIG_CYGWIN
-#     include <sys/statfs.h>
-#   endif
-#   ifndef _WIN32
-#     include <sys/sysctl.h>
-#   endif
-# endif
 
 // libmythdb headers
 #include "mythcorecontext.h"
@@ -68,10 +50,9 @@ void MythSystemManager::run(void)
         usleep(100000); // sleep 100ms
 
         // check for any running processes
-        int count;
         m_mapLock.lock();
-        count = m_pMap.size();
-        if( count )
+
+        if( m_pMap.isEmpty() )
         {
             m_mapLock.unlock();
             continue;
@@ -162,7 +143,9 @@ void MythSystemManager::run(void)
                 {
                     VERBOSE(VB_GENERAL, QString("Managed child (PID: %1) timed out"
                                                 ", issuing KILL signal").arg(pid));
-                    kill(pid, SIGKILL);
+                    // Prevent constant attempts to kill an obstinate child
+                    ms->m_timeout = 0;
+                    ms->Kill();
                 }
 
                 // issuing TERM signal
@@ -171,8 +154,8 @@ void MythSystemManager::run(void)
                     VERBOSE(VB_GENERAL, QString("Managed child (PID: %1) timed out"
                                                 ", issuing TERM signal").arg(pid));
                     ms->m_status = GENERIC_EXIT_TIMEOUT;
-                    ms->m_timeout += 1;
-                    kill(pid, SIGTERM);
+                    ms->m_timeout = now + 1;
+                    ms->Term();
                 }
             }
 
@@ -191,33 +174,36 @@ void MythSystemManager::run(void)
         if( pMap.size() )
         {
             // build structures for select()
-            fd_set rfds;
+            fd_set  rfds;
             timeval tv;
+            int     maxfd = -1;
+
             tv.tv_sec = 0; tv.tv_usec = 0;
 
             // build descriptor list
             FD_ZERO(&rfds);
             pipeMap_t::iterator j;
             for( j = pMap.begin(); j != pMap.end(); ++j )
+            {
                 FD_SET(j.key(), &rfds);
+                maxfd = (j.key() > maxfd ? j.key() : maxfd);
+            }
 
-            int retval = select(pMap.size(), &rfds, NULL, NULL, &tv);
+            int retval = select(maxfd + 1, &rfds, NULL, NULL, &tv);
             if( retval == -1 )
                 VERBOSE(VB_GENERAL, QString("select() failed because of %1")
                             .arg(strerror(errno)));
             else if( retval > 0 )
             {
                 // loop through returned descriptors
-                char buf[65536];
                 for( j = pMap.begin(); j != pMap.end(); ++j )
                 {
                     if( FD_ISSET(j.key(), &rfds) )
                     {
-                        // zero memory, and push read data to buffer
-                        memset(&buf, 0, 65536);
-                        if( read(j.key(), &buf, 65536) < 0 )
+                        int len;
+                        if( (len = read(j.key(), &m_readbuf, 65536)) < 0 )
                             continue;
-                        j.value()->append(buf);
+                        j.value()->append(m_readbuf, len);
                     }
                 }
             }
@@ -312,12 +298,14 @@ MythSystem::~MythSystem(void)
 /** \fn MythSystem::Run()
  *  \brief Runs a command inside the /bin/sh shell. Returns immediately
  */
-void MythSystem::Run(time_t timeout=0)
+void MythSystem::Run(time_t timeout)
 {
     // runs pre_flags
     // forks child process
     // spawns manager and hand off self
     HandlePreRun();
+
+    m_timeout = timeout;
     Fork();
 
     if( manager == NULL )
@@ -327,7 +315,8 @@ void MythSystem::Run(time_t timeout=0)
     }
 
     if( timeout )
-        m_timeout = time(NULL) + timeout;
+        m_timeout += time(NULL);
+
     m_pmutex.lock();
 
     manager->append(this);
@@ -344,11 +333,8 @@ uint MythSystem::Wait(time_t timeout)
     {
         if( timeout > 0 )
             timeout += time(NULL);
-        else
-            timeout = 2147483648; // we'll have to change this by 2038
-                                  // is there a time_t_max value?
 
-        while( time(NULL) < timeout )
+        while( !timeout || time(NULL) < timeout )
         {
             // loop until timeout hits or process ends
             if( m_pmutex.tryLock(100) )
@@ -363,8 +349,10 @@ uint MythSystem::Wait(time_t timeout)
     else
     {
         if( timeout > 0 )
+        {
             if( m_pmutex.tryLock(timeout*1000) )
                 m_pmutex.unlock();
+        }
         else
         {
             m_pmutex.lock();
@@ -376,7 +364,7 @@ uint MythSystem::Wait(time_t timeout)
 
 void MythSystem::Term(bool force)
 {
-    if( (m_status != GENERIC_EXIT_RUNNING) && (m_pid > 0) )
+    if( (m_status != GENERIC_EXIT_RUNNING) || (m_pid <= 0) )
         return;
     VERBOSE(VB_GENERAL, QString("Child PID %1 aborted, terminating")
                     .arg(m_pid));
@@ -392,7 +380,7 @@ void MythSystem::Term(bool force)
 
 void MythSystem::Kill() const
 {
-    if( (m_status != GENERIC_EXIT_RUNNING) && (m_pid > 0) )
+    if( (m_status != GENERIC_EXIT_RUNNING) || (m_pid <= 0) )
         return;
     VERBOSE(VB_GENERAL, QString("Child PID %1 aborted, killing")
                     .arg(m_pid));
@@ -401,7 +389,7 @@ void MythSystem::Kill() const
 
 void MythSystem::Stop() const
 {
-    if( (m_status != GENERIC_EXIT_RUNNING) && (m_pid > 0) )
+    if( (m_status != GENERIC_EXIT_RUNNING) || (m_pid <= 0) )
         return;
     VERBOSE(VB_GENERAL, QString("Child PID %1 suspended")
                     .arg(m_pid));
@@ -410,7 +398,7 @@ void MythSystem::Stop() const
 
 void MythSystem::Cont() const
 {
-    if( (m_status != GENERIC_EXIT_RUNNING) && (m_pid > 0) )
+    if( (m_status != GENERIC_EXIT_RUNNING) || (m_pid <= 0) )
         return;
     VERBOSE(VB_GENERAL, QString("Child PID %1 resumed")
                     .arg(m_pid));
@@ -419,7 +407,7 @@ void MythSystem::Cont() const
 
 void MythSystem::HangUp() const
 {
-    if( (m_status != GENERIC_EXIT_RUNNING) && (m_pid > 0) )
+    if( (m_status != GENERIC_EXIT_RUNNING) || (m_pid <= 0) )
         return;
     VERBOSE(VB_GENERAL, QString("Child PID %1 hung-up")
                     .arg(m_pid));
@@ -428,7 +416,7 @@ void MythSystem::HangUp() const
 
 void MythSystem::USR1() const
 {
-    if( (m_status != GENERIC_EXIT_RUNNING) && (m_pid > 0) )
+    if( (m_status != GENERIC_EXIT_RUNNING) || (m_pid <= 0) )
         return;
     VERBOSE(VB_GENERAL, QString("Child PID %1 USR1")
                     .arg(m_pid));
@@ -437,7 +425,7 @@ void MythSystem::USR1() const
 
 void MythSystem::USR2() const
 {
-    if( (m_status != GENERIC_EXIT_RUNNING) && (m_pid > 0) )
+    if( (m_status != GENERIC_EXIT_RUNNING) || (m_pid <= 0) )
         return;
     VERBOSE(VB_GENERAL, QString("Child PID %1 USR2")
                     .arg(m_pid));
@@ -482,10 +470,6 @@ void MythSystem::ProcessFlags(uint flags)
         m_disabledrawing = !(flags & kMSDontDisableDrawing);
         m_processevents  = flags & kMSProcessEvents;
     }
-    else
-    {
-        m_processevents = false;
-    }
 
     if( flags & kMSStdIn )
         m_usestdin = true;
@@ -507,9 +491,10 @@ QByteArray *MythSystem::_read(int size, int id)
         ret->append(m_stdbuff[id].read(size));
     else if( m_stdpipe[id] > -1 )
     {
+        int len;
         char *buf = (char *)calloc(size, 0);
-        read(m_stdpipe[id+1], buf, size);
-        ret->append(buf);
+        len = read(m_stdpipe[id+1], buf, size);
+        ret->append(buf, len);
         free(buf);
     }
 
@@ -585,9 +570,16 @@ void MythSystem::HandlePostRun()
     }
 }
 
+#define MAX_BUFLEN 1024
 void MythSystem::Fork()
 {
     QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(m_command);
+
+    // For use in the child
+    char locerr[MAX_BUFLEN];
+    strncpy(locerr, (const char *)LOC_ERR.constData(), MAX_BUFLEN);
+    locerr[MAX_BUFLEN-1] = '\0';
+
     VERBOSE(VB_GENERAL, QString("Launching: %1").arg(m_command));
 
     int p_stdin[]  = {-1,-1};
@@ -626,7 +618,7 @@ void MythSystem::Fork()
     if( m_useshell )
     {
         command = "/bin/sh";
-        _cmdargs << "/bin/sh" << "sh" << "-c"
+        _cmdargs << "sh" << "-c"
                  << m_command.toUtf8().constData() << (char *)0;
     }
     else
@@ -659,6 +651,10 @@ void MythSystem::Fork()
         m_pid = child;
         m_status = GENERIC_EXIT_RUNNING;
 
+        VERBOSE(VB_GENERAL, QString("Managed child (PID: %1) has started! "
+                                            "command=%2, timeout=%3")
+                    .arg(m_pid) .arg(m_command) .arg(m_timeout));
+
         /* close unused pipe ends */
         CLOSE(p_stdin[0]);
         CLOSE(p_stdout[1]);
@@ -671,9 +667,9 @@ void MythSystem::Fork()
     }
     else if (child == 0)
     {
-        /* Child - NOTE: it is not safe to use VERBOSE between the fork and
-         * execl calls in the child.  It causes occasional locking issues that
-         * cause deadlocked child processes. */
+        /* Child - NOTE: it is not safe to use VERBOSE or QString between the 
+         * fork and execv calls in the child.  It causes occasional locking 
+         * issues that cause deadlocked child processes. */
 
         /* handle standard input */
         if( p_stdin[0] >= 0 )
@@ -681,9 +677,9 @@ void MythSystem::Fork()
             /* try to attach stdin to input pipe - failure is fatal */
             if( dup2(p_stdin[0], 0) < 0 )
             {
-                QString message = LOC_ERR +
-                        "Cannot redirect input pipe to standard input." +ENO;
-                cerr << message.constData() << endl;
+                cerr << locerr 
+                     << "Cannot redirect input pipe to standard input: "
+                     << strerror(errno) << endl;
                 _exit(MYTHSYSTEM__EXIT__PIPE_FAILURE);
             }
         }
@@ -695,17 +691,18 @@ void MythSystem::Fork()
             {
                 if( dup2(fd, 0) < 0)
                 {
-                    QString message = LOC_ERR + 
-                        "Cannot redirect /dev/null to standard input,"
-                        "\n\t\t\tfailed to duplicate file descriptor." + ENO;
-                    cerr << message.constData() << endl;
+                    cerr << locerr
+                         << "Cannot redirect /dev/null to standard input,"
+                            "\n\t\t\tfailed to duplicate file descriptor: " 
+                         << strerror(errno) << endl;
                 }
             }
             else
             {
-                QString message = LOC_ERR + "Cannot redirect /dev/null "
-                    "to standard input, failed to open." + ENO;
-                cerr << message.constData() << endl;
+                cerr << locerr
+                     << "Cannot redirect /dev/null to standard input, "
+                        "failed to open: "
+                     << strerror(errno) << endl;
             }
         }
 
@@ -715,9 +712,9 @@ void MythSystem::Fork()
             /* try to attach stdout to output pipe - failure is fatal */
             if( dup2(p_stdout[1], 1) < 0)
             {
-                QString message = LOC_ERR +
-                        "Cannot redirect output pipe to standard output." +ENO;
-                cerr << message.constData() << endl;
+                cerr << locerr
+                     << "Cannot redirect output pipe to standard output: "
+                     << strerror(errno) << endl;
                 _exit(MYTHSYSTEM__EXIT__PIPE_FAILURE);
             }
         }
@@ -728,9 +725,9 @@ void MythSystem::Fork()
             /* try to attach stderr to error pipe - failure is fatal */
             if( dup2(p_stderr[1], 2) < 0)
             {
-                QString message = LOC_ERR +
-                        "Cannot redirect error pipe to standard error." +ENO;
-                cerr << message.constData() << endl;
+                cerr << locerr
+                     << "Cannot redirect error pipe to standard error: " 
+                     << strerror(errno) << endl;
                 _exit(MYTHSYSTEM__EXIT__PIPE_FAILURE);
             }
         }
@@ -745,9 +742,9 @@ void MythSystem::Fork()
         if (errno)
         {
             // Can't use VERBOSE due to locking fun.
-            QString message = LOC_ERR + QString("execl() failed because %1")
-                    .arg(strerror(errno));
-            cerr << message.constData() << endl;
+            cerr << locerr
+                 << "execv() failed: "
+                 << strerror(errno) << endl;
         }
 
         /* Failed to exec */
@@ -768,8 +765,8 @@ void MythSystem::Fork()
 
 uint myth_system(const QString &command, uint flags, uint timeout)
 {
-    flags &= kMSRunShell;
-    MythSystem ms = MythSystem(command, flags & kMSRunShell);
+    flags |= kMSRunShell;
+    MythSystem ms = MythSystem(command, flags | kMSRunShell);
     ms.Run(timeout);
     uint result = ms.Wait(0);
     return result;

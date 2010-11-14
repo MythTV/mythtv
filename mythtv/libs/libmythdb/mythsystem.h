@@ -37,6 +37,7 @@ class MythSystemManager : public QThread
     private:
         MSMap_t  m_pMap;
         QMutex   m_mapLock;
+        char     m_readbuf[65336];
 };
 
 class MPUBLIC MythSystem : public QObject
@@ -47,8 +48,8 @@ class MPUBLIC MythSystem : public QObject
         MythSystem(const MythSystem &other);
         ~MythSystem(void);
 
-        void Run(time_t);
-        uint Wait(time_t);
+        void Run(time_t timeout = 0);
+        uint Wait(time_t timeout = 0);
 
         ssize_t Write(const QByteArray*);
         QByteArray *Read(int size);
@@ -56,7 +57,7 @@ class MPUBLIC MythSystem : public QObject
         QByteArray *ReadAll() const;
         QByteArray *ReadAllErr() const;
 
-        void Term(bool);
+        void Term(bool force=false);
         void Kill() const;
         void Stop() const;
         void Cont() const;
