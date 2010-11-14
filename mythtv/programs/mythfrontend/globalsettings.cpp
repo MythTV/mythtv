@@ -367,7 +367,7 @@ void AudioConfigSettings::UpdateCapabilities(const QString &device)
     for (int i = 1; i <= max_speakers; i++)
     {
         if (invalid || settings.IsSupportedChannels(i) ||
-            (bForceDigital && (i == 2 || i == 6)))
+            (bForceDigital && i == 6))
         {
             QString txt;
 
