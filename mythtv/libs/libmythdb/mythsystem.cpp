@@ -241,20 +241,38 @@ void MythSystemManager::append(MythSystem *ms)
  * MythSystem method defines
  ******************************/
 
-// need to finish up these constructors
-MythSystem::MythSystem(const QString &command, uint flags) :
-    m_status(GENERIC_EXIT_START)
+MythSystem::MythSystem(const QString &command, uint flags)
 {
+    setCommand(command, flags);
+}
+
+/** \fn MythSystem::setCommand(const QString &command) 
+ *  \brief Resets an existing MythSystem object to a new command
+ */
+void MythSystem::SetCommand(const QString &command, uint flags)
+{
+    m_status = GENERIC_EXIT_START;
     ProcessFlags(flags);
     // force shell operation
     m_useshell = true;
     m_command = QString(command);
 }
 
+
 MythSystem::MythSystem(const QString &command, 
-                       const QStringList &args, uint flags) :
-    m_status(GENERIC_EXIT_START)
+                       const QStringList &args, uint flags)
 {
+    setCommand(command, args, flags);
+}
+
+/** \fn MythSystem::setCommand(const QString &command, 
+                               const QStringList &args)
+ *  \brief Resets an existing MythSystem object to a new command
+ */
+void MythSystem::SetCommand(const QString &command, 
+                            const QStringList &args, uint flags)
+{
+    m_status = GENERIC_EXIT_START;
     // check for execute rights
     if( !access(command.toUtf8().constData(), X_OK) )
     {
@@ -271,6 +289,7 @@ MythSystem::MythSystem(const QString &command,
     else
         m_args = QStringList(args);
 }
+
 
 MythSystem::MythSystem(const MythSystem &other) :
     m_status(other.m_status),

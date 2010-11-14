@@ -49,6 +49,9 @@ class MPUBLIC MythSystem : public QObject
         MythSystem(const MythSystem &other);
         ~MythSystem(void);
 
+        SetCommand(const QString &, uint);
+        SetCommand(const QString &, const QStringList &, uint);
+
         void Run(time_t timeout = 0);
         uint Wait(time_t timeout = 0);
 
