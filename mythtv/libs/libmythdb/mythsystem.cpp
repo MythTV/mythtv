@@ -772,7 +772,13 @@ uint myth_system(const QString &command, uint flags, uint timeout)
     return result;
 }
 
-
+extern "C" {
+    unsigned int myth_system_c(char *command, uint flags, uint timeout)
+    {
+        QString cmd(command);
+        return myth_system(cmd, flags, timeout);
+    }
+}
 
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4

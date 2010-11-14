@@ -1,14 +1,6 @@
 #ifndef MYTHSYSTEM_H_
 #define MYTHSYSTEM_H_
 
-#include <QString>
-#include <QStringList>
-#include <QBuffer>
-#include <QMutex>
-#include <QMap>
-#include <QThread>
-#include <unistd.h>  // for pid_t
-
 #include "mythexp.h"
 
 typedef enum MythSystemMask {
@@ -24,6 +16,15 @@ typedef enum MythSystemMask {
     kMSBuffered                 = 0x00000018, //< buffer the IO channels
     kMSRunShell                 = 0x00000020, //< run process through bourne shell
 } MythSystemFlag;
+
+#ifdef __cplusplus
+#include <QString>
+#include <QStringList>
+#include <QBuffer>
+#include <QMutex>
+#include <QMap>
+#include <QThread>
+#include <unistd.h>  // for pid_t
 
 class MythSystem;
 
@@ -105,6 +106,15 @@ class MPUBLIC MythSystem : public QObject
 MPUBLIC unsigned int myth_system(const QString &command, 
                                  uint flags = kMSNone,
                                  uint timeout = 0);
+extern "C" {
+#endif
+
+/* C prototype */
+MPUBLIC unsigned int myth_system_c(char *command, uint flags, uint timeout);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
