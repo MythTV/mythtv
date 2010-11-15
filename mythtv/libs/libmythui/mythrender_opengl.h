@@ -133,6 +133,7 @@ class MythRenderOpenGL : public QGLContext, public MythRender
   private:
     void Init2DState(void);
     void InitProcs(void);
+    void* GetProcAddress(const QString &proc) const;
     void InitFeatures(void);
     void Reset(void);
     void ResetVars(void);

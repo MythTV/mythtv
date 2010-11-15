@@ -1103,9 +1103,9 @@ bool MythRenderOpenGL::HasGLXWaitVideoSyncSGI(void)
         if (glxExt.contains(QLatin1String("GLX_SGI_video_sync")))
         {
             g_glXGetVideoSyncSGI = (MYTH_GLXGETVIDEOSYNCSGIPROC)
-                getProcAddress("glXGetVideoSyncSGI");
+                GetProcAddress("glXGetVideoSyncSGI");
             g_glXWaitVideoSyncSGI = (MYTH_GLXWAITVIDEOSYNCSGIPROC)
-                getProcAddress("glXWaitVideoSyncSGI");
+                GetProcAddress("glXWaitVideoSyncSGI");
         }
 #endif
         doneCurrent();
@@ -1160,83 +1160,91 @@ void MythRenderOpenGL::InitProcs(void)
     m_extensions = (reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS)));
 
     m_glActiveTexture = (MYTH_GLACTIVETEXTUREPROC)
-        getProcAddress("glActiveTexture");
+        GetProcAddress("glActiveTexture");
     m_glMapBufferARB = (MYTH_GLMAPBUFFERARBPROC)
-        getProcAddress("glMapBufferARB");
+        GetProcAddress("glMapBufferARB");
     m_glBindBufferARB = (MYTH_GLBINDBUFFERARBPROC)
-        getProcAddress("glBindBufferARB");
+        GetProcAddress("glBindBufferARB");
     m_glGenBuffersARB = (MYTH_GLGENBUFFERSARBPROC)
-        getProcAddress("glGenBuffersARB");
+        GetProcAddress("glGenBuffersARB");
     m_glBufferDataARB = (MYTH_GLBUFFERDATAARBPROC)
-        getProcAddress("glBufferDataARB");
+        GetProcAddress("glBufferDataARB");
     m_glUnmapBufferARB = (MYTH_GLUNMAPBUFFERARBPROC)
-        getProcAddress("glUnmapBufferARB");
+        GetProcAddress("glUnmapBufferARB");
     m_glDeleteBuffersARB = (MYTH_GLDELETEBUFFERSARBPROC)
-        getProcAddress("glDeleteBuffersARB");
+        GetProcAddress("glDeleteBuffersARB");
     m_glGenProgramsARB = (MYTH_GLGENPROGRAMSARBPROC)
-        getProcAddress("glGenProgramsARB");
+        GetProcAddress("glGenProgramsARB");
     m_glBindProgramARB = (MYTH_GLBINDPROGRAMARBPROC)
-        getProcAddress("glBindProgramARB");
+        GetProcAddress("glBindProgramARB");
     m_glProgramStringARB = (MYTH_GLPROGRAMSTRINGARBPROC)
-        getProcAddress("glProgramStringARB");
+        GetProcAddress("glProgramStringARB");
     m_glProgramEnvParameter4fARB = (MYTH_GLPROGRAMENVPARAMETER4FARBPROC)
-        getProcAddress("glProgramEnvParameter4fARB");
+        GetProcAddress("glProgramEnvParameter4fARB");
     m_glDeleteProgramsARB = (MYTH_GLDELETEPROGRAMSARBPROC)
-        getProcAddress("glDeleteProgramsARB");
+        GetProcAddress("glDeleteProgramsARB");
     m_glGetProgramivARB = (MYTH_GLGETPROGRAMIVARBPROC)
-        getProcAddress("glGetProgramivARB");
+        GetProcAddress("glGetProgramivARB");
     m_glGenFramebuffersEXT = (MYTH_GLGENFRAMEBUFFERSEXTPROC)
-        getProcAddress("glGenFramebuffersEXT");
+        GetProcAddress("glGenFramebuffersEXT");
     m_glBindFramebufferEXT = (MYTH_GLBINDFRAMEBUFFEREXTPROC)
-        getProcAddress("glBindFramebufferEXT");
+        GetProcAddress("glBindFramebufferEXT");
     m_glFramebufferTexture2DEXT = (MYTH_GLFRAMEBUFFERTEXTURE2DEXTPROC)
-        getProcAddress("glFramebufferTexture2DEXT");
+        GetProcAddress("glFramebufferTexture2DEXT");
     m_glCheckFramebufferStatusEXT = (MYTH_GLCHECKFRAMEBUFFERSTATUSEXTPROC)
-        getProcAddress("glCheckFramebufferStatusEXT");
+        GetProcAddress("glCheckFramebufferStatusEXT");
     m_glDeleteFramebuffersEXT = (MYTH_GLDELETEFRAMEBUFFERSEXTPROC)
-        getProcAddress("glDeleteFramebuffersEXT");
+        GetProcAddress("glDeleteFramebuffersEXT");
     m_glGenFencesNV = (MYTH_GLGENFENCESNVPROC)
-        getProcAddress("glGenFencesNV");
+        GetProcAddress("glGenFencesNV");
     m_glDeleteFencesNV = (MYTH_GLDELETEFENCESNVPROC)
-        getProcAddress("glDeleteFencesNV");
+        GetProcAddress("glDeleteFencesNV");
     m_glSetFenceNV = (MYTH_GLSETFENCENVPROC)
-        getProcAddress("glSetFenceNV");
+        GetProcAddress("glSetFenceNV");
     m_glFinishFenceNV = (MYTH_GLFINISHFENCENVPROC)
-        getProcAddress("glFinishFenceNV");
+        GetProcAddress("glFinishFenceNV");
     m_glGenFencesAPPLE = (MYTH_GLGENFENCESAPPLEPROC)
-        getProcAddress("glGenFencesAPPLE");
+        GetProcAddress("glGenFencesAPPLE");
     m_glDeleteFencesAPPLE = (MYTH_GLDELETEFENCESAPPLEPROC)
-        getProcAddress("glDeleteFencesAPPLE");
+        GetProcAddress("glDeleteFencesAPPLE");
     m_glSetFenceAPPLE = (MYTH_GLSETFENCEAPPLEPROC)
-        getProcAddress("glSetFenceAPPLE");
+        GetProcAddress("glSetFenceAPPLE");
     m_glFinishFenceAPPLE = (MYTH_GLFINISHFENCEAPPLEPROC)
-        getProcAddress("glFinishFenceAPPLE");
+        GetProcAddress("glFinishFenceAPPLE");
     m_glCreateShaderObject = (MYTH_GLCREATESHADEROBJECT)
-        getProcAddress("glCreateShaderObjectARB");
+        GetProcAddress("glCreateShaderObjectARB");
     m_glShaderSource = (MYTH_GLSHADERSOURCE)
-        getProcAddress("glShaderSourceARB");
+        GetProcAddress("glShaderSourceARB");
     m_glCompileShader = (MYTH_GLCOMPILESHADER)
-        getProcAddress("glCompileShaderARB");
+        GetProcAddress("glCompileShaderARB");
     m_glCreateProgramObject = (MYTH_GLCREATEPROGRAMOBJECT)
-        getProcAddress("glCreateProgramObjectARB");
+        GetProcAddress("glCreateProgramObjectARB");
     m_glAttachObject = (MYTH_GLATTACHOBJECT)
-        getProcAddress("glAttachObjectARB");
+        GetProcAddress("glAttachObjectARB");
     m_glLinkProgram = (MYTH_GLLINKPROGRAM)
-        getProcAddress("glLinkProgramARB");
+        GetProcAddress("glLinkProgramARB");
     m_glUseProgram = (MYTH_GLUSEPROGRAM)
-        getProcAddress("glUseProgramObjectARB");
+        GetProcAddress("glUseProgramObjectARB");
     m_glGetInfoLog = (MYTH_GLGETINFOLOG)
-        getProcAddress("glGetInfoLogARB");
+        GetProcAddress("glGetInfoLogARB");
     m_glGetObjectParameteriv = (MYTH_GLGETOBJECTPARAMETERIV)
-        getProcAddress("glGetObjectParameterivARB");
+        GetProcAddress("glGetObjectParameterivARB");
     m_glDetachObject = (MYTH_GLDETACHOBJECT)
-        getProcAddress("glDetachObjectARB");
+        GetProcAddress("glDetachObjectARB");
     m_glDeleteObject = (MYTH_GLDELETEOBJECT)
-        getProcAddress("glDeleteObjectARB");
+        GetProcAddress("glDeleteObjectARB");
     m_glGetUniformLocation = (MYTH_GLGETUNIFORMLOCATION)
-        getProcAddress("glGetUniformLocationARB");
+        GetProcAddress("glGetUniformLocationARB");
     m_glUniform4f = (MYTH_GLUNIFORM4F)
-        getProcAddress("glUniform4fARB");
+        GetProcAddress("glUniform4fARB");
+}
+
+void* MythRenderOpenGL::GetProcAddress(const QString &proc) const
+{
+    void *result = getProcAddress(proc);
+    if (result == NULL)
+        VERBOSE(VB_EXTRA, LOC + QString("Extension not found: %1").arg(proc));
+    return result;
 }
 
 void MythRenderOpenGL::InitFeatures(void)
