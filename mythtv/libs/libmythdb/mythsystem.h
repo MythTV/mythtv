@@ -67,6 +67,7 @@ class MPUBLIC MythSystem : public QObject
 
         void SetCommand(const QString &, uint);
         void SetCommand(const QString &, const QStringList &, uint);
+        void SetDirectory(const QString &);
 
         void Run(time_t timeout = 0);
         uint Wait(time_t timeout = 0);
@@ -108,6 +109,7 @@ class MPUBLIC MythSystem : public QObject
 
         QString     m_command;
         QStringList m_args;
+        QString     m_directory;
 
         int     m_stdpipe[3]; // should there be a means of hitting these directly?
         QBuffer m_stdbuff[2]; // do these need to be allocated?
@@ -125,6 +127,7 @@ class MPUBLIC MythSystem : public QObject
         bool  m_usestderr;
         bool  m_bufferedio;
         bool  m_useshell;
+        bool  m_setdirectory;
 };
 
 MPUBLIC unsigned int myth_system(const QString &command, 

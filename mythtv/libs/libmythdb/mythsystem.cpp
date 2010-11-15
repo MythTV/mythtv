@@ -254,7 +254,6 @@ void MythSystemManager::RunManagerThread()
 void MythSystemManager::RunSignalThread(void)
 {
     VERBOSE(VB_GENERAL, "Starting process signal handler");
-
     while( gCoreContext )
     {
         usleep(50000); // sleep 50ms
@@ -372,6 +371,13 @@ MythSystem::MythSystem(const MythSystem &other) :
 // QBuffers may also need freeing
 MythSystem::~MythSystem(void)
 {
+}
+
+
+void MythSystem::SetDirectory(const QString &directory)
+{
+    m_setdirectory = true;
+    m_directory = QString(directory);
 }
 
 /** \fn MythSystem::Run()
@@ -534,6 +540,7 @@ void MythSystem::ProcessFlags(uint flags)
     m_usestderr       = false;
     m_bufferedio      = false;
     m_useshell        = false;
+    m_setdirectory    = false;
 
     if( m_status != GENERIC_EXIT_START )
         return;
@@ -721,6 +728,9 @@ void MythSystem::Fork()
     }
     char **cmdargs = (char **)_cmdargs.data();
 
+    const char *directory;
+    directory = m_directory.toUtf8().constData();
+
     pid_t child = fork();
 
     if (child < 0)
@@ -820,6 +830,18 @@ void MythSystem::Fork()
         /* Close all open file descriptors except stdin/stdout/stderr */
         for( int i = sysconf(_SC_OPEN_MAX) - 1; i > 2; i-- )
             close(i);
+
+        /* set directory */
+        if( m_setdirectory )
+        {
+            chdir(directory);
+            if( errno )
+            {
+                cerr << locerr
+                     << "chdir() failed: "
+                     << strerror(errno) << endl;
+            }
+        }
 
         /* run command */
         execv(command, cmdargs);
