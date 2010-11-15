@@ -958,8 +958,8 @@ void MythRenderOpenGL::DrawBitmap(uint tex, uint target, const QRect *src,
                                   const QRect *dst, uint prog, int alpha,
                                   int red, int green, int blue)
 {
-    if (tex && !m_textures.contains(tex))
-        tex = 0;
+    if (!tex || !m_textures.contains(tex))
+        return;
 
     if (target && !m_framebuffers.contains(target))
         target = 0;
@@ -974,26 +974,12 @@ void MythRenderOpenGL::DrawBitmap(uint tex, uint target, const QRect *src,
     SetBlend(true);
     SetColor(red, green, blue, alpha);
 
-    if (tex)
-    {
-        EnableTextures(tex);
-        glBindTexture(m_textures[tex].m_type, tex);
-        UpdateTextureVertices(tex, src, dst);
-        glVertexPointer(2, GL_FLOAT, 0, &m_textures[tex].m_vertices);
-        glTexCoordPointer(2, GL_FLOAT, 0, &m_textures[tex].m_texcoords);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    }
-    else
-    {
-        DisableTextures();
-        GLfloat vertices[8];
-        vertices[2] = vertices[0] = dst->left();
-        vertices[5] = vertices[1] = dst->top();
-        vertices[4] = vertices[6] = dst->left() + dst->width();
-        vertices[3] = vertices[7] = dst->top() + dst->height();
-        glVertexPointer(2, GL_FLOAT, 0, &vertices);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    }
+    EnableTextures(tex);
+    glBindTexture(m_textures[tex].m_type, tex);
+    UpdateTextureVertices(tex, src, dst);
+    glVertexPointer(2, GL_FLOAT, 0, &m_textures[tex].m_vertices);
+    glTexCoordPointer(2, GL_FLOAT, 0, &m_textures[tex].m_texcoords);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     doneCurrent();
 }
