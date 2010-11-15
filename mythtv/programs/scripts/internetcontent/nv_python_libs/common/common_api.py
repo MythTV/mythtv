@@ -18,7 +18,7 @@ MythNetvision Grabber scripts that run as a Web application and global functions
 MNV grabbers.
 '''
 
-__version__="v0.2.2"
+__version__="v0.2.3"
 # 0.0.1 Initial development
 # 0.1.0 Alpha release
 # 0.1.1 Added the ability to have a mashup name independant of the mashup title
@@ -50,6 +50,7 @@ __version__="v0.2.2"
 #       when new custom HTML pages were added.
 # 0.2.1 Add the ability for a parameters to be passed to a XSLT style sheet
 # 0.2.2 Added a common XPath extention to test if a string starts or ends with a substring
+# 0.2.3 Fixed Error messages that were not unicode strings
 
 import os, struct, sys, re, datetime, time, subprocess, string
 import urllib
@@ -964,7 +965,7 @@ class getURL(Thread):
 
     def run(self):
         if self.debug:
-            print "getURL href(%s)" % (self.urlDictionary[self.urlKey]['href'], )
+            print u"getURL href(%s)" % (self.urlDictionary[self.urlKey]['href'], )
             print
 
         # Input the data from a url
@@ -985,9 +986,9 @@ class getURL(Thread):
                 try:
                    self.urlDictionary[self.urlKey]['tmp'] = self.urlDictionary[self.urlKey]['tree'].xpath(self.urlDictionary[self.urlKey]['filter'][index], namespaces=self.urlDictionary[self.urlKey]['namespaces'])
                 except AssertionError, e:
-                    sys.stderr.write("No filter results for Name(%s)\n" % self.urlKey)
-                    sys.stderr.write("No filter results for url(%s)\n" % self.urlDictionary[self.urlKey]['href'])
-                    sys.stderr.write("! Error:(%s)\n" % e)
+                    sys.stderr.write(u"No filter results for Name(%s)\n" % self.urlKey)
+                    sys.stderr.write(u"No filter results for url(%s)\n" % self.urlDictionary[self.urlKey]['href'])
+                    sys.stderr.write(u"! Error:(%s)\n" % e)
                     if len(self.urlDictionary[self.urlKey]['filter']) == index-1:
                         return
                     else:
@@ -1003,15 +1004,15 @@ self.urlDictionary[self.urlKey]['parameter']) )
                     else:
                         self.urlDictionary[self.urlKey]['tmp'] = self.urlDictionary[self.urlKey]['xslt'][index](self.urlDictionary[self.urlKey]['tree'])
                 except Exception, e:
-                    sys.stderr.write("! XSLT Error:(%s) Key(%s)\n" % (e, self.urlKey))
+                    sys.stderr.write(u"! XSLT Error:(%s) Key(%s)\n" % (e, self.urlKey))
                     if len(self.urlDictionary[self.urlKey]['filter']) == index-1:
                         return
                     else:
                         continue
                 # Was any data found?
                 if self.urlDictionary[self.urlKey]['tmp'].getroot() == None:
-                    sys.stderr.write("No Xslt results for Name(%s)\n" % self.urlKey)
-                    sys.stderr.write("No Xslt results for url(%s)\n" % self.urlDictionary[self.urlKey]['href'])
+                    sys.stderr.write(u"No Xslt results for Name(%s)\n" % self.urlKey)
+                    sys.stderr.write(u"No Xslt results for url(%s)\n" % self.urlDictionary[self.urlKey]['href'])
                     if len(self.urlDictionary[self.urlKey]['filter']) == index-1:
                         return
                     else:

@@ -46,7 +46,7 @@
   </subDirectory>
 
   <subDirectory name="Tribute.ca">
-    <sourceURL enabled="true" name="Tribute.ca"  xsltFile="tributecaHTML_item" type="html" url="http://www.tribute.ca/trailers/"/>
+    <sourceURL enabled="true" name="Tribute.ca"  xsltFile="tributecaHTML_item" type="html" url="http://www.tribute.ca/movietrailers/"/>
   </subDirectory>
 
   <subDirectory name="TrailerAddict.com">

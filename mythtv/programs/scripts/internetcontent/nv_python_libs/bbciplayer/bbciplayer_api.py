@@ -20,13 +20,14 @@ provided by BBC (http://www.bbc.co.uk). The specific BBC iPlayer RSS feeds that 
 "~/.mythtv/MythNetvision/userGrabberPrefs/bbciplayer.xml"
 '''
 
-__version__="v0.1.2"
+__version__="v0.1.3"
 # 0.1.0 Initial development
 # 0.1.1 Changed the logger to only output to stderr rather than a file
 # 0.1.2 Fixed incorrect URL creation for RSS feed Web pages
 #       Restricted custom HTML web pages to Video media only. Audio will only play from its Web page.
 #       Add the "customhtml" tag to search and treeviews
 #       Removed the need for python MythTV bindings and added "%SHAREDIR%" to icon directory path
+# 0.1.3 Fixed search due to BBC Web site changes
 
 import os, struct, sys, re, time, datetime, shutil, urllib, re
 import logging
@@ -349,16 +350,19 @@ class Videos(object):
             urlType = u'fullscreen'
 
         # Translate the search results into MNV RSS item format
-        linkFilter = etree.XPath(u".//div[@class='episode-details']/a")
-        titleFilter = etree.XPath(u".//div[@class='episode-details']/h3")
-        descFilter = etree.XPath(u".//div[@class='episode-details']//p")
-        thumbnailFilter = etree.XPath(u".//div[@class='episode-thumbnail']//img")
+        audioFilter = etree.XPath('./@class="audio"')
+        linkFilter = etree.XPath(u".//div[@class='episode-info']//a")
+        titleFilter = etree.XPath(u".//div[@class='episode-info']//a")
+        descFilter = etree.XPath(u".//div[@class='episode-info']//p[@class='episode-synopsis']")
+        thumbnailFilter = etree.XPath(u".//div[@class='episode-image']//img")
         itemDict = {}
         for result in searchResults:
             tmpLink = linkFilter(result)
             if not len(tmpLink):   # Make sure that this result actually has a video
                 continue
             bbciplayerItem = etree.XML(self.common.mnvItem)
+            # Is this an Audio or Video item (true/false)
+            audioTF = audioFilter(result)
             # Extract and massage data
             link = tmpLink[0].attrib['href']
             if urlType == 'bigscreen':
@@ -366,7 +370,7 @@ class Videos(object):
             elif urlType == 'bbcweb':
                 link = u'http://www.bbc.co.uk'+ link
             else:
-                if tmpLink[0].attrib['class'].find('cta-video') != -1:
+                if not audioTF:
                     link = link.replace(u'/iplayer/episode/', u'')
                     index = link.find(u'/')
                     link = link[:index]
@@ -388,7 +392,10 @@ class Videos(object):
             bbciplayerItem.xpath('.//media:thumbnail', namespaces=self.common.namespaces)[0].attrib['url'] = self.common.ampReplace(thumbnailFilter(result)[0].attrib['src'])
             bbciplayerItem.xpath('.//media:content', namespaces=self.common.namespaces)[0].attrib['url'] = link
             # Videos are only viewable in the UK so add a country indicator if this is a video
-            countCode = self.setCountry(result)
+            if audioTF:
+                countCode = None
+            else:
+                countCode = u'uk'
             if countCode:
                 etree.SubElement(bbciplayerItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}country").text = countCode
             s_e = self.getSeasonEpisode(title)

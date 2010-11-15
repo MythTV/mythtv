@@ -21,8 +21,9 @@ See this link for the specifications:
 http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format
 '''
 
-__version__="v0.1.0"
+__version__="v0.1.1"
 # 0.1.0 Initial development
+# 0.1.1 Changes to due to Web site modifications
 
 
 # Specify the class names that have XPath extention functions
@@ -91,8 +92,9 @@ class xpathFunctions(object):
     """Functions specific extending XPath
     """
     def __init__(self):
-        self.functList = ['tributecaLinkGeneration', 'tributecaThumbnailLink', 'tributecaTopTenTitle', 'tributecaIsCustomHTML', 'tributecaCheckIfDBItem', ]
+        self.functList = ['tributecaLinkGeneration', 'tributecaThumbnailLink', 'tributecaTopTenTitle', 'tributecaIsCustomHTML', 'tributecaCheckIfDBItem', 'tributecaDebug', 'tributecaGetAnchors', ]
         self.TextTail = etree.XPath("string()")
+        self.anchorList = etree.XPath(".//a", namespaces=common.namespaces)
         self.persistence = {}
     # end __init__()
 
@@ -104,12 +106,13 @@ class xpathFunctions(object):
 
     def tributecaLinkGeneration(self, context, *args):
         '''Generate a link for the Tribute.ca site. Sigificant massaging of the title is required.
-        Call example: 'mnvXpath:tributecaLinkGeneration(string(.), string(preceding-sibling::a[1]))'
+        Call example: 'mnvXpath:tributecaLinkGeneration(position(), ..//a)'
         return the url link
         '''
         downloadURL = u'http://www.tribute.ca/streamingflash/%s.flv'
         position = int(args[0])-1
         webURL = u'http://www.tribute.ca%s' % args[1][position].attrib['href'].strip()
+
         # If this is for the download then just return what was found for the "link" element
         if self.persistence.has_key('tributecaLinkGeneration'):
             if self.persistence['tributecaLinkGeneration'] != None:
@@ -151,7 +154,6 @@ class xpathFunctions(object):
             trailer2 = u'tr2'
         if currentTitle.find(': An IMAX') != -1:
             trailer2 = u'tr2'
-
         titleArray[0] = titleArray[0].replace(u'&', u'and')
         self.persistence['tributecaThumbnailLink'] = urllib.quote_plus(titleArray[0].lower().replace(u' ', u'_').replace(u"'", u'').replace(u'-', u'_').replace(u'?', u'').replace(u'.', u'').encode("utf-8"))
         titleArray[0] = urllib.quote_plus(re.sub('[%s]' % re.escape(string.punctuation), '', titleArray[0].lower().replace(u' ', u'').encode("utf-8")))
@@ -159,7 +161,6 @@ class xpathFunctions(object):
         # Verify that the FLV file url really exits. If it does not then use the Web page link.
         videocode = u'%s%s' % (titleArray[0], trailer2)
         flvURL = downloadURL % videocode
-
         resultCheckUrl = common.checkURL(flvURL)
         if not resultCheckUrl[0] or resultCheckUrl[1]['Content-Type'] != u'video/x-flv':
             if trailer2 != u'':
@@ -183,7 +184,6 @@ class xpathFunctions(object):
                             flvURL = webURL
                     else:
                         flvURL = webURL
-
         if flvURL != webURL:
             self.persistence['tributecaLinkGeneration'] = videocode
             return common.linkWebPage(u'dummycontext', 'tributeca')+videocode
@@ -251,6 +251,33 @@ class xpathFunctions(object):
         '''
         return common.checkIfDBItem('dummy', {'feedtitle': 'Movie Trailers', 'title': arg[0].replace('Trailer', u'').strip(), 'author': arg[1], 'description': arg[2]})
     # end tributecaCheckIfDBItem()
+
+    def tributecaGetAnchors(self, context, *arg):
+        ''' Routine used to get specific anchor elements.
+        Unfortunitely position dependant.
+        Call: mnvXpath:tributecaGetAnchors(//ul[@class='clump'], 3)
+        '''
+        return self.anchorList(arg[0][int(arg[1])])
+    # end tributecaGetAnchors()
+
+    def tributecaDebug(self, context, *arg):
+        ''' Routine only used for debugging. Prints out the node
+        passed as an argument. Not to be used in production.
+        Call example: mnvXpath:tributecaDebug(//a)
+        '''
+        testpath = etree.XPath(".//a", namespaces=common.namespaces)
+        print arg
+        count = 0
+        for x in arg:
+            sys.stdout.write(u'\nElement Count (%s):\n' % count)
+#            for y in testpath(x):
+#                sys.stdout.write(etree.tostring(y, encoding='UTF-8', pretty_print=True))
+            print "testpath(%s)" % testpath(x)
+            count+=1
+        print
+#        sys.stdout.write(etree.tostring(arg[0], encoding='UTF-8', pretty_print=True))
+        return u"========tributecaDebug Called========="
+    # end tributecaDebug()
 
 ######################################################################################################
 #

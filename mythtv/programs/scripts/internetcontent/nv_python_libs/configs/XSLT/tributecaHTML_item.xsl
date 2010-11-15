@@ -30,8 +30,12 @@
 
     <xsl:template name="featured">
         <xsl:element name="directory">
-            <xsl:attribute name="name"><xsl:value-of select="string('Featured movie Trailers')"/></xsl:attribute>
-            <xsl:attribute name="thumbnail"><xsl:value-of select="string('http://www.tribute.ca/images/tribute_title.gif')"/></xsl:attribute>
+            <xsl:attribute name="name">
+                <xsl:value-of select="string('Featured movie Trailers')"/>
+            </xsl:attribute>
+            <xsl:attribute name="thumbnail">
+                <xsl:value-of select="string('http://www.tribute.ca/images/tribute_title.gif')"/>
+            </xsl:attribute>
             <xsl:for-each select="//a[@class]/img[@src]/..">
                 <dataSet>
                     <directoryThumbnail>http://www.tribute.ca/images/tribute_title.gif</directoryThumbnail>
@@ -74,7 +78,8 @@
         <xsl:element name="directory">
             <xsl:attribute name="name"><xsl:value-of select="string('Movie Trailers Now Playing')"/></xsl:attribute>
             <xsl:attribute name="thumbnail"><xsl:value-of select="string('http://www.tribute.ca/images/tribute_title.gif')"/></xsl:attribute>
-            <xsl:for-each select="//h3[string(span)='Movie Trailers Now Playing']/..//a">
+            <!-- ul = 1 for 'Movie Trailers Now Playing'-->
+            <xsl:for-each select="mnvXpath:tributecaGetAnchors(//ul[@class='clump'], 1)">
                 <dataSet>
                     <directoryThumbnail>http://www.tribute.ca/images/tribute_title.gif</directoryThumbnail>
                     <xsl:choose>
@@ -87,7 +92,7 @@
                                 <author>Tribute.ca</author>
                                 <pubDate><xsl:value-of select="mnvXpath:pubDate('Now')"/></pubDate>
                                 <description><xsl:value-of select="normalize-space(./@title)"/></description>
-                                <link><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Movie Trailers Now Playing']/..//a)"/></link>
+                                <link><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), ../..//a)"/></link>
                                 <xsl:if test="mnvXpath:tributecaIsCustomHTML(('dummy'))">
                                     <mythtv:customhtml>true</mythtv:customhtml>
                                 </xsl:if>
@@ -96,7 +101,7 @@
                                         <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaThumbnailLink(string(.))"/></xsl:attribute>
                                     </xsl:element>
                                     <xsl:element name="media:content">
-                                        <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Movie Trailers Now Playing']/..//a)"/></xsl:attribute>
+                                        <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), ../..//a)"/></xsl:attribute>
                                         <xsl:attribute name="duration"></xsl:attribute>
                                         <xsl:attribute name="width"></xsl:attribute>
                                         <xsl:attribute name="height"></xsl:attribute>
@@ -114,9 +119,10 @@
 
     <xsl:template name="comingsoon">
         <xsl:element name="directory">
-            <xsl:attribute name="name"><xsl:value-of select="string('Coming Soon Movie Trailers')"/></xsl:attribute>
+            <xsl:attribute name="name"><xsl:value-of select="string('Coming Soon  Movie Trailers')"/></xsl:attribute>
             <xsl:attribute name="thumbnail"><xsl:value-of select="string('http://www.tribute.ca/images/tribute_title.gif')"/></xsl:attribute>
-            <xsl:for-each select="//h3[string(span)='Coming Soon Movie Trailers']/..//a">
+            <!-- ul = 3 for 'Coming Soon  Movie Trailers'-->
+            <xsl:for-each select="mnvXpath:tributecaGetAnchors(//ul[@class='clump'], 3)">
                 <dataSet>
                     <directoryThumbnail>http://www.tribute.ca/images/tribute_title.gif</directoryThumbnail>
                     <xsl:choose>
@@ -129,7 +135,7 @@
                                 <author>Tribute.ca</author>
                                 <pubDate><xsl:value-of select="mnvXpath:pubDate('Now')"/></pubDate>
                                 <description><xsl:value-of select="concat(normalize-space(string(.)), ' coming ', normalize-space(string(../small/i)))"/></description>
-                                <link><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Coming Soon Movie Trailers']/..//a)"/></link>
+                                <link><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), ../..//a)"/></link>
                                 <xsl:if test="mnvXpath:tributecaIsCustomHTML(('dummy'))">
                                     <mythtv:customhtml>true</mythtv:customhtml>
                                 </xsl:if>
@@ -138,7 +144,7 @@
                                         <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaThumbnailLink(string(.))"/></xsl:attribute>
                                     </xsl:element>
                                     <xsl:element name="media:content">
-                                        <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Coming Soon Movie Trailers']/..//a)"/></xsl:attribute>
+                                        <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), ../..//a)"/></xsl:attribute>
                                         <xsl:attribute name="duration"></xsl:attribute>
                                         <xsl:attribute name="width"></xsl:attribute>
                                         <xsl:attribute name="height"></xsl:attribute>
@@ -158,7 +164,8 @@
         <xsl:element name="directory">
             <xsl:attribute name="name"><xsl:value-of select="string('Top 10 Upcoming Trailers')"/></xsl:attribute>
             <xsl:attribute name="thumbnail"><xsl:value-of select="string('http://www.tribute.ca/images/tribute_title.gif')"/></xsl:attribute>
-            <xsl:for-each select="//h3[string(span)='Top 10 Upcoming Trailers']/..//a">
+            <!-- ul = 2 for 'Top 10 Upcoming Trailers'-->
+            <xsl:for-each select="mnvXpath:tributecaGetAnchors(//ul[@class='clump'], 2)">
                 <dataSet>
                     <directoryThumbnail>http://www.tribute.ca/images/tribute_title.gif</directoryThumbnail>
                     <xsl:choose>
@@ -171,7 +178,7 @@
                                 <author>Tribute.ca</author>
                                 <pubDate><xsl:value-of select="mnvXpath:pubDate('Now')"/></pubDate>
                                 <description><xsl:value-of select="normalize-space(./@title)"/></description>
-                                <link><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Top 10 Upcoming Trailers']/..//a)"/></link>
+                                <link><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), ../..//a)"/></link>
                                 <xsl:if test="mnvXpath:tributecaIsCustomHTML(('dummy'))">
                                     <mythtv:customhtml>true</mythtv:customhtml>
                                 </xsl:if>
@@ -180,7 +187,7 @@
                                         <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaThumbnailLink(string(.))"/></xsl:attribute>
                                     </xsl:element>
                                     <xsl:element name="media:content">
-                                        <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Top 10 Upcoming Trailers']/..//a)"/></xsl:attribute>
+                                        <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), ../..//a)"/></xsl:attribute>
                                         <xsl:attribute name="duration"></xsl:attribute>
                                         <xsl:attribute name="width"></xsl:attribute>
                                         <xsl:attribute name="height"></xsl:attribute>
@@ -200,7 +207,8 @@
         <xsl:element name="directory">
             <xsl:attribute name="name"><xsl:value-of select="string('Top Box Office Movie Trailers')"/></xsl:attribute>
             <xsl:attribute name="thumbnail"><xsl:value-of select="string('http://www.tribute.ca/images/tribute_title.gif')"/></xsl:attribute>
-            <xsl:for-each select="//h3[string(span)='Top Box Office Movie Trailers']/..//a">
+            <!-- ul = 0 for 'Top Box Office Movie Trailers'-->
+            <xsl:for-each select="mnvXpath:tributecaGetAnchors(//ul[@class='clump'], 0)">
                 <dataSet>
                     <directoryThumbnail>http://www.tribute.ca/images/tribute_title.gif</directoryThumbnail>
                     <xsl:choose>
@@ -213,7 +221,7 @@
                                 <author>Tribute.ca</author>
                                 <pubDate><xsl:value-of select="mnvXpath:pubDate('Now')"/></pubDate>
                                 <description><xsl:value-of select="normalize-space(./@title)"/></description>
-                                <link><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Top Box Office Movie Trailers']/..//a)"/></link>
+                                <link><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), ..//a)"/></link>
                                 <xsl:if test="mnvXpath:tributecaIsCustomHTML(('dummy'))">
                                     <mythtv:customhtml>true</mythtv:customhtml>
                                 </xsl:if>
@@ -222,7 +230,7 @@
                                         <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaThumbnailLink(string(.))"/></xsl:attribute>
                                     </xsl:element>
                                     <xsl:element name="media:content">
-                                        <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Top Box Office Movie Trailers']/..//a)"/></xsl:attribute>
+                                        <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), ..//a)"/></xsl:attribute>
                                         <xsl:attribute name="duration"></xsl:attribute>
                                         <xsl:attribute name="width"></xsl:attribute>
                                         <xsl:attribute name="height"></xsl:attribute>
