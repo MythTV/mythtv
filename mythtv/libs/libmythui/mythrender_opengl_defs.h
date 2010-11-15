@@ -60,6 +60,10 @@
 #define GL_MAX_TEXTURE_UNITS 0x84E2
 #endif
 
+#ifndef GL_ARRAY_BUFFER_ARB
+#define GL_ARRAY_BUFFER_ARB               0x8892
+#endif
+
 #ifndef GL_PIXEL_UNPACK_BUFFER_ARB
 #define GL_PIXEL_UNPACK_BUFFER_ARB        0x88EC
 #endif

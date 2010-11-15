@@ -62,7 +62,7 @@ class MythGLTexture
     MythGLTexture() :
         m_type(GL_TEXTURE_2D), m_data(NULL), m_data_size(0),
         m_data_type(GL_UNSIGNED_BYTE), m_data_fmt(GL_BGRA),
-        m_internal_fmt(GL_RGBA8), m_pbo(0),
+        m_internal_fmt(GL_RGBA8), m_pbo(0), m_vbo(0),
         m_filter(GL_LINEAR), m_wrap(GL_CLAMP_TO_EDGE),
         m_size(0,0), m_act_size(0,0)
     {
@@ -81,6 +81,7 @@ class MythGLTexture
     GLuint  m_data_fmt;
     GLuint  m_internal_fmt;
     GLuint  m_pbo;
+    GLuint  m_vbo;
     GLuint  m_filter;
     GLuint  m_wrap;
     QSize   m_size;
@@ -459,6 +460,8 @@ uint MythRenderOpenGL::CreateTexture(QSize act_size, bool use_pbo,
             SetTextureFilters(tex, filter, wrap);
             if (use_pbo)
                 m_textures[tex].m_pbo = CreatePBO(tex);
+            //if (use_vbo)
+            //    m_textures[tex].m_vbo = CreateVBO();
         }
         else
         {
@@ -638,6 +641,8 @@ void MythRenderOpenGL::DeleteTexture(uint tex)
         delete m_textures[tex].m_data;
     if (m_textures[tex].m_pbo)
         m_glDeleteBuffersARB(1, &(m_textures[tex].m_pbo));
+    if (m_textures[tex].m_vbo)
+        m_glDeleteBuffersARB(1, &(m_textures[tex].m_vbo));
     m_textures.remove(tex);
 
     Flush(true);
@@ -1315,11 +1320,15 @@ void MythRenderOpenGL::InitFeatures(void)
         m_glCheckFramebufferStatusEXT)
         m_exts_supported += kGLExtFBufObj;
 
-    if(m_extensions.contains("GL_ARB_pixel_buffer_object") &&
-        m_glMapBufferARB  && m_glBindBufferARB &&
-        m_glGenBuffersARB && m_glDeleteBuffersARB &&
-        m_glBufferDataARB && m_glUnmapBufferARB)
+    bool buffer_procs = m_glMapBufferARB  && m_glBindBufferARB &&
+                        m_glGenBuffersARB && m_glDeleteBuffersARB &&
+                        m_glBufferDataARB && m_glUnmapBufferARB;
+
+    if(m_extensions.contains("GL_ARB_pixel_buffer_object") && buffer_procs)
         m_exts_supported += kGLExtPBufObj;
+
+    if (m_extensions.contains("GL_ARB_vertex_buffer_object") && buffer_procs)
+        m_exts_supported += kGLExtVBO;
 
     if(m_extensions.contains("GL_NV_fence") &&
         m_glGenFencesNV && m_glDeleteFencesNV &&
@@ -1460,6 +1469,16 @@ uint MythRenderOpenGL::CreatePBO(uint tex)
 
     Flush(true);
     return tmp_pbo;
+}
+
+uint MythRenderOpenGL::CreateVBO(void)
+{
+    if (!(m_exts_used & kGLExtVBO))
+        return 0;
+
+    GLuint tmp_vbo;
+    m_glGenBuffersARB(1, &tmp_vbo);
+    return tmp_vbo;
 }
 
 void MythRenderOpenGL::DeleteOpenGLResources(void)

@@ -44,7 +44,8 @@ typedef enum
     kGLMipMaps     = 0x0400,
     kGLSL          = 0x0800,
     kGLVertexArray = 0x1000,
-    kGLMaxFeat     = 0x2000,
+    kGLExtVBO      = 0x2000,
+    kGLMaxFeat     = 0x4000,
 } GLFeatures;
 
 class MythGLTexture;
@@ -140,6 +141,7 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     void ResetProcs(void);
 
     uint CreatePBO(uint tex);
+    uint CreateVBO(void);
     void DeleteOpenGLResources(void);
     void DeleteTextures(void);
     void DeletePrograms(void);
