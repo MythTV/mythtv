@@ -42,6 +42,7 @@ static inline int __glCheck__(const QString &loc, const char* fileName, int n)
     return error;
 }
 
+#define MAX_VERTEX_CACHE 50
 #define glCheck() __glCheck__(LOC, __FILE__, __LINE__)
 
 class MythGLShaderObject
@@ -1052,28 +1053,22 @@ void MythRenderOpenGL::DrawRect(const QRect &area, bool drawFill,
     SetBlend(true);
     DisableTextures();
 
-    GLfloat vertices[8];
-    vertices[2] = vertices[0] = area.left();
-    vertices[5] = vertices[1] = area.top();
-    vertices[4] = vertices[6] = area.left() + area.width();
-    vertices[3] = vertices[7] = area.top() + area.height();
-
     if (drawFill)
     {
         SetColor(fillColor.red(), fillColor.green(),
                  fillColor.blue(), fillColor.alpha());
-        glVertexPointer(2, GL_FLOAT, 0, &vertices);
+        GLfloat *vertices = GetCachedVertices(GL_TRIANGLE_STRIP, area);
+        glVertexPointer(2, GL_FLOAT, 0, vertices);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 
     if (drawLine)
     {
-        vertices[7] = vertices[1];
-        vertices[5] = vertices[3];
         SetColor(lineColor.red(), lineColor.green(),
                  lineColor.blue(), lineColor.alpha());
         glLineWidth(lineWidth);
-        glVertexPointer(2, GL_FLOAT, 0, &vertices);
+        GLfloat *vertices = GetCachedVertices(GL_LINE_LOOP, area);
+        glVertexPointer(2, GL_FLOAT, 0, vertices);
         glDrawArrays(GL_LINE_LOOP, 0, 4);
     }
 
@@ -1488,6 +1483,13 @@ void MythRenderOpenGL::DeleteOpenGLResources(void)
     }
 
     Flush(false);
+
+    ExpireVertices();
+    if (m_cachedVertices.size())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString(" %1 unexpired vertices")
+            .arg(m_cachedVertices.size()));
+    }
 }
 
 void MythRenderOpenGL::DeleteTextures(void)
@@ -1586,6 +1588,55 @@ bool MythRenderOpenGL::CheckObjectStatus(uint obj)
         free(infoLog);
     }
     return false;
+}
+
+GLfloat* MythRenderOpenGL::GetCachedVertices(GLuint type, const QRect &area)
+{
+    uint64_t ref = ((uint64_t)area.left() & 0xfff) +
+                  (((uint64_t)area.top() & 0xfff) << 12) +
+                  (((uint64_t)area.width() & 0xfff) << 24) +
+                  (((uint64_t)area.height() & 0xfff) << 36) +
+                  (((uint64_t)type & 0xfff) << 48);
+
+    if (m_cachedVertices.contains(ref))
+    {
+        m_vertexExpiry.removeOne(ref);
+        m_vertexExpiry.append(ref);
+        return m_cachedVertices[ref];
+    }
+
+    GLfloat *vertices = new GLfloat[8];
+
+    vertices[2] = vertices[0] = area.left();
+    vertices[5] = vertices[1] = area.top();
+    vertices[4] = vertices[6] = area.left() + area.width();
+    vertices[3] = vertices[7] = area.top() + area.height();
+
+    if (type == GL_LINE_LOOP)
+    {
+        vertices[7] = vertices[1];
+        vertices[5] = vertices[3];
+    }
+
+    m_cachedVertices.insert(ref, vertices);
+    m_vertexExpiry.append(ref);
+    ExpireVertices(MAX_VERTEX_CACHE);
+
+    return vertices;
+}
+
+void MythRenderOpenGL::ExpireVertices(uint max)
+{
+    while (m_vertexExpiry.size() > max)
+    {
+        uint64_t ref = m_vertexExpiry.first();
+        m_vertexExpiry.removeFirst();
+        GLfloat *vertices = NULL;
+        if (m_cachedVertices.contains(ref))
+            m_cachedVertices.value(ref);
+        m_cachedVertices.remove(ref);
+        delete [] vertices;
+    }
 }
 
 bool MythRenderOpenGL::ClearTexture(uint tex)
