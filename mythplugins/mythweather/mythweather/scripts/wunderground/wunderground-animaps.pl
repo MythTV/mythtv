@@ -5,6 +5,7 @@ use English;
 use strict;
 use warnings;
 
+use File::Path;
 use File::Basename;
 use Cwd 'abs_path';
 use lib dirname(abs_path($0 or $PROGRAM_NAME)),
