@@ -154,8 +154,6 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
     m_currentPlaylist = 0;
     m_currentPlayitem = 0;
     m_currentChapter = 0;
-    m_currentMenuPage = 0;
-    m_currentButton = 0;
     m_currentAudioStream = 0;
     m_currentIGStream = 0;
     m_currentPGTextSTStream = 0;
@@ -167,9 +165,6 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
     m_secondaryVideoIsFullscreen = false;
     m_still = false;
     m_inMenu = false;
-    m_enableButton = 0;
-    m_disableButton = 0;
-    m_popupOff = 0;
 
     VERBOSE(VB_IMPORTANT, LOC + QString("Found %1 relevant titles.")
             .arg(m_numTitles));
@@ -197,7 +192,7 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
     // First, attempt to initialize the disc in HDMV navigation mode.
     // If this fails, fall back to the traditional built-in title switching
     // mode.
-    if (bd_play(bdnav) < 0)
+    if (!bd_play(bdnav))
           SwitchTitle(m_mainTitle);
     else
     {
@@ -524,35 +519,10 @@ void BDRingBufferPriv::HandleBDEvent(BD_EVENT &ev)
 
         /* Interactive Graphics */
 
-        case BD_EVENT_MENU_PAGE_ID:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
-                    QString("BDRingBuf: EVENT_MENU_PAGE_ID %1").arg(ev.param));
-            m_currentMenuPage = ev.param;
-            break;
-        case BD_EVENT_SELECTED_BUTTON_ID:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
-                    QString("BDRingBuf: EVENT_SELECTED_BUTTON_ID %1").arg(ev.param));
-            m_currentButton = ev.param;
-            break;
         case BD_EVENT_STILL:
             VERBOSE(VB_PLAYBACK|VB_EXTRA,
                     QString("BDRingBuf: EVENT_STILL %1").arg(ev.param));
             m_still = ev.param;
-            break;
-        case BD_EVENT_ENABLE_BUTTON:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
-                    QString("BDRingBuf: EVENT_ENABLE_BUTTON %1").arg(ev.param));
-            m_enableButton = ev.param;
-            break;
-        case BD_EVENT_DISABLE_BUTTON:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
-                    QString("BDRingBuf: EVENT_DISABLE_BUTTON %1").arg(ev.param));
-            m_disableButton = ev.param;
-            break;
-        case BD_EVENT_POPUP_OFF:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
-                    QString("BDRingBuf: EVENT_POPUP_OFF %1").arg(ev.param));
-            m_popupOff = ev.param;
             break;
 
         /* stream selection */

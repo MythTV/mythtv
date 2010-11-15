@@ -84,9 +84,6 @@ class MPUBLIC BDRingBufferPriv
     int                m_currentPlayitem;
     int                m_currentChapter;
 
-    int                m_currentMenuPage;
-    int                m_currentButton;
-
     int                m_currentAudioStream;
     int                m_currentIGStream;
     int                m_currentPGTextSTStream;
@@ -101,11 +98,6 @@ class MPUBLIC BDRingBufferPriv
   public:
     bool               m_still;
     bool               m_inMenu;
-
-    // These probably ought to be handled in functions
-    int                m_enableButton;
-    int                m_disableButton;
-    bool               m_popupOff;
 
 };
 #endif

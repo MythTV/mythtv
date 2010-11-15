@@ -48,6 +48,7 @@ typedef enum {
     GC_CTRL_POPUP,           /* param: on/off */
     GC_CTRL_IG_END,          /* execution of IG object is complete */
     GC_CTRL_RESET,           /* reset graphics controller */
+    GC_CTRL_MOUSE_MOVE,      /* move selected button to (x,y), param: (x<<16 | y) */
 } gc_ctrl_e;
 
 typedef struct {

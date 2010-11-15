@@ -395,6 +395,7 @@ static int _play_at(HDMV_VM *p, int playlist, int playitem, int playmark)
 
     if (playlist >= 0) {
         _queue_event(p, HDMV_EVENT_PLAY_PL, playlist);
+        _suspend_object(p);
     }
 
     if (playitem >= 0) {
