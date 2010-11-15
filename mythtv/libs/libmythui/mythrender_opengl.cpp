@@ -10,8 +10,8 @@
 #include <GL/glx.h>
 #endif
 
-MYTH_GLXGETVIDEOSYNCSGIPROC  MythRenderOpenGL::gMythGLXGetVideoSyncSGI  = NULL;
-MYTH_GLXWAITVIDEOSYNCSGIPROC MythRenderOpenGL::gMythGLXWaitVideoSyncSGI = NULL;
+MYTH_GLXGETVIDEOSYNCSGIPROC  MythRenderOpenGL::g_glXGetVideoSyncSGI  = NULL;
+MYTH_GLXWAITVIDEOSYNCSGIPROC MythRenderOpenGL::g_glXWaitVideoSyncSGI = NULL;
 
 static const QString kDefaultVertexShader =
 "#version 140\n"
@@ -204,14 +204,14 @@ void MythRenderOpenGL::Flush(bool use_fence)
     if ((m_exts_used & kGLAppleFence) &&
         (m_fence && use_fence))
     {
-        gMythGLSetFenceAPPLE(m_fence);
-        gMythGLFinishFenceAPPLE(m_fence);
+        m_glSetFenceAPPLE(m_fence);
+        m_glFinishFenceAPPLE(m_fence);
     }
     else if ((m_exts_used & kGLNVFence) &&
              (m_fence && use_fence))
     {
-        gMythGLSetFenceNV(m_fence, GL_ALL_COMPLETED_NV);
-        gMythGLFinishFenceNV(m_fence);
+        m_glSetFenceNV(m_fence, GL_ALL_COMPLETED_NV);
+        m_glFinishFenceNV(m_fence);
     }
     else
     {
@@ -261,13 +261,13 @@ void MythRenderOpenGL::SetFence(void)
     makeCurrent();
     if (m_exts_used & kGLAppleFence)
     {
-        gMythGLGenFencesAPPLE(1, &m_fence);
+        m_glGenFencesAPPLE(1, &m_fence);
         if (m_fence)
             VERBOSE(VB_PLAYBACK, LOC + "Using GL_APPLE_fence");
     }
     else if (m_exts_used & kGLNVFence)
     {
-        gMythGLGenFencesNV(1, &m_fence);
+        m_glGenFencesNV(1, &m_fence);
         if (m_fence)
             VERBOSE(VB_PLAYBACK, LOC + "Using GL_NV_fence");
     }
@@ -289,10 +289,10 @@ void* MythRenderOpenGL::GetTextureBuffer(uint tex, bool create_buffer)
 
     if (m_textures[tex].m_pbo)
     {
-        gMythGLBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, m_textures[tex].m_pbo);
-        gMythGLBufferDataARB(GL_PIXEL_UNPACK_BUFFER_ARB,
+        m_glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, m_textures[tex].m_pbo);
+        m_glBufferDataARB(GL_PIXEL_UNPACK_BUFFER_ARB,
                              m_textures[tex].m_data_size, NULL, GL_STREAM_DRAW);
-        return gMythGLMapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY);
+        return m_glMapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY);
     }
 
     if (m_textures[tex].m_data)
@@ -317,11 +317,11 @@ void MythRenderOpenGL::UpdateTexture(uint tex, void *buf)
 
     if (m_textures[tex].m_pbo)
     {
-        gMythGLUnmapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB);
+        m_glUnmapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB);
         glTexSubImage2D(m_textures[tex].m_type, 0, 0, 0, size.width(),
                         size.height(), m_textures[tex].m_data_fmt,
                         m_textures[tex].m_data_type, 0);
-        gMythGLBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+        m_glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
     }
     else
     {
@@ -540,7 +540,7 @@ void MythRenderOpenGL::ActiveTexture(int active_tex)
     makeCurrent();
     if (m_active_tex != active_tex)
     {
-        gMythGLActiveTexture(active_tex);
+        m_glActiveTexture(active_tex);
         m_active_tex = active_tex;
     }
     doneCurrent();
@@ -637,7 +637,7 @@ void MythRenderOpenGL::DeleteTexture(uint tex)
     if (m_textures[tex].m_data)
         delete m_textures[tex].m_data;
     if (m_textures[tex].m_pbo)
-        gMythGLDeleteBuffersARB(1, &(m_textures[tex].m_pbo));
+        m_glDeleteBuffersARB(1, &(m_textures[tex].m_pbo));
     m_textures.remove(tex);
 
     Flush(true);
@@ -661,19 +661,19 @@ bool MythRenderOpenGL::CreateFrameBuffer(uint &fb, uint tex)
     EnableTextures(tex);
     glPushAttrib(GL_VIEWPORT_BIT);
     glViewport(0, 0, size.width(), size.height());
-    gMythGLGenFramebuffersEXT(1, &glfb);
-    gMythGLBindFramebufferEXT(GL_FRAMEBUFFER_EXT, glfb);
+    m_glGenFramebuffersEXT(1, &glfb);
+    m_glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, glfb);
     glBindTexture(m_textures[tex].m_type, tex);
     glTexImage2D(m_textures[tex].m_type, 0, m_textures[tex].m_internal_fmt,
                  (GLint) size.width(), (GLint) size.height(), 0,
                  m_textures[tex].m_data_fmt, m_textures[tex].m_data_type, NULL);
-    gMythGLFramebufferTexture2DEXT(
+    m_glFramebufferTexture2DEXT(
         GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
         m_textures[tex].m_type, tex, 0);
 
     GLenum status;
-    status = gMythGLCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-    gMythGLBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    status = m_glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+    m_glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     glPopAttrib();
 
     bool success = false;
@@ -723,7 +723,7 @@ bool MythRenderOpenGL::CreateFrameBuffer(uint &fb, uint tex)
     if (success)
         m_framebuffers.push_back(glfb);
     else
-        gMythGLDeleteFramebuffersEXT(1, &glfb);
+        m_glDeleteFramebuffersEXT(1, &glfb);
 
     Flush(true);
     glCheck();
@@ -743,7 +743,7 @@ void MythRenderOpenGL::DeleteFrameBuffer(uint fb)
     {
         if (*it == fb)
         {
-            gMythGLDeleteFramebuffersEXT(1, &(*it));
+            m_glDeleteFramebuffersEXT(1, &(*it));
             m_framebuffers.erase(it);
             break;
         }
@@ -762,7 +762,7 @@ void MythRenderOpenGL::BindFramebuffer(uint fb)
         return;
 
     makeCurrent();
-    gMythGLBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
+    m_glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
     doneCurrent();
     m_active_fb = fb;
 }
@@ -787,9 +787,9 @@ bool MythRenderOpenGL::CreateFragmentProgram(const QString &program, uint &prog)
     QByteArray tmp = program.toAscii();
 
     GLuint glfp;
-    gMythGLGenProgramsARB(1, &glfp);
-    gMythGLBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, glfp);
-    gMythGLProgramStringARB(GL_FRAGMENT_PROGRAM_ARB,
+    m_glGenProgramsARB(1, &glfp);
+    m_glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, glfp);
+    m_glProgramStringARB(GL_FRAGMENT_PROGRAM_ARB,
                             GL_PROGRAM_FORMAT_ASCII_ARB,
                             tmp.length(), tmp.constData());
 
@@ -802,7 +802,7 @@ bool MythRenderOpenGL::CreateFragmentProgram(const QString &program, uint &prog)
 
         success = false;
     }
-    gMythGLGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB,
+    m_glGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB,
                            GL_PROGRAM_UNDER_NATIVE_LIMITS_ARB, &error);
     if (error != 1)
     {
@@ -815,7 +815,7 @@ bool MythRenderOpenGL::CreateFragmentProgram(const QString &program, uint &prog)
     if (success)
         m_programs.push_back(glfp);
     else
-        gMythGLDeleteProgramsARB(1, &glfp);
+        m_glDeleteProgramsARB(1, &glfp);
 
     Flush(true);
     doneCurrent();
@@ -835,7 +835,7 @@ void MythRenderOpenGL::DeleteFragmentProgram(uint fp)
     {
         if (*it == fp)
         {
-            gMythGLDeleteProgramsARB(1, &(*it));
+            m_glDeleteProgramsARB(1, &(*it));
             m_programs.erase(it);
             break;
         }
@@ -868,7 +868,7 @@ void MythRenderOpenGL::EnableFragmentProgram(int fp)
 
     if (fp != m_active_prog)
     {
-        gMythGLBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, fp);
+        m_glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, fp);
         m_active_prog = fp;
     }
 
@@ -889,7 +889,7 @@ uint MythRenderOpenGL::CreateShaderObject(const QString &vertex,
     vert_shader.detach();
     frag_shader.detach();
 
-    result = gMythGLCreateProgramObject();
+    result = m_glCreateProgramObject();
     if (!result)
         return 0;
 
@@ -915,11 +915,11 @@ void MythRenderOpenGL::DeleteShaderObject(uint obj)
 
     GLuint vertex   = m_shader_objects[obj].m_vertex_shader;
     GLuint fragment = m_shader_objects[obj].m_fragment_shader;
-    gMythGLDetachObject(obj, vertex);
-    gMythGLDetachObject(obj, fragment);
-    gMythGLDeleteObject(vertex);
-    gMythGLDeleteObject(fragment);
-    gMythGLDeleteObject(obj);
+    m_glDetachObject(obj, vertex);
+    m_glDetachObject(obj, fragment);
+    m_glDeleteObject(vertex);
+    m_glDeleteObject(fragment);
+    m_glDeleteObject(obj);
     m_shader_objects.remove(obj);
 
     Flush(true);
@@ -934,7 +934,7 @@ void MythRenderOpenGL::EnableShaderObject(uint obj)
     if (!obj && m_active_obj)
     {
         makeCurrent();
-        gMythGLUseProgram(0);
+        m_glUseProgram(0);
         m_active_obj = 0;
         doneCurrent();
         return;
@@ -944,7 +944,7 @@ void MythRenderOpenGL::EnableShaderObject(uint obj)
         return;
 
     makeCurrent();
-    gMythGLUseProgram(obj);
+    m_glUseProgram(obj);
     m_active_obj = obj;
     doneCurrent();
 }
@@ -1102,15 +1102,15 @@ bool MythRenderOpenGL::HasGLXWaitVideoSyncSGI(void)
                                                            screen)));
         if (glxExt.contains(QLatin1String("GLX_SGI_video_sync")))
         {
-            gMythGLXGetVideoSyncSGI = (MYTH_GLXGETVIDEOSYNCSGIPROC)
+            g_glXGetVideoSyncSGI = (MYTH_GLXGETVIDEOSYNCSGIPROC)
                 getProcAddress("glXGetVideoSyncSGI");
-            gMythGLXWaitVideoSyncSGI = (MYTH_GLXWAITVIDEOSYNCSGIPROC)
+            g_glXWaitVideoSyncSGI = (MYTH_GLXWAITVIDEOSYNCSGIPROC)
                 getProcAddress("glXWaitVideoSyncSGI");
         }
 #endif
         doneCurrent();
     }
-    return gMythGLXGetVideoSyncSGI && gMythGLXWaitVideoSyncSGI;
+    return g_glXGetVideoSyncSGI && g_glXWaitVideoSyncSGI;
 }
 
 unsigned int MythRenderOpenGL::GetVideoSyncCount(void)
@@ -1119,7 +1119,7 @@ unsigned int MythRenderOpenGL::GetVideoSyncCount(void)
     if (HasGLXWaitVideoSyncSGI())
     {
         makeCurrent();
-        gMythGLXGetVideoSyncSGI(&count);
+        g_glXGetVideoSyncSGI(&count);
         doneCurrent();
     }
     return count;
@@ -1130,7 +1130,7 @@ void MythRenderOpenGL::WaitForVideoSync(int div, int rem, unsigned int *count)
     if (HasGLXWaitVideoSyncSGI())
     {
         makeCurrent();
-        gMythGLXWaitVideoSyncSGI(div, rem, count);
+        g_glXWaitVideoSyncSGI(div, rem, count);
         doneCurrent();
     }
 }
@@ -1159,83 +1159,83 @@ void MythRenderOpenGL::InitProcs(void)
 {
     m_extensions = (reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS)));
 
-    gMythGLActiveTexture = (MYTH_GLACTIVETEXTUREPROC)
+    m_glActiveTexture = (MYTH_GLACTIVETEXTUREPROC)
         getProcAddress("glActiveTexture");
-    gMythGLMapBufferARB = (MYTH_GLMAPBUFFERARBPROC)
+    m_glMapBufferARB = (MYTH_GLMAPBUFFERARBPROC)
         getProcAddress("glMapBufferARB");
-    gMythGLBindBufferARB = (MYTH_GLBINDBUFFERARBPROC)
+    m_glBindBufferARB = (MYTH_GLBINDBUFFERARBPROC)
         getProcAddress("glBindBufferARB");
-    gMythGLGenBuffersARB = (MYTH_GLGENBUFFERSARBPROC)
+    m_glGenBuffersARB = (MYTH_GLGENBUFFERSARBPROC)
         getProcAddress("glGenBuffersARB");
-    gMythGLBufferDataARB = (MYTH_GLBUFFERDATAARBPROC)
+    m_glBufferDataARB = (MYTH_GLBUFFERDATAARBPROC)
         getProcAddress("glBufferDataARB");
-    gMythGLUnmapBufferARB = (MYTH_GLUNMAPBUFFERARBPROC)
+    m_glUnmapBufferARB = (MYTH_GLUNMAPBUFFERARBPROC)
         getProcAddress("glUnmapBufferARB");
-    gMythGLDeleteBuffersARB = (MYTH_GLDELETEBUFFERSARBPROC)
+    m_glDeleteBuffersARB = (MYTH_GLDELETEBUFFERSARBPROC)
         getProcAddress("glDeleteBuffersARB");
-    gMythGLGenProgramsARB = (MYTH_GLGENPROGRAMSARBPROC)
+    m_glGenProgramsARB = (MYTH_GLGENPROGRAMSARBPROC)
         getProcAddress("glGenProgramsARB");
-    gMythGLBindProgramARB = (MYTH_GLBINDPROGRAMARBPROC)
+    m_glBindProgramARB = (MYTH_GLBINDPROGRAMARBPROC)
         getProcAddress("glBindProgramARB");
-    gMythGLProgramStringARB = (MYTH_GLPROGRAMSTRINGARBPROC)
+    m_glProgramStringARB = (MYTH_GLPROGRAMSTRINGARBPROC)
         getProcAddress("glProgramStringARB");
-    gMythGLProgramEnvParameter4fARB = (MYTH_GLPROGRAMENVPARAMETER4FARBPROC)
+    m_glProgramEnvParameter4fARB = (MYTH_GLPROGRAMENVPARAMETER4FARBPROC)
         getProcAddress("glProgramEnvParameter4fARB");
-    gMythGLDeleteProgramsARB = (MYTH_GLDELETEPROGRAMSARBPROC)
+    m_glDeleteProgramsARB = (MYTH_GLDELETEPROGRAMSARBPROC)
         getProcAddress("glDeleteProgramsARB");
-    gMythGLGetProgramivARB = (MYTH_GLGETPROGRAMIVARBPROC)
+    m_glGetProgramivARB = (MYTH_GLGETPROGRAMIVARBPROC)
         getProcAddress("glGetProgramivARB");
-    gMythGLGenFramebuffersEXT = (MYTH_GLGENFRAMEBUFFERSEXTPROC)
+    m_glGenFramebuffersEXT = (MYTH_GLGENFRAMEBUFFERSEXTPROC)
         getProcAddress("glGenFramebuffersEXT");
-    gMythGLBindFramebufferEXT = (MYTH_GLBINDFRAMEBUFFEREXTPROC)
+    m_glBindFramebufferEXT = (MYTH_GLBINDFRAMEBUFFEREXTPROC)
         getProcAddress("glBindFramebufferEXT");
-    gMythGLFramebufferTexture2DEXT = (MYTH_GLFRAMEBUFFERTEXTURE2DEXTPROC)
+    m_glFramebufferTexture2DEXT = (MYTH_GLFRAMEBUFFERTEXTURE2DEXTPROC)
         getProcAddress("glFramebufferTexture2DEXT");
-    gMythGLCheckFramebufferStatusEXT = (MYTH_GLCHECKFRAMEBUFFERSTATUSEXTPROC)
+    m_glCheckFramebufferStatusEXT = (MYTH_GLCHECKFRAMEBUFFERSTATUSEXTPROC)
         getProcAddress("glCheckFramebufferStatusEXT");
-    gMythGLDeleteFramebuffersEXT = (MYTH_GLDELETEFRAMEBUFFERSEXTPROC)
+    m_glDeleteFramebuffersEXT = (MYTH_GLDELETEFRAMEBUFFERSEXTPROC)
         getProcAddress("glDeleteFramebuffersEXT");
-    gMythGLGenFencesNV = (MYTH_GLGENFENCESNVPROC)
+    m_glGenFencesNV = (MYTH_GLGENFENCESNVPROC)
         getProcAddress("glGenFencesNV");
-    gMythGLDeleteFencesNV = (MYTH_GLDELETEFENCESNVPROC)
+    m_glDeleteFencesNV = (MYTH_GLDELETEFENCESNVPROC)
         getProcAddress("glDeleteFencesNV");
-    gMythGLSetFenceNV = (MYTH_GLSETFENCENVPROC)
+    m_glSetFenceNV = (MYTH_GLSETFENCENVPROC)
         getProcAddress("glSetFenceNV");
-    gMythGLFinishFenceNV = (MYTH_GLFINISHFENCENVPROC)
+    m_glFinishFenceNV = (MYTH_GLFINISHFENCENVPROC)
         getProcAddress("glFinishFenceNV");
-    gMythGLGenFencesAPPLE = (MYTH_GLGENFENCESAPPLEPROC)
+    m_glGenFencesAPPLE = (MYTH_GLGENFENCESAPPLEPROC)
         getProcAddress("glGenFencesAPPLE");
-    gMythGLDeleteFencesAPPLE = (MYTH_GLDELETEFENCESAPPLEPROC)
+    m_glDeleteFencesAPPLE = (MYTH_GLDELETEFENCESAPPLEPROC)
         getProcAddress("glDeleteFencesAPPLE");
-    gMythGLSetFenceAPPLE = (MYTH_GLSETFENCEAPPLEPROC)
+    m_glSetFenceAPPLE = (MYTH_GLSETFENCEAPPLEPROC)
         getProcAddress("glSetFenceAPPLE");
-    gMythGLFinishFenceAPPLE = (MYTH_GLFINISHFENCEAPPLEPROC)
+    m_glFinishFenceAPPLE = (MYTH_GLFINISHFENCEAPPLEPROC)
         getProcAddress("glFinishFenceAPPLE");
-    gMythGLCreateShaderObject = (MYTH_GLCREATESHADEROBJECT)
+    m_glCreateShaderObject = (MYTH_GLCREATESHADEROBJECT)
         getProcAddress("glCreateShaderObjectARB");
-    gMythGLShaderSource = (MYTH_GLSHADERSOURCE)
+    m_glShaderSource = (MYTH_GLSHADERSOURCE)
         getProcAddress("glShaderSourceARB");
-    gMythGLCompileShader = (MYTH_GLCOMPILESHADER)
+    m_glCompileShader = (MYTH_GLCOMPILESHADER)
         getProcAddress("glCompileShaderARB");
-    gMythGLCreateProgramObject = (MYTH_GLCREATEPROGRAMOBJECT)
+    m_glCreateProgramObject = (MYTH_GLCREATEPROGRAMOBJECT)
         getProcAddress("glCreateProgramObjectARB");
-    gMythGLAttachObject = (MYTH_GLATTACHOBJECT)
+    m_glAttachObject = (MYTH_GLATTACHOBJECT)
         getProcAddress("glAttachObjectARB");
-    gMythGLLinkProgram = (MYTH_GLLINKPROGRAM)
+    m_glLinkProgram = (MYTH_GLLINKPROGRAM)
         getProcAddress("glLinkProgramARB");
-    gMythGLUseProgram = (MYTH_GLUSEPROGRAM)
+    m_glUseProgram = (MYTH_GLUSEPROGRAM)
         getProcAddress("glUseProgramObjectARB");
-    gMythGLGetInfoLog = (MYTH_GLGETINFOLOG)
+    m_glGetInfoLog = (MYTH_GLGETINFOLOG)
         getProcAddress("glGetInfoLogARB");
-    gMythGLGetObjectParameteriv = (MYTH_GLGETOBJECTPARAMETERIV)
+    m_glGetObjectParameteriv = (MYTH_GLGETOBJECTPARAMETERIV)
         getProcAddress("glGetObjectParameterivARB");
-    gMythGLDetachObject = (MYTH_GLDETACHOBJECT)
+    m_glDetachObject = (MYTH_GLDETACHOBJECT)
         getProcAddress("glDetachObjectARB");
-    gMythGLDeleteObject = (MYTH_GLDELETEOBJECT)
+    m_glDeleteObject = (MYTH_GLDELETEOBJECT)
         getProcAddress("glDeleteObjectARB");
-    gMythGLGetUniformLocation = (MYTH_GLGETUNIFORMLOCATION)
+    m_glGetUniformLocation = (MYTH_GLGETUNIFORMLOCATION)
         getProcAddress("glGetUniformLocationARB");
-    gMythGLUniform4f = (MYTH_GLUNIFORM4F)
+    m_glUniform4f = (MYTH_GLUNIFORM4F)
         getProcAddress("glUniform4fARB");
 }
 
@@ -1255,7 +1255,7 @@ void MythRenderOpenGL::InitFeatures(void)
         m_exts_supported += kGLExtRect;
 
     if (m_extensions.contains("GL_ARB_multitexture") &&
-        gMythGLActiveTexture)
+        m_glActiveTexture)
     {
         m_exts_supported += kGLMultiTex;
         if (m_max_units < 3)
@@ -1284,43 +1284,43 @@ void MythRenderOpenGL::InitFeatures(void)
     }
 
     if (m_extensions.contains("GL_ARB_fragment_program") &&
-        gMythGLGenProgramsARB   && gMythGLBindProgramARB &&
-        gMythGLProgramStringARB && gMythGLDeleteProgramsARB &&
-        gMythGLGetProgramivARB  && gMythGLProgramEnvParameter4fARB)
+        m_glGenProgramsARB   && m_glBindProgramARB &&
+        m_glProgramStringARB && m_glDeleteProgramsARB &&
+        m_glGetProgramivARB  && m_glProgramEnvParameter4fARB)
         m_exts_supported += kGLExtFragProg;
 
     if (m_extensions.contains("GL_ARB_shader_objects") &&
         m_extensions.contains("GL_ARB_vertex_shader") &&
         m_extensions.contains("GL_ARB_fragment_shader") &&
-        gMythGLShaderSource  && gMythGLCreateShaderObject &&
-        gMythGLCompileShader && gMythGLCreateProgramObject &&
-        gMythGLAttachObject  && gMythGLLinkProgram &&
-        gMythGLUseProgram    && gMythGLGetInfoLog &&
-        gMythGLDetachObject  && gMythGLGetObjectParameteriv &&
-        gMythGLDeleteObject  && gMythGLGetUniformLocation &&
-        gMythGLUniform4f)
+        m_glShaderSource  && m_glCreateShaderObject &&
+        m_glCompileShader && m_glCreateProgramObject &&
+        m_glAttachObject  && m_glLinkProgram &&
+        m_glUseProgram    && m_glGetInfoLog &&
+        m_glDetachObject  && m_glGetObjectParameteriv &&
+        m_glDeleteObject  && m_glGetUniformLocation &&
+        m_glUniform4f)
         m_exts_supported += kGLSL;
 
     if (m_extensions.contains("GL_EXT_framebuffer_object") &&
-        gMythGLGenFramebuffersEXT      && gMythGLBindFramebufferEXT &&
-        gMythGLFramebufferTexture2DEXT && gMythGLDeleteFramebuffersEXT &&
-        gMythGLCheckFramebufferStatusEXT)
+        m_glGenFramebuffersEXT      && m_glBindFramebufferEXT &&
+        m_glFramebufferTexture2DEXT && m_glDeleteFramebuffersEXT &&
+        m_glCheckFramebufferStatusEXT)
         m_exts_supported += kGLExtFBufObj;
 
     if(m_extensions.contains("GL_ARB_pixel_buffer_object") &&
-        gMythGLMapBufferARB  && gMythGLBindBufferARB &&
-        gMythGLGenBuffersARB && gMythGLDeleteBuffersARB &&
-        gMythGLBufferDataARB && gMythGLUnmapBufferARB)
+        m_glMapBufferARB  && m_glBindBufferARB &&
+        m_glGenBuffersARB && m_glDeleteBuffersARB &&
+        m_glBufferDataARB && m_glUnmapBufferARB)
         m_exts_supported += kGLExtPBufObj;
 
     if(m_extensions.contains("GL_NV_fence") &&
-        gMythGLGenFencesNV && gMythGLDeleteFencesNV &&
-        gMythGLSetFenceNV  && gMythGLFinishFenceNV)
+        m_glGenFencesNV && m_glDeleteFencesNV &&
+        m_glSetFenceNV  && m_glFinishFenceNV)
         m_exts_supported += kGLNVFence;
 
     if(m_extensions.contains("GL_APPLE_fence") &&
-        gMythGLGenFencesAPPLE && gMythGLDeleteFencesAPPLE &&
-        gMythGLSetFenceAPPLE  && gMythGLFinishFenceAPPLE)
+        m_glGenFencesAPPLE && m_glDeleteFencesAPPLE &&
+        m_glSetFenceAPPLE  && m_glFinishFenceAPPLE)
         m_exts_supported += kGLAppleFence;
 
     if (m_extensions.contains("GL_MESA_ycbcr_texture"))
@@ -1391,45 +1391,45 @@ void MythRenderOpenGL::ResetProcs(void)
 {
     m_extensions = QString();
 
-    gMythGLActiveTexture = NULL;
-    gMythGLGenProgramsARB = NULL;
-    gMythGLBindProgramARB = NULL;
-    gMythGLProgramStringARB = NULL;
-    gMythGLProgramEnvParameter4fARB = NULL;
-    gMythGLDeleteProgramsARB = NULL;
-    gMythGLGetProgramivARB = NULL;
-    gMythGLMapBufferARB = NULL;
-    gMythGLBindBufferARB = NULL;
-    gMythGLGenBuffersARB = NULL;
-    gMythGLBufferDataARB = NULL;
-    gMythGLUnmapBufferARB = NULL;
-    gMythGLDeleteBuffersARB = NULL;
-    gMythGLGenFramebuffersEXT = NULL;
-    gMythGLBindFramebufferEXT = NULL;
-    gMythGLFramebufferTexture2DEXT = NULL;
-    gMythGLCheckFramebufferStatusEXT = NULL;
-    gMythGLDeleteFramebuffersEXT = NULL;
-    gMythGLGenFencesNV = NULL;
-    gMythGLDeleteFencesNV = NULL;
-    gMythGLSetFenceNV = NULL;
-    gMythGLFinishFenceNV = NULL;
-    gMythGLGenFencesAPPLE = NULL;
-    gMythGLDeleteFencesAPPLE = NULL;
-    gMythGLSetFenceAPPLE = NULL;
-    gMythGLFinishFenceAPPLE = NULL;
-    gMythGLCreateShaderObject = NULL;
-    gMythGLShaderSource = NULL;
-    gMythGLCompileShader = NULL;
-    gMythGLCreateProgramObject = NULL;
-    gMythGLAttachObject = NULL;
-    gMythGLLinkProgram = NULL;
-    gMythGLUseProgram = NULL;
-    gMythGLGetInfoLog = NULL;
-    gMythGLGetObjectParameteriv = NULL;
-    gMythGLDetachObject = NULL;
-    gMythGLDeleteObject = NULL;
-    gMythGLGetUniformLocation = NULL;
-    gMythGLUniform4f = NULL;
+    m_glActiveTexture = NULL;
+    m_glGenProgramsARB = NULL;
+    m_glBindProgramARB = NULL;
+    m_glProgramStringARB = NULL;
+    m_glProgramEnvParameter4fARB = NULL;
+    m_glDeleteProgramsARB = NULL;
+    m_glGetProgramivARB = NULL;
+    m_glMapBufferARB = NULL;
+    m_glBindBufferARB = NULL;
+    m_glGenBuffersARB = NULL;
+    m_glBufferDataARB = NULL;
+    m_glUnmapBufferARB = NULL;
+    m_glDeleteBuffersARB = NULL;
+    m_glGenFramebuffersEXT = NULL;
+    m_glBindFramebufferEXT = NULL;
+    m_glFramebufferTexture2DEXT = NULL;
+    m_glCheckFramebufferStatusEXT = NULL;
+    m_glDeleteFramebuffersEXT = NULL;
+    m_glGenFencesNV = NULL;
+    m_glDeleteFencesNV = NULL;
+    m_glSetFenceNV = NULL;
+    m_glFinishFenceNV = NULL;
+    m_glGenFencesAPPLE = NULL;
+    m_glDeleteFencesAPPLE = NULL;
+    m_glSetFenceAPPLE = NULL;
+    m_glFinishFenceAPPLE = NULL;
+    m_glCreateShaderObject = NULL;
+    m_glShaderSource = NULL;
+    m_glCompileShader = NULL;
+    m_glCreateProgramObject = NULL;
+    m_glAttachObject = NULL;
+    m_glLinkProgram = NULL;
+    m_glUseProgram = NULL;
+    m_glGetInfoLog = NULL;
+    m_glGetObjectParameteriv = NULL;
+    m_glDetachObject = NULL;
+    m_glDeleteObject = NULL;
+    m_glGetUniformLocation = NULL;
+    m_glUniform4f = NULL;
 }
 
 uint MythRenderOpenGL::CreatePBO(uint tex)
@@ -1440,15 +1440,15 @@ uint MythRenderOpenGL::CreatePBO(uint tex)
     if (!m_textures.contains(tex))
         return 0;
 
-    gMythGLBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+    m_glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
     glTexImage2D(m_textures[tex].m_type, 0, m_textures[tex].m_internal_fmt,
                  m_textures[tex].m_size.width(),
                  m_textures[tex].m_size.height(), 0,
                  m_textures[tex].m_data_fmt, m_textures[tex].m_data_type, NULL);
 
     GLuint tmp_pbo;
-    gMythGLGenBuffersARB(1, &tmp_pbo);
-    gMythGLBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+    m_glGenBuffersARB(1, &tmp_pbo);
+    m_glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
 
     Flush(true);
     return tmp_pbo;
@@ -1467,9 +1467,9 @@ void MythRenderOpenGL::DeleteOpenGLResources(void)
     if (m_fence)
     {
         if (m_exts_supported & kGLAppleFence)
-            gMythGLDeleteFencesAPPLE(1, &m_fence);
+            m_glDeleteFencesAPPLE(1, &m_fence);
         else if(m_exts_supported & kGLNVFence)
-            gMythGLDeleteFencesNV(1, &m_fence);
+            m_glDeleteFencesNV(1, &m_fence);
         m_fence = 0;
     }
 
@@ -1485,7 +1485,7 @@ void MythRenderOpenGL::DeleteTextures(void)
         if (it.value().m_data)
             delete it.value().m_data;
         if (it.value().m_pbo)
-            gMythGLDeleteBuffersARB(1, &(it.value().m_pbo));
+            m_glDeleteBuffersARB(1, &(it.value().m_pbo));
     }
     m_textures.clear();
     Flush(true);
@@ -1495,7 +1495,7 @@ void MythRenderOpenGL::DeletePrograms(void)
 {
     QVector<GLuint>::iterator it;
     for (it = m_programs.begin(); it != m_programs.end(); ++it)
-        gMythGLDeleteProgramsARB(1, &(*(it)));
+        m_glDeleteProgramsARB(1, &(*(it)));
     m_programs.clear();
     Flush(true);
 }
@@ -1504,7 +1504,7 @@ void MythRenderOpenGL::DeleteFrameBuffers(void)
 {
     QVector<GLuint>::iterator it;
     for (it = m_framebuffers.begin(); it != m_framebuffers.end(); ++it)
-        gMythGLDeleteFramebuffersEXT(1, &(*(it)));
+        m_glDeleteFramebuffersEXT(1, &(*(it)));
     m_framebuffers.clear();
     Flush(true);
 }
@@ -1517,11 +1517,11 @@ void MythRenderOpenGL::DeleteShaderObjects(void)
         GLuint object   = it.key();
         GLuint vertex   = it.value().m_vertex_shader;
         GLuint fragment = it.value().m_fragment_shader;
-        gMythGLDetachObject(object, vertex);
-        gMythGLDetachObject(object, fragment);
-        gMythGLDeleteObject(vertex);
-        gMythGLDeleteObject(fragment);
-        gMythGLDeleteObject(object);
+        m_glDetachObject(object, vertex);
+        m_glDetachObject(object, fragment);
+        m_glDeleteObject(vertex);
+        m_glDeleteObject(fragment);
+        m_glDeleteObject(object);
     }
     m_shader_objects.clear();
     Flush(true);
@@ -1529,11 +1529,11 @@ void MythRenderOpenGL::DeleteShaderObjects(void)
 
 uint MythRenderOpenGL::CreateShader(int type, const QString source)
 {
-    uint result = gMythGLCreateShaderObject(type);
+    uint result = m_glCreateShaderObject(type);
     QByteArray src = source.toAscii();
     const char* tmp[1] = { src.constData() };
-    gMythGLShaderSource(result, 1, tmp, NULL);
-    gMythGLCompileShader(result);
+    m_glShaderSource(result, 1, tmp, NULL);
+    m_glCompileShader(result);
     return result;
 }
 
@@ -1545,16 +1545,16 @@ bool MythRenderOpenGL::ValidateShaderObject(uint obj)
         !m_shader_objects[obj].m_vertex_shader)
         return false;
 
-    gMythGLAttachObject(obj, m_shader_objects[obj].m_fragment_shader);
-    gMythGLAttachObject(obj, m_shader_objects[obj].m_vertex_shader);
-    gMythGLLinkProgram(obj);
+    m_glAttachObject(obj, m_shader_objects[obj].m_fragment_shader);
+    m_glAttachObject(obj, m_shader_objects[obj].m_vertex_shader);
+    m_glLinkProgram(obj);
     return CheckObjectStatus(obj);
 }
 
 bool MythRenderOpenGL::CheckObjectStatus(uint obj)
 {
     int ok;
-    gMythGLGetObjectParameteriv(obj, GL_OBJECT_LINK_STATUS_ARB, &ok);
+    m_glGetObjectParameteriv(obj, GL_OBJECT_LINK_STATUS_ARB, &ok);
     if (ok > 0)
         return true;
 
@@ -1562,12 +1562,12 @@ bool MythRenderOpenGL::CheckObjectStatus(uint obj)
     int infologLength = 0;
     int charsWritten  = 0;
     char *infoLog;
-    gMythGLGetObjectParameteriv(obj, GL_OBJECT_INFO_LOG_LENGTH_ARB,
+    m_glGetObjectParameteriv(obj, GL_OBJECT_INFO_LOG_LENGTH_ARB,
                                 &infologLength);
     if (infologLength > 0)
     {
         infoLog = (char *)malloc(infologLength);
-        gMythGLGetInfoLog(obj, infologLength, &charsWritten, infoLog);
+        m_glGetInfoLog(obj, infologLength, &charsWritten, infoLog);
         VERBOSE(VB_IMPORTANT, QString("\n\n%1").arg(infoLog));
         free(infoLog);
     }
@@ -1656,7 +1656,7 @@ void MythRenderOpenGL::InitFragmentParams(uint fp, float a, float b,
                                           float c, float d)
 {
     makeCurrent();
-    gMythGLProgramEnvParameter4fARB(
+    m_glProgramEnvParameter4fARB(
         GL_FRAGMENT_PROGRAM_ARB, fp, a, b, c, d);
     doneCurrent();
 }

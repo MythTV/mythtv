@@ -186,54 +186,54 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     uint32_t m_background;
 
     // Multi-texturing
-    MYTH_GLACTIVETEXTUREPROC             gMythGLActiveTexture;
+    MYTH_GLACTIVETEXTUREPROC             m_glActiveTexture;
     // Fragment programs
-    MYTH_GLGENPROGRAMSARBPROC            gMythGLGenProgramsARB;
-    MYTH_GLBINDPROGRAMARBPROC            gMythGLBindProgramARB;
-    MYTH_GLPROGRAMSTRINGARBPROC          gMythGLProgramStringARB;
-    MYTH_GLPROGRAMENVPARAMETER4FARBPROC  gMythGLProgramEnvParameter4fARB;
-    MYTH_GLDELETEPROGRAMSARBPROC         gMythGLDeleteProgramsARB;
-    MYTH_GLGETPROGRAMIVARBPROC           gMythGLGetProgramivARB;
+    MYTH_GLGENPROGRAMSARBPROC            m_glGenProgramsARB;
+    MYTH_GLBINDPROGRAMARBPROC            m_glBindProgramARB;
+    MYTH_GLPROGRAMSTRINGARBPROC          m_glProgramStringARB;
+    MYTH_GLPROGRAMENVPARAMETER4FARBPROC  m_glProgramEnvParameter4fARB;
+    MYTH_GLDELETEPROGRAMSARBPROC         m_glDeleteProgramsARB;
+    MYTH_GLGETPROGRAMIVARBPROC           m_glGetProgramivARB;
     // PixelBuffer Objects
-    MYTH_GLMAPBUFFERARBPROC              gMythGLMapBufferARB;
-    MYTH_GLBINDBUFFERARBPROC             gMythGLBindBufferARB;
-    MYTH_GLGENBUFFERSARBPROC             gMythGLGenBuffersARB;
-    MYTH_GLBUFFERDATAARBPROC             gMythGLBufferDataARB;
-    MYTH_GLUNMAPBUFFERARBPROC            gMythGLUnmapBufferARB;
-    MYTH_GLDELETEBUFFERSARBPROC          gMythGLDeleteBuffersARB;
+    MYTH_GLMAPBUFFERARBPROC              m_glMapBufferARB;
+    MYTH_GLBINDBUFFERARBPROC             m_glBindBufferARB;
+    MYTH_GLGENBUFFERSARBPROC             m_glGenBuffersARB;
+    MYTH_GLBUFFERDATAARBPROC             m_glBufferDataARB;
+    MYTH_GLUNMAPBUFFERARBPROC            m_glUnmapBufferARB;
+    MYTH_GLDELETEBUFFERSARBPROC          m_glDeleteBuffersARB;
     // FrameBuffer Objects
-    MYTH_GLGENFRAMEBUFFERSEXTPROC        gMythGLGenFramebuffersEXT;
-    MYTH_GLBINDFRAMEBUFFEREXTPROC        gMythGLBindFramebufferEXT;
-    MYTH_GLFRAMEBUFFERTEXTURE2DEXTPROC   gMythGLFramebufferTexture2DEXT;
-    MYTH_GLCHECKFRAMEBUFFERSTATUSEXTPROC gMythGLCheckFramebufferStatusEXT;
-    MYTH_GLDELETEFRAMEBUFFERSEXTPROC     gMythGLDeleteFramebuffersEXT;
+    MYTH_GLGENFRAMEBUFFERSEXTPROC        m_glGenFramebuffersEXT;
+    MYTH_GLBINDFRAMEBUFFEREXTPROC        m_glBindFramebufferEXT;
+    MYTH_GLFRAMEBUFFERTEXTURE2DEXTPROC   m_glFramebufferTexture2DEXT;
+    MYTH_GLCHECKFRAMEBUFFERSTATUSEXTPROC m_glCheckFramebufferStatusEXT;
+    MYTH_GLDELETEFRAMEBUFFERSEXTPROC     m_glDeleteFramebuffersEXT;
     // NV_fence
-    MYTH_GLGENFENCESNVPROC               gMythGLGenFencesNV;
-    MYTH_GLDELETEFENCESNVPROC            gMythGLDeleteFencesNV;
-    MYTH_GLSETFENCENVPROC                gMythGLSetFenceNV;
-    MYTH_GLFINISHFENCENVPROC             gMythGLFinishFenceNV;
+    MYTH_GLGENFENCESNVPROC               m_glGenFencesNV;
+    MYTH_GLDELETEFENCESNVPROC            m_glDeleteFencesNV;
+    MYTH_GLSETFENCENVPROC                m_glSetFenceNV;
+    MYTH_GLFINISHFENCENVPROC             m_glFinishFenceNV;
     // APPLE_fence
-    MYTH_GLGENFENCESAPPLEPROC            gMythGLGenFencesAPPLE;
-    MYTH_GLDELETEFENCESAPPLEPROC         gMythGLDeleteFencesAPPLE;
-    MYTH_GLSETFENCEAPPLEPROC             gMythGLSetFenceAPPLE;
-    MYTH_GLFINISHFENCEAPPLEPROC          gMythGLFinishFenceAPPLE;
+    MYTH_GLGENFENCESAPPLEPROC            m_glGenFencesAPPLE;
+    MYTH_GLDELETEFENCESAPPLEPROC         m_glDeleteFencesAPPLE;
+    MYTH_GLSETFENCEAPPLEPROC             m_glSetFenceAPPLE;
+    MYTH_GLFINISHFENCEAPPLEPROC          m_glFinishFenceAPPLE;
     // GLX_SGI_video_sync
-    static MYTH_GLXGETVIDEOSYNCSGIPROC   gMythGLXGetVideoSyncSGI;
-    static MYTH_GLXWAITVIDEOSYNCSGIPROC  gMythGLXWaitVideoSyncSGI;
+    static MYTH_GLXGETVIDEOSYNCSGIPROC   g_glXGetVideoSyncSGI;
+    static MYTH_GLXWAITVIDEOSYNCSGIPROC  g_glXWaitVideoSyncSGI;
     // GLSL
-    MYTH_GLCREATESHADEROBJECT            gMythGLCreateShaderObject;
-    MYTH_GLSHADERSOURCE                  gMythGLShaderSource;
-    MYTH_GLCOMPILESHADER                 gMythGLCompileShader;
-    MYTH_GLCREATEPROGRAMOBJECT           gMythGLCreateProgramObject;
-    MYTH_GLATTACHOBJECT                  gMythGLAttachObject;
-    MYTH_GLLINKPROGRAM                   gMythGLLinkProgram;
-    MYTH_GLUSEPROGRAM                    gMythGLUseProgram;
-    MYTH_GLGETINFOLOG                    gMythGLGetInfoLog;
-    MYTH_GLGETOBJECTPARAMETERIV          gMythGLGetObjectParameteriv;
-    MYTH_GLDETACHOBJECT                  gMythGLDetachObject;
-    MYTH_GLDELETEOBJECT                  gMythGLDeleteObject;
-    MYTH_GLGETUNIFORMLOCATION            gMythGLGetUniformLocation;
-    MYTH_GLUNIFORM4F                     gMythGLUniform4f;
+    MYTH_GLCREATESHADEROBJECT            m_glCreateShaderObject;
+    MYTH_GLSHADERSOURCE                  m_glShaderSource;
+    MYTH_GLCOMPILESHADER                 m_glCompileShader;
+    MYTH_GLCREATEPROGRAMOBJECT           m_glCreateProgramObject;
+    MYTH_GLATTACHOBJECT                  m_glAttachObject;
+    MYTH_GLLINKPROGRAM                   m_glLinkProgram;
+    MYTH_GLUSEPROGRAM                    m_glUseProgram;
+    MYTH_GLGETINFOLOG                    m_glGetInfoLog;
+    MYTH_GLGETOBJECTPARAMETERIV          m_glGetObjectParameteriv;
+    MYTH_GLDETACHOBJECT                  m_glDetachObject;
+    MYTH_GLDELETEOBJECT                  m_glDeleteObject;
+    MYTH_GLGETUNIFORMLOCATION            m_glGetUniformLocation;
+    MYTH_GLUNIFORM4F                     m_glUniform4f;
 };
 
 #endif
