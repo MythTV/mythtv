@@ -4605,7 +4605,7 @@ bool AvFormatDecoder::DoPassThrough(const AVCodecContext *ctx)
         passthru = m_audio->CanDTS();
     passthru &= m_audio->CanPassthrough(ctx->sample_rate);
         // Will downmix if we can't support the amount of channels
-    passthru &= ctx->channels >= (int)m_audio->GetMaxChannels();
+    passthru &= ctx->channels <= (int)m_audio->GetMaxChannels();
     passthru &= !internal_vol;
     passthru &= !transcoding && !disable_passthru;
     // Don't know any cards that support spdif clocked at < 44100
