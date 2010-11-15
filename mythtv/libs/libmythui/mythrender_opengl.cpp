@@ -334,76 +334,6 @@ void MythRenderOpenGL::UpdateTexture(uint tex, void *buf)
     doneCurrent();
 }
 
-bool MythRenderOpenGL::UpdateTextureVertices(uint tex, const QRect *src,
-                                             const QRect *dst)
-{
-    if (!m_textures.contains(tex))
-        return false;
-
-    GLfloat *data = m_textures[tex].m_vertex_data;
-
-    data[0 + TEX_OFFSET] = src->left();
-    data[1 + TEX_OFFSET] = src->top() + src->height();
-
-    data[6 + TEX_OFFSET] = src->left() + src->width();
-    data[7 + TEX_OFFSET] = src->top();
-
-    if (!IsRectTexture(m_textures[tex].m_type))
-    {
-        data[0 + TEX_OFFSET] /= (float)m_textures[tex].m_size.width();
-        data[6 + TEX_OFFSET] /= (float)m_textures[tex].m_size.width();
-        data[1 + TEX_OFFSET] /= (float)m_textures[tex].m_size.height();
-        data[7 + TEX_OFFSET] /= (float)m_textures[tex].m_size.height();
-    }
-
-    data[2 + TEX_OFFSET] = data[0 + TEX_OFFSET];
-    data[3 + TEX_OFFSET] = data[7 + TEX_OFFSET];
-    data[4 + TEX_OFFSET] = data[6 + TEX_OFFSET];
-    data[5 + TEX_OFFSET] = data[1 + TEX_OFFSET];
-
-    data[2] = data[0] = dst->left();
-    data[5] = data[1] = dst->top();
-    data[4] = data[6] = dst->left() + std::min(src->width(), dst->width());
-    data[3] = data[7] = dst->top() + std::min(src->height(), dst->height());
-
-    return true;
-}
-
-bool MythRenderOpenGL::UpdateTextureVertices(uint tex, const QRectF *src,
-                                             const QRectF *dst)
-{
-    if (!m_textures.contains(tex))
-        return false;
-
-    GLfloat *data = m_textures[tex].m_vertex_data;
-
-    data[0 + TEX_OFFSET] = src->left();
-    data[1 + TEX_OFFSET] = src->top() + src->height();
-
-    data[6 + TEX_OFFSET] = src->left() + src->width();
-    data[7 + TEX_OFFSET] = src->top();
-
-    if (!IsRectTexture(m_textures[tex].m_type))
-    {
-        data[0 + TEX_OFFSET] /= (float)m_textures[tex].m_size.width();
-        data[6 + TEX_OFFSET] /= (float)m_textures[tex].m_size.width();
-        data[1 + TEX_OFFSET] /= (float)m_textures[tex].m_size.height();
-        data[7 + TEX_OFFSET] /= (float)m_textures[tex].m_size.height();
-    }
-
-    data[2 + TEX_OFFSET] = data[0 + TEX_OFFSET];
-    data[3 + TEX_OFFSET] = data[7 + TEX_OFFSET];
-    data[4 + TEX_OFFSET] = data[6 + TEX_OFFSET];
-    data[5 + TEX_OFFSET] = data[1 + TEX_OFFSET];
-
-    data[2] = data[0] = dst->left();
-    data[5] = data[1] = dst->top();
-    data[4] = data[6] = dst->left() + dst->width();
-    data[3] = data[7] = dst->top() + dst->height();
-
-    return true;
-}
-
 int MythRenderOpenGL::GetTextureType(bool &rect)
 {
     int ret = GL_TEXTURE_2D;
@@ -1590,6 +1520,76 @@ bool MythRenderOpenGL::CheckObjectStatus(uint obj)
     return false;
 }
 
+bool MythRenderOpenGL::UpdateTextureVertices(uint tex, const QRect *src,
+                                             const QRect *dst)
+{
+    if (!m_textures.contains(tex))
+        return false;
+
+    GLfloat *data = m_textures[tex].m_vertex_data;
+
+    data[0 + TEX_OFFSET] = src->left();
+    data[1 + TEX_OFFSET] = src->top() + src->height();
+
+    data[6 + TEX_OFFSET] = src->left() + src->width();
+    data[7 + TEX_OFFSET] = src->top();
+
+    if (!IsRectTexture(m_textures[tex].m_type))
+    {
+        data[0 + TEX_OFFSET] /= (float)m_textures[tex].m_size.width();
+        data[6 + TEX_OFFSET] /= (float)m_textures[tex].m_size.width();
+        data[1 + TEX_OFFSET] /= (float)m_textures[tex].m_size.height();
+        data[7 + TEX_OFFSET] /= (float)m_textures[tex].m_size.height();
+    }
+
+    data[2 + TEX_OFFSET] = data[0 + TEX_OFFSET];
+    data[3 + TEX_OFFSET] = data[7 + TEX_OFFSET];
+    data[4 + TEX_OFFSET] = data[6 + TEX_OFFSET];
+    data[5 + TEX_OFFSET] = data[1 + TEX_OFFSET];
+
+    data[2] = data[0] = dst->left();
+    data[5] = data[1] = dst->top();
+    data[4] = data[6] = dst->left() + std::min(src->width(), dst->width());
+    data[3] = data[7] = dst->top() + std::min(src->height(), dst->height());
+
+    return true;
+}
+
+bool MythRenderOpenGL::UpdateTextureVertices(uint tex, const QRectF *src,
+                                             const QRectF *dst)
+{
+    if (!m_textures.contains(tex))
+        return false;
+
+    GLfloat *data = m_textures[tex].m_vertex_data;
+
+    data[0 + TEX_OFFSET] = src->left();
+    data[1 + TEX_OFFSET] = src->top() + src->height();
+
+    data[6 + TEX_OFFSET] = src->left() + src->width();
+    data[7 + TEX_OFFSET] = src->top();
+
+    if (!IsRectTexture(m_textures[tex].m_type))
+    {
+        data[0 + TEX_OFFSET] /= (float)m_textures[tex].m_size.width();
+        data[6 + TEX_OFFSET] /= (float)m_textures[tex].m_size.width();
+        data[1 + TEX_OFFSET] /= (float)m_textures[tex].m_size.height();
+        data[7 + TEX_OFFSET] /= (float)m_textures[tex].m_size.height();
+    }
+
+    data[2 + TEX_OFFSET] = data[0 + TEX_OFFSET];
+    data[3 + TEX_OFFSET] = data[7 + TEX_OFFSET];
+    data[4 + TEX_OFFSET] = data[6 + TEX_OFFSET];
+    data[5 + TEX_OFFSET] = data[1 + TEX_OFFSET];
+
+    data[2] = data[0] = dst->left();
+    data[5] = data[1] = dst->top();
+    data[4] = data[6] = dst->left() + dst->width();
+    data[3] = data[7] = dst->top() + dst->height();
+
+    return true;
+}
+
 GLfloat* MythRenderOpenGL::GetCachedVertices(GLuint type, const QRect &area)
 {
     uint64_t ref = ((uint64_t)area.left() & 0xfff) +
@@ -1627,7 +1627,7 @@ GLfloat* MythRenderOpenGL::GetCachedVertices(GLuint type, const QRect &area)
 
 void MythRenderOpenGL::ExpireVertices(uint max)
 {
-    while (m_vertexExpiry.size() > max)
+    while ((uint)m_vertexExpiry.size() > max)
     {
         uint64_t ref = m_vertexExpiry.first();
         m_vertexExpiry.removeFirst();
