@@ -56,6 +56,7 @@ class MythGLShaderObject
     GLuint m_fragment_shader;
 };
 
+#define TEX_OFFSET 8
 class MythGLTexture
 {
   public:
@@ -66,8 +67,7 @@ class MythGLTexture
         m_filter(GL_LINEAR), m_wrap(GL_CLAMP_TO_EDGE),
         m_size(0,0), m_act_size(0,0)
     {
-        memset(&m_vertices, 0, sizeof(m_vertices));
-        memset(&m_texcoords, 0, sizeof(m_texcoords));
+        memset(&m_vertex_data, 0, sizeof(m_vertex_data));
     }
 
     ~MythGLTexture()
@@ -86,8 +86,7 @@ class MythGLTexture
     GLuint  m_wrap;
     QSize   m_size;
     QSize   m_act_size;
-    GLfloat m_vertices[8];
-    GLfloat m_texcoords[8];
+    GLfloat m_vertex_data[16];
 };
 
 OpenGLLocker::OpenGLLocker(MythRenderOpenGL *render) : m_render(render)
@@ -340,31 +339,31 @@ bool MythRenderOpenGL::UpdateTextureVertices(uint tex, const QRect *src,
     if (!m_textures.contains(tex))
         return false;
 
-    m_textures[tex].m_texcoords[0] = src->left();
-    m_textures[tex].m_texcoords[1] = src->top() + src->height();
+    GLfloat *data = m_textures[tex].m_vertex_data;
 
-    m_textures[tex].m_texcoords[6] = src->left() + src->width();
-    m_textures[tex].m_texcoords[7] = src->top();
+    data[0 + TEX_OFFSET] = src->left();
+    data[1 + TEX_OFFSET] = src->top() + src->height();
+
+    data[6 + TEX_OFFSET] = src->left() + src->width();
+    data[7 + TEX_OFFSET] = src->top();
 
     if (!IsRectTexture(m_textures[tex].m_type))
     {
-        m_textures[tex].m_texcoords[0] /= (float)m_textures[tex].m_size.width();
-        m_textures[tex].m_texcoords[6] /= (float)m_textures[tex].m_size.width();
-        m_textures[tex].m_texcoords[1] /= (float)m_textures[tex].m_size.height();
-        m_textures[tex].m_texcoords[7] /= (float)m_textures[tex].m_size.height();
+        data[0 + TEX_OFFSET] /= (float)m_textures[tex].m_size.width();
+        data[6 + TEX_OFFSET] /= (float)m_textures[tex].m_size.width();
+        data[1 + TEX_OFFSET] /= (float)m_textures[tex].m_size.height();
+        data[7 + TEX_OFFSET] /= (float)m_textures[tex].m_size.height();
     }
 
-    m_textures[tex].m_texcoords[2] = m_textures[tex].m_texcoords[0];
-    m_textures[tex].m_texcoords[3] = m_textures[tex].m_texcoords[7];
-    m_textures[tex].m_texcoords[4] = m_textures[tex].m_texcoords[6];
-    m_textures[tex].m_texcoords[5] = m_textures[tex].m_texcoords[1];
+    data[2 + TEX_OFFSET] = data[0 + TEX_OFFSET];
+    data[3 + TEX_OFFSET] = data[7 + TEX_OFFSET];
+    data[4 + TEX_OFFSET] = data[6 + TEX_OFFSET];
+    data[5 + TEX_OFFSET] = data[1 + TEX_OFFSET];
 
-    m_textures[tex].m_vertices[2] = m_textures[tex].m_vertices[0] = dst->left();
-    m_textures[tex].m_vertices[5] = m_textures[tex].m_vertices[1] = dst->top();
-    m_textures[tex].m_vertices[4] = m_textures[tex].m_vertices[6] =
-        dst->left() + std::min(src->width(), dst->width());
-    m_textures[tex].m_vertices[3] = m_textures[tex].m_vertices[7] =
-        dst->top() + std::min(src->height(), dst->height());
+    data[2] = data[0] = dst->left();
+    data[5] = data[1] = dst->top();
+    data[4] = data[6] = dst->left() + std::min(src->width(), dst->width());
+    data[3] = data[7] = dst->top() + std::min(src->height(), dst->height());
 
     return true;
 }
@@ -375,29 +374,31 @@ bool MythRenderOpenGL::UpdateTextureVertices(uint tex, const QRectF *src,
     if (!m_textures.contains(tex))
         return false;
 
-    m_textures[tex].m_texcoords[0] = src->left();
-    m_textures[tex].m_texcoords[1] = src->top() + src->height();
+    GLfloat *data = m_textures[tex].m_vertex_data;
 
-    m_textures[tex].m_texcoords[6] = src->left() + src->width();
-    m_textures[tex].m_texcoords[7] = src->top();
+    data[0 + TEX_OFFSET] = src->left();
+    data[1 + TEX_OFFSET] = src->top() + src->height();
+
+    data[6 + TEX_OFFSET] = src->left() + src->width();
+    data[7 + TEX_OFFSET] = src->top();
 
     if (!IsRectTexture(m_textures[tex].m_type))
     {
-        m_textures[tex].m_texcoords[0] /= (float)m_textures[tex].m_size.width();
-        m_textures[tex].m_texcoords[6] /= (float)m_textures[tex].m_size.width();
-        m_textures[tex].m_texcoords[1] /= (float)m_textures[tex].m_size.height();
-        m_textures[tex].m_texcoords[7] /= (float)m_textures[tex].m_size.height();
+        data[0 + TEX_OFFSET] /= (float)m_textures[tex].m_size.width();
+        data[6 + TEX_OFFSET] /= (float)m_textures[tex].m_size.width();
+        data[1 + TEX_OFFSET] /= (float)m_textures[tex].m_size.height();
+        data[7 + TEX_OFFSET] /= (float)m_textures[tex].m_size.height();
     }
 
-    m_textures[tex].m_texcoords[2] = m_textures[tex].m_texcoords[0];
-    m_textures[tex].m_texcoords[3] = m_textures[tex].m_texcoords[7];
-    m_textures[tex].m_texcoords[4] = m_textures[tex].m_texcoords[6];
-    m_textures[tex].m_texcoords[5] = m_textures[tex].m_texcoords[1];
+    data[2 + TEX_OFFSET] = data[0 + TEX_OFFSET];
+    data[3 + TEX_OFFSET] = data[7 + TEX_OFFSET];
+    data[4 + TEX_OFFSET] = data[6 + TEX_OFFSET];
+    data[5 + TEX_OFFSET] = data[1 + TEX_OFFSET];
 
-    m_textures[tex].m_vertices[2] = m_textures[tex].m_vertices[0] = dst->left();
-    m_textures[tex].m_vertices[5] = m_textures[tex].m_vertices[1] = dst->top();
-    m_textures[tex].m_vertices[4] = m_textures[tex].m_vertices[6] = dst->left() + dst->width();
-    m_textures[tex].m_vertices[3] = m_textures[tex].m_vertices[7] = dst->top() + dst->height();
+    data[2] = data[0] = dst->left();
+    data[5] = data[1] = dst->top();
+    data[4] = data[6] = dst->left() + dst->width();
+    data[3] = data[7] = dst->top() + dst->height();
 
     return true;
 }
@@ -977,8 +978,8 @@ void MythRenderOpenGL::DrawBitmap(uint tex, uint target, const QRect *src,
     EnableTextures(tex);
     glBindTexture(m_textures[tex].m_type, tex);
     UpdateTextureVertices(tex, src, dst);
-    glVertexPointer(2, GL_FLOAT, 0, &m_textures[tex].m_vertices);
-    glTexCoordPointer(2, GL_FLOAT, 0, &m_textures[tex].m_texcoords);
+    glVertexPointer(2, GL_FLOAT, 0, m_textures[tex].m_vertex_data);
+    glTexCoordPointer(2, GL_FLOAT, 0, m_textures[tex].m_vertex_data + TEX_OFFSET);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     doneCurrent();
@@ -1025,8 +1026,8 @@ void MythRenderOpenGL::DrawBitmap(uint *textures, uint texture_count,
     }
 
     UpdateTextureVertices(first, src, dst);
-    glVertexPointer(2, GL_FLOAT, 0, &m_textures[first].m_vertices);
-    glTexCoordPointer(2, GL_FLOAT, 0, &m_textures[first].m_texcoords);
+    glVertexPointer(2, GL_FLOAT, 0, m_textures[first].m_vertex_data);
+    glTexCoordPointer(2, GL_FLOAT, 0, m_textures[first].m_vertex_data + TEX_OFFSET);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     ActiveTexture(GL_TEXTURE0);
