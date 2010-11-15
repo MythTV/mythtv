@@ -7,6 +7,8 @@
 #include "mythdirs.h"
 #include "mythcontext.h"
 #include "mythverbose.h"
+#include "mythsystem.h"
+#include "exitcodes.h"
 
 #include "netgrabbermanager.h"
 #include "netutils.h"
@@ -50,7 +52,7 @@ void GrabberScript::run()
                          kMSStdOut | kMSBuffered);
 
     m_getTree.Run(900);
-    int status = m_getTree.wait();
+    int status = m_getTree.Wait();
     if( status == GENERIC_EXIT_CMD_NOT_FOUND )
         VERBOSE(VB_IMPORTANT, LOC + QString("Internet Content Source %1 "
                             "cannot run, file missing.").arg(m_title));
@@ -59,8 +61,9 @@ void GrabberScript::run()
         VERBOSE(VB_IMPORTANT, LOC + QString("Internet Content Source %1 "
                            "completed download, beginning processing...").arg(m_title));
 
-        QByteArray result = m_getTree.readAll();
+        QByteArray result = QByteArray(*m_getTree.ReadAll());
 
+	QDomDocument domDoc;
         domDoc.setContent(result, true);
         QDomElement root = domDoc.documentElement();
         QDomElement channel = root.firstChildElement("channel");
@@ -358,7 +361,7 @@ void Search::slotProcessSearchExit(int exitcode)
     {
         VERBOSE(VB_GENERAL|VB_EXTRA, LOC_ERR + "Internet Search Successfully Completed");
 
-        m_data = m_searchProcess->readAll();
+        m_data = QByteArray(*m_searchProcess->ReadAll());
         m_document.setContent(m_data, true);
     }
 

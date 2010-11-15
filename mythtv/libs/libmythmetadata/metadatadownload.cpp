@@ -180,9 +180,9 @@ MetadataLookupList MetadataDownload::runGrabber(QString cmd, QStringList args,
     VERBOSE(VB_GENERAL, QString("Running Grabber: %1 %2")
         .arg(cmd).arg(args.join(" ")));
 
-    grabber.Run()
-    grabber.Wait()
-    QByteArray result = grabber.readAll();
+    grabber.Run();
+    grabber.Wait();
+    QByteArray result = QByteArray(*grabber.ReadAll());
     if (!result.isEmpty())
     {
         QDomDocument doc;

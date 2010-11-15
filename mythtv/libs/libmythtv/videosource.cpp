@@ -41,6 +41,7 @@ using namespace std;
 #include "mythverbose.h"
 #include "libmythupnp/httprequest.h"    // for TestMimeType()
 #include "mythsystem.h"
+#include "exitcodes.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"
@@ -574,10 +575,9 @@ void XMLTVConfig::Load(void)
     if (status != GENERIC_EXIT_OK)
     {
         QTextStream ostream(find_grabber_proc.ReadAll());
-        while (ostream.canReadLine())
+        while (!ostream.atEnd())
         {
-            QByteArray tmp = ostream.readLine();
-            QString grabber_list(tmp);
+            QString grabber_list(ostream.readLine());
             grabber_list = grabber_list.left(grabber_list.size() - 1);
             QStringList grabber_split =
                 grabber_list.split("|", QString::SkipEmptyParts);

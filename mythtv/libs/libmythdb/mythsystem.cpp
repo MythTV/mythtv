@@ -40,14 +40,38 @@ typedef QList<MythSystem *> MSList;
  * MythSystemManager method defines
  *********************************/
 static class MythSystemManager *manager = NULL;
+void *doSignalThread(void *arg);
+
+MythSystemManager::MythSystemManager() :
+        QThread(), m_primary(true)
+{
+}
+
+MythSystemManager::MythSystemManager(MythSystemManager *other) :
+        QThread()
+{
+    m_msList =   other->m_msList;
+    m_listLock = other->m_listLock;
+    m_primary =  false;
+}
 
 void MythSystemManager::run(void)
 {
-    VERBOSE(VB_GENERAL, "Starting reaper thread");
+    if( m_primary )
+        RunManagerThread();
+    else
+        RunSignalThread();
+}
+
+void MythSystemManager::RunManagerThread()
+{
+    VERBOSE(VB_GENERAL, "Starting process manager");
 
     m_msList = new MSList();
+    m_listLock = new QMutex();
 
-    StartSignalThread();
+    MythSystemManager *sthread = new MythSystemManager(this);
+    sthread->start();
 
     // gCoreContext is set to NULL during shutdown, and we need this thread to
     // exit during shutdown.
@@ -64,7 +88,7 @@ void MythSystemManager::run(void)
             continue;
         }
 
-        m_listLock.lock();
+        m_listLock->lock();
         pipeMap_t   pMap;   // map of IO pipes for buffering
         MythSystem *ms;
         pid_t       pid;
@@ -84,7 +108,7 @@ void MythSystemManager::run(void)
 
             // pop exited process off managed list, add to cleanup list
             ms = m_pMap.take(pid);
-            msList->append(ms);
+            m_msList->append(ms);
 
             // handle normal exit
             if( WIFEXITED(status) )
@@ -221,33 +245,30 @@ void MythSystemManager::run(void)
         // hold off unlocking until all the way down here to 
         // give the buffer handling a chance to run before
         // being closed down by signal thread
-        m_listLock.unlock();
+        m_listLock->unlock();
     }
 }
 
-void MythSystemManager::StartSignalThread()
+// spawn separate thread for signals to prevent manager
+// thread from blocking in some slot
+void MythSystemManager::RunSignalThread(void)
 {
-    pthread_t sigThread;
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    pthread_create(&sigThread, &attr, DoSignalThread, NULL);
-    pthread_attr_destroy(&attr);
-}
+    VERBOSE(VB_GENERAL, "Starting process signal handler");
 
-void MythSystemManager::DoSignalThread(void *param)
-{
     while( gCoreContext )
     {
         usleep(50000); // sleep 50ms
         while( true )
         {
             // handle cleanup and signalling for closed processes
-            m_listLock.lock();
-            if( m_msList.isEmpty() )
+            m_listLock->lock();
+            if( m_msList->isEmpty() )
+            {
+                m_listLock->unlock();
                 break;
-            MythSystem *ms = m_listLock->takeFirst();
-            m_listLock.unlock();
+            }
+            MythSystem *ms = m_msList->takeFirst();
+            m_listLock->unlock();
 
             ms->HandlePostRun();
             CLOSE(ms->m_stdpipe[0]);
@@ -364,7 +385,7 @@ void MythSystem::Run(time_t timeout)
     if( m_status != GENERIC_EXIT_START )
     {
         emit error(m_status);
-        return
+        return;
     }
 
     HandlePreRun();

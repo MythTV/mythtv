@@ -10,11 +10,13 @@ typedef enum MythSystemMask {
     kMSRunBackground            = 0x00000004, //< run child in the background
     kMSProcessEvents            = 0x00000008, //< process events while waiting
     kMSInUi                     = 0x00000010, //< the parent is in the UI
-    kMSStdIn                    = 0x00000011, //< allow access to stdin
-    kMSStdOut                   = 0x00000012, //< allow access to stdout
-    kMSStdErr                   = 0x00000014, //< allow access to stderr
-    kMSBuffered                 = 0x00000018, //< buffer the IO channels
-    kMSRunShell                 = 0x00000020, //< run process through bourne shell
+    kMSStdIn                    = 0x00000020, //< allow access to stdin
+    kMSStdOut                   = 0x00000040, //< allow access to stdout
+    kMSStdErr                   = 0x00000080, //< allow access to stderr
+    kMSBuffered                 = 0x00000100, //< buffer the IO channels
+    kMSRunShell                 = 0x00000200, //< run process through bourne shell
+    kMSNoRunShell               = 0x00000400, //< do NOT run process through bourne shell
+    kMSAnonLog                  = 0x00000800, //< anonymize the logs
 } MythSystemFlag;
 
 #ifdef __cplusplus
@@ -34,17 +36,20 @@ typedef QList<MythSystem *> MSList_t;
 class MythSystemManager : public QThread
 {
     public:
+        MythSystemManager();
+        MythSystemManager(MythSystemManager *other);
         void run(void);
         void append(MythSystem *);
     private:
-        void StartSignalThread();
-        void DoSignalThread(void *);
+        void RunManagerThread();
+        void RunSignalThread();
 
         MSMap_t    m_pMap;
         QMutex     m_mapLock;
 
-        MSList_t   m_msList;
-        QMutex     m_listLock;
+        MSList_t  *m_msList;
+        QMutex    *m_listLock;
+        bool       m_primary;
 
         char       m_readbuf[65336];
 };
@@ -54,6 +59,7 @@ class MPUBLIC MythSystem : public QObject
     Q_OBJECT
 
     public:
+        MythSystem() {};
         MythSystem(const QString &, uint);
         MythSystem(const QString &, const QStringList &, uint);
         MythSystem(const MythSystem &other);
@@ -84,7 +90,7 @@ class MPUBLIC MythSystem : public QObject
 
     signals:
         void started();
-        void finished(uint status);
+        void finished();
         void error(uint status);
 
     private:

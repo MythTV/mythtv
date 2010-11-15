@@ -634,10 +634,11 @@ bool FillData::Run(SourceList &sourcelist)
             else
             {
                 QTextStream ostream(grabber_capabilities_proc.ReadAll());
-                while (ostream.canReadLine())
+                QString capabilities;
+                while (!ostream.atEnd())
                 {
                     QString capability
-                        = grabber_capabilities_proc.readLine().simplified();
+                        = ostream.readLine().simplified();
                     capabilities += capability + ' ';
 
                     if (capability == "baseline")
