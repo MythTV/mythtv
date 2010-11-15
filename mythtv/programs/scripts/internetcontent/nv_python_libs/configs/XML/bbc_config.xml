@@ -19,9 +19,8 @@
             <url>
                 <name>BBC iPlayer Search</name>
                 <href>http://www.bbc.co.uk/iplayer/search</href>
-                <filter>//div[@class='search result-wrapper']//ul</filter>
-                <filter>//div[@id='results-container']//ul</filter>
-                <pageFilter>//a/@class[starts-with(.,'last page')]/..</pageFilter>
+                <filter>//ul[@class='result-list listview episodelist']/li</filter>
+                <pageFilter>//a/@title[starts-with(.,'Next page')]/..</pageFilter>
                 <parserType>html</parserType>
             </url>
         </urls>
