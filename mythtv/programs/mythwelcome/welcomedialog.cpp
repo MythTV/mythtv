@@ -657,8 +657,7 @@ void WelcomeDialog::shutdownNow(void)
     // don't shutdown if we are recording
     if (m_isRecording)
     {
-        MythPopupBox::showOkPopup(GetMythMainWindow(), "Cannot shutdown",
-                tr("Cannot shutdown because MythTV is currently recording"));
+        ShowOkPopup(tr("Cannot shutdown because MythTV is currently recording"));
         return;
     }
 
@@ -669,8 +668,7 @@ void WelcomeDialog::shutdownNow(void)
         curtime.secsTo(m_nextRecordingStart) - m_preRollSeconds <
         (m_idleWaitForRecordingTime * 60) + m_idleTimeoutSecs)
     {
-        MythPopupBox::showOkPopup(GetMythMainWindow(), "Cannot shutdown",
-                tr("Cannot shutdown because MythTV is about to start recording"));
+        ShowOkPopup(tr("Cannot shutdown because MythTV is about to start recording"));
         return;
     }
 
@@ -683,9 +681,8 @@ void WelcomeDialog::shutdownNow(void)
 
     if (statusCode & 128)
     {
-        MythPopupBox::showOkPopup(GetMythMainWindow(), "Cannot shutdown",
-                tr("Cannot shutdown because MythTV is about to start "
-                "a wakeup/shutdown period."));
+        ShowOkPopup(tr("Cannot shutdown because MythTV is about to start "
+                       "a wakeup/shutdown period."));
         return;
     }
 
