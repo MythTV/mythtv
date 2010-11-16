@@ -175,6 +175,7 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     uint CreateShader(int type, const QString source);
     bool ValidateShaderObject(uint obj);
     bool CheckObjectStatus(uint obj);
+    void OptimiseShaderSource(QString &source);
 
     bool UpdateTextureVertices(uint tex, const QRect *src, const QRect *dst);
     bool UpdateTextureVertices(uint tex, const QRectF *src, const QRectF *dst);

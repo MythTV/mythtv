@@ -20,7 +20,8 @@ MYTH_GLXWAITVIDEOSYNCSGIPROC MythRenderOpenGL::g_glXWaitVideoSyncSGI = NULL;
 #define TEXTURE_SIZE  2
 
 static const QString kDefaultVertexShader =
-"#version 100\n"
+"GLSL_VERSION"
+"GLSL_EXTENSIONS"
 "attribute vec4 a_color;\n"
 "attribute vec2 a_texcoord0;\n"
 "varying   vec4 v_color;\n"
@@ -32,14 +33,14 @@ static const QString kDefaultVertexShader =
 "}\n";
 
 static const QString kDefaultFragmentShader =
-"#version 100\n"
-"#extension GL_ARB_texture_rectangle : enable\n"
-"uniform sampler2DRect s_texture0;\n"
+"GLSL_VERSION"
+"GLSL_EXTENSIONS"
+"uniform sampler2D s_texture0;\n"
 "varying vec4 v_color;\n"
 "varying vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
-"    gl_FragColor = texture2DRect(s_texture0, v_texcoord0) * v_color;\n"
+"    gl_FragColor = texture2D(s_texture0, v_texcoord0) * v_color;\n"
 "}\n";
 
 static inline int __glCheck__(const QString &loc, const char* fileName, int n)
@@ -883,6 +884,9 @@ uint MythRenderOpenGL::CreateShaderObject(const QString &vertex,
     vert_shader.detach();
     frag_shader.detach();
 
+    OptimiseShaderSource(vert_shader);
+    OptimiseShaderSource(frag_shader);
+
     result = m_glCreateProgramObject();
     if (!result)
         return 0;
@@ -1702,6 +1706,24 @@ bool MythRenderOpenGL::CheckObjectStatus(uint obj)
         free(infoLog);
     }
     return false;
+}
+
+void MythRenderOpenGL::OptimiseShaderSource(QString &source)
+{
+    QString version = "#version 100\n";
+    QString extensions = "";
+
+    if (m_exts_used & kGLExtRect)
+    {
+        extensions += "#extension GL_ARB_texture_rectangle : enable\n";
+        source.replace("sampler2D", "sampler2DRect");
+        source.replace("texture2D", "texture2DRect");
+    }
+
+    source.replace("GLSL_VERSION", version);
+    source.replace("GLSL_EXTENSIONS", extensions);
+
+    VERBOSE(VB_EXTRA, "\n" + source);
 }
 
 bool MythRenderOpenGL::UpdateTextureVertices(uint tex, const QRect *src,
