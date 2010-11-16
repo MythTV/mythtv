@@ -72,7 +72,7 @@ bool UpgradeNewsDatabaseSchema(void)
     if (dbver == currentDatabaseVersion)
         return true;
 
-    if (dbver == "")
+    if (dbver.isEmpty())
     {
         VERBOSE(VB_IMPORTANT,
                 "Inserting MythNews initial database information.");
