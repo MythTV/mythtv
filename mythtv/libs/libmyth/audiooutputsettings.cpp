@@ -319,8 +319,6 @@ AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
         cur_channels = max_channels;
 
     aosettings->SetBestSupportedChannels(cur_channels);
-    if (cur_channels <= 2)
-        bDTS = bAC3 = false;
     aosettings->m_AC3 = bAC3;
     aosettings->m_DTS = bDTS;
     aosettings->m_LPCM = bLPCM;
