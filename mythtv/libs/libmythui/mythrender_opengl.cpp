@@ -151,6 +151,41 @@ void MythRenderOpenGL::doneCurrent()
     m_lock->unlock();
 }
 
+void MythRenderOpenGL::SetFeatures(uint features)
+{
+    m_exts_used = features;
+
+    if ((m_exts_used & kGLExtVBO) && (m_exts_used & kGLSL) &&
+        (m_exts_used & kGLExtFBufObj))
+    {
+        m_profile = kGLHighProfile;
+        VERBOSE(VB_GENERAL, LOC + QString("Using high profile "
+                                          "(GLSL + VBOs + FBOs)"));
+    }
+    else if ((m_exts_used & kGLVertexArray) && (m_exts_used & kGLMultiTex))
+    {
+        m_profile = kGLLegacyProfile;
+        VERBOSE(VB_GENERAL, LOC + QString("Using legacy profile "
+                                          " (Vertex arrays + multi-texturing)"));
+        if (m_exts_used & kGLExtFragProg)
+        {
+            VERBOSE(VB_GENERAL, LOC +
+                        QString("Fragment program support available"));
+        }
+    }
+    else
+    {
+        m_profile = kGLNoProfile;
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Stoneage OpenGL installation?"));
+    }
+
+    if (m_exts_used & kGLExtPBufObj)
+    {
+        VERBOSE(VB_GENERAL, LOC +
+                        QString("PixelBufferObject support available"));
+    }
+}
+
 int MythRenderOpenGL::SetPictureAttribute(int attribute, int newValue)
 {
     int ret = -1;
@@ -1264,8 +1299,6 @@ void MythRenderOpenGL::InitFeatures(void)
     if (m_extensions.contains("GL_SGIS_generate_mipmap"))
         m_exts_supported += kGLMipMaps;
 
-    m_exts_used = m_exts_supported;
-
     static bool debugged = false;
     if (!debugged)
     {
@@ -1283,6 +1316,8 @@ void MythRenderOpenGL::InitFeatures(void)
         VERBOSE(VB_GENERAL, LOC + QString("Direct rendering: %1")
                 .arg((this->format().directRendering()) ? "Yes" : "No"));
     }
+
+    SetFeatures(m_exts_supported);
 }
 
 void MythRenderOpenGL::Reset(void)
@@ -1298,6 +1333,7 @@ void MythRenderOpenGL::ResetVars(void)
     m_lock            = new QMutex(QMutex::Recursive);
     m_lock_level      = 0;
 
+    m_profile         = kGLNoProfile;
     m_extensions      = QString();
     m_exts_supported  = kGLFeatNone;
     m_exts_used       = kGLFeatNone;

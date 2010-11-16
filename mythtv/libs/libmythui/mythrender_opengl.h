@@ -48,6 +48,13 @@ typedef enum
     kGLMaxFeat     = 0x4000,
 } GLFeatures;
 
+typedef enum
+{
+    kGLNoProfile     = 0x00,
+    kGLLegacyProfile = 0x01,
+    kGLHighProfile   = 0x02,
+} GLProfile;
+
 class MythGLTexture;
 class MythGLShaderObject;
 class MythRenderOpenGL;
@@ -75,7 +82,7 @@ class MythRenderOpenGL : public QGLContext, public MythRender
 
     int   GetMaxTextureSize(void)    { return m_max_tex_size;   }
     uint  GetFeatures(void)          { return m_exts_supported; }
-    void  SetFeatures(uint features) { m_exts_used = features;  }
+    void  SetFeatures(uint features);
     int   SetPictureAttribute(int attribute, int newValue);
 
     void  MoveResizeWindow(const QRect &rect);
@@ -172,6 +179,8 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     QMutex  *m_lock;
     int      m_lock_level;
 
+    // profile
+    GLProfile m_profile;
     QString  m_extensions;
     uint     m_exts_supported;
     uint     m_exts_used;
