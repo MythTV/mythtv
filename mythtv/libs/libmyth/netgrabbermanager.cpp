@@ -61,7 +61,7 @@ void GrabberScript::run()
         VERBOSE(VB_IMPORTANT, LOC + QString("Internet Content Source %1 "
                            "completed download, beginning processing...").arg(m_title));
 
-        QByteArray result = QByteArray(*m_getTree.ReadAll());
+        QByteArray result = m_getTree.ReadAll();
 
 	QDomDocument domDoc;
         domDoc.setContent(result, true);
@@ -361,7 +361,7 @@ void Search::slotProcessSearchExit(int exitcode)
     {
         VERBOSE(VB_GENERAL|VB_EXTRA, LOC_ERR + "Internet Search Successfully Completed");
 
-        m_data = QByteArray(*m_searchProcess->ReadAll());
+        m_data = m_searchProcess->ReadAll();
         m_document.setContent(m_data, true);
     }
 

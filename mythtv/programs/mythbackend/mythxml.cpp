@@ -1652,7 +1652,7 @@ void MythXML::GetInternetSources( HTTPRequest *pRequest )
 
         scriptcheck.Run();
         scriptcheck.Wait();
-        QByteArray result = QByteArray(*scriptcheck.ReadAll());
+        QByteArray result = scriptcheck.ReadAll();
 
         if (!result.isEmpty() && result.toLower().startsWith("<grabber>"))
             ret += result;

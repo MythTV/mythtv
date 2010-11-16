@@ -28,6 +28,7 @@ typedef enum MythSystemMask {
 #include <QThread>
 #include <QWaitCondition>
 #include <unistd.h>  // for pid_t
+#include <sys/select.h>
 
 class MythSystem;
 
@@ -55,6 +56,7 @@ class MythSystemIOHandler: public QThread
         PMap_t          m_pMap;
 
         fd_set m_fds;
+        int    m_maxfd;
         bool   m_read;
         char   m_readbuf[65536];
 };
@@ -99,11 +101,11 @@ class MPUBLIC MythSystem : public QObject
         void Run(time_t timeout = 0);
         uint Wait(time_t timeout = 0);
 
-        int Write(const QByteArray*);
+        int Write(const QByteArray&);
         QByteArray Read(int size);
         QByteArray ReadErr(int size);
-        QByteArray ReadAll() const;
-        QByteArray ReadAllErr() const;
+        QByteArray& ReadAll();
+        QByteArray& ReadAllErr();
 
         void Term(bool force=false);
         void Kill() const;

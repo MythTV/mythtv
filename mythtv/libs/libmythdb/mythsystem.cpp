@@ -41,9 +41,8 @@ typedef QList<MythSystem *> MSList;
 static class MythSystemManager *manager = NULL;
 
 MythSystemIOHandler::MythSystemIOHandler(bool read) :
-    QThread()
+    QThread(), m_read(read)
 {
-    m_read = read;
 }
 
 void MythSystemIOHandler::run(void)
@@ -56,9 +55,11 @@ void MythSystemIOHandler::run(void)
 
     while( gCoreContext )
     {
+        mutex.lock();
         m_pWait.wait(&mutex);
+        mutex.unlock();
 
-        while( true )
+        while( gCoreContext )
         {
             usleep(10000); // ~100x per second, for ~3MBps throughput
             m_pLock.lock();
@@ -72,10 +73,12 @@ void MythSystemIOHandler::run(void)
             tv.tv_sec = 0; tv.tv_usec = 0;
           
             int retval;
+            fd_set fds = m_fds;
+
             if( m_read )
-                retval = select(m_pMap.size(), &m_fds, NULL, NULL, &tv);
+                retval = select(m_maxfd+1, &fds, NULL, NULL, &tv);
             else
-                retval = select(m_pMap.size(), NULL, &m_fds, NULL, &tv);
+                retval = select(m_maxfd+1, NULL, &fds, NULL, &tv);
 
             if( retval == -1 )
                 VERBOSE(VB_GENERAL, QString("select() failed because of %1")
@@ -83,17 +86,17 @@ void MythSystemIOHandler::run(void)
 
             else if( retval > 0 )
             {
-                PMap_t::iterator j, next;
-                for( j = m_pMap.begin(); j != m_pMap.end(); j = next )
+                PMap_t::iterator i, next;
+                for( i = m_pMap.begin(); i != m_pMap.end(); i = next )
                 {
-                    next = j+1;
-                    int fd = j.key();
-                    if( FD_ISSET(fd, &m_fds) )
+                    next = i+1;
+                    int fd = i.key();
+                    if( FD_ISSET(fd, &fds) )
                     {
                         if( m_read )
-                            HandleRead(j.key(), j.value());
+                            HandleRead(i.key(), i.value());
                         else
-                            HandleWrite(j.key(), j.value());
+                            HandleWrite(i.key(), i.value());
                     }
                 }
             }
@@ -105,7 +108,8 @@ void MythSystemIOHandler::run(void)
 void MythSystemIOHandler::HandleRead(int fd, QBuffer *buff)
 {
     int len;
-    if( (len = read(fd, &m_readbuf, 65536)) < 0 )
+    errno = 0;
+    if( (len = read(fd, &m_readbuf, 65536)) <= 0 )
     {
         if( errno != EAGAIN )
         {
@@ -171,10 +175,14 @@ void MythSystemIOHandler::BuildFDs()
 {
     // build descriptor list
     FD_ZERO(&m_fds);
+    m_maxfd = -1;
 
-    PMap_t::iterator j;
-    for( j = m_pMap.begin(); j != m_pMap.end(); ++j )
-        FD_SET(j.key(), &m_fds);
+    PMap_t::iterator i;
+    for( i = m_pMap.begin(); i != m_pMap.end(); ++i )
+    {
+        FD_SET(i.key(), &m_fds);
+        m_maxfd = (i.key() > m_maxfd ? i.key() : m_maxfd);
+    }
 }
 
 MythSystemManager::MythSystemManager() :
@@ -347,7 +355,7 @@ void MythSystemManager::RunSignalThread(void)
     while( gCoreContext )
     {
         usleep(50000); // sleep 50ms
-        while( true )
+        while( gCoreContext )
         {
             // handle cleanup and signalling for closed processes
             m_listLock->lock();
@@ -369,9 +377,6 @@ void MythSystemManager::RunSignalThread(void)
                 emit ms->finished();
             else
                 emit ms->error(ms->m_status);
-
-//            if( ms->m_runinbackground )   // not sure if this should be done
-//                delete ms;
         }
     }
 }
@@ -436,12 +441,12 @@ void MythSystem::SetCommand(const QString &command,
 
     ProcessFlags(flags);
 
-    // check for execute rights
     if( m_useshell )
         m_command.append(args.join(" "));
 
     else
     {
+        // check for execute rights
         if( !access(command.toUtf8().constData(), X_OK) )
             m_status = GENERIC_EXIT_CMD_NOT_FOUND;
         else
@@ -684,18 +689,18 @@ void MythSystem::ProcessFlags(uint flags)
         m_useshell = false;
 }
 
-QByteArray MythSystem::Read(int size) { return m_stdbuff[1].read(size); }
+QByteArray MythSystem::Read(int size)    { return m_stdbuff[1].read(size); }
 QByteArray MythSystem::ReadErr(int size) { return m_stdbuff[2].read(size); }
-QByteArray MythSystem::ReadAll() const { return m_stdbuff[1].buffer(); }
-QByteArray MythSystem::ReadAllErr() const { return m_stdbuff[2].buffer(); }
+QByteArray& MythSystem::ReadAll()        { return m_stdbuff[1].buffer(); }
+QByteArray& MythSystem::ReadAllErr()     { return m_stdbuff[2].buffer(); }
 
-int MythSystem::Write(const QByteArray *ba)
+int MythSystem::Write(const QByteArray &ba)
 {
     if (!m_usestdin)
         return 0;
 
-    m_stdbuff[0].buffer().append(ba->constData());
-    return ba->size();
+    m_stdbuff[0].buffer().append(ba.constData());
+    return ba.size();
 }
 
 

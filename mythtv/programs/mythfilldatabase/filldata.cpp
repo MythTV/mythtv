@@ -633,7 +633,8 @@ bool FillData::Run(SourceList &sourcelist)
                         "your xmltv grabber").arg(xmltv_grabber));
             else
             {
-                QTextStream ostream(grabber_capabilities_proc.ReadAll());
+                QByteArray result = grabber_capabilities_proc.ReadAll();
+                QTextStream ostream(result);
                 QString capabilities;
                 while (!ostream.atEnd())
                 {

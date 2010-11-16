@@ -476,7 +476,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             return;
         }
     
-        QByteArray input = QByteArray(*ms.ReadAll());
+        QByteArray input = ms.ReadAll();
 
         QStringList output = QString(input).split('\n', 
                                                   QString::SkipEmptyParts);

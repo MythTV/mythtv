@@ -182,7 +182,7 @@ MetadataLookupList MetadataDownload::runGrabber(QString cmd, QStringList args,
 
     grabber.Run();
     grabber.Wait();
-    QByteArray result = QByteArray(*grabber.ReadAll());
+    QByteArray result = grabber.ReadAll();
     if (!result.isEmpty())
     {
         QDomDocument doc;
