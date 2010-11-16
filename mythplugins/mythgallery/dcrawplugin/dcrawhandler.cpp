@@ -8,8 +8,8 @@
 #include <QFile>
 #include <QImage>
 #include <QIODevice>
-#include <QProcess>
 #include <QString>
+#include "mythsystem.h"
 
 namespace
 {
@@ -36,19 +36,8 @@ bool DcrawHandler::canRead() const
         // MythGallery anyway. So for simplicity we give up.
         return false;
 
-    QProcess process(NULL);
-    QString program = "dcraw";
-    QStringList arguments;
-    arguments << "-i" << path;
-    process.start(program, arguments, QIODevice::NotOpen);
-
-    bool finished = process.waitForFinished();
-    if (!finished)
-        return false;
-    if (process.exitStatus() != QProcess::NormalExit)
-        return false;
-    bool success = (process.exitCode() == 0);
-    return success;
+    QString command = "dcraw -i " + path;
+    return (!myth_system(command));
 }
 
 bool DcrawHandler::read(QImage *image)
@@ -62,25 +51,20 @@ bool DcrawHandler::read(QImage *image)
         // MythGallery anyway. So for simplicity we give up.
         return false;
 
-    QProcess process(NULL);
-    QString program = "dcraw";
     QStringList arguments;
     arguments << "-c" << "-w" << "-W";
 #ifdef ICC_PROFILE
     arguments << "-p" << ICC_PROFILE;
 #endif // ICC_PROFILE
     arguments << path;
-    process.start(program, arguments, QIODevice::ReadOnly);
 
-    bool finished = process.waitForFinished();
-    if (!finished)
-        return false;
-    if (process.exitStatus() != QProcess::NormalExit)
-        return false;
-    if (process.exitCode() != 0)
+    uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
+    MythSystem ms("dcraw", arguments, flags);
+    ms.Run();
+    if (ms.Wait())
         return false;
 
-    QByteArray buffer = process.readAll();
+    QByteArray buffer = ms.ReadAll();
     if (buffer.isEmpty())
         return false;
 
