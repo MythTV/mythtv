@@ -139,6 +139,23 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     void         WaitForVideoSync(int div, int rem, unsigned int *count);
 
   private:
+    void DrawBitmapLegacy(uint tex, const QRect *src, const QRect *dst,
+                         uint prog, int alpha, int red, int green, int blue);
+    void DrawBitmapHigh(uint tex, const QRect *src, const QRect *dst,
+                        uint prog, int alpha, int red, int green, int blue);
+    void DrawBitmapLegacy(uint *textures, uint texture_count,
+                          const QRectF *src, const QRectF *dst,
+                          uint prog, bool colour_control);
+    void DrawBitmapHigh(uint *textures, uint texture_count,
+                        const QRectF *src, const QRectF *dst,
+                        uint prog, bool colour_control);
+    void DrawRectLegacy(const QRect &area, bool drawFill,
+                        const QColor &fillColor,  bool drawLine,
+                        int lineWidth, const QColor &lineColor, int prog);
+    void DrawRectHigh(const QRect &area, bool drawFill,
+                      const QColor &fillColor,  bool drawLine,
+                      int lineWidth, const QColor &lineColor, int prog);
+
     void Init2DState(void);
     void InitProcs(void);
     void* GetProcAddress(const QString &proc) const;

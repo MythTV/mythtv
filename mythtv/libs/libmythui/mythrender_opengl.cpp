@@ -155,6 +155,10 @@ void MythRenderOpenGL::SetFeatures(uint features)
 {
     m_exts_used = features;
 
+    m_profile = kGLLegacyProfile;
+    VERBOSE(VB_GENERAL, LOC + "Forcing legacy profile.");
+    return;
+
     if ((m_exts_used & kGLExtVBO) && (m_exts_used & kGLSL) &&
         (m_exts_used & kGLExtFBufObj))
     {
@@ -931,22 +935,17 @@ void MythRenderOpenGL::DrawBitmap(uint tex, uint target, const QRect *src,
     if (target && !m_framebuffers.contains(target))
         target = 0;
 
-    if (prog && !m_programs.contains(prog))
-        prog = 0;
-
     makeCurrent();
-
     BindFramebuffer(target);
-    EnableFragmentProgram(prog);
-    SetBlend(true);
-    SetColor(red, green, blue, alpha);
 
-    EnableTextures(tex);
-    glBindTexture(m_textures[tex].m_type, tex);
-    UpdateTextureVertices(tex, src, dst);
-    glVertexPointer(2, GL_FLOAT, 0, m_textures[tex].m_vertex_data);
-    glTexCoordPointer(2, GL_FLOAT, 0, m_textures[tex].m_vertex_data + TEX_OFFSET);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    if (kGLLegacyProfile == m_profile)
+    {
+        DrawBitmapLegacy(tex, src, dst, prog, alpha, red, green, blue);
+    }
+    else if (kGLHighProfile == m_profile)
+    {
+        DrawBitmapHigh(tex, src, dst, prog, alpha, red, green, blue);
+    }
 
     doneCurrent();
 }
@@ -962,41 +961,18 @@ void MythRenderOpenGL::DrawBitmap(uint *textures, uint texture_count,
     if (target && !m_framebuffers.contains(target))
         target = 0;
 
-    if (prog && !m_programs.contains(prog))
-        prog = 0;
-
     makeCurrent();
-
-    uint first = textures[0];
-
     BindFramebuffer(target);
-    EnableFragmentProgram(prog);
-    if (colour_control)
-    {
-        InitFragmentParams(0, m_attribs[kGLAttribBrightness],
-                           m_attribs[kGLAttribContrast],
-                           m_attribs[kGLAttribColour], 0.5f);
-    }
-    SetBlend(false);
-    SetColor(255, 255, 255, 255);
 
-    EnableTextures(first);
-    uint active_tex = 0;
-    for (uint i = 0; i < texture_count; i++)
+    if (kGLLegacyProfile == m_profile)
     {
-        if (m_textures.contains(textures[i]))
-        {
-            ActiveTexture(GL_TEXTURE0 + active_tex++);
-            glBindTexture(m_textures[textures[i]].m_type, textures[i]);
-        }
+        DrawBitmapLegacy(textures, texture_count, src, dst, prog, colour_control);
+    }
+    else if (kGLHighProfile == m_profile)
+    {
+        DrawBitmapHigh(textures, texture_count, src, dst, prog, colour_control);
     }
 
-    UpdateTextureVertices(first, src, dst);
-    glVertexPointer(2, GL_FLOAT, 0, m_textures[first].m_vertex_data);
-    glTexCoordPointer(2, GL_FLOAT, 0, m_textures[first].m_vertex_data + TEX_OFFSET);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    ActiveTexture(GL_TEXTURE0);
     doneCurrent();
 }
 
@@ -1008,12 +984,31 @@ void MythRenderOpenGL::DrawRect(const QRect &area, bool drawFill,
     if (target && !m_framebuffers.contains(target))
         target = 0;
 
+    makeCurrent();
+    BindFramebuffer(target);
+
+    if (kGLLegacyProfile == m_profile)
+    {
+        DrawRectLegacy(area, drawFill, fillColor, drawLine,
+                       lineWidth, lineColor, prog);
+    }
+    else if (kGLHighProfile == m_profile)
+    {
+        DrawRectHigh(area, drawFill, fillColor, drawLine,
+                       lineWidth, lineColor, prog);
+    }
+
+    doneCurrent();
+}
+
+void MythRenderOpenGL::DrawRectLegacy(const QRect &area, bool drawFill,
+                                      const QColor &fillColor,  bool drawLine,
+                                      int lineWidth, const QColor &lineColor,
+                                      int prog)
+{
     if (prog && !m_programs.contains(prog))
         prog = 0;
 
-    makeCurrent();
-
-    BindFramebuffer(target);
     EnableFragmentProgram(prog);
     SetBlend(true);
     DisableTextures();
@@ -1036,8 +1031,14 @@ void MythRenderOpenGL::DrawRect(const QRect &area, bool drawFill,
         glVertexPointer(2, GL_FLOAT, 0, vertices);
         glDrawArrays(GL_LINE_LOOP, 0, 4);
     }
+}
 
-    doneCurrent();
+void MythRenderOpenGL::DrawRectHigh(const QRect &area, bool drawFill,
+                                    const QColor &fillColor,  bool drawLine,
+                                    int lineWidth, const QColor &lineColor,
+                                    int prog)
+{
+
 }
 
 bool MythRenderOpenGL::HasGLXWaitVideoSyncSGI(void)
@@ -1085,6 +1086,77 @@ void MythRenderOpenGL::WaitForVideoSync(int div, int rem, unsigned int *count)
         g_glXWaitVideoSyncSGI(div, rem, count);
         doneCurrent();
     }
+}
+
+void MythRenderOpenGL::DrawBitmapLegacy(uint tex, const QRect *src,
+                                        const QRect *dst, uint prog, int alpha,
+                                        int red, int green, int blue)
+{
+    if (prog && !m_programs.contains(prog))
+        prog = 0;
+
+    EnableFragmentProgram(prog);
+    SetBlend(true);
+    SetColor(red, green, blue, alpha);
+
+    EnableTextures(tex);
+    glBindTexture(m_textures[tex].m_type, tex);
+    UpdateTextureVertices(tex, src, dst);
+    glVertexPointer(2, GL_FLOAT, 0, m_textures[tex].m_vertex_data);
+    glTexCoordPointer(2, GL_FLOAT, 0, m_textures[tex].m_vertex_data + TEX_OFFSET);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
+void MythRenderOpenGL::DrawBitmapHigh(uint tex, const QRect *src,
+                                      const QRect *dst, uint prog, int alpha,
+                                      int red, int green, int blue)
+{
+
+}
+
+void MythRenderOpenGL::DrawBitmapLegacy(uint *textures, uint texture_count,
+                                        const QRectF *src, const QRectF *dst,
+                                        uint prog, bool colour_control)
+{
+    if (prog && !m_programs.contains(prog))
+        prog = 0;
+
+    uint first = textures[0];
+
+    EnableFragmentProgram(prog);
+    if (colour_control)
+    {
+        InitFragmentParams(0, m_attribs[kGLAttribBrightness],
+                           m_attribs[kGLAttribContrast],
+                           m_attribs[kGLAttribColour], 0.5f);
+    }
+    SetBlend(false);
+    SetColor(255, 255, 255, 255);
+
+    EnableTextures(first);
+    uint active_tex = 0;
+    for (uint i = 0; i < texture_count; i++)
+    {
+        if (m_textures.contains(textures[i]))
+        {
+            ActiveTexture(GL_TEXTURE0 + active_tex++);
+            glBindTexture(m_textures[textures[i]].m_type, textures[i]);
+        }
+    }
+
+    UpdateTextureVertices(first, src, dst);
+    glVertexPointer(2, GL_FLOAT, 0, m_textures[first].m_vertex_data);
+    glTexCoordPointer(2, GL_FLOAT, 0, m_textures[first].m_vertex_data + TEX_OFFSET);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    ActiveTexture(GL_TEXTURE0);
+}
+
+void MythRenderOpenGL::DrawBitmapHigh(uint *textures, uint texture_count,
+                                      const QRectF *src, const QRectF *dst,
+                                      uint prog, bool colour_control)
+{
+
 }
 
 void MythRenderOpenGL::Init2DState(void)
