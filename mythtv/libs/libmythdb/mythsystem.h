@@ -26,12 +26,38 @@ typedef enum MythSystemMask {
 #include <QMutex>
 #include <QMap>
 #include <QThread>
+#include <QWaitCondition>
 #include <unistd.h>  // for pid_t
 
 class MythSystem;
 
 typedef QMap<pid_t, MythSystem *> MSMap_t;
+typedef QMap<int, QBuffer *> PMap_t;
 typedef QList<MythSystem *> MSList_t;
+
+class MythSystemIOHandler: public QThread
+{
+    public:
+        MythSystemIOHandler(bool read);
+        void   run(void);
+
+        void   insert(int fd, QBuffer *buff);
+        void   remove(int fd);
+        void   wake();
+
+    private:
+        void   HandleRead(int fd, QBuffer *buff);
+        void   HandleWrite(int fd, QBuffer *buff);
+        void   BuildFDs();
+
+        QWaitCondition  m_pWait;
+        QMutex          m_pLock;
+        PMap_t          m_pMap;
+
+        fd_set m_fds;
+        bool   m_read;
+        char   m_readbuf[65536];
+};
 
 class MythSystemManager : public QThread
 {
@@ -44,14 +70,15 @@ class MythSystemManager : public QThread
         void RunManagerThread();
         void RunSignalThread();
 
+        MythSystemIOHandler     *m_readThread;
+        MythSystemIOHandler     *m_writeThread;
+
         MSMap_t    m_pMap;
         QMutex     m_mapLock;
 
         MSList_t  *m_msList;
         QMutex    *m_listLock;
         bool       m_primary;
-
-        char       m_readbuf[65536];
 };
 
 class MPUBLIC MythSystem : public QObject
@@ -73,10 +100,10 @@ class MPUBLIC MythSystem : public QObject
         uint Wait(time_t timeout = 0);
 
         int Write(const QByteArray*);
-        QByteArray *Read(int size);
-        QByteArray *ReadErr(int size);
-        QByteArray *ReadAll() const;
-        QByteArray *ReadAllErr() const;
+        QByteArray Read(int size);
+        QByteArray ReadErr(int size);
+        QByteArray ReadAll() const;
+        QByteArray ReadAllErr() const;
 
         void Term(bool force=false);
         void Kill() const;
@@ -99,8 +126,6 @@ class MPUBLIC MythSystem : public QObject
         void HandlePreRun();
         void HandlePostRun();
         void Fork();
-        QByteArray *_read(int, int);
-        QByteArray *_readall(int) const;
 
         uint   m_status;
         pid_t  m_pid;
@@ -113,11 +138,7 @@ class MPUBLIC MythSystem : public QObject
         QString     m_directory;
 
         int     m_stdpipe[3]; // should there be a means of hitting these directly?
-        QBuffer m_stdbuff[2]; // do these need to be allocated?
-
-        QByteArray m_writeBuf;
-        int     m_writeOffset;
-        int     m_writeRemain;
+        QBuffer m_stdbuff[3]; // do these need to be allocated?
 
         // move to a struct to keep things clean?
         // perhaps allow overloaded input using the struct
@@ -130,7 +151,6 @@ class MPUBLIC MythSystem : public QObject
         bool  m_usestdin;
         bool  m_usestdout;
         bool  m_usestderr;
-        bool  m_bufferedio;
         bool  m_useshell;
         bool  m_setdirectory;
 };

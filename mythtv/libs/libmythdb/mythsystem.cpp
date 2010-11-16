@@ -33,15 +33,149 @@
 
 #define CLOSE(x) if( x >= 0 ) {close(x); x = -1;}
 
-typedef QMap<int, QByteArray *> pipeRMap_t;
-typedef QMap<int, MythSystem *> pipeWMap_t;
 typedef QList<MythSystem *> MSList;
 
 /**********************************
  * MythSystemManager method defines
  *********************************/
 static class MythSystemManager *manager = NULL;
-void *doSignalThread(void *arg);
+
+MythSystemIOHandler::MythSystemIOHandler(bool read) :
+    QThread()
+{
+    m_read = read;
+}
+
+void MythSystemIOHandler::run(void)
+{
+    m_pLock.lock();
+    BuildFDs();
+    m_pLock.unlock();
+
+    QMutex mutex;
+
+    while( gCoreContext )
+    {
+        m_pWait.wait(&mutex);
+
+        while( true )
+        {
+            usleep(10000); // ~100x per second, for ~3MBps throughput
+            m_pLock.lock();
+            if( m_pMap.isEmpty() )
+            {
+                m_pLock.unlock();
+                break;
+            }
+            
+            timeval tv;
+            tv.tv_sec = 0; tv.tv_usec = 0;
+          
+            int retval;
+            if( m_read )
+                retval = select(m_pMap.size(), &m_fds, NULL, NULL, &tv);
+            else
+                retval = select(m_pMap.size(), NULL, &m_fds, NULL, &tv);
+
+            if( retval == -1 )
+                VERBOSE(VB_GENERAL, QString("select() failed because of %1")
+                            .arg(strerror(errno)));
+
+            else if( retval > 0 )
+            {
+                PMap_t::iterator j, next;
+                for( j = m_pMap.begin(); j != m_pMap.end(); j = next )
+                {
+                    next = j+1;
+                    int fd = j.key();
+                    if( FD_ISSET(fd, &m_fds) )
+                    {
+                        if( m_read )
+                            HandleRead(j.key(), j.value());
+                        else
+                            HandleWrite(j.key(), j.value());
+                    }
+                }
+            }
+            m_pLock.unlock();
+        }
+    }
+}
+
+void MythSystemIOHandler::HandleRead(int fd, QBuffer *buff)
+{
+    int len;
+    if( (len = read(fd, &m_readbuf, 65536)) < 0 )
+    {
+        if( errno != EAGAIN )
+        {
+            m_pMap.remove(fd);
+            BuildFDs();
+        }
+    }
+    else
+        buff->buffer().append(m_readbuf, len);
+}
+
+void MythSystemIOHandler::HandleWrite(int fd, QBuffer *buff)
+{
+    if( buff->atEnd() )
+    {
+        m_pMap.remove(fd);
+        BuildFDs();
+        return;
+    }
+
+    int pos = buff->pos();
+    int len = buff->size() - pos;
+    len = (len > 32768 ? 32768 : len);
+
+    int rlen = write(fd, buff->read(len).constData(), len);
+    if( rlen < 0 )
+    {
+        if( errno != EAGAIN )
+        {
+            m_pMap.remove(fd);
+            BuildFDs();
+        }
+        else
+            buff->seek(pos);
+    }
+    else if( rlen != len )
+        buff->seek(pos+rlen);
+}
+
+void MythSystemIOHandler::insert(int fd, QBuffer *buff)
+{
+    m_pLock.lock();
+    m_pMap.insert(fd, buff);
+    BuildFDs();
+    m_pLock.unlock();
+    wake();
+}
+
+void MythSystemIOHandler::remove(int fd)
+{
+    m_pLock.lock();
+    m_pMap.remove(fd);
+    BuildFDs();
+    m_pLock.unlock();
+}
+
+void MythSystemIOHandler::wake()
+{
+    m_pWait.wakeAll();
+}
+
+void MythSystemIOHandler::BuildFDs()
+{
+    // build descriptor list
+    FD_ZERO(&m_fds);
+
+    PMap_t::iterator j;
+    for( j = m_pMap.begin(); j != m_pMap.end(); ++j )
+        FD_SET(j.key(), &m_fds);
+}
 
 MythSystemManager::MythSystemManager() :
         QThread(), m_primary(true)
@@ -74,6 +208,9 @@ void MythSystemManager::RunManagerThread()
     MythSystemManager *sthread = new MythSystemManager(this);
     sthread->start();
 
+    m_readThread =  new MythSystemIOHandler(true);
+    m_writeThread = new MythSystemIOHandler(false);
+
     // gCoreContext is set to NULL during shutdown, and we need this thread to
     // exit during shutdown.
     while( gCoreContext )
@@ -91,8 +228,6 @@ void MythSystemManager::RunManagerThread()
         m_mapLock.unlock();
 
         m_listLock->lock();
-        pipeRMap_t          pRMap;   // map of IO pipes for buffering
-        pipeWMap_t          pWMap;   // map of IO pipes for buffering
         MythSystem         *ms;
         pid_t               pid;
 
@@ -153,16 +288,6 @@ void MythSystemManager::RunManagerThread()
                     .arg(pid) .arg(ms->m_logcmd) .arg(status) .arg(ms->m_status));
             }
 
-            // hand off buffered pipes for final processing
-            if( ms->m_bufferedio )
-            {
-                if( ms->m_usestdin && ms->m_stdpipe[0] > 0 )
-                    pWMap.insert(ms->m_stdpipe[0], ms);
-                if( ms->m_usestdout )
-                    pRMap.insert(ms->m_stdpipe[1], &(ms->m_stdbuff[0].buffer()));
-                if( ms->m_usestderr )
-                    pRMap.insert(ms->m_stdpipe[2], &(ms->m_stdbuff[1].buffer()));
-            }
         }
 
 
@@ -199,125 +324,19 @@ void MythSystemManager::RunManagerThread()
                     ms->Term();
                 }
             }
-
-            // handle processes needing buffering
-            if( ms->m_bufferedio )
-            {
-                if( ms->m_usestdin && ms->m_stdpipe[0] > 0 )
-                    pWMap.insert(ms->m_stdpipe[0], ms);
-                if( ms->m_usestdout )
-                    pRMap.insert(ms->m_stdpipe[1], &(ms->m_stdbuff[0].buffer()));
-                if( ms->m_usestderr )
-                    pRMap.insert(ms->m_stdpipe[2], &(ms->m_stdbuff[1].buffer()));
-            }
         }
 
         m_mapLock.unlock();
-
-        if( !pRMap.isEmpty() || !pWMap.isEmpty() )
-        {
-            // build structures for select()
-            fd_set  rfds;
-            fd_set  wfds;
-            timeval tv;
-            int     maxfd = -1;
-
-            tv.tv_sec = 0; tv.tv_usec = 0;
-
-            // build descriptor list
-            FD_ZERO(&rfds);
-            FD_ZERO(&wfds);
-
-            pipeRMap_t::iterator j;
-            pipeWMap_t::iterator k;
-            for( j = pRMap.begin(); j != pRMap.end(); ++j )
-            {
-                FD_SET(j.key(), &rfds);
-                maxfd = (j.key() > maxfd ? j.key() : maxfd);
-            }
-
-            for( k = pWMap.begin(); k != pWMap.end(); ++k )
-            {
-                FD_SET(k.key(), &wfds);
-                maxfd = (k.key() > maxfd ? k.key() : maxfd);
-            }
-
-            int retval = select(maxfd + 1, &rfds, &wfds, NULL, &tv);
-            if( retval == -1 )
-                VERBOSE(VB_GENERAL, QString("select() failed because of %1")
-                            .arg(strerror(errno)));
-            else if( retval > 0 )
-            {
-                // loop through returned descriptors
-                pipeRMap_t::iterator nextj;
-                for( j = pRMap.begin(); j != pRMap.end(); j = nextj )
-                {
-                    nextj = j+1;
-                    int fd = j.key();
-                    if( FD_ISSET(fd, &rfds) )
-                    {
-                        int len;
-                        if( (len = read(fd, &m_readbuf, 65536)) < 0 )
-                        {
-                            if( errno != EAGAIN )
-                            {
-                                pRMap.remove(fd);
-                                CLOSE(fd);
-                            }
-                            continue;
-                        }
-                        j.value()->append(m_readbuf, len);
-                    }
-                }
-
-                pipeWMap_t::iterator nextk;
-                for( k = pWMap.begin(); k != pWMap.end(); k = nextk )
-                {
-                    nextk = k+1;
-                    if( FD_ISSET(k.key(), &wfds) )
-                    {
-                        int len;
-                        ms = k.value();
-
-                        VERBOSE(VB_IMPORTANT, QString("offset: %1, remain: %2")
-                            .arg(ms->m_writeOffset).arg(ms->m_writeRemain));
-
-                        if( ms->m_writeRemain == 0 )
-                        {
-                            int fd = ms->m_stdpipe[0];
-                            
-                            pWMap.remove(fd);
-                            CLOSE(ms->m_stdpipe[0]);
-                            continue;
-                        } 
-
-                        len = (ms->m_writeRemain > 32768 ? 32768 :
-                               ms->m_writeRemain);
-                        len = write( k.key(), 
-                            ms->m_writeBuf.mid(ms->m_writeOffset, len), len);
-                        if (len < 0) 
-                        {
-                            if( errno != EAGAIN )
-                            {
-                                ms->m_writeRemain = 0;
-                            }
-                            continue;
-                        }
-                        else
-                        {
-                            ms->m_writeOffset += len;
-                            ms->m_writeRemain -= len;
-                        }
-                    }
-                }
-            }
-        }
 
         // hold off unlocking until all the way down here to 
         // give the buffer handling a chance to run before
         // being closed down by signal thread
         m_listLock->unlock();
     }
+
+    // kick to allow them to close themselves cleanly
+    m_readThread->wake();
+    m_writeThread->wake();
 }
 
 // spawn separate thread for signals to prevent manager
@@ -362,6 +381,13 @@ void MythSystemManager::append(MythSystem *ms)
     m_mapLock.lock();
     m_pMap.insert(ms->m_pid, ms);
     m_mapLock.unlock();
+
+    if( ms->m_usestdin )
+        m_writeThread->insert(ms->m_stdpipe[0], &(ms->m_stdbuff[0]));
+    if( ms->m_usestdout )
+        m_readThread->insert(ms->m_stdpipe[1], &(ms->m_stdbuff[1]));
+    if( ms->m_usestderr )
+        m_readThread->insert(ms->m_stdpipe[2], &(ms->m_stdbuff[2]));
 }
 
 /*******************************
@@ -448,7 +474,6 @@ MythSystem::MythSystem(const MythSystem &other) :
     m_usestdin(other.m_usestdin),
     m_usestdout(other.m_usestdout),
     m_usestderr(other.m_usestderr),
-    m_bufferedio(other.m_bufferedio),
     m_useshell(other.m_useshell)
 {
 }
@@ -623,7 +648,6 @@ void MythSystem::ProcessFlags(uint flags)
     m_usestdin        = false;
     m_usestdout       = false;
     m_usestderr       = false;
-    m_bufferedio      = false;
     m_useshell        = false;
     m_setdirectory    = false;
 
@@ -654,63 +678,24 @@ void MythSystem::ProcessFlags(uint flags)
         m_usestdout = true;
     if( flags & kMSStdErr )
         m_usestderr = true;
-    if( flags & kMSBuffered )
-        m_bufferedio = true;
     if( flags & kMSRunShell )
         m_useshell = true;
     if( flags & kMSNoRunShell ) // override for use with myth_system
         m_useshell = false;
 }
 
-QByteArray *MythSystem::_read(int size, int id)
-{
-    QByteArray *ret = new QByteArray("");
-
-    if( m_bufferedio )
-        ret->append(m_stdbuff[id].read(size));
-    else if( m_stdpipe[id] > -1 )
-    {
-        int len;
-        char *buf = (char *)calloc(size, 0);
-        len = read(m_stdpipe[id+1], buf, size);
-        ret->append(buf, len);
-        free(buf);
-    }
-
-    return ret;
-}
-
-QByteArray *MythSystem::_readall(int id) const
-{
-    QByteArray *ret = new QByteArray("");
-
-    if( m_bufferedio )
-        ret->append(m_stdbuff[id].buffer());
-
-    return ret;
-}
-
-QByteArray *MythSystem::Read(int size) { return _read(size, 0); }
-
-QByteArray *MythSystem::ReadErr(int size) { return _read(size, 1); }
-
-QByteArray *MythSystem::ReadAll() const { return _readall(0); }
-
-QByteArray *MythSystem::ReadAllErr() const { return _readall(1); }
+QByteArray MythSystem::Read(int size) { return m_stdbuff[1].read(size); }
+QByteArray MythSystem::ReadErr(int size) { return m_stdbuff[2].read(size); }
+QByteArray MythSystem::ReadAll() const { return m_stdbuff[1].buffer(); }
+QByteArray MythSystem::ReadAllErr() const { return m_stdbuff[2].buffer(); }
 
 int MythSystem::Write(const QByteArray *ba)
 {
     if (!m_usestdin)
         return 0;
-    
-    m_writeBuf = *ba;
-    m_writeOffset = 0;
-    m_writeRemain = m_writeBuf.size();
 
-    if (!m_bufferedio)
-        return write(m_stdpipe[0], m_writeBuf.constData(), m_writeRemain);
-
-    return m_writeRemain;
+    m_stdbuff[0].buffer().append(ba->constData());
+    return ba->size();
 }
 
 
@@ -767,9 +752,9 @@ void MythSystem::Fork()
 
     VERBOSE(VB_GENERAL, QString("Launching: %1").arg(m_logcmd));
 
-    m_writeRemain = 0;
     m_stdbuff[0].setBuffer(0);
     m_stdbuff[1].setBuffer(0);
+    m_stdbuff[2].setBuffer(0);
 
     int p_stdin[]  = {-1,-1};
     int p_stdout[] = {-1,-1};
@@ -778,27 +763,33 @@ void MythSystem::Fork()
     /* set up pipes */
     if( m_usestdin )
     {
-        if( pipe2(p_stdin, O_NONBLOCK) == -1 )
+        if( pipe(p_stdin) == -1 )
         {
             VERBOSE(VB_GENERAL, (LOC_ERR + "stdin pipe() failed"));
             m_status = GENERIC_EXIT_NOT_OK;
         }
+        else
+            fcntl(p_stdin[1], F_SETFL, O_NONBLOCK);
     }
     if( m_usestdout )
     {
-        if( pipe2(p_stdout, O_NONBLOCK) == -1 )
+        if( pipe(p_stdout) == -1 )
         {
             VERBOSE(VB_GENERAL, (LOC_ERR + "stdout pipe() failed"));
             m_status = GENERIC_EXIT_NOT_OK;
         }
+        else
+            fcntl(p_stdout[0], F_SETFL, O_NONBLOCK);
     }
     if( m_usestderr )
     {
-        if( pipe2(p_stderr, O_NONBLOCK) == -1 )
+        if( pipe(p_stderr) == -1 )
         {
             VERBOSE(VB_GENERAL, (LOC_ERR + "stderr pipe() failed"));
             m_status = GENERIC_EXIT_NOT_OK;
         }
+        else
+            fcntl(p_stderr[0], F_SETFL, O_NONBLOCK);
     }
 
     // set up command args
