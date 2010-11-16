@@ -1,6 +1,7 @@
 #include <unistd.h>      // for isatty() on Windows
 
 #include "dialogbox.h"
+#include "mythdialogbox.h"
 #include "mythcorecontext.h"
 #include "schemawizard.h"
 #include "util.h"
@@ -408,7 +409,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
         if (returnValue == MYTH_SCHEMA_ERROR)
         {
             // Display error, return warning to caller
-            MythPopupBox::showOkPopup(GetMythMainWindow(), "", message);
+            ShowOkPopup(message);
             return MYTH_SCHEMA_ERROR;
         }
 
