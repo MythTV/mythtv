@@ -13,21 +13,33 @@
 MYTH_GLXGETVIDEOSYNCSGIPROC  MythRenderOpenGL::g_glXGetVideoSyncSGI  = NULL;
 MYTH_GLXWAITVIDEOSYNCSGIPROC MythRenderOpenGL::g_glXWaitVideoSyncSGI = NULL;
 
+#define VERTEX_INDEX  0
+#define COLOR_INDEX   1
+#define TEXTURE_INDEX 2
+#define VERTEX_SIZE   2
+#define TEXTURE_SIZE  2
+
 static const QString kDefaultVertexShader =
-"#version 140\n"
-"uniform Transformation {\n"
-"    mat4 projection_matrix;\n"
-"    mat4 modelview_matrix;\n"
-"};\n"
-"in vec3 vertex;\n"
+"#version 100\n"
+"attribute vec4 a_color;\n"
+"attribute vec2 a_texcoord0;\n"
+"varying   vec4 v_color;\n"
+"varying   vec2 v_texcoord0;\n"
 "void main() {\n"
-"    gl_Position = projection_matrix * modelview_matrix * vec4(vertex, 1.0);\n"
+"    gl_Position = ftransform();\n"
+"    v_texcoord0 = a_texcoord0;\n"
+"    v_color     = a_color;\n"
 "}\n";
 
 static const QString kDefaultFragmentShader =
+"#version 100\n"
+"#extension GL_ARB_texture_rectangle : enable\n"
+"uniform sampler2DRect s_texture0;\n"
+"varying vec4 v_color;\n"
+"varying vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
-"    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n"
+"    gl_FragColor = texture2DRect(s_texture0, v_texcoord0) * v_color;\n"
 "}\n";
 
 static inline int __glCheck__(const QString &loc, const char* fileName, int n)
@@ -187,6 +199,12 @@ void MythRenderOpenGL::SetFeatures(uint features)
     {
         VERBOSE(VB_GENERAL, LOC +
                         QString("PixelBufferObject support available"));
+    }
+
+    if (kGLHighProfile == m_profile && m_default_shader == 0)
+    {
+        m_default_shader = CreateShaderObject(kDefaultVertexShader,
+                                              kDefaultFragmentShader);
     }
 }
 
@@ -1001,46 +1019,6 @@ void MythRenderOpenGL::DrawRect(const QRect &area, bool drawFill,
     doneCurrent();
 }
 
-void MythRenderOpenGL::DrawRectLegacy(const QRect &area, bool drawFill,
-                                      const QColor &fillColor,  bool drawLine,
-                                      int lineWidth, const QColor &lineColor,
-                                      int prog)
-{
-    if (prog && !m_programs.contains(prog))
-        prog = 0;
-
-    EnableFragmentProgram(prog);
-    SetBlend(true);
-    DisableTextures();
-
-    if (drawFill)
-    {
-        SetColor(fillColor.red(), fillColor.green(),
-                 fillColor.blue(), fillColor.alpha());
-        GLfloat *vertices = GetCachedVertices(GL_TRIANGLE_STRIP, area);
-        glVertexPointer(2, GL_FLOAT, 0, vertices);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    }
-
-    if (drawLine)
-    {
-        SetColor(lineColor.red(), lineColor.green(),
-                 lineColor.blue(), lineColor.alpha());
-        glLineWidth(lineWidth);
-        GLfloat *vertices = GetCachedVertices(GL_LINE_LOOP, area);
-        glVertexPointer(2, GL_FLOAT, 0, vertices);
-        glDrawArrays(GL_LINE_LOOP, 0, 4);
-    }
-}
-
-void MythRenderOpenGL::DrawRectHigh(const QRect &area, bool drawFill,
-                                    const QColor &fillColor,  bool drawLine,
-                                    int lineWidth, const QColor &lineColor,
-                                    int prog)
-{
-
-}
-
 bool MythRenderOpenGL::HasGLXWaitVideoSyncSGI(void)
 {
     static bool initialised = false;
@@ -1099,19 +1077,48 @@ void MythRenderOpenGL::DrawBitmapLegacy(uint tex, const QRect *src,
     SetBlend(true);
     SetColor(red, green, blue, alpha);
 
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     EnableTextures(tex);
     glBindTexture(m_textures[tex].m_type, tex);
     UpdateTextureVertices(tex, src, dst);
     glVertexPointer(2, GL_FLOAT, 0, m_textures[tex].m_vertex_data);
     glTexCoordPointer(2, GL_FLOAT, 0, m_textures[tex].m_vertex_data + TEX_OFFSET);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void MythRenderOpenGL::DrawBitmapHigh(uint tex, const QRect *src,
                                       const QRect *dst, uint prog, int alpha,
                                       int red, int green, int blue)
 {
+    if (prog && !m_shader_objects.contains(prog))
+        prog = 0;
+    if (prog == 0 && m_default_shader)
+        prog = m_default_shader;
 
+    EnableShaderObject(prog);
+    SetBlend(true);
+
+    EnableTextures(tex);
+    glBindTexture(m_textures[tex].m_type, tex);
+    UpdateTextureVertices(tex, src, dst);
+    m_glEnableVertexAttribArray(VERTEX_INDEX);
+    m_glEnableVertexAttribArray(TEXTURE_INDEX);
+
+    m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+                            VERTEX_SIZE * sizeof(GLfloat),
+                            m_textures[tex].m_vertex_data);
+    m_glVertexAttrib4f(COLOR_INDEX, red / 255.0, green / 255.0, blue / 255.0, alpha / 255.0);
+    m_glVertexAttribPointer(TEXTURE_INDEX, TEXTURE_SIZE, GL_FLOAT, GL_FALSE,
+                            TEXTURE_SIZE * sizeof(GLfloat),
+                            m_textures[tex].m_vertex_data + TEX_OFFSET);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    m_glDisableVertexAttribArray(TEXTURE_INDEX);
+    m_glDisableVertexAttribArray(VERTEX_INDEX);
 }
 
 void MythRenderOpenGL::DrawBitmapLegacy(uint *textures, uint texture_count,
@@ -1133,6 +1140,8 @@ void MythRenderOpenGL::DrawBitmapLegacy(uint *textures, uint texture_count,
     SetBlend(false);
     SetColor(255, 255, 255, 255);
 
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     EnableTextures(first);
     uint active_tex = 0;
     for (uint i = 0; i < texture_count; i++)
@@ -1150,11 +1159,56 @@ void MythRenderOpenGL::DrawBitmapLegacy(uint *textures, uint texture_count,
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     ActiveTexture(GL_TEXTURE0);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void MythRenderOpenGL::DrawBitmapHigh(uint *textures, uint texture_count,
                                       const QRectF *src, const QRectF *dst,
                                       uint prog, bool colour_control)
+{
+
+}
+
+void MythRenderOpenGL::DrawRectLegacy(const QRect &area, bool drawFill,
+                                      const QColor &fillColor,  bool drawLine,
+                                      int lineWidth, const QColor &lineColor,
+                                      int prog)
+{
+    if (prog && !m_programs.contains(prog))
+        prog = 0;
+
+    EnableFragmentProgram(prog);
+    SetBlend(true);
+    DisableTextures();
+    glEnableClientState(GL_VERTEX_ARRAY);
+
+    if (drawFill)
+    {
+        SetColor(fillColor.red(), fillColor.green(),
+                 fillColor.blue(), fillColor.alpha());
+        GLfloat *vertices = GetCachedVertices(GL_TRIANGLE_STRIP, area);
+        glVertexPointer(2, GL_FLOAT, 0, vertices);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
+
+    if (drawLine)
+    {
+        SetColor(lineColor.red(), lineColor.green(),
+                 lineColor.blue(), lineColor.alpha());
+        glLineWidth(lineWidth);
+        GLfloat *vertices = GetCachedVertices(GL_LINE_LOOP, area);
+        glVertexPointer(2, GL_FLOAT, 0, vertices);
+        glDrawArrays(GL_LINE_LOOP, 0, 4);
+    }
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+}
+
+void MythRenderOpenGL::DrawRectHigh(const QRect &area, bool drawFill,
+                                    const QColor &fillColor,  bool drawLine,
+                                    int lineWidth, const QColor &lineColor,
+                                    int prog)
 {
 
 }
@@ -1174,8 +1228,6 @@ void MythRenderOpenGL::Init2DState(void)
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     Flush(true);
 }
 
@@ -1261,6 +1313,16 @@ void MythRenderOpenGL::InitProcs(void)
         GetProcAddress("glGetUniformLocationARB");
     m_glUniform4f = (MYTH_GLUNIFORM4F)
         GetProcAddress("glUniform4fARB");
+    m_glVertexAttribPointer = (MYTH_GLVERTEXATTRIBPOINTER)
+        GetProcAddress("glVertexAttribPointer");
+    m_glEnableVertexAttribArray = (MYTH_GLENABLEVERTEXATTRIBARRAY)
+        GetProcAddress("glEnableVertexAttribArray");
+    m_glDisableVertexAttribArray = (MYTH_GLDISABLEVERTEXATTRIBARRAY)
+        GetProcAddress("glDisableVertexAttribArray");
+    m_glBindAttribLocation = (MYTH_GLBINDATTRIBLOCATION)
+        GetProcAddress("glBindAttribLocation");
+    m_glVertexAttrib4f = (MYTH_GLVERTEXATTRIB4F)
+        GetProcAddress("glVertexAttrib4f");
 }
 
 void* MythRenderOpenGL::GetProcAddress(const QString &proc) const
@@ -1330,8 +1392,14 @@ void MythRenderOpenGL::InitFeatures(void)
         m_glUseProgram    && m_glGetInfoLog &&
         m_glDetachObject  && m_glGetObjectParameteriv &&
         m_glDeleteObject  && m_glGetUniformLocation &&
-        m_glUniform4f)
+        m_glUniform4f     && m_glVertexAttribPointer &&
+        m_glEnableVertexAttribArray &&
+        m_glDisableVertexAttribArray &&
+        m_glBindAttribLocation &&
+        m_glVertexAttrib4f)
+    {
         m_exts_supported += kGLSL;
+    }
 
     if (m_extensions.contains("GL_EXT_framebuffer_object") &&
         m_glGenFramebuffersEXT      && m_glBindFramebufferEXT &&
@@ -1412,6 +1480,7 @@ void MythRenderOpenGL::ResetVars(void)
     m_max_tex_size    = 0;
     m_max_units       = 0;
     m_default_texture_type = GL_TEXTURE_2D;
+    m_default_shader  = 0;
 
     m_viewport        = QSize();
     m_active_tex      = 0;
@@ -1467,6 +1536,11 @@ void MythRenderOpenGL::ResetProcs(void)
     m_glDeleteObject = NULL;
     m_glGetUniformLocation = NULL;
     m_glUniform4f = NULL;
+    m_glVertexAttribPointer = NULL;
+    m_glEnableVertexAttribArray = NULL;
+    m_glDisableVertexAttribArray = NULL;
+    m_glBindAttribLocation = NULL;
+    m_glVertexAttrib4f = NULL;
 }
 
 uint MythRenderOpenGL::CreatePBO(uint tex)
@@ -1601,6 +1675,8 @@ bool MythRenderOpenGL::ValidateShaderObject(uint obj)
 
     m_glAttachObject(obj, m_shader_objects[obj].m_fragment_shader);
     m_glAttachObject(obj, m_shader_objects[obj].m_vertex_shader);
+    m_glBindAttribLocation(obj, TEXTURE_INDEX, "a_texcoord0");
+    m_glBindAttribLocation(obj, COLOR_INDEX, "a_color");
     m_glLinkProgram(obj);
     return CheckObjectStatus(obj);
 }

@@ -206,5 +206,16 @@ typedef GLint ( * MYTH_GLGETUNIFORMLOCATION)
     (GLuint program, const char *name);
 typedef void  ( * MYTH_GLUNIFORM4F)
     (GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+typedef void ( * MYTH_GLVERTEXATTRIBPOINTER)
+    (GLuint index, GLint size, GLenum type, GLboolean normalize,
+     GLsizei stride, const GLvoid *ptr);
+typedef void ( * MYTH_GLENABLEVERTEXATTRIBARRAY)
+    (GLuint index);
+typedef void ( * MYTH_GLDISABLEVERTEXATTRIBARRAY)
+    (GLuint index);
+typedef void ( * MYTH_GLBINDATTRIBLOCATION)
+    (GLhandleARB programObj, GLuint index, const GLcharARB *name);
+typedef void ( * MYTH_GLVERTEXATTRIB4F)
+    (GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
 
 #endif

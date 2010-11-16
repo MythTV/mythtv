@@ -204,6 +204,7 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     int      m_max_tex_size;
     int      m_max_units;
     int      m_default_texture_type;
+    uint     m_default_shader;
 
     // basic GL state tracking
     QSize    m_viewport;
@@ -269,6 +270,11 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     MYTH_GLDELETEOBJECT                  m_glDeleteObject;
     MYTH_GLGETUNIFORMLOCATION            m_glGetUniformLocation;
     MYTH_GLUNIFORM4F                     m_glUniform4f;
+    MYTH_GLVERTEXATTRIBPOINTER           m_glVertexAttribPointer;
+    MYTH_GLENABLEVERTEXATTRIBARRAY       m_glEnableVertexAttribArray;
+    MYTH_GLDISABLEVERTEXATTRIBARRAY      m_glDisableVertexAttribArray;
+    MYTH_GLBINDATTRIBLOCATION            m_glBindAttribLocation;
+    MYTH_GLVERTEXATTRIB4F                m_glVertexAttrib4f;
 };
 
 #endif
