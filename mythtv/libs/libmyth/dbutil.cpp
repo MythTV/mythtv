@@ -11,7 +11,6 @@
 #include <QDateTime>
 #include <QSqlError>
 #include <QSqlRecord>
-#include <QProcess>
 
 #include "dbutil.h"
 #include "mythcorecontext.h"
@@ -20,6 +19,7 @@
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythverbose.h"
+#include "mythsystem.h"
 
 #define LOC QString("DBUtil: ")
 #define LOC_ERR QString("DBUtil Error: ")
@@ -801,28 +801,29 @@ int DBUtil::CountClients(void)
 
     QString     cmd = "mysql";
     QStringList params;
-    QProcess    proc;
 
     params << "-h" << DB.dbHostName;
     params << "-u" << DB.dbUserName;
     params << "-p" + DB.dbPassword;
     params << "-e" << "SHOW PROCESSLIST";
 
-    proc.start(cmd, params);
-    if (!proc.waitForStarted(1000) ||
-        !proc.waitForFinished(3000))
-    {
-        proc.kill();
+    uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
+    MythSystem  ms(cmd, params, flags);
+    ms.Run(4);
+    if (ms.Wait())
         return 0;
-    }
 
-    while (proc.canReadLine())
+    QByteArray result = ms.ReadAll();
+    if (result.isEmpty())
+        return 0;
+
+    QTextStream text(result);
+    while (!text.atEnd())
     {
         QByteArray dbname = DB.dbName.toAscii();
-        if (proc.readLine().contains(dbname.constData()))
+        if (text.readLine().contains(dbname.constData()))
             ++count;
     }
-
 
     // On average, each myth program has 4 database connections,
     // but we round up just in case a new program is loading:
