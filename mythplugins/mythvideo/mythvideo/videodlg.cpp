@@ -7,7 +7,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
-#include <QProcess>
 #include <QHttp>
 #include <QBuffer>
 #include <QUrl>

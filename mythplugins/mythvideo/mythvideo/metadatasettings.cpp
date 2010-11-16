@@ -2,7 +2,6 @@
 
 // qt
 #include <QString>
-#include <QProcess>
 
 // myth
 #include <mythcontext.h>

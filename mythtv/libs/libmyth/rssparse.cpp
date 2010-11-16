@@ -1,7 +1,6 @@
 #include <QFile>
 #include <QDataStream>
 #include <QDomDocument>
-#include <QProcess>
 #include <QDomImplementation>
 #include <QHash>
 #include <QLocale>

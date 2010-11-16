@@ -5,9 +5,9 @@
 using namespace std;
 
 #include <QString>
+#include <QStringList>
 #include <QList>
 #include <QObject>
-#include <QProcess>
 #include <QDomDocument>
 #include <QDateTime>
 #include <QPair>

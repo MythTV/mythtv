@@ -4,7 +4,6 @@
 
 // qt
 #include <QString>
-#include <QProcess>
 #include <QMetaType>
 #include <QDateTime>
 #include <QFileInfo>

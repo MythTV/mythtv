@@ -15,7 +15,6 @@
 #include <QLabel>
 #include <QKeyEvent>
 #include <QEvent>
-#include <QProcess>
 #include <QStringList>
 #include <Q3HBoxLayout>
 #include <Q3VBoxLayout>

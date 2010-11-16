@@ -1,6 +1,5 @@
 // qt
 #include <QString>
-#include <QProcess>
 #include <QFile>
 #include <QDir>
 
