@@ -88,7 +88,7 @@ ThemeChooser::~ThemeChooser()
     gCoreContext->removeListener(this);
 }
 
-bool sortThemeNames(const QFileInfo &s1, const QFileInfo &s2)
+static bool sortThemeNames(const QFileInfo &s1, const QFileInfo &s2)
 {
     return s1.fileName().toLower() < s2.fileName().toLower();
 }
