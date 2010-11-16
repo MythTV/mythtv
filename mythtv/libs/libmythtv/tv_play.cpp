@@ -4020,7 +4020,7 @@ bool TV::DiscMenuHandleAction(PlayerContext *ctx,
         {
             VideoFrame *frame = output->GetLastShownFrame();
             if (frame)
-               pts = frame->timecode;
+               pts = (frame->timecode * 1000) * 90000;
         }
 
         handled = true;
