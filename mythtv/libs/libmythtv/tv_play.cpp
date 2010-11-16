@@ -11289,9 +11289,7 @@ void TV::ShowNoRecorderDialog(const PlayerContext *ctx, NoRecorderMsg msgType)
     }
     else
     {
-        MythPopupBox::showOkPopup(
-            GetMythMainWindow(), QObject::tr("Channel Change Error"),
-            errorText);
+        ShowOkPopup(errorText);
     }
     ReturnOSDLock(ctx, osd);
 }
