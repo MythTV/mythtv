@@ -81,6 +81,7 @@ MPUBLIC bool IsPulseAudioRunning(void);
 
 MPUBLIC bool myth_nice(int val);
 MPUBLIC void myth_yield(void);
+MPUBLIC bool myth_ioprio(int val); // range -1..8, smaller is higher priority
 
 MPUBLIC bool myth_FileIsDVD(const QString &filename);
 MPUBLIC bool myth_FileIsBD(const QString &filename);

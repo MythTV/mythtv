@@ -1336,12 +1336,12 @@ int main(int argc, char *argv[])
         int jobQueueCPU = gCoreContext->GetNumSetting("JobQueueCPU", 0);
 
         if (jobQueueCPU < 2)
+        {
             myth_nice(17);
+            myth_ioprio((0 == jobQueueCPU) ? 8 : 7);
+        }
 
-        if (jobQueueCPU)
-            fullSpeed = true;
-        else
-            fullSpeed = false;
+        fullSpeed = jobQueueCPU != 0;
 
         quiet = true;
         isVideo = false;
@@ -1355,7 +1355,10 @@ int main(int argc, char *argv[])
 
     // be nice to other programs since FlagCommercials() can consume 100% CPU
     if (beNice)
+    {
         myth_nice(17);
+        myth_ioprio(7);
+    }
 
     time_now = time(NULL);
     if (!quiet)

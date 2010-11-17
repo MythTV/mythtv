@@ -1213,6 +1213,88 @@ void myth_yield(void)
 #endif
 }
 
+/** \brief Allows setting the I/O priority of the current process/thread.
+ *
+ *  As of November 14th, 2010 this only works on Linux when using the CFQ
+ *  I/O Scheduler. The range is -1 to 8, with -1 being real-time priority
+ *  0 through 7 being standard best-time priorities and 8 being the idle
+ *  priority. The deadline and noop I/O Schedulers will ignore this but
+ *  are much less likely to starve video playback to feed the transcoder
+ *  or flagger. (noop is only recommended for SSDs.)
+ *
+ *  Since a process needs to have elevated priviledges to use either the
+ *  real-time or idle priority this will try priorities 0 or 7 respectively
+ *  if -1 or 8 do not work. It will not report an error on these conditions
+ *  as they will be the common case.
+ *
+ *  Only Linux on i386, ppc, x86_64 and ia64 are currently supported.
+ *  This is a no-op on all other architectures and platforms.
+ */
+#if defined(__linux__) && ( defined(__i386__) || defined(__ppc__) || \
+                            defined(__x86_64__) || defined(__ia64__) )
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <getopt.h>
+#include <unistd.h>
+#include <sys/ptrace.h>
+#include <asm/unistd.h>
+
+#if defined(__i386__)
+# define __NR_ioprio_set  289
+# define __NR_ioprio_get  290
+#elif defined(__ppc__)
+# define __NR_ioprio_set  273
+# define __NR_ioprio_get  274
+#elif defined(__x86_64__)
+# define __NR_ioprio_set  251
+# define __NR_ioprio_get  252
+#elif defined(__ia64__)
+# define __NR_ioprio_set  1274
+# define __NR_ioprio_get  1275
+#endif
+
+#define IOPRIO_BITS             (16)
+#define IOPRIO_CLASS_SHIFT      (13)
+#define IOPRIO_PRIO_MASK        ((1UL << IOPRIO_CLASS_SHIFT) - 1)
+#define IOPRIO_PRIO_CLASS(mask) ((mask) >> IOPRIO_CLASS_SHIFT)
+#define IOPRIO_PRIO_DATA(mask)  ((mask) & IOPRIO_PRIO_MASK)
+#define IOPRIO_PRIO_VALUE(class, data)  (((class) << IOPRIO_CLASS_SHIFT) | data)
+
+enum { IOPRIO_CLASS_NONE,IOPRIO_CLASS_RT,IOPRIO_CLASS_BE,IOPRIO_CLASS_IDLE, };
+enum { IOPRIO_WHO_PROCESS = 1, IOPRIO_WHO_PGRP, IOPRIO_WHO_USER, };
+
+bool myth_ioprio(int val)
+{
+    int new_ioclass = (val < 0) ? IOPRIO_CLASS_RT :
+        (val > 7) ? IOPRIO_CLASS_IDLE : IOPRIO_CLASS_BE;
+    int new_iodata = (new_ioclass == IOPRIO_CLASS_BE) ? val : 0;
+    int new_ioprio = IOPRIO_PRIO_VALUE(new_ioclass, new_iodata);
+
+    int pid = getpid();
+    int old_ioprio = syscall(__NR_ioprio_get, IOPRIO_WHO_PROCESS, pid);
+    if (old_ioprio == new_ioprio)
+        return true;
+
+    int ret = syscall(__NR_ioprio_set, IOPRIO_WHO_PROCESS, pid, new_ioprio);
+
+    if (-1 == ret && EPERM == errno && IOPRIO_CLASS_BE != new_ioclass)
+    {
+        new_iodata = (new_ioclass == IOPRIO_CLASS_RT) ? 0 : 7;
+        new_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, new_iodata);
+        ret = syscall(__NR_ioprio_set, IOPRIO_WHO_PROCESS, pid, new_ioprio);
+    }
+
+    return 0 == ret;
+}
+
+#else
+
+bool myth_ioprio(int) { return true; }
+
+#endif
+
 bool myth_FileIsDVD(const QString &filename)
 {
     if ((filename.toLower().startsWith("dvd:")) ||

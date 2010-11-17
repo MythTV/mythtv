@@ -1885,7 +1885,10 @@ void JobQueue::DoTranscodeThread(int jobID)
     runningJobsLock->unlock();
 
     if (jobQueueCPU < 2)
+    {
         myth_nice(17);
+        myth_ioprio((0 == jobQueueCPU) ? 8 : 7);
+    }
 
     QString transcoderName;
     if (transcoder == RecordingProfile::TranscoderAutodetect)
@@ -2236,8 +2239,10 @@ void JobQueue::DoUserJobThread(int jobID)
     switch (jobQueueCPU)
     {
         case  0: myth_nice(17);
+                 myth_ioprio(8);
                  break;
         case  1: myth_nice(10);
+                 myth_ioprio(7);
                  break;
         case  2:
         default: break;
