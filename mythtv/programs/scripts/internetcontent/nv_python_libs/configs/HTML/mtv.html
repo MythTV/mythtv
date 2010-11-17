@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+  <head>
+  <!-- Author: R.D. Vaughan
+       Nov 17th, 2010
+       Purpose: Implement full screen browser video display for MTV Videos
+  Example:
+  file:///usr/local/share/mythtv/mythnetvision/scripts/nv_python_libs/configs/HTML/mtv.html?title=We%20Are%20The%20One&videocode=176000
+  -->
+    <script type="text/javascript">
+      function gup( name )
+        {
+          name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+          var regexS = "[\\?&]"+name+"=([^&#]*)";
+          var regex = new RegExp( regexS );
+          var results = regex.exec( window.location.href );
+          if( results == null )
+            return "";
+          else
+            return results[1];
+        }
+
+      var pageTitle = gup( 'title' );
+      if (pageTitle != "")
+          pageTitle = 'MTV: '+unescape(pageTitle);
+      var videocode = gup( 'videocode' );
+      var image = gup( 'image' );
+
+      var embedded = '<object style="visibility: visible;" data="http://media.mtvnservices.com/mgid:uma:video:mtv.com:VIDEOCODE" name="embeddedPlayer" id="embeddedPlayer" type="application/x-shockwave-flash" height="100%" width="100%"><param value="true" name="allowFullScreen"><param value="always" name="allowScriptAccess"><param value="transparent" name="wmode"><param value="true" name="swliveconnect"><param value="#000000" name="bgcolor"><param value="sid=MTV_Videos&amp;configParams=instance%3Dmtv%26vid%3DVIDEOCODE%26id%3D1572737&amp;autoPlay=true" name="flashvars"></object>'
+
+      document.write('<title>'+pageTitle+'</title>');
+      embedded = embedded.replace(/VIDEOCODE/g, videocode)
+      embedded = embedded.replace(/IMAGE/g, image)
+
+      document.write(embedded);
+
+    </script>
+  </head>
+</html>
