@@ -441,14 +441,7 @@ bool BDRingBufferPriv::GoToMenu(const QString str)
 
     VERBOSE(VB_PLAYBACK, QString("BDRingBuf: GoToMenu %1").arg(str));
 
-    if (str.compare("popup") == 0)
-    {
-//        if (bd_popup_call(bdnav) < 0)
-//            return false;
-//        else
-//            return true;
-    }
-    else if (str.compare("root") == 0)
+    if (str.compare("root") == 0)
     {
         if (bd_menu_call(bdnav) < 0)
             return false;
@@ -499,7 +492,7 @@ void BDRingBufferPriv::HandleBDEvent(BD_EVENT &ev)
         case BD_EVENT_TITLE:
             VERBOSE(VB_PLAYBACK|VB_EXTRA,
                     QString("BDRingBuf: EVENT_TITLE %1").arg(ev.param));
-            m_currentTitle = ev.param;
+            SwitchTitle(ev.param);
             break;
         case BD_EVENT_PLAYLIST:
             VERBOSE(VB_PLAYBACK|VB_EXTRA,
