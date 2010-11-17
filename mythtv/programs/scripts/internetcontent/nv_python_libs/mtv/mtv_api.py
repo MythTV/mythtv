@@ -19,7 +19,7 @@ metadata, video and image URLs from MTV. These routines are based on the api. Sp
 for this api are published at http://developer.mtvnservices.com/docs
 '''
 
-__version__="v0.2.4"
+__version__="v0.2.5"
 # 0.1.0 Initial development
 # 0.1.1 Added Tree View Processing
 # 0.1.2 Modified Reee view code and structure to be standandized across all grabbers
@@ -33,6 +33,7 @@ __version__="v0.2.4"
 #       Removed the import and use of the feedparser library
 # 0.2.3 Fixed an exception message output code error in two places
 # 0.2.4 Removed the need for python MythTV bindings and added "%SHAREDIR%" to icon directory path
+# 0.2.5 Use MTV web page as API not returning valid URLs
 
 import os, struct, sys, re, time
 from datetime import datetime, timedelta
@@ -238,6 +239,8 @@ class Videos(object):
             'genres': {'Genres': 'directories/topics/music','world_reggae': 'directories/music_genres/world_reggae', 'pop': 'directories/music_genres/pop', 'metal': 'directories/music_genres/metal', 'environmental': 'directories/music_genres/environmental', 'latin': 'directories/music_genres/latino', 'randb': 'directories/music_genres/rnb', 'rock': 'directories/music_genres/rock', 'easy_listening': 'directories/music_genres/easy_listening', 'jazz': 'directories/music_genres/jazz', 'country': 'directories/music_genres/country', 'hip_hop': 'directories/music_genres/hiphop', 'classical': 'directories/music_genres/classical', 'electronic_dance': 'directories/music_genres/electronic_dance', 'blues_folk': 'directories/music_genres/blues_folk', 'alternative': 'directories/music_genres/alternative', 'soundtracks_musicals': 'directories/music_genres/soundtracks_musicals',
             },
             }
+        # Get the absolute path to the mtv.html file
+        self.mtvHtmlPath = u'file://'+os.path.dirname( os.path.realpath( __file__ )).replace(u'/nv_python_libs/mtv', u'/nv_python_libs/configs/HTML/mtv.html?title=%s&amp;videocode=%s')
 
         # Initialize the tree view flag so that the item parsing code can be used for multiple purposes
         self.treeview = False
@@ -400,7 +403,7 @@ class Videos(object):
 
             video_details = None
             try:
-                video_details = self.videoDetails(item['id'])
+                video_details = self.videoDetails(item['id'], urllib.quote(item['title'].encode("utf-8")))
             except MtvUrlError, msg:
                 sys.stderr.write(self.error_messages['MtvUrlError'] % msg)
             except MtvVideoDetailError, msg:
@@ -442,7 +445,7 @@ class Videos(object):
         # end searchTitle()
 
 
-    def videoDetails(self, url):
+    def videoDetails(self, url, title=u''):
         '''Using the passed URL retrieve the video meta data details
         return a dictionary of video metadata details
         return
@@ -463,7 +466,10 @@ class Videos(object):
         cur_size = True
         for e in etree:
             if e.tag.endswith(u'content') and e.text == None:
-                metadata['video'] =  e.get('url')
+                index = e.get('url').rindex(u':')
+                metadata['video'] = self.mtvHtmlPath % (title,  e.get('url')[index+1:])
+                # !! This tag will need to be added at a later date
+#                metadata['customhtml'] = u'true'
                 metadata['duration'] =  e.get('duration')
             if e.tag.endswith(u'player'):
                 metadata['link'] = e.get('url')
@@ -745,7 +751,11 @@ class Videos(object):
             if not metadata.has_key('video'):
                 metadata['video'] = metadata['link']
             else:
+                index = metadata['video'].rindex(u':')
+                metadata['video'] = self.mtvHtmlPath % (urllib.quote(metadata['title'].encode("utf-8")), metadata['video'][index+1:])
                 metadata['link'] =  metadata['video']
+                # !! This tag will need to be added at a later date
+#                metadata['customhtml'] = u'true'
 
             if not dictionary_first:  # Add the dictionaries display name
                 dictionaries.append([self.massageDescription(self.feed_names[self.tree_key][self.feed]), self.setTreeViewIcon()])
