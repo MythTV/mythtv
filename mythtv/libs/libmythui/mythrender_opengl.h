@@ -55,6 +55,13 @@ typedef enum
     kGLHighProfile   = 0x02,
 } GLProfile;
 
+typedef enum
+{
+    kShaderSimple  = 0,
+    kShaderDefault = 1,
+    kShaderCount   = 2,
+} DefaultShaders;
+
 class MythGLTexture;
 class MythGLShaderObject;
 class MythRenderOpenGL;
@@ -172,6 +179,8 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     void DeleteShaderObjects(void);
     void DeleteFrameBuffers(void);
 
+    void CreateDefaultShaders(void);
+    void DeleteDefaultShaders(void);
     uint CreateShader(int type, const QString source);
     bool ValidateShaderObject(uint obj);
     bool CheckObjectStatus(uint obj);
@@ -205,7 +214,7 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     int      m_max_tex_size;
     int      m_max_units;
     int      m_default_texture_type;
-    uint     m_default_shader;
+    uint     m_shaders[kShaderCount];
 
     // basic GL state tracking
     QSize    m_viewport;

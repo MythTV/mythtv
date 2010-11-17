@@ -43,6 +43,25 @@ static const QString kDefaultFragmentShader =
 "    gl_FragColor = texture2D(s_texture0, v_texcoord0) * v_color;\n"
 "}\n";
 
+static const QString kSimpleVertexShader =
+"GLSL_VERSION"
+"GLSL_EXTENSIONS"
+"attribute vec4 a_color;\n"
+"varying   vec4 v_color;\n"
+"void main() {\n"
+"    gl_Position = ftransform();\n"
+"    v_color     = a_color;\n"
+"}\n";
+
+static const QString kSimpleFragmentShader =
+"GLSL_VERSION"
+"GLSL_EXTENSIONS"
+"varying vec4 v_color;\n"
+"void main(void)\n"
+"{\n"
+"    gl_FragColor = v_color;\n"
+"}\n";
+
 static inline int __glCheck__(const QString &loc, const char* fileName, int n)
 {
     int error = glGetError();
@@ -202,11 +221,9 @@ void MythRenderOpenGL::SetFeatures(uint features)
                         QString("PixelBufferObject support available"));
     }
 
-    if (kGLHighProfile == m_profile && m_default_shader == 0)
-    {
-        m_default_shader = CreateShaderObject(kDefaultVertexShader,
-                                              kDefaultFragmentShader);
-    }
+    DeleteDefaultShaders();
+    if (kGLHighProfile == m_profile)
+        CreateDefaultShaders();
 }
 
 int MythRenderOpenGL::SetPictureAttribute(int attribute, int newValue)
@@ -1099,8 +1116,8 @@ void MythRenderOpenGL::DrawBitmapHigh(uint tex, const QRect *src,
 {
     if (prog && !m_shader_objects.contains(prog))
         prog = 0;
-    if (prog == 0 && m_default_shader)
-        prog = m_default_shader;
+    if (prog == 0)
+        prog = m_shaders[kShaderDefault];
 
     EnableShaderObject(prog);
     SetBlend(true);
@@ -1214,7 +1231,45 @@ void MythRenderOpenGL::DrawRectHigh(const QRect &area, bool drawFill,
                                     int lineWidth, const QColor &lineColor,
                                     int prog)
 {
+    if (prog && !m_shader_objects.contains(prog))
+        prog = 0;
+    if (prog == 0)
+        prog = m_shaders[kShaderSimple];
 
+    EnableShaderObject(prog);
+    SetBlend(true);
+    DisableTextures();
+
+    m_glEnableVertexAttribArray(VERTEX_INDEX);
+
+    if (drawFill)
+    {
+        m_glVertexAttrib4f(COLOR_INDEX,
+                           fillColor.red() / 255.0,
+                           fillColor.green() / 255.0,
+                           fillColor.blue() / 255.0,
+                           fillColor.alpha() / 255.0);
+        GLfloat *vertices = GetCachedVertices(GL_TRIANGLE_STRIP, area);
+        m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+                                VERTEX_SIZE * sizeof(GLfloat), vertices);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
+
+    if (drawLine)
+    {
+        glLineWidth(lineWidth);
+        m_glVertexAttrib4f(COLOR_INDEX,
+                           lineColor.red() / 255.0,
+                           lineColor.green() / 255.0,
+                           lineColor.blue() / 255.0,
+                           lineColor.alpha() / 255.0);
+        GLfloat *vertices = GetCachedVertices(GL_LINE_LOOP, area);
+        m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+                                VERTEX_SIZE * sizeof(GLfloat), vertices);
+        glDrawArrays(GL_LINE_LOOP, 0, 4);
+    }
+
+    m_glDisableVertexAttribArray(VERTEX_INDEX);
 }
 
 void MythRenderOpenGL::Init2DState(void)
@@ -1484,7 +1539,7 @@ void MythRenderOpenGL::ResetVars(void)
     m_max_tex_size    = 0;
     m_max_units       = 0;
     m_default_texture_type = GL_TEXTURE_2D;
-    m_default_shader  = 0;
+    memset(m_shaders, 0, sizeof(m_shaders));
 
     m_viewport        = QSize();
     m_active_tex      = 0;
@@ -1583,6 +1638,7 @@ void MythRenderOpenGL::DeleteOpenGLResources(void)
 {
     VERBOSE(VB_GENERAL, LOC + "Deleting OpenGL Resources");
 
+    DeleteDefaultShaders();
     DeletePrograms();
     DeleteTextures();
     DeleteFrameBuffers();
@@ -1657,6 +1713,23 @@ void MythRenderOpenGL::DeleteShaderObjects(void)
     }
     m_shader_objects.clear();
     Flush(true);
+}
+
+void MythRenderOpenGL::CreateDefaultShaders(void)
+{
+    m_shaders[kShaderSimple]  = CreateShaderObject(kSimpleVertexShader,
+                                                   kSimpleFragmentShader);
+    m_shaders[kShaderDefault] = CreateShaderObject(kDefaultVertexShader,
+                                                   kDefaultFragmentShader);
+}
+
+void MythRenderOpenGL::DeleteDefaultShaders(void)
+{
+    for (int i = 0; i < kShaderCount; i++)
+    {
+        DeleteShaderObject(m_shaders[i]);
+        m_shaders[i] = 0;
+    }
 }
 
 uint MythRenderOpenGL::CreateShader(int type, const QString source)
