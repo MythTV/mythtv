@@ -214,7 +214,7 @@ typedef void ( * MYTH_GLENABLEVERTEXATTRIBARRAY)
 typedef void ( * MYTH_GLDISABLEVERTEXATTRIBARRAY)
     (GLuint index);
 typedef void ( * MYTH_GLBINDATTRIBLOCATION)
-    (GLhandleARB programObj, GLuint index, const GLcharARB *name);
+    (GLuint program, GLuint index, const GLcharARB *name);
 typedef void ( * MYTH_GLVERTEXATTRIB4F)
     (GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
 
