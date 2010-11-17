@@ -9673,6 +9673,10 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         else if (valid && desc[0] == "DELETE")
         {
         }
+        else if (valid && desc[0] == "PLAY")
+        {
+            DoPlay(actx);
+        }
         else
         {
             VERBOSE(VB_IMPORTANT, "Unrecognised dialog event.");
@@ -11647,7 +11651,8 @@ void TV::ShowOSDPromptDeleteRecording(PlayerContext *ctx, QString title,
 
     ClearOSD(ctx);
 
-    if (!ctx->paused)
+    bool paused = ctx->paused;
+    if (!paused)
         DoTogglePause(ctx, false);
 
     InfoMap infoMap;
@@ -11676,6 +11681,8 @@ void TV::ShowOSDPromptDeleteRecording(PlayerContext *ctx, QString title,
                                  "DIALOG_VIDEOEXIT_JUSTDELETE_0");
             osd->DialogAddButton(tr("No, keep it, I changed my mind"),
                                  "DIALOG_VIDEOEXIT_JUSTEXIT_0", false, true);
+            if (!paused)
+                osd->DialogBack("", "DIALOG_PLAY_0_0", true);
         }
 
         QMutexLocker locker(&timerIdLock);
