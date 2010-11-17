@@ -23,10 +23,12 @@ static void HandleOverlayCallback(void *data, const bd_overlay_s * const overlay
     if (!overlay || overlay->plane == 1)
         bdpriv->m_inMenu = false;
 
-    if (!overlay->img)
+    if (!overlay || !overlay->img)
         return;
 
-    const BD_PG_RLE_ELEM *rlep = overlay->img;
+    bdpriv->m_inMenu = true;
+// Uncomment me when you can actually do something with this image.
+//    const BD_PG_RLE_ELEM *rlep = overlay->img;
     unsigned pixels = overlay->w * overlay->h;
     VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + QString("In Menu Callback, ready to draw "
                         "an overlay of %1x%2 at %3,%4 (%5 pixels).")
@@ -429,6 +431,11 @@ void BDRingBufferPriv::PressButton(int32_t key, int64_t pts)
     if (key < 0)
         return;
 
+    // If we're toggling the menu off, toggle the menu bool
+    // since we may not get a callback.
+    if (key == BD_VK_POPUP)
+        m_inMenu = !m_inMenu;
+
     bd_user_input(bdnav, pts, key);
 }
 
@@ -443,12 +450,15 @@ bool BDRingBufferPriv::GoToMenu(const QString str)
 
     if (str.compare("root") == 0)
     {
-        if (bd_menu_call(bdnav) < 0)
-            return false;
+        if (bd_menu_call(bdnav))
+        {
+            VERBOSE(VB_PLAYBACK, QString("BDRingBuf: Invoked Menu Successfully"));
+            return true;
+        }
         else
         {
-            m_inMenu = !m_inMenu;
-            return true;
+            m_inMenu = false;
+            return false;
         }
     }
     else

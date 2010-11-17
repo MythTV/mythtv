@@ -4047,6 +4047,10 @@ bool TV::DiscMenuHandleAction(PlayerContext *ctx,
         {
             ctx->buffer->BD()->PressButton(BD_VK_RIGHT, pts);
         }
+        else if (has_action("MENUTEXT", actions))
+        {
+            ctx->buffer->BD()->PressButton(BD_VK_POPUP, pts);
+        }
         else if (has_action("0", actions))
         {
             ctx->buffer->BD()->PressButton(BD_VK_0, pts);
