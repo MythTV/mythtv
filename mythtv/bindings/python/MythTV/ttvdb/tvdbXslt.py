@@ -80,12 +80,12 @@ version = ''
 for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
-#if version < '2.7.2':
-#    sys.stderr.write(u'''
-#! Error - The installed version of the "lxml" python library "libxml" version is too old.
-#          At least "libxml" version 2.7.2 must be installed. Your version is (%s).
-#''' % version)
-#    sys.exit(1)
+if version < '2.7.2':
+    sys.stderr.write(u'''
+! Error - The installed version of the "lxml" python library "libxml" version is too old.
+          At least "libxml" version 2.7.2 must be installed. Your version is (%s).
+''' % version)
+    sys.exit(1)
 
 
 class xpathFunctions(object):
