@@ -19,6 +19,10 @@ MYTH_GLXWAITVIDEOSYNCSGIPROC MythRenderOpenGL::g_glXWaitVideoSyncSGI = NULL;
 #define VERTEX_SIZE   2
 #define TEXTURE_SIZE  2
 
+static const GLuint kVertexOffset  = 0;
+static const GLuint kTextureOffset = 8 * sizeof(GLfloat);
+static const GLuint kVertexSize    = 16 * sizeof(GLfloat);
+
 static const QString kDefaultVertexShader =
 "GLSL_VERSION"
 "GLSL_EXTENSIONS"
@@ -467,8 +471,8 @@ uint MythRenderOpenGL::CreateTexture(QSize act_size, bool use_pbo,
             SetTextureFilters(tex, filter, wrap);
             if (use_pbo)
                 m_textures[tex].m_pbo = CreatePBO(tex);
-            //if (use_vbo)
-            //    m_textures[tex].m_vbo = CreateVBO();
+            if (kGLHighProfile == m_profile)
+                m_textures[tex].m_vbo = CreateVBO();
         }
         else
         {
@@ -1124,22 +1128,31 @@ void MythRenderOpenGL::DrawBitmapHigh(uint tex, const QRect *src,
 
     EnableTextures(tex);
     glBindTexture(m_textures[tex].m_type, tex);
+
+    m_glBindBufferARB(GL_ARRAY_BUFFER, m_textures[tex].m_vbo);
     UpdateTextureVertices(tex, src, dst);
+    m_glBufferDataARB(GL_ARRAY_BUFFER, kVertexSize, NULL, GL_STREAM_DRAW);
+    void* target = m_glMapBufferARB(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+    if (target)
+        memcpy(target, m_textures[tex].m_vertex_data, kVertexSize);
+    m_glUnmapBufferARB(GL_ARRAY_BUFFER);
+
     m_glEnableVertexAttribArray(VERTEX_INDEX);
     m_glEnableVertexAttribArray(TEXTURE_INDEX);
 
     m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                             VERTEX_SIZE * sizeof(GLfloat),
-                            m_textures[tex].m_vertex_data);
+                            (const void *) kVertexOffset);
     m_glVertexAttrib4f(COLOR_INDEX, red / 255.0, green / 255.0, blue / 255.0, alpha / 255.0);
     m_glVertexAttribPointer(TEXTURE_INDEX, TEXTURE_SIZE, GL_FLOAT, GL_FALSE,
                             TEXTURE_SIZE * sizeof(GLfloat),
-                            m_textures[tex].m_vertex_data + TEX_OFFSET);
+                            (const void *) kTextureOffset);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     m_glDisableVertexAttribArray(TEXTURE_INDEX);
     m_glDisableVertexAttribArray(VERTEX_INDEX);
+    m_glBindBufferARB(GL_ARRAY_BUFFER, 0);
 }
 
 void MythRenderOpenGL::DrawBitmapLegacy(uint *textures, uint texture_count,
