@@ -190,6 +190,8 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     bool UpdateTextureVertices(uint tex, const QRectF *src, const QRectF *dst);
     GLfloat* GetCachedVertices(GLuint type, const QRect &area);
     void ExpireVertices(uint max = 0);
+    void GetCachedVBO(GLuint type, const QRect &area);
+    void ExpireVBOS(uint max = 0);
     bool ClearTexture(uint tex);
     uint GetBufferSize(QSize size, uint fmt, uint type);
     void InitFragmentParams(uint fp, float a, float b, float c, float d);
@@ -230,6 +232,8 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     // vertex cache
     QMap<uint64_t,GLfloat*> m_cachedVertices;
     QList<uint64_t>         m_vertexExpiry;
+    QMap<uint64_t,GLuint>   m_cachedVBOS;
+    QList<uint64_t>         m_vboExpiry;
 
     // Multi-texturing
     MYTH_GLACTIVETEXTUREPROC             m_glActiveTexture;

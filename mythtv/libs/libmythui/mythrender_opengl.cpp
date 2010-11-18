@@ -1262,10 +1262,12 @@ void MythRenderOpenGL::DrawRectHigh(const QRect &area, bool drawFill,
                            fillColor.green() / 255.0,
                            fillColor.blue() / 255.0,
                            fillColor.alpha() / 255.0);
-        GLfloat *vertices = GetCachedVertices(GL_TRIANGLE_STRIP, area);
+        GetCachedVBO(GL_TRIANGLE_STRIP, area);
         m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
-                                VERTEX_SIZE * sizeof(GLfloat), vertices);
+                                VERTEX_SIZE * sizeof(GLfloat),
+                               (const void *) kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        m_glBindBufferARB(GL_ARRAY_BUFFER, 0);
     }
 
     if (drawLine)
@@ -1276,10 +1278,12 @@ void MythRenderOpenGL::DrawRectHigh(const QRect &area, bool drawFill,
                            lineColor.green() / 255.0,
                            lineColor.blue() / 255.0,
                            lineColor.alpha() / 255.0);
-        GLfloat *vertices = GetCachedVertices(GL_LINE_LOOP, area);
+        GetCachedVBO(GL_LINE_LOOP, area);
         m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
-                                VERTEX_SIZE * sizeof(GLfloat), vertices);
+                                VERTEX_SIZE * sizeof(GLfloat),
+                               (const void *) kVertexOffset);
         glDrawArrays(GL_LINE_LOOP, 0, 4);
+        m_glBindBufferARB(GL_ARRAY_BUFFER, 0);
     }
 
     m_glDisableVertexAttribArray(VERTEX_INDEX);
@@ -1670,9 +1674,17 @@ void MythRenderOpenGL::DeleteOpenGLResources(void)
     Flush(false);
 
     ExpireVertices();
+    ExpireVBOS();
+
     if (m_cachedVertices.size())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString(" %1 unexpired vertices")
+            .arg(m_cachedVertices.size()));
+    }
+
+    if (m_cachedVBOS.size())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString(" %1 unexpired VBOs")
             .arg(m_cachedVertices.size()));
     }
 }
@@ -1925,9 +1937,58 @@ void MythRenderOpenGL::ExpireVertices(uint max)
         m_vertexExpiry.removeFirst();
         GLfloat *vertices = NULL;
         if (m_cachedVertices.contains(ref))
-            m_cachedVertices.value(ref);
+            vertices = m_cachedVertices.value(ref);
         m_cachedVertices.remove(ref);
         delete [] vertices;
+    }
+}
+
+void MythRenderOpenGL::GetCachedVBO(GLuint type, const QRect &area)
+{
+    uint64_t ref = ((uint64_t)area.left() & 0xfff) +
+                  (((uint64_t)area.top() & 0xfff) << 12) +
+                  (((uint64_t)area.width() & 0xfff) << 24) +
+                  (((uint64_t)area.height() & 0xfff) << 36) +
+                  (((uint64_t)type & 0xfff) << 48);
+
+    if (m_cachedVBOS.contains(ref))
+    {
+        m_vboExpiry.removeOne(ref);
+        m_vboExpiry.append(ref);
+    }
+    else
+    {
+        GLfloat *vertices = GetCachedVertices(type, area);
+        GLuint vbo = CreateVBO();
+        m_cachedVBOS.insert(ref, vbo);
+        m_vboExpiry.append(ref);
+
+        m_glBindBufferARB(GL_ARRAY_BUFFER, vbo);
+        m_glBufferDataARB(GL_ARRAY_BUFFER, kTextureOffset, NULL, GL_STREAM_DRAW);
+        void* target = m_glMapBufferARB(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+        if (target)
+            memcpy(target, vertices, kTextureOffset);
+        m_glUnmapBufferARB(GL_ARRAY_BUFFER);
+
+        ExpireVBOS(MAX_VERTEX_CACHE);
+        return;
+    }
+
+    m_glBindBufferARB(GL_ARRAY_BUFFER, m_cachedVBOS.value(ref));
+}
+
+void MythRenderOpenGL::ExpireVBOS(uint max)
+{
+    while ((uint)m_vboExpiry.size() > max)
+    {
+        uint64_t ref = m_vboExpiry.first();
+        m_vboExpiry.removeFirst();
+        if (m_cachedVBOS.contains(ref))
+        {
+            GLuint vbo = m_cachedVBOS.value(ref);
+            m_glDeleteBuffersARB(1, &vbo);
+            m_cachedVBOS.remove(ref);
+        }
     }
 }
 
