@@ -1836,7 +1836,7 @@ bool MythRenderOpenGL::CheckObjectStatus(uint obj)
 
 void MythRenderOpenGL::OptimiseShaderSource(QString &source)
 {
-    QString version = "#version 100\n";
+    QString version = "#version 120\n";
     QString extensions = "";
 
     if (m_exts_used & kGLExtRect)
