@@ -43,6 +43,10 @@ using namespace std;
 #define O_BINARY 0
 #endif
 
+#if HAVE_POSIX_FADVISE < 1
+static int posix_fadvise(int, off_t, off_t, int) { return 0; }
+#endif
+
 // about one second at 35mbit
 const uint RingBuffer::kBufferSize = 4 * 1024 * 1024;
 const int  RingBuffer::kDefaultOpenTimeout = 2000; // ms
@@ -423,9 +427,8 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
                 {
                     if (0 == lseek(fd2, 0, SEEK_SET))
                     {
-#if HAVE_POSIX_FADVISE
                         posix_fadvise(fd2, 0, 0, POSIX_FADV_SEQUENTIAL);
-#endif
+                        posix_fadvise(fd2, 0, 1*1024*1024, POSIX_FADV_WILLNEED);
                         lasterror = 0;
                         break;
                     }
@@ -1259,12 +1262,16 @@ void RingBuffer::run(void)
             poslock.lockForWrite();
             rbwlock.lockForWrite();
             internalreadpos += read_return;
+            off_t donotneed = internalreadpos;
             rbwpos = (rbwpos + read_return) % kBufferSize;
             VERBOSE(VB_FILE|VB_EXTRA,
                     LOC + QString("rbwpos += %1K requested %2K in read")
                     .arg(read_return/1024,3).arg(totfree/1024,3));
             rbwlock.unlock();
             poslock.unlock();
+
+            if (fd2 >=0 && donotneed > 0)
+                posix_fadvise(fd2, 0, donotneed, POSIX_FADV_DONTNEED);
         }
 
         int used = kBufferSize - ReadBufFree();
@@ -1501,7 +1508,10 @@ int RingBuffer::ReadDirect(void *buf, int count, bool peek)
             if (remotefile)
                 remotefile->Seek(old_pos, SEEK_SET);
             else
+            {
                 lseek64(fd2, old_pos, SEEK_SET);
+                posix_fadvise(fd2, old_pos, 1*1024*1024, POSIX_FADV_WILLNEED);
+            }
         }
         else
         {
@@ -1869,7 +1879,13 @@ long long RingBuffer::Seek(long long pos, int whence, bool has_lock)
                 if (remotefile)
                     ret = remotefile->Seek(internalreadpos, SEEK_SET);
                 else
+                {
                     ret = lseek64(fd2, internalreadpos, SEEK_SET);
+                    posix_fadvise(fd2, 0,
+                                  internalreadpos, POSIX_FADV_DONTNEED);
+                    posix_fadvise(fd2, internalreadpos,
+                                  1*1024*1024, POSIX_FADV_WILLNEED);
+                }
                 VERBOSE(VB_FILE, LOC +
                         QString("Seek to %1 from ignore pos %2 returned %3")
                         .arg(internalreadpos).arg(ignorereadpos).arg(ret));
@@ -1918,11 +1934,7 @@ long long RingBuffer::Seek(long long pos, int whence, bool has_lock)
                 new_pos = fi.size() - off_end;
             }
         }
-#ifdef __FreeBSD__
-        else if (llabs(new_pos-readpos) > 100000000LL)
-#else
-        else if (abs(new_pos-readpos) > 100000000LL)
-#endif
+        else
         {
             if (remotefile)
             {
@@ -1934,7 +1946,14 @@ long long RingBuffer::Seek(long long pos, int whence, bool has_lock)
                 off_end = fi.size() - new_pos;
             }
         }
-        if (off_end == 250000)
+
+        if (off_end != 0xDEADBEEF)
+        {
+            VERBOSE(VB_FILE, LOC +
+                    QString("Seek(): Offset from end: %1").arg(off_end));
+        }
+
+        if (off_end <= 250000)
         {
             VERBOSE(VB_FILE, LOC +
                     QString("Seek(): offset from end: %1").arg(off_end) +
@@ -1946,7 +1965,10 @@ long long RingBuffer::Seek(long long pos, int whence, bool has_lock)
             if (remotefile)
                 ret = remotefile->Seek(ignorereadpos, SEEK_SET);
             else
+            {
                 ret = lseek64(fd2, ignorereadpos, SEEK_SET);
+                posix_fadvise(fd2, ignorereadpos, 250000, POSIX_FADV_WILLNEED);
+            }
 
             if (ret < 0)
             {
@@ -2029,6 +2051,11 @@ long long RingBuffer::Seek(long long pos, int whence, bool has_lock)
     else
     {
         ret = lseek64(fd2, pos, whence);
+        if (ret >= 0)
+        {
+            posix_fadvise(fd2, 0,   ret,         POSIX_FADV_DONTNEED);
+            posix_fadvise(fd2, ret, 1*1024*1024, POSIX_FADV_WILLNEED);
+        }
     }
 
     if (ret >= 0)
