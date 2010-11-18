@@ -21,6 +21,7 @@
 
 #if HAVE_POSIX_FADVISE < 1
 static int posix_fadvise(int, off_t, off_t, int) { return 0; }
+#define POSIX_FADV_DONTNEED 0
 #  if defined(__linux__)
 #    warning "Not using fadvise on platform that supports it."
 #  endif
