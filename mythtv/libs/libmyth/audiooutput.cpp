@@ -192,6 +192,12 @@ void AudioOutput::Error(const QString &msg)
     VERBOSE(VB_IMPORTANT, "AudioOutput Error: " + lastError);
 }
 
+void AudioOutput::SilentError(const QString &msg)
+{
+    lastError = msg;
+    lastError.detach();
+}
+
 void AudioOutput::Warn(const QString &msg)
 {
     lastWarn = msg;

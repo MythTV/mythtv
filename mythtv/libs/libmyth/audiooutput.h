@@ -105,6 +105,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 
   protected:
     void Error(const QString &msg);
+    void SilentError(const QString &msg);
     void Warn(const QString &msg);
     void ClearError(void);
     void ClearWarning(void);
