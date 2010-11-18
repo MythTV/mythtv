@@ -3616,8 +3616,9 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
         osd->DialogHandleKeypress(e);
         handled = true;
     }
+    ReturnOSDLock(actx, osd);
 
-    if (editmode && osd && !handled)
+    if (editmode && !handled)
     {
         handled |= GetMythMainWindow()->TranslateKeyPress(
                    "TV Editing", e, actions);
@@ -3654,7 +3655,6 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
         if (handled)
             editmode = actx->player->GetEditMode();
     }
-    ReturnOSDLock(actx, osd);
 
     if (handled)
         return;
