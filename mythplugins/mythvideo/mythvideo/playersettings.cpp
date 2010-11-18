@@ -16,8 +16,7 @@ using namespace std;
 PlayerSettings::PlayerSettings(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
       m_defaultPlayerEdit(NULL),     m_dvdPlayerEdit(NULL),
-      m_dvdDriveEdit(NULL),          m_vcdPlayerEdit(NULL),
-      m_vcdDriveEdit(NULL),          m_altPlayerEdit(NULL),
+      m_dvdDriveEdit(NULL),          m_altPlayerEdit(NULL),
       m_altCheck(NULL),
       m_okButton(NULL),              m_cancelButton(NULL)
 {
@@ -36,8 +35,7 @@ bool PlayerSettings::Create()
     m_defaultPlayerEdit = dynamic_cast<MythUITextEdit *> (GetChild("defaultplayer"));
     m_dvdPlayerEdit = dynamic_cast<MythUITextEdit *> (GetChild("dvdplayer"));
     m_dvdDriveEdit = dynamic_cast<MythUITextEdit *> (GetChild("dvddrive"));
-    m_vcdPlayerEdit = dynamic_cast<MythUITextEdit *> (GetChild("vcdplayer"));
-    m_vcdDriveEdit = dynamic_cast<MythUITextEdit *> (GetChild("vcddrive"));
+    m_blurayMountEdit = dynamic_cast<MythUITextEdit *> (GetChild("bluraymount"));
     m_altPlayerEdit = dynamic_cast<MythUITextEdit *> (GetChild("altplayer"));
 
     m_altCheck = dynamic_cast<MythUICheckBox *> (GetChild("altcheck"));
@@ -45,8 +43,8 @@ bool PlayerSettings::Create()
     m_okButton = dynamic_cast<MythUIButton *> (GetChild("ok"));
     m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
 
-    if (!m_defaultPlayerEdit || !m_dvdPlayerEdit || !m_vcdPlayerEdit ||
-        !m_altCheck || !m_altPlayerEdit || !m_dvdDriveEdit || !m_vcdDriveEdit ||
+    if (!m_defaultPlayerEdit || !m_dvdPlayerEdit ||
+        !m_altCheck || !m_altPlayerEdit || !m_dvdDriveEdit || !m_blurayMountEdit ||
         !m_okButton || !m_cancelButton)
     {
         VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
@@ -63,10 +61,8 @@ bool PlayerSettings::Create()
                            "Internal"));
     m_dvdDriveEdit->SetText(gCoreContext->GetSetting("DVDDeviceLocation",
                            "default"));
-    m_vcdPlayerEdit->SetText(gCoreContext->GetSetting("VCDPlayerCommand",
-                           "mplayer vcd:// -cdrom-device %d -fs -zoom -vo xv"));
-    m_vcdDriveEdit->SetText(gCoreContext->GetSetting("VCDDeviceLocation",
-                           "default"));
+    m_blurayMountEdit->SetText(gCoreContext->GetSetting("BluRayMountpoint",
+                           "/media/cdrom"));
     m_altPlayerEdit->SetText(gCoreContext->GetSetting(
                            "mythvideo.VideoAlternatePlayer", "Internal"));
 
@@ -94,15 +90,9 @@ bool PlayerSettings::Create()
                     "playing the DVD needs to have read permission "
                     "on the device.  'default' will let the "
                     "MediaMonitor choose a device."));
-    m_vcdPlayerEdit->SetHelpText(
-               tr("This can be any command to launch a VCD "
-               "player. The Internal player will not play VCDs. "
-               "%d will be substituted for the VCD device (e.g. /dev/cdrom)."));
-    m_vcdDriveEdit->SetHelpText(
-                    tr("This device must exist, and the user "
-                    "playing the VCD needs to have read permission "
-                    "on the device.  'default' will let the "
-                    "MediaMonitor choose a device."));
+    m_blurayMountEdit->SetHelpText(
+                    tr("This path is the location your "
+                       "operating system mounts Blu-ray discs."));
     m_altPlayerEdit->SetHelpText(
                  tr("If for some reason the default player "
                  "doesn't play a video, you can play it in an alternate "
@@ -126,8 +116,7 @@ void PlayerSettings::slotSave(void)
     gCoreContext->SaveSetting("VideoDefaultPlayer", m_defaultPlayerEdit->GetText());
     gCoreContext->SaveSetting("mythdvd.DVDPlayerCommand", m_dvdPlayerEdit->GetText());
     gCoreContext->SaveSetting("DVDDeviceLocation", m_dvdDriveEdit->GetText());
-    gCoreContext->SaveSetting("VCDPlayerCommand", m_vcdPlayerEdit->GetText());
-    gCoreContext->SaveSetting("VCDDeviceLocation", m_vcdDriveEdit->GetText());
+    gCoreContext->SaveSetting("BluRayMountpoint", m_blurayMountEdit->GetText());
     gCoreContext->SaveSetting("mythvideo.VideoAlternatePlayer", m_altPlayerEdit->GetText());
 
     int checkstate = 0;

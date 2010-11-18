@@ -11,7 +11,7 @@
       <type>VIDEO_SETTINGS_PLAYER</type>
       <text>Player Settings</text>
       <action>SETTINGS_PLAYER</action>
-      <description>Player Applications and DVD/VCD Drives</description>
+      <description>Player Applications and Optical Drives</description>
    </button>
 
    <button>

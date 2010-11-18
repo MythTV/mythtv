@@ -85,116 +85,87 @@ namespace
     // This stores the last MythMediaDevice that was detected:
     QString gDVDdevice;
 
-    void playVCD()
-    {
-        //
-        //  Get the command string to play a VCD
-        //
-        QString command_string = gCoreContext->GetSetting("VCDPlayerCommand");
-
-        GetMythUI()->AddCurrentLocation("playvcd");
-
-        if(command_string.length() < 1)
-        {
-            //
-            //  User probably never did setup
-            //
-            MythScreenStack *popupStack =
-                    GetMythMainWindow()->GetStack("popup stack");
-            QString label =
-                    QObject::tr("You have no VCD Player command defined.");
-            MythDialogBox *okPopup = new MythDialogBox(label, popupStack,
-                                                       "vcdmenupopup");
-
-            if (okPopup->Create())
-                popupStack->AddScreen(okPopup, false);
-
-            okPopup->AddButton(QObject::tr("OK, I'll go run Setup"));
-
-            GetMythUI()->RemoveCurrentLocation();
-            return;
-        }
-        else
-        {
-            if(command_string.contains("%d"))
-            {
-                //
-                //  Need to do device substitution
-                //
-                command_string = command_string.replace(QRegExp("%d"),
-                        MediaMonitor::defaultVCDdevice());
-            }
-            sendPlaybackStart();
-            myth_system(command_string);
-            sendPlaybackEnd();
-            GetMythMainWindow()->raise();
-            GetMythMainWindow()->activateWindow();
-            if (GetMythMainWindow()->currentWidget())
-                GetMythMainWindow()->currentWidget()->setFocus();
-        }
-        GetMythUI()->RemoveCurrentLocation();
-    }
-
-    void playDVD()
+    void playDisc()
     {
         //
         //  Get the command string to play a DVD
         //
 
+        bool isBD = false;
+
         QString command_string =
                 gCoreContext->GetSetting("mythdvd.DVDPlayerCommand");
-        //    , "Internal");
-        QString dvd_device = gDVDdevice;
+        QString bluray_mountpoint =
+                gCoreContext->GetSetting("BluRayMountpoint", "/media/cdrom");
+        QDir bdtest(bluray_mountpoint + "/BDMV");
 
-        if (dvd_device.isEmpty())
-            dvd_device = MediaMonitor::defaultDVDdevice();
+        if (bdtest.exists())
+            isBD = true;
 
-        if (dvd_device.isEmpty())
-            return;  // User cancelled in the Popup
-
-        GetMythUI()->AddCurrentLocation("playdvd");
-
-        if ((command_string.indexOf("internal", 0, Qt::CaseInsensitive) > -1) ||
-            (command_string.length() < 1))
+        if (isBD)
         {
-#ifdef Q_OS_MAC
-            // Convert a BSD 'leaf' name into a raw device path
-            QString filename = "dvd://dev/r";   // e.g. 'dvd://dev/rdisk2'
-#elif USING_MINGW
-            QString filename = "dvd:";          // e.g. 'dvd:E\\'
-#else
-            QString filename = "dvd:/";         // e.g. 'dvd://dev/sda'
-#endif
-            filename += dvd_device;
+            GetMythUI()->AddCurrentLocation("playdisc");
 
-            command_string = "Internal";
-            GetMythMainWindow()->HandleMedia(command_string, filename);
+            QString filename = QString("bd:/%1/").arg(bluray_mountpoint);
+
+            GetMythMainWindow()->HandleMedia("Internal", filename);
+
             GetMythUI()->RemoveCurrentLocation();
-
-            return;
         }
         else
         {
-            if (command_string.contains("%d"))
+            QString dvd_device = gDVDdevice;
+
+            if (dvd_device.isEmpty())
+                dvd_device = MediaMonitor::defaultDVDdevice();
+
+            if (dvd_device.isEmpty())
+                return;  // User cancelled in the Popup
+
+            GetMythUI()->AddCurrentLocation("playdisc");
+
+            if ((command_string.indexOf("internal", 0, Qt::CaseInsensitive) > -1) ||
+                (command_string.length() < 1))
             {
-                //
-                //  Need to do device substitution
-                //
-                command_string =
-                        command_string.replace(QRegExp("%d"), dvd_device);
+#ifdef Q_OS_MAC
+                // Convert a BSD 'leaf' name into a raw device path
+                QString filename = "dvd://dev/r";   // e.g. 'dvd://dev/rdisk2'
+#elif USING_MINGW
+                QString filename = "dvd:";          // e.g. 'dvd:E\\'
+#else
+                QString filename = "dvd:/";         // e.g. 'dvd://dev/sda'
+#endif
+                filename += dvd_device;
+
+                command_string = "Internal";
+                GetMythMainWindow()->HandleMedia(command_string, filename);
+                GetMythUI()->RemoveCurrentLocation();
+
+                return;
             }
-            sendPlaybackStart();
-            myth_system(command_string);
-            sendPlaybackEnd();
-            if (GetMythMainWindow())
+            else
             {
-                GetMythMainWindow()->raise();
-                GetMythMainWindow()->activateWindow();
-                if (GetMythMainWindow()->currentWidget())
-                    GetMythMainWindow()->currentWidget()->setFocus();
+                if (command_string.contains("%d"))
+                {
+                    //
+                    //  Need to do device substitution
+                    //
+                    command_string =
+                            command_string.replace(QRegExp("%d"), dvd_device);
+                }
+                sendPlaybackStart();
+                myth_system(command_string);
+                sendPlaybackEnd();
+                if (GetMythMainWindow())
+                {
+                    GetMythMainWindow()->raise();
+                    GetMythMainWindow()->activateWindow();
+                    if (GetMythMainWindow()->currentWidget())
+                        GetMythMainWindow()->currentWidget()->setFocus();
+                }
             }
+            GetMythUI()->RemoveCurrentLocation();
         }
-        GetMythUI()->RemoveCurrentLocation();
     }
 
     /////////////////////////////////////////////////
@@ -247,32 +218,12 @@ namespace
             case 1 : // Display menu (mythdvd)*/
                 mythplugin_run();
                 break;
-            case 2 : // play DVD
-                playDVD();
+            case 2 : // play DVD or Blu-ray
+                playDisc();
                 break;
             default:
                 VERBOSE(VB_IMPORTANT, "mythdvd main.o: handleMedia() does not "
                         "know what to do");
-        }
-    }
-
-    void handleVCDMedia(MythMediaDevice *vcd)
-    {
-        if (!vcd || !vcd->isUsable())
-            return;
-
-        switch (gCoreContext->GetNumSetting("DVDOnInsertDVD", 1))
-        {
-            case 0 : // Do nothing
-                break;
-            case 1 : // Display menu (mythdvd)*/
-                mythplugin_run();
-                break;
-            case 2 : // play VCD
-                playVCD();
-                break;
-            case 3 : // Do nothing, cannot rip VCD?
-                break;
         }
     }
 
@@ -319,17 +270,12 @@ namespace
             "Go to the last video"), "End");
 
         // MythDVD
-        REG_JUMP("Play DVD", QT_TRANSLATE_NOOP("MythControls",
-            "Play a DVD"), "", playDVD);
+        REG_JUMP("Play Disc", QT_TRANSLATE_NOOP("MythControls",
+            "Play an Optical Disc"), "", playDisc);
         REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
             "MythDVD DVD Media Handler"), "", "", handleDVDMedia,
             MEDIATYPE_DVD, QString::null);
 
-        REG_JUMP("Play VCD", QT_TRANSLATE_NOOP("MythControls",
-            "Play a VCD"), "", playVCD);
-        REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
-            "MythDVD VCD Media Handler"), "", "", handleVCDMedia,
-            MEDIATYPE_VCD, QString::null);
     }
 
     class RunSettingsCompletion : public QObject
@@ -433,13 +379,9 @@ namespace
             if (fa->Create())
                 mainStack->AddScreen(fa);
         }
-        else if (sel == "dvd_play")
+        else if (sel == "disc_play")
         {
-            playDVD();
-        }
-        else if (sel == "vcd_play")
-        {
-            playVCD();
+            playDisc();
         }
     }
 
