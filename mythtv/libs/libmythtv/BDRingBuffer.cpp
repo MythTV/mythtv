@@ -1,3 +1,4 @@
+#include <QImage>
 
 #include <cstring>
 
@@ -20,6 +21,9 @@ static void HandleOverlayCallback(void *data, const bd_overlay_s * const overlay
 {
     BDRingBufferPriv *bdpriv = (BDRingBufferPriv*) data;
 
+    if (!bdpriv)
+        return;
+
     if (!overlay || overlay->plane == 1)
         bdpriv->m_inMenu = false;
 
@@ -27,9 +31,26 @@ static void HandleOverlayCallback(void *data, const bd_overlay_s * const overlay
         return;
 
     bdpriv->m_inMenu = true;
-// Uncomment me when you can actually do something with this image.
-//    const BD_PG_RLE_ELEM *rlep = overlay->img;
+
+    const BD_PG_RLE_ELEM *rlep = overlay->img;
+    uint8_t *yuvimg = (uint8_t*)malloc(overlay->w * overlay->h);
     unsigned pixels = overlay->w * overlay->h;
+
+    for (unsigned i = 0; i < pixels; i += rlep->len, rlep++)
+    {
+        memset(yuvimg + i, rlep->color, rlep->len);
+    }
+
+    QImage qoverlay(yuvimg, overlay->w, overlay->h, QImage::Format_Indexed8);
+
+    uint32_t *origpalette = (uint32_t *)(overlay->palette);
+    QVector<unsigned int> palette;
+    for (int i = 0; i < 256; i++)
+        palette.push_back(origpalette[i]);
+
+    qoverlay.setColorTable(palette);
+    qoverlay.save(QString("bluray.menuimg.%1.%2.png").arg(overlay->w).arg(overlay->h));
+
     VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + QString("In Menu Callback, ready to draw "
                         "an overlay of %1x%2 at %3,%4 (%5 pixels).")
                         .arg(overlay->w).arg(overlay->h).arg(overlay->x)
@@ -194,11 +215,10 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
     // First, attempt to initialize the disc in HDMV navigation mode.
     // If this fails, fall back to the traditional built-in title switching
     // mode.
-    if (!bd_play(bdnav))
-          SwitchTitle(m_mainTitle);
-    else
+    if (bd_play(bdnav))
     {
         m_is_hdmv_navigation = true;
+
         // Initialize the HDMV event queue
         HandleBDEvents();
 
@@ -276,10 +296,12 @@ bool BDRingBufferPriv::SwitchTitle(uint title)
     if (!m_currentTitleInfo)
         return false;
 
+    if (!m_is_hdmv_navigation)
+        bd_select_title(bdnav, title);
+
     m_currentTitleLength = m_currentTitleInfo->duration;
     m_currentTitleAngleCount = m_currentTitleInfo->angle_count;
     m_currentAngle = 0;
-    bd_select_title(bdnav, title);
     uint32_t chapter_count = m_currentTitleInfo->chapter_count;
     VERBOSE(VB_IMPORTANT, LOC + QString("Selected title: index %1. "
                                         "Duration: %2 (%3 mins) "
@@ -502,12 +524,14 @@ void BDRingBufferPriv::HandleBDEvent(BD_EVENT &ev)
         case BD_EVENT_TITLE:
             VERBOSE(VB_PLAYBACK|VB_EXTRA,
                     QString("BDRingBuf: EVENT_TITLE %1").arg(ev.param));
-            SwitchTitle(ev.param);
+            m_currentTitle = ev.param;
             break;
         case BD_EVENT_PLAYLIST:
             VERBOSE(VB_PLAYBACK|VB_EXTRA,
                     QString("BDRingBuf: EVENT_PLAYLIST %1").arg(ev.param));
             m_currentPlaylist = ev.param;
+            m_currentTitle = bd_get_current_title(bdnav);
+            SwitchTitle(m_currentTitle);
             break;
         case BD_EVENT_PLAYITEM:
             VERBOSE(VB_PLAYBACK|VB_EXTRA,
