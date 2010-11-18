@@ -57,7 +57,7 @@
     <button>
         <type>SETTINGS_VIDEO</type>
         <text>Videos Settings</text>
-        <description>Configure playback and DVD ripping</description>
+        <description>Configure playback and metadata</description>
         <action>CONFIGPLUGIN mythvideo</action>
         <depends>mythvideo</depends>
     </button>

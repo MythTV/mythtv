@@ -2,18 +2,10 @@
 <mythmenu name="OPTICAL_DISK">
 
     <button>
-        <type>DVD_PLAY</type>
-        <text>Play DVD</text>
-        <description>Play the video on a movie DVD</description>
-        <action>JUMP Play DVD</action>
-        <depends>mythvideo</depends>
-    </button>
-
-    <button>
-        <type>VCD_PLAY</type>
-        <text>Play VCD</text>
-        <description>Play the video on a VCD</description>
-        <action>JUMP Play VCD</action>
+        <type>DISC_PLAY</type>
+        <text>Play Disc</text>
+        <description>Play the video on a Blu-ray or DVD</description>
+        <action>JUMP Play Disc</action>
         <depends>mythvideo</depends>
     </button>
 
@@ -36,7 +28,7 @@
     <button>
         <type>EJECT</type>
         <text>Eject media</text>
-        <description>Eject CD or DVD from drive</description>
+        <description>Eject Disc from drive</description>
         <action>EJECT</action>
     </button>
 

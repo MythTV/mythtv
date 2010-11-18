@@ -204,19 +204,9 @@
                             </imagetype>-->
                         </state>
 
-                        <state name="DVD_PLAY" from="default">
+                        <state name="DISC_PLAY" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/play_dvd.png</filename>
-                            </imagetype>
-                        </state>
-                        <state name="VCD_PLAY" from="default">
-                            <imagetype name="icon">
-                                <filename>watermarks/cd.png</filename>
-                            </imagetype>
-                        </state>
-                        <state name="DVD_RIP" from="default">
-                            <imagetype name="icon">
-                                <filename>watermarks/import_dvd.png</filename>
                             </imagetype>
                         </state>
 
@@ -620,25 +610,14 @@
                             </imagetype>-->
                         </state>
 
-                        <state name="DVD_PLAY" from="DVD">
+                        <state name="DISC_PLAY" from="DVD">
                             <imagetype name="icon">
                                 <filename>watermarks/play_dvd.png</filename>
-                            </imagetype>
-                        </state>
-                        <state name="VCD_PLAY" from="default">
-                            <imagetype name="icon">
-                                <filename>watermarks/cd.png</filename>
-                            </imagetype>
-                        </state>
-                        <state name="DVD_RIP" from="default">
-                            <imagetype name="icon">
-                                <filename>watermarks/import_dvd.png</filename>
                             </imagetype>
                         </state>
 
                         <state name="DVD_SETTINGS_GENERAL" from="DVD" />
                         <state name="DVD_SETTINGS_PLAY" from="DVD" />
-                        <state name="DVD_SETTINGS_RIP" from="DVD_RIP" />
 
                         <state name="GAME_SETTINGS_GENERAL" from="GAME" />
                         <state name="GAME_SCAN" from="GAME" />

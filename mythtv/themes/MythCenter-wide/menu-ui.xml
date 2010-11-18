@@ -260,17 +260,7 @@
             </state>
 
             <!--   dvdmenu.xml  -->
-            <state name="DVD_PLAY" from="DVD" />
-            <state name="VCD_PLAY" from="DEFAULT">
-                <imagetype name="watermark">
-                    <filename>watermark/cd.png</filename>
-                </imagetype>
-            </state>
-            <state name="DVD_RIP" from="DEFAULT">
-                <imagetype name="watermark">
-                    <filename>watermark/dvd_rip.png</filename>
-                </imagetype>
-            </state>
+            <state name="DISC_PLAY" from="DVD" />
 
             <!--   dvd_settings.xml  -->
             <state name="DVD_SETTINGS_GENERAL" from="DVD" />

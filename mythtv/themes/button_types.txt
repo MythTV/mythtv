@@ -84,13 +84,11 @@ netflix_menu.xml
 
 optical_menu.xml
 
-      1. DVD_PLAY
-      2. VCD_PLAY
-      3. DVD_RIP
-      4. BURN
-      5. ARCHIVE
-      6. MUSIC_RIP
-      7. EJECT
+      1. DISC_PLAY
+      2. BURN
+      3. ARCHIVE
+      4. MUSIC_RIP
+      5. EJECT
 
 recpriorities_settings.xml
 
