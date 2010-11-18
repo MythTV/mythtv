@@ -1369,6 +1369,12 @@ void MythRenderOpenGL::InitProcs(void)
         GetProcAddress("glShaderSourceARB");
     m_glCompileShader = (MYTH_GLCOMPILESHADER)
         GetProcAddress("glCompileShaderARB");
+    m_glGetShader = (MYTH_GLGETSHADER)
+        GetProcAddress("glGetShaderiv");
+    m_glGetShaderInfoLog = (MYTH_GLGETSHADERINFOLOG)
+        GetProcAddress("glGetShaderInfoLog");
+    m_glDeleteShader = (MYTH_GLDELETESHADER)
+        GetProcAddress("glDeleteShader");
     m_glCreateProgramObject = (MYTH_GLCREATEPROGRAMOBJECT)
         GetProcAddress("glCreateProgramObjectARB");
     m_glAttachObject = (MYTH_GLATTACHOBJECT)
@@ -1463,7 +1469,9 @@ void MythRenderOpenGL::InitFeatures(void)
         m_extensions.contains("GL_ARB_vertex_shader") &&
         m_extensions.contains("GL_ARB_fragment_shader") &&
         m_glShaderSource  && m_glCreateShaderObject &&
-        m_glCompileShader && m_glCreateProgramObject &&
+        m_glCompileShader && m_glGetShader &&
+        m_glGetShaderInfoLog && m_glDeleteShader &&
+        m_glCreateProgramObject &&
         m_glAttachObject  && m_glLinkProgram &&
         m_glUseProgram    && m_glGetInfoLog &&
         m_glDetachObject  && m_glGetObjectParameteriv &&
@@ -1602,6 +1610,9 @@ void MythRenderOpenGL::ResetProcs(void)
     m_glCreateShaderObject = NULL;
     m_glShaderSource = NULL;
     m_glCompileShader = NULL;
+    m_glGetShader = NULL;
+    m_glGetShaderInfoLog = NULL;
+    m_glDeleteShader = NULL;
     m_glCreateProgramObject = NULL;
     m_glAttachObject = NULL;
     m_glLinkProgram = NULL;
@@ -1732,8 +1743,8 @@ void MythRenderOpenGL::DeleteShaderObjects(void)
         GLuint fragment = it.value().m_fragment_shader;
         m_glDetachObject(object, vertex);
         m_glDetachObject(object, fragment);
-        m_glDeleteObject(vertex);
-        m_glDeleteObject(fragment);
+        m_glDeleteShader(vertex);
+        m_glDeleteShader(fragment);
         m_glDeleteObject(object);
     }
     m_shader_objects.clear();
@@ -1764,6 +1775,23 @@ uint MythRenderOpenGL::CreateShader(int type, const QString source)
     const char* tmp[1] = { src.constData() };
     m_glShaderSource(result, 1, tmp, NULL);
     m_glCompileShader(result);
+    GLint compiled;
+    m_glGetShader(result, GL_COMPILE_STATUS, &compiled);
+    if (!compiled)
+    {
+        GLint length = 0;
+        m_glGetShader(result, GL_INFO_LOG_LENGTH, &length);
+        if (length > 1)
+        {
+            char *log = (char*)malloc(sizeof(char) * length);
+            m_glGetShaderInfoLog(result, length, NULL, log);
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to compile shader.");
+            VERBOSE(VB_IMPORTANT, log);
+            free(log);
+        }
+        m_glDeleteShader(result);
+        result = 0;
+    }
     return result;
 }
 

@@ -274,6 +274,9 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     MYTH_GLCREATESHADEROBJECT            m_glCreateShaderObject;
     MYTH_GLSHADERSOURCE                  m_glShaderSource;
     MYTH_GLCOMPILESHADER                 m_glCompileShader;
+    MYTH_GLGETSHADER                     m_glGetShader;
+    MYTH_GLGETSHADERINFOLOG              m_glGetShaderInfoLog;
+    MYTH_GLDELETESHADER                  m_glDeleteShader;
     MYTH_GLCREATEPROGRAMOBJECT           m_glCreateProgramObject;
     MYTH_GLATTACHOBJECT                  m_glAttachObject;
     MYTH_GLLINKPROGRAM                   m_glLinkProgram;

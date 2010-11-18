@@ -186,6 +186,12 @@ typedef void ( * MYTH_GLSHADERSOURCE)
     (GLuint shader, int numOfStrings, const char **strings, int *lenOfStrings);
 typedef void ( * MYTH_GLCOMPILESHADER)
     (GLuint shader);
+typedef void ( * MYTH_GLGETSHADER)
+    (GLuint shader, GLenum pname, GLint *params);
+typedef void ( * MYTH_GLGETSHADERINFOLOG)
+    (GLuint shader, GLint length, GLint length, GLchar *infolog);
+typedef void ( * MYTH_GLDELETESHADER)
+    (GLuint shader);
 typedef GLuint ( * MYTH_GLCREATEPROGRAMOBJECT)
     (void);
 typedef void ( * MYTH_GLATTACHOBJECT)
