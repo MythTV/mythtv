@@ -189,7 +189,7 @@ typedef void ( * MYTH_GLCOMPILESHADER)
 typedef void ( * MYTH_GLGETSHADER)
     (GLuint shader, GLenum pname, GLint *params);
 typedef void ( * MYTH_GLGETSHADERINFOLOG)
-    (GLuint shader, GLint length, GLint length, GLchar *infolog);
+    (GLuint shader, GLint maxlength, GLint length, GLchar *infolog);
 typedef void ( * MYTH_GLDELETESHADER)
     (GLuint shader);
 typedef GLuint ( * MYTH_GLCREATEPROGRAMOBJECT)
