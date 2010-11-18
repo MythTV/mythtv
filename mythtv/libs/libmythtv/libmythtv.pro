@@ -344,8 +344,6 @@ using_frontend {
         DEFINES += USING_OPENGL
         HEADERS += util-opengl.h
         SOURCES += util-opengl.cpp
-        HEADERS += mythrender_opengl.h
-        SOURCES += mythrender_opengl.cpp
         QT += opengl
     }
     using_opengl_vsync:DEFINES += USING_OPENGL_VSYNC
