@@ -239,7 +239,7 @@ void AudioOutputSettings::SetBestSupportedChannels(int channels)
     vector<int>::reverse_iterator it;
 
     for (it = m_channels.rbegin();
-         *it >= channels && it < m_channels.rend();
+         it != m_channels.rend() && *it >= channels;
          it++)
         m_channels.pop_back();
     m_channels.push_back(channels);
