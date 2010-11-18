@@ -7,12 +7,14 @@
 #include <QVector>
 #include <QMetaType>
 #include <QVariant>
+#include <QMap>
+#include <QHash>
 
 #include "mythexp.h"
 
+#include "mythuibuttonlist.h"
+
 class SortableMythGenericTreeList;
-class MythUIButtonList;
-class MythUIButtonListItem;
 
 class MPUBLIC MythGenericTree
 {
@@ -59,8 +61,18 @@ class MPUBLIC MythGenericTree
     void setParent(MythGenericTree* a_parent) { m_parent = a_parent; }
     MythGenericTree *getParent(void) const;
 
-    const QString getString(void) const { return m_string; }
-    void setString(const QString &str) { m_string = str; }
+    // Deprecated
+    const QString getString(void) const { return m_text; }
+    void setString(const QString &str) { m_text = str; }
+    // End deprecated
+
+    void SetText(const QString &text, const QString &name="",
+                 const QString &state="");
+    void SetTextFromMap(QHash<QString, QString> &infoMap, const QString &state="");
+    QString GetText(const QString &name="") const;
+
+    void SetImage(const QString &filename, const QString &name="");
+    QString GetImage(const QString &name="") const;
 
     void SetData(QVariant data) { m_data = data; }
     const QVariant GetData(void) const { return m_data; }
@@ -110,7 +122,10 @@ class MPUBLIC MythGenericTree
   private:
     void reorderSubnodes(void);
 
-    QString m_string;
+    QString m_text;
+    QMap<QString, TextProperties> m_strings;
+    QMap<QString, QString> m_imageFilenames;
+    QMap<QString, QString> m_states;
     int m_int;
     QVariant m_data;
     uint m_visibleCount;

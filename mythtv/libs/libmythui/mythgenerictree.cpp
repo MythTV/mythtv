@@ -115,7 +115,7 @@ MythGenericTree::MythGenericTree(const QString &a_string, int an_int,
     // TODO Switch to a QT List, or drop the attribute concept entirely
     m_attributes = new IntVector(6);
 
-    m_string = a_string;
+    m_text = a_string;
     m_int = an_int;
     m_data = 0;
 
@@ -723,12 +723,12 @@ void MythGenericTree::SetVisible(bool visible)
 {
     if (m_visible == visible)
         return;
-    
+
     m_visible = visible;
 
     if (!m_parent)
         return;
-    
+
     if (visible)
         m_parent->IncVisibleCount();
     else
@@ -739,9 +739,67 @@ MythUIButtonListItem *MythGenericTree::CreateListButton(MythUIButtonList *list)
 {
     MythUIButtonListItem *item = new MythUIButtonListItem(list, getString());
     item->SetData(qVariantFromValue(this));
+    item->SetTextFromMap(m_strings);
+    item->SetImageFromMap(m_imageFilenames);
 
     if (visibleChildCount() > 0)
         item->setDrawArrow(true);
 
     return item;
+}
+
+void MythGenericTree::SetText(const QString &text, const QString &name,
+                              const QString &state)
+{
+    if (!name.isEmpty())
+    {
+        TextProperties textprop;
+        textprop.text = text;
+        textprop.state = state;
+        m_strings.insert(name, textprop);
+    }
+    else
+        m_text = text;
+}
+
+void MythGenericTree::SetTextFromMap(QHash<QString, QString> &infoMap,
+                                     const QString &state)
+{
+    QHash<QString, QString>::iterator map_it = infoMap.begin();
+    while (map_it != infoMap.end())
+    {
+        TextProperties textprop;
+        textprop.text = (*map_it);
+        textprop.state = state;
+        m_strings[map_it.key()] = textprop;
+        ++map_it;
+    }
+}
+
+QString MythGenericTree::GetText(const QString &name) const
+{
+    if (name.isEmpty())
+        return m_text;
+    else if (m_strings.contains(name))
+        return m_strings[name].text;
+    else
+        return QString();
+}
+
+void MythGenericTree::SetImage(const QString &filename, const QString &name)
+{
+    if (!name.isEmpty())
+        m_imageFilenames.insert(name, filename);
+}
+
+QString MythGenericTree::GetImage(const QString &name) const
+{
+    if (name.isEmpty())
+        return QString();
+
+    QMap<QString, QString>::const_iterator it = m_imageFilenames.find(name);
+    if (it != m_imageFilenames.end())
+        return *it;
+
+    return QString();
 }

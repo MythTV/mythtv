@@ -14,6 +14,11 @@
 class MythUIButtonList;
 class MythUIStateType;
 
+struct TextProperties {
+    QString text;
+    QString state;
+};
+
 class MPUBLIC MythUIButtonListItem
 {
   public:
@@ -22,11 +27,6 @@ class MPUBLIC MythUIButtonListItem
         NotChecked = 0,
         HalfChecked,
         FullChecked
-    };
-
-    struct TextProperties {
-        QString text;
-        QString state;
     };
 
     MythUIButtonListItem(MythUIButtonList *lbtype, const QString& text,
@@ -41,6 +41,7 @@ class MPUBLIC MythUIButtonListItem
     void SetText(const QString &text, const QString &name="",
                  const QString &state="");
     void SetTextFromMap(QHash<QString, QString> &infoMap, const QString &state="");
+    void SetTextFromMap(QMap<QString, TextProperties> &stringMap);
     QString GetText(const QString &name="") const;
 
     void SetFontState(const QString &state, const QString &name="");
@@ -58,6 +59,7 @@ class MPUBLIC MythUIButtonListItem
 
     void SetImage(const QString &filename, const QString &name="",
                   bool force_reload = false);
+    void SetImageFromMap(const QMap<QString, QString> &imageMap);
     QString GetImage(const QString &name="") const;
 
     void DisplayState(const QString &state, const QString &name);
@@ -94,6 +96,7 @@ class MPUBLIC MythUIButtonListItem
     QMap<QString, QString> m_states;
 
     friend class MythUIButtonList;
+    friend class MythGenericTree;
 };
 
 /**

@@ -2494,7 +2494,7 @@ void MythUIButtonList::updateLCD(void)
             if (!m_lcdColumns[x].isEmpty() && item->m_strings.contains(m_lcdColumns[x]))
             {
                 // named text column
-                MythUIButtonListItem::TextProperties props = item->m_strings[m_lcdColumns[x]];
+                TextProperties props = item->m_strings[m_lcdColumns[x]];
                 if (text.isEmpty())
                     text = props.text;
                 else
@@ -2617,6 +2617,12 @@ void MythUIButtonListItem::SetTextFromMap(QHash<QString, QString> &infoMap,
         m_parent->Update();
 }
 
+void MythUIButtonListItem::SetTextFromMap(QMap<QString,TextProperties> &stringMap)
+{
+    m_strings.clear();
+    m_strings = stringMap;
+}
+
 QString MythUIButtonListItem::GetText(const QString &name) const
 {
     if (name.isEmpty())
@@ -2666,6 +2672,12 @@ void MythUIButtonListItem::setImage(MythImage *image, const QString &name)
 
     if (m_parent)
         m_parent->Update();
+}
+
+void MythUIButtonListItem::SetImageFromMap(const QMap<QString,QString> &imageMap)
+{
+    m_imageFilenames.clear();
+    m_imageFilenames = imageMap;
 }
 
 MythImage* MythUIButtonListItem::getImage(const QString &name)
