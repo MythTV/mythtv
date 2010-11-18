@@ -17,12 +17,13 @@
 #include "ThreadedFileWriter.h"
 #include "compat.h"
 #include "mythverbose.h"
-#include "mythconfig.h"
+#include "mythconfig.h" // gives us HAVE_POSIX_FADVISE
 
-#if defined(_POSIX_SYNCHRONIZED_IO) && _POSIX_SYNCHRONIZED_IO > 0
-#define HAVE_FDATASYNC 1
-#else
-#define HAVE_FDATASYNC 0
+#if HAVE_POSIX_FADVISE < 1
+static int posix_fadvise(int, off_t, off_t, int) { return 0; }
+#  if defined(__linux__)
+#    warning "Not using fadvise on platform that supports it."
+#  endif
 #endif
 
 #define LOC QString("TFW: ")
@@ -358,42 +359,47 @@ void ThreadedFileWriter::Flush(void)
     flush = false;
 }
 
-/** \fn ThreadedFileWriter::Sync(void)
- *  \brief flush data written to the file descriptor to disk.
+/** \brief Flush data written to the file descriptor to disk.
  *
- *   NOTE: This doesn't even try flush our queue of data.
- *   This only ensures that data which has already been sent
- *   to the kernel for this file is written to disk. This
- *   means that if this backend is writing the data over a
- *   network filesystem like NFS, then the data will be visible
- *   to the NFS server after this is called. It is also useful
- *   in preventing the kernel from buffering up so many writes
- *   that they steal the CPU for a long time when the write
- *   to disk actually occurs.
+ *  This prevents freezing up Linux disk access on a running
+ *  CFQ, AS, or Deadline as the disk write schedulers. It does
+ *  this via two mechanism. One is a data sync using the best
+ *  mechanism available (fdatasync then fsync). The second is
+ *  by telling the kernel we do not intend to use the data just
+ *  written anytime soon so other processes time-slices will
+ *  not be used to deal with our excess dirty pages.
+ *
+ *  \note We used to also use sync_file_range on Linux, however
+ *  this is incompatible with newer filesystems such as BRTFS and
+ *  does not actually sync any blocks that have not been allocated
+ *  yet so it was never really appropriate for ThreadedFileWriter.
+ *
+ *  \note We use standard posix calls for this, so any operating
+ *  system supporting the calls will benefit, but this has been
+ *  designed with Linux in mind. Other OS's may benefit from
+ *  revisiting this function.
  */
 void ThreadedFileWriter::Sync(void)
 {
     if (fd >= 0)
     {
-#if HAVE_SYNC_FILE_RANGE
-            uint64_t write_position;
+        /// Toss any data the kernel wrote to disk on it's own from
+        /// the cache, so we don't get penalized for preserving it
+        /// during the sync.
+        (void) posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
 
-            buflock.lock();
-            write_position = m_file_wpos;
-            buflock.unlock();
-
-            if ((write_position - m_file_sync) > TFW_MAX_WRITE_SIZE ||
-                (write_position && m_file_sync < (uint64_t)tfw_min_write_size))
-            {
-                sync_file_range(fd, m_file_sync, write_position - m_file_sync,
-                                SYNC_FILE_RANGE_WRITE);
-                m_file_sync = write_position;
-            }
-#elif HAVE_FDATASYNC
-            fdatasync(fd);
+#if defined(_POSIX_SYNCHRONIZED_IO) && _POSIX_SYNCHRONIZED_IO > 0
+        // fdatasync tries to avoid updating metadata, but will in
+        // practice always update metadata if any data is written
+        // as the file will usually have grown.
+        fdatasync(fd);
 #else
-            fsync(fd);
+        fsync(fd);
 #endif
+
+        // Toss any data we just synced from cache, so we don't
+        // get penalized for it between now and the next sync.
+        (void) posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
     }
 }
 
