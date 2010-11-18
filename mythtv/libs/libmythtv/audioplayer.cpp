@@ -5,8 +5,8 @@
 #define LOC QString("AudioPlayer: ")
 
 AudioPlayer::AudioPlayer(MythPlayer *parent, bool muted)
-  : m_parent(parent),    m_audioOutput(NULL),   m_channels(2),
-    m_orig_channels(2),  m_codec(0),            m_format(FORMAT_NONE),
+  : m_parent(parent),    m_audioOutput(NULL),   m_channels(-1),
+    m_orig_channels(-1), m_codec(0),            m_format(FORMAT_NONE),
     m_samplerate(44100), m_stretchfactor(1.0f), m_passthru(false),
     m_lock(QMutex::Recursive), m_muted_on_creation(muted), 
     m_main_device(QString::null), m_passthru_device(QString::null),
@@ -44,18 +44,24 @@ QString AudioPlayer::ReinitAudio(void)
     QMutexLocker lock(&m_lock);
     QString errMsg = QString::null;
 
+    bool firstinit = (m_format == FORMAT_NONE &&
+                      m_channels < 0 &&
+                      m_samplerate == 44100);
+
     if ((m_format == FORMAT_NONE) ||
         (m_channels <= 0) ||
         (m_samplerate <= 0))
     {
-        VERBOSE(VB_IMPORTANT, LOC +
-                QString("Disabling Audio, params(%1,%2,%3)")
-                .arg(m_format).arg(m_channels).arg(m_samplerate));
-
+        if (!firstinit)
+        {
+            VERBOSE(VB_IMPORTANT, LOC +
+                    QString("Disabling Audio, params(%1,%2,%3)")
+                    .arg(m_format).arg(m_channels).arg(m_samplerate));
+        }
         no_audio_in = no_audio_out = true;
     }
-
-    no_audio_in = false;
+    else
+        no_audio_in = false;
 
     if (no_audio_out && want_audio)
     {
@@ -76,8 +82,11 @@ QString AudioPlayer::ReinitAudio(void)
 
         if (!errMsg.isEmpty())
         {
-            VERBOSE(VB_IMPORTANT, LOC + "Disabling Audio" +
-                    QString(", reason is: %1").arg(errMsg));
+            if (!firstinit)
+            {
+                VERBOSE(VB_IMPORTANT, LOC + "Disabling Audio" +
+                        QString(", reason is: %1").arg(errMsg));
+            }
             no_audio_out = true;
         }
         else if (no_audio_out)
