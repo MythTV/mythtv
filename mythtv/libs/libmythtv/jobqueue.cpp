@@ -2154,7 +2154,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
         ChangeJobStatus(jobID, JOB_ERRORED, comment);
         priority = LP_WARNING;
     }
-    else if (breaksFound >= COMMFLAG_EXIT_START)
+    else if (breaksFound >= GENERIC_EXIT_NOT_OK) // 256 or above - error
     {
         comment = tr("Failed with exit status %1").arg(breaksFound);
         ChangeJobStatus(jobID, JOB_ERRORED, comment);
