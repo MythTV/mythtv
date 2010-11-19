@@ -50,7 +50,7 @@ class MythGLTexture;
 class MythGLShaderObject;
 class MythRenderOpenGL;
 
-class OpenGLLocker
+class MPUBLIC OpenGLLocker
 {
   public:
     OpenGLLocker(MythRenderOpenGL *render);
@@ -59,7 +59,7 @@ class OpenGLLocker
     MythRenderOpenGL *m_render;
 };
 
-class MythRenderOpenGL : public QGLContext, public MythRender
+class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
 {
   public:
     MythRenderOpenGL(const QGLFormat& format, QPaintDevice* device);
