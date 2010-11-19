@@ -602,6 +602,7 @@ namespace fake_unnamed
         sub_node->setAttribute(kNodeSort, kOrderSub);
         sub_node->setOrderingIndex(kNodeSort);
         sub_node->SetData(QVariant::fromValue(TreeNodeData(fqPath, host, prefix)));
+        sub_node->SetText(name, "title");
 
         // ...and the updir node.
         if (add_up_dirs)
@@ -623,6 +624,31 @@ namespace fake_unnamed
         sub_node->setAttribute(kNodeSort, kOrderItem);
         sub_node->setOrderingIndex(kNodeSort);
         sub_node->SetData(QVariant::fromValue(TreeNodeData(metadata)));
+        QHash<QString, QString> textMap;
+        metadata->toMap(textMap);
+        sub_node->SetTextFromMap(textMap);
+        if (!metadata->GetHost().isEmpty())
+        {
+            QString coverart = generate_file_url("Coverart",
+                                   metadata->GetHost(), metadata->GetCoverFile());
+            sub_node->SetImage(coverart, "coverart");
+            QString banner = generate_file_url("Banners",
+                                   metadata->GetHost(), metadata->GetBanner());
+            sub_node->SetImage(banner, "banner");
+            QString fanart = generate_file_url("Fanart",
+                                   metadata->GetHost(), metadata->GetFanart());
+            sub_node->SetImage(fanart, "fanart");
+            QString screenshot = generate_file_url("Screenshots",
+                                   metadata->GetHost(), metadata->GetScreenshot());
+            sub_node->SetImage(screenshot, "screenshot");
+        }
+        else
+        {
+            sub_node->SetImage(metadata->GetCoverFile(), "coverart");
+            sub_node->SetImage(metadata->GetBanner(), "banner");
+            sub_node->SetImage(metadata->GetFanart(), "fanart");
+            sub_node->SetImage(metadata->GetScreenshot(), "screenshot");
+        }
 
         return 1;
     }
