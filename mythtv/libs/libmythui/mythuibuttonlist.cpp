@@ -265,7 +265,7 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
     int  max_width, max_height;
     int  left_width, right_width;
     int  begin, end;
-    bool underflow;
+    bool underflow = false;	// keep from being uninitialized
     bool added;
     bool hsplit, vsplit;
     int  selectedIdx;
