@@ -566,13 +566,14 @@ void XMLTVConfig::Load(void)
     QStringList args;
     args += "baseline";
 
-    MythSystem find_grabber_proc("tv_find_grabbers", args, kMSStdOut|kMSBuffered|kMSRunShell);
+    MythSystem find_grabber_proc("tv_find_grabbers", args, 
+                                 kMSStdOut | kMSBuffered | kMSRunShell);
     find_grabber_proc.Run(25);
     VERBOSE(VB_GENERAL,
             loc + "Running 'tv_find_grabbers " + args.join(" ") + "'.");
     uint status = find_grabber_proc.Wait();
 
-    if (status != GENERIC_EXIT_OK)
+    if (status == GENERIC_EXIT_OK)
     {
         QTextStream ostream(find_grabber_proc.ReadAll());
         while (!ostream.atEnd())
