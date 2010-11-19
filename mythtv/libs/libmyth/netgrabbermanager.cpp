@@ -48,7 +48,7 @@ void GrabberScript::run()
     QMutexLocker locker(&m_lock);
 
     QString commandline = m_commandline;
-    m_getTree.SetCommand(commandline, QStringList() << "T",
+    m_getTree.SetCommand(commandline, QStringList() << "-T",
                          kMSStdOut | kMSBuffered);
 
     m_getTree.Run(900);
@@ -235,9 +235,6 @@ Search::Search()
     : m_searchProcess(NULL)
 {
     m_videoList.clear();
-    m_searchtimer = new QTimer();
-
-    m_searchtimer->setSingleShot(true);
 }
 
 Search::~Search()
@@ -246,13 +243,6 @@ Search::~Search()
 
     delete m_searchProcess;
     m_searchProcess = NULL;
-
-    if (m_searchtimer)
-    {
-        m_searchtimer->disconnect();
-        m_searchtimer->deleteLater();
-        m_searchtimer = NULL;
-    }
 }
 
 
@@ -263,7 +253,7 @@ void Search::executeSearch(const QString &script, const QString &query, uint pag
     m_searchProcess = new MythSystem();
 
     connect(m_searchProcess, SIGNAL(finished()), this, SLOT(slotProcessSearchExit()));
-    connect(m_searchtimer, SIGNAL(timeout()), this, SLOT(slotSearchTimeout()));
+    connect(m_searchProcess, SIGNAL(error(uint)), this, SLOT(slotProcessSearchExit(uint)));
 
     QString cmd = script;
 
@@ -281,8 +271,9 @@ void Search::executeSearch(const QString &script, const QString &query, uint pag
     VERBOSE(VB_GENERAL|VB_EXTRA, LOC + QString("Internet Search Query: %1 %2")
                                         .arg(cmd).arg(args.join(" ")));
 
-    m_searchtimer->start(40 * 1000);
-    m_searchProcess->SetCommand(cmd, args, kMSStdOut | kMSBuffered);
+    m_searchProcess->SetCommand(cmd, args, 
+                                kMSStdOut | kMSBuffered | kMSRunBackground );
+    m_searchProcess->Run(40);
 }
 
 void Search::resetSearch()
@@ -350,8 +341,19 @@ void Search::process()
 
 void Search::slotProcessSearchExit(int exitcode)
 {
-    if (m_searchtimer)
-        m_searchtimer->stop();
+    if (exitcode == GENERIC_EXIT_TIMEOUT)
+    {
+        VERBOSE(VB_GENERAL|VB_EXTRA, LOC_ERR + "Internet Search Timeout");
+
+        if (m_searchProcess)
+        {
+            m_searchProcess->Term(true);
+            m_searchProcess->deleteLater();
+            m_searchProcess = NULL;
+        }
+        emit searchTimedOut(this);
+        return;
+    }
 
     if (exitcode != GENERIC_EXIT_OK)
     {
@@ -375,17 +377,5 @@ void Search::SetData(QByteArray data)
     m_data = data;
     m_document.setContent(m_data, true);
 
-}
-void Search::slotSearchTimeout()
-{
-    VERBOSE(VB_GENERAL|VB_EXTRA, LOC_ERR + "Internet Search Timeout");
-
-    if (m_searchProcess)
-    {
-        m_searchProcess->Term(true);
-        m_searchProcess->deleteLater();
-        m_searchProcess = NULL;
-    }
-    emit searchTimedOut(this);
 }
 

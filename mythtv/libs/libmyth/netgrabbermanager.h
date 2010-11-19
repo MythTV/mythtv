@@ -160,7 +160,6 @@ class MPUBLIC Search : public QObject
 
     QByteArray              m_data;
     QDomDocument            m_document;
-    QTimer                 *m_searchtimer;
     ResultItem::resultList  m_videoList;
 
     uint                    m_numResults;
@@ -174,8 +173,7 @@ class MPUBLIC Search : public QObject
 
   private slots:
 
-    void slotProcessSearchExit(int exitcode);
-    void slotSearchTimeout(void);
+    void slotProcessSearchExit(int exitcode = 0);
 };
 
 #endif
