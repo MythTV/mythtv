@@ -118,6 +118,20 @@
 #define GL_OBJECT_INFO_LOG_LENGTH_ARB     0x8B84
 #endif
 
+#ifndef GL_COMPILE_STATUS
+#define GL_COMPILE_STATUS                 0x8B81
+#endif
+#ifndef GL_INFO_LOG_LENGTH
+#define GL_INFO_LOG_LENGTH                0x8B84
+#endif
+
+#ifndef GL_VERSION_2_0
+typedef char GLchar;
+#endif
+#ifndef GL_ARB_shader_objects
+typedef char GLcharARB;
+#endif
+
 #ifndef APIENTRY
 #define APIENTRY
 #endif

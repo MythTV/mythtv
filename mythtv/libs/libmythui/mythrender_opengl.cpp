@@ -1131,13 +1131,13 @@ void MythRenderOpenGL::DrawBitmapHigh(uint tex, const QRect *src,
     EnableTextures(tex);
     glBindTexture(m_textures[tex].m_type, tex);
 
-    m_glBindBufferARB(GL_ARRAY_BUFFER, m_textures[tex].m_vbo);
+    m_glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_textures[tex].m_vbo);
     UpdateTextureVertices(tex, src, dst);
-    m_glBufferDataARB(GL_ARRAY_BUFFER, kVertexSize, NULL, GL_STREAM_DRAW);
-    void* target = m_glMapBufferARB(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+    m_glBufferDataARB(GL_ARRAY_BUFFER_ARB, kVertexSize, NULL, GL_STREAM_DRAW);
+    void* target = m_glMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY);
     if (target)
         memcpy(target, m_textures[tex].m_vertex_data, kVertexSize);
-    m_glUnmapBufferARB(GL_ARRAY_BUFFER);
+    m_glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
 
     m_glEnableVertexAttribArray(VERTEX_INDEX);
     m_glEnableVertexAttribArray(TEXTURE_INDEX);
@@ -1154,7 +1154,7 @@ void MythRenderOpenGL::DrawBitmapHigh(uint tex, const QRect *src,
 
     m_glDisableVertexAttribArray(TEXTURE_INDEX);
     m_glDisableVertexAttribArray(VERTEX_INDEX);
-    m_glBindBufferARB(GL_ARRAY_BUFFER, 0);
+    m_glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 }
 
 void MythRenderOpenGL::DrawBitmapLegacy(uint *textures, uint texture_count,
@@ -1269,7 +1269,7 @@ void MythRenderOpenGL::DrawRectHigh(const QRect &area, bool drawFill,
                                 VERTEX_SIZE * sizeof(GLfloat),
                                (const void *) kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        m_glBindBufferARB(GL_ARRAY_BUFFER, 0);
+        m_glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
     }
 
     if (drawLine)
@@ -1285,7 +1285,7 @@ void MythRenderOpenGL::DrawRectHigh(const QRect &area, bool drawFill,
                                 VERTEX_SIZE * sizeof(GLfloat),
                                (const void *) kVertexOffset);
         glDrawArrays(GL_LINE_LOOP, 0, 4);
-        m_glBindBufferARB(GL_ARRAY_BUFFER, 0);
+        m_glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
     }
 
     m_glDisableVertexAttribArray(VERTEX_INDEX);
@@ -1993,18 +1993,18 @@ void MythRenderOpenGL::GetCachedVBO(GLuint type, const QRect &area)
         m_cachedVBOS.insert(ref, vbo);
         m_vboExpiry.append(ref);
 
-        m_glBindBufferARB(GL_ARRAY_BUFFER, vbo);
-        m_glBufferDataARB(GL_ARRAY_BUFFER, kTextureOffset, NULL, GL_STREAM_DRAW);
-        void* target = m_glMapBufferARB(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+        m_glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
+        m_glBufferDataARB(GL_ARRAY_BUFFER_ARB, kTextureOffset, NULL, GL_STREAM_DRAW);
+        void* target = m_glMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY);
         if (target)
             memcpy(target, vertices, kTextureOffset);
-        m_glUnmapBufferARB(GL_ARRAY_BUFFER);
+        m_glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
 
         ExpireVBOS(MAX_VERTEX_CACHE);
         return;
     }
 
-    m_glBindBufferARB(GL_ARRAY_BUFFER, m_cachedVBOS.value(ref));
+    m_glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_cachedVBOS.value(ref));
 }
 
 void MythRenderOpenGL::ExpireVBOS(uint max)
