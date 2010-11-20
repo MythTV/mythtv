@@ -1,6 +1,6 @@
 INCLUDEPATH += ../.. ../../libs/ ../../libs/libmyth ../../libs/libmythtv
 INCLUDEPATH += ../../external/FFmpeg
-INCLUDEPATH += ../../libs/libmythupnp ../../libs/libmythui
+INCLUDEPATH += ../../libs/libmythupnp ../../libs/libmythui ../../libs/libmythmetadata
 INCLUDEPATH += ../../libs/libmythlivemedia ../../libs/libmythdb ../../libmythhdhomerun
 INCLUDEPATH += ../../libs/libmythdvdnav ../../libs/libmythbluray ../../libs/libmythsamplerate
 
@@ -13,6 +13,7 @@ LIBS += -L../../external/FFmpeg/libswscale
 LIBS += -L../../libs/libmythdb
 LIBS += -L../../libs/libmythui
 LIBS += -L../../libs/libmythupnp
+LIBS += -L../../libs/libmythmetdata
 
 LIBS += -lmythtv-$$LIBVERSION
 LIBS += -lmythswscale
@@ -24,6 +25,7 @@ LIBS += -lmythupnp-$$LIBVERSION
 LIBS += -lmythdb-$$LIBVERSION
 LIBS += -lmythui-$$LIBVERSION
 LIBS += -lmyth-$$LIBVERSION
+LIBS += -lmythmetadata-$$LIBVERSION
 
 using_live:LIBS += -L../../libs/libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_mheg:LIBS += -L../../libs/libmythfreemheg -lmythfreemheg-$$LIBVERSION

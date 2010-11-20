@@ -64,7 +64,8 @@ using namespace std;
 #include "mythcoreutil.h"
 #include "mythdirs.h"
 #include "mythdownloadmanager.h"
-
+#include "videoscan.h"
+#include "videoutils.h"
 
 /** Milliseconds to wait for an existing thread from
  *  process request thread pool.
@@ -644,6 +645,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
             VERBOSE(VB_IMPORTANT, "Bad SET_SETTING");
         else
             HandleSetSetting(tokens, pbs);
+    }
+    else if (command == "SCAN_VIDEOS")
+    {
+        HandleScanVideos(pbs);
     }
     else if (command == "ALLOW_SHUTDOWN")
     {
@@ -2180,6 +2185,14 @@ bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
     VERBOSE(VB_FILE, QString("Finished truncating '%1'").arg(filename));
 
     return ok;
+}
+
+void MainServer::finishVideoScan(bool changed)
+{
+    if (changed)
+        VERBOSE(VB_GENERAL, QString("Video scan completed, new entries added"));
+    delete videoscanner;
+    videoscanner = NULL;
 }
 
 void MainServer::HandleCheckRecordingActive(QStringList &slist,
@@ -4796,6 +4809,28 @@ void MainServer::HandleSetSetting(QStringList &tokens,
         SendResponse(pbssock, retlist);
 
     return;
+}
+
+void MainServer::HandleScanVideos(PlaybackSock *pbs)
+{
+    MythSocket *pbssock = pbs->getSocket();
+
+    QStringList retlist;
+
+    videoscanner = new VideoScanner();
+
+    if (videoscanner)
+    {
+        connect(videoscanner, SIGNAL(finished(bool)),
+            SLOT(finishVideoScan(bool)));
+        videoscanner->doScan(GetVideoDirs());
+        retlist << "OK";
+    }
+    else
+        retlist << "ERROR";
+
+    if (pbssock)
+        SendResponse(pbssock, retlist);
 }
 
 void MainServer::HandleFileTransferQuery(QStringList &slist,

@@ -511,6 +511,21 @@ int handle_command(const MythCommandLineParser &cmdline)
         return (ok) ? BACKEND_EXIT_OK : BACKEND_EXIT_NO_CONNECT;
     }
 
+    if (cmdline.ScanVideos())
+    {
+        bool ok = false;
+        if (gCoreContext->ConnectToMasterServer())
+        {
+            gCoreContext->SendReceiveStringList(QStringList() << "SCAN_VIDEOS");
+            VERBOSE(VB_IMPORTANT, "Requested video scan");
+            ok = true;
+        }
+        else
+            VERBOSE(VB_IMPORTANT, "Cannot connect to master for video scan");
+
+        return (ok) ? BACKEND_EXIT_OK : BACKEND_EXIT_NO_CONNECT;
+    }
+
     if (!cmdline.GetPrintExpire().isEmpty())
     {
         expirer = new AutoExpire();

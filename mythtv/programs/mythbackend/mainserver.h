@@ -28,6 +28,7 @@ using namespace std;
 class ProcessRequestThread;
 class QUrl;
 class MythServer;
+class VideoScanner;
 class QTimer;
 
 class MainServer : public QObject, public MythSocketCBs
@@ -66,6 +67,7 @@ class MainServer : public QObject, public MythSocketCBs
     void reconnectTimeout(void);
     void deferredDeleteSlot(void);
     void autoexpireUpdate(void);
+    void finishVideoScan(bool changed);
 
   private slots:
     void newConnection(MythSocket *);
@@ -158,6 +160,7 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleSetBookmark(QStringList &tokens, PlaybackSock *pbs);
     void HandleSettingQuery(QStringList &tokens, PlaybackSock *pbs);
     void HandleSetSetting(QStringList &tokens, PlaybackSock *pbs);
+    void HandleScanVideos(PlaybackSock *pbs);
     void HandleVersion(MythSocket *socket, const QStringList &slist);
     void HandleBackendRefresh(MythSocket *socket);
     void HandleQueryLoad(PlaybackSock *pbs);
@@ -209,6 +212,7 @@ class MainServer : public QObject, public MythSocketCBs
     QMap<int, EncoderLink *> *encoderList;
 
     MythServer *mythserver;
+    VideoScanner *videoscanner;
 
     QReadWriteLock sockListLock;
     vector<PlaybackSock *> playbackList;

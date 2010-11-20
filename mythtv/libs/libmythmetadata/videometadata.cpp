@@ -7,6 +7,7 @@
 
 #include "mythcontext.h"
 #include "mythdb.h"
+#include "storagegroup.h"
 #include "remotefile.h"
 #include "remoteutil.h"
 #include "util.h"
@@ -942,10 +943,16 @@ int VideoMetadata::UpdateHashedDBRecord(const QString &hash,
 QString VideoMetadata::VideoFileHash(const QString &file_name,
                            const QString &host)
 {
-    if (!host.isEmpty())
+    if (!host.isEmpty() && !isHostMaster(host))
     {
         QString url = generate_file_url("Videos", host, file_name);
         return RemoteFile::GetFileHash(url);
+    }
+    else if (!host.isEmpty())
+    {
+        StorageGroup sgroup("Videos", host);
+        QString fullname = sgroup.FindRecordingFile(file_name);
+        return FileHash(fullname);
     }
     else
         return FileHash(file_name);

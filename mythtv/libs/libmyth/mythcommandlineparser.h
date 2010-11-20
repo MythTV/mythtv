@@ -44,6 +44,7 @@ typedef enum {
     kCLPStartTime            = 0x0080000000ULL,
     kCLPPrintExpire          = 0x0100000000ULL,
     kCLPGeneratePreview      = 0x0200000000ULL,
+    kCLPScanVideos           = 0x0400000000ULL,
 } ParseType;
 
 class MPUBLIC MythCommandLineParser
@@ -87,6 +88,7 @@ class MPUBLIC MythCommandLineParser
 
     bool SetVerbose(void)           const { return setverbose;  }
     bool Reschedule(void)           const { return resched;     }
+    bool ScanVideos(void)           const { return scanvideos;  }
     bool ClearSettingsCache(void)   const { return clearsettingscache; }
     bool WantUPnPRebuild(void)      const { return wantupnprebuild; }
 
@@ -101,7 +103,8 @@ class MPUBLIC MythCommandLineParser
             !eventString.isEmpty()    || wantupnprebuild       ||
             setverbose                || clearsettingscache    ||
             printsched                || testsched             ||
-            resched                   || !printexpire.isEmpty();
+            resched                   || scanvideos            ||
+            !printexpire.isEmpty();
     }
 
     bool    WantsToExit(void) const { return wantsToExit; }
@@ -137,6 +140,7 @@ class MPUBLIC MythCommandLineParser
     bool                  setverbose;
     bool                  resched;
     bool                  nosched;
+    bool                  scanvideos;
     bool                  noupnp;
     bool                  nojobqueue;
     bool                  nohousekeeper;

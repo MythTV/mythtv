@@ -9,6 +9,7 @@
 #include "mythcontext.h"
 #include "mythverbose.h"
 #include "videoutils.h"
+#include "storagegroup.h"
 
 DirectoryHandler::~DirectoryHandler()
 {
@@ -111,7 +112,7 @@ namespace
 
     bool scan_sg_dir(const QString &start_path, const QString &host,
                      const QString &base_path, DirectoryHandler *handler,
-		             const ext_lookup &ext_settings)
+		     const ext_lookup &ext_settings, bool isMaster = false)
     {
         QString path = start_path;
 
@@ -125,16 +126,25 @@ namespace
             path = "";
 
         QStringList list;
-        bool ok = RemoteGetFileList(host, start_path, &list, "Videos");
+        bool ok = false;
 
-        if (!ok || list.at(0).startsWith("SLAVE UNREACHABLE"))
+        if (isMaster)
+        {
+            StorageGroup sg("Videos", host);
+            list = sg.GetFileInfoList(start_path);
+            ok = true;
+        }
+        else
+            ok = RemoteGetFileList(host, start_path, &list, "Videos");
+
+        if (!ok || (!list.isEmpty() && list.at(0).startsWith("SLAVE UNREACHABLE")))
         {
             VERBOSE(VB_GENERAL, QString("Backend : %1 : Is currently Unreachable. Skipping this one.")
                                 .arg(host));
             return false;
         }
 
-        if ((!list.size()) || (list.at(0) == "EMPTY LIST")) 
+        if ((!list.size()) || (list.at(0) == "EMPTY LIST"))
             return true;
 
         for (QStringList::iterator p = list.begin(); p != list.end(); ++p)
@@ -164,7 +174,7 @@ namespace
                 // so ignore the results and continue. As long as we reached it once
                 // to make it this far than we know he SG/Path exists
                 (void) scan_sg_dir(start_path + "/" + fileName, host, base_path,
-                             dh, ext_settings);
+                             dh, ext_settings, isMaster);
             }
             else
             {
@@ -231,7 +241,7 @@ bool ScanVideoDirectory(const QString &start_path, DirectoryHandler *handler,
         QString host = sgurl.host();
         QString path = sgurl.path();
 
-        if (!scan_sg_dir(path, host, path, handler, extlookup))
+        if (!scan_sg_dir(path, host, path, handler, extlookup, isHostMaster(host)))
         {
             VERBOSE(VB_GENERAL, QString("MythVideo::ScanVideoDirectory failed to scan %1 ").arg(host));
             pathScanned = false;

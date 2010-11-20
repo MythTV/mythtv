@@ -34,6 +34,7 @@ MythCommandLineParser::MythCommandLineParser(uint64_t things_to_parse) :
     setverbose(false),
     resched(false),
     nosched(false),
+    scanvideos(false),
     noupnp(false),
     nojobqueue(false),
     nohousekeeper(false),
@@ -236,6 +237,12 @@ bool MythCommandLineParser::Parse(
              !strcmp(argv[argpos],"--nosched"))
     {
         nosched = true;
+        return true;
+    }
+    else if ((parseTypes && kCLPReschedule) &&
+             !strcmp(argv[argpos],"--scanvideos"))
+    {
+        scanvideos = true;
         return true;
     }
     else if ((parseTypes && kCLPNoUPnP) &&
@@ -834,6 +841,12 @@ QString MythCommandLineParser::GetHelpString(bool with_header) const
     {
         msg << "--nosched                      "
             << "Do not perform any scheduling" << endl;
+    }
+
+    if (parseTypes & kCLPScanVideos)
+    {
+        msg << "--scanvideos                   "
+            << "Scan for new video content" << endl;
     }
 
     if (parseTypes & kCLPNoUPnP)

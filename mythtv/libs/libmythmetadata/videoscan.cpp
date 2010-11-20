@@ -81,7 +81,7 @@ class VideoScannerThread : public QThread
         VideoMetadataListManager::metadata_list ml;
         VideoMetadataListManager::loadAllFromDatabase(ml);
         m_dbmetadata->setList(ml);
-
+        m_HasGUI = gCoreContext->HasGUI();
         m_ListUnknown = gCoreContext->GetNumSetting("VideoListUnknownFiletypes", 0);
     }
 
@@ -100,12 +100,15 @@ class VideoScannerThread : public QThread
             imageExtensions.push_back(QString(*p));
         }
 
+        VERBOSE(VB_GENERAL, QString("Beginning Video Scan."));
+
         uint counter = 0;
         FileCheckList fs_files;
         failedSGHosts.clear();
 
-        SendProgressEvent(counter, (uint)m_directories.size(),
-                          tr("Searching for video files"));
+        if (m_HasGUI)
+            SendProgressEvent(counter, (uint)m_directories.size(),
+                              tr("Searching for video files"));
         for (QStringList::const_iterator iter = m_directories.begin();
              iter != m_directories.end(); ++iter)
         {
@@ -122,8 +125,8 @@ class VideoScannerThread : public QThread
                     VERBOSE(VB_GENERAL, QString("Failed to scan :%1:").arg(*iter));
                 }
             }
-
-            SendProgressEvent(++counter);
+            if (m_HasGUI)
+                SendProgressEvent(++counter);
         }
 
         PurgeList db_remove;
@@ -184,8 +187,9 @@ class VideoScannerThread : public QThread
         int counter = 0;
         FileCheckList::iterator iter;
 
-        SendProgressEvent(counter, (uint)m_dbmetadata->getList().size(),
-                          tr("Verifying video files"));
+        if (m_HasGUI)
+            SendProgressEvent(counter, (uint)m_dbmetadata->getList().size(),
+                              tr("Verifying video files"));
 
         // For every file we know about, check to see if it still exists.
         for (VideoMetadataListManager::metadata_list::const_iterator p =
@@ -223,8 +227,8 @@ class VideoScannerThread : public QThread
                     }
                 }
             }
-
-            SendProgressEvent(++counter);
+            if (m_HasGUI)
+                SendProgressEvent(++counter);
         }
     }
 
@@ -234,8 +238,9 @@ class VideoScannerThread : public QThread
         int ret = 0;
         uint counter = 0;
         QList<int> preservelist;
-        SendProgressEvent(counter, (uint)(add.size() + remove.size()),
-                          tr("Updating video database"));
+        if (m_HasGUI)
+            SendProgressEvent(counter, (uint)(add.size() + remove.size()),
+                              tr("Updating video database"));
 
         for (FileCheckList::const_iterator p = add.begin(); p != add.end(); ++p)
         {
@@ -289,7 +294,8 @@ class VideoScannerThread : public QThread
                 }
                 ret += 1;
             }
-            SendProgressEvent(++counter);
+            if (m_HasGUI)
+                SendProgressEvent(++counter);
         }
 
         // When prompting is restored, account for the answer here.
@@ -299,7 +305,8 @@ class VideoScannerThread : public QThread
         {
             if (!preservelist.contains(p->first))
                 removeOrphans(p->first, p->second);
-            SendProgressEvent(++counter);
+            if (m_HasGUI)
+                SendProgressEvent(++counter);
         }
 
         return ret;
@@ -332,6 +339,7 @@ class VideoScannerThread : public QThread
     bool m_ListUnknown;
     bool m_RemoveAll;
     bool m_KeepAll;
+    bool m_HasGUI;
     QStringList m_directories;
     QStringList failedSGHosts;
 
@@ -357,27 +365,30 @@ void VideoScanner::doScan(const QStringList &dirs)
     if (m_scanThread->isRunning())
         return;
 
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-
-    MythUIProgressDialog *progressDlg = new MythUIProgressDialog("",
-            popupStack, "videoscanprogressdialog");
-
-    if (progressDlg->Create())
+    if (gCoreContext->HasGUI())
     {
-        popupStack->AddScreen(progressDlg, false);
-        connect(m_scanThread, SIGNAL(finished()),
-                progressDlg, SLOT(Close()));
-        connect(m_scanThread, SIGNAL(finished()),
-                SLOT(finishedScan()));
-    }
-    else
-    {
-        delete progressDlg;
-        progressDlg = NULL;
+        MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+        MythUIProgressDialog *progressDlg = new MythUIProgressDialog("",
+                popupStack, "videoscanprogressdialog");
+
+        if (progressDlg->Create())
+        {
+            popupStack->AddScreen(progressDlg, false);
+            connect(m_scanThread, SIGNAL(finished()),
+                    progressDlg, SLOT(Close()));
+            connect(m_scanThread, SIGNAL(finished()),
+                    SLOT(finishedScan()));
+        }
+        else
+        {
+            delete progressDlg;
+            progressDlg = NULL;
+        }
+        m_scanThread->SetProgressDialog(progressDlg);
     }
 
     m_scanThread->SetDirs(dirs);
-    m_scanThread->SetProgressDialog(progressDlg);
     m_scanThread->start();
 }
 

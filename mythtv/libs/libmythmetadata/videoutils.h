@@ -51,6 +51,8 @@ MPUBLIC QString TrailerToState(const QString &trailerFile);
 MPUBLIC QString ParentalLevelToState(const ParentalLevel &level);
 MPUBLIC QString WatchedToState(bool watched);
 
+MPUBLIC bool isHostMaster(const QString &host);
+
 // this needs to be an inline and pull in the storage group and context
 // headers since it this used in dbcheck.cpp.
 #include <storagegroup.h>

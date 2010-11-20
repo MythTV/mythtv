@@ -81,6 +81,7 @@ int main(int argc, char **argv)
         kCLPTestSchedule         |
         kCLPReschedule           |
         kCLPNoSchedule           |
+        kCLPScanVideos           |
         kCLPNoUPnP               |
         kCLPUPnPRebuild          |
         kCLPNoJobqueue           |

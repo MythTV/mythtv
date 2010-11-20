@@ -26,7 +26,7 @@ class MPUBLIC VideoScanner : public QObject
 
   private:
     class VideoScannerThread *m_scanThread;
-    bool                m_cancel;
+    bool                      m_cancel;
 };
 
 #endif
