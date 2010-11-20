@@ -13,7 +13,7 @@ LIBS += -L../../external/FFmpeg/libswscale
 LIBS += -L../../libs/libmythdb
 LIBS += -L../../libs/libmythui
 LIBS += -L../../libs/libmythupnp
-LIBS += -L../../libs/libmythmetdata
+LIBS += -L../../libs/libmythmetadata
 
 LIBS += -lmythtv-$$LIBVERSION
 LIBS += -lmythswscale
