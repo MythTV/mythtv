@@ -139,6 +139,7 @@ QString ImageView::GetRandomEffect(void) const
 {
     QMap<QString,QString> tmpMap = m_effect_map;
     tmpMap.remove("none");
+    tmpMap.remove("Ken Burns (gl)");
     QStringList t = tmpMap.keys();
     int i = (int) ( (float)(t.count()) * rand() / (RAND_MAX + 1.0f) );
     return tmpMap[t[i]];

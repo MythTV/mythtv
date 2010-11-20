@@ -23,6 +23,7 @@
 #define GLSINGLEVIEW_H
 #ifdef USING_OPENGL
 
+
 // MythTV plugin headers
 #include <util.h>
 #include <mythdialogs.h>
@@ -37,6 +38,7 @@ class QImage;
 class QTimer;
 
 class GLSingleView;
+class KenBurnsImageLoader;
 
 class GLSDialog : public MythDialog
 {
@@ -62,6 +64,9 @@ class GLSingleView : public QGLWidget, public ImageView
     ~GLSingleView();
 
     void CleanUp(void);
+    void Ready(){m_effect_kenBurns_image_ready = true;}
+    void LoadImage(QImage image, QSize origSize);
+    
 
   protected:
     void initializeGL(void);
@@ -99,7 +104,12 @@ class GLSingleView : public QGLWidget, public ImageView
     void EffectSlide(void);
     void EffectFlutter(void);
     void EffectCube(void);
-
+    void EffectKenBurns(void);
+  
+  private:
+	float FindMaxScale(float x_loc, float y_loc);
+	void FindRandXY(float &x_loc, float &y_loc);
+    
   private slots:
     void SlideTimeout(void);
 
@@ -130,6 +140,35 @@ class GLSingleView : public QGLWidget, public ImageView
     float         m_effect_cube_xrot;
     float         m_effect_cube_yrot;
     float         m_effect_cube_zrot;
+    float         m_effect_kenBurns_location_x[2];
+    float         m_effect_kenBurns_location_y[2];
+    int           m_effect_kenBurns_projection[2];
+    MythTimer 	  m_effect_kenBurns_image_time[2];
+    float         m_effect_kenBurns_image_timeout;
+    KenBurnsImageLoader *m_effect_kenBurns_imageLoadThread;
+    bool          m_effect_kenBurns_image_ready;
+    QImage        m_effect_kenBurns_image;
+    QSize         m_effect_kenBurns_orig_image_size;
+    ThumbItem     *m_effect_kenBurns_item;
+    bool          m_effect_kenBurns_initialized;
+    bool          m_effect_kenBurns_new_image_started;
+    
+};
+
+class KenBurnsImageLoader : public QThread
+{
+public:
+    KenBurnsImageLoader(GLSingleView *singleView, ThumbList &itemList, QSize m_texSize, QSize m_screenSize);
+    void Initialize(int pos);
+    void run();
+private:
+	GLSingleView *m_singleView;
+    ThumbList     m_itemList;
+    int           m_pos;
+    bool          m_tex1First;
+    QSize         m_screenSize;
+    QSize         m_texSize;
+
 };
 
 #endif // USING_OPENGL

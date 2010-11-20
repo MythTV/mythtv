@@ -31,6 +31,7 @@ using namespace std;
 #include <QImage>
 #include <QDir>
 #include <QPainter>
+#include <qbuffer.h>
 
 // MythTV plugin headers
 #include <mythcontext.h>
@@ -38,6 +39,7 @@ using namespace std;
 #include <mythuihelper.h>
 
 // MythGallery headers
+#include "config.h"
 #include "glsingleview.h"
 #include "galleryutil.h"
 
@@ -95,7 +97,10 @@ GLSingleView::GLSingleView(ThumbList itemList, int *pos, int slideShow,
       // Unshared effect state variables
       m_effect_cube_xrot(0.0f),
       m_effect_cube_yrot(0.0f),
-      m_effect_cube_zrot(0.0f)
+      m_effect_cube_zrot(0.0f),
+      m_effect_kenBurns_image_ready(true),
+      m_effect_kenBurns_initialized(false),
+      m_effect_kenBurns_new_image_started(true)
 {
     m_scaleMax = (ScaleMax) gCoreContext->GetNumSetting("GalleryScaleMax", 0);
 
@@ -707,6 +712,7 @@ void GLSingleView::RegisterEffects(void)
     m_effect_map.insert("slide (gl)",      "EffectSlide");
     m_effect_map.insert("flutter (gl)",    "EffectFlutter");
     m_effect_map.insert("cube (gl)",       "EffectCube");
+    m_effect_map.insert("Ken Burns (gl)",  "EffectKenBurns");
 }
 
 void GLSingleView::RunEffect(const QString &effect)
@@ -729,6 +735,8 @@ void GLSingleView::RunEffect(const QString &effect)
         EffectFlutter();
     else if (effect == "EffectCube")
         EffectCube();
+    else if (effect == "EffectKenBurns")
+        EffectKenBurns();
     else //if (effect == "EffectNone")
         EffectNone();
 }
@@ -1212,6 +1220,168 @@ void GLSingleView::EffectCube(void)
     m_effect_current_frame++;
 }
 
+void GLSingleView::EffectKenBurns(void)
+{
+
+    float single_image_pct = 0.75;
+    float trans_pct = 1.0 - single_image_pct;
+    float scale_max, x_loc, y_loc;
+    float scale_factor = 0;
+
+    //initialize effect   
+    if (!m_effect_kenBurns_initialized)
+    {
+                
+        m_effect_kenBurns_initialized = !m_effect_kenBurns_initialized;
+        m_effect_kenBurns_item = NULL;
+        // Need to load images in the background to keep effect smooth
+        m_effect_kenBurns_imageLoadThread = new KenBurnsImageLoader(this, m_itemList, m_texSize, m_screenSize);
+        //Since total image time is longer/different than effect time, create image timers
+        m_effect_kenBurns_image_time[m_texCur ? 0 : 1].restart();
+        // Pan image to a random location
+        FindRandXY(m_effect_kenBurns_location_x[0], m_effect_kenBurns_location_y[0]);
+        // Since first two images are preloaded, hardcode  them to zoom in
+        m_effect_kenBurns_projection[0] = 1;
+        m_effect_kenBurns_projection[1] = 1;
+        m_effect_kenBurns_image_timeout = m_effect_transition_timeout + 
+                (m_effect_transition_timeout * trans_pct);
+    }
+
+    if (m_effect_frame_time.elapsed() >= m_effect_transition_timeout)
+    {
+        // Effect timed out, move new image to old image but don't load new image yet...
+        m_tex1First = !m_tex1First;
+        m_texCur      = (m_texCur) ? 0 : 1;
+        m_effect_current_frame  = 0;
+        m_effect_frame_time.restart(); 
+
+        m_effect_kenBurns_image_ready = false;
+
+        // Find next image to be loaded
+        int oldpos = m_pos;
+
+        while (true)
+        {
+            m_pos = m_slideshow_sequence->next();
+            m_effect_kenBurns_item = m_itemList.at(m_pos);
+            if (m_effect_kenBurns_item)
+            {
+                // Skip movies
+                if (QFile::exists(m_effect_kenBurns_item->GetPath()) && !GalleryUtil::IsMovie(m_effect_kenBurns_item->GetPath()))
+                {
+                    break;
+                }
+            }
+            if (m_pos == oldpos)
+            {
+                // No valid items!!!
+                close();
+            }
+        }
+        m_effect_kenBurns_imageLoadThread->Initialize(m_pos);
+        m_effect_kenBurns_imageLoadThread->start();
+    }
+
+    float t[2], elapsed[2], s[2], effect_pct;
+    elapsed[m_texCur] = m_effect_kenBurns_image_time[m_texCur].elapsed();
+    elapsed[m_texCur ? 0 : 1] = m_effect_kenBurns_image_time[m_texCur ? 0 : 1].elapsed();
+    //progress linearly
+    t[m_texCur] = elapsed[m_texCur] / m_effect_kenBurns_image_timeout;
+    t[m_texCur ? 0 : 1] = elapsed[m_texCur ? 0 : 1] / m_effect_kenBurns_image_timeout;
+    //progress faster initially then slowing down- this is needed to ensure images zoom faster than they pan and
+    //therefore stay completely on the screen
+    s[m_texCur] = sqrt(elapsed[m_texCur]) / sqrt(m_effect_kenBurns_image_timeout);
+    s[m_texCur ? 0 : 1] = sqrt(elapsed[m_texCur ? 0 : 1]) / sqrt(m_effect_kenBurns_image_timeout); 
+    
+    effect_pct = m_effect_frame_time.elapsed() *  m_effect_transition_timeout_inv;
+
+    // Load new image if its ready
+    if (effect_pct > single_image_pct && m_effect_kenBurns_image_ready) 
+    {
+        if (!m_effect_kenBurns_new_image_started)
+        { 			
+            if (m_effect_kenBurns_item) //Do not create textures for first two images, since they are preloaded
+            {
+                m_texItem[!m_tex1First].SetItem(m_effect_kenBurns_item, m_effect_kenBurns_orig_image_size);
+                m_texItem[!m_tex1First].ScaleTo(m_screenSize, m_scaleMax);
+                m_texItem[!m_tex1First].Init(m_effect_kenBurns_image);
+                UpdateLCD(m_effect_kenBurns_item);
+                
+                //choose the location and projection (zoom in or out) randomly
+                FindRandXY(m_effect_kenBurns_location_x[m_texCur], m_effect_kenBurns_location_y[m_texCur]);
+                m_effect_kenBurns_projection[m_texCur] = 1 + (int)((2.0f * rand() / (RAND_MAX + 1.0f))); 
+
+            } 
+            else  //No item, must be 1 of the first two preloaded items
+            {
+                //start at random location and zoom out to face in center
+                FindRandXY(m_effect_kenBurns_location_x[m_texCur], m_effect_kenBurns_location_y[m_texCur]);
+                m_effect_kenBurns_projection[m_texCur] = 1; 
+            }
+
+            m_effect_kenBurns_image_time[m_texCur].restart();
+            m_effect_kenBurns_new_image_started = true;
+        }
+        if (m_effect_kenBurns_projection[m_texCur] == 1) // Zoom in image
+        {
+            // Start in center and pan out
+            x_loc = m_effect_kenBurns_location_x[m_texCur] * t[m_texCur]; 
+            y_loc = m_effect_kenBurns_location_y[m_texCur] * t[m_texCur]; 		
+            scale_max = FindMaxScale(x_loc,y_loc);
+            scale_factor = 	1.0f + (scale_max * s[m_texCur]); 
+        }
+        else // Zoom out image
+        {
+            // Start at random location and pan to center
+            x_loc = m_effect_kenBurns_location_x[m_texCur] -  m_effect_kenBurns_location_x[m_texCur] * t[m_texCur]; 
+            y_loc = m_effect_kenBurns_location_y[m_texCur] -  m_effect_kenBurns_location_y[m_texCur] * t[m_texCur];
+            scale_max = FindMaxScale(x_loc,y_loc);
+            scale_factor = 	1.0f + scale_max -  (scale_max * t[m_texCur]);
+        } 
+
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        glTranslatef(x_loc, y_loc, 0.0f);
+
+        m_texItem[m_texCur].MakeQuad((effect_pct-single_image_pct)*4, scale_factor); 
+    }
+   
+    //Load old picture
+    if (m_effect_kenBurns_projection[m_texCur ? 0 : 1] == 1)// Zoom in image
+    {
+        x_loc = m_effect_kenBurns_location_x[m_texCur ? 0 : 1] * t[m_texCur ? 0 : 1]; 
+        y_loc = m_effect_kenBurns_location_y[m_texCur ? 0 : 1] * t[m_texCur ? 0 : 1];
+        scale_max = FindMaxScale(x_loc,y_loc);
+        scale_factor = 	1.0f + (scale_max * s[m_texCur ? 0 : 1]);
+    }
+    else // Zoom out image
+    {
+        x_loc = m_effect_kenBurns_location_x[m_texCur ? 0 : 1] -  
+            m_effect_kenBurns_location_x[m_texCur ? 0 : 1] * t[m_texCur ? 0 : 1]; 
+        y_loc = m_effect_kenBurns_location_y[m_texCur ? 0 : 1] -  
+            m_effect_kenBurns_location_y[m_texCur ? 0 : 1] * t[m_texCur ? 0 : 1];
+        scale_max = FindMaxScale(x_loc,y_loc);
+        scale_factor = 	1.0f + scale_max -  (scale_max * t[m_texCur ? 0 : 1]);
+    } 
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glTranslatef(x_loc, y_loc, 0.0f);
+
+    if (effect_pct<= single_image_pct) 
+    {
+        m_effect_kenBurns_new_image_started=false;
+        m_texItem[m_texCur ? 0 : 1].MakeQuad(1.0f, scale_factor); //
+    }
+    else // Fade out image
+    {
+        m_texItem[m_texCur ? 0 : 1].MakeQuad(1.0f - ((effect_pct-single_image_pct)*4), scale_factor); 
+
+    }
+    
+    m_effect_current_frame++;
+}
+
 void GLSingleView::SlideTimeout(void)
 {
     bool wasMovie = false, isMovie = false;
@@ -1317,4 +1487,59 @@ void GLSingleView::createTexInfo(void)
     /* enable linear filtering  */
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+}
+
+void GLSingleView::LoadImage(QImage image, QSize origSize)
+{
+    m_effect_kenBurns_image = image;
+    m_effect_kenBurns_orig_image_size = origSize;
+}
+
+float GLSingleView::FindMaxScale(float x_loc, float y_loc)
+{
+    // Zoom big enough to keep the entire image on screen when we pan
+    if (abs(x_loc) > abs(y_loc))
+        return abs(x_loc) * 2;
+    else
+        return abs(y_loc) * 2;
+}
+
+void GLSingleView::FindRandXY(float &x_loc, float &y_loc)
+{
+    x_loc = (0.5 * rand() / (RAND_MAX + 1.0f)) + 0.25;  //Random number between .25 and .75
+    if ((int)(2.0 * rand() / (RAND_MAX + 1.0f)) == 0)
+        x_loc = -1 * x_loc;
+    y_loc = (0.5 * rand() / (RAND_MAX + 1.0f)) + 0.25;  //Random number between .25 and .75
+    if ((int)(2.0 * rand() / (RAND_MAX + 1.0f)) == 0)
+        y_loc = -1 * y_loc;   
+}
+
+KenBurnsImageLoader::KenBurnsImageLoader(GLSingleView *singleView, ThumbList &itemList, QSize texSize, QSize screenSize)
+{
+    m_singleView = singleView;
+    m_itemList = itemList;
+    m_texSize = texSize;
+    m_screenSize = screenSize;
+}
+
+void KenBurnsImageLoader::Initialize(int pos)
+{
+    m_pos = pos;
+}
+
+void KenBurnsImageLoader::run() 
+{
+    ThumbItem *item = m_itemList.at(m_pos);
+    if (!item)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "No item at "<<m_pos);
+        return;
+    }
+    QImage image(item->GetPath());
+    if (image.isNull())
+        return;
+    
+    m_singleView->LoadImage(QGLWidget::convertToGLFormat(image.scaled(m_texSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation)), image.size());   
+    m_singleView->Ready();
+
 }
