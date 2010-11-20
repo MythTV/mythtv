@@ -46,15 +46,42 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
     if (passthru_device == "auto")
     {
         passthru_device = main_device;
-        if (passthru_device.contains(":"))
+
+        /* to set the non-audio bit, use AES0=6 */
+        int len = passthru_device.length();
+        int args = passthru_device.indexOf(":");
+
+        if (args < 0)
         {
-            passthru_device += ",";
+            /* no existing parameters: add it behind device name */
+            passthru_device += ":AES0=6";
         }
         else
         {
-            passthru_device += ":";
+            do
+                ++args;
+            while (args < passthru_device.length() &&
+                   passthru_device[args].isSpace());
+            if (args == passthru_device.length())
+            {
+                /* ":" but no parameters */
+                passthru_device += "AES0=6";
+            }
+            else if (passthru_device[args] != '{')
+            {
+                /* a simple list of parameters: add it at the end of the list */
+                passthru_device += ",AES0=6";
+            }
+            else
+            {
+                /* parameters in config syntax: add it inside the { } block */
+                do
+                    --len;
+                while (len > 0 && passthru_device[len].isSpace());
+                if (passthru_device[len] == '}')
+                    passthru_device = passthru_device.insert(len, " AES0=6");
+            }
         }
-        passthru_device += "AES0=0x6,AES1=0x82,AES2=0x0,AES3=0x2";
     }
     else if (passthru_device.toLower() == "default")
         passthru_device = main_device;
@@ -334,12 +361,17 @@ bool AudioOutputALSA::OpenDevice()
         real_device = main_device;
     }
 
-    VERBOSE(VB_GENERAL, QString("Opening ALSA audio device '%1'.")
-                        .arg(real_device));
-
     QByteArray dev_ba = real_device.toAscii();
-    if ((err = snd_pcm_open(&pcm_handle, dev_ba.constData(),
-                            SND_PCM_STREAM_PLAYBACK, OPEN_FLAGS&FILTER_FLAGS)) < 0)
+    err = snd_pcm_open(&pcm_handle, dev_ba.constData(),
+                       SND_PCM_STREAM_PLAYBACK, 0);
+    if ((passthru || enc) && err < 0)
+    {
+        // passthru open failed, retry default device
+        dev_ba = main_device.toAscii();
+        err = snd_pcm_open(&pcm_handle, dev_ba.constData(),
+                           SND_PCM_STREAM_PLAYBACK, 0);
+    }
+    if (err < 0)
     {
         AERROR(QString("snd_pcm_open(%1)").arg(real_device));
         if (pcm_handle)
