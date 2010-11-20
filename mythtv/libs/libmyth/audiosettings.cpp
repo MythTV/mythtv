@@ -103,14 +103,14 @@ AudioSettings::AudioSettings(
 
 void AudioSettings::FixPassThrough(void)
 {
-    if (passthru_device.isEmpty() || passthru_device.toLower() == "default")
+    if (passthru_device.isEmpty())
         passthru_device = "auto";
 }
 
 void AudioSettings::TrimDeviceType(void)
 {
     main_device.remove(0, 5);
-    if (passthru_device != "auto")
+    if (passthru_device != "auto" && passthru_device.toLower() != "default")
         passthru_device.remove(0, 5);
 }
 

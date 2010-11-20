@@ -46,15 +46,19 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
     if (passthru_device == "auto")
     {
         passthru_device = main_device;
-        if (!passthru_device.contains(":"))
-            passthru_device += ":AES0=0x6,AES1=0x82,AES2=0x0,AES3=0x2";
+        if (passthru_device.contains(":"))
+        {
+            passthru_device += ",";
+        }
         else
         {
-            passthru_device = passthru_device.insert(
-                passthru_device.indexOf(":") + 1,
-                "AES0=0x6,AES1=0x82,AES2=0x0,AES3=0x2,");
+            passthru_device += ":";
         }
+        passthru_device += "AES0=0x6,AES1=0x82,AES2=0x0,AES3=0x2";
     }
+    else if (passthru_device.toLower() == "default")
+        passthru_device = main_device;
+
     InitSettings(settings);
     if (settings.init)
         Reconfigure(settings);

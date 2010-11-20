@@ -319,6 +319,9 @@ AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
         cur_channels = max_channels;
 
     aosettings->SetBestSupportedChannels(cur_channels);
+        // do not passthrough stereo AC3 or stereo DTS
+        // this is required should we need to upmix and at this stage of the
+        // audio lifecycle, we don't know if we will upconvert or not
     if (cur_channels <= 2)
         bDTS = bAC3 = false;
     aosettings->m_AC3 = bAC3;

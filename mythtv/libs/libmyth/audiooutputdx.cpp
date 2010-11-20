@@ -108,7 +108,7 @@ AudioOutputDX::AudioOutputDX(const AudioSettings &settings) :
 {
     timeBeginPeriod(1);
     InitSettings(settings);
-    if (passthru_device == "auto")
+    if (passthru_device == "auto" || passthru_device.toLower() == "default")
         passthru_device = main_device;
     if (settings.init)
         Reconfigure(settings);
