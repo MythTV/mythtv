@@ -299,9 +299,12 @@ AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
 
     int cur_channels = gCoreContext->GetNumSetting("MaxChannels", 2);
     int max_channels = aosettings->BestSupportedChannels();
-    bool bAC3  = aosettings->m_AC3 &&
+    bool bForceDigital = gCoreContext->GetNumSetting("AdvancedAudioSettings", false) &&
+        gCoreContext->GetNumSetting("PassThruDeviceOverride", false);
+
+    bool bAC3  = (aosettings->m_AC3 || bForceDigital) &&
         gCoreContext->GetNumSetting("AC3PassThru", false);
-    bool bDTS  = aosettings->m_DTS &&
+    bool bDTS  = (aosettings->m_DTS || bForceDigital) && 
         gCoreContext->GetNumSetting("DTSPassThru", false);
     bool bLPCM = aosettings->m_LPCM &&
         (aosettings->m_passthrough == -1 ||

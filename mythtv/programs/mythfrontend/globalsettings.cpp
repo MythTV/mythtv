@@ -118,7 +118,8 @@ AudioConfigSettings::AudioConfigSettings() :
     VerticalConfigurationGroup(false, true, false, false),
     m_OutputDevice(NULL),   m_MaxAudioChannels(NULL),
     m_AudioUpmix(NULL),     m_AudioUpmixType(NULL),
-    m_AC3PassThrough(NULL), m_DTSPassThrough(NULL),  m_MPCM(NULL)
+    m_AC3PassThrough(NULL), m_DTSPassThrough(NULL),  m_MPCM(NULL),
+    m_AdvancedAudioSettings(NULL),                   m_PassThroughOverride(NULL)
 {
     setLabel(QObject::tr("Audio System"));
     setUseLabel(false);
@@ -173,22 +174,22 @@ AudioConfigSettings::AudioConfigSettings() :
     maingroup->addChild((m_AudioUpmix = AudioUpmix()));
     maingroup->addChild((m_AudioUpmixType = AudioUpmixType()));
 
-    Setting *advancedsettings = AdvancedAudioSettings();
-    addChild(advancedsettings);
+    m_AdvancedAudioSettings = AdvancedAudioSettings();
+    addChild(m_AdvancedAudioSettings);
 
     ConfigurationGroup *group2 =
         new VerticalConfigurationGroup(false);
 
-    TriggeredItem *sub2 = new TriggeredItem(advancedsettings, group2);
+    TriggeredItem *sub2 = new TriggeredItem(m_AdvancedAudioSettings, group2);
     addChild(sub2);
 
     ConfigurationGroup *settings3 =
         new HorizontalConfigurationGroup(false, false);
 
-    Setting *passthroughoverride = PassThroughOverride();
+    m_PassThroughOverride = PassThroughOverride();
     TriggeredItem *sub3 =
-        new TriggeredItem(passthroughoverride, PassThroughOutputDevice());
-    settings3->addChild(passthroughoverride);
+        new TriggeredItem(m_PassThroughOverride, PassThroughOutputDevice());
+    settings3->addChild(m_PassThroughOverride);
     settings3->addChild(sub3);
 
     ConfigurationGroup *settings4 =
@@ -217,6 +218,10 @@ AudioConfigSettings::AudioConfigSettings() :
     connect(m_DTSPassThrough, SIGNAL(valueChanged(const QString&)),
             this, SLOT(UpdateCapabilities(const QString&)));
     connect(m_MPCM, SIGNAL(valueChanged(const QString&)),
+            this, SLOT(UpdateCapabilities(const QString&)));
+    connect(m_PassThroughOverride, SIGNAL(valueChanged(const QString&)),
+            this, SLOT(UpdateCapabilities(const QString&)));
+    connect(m_AdvancedAudioSettings, SIGNAL(valueChanged(const QString&)),
             this, SLOT(UpdateCapabilities(const QString&)));
 }
 
@@ -271,18 +276,22 @@ void AudioConfigSettings::UpdateVisibility(const QString &device)
 
 void AudioConfigSettings::UpdateCapabilities(const QString &device)
 {
-   int max_speakers = 8;
+    int max_speakers = 8;
     bool invalid = false;
     int passthrough = 0;
     AudioOutputSettings settings;
 
         // Test if everything is set yet
     if (!m_OutputDevice   || !m_MaxAudioChannels ||
-        !m_AC3PassThrough || !m_DTSPassThrough   || !m_MPCM)
+        !m_AC3PassThrough || !m_DTSPassThrough   || !m_MPCM ||
+        !m_AdvancedAudioSettings                 || !m_PassThroughOverride)
         return;
 
     if (!slotlock.tryLock()) // Doing a rescan of channels
         return;
+
+    bool bForceDigital = (m_AdvancedAudioSettings->boolValue() &&
+                          m_PassThroughOverride->boolValue());
 
     QString out = m_OutputDevice->getValue();
     if (!audiodevs.contains(out))
@@ -296,8 +305,10 @@ void AudioConfigSettings::UpdateCapabilities(const QString &device)
 
         max_speakers = settings.BestSupportedChannels();
 
-        bool bAC3  = settings.canAC3() && m_AC3PassThrough->boolValue();
-        bool bDTS  = settings.canDTS() && m_DTSPassThrough->boolValue();
+        bool bAC3  = (settings.canAC3() || bForceDigital) &&
+            m_AC3PassThrough->boolValue();
+        bool bDTS  = (settings.canDTS() || bForceDigital) &&
+            m_DTSPassThrough->boolValue();
         bool bLPCM = settings.canPassthrough() == -1 ||
             (settings.canLPCM() && m_MPCM->boolValue());
 
@@ -308,15 +319,22 @@ void AudioConfigSettings::UpdateCapabilities(const QString &device)
         passthrough = settings.canPassthrough();
     }
 
-    m_triggerAC3->setValue(invalid || settings.canAC3());
-    m_triggerDTS->setValue(invalid || settings.canDTS());
+    m_triggerAC3->setValue(invalid || settings.canAC3() || bForceDigital);
+    m_triggerDTS->setValue(invalid || settings.canDTS() || bForceDigital);
 
     m_MPCM->setEnabled(invalid || (settings.canLPCM() &&
                                    settings.canPassthrough() >= 0));
     switch (passthrough)
     {
         case -1:
-            m_MPCM->setLabel(QObject::tr("No digital passthrough"));
+            if (bForceDigital)
+            {
+                m_MPCM->setLabel(QString());
+            }
+            else
+            {
+                m_MPCM->setLabel(QObject::tr("No digital passthrough"));
+            }
             break;
         case 1:
             m_MPCM->setLabel(QObject::tr("LPCM"));
@@ -348,7 +366,8 @@ void AudioConfigSettings::UpdateCapabilities(const QString &device)
     m_MaxAudioChannels->resetMaxCount(3);
     for (int i = 1; i <= max_speakers; i++)
     {
-        if (invalid || settings.IsSupportedChannels(i))
+        if (invalid || settings.IsSupportedChannels(i) ||
+            (bForceDigital && i == 6))
         {
             QString txt;
 

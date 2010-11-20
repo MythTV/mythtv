@@ -57,6 +57,8 @@ class AudioConfigSettings : public VerticalConfigurationGroup
     HostCheckBox         *m_AC3PassThrough;
     HostCheckBox         *m_DTSPassThrough;
     HostCheckBox         *m_MPCM;
+    HostCheckBox         *m_AdvancedAudioSettings;
+    HostCheckBox         *m_PassThroughOverride;
     ADCMap                audiodevs;
     AudioOutput::ADCVect  devices;
     QMutex                slotlock;
