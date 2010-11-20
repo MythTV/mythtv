@@ -210,6 +210,12 @@ void MythUIImage::Clear(void)
         m_Images.remove(it.key());
     }
     m_Delays.clear();
+    if (m_animatedImage)
+    {
+        m_LowNum = 0;
+        m_HighNum = 0;
+        m_animatedImage = false;
+    }
 }
 
 /**
@@ -221,7 +227,12 @@ void MythUIImage::Reset(void)
     if (m_Filename != m_OrigFilename)
     {
         m_Filename = m_OrigFilename;
-        m_animatedImage = false;
+        if (m_animatedImage)
+        {
+            m_LowNum = 0;
+            m_HighNum = 0;
+            m_animatedImage = false;
+        }
         d->m_UpdateLock.unlock();
         Load();
     }
@@ -626,7 +637,8 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
     int j = 0;
     for (int i = m_LowNum; i <= m_HighNum && !m_animatedImage; i++)
     {
-        if (!m_animatedImage && m_HighNum >= 1)
+        if (!m_animatedImage && m_HighNum != m_LowNum && 
+            bFilename.contains("%1"))
             filename = bFilename.arg(i);
 
         imagelabel = GenImageLabel(filename, w, h);
