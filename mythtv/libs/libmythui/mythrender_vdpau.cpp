@@ -119,22 +119,23 @@ class VDPAUCSCMatrix
         float uvsin = m_procamp.saturation * sin(m_procamp.hue);
         float Kr, Kg, Kb;
         int rgbmin = 16;
-        int rgbr = 235-16;
+        int chroma_range = 224;
+        int luma_range   = 219;
 
         Kr = color_coeffs[csp][0];
         Kg = color_coeffs[csp][1];
         Kb = color_coeffs[csp][2];
 
         float uv_coeffs[3][2] = {
-            { 0.000,                      (rgbr/112.0)*(1-Kr)       },
-            {-(rgbr/112.0)*(1-Kb)*Kb/Kg, -(rgbr/112.0)*(1-Kr)*Kr/Kg },
-            { (rgbr/112.0)*(1-Kb),        0.000                     }
+            { 0.000,                              (chroma_range/112.0)*(1-Kr)       },
+            {-(chroma_range/112.0)*(1-Kb)*Kb/Kg, -(chroma_range/112.0)*(1-Kr)*Kr/Kg },
+            { (chroma_range/112.0)*(1-Kb),        0.000                     }
         };
 
         for (int i = 0; i < 3; i++)
         {
             m_csc[i][3]  = m_procamp.brightness;
-            m_csc[i][0]  = rgbr * m_procamp.contrast / 219;
+            m_csc[i][0]  = luma_range * m_procamp.contrast / 219;
             m_csc[i][3] += (-16 / 255.0) * m_csc[i][0];
             m_csc[i][1]  = uv_coeffs[i][0] * uvcos + uv_coeffs[i][1] * uvsin;
             m_csc[i][3] += (-128 / 255.0) * m_csc[i][1];
