@@ -65,7 +65,8 @@ SingleView::SingleView(
       m_info_pixmap(NULL),
 
       // Caption variables
-      m_caption_show(false),
+      m_caption_show(0),
+      m_caption_remove(false),
       m_caption_pixmap(NULL),
       m_caption_restore_pixmap(NULL),
       m_caption_timer(new QTimer(this)),
@@ -111,8 +112,6 @@ SingleView::SingleView(
     // ---------------------------------------------------------------
 
     m_caption_show = gCoreContext->GetNumSetting("GalleryOverlayCaption", 0);
-    m_caption_show = min(m_slideshow_frame_delay, m_caption_show);
-
     if (m_caption_show)
     {
         m_caption_pixmap  = CreateBackground(QSize(screenwidth, 100));
@@ -249,11 +248,19 @@ void SingleView::paintEvent(QPaintEvent *)
                              *m_pixmap, QRect(m_source_loc, pix.size()));
             }
 
-            if (m_caption_show && !m_caption_timer->isActive())
+            if (m_caption_remove)
+            {
+                m_caption_remove = false;
+                QPainter p(this);
+                p.drawPixmap(QPoint(0, screenheight - 100),
+                             *m_caption_restore_pixmap, QRect(0,0,-1,-1));
+                p.end();
+            }
+            else if (m_caption_show && !m_caption_timer->isActive())
             {
                 ThumbItem *item = m_itemList.at(m_pos);
                 if (!item->HasCaption())
-                    item->SetCaption(GalleryUtil::GetCaption(item->GetPath()));
+                    item->InitCaption(true);
 
                 if (item->HasCaption())
                 {
@@ -1395,6 +1402,12 @@ void SingleView::EffectNoise(void)
 void SingleView::SlideTimeout(void)
 {
     bool wasMovie = false, isMovie = false;
+
+    if (m_caption_timer->isActive())
+    {
+        m_caption_timer->stop();
+    }
+
     if (m_effect_method.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "No transition method");
@@ -1462,8 +1475,6 @@ void SingleView::SlideTimeout(void)
 void SingleView::CaptionTimeout(void)
 {
     m_caption_timer->stop();
-    QPainter p(this);
-    p.drawPixmap(QPoint(0, screenheight - 100),
-                 *m_caption_restore_pixmap, QRect(0,0,-1,-1));
-    p.end();
+    m_caption_remove = true;
+    update();
 }

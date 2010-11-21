@@ -117,6 +117,7 @@ class SingleView : public MythDialog, public ImageView
 
     // Common slideshow variables
     int           m_caption_show;
+    bool          m_caption_remove;
     QPixmap      *m_caption_pixmap;
     QPixmap      *m_caption_restore_pixmap;
     QTimer       *m_caption_timer;
