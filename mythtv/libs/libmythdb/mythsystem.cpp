@@ -87,7 +87,7 @@ void MythSystemIOHandler::run(void)
                 retval = select(m_maxfd+1, NULL, &fds, NULL, &tv);
 
             if( retval == -1 )
-                VERBOSE(VB_GENERAL, QString("select(%1, %2) failed because of %3")
+                VERBOSE(VB_GENERAL, QString("select(%1, %2) failed: %3")
                             .arg(m_maxfd+1).arg(m_read).arg(strerror(errno)));
 
             else if( retval > 0 )
@@ -193,6 +193,7 @@ void MythSystemIOHandler::BuildFDs()
 
 MythSystemManager::MythSystemManager() : QThread()
 {
+    m_jumpAbort = false;
 }
 
 void MythSystemManager::run(void)
@@ -282,7 +283,9 @@ void MythSystemManager::run(void)
         // loop through running processes for any that require action
         MSMap_t::iterator   i, next;
         time_t              now = time(NULL);
+
         m_mapLock.lock();
+        m_jumpLock.lock();
         for( i = m_pMap.begin(); i != m_pMap.end(); i = next )
         {
             next = i + 1;
@@ -312,7 +315,13 @@ void MythSystemManager::run(void)
                     ms->Term();
                 }
             }
+
+            if ( m_jumpAbort && ms->m_abortonjump )
+                ms->Term();
         }
+
+        m_jumpAbort = false;
+        m_jumpLock.unlock();
 
         m_mapLock.unlock();
 
@@ -339,6 +348,13 @@ void MythSystemManager::append(MythSystem *ms)
         readThread->insert(ms->m_stdpipe[1], &(ms->m_stdbuff[1]));
     if( ms->m_usestderr )
         readThread->insert(ms->m_stdpipe[2], &(ms->m_stdbuff[2]));
+}
+
+void MythSystemManager::jumpAbort(void)
+{
+    m_jumpLock.lock();
+    m_jumpAbort = true;
+    m_jumpLock.unlock();
 }
 
 // spawn separate thread for signals to prevent manager
@@ -466,6 +482,7 @@ MythSystem::MythSystem(const MythSystem &other) :
     m_command(other.m_command),
     m_logcmd(other.m_logcmd),
     m_args(other.m_args),
+    m_directory(other.m_directory),
 
     m_runinbackground(other.m_runinbackground),
     m_isinui(other.m_isinui),
@@ -475,7 +492,9 @@ MythSystem::MythSystem(const MythSystem &other) :
     m_usestdin(other.m_usestdin),
     m_usestdout(other.m_usestdout),
     m_usestderr(other.m_usestderr),
-    m_useshell(other.m_useshell)
+    m_useshell(other.m_useshell),
+    m_setdirectory(other.m_setdirectory),
+    m_abortonjump(other.m_abortonjump)
 {
 }
 
@@ -669,6 +688,7 @@ void MythSystem::ProcessFlags(uint flags)
     m_usestderr       = false;
     m_useshell        = false;
     m_setdirectory    = false;
+    m_abortonjump     = false;
 
     if( m_status != GENERIC_EXIT_START )
         return;
@@ -701,6 +721,8 @@ void MythSystem::ProcessFlags(uint flags)
         m_useshell = true;
     if( flags & kMSNoRunShell ) // override for use with myth_system
         m_useshell = false;
+    if( flags & kMSAbortOnJump )
+        m_abortonjump = true;
 }
 
 QByteArray MythSystem::Read(int size)     { return m_stdbuff[1].read(size); }
@@ -1003,6 +1025,17 @@ uint myth_system(const QString &command, uint flags, uint timeout)
     ms.Run(timeout);
     uint result = ms.Wait(0);
     return result;
+}
+
+void myth_system_jump_abort(void)
+{
+    if( manager == NULL )
+    {
+        manager = new MythSystemManager;
+        manager->start();
+    }
+    VERBOSE(VB_GENERAL, "Triggering Abort on Jumppoint");
+    manager->jumpAbort();
 }
 
 extern "C" {
