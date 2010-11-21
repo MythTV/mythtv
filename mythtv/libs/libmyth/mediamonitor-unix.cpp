@@ -36,6 +36,7 @@ using namespace std;
 #include "mythhdd.h"
 #include "mythverbose.h"
 #include "mythsystem.h"
+#include "exitcodes.h"
 
 #if HAVE_LIBUDEV
 extern "C" {
@@ -244,40 +245,36 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
         udev_unref(udev);
     }
   #else   // HAVE_LIBUDEV
-    // Use udevinfo to determine the name
+    // Use udevadm info to determine the name
     QStringList  args;
-    args << "-q"  << "name"
+    args << "info" << "-q"  << "name"
          << "-rp" << sysfs;
 
     uint flags = kMSStdOut | kMSBuffered;
     if( VERBOSE_LEVEL_CHECK(VB_MEDIA|VB_EXTRA) )
         flags |= kMSStdErr;
 
-    MythSystem  *udevinfo = new MythSystem("udevinfo", args, flags);
-    udevinfo->Run(2);
-    if( udevinfo->Wait() != GENERIC_EXIT_OK )
+    MythSystem  udevinfo = new MythSystem("udevinfo", args, flags);
+    udevinfo.Run(4);
+    if( udevinfo.Wait() != GENERIC_EXIT_OK )
     {
-        delete udevinfo;
         return ret;
     }
 
     if (VERBOSE_LEVEL_CHECK(VB_MEDIA|VB_EXTRA))
     {
-        QTextStream estream(udevinfo->ReadAllErr());
+        QTextStream estream(udevinfo.ReadAllErr());
         while( !estream.atEnd() )
             VERBOSE(VB_MEDIA+VB_EXTRA,
-                    msg + " - udevinfo error...\n" + estream.readLine());
+                    msg + " - udevadm info error...\n" + estream.readLine());
     }
 
-    QTextStream ostream(udevinfo->ReadAll());
-    ret = ostream.readline();
+    QTextStream ostream(udevinfo.ReadAll());
+    ret = ostream.readLine();
     if( ret.startsWith("device not found in database") )
     {
-        delete udevinfo;
         return ret;
     }
-
-    delete udevinfo;
   #endif // HAVE_LIBUDEV
 #endif // linux
 
