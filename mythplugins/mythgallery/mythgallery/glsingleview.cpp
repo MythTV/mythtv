@@ -186,9 +186,6 @@ void GLSingleView::initializeGL(void)
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &param);
     m_texMaxDim = param;
 
-    m_texSize = QSize(GetNearestGLTextureSize(m_screenSize.width()),
-                      GetNearestGLTextureSize(m_screenSize.height()));
-
     Load();
 }
 
@@ -245,6 +242,8 @@ void GLSingleView::paintGL(void)
                     p.drawText(rect, Qt::AlignCenter, tr("Press SELECT to play again"));
                     p.end();
 
+                    m_texSize = QSize(GetNearestGLTextureSize(image.size().width()),
+                                      GetNearestGLTextureSize(image.size().height()));
                     int a = m_tex1First ? 0 : 1;
                     m_texItem[a].SetItem(item, image.size());
                     m_texItem[a].ScaleTo(m_screenSize, m_scaleMax);
@@ -467,7 +466,9 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
             m_source_x = 0;
             m_source_y = 0;
             SetZoom(1.0f);
-            Load();
+            
+            int a = m_tex1First ? 0 : 1;
+            m_texItem[a].ScaleTo(m_screenSize, m_scaleMax);
         }
         else
         {
@@ -639,6 +640,8 @@ void GLSingleView::Load(void)
     if (image.isNull())
         return;
 
+    m_texSize = QSize(GetNearestGLTextureSize(image.size().width()),
+                      GetNearestGLTextureSize(image.size().height()));
     int a = m_tex1First ? 0 : 1;
     m_texItem[a].SetItem(item, image.size());
     m_texItem[a].ScaleTo(m_screenSize, m_scaleMax);
