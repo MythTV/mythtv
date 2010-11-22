@@ -12,6 +12,7 @@
 #include <fcntl.h>
 #include <time.h>
 #include <signal.h>  // for kill()
+#include <string.h>
 #include <sys/select.h>
 #include <sys/wait.h>
 
@@ -494,7 +495,8 @@ MythSystem::MythSystem(const MythSystem &other) :
     m_usestderr(other.m_usestderr),
     m_useshell(other.m_useshell),
     m_setdirectory(other.m_setdirectory),
-    m_abortonjump(other.m_abortonjump)
+    m_abortonjump(other.m_abortonjump),
+    m_setpgid(other.m_setpgid)
 {
 }
 
@@ -605,76 +607,25 @@ void MythSystem::Term(bool force)
 {
     if( (m_status != GENERIC_EXIT_RUNNING) || (m_pid <= 0) )
         return;
-    VERBOSE(VB_GENERAL, QString("Child PID %1 aborted, terminating")
-                    .arg(m_pid));
-    // send TERM signal to process
-    kill(m_pid, SIGTERM);
+
+    Signal(SIGTERM);
     if( force )
     {
         // send KILL if it does not exit within one second
         if( Wait(1) == GENERIC_EXIT_RUNNING )
-            Kill();
+            Signal(SIGKILL);
     }
 }
 
-void MythSystem::Kill() const
+void MythSystem::Signal( int sig )
 {
     if( (m_status != GENERIC_EXIT_RUNNING) || (m_pid <= 0) )
         return;
-    VERBOSE(VB_GENERAL, QString("Child PID %1 aborted, killing")
-                    .arg(m_pid));
-    kill(m_pid, SIGKILL);
+    VERBOSE(VB_GENERAL, QString("Child PID %1 killed with %2")
+                    .arg(m_pid).arg(strsignal(sig)));
+    kill((m_setpgid ? -m_pid : m_pid), sig);
 }
 
-void MythSystem::Stop() const
-{
-    if( (m_status != GENERIC_EXIT_RUNNING) || (m_pid <= 0) )
-        return;
-    VERBOSE(VB_GENERAL, QString("Child PID %1 suspended")
-                    .arg(m_pid));
-    kill(m_pid, SIGSTOP);
-}
-
-void MythSystem::Cont() const
-{
-    if( (m_status != GENERIC_EXIT_RUNNING) || (m_pid <= 0) )
-        return;
-    VERBOSE(VB_GENERAL, QString("Child PID %1 resumed")
-                    .arg(m_pid));
-    kill(m_pid, SIGCONT);
-}
-
-void MythSystem::HangUp() const
-{
-    if( (m_status != GENERIC_EXIT_RUNNING) || (m_pid <= 0) )
-        return;
-    VERBOSE(VB_GENERAL, QString("Child PID %1 hung-up")
-                    .arg(m_pid));
-    kill(m_pid, SIGHUP);
-}
-
-void MythSystem::USR1() const
-{
-    if( (m_status != GENERIC_EXIT_RUNNING) || (m_pid <= 0) )
-        return;
-    VERBOSE(VB_GENERAL, QString("Child PID %1 USR1")
-                    .arg(m_pid));
-    kill(m_pid, SIGUSR1);
-}
-
-void MythSystem::USR2() const
-{
-    if( (m_status != GENERIC_EXIT_RUNNING) || (m_pid <= 0) )
-        return;
-    VERBOSE(VB_GENERAL, QString("Child PID %1 USR2")
-                    .arg(m_pid));
-    kill(m_pid, SIGUSR2);
-}
-
-bool MythSystem::isBackground() const
-{
-    return m_runinbackground;
-}
 
 void MythSystem::ProcessFlags(uint flags)
 {
@@ -689,6 +640,7 @@ void MythSystem::ProcessFlags(uint flags)
     m_useshell        = false;
     m_setdirectory    = false;
     m_abortonjump     = false;
+    m_setpgid         = false;
 
     if( m_status != GENERIC_EXIT_START )
         return;
@@ -723,6 +675,8 @@ void MythSystem::ProcessFlags(uint flags)
         m_useshell = false;
     if( flags & kMSAbortOnJump )
         m_abortonjump = true;
+    if( flags & kMSSetPGID )
+        m_setpgid = true;
 }
 
 QByteArray MythSystem::Read(int size)     { return m_stdbuff[1].read(size); }
@@ -990,6 +944,16 @@ void MythSystem::Fork()
         {
             cerr << locerr
                  << "chdir() failed: "
+                 << strerror(errno) << endl;
+        }
+
+        /* Set the process group id to be the same as the pid of this child
+         * process.  This ensures that any subprocesses launched by this
+         * process can be killed along with the process itself. */ 
+        if (m_setpgid && setpgid(0,0) < 0 ) 
+        {
+            cerr << locerr
+                 << "setpgid() failed: "
                  << strerror(errno) << endl;
         }
 

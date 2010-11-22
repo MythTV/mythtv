@@ -2,6 +2,7 @@
 #define MYTHSYSTEM_H_
 
 #include "mythexp.h"
+#include <signal.h>
 
 typedef enum MythSystemMask {
     kMSNone               = 0x00000000,
@@ -18,6 +19,7 @@ typedef enum MythSystemMask {
     kMSNoRunShell         = 0x00000400, //< do NOT run process through shell
     kMSAnonLog            = 0x00000800, //< anonymize the logs
     kMSAbortOnJump        = 0x00001000, //< abort this process on a jumppoint
+    kMSSetPGID            = 0x00002000, //< set the process group id
 } MythSystemFlag;
 
 #ifdef __cplusplus
@@ -110,13 +112,14 @@ class MPUBLIC MythSystem : public QObject
         QByteArray& ReadAllErr();
 
         void Term(bool force=false);
-        void Kill() const;
-        void Stop() const;
-        void Cont() const;
-        void HangUp() const;
-        void USR1() const;
-        void USR2() const;
-        bool isBackground() const;
+        void Kill()   { Signal(SIGKILL); };
+        void Stop()   { Signal(SIGSTOP); };
+        void Cont()   { Signal(SIGCONT); };
+        void HangUp() { Signal(SIGHUP);  };
+        void USR1()   { Signal(SIGUSR1); };
+        void USR2()   { Signal(SIGUSR2); };
+
+        bool isBackground() { return m_runinbackground; };
 
         friend class MythSystemManager;
         friend class MythSystemSignalManager;
@@ -131,6 +134,7 @@ class MPUBLIC MythSystem : public QObject
         void HandlePreRun();
         void HandlePostRun();
         void Fork();
+        void Signal(int sig);
 
         uint   m_status;
         pid_t  m_pid;
@@ -159,6 +163,7 @@ class MPUBLIC MythSystem : public QObject
         bool  m_useshell;
         bool  m_setdirectory;
         bool  m_abortonjump;
+        bool  m_setpgid;
 };
 
 MPUBLIC unsigned int myth_system(const QString &command, 
