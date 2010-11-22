@@ -156,6 +156,31 @@ void Decoder::commitMetadata(Metadata *mdata)
     }
 }
 
+/**
+ *  \brief Write the changable metadata, e.g. ratings, playcounts; to the
+ *         \p filename if the tag format supports it.
+ *
+ *  Creates a \p MetaIO object using \p Decoder::doCreateTagger and
+ *  asks the MetaIO object to write changes to a specific subset of metadata
+ *  to \p filename.
+ *
+ *  \params mdata the metadata to write to the disk
+ */
+void Decoder::commitVolatileMetadata(const Metadata *mdata)
+{
+    if (!mdata || !GetMythDB()->GetNumSetting("AllowTagWriting", 0))
+        return;
+
+    MetaIO* p_tagger = doCreateTagger();
+    if (p_tagger)
+    {
+        p_tagger->writeVolatileMetadata(mdata);
+        delete p_tagger;
+    }
+
+    mdata->UpdateModTime();
+}
+
 // static methods
 
 int Decoder::ignore_id3 = 0;

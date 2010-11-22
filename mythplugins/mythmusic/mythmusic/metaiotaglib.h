@@ -26,7 +26,7 @@ class MetaIOTagLib : public MetaIO
 
     virtual bool write(Metadata* mdata) = 0;
     virtual Metadata* read(QString filename) = 0;
-    
+
   protected:
     int getTrackLength(TagLib::FileRef *file);
     int getTrackLength(QString filename);

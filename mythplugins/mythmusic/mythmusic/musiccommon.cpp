@@ -188,9 +188,9 @@ bool MusicCommon::CreateCommon(void)
 
     if (m_currentPlaylist)
     {
-        connect(m_currentPlaylist, SIGNAL(itemClicked(MythUIButtonListItem*)), 
+        connect(m_currentPlaylist, SIGNAL(itemClicked(MythUIButtonListItem*)),
                 this, SLOT(playlistItemClicked(MythUIButtonListItem*)));
-        connect(m_currentPlaylist, SIGNAL(itemSelected(MythUIButtonListItem*)), 
+        connect(m_currentPlaylist, SIGNAL(itemSelected(MythUIButtonListItem*)),
                 this, SLOT(playlistItemSelected(MythUIButtonListItem*)));
 
         updateUIPlaylist();
@@ -407,9 +407,9 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
             }
         }
         else if (action == "THMBUP")
-            increaseRating();
+            changeRating(true);
         else if (action == "THMBDOWN")
-            decreaseRating();
+            changeRating(false);
         else if (action == "NEXTTRACK")
         {
             if (m_nextButton)
@@ -817,48 +817,33 @@ void MusicCommon::seek(int pos)
     }
 }
 
-void MusicCommon::increaseRating(void)
+void MusicCommon::changeRating(bool increase)
 {
+    // Rationale here is that if you can't get visual feedback on ratings
+    // adjustments, you probably should not be changing them
+    if (!m_ratingState)
+        return;
+
     Metadata *curMeta = gPlayer->getCurrentMetadata();
 
     if (!curMeta)
         return;
 
-    if (m_ratingState)
-    {
+    if (increase)
         curMeta->incRating();
-        curMeta->persist();
-        m_ratingState->DisplayState(QString("%1").arg(curMeta->Rating()));
-
-        // if all_music is still in scope we need to keep that in sync
-        if (gMusicData->all_music)
-        {
-            Metadata *mdata = gMusicData->all_music->getMetadata(curMeta->ID());
-            if (mdata)
-                mdata->incRating();
-        }
-    }
-}
-
-void MusicCommon::decreaseRating(void)
-{
-    Metadata *curMeta = gPlayer->getCurrentMetadata();
-
-    if (!curMeta)
-        return;
-
-    if (m_ratingState)
-    {
+    else
         curMeta->decRating();
-        curMeta->persist();
-        m_ratingState->DisplayState(QString("%1").arg(curMeta->Rating()));
 
-        // if all_music is still in scope we need to keep that in sync
-        if (gMusicData->all_music)
+    curMeta->persist(); // incRating() already triggers a persist on track changes - redundant?
+    m_ratingState->DisplayState(QString("%1").arg(curMeta->Rating()));
+
+    // if all_music is still in scope we need to keep that in sync
+    if (gMusicData->all_music)
+    {
+        Metadata *mdata = gMusicData->all_music->getMetadata(curMeta->ID());
+        if (mdata)
         {
-            Metadata *mdata = gMusicData->all_music->getMetadata(curMeta->ID());
-            if (mdata)
-                mdata->decRating();
+            mdata->setRating(curMeta->Rating());
         }
     }
 }
@@ -1248,7 +1233,7 @@ void MusicCommon::updateTrackInfo(Metadata *mdata)
     MetadataMap metadataMap;
     mdata->toMap(metadataMap);
     SetTextFromMap(metadataMap);
-    
+
     m_maxTime = mdata->Length() / 1000;
     if (m_coverartImage)
     {
@@ -1375,7 +1360,7 @@ void MusicCommon::updateUIPlaylist(void)
         Metadata *mdata = gMusicData->all_music->getMetadata(trackid);
         if (mdata)
         {
-            MythUIButtonListItem *item = 
+            MythUIButtonListItem *item =
                 new MythUIButtonListItem(m_currentPlaylist, "", qVariantFromValue(mdata));
 
             MetadataMap metadataMap;

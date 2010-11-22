@@ -88,8 +88,11 @@ void Metadata::SetStartdir(const QString &dir)
     Metadata::m_startdir = dir;
 }
 
-void Metadata::persist()
+void Metadata::persist() const
 {
+    if (m_id < 1)
+        return;
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE music_songs set rating = :RATING , "
                   "numplays = :PLAYCOUNT , lastplay = :LASTPLAY "
@@ -101,6 +104,25 @@ void Metadata::persist()
 
     if (!query.exec())
         MythDB::DBError("music persist", query);
+}
+
+
+void Metadata::UpdateModTime() const
+{
+    if (m_id < 1)
+        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("UPDATE music_songs SET date_modified = :DATE_MOD "
+                  "WHERE song_id= :ID ;");
+
+    query.bindValue(":DATE_MOD", QDateTime::currentDateTime());
+    query.bindValue(":ID", m_id);
+
+    if (!query.exec())
+        MythDB::DBError("Metadata::UpdateModTime",
+                        query);
 }
 
 int Metadata::compare(const Metadata *other) const

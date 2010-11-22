@@ -181,7 +181,8 @@ class Metadata
     void getField(const QString& field, QString *data);
     void toMap(MetadataMap &metadataMap);
 
-    void persist();
+    void persist(void) const;
+    void UpdateModTime(void) const;
     bool hasChanged() {return m_changed;}
     int compare(const Metadata *other) const;
     static void setArtistAndTrackFormats();

@@ -93,6 +93,7 @@ class Decoder : public QThread, public MythObservable
     virtual Metadata *getMetadata(void);
     virtual MetaIO *doCreateTagger (void);
     virtual void commitMetadata(Metadata *mdata);
+    virtual void commitVolatileMetadata(const Metadata *mdata);
 
     // static methods
     static QStringList all();

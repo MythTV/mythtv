@@ -4,6 +4,9 @@
 
 // Libmyth
 #include <mythverbose.h>
+#include <set>
+
+const String email = "music@mythtv.org";  // TODO username/ip/hostname?
 
 MetaIOID3::MetaIOID3(void)
     : MetaIOTagLib()
@@ -24,7 +27,7 @@ TagLib::MPEG::File *MetaIOID3::OpenFile(const QString &filename)
 {
     QByteArray fname = filename.toLocal8Bit();
     TagLib::MPEG::File *mpegfile = new TagLib::MPEG::File(fname.constData());
-    
+
     if (!mpegfile->isOpen())
     {
         delete mpegfile;
@@ -43,7 +46,7 @@ bool MetaIOID3::write(Metadata* mdata)
 
     if (!mpegfile)
         return false;
-    
+
     TagLib::ID3v2::Tag *tag = mpegfile->ID3v2Tag();
 
     if (!tag)
@@ -51,29 +54,27 @@ bool MetaIOID3::write(Metadata* mdata)
         delete mpegfile;
         return false;
     }
-    
+
     WriteGenericMetadata(tag, mdata);
-    
-    if (mdata->Rating() > 0 || mdata->PlayCount() > 0)
-    {
-        // Needs to be implemented for taglib by subclassing ID3v2::Frames
-        // with one to handle POPM frames
-    }
-    
+
+    // MythTV rating and playcount, stored in POPM frame
+    writeRating(tag, mdata->Rating());
+    writePlayCount(tag, mdata->PlayCount());
+
     // MusicBrainz ID
     UserTextIdentificationFrame *musicbrainz = NULL;
     musicbrainz = find(tag, "MusicBrainz Album Artist Id");
 
     if (mdata->Compilation())
     {
-        
+
         if (!musicbrainz)
         {
             musicbrainz = new UserTextIdentificationFrame(TagLib::String::UTF8);
             tag->addFrame(musicbrainz);
             musicbrainz->setDescription("MusicBrainz Album Artist Id");
         }
-        
+
         musicbrainz->setText(MYTH_MUSICBRAINZ_ALBUMARTIST_UUID);
     }
     else if (musicbrainz)
@@ -86,7 +87,7 @@ bool MetaIOID3::write(Metadata* mdata)
         TagLib::ID3v2::FrameList tpelist = tag->frameListMap()["TPE4"];
         if (!tpelist.isEmpty())
             tpe4frame = (TextIdentificationFrame *)tpelist.front();
-        
+
         if (!tpe4frame)
         {
             tpe4frame = new TextIdentificationFrame(TagLib::ByteVector("TPE4"),
@@ -95,7 +96,7 @@ bool MetaIOID3::write(Metadata* mdata)
         }
         tpe4frame->setText(QStringToTString(mdata->CompilationArtist()));
 
-        
+
         TextIdentificationFrame *tpe2frame = NULL;
         tpelist = tag->frameListMap()["TPE2"];
         if (!tpelist.isEmpty())
@@ -109,11 +110,11 @@ bool MetaIOID3::write(Metadata* mdata)
         }
         tpe2frame->setText(QStringToTString(mdata->CompilationArtist()));
     }
-    
+
     bool result = mpegfile->save();
 
     delete mpegfile;
-    
+
     return result;
 }
 
@@ -123,7 +124,7 @@ bool MetaIOID3::write(Metadata* mdata)
 Metadata *MetaIOID3::read(QString filename)
 {
     TagLib::MPEG::File *mpegfile = OpenFile(filename);
-    
+
     if (!mpegfile)
         return NULL;
 
@@ -156,9 +157,9 @@ Metadata *MetaIOID3::read(QString filename)
             tag->setGenre(tag_v1->genre());
         }
     }
-    
+
     Metadata *metadata = new Metadata(filename);
-    
+
     ReadGenericMetadata(tag, metadata);
 
     bool compilation = false;
@@ -173,12 +174,31 @@ Metadata *MetaIOID3::read(QString filename)
         tpelist = tag->frameListMap()["TPE2"];
     if (!tpelist.isEmpty())
         tpeframe = (TextIdentificationFrame *)tpelist.front();
-    
+
     if (tpeframe && !tpeframe->toString().isEmpty())
     {
         QString compilation_artist = TStringToQString(tpeframe->toString())
                                                                     .trimmed();
         metadata->setCompilationArtist(compilation_artist);
+    }
+
+    // MythTV rating and playcount, stored in POPM frame
+    PopularimeterFrame *popm = findPOPM(tag, email);
+
+    if (!popm)
+    {
+        if (!tag->frameListMap()["POPM"].isEmpty())
+            popm = dynamic_cast<PopularimeterFrame *>
+                                        (tag->frameListMap()["POPM"].front());
+    }
+
+    if (popm)
+    {
+        int rating = popm->rating();
+        rating = static_cast<int>(((static_cast<float>(rating)/255.0)
+                                                                * 10.0) + 0.5);
+        metadata->setRating(rating);
+        metadata->setPlaycount(popm->counter());
     }
 
     // Look for MusicBrainz Album+Artist ID in TXXX Frame
@@ -195,7 +215,7 @@ Metadata *MetaIOID3::read(QString filename)
     }
 
     // Length
-    if (!mpegfile->ID3v2Tag()->frameListMap()["TLEN"].isEmpty())
+    if (!tag->frameListMap()["TLEN"].isEmpty())
     {
         int length = tag->frameListMap()["TLEN"].front()->toString().toInt();
         metadata->setLength(length);
@@ -221,7 +241,7 @@ Metadata *MetaIOID3::read(QString filename)
     }
     else
         delete mpegfile;
-    
+
     return metadata;
 }
 
@@ -259,7 +279,7 @@ QImage MetaIOID3::getAlbumArt(QString filename, ImageType type)
         default:
             return picture;
     }
-    
+
     QByteArray fname = filename.toLocal8Bit();
     TagLib::MPEG::File *mpegfile = new TagLib::MPEG::File(fname.constData());
 
@@ -386,5 +406,93 @@ UserTextIdentificationFrame* MetaIOID3::find(TagLib::ID3v2::Tag *tag,
     if (f && f->description() == description)
       return f;
   }
-  return 0;
+  return NULL;
+}
+
+/*!
+ * \brief Find the POPM tag associated with MythTV
+ *        This is a copy of the same function in the
+ *        TagLib::ID3v2::UserTextIdentificationFrame Class with a static
+ *        instead of dynamic cast.
+ *
+ * \param tag Pointer to TagLib::ID3v2::Tag object
+ * \param email Email address associated with this POPM frame
+ * \returns Pointer to frame
+ */
+PopularimeterFrame* MetaIOID3::findPOPM(TagLib::ID3v2::Tag *tag,
+                                        const String &email)
+{
+  TagLib::ID3v2::FrameList l = tag->frameList("POPM");
+  for(TagLib::ID3v2::FrameList::Iterator it = l.begin(); it != l.end(); ++it)
+  {
+    PopularimeterFrame *f = static_cast<PopularimeterFrame *>(*it);
+    if (f && f->email() == email)
+      return f;
+  }
+  return NULL;
+}
+
+bool MetaIOID3::writePlayCount(TagLib::ID3v2::Tag *tag, int playcount)
+{
+    if (!tag)
+        return false;
+
+    PopularimeterFrame *popm = findPOPM(tag, email);
+
+    if (!popm)
+    {
+        popm = new PopularimeterFrame();
+        tag->addFrame(popm);
+        popm->setEmail(email);
+    }
+
+    popm->setCounter(playcount);
+
+    return true;
+}
+
+bool MetaIOID3::writeVolatileMetadata(const Metadata* mdata)
+{
+    QString filename = mdata->Filename();
+    int rating = mdata->Rating();
+    int playcount = mdata->PlayCount();
+    TagLib::MPEG::File *mpegfile = OpenFile(filename);
+
+    if (!mpegfile)
+        return false;
+
+    TagLib::ID3v2::Tag *tag = mpegfile->ID3v2Tag();
+
+    if (!tag)
+    {
+        delete mpegfile;
+        return false;
+    }
+
+    bool result = (writeRating(tag, rating) && writePlayCount(tag, playcount));
+
+    mpegfile->save();
+    delete mpegfile;
+
+    return result;
+}
+
+bool MetaIOID3::writeRating(TagLib::ID3v2::Tag *tag, int rating)
+{
+    if (!tag)
+        return false;
+
+    PopularimeterFrame *popm = findPOPM(tag, email);
+
+    if (!popm)
+    {
+        popm = new PopularimeterFrame();
+        tag->addFrame(popm);
+        popm->setEmail(email);
+    }
+    int popmrating = static_cast<int>(((static_cast<float>(rating) / 10.0)
+                                                               * 255.0) + 0.5);
+    popm->setRating(popmrating);
+
+    return true;
 }

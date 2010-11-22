@@ -10,6 +10,7 @@
 #include <id3v2tag.h>
 #include <textidentificationframe.h>
 #include <attachedpictureframe.h>
+#include <popularimeterframe.h>
 #include <mpegproperties.h>
 #include <mpegfile.h>
 #include <tfile.h>
@@ -19,6 +20,7 @@
 
 using TagLib::ID3v2::UserTextIdentificationFrame;
 using TagLib::ID3v2::TextIdentificationFrame;
+using TagLib::ID3v2::PopularimeterFrame;
 using TagLib::ID3v2::AttachedPictureFrame;
 using TagLib::MPEG::Properties;
 
@@ -38,8 +40,13 @@ class MetaIOID3 : public MetaIOTagLib
   public:
     MetaIOID3(void);
     virtual ~MetaIOID3(void);
-    
+
     bool write(Metadata* mdata);
+    bool writeVolatileMetadata(const Metadata* mdata);
+
+    bool writePlayCount(TagLib::ID3v2::Tag *tag, int playcount);
+    bool writeRating(TagLib::ID3v2::Tag *tag, int rating);
+
     Metadata* read(QString filename);
     static QImage getAlbumArt(QString filename, ImageType type);
 
@@ -48,6 +55,7 @@ class MetaIOID3 : public MetaIOTagLib
 
     AlbumArtList readAlbumArt(TagLib::ID3v2::Tag *tag);
     UserTextIdentificationFrame* find(TagLib::ID3v2::Tag *tag, const String &description);
+    PopularimeterFrame* findPOPM(TagLib::ID3v2::Tag *tag, const String &email);
 };
 
 #endif

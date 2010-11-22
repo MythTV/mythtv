@@ -16,12 +16,25 @@ class MetaIO
     virtual ~MetaIO(void);
 
     /*!
-    * \brief Writes metadata back to a file
+    * \brief Writes all metadata back to a file
     *
     * \param mdata A pointer to a Metadata object
     * \returns Boolean to indicate success/failure.
     */
     virtual bool write(Metadata* mdata) = 0;
+
+    /*!
+    * \brief Writes rating and playcount back to a file
+    *
+    * \param rating Integer between 0 and 10 representing the rating given to
+    *               this file by the user
+    * \returns Boolean to indicate success/failure.
+    */
+    virtual bool writeVolatileMetadata(const Metadata* mdata)
+    {
+        (void)mdata;
+        return false;
+    }
 
     /*!
     * \brief Reads Metadata from a file.
@@ -31,13 +44,13 @@ class MetaIO
     */
     virtual Metadata* read(QString filename) = 0;
 
-    void readFromFilename(QString filename, QString &artist, QString &album, 
+    void readFromFilename(QString filename, QString &artist, QString &album,
                           QString &title, QString &genre, int &tracknum);
 
     Metadata* readFromFilename(QString filename, bool blnLength = false);
 
     void readFromFilename(Metadata *metadata);
-    
+
   protected:
 
   private:

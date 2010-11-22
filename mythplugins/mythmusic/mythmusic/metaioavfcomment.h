@@ -21,10 +21,10 @@ class MetaIOAVFComment : public MetaIO
 public:
     MetaIOAVFComment(void);
     virtual ~MetaIOAVFComment(void);
-    
+
     bool write(Metadata* mdata);
     Metadata* read(QString filename);
-    
+
 private:
     int getTrackLength(QString filename);
     int getTrackLength(AVFormatContext* p_context);

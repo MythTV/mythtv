@@ -51,8 +51,7 @@ class MPUBLIC MusicCommon : public MythScreenType
     void seekback(void);
     void seek(int);
     void stopAll(void);
-    void increaseRating(void);
-    void decreaseRating(void);
+    void changeRating(bool increase);
 
     void showViewMenu(void);
     void showPlaylistMenu(void);

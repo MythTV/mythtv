@@ -175,7 +175,7 @@ void MusicPlayer::addVisual(MainVisual *visual)
             m_output->addListener(visual);
             m_output->addVisual(visual);
         }
- 
+
         m_visualisers.insert(visual);
     }
 }
@@ -270,7 +270,7 @@ void MusicPlayer::play(void)
     if (!m_output)
         openOutputDevice();
 
-    if (!getDecoderHandler()) 
+    if (!getDecoderHandler())
         setupDecoderHandler();
 
     getDecoderHandler()->start(meta);
@@ -278,14 +278,17 @@ void MusicPlayer::play(void)
 
 void MusicPlayer::stopDecoder(void)
 {
-    if (getDecoderHandler())
-        getDecoderHandler()->stop();
-
     if (m_currentMetadata)
     {
         if (m_currentMetadata->hasChanged())
+        {
             m_currentMetadata->persist();
+            getDecoder()->commitVolatileMetadata(m_currentMetadata);
+        }
     }
+
+    if (getDecoderHandler())
+        getDecoderHandler()->stop();
 
     m_currentMetadata = NULL;
 }
@@ -941,7 +944,7 @@ MuteState MusicPlayer::getMuteState(void) const
 
 void MusicPlayer::toMap(QHash<QString, QString> &map)
 {
-    map["volumemute"] = QString("%1%").arg(getVolume()) + 
+    map["volumemute"] = QString("%1%").arg(getVolume()) +
                         (isMuted() ? " (" + tr("Muted") + ")" : "");
     map["volume"] = QString("%1").arg(getVolume());
     map["volumepercent"] = QString("%1%").arg(getVolume());
@@ -972,7 +975,7 @@ void MusicPlayer::playlistChanged(int trackID, bool deleted)
     }
 }
 
-void MusicPlayer::setupDecoderHandler() 
+void MusicPlayer::setupDecoderHandler()
 {
     m_decoderHandler = new DecoderHandler();
     m_decoderHandler->addListener(this);
@@ -1020,7 +1023,7 @@ void MusicPlayer::decoderHandlerReady(void)
         //m_visual->setOutput(m_output);
     }
 
-    if (getDecoder()->initialize()) 
+    if (getDecoder()->initialize())
     {
         if (m_output)
              m_output->Reset();

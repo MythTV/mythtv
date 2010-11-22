@@ -122,14 +122,27 @@ static HostLineEdit *NonID3FileNameFormat()
     return gc;
 };
 
+static HostCheckBox *AllowTagWriting()
+{
+    HostCheckBox *gc = new HostCheckBox("AllowTagWriting");
+    gc->setLabel(QObject::tr("Allow metadata to be written to tags"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If set, MythMusic will be allowed to update the "
+                                "metadata in the file (e.g. ID3) to match the "
+                                "database. This means allowing MythTV to write "
+                                "to the file and permissions must be set "
+                                "accordingly. Features such as ID3 playcounts "
+                                "and ratings depend on this being enabled."));
+    return gc;
+};
 
 static HostCheckBox *IgnoreID3Tags()
 {
     HostCheckBox *gc = new HostCheckBox("Ignore_ID3");
-    gc->setLabel(QObject::tr("Ignore ID3 Tags"));
+    gc->setLabel(QObject::tr("Ignore Metadata Tags"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("If set, MythMusic will skip checking ID3 tags "
-                    "in files and just try to determine Genre, Artist, "
+    gc->setHelpText(QObject::tr("If set, MythMusic will skip checking the metadata tags "
+                    "in files (ID3 etc) and just try to determine Genre, Artist, "
                     "Album, and Track number and title from the "
                     "filename."));
     return gc;
@@ -569,6 +582,7 @@ MusicGeneralSettings::MusicGeneralSettings(void)
     general2->addChild(ArtistTreeGroups());
     general2->addChild(NonID3FileNameFormat());
     general2->addChild(IgnoreID3Tags());
+    general2->addChild(AllowTagWriting());
     general2->addChild(TagEncoding());
     addChild(general2);
 

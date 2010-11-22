@@ -660,6 +660,7 @@ void EditMetadataDialog::saveToDatabase()
 
     m_metadata->dumpToDatabase();
     *m_sourceMetadata = m_metadata;
+
     accept();
 }
 
