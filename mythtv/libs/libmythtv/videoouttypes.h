@@ -87,18 +87,20 @@ typedef enum PictureAttribute
     kPictureAttribute_Contrast,
     kPictureAttribute_Colour,
     kPictureAttribute_Hue,
+    kPictureAttribute_StudioLevels,
     kPictureAttribute_Volume,
     kPictureAttribute_MAX
 } PictureAttribute;
 
 typedef enum PictureAttributeSupported
 {
-    kPictureAttributeSupported_None       = 0x00,
-    kPictureAttributeSupported_Brightness = 0x01,
-    kPictureAttributeSupported_Contrast   = 0x02,
-    kPictureAttributeSupported_Colour     = 0x04,
-    kPictureAttributeSupported_Hue        = 0x08,
-    kPictureAttributeSupported_Volume     = 0x10,
+    kPictureAttributeSupported_None         = 0x00,
+    kPictureAttributeSupported_Brightness   = 0x01,
+    kPictureAttributeSupported_Contrast     = 0x02,
+    kPictureAttributeSupported_Colour       = 0x04,
+    kPictureAttributeSupported_Hue          = 0x08,
+    kPictureAttributeSupported_StudioLevels = 0x10,
+    kPictureAttributeSupported_Volume       = 0x20,
 } PictureAttributeSupported;
 
 typedef enum VideoErrorState
@@ -271,19 +273,21 @@ inline QString toString(PictureAttribute pictureattribute)
     QString ret = QObject::tr("None");
     switch (pictureattribute)
     {
-      case kPictureAttribute_None: break;
+      case kPictureAttribute_None:            break;
       case kPictureAttribute_Brightness:
-          ret = QObject::tr("Brightness"); break;
+          ret = QObject::tr("Brightness");    break;
       case kPictureAttribute_Contrast:
-          ret = QObject::tr("Contrast");   break;
+          ret = QObject::tr("Contrast");      break;
       case kPictureAttribute_Colour:
-          ret = QObject::tr("Color");      break;
+          ret = QObject::tr("Color");         break;
       case kPictureAttribute_Hue:
-          ret = QObject::tr("Hue");        break;
+          ret = QObject::tr("Hue");           break;
+      case kPictureAttribute_StudioLevels:
+          ret = QObject::tr("Studio Levels"); break;
       case kPictureAttribute_Volume:
-          ret = QObject::tr("Volume");     break;
+          ret = QObject::tr("Volume");        break;
       case kPictureAttribute_MAX:
-          ret = "MAX";                     break;
+          ret = "MAX";                        break;
     }
 
     ret.detach();
@@ -297,15 +301,17 @@ inline QString toDBString(PictureAttribute pictureattribute)
     {
       case kPictureAttribute_None: break;
       case kPictureAttribute_Brightness:
-          ret = "brightness"; break;
+          ret = "brightness";      break;
       case kPictureAttribute_Contrast:
-          ret = "contrast";   break;
+          ret = "contrast";        break;
       case kPictureAttribute_Colour:
-          ret = "colour";     break;
+          ret = "colour";          break;
       case kPictureAttribute_Hue:
-          ret = "hue";        break;
+          ret = "hue";             break;
+      case kPictureAttribute_StudioLevels:
+          ret = "studiolevels";    break;
       case kPictureAttribute_Volume:
-      case kPictureAttribute_MAX: break;
+      case kPictureAttribute_MAX:  break;
     }
 
     if (ret.isEmpty())
@@ -352,6 +358,8 @@ inline QString toString(PictureAttributeSupported supported)
         ret += "Colour, ";
     if (kPictureAttributeSupported_Hue & supported)
         ret += "Hue, ";
+    if (kPictureAttributeSupported_StudioLevels & supported)
+        ret += "Studio Levels, ";
     if (kPictureAttributeSupported_Volume & supported)
         ret += "Volume, ";
 
@@ -373,6 +381,8 @@ inline PictureAttributeSupported toMask(PictureAttribute pictureattribute)
             ret = kPictureAttributeSupported_Colour; break;
         case kPictureAttribute_Hue:
             ret = kPictureAttributeSupported_Hue; break;
+        case kPictureAttribute_StudioLevels:
+            ret = kPictureAttributeSupported_StudioLevels; break;
         case kPictureAttribute_Volume:
             ret = kPictureAttributeSupported_Volume; break;
         case kPictureAttribute_MAX: break;
