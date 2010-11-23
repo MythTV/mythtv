@@ -653,7 +653,7 @@ def getStorageGroups():
                     logger.error(u"The local Storage group (%s) directory contained\ncharacters that caused a UnicodeDecodeError. This storage group has been rejected." % (record.groupname))
                     continue    # Skip any line that has non-utf8 characters in it
                 except (UnicodeEncodeError, TypeError):
-                    pass
+                    dirname = record.dirname  # assume already unicode and pass unchanged
 
                 # Add a slash if missing to any storage group dirname
                 if dirname[-1:] == u'/':
