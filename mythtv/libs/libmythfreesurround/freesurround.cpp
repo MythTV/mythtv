@@ -289,7 +289,7 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
     }
 
     VERBOSE(VB_AUDIO+VB_TIMESTAMP+VB_EXTRA,
-            QString("FreeSurround::putFrames %1 #ch %2 used %4 generated %5")
+            QString("FreeSurround::putFrames %1 #ch %2 used %3 generated %4")
             .arg(numFrames).arg(numChannels).arg(i).arg(out_count));
 
     return i;
