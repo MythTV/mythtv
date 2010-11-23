@@ -898,7 +898,8 @@ void MythMainWindow::Init(void)
     GetMythUI()->ThemeWidget(this);
     Show();
 
-    setMouseTracking(true); // Required for mouse cursor auto-hide
+    if (!GetMythDB()->GetNumSetting("HideMouseCursor", 0))
+        setMouseTracking(true); // Required for mouse cursor auto-hide
     // Set cursor call must come after Show() to work on some systems.
     ShowMouseCursor(false);
 
@@ -977,7 +978,8 @@ void MythMainWindow::Init(void)
     d->paintwin->setFixedSize(size());
     d->paintwin->raise();
     d->paintwin->show();
-    d->paintwin->setMouseTracking(true); // Required for mouse cursor auto-hide
+    if (!GetMythDB()->GetNumSetting("HideMouseCursor", 0))
+        d->paintwin->setMouseTracking(true); // Required for mouse cursor auto-hide
 
     GetMythUI()->UpdateImageCache();
     if (d->m_themeBase)
@@ -2266,6 +2268,8 @@ void MythMainWindow::LockInputDevices( bool locked )
 
 void MythMainWindow::ShowMouseCursor(bool show)
 {
+    if (show && GetMythDB()->GetNumSetting("HideMouseCursor", 0))
+        return;
 #ifdef QWS
     QWSServer::setCursorVisible(show);
 #endif

@@ -2693,6 +2693,18 @@ class VideoModeSettings : public TriggeredConfigurationGroup
 };
 #endif
 
+static HostCheckBox *HideMouseCursor()
+{
+    HostCheckBox *gc = new HostCheckBox("HideMouseCursor");
+    gc->setLabel(QObject::tr("Hide mouse cursor in MythTV"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Toggles mouse cursor visibility for touchscreens. "
+                    "By default MythTV will auto-hide the cursor if the mouse doesn't "
+                    "move for a period, this setting disables the cursor entirely."));
+    return gc;
+};
+
+
 static HostCheckBox *RunInWindow()
 {
     HostCheckBox *gc = new HostCheckBox("RunFrontendInWindow");
@@ -4327,6 +4339,7 @@ AppearanceSettings::AppearanceSettings()
         new VerticalConfigurationGroup(false, false, false, false);
 
     column2->addChild(GuiSizeForTV());
+    column2->addChild(HideMouseCursor());
     column2->addChild(RunInWindow());
     column2->addChild(UseFixedWindowSize());
 
