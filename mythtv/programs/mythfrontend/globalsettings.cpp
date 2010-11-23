@@ -282,7 +282,7 @@ void AudioConfigSettings::UpdateCapabilities(const QString &device)
     AudioOutputSettings settings;
 
         // Test if everything is set yet
-    if (!m_OutputDevice   || !m_MaxAudioChannels || !m_AdvancedAudioSettings || 
+    if (!m_OutputDevice   || !m_MaxAudioChannels || !m_AdvancedAudioSettings ||
         !m_AC3PassThrough || !m_DTSPassThrough   || !m_MPCM ||
         !m_PassThroughOverride)
         return;
@@ -2693,19 +2693,6 @@ class VideoModeSettings : public TriggeredConfigurationGroup
 };
 #endif
 
-static HostCheckBox *HideMouseCursor()
-{
-    HostCheckBox *gc = new HostCheckBox("HideMouseCursor");
-    gc->setLabel(QObject::tr("Hide mouse cursor in MythTV"));
-    gc->setValue(true);
-    gc->setHelpText(QObject::tr("Toggles mouse cursor visibility. "
-                    "Most of the MythTV GUI does not respond "
-                    "to mouse clicks. Use this option to avoid "
-                    "\"losing\" your mouse cursor."));
-    return gc;
-};
-
-
 static HostCheckBox *RunInWindow()
 {
     HostCheckBox *gc = new HostCheckBox("RunFrontendInWindow");
@@ -4340,7 +4327,6 @@ AppearanceSettings::AppearanceSettings()
         new VerticalConfigurationGroup(false, false, false, false);
 
     column2->addChild(GuiSizeForTV());
-    column2->addChild(HideMouseCursor());
     column2->addChild(RunInWindow());
     column2->addChild(UseFixedWindowSize());
 

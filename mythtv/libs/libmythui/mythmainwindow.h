@@ -45,7 +45,7 @@ class MPUBLIC MythMainWindow : public QWidget
     MythScreenStack *GetStack(const QString &stackname);
 
     bool TranslateKeyPress(const QString &context, QKeyEvent *e,
-                           QStringList &actions, bool allowJumps = true) 
+                           QStringList &actions, bool allowJumps = true)
                            __attribute__ ((warn_unused_result));
 
     void ResetKeys(void);
@@ -71,8 +71,8 @@ class MPUBLIC MythMainWindow : public QWidget
 
     bool HandleMedia(const QString& handler, const QString& mrl,
                      const QString& plot="", const QString& title="",
-                     const QString& subtitle="", const QString& director="", 
-                     int season=0, int episode=0, int lenMins=120, 
+                     const QString& subtitle="", const QString& director="",
+                     int season=0, int episode=0, int lenMins=120,
                      const QString& year="1895");
 
     void JumpTo(const QString &destination, bool pop = true);
@@ -119,6 +119,7 @@ class MPUBLIC MythMainWindow : public QWidget
 
   public slots:
     void mouseTimeout();
+    void HideMouseTimeout();
 
   protected slots:
     void animate();
@@ -148,6 +149,8 @@ class MPUBLIC MythMainWindow : public QWidget
     void SetDrawEnabled(bool enable);
 
     void LockInputDevices(bool locked);
+
+    void ShowMouseCursor(bool show);
 
     MythMainWindowPrivate *d;
 };
