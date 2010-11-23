@@ -707,6 +707,9 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "TOGGLEPICCONTROLS",
             QT_TRANSLATE_NOOP("MythControls", "Playback picture adjustments"),
              "F");
+    REG_KEY("TV Playback", "TOGGLESTUDIOLEVELS",
+            QT_TRANSLATE_NOOP("MythControls", "Playback picture adjustments"),
+             "");
     REG_KEY("TV Playback", "TOGGLECHANCONTROLS",
             QT_TRANSLATE_NOOP("MythControls", "Recording picture adjustments "
             "for this channel"), "Ctrl+G");
@@ -4453,6 +4456,8 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
         ChangeAudioSync(ctx, 0);   // just display
     else if (has_action("TOGGLEPICCONTROLS", actions))
         DoTogglePictureAttribute(ctx, kAdjustingPicture_Playback);
+    else if (has_action("TOGGLESTUDIOLEVELS", actions))
+        DoToggleStudioLevels(ctx);
     else if (has_action("TOGGLESTRETCH", actions))
         ToggleTimeStretch(ctx);
     else if (has_action("TOGGLEUPMIX", actions))
@@ -8927,6 +8932,13 @@ static PictureAttribute next(
     return next((PictureAttributeSupported)sup, attr);
 }
 
+void TV::DoToggleStudioLevels(const PlayerContext *ctx)
+{
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    ctx->player->ToggleStudioLevels();
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+}
+
 void TV::DoTogglePictureAttribute(const PlayerContext *ctx,
                                   PictureAdjustType type)
 {
@@ -9792,6 +9804,10 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
             (action.right(1).toInt() - 1);
         DoTogglePictureAttribute(actx, kAdjustingPicture_Playback);
     }
+    else if (action.left(18) == "TOGGLESTUDIOLEVELS")
+    {
+        DoToggleStudioLevels(actx);
+    }
     else if (action.left(12) == "TOGGLEASPECT")
     {
         ToggleAspectOverride(actx,
@@ -10088,6 +10104,7 @@ void TV::FillOSDMenuVideo(const PlayerContext *ctx, OSD *osd,
     QStringList tracks;
     uint curtrack                     = ~0;
     uint sup                          = kPictureAttributeSupported_None;
+    bool studio_levels                = false;
     bool autodetect                   = false;
     AdjustFillMode adjustfill         = kAdjustFill_Off;
     AspectOverrideMode aspectoverride = kAspect_Off;
@@ -10104,10 +10121,12 @@ void TV::FillOSDMenuVideo(const PlayerContext *ctx, OSD *osd,
         scan_type_locked = ctx->player->IsScanTypeLocked();
         if (!tracks.empty())
             curtrack = (uint) ctx->player->GetTrack(kTrackTypeVideo);
-        if (ctx->player->getVideoOutput())
+        VideoOutput *vo = ctx->player->getVideoOutput();
+        if (vo)
         {
-            sup = ctx->player->getVideoOutput()->GetSupportedPictureAttributes();
-            autodetect = !ctx->player->getVideoOutput()->hasHWAcceleration();
+            sup = vo->GetSupportedPictureAttributes();
+            studio_levels = vo->GetPictureAttribute(kPictureAttribute_StudioLevels) > 0;
+            autodetect = !vo->hasHWAcceleration();
         }
     }
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
@@ -10186,8 +10205,17 @@ void TV::FillOSDMenuVideo(const PlayerContext *ctx, OSD *osd,
         {
             if (toMask((PictureAttribute)i) & sup)
             {
-                osd->DialogAddButton(toString((PictureAttribute) i),
-                               QString("TOGGLEPICCONTROLS%1").arg(i));
+                if ((PictureAttribute)i == kPictureAttribute_StudioLevels)
+                {
+                    QString msg = studio_levels ? tr("Disable studio levels") :
+                                                  tr("Enable studio levels");
+                    osd->DialogAddButton(msg, "TOGGLESTUDIOLEVELS");
+                }
+                else
+                {
+                    osd->DialogAddButton(toString((PictureAttribute) i),
+                                   QString("TOGGLEPICCONTROLS%1").arg(i));
+                }
             }
         }
     }

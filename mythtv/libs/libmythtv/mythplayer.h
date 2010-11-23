@@ -301,6 +301,9 @@ class MPUBLIC MythPlayer
     void LockOSD(void)    { osdLock.lock();   }
     void UnlockOSD(void)  { osdLock.unlock(); }
 
+    // Public picture controls
+    void ToggleStudioLevels(void);
+
   protected:
     // Initialization
     void OpenDummy(void);

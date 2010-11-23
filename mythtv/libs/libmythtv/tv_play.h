@@ -517,6 +517,7 @@ class MPUBLIC TV : public QThread
 
     void ToggleRecord(PlayerContext*);
 
+    void DoToggleStudioLevels(const PlayerContext *ctx);
     void DoTogglePictureAttribute(const PlayerContext*,
                                   PictureAdjustType type);
     void DoChangePictureAttribute(

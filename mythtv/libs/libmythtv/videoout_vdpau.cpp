@@ -59,7 +59,7 @@ VideoOutputVDPAU::VideoOutputVDPAU()
     m_lock(QMutex::Recursive), m_pip_layer(0), m_pip_surface(0),
     m_pip_ready(false),      m_osd_painter(NULL), m_using_piccontrols(false),
     m_skip_chroma(false),    m_denoise(0.0f),
-    m_sharpen(0.0f),         m_studio(false),
+    m_sharpen(0.0f),
     m_colorspace(VDP_COLOR_STANDARD_ITUR_BT_601)
 {
     if (gCoreContext->GetNumSetting("UseVideoModes", 0))
@@ -112,7 +112,7 @@ bool VideoOutputVDPAU::Init(int width, int height, float aspect, WId winid,
         return ok;
     }
 
-    m_using_piccontrols = (db_use_picture_controls || m_studio ||
+    m_using_piccontrols = (db_use_picture_controls ||
                            m_colorspace != VDP_COLOR_STANDARD_ITUR_BT_601);
     if (m_using_piccontrols)
         InitPictureAttributes();
@@ -796,7 +796,8 @@ void VideoOutputVDPAU::InitPictureAttributes(void)
                            (kPictureAttributeSupported_Brightness |
                             kPictureAttributeSupported_Contrast |
                             kPictureAttributeSupported_Colour |
-                            kPictureAttributeSupported_Hue);
+                            kPictureAttributeSupported_Hue |
+                            kPictureAttributeSupported_StudioLevels);
     VERBOSE(VB_PLAYBACK, LOC + QString("PictureAttributes: %1")
             .arg(toString(supported_attributes)));
     VideoOutput::InitPictureAttributes();
@@ -804,10 +805,6 @@ void VideoOutputVDPAU::InitPictureAttributes(void)
     m_lock.lock();
     if (m_render && m_video_mixer)
     {
-        if (m_studio)
-            m_render->SetMixerAttribute(m_video_mixer,
-                                        kVDPAttribStudioLevels, 1);
-
         if (m_colorspace < 0)
         {
             QSize size = window.GetVideoDim();
@@ -850,6 +847,9 @@ int VideoOutputVDPAU::SetPictureAttribute(PictureAttribute attribute,
             break;
         case kPictureAttribute_Hue:
             vdpau_attrib = kVDPAttribHue;
+            break;
+        case kPictureAttribute_StudioLevels:
+            vdpau_attrib = kVDPAttribStudioLevels;
             break;
         default:
             newValue = -1;
@@ -1163,7 +1163,6 @@ void VideoOutputVDPAU::ParseOptions(void)
     m_skip_chroma = false;
     m_denoise     = 0.0f;
     m_sharpen     = 0.0f;
-    m_studio      = false;
     m_colorspace  = VDP_COLOR_STANDARD_ITUR_BT_601;
     m_buffer_size = NUM_VDPAU_BUFFERS;
     m_mixer_features = kVDPFeatNone;
@@ -1242,12 +1241,6 @@ void VideoOutputVDPAU::ParseOptions(void)
                     .arg((m_colorspace == VDP_COLOR_STANDARD_ITUR_BT_601) ?
                     "BT.601" : "BT.709"));
             }
-        }
-        else if (name.contains("vdpaustudio"))
-        {
-            VERBOSE(VB_PLAYBACK, LOC +
-                    QString("Enabling Studio Levels [16-235]."));
-            m_studio = true;
         }
         else if (name.contains("vdpauhqscaling"))
         {

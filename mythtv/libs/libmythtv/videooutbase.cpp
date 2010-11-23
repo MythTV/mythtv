@@ -360,6 +360,8 @@ VideoOutput::VideoOutput() :
         gCoreContext->GetNumSetting("PlaybackColour",     50);
     db_pict_attr[kPictureAttribute_Hue] =
         gCoreContext->GetNumSetting("PlaybackHue",         0);
+    db_pict_attr[kPictureAttribute_StudioLevels] =
+        gCoreContext->GetNumSetting("PlaybackStudioLevels", 0);
 
     db_aspectoverride = (AspectOverrideMode)
         gCoreContext->GetNumSetting("AspectOverride",      0);
@@ -852,6 +854,9 @@ int VideoOutput::ChangePictureAttribute(
     if (kPictureAttribute_Hue == attributeType)
         newVal = newVal % 100;
 
+    if ((kPictureAttribute_StudioLevels == attributeType) && newVal > 1)
+        newVal = 1;
+
     newVal = min(max(newVal, 0), 100);
 
     return SetPictureAttribute(attributeType, newVal);
@@ -898,6 +903,8 @@ void VideoOutput::SetPictureAttributeDBValue(
         dbName = "PlaybackColour";
     else if (kPictureAttribute_Hue == attributeType)
         dbName = "PlaybackHue";
+    else if (kPictureAttribute_StudioLevels == attributeType)
+        dbName = "PlaybackStudioLevels";
 
     if (!dbName.isEmpty())
         gCoreContext->SaveSetting(dbName, newValue);

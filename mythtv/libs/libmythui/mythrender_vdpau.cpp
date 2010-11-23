@@ -96,6 +96,7 @@ class VDPAUCSCMatrix
         m_procamp.hue            = 0.0f;
         memset(&m_csc, 0, sizeof(VdpCSCMatrix));
     }
+    void SetStudioLevels(bool studio) { m_studio = studio; }
     void SetBrightness(int val) { m_procamp.brightness = (val * 0.02f) - 1.0f; }
     void SetContrast(int val)   { m_procamp.contrast = (val * 0.02f);          }
     void SetColour(int val)     { m_procamp.saturation = (val * 0.02f);        }
@@ -1208,6 +1209,8 @@ int MythRenderVDPAU::SetMixerAttribute(uint id, uint attrib, int value)
         m_videoMixers[id].m_csc->SetColour(value);
     else if (attrib == kVDPAttribBrightness)
         m_videoMixers[id].m_csc->SetBrightness(value);
+    else if (attrib == kVDPAttribStudioLevels)
+        m_videoMixers[id].m_csc->SetStudioLevels(value > 0);
     else
         return -1;
 

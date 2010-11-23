@@ -4557,6 +4557,23 @@ QString MythPlayer::GetError(void) const
     return tmp;
 }
 
+void MythPlayer::ToggleStudioLevels(void)
+{
+    if (!videoOutput)
+        return;
+
+    if (!(videoOutput->GetSupportedPictureAttributes() &
+          kPictureAttributeSupported_StudioLevels))
+        return;
+
+    int val = videoOutput->GetPictureAttribute(kPictureAttribute_StudioLevels);
+    val = (val > 0) ? 0 : 1;
+    videoOutput->SetPictureAttribute(kPictureAttribute_StudioLevels, val);
+    QString msg = (val > 0) ? QObject::tr("Enabled Studio Levels") :
+                              QObject::tr("Disabled Studio Levels");
+    SetOSDMessage(msg, kOSDTimeout_Med);
+}
+
 void MythPlayer::SetOSDMessage(const QString &msg, OSDTimeout timeout)
 {
     if (!osd)
