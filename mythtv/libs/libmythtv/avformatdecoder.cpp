@@ -3261,10 +3261,11 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
             .arg(mpa_pic->reordered_opaque).arg(temppts).arg(lastvpts));
 
     picframe->interlaced_frame = mpa_pic->interlaced_frame;
-    picframe->top_field_first = mpa_pic->top_field_first;
-    picframe->repeat_pict = mpa_pic->repeat_pict;
+    picframe->top_field_first  = mpa_pic->top_field_first;
+    picframe->repeat_pict      = mpa_pic->repeat_pict;
+    picframe->disp_timecode    = NormalizeVideoTimecode(stream, temppts);
+    picframe->frameNumber      = framesPlayed;
 
-    picframe->frameNumber = framesPlayed;
     m_parent->ReleaseNextVideoFrame(picframe, temppts);
     if (private_dec && mpa_pic->data[3])
         context->release_buffer(context, mpa_pic);
