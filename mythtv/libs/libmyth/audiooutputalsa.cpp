@@ -113,6 +113,11 @@ int AudioOutputALSA::TryOpenDevice(int open_mode, int try_ac3)
         m_lastdevice = passthru_device;
         if (!m_autopassthrough)
             return err;
+        if (err < 0)
+        {
+            VBAUDIO(QString("Auto setting passthrough failed (%1), defaulting "
+                            "to main device").arg(snd_strerror(err)));
+        }
     }
     if (!try_ac3 || err < 0)
     {
