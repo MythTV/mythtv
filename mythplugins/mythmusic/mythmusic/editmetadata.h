@@ -40,7 +40,6 @@ class EditMetadataDialog : public MythThemedDialog
     void incRating(bool up_or_down);
     void showSaveMenu();
     void saveToDatabase();
-    void saveToFile();
     void saveToMetadata();
     void saveAll();
     void cancelPopup();

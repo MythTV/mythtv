@@ -615,15 +615,8 @@ void EditMetadataDialog::showSaveMenu()
     }
     else
     {
-        topButton = popup->addButton(tr("Save to Database Only"), this,
-                                     SLOT(saveToDatabase()));
-        if (!m_metadata->Filename().contains("://"))
-        {
-            popup->addButton(tr("Save to File Only"), this,
-                                SLOT(saveToFile()));
-            popup->addButton(tr("Save to File and Database"), this,
-                                SLOT(saveAll()));
-        }
+        topButton = popup->addButton(tr("Save Changes"), this,
+                                     SLOT(saveAll()));
     }
 
     popup->addButton(tr("Exit/Do Not Save"), this,
@@ -664,46 +657,18 @@ void EditMetadataDialog::saveToDatabase()
     accept();
 }
 
-void EditMetadataDialog::saveToFile()
-{
-    cancelPopup();
-
-    if (!MythPopupBox::showOkCancelPopup(GetMythMainWindow(),
-                                         "Save To File",
-                                         tr("Are you sure you want to save the "
-                                         "modified metadata to the file?"),
-                                         false))
-    {
-        return;
-    }
-
-    Decoder *decoder = Decoder::create(m_metadata->Filename(), NULL, NULL, true);
-    if (decoder)
-    {
-        decoder->commitMetadata(m_metadata);
-        delete decoder;
-    }
-    accept();
-}
-
 void EditMetadataDialog::saveAll()
 {
     cancelPopup();
 
-    if (!MythPopupBox::showOkCancelPopup(GetMythMainWindow(),
-                                         "Save To File",
-                                         tr("Are you sure you want to save the "
-                                         "modified metadata to the file?"),
-                                         false))
+    if (GetMythDB()->GetNumSetting("AllowTagWriting", 0))
     {
-        return;
-    }
-
-    Decoder *decoder = Decoder::create(m_metadata->Filename(), NULL, NULL, true);
-    if (decoder)
-    {
-        decoder->commitMetadata(m_metadata);
-        delete decoder;
+        Decoder *decoder = Decoder::create(m_metadata->Filename(), NULL, NULL, true);
+        if (decoder)
+        {
+            decoder->commitMetadata(m_metadata);
+            delete decoder;
+        }
     }
 
     saveToDatabase();
