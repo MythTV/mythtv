@@ -381,7 +381,7 @@ bool AudioOutputALSA::OpenDevice()
 
     if ((err = TryOpenDevice(0, passthru || enc)) < 0)    
     {
-        AERROR(QString("snd_pcm_open2(\"%1\")").arg(m_lastdevice));
+        AERROR(QString("snd_pcm_open(\"%1\")").arg(m_lastdevice));
         if (pcm_handle)
             CloseDevice();
         return false;
