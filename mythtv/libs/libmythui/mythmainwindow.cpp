@@ -1163,7 +1163,6 @@ void MythMainWindow::attach(QWidget *child)
     // if windows are created on different threads,
     // or if setFocus() is called from a thread other than the main UI thread,
     // setFocus() hangs the thread that called it
-    // currently, it's impossible to switch to program guide from livetv
     VERBOSE(VB_IMPORTANT,
             QString("MythMainWindow::attach old: %1, new: %2, thread: %3")
             .arg(currentWidget() ? currentWidget()->objectName() : "none")
@@ -1177,6 +1176,7 @@ void MythMainWindow::attach(QWidget *child)
     child->winId();
     child->raise();
     child->setFocus();
+    child->setMouseTracking(true);
 }
 
 void MythMainWindow::detach(QWidget *child)
@@ -1197,6 +1197,7 @@ void MythMainWindow::detach(QWidget *child)
     {
         current->setEnabled(true);
         current->setFocus();
+        current->setMouseTracking(true);
     }
 
     if (d->exitingtomain)
