@@ -420,8 +420,8 @@ HostCheckBox *AudioConfigSettings::DTSPassThrough()
 
 HostCheckBox *AudioConfigSettings::MPCM()
 {
-    HostCheckBox *gc = new HostCheckBox("MultiChannelPCM");
-    gc->setLabel(QObject::tr("Stereo PCM"));
+    HostCheckBox *gc = new HostCheckBox("StereoPCM");
+    gc->setLabel(QObject::tr("Stereo PCM Only"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
                     "only supports 2 channels PCM (typically an old HDMI 1.0 "
