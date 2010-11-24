@@ -31,6 +31,7 @@ class AudioOutputALSA : public AudioOutputBase
     AudioOutputSettings* GetOutputSettings(void);
 
   private:
+    int TryOpenDevice(int open_mode, int try_ac3);
     int GetPCMInfo(int &card, int &device, int &subdevice);
     bool SetPreallocBufferSize(int size);
     bool IncPreallocBufferSize(int buffer_time);
@@ -42,12 +43,14 @@ class AudioOutputALSA : public AudioOutputBase
 
   private:
     snd_pcm_t   *pcm_handle;
-    int          numbadioctls;
     int          pbufsize;
     int          m_card, m_device, m_subdevice;
     QMutex       killAudioLock;
     snd_pcm_sframes_t (*pcm_write_func)(snd_pcm_t*, const void*,
                                         snd_pcm_uframes_t);
+    bool         m_autopassthrough;
+    QString      m_lastdevice;
+
     struct {
         QString            device;
         QString            control;

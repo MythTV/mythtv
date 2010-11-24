@@ -33,11 +33,11 @@ using namespace std;
 AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
     AudioOutputBase(settings),
     pcm_handle(NULL),
-    numbadioctls(0),
     pbufsize(-1),
     m_card(-1),
     m_device(-1),
-    m_subdevice(-1)
+    m_subdevice(-1),
+    m_autopassthrough(false)
 {
     m_mixer.handle = NULL;
     m_mixer.elem = NULL;
@@ -45,16 +45,48 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
     // Set everything up
     if (passthru_device == "auto")
     {
+        m_autopassthrough = true;
         passthru_device = main_device;
-        if (!passthru_device.contains(":"))
-            passthru_device += ":AES0=0x6,AES1=0x82,AES2=0x0,AES3=0x2";
+
+        /* to set the non-audio bit, use AES0=6 */
+        int len = passthru_device.length();
+        int args = passthru_device.indexOf(":");
+
+        if (args < 0)
+        {
+            /* no existing parameters: add it behind device name */
+            passthru_device += ":AES0=6";
+        }
         else
         {
-            passthru_device = passthru_device.insert(
-                passthru_device.indexOf(":") + 1,
-                "AES0=0x6,AES1=0x82,AES2=0x0,AES3=0x2,");
+            do
+                ++args;
+            while (args < passthru_device.length() &&
+                   passthru_device[args].isSpace());
+            if (args == passthru_device.length())
+            {
+                /* ":" but no parameters */
+                passthru_device += "AES0=6";
+            }
+            else if (passthru_device[args] != '{')
+            {
+                /* a simple list of parameters: add it at the end of the list */
+                passthru_device += ",AES0=6";
+            }
+            else
+            {
+                /* parameters in config syntax: add it inside the { } block */
+                do
+                    --len;
+                while (len > 0 && passthru_device[len].isSpace());
+                if (passthru_device[len] == '}')
+                    passthru_device = passthru_device.insert(len, " AES0=6");
+            }
         }
     }
+    else if (passthru_device.toLower() == "default")
+        passthru_device = main_device;
+
     InitSettings(settings);
     if (settings.init)
         Reconfigure(settings);
@@ -65,6 +97,37 @@ AudioOutputALSA::~AudioOutputALSA()
     if (pbufsize > 0)
         SetPreallocBufferSize(pbufsize);
     KillAudio();
+}
+
+int AudioOutputALSA::TryOpenDevice(int open_mode, int try_ac3)
+{
+    QString real_device;
+    QByteArray dev_ba;
+    int err = -1;
+
+    if (try_ac3)
+    {
+        dev_ba = passthru_device.toAscii();
+        err = snd_pcm_open(&pcm_handle, dev_ba.constData(),
+                           SND_PCM_STREAM_PLAYBACK, open_mode);
+        m_lastdevice = passthru_device;
+        if (!m_autopassthrough)
+            return err;
+        if (err < 0)
+        {
+            VBAUDIO(QString("Auto setting passthrough failed (%1), defaulting "
+                            "to main device").arg(snd_strerror(err)));
+        }
+    }
+    if (!try_ac3 || err < 0)
+    {
+        // passthru open failed, retry default device
+        dev_ba = main_device.toAscii();
+        err = snd_pcm_open(&pcm_handle, dev_ba.constData(),
+                           SND_PCM_STREAM_PLAYBACK, open_mode);
+        m_lastdevice = main_device;
+    }
+    return err;
 }
 
 int AudioOutputALSA::GetPCMInfo(int &card, int &device, int &subdevice)
@@ -204,8 +267,6 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
     int rate;
     int err;
 
-    QString real_device = (passthru || enc) ? passthru_device : main_device;
-
     AudioOutputSettings *settings = new AudioOutputSettings();
 
     if (pcm_handle)
@@ -213,11 +274,10 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
         snd_pcm_close(pcm_handle);
         pcm_handle = NULL;
     }
-    QByteArray dev_ba = real_device.toAscii();
-    if((err = snd_pcm_open(&pcm_handle, dev_ba.constData(),
-                           SND_PCM_STREAM_PLAYBACK, OPEN_FLAGS)) < 0)
+
+    if((err = TryOpenDevice(OPEN_FLAGS, passthru || enc)) < 0)
     {
-        AERROR(QString("snd_pcm_open(\"%1\")").arg(real_device));
+        AERROR(QString("snd_pcm_open(\"%1\")").arg(m_lastdevice));
         delete settings;
         return NULL;
     }
@@ -227,11 +287,9 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
     if ((err = snd_pcm_hw_params_any(pcm_handle, params)) < 0)
     {
         snd_pcm_close(pcm_handle);
-        if((err = snd_pcm_open(&pcm_handle, dev_ba.constData(),
-                               SND_PCM_STREAM_PLAYBACK, OPEN_FLAGS&FILTER_FLAGS
-                               )) < 0)
+        if((err = TryOpenDevice(OPEN_FLAGS&FILTER_FLAGS, passthru || enc)) < 0)
         {
-            AERROR(QString("snd_pcm_open(\"%1\")").arg(real_device));
+            AERROR(QString("snd_pcm_open(\"%1\")").arg(m_lastdevice));
             delete settings;
             return NULL;
         }
@@ -277,6 +335,9 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
     QMap<QString, QString> *alsadevs = GetALSADevices("pcm");
     while(1)
     {
+        QString real_device = (((passthru || enc) && !m_autopassthrough) ?
+                               passthru_device : main_device);
+
         QString desc = alsadevs->value(real_device);
 
         settings->setPassthrough(1);   // yes passthrough
@@ -314,30 +375,13 @@ bool AudioOutputALSA::OpenDevice()
     snd_pcm_format_t format;
     uint buffer_time, period_time;
     int err;
-    QString real_device;
 
     if (pcm_handle != NULL)
         CloseDevice();
 
-    numbadioctls = 0;
-
-    if (passthru || enc)
+    if ((err = TryOpenDevice(0, passthru || enc)) < 0)    
     {
-        real_device = passthru_device;        
-    }
-    else
-    {
-        real_device = main_device;
-    }
-
-    VERBOSE(VB_GENERAL, QString("Opening ALSA audio device '%1'.")
-                        .arg(real_device));
-
-    QByteArray dev_ba = real_device.toAscii();
-    if ((err = snd_pcm_open(&pcm_handle, dev_ba.constData(),
-                            SND_PCM_STREAM_PLAYBACK, OPEN_FLAGS&FILTER_FLAGS)) < 0)
-    {
-        AERROR(QString("snd_pcm_open(%1)").arg(real_device));
+        AERROR(QString("snd_pcm_open(\"%1\")").arg(m_lastdevice));
         if (pcm_handle)
             CloseDevice();
         return false;

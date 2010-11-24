@@ -200,11 +200,18 @@ AudioOutputSettings* AudioOutputBase::GetOutputSettingsUsers(void)
 /**
  * Test if we can output digital audio and if sample rate is supported
  */
-bool AudioOutputBase::CanPassthrough(int samplerate) const
+bool AudioOutputBase::CanPassthrough(int samplerate, int channels) const
 {
     bool ret = false;
     ret = output_settings->IsSupportedFormat(FORMAT_S16);
     ret &= output_settings->IsSupportedRate(samplerate);
+    // Don't know any cards that support spdif clocked at < 44100
+    // Some US cable transmissions have 2ch 32k AC-3 streams
+    ret &= samplerate >= 44100;
+        // Will downmix if we can't support the amount of channels
+    ret &= channels <= max_channels;
+        // Stereo content will always be decoded so it can later be upmixed
+    ret &= channels != 2;
 
     return ret;
 }

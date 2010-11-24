@@ -115,7 +115,7 @@ class AudioReencodeBuffer : public AudioOutput
     {
         last_audiotime = timecode;
     }
-    virtual bool CanPassthrough(int) const
+    virtual bool CanPassthrough(int, int) const
     {
         return false;
     }
