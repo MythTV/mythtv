@@ -418,7 +418,7 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(int64_t timecode)
     if (!st)
         return false;
 
-    if (ic->start_time != AV_NOPTS_VALUE)
+    if (ic->start_time != (int64_t)AV_NOPTS_VALUE)
         start_pts = av_rescale(ic->start_time,
                                st->time_base.den,
                                AV_TIME_BASE * (int64_t)st->time_base.num);
@@ -438,7 +438,7 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(AVStream *st,
 {
     int64_t start_pts = 0, pts;
 
-    if (ic->start_time != AV_NOPTS_VALUE)
+    if (ic->start_time != (int64_t)AV_NOPTS_VALUE)
         start_pts = av_rescale(ic->start_time,
                                st->time_base.den,
                                AV_TIME_BASE * (int64_t)st->time_base.num);
@@ -566,8 +566,6 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
 
         return true;
     }
-
-    AVCodecContext *context = st->codec;
 
     long long ts = 0;
     if (ic->start_time != (int64_t)AV_NOPTS_VALUE)
@@ -3016,65 +3014,6 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
         return true;
     }
 
-    // Decode CEA-608 and CEA-708 captions
-    for (uint i = 0; i < (uint)mpa_pic.atsc_cc_len;
-    i += ((mpa_pic.atsc_cc_buf[i] & 0x1f) * 3) + 2)
-    {
-        DecodeDTVCC(mpa_pic.atsc_cc_buf + i,
-                    mpa_pic.atsc_cc_len - i);
-    }
-
-    VideoFrame *picframe = (VideoFrame *)(mpa_pic.opaque);
-
-    if (!directrendering)
-    {
-        AVPicture tmppicture;
-
-        VideoFrame *xf = picframe;
-        picframe = m_parent->GetNextVideoFrame(false);
-
-        unsigned char *buf = picframe->buf;
-        avpicture_fill(&tmppicture, buf, PIX_FMT_YUV420P, context->width,
-                       context->height);
-        tmppicture.data[0] = buf + picframe->offsets[0];
-        tmppicture.data[1] = buf + picframe->offsets[1];
-        tmppicture.data[2] = buf + picframe->offsets[2];
-        tmppicture.linesize[0] = picframe->pitches[0];
-        tmppicture.linesize[1] = picframe->pitches[1];
-        tmppicture.linesize[2] = picframe->pitches[2];
-
-        QSize dim = get_video_dim(*context);
-        sws_ctx = sws_getCachedContext(sws_ctx, context->width,
-                                       context->height, context->pix_fmt,
-                                       context->width, context->height,
-                                       PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
-                                       NULL, NULL, NULL);
-        if (!sws_ctx)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to allocate sws context");
-            return false;
-        }
-        sws_scale(sws_ctx, mpa_pic.data, mpa_pic.linesize, 0, dim.height(),
-                  tmppicture.data, tmppicture.linesize);
-
-
-        if (xf)
-        {
-            // Set the frame flags, but then discard it
-            // since we are not using it for display.
-            xf->interlaced_frame = mpa_pic.interlaced_frame;
-            xf->top_field_first = mpa_pic.top_field_first;
-            xf->frameNumber = framesPlayed;
-            m_parent->DiscardVideoFrame(xf);
-        }
-    }
-    else if (!picframe)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "NULL videoframe - direct rendering not"
-                "correctly initialized.");
-        return false;
-    }
-
     // Detect faulty video timestamps using logic from ffplay.
     if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
     {
@@ -3115,67 +3054,18 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     {
         pts = pkt->dts;
     }
-    long long temppts = (long long)(av_q2d(curstream->time_base) * pts * 1000);
 
-    // Validate the video pts against the last pts. If it's
-    // a little bit smaller, equal or missing, compute
-    // it from the last. Otherwise assume a wraparound.
-    if (!ringBuffer->isDVD() &&
-        temppts <= lastvpts &&
-        (temppts + 10000 > lastvpts || temppts <= 0))
-    {
-        temppts = lastvpts;
-        temppts += (long long)(1000 / fps);
-        // MPEG2/H264 frames can be repeated, update pts accordingly
-        temppts += (long long)(mpa_pic.repeat_pict * 500 / fps);
-    }
+    VERBOSE(VB_PLAYBACK+VB_TIMESTAMP+VB_EXTRA, LOC +
+            QString("video packet timestamps reordered %1 pts %2 dts %3")
+            .arg(mpa_pic.reordered_opaque).arg(pkt->pts).arg(pkt->dts));
 
-    VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, LOC +
-            QString("video timecode %1 %2 %3 %4 %5").arg(mpa_pic.reordered_opaque)
-                    .arg(pkt->pts).arg(pkt->dts).arg(temppts).arg(lastvpts));
+    mpa_pic.reordered_opaque = pts;
 
-/* XXX: Broken.
-    if (mpa_pic.qscale_table != NULL && mpa_pic.qstride > 0 &&
-        context->height == picframe->height)
-    {
-        int tblsize = mpa_pic.qstride *
-                      ((picframe->height + 15) / 16);
-
-        if (picframe->qstride != mpa_pic.qstride ||
-            picframe->qscale_table == NULL)
-        {
-            picframe->qstride = mpa_pic.qstride;
-            if (picframe->qscale_table)
-                delete [] picframe->qscale_table;
-            picframe->qscale_table = new unsigned char[tblsize];
-        }
-
-        memcpy(picframe->qscale_table, mpa_pic.qscale_table,
-               tblsize);
-    }
-*/
-
-    picframe->interlaced_frame = mpa_pic.interlaced_frame;
-    picframe->top_field_first  = mpa_pic.top_field_first;
-    picframe->repeat_pict      = mpa_pic.repeat_pict;
-    picframe->disp_timecode    = NormalizeVideoTimecode(curstream, temppts);
-    picframe->frameNumber      = framesPlayed;
-
-    m_parent->ReleaseNextVideoFrame(picframe, temppts);
-    if (private_dec && mpa_pic.data[3])
-        context->release_buffer(context, &mpa_pic);
-
-    decoded_video_frame = picframe;
-    gotvideo = 1;
-    framesPlayed++;
-
-    lastvpts = temppts;
+    ProcessVideoFrame(curstream, &mpa_pic);
 
     return true;
 }
 
-// TODO this is a temporary implementation. Remove code duplication with
-// ProcessVideoPacket for 0.25
 bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
 {
     long long pts = 0;
@@ -3239,9 +3129,8 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         return false;
     }
 
-    pts = (long long)(av_q2d(stream->time_base) * mpa_pic->reordered_opaque * 1000);
-
-    long long temppts = pts;
+    long long temppts = (long long)(av_q2d(stream->time_base) * 
+                                    mpa_pic->reordered_opaque * 1000);
 
     // Validate the video pts against the last pts. If it's
     // a little bit smaller, equal or missing, compute
@@ -3257,7 +3146,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
     }
 
     VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, LOC +
-            QString("ProcessVideoFrame timecode %1 %2 %3")
+            QString("video timecode %1 %2 %3")
             .arg(mpa_pic->reordered_opaque).arg(temppts).arg(lastvpts));
 
     picframe->interlaced_frame = mpa_pic->interlaced_frame;
