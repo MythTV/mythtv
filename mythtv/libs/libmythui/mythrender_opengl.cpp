@@ -977,8 +977,7 @@ void MythRenderOpenGL::DrawBitmap(uint tex, uint target, const QRect *src,
 
 void MythRenderOpenGL::DrawBitmap(uint *textures, uint texture_count,
                                   uint target, const QRectF *src,
-                                  const QRectF *dst, uint prog,
-                                  bool colour_control)
+                                  const QRectF *dst, uint prog)
 {
     if (!textures || !texture_count)
         return;
@@ -991,11 +990,11 @@ void MythRenderOpenGL::DrawBitmap(uint *textures, uint texture_count,
 
     if (kGLLegacyProfile == m_profile)
     {
-        DrawBitmapLegacy(textures, texture_count, src, dst, prog, colour_control);
+        DrawBitmapLegacy(textures, texture_count, src, dst, prog);
     }
     else if (kGLHighProfile == m_profile)
     {
-        DrawBitmapHigh(textures, texture_count, src, dst, prog, colour_control);
+        DrawBitmapHigh(textures, texture_count, src, dst, prog);
     }
 
     doneCurrent();
@@ -1139,7 +1138,7 @@ void MythRenderOpenGL::DrawBitmapHigh(uint tex, const QRect *src,
 
 void MythRenderOpenGL::DrawBitmapLegacy(uint *textures, uint texture_count,
                                         const QRectF *src, const QRectF *dst,
-                                        uint prog, bool colour_control)
+                                        uint prog)
 {
     if (prog && !m_programs.contains(prog))
         prog = 0;
@@ -1147,12 +1146,6 @@ void MythRenderOpenGL::DrawBitmapLegacy(uint *textures, uint texture_count,
     uint first = textures[0];
 
     EnableFragmentProgram(prog);
-    if (colour_control)
-    {
-//        InitFragmentParams(0, m_attribs[kGLAttribBrightness],
-//                           m_attribs[kGLAttribContrast],
-//                           m_attribs[kGLAttribColour], 0.5f);
-    }
     SetBlend(false);
     SetColor(255, 255, 255, 255);
 
@@ -1181,7 +1174,7 @@ void MythRenderOpenGL::DrawBitmapLegacy(uint *textures, uint texture_count,
 
 void MythRenderOpenGL::DrawBitmapHigh(uint *textures, uint texture_count,
                                       const QRectF *src, const QRectF *dst,
-                                      uint prog, bool colour_control)
+                                      uint prog)
 {
 
 }
@@ -1313,8 +1306,8 @@ void MythRenderOpenGL::InitProcs(void)
         GetProcAddress("glBindProgramARB");
     m_glProgramStringARB = (MYTH_GLPROGRAMSTRINGARBPROC)
         GetProcAddress("glProgramStringARB");
-    m_glProgramEnvParameter4fARB = (MYTH_GLPROGRAMENVPARAMETER4FARBPROC)
-        GetProcAddress("glProgramEnvParameter4fARB");
+    m_glProgramLocalParameter4fARB = (MYTH_GLPROGRAMLOCALPARAMETER4FARBPROC)
+        GetProcAddress("glProgramLocalParameter4fARB");
     m_glDeleteProgramsARB = (MYTH_GLDELETEPROGRAMSARBPROC)
         GetProcAddress("glDeleteProgramsARB");
     m_glGetProgramivARB = (MYTH_GLGETPROGRAMIVARBPROC)
@@ -1444,7 +1437,7 @@ void MythRenderOpenGL::InitFeatures(void)
     if (m_extensions.contains("GL_ARB_fragment_program") &&
         m_glGenProgramsARB   && m_glBindProgramARB &&
         m_glProgramStringARB && m_glDeleteProgramsARB &&
-        m_glGetProgramivARB  && m_glProgramEnvParameter4fARB)
+        m_glGetProgramivARB  && m_glProgramLocalParameter4fARB)
         m_exts_supported += kGLExtFragProg;
 
     if (m_extensions.contains("GL_ARB_shader_objects") &&
@@ -1567,7 +1560,7 @@ void MythRenderOpenGL::ResetProcs(void)
     m_glGenProgramsARB = NULL;
     m_glBindProgramARB = NULL;
     m_glProgramStringARB = NULL;
-    m_glProgramEnvParameter4fARB = NULL;
+    m_glProgramLocalParameter4fARB = NULL;
     m_glDeleteProgramsARB = NULL;
     m_glGetProgramivARB = NULL;
     m_glMapBufferARB = NULL;
@@ -2080,11 +2073,19 @@ uint MythRenderOpenGL::GetBufferSize(QSize size, uint fmt, uint type)
     return size.width() * size.height() * bpp * bytes;
 }
 
-void MythRenderOpenGL::InitFragmentParams(uint fp, float a, float b,
-                                          float c, float d)
+void MythRenderOpenGL::SetFragmentParams(uint fp, void* vals)
 {
     makeCurrent();
-    m_glProgramEnvParameter4fARB(
-        GL_FRAGMENT_PROGRAM_ARB, fp, a, b, c, d);
+
+    EnableFragmentProgram(fp);
+
+    float *v = (float*)vals;
+    m_glProgramLocalParameter4fARB(
+        GL_FRAGMENT_PROGRAM_ARB, 0, v[0], v[1], v[2], v[3]);
+    m_glProgramLocalParameter4fARB(
+        GL_FRAGMENT_PROGRAM_ARB, 1, v[4], v[5], v[6], v[7]);
+    m_glProgramLocalParameter4fARB(
+        GL_FRAGMENT_PROGRAM_ARB, 2, v[8], v[9], v[10], v[11]);
+
     doneCurrent();
 }

@@ -78,7 +78,7 @@ OpenGLVideo::OpenGLVideo() :
     display_video_rect(0,0,0,0), video_rect(0,0,0,0),
     frameBufferRect(0,0,0,0), softwareDeinterlacer(QString::null),
     hardwareDeinterlacer(QString::null), hardwareDeinterlacing(false),
-    useColourControl(false),  viewportControl(false),
+    colourSpace(NULL),        viewportControl(false),
     inputTextureSize(0,0),    currentFrameNum(0),
     inputUpdated(false),      refsNeeded(0),
     textureRects(false),      textureType(GL_TEXTURE_2D),
@@ -136,7 +136,7 @@ void OpenGLVideo::Teardown(void)
      window
  */
 
-bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, bool colour_control,
+bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspace,
                        QSize videoDim, QRect displayVisibleRect,
                        QRect displayVideoRect, QRect videoRect,
                        bool viewport_control, QString options,
@@ -160,7 +160,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, bool colour_control,
     frameBufferRect       = QRect(QPoint(0,0), video_dim);
     softwareDeinterlacer  = "";
     hardwareDeinterlacing = false;
-    useColourControl      = colour_control;
+    colourSpace           = colourspace;
     viewportControl       = viewport_control;
     inputTextureSize      = QSize(0,0);
     currentFrameNum       = -1;
@@ -223,6 +223,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, bool colour_control,
             using_ycbcrtex = false;
             using_hardwaretex = false;
         }
+        colourSpace->SetSupportedAttributes(kPictureAttributeSupported_None);
     }
 
     if (ok)
@@ -251,6 +252,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, bool colour_control,
         if (bgra32tex && AddFilter(kGLFilterResize))
         {
             inputTextures.push_back(bgra32tex);
+            colourSpace->SetSupportedAttributes(kPictureAttributeSupported_None);
         }
         else
         {
@@ -1027,9 +1029,11 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
             program = filter->fragmentPrograms[prog_ref];
         }
 
+        if (type == kGLFilterYUV2RGB)
+            gl_context->SetFragmentParams(program, colourSpace->GetMatrix());
+
         gl_context->DrawBitmap(textures, texture_count, target, &trect, &vrect,
-                               program,
-                              (useColourControl && type == kGLFilterYUV2RGB));
+                               program);
 
         inputs = filter->frameBufferTextures;
         inputsize = realsize;
@@ -1108,7 +1112,8 @@ QString OpenGLVideo::FilterToString(OpenGLFilterType filt)
 }
 
 static const QString attrib_fast =
-"ATTRIB tex  = fragment.texcoord[0];\n";
+"ATTRIB tex   = fragment.texcoord[0];\n"
+"PARAM yuv[3] = { program.local[0..2] };\n";
 
 static const QString var_alpha =
 "TEMP alpha;\n";
@@ -1119,21 +1124,15 @@ static const QString tex_alpha =
 static const QString tex_fast =
 "TEX res, tex, texture[0], %1;\n";
 
-static const QString param_colour =
-"PARAM  adj  = program.env[0];\n";
-
-static const QString calc_colour_fast =
-"SUB res, res, 0.5;\n"
-"MAD res, res, adj.zzzy, adj.wwwx;\n";
-
 static const QString var_fast =
 "TEMP tmp, res;\n";
 
 static const QString end_fast =
-"SUB tmp, res.rbgg, { 0.5, 0.5 };\n"
-"MAD res, res.a, 1.164, -0.063;\n"
-"MAD res, { 0, -.392, 2.017 }, tmp.xxxw, res;\n"
-"MAD result.color, { 1.596, -.813, 0, 0 }, tmp.yyyw, res;\n";
+"DPH tmp.r, res.arbg, yuv[0];\n"
+"DPH tmp.g, res.arbg, yuv[1];\n"
+"DPH tmp.b, res.arbg, yuv[2];\n"
+"MOV tmp.a, res.g;\n"
+"MOV result.color, tmp;\n";
 
 static const QString var_deint =
 "TEMP other, current, mov, prev;\n";
@@ -1516,11 +1515,9 @@ QString OpenGLVideo::GetProgramString(OpenGLFilterType name,
             }
 
             ret += attrib_fast;
-            ret += useColourControl ? param_colour : "";
             ret += (deint != "") ? var_deint : "";
             ret += var_fast + (need_tex ? tex_fast : "");
             ret += deint_bit;
-            ret += useColourControl ? calc_colour_fast : "";
             ret += end_fast;
         }
             break;
@@ -1564,6 +1561,7 @@ QString OpenGLVideo::GetProgramString(OpenGLFilterType name,
 
     ret += "END";
 
+    VERBOSE(VB_PLAYBACK|VB_EXTRA, "\n" + ret + "\n");
     VERBOSE(VB_PLAYBACK, LOC + QString("Created %1 fragment program %2")
                 .arg(FilterToString(name)).arg(deint));
 

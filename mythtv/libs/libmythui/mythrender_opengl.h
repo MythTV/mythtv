@@ -116,6 +116,7 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     bool CreateFragmentProgram(const QString &program, uint &prog);
     void DeleteFragmentProgram(uint prog);
     void EnableFragmentProgram(int fp);
+    void SetFragmentParams(uint fp, void* vals);
 
     uint CreateShaderObject(const QString &vert, const QString &frag);
     void DeleteShaderObject(uint obj);
@@ -125,8 +126,7 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
                     uint prog, int alpha = 255, int red = 255, int green = 255,
                     int blue = 255);
     void DrawBitmap(uint *textures, uint texture_count, uint target,
-                    const QRectF *src, const QRectF *dst, uint prog,
-                    bool colour_control = false);
+                    const QRectF *src, const QRectF *dst, uint prog);
     void DrawRect(const QRect &area, bool drawFill,
                   const QColor &fillColor, bool drawLine,
                   int lineWidth, const QColor &lineColor,
@@ -142,11 +142,9 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     void DrawBitmapHigh(uint tex, const QRect *src, const QRect *dst,
                         uint prog, int alpha, int red, int green, int blue);
     void DrawBitmapLegacy(uint *textures, uint texture_count,
-                          const QRectF *src, const QRectF *dst,
-                          uint prog, bool colour_control);
+                          const QRectF *src, const QRectF *dst, uint prog);
     void DrawBitmapHigh(uint *textures, uint texture_count,
-                        const QRectF *src, const QRectF *dst,
-                        uint prog, bool colour_control);
+                        const QRectF *src, const QRectF *dst, uint prog);
     void DrawRectLegacy(const QRect &area, bool drawFill,
                         const QColor &fillColor,  bool drawLine,
                         int lineWidth, const QColor &lineColor, int prog);
@@ -185,7 +183,6 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     void ExpireVBOS(uint max = 0);
     bool ClearTexture(uint tex);
     uint GetBufferSize(QSize size, uint fmt, uint type);
-    void InitFragmentParams(uint fp, float a, float b, float c, float d);
 
   private:
     // GL resources
@@ -231,7 +228,7 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     MYTH_GLGENPROGRAMSARBPROC            m_glGenProgramsARB;
     MYTH_GLBINDPROGRAMARBPROC            m_glBindProgramARB;
     MYTH_GLPROGRAMSTRINGARBPROC          m_glProgramStringARB;
-    MYTH_GLPROGRAMENVPARAMETER4FARBPROC  m_glProgramEnvParameter4fARB;
+    MYTH_GLPROGRAMLOCALPARAMETER4FARBPROC m_glProgramLocalParameter4fARB;
     MYTH_GLDELETEPROGRAMSARBPROC         m_glDeleteProgramsARB;
     MYTH_GLGETPROGRAMIVARBPROC           m_glGetProgramivARB;
     // PixelBuffer Objects

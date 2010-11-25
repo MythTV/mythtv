@@ -134,10 +134,7 @@ bool VideoOutputOpenGL::Init(int width, int height, float aspect,
     success &= SetupOpenGL();
 
     InitOSD();
-
-    if (db_use_picture_controls)
-        InitPictureAttributes();
-
+    InitPictureAttributes();
     MoveResize();
 
     if (!success)
@@ -246,7 +243,7 @@ bool VideoOutputOpenGL::SetupOpenGL(void)
     bool success = false;
     OpenGLLocker ctx_lock(gl_context);
     gl_videochain = new OpenGLVideo();
-    success = gl_videochain->Init(gl_context, db_use_picture_controls,
+    success = gl_videochain->Init(gl_context, &videoColourSpace,
                                   window.GetVideoDim(), dvr,
                                   window.GetDisplayVideoRect(),
                                   window.GetVideoRect(), true,
@@ -458,12 +455,12 @@ void VideoOutputOpenGL::InitPictureAttributes(void)
     if (!gl_context)
         return;
 
-//    videoColourSpace.SetSupportedAttributes((PictureAttributeSupported)
-//                                       (kPictureAttributeSupported_Brightness |
-//                                        kPictureAttributeSupported_Contrast |
-//                                        kPictureAttributeSupported_Colour |
-//                                        kPictureAttributeSupported_Hue |
-//                                        kPictureAttributeSupported_StudioLevels));
+    videoColourSpace.SetSupportedAttributes((PictureAttributeSupported)
+                                       (kPictureAttributeSupported_Brightness |
+                                        kPictureAttributeSupported_Contrast |
+                                        kPictureAttributeSupported_Colour |
+                                        kPictureAttributeSupported_Hue |
+                                        kPictureAttributeSupported_StudioLevels));
 }
 
 int VideoOutputOpenGL::SetPictureAttribute(PictureAttribute attribute,
@@ -612,7 +609,7 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  *frame,
     {
         VERBOSE(VB_PLAYBACK, LOC + "Initialise PiP.");
         gl_pipchains[pipplayer] = gl_pipchain = new OpenGLVideo();
-        bool success = gl_pipchain->Init(gl_context, db_use_picture_controls,
+        bool success = gl_pipchain->Init(gl_context, &videoColourSpace,
                      QSize(pipVideoWidth, pipVideoHeight),
                      dvr, position,
                      QRect(0, 0, pipVideoWidth, pipVideoHeight),
@@ -633,9 +630,8 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  *frame,
         delete gl_pipchain;
         gl_pipchains[pipplayer] = gl_pipchain = new OpenGLVideo();
         bool success = gl_pipchain->Init(
-            gl_context, db_use_picture_controls,
-            QSize(pipVideoWidth, pipVideoHeight),
-            dvr, position,
+            gl_context, &videoColourSpace,
+            QSize(pipVideoWidth, pipVideoHeight), dvr, position,
             QRect(0, 0, pipVideoWidth, pipVideoHeight),
             false, GetFilters(), false);
 

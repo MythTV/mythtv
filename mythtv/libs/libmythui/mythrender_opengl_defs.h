@@ -146,7 +146,7 @@ typedef void (APIENTRY * MYTH_GLDELETEPROGRAMSARBPROC)
     (GLsizei n, const GLuint *programs);
 typedef void (APIENTRY * MYTH_GLGENPROGRAMSARBPROC)
     (GLsizei n, GLuint *programs);
-typedef void (APIENTRY * MYTH_GLPROGRAMENVPARAMETER4FARBPROC)
+typedef void (APIENTRY * MYTH_GLPROGRAMLOCALPARAMETER4FARBPROC)
     (GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
 typedef void (APIENTRY * MYTH_GLGETPROGRAMIVARBPROC)
     (GLenum target, GLenum pname, GLint *params);

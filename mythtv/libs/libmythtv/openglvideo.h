@@ -40,7 +40,7 @@ class OpenGLVideo
     OpenGLVideo();
    ~OpenGLVideo();
 
-    bool Init(MythRenderOpenGL *glcontext, bool colour_control,
+    bool Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspace,
               QSize videoDim, QRect displayVisibleRect,
               QRect displayVideoRect, QRect videoRect,
               bool viewport_control,  QString options,
@@ -113,7 +113,7 @@ class OpenGLVideo
     QString        softwareDeinterlacer;
     QString        hardwareDeinterlacer;
     bool           hardwareDeinterlacing;
-    bool           useColourControl;
+    VideoColourSpace *colourSpace;
     bool           viewportControl;
     vector<GLuint>   referenceTextures;
     vector<GLuint>   inputTextures;
