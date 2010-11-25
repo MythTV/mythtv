@@ -958,7 +958,8 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
     }
 
     player_ctx->buffer->Start();
-    char testbuf[kDecoderProbeBufferSize];
+    /// OSX has a small stack, so we put this buffer on the heap instead.
+    char *testbuf = new char[kDecoderProbeBufferSize];
     UnpauseBuffer();
 
     // delete any pre-existing recorder
@@ -978,7 +979,8 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
                         QString("OpenFile(): Could not read "
                                 "first %1 bytes of '%2'")
                         .arg(testreadsize)
-                        .arg(player_ctx->buffer->GetFilename()));
+                        .arg(player_ctx->buffer->GetFilename())); 
+                delete[] testbuf;
                 return -1;
             }
             VERBOSE(VB_IMPORTANT, LOC_WARN + "OpenFile() waiting on data");
@@ -1001,12 +1003,15 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
                 QString("Couldn't find an A/V decoder for: '%1'")
                 .arg(player_ctx->buffer->GetFilename()));
 
+        delete[] testbuf;
         return -1;
     }
     else if (decoder->IsErrored())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not initialize A/V decoder.");
         SetDecoder(NULL);
+
+        delete[] testbuf;
         return -1;
     }
 
@@ -1027,6 +1032,7 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
     // is true, only disable if no_video_decode is true.
     int ret = decoder->OpenFile(
         player_ctx->buffer, no_video_decode, testbuf, testreadsize);
+    delete[] testbuf;
 
     if (ret < 0)
     {

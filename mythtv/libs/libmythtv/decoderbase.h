@@ -18,7 +18,7 @@ class TeletextViewer;
 class MythPlayer;
 class AudioPlayer;
 
-const int kDecoderProbeBufferSize = 128 * 1024;
+const int kDecoderProbeBufferSize = 256 * 1024;
 
 /// Track types
 typedef enum TrackTypes
