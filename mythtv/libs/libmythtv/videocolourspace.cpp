@@ -184,8 +184,8 @@ void VideoColourSpace::Update(void)
                                  ( 1.5701f * uvcos) - ( 0.0000f * uvsin), 0.0f,
                          1.000f, (-0.1870f * uvcos) + (-0.4664f * uvsin),
                                  (-0.4664f * uvcos) - (-0.1870f * uvsin), 0.0f,
-                         1.000f, (-1.8556f * uvcos) + ( 0.0000f * uvsin),
-                                 ( 0.0000f * uvcos) - (-1.8556f * uvsin), 0.0f);
+                         1.000f, ( 1.8556f * uvcos) + ( 0.0000f * uvsin),
+                                 ( 0.0000f * uvcos) - ( 1.8556f * uvsin), 0.0f);
             break;
 
         case kCSTD_ITUR_BT_601:
