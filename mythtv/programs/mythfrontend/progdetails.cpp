@@ -662,7 +662,7 @@ void ProgDetails::loadPage(void)
         recordingHost = m_progInfo.GetHostname();
         recordedFilename = m_progInfo.GetBasename();
         recordedFileSize = QString("%1 ")
-            .arg((double)(m_progInfo.GetFilesize()>>30),0,'f',2);
+            .arg(m_progInfo.GetFilesize()/((double)(1<<30)),0,'f',2);
         recordedFileSize += tr("GB", "GigaBytes");
 
         query.prepare("SELECT profile FROM recorded"
