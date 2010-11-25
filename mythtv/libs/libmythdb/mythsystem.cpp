@@ -54,6 +54,9 @@ MythSystemIOHandler::MythSystemIOHandler(bool read) :
 
 void MythSystemIOHandler::run(void)
 {
+    VERBOSE(VB_GENERAL, QString("Starting IO manager (%1)")
+        .arg(m_read ? "read" : "write"));
+
     m_pLock.lock();
     BuildFDs();
     m_pLock.unlock();
@@ -168,6 +171,12 @@ void MythSystemIOHandler::insert(int fd, QBuffer *buff)
 void MythSystemIOHandler::remove(int fd)
 {
     m_pLock.lock();
+    if (m_read)
+    {
+        PMap_t::iterator i;
+        i = m_pMap.find(fd);
+        HandleRead(i.key(), i.value());
+    }
     m_pMap.remove(fd);
     BuildFDs();
     m_pLock.unlock();
