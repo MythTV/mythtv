@@ -4,7 +4,7 @@
       <type>WEATHER_SETTINGS_GENERAL</type>
       <text>Global Settings</text>
       <action>SETTINGS_GENERAL</action>
-      <description>General weather plugin options</description>
+      <description>General weather options</description>
    </button>
 
    <button>

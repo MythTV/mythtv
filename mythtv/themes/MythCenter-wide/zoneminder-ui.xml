@@ -76,7 +76,7 @@
         <textarea name="pagetitle" from="basetextarea">
             <area>30,10,570,40</area>
             <font>baselarge</font>
-            <value>Zone Minder Console</value>
+            <value>ZoneMinder Console</value>
         </textarea>
 
         <shape name="topbackground" from="basebackground">
@@ -311,7 +311,7 @@
         <textarea name="pagetitle" from="basetextarea">
             <area>30,10,570,40</area>
             <font>baselarge</font>
-            <value>Zone Minder Events</value>
+            <value>ZoneMinder Events</value>
         </textarea>
 
         <shape name="topbackground" from="basebackground">
@@ -673,7 +673,7 @@
         <textarea name="pagetitle" from="basetextarea">
             <area>30,10,570,40</area>
             <font>baselarge</font>
-            <value>Zone Minder Event Player</value>
+            <value>ZoneMinder Event Player</value>
         </textarea>
 
         <shape name="topbackground" from="basebackground">
@@ -797,7 +797,7 @@
         <textarea name="pagetitle" from="basetextarea">
             <area>30,10,570,40</area>
             <font>baselarge</font>
-            <value>Zone Minder Live Player</value>
+            <value>ZoneMinder Live Player</value>
         </textarea>
 
         <!-- one monitor view -->

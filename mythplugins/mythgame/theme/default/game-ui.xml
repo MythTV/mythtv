@@ -267,7 +267,7 @@
 
     <textarea name="rompath_lab" from="basetextarea">
         <area>40,180,140,40</area>
-        <value>Rompath:</value>
+        <value>ROM path:</value>
         <align>right</align>
     </textarea>
 

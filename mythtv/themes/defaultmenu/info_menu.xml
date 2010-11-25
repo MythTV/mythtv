@@ -57,7 +57,7 @@
 
     <button>
         <type>ZONEMINDER</type>
-        <text>Zone Minder</text>
+        <text>ZoneMinder</text>
         <description>Home surveillance</description>
         <action>PLUGIN mythzoneminder</action>
         <depends>mythzoneminder</depends>
