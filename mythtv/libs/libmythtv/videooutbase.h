@@ -22,6 +22,8 @@ extern "C" {
 #include "mythdisplay.h"
 #include "DisplayRes.h"
 #include "videodisplayprofile.h"
+#include "videocolourspace.h"
+
 using namespace std;
 
 class MythPainter;
@@ -130,12 +132,12 @@ class VideoOutput
     /// \brief Tells video output that a full repaint is needed.
     void ExposeEvent(void);
 
-    PictureAttributeSupported GetSupportedPictureAttributes(void) const
-        { return supported_attributes; }
-    int         ChangePictureAttribute(PictureAttribute, bool direction);
-    virtual int SetPictureAttribute(PictureAttribute, int newValue);
-    int         GetPictureAttribute(PictureAttribute) const;
-    virtual void InitPictureAttributes(void);
+    PictureAttributeSupported GetSupportedPictureAttributes(void)
+        { return videoColourSpace.SupportedAttributes(); }
+    int          ChangePictureAttribute(PictureAttribute, bool direction);
+    virtual int  SetPictureAttribute(PictureAttribute, int newValue);
+    int          GetPictureAttribute(PictureAttribute);
+    virtual void InitPictureAttributes(void) { }
 
     bool AllowPreviewEPG(void) const;
 
@@ -260,8 +262,6 @@ class VideoOutput
 
     virtual bool DisplayOSD(VideoFrame *frame, OSD *osd);
 
-    virtual void SetPictureAttributeDBValue(
-        PictureAttribute attributeType, int newValue);
     QRect GetVisibleOSDBounds(float&, float&, float) const;
     QRect GetTotalOSDBounds(void) const;
     virtual bool hasFullScreenOSD(void) const { return false; }
@@ -277,15 +277,14 @@ class VideoOutput
 
     void SetVideoAspectRatio(float aspect);
 
-    VideoOutWindow window;
-    QSize   db_display_dim;   ///< Screen dimensions in millimeters from DB
-    typedef QMap<PictureAttribute,int> PictureSettingMap;
-    PictureSettingMap  db_pict_attr; ///< Picture settings
+    VideoOutWindow     window;
+    QSize              db_display_dim;   ///< Screen dimensions in millimeters from DB
+    VideoColourSpace   videoColourSpace;
     AspectOverrideMode db_aspectoverride;
     AdjustFillMode     db_adjustfill;
     LetterBoxColour    db_letterbox_colour;
-    QString db_deint_filtername;
-    bool    db_use_picture_controls;
+    QString            db_deint_filtername;
+    bool               db_use_picture_controls;
 
     // Video parameters
     MythCodecID          video_codec_id;
@@ -322,9 +321,6 @@ class VideoOutput
     // Various state variables
     VideoErrorState errorState;
     long long framesPlayed;
-
-    // PIP
-    PictureAttributeSupported supported_attributes;
 
     // Custom display resolutions
     DisplayRes *display_res;

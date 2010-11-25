@@ -1000,7 +1000,8 @@ int VideoOutputDirectfb::SetPictureAttribute(
     data->videoLayer->GetColorAdjustment(data->videoLayer, &adj);
     adj.flags = DCAF_NONE;
 
-    newValue   = min(max(newValue, 0), 100);
+    newValue = videoColourSpace.SetPictureAttribute(attribute, newValue);
+
     uint value = (0xffff * newValue) / 100;
 
     if ((kPictureAttribute_Brightness == attribute) &&
@@ -1032,7 +1033,6 @@ int VideoOutputDirectfb::SetPictureAttribute(
     {
         data->videoLayer->SetColorAdjustment(data->videoLayer,
                                              (DFBColorAdjustment*) &adj);
-        SetPictureAttributeDBValue(attribute, newValue);
         return newValue;
     }
 

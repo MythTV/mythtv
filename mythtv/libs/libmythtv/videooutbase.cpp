@@ -308,7 +308,7 @@ VideoOutput *VideoOutput::Create(
 VideoOutput::VideoOutput() :
     // DB Settings
     db_display_dim(0,0),
-    db_aspectoverride(kAspect_Off),     db_adjustfill(kAdjustFill_Off),
+    db_aspectoverride(kAspect_Off), db_adjustfill(kAdjustFill_Off),
     db_letterbox_colour(kLetterBoxColour_Black),
     db_deint_filtername(QString::null),
     db_use_picture_controls(false),
@@ -336,7 +336,6 @@ VideoOutput::VideoOutput() :
 
     // Various state variables
     errorState(kError_None),            framesPlayed(0),
-    supported_attributes(kPictureAttributeSupported_None),
 
     // Custom display resolutions
     display_res(NULL),
@@ -351,17 +350,6 @@ VideoOutput::VideoOutput() :
     bzero(&pip_tmp_image, sizeof(pip_tmp_image));
     db_display_dim = QSize(gCoreContext->GetNumSetting("DisplaySizeWidth",  0),
                            gCoreContext->GetNumSetting("DisplaySizeHeight", 0));
-
-    db_pict_attr[kPictureAttribute_Brightness] =
-        gCoreContext->GetNumSetting("PlaybackBrightness", 50);
-    db_pict_attr[kPictureAttribute_Contrast] =
-        gCoreContext->GetNumSetting("PlaybackContrast",   50);
-    db_pict_attr[kPictureAttribute_Colour] =
-        gCoreContext->GetNumSetting("PlaybackColour",     50);
-    db_pict_attr[kPictureAttribute_Hue] =
-        gCoreContext->GetNumSetting("PlaybackHue",         0);
-    db_pict_attr[kPictureAttribute_StudioLevels] =
-        gCoreContext->GetNumSetting("PlaybackStudioLevels", 0);
 
     db_aspectoverride = (AspectOverrideMode)
         gCoreContext->GetNumSetting("AspectOverride",      0);
@@ -871,45 +859,12 @@ int VideoOutput::ChangePictureAttribute(
  */
 int VideoOutput::SetPictureAttribute(PictureAttribute attribute, int newValue)
 {
-    (void)attribute;
-    (void)newValue;
-    return -1;
+    return videoColourSpace.SetPictureAttribute(attribute, newValue);
 }
 
-int VideoOutput::GetPictureAttribute(PictureAttribute attributeType) const
+int VideoOutput::GetPictureAttribute(PictureAttribute attributeType)
 {
-    PictureSettingMap::const_iterator it = db_pict_attr.find(attributeType);
-    if (it == db_pict_attr.end())
-        return -1;
-    return *it;
-}
-
-void VideoOutput::InitPictureAttributes(void)
-{
-    PictureSettingMap::const_iterator it = db_pict_attr.begin();
-    for (; it != db_pict_attr.end(); ++it)
-        SetPictureAttribute(it.key(), *it);
-}
-
-void VideoOutput::SetPictureAttributeDBValue(
-    PictureAttribute attributeType, int newValue)
-{
-    QString dbName = QString::null;
-    if (kPictureAttribute_Brightness == attributeType)
-        dbName = "PlaybackBrightness";
-    else if (kPictureAttribute_Contrast == attributeType)
-        dbName = "PlaybackContrast";
-    else if (kPictureAttribute_Colour == attributeType)
-        dbName = "PlaybackColour";
-    else if (kPictureAttribute_Hue == attributeType)
-        dbName = "PlaybackHue";
-    else if (kPictureAttribute_StudioLevels == attributeType)
-        dbName = "PlaybackStudioLevels";
-
-    if (!dbName.isEmpty())
-        gCoreContext->SaveSetting(dbName, newValue);
-
-    db_pict_attr[attributeType] = newValue;
+    return videoColourSpace.GetPictureAttribute(attributeType);
 }
 
 /**

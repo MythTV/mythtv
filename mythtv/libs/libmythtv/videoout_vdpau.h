@@ -118,11 +118,9 @@ class VideoOutputVDPAU : public VideoOutput
 
     MythVDPAUPainter    *m_osd_painter;
 
-    bool                 m_using_piccontrols;
     bool                 m_skip_chroma;
     float                m_denoise;
     float                m_sharpen;
-    bool                 m_studio;
     int                  m_colorspace;
 };
 

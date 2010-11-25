@@ -3119,9 +3119,14 @@ void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
 int VideoOutputXv::SetPictureAttribute(
     PictureAttribute attribute, int newValue)
 {
-    if (!supported_attributes)
-        return -1;
+    newValue = videoColourSpace.SetPictureAttribute(attribute, newValue);
+    if (newValue >= 0)
+        newValue = SetXVPictureAttribute(attribute, newValue);
+    return newValue;
+}
 
+int VideoOutputXv::SetXVPictureAttribute(PictureAttribute attribute, int newValue)
+{
     QString attrName = toXVString(attribute);
     QByteArray ascii_attr_name =  attrName.toAscii();
     const char *cname = ascii_attr_name.constData();
@@ -3130,21 +3135,6 @@ int VideoOutputXv::SetPictureAttribute(
     {
         VERBOSE(VB_IMPORTANT, "\n\n\n attrName.isEmpty() \n\n\n");
         return -1;
-    }
-
-    if (0 == (toMask(attribute) & supported_attributes))
-    {
-        VERBOSE(VB_IMPORTANT, "\n\n\n unsupported attribute \n\n\n");
-        return -1;
-    }
-
-    newValue = min(max(newValue, 0), 100);
-    if (kPictureAttribute_Hue == attribute)
-    {
-        int oldValue = GetPictureAttribute(attribute);
-        newValue = (0 == newValue && oldValue > 0 && oldValue < 5) ?
-            100 : ((100 == newValue && oldValue > 95 && oldValue < 100) ?
-                   0 : newValue);
     }
 
     int port_min = xv_attribute_min[attribute];
@@ -3178,13 +3168,12 @@ int VideoOutputXv::SetPictureAttribute(
     }
 #endif
 
-    SetPictureAttributeDBValue(attribute, newValue);
     return newValue;
 }
 
 void VideoOutputXv::InitPictureAttributes(void)
 {
-    supported_attributes = kPictureAttributeSupported_None;
+    PictureAttributeSupported supported = kPictureAttributeSupported_None;
 
     if (VideoOutputSubType() >= XVideo)
     {
@@ -3208,28 +3197,20 @@ void VideoOutputXv::InitPictureAttributes(void)
             if (xv_is_attrib_supported(disp, xv_port, cname,
                                        &val, &min_val, &max_val))
             {
-                supported_attributes = (PictureAttributeSupported)
-                    (supported_attributes | toMask((PictureAttribute)i));
+                supported = (PictureAttributeSupported)
+                    (supported | toMask((PictureAttribute)i));
                 xv_attribute_min[(PictureAttribute)i] = min_val;
                 xv_attribute_max[(PictureAttribute)i] = max_val;
                 xv_attribute_def[(PictureAttribute)i] = val;
                 VERBOSE(VB_PLAYBACK, LOC + QString("%1: %2:%3:%4")
                     .arg(cname).arg(min_val).arg(val).arg(max_val));
+                SetXVPictureAttribute((PictureAttribute)i,
+                    videoColourSpace.GetPictureAttribute((PictureAttribute)i));
             }
         }
 
-        if (xv_set_defaults)
-            restore_port_attributes(xv_port, false);
+        videoColourSpace.SetSupportedAttributes(supported);
     }
-    else
-    {
-        return;
-    }
-
-    VERBOSE(VB_PLAYBACK, LOC + QString("PictureAttributes: %1")
-            .arg(toString(supported_attributes)));
-
-    VideoOutput::InitPictureAttributes();
 }
 
 void VideoOutputXv::CheckFrameStates(void)

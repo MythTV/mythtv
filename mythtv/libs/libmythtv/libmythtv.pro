@@ -302,12 +302,13 @@ using_frontend {
     HEADERS += jitterometer.h           yuv2rgb.h
     HEADERS += videodisplayprofile.h    mythcodecid.h
     HEADERS += videoouttypes.h          util-osd.h
-    HEADERS += videooutwindow.h
+    HEADERS += videooutwindow.h         videocolourspace.h
     SOURCES += videooutbase.cpp         videoout_null.cpp
     SOURCES += videobuffers.cpp         vsync.cpp
     SOURCES += jitterometer.cpp         yuv2rgb.cpp
     SOURCES += videodisplayprofile.cpp  mythcodecid.cpp
     SOURCES += videooutwindow.cpp       util-osd.cpp
+    SOURCES += videocolourspace.cpp
 
     using_quartz_video: DEFINES += USING_QUARTZ_VIDEO
     using_quartz_video: HEADERS += videoout_quartz.h

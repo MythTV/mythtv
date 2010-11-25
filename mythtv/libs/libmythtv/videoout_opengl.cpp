@@ -458,46 +458,21 @@ void VideoOutputOpenGL::InitPictureAttributes(void)
     if (!gl_context)
         return;
 
-    supported_attributes =(PictureAttributeSupported)
-                          (kPictureAttributeSupported_Brightness |
-                           kPictureAttributeSupported_Contrast |
-                           kPictureAttributeSupported_Colour);
-
-    VERBOSE(VB_PLAYBACK, LOC + QString("PictureAttributes: %1")
-            .arg(toString(supported_attributes)));
-
-    VideoOutput::InitPictureAttributes();
+//    videoColourSpace.SetSupportedAttributes((PictureAttributeSupported)
+//                                       (kPictureAttributeSupported_Brightness |
+//                                        kPictureAttributeSupported_Contrast |
+//                                        kPictureAttributeSupported_Colour |
+//                                        kPictureAttributeSupported_Hue |
+//                                        kPictureAttributeSupported_StudioLevels));
 }
 
-int VideoOutputOpenGL::SetPictureAttribute(
-    PictureAttribute attribute, int newValue)
+int VideoOutputOpenGL::SetPictureAttribute(PictureAttribute attribute,
+                                           int newValue)
 {
-    if (!supported_attributes || !gl_context)
+    if (!gl_context)
         return -1;
 
-    newValue = min(max(newValue, 0), 100);
-
-    uint gl_attrib = kGLAttribNone;
-    switch (attribute)
-    {
-        case kPictureAttribute_Brightness:
-            gl_attrib = kGLAttribBrightness;
-            break;
-        case kPictureAttribute_Contrast:
-            gl_attrib = kGLAttribContrast;
-            break;
-        case kPictureAttribute_Colour:
-            gl_attrib = kGLAttribColour;
-            break;
-        default:
-            newValue = -1;
-    }
-
-    if (gl_attrib != kGLAttribNone)
-        newValue = gl_context->SetPictureAttribute(attribute, newValue);
-    if (newValue >= 0)
-        SetPictureAttributeDBValue(attribute, newValue);
-    return newValue;
+    return videoColourSpace.SetPictureAttribute(attribute, newValue);
 }
 
 bool VideoOutputOpenGL::SetupDeinterlace(

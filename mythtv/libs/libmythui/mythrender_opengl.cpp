@@ -232,26 +232,6 @@ void MythRenderOpenGL::SetFeatures(uint features)
         CreateDefaultShaders();
 }
 
-int MythRenderOpenGL::SetPictureAttribute(int attribute, int newValue)
-{
-    int ret = -1;
-    switch (attribute)
-    {
-        case kGLAttribBrightness:
-            ret = newValue;
-            m_attribs[attribute] = (newValue * 0.02f) - 0.5f;
-            break;
-        case kGLAttribContrast:
-        case kGLAttribColour:
-            ret = newValue;
-            m_attribs[attribute] = (newValue * 0.02f);
-            break;
-        default:
-            break;
-    }
-    return ret;
-}
-
 void MythRenderOpenGL::MoveResizeWindow(const QRect &rect)
 {
     QWidget *parent = (QWidget*)this->device();
@@ -1169,9 +1149,9 @@ void MythRenderOpenGL::DrawBitmapLegacy(uint *textures, uint texture_count,
     EnableFragmentProgram(prog);
     if (colour_control)
     {
-        InitFragmentParams(0, m_attribs[kGLAttribBrightness],
-                           m_attribs[kGLAttribContrast],
-                           m_attribs[kGLAttribColour], 0.5f);
+//        InitFragmentParams(0, m_attribs[kGLAttribBrightness],
+//                           m_attribs[kGLAttribContrast],
+//                           m_attribs[kGLAttribColour], 0.5f);
     }
     SetBlend(false);
     SetColor(255, 255, 255, 255);

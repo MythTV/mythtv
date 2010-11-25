@@ -82,78 +82,6 @@ static const VdpOutputSurfaceRenderBlendState pipblend =
     VDP_OUTPUT_SURFACE_RENDER_BLEND_EQUATION_ADD,
 };
 
-class VDPAUCSCMatrix
-{
-  public:
-    VDPAUCSCMatrix(VdpColorStandard std = VDP_COLOR_STANDARD_ITUR_BT_601,
-                   bool studio = false)
-      : m_std(std), m_studio(studio)
-    {
-        m_procamp.struct_version = VDP_PROCAMP_VERSION;
-        m_procamp.brightness     = 0.0f;
-        m_procamp.contrast       = 1.0f;
-        m_procamp.saturation     = 1.0f;
-        m_procamp.hue            = 0.0f;
-        memset(&m_csc, 0, sizeof(VdpCSCMatrix));
-    }
-    void SetStudioLevels(bool studio) { m_studio = studio; }
-    void SetBrightness(int val) { m_procamp.brightness = (val * 0.02f) - 1.0f; }
-    void SetContrast(int val)   { m_procamp.contrast = (val * 0.02f);          }
-    void SetColour(int val)     { m_procamp.saturation = (val * 0.02f);        }
-    void SetHue(int val)
-    {
-        float new_val = (val * 0.062831853f);
-        if (new_val > 3.14159265f)
-            new_val -= 6.2831853f;
-        m_procamp.hue = new_val;
-    }
-
-    bool ManualUpdate(void)
-    {
-        if (!m_studio)
-            return false;
-
-        static const float color_coeffs[][3] = {{ 0.299, 0.587, 0.114},
-                                                { 0.2125, 0.7154, 0.0721}};
-        int csp = (m_std == VDP_COLOR_STANDARD_ITUR_BT_601) ? 0 : 1;
-        float uvcos = m_procamp.saturation * cos(m_procamp.hue);
-        float uvsin = m_procamp.saturation * sin(m_procamp.hue);
-        float Kr, Kg, Kb;
-        int rgbmin = 16;
-        int chroma_range = 224;
-        int luma_range   = 219;
-
-        Kr = color_coeffs[csp][0];
-        Kg = color_coeffs[csp][1];
-        Kb = color_coeffs[csp][2];
-
-        float uv_coeffs[3][2] = {
-            { 0.000,                              (chroma_range/112.0)*(1-Kr)       },
-            {-(chroma_range/112.0)*(1-Kb)*Kb/Kg, -(chroma_range/112.0)*(1-Kr)*Kr/Kg },
-            { (chroma_range/112.0)*(1-Kb),        0.000                     }
-        };
-
-        for (int i = 0; i < 3; i++)
-        {
-            m_csc[i][3]  = m_procamp.brightness;
-            m_csc[i][0]  = luma_range * m_procamp.contrast / 219;
-            m_csc[i][3] += (-16 / 255.0) * m_csc[i][0];
-            m_csc[i][1]  = uv_coeffs[i][0] * uvcos + uv_coeffs[i][1] * uvsin;
-            m_csc[i][3] += (-128 / 255.0) * m_csc[i][1];
-            m_csc[i][2]  = uv_coeffs[i][0] * uvsin + uv_coeffs[i][1] * uvcos;
-            m_csc[i][3] += (-128 / 255.0) * m_csc[i][2];
-            m_csc[i][3] += rgbmin / 255.0;
-            m_csc[i][3] += 0.5 - m_procamp.contrast / 2.0;
-        }
-        return true;
-    }
-
-    VdpColorStandard m_std;
-    bool             m_studio;
-    VdpProcamp       m_procamp;
-    VdpCSCMatrix     m_csc;
-};
-
 class VDPAUColor
 {
   public:
@@ -280,12 +208,14 @@ class VDPAUVideoMixer : public VDPAUResource
     VDPAUVideoMixer(uint id, QSize size, uint layers, uint features,
                     VdpChromaType type)
      : VDPAUResource(id, size), m_layers(layers), m_features(features),
-      m_type(type), m_csc(NULL), m_noise_reduction(NULL), m_sharpness(NULL),
-      m_skip_chroma(NULL), m_background(NULL) { }
+      m_type(type), m_noise_reduction(NULL), m_sharpness(NULL),
+      m_skip_chroma(NULL), m_background(NULL)
+    {
+        memset(&m_csc, 0, sizeof(VdpCSCMatrix));
+    }
+
    ~VDPAUVideoMixer()
     {
-        if (m_csc)
-            delete m_csc;
         if (m_noise_reduction)
             delete m_noise_reduction;
         if (m_sharpness)
@@ -299,7 +229,7 @@ class VDPAUVideoMixer : public VDPAUResource
     uint            m_layers;
     uint            m_features;
     VdpChromaType   m_type;
-    VDPAUCSCMatrix *m_csc;
+    VdpCSCMatrix    m_csc;
     float          *m_noise_reduction;
     float          *m_sharpness;
     uint8_t        *m_skip_chroma;
@@ -856,9 +786,8 @@ uint MythRenderVDPAU::CreateVideoMixer(const QSize &size, uint layers,
         m_videoMixers[existing].m_type     = type;
         m_videoMixers[existing].m_size     = size;
 
-        if (m_videoMixers[existing].m_csc)
-            SetMixerAttribute(existing, kVDPAttribColour,
-                (int)(m_videoMixers[existing].m_csc->m_procamp.saturation / 0.02f));
+        SetCSCMatrix(existing, &m_videoMixers[existing].m_csc);
+
         if (m_videoMixers[existing].m_noise_reduction)
             SetMixerAttribute(existing, kVDPAttribNoiseReduction,
                             *(m_videoMixers[existing].m_noise_reduction));
@@ -1159,11 +1088,25 @@ bool MythRenderVDPAU::ChangeVideoMixerFeatures(uint id, uint features)
                                    m_videoMixers[id].m_type, id));
 }
 
+void MythRenderVDPAU::SetCSCMatrix(uint id, void* vals)
+{
+    LOCK_RENDER
+    CHECK_STATUS();
+
+    if (!m_videoMixers.contains(id))
+        return;
+
+    memcpy(&m_videoMixers[id].m_csc, vals, sizeof(VdpCSCMatrix));
+
+    VdpVideoMixerAttribute attr = { VDP_VIDEO_MIXER_ATTRIBUTE_CSC_MATRIX };
+    void const * val = { vals };
+    SetMixerAttribute(id, &attr, &val);
+}
+
 int MythRenderVDPAU::SetMixerAttribute(uint id, uint attrib, int value)
 {
     LOCK_RENDER
     CHECK_STATUS(false);
-    INIT_ST
 
     if (!m_videoMixers.contains(id) || attrib > kVDPAttribCSCEnd)
         return -1;
@@ -1190,42 +1133,6 @@ int MythRenderVDPAU::SetMixerAttribute(uint id, uint attrib, int value)
         return SetMixerAttribute(id, &attr, &val);
     }
 
-    if (!m_videoMixers[id].m_csc)
-    {
-        m_videoMixers[id].m_csc = new VDPAUCSCMatrix();
-        if (!m_videoMixers[id].m_csc)
-            return -1;
-    }
-
-    if (attrib == kVDPAttribColorStandard)
-        m_videoMixers[id].m_csc->m_std = value;
-    else if (attrib == kVDPAttribStudioLevels)
-        m_videoMixers[id].m_csc->m_studio = value;
-    else if (attrib == kVDPAttribHue)
-        m_videoMixers[id].m_csc->SetHue(value);
-    else if (attrib == kVDPAttribContrast)
-        m_videoMixers[id].m_csc->SetContrast(value);
-    else if (attrib == kVDPAttribColour)
-        m_videoMixers[id].m_csc->SetColour(value);
-    else if (attrib == kVDPAttribBrightness)
-        m_videoMixers[id].m_csc->SetBrightness(value);
-    else if (attrib == kVDPAttribStudioLevels)
-        m_videoMixers[id].m_csc->SetStudioLevels(value > 0);
-    else
-        return -1;
-
-    if (!m_videoMixers[id].m_csc->ManualUpdate())
-    {
-        vdp_st = vdp_generate_csc_matrix(&(m_videoMixers[id].m_csc->m_procamp),
-                                         m_videoMixers[id].m_csc->m_std,
-                                         &(m_videoMixers[id].m_csc->m_csc));
-        CHECK_ST
-    }
-
-    VdpVideoMixerAttribute attr = { VDP_VIDEO_MIXER_ATTRIBUTE_CSC_MATRIX };
-    void const * val = { &(m_videoMixers[id].m_csc->m_csc) };
-    if (SetMixerAttribute(id, &attr, &val))
-        return value;
     return -1;
 }
 

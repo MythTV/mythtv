@@ -24,13 +24,7 @@ typedef enum
     kVDPAttribNone           = 0x000,
     kVDPAttribBackground     = 0x001,
     kVDPAttribSkipChroma     = 0x002,
-    kVDPAttribBrightness     = 0x004,
-    kVDPAttribContrast       = 0x008,
-    kVDPAttribColour         = 0x010,
-    kVDPAttribHue            = 0x020,
-    kVDPAttribColorStandard  = 0x040,
-    kVDPAttribStudioLevels   = 0x080,
-    kVDPAttribCSCEnd         = kVDPAttribStudioLevels,
+    kVDPAttribCSCEnd         = kVDPAttribSkipChroma,
     kVDPAttribFiltersStart   = 0x100,
     kVDPAttribNoiseReduction = kVDPAttribFiltersStart,
     kVDPAttribSharpness      = 0x200,
@@ -114,6 +108,7 @@ class MPUBLIC MythRenderVDPAU : public MythRender
     bool ChangeVideoMixerFeatures(uint id, uint features);
     int  SetMixerAttribute(uint id, uint attrib, int value);
     bool SetMixerAttribute(uint id, uint attrib, float value);
+    void SetCSCMatrix(uint id, void* vals);
 
     bool UploadBitmap(uint id, void* const plane[1], uint32_t pitch[1]);
     bool UploadMythImage(uint id, MythImage *image);

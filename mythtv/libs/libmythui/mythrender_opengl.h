@@ -22,14 +22,6 @@
 
 typedef enum
 {
-    kGLAttribNone = 0,
-    kGLAttribBrightness,
-    kGLAttribContrast,
-    kGLAttribColour,
-} GLPictureAttribute;
-
-typedef enum
-{
     kGLFeatNone    = 0x0000,
     kGLMultiTex    = 0x0001,
     kGLExtRect     = 0x0002,
@@ -90,7 +82,6 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     int   GetMaxTextureSize(void)    { return m_max_tex_size;   }
     uint  GetFeatures(void)          { return m_exts_supported; }
     void  SetFeatures(uint features);
-    int   SetPictureAttribute(int attribute, int newValue);
 
     void  MoveResizeWindow(const QRect &rect);
     void  SetViewPort(const QSize &size);
@@ -198,7 +189,6 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
 
   private:
     // GL resources
-    QHash<int, float>            m_attribs;
     QHash<GLuint, MythGLTexture> m_textures;
     QHash<GLuint, MythGLShaderObject> m_shader_objects;
     QVector<GLuint>              m_programs;

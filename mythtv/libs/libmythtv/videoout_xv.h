@@ -156,6 +156,7 @@ class VideoOutputXv : public VideoOutput
                          MythPlayer  *pipplayer,
                          PIPLocation  loc);
 
+    int  SetXVPictureAttribute(PictureAttribute attribute, int newValue);
     void InitColorKey(bool turnoffautopaint);
 
     bool InitVideoBuffers(bool use_xv, bool use_shm);
