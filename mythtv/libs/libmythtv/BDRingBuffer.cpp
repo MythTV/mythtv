@@ -302,15 +302,18 @@ bool BDRingBufferPriv::SwitchTitle(uint title)
     m_currentTitleLength = m_currentTitleInfo->duration;
     m_currentTitleAngleCount = m_currentTitleInfo->angle_count;
     m_currentAngle = 0;
+    m_titlesize = bd_get_title_size(bdnav);
     uint32_t chapter_count = m_currentTitleInfo->chapter_count;
     VERBOSE(VB_IMPORTANT, LOC + QString("Selected title: index %1. "
                                         "Duration: %2 (%3 mins) "
-                                        "Number of Chapters: %4 Number of Angles: %5")
+                                        "Number of Chapters: %4 Number of Angles: %5 "
+                                        "Title Size: %6")
                                         .arg(title)
                                         .arg(m_currentTitleLength)
                                         .arg(m_currentTitleLength / (90000 * 60))
                                         .arg(chapter_count)
-                                        .arg(m_currentTitleAngleCount));
+                                        .arg(m_currentTitleAngleCount)
+                                        .arg(m_titlesize));
     VERBOSE(VB_PLAYBACK, LOC + QString("Frame Rate: %1").arg(GetFrameRate()));
     if (chapter_count)
     {
@@ -329,7 +332,6 @@ bool BDRingBufferPriv::SwitchTitle(uint title)
                     .arg(framenum));
         }
     }
-    m_titlesize = bd_get_title_size(bdnav);
     return true;
 }
 
@@ -355,9 +357,17 @@ int BDRingBufferPriv::safe_read(void *data, unsigned sz)
 {
     if (m_is_hdmv_navigation)
     {
-        BD_EVENT event;
-        bd_read_ext(bdnav, (unsigned char *)data, sz, &event);
-        HandleBDEvents();
+        int result = 0;
+        while (result == 0)
+        {
+            BD_EVENT event;
+            result = bd_read_ext(bdnav,
+                                 (unsigned char *)data,
+                                  sz, &event);
+            HandleBDEvent(event);
+            if (result == 0)
+                HandleBDEvents();
+        }
     }
     else
     {
@@ -524,7 +534,8 @@ void BDRingBufferPriv::HandleBDEvent(BD_EVENT &ev)
         case BD_EVENT_TITLE:
             VERBOSE(VB_PLAYBACK|VB_EXTRA,
                     QString("BDRingBuf: EVENT_TITLE %1").arg(ev.param));
-            m_currentTitle = ev.param;
+            m_currentTitle = bd_get_current_title(bdnav);
+            SwitchTitle(m_currentTitle);
             break;
         case BD_EVENT_PLAYLIST:
             VERBOSE(VB_PLAYBACK|VB_EXTRA,
