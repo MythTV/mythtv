@@ -431,7 +431,7 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
 
     unsigned int systemcall_status;
 
-    systemcall_status = myth_system(command);
+    systemcall_status = myth_system(command, kMSRunShell);
     bool succeeded = (systemcall_status == 0);
 
     VERBOSE(VB_XMLTV,
@@ -623,9 +623,10 @@ bool FillData::Run(SourceList &sourcelist)
 
         if (is_grabber_external(xmltv_grabber))
         {
+            uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
             MythSystem grabber_capabilities_proc(xmltv_grabber,
                                                  QStringList("--capabilities"),
-                                                 kMSStdOut|kMSBuffered);
+                                                 flags);
             grabber_capabilities_proc.Run(25);
             if (grabber_capabilities_proc.Wait() != GENERIC_EXIT_OK)
                 VERBOSE(VB_IMPORTANT, QString("%1  --capabilities failed "
@@ -640,6 +641,10 @@ bool FillData::Run(SourceList &sourcelist)
                 {
                     QString capability
                         = ostream.readLine().simplified();
+
+                    if (capability.isEmpty())
+                        continue;
+
                     capabilities += capability + ' ';
 
                     if (capability == "baseline")
@@ -661,10 +666,10 @@ bool FillData::Run(SourceList &sourcelist)
 
         if (hasprefmethod)
         {
-
+            uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
             MythSystem grabber_method_proc(xmltv_grabber,
                                            QStringList("--preferredmethod"),
-                                           kMSStdOut|kMSBuffered);
+                                           flags);
             grabber_method_proc.Run(15);
             if (grabber_method_proc.Wait() != GENERIC_EXIT_OK)
                 VERBOSE(VB_IMPORTANT, QString("%1 --preferredmethod failed"
