@@ -11,6 +11,7 @@
 #include "mpegstreamdata.h"
 #include "dtvrecorder.h"
 #include "tv_rec.h"
+#include "mythverbose.h"
 
 extern "C" {
 extern const uint8_t *ff_find_start_code(const uint8_t *p, const uint8_t *end, uint32_t *state);
@@ -329,7 +330,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     if (hasKeyFrame)
     {
         _last_keyframe_seen = _frames_seen_count;
-        HandleKeyframe();
+        HandleKeyframe(_frames_written_count, TSPacket::SIZE);
     }
 
     if (hasFrame)
@@ -388,7 +389,7 @@ bool DTVRecorder::FindAudioKeyframes(const TSPacket*)
         if (1 == (_frames_seen_count & 0x7))
         {
             _last_keyframe_seen = _frames_seen_count;
-            HandleKeyframe();
+            HandleKeyframe(_frames_written_count);
             hasKeyFrame = true;
         }
 
@@ -416,7 +417,7 @@ bool DTVRecorder::FindOtherKeyframes(const TSPacket *tspacket)
     _frames_written_count++;
     _last_keyframe_seen = _frames_seen_count;
 
-    HandleKeyframe();
+    HandleKeyframe(_frames_written_count);
 
     _has_written_other_keyframe = true;
 
@@ -451,12 +452,14 @@ void DTVRecorder::SetNextRecording(const ProgramInfo *progInf, RingBuffer *rb)
  *  \brief This save the current frame to the position maps
  *         and handles ringbuffer switching.
  */
-void DTVRecorder::HandleKeyframe(uint64_t extra)
+void DTVRecorder::HandleKeyframe(uint64_t frameNum, int64_t extra)
 {
     if (!ringBuffer)
         return;
 
+#if 0
     unsigned long long frameNum = _frames_written_count;
+#endif
 
     _first_keyframe = (_first_keyframe < 0) ? frameNum : _first_keyframe;
 
@@ -466,7 +469,7 @@ void DTVRecorder::HandleKeyframe(uint64_t extra)
     {
         long long startpos = ringBuffer->GetWritePosition();
         // FIXME: handle keyframes with start code spanning over two ts packets
-        startpos += _payload_buffer.size() + extra;
+        startpos += _payload_buffer.size() - extra;
 
         // Don't put negative offsets into the database, they get munged into
         // MAX_INT64 - offset, which is an exceedingly large number, and
@@ -773,17 +776,17 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
             hasKeyFrame &= (_last_seq_seen + maxKFD) < _frames_seen_count;
         }
 
-        if (hasKeyFrame)
-        {
-            _last_keyframe_seen = _frames_seen_count;
-            HandleKeyframe(bufptr - bufstart);
-        }
-
         if (hasFrame)
         {
             _frames_seen_count++;
-            if (!_wait_for_keyframe_option || _first_keyframe>=0)
+            if (!_wait_for_keyframe_option || _first_keyframe >= 0)
                 _frames_written_count++;
+        }
+
+        if (hasKeyFrame)
+        {
+            _last_keyframe_seen = _frames_seen_count;
+            HandleKeyframe(_frames_written_count, bufptr - bufstart);
         }
 
         if ((aspectRatio > 0) && (aspectRatio != m_videoAspect))
@@ -846,6 +849,9 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
     uint64_t rem = (bufend - bufstart);
     _payload_buffer.resize(idx + rem);
     memcpy(&_payload_buffer[idx], bufstart, rem);
+#if 0
+VERBOSE(VB_GENERAL, QString("idx: %1, rem: %2").arg(idx).arg(rem) );
+#endif
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
