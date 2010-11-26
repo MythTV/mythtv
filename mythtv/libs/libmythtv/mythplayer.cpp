@@ -3536,6 +3536,7 @@ bool MythPlayer::EnableEdit(void)
     pausedBeforeEdit = Pause();
     deleteMap.SetEditing(true);
     osd->DialogQuit();
+    ResetCaptions();
     osd->HideAll();
     deleteMap.UpdateSeekAmount(0, video_frame_rate);
     deleteMap.UpdateOSD(framesPlayed, totalFrames, video_frame_rate,
