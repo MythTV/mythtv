@@ -1154,22 +1154,10 @@ field_calc +
 };
 
 static const QString deint_end_top =
-"CMP other, mov, current, other;\n"
 "CMP res,  prev, current, other;\n";
 
 static const QString deint_end_bot =
-"CMP other, mov, current, other;\n"
 "CMP res,  prev, other, current;\n";
-
-static const QString motion_calc =
-"ABS mov, mov;\n"
-"SUB mov, mov, 0.01;\n";
-
-static const QString motion_top =
-"SUB mov, prev, current;\n" + motion_calc;
-
-static const QString motion_bot =
-"SUB mov, res, current;\n" + motion_calc;
 
 static const QString linearblend[2] = {
 "TEX current, tex, texture[1], %1;\n"
@@ -1179,7 +1167,7 @@ static const QString linearblend[2] = {
 "SUB mov, tex, {0.0, %3, 0.0, 0.0};\n"
 "TEX mov, mov, texture[1], %1;\n"
 "LRP other, 0.5, other, mov;\n"
-+ motion_top + field_calc + deint_end_top,
++ field_calc + deint_end_top,
 
 "TEX current, tex, texture[1], %1;\n"
 "SUB other, tex, {0.0, %3, 0.0, 0.0};\n"
@@ -1187,13 +1175,12 @@ static const QString linearblend[2] = {
 "ADD mov, tex, {0.0, %3, 0.0, 0.0};\n"
 "TEX mov, mov, texture[1], %1;\n"
 "LRP other, 0.5, other, mov;\n"
-+ motion_bot + field_calc + deint_end_bot
++ field_calc + deint_end_bot
 };
 
 static const QString kerneldeint[2] = {
 "TEX current, tex, texture[1], %1;\n"
 "TEX prev, tex, texture[2], %1;\n"
-+ motion_top +
 "MUL other, 0.125, prev;\n"
 "MAD other, 0.125, current, other;\n"
 "ADD prev, tex, {0.0, %3, 0.0, 0.0};\n"
@@ -1215,7 +1202,6 @@ static const QString kerneldeint[2] = {
 + field_calc + deint_end_top,
 
 "TEX current, tex, texture[1], %1;\n"
-+ motion_bot +
 "MUL other, 0.125, res;\n"
 "MAD other, 0.125, current, other;\n"
 "ADD prev, tex, {0.0, %3, 0.0, 0.0};\n"
