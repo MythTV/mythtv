@@ -3245,8 +3245,7 @@ void TVRec::GetNextProgram(BrowseDirection direction,
         }
         else if (BROWSE_RIGHT == direction)
         {
-                chanid = channel->GetNextChannel(channum,
-                                                 CHANNEL_DIRECTION_SAME);
+            chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_SAME);
             compare = ">";
             sortorder = "asc";
         }
