@@ -29,6 +29,7 @@
 #include "mythevent.h"
 #include "mythsocket.h"
 #include "mythsystem.h"
+#include "exitcodes.h"
 
 
 static QString LOC = "lcddevice: ";
@@ -138,8 +139,8 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
     }
 
     // check if the 'mythlcdserver' is running
-    unsigned int res = myth_system("ps ch -C mythlcdserver -o pid > /dev/null");
-    if (res == 1)
+    uint flags = kMSRunShell | kMSDontBlockInputDevs | kMSDontDisableDrawing;
+    if (myth_system("ps ch -C mythlcdserver -o pid > /dev/null", flags) == 1)
     {
         // we need to start the mythlcdserver
         VERBOSE(VB_GENERAL, "Starting mythlcdserver");
@@ -757,6 +758,9 @@ QString LCD::quotedString(const QString &s)
 bool LCD::startLCDServer(void)
 {
     QString command = GetInstallPrefix() + "/bin/mythlcdserver -v none &";
+    uint flags = kMSDontBlockInputDevs | kMSDontDisableDrawing | 
+                 kMSRunBackground;
 
-    return( !myth_system(command, kMSProcessEvents | kMSRunBackground) );
+    uint retval = myth_system(command, flags);
+    return( retval == GENERIC_EXIT_RUNNING );
 }
