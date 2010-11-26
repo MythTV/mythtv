@@ -1228,9 +1228,7 @@ bool VideoOutputXv::InitSetupBuffers(void)
     if (xv_port && (VideoOutputSubType() >= XVideo))
         save_port_attributes(xv_port);
 
-    // Initialize the picture controls if we need to..
-    if (db_use_picture_controls)
-        InitPictureAttributes();
+    InitPictureAttributes();
 
     return true;
 }

@@ -2087,20 +2087,6 @@ static HostCheckBox *AltClearSavedPosition()
     return gc;
 }
 
-#if defined(USING_XV) || defined(USING_OPENGL_VIDEO) || defined(USING_VDPAU)
-static HostCheckBox *UsePicControls()
-{
-    HostCheckBox *gc = new HostCheckBox("UseOutputPictureControls");
-    gc->setLabel(QObject::tr("Enable picture controls"));
-    gc->setValue(false);
-    gc->setHelpText(
-        QObject::tr(
-            "If enabled, MythTV attempts to initialize picture controls "
-            "(brightness, contrast, etc.) that are applied during playback."));
-    return gc;
-}
-#endif
-
 // This currently does not work
 /*
 static HostLineEdit *UDPNotifyPort()
@@ -4040,9 +4026,6 @@ PlaybackSettings::PlaybackSettings()
 #ifdef USING_OPENGL_VSYNC
     //general1->addChild(UseOpenGLVSync());
 #endif // USING_OPENGL_VSYNC
-#if defined(USING_XV) || defined(USING_OPENGL_VIDEO) || defined(USING_VDPAU)
-    general1->addChild(UsePicControls());
-#endif // USING_XV
     addChild(general1);
 
     VerticalConfigurationGroup* general2 =

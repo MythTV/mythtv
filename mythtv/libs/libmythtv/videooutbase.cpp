@@ -311,7 +311,6 @@ VideoOutput::VideoOutput() :
     db_aspectoverride(kAspect_Off), db_adjustfill(kAdjustFill_Off),
     db_letterbox_colour(kLetterBoxColour_Black),
     db_deint_filtername(QString::null),
-    db_use_picture_controls(false),
 
     // Video parameters
     video_codec_id(kCodec_NONE),
@@ -357,8 +356,6 @@ VideoOutput::VideoOutput() :
         gCoreContext->GetNumSetting("AdjustFill",          0);
     db_letterbox_colour = (LetterBoxColour)
         gCoreContext->GetNumSetting("LetterboxColour",     0);
-    db_use_picture_controls =
-        gCoreContext->GetNumSetting("UseOutputPictureControls", 0);
 
     if (!gCoreContext->IsDatabaseIgnored())
         db_vdisp_profile = new VideoDisplayProfile();

@@ -284,7 +284,6 @@ class VideoOutput
     AdjustFillMode     db_adjustfill;
     LetterBoxColour    db_letterbox_colour;
     QString            db_deint_filtername;
-    bool               db_use_picture_controls;
 
     // Video parameters
     MythCodecID          video_codec_id;
