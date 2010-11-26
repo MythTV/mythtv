@@ -405,12 +405,15 @@ void MythSystemSignalManager::run(void)
                 readThread->remove(ms->m_stdpipe[2]);
             CLOSE(ms->m_stdpipe[2]);
 
-            ms->m_pmutex.unlock();
-
             if( ms->m_status == GENERIC_EXIT_OK )
                 emit ms->finished();
             else
                 emit ms->error(ms->m_status);
+
+            ms->m_pmutex.unlock();
+
+            if( ms->doAutoCleanup() )
+                delete ms;
         }
     }
 }
@@ -430,11 +433,16 @@ MythSystem::MythSystem(const QString &command, uint flags)
 void MythSystem::SetCommand(const QString &command, uint flags)
 {
     m_status = GENERIC_EXIT_START;
+
     // force shell operation
     flags |= kMSRunShell;
+    m_command = QString(command).trimmed();
+
+    // m_command must be set before this call
     ProcessFlags(flags);
-    m_command = QString(command);
+
     m_logcmd = m_command;
+
     if( flags & kMSAnonLog ) 
     {
         m_logcmd.truncate(m_logcmd.indexOf(" "));
@@ -457,7 +465,7 @@ void MythSystem::SetCommand(const QString &command,
                             const QStringList &args, uint flags)
 {
     m_status = GENERIC_EXIT_START;
-    m_command = QString(command);
+    m_command = QString(command).trimmed();
 
     ProcessFlags(flags);
 
@@ -505,7 +513,8 @@ MythSystem::MythSystem(const MythSystem &other) :
     m_useshell(other.m_useshell),
     m_setdirectory(other.m_setdirectory),
     m_abortonjump(other.m_abortonjump),
-    m_setpgid(other.m_setpgid)
+    m_setpgid(other.m_setpgid),
+    m_autocleanup(other.m_autocleanup)
 {
 }
 
@@ -538,6 +547,9 @@ void MythSystem::Run(time_t timeout)
     HandlePreRun();
 
     m_timeout = timeout;
+    if( timeout )
+        m_timeout += time(NULL);
+
     Fork();
 
     if( manager == NULL )
@@ -563,9 +575,6 @@ void MythSystem::Run(time_t timeout)
         writeThread = new MythSystemIOHandler(false);
         writeThread->start();
     }
-
-    if( timeout )
-        m_timeout += time(NULL);
 
     m_pmutex.lock();
     emit started();
@@ -650,15 +659,25 @@ void MythSystem::ProcessFlags(uint flags)
     m_setdirectory    = false;
     m_abortonjump     = false;
     m_setpgid         = false;
+    m_autocleanup     = false;
 
     if( m_status != GENERIC_EXIT_START )
+    {
+        VERBOSE(VB_IMPORTANT, QString("status: %1").arg(m_status));
         return;
+    }
 
     if( flags & kMSRunBackground )
         m_runinbackground = true;
-    else if( m_command.endsWith("&") )
+
+    if( m_command.endsWith("&") )
     {
-        VERBOSE(VB_GENERAL, "Adding background flag");
+        if (!m_runinbackground)
+            VERBOSE(VB_GENERAL, "Adding background flag");
+
+        // Remove the &
+        m_command.chop(1);
+        m_command = m_command.trimmed();
         m_runinbackground = true;
         m_useshell = true;
     }
@@ -686,10 +705,12 @@ void MythSystem::ProcessFlags(uint flags)
         m_abortonjump = true;
     if( flags & kMSSetPGID )
         m_setpgid = true;
+    if( flags & kMSAutoCleanup && m_runinbackground )
+        m_autocleanup = true;
 }
 
-QByteArray MythSystem::Read(int size)     { return m_stdbuff[1].read(size); }
-QByteArray MythSystem::ReadErr(int size)  { return m_stdbuff[2].read(size); }
+QByteArray  MythSystem::Read(int size)    { return m_stdbuff[1].read(size); }
+QByteArray  MythSystem::ReadErr(int size) { return m_stdbuff[2].read(size); }
 QByteArray& MythSystem::ReadAll()         { return m_stdbuff[1].buffer(); }
 QByteArray& MythSystem::ReadAllErr()      { return m_stdbuff[2].buffer(); }
 
@@ -849,8 +870,9 @@ void MythSystem::Fork()
         m_status = GENERIC_EXIT_RUNNING;
 
         VERBOSE(VB_GENERAL, QString("Managed child (PID: %1) has started! "
-                                            "%2 command=%3, timeout=%4")
+                                            "%2%3 command=%4, timeout=%5")
                     .arg(m_pid) .arg(m_useshell ? "*" : "")
+                    .arg(m_runinbackground ? "&" : "")
                     .arg(m_logcmd) .arg(m_timeout));
 
         /* close unused pipe ends */
@@ -993,10 +1015,13 @@ void MythSystem::Fork()
 
 uint myth_system(const QString &command, uint flags, uint timeout)
 {
-    flags |= kMSRunShell;
-    MythSystem ms = MythSystem(command, flags);
-    ms.Run(timeout);
-    uint result = ms.Wait(0);
+    flags |= kMSRunShell | kMSAutoCleanup;
+    MythSystem *ms = new MythSystem(command, flags);
+    ms->Run(timeout);
+    uint result = ms->Wait(0);
+    if (!(flags & kMSRunBackground))
+        delete ms;
+
     return result;
 }
 

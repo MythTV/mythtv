@@ -20,6 +20,7 @@ typedef enum MythSystemMask {
     kMSAnonLog            = 0x00000800, //< anonymize the logs
     kMSAbortOnJump        = 0x00001000, //< abort this process on a jumppoint
     kMSSetPGID            = 0x00002000, //< set the process group id
+    kMSAutoCleanup        = 0x00004000, //< automatically delete if backgrounded
 } MythSystemFlag;
 
 #ifdef __cplusplus
@@ -119,7 +120,8 @@ class MPUBLIC MythSystem : public QObject
         void USR1()   { Signal(SIGUSR1); };
         void USR2()   { Signal(SIGUSR2); };
 
-        bool isBackground() { return m_runinbackground; };
+        bool isBackground()  { return m_runinbackground; };
+        bool doAutoCleanup() { return m_autocleanup; };
 
         friend class MythSystemManager;
         friend class MythSystemSignalManager;
@@ -164,6 +166,7 @@ class MPUBLIC MythSystem : public QObject
         bool  m_setdirectory;
         bool  m_abortonjump;
         bool  m_setpgid;
+        bool  m_autocleanup;
 };
 
 MPUBLIC unsigned int myth_system(const QString &command, 
