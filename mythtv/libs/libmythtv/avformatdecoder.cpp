@@ -941,7 +941,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     fmt->flags &= ~AVFMT_NOFILE;
 
-    if (!ringBuffer->isDVD() && !livetv)
+    if (!ringBuffer->isDVD() && !ringBuffer->isBD() && !livetv)
         av_estimate_timings(ic, 0);
 
     // Scan for the initial A/V streams
