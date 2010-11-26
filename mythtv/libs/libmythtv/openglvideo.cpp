@@ -928,8 +928,8 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
                          display_visible_rect : frameBufferRect;
         QRectF vrect(display);
 
-        // invert if last filter
-        if (it == filters.begin() && filters.size() > 1)
+        // invert if first filter
+        if (it == filters.begin())
         {
             vrect.setTop((visible.height()) - display.top());
             vrect.setBottom(vrect.top() - (display.height()));
