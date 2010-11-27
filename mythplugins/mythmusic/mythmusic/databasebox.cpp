@@ -442,8 +442,9 @@ void DatabaseBox::BlankCDRW()
 
     QString cmd = QString("cdrecord -v dev=%1 -blank=%2")
         .arg(scsidev).arg(blanktype);
+    uint flags = kMSRunShell | kMSDontBlockInputDevs | kMSDontDisableDrawing;
 
-    if (!myth_system(cmd))
+    if (myth_system(cmd, flags))
     {
         VERBOSE(VB_IMPORTANT, QString("DatabaseBox::BlankCDRW()") +
                 QString(" cmd: '%1' Failed!").arg(cmd));
