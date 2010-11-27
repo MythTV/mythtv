@@ -125,11 +125,13 @@ class MPUBLIC MythSystem : public QObject
 
         friend class MythSystemManager;
         friend class MythSystemSignalManager;
+        friend class MythSystemIOHandler;
 
     signals:
         void started();
         void finished();
         void error(uint status);
+        void readDataReady(int fd);
 
     private:
         void ProcessFlags(uint);

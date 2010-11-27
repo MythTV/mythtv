@@ -31,9 +31,24 @@
 #include "mythverbose.h"
 #include "exitcodes.h"
 
-#define CLOSE(x) if( x >= 0 ) {close(x); x = -1;}
+#define CLOSE(x) \
+if( (x) >= 0 ) { \
+    close((x)); \
+    fdLock.lock(); \
+    delete fdMap.value((x)); \
+    fdMap.remove((x)); \
+    fdLock.unlock(); \
+    (x) = -1; \
+}
 
 typedef QList<MythSystem *> MSList;
+
+typedef struct
+{
+    MythSystem     *ms;
+    int             type;
+} FDType_t;
+typedef QMap<int, FDType_t*> FDMap_t;
 
 /**********************************
  * MythSystemManager method defines
@@ -44,6 +59,8 @@ static MythSystemIOHandler     *readThread = NULL;
 static MythSystemIOHandler     *writeThread = NULL;
 static MSList_t                 msList;
 static QMutex                   listLock;
+static FDMap_t                  fdMap;
+static QMutex                   fdLock;
 
 
 MythSystemIOHandler::MythSystemIOHandler(bool read) :
@@ -128,7 +145,19 @@ void MythSystemIOHandler::HandleRead(int fd, QBuffer *buff)
         }
     }
     else
+    {
         buff->buffer().append(m_readbuf, len);
+
+        // Get the corresponding MythSystem instance, and the stdout/stderr
+        // type
+        fdLock.lock();
+        FDType_t *fdType = fdMap.value(fd);
+        fdLock.unlock();
+
+        // Emit the data ready signal (1 = stdout, 2 = stderr)
+        MythSystem *ms = fdType->ms;
+        emit ms->readDataReady(fdType->type);
+    }
 }
 
 void MythSystemIOHandler::HandleWrite(int fd, QBuffer *buff)
@@ -352,12 +381,28 @@ void MythSystemManager::append(MythSystem *ms)
     m_pMap.insert(ms->m_pid, ms);
     m_mapLock.unlock();
 
+    fdLock.lock();
     if( ms->m_usestdin )
         writeThread->insert(ms->m_stdpipe[0], &(ms->m_stdbuff[0]));
+
     if( ms->m_usestdout )
+    {
+        FDType_t *fdType = new FDType_t;
+        fdType->ms = ms;
+        fdType->type = 1;
+        fdMap.insert( ms->m_stdpipe[1], fdType );
         readThread->insert(ms->m_stdpipe[1], &(ms->m_stdbuff[1]));
+    }
+
     if( ms->m_usestderr )
+    {
+        FDType_t *fdType = new FDType_t;
+        fdType->ms = ms;
+        fdType->type = 2;
+        fdMap.insert( ms->m_stdpipe[2], fdType );
         readThread->insert(ms->m_stdpipe[2], &(ms->m_stdbuff[2]));
+    }
+    fdLock.unlock();
 }
 
 void MythSystemManager::jumpAbort(void)
@@ -409,6 +454,8 @@ void MythSystemSignalManager::run(void)
                 emit ms->finished();
             else
                 emit ms->error(ms->m_status);
+
+            ms->disconnect();
 
             ms->m_pmutex.unlock();
 
@@ -550,8 +597,6 @@ void MythSystem::Run(time_t timeout)
     if( timeout )
         m_timeout += time(NULL);
 
-    Fork();
-
     if( manager == NULL )
     {
         manager = new MythSystemManager;
@@ -575,6 +620,8 @@ void MythSystem::Run(time_t timeout)
         writeThread = new MythSystemIOHandler(false);
         writeThread->start();
     }
+
+    Fork();
 
     m_pmutex.lock();
     emit started();
