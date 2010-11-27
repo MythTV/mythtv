@@ -79,8 +79,10 @@ class Track
     bool          cd_flag;
 };
 
-class Playlist
+class Playlist : public QObject
 {
+    Q_OBJECT
+
   public:
     Playlist(AllMusic *all_music_ptr);
     ~Playlist();
@@ -152,6 +154,10 @@ class Playlist
     int CreateCDMP3(void);
     int CreateCDAudio(void);
 
+  private slots:
+    void mkisofsData(int fd);
+    void cdrecordData(int fd);
+
   private:
     QString             removeDuplicateTracks(const QString &new_songlist);
     int                 playlistid;
@@ -162,6 +168,8 @@ class Playlist
     AllMusic           *all_available_music;
     PlaylistContainer  *parent;
     bool                changed;
+    MythProgressDialog *progress;
+    MythSystem         *proc;
 };
 
 #endif
