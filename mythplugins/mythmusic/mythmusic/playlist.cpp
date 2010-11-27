@@ -1224,17 +1224,20 @@ void Playlist::cdrecordData(int fd)
 
     QByteArray buf;
     if (fd == 1) 
-        buf = proc->ReadAll();
-    else
-        buf = proc->ReadAllErr();
-
-    QTextStream text(buf);
-
-    while (!text.atEnd())
     {
-        if (fd == 1)
+        buf = proc->ReadAll();
+
+        // I would just use the QTextStream::readLine(), but wodim uses \r
+        // to update the same line, so I'm splitting it on \r or \n
+        // Track 01:    6 of  147 MB written (fifo 100%) [buf  99%]  16.3x.
+        QString data(buf);
+        QStringList list = data.split(QRegExp("[\\r\\n]"), 
+                                      QString::SkipEmptyParts);
+
+        for (int i = 0; i < list.size(); i++)
         {
-            QString line = text.readLine();
+            QString line = list.at(i);
+
             if (line.mid(15, 2) == "of")
             {
                 int mbdone  = line.mid(10, 5).trimmed().toInt();
@@ -1246,12 +1249,19 @@ void Playlist::cdrecordData(int fd)
                 }
             }
         }
-        else
+    }
+    else
+    {
+        buf = proc->ReadAllErr();
+
+        QTextStream text(buf);
+
+        while (!text.atEnd())
         {
             QString err = text.readLine();
-            if (err == "cdrecord: Drive needs to reload the media" ||
-                err == "cdrecord: Input/output error." ||
-                err == "cdrecord: No disk / Wrong disk!")
+            if (err.contains("Drive needs to reload the media") ||
+                err.contains("Input/output error.") ||
+                err.contains("No disk / Wrong disk!"))
             {
                 VERBOSE(VB_IMPORTANT, err);
                 proc->Term();
@@ -1284,6 +1294,11 @@ void Playlist::mkisofsData(int fd)
 	    }
         }
     }
+}
+
+void Playlist::processExit(uint retval)
+{
+    procExitVal = retval;
 }
 
 int Playlist::CreateCDMP3(void)
@@ -1418,21 +1433,32 @@ int Playlist::CreateCDMP3(void)
     args << "-R";
 
     uint flags = kMSRunShell | kMSStdErr | kMSBuffered |
-                 kMSDontDisableDrawing | kMSDontBlockInputDevs;
+                 kMSDontDisableDrawing | kMSDontBlockInputDevs | 
+                 kMSRunBackground;
 
     proc = new MythSystem(command, args, flags);
 
-    connect(proc, SIGNAL(dataReady(int)), this, SLOT(mkisofsData(int)));
+    connect(proc, SIGNAL(readDataReady(int)), this, SLOT(mkisofsData(int)), 
+            Qt::DirectConnection);
+    connect(proc, SIGNAL(finished()),         this, SLOT(processExit()), 
+            Qt::DirectConnection);
+    connect(proc, SIGNAL(error(uint)),        this, SLOT(processExit(uint)), 
+            Qt::DirectConnection);
+
+    procExitVal = GENERIC_EXIT_RUNNING;
     proc->Run();
 
-    uint retval = proc->Wait();
+    while( procExitVal == GENERIC_EXIT_RUNNING )
+        usleep( 100000 );
+
+    uint retval = procExitVal;
 
     progress->Close();
     progress->deleteLater();
     proc->disconnect();
     delete proc;
 
-    if (!retval)
+    if (retval)
     {
         VERBOSE(VB_IMPORTANT, QString("Unable to run mkisofs: returns %1")
                 .arg(retval));
@@ -1446,8 +1472,7 @@ int Playlist::CreateCDMP3(void)
         args = QStringList();
         args << "-v";
         //args << "-dummy";
-        args << "dev=";
-        args << scsidev;
+        args << QString("dev=%1").arg(scsidev);
 
         if (writespeed.toInt() > 0)
         {
@@ -1459,19 +1484,30 @@ int Playlist::CreateCDMP3(void)
         args << tmprecordisofs;
 
         flags = kMSRunShell | kMSStdErr | kMSStdOut | kMSBuffered |
-                kMSDontDisableDrawing | kMSDontBlockInputDevs;
+                kMSDontDisableDrawing | kMSDontBlockInputDevs |
+                kMSRunBackground;
 
         proc = new MythSystem(command, args, flags);
-        connect(proc, SIGNAL(dataReady(int)), this, SLOT(cdrecordData(int)));
+        connect(proc, SIGNAL(readDataReady(int)), 
+                this, SLOT(cdrecordData(int)), Qt::DirectConnection);
+        connect(proc, SIGNAL(finished()),
+                this, SLOT(processExit()), Qt::DirectConnection);
+        connect(proc, SIGNAL(error(uint)),
+                this, SLOT(processExit(uint)), Qt::DirectConnection);
+        procExitVal = GENERIC_EXIT_RUNNING;
         proc->Run();
-        retval = proc->Wait();
+
+        while( procExitVal == GENERIC_EXIT_RUNNING )
+            usleep( 100000 );
+
+        retval = procExitVal;
 
         progress->Close();
         progress->deleteLater();
         proc->disconnect();
         delete proc;
 
-        if (!retval)
+        if (retval)
         {
             VERBOSE(VB_IMPORTANT, QString("Unable to run cdrecord: returns %1")
                     .arg(retval));
