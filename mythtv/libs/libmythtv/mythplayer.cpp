@@ -3185,7 +3185,7 @@ void MythPlayer::ChangeSpeed(void)
         videoOutput->SetPrebuffering(ffrew_skip == 1);
         decoder->setExactSeeks(exactseeks && ffrew_skip == 1);
         if (play_speed != 0.0f && !(last_speed == 0.0f && ffrew_skip == 1))
-            DoJumpToFrame(framesPlayed);
+            DoJumpToFrame(framesPlayed + fftime - rewindtime);
     }
 
     VERBOSE(VB_PLAYBACK, LOC + "Play speed: " +
