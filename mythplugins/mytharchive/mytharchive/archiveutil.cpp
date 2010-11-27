@@ -240,7 +240,7 @@ bool getFileDetails(ArchiveItem *a)
     QString command = QString("mytharchivehelper -i \"%1\" \"%2\" %3 > /dev/null 2>&1")
             .arg(inFile).arg(outFile).arg(lenMethod);
 
-    if (!myth_system(command))
+    if (myth_system(command))
         return false;
 
     QDomDocument doc("mydocument");

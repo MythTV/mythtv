@@ -205,7 +205,7 @@ static bool createISOImage(QString &sourceDirectory)
     command += tempDirectory + "mythburn.iso " + sourceDirectory;
 
     unsigned int res;
-    if (!(res = myth_system(command)))
+    if ((res = myth_system(command)))
     {
         VERBOSE(VB_JOBQUEUE, QString("ERROR: Failed while running mkisofs. Result: %1")
                 .arg(res));
@@ -261,7 +261,7 @@ static int burnISOImage(int mediaType, bool bEraseDVDRW, bool nativeFormat)
     }
 
     unsigned int res;
-    if (!(res = myth_system(command)))
+    if ((res = myth_system(command)))
         VERBOSE(VB_JOBQUEUE,
                 QString("ERROR: Failed while running growisofs. Result: %1")
                 .arg(res));

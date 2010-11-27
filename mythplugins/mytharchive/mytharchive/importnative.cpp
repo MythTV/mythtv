@@ -427,7 +427,7 @@ void ImportNative::finishedPressed()
     commandline = "mytharchivehelper -f \"" + m_xmlFile + "\" " + chanID;
     commandline += " > "  + logDir + "/progress.log 2>&1 &";
 
-    if (!myth_system(commandline, kMSRunBackground))
+    if (myth_system(commandline, kMSRunBackground))
     {
         ShowOkPopup(tr("It was not possible to import the Archive. "
                        " An error occured when running 'mytharchivehelper'") );

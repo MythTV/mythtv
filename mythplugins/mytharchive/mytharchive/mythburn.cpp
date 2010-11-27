@@ -942,7 +942,7 @@ void MythBurn::runScript()
 
     gCoreContext->SaveSetting("MythArchiveLastRunStatus", "Running");
 
-    if (!myth_system(commandline, kMSRunBackground))
+    if (myth_system(commandline, kMSRunBackground))
     {
         ShowOkPopup(tr("It was not possible to create the DVD. "
                        " An error occured when running the scripts"));
@@ -1193,7 +1193,7 @@ void BurnMenu::doBurn(int mode)
     commandline = "mytharchivehelper -b " + sArchiveFormat +
                   " " + sEraseDVDRW  + " " + sNativeFormat;
     commandline += " > "  + logDir + "/progress.log 2>&1 &";
-    if (!myth_system(commandline, kMSRunBackground))
+    if (myth_system(commandline, kMSRunBackground))
     {
         showWarningDialog(QObject::tr("It was not possible to run "
                                       "mytharchivehelper to burn the DVD."));

@@ -621,8 +621,6 @@ static int shutdown()
                     + nvramCommand);
 
             shutdownmode = myth_system(nvramCommand);
-            if (WIFEXITED(shutdownmode))
-                shutdownmode = WEXITSTATUS(shutdownmode);
 
             VERBOSE(VB_IMPORTANT, (nvramCommand + " exited with code %2")
                                   .arg(shutdownmode));

@@ -465,7 +465,7 @@ void ExportNative::runScript()
     commandline = "mytharchivehelper -n " + configDir + "/mydata.xml";  // job file
     commandline += " > "  + logDir + "/progress.log 2>&1 &";            // Logs
 
-    if (!myth_system(commandline, kMSRunBackground))
+    if (myth_system(commandline, kMSRunBackground))
     {
         ShowOkPopup(QObject::tr("It was not possible to create the DVD. "
                                 "An error occured when running the scripts") );

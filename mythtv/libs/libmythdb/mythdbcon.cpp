@@ -97,7 +97,7 @@ bool MSqlDatabase::OpenDatabase()
                          "Using WOL to wakeup database server (Try %1 of %2)")
                          .arg(trycount).arg(dbparms.wolRetry));
 
-                if (!myth_system(dbparms.wolCommand))
+                if (myth_system(dbparms.wolCommand))
                 {
                     VERBOSE(VB_IMPORTANT,
                             QString("Failed to run WOL command '%1'")
