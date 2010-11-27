@@ -1933,7 +1933,7 @@ void MythMainWindow::customEvent(QEvent *ce)
             if (screen)
                 screen->gestureEvent(ge);
         }
-        VERBOSE(VB_IMPORTANT, QString("Gesture: %1")
+        VERBOSE(VB_GUI, QString("Gesture: %1")
                 .arg(QString(*ge).toLocal8Bit().constData()));
     }
     else if (ce->type() == MythEvent::kExitToMainMenuEventType &&
