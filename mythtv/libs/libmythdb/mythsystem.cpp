@@ -582,21 +582,13 @@ void MythSystem::SetDirectory(const QString &directory)
  */
 void MythSystem::Run(time_t timeout)
 {
-    // runs pre_flags
-    // forks child process
-    // spawns manager and hand off self
     if( m_status != GENERIC_EXIT_START )
     {
         emit error(m_status);
         return;
     }
 
-    HandlePreRun();
-
-    m_timeout = timeout;
-    if( timeout )
-        m_timeout += time(NULL);
-
+    // Start the threads if they haven't been started yet.
     if( manager == NULL )
     {
         manager = new MythSystemManager;
@@ -621,7 +613,18 @@ void MythSystem::Run(time_t timeout)
         writeThread->start();
     }
 
+
+    // Handle any locking of drawing, etc
+    HandlePreRun();
+
+    m_timeout = timeout;
+
     Fork();
+
+    // Do this after Fork() so the displayed timeout in the logs looks right
+    if( timeout )
+        m_timeout += time(NULL);
+
 
     m_pmutex.lock();
     emit started();
