@@ -93,6 +93,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
 
     memory_corruption_test0(0xdeadbeef),
     memory_corruption_test1(0xdeadbeef),
+    src_out(NULL),              kAudioSRCOutputSize(0),
     memory_corruption_test2(0xdeadbeef),
     memory_corruption_test3(0xdeadbeef)
 {
@@ -100,7 +101,6 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     // The following are not bzero() because MS Windows doesn't like it.
     memset(&src_data,          0, sizeof(SRC_DATA));
     memset(src_in,             0, sizeof(float) * kAudioSRCInputSize);
-    memset(src_out,            0, sizeof(float) * kAudioSRCOutputSize);
     memset(audiobuffer,        0, sizeof(char)  * kAudioRingBufferSize);
 
     // Default SRC quality - QUALITY_HIGH is quite expensive
@@ -474,6 +474,16 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
         src_data.src_ratio      = (double)samplerate / settings.samplerate;
         src_data.data_in        = src_in;
+        if (kAudioSRCOutputSize < (int)
+            ((float)kAudioSRCInputSize * samplerate / settings.samplerate) + 1)
+        {
+            kAudioSRCOutputSize = (int)
+                ((float) kAudioSRCInputSize * samplerate /
+                 settings.samplerate) + 1;
+            if (src_out)
+                delete[] src_out;
+            src_out = new float[kAudioSRCOutputSize];
+        }
         src_data.data_out       = src_out;
         src_data.output_frames  = kAudioSRCOutputSize;
         src_data.end_of_input = 0;
@@ -645,6 +655,12 @@ void AudioOutputBase::KillAudio()
     if (src_ctx)
     {
         src_delete(src_ctx);
+        if (kAudioSRCOutputSize > 0)
+        {            
+            kAudioSRCOutputSize = 0;
+            delete[] src_out;
+            src_out = NULL;
+        }
         src_ctx = NULL;
     }
 
