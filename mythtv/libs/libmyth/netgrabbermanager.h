@@ -65,7 +65,6 @@ class MPUBLIC GrabberScript : public QThread
     QString     m_description;
     QString     m_commandline;
     double      m_version;
-    MythSystem  m_getTree;
 };
 Q_DECLARE_METATYPE(GrabberScript *);
 
@@ -173,7 +172,7 @@ class MPUBLIC Search : public QObject
 
   private slots:
 
-    void slotProcessSearchExit(int exitcode = 0);
+    void slotProcessSearchExit(uint exitcode = 0);
 };
 
 #endif

@@ -48,11 +48,11 @@ void GrabberScript::run()
     QMutexLocker locker(&m_lock);
 
     QString commandline = m_commandline;
-    m_getTree.SetCommand(commandline, QStringList() << "-T",
-                         kMSStdOut | kMSBuffered);
+    MythSystem getTree(commandline, QStringList("-T"),
+                       kMSRunShell | kMSStdOut | kMSBuffered);
+    getTree.Run(900);
+    int status = getTree.Wait();
 
-    m_getTree.Run(900);
-    int status = m_getTree.Wait();
     if( status == GENERIC_EXIT_CMD_NOT_FOUND )
         VERBOSE(VB_IMPORTANT, LOC + QString("Internet Content Source %1 "
                             "cannot run, file missing.").arg(m_title));
@@ -61,7 +61,7 @@ void GrabberScript::run()
         VERBOSE(VB_IMPORTANT, LOC + QString("Internet Content Source %1 "
                            "completed download, beginning processing...").arg(m_title));
 
-        QByteArray result = m_getTree.ReadAll();
+        QByteArray result = getTree.ReadAll();
 
 	QDomDocument domDoc;
         domDoc.setContent(result, true);
@@ -250,6 +250,7 @@ void Search::executeSearch(const QString &script, const QString &query, uint pag
 {
     resetSearch();
 
+VERBOSE(VB_IMPORTANT, "Search::executeSearch");
     m_searchProcess = new MythSystem();
 
     connect(m_searchProcess, SIGNAL(finished()), this, SLOT(slotProcessSearchExit()));
@@ -271,8 +272,8 @@ void Search::executeSearch(const QString &script, const QString &query, uint pag
     VERBOSE(VB_GENERAL|VB_EXTRA, LOC + QString("Internet Search Query: %1 %2")
                                         .arg(cmd).arg(args.join(" ")));
 
-    m_searchProcess->SetCommand(cmd, args, 
-                                kMSStdOut | kMSBuffered | kMSRunBackground );
+    uint flags = kMSRunShell | kMSStdOut | kMSBuffered | kMSRunBackground;
+    m_searchProcess->SetCommand(cmd, args, flags);
     m_searchProcess->Run(40);
 }
 
@@ -339,7 +340,7 @@ void Search::process()
 
 }
 
-void Search::slotProcessSearchExit(int exitcode)
+void Search::slotProcessSearchExit(uint exitcode)
 {
     if (exitcode == GENERIC_EXIT_TIMEOUT)
     {
