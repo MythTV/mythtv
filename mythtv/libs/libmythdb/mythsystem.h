@@ -169,6 +169,7 @@ class MPUBLIC MythSystem : public QObject
         bool  m_abortonjump;
         bool  m_setpgid;
         bool  m_autocleanup;
+        bool  m_anonlog;
 };
 
 MPUBLIC unsigned int myth_system(const QString &command, 

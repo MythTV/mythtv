@@ -23,7 +23,6 @@
 #include <QMap>
 #include <QString>
 #include <QStringList>
-#include <QVector>
 
 // libmythdb headers
 #include "mythcorecontext.h"
@@ -484,17 +483,12 @@ void MythSystem::SetCommand(const QString &command, uint flags)
     // force shell operation
     flags |= kMSRunShell;
     m_command = QString(command).trimmed();
+    m_args = QStringList();
 
     // m_command must be set before this call
     ProcessFlags(flags);
 
     m_logcmd = m_command;
-
-    if( flags & kMSAnonLog ) 
-    {
-        m_logcmd.truncate(m_logcmd.indexOf(" "));
-        m_logcmd.append(" (anonymized)");
-    }
 }
 
 
@@ -513,29 +507,15 @@ void MythSystem::SetCommand(const QString &command,
 {
     m_status = GENERIC_EXIT_START;
     m_command = QString(command).trimmed();
+    m_args = QStringList(args);
 
     ProcessFlags(flags);
 
-    if( m_useshell ) 
-    {
-        m_command += " ";
-        m_command += QString(args.join(" "));
-    }
-    else
-    {
-        // check for execute rights
-        if( !access(command.toUtf8().constData(), X_OK) )
-            m_status = GENERIC_EXIT_CMD_NOT_FOUND;
-        else
-            m_args = QStringList(args);
-    }
+    // check for execute rights
+    if( !m_useshell && !access(command.toUtf8().constData(), X_OK) )
+        m_status = GENERIC_EXIT_CMD_NOT_FOUND;
 
-    m_logcmd = m_command;
-    if( flags & kMSAnonLog )
-    {
-        m_logcmd.truncate(m_logcmd.indexOf(" "));
-        m_logcmd.append(" (anonymized)");
-    }
+    m_logcmd = m_command + " " + m_args.join(" ");
 }
 
 
@@ -561,7 +541,8 @@ MythSystem::MythSystem(const MythSystem &other) :
     m_setdirectory(other.m_setdirectory),
     m_abortonjump(other.m_abortonjump),
     m_setpgid(other.m_setpgid),
-    m_autocleanup(other.m_autocleanup)
+    m_autocleanup(other.m_autocleanup),
+    m_anonlog(other.m_anonlog)
 {
 }
 
@@ -710,6 +691,7 @@ void MythSystem::ProcessFlags(uint flags)
     m_abortonjump     = false;
     m_setpgid         = false;
     m_autocleanup     = false;
+    m_anonlog         = false;
 
     if( m_status != GENERIC_EXIT_START )
     {
@@ -757,6 +739,8 @@ void MythSystem::ProcessFlags(uint flags)
         m_setpgid = true;
     if( flags & kMSAutoCleanup && m_runinbackground )
         m_autocleanup = true;
+    if( flags & kMSAnonLog )
+        m_anonlog = true;
 }
 
 QByteArray  MythSystem::Read(int size)    { return m_stdbuff[1].read(size); }
@@ -817,6 +801,12 @@ void MythSystem::HandlePostRun()
 #define MAX_BUFLEN 1024
 void MythSystem::Fork()
 {
+    if( m_anonlog )
+    {
+        m_logcmd.truncate(m_logcmd.indexOf(" "));
+        m_logcmd.append(" (anonymized)");
+    }
+
     QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(m_logcmd);
 
     // For use in the child
@@ -867,38 +857,27 @@ void MythSystem::Fork()
     }
 
     // set up command args
-    const char *command;
+    if (m_useshell)
+    {
+        QStringList args = QStringList("-c");
+        args << m_command + " " + m_args.join(" ");
+        m_args = QStringList(args);
+        m_command = "/bin/sh";
+    }
+    m_args.prepend(m_command.split('/').last());
+
     QByteArray cmdUTF8 = m_command.toUtf8();
-    QVector<const char *> _cmdargs;
-    if( m_useshell )
-    {
-        command = strdup("/bin/sh");
-        _cmdargs << "sh" << "-c"
-                 << cmdUTF8.constData() << (char *)0;
-    }
-    else
-    {
-        command = strdup(m_command.toUtf8().constData());
-        _cmdargs << m_command.split('/').last().toUtf8().constData();
+    const char *command = strdup(cmdUTF8.constData());
 
-        QStringList::const_iterator it = m_args.constBegin();
-        while( it != m_args.constEnd() )
-        {
-                _cmdargs << it->toUtf8().constData();
-                it++;
-        }
-        _cmdargs << (char *)0;
-    }
-
-    char **cmdargs = (char **)malloc(_cmdargs.size() * sizeof(char *));
+    char **cmdargs = (char **)malloc((m_args.size() + 1) * sizeof(char *));
     int i;
-    for( i = 0; i < _cmdargs.size(); ++i )
+    QStringList::const_iterator it;
+
+    for( i = 0, it = m_args.constBegin(); it != m_args.constEnd(); it++, i++ )
     {
-        if (_cmdargs.at(i) == NULL)
-            cmdargs[i] = NULL;
-        else
-            cmdargs[i] = strdup(_cmdargs.at(i));
+        cmdargs[i] = strdup( it->toUtf8().constData() );
     }
+    cmdargs[i] = NULL;
 
     const char *directory = NULL;
     if (m_setdirectory && !m_directory.isEmpty())
