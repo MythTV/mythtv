@@ -1887,7 +1887,7 @@ long long RingBuffer::Seek(long long pos, int whence, bool has_lock)
     }
 #endif
 
-#if 1
+#if 0
     // This optimizes the seek end-250000, read, seek 0, read portion 
     // of the pattern ffmpeg performs at the start of playback to
     // determine the pts.
@@ -1986,8 +1986,6 @@ long long RingBuffer::Seek(long long pos, int whence, bool has_lock)
                 readsallowed = false;
             }
 
-            rbwlock.unlock();
-            rbrlock.unlock();
             poslock.unlock();
 
             generalWait.wakeAll();
