@@ -114,6 +114,12 @@ typedef enum {
     BLURAY_TEXT_CHAR_CODE_BIG5            = 0x07
 } bd_char_code_e;
 
+typedef enum {
+    BLURAY_STILL_NONE     = 0x00,
+    BLURAY_STILL_TIME     = 0x01,
+    BLURAY_STILL_INFINITE = 0x02,
+} bd_still_mode_e;
+
 typedef struct bd_stream_info {
     uint8_t     coding_type;
     uint8_t     format;
@@ -126,6 +132,8 @@ typedef struct bd_stream_info {
 
 typedef struct bd_clip {
     uint32_t           pkt_count;
+    uint8_t            still_mode;
+    uint16_t           still_time;  /* seconds */
     uint8_t            video_stream_count;
     uint8_t            audio_stream_count;
     uint8_t            pg_stream_count;
