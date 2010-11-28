@@ -10,6 +10,7 @@
 #include "mythuihelper.h"
 #include "mythsystem.h"
 #include "metadatadownload.h"
+#include "util.h"
 
 QEvent::Type MetadataLookupEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
@@ -174,7 +175,7 @@ MetadataLookupList MetadataDownload::runGrabber(QString cmd, QStringList args,
                                                 MetadataLookup* lookup,
                                                 bool passseas)
 {
-    MythSystem grabber(cmd, args, kMSStdOut | kMSBuffered);
+    MythSystem grabber(cmd, args, kMSRunShell | kMSStdOut | kMSBuffered);
     MetadataLookupList list;
 
     VERBOSE(VB_GENERAL, QString("Running Grabber: %1 %2")
@@ -225,7 +226,8 @@ MetadataLookupList MetadataDownload::handleGame(MetadataLookup* lookup)
     if (lookup->GetStep() == SEARCH)
     {
         args.append(QString("-M"));
-        args.append(lookup->GetTitle());
+        QString title = lookup->GetTitle();
+        args.append(ShellEscape(title));
     }
     else if (lookup->GetStep() == GETDATA)
     {
@@ -261,7 +263,8 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup* lookup)
     if (lookup->GetStep() == SEARCH)
     {
         args.append(QString("-M"));
-        args.append(lookup->GetTitle());
+        QString title = lookup->GetTitle();
+        args.append(ShellEscape(title));
     }
     else if (lookup->GetStep() == GETDATA)
     {
@@ -327,8 +330,10 @@ MetadataLookupList MetadataDownload::handleVideoUndetermined(
     args.append(QString("-l")); // Language Flag
     args.append(gCoreContext->GetLanguage()); // UI Language
     args.append(QString("-N"));
-    args.append(lookup->GetTitle());
-    args.append(lookup->GetSubtitle());
+    QString title = lookup->GetTitle();
+    args.append(ShellEscape(title));
+    QString subtitle = lookup->GetSubtitle();
+    args.append(ShellEscape(subtitle));
 
     // Try to do a title/subtitle lookup
     list = runGrabber(cmd, args, lookup, false);
