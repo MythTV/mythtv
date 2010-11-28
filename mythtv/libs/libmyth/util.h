@@ -88,6 +88,7 @@ MPUBLIC bool myth_FileIsDVD(const QString &filename);
 MPUBLIC bool myth_FileIsBD(const QString &filename);
 
 MPUBLIC bool RemoveDirectory(QDir &aDir);
+MPUBLIC QString &ShellEscape(QString &string);
 
 // CPU Tick timing function
 #ifdef MMX

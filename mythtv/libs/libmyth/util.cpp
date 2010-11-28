@@ -1362,4 +1362,18 @@ bool RemoveDirectory(QDir &aDir)
     return(has_err);
 }
 
+MPUBLIC QString &ShellEscape(QString &string)
+{
+    if (string.contains("\""))
+        string = string.replace("\"", "\\\"");
+
+    if (string.contains(" "))
+    {
+        string.prepend("\"");
+        string.append("\"");
+    }
+
+    return string;
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
