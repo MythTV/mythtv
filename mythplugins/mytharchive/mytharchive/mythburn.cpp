@@ -27,6 +27,7 @@
 #include <mythuiprogressbar.h>
 #include <util.h>
 #include <mythsystem.h>
+#include <exitcodes.h>
 
 // mytharchive
 #include "archiveutil.h"
@@ -942,7 +943,10 @@ void MythBurn::runScript()
 
     gCoreContext->SaveSetting("MythArchiveLastRunStatus", "Running");
 
-    if (myth_system(commandline, kMSRunBackground))
+    uint flags = kMSRunBackground | kMSDontBlockInputDevs | 
+                 kMSDontDisableDrawing;
+    uint retval = myth_system(commandline, flags);
+    if (retval != GENERIC_EXIT_RUNNING && retval != GENERIC_EXIT_OK)
     {
         ShowOkPopup(tr("It was not possible to create the DVD. "
                        " An error occured when running the scripts"));
@@ -1193,7 +1197,11 @@ void BurnMenu::doBurn(int mode)
     commandline = "mytharchivehelper -b " + sArchiveFormat +
                   " " + sEraseDVDRW  + " " + sNativeFormat;
     commandline += " > "  + logDir + "/progress.log 2>&1 &";
-    if (myth_system(commandline, kMSRunBackground))
+
+    uint flags = kMSRunBackground | kMSDontBlockInputDevs | 
+                 kMSDontDisableDrawing;
+    uint retval = myth_system(commandline, flags);
+    if (retval != GENERIC_EXIT_RUNNING && retval != GENERIC_EXIT_OK)
     {
         showWarningDialog(QObject::tr("It was not possible to run "
                                       "mytharchivehelper to burn the DVD."));

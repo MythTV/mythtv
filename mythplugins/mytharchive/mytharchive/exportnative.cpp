@@ -23,6 +23,7 @@
 #include <mythuiprogressbar.h>
 #include <mythmainwindow.h>
 #include <mythsystem.h>
+#include <exitcodes.h>
 
 // mytharchive
 #include "exportnative.h"
@@ -465,15 +466,17 @@ void ExportNative::runScript()
     commandline = "mytharchivehelper -n " + configDir + "/mydata.xml";  // job file
     commandline += " > "  + logDir + "/progress.log 2>&1 &";            // Logs
 
-    if (myth_system(commandline, kMSRunBackground))
+    uint flags = kMSRunBackground | kMSDontBlockInputDevs | 
+                 kMSDontDisableDrawing;
+    uint retval = myth_system(commandline, flags);
+    if (retval != GENERIC_EXIT_RUNNING && retval != GENERIC_EXIT_OK)
     {
         ShowOkPopup(QObject::tr("It was not possible to create the DVD. "
                                 "An error occured when running the scripts") );
+        return;
     }
-    else
-    {
-        showLogViewer();
-    }
+
+    showLogViewer();
 }
 
 void ExportNative::handleAddRecording()

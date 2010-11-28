@@ -351,10 +351,12 @@ int NativeArchive::doNativeArchive(const QString &jobFile)
         saveDirectory += "work/";
 
         QDir dir(saveDirectory);
-        if (!RemoveDirectory(dir))
-            VERBOSE(VB_IMPORTANT, "NativeArchive: Failed to clear work directory");
-        else
-            dir.mkdir(saveDirectory);
+        if (dir.exists())
+        {
+            if (!RemoveDirectory(dir))
+                VERBOSE(VB_IMPORTANT, "NativeArchive: Failed to clear work directory");
+        }
+        dir.mkpath(saveDirectory);
     }
 
     VERBOSE(VB_JOBQUEUE, QString("Saving files to : %1").arg(saveDirectory));
@@ -449,7 +451,9 @@ int NativeArchive::exportRecording(QDomElement   &itemNode,
     // create the directory to hold this items files
     QDir dir(saveDirectory + title);
     if (!dir.exists())
-        dir.mkdir(saveDirectory + title);
+        dir.mkpath(saveDirectory + title);
+    if (!dir.exists())
+        VERBOSE(VB_IMPORTANT, strerror(errno));
 
     VERBOSE(VB_JOBQUEUE, "Creating xml file for " + title);
     QDomDocument doc("MYTHARCHIVEITEM");
@@ -2877,7 +2881,7 @@ int main(int argc, char **argv)
     else
         showUsage();
 
-    return res;
+    exit(res);
 }
 
 
