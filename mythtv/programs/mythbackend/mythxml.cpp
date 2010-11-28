@@ -1647,9 +1647,8 @@ void MythXML::GetInternetSources( HTTPRequest *pRequest )
             i != Grabbers.end(); ++i)
     {
         QString commandline = GrabberDir + (*i);
-        MythSystem scriptcheck(commandline, QStringList() << "-v",
-                               kMSStdOut|kMSBuffered);
-
+        MythSystem scriptcheck(commandline, QStringList("-v"),
+                               kMSRunShell | kMSStdOut | kMSBuffered);
         scriptcheck.Run();
         scriptcheck.Wait();
         QByteArray result = scriptcheck.ReadAll();
