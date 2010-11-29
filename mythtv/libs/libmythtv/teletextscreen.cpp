@@ -43,14 +43,15 @@ TeletextScreen::TeletextScreen(MythPlayer *player, const char * name,
                                int fontStretch) :
     MythScreenType((MythScreenType*)NULL, name),
     m_player(player),           m_safeArea(QRect()),
-    m_colSize(10),              m_rowSize(10),
+    m_colWidth(10),             m_rowHeight(10),
     m_fetchpage(0),             m_fetchsubpage(0),
     m_bgColor(QColor(kColorBlack)),
     m_curpage(0x100),           m_cursubpage(-1),
     m_curpage_showheader(true), m_curpage_issubtitle(false),
     m_transparent(false),       m_revealHidden(false),
     m_displaying(false),        m_header_changed(false),
-    m_page_changed(false),      m_fontStretch(fontStretch)
+    m_page_changed(false),      m_fontStretch(fontStretch),
+    m_fontHeight(10)
 {
     memset(m_pageinput, 0, sizeof(m_pageinput));
     memset(m_header,    0, sizeof(m_header));
@@ -86,10 +87,10 @@ void TeletextScreen::CleanUp(void)
 QImage* TeletextScreen::GetRowImage(int row, QRect &rect)
 {
     int y   = row & ~1;
-    rect.translate(0, -(y * m_rowSize));
+    rect.translate(0, -(y * m_rowHeight));
     if (!m_rowImages.contains(y))
     {
-        QImage* img = new QImage(m_safeArea.width(), m_rowSize * 2,
+        QImage* img = new QImage(m_safeArea.width(), m_rowHeight * 2,
                                  QImage::Format_ARGB32);
         if (img)
         {
@@ -126,8 +127,8 @@ void TeletextScreen::OptimiseDisplayedArea(void)
         if (uiimage)
         {
             uiimage->SetImage(image);
-            uiimage->SetArea(MythRect(0, row * m_rowSize,
-                                      m_safeArea.width(), m_rowSize * 2));
+            uiimage->SetArea(MythRect(0, row * m_rowHeight,
+                                      m_safeArea.width(), m_rowHeight * 2));
         }
     }
 
@@ -159,19 +160,41 @@ void TeletextScreen::OptimiseDisplayedArea(void)
 
 void TeletextScreen::Pulse(void)
 {
-    if (!InitialiseFont(m_fontStretch) || !m_displaying)
+    if (!InitialiseFont() || !m_displaying)
         return;
 
     if (m_player && m_player->getVideoOutput())
     {
+        static const float kTextPadding = 0.96f;
         QRect oldsafe = m_safeArea;
         m_safeArea = m_player->getVideoOutput()->GetSafeRect();
+        m_colWidth = (int)((float)m_safeArea.width() / (float)kTeletextColumns);
+        m_rowHeight = (int)((float)m_safeArea.height() / (float)kTeletextRows);
+
         if (oldsafe != m_safeArea)
+        {
             m_page_changed = true;
-        m_colSize = (int)((float)m_safeArea.width() / (float)kTeletextColumns);
-        m_rowSize = (int)((float)m_safeArea.height() / (float)kTeletextRows);
-        gTTFont->GetFace()->setPixelSize(m_safeArea.height() /
-                                        (kTeletextRows * 1.2));
+
+            int max_width  = (int)((float)m_colWidth * kTextPadding);
+            m_fontHeight = (int)((float)m_rowHeight * kTextPadding);
+            if (max_width > (m_colWidth - 2))
+                max_width = m_colWidth -2;
+            if (m_fontHeight > (m_rowHeight - 2))
+                m_fontHeight = m_rowHeight - 2;
+            gTTFont->GetFace()->setPixelSize(m_fontHeight);
+
+            m_fontStretch = 200;
+            bool ok = false;
+            while (!ok && m_fontStretch > 50)
+            {
+                gTTFont->GetFace()->setStretch(m_fontStretch);
+                QFontMetrics font(*(gTTFont->GetFace()));
+                if (font.averageCharWidth() <= max_width || m_fontStretch < 50)
+                    ok = true;
+                else
+                    m_fontStretch -= 10;
+            }
+        }
     }
     else
     {
@@ -918,18 +941,15 @@ void TeletextScreen::DrawCharacter(int x, int y, QChar ch, int doubleheight)
         return;
 
     int row = y;
-    x *= m_colSize;
-    y *= m_rowSize;
-    int height = m_rowSize * (doubleheight ? 2 : 1);
-    QRect rect(x, y, m_colSize, height);
+    x *= m_colWidth;
+    y *= m_rowHeight;
+    int height = m_rowHeight * (doubleheight ? 2 : 1);
+    QRect rect(x, y, m_colWidth, height);
 
-    int fontheight = 10;
     if (doubleheight)
     {
-        fontheight = m_safeArea.height() / (kTeletextRows * 1.2);
-        int doubleheight = fontheight * 2;
-        gTTFont->GetFace()->setPixelSize(doubleheight);
-        gTTFont->GetFace()->setStretch(50);
+        gTTFont->GetFace()->setPixelSize(m_fontHeight * 2);
+        gTTFont->GetFace()->setStretch(m_fontStretch / 2);
     }
 
     QImage* image = GetRowImage(row, rect);
@@ -945,8 +965,8 @@ void TeletextScreen::DrawCharacter(int x, int y, QChar ch, int doubleheight)
     if (row & 1)
     {
         row++;
-        rect = QRect(x, y + m_rowSize, m_colSize, height);
-        rect.translate(0, -m_rowSize);
+        rect = QRect(x, y + m_rowHeight, m_colWidth, height);
+        rect.translate(0, -m_rowHeight);
         image = GetRowImage(row, rect);
         if (image)
         {
@@ -960,17 +980,17 @@ void TeletextScreen::DrawCharacter(int x, int y, QChar ch, int doubleheight)
 
     if (doubleheight)
     {
-        gTTFont->GetFace()->setPixelSize(fontheight);
-        gTTFont->GetFace()->setStretch(100);
+        gTTFont->GetFace()->setPixelSize(m_fontHeight);
+        gTTFont->GetFace()->setStretch(m_fontStretch);
     }
 }
 
 void TeletextScreen::DrawBackground(int x, int y)
 {
     int row = y;
-    x *= m_colSize;
-    y *= m_rowSize;
-    DrawRect(row, QRect(x, y, m_colSize, m_rowSize));
+    x *= m_colWidth;
+    y *= m_rowHeight;
+    DrawRect(row, QRect(x, y, m_colWidth, m_rowHeight));
 }
 
 void TeletextScreen::DrawRect(int row, QRect rect)
@@ -990,11 +1010,11 @@ void TeletextScreen::DrawRect(int row, QRect rect)
 void TeletextScreen::DrawMosaic(int x, int y, int code, int doubleheight)
 {
     int row = y;
-    x *= m_colSize;
-    y *= m_rowSize;
+    x *= m_colWidth;
+    y *= m_rowHeight;
 
-    int dx = (int)round(m_colSize / 2) + 1;
-    int dy = (int)round(m_rowSize / 3) + 1;
+    int dx = (int)round(m_colWidth / 2) + 1;
+    int dy = (int)round(m_rowHeight / 3) + 1;
     dy = (doubleheight) ? (2 * dy) : dy;
 
     if (code & 0x10)
@@ -1246,7 +1266,7 @@ const TeletextSubPage *TeletextScreen::FindSubPageInternal(
     return res;
 }
 
-bool TeletextScreen::InitialiseFont(int fontStretch)
+bool TeletextScreen::InitialiseFont()
 {
     static bool initialised = false;
     QString font = gCoreContext->GetSetting("OSDSubFont", "FreeSans");
@@ -1262,7 +1282,6 @@ bool TeletextScreen::InitialiseFont(int fontStretch)
     {
         QFont newfont(font);
         font.detach();
-        newfont.setStretch(fontStretch);
         mythfont->SetFace(newfont);
         gTTFont = mythfont;
     }

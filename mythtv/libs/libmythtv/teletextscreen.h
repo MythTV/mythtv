@@ -92,7 +92,7 @@ class TeletextMagazine
 
 class TeletextScreen: public MythScreenType, public TeletextViewer
 {
-    static bool  InitialiseFont(int fontStretch = QFont::Unstretched);
+    static bool  InitialiseFont(void);
 
   public:
     TeletextScreen(MythPlayer *player, const char * name, int fontStretch);
@@ -146,8 +146,8 @@ class TeletextScreen: public MythScreenType, public TeletextViewer
 
     MythPlayer *m_player;
     QRect       m_safeArea;
-    int         m_colSize;
-    int         m_rowSize;
+    int         m_colWidth;
+    int         m_rowHeight;
 
     QMutex m_lock;
 
@@ -172,6 +172,7 @@ class TeletextScreen: public MythScreenType, public TeletextViewer
     unsigned char    m_bitswap[256];
     QHash<int, QImage*> m_rowImages;
     int          m_fontStretch;
+    int          m_fontHeight;
 
   public:
     static const QColor kColorBlack;
