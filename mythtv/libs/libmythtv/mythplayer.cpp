@@ -2926,10 +2926,10 @@ bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
     {
         int tries = 0;
         while (!videoOutput->EnoughFreeFrames() && (tries++ < 10))
-            usleep(10000);
+            usleep(1000);
         if (!videoOutput->EnoughFreeFrames())
         {
-            if (++videobuf_retries >= 200)
+            if (++videobuf_retries >= 2000)
             {
                 VERBOSE(VB_IMPORTANT, LOC +
                         "Timed out waiting for free video buffers.");
