@@ -195,6 +195,7 @@ AudioConfigSettings::AudioConfigSettings() :
     ConfigurationGroup *settings5 =
         new HorizontalConfigurationGroup(false, false);
     settings5->addChild(Audio48kOverride());
+    settings5->addChild(DownmixOverride());
 
     m_triggerMPCM = new TransCheckBoxSetting();
     m_MPCM = MPCM();
@@ -472,6 +473,19 @@ HostCheckBox *AudioConfigSettings::Audio48kOverride()
     gc->setHelpText(QObject::tr("Force audio sample rate to 48kHz. "
                                 "Some audio devices will report various rates, "
                                 "but they ultimately crash."));
+    return gc;
+}
+
+HostCheckBox *AudioConfigSettings::DownmixOverride()
+{
+    HostCheckBox *gc = new HostCheckBox("AudioDownmixOverride");
+    gc->setLabel(QObject::tr("Always use internal downmixer"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If uncheck, for AC3 and DTS audio content; "
+                                "use ffmpeg's internal downmixer when required."
+                                " If checked, Myth's own downmixer will be used"
+                                " for all content. While not as fast, it "
+                                "doesn't suffer from low volume issues."));
     return gc;
 }
 

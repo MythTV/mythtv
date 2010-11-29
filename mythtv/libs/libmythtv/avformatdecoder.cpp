@@ -4501,6 +4501,10 @@ void AvFormatDecoder::SetDisablePassThrough(bool disable)
 
 inline bool AvFormatDecoder::DecoderWillDownmix(const AVCodecContext *ctx)
 {
+    if (gCoreContext->GetNumSetting("AdvancedAudioSettings", false) &&
+        gCoreContext->GetNumSetting("AudioDownmixOverride",  false))
+        return false;
+
     switch (ctx->codec_id)
     {
         case CODEC_ID_AC3:
