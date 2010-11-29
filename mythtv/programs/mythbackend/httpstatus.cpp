@@ -469,7 +469,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
         uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
         MythSystem ms(info_script, flags);
-        ms.Run();
+        ms.Run(10);
         if (ms.Wait() != GENERIC_EXIT_OK)
         {
             VERBOSE(VB_IMPORTANT, QString("Error running miscellaneous "
