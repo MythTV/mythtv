@@ -2236,8 +2236,7 @@ void MythMainWindow::StartLIRC(void)
     d->lircThread = new LIRC(
         this,
         GetMythDB()->GetSetting("LircSocket", lirc_socket),
-        "mythtv", config_file,
-        GetMythDB()->GetSetting("LircKeyPressedApp", ""));
+        "mythtv", config_file);
 
     if (d->lircThread->Init())
     {

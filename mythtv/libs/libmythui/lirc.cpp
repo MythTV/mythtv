@@ -79,15 +79,13 @@ QMutex LIRC::lirclib_lock;
 LIRC::LIRC(QObject *main_window,
            const QString &lircd_device,
            const QString &our_program,
-           const QString &config_file,
-           const QString &external_app)
+           const QString &config_file)
     : QThread(),
       lock(QMutex::Recursive),
       m_mainWindow(main_window),
       lircdDevice(lircd_device),
       program(our_program),
       configFile(config_file),
-      m_externalApp(external_app),
       doRun(false),
       buf_offset(0),
       eofCount(0),
@@ -97,7 +95,6 @@ LIRC::LIRC(QObject *main_window,
     lircdDevice.detach();
     program.detach();
     configFile.detach();
-    m_externalApp.detach();
     buf.resize(128);
 }
   
@@ -401,8 +398,6 @@ void LIRC::Process(const QByteArray &data)
         for (int i = (int)keyReleases.size() - 1; i>=0; i--)
             QCoreApplication::postEvent(m_mainWindow, keyReleases[i]);
 
-        SpawnApp();
-
         ret = lirc_code2char(
             d->lircState, d->lircConfig, const_cast<char*>(data.constData()), &code);
     }
@@ -537,21 +532,3 @@ QList<QByteArray> LIRC::GetCodes(void)
     return ret;
 }
 
-void LIRC::SpawnApp(void)
-{
-    // Spawn app to illuminate led (or what ever the user has picked if
-    // anything) to give positive feedback that a key was received
-    if (m_externalApp.isEmpty())
-        return;
-
-    QString command = m_externalApp + " &";
-
-    uint status = myth_system(command, kMSRunBackground);
-
-    if (status > 0)
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("External key pressed command exited with status %1")
-                .arg(status));
-    }
-}

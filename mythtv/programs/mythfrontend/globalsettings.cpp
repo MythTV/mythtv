@@ -2300,16 +2300,6 @@ static HostLineEdit *LircDaemonDevice()
     return ge;
 }
 
-static HostLineEdit *LircKeyPressedApp()
-{
-    HostLineEdit *ge = new HostLineEdit("LircKeyPressedApp");
-    ge->setLabel(QObject::tr("LIRC keypress application"));
-    ge->setValue("");
-    ge->setHelpText(QObject::tr("External application or script to run when "
-                    "a keypress is received by LIRC."));
-    return ge;
-}
-
 static HostLineEdit *ScreenShotPath()
 {
     HostLineEdit *ge = new HostLineEdit("ScreenShotPath");
@@ -3998,7 +3988,6 @@ MainGeneralSettings::MainGeneralSettings()
         new VerticalConfigurationGroup(false, true, false, false);
     remotecontrol->setLabel(QObject::tr("Remote Control"));
     remotecontrol->addChild(LircDaemonDevice());
-    remotecontrol->addChild(LircKeyPressedApp());
     remotecontrol->addChild(NetworkControlEnabled());
     remotecontrol->addChild(NetworkControlPort());
     addChild(remotecontrol);
