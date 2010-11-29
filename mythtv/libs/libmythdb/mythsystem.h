@@ -34,60 +34,9 @@ typedef enum MythSystemMask {
 #include <unistd.h>  // for pid_t
 #include <sys/select.h>
 
-class MythSystem;
+typedef QMap<QString, bool> Setting_t;
 
-typedef QMap<pid_t, MythSystem *> MSMap_t;
-typedef QMap<int, QBuffer *> PMap_t;
-typedef QList<MythSystem *> MSList_t;
-
-class MythSystemIOHandler: public QThread
-{
-    public:
-        MythSystemIOHandler(bool read);
-        void   run(void);
-
-        void   insert(int fd, QBuffer *buff);
-        void   remove(int fd);
-        void   wake();
-
-    private:
-        void   HandleRead(int fd, QBuffer *buff);
-        void   HandleWrite(int fd, QBuffer *buff);
-        void   BuildFDs();
-
-        QWaitCondition  m_pWait;
-        QMutex          m_pLock;
-        PMap_t          m_pMap;
-
-        fd_set m_fds;
-        int    m_maxfd;
-        bool   m_read;
-        char   m_readbuf[65536];
-};
-
-class MythSystemManager : public QThread
-{
-    public:
-        MythSystemManager();
-        void run(void);
-        void append(MythSystem *);
-        void jumpAbort(void);
-    private:
-        MSMap_t    m_pMap;
-        QMutex     m_mapLock;
-        bool       m_jumpAbort;
-        QMutex     m_jumpLock;
-};
-
-class MythSystemSignalManager : public QThread
-{
-    public:
-        MythSystemSignalManager();
-        void run(void);
-    private:
-};
-
-
+class MythSystemPrivate;
 class MPUBLIC MythSystem : public QObject
 {
     Q_OBJECT
@@ -109,8 +58,8 @@ class MPUBLIC MythSystem : public QObject
         int Write(const QByteArray&);
         QByteArray Read(int size);
         QByteArray ReadErr(int size);
-        QByteArray& ReadAll();
-        QByteArray& ReadAllErr();
+        QByteArray ReadAll();
+        QByteArray ReadAllErr();
 
         void Term(bool force=false);
         void Kill()   { Signal(SIGKILL); };
@@ -119,13 +68,31 @@ class MPUBLIC MythSystem : public QObject
         void HangUp() { Signal(SIGHUP);  };
         void USR1()   { Signal(SIGUSR1); };
         void USR2()   { Signal(SIGUSR2); };
+        void Signal(int sig);
 
-        bool isBackground()  { return m_runinbackground; };
-        bool doAutoCleanup() { return m_autocleanup; };
+        void JumpAbort(void);
 
-        friend class MythSystemManager;
-        friend class MythSystemSignalManager;
-        friend class MythSystemIOHandler;
+        bool isBackground()  { return GetSetting("RunInBackground"); };
+        bool doAutoCleanup() { return GetSetting("AutoCleanup"); };
+        void HandlePreRun();
+        void HandlePostRun();
+
+        uint GetStatus()             { return m_status; };
+        void SetStatus(uint status)  { m_status = status; };
+
+        QString& GetLogCmd()         { return m_logcmd; };
+        QString& GetDirectory()      { return m_directory; };
+
+        bool GetSetting(const char *setting) 
+            { return m_settings.value(QString(setting)); };
+
+        QString& GetCommand()        { return m_command; };
+        void SetCommand(QString &cmd) { m_command = cmd; };
+
+        QStringList &GetArgs()       { return m_args; };
+        void SetArgs(QStringList &args)  { m_args = args; };
+
+        friend class MythSystemPrivate;
 
     signals:
         void started();
@@ -134,43 +101,65 @@ class MPUBLIC MythSystem : public QObject
         void readDataReady(int fd);
 
     private:
-        void ProcessFlags(uint);
-        void HandlePreRun();
-        void HandlePostRun();
-        void Fork();
-        void Signal(int sig);
+        void initializePrivate(void);
+        MythSystemPrivate *d;
 
-        uint   m_status;
-        pid_t  m_pid;
-        QMutex m_pmutex;
-        time_t m_timeout;
+    protected:
+        void ProcessFlags(uint flags);
+
+        uint        m_status;
 
         QString     m_command;
         QString     m_logcmd;
         QStringList m_args;
         QString     m_directory;
 
-        int     m_stdpipe[3]; // should there be a means of hitting these directly?
-        QBuffer m_stdbuff[3]; // do these need to be allocated?
-
-        // move to a struct to keep things clean?
-        // perhaps allow overloaded input using the struct
-        //   rather than the bitwise
-        bool  m_runinbackground;
-        bool  m_isinui;
-        bool  m_blockinputdevs;
-        bool  m_disabledrawing;
-        bool  m_processevents;
-        bool  m_usestdin;
-        bool  m_usestdout;
-        bool  m_usestderr;
-        bool  m_useshell;
-        bool  m_setdirectory;
-        bool  m_abortonjump;
-        bool  m_setpgid;
-        bool  m_autocleanup;
-        bool  m_anonlog;
+        Setting_t   m_settings;
 };
+
+class MPUBLIC MythSystemPrivate : public QObject
+{
+    Q_OBJECT
+
+    public:
+        virtual void Run(time_t timeout = 0) = 0;
+        virtual uint Wait(time_t timeout = 0) = 0;
+
+        virtual int Write(const QByteArray&) = 0;
+        virtual QByteArray Read(int size) = 0;
+        virtual QByteArray ReadErr(int size) = 0;
+        virtual QByteArray& ReadAll() = 0;
+        virtual QByteArray& ReadAllErr() = 0;
+
+        virtual void Term(bool force=false) = 0;
+        virtual void Signal(int sig) = 0;
+        virtual void JumpAbort(void) = 0;
+
+    protected:
+        MythSystem *m_parent;
+
+        uint GetStatus()             { return m_parent->GetStatus(); };
+        void SetStatus(uint status)  { m_parent->SetStatus(status); };
+
+        QString& GetLogCmd()         { return m_parent->GetLogCmd(); };
+        QString& GetDirectory()      { return m_parent->GetDirectory(); };
+
+        bool GetSetting(const char *setting) 
+            { return m_parent->GetSetting(setting); };
+
+        QString& GetCommand()        { return m_parent->GetCommand(); };
+        void SetCommand(QString &cmd) { m_parent->SetCommand(cmd); };
+
+        QStringList &GetArgs()       { return m_parent->GetArgs(); };
+        void SetArgs(QStringList &args)  { m_parent->SetArgs(args); };
+
+    signals:
+        void started();
+        void finished();
+        void error(uint status);
+        void readDataReady(int fd);
+};
+
 
 MPUBLIC unsigned int myth_system(const QString &command, 
                                  uint flags = kMSNone,

@@ -27,7 +27,8 @@
 #define GENERIC_EXIT_RUNNING                      273
 #define GENERIC_EXIT_PIPE_FAILURE                 274
 #define GENERIC_EXIT_TERMINATED                   275
-#define GENERIC_EXIT_START                        275
+#define GENERIC_EXIT_NO_HANDLER                   276
+#define GENERIC_EXIT_START                        276
 
 // libmyth
 #define MYTHSYSTEM__EXIT__EXECL_ERROR             GENERIC_EXIT_EXECL_ERROR

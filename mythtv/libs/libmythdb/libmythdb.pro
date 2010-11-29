@@ -31,8 +31,14 @@ SOURCES += unzip.cpp iso639.cpp iso3166.cpp
 
 win32:SOURCES += msocketdevice_win.cpp
 unix {
-    SOURCES += msocketdevice_unix.cpp
+    SOURCES += msocketdevice_unix.cpp system-unix.cpp
+    HEADERS += system-unix.h
     QMAKE_CXXFLAGS += -fno-strict-aliasing
+}
+
+mingw {
+    SOURCES += system-windows.cpp
+    HEADERS += system-windows.h
 }
 
 # Install headers to same location as libmyth to make things easier
