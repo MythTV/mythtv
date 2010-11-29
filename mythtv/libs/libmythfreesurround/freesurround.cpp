@@ -37,7 +37,7 @@ using namespace std;
 #include <QDateTime>
 
 // our default internal block size, in floats
-static const unsigned default_block_size = 8192;
+static const unsigned default_block_size = SURROUND_BUFSIZE;
 // Gain of center and lfe channels in passive mode (sqrt 0.5)
 static const float center_level = 0.707107; 
 

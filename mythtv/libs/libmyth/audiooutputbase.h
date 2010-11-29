@@ -19,10 +19,6 @@ using namespace std;
 #include "samplerate.h"
 #include "mythverbose.h"
 
-// make sure AVCODEC_MAX_AUDIO_FRAME_SIZE definition match the one in
-// libavcodec/avcodec.h
-#define AVCODEC_MAX_AUDIO_FRAME_SIZE 192000
-
 #define VBAUDIO(str)   VERBOSE(VB_AUDIO, LOC + str)
 #define VBAUDIOTS(str) VERBOSE(VB_AUDIO+VB_TIMESTAMP, LOC + str)
 #define VBGENERAL(str) VERBOSE(VB_GENERAL, LOC + str)
@@ -99,7 +95,8 @@ class AudioOutputBase : public AudioOutput, public QThread
     virtual void bufferOutputData(bool y){ buffer_output_data_for_use = y; }
     virtual int readOutputData(unsigned char *read_buffer, int max_length);
 
-    static const uint kAudioSRCInputSize  = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+    static const uint kAudioSRCInputSize = 4096;
+
     /// Audio Buffer Size -- should be divisible by 32,24,16,12,10,8,6,4,2..
     static const uint kAudioRingBufferSize   = 3072000;
 
