@@ -1643,7 +1643,7 @@ MPEG2frame *MPEG2fixup::DecodeToFrame(int frameNum, int skip_reset)
         // time
         displayFrame->toFirst();
         VERBOSE(MPF_IMPORTANT, QString("Frame %1 > %2."
-                " Corruption likely at pos: %2")
+                " Corruption likely at pos: %3")
                .arg(info->display_picture->temporal_reference)
                .arg(frameNum).arg(spare->pkt.pos));
     }
