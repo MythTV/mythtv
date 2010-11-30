@@ -5,7 +5,7 @@ using namespace std;
 #include "mythverbose.h"
 #include "audiooutputsettings.h"
 
-class AudioOutputUtil
+class MPUBLIC AudioOutputUtil
 {
  public:
     static bool has_hardware_fpu();
