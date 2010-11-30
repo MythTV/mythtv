@@ -2011,8 +2011,6 @@ long long RingBuffer::Seek(long long pos, int whence, bool has_lock)
                 readsallowed = false;
             }
 
-            rbwlock.unlock();
-            rbrlock.unlock();
             poslock.unlock();
 
             generalWait.wakeAll();
