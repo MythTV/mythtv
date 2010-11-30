@@ -43,6 +43,7 @@ class MPUBLIC BDRingBufferPriv
     bool IsHDMVNavigation(void) const { return m_is_hdmv_navigation; }
     bool IsInMenu(void) const { return m_inMenu; }
     bool InStillFrame(void) { return m_still > 0; }
+    bool TitleChanged(void);
 
     void GetDescForPos(QString &desc) const;
     double GetFrameRate(void);
@@ -95,8 +96,10 @@ class MPUBLIC BDRingBufferPriv
     bool               m_secondaryVideoEnabled;
     bool               m_secondaryVideoIsFullscreen;
 
+    bool               m_titleChanged;
+
   public:
-    bool               m_still;
+    uint8_t            m_still;
     bool               m_inMenu;
 
 };

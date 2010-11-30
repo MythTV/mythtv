@@ -620,8 +620,7 @@ class MPUBLIC TV : public QThread
     bool DiscMenuHandleAction(PlayerContext*,
                              const QStringList &actions,
                              bool isDVD, bool isDVDStill,
-                             bool isBD = false,
-                             bool isBDStill = false);
+                             bool isBD = false);
 
     // Program jumping stuff
     void SetLastProgram(const ProgramInfo *rcinfo);

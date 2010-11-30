@@ -4128,6 +4128,20 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             selectedTrack[kTrackTypeVideo].av_stream_index = 0;
         }
 
+        if (ringBuffer->isBD())
+        {
+            // Update the title length
+            if (m_parent->AtNormalSpeed() && ringBuffer->BD()->TitleChanged())
+            {
+                ResetPosMap();
+                SyncPositionMap();
+                UpdateFramesPlayed();
+            }
+
+            // always use the first video stream (must come after ScanStreams above)
+            selectedTrack[kTrackTypeVideo].av_stream_index = 0;
+        }
+
         if (gotvideo)
         {
             if (decodetype == kDecodeNothing)

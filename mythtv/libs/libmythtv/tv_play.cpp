@@ -3975,7 +3975,7 @@ bool TV::AudioSyncHandleAction(PlayerContext *ctx,
 bool TV::DiscMenuHandleAction(PlayerContext *ctx,
                              const QStringList &actions,
                              bool isDVD, bool isDVDStill,
-                             bool isBD, bool isBDStill)
+                             bool isBD)
 {
     bool handled = false;
 
@@ -4015,7 +4015,7 @@ bool TV::DiscMenuHandleAction(PlayerContext *ctx,
         else
             handled = false;
     }
-    if (isBD && isBDStill)
+    if (isBD)
     {
         int64_t pts = 0;
         VideoOutput *output = ctx->player->getVideoOutput();

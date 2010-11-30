@@ -60,7 +60,7 @@ static void HandleOverlayCallback(void *data, const bd_overlay_s * const overlay
 BDRingBufferPriv::BDRingBufferPriv()
     : bdnav(NULL),
       m_is_hdmv_navigation(false),
-      m_numTitles(0)
+      m_numTitles(0), m_titleChanged(false)
 {
 }
 
@@ -186,7 +186,7 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
     m_secondaryAudioEnabled = false;
     m_secondaryVideoEnabled = false;
     m_secondaryVideoIsFullscreen = false;
-    m_still = false;
+    m_still = 0;
     m_inMenu = false;
 
     VERBOSE(VB_IMPORTANT, LOC + QString("Found %1 relevant titles.")
@@ -299,6 +299,7 @@ bool BDRingBufferPriv::SwitchTitle(uint title)
     if (!m_is_hdmv_navigation)
         bd_select_title(bdnav, title);
 
+    m_titleChanged = true;
     m_currentTitleLength = m_currentTitleInfo->duration;
     m_currentTitleAngleCount = m_currentTitleInfo->angle_count;
     m_currentAngle = 0;
@@ -333,6 +334,13 @@ bool BDRingBufferPriv::SwitchTitle(uint title)
         }
     }
     return true;
+}
+
+bool BDRingBufferPriv::TitleChanged(void)
+{
+    bool ret = m_titleChanged;
+    m_titleChanged = false;
+    return ret;
 }
 
 bool BDRingBufferPriv::SwitchAngle(uint angle)
@@ -534,7 +542,7 @@ void BDRingBufferPriv::HandleBDEvent(BD_EVENT &ev)
         case BD_EVENT_TITLE:
             VERBOSE(VB_PLAYBACK|VB_EXTRA,
                     QString("BDRingBuf: EVENT_TITLE %1").arg(ev.param));
-            m_currentTitle = bd_get_current_title(bdnav);
+            m_currentTitle = ev.param;
             SwitchTitle(m_currentTitle);
             break;
         case BD_EVENT_PLAYLIST:
