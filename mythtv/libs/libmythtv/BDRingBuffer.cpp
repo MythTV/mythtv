@@ -159,6 +159,11 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
     // Set player country code via MythLocale. (not a region setting)
     bd_set_player_setting_str(bdnav, BLURAY_PLAYER_SETTING_COUNTRY_CODE, country);
 
+    int regioncode = 0;
+    regioncode = gCoreContext->GetNumSetting("BlurayRegionCode");
+    if (regioncode > 0)
+        bd_set_player_setting(bdnav, BLURAY_PLAYER_SETTING_REGION_CODE, regioncode);
+
     VERBOSE(VB_IMPORTANT, LOC + QString("Using %1 as keyfile...")
             .arg(QString(keyfilepath)));
 
