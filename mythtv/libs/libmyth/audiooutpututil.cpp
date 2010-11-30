@@ -451,6 +451,19 @@ static int fromFloatFLT(float *out, float *in, int len)
 }
 
 /**
+ * Returns true if platform has an FPU.
+ * for the time being, this test is limited to testing if SSE2 is supported
+ */
+bool AudioOutputUtil::has_hardware_fpu()
+{
+#if ARCH_X86
+    return sse_check();
+#else
+    return false;
+#endif
+}
+
+/**
  * Convert integer samples to floats
  *
  * Consumes 'bytes' bytes from in and returns the numer of bytes written to out

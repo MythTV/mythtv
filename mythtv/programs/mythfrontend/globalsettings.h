@@ -43,7 +43,6 @@ class AudioConfigSettings : public VerticalConfigurationGroup
     HostCheckBox         *SRCQualityOverride();
     HostComboBox         *SRCQuality();
     HostCheckBox         *Audio48kOverride();
-    HostCheckBox         *DownmixOverride();
     HostCheckBox         *PassThroughOverride();
     HostComboBox         *PassThroughOutputDevice();
 

@@ -15,6 +15,7 @@ using namespace std;
 #include "avformatdecoder.h"
 #include "privatedecoder.h"
 #include "audiooutput.h"
+#include "audiooutpututil.h"
 #include "RingBuffer.h"
 #include "mythplayer.h"
 #include "remoteencoder.h"
@@ -4501,10 +4502,10 @@ void AvFormatDecoder::SetDisablePassThrough(bool disable)
 
 inline bool AvFormatDecoder::DecoderWillDownmix(const AVCodecContext *ctx)
 {
-    if (gCoreContext->GetNumSetting("AdvancedAudioSettings", false) &&
-        gCoreContext->GetNumSetting("AudioDownmixOverride",  false))
+        // Until ffmpeg properly implements dialnorm
+        // use Myth internal downmixer if machines has FPU/SSE
+    if (AudioOutputUtil::has_hardware_fpu())
         return false;
-
     switch (ctx->codec_id)
     {
         case CODEC_ID_AC3:
