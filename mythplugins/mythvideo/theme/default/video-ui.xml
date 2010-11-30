@@ -1366,23 +1366,33 @@
             <position>250,245</position>
         </textedit>
 
+        <textarea name="blureg_text" from="basetextarea">
+            <area>100,305,130,30</area>
+            <align>right</align>
+            <value>Blu-ray Region:</value>
+        </textarea>
+
+        <buttonlist name="blurayregionlist" from="basewideselector">
+            <position>250,295</position>
+        </buttonlist>
+
         <checkbox name="altcheck" from="basecheckbox">
-            <position>500,300</position>
+            <position>500,350</position>
         </checkbox>
 
         <textarea name="altcheck_text" from="basetextarea">
-            <area>300,300,300,30</area>
+            <area>300,350,300,30</area>
             <value>Enable Alternate Player:</value>
         </textarea>
 
         <textarea name="alt_text" from="basetextarea">
-            <area>100,355,130,30</area>
+            <area>100,405,130,30</area>
             <align>right</align>
             <value>Alternate Player:</value>
         </textarea>
 
         <textedit name="altplayer" from="basetextedit">
-            <position>250,345</position>
+            <position>250,395</position>
         </textedit>
 
         <textarea name="helptext" from="basetextarea">

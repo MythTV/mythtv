@@ -3,6 +3,7 @@
 
 // libmythui
 #include <mythuibutton.h>
+#include <mythuibuttonlist.h>
 #include <mythuicheckbox.h>
 #include <mythscreentype.h>
 #include <mythdialogbox.h>
@@ -26,6 +27,8 @@ class PlayerSettings : public MythScreenType
     MythUITextEdit   *m_blurayMountEdit;
     MythUITextEdit   *m_altPlayerEdit;
 
+    MythUIButtonList *m_blurayRegionList;
+
     MythUICheckBox   *m_altCheck;
 
     MythUIButton     *m_okButton;
@@ -34,6 +37,7 @@ class PlayerSettings : public MythScreenType
   private slots:
     void slotSave(void);
     void toggleAlt(void);
+    void fillRegionList(void);
 };
 
 #endif

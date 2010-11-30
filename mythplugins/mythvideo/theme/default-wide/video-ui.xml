@@ -1474,37 +1474,47 @@
             <position>550,305</position>
         </textedit>
 
+        <textarea name="blureg_text" from="basetextarea">
+            <area>300,375,230,30</area>
+            <align>right</align>
+            <value>Blu-ray Region:</value>
+        </textarea>
+
+        <buttonlist name="blurayregionlist" from="basewideselector">
+            <position>550,365</position>
+        </buttonlist>
+
         <checkbox name="altcheck" from="basecheckbox">
-            <position>775,380</position>
+            <position>775,440</position>
         </checkbox>
 
         <textarea name="altcheck_text" from="basetextarea">
-            <area>500,380,300,30</area>
+            <area>500,440,300,30</area>
             <value>Enable Alternate Player:</value>
         </textarea>
 
         <textarea name="alt_text" from="basetextarea">
-            <area>300,445,230,30</area>
+            <area>300,505,230,30</area>
             <align>right</align>
             <value>Alternate Player:</value>
         </textarea>
 
         <textedit name="altplayer" from="basetextedit">
-            <position>550,435</position>
+            <position>550,495</position>
         </textedit>
 
         <textarea name="helptext" from="basetextarea">
-            <area>50,510,1180,60</area>
+            <area>50,550,1180,60</area>
             <multiline>true</multiline>
         </textarea>
 
         <button name="ok" from="basebutton">
-            <position>415,580</position>
+            <position>415,620</position>
             <value>OK</value>
         </button>
 
         <button name="cancel" from="basebutton">
-            <position>715,580</position>
+            <position>715,620</position>
             <value>Cancel</value>
         </button>
 
