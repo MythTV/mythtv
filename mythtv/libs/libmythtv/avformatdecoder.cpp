@@ -28,6 +28,7 @@ using namespace std;
 #include "dvbdescriptors.h"
 #include "cc608decoder.h"
 #include "cc708decoder.h"
+#include "teletextdecoder.h"
 #include "subtitlereader.h"
 #include "interactivetv.h"
 #include "DVDRingBuffer.h"
@@ -277,7 +278,8 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       // Closed Caption & Teletext decoders
       ccd608(new CC608Decoder(parent->GetCC608Reader())),
       ccd708(new CC708Decoder(parent->GetCC708Reader())),
-      ttd(new TeletextDecoder(parent)), subReader(parent->GetSubReader()),
+      ttd(new TeletextDecoder(parent->GetTeletextReader())),
+      subReader(parent->GetSubReader()),
       // Interactive TV
       itv(NULL),
       // Audio
@@ -3509,11 +3511,6 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
 int AvFormatDecoder::GetTeletextDecoderType(void) const
 {
     return ttd->GetDecoderType();
-}
-
-void AvFormatDecoder::SetTeletextDecoderViewer(TeletextViewer *view)
-{
-    ttd->SetViewer(view);
 }
 
 QString AvFormatDecoder::GetXDS(const QString &key) const

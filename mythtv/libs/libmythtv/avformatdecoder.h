@@ -158,7 +158,6 @@ class AvFormatDecoder : public DecoderBase
     virtual int64_t NormalizeVideoTimecode(AVStream *st, int64_t timecode);
 
     virtual int  GetTeletextDecoderType(void) const;
-    virtual void SetTeletextDecoderViewer(TeletextViewer*);
 
     virtual QString GetXDS(const QString&) const;
 

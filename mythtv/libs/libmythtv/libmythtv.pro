@@ -197,8 +197,8 @@ HEADERS += datadirect.h
 SOURCES += datadirect.cpp
 
 # Teletext stuff
-HEADERS += teletextdecoder.h        vbilut.h
-SOURCES += teletextdecoder.cpp      vbilut.cpp
+HEADERS += teletextdecoder.h        teletextreader.h   vbilut.h
+SOURCES += teletextdecoder.cpp      teletextreader.cpp vbilut.cpp
 
 # MPEG parsing stuff
 HEADERS += mpeg/tspacket.h          mpeg/pespacket.h

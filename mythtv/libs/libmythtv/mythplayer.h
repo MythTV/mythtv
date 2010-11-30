@@ -15,7 +15,7 @@
 #include "osd.h"
 #include "jitterometer.h"
 #include "videooutbase.h"
-#include "teletextdecoder.h"
+#include "teletextreader.h"
 #include "subtitlereader.h"
 #include "tv_play.h"
 #include "yuv2rgb.h"
@@ -254,11 +254,11 @@ class MPUBLIC MythPlayer
     virtual bool PrepareAudioSample(int64_t &timecode);
 
     // Public Closed caption and teletext stuff
-    void SetupTeletextViewer(void);
     uint GetCaptionMode(void) const    { return textDisplayMode; }
     CC708Reader* GetCC708Reader(void)  { return &cc708; }
     CC608Reader* GetCC608Reader(void)  { return &cc608; }
     SubtitleReader* GetSubReader(void) { return &subReader; }
+    TeletextReader* GetTeletextReader(void) { return &ttxReader; }
 
     // Public Audio/Subtitle/EIA-608/EIA-708 stream selection - thread safe
     void TracksChanged(uint trackType);
@@ -634,12 +634,12 @@ class MPUBLIC MythPlayer
 
     // Support for captions, teletext, etc. decoded by libav
     SubtitleReader subReader;
+    TeletextReader ttxReader;
     /// This allows us to enable captions/subtitles later if the streams
     /// are not immediately available when the video starts playing.
     bool      textDesired;
     bool      enableCaptions;
     bool      disableCaptions;
-    bool      initTeletext;
 
     // CC608/708
     bool db_prefer708;

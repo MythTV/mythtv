@@ -31,13 +31,9 @@ using namespace std;
 
 #include "osd.h"
 #include "teletextdecoder.h"
+#include "teletextreader.h"
 #include "vbilut.h"
-#include "mythplayer.h"
 #include "mythverbose.h"
-
-/******************************************************************/
-//Decoder section
-//
 
 /** \fn TeletextDecoder::Decode(const unsigned char*, int)
  *  \brief Decodes teletext data
@@ -50,36 +46,8 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
     int err = 0, latin1 = -1, zahl1, pagenum, subpagenum, lang, flags;
     uint magazine, packet, header;
 
-    if (!m_player)
+    if (!m_teletext_reader)
         return;
-
-    int mode = m_player->GetCaptionMode();
-    if (!((mode == kDisplayNUVTeletextCaptions) ||
-          (mode == kDisplayTeletextCaptions) ||
-          (mode == kDisplayTeletextMenu)))
-    {
-        return;
-    }
-
-    if (!m_player->TryLockOSD())
-    {
-        VERBOSE(VB_PLAYBACK, "TeletextDecoder: Failed to get OSD lock.");
-        return;
-    }
-
-    if (!m_teletextviewer && m_player)
-    {
-        m_player->UnlockOSD();
-        m_player->SetupTeletextViewer();
-        return;
-    }
-
-    if (!m_teletextviewer)
-    {
-        VERBOSE(VB_VBI, "TeletextDecoder: No Teletext Viewer defined!");
-        m_player->UnlockOSD();
-        return;
-    }
 
     m_decodertype = vbimode;
 
@@ -89,10 +57,7 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
             header = hamm16(buf, &err);
 
             if (err & 0xf000)
-            {
-                m_player->UnlockOSD();
                 return; // error in data header
-            }
 
             magazine = header & 7;
             packet = (header >> 3) & 0x1f;
@@ -125,16 +90,12 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
                 packet += 16;
 
             if (err == 1)
-            {
-                m_player->UnlockOSD();
                 return;  // error in data header
-            }
 
             buf += 2;
             break;
 
         default:
-            m_player->UnlockOSD();
             return; // error in vbimode
     }
 
@@ -150,10 +111,7 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
                     b3 = hamm16(buf+4, &err);// subpage number + flags
                     b4 = hamm16(buf+6, &err);// language code + more flags
                     if (err & 0xf000)
-                    {
-                        m_player->UnlockOSD();
                         return;
-                    }
 
                     break;
 
@@ -164,21 +122,13 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
                     b3 = hamm84(buf+5, &err)*16+hamm84(buf+4, &err);
                     b4 = hamm84(buf+7, &err)*16+hamm84(buf+6, &err);
                     if (err == 1)
-                    {
-                        m_player->UnlockOSD();
                         return;
-                    }
 
                     break;
 
                 default:
-                    m_player->UnlockOSD();
                     return; // error in vbimode
             }
-
-            //VERBOSE(VB_VBI, QString("Page Header found: "
-            //                        "Magazine %1, Page Number %2")
-            //        .arg(magazine).arg(b1));
 
             subpagenum= (b2 + b3 * 256) & 0x3f7f;
             pagenum = (magazine?:8)*256 + b1;
@@ -187,15 +137,14 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
             flags = b4 & 0x1F;
             flags |= b3 & 0xC0;
             flags |= (b2 & 0x80) >> 2;
-            m_teletextviewer->AddPageHeader(pagenum, subpagenum, buf,
-                                            vbimode, lang, flags);
+            m_teletext_reader->AddPageHeader(pagenum, subpagenum, buf,
+                                             vbimode, lang, flags);
 
             break;
 
         default: // Page Data
-            m_teletextviewer->AddTeletextData((magazine?:8), packet,
-                                              buf, vbimode);
+            m_teletext_reader->AddTeletextData((magazine?:8), packet,
+                                               buf, vbimode);
             break;
     }
-    m_player->UnlockOSD();
 }
