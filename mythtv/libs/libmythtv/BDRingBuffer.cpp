@@ -55,6 +55,9 @@ static void HandleOverlayCallback(void *data, const bd_overlay_s * const overlay
                         "an overlay of %1x%2 at %3,%4 (%5 pixels).")
                         .arg(overlay->w).arg(overlay->h).arg(overlay->x)
                         .arg(overlay->y).arg(pixels));
+
+    if (overlay->plane == 1)
+        bdpriv->m_inMenu = true;
 }
 
 BDRingBufferPriv::BDRingBufferPriv()
@@ -495,11 +498,6 @@ void BDRingBufferPriv::PressButton(int32_t key, int64_t pts)
 
     if (key < 0)
         return;
-
-    // If we're toggling the menu off, toggle the menu bool
-    // since we may not get a callback.
-    if (key == BD_VK_POPUP)
-        m_inMenu = !m_inMenu;
 
     bd_user_input(bdnav, pts, key);
 }
