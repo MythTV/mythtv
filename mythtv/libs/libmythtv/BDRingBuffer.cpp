@@ -288,7 +288,7 @@ int BDRingBufferPriv::GetTitleDuration(int title) const
     return duration;
 }
 
-bool BDRingBufferPriv::SwitchTitle(uint title)
+bool BDRingBufferPriv::SwitchTitle(uint32_t index)
 {
     if (!bdnav)
         return false;
@@ -296,25 +296,45 @@ bool BDRingBufferPriv::SwitchTitle(uint title)
     if (m_currentTitleInfo)
         bd_free_title_info(m_currentTitleInfo);
 
-    m_currentTitleInfo = bd_get_title_info(bdnav, title);
+    m_currentTitleInfo = bd_get_title_info(bdnav, index);
 
     if (!m_currentTitleInfo)
         return false;
 
-    if (!m_is_hdmv_navigation)
-        bd_select_title(bdnav, title);
+    bd_select_title(bdnav, index);
 
+    return UpdateTitleInfo(index);
+}
+
+bool BDRingBufferPriv::SwitchPlaylist(uint32_t index)
+{
+    if (!bdnav)
+        return false;
+
+    if (m_currentTitleInfo)
+        bd_free_title_info(m_currentTitleInfo);
+
+    m_currentTitleInfo = bd_get_playlist_info(bdnav, index);
+
+    if (!m_currentTitleInfo)
+        return false;
+
+    return UpdateTitleInfo(index);
+}
+
+bool BDRingBufferPriv::UpdateTitleInfo(uint32_t index)
+{
     m_titleChanged = true;
     m_currentTitleLength = m_currentTitleInfo->duration;
     m_currentTitleAngleCount = m_currentTitleInfo->angle_count;
     m_currentAngle = 0;
     m_titlesize = bd_get_title_size(bdnav);
     uint32_t chapter_count = m_currentTitleInfo->chapter_count;
-    VERBOSE(VB_IMPORTANT, LOC + QString("Selected title: index %1. "
+    VERBOSE(VB_IMPORTANT, LOC + QString("Selected title/playlist: index %1. "
                                         "Duration: %2 (%3 mins) "
                                         "Number of Chapters: %4 Number of Angles: %5 "
                                         "Title Size: %6")
-                                        .arg(title)
+                                        .arg(index)
                                         .arg(m_currentTitleLength)
                                         .arg(m_currentTitleLength / (90000 * 60))
                                         .arg(chapter_count)
@@ -547,15 +567,13 @@ void BDRingBufferPriv::HandleBDEvent(BD_EVENT &ev)
         case BD_EVENT_TITLE:
             VERBOSE(VB_PLAYBACK|VB_EXTRA,
                     QString("BDRingBuf: EVENT_TITLE %1").arg(ev.param));
-            m_currentTitle = ev.param;
-            SwitchTitle(m_currentTitle);
             break;
         case BD_EVENT_PLAYLIST:
             VERBOSE(VB_PLAYBACK|VB_EXTRA,
                     QString("BDRingBuf: EVENT_PLAYLIST %1").arg(ev.param));
             m_currentPlaylist = ev.param;
             m_currentTitle = bd_get_current_title(bdnav);
-            SwitchTitle(m_currentTitle);
+            SwitchPlaylist(m_currentPlaylist);
             break;
         case BD_EVENT_PLAYITEM:
             VERBOSE(VB_PLAYBACK|VB_EXTRA,

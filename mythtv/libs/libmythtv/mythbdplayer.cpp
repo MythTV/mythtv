@@ -59,6 +59,9 @@ void MythBDPlayer::GetChapterTimes(QList<long long> &times)
 
 int MythBDPlayer::GetNumTitles(void) const
 {
+    if (player_ctx->buffer->BD()->IsHDMVNavigation())
+        return 0;
+
     if (player_ctx->buffer->BD() && player_ctx->buffer->BD()->IsOpen())
         return player_ctx->buffer->BD()->GetNumTitles();
     return 0;
@@ -124,6 +127,9 @@ QString MythBDPlayer::GetAngleName(int angle) const
 
 bool MythBDPlayer::SwitchTitle(int title)
 {
+    if (player_ctx->buffer->BD()->IsHDMVNavigation())
+        return false;
+
     uint total = GetNumTitles();
     if (!total || title == GetCurrentTitle() || title >= (int)total)
         return false;
@@ -151,6 +157,9 @@ bool MythBDPlayer::SwitchTitle(int title)
 
 bool MythBDPlayer::NextTitle(void)
 {
+    if (player_ctx->buffer->BD()->IsHDMVNavigation())
+        return false;
+
     uint total = GetNumTitles();
     int next = GetCurrentTitle() + 1;
     if (!total || next >= (int)total)
@@ -161,6 +170,9 @@ bool MythBDPlayer::NextTitle(void)
 
 bool MythBDPlayer::PrevTitle(void)
 {
+    if (player_ctx->buffer->BD()->IsHDMVNavigation())
+        return false;
+
     uint total = GetNumTitles();
     int prev = GetCurrentTitle() - 1;
     if (!total || prev < 0)

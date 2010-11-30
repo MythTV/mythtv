@@ -56,8 +56,11 @@ class MPUBLIC BDRingBufferPriv
     void close(void);
 
     bool GoToMenu(const QString str);
-    bool SwitchTitle(uint title);
+    bool SwitchTitle(uint32_t index);
+    bool SwitchPlaylist(uint32_t index);
     bool SwitchAngle(uint angle);
+
+    bool UpdateTitleInfo(uint32_t index);
 
     int  safe_read(void *data, unsigned sz);
     uint64_t Seek(uint64_t pos);
