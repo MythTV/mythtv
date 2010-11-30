@@ -1956,7 +1956,12 @@ long long RingBuffer::Seek(long long pos, int whence, bool has_lock)
                     QString("Seek(): Offset from end: %1").arg(off_end));
         }
 
-        if (off_end <= 250000)
+        // See #9150, mkv files and at least one mp4 file have trouble with
+        // this optimization for an unknown reason, but if we only do it on
+        // seeks to END-250000, then it is only used for MPEG-2 files where
+        // we know this can speed up seeking and no problems have been
+        // reported.
+        if (off_end == 250000)
         {
             VERBOSE(VB_FILE, LOC +
                     QString("Seek(): offset from end: %1").arg(off_end) +
