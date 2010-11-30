@@ -204,7 +204,7 @@ computeBlankMap(FrameAnalyzer::FrameMap *blankMap, long long nframes,
 
 void
 computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
-        const FrameAnalyzer::FrameMap *blankMap, float fps, bool skipcommblanks,
+        const FrameAnalyzer::FrameMap *blankMap, float fps,
         int debugLevel)
 {
     /*
@@ -339,35 +339,31 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
             break;
     }
 
-    /* Adjust for skipcommblanks configuration. */
+    /* Adjust for blank intervals. */
     FrameAnalyzer::FrameMap::iterator iibreak = breakMap->begin();
     while (iibreak != breakMap->end())
     {
         long long iib = iibreak.key();
         long long iie = iib + *iibreak;
+        FrameAnalyzer::FrameMap::iterator jjbreak = iibreak;
+        ++jjbreak;
+        breakMap->erase(iibreak);
 
-        if (!skipcommblanks)
-        {
-            /* Trim leading blanks from commercial break. */
-            FrameAnalyzer::FrameMap::const_iterator iiblank =
-                blankMap->find(iib);
-            FrameAnalyzer::FrameMap::iterator jjbreak = iibreak;
-            ++jjbreak;
-            iib += *iiblank;
-            breakMap->erase(iibreak);
-            breakMap->insert(iib, iie - iib);
-            iibreak = jjbreak;
-        }
-        else
-        {
-            /* Add trailing blanks to commercial break. */
-            ++iibreak;
-            FrameAnalyzer::FrameMap::const_iterator jjblank =
-                blankMap->find(iie);
-            iie += *jjblank;
-            breakMap->remove(iib);
-            breakMap->insert(iib, iie - iib);
-        }
+        /* Trim leading blanks from commercial break. */
+        long long addb = *blankMap->find(iib);
+        addb = addb / 2;
+        if (addb > MAX_BLANK_FRAMES)
+            addb = MAX_BLANK_FRAMES;
+        iib += addb;
+        /* Add trailing blanks to commercial break. */
+        long long adde = *blankMap->find(iie);
+        iie += adde;
+        long long sube = adde / 2;
+        if (sube > MAX_BLANK_FRAMES)
+            sube = MAX_BLANK_FRAMES;
+        iie -= sube;
+        breakMap->insert(iib, iie - iib);
+        iibreak = jjbreak;
     }
 }
 
@@ -379,11 +375,6 @@ BlankFrameDetector::BlankFrameDetector(HistogramAnalyzer *ha, QString debugdir)
     , fps(0.0f)
     , debugLevel(0)
 {
-    skipcommblanks = gCoreContext->GetNumSetting("CommSkipAllBlanks", 1) != 0;
-
-    VERBOSE(VB_COMMFLAG, QString("BlankFrameDetector: skipcommblanks=%1")
-            .arg(skipcommblanks ? "true" : "false"));
-
     /*
      * debugLevel:
      *      0: no debugging
@@ -573,7 +564,7 @@ BlankFrameDetector::computeForLogoSurplus(
     /*
      * Compute breaks (breakMap).
      */
-    computeBreakMap(&breakMap, &blankMap, fps, skipcommblanks, debugLevel);
+    computeBreakMap(&breakMap, &blankMap, fps, debugLevel);
 
     /*
      * Expand blank-frame breaks to fully include overlapping logo breaks.
@@ -650,7 +641,7 @@ BlankFrameDetector::computeBreaks(FrameAnalyzer::FrameMap *breaks)
     if (breakMap.empty())
     {
         /* Compute breaks (breakMap). */
-        computeBreakMap(&breakMap, &blankMap, fps, skipcommblanks, debugLevel);
+        computeBreakMap(&breakMap, &blankMap, fps, debugLevel);
         frameAnalyzerReportMap(&breakMap, fps, "BF Break");
     }
 

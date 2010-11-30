@@ -827,18 +827,6 @@ static GlobalCheckBox *AggressiveCommDetect()
     return bc;
 }
 
-static GlobalCheckBox *CommSkipAllBlanks()
-{
-    GlobalCheckBox *bc = new GlobalCheckBox("CommSkipAllBlanks");
-    bc->setLabel(QObject::tr("Skip blank frames after commercials"));
-    bc->setValue(true);
-    bc->setHelpText(QObject::tr("When using blank frame detection and "
-                    "automatic flagging, enable this option to include blank "
-                    "frames following commercial breaks as part of the "
-                    "commercial break."));
-    return bc;
-}
-
 static HostSpinBox *CommRewindAmount()
 {
     HostSpinBox *gs = new HostSpinBox("CommRewindAmount", 0, 10, 1);
@@ -4095,7 +4083,6 @@ PlaybackSettings::PlaybackSettings()
     comms->addChild(CommNotifyAmount());
     comms->addChild(MaximumCommercialSkip());
     comms->addChild(MergeShortCommBreaks());
-    comms->addChild(CommSkipAllBlanks());
     addChild(comms);
 
 #if CONFIG_DARWIN

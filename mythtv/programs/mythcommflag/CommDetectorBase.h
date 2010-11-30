@@ -9,6 +9,8 @@ using namespace std;
 
 #include "programtypes.h"
 
+#define MAX_BLANK_FRAMES 60
+
 typedef enum commMapValues {
     MARK_START   = 0,
     MARK_END     = 1,

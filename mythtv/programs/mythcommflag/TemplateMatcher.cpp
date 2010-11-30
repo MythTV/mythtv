@@ -673,7 +673,6 @@ int
 TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
     long long nframes)
 {
-    const bool skipCommBlanks = blankFrameDetector->getSkipCommBlanks();
     const FrameAnalyzer::FrameMap *blankMap = blankFrameDetector->getBlanks();
 
     /*
@@ -778,8 +777,10 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
         if (jj != blankMap->constEnd())
         {
             newbrkb = jj.key();
-            if (!skipCommBlanks)
-                newbrkb += *jj;
+            long long adj = *jj / 2;
+            if (adj > MAX_BLANK_FRAMES)
+                adj = MAX_BLANK_FRAMES;
+            newbrkb += adj;
         }
 
         /*
@@ -796,8 +797,12 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
         if (kk != blankMap->constEnd())
         {
             newbrke = kk.key();
-            if (skipCommBlanks)
-                newbrke += *kk;
+            long long adj = *kk;
+            newbrke += adj;
+            adj /= 2;
+            if (adj > MAX_BLANK_FRAMES)
+                adj = MAX_BLANK_FRAMES;
+            newbrke -= adj;
         }
 
         /*

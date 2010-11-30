@@ -170,7 +170,6 @@ ClassicCommDetector::ClassicCommDetector(SkipType commDetectMethod_in,
     commDetectMaxCommLength =
         gCoreContext->GetNumSetting("CommDetectMaxCommLength", 125);
 
-    skipAllBlanks = !!gCoreContext->GetNumSetting("CommSkipAllBlanks", 1);
     commDetectBlankCanHaveLogo =
         !!gCoreContext->GetNumSetting("CommDetectBlankCanHaveLogo", 1);
 }
@@ -1794,19 +1793,18 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
     {
         if (*it == MARK_COMM_START)
         {
-            lastStart = it.key();
-            if (skipAllBlanks)
-            {
-                while ((lastStart > 0) &&
-                        (frameInfo[lastStart - 1].flagMask & COMM_FRAME_BLANK))
-                    lastStart--;
-            }
-            else
-            {
-                while ((lastStart < (framesProcessed - (2 * fps))) &&
-                        (frameInfo[lastStart + 1].flagMask & COMM_FRAME_BLANK))
-                    lastStart++;
-            }
+            uint64_t lastStartLower = it.key();
+            uint64_t lastStartUpper = it.key();
+            while ((lastStartLower > 0) &&
+                   (frameInfo[lastStartLower - 1].flagMask & COMM_FRAME_BLANK))
+                lastStartLower--;
+            while ((lastStartUpper < (framesProcessed - (2 * fps))) &&
+                   (frameInfo[lastStartUpper + 1].flagMask & COMM_FRAME_BLANK))
+                lastStartUpper++;
+            uint64_t adj = (lastStartUpper - lastStartLower) / 2;
+            if (adj > MAX_BLANK_FRAMES)
+                adj = MAX_BLANK_FRAMES;
+            lastStart = lastStartLower + adj;
 
             if (verboseDebugging)
                 VERBOSE(VB_COMMFLAG, QString("Start Mark: %1 -> %2")
@@ -1817,19 +1815,18 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
         }
         else
         {
-            lastEnd = it.key();
-            if (skipAllBlanks)
-            {
-                while ((lastEnd < (framesProcessed - (2 * fps))) &&
-                        (frameInfo[lastEnd + 1].flagMask & COMM_FRAME_BLANK))
-                    lastEnd++;
-            }
-            else
-            {
-                while ((lastEnd > 0) &&
-                        (frameInfo[lastEnd - 1].flagMask & COMM_FRAME_BLANK))
-                    lastEnd--;
-            }
+            uint64_t lastEndLower = it.key();
+            uint64_t lastEndUpper = it.key();
+            while ((lastEndUpper < (framesProcessed - (2 * fps))) &&
+                   (frameInfo[lastEndUpper + 1].flagMask & COMM_FRAME_BLANK))
+                lastEndUpper++;
+            while ((lastEndLower > 0) &&
+                   (frameInfo[lastEndLower - 1].flagMask & COMM_FRAME_BLANK))
+                lastEndLower--;
+            uint64_t adj = (lastEndUpper - lastEndLower) / 2;
+            if (adj > MAX_BLANK_FRAMES)
+                adj = MAX_BLANK_FRAMES;
+            lastEnd = lastEndUpper - adj;
 
             if (verboseDebugging)
                 VERBOSE(VB_COMMFLAG, QString("End Mark  : %1 -> %2")
@@ -1942,6 +1939,7 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
     for(; i < (commercials-1); i++)
     {
         long long r = c_start[i];
+        long long adjustment = 0;
 
         if ((r < (30 * fps)) &&
             (first_comm))
@@ -1963,18 +1961,26 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
                 x++;
             }
 
-            if (skipAllBlanks)
-                while((blankFrameMap.contains(r+1)) &&
-                        (c_start[i+1] != (r+1)))
+            while((blankFrameMap.contains(r+1)) &&
+                  (c_start[i+1] != (r+1)))
+                {
                     r++;
+                    adjustment++;
+                }
         }
         else
         {
-            if (skipAllBlanks)
-                while(blankFrameMap.contains(r+1))
-                    r++;
+            while(blankFrameMap.contains(r+1))
+            {
+                r++;
+                adjustment++;
+            }
         }
 
+        adjustment /= 2;
+        if (adjustment > MAX_BLANK_FRAMES)
+            adjustment = MAX_BLANK_FRAMES;
+        r -= adjustment;
         blankCommMap[r] = MARK_COMM_END;
         first_comm = false;
     }

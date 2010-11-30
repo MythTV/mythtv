@@ -153,8 +153,6 @@ class ClassicCommDetector : public CommDetectorBase
         bool logoInfoAvailable;
         LogoDetectorBase* logoDetector;
 
-        bool skipAllBlanks;
-
         unsigned char *framePtr;
 
         frm_dir_map_t blankFrameMap;

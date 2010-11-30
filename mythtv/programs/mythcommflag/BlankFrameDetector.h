@@ -31,7 +31,6 @@ public:
         { return (index) ? blankMap : breakMap; }
 
     /* BlankFrameDetector interface. */
-    bool getSkipCommBlanks(void) const { return skipcommblanks; }
     const FrameAnalyzer::FrameMap *getBlanks(void) const { return &blankMap; }
     int computeForLogoSurplus(const TemplateMatcher *tm);
     int computeForLogoDeficit(const TemplateMatcher *tm);
@@ -40,7 +39,6 @@ public:
 private:
     HistogramAnalyzer       *histogramAnalyzer;
     float                   fps;
-    bool                    skipcommblanks;         /* skip commercial blanks */
 
     FrameAnalyzer::FrameMap blankMap;
     FrameAnalyzer::FrameMap breakMap;
