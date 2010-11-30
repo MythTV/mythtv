@@ -20,7 +20,7 @@ contains(INCLUDEPATH, /usr/local/include) {
 }
 
 DEPENDPATH  += .
-DEPENDPATH  += ../libmyth
+DEPENDPATH  += ../libmyth ../libmyth/audio
 DEPENDPATH  += ../libmythdb ../libmythhdhomerun
 DEPENDPATH  += ../libmythdvdnav/
 DEPENDPATH  += ../libmythbluray/

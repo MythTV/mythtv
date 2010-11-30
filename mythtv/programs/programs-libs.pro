@@ -1,5 +1,5 @@
-INCLUDEPATH += ../.. ../../libs/ ../../libs/libmyth ../../libs/libmythtv
-INCLUDEPATH += ../../external/FFmpeg
+INCLUDEPATH += ../.. ../../libs/ ../../libs/libmyth ../../libs/libmyth/audio
+INCLUDEPATH +=  ../../libs/libmythtv ../../external/FFmpeg
 INCLUDEPATH += ../../libs/libmythupnp ../../libs/libmythui ../../libs/libmythmetadata
 INCLUDEPATH += ../../libs/libmythlivemedia ../../libs/libmythdb ../../libmythhdhomerun
 INCLUDEPATH += ../../libs/libmythdvdnav ../../libs/libmythbluray ../../libs/libmythsamplerate
@@ -49,8 +49,8 @@ TARGETDEPS += ../../libs/libmythdb/libmythdb-$${MYTH_SHLIB_EXT}
 using_live: TARGETDEPS += ../../libs/libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
 using_hdhomerun: TARGETDEPS += ../../libs/libmythhdhomerun/libmythhdhomerun-$${MYTH_SHLIB_EXT}
 
-DEPENDPATH += ../.. ../../libs ../../libs/libmyth ../../libs/libmythtv
-DEPENDPATH += ../../external/FFmpeg
+DEPENDPATH += ../.. ../../libs ../../libs/libmyth ../../libs/libmyth/audio
+DEPENDPATH +=  ../../libs/libmythtv ../../external/FFmpeg
 DEPENDPATH += ../../libs/libmythupnp ../../libs/libmythui
 DEPENDPATH += ../../libs/libmythlivemedia ../../libmythdb ../../libmythhdhomerun
 
