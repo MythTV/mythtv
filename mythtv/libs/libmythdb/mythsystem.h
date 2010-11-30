@@ -2,6 +2,7 @@
 #define MYTHSYSTEM_H_
 
 #include "mythexp.h"
+#include "compat.h"
 #include <signal.h>
 
 typedef enum MythSystemMask {
@@ -31,8 +32,6 @@ typedef enum MythSystemMask {
 #include <QMap>
 #include <QThread>
 #include <QWaitCondition>
-#include <unistd.h>  // for pid_t
-#include <sys/select.h>
 
 typedef QMap<QString, bool> Setting_t;
 
@@ -58,8 +57,8 @@ class MPUBLIC MythSystem : public QObject
         int Write(const QByteArray&);
         QByteArray Read(int size);
         QByteArray ReadErr(int size);
-        QByteArray ReadAll();
-        QByteArray ReadAllErr();
+        QByteArray& ReadAll();
+        QByteArray& ReadAllErr();
 
         void Term(bool force=false);
         void Kill()   { Signal(SIGKILL); };
@@ -92,6 +91,10 @@ class MPUBLIC MythSystem : public QObject
         QStringList &GetArgs()       { return m_args; };
         void SetArgs(QStringList &args)  { m_args = args; };
 
+        QBuffer *GetBuffer(int index) { return &m_stdbuff[index]; };
+
+        void Unlock() { m_pmutex.unlock(); };
+
         friend class MythSystemPrivate;
 
     signals:
@@ -108,6 +111,7 @@ class MPUBLIC MythSystem : public QObject
         void ProcessFlags(uint flags);
 
         uint        m_status;
+        QMutex      m_pmutex;
 
         QString     m_command;
         QString     m_logcmd;
@@ -115,6 +119,7 @@ class MPUBLIC MythSystem : public QObject
         QString     m_directory;
 
         Setting_t   m_settings;
+        QBuffer     m_stdbuff[3];
 };
 
 class MPUBLIC MythSystemPrivate : public QObject
@@ -122,14 +127,8 @@ class MPUBLIC MythSystemPrivate : public QObject
     Q_OBJECT
 
     public:
-        virtual void Run(time_t timeout = 0) = 0;
-        virtual uint Wait(time_t timeout = 0) = 0;
-
-        virtual int Write(const QByteArray&) = 0;
-        virtual QByteArray Read(int size) = 0;
-        virtual QByteArray ReadErr(int size) = 0;
-        virtual QByteArray& ReadAll() = 0;
-        virtual QByteArray& ReadAllErr() = 0;
+        virtual void Fork(time_t timeout) = 0;
+        virtual void Manage() = 0;
 
         virtual void Term(bool force=false) = 0;
         virtual void Signal(int sig) = 0;
@@ -152,6 +151,9 @@ class MPUBLIC MythSystemPrivate : public QObject
 
         QStringList &GetArgs()       { return m_parent->GetArgs(); };
         void SetArgs(QStringList &args)  { m_parent->SetArgs(args); };
+
+        QBuffer *GetBuffer(int index) { return m_parent->GetBuffer(index); };
+        void Unlock() { m_parent->Unlock(); };
 
     signals:
         void started();

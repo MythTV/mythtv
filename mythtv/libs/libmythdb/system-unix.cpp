@@ -387,7 +387,7 @@ void MythSystemManager::append(MythSystemUnix *ms)
 
     fdLock.lock();
     if( ms->GetSetting("UseStdin") )
-        writeThread->insert(ms->m_stdpipe[0], &(ms->m_stdbuff[0]));
+        writeThread->insert(ms->m_stdpipe[0], ms->GetBuffer(0));
 
     if( ms->GetSetting("UseStdout") )
     {
@@ -395,7 +395,7 @@ void MythSystemManager::append(MythSystemUnix *ms)
         fdType->ms = ms;
         fdType->type = 1;
         fdMap.insert( ms->m_stdpipe[1], fdType );
-        readThread->insert(ms->m_stdpipe[1], &(ms->m_stdbuff[1]));
+        readThread->insert(ms->m_stdpipe[1], ms->GetBuffer(1));
     }
 
     if( ms->GetSetting("UseStderr") )
@@ -404,7 +404,7 @@ void MythSystemManager::append(MythSystemUnix *ms)
         fdType->ms = ms;
         fdType->type = 2;
         fdMap.insert( ms->m_stdpipe[2], fdType );
-        readThread->insert(ms->m_stdpipe[2], &(ms->m_stdbuff[2]));
+        readThread->insert(ms->m_stdpipe[2], ms->GetBuffer(2));
     }
     fdLock.unlock();
 }
@@ -461,7 +461,7 @@ void MythSystemSignalManager::run(void)
 
             ms->disconnect();
 
-            ms->m_pmutex.unlock();
+            ms->Unlock();
 
             if( ms->m_parent->doAutoCleanup() )
                 delete ms;
@@ -481,23 +481,6 @@ MythSystemUnix::MythSystemUnix(MythSystem *parent)
     connect( this, SIGNAL(finished()), m_parent, SIGNAL(finished()) );
     connect( this, SIGNAL(error(uint)), m_parent, SIGNAL(error(uint)) );
     connect( this, SIGNAL(readDataReady(int)), m_parent, SIGNAL(readDataReady(int)) );
-}
-
-// QBuffers may also need freeing
-MythSystemUnix::~MythSystemUnix(void)
-{
-}
-
-/** \fn MythSystem::Run()
- *  \brief Runs a command inside the /bin/sh shell. Returns immediately
- */
-void MythSystemUnix::Run(time_t timeout)
-{
-    if( GetStatus() != GENERIC_EXIT_START )
-    {
-        emit error(GetStatus());
-        return;
-    }
 
     // Start the threads if they haven't been started yet.
     if( manager == NULL )
@@ -523,64 +506,13 @@ void MythSystemUnix::Run(time_t timeout)
         writeThread = new MythSystemIOHandler(false);
         writeThread->start();
     }
-
-
-    // Handle any locking of drawing, etc
-    m_parent->HandlePreRun();
-
-    m_timeout = timeout;
-
-    Fork();
-
-    // Do this after Fork() so the displayed timeout in the logs looks right
-    if( timeout )
-        m_timeout += time(NULL);
-
-
-    m_pmutex.lock();
-    emit started();
-    manager->append(this);
 }
 
-// should there be a separate 'getstatus' call? or is using
-// Wait() for that purpose sufficient?
-uint MythSystemUnix::Wait(time_t timeout)
+// QBuffers may also need freeing
+MythSystemUnix::~MythSystemUnix(void)
 {
-    if( (GetStatus() != GENERIC_EXIT_RUNNING) || GetSetting("RunInBackground") )
-        return GetStatus();
-
-    if( GetSetting("ProcessEvents") )
-    {
-        if( timeout > 0 )
-            timeout += time(NULL);
-
-        while( !timeout || time(NULL) < timeout )
-        {
-            // loop until timeout hits or process ends
-            if( m_pmutex.tryLock(100) )
-            {
-                m_pmutex.unlock();
-                break;
-            }
-
-            qApp->processEvents();
-        }
-    }
-    else
-    {
-        if( timeout > 0 )
-        {
-            if( m_pmutex.tryLock(timeout*1000) )
-                m_pmutex.unlock();
-        }
-        else
-        {
-            m_pmutex.lock();
-            m_pmutex.unlock();
-        }
-    }
-    return GetStatus();
 }
+
 
 void MythSystemUnix::Term(bool force)
 {
@@ -591,7 +523,7 @@ void MythSystemUnix::Term(bool force)
     if( force )
     {
         // send KILL if it does not exit within one second
-        if( Wait(1) == GENERIC_EXIT_RUNNING )
+        if( m_parent->Wait(1) == GENERIC_EXIT_RUNNING )
             Signal(SIGKILL);
     }
 }
@@ -605,37 +537,8 @@ void MythSystemUnix::Signal( int sig )
     kill((GetSetting("SetPGID") ? -m_pid : m_pid), sig);
 }
 
-QByteArray  MythSystemUnix::Read(int size)
-{ 
-    return m_stdbuff[1].read(size); 
-}
-
-QByteArray  MythSystemUnix::ReadErr(int size)
-{ 
-    return m_stdbuff[2].read(size); 
-}
-
-QByteArray& MythSystemUnix::ReadAll()
-{
-    return m_stdbuff[1].buffer();
-}
-
-QByteArray& MythSystemUnix::ReadAllErr()
-{
-    return m_stdbuff[2].buffer();
-}
-
-int MythSystemUnix::Write(const QByteArray &ba)
-{
-    if (!GetSetting("UseStdin"))
-        return 0;
-
-    m_stdbuff[0].buffer().append(ba.constData());
-    return ba.size();
-}
-
 #define MAX_BUFLEN 1024
-void MythSystemUnix::Fork()
+void MythSystemUnix::Fork(time_t timeout)
 {
     QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(GetLogCmd());
 
@@ -646,9 +549,9 @@ void MythSystemUnix::Fork()
 
     VERBOSE(VB_GENERAL, QString("Launching: %1").arg(GetLogCmd()));
 
-    m_stdbuff[0].setBuffer(0);
-    m_stdbuff[1].setBuffer(0);
-    m_stdbuff[2].setBuffer(0);
+    GetBuffer(0)->setBuffer(0);
+    GetBuffer(1)->setBuffer(0);
+    GetBuffer(2)->setBuffer(0);
 
     int p_stdin[]  = {-1,-1};
     int p_stdout[] = {-1,-1};
@@ -737,6 +640,10 @@ void MythSystemUnix::Fork()
                     .arg(m_pid) .arg(GetSetting("UseShell") ? "*" : "")
                     .arg(GetSetting("RunInBackground") ? "&" : "")
                     .arg(GetLogCmd()) .arg(m_timeout));
+
+        m_timeout = timeout;
+        if( timeout )
+            m_timeout += time(NULL);
 
         /* close unused pipe ends */
         CLOSE(p_stdin[0]);
@@ -874,6 +781,16 @@ void MythSystemUnix::Fork()
         CLOSE(p_stderr[0]);
         CLOSE(p_stderr[1]);
     }
+}
+
+void MythSystemUnix::Manage(void)
+{
+    if( manager == NULL )
+    {
+        manager = new MythSystemManager;
+        manager->start();
+    }
+    manager->append(this);
 }
 
 void MythSystemUnix::JumpAbort(void)

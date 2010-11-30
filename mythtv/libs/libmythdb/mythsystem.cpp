@@ -1,9 +1,9 @@
 
-// Own header
-#include "mythsystem.h"
-
 // compat header
 #include "compat.h"
+
+// Own header
+#include "mythsystem.h"
 
 // C++/C headers
 #include <cerrno>
@@ -13,8 +13,6 @@
 #include <time.h>
 #include <signal.h>  // for kill()
 #include <string.h>
-#include <sys/select.h>
-#include <sys/wait.h>
 
 // QT headers
 #include <QCoreApplication>
@@ -33,6 +31,10 @@
 #if CONFIG_CYGWIN || defined(_WIN32)
 #include "system-windows.h"
 #else
+#if 0
+#include <sys/select.h>
+#include <sys/wait.h>
+#endif
 #include "system-unix.h"
 #endif
 
@@ -133,13 +135,20 @@ void MythSystem::Run(time_t timeout)
     if( !d )
         m_status = GENERIC_EXIT_NO_HANDLER;
 
-    if( m_status != GENERIC_EXIT_START )
+    if( GetStatus() != GENERIC_EXIT_START )
     {
-        emit error(m_status);
+        emit error(GetStatus());
         return;
     }
 
-    d->Run(timeout);
+    // Handle any locking of drawing, etc
+    HandlePreRun();
+
+    d->Fork(timeout);
+
+    m_pmutex.lock();
+    emit started();
+    d->Manage();
 }
 
 // should there be a separate 'getstatus' call? or is using
@@ -149,10 +158,40 @@ uint MythSystem::Wait(time_t timeout)
     if( !d )
         m_status = GENERIC_EXIT_NO_HANDLER;
 
-    if( (m_status != GENERIC_EXIT_RUNNING) || GetSetting("RunInBackground") )
-        return m_status;
+    if( (GetStatus() != GENERIC_EXIT_RUNNING) || GetSetting("RunInBackground") )
+        return GetStatus();
 
-    return d->Wait(timeout);
+    if( GetSetting("ProcessEvents") )
+    {
+        if( timeout > 0 )
+            timeout += time(NULL);
+
+        while( !timeout || time(NULL) < timeout )
+        {
+            // loop until timeout hits or process ends
+            if( m_pmutex.tryLock(100) )
+            {
+                m_pmutex.unlock();
+                break;
+            }
+
+            qApp->processEvents();
+        }
+    }
+    else
+    {
+        if( timeout > 0 )
+        {
+            if( m_pmutex.tryLock(timeout*1000) )
+                m_pmutex.unlock();
+        }
+        else
+        {
+            m_pmutex.lock();
+            m_pmutex.unlock();
+        }
+    }
+    return GetStatus();
 }
 
 void MythSystem::Term(bool force)
@@ -231,43 +270,32 @@ void MythSystem::ProcessFlags(uint flags)
 }
 
 QByteArray  MythSystem::Read(int size)
-{
-    if (!d)
-        return QByteArray();
-    
-    return d->Read(size);
+{ 
+    return m_stdbuff[1].read(size); 
 }
 
 QByteArray  MythSystem::ReadErr(int size)
-{
-    if (!d)
-        return QByteArray();
-        
-    return d->ReadErr(size);
+{ 
+    return m_stdbuff[2].read(size); 
 }
 
-QByteArray MythSystem::ReadAll()
+QByteArray& MythSystem::ReadAll()
 {
-    if (!d)
-        return QByteArray();
-        
-    return d->ReadAll();
+    return m_stdbuff[1].buffer();
 }
 
-QByteArray MythSystem::ReadAllErr()
+QByteArray& MythSystem::ReadAllErr()
 {
-    if (!d)
-        return QByteArray();
-        
-    return d->ReadAllErr();
+    return m_stdbuff[2].buffer();
 }
 
 int MythSystem::Write(const QByteArray &ba)
 {
-    if (!d || !GetSetting("UseStdin"))
+    if (!GetSetting("UseStdin"))
         return 0;
 
-    return d->Write(ba);
+    m_stdbuff[0].buffer().append(ba.constData());
+    return ba.size();
 }
 
 void MythSystem::HandlePreRun()
