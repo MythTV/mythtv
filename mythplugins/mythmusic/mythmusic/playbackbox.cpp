@@ -468,7 +468,8 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                                             160, 160);
                 mainvisual->setVisual(visual_modes[current_visual]);
                 bannerDisable();
-                updateTrackInfo(curMeta);
+                if (curMeta)
+                    updateTrackInfo(curMeta);
 
                 if (!m_parent->IsExitingToMain())
                     handled = true;
@@ -970,7 +971,7 @@ void PlaybackBoxMusic::postUpdate()
 
 void PlaybackBoxMusic::occasionallyCheckCD()
 {
-    if (!cd_reader_thread->getLock()->tryLock())
+    if (!cd_reader_thread || !cd_reader_thread->getLock()->tryLock())
         return;
     cd_reader_thread->getLock()->unlock();
 
@@ -1068,7 +1069,8 @@ void PlaybackBoxMusic::showEditMetadataDialog()
 
         GenericTree *node = music_tree_list->getCurrentNode();
         curMeta = gMusicData->all_music->getMetadata(node->getInt());
-        updateTrackInfo(curMeta);
+        if (curMeta)
+            updateTrackInfo(curMeta);
 
         setShuffleMode(gPlayer->getShuffleMode());
 
@@ -1362,7 +1364,8 @@ void PlaybackBoxMusic::play()
             gPlayer->getOutput()->SetTimecode(0);
     }
 
-    bannerEnable(curMeta, show_album_art);
+    if (curMeta)
+        bannerEnable(curMeta, show_album_art);
 }
 
 void PlaybackBoxMusic::visEnable()
@@ -1393,7 +1396,7 @@ void PlaybackBoxMusic::bannerToggle(Metadata *mdata)
 {
     if (mainvisual->bannerIsShowing())
         bannerDisable();
-    else
+    else if (mdata)
         bannerEnable(mdata, false);
 }
 
@@ -1806,7 +1809,8 @@ void PlaybackBoxMusic::restorePosition(const QString &position)
                         if (node)
                         {
                             curMeta = gMusicData->all_music->getMetadata(node->getInt());
-                            updateTrackInfo(curMeta);
+                            if (curMeta)
+                                updateTrackInfo(curMeta);
 
                             maxTime = curMeta->Length() / 1000;
 
@@ -1832,7 +1836,8 @@ void PlaybackBoxMusic::restorePosition(const QString &position)
                     if (node)
                     {
                         curMeta = gMusicData->all_music->getMetadata(node->getInt());
-                        updateTrackInfo(curMeta);
+                        if (curMeta)
+                            updateTrackInfo(curMeta);
 
                         maxTime = curMeta->Length() / 1000;
 
@@ -2074,24 +2079,27 @@ void PlaybackBoxMusic::wipeTrackInfo()
 
 void PlaybackBoxMusic::updateTrackInfo(Metadata *mdata)
 {
-    if (visualizer_status != 2)
+    if (mdata)
     {
-        if (title_text)
-            title_text->SetText(mdata->FormatTitle());
-        if (artist_text)
-            artist_text->SetText(mdata->FormatArtist());
-        if (album_text)
-            album_text->SetText(mdata->Album());
-        if (albumart_image)
-            showAlbumArtImage(mdata);
-
-        if (showrating)
+        if (visualizer_status != 2)
         {
-            if (ratings_image)
-                ratings_image->setRepeat(mdata->Rating());
+            if (title_text)
+                title_text->SetText(mdata->FormatTitle());
+            if (artist_text)
+                artist_text->SetText(mdata->FormatArtist());
+            if (album_text)
+                album_text->SetText(mdata->Album());
+            if (albumart_image)
+                showAlbumArtImage(mdata);
+
+            if (showrating)
+            {
+                if (ratings_image)
+                    ratings_image->setRepeat(mdata->Rating());
+            }
         }
+        setTrackOnLCD(mdata);
     }
-    setTrackOnLCD(mdata);
 }
 
 void PlaybackBoxMusic::showAlbumArtImage(Metadata *mdata)
@@ -2169,8 +2177,8 @@ void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes
         }
 
         curMeta = gMusicData->all_music->getMetadata(node_int);
-
-        updateTrackInfo(curMeta);
+        if (curMeta)
+            updateTrackInfo(curMeta);
 
         maxTime = curMeta->Length() / 1000;
 
