@@ -95,8 +95,8 @@ class AudioOutputBase : public AudioOutput, public QThread
     virtual void bufferOutputData(bool y){ buffer_output_data_for_use = y; }
     virtual int readOutputData(unsigned char *read_buffer, int max_length);
 
-    static const uint kAudioSRCInputSize  = 16384<<1;
-    static const uint kAudioSRCOutputSize = 16384<<3;
+    static const uint kAudioSRCInputSize = 32768;
+
     /// Audio Buffer Size -- should be divisible by 32,24,16,12,10,8,6,4,2..
     static const uint kAudioRingBufferSize   = 3072000;
 
@@ -224,7 +224,8 @@ class AudioOutputBase : public AudioOutput, public QThread
     uint memory_corruption_test0;
     float src_in_buf[kAudioSRCInputSize + 16];
     uint memory_corruption_test1;
-    float src_out[kAudioSRCOutputSize];
+    float *src_out;
+    int kAudioSRCOutputSize;
     uint memory_corruption_test2;
     /** main audio buffer */
     uchar audiobuffer[kAudioRingBufferSize];

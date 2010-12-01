@@ -120,9 +120,8 @@ static int toFloat8(float *out, uchar *in, int len)
 }
 
 /*
- All fromFloat variants require 16 byte aligned output buffers on x86
- The SSE code processes 16 bytes at a time and leaves any remainder for the C
- - there is no remainder in practice */
+  The SSE code processes 16 bytes at a time and leaves any remainder for the C
+  - there is no remainder in practice */
 
 static int fromFloat8(uchar *out, float *in, int len)
 {
@@ -130,7 +129,7 @@ static int fromFloat8(uchar *out, float *in, int len)
     float f = (1<<7) - 1;
 
 #if ARCH_X86
-    if (sse_check() && len >= 16)
+    if (sse_check() && len >= 16 && ((unsigned long)out & 0xf) == 0)
     {
         int loops = len >> 4;
         i = loops << 4;
@@ -235,7 +234,7 @@ static int fromFloat16(short *out, float *in, int len)
     float f = (1<<15) - 1;
 
 #if ARCH_X86
-    if (sse_check() && len >= 16)
+    if (sse_check() && len >= 16 && ((unsigned long)out & 0xf) == 0)
     {
         int loops = len >> 4;
         i = loops << 4;
@@ -342,7 +341,7 @@ static int fromFloat32(AudioFormat format, int *out, float *in, int len)
         shift = 0;
 
 #if ARCH_X86
-    if (sse_check() && len >= 16)
+    if (sse_check() && len >= 16 && ((unsigned long)out & 0xf) == 0)
     {
         float o = 1, mo = -1;
         int loops = len >> 4;
@@ -407,7 +406,7 @@ static int fromFloatFLT(float *out, float *in, int len)
     int i = 0;
 
 #if ARCH_X86
-    if (sse_check() && len >= 16)
+    if (sse_check() && len >= 16 && ((unsigned long)in & 0xf) == 0)
     {
         int loops = len >> 4;
         float o = 1, mo = -1;

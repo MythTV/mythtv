@@ -93,6 +93,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
 
     memory_corruption_test0(0xdeadbeef),
     memory_corruption_test1(0xdeadbeef),
+    src_out(NULL),              kAudioSRCOutputSize(0),
     memory_corruption_test2(0xdeadbeef),
     memory_corruption_test3(0xdeadbeef)
 {
@@ -100,7 +101,6 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     // The following are not bzero() because MS Windows doesn't like it.
     memset(&src_data,          0, sizeof(SRC_DATA));
     memset(src_in,             0, sizeof(float) * kAudioSRCInputSize);
-    memset(src_out,            0, sizeof(float) * kAudioSRCOutputSize);
     memset(audiobuffer,        0, sizeof(char)  * kAudioRingBufferSize);
 
     // Default SRC quality - QUALITY_HIGH is quite expensive
@@ -133,6 +133,9 @@ AudioOutputBase::~AudioOutputBase()
     // We got this from a subclass, delete it
     delete output_settings;
     delete output_settingsraw;
+
+    if (kAudioSRCOutputSize > 0)
+        delete[] src_out;
 
     assert(memory_corruption_test0 == 0xdeadbeef);
     assert(memory_corruption_test1 == 0xdeadbeef);
@@ -474,6 +477,17 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
         src_data.src_ratio      = (double)samplerate / settings.samplerate;
         src_data.data_in        = src_in;
+        int newsize             = ((long)((float)kAudioSRCInputSize *
+                                          samplerate / settings.samplerate) +
+                                   15) & ~0xf;
+        if (kAudioSRCOutputSize < newsize)
+        {
+            kAudioSRCOutputSize = newsize;
+            VBAUDIO(QString("Resampler allocating %1").arg(newsize));
+            if (src_out)
+                delete[] src_out;
+            src_out = new float[kAudioSRCOutputSize];
+        }
         src_data.data_out       = src_out;
         src_data.output_frames  = kAudioSRCOutputSize;
         src_data.end_of_input = 0;
@@ -789,7 +803,7 @@ int64_t AudioOutputBase::GetAudiotime(void)
 
     /* timecode is the stretch adjusted version
        of major post-stretched buffer contents
-       processing latencies are catered for in AddSamples/SetAudiotime
+       processing latencies are catered for in AddFrames/SetAudiotime
        to eliminate race */
     audiotime = audbuf_timecode - (
         ((main_buffer + soundcard_buffer) * eff_stretchfactor ) /
@@ -819,7 +833,7 @@ int64_t AudioOutputBase::GetAudiotime(void)
 /**
  * Set the timecode of the top of the ringbuffer
  * Exclude all other processing elements as they dont vary
- * between AddSamples calls
+ * between AddFrames calls
  */
 void AudioOutputBase::SetAudiotime(int frames, int64_t timecode)
 {
@@ -841,12 +855,12 @@ void AudioOutputBase::SetAudiotime(int frames, int64_t timecode)
 
     int64_t old_audbuf_timecode = audbuf_timecode;
 
-    audbuf_timecode = timecode + 
+    audbuf_timecode = timecode +
                 (((frames + processframes_unstretched) * 100000) +
                   (processframes_stretched * eff_stretchfactor )) / effdsp;
 
     // check for timecode wrap and reset audiotime if detected
-    // timecode will always be monotonic asc if not seeked and reset 
+    // timecode will always be monotonic asc if not seeked and reset
     // happens if seek or pause happens
     if (audbuf_timecode < old_audbuf_timecode)
         audiotime = 0;
@@ -979,32 +993,48 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
     }
 
     // Upmix to 6ch via FreeSurround
-
     // Calculate frame size of input
     off =  processing ? 4 : output_settings->SampleSize(format);
     off *= source_channels;
 
-    int i = 0;
-    while (i < frames)
-        i += upmixer->putFrames(buffer + i * off, frames - i, source_channels);
-
-    int nFrames = upmixer->numFrames();
-    if (!nFrames)
-        return 0;
-
-    len = CheckFreeSpace(nFrames);
-
-    int bdFrames = bdiff / bpf;
-    if (bdFrames < nFrames)
+    int remaining_frames = frames;
+    len = 0;
+    do
     {
-        upmixer->receiveFrames((float *)(WPOS), bdFrames);
-        nFrames -= bdFrames;
-        org_waud = 0;
-    }
-    if (nFrames > 0)
-        upmixer->receiveFrames((float *)(WPOS), nFrames);
+        int i;
+        frames = remaining_frames;
+        if (frames * source_channels > SURROUND_BUFSIZE)
+        {
+            frames = SURROUND_BUFSIZE / source_channels;
+        }
 
-    org_waud += nFrames * bpf;
+        i = 0;
+        while (i < frames)
+            i += upmixer->putFrames(buffer + i * off,
+                                    frames - i, source_channels);
+
+        remaining_frames -= i;
+        buffer += i * off;
+
+        int nFrames = upmixer->numFrames();
+        if (!nFrames)
+            continue;
+
+        len += CheckFreeSpace(nFrames);
+
+        int bdFrames = (kAudioRingBufferSize - org_waud) / bpf;
+        if (bdFrames < nFrames)
+        {
+            upmixer->receiveFrames((float *)(WPOS), bdFrames);
+            nFrames -= bdFrames;
+            org_waud = 0;
+        }
+        if (nFrames > 0)
+            upmixer->receiveFrames((float *)(WPOS), nFrames);
+
+        org_waud += nFrames * bpf;
+    }
+    while (remaining_frames > 0);
     return len;
 }
 
@@ -1013,11 +1043,13 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
  *
  * Returns false if there's not enough space right now
  */
-bool AudioOutputBase::AddFrames(void *buffer, int in_frames, int64_t timecode)
+bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
+                                int64_t timecode)
 {
     int org_waud = waud,               afree = audiofree();
     int frames   = in_frames;
-    int bpf      = bytes_per_frame,    len   = frames * source_bytes_per_frame;
+    void *buffer = in_buffer;
+    int bpf      = bytes_per_frame,    len = frames * source_bytes_per_frame;
     int used     = kAudioRingBufferSize - afree;
     bool music   = false;
     int bdiff;
@@ -1044,15 +1076,17 @@ bool AudioOutputBase::AddFrames(void *buffer, int in_frames, int64_t timecode)
         // Send original samples to mythmusic visualisation
         timecode = (int64_t)(frames_buffered) * 1000 / source_samplerate;
         frames_buffered += frames;
-        dispatchVisual((uchar *)buffer, len, timecode, source_channels,
+        dispatchVisual((uchar *)in_buffer, len, timecode, source_channels,
                        output_settings->FormatToBits(format));
         music = true;
     }
 
+    // Calculate amount of free space required in ringbuffer
     if (processing)
     {
-        // Convert to floats
-        len = AudioOutputUtil::toFloat(format, src_in, buffer, len);
+        // Final float conversion space requirement
+        len = sizeof(*src_in_buf) /
+            AudioOutputSettings::SampleSize(format) * len;
 
         // Account for changes in number of channels
         if (needs_upmix || needs_downmix)
@@ -1074,124 +1108,178 @@ bool AudioOutputBase::AddFrames(void *buffer, int in_frames, int64_t timecode)
 
     if (len > afree)
     {
-            VBAUDIOTS("Buffer is full, AddFrames returning false");
-            return false; // would overflow
+        VBAUDIOTS("Buffer is full, AddFrames returning false");
+        return false; // would overflow
     }
 
-    // Perform downmix if necessary
-    if (needs_downmix)
-        if(AudioOutputDownmix::DownmixFrames(source_channels, channels,
-                                             src_in, src_in, frames) < 0)
-            VBERROR("Error occurred while downmixing");
+    int frames_remaining = in_frames;
+    int frames_offset = 0;
+    int frames_final = 0;
 
-    // Resample if necessary
-    if (need_resampler && src_ctx)
+    while(frames_remaining > 0)
     {
-        src_data.input_frames = frames;
-        int error = src_process(src_ctx, &src_data);
+        buffer = (char *)in_buffer + frames_offset;
+        frames = frames_remaining;
 
-        if (error)
-            VBERROR(QString("Error occurred while resampling audio: %1")
-                    .arg(src_strerror(error)));
+        len = frames * source_bytes_per_frame;
 
-        buffer = src_out;
-        in_frames = frames = src_data.output_frames_gen;
-    }
-    else if (processing)
-        buffer = src_in;
-
-    /* we want the timecode of the last sample added but we are given the
-       timecode of the first - add the time in ms that the frames added
-       represent */
-
-    // Copy samples into audiobuffer, with upmix if necessary
-    if ((len = CopyWithUpmix((char *)buffer, frames, org_waud)) <= 0)
-    {
-        SetAudiotime(in_frames, timecode);
-        return true;
-    }
-
-    frames = len / bpf;
-
-    bdiff = kAudioRingBufferSize - waud;
-
-    if (pSoundStretch)
-    {
-        // does not change the timecode, only the number of samples
-        org_waud     = waud;
-        int bdFrames = bdiff / bpf;
-
-        if (bdiff < len)
+        if (processing)
         {
-            pSoundStretch->putSamples((STST *)(WPOS), bdFrames);
-            pSoundStretch->putSamples((STST *)ABUF, (len - bdiff) / bpf);
+            if (frames * source_channels > (int)kAudioSRCInputSize)
+            {
+                frames = kAudioSRCInputSize / source_channels;
+                len = frames * source_bytes_per_frame;
+                frames_offset += len;
+            }
+            // Convert to floats
+            len = AudioOutputUtil::toFloat(format, src_in, buffer, len);
+        }
+        frames_remaining -= frames;
+
+        // Perform downmix if necessary
+        if (needs_downmix)
+            if(AudioOutputDownmix::DownmixFrames(source_channels, channels,
+                                                 src_in, src_in, frames) < 0)
+                VBERROR("Error occurred while downmixing");
+
+        // Resample if necessary
+        if (need_resampler && src_ctx)
+        {
+            src_data.input_frames = frames;
+            int error = src_process(src_ctx, &src_data);
+
+            if (error)
+                VBERROR(QString("Error occurred while resampling audio: %1")
+                        .arg(src_strerror(error)));
+
+            buffer = src_out;
+            frames = src_data.output_frames_gen;
+            frames_final += frames;
         }
         else
-            pSoundStretch->putSamples((STST *)(WPOS), frames);
-
-        int nFrames = pSoundStretch->numSamples();
-        if (nFrames > frames)
-            CheckFreeSpace(nFrames);
-
-        len = nFrames * bpf;
-
-        if (nFrames > bdFrames)
         {
-            nFrames -= pSoundStretch->receiveSamples((STST *)(WPOS), bdFrames);
-            org_waud = 0;
+            frames_final += frames;
+            if (processing)
+                buffer = src_in;
         }
-        if (nFrames > 0)
-            nFrames = pSoundStretch->receiveSamples((STST *)(WPOS), nFrames);
 
-        org_waud += nFrames * bpf;
+        /* we want the timecode of the last sample added but we are given the
+           timecode of the first - add the time in ms that the frames added
+           represent */
+
+        // Copy samples into audiobuffer, with upmix if necessary
+        if ((len = CopyWithUpmix((char *)buffer, frames, org_waud)) <= 0)
+        {
+            continue;
+        }
+
+        frames = len / bpf;
+
+        bdiff = kAudioRingBufferSize - waud;
+
+        if (pSoundStretch)
+        {
+            // does not change the timecode, only the number of samples
+            org_waud     = waud;
+            int bdFrames = bdiff / bpf;
+
+            if (bdiff < len)
+            {
+                pSoundStretch->putSamples((STST *)(WPOS), bdFrames);
+                pSoundStretch->putSamples((STST *)ABUF, (len - bdiff) / bpf);
+            }
+            else
+                pSoundStretch->putSamples((STST *)(WPOS), frames);
+
+            int nFrames = pSoundStretch->numSamples();
+            if (nFrames > frames)
+                CheckFreeSpace(nFrames);
+
+            len = nFrames * bpf;
+
+            if (nFrames > bdFrames)
+            {
+                nFrames -= pSoundStretch->receiveSamples((STST *)(WPOS),
+                                                         bdFrames);
+                org_waud = 0;
+            }
+            if (nFrames > 0)
+                nFrames = pSoundStretch->receiveSamples((STST *)(WPOS),
+                                                        nFrames);
+
+            org_waud += nFrames * bpf;
+        }
+
+        if (internal_vol && SWVolume())
+        {
+            org_waud    = waud;
+            int num     = len;
+
+            if (bdiff <= num)
+            {
+                AudioOutputUtil::AdjustVolume(WPOS, bdiff, volume,
+                                              music, needs_upmix && upmixer);
+                num -= bdiff;
+                org_waud = 0;
+            }
+            if (num > 0)
+                AudioOutputUtil::AdjustVolume(WPOS, num, volume,
+                                              music, needs_upmix && upmixer);
+            org_waud += num;
+        }
+
+        if (encoder)
+        {
+            org_waud            = waud;
+            int org_waud2       = waud;
+            int remaining       = len;
+            int to_get          = 0;
+            // The AC3 encoder can only work on 128kB of data at a time
+            int maxframes       = ((INBUFSIZE / encoder->FrameSize()) *
+                                   encoder->FrameSize() + 15) & ~0xf;
+
+            do
+            {
+                len = remaining;
+                if (len > maxframes)
+                {
+                    len = maxframes;
+                }
+                remaining -= len;
+
+                bdiff = kAudioRingBufferSize - org_waud;
+                if (bdiff < len)
+                {
+                    encoder->Encode(WPOS, bdiff, processing);
+                    to_get = encoder->Encode(ABUF, len - bdiff, processing);
+                    org_waud = len - bdiff;
+                }
+                else
+                {
+                    to_get = encoder->Encode(WPOS, len, processing);
+                    org_waud += len;
+                }
+
+                bdiff = kAudioRingBufferSize - org_waud2;
+                if (bdiff <= to_get)
+                {
+                    encoder->GetFrames(audiobuffer + org_waud2, bdiff);
+                    to_get -= bdiff ;
+                    org_waud2 = 0;
+                }
+                if (to_get > 0)
+                    encoder->GetFrames(audiobuffer + org_waud2, to_get);
+
+                org_waud2 += to_get;
+            }
+            while (remaining > 0);
+            org_waud = org_waud2;
+        }
+
+        waud = org_waud;
     }
 
-    if (internal_vol && SWVolume())
-    {
-        org_waud    = waud;
-        int num     = len;
-
-        if (bdiff <= num)
-        {
-            AudioOutputUtil::AdjustVolume(WPOS, bdiff, volume,
-                                          music, needs_upmix && upmixer);
-            num -= bdiff;
-            org_waud = 0;
-        }
-        if (num > 0)
-            AudioOutputUtil::AdjustVolume(WPOS, num, volume,
-                                          music, needs_upmix && upmixer);
-        org_waud += num;
-    }
-
-    if (encoder)
-    {
-        org_waud   = waud;
-        int to_get = 0;
-
-        if (bdiff < len)
-        {
-            encoder->Encode(WPOS, bdiff, processing);
-            to_get = encoder->Encode(ABUF, len - bdiff, processing);
-        }
-        else
-            to_get = encoder->Encode(WPOS, len, processing);
-
-        if (bdiff <= to_get)
-        {
-            encoder->GetFrames(WPOS, bdiff);
-            to_get -= bdiff;
-            org_waud = 0;
-        }
-        if (to_get > 0)
-            encoder->GetFrames(WPOS, to_get);
-
-        org_waud += to_get;
-    }
-
-    waud = org_waud;
-
-    SetAudiotime(in_frames, timecode);
+    SetAudiotime(frames_final, timecode);
 
     return true;
 }
