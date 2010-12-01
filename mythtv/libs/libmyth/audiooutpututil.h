@@ -5,9 +5,10 @@ using namespace std;
 #include "mythverbose.h"
 #include "audiooutputsettings.h"
 
-class AudioOutputUtil
+class MPUBLIC AudioOutputUtil
 {
  public:
+    static bool has_hardware_fpu();
     static int  toFloat(AudioFormat format, void *out, void *in, int bytes);
     static int  fromFloat(AudioFormat format, void *out, void *in, int bytes);
     static void MonoToStereo(void *dst, void *src, int samples);
