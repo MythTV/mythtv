@@ -283,7 +283,8 @@ void MusicPlayer::stopDecoder(void)
         if (m_currentMetadata->hasChanged())
         {
             m_currentMetadata->persist();
-            getDecoder()->commitVolatileMetadata(m_currentMetadata);
+            if (getDecoder())
+                getDecoder()->commitVolatileMetadata(m_currentMetadata);
         }
     }
 
