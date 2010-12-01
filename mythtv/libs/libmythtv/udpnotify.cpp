@@ -125,7 +125,7 @@ void UDPNotify::ParseTextArea(UDPNotifyOSDSet *container, QDomElement &element)
 {
     QString value;
     QString name = element.attribute("name", "");
-    if (name.isNull() || name.isEmpty())
+    if (name.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, "Text area needs a name");
         return;

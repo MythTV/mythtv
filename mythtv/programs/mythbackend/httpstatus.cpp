@@ -933,7 +933,7 @@ int HttpStatus::PrintScheduled( QTextStream &os, QDomElement scheduled )
                    << startTs.toString(timeformat) << "-"
                    << endTs.toString(timeformat) << ")<br />";
 
-                if ( !sSubTitle.isNull() && !sSubTitle.isEmpty())
+                if ( !sSubTitle.isEmpty())
                     os << "<em>" << sSubTitle << "</em><br /><br />";
 
                 os << sDesc << "<br /><br />"
