@@ -1106,6 +1106,9 @@ void PlaybackBoxMusic::checkForPlaylists()
                 if (scan_for_cd)
                     updatePlaylistFromCD();
 
+                bool bLocked = cd_reader_thread ?
+                    cd_reader_thread->getLock()->lock(), true : false;
+
                 music_tree_list->showWholeTree(show_whole_tree);
                 Q3ValueList <int> branches_to_current_node;
                 branches_to_current_node.append(0); //  Root node
@@ -1135,6 +1138,8 @@ void PlaybackBoxMusic::checkForPlaylists()
                 if (curMeta)
                     updateTrackInfo(curMeta);
 
+                if (bLocked && cd_reader_thread)
+                    cd_reader_thread->getLock()->unlock();
                 return;     // Do not restart Timer
             }
             else

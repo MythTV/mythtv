@@ -472,7 +472,15 @@ static void handleMedia(MythMediaDevice *cd)
     }
 
     if (gCoreContext->GetNumSetting("AutoPlayCD", 0))
+    {
+        // Empty the playlist to ensure CD is played first
+        if (gMusicData->all_music)
+            gMusicData->all_music->clearCDData();
+        if (gMusicData->all_playlists)
+            gMusicData->all_playlists->clearCDList();
+
         runMusicPlayback();
+    }
     else
         mythplugin_run();
 }
