@@ -267,7 +267,7 @@ void DecoderHandler::start(Metadata *mdata)
     m_redirects = 0;
 
     QUrl url;
-    if (mdata->Filename().startsWith('/'))
+    if (QFileInfo(mdata->Filename()).isAbsolute())
         url = QUrl::fromLocalFile(mdata->Filename());
     else
         url.setUrl(mdata->Filename());
@@ -328,7 +328,7 @@ bool DecoderHandler::next(void)
     PlayListFileEntry *entry = m_playlist.get(m_playlist_pos);
 
     QUrl url;
-    if (entry->File().startsWith('/'))
+    if (QFileInfo(entry->File()).isAbsolute())
         url = QUrl::fromLocalFile(entry->File());
     else
         url.setUrl(entry->File());
@@ -398,7 +398,7 @@ bool DecoderHandler::createPlaylist(const QUrl &url)
 
     if (extension == ".pls" || extension == ".m3u")
     {
-        if (url.scheme() == "file" || url.toString().startsWith('/'))
+        if (url.scheme() == "file" || QFileInfo(url.toString()).isAbsolute())
             return createPlaylistFromFile(url);
         else
             return createPlaylistFromRemoteUrl(url);
@@ -411,7 +411,7 @@ bool DecoderHandler::createPlaylistForSingleFile(const QUrl &url)
 {
     PlayListFileEntry *entry = new PlayListFileEntry;
 
-    if (url.scheme() == "file" || url.toString().startsWith('/'))
+    if (url.scheme() == "file" || QFileInfo(url.toString()).isAbsolute())
         entry->setFile(url.toLocalFile());
     else
         entry->setFile(url.toString());
@@ -513,7 +513,7 @@ void DecoderHandler::createIOFactory(const QUrl &url)
     if (haveIOFactory()) 
         deleteIOFactory();
 
-    if (url.scheme() == "file" || url.toString().startsWith('/') || url.toString().endsWith(".cda"))
+    if (url.scheme() == "file" || QFileInfo(url.toString()).isAbsolute() || url.toString().endsWith(".cda"))
         m_io_factory = new DecoderIOFactoryFile(this);
     else if (m_meta && m_meta->Format() == "cast")
         m_io_factory = new DecoderIOFactoryShoutCast(this);
