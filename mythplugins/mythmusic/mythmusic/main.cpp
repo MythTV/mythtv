@@ -272,6 +272,7 @@ static void startRipper(void)
 {
     loadMusic();
 
+#ifndef USING_MINGW
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     Ripper *rip = new Ripper(mainStack, chooseCD());
@@ -284,12 +285,14 @@ static void startRipper(void)
     QObject::connect(rip, SIGNAL(ripFinished()),
                      gMusicData, SLOT(reloadMusic()),
                      Qt::QueuedConnection);
+#endif
 }
 
 static void startImport(void)
 {
     loadMusic();
 
+#ifndef USING_MINGW
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     ImportMusicDialog *import = new ImportMusicDialog(mainStack);
@@ -302,6 +305,7 @@ static void startImport(void)
     QObject::connect(import, SIGNAL(importFinished()),
                      gMusicData, SLOT(reloadMusic()),
                      Qt::QueuedConnection);
+#endif
 }
 
 static void MusicCallback(void *data, QString &selection)
@@ -396,6 +400,7 @@ static void runRipCD(void)
 {
     loadMusic();
 
+#ifndef USING_MINGW
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     Ripper *rip = new Ripper(mainStack, chooseCD());
@@ -408,6 +413,7 @@ static void runRipCD(void)
     QObject::connect(rip, SIGNAL(ripFinished()),
                      gMusicData, SLOT(reloadMusic()),
                      Qt::QueuedConnection);
+#endif
 }
 
 static void runScan(void)
