@@ -1,3 +1,7 @@
+
+#include <unistd.h>
+#include <fcntl.h>
+
 #include <iostream>
 #include <memory>
 
@@ -5,6 +9,7 @@
 #include <QDir>
 #include <QMap>
 #include <QApplication>
+#include <QFileInfo>
 
 #include "mythconfig.h"
 #include "mythcontext.h"
@@ -40,6 +45,7 @@ ExitPrompter   *exitPrompt  = NULL;
 StartPrompter  *startPrompt = NULL;
 
 static MythThemedMenu *menu;
+static QString  logfile;
 
 static void SetupMenuCallback(void* data, QString& selection)
 {
@@ -197,7 +203,43 @@ static void print_usage()
                 "Force the setting named 'KEY' to value 'VALUE'" << endl
              << "-v or --verbose debug-level    "
                 "Use '-v help' for level info" << endl
+             << "-l or --logfile filename       "
+                "Writes STDERR and STDOUT messages to filename" << endl
              << endl;
+}
+
+static int log_rotate(int report_error)
+{
+    int new_logfd = open(logfile.toLocal8Bit().constData(),
+                         O_WRONLY|O_CREAT|O_APPEND, 0664);
+
+    if (new_logfd < 0) {
+        /* If we can't open the new logfile, send data to /dev/null */
+        if (report_error)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Can not open logfile '%1'")
+                    .arg(logfile));
+            return -1;
+        }
+
+        new_logfd = open("/dev/null", O_WRONLY);
+
+        if (new_logfd < 0) {
+            /* There's not much we can do, so punt. */
+            return -1;
+        }
+    }
+
+    while (dup2(new_logfd, 1) < 0 && errno == EINTR);
+    while (dup2(new_logfd, 2) < 0 && errno == EINTR);
+    while (close(new_logfd) < 0   && errno == EINTR);
+
+    return 0;
+}
+
+static void log_rotate_handler(int)
+{
+    log_rotate(0);
 }
 
 int main(int argc, char *argv[])
@@ -254,6 +296,15 @@ int main(int argc, char *argv[])
 
     QMap<QString, QString> settingsOverride;
 
+    extern const char *myth_source_version;
+    extern const char *myth_source_path;
+
+    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
+                            .arg(binname)
+                            .arg(myth_source_path)
+                            .arg(myth_source_version));
+
+
     for(int argpos = 1; argpos < a.argc(); ++argpos)
     {
         if (!strcmp(a.argv()[argpos],"-display") ||
@@ -294,6 +345,29 @@ int main(int argc, char *argv[])
             else
             {
                 cerr << "Missing argument to -geometry option\n";
+                return BACKEND_EXIT_INVALID_CMDLINE;
+            }
+        }
+        else if (!strcmp(a.argv()[argpos],"-l") ||
+                 !strcmp(a.argv()[argpos],"--logfile"))
+        {
+            if (a.argc()-1 > argpos)
+            {
+                logfile = a.argv()[argpos+1];
+                if (logfile.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument"
+                            " to -l/--logfile option\n";
+                    return BACKEND_EXIT_INVALID_CMDLINE;
+                }
+                else
+                {
+                    ++argpos;
+                }
+            }
+            else
+            {
+                cerr << "Missing argument to -l/--logfile option\n";
                 return BACKEND_EXIT_INVALID_CMDLINE;
             }
         }
@@ -426,6 +500,21 @@ int main(int argc, char *argv[])
             cerr << "Invalid argument: " << a.argv()[argpos] << endl;
             print_usage();
             return BACKEND_EXIT_INVALID_CMDLINE;
+        }
+    }
+
+    if (logfile.size())
+    {
+        if (log_rotate(1) < 0)
+            cerr << "cannot open logfile; using stdout/stderr" << endl;
+        else
+        {
+            VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
+                                    .arg(binname)
+                                    .arg(myth_source_path)
+                                    .arg(myth_source_version));
+
+            signal(SIGHUP, &log_rotate_handler);
         }
     }
 
