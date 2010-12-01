@@ -5772,12 +5772,7 @@ float TV::DoTogglePauseStart(PlayerContext *ctx)
     else
     {
         if (ctx->ff_rew_state)
-        {
             time = StopFFRew(ctx);
-            ctx->player->Play(ctx->ts_normal, true);
-            usleep(1000);
-        }
-
         ctx->player->Pause();
     }
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
@@ -5836,7 +5831,7 @@ bool TV::DoPlayerSeek(PlayerContext *ctx, float time)
     if (time > -0.001f && time < +0.001f)
         return false;
 
-    VERBOSE(VB_PLAYBACK, LOC + "DoPlayerSeek() -- begin");
+    VERBOSE(VB_PLAYBACK, LOC + QString("DoPlayerSeek (%1 seconds)").arg(time));
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (!ctx->player)
@@ -5851,18 +5846,10 @@ bool TV::DoPlayerSeek(PlayerContext *ctx, float time)
     bool res = false;
 
     if (time > 0.0f)
-    {
-        VERBOSE(VB_PLAYBACK, LOC + "DoPlayerSeek() -- ff");
         res = ctx->player->FastForward(time);
-    }
     else if (time < 0.0)
-    {
-        VERBOSE(VB_PLAYBACK, LOC + "DoPlayerSeek() -- rew");
         res = ctx->player->Rewind(-time);
-    }
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-
-    VERBOSE(VB_PLAYBACK, LOC + "DoPlayerSeek() -- end");
 
     return res;
 }
