@@ -1766,8 +1766,8 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
             Visual *visual = DefaultVisual(d, scrn);
             XJ_non_xv_image = XCreateImage(d, visual, disp->GetDepth(),
                                            ZPixmap, /*offset*/0, /*data*/0,
-                                           display_visible_rect.width(),
-                                           display_visible_rect.height(),
+                                           display_visible_rect.width()  & ~0x1,
+                                           display_visible_rect.height() & ~0x1,
                                            /*bitmap_pad*/8, 0);
 
             if (!XJ_non_xv_image)
