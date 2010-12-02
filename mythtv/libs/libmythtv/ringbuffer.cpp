@@ -18,6 +18,7 @@
 #include "fileringbuffer.h"
 #include "dvdringbuffer.h"
 #include "bdringbuffer.h"
+#include "streamingringbuffer.h"
 #include "livetvchain.h"
 #include "mythcontext.h"
 #include "ringbuffer.h"
@@ -119,6 +120,11 @@ RingBuffer *RingBuffer::Create(
 
     bool is_dvd = false;
     bool is_bd  = false;
+
+    if (lfilename.startsWith("http://"))
+    {
+        return new StreamingRingBuffer(lfilename);
+    }
 
     if (!stream_only && lfilename.startsWith("myth://"))
     {
