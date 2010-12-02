@@ -4511,7 +4511,7 @@ Download TagLib from <url url="http://developer.kde.org/~wheeler/taglib.html"
 name="http://developer.kde.org/~wheeler/taglib.html"> and install:
 
 <tscreen><verb>
-$ tar -xzf taglib-1.4.tar.gz
+$ tar -xzf taglib-1.6.3.tar.gz
 $ cd taglib-1.4
 $ ./configure
 $ make
