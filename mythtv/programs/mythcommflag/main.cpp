@@ -34,7 +34,7 @@ using namespace std;
 #include "tvremoteutil.h"
 #include "jobqueue.h"
 #include "remoteencoder.h"
-#include "RingBuffer.h"
+#include "ringbuffer.h"
 #include "mythcommandlineparser.h"
 #include "mythtranslation.h"
 
@@ -155,7 +155,7 @@ static int BuildVideoMarkup(ProgramInfo *program_info, bool useDB)
     else
         filename = get_filename(program_info);
 
-    RingBuffer *tmprbuf = new RingBuffer(filename, false);
+    RingBuffer *tmprbuf = RingBuffer::Create(filename, false);
     if (!tmprbuf)
     {
         VERBOSE(VB_IMPORTANT,
@@ -737,7 +737,7 @@ static int FlagCommercials(
 
     QString filename = get_filename(program_info);
 
-    RingBuffer *tmprbuf = new RingBuffer(filename, false);
+    RingBuffer *tmprbuf = RingBuffer::Create(filename, false);
     if (!tmprbuf)
     {
         VERBOSE(VB_IMPORTANT,

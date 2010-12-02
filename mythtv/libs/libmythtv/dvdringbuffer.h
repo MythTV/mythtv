@@ -10,7 +10,9 @@
 #include <QMutex>
 #include <QRect>
 
+#include "ringbuffer.h"
 #include "util.h"
+
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
@@ -25,43 +27,46 @@ extern "C" {
 
 class MythDVDPlayer;
 
-class MPUBLIC DVDRingBufferPriv
+class MPUBLIC DVDRingBuffer : public RingBuffer
 {
   public:
-    DVDRingBufferPriv();
-    virtual ~DVDRingBufferPriv();
+    DVDRingBuffer(const QString &lfilename);
+    virtual ~DVDRingBuffer();
 
     // gets
-    int  GetTitle(void) const { return m_title;        }
-    bool DVDWaitingForPlayer(void) { return m_playerWait; }
-    int  GetPart(void)  const { return m_part;         }
-    int  GetCurrentAngle(void) const { return m_currentAngle;           };
-    int  GetNumAngles(void)          { return m_currentTitleAngleCount; };
-    bool IsOpen(void)   const { return m_dvdnav;       }
-    long long GetReadPosition(void);
-    long long GetTotalReadPosition(void) { return m_titleLength; }
+    int  GetTitle(void)        const { return m_title;                  }
+    bool DVDWaitingForPlayer(void)   { return m_playerWait;             }
+    int  GetPart(void)         const { return m_part;                   }
+    int  GetCurrentAngle(void) const { return m_currentAngle;           }
+    int  GetNumAngles(void)          { return m_currentTitleAngleCount; }
+    bool IsOpen(void)          const { return m_dvdnav;                 }
+    long long GetTotalReadPosition(void) { return m_titleLength;        }
+    uint GetChapterLength(void)    const { return m_pgLength / 90000;   }
+    virtual long long GetReadPosition(void) const;
     void GetDescForPos(QString &desc);
     void GetPartAndTitle(int &_part, int &_title) const
         { _part  = m_part; _title = m_title; }
     uint GetTotalTimeOfTitle(void);
-    uint GetChapterLength(void) const { return m_pgLength / 90000; }
+
     uint GetCellStart(void);
     bool PGCLengthChanged(void);
     bool CellChanged(void);
-    bool InStillFrame(void) const { return m_still > 0; }
-    bool NeedsStillFrame(void) { return InStillFrame() || NewSequence(); }
+    bool IsInStillFrame(void)   const { return m_still > 0;             }
+    bool NeedsStillFrame(void) { return IsInStillFrame() || NewSequence(); }
     bool NewSequence(bool new_sequence = false);
     bool AudioStreamsChanged(void) const { return m_audioStreamsChanged; }
-    bool IsWaiting(void) const { return m_dvdWaiting; }
-    int  NumPartsInTitle(void) const { return m_titleParts; }
+    bool IsWaiting(void) const           { return m_dvdWaiting;          }
+    int  NumPartsInTitle(void)     const { return m_titleParts;          }
     void GetMenuSPUPkt(uint8_t *buf, int len, int stream_id);
+    virtual bool IsInDiscMenuOrStillFrame(void) const
+        { return IsInMenu() || IsInStillFrame(); }
 
     // Public menu/button stuff
     AVSubtitle *GetMenuSubtitle(uint &version);
     int         NumMenuButtons(void) const;
     QRect       GetButtonCoords(void);
     void        ReleaseMenuButton(void);
-    bool        IsInMenu(void) { return m_inMenu; }
+    bool        IsInMenu(void) const { return m_inMenu; }
     void        ActivateButton(void);
     void        MoveButtonLeft(void);
     void        MoveButtonRight(void);
@@ -80,30 +85,32 @@ class MPUBLIC DVDRingBufferPriv
     bool GetNameAndSerialNum(QString& _name, QString& _serialnum);
     double GetFrameRate(void);
     bool StartOfTitle(void) { return (m_part == 0); }
-    bool EndOfTitle(void)   { return    ((!m_titleParts) ||
-                                        (m_part == (m_titleParts - 1)) ||
-                                        (m_titleParts == 1)); }
+    bool EndOfTitle(void)   { return ((!m_titleParts) ||
+                                     (m_part == (m_titleParts - 1)) ||
+                                     (m_titleParts == 1)); }
 
     // commands
-    bool OpenFile(const QString &filename);
+    virtual bool OpenFile(const QString &lfilename,
+                          uint retry_ms = kDefaultOpenTimeout);
     void PlayTitleAndPart(int _title, int _part)
         { dvdnav_part_play(m_dvdnav, _title, _part); }
     bool StartFromBeginning(void);
     void CloseDVD(void);
     bool nextTrack(void);
     void prevTrack(void);
-    int  safe_read(void *data, unsigned sz);
+    virtual int safe_read(void *data, uint sz);
+    virtual long long Seek(long long pos, int whence, bool has_lock);
     long long NormalSeek(long long time);
     void SkipStillFrame(void);
     void WaitSkip(void);
-    void SkipDVDWaitingForPlayer(void) { m_playerWait = false; }
+    void SkipDVDWaitingForPlayer(void)    { m_playerWait = false;           }
     bool GoToMenu(const QString str);
     void GoToNextProgram(void);
     void GoToPreviousProgram(void);
 
-    void IgnoreStillOrWait(bool skip) { m_skipstillorwait = skip; }
+    void IgnoreStillOrWait(bool skip)     { m_skipstillorwait = skip;       }
     void AudioStreamsChanged(bool change) { m_audioStreamsChanged = change; }
-    uint GetCurrentTime(void) { return (m_currentTime / 90000); }
+    uint GetCurrentTime(void)             { return (m_currentTime / 90000); }
     uint TitleTimeLeft(void);
     void  SetTrack(uint type, int trackNo);
     int   GetTrack(uint type);
@@ -118,7 +125,6 @@ class MPUBLIC DVDRingBufferPriv
     dvdnav_t      *m_dvdnav;
     unsigned char  m_dvdBlockWriteBuf[DVD_BLOCK_SIZE];
     unsigned char *m_dvdBlockReadBuf;
-    QString        m_dvdFilename;
     int            m_dvdBlockRPos;
     int            m_dvdBlockWPos;
     long long      m_pgLength;

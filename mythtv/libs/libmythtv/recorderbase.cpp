@@ -7,7 +7,7 @@ using namespace std;
 #include "recorderbase.h"
 #include "tv_rec.h"
 #include "mythverbose.h"
-#include "RingBuffer.h"
+#include "ringbuffer.h"
 #include "recordingprofile.h"
 #include "programinfo.h"
 #include "util.h"

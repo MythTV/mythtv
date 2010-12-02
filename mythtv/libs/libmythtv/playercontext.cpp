@@ -10,7 +10,7 @@
 #include "mythbdplayer.h"
 #include "remoteencoder.h"
 #include "livetvchain.h"
-#include "RingBuffer.h"
+#include "ringbuffer.h"
 #include "playgroup.h"
 #include "videoouttypes.h"
 #include "storagegroup.h"

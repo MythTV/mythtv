@@ -20,7 +20,7 @@
 // MythTV headers
 #include "mythconfig.h"
 
-#include "RingBuffer.h"
+#include "ringbuffer.h"
 #include "mythplayer.h"
 #include "previewgenerator.h"
 #include "tv_rec.h"
@@ -788,7 +788,7 @@ char *PreviewGenerator::GetScreenGrab(
         }
     }
 
-    RingBuffer *rbuf = new RingBuffer(filename, false, false, 0);
+    RingBuffer *rbuf = RingBuffer::Create(filename, false, false, 0);
     if (!rbuf->IsOpen())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Previewer could not open file: " +

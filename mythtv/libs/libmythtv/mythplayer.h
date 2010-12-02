@@ -11,7 +11,7 @@
 #include "playercontext.h"
 #include "volumebase.h"
 #include "audiooutputsettings.h"
-#include "RingBuffer.h"
+#include "ringbuffer.h"
 #include "osd.h"
 #include "jitterometer.h"
 #include "videooutbase.h"

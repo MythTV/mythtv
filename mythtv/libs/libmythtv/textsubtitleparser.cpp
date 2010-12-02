@@ -18,7 +18,7 @@ using std::lower_bound;
 
 // MythTV
 #include "mythcorecontext.h"
-#include "RingBuffer.h"
+#include "ringbuffer.h"
 #include "textsubtitleparser.h"
 #include "xine_demux_sputext.h"
 
@@ -119,7 +119,7 @@ void TextSubtitles::Clear(void)
 bool TextSubtitleParser::LoadSubtitles(QString fileName, TextSubtitles &target)
 {
     demux_sputext_t sub_data;
-    sub_data.rbuffer = new RingBuffer(fileName, 0, false);
+    sub_data.rbuffer = RingBuffer::Create(fileName, 0, false);
 
     if (!sub_data.rbuffer)
         return false;

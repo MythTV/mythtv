@@ -54,7 +54,7 @@
 using namespace std;
 
 // MythTV includes
-#include "RingBuffer.h"
+#include "ringbuffer.h"
 #include "programinfo.h"
 #include "mpegtables.h"
 #include "iso639.h"

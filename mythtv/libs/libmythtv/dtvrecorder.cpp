@@ -5,7 +5,7 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-#include "RingBuffer.h"
+#include "ringbuffer.h"
 #include "programinfo.h"
 #include "mpegtables.h"
 #include "mpegstreamdata.h"

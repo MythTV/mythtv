@@ -6,7 +6,7 @@
 #include <vector>
 using namespace std;
 
-#include "RingBuffer.h"
+#include "ringbuffer.h"
 #include "remoteencoder.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"

@@ -1,7 +1,7 @@
 #ifndef _AVFRINGBUFFER_H_
 #define _AVFRINGBUFFER_H_
 
-#include "RingBuffer.h"
+#include "ringbuffer.h"
 
 extern "C" {
 #include "libavformat/avformat.h"

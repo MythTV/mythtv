@@ -3,7 +3,7 @@
 #include <QFileInfo>
 
 #include "filetransfer.h"
-#include "RingBuffer.h"
+#include "ringbuffer.h"
 #include "util.h"
 #include "mythsocket.h"
 #include "programinfo.h"
@@ -11,7 +11,7 @@
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
                            bool usereadahead, int timeout_ms) :
     readthreadlive(true), readsLocked(false),
-    rbuffer(new RingBuffer(filename, false, usereadahead, timeout_ms)),
+    rbuffer(RingBuffer::Create(filename, false, usereadahead, timeout_ms)),
     sock(remote), ateof(false), lock(QMutex::NonRecursive),
     refLock(QMutex::NonRecursive), refCount(0), writemode(false)
 {
@@ -21,7 +21,7 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote, bool write) :
     readthreadlive(true), readsLocked(false),
-    rbuffer(new RingBuffer(filename, write)),
+    rbuffer(RingBuffer::Create(filename, write)),
     sock(remote), ateof(false), lock(QMutex::NonRecursive),
     refLock(QMutex::NonRecursive), refCount(0), writemode(write)
 {
@@ -234,7 +234,7 @@ void FileTransfer::SetTimeout(bool fast)
     if (pginfo)
         pginfo->UpdateInUseMark();
 
-    rbuffer->SetTimeout(fast);
+    rbuffer->SetOldFile(fast);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

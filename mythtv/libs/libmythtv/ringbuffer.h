@@ -17,25 +17,25 @@ extern "C" {
 
 #include "mythexp.h"
 
-class RemoteFile;
 class ThreadedFileWriter;
-class DVDRingBufferPriv;
-class BDRingBufferPriv;
+class DVDRingBuffer;
+class BDRingBuffer;
 class LiveTVChain;
+class RemoteFile;
 
 class MPUBLIC RingBuffer : protected QThread
 {
   public:
-    RingBuffer(const QString &lfilename, bool write,
-               bool usereadahead = true,
-               int timeout_ms = kDefaultOpenTimeout);
-   ~RingBuffer();
+    static RingBuffer *Create(const QString &lfilename, bool write,
+                              bool usereadahead = true,
+                              int timeout_ms = kDefaultOpenTimeout,
+                              bool stream_only = false);
+    ~RingBuffer();
 
     // Sets
     void SetWriteBufferSize(int newSize);
     void SetWriteBufferMinWriteSize(int newMinSize);
     void SetOldFile(bool is_old);
-    void SetStreamOnly(bool stream);
     void UpdateRawBitrate(uint rawbitrate);
     void UpdatePlaySpeed(float playspeed);
 
@@ -46,15 +46,37 @@ class MPUBLIC RingBuffer : protected QThread
     /// \sa StartReads(void), StopReads(void)
     bool      GetStopReads(void)     const { return stopreads; }
     bool      isPaused(void)         const;
-    long long GetReadPosition(void)  const;
+    /// \brief Returns how far into the file we have read.
+    virtual long long GetReadPosition(void)  const = 0;
     long long GetWritePosition(void) const;
-    long long GetRealFileSize(void)  const;
-    bool      IsOpen(void)           const;
+    /// \brief Returns the size of the file we are reading/writing,
+    ///        or -1 if the query fails.
+    virtual long long GetRealFileSize(void)  const { return -1; }
     bool      IsNearEnd(double fps, uint vvf) const;
+    /// \brief Returns true if open for either reading or writing.
+    virtual bool IsOpen(void) const = 0;
+
+    bool IsDisc(void) const { return IsDVD() || IsBD(); }
+    bool IsDVD(void)  const { return DVD() != NULL;     }
+    bool IsBD(void)   const { return BD()  != NULL;     }
+    const DVDRingBuffer *DVD(void) const;
+    const BDRingBuffer  *BD(void)  const;
+    DVDRingBuffer *DVD(void);
+    BDRingBuffer  *BD(void);
+
+    virtual bool IsInDiscMenuOrStillFrame(void) const { return false; }
 
     // General Commands
-    void OpenFile(const QString &lfilename,
-                  uint retry_ms = kDefaultOpenTimeout);
+
+    /** \brief Opens a file for reading.
+     *
+     *  \param lfilename  Name of file to read
+     *  \param retry_ms   How many ms to retry reading the file
+     *                    after the first try before giving up.
+     */
+    virtual bool OpenFile(const QString &lfilename,
+                          uint retry_ms = kDefaultOpenTimeout) = 0;
+
     int  Read(void *buf, int count);
     int  Peek(void *buf, int count); // only works with readahead
 
@@ -62,8 +84,9 @@ class MPUBLIC RingBuffer : protected QThread
                bool toAdjust      = false,
                bool resetInternal = false);
 
-    // Seeks
-    long long Seek(long long pos, int whence, bool has_lock = false);
+    /// \brief Seeks to a particular position in the file.
+    virtual long long Seek(
+        long long pos, int whence, bool has_lock = false) = 0;
 
     // Pause commands
     void Pause(void);
@@ -87,47 +110,21 @@ class MPUBLIC RingBuffer : protected QThread
     void Sync(void);
     long long WriterSeek(long long pos, int whence, bool has_lock = false);
 
-    // DVDRingBuffer proxies
-    bool IsDVD(void) const;
-
-    // BDRingBuffer proxies
-    bool IsBD(void) const;
-
-    // Universal still frame/menu check
-    bool InDiscMenuOrStillFrame(void);
-
     long long SetAdjustFilesize(void);
 
     /// Calls SetOldFile(), do not use
     void SetTimeout(bool is_old) MDEPRECATED { SetOldFile(is_old); }
-    /// Calls IsDVD(), do not use
-    bool isDVD(void) const MDEPRECATED { return IsDVD(); }
-    /// Calls IsBD(), do not use
-    bool isBD(void) const MDEPRECATED { return IsBD(); }
-    /// Illicitly manipulating privates is ill advised!
-    /// DO NOT USE
-    DVDRingBufferPriv *DVD() MDEPRECATED
-    {
-        return dvdPriv;
-    }
-    /// Illicitly manipulating privates is ill advised!
-    /// DO NOT USE
-    BDRingBufferPriv *BD() MDEPRECATED
-    {
-        return bdPriv;
-    }
 
     static const int kDefaultOpenTimeout;
     static const int kLiveTVOpenTimeout;
 
   protected:
+    RingBuffer();
+
     void run(void); // QThread
     void CalcReadAheadThresh(void);
     bool PauseAndWait(void);
-    int safe_read_bd(void *data, uint sz);
-    int safe_read_dvd(void *data, uint sz);
-    int safe_read(int fd, void *data, uint sz);
-    int safe_read(RemoteFile *rf, void *data, uint sz);
+    virtual int safe_read(void *data, uint sz) = 0;
 
     int ReadPriv(void *buf, int count, bool peek);
     int ReadDirect(void *buf, int count, bool peek);
@@ -140,7 +137,7 @@ class MPUBLIC RingBuffer : protected QThread
     void ResetReadAhead(long long newinternal);
     void KillReadAheadThread(void);
 
-  private:
+  protected:
     mutable QReadWriteLock poslock;
     long long readpos;            // protected by poslock
     long long writepos;           // protected by poslock
@@ -176,7 +173,6 @@ class MPUBLIC RingBuffer : protected QThread
     bool      ateof;              // protected by rwlock
     bool      readsallowed;       // protected by rwlock
     bool      setswitchtonext;    // protected by rwlock
-    bool      streamOnly;         // protected by rwlock
     bool      ignorereadahead;    // protected by rwlock
     uint      rawbitrate;         // protected by rwlock
     float     playspeed;          // protected by rwlock
@@ -186,11 +182,6 @@ class MPUBLIC RingBuffer : protected QThread
     int       wanttoread;         // protected by rwlock
     int       numfailures;        // protected by rwlock (see note 1)
     bool      commserror;         // protected by rwlock
-
-    // We should really subclass for these two sets of functionality..
-    // current implementation is not thread-safe.
-    DVDRingBufferPriv *dvdPriv; // NOT protected by a lock
-    BDRingBufferPriv  *bdPriv;  // NOT protected by a lock
 
     bool oldfile;                 // protected by rwlock
 

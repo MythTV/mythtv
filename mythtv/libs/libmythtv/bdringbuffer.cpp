@@ -8,33 +8,37 @@
 #include "decoders/overlay.h"
 
 #include "iso639.h"
-#include "BDRingBuffer.h"
+#include "bdringbuffer.h"
 #include "mythverbose.h"
 #include "mythcorecontext.h"
 #include "mythlocale.h"
 #include "mythdirs.h"
 #include "bluray.h"
 
-#define LOC     QString("BDRingBuffer: ")
+#define LOC      QString("BDRingBuf(%1): ").arg(filename)
+#define LOC_WARN QString("BDRingBuf(%1) Warning: ").arg(filename)
+#define LOC_ERR  QString("BDRingBuf(%1) Error: ").arg(filename)
 
-static void HandleOverlayCallback(void *data, const bd_overlay_s * const overlay)
+static void HandleOverlayCallback(
+    void *data, const bd_overlay_s * const overlay)
 {
-    BDRingBufferPriv *bdpriv = (BDRingBufferPriv*) data;
+    BDRingBuffer *bdrb = (BDRingBuffer*) data;
 
-    if (!bdpriv)
+    if (!bdrb)
         return;
 
     if (!overlay || overlay->plane == 1)
-        bdpriv->m_inMenu = false;
+        bdrb->m_inMenu = false;
 
     if (!overlay || !overlay->img)
         return;
 
-    bdpriv->m_inMenu = true;
+    bdrb->m_inMenu = true;
 
     const BD_PG_RLE_ELEM *rlep = overlay->img;
     uint8_t *yuvimg = (uint8_t*)malloc(overlay->w * overlay->h);
     unsigned pixels = overlay->w * overlay->h;
+
 
     for (unsigned i = 0; i < pixels; i += rlep->len, rlep++)
     {
@@ -51,28 +55,28 @@ static void HandleOverlayCallback(void *data, const bd_overlay_s * const overlay
     qoverlay.setColorTable(palette);
     qoverlay.save(QString("bluray.menuimg.%1.%2.png").arg(overlay->w).arg(overlay->h));
 
-    VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + QString("In Menu Callback, ready to draw "
+    VERBOSE(VB_PLAYBACK|VB_EXTRA, QString("In Menu Callback, ready to draw "
                         "an overlay of %1x%2 at %3,%4 (%5 pixels).")
                         .arg(overlay->w).arg(overlay->h).arg(overlay->x)
                         .arg(overlay->y).arg(pixels));
 
     if (overlay->plane == 1)
-        bdpriv->m_inMenu = true;
+        bdrb->m_inMenu = true;
 }
 
-BDRingBufferPriv::BDRingBufferPriv()
-    : bdnav(NULL),
-      m_is_hdmv_navigation(false),
-      m_numTitles(0), m_titleChanged(false)
+BDRingBuffer::BDRingBuffer(const QString &lfilename)
+  : bdnav(NULL), m_is_hdmv_navigation(false),
+    m_numTitles(0), m_titleChanged(false)
 {
+    OpenFile(lfilename);
 }
 
-BDRingBufferPriv::~BDRingBufferPriv()
+BDRingBuffer::~BDRingBuffer()
 {
     close();
 }
 
-void BDRingBufferPriv::close(void)
+void BDRingBuffer::close(void)
 {
     if (bdnav)
     {
@@ -83,7 +87,84 @@ void BDRingBufferPriv::close(void)
     }
 }
 
-uint64_t BDRingBufferPriv::Seek(uint64_t pos)
+long long BDRingBuffer::Seek(long long pos, int whence, bool has_lock)
+{
+    VERBOSE(VB_FILE, LOC + QString("Seek(%1,%2,%3)")
+            .arg(pos).arg((SEEK_SET==whence)?"SEEK_SET":
+                          ((SEEK_CUR==whence)?"SEEK_CUR":"SEEK_END"))
+            .arg(has_lock?"locked":"unlocked"));
+
+    long long ret = -1;
+
+    // lockForWrite takes priority over lockForRead, so this will
+    // take priority over the lockForRead in the read ahead thread.
+    if (!has_lock)
+        rwlock.lockForWrite();
+
+    poslock.lockForWrite();
+
+    // Optimize no-op seeks
+    if (readaheadrunning &&
+        ((whence == SEEK_SET && pos == readpos) ||
+         (whence == SEEK_CUR && pos == 0)))
+    {
+        ret = readpos;
+
+        poslock.unlock();
+        if (!has_lock)
+            rwlock.unlock();
+
+        return ret;
+    }
+
+    // only valid for SEEK_SET & SEEK_CUR
+    long long new_pos = (SEEK_SET==whence) ? pos : readpos + pos;
+
+    // Here we perform a normal seek. When successful we
+    // need to call ResetReadAhead(). A reset means we will
+    // need to refill the buffer, which takes some time.
+    if ((SEEK_END == whence) ||
+        ((SEEK_CUR == whence) && new_pos != 0))
+    {
+        errno = EINVAL;
+        ret = -1;
+    }
+    else
+    {
+        Seek(new_pos);
+        ret = new_pos;
+    }
+
+    if (ret >= 0)
+    {
+        readpos = ret;
+        
+        ignorereadpos = -1;
+
+        if (readaheadrunning)
+            ResetReadAhead(readpos);
+
+        readAdjust = 0;
+    }
+    else
+    {
+        QString cmd = QString("Seek(%1, %2)").arg(pos)
+            .arg((SEEK_SET == whence) ? "SEEK_SET" :
+                 ((SEEK_CUR == whence) ?"SEEK_CUR" : "SEEK_END"));
+        VERBOSE(VB_IMPORTANT, LOC_ERR + cmd + " Failed" + ENO);
+    }
+
+    poslock.unlock();
+
+    generalWait.wakeAll();
+
+    if (!has_lock)
+        rwlock.unlock();
+
+    return ret;
+}
+
+uint64_t BDRingBuffer::Seek(uint64_t pos)
 {
     VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + QString("Seeking to %1.")
                 .arg(pos));
@@ -93,65 +174,86 @@ uint64_t BDRingBufferPriv::Seek(uint64_t pos)
     return GetReadPosition();
 }
 
-void BDRingBufferPriv::GetDescForPos(QString &desc) const
+void BDRingBuffer::GetDescForPos(QString &desc) const
 {
     desc = QObject::tr("Title %1 chapter %2")
                        .arg(m_currentTitleInfo->idx)
                        .arg(m_currentTitleInfo->chapters->idx);
 }
 
-bool BDRingBufferPriv::OpenFile(const QString &filename)
+bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 {
     VERBOSE(VB_IMPORTANT, LOC + QString("Opened BDRingBuffer device at %1")
-            .arg(filename.toLatin1().data()));
+            .arg(lfilename.toLatin1().data()));
+
+    rwlock.lockForWrite();
+
+    if (bdnav)
+    {
+        if (m_currentTitleInfo)
+            bd_free_title_info(m_currentTitleInfo);
+        bd_close(bdnav);
+        bdnav = NULL;
+    }
+
+    filename = lfilename;
 
     QString keyfile = QString("%1/KEYDB.cfg").arg(GetConfDir());
     QByteArray keyarray = keyfile.toAscii();
     const char *keyfilepath = keyarray.data();
 
-    bdnav = bd_open(filename.toLatin1().data(), keyfilepath);
+    bdnav = bd_open(lfilename.toLatin1().data(), keyfilepath);
 
     if (!bdnav)
+    {
+        rwlock.unlock();
         return false;
+    }
 
     // Check disc to see encryption status, menu and navigation types.
     const BLURAY_DISC_INFO *discinfo = bd_get_disc_info(bdnav);
     if (discinfo)
-        VERBOSE(VB_PLAYBACK, QString("*** Blu-ray Disc Information ***\n"
-                                  "First Play Supported: %1\n"
-                                  "Top Menu Supported: %2\n"
-                                  "Number of HDMV Titles: %3\n"
-                                  "Number of BD-J Titles: %4\n"
-                                  "Number of Unsupported Titles: %5\n"
-                                  "AACS present on disc: %6\n"
-                                  "libaacs used: %7\n"
-                                  "AACS handled: %8\n"
-                                  "BD+ present on disc: %9\n"
-                                  "libbdplus used: %10\n"
-                                  "BD+ handled: %11")
-                                  .arg(discinfo->first_play_supported ? "yes" : "no")
-                                  .arg(discinfo->top_menu_supported ? "yes" : "no")
-                                  .arg(discinfo->num_hdmv_titles)
-                                  .arg(discinfo->num_bdj_titles)
-                                  .arg(discinfo->num_unsupported_titles)
-                                  .arg(discinfo->aacs_detected ? "yes" : "no")
-                                  .arg(discinfo->libaacs_detected ? "yes" : "no")
-                                  .arg(discinfo->aacs_handled ? "yes" : "no")
-                                  .arg(discinfo->bdplus_detected ? "yes" : "no")
-                                  .arg(discinfo->libbdplus_detected ? "yes" : "no")
-                                  .arg(discinfo->bdplus_handled ? "yes" : "no"));
+    {
+        VERBOSE(VB_PLAYBACK, QString(
+                    "*** Blu-ray Disc Information ***\n"
+                    "First Play Supported: %1\n"
+                    "Top Menu Supported: %2\n"
+                    "Number of HDMV Titles: %3\n"
+                    "Number of BD-J Titles: %4\n"
+                    "Number of Unsupported Titles: %5\n"
+                    "AACS present on disc: %6\n"
+                    "libaacs used: %7\n"
+                    "AACS handled: %8\n"
+                    "BD+ present on disc: %9\n"
+                    "libbdplus used: %10\n"
+                    "BD+ handled: %11")
+                .arg(discinfo->first_play_supported ? "yes" : "no")
+                .arg(discinfo->top_menu_supported ? "yes" : "no")
+                .arg(discinfo->num_hdmv_titles)
+                .arg(discinfo->num_bdj_titles)
+                .arg(discinfo->num_unsupported_titles)
+                .arg(discinfo->aacs_detected ? "yes" : "no")
+                .arg(discinfo->libaacs_detected ? "yes" : "no")
+                .arg(discinfo->aacs_handled ? "yes" : "no")
+                .arg(discinfo->bdplus_detected ? "yes" : "no")
+                .arg(discinfo->libbdplus_detected ? "yes" : "no")
+                .arg(discinfo->bdplus_handled ? "yes" : "no"));
+    }
 
-    // The following settings affect HDMV navigation (default audio track selection,
+    // The following settings affect HDMV navigation
+    // (default audio track selection,
     // parental controls, menu language, etc.  They are not yet used.
 
     // Set parental level "age" to 99 for now.  TODO: Add support for FE level
     bd_set_player_setting(bdnav, BLURAY_PLAYER_SETTING_PARENTAL, 99);
 
     // Set preferred language to FE guide language
-    const char *langpref = gCoreContext->GetSetting("ISO639Language0", "eng").toLatin1().data();
+    const char *langpref = gCoreContext->GetSetting(
+        "ISO639Language0", "eng").toLatin1().data();
     QString QScountry  = gCoreContext->GetLocale()->GetCountryCode().toLower();
     const char *country = QScountry.toLatin1().data();
-    bd_set_player_setting_str(bdnav, BLURAY_PLAYER_SETTING_AUDIO_LANG, langpref);
+    bd_set_player_setting_str(
+        bdnav, BLURAY_PLAYER_SETTING_AUDIO_LANG, langpref);
 
     // Set preferred presentation graphics language to the FE guide language
     bd_set_player_setting_str(bdnav, BLURAY_PLAYER_SETTING_PG_LANG, langpref);
@@ -160,7 +262,8 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
     bd_set_player_setting_str(bdnav, BLURAY_PLAYER_SETTING_MENU_LANG, langpref);
 
     // Set player country code via MythLocale. (not a region setting)
-    bd_set_player_setting_str(bdnav, BLURAY_PLAYER_SETTING_COUNTRY_CODE, country);
+    bd_set_player_setting_str(
+        bdnav, BLURAY_PLAYER_SETTING_COUNTRY_CODE, country);
 
     int regioncode = 0;
     regioncode = gCoreContext->GetNumSetting("BlurayRegionCode");
@@ -235,24 +338,34 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
     }
 #endif
 
+    readblocksize   = BD_BLOCK_SIZE * 62;
+    setswitchtonext = false;
+    ateof           = false;
+    commserror      = false;
+    numfailures     = 0;
+    rawbitrate      = 8000;
+    CalcReadAheadThresh();
+
+    rwlock.unlock();
+
     return true;
 }
 
-uint64_t BDRingBufferPriv::GetReadPosition(void)
+long long BDRingBuffer::GetReadPosition(void) const
 {
     if (bdnav)
         return bd_tell(bdnav);
     return 0;
 }
 
-uint32_t BDRingBufferPriv::GetNumChapters(void)
+uint32_t BDRingBuffer::GetNumChapters(void)
 {
     if (m_currentTitleInfo)
         return m_currentTitleInfo->chapter_count;
     return 0;
 }
 
-uint64_t BDRingBufferPriv::GetChapterStartTime(uint32_t chapter)
+uint64_t BDRingBuffer::GetChapterStartTime(uint32_t chapter)
 {
     if (chapter < 0 || chapter >= GetNumChapters())
         return 0;
@@ -260,7 +373,7 @@ uint64_t BDRingBufferPriv::GetChapterStartTime(uint32_t chapter)
                                    90000.0f);
 }
 
-uint64_t BDRingBufferPriv::GetChapterStartFrame(uint32_t chapter)
+uint64_t BDRingBuffer::GetChapterStartFrame(uint32_t chapter)
 {
     if (chapter < 0 || chapter >= GetNumChapters())
         return 0;
@@ -268,14 +381,14 @@ uint64_t BDRingBufferPriv::GetChapterStartFrame(uint32_t chapter)
                                     GetFrameRate()) / 90000.0f);
 }
 
-int BDRingBufferPriv::GetCurrentTitle(void) const
+int BDRingBuffer::GetCurrentTitle(void) const
 {
     if (m_currentTitleInfo)
         return m_currentTitleInfo->idx;
     return -1;
 }
 
-int BDRingBufferPriv::GetTitleDuration(int title) const
+int BDRingBuffer::GetTitleDuration(int title) const
 {
     int numTitles = GetNumTitles();
 
@@ -291,7 +404,7 @@ int BDRingBufferPriv::GetTitleDuration(int title) const
     return duration;
 }
 
-bool BDRingBufferPriv::SwitchTitle(uint32_t index)
+bool BDRingBuffer::SwitchTitle(uint32_t index)
 {
     if (!bdnav)
         return false;
@@ -309,7 +422,7 @@ bool BDRingBufferPriv::SwitchTitle(uint32_t index)
     return UpdateTitleInfo(index);
 }
 
-bool BDRingBufferPriv::SwitchPlaylist(uint32_t index)
+bool BDRingBuffer::SwitchPlaylist(uint32_t index)
 {
     if (!bdnav)
         return false;
@@ -325,7 +438,7 @@ bool BDRingBufferPriv::SwitchPlaylist(uint32_t index)
     return UpdateTitleInfo(index);
 }
 
-bool BDRingBufferPriv::UpdateTitleInfo(uint32_t index)
+bool BDRingBuffer::UpdateTitleInfo(uint32_t index)
 {
     m_titleChanged = true;
     m_currentTitleLength = m_currentTitleInfo->duration;
@@ -364,14 +477,14 @@ bool BDRingBufferPriv::UpdateTitleInfo(uint32_t index)
     return true;
 }
 
-bool BDRingBufferPriv::TitleChanged(void)
+bool BDRingBuffer::TitleChanged(void)
 {
     bool ret = m_titleChanged;
     m_titleChanged = false;
     return ret;
 }
 
-bool BDRingBufferPriv::SwitchAngle(uint angle)
+bool BDRingBuffer::SwitchAngle(uint angle)
 {
     if (!bdnav)
         return false;
@@ -382,14 +495,14 @@ bool BDRingBufferPriv::SwitchAngle(uint angle)
     return true;
 }
 
-uint64_t BDRingBufferPriv::GetTotalReadPosition(void)
+uint64_t BDRingBuffer::GetTotalReadPosition(void)
 {
     if (bdnav)
         return bd_get_title_size(bdnav);
     return 0;
 }
 
-int BDRingBufferPriv::safe_read(void *data, unsigned sz)
+int BDRingBuffer::safe_read(void *data, uint sz)
 {
     if (m_is_hdmv_navigation)
     {
@@ -414,7 +527,7 @@ int BDRingBufferPriv::safe_read(void *data, unsigned sz)
     return sz;
 }
 
-double BDRingBufferPriv::GetFrameRate(void)
+double BDRingBuffer::GetFrameRate(void)
 {
     if (bdnav && m_currentTitleInfo)
     {
@@ -447,7 +560,7 @@ double BDRingBufferPriv::GetFrameRate(void)
     return 0;
 }
 
-int BDRingBufferPriv::GetAudioLanguage(uint streamID)
+int BDRingBuffer::GetAudioLanguage(uint streamID)
 {
     if (!m_currentTitleInfo ||
         streamID >= m_currentTitleInfo->clips->audio_stream_count)
@@ -462,7 +575,7 @@ int BDRingBufferPriv::GetAudioLanguage(uint streamID)
     return code;
 }
 
-int BDRingBufferPriv::GetSubtitleLanguage(uint streamID)
+int BDRingBuffer::GetSubtitleLanguage(uint streamID)
 {
     if (!m_currentTitleInfo)
         return iso639_str3_to_key("und");
@@ -488,7 +601,7 @@ int BDRingBufferPriv::GetSubtitleLanguage(uint streamID)
     return iso639_str3_to_key("und");
 }
 
-void BDRingBufferPriv::PressButton(int32_t key, int64_t pts)
+void BDRingBuffer::PressButton(int32_t key, int64_t pts)
 {
     if (!bdnav)
         return;
@@ -504,7 +617,7 @@ void BDRingBufferPriv::PressButton(int32_t key, int64_t pts)
 
 /** \brief jump to a Blu-ray root or popup menu
  */
-bool BDRingBufferPriv::GoToMenu(const QString str)
+bool BDRingBuffer::GoToMenu(const QString str)
 {
     if (!m_is_hdmv_navigation)
         return false;
@@ -530,7 +643,7 @@ bool BDRingBufferPriv::GoToMenu(const QString str)
     return false;
 }
 
-bool BDRingBufferPriv::HandleBDEvents()
+bool BDRingBuffer::HandleBDEvents(void)
 {
     BD_EVENT ev;
     while (bd_get_event(bdnav, &ev))
@@ -545,7 +658,7 @@ bool BDRingBufferPriv::HandleBDEvents()
     return true;
 }
 
-void BDRingBufferPriv::HandleBDEvent(BD_EVENT &ev)
+void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
 {
     switch (ev.event) {
         case BD_EVENT_NONE:

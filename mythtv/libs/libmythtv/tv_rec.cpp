@@ -25,7 +25,7 @@ using namespace std;
 #include "jobqueue.h"
 #include "recordingrule.h"
 #include "eitscanner.h"
-#include "RingBuffer.h"
+#include "ringbuffer.h"
 #include "storagegroup.h"
 #include "remoteutil.h"
 #include "tvremoteutil.h"
@@ -4065,7 +4065,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
         bool write = genOpt.cardtype != "IMPORT";
         VERBOSE(VB_IMPORTANT, LOC + QString("rec->GetPathname(): '%1'")
                 .arg(rec->GetPathname()));
-        SetRingBuffer(new RingBuffer(rec->GetPathname(), write));
+        SetRingBuffer(RingBuffer::Create(rec->GetPathname(), write));
         if (!ringBuffer->IsOpen() && write)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -4450,7 +4450,7 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
 
     StartedRecording(prog);
 
-    *rb = new RingBuffer(prog->GetPathname(), true);
+    *rb = RingBuffer::Create(prog->GetPathname(), true);
     if (!(*rb)->IsOpen())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +

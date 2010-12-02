@@ -24,7 +24,7 @@
 using namespace std;
 
 // MythTV includes
-#include "RingBuffer.h"
+#include "ringbuffer.h"
 #include "atsctables.h"
 #include "atscstreamdata.h"
 #include "dvbstreamdata.h"

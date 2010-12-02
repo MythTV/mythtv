@@ -32,7 +32,7 @@ extern "C" {
 
 // MythTV headers
 #include "mpegrecorder.h"
-#include "RingBuffer.h"
+#include "ringbuffer.h"
 #include "mythcorecontext.h"
 #include "programinfo.h"
 #include "recordingprofile.h"

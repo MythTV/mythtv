@@ -1,7 +1,7 @@
 #ifndef XINE_DEMUX_SPUTEXT_H
 #define XINE_DEMUX_SPUTEXT_H
 
-#include "RingBuffer.h"
+#include "ringbuffer.h"
 
 #define SUB_BUFSIZE   1024
 #define SUB_MAX_TEXT  5

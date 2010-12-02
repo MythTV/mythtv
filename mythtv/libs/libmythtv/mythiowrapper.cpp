@@ -20,7 +20,7 @@
 #include "mythcorecontext.h"
 #include "mythverbose.h"
 #include "remotefile.h"
-#include "RingBuffer.h"
+#include "ringbuffer.h"
 
 #include "mythiowrapper.h"
 
@@ -130,15 +130,17 @@ int mythfile_open(const char *pathname, int flags)
         else
         {
             if (flags & O_WRONLY)
-                rb = new RingBuffer(pathname, true, false, -1); // Writeable
+                rb = RingBuffer::Create(
+                    pathname, true, false,
+                    RingBuffer::kDefaultOpenTimeout, true); // Writeable
             else
-                rb = new RingBuffer(pathname, false, true, -1); // Read-Only
+                rb = RingBuffer::Create(
+                    pathname, false, true,
+                    RingBuffer::kDefaultOpenTimeout, true); // Read-Only
 
             if (!rb)
                 return -1;
 
-            rb->SetStreamOnly(true);
-            rb->OpenFile(pathname);
             rb->Start();
         }
 

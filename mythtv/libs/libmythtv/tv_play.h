@@ -617,10 +617,7 @@ class MPUBLIC TV : public QThread
     // DVD methods
     void DVDJumpBack(PlayerContext*);
     void DVDJumpForward(PlayerContext*);
-    bool DiscMenuHandleAction(PlayerContext*,
-                             const QStringList &actions,
-                             bool isDVD, bool isDVDStill,
-                             bool isBD = false);
+    bool DiscMenuHandleAction(PlayerContext*, const QStringList &actions);
 
     // Program jumping stuff
     void SetLastProgram(const ProgramInfo *rcinfo);

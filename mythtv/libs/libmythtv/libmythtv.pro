@@ -141,8 +141,6 @@ SOURCES += minilzo.cpp              RTjpegN.cpp
 
 # Misc. needed by backend/frontend
 HEADERS += recordinginfo.h
-HEADERS += RingBuffer.h             avfringbuffer.h
-HEADERS += ThreadedFileWriter.h
 HEADERS += dbcheck.h
 HEADERS += tvremoteutil.h           tv.h
 HEADERS += jobqueue.h
@@ -163,10 +161,11 @@ HEADERS += myth_imgconvert.h
 HEADERS += channelgroup.h           channelgroupsettings.h
 HEADERS += recordingrule.h          programdetail.h
 HEADERS += mythsystemevent.h
+HEADERS += avfringbuffer.h          ThreadedFileWriter.h
+HEADERS += ringbuffer.h             fileringbuffer.h
+HEADERS += dvdringbuffer.h          bdringbuffer.h
 
 SOURCES += recordinginfo.cpp
-SOURCES += RingBuffer.cpp           avfringbuffer.cpp
-SOURCES += ThreadedFileWriter.cpp
 SOURCES += dbcheck.cpp
 SOURCES += tvremoteutil.cpp         tv.cpp
 SOURCES += jobqueue.cpp
@@ -187,6 +186,9 @@ SOURCES += channelgroup.cpp         channelgroupsettings.cpp
 SOURCES += myth_imgconvert.cpp
 SOURCES += recordingrule.cpp        programdetail.cpp
 SOURCES += mythsystemevent.cpp
+SOURCES += avfringbuffer.cpp        ThreadedFileWriter.cpp
+SOURCES += ringbuffer.cpp           fileringBuffer.cpp
+SOURCES += dvdringbuffer.cpp        bdringbuffer.cpp
 
 # DiSEqC
 HEADERS += diseqc.h                 diseqcsettings.h
@@ -251,17 +253,17 @@ using_frontend {
     # Video playback
     HEADERS += tv_play.h                mythplayer.h
     HEADERS += mythdvdplayer.h          audioplayer.h
-    HEADERS += DVDRingBuffer.h          playercontext.h
+    HEADERS += playercontext.h
     HEADERS += tv_play_win.h            deletemap.h
     HEADERS += mythcommflagplayer.h     commbreakmap.h
-    HEADERS += BDRingBuffer.h           mythbdplayer.h
+    HEADERS += mythbdplayer.h
     HEADERS += mythiowrapper.h          tvbrowsehelper.h
     SOURCES += tv_play.cpp              mythplayer.cpp
     SOURCES += mythdvdplayer.cpp        audioplayer.cpp
-    SOURCES += DVDRingBuffer.cpp        playercontext.cpp
+    SOURCES += playercontext.cpp
     SOURCES += tv_play_win.cpp          deletemap.cpp
     SOURCES += mythcommflagplayer.cpp   commbreakmap.cpp
-    SOURCES += BDRingBuffer.cpp         mythbdplayer.cpp
+    SOURCES += mythbdplayer.cpp
     SOURCES += mythiowrapper.cpp        tvbrowsehelper.cpp
 
     # Text subtitle parser

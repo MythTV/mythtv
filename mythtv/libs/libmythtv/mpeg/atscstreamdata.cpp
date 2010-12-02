@@ -8,7 +8,7 @@ using namespace std;
 
 #include "atscstreamdata.h"
 #include "atsctables.h"
-#include "RingBuffer.h"
+#include "ringbuffer.h"
 #include "eithelper.h"
 
 #define LOC QString("ATSCStream: ")

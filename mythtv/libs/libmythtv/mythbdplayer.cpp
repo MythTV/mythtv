@@ -1,4 +1,4 @@
-#include "BDRingBuffer.h"
+#include "bdringbuffer.h"
 #include "mythbdplayer.h"
 
 #define LOC     QString("BDPlayer: ")

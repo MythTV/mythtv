@@ -37,7 +37,7 @@ using namespace std;
 #include "profilegroup.h"
 #include "playgroup.h"
 #include "networkcontrol.h"
-#include "DVDRingBuffer.h"
+#include "dvdringbuffer.h"
 #include "scheduledrecording.h"
 #include "mythsystemevent.h"
 
@@ -750,7 +750,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
 
     if (pginfo->IsVideoDVD())
     {
-        RingBuffer *tmprbuf = new RingBuffer(pginfo->GetPathname(), false);
+        RingBuffer *tmprbuf = RingBuffer::Create(pginfo->GetPathname(), false);
 
         if (!tmprbuf)
         {
@@ -759,8 +759,8 @@ static int internal_play_media(const QString &mrl, const QString &plot,
         }
         QString name;
         QString serialid;
-        if (tmprbuf->isDVD() &&
-             tmprbuf->DVD()->GetNameAndSerialNum(name, serialid))
+        if (tmprbuf->IsDVD() &&
+            tmprbuf->DVD()->GetNameAndSerialNum(name, serialid))
         {
             QStringList fields = pginfo->QueryDVDBookmark(serialid, false);
             if (!fields.empty())

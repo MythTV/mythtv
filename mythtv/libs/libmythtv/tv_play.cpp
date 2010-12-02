@@ -40,8 +40,8 @@ using namespace std;
 #include "mythconfig.h"
 #include "livetvchain.h"
 #include "playgroup.h"
-#include "DVDRingBuffer.h"
-#include "BDRingBuffer.h"
+#include "dvdringbuffer.h"
+#include "bdringbuffer.h"
 #include "datadirect.h"
 #include "sourceutil.h"
 #include "cardutil.h"
@@ -2038,8 +2038,11 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
                                           "cardtype(%2)")
                     .arg(playbackURL).arg(ctx->tvchain->GetCardType(-1)));
 
-            ctx->SetRingBuffer(new RingBuffer(playbackURL, false, true,
-                               opennow ? RingBuffer::kLiveTVOpenTimeout : -1));
+            ctx->SetRingBuffer(
+                RingBuffer::Create(
+                    playbackURL, false, true,
+                    opennow ? RingBuffer::kLiveTVOpenTimeout : -1));
+
             ctx->buffer->SetLiveMode(ctx->tvchain);
         }
 
@@ -2113,7 +2116,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         }
         ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-        ctx->SetRingBuffer(new RingBuffer(playbackURL, false));
+        ctx->SetRingBuffer(RingBuffer::Create(playbackURL, false));
 
         if (ctx->buffer && ctx->buffer->IsOpen())
         {
@@ -2239,7 +2242,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             ITVRestart(ctx, false);
         }
 
-        if (ctx->buffer && ctx->buffer->isDVD())
+        if (ctx->buffer && ctx->buffer->IsDVD())
         {
             UpdateLCD();
         }
@@ -2367,7 +2370,7 @@ void TV::StopStuff(PlayerContext *mctx, PlayerContext *ctx,
 
     SetActive(mctx, 0, false);
 
-    if (ctx->buffer && ctx->buffer->isDVD())
+    if (ctx->buffer && ctx->buffer->IsDVD())
     {
         VERBOSE(VB_PLAYBACK,LOC + " StopStuff() -- "
                 "get dvd player out of still frame or wait status");
@@ -3062,10 +3065,10 @@ bool TV::HandleLCDTimerEvent(void)
         if (StateIsLiveTV(GetState(actx)))
             ShowLCDChannelInfo(actx);
 
-        if (actx->buffer && actx->buffer->isDVD())
+        if (actx->buffer && actx->buffer->IsDVD())
         {
             ShowLCDDVDInfo(actx);
-            showProgress = !actx->buffer->InDiscMenuOrStillFrame();
+            showProgress = !actx->buffer->IsInDiscMenuOrStillFrame();
         }
 
         if (showProgress)
@@ -3735,18 +3738,17 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
 
     handled = false;
 
-    bool isDVD = actx->buffer && actx->buffer->isDVD();
-    bool isDVDStill = isDVD && actx->buffer->InDiscMenuOrStillFrame();
-    bool isBD = actx->buffer && actx->buffer->isBD();
-    bool isBDStill = isBD && actx->buffer->InDiscMenuOrStillFrame();
+    bool isDVD = actx->buffer && actx->buffer->IsDVD();
+    bool isMenuOrStill = actx->buffer->IsInDiscMenuOrStillFrame();
 
     handled = handled || BrowseHandleAction(actx, actions);
     handled = handled || ManualZoomHandleAction(actx, actions);
     handled = handled || PictureAttributeHandleAction(actx, actions);
     handled = handled || TimeStretchHandleAction(actx, actions);
     handled = handled || AudioSyncHandleAction(actx, actions);
-    handled = handled || DiscMenuHandleAction(actx, actions, isDVD, isDVDStill, isBD);
-    handled = handled || ActiveHandleAction(actx, actions, isDVD, isDVDStill);
+    handled = handled || DiscMenuHandleAction(actx, actions);
+    handled = handled || ActiveHandleAction(
+        actx, actions, isDVD, isMenuOrStill);
     handled = handled || ToggleHandleAction(actx, actions, isDVD);
     handled = handled || PxPHandleAction(actx, actions);
     handled = handled || FFRewHandleAction(actx, actions);
@@ -3972,16 +3974,15 @@ bool TV::AudioSyncHandleAction(PlayerContext *ctx,
     return handled;
 }
 
-bool TV::DiscMenuHandleAction(PlayerContext *ctx,
-                             const QStringList &actions,
-                             bool isDVD, bool isDVDStill,
-                             bool isBD)
+bool TV::DiscMenuHandleAction(PlayerContext *ctx, const QStringList &actions)
 {
     bool handled = false;
+    DVDRingBuffer *dvdrb = ctx->buffer->DVD();
+    BDRingBuffer  *bdrb  = ctx->buffer->BD();
 
-    if (isDVD)
+    if (dvdrb)
     {
-        int nb_buttons = ctx->buffer->DVD()->NumMenuButtons();
+        int nb_buttons = dvdrb->NumMenuButtons();
         if (nb_buttons == 0)
             return false;
 
@@ -3989,33 +3990,33 @@ bool TV::DiscMenuHandleAction(PlayerContext *ctx,
         if (has_action("UP", actions) ||
             has_action("CHANNELUP", actions))
         {
-            ctx->buffer->DVD()->MoveButtonUp();
+            dvdrb->MoveButtonUp();
         }
         else if (has_action("DOWN", actions) ||
                  has_action("CHANNELDOWN", actions))
         {
-            ctx->buffer->DVD()->MoveButtonDown();
+            dvdrb->MoveButtonDown();
         }
         else if (has_action("LEFT", actions) ||
                  has_action("SEEKRWND", actions))
         {
-            ctx->buffer->DVD()->MoveButtonLeft();
+            dvdrb->MoveButtonLeft();
         }
         else if (has_action("RIGHT", actions) ||
                  has_action("SEEKFFWD", actions))
         {
-            ctx->buffer->DVD()->MoveButtonRight();
+            dvdrb->MoveButtonRight();
         }
         else if (has_action("SELECT", actions))
         {
             ctx->LockDeletePlayer(__FILE__, __LINE__);
-            ctx->buffer->DVD()->ActivateButton();
+            dvdrb->ActivateButton();
             ctx->UnlockDeletePlayer(__FILE__, __LINE__);
         }
         else
             handled = false;
     }
-    if (isBD)
+    else if (bdrb)
     {
         int64_t pts = 0;
         VideoOutput *output = ctx->player->getVideoOutput();
@@ -4033,70 +4034,70 @@ bool TV::DiscMenuHandleAction(PlayerContext *ctx,
         if (has_action("UP", actions) ||
             has_action("CHANNELUP", actions))
         {
-            ctx->buffer->BD()->PressButton(BD_VK_UP, pts);
+            bdrb->PressButton(BD_VK_UP, pts);
         }
         else if (has_action("DOWN", actions) ||
                  has_action("CHANNELDOWN", actions))
         {
-            ctx->buffer->BD()->PressButton(BD_VK_DOWN, pts);
+            bdrb->PressButton(BD_VK_DOWN, pts);
         }
         else if (has_action("LEFT", actions) ||
                  has_action("SEEKRWND", actions))
         {
-            ctx->buffer->BD()->PressButton(BD_VK_LEFT, pts);
+            bdrb->PressButton(BD_VK_LEFT, pts);
         }
         else if (has_action("RIGHT", actions) ||
                  has_action("SEEKFFWD", actions))
         {
-            ctx->buffer->BD()->PressButton(BD_VK_RIGHT, pts);
+            bdrb->PressButton(BD_VK_RIGHT, pts);
         }
         else if (has_action("MENUTEXT", actions))
         {
-            ctx->buffer->BD()->PressButton(BD_VK_POPUP, pts);
+            bdrb->PressButton(BD_VK_POPUP, pts);
         }
         else if (has_action("0", actions))
         {
-            ctx->buffer->BD()->PressButton(BD_VK_0, pts);
+            bdrb->PressButton(BD_VK_0, pts);
         }
         else if (has_action("1", actions))
         {
-            ctx->buffer->BD()->PressButton(BD_VK_1, pts);
+            bdrb->PressButton(BD_VK_1, pts);
         }
         else if (has_action("2", actions))
         {
-            ctx->buffer->BD()->PressButton(BD_VK_2, pts);
+            bdrb->PressButton(BD_VK_2, pts);
         }
         else if (has_action("3", actions))
         {
-            ctx->buffer->BD()->PressButton(BD_VK_3, pts);
+            bdrb->PressButton(BD_VK_3, pts);
         }
         else if (has_action("4", actions))
         {
-            ctx->buffer->BD()->PressButton(BD_VK_4, pts);
+            bdrb->PressButton(BD_VK_4, pts);
         }
         else if (has_action("5", actions))
         {
-            ctx->buffer->BD()->PressButton(BD_VK_5, pts);
+            bdrb->PressButton(BD_VK_5, pts);
         }
         else if (has_action("6", actions))
         {
-            ctx->buffer->BD()->PressButton(BD_VK_6, pts);
+            bdrb->PressButton(BD_VK_6, pts);
         }
         else if (has_action("7", actions))
         {
-            ctx->buffer->BD()->PressButton(BD_VK_7, pts);
+            bdrb->PressButton(BD_VK_7, pts);
         }
         else if (has_action("8", actions))
         {
-            ctx->buffer->BD()->PressButton(BD_VK_8, pts);
+            bdrb->PressButton(BD_VK_8, pts);
         }
         else if (has_action("9", actions))
         {
-            ctx->buffer->BD()->PressButton(BD_VK_9, pts);
+            bdrb->PressButton(BD_VK_9, pts);
         }
         else if (has_action("SELECT", actions))
         {
-            ctx->buffer->BD()->PressButton(BD_VK_ENTER, pts);
+            bdrb->PressButton(BD_VK_ENTER, pts);
         }
         else
             handled = false;
@@ -4814,7 +4815,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
     }
     else if (tokens.size() >= 3 && tokens[1] == "SEEK" && ctx->HasPlayer())
     {
-        if (ctx->buffer && ctx->buffer->InDiscMenuOrStillFrame())
+        if (ctx->buffer && ctx->buffer->IsInDiscMenuOrStillFrame())
             return;
 
         ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -4929,7 +4930,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
             }
             else
             {
-                if (ctx->buffer->isDVD())
+                if (ctx->buffer->IsDVD())
                     infoStr = "DVD";
                 else if (ctx->playingInfo->IsRecording())
                     infoStr = "Recorded";
@@ -5753,7 +5754,7 @@ float TV::DoTogglePauseStart(PlayerContext *ctx)
     if (!ctx)
         return 0.0f;
 
-    if (ctx->buffer && ctx->buffer->InDiscMenuOrStillFrame())
+    if (ctx->buffer && ctx->buffer->IsInDiscMenuOrStillFrame())
         return 0.0f;
 
     ctx->ff_rew_speed = 0;
@@ -5787,7 +5788,7 @@ void TV::DoTogglePauseFinish(PlayerContext *ctx, float time, bool showOSD)
     if (!ctx || !ctx->HasPlayer())
         return;
 
-    if (ctx->buffer && ctx->buffer->InDiscMenuOrStillFrame())
+    if (ctx->buffer && ctx->buffer->IsInDiscMenuOrStillFrame())
         return;
 
     if (ctx->paused)
@@ -6572,8 +6573,10 @@ void TV::SwitchCards(PlayerContext *ctx,
             ctx->LockPlayingInfo(__FILE__, __LINE__);
             QString playbackURL = ctx->playingInfo->GetPlaybackURL(true);
             bool opennow = (ctx->tvchain->GetCardType(-1) != "DUMMY");
-            ctx->SetRingBuffer(new RingBuffer(playbackURL, false, true,
-                               opennow ? RingBuffer::kLiveTVOpenTimeout : -1));
+            ctx->SetRingBuffer(
+                RingBuffer::Create(
+                    playbackURL, false, true,
+                    opennow ? RingBuffer::kLiveTVOpenTimeout : -1));
 
             ctx->tvchain->SetProgram(*ctx->playingInfo);
             ctx->buffer->SetLiveMode(ctx->tvchain);
@@ -7634,12 +7637,12 @@ void TV::ShowLCDDVDInfo(const PlayerContext *ctx)
 {
     class LCD * lcd = LCD::Get();
 
-    if (!lcd || !ctx->buffer || !ctx->buffer->isDVD())
+    if (!lcd || !ctx->buffer || !ctx->buffer->IsDVD())
     {
         return;
     }
 
-    DVDRingBufferPriv *dvd = ctx->buffer->DVD();
+    DVDRingBuffer *dvd = ctx->buffer->DVD();
     QString dvdName, dvdSerial;
     QString mainStatus, subStatus;
 
@@ -7647,10 +7650,15 @@ void TV::ShowLCDDVDInfo(const PlayerContext *ctx)
     {
         dvdName = tr("DVD");
     }
+
     if (dvd->IsInMenu())
+    {
         mainStatus = tr("Menu");
-    else if (dvd->InStillFrame())
+    }
+    else if (dvd->IsInStillFrame())
+    {
         mainStatus = tr("Still Frame");
+    }
     else
     {
         QString timeMins, timeHrsMin;
@@ -11467,14 +11475,15 @@ bool TV::ScreenShot(PlayerContext *ctx, long long frameNumber)
 */
 void TV::DVDJumpBack(PlayerContext *ctx)
 {
-    if (!ctx->HasPlayer() || !ctx->buffer || !ctx->buffer->isDVD())
+    DVDRingBuffer *dvdrb = dynamic_cast<DVDRingBuffer*>(ctx->buffer);
+    if (!ctx->HasPlayer() || !dvdrb)
         return;
 
-    if (ctx->buffer->InDiscMenuOrStillFrame())
+    if (ctx->buffer->IsInDiscMenuOrStillFrame())
     {
         UpdateOSDSeekMessage(ctx, tr("Skip Back Not Allowed"), kOSDTimeout_Med);
     }
-    else if (!ctx->buffer->DVD()->StartOfTitle())
+    else if (!dvdrb->StartOfTitle())
     {
         ctx->LockDeletePlayer(__FILE__, __LINE__);
         if (ctx->player)
@@ -11484,8 +11493,8 @@ void TV::DVDJumpBack(PlayerContext *ctx)
     }
     else
     {
-        uint titleLength = ctx->buffer->DVD()->GetTotalTimeOfTitle();
-        uint chapterLength = ctx->buffer->DVD()->GetChapterLength();
+        uint titleLength = dvdrb->GetTotalTimeOfTitle();
+        uint chapterLength = dvdrb->GetChapterLength();
         if ((titleLength == chapterLength) && chapterLength > 300)
         {
             DoSeek(ctx, -ctx->jumptime * 60, tr("Jump Back"));
@@ -11507,17 +11516,18 @@ void TV::DVDJumpBack(PlayerContext *ctx)
  */
 void TV::DVDJumpForward(PlayerContext *ctx)
 {
-    if (!ctx->HasPlayer() || !ctx->buffer || !ctx->buffer->isDVD())
+    DVDRingBuffer *dvdrb = dynamic_cast<DVDRingBuffer*>(ctx->buffer);
+    if (!ctx->HasPlayer() || !dvdrb)
         return;
 
-    bool in_still = ctx->buffer->DVD()->InStillFrame();
-    bool in_menu  = ctx->buffer->DVD()->IsInMenu();
-    if (in_still && !ctx->buffer->DVD()->NumMenuButtons())
+    bool in_still = dvdrb->IsInStillFrame();
+    bool in_menu  = dvdrb->IsInMenu();
+    if (in_still && !dvdrb->NumMenuButtons())
     {
-        ctx->buffer->DVD()->SkipStillFrame();
+        dvdrb->SkipStillFrame();
         UpdateOSDSeekMessage(ctx, tr("Skip Still Frame"), kOSDTimeout_Med);
     }
-    else if (!ctx->buffer->DVD()->EndOfTitle() && !in_still && !in_menu)
+    else if (!dvdrb->EndOfTitle() && !in_still && !in_menu)
     {
         ctx->LockDeletePlayer(__FILE__, __LINE__);
         if (ctx->player)
@@ -11528,9 +11538,9 @@ void TV::DVDJumpForward(PlayerContext *ctx)
     }
     else if (!in_still && !in_menu)
     {
-        uint titleLength = ctx->buffer->DVD()->GetTotalTimeOfTitle();
-        uint chapterLength = ctx->buffer->DVD()->GetChapterLength();
-        uint currentTime = ctx->buffer->DVD()->GetCurrentTime();
+        uint titleLength = dvdrb->GetTotalTimeOfTitle();
+        uint chapterLength = dvdrb->GetChapterLength();
+        uint currentTime = dvdrb->GetCurrentTime();
         if ((titleLength == chapterLength) &&
              (currentTime < (chapterLength - (ctx->jumptime * 60))) &&
              chapterLength > 300)
@@ -11554,7 +11564,7 @@ void TV::DVDJumpForward(PlayerContext *ctx)
  */
 bool TV::IsBookmarkAllowed(const PlayerContext *ctx) const
 {
-    bool isDVD = ctx->buffer && ctx->buffer->isDVD();
+    bool isDVD = ctx->buffer && ctx->buffer->IsDVD();
 
     ctx->LockPlayingInfo(__FILE__, __LINE__);
 
@@ -11611,7 +11621,7 @@ void TV::ShowOSDStopWatchingRecording(PlayerContext *ctx)
 
     if (StateIsLiveTV(GetState(ctx)))
         videotype = tr("Live TV");
-    else if (ctx->buffer->isDVD())
+    else if (ctx->buffer->IsDVD())
         videotype = tr("this DVD");
 
     ctx->LockPlayingInfo(__FILE__, __LINE__);

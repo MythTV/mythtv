@@ -56,7 +56,7 @@ using namespace std;
 #include "autoexpire.h"
 #include "storagegroup.h"
 #include "compat.h"
-#include "RingBuffer.h"
+#include "ringbuffer.h"
 #include "remotefile.h"
 #include "mythsystemevent.h"
 #include "tv.h"

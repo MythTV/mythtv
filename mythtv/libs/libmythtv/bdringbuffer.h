@@ -8,6 +8,7 @@
 #include "libmythbluray/bluray.h"
 #include "libmythbluray/keys.h"
 
+#include "ringbuffer.h"
 #include "util.h"
 
 /** \class BDRingBufferPriv
@@ -16,13 +17,11 @@
  *   A class to allow a RingBuffer to read from BDs.
  */
 
-class NuppelVideoPlayer;
-
-class MPUBLIC BDRingBufferPriv
+class MPUBLIC BDRingBuffer : public RingBuffer
 {
   public:
-    BDRingBufferPriv();
-    virtual ~BDRingBufferPriv();
+    BDRingBuffer(const QString &lfilename);
+    virtual ~BDRingBuffer();
 
     uint32_t GetNumTitles(void) const { return m_numTitles; }
     int      GetCurrentTitle(void) const;
@@ -33,7 +32,7 @@ class MPUBLIC BDRingBufferPriv
     // Get The total duration of the current title in 90Khz ticks.
     uint64_t GetTotalTimeOfTitle(void) const { return (m_currentTitleLength / 90000); }
     uint64_t GetCurrentTime(void) { return (m_currentTime / 90000); }
-    uint64_t GetReadPosition(void);
+    virtual long long GetReadPosition(void) const; // RingBuffer
     uint64_t GetTotalReadPosition(void);
     uint32_t GetNumChapters(void);
     uint64_t GetNumAngles(void) { return m_currentTitleAngleCount; }
@@ -42,7 +41,9 @@ class MPUBLIC BDRingBufferPriv
     bool IsOpen(void)        const { return bdnav; }
     bool IsHDMVNavigation(void) const { return m_is_hdmv_navigation; }
     bool IsInMenu(void) const { return m_inMenu; }
-    bool InStillFrame(void) { return m_still > 0; }
+    bool IsInStillFrame(void) const { return m_still > 0; }
+    virtual bool IsInDiscMenuOrStillFrame(void) const
+        { return IsInMenu() || IsInStillFrame(); } // RingBuffer
     bool TitleChanged(void);
 
     void GetDescForPos(QString &desc) const;
@@ -52,7 +53,8 @@ class MPUBLIC BDRingBufferPriv
     int GetSubtitleLanguage(uint streamID);
 
     // commands
-    bool OpenFile(const QString &filename);
+    virtual bool OpenFile(const QString &filename,
+                          uint retry_ms = kDefaultOpenTimeout);
     void close(void);
 
     bool GoToMenu(const QString str);
@@ -62,7 +64,8 @@ class MPUBLIC BDRingBufferPriv
 
     bool UpdateTitleInfo(uint32_t index);
 
-    int  safe_read(void *data, unsigned sz);
+    virtual int safe_read(void *data, uint sz);
+    virtual long long Seek(long long pos, int whence, bool has_lock);
     uint64_t Seek(uint64_t pos);
 
     bool HandleBDEvents(void);
@@ -103,7 +106,7 @@ class MPUBLIC BDRingBufferPriv
 
   public:
     uint8_t            m_still;
-    bool               m_inMenu;
+    volatile bool      m_inMenu;
 
 };
 #endif

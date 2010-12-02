@@ -377,7 +377,7 @@ int Transcode::TranscodeFile(
     nvr = new NuppelVideoRecorder(NULL, NULL);
 
     // Input setup
-    inRingBuffer = new RingBuffer(inputname, false, false);
+    inRingBuffer = RingBuffer::Create(inputname, false, false);
     player = new MythPlayer();
 
     player_ctx = new PlayerContext(kTranscoderInUseID);
@@ -684,7 +684,7 @@ int Transcode::TranscodeFile(
         else if (vidsetting == "RTjpeg")
             nvr->SetupRTjpeg();
 
-        outRingBuffer = new RingBuffer(outputname, true, false);
+        outRingBuffer = RingBuffer::Create(outputname, true, false);
         nvr->SetRingBuffer(outRingBuffer);
         nvr->WriteHeader();
         nvr->StreamAllocate();
