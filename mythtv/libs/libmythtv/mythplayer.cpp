@@ -209,7 +209,6 @@ MythPlayer::MythPlayer(bool muted)
       ttPageNum(0x888),
       // Support for captions, teletext, etc. decoded by libav
       textDesired(false), enableCaptions(false), disableCaptions(false),
-      initTeletext(false),
       // CC608/708
       db_prefer708(true), cc608(this), cc708(this),
       // MHEG/MHI Interactive TV visible in OSD
@@ -615,7 +614,6 @@ void MythPlayer::ReinitOSD(void)
                 uint old = textDisplayMode;
                 ToggleCaptions(old);
                 osd->Reinit(visible, aspect);
-                SetupTeletextViewer();
                 EnableCaptions(old, false);
             }
         }
@@ -1420,26 +1418,6 @@ bool MythPlayer::ToggleCaptions(uint type)
     return textDisplayMode;
 }
 
-void MythPlayer::SetupTeletextViewer(void)
-{
-    if (QThread::currentThread() != playerThread)
-    {
-        initTeletext = true;
-        return;
-    }
-
-    if (osd)
-    {
-        QMutexLocker locker(&osdLock);
-        TeletextViewer* ttview =  (TeletextViewer*)osd->InitTeletext();
-        if (ttview && decoder)
-        {
-            initTeletext = false;
-            decoder->SetTeletextDecoderViewer(ttview);
-        }
-    }
-}
-
 void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
 {
     QMutexLocker locker(&osdLock);
@@ -2036,7 +2014,6 @@ void MythPlayer::VideoStart(void)
         videoOutput->GetOSDBounds(total, visible, aspect, scaling, 1.0f);
         osd->Init(visible, aspect);
         videoOutput->InitOSD(osd);
-        SetupTeletextViewer();
         osd->EnableSubtitles(kDisplayNone);
 
 #ifdef USING_MHEG
@@ -2528,10 +2505,6 @@ void MythPlayer::EventLoop(void)
         SetCaptionsEnabled(true, false);
     if (disableCaptions)
         SetCaptionsEnabled(false, false);
-
-    // (re)initialise the teletext viewer
-    if (initTeletext)
-        SetupTeletextViewer();
 
     // refresh the position map for an in-progress recording while editing
     if (hasFullPositionMap && watchingrecording && player_ctx->recorder &&

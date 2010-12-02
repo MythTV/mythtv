@@ -188,7 +188,6 @@ class DecoderBase
     inline int   NextTrack(uint type);
 
     virtual int  GetTeletextDecoderType(void) const { return -1; }
-    virtual void SetTeletextDecoderViewer(TeletextViewer*) {;}
 
     virtual QString GetXDS(const QString&) const { return QString::null; }
 
