@@ -457,7 +457,7 @@ if ! disabled weather; then
     check_pl_lib "XML::Simple"  || disable_weather "XML::Simple"
     check_pl_lib "XML::XPath"  || disable_weather "XML::XPath"
     check_pl_lib "Image::Size"  || disable_weather "Image::Size"
-    check_pl_lib "DateTime::Format::ISO8601" || 
+    check_pl_lib "DateTime::Format::ISO8601" ||
         disable_weather "DateTime::Format::ISO8601"
     check_pl_lib "SOAP::Lite"  || disable_weather "SOAP::Lite"
 fi
@@ -533,15 +533,15 @@ if test "$music" != "no" ; then
     if test x`which taglib-config` != x"" ; then
         taglib_minor=`taglib-config --version | cut -d. -f2`
         if test x"$taglib_minor" = x"" ; then
-            echo "Can't find taglib-config. Assuming 1.5 or later."
-            taglib_minor="5"
+            echo "Can't find taglib-config. Assuming 1.6 or later."
+            taglib_minor="6"
         fi
     fi
 
-    if has_library libtag && has_header taglib/fileref.h && test $taglib_minor -ge 5 ; then
+    if has_library libtag && has_header taglib/fileref.h && test $taglib_minor -ge 6 ; then
         taglib="yes"
     else
-        echo "MythMusic requires taglib 1.5 or later."
+        echo "MythMusic requires taglib 1.6 or later."
     fi
 
     if test "$targetos" != "Darwin" -a "`echo ${targetos} | cut -c1-5`" != "MINGW" ; then
