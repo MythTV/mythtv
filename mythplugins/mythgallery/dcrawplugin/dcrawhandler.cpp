@@ -10,6 +10,7 @@
 #include <QIODevice>
 #include <QString>
 #include "mythsystem.h"
+#include "exitcodes.h"
 
 namespace
 {
@@ -37,7 +38,7 @@ bool DcrawHandler::canRead() const
         return false;
 
     QString command = "dcraw -i " + path;
-    return (!myth_system(command));
+    return (myth_system(command) == GENERIC_EXIT_OK);
 }
 
 bool DcrawHandler::read(QImage *image)
@@ -61,7 +62,7 @@ bool DcrawHandler::read(QImage *image)
     uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
     MythSystem ms("dcraw", arguments, flags);
     ms.Run();
-    if (ms.Wait())
+    if (ms.Wait() != GENERIC_EXIT_OK)
         return false;
 
     QByteArray buffer = ms.ReadAll();

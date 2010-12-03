@@ -48,6 +48,7 @@ using namespace std;
 #include "mythsocket.h"
 #include "mythcoreutil.h"
 #include "remotefile.h"
+#include "mythsystem.h"
 
 #include "mythconfig.h" // for CONFIG_DARWIN
 
@@ -737,21 +738,21 @@ bool ping(const QString &host, int timeout)
                   .arg(timeout).arg(host);
 
     if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
-                         kMSProcessEvents))
+                         kMSProcessEvents) != GENERIC_EXIT_OK)
         return false;
 #else
     QString cmd = QString("ping -t %1 -c 1  %2  >/dev/null 2>&1")
                   .arg(timeout).arg(host);
 
     if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
-                         kMSProcessEvents))
+                         kMSProcessEvents) != GENERIC_EXIT_OK)
     {
         // ping command may not like -t argument. Simplify:
 
         cmd = QString("ping -c 1  %2  >/dev/null 2>&1").arg(host);
 
         if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
-                             kMSProcessEvents))
+                             kMSProcessEvents) != GENERIC_EXIT_OK)
             return false;
     }
 #endif
@@ -1181,12 +1182,12 @@ bool IsPulseAudioRunning(void)
 #if CONFIG_DARWIN || (__FreeBSD__) || defined(__OpenBSD__)
     const char *command = "ps -ax | grep -i pulseaudio | grep -v grep > /dev/null";
 #else
-    const char *command = "ps -ae | grep pulseaudio > /dev/null";
+    const char *command = "ps ch -C pulseaudio -o pid > /dev/null";
 #endif
     // Do NOT use kMSProcessEvents here, it will cause deadlock
-    bool res = myth_system(command, kMSDontBlockInputDevs | 
+    uint res = myth_system(command, kMSDontBlockInputDevs | 
                                     kMSDontDisableDrawing);
-    return !res;
+    return (res == GENERIC_EXIT_OK);
 }
 
 bool myth_nice(int val)

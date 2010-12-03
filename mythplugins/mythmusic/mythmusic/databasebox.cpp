@@ -20,6 +20,7 @@ using namespace std;
 #include <uilistbtntype.h>
 #include <mythmediamonitor.h>
 #include <mythsystem.h>
+#include <exitcodes.h>
 
 // mythmusic
 #include "metadata.h"
@@ -444,7 +445,7 @@ void DatabaseBox::BlankCDRW()
         .arg(scsidev).arg(blanktype);
     uint flags = kMSRunShell | kMSDontBlockInputDevs | kMSDontDisableDrawing;
 
-    if (myth_system(cmd, flags))
+    if (myth_system(cmd, flags) != GENERIC_EXIT_OK)
     {
         VERBOSE(VB_IMPORTANT, QString("DatabaseBox::BlankCDRW()") +
                 QString(" cmd: '%1' Failed!").arg(cmd));

@@ -193,7 +193,7 @@ static int unlockShutdown()
 static bool isRunning(const char *program)
 {
     QString command = QString("ps ch -C %1 -o pid > /dev/null").arg(program);
-    return !myth_system(command);
+    return (myth_system(command) == GENERIC_EXIT_OK);
 }
 
 static QDateTime getDailyWakeupTime(QString sPeriod)

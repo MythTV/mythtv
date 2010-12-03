@@ -51,7 +51,7 @@ void GrabberScript::run()
     MythSystem getTree(commandline, QStringList("-T"),
                        kMSRunShell | kMSStdOut | kMSBuffered);
     getTree.Run(900);
-    int status = getTree.Wait();
+    uint status = getTree.Wait();
 
     if( status == GENERIC_EXIT_CMD_NOT_FOUND )
         VERBOSE(VB_IMPORTANT, LOC + QString("Internet Content Source %1 "

@@ -37,6 +37,8 @@
 #include "config.h"
 #include "thumbgenerator.h"
 #include "galleryutil.h"
+#include "mythsystem.h"
+#include "exitcodes.h"
 
 #ifdef EXIF_SUPPORT
 #include <libexif/exif-data.h>
@@ -297,10 +299,12 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
 
         if (tmpDir.exists())
         {
-            QString cmd = "cd \"" + tmpDir.absolutePath() +
-                          "\"; mplayer -nosound -frames 1 -vo png:z=6 \"" +
+            QString cmd = "mplayer -nosound -frames 1 -vo png:z=6 \"" +
                           fi.absoluteFilePath() + "\"";
-            if (myth_system(cmd) == 0)
+            MythSystem ms(cmd, kMSRunShell);
+            ms.SetDirectory(tmpDir.absolutePath());
+            ms.Run();
+            if (ms.Wait() == GENERIC_EXIT_OK)
             {
                 QFileInfo thumb(tmpDir.filePath("00000001.png"));
                 if (thumb.exists())

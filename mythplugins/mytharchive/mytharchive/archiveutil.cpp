@@ -21,6 +21,7 @@ using namespace std;
 #include <mythdialogbox.h>
 #include <util.h>
 #include <mythsystem.h>
+#include <exitcodes.h>
 
 // mytharchive
 #include "archiveutil.h"
@@ -241,7 +242,7 @@ bool getFileDetails(ArchiveItem *a)
             .arg(inFile).arg(outFile).arg(lenMethod);
 
     uint flags = kMSDontBlockInputDevs | kMSDontDisableDrawing;
-    if (myth_system(command, flags))
+    if (myth_system(command, flags) != GENERIC_EXIT_OK)
         return false;
 
     QDomDocument doc("mydocument");

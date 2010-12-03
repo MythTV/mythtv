@@ -17,6 +17,7 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "mythsocket.h"
 #include "mythsystem.h"
+#include "exitcodes.h"
 
 #include "mythversion.h"
 
@@ -541,12 +542,12 @@ bool MythCoreContext::BackendIsRunning(void)
     const char *command = "%systemroot%\\system32\\tasklist.exe "
        " | %systemroot%\\system32\\find.exe /i \"mythbackend.exe\" ";
 #else
-    const char *command = "ps -ae | grep mythbackend > /dev/null";
+    const char *command = "ps ch -C mythbackend -o pid > /dev/null";
 #endif
-    bool res = myth_system(command, kMSDontBlockInputDevs |
+    uint res = myth_system(command, kMSDontBlockInputDevs |
                                     kMSDontDisableDrawing |
                                     kMSProcessEvents);
-    return !res;
+    return (res == GENERIC_EXIT_OK);
 }
 
 bool MythCoreContext::IsFrontendOnly(void)

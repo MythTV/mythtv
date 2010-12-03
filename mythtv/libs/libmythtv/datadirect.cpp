@@ -19,6 +19,7 @@
 #include "util.h"
 #include "dbutil.h"
 #include "mythsystem.h"
+#include "exitcodes.h"
 
 #define SHOW_WGET_OUTPUT 0
 
@@ -1018,12 +1019,12 @@ bool DataDirectProcessor::DDPost(
         VERBOSE(VB_GENERAL, "command: "<<command<<endl);
 
     err_txt = "Returned failure";
-    if (myth_system(command, kMSAnonLog))
+    if (myth_system(command, kMSAnonLog) != GENERIC_EXIT_OK)
         return false;
 
 #ifndef USING_MINGW
     command = QString("gzip -d %1").arg(outfile+".gz");
-    if (myth_system(command))
+    if (myth_system(command) != GENERIC_EXIT_OK)
         return false;
 #endif
 

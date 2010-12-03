@@ -2312,9 +2312,9 @@ bool Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
                                                        "");
     if (!preSDWUCheckCommand.isEmpty())
     {
-        int state = myth_system(preSDWUCheckCommand);
+        uint state = myth_system(preSDWUCheckCommand);
 
-        if (GENERIC_EXIT_NOT_OK != state)
+        if (state != GENERIC_EXIT_NOT_OK)
         {
             retval = false;
             switch(state)
@@ -2402,7 +2402,7 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
                                     setwakeup_cmd);
 
         // now run the command to set the wakeup time
-        if (myth_system(setwakeup_cmd))
+        if (myth_system(setwakeup_cmd) != GENERIC_EXIT_OK)
         {
             VERBOSE(VB_IMPORTANT, "SetWakeuptimeCommand failed, "
                     "shutdown aborted");
@@ -2428,10 +2428,10 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
                                     "this computer :-\n\t\t\t\t\t\t") + halt_cmd);
 
         // and now shutdown myself
-        if (!myth_system(halt_cmd))
+        if (myth_system(halt_cmd) == GENERIC_EXIT_OK)
             return;
-        else
-            VERBOSE(VB_IMPORTANT, "ServerHaltCommand failed, shutdown aborted");
+
+        VERBOSE(VB_IMPORTANT, "ServerHaltCommand failed, shutdown aborted");
     }
 
     // If we make it here then either the shutdown failed
@@ -2629,11 +2629,10 @@ bool Scheduler::WakeUpSlave(QString slaveHostname, bool setWakingStatus)
         VERBOSE(VB_SCHEDULE, QString("Executing '%1' to wake up slave.")
                 .arg(wakeUpCommand));
         myth_system(wakeUpCommand);
+        return true;
     }
-    else
-        return WakeOnLAN(wakeUpCommand);
 
-    return true;
+    return WakeOnLAN(wakeUpCommand);
 }
 
 void Scheduler::WakeUpSlaves(void)

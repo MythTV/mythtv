@@ -14,7 +14,9 @@
 #include "mythplayer.h"
 #include "mythcorecontext.h"    /* gContext */
 #include "frame.h"          /* VideoFrame */
-#include "util.h"           /* myth_system */
+#include "util.h"
+#include "mythsystem.h"
+#include "exitcodes.h"
 
 // Commercial Flagging headers
 #include "CommDetector2.h"
@@ -46,8 +48,9 @@ writeJPG(QString prefix, const AVPicture *img, int imgheight)
             }
         }
 
-        if (myth_system(QString("convert -quality 50 -resize 192x144 %1 %2")
-                    .arg(pgmfile.fileName()).arg(jpgfi.filePath())))
+        QString cmd = QString("convert -quality 50 -resize 192x144 %1 %2")
+                      .arg(pgmfile.fileName()).arg(jpgfi.filePath());
+        if (myth_system(cmd) != GENERIC_EXIT_OK)
             return -1;
 
         if (!pgmfile.remove())

@@ -13,6 +13,7 @@
 #include <compat.h>
 #include <mythdirs.h>
 #include <mythsystem.h>
+#include <exitcodes.h>
 
 // MythWeather headers
 #include "weatherScreen.h"
@@ -32,7 +33,7 @@ QStringList WeatherSource::ProbeTypes(QString workingDirectory,
     MythSystem ms(program, arguments, flags);
     ms.SetDirectory(workingDirectory);
     ms.Run();
-    if (ms.Wait())
+    if (ms.Wait() != GENERIC_EXIT_OK)
     {
         VERBOSE(VB_IMPORTANT, loc_err + "Cannot run script");
         return types;
@@ -76,7 +77,7 @@ bool WeatherSource::ProbeTimeouts(QString  workingDirectory,
     MythSystem ms(program, arguments, flags);
     ms.SetDirectory(workingDirectory);
     ms.Run();
-    if (ms.Wait())
+    if (ms.Wait() != GENERIC_EXIT_OK)
     {
         VERBOSE(VB_IMPORTANT, loc_err + "Cannot run script");
         return false;
@@ -140,7 +141,7 @@ bool WeatherSource::ProbeInfo(ScriptInfo &info)
     MythSystem ms(info.program, arguments, flags);
     ms.SetDirectory(info.path);
     ms.Run();
-    if (ms.Wait())
+    if (ms.Wait() != GENERIC_EXIT_OK)
     {
         VERBOSE(VB_IMPORTANT, loc_err + "Cannot run script");
         return false;
@@ -391,7 +392,7 @@ QStringList WeatherSource::getLocationList(const QString &str)
     ms.SetDirectory(m_info->path);
     ms.Run();
     
-    if (ms.Wait())
+    if (ms.Wait() != GENERIC_EXIT_OK)
     {
         VERBOSE(VB_IMPORTANT, loc_err + "Cannot run script");
         return QStringList();
@@ -507,7 +508,7 @@ void WeatherSource::processExit(uint status)
 {
     m_ms->disconnect(); // disconnects all signals
 
-    if (!status)
+    if (status == GENERIC_EXIT_OK)
     {
         m_buffer = m_ms->ReadAll();
     }
@@ -515,7 +516,7 @@ void WeatherSource::processExit(uint status)
     delete m_ms;
     m_ms = NULL;
 
-    if (status)
+    if (status != GENERIC_EXIT_OK)
     {
         VERBOSE(VB_IMPORTANT, QString("script exit status %1").arg(status));
         return;

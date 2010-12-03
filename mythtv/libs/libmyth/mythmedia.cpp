@@ -15,6 +15,8 @@
 #include "mythconfig.h"
 #include "mythverbose.h"
 #include "util.h"
+#include "mythsystem.h"
+#include "exitcodes.h"
 
 using namespace std;
 
@@ -121,7 +123,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
                 .arg(m_DevicePath);
     
         VERBOSE(VB_MEDIA, QString("Executing '%1'").arg(MountCommand));
-        if (!myth_system(MountCommand, kMSDontBlockInputDevs))
+        if (myth_system(MountCommand, kMSDontBlockInputDevs) != GENERIC_EXIT_OK)
         {
             if (DoMount)
             {
@@ -278,7 +280,7 @@ MediaError MythMediaDevice::eject(bool open_close)
 
     QString  command = "disktool -e " + m_DevicePath + " &";
 
-    if (myth_system(command, kMSRunBackground) > 0)
+    if (myth_system(command, kMSRunBackground) != GENERIC_EXIT_OK)
         return MEDIAERR_FAILED;
 
     return MEDIAERR_OK;

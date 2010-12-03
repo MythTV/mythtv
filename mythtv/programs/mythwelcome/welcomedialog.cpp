@@ -128,7 +128,7 @@ void WelcomeDialog::checkAutoStart(void)
     // mythshutdown --startup returns 0 for automatic startup
     //                                1 for manual startup
     QString mythshutdown_exe = m_installDir + "/bin/mythshutdown --startup";
-    unsigned int state = myth_system(mythshutdown_exe);
+    uint state = myth_system(mythshutdown_exe);
 
     VERBOSE(VB_GENERAL, "mythshutdown --startup returned: " << state);
 
@@ -263,7 +263,7 @@ bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
             QString mythshutdown_lock =
                 m_installDir + "/bin/mythshutdown --lock";
 
-            unsigned int statusCode = myth_system(mythshutdown_status);
+            uint statusCode = myth_system(mythshutdown_status);
             // is shutdown locked by a user
             if (!(statusCode & 0xFF00) && statusCode & 16)
             {
@@ -524,7 +524,7 @@ void WelcomeDialog::updateStatusMessage(void)
     }
 
     QString mythshutdown_status = m_installDir + "/bin/mythshutdown --status 0";
-    unsigned int statusCode = myth_system(mythshutdown_status);
+    uint statusCode = myth_system(mythshutdown_status);
 
     if (!(statusCode & 0xFF00))
     {
@@ -595,7 +595,7 @@ void WelcomeDialog::showMenu(void)
     m_menuPopup->SetReturnEvent(this, "action");
 
     QString mythshutdown_status = m_installDir + "/bin/mythshutdown --status 0";
-    unsigned int statusCode = myth_system(mythshutdown_status);
+    uint statusCode = myth_system(mythshutdown_status);
 
     if (!(statusCode & 0xFF00) && statusCode & 16)
         m_menuPopup->AddButton(tr("Unlock Shutdown"), SLOT(unlockShutdown()));
@@ -665,7 +665,7 @@ void WelcomeDialog::shutdownNow(void)
     // don't shutdown if we are about to start a wakeup/shutdown period
     QString mythshutdown_exe_status =
         m_installDir + "/bin/mythshutdown --status 0";
-    unsigned int statusCode = myth_system(mythshutdown_exe_status);
+    uint statusCode = myth_system(mythshutdown_exe_status);
     if (!(statusCode & 0xFF00) && statusCode & 128)
     {
         ShowOkPopup(tr("Cannot shutdown because MythTV is about to start "

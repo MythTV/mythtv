@@ -432,7 +432,7 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
     unsigned int systemcall_status;
 
     systemcall_status = myth_system(command, kMSRunShell);
-    bool succeeded = (systemcall_status == 0);
+    bool succeeded = (systemcall_status == GENERIC_EXIT_OK);
 
     VERBOSE(VB_XMLTV,
             "------------------ End of XMLTV output ------------------");

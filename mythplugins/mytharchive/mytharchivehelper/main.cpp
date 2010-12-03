@@ -204,8 +204,8 @@ static bool createISOImage(QString &sourceDirectory)
     QString command = mkisofs + " -R -J -V 'MythTV Archive' -o ";
     command += tempDirectory + "mythburn.iso " + sourceDirectory;
 
-    unsigned int res;
-    if ((res = myth_system(command)))
+    uint res = myth_system(command);
+    if (res != GENERIC_EXIT_OK)
     {
         VERBOSE(VB_JOBQUEUE, QString("ERROR: Failed while running mkisofs. Result: %1")
                 .arg(res));
@@ -260,8 +260,8 @@ static int burnISOImage(int mediaType, bool bEraseDVDRW, bool nativeFormat)
         }
     }
 
-    unsigned int res;
-    if ((res = myth_system(command)))
+    uint res = myth_system(command);
+    if (res != GENERIC_EXIT_OK)
         VERBOSE(VB_JOBQUEUE,
                 QString("ERROR: Failed while running growisofs. Result: %1")
                 .arg(res));

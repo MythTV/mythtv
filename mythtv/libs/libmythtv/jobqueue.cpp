@@ -1943,7 +1943,7 @@ void JobQueue::DoTranscodeThread(int jobID)
         VERBOSE(VB_JOBQUEUE, LOC + QString("Running command: '%1'")
                                            .arg(command));
 
-        int result = myth_system(command);
+        uint result = myth_system(command);
         int status = GetJobStatus(jobID);
 
         if ((result == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
@@ -2107,7 +2107,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
     VERBOSE(VB_GENERAL, LOC + "Commercial Detection Starting for " + detailstr);
     gCoreContext->LogEntry("commflag", LP_NOTICE, msg, detailstr);
 
-    int breaksFound = 0;
+    uint breaksFound = 0;
     QString path;
     QString command;
 
@@ -2250,7 +2250,7 @@ void JobQueue::DoUserJobThread(int jobID)
 
     VERBOSE(VB_JOBQUEUE, LOC + QString("Running command: '%1'")
                                        .arg(command));
-    int result = myth_system(command);
+    uint result = myth_system(command);
 
     if ((result == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
         (result == MYTHSYSTEM__EXIT__CMD_NOT_FOUND))
