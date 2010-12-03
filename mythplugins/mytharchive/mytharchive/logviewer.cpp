@@ -153,11 +153,13 @@ void LogViewer::updateLogItem(MythUIButtonListItem *item)
 void LogViewer::cancelClicked(void)
 {
     QString tempDir = gCoreContext->GetSetting("MythArchiveTempDir", "");
+    QFile lockFile(tempDir + "/logs/mythburncancel.lck");
 
-    QString command("echo Cancel > " + tempDir + "/logs/mythburncancel.lck");
-    int res = system(qPrintable(command));
-    if (WIFEXITED(res) == 0)
+    if (!lockFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
         VERBOSE(VB_IMPORTANT, "LogViewer: Failed to create mythburncancel.lck file");
+
+    lockFile.write("Cancel\n\r");
+    lockFile.close();
 
     ShowOkPopup(QObject::tr("Background creation has been asked to stop.\n" 
                             "This may take a few minutes."));

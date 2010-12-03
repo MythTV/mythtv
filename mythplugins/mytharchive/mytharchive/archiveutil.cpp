@@ -20,6 +20,7 @@ using namespace std;
 #include <mythmainwindow.h>
 #include <mythdialogbox.h>
 #include <util.h>
+#include <mythsystem.h>
 
 // mytharchive
 #include "archiveutil.h"
@@ -239,10 +240,7 @@ bool getFileDetails(ArchiveItem *a)
     QString command = QString("mytharchivehelper -i \"%1\" \"%2\" %3 > /dev/null 2>&1")
             .arg(inFile).arg(outFile).arg(lenMethod);
 
-    int res = system(qPrintable(command));
-    if (WIFEXITED(res))
-        res = WEXITSTATUS(res);
-    if (res != 0)
+    if (!myth_system(command))
         return false;
 
     QDomDocument doc("mydocument");

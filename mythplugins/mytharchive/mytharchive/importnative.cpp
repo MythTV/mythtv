@@ -16,6 +16,7 @@
 #include <mythuibutton.h>
 #include <mythuibuttonlist.h>
 #include <mythdialogbox.h>
+#include <mythsystem.h>
 
 // mytharchive
 #include "importnative.h"
@@ -426,9 +427,7 @@ void ImportNative::finishedPressed()
     commandline = "mytharchivehelper -f \"" + m_xmlFile + "\" " + chanID;
     commandline += " > "  + logDir + "/progress.log 2>&1 &";
 
-    int state = system(qPrintable(commandline));
-
-    if (state != 0)
+    if (!myth_system(commandline, kMSRunBackground))
     {
         ShowOkPopup(tr("It was not possible to import the Archive. "
                        " An error occured when running 'mytharchivehelper'") );

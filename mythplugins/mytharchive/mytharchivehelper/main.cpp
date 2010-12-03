@@ -59,6 +59,9 @@ using namespace std;
 #include <programinfo.h>
 #include <mythdirs.h>
 #include <mythconfig.h>
+#include <mythsystem.h>
+#include <util.h>
+
 extern "C" {
 #include <avcodec.h>
 #include <avformat.h>
@@ -91,11 +94,14 @@ NativeArchive::NativeArchive(void)
 {
     // create the lock file so the UI knows we're running
     QString tempDir = getTempDirectory();
-    QString command = QString("echo %1 > " + tempDir +
-                      "/logs/mythburn.lck").arg(getpid());
-    int res = system(qPrintable(command));
-    if (WIFEXITED(res) == 0)
+    QFile file(tempDir + "/logs/mythburn.lck");
+
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
         VERBOSE(VB_IMPORTANT, "NativeArchive: Failed to create lock file");
+
+    QString pid = QString("%1").arg(getpid());
+    file.write(pid.toAscii());
+    file.close();
 }
 
 NativeArchive::~NativeArchive(void)
@@ -198,10 +204,8 @@ static bool createISOImage(QString &sourceDirectory)
     QString command = mkisofs + " -R -J -V 'MythTV Archive' -o ";
     command += tempDirectory + "mythburn.iso " + sourceDirectory;
 
-    int res = system(qPrintable(command));
-    if (WIFEXITED(res))
-        res = WEXITSTATUS(res);
-    if (res != 0)
+    unsigned int res;
+    if (!(res = myth_system(command)))
     {
         VERBOSE(VB_JOBQUEUE, QString("ERROR: Failed while running mkisofs. Result: %1")
                 .arg(res));
@@ -256,15 +260,13 @@ static int burnISOImage(int mediaType, bool bEraseDVDRW, bool nativeFormat)
         }
     }
 
-    int res = system(qPrintable(command));
-    if (WIFEXITED(res))
-        res = WEXITSTATUS(res);
-    if (res == 0)
-        VERBOSE(VB_JOBQUEUE, "Finished burning ISO image");
-    else
+    unsigned int res;
+    if (!(res = myth_system(command)))
         VERBOSE(VB_JOBQUEUE,
                 QString("ERROR: Failed while running growisofs. Result: %1")
                 .arg(res));
+    else
+        VERBOSE(VB_JOBQUEUE, "Finished burning ISO image");
 
     return res;
 }
@@ -348,9 +350,11 @@ int NativeArchive::doNativeArchive(const QString &jobFile)
 
         saveDirectory += "work/";
 
-        int res = system(qPrintable("rm -fr " + saveDirectory + "*"));
-        if (!WIFEXITED(res) || WEXITSTATUS(res))
+        QDir dir(saveDirectory);
+        if (!RemoveDirectory(dir))
             VERBOSE(VB_IMPORTANT, "NativeArchive: Failed to clear work directory");
+        else
+            dir.mkdir(saveDirectory);
     }
 
     VERBOSE(VB_JOBQUEUE, QString("Saving files to : %1").arg(saveDirectory));

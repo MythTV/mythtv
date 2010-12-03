@@ -25,6 +25,8 @@
 #include <mythuicheckbox.h>
 #include <mythuibuttonlist.h>
 #include <mythuiprogressbar.h>
+#include <util.h>
+#include <mythsystem.h>
 
 // mytharchive
 #include "archiveutil.h"
@@ -35,6 +37,8 @@
 #include "recordingselector.h"
 #include "videoselector.h"
 #include "logviewer.h"
+
+using namespace std;
 
 MythBurn::MythBurn(MythScreenStack   *parent,
                    MythScreenType    *destinationScreen,
@@ -49,12 +53,8 @@ MythBurn::MythBurn(MythScreenStack   *parent,
     // remove any old thumb images
     QString thumbDir = getTempDirectory() + "/config/thumbs";
     QDir dir(thumbDir);
-    if (dir.exists())
-    {
-        int res = system(qPrintable("rm -rf " + thumbDir));
-        if (!WIFEXITED(res) || WEXITSTATUS(res))
-            VERBOSE(VB_IMPORTANT, "MythBurn: Failed to clear thumb directory");
-    }
+    if (dir.exists() && !RemoveDirectory(dir))
+        VERBOSE(VB_IMPORTANT, "MythBurn: Failed to clear thumb directory");
 
     m_bCreateISO = false;
     m_bDoBurn = false;
@@ -942,9 +942,7 @@ void MythBurn::runScript()
 
     gCoreContext->SaveSetting("MythArchiveLastRunStatus", "Running");
 
-    int state = system(qPrintable(commandline));
-
-    if (state != 0)
+    if (!myth_system(commandline, kMSRunBackground))
     {
         ShowOkPopup(tr("It was not possible to create the DVD. "
                        " An error occured when running the scripts"));
@@ -1195,9 +1193,7 @@ void BurnMenu::doBurn(int mode)
     commandline = "mytharchivehelper -b " + sArchiveFormat +
                   " " + sEraseDVDRW  + " " + sNativeFormat;
     commandline += " > "  + logDir + "/progress.log 2>&1 &";
-    int state = system(qPrintable(commandline));
-
-    if (state != 0)
+    if (!myth_system(commandline, kMSRunBackground))
     {
         showWarningDialog(QObject::tr("It was not possible to run "
                                       "mytharchivehelper to burn the DVD."));
