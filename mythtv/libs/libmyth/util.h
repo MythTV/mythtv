@@ -6,6 +6,7 @@ using namespace std;
 
 #include <QStringList>
 #include <QDateTime>
+#include <QDir>
 
 #include <stdint.h>
 #include <time.h>
@@ -85,6 +86,8 @@ MPUBLIC bool myth_ioprio(int val); // range -1..8, smaller is higher priority
 
 MPUBLIC bool myth_FileIsDVD(const QString &filename);
 MPUBLIC bool myth_FileIsBD(const QString &filename);
+
+MPUBLIC bool RemoveDirectory(QDir &aDir);
 
 // CPU Tick timing function
 #ifdef MMX

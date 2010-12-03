@@ -1329,4 +1329,37 @@ bool myth_FileIsBD(const QString &filename)
     return false;
 }
 
+bool RemoveDirectory(QDir &aDir)
+{
+    if (!aDir.exists())//QDir::NoDotAndDotDot
+        return false;
+
+    QFileInfoList entries = aDir.entryInfoList(QDir::NoDotAndDotDot | 
+                                               QDir::Dirs | QDir::Files);
+    int count = entries.size();
+    bool has_err = false;
+
+    for (int idx = 0; idx < count && !has_err; idx++)
+    {
+        QFileInfo entryInfo = entries[idx];
+        QString path = entryInfo.absoluteFilePath();
+        if (entryInfo.isDir())
+        {
+            QDir dir(path);
+            has_err = RemoveDirectory(dir);
+        }
+        else
+        {
+            QFile file(path);
+            if (!file.remove())
+                has_err = true;
+        }
+    }
+
+    if (!has_err && !aDir.rmdir(aDir.absolutePath()))
+        has_err = true;
+
+    return(has_err);
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
