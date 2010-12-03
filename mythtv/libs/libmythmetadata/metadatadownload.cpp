@@ -1,7 +1,6 @@
 // qt
 #include <QCoreApplication>
 #include <QEvent>
-#include <QProcess>
 #include <QDir>
 
 // myth
@@ -9,7 +8,7 @@
 #include "mythdirs.h"
 #include "mythverbose.h"
 #include "mythuihelper.h"
-
+#include "mythsystem.h"
 #include "metadatadownload.h"
 
 QEvent::Type MetadataLookupEvent::kEventType =
@@ -175,15 +174,14 @@ MetadataLookupList MetadataDownload::runGrabber(QString cmd, QStringList args,
                                                 MetadataLookup* lookup,
                                                 bool passseas)
 {
-    QProcess grabber;
+    MythSystem grabber(cmd, args, kMSStdOut | kMSBuffered);
     MetadataLookupList list;
 
     VERBOSE(VB_GENERAL, QString("Running Grabber: %1 %2")
         .arg(cmd).arg(args.join(" ")));
 
-    grabber.setReadChannel(QProcess::StandardOutput);
-    grabber.start(cmd, args);
-    grabber.waitForFinished();
+    grabber.Run()
+    grabber.Wait()
     QByteArray result = grabber.readAll();
     if (!result.isEmpty())
     {
