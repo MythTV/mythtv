@@ -34,6 +34,7 @@ using namespace std;
 #include "channelrecpriority.h"
 #include "custompriority.h"
 #include "globalsettings.h"
+#include "audiosettings.h"
 #include "profilegroup.h"
 #include "playgroup.h"
 #include "networkcontrol.h"
