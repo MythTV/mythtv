@@ -20,6 +20,7 @@ using namespace std;
 #include <dialogbox.h>
 #include <mythdialogs.h>
 #include <mythdb.h>
+#include <mythuihelper.h>
 
 struct SmartPLField
 {
@@ -897,6 +898,8 @@ SmartPlaylistEditor::SmartPlaylistEditor(MythMainWindow *parent, const char *nam
     Q3VBoxLayout *vbox = new Q3VBoxLayout(this, (int)(15 * wmult));
     Q3HBoxLayout *hbox = new Q3HBoxLayout(vbox, (int)(0 * wmult));
 
+    setFont(GetMythUI()->GetMediumFont());
+
     // Window title
     QString message = tr("Smart Playlist Editor");
     QLabel *label = new QLabel(message, this);
@@ -1672,6 +1675,8 @@ SmartPLResultViewer::SmartPLResultViewer(MythMainWindow *parent, const char *nam
 {
     Q3VBoxLayout *vbox = new Q3VBoxLayout(this, (int)(20 * wmult));
     Q3HBoxLayout *hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
+
+    setFont(GetMythUI()->GetMediumFont());
 
     // Window title
     QString message = tr("Smart Playlist Result Viewer");
