@@ -65,23 +65,21 @@ class MythSystemManager : public QThread
 {
     public:
         MythSystemManager();
-        MythSystemManager(MythSystemManager *other);
         void run(void);
         void append(MythSystem *);
     private:
-        void RunManagerThread();
-        void RunSignalThread();
-
-        MythSystemIOHandler     *m_readThread;
-        MythSystemIOHandler     *m_writeThread;
-
         MSMap_t    m_pMap;
         QMutex     m_mapLock;
-
-        MSList_t  *m_msList;
-        QMutex    *m_listLock;
-        bool       m_primary;
 };
+
+class MythSystemSignalManager : public QThread
+{
+    public:
+        MythSystemSignalManager();
+        void run(void);
+    private:
+};
+
 
 class MPUBLIC MythSystem : public QObject
 {
@@ -117,6 +115,7 @@ class MPUBLIC MythSystem : public QObject
         bool isBackground() const;
 
         friend class MythSystemManager;
+        friend class MythSystemSignalManager;
 
     signals:
         void started();

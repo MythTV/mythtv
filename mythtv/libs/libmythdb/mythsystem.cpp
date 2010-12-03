@@ -12,7 +12,6 @@
 #include <fcntl.h>
 #include <time.h>
 #include <signal.h>  // for kill()
-#include <pthread.h>
 #include <sys/select.h>
 #include <sys/wait.h>
 
@@ -38,10 +37,17 @@ typedef QList<MythSystem *> MSList;
 /**********************************
  * MythSystemManager method defines
  *********************************/
-static class MythSystemManager *manager = NULL;
+static MythSystemManager       *manager = NULL;
+static MythSystemSignalManager *smanager = NULL;
+static MythSystemIOHandler     *readThread = NULL;
+static MythSystemIOHandler     *writeThread = NULL;
+static MSList_t                 msList;
+static QMutex                   listLock;
+
 
 MythSystemIOHandler::MythSystemIOHandler(bool read) :
-    QThread(), m_read(read)
+    QThread(), m_pWait(), m_pLock(), m_pMap(PMap_t()),
+    m_read(read)
 {
 }
 
@@ -81,8 +87,8 @@ void MythSystemIOHandler::run(void)
                 retval = select(m_maxfd+1, NULL, &fds, NULL, &tv);
 
             if( retval == -1 )
-                VERBOSE(VB_GENERAL, QString("select() failed because of %1")
-                            .arg(strerror(errno)));
+                VERBOSE(VB_GENERAL, QString("select(%1, %2) failed because of %3")
+                            .arg(m_maxfd+1).arg(m_read).arg(strerror(errno)));
 
             else if( retval > 0 )
             {
@@ -185,39 +191,13 @@ void MythSystemIOHandler::BuildFDs()
     }
 }
 
-MythSystemManager::MythSystemManager() :
-        QThread(), m_primary(true)
+MythSystemManager::MythSystemManager() : QThread()
 {
-}
-
-MythSystemManager::MythSystemManager(MythSystemManager *other) :
-        QThread()
-{
-    m_msList =   other->m_msList;
-    m_listLock = other->m_listLock;
-    m_primary =  false;
 }
 
 void MythSystemManager::run(void)
 {
-    if( m_primary )
-        RunManagerThread();
-    else
-        RunSignalThread();
-}
-
-void MythSystemManager::RunManagerThread()
-{
     VERBOSE(VB_GENERAL, "Starting process manager");
-
-    m_msList = new MSList();
-    m_listLock = new QMutex();
-
-    MythSystemManager *sthread = new MythSystemManager(this);
-    sthread->start();
-
-    m_readThread =  new MythSystemIOHandler(true);
-    m_writeThread = new MythSystemIOHandler(false);
 
     // gCoreContext is set to NULL during shutdown, and we need this thread to
     // exit during shutdown.
@@ -235,12 +215,12 @@ void MythSystemManager::RunManagerThread()
         }
         m_mapLock.unlock();
 
-        m_listLock->lock();
         MythSystem         *ms;
         pid_t               pid;
+        int                 status;
 
         // check for any newly exited processes
-        int status;
+        listLock.lock();
         while( (pid = waitpid(-1, &status, WNOHANG)) > 0 )
         {
             m_mapLock.lock();
@@ -256,7 +236,7 @@ void MythSystemManager::RunManagerThread()
             // pop exited process off managed list, add to cleanup list
             ms = m_pMap.take(pid);
             m_mapLock.unlock();
-            m_msList->append(ms);
+            msList.append(ms);
 
             // handle normal exit
             if( WIFEXITED(status) )
@@ -339,46 +319,12 @@ void MythSystemManager::RunManagerThread()
         // hold off unlocking until all the way down here to 
         // give the buffer handling a chance to run before
         // being closed down by signal thread
-        m_listLock->unlock();
+        listLock.unlock();
     }
 
     // kick to allow them to close themselves cleanly
-    m_readThread->wake();
-    m_writeThread->wake();
-}
-
-// spawn separate thread for signals to prevent manager
-// thread from blocking in some slot
-void MythSystemManager::RunSignalThread(void)
-{
-    VERBOSE(VB_GENERAL, "Starting process signal handler");
-    while( gCoreContext )
-    {
-        usleep(50000); // sleep 50ms
-        while( gCoreContext )
-        {
-            // handle cleanup and signalling for closed processes
-            m_listLock->lock();
-            if( m_msList->isEmpty() )
-            {
-                m_listLock->unlock();
-                break;
-            }
-            MythSystem *ms = m_msList->takeFirst();
-            m_listLock->unlock();
-
-            ms->HandlePostRun();
-            CLOSE(ms->m_stdpipe[0]);
-            CLOSE(ms->m_stdpipe[1]);
-            CLOSE(ms->m_stdpipe[2]);
-            ms->m_pmutex.unlock();
-
-            if( ms->m_status == GENERIC_EXIT_OK )
-                emit ms->finished();
-            else
-                emit ms->error(ms->m_status);
-        }
-    }
+    readThread->wake();
+    writeThread->wake();
 }
 
 void MythSystemManager::append(MythSystem *ms)
@@ -388,11 +334,59 @@ void MythSystemManager::append(MythSystem *ms)
     m_mapLock.unlock();
 
     if( ms->m_usestdin )
-        m_writeThread->insert(ms->m_stdpipe[0], &(ms->m_stdbuff[0]));
+        writeThread->insert(ms->m_stdpipe[0], &(ms->m_stdbuff[0]));
     if( ms->m_usestdout )
-        m_readThread->insert(ms->m_stdpipe[1], &(ms->m_stdbuff[1]));
+        readThread->insert(ms->m_stdpipe[1], &(ms->m_stdbuff[1]));
     if( ms->m_usestderr )
-        m_readThread->insert(ms->m_stdpipe[2], &(ms->m_stdbuff[2]));
+        readThread->insert(ms->m_stdpipe[2], &(ms->m_stdbuff[2]));
+}
+
+// spawn separate thread for signals to prevent manager
+// thread from blocking in some slot
+MythSystemSignalManager::MythSystemSignalManager() : QThread()
+{
+}
+
+void MythSystemSignalManager::run(void)
+{
+    VERBOSE(VB_GENERAL, "Starting process signal handler");
+    while( gCoreContext )
+    {
+        usleep(50000); // sleep 50ms
+        while( gCoreContext )
+        {
+            // handle cleanup and signalling for closed processes
+            listLock.lock();
+            if( msList.isEmpty() )
+            {
+                listLock.unlock();
+                break;
+            }
+            MythSystem *ms = msList.takeFirst();
+            listLock.unlock();
+
+            ms->HandlePostRun();
+
+            if (ms->m_stdpipe[0] > 0)
+                writeThread->remove(ms->m_stdpipe[0]);
+            CLOSE(ms->m_stdpipe[0]);
+
+            if (ms->m_stdpipe[1] > 0)
+                readThread->remove(ms->m_stdpipe[1]);
+            CLOSE(ms->m_stdpipe[1]);
+
+            if (ms->m_stdpipe[2] > 0)
+                readThread->remove(ms->m_stdpipe[2]);
+            CLOSE(ms->m_stdpipe[2]);
+
+            ms->m_pmutex.unlock();
+
+            if( ms->m_status == GENERIC_EXIT_OK )
+                emit ms->finished();
+            else
+                emit ms->error(ms->m_status);
+        }
+    }
 }
 
 /*******************************
@@ -441,9 +435,11 @@ void MythSystem::SetCommand(const QString &command,
 
     ProcessFlags(flags);
 
-    if( m_useshell )
-        m_command.append(args.join(" "));
-
+    if( m_useshell ) 
+    {
+        m_command += " ";
+        m_command += QString(args.join(" "));
+    }
     else
     {
         // check for execute rights
@@ -518,6 +514,24 @@ void MythSystem::Run(time_t timeout)
     {
         manager = new MythSystemManager;
         manager->start();
+    }
+
+    if( smanager == NULL )
+    {
+        smanager = new MythSystemSignalManager;
+        smanager->start();
+    }
+
+    if( readThread == NULL )
+    {
+        readThread = new MythSystemIOHandler(true);
+        readThread->start();
+    }
+
+    if( writeThread == NULL )
+    {
+        writeThread = new MythSystemIOHandler(false);
+        writeThread->start();
     }
 
     if( timeout )
@@ -689,10 +703,10 @@ void MythSystem::ProcessFlags(uint flags)
         m_useshell = false;
 }
 
-QByteArray MythSystem::Read(int size)    { return m_stdbuff[1].read(size); }
-QByteArray MythSystem::ReadErr(int size) { return m_stdbuff[2].read(size); }
-QByteArray& MythSystem::ReadAll()        { return m_stdbuff[1].buffer(); }
-QByteArray& MythSystem::ReadAllErr()     { return m_stdbuff[2].buffer(); }
+QByteArray MythSystem::Read(int size)     { return m_stdbuff[1].read(size); }
+QByteArray MythSystem::ReadErr(int size)  { return m_stdbuff[2].read(size); }
+QByteArray& MythSystem::ReadAll()         { return m_stdbuff[1].buffer(); }
+QByteArray& MythSystem::ReadAllErr()      { return m_stdbuff[2].buffer(); }
 
 int MythSystem::Write(const QByteArray &ba)
 {
@@ -727,13 +741,12 @@ void MythSystem::HandlePreRun()
 
 void MythSystem::HandlePostRun()
 {
-    // This needs to be a send event so that the MythUI m_drawState change is
-    // flagged immediately instead of after existing events are processed
-    // since this function could be called inside one of those events.
+    // Since this is *not* running in the UI thread (but rather the signal
+    // handler thread), we need to use postEvents
     if( m_disabledrawing )
     {
-        QEvent event(MythEvent::kPopDisableDrawingEventType);
-        QCoreApplication::sendEvent(gCoreContext->GetGUIObject(), &event);
+        QEvent *event = new QEvent(MythEvent::kPopDisableDrawingEventType);
+        QCoreApplication::postEvent(gCoreContext->GetGUIObject(), event);
     }
 
     // This needs to be a post event so that the MythUI unlocks input devices
@@ -752,7 +765,7 @@ void MythSystem::Fork()
 
     // For use in the child
     char locerr[MAX_BUFLEN];
-    strncpy(locerr, (const char *)LOC_ERR.constData(), MAX_BUFLEN);
+    strncpy(locerr, (const char *)LOC_ERR.toUtf8().constData(), MAX_BUFLEN);
     locerr[MAX_BUFLEN-1] = '\0';
 
     VERBOSE(VB_GENERAL, QString("Launching: %1").arg(m_logcmd));
@@ -799,16 +812,17 @@ void MythSystem::Fork()
 
     // set up command args
     const char *command;
+    QByteArray cmdUTF8 = m_command.toUtf8();
     QVector<const char *> _cmdargs;
     if( m_useshell )
     {
-        command = "/bin/sh";
+        command = strdup("/bin/sh");
         _cmdargs << "sh" << "-c"
-                 << m_command.toUtf8().constData() << (char *)0;
+                 << cmdUTF8.constData() << (char *)0;
     }
     else
     {
-        command = m_command.toUtf8().constData();
+        command = strdup(m_command.toUtf8().constData());
         _cmdargs << m_command.split('/').last().toUtf8().constData();
 
         QStringList::const_iterator it = m_args.constBegin();
@@ -819,10 +833,20 @@ void MythSystem::Fork()
         }
         _cmdargs << (char *)0;
     }
-    char **cmdargs = (char **)_cmdargs.data();
 
-    const char *directory;
-    directory = m_directory.toUtf8().constData();
+    char **cmdargs = (char **)malloc(_cmdargs.size() * sizeof(char *));
+    int i;
+    for( i = 0; i < _cmdargs.size(); ++i )
+    {
+        if (_cmdargs.at(i) == NULL)
+            cmdargs[i] = NULL;
+        else
+            cmdargs[i] = strdup(_cmdargs.at(i));
+    }
+
+    const char *directory = NULL;
+    if (m_setdirectory && !m_directory.isEmpty())
+        directory = strdup(m_directory.toUtf8().constData());
 
     pid_t child = fork();
 
@@ -853,6 +877,20 @@ void MythSystem::Fork()
         m_stdpipe[0] = p_stdin[1];
         m_stdpipe[1] = p_stdout[0];
         m_stdpipe[2] = p_stderr[0];
+
+        // clean up the memory use
+        if( command )
+            free((void *)command);
+
+        if( directory )
+            free((void *)directory);
+
+        if( cmdargs )
+        {
+            for (i = 0; cmdargs[i]; i++)
+                free( cmdargs[i] );
+            free( cmdargs );
+        }
     }
     else if (child == 0)
     {
@@ -926,21 +964,15 @@ void MythSystem::Fork()
             close(i);
 
         /* set directory */
-        if( m_setdirectory )
+        if( directory && chdir(directory) < 0 )
         {
-            chdir(directory);
-            if( errno )
-            {
-                cerr << locerr
-                     << "chdir() failed: "
-                     << strerror(errno) << endl;
-            }
+            cerr << locerr
+                 << "chdir() failed: "
+                 << strerror(errno) << endl;
         }
 
         /* run command */
-        execv(command, cmdargs);
-        
-        if (errno)
+        if( execv(command, cmdargs) < 0 )
         {
             // Can't use VERBOSE due to locking fun.
             cerr << locerr
