@@ -1236,7 +1236,7 @@ bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
             int remaining       = len;
             int to_get          = 0;
             // The AC3 encoder can only work on 128kB of data at a time
-            int maxframes       = ((INBUFSIZE / encoder->FrameSize()) *
+            int maxframes       = ((INBUFSIZE / encoder->FrameSize() - 1) *
                                    encoder->FrameSize()) & ~0xf;
 
             do
