@@ -15,7 +15,7 @@
 #define SI_UNITS 0
 #define ENG_UNITS 1
 #define DEFAULT_UPDATE_TIMEOUT (5*60*1000)
-#define DEFAULT_SCRIPT_TIMEOUT (60*1000)
+#define DEFAULT_SCRIPT_TIMEOUT (60)
 
 typedef unsigned char units_t;
 typedef QMap<QString, QString> DataMap;
