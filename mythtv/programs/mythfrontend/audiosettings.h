@@ -87,4 +87,10 @@ class AudioMixerSettings : public TriggeredConfigurationGroup
     static const char   *MixerControlControls[];
 };
 
+class AudioGeneralSettings : public ConfigurationWizard
+{
+  public:
+    AudioGeneralSettings();
+};
+
 #endif
