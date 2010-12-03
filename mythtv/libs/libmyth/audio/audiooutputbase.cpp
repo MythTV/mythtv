@@ -1115,6 +1115,7 @@ bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
     int frames_remaining = in_frames;
     int frames_offset = 0;
     int frames_final = 0;
+    int maxframes = (kAudioSRCInputSize / source_bytes_per_frame) & ~0xf;
 
     while(frames_remaining > 0)
     {
@@ -1125,9 +1126,9 @@ bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
 
         if (processing)
         {
-            if (frames * source_channels > (int)kAudioSRCInputSize)
+            if (frames > maxframes)
             {
-                frames = kAudioSRCInputSize / source_channels;
+                frames = maxframes;
                 len = frames * source_bytes_per_frame;
                 frames_offset += len;
             }
@@ -1236,7 +1237,7 @@ bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
             int to_get          = 0;
             // The AC3 encoder can only work on 128kB of data at a time
             int maxframes       = ((INBUFSIZE / encoder->FrameSize()) *
-                                   encoder->FrameSize() + 15) & ~0xf;
+                                   encoder->FrameSize()) & ~0xf;
 
             do
             {

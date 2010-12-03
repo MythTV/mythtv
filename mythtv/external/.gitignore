@@ -1,0 +1,10 @@
+!Makefile
+!config.*
+.version
+*.d
+*.ver
+version.h
+.config
+config.mak
+config.h
+avconfig.h
