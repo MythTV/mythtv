@@ -98,7 +98,9 @@ AudioConfigSettings::AudioConfigSettings() :
     VerticalConfigurationGroup(false, true, false, false),
     m_OutputDevice(NULL),   m_MaxAudioChannels(NULL),
     m_AudioUpmix(NULL),     m_AudioUpmixType(NULL),
-    m_AC3PassThrough(NULL), m_DTSPassThrough(NULL)
+    m_AC3PassThrough(NULL), m_DTSPassThrough(NULL),
+    m_EAC3PassThrough(NULL),m_TrueHDPassThrough(NULL),
+    m_passthrough8(false)
 {
     setLabel(QObject::tr("Audio System"));
     setUseLabel(false);
@@ -128,6 +130,7 @@ AudioConfigSettings::AudioConfigSettings() :
     devices.append(*adc);
 
     delete adc;
+    CheckPassthrough();
 
     ConfigurationGroup *maingroup = new VerticalConfigurationGroup(false,
                                                                    false);
@@ -136,11 +139,15 @@ AudioConfigSettings::AudioConfigSettings() :
     m_triggerDigital = new TransCheckBoxSetting();
     m_AC3PassThrough = AC3PassThrough();
     m_DTSPassThrough = DTSPassThrough();
+    m_EAC3PassThrough = EAC3PassThrough();
+    m_TrueHDPassThrough = TrueHDPassThrough();
 
     m_cgsettings = new HorizontalConfigurationGroup();
     m_cgsettings->setLabel(QObject::tr("Digital Audio Capabilities"));
     m_cgsettings->addChild(m_AC3PassThrough);
     m_cgsettings->addChild(m_DTSPassThrough);
+    m_cgsettings->addChild(m_EAC3PassThrough);
+    m_cgsettings->addChild(m_TrueHDPassThrough);
 
     TriggeredItem *sub1 = new TriggeredItem(m_triggerDigital, m_cgsettings);
 
@@ -165,6 +172,10 @@ AudioConfigSettings::AudioConfigSettings() :
     connect(m_AC3PassThrough, SIGNAL(valueChanged(const QString&)),
             this, SLOT(UpdateCapabilities(const QString&)));
     connect(m_DTSPassThrough, SIGNAL(valueChanged(const QString&)),
+            this, SLOT(UpdateCapabilities(const QString&)));
+    connect(m_EAC3PassThrough, SIGNAL(valueChanged(const QString&)),
+            this, SLOT(UpdateCapabilities(const QString&)));
+    connect(m_TrueHDPassThrough, SIGNAL(valueChanged(const QString&)),
             this, SLOT(UpdateCapabilities(const QString&)));
     AudioRescan();
 }
@@ -225,8 +236,9 @@ void AudioConfigSettings::UpdateCapabilities(const QString &device)
     AudioOutputSettings settings;
 
         // Test if everything is set yet
-    if (!m_OutputDevice   || !m_MaxAudioChannels ||
-        !m_AC3PassThrough || !m_DTSPassThrough)
+    if (!m_OutputDevice    || !m_MaxAudioChannels   ||
+        !m_AC3PassThrough  || !m_DTSPassThrough     ||
+        !m_EAC3PassThrough || !m_TrueHDPassThrough)
         return;
 
     if (!slotlock.tryLock()) // Doing a rescan of channels
@@ -263,6 +275,17 @@ void AudioConfigSettings::UpdateCapabilities(const QString &device)
 
     m_triggerDigital->setValue(invalid || bForceDigital ||
                                settings.canAC3() || settings.canDTS());
+    m_EAC3PassThrough->setEnabled(invalid || m_passthrough8 ||
+                                  (settings.canPassthrough() >= 0 &&
+                                   max_speakers >= 8));
+    m_TrueHDPassThrough->setEnabled(invalid || m_passthrough8 ||
+                                    (settings.canPassthrough() >= 0 &&
+                                     max_speakers >= 8));
+    if (m_EAC3PassThrough->boolValue() || m_TrueHDPassThrough->boolValue())
+    {
+        max_speakers = 8;
+    }
+
     int cur_speakers = m_MaxAudioChannels->getValue().toInt();
 
     if (cur_speakers > max_speakers)
@@ -277,7 +300,7 @@ void AudioConfigSettings::UpdateCapabilities(const QString &device)
     for (int i = 1; i <= max_speakers; i++)
     {
         if (invalid || settings.IsSupportedChannels(i) ||
-            (bForceDigital && i == 6))
+            (bForceDigital && i >= 6))
         {
             QString txt;
 
@@ -323,6 +346,7 @@ void AudioConfigSettings::AudioAdvanced()
 
     if (audiosettings.exec() == kDialogCodeAccepted)
     {
+        CheckPassthrough();
         UpdateCapabilities(QString::null);
     }
 }
@@ -380,6 +404,52 @@ HostCheckBox *AudioConfigSettings::DTSPassThrough()
                     "supports DTS. You must use a digital connection. Uncheck "
                     "if using an analog connection"));
     return gc;
+}
+
+HostCheckBox *AudioConfigSettings::EAC3PassThrough()
+{
+    HostCheckBox *gc = new HostCheckBox("EAC3PassThru");
+    gc->setLabel(QObject::tr("E-AC3/DTS-HD"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
+                    "supports E-AC3 (DD+) or DTS-HD. You must use a hdmi "
+                    "connection."));
+    return gc;
+}
+
+HostCheckBox *AudioConfigSettings::TrueHDPassThrough()
+{
+    HostCheckBox *gc = new HostCheckBox("TrueHDPassThru");
+    gc->setLabel(QObject::tr("TrueHD"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
+                    "supports Dolby TrueHD. You must use a hdmi connection."));
+    return gc;
+}
+
+bool AudioConfigSettings::CheckPassthrough()
+{
+    m_passthrough8 = false;
+    if (gCoreContext->GetNumSetting("PassThruDeviceOverride", false))
+    {
+        QString name = gCoreContext->GetSetting("PassThruOutputDevice");
+        AudioOutput::AudioDeviceConfig *adc =
+            AudioOutput::GetAudioDeviceConfig(name, name, true);
+        if (adc->settings.IsInvalid())
+        {
+            VERBOSE(VB_IMPORTANT, QString("Passthru device %1 isn't usable "
+                                 "Check audio configuration").arg(name));
+        }
+        else
+        {
+            if (adc->settings.BestSupportedChannels() >= 8)
+            {
+                m_passthrough8 = true;
+            }
+        }
+        delete adc;
+    }
+    return m_passthrough8;
 }
 
 static HostCheckBox *MythControlsVolume()

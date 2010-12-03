@@ -37,6 +37,9 @@ class AudioConfigSettings : public VerticalConfigurationGroup
     HostComboBox         *AudioUpmixType();
     HostCheckBox         *AC3PassThrough();
     HostCheckBox         *DTSPassThrough();
+    HostCheckBox         *EAC3PassThrough();
+    HostCheckBox         *TrueHDPassThrough();
+    bool                  CheckPassthrough();
 
     ConfigurationGroup   *m_cgsettings;
     AudioDeviceComboBox  *m_OutputDevice;
@@ -47,9 +50,12 @@ class AudioConfigSettings : public VerticalConfigurationGroup
     TransCheckBoxSetting *m_triggerMPCM;
     HostCheckBox         *m_AC3PassThrough;
     HostCheckBox         *m_DTSPassThrough;
+    HostCheckBox         *m_EAC3PassThrough;
+    HostCheckBox         *m_TrueHDPassThrough;
     ADCMap                audiodevs;
     AudioOutput::ADCVect  devices;
     QMutex                slotlock;
+    bool                  m_passthrough8;
 };
 
 class AudioDeviceComboBox : public HostComboBox
