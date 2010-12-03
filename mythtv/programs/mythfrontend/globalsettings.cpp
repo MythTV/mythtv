@@ -29,7 +29,6 @@
 #include "iso639.h"
 #include "playbackbox.h"
 #include "globalsettings.h"
-#include "audiosettings.h"
 #include "recordingprofile.h"
 #include "mythxdisplay.h"
 #include "DisplayRes.h"
@@ -3380,10 +3379,6 @@ MainGeneralSettings::MainGeneralSettings()
     pin->addChild(SetupPinCodeRequired());
     pin->addChild(SetupPinCode());
     addChild(pin);
-
-    addChild(new AudioConfigSettings());
-
-    addChild(new AudioMixerSettings());
 
     VerticalConfigurationGroup *general =
         new VerticalConfigurationGroup(false, true, false, false);

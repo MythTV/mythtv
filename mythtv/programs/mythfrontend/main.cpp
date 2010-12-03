@@ -33,6 +33,7 @@ using namespace std;
 #include "programrecpriority.h"
 #include "channelrecpriority.h"
 #include "custompriority.h"
+#include "audiooutput.h"
 #include "globalsettings.h"
 #include "audiosettings.h"
 #include "profilegroup.h"
@@ -579,6 +580,11 @@ static void TVMenuCallback(void *data, QString &selection)
     {
         GeneralSettings settings;
         settings.exec();
+    }
+    else if (sel == "settings audiogeneral")
+    {
+        AudioGeneralSettings audiosettings;
+        audiosettings.exec();
     }
     else if (sel == "settings maingeneral")
     {

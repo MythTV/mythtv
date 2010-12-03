@@ -595,4 +595,10 @@ AudioMixerSettings::AudioMixerSettings() :
     addTarget("1", settings);
 }
 
+AudioGeneralSettings::AudioGeneralSettings()
+{
+    addChild(new AudioConfigSettings());
+    addChild(new AudioMixerSettings());
+}
+
 // vim:set sw=4 ts=4 expandtab:
