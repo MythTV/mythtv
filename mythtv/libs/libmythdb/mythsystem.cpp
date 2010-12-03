@@ -12,6 +12,7 @@
 #include <fcntl.h>
 #include <time.h>
 #include <signal.h>  // for kill()
+#include <pthread.h>
 #include <sys/select.h>
 #include <sys/wait.h>
 
@@ -33,6 +34,7 @@
 #define CLOSE(x) if( x >= 0 ) {close(x); x = -1;}
 
 typedef QMap<int, QByteArray *> pipeMap_t;
+typedef QList<MythSystem *> MSList;
 
 /**********************************
  * MythSystemManager method defines
@@ -42,6 +44,10 @@ static class MythSystemManager *manager = NULL;
 void MythSystemManager::run(void)
 {
     VERBOSE(VB_GENERAL, "Starting reaper thread");
+
+    m_msList = new MSList();
+
+    StartSignalThread();
 
     // gCoreContext is set to NULL during shutdown, and we need this thread to
     // exit during shutdown.
@@ -58,10 +64,10 @@ void MythSystemManager::run(void)
             continue;
         }
 
-        QList<MythSystem *>     msList; // list of exited processed for delayed cleanup
-        pipeMap_t               pMap;   // map of IO pipes for buffering
-        MythSystem             *ms;
-        pid_t                   pid;
+        m_listLock.lock();
+        pipeMap_t   pMap;   // map of IO pipes for buffering
+        MythSystem *ms;
+        pid_t       pid;
 
 
         // check for any newly exited processes
@@ -78,7 +84,7 @@ void MythSystemManager::run(void)
 
             // pop exited process off managed list, add to cleanup list
             ms = m_pMap.take(pid);
-            msList.append(ms);
+            msList->append(ms);
 
             // handle normal exit
             if( WIFEXITED(status) )
@@ -174,7 +180,7 @@ void MythSystemManager::run(void)
 
         m_mapLock.unlock();
 
-        if( pMap.size() )
+        if( !pMap.isEmpty() )
         {
             // build structures for select()
             fd_set  rfds;
@@ -212,21 +218,51 @@ void MythSystemManager::run(void)
             }
         }
 
-        // handle any cleanup of closed processes
-        if( msList.size() )
-        {
-            QList<MythSystem *>::iterator k;
-            for( k = msList.begin(); k != msList.end(); ++k )
-            {
-                (*k)->HandlePostRun();
-                CLOSE((*k)->m_stdpipe[0]); // should these be left open for unbuffered operation?
-                CLOSE((*k)->m_stdpipe[1]);
-                CLOSE((*k)->m_stdpipe[2]);
-                (*k)->m_pmutex.unlock();
-            }
-        }
+        // hold off unlocking until all the way down here to 
+        // give the buffer handling a chance to run before
+        // being closed down by signal thread
+        m_listLock.unlock();
+    }
+}
 
-        // is there a condition where i should be destroying the MythSystem objects?
+void MythSystemManager::StartSignalThread()
+{
+    pthread_t sigThread;
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    pthread_create(&sigThread, &attr, DoSignalThread, NULL);
+    pthread_attr_destroy(&attr);
+}
+
+void MythSystemManager::DoSignalThread(void *param)
+{
+    while( gCoreContext )
+    {
+        usleep(50000); // sleep 50ms
+        while( true )
+        {
+            // handle cleanup and signalling for closed processes
+            m_listLock.lock();
+            if( m_msList.isEmpty() )
+                break;
+            MythSystem *ms = m_listLock->takeFirst();
+            m_listLock.unlock();
+
+            ms->HandlePostRun();
+            CLOSE(ms->m_stdpipe[0]);
+            CLOSE(ms->m_stdpipe[1]);
+            CLOSE(ms->m_stdpipe[2]);
+            ms->m_pmutex.unlock();
+
+            if( ms->m_status == GENERIC_EXIT_OK )
+                emit ms->finished();
+            else
+                emit ms->error(ms->m_status);
+
+//            if( ms->m_runinbackground )   // not sure if this should be done
+//                delete ms;
+        }
     }
 }
 
@@ -273,21 +309,21 @@ void MythSystem::SetCommand(const QString &command,
                             const QStringList &args, uint flags)
 {
     m_status = GENERIC_EXIT_START;
-    // check for execute rights
-    if( !access(command.toUtf8().constData(), X_OK) )
-    {
-        m_status = GENERIC_EXIT_CMD_NOT_FOUND;
-        ProcessFlags(flags);
-        return;
-    }
-
     m_command = QString(command);
 
     ProcessFlags(flags);
+
+    // check for execute rights
     if( m_useshell )
         m_command.append(args.join(" "));
+
     else
-        m_args = QStringList(args);
+    {
+        if( !access(command.toUtf8().constData(), X_OK) )
+            m_status = GENERIC_EXIT_CMD_NOT_FOUND;
+        else
+            m_args = QStringList(args);
+    }
 }
 
 
@@ -325,6 +361,12 @@ void MythSystem::Run(time_t timeout)
     // runs pre_flags
     // forks child process
     // spawns manager and hand off self
+    if( m_status != GENERIC_EXIT_START )
+    {
+        emit error(m_status);
+        return
+    }
+
     HandlePreRun();
 
     m_timeout = timeout;
@@ -340,7 +382,7 @@ void MythSystem::Run(time_t timeout)
         m_timeout += time(NULL);
 
     m_pmutex.lock();
-
+    emit started();
     manager->append(this);
 }
 

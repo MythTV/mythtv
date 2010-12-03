@@ -29,6 +29,7 @@ typedef enum MythSystemMask {
 class MythSystem;
 
 typedef QMap<pid_t, MythSystem *> MSMap_t;
+typedef QList<MythSystem *> MSList_t;
 
 class MythSystemManager : public QThread
 {
@@ -36,13 +37,22 @@ class MythSystemManager : public QThread
         void run(void);
         void append(MythSystem *);
     private:
-        MSMap_t  m_pMap;
-        QMutex   m_mapLock;
-        char     m_readbuf[65336];
+        void StartSignalThread();
+        void DoSignalThread(void *);
+
+        MSMap_t    m_pMap;
+        QMutex     m_mapLock;
+
+        MSList_t   m_msList;
+        QMutex     m_listLock;
+
+        char       m_readbuf[65336];
 };
 
 class MPUBLIC MythSystem : public QObject
 {
+    Q_OBJECT
+
     public:
         MythSystem(const QString &, uint);
         MythSystem(const QString &, const QStringList &, uint);
@@ -71,6 +81,11 @@ class MPUBLIC MythSystem : public QObject
         bool isBackground() const;
 
         friend class MythSystemManager;
+
+    signals:
+        void started();
+        void finished(uint status);
+        void error(uint status);
 
     private:
         void ProcessFlags(uint);
