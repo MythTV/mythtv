@@ -29,6 +29,7 @@ class AudioConfigSettings : public VerticalConfigurationGroup
     void UpdateCapabilities(const QString&);
     void AudioRescan();
     void AudioAdvanced();
+    void AudioTest();
 
   private:
     AudioDeviceComboBox  *OutputDevice();
