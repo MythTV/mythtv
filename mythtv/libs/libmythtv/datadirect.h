@@ -353,11 +353,11 @@ class MPUBLIC DataDirectProcessor
     static bool Post(QString url, const PostList &list, QString documentFile,
                      QString inCookieFile, QString outCookieFile);
 
-    static FILE *DDPost(QString    url,
-                        QString    postFilename, QString    inputFilename,
-                        QString    userid,       QString    password,
-                        QDateTime  pstartDate,   QDateTime  pendDate,
-                        QString   &err_txt,      bool      &is_pipe);
+    static bool DDPost(QString    url,
+                       QString    postFilename, QString    inputFilename,
+                       QString    userid,       QString    password,
+                       QDateTime  pstartDate,   QDateTime  pendDate,
+                       QString   &err_txt);
 
 
   private:

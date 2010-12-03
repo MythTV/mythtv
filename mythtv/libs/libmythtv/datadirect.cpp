@@ -3,6 +3,7 @@
 // Qt headers
 #include <QDir>
 #include <QFileInfo>
+#include <QByteArray>
 
 // MythTV headers
 #include "datadirect.h"
@@ -17,6 +18,7 @@
 #include "mythversion.h"
 #include "util.h"
 #include "dbutil.h"
+#include "mythsystem.h"
 
 #define SHOW_WGET_OUTPUT 0
 
@@ -939,26 +941,23 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
     //cerr << "Done...\n";
 }
 
-FILE *DataDirectProcessor::DDPost(
+bool DataDirectProcessor::DDPost(
     QString    ddurl,
     QString    postFilename, QString    inputFile,
     QString    userid,       QString    password,
     QDateTime  pstartDate,   QDateTime  pendDate,
-    QString   &err_txt,      bool      &is_pipe)
+    QString   &err_txt)
 {
-    if (!inputFile.isEmpty())
+    if (!inputFile.isEmpty() && QFile(inputFile).exists())
     {
-        err_txt = QString("Unable to open '%1'").arg(inputFile);
-        is_pipe = false;
-        QByteArray tmp = inputFile.toAscii();
-        return fopen(tmp.constData(), "r");
+        return true;
     }
 
     QFile postfile(postFilename);
     if (!postfile.open(QIODevice::WriteOnly))
     {
         err_txt = "Unable to open post data output file.";
-        return NULL;
+        return false;
     }
 
     QString startdatestr = pstartDate.toString(Qt::ISODate) + "Z";
@@ -988,14 +987,16 @@ FILE *DataDirectProcessor::DDPost(
     password.replace('\'', "'\\''");
     userid.replace('\'', "'\\''");
 
+    QString outfile = (inputFile.isEmpty() ? "/tmp/crap" : inputFile);
+
     QString command;
     {
         QMutexLocker locker(&user_agent_lock);
         command = QString(
             "wget --http-user='%1' --http-passwd='%2' --post-file='%3' "
-            " %4 --user-agent='%5' --output-document=- ")
+            " %4 --user-agent='%5' --output-document=%6")
             .arg(userid).arg(password).arg(postFilename).arg(ddurl)
-            .arg(user_agent);
+            .arg(user_agent).arg(outfile);
     }
 
 #ifdef USING_MINGW
@@ -1010,17 +1011,23 @@ FILE *DataDirectProcessor::DDPost(
     // if (!SHOW_WGET_OUTPUT)
     //    command += " 2> /dev/null ";
 
-    command += " --header='Accept-Encoding:gzip' | gzip -df";
+    command += ".gz --header='Accept-Encoding:gzip'";
 #endif
 
     if (SHOW_WGET_OUTPUT)
         VERBOSE(VB_GENERAL, "command: "<<command<<endl);
 
-    err_txt = command;
+    err_txt = "Returned failure";
+    if (myth_system(command, kMSAnonLog))
+        return false;
 
-    is_pipe = true;
-    QByteArray tmp = command.toAscii();
-    return popen(tmp.constData(), "r");
+#ifndef USING_MINGW
+    command = QString("gzip -d %1").arg(outfile+".gz");
+    if (myth_system(command))
+        return false;
+#endif
+
+    return true;
 }
 
 bool DataDirectProcessor::GrabNextSuggestedTime(void)
@@ -1095,7 +1102,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
         command += " 2> /dev/null ";
 #endif
 
-    myth_system(command);
+    myth_system(command, kMSAnonLog);
 
     QDateTime NextSuggestedTime;
     QDateTime BlockedTime;
@@ -1169,23 +1176,6 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     return GotNextSuggestedTime;
 }
 
-static inline bool close_fp(FILE *&fp, bool fp_is_pipe)
-{
-    int err;
-
-    if (fp_is_pipe)
-        err = pclose(fp);
-    else
-        err = fclose(fp);
-
-    if (err<0)
-        VERBOSE(VB_IMPORTANT, "Failed to close file." + ENO);
-
-    fp = NULL;
-
-    return err>=0;
-}
-
 bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
                                    const QDateTime pendDate)
 {
@@ -1208,9 +1198,11 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
 
         if (QFile(cache_dd_data).exists() && inputfilename.isEmpty())
         {
-            VERBOSE(VB_GENERAL, LOC + "Copying from DD cache");
-            inputfile = cache_dd_data;
+            VERBOSE(VB_GENERAL, LOC + "Using DD cache");
         }
+
+        if( inputfilename.isEmpty() )
+            inputfile = cache_dd_data;
     }
 
     bool ok;
@@ -1221,92 +1213,40 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
         return false;
     }
 
-    bool fp_is_pipe;
-    FILE *fp = DDPost(ddurl, postFilename, inputfile,
-                      GetUserID(), GetPassword(),
-                      pstartDate, pendDate, err, fp_is_pipe);
-    if (!fp)
+    if (!DDPost(ddurl, postFilename, inputfile, GetUserID(), GetPassword(),
+                pstartDate, pendDate, err))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get data " +
-                QString("(%1) -- ").arg(err) + ENO);
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to get data: %1")
+                .arg(err));
         return false;
     }
 
-    if (cachedata && (inputfile != cache_dd_data))
+    QFile file(inputfile);
+    file.open(QIODevice::ReadOnly);
+    QByteArray data = file.readAll();
+    file.close();
+
+    if (data.isEmpty())
     {
-        QFile in, out(cache_dd_data);
-        bool ok = out.open(QIODevice::WriteOnly);
-        if (!ok)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_WARN +
-                    "Cannot open DD cache file in '" +
-                    tmpDir + "' for writing!");
-        }
-        else
-        {
-            VERBOSE(VB_GENERAL, LOC + "Saving listings to DD cache");
-            ok = in.open(fp, QIODevice::ReadOnly);
-            out.close(); // let copy routine handle dst file
-        }
-
-        if (ok)
-        {
-            ok = copy(out, in);
-            in.close();
-
-            close_fp(fp, fp_is_pipe);
-
-            if (ok)
-            {
-                QByteArray tmp = cache_dd_data.toAscii();
-                fp = fopen(tmp.constData(), "r");
-                fp_is_pipe = false;
-            }
-            else
-            {
-                VERBOSE(VB_IMPORTANT,
-                        LOC_ERR + "Failed to save DD cache! "
-                        "redownloading data...");
-                cachedata = false;
-                fp = DDPost(ddurl, postFilename, inputfile,
-                            GetUserID(), GetPassword(),
-                            pstartDate, pendDate, err, fp_is_pipe);
-            }
-        }
-    }
-
-    if (!fp)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get data 2 " +
-                QString("(%1) -- ").arg(err) + ENO);
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Data is empty");
         return false;
     }
 
     ok = true;
-    QFile f;
-    if (f.open(fp, QIODevice::ReadOnly))
+
+    DDStructureParser ddhandler(*this);
+    QXmlInputSource  xmlsource;
+    QXmlSimpleReader xmlsimplereader;
+
+    xmlsource.setData(data);
+    xmlsimplereader.setContentHandler(&ddhandler);
+    if (!xmlsimplereader.parse(xmlsource))
     {
-        DDStructureParser ddhandler(*this);
-        QXmlInputSource  xmlsource(&f);
-        QXmlSimpleReader xmlsimplereader;
-        xmlsimplereader.setContentHandler(&ddhandler);
-        if (!xmlsimplereader.parse(xmlsource))
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "DataDirect XML failed to "
-                    "properly parse, downloaded listings were probably "
-                    "corrupt.");
-            ok = false;
-        }
-        f.close();
-    }
-    else
-    {
-        VERBOSE(VB_GENERAL, LOC_ERR + "Error opening DataDirect file");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "DataDirect XML failed to "
+                "properly parse, downloaded listings were probably "
+                "corrupt.");
         ok = false;
     }
-
-    // f.close() only flushes pipe/file, we need to actually close it.
-    close_fp(fp, fp_is_pipe);
 
     return ok;
 }
