@@ -11,7 +11,6 @@
 #include <QCoreApplication>
 #include <QEvent>
 #include <QDir>
-#include <QThread>
 
 // MythTV headers
 #include "mythconfig.h"
@@ -462,64 +461,6 @@ bool AudioConfigSettings::CheckPassthrough()
     return m_passthrough8;
 }
 
-class AudioTestThread : public QThread
-{
-public:
-    void run()
-        {
-            char *frames_in = new char[m_channels * 48000 * sizeof(int16_t) + 15];
-            char *frames = (char *)(((long)frames_in + 15) & ~0xf);
-            for (int i = 0; i < m_channels; i++)
-            {
-                AudioOutputUtil::GeneratePinkSamples(frames, m_channels,
-                                                     i, 48000);
-                if (!m_audioOutput->AddFrames(frames, 48000, -1))
-                {
-                    VERBOSE(VB_AUDIO, "AddAudioData() "
-                            "Audio buffer overflow, audio data lost!");
-                }
-                    //if (m_dialog)
-                {
-                        // Send event here
-                        //QApplication::postEvent(m_dialog, NULL);
-                }
-                sleep(1);
-            usleep(500000);
-            }
-
-            delete[] frames_in;
-        }
-    QString result()
-        {
-            QString errMsg;
-            
-            if (!m_audioOutput)
-                errMsg = QObject::tr("Unable to create AudioOutput.");
-            else
-                errMsg = m_audioOutput->GetError();
-            return errMsg;
-        }
-    AudioTestThread(QString main, QString pass, int channels)
-        : m_channels(channels)
-        {
-            m_audioOutput = AudioOutput::OpenAudio(main,
-                                                   pass,
-                                                   FORMAT_S16, channels,
-                                                   0, 48000,
-                                                   AUDIOOUTPUT_VIDEO,
-                                                   true, false);
-        }
-    ~AudioTestThread()
-        {
-            if (m_audioOutput)
-                delete m_audioOutput;
-        }
-    
-private:
-    AudioOutput          *m_audioOutput;
-    int                   m_channels;
-};
-    
 void AudioConfigSettings::AudioTest()
 {
     QString out  = m_OutputDevice->getValue();
@@ -527,33 +468,218 @@ void AudioConfigSettings::AudioTest()
     int channels = m_MaxAudioChannels->getValue().toInt();
     QString errMsg;
 
-    if (gCoreContext->GetNumSetting("PassThruDeviceOverride", false))
-    {
-        name = gCoreContext->GetSetting("PassThruOutputDevice");
-    }
-    AudioTestThread *att = new AudioTestThread(out, name, channels);
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    QString result = att->result();
-    if (!result.isEmpty())
+    SpeakerTest *st = new SpeakerTest(
+        mainStack, "Speaker Test", out, name, 2);
+    if (st->Create())
     {
-        MythPopupBox::showOkPopup(
-            GetMythMainWindow(), QObject::tr("Error"), errMsg);
-        delete att;
-        att = NULL;
+        mainStack->AddScreen(st);
     }
     else
+        delete st;
+}
+
+QEvent::Type ChannelChangedEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+
+// ---------------------------------------------------
+
+
+AudioTestThread::AudioTestThread(QObject *parent,
+                                 QString main, QString passthrough,
+                                 int channels) :
+    m_channels(channels), m_device(main), m_passthrough(passthrough),
+    m_interrupted(false)
+{
+    m_parent = parent;
+    m_audioOutput = AudioOutput::OpenAudio(m_device,
+                                           m_passthrough,
+                                           FORMAT_S16, m_channels,
+                                           0, 48000,
+                                           AUDIOOUTPUT_VIDEO,
+                                           true, false);
+}
+
+AudioTestThread::~AudioTestThread()
+{
+    cancel();
+    wait();
+    if (m_audioOutput)
+        delete m_audioOutput;
+}
+
+QString AudioTestThread::result()
+{
+    QString errMsg;
+    if (!m_audioOutput)
+        errMsg = QObject::tr("Unable to create AudioOutput.");
+    else
+        errMsg = m_audioOutput->GetError();
+    return errMsg;
+}
+
+void AudioTestThread::cancel()
+{
+    m_interrupted = true;
+}
+
+void AudioTestThread::run()
+{
+    m_interrupted = false;
+
+    if (m_audioOutput)
     {
-            // set MythUI recipient here
-            //att->setUIWindow(NULL);
-        att->start();
-    }
-    if (att && att->wait())
-    {
-        delete att;
+        char *frames_in = new char[m_channels * 48000 * sizeof(int16_t) + 15];
+        char *frames = (char *)(((long)frames_in + 15) & ~0xf);
+        while (!m_interrupted)
+        {
+            for (int i = 0; i < m_channels && !m_interrupted; i++)
+            {
+                AudioOutputUtil::GeneratePinkSamples(frames, m_channels,
+                                                     i, 48000);
+                if (m_parent)
+                {
+                    QString channel;
+
+                    switch(i)
+                    {
+                        case 0:
+                            channel = "frontleft";
+                            break;
+                        case 1:
+                            channel = "frontright";
+                            break;
+                        case 2:
+                            channel = "center";
+                            break;
+                        case 3:
+                            channel = "lfe";
+                            break;
+                        case 4:
+                            if (m_channels == 6)
+                                channel = "leftsurround";
+                            else
+                                channel = "rearleft";
+                            break;
+                        case 5:
+                            if (m_channels == 6)
+                                channel = "rightsurround";
+                            else
+                                channel = "rearleft";
+                            break;
+                        case 6:
+                            channel = "leftsurround";
+                            break;
+                        case 7:
+                            channel = "rightsurround";
+                            break;
+                    }
+                    QCoreApplication::postEvent(
+                        m_parent, new ChannelChangedEvent(channel));
+                }
+                if (!m_audioOutput->AddFrames(frames, 48000, -1))
+                {
+                    VERBOSE(VB_AUDIO, "AddAudioData() "
+                            "Audio buffer overflow, audio data lost!");
+                }
+                for (int j = 0; j < 16 && !m_interrupted; j++)
+                {
+                    usleep(62500);  //1/16th of a second
+                }
+                usleep(500000); //.5s
+            }
+        }
+        delete[] frames_in;
     }
 }
 
-static HostCheckBox *MythControlsVolume()
+SpeakerTest::SpeakerTest(MythScreenStack *parent, QString name,
+                         QString main, QString passthrough, int channels)
+    : MythScreenType(parent, name),
+      m_speakerLocation(NULL), m_testButton(NULL), m_testSpeakers(NULL)
+{
+    m_testSpeakers = new AudioTestThread(this, main, passthrough, channels);
+}
+
+bool SpeakerTest::Create()
+{
+    bool foundtheme = false;
+
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("config-ui.xml", "audiosettings", this);
+
+    if (!foundtheme)
+        return false;
+
+    if (!m_testSpeakers->result().isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT, "Not working.");
+        return false;
+    }
+
+    m_testButton = dynamic_cast<MythUIButton *> (GetChild("test"));
+    m_speakerLocation = dynamic_cast<MythUIStateType *> (GetChild("speakerlocation"));
+
+    if (!m_testButton || !m_speakerLocation)
+    {
+        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        return false;
+    }
+
+    connect(m_testButton, SIGNAL(Clicked()), this, SLOT(toggleTest()));
+
+    BuildFocusList();
+
+    return true;
+}
+
+SpeakerTest::~SpeakerTest()
+{
+    if (m_testSpeakers)
+    {
+        m_testSpeakers->cancel();
+        m_testSpeakers->wait();
+        delete m_testSpeakers;
+        m_testSpeakers = NULL;
+    }
+}
+
+void SpeakerTest::toggleTest(void)
+{
+    if (m_testSpeakers->isRunning())
+        m_testSpeakers->cancel();
+    else if (m_testSpeakers)
+        m_testSpeakers->start();
+}
+
+bool SpeakerTest::keyPressEvent(QKeyEvent *event)
+{
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
+
+    bool handled = false;
+
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
+}
+
+void SpeakerTest::customEvent(QEvent *event)
+{
+    if (event->type() == ChannelChangedEvent::kEventType)
+    {
+        ChannelChangedEvent *cce = (ChannelChangedEvent*)(event);
+
+        QString channel   = cce->channel;
+
+        if (!channel.isEmpty())
+            m_speakerLocation->DisplayState(channel);
+    }
+}
+
+HostCheckBox *AudioMixerSettings::MythControlsVolume()
 {
     HostCheckBox *gc = new HostCheckBox("MythControlsVolume");
     gc->setLabel(QObject::tr("Use internal volume controls"));

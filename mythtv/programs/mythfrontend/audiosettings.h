@@ -2,12 +2,20 @@
 #define MYTHAUDIOSETTINGS_H
 
 #include <QStringList>
+
 #include <QObject>
+#include <QMutex>
+#include <QThread>
 
 #include "settings.h"
 #include "mythcontext.h"
 
-#include <QMutex>
+// libmythui
+#include <mythuibutton.h>
+#include <mythuistatetype.h>
+#include <mythscreentype.h>
+#include <mythdialogbox.h>
+
 #include "audiooutput.h"
 
 class AudioDeviceComboBox;
@@ -78,6 +86,7 @@ class AudioMixerSettings : public TriggeredConfigurationGroup
   public:
     AudioMixerSettings();
   private:
+    HostCheckBox        *MythControlsVolume();
     HostComboBox        *MixerDevice();
     HostComboBox        *MixerControl();
     HostSlider          *MixerVolume();
@@ -111,6 +120,66 @@ class AudioAdvancedSettingsGroup : public ConfigurationWizard
 {
   public:
     AudioAdvancedSettingsGroup(bool mpcm);
+};
+
+class ChannelChangedEvent : public QEvent
+{
+  public:
+    ChannelChangedEvent(QString channame) :
+                 QEvent(kEventType),
+                 channel(channame) {}
+    ~ChannelChangedEvent() {}
+
+    QString channel;
+
+    static Type kEventType;
+};
+
+class AudioTestThread : public QThread
+{
+  public:
+
+    AudioTestThread(QObject *parent, QString main, QString passthrough,
+                    int channels);
+    ~AudioTestThread();
+
+    void cancel();
+    QString result();
+
+  protected:
+    void run();
+
+  private:
+    QObject              *m_parent;
+    AudioOutput          *m_audioOutput;
+    int                   m_channels;
+    QString               m_device;
+    QString               m_passthrough;
+    bool                  m_interrupted;
+};
+
+class SpeakerTest : public MythScreenType
+{
+  Q_OBJECT
+
+  public:
+
+    SpeakerTest(MythScreenStack *parent, QString name,
+                QString main, QString passthrough, int channels);
+    ~SpeakerTest();
+
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
+    void customEvent(QEvent *event);
+
+  private:
+    MythUIStateType          *m_speakerLocation;
+    MythUIButton             *m_testButton;
+
+    AudioTestThread          *m_testSpeakers;
+
+  private slots:
+    void toggleTest(void);
 };
 
 #endif

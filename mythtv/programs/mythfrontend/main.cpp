@@ -593,6 +593,26 @@ static void TVMenuCallback(void *data, QString &selection)
         QStringList strlist( QString("REFRESH_BACKEND") );
         gCoreContext->SendReceiveStringList(strlist);
     }
+    else if (sel == "settings audiogeneral")
+    {
+        AudioGeneralSettings audiosettings;
+        audiosettings.exec();
+    }
+    else if (sel == "speaker_test")
+    {
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        QString passthru = gCoreContext->GetNumSetting(
+            "PassThruDeviceOverride", false) ?
+            gCoreContext->GetSetting("PassThruOutputDevice") : QString::null;
+        QString main = gCoreContext->GetSetting("AudioOutputDevice");
+        int channels = gCoreContext->GetNumSetting("MaxChannels", 2);
+        SpeakerTest *st = new SpeakerTest(
+            mainStack, "Speaker Test", main, passthru, channels);
+        if (st->Create())
+            mainStack->AddScreen(st);
+        else
+            delete st;
+    }
     else if (sel == "settings playback")
     {
         PlaybackSettings settings;
