@@ -24,7 +24,6 @@ using namespace std;
 // Qt headers
 #include <QList>
 #include <QTextStream>
-#include <QProcess>
 #include <QDir>
 #include <QFile>
 
@@ -36,6 +35,7 @@ using namespace std;
 #include "mythcdrom.h"
 #include "mythhdd.h"
 #include "mythverbose.h"
+#include "mythsystem.h"
 
 #if HAVE_LIBUDEV
 extern "C" {
@@ -245,50 +245,39 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
     }
   #else   // HAVE_LIBUDEV
     // Use udevinfo to determine the name
-    QProcess    *udevinfo = new QProcess();
-    QTextStream  stream(udevinfo);
     QStringList  args;
+    args << "-q"  << "name"
+         << "-rp" << sysfs;
 
-    args << "-q";
-    args << "name";
-    args << "-rp";
-    args << sysfs;
-    udevinfo->start("udevinfo", args);
+    uint flags = kMSStdOut | kMSBuffered;
+    if( VERBOSE_LEVEL_CHECK(VB_MEDIA|VB_EXTRA) )
+        flags |= kMSStdErr;
 
-    if (!udevinfo->waitForStarted(2000 /*ms*/))
+    MythSystem  *udevinfo = new MythSystem("udevinfo", args, flags);
+    udevinfo->Run(2);
+    if( udevinfo->Wait() != GENERIC_EXIT_OK )
     {
-        VERBOSE(VB_MEDIA, msg + ", Error - udevinfo failed to start!");
-        udevinfo->deleteLater();
-        return ret;
-    }
-
-    if (!udevinfo->waitForFinished(2000 /*ms*/))
-    {
-        VERBOSE(VB_MEDIA,
-                msg + ", Error - udevinfo failed to end! Terminating");
-        udevinfo->kill();
-        udevinfo->deleteLater();
+        delete udevinfo;
         return ret;
     }
 
     if (VERBOSE_LEVEL_CHECK(VB_MEDIA|VB_EXTRA))
     {
-        udevinfo->setReadChannel(QProcess::StandardError);
-
-        while (!stream.atEnd())
-        {
+        QTextStream estream(udevinfo->ReadAllErr());
+        while( !estream.atEnd() )
             VERBOSE(VB_MEDIA+VB_EXTRA,
-                    msg + " - udevinfo error...\n" + stream.readLine());
-        }
+                    msg + " - udevinfo error...\n" + estream.readLine());
     }
 
-    udevinfo->setReadChannel(QProcess::StandardOutput);
-
-    ret = stream.readLine();
-    if (ret.startsWith("device not found in database"))
+    QTextStream ostream(udevinfo->ReadAll());
+    ret = ostream.readline();
+    if( ret.startsWith("device not found in database") )
+    {
+        delete udevinfo;
         return ret;
+    }
 
-    udevinfo->deleteLater();
+    delete udevinfo;
   #endif // HAVE_LIBUDEV
 #endif // linux
 
