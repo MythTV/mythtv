@@ -51,7 +51,7 @@ class MythSystemManager : public QThread
         QMutex    *m_listLock;
         bool       m_primary;
 
-        char       m_readbuf[65336];
+        char       m_readbuf[65536];
 };
 
 class MPUBLIC MythSystem : public QObject
@@ -72,7 +72,7 @@ class MPUBLIC MythSystem : public QObject
         void Run(time_t timeout = 0);
         uint Wait(time_t timeout = 0);
 
-        ssize_t Write(const QByteArray*);
+        int Write(const QByteArray*);
         QByteArray *Read(int size);
         QByteArray *ReadErr(int size);
         QByteArray *ReadAll() const;
@@ -108,11 +108,16 @@ class MPUBLIC MythSystem : public QObject
         time_t m_timeout;
 
         QString     m_command;
+        QString     m_logcmd;
         QStringList m_args;
         QString     m_directory;
 
         int     m_stdpipe[3]; // should there be a means of hitting these directly?
         QBuffer m_stdbuff[2]; // do these need to be allocated?
+
+        QByteArray m_writeBuf;
+        int     m_writeOffset;
+        int     m_writeRemain;
 
         // move to a struct to keep things clean?
         // perhaps allow overloaded input using the struct

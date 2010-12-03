@@ -24,9 +24,9 @@
 #define GENERIC_EXIT_TIMEOUT                      241
 #define GENERIC_EXIT_ABORTED                      240
 #define GENERIC_EXIT_RUNNING                      239
-#define GENERIC_EXIT_START                        239
 #define GENERIC_EXIT_PIPE_FAILURE                 238
 #define GENERIC_EXIT_TERMINATED                   237
+#define GENERIC_EXIT_START                        236
 #define GENERIC_EXIT_CMD_NOT_FOUND                127
 
 // libmyth

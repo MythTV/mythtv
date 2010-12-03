@@ -33,7 +33,8 @@
 
 #define CLOSE(x) if( x >= 0 ) {close(x); x = -1;}
 
-typedef QMap<int, QByteArray *> pipeMap_t;
+typedef QMap<int, QByteArray *> pipeRMap_t;
+typedef QMap<int, MythSystem *> pipeWMap_t;
 typedef QList<MythSystem *> MSList;
 
 /**********************************
@@ -87,27 +88,31 @@ void MythSystemManager::RunManagerThread()
             m_mapLock.unlock();
             continue;
         }
+        m_mapLock.unlock();
 
         m_listLock->lock();
-        pipeMap_t   pMap;   // map of IO pipes for buffering
-        MythSystem *ms;
-        pid_t       pid;
-
+        pipeRMap_t          pRMap;   // map of IO pipes for buffering
+        pipeWMap_t          pWMap;   // map of IO pipes for buffering
+        MythSystem         *ms;
+        pid_t               pid;
 
         // check for any newly exited processes
         int status;
         while( (pid = waitpid(-1, &status, WNOHANG)) > 0 )
         {
+            m_mapLock.lock();
             // unmanaged process has exited
             if( !m_pMap.contains(pid) )
             {
                 VERBOSE(VB_GENERAL, QString("Unmanaged child (PID: %1) has exited!")
                     .arg(pid));
+                m_mapLock.unlock();
                 continue;
             }
 
             // pop exited process off managed list, add to cleanup list
             ms = m_pMap.take(pid);
+            m_mapLock.unlock();
             m_msList->append(ms);
 
             // handle normal exit
@@ -116,7 +121,7 @@ void MythSystemManager::RunManagerThread()
                 ms->m_status = WEXITSTATUS(status);
                 VERBOSE(VB_GENERAL, QString("Managed child (PID: %1) has exited! "
                                             "command=%2, status=%3, result=%4")
-                    .arg(pid) .arg(ms->m_command) .arg(status) .arg(ms->m_status));
+                    .arg(pid) .arg(ms->m_logcmd) .arg(status) .arg(ms->m_status));
             }
 
             // handle forced exit
@@ -135,7 +140,7 @@ void MythSystemManager::RunManagerThread()
 
                 VERBOSE(VB_GENERAL, QString("Managed child (PID: %1) has signalled! "
                                             "command=%2, status=%3, result=%4, signal=%5")
-                    .arg(pid) .arg(ms->m_command) .arg(status) .arg(ms->m_status)
+                    .arg(pid) .arg(ms->m_logcmd) .arg(status) .arg(ms->m_status)
                     .arg(sig));
             }
 
@@ -145,16 +150,18 @@ void MythSystemManager::RunManagerThread()
                 ms->m_status = GENERIC_EXIT_NOT_OK;
                 VERBOSE(VB_GENERAL, QString("Managed child (PID: %1) has terminated! "
                                             "command=%2, status=%3, result=%4")
-                    .arg(pid) .arg(ms->m_command) .arg(status) .arg(ms->m_status));
+                    .arg(pid) .arg(ms->m_logcmd) .arg(status) .arg(ms->m_status));
             }
 
             // hand off buffered pipes for final processing
             if( ms->m_bufferedio )
             {
+                if( ms->m_usestdin && ms->m_stdpipe[0] > 0 )
+                    pWMap.insert(ms->m_stdpipe[0], ms);
                 if( ms->m_usestdout )
-                    pMap.insert(ms->m_stdpipe[1], &(ms->m_stdbuff[0].buffer()));
+                    pRMap.insert(ms->m_stdpipe[1], &(ms->m_stdbuff[0].buffer()));
                 if( ms->m_usestderr )
-                    pMap.insert(ms->m_stdpipe[2], &(ms->m_stdbuff[1].buffer()));
+                    pRMap.insert(ms->m_stdpipe[2], &(ms->m_stdbuff[1].buffer()));
             }
         }
 
@@ -162,6 +169,7 @@ void MythSystemManager::RunManagerThread()
         // loop through running processes for any that require action
         MSMap_t::iterator   i, next;
         time_t              now = time(NULL);
+        m_mapLock.lock();
         for( i = m_pMap.begin(); i != m_pMap.end(); i = next )
         {
             next = i + 1;
@@ -195,19 +203,22 @@ void MythSystemManager::RunManagerThread()
             // handle processes needing buffering
             if( ms->m_bufferedio )
             {
+                if( ms->m_usestdin && ms->m_stdpipe[0] > 0 )
+                    pWMap.insert(ms->m_stdpipe[0], ms);
                 if( ms->m_usestdout )
-                    pMap.insert(ms->m_stdpipe[1], &(ms->m_stdbuff[0].buffer()));
+                    pRMap.insert(ms->m_stdpipe[1], &(ms->m_stdbuff[0].buffer()));
                 if( ms->m_usestderr )
-                    pMap.insert(ms->m_stdpipe[2], &(ms->m_stdbuff[1].buffer()));
+                    pRMap.insert(ms->m_stdpipe[2], &(ms->m_stdbuff[1].buffer()));
             }
         }
 
         m_mapLock.unlock();
 
-        if( !pMap.isEmpty() )
+        if( !pRMap.isEmpty() || !pWMap.isEmpty() )
         {
             // build structures for select()
             fd_set  rfds;
+            fd_set  wfds;
             timeval tv;
             int     maxfd = -1;
 
@@ -215,28 +226,88 @@ void MythSystemManager::RunManagerThread()
 
             // build descriptor list
             FD_ZERO(&rfds);
-            pipeMap_t::iterator j;
-            for( j = pMap.begin(); j != pMap.end(); ++j )
+            FD_ZERO(&wfds);
+
+            pipeRMap_t::iterator j;
+            pipeWMap_t::iterator k;
+            for( j = pRMap.begin(); j != pRMap.end(); ++j )
             {
                 FD_SET(j.key(), &rfds);
                 maxfd = (j.key() > maxfd ? j.key() : maxfd);
             }
 
-            int retval = select(maxfd + 1, &rfds, NULL, NULL, &tv);
+            for( k = pWMap.begin(); k != pWMap.end(); ++k )
+            {
+                FD_SET(k.key(), &wfds);
+                maxfd = (k.key() > maxfd ? k.key() : maxfd);
+            }
+
+            int retval = select(maxfd + 1, &rfds, &wfds, NULL, &tv);
             if( retval == -1 )
                 VERBOSE(VB_GENERAL, QString("select() failed because of %1")
                             .arg(strerror(errno)));
             else if( retval > 0 )
             {
                 // loop through returned descriptors
-                for( j = pMap.begin(); j != pMap.end(); ++j )
+                pipeRMap_t::iterator nextj;
+                for( j = pRMap.begin(); j != pRMap.end(); j = nextj )
                 {
-                    if( FD_ISSET(j.key(), &rfds) )
+                    nextj = j+1;
+                    int fd = j.key();
+                    if( FD_ISSET(fd, &rfds) )
                     {
                         int len;
-                        if( (len = read(j.key(), &m_readbuf, 65536)) < 0 )
+                        if( (len = read(fd, &m_readbuf, 65536)) < 0 )
+                        {
+                            if( errno != EAGAIN )
+                            {
+                                pRMap.remove(fd);
+                                CLOSE(fd);
+                            }
                             continue;
+                        }
                         j.value()->append(m_readbuf, len);
+                    }
+                }
+
+                pipeWMap_t::iterator nextk;
+                for( k = pWMap.begin(); k != pWMap.end(); k = nextk )
+                {
+                    nextk = k+1;
+                    if( FD_ISSET(k.key(), &wfds) )
+                    {
+                        int len;
+                        ms = k.value();
+
+                        VERBOSE(VB_IMPORTANT, QString("offset: %1, remain: %2")
+                            .arg(ms->m_writeOffset).arg(ms->m_writeRemain));
+
+                        if( ms->m_writeRemain == 0 )
+                        {
+                            int fd = ms->m_stdpipe[0];
+                            
+                            pWMap.remove(fd);
+                            CLOSE(ms->m_stdpipe[0]);
+                            continue;
+                        } 
+
+                        len = (ms->m_writeRemain > 32768 ? 32768 :
+                               ms->m_writeRemain);
+                        len = write( k.key(), 
+                            ms->m_writeBuf.mid(ms->m_writeOffset, len), len);
+                        if (len < 0) 
+                        {
+                            if( errno != EAGAIN )
+                            {
+                                ms->m_writeRemain = 0;
+                            }
+                            continue;
+                        }
+                        else
+                        {
+                            ms->m_writeOffset += len;
+                            ms->m_writeRemain -= len;
+                        }
                     }
                 }
             }
@@ -308,10 +379,16 @@ MythSystem::MythSystem(const QString &command, uint flags)
 void MythSystem::SetCommand(const QString &command, uint flags)
 {
     m_status = GENERIC_EXIT_START;
-    ProcessFlags(flags);
     // force shell operation
-    m_useshell = true;
+    flags |= kMSRunShell;
+    ProcessFlags(flags);
     m_command = QString(command);
+    m_logcmd = m_command;
+    if( flags & kMSAnonLog ) 
+    {
+        m_logcmd.truncate(m_logcmd.indexOf(" "));
+        m_logcmd.append(" (anonymized)");
+    }
 }
 
 
@@ -344,6 +421,13 @@ void MythSystem::SetCommand(const QString &command,
         else
             m_args = QStringList(args);
     }
+
+    m_logcmd = m_command;
+    if( flags & kMSAnonLog )
+    {
+        m_logcmd.truncate(m_logcmd.indexOf(" "));
+        m_logcmd.append(" (anonymized)");
+    }
 }
 
 
@@ -353,6 +437,7 @@ MythSystem::MythSystem(const MythSystem &other) :
     m_timeout(other.m_timeout),
 
     m_command(other.m_command),
+    m_logcmd(other.m_logcmd),
     m_args(other.m_args),
 
     m_runinbackground(other.m_runinbackground),
@@ -573,6 +658,8 @@ void MythSystem::ProcessFlags(uint flags)
         m_bufferedio = true;
     if( flags & kMSRunShell )
         m_useshell = true;
+    if( flags & kMSNoRunShell ) // override for use with myth_system
+        m_useshell = false;
 }
 
 QByteArray *MythSystem::_read(int size, int id)
@@ -611,13 +698,19 @@ QByteArray *MythSystem::ReadAll() const { return _readall(0); }
 
 QByteArray *MythSystem::ReadAllErr() const { return _readall(1); }
 
-ssize_t MythSystem::Write(const QByteArray *ba)
+int MythSystem::Write(const QByteArray *ba)
 {
-    if( !m_usestdin )
+    if (!m_usestdin)
         return 0;
     
-    int size = ba->size();
-    return write(m_stdpipe[0], ba->constData(), size); // if i dont free the constData, is that a memory leak?
+    m_writeBuf = *ba;
+    m_writeOffset = 0;
+    m_writeRemain = m_writeBuf.size();
+
+    if (!m_bufferedio)
+        return write(m_stdpipe[0], m_writeBuf.constData(), m_writeRemain);
+
+    return m_writeRemain;
 }
 
 
@@ -665,14 +758,18 @@ void MythSystem::HandlePostRun()
 #define MAX_BUFLEN 1024
 void MythSystem::Fork()
 {
-    QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(m_command);
+    QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(m_logcmd);
 
     // For use in the child
     char locerr[MAX_BUFLEN];
     strncpy(locerr, (const char *)LOC_ERR.constData(), MAX_BUFLEN);
     locerr[MAX_BUFLEN-1] = '\0';
 
-    VERBOSE(VB_GENERAL, QString("Launching: %1").arg(m_command));
+    VERBOSE(VB_GENERAL, QString("Launching: %1").arg(m_logcmd));
+
+    m_writeRemain = 0;
+    m_stdbuff[0].setBuffer(0);
+    m_stdbuff[1].setBuffer(0);
 
     int p_stdin[]  = {-1,-1};
     int p_stdout[] = {-1,-1};
@@ -681,7 +778,7 @@ void MythSystem::Fork()
     /* set up pipes */
     if( m_usestdin )
     {
-        if( pipe(p_stdin) == -1 )
+        if( pipe2(p_stdin, O_NONBLOCK) == -1 )
         {
             VERBOSE(VB_GENERAL, (LOC_ERR + "stdin pipe() failed"));
             m_status = GENERIC_EXIT_NOT_OK;
@@ -689,7 +786,7 @@ void MythSystem::Fork()
     }
     if( m_usestdout )
     {
-        if( pipe(p_stdout) == -1 )
+        if( pipe2(p_stdout, O_NONBLOCK) == -1 )
         {
             VERBOSE(VB_GENERAL, (LOC_ERR + "stdout pipe() failed"));
             m_status = GENERIC_EXIT_NOT_OK;
@@ -697,7 +794,7 @@ void MythSystem::Fork()
     }
     if( m_usestderr )
     {
-        if( pipe(p_stderr) == -1 )
+        if( pipe2(p_stderr, O_NONBLOCK) == -1 )
         {
             VERBOSE(VB_GENERAL, (LOC_ERR + "stderr pipe() failed"));
             m_status = GENERIC_EXIT_NOT_OK;
@@ -747,8 +844,9 @@ void MythSystem::Fork()
         m_status = GENERIC_EXIT_RUNNING;
 
         VERBOSE(VB_GENERAL, QString("Managed child (PID: %1) has started! "
-                                            "command=%2, timeout=%3")
-                    .arg(m_pid) .arg(m_command) .arg(m_timeout));
+                                            "%2 command=%3, timeout=%4")
+                    .arg(m_pid) .arg(m_useshell ? "*" : "")
+                    .arg(m_logcmd) .arg(m_timeout));
 
         /* close unused pipe ends */
         CLOSE(p_stdin[0]);
@@ -873,7 +971,7 @@ void MythSystem::Fork()
 uint myth_system(const QString &command, uint flags, uint timeout)
 {
     flags |= kMSRunShell;
-    MythSystem ms = MythSystem(command, flags | kMSRunShell);
+    MythSystem ms = MythSystem(command, flags);
     ms.Run(timeout);
     uint result = ms.Wait(0);
     return result;
