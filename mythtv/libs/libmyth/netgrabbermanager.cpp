@@ -1,7 +1,6 @@
 // qt
 #include <QString>
 #include <QCoreApplication>
-#include <QProcess>
 #include <QFile>
 #include <QDir>
 
@@ -47,22 +46,16 @@ void GrabberScript::run()
     QMutexLocker locker(&m_lock);
 
     QString commandline = m_commandline;
-    m_getTree.setReadChannel(QProcess::StandardOutput);
+    m_getTree.SetCommand(commandline, QStringList() << "T",
+                         kMSStdOut | kMSBuffered);
 
-    if (QFile(commandline).exists())
+    m_getTree.Run(900);
+    int status = m_getTree.wait();
+    if( status == GENERIC_EXIT_CMD_NOT_FOUND )
+        VERBOSE(VB_IMPORTANT, LOC + QString("Internet Content Source %1 "
+                            "cannot run, file missing.").arg(m_title));
+    else if( status == GENERIC_EXIT_OK )
     {
-        m_getTree.start(commandline, QStringList() << "-T");
-        m_getTree.waitForFinished(900000);
-        QDomDocument domDoc;
-
-        if (QProcess::NormalExit != m_getTree.exitStatus())
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Internet Content Source "
-                           "%1 crashed while grabbing tree.").arg(m_title));
-            emit finished();
-            return;
-        }
-
         VERBOSE(VB_IMPORTANT, LOC + QString("Internet Content Source %1 "
                            "completed download, beginning processing...").arg(m_title));
 
@@ -82,10 +75,12 @@ void GrabberScript::run()
         markTreeUpdated(this, QDateTime::currentDateTime());
         VERBOSE(VB_IMPORTANT, LOC + QString("Internet Content Source %1 "
                            "completed processing, marking as updated.").arg(m_title));
-        emit finished();
     }
     else
-        emit finished();
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Internet Content Source "
+                           "%1 crashed while grabbing tree.").arg(m_title));
+
+    emit finished();
 }
 
 void GrabberScript::parseDBTree(const QString &feedtitle, const QString &path,
@@ -262,10 +257,9 @@ void Search::executeSearch(const QString &script, const QString &query, uint pag
 {
     resetSearch();
 
-    m_searchProcess = new QProcess();
+    m_searchProcess = new MythSystem();
 
-    connect(m_searchProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
-                  SLOT(slotProcessSearchExit(int, QProcess::ExitStatus)));
+    connect(m_searchProcess, SIGNAL(finished()), this, SLOT(slotProcessSearchExit()));
     connect(m_searchtimer, SIGNAL(timeout()), this, SLOT(slotSearchTimeout()));
 
     QString cmd = script;
@@ -285,7 +279,7 @@ void Search::executeSearch(const QString &script, const QString &query, uint pag
                                         .arg(cmd).arg(args.join(" ")));
 
     m_searchtimer->start(40 * 1000);
-    m_searchProcess->start(cmd, args);
+    m_searchProcess->SetCommand(cmd, args, kMSStdOut | kMSBuffered);
 }
 
 void Search::resetSearch()
@@ -351,13 +345,12 @@ void Search::process()
 
 }
 
-void Search::slotProcessSearchExit(int exitcode, QProcess::ExitStatus exitstatus)
+void Search::slotProcessSearchExit(int exitcode)
 {
     if (m_searchtimer)
         m_searchtimer->stop();
 
-    if ((exitstatus != QProcess::NormalExit) ||
-        (exitcode != 0))
+    if (exitcode != GENERIC_EXIT_OK)
     {
         m_document.setContent(QString());
     }
@@ -365,7 +358,7 @@ void Search::slotProcessSearchExit(int exitcode, QProcess::ExitStatus exitstatus
     {
         VERBOSE(VB_GENERAL|VB_EXTRA, LOC_ERR + "Internet Search Successfully Completed");
 
-        m_data = m_searchProcess->readAllStandardOutput();
+        m_data = m_searchProcess->readAll();
         m_document.setContent(m_data, true);
     }
 
@@ -386,7 +379,7 @@ void Search::slotSearchTimeout()
 
     if (m_searchProcess)
     {
-        m_searchProcess->close();
+        m_searchProcess->Term(true);
         m_searchProcess->deleteLater();
         m_searchProcess = NULL;
     }

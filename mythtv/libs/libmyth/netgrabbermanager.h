@@ -8,10 +8,10 @@
 #include <QMetaType>
 #include <QMutex>
 #include <QTimer>
-#include <QProcess>
 
 #include "rssparse.h"
 #include "mythexp.h"
+#include "mythsystem.h"
 
 class MPUBLIC GrabberScript : public QThread
 {
@@ -65,7 +65,7 @@ class MPUBLIC GrabberScript : public QThread
     QString     m_description;
     QString     m_commandline;
     double      m_version;
-    QProcess    m_getTree;
+    MythSystem  m_getTree;
 };
 Q_DECLARE_METATYPE(GrabberScript *);
 
@@ -156,12 +156,12 @@ class MPUBLIC Search : public QObject
 
   private:
 
-    QProcess               *m_searchProcess;
+    MythSystem             *m_searchProcess;
 
     QByteArray              m_data;
     QDomDocument            m_document;
     QTimer                 *m_searchtimer;
-    ResultItem::resultList m_videoList;
+    ResultItem::resultList  m_videoList;
 
     uint                    m_numResults;
     uint                    m_numReturned;
@@ -174,8 +174,7 @@ class MPUBLIC Search : public QObject
 
   private slots:
 
-    void slotProcessSearchExit(int exitcode,
-                               QProcess::ExitStatus exitstatus);
+    void slotProcessSearchExit(int exitcode);
     void slotSearchTimeout(void);
 };
 
