@@ -103,23 +103,27 @@ AudioConfigSettings::AudioConfigSettings() :
     setLabel(QObject::tr("Audio System"));
     setUseLabel(false);
 
+    ConfigurationGroup *devicegroup = new HorizontalConfigurationGroup(false,
+                                                                       false);
+    devicegroup->addChild((m_OutputDevice = new AudioDeviceComboBox(this)));
         // Rescan button
     TransButtonSetting *rescan = new TransButtonSetting("rescan");
-    rescan->setLabel(QObject::tr("Scan for audio devices"));
-    rescan->setHelpText(QObject::tr("Scan for available audio devices. "
-                                    "Custom entry will be scanned and "
+    rescan->setLabel(QObject::tr("Rescan"));
+    rescan->setHelpText(QObject::tr("Rescan for available audio devices. "
+                                    "Current entry will be checked and "
                                     "capability entries populated."));
-    addChild(rescan);
+    devicegroup->addChild(rescan);
     connect(rescan, SIGNAL(pressed()), this, SLOT(AudioRescan()));
-
-    addChild((m_OutputDevice = new AudioDeviceComboBox(this)));
+    addChild(devicegroup);
 
     QString name = m_OutputDevice->getValue();
     AudioOutput::AudioDeviceConfig *adc =
         AudioOutput::GetAudioDeviceConfig(name, name, true);
     if (adc->settings.IsInvalid())
+    {
         VERBOSE(VB_IMPORTANT, QString("Audio device %1 isn't usable "
                                       "Check audio configuration").arg(name));
+    }
     audiodevs.insert(name, *adc);
     devices.append(*adc);
 
@@ -162,6 +166,7 @@ AudioConfigSettings::AudioConfigSettings() :
             this, SLOT(UpdateCapabilities(const QString&)));
     connect(m_DTSPassThrough, SIGNAL(valueChanged(const QString&)),
             this, SLOT(UpdateCapabilities(const QString&)));
+    AudioRescan();
 }
 
 void AudioConfigSettings::AudioRescan()
