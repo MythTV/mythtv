@@ -139,7 +139,7 @@ bool SourceManager::findScripts()
         db.bindValue(":ID", toRemove[i]);
         if (!db.exec())
         {
-            MythDB::DBError("Deleting weather source settings", db);
+            // MythDB::DBError("Deleting weather source settings", db);
         }
     }
 

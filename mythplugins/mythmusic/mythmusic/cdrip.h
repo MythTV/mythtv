@@ -104,13 +104,14 @@ class Ripper : public MythScreenType
     void yearChanged(void);
     void compilationChanged(bool state);
     void switchTitlesAndArtists();
-    void reject();
     void searchArtist(void);
     void searchAlbum(void);
     void searchGenre(void);
     void RipComplete(bool result);
     void toggleTrackActive(MythUIButtonListItem *);
     void showEditMetadataDialog(MythUIButtonListItem *);
+    void EjectFinished(void);
+    void ScanFinished(void);
 
   signals:
     void ripFinished(void);
@@ -137,7 +138,7 @@ class Ripper : public MythScreenType
     MythUIButtonList    *m_trackList;
     MythUIButtonList    *m_qualityList;
 
-    MythUIButton        *m_switchTitleArtist;
+    MythUIButton  *m_switchTitleArtist;
     MythUIButton  *m_scanButton;
     MythUIButton  *m_ripButton;
     MythUIButton  *m_searchArtistButton;
@@ -152,6 +153,9 @@ class Ripper : public MythScreenType
     bool               m_mediaMonitorActive;
 
     QString            m_CDdevice;
+
+    CDEjectorThread   *m_ejectThread;
+    CDScannerThread   *m_scanThread;
 };
 
 

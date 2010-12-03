@@ -45,6 +45,10 @@ using namespace std;
 #include <mythuibuttonlist.h>
 #include <mythsystem.h>
 
+// MythUI headers
+#include <mythtv/libmythui/mythscreenstack.h>
+#include <mythtv/libmythui/mythprogressdialog.h>
+
 // MythMusic includes
 #include "cdrip.h"
 #include "cddecoder.h"
@@ -448,7 +452,8 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 ///////////////////////////////////////////////////////////////////////////////
 
 Ripper::Ripper(MythScreenStack *parent, QString device)
-       : MythScreenType(parent, "ripcd")
+       : MythScreenType(parent, "ripcd"),
+         m_ejectThread(NULL), m_scanThread(NULL)
 {
     m_CDdevice = device;
 
@@ -580,18 +585,21 @@ bool Ripper::keyPressEvent(QKeyEvent *event)
 
 void Ripper::startScanCD(void)
 {
-    MythBusyDialog *busy = new MythBusyDialog("Scanning CD. Please Wait ...");
-    CDScannerThread *scanner = new CDScannerThread(this);
-    busy->start();
-    scanner->start();
+    if (m_scanThread)
+        return;
 
-    while (!scanner->isFinished())
-    {
-        usleep(500);
-        qApp->processEvents();
-    }
+    QString message = QObject::tr("Scanning CD. Please Wait ...");
+    OpenBusyPopup(message);
 
-    delete scanner;
+    m_scanThread = new CDScannerThread(this);
+    connect(m_scanThread, SIGNAL(finished()), SLOT(ScanFinished()));
+    m_scanThread->start();
+}
+
+void Ripper::ScanFinished()
+{
+    delete m_scanThread;
+    m_scanThread = NULL;
 
     m_tracks->clear();
 
@@ -727,7 +735,7 @@ void Ripper::startScanCD(void)
     BuildFocusList();
     updateTrackList();
 
-    busy->deleteLater();
+    CloseBusyPopup();
 }
 
 void Ripper::scanCD(void)
@@ -1134,14 +1142,6 @@ void Ripper::switchTitlesAndArtists()
     }
 }
 
-void Ripper::reject()
-{
-    if (!GetMythMainWindow()->IsExitingToMain())
-        startEjectCD();
-
-    Close();
-}
-
 void Ripper::startRipper(void)
 {
     if (m_tracks->size() == 0)
@@ -1186,23 +1186,24 @@ void Ripper::RipComplete(bool result)
 
 void Ripper::startEjectCD()
 {
-    MythBusyDialog  *busy
-        = new MythBusyDialog(tr("Ejecting CD. Please Wait ..."));
-    CDEjectorThread *ejector = new CDEjectorThread(this);
-    busy->start();
-    ejector->start();
+    if (m_ejectThread)
+        return;
 
-    while (!ejector->isFinished())
-    {
-        usleep(500);
-        qApp->processEvents();
-    }
+    QString message = tr("Ejecting CD. Please Wait ...");
 
-    delete ejector;
-    busy->deleteLater();
+    OpenBusyPopup(message);
 
-    if (class LCD * lcd = LCD::Get())
-        lcd->switchToTime();
+    m_ejectThread = new CDEjectorThread(this);
+    connect(m_ejectThread, SIGNAL(finished()), SLOT(EjectFinished()));
+    m_ejectThread->start();
+}
+
+void Ripper::EjectFinished()
+{
+    delete m_ejectThread;
+    m_ejectThread = NULL;
+
+    CloseBusyPopup();
 }
 
 void Ripper::ejectCD()
