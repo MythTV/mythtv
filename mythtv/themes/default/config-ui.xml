@@ -400,5 +400,79 @@
         </button>
 
     </window>
+    <window name="audiosettings">
+        <statetype name="speakerlocation">
+            <position>100,100</position>
+            <state name="frontleft">
+                <textarea name="speakertext" from="basetextarea">
+                    <area>0,0,400,60</area>
+                    <align>allcenter</align>
+                    <multiline>true</multiline>
+                    <value>Front Left</value>
+                </textarea>
+            </state>
+            <state name="center">
+                <textarea name="speakertext" from="basetextarea">
+                    <area>0,0,400,60</area>
+                    <align>allcenter</align>
+                    <multiline>true</multiline>
+                    <value>Center</value>
+                </textarea>
+            </state>
+            <state name="frontright">
+                <textarea name="speakertext" from="basetextarea">
+                    <area>0,0,400,60</area>
+                    <align>allcenter</align>
+                    <multiline>true</multiline>
+                    <value>Front Right</value>
+                </textarea>
+            </state>
+            <state name="leftsurround">
+                <textarea name="speakertext" from="basetextarea">
+                    <area>0,0,400,60</area>
+                    <align>allcenter</align>
+                    <multiline>true</multiline>
+                    <value>Left Surround</value>
+                </textarea>
+            </state>
+            <state name="rightsurround">
+                <textarea name="speakertext" from="basetextarea">
+                    <area>0,0,400,60</area>
+                    <align>allcenter</align>
+                    <multiline>true</multiline>
+                    <value>Right Surround</value>
+                </textarea>
+            </state>
+            <state name="rearleft">
+                <textarea name="speakertext" from="basetextarea">
+                    <area>0,0,400,60</area>
+                    <align>allcenter</align>
+                    <multiline>true</multiline>
+                    <value>Rear left</value>
+                </textarea>
+            </state>
+            <state name="rearright">
+                <textarea name="speakertext" from="basetextarea">
+                    <area>0,0,400,60</area>
+                    <align>allcenter</align>
+                    <multiline>true</multiline>
+                    <value>Rear Right</value>
+                </textarea>
+            </state>
+            <state name="lfe">
+                <textarea name="speakertext" from="basetextarea">
+                    <area>0,0,400,60</area>
+                    <align>allcenter</align>
+                    <multiline>true</multiline>
+                    <value>LFE channel</value>
+                </textarea>
+            </state>
+        </statetype>
+
+        <button name="test" from="basebutton">
+            <position>610,530</position>
+            <value>Test Speakers</value>
+        </button>
+    </window>
 
 </mythuitheme>
