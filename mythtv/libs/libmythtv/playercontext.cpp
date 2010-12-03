@@ -425,9 +425,9 @@ bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
     if (nohardwaredecoders)
         player->DisableHardwareDecoders();
 
-    QString passthru_device = gCoreContext->GetNumSetting("AdvancedAudioSettings", false) &&
-                              gCoreContext->GetNumSetting("PassThruDeviceOverride", false) ?
-                                  gCoreContext->GetSetting("PassThruOutputDevice") : QString::null;
+    QString passthru_device = gCoreContext->GetNumSetting(
+        "PassThruDeviceOverride", false) ?
+        gCoreContext->GetSetting("PassThruOutputDevice") : QString::null;
 
     player->SetPlayerInfo(tv, widget, exact_seeking, this);
     AudioPlayer *audio = player->GetAudio();

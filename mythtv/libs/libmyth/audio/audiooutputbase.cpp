@@ -107,8 +107,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     src_quality  = QUALITY_MEDIUM;
 
     // Handle override of SRC quality settings
-    if (gCoreContext->GetNumSetting("AdvancedAudioSettings", false) &&
-        gCoreContext->GetNumSetting("SRCQualityOverride",    false))
+    if (gCoreContext->GetNumSetting("SRCQualityOverride", false))
     {
         src_quality = gCoreContext->GetNumSetting("SRCQuality", QUALITY_MEDIUM);
         // Extra test to keep backward compatibility with earlier SRC setting
@@ -444,7 +443,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     // Force resampling if we are encoding to AC3 and sr > 48k
     // or if 48k override was checked in settings
     if ((samplerate != 48000 &&
-         gCoreContext->GetNumSetting("AdvancedAudioSettings", false) &&
          gCoreContext->GetNumSetting("Audio48kOverride", false)) ||
         (enc && (samplerate > 48000 || (need_resampler && dest_rate > 48000))))
     {
