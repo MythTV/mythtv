@@ -33,6 +33,7 @@
 #include "programinfo.h"
 #include "channelutil.h"
 #include "storagegroup.h"
+#include "mythsystem.h"
 
 #include "rssparse.h"
 #include "netutils.h"
@@ -1645,12 +1646,14 @@ void MythXML::GetInternetSources( HTTPRequest *pRequest )
     for (QStringList::const_iterator i = Grabbers.begin();
             i != Grabbers.end(); ++i)
     {
-        QProcess scriptCheck;
         QString commandline = GrabberDir + (*i);
-        scriptCheck.setReadChannel(QProcess::StandardOutput);
-        scriptCheck.start(commandline, QStringList() << "-v");
-        scriptCheck.waitForFinished();
+        MythSystem scriptcheck(commandline, QStringList() << "-v",
+                               kMSStdOut|kMSBuffered);
+
+        scriptcheck.Run();
+        scriptcheck.Wait();
         QString result = scriptCheck.readAll();
+
         if (!result.isEmpty() && result.toLower().startsWith("<grabber>"))
             ret += result;
     }

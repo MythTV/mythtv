@@ -12,13 +12,13 @@ using namespace std;
 
 // Qt headers
 #include <QCoreApplication>
+#include <QTextStream>
 #include <QStringList>
 #include <QCursor>
 #include <QLayout>
 #include <QFile>
 #include <QMap>
 #include <QDir>
-#include <QProcess>
 #include <QDateTime>
 
 // MythTV headers
@@ -40,6 +40,7 @@ using namespace std;
 #include "mythdirs.h"
 #include "mythverbose.h"
 #include "libmythupnp/httprequest.h"    // for TestMimeType()
+#include "mythsystem.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"
@@ -555,8 +556,6 @@ void XMLTVConfig::Load(void)
     QString gname, d1, d2, d3;
     SourceUtil::GetListingsLoginData(parent.getSourceID(), gname, d1, d2, d3);
 
-    QProcess find_grabber_proc;
-
     QString loc = "XMLTVConfig::Load: ";
     QString loc_err = "XMLTVConfig::Load, Error: ";
 
@@ -565,42 +564,34 @@ void XMLTVConfig::Load(void)
 
     QStringList args;
     args += "baseline";
-    find_grabber_proc.start("tv_find_grabbers", args);
-    bool ok = find_grabber_proc.waitForStarted(250 /* milliseconds */);
-    if (!ok)
-        VERBOSE(VB_IMPORTANT, loc + "Failed to run tv_find_grabbers");
 
+    MythSystem find_grabber_proc("tv_find_grabbers", args, kMSStdOut|kMSBuffered|kMSRunShell);
+    find_grabber_proc.Run(25);
     VERBOSE(VB_GENERAL,
             loc + "Running 'tv_find_grabbers " + args.join(" ") + "'.");
+    uint status = find_grabber_proc.Wait();
 
-    for (int i = 0; i < 100; ++i)
+    if (status != GENERIC_EXIT_OK)
     {
-        ok = find_grabber_proc.waitForFinished(250);
-        if (ok)
-            break;
+        QTextStream ostream(find_grabber_proc.ReadAll());
+        while (ostream.canReadLine())
+        {
+            QByteArray tmp = ostream.readLine();
+            QString grabber_list(tmp);
+            grabber_list = grabber_list.left(grabber_list.size() - 1);
+            QStringList grabber_split =
+                grabber_list.split("|", QString::SkipEmptyParts);
+            QString grabber_name = grabber_split[1] + " (xmltv)";
+            QFileInfo grabber_file(grabber_split[0]);
+
+            name_list.push_back(grabber_name);
+            prog_list.push_back(grabber_file.fileName());
+            VERBOSE(VB_GENERAL+VB_EXTRA, "Found " + grabber_split[0]);
+        }
+        VERBOSE(VB_GENERAL, loc + "Finished running tv_find_grabbers");
     }
-
-    if (!ok)
-        VERBOSE(VB_IMPORTANT, loc + "We timed out waiting");
-
-    find_grabber_proc.setReadChannel(QProcess::StandardOutput);
-
-    while (find_grabber_proc.canReadLine())
-    {
-        QByteArray tmp = find_grabber_proc.readLine();
-        QString grabber_list(tmp);
-        grabber_list = grabber_list.left(grabber_list.size() - 1);
-        QStringList grabber_split =
-            grabber_list.split("|", QString::SkipEmptyParts);
-        QString grabber_name = grabber_split[1] + " (xmltv)";
-        QFileInfo grabber_file(grabber_split[0]);
-
-        name_list.push_back(grabber_name);
-        prog_list.push_back(grabber_file.fileName());
-        VERBOSE(VB_GENERAL+VB_EXTRA, "Found " + grabber_split[0]);
-    }
-
-    VERBOSE(VB_GENERAL, loc + "Finished running tv_find_grabbers");
+    else
+        VERBOSE(VB_IMPORTANT, loc + "Failed to run tv_find_grabbers");
 
     LoadXMLTVGrabbers(name_list, prog_list);
 

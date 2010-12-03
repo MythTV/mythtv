@@ -11,8 +11,8 @@
 using namespace std;
 
 // Qt headers
+#include <QTextStream>
 #include <QDateTime>
-#include <QProcess>
 #include <QFile>
 #include <QList>
 #include <QMap>
@@ -623,103 +623,56 @@ bool FillData::Run(SourceList &sourcelist)
 
         if (is_grabber_external(xmltv_grabber))
         {
-            QProcess grabber_capabilities_proc;
-            grabber_capabilities_proc.setProcessChannelMode(
-                QProcess::SeparateChannels);
-            grabber_capabilities_proc.start(
-                xmltv_grabber,
-                QStringList("--capabilities"));
-
-            if (grabber_capabilities_proc.waitForStarted(1000))
-            {
-                bool ok = grabber_capabilities_proc.waitForFinished(25*1000);
-
-                if (ok &&
-                    QProcess::NormalExit ==
-                    grabber_capabilities_proc.exitStatus())
-                {
-                    QString capabilities;
-                    grabber_capabilities_proc
-                        .setReadChannel(QProcess::StandardOutput);
-                    while (grabber_capabilities_proc.canReadLine())
-                    {
-                        QString capability
-                            = grabber_capabilities_proc.readLine().simplified();
-                        capabilities += capability + ' ';
-
-                        if (capability == "baseline")
-                            (*it).xmltvgrabber_baseline = true;
-
-                        if (capability == "manualconfig")
-                            (*it).xmltvgrabber_manualconfig = true;
-
-                        if (capability == "cache")
-                            (*it).xmltvgrabber_cache = true;
-
-                        if (capability == "preferredmethod")
-                            hasprefmethod = true;
-                    }
-
-                    VERBOSE(VB_GENERAL, QString("Grabber has capabilities: %1")
-                        .arg(capabilities));
-                }
-                else
-                {
-                    VERBOSE(VB_IMPORTANT, QString("%1  --capabilities failed "
+            MythSystem grabber_capabilities_proc(xmltv_grabber,
+                                                 QStringList("--capabilities"),
+                                                 kMSStdOut|kMSBuffered);
+            grabber_capabilities_proc.Run(25);
+            if (grabber_capabilities_proc.Wait() != GENERIC_EXIT_OK)
+                VERBOSE(VB_IMPORTANT, QString("%1  --capabilities failed "
                         "or we timed out waiting. You may need to upgrade "
                         "your xmltv grabber").arg(xmltv_grabber));
-                }
-            }
             else
             {
-                grabber_capabilities_proc
-                    .setReadChannel(QProcess::StandardOutput);
-                QString error = grabber_capabilities_proc.readLine();
-                VERBOSE(VB_IMPORTANT, QString("Failed to run %1 "
-                        "--capabilities").arg(xmltv_grabber));
+                QTextStream ostream(grabber_capabilities_proc.ReadAll());
+                while (ostream.canReadLine())
+                {
+                    QString capability
+                        = grabber_capabilities_proc.readLine().simplified();
+                    capabilities += capability + ' ';
+
+                    if (capability == "baseline")
+                        (*it).xmltvgrabber_baseline = true;
+
+                    if (capability == "manualconfig")
+                        (*it).xmltvgrabber_manualconfig = true;
+
+                    if (capability == "cache")
+                        (*it).xmltvgrabber_cache = true;
+
+                    if (capability == "preferredmethod")
+                        hasprefmethod = true;
+                }
+                VERBOSE(VB_GENERAL, QString("Grabber has capabilities: %1")
+                        .arg(capabilities));
             }
         }
 
         if (hasprefmethod)
         {
 
-            QProcess grabber_method_proc;
-            grabber_method_proc.setProcessChannelMode(
-                QProcess::SeparateChannels);
-            grabber_method_proc.start(
-                xmltv_grabber,
-                QStringList("--preferredmethod"));
-
-            if (grabber_method_proc.waitForStarted(1000))
-            {
-                bool ok = grabber_method_proc.waitForFinished(15*1000);
-
-                if (ok &&
-                    QProcess::NormalExit == grabber_method_proc.exitStatus())
-                {
-                    grabber_method_proc
-                        .setReadChannel(QProcess::StandardOutput);
-                    (*it).xmltvgrabber_prefmethod =
-                        grabber_method_proc.readLine().simplified();
-                }
-                else
-                {
-                    VERBOSE(VB_IMPORTANT, QString("%1 --preferredmethod failed"
+            MythSystem grabber_method_proc(xmltv_grabber,
+                                           QStringList("--preferredmethod"),
+                                           kMSStdOut|kMSBuffered);
+            grabber_method_proc.Run(15);
+            if (grabber_method_proc.Wait() != GENERIC_EXIT_OK)
+                VERBOSE(VB_IMPORTANT, QString("%1 --preferredmethod failed"
                     " or we timed out waiting. You may need to upgrade your"
                     " xmltv grabber").arg(xmltv_grabber));
-                }
-
-                VERBOSE(VB_GENERAL, QString("Grabber prefers method: %1")
-                                    .arg((*it).xmltvgrabber_prefmethod));
-            }
             else
             {
-                grabber_method_proc
-                    .setReadChannel(QProcess::StandardOutput);
-                QString error = grabber_method_proc.readLine();
-                VERBOSE(VB_IMPORTANT,
-                        QString("Failed to run %1 --preferredmethod")
-                        .arg(xmltv_grabber));
+                QTextStream ostream(grabber_method_proc.ReadAll());
+                (*it).xmltvgrabber_prefmethod =
+                                ostream.readLine().simplified();
             }
         }
 
