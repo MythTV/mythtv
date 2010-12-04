@@ -26,6 +26,10 @@ all: version.cpp subdirs
 config.mak:
 	$(error run configure to create $@)
 
+# Override PWD in case this is run from a makefile at a higher level with
+# make -C mythtv
+PWD := $(shell pwd)
+
 version.cpp:	libs/libmythdb/mythversion.h
 	sh version.sh $(PWD)
 
