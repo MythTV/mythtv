@@ -650,6 +650,8 @@ void MythSystemWindows::Fork(time_t timeout)
         m_child = pi.hProcess;
         SetStatus( GENERIC_EXIT_RUNNING );
 
+        m_timeout = timeout;
+
         VERBOSE(VB_GENERAL, QString("Managed child (Handle: %1) has started! "
                                             "%2%3 command=%4, timeout=%5")
                     .arg((long long)m_child) 
@@ -657,7 +659,6 @@ void MythSystemWindows::Fork(time_t timeout)
                     .arg(GetSetting("RunInBackground") ? "&" : "")
                     .arg(GetLogCmd()) .arg(m_timeout));
 
-        m_timeout = timeout;
         if( timeout )
             m_timeout += time(NULL);
 

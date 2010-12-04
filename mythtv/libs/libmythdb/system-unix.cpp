@@ -635,13 +635,14 @@ void MythSystemUnix::Fork(time_t timeout)
         m_pid = child;
         SetStatus( GENERIC_EXIT_RUNNING );
 
+        m_timeout = timeout;
+
         VERBOSE(VB_GENERAL, QString("Managed child (PID: %1) has started! "
                                             "%2%3 command=%4, timeout=%5")
                     .arg(m_pid) .arg(GetSetting("UseShell") ? "*" : "")
                     .arg(GetSetting("RunInBackground") ? "&" : "")
                     .arg(GetLogCmd()) .arg(m_timeout));
 
-        m_timeout = timeout;
         if( timeout )
             m_timeout += time(NULL);
 
