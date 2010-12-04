@@ -10,7 +10,6 @@
 #include "channelutil.h"
 #include "frequencytables.h"
 #include "listingsources.h"
-#include "mythwidgets.h"
 #include "mythcontext.h"
 #include "mythdb.h"
 #include "mythverbose.h"
