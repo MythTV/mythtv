@@ -1,0 +1,7 @@
+*.a
+*.o
+moc_*.cpp
+*.so
+*.so.*
+*.orig
+*.rej
