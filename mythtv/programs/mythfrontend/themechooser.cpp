@@ -146,6 +146,10 @@ void ThemeChooser::Load(void)
     themes.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
     themes.setSorting(QDir::Name | QDir::IgnoreCase);
 
+    // FIXME: For now, treat git master the same as svn trunk
+    if (MythVersion == "master")
+        MythVersion = "trunk";
+
     if (MythVersion != "trunk")
     {
         MythVersion = myth_binary_version; // Example: 0.25.20101017-1
