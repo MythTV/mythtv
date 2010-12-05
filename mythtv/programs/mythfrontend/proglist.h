@@ -77,7 +77,7 @@ class ProgLister : public ScheduleCommon
 
     void ClearCurrentProgramInfo(void);
     void UpdateDisplay(void);
-    void UpdateDisplay(const ProgramInfo & selected);
+    void UpdateDisplay(const ProgramInfo *selected, int selectedOffset);
     void UpdateButtonList(void);
     void UpdateKeywordInDB(const QString &text, const QString &oldValue);
 

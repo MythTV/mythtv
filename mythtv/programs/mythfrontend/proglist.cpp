@@ -113,7 +113,7 @@ ProgLister::ProgLister(
 
     m_allowEvents(true),
     m_titleSort(false),
-    m_reverseSort(false),
+    m_reverseSort(true),
     m_useGenres(false),
 
     m_schedText(NULL),
@@ -1056,7 +1056,12 @@ void ProgLister::FillViewList(const QString &view)
         m_curView = m_viewList.size() - 1;
 }
 
-typedef binary_function<const ProgramInfo*, const ProgramInfo*, bool> plCompare;
+class plCompare : binary_function<const ProgramInfo*, const ProgramInfo*, bool>
+{
+    public:
+        virtual bool operator()(const ProgramInfo *a, const ProgramInfo *b)
+            = 0;
+};
 
 class plTitleSort : public plCompare
 {
@@ -1363,7 +1368,12 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     ProgramInfo        selected;
     const ProgramInfo *selectedP = (restorePosition) ? GetCurrent() : NULL;
     if (selectedP)
+    {
         selected = *selectedP;
+        selectedP = &selected;
+    }
+    int selectedOffset = 
+        m_progList->GetCurrentPos() - m_progList->GetTopItemPos();
 
     m_progList->Reset();
     m_itemList.clear();
@@ -1415,7 +1425,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
         SortList(GetSortBy(), m_reverseSort);
 
     if (updateDisp)
-        UpdateDisplay(selected);
+        UpdateDisplay(selectedP, selectedOffset);
 }
 
 ProgLister::SortBy ProgLister::GetSortBy(void) const
@@ -1477,19 +1487,37 @@ void ProgLister::UpdateDisplay(void)
     UpdateButtonList();
 }
 
-void ProgLister::UpdateDisplay(const ProgramInfo & selected)
+void ProgLister::UpdateDisplay(const ProgramInfo *selected, int selectedOffset)
 {
     UpdateDisplay();
 
+    if (!selected)
+        return;
+
     // Restore selection
-    for (uint i = 0; i < m_itemList.size(); i++)
+    plCompare *comp;
+    if (!m_titleSort)
+        comp = new plTimeSort();
+    else if (m_type == plPreviouslyRecorded)
+        comp = new plPrevTitleSort();
+    else
+        comp = new plTitleSort();
+
+    int i;
+    for (i = m_itemList.size() - 2; i >= 0; i--)
     {
-        if (selected.IsSameProgramWeakCheck(*(m_itemList[i])))
-        {
-            m_progList->SetItemCurrent(i);
+        bool dobreak;
+        if (m_reverseSort)
+            dobreak = comp->operator()(selected, m_itemList[i]);
+        else
+            dobreak = comp->operator()(m_itemList[i], selected);
+        if (dobreak)
             break;
-        }
     }
+
+    delete comp;
+
+    m_progList->SetItemCurrent(i + 1, i + 1 - selectedOffset);
 }
 
 void ProgLister::UpdateButtonList(void)
