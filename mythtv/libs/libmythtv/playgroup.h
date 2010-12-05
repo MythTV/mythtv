@@ -4,24 +4,17 @@
 #include <QStringList>
 
 #include "settings.h"
-#include "mythwidgets.h"
 
 class ProgramInfo;
 
-class MPUBLIC PlayGroup: public ConfigurationWizard
+class MPUBLIC PlayGroup
 {
- public:
-    PlayGroup(QString _name);
-    QString getName(void) const { return name; }
-
+  public:
     static QStringList GetNames(void);
     static int GetCount(void);
     static QString GetInitialName(const ProgramInfo *pi);
-    static int GetSetting(const QString &name, const QString &field, 
+    static int GetSetting(const QString &name, const QString &field,
                           int defval);
-
- private:
-    QString name;
 };
 
 class MPUBLIC PlayGroupEditor : public QObject, public ConfigurationDialog
