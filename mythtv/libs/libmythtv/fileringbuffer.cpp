@@ -16,6 +16,13 @@
 #include "remotefile.h"
 #include "util.h"
 
+#if HAVE_POSIX_FADVISE < 1
+static int posix_fadvise(int, off_t, off_t, int) { return 0; }
+#define POSIX_FADV_SEQUENTIAL 0
+#define POSIX_FADV_WILLNEED 0
+#define POSIX_FADV_DONTNEED 0
+#endif
+
 #ifndef O_STREAMING
 #define O_STREAMING 0
 #endif
