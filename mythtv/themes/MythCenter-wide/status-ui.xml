@@ -11,7 +11,7 @@
         </textarea>
 
         <shape name="list_background" from="basebackground">
-            <area>30,94,1220,370</area>
+            <area>30,94,1220,390</area>
         </shape>
 
         <buttonlist name="category">
