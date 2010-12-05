@@ -41,6 +41,7 @@ typedef struct
 enum MonitorPalette
 {
     MP_GREY = 1,
+    MP_RGB565 = 3,
     MP_RGB24 = 4
 };
 

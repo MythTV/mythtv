@@ -463,6 +463,13 @@ void Player::updateFrame(const unsigned char* buffer)
                 m_rgba[pos_rgba++] = b;
                 m_rgba[pos_rgba++] = 0xff;
             }
+            else if (m_monitor.palette == MP_RGB565)
+            {
+                m_rgba[pos_rgba++] = r; 
+                m_rgba[pos_rgba++] = b;
+                m_rgba[pos_rgba++] = g;
+                m_rgba[pos_rgba++] = 0xff;
+            }
             else
             {
                 m_rgba[pos_rgba++] = b;
