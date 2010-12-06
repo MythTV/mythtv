@@ -19,6 +19,7 @@ using namespace std;
 #include "bookmarkeditor.h"
 #include "browserdbutil.h"
 #include "mythbrowser.h"
+#include "mythflashplayer.h"
 
 // ---------------------------------------------------
 
@@ -381,7 +382,11 @@ void BookmarkManager::slotBookmarkClicked(MythUIButtonListItem *item)
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-        MythBrowser *mythbrowser = new MythBrowser(mainStack, urls, zoom.toFloat());
+        MythScreenType *mythbrowser;
+        if (urls[0].startsWith("mythflash://"))
+            mythbrowser = new MythFlashPlayer(mainStack, urls);
+        else
+            mythbrowser = new MythBrowser(mainStack, urls, zoom.toFloat());
 
         if (mythbrowser->Create())
         {

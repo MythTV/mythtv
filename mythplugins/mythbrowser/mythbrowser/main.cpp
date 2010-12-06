@@ -15,6 +15,7 @@
 #include "bookmarkmanager.h"
 #include "browserdbutil.h"
 #include "mythbrowser.h"
+#include "mythflashplayer.h"
 
 using namespace std;
 
@@ -30,8 +31,11 @@ static int handleMedia(const QString &url, const QString &, const QString &, con
     float zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.4").toFloat();
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-
-    MythBrowser *mythbrowser = new MythBrowser(mainStack, urls, zoom);
+    MythScreenType *mythbrowser;
+    if (urls[0].startsWith("mythflash://"))
+        mythbrowser = new MythFlashPlayer(mainStack, urls);
+    else
+        mythbrowser = new MythBrowser(mainStack, urls, zoom);
 
     if (mythbrowser->Create())
         mainStack->AddScreen(mythbrowser);
