@@ -697,7 +697,7 @@ void VideoOutput::StopEmbedding(void)
 /**
  * \fn VideoOutput::DrawSlice(VideoFrame*, int, int, int, int)
  * \brief Informs video output of new data for frame,
- *        used for XvMC acceleration.
+ *        used for hardware accelerated decoding.
  */
 void VideoOutput::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 {
