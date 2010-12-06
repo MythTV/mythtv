@@ -38,7 +38,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20101006-1"
+VERSION="0.1.20101206-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -400,7 +400,7 @@ def getThemeFile(theme,file):
 # Returns the path where we can find our fonts
 
 def getFontPathName(fontname):
-    return os.path.join(sharepath, fontname)
+    return os.path.join(sharepath, "fonts", fontname)
 
 #############################################################
 # Creates a file path where the temp files for a video file can be created
