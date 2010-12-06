@@ -14,10 +14,6 @@ extern "C" {
 #include "compat.h"
 #include "mythverbose.h"
 
-#ifdef USING_XVMC
-#include "videoout_xv.h" // for xvmc stuff
-#endif
-
 #define DEBUG_FRAME_LOCKS 0
 
 #define TRY_LOCK_SPINS                 100
@@ -214,8 +210,6 @@ void VideoBuffers::Reset()
     limbo.clear();
     pause.clear();
     displayed.clear();
-    parents.clear();
-    children.clear();
     vbufferMap.clear();
 }
 
@@ -655,21 +649,10 @@ void VideoBuffers::DiscardFrames(bool next_frame_keyframe)
 
     if (!next_frame_keyframe)
     {
-        for (bool change = true; change;)
-        {
-            change = false;
-            frame_queue_t ula(used);
-            frame_queue_t::iterator it = ula.begin();
-            for (; it != ula.end(); ++it)
-            {
-                if (!HasChildren(*it))
-                {
-                    RemoveInheritence(*it);
-                    DiscardFrame(*it);
-                    change = true;
-                }
-            }
-        }
+        frame_queue_t ula(used);
+        frame_queue_t::iterator it = ula.begin();
+        for (; it != ula.end(); ++it)
+            DiscardFrame(*it);
         VERBOSE(VB_PLAYBACK,
                 QString("VideoBuffers::DiscardFrames(%1): %2 -- done")
                 .arg(next_frame_keyframe).arg(GetStatus()));
@@ -681,8 +664,6 @@ void VideoBuffers::DiscardFrames(bool next_frame_keyframe)
     ula.insert(ula.end(), limbo.begin(), limbo.end());
     ula.insert(ula.end(), available.begin(), available.end());
     frame_queue_t::iterator it;
-    for (it = ula.begin(); it != ula.end(); ++it)
-        RemoveInheritence(*it);
 
     // Discard frames
     frame_queue_t discards(used);
@@ -893,209 +874,6 @@ void VideoBuffers::UnlockFrames(vector<const VideoFrame*>& vec,
         UnlockFrame(vec[i], "");
 }
 
-void VideoBuffers::AddInheritence(const VideoFrame *frame)
-{
-    (void)frame;
-#ifdef USING_XVMC
-    QMutexLocker locker(&global_lock);
-
-    frame_map_t::iterator it = parents.find(frame);
-    if (it == parents.end())
-    {
-        // find "parents"...
-        frame_queue_t new_parents;
-        VideoFrame *past = PastFrame(frame);
-        if (past == frame)
-            VERBOSE(VB_IMPORTANT, QString("AddInheritence(%1) Error, past=frame")
-                    .arg(DebugString(frame)));
-        else if (past)
-        {
-            bool in_correct_buffer =
-                used.contains(past) || displayed.contains(past) ||
-                limbo.contains(past) || pause.contains(past);
-            if (in_correct_buffer)
-                new_parents.push_back(past);
-            else
-                VERBOSE(VB_IMPORTANT, QString("AddInheritence past %1 NOT "
-                                              "in used or in done. %2")
-                        .arg(DebugString(past)).arg(GetStatus()));
-        }
-
-        VideoFrame *future = FutureFrame(frame);
-        if (future == frame)
-            VERBOSE(VB_IMPORTANT, QString("AddInheritence(%1) Error, future=frame")
-                    .arg(DebugString(frame)));
-        else if (future)
-        {
-            if (used.contains(future) || limbo.contains(future))
-                new_parents.push_back(future);
-            else
-                VERBOSE(VB_IMPORTANT, QString("AddInheritence future %1 NOT "
-                                              "in used or in limbo. %2")
-                        .arg(DebugString(future)).arg(GetStatus()));
-        }
-
-        parents[frame] = new_parents;
-        // add self as "child"
-        frame_queue_t::iterator it = new_parents.begin();
-        for (; it != new_parents.end(); ++it)
-            children[*it].push_back((VideoFrame*)frame);
-    }
-#endif // USING_XVMC
-}
-
-void VideoBuffers::RemoveInheritence(const VideoFrame *frame)
-{
-    QMutexLocker locker(&global_lock);
-
-    frame_map_t::iterator it = parents.find(frame);
-    if (it == parents.end())
-        return;
-
-    frame_queue_t new_parents;
-    frame_queue_t &p = it->second;
-    for (frame_queue_t::iterator pit = p.begin(); pit != p.end(); ++pit)
-    {
-        frame_map_t::iterator cit = children.find(*pit);
-        if (cit != children.end())
-        {
-            frame_queue_t::iterator fit = cit->second.find((VideoFrame*)frame);
-            if (fit != cit->second.end())
-                cit->second.erase(fit);
-            else
-                new_parents.push_back(*pit);
-        }
-    }
-
-    if (new_parents.empty())
-        parents.erase(it);
-    else
-    {
-        parents[frame] = new_parents;
-        VERBOSE(VB_IMPORTANT, QString("RemoveInheritenc:%1 parents.size() = ")
-                .arg(DebugString(frame)).arg(parents.size()));
-        frame_queue_t::iterator pit = new_parents.begin();
-        for (int i=0; pit != new_parents.end() && i<8; (++pit), (++i))
-            VERBOSE(VB_IMPORTANT, QString("Parent #%1: %2")
-                    .arg(i).arg(DebugString(*pit)));
-    }
-}
-
-frame_queue_t VideoBuffers::Children(const VideoFrame *frame)
-{
-    QMutexLocker locker(&global_lock);
-
-    frame_queue_t c;
-    frame_map_t::iterator it = children.find(frame);
-    if (it != children.end())
-        c = it->second;
-    return c;
-}
-
-bool VideoBuffers::HasChildren(const VideoFrame *frame)
-{
-    QMutexLocker locker(&global_lock);
-
-    frame_map_t::iterator it = children.find(frame);
-    if (it != children.end())
-        return !(it->second.empty());
-    return false;
-}
-
-#ifdef USING_XVMC
-
-inline struct xvmc_pix_fmt *GetRender(VideoFrame *frame)
-{
-    if (frame)
-        return (struct xvmc_pix_fmt*) frame->buf;
-    else
-        return NULL;
-}
-
-inline const struct xvmc_pix_fmt *GetRender(const VideoFrame *frame)
-{
-    if (frame)
-        return (const struct xvmc_pix_fmt*) frame->buf;
-    else
-        return NULL;
-}
-
-VideoFrame* VideoBuffers::PastFrame(const VideoFrame *frame)
-{
-    LockFrame(frame, "PastFrame");
-    const struct xvmc_pix_fmt* r = GetRender(frame);
-    VideoFrame* f = NULL;
-    if (r)
-        f = xvmc_surf_to_frame[r->p_past_surface];
-    UnlockFrame(frame, "PastFrame");
-    return f;
-}
-
-VideoFrame* VideoBuffers::FutureFrame(const VideoFrame *frame)
-{
-    LockFrame(frame, "FutureFrame");
-    const struct xvmc_pix_fmt* r = GetRender(frame);
-    VideoFrame* f = NULL;
-    if (r)
-        f = xvmc_surf_to_frame[r->p_future_surface];
-    UnlockFrame(frame, "FutureFrame");
-    return f;
-}
-
-VideoFrame* VideoBuffers::GetOSDFrame(const VideoFrame *frame)
-{
-    LockFrame(frame, "GetOSDFrame");
-    const struct xvmc_pix_fmt* r = GetRender(frame);
-    VideoFrame* f = NULL;
-    if (r)
-        f = (VideoFrame*) (r->p_osd_target_surface_render);
-
-    QString dbg_str("GetOSDFrame ");
-#if DEBUG_FRAME_LOCKS
-    if (f)
-        dbg_str.append(DebugString(f, true));
-#endif
-    UnlockFrame(frame, dbg_str.toLocal8Bit().constData());
-
-    return f;
-}
-
-void VideoBuffers::SetOSDFrame(VideoFrame *frame, VideoFrame *osd)
-{
-    if (frame == osd)
-    {
-        VERBOSE(VB_IMPORTANT, QString("SetOSDFrame() -- frame==osd %1")
-                .arg(GetStatus()));
-        return;
-    }
-
-    LockFrame(frame, "SetOSDFrame");
-    struct xvmc_pix_fmt* r = GetRender(frame);
-    if (r)
-    {
-        QMutexLocker locker(&global_lock);
-
-        VideoFrame* old_osd = (VideoFrame*) r->p_osd_target_surface_render;
-        if (old_osd)
-            xvmc_osd_parent[old_osd] = NULL;
-
-        r->p_osd_target_surface_render = osd;
-
-        if (osd)
-            xvmc_osd_parent[osd] = frame;
-    }
-
-    UnlockFrame(frame, "SetOSDFrame");
-}
-
-VideoFrame* VideoBuffers::GetOSDParent(const VideoFrame *osd)
-{
-    QMutexLocker locker(&global_lock);
-    return xvmc_osd_parent[osd];
-}
-
-#endif
-
 bool VideoBuffers::CreateBuffers(VideoFrameType type, int width, int height)
 {
     vector<unsigned char*> bufs;
@@ -1174,84 +952,6 @@ bool VideoBuffers::CreateBuffer(int width, int height, uint num, void* data,
     return true;
 }
 
-#ifdef USING_XVMC
-bool VideoBuffers::CreateBuffers(int width, int height,
-                                 MythXDisplay *disp,
-                                 void *p_xvmc_ctx,
-                                 void *p_xvmc_surf_info,
-                                 vector<void*> surfs)
-{
-    XvMCContext &xvmc_ctx           = *((XvMCContext*) p_xvmc_ctx);
-    XvMCSurfaceInfo &xvmc_surf_info = *((XvMCSurfaceInfo*) p_xvmc_surf_info);
-
-    static unsigned char *ffmpeg_vld_hack = (unsigned char*)
-        "avlib should not use this private data in XvMC-VLD mode.";
-
-    if (surfs.size()>allocSize())
-    {
-        VERBOSE(VB_PLAYBACK,
-                QString("Allocated %1 XvMC surfaces, minimum was %2 surfaces")
-                .arg(surfs.size()).arg(allocSize()));
-
-        Reset();
-        uint increment = surfs.size() - allocSize();
-
-        Init(surfs.size(),
-             false /* create an extra frame for pause? */,
-             needfreeframes,
-             needprebufferframes_normal + increment - 1,
-             needprebufferframes_small,
-             keepprebufferframes + 1);
-    }
-
-    for (uint i = 0; i < allocSize(); i++)
-    {
-        xvmc_vo_surf_t *surf    = (xvmc_vo_surf_t*) surfs[i];
-        struct xvmc_pix_fmt *render = new struct xvmc_pix_fmt;
-        allocated_structs.push_back((unsigned char*)render);
-        memset(render, 0, sizeof(struct xvmc_pix_fmt));
-
-        // constants
-        render->xvmc_id         = AV_XVMC_ID;
-        render->state           = 0;
-
-        // from videoout_xv
-        render->disp            = disp->GetDisplay();
-        render->ctx             = &xvmc_ctx;
-
-        // from xvmv block and surface arrays
-        render->p_surface       = &surf->surface;
-
-        render->allocated_data_blocks = surf->blocks.num_blocks;
-        render->allocated_mv_blocks   = surf->macro_blocks.num_blocks;
-
-        init(&buffers[i],
-             FMT_XVMC_IDCT_MPEG2, (unsigned char*) render,
-             width, height, sizeof(XvMCSurface));
-
-        buffers[i].priv[0]      = ffmpeg_vld_hack;
-        buffers[i].priv[1]      = ffmpeg_vld_hack;
-
-        if (surf->blocks.blocks)
-        {
-            render->data_blocks = surf->blocks.blocks;
-            buffers[i].priv[0]  = (unsigned char*) &(surf->blocks);
-
-            render->mv_blocks   = surf->macro_blocks.macro_blocks;
-            buffers[i].priv[1]  = (unsigned char*) &(surf->macro_blocks);
-        }
-
-        // from surface info
-        render->idct = (xvmc_surf_info.mc_type & XVMC_IDCT) == XVMC_IDCT;
-        render->unsigned_intra  = (xvmc_surf_info.flags &
-                                  XVMC_INTRA_UNSIGNED) == XVMC_INTRA_UNSIGNED;
-
-        xvmc_surf_to_frame[render->p_surface] = &buffers[i];
-    }
-    return true;
-}
-#endif
-
 void VideoBuffers::DeleteBuffers()
 {
     next_dbg_str = 0;
@@ -1273,9 +973,6 @@ void VideoBuffers::DeleteBuffers()
     for (uint i = 0; i < allocated_arrays.size(); i++)
         av_free(allocated_arrays[i]);
     allocated_arrays.clear();
-#ifdef USING_XVMC
-    xvmc_surf_to_frame.clear();
-#endif
 }
 
 static unsigned long long to_bitmap(const frame_queue_t& list);

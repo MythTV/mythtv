@@ -5090,7 +5090,6 @@ bool TV::CreatePIP(PlayerContext *ctx, const ProgramInfo *info)
         return false;
     }
 
-    /* TODO implement PIP solution for Xvmc playback */
     if (!IsPIPSupported(mctx))
     {
         VERBOSE(VB_IMPORTANT, LOC + "PiP not supported by video method.");

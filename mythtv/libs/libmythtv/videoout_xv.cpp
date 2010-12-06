@@ -1362,15 +1362,7 @@ void VideoOutputXv::DiscardFrame(VideoFrame *frame)
     if (!frame)
         return;
 
-    if (vbuffers.HasChildren(frame))
-    {
-        vbuffers.safeEnqueue(kVideoBuffer_displayed, frame);
-    }
-    else
-    {
-        vbuffers.RemoveInheritence(frame);
-        vbuffers.DiscardFrame(frame);
-    }
+    vbuffers.DiscardFrame(frame);
 }
 
 void VideoOutputXv::ClearAfterSeek(void)

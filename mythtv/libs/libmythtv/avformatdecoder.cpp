@@ -4018,54 +4018,6 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             continue;
         }
 
-        if (ringBuffer->IsDVD() &&
-            curstream->codec->codec_type == CODEC_TYPE_VIDEO)
-        {
-#ifdef USING_XVMC
-            if (!private_dec)
-            {
-                int current_width = curstream->codec->width;
-                int video_width = m_parent->GetVideoSize().width();
-                if (dvd_xvmc_enabled && m_parent && m_parent->getVideoOutput())
-                {
-                    bool dvd_xvmc_active = false;
-                    if (codec_is_xvmc(video_codec_id))
-                    {
-                        dvd_xvmc_active = true;
-                    }
-
-                    bool indiscmenu   = ringBuffer->IsInDiscMenuOrStillFrame();
-                    if ((indiscmenu && dvd_xvmc_active) ||
-                        ((!indiscmenu && !dvd_xvmc_active)))
-                    {
-                        VERBOSE(VB_PLAYBACK, LOC + QString("DVD Codec Change "
-                                    "indiscmenu %1 dvd_xvmc_active %2")
-                                .arg(indiscmenu).arg(dvd_xvmc_active));
-                        dvd_video_codec_changed = true;
-                    }
-                }
-
-                if ((video_width > 0) && dvd_video_codec_changed)
-                {
-                    VERBOSE(VB_PLAYBACK, LOC +
-                            QString("DVD Stream/Codec Change "
-                                    "video_width %1 current_width %2 "
-                                    "dvd_video_codec_changed %3")
-                            .arg(video_width).arg(current_width)
-                            .arg(dvd_video_codec_changed));
-                    av_free_packet(pkt);
-                    if (current_width > 0) {
-                        CloseCodecs();
-                        ScanStreams(false);
-                        allowedquit = true;
-                        dvd_video_codec_changed = false;
-                    }
-                    continue;
-                }
-            }
-#endif //USING_XVMC
-        }
-
         enum CodecType codec_type = curstream->codec->codec_type;
 
         if (storevideoframes && codec_type == CODEC_TYPE_VIDEO)
