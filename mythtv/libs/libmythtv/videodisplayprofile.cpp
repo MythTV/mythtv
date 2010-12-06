@@ -638,8 +638,6 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
     {
         dec_name["ffmpeg"]   = QObject::tr("Standard");
         dec_name["libmpeg2"] = QObject::tr("libmpeg2");
-        dec_name["xvmc"]     = QObject::tr("Standard XvMC");
-        dec_name["xvmc-vld"] = QObject::tr("VIA XvMC");
         dec_name["macaccel"] = QObject::tr("Mac hardware acceleration");
         dec_name["vdpau"]    = QObject::tr("NVidia VDPAU acceleration");
     }
@@ -670,16 +668,6 @@ QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
         msg +=  QObject::tr(
             "libmpeg2 is slower on almost all processors than ffmpeg "
             "and breaks caption decoding. Use at your own risk!");
-
-    if (decoder == "xvmc")
-        msg += QObject::tr(
-            "Standard XvMC will use XvMC API 1.0 to "
-            "play back video; this is fast, but does not "
-            "work well with HDTV sized frames.");
-
-    if (decoder == "xvmc-vld")
-        msg += QObject::tr("VIA XvMC will use the VIA VLD XvMC extension.");
-
 
     if (decoder == "macaccel")
         msg += QObject::tr(
@@ -1028,40 +1016,8 @@ void VideoDisplayProfile::CreateOldProfiles(const QString &hostname)
                   "ffmpeg", 1, true, "quartz-blit", "softblend", true,
                   "linearblend", "linearblend", "");
 
-    (void) QObject::tr("CPU+", "Sample: Hardware assist HD only");
     DeleteProfileGroup("CPU+", hostname);
-    groupid = CreateProfileGroup("CPU+", hostname);
-    CreateProfile(groupid, 1, "<=", 720, 576, ">", 0, 0,
-                  "ffmpeg", 1, true, "xv-blit", "softblend", true,
-                  "bobdeint", "linearblend", "");
-    CreateProfile(groupid, 2, "<=", 1280, 720, ">", 720, 576,
-                  "xvmc", 1, true, "xvmc-blit", "opengl", true,
-                  "bobdeint", "onefield", "");
-    CreateProfile(groupid, 3, "<=", 1280, 720, ">", 720, 576,
-                  "libmpeg2", 1, true, "xv-blit", "softblend", true,
-                  "bobdeint", "onefield", "");
-    CreateProfile(groupid, 4, ">", 0, 0, "", 0, 0,
-                  "xvmc", 1, true, "xvmc-blit", "ia44blend", false,
-                  "bobdeint", "onefield", "");
-    CreateProfile(groupid, 5, ">", 0, 0, "", 0, 0,
-                  "libmpeg2", 1, true, "xv-blit", "chromakey", false,
-                  "bobdeint", "onefield", "");
-
-    (void) QObject::tr("CPU--", "Sample: Hardware assist all");
     DeleteProfileGroup("CPU--", hostname);
-    groupid = CreateProfileGroup("CPU--", hostname);
-    CreateProfile(groupid, 1, "<=", 720, 576, ">", 0, 0,
-                  "xvmc", 1, true, "xvmc-blit", "ia44blend", false,
-                  "bobdeint", "onefield", "");
-    CreateProfile(groupid, 2, "<=", 1280, 720, ">", 720, 576,
-                  "xvmc", 1, true, "xvmc-blit", "ia44blend", false,
-                  "bobdeint", "onefield", "");
-    CreateProfile(groupid, 3, ">", 0, 0, "", 0, 0,
-                  "xvmc", 1, true, "xvmc-blit", "ia44blend", false,
-                  "bobdeint", "onefield", "");
-    CreateProfile(groupid, 4, ">", 0, 0, "", 0, 0,
-                  "libmpeg2", 1, true, "xv-blit", "chromakey", false,
-                  "none", "none", "");
 }
 
 void VideoDisplayProfile::CreateNewProfiles(const QString &hostname)
@@ -1196,12 +1152,6 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
             "This is the standard video renderer for X11 systems. It uses "
             "XVideo hardware assist for scaling, color conversion. If the "
             "hardware offers picture controls the renderer supports them.");
-
-    if (renderer == "xvmc-blit")
-        msg = QObject::tr(
-            "This is the standard video renderer for XvMC decoders. It uses "
-            "XVideo hardware assist for scaling, color conversion and "
-            "when available offers XVideo picture controls.");
 
     if (renderer == "directfb")
         msg = QObject::tr(
@@ -1403,8 +1353,7 @@ QString VideoDisplayProfile::GetOSDHelp(const QString &osd)
         msg = QObject::tr(
             "Render the OSD using the XVideo chromakey feature."
             "This renderer does not alpha blend. But it is the fastest "
-            "OSD renderer; and is particularly efficient compared to the "
-            "ia44blend OSD renderer for XvMC.") + "\n" +
+            "OSD renderer for XVideo.") + "\n" +
             QObject::tr(
                 "Note: nVidia hardware after the 5xxx series does not "
                 "have XVideo chromakey support.");
@@ -1414,17 +1363,6 @@ QString VideoDisplayProfile::GetOSDHelp(const QString &osd)
     {
         msg = QObject::tr(
             "Software OSD rendering uses your CPU to alpha blend the OSD.");
-    }
-
-    if (osd == "ia44blend")
-    {
-        msg = QObject::tr(
-            "Uses hardware support for 16 color alpha-blend surfaces for "
-            "rendering the OSD. Because of the limited color range, MythTV "
-            "renders the OSD in 16 level grayscale.") + "\n" +
-            QObject::tr(
-                "Note: Not recommended for nVidia or Intel chipsets. This "
-                "removes two of the limited XvMC buffers from decoding duty.");
     }
 
     if (osd.contains("opengl"))

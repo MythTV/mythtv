@@ -98,7 +98,7 @@ bool GalleryUtil::IsImage(const QString &filePath)
     QStringList::const_iterator it = filt.begin();
     for (; it != filt.end(); ++it)
     {
-        if ((*it).toLower().contains(fi.suffix()))
+        if ((*it).contains(fi.suffix().toLower()))
             return true;
     }
 
@@ -115,7 +115,7 @@ bool GalleryUtil::IsMovie(const QString &filePath)
     QStringList::const_iterator it = filt.begin();
     for (; it != filt.end(); ++it)
     {
-        if ((*it).toLower().contains(fi.suffix()))
+        if ((*it).contains(fi.suffix().toLower()))
             return true;
     }
 

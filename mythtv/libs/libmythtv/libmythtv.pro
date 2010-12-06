@@ -324,18 +324,10 @@ using_frontend {
 
     using_x11:DEFINES += USING_X11
 
-    using_xv:HEADERS += videoout_xv.h   XvMCSurfaceTypes.h
-    using_xv:HEADERS += osdxvmc.h       osdchromakey.h
-    using_xv:HEADERS += util-xvmc.h     util-xv.h
-    using_xv:SOURCES += videoout_xv.cpp XvMCSurfaceTypes.cpp
-    using_xv:SOURCES += osdxvmc.cpp     osdchromakey.cpp
-    using_xv:SOURCES += util-xvmc.cpp   util-xv.cpp
+    using_xv:HEADERS += videoout_xv.h   util-xv.h   osdchromakey.h
+    using_xv:SOURCES += videoout_xv.cpp util-xv.cpp osdchromakey.cpp
 
     using_xv:DEFINES += USING_XV
-
-    using_xvmc:DEFINES += USING_XVMC
-    using_xvmcw:DEFINES += USING_XVMCW
-    using_xvmc_vld:DEFINES += USING_XVMC_VLD
 
     using_vdpau {
         DEFINES += USING_VDPAU

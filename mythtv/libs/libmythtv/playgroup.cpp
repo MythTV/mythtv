@@ -1,13 +1,24 @@
 #include "mythdb.h"
 #include "playgroup.h"
 #include "programinfo.h"
+#include "mythwidgets.h"
+
+class PlayGroupConfig: public ConfigurationWizard
+{
+ public:
+    PlayGroupConfig(QString _name);
+    QString getName(void) const { return name; }
+
+ private:
+    QString name;
+};
 
 // A parameter associated with the profile itself
 class PlayGroupDBStorage : public SimpleDBStorage
 {
   protected:
     PlayGroupDBStorage(Setting         *_setting,
-                       const PlayGroup &_parent,
+                       const PlayGroupConfig &_parent,
                        QString          _name) :
         SimpleDBStorage(_setting, "playgroup", _name), parent(_parent)
     {
@@ -16,7 +27,7 @@ class PlayGroupDBStorage : public SimpleDBStorage
 
     virtual QString GetWhereClause(MSqlBindings &bindings) const;
 
-    const PlayGroup &parent;
+    const PlayGroupConfig &parent;
 };
 
 QString PlayGroupDBStorage::GetWhereClause(MSqlBindings &bindings) const
@@ -32,7 +43,7 @@ QString PlayGroupDBStorage::GetWhereClause(MSqlBindings &bindings) const
 class TitleMatch : public LineEditSetting, public PlayGroupDBStorage
 {
   public:
-    TitleMatch(const PlayGroup& _parent):
+    TitleMatch(const PlayGroupConfig& _parent):
         LineEditSetting(this), PlayGroupDBStorage(this, _parent, "titlematch")
     {
         setLabel(QObject::tr("Title match (regex)"));
@@ -47,7 +58,7 @@ class TitleMatch : public LineEditSetting, public PlayGroupDBStorage
 class SkipAhead : public SpinBoxSetting, public PlayGroupDBStorage
 {
   public:
-    SkipAhead(const PlayGroup& _parent):
+    SkipAhead(const PlayGroupConfig& _parent):
         SpinBoxSetting(this, 0, 600, 5, true,
                        "(" + QObject::tr("default") + ")"),
         PlayGroupDBStorage(this, _parent, "skipahead") {
@@ -60,7 +71,7 @@ class SkipAhead : public SpinBoxSetting, public PlayGroupDBStorage
 class SkipBack : public SpinBoxSetting, public PlayGroupDBStorage
 {
   public:
-    SkipBack(const PlayGroup& _parent):
+    SkipBack(const PlayGroupConfig& _parent):
         SpinBoxSetting(this, 0, 600, 5, true,
                        "(" + QObject::tr("default") + ")"),
         PlayGroupDBStorage(this, _parent, "skipback")
@@ -74,7 +85,7 @@ class SkipBack : public SpinBoxSetting, public PlayGroupDBStorage
 class JumpMinutes : public SpinBoxSetting, public PlayGroupDBStorage
 {
   public:
-    JumpMinutes(const PlayGroup& _parent):
+    JumpMinutes(const PlayGroupConfig& _parent):
         SpinBoxSetting(this, 0, 30, 10, true,
                        "(" + QObject::tr("default") + ")"),
         PlayGroupDBStorage(this, _parent, "jump")
@@ -88,7 +99,7 @@ class JumpMinutes : public SpinBoxSetting, public PlayGroupDBStorage
 class TimeStretch : public SpinBoxSetting, public PlayGroupDBStorage
 {
   public:
-    TimeStretch(const PlayGroup& _parent):
+    TimeStretch(const PlayGroupConfig& _parent):
         SpinBoxSetting(this, 45, 200, 5, false,
                        "(" + QObject::tr("default") + ")"),
         PlayGroupDBStorage(this, _parent, "timestretch")
@@ -120,8 +131,7 @@ class TimeStretch : public SpinBoxSetting, public PlayGroupDBStorage
     }
 };
 
-PlayGroup::PlayGroup(QString _name)
-    : name(_name)
+PlayGroupConfig::PlayGroupConfig(QString _name) : name(_name)
 {
     ConfigurationGroup* cgroup = new VerticalConfigurationGroup(false);
     cgroup->setLabel(getName() + " " + QObject::tr("Group", "Play Group"));
@@ -143,7 +153,7 @@ int PlayGroup::GetCount(void)
     query.prepare("SELECT COUNT(name) FROM playgroup "
                   "WHERE name <> 'Default' ORDER BY name;");
     if (!query.exec())
-        MythDB::DBError("PlayGroup::GetCount()", query);
+        MythDB::DBError("PlayGroupConfig::GetCount()", query);
     else if (query.next())
         names = query.value(0).toInt();
 
@@ -158,7 +168,7 @@ QStringList PlayGroup::GetNames(void)
     query.prepare("SELECT name FROM playgroup "
                   "WHERE name <> 'Default' ORDER BY name;");
     if (!query.exec())
-        MythDB::DBError("PlayGroup::GetNames()", query);
+        MythDB::DBError("PlayGroupConfig::GetNames()", query);
     else
     {
         while (query.next())
@@ -203,7 +213,7 @@ int PlayGroup::GetSetting(const QString &name, const QString &field,
                   .arg(field).arg(field));
     query.bindValue(":NAME", name);
     if (!query.exec())
-        MythDB::DBError("PlayGroup::GetSetting", query);
+        MythDB::DBError("PlayGroupConfig::GetSetting", query);
     else if (query.next())
         res = query.value(1).toInt();
 
@@ -225,7 +235,7 @@ void PlayGroupEditor::open(QString name)
     if (name == "__CREATE_NEW_GROUP__")
     {
         name = "";
-        bool ok = MythPopupBox::showGetTextPopup(GetMythMainWindow(), 
+        bool ok = MythPopupBox::showGetTextPopup(GetMythMainWindow(),
             tr("Create New Playback Group"),
             tr("Enter group name or press SELECT to enter text via the "
                "On Screen Keyboard"), name);
@@ -241,7 +251,7 @@ void PlayGroupEditor::open(QString name)
             created = true;
     }
 
-    PlayGroup group(name);
+    PlayGroupConfig group(name);
     if (group.exec() == QDialog::Accepted || !created)
         lastValue = name;
     else

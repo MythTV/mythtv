@@ -14,10 +14,6 @@ using namespace std;
 #include <QString>
 #include <QWaitCondition>
 
-#ifdef USING_XVMC
-#include <qwindowdefs.h>
-#endif // USING_XVMC
-
 #include "mythdeque.h"
 
 #ifdef USING_X11
@@ -26,12 +22,9 @@ class MythXDisplay;
 
 typedef MythDeque<VideoFrame*>                frame_queue_t;
 typedef vector<VideoFrame>                    frame_vector_t;
-typedef map<const VideoFrame*, frame_queue_t> frame_map_t;
-typedef map<const void*, VideoFrame*>         surf_to_frame_map_t;
 typedef map<const unsigned char*, void*>      buffer_map_t;
 typedef map<const VideoFrame*, uint>          vbuffer_map_t;
 typedef map<const VideoFrame*, QMutex*>       frame_lock_map_t;
-typedef map<const VideoFrame*, VideoFrame*>   frame_to_frame_map_t;
 typedef vector<unsigned char*>                uchar_vector_t;
 
 
@@ -136,26 +129,8 @@ class VideoBuffers
     void UnlockFrame(const VideoFrame *, const char* owner);
     void UnlockFrames(vector<const VideoFrame*>&, const char* owner);
 
-    void AddInheritence(const VideoFrame *frame);
-    void RemoveInheritence(const VideoFrame *frame);
-    frame_queue_t Children(const VideoFrame *frame);
-    bool HasChildren(const VideoFrame *frame);
-
     void Clear(uint i);
     void Clear(void);
-
-#ifdef USING_XVMC
-    VideoFrame* PastFrame(const VideoFrame *frame);
-    VideoFrame* FutureFrame(const VideoFrame *frame);
-    VideoFrame* GetOSDFrame(const VideoFrame *frame);
-    void SetOSDFrame(VideoFrame *frame, VideoFrame *osd);
-    VideoFrame* GetOSDParent(const VideoFrame *osd);
-    bool CreateBuffers(int width, int height,
-                       MythXDisplay *disp,
-                       void* xvmc_ctx,
-                       void* xvmc_surf_info,
-                       vector<void*> surfs);
-#endif
 
     bool CreateBuffer(int width, int height, uint num, void *data,
                       VideoFrameType fmt);
@@ -172,8 +147,6 @@ class VideoBuffers
     frame_vector_t         buffers;
     uchar_vector_t         allocated_structs; // for DeleteBuffers
     uchar_vector_t         allocated_arrays;  // for DeleteBuffers
-    frame_map_t            parents;    // prev & future frames
-    frame_map_t            children;   // frames that depend on a parent frame
 
     uint                   numbuffers;
     uint                   needfreeframes;
@@ -191,11 +164,6 @@ class VideoBuffers
     bool                   use_frame_locks;
     QMutex                 frame_lock;
     frame_lock_map_t       frame_locks;
-
-#ifdef USING_XVMC
-    surf_to_frame_map_t    xvmc_surf_to_frame;
-    frame_to_frame_map_t   xvmc_osd_parent;
-#endif
 };
 
 #endif // __VIDEOBUFFERS_H__

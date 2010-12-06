@@ -960,7 +960,6 @@ void VideoOutputVDPAU::CheckFrameStates(void)
             }
             else
             {
-                vbuffers.RemoveInheritence(frame);
                 vbuffers.safeEnqueue(kVideoBuffer_avail, frame);
                 vbuffers.end_lock();
                 it = vbuffers.begin_lock(kVideoBuffer_displayed);

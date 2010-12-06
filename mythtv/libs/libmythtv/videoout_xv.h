@@ -19,36 +19,15 @@ extern "C" {
 
 class MythPlayer;
 class ChromaKeyOSD;
-class XvMCBufferSettings;
-class XvMCSurfaceTypes;
-class XvMCTextures;
-class XvMCOSD;
-
-#ifdef USING_XVMC
-#   include "XvMCSurfaceTypes.h"
-#   include "libavcodec/xvmc.h"
-    typedef struct
-    {
-        XvMCSurface         surface;
-        XvMCBlockArray      blocks;
-        XvMCMacroBlockArray macro_blocks;
-    } xvmc_vo_surf_t;
-#else // if !USING_XVMC
-    typedef int xvmc_vo_surf_t;
-    typedef int XvMCSurfaceInfo;
-    struct XvMCContext;
-#endif // !USING_XVMC
 
 typedef enum VideoOutputSubType
 {
     XVUnknown = 0, Xlib, XShm, XVideo,
-    XVideoMC, XVideoIDCT, XVideoVLD, 
 } VOSType;
 
 class VideoOutputXv : public VideoOutput
 {
     friend class ChromaKeyOSD;
-    friend class XvMCOSD;
   public:
     static void GetRenderOptions(render_opts &opts, QStringList &cpudeints);
     VideoOutputXv();
@@ -68,7 +47,6 @@ class VideoOutputXv : public VideoOutput
                       FrameScanType scan);
 
     void PrepareFrame(VideoFrame*, FrameScanType, OSD *osd);
-    void DrawSlice(VideoFrame*, int x, int y, int w, int h);
     void Show(FrameScanType);
 
     void ClearAfterSeek(void);
@@ -95,36 +73,21 @@ class VideoOutputXv : public VideoOutput
         { return XVideo == VideoOutputSubType(); }
     virtual bool IsPBPSupported(void) const
         { return XVideo == VideoOutputSubType(); }
-    virtual bool NeedExtraAudioDecode(void) const
-        { return XVideoMC <= VideoOutputSubType(); }
-    virtual bool hasHWAcceleration(void) const
-        { return XVideoMC <= VideoOutputSubType(); }
-
-    void CheckFrameStates(void);
+    virtual bool NeedExtraAudioDecode(void) const { return false; }
+    virtual bool hasHWAcceleration(void) const    { return false; }
 
     virtual QRect GetPIPRect(PIPLocation  location,
                              MythPlayer  *pipplayer = NULL,
                              bool         do_pixel_adj = true) const;
 
-    static MythCodecID GetBestSupportedCodec(uint width, uint height,
-                                             uint osd_width, uint osd_height,
-                                             uint stream_type, int xvmc_chroma,
-                                             bool test_surface, bool force_xv);
+    static MythCodecID GetBestSupportedCodec(uint stream_type);
 
     static int GrabSuitableXvPort(MythXDisplay* disp, Window root,
                                   MythCodecID type,
                                   uint width, uint height,
                                   bool &xvsetdefaults,
-                                  int xvmc_chroma = 0,
-                                  XvMCSurfaceInfo* si = NULL,
                                   QString *adaptor_name = NULL);
     static void UngrabXvPort(MythXDisplay* disp, int port);
-
-    static XvMCContext* CreateXvMCContext(MythXDisplay* disp, int port,
-                                          int surf_type,
-                                          int width, int height);
-    static void DeleteXvMCContext(MythXDisplay* disp, XvMCContext*& ctx);
-
 
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
@@ -137,56 +100,34 @@ class VideoOutputXv : public VideoOutput
     VideoFrame *GetNextFreeFrame(bool allow_unsafe);
     void DiscardFrame(VideoFrame*);
     void DiscardFrames(bool next_frame_keyframe);
-    void DoneDisplayingFrame(VideoFrame *frame);
 
-    void ProcessFrameXvMC(VideoFrame *frame, OSD *osd);
     void ProcessFrameMem(VideoFrame *frame, OSD *osd,
                          FilterChain *filterList,
                          const PIPMap &pipPlayers,
                          FrameScanType scan);
 
-    void PrepareFrameXvMC(VideoFrame *, FrameScanType);
     void PrepareFrameXv(VideoFrame *);
     void PrepareFrameMem(VideoFrame *, FrameScanType);
 
-    void ShowXvMC(FrameScanType scan);
     void ShowXVideo(FrameScanType scan);
-
-    virtual void ShowPIP(VideoFrame  *frame,
-                         MythPlayer  *pipplayer,
-                         PIPLocation  loc);
 
     int  SetXVPictureAttribute(PictureAttribute attribute, int newValue);
     void InitColorKey(bool turnoffautopaint);
 
     bool InitVideoBuffers(bool use_xv, bool use_shm);
 
-    bool InitXvMC(void);
     bool InitXVideo(void);
     bool InitXShm(void);
     bool InitXlib(void);
     bool InitOSD(void);
 
-    bool CreateXvMCBuffers(void);
     bool CreateBuffers(VOSType subtype);
-    vector<void*> CreateXvMCSurfaces(uint num, bool surface_has_vld);
     vector<unsigned char*> CreateShmImages(uint num, bool use_xv);
     void CreatePauseFrame(VOSType subtype);
 
     void DeleteBuffers(VOSType subtype, bool delete_pause_frame);
 
     bool InitSetupBuffers(void);
-
-    // XvMC specific helper functions
-    static bool IsDisplaying(VideoFrame* frame);
-    static bool IsRendering(VideoFrame* frame);
-    static void SyncSurface(VideoFrame* frame, int past_future = 0);
-    static void FlushSurface(VideoFrame* frame);
-
-#ifdef USING_XVMC 
-    XvMCOSD* GetAvailableOSD();
-    void ReturnAvailableOSD(XvMCOSD*);
-#endif // USING_XVMC
 
     // Misc.
     VOSType              video_output_subtype;
@@ -199,7 +140,6 @@ class VideoOutputXv : public VideoOutput
     unsigned long        XJ_letterbox_colour;
     bool                 XJ_started;
 
-    // Used for all non-XvMC drawing
     VideoFrame           av_pause_frame;
     vector<XShmSegmentInfo*> XJ_shm_infos;
     vector<YUVInfo>      XJ_yuv_infos;
@@ -211,17 +151,6 @@ class VideoOutputXv : public VideoOutput
     int                  non_xv_fps;
     PixelFormat          non_xv_av_format;
     time_t               non_xv_stop_time;
-
-    // Basic XvMC drawing info
-    XvMCBufferSettings  *xvmc_buf_attr;
-    int                  xvmc_chroma;
-    XvMCContext         *xvmc_ctx;
-    vector<void*>        xvmc_surfs;
-    QMutex               xvmc_osd_lock;
-    MythDeque<XvMCOSD*>  xvmc_osd_available;
-#ifdef USING_XVMC 
-    XvMCSurfaceInfo      xvmc_surf_info;
-#endif // USING_XVMC
 
     // Basic Xv drawing info
     int                  xv_port;
