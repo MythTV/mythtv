@@ -2866,7 +2866,6 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 
 bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
 {
-    long long pts = 0;
     AVCodecContext *context = stream->codec;
 
     // Decode CEA-608 and CEA-708 captions
@@ -3983,7 +3982,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                 av_init_packet(pkt);
             }
 
-            int retval;
+            int retval = 0;
             if (!ic || ((retval = av_read_frame(ic, pkt)) < 0))
             {
                 if (retval == -EAGAIN)
