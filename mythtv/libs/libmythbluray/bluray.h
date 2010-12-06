@@ -446,6 +446,7 @@ void bd_stop_bdj(BLURAY *bd); // shutdown BD-J and clean up resources
 typedef enum {
     BD_EVENT_NONE = 0,
     BD_EVENT_ERROR,
+    BD_EVENT_ENCRYPTED,
 
     /* current playback position */
     BD_EVENT_ANGLE,     /* current angle, 1...N */
