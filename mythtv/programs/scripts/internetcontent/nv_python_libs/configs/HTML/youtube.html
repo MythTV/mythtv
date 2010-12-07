@@ -1,30 +1,83 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
-  <head>
-  <!-- Author: R.D. Vaughan
-       Apr 28th, 2010
-       Purpose: Implement full screen browser video display for the BBC iPlayer
-  Example:
-  file:///usr/local/share/mythtv/mythnetvision/scripts/nv_python_libs/configs/HTML/bbciplayer.html?videocode=b00s5nfv
-  -->
-    <script type="text/javascript">
-      function gup( name )
-        {
-          name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-          var regexS = "[\\?&]"+name+"=([^&#]*)";
-          var regex = new RegExp( regexS );
-          var results = regex.exec( window.location.href );
-          if( results == null )
-            return "";
-          else
-            return results[1];
-        }
+    <head>
+        <style type="text/css">
+            body {
+                padding: 0;
+                margin: 0;
+            }
+        </style>
 
-      var videocode = gup( 'videocode' );
-      var embedded = '<embed height="98%" width="100%" type="application/x-shockwave-flash" src="http://s.ytimg.com/yt/swf/watch-vfl170492.swf" id="movie_player" flashvars="rv.7.length_seconds=136&amp;rv.2.thumbnailUrl=http%3A%2F%2Fi2.ytimg.com%2Fvi%2FIFhhaXDziZ4%2Fdefault.jpg&amp;rv.0.url=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DBf04aUZMIVQ&amp;rv.0.view_count=28868&amp;vq=auto&amp;rv.6.author=krlitosito&amp;rv.3.view_count=34084&amp;rv.0.length_seconds=251&amp;rv.4.thumbnailUrl=http%3A%2F%2Fi3.ytimg.com%2Fvi%2FzI9C9j0QgU4%2Fdefault.jpg&amp;fmt_url_map=34%7Chttp%3A%2F%2Fv11.lscache8.c.youtube.com%2Fvideoplayback%3Fip%3D99.0.0.0%26sparams%3Did%252Cexpire%252Cip%252Cipbits%252Citag%252Calgorithm%252Cburst%252Cfactor%26fexp%3D902303%252C906712%26algorithm%3Dthrottle-factor%26itag%3D34%26ipbits%3D8%26burst%3D40%26sver%3D3%26expire%3D1276203600%26key%3Dyt1%26signature%3D977BE213A3E74A1B3597CC270D8990872B299745.B36097223339C126F6C108E54090CDAEFE383D73%26factor%3D1.25%26id%3Db9493e8e24226592%2C5%7Chttp%3A%2F%2Fv14.lscache2.c.youtube.com%2Fvideoplayback%3Fip%3D99.0.0.0%26sparams%3Did%252Cexpire%252Cip%252Cipbits%252Citag%252Calgorithm%252Cburst%252Cfactor%26fexp%3D902303%252C906712%26algorithm%3Dthrottle-factor%26itag%3D5%26ipbits%3D8%26burst%3D40%26sver%3D3%26expire%3D1276203600%26key%3Dyt1%26signature%3D42F8774F51ED24983133B8D8F797908F97D8C371.3B0C17A6728074833130840B82BE167F4CA1035D%26factor%3D1.25%26id%3Db9493e8e24226592&amp;csi_page_type=wwad&amp;cr=CA&amp;rv.1.url=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DPzeRpPSZOjI&amp;rv.6.thumbnailUrl=http%3A%2F%2Fi3.ytimg.com%2Fvi%2FBwBz4h_4POA%2Fdefault.jpg&amp;host_language=en&amp;rv.3.rating=4.92660550459&amp;fmt_list=34%2F0%2F9%2F0%2F115%2C5%2F0%2F7%2F0%2F0&amp;rv.7.id=P5y-yjheRKE&amp;targeting_video_doc_id=&amp;rv.0.rating=4.97297297297&amp;invideo=True&amp;rv.5.id=6oHEgkK9wj0&amp;tk=Rqbx09U3FZ_vusI7vVWVX-zIbWbZAIm1Q2GN6gt7W3SQKWb-qm-Lvw%3D%3D&amp;sffb=True&amp;rv.0.id=Bf04aUZMIVQ&amp;rv.5.url=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D6oHEgkK9wj0&amp;timestamp=1276178843&amp;rv.0.author=WaspEnterprise&amp;rv.3.thumbnailUrl=http%3A%2F%2Fi3.ytimg.com%2Fvi%2F663CI_o4sTY%2Fdefault.jpg&amp;rv.2.author=8Etech8&amp;rv.6.url=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DBwBz4h_4POA&amp;ad_host=ca-host-pub-4790912793353039&amp;ad_eurl=http%3A%2F%2Fwww.youtube.com%2Fvideo%2FVIDEOCODE&amp;mpu=True&amp;hl=en_US&amp;ad_flags=1&amp;rv.0.thumbnailUrl=http%3A%2F%2Fi3.ytimg.com%2Fvi%2FBf04aUZMIVQ%2Fdefault.jpg&amp;rv.5.length_seconds=282&amp;rv.7.author=krlitosito&amp;rv.5.view_count=7517&amp;rv.1.length_seconds=251&amp;rv.3.id=663CI_o4sTY&amp;rv.2.id=IFhhaXDziZ4&amp;rv.2.length_seconds=316&amp;t=vjVQa1PpcFMjs5n51hkGar4Hp9uA3GYTt6LvegEYo00%3D&amp;rv.6.id=BwBz4h_4POA&amp;cafe_experiment_id=&amp;rv.6.view_count=2565&amp;rv.3.author=krlitosito&amp;rv.4.id=zI9C9j0QgU4&amp;fexp=902303%2C906712&amp;allow_embed=1&amp;ad_host_tier=54235&amp;fmt_stream_map=34%7Chttp%3A%2F%2Fv11.lscache8.c.youtube.com%2Fvideoplayback%3Fip%3D99.0.0.0%26sparams%3Did%252Cexpire%252Cip%252Cipbits%252Citag%252Calgorithm%252Cburst%252Cfactor%26fexp%3D902303%252C906712%26algorithm%3Dthrottle-factor%26itag%3D34%26ipbits%3D8%26burst%3D40%26sver%3D3%26expire%3D1276203600%26key%3Dyt1%26signature%3D977BE213A3E74A1B3597CC270D8990872B299745.B36097223339C126F6C108E54090CDAEFE383D73%26factor%3D1.25%26id%3Db9493e8e24226592%2C5%7Chttp%3A%2F%2Fv14.lscache2.c.youtube.com%2Fvideoplayback%3Fip%3D99.0.0.0%26sparams%3Did%252Cexpire%252Cip%252Cipbits%252Citag%252Calgorithm%252Cburst%252Cfactor%26fexp%3D902303%252C906712%26algorithm%3Dthrottle-factor%26itag%3D5%26ipbits%3D8%26burst%3D40%26sver%3D3%26expire%3D1276203600%26key%3Dyt1%26signature%3D42F8774F51ED24983133B8D8F797908F97D8C371.3B0C17A6728074833130840B82BE167F4CA1035D%26factor%3D1.25%26id%3Db9493e8e24226592&amp;rv.2.rating=4.88311688312&amp;shownextbutton=1&amp;rv.1.id=PzeRpPSZOjI&amp;rv.4.length_seconds=228&amp;ad_logging_flag=1&amp;rv.7.view_count=3940&amp;rv.6.length_seconds=253&amp;length_seconds=295&amp;fmt_map=34%2F0%2F9%2F0%2F115%2C5%2F0%2F7%2F0%2F0&amp;enablejsapi=1&amp;video_id=VIDEOCODE&amp;plid=AASIrYqnNA1liVSJ&amp;afv=True&amp;rv.5.rating=4.98&amp;ad_tag=http%3A%2F%2Fad-g.doubleclick.net%2Fpfadx%2Fcom.ytpwatch.music%2Fmain_6%3Bsz%3DWIDTHxHEIGHT%3Bmpvid%3DAASIrYqpBw0C8F4n%3B%21c%3D6%3Bytexp%3D902303.906712%3Bytps%3Ddefault%3Bklg%3Den%3Bkvid%3DVIDEOCODE%3Bctb%3D1%3Bkt%3DK%3Bko%3Dc%3Bkpid%3D6%3Bkga%3D-1%3Bkr%3DN%3Bshortform%3D1%3Bu%3DVIDEOCODE%7C6%3Bkgg%3D-1%3Bkcr%3Dca%3Bafv%3D1%3Bkhd%3D0%3Bdc_dedup%3D1%3Bkpu%3Desther1208%3B&amp;ad_video_pub_id=ca-pub-6219811747049371&amp;rv.4.url=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DzI9C9j0QgU4&amp;rv.1.author=0rganix&amp;rv.1.rating=4.97674418605&amp;rv.5.thumbnailUrl=http%3A%2F%2Fi3.ytimg.com%2Fvi%2F6oHEgkK9wj0%2Fdefault.jpg&amp;watermark=http%3A%2F%2Fs.ytimg.com%2Fyt%2Fswf%2Flogo-vfl106645.swf%2Chttp%3A%2F%2Fs.ytimg.com%2Fyt%2Fswf%2Fhdlogo-vfl100714.swf&amp;rv.7.rating=4.73333333333&amp;rv.3.url=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D663CI_o4sTY&amp;rv.2.url=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DIFhhaXDziZ4&amp;cid=6&amp;rv.7.url=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DP5y-yjheRKE&amp;rv.2.view_count=31320&amp;ad_channel_code_overlay=invideo_overlay_480x70_cat10%2Cafv_overlay%2Cafv_ugc%2Cytps_default%2Cyt_mpvid_AASIrYqpBw0C8F4n%2Cyt_cid_6%2Cytexp_902303.906712&amp;rv.4.view_count=1325763&amp;ad_module=http%3A%2F%2Fs.ytimg.com%2Fyt%2Fswf%2Fad-vfl170492.swf&amp;rv.1.view_count=22657&amp;dclk=True&amp;rv.6.rating=5.0&amp;sk=lsWSaZl1UFLCUxUw44Lon-hoi_2GTCy-C&amp;ctb=True&amp;rv.1.thumbnailUrl=http%3A%2F%2Fi1.ytimg.com%2Fvi%2FPzeRpPSZOjI%2Fdefault.jpg&amp;mpvid=AASIrYqpBw0C8F4n&amp;rv.3.length_seconds=330&amp;rv.5.author=Ulrick31&amp;rv.4.rating=4.90052939537" allowscriptaccess="always" allowfullscreen="true" bgcolor="#000000" />';
-      document.write('<title>YouTube Full Screen</title>');
-      document.write(embedded.replace(/VIDEOCODE/g, videocode));
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+        <script type="text/javascript">
+            /* gup function by R.D. Vaughan */
+            function gup( name )
+            {
+                name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+                var regexS = "[\\?&]"+name+"=([^&#]*)";
+                var regex = new RegExp( regexS );
+                var results = regex.exec( window.location.href );
+                if( results == null )
+                    return "";
+                else
+                    return results[1];
+            }
 
-    </script>
-  </head>
+            var myth_player = null;
+
+            var params = {
+                allowScriptAccess: "always",
+                allowfullscreen: 'true',
+                wmode: 'opaque'
+            };
+            var atts = { id: "myytplayer" };
+            swfobject.embedSWF("http://www.youtube.com/apiplayer?enablejsapi=1&playerapiid=ytplayer", 
+                               "myth_player", window.innerWidth, window.innerHeight, "8", null, null, params, atts);
+
+            function onYouTubePlayerReady(playerId) {
+                myth_player = document.getElementById("myytplayer");
+                myth_player.setVolume(50);
+                var videocode = gup('videocode');
+                if (videocode != "") {
+                    myth_player.cueVideoById(videocode);
+                    myth_player.playVideo();
+                }
+            }
+
+            function play() {
+                if (myth_player) {
+                    var state = myth_player.getPlayerState();
+                    if (state == 1) // Playing
+                        myth_player.pauseVideo();
+                    else if (state != 3) // Video is either unstarted, ended, paused or cued
+                        myth_player.playVideo();
+                }
+            }
+
+            function seek(amount) {
+                if (myth_player) {
+                    myth_player.seekTo(myth_player.getCurrentTime() + amount, true);
+                }
+            }
+
+            function adjustVolume(amount) {
+                if (myth_player) {
+                    myth_player.setVolume(myth_player.getVolume() + amount);
+                }
+            }
+
+            window.onresize = function() {
+                document.body.style.width = window.innerWidth;
+                document.body.style.height = window.innerHeight;
+                if (myth_player) {
+                    //             myth_player.setSize(window.innerWidth, window.innerHeight);
+                    document.getElementById("myytplayer").width = window.innerWidth;
+                    document.getElementById("myytplayer").height = window.innerHeight;
+                }
+            };
+        </script>
+    </head>
+    <body>
+        <div id="myth_player"/>
+    </body>
 </html>
