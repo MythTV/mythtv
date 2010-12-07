@@ -1,12 +1,11 @@
 #!/bin/sh
 #
 # small shell script to generate version.cpp
-# it expects two parameters
+# it expects one parameter
 # first parameter is the root of the source directory
-# second parameter is the svn base folder (trunk, branches/release-0-21-fixes)
 
 if test $# -ne 1; then
-    echo "Usage: version.sh SVN_TREE_DIR"
+    echo "Usage: version.sh GIT_TREE_DIR"
     exit 1
 fi
 
@@ -18,21 +17,21 @@ else
     exit 0
 fi
 
-SVNTREEDIR=$1
-SVNREPOPATH="exported"
+GITTREEDIR=$1
+GITREPOPATH="exported"
 
-SOURCE_VERSION=$(svnversion ${SVNTREEDIR} 2>/dev/null || echo Unknown)
+cd ${GITTREEDIR}
+
+SOURCE_VERSION=$(git describe --dirty || echo Unknown)
 
 case "${SOURCE_VERSION}" in
     exported|Unknown)
-        if test -e $SVNTREEDIR/VERSION ; then
-            . $SVNTREEDIR/VERSION
+        if test -e $GITTREEDIR/VERSION ; then
+            . $GITTREEDIR/VERSION
         fi
     ;;
     *)
-    SVNREPOPATH=$(echo "$$URL$$" | sed -e 's,.*/svn/,,' \
-                                       -e 's,/mythtv/version\.sh.*,,' \
-                                       -e 's,/version\.sh.*,,')
+    BRANCH=$(git branch | sed -e '/^[^\*]/d' -e 's/^\* //' -e 's/(no branch)/exported/')
     ;;
 esac
 
@@ -41,7 +40,7 @@ cat > .vers.new <<EOF
 #include "mythversion.h"
 
 const MPUBLIC char *myth_source_version = "${SOURCE_VERSION}";
-const MPUBLIC char *myth_source_path = "${SVNREPOPATH}";
+const MPUBLIC char *myth_source_path = "${BRANCH}";
 const MPUBLIC char *myth_binary_version = MYTH_BINARY_VERSION;
 EOF
 

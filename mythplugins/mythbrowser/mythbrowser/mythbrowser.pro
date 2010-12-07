@@ -16,9 +16,9 @@ installimages.files = images/*.png
 INSTALLS += installimages
 
 # Input
-HEADERS += mythbrowser.h webpage.h 
+HEADERS += mythbrowser.h mythflashplayer.h webpage.h 
 HEADERS += bookmarkmanager.h bookmarkeditor.h browserdbutil.h
-SOURCES += main.cpp mythbrowser.cpp webpage.cpp
+SOURCES += main.cpp mythbrowser.cpp mythflashplayer.cpp webpage.cpp
 SOURCES += bookmarkmanager.cpp bookmarkeditor.cpp browserdbutil.cpp
 
 include ( ../../libs-targetfix.pro )

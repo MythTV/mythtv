@@ -74,9 +74,9 @@ typedef enum FrameScanType
 {
     kScan_Ignore       = -1,
     kScan_Detect       =  0,
-    kScan_Interlaced   =  1, // == XVMC_TOP_PICTURE
-    kScan_Intr2ndField =  2, // == XVMC_BOTTOM_PICTURE
-    kScan_Progressive  =  3, // == XVMC_FRAME_PICTURE
+    kScan_Interlaced   =  1,
+    kScan_Intr2ndField =  2,
+    kScan_Progressive  =  3,
 } FrameScanType;
 
 typedef enum PictureAttribute

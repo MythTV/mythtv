@@ -697,7 +697,7 @@ void VideoOutput::StopEmbedding(void)
 /**
  * \fn VideoOutput::DrawSlice(VideoFrame*, int, int, int, int)
  * \brief Informs video output of new data for frame,
- *        used for XvMC acceleration.
+ *        used for hardware accelerated decoding.
  */
 void VideoOutput::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 {
@@ -953,8 +953,7 @@ void VideoOutput::ShowPIPs(VideoFrame *frame, const PIPMap &pipPlayers)
  * \fn VideoOutput::ShowPIP(VideoFrame*,MythPlayer*,PIPLocation)
  * \brief Composites PiP image onto a video frame.
  *
- *  Note: This only works with memory backed VideoFrames,
- *        that is not XvMC, OpenGL, VDPAU, etc.
+ *  Note: This only works with memory backed VideoFrames.
  *
  * \param frame     Frame to composite PiP onto.
  * \param pipplayer Picture-in-Picture Player.

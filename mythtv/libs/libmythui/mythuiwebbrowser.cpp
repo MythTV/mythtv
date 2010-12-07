@@ -322,6 +322,7 @@ MythUIWebBrowser::~MythUIWebBrowser()
 {
     if (m_browser)
     {
+        m_browser->hide();
         m_browser->disconnect();
         m_browser->deleteLater();
         m_browser = NULL;
@@ -549,6 +550,18 @@ QUrl MythUIWebBrowser::GetUrl(void)
     }
     else
         return QUrl();
+}
+
+/** \fn MythUIWebBrowser::evaluateJavaScript(const QString& scriptSource)
+ *  \brief Evaluates the JavaScript code in \a scriptSource.
+ *  \return QVariant
+ */
+QVariant MythUIWebBrowser::evaluateJavaScript(const QString& scriptSource)
+{
+    if (m_browser)
+        return m_browser->page()->mainFrame()->evaluateJavaScript(scriptSource);
+    else
+        return QVariant();
 }
 
 void MythUIWebBrowser::slotLoadStarted(void)

@@ -72,6 +72,8 @@ class MPUBLIC MythUIWebBrowser : public MythUIType
     bool CanGoForward(void);
     bool CanGoBack(void);
 
+    QVariant evaluateJavaScript(const QString& scriptSource);
+
   public slots:
     void Back(void);
     void Forward(void);

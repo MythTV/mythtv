@@ -315,8 +315,8 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
         }
         else
         {
-            int major, minor;
-            long long freq;
+            int major, minor = 0;
+            long long freq = 0;
             get_atsc_stuff((*i).chanstr, id, (*i).freqid.toInt(), major, minor, freq);
 
             if (interactive && ((minor == 0) || (freq > 0)))

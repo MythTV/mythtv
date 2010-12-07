@@ -40,13 +40,6 @@ using namespace std;
 
 #include "videoout_quartz.h"  // For VOQ::GetBestSupportedCodec()
 
-#ifdef USING_XVMC
-#include "videoout_xv.h"
-extern "C" {
-#include "libavcodec/xvmc.h"
-}
-#endif // USING_XVMC
-
 #ifdef USING_VDPAU
 #include "videoout_vdpau.h"
 extern "C" {
@@ -116,14 +109,9 @@ static float get_aspect(const AVCodecContext &ctx)
     return aspect_ratio;
 }
 
-int get_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic);
-int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
+int  get_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
 void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
-void release_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic);
-void render_slice_xvmc(struct AVCodecContext *s, const AVFrame *src,
-                       int offset[4], int y, int type, int height);
-
-int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic);
+int  get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic);
 void release_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic);
 void render_slice_vdpau(struct AVCodecContext *s, const AVFrame *src,
                         int offset[4], int y, int type, int height);
@@ -228,13 +216,6 @@ void AvFormatDecoder::GetDecoders(render_opts &opts)
     (*opts.equiv_decoders)["ffmpeg"].append("nuppel");
     (*opts.equiv_decoders)["ffmpeg"].append("dummy");
 
-#ifdef USING_XVMC
-    opts.decoders->append("xvmc");
-    opts.decoders->append("xvmc-vld");
-    (*opts.equiv_decoders)["xvmc"].append("dummy");
-    (*opts.equiv_decoders)["xvmc-vld"].append("dummy");
-#endif
-
 #ifdef USING_VDPAU
     opts.decoders->append("vdpau");
     (*opts.equiv_decoders)["vdpau"].append("dummy");
@@ -287,8 +268,6 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       internal_vol(false),
       disable_passthru(false),
       dummy_frame(NULL),
-      // DVD
-      dvd_xvmc_enabled(false), dvd_video_codec_changed(false),
       m_fps(0.0f)
 {
     bzero(&params, sizeof(AVFormatParameters));
@@ -1107,19 +1086,6 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
     return fps;
 }
 
-static bool IS_XVMC_VLD_PIX_FMT(enum PixelFormat fmt)
-{
-    return
-        fmt == PIX_FMT_XVMC_MPEG2_VLD;
-}
-
-static bool IS_XVMC_PIX_FMT(enum PixelFormat fmt)
-{
-    return
-        fmt == PIX_FMT_XVMC_MPEG2_MC ||
-        fmt == PIX_FMT_XVMC_MPEG2_IDCT;
-}
-
 static bool IS_VDPAU_PIX_FMT(enum PixelFormat fmt)
 {
     return
@@ -1129,30 +1095,6 @@ static bool IS_VDPAU_PIX_FMT(enum PixelFormat fmt)
         fmt == PIX_FMT_VDPAU_MPEG4 ||
         fmt == PIX_FMT_VDPAU_WMV3  ||
         fmt == PIX_FMT_VDPAU_VC1;
-}
-
-static enum PixelFormat get_format_xvmc_vld(struct AVCodecContext *avctx,
-                                            const enum PixelFormat *fmt)
-{
-    int i = 0;
-
-    for(i=0; fmt[i]!=PIX_FMT_NONE; i++)
-        if (IS_XVMC_VLD_PIX_FMT(fmt[i]))
-            break;
-
-    return fmt[i];
-}
-
-static enum PixelFormat get_format_xvmc(struct AVCodecContext *avctx,
-                                        const enum PixelFormat *fmt)
-{
-    int i = 0;
-
-    for(i=0; fmt[i]!=PIX_FMT_NONE; i++)
-        if (IS_XVMC_PIX_FMT(fmt[i]))
-            break;
-
-    return fmt[i];
 }
 
 static enum PixelFormat get_format_vdpau(struct AVCodecContext *avctx,
@@ -1251,17 +1193,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         }
     }
 
-    if (CODEC_IS_XVMC(codec))
-    {
-        enc->flags |= CODEC_FLAG_EMU_EDGE;
-        enc->get_buffer = get_avf_buffer_xvmc;
-        enc->get_format = (codec->id == CODEC_ID_MPEG2VIDEO_XVMC) ?
-                            get_format_xvmc : get_format_xvmc_vld;
-        enc->release_buffer = release_avf_buffer_xvmc;
-        enc->draw_horiz_band = render_slice_xvmc;
-        enc->slice_flags = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
-    }
-    else if (CODEC_IS_VDPAU(codec))
+    if (CODEC_IS_VDPAU(codec))
     {
         enc->get_buffer      = get_avf_buffer_vdpau;
         enc->get_format      = get_format_vdpau;
@@ -1338,7 +1270,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 
         m_parent->SetVideoParams(width, height, fps,
                                  keyframedist, aspect, kScan_Detect,
-                                 dvd_video_codec_changed);
+                                 false);
         if (LCD *lcd = LCD::Get())
         {
             LCDVideoFormatSet video_format;
@@ -1375,24 +1307,6 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         }
     }
 }
-
-#ifdef USING_XVMC
-static int xvmc_pixel_format(enum PixelFormat pix_fmt)
-{
-    int xvmc_chroma = XVMC_CHROMA_FORMAT_420;
-
-#if 0
-// We don't support other chromas yet
-    if (PIX_FMT_YUV420P == pix_fmt)
-        xvmc_chroma = XVMC_CHROMA_FORMAT_420;
-    else if (PIX_FMT_YUV422P == pix_fmt)
-        xvmc_chroma = XVMC_CHROMA_FORMAT_422;
-    else if (PIX_FMT_YUV420P == pix_fmt)
-        xvmc_chroma = XVMC_CHROMA_FORMAT_444;
-#endif
-    return xvmc_chroma;
-}
-#endif // USING_XVMC
 
 // CC Parity checking
 // taken from xine-lib libspucc
@@ -1791,7 +1705,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 bool handled = false;
                 if (!using_null_videoout && mpeg_version(enc->codec_id))
                 {
-#if defined(USING_VDPAU) || defined(USING_XVMC)
+#if defined(USING_VDPAU)
                     // HACK -- begin
                     // Force MPEG2 decoder on MPEG1 streams.
                     // Needed for broken transmitters which mark
@@ -1800,7 +1714,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     if (CODEC_ID_MPEG1VIDEO == enc->codec_id)
                         enc->codec_id = CODEC_ID_MPEG2VIDEO;
                     // HACK -- end
-#endif // USING_XVMC || USING_VDPAU
+#endif // USING_VDPAU
 #ifdef USING_VDPAU
                     MythCodecID vdpau_mcid;
                     vdpau_mcid = VideoOutputVDPAU::GetBestSupportedCodec(
@@ -1814,55 +1728,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         handled = true;
                     }
 #endif // USING_VDPAU
-#ifdef USING_XVMC
-
-                    bool force_xv = no_hardware_decoders;
-                    if (ringBuffer && ringBuffer->IsDVD())
-                    {
-                        if (dec.left(4) == "xvmc")
-                            dvd_xvmc_enabled = true;
-
-                        if (ringBuffer->IsInDiscMenuOrStillFrame() &&
-                            dvd_xvmc_enabled)
-                        {
-                            force_xv = true;
-                            enc->pix_fmt = PIX_FMT_YUV420P;
-                        }
-                    }
-
-                    MythCodecID mcid;
-                    mcid = VideoOutputXv::GetBestSupportedCodec(
-                        /* disp dim     */ width, height,
-                        /* osd dim      */ /*enc->width*/ 0, /*enc->height*/ 0,
-                        /* mpeg type    */ mpeg_version(enc->codec_id),
-                        /* xvmc pix fmt */ xvmc_pixel_format(enc->pix_fmt),
-                        /* test surface */ codec_is_std(video_codec_id),
-                        /* force_xv     */ force_xv);
-
-                    if (mcid >= video_codec_id)
-                    {
-                        bool vcd, idct, mc, vdpau;
-                        enc->codec_id = (CodecID)
-                            myth2av_codecid(mcid, vcd, idct, mc, vdpau);
-
-                        if (ringBuffer && ringBuffer->IsDVD() &&
-                            (mcid == video_codec_id) &&
-                            dvd_video_codec_changed)
-                        {
-                            dvd_video_codec_changed = false;
-                            dvd_xvmc_enabled = false;
-                        }
-
-                        video_codec_id = mcid;
-                        if (!force_xv && codec_is_xvmc_std(mcid))
-                        {
-                            enc->pix_fmt = (idct) ?
-                                PIX_FMT_XVMC_MPEG2_IDCT :
-                                PIX_FMT_XVMC_MPEG2_MC;
-                        }
-                        handled = true;
-                    }
-#endif // USING_XVMC
                 }
 
                 if (!handled)
@@ -2388,83 +2253,6 @@ void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
 
     for (uint i = 0; i < 4; i++)
         pic->data[i] = NULL;
-}
-
-int get_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic)
-{
-    AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
-    VideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame(false);
-
-    pic->data[0] = frame->priv[0];
-    pic->data[1] = frame->priv[1];
-    pic->data[2] = frame->buf;
-
-    pic->linesize[0] = 0;
-    pic->linesize[1] = 0;
-    pic->linesize[2] = 0;
-
-    pic->opaque = frame;
-    pic->type = FF_BUFFER_TYPE_USER;
-
-    pic->age = 256 * 256 * 256 * 64;
-
-#ifdef USING_XVMC
-    struct xvmc_pix_fmt *render = (struct xvmc_pix_fmt *)frame->buf;
-
-    render->state = AV_XVMC_STATE_PREDICTION;
-    render->picture_structure = 0;
-    render->flags = 0;
-    render->start_mv_blocks_num = 0;
-    render->filled_mv_blocks_num = 0;
-    render->next_free_data_block_num = 0;
-#endif
-
-    pic->reordered_opaque = c->reordered_opaque;
-
-    return 0;
-}
-
-void release_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic)
-{
-    assert(pic->type == FF_BUFFER_TYPE_USER);
-
-#ifdef USING_XVMC
-    struct xvmc_pix_fmt *render = (struct xvmc_pix_fmt *)pic->data[2];
-    render->state &= ~AV_XVMC_STATE_PREDICTION;
-#endif
-
-    AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
-    if (nd && nd->GetPlayer() && nd->GetPlayer()->getVideoOutput())
-        nd->GetPlayer()->getVideoOutput()->DeLimboFrame((VideoFrame*)pic->opaque);
-
-    for (uint i = 0; i < 4; i++)
-        pic->data[i] = NULL;
-
-}
-
-void render_slice_xvmc(struct AVCodecContext *s, const AVFrame *src,
-                       int offset[4], int y, int type, int height)
-{
-    if (!src)
-        return;
-
-    (void)offset;
-    (void)type;
-
-    if (s && src && s->opaque && src->opaque)
-    {
-        AvFormatDecoder *nd = (AvFormatDecoder *)(s->opaque);
-
-        int width = s->width;
-
-        VideoFrame *frame = (VideoFrame *)src->opaque;
-        nd->GetPlayer()->DrawSlice(frame, 0, y, width, height);
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, LOC +
-                "render_slice_xvmc called with bad avctx or src");
-    }
 }
 
 int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
@@ -3078,7 +2866,6 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 
 bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
 {
-    long long pts = 0;
     AVCodecContext *context = stream->codec;
 
     // Decode CEA-608 and CEA-708 captions
@@ -4195,7 +3982,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                 av_init_packet(pkt);
             }
 
-            int retval;
+            int retval = 0;
             if (!ic || ((retval = av_read_frame(ic, pkt)) < 0))
             {
                 if (retval == -EAGAIN)
@@ -4228,54 +4015,6 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Bad stream (NULL)");
             av_free_packet(pkt);
             continue;
-        }
-
-        if (ringBuffer->IsDVD() &&
-            curstream->codec->codec_type == CODEC_TYPE_VIDEO)
-        {
-#ifdef USING_XVMC
-            if (!private_dec)
-            {
-                int current_width = curstream->codec->width;
-                int video_width = m_parent->GetVideoSize().width();
-                if (dvd_xvmc_enabled && m_parent && m_parent->getVideoOutput())
-                {
-                    bool dvd_xvmc_active = false;
-                    if (codec_is_xvmc(video_codec_id))
-                    {
-                        dvd_xvmc_active = true;
-                    }
-
-                    bool indiscmenu   = ringBuffer->IsInDiscMenuOrStillFrame();
-                    if ((indiscmenu && dvd_xvmc_active) ||
-                        ((!indiscmenu && !dvd_xvmc_active)))
-                    {
-                        VERBOSE(VB_PLAYBACK, LOC + QString("DVD Codec Change "
-                                    "indiscmenu %1 dvd_xvmc_active %2")
-                                .arg(indiscmenu).arg(dvd_xvmc_active));
-                        dvd_video_codec_changed = true;
-                    }
-                }
-
-                if ((video_width > 0) && dvd_video_codec_changed)
-                {
-                    VERBOSE(VB_PLAYBACK, LOC +
-                            QString("DVD Stream/Codec Change "
-                                    "video_width %1 current_width %2 "
-                                    "dvd_video_codec_changed %3")
-                            .arg(video_width).arg(current_width)
-                            .arg(dvd_video_codec_changed));
-                    av_free_packet(pkt);
-                    if (current_width > 0) {
-                        CloseCodecs();
-                        ScanStreams(false);
-                        allowedquit = true;
-                        dvd_video_codec_changed = false;
-                    }
-                    continue;
-                }
-            }
-#endif //USING_XVMC
         }
 
         enum CodecType codec_type = curstream->codec->codec_type;

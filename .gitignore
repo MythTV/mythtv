@@ -5,3 +5,4 @@ moc_*.cpp
 *.so.*
 *.orig
 *.rej
+*kdev*

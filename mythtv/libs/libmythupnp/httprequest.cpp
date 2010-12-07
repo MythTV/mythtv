@@ -522,6 +522,8 @@ qint64 HTTPRequest::SendFile( QFile &file, qint64 llStart, qint64 llBytes )
     } 
     else 
     { 
+        qint64     llSent = 0;
+
         do 
         { 
             // SSIZE_MAX should work in kernels 2.6.16 and later. 
@@ -531,12 +533,18 @@ qint64 HTTPRequest::SendFile( QFile &file, qint64 llStart, qint64 llBytes )
                 getSocketHandle(), fd, &offset, 
                 (size_t) ((llBytes > INT_MAX) ? INT_MAX : llBytes)); 
   
-            llBytes  -= ( offset - llStart ); 
-            VERBOSE(VB_UPNP, QString("SendResponseFile : --- " 
-            "size = %1, offset = %2, sent = %3") 
-            .arg(llBytes).arg(offset).arg(sent)); 
+            if (sent >= 0)
+            {
+                llBytes -= sent; 
+                llSent  += sent;
+                VERBOSE(VB_UPNP, QString("SendResponseFile : --- " 
+                        "size = %1, offset = %2, sent = %3") 
+                        .arg(llBytes).arg(offset).arg(sent)); 
+            }
         } 
         while (( sent >= 0 ) && ( llBytes > 0 )); 
+
+        sent = llSent;
     } 
 
 #endif

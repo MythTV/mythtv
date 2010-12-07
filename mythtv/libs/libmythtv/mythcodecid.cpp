@@ -33,39 +33,6 @@ QString toString(MythCodecID codecid)
         case kCodec_WMV3:
             return "WMV3";
 
-        case kCodec_MPEG1_XVMC:
-            return "MPEG1 XvMC";
-        case kCodec_MPEG2_XVMC:
-            return "MPEG2 XvMC";
-        case kCodec_H263_XVMC:
-            return "H.263 XvMC";
-        case kCodec_MPEG4_XVMC:
-            return "MPEG4 XvMC";
-        case kCodec_H264_XVMC:
-            return "H.264 XvMC";
-
-        case kCodec_MPEG1_IDCT:
-            return "MPEG1 IDCT";
-        case kCodec_MPEG2_IDCT:
-            return "MPEG2 IDCT";
-        case kCodec_H263_IDCT:
-            return "H.263 IDCT";
-        case kCodec_MPEG4_IDCT:
-            return "MPEG4 IDCT";
-        case kCodec_H264_IDCT:
-            return "H.264 IDCT";
-
-        case kCodec_MPEG1_VLD:
-            return "MPEG1 VLD";
-        case kCodec_MPEG2_VLD:
-            return "MPEG2 VLD";
-        case kCodec_H263_VLD:
-            return "H.263 VLD";
-        case kCodec_MPEG4_VLD:
-            return "MPEG4 VLD";
-        case kCodec_H264_VLD:
-            return "H.264 VLD";
-
         case kCodec_MPEG1_VDPAU:
             return "MPEG1 VDPAU";
         case kCodec_MPEG2_VDPAU:
@@ -118,10 +85,9 @@ QString toString(MythCodecID codecid)
     return QString("Unknown(%1)").arg(codecid);
 }
 
-int myth2av_codecid(MythCodecID codec_id,
-                    bool &vld, bool &idct, bool &mc, bool &vdpau)
+int myth2av_codecid(MythCodecID codec_id, bool &vdpau)
 {
-    vld = idct = mc = vdpau = false;
+    vdpau = false;
     CodecID ret = CODEC_ID_NONE;
     switch (codec_id)
     {
@@ -152,57 +118,6 @@ int myth2av_codecid(MythCodecID codec_id,
             break;
         case kCodec_WMV3:
             ret = CODEC_ID_WMV3;
-            break;
-
-        case kCodec_MPEG1_XVMC:
-        case kCodec_MPEG2_XVMC:
-            mc = true;
-            ret = CODEC_ID_MPEG2VIDEO_XVMC;
-            break;
-        case kCodec_H263_XVMC:
-            VERBOSE(VB_IMPORTANT, "Error: XvMC H.263 not supported by ffmpeg");
-            break;
-        case kCodec_MPEG4_XVMC:
-            VERBOSE(VB_IMPORTANT, "Error: XvMC MPEG4 not supported by ffmpeg");
-            break;
-        case kCodec_H264_XVMC:
-            VERBOSE(VB_IMPORTANT, "Error: XvMC H.264 not supported by ffmpeg");
-            break;
-
-        case kCodec_MPEG1_IDCT:
-        case kCodec_MPEG2_IDCT:
-            idct = mc = true;
-            ret = CODEC_ID_MPEG2VIDEO_XVMC;
-            break;
-        case kCodec_H263_IDCT:
-            VERBOSE(VB_IMPORTANT,
-                    "Error: XvMC-IDCT H.263 not supported by ffmpeg");
-            break;
-        case kCodec_MPEG4_IDCT:
-            VERBOSE(VB_IMPORTANT,
-                    "Error: XvMC-IDCT MPEG4 not supported by ffmpeg");
-            break;
-        case kCodec_H264_IDCT:
-            VERBOSE(VB_IMPORTANT,
-                    "Error: XvMC-IDCT H.264 not supported by ffmpeg");
-            break;
-
-        case kCodec_MPEG1_VLD:
-        case kCodec_MPEG2_VLD:
-            vld = true;
-            ret = CODEC_ID_MPEG2VIDEO_XVMC_VLD;
-            break;
-        case kCodec_H263_VLD:
-            VERBOSE(VB_IMPORTANT,
-                    "Error: XvMC-VLD H.263 not supported by ffmpeg");
-            break;
-        case kCodec_MPEG4_VLD:
-            VERBOSE(VB_IMPORTANT,
-                    "Error: XvMC-VLD MPEG4 not supported by ffmpeg");
-            break;
-        case kCodec_H264_VLD:
-            VERBOSE(VB_IMPORTANT,
-                    "Error: XvMC-VLD H.264 not supported by ffmpeg");
             break;
 
         case kCodec_MPEG1_VDPAU:
@@ -293,8 +208,6 @@ int mpeg_version(int codec_id)
         case CODEC_ID_MPEG1VIDEO:
             return 1;
         case CODEC_ID_MPEG2VIDEO:
-        case CODEC_ID_MPEG2VIDEO_XVMC:
-        case CODEC_ID_MPEG2VIDEO_XVMC_VLD:
             return 2;
         case CODEC_ID_H263:
             return 3;
@@ -320,25 +233,16 @@ QString get_encoding_type(MythCodecID codecid)
             return "RTjpeg";
 
         case kCodec_MPEG1:
-        case kCodec_MPEG1_XVMC:
-        case kCodec_MPEG1_IDCT:
-        case kCodec_MPEG1_VLD:
         case kCodec_MPEG1_VDPAU:
         case kCodec_MPEG1_VAAPI:
         case kCodec_MPEG1_DXVA2:
         case kCodec_MPEG2:
-        case kCodec_MPEG2_XVMC:
-        case kCodec_MPEG2_IDCT:
-        case kCodec_MPEG2_VLD:
         case kCodec_MPEG2_VDPAU:
         case kCodec_MPEG2_VAAPI:
         case kCodec_MPEG2_DXVA2:
             return "MPEG-2";
 
         case kCodec_H263:
-        case kCodec_H263_XVMC:
-        case kCodec_H263_IDCT:
-        case kCodec_H263_VLD:
         case kCodec_H263_VDPAU:
         case kCodec_H263_VAAPI:
         case kCodec_H263_DXVA2:
@@ -346,18 +250,12 @@ QString get_encoding_type(MythCodecID codecid)
 
         case kCodec_NUV_MPEG4:
         case kCodec_MPEG4:
-        case kCodec_MPEG4_IDCT:
-        case kCodec_MPEG4_XVMC:
-        case kCodec_MPEG4_VLD:
         case kCodec_MPEG4_VDPAU:
         case kCodec_MPEG4_VAAPI:
         case kCodec_MPEG4_DXVA2:
             return "MPEG-4";
 
         case kCodec_H264:
-        case kCodec_H264_XVMC:
-        case kCodec_H264_IDCT:
-        case kCodec_H264_VLD:
         case kCodec_H264_VDPAU:
         case kCodec_H264_VAAPI:
         case kCodec_H264_DXVA2:
@@ -377,8 +275,6 @@ QString get_encoding_type(MythCodecID codecid)
 
         case kCodec_NONE:
         case kCodec_NORMAL_END:
-        case kCodec_STD_XVMC_END:
-        case kCodec_VLD_END:
         case kCodec_VDPAU_END:
         case kCodec_VAAPI_END:
         case kCodec_DXVA2_END:
@@ -390,12 +286,6 @@ QString get_encoding_type(MythCodecID codecid)
 
 QString get_decoder_name(MythCodecID codec_id)
 {
-    if (codec_is_xvmc_std(codec_id))
-        return "xvmc";
-
-    if (codec_is_xvmc_vld(codec_id))
-        return "xvmc-vld";
-
     if (codec_is_vdpau(codec_id))
         return "vdpau";
 
