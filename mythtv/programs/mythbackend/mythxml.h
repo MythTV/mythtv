@@ -54,10 +54,11 @@ typedef enum
     MXML_GetVideoArt            = 17,
     MXML_GetInternetSearch      = 18,
     MXML_GetInternetSources     = 19,
+    MXML_GetInternetContent     = 20,
 
-    MXML_GetFile                = 20,
-    MXML_GetFileList            = 21,
-    MXML_GetFileLinks           = 22,
+    MXML_GetFile                = 21,
+    MXML_GetFileList            = 22,
+    MXML_GetFileLinks           = 23,
 
 } MythXMLMethod;
 
@@ -127,6 +128,7 @@ class MythXML : public Eventing
 
         void    GetInternetSearch( HTTPRequest *pRequest );
         void    GetInternetSources( HTTPRequest *pRequest );
+        void    GetInternetContent( HTTPRequest *pRequest );
 
         void    GetDeviceDesc  ( HTTPRequest *pRequest );
         void    GetFile        ( HTTPRequest *pRequest, QString sFileName );
