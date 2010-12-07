@@ -311,7 +311,7 @@ void AudioConfigSettings::UpdateCapabilities(const QString &device)
             m_DTSPassThrough->boolValue();
         bool bLPCM = settings.canPassthrough() == -1 ||
             (settings.canLPCM() &&
-             m_AdvancedAudioSettings->boolValue() && !m_MPCM->boolValue());
+             !(m_AdvancedAudioSettings->boolValue() && m_MPCM->boolValue()));
 
         if (max_speakers > 2 && !bLPCM)
             max_speakers = 2;

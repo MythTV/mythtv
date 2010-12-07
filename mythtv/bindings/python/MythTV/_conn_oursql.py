@@ -2,13 +2,16 @@ from logging import MythLog
 from exceptions import MythDBError
 
 import os
-_allow_oursql = os.environ.get('ENABLE_OURSQL', False)
-if _allow_oursql not in ['true', 'True', 'TRUE', 'yes', 'YES', '1']:
-    raise ImportError('Refusing to import oursql')
 
 import oursql
+__version__ = oursql.__version__.split('.')
 
-__version__ = tuple(['oursql']+oursql.__version__.split('.')) 
+if __version__ < ('0','9','3'):
+    _allow_oursql = os.environ.get('ENABLE_OURSQL', False)
+    if _allow_oursql not in ['true', 'True', 'TRUE', 'yes', 'YES', '1']:
+        raise ImportError('Refusing to import oursql')
+
+__version__ = tuple(['oursql']+__version__)
 
 def dbconnect(dbconn, log):
     log(MythLog.DATABASE|MythLog.EXTRA,
