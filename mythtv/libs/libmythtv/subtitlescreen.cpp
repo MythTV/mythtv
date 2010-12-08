@@ -314,7 +314,6 @@ void SubtitleScreen::DisplayTextSubtitles(void)
             int height = (m_safeArea.height() * m_textFontZoom) / 1800;
             gTextSubFont->GetFace()->setPixelSize(height);
             gTextSubFont->SetColor(Qt::white);
-            gTextSubFont->SetOutline(true, Qt::black, 2, 255);
         }
     }
     else
@@ -394,7 +393,6 @@ void SubtitleScreen::DisplayRawTextSubtitles(void)
             int height = (m_safeArea.height() * m_textFontZoom) / 1800;
             gTextSubFont->GetFace()->setPixelSize(height);
             gTextSubFont->SetColor(Qt::white);
-            gTextSubFont->SetOutline(true, Qt::black, 2, 255);
         }
     }
     else
@@ -927,6 +925,7 @@ bool SubtitleScreen::InitialiseFont(int fontStretch)
         newfont.setStretch(fontStretch);
         font.detach();
         mythfont->SetFace(newfont);
+        mythfont->SetOutline(true, Qt::black, 2, 255);
         gTextSubFont = mythfont;
     }
     else
