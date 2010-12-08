@@ -617,16 +617,16 @@ void BDRingBuffer::PressButton(int32_t key, int64_t pts)
 
 /** \brief jump to a Blu-ray root or popup menu
  */
-bool BDRingBuffer::GoToMenu(const QString str)
+bool BDRingBuffer::GoToMenu(const QString str, int64_t pts)
 {
-    if (!m_is_hdmv_navigation)
+    if (!m_is_hdmv_navigation || pts <= 0)
         return false;
 
     VERBOSE(VB_PLAYBACK, QString("BDRingBuf: GoToMenu %1").arg(str));
 
     if (str.compare("root") == 0)
     {
-        if (bd_menu_call(bdnav))
+        if (bd_menu_call(bdnav, pts))
         {
             VERBOSE(VB_PLAYBACK, QString("BDRingBuf: Invoked Menu Successfully"));
             return true;
