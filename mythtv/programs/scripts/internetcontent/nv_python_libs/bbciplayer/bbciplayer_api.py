@@ -35,7 +35,7 @@ from socket import gethostname, gethostbyname
 from threading import Thread
 from copy import deepcopy
 from operator import itemgetter, attrgetter
-
+from MythTV import MythXML
 from bbciplayer_exceptions import (BBCUrlError, BBCHttpError, BBCRssError, BBCVideoNotFound, BBCConfigFileError, BBCUrlDownloadError)
 
 class OutStreamEncoder(object):
@@ -141,6 +141,7 @@ class Videos(object):
 
         """
         self.config = {}
+        self.mythxml = MythXML()
 
         if apikey is not None:
             self.config['apikey'] = apikey
@@ -299,6 +300,10 @@ class Videos(object):
 #
 ###########################################################################################################
 
+    def processVideoUrl(self, url):
+        playerUrl = self.mythxml.getInternetContentUrl("nv_python_libs/configs/HTML/bbciplayer.html", \
+                                                       url)
+        return playerUrl
 
     def searchTitle(self, title, pagenumber, pagelen):
         '''Key word video search of the BBC iPlayer web site
@@ -374,14 +379,14 @@ class Videos(object):
                     link = link.replace(u'/iplayer/episode/', u'')
                     index = link.find(u'/')
                     link = link[:index]
-                    link = u'file://%s/nv_python_libs/configs/HTML/bbciplayer.html?videocode=%s' % (baseProcessingDir, link)
+                    link = self.processVideoUrl(link);
                     etree.SubElement(bbciplayerItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}customhtml").text = 'true'
                 else: # Audio media will not play in the embedded HTML page
                     link = u'http://www.bbc.co.uk'+ link
+                    link = self.common.ampReplace(link)
 
             title = self.common.massageText(titleFilter(result)[0].attrib['title'].strip())
             description = self.common.massageText(etree.tostring(descFilter(result)[0], method="text", encoding=unicode).strip())
-            link = self.common.ampReplace(link)
 
             # Insert data into a new item element
             bbciplayerItem.find('title').text = title
@@ -664,13 +669,12 @@ class Videos(object):
                                 link = link.replace(u'http://www.bbc.co.uk/iplayer/episode/', u'')
                                 index = link.find(u'/')
                                 link = link[:index]
-                                link = u'file://%s/nv_python_libs/configs/HTML/bbciplayer.html?videocode=%s' % (baseProcessingDir, link)
+                                link = self.processVideoUrl(link);
                                 etree.SubElement(bbciplayerItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}customhtml").text = 'true'
                             else:
                                 pass # Radio media cannot be played within the embedded weg page
                     else:
                         continue
-                    link = self.common.ampReplace(link)
                     # Convert the pubDate "2010-03-22T07:56:21Z" to a MNV pubdate format
                     pubdate = creationDate(itemData)
                     if len(pubdate):
