@@ -10,6 +10,7 @@
 #include <mythcontext.h>
 #include <libmythui/mythmainwindow.h>
 #include <mythuiwebbrowser.h>
+#include <playgroup.h>
 
 // mythbrowser
 #include "webpage.h"
@@ -22,6 +23,9 @@ MythFlashPlayer::MythFlashPlayer(MythScreenStack *parent,
     : MythScreenType (parent, "mythflashplayer"),
       m_browser(NULL), m_url(urlList[0])
 {
+    m_fftime       = PlayGroup::GetSetting("Default", "skipahead", 30);
+    m_rewtime      = PlayGroup::GetSetting("Default", "skipback", 5);
+    m_jumptime     = PlayGroup::GetSetting("Default", "jump", 10);
     qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
 }
 
@@ -75,13 +79,17 @@ bool MythFlashPlayer::keyPressEvent(QKeyEvent *event)
         if (action == "PAUSE")
             evaluateJavaScript("play();");
         else if (action == "SEEKFFWD")
-            evaluateJavaScript("seek(10);");
+            evaluateJavaScript(QString("seek(%1);").arg(m_fftime));
         else if (action == "SEEKRWND")
-            evaluateJavaScript("seek(-10);");
+            evaluateJavaScript(QString("seek(-%1);").arg(m_rewtime));
         else if (action == "CHANNELUP")
-            evaluateJavaScript("seek(60);");
+            evaluateJavaScript(QString("seek(%1);").arg(m_jumptime * 60));
         else if (action == "CHANNELDOWN")
-            evaluateJavaScript("seek(-60);");
+            evaluateJavaScript(QString("seek(-%1);").arg(m_jumptime * 60));
+        else if (action == "VOLUMEUP")
+            evaluateJavaScript("adjustVolume(2);");
+        else if (action == "VOLUMEDOWN")
+            evaluateJavaScript("adjustVolume(-2);");
         else
             handled = false;
 

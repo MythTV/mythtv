@@ -247,6 +247,11 @@ SOURCES += dtvconfparser.cpp        dtvconfparserhelpers.cpp
 HEADERS += channelscan/scaninfo.h   channelscan/channelimporter.h
 SOURCES += channelscan/scaninfo.cpp channelscan/channelimporter.cpp
 
+inc.path = $${PREFIX}/include/mythtv/
+inc.files  = playgroup.h
+
+INSTALLS += inc
+
 using_frontend {
     # Recording profile stuff
     HEADERS += profilegroup.h

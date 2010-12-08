@@ -40,6 +40,7 @@ __version__="v0.2.5"
 import os, struct, sys, re, time
 import urllib, urllib2
 import logging
+from MythTV import MythXML
 
 try:
     import xml.etree.cElementTree as ElementTree
@@ -150,6 +151,7 @@ class Videos(object):
 
         """
         self.config = {}
+        self.mythxml = MythXML()
 
         if apikey is not None:
             self.config['apikey'] = apikey
@@ -410,6 +412,10 @@ class Videos(object):
 #
 ###########################################################################################################
 
+    def processVideoUrl(self, url):
+        playerUrl = self.mythxml.getInternetContentUrl("nv_python_libs/configs/HTML/bliptv.html", \
+                                                       url.replace(u'http://blip.tv/play/', ''))
+        return self.ampReplace(playerUrl)
 
     def searchTitle(self, title, pagenumber, pagelen):
         '''Key word video search of the blip.tv web site
@@ -500,7 +506,7 @@ class Videos(object):
             if not item.has_key('video') and not item.has_key('link') and not embedURL:
                 continue
             if embedURL:
-                item['link'] = embedURL
+                item['link'] = self.processVideoUrl(embedURL)
             if item.has_key('link') and not item.has_key('video'):
                 continue
             if item.has_key('video') and not item.has_key('link'):

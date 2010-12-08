@@ -61,6 +61,7 @@ import pycurl
 import xml.etree.ElementTree as ET
 import inspect
 import oauth.oauth_api as oauth
+from MythTV import MythXML
 
 from vimeo_exceptions import (VimeoUrlError, VimeoHttpError, VimeoResponseError, VimeoVideoNotFound, VimeoRequestTokenError, VimeoAuthorizeTokenError, VimeoVideosSearchError, VimeoAllChannelError, __errmsgs__)
 
@@ -669,6 +670,7 @@ class Videos(object):
 
         """
         self.config = {}
+        self.mythxml = MythXML()
 
         self.config['debug_enabled'] = debug # show debugging messages
 
@@ -886,6 +888,10 @@ class Videos(object):
 
     # end initializeVimeo()
 
+    def processVideoUrl(self, url):
+        playerUrl = self.mythxml.getInternetContentUrl("nv_python_libs/configs/HTML/vimeo.html", \
+                                                       url.replace(u'http://vimeo.com/', ''))
+        return self.ampReplace(playerUrl)
 
     def searchTitle(self, title, pagenumber, pagelen):
         '''Key word video search of the vimeo.com web site
@@ -980,7 +986,7 @@ class Videos(object):
                         if url.get('type') == 'video':
                             if url.text: # Make the link fullscreen and auto play
                                 if embed_flag:
-                                    v_details[url.tag] = self.ampReplace(url.text.strip().replace(u'http://vimeo.com/', u'http://vimeo.com/moogaloop.swf?clip_id=')+u'&autoplay=1')
+                                    v_details[url.tag] = self.processVideoUrl(url.text.strip())
                                 else:
                                     v_details[url.tag] = self.ampReplace(url.text.strip())
                             else:
@@ -1378,7 +1384,7 @@ class Videos(object):
                         if url.get('type') == 'video':
                             if url.text: # Make the link fullscreen and auto play
                                 if embed_flag:
-                                    v_details[url.tag] = self.ampReplace(url.text.strip().replace(u'http://vimeo.com/', u'http://vimeo.com/moogaloop.swf?clip_id=')+u'&autoplay=1')
+                                    v_details[url.tag] = self.processVideoUrl(url.text.strip())
                                 else:
                                     v_details[url.tag] = self.ampReplace(url.text.strip())
                             else:

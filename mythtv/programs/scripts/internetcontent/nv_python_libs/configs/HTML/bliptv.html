@@ -1,31 +1,115 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
-  <head>
-  <!-- Author: R.D. Vaughan       June 8th, 2010
-       Purpose: Implement full screen browser video display for the Blip.tv
-  Example:
-  file:///usr/local/share/mythtv/mythnetvision/scripts/nv_python_libs/configs/HTML/bliptv.html?videocode=Terraadmin-TERRA534HindsightAndForesight20YearsAfterTheExxonVald846
-  -->
-    <script type="text/javascript">
-      function gup( name )
-        {
-          name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-          var regexS = "[\\?&]"+name+"=([^&#]*)";
-          var regex = new RegExp( regexS );
-          var results = regex.exec( window.location.href );
-          if( results == null )
-            return "";
-          else
-            return results[1];
-        }
+    <head>
+        <style type="text/css">
+            body {
+                padding: 0;
+                margin: 0;
+                overflow-x: hidden;
+                overflow-y: hidden;
+            }
+        </style>
 
-      var videocode = gup( 'videocode' );
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+        <script type="text/javascript">
+            /* gup function by R.D. Vaughan */
+            function gup( name )
+            {
+                name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+                var regexS = "[\\?&]"+name+"=([^&#]*)";
+                var regex = new RegExp( regexS );
+                var results = regex.exec( window.location.href );
+                if( results == null )
+                    return "";
+                else
+                    return results[1];
+            }
 
-      var embedded = '<embed src="http://www.tribute.ca/player/player.swf" width="100%" height="98%" quality="high" allowFullScreen="true" pluginspage="http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash" type="application/x-shockwave-flash" FlashVars="flashlet={_thumbnailTitles:[\'video\'],_videoList:[\'http://blip.tv/file/get/VIDEOCODE.flv\'],_videoAdsList:[\'\'],_previewImageList:[\'\'],_thumbnailPlayList:[\'\'],_fixedWidth:100%,_fixedHeight:98%,_videoProportions:true,_autoSize:true,_autoPlay:true,_bufferTime:4,_ownerLogoIMGPath:\'/player/watermark.png\',_ownerLogoAlpha:50,_ownerLogoLink:\'\',_thumbnailCarousel:false,_mainbarAutoHide:true,_mainbar_Alpha:75,_mainbar_Top:#333333,_mainbar_Bottom:#666666,_volumeAudio:60,_seekBar_color:#999999,_buttonToolTips:false,_buttonsColor:#FFFFFF,_hideEmailButton:true,_hideEmbedButton:true,_hideFullscreenButton:false,_hidePlayListButton:true,_hideTimerButton:false,_hideVideoPropButton:true,_hideVolumeButton:false}"></embed> />'
+            var myth_player = null;
+            var video_id = gup( 'videocode' );
+            var url = 'http://blip.tv/play/';
+            var final = url.concat(video_id);
+            var curTime = 0;
+            var curVolume = 1;
+            var curState = 2;
 
-      document.write('<title>Blip.tv Full Screen</title>');
-      document.write(embedded.replace(/VIDEOCODE/g, videocode));
+            var params = {
+                allowScriptAccess: "always",
+                allowfullscreen: 'true',
+                wmode: 'opaque'
+            };
 
-    </script>
-  </head>
+            var flashvars = {
+                'enablejs': 'true',
+                'javascriptid': 'mybtvplayer',
+                'autostart': 'true'
+            };
+
+            var atts = { id: "mybtvplayer" };
+
+            swfobject.embedSWF(final,
+                               "myth_player", window.innerWidth, window.innerHeight, "8", null, flashvars, params, atts, onPlayerReady);
+
+            function onPlayerReady() {
+                myth_player = document.getElementById("mybtvplayer");
+            }
+
+            function getUpdate(changeType, param1, param2){
+                switch(changeType) {
+                    case "time":
+                        curTime = param1;
+                        break;
+                    case "volume":
+                        break;
+                    case "state":
+                        curState = param1;
+                        break;
+                }
+            }
+
+            function play() {
+                if (myth_player) {
+                    if (curState == 0) {
+                        myth_player.sendEvent("play");
+                        curState = 2;
+                    }
+                    else if (curState == 2) {
+                        myth_player.sendEvent("pause");
+                        curState = 0;
+                    }
+                }
+            }
+
+            function seek(amount) {
+                if (myth_player) {
+                    curTime += amount;
+                    myth_player.sendEvent("seek", curTime);
+                }
+            }
+
+            function adjustVolume(amount) {
+                if (myth_player) {
+                    curVolume += (amount / 30);
+                    if (curVolume > 1)
+                        curVolume = 1;
+                    if (curVolume < 0)
+                        curVolume = 0;
+                    myth_player.sendEvent("volume", curVolume);
+                }
+            }
+
+            window.onresize = function() {
+                document.body.style.width = window.innerWidth;
+                document.body.style.height = window.innerHeight;
+                if (myth_player) {
+                    //             myth_player.setSize(window.innerWidth, window.innerHeight);
+                    document.getElementById("mybtvplayer").width = window.innerWidth;
+                    document.getElementById("mybtvplayer").height = window.innerHeight;
+                }
+            };
+        </script>
+    </head>
+    <body>
+        <div id="myth_player"/>
+    </body>
 </html>

@@ -995,6 +995,10 @@ class MythXML( XMLConnection ):
                         find('InternetContent').findall('grabber'):
             yield InternetSource.fromEtree(grabber, self)
 
+    def getInternetContentUrl(self, grabber, videocode):
+        return "mythflash://%s:%s/Myth/GetInternetContent?Grabber=%s&videocode=%s" \
+            % (self.host, self.port, grabber, videocode)
+
     def getPreviewImage(self, chanid, starttime, width=None, \
                                                  height=None, secsin=None):
         starttime = datetime.duck(starttime)
