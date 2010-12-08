@@ -34,7 +34,7 @@ class AudioConfigSettings : public VerticalConfigurationGroup
 
   private slots:
     void UpdateVisibility(const QString&);
-    void UpdateCapabilities(const QString&);
+    AudioOutputSettings UpdateCapabilities(const QString&);
     void AudioRescan();
     void AudioAdvanced();
     void StartAudioTest();
@@ -126,18 +126,19 @@ class AudioAdvancedSettingsGroup : public ConfigurationWizard
 class AudioTestGroup : public ConfigurationWizard
 {
   public:
-    AudioTestGroup(QString main, QString passthrough, int channels);
+    AudioTestGroup(QString main, QString passthrough,
+                   int channels, AudioOutputSettings settings);
 };
 
 class ChannelChangedEvent : public QEvent
 {
   public:
-    ChannelChangedEvent(QString channame) :
-                 QEvent(kEventType),
-                 channel(channame) {}
+    ChannelChangedEvent(QString channame, bool fulltest) :
+        QEvent(kEventType), channel(channame), fulltest(fulltest) {}
     ~ChannelChangedEvent() {}
 
     QString channel;
+    bool    fulltest;
 
     static Type kEventType;
 };
@@ -147,11 +148,12 @@ class AudioTestThread : public QThread
   public:
 
     AudioTestThread(QObject *parent, QString main, QString passthrough,
-                    int channels);
+                    int channels, AudioOutputSettings settings);
     ~AudioTestThread();
 
     void cancel();
     QString result();
+    void setChannel(int channel);
 
   protected:
     void run();
@@ -163,13 +165,15 @@ class AudioTestThread : public QThread
     QString             m_device;
     QString             m_passthrough;
     bool                m_interrupted;
+    int                 m_channel;
 };
 
 class AudioTest : public VerticalConfigurationGroup
 {
     Q_OBJECT
   public:
-    AudioTest(QString main, QString passthrough, int channels);
+    AudioTest(QString main, QString passthrough,
+              int channels, AudioOutputSettings settings);
     ~AudioTest();
     bool event(QEvent *event);
 

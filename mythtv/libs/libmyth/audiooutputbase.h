@@ -181,8 +181,8 @@ class AudioOutputBase : public AudioOutput, public QThread
     int source_channels;
     int source_samplerate;
     int source_bytes_per_frame;
-    bool needs_upmix;
     bool upmix_default;
+    bool needs_upmix;
     bool needs_downmix;
     int surround_mode;
     float old_stretchfactor;

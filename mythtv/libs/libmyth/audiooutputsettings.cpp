@@ -271,7 +271,7 @@ AudioOutputSettings* AudioOutputSettings::GetCleaned(bool newcopy)
     aosettings->m_LPCM = (mchannels > 2);
     if (mchannels == 2 && m_passthrough >= 0)
     {
-        VERBOSE(VB_AUDIO, LOC + QString("AC3 or DTS capable"));
+        VERBOSE(VB_AUDIO, LOC + QString("may be AC3 or DTS capable"));
         aosettings->AddSupportedChannels(6);
     }
     aosettings->m_DTS = aosettings->m_AC3 = (m_passthrough >= 0);

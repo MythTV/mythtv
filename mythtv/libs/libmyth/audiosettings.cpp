@@ -19,7 +19,8 @@ AudioSettings::AudioSettings() :
     use_passthru(false),
     source(AUDIOOUTPUT_UNKNOWN),
     upmixer(0),
-    init(false)
+    init(false),
+    custom(NULL)
 {
 }
 
@@ -36,19 +37,28 @@ AudioSettings::AudioSettings(const AudioSettings &other) :
     upmixer(other.upmixer),
     init(true)
 {
+    if (other.custom)
+    {
+            // make a copy of it
+        custom = new AudioOutputSettings;
+        *custom = *other.custom;
+    }
+    else
+        custom = NULL;
 }
 
 AudioSettings::AudioSettings(
-    const QString     &main_device,
-    const QString     &passthru_device,
-    AudioFormat       format,
-    int               channels,
-    int               codec,
-    int               samplerate,
-    AudioOutputSource source,
-    bool              set_initial_vol,
-    bool              use_passthru,
-    int               upmixer_startup) :
+    const QString              &main_device,
+    const QString              &passthru_device,
+    AudioFormat                 format,
+    int                         channels,
+    int                         codec,
+    int                         samplerate,
+    AudioOutputSource           source,
+    bool                        set_initial_vol,
+    bool                        use_passthru,
+    int                         upmixer_startup,
+    AudioOutputSettings        *custom) :
     main_device(main_device),
     passthru_device(passthru_device),
     format(format),
@@ -61,6 +71,14 @@ AudioSettings::AudioSettings(
     upmixer(upmixer_startup),
     init(true)
 {
+    if (custom)
+    {
+            // make a copy of it
+        this->custom = new AudioOutputSettings;
+        *this->custom = *custom;
+    }
+    else
+        this->custom = NULL;
 }
 
 AudioSettings::AudioSettings(
@@ -80,7 +98,8 @@ AudioSettings::AudioSettings(
     use_passthru(use_passthru),
     source(AUDIOOUTPUT_UNKNOWN),
     upmixer(upmixer_startup),
-    init(true)
+    init(true),
+    custom(NULL)
 {
 }
 
@@ -97,8 +116,15 @@ AudioSettings::AudioSettings(
     use_passthru(false),
     source(AUDIOOUTPUT_UNKNOWN),
     upmixer(0),
-    init(false)
+    init(false),
+    custom(NULL)
 {
+}
+
+AudioSettings::~AudioSettings()
+{
+    if (custom)
+        delete custom;
 }
 
 void AudioSettings::FixPassThrough(void)
