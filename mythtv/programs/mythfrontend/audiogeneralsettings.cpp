@@ -548,16 +548,17 @@ void AudioTestThread::run()
     {
         char *frames_in = new char[m_channels * 1024 * sizeof(int16_t) + 15];
         char *frames = (char *)(((long)frames_in + 15) & ~0xf);
+
+        int begin = 0;
+        int end = m_channels + 1;
+        if (m_channel >= 0)
+        {
+            begin = m_channel;
+            end = m_channel + 1;
+        }
+
         while (!m_interrupted)
         {
-            int begin = 0;
-            int end = m_channels + 1;
-            if (m_channel >= 0)
-            {
-                begin = m_channel;
-                end = m_channel + 1;
-            }
-
             for (int i = begin; i < end && !m_interrupted; i++)
             {
                 int current = smptelayout[m_channels - 2][i];
@@ -768,6 +769,7 @@ void AudioTest::toggle(QString str)
         m_at->wait();
     }
     m_at->setChannel(channel);
+
     m_at->start();
 }
 
