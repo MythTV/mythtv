@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+    <head>
+        <style type="text/css">
+            body {
+                padding: 0;
+                margin: 0;
+            }
+        </style>
+
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+        <script type="text/javascript">
+            /* gup function by R.D. Vaughan */
+            function gup( name )
+            {
+                name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+                var regexS = "[\\?&]"+name+"=([^&#]*)";
+                var regex = new RegExp( regexS );
+                var results = regex.exec( window.location.href );
+                if( results == null )
+                    return "";
+                else
+                    return results[1];
+            }
+
+            var myth_player = null;
+            var videocode = gup('videocode');
+
+            var params = {
+                allowScriptAccess: "always",
+                allowfullscreen: 'true',
+                wmode: 'opaque'
+            };
+
+            var flashvars = {
+                autoStart: 1
+            };
+
+            var atts = { id: "mydmplayer" };
+
+            swfobject.embedSWF('http://www.dailymotion.com/swf/' + videocode + '&enableApi=1&playerapiid=dmplayer&autoPlay=1',
+                               "myth_player", window.innerWidth, window.innerHeight, "8", null, flashvars, params, atts);
+
+            function onDailymotionPlayerReady(playerId) {
+                myth_player = document.getElementById("mydmplayer");
+                myth_player.setVolume(50);
+                if (videocode != "") {
+                    myth_player.loadVideoById(videocode);
+                    myth_player.playVideo();
+                }
+            }
+
+            function play() {
+                if (myth_player) {
+                    var state = myth_player.getPlayerState();
+                    if (state == 1) // Playing
+                        myth_player.pauseVideo();
+                    else if (state != 3) // Video is either unstarted, ended, paused or cued
+                        myth_player.playVideo();
+                }
+            }
+
+            function seek(amount) {
+                if (myth_player) {
+                    myth_player.seekTo(myth_player.getCurrentTime() + amount);
+                }
+            }
+
+            function adjustVolume(amount) {
+                if (myth_player) {
+                    myth_player.setVolume(myth_player.getVolume() + amount);
+                }
+            }
+
+            window.onresize = function() {
+                document.body.style.width = window.innerWidth;
+                document.body.style.height = window.innerHeight;
+                if (myth_player) {
+                    //             myth_player.setSize(window.innerWidth, window.innerHeight);
+                    document.getElementById("mydmplayer").width = window.innerWidth;
+                    document.getElementById("mydmplayer").height = window.innerHeight;
+                }
+            };
+        </script>
+    </head>
+    <body>
+        <div id="myth_player"/>
+    </body>
+</html>
