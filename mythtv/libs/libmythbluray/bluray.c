@@ -1027,13 +1027,21 @@ int bd_read(BLURAY *bd, unsigned char *buf, int len)
                 if (st->clip == NULL) {
                     // We previously reached the last clip.  Nothing
                     // else to read.
+                    _queue_event(bd, (BD_EVENT){BD_EVENT_END_OF_TITLE, 0});
                     return 0;
                 }
                 if (clip_pkt >= st->clip->end_pkt) {
+
+                    // split read()'s at clip boundary
+                    if (out_len) {
+                        return out_len;
+                    }
+
                     st->clip = nav_next_clip(bd->title, st->clip);
                     if (st->clip == NULL) {
                         DEBUG(DBG_BLURAY|DBG_STREAM, "End of title (%p)\n", bd);
-                        return out_len;
+                        _queue_event(bd, (BD_EVENT){BD_EVENT_END_OF_TITLE, 0});
+                        return 0;
                     }
                     if (!_open_m2ts(bd, st)) {
                         return -1;

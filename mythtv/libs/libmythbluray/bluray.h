@@ -461,6 +461,7 @@ typedef enum {
     BD_EVENT_PLAYLIST,  /* current playlist (xxxxx.mpls) */
     BD_EVENT_PLAYITEM,  /* current play item */
     BD_EVENT_CHAPTER,   /* current chapter, 1...N */
+    BD_EVENT_END_OF_TITLE,
 
     /* stream selection */
     BD_EVENT_AUDIO_STREAM,           /* 1..32,  0xff  = none */

@@ -679,6 +679,11 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
             VERBOSE(VB_PLAYBACK|VB_EXTRA,
                     QString("BDRingBuf: EVENT_TITLE %1").arg(ev.param));
             break;
+        case BD_EVENT_END_OF_TITLE:
+            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+                    QString("BDRingBuf: EVENT_END_OF_TITLE"));
+            // TODO: Signal the player to flush buffers before reading further.
+            break;
         case BD_EVENT_PLAYLIST:
             VERBOSE(VB_PLAYBACK|VB_EXTRA,
                     QString("BDRingBuf: EVENT_PLAYLIST %1").arg(ev.param));
