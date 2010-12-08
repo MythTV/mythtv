@@ -1258,11 +1258,11 @@ like this:
 
 The <tt>lircd.conf</tt> file can have multiple remote controls defined.
 
-The second part is <tt>lircrc</tt>, which takes the name of the button which
+The second part is <tt>~/.lircrc</tt>, which takes the name of the button which
 was pressed ("ChannelUp") in the above example, and associates that to an
 action to be performed by a program using the remote control.  So in MythTV,
 ChannelUp means one thing, while in <bf>mplayer</bf> it means something
-different.  <tt>lircrc</tt> gives you the flexibility of taking the name of
+different.  <tt>~/.lircrc</tt> gives you the flexibility of taking the name of
 the button and having it perform different actions depending on which
 program you're using at the time.
 
@@ -1270,7 +1270,7 @@ program you're using at the time.
 community, and there is no standard for the common button names.  One
 <tt>lircd.conf</tt> file may contain a definition for a button called
 "ChannelUp", while another may contain a definition for "Chan+".  Your
-<tt>lircrc</tt> file must therefore be configured appropriately, or it won't
+<tt>~/.lircrc</tt> file must therefore be configured appropriately, or it won't
 work.
 
 Look for pre-made lircd.conf configuration files at <url
@@ -1309,15 +1309,23 @@ The next step is to convert those signals into something that can be used
 to control MythTV.  MythTV now includes native support for lirc and can
 interact directly with it.
 
+Example <tt>~/.lircrc</tt> files for configuring remote controls for MythTV are
+available in the <url
+url="http://www.mythtv.org/wiki/Category:LIRC_Configuration_Files"
+name="LIRC Configuration Files"> category of the MythTV wiki.  There are also
+many pages providing details for specific remote controls in the <url
+url="http://www.mythtv.org/wiki/Category:Remote_Controls"
+name="Remote Controls"> category of the wiki.
+
+After browsing the available configuration files,
+you may copy/paste the desired configuration information into
+<tt>~/.lircrc</tt> or download it from the wiki.
 <tscreen><verb>
-$ cd mythtv/contrib/config_files/lirc
-$ cp lircrc.example ~/.lircrc
+$ mythwikiscripts
 </verb></tscreen>
-or
-<tscreen><verb>
-$ cp lircrc.example.pinnaclestudiopctv ~/.lircrc
-</verb></tscreen>
-if you've got a Pinnacle Studio PCTV remote.
+Follow the on-screen prompts to download the configuration file.
+
+Once you've put the desired configuration into <tt>~/.lircrc</tt>, test it.
 <tscreen><verb>
 $ irw
 </verb></tscreen>
@@ -1341,12 +1349,13 @@ If <bf>irxevent</bf> isn't running, then MythTV will not respond to your remote
 control unless you're using native lirc support.
 
 <sect1>Additional information for lirc
-<p>Take a look at the lircrc.example files in the <tt>contrib/configfiles/</tt>
-directory.  In my case, (Pinnacle Studio card) the channel up and down functions
-weren't working, due to the fact that the button names were different than
-the default <tt>lircrc.example</tt> file that came with MythTV.
+<p>Take a look at the example <tt>~/.lircrc</tt> files in the <url
+url="http://www.mythtv.org/wiki/Category:LIRC_Configuration_Files"
+name="MythTV wiki">.  In my case, (Pinnacle Studio card) the channel up and
+down functions weren't working, due to the fact that the button names were
+different from the example <tt>~/.lircrc</tt> I used to start my configuration.
 
-The <tt>lircrc.example</tt> file has this:
+The example file had this:
 <tscreen><verb>
 begin
     prog = irxevent
@@ -1384,15 +1393,16 @@ begin
 end
 </verb></tscreen>
 which took care of basic functionality.  Because the PCTV Studio remote
-has additional buttons, look at the
-<tt>contrib/config_files/lirc/lircrc.example.pinnaclestudiopctv</tt> for an example of how
+has additional buttons, look at the <url
+url="http://www.mythtv.org/wiki/Lircrc_-_Pinnacle_Studio_PCTV"
+name="lircrc - Pinnacle Studio PCTV"> page for an example of how
 to define additional buttons, and how to debug potential button name
-conflicts between the <tt>lircrc.example</tt> file and how <bf>your</bf>
+conflicts between your <tt>~/.lircrc</tt> file and how <bf>your</bf>
 remote defines the button names.
 
 By examining the button names defined in <tt>/etc/lircd.conf</tt> and using
 the <bf>irw</bf> program to make sure that your remote is working, you can
-create the appropriate mappings in <tt>.lircrc</tt> to get excellent remote
+create the appropriate mappings in <tt>~/.lircrc</tt> to get excellent remote
 functionality with MythTV.
 
 Note the <bf>repeat =</bf> parameter.  This informs the <tt>irxevent</tt>
@@ -1987,8 +1997,9 @@ $ ./channel_icons.pl --find-missing --rescan
 
 If you do not have XMLTV software installed and do not want to install it
 for the sake of this minor task, there is a generic
-<tt>contrib/master_iconmap.xml</tt> which you can copy and use but this may
-not be as complete as using the specific information for your service.
+<tt>contrib/icons/master_iconmap/master_iconmap.xml</tt> which you can copy
+and use but this may not be as complete as using the specific information
+for your service.
 
 <!-- FIX XXXXXXX -->
 Once you have an <tt>iconmap.xml</tt> file, add the icon information to your
@@ -2696,9 +2707,10 @@ mythbackend configuration GUI.
 
 However, there is not <bf>changechannel</bf> program per-se, because this is
 going to be dependent on what sort of external tuner you have.  Look in the
-<tt>contrib/channel_changers</tt> directory for a number of programs and
-scripts which may be used to change channels.  Once you find one which
-works, copy it to <tt>/usr/local/bin/changechannel</tt>.
+<url url="http://www.mythtv.org/wiki/Category:Channel_Change_Scripts"
+name="Channel Change Scripts"> category of the MythTV wiki for a number of
+programs and scripts which may be used to change channels.  Once you find one
+which works, copy it to <tt>/usr/local/bin/changechannel</tt>.
 
 Feel free to browse some of what sort of hardware is available at <url
 url="http://store.snapstream.com/accessories.html"
@@ -5513,7 +5525,9 @@ $ cat vidout > video.yuv
 
 <sect1>Using a different window manager
 <p>MythTV is not dependent on any particular window manager.  If you wish to
-run a lightweight window manager, the <tt>contrib/configfiles/</tt> directory has an
+run a lightweight window manager, the
+<url url="http://www.mythtv.org/wiki/Category:Window_Manager_Configuration_Files"
+name="Window Manager Configuration Files"> category of the MythTV wiki has an
 example of a <tt>.twmrc</tt> and <tt>.fvwmrc</tt> file you may use.
 
 <sect1>What capture resolution should I use?  How does video work?
@@ -5837,30 +5851,36 @@ session.screen0.focusModel:     SloppyFocus
 
 <label id="mythbackend_autostart">
 <sect1>Automatically starting mythbackend at system boot time
+<p>There are several example start scripts in the
+<url url="http://www.mythtv.org/wiki/Category:Startup_Scripts"
+name="Startup Scripts"> category of the MythTV wiki.
 <sect2>Red Hat And Mandriva
-<p>Here's a method for automatically starting mythbackend submitted by Mike
-Thomson (<url url="mailto:linux@m-thomson.net" name="mailto:linux@m-thomson.net">) and Stu Tomlinson (<url
-url="mailto:stu@nosnilmot.com" name="mailto:stu@nosnilmot.com">).
+<p>Here's a method for automatically starting mythbackend on Fedora.
 
-Copy the files from the MythTV <tt>contrib</tt> directory or from Mike's web
-site (<url url="http://m-thomson.net/mythtv/"
-name="http://m-thomson.net/mythtv/">) as follows:
+Copy the files from the
+<url url="http://www.mythtv.org/wiki/Fedora_init.d_mythbackend"
+name="Fedora init.d mythbackend"> page of the MythTV wiki as follows:
 
-<tt>etc.rc.d.init.mythbackend</tt> should be made executable and copied to
-<tt>/etc/rc.d/init.d/</tt>:
 <tscreen><verb>
-$ cd contrib
+$ mythwikiscripts
+</verb></tscreen>
+and follow the on-screen prompts to download <tt>Fedora - mythbackend
+init</tt>, choosing to save the files to temporary files
+<tt>/tmp/sysconfig.mythbackend</tt> and <tt>/tmp/init.mythbackend</tt>.
+
+<tt>/tmp/init.mythbackend</tt> should be made executable and copied to
+<tt>/etc/rc.d/init.d/</tt>
+<tscreen><verb>
 $ su
-# chmod a+x etc.rc.d.init.d.mythbackend
-# cp etc.rc.d.init.d.mythbackend /etc/rc.d/init.d/mythbackend
+# chmod a+x /tmp/init.mythbackend
+# cp /tmp/init.mythbackend /etc/rc.d/init.d/mythbackend
 </verb></tscreen>
 
-<tt>etc.sysconfig.mythbackend</tt> should be copied to
+<tt>/tmp/sysconfig.mythbackend</tt> should be copied to
 <tt>/etc/sysconfig/</tt>:
 <tscreen><verb>
-$ cd contrib
 $ su
-# cp etc.sysconfig.mythbackend /etc/sysconfig/mythbackend
+# cp /tmp/sysconfig.mythbackend /etc/sysconfig/mythbackend
 </verb></tscreen>
 
 Edit <tt>/etc/sysconfig/mythbackend</tt> if you want to change the defaults
@@ -5969,12 +5989,19 @@ following:
 /var/log/mythtv/*               root.mythtv             664
 </verb></tscreen>
 
-A copy of the above has been included in the contrib/ directory.  You may
-add it by typing:
+A copy of the above has been included in the
+<url url="http://www.mythtv.org/wiki/Mandriva_Security_Package_Configuration"
+name="Mandriva Security Package Configuration"> page on the MythTV wiki.
+You may add it by typing:
 <tscreen><verb>
-$ cd contrib
+$ mythwikiscripts
+</verb></tscreen>
+and follow the on-screen prompts to download <tt>msec Configuration File</tt>
+to a temporary file <tt>/tmp/msec.perm.local</tt>.
+
+<tscreen><verb>
 $ su
-# cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
+# cat /tmp/msec.perm.local >> /etc/security/msec/perm.local
 # exit
 </verb></tscreen>
 
@@ -6441,8 +6468,12 @@ direct serial connection is more reliable than an IR blaster.  Not all STB's
 that have a Low Speed Data port have it enabled; you may need to convince
 your service provider to turn it on.  Stating that you have a Tivo may help;
 the Tivo has a direct-connect capability.
-<item>Use a firewire connection.  There is a <tt>6200ch.c</tt> in the MythTV
-contrib directory which may work for you.
+<item>Use a firewire connection.  There are firewire channel change scripts and
+firewire priming scripts in the
+<url url="http://www.mythtv.org/wiki/Category:Channel_Change_Scripts"
+name="Channel_Change_Scripts"> and
+<url url="http://www.mythtv.org/wiki/Category:Firewire_Priming_Scripts"
+name="Firewire Priming Scripts"> categories of the MythTV wiki.
 </enum>
 <sect1>Configuring one machine to flag all commercials
 <p>Commercial flagging can be CPU intensive.  By default, the backend that
