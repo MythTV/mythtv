@@ -30,13 +30,6 @@
     </button>
 
     <button>
-        <type>SPEAKER_TEST</type>
-        <text>Speaker Test</text>
-        <description>Run a speaker test</description>
-        <action>SPEAKER_TEST</action>
-    </button>
-
-    <button>
         <type>SCREENSETUPWIZARD</type>
         <text>Screen Setup Wizards</text>
         <description>Compensate for TVs with overscan</description>

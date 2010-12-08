@@ -238,9 +238,12 @@ void AudioConfigSettings::UpdateVisibility(const QString &device)
     m_AudioUpmixType->setEnabled(cur_speakers > 2);
 }
 
-void AudioConfigSettings::UpdateCapabilities(const QString &device)
+AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
+    const QString &device)
 {
     int max_speakers = 8;
+    int realmax_speakers = 8;
+
     bool invalid = false;
     AudioOutputSettings settings;
 
@@ -248,13 +251,16 @@ void AudioConfigSettings::UpdateCapabilities(const QString &device)
     if (!m_OutputDevice    || !m_MaxAudioChannels   ||
         !m_AC3PassThrough  || !m_DTSPassThrough     ||
         !m_EAC3PassThrough || !m_TrueHDPassThrough)
-        return;
+        return settings;
 
     if (!slotlock.tryLock()) // Doing a rescan of channels
-        return;
+        return settings;
 
     bool bForceDigital = gCoreContext->GetNumSetting("PassThruDeviceOverride",
                                                      false);
+    bool bAC3 = true;
+    bool bDTS = true;
+    bool bLPCM = true;
 
     QString out = m_OutputDevice->getValue();
     if (!audiodevs.contains(out))
@@ -266,13 +272,13 @@ void AudioConfigSettings::UpdateCapabilities(const QString &device)
     {
         settings = audiodevs.value(out).settings;
 
-        max_speakers = settings.BestSupportedChannels();
+        realmax_speakers = max_speakers = settings.BestSupportedChannels();
 
-        bool bAC3  = (settings.canAC3() || bForceDigital) &&
+        bAC3  = (settings.canAC3() || bForceDigital) &&
             m_AC3PassThrough->boolValue();
-        bool bDTS  = (settings.canDTS() || bForceDigital) &&
+        bDTS  = (settings.canDTS() || bForceDigital) &&
             m_DTSPassThrough->boolValue();
-        bool bLPCM = settings.canPassthrough() == -1 ||
+        bLPCM = settings.canPassthrough() == -1 ||
             (settings.canLPCM() &&
              !gCoreContext->GetNumSetting("StereoPCM", false));
 
@@ -290,12 +296,6 @@ void AudioConfigSettings::UpdateCapabilities(const QString &device)
                               max_speakers >= 8));
     m_EAC3PassThrough->setEnabled(canhdpassthrough);
     m_TrueHDPassThrough->setEnabled(canhdpassthrough);
-
-    if (canhdpassthrough &&
-        (m_EAC3PassThrough->boolValue() || m_TrueHDPassThrough->boolValue()))
-    {
-        max_speakers = 8;
-    }
 
     int cur_speakers = m_MaxAudioChannels->getValue().toInt();
 
@@ -333,7 +333,13 @@ void AudioConfigSettings::UpdateCapabilities(const QString &device)
                                              i == cur_speakers);
         }
     }
+    settings.SetBestSupportedChannels(cur_speakers);
+    settings.setAC3(bAC3);
+    settings.setDTS(bDTS);
+    settings.setLPCM(bLPCM && (realmax_speakers > 2));
+
     slotlock.unlock();
+    return settings;
 }
 
 void AudioConfigSettings::AudioAdvanced()
@@ -465,6 +471,8 @@ bool AudioConfigSettings::CheckPassthrough()
 
 void AudioConfigSettings::StartAudioTest()
 {
+    AudioOutputSettings settings = UpdateCapabilities(QString::null);
+    
     QString out  = m_OutputDevice->getValue();
     QString passthrough =
         gCoreContext->GetNumSetting("PassThruDeviceOverride", false) ?
@@ -472,23 +480,24 @@ void AudioConfigSettings::StartAudioTest()
     int channels = m_MaxAudioChannels->getValue().toInt();
     QString errMsg;
 
-    AudioTestGroup audiotest(out, passthrough, channels);
+    AudioTestGroup audiotest(out, passthrough, channels, settings);
 
     audiotest.exec();
 }
 
 AudioTestThread::AudioTestThread(QObject *parent,
                                  QString main, QString passthrough,
-                                 int channels) :
+                                 int channels,
+                                 AudioOutputSettings settings) :
     m_parent(parent), m_channels(channels), m_device(main),
-    m_passthrough(passthrough), m_interrupted(false)
+    m_passthrough(passthrough), m_interrupted(false), m_channel(-1)
 {
     m_audioOutput = AudioOutput::OpenAudio(m_device,
                                            m_passthrough,
                                            FORMAT_S16, m_channels,
                                            0, 48000,
                                            AUDIOOUTPUT_VIDEO,
-                                           true, false);
+                                           true, false, 0, &settings);
 }
 
 QEvent::Type ChannelChangedEvent::kEventType =
@@ -502,6 +511,11 @@ AudioTestThread::~AudioTestThread()
         delete m_audioOutput;
 }
 
+void AudioTestThread::cancel()
+{
+    m_interrupted = true;
+}
+
 QString AudioTestThread::result()
 {
     QString errMsg;
@@ -512,30 +526,47 @@ QString AudioTestThread::result()
     return errMsg;
 }
 
-void AudioTestThread::cancel()
+void AudioTestThread::setChannel(int channel)
 {
-    m_interrupted = true;
+    m_channel = channel;
 }
 
 void AudioTestThread::run()
 {
     m_interrupted = false;
+    int smptelayout[7][8] = { 
+        { 0, 1 },                       //stereo
+        { },                            //not used
+        { },                            //not used
+        { },                            //not used
+        { 0, 2, 1, 5, 4, 3 },           //5.1
+        { },                            //not used
+        { 0, 2, 1, 7,  5, 4, 6, 3 },    //7.1
+    };
 
     if (m_audioOutput)
     {
-        char *frames_in = new char[m_channels * 48000 * sizeof(int16_t) + 15];
+        char *frames_in = new char[m_channels * 1024 * sizeof(int16_t) + 15];
         char *frames = (char *)(((long)frames_in + 15) & ~0xf);
         while (!m_interrupted)
         {
-            for (int i = 0; i < m_channels && !m_interrupted; i++)
+            int begin = 0;
+            int end = m_channels + 1;
+            if (m_channel >= 0)
             {
-                AudioOutputUtil::GeneratePinkSamples(frames, m_channels,
-                                                     i, 48000);
+                begin = m_channel;
+                end = m_channel + 1;
+            }
+
+            for (int i = begin; i < end && !m_interrupted; i++)
+            {
+                int current = smptelayout[m_channels - 2][i];
+
                 if (m_parent)
                 {
                     QString channel;
 
-                    switch(i)
+                    switch(current)
                     {
                         case 0:
                             channel = "frontleft";
@@ -559,7 +590,7 @@ void AudioTestThread::run()
                             if (m_channels == 6)
                                 channel = "surroundright";
                             else
-                                channel = "rearleft";
+                                channel = "rearright";
                             break;
                         case 6:
                             channel = "surroundleft";
@@ -569,24 +600,35 @@ void AudioTestThread::run()
                             break;
                     }
                     QCoreApplication::postEvent(
-                        m_parent, new ChannelChangedEvent(channel));
+                        m_parent, new ChannelChangedEvent(channel,
+                                                          m_channel < 0));
                 }
-                if (!m_audioOutput->AddFrames(frames, 48000, -1))
+                    // play sample sound for about 3s
+                for (int j = 0; j < 144 && !m_interrupted; j++)
                 {
-                    VERBOSE(VB_AUDIO, "AddAudioData() "
-                            "Audio buffer overflow, audio data lost!");
+                    AudioOutputUtil::GeneratePinkSamples(frames, m_channels,
+                                                         current, 1000);
+                    if (!m_audioOutput->AddFrames(frames, 1000, -1))
+                    {
+                        VERBOSE(VB_AUDIO, "AddAudioData() "
+                                "Audio buffer overflow, audio data lost!");
+                    }
+                    usleep(20833-1000); // 1/48th of a second
                 }
-                usleep(m_audioOutput->GetAudioBufferedTime()*1000);
+                m_audioOutput->Drain();
                 m_audioOutput->Pause(true);
                 usleep(500000); // .5s pause
                 m_audioOutput->Pause(false);
             }
+            if (m_channel >= 0)
+                break;
         }
         delete[] frames_in;
     }
 }
 
-AudioTest::AudioTest(QString main, QString passthrough, int channels) 
+AudioTest::AudioTest(QString main, QString passthrough,
+                     int channels, AudioOutputSettings settings) 
     : VerticalConfigurationGroup(false, true, false, false),
       m_channels(channels),
       m_frontleft(NULL), m_frontright(NULL), m_center(NULL),
@@ -596,7 +638,7 @@ AudioTest::AudioTest(QString main, QString passthrough, int channels)
 {
     setLabel(QObject::tr("Audio Configuration Testing"));
 
-    m_at = new AudioTestThread(this, main, passthrough, channels);
+    m_at = new AudioTestThread(this, main, passthrough, channels, settings);
     if (!m_at->result().isEmpty())
     {
         QString msg = main + QObject::tr(" is invalid or not "
@@ -620,33 +662,49 @@ AudioTest::AudioTest(QString main, QString passthrough, int channels)
     ConfigurationGroup *reargroup =
         new HorizontalConfigurationGroup(false,
                                          false);
-    m_frontleft = new TransButtonSetting("frontleft");
+    m_frontleft = new TransButtonSetting("0");
     m_frontleft->setLabel(QObject::tr("Front Left"));
-    m_frontright = new TransButtonSetting("frontright");
+    connect(m_frontleft,
+            SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
+    m_frontright = new TransButtonSetting("1");
     m_frontright->setLabel(QObject::tr("Front Right"));
-    m_center = new TransButtonSetting("center");
+    connect(m_frontright,
+            SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
+    m_center = new TransButtonSetting("2");
     m_center->setLabel(QObject::tr("Center"));
+    connect(m_center,
+            SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
 
     frontgroup->addChild(m_frontleft);
 
     switch(m_channels)
     {
         case 8:
-            m_rearleft = new TransButtonSetting("rearleft");
+            m_rearleft = new TransButtonSetting("6");
             m_rearleft->setLabel(QObject::tr("Rear Left"));
-            m_rearright = new TransButtonSetting("rearright");
+            connect(m_rearleft,
+                    SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
+            m_rearright = new TransButtonSetting("7");
             m_rearright->setLabel(QObject::tr("Rear Right"));
+            connect(m_rearright,
+                    SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
 
             reargroup->addChild(m_rearleft);
             reargroup->addChild(m_rearright);
     
         case 6:
-            m_surroundleft = new TransButtonSetting("surroundleft");
+            m_surroundleft = new TransButtonSetting("4");
             m_surroundleft->setLabel(QObject::tr("Surround Left"));
-            m_surroundright = new TransButtonSetting("surroundright");
+            connect(m_surroundleft,
+                    SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
+            m_surroundright = new TransButtonSetting("5");
             m_surroundright->setLabel(QObject::tr("Surround Right"));
-            m_lfe = new TransButtonSetting("lfe");
+            connect(m_surroundright,
+                    SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
+            m_lfe = new TransButtonSetting("3");
             m_lfe->setLabel(QObject::tr("LFE"));
+            connect(m_lfe,
+                    SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
 
             frontgroup->addChild(m_center);
             middlegroup->addChild(m_surroundleft);
@@ -677,7 +735,7 @@ void AudioTest::toggle(QString str)
         if (m_at->isRunning())
         {
             m_at->cancel();
-            m_button->setLabel(QObject::tr("Start channels test"));
+            m_button->setLabel(QObject::tr("Test All"));
             if (m_frontleft)
                 m_frontleft->setEnabled(true);
             if (m_frontright)
@@ -697,10 +755,20 @@ void AudioTest::toggle(QString str)
         }
         else
         {
+            m_at->setChannel(-1);
             m_at->start();
             m_button->setLabel(QObject::tr("Stop"));
         }
+        return;
     }
+    int channel = str.toInt();
+    if (m_at->isRunning())
+    {
+        m_at->cancel();
+        m_at->wait();
+    }
+    m_at->setChannel(channel);
+    m_at->start();
 }
 
 bool AudioTest::event(QEvent *event)
@@ -708,11 +776,15 @@ bool AudioTest::event(QEvent *event)
     if (event->type() != ChannelChangedEvent::kEventType)
         return QObject::event(event); //not handled
 
+    ChannelChangedEvent *cce = (ChannelChangedEvent*)(event);
+    QString channel          = cce->channel;
+
+    if (!cce->fulltest)
+        return false;
+
     bool fl, fr, c, lfe, sl, sr, rl, rr;
     fl = fr = c = lfe = sl = sr = rl = rr = false;
 
-    ChannelChangedEvent *cce = (ChannelChangedEvent*)(event);
-    QString channel   = cce->channel;
     if (channel == "frontleft")
     {
         fl = true;
@@ -765,9 +837,10 @@ bool AudioTest::event(QEvent *event)
 }
 
 
-AudioTestGroup::AudioTestGroup(QString main, QString passthrough, int channels)
+AudioTestGroup::AudioTestGroup(QString main, QString passthrough,
+                               int channels, AudioOutputSettings settings)
 {
-    addChild(new AudioTest(main, passthrough, channels));
+    addChild(new AudioTest(main, passthrough, channels, settings));
 }
 
 HostCheckBox *AudioMixerSettings::MythControlsVolume()

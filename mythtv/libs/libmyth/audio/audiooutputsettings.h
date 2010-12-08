@@ -61,10 +61,13 @@ class MPUBLIC AudioOutputSettings
         bool canDTS()                   { return m_DTS; };
         bool canLPCM()                  { return m_LPCM; };
         bool IsInvalid()                { return m_invalid; };
+        void setAC3(bool b)             { m_AC3 = b; };
+        void setDTS(bool b)             { m_DTS = b; };
+        void setLPCM(bool b)            { m_LPCM = b; };
+        void SetBestSupportedChannels(int channels);
 
     private:
         void SortSupportedChannels();
-        void SetBestSupportedChannels(int channels);
 
         /* passthrough status
          * -1 : no

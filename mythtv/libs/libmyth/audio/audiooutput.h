@@ -41,7 +41,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
         const QString &audiodevice, const QString &passthrudevice,
         AudioFormat format, int channels, int codec, int samplerate,
         AudioOutputSource source, bool set_initial_vol, bool passthru,
-        int upmixer_startup = 0);
+        int upmixer_startup = 0, AudioOutputSettings *custom = NULL);
     static AudioOutput *OpenAudio(AudioSettings &settings,
                                   bool willsuspendpa = true);
     static AudioOutput *OpenAudio(

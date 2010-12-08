@@ -73,7 +73,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     pSoundStretch(NULL),
     encoder(NULL),              upmixer(NULL),
     source_channels(-1),        source_samplerate(0),
-    source_bytes_per_frame(0),
+    source_bytes_per_frame(0),  upmix_default(false),
     needs_upmix(false),         needs_downmix(false),
     surround_mode(QUALITY_LOW), old_stretchfactor(1.0f),
     volume(80),                 volumeControl(QString()),
@@ -144,6 +144,17 @@ AudioOutputBase::~AudioOutputBase()
 
 void AudioOutputBase::InitSettings(const AudioSettings &settings)
 {
+    if (settings.custom)
+    {
+            // got a custom audio report already, use it
+            // this was likely provided by the AudioTest utility
+        output_settings = new AudioOutputSettings;
+        *output_settings = *settings.custom;
+        max_channels = output_settings->BestSupportedChannels();
+        configured_channels = max_channels;
+        return;
+    }
+
     // Ask the subclass what we can send to the device
     output_settings = GetOutputSettingsUsers();
 
