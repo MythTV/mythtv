@@ -264,9 +264,6 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
     m_currentStartTime = m_originalStartTime.addSecs(secsoffset);
     m_startChanID  = chanid;
     m_startChanNum = channum;
-
-    if (m_player)
-        m_embedVideo = m_player->IsRunning() && m_embedVideo;
 }
 
 bool GuideGrid::Create()
@@ -2200,7 +2197,7 @@ void GuideGrid::EmbedTVWindow(void)
 
 void GuideGrid::refreshVideo(void)
 {
-    if (m_player && m_player->IsRunning() && m_usingNullVideo)
+    if (m_player && m_usingNullVideo)
     {
         GetMythMainWindow()->GetPaintWindow()->update(m_videoRect);
     }
@@ -2216,7 +2213,7 @@ void GuideGrid::aboutToHide(void)
 
 void GuideGrid::aboutToShow(void)
 {
-    if (m_player && m_player->IsRunning())
+    if (m_player)
         EmbedTVWindow();
 
     MythScreenType::aboutToShow();

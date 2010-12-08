@@ -164,9 +164,8 @@ class AskProgramInfo
     ProgramInfo *info;
 };
 
-class MPUBLIC TV : public QThread
+class MPUBLIC TV : public QObject
 {
-    friend class QTVEventThread;
     friend class PlaybackBox;
     friend class GuideGrid;
     friend class TvPlayWindow;
@@ -233,9 +232,6 @@ class MPUBLIC TV : public QThread
     // Boolean queries
     /// Returns true if we are currently in the process of switching recorders.
     bool IsSwitchingCards(void)  const { return switchToRec; }
-    /// Returns true if the TV event thread is running. Should always be true
-    /// between the end of the constructor and the beginning of the destructor.
-    bool IsRunning(void)         const { return isRunning(); }
     /// Returns true if the user told Mythtv to allow re-recording of the show
     bool getAllowRerecord(void) const { return allowRerecord;  }
     /// This is set to true if the player reaches the end of the
@@ -298,7 +294,6 @@ class MPUBLIC TV : public QThread
 
     void DoEditSchedule(int editType = kScheduleProgramGuide);
 
-    virtual void run(void);
     void TVEventThreadChecks(void);
 
     void PauseAudioUntilBuffered(PlayerContext *ctx);
@@ -862,10 +857,6 @@ class MPUBLIC TV : public QThread
     TimerContextMap      stateChangeTimerId;
     TimerContextMap      signalMonitorTimerId;
     TimerContextMap      tvchainUpdateTimerId;
-
-    /// Condition to signal that the Event thread is up and running
-    QWaitCondition mainLoopCond;
-    QMutex mainLoopCondLock;
 
     /// Condition to signal State changes
     QWaitCondition stateChangeCond;
