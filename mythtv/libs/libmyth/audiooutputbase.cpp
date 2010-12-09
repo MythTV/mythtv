@@ -997,26 +997,17 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
     off =  processing ? 4 : output_settings->SampleSize(format);
     off *= source_channels;
 
-    int remaining_frames = frames;
     len = 0;
-    do
+    int i = 0;
+    while (i < frames)
     {
-        int i;
-        frames = remaining_frames;
-        if (frames * source_channels > SURROUND_BUFSIZE)
-        {
-            frames = SURROUND_BUFSIZE / source_channels;
-        }
+        int nFrames;
 
-        i = 0;
-        while (i < frames)
-            i += upmixer->putFrames(buffer + i * off,
-                                    frames - i, source_channels);
+        i += upmixer->putFrames(buffer + i * off,
+                                frames - i, source_channels);
 
-        remaining_frames -= i;
-        buffer += i * off;
+        nFrames = upmixer->numFrames();
 
-        int nFrames = upmixer->numFrames();
         if (!nFrames)
             continue;
 
@@ -1034,7 +1025,6 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
 
         org_waud += nFrames * bpf;
     }
-    while (remaining_frames > 0);
     return len;
 }
 
@@ -1115,7 +1105,7 @@ bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
     int frames_remaining = in_frames;
     int frames_offset = 0;
     int frames_final = 0;
-    int maxframes = (kAudioSRCInputSize / source_bytes_per_frame) & ~0xf;
+    int maxframes = (kAudioSRCInputSize / channels) & ~0xf;
 
     while(frames_remaining > 0)
     {
@@ -1155,14 +1145,9 @@ bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
 
             buffer = src_out;
             frames = src_data.output_frames_gen;
-            frames_final += frames;
         }
-        else
-        {
-            frames_final += frames;
-            if (processing)
-                buffer = src_in;
-        }
+        else if (processing)
+            buffer = src_in;
 
         /* we want the timecode of the last sample added but we are given the
            timecode of the first - add the time in ms that the frames added
@@ -1175,6 +1160,7 @@ bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
         }
 
         frames = len / bpf;
+        frames_final += frames;
 
         bdiff = kAudioRingBufferSize - waud;
 
@@ -1331,8 +1317,8 @@ void AudioOutputBase::OutputAudioLoop(void)
 
     // to reduce startup latency, write silence in 8ms chunks
     int zero_fragment_size = (int)(0.008*samplerate/channels);
-    // make sure its a multiple of bytes_per_frame
-    zero_fragment_size *= bytes_per_frame;
+    // make sure its a multiple of output_bytes_per_frame
+    zero_fragment_size *= output_bytes_per_frame;
     if (zero_fragment_size > fragment_size)
         zero_fragment_size = fragment_size;
 
