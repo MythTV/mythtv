@@ -362,26 +362,18 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
 
         // Process Events
         VERBOSE(VB_PLAYBACK, LOC + "StartTV -- process events begin");
-        MythTimer st; st.start();
-        bool is_started = false;
+
         while (true)
         {
             qApp->processEvents();
 
-            QMutexLocker locker(&tv->stateChangeCondLock);
-            TVState state   = tv->GetState(0);
-            bool is_err     = kState_Error == state;
-            bool is_none    = kState_None  == state;
-            is_started = is_started ||
-                (st.elapsed() > (int) TV::kEndOfPlaybackFirstCheckTimer) ||
-                (!is_none && !is_err && kState_ChangingState != state);
-            if (is_err || (is_none && is_started))
+            TVState state = tv->GetState(0);
+            bool is_err   = kState_Error == state;
+            bool is_none  = kState_None  == state;
+            if (is_err || is_none)
                 break;
-
-            // timeout needs to be low enough to process keyboard input
-            unsigned long timeout = 20; // milliseconds
-            tv->stateChangeCond.wait(&tv->stateChangeCondLock, timeout);
         }
+
         VERBOSE(VB_PLAYBACK, LOC + "StartTV -- process events end");
 
         if (tv->getJumpToProgram())
@@ -1928,9 +1920,6 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         VERBOSE(VB_IMPORTANT, LOC + "HandleStateChange() Warning, "
                 "called with no state to change to.");
         ctx->UnlockState();
-
-        QMutexLocker locker(&stateChangeCondLock);
-        stateChangeCond.wakeAll();
         return;
     }
 
@@ -1947,9 +1936,6 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
                 "Attempting to set to an error state!");
         SetErrored(ctx);
         ctx->UnlockState();
-
-        QMutexLocker locker(&stateChangeCondLock);
-        stateChangeCond.wakeAll();
         return;
     }
 
@@ -2292,9 +2278,6 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
     VERBOSE(VB_PLAYBACK, LOC +
             QString("HandleStateChange(%1) -- end")
             .arg(find_player_index(ctx)));
-
-    QMutexLocker locker(&stateChangeCondLock);
-    stateChangeCond.wakeAll();
 }
 #undef TRANSITION
 #undef SET_NEXT
