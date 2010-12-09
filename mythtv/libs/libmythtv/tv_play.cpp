@@ -3982,6 +3982,9 @@ bool TV::DiscMenuHandleAction(PlayerContext *ctx, const QStringList &actions)
     }
     else if (bdrb)
     {
+        if (!bdrb->IsInDiscMenuOrStillFrame())
+            return false;
+
         int64_t pts = 0;
         VideoOutput *output = ctx->player->getVideoOutput();
         if (output)
