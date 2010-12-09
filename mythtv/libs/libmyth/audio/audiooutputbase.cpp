@@ -423,11 +423,13 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     /* Encode to AC-3 if we're allowed to passthru but aren't currently
        and we have more than 2 channels but multichannel PCM is not supported
-       or if the device just doesn't support the number of channels */
+       or if the device just doesn't support the number of channels or
+       (hack) if we are upmixing stereo to 5.1 */
     enc = (!passthru &&
            output_settings->IsSupportedFormat(FORMAT_S16) &&
            output_settings->canAC3() &&
-           ((!output_settings->canLPCM() && configured_channels > 2) ||
+           ((needs_upmix && source_channels == 2) ||
+            (!output_settings->canLPCM() && configured_channels > 2) ||
             !output_settings->IsSupportedChannels(channels)));
     VBAUDIO(QString("enc(%1), passthru(%2), canAC3(%3), canDTS(%4), canLPCM(%5)"
                     ", configured_channels(%6), %7 channels supported(%8)")
@@ -525,7 +527,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         if (enc)
             output_format = FORMAT_S16;  // Output s16le for AC-3 encoder
         else
-            output_format = output_settings->BestSupportedFormat();
+            output_format = format; //output_settings->BestSupportedFormat();
     }
 
     if (passthru)
