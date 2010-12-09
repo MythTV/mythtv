@@ -600,7 +600,7 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
 
         if (cc && (cc->text != QString::null))
         {
-            int width  = font.width(cc->text) + pad_width * 2;
+            int width  = font.width(cc->text) + pad_width;
             int x = teletextmode ? cc->y : (cc->x + 3);
             int y = teletextmode ? cc->x : cc->y;
             x = (int)(((float)x / (float)xscale) * (float)m_safeArea.width());
@@ -612,7 +612,8 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
                 MythUIShape *shape = new MythUIShape(this,
                     QString("cc608bg%1%2%3").arg(cc->x).arg(cc->y).arg(width));
                 shape->SetFillBrush(bgfill);
-                shape->SetArea(MythRect(rect));
+                QRect bgrect(x - pad_width, y, width + pad_width, height);
+                shape->SetArea(MythRect(bgrect));
             }
 
             gTextSubFont->SetColor(clr[max(min(0, cc->color), 7)]);
@@ -620,7 +621,7 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
                    cc->text, *gTextSubFont, rect, rect, (MythUIType*)this,
                    QString("cc608txt%1%2%3").arg(cc->x).arg(cc->y).arg(width));
             if (text)
-                text->SetJustification(Qt::AlignCenter);
+                text->SetJustification(Qt::AlignLeft);
             m_refreshArea = true;
             VERBOSE(VB_VBI, QString("x %1 y %2 String: '%3'")
                                 .arg(cc->x).arg(cc->y).arg(cc->text));
