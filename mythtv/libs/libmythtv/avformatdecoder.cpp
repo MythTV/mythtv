@@ -54,11 +54,6 @@ extern const uint8_t *ff_find_start_code(const uint8_t *p, const uint8_t *end, u
 extern void ff_read_frame_flush(AVFormatContext *s);
 #include "libavformat/avio.h"
 #include "libswscale/swscale.h"
-#if CONFIG_LIBMPEG2EXTERNAL
-#include <mpeg2dec/mpeg2.h>
-#else
-#include "../libmythmpeg2/mpeg2.h"
-#endif
 #include "ivtv_myth.h"
 }
 
