@@ -2129,9 +2129,10 @@ static QStringList allowed_video_renderers(
     if (!curwin)
         curwin = display->GetRoot();
 
-    bool xv, shm,  dummy;
+    bool xv  = true;
+    bool shm = true;
 
-    myth2av_codecid(myth_codec_id, dummy);
+    myth2av_codecid(myth_codec_id);
 
     SetFromEnv(xv, shm);
     SetFromHW(display, curwin, xv, shm);
