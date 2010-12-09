@@ -2437,7 +2437,6 @@ void VideoDialog::VideoMenu()
             m_menuPopup->AddButton(tr("Mark as Watched"), SLOT(ToggleWatched()));
         m_menuPopup->AddButton(tr("Video Info"), SLOT(InfoMenu()), true);
         m_menuPopup->AddButton(tr("Change Video Details"), SLOT(ManageMenu()), true);
-        m_menuPopup->AddButton(tr("Video Options"), SLOT(VideoOptionMenu()), true);
         m_menuPopup->AddButton(tr("Delete"), SLOT(RemoveVideo()));
     }
     if (node && !(node->getInt() >= 0) && node->getInt() != kUpFolder)
@@ -2707,34 +2706,6 @@ void VideoDialog::InfoMenu()
     }
 }
 
-/** \fn VideoDialog::VideoOptionMenu()
- *  \brief Pop up a MythUI Menu to toggle watched/browseable.
- *  \return void.
- */
-void VideoDialog::VideoOptionMenu()
-{
-    QString label = tr("Video Options");
-
-    m_menuPopup = new MythDialogBox(label, m_popupStack, "videomenupopup");
-
-    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
-
-    if (m_menuPopup->Create())
-        m_popupStack->AddScreen(m_menuPopup);
-
-    m_menuPopup->SetReturnEvent(this, "option");
-
-    if (metadata->GetWatched())
-        m_menuPopup->AddButton(tr("Mark as Unwatched"), SLOT(ToggleWatched()));
-    else
-        m_menuPopup->AddButton(tr("Mark as Watched"), SLOT(ToggleWatched()));
-
-    if (metadata->GetBrowse())
-        m_menuPopup->AddButton(tr("Mark as Non-Browseable"), SLOT(ToggleBrowseable()));
-    else
-        m_menuPopup->AddButton(tr("Mark as Browseable"), SLOT(ToggleBrowseable()));
-}
-
 /** \fn VideoDialog::ManageMenu()
  *  \brief Pop up a MythUI Menu for metadata management.
  *  \return void.
@@ -2754,8 +2725,6 @@ void VideoDialog::ManageMenu()
 
     m_menuPopup->AddButton(tr("Edit Details"), SLOT(EditMetadata()));
     m_menuPopup->AddButton(tr("Retrieve Details"), SLOT(VideoSearch()));
-    m_menuPopup->AddButton(tr("Manually Enter Video #"),
-            SLOT(ManualVideoUID()));
     if (metadata->GetProcessed())
         m_menuPopup->AddButton(tr("Allow Updates"), SLOT(ToggleProcess()));
     else
@@ -3638,36 +3607,6 @@ void VideoDialog::OnParentalChange(int amount)
             metadata->UpdateDatabase();
             refreshData();
         }
-    }
-}
-
-void VideoDialog::ManualVideoUID()
-{
-    QString message = tr("Enter Video Unique ID:");
-
-    MythTextInputDialog *searchdialog =
-                                new MythTextInputDialog(m_popupStack, message);
-
-    if (searchdialog->Create())
-        m_popupStack->AddScreen(searchdialog);
-
-    connect(searchdialog, SIGNAL(haveResult(QString)),
-            SLOT(OnManualVideoUID(QString)), Qt::QueuedConnection);
-}
-
-void VideoDialog::OnManualVideoUID(QString video_uid)
-{
-    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
-    MythGenericTree *node = GetNodePtrFromButton(GetItemCurrent());
-
-   if (video_uid.length() && node && metadata)
-    {
-        MetadataLookup *lookup = new MetadataLookup();
-        lookup->SetStep(GETDATA);
-        lookup->SetType(VID);
-        lookup->SetInetref(video_uid);
-        lookup->SetData(qVariantFromValue(node));
-        m_query->addLookup(lookup);
     }
 }
 
