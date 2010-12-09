@@ -242,7 +242,7 @@ QStringList PlaybackSock::GetSGFileList(QString &host, QString &groupname,
     strlist << host;
     strlist << groupname;
     strlist << directory;
-    QString::number(fileNamesOnly);
+    strlist << QString::number(fileNamesOnly);
 
     SendReceiveStringList(strlist);
 
