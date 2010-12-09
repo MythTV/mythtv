@@ -78,7 +78,6 @@ typedef void (*EMBEDRETURNVOIDSCHEDIT) (const ProgramInfo *, void *);
 //            -> recorderPlaybackInfoLock
 //            -> timerIdLock
 //            -> mainLoopCondLock
-//            -> stateChangeCondLock
 //            -> channelGroupLock
 //
 // When holding one of these locks, you may lock any lock of  the locks to
@@ -855,10 +854,6 @@ class MPUBLIC TV : public QObject
     TimerContextMap      stateChangeTimerId;
     TimerContextMap      signalMonitorTimerId;
     TimerContextMap      tvchainUpdateTimerId;
-
-    /// Condition to signal State changes
-    QWaitCondition stateChangeCond;
-    QMutex stateChangeCondLock;
 
   public:
     // Constants
