@@ -117,12 +117,6 @@ void VideoOutputXv::GetRenderOptions(render_opts &opts,
         (*opts.safe_renderers)["ffmpeg"].append("xshm");
         (*opts.safe_renderers)["ffmpeg"].append("xv-blit");
     }
-    if (opts.decoders->contains("libmpeg2"))
-    {
-        (*opts.safe_renderers)["libmpeg2"].append("xlib");
-        (*opts.safe_renderers)["libmpeg2"].append("xshm");
-        (*opts.safe_renderers)["libmpeg2"].append("xv-blit");
-    }
 
     if (opts.decoders->contains("crystalhd"))
     {

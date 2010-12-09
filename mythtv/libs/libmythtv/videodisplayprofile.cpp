@@ -637,7 +637,6 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
     if (dec_name.empty())
     {
         dec_name["ffmpeg"]   = QObject::tr("Standard");
-        dec_name["libmpeg2"] = QObject::tr("libmpeg2");
         dec_name["macaccel"] = QObject::tr("Mac hardware acceleration");
         dec_name["vdpau"]    = QObject::tr("NVidia VDPAU acceleration");
     }
@@ -663,11 +662,6 @@ QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
 
     if (decoder == "ffmpeg")
         msg += QObject::tr("Standard will use ffmpeg library.");
-
-    if (decoder == "libmpeg2")
-        msg +=  QObject::tr(
-            "libmpeg2 is slower on almost all processors than ffmpeg "
-            "and breaks caption decoding. Use at your own risk!");
 
     if (decoder == "macaccel")
         msg += QObject::tr(

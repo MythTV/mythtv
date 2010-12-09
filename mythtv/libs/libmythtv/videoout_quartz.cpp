@@ -1092,8 +1092,6 @@ void VideoOutputQuartz::GetRenderOptions(render_opts &opts,
     (*opts.safe_renderers)["nuppel"].append("quartz-blit");
     if (opts.decoders->contains("ffmpeg"))
         (*opts.safe_renderers)["ffmpeg"].append("quartz-blit");
-    if (opts.decoders->contains("libmpeg2"))
-        (*opts.safe_renderers)["libmpeg2"].append("quartz-blit");
     if (opts.decoders->contains("vda"))
         (*opts.safe_renderers)["vda"].append("quartz-blit");
     if (opts.decoders->contains("crystalhd"))
@@ -1764,7 +1762,7 @@ MythCodecID VideoOutputQuartz::GetBestSupportedCodec(
     VideoDisplayProfile vdp;
     vdp.SetInput(QSize(width, height));
     QString dec = vdp.GetDecoder();
-    if ((dec == "libmpeg2") || (dec == "ffmpeg"))
+    if (dec == "ffmpeg")
         return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
     return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
 }

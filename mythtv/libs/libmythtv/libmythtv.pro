@@ -64,11 +64,6 @@ using_live: LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_hdhomerun: LIBS += -L../libmythhdhomerun -lmythhdhomerun-$$LIBVERSION
 using_backend: LIBS += -lmp3lame
 LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
-!contains( CONFIG_LIBMPEG2EXTERNAL, yes) {
-        DEPENDPATH  += ../libmythmpeg2
-        LIBS += -L../libmythmpeg2 -lmythmpeg2-$$LIBVERSION
-        TARGETDEPS += ../libmythmpeg2/libmythmpeg2-$${MYTH_LIB_EXT}
-}
 
 TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
@@ -280,10 +275,10 @@ using_frontend {
     # A/V decoders
     HEADERS += decoderbase.h
     HEADERS += nuppeldecoder.h          avformatdecoder.h
-    HEADERS += privatedecoder.h         privatedecoder_mpeg2.h
+    HEADERS += privatedecoder.h
     SOURCES += decoderbase.cpp
     SOURCES += nuppeldecoder.cpp        avformatdecoder.cpp
-    SOURCES += privatedecoder.cpp       privatedecoder_mpeg2.cpp
+    SOURCES += privatedecoder.cpp
 
     using_crystalhd {
         DEFINES += USING_CRYSTALHD

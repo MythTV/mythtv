@@ -270,8 +270,6 @@ void VideoOutputDirectfb::GetRenderOptions(render_opts &opts,
     (*opts.safe_renderers)["nuppel"].append("directfb");
     if (opts.decoders->contains("ffmpeg"))
         (*opts.safe_renderers)["ffmpeg"].append("directfb");
-    if (opts.decoders->contains("libmpeg2"))
-        (*opts.safe_renderers)["libmpeg2"].append("directfb");
     if (opts.decoders->contains("crystalhd"))
         (*opts.safe_renderers)["crystalhd"].append("directfb");
     opts.priorities->insert("directfb", 60);
