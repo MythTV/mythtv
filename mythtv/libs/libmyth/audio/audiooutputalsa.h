@@ -46,8 +46,6 @@ class AudioOutputALSA : public AudioOutputBase
     int          pbufsize;
     int          m_card, m_device, m_subdevice;
     QMutex       killAudioLock;
-    snd_pcm_sframes_t (*pcm_write_func)(snd_pcm_t*, const void*,
-                                        snd_pcm_uframes_t);
     bool         m_autopassthrough;
     QString      m_lastdevice;
 
