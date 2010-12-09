@@ -2437,7 +2437,11 @@ void VideoDialog::VideoMenu()
             m_menuPopup->AddButton(tr("Mark as Watched"), SLOT(ToggleWatched()));
         m_menuPopup->AddButton(tr("Video Info"), SLOT(InfoMenu()), true);
         m_menuPopup->AddButton(tr("Change Video Details"), SLOT(ManageMenu()), true);
-        m_menuPopup->AddButton(tr("Delete"), SLOT(RemoveVideo()));
+
+        if (m_d->m_type == DLG_MANAGER)
+        {
+            m_menuPopup->AddButton(tr("Delete"), SLOT(RemoveVideo()));
+        }
     }
     if (node && !(node->getInt() >= 0) && node->getInt() != kUpFolder)
         m_menuPopup->AddButton(tr("Play Folder"), SLOT(playFolder()));
