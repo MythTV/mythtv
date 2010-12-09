@@ -3559,18 +3559,6 @@ void VideoDialog::VideoAutoSearch(MythGenericTree *node)
     }
 }
 
-void VideoDialog::ToggleBrowseable()
-{
-    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
-    if (metadata)
-    {
-        metadata->SetBrowse(!metadata->GetBrowse());
-        metadata->UpdateDatabase();
-
-        refreshData();
-    }
-}
-
 void VideoDialog::ToggleWatched()
 {
     VideoMetadata *metadata = GetMetadata(GetItemCurrent());

@@ -97,7 +97,6 @@ class VideoDialog : public MythScreenType
                      bool automode = false);
     void VideoAutoSearch(MythGenericTree *node = NULL);
     void ResetMetadata();
-    void ToggleBrowseable();
     void ToggleWatched();
     void ToggleProcess();
     void RemoveVideo();
