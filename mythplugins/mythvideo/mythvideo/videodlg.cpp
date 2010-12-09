@@ -2514,20 +2514,6 @@ void VideoDialog::DisplayMenu()
 
     m_menuPopup->AddButton(tr("Change View"), SLOT(ViewMenu()), true);
 
-    if (m_d->m_isFileBrowser)
-        m_menuPopup->AddButton(tr("Disable File Browse Mode"),
-                                                    SLOT(ToggleBrowseMode()));
-    else
-        m_menuPopup->AddButton(tr("Enable File Browse Mode"),
-                                                    SLOT(ToggleBrowseMode()));
-
-    if (m_d->m_isFlatList)
-        m_menuPopup->AddButton(tr("Disable Flat View"),
-                                                    SLOT(ToggleFlatView()));
-    else
-        m_menuPopup->AddButton(tr("Enable Flat View"),
-                                                    SLOT(ToggleFlatView()));
-
     m_menuPopup->AddButton(tr("Settings"), SLOT(SettingsMenu()), true);
 }
 
@@ -2560,6 +2546,20 @@ void VideoDialog::ViewMenu()
     if (!(m_d->m_type & DLG_MANAGER))
         m_menuPopup->AddButton(tr("Switch to Manage View"),
                 SLOT(SwitchManager()));
+
+    if (m_d->m_isFileBrowser)
+        m_menuPopup->AddButton(tr("Disable File Browse Mode"),
+                                                    SLOT(ToggleBrowseMode()));
+    else
+        m_menuPopup->AddButton(tr("Enable File Browse Mode"),
+                                                    SLOT(ToggleBrowseMode()));
+
+    if (m_d->m_isFlatList)
+        m_menuPopup->AddButton(tr("Disable Flat View"),
+                                                    SLOT(ToggleFlatView()));
+    else
+        m_menuPopup->AddButton(tr("Enable Flat View"),
+                                                    SLOT(ToggleFlatView()));
 }
 
 /** \fn VideoDialog::SettingsMenu()
