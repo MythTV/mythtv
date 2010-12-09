@@ -20,7 +20,7 @@ using namespace std;
    mythtv/bindings/perl/MythTV.pm
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1264";
+const QString currentDatabaseVersion = "1265";
 
 static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver);
 static bool performActualUpdate(
@@ -5499,6 +5499,25 @@ NULL
 NULL
 };
         if (!performActualUpdate(updates, "1264", dbver))
+            return false;
+    }
+
+    if (dbver == "1264")
+    {
+        const char *updates[] = {
+"DELETE FROM displayprofiles WHERE profilegroupid IN "
+"  (SELECT profilegroupid FROM displayprofilegroups "
+"    WHERE name IN ('CPU++', 'CPU+', 'CPU--'))",
+"DELETE FROM displayprofilegroups WHERE name IN ('CPU++', 'CPU+', 'CPU--')",
+"DELETE FROM settings WHERE value = 'DefaultVideoPlaybackProfile' "
+"   AND data IN ('CPU++', 'CPU+', 'CPU--')",
+"UPDATE displayprofiles SET data = 'ffmpeg' WHERE data = 'libmpeg2'",
+"UPDATE displayprofiles SET data = 'ffmpeg' WHERE data = 'xvmc'",
+"UPDATE displayprofiles SET data = 'xv-blit' WHERE data = 'xvmc-blit'",
+"UPDATE displayprofiles SET data = 'softblend' WHERE data = 'ia44blend'",
+NULL
+};
+        if (!performActualUpdate(updates, "1265", dbver))
             return false;
     }
 
