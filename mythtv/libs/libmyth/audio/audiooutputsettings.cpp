@@ -307,8 +307,7 @@ AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
     bool bDTS  = (aosettings->m_DTS || bForceDigital) && 
         gCoreContext->GetNumSetting("DTSPassThru", false);
     bool bLPCM = aosettings->m_LPCM &&
-        (aosettings->m_passthrough == -1 ||
-         !(bAdv && gCoreContext->GetNumSetting("StereoPCM", false)));
+        !(bAdv && gCoreContext->GetNumSetting("StereoPCM", false));
 
     if (max_channels > 2 && !bLPCM)
         max_channels = 2;
