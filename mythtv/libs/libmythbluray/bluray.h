@@ -477,7 +477,10 @@ typedef enum {
     BD_EVENT_SECONDARY_VIDEO,        /* 0 - disable, 1 - enable */
     BD_EVENT_SECONDARY_VIDEO_SIZE,   /* 0 - PIP, 0xf - fullscreen */
 
-    /* still */
+    /* HDMV VM or JVM seeked the stream. Next read() will return data from new position. */
+    BD_EVENT_SEEK,
+
+    /* still playback (pause) */
     BD_EVENT_STILL,         /* 0 - off, 1 - on */
 
 } bd_event_e;

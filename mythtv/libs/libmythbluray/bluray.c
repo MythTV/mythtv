@@ -261,8 +261,10 @@ static int _open_m2ts(BLURAY *bd, BD_STREAM *st)
                         bd->aacs, title);
             }
 
-            if (st == &bd->st0)
+            if (st == &bd->st0) {
                 bd_psr_write(bd->regs, PSR_PLAYITEM, st->clip->ref);
+                bd_psr_write(bd->regs, PSR_TIME,     st->clip->in_time);
+            }
 
             return 1;
         }
@@ -1796,11 +1798,16 @@ static void _process_hdmv_vm_event(BLURAY *bd, HDMV_EVENT *hev)
             break;
 
         case HDMV_EVENT_PLAY_PI:
-            //bd_seek_pi(bd, hev->param);
+#if 0
+            _queue_event(bd, (BD_EVENT){BD_EVENT_SEEK, 0});
+            bd_seek_pi(bd, hev->param);
+#else
             DEBUG(DBG_BLURAY|DBG_CRIT, "HDMV_EVENT_PLAY_PI: not implemented\n");
+#endif
             break;
 
         case HDMV_EVENT_PLAY_PM:
+            _queue_event(bd, (BD_EVENT){BD_EVENT_SEEK, 0});
             bd_seek_mark(bd, hev->param);
             break;
 
