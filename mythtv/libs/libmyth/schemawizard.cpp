@@ -413,12 +413,12 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
             return MYTH_SCHEMA_ERROR;
         }
 
+        if (m_expertMode)
+            return returnValue;  // Experts don't like to repeat themselves :-)
+
         returnValue = GuiPrompt(message, upgradable, m_expertMode);
         if (returnValue == MYTH_SCHEMA_EXIT)
             return MYTH_SCHEMA_EXIT;
-
-        if (m_expertMode)
-            return returnValue;  // Experts don't like to repeat themselves :-)
 
         // The annoying extra confirmation:
         if (backupStatus == kDB_Backup_Completed)
