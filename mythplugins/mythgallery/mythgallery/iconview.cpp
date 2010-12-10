@@ -482,23 +482,12 @@ bool IconView::keyPressEvent(QKeyEvent *event)
 
         if (action == "ESCAPE") 
         {
-            if (!GetMythMainWindow()->IsExitingToMain()) 
+            if (GetMythMainWindow()->IsExitingToMain()) 
             {
-                handled = HandleEscape();
-            } 
-            else 
-            {
-                while (true) 
-                {
-                    QDir currentDir(m_currDir);
-                    QDir rootDir(m_galleryDir);
-                    if (currentDir != rootDir) 
-                        HandleSubDirEscape(m_galleryDir);
-                    else 
-                        break;
-                }
-                handled = HandleEscape();
+                while ( m_currDir != m_galleryDir &&
+                        HandleSubDirEscape(m_galleryDir) );
             }
+            handled = HandleEscape();
         }
     }
 
