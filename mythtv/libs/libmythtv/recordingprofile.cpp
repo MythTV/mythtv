@@ -1268,6 +1268,107 @@ void RecordingProfile::loadByID(int profileId)
         isEncoder = CardUtil::IsEncoder(type);
     }
 
+    CompleteLoad(profileId, type);
+}
+
+void RecordingProfile::FiltersChanged(const QString &val)
+{
+    if (!tr_filters || !tr_lossless)
+      return;
+
+    // If there are filters, we cannot do lossless transcoding
+    if (!val.trimmed().isEmpty())
+    {
+       tr_lossless->setValue(false);
+       tr_lossless->setEnabled(false);
+    }
+    else
+    {
+       tr_lossless->setEnabled(true);
+    }
+}
+
+bool RecordingProfile::loadByType(const QString &name, const QString &cardtype)
+{
+    QString hostname = gCoreContext->GetHostName().toLower();
+    uint profileId = 0;
+
+    MSqlQuery result(MSqlQuery::InitCon());
+    result.prepare(
+        "SELECT recordingprofiles.id, profilegroups.hostname, "
+        "       profilegroups.is_default "
+        "FROM recordingprofiles, profilegroups "
+        "WHERE profilegroups.id       = recordingprofiles.profilegroup AND "
+        "      profilegroups.cardtype = :CARDTYPE                      AND "
+        "      recordingprofiles.name = :NAME");
+    result.bindValue(":CARDTYPE", cardtype);
+    result.bindValue(":NAME", name);
+
+    if (!result.exec())
+    {
+        MythDB::DBError("RecordingProfile::loadByType()", result);
+        return false;
+    }
+
+    while (result.next())
+    {
+        if ((result.value(1).toString().toLower() == hostname) ||
+            (result.value(2).toInt() == 1))
+        {
+            profileId = result.value(0).toUInt();
+
+        if (result.value(1).toString().toLower() == hostname)
+            break;
+        }
+        }
+
+    if (profileId)
+    {
+        if (profileName.isEmpty())
+            profileName = name;
+        isEncoder = CardUtil::IsEncoder(cardtype);
+        CompleteLoad(profileId, cardtype);
+        return true;
+    }
+
+    return false;
+}
+
+bool RecordingProfile::loadByGroup(const QString &name, const QString &group)
+{
+    MSqlQuery result(MSqlQuery::InitCon());
+    result.prepare(
+        "SELECT recordingprofiles.id, cardtype "
+        "FROM recordingprofiles, profilegroups "
+        "WHERE recordingprofiles.profilegroup = profilegroups.id AND "
+        "      profilegroups.name             = :GROUPNAME       AND "
+        "      recordingprofiles.name         = :NAME");
+    result.bindValue(":GROUPNAME", group);
+    result.bindValue(":NAME", name);
+
+    if (!result.exec())
+    {
+        MythDB::DBError("RecordingProfile::loadByGroup()", result);
+        return false;
+    }
+
+    if (result.next())
+    {
+        uint profileId = result.value(0).toUInt();
+        QString type = result.value(1).toString();
+
+        if (profileName.isEmpty())
+            profileName = name;
+        isEncoder = CardUtil::IsEncoder(type);
+        CompleteLoad(profileId, type);
+        return true;
+    }
+
+    return false;
+}
+
+void RecordingProfile::CompleteLoad(int profileId, QString type)
+{
     if (isEncoder)
     {
         QString tvFormat = gCoreContext->GetSetting("TVFormat");
@@ -1297,94 +1398,6 @@ void RecordingProfile::loadByID(int profileId)
 
     id->setValue(profileId);
     Load();
-}
-
-void RecordingProfile::FiltersChanged(const QString &val)
-{
-    if (!tr_filters || !tr_lossless)
-      return;
-
-    // If there are filters, we cannot do lossless transcoding
-    if (!val.trimmed().isEmpty())
-    {
-       tr_lossless->setValue(false);
-       tr_lossless->setEnabled(false);
-    }
-    else
-    {
-       tr_lossless->setEnabled(true);
-    }
-}
-
-bool RecordingProfile::loadByType(const QString &name, const QString &cardtype)
-{
-    QString hostname = gCoreContext->GetHostName().toLower();
-    uint recid = 0;
-
-    MSqlQuery result(MSqlQuery::InitCon());
-    result.prepare(
-        "SELECT recordingprofiles.id, profilegroups.hostname, "
-        "       profilegroups.is_default "
-        "FROM recordingprofiles, profilegroups "
-        "WHERE profilegroups.id       = recordingprofiles.profilegroup AND "
-        "      profilegroups.cardtype = :CARDTYPE                      AND "
-        "      recordingprofiles.name = :NAME");
-    result.bindValue(":CARDTYPE", cardtype);
-    result.bindValue(":NAME", name);
-
-    if (!result.exec())
-    {
-        MythDB::DBError("RecordingProfile::loadByType()", result);
-        return false;
-    }
-
-    while (result.next())
-    {
-        if (result.value(1).toString().toLower() == hostname)
-        {
-            recid = result.value(0).toUInt();
-            break;
-        }
-        else if (result.value(2).toInt() == 1)
-        {
-            recid = result.value(0).toUInt();
-        }
-    }
-
-    if (recid)
-    {
-        loadByID(recid);
-        return true;
-    }
-
-    return false;
-}
-
-bool RecordingProfile::loadByGroup(const QString &name, const QString &group)
-{
-    MSqlQuery result(MSqlQuery::InitCon());
-    result.prepare(
-        "SELECT recordingprofiles.id "
-        "FROM recordingprofiles, profilegroups "
-        "WHERE recordingprofiles.profilegroup = profilegroups.id AND "
-        "      profilegroups.name             = :GROUPNAME       AND "
-        "      recordingprofiles.name         = :NAME");
-    result.bindValue(":GROUPNAME", group);
-    result.bindValue(":NAME", name);
-
-    if (!result.exec())
-    {
-        MythDB::DBError("RecordingProfile::loadByGroup()", result);
-        return false;
-    }
-
-    if (result.next())
-    {
-        loadByID(result.value(0).toUInt());
-        return true;
-    }
-
-    return false;
 }
 
 void RecordingProfile::setCodecTypes()
