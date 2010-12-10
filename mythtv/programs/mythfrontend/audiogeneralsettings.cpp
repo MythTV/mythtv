@@ -261,6 +261,8 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
     bool bAC3 = true;
     bool bDTS = true;
     bool bLPCM = true;
+    bool bHD = true;
+    bool bHDLL = true;
 
     QString out = m_OutputDevice->getValue();
     if (!audiodevs.contains(out))
@@ -278,10 +280,13 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
             m_AC3PassThrough->boolValue();
         bDTS  = (settings.canDTS() || bForceDigital) &&
             m_DTSPassThrough->boolValue();
-        bLPCM = settings.canPassthrough() == -1 ||
-            (settings.canLPCM() &&
-             !gCoreContext->GetNumSetting("StereoPCM", false));
-
+        bLPCM = settings.canLPCM() &&
+            !gCoreContext->GetNumSetting("StereoPCM", false);
+        bHD = ((bLPCM && settings.canHD()) || bForceDigital) &&
+            m_EAC3PassThrough->boolValue();
+        bHDLL = ((bLPCM && settings.canHDLL()) || bForceDigital) &&
+            m_TrueHDPassThrough->boolValue();
+            
         if (max_speakers > 2 && !bLPCM)
             max_speakers = 2;
         if (max_speakers == 2 && (bAC3 || bDTS))
@@ -290,12 +295,8 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
 
     m_triggerDigital->setValue(invalid || bForceDigital ||
                                settings.canAC3() || settings.canDTS());
-
-    bool canhdpassthrough = (invalid || m_passthrough8 ||
-                             (settings.canPassthrough() >= 0 &&
-                              max_speakers >= 8));
-    m_EAC3PassThrough->setEnabled(canhdpassthrough);
-    m_TrueHDPassThrough->setEnabled(canhdpassthrough);
+    m_EAC3PassThrough->setEnabled(settings.canHD() && bLPCM);
+    m_TrueHDPassThrough->setEnabled(settings.canHDLL() & bLPCM);
 
     int cur_speakers = m_MaxAudioChannels->getValue().toInt();
 
@@ -437,7 +438,7 @@ HostCheckBox *AudioConfigSettings::EAC3PassThrough()
 HostCheckBox *AudioConfigSettings::TrueHDPassThrough()
 {
     HostCheckBox *gc = new HostCheckBox("TrueHDPassThru");
-    gc->setLabel(QObject::tr("TrueHD"));
+    gc->setLabel(QObject::tr("TrueHD/DTS-HD MA"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
                     "supports Dolby TrueHD. You must use a hdmi connection."));

@@ -1,6 +1,6 @@
 /* -*- Mode: c++ -*-
  *
- * Copyright (C) foobum@gmail.com 2010
+ * Copyright (C) 2010 foobum@gmail.com and jyavenard@gmail.com
  *
  * Licensed under the GPL v2 or a later version at your choosing.
  */
@@ -17,8 +17,8 @@ using namespace std;
 #define LOC QString("AO: ")
 
 AudioOutputSettings::AudioOutputSettings(bool invalid) :
-    m_passthrough(-1), m_AC3(false), m_DTS(false), m_LPCM(false),
-    m_invalid(invalid)
+    m_passthrough(-1), m_AC3(false),  m_DTS(false), m_LPCM(false),
+    m_HD(false)      , m_HDLL(false), m_invalid(invalid)
 {
     m_sr.assign(srs,  srs  +
                 sizeof(srs)  / sizeof(int));
@@ -51,6 +51,8 @@ AudioOutputSettings& AudioOutputSettings::operator=(
     m_AC3           = rhs.m_AC3;
     m_DTS           = rhs.m_DTS;
     m_LPCM          = rhs.m_LPCM;
+    m_HD            = rhs.m_HD;
+    m_HDLL          = rhs.m_HDLL;
     m_invalid       = rhs.m_invalid;
     m_sr_it         = m_sr.begin() + (rhs.m_sr_it - rhs.m_sr.begin());
     m_sf_it         = m_sf.begin() + (rhs.m_sf_it - rhs.m_sf.begin());
@@ -269,6 +271,12 @@ AudioOutputSettings* AudioOutputSettings::GetCleaned(bool newcopy)
     int mchannels = BestSupportedChannels();
 
     aosettings->m_LPCM = (mchannels > 2);
+        // E-AC3 is transferred as sterep PCM at 4 times the rates
+        // assume all amplifier supporting E-AC3 also supports 7.1 LPCM
+        // as it's required under the bluray standard
+    aosettings->m_HD = (mchannels == 8 && BestSupportedRate() == 192000);
+    aosettings->m_HDLL = (mchannels == 8 && BestSupportedRate() == 192000);
+
     if (mchannels == 2 && m_passthrough >= 0)
     {
         VERBOSE(VB_AUDIO, LOC + QString("may be AC3 or DTS capable"));
@@ -307,6 +315,10 @@ AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
         gCoreContext->GetNumSetting("DTSPassThru", false);
     bool bLPCM = aosettings->m_LPCM &&
         !gCoreContext->GetNumSetting("StereoPCM", false);
+    bool bHD = bLPCM && aosettings->m_HD &&
+        gCoreContext->GetNumSetting("EAC3PassThru", false);
+    bool bHDLL = bLPCM && aosettings->m_HD &&
+        gCoreContext->GetNumSetting("TrueHDPassThru", false);
 
     if (max_channels > 2 && !bLPCM)
         max_channels = 2;

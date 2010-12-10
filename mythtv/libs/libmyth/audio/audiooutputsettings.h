@@ -57,13 +57,44 @@ class MPUBLIC AudioOutputSettings
 
         void setPassthrough(int val)    { m_passthrough = val; };
         int  canPassthrough()           { return m_passthrough; };
+            /**
+             * return true if device can or may support AC3
+             */
         bool canAC3()                   { return m_AC3; };
+            /**
+             * return true if device can or may support DTS
+             */
         bool canDTS()                   { return m_DTS; };
+            /**
+             * return true if device supports multichannels PCM
+             */
         bool canLPCM()                  { return m_LPCM; };
+            /**
+             * return true if device supports E-AC3 or DTS-HD passthrough
+             */
+        bool canHD()                    { return m_HD; };
+            /**
+             * return true if device supports TrueHD or DTS-HD passthrough
+             */
+        bool canHDLL()                  { return m_HDLL; };
+            /**
+             * return true if class instance is marked invalid.
+             * if true, you can not assume any of the other method returned
+             * values are valid
+             */
         bool IsInvalid()                { return m_invalid; };
+            /**
+             * return true if device supports TrueHD or DTS-HD passthrough
+             */
         void setAC3(bool b)             { m_AC3 = b; };
         void setDTS(bool b)             { m_DTS = b; };
         void setLPCM(bool b)            { m_LPCM = b; };
+        void setHD(bool b)              { m_HD = b; };
+        void setHDLL(bool b)            { m_HDLL = b; };
+            /**
+             * Force set the greatest number of channels supported by the audio
+             * device
+             */
         void SetBestSupportedChannels(int channels);
 
     private:
@@ -78,6 +109,9 @@ class MPUBLIC AudioOutputSettings
         bool m_AC3;
         bool m_DTS;
         bool m_LPCM;
+        bool m_HD;
+        bool m_HDLL;
+
         bool m_invalid;
 
         vector<int> m_sr, m_rates, m_channels;
