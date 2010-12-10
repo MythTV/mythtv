@@ -222,7 +222,6 @@ class MPUBLIC TV : public QObject
                               NoRecorderMsg msgType = kNoRecorders);
     void FinishRecording(int player_idx); ///< Finishes player's recording
     void AskAllowRecording(PlayerContext*, const QStringList&, int, bool, bool);
-    bool PromptRecGroupPassword(PlayerContext*);
 
     bool CreatePBP(PlayerContext *lctx, const ProgramInfo *info);
     bool CreatePIP(PlayerContext *lctx, const ProgramInfo *info);

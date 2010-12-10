@@ -21,7 +21,6 @@ using namespace std;
 #include "tv_play.h"
 #include "tv_rec.h"
 #include "mythcorecontext.h"
-#include "dialogbox.h"
 #include "remoteencoder.h"
 #include "remoteutil.h"
 #include "tvremoteutil.h"
@@ -57,7 +56,6 @@ using namespace std;
 #include "recordinginfo.h"
 #include "mythsystemevent.h"
 #include "videometadatautil.h"
-#include "mythdialogbox.h"
 #include "mythdirs.h"
 #include "tvbrowsehelper.h"
 
@@ -10923,11 +10921,7 @@ void TV::FillOSDMenuJumpRec(PlayerContext* ctx, const QString category,
                 QString group = Iprog.key();
 
                 if (plist[0]->GetRecordingGroup() != currecgroup)
-                {
                     SetLastProgram(plist[0]);
-                    if (!PromptRecGroupPassword(ctx))
-                        continue;
-                }
 
                 if (progIndex == 1 && level == 0)
                 {
@@ -11055,18 +11049,15 @@ bool TV::HandleJumpToProgramAction(
     if (has_action("JUMPPREV", actions) ||
         (has_action("PREVCHAN", actions) && !StateIsLiveTV(s)))
     {
-        if (PromptRecGroupPassword(ctx))
+        if (mctx == ctx)
         {
-            if (mctx == ctx)
-            {
-                PrepareToExitPlayer(ctx, __LINE__);
-                jumpToProgram = true;
-                SetExitPlayer(true, true);
-            }
-            else
-            {
-                // TODO
-            }
+            PrepareToExitPlayer(ctx, __LINE__);
+            jumpToProgram = true;
+            SetExitPlayer(true, true);
+        }
+        else
+        {
+            // TODO
         }
         return true;
     }
@@ -11824,52 +11815,6 @@ bool TV::IsSameProgram(int player_idx, const ProgramInfo *rcinfo) const
     ReturnPlayerLock(ctx);
 
     return ret;
-}
-
-bool TV::PromptRecGroupPassword(PlayerContext *ctx)
-{
-    QMutexLocker locker(&lastProgramLock);
-
-    if (!lastProgram)
-        return false;
-
-    bool stayPaused = ctx->paused;
-    if (!ctx->paused)
-        DoTogglePause(ctx, false);
-    QString recGroupPassword;
-    lastProgram->SetRecordingGroup(lastProgram->QueryRecordingGroup());
-    recGroupPassword = ProgramInfo::QueryRecordingGroupPassword(
-        lastProgram->GetRecordingGroup());
-
-    if (recGroupPassword.size())
-    {
-        //qApp->lock();
-        bool ok = false;
-        QString text = tr("'%1' Group Password:")
-            .arg(lastProgram->GetRecordingGroup());
-        MythPasswordDialog *pwd = new MythPasswordDialog(text, &ok,
-                                                recGroupPassword,
-                                                GetMythMainWindow());
-        pwd->exec();
-        pwd->deleteLater();
-        pwd = NULL;
-
-        //qApp->unlock();
-        if (!ok)
-        {
-            SetOSDMessage(ctx, tr("Password Failed"));
-
-            if (ctx->paused && !stayPaused)
-                DoTogglePause(ctx, false);
-
-            return false;
-        }
-    }
-
-    if (ctx->paused && !stayPaused)
-        DoTogglePause(ctx, false);
-
-    return true;
 }
 
 void TV::RestoreScreenSaver(const PlayerContext *ctx)
