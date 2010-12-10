@@ -498,6 +498,10 @@ AudioTestThread::AudioTestThread(QObject *parent,
                                            0, 48000,
                                            AUDIOOUTPUT_VIDEO,
                                            true, false, 0, &settings);
+    if (result().isEmpty())
+    {
+        m_audioOutput->Pause(true);
+    }
 }
 
 QEvent::Type ChannelChangedEvent::kEventType =
@@ -549,14 +553,15 @@ void AudioTestThread::run()
         char *frames_in = new char[m_channels * 1024 * sizeof(int16_t) + 15];
         char *frames = (char *)(((long)frames_in + 15) & ~0xf);
 
+        m_audioOutput->Pause(false);
+
         int begin = 0;
-        int end = m_channels + 1;
+        int end = m_channels;
         if (m_channel >= 0)
         {
             begin = m_channel;
             end = m_channel + 1;
         }
-
         while (!m_interrupted)
         {
             for (int i = begin; i < end && !m_interrupted; i++)
@@ -614,7 +619,8 @@ void AudioTestThread::run()
                         VERBOSE(VB_AUDIO, "AddAudioData() "
                                 "Audio buffer overflow, audio data lost!");
                     }
-                    usleep(20833-1000); // 1/48th of a second
+                    usleep(20000); // a tad less than 1/48th of
+                                   // a second to avoid underruns
                 }
                 m_audioOutput->Drain();
                 m_audioOutput->Pause(true);
@@ -624,6 +630,8 @@ void AudioTestThread::run()
             if (m_channel >= 0)
                 break;
         }
+        m_audioOutput->Pause(true);
+
         delete[] frames_in;
     }
 }
@@ -667,11 +675,11 @@ AudioTest::AudioTest(QString main, QString passthrough,
     m_frontleft->setLabel(QObject::tr("Front Left"));
     connect(m_frontleft,
             SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
-    m_frontright = new TransButtonSetting("1");
+    m_frontright = new TransButtonSetting("2");
     m_frontright->setLabel(QObject::tr("Front Right"));
     connect(m_frontright,
             SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
-    m_center = new TransButtonSetting("2");
+    m_center = new TransButtonSetting("1");
     m_center->setLabel(QObject::tr("Center"));
     connect(m_center,
             SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
@@ -681,11 +689,11 @@ AudioTest::AudioTest(QString main, QString passthrough,
     switch(m_channels)
     {
         case 8:
-            m_rearleft = new TransButtonSetting("6");
+            m_rearleft = new TransButtonSetting("5");
             m_rearleft->setLabel(QObject::tr("Rear Left"));
             connect(m_rearleft,
                     SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
-            m_rearright = new TransButtonSetting("7");
+            m_rearright = new TransButtonSetting("4");
             m_rearright->setLabel(QObject::tr("Rear Right"));
             connect(m_rearright,
                     SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
@@ -694,15 +702,16 @@ AudioTest::AudioTest(QString main, QString passthrough,
             reargroup->addChild(m_rearright);
     
         case 6:
-            m_surroundleft = new TransButtonSetting("4");
+            m_surroundleft = new TransButtonSetting(m_channels == 6 ?
+                                                    "4" : "6");
             m_surroundleft->setLabel(QObject::tr("Surround Left"));
             connect(m_surroundleft,
                     SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
-            m_surroundright = new TransButtonSetting("5");
+            m_surroundright = new TransButtonSetting("3");
             m_surroundright->setLabel(QObject::tr("Surround Right"));
             connect(m_surroundright,
                     SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
-            m_lfe = new TransButtonSetting("3");
+            m_lfe = new TransButtonSetting(m_channels == 6 ? "5" : "7");
             m_lfe->setLabel(QObject::tr("LFE"));
             connect(m_lfe,
                     SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
