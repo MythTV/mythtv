@@ -414,7 +414,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
         }
 
         if (m_expertMode)
-            return returnValue;  // Experts don't like to repeat themselves :-)
+            return MYTH_SCHEMA_USE_EXISTING;
 
         returnValue = GuiPrompt(message, upgradable, m_expertMode);
         if (returnValue == MYTH_SCHEMA_EXIT)
