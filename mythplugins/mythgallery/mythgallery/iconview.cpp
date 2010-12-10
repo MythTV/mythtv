@@ -204,6 +204,7 @@ bool IconView::Create(void)
         m_thumbGen->setSize(thumbWidth, thumbHeight);
 
     SetupMediaMonitor();
+    LoadDirectory(m_galleryDir);
 
     return true;
 }
@@ -370,7 +371,6 @@ void IconView::SetupMediaMonitor(void)
         }
     }
     m_currDevice = NULL;
-    LoadDirectory(m_galleryDir);
 #endif // _WIN32
 }
 
