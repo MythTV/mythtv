@@ -32,6 +32,7 @@ version <next>:
 - hflip filter
 - Apple HTTP Live Streaming demuxer
 - IEC 61937 encapsulation for E-AC3 (for HDMI passthrough)
+- IEC 61937 encapsulation for E-AC3 and TrueHD (for HDMI passthrough)
 
 
 version 0.6:
