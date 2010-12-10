@@ -74,8 +74,13 @@ QStringList GetVideoDirsByHost(QString host)
 
     if (host.isEmpty())
     {
+#ifdef WIN32
+        QStringList tmp3 = gCoreContext->GetSetting("VideoStartupDir",
+                    DEFAULT_VIDEOSTARTUP_DIR).split(";", QString::SkipEmptyParts);
+#else
         QStringList tmp3 = gCoreContext->GetSetting("VideoStartupDir",
                     DEFAULT_VIDEOSTARTUP_DIR).split(":", QString::SkipEmptyParts);
+#endif
         for (QStringList::iterator p = tmp3.begin(); p != tmp3.end(); ++p)
         {
             bool matches = false;

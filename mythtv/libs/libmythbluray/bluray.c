@@ -1027,13 +1027,21 @@ int bd_read(BLURAY *bd, unsigned char *buf, int len)
                 if (st->clip == NULL) {
                     // We previously reached the last clip.  Nothing
                     // else to read.
+                    _queue_event(bd, (BD_EVENT){BD_EVENT_END_OF_TITLE, 0});
                     return 0;
                 }
                 if (clip_pkt >= st->clip->end_pkt) {
+
+                    // split read()'s at clip boundary
+                    if (out_len) {
+                        return out_len;
+                    }
+
                     st->clip = nav_next_clip(bd->title, st->clip);
                     if (st->clip == NULL) {
                         DEBUG(DBG_BLURAY|DBG_STREAM, "End of title (%p)\n", bd);
-                        return out_len;
+                        _queue_event(bd, (BD_EVENT){BD_EVENT_END_OF_TITLE, 0});
+                        return 0;
                     }
                     if (!_open_m2ts(bd, st)) {
                         return -1;
@@ -1084,19 +1092,17 @@ static int _find_ig_stream(BLURAY *bd, uint16_t *pid, int *sub_path_idx)
 {
     MPLS_PI  *pi        = &bd->title->pl->play_item[0];
     unsigned  ig_stream = bd_psr_read(bd->regs, PSR_IG_STREAM_ID);
-    unsigned  ii;
 
-    for (ii = 0; ii < pi->stn.num_ig; ii++) {
-        if (ii + 1 == ig_stream) {
-            if (pi->stn.ig[ii].stream_type == 2) {
-                *sub_path_idx = pi->stn.ig[ii].subpath_id;
-            }
-            *pid = pi->stn.ig[ii].pid;
-
-            DEBUG(DBG_BLURAY, "_find_ig_stream(): current IG stream pid 0x%04x sub-path %d\n",
-                  *pid, *sub_path_idx);
-            return 1;
+    if (ig_stream > 0 && ig_stream <= pi->stn.num_ig) {
+        ig_stream--;
+        if (pi->stn.ig[ig_stream].stream_type == 2) {
+            *sub_path_idx = pi->stn.ig[ig_stream].subpath_id;
         }
+        *pid = pi->stn.ig[ig_stream].pid;
+
+        DEBUG(DBG_BLURAY, "_find_ig_stream(): current IG stream pid 0x%04x sub-path %d\n",
+              *pid, *sub_path_idx);
+        return 1;
     }
 
     return 0;
@@ -1596,6 +1602,33 @@ static void _process_psr_event(void *handle, BD_PSR_EVENT *ev)
     }
 }
 
+static void _queue_initial_psr_events(BLURAY *bd)
+{
+    const uint32_t psrs[] = {
+        PSR_ANGLE_NUMBER,
+        PSR_TITLE_NUMBER,
+        PSR_CHAPTER,
+        PSR_PLAYLIST,
+        PSR_PLAYITEM,
+        PSR_IG_STREAM_ID,
+        PSR_PRIMARY_AUDIO_ID,
+        PSR_PG_STREAM,
+        PSR_SECONDARY_AUDIO_VIDEO,
+    };
+    unsigned ii;
+
+    for (ii = 0; ii < sizeof(psrs) / sizeof(psrs[0]); ii++) {
+        BD_PSR_EVENT ev = {
+            .ev_type = 0,
+            .psr_idx = psrs[ii],
+            .old_val = 0,
+            .new_val = bd_psr_read(bd->regs, psrs[ii]),
+        };
+
+        _process_psr_event(bd, &ev);
+    }
+}
+
 static int _play_bdj(BLURAY *bd, const char *name)
 {
     bd->title_type = title_bdj;
@@ -1714,12 +1747,17 @@ int bd_play(BLURAY *bd)
     _init_event_queue(bd);
 
     bd_psr_register_cb(bd->regs, _process_psr_event, bd);
+    _queue_initial_psr_events(bd);
 
     return bd_play_title(bd, TITLE_FIRST_PLAY);
 }
 
-int bd_menu_call(BLURAY *bd)
+int bd_menu_call(BLURAY *bd, int64_t pts)
 {
+    if (pts >= 0) {
+        bd_psr_write(bd->regs, PSR_TIME, (uint32_t)(((uint64_t)pts) >> 1));
+    }
+
     if (bd->title_type == title_undef) {
         // bd_play not called
         return 0;
@@ -1887,6 +1925,7 @@ int bd_get_event(BLURAY *bd, BD_EVENT *event)
         _init_event_queue(bd);
 
         bd_psr_register_cb(bd->regs, _process_psr_event, bd);
+        _queue_initial_psr_events(bd);
     }
 
     return _get_event(bd, event);

@@ -637,7 +637,6 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
     if (dec_name.empty())
     {
         dec_name["ffmpeg"]   = QObject::tr("Standard");
-        dec_name["libmpeg2"] = QObject::tr("libmpeg2");
         dec_name["macaccel"] = QObject::tr("Mac hardware acceleration");
         dec_name["vdpau"]    = QObject::tr("NVidia VDPAU acceleration");
     }
@@ -663,11 +662,6 @@ QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
 
     if (decoder == "ffmpeg")
         msg += QObject::tr("Standard will use ffmpeg library.");
-
-    if (decoder == "libmpeg2")
-        msg +=  QObject::tr(
-            "libmpeg2 is slower on almost all processors than ffmpeg "
-            "and breaks caption decoding. Use at your own risk!");
 
     if (decoder == "macaccel")
         msg += QObject::tr(
@@ -767,14 +761,14 @@ QString VideoDisplayProfile::GetDefaultProfileName(const QString &hostname)
 
     QStringList profiles = GetProfiles(hostname);
 
-    tmp = (profiles.contains(tmp)) ? tmp : QString::null;
+    tmp = (profiles.contains(tmp)) ? tmp : QString();
 
     if (tmp.isEmpty())
     {
         if (profiles.size())
             tmp = profiles[0];
 
-        tmp = (profiles.contains("CPU+")) ? "CPU+" : tmp;
+        tmp = (profiles.contains("Normal")) ? "Normal" : tmp;
 
         if (!tmp.isEmpty())
         {
@@ -1004,22 +998,6 @@ bool VideoDisplayProfile::DeleteProfileGroup(
     return ok;
 }
 
-void VideoDisplayProfile::CreateOldProfiles(const QString &hostname)
-{
-    (void) QObject::tr("CPU++", "Sample: No hardware assist");
-    DeleteProfileGroup("CPU++", hostname);
-    uint groupid = CreateProfileGroup("CPU++", hostname);
-    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
-                  "ffmpeg", 1, true, "xv-blit", "softblend", true,
-                  "bobdeint", "linearblend", "");
-    CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
-                  "ffmpeg", 1, true, "quartz-blit", "softblend", true,
-                  "linearblend", "linearblend", "");
-
-    DeleteProfileGroup("CPU+", hostname);
-    DeleteProfileGroup("CPU--", hostname);
-}
-
 void VideoDisplayProfile::CreateNewProfiles(const QString &hostname)
 {
     (void) QObject::tr("High Quality", "Sample: high quality");
@@ -1104,8 +1082,8 @@ void VideoDisplayProfile::CreateVDPAUProfiles(const QString &hostname)
 
 void VideoDisplayProfile::CreateProfiles(const QString &hostname)
 {
-    CreateOldProfiles(hostname);
     CreateNewProfiles(hostname);
+    CreateVDPAUProfiles(hostname);
 }
 
 QStringList VideoDisplayProfile::GetVideoRenderers(const QString &decoder)

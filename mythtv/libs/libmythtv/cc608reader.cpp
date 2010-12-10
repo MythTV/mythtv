@@ -41,7 +41,6 @@ CC608Buffer* CC608Reader::GetOutputText(bool &changed)
     if (!m_enabled || !m_parent)
         return NULL;
 
-    changed = m_changed;
     VideoFrame *last = NULL;
     if (m_parent->getVideoOutput())
         last = m_parent->getVideoOutput()->GetLastShownFrame();

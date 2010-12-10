@@ -51,10 +51,10 @@
 #define MM_SSE    0x0008 /* SSE functions */
 #define MM_SSE2   0x0010 /* PIV SSE2 functions */
 #define MM_3DNOWEXT  0x0020 /* AMD 3DNowExt */
-#define MM_SSE3   0x0010 /* SSE3 functions */
-#define MM_SSSE3  0x0010 /* SSSE3 functions */
-#define MM_SSE4   0x0010 /* SSE4.1 functions */
-#define MM_SSE42  0x0010 /* SSE4.2 functions */
+#define MM_SSE3   0x0040 /* SSE3 functions */
+#define MM_SSSE3  0x0080 /* SSSE3 functions */
+#define MM_SSE4   0x0100 /* SSE4.1 functions */
+#define MM_SSE42  0x0200 /* SSE4.2 functions */
 
 /// Checks which instruction set extensions are supported by the CPU.
 ///
