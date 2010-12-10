@@ -656,7 +656,8 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
 
     // See if we need to increase the prealloc'd buffer size
     // If buffer_time is too small we could underrun
-    if (buffer_time < original_buffer_time && pbufsize < 0)
+    // Make 10% leeway okay
+    if (buffer_time * 1.10f < (float)original_buffer_time && pbufsize < 0)
     {
         VBAUDIO(QString("Requested %1us got %2 buffer time")
                 .arg(original_buffer_time).arg(buffer_time));
@@ -666,6 +667,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
     VBAUDIO(QString("Buffer time = %1 us").arg(buffer_time));
 
     /* set the period time */
+    dir = 1;
     err = snd_pcm_hw_params_set_period_time_near(handle, params,
                                                  &period_time, &dir);
     CHECKERR(QString("Unable to set period time %1").arg(period_time));
@@ -682,7 +684,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
 
     /* set member variables */
     soundcard_buffer_size = buffer_size * output_bytes_per_frame;
-    fragment_size = (period_size * output_bytes_per_frame) >> 1;
+    fragment_size = (period_size * output_bytes_per_frame);
 
     /* get the current swparams */
     err = snd_pcm_sw_params_current(handle, swparams);
