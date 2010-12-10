@@ -31,6 +31,7 @@ version <next>:
 - RTP packetization and depacketization of VP8
 - hflip filter
 - Apple HTTP Live Streaming demuxer
+- IEC 61937 encapsulation for E-AC3 (for HDMI passthrough)
 
 
 version 0.6:
