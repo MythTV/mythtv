@@ -684,7 +684,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
 
     /* set member variables */
     soundcard_buffer_size = buffer_size * output_bytes_per_frame;
-    fragment_size = (period_size * output_bytes_per_frame);
+    fragment_size = (period_size * output_bytes_per_frame) >> 1;
 
     /* get the current swparams */
     err = snd_pcm_sw_params_current(handle, swparams);
