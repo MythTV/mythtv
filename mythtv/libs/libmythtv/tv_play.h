@@ -78,7 +78,6 @@ typedef void (*EMBEDRETURNVOIDSCHEDIT) (const ProgramInfo *, void *);
 //            -> recorderPlaybackInfoLock
 //            -> timerIdLock
 //            -> mainLoopCondLock
-//            -> stateChangeCondLock
 //            -> channelGroupLock
 //
 // When holding one of these locks, you may lock any lock of  the locks to
@@ -223,7 +222,6 @@ class MPUBLIC TV : public QObject
                               NoRecorderMsg msgType = kNoRecorders);
     void FinishRecording(int player_idx); ///< Finishes player's recording
     void AskAllowRecording(PlayerContext*, const QStringList&, int, bool, bool);
-    bool PromptRecGroupPassword(PlayerContext*);
 
     bool CreatePBP(PlayerContext *lctx, const ProgramInfo *info);
     bool CreatePIP(PlayerContext *lctx, const ProgramInfo *info);
@@ -855,10 +853,6 @@ class MPUBLIC TV : public QObject
     TimerContextMap      stateChangeTimerId;
     TimerContextMap      signalMonitorTimerId;
     TimerContextMap      tvchainUpdateTimerId;
-
-    /// Condition to signal State changes
-    QWaitCondition stateChangeCond;
-    QMutex stateChangeCondLock;
 
   public:
     // Constants

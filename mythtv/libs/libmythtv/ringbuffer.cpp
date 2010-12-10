@@ -161,6 +161,8 @@ RingBuffer *RingBuffer::Create(
             lfilename.remove(0,5);             // e.g. "dvd://dev/sda"
         else if (lfilename.left(5) == "dvd:/") // Less correct URI "dvd:" + path
             lfilename.remove(0,4);             // e.g. "dvd:/videos/ET"
+        else if (lfilename.left(4) == "dvd:")   // Win32 URI "dvd:" + abs path
+            lfilename.remove(0,4);              //             e.g. "dvd:D:\"
 
         if (QFile::exists(lfilename) || lfilename.startsWith("myth://"))
         {

@@ -5,7 +5,7 @@ Contains any static and global variables for MythTV Python Bindings
 """
 
 OWN_VERSION = (0,24,0,1)
-SCHEMA_VERSION = 1264
+SCHEMA_VERSION = 1265
 MVSCHEMA_VERSION = 1038
 NVSCHEMA_VERSION = 1007
 MUSICSCHEMA_VERSION = 1017

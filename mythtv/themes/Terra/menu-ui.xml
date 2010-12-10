@@ -76,7 +76,7 @@
                     <value>CD/DVD Options</value>
                 </textarea>
             </state>
-            <state name="DVD_SETTINGS" from="DVD" />
+            <state name="DISC_SETTINGS" from="DVD" />
             <state name="MUSIC_SETTINGS">
                 <textarea name="heading" from="baseheading">
                     <value>Music Settings</value>
@@ -212,7 +212,6 @@
 
                         <state name="DVD_SETTINGS_GENERAL" from="DVD" />
                         <state name="DVD_SETTINGS_PLAY" from="DVD" />
-                        <state name="DVD_SETTINGS_RIP" from="DVD_RIP" />
 
                         <state name="GAME_SETTINGS_GENERAL" from="GAME" />
                         <state name="GAME_SCAN" from="GAME" />
