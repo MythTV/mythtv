@@ -96,7 +96,7 @@ int mythfile_open(const char *pathname, int flags)
         return -1;
 
     if (S_ISDIR( fileinfo.st_mode )) // libmythdvdnav tries to open() a dir
-        return -1;
+        return errno = EISDIR, -1;
 
     int fileID = -1;
     if (strncmp(pathname, "myth://", 7))
@@ -193,6 +193,12 @@ int mythfile_close(int fileID)
     return result;
 }
 
+#ifdef USING_MINGW
+#   undef  lseek
+#   define lseek  _lseeki64
+#   undef  off_t
+#   define off_t off64_t
+#endif
 off_t mythfile_seek(int fileID, off_t offset, int whence)
 {
     off_t result = -1;
@@ -206,11 +212,7 @@ off_t mythfile_seek(int fileID, off_t offset, int whence)
     else if (m_remotefiles.contains(fileID))
         result = m_remotefiles[fileID]->Seek(offset, whence);
     else if (m_localfiles.contains(fileID))
-#ifdef USING_MINGW
-        result = lseek64(m_localfiles[fileID], offset, whence);
-#else
         result = lseek(m_localfiles[fileID], offset, whence);
-#endif
     m_fileWrapperLock.unlock();
 
     return result;
@@ -228,15 +230,15 @@ off_t mythfile_tell(int fileID)
     else if (m_remotefiles.contains(fileID))
         result = m_remotefiles[fileID]->Seek(0, SEEK_CUR);
     else if (m_localfiles.contains(fileID))
-#ifdef USING_MINGW
-        result = lseek64(m_localfiles[fileID], 0, SEEK_CUR);
-#else
         result = lseek(m_localfiles[fileID], 0, SEEK_CUR);
-#endif
     m_fileWrapperLock.unlock();
 
     return result;
 }
+#ifdef USING_MINGW
+#   undef  lseek
+#   undef  off_t
+#endif
 
 ssize_t mythfile_read(int fileID, void *buf, size_t count)
 {

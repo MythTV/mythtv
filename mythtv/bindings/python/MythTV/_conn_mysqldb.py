@@ -4,13 +4,12 @@ from exceptions import MythDBError
 from weakref import ref
 
 import sys
-if sys.version_info >= (2,7):
-    raise ImportError('MySQLdb is incompatible with this version of Python.')
-
 import warnings
 with warnings.catch_warnings():
     warnings.simplefilter('ignore')
     import MySQLdb, MySQLdb.cursors
+if (MySQLdb.version_info < (1,2,3)) and (sys.version_info >= (2,7)):
+    raise ImportError('MySQLdb is too old for this version of Python')
 
 __version__ = tuple(['MySQLdb']+list(MySQLdb.version_info))
 

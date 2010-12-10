@@ -11,8 +11,13 @@ extern "C" {
 int     mythfile_check(int fileID);
 int     mythfile_open(const char *pathname, int flags);
 int     mythfile_close(int fileID);
+#ifdef USING_MINGW
+off64_t mythfile_seek(int fileID, off64_t offset, int whence);
+off64_t mythfile_tell(int fileID);
+#else
 off_t   mythfile_seek(int fileID, off_t offset, int whence);
 off_t   mythfile_tell(int fileID);
+#endif
 ssize_t mythfile_read(int fileID, void *buf, size_t count);
 ssize_t mythfile_write(int fileID, void *buf, size_t count);
 int     mythfile_stat(const char *path, struct stat *buf);

@@ -24,22 +24,28 @@
             }
 
             var myth_player = null;
+            var videocode = gup('videocode');
 
             var params = {
                 allowScriptAccess: "always",
                 allowfullscreen: 'true',
                 wmode: 'opaque'
             };
-            var atts = { id: "myytplayer" };
-            swfobject.embedSWF("http://www.youtube.com/apiplayer?enablejsapi=1&playerapiid=ytplayer", 
-                               "myth_player", window.innerWidth, window.innerHeight, "8", null, null, params, atts);
 
-            function onYouTubePlayerReady(playerId) {
-                myth_player = document.getElementById("myytplayer");
+            var flashvars = {
+                autoStart: 1
+            };
+
+            var atts = { id: "mydmplayer" };
+
+            swfobject.embedSWF('http://www.dailymotion.com/swf/' + videocode + '&enableApi=1&playerapiid=dmplayer&autoPlay=1',
+                               "myth_player", window.innerWidth, window.innerHeight, "8", null, flashvars, params, atts);
+
+            function onDailymotionPlayerReady(playerId) {
+                myth_player = document.getElementById("mydmplayer");
                 myth_player.setVolume(50);
-                var videocode = gup('videocode');
                 if (videocode != "") {
-                    myth_player.cueVideoById(videocode);
+                    myth_player.loadVideoById(videocode);
                     myth_player.playVideo();
                 }
             }
@@ -56,7 +62,7 @@
 
             function seek(amount) {
                 if (myth_player) {
-                    myth_player.seekTo(myth_player.getCurrentTime() + amount, true);
+                    myth_player.seekTo(myth_player.getCurrentTime() + amount);
                 }
             }
 
@@ -71,8 +77,8 @@
                 document.body.style.height = window.innerHeight;
                 if (myth_player) {
                     //             myth_player.setSize(window.innerWidth, window.innerHeight);
-                    document.getElementById("myytplayer").width = window.innerWidth;
-                    document.getElementById("myytplayer").height = window.innerHeight;
+                    document.getElementById("mydmplayer").width = window.innerWidth;
+                    document.getElementById("mydmplayer").height = window.innerHeight;
                 }
             };
         </script>

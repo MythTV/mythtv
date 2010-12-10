@@ -38,6 +38,7 @@ __version__="v0.2.5"
 import os, struct, sys, re, time
 import urllib, urllib2
 import logging
+from MythTV import MythXML
 
 try:
     import xml.etree.cElementTree as ElementTree
@@ -148,6 +149,7 @@ class Videos(object):
 
         """
         self.config = {}
+        self.mythxml = MythXML()
 
         if apikey is not None:
             self.config['apikey'] = apikey
@@ -522,7 +524,7 @@ class Videos(object):
                                 continue
                             if not elem.get(key) == '5':
                                 continue
-                            item['video'] = self.ampReplace((elem.get('url')+'&autoplay=1'))
+                            self.processVideoUrl(item, elem)
                             flash = True
                         continue
             if not item.has_key('video'):
@@ -715,6 +717,18 @@ class Videos(object):
         return [[self.channel, dictionaries]]
     # end displayTreeView()
 
+    def processVideoUrl(self, item, elem):
+        '''Processes elem.get('url') to either use a custom HTML page served by
+        the backend, or include '&autoplay=1'
+        '''
+        m = re.search('/v/([^?]+)', elem.get('url'))
+        if m:
+            url = self.mythxml.getInternetContentUrl("nv_python_libs/configs/HTML/youtube.html", \
+                                                     m.group(1))
+            item['video'] = self.ampReplace(url)
+        else:
+            item['video'] = self.ampReplace((elem.get('url')+'&autoplay=1'))
+
     def makeURL(self, URL):
         '''Form a URL to search for videos
         return a URL
@@ -868,7 +882,7 @@ class Videos(object):
                             if not elem.get(key) == '5':
                                 continue
                             if elem.get('url'):
-                                metadata['video'] = self.ampReplace((elem.get('url')+'&amp;autoplay=1'))
+                                self.processVideoUrl(metadata, elem)
                                 flash = True
                         continue
 

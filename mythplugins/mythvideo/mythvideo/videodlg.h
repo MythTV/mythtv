@@ -96,9 +96,7 @@ class VideoDialog : public MythScreenType
     void VideoSearch(MythGenericTree *node = NULL,
                      bool automode = false);
     void VideoAutoSearch(MythGenericTree *node = NULL);
-    void ManualVideoUID();
     void ResetMetadata();
-    void ToggleBrowseable();
     void ToggleWatched();
     void ToggleProcess();
     void RemoveVideo();
@@ -106,7 +104,6 @@ class VideoDialog : public MythScreenType
 
     void VideoMenu();
     void InfoMenu();
-    void VideoOptionMenu();
     void ManageMenu();
     void PlayMenu();
     void DisplayMenu();
@@ -131,8 +128,6 @@ class VideoDialog : public MythScreenType
 
     // Called when the underlying data for an item changes
     void OnVideoSearchListSelection(MetadataLookup *lookup);
-
-    void OnManualVideoUID(QString video_uid);
 
     void doVideoScan();
 

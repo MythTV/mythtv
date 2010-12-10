@@ -204,6 +204,7 @@ bool IconView::Create(void)
         m_thumbGen->setSize(thumbWidth, thumbHeight);
 
     SetupMediaMonitor();
+    LoadDirectory(m_galleryDir);
 
     return true;
 }
@@ -370,7 +371,6 @@ void IconView::SetupMediaMonitor(void)
         }
     }
     m_currDevice = NULL;
-    LoadDirectory(m_galleryDir);
 #endif // _WIN32
 }
 
@@ -482,23 +482,12 @@ bool IconView::keyPressEvent(QKeyEvent *event)
 
         if (action == "ESCAPE") 
         {
-            if (!GetMythMainWindow()->IsExitingToMain()) 
+            if (GetMythMainWindow()->IsExitingToMain()) 
             {
-                handled = HandleEscape();
-            } 
-            else 
-            {
-                while (true) 
-                {
-                    QDir currentDir(m_currDir);
-                    QDir rootDir(m_galleryDir);
-                    if (currentDir != rootDir) 
-                        HandleSubDirEscape(m_galleryDir);
-                    else 
-                        break;
-                }
-                handled = HandleEscape();
+                while ( m_currDir != m_galleryDir &&
+                        HandleSubDirEscape(m_galleryDir) );
             }
+            handled = HandleEscape();
         }
     }
 

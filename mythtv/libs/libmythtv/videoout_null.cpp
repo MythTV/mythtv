@@ -22,8 +22,6 @@ void VideoOutputNull::GetRenderOptions(render_opts &opts,
     (*opts.safe_renderers)["nuppel"].append("null");
     if (opts.decoders->contains("ffmpeg"))
         (*opts.safe_renderers)["ffmpeg"].append("null");
-    if (opts.decoders->contains("libmpeg2"))
-        (*opts.safe_renderers)["libmpeg2"].append("null");
     if (opts.decoders->contains("crystalhd"))
         (*opts.safe_renderers)["crystalhd"].append("null");
 

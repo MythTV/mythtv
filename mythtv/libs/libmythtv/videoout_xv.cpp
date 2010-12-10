@@ -117,12 +117,6 @@ void VideoOutputXv::GetRenderOptions(render_opts &opts,
         (*opts.safe_renderers)["ffmpeg"].append("xshm");
         (*opts.safe_renderers)["ffmpeg"].append("xv-blit");
     }
-    if (opts.decoders->contains("libmpeg2"))
-    {
-        (*opts.safe_renderers)["libmpeg2"].append("xlib");
-        (*opts.safe_renderers)["libmpeg2"].append("xshm");
-        (*opts.safe_renderers)["libmpeg2"].append("xv-blit");
-    }
 
     if (opts.decoders->contains("crystalhd"))
     {
@@ -2135,9 +2129,10 @@ static QStringList allowed_video_renderers(
     if (!curwin)
         curwin = display->GetRoot();
 
-    bool xv, shm,  dummy;
+    bool xv  = true;
+    bool shm = true;
 
-    myth2av_codecid(myth_codec_id, dummy);
+    myth2av_codecid(myth_codec_id);
 
     SetFromEnv(xv, shm);
     SetFromHW(display, curwin, xv, shm);

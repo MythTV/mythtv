@@ -54,11 +54,6 @@ extern const uint8_t *ff_find_start_code(const uint8_t *p, const uint8_t *end, u
 extern void ff_read_frame_flush(AVFormatContext *s);
 #include "libavformat/avio.h"
 #include "libswscale/swscale.h"
-#if CONFIG_LIBMPEG2EXTERNAL
-#include <mpeg2dec/mpeg2.h>
-#else
-#include "../libmythmpeg2/mpeg2.h"
-#endif
 #include "ivtv_myth.h"
 }
 
@@ -2866,7 +2861,6 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 
 bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
 {
-    long long pts = 0;
     AVCodecContext *context = stream->codec;
 
     // Decode CEA-608 and CEA-708 captions
@@ -3983,7 +3977,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                 av_init_packet(pkt);
             }
 
-            int retval;
+            int retval = 0;
             if (!ic || ((retval = av_read_frame(ic, pkt)) < 0))
             {
                 if (retval == -EAGAIN)

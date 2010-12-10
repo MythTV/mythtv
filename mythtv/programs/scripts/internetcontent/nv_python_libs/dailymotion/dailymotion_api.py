@@ -37,6 +37,7 @@ __version__="v0.2.4"
 import os, struct, sys, re, time
 import urllib, urllib2
 import logging
+from MythTV import MythXML
 
 try:
     import xml.etree.cElementTree as ElementTree
@@ -147,6 +148,7 @@ class Videos(object):
 
         """
         self.config = {}
+        self.mythxml = MythXML()
 
         if apikey is not None:
             self.config['apikey'] = apikey
@@ -697,6 +699,10 @@ class Videos(object):
 #
 ###########################################################################################################
 
+    def processVideoUrl(self, url):
+        playerUrl = self.mythxml.getInternetContentUrl("nv_python_libs/configs/HTML/dailymotion.html", \
+                                                       url.replace(u'http://www.dailymotion.com/swf/video/', ''))
+        return self.ampReplace(playerUrl)
 
     def searchTitle(self, title, pagenumber, pagelen):
         '''Key word video search of the Dailymotion web site
@@ -927,7 +933,7 @@ class Videos(object):
                 for elem in e:
                     if elem.tag.endswith('content') and elem.get('type') == 'application/x-shockwave-flash':
                         if elem.get('url'):
-                            meta_data['video'] = self.ampReplace((elem.get('url')+u'?autoPlay=1'))
+                            meta_data['video'] = self.processVideoUrl(elem.get('url'))
                         if elem.get('duration'):
                             meta_data['duration'] = elem.get('duration').strip()
                         if elem.get('width'):

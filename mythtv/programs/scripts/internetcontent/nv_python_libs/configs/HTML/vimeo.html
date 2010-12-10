@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+    <head>
+        <style type="text/css">
+            body {
+                padding: 0;
+                margin: 0;
+            }
+        </style>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+        <script type="text/javascript">
+            /* gup function by R.D. Vaughan */
+            function gup( name )
+            {
+                name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+                var regexS = "[\\?&]"+name+"=([^&#]*)";
+                var regex = new RegExp( regexS );
+                var results = regex.exec( window.location.href );
+                if( results == null )
+                    return "";
+                else
+                    return results[1];
+            }
+
+            var video_id = gup( 'videocode' );
+            var myth_player = null;
+            var paused = false;
+            var volume = 50;
+
+            function vimeo_player_loaded(swf_id) {
+                myth_player = document.getElementById(swf_id);
+                myth_player.api_setVolume(volume);
+                document.getElementById('controls').style.display = '';
+            }
+
+            function play() {
+                if (myth_player) {
+                    if (paused) {
+                        myth_player.api_play();
+                        paused = false;
+                    }
+                    else if (!paused) {
+                        myth_player.api_pause();
+                        paused = true;
+                    }
+                }
+            }
+
+            function seek(amount) {
+                if (myth_player) {
+                    myth_player.api_seekTo(myth_player.api_getCurrentTime() + amount);
+                }
+            }
+
+            function adjustVolume(amount) {
+                if (myth_player) {
+                    volume += amount;
+                    if (volume > 100)
+                        volume = 100;
+                    if (volume < 0)
+                        volume = 0;
+                    myth_player.api_setVolume(volume);
+                }
+            }
+
+            var flashvars = {
+                clip_id: video_id,
+                show_portrait: 1,
+                show_byline: 1,
+                show_title: 1,
+                fp_version: 10,
+                js_api: 1, // required in order to use the Javascript API
+                js_onLoad: 'vimeo_player_loaded', // moogaloop will call this JS function when it's done loading (optional)
+                js_swf_id: 'myth_player' // this will be passed into all event methods so you can keep track of multiple moogaloops (optional)
+            };
+            var params = {
+                allowscriptaccess: 'always',
+                allowfullscreen: 'true',
+                wmode: 'opaque',
+                
+            };
+            var attributes = {};
+
+            // For more SWFObject documentation visit: http://code.google.com/p/swfobject/wiki/documentation
+            swfobject.embedSWF("http://vimeo.com/moogaloop.swf?autoplay=1", "myth_player", window.innerWidth, window.innerHeight, "9.0.0","expressInstall.swf", flashvars, params, attributes);
+        </script>
+    </head>
+    <body>
+        <div id="myth_player"/>
+    </body>
+</html>
