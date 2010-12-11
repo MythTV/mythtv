@@ -10,9 +10,9 @@
 # Original author: Xavier Hervy (maxpower44 AT tiscali DOT fr)
 
 # changes:
-#   20-10-2009: Geoffroy Geerseau ( http://www.soslinux.net : jamdess AT soslinux DOT net )
+#   20-10-2009: Geoffroy Geerseau ( http://www.jinux.fr )
 #   Modified for the new allocine templates
-#   25-10-2009: Geoffroy Geerseau ( http://www.soslinux.net : jamdess AT soslinux DOT net )
+#   25-10-2009: Geoffroy Geerseau ( http://www.jinux.fr )
 #   Poster download correction
 #   Userrating correction
 #   28-10-2009: Robert McNamara (Myth Dev)
@@ -22,6 +22,11 @@
 #   Allocine have, once again, change their templates...
 #   09-10-2010: Geoffroy Geerseau
 #   EOL correction. Cast, Genre, Rates
+#   10-12-2010: Geoffroy Geerseau ( http://www.jinux.fr )
+#   Poster download fix
+
+
+
 
    
 use File::Basename;
@@ -191,16 +196,18 @@ sub getMovieData {
    $countries =~ s/\s//gm;
    $countries =~ s/,/, /gm;
    # parse for coverart
-   my $mediafile = parseBetween($response,"<a href=\"/film/fichefilm-".$movieid."/affiches/detail/?cmediafile=","\" >");
+   my $mediafile = parseBetween($response,"<a href=\"/film/fichefilm-".$movieid."/affiches/detail/?cmediafile=","\"");
    $covrequest = "http://www.allocine.fr/film/fichefilm-".$movieid."/affiches/detail/?cmediafile=".$mediafile;
    ($rc, $covresponse) = myth_url_get($covrequest);
-   my $uri = parseBetween(parseBetween($covresponse,"<div class=\"tac\" style=\"\">","</div>"),"<img src=\"","\" alt");
+   
+   my $uri = parseBetween(parseBetween($covresponse,"<div class=\"tac\" style=\"\">","</div>"),"<img src=\"","\"");
+
    if ($uri eq "")
    {
-        $request = "http://www.allocine.fr/film/fichefilm-".$movieid."/affiches/";
-        ($rc, $response) = myth_url_get($request);
-        my $tmp_uri = parseBetween($response, "<a href=\"/film/fichefilm-".$movieid."/affiches/\">"," alt=");
-        $tmp_uri =~ s/\n/ /gm;
+        $request = "http://www.allocine.fr/film/fichefilm_gen_cfilm=" . $movieid . ".html";
+	($rc, $response) = myth_url_get($request);
+        my $tmp_uri = parseBetween($response, "<div class=\"poster\">", "</div>");
+	$tmp_uri =~ s/\n/ /gm;
         $uri = trim(parseBetween($tmp_uri,"<img src='h","'"));
         if($uri ne "")
         {
@@ -240,23 +247,22 @@ sub getMoviePoster {
    my $request = "http://www.allocine.fr/film/fichefilm-".$movieid."/affiches/";
    if (defined $opt_d) { printf("# request: '%s'\n", $request); }
    my ($rc, $response) = myth_url_get($request);
-   my $mediafile = parseBetween($response,"<a href=\"/film/fichefilm-".$movieid."/affiches/detail/?cmediafile=","\" >");
+   my $mediafile = parseBetween($response,"<a href=\"/film/fichefilm-".$movieid."/affiches/detail/?cmediafile=","\"");
 
    $request = "http://www.allocine.fr/film/fichefilm-".$movieid."/affiches/detail/?cmediafile=".$mediafile;
    ($rc, $response) = myth_url_get($request);
-   my $uri = parseBetween(parseBetween($response,"<div class=\"tac\" style=\"\">","</div>"),"<img src=\"","\" alt");
+   my $uri = parseBetween(parseBetween($response,"<div class=\"tac\" style=\"\">","</div>"),"<img src=\"","\"");
    if ($uri eq "")
    {
-	$request = "http://www.allocine.fr/film/fichefilm-".$movieid."/affiches/";
-	($rc, $response) = myth_url_get($request);
-	my $tmp_uri = parseBetween($response, "<a href=\"/film/fichefilm-".$movieid."/affiches/\">"," alt=");
+        $request = "http://www.allocine.fr/film/fichefilm_gen_cfilm=" . $movieid . ".html";
+        ($rc, $response) = myth_url_get($request);
+        my $tmp_uri = parseBetween($response, "<div class=\"poster\">", "</div>");
         $tmp_uri =~ s/\n/ /gm;
-	$uri = trim(parseBetween($tmp_uri,"<img src='h","'"));
-	if($uri ne "")
-	{
-		$uri = "h$uri";
-	}
-        print "$uri\n";
+        $uri = trim(parseBetween($tmp_uri,"<img src='h","'"));
+        if($uri ne "")
+        {
+                $uri = "h$uri";
+        }
    }
    
    # if no picture was found, just download the empty poster
