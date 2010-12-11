@@ -18,8 +18,6 @@ class MythFlashPlayer : public MythScreenType
 
   private:
     QVariant evaluateJavaScript(const QString&);
-    int GetPlayGroupSetting(const QString &name,
-                            const QString &field, int defval);
     MythUIWebBrowser*         m_browser;
     QString                   m_url;
     int                       m_fftime;
