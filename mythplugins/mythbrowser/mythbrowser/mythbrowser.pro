@@ -2,6 +2,8 @@ include (../../mythconfig.mak )
 include (../../settings.pro )
 include (../../programs-libs.pro )
 
+LIBS += -lmythtv-$$LIBVERSION
+
 QT += network xml sql opengl webkit
 
 TEMPLATE = lib
@@ -16,7 +18,7 @@ installimages.files = images/*.png
 INSTALLS += installimages
 
 # Input
-HEADERS += mythbrowser.h mythflashplayer.h webpage.h 
+HEADERS += mythbrowser.h mythflashplayer.h webpage.h
 HEADERS += bookmarkmanager.h bookmarkeditor.h browserdbutil.h
 SOURCES += main.cpp mythbrowser.cpp mythflashplayer.cpp webpage.cpp
 SOURCES += bookmarkmanager.cpp bookmarkeditor.cpp browserdbutil.cpp
