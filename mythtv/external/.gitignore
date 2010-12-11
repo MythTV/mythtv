@@ -8,3 +8,6 @@ version.h
 config.mak
 config.h
 avconfig.h
+ffmpeg
+ffmpeg_g
+mythffmpeg
