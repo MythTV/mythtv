@@ -7,6 +7,7 @@ extern "C" {
 
 #define INBUFSIZE 131072
 #define OUTBUFSIZE 98304
+#define ENCODER_INBUFSIZE INBUFSIZE
 
 class AudioOutputDigitalEncoder
 {
