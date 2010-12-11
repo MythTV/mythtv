@@ -1955,6 +1955,7 @@ enable avutil
 enable asm
 enable debug
 #enable doc
+enable ffmpeg
 enable fastdiv
 enable gpl
 enable mpegaudio_hp
