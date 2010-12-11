@@ -863,7 +863,7 @@ class Video( VideoSchema, DBDataWrite, CMPVideo ):
         return vid
 
     def _playOnFe(self, fe):
-        return fe.send('play','filename myth://Videos@%s/%s' % 
+        return fe.send('play','file myth://Videos@%s/%s' % 
                     (self.host, self.filename))
 
 class VideoGrabber( Grabber ):
