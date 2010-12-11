@@ -10,11 +10,11 @@
 #include <mythcontext.h>
 #include <libmythui/mythmainwindow.h>
 #include <mythuiwebbrowser.h>
-#include <playgroup.h>
 
 // mythbrowser
 #include "webpage.h"
 #include "mythflashplayer.h"
+#include "mythdb.h"
 
 using namespace std;
 
@@ -23,9 +23,9 @@ MythFlashPlayer::MythFlashPlayer(MythScreenStack *parent,
     : MythScreenType (parent, "mythflashplayer"),
       m_browser(NULL), m_url(urlList[0])
 {
-    m_fftime       = PlayGroup::GetSetting("Default", "skipahead", 30);
-    m_rewtime      = PlayGroup::GetSetting("Default", "skipback", 5);
-    m_jumptime     = PlayGroup::GetSetting("Default", "jump", 10);
+    m_fftime       = GetPlayGroupSetting("Default", "skipahead", 30);
+    m_rewtime      = GetPlayGroupSetting("Default", "skipback", 5);
+    m_jumptime     = GetPlayGroupSetting("Default", "jump", 10);
     qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
 }
 
@@ -104,3 +104,24 @@ bool MythFlashPlayer::keyPressEvent(QKeyEvent *event)
 
     return handled;
 }
+
+int MythFlashPlayer::GetPlayGroupSetting(const QString &name,
+                                         const QString &field, int defval)
+{
+    int res = defval;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(QString("SELECT name, %1 FROM playgroup "
+                          "WHERE (name = :NAME OR name = 'Default') "
+                          "      AND %2 <> 0 "
+                          "ORDER BY name = 'Default';")
+                  .arg(field).arg(field));
+    query.bindValue(":NAME", name);
+    if (!query.exec())
+        MythDB::DBError("MythFlashPlayer::GetPlayGroupSetting", query);
+    else if (query.next())
+        res = query.value(1).toInt();
+
+    return res;
+}
+

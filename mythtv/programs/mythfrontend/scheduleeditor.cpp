@@ -771,6 +771,7 @@ void StoreOptEditor::Load()
     }
 
     groups.sort();
+    groups.removeDuplicates();
     for (it = groups.begin(); it != groups.end(); ++it)
     {
         label = tr("Include in the \"%1\" recording group");

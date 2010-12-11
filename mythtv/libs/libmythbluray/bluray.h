@@ -477,8 +477,14 @@ typedef enum {
     BD_EVENT_SECONDARY_VIDEO,        /* 0 - disable, 1 - enable */
     BD_EVENT_SECONDARY_VIDEO_SIZE,   /* 0 - PIP, 0xf - fullscreen */
 
-    /* still */
-    BD_EVENT_STILL,         /* 0 - off, 1 - on */
+    /* HDMV VM or JVM seeked the stream. Next read() will return data from new position. */
+    BD_EVENT_SEEK,
+
+    /* still playback (pause) */
+    BD_EVENT_STILL,                  /* 0 - off, 1 - on */
+
+    /* Still playback for n seconds (reached end of still mode play item) */
+    BD_EVENT_STILL_TIME,             /* 0 = infinite ; 1...300 = seconds */
 
 } bd_event_e;
 
@@ -582,6 +588,18 @@ void bd_register_overlay_proc(BLURAY *bd, void *handle, bd_overlay_proc_f func);
  * @return 1 on success, 0 if error
  */
 void bd_user_input(BLURAY *bd, int64_t pts, uint32_t key);
+
+/**
+ *
+ *  Select menu button at location (x,y).
+ *
+ * @param bd  BLURAY object
+ * @param pts current playback position (1/90000s) or -1
+ * @param x mouse pointer x-position
+ * @param y mouse pointer y-position
+ * @return none
+ */
+void bd_mouse_select(BLURAY *bd, int64_t pts, uint16_t x, uint16_t y);
 
 #ifdef __cplusplus
 };

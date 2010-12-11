@@ -94,8 +94,6 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
 
 AudioOutputALSA::~AudioOutputALSA()
 {
-    if (pbufsize > 0)
-        SetPreallocBufferSize(pbufsize);
     KillAudio();
 }
 
@@ -235,7 +233,10 @@ bool AudioOutputALSA::IncPreallocBufferSize(int buffer_time)
 
     int cur  = pfile.readAll().trimmed().toInt();
     int max  = mfile.readAll().trimmed().toInt();
-    int size = cur * (50000 / buffer_time + 1);
+
+    int size = (samplerate / 1000) *
+        (buffer_time / 1000) *
+        output_bytes_per_frame / 1024;
 
     VBAUDIO(QString("Prealloc buffer cur: %1 max: %3").arg(cur).arg(max));
 
@@ -414,7 +415,7 @@ bool AudioOutputALSA::OpenDevice()
     {
         // We need to increase preallocated buffer size in the driver
         // Set it and try again
-        if(!IncPreallocBufferSize(err))
+        if(!IncPreallocBufferSize(buffer_time))
             VBERROR("Unable to sufficiently increase preallocated buffer size"
                     " - underruns are likely");
         return OpenDevice();
@@ -647,18 +648,26 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
     }
 
     /* set the buffer time */
+    dir = 0;
+    uint original_buffer_time = buffer_time;
     err = snd_pcm_hw_params_set_buffer_time_near(handle, params,
                                                  &buffer_time, &dir);
     CHECKERR(QString("Unable to set buffer time %1").arg(buffer_time));
 
     // See if we need to increase the prealloc'd buffer size
     // If buffer_time is too small we could underrun
-    if (buffer_time < 50000 && pbufsize < 0)
+    // Make 10% leeway okay
+    if (buffer_time * 1.10f < (float)original_buffer_time && pbufsize < 0)
+    {
+        VBAUDIO(QString("Requested %1us got %2 buffer time")
+                .arg(original_buffer_time).arg(buffer_time));
         return buffer_time;
+    }
 
     VBAUDIO(QString("Buffer time = %1 us").arg(buffer_time));
 
     /* set the period time */
+    dir = 1;
     err = snd_pcm_hw_params_set_period_time_near(handle, params,
                                                  &period_time, &dir);
     CHECKERR(QString("Unable to set period time %1").arg(period_time));

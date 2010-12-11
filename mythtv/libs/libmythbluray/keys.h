@@ -54,6 +54,10 @@ typedef enum {
     BD_VK_RIGHT     = 15,
     BD_VK_ENTER     = 16,
 
+    /* Mouse click */
+    /* Translated to BD_VK_ENTER if mouse is over valid button */
+    BD_VK_MOUSE_ACTIVATE = 17,
+
 } bd_vk_key_e;
 
 #ifdef __cplusplus

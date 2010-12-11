@@ -37,30 +37,16 @@ static void HandleOverlayCallback(
     bdrb->m_inMenu = true;
 
     const BD_PG_RLE_ELEM *rlep = overlay->img;
-    int width = overlay->w;
 
-    if (fmod(overlay->w, 4) > 0)
-    {
-        while (fmod(width, 4) > 0)
-            width++;
-    }
-
-    uint8_t *yuvimg = (uint8_t*)malloc(width * overlay->h);
-    unsigned pixels = width * overlay->h;
-    int line = 1;
+    uint8_t *yuvimg = (uint8_t*)malloc(overlay->w * overlay->h);
+    unsigned pixels = overlay->w * overlay->h;
 
     for (unsigned i = 0; i < pixels; i += rlep->len, rlep++)
     {
-        if (rlep->color == 0 && rlep->len == 0)
-        {
-            i = (line * width) + 1;
-            line++;
-        }
-        else if (rlep)
-            memset(yuvimg + i, rlep->color, rlep->len);
+        memset(yuvimg + i, rlep->color, rlep->len);
     }
 
-    QImage qoverlay(yuvimg, width, overlay->h, QImage::Format_Indexed8);
+    QImage qoverlay(yuvimg, overlay->w, overlay->h, QImage::Format_Indexed8);
 
     uint32_t *origpalette = (uint32_t *)(overlay->palette);
     QVector<unsigned int> palette;
@@ -83,11 +69,11 @@ static void HandleOverlayCallback(
     }
 
     qoverlay.setColorTable(palette);
-    qoverlay.save(QString("%1/bluray.menuimg.%2.%3.png").arg(QDir::home().path()).arg(width).arg(overlay->h));
+    qoverlay.save(QString("%1/bluray.menuimg.%2.%3.jpg").arg(QDir::home().path()).arg(overlay->w).arg(overlay->h));
 
     VERBOSE(VB_PLAYBACK|VB_EXTRA, QString("In Menu Callback, ready to draw "
                         "an overlay of %1x%2 at %3,%4 (%5 pixels).")
-                        .arg(width).arg(overlay->h).arg(overlay->x)
+                        .arg(overlay->w).arg(overlay->h).arg(overlay->x)
                         .arg(overlay->y).arg(pixels));
 
     if (overlay->plane == 1)
@@ -645,6 +631,17 @@ void BDRingBuffer::PressButton(int32_t key, int64_t pts)
     bd_user_input(bdnav, pts, key);
 }
 
+void BDRingBuffer::ClickButton(int64_t pts, uint16_t x, uint16_t y)
+{
+    if (!bdnav)
+        return;
+
+    if (pts <= 0 || x <= 0 || y <= 0)
+        return;
+
+    bd_mouse_select(bdnav, pts, x, y);
+}
+
 /** \brief jump to a Blu-ray root or popup menu
  */
 bool BDRingBuffer::GoToMenu(const QString str, int64_t pts)
@@ -697,6 +694,10 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
             VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_ERROR %1").arg(ev.param));
             break;
+        case BD_EVENT_ENCRYPTED:
+            VERBOSE(VB_IMPORTANT,
+                    QString("BDRingBuf: EVENT_ENCRYPTED, playback will fail."));
+            break;
 
         /* current playback position */
 
@@ -731,13 +732,19 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
                     QString("BDRingBuf: EVENT_CHAPTER %1").arg(ev.param));
             m_currentChapter = ev.param;
             break;
-
-        /* Interactive Graphics */
-
         case BD_EVENT_STILL:
             VERBOSE(VB_PLAYBACK|VB_EXTRA,
                     QString("BDRingBuf: EVENT_STILL %1").arg(ev.param));
             m_still = ev.param;
+            break;
+        case BD_EVENT_STILL_TIME:
+            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+                    QString("BDRingBuf: EVENT_STILL_TIME %1").arg(ev.param));
+            // TODO: Handle still playback.  0 = infinite, 1-300 = seconds.
+            break;
+        case BD_EVENT_SEEK:
+            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+                    QString("BDRingBuf: EVENT_SEEK"));
             break;
 
         /* stream selection */
