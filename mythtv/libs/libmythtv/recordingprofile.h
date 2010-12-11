@@ -88,6 +88,8 @@ class MPUBLIC RecordingProfile : public QObject, public ConfigurationWizard
     virtual void loadByID(int id);
     virtual bool loadByType(const QString &name, const QString &cardtype);
     virtual bool loadByGroup(const QString &name, const QString &group);
+    virtual void CompleteLoad(int profileId, const QString &type,
+                              const QString &name);
     virtual DialogCode exec(void);
 
     // sets
@@ -107,14 +109,14 @@ class MPUBLIC RecordingProfile : public QObject, public ConfigurationWizard
     static void fillSelections(SelectSetting* setting,
                                int group, bool foldautodetect = false);
     static void fillSelections(SelectManagedListItem* setting,
-                               int group);                           
+                               int group);
 
     // constants
     static const uint TranscoderAutodetect = 0; ///< sentinel value
     static const int TranscoderGroup = 6;       ///< hard-coded DB value
 
   private slots:
-    void ResizeTranscode(bool resize); 
+    void ResizeTranscode(bool resize);
     void SetLosslessTranscode(bool lossless);
     void FiltersChanged(const QString &val);
 
