@@ -16,6 +16,7 @@ MANPAGES    = $(addprefix doc/, $(addsuffix .1, $(PROGS-yes)))
 HTMLPAGES   = $(addprefix doc/, $(addsuffix -doc.html, $(PROGS-yes)))
 TOOLS       = $(addprefix tools/, $(addsuffix $(EXESUF), cws2fws pktdumper probetest qt-faststart trasher))
 HOSTPROGS   = $(addprefix tests/, audiogen videogen rotozoom tiny_psnr base64)
+MYTHPROGS   = $(addprefix myth, ${PROGS})
 
 BASENAMES   = ffmpeg ffplay ffprobe ffserver
 ALLPROGS    = $(addsuffix   $(EXESUF), $(BASENAMES))
@@ -46,7 +47,8 @@ FF_DEP_LIBS  := $(DEP_LIBS)
 ALL_TARGETS-$(CONFIG_DOC)       += documentation
 
 ifdef PROGS
-INSTALL_TARGETS-yes             += install-progs install-data
+INSTALL_TARGETS-yes             += install-mythprogs
+#INSTALL_TARGETS-yes             += install-progs install-data
 INSTALL_TARGETS-$(CONFIG_DOC)   += install-man
 endif
 INSTALL_PROGS_TARGETS-$(CONFIG_SHARED) = install-libs
@@ -56,6 +58,9 @@ all: $(FF_DEP_LIBS) $(PROGS) $(ALL_TARGETS-yes)
 $(PROGS): %$(EXESUF): %_g$(EXESUF)
 	$(CP) $< $@
 	$(STRIP) $@
+
+${MYTHPROGS}: myth%: %
+	$(CP) $< $@
 
 config.h: .config
 .config: $(wildcard $(FFLIBS:%=$(SRC_DIR)/lib%/all*.c))
@@ -136,6 +141,10 @@ install: $(INSTALL_TARGETS-yes)
 install-progs: $(PROGS) $(INSTALL_PROGS_TARGETS-yes)
 	$(Q)mkdir -p "$(BINDIR)"
 	$(INSTALL) -c -m 755 $(PROGS) "$(BINDIR)"
+
+install-mythprogs: $(MYTHPROGS) $(INSTALL_PROGS_TARGETS-yes)
+	$(Q)mkdir -p "$(BINDIR)"
+	$(INSTALL) -c -m 755 $(MYTHPROGS) "$(BINDIR)"
 
 install-data: $(DATA_FILES)
 	$(Q)mkdir -p "$(DATADIR)"
