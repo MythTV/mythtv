@@ -13,8 +13,8 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 # Input
 HEADERS += audio/audiooutput.h audio/audiooutputbase.h audio/audiooutputnull.h
 HEADERS += audio/audiooutpututil.h audio/audiooutputdownmix.h
-HEADERS += audio/audiooutputdigitalencoder.h audio/audiosettings.h
-HEADERS += audio/audiooutputsettings.h audio/pink.h
+HEADERS += audio/audiooutputdigitalencoder.h udip/spdifencoder.h
+HEADERS += audio/audiosettings.h audio/audiooutputsettings.h audio/pink.h
 HEADERS += backendselect.h dbsettings.h dialogbox.h
 HEADERS += generictree.h langsettings.h
 HEADERS += managedlist.h mythconfigdialogs.h mythconfiggroups.h
@@ -40,7 +40,8 @@ HEADERS += rssparse.h             netutils.h
 HEADERS += virtualkeyboard_qt.h
 
 SOURCES += audio/audiooutput.cpp audio/audiooutputbase.cpp
-SOURCES += audio/audiooutputnull.cpp audio/audiooutputdigitalencoder.cpp
+SOURCES += audio/spdifencoder.cpp audio/audiooutputdigitalencoder.cpp
+SOURCES += audio/audiooutputnull.cpp
 SOURCES += audio/audiooutpututil.cpp audio/audiooutputdownmix.cpp
 SOURCES += audio/audiosettings.cpp audio/audiooutputsettings.cpp audio/pink.c
 SOURCES += volumebase.cpp xmlparse.cpp

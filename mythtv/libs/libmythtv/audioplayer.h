@@ -42,6 +42,8 @@ class MPUBLIC AudioPlayer
     bool  CanPassthrough(int samplerate, int channels);
     bool  CanAC3(void);
     bool  CanDTS(void);
+    bool  CanHD(void);
+    bool  CanHDLL(void);
     uint  GetMaxChannels(void);
     int64_t GetAudioTime(void);
 
