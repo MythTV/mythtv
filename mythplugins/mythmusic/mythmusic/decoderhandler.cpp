@@ -137,6 +137,7 @@ DecoderIOFactoryUrl::DecoderIOFactoryUrl(DecoderHandler *parent) : DecoderIOFact
     m_input->open(QIODevice::ReadWrite);
 
     m_bytesWritten = 0;
+    m_redirectCount = 0;
 }
 
 DecoderIOFactoryUrl::~DecoderIOFactoryUrl(void)
@@ -393,10 +394,10 @@ void DecoderHandler::customEvent(QEvent *e)
 
 bool DecoderHandler::createPlaylist(const QUrl &url)
 {
-    QString extension = QFileInfo(url.path()).fileName().right(4).toLower();
+    QString extension = QFileInfo(url.path()).suffix();
     VERBOSE (VB_NETWORK, QString ("File %1 has extension %2").arg (url.fileName()).arg(extension));
 
-    if (extension == ".pls" || extension == ".m3u")
+    if (extension == "pls" || extension == "m3u")
     {
         if (url.scheme() == "file" || QFileInfo(url.toString()).isAbsolute())
             return createPlaylistFromFile(url);
