@@ -31,6 +31,137 @@
 #include "mythuihelper.h"
 #include "mythcorecontext.h"
 
+
+/**
+ * @class BrowserApi
+ * @brief Adds a JavaScript object 
+ * \note allows the browser to control the music player
+ */
+BrowserApi::BrowserApi(QObject *parent) : QObject(parent)
+{
+    gCoreContext->addListener(this);
+}
+
+void BrowserApi::setWebView(QWebView *view)
+{
+    QWebPage *page = view->page();
+    m_frame = page->mainFrame();
+
+    attachObject();
+    connect(m_frame, SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(attachObject()));
+}
+
+void BrowserApi::attachObject(void)
+{
+    m_frame->addToJavaScriptWindowObject(QString("MusicPlayer"), this);
+}
+
+int BrowserApi::Play(void)
+{
+    MythEvent me(QString("MUSIC_COMMAND PLAY"));
+    gCoreContext->dispatch(me);
+}
+
+int BrowserApi::Stop(void)
+{
+    MythEvent me(QString("MUSIC_COMMAND STOP"));
+    gCoreContext->dispatch(me);
+}
+
+int BrowserApi::Pause(void)
+{
+    MythEvent me(QString("MUSIC_COMMAND PAUSE"));
+    gCoreContext->dispatch(me);
+}
+
+int BrowserApi::SetVolume(int volumn)
+{
+    MythEvent me(QString("MUSIC_COMMAND SET_VOLUME %1").arg(volumn));
+    gCoreContext->dispatch(me);
+}
+
+int BrowserApi::GetVolume(void)
+{
+    m_gotAnswer = false;
+
+    MythEvent me(QString("MUSIC_COMMAND GET_VOLUME"));
+    gCoreContext->dispatch(me);
+
+    QTime timer;
+    timer.start();
+    while (timer.elapsed() < 2000  && !m_gotAnswer)
+    {
+        qApp->processEvents();
+        usleep(10000);
+    }
+
+    if (m_gotAnswer)
+        return m_answer.toInt();
+
+    return -1;
+}
+
+int BrowserApi::PlayFile(QString filename)
+{
+    MythEvent me(QString("MUSIC_COMMAND PLAY_FILE '%1'").arg(filename));
+    gCoreContext->dispatch(me);
+}
+
+int BrowserApi::PlayTrack(int trackID)
+{
+    MythEvent me(QString("MUSIC_COMMAND PLAY_TRACK %1").arg(trackID));
+    gCoreContext->dispatch(me);
+}
+
+int BrowserApi::PlayURL(QString url)
+{
+    MythEvent me(QString("MUSIC_COMMAND PLAY_URL %1").arg(url));
+    gCoreContext->dispatch(me);
+}
+
+QString BrowserApi::GetMetadata(void)
+{
+    m_gotAnswer = false;
+
+    MythEvent me(QString("MUSIC_COMMAND GET_METADATA"));
+    gCoreContext->dispatch(me);
+
+    QTime timer;
+    timer.start();
+    while (timer.elapsed() < 2000  && !m_gotAnswer)
+    {
+        qApp->processEvents();
+        usleep(10000);
+    }
+
+    if (m_gotAnswer)
+        return m_answer;
+
+    return QString("unknown");
+}
+
+void BrowserApi::customEvent(QEvent *e)
+{
+    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    {
+        MythEvent *me = (MythEvent *)e;
+        QString message = me->Message();
+
+        if (message.left(13) != "MUSIC_CONTROL")
+            return;
+
+        QStringList tokens = message.simplified().split(" ");
+        if ((tokens.size() >= 3) &&
+            (tokens[1] == "ANSWER"))
+        {
+            m_answer = tokens[2];
+            for (int i = 3; i < tokens.size(); i++)
+                m_answer += QString(" ") + tokens[i];
+            m_gotAnswer = true;
+        }
+    }
+}
+
 /**
  * @class MythWebView
  * @brief Subclass of QWebView
@@ -45,6 +176,14 @@ MythWebView::MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser)
             this, SLOT(handleUnsupportedContent(QNetworkReply *)));
 
     page()->setForwardUnsupportedContent(true);
+
+    m_api = new BrowserApi(this);
+    m_api->setWebView(this);
+}
+
+MythWebView::~MythWebView(void)
+{
+    delete m_api;
 }
 
 /**

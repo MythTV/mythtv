@@ -17,12 +17,47 @@
 
 class MythUIWebBrowser;
 
+class BrowserApi : public QObject
+{
+    Q_OBJECT
+  public:
+    BrowserApi(QObject *parent);
+
+    void setWebView(QWebView *view);
+
+  public slots:
+    int Play(void);
+    int Stop(void);
+    int Pause(void);
+
+    int SetVolume(int volumn);
+    int GetVolume(void);
+
+    int PlayFile(QString filename);
+    int PlayTrack(int trackID);
+    int PlayURL(QString url);
+
+    QString GetMetadata(void);
+
+  private slots:
+    void attachObject();
+
+  private:
+    void customEvent(QEvent *e);
+
+    QWebFrame *m_frame;
+
+    bool       m_gotAnswer;
+    QString    m_answer;
+};
+
 class MythWebView : public QWebView
 {
   Q_OBJECT
 
   public:
     MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser);
+    ~MythWebView(void);
 
     virtual void keyPressEvent(QKeyEvent *event);
 
@@ -30,6 +65,7 @@ class MythWebView : public QWebView
     void  handleUnsupportedContent(QNetworkReply *reply);
   private:
     MythUIWebBrowser *m_parentBrowser;
+    BrowserApi       *m_api;
 };
 
 /**
