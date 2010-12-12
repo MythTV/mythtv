@@ -26,16 +26,16 @@ class BrowserApi : public QObject
     void setWebView(QWebView *view);
 
   public slots:
-    int Play(void);
-    int Stop(void);
-    int Pause(void);
+    void Play(void);
+    void Stop(void);
+    void Pause(void);
 
-    int SetVolume(int volumn);
+    void SetVolume(int volumn);
     int GetVolume(void);
 
-    int PlayFile(QString filename);
-    int PlayTrack(int trackID);
-    int PlayURL(QString url);
+    void PlayFile(QString filename);
+    void PlayTrack(int trackID);
+    void PlayURL(QString url);
 
     QString GetMetadata(void);
 

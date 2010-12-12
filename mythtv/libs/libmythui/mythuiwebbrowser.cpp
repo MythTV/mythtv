@@ -56,25 +56,25 @@ void BrowserApi::attachObject(void)
     m_frame->addToJavaScriptWindowObject(QString("MusicPlayer"), this);
 }
 
-int BrowserApi::Play(void)
+void BrowserApi::Play(void)
 {
     MythEvent me(QString("MUSIC_COMMAND PLAY"));
     gCoreContext->dispatch(me);
 }
 
-int BrowserApi::Stop(void)
+void BrowserApi::Stop(void)
 {
     MythEvent me(QString("MUSIC_COMMAND STOP"));
     gCoreContext->dispatch(me);
 }
 
-int BrowserApi::Pause(void)
+void BrowserApi::Pause(void)
 {
     MythEvent me(QString("MUSIC_COMMAND PAUSE"));
     gCoreContext->dispatch(me);
 }
 
-int BrowserApi::SetVolume(int volumn)
+void BrowserApi::SetVolume(int volumn)
 {
     MythEvent me(QString("MUSIC_COMMAND SET_VOLUME %1").arg(volumn));
     gCoreContext->dispatch(me);
@@ -101,19 +101,19 @@ int BrowserApi::GetVolume(void)
     return -1;
 }
 
-int BrowserApi::PlayFile(QString filename)
+void BrowserApi::PlayFile(QString filename)
 {
     MythEvent me(QString("MUSIC_COMMAND PLAY_FILE '%1'").arg(filename));
     gCoreContext->dispatch(me);
 }
 
-int BrowserApi::PlayTrack(int trackID)
+void BrowserApi::PlayTrack(int trackID)
 {
     MythEvent me(QString("MUSIC_COMMAND PLAY_TRACK %1").arg(trackID));
     gCoreContext->dispatch(me);
 }
 
-int BrowserApi::PlayURL(QString url)
+void BrowserApi::PlayURL(QString url)
 {
     MythEvent me(QString("MUSIC_COMMAND PLAY_URL %1").arg(url));
     gCoreContext->dispatch(me);
