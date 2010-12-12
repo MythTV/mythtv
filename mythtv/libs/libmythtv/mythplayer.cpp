@@ -542,15 +542,13 @@ bool MythPlayer::InitVideo(void)
                 decoder->GetVideoCodecPrivate(),
                 pipState,
                 video_disp_dim, video_aspect,
-                widget->winId(), display_rect, (video_frame_rate * play_speed),
+                widget->winId(), display_rect, video_frame_rate,
                 0 /*embedid*/);
         }
 
         if (videoOutput)
         {
             videoOutput->SetVideoScalingAllowed(true);
-            // We need to tell it this for automatic deinterlacer settings
-            videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
             CheckExtraAudioDecode();
         }
     }
@@ -647,6 +645,8 @@ void MythPlayer::ReinitVideo(void)
         QMutexLocker locker1(&osdLock);
         QMutexLocker locker2(&vidExitLock);
         QMutexLocker locker3(&videofiltersLock);
+
+        videoOutput->SetVideoFrameRate(video_frame_rate);
         float aspect = (forced_video_aspect > 0) ? forced_video_aspect :
                                                video_aspect;
         if (!videoOutput->InputChanged(video_disp_dim, aspect,
@@ -660,8 +660,6 @@ void MythPlayer::ReinitVideo(void)
             return;
         }
 
-        // We need to tell it this for automatic deinterlacer settings
-        videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
         if (osd)
             osd->SetPainter(videoOutput->GetOSDPainter());
         ReinitOSD();
@@ -3169,7 +3167,7 @@ void MythPlayer::ChangeSpeed(void)
     if (videoOutput && videosync)
     {
         // We need to tell it this for automatic deinterlacer settings
-        videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
+        videoOutput->SetVideoFrameRate(video_frame_rate);
 
         // If using bob deinterlace, turn on or off if we
         // changed to or from synchronous playback speed.
