@@ -2393,6 +2393,8 @@ void MainServer::DoHandleDeleteRecording(
         recinfo.SaveAutoExpire(kDeletedAutoExpire, true);
         if (recinfo.GetRecordingStatus() == rsRecording)
             DoHandleStopRecording(recinfo, NULL);
+        if (forgetHistory)
+            recinfo.ForgetHistory();
         QStringList outputlist( QString::number(0) );
         SendResponse(pbssock, outputlist);
         return;

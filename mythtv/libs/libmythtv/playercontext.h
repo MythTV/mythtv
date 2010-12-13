@@ -74,7 +74,6 @@ class MPUBLIC PlayerContext
     bool StartPlaying(int maxWait = -1);
     void StopPlaying(void);
     void DeletePlayerThread(void);
-    bool StartOSD(TV *tv);
     void UpdateTVChain(void);
     bool ReloadTVChain(void);
     void CreatePIPWindow(const QRect&, int pos = -1, 
@@ -140,7 +139,6 @@ class MPUBLIC PlayerContext
     // Boolean Gets
     bool IsPIPSupported(void) const;
     bool IsPBPSupported(void) const;
-    bool IsOSDFullScreen(void) const;
     bool IsPIP(void) const
         { return (kPIPonTV == pipState) || (kPIPStandAlone == pipState); }
     bool IsPBP(void) const
@@ -177,7 +175,6 @@ class MPUBLIC PlayerContext
     AVSpecialDecode     specialDecode;
     bool                nohardwaredecoders; // < Disable use of VDPAU decoding
     int                 last_cardid; ///< CardID of current/last recorder
-    float               last_framerate; ///< Estimated framerate from recorder
     /// 0 == normal, +1 == fast forward, -1 == rewind
     int                 ff_rew_state;
     /// Index into ff_rew_speeds for FF and Rewind speeds

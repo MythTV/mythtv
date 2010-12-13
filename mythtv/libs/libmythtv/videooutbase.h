@@ -288,7 +288,6 @@ class VideoOutput
     // Video parameters
     MythCodecID          video_codec_id;
     VideoDisplayProfile *db_vdisp_profile;
-    float                video_prate;  ///< Playback frame rate of video
 
     // Picture-in-Picture
     QSize   pip_desired_display_size;

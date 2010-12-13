@@ -320,7 +320,7 @@ package MythTV::Recording;
         ($info{'audio_bits_per_sample'}) = $data =~ m/^AUDIO:.+?ch,\s*[su](8|16)/mi;
         ($info{'audio_channels'})        = $data =~ m/^ID_AUDIO_NCH=0*([1-9]\d*)/m;
         ($info{'aspect'})                = $data =~ m/^ID_VIDEO_ASPECT=0*([1-9]\d*(?:[\.\,]\d+)?)/m;
-        ($info{'audio_type'})            = $data =~ m/^ID_AUDIO_CODEC=0*([1-9]\d*(?:\.\d+)?)/m;
+        ($info{'audio_type'})            = $data =~ m/^ID_AUDIO_CODEC=(\w+)/m;
         ($info{'mpeg_stream_type'})      = $data =~ m/^ID_DEMUXER=(\w+)/mi;
 
     # Set the is_mpeg flag

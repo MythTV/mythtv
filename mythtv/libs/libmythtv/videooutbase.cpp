@@ -213,7 +213,7 @@ VideoOutput *VideoOutput::Create(
         if (vo)
         {
             vo->SetPIPState(pipState);
-            vo->video_prate = video_prate;
+            vo->SetVideoFrameRate(video_prate);
             if (vo->Init(
                     video_dim.width(), video_dim.height(), video_aspect,
                     win_id, display_rect.x(), display_rect.y(),
@@ -313,8 +313,7 @@ VideoOutput::VideoOutput() :
     db_deint_filtername(QString::null),
 
     // Video parameters
-    video_codec_id(kCodec_NONE),
-    db_vdisp_profile(NULL),             video_prate(0.0),
+    video_codec_id(kCodec_NONE),        db_vdisp_profile(NULL),
 
     // Picture-in-Picture stuff
     pip_desired_display_size(160,128),  pip_display_size(0,0),
@@ -450,7 +449,6 @@ bool VideoOutput::IsPreferredRenderer(QSize video_size)
 
 void VideoOutput::SetVideoFrameRate(float playback_fps)
 {
-    video_prate = playback_fps;
     if (db_vdisp_profile)
         db_vdisp_profile->SetOutput(playback_fps);
 }
@@ -1540,7 +1538,8 @@ void VideoOutput::ResizeForVideo(uint width, uint height)
     if ((width == 1920 || width == 1440) && height == 1088)
         height = 1080; // ATSC 1920x1080
 
-    if (display_res && display_res->SwitchToVideo(width, height, video_prate))
+    float rate = db_vdisp_profile ? db_vdisp_profile->GetOutput() : 0.0f;
+    if (display_res && display_res->SwitchToVideo(width, height, rate))
     {
         // Switching to custom display resolution succeeded
         // Make a note of the new size

@@ -544,15 +544,13 @@ bool MythPlayer::InitVideo(void)
                 decoder->GetVideoCodecPrivate(),
                 pipState,
                 video_disp_dim, video_aspect,
-                widget->winId(), display_rect, (video_frame_rate * play_speed),
+                widget->winId(), display_rect, video_frame_rate,
                 0 /*embedid*/);
         }
 
         if (videoOutput)
         {
             videoOutput->SetVideoScalingAllowed(true);
-            // We need to tell it this for automatic deinterlacer settings
-            videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
             CheckExtraAudioDecode();
         }
     }
@@ -649,6 +647,8 @@ void MythPlayer::ReinitVideo(void)
         QMutexLocker locker1(&osdLock);
         QMutexLocker locker2(&vidExitLock);
         QMutexLocker locker3(&videofiltersLock);
+
+        videoOutput->SetVideoFrameRate(video_frame_rate);
         float aspect = (forced_video_aspect > 0) ? forced_video_aspect :
                                                video_aspect;
         if (!videoOutput->InputChanged(video_disp_dim, aspect,
@@ -662,8 +662,6 @@ void MythPlayer::ReinitVideo(void)
             return;
         }
 
-        // We need to tell it this for automatic deinterlacer settings
-        videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
         if (osd)
             osd->SetPainter(videoOutput->GetOSDPainter());
         ReinitOSD();
@@ -3180,7 +3178,7 @@ void MythPlayer::ChangeSpeed(void)
     if (videoOutput && videosync)
     {
         // We need to tell it this for automatic deinterlacer settings
-        videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
+        videoOutput->SetVideoFrameRate(video_frame_rate);
 
         // If using bob deinterlace, turn on or off if we
         // changed to or from synchronous playback speed.
@@ -3314,10 +3312,8 @@ bool MythPlayer::IsReallyNearEnd(void) const
 }
 
 /** \brief Returns true iff near end of recording.
- *  \param margin minimum number of frames we want before being near end,
- *                defaults to 2 seconds of video.
  */
-bool MythPlayer::IsNearEnd(int64_t margin)
+bool MythPlayer::IsNearEnd(void)
 {
     uint64_t framesRead, framesLeft = 0;
 
@@ -3333,7 +3329,7 @@ bool MythPlayer::IsNearEnd(int64_t margin)
     }
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-    margin = (margin >= 0) ? margin: (long long) (video_frame_rate*2);
+    long long margin = (long long)(video_frame_rate * 2);
     margin = (long long) (margin * audio.GetStretchFactor());
     bool watchingTV = watchingrecording && player_ctx->recorder &&
         player_ctx->recorder->IsValidRecorder();
