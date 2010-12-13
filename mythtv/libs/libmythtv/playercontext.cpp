@@ -161,13 +161,6 @@ bool PlayerContext::IsPBPSupported(void) const
     return supported;
 }
 
-bool PlayerContext::IsOSDFullScreen(void) const
-{
-    // Note: This is to allow future OSD implementations to cover
-    // two or more PBP screens.
-    return false;
-}
-
 void PlayerContext::CreatePIPWindow(const QRect &rect, int pos,
                     QWidget *widget)
 {
