@@ -11,3 +11,6 @@ avconfig.h
 ffmpeg
 ffmpeg_g
 mythffmpeg
+ffplay
+ffplay_g
+mythffplay
