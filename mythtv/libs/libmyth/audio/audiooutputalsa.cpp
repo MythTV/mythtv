@@ -55,7 +55,7 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
         if (args < 0)
         {
             /* no existing parameters: add it behind device name */
-            passthru_device += ":AES0=6";
+            passthru_device += ":AES0=6,AES1=0x82,AES2=0x00,AES3=0x01";
         }
         else
         {
@@ -66,12 +66,12 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
             if (args == passthru_device.length())
             {
                 /* ":" but no parameters */
-                passthru_device += "AES0=6";
+                passthru_device += "AES0=6,AES1=0x82,AES2=0x00,AES3=0x01";
             }
             else if (passthru_device[args] != '{')
             {
                 /* a simple list of parameters: add it at the end of the list */
-                passthru_device += ",AES0=6";
+                passthru_device += ",AES0=6,AES1=0x82,AES2=0x00,AES3=0x01";
             }
             else
             {
@@ -80,7 +80,8 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
                     --len;
                 while (len > 0 && passthru_device[len].isSpace());
                 if (passthru_device[len] == '}')
-                    passthru_device = passthru_device.insert(len, " AES0=6");
+                    passthru_device = passthru_device.insert(
+                        len, " AES0=6 AES1 0x82 AES2=0x00 AES3=0x01");
             }
         }
     }
@@ -106,6 +107,7 @@ int AudioOutputALSA::TryOpenDevice(int open_mode, int try_ac3)
     if (try_ac3)
     {
         dev_ba = passthru_device.toAscii();
+        VBAUDIO(QString("OpenDevice %1 for passthrough").arg(passthru_device));
         err = snd_pcm_open(&pcm_handle, dev_ba.constData(),
                            SND_PCM_STREAM_PLAYBACK, open_mode);
         m_lastdevice = passthru_device;
@@ -120,6 +122,7 @@ int AudioOutputALSA::TryOpenDevice(int open_mode, int try_ac3)
     if (!try_ac3 || err < 0)
     {
         // passthru open failed, retry default device
+        VBAUDIO(QString("OpenDevice %1").arg(main_device));
         dev_ba = main_device.toAscii();
         err = snd_pcm_open(&pcm_handle, dev_ba.constData(),
                            SND_PCM_STREAM_PLAYBACK, open_mode);
@@ -483,7 +486,10 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
         return;
     }
 
-    if ((!passthru && channels == 6) || channels == 8)
+        /* Audio received is using SMPTE channel ordering
+         * ALSA uses its own channel order.
+         * Do not re-order passthu audio */
+    if (!passthru && (channels  == 6 || channels == 8))
         ReorderSmpteToAlsa(aubuf, frames, output_format, channels - 6);
 
     VERBOSE(VB_AUDIO+VB_TIMESTAMP,

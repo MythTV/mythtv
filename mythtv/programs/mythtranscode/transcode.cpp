@@ -74,7 +74,6 @@ class AudioReencodeBuffer : public AudioOutput
         eff_audiorate = (dsprate / 100);
     }
 
-    virtual void SetBlocking(bool block) { (void)block; }
     virtual void Reset(void)
     {
         audiobuffer_len = 0;

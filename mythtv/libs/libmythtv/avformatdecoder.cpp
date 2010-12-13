@@ -3625,7 +3625,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
     long long pts       = 0;
     int ret             = 0;
     int data_size       = 0;
-    bool firstloop      = true, dts = false;
+    bool firstloop      = true;
 
     avcodeclock->lock();
     int audIdx = selectedTrack[kTrackTypeAudio].av_stream_index;
@@ -3736,6 +3736,11 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             m_spdifenc->WriteFrame(tmp_pkt.data, tmp_pkt.size);
             data_size = tmp_pkt.size;
             ret = m_spdifenc->GetData((unsigned char *)audioSamples, data_size);
+            if (ret < 0)
+            {
+                avcodeclock->unlock();
+                return true;
+            }
         }
         else
         {
@@ -3772,8 +3777,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
         if (ret < 0)
         {
-            if (!dts)
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Unknown audio decoding error");
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Unknown audio decoding error");
             return false;
         }
 
@@ -4282,6 +4286,10 @@ bool AvFormatDecoder::DoPassThrough(const AVCodecContext *ctx)
         passthru = m_audio->CanAC3();
     else if (ctx->codec_id == CODEC_ID_DTS)
         passthru = m_audio->CanDTS();
+    else if (ctx->codec_id == CODEC_ID_EAC3)
+        passthru = m_audio->CanHD();
+    else if (ctx->codec_id == CODEC_ID_TRUEHD)
+        passthru = m_audio->CanHDLL();
     passthru &= m_audio->CanPassthrough(ctx->sample_rate, ctx->channels);
     passthru &= !internal_vol;
     passthru &= !transcoding && !disable_passthru;
