@@ -98,8 +98,7 @@ AudioConfigSettings::AudioConfigSettings() :
     VerticalConfigurationGroup(false, true, false, false),
     m_OutputDevice(NULL),   m_MaxAudioChannels(NULL),
     m_AudioUpmix(NULL),     m_AudioUpmixType(NULL),
-    m_AC3PassThrough(NULL), m_DTSPassThrough(NULL),  m_MPCM(NULL),
-    m_AdvancedAudioSettings(NULL),                   m_PassThroughOverride(NULL)
+    m_AC3PassThrough(NULL), m_DTSPassThrough(NULL)
 {
     setLabel(QObject::tr("Audio System"));
     setUseLabel(false);
@@ -123,6 +122,7 @@ AudioConfigSettings::AudioConfigSettings() :
                                       "Check audio configuration").arg(name));
     audiodevs.insert(name, *adc);
     devices.append(*adc);
+
     delete adc;
 
     ConfigurationGroup *maingroup = new VerticalConfigurationGroup(false,
@@ -146,48 +146,12 @@ AudioConfigSettings::AudioConfigSettings() :
     maingroup->addChild((m_AudioUpmix = AudioUpmix()));
     maingroup->addChild((m_AudioUpmixType = AudioUpmixType()));
 
-    m_AdvancedAudioSettings = AdvancedAudioSettings();
-    addChild(m_AdvancedAudioSettings);
-
-    ConfigurationGroup *group2 =
-        new VerticalConfigurationGroup(false);
-
-    TriggeredItem *sub2 = new TriggeredItem(m_AdvancedAudioSettings, group2);
-    addChild(sub2);
-
-    ConfigurationGroup *settings3 =
-        new HorizontalConfigurationGroup(false, false);
-
-    m_PassThroughOverride = PassThroughOverride();
-    TriggeredItem *sub3 =
-        new TriggeredItem(m_PassThroughOverride, PassThroughOutputDevice());
-    settings3->addChild(m_PassThroughOverride);
-    settings3->addChild(sub3);
-
-    ConfigurationGroup *settings4 =
-        new HorizontalConfigurationGroup(false, false);
-    Setting *srcqualityoverride = SRCQualityOverride();
-    TriggeredItem *sub4 =
-        new TriggeredItem(srcqualityoverride, SRCQuality());
-    settings4->addChild(srcqualityoverride);
-    settings4->addChild(sub4);
-
-    ConfigurationGroup *settings5 =
-        new HorizontalConfigurationGroup(false, false);
-    settings5->addChild(Audio48kOverride());
-
-    m_triggerMPCM = new TransCheckBoxSetting();
-    m_MPCM = MPCM();
-    TriggeredItem *subMPCM = new TriggeredItem(m_triggerMPCM, m_MPCM);
-
-    ConfigurationGroup *settings6 =
-        new HorizontalConfigurationGroup(false, false);
-    settings6->addChild(subMPCM);
-
-    group2->addChild(settings4);
-    group2->addChild(settings5);
-    group2->addChild(settings3);
-    group2->addChild(settings6);
+    TransButtonSetting *advanced = new TransButtonSetting("advanced");
+    advanced->setLabel(QObject::tr("Advanced Audio Settings"));
+    advanced->setHelpText(QObject::tr("Enable extra audio settings. Under most "
+                                  "usage all options should be unchecked"));
+    connect(advanced, SIGNAL(pressed()), this, SLOT(AudioAdvanced()));
+    addChild(advanced);
 
         // Set slots
     connect(m_MaxAudioChannels, SIGNAL(valueChanged(const QString&)),
@@ -197,12 +161,6 @@ AudioConfigSettings::AudioConfigSettings() :
     connect(m_AC3PassThrough, SIGNAL(valueChanged(const QString&)),
             this, SLOT(UpdateCapabilities(const QString&)));
     connect(m_DTSPassThrough, SIGNAL(valueChanged(const QString&)),
-            this, SLOT(UpdateCapabilities(const QString&)));
-    connect(m_MPCM, SIGNAL(valueChanged(const QString&)),
-            this, SLOT(UpdateCapabilities(const QString&)));
-    connect(m_PassThroughOverride, SIGNAL(valueChanged(const QString&)),
-            this, SLOT(UpdateCapabilities(const QString&)));
-    connect(m_AdvancedAudioSettings, SIGNAL(valueChanged(const QString&)),
             this, SLOT(UpdateCapabilities(const QString&)));
 }
 
@@ -262,16 +220,15 @@ void AudioConfigSettings::UpdateCapabilities(const QString &device)
     AudioOutputSettings settings;
 
         // Test if everything is set yet
-    if (!m_OutputDevice   || !m_MaxAudioChannels || !m_AdvancedAudioSettings ||
-        !m_AC3PassThrough || !m_DTSPassThrough   || !m_MPCM ||
-        !m_PassThroughOverride)
+    if (!m_OutputDevice   || !m_MaxAudioChannels ||
+        !m_AC3PassThrough || !m_DTSPassThrough)
         return;
 
     if (!slotlock.tryLock()) // Doing a rescan of channels
         return;
 
-    bool bForceDigital = (m_AdvancedAudioSettings->boolValue() &&
-                          m_PassThroughOverride->boolValue());
+    bool bForceDigital = gCoreContext->GetNumSetting("PassThruDeviceOverride",
+                                                     false);
 
     QString out = m_OutputDevice->getValue();
     if (!audiodevs.contains(out))
@@ -291,7 +248,7 @@ void AudioConfigSettings::UpdateCapabilities(const QString &device)
             m_DTSPassThrough->boolValue();
         bool bLPCM = settings.canPassthrough() == -1 ||
             (settings.canLPCM() &&
-             m_AdvancedAudioSettings->boolValue() && !m_MPCM->boolValue());
+             !gCoreContext->GetNumSetting("StereoPCM", false));
 
         if (max_speakers > 2 && !bLPCM)
             max_speakers = 2;
@@ -301,9 +258,6 @@ void AudioConfigSettings::UpdateCapabilities(const QString &device)
 
     m_triggerDigital->setValue(invalid || bForceDigital ||
                                settings.canAC3() || settings.canDTS());
-    m_triggerMPCM->setValue(invalid || (settings.canLPCM() &&
-                                        settings.canPassthrough() >= 0));
-
     int cur_speakers = m_MaxAudioChannels->getValue().toInt();
 
     if (cur_speakers > max_speakers)
@@ -341,6 +295,31 @@ void AudioConfigSettings::UpdateCapabilities(const QString &device)
         }
     }
     slotlock.unlock();
+}
+
+void AudioConfigSettings::AudioAdvanced()
+{
+    QString out  = m_OutputDevice->getValue();
+    bool invalid = false;
+    AudioOutputSettings settings;
+
+    if (!audiodevs.contains(out))
+    {
+        invalid = true;
+    }
+    else
+    {
+        settings = audiodevs.value(out).settings;
+    }
+
+    AudioAdvancedSettingsGroup audiosettings(invalid ||
+                                             (settings.canLPCM() &&
+                                              settings.canPassthrough() >= 0));
+
+    if (audiosettings.exec() == kDialogCodeAccepted)
+    {
+        UpdateCapabilities(QString::null);
+    }
 }
 
 HostComboBox *AudioConfigSettings::MaxAudioChannels()
@@ -395,94 +374,6 @@ HostCheckBox *AudioConfigSettings::DTSPassThrough()
     gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
                     "supports DTS. You must use a digital connection. Uncheck "
                     "if using an analog connection"));
-    return gc;
-}
-
-HostCheckBox *AudioConfigSettings::MPCM()
-{
-    HostCheckBox *gc = new HostCheckBox("StereoPCM");
-    gc->setLabel(QObject::tr("Stereo PCM Only"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
-                    "only supports 2 channels PCM (typically an old HDMI 1.0 "
-                    "device). Multi-channels audio will be re-encoded to AC3 "
-                    "when required"));
-    return gc;
-}
-
-HostCheckBox *AudioConfigSettings::AdvancedAudioSettings()
-{
-    HostCheckBox *gc = new HostCheckBox("AdvancedAudioSettings");
-    gc->setLabel(QObject::tr("Advanced audio configuration"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Enable extra audio settings."));
-    return gc;
-}
-
-HostCheckBox *AudioConfigSettings::SRCQualityOverride()
-{
-    HostCheckBox *gc = new HostCheckBox("SRCQualityOverride");
-    gc->setLabel(QObject::tr("Override SRC quality"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Enable to override audio sample rate "
-                    "conversion quality."));
-    return gc;
-}
-
-HostComboBox *AudioConfigSettings::SRCQuality()
-{
-    HostComboBox *gc = new HostComboBox("SRCQuality", false);
-    gc->setLabel(QObject::tr("Sample rate conversion"));
-    gc->addSelection(QObject::tr("Disabled"), "-1");
-    gc->addSelection(QObject::tr("Fastest"), "0");
-    gc->addSelection(QObject::tr("Good"), "1", true); // default
-    gc->addSelection(QObject::tr("Best"), "2");
-    gc->setHelpText(QObject::tr("Set the quality of audio sample-rate "
-                    "conversion. \"Good\" (default) provides the best "
-                    "compromise between CPU usage and quality. \"Disabled\" "
-                    "lets the audio device handle sample-rate conversion."));
-    return gc;
-}
-
-HostCheckBox *AudioConfigSettings::Audio48kOverride()
-{
-    HostCheckBox *gc = new HostCheckBox("Audio48kOverride");
-    gc->setLabel(QObject::tr("Force audio device output to 48kHz"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Force audio sample rate to 48kHz. "
-                                "Some audio devices will report various rates, "
-                                "but they ultimately crash."));
-    return gc;
-}
-
-HostCheckBox *AudioConfigSettings::PassThroughOverride()
-{
-    HostCheckBox *gc = new HostCheckBox("PassThruDeviceOverride");
-    gc->setLabel(QObject::tr("Separate digital output device"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Use a distinct digital output device from "
-                                "default."));
-    return gc;
-}
-
-HostComboBox *AudioConfigSettings::PassThroughOutputDevice()
-{
-    HostComboBox *gc = new HostComboBox("PassThruOutputDevice", true);
-
-    gc->setLabel(QObject::tr("Digital output device"));
-    gc->addSelection(QObject::tr("Default"), "Default");
-#ifdef USING_MINGW
-    gc->addSelection("DirectX:Primary Sound Driver");
-#else
-    gc->addSelection("ALSA:iec958:{ AES0 0x02 }",
-                     "ALSA:iec958:{ AES0 0x02 }");
-    gc->addSelection("ALSA:hdmi", "ALSA:hdmi");
-    gc->addSelection("ALSA:plughw:0,3", "ALSA:plughw:0,3");
-#endif
-
-    gc->setHelpText(QObject::tr("Deprecated. Audio output device to use for "
-                        "digital audio. This value is currently only used "
-                        "with ALSA and DirectX sound output."));
     return gc;
 }
 
@@ -599,6 +490,130 @@ AudioGeneralSettings::AudioGeneralSettings()
 {
     addChild(new AudioConfigSettings());
     addChild(new AudioMixerSettings());
+}
+
+HostCheckBox *AudioAdvancedSettings::MPCM()
+{
+    HostCheckBox *gc = new HostCheckBox("StereoPCM");
+    gc->setLabel(QObject::tr("Stereo PCM Only"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
+                    "only supports 2 channels PCM (typically an old HDMI 1.0 "
+                    "device). Multi-channels audio will be re-encoded to AC3 "
+                    "when required"));
+    return gc;
+}
+
+HostCheckBox *AudioAdvancedSettings::SRCQualityOverride()
+{
+    HostCheckBox *gc = new HostCheckBox("SRCQualityOverride");
+    gc->setLabel(QObject::tr("Override SRC quality"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Enable to override audio sample rate "
+                    "conversion quality."));
+    return gc;
+}
+
+HostComboBox *AudioAdvancedSettings::SRCQuality()
+{
+    HostComboBox *gc = new HostComboBox("SRCQuality", false);
+    gc->setLabel(QObject::tr("Sample rate conversion"));
+    gc->addSelection(QObject::tr("Disabled"), "-1");
+    gc->addSelection(QObject::tr("Fastest"), "0");
+    gc->addSelection(QObject::tr("Good"), "1", true); // default
+    gc->addSelection(QObject::tr("Best"), "2");
+    gc->setHelpText(QObject::tr("Set the quality of audio sample-rate "
+                    "conversion. \"Good\" (default) provides the best "
+                    "compromise between CPU usage and quality. \"Disabled\" "
+                    "lets the audio device handle sample-rate conversion."));
+    return gc;
+}
+
+HostCheckBox *AudioAdvancedSettings::Audio48kOverride()
+{
+    HostCheckBox *gc = new HostCheckBox("Audio48kOverride");
+    gc->setLabel(QObject::tr("Force audio device output to 48kHz"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Force audio sample rate to 48kHz. "
+                                "Some audio devices will report various rates, "
+                                "but they ultimately crash."));
+    return gc;
+}
+
+HostCheckBox *AudioAdvancedSettings::PassThroughOverride()
+{
+    HostCheckBox *gc = new HostCheckBox("PassThruDeviceOverride");
+    gc->setLabel(QObject::tr("Separate digital output device"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Use a distinct digital output device from "
+                                "default."));
+    return gc;
+}
+
+HostComboBox *AudioAdvancedSettings::PassThroughOutputDevice()
+{
+    HostComboBox *gc = new HostComboBox("PassThruOutputDevice", true);
+
+    gc->setLabel(QObject::tr("Digital output device"));
+    gc->addSelection(QObject::tr("Default"), "Default");
+#ifdef USING_MINGW
+    gc->addSelection("DirectX:Primary Sound Driver");
+#else
+    gc->addSelection("ALSA:iec958:{ AES0 0x02 }",
+                     "ALSA:iec958:{ AES0 0x02 }");
+    gc->addSelection("ALSA:hdmi", "ALSA:hdmi");
+    gc->addSelection("ALSA:plughw:0,3", "ALSA:plughw:0,3");
+#endif
+
+    gc->setHelpText(QObject::tr("Deprecated. Audio output device to use for "
+                        "digital audio. This value is currently only used "
+                        "with ALSA and DirectX sound output."));
+    return gc;
+}
+
+AudioAdvancedSettings::AudioAdvancedSettings(bool mpcm)
+{
+    ConfigurationGroup *settings3 =
+        new HorizontalConfigurationGroup(false, false);
+
+    m_PassThroughOverride = PassThroughOverride();
+    TriggeredItem *sub3 =
+        new TriggeredItem(m_PassThroughOverride, PassThroughOutputDevice());
+    settings3->addChild(m_PassThroughOverride);
+    settings3->addChild(sub3);
+
+    ConfigurationGroup *settings4 =
+        new HorizontalConfigurationGroup(false, false);
+    Setting *srcqualityoverride = SRCQualityOverride();
+    TriggeredItem *sub4 =
+        new TriggeredItem(srcqualityoverride, SRCQuality());
+    settings4->addChild(srcqualityoverride);
+    settings4->addChild(sub4);
+
+    ConfigurationGroup *settings5 =
+        new HorizontalConfigurationGroup(false, false);
+    settings5->addChild(Audio48kOverride());
+
+    ConfigurationGroup *settings6;
+
+    if (mpcm)
+    {
+        settings6 = new HorizontalConfigurationGroup(false, false);
+        settings6->addChild(MPCM());
+    }
+    
+    addChild(settings4);
+    addChild(settings5);
+    addChild(settings3);
+    if (mpcm)
+    {
+        addChild(settings6);
+    }
+}
+
+AudioAdvancedSettingsGroup::AudioAdvancedSettingsGroup(bool mpcm)
+{
+    addChild(new AudioAdvancedSettings(mpcm));
 }
 
 // vim:set sw=4 ts=4 expandtab:
