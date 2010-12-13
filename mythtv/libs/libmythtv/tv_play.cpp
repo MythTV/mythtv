@@ -2044,8 +2044,6 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
 
         if (ctx->playingInfo && StartRecorder(ctx,-1))
         {
-            // Cache starting frame rate for this recorder
-            ctx->last_framerate = ctx->recorder->GetFrameRate();
             ok = StartPlayer(mctx, ctx, desiredNextState);
         }
         if (!ok)
@@ -4161,26 +4159,19 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         ctx->LockDeletePlayer(__FILE__, __LINE__);
         long long bookmark = ctx->player->GetBookmark();
         long long curloc   = ctx->player->GetFramesPlayed();
-        float mult = 1.0f;
-        if (ctx->last_framerate)
-            mult = 1.0f / ctx->last_framerate;
-        long long seekloc = (long long) ((bookmark - curloc) * mult);
+        float     rate     = ctx->player->GetFrameRate();
+        long long seekloc = (long long) ((bookmark - curloc) / rate);
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
-        if (bookmark > ctx->last_framerate)
-        {
+        if (bookmark > rate)
             DoSeek(ctx, seekloc, tr("Jump to Bookmark"));
-        }
     }
     else if (has_action("JUMPSTART",actions))
     {
         long long seekloc = +1;
         ctx->LockDeletePlayer(__FILE__, __LINE__);
-        if (ctx->player && ctx->last_framerate >= 0.0001f)
-        {
-            seekloc = (int64_t) (-1.0 * ctx->player->GetFramesPlayed() /
-                                 ctx->last_framerate);
-        }
+        seekloc = (int64_t) (-1.0 * ctx->player->GetFramesPlayed() /
+                             ctx->player->GetFrameRate());
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
         if (seekloc <= 0)
@@ -4781,11 +4772,11 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
         else if (tokens[2] == "BACKWARD")
             DoSeek(ctx, -ctx->rewtime, tr("Skip Back"));
         else if ((tokens[2] == "POSITION") && (tokens.size() == 4) &&
-                 (tokens[3].contains(QRegExp("^\\d+$"))) &&
-                 ctx->last_framerate)
+                 (tokens[3].contains(QRegExp("^\\d+$"))))
         {
             long long rel_frame = tokens[3].toInt();
-            rel_frame -= (long long) (fplay * (1.0 / ctx->last_framerate)),
+            rel_frame -= (long long) (fplay * (1.0 /
+                                      ctx->player->GetFrameRate()));
             DoSeek(ctx, rel_frame, tr("Jump To"));
         }
     }
@@ -4865,8 +4856,12 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
 
             ctx->LockDeletePlayer(__FILE__, __LINE__);
             long long fplay = 0;
+            float     rate  = 30.0f;
             if (ctx->player)
+            {
                 fplay = ctx->player->GetFramesPlayed();
+                rate  = ctx->player->GetFrameRate();
+            }
             ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
             ctx->LockPlayingInfo(__FILE__, __LINE__);
@@ -4899,7 +4894,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
                     .arg(respDate.toString(Qt::ISODate))
                     .arg(fplay)
                     .arg(ctx->buffer->GetFilename())
-                    .arg(ctx->last_framerate);
+                    .arg(rate);
             }
             else
             {
@@ -4909,7 +4904,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
                     .arg(speedStr)
                     .arg(ctx->buffer->GetFilename())
                     .arg(fplay)
-                    .arg(ctx->last_framerate);
+                    .arg(rate);
             }
 
             ctx->UnlockPlayingInfo(__FILE__, __LINE__);
@@ -4998,7 +4993,6 @@ bool TV::CreatePBP(PlayerContext *ctx, const ProgramInfo *info)
     if (ok)
     {
         ScheduleStateChange(mctx);
-        mctx->StartOSD(this);
         mctx->LockDeletePlayer(__FILE__, __LINE__);
         if (mctx->player)
             mctx->player->JumpToFrame(mctx_frame);
@@ -5125,10 +5119,7 @@ bool TV::StartPlayer(PlayerContext *mctx, PlayerContext *ctx,
     }
 
     if (ok)
-    {
-        ctx->StartOSD(this);
         SetSpeedChangeTimer(25, __LINE__);
-    }
 
     VERBOSE(VB_PLAYBACK, LOC + QString("StartPlayer(%1, %2, %3) -- end %4")
             .arg(find_player_index(ctx)).arg(StateToString(desiredState))
@@ -5499,7 +5490,6 @@ void TV::PBPRestartMainPlayer(PlayerContext *mctx)
                         mctx->embedWinID, &mctx->embedBounds))
     {
         ScheduleStateChange(mctx);
-        mctx->StartOSD(this);
         mctx->LockDeletePlayer(__FILE__, __LINE__);
         if (mctx->player)
             mctx->player->JumpToFrame(mctx_frame);
@@ -5832,8 +5822,14 @@ bool TV::SeekHandleAction(PlayerContext *actx, const QStringList &actions,
     {
         if (!isDVD)
         {
+            float rate = 30.0f;
+            actx->LockDeletePlayer(__FILE__, __LINE__);
+            if (actx->player)
+                rate = actx->player->GetFrameRate();
+            actx->UnlockDeletePlayer(__FILE__, __LINE__);
+
             float time = (flags & kAbsolute) ?  direction :
-                             direction * (1.001 / actx->last_framerate);
+                             direction * (1.001 / rate);
             QString message = (flags & kRewind) ? QString(tr("Rewind")) :
                                                  QString(tr("Forward"));
             DoSeek(actx, time, message);
@@ -5902,10 +5898,10 @@ void TV::DoArbSeek(PlayerContext *ctx, ArbSeekWhence whence)
         }
         if (whence == ARBSEEK_END)
             time = (ctx->player->CalcMaxFFTime(LONG_MAX, false) /
-                    ctx->last_framerate) - time;
+                    ctx->player->GetFrameRate()) - time;
         else
             time = time - (ctx->player->GetFramesPlayed() - 1) /
-                    ctx->last_framerate;
+                    ctx->player->GetFrameRate();
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
         DoSeek(ctx, time, tr("Jump To"));
     }
@@ -6533,8 +6529,6 @@ void TV::SwitchCards(PlayerContext *ctx,
         bool ok = false;
         if (ctx->playingInfo && StartRecorder(ctx,-1))
         {
-            // Cache starting frame rate for this recorder
-            ctx->last_framerate = ctx->recorder->GetFrameRate();
             PlayerContext *mctx = GetPlayer(ctx, 0);
 
             if (ctx->CreatePlayer(
@@ -6543,7 +6537,6 @@ void TV::SwitchCards(PlayerContext *ctx,
             {
                 ScheduleStateChange(ctx);
                 ok = true;
-                ctx->StartOSD(this);
                 ctx->PushPreviousChannel();
                 for (uint i = 1; i < player.size(); i++)
                     PIPAddPlayer(mctx, GetPlayer(ctx, i));
