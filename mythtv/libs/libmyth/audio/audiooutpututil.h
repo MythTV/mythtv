@@ -20,7 +20,7 @@ class MPUBLIC AudioOutputUtil
     static void MuteChannel(int obits, int channels, int ch,
                             void *buffer, int bytes);
     static char *GeneratePinkSamples(char *frames, int channels,
-                                     int channel, int count);
+                                     int channel, int count, int bits = 16);
 };
 
 #endif

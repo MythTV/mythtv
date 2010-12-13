@@ -89,6 +89,10 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, AVCodecContext *ctx)
 
     av_write_header(m_oc);
 
+    VERBOSE(VB_AUDIO, LOC + QString("Creating %1 encoder (%2, %3Hz)")
+            .arg(muxer).arg(ff_codec_id_string((CodecID)codec->codec_type))
+            .arg(codec->sample_rate));
+
     m_complete = true;
 }
 
