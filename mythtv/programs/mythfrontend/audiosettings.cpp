@@ -11,13 +11,16 @@
 #include <QCoreApplication>
 #include <QEvent>
 #include <QDir>
+#include <QThread>
 
 // MythTV headers
 #include "mythconfig.h"
 #include "mythcorecontext.h"
 #include "mythdbcon.h"
 #include "mythverbose.h"
+#include "audiooutpututil.h"
 #include "audiosettings.h"
+#include "mythdialogbox.h"
 
 class TriggeredItem : public TriggeredConfigurationGroup
 {
@@ -156,6 +159,13 @@ AudioConfigSettings::AudioConfigSettings() :
     maingroup->addChild((m_MaxAudioChannels = MaxAudioChannels()));
     maingroup->addChild((m_AudioUpmix = AudioUpmix()));
     maingroup->addChild((m_AudioUpmixType = AudioUpmixType()));
+
+    TransButtonSetting *test = new TransButtonSetting("test");
+    test->setLabel(QObject::tr("Test"));
+    test->setHelpText(QObject::tr("Will play a test pattern on all configured "
+                                  "speakers"));
+    connect(test, SIGNAL(pressed()), this, SLOT(AudioTest()));
+    addChild(test);
 
     TransButtonSetting *advanced = new TransButtonSetting("advanced");
     advanced->setLabel(QObject::tr("Advanced Audio Settings"));
@@ -450,6 +460,97 @@ bool AudioConfigSettings::CheckPassthrough()
         delete adc;
     }
     return m_passthrough8;
+}
+
+class AudioTestThread : public QThread
+{
+public:
+    void run()
+        {
+            char *frames_in = new char[m_channels * 48000 * sizeof(int16_t) + 15];
+            char *frames = (char *)(((long)frames_in + 15) & ~0xf);
+            for (int i = 0; i < m_channels; i++)
+            {
+                AudioOutputUtil::GeneratePinkSamples(frames, m_channels,
+                                                     i, 48000);
+                if (!m_audioOutput->AddFrames(frames, 48000, -1))
+                {
+                    VERBOSE(VB_AUDIO, "AddAudioData() "
+                            "Audio buffer overflow, audio data lost!");
+                }
+                    //if (m_dialog)
+                {
+                        // Send event here
+                        //QApplication::postEvent(m_dialog, NULL);
+                }
+                sleep(1);
+            usleep(500000);
+            }
+
+            delete[] frames_in;
+        }
+    QString result()
+        {
+            QString errMsg;
+            
+            if (!m_audioOutput)
+                errMsg = QObject::tr("Unable to create AudioOutput.");
+            else
+                errMsg = m_audioOutput->GetError();
+            return errMsg;
+        }
+    AudioTestThread(QString main, QString pass, int channels)
+        : m_channels(channels)
+        {
+            m_audioOutput = AudioOutput::OpenAudio(main,
+                                                   pass,
+                                                   FORMAT_S16, channels,
+                                                   0, 48000,
+                                                   AUDIOOUTPUT_VIDEO,
+                                                   true, false);
+        }
+    ~AudioTestThread()
+        {
+            if (m_audioOutput)
+                delete m_audioOutput;
+        }
+    
+private:
+    AudioOutput          *m_audioOutput;
+    int                   m_channels;
+};
+    
+void AudioConfigSettings::AudioTest()
+{
+    QString out  = m_OutputDevice->getValue();
+    QString name;
+    int channels = m_MaxAudioChannels->getValue().toInt();
+    QString errMsg;
+
+    if (gCoreContext->GetNumSetting("PassThruDeviceOverride", false))
+    {
+        name = gCoreContext->GetSetting("PassThruOutputDevice");
+    }
+    AudioTestThread *att = new AudioTestThread(out, name, channels);
+
+    QString result = att->result();
+    if (!result.isEmpty())
+    {
+        MythPopupBox::showOkPopup(
+            GetMythMainWindow(), QObject::tr("Error"), errMsg);
+        delete att;
+        att = NULL;
+    }
+    else
+    {
+            // set MythUI recipient here
+            //att->setUIWindow(NULL);
+        att->start();
+    }
+    if (att && att->wait())
+    {
+        delete att;
+    }
 }
 
 static HostCheckBox *MythControlsVolume()

@@ -3,6 +3,8 @@
 using namespace std;
 #include "mythconfig.h"
 #include "audiooutpututil.h"
+#include <sys/types.h>
+#include <byteswap.h>
 
 #define LOC QString("AO: ")
 #define LOC_ERR QString("AO, ERROR: ")
@@ -629,3 +631,41 @@ void AudioOutputUtil::MuteChannel(int obits, int channels, int ch,
     else
         _MuteChannel((int *)buffer, channels, ch, frames);
 }
+
+#if HAVE_BIGENDIAN
+#define LE_SHORT(v)		bswap_16(v)
+#else
+#define LE_SHORT(v)		(v)
+#endif
+
+char *AudioOutputUtil::GeneratePinkSamples(char *frames, int channels,
+                                           int channel,
+                                           int count)
+{
+    pink_noise_t pink;
+
+    initialize_pink_noise(&pink, 16);
+  
+    double   res;
+    int32_t  ires;
+    int16_t *samp16 = (int16_t*) frames;
+
+    while (count-- > 0)
+    {
+        for(int chn = 0 ; chn < channels; chn++)
+        {
+            if (chn==channel)
+            {
+                res = generate_pink_noise_sample(&pink) * 0x03fffffff; /* Don't use MAX volume */
+                ires = res;
+                *samp16++ = LE_SHORT(ires >> 16);
+            }
+            else
+            {
+                *samp16++ = 0;
+            }
+        }
+    }    
+    return frames;
+}
+  
