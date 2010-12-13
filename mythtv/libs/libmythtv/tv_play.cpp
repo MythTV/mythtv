@@ -7863,13 +7863,8 @@ void TV::DoEditSchedule(int editType)
         pause_active = !actx->player || !actx->player->getVideoOutput();
         if (actx->player && actx->player->getVideoOutput())
             allowEmbedding = actx->player->getVideoOutput()->AllowPreviewEPG();
-
         if (!pause_active)
-        {
-            long long margin = (long long)
-                (actx->last_framerate * actx->player->GetAudioStretchFactor());
-            isNearEnd = actx->player->IsNearEnd(margin);
-        }
+            isNearEnd = actx->player->IsNearEnd();
         actx->UnlockDeletePlayer(__FILE__, __LINE__);
     }
 

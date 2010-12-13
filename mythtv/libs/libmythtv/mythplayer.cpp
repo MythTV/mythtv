@@ -3312,10 +3312,8 @@ bool MythPlayer::IsReallyNearEnd(void) const
 }
 
 /** \brief Returns true iff near end of recording.
- *  \param margin minimum number of frames we want before being near end,
- *                defaults to 2 seconds of video.
  */
-bool MythPlayer::IsNearEnd(int64_t margin)
+bool MythPlayer::IsNearEnd(void)
 {
     uint64_t framesRead, framesLeft = 0;
 
@@ -3331,7 +3329,7 @@ bool MythPlayer::IsNearEnd(int64_t margin)
     }
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-    margin = (margin >= 0) ? margin: (long long) (video_frame_rate*2);
+    long long margin = (long long)(video_frame_rate * 2);
     margin = (long long) (margin * audio.GetStretchFactor());
     bool watchingTV = watchingrecording && player_ctx->recorder &&
         player_ctx->recorder->IsValidRecorder();
