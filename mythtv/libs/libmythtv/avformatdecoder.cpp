@@ -4470,7 +4470,6 @@ void AvFormatDecoder::av_update_stream_timings_video(AVFormatContext *ic)
 {
     int64_t start_time, start_time1, end_time, end_time1;
     int64_t duration, duration1;
-    int i;
     AVStream *st = NULL;
 
     start_time = INT64_MAX;
@@ -4489,7 +4488,6 @@ void AvFormatDecoder::av_update_stream_timings_video(AVFormatContext *ic)
         return;
 
    duration = INT64_MIN;
-   st = ic->streams[i];
    if (st->start_time != AV_NOPTS_VALUE && st->time_base.den) {
        start_time1= av_rescale_q(st->start_time, st->time_base, AV_TIME_BASE_Q);
        if (start_time1 < start_time)
