@@ -15,7 +15,6 @@ HEADERS += audiooutput.h audiooutputbase.h audiooutputnull.h
 HEADERS += audiooutpututil.h audiooutputdownmix.h
 HEADERS += audiooutputdigitalencoder.h audiosettings.h audiooutputsettings.h
 HEADER  += pink.h spdifencoder.h
-w have the basis for E-AC3, TrueHD and DTS-HD passthrough
 HEADERS += backendselect.h dbsettings.h dialogbox.h
 HEADERS += generictree.h langsettings.h
 HEADERS += managedlist.h mythconfigdialogs.h mythconfiggroups.h
@@ -44,7 +43,6 @@ SOURCES += audiooutput.cpp audiooutputbase.cpp audiooutputnull.cpp
 SOURCES += audiooutpututil.cpp audiooutputdownmix.cpp
 SOURCES += audiooutputdigitalencoder.cpp audiosettings.cpp audiooutputsettings.cpp
 SOURCES += pink.c spdifencoder.cpp
-SOURCES += volumebase.cpp xmlparse.cpp
 SOURCES += backendselect.cpp dbsettings.cpp dialogbox.cpp
 SOURCES += generictree.cpp langsettings.cpp
 SOURCES += managedlist.cpp mythconfigdialogs.cpp mythconfiggroups.cpp
