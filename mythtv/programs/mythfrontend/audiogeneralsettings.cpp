@@ -288,9 +288,11 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
         bLPCM = settings.canLPCM() &&
             !gCoreContext->GetNumSetting("StereoPCM", false);
         bHD = ((bLPCM && settings.canHD()) || bForceDigital) &&
-            m_EAC3PassThrough->boolValue();
+            m_EAC3PassThrough->boolValue() &&
+            !gCoreContext->GetNumSetting("Audio48kOverride", false);
         bHDLL = ((bLPCM && settings.canHDLL()) || bForceDigital) &&
-            m_TrueHDPassThrough->boolValue();
+            m_TrueHDPassThrough->boolValue() &&
+            !gCoreContext->GetNumSetting("Audio48kOverride", false);
             
         if (max_speakers > 2 && !bLPCM)
             max_speakers = 2;

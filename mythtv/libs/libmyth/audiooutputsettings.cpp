@@ -316,9 +316,11 @@ AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
     bool bLPCM = aosettings->m_LPCM &&
         !gCoreContext->GetNumSetting("StereoPCM", false);
     bool bHD = bLPCM && aosettings->m_HD &&
-        gCoreContext->GetNumSetting("EAC3PassThru", false);
+        gCoreContext->GetNumSetting("EAC3PassThru", false) &&
+        !gCoreContext->GetNumSetting("Audio48kOverride", false);
     bool bHDLL = bLPCM && aosettings->m_HD &&
-        gCoreContext->GetNumSetting("TrueHDPassThru", false);
+        gCoreContext->GetNumSetting("TrueHDPassThru", false) &&
+        !gCoreContext->GetNumSetting("Audio48kOverride", false);
 
     if (max_channels > 2 && !bLPCM)
         max_channels = 2;
