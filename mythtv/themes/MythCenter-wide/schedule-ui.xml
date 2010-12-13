@@ -532,7 +532,7 @@
                         <area>240,2,220,24</area>
                     </textarea>
                     <textarea name="title" from="shortstarttimedate">
-                        <area>475,2,675,24</area>
+                        <area>480,2,675,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
                         <area>1165,2,30,24</area>
