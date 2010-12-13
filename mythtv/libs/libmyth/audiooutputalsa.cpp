@@ -238,7 +238,8 @@ bool AudioOutputALSA::IncPreallocBufferSize(int buffer_time)
         (buffer_time / 1000) *
         output_bytes_per_frame / 1024;
 
-    VBAUDIO(QString("Prealloc buffer cur: %1 max: %3").arg(cur).arg(max));
+    VBAUDIO(QString("Prealloc buffer cur: %1 need: %2 max: %3")
+            .arg(cur).arg(size).arg(max));
 
     if (size > max)
     {
@@ -401,7 +402,7 @@ bool AudioOutputALSA::OpenDevice()
     }
 
     period_time = 50000;  // aim for an interrupt every 50ms
-    buffer_time = period_time << 2; // buffer 200ms worth of samples
+    buffer_time = period_time << 3; // buffer 400ms worth of samples
 
     err = SetParameters(pcm_handle, format, channels, samplerate,
                         buffer_time, period_time);
