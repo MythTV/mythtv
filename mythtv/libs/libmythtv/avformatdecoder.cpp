@@ -865,6 +865,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     CloseContext();
 
     ringBuffer = rbuffer;
+    ringBuffer->OpenFile(ringBuffer->GetFilename());
 
     if (avfRingBuffer)
         delete avfRingBuffer;
