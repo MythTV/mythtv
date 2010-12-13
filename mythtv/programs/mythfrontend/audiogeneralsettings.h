@@ -148,7 +148,7 @@ class AudioTestThread : public QThread
   public:
 
     AudioTestThread(QObject *parent, QString main, QString passthrough,
-                    int channels, AudioOutputSettings settings);
+                    int channels, AudioOutputSettings settings, bool hd);
     ~AudioTestThread();
 
     void cancel();
@@ -159,13 +159,16 @@ class AudioTestThread : public QThread
     void run();
 
   private:
-    QObject            *m_parent;
-    AudioOutput        *m_audioOutput;
-    int                 m_channels;
-    QString             m_device;
-    QString             m_passthrough;
-    bool                m_interrupted;
-    int                 m_channel;
+    QObject                *m_parent;
+    AudioOutput            *m_audioOutput;
+    int                     m_channels;
+    QString                 m_device;
+    QString                 m_passthrough;
+    bool                    m_interrupted;
+    int                     m_channel;
+    bool                    m_hd;
+    int                     m_samplerate;
+    AudioFormat             m_format;
 };
 
 class AudioTest : public VerticalConfigurationGroup
@@ -178,18 +181,25 @@ class AudioTest : public VerticalConfigurationGroup
     bool event(QEvent *event);
 
   private:
-    int                 m_channels      ;
-    TransButtonSetting *m_frontleft;
-    TransButtonSetting *m_frontright;
-    TransButtonSetting *m_center;
-    TransButtonSetting *m_surroundleft;
-    TransButtonSetting *m_surroundright;
-    TransButtonSetting *m_rearleft;
-    TransButtonSetting *m_rearright;
-    TransButtonSetting *m_lfe;
-    AudioTestThread    *m_at;
-    TransButtonSetting *m_button;
+    int                     m_channels;
+    TransButtonSetting     *m_frontleft;
+    TransButtonSetting     *m_frontright;
+    TransButtonSetting     *m_center;
+    TransButtonSetting     *m_surroundleft;
+    TransButtonSetting     *m_surroundright;
+    TransButtonSetting     *m_rearleft;
+    TransButtonSetting     *m_rearright;
+    TransButtonSetting     *m_lfe;
+    AudioTestThread        *m_at;
+    TransButtonSetting     *m_button;
+    TransCheckBoxSetting   *m_hd;
+    QString                 m_main;
+    QString                 m_passthrough;
+    AudioOutputSettings     m_settings;
+    bool                    m_quality;
+
   private slots:
     void toggle(QString str);
+    void togglequality(void);
 };
 #endif

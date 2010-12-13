@@ -21,6 +21,11 @@
 #include "audiogeneralsettings.h"
 #include "mythdialogbox.h"
 
+extern "C" {
+#include "libavformat/avformat.h"
+}
+
+
 class TriggeredItem : public TriggeredConfigurationGroup
 {
   public:
@@ -489,14 +494,20 @@ void AudioConfigSettings::StartAudioTest()
 AudioTestThread::AudioTestThread(QObject *parent,
                                  QString main, QString passthrough,
                                  int channels,
-                                 AudioOutputSettings settings) :
+                                 AudioOutputSettings settings,
+                                 bool hd) :
     m_parent(parent), m_channels(channels), m_device(main),
-    m_passthrough(passthrough), m_interrupted(false), m_channel(-1)
+    m_passthrough(passthrough), m_interrupted(false), m_channel(-1), m_hd(hd)
 {
-    m_audioOutput = AudioOutput::OpenAudio(m_device,
-                                           m_passthrough,
-                                           FORMAT_S16, m_channels,
-                                           0, 48000,
+    /* initialize libavcodec, and register all codecs and formats */
+    av_register_all();
+
+    m_format = hd ? settings.BestSupportedFormat() : FORMAT_S16;
+    m_samplerate = hd ? settings.BestSupportedRate() : 48000;
+
+    m_audioOutput = AudioOutput::OpenAudio(m_device, m_passthrough,
+                                           m_format, m_channels,
+                                           0, m_samplerate,
                                            AUDIOOUTPUT_VIDEO,
                                            true, false, 0, &settings);
     if (result().isEmpty())
@@ -551,7 +562,7 @@ void AudioTestThread::run()
 
     if (m_audioOutput)
     {
-        char *frames_in = new char[m_channels * 1024 * sizeof(int16_t) + 15];
+        char *frames_in = new char[m_channels * 1024 * sizeof(int32_t) + 15];
         char *frames = (char *)(((long)frames_in + 15) & ~0xf);
 
         m_audioOutput->Pause(false);
@@ -609,19 +620,24 @@ void AudioTestThread::run()
                     QCoreApplication::postEvent(
                         m_parent, new ChannelChangedEvent(channel,
                                                           m_channel < 0));
+                    VERBOSE(VB_AUDIO, QString("AudioTest: %1 (%2->%3)")
+                            .arg(channel).arg(i).arg(current));
                 }
+
                     // play sample sound for about 3s
-                for (int j = 0; j < 144 && !m_interrupted; j++)
+                int top = m_samplerate / 1000 * 3;
+                for (int j = 0; j < top && !m_interrupted; j++)
                 {
                     AudioOutputUtil::GeneratePinkSamples(frames, m_channels,
-                                                         current, 1000);
+                                                         current, 1000,
+                                                         m_hd ? 32 : 16);
                     if (!m_audioOutput->AddFrames(frames, 1000, -1))
                     {
                         VERBOSE(VB_AUDIO, "AddAudioData() "
                                 "Audio buffer overflow, audio data lost!");
                     }
-                    usleep(20000); // a tad less than 1/48th of
-                                   // a second to avoid underruns
+                     // a tad less than 1/48th of a second to avoid underruns
+                    usleep((1000000 / m_samplerate) * 1000);
                 }
                 m_audioOutput->Drain();
                 m_audioOutput->Pause(true);
@@ -643,12 +659,14 @@ AudioTest::AudioTest(QString main, QString passthrough,
       m_channels(channels),
       m_frontleft(NULL), m_frontright(NULL), m_center(NULL),
       m_surroundleft(NULL), m_surroundright(NULL),
-      m_rearleft(NULL), m_rearright(NULL), m_lfe(NULL)
-
+      m_rearleft(NULL), m_rearright(NULL), m_lfe(NULL),
+      m_main(main), m_passthrough(passthrough), m_settings(settings),
+      m_quality(false)
 {
     setLabel(QObject::tr("Audio Configuration Testing"));
 
-    m_at = new AudioTestThread(this, main, passthrough, channels, settings);
+    m_at = new AudioTestThread(this, main, passthrough, channels,
+                               settings, m_quality);
     if (!m_at->result().isEmpty())
     {
         QString msg = main + QObject::tr(" is invalid or not "
@@ -730,6 +748,15 @@ AudioTest::AudioTest(QString main, QString passthrough,
     addChild(middlegroup);
     addChild(reargroup);
     addChild(m_button);
+
+    m_hd = new TransCheckBoxSetting();
+    m_hd->setLabel(QObject::tr("Use Highest Quality Mode"));
+    m_hd->setHelpText(QObject::tr("Use the highest audio quality settings "
+                                  "supported by your audio card. This will be "
+                                  "a good place to start troubleshooting "
+                                  "potential errors"));
+    addChild(m_hd);
+    connect(m_hd, SIGNAL(valueChanged(QString)), this, SLOT(togglequality()));
 }
 
 AudioTest::~AudioTest()
@@ -772,15 +799,35 @@ void AudioTest::toggle(QString str)
         }
         return;
     }
-    int channel = str.toInt();
     if (m_at->isRunning())
     {
         m_at->cancel();
         m_at->wait();
     }
+
+    int channel = str.toInt();
     m_at->setChannel(channel);
 
     m_at->start();
+}
+
+void AudioTest::togglequality()
+{
+    if (m_at->isRunning())
+    {
+        toggle("start");
+    }
+
+    m_quality = m_hd->boolValue();
+    delete m_at;
+    m_at = new AudioTestThread(this, m_main, m_passthrough, m_channels,
+                               m_settings, m_quality);
+    if (!m_at->result().isEmpty())
+    {
+        QString msg = QObject::tr("Audio device is invalid or not useable.");
+        MythPopupBox::showOkPopup(
+            GetMythMainWindow(), QObject::tr("Warning"), msg);
+    }
 }
 
 bool AudioTest::event(QEvent *event)
