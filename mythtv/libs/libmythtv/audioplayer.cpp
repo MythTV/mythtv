@@ -313,6 +313,22 @@ bool AudioPlayer::CanDTS(void)
     return ret;
 }
 
+bool AudioPlayer::CanHD(void)
+{
+    bool ret = false;
+    if (m_audioOutput)
+        ret = m_audioOutput->GetOutputSettingsUsers()->canHD();
+    return ret;
+}
+
+bool AudioPlayer::CanHDLL(void)
+{
+    bool ret = false;
+    if (m_audioOutput)
+        ret = m_audioOutput->GetOutputSettingsUsers()->canHDLL();
+    return ret;
+}
+
 uint AudioPlayer::GetMaxChannels(void)
 {
     uint ret = 2;

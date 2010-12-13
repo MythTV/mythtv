@@ -12,6 +12,7 @@
 #include "decoderbase.h"
 #include "privatedecoder.h"
 #include "audiooutputsettings.h"
+#include "spdifencoder.h"
 #include "vbilut.h"
 #include "H264Parser.h"
 #include "videodisplayprofile.h"
@@ -334,6 +335,9 @@ class AvFormatDecoder : public DecoderBase
     bool dvd_video_codec_changed;
 
     float m_fps;
+
+    // SPDIF Encoder for digital passthrough
+    SPDIFEncoder     *m_spdifenc;
 };
 
 #endif
