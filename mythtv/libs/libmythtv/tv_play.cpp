@@ -7863,13 +7863,8 @@ void TV::DoEditSchedule(int editType)
         pause_active = !actx->player || !actx->player->getVideoOutput();
         if (actx->player && actx->player->getVideoOutput())
             allowEmbedding = actx->player->getVideoOutput()->AllowPreviewEPG();
-
         if (!pause_active)
-        {
-            long long margin = (long long)
-                (actx->last_framerate * actx->player->GetAudioStretchFactor());
-            isNearEnd = actx->player->IsNearEnd(margin);
-        }
+            isNearEnd = actx->player->IsNearEnd();
         actx->UnlockDeletePlayer(__FILE__, __LINE__);
     }
 
@@ -11912,7 +11907,7 @@ OSD *TV::GetOSDL(const PlayerContext *ctx, const char *file, int location)
     const PlayerContext *mctx = GetPlayer(ctx, 0);
 
     mctx->LockDeletePlayer(file, location);
-    if (mctx->player && (ctx->IsPIP() || mctx->IsOSDFullScreen()))
+    if (mctx->player && ctx->IsPIP())
     {
         mctx->LockOSD();
         OSD *osd = mctx->player->GetOSD();

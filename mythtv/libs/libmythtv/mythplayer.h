@@ -194,7 +194,7 @@ class MPUBLIC MythPlayer
     bool    IsPlaying(uint wait_ms = 0, bool wait_for = true) const;
     bool    AtNormalSpeed(void) const         { return next_normal_speed; }
     bool    IsReallyNearEnd(void) const;
-    bool    IsNearEnd(int64_t framesRemaining = -1);
+    bool    IsNearEnd(void);
     bool    HasAudioOut(void) const           { return audio.HasAudioOut(); }
     bool    IsPIPActive(void) const           { return pip_active; }
     bool    IsPIPVisible(void) const          { return pip_visible; }
