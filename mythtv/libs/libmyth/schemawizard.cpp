@@ -168,7 +168,7 @@ int SchemaUpgradeWizard::CompareAndWait(const int seconds)
             Compare();
             unlockSchema(query);
 
-            if (m_expertMode)  // Experts don't like to wait around :-)
+            if (m_expertMode)
                 break;
         }
 
@@ -417,7 +417,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
             return MYTH_SCHEMA_EXIT;
 
         if (m_expertMode)
-            return returnValue;  // Experts don't like to repeat themselves :-)
+            return returnValue;
 
         // The annoying extra confirmation:
         if (backupStatus == kDB_Backup_Completed)
