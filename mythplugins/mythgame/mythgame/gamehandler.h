@@ -21,7 +21,7 @@ enum GameFound
     inNone,
     inFileSystem,
     inDatabase,
-    inBoth   
+    inBoth
 };
 
 class GameScan
@@ -71,7 +71,7 @@ class GameHandler : public QObject
     static GameHandler *newHandler(QString name);
     static uint count(void);
     void InitMetaDataMap(QString GameType);
-    void GetMetadata(GameHandler *handler, QString rom, 
+    void GetMetadata(GameHandler *handler, QString rom,
                              QString* Genre, QString* Year, QString* Country,
                              QString* CRC32, QString* GameName,
                              QString* Plot, QString* Publisher, QString* Version,
@@ -81,10 +81,10 @@ class GameHandler : public QObject
     void UpdateGameDB(GameHandler *handler);
     void VerifyGameDB(GameHandler *handler);
 
-    static void clearAllGameData(void); 
+    static void clearAllGameData(void);
 
     static int buildFileCount(QString directory, GameHandler *handler);
-    void buildFileList(QString directory, GameHandler *handler, 
+    void buildFileList(QString directory, GameHandler *handler,
                               MythProgressDialog *pdial, int* filecount);
 
     void processGames(GameHandler *);

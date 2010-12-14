@@ -19,8 +19,8 @@
 EditRomInfoDialog::EditRomInfoDialog(MythScreenStack *parent,
         QString name, RomInfo *romInfo) : MythScreenType(parent, name),
     m_id(""), m_retObject(0), m_gamenameEdit(0), m_genreEdit(0),
-    m_yearEdit(0), m_countryEdit(0), m_plotEdit(0), m_publisherEdit(0), 
-    m_favoriteCheck(0), m_screenshotButton(0), m_fanartButton(0), 
+    m_yearEdit(0), m_countryEdit(0), m_plotEdit(0), m_publisherEdit(0),
+    m_favoriteCheck(0), m_screenshotButton(0), m_fanartButton(0),
     m_fanartText(0), m_boxartButton(0), m_boxartText(0), m_doneButton(0)
 {
     m_workingRomInfo = new RomInfo(*romInfo);

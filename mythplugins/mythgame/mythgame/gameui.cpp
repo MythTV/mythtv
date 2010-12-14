@@ -19,7 +19,7 @@
 #include "romedit.h"
 #include "gameui.h"
 
-class GameTreeInfo 
+class GameTreeInfo
 {
   public:
     GameTreeInfo(const QString& levels, const QString& filter)
@@ -606,7 +606,7 @@ void GameUI::searchStart(void)
         for (it = children->begin(); it != children->end(); ++it)
         {
             MythGenericTree *child = *it;
-            childList << child->getString(); 
+            childList << child->getString();
         }
 
         MythScreenStack *popupStack =
@@ -793,21 +793,21 @@ QString GameUI::getFillSql(MythGenericTree *node) const
             filter += " and romname like '" + layer + "%'";
 
     }
-    else if ((childLevel == "gamename") && (layer.length() == 1)) 
+    else if ((childLevel == "gamename") && (layer.length() == 1))
     {
         columns = childIsLeaf
                     ? childLevel + ",system,year,genre,gamename"
                     : childLevel;
 
-        if (m_showHashed) 
+        if (m_showHashed)
             filter += " and gamename like '" + layer + "%'";
 
     }
-    else if (childLevel == "hash") 
+    else if (childLevel == "hash")
     {
         columns = "left(gamename,1)";
     }
-    else 
+    else
     {
 
         columns = childIsLeaf
@@ -817,7 +817,7 @@ QString GameUI::getFillSql(MythGenericTree *node) const
 
     //  this whole section ought to be in rominfo.cpp really, but I've put it
     //  in here for now to minimise the number of files changed by this mod
-    if (romInfo) 
+    if (romInfo)
     {
         if (!romInfo->System().isEmpty())
         {
@@ -864,7 +864,7 @@ QString GameUI::getFillSql(MythGenericTree *node) const
                 + " order by romname"
                 + ";";
     }
-    else if (childLevel == "hash") 
+    else if (childLevel == "hash")
     {
         sql = "select distinct "
                 + columns
