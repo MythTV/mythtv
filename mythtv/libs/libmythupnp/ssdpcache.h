@@ -24,7 +24,7 @@
 #ifndef __SSDPCLIENT_H__
 #define __SSDPCLIENT_H__
 
-#include "mythexp.h"
+#include "upnpexp.h"
 #include "mythobservable.h"
 
 #include <QObject>
@@ -85,7 +85,7 @@ typedef QMap< QString, SSDPCacheEntries * > SSDPCacheEntriesMap;   // Key == Ser
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-class MPUBLIC SSDPCache : public QObject,
+class UPNP_PUBLIC SSDPCache : public QObject,
                   public MythObservable
 {
     Q_OBJECT
