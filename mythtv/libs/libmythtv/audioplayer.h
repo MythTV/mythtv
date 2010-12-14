@@ -53,6 +53,7 @@ class MPUBLIC AudioPlayer
 
     void AddAudioData(char *buffer, int len, int64_t timecode);
     bool GetBufferStatus(uint &fill, uint &total);
+    bool IsBufferAlmostFull(void);
 
   private:
     MythPlayer  *m_parent;
