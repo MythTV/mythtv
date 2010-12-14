@@ -1820,6 +1820,8 @@ void Scheduler::RunScheduler(void)
 
                 if (firstRun)
                 {
+                    firstRun = false;
+
                     //the parameter given to the startup_cmd. "user" means a user
                     // started the BE, 'auto' means it was started automatically
                     QString startupParam = "user";
@@ -1853,9 +1855,12 @@ void Scheduler::RunScheduler(void)
                     if (!startupCommand.isEmpty())
                     {
                         startupCommand.replace("$status", startupParam);
+                        schedLock.unlock();
                         myth_system(startupCommand);
+                        schedLock.lock();
+                        if (reclist_changed)
+                            continue;
                     }
-                    firstRun = false;
                 }
 
                 PutInactiveSlavesToSleep();
@@ -2428,10 +2433,12 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
                                     "this computer :-\n\t\t\t\t\t\t") + halt_cmd);
 
         // and now shutdown myself
-        if (!myth_system(halt_cmd))
+        schedLock.unlock();
+        unsigned int res = myth_system(halt_cmd);
+        schedLock.lock();
+        if (!res)
             return;
-        else
-            VERBOSE(VB_IMPORTANT, "ServerHaltCommand failed, shutdown aborted");
+        VERBOSE(VB_IMPORTANT, "ServerHaltCommand failed, shutdown aborted");
     }
 
     // If we make it here then either the shutdown failed
