@@ -146,7 +146,7 @@ Common MythArchive window definitions
                     </statetype>
                 </state>
                 <state name="selectedactive" from="active">
-                    <shape name="buttonbackground">
+                    <shape name="background">
                         <area>0,0,100%,100%</area>
                         <fill style="gradient">
                             <gradient start="#52CA38" end="#349838" />
@@ -154,7 +154,7 @@ Common MythArchive window definitions
                     </shape>
                 </state>
                 <state name="selectedinactive" from="active">
-                    <shape name="buttonbackground">
+                    <shape name="background">
                         <area>0,0,100%,100%</area>
                         <fill style="gradient">
                             <gradient start="#52CA38" end="#349838" alpha="100" />
@@ -259,7 +259,7 @@ Common MythArchive window definitions
                     </statetype>
                 </state>
                 <state name="selectedactive" from="active">
-                    <shape name="buttonbackground">
+                    <shape name="background">
                         <area>0,0,100%,100%</area>
                         <fill style="gradient">
                             <gradient start="#52CA38" end="#349838" />
@@ -267,7 +267,7 @@ Common MythArchive window definitions
                     </shape>
                 </state>
                 <state name="selectedinactive" from="active">
-                    <shape name="buttonbackground">
+                    <shape name="background">
                         <area>0,0,100%,100%</area>
                         <fill style="gradient">
                             <gradient start="#52CA38" end="#349838" alpha="100" />
@@ -330,7 +330,7 @@ Common MythArchive window definitions
                     </statetype>
                 </state>
                 <state name="selectedactive" from="active">
-                    <shape name="buttonbackground">
+                    <shape name="background">
                         <area>0,0,100%,100%</area>
                         <fill style="gradient">
                             <gradient start="#52CA38" end="#349838" />
@@ -338,7 +338,7 @@ Common MythArchive window definitions
                     </shape>
                 </state>
                 <state name="selectedinactive" from="active">
-                    <shape name="buttonbackground">
+                    <shape name="background">
                         <area>0,0,100%,100%</area>
                         <fill style="gradient">
                             <gradient start="#52CA38" end="#349838" alpha="100" />
