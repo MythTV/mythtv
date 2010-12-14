@@ -579,18 +579,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         if (enc)
             output_format = FORMAT_S16;  // Output s16le for AC-3 encoder
         else
-        {
-                // re-encode audio using same format as input if upmixing
-                // to minimize the memory sound buffer usage. There should be
-                // no siginificant quality loss
-            if (needs_upmix &&
-                output_settings->IsSupportedFormat(format))
-            {
-                output_format = format;
-            }
-            else
-                output_format = output_settings->BestSupportedFormat();
-        }
+            output_format = output_settings->BestSupportedFormat();
     }
 
     bytes_per_frame =  processing ? 4 : output_settings->SampleSize(format);
