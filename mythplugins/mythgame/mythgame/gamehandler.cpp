@@ -25,18 +25,6 @@
 
 static QList<GameHandler*> *handlers = NULL;
 
-static bool existsHandler(const QString name)
-{
-    for (int i = 0; i < handlers->size(); i++)
-    {
-        GameHandler *handler = handlers->at(i);
-        if (handler->SystemName() == name)
-            return true;
-    }
-
-    return false;
-}
-
 static void checkHandlers(void)
 {
     // If a handlers list doesn't currently exist create one. Otherwise
