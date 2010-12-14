@@ -1121,19 +1121,15 @@ AudioAdvancedSettings::AudioAdvancedSettings(bool mpcm)
         new HorizontalConfigurationGroup(false, false);
     settings5->addChild(Audio48kOverride());
 
-    ConfigurationGroup *settings6;
-
-    if (mpcm)
-    {
-        settings6 = new HorizontalConfigurationGroup(false, false);
-        settings6->addChild(MPCM());
-    }
-
     addChild(settings4);
     addChild(settings5);
     addChild(settings3);
+
     if (mpcm)
     {
+        ConfigurationGroup *settings6;
+        settings6 = new HorizontalConfigurationGroup(false, false);
+        settings6->addChild(MPCM());
         addChild(settings6);
     }
 }
