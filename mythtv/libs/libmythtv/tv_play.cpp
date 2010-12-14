@@ -4642,7 +4642,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
         }
         else
         {
-            float tmpSpeed;
+            float tmpSpeed = 1.0f;
             bool ok = false;
 
             if (tokens[2].contains(QRegExp("^\\-*\\d+x$")))
