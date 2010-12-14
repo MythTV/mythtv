@@ -3927,11 +3927,8 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
     avcodeclock->unlock();
 
     uint ofill = 0, ototal = 0, othresh = 0, total_decoded_audio = 0;
-    if (m_audio->GetBufferStatus(ofill, ototal))
-    {
-        othresh =  ((ototal>>1) + (ototal>>2));
-        allowedquit = (!(decodetype & kDecodeAudio)) && (ofill > othresh);
-    }
+    allowedquit = (!(decodetype & kDecodeAudio)) &&
+        m_audio->IsBufferAlmostFull();
 
     if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
         pts = (long long)(av_q2d(curstream->time_base) * pkt->dts * 1000);
@@ -4103,26 +4100,6 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         total_decoded_audio += data_size;
 
         allowedquit |= ringBuffer->InDVDMenuOrStillFrame();
-        // Audio can expand by a factor of 6 in audiooutputbase's audiobuffer
-        allowedquit |= !(decodetype & kDecodeVideo) &&
-                       ((ofill + total_decoded_audio * 6) > othresh);
-
-        // top off audio buffers initially in audio only mode
-        if (!allowedquit && !(decodetype & kDecodeVideo))
-        {
-            uint fill, total;
-            if (m_audio->GetBufferStatus(fill, total))
-            {
-                total /= 6; // Possible expansion in aobase (upmix, float conv)
-                allowedquit = fill == 0 || fill > total>>1           ||
-                              total - fill < (uint)(data_size)       ||
-                              ofill + total_decoded_audio > total>>2 ||
-                              total - fill < (uint)(data_size<<1);
-            }
-            else
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "GetFrame() : Failed to top off "
-                                                "buffers in audio only mode");
-        }
 
         tmp_pkt.data += ret;
         tmp_pkt.size -= ret;
@@ -4161,12 +4138,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         skipaudio = false;
     }
 
-    uint ofill = 0, ototal = 0, othresh = 0;
-    if (m_audio->GetBufferStatus(ofill, ototal))
-    {
-        othresh =  ((ototal>>1) + (ototal>>2));
-        allowedquit = ofill > othresh;
-    }
+    allowedquit = m_audio->IsBufferAlmostFull();
 
     if (private_dec && private_dec->HasBufferedFrames() &&
        (selectedTrack[kTrackTypeVideo].av_stream_index > -1))

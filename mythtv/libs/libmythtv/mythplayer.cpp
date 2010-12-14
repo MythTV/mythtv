@@ -542,15 +542,13 @@ bool MythPlayer::InitVideo(void)
                 decoder->GetVideoCodecPrivate(),
                 pipState,
                 video_disp_dim, video_aspect,
-                widget->winId(), display_rect, (video_frame_rate * play_speed),
+                widget->winId(), display_rect, video_frame_rate,
                 0 /*embedid*/);
         }
 
         if (videoOutput)
         {
             videoOutput->SetVideoScalingAllowed(true);
-            // We need to tell it this for automatic deinterlacer settings
-            videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
             CheckExtraAudioDecode();
         }
     }
@@ -647,6 +645,8 @@ void MythPlayer::ReinitVideo(void)
         QMutexLocker locker1(&osdLock);
         QMutexLocker locker2(&vidExitLock);
         QMutexLocker locker3(&videofiltersLock);
+
+        videoOutput->SetVideoFrameRate(video_frame_rate);
         float aspect = (forced_video_aspect > 0) ? forced_video_aspect :
                                                video_aspect;
         if (!videoOutput->InputChanged(video_disp_dim, aspect,
@@ -660,8 +660,6 @@ void MythPlayer::ReinitVideo(void)
             return;
         }
 
-        // We need to tell it this for automatic deinterlacer settings
-        videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
         if (osd)
             osd->SetPainter(videoOutput->GetOSDPainter());
         ReinitOSD();
@@ -1922,6 +1920,14 @@ bool MythPlayer::PrebufferEnoughFrames(bool pause_audio, int min_buffers)
             VERBOSE(VB_IMPORTANT, LOC +
                 QString("Waited 100ms for video buffers %1")
                 .arg(videoOutput->GetFrameStatus()));
+            if (audio.IsBufferAlmostFull())
+            {
+                // We are likely to enter this condition
+                // if the audio buffer was too full during GetFrame in AVFD
+                VERBOSE(VB_AUDIO, LOC +
+                    QString("Resetting audio buffer"));
+                audio.Reset();
+            }
         }
         if ((waited_for > 500) && !videoOutput->EnoughFreeFrames())
         {
@@ -2715,7 +2721,7 @@ bool MythPlayer::PauseDecoder(void)
 
     int tries = 0;
     pauseDecoder = true;
-    while (decoderThread && !killdecoder && !eof && (tries++ < 100) &&
+    while (decoderThread && !killdecoder && (tries++ < 100) &&
           !decoderThreadPause.wait(&decoderPauseLock, 100))
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Waited 100ms for decoder to pause");
@@ -2804,19 +2810,29 @@ void MythPlayer::DecoderLoop(bool pause)
 
         if (forcePositionMapSync)
         {
-            forcePositionMapSync = false;
-            decoder->SyncPositionMap();
+            decoder_change_lock.lock();
+            if (decoder)
+            {
+                forcePositionMapSync = false;
+                decoder->SyncPositionMap();
+            }
+            decoder_change_lock.unlock();
         }
 
         if (decoderSeek >= 0)
         {
-            decoderSeekLock.lock();
-            if (((uint64_t)decoderSeek < framesPlayed) && decoder)
-                decoder->DoRewind(decoderSeek);
-            else if (decoder)
-                decoder->DoFastForward(decoderSeek);
-            decoderSeek = -1;
-            decoderSeekLock.unlock();
+            decoder_change_lock.lock();
+            if (decoder)
+            {
+                decoderSeekLock.lock();
+                if (((uint64_t)decoderSeek < framesPlayed) && decoder)
+                    decoder->DoRewind(decoderSeek);
+                else if (decoder)
+                    decoder->DoFastForward(decoderSeek);
+                decoderSeek = -1;
+                decoderSeekLock.unlock();
+            }
+            decoder_change_lock.unlock();
         }
 
         bool obey_eof = eof && !(eof && player_ctx->tvchain && !allpaused);
@@ -3169,7 +3185,7 @@ void MythPlayer::ChangeSpeed(void)
     if (videoOutput && videosync)
     {
         // We need to tell it this for automatic deinterlacer settings
-        videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
+        videoOutput->SetVideoFrameRate(video_frame_rate);
 
         // If using bob deinterlace, turn on or off if we
         // changed to or from synchronous playback speed.
@@ -4478,6 +4494,7 @@ bool MythPlayer::SetVideoByComponentTag(int tag)
 void MythPlayer::SetDecoder(DecoderBase *dec)
 {
     QMutexLocker locker(&decoder_change_lock);
+    PauseDecoder();
 
     if (!decoder)
         decoder = dec;
