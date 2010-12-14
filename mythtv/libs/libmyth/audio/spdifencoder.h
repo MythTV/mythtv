@@ -3,13 +3,15 @@
 
 #include <QString>
 
+#include "output.h"
+
 extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 #include "libavcodec/audioconvert.h"
 }
 
-class SPDIFEncoder
+class MPUBLIC SPDIFEncoder
 {
 
   public:
