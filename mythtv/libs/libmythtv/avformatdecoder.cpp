@@ -3637,7 +3637,6 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
     int audSubIdx = selectedTrack[kTrackTypeAudio].av_substream_index;
     avcodeclock->unlock();
 
-    uint ofill = 0, ototal = 0, othresh = 0, total_decoded_audio = 0;
     allowedquit = (!(decodetype & kDecodeAudio)) &&
         m_audio->IsBufferAlmostFull();
 
@@ -3814,8 +3813,6 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                                  (char *)audioSamples, data_size);
 
         m_audio->AddAudioData((char *)audioSamples, data_size, temppts);
-
-        total_decoded_audio += data_size;
 
         allowedquit |= ringBuffer->IsInDiscMenuOrStillFrame();
 
