@@ -93,7 +93,14 @@ bool AudioOutputDigitalEncoder::Init(
     {
         delete m_spdifenc;
     }
+
     m_spdifenc = new SPDIFEncoder("spdif", av_context);
+    if (!m_spdifenc->Succeeded())
+    {
+        Dispose();
+        delete m_spdifenc;
+        return false;
+    }
 
     bytes_per_sample = av_context->channels * sizeof(short);
     one_frame_bytes  = bytes_per_sample * av_context->frame_size;

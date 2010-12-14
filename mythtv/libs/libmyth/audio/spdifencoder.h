@@ -11,6 +11,17 @@ extern "C" {
 #include "libavcodec/audioconvert.h"
 }
 
+#pragma weak av_guess_format
+#pragma weak avformat_alloc_context
+#pragma weak av_new_stream
+#pragma weak av_write_header
+#pragma weak av_write_frame
+#pragma weak av_write_trailer
+#pragma weak avcodec_close
+#pragma weak av_freep
+#pragma weak av_set_parameters
+#pragma weak av_alloc_put_byte
+
 class MPUBLIC SPDIFEncoder
 {
 
@@ -20,6 +31,7 @@ class MPUBLIC SPDIFEncoder
     void WriteFrame(unsigned char *data, int size);
     int  GetData(unsigned char *buffer, int &dest_size);
     void Reset();
+    bool Succeeded()  { return m_complete; };
     
   private:
     static int funcIO(void *opaque, unsigned char *buf, int size);
