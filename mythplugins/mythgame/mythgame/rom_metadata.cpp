@@ -6,7 +6,7 @@
 
 #include "unzip.h"
 
-int calcOffset(QString GameType, uLong filesize) {
+static int calcOffset(QString GameType, uLong filesize) {
     int result;
     uLong rom_size;
 
@@ -30,7 +30,7 @@ int calcOffset(QString GameType, uLong filesize) {
     return result;
 }
 
-QString crcStr(uLong crc) {
+static QString crcStr(uLong crc) {
     QString tmpcrc("");
 
     tmpcrc = QString("%1").arg( crc, 0, 16 );

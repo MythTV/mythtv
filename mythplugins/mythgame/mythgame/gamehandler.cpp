@@ -25,7 +25,7 @@
 
 static QList<GameHandler*> *handlers = NULL;
 
-bool existsHandler(const QString name)
+static bool existsHandler(const QString name)
 {
     for (int i = 0; i < handlers->size(); i++)
     {
@@ -195,10 +195,10 @@ void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre,
 
     if ((*Genre == "Unknown") || (*Genre).isEmpty())
         *Genre = QString("Unknown%1").arg( handler->GameType() );
-    
+
 }
 
-void purgeGameDB(QString filename, QString RomPath) 
+static void purgeGameDB(QString filename, QString RomPath) 
 {
     VERBOSE(VB_GENERAL, LOC + QString("Purging %1 - %2").arg(RomPath)
             .arg(filename));
@@ -250,7 +250,7 @@ void GameHandler::promptForRemoval(GameScan scan)
         delete removalPopup;
 }
 
-void updateDisplayRom(QString romname, int display, QString Systemname)
+static void updateDisplayRom(QString romname, int display, QString Systemname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE gamemetadata SET display = :DISPLAY "
@@ -265,7 +265,7 @@ void updateDisplayRom(QString romname, int display, QString Systemname)
 
 }
 
-void updateDiskCount(QString romname, int diskcount, QString GameType)
+static void updateDiskCount(QString romname, int diskcount, QString GameType)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE gamemetadata SET diskcount = :DISKCOUNT "
@@ -280,7 +280,7 @@ void updateDiskCount(QString romname, int diskcount, QString GameType)
 
 }
 
-void updateGameName(QString romname, QString GameName, QString Systemname)
+static void updateGameName(QString romname, QString GameName, QString Systemname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE gamemetadata SET GameName = :GAMENAME "
