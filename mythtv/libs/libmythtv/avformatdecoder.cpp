@@ -4023,7 +4023,14 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             if (!m_spdifenc)
             {
                 m_spdifenc = new SPDIFEncoder("spdif", ctx);
+                if (!m_spdifenc->Succeeded())
+                {
+                    avcodeclock->unlock();
+                    delete m_spdifenc;
+                    return false;
+                }
             }
+
             m_spdifenc->WriteFrame(tmp_pkt.data, tmp_pkt.size);
             data_size = tmp_pkt.size;
             ret = m_spdifenc->GetData((unsigned char *)audioSamples, data_size);

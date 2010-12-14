@@ -24,6 +24,26 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, AVCodecContext *ctx)
     AVOutputFormat *fmt =
         av_guess_format(dev_ba.constData(), NULL, NULL);
 
+    if (!(av_guess_format && avformat_alloc_context &&
+          av_new_stream && av_write_header && av_write_frame &&
+          av_write_trailer && av_set_parameters))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't find libavformat");
+        return;
+    }
+
+    if (!avcodec_close)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't find libavcodec");
+        return;
+    }
+
+    if (!(av_freep && av_alloc_put_byte))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't find libavutil");
+        return;
+    }
+
     if (!fmt)
     {
         VERBOSE(VB_AUDIO, LOC_ERR + "av_guess_format");
@@ -186,6 +206,6 @@ void SPDIFEncoder::Destroy()
         {
             av_freep(&m_oc->pb);
         }
-        av_free(m_oc);
+        av_freep(&m_oc);
     }
 }
