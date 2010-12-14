@@ -1920,6 +1920,14 @@ bool MythPlayer::PrebufferEnoughFrames(bool pause_audio, int min_buffers)
             VERBOSE(VB_IMPORTANT, LOC +
                 QString("Waited 100ms for video buffers %1")
                 .arg(videoOutput->GetFrameStatus()));
+            if (audio.IsBufferAlmostFull())
+            {
+                // We are likely to enter this condition
+                // if the audio buffer was too full during GetFrame in AVFD
+                VERBOSE(VB_AUDIO, LOC +
+                    QString("Resetting audio buffer"));
+                audio.Reset();
+            }
         }
         if ((waited_for > 500) && !videoOutput->EnoughFreeFrames())
         {

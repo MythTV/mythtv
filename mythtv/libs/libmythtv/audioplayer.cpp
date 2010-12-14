@@ -351,3 +351,14 @@ bool AudioPlayer::GetBufferStatus(uint &fill, uint &total)
     m_audioOutput->GetBufferStatus(fill, total);
     return true;
 }
+
+bool AudioPlayer::IsBufferAlmostFull(void)
+{
+    uint ofill = 0, ototal = 0, othresh = 0;
+    if (GetBufferStatus(ofill, ototal))
+    {
+        othresh =  ((ototal>>1) + (ototal>>2));
+        return ofill > othresh;
+    }
+    return false;
+}
