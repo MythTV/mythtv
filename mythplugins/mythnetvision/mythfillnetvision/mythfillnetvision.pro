@@ -16,4 +16,6 @@ QMAKE_CLEAN += $(TARGET)
 # Input
 SOURCES += main.cpp
 
+LIBS += -lmythavformat
+
 include ( ../../libs-targetfix.pro )
