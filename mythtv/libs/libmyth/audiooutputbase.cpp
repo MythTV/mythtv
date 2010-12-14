@@ -583,10 +583,13 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
                 // re-encode audio using same format as input if upmixing
                 // to minimize the memory sound buffer usage. There should be
                 // no siginificant quality loss
-            if (needs_upmix)
+            if (needs_upmix &&
+                output_settings->IsSupportedFormat(format))
+            {
                 output_format = format;
+            }
             else
-                output_settings->BestSupportedFormat();
+                output_format = output_settings->BestSupportedFormat();
         }
     }
 
