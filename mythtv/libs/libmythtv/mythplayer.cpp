@@ -2735,7 +2735,7 @@ bool MythPlayer::PauseDecoder(void)
 
     int tries = 0;
     pauseDecoder = true;
-    while (decoderThread && !killdecoder && !eof && (tries++ < 100) &&
+    while (decoderThread && !killdecoder && (tries++ < 100) &&
           !decoderThreadPause.wait(&decoderPauseLock, 100))
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Waited 100ms for decoder to pause");
@@ -2824,19 +2824,29 @@ void MythPlayer::DecoderLoop(bool pause)
 
         if (forcePositionMapSync)
         {
-            forcePositionMapSync = false;
-            decoder->SyncPositionMap();
+            decoder_change_lock.lock();
+            if (decoder)
+            {
+                forcePositionMapSync = false;
+                decoder->SyncPositionMap();
+            }
+            decoder_change_lock.unlock();
         }
 
         if (decoderSeek >= 0)
         {
-            decoderSeekLock.lock();
-            if (((uint64_t)decoderSeek < framesPlayed) && decoder)
-                decoder->DoRewind(decoderSeek);
-            else if (decoder)
-                decoder->DoFastForward(decoderSeek);
-            decoderSeek = -1;
-            decoderSeekLock.unlock();
+            decoder_change_lock.lock();
+            if (decoder)
+            {
+                decoderSeekLock.lock();
+                if (((uint64_t)decoderSeek < framesPlayed) && decoder)
+                    decoder->DoRewind(decoderSeek);
+                else if (decoder)
+                    decoder->DoFastForward(decoderSeek);
+                decoderSeek = -1;
+                decoderSeekLock.unlock();
+            }
+            decoder_change_lock.unlock();
         }
 
         bool obey_eof = eof && !(eof && player_ctx->tvchain && !allpaused);
@@ -4486,6 +4496,7 @@ bool MythPlayer::SetVideoByComponentTag(int tag)
 void MythPlayer::SetDecoder(DecoderBase *dec)
 {
     QMutexLocker locker(&decoder_change_lock);
+    PauseDecoder();
 
     if (!decoder)
         decoder = dec;
