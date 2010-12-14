@@ -27,7 +27,7 @@
 #include <QThread>
 #include <QFile>
 
-#include "mythexp.h"
+#include "upnpexp.h"
 #include "httpserver.h"
 #include "taskqueue.h"
 #include "msocketdevice.h"
@@ -69,7 +69,7 @@ typedef enum
 
 #define NumberOfSockets     (sizeof( m_Sockets ) / sizeof( MSocketDevice * ))
 
-class MPUBLIC SSDP : public QThread
+class UPNP_PUBLIC SSDP : public QThread
 {
     private:
 

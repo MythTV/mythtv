@@ -28,7 +28,7 @@
 
 #include "httpcomms.h"
 
-#include "mythexp.h"
+#include "upnpexp.h"
 
 #include "mythdbparams.h"
 #include "upnp.h"
@@ -42,7 +42,7 @@
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-class MPUBLIC MythXMLClient : public SOAPClient
+class UPNP_PUBLIC MythXMLClient : public SOAPClient
 {
     protected:
 
