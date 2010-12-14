@@ -524,7 +524,7 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
             case -EPIPE:
                  if (snd_pcm_state(pcm_handle) == SND_PCM_STATE_XRUN)
                  {
-                    VBERROR("WriteAudio: buffer underrun");
+                    VBAUDIO("WriteAudio: buffer underrun");
                     if ((err = snd_pcm_prepare(pcm_handle)) < 0)
                     {
                         AERROR("WriteAudio: unable to recover from xrun");
