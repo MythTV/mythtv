@@ -12,6 +12,7 @@
 #include "decoderbase.h"
 #include "privatedecoder.h"
 #include "audiooutputsettings.h"
+#include "spdifencoder.h"
 #include "vbilut.h"
 #include "H264Parser.h"
 #include "videodisplayprofile.h"
@@ -327,6 +328,9 @@ class AvFormatDecoder : public DecoderBase
     AudioInfo         audioOut;
 
     float m_fps;
+
+    // SPDIF Encoder for digital passthrough
+    SPDIFEncoder     *m_spdifenc;
 };
 
 #endif

@@ -54,7 +54,7 @@ class MPUBLIC Configurable : public QObject
     virtual Setting* byName(const QString &name) = 0;
 
     // A label displayed to the user
-    void setLabel(QString str) { label = str; }
+    virtual void setLabel(QString str) { label = str; }
     QString getLabel(void) const { return label; }
     void setLabelAboveWidget(bool l = true) { labelAboveWidget = l; }
 
@@ -579,6 +579,8 @@ class MPUBLIC ButtonSetting: public Setting
     virtual void widgetInvalid(QObject *obj);
 
     virtual void setEnabled(bool b);
+
+    virtual void setLabel(QString);
 
     virtual void setHelpText(const QString &);
 

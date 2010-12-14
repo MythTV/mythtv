@@ -1,6 +1,6 @@
 /* -*- Mode: c++ -*-
  *
- * Copyright (C) foobum@gmail.com 2010
+ * Copyright (C) 2010 foobum@gmail.com and jyavenard@gmail.com
  *
  * Licensed under the GPL v2 or a later version at your choosing.
  */
@@ -14,11 +14,15 @@ using namespace std;
 #include "mythverbose.h"
 #include "mythcorecontext.h"
 
+extern "C" {
+#include "libavutil/avutil.h"  // to check version of libavformat
+}
+
 #define LOC QString("AO: ")
 
 AudioOutputSettings::AudioOutputSettings(bool invalid) :
-    m_passthrough(-1), m_AC3(false), m_DTS(false), m_LPCM(false),
-    m_invalid(invalid)
+    m_passthrough(-1), m_AC3(false),  m_DTS(false), m_LPCM(false),
+    m_HD(false)      , m_HDLL(false), m_invalid(invalid)
 {
     m_sr.assign(srs,  srs  +
                 sizeof(srs)  / sizeof(int));
@@ -51,6 +55,8 @@ AudioOutputSettings& AudioOutputSettings::operator=(
     m_AC3           = rhs.m_AC3;
     m_DTS           = rhs.m_DTS;
     m_LPCM          = rhs.m_LPCM;
+    m_HD            = rhs.m_HD;
+    m_HDLL          = rhs.m_HDLL;
     m_invalid       = rhs.m_invalid;
     m_sr_it         = m_sr.begin() + (rhs.m_sr_it - rhs.m_sr.begin());
     m_sf_it         = m_sf.begin() + (rhs.m_sf_it - rhs.m_sf.begin());
@@ -269,9 +275,16 @@ AudioOutputSettings* AudioOutputSettings::GetCleaned(bool newcopy)
     int mchannels = BestSupportedChannels();
 
     aosettings->m_LPCM = (mchannels > 2);
+        // E-AC3 is transferred as sterep PCM at 4 times the rates
+        // assume all amplifier supporting E-AC3 also supports 7.1 LPCM
+        // as it's required under the bluray standard
+#if LIBAVFORMAT_VERSION_INT > AV_VERSION_INT( 52, 83, 0 )
+    aosettings->m_HD = (mchannels == 8 && BestSupportedRate() == 192000);
+    aosettings->m_HDLL = (mchannels == 8 && BestSupportedRate() == 192000);
+#endif
     if (mchannels == 2 && m_passthrough >= 0)
     {
-        VERBOSE(VB_AUDIO, LOC + QString("AC3 or DTS capable"));
+        VERBOSE(VB_AUDIO, LOC + QString("may be AC3 or DTS capable"));
         aosettings->AddSupportedChannels(6);
     }
     aosettings->m_DTS = aosettings->m_AC3 = (m_passthrough >= 0);
@@ -299,15 +312,20 @@ AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
 
     int cur_channels = gCoreContext->GetNumSetting("MaxChannels", 2);
     int max_channels = aosettings->BestSupportedChannels();
-    bool bAdv = gCoreContext->GetNumSetting("AdvancedAudioSettings", false);
-    bool bForceDigital = bAdv &&
-        gCoreContext->GetNumSetting("PassThruDeviceOverride", false);
+    bool bForceDigital = gCoreContext->GetNumSetting(
+        "PassThruDeviceOverride", false);
     bool bAC3  = (aosettings->m_AC3 || bForceDigital) &&
         gCoreContext->GetNumSetting("AC3PassThru", false);
     bool bDTS  = (aosettings->m_DTS || bForceDigital) && 
         gCoreContext->GetNumSetting("DTSPassThru", false);
     bool bLPCM = aosettings->m_LPCM &&
-        !(bAdv && gCoreContext->GetNumSetting("StereoPCM", false));
+        !gCoreContext->GetNumSetting("StereoPCM", false);
+    bool bHD = bLPCM && aosettings->m_HD &&
+        gCoreContext->GetNumSetting("EAC3PassThru", false) &&
+        !gCoreContext->GetNumSetting("Audio48kOverride", false);
+    bool bHDLL = bLPCM && aosettings->m_HD &&
+        gCoreContext->GetNumSetting("TrueHDPassThru", false) &&
+        !gCoreContext->GetNumSetting("Audio48kOverride", false);
 
     if (max_channels > 2 && !bLPCM)
         max_channels = 2;
@@ -318,8 +336,11 @@ AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
         cur_channels = max_channels;
 
     aosettings->SetBestSupportedChannels(cur_channels);
-    aosettings->m_AC3 = bAC3;
-    aosettings->m_DTS = bDTS;
+    aosettings->m_AC3   = bAC3;
+    aosettings->m_DTS   = bDTS;
+    aosettings->m_HD    = bHD;
+    aosettings->m_HDLL  = bHDLL;
+        
     aosettings->m_LPCM = bLPCM;
 
     return aosettings;

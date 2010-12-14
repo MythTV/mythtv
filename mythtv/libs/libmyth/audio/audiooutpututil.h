@@ -4,6 +4,9 @@
 using namespace std;
 #include "mythverbose.h"
 #include "audiooutputsettings.h"
+extern "C" {
+#include "pink.h"
+}
 
 class MPUBLIC AudioOutputUtil
 {
@@ -16,6 +19,8 @@ class MPUBLIC AudioOutputUtil
                              bool music, bool upmix);
     static void MuteChannel(int obits, int channels, int ch,
                             void *buffer, int bytes);
+    static char *GeneratePinkSamples(char *frames, int channels,
+                                     int channel, int count, int bits = 16);
 };
 
 #endif

@@ -23,6 +23,13 @@
     </button>
 
     <button>
+        <type>SETTINGS_AUDIOGENERAL</type>
+        <text>Audio</text>
+        <description>Configure local audio output</description>
+        <action>SETTINGS AUDIOGENERAL</action>
+    </button>
+
+    <button>
         <type>SCREENSETUPWIZARD</type>
         <text>Screen Setup Wizards</text>
         <description>Compensate for TVs with overscan</description>

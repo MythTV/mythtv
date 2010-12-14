@@ -20,7 +20,7 @@ INSTALLS += setting
 QMAKE_CLEAN += $(TARGET)
 
 # Input
-HEADERS += playbackbox.h viewscheduled.h globalsettings.h
+HEADERS += playbackbox.h viewscheduled.h globalsettings.h audiogeneralsettings.h
 HEADERS += manualschedule.h programrecpriority.h channelrecpriority.h
 HEADERS += statusbox.h networkcontrol.h custompriority.h
 HEADERS += mediarenderer.h mythfexml.h playbackboxlistitem.h
@@ -33,7 +33,7 @@ HEADERS += proglist.h                   proglist_helpers.h
 HEADERS += playbackboxhelper.h          viewschedulediff.h
 HEADERS += themechooser.h
 
-SOURCES += main.cpp playbackbox.cpp viewscheduled.cpp
+SOURCES += main.cpp playbackbox.cpp viewscheduled.cpp audiogeneralsettings.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp
 SOURCES += channelrecpriority.cpp statusbox.cpp networkcontrol.cpp
 SOURCES += mediarenderer.cpp mythfexml.cpp playbackboxlistitem.cpp

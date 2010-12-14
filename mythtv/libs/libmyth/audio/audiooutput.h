@@ -41,7 +41,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
         const QString &audiodevice, const QString &passthrudevice,
         AudioFormat format, int channels, int codec, int samplerate,
         AudioOutputSource source, bool set_initial_vol, bool passthru,
-        int upmixer_startup = 0);
+        int upmixer_startup = 0, AudioOutputSettings *custom = NULL);
     static AudioOutput *OpenAudio(AudioSettings &settings,
                                   bool willsuspendpa = true);
     static AudioOutput *OpenAudio(
@@ -60,6 +60,9 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 
     virtual void SetStretchFactor(float factor);
     virtual float GetStretchFactor(void) const { return 1.0f; }
+    virtual int GetChannels(void) const { return 2; }
+    virtual AudioFormat GetFormat(void) const { return FORMAT_S16; };
+    virtual int GetBytesPerFrame(void) const { return 4; };
 
     virtual AudioOutputSettings* GetOutputSettingsCleaned(void)
         { return new AudioOutputSettings; }
