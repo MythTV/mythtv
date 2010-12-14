@@ -6,13 +6,13 @@ TEMPLATE = lib
 CONFIG += plugin thread
 TARGET = mythvideo
 
-LIBS += -lmythmetadata-$$LIBVERSION  
+LIBS += -lmythmetadata-$$LIBVERSION
 
 target.path = $${LIBDIR}/mythtv/plugins
 
 installscripts.path = $${PREFIX}/share/mythtv/mythvideo/scripts
 installscripts.files = scripts/*.pl scripts/*.py scripts/README scripts/jamu-example.conf scripts/jamu.README
-installscriptsjamumods.path = $${PREFIX}/share/mythtv/mythvideo/scripts/ttvdb                                           
+installscriptsjamumods.path = $${PREFIX}/share/mythtv/mythvideo/scripts/ttvdb
 installscriptsjamumods.files = scripts/Television/ttvdb/*.py scripts/Television/ttvdb/*.conf
 installscriptmodules.path = $${PREFIX}/share/mythtv/mythvideo/scripts/Movie/MythTV
 installscriptmodules.files = scripts/MythTV/MythVideoCommon.pm
@@ -35,5 +35,9 @@ SOURCES += playercommand.cpp playersettings.cpp metadatasettings.cpp
 mingw:DEFINES += USING_MINGW
 
 QT += sql xml network
+
+use_hidesyms {
+    QMAKE_CXXFLAGS += -fvisibility=hidden
+}
 
 include ( ../../libs-targetfix.pro )

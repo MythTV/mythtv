@@ -3,10 +3,10 @@
 // Created     : Oct. 1, 2005
 //
 // Purpose     : SSDP Discovery Service Implmenetation
-//                                                                            
+//
 // Copyright (c) 2005 David Blain <mythtv@theblains.net>
-//                                          
-// This library is free software; you can redistribute it and/or 
+//
+// This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or at your option any later version of the LGPL.
@@ -27,6 +27,7 @@
 #include <QThread>
 #include <QFile>
 
+#include "upnpexp.h"
 #include "httpserver.h"
 #include "taskqueue.h"
 #include "msocketdevice.h"
@@ -37,7 +38,7 @@
 #define SSDP_PORT       1900
 #define SSDP_SEARCHPORT 6549
 
-typedef enum 
+typedef enum
 {
     SSDPM_Unknown         = 0,
     SSDPM_GetDeviceDesc   = 1,
@@ -68,7 +69,7 @@ typedef enum
 
 #define NumberOfSockets     (sizeof( m_Sockets ) / sizeof( MSocketDevice * ))
 
-class SSDP : public QThread
+class UPNP_PUBLIC SSDP : public QThread
 {
     private:
 
@@ -94,8 +95,8 @@ class SSDP : public QThread
 
         bool    IsTermRequested      ();
 
-        QString GetHeaderValue    ( const QStringMap &headers, 
-                                    const QString    &sKey, 
+        QString GetHeaderValue    ( const QStringMap &headers,
+                                    const QString    &sKey,
                                     const QString    &sDefault );
 
         void    ProcessData       ( MSocketDevice *pSocket );

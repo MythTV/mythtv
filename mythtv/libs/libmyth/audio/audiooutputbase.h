@@ -61,6 +61,9 @@ class AudioOutputBase : public AudioOutput, public QThread
     // timestretch
     virtual void SetStretchFactor(float factor);
     virtual float GetStretchFactor(void) const;
+    virtual int GetChannels(void) const { return channels; }
+    virtual AudioFormat GetFormat(void) const { return format; };
+    virtual int GetBytesPerFrame(void) const { return source_bytes_per_frame; };
 
     virtual bool CanPassthrough(int samplerate, int channels) const;
     virtual bool ToggleUpmix(void);
@@ -181,8 +184,8 @@ class AudioOutputBase : public AudioOutput, public QThread
     int source_channels;
     int source_samplerate;
     int source_bytes_per_frame;
-    bool needs_upmix;
     bool upmix_default;
+    bool needs_upmix;
     bool needs_downmix;
     int surround_mode;
     float old_stretchfactor;

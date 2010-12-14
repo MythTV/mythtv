@@ -73,7 +73,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     pSoundStretch(NULL),
     encoder(NULL),              upmixer(NULL),
     source_channels(-1),        source_samplerate(0),
-    source_bytes_per_frame(0),
+    source_bytes_per_frame(0),  upmix_default(false),
     needs_upmix(false),         needs_downmix(false),
     surround_mode(QUALITY_LOW), old_stretchfactor(1.0f),
     volume(80),                 volumeControl(QString()),
@@ -107,8 +107,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     src_quality  = QUALITY_MEDIUM;
 
     // Handle override of SRC quality settings
-    if (gCoreContext->GetNumSetting("AdvancedAudioSettings", false) &&
-        gCoreContext->GetNumSetting("SRCQualityOverride",    false))
+    if (gCoreContext->GetNumSetting("SRCQualityOverride", false))
     {
         src_quality = gCoreContext->GetNumSetting("SRCQuality", QUALITY_MEDIUM);
         // Extra test to keep backward compatibility with earlier SRC setting
@@ -145,6 +144,17 @@ AudioOutputBase::~AudioOutputBase()
 
 void AudioOutputBase::InitSettings(const AudioSettings &settings)
 {
+    if (settings.custom)
+    {
+            // got a custom audio report already, use it
+            // this was likely provided by the AudioTest utility
+        output_settings = new AudioOutputSettings;
+        *output_settings = *settings.custom;
+        max_channels = output_settings->BestSupportedChannels();
+        configured_channels = max_channels;
+        return;
+    }
+
     // Ask the subclass what we can send to the device
     output_settings = GetOutputSettingsUsers();
 
@@ -163,7 +173,7 @@ void AudioOutputBase::InitSettings(const AudioSettings &settings)
 /**
  * Returns capabilities supported by the audio device
  * amended to take into account the digital audio
- * options (AC3 and DTS)
+ * options (AC3, DTS, E-AC3 and TrueHD)
  */
 AudioOutputSettings* AudioOutputBase::GetOutputSettingsCleaned(void)
 {
@@ -185,7 +195,7 @@ AudioOutputSettings* AudioOutputBase::GetOutputSettingsCleaned(void)
 /**
  * Returns capabilities supported by the audio device
  * amended to take into account the digital audio
- * options (AC3 and DTS) as well as the user settings
+ * options (AC3, DTS, E-AC3 and TrueHD) as well as the user settings
  */
 AudioOutputSettings* AudioOutputBase::GetOutputSettingsUsers(void)
 {
@@ -211,10 +221,12 @@ bool AudioOutputBase::CanPassthrough(int samplerate, int channels) const
     // Don't know any cards that support spdif clocked at < 44100
     // Some US cable transmissions have 2ch 32k AC-3 streams
     ret &= samplerate >= 44100;
-        // Will downmix if we can't support the amount of channels
-    ret &= channels <= max_channels;
-        // Stereo content will always be decoded so it can later be upmixed
-    ret &= channels != 2;
+    // Will passthrough if surround audio was defined. Amplifier will
+    // do the downmix if required
+    ret &= max_channels >= 6;
+    // Stereo content will always be decoded so it can later be upmixed
+    // unless audio is configured for stereoo
+    ret |= channels == 2 && max_channels == 2;
 
     return ret;
 }
@@ -419,7 +431,8 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     VBAUDIO(QString("Original codec was %1, %2, %3 kHz, %4 channels")
             .arg(ff_codec_id_string((CodecID)codec))
             .arg(output_settings->FormatToString(format))
-            .arg(samplerate/1000).arg(source_channels));
+            .arg(samplerate/1000)
+            .arg(source_channels));
 
     /* Encode to AC-3 if we're allowed to passthru but aren't currently
        and we have more than 2 channels but multichannel PCM is not supported
@@ -429,22 +442,25 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
            output_settings->canAC3() &&
            ((!output_settings->canLPCM() && configured_channels > 2) ||
             !output_settings->IsSupportedChannels(channels)));
-    VBAUDIO(QString("enc(%1), passthru(%2), canAC3(%3), canDTS(%4), canLPCM(%5)"
-                    ", configured_channels(%6), %7 channels supported(%8)")
+    VBAUDIO(QString("enc(%1), passthru(%2), canAC3(%3), canDTS(%4), canHD(%5), "
+                    "canHDLL(%6), canLPCM(%7), "
+                    "configured_channels(%8), %9 channels supported(%10)")
             .arg(enc)
             .arg(passthru)
             .arg(output_settings->canAC3())
             .arg(output_settings->canDTS())
+            .arg(output_settings->canHD())
+            .arg(output_settings->canHDLL())
             .arg(output_settings->canLPCM())
             .arg(configured_channels)
-            .arg(channels).arg(output_settings->IsSupportedChannels(channels)));
+            .arg(channels)
+            .arg(output_settings->IsSupportedChannels(channels)));
 
     int dest_rate = 0;
 
     // Force resampling if we are encoding to AC3 and sr > 48k
     // or if 48k override was checked in settings
     if ((samplerate != 48000 &&
-         gCoreContext->GetNumSetting("AdvancedAudioSettings", false) &&
          gCoreContext->GetNumSetting("Audio48kOverride", false)) ||
         (enc && (samplerate > 48000 || (need_resampler && dest_rate > 48000))))
     {
@@ -511,8 +527,46 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         }
     }
 
-    source_bytes_per_frame = source_channels *
-                             output_settings->SampleSize(format);
+    if (passthru)
+    {
+        switch (settings.codec)
+        {
+            case CODEC_ID_EAC3:
+                samplerate *= 4;
+            case CODEC_ID_AC3:
+            case CODEC_ID_DTS:
+                channels = 2;
+                break;
+            case CODEC_ID_TRUEHD:
+                channels = 8;
+                switch(samplerate)
+                {
+                    case 48000:
+                    case 96000:
+                    case 192000:
+                        samplerate = 192000;
+                        break;
+                    case 44100:
+                    case 88200:
+                    case 176400:
+                        samplerate = 176400;
+                        break;
+                    default:
+                        VBAUDIO("TrueHD: Unsupported samplerate");
+                        break;
+                }
+                break;
+        }
+        //AC3, DTS, DTS-HD MA and TrueHD use 16 bits samples
+        format = output_format = FORMAT_S16;
+        source_bytes_per_frame = channels *
+            output_settings->SampleSize(format);
+    }
+    else
+    {
+        source_bytes_per_frame = source_channels *
+            output_settings->SampleSize(format);
+    }
 
     // Turn on float conversion?
     if (need_resampler || needs_upmix || needs_downmix ||
@@ -527,9 +581,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         else
             output_format = output_settings->BestSupportedFormat();
     }
-
-    if (passthru)
-        channels = 2; // IEC958 bitstream - 2 ch
 
     bytes_per_frame =  processing ? 4 : output_settings->SampleSize(format);
     bytes_per_frame *= channels;
@@ -967,6 +1018,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
     if (!needs_upmix)
     {
         int num  = len;
+
         if (bdiff <= num)
         {
             memcpy(WPOS, buffer, bdiff);
@@ -1045,7 +1097,8 @@ bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
     int org_waud = waud,               afree = audiofree();
     int frames   = in_frames;
     void *buffer = in_buffer;
-    int bpf      = bytes_per_frame,    len = frames * source_bytes_per_frame;
+    int bpf      = bytes_per_frame;
+    int len      = frames * source_bytes_per_frame;
     int used     = kAudioRingBufferSize - afree;
     bool music   = false;
     int bdiff;
@@ -1110,7 +1163,8 @@ bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
 
     int frames_remaining = in_frames;
     int frames_final = 0;
-    int maxframes = (kAudioSRCInputSize / source_channels) & ~0xf;
+    int maxframes = (kAudioSRCInputSize /
+                     (passthru ? channels : source_channels)) & ~0xf;
     int offset = 0;
 
     while(frames_remaining > 0)
@@ -1131,6 +1185,7 @@ bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
             // Convert to floats
             len = AudioOutputUtil::toFloat(format, src_in, buffer, len);
         }
+
         frames_remaining -= frames;
 
         // Perform downmix if necessary

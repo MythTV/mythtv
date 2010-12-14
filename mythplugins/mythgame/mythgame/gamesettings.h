@@ -19,7 +19,7 @@ struct GameTypes {
 // TODO FIXME Can't initialize translated values statically. They are only
 //            translated if you get lucky with dynamic linking order.
 const GameTypes GameTypeList[MAX_GAME_TYPES] =
-{   
+{
     { QObject::tr("OTHER"),   "OTHER",  "" },
     { QObject::tr("AMIGA"),   "AMIGA",  "adf,ipf" },
     { QObject::tr("ATARI"),   "ATARI",  "bin,a26" },

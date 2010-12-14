@@ -34,12 +34,12 @@ class MPUBLIC ParentalLevel
 };
 Q_DECLARE_METATYPE(ParentalLevel*)
 
-bool operator!=(const ParentalLevel &lhs, const ParentalLevel &rhs);
-bool operator==(const ParentalLevel &lhs, const ParentalLevel &rhs);
-bool operator<(const ParentalLevel &lhs, const ParentalLevel &rhs);
-bool operator>(const ParentalLevel &lhs, const ParentalLevel &rhs);
-bool operator<=(const ParentalLevel &lhs, const ParentalLevel &rhs);
-bool operator>=(const ParentalLevel &lhs, const ParentalLevel &rhs);
+bool operator!=(const ParentalLevel &lhs, const ParentalLevel &rhs) MPUBLIC;
+bool operator==(const ParentalLevel &lhs, const ParentalLevel &rhs) MPUBLIC;
+bool operator<(const ParentalLevel &lhs, const ParentalLevel &rhs) MPUBLIC;
+bool operator>(const ParentalLevel &lhs, const ParentalLevel &rhs) MPUBLIC;
+bool operator<=(const ParentalLevel &lhs, const ParentalLevel &rhs) MPUBLIC;
+bool operator>=(const ParentalLevel &lhs, const ParentalLevel &rhs) MPUBLIC;
 
 class MPUBLIC ParentalLevelChangeChecker : public QObject
 {

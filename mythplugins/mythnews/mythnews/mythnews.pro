@@ -3,7 +3,7 @@ include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 
 QT += network sql xml
- 
+
 TEMPLATE = lib
 CONFIG += plugin thread warn_on debug
 TARGET = mythnews
@@ -27,5 +27,9 @@ SOURCES += mythnews.cpp   mythnewsconfig.cpp mythnewseditor.cpp
 SOURCES += newssite.cpp   newsarticle.cpp
 SOURCES += newsdbutil.cpp dbcheck.cpp
 SOURCES += main.cpp
+
+use_hidesyms {
+    QMAKE_CXXFLAGS += -fvisibility=hidden
+}
 
 include ( ../../libs-targetfix.pro )

@@ -26,27 +26,29 @@ class MPUBLIC AudioSettings
     AudioSettings();
     AudioSettings(const AudioSettings &other);
     AudioSettings(
-        const QString    &main_device,
-        const QString    &passthru_device,
-        AudioFormat       format,
-        int               channels,
-        int               codec,
-        int               samplerate,
-        AudioOutputSource source,
-        bool              set_initial_vol,
-        bool              use_passthru,
-        int               upmixer_startup = 0);
+        const QString          &main_device,
+        const QString          &passthru_device,
+        AudioFormat             format,
+        int                     channels,
+        int                     codec,
+        int                     samplerate,
+        AudioOutputSource       source,
+        bool                    set_initial_vol,
+        bool                    use_passthru,
+        int                     upmixer_startup = 0,
+        AudioOutputSettings     *custom = NULL);
 
-    AudioSettings(AudioFormat format,
-                  int         channels,
-                  int         codec,
-                  int         samplerate,
-                  bool        use_passthru,
-                  int         upmixer_startup = 0);
+    AudioSettings(AudioFormat   format,
+                  int           channels,
+                  int           codec,
+                  int           samplerate,
+                  bool          use_passthru,
+                  int           upmixer_startup = 0);
 
     AudioSettings(const QString    &main_device,
                   const QString    &passthru_device = QString::null);
 
+    ~AudioSettings();
     void FixPassThrough(void);
     void TrimDeviceType(void);
 
@@ -54,17 +56,18 @@ class MPUBLIC AudioSettings
     QString GetPassthruDevice(void) const;
 
   public:
-    QString           main_device;
-    QString           passthru_device;
-    AudioFormat       format;
-    int               channels;
-    int               codec;
-    int               samplerate;
-    bool              set_initial_vol;
-    bool              use_passthru;
-    AudioOutputSource source;
-    int               upmixer;
-    bool              init;
+    QString             main_device;
+    QString             passthru_device;
+    AudioFormat         format;
+    int                 channels;
+    int                 codec;
+    int                 samplerate;
+    bool                set_initial_vol;
+    bool                use_passthru;
+    AudioOutputSource   source;
+    int                 upmixer;
+    bool                init;
+    AudioOutputSettings *custom;
 };
 
 #endif // _AUDIO_SETTINGS_H_

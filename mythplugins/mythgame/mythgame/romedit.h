@@ -13,7 +13,7 @@ class EditRomInfoDialog : public MythScreenType
      EditRomInfoDialog(MythScreenStack *parent,
                        QString name,
                        RomInfo *romInfo);
-                       
+
     ~EditRomInfoDialog();
 
     bool Create();
@@ -50,7 +50,7 @@ class EditRomInfoDialog : public MythScreenType
     MythUITextEdit      *m_countryEdit;
     MythUITextEdit      *m_plotEdit;
     MythUITextEdit      *m_publisherEdit;
-    MythUICheckBox      *m_favoriteCheck; 
+    MythUICheckBox      *m_favoriteCheck;
     MythUIButton        *m_screenshotButton;
     MythUIText          *m_screenshotText;
     MythUIButton        *m_fanartButton;

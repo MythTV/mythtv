@@ -10,11 +10,11 @@ class RomInfo
 {
   public:
     RomInfo(QString lromname = "", QString lsystem = "", QString lgamename ="",
-            QString lgenre = "", QString lyear = "", bool lfavorite = FALSE, 
+            QString lgenre = "", QString lyear = "", bool lfavorite = FALSE,
             QString lrompath = "", QString lcountry ="", QString lcrc_value = "",
             int ldiskcount = 0, QString lgametype = "", int lromcount = 0,
-            QString lallsystems = "", QString lplot = "", QString lpublisher = "", 
-            QString lversion = "", QString lscreenshot = "", QString lfanart = "", 
+            QString lallsystems = "", QString lplot = "", QString lpublisher = "",
+            QString lversion = "", QString lscreenshot = "", QString lfanart = "",
             QString lboxart = "", QString linetref = "")
             {
                 romname = lromname;
@@ -90,7 +90,7 @@ class RomInfo
 
     QString Genre() const { return genre; }
     void setGenre(const QString &lgenre) { genre = lgenre; }
-    
+
     QString Country() const { return country; }
     void setCountry(const QString &lcountry) { country = lcountry; }
 

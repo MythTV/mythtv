@@ -3,9 +3,11 @@
 using namespace std;
 #include "mythconfig.h"
 #include "audiooutpututil.h"
+#include <sys/types.h>
+#include <byteswap.h>
 
-#define LOC QString("AO: ")
-#define LOC_ERR QString("AO, ERROR: ")
+#define LOC QString("AOUtil: ")
+#define LOC_ERR QString("AOUtil, ERROR: ")
 
 #if ARCH_X86
 static int has_sse2 = -1;
@@ -629,3 +631,49 @@ void AudioOutputUtil::MuteChannel(int obits, int channels, int ch,
     else
         _MuteChannel((int *)buffer, channels, ch, frames);
 }
+
+#if HAVE_BIGENDIAN
+#define LE_SHORT(v)		bswap_16(v)
+#define LE_INT(v)		bswap_32(v)
+#else
+#define LE_SHORT(v)		(v)
+#define LE_INT(v)		(v)
+#endif
+
+char *AudioOutputUtil::GeneratePinkSamples(char *frames, int channels,
+                                           int channel, int count, int bits)
+{
+    pink_noise_t pink;
+
+    initialize_pink_noise(&pink, bits);
+
+    double   res;
+    int32_t  ires;
+    int16_t *samp16 = (int16_t*) frames;
+    int32_t *samp32 = (int32_t*) frames;
+
+    while (count-- > 0)
+    {
+        for(int chn = 0 ; chn < channels; chn++)
+        {
+            if (chn==channel)
+            {
+                res = generate_pink_noise_sample(&pink) * 0x03fffffff; /* Don't use MAX volume */
+                ires = res;
+                if (bits == 16)
+                    *samp16++ = LE_SHORT(ires >> 16);
+                else
+                    *samp32++ = LE_INT(ires);
+            }
+            else
+            {
+                if (bits == 16)
+                    *samp16++ = 0;
+                else
+                    *samp32++ = 0;
+            }
+        }
+    }    
+    return frames;
+}
+  

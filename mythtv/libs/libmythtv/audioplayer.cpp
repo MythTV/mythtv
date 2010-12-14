@@ -106,8 +106,6 @@ QString AudioPlayer::ReinitAudio(void)
         const AudioSettings settings(m_format, m_channels, m_codec,
                                      m_samplerate, m_passthru);
         m_audioOutput->Reconfigure(settings);
-        if (m_passthru)
-            m_channels = 2;
         errMsg = m_audioOutput->GetError();
         SetStretchFactor(m_stretchfactor);
     }
@@ -313,6 +311,22 @@ bool AudioPlayer::CanDTS(void)
     return ret;
 }
 
+bool AudioPlayer::CanHD(void)
+{
+    bool ret = false;
+    if (m_audioOutput)
+        ret = m_audioOutput->GetOutputSettingsUsers()->canHD();
+    return ret;
+}
+
+bool AudioPlayer::CanHDLL(void)
+{
+    bool ret = false;
+    if (m_audioOutput)
+        ret = m_audioOutput->GetOutputSettingsUsers()->canHDLL();
+    return ret;
+}
+
 uint AudioPlayer::GetMaxChannels(void)
 {
     uint ret = 2;
@@ -334,12 +348,14 @@ void AudioPlayer::AddAudioData(char *buffer, int len, int64_t timecode)
     if (m_parent->PrepareAudioSample(timecode) && m_audioOutput &&
         !no_audio_out)
         m_audioOutput->Drain();
-    int samplesize = m_channels * AudioOutputSettings::SampleSize(m_format);
+    int samplesize = m_audioOutput->GetBytesPerFrame();
+
     if ((samplesize <= 0) || !m_audioOutput)
         return;
     int frames = len / samplesize;
+
     if (!m_audioOutput->AddFrames(buffer, frames, timecode))
-        VERBOSE(VB_PLAYBACK, LOC + "AddAudioData():p1: "
+        VERBOSE(VB_PLAYBACK, LOC + "AddAudioData(): "
                 "Audio buffer overflow, audio data lost!");
 }
 
@@ -350,4 +366,15 @@ bool AudioPlayer::GetBufferStatus(uint &fill, uint &total)
         return false;
     m_audioOutput->GetBufferStatus(fill, total);
     return true;
+}
+
+bool AudioPlayer::IsBufferAlmostFull(void)
+{
+    uint ofill = 0, ototal = 0, othresh = 0;
+    if (GetBufferStatus(ofill, ototal))
+    {
+        othresh =  ((ototal>>1) + (ototal>>2));
+        return ofill > othresh;
+    }
+    return false;
 }

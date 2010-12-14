@@ -3,10 +3,10 @@
 // Created     : Jan. 8, 2007
 //
 // Purpose     : SSDP Cache Declaration
-//                                                                            
+//
 // Copyright (c) 2007 David Blain <mythtv@theblains.net>
-//                                          
-// This library is free software; you can redistribute it and/or 
+//
+// This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or at your option any later version of the LGPL.
@@ -24,6 +24,7 @@
 #ifndef __SSDPCLIENT_H__
 #define __SSDPCLIENT_H__
 
+#include "upnpexp.h"
 #include "mythobservable.h"
 
 #include <QObject>
@@ -84,7 +85,7 @@ typedef QMap< QString, SSDPCacheEntries * > SSDPCacheEntriesMap;   // Key == Ser
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-class SSDPCache : public QObject,  
+class UPNP_PUBLIC SSDPCache : public QObject,
                   public MythObservable
 {
     Q_OBJECT
@@ -93,7 +94,7 @@ class SSDPCache : public QObject,
 
         QMutex                  m_mutex;
         SSDPCacheEntriesMap     m_cache;
-    
+
         void NotifyAdd   ( const QString &sURI,
                            const QString &sUSN,
                            const QString &sLocation );

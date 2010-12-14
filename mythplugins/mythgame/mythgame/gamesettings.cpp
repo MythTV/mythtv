@@ -80,7 +80,7 @@ static HostCheckBox *GameTreeView()
     return gc;
 }
 
-HostLineEdit *GetScreenshotDir()
+static HostLineEdit *GetScreenshotDir()
 {
     HostLineEdit *gc = new HostLineEdit("mythgame.screenshotdir");
     gc->setLabel(QObject::tr("Directory where Game Screenshots are stored"));
@@ -90,7 +90,7 @@ HostLineEdit *GetScreenshotDir()
     return gc;
 }
 
-HostLineEdit *GetFanartDir()
+static HostLineEdit *GetFanartDir()
 {
     HostLineEdit *gc = new HostLineEdit("mythgame.fanartdir");
     gc->setLabel(QObject::tr("Directory where Game Fanart is stored"));
@@ -100,7 +100,7 @@ HostLineEdit *GetFanartDir()
     return gc;
 }
 
-HostLineEdit *GetBoxartDir()
+static HostLineEdit *GetBoxartDir()
 {
     HostLineEdit *gc = new HostLineEdit("mythgame.boxartdir");
     gc->setLabel(QObject::tr("Directory where Game Boxart is stored"));

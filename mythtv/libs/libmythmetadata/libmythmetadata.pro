@@ -15,7 +15,7 @@ HEADERS += cleanup.h  dbaccess.h  dirscan.h  globals.h  parentalcontrols.h
 HEADERS += videoscan.h  videoutils.h  videometadata.h  videometadatalistmanager.h
 HEADERS += quicksp.h metadatacommon.h metadatadownload.h metadataimagedownload.h
 
-SOURCES += cleanup.cpp  dbaccess.cpp  dirscan.cpp  globals.cpp  
+SOURCES += cleanup.cpp  dbaccess.cpp  dirscan.cpp  globals.cpp
 SOURCES += parentalcontrols.cpp  videoscan.cpp  videoutils.cpp
 SOURCES += videometadata.cpp  videometadatalistmanager.cpp
 SOURCES += metadatacommon.cpp metadatadownload.cpp metadataimagedownload.cpp
@@ -58,6 +58,10 @@ macx {
 }
 
 QT += network xml sql
+
+use_hidesyms {
+    QMAKE_CXXFLAGS += -fvisibility=hidden
+}
 
 include ( ../libs-targetfix.pro )
 

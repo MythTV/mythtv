@@ -33,7 +33,9 @@ using namespace std;
 #include "programrecpriority.h"
 #include "channelrecpriority.h"
 #include "custompriority.h"
+#include "audiooutput.h"
 #include "globalsettings.h"
+#include "audiogeneralsettings.h"
 #include "profilegroup.h"
 #include "playgroup.h"
 #include "networkcontrol.h"
@@ -586,12 +588,22 @@ static void TVMenuCallback(void *data, QString &selection)
         GeneralSettings settings;
         settings.exec();
     }
+    else if (sel == "settings audiogeneral")
+    {
+        AudioGeneralSettings audiosettings;
+        audiosettings.exec();
+    }
     else if (sel == "settings maingeneral")
     {
         MainGeneralSettings mainsettings;
         mainsettings.exec();
         QStringList strlist( QString("REFRESH_BACKEND") );
         gCoreContext->SendReceiveStringList(strlist);
+    }
+    else if (sel == "settings audiogeneral")
+    {
+        AudioGeneralSettings audiosettings;
+        audiosettings.exec();
     }
     else if (sel == "settings playback")
     {

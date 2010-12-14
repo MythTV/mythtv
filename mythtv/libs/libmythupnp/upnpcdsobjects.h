@@ -3,10 +3,10 @@
 // Created     : Oct. 24, 2005
 //
 // Purpose     : uPnp Content Directory Service Object Definitions
-//                                                                            
+//
 // Copyright (c) 2005 David Blain <mythtv@theblains.net>
-//                                          
-// This library is free software; you can redistribute it and/or 
+//
+// This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or at your option any later version of the LGPL.
@@ -28,6 +28,8 @@
 #include <QString>
 #include <QList>
 #include <QMap>
+
+#include "upnpexp.h"
 
 class CDSObject;
 class QTextStream;
@@ -61,7 +63,7 @@ class Property
 
     public:
 
-        explicit Property( const QString &sName, 
+        explicit Property( const QString &sName,
                            const QString &sNameSpace = "",
                            bool           bRequired  = false,
                            const QString &sValue     = "" )
@@ -72,7 +74,7 @@ class Property
             m_sValue     = sValue;
         }
 
-        void AddAttribute( const QString &sName, 
+        void AddAttribute( const QString &sName,
                            const QString &sValue )
         {
             m_lstAttributes.push_back(NameValue(sName, sValue));
@@ -97,14 +99,14 @@ class Resource
 
     public:
 
-        Resource( const QString &sProtocolInfo, 
+        Resource( const QString &sProtocolInfo,
                   const QString &sURI )
         {
             m_sProtocolInfo = sProtocolInfo;
             m_sURI          = sURI;
         }
 
-        void AddAttribute( const QString &sName, 
+        void AddAttribute( const QString &sName,
                            const QString &sValue )
         {
             m_lstAttributes.push_back(NameValue(sName, sValue));
@@ -127,7 +129,7 @@ class ContainerClass
 
     public:
 
-        ContainerClass( const QString &sClass, 
+        ContainerClass( const QString &sClass,
                         const QString &sName,
                         bool           bIncludeDerived )
         {
@@ -143,14 +145,14 @@ typedef QStringList FilterMap;
 
 //////////////////////////////////////////////////////////////////////////////
 
-class CDSObject
+class UPNP_PUBLIC CDSObject
 {
     public:
         short           m_nUpdateId;
 
         ObjectTypes     m_eType;
 
-        // Required 
+        // Required
 
         QString         m_sId;
         QString         m_sParentId;
@@ -160,7 +162,7 @@ class CDSObject
         bool            m_bSearchable;
 
         // Optional
-             
+
         QString         m_sCreator;
         QString         m_sWriteStatus;
 
@@ -180,7 +182,7 @@ class CDSObject
 
     public:
 
-        explicit      CDSObject( const QString sId = "-1", 
+        explicit      CDSObject( const QString sId = "-1",
                                  const QString sTitle = "",
                                  const QString sParentId = "-1" );
         virtual      ~CDSObject();
@@ -204,33 +206,33 @@ class CDSObject
 
     public:
 
-        static  CDSObject *CreateItem             ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreateContainer        ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreateAudioItem        ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreateMusicTrack       ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreateAudioBroadcast   ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreateAudioBook        ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreateVideoItem        ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreateMovie            ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreateVideoBroadcast   ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreateMusicVideoClip   ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreateImageItem        ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreatePhoto            ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreatePlaylistItem     ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreateTextItem         ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreateAlbum            ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreateMusicAlbum       ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreatePhotoAlbum       ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreateGenre            ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreateMusicGenre       ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreateMovieGenre       ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreatePlaylistContainer( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreatePerson           ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreateMusicArtist      ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreateStorageSystem    ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreateStorageVolume    ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
-        static  CDSObject *CreateStorageFolder    ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL ); 
+        static  CDSObject *CreateItem             ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreateContainer        ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreateAudioItem        ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreateMusicTrack       ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreateAudioBroadcast   ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreateAudioBook        ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreateVideoItem        ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreateMovie            ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreateVideoBroadcast   ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreateMusicVideoClip   ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreateImageItem        ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreatePhoto            ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreatePlaylistItem     ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreateTextItem         ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreateAlbum            ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreateMusicAlbum       ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreatePhotoAlbum       ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreateGenre            ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreateMusicGenre       ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreateMovieGenre       ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreatePlaylistContainer( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreatePerson           ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreateMusicArtist      ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreateStorageSystem    ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreateStorageVolume    ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
+        static  CDSObject *CreateStorageFolder    ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject = NULL );
 
-};        
+};
 
 #endif

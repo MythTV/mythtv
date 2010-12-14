@@ -2,7 +2,7 @@ include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 include (config.pro)
- 
+
 QT += xml sql opengl qt3support network
 
 !exists( config.pro ) {
@@ -81,6 +81,11 @@ mingw {
 
     # libcdaudio needs ...
     LIBS += -lwsock32
+}
+
+use_hidesyms {
+    QMAKE_CXXFLAGS += -fvisibility=hidden
+    QMAKE_CXXFLAGS_SHLIB += -fvisibility=hidden
 }
 
 include ( ../../libs-targetfix.pro )
