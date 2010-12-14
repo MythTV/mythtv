@@ -11,6 +11,7 @@ using namespace std;
 #include <QTextCodec>
 
 // MythTV headers
+#include "mythexp.h"
 #include "mythconfig.h"
 #include "avformatdecoder.h"
 #include "privatedecoder.h"
@@ -916,7 +917,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if (!livetv && !ringBuffer->IsDisc())
     {
         av_estimate_timings(ic, 0);
-        // generate timings based on the video stream to avoid bogus ffmpeg 
+        // generate timings based on the video stream to avoid bogus ffmpeg
         // values for duration and bitrate
         av_update_stream_timings_video(ic);
     }
@@ -1055,17 +1056,17 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
     if (stream->r_frame_rate.den && stream->r_frame_rate.num) // tbr
         estimated_fps = av_q2d(stream->r_frame_rate);
 
-    if (QString(ic->iformat->name).contains("matroska") && 
+    if (QString(ic->iformat->name).contains("matroska") &&
         avg_fps < 121.0f && avg_fps > 3.0f)
         fps = avg_fps; // matroska default_duration
-    else if (QString(ic->iformat->name).contains("avi") && 
+    else if (QString(ic->iformat->name).contains("avi") &&
         container_fps < 121.0f && container_fps > 3.0f)
         fps = container_fps; // avi uses container fps for timestamps
-    else if (stream_fps < 121.0f && stream_fps > 3.0f) 
+    else if (stream_fps < 121.0f && stream_fps > 3.0f)
         fps = stream_fps;
-    else if (container_fps < 121.0f && container_fps > 3.0f) 
+    else if (container_fps < 121.0f && container_fps > 3.0f)
         fps = container_fps;
-    else if (estimated_fps < 70.0f && estimated_fps > 20.0f) 
+    else if (estimated_fps < 70.0f && estimated_fps > 20.0f)
         fps = estimated_fps;
     else
         fps = stream_fps;
@@ -1107,7 +1108,11 @@ static enum PixelFormat get_format_vdpau(struct AVCodecContext *avctx,
     return fmt[i];
 }
 
-static enum PixelFormat get_format_dxva2(struct AVCodecContext *avctx,
+// Declared seperately to allow attribute
+static enum PixelFormat get_format_dxva2(struct AVCodecContext *,
+                                         const enum PixelFormat *) MUNUSED;
+
+enum PixelFormat get_format_dxva2(struct AVCodecContext *avctx,
                                          const enum PixelFormat *fmt)
 {
     if (!fmt)
@@ -1126,7 +1131,11 @@ static bool IS_VAAPI_PIX_FMT(enum PixelFormat fmt)
            fmt == PIX_FMT_VAAPI_VLD;
 }
 
-static enum PixelFormat get_format_vaapi(struct AVCodecContext *avctx,
+// Declared seperately to allow attribute
+static enum PixelFormat get_format_vaapi(struct AVCodecContext *,
+                                         const enum PixelFormat *) MUNUSED;
+
+enum PixelFormat get_format_vaapi(struct AVCodecContext *avctx,
                                          const enum PixelFormat *fmt)
 {
     if (!fmt)
@@ -2924,7 +2933,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         return false;
     }
 
-    long long temppts = (long long)(av_q2d(stream->time_base) * 
+    long long temppts = (long long)(av_q2d(stream->time_base) *
                                     mpa_pic->reordered_opaque * 1000);
 
     // Validate the video pts against the last pts. If it's
@@ -4464,18 +4473,18 @@ void AvFormatDecoder::av_update_stream_timings_video(AVFormatContext *ic)
         return;
 
    duration = INT64_MIN;
-   if (st->start_time != AV_NOPTS_VALUE && st->time_base.den) {
+   if (st->start_time != (int64_t)AV_NOPTS_VALUE && st->time_base.den) {
        start_time1= av_rescale_q(st->start_time, st->time_base, AV_TIME_BASE_Q);
        if (start_time1 < start_time)
            start_time = start_time1;
-       if (st->duration != AV_NOPTS_VALUE) {
+       if (st->duration != (int64_t)AV_NOPTS_VALUE) {
            end_time1 = start_time1
                      + av_rescale_q(st->duration, st->time_base, AV_TIME_BASE_Q);
            if (end_time1 > end_time)
                end_time = end_time1;
        }
    }
-   if (st->duration != AV_NOPTS_VALUE) {
+   if (st->duration != (int64_t)AV_NOPTS_VALUE) {
        duration1 = av_rescale_q(st->duration, st->time_base, AV_TIME_BASE_Q);
        if (duration1 > duration)
            duration = duration1;
