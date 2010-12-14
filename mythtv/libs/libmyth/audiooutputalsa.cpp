@@ -504,7 +504,7 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
 
     while (frames > 0)
     {
-        lw = pcm_write_func(pcm_handle, tmpbuf, frames);
+        lw = snd_pcm_writei(pcm_handle, tmpbuf, frames);
 
         if (lw >= 0)
         {
@@ -611,22 +611,10 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
     err = snd_pcm_hw_params_any(handle, params);
     CHECKERR("No playback configurations available");
 
-    /* set the interleaved read/write format, use mmap if available */
-    pcm_write_func = &snd_pcm_mmap_writei;
-    if ((err = snd_pcm_hw_params_set_access(handle, params,
-                                          SND_PCM_ACCESS_MMAP_INTERLEAVED)) < 0)
-    {
-        Warn("mmap not available, attempting to fall back to slow writes");
-        QString old_err = snd_strerror(err);
-        pcm_write_func  = &snd_pcm_writei;
-        if ((err = snd_pcm_hw_params_set_access(handle, params,
-                                            SND_PCM_ACCESS_RW_INTERLEAVED)) < 0)
-        {
-            Error("Interleaved sound types MMAP & RW are not available");
-            AERROR(QString("MMAP Error: %1\n\t\t\tRW Error").arg(old_err));
-            return err;
-        }
-    }
+    /* set the interleaved read/write format */
+    err = snd_pcm_hw_params_set_access(handle, params,
+                                       SND_PCM_ACCESS_RW_INTERLEAVED);
+    CHECKERR(QString("Interleaved RW audio not available"));
 
     /* set the sample format */
     err = snd_pcm_hw_params_set_format(handle, params, format);
