@@ -62,24 +62,6 @@ static int RunNetTree(void)
     }
 }
 
-static int RunTreeEditor(void)
-{
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-
-    TreeEditor *treeedit = new TreeEditor(mainStack, "mythnettreeeditor");
-
-    if (treeedit->Create())
-    {
-        mainStack->AddScreen(treeedit);
-        return 0;
-    }
-    else
-    {
-        delete treeedit;
-        return -1;
-    }
-}
-
 static void runNetVision(void)
 {
     RunNetVision();
@@ -88,11 +70,6 @@ static void runNetVision(void)
 static void runNetTree(void)
 {
     RunNetTree();
-}
-
-static void runTreeEditor(void)
-{
-    RunTreeEditor();
 }
 
 static void setupKeys(void)

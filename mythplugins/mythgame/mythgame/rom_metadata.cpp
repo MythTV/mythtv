@@ -6,7 +6,7 @@
 
 #include "unzip.h"
 
-int calcOffset(QString GameType, uLong filesize) {
+static int calcOffset(QString GameType, uLong filesize) {
     int result;
     uLong rom_size;
 
@@ -30,7 +30,7 @@ int calcOffset(QString GameType, uLong filesize) {
     return result;
 }
 
-QString crcStr(uLong crc) {
+static QString crcStr(uLong crc) {
     QString tmpcrc("");
 
     tmpcrc = QString("%1").arg( crc, 0, 16 );
@@ -50,7 +50,7 @@ QString crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB
     uLong crc = crc32(0, Z_NULL, 0);
     QString crcRes;
     char filename_inzip[256];
-    unz_file_info file_info;    
+    unz_file_info file_info;
     int err;
     int offset;
     unzFile zf;
@@ -79,23 +79,23 @@ QString crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB
                 while ((count = unzReadCurrentFile(zf, block, blocksize)) > 0)
                 {
                     crc = crc32(crc, (Bytef *)block, (uInt)count);
-                }   
+                }
                 crcRes = crcStr(crc);
                 *key = QString("%1:%2")
                              .arg(crcRes)
                              .arg(filename_inzip);
 
-                if (romDB->contains(*key)) 
+                if (romDB->contains(*key))
                 {
                     unzCloseCurrentFile(zf);
                     break;
                 }
 
                 unzCloseCurrentFile(zf);
-            }   
-        }   
+            }
+        }
         unzClose(zf);
-    }   
+    }
     else
     {
         QFile f(romname);
@@ -117,8 +117,8 @@ QString crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB
             crcRes = crcStr(crc);
             *key = QString("%1:").arg(crcRes);
             f.close();
-        }   
-    }   
+        }
+    }
 
     return crcRes;
 }
