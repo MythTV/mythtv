@@ -151,7 +151,11 @@ uint PESPacket::CalcCRC(void) const
 
 bool PESPacket::VerifyCRC(void) const
 {
-    bool ret = !HasCRC() || (CalcCRC() == CRC());
+    /* ignore HasCRC for stream id 0x70 (DVB TDT tables)
+     * real solution would be not using PESPacket for mpeg section/dvb tables
+     * since they are not. HasCRC() is not valid for them
+     */
+    bool ret = !HasCRC() || (StreamID() == 0x70) || (CalcCRC() == CRC());
     if (!ret)
     {
         VERBOSE(VB_SIPARSER,
