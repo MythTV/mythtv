@@ -183,6 +183,11 @@ bool AudioOutputALSA::SetPreallocBufferSize(int size)
     if (GetPCMInfo(card, device, subdevice) < 0)
         return false;
 
+    // We can not increase the size of the audio buffer while device is opened
+    // so make sure it is closed
+    if (pcm_handle != NULL)
+        CloseDevice();
+
     QFile pfile(QString("/proc/asound/card%1/pcm%2p/sub%3/prealloc")
                 .arg(card).arg(device).arg(subdevice));
 
