@@ -24,10 +24,10 @@ INSTALLS += target
 HEADERS += archivesettings.h logviewer.h fileselector.h
 HEADERS += recordingselector.h videoselector.h dbcheck.h
 HEADERS += archiveutil.h selectdestination.h
-HEADERS += mythburn.h themeselector.h editmetadata.h thumbfinder.h 
+HEADERS += mythburn.h themeselector.h editmetadata.h thumbfinder.h
 HEADERS += exportnative.h importnative.h
 
-SOURCES += main.cpp archivesettings.cpp logviewer.cpp 
+SOURCES += main.cpp archivesettings.cpp logviewer.cpp
 SOURCES += fileselector.cpp recordingselector.cpp videoselector.cpp
 SOURCES += dbcheck.cpp archiveutil.cpp selectdestination.cpp
 SOURCES += mythburn.cpp themeselector.cpp editmetadata.cpp thumbfinder.cpp
@@ -55,13 +55,17 @@ profilefiles.path = $${SYSROOT}$${PREFIX}/share/mythtv/mytharchive/encoder_profi
 profilefiles.files = ../mythburn/encoder_profiles/*.xml
 
 nativeuifiles.path = $${SYSROOT}$${PREFIX}/share/mythtv/themes/default
-nativeuifiles.files = mythnative-ui.xml 
+nativeuifiles.files = mythnative-ui.xml
 
-INSTALLS +=  scriptfiles introfiles themefiles imagefiles musicfiles 
+INSTALLS +=  scriptfiles introfiles themefiles imagefiles musicfiles
 INSTALLS +=  profilefiles burnuifiles
-INSTALLS +=  nativeuifiles 
+INSTALLS +=  nativeuifiles
 
 #The following line was inserted by qt3to4
-QT += xml sql opengl 
+QT += xml sql opengl
+
+use_hidesyms {
+    QMAKE_CXXFLAGS += -fvisibility=hidden
+}
 
 include ( ../../libs-targetfix.pro )

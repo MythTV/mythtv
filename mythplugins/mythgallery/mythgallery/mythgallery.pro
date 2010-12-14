@@ -39,4 +39,8 @@ opengl {
 #The following line was inserted by qt3to4
 QT += network opengl sql xml
 
+use_hidesyms {
+    QMAKE_CXXFLAGS += -fvisibility=hidden
+}
+
 include ( ../../libs-targetfix.pro )
