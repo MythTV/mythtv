@@ -1,3 +1,4 @@
+
 #include "gamehandler.h"
 #include "rominfo.h"
 #include "rom_metadata.h"
@@ -7,12 +8,17 @@
 #include <QDir>
 #include <QList>
 
-#include <mythcontext.h>
+
 #include <mythdbcon.h>
-#include <mythdialogs.h>
 #include <util.h>
 #include <mythdb.h>
+
+#include <mythcontext.h>
+#include <mythdialogs.h>
+
 #include <mythuihelper.h>
+#include <mythdialogbox.h>
+#include <mythmainwindow.h>
 
 #define LOC_ERR QString("MythGame:GAMEHANDLER Error: ")
 #define LOC QString("MythGame:GAMEHANDLER: ")
@@ -214,46 +220,34 @@ void purgeGameDB(QString filename, QString RomPath)
 
 }
 
-void GameHandler::promptForRemoval(QString filename, QString RomPath)
+void GameHandler::promptForRemoval(GameScan scan)
 {
+    QString filename = scan.Rom();
+    QString RomPath = scan.RomFullPath();
+
     if (m_RemoveAll)
         purgeGameDB(filename , RomPath);
 
     if (m_KeepAll || m_RemoveAll)
         return;
 
-    QStringList buttonText;
-    buttonText += QObject::tr("No");
-    buttonText += QObject::tr("No to all");
-    buttonText += QObject::tr("Yes");
-    buttonText += QObject::tr("Yes to all");
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythDialogBox *removalPopup = new MythDialogBox(
+        tr("%1 appears to be missing.\nRemove it from the database?")
+        .arg(filename), popupStack, "chooseSystemPopup");
 
-
-    DialogCode result = MythPopupBox::ShowButtonPopup(
-        GetMythMainWindow(), 
-        QObject::tr("File Missing"),
-        QString(QObject::tr("%1 appears to be missing.\nRemove it"
-                            " from the database?")).arg(filename),
-        buttonText, kDialogCodeButton0);
-
-    switch (result)
+    if (removalPopup->Create())
     {
-        case kDialogCodeButton0:
-        case kDialogCodeRejected:
-        default:
-            break;
-        case kDialogCodeButton1:
-            m_KeepAll = true;
-            break;
-        case kDialogCodeButton2:
-            purgeGameDB(filename , RomPath);
-            break;
-        case kDialogCodeButton3:
-            m_RemoveAll = true;
-            purgeGameDB(filename , RomPath);
-            break;
-    };
+        removalPopup->SetReturnEvent(this, "removalPopup");
 
+        removalPopup->AddButton(tr("No"));
+        removalPopup->AddButton(tr("No to all"));
+        removalPopup->AddButton(tr("Yes"), qVariantFromValue(scan));
+        removalPopup->AddButton(tr("Yes to all"), qVariantFromValue(scan));
+        popupStack->AddScreen(removalPopup);
+}
+    else
+        delete removalPopup;
 }
 
 void updateDisplayRom(QString romname, int display, QString Systemname)
@@ -488,7 +482,7 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
         else if ((iter.value().FoundLoc() == inDatabase) && (removalprompt))
         {
 
-            promptForRemoval( iter.value().Rom() , iter.value().RomPath() );
+            promptForRemoval( iter.value() );
         }
 
         progressDlg->setProgress(++counter);
@@ -939,3 +933,34 @@ void GameHandler::registerHandler(GameHandler *handler)
     handlers->append(handler);
 }
 
+void GameHandler::customEvent(QEvent *event)
+{
+    if (event->type() == DialogCompletionEvent::kEventType)
+    {
+        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+
+        QString resultid   = dce->GetId();
+        QString resulttext = dce->GetResultText();
+
+        if (resultid == "removalPopup")
+        {
+            int buttonNum = dce->GetResult();
+            GameScan scan = qVariantValue<GameScan>(dce->GetData());
+            switch (buttonNum)
+            {
+                case 1:
+                    m_KeepAll = true;
+                    break;
+                case 2:
+                    purgeGameDB(scan.Rom() , scan.RomFullPath());
+                    break;
+                case 3:
+                    m_RemoveAll = true;
+                    purgeGameDB(scan.Rom() , scan.RomFullPath());
+                    break;
+                default:
+                    break;
+            };
+        }
+    }
+}

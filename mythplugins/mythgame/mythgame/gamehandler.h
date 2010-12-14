@@ -4,15 +4,17 @@
 
 #include <QStringList>
 #include <QMap>
+#include <QObject>
+#include <QEvent>
 
 #include <mythdbcon.h>
 
 #include "rom_metadata.h"
 #include "rominfo.h"
 
+class MythUIProgressDialog;
 class MythMainWindow;
 class GameHandler;
-class QObject;
 
 enum GameFound
 {
@@ -46,13 +48,17 @@ class GameScan
     int     foundloc;
 };
 
+Q_DECLARE_METATYPE(GameScan)
+
 typedef QMap<QString, GameScan> GameScanMap;
 
 class MythProgressDialog;
-class GameHandler
+class GameHandler : public QObject
 {
+    Q_OBJECT
+
   public:
-    GameHandler() :
+    GameHandler() : QObject(),
         rebuild(false),             spandisks(0),
         systemname(QString::null),  rompath(QString::null),
         commandline(QString::null), workingpath(QString::null),
@@ -71,7 +77,7 @@ class GameHandler
                              QString* Plot, QString* Publisher, QString* Version,
                              QString* Fanart, QString* Boxart);
 
-    void promptForRemoval(QString filename, QString RomPath );
+    void promptForRemoval(GameScan scan);
     void UpdateGameDB(GameHandler *handler);
     void VerifyGameDB(GameHandler *handler);
 
@@ -105,6 +111,7 @@ class GameHandler
   protected:
     static GameHandler* GetHandler(RomInfo *rominfo);
     static GameHandler* GetHandlerByName(QString systemname);
+    void customEvent(QEvent *event);
 
     bool rebuild;
     int spandisks;
