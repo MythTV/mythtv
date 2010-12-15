@@ -239,20 +239,25 @@ bool AudioOutputALSA::IncPreallocBufferSize(int buffer_time)
     int cur  = pfile.readAll().trimmed().toInt();
     int max  = mfile.readAll().trimmed().toInt();
 
-    int size = (samplerate / 1000) *
-        (buffer_time / 1000) *
-        output_bytes_per_frame / 1024;
+    int size = (((samplerate / 1000) *
+                 (buffer_time / 1000) *
+                 output_bytes_per_frame / 1024) / 64 + 1) * 64;
 
     VBAUDIO(QString("Prealloc buffer cur: %1 max: %3").arg(cur).arg(max));
 
-    if (size > max)
+    if(size == cur)
+    {
+        pfile.close();
+        mfile.close();
+        ret = false;
+        return ret;
+    }
+    
+    if (size > max || !size)
     {
         size = max;
         ret = false;
     }
-
-    if (!size)
-        ret = false;
 
     pfile.close();
     mfile.close();
