@@ -40,7 +40,11 @@ typedef vector<text_subtitle_t> TextSubtitleList;
 class TextSubtitles
 {
   public:
-    TextSubtitles() : m_frameBasedTiming(false) {}
+    TextSubtitles() : m_frameBasedTiming(false)
+    {
+        m_lastReturnedSubtitle.start = 0;
+        m_lastReturnedSubtitle.end   = 0;
+    }
 
     virtual ~TextSubtitles() {}
 
