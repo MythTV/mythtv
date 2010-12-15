@@ -1880,7 +1880,7 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
     unsigned char *outputbuf = new unsigned char[bufflen];
 
     int frameNo = -1, thumbCount = 0;
-    int frameFinished;
+    int frameFinished = 0;
     int keyFrame;
 
     while (av_read_frame(inputFC, &pkt) >= 0)
@@ -1893,7 +1893,7 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
                 thumbCount++;
 
                 avcodec_flush_buffers(codecCtx);
-                avcodec_decode_video(codecCtx, frame, &frameFinished, pkt.data, pkt.size);
+                avcodec_decode_video2(codecCtx, frame, &frameFinished, &pkt);
                 keyFrame = frame->key_frame;
 
                 while (!frameFinished || !keyFrame)
@@ -1905,7 +1905,7 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
                     if (pkt.stream_index == videostream)
                     {
                         frameNo++;
-                        avcodec_decode_video(codecCtx, frame, &frameFinished, pkt.data, pkt.size);
+                        avcodec_decode_video2(codecCtx, frame, &frameFinished, &pkt);
                         keyFrame = frame->key_frame;
                     }
                 }
@@ -1964,9 +1964,9 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
                                 if (pkt.stream_index == videostream)
                                 {
                                     frameNo++;
-                                    avcodec_decode_video(codecCtx, frame,
+                                    avcodec_decode_video2(codecCtx, frame,
                                                          &frameFinished,
-                                                         pkt.data, pkt.size);
+                                                         &pkt);
                                 }
                             }
                         }
