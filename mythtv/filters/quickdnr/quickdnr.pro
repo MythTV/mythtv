@@ -3,4 +3,4 @@ include ( ../filter-avcodec.pro )
 
 # Input
 SOURCES += filter_quickdnr.c
-QMAKE_CXXFLAGS += -fno-strict-aliasing
+QMAKE_CFLAGS += -fno-strict-aliasing
