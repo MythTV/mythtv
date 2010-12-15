@@ -8523,7 +8523,7 @@ Do you wish to continue watching?</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="364"/>
         <source>7.1</source>
-        <translation>0% {7.1?}</translation>
+        <translation>7.1</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="380"/>
