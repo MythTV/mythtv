@@ -18,7 +18,7 @@ INCLUDEPATH += replex
 INCLUDEPATH += ../../../external/FFmpeg
 INCLUDEPATH += ../../../libs
 
-QMAKE_CFLAGS += -Wno-unused-result -Wno-unused-function
+QMAKE_CFLAGS += -Wno-unused-function
 
 LIBS += -L../../../external/FFmpeg/libavutil -L../../../external/FFmpeg/libavcodec -L../../../external/FFmpeg/libavcore -L../../../external/FFmpeg/libavformat
 LIBS += -lmythavformat -lmythavcodec -lmythavcore -lmythavutil

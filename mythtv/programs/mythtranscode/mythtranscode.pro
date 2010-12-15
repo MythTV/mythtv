@@ -9,7 +9,7 @@ target.path = $${PREFIX}/bin
 INSTALLS = target
 
 QMAKE_CLEAN += $(TARGET)
-QMAKE_CFLAGS += -Wno-unused-result -Wno-unused-function
+QMAKE_CFLAGS += -Wno-unused-function
 
 # Input
 SOURCES += main.cpp transcode.cpp mpeg2fix.cpp helper.c
