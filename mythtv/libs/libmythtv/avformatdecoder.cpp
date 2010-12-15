@@ -85,6 +85,10 @@ static int cc608_parity(uint8_t byte);
 static int cc608_good_parity(const int *parity_table, uint16_t data);
 static void cc608_build_parity_table(int *parity_table);
 
+static int dts_decode_header(uint8_t *indata_ptr, int *rate,
+                             int *nblks, int *sfreq);
+static int extract_core_dts(unsigned char *data, int len);
+
 static QSize get_video_dim(const AVCodecContext &ctx)
 {
     return QSize(ctx.width >> ctx.lowres, ctx.height >> ctx.lowres);
@@ -4029,9 +4033,20 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                     return false;
                 }
             }
-
-            m_spdifenc->WriteFrame(tmp_pkt.data, tmp_pkt.size);
+                // Extract core DTS unless we can process it
+            if (ctx->codec_id == CODEC_ID_DTS && !m_audio->CanHD())
+            {
+                tmp_pkt.size = extract_core_dts(tmp_pkt.data, tmp_pkt.size);
+                if (tmp_pkt.size < 0)
+                {
+                        // error extracting core dts
+                    avcodeclock->unlock();
+                    return false;
+                }
+            }
             data_size = tmp_pkt.size;
+            m_spdifenc->WriteFrame(tmp_pkt.data, data_size);
+
             ret = m_spdifenc->GetData((unsigned char *)audioSamples, data_size);
             if (ret < 0)
             {
@@ -4761,4 +4776,104 @@ bool AvFormatDecoder::SetupAudioStream(void)
     return true;
 }
 
+static int extract_core_dts(unsigned char *data, int len)
+{
+    int rate, sfreq, nblks;
+
+    int enc_len = dts_decode_header(data, &rate, &nblks, &sfreq);
+    if (enc_len < 0)
+        return enc_len;
+
+    int nr_samples = nblks * 32;
+    int block_len = nr_samples * 2 * 2;
+
+    if (enc_len == 0 || enc_len > len)
+    {
+        return len;
+    }
+
+    enc_len = (enc_len < block_len - 8) ? enc_len : block_len - 8;
+
+    return enc_len;
+}
+
+// defines from libavcodec/dca.h
+#define DCA_MARKER_RAW_BE 0x7FFE8001
+#define DCA_MARKER_RAW_LE 0xFE7F0180
+#define DCA_MARKER_14B_BE 0x1FFFE800
+#define DCA_MARKER_14B_LE 0xFF1F00E8
+#define DCA_HD_MARKER 0x64582025
+
+static int dts_decode_header(uint8_t *indata_ptr, int *rate,
+                             int *nblks, int *sfreq)
+{
+    uint id = ((indata_ptr[0] << 24) | (indata_ptr[1] << 16) |
+               (indata_ptr[2] << 8) | (indata_ptr[3]));
+
+    switch (id)
+    {
+        case DCA_MARKER_RAW_BE:
+            break;
+        case DCA_MARKER_RAW_LE:
+        case DCA_MARKER_14B_BE:
+        case DCA_MARKER_14B_LE:
+        case DCA_HD_MARKER:
+            VERBOSE(VB_AUDIO+VB_EXTRA, LOC +
+                    QString("DTS: Unsupported frame (id 0x%1)").arg(id, 8, 16));
+            return -1;
+            break;
+        default:
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("DTS: Unknown frame (id 0x%1)").arg(id, 8, 16));
+            return -1;
+    }
+
+    int ftype = indata_ptr[4] >> 7;
+
+    int surp = (indata_ptr[4] >> 2) & 0x1f;
+    surp = (surp + 1) % 32;
+
+    *nblks = (indata_ptr[4] & 0x01) << 6 | (indata_ptr[5] >> 2);
+    ++*nblks;
+
+    int fsize = (indata_ptr[5] & 0x03) << 12 |
+                (indata_ptr[6] << 4) | (indata_ptr[7] >> 4);
+    ++fsize;
+
+    *sfreq = (indata_ptr[8] >> 2) & 0x0f;
+    *rate = (indata_ptr[8] & 0x03) << 3 | ((indata_ptr[9] >> 5) & 0x07);
+
+    if (ftype != 1)
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+                QString("DTS: Termination frames not handled (ftype %1)")
+                .arg(ftype));
+        return -1;
+    }
+
+    if (*sfreq != 13)
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+                QString("DTS: Only 48kHz supported (sfreq %1)").arg(*sfreq));
+        return -1;
+    }
+
+    if ((fsize > 8192) || (fsize < 96))
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+                QString("DTS: fsize: %1 invalid").arg(fsize));
+        return -1;
+    }
+
+    if (*nblks != 8 && *nblks != 16 && *nblks != 32 &&
+        *nblks != 64 && *nblks != 128 && ftype == 1)
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+                QString("DTS: nblks %1 not valid for normal frame")
+                .arg(*nblks));
+        return -1;
+    }
+
+    return fsize;
+}
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
