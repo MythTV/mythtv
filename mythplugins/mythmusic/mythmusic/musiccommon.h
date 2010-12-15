@@ -79,7 +79,7 @@ class MPUBLIC MusicCommon : public MythScreenType
     void toggleMute(void);
     void toggleUpmix(void);
     void showVolume(void);
-    void updateVolume(uint volume, bool muted);
+    void updateVolume(void);
     void showSpeed(bool show);
 
     void startVisualizer(void);
@@ -160,7 +160,6 @@ class MPUBLIC MythMusicVolumeDialog : public MythScreenType
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *event);
-    void customEvent(QEvent *event);
 
   protected:
     void increaseVolume(void);

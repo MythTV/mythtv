@@ -36,7 +36,7 @@
 
 using namespace std;
 
-int write_buffer(char *buf, int bufsize, FILE *fp)
+static int write_buffer(char *buf, int bufsize, FILE *fp)
 {
     return fwrite(buf, 1, bufsize, fp);
 }
