@@ -10,9 +10,10 @@ MythArchive GUI theme
     <window name="profilepopup">
         <area>-1,-1,413,426</area>
 
-        <imagetype name="box">
-            <filename>mz_function_popup.png</filename>
-        </imagetype>
+        <shape name="background" from="basebackground">
+            <area>0,0,413,426</area>
+            <fill color="#000000" alpha="220" />
+        </shape>
 
         <textarea name="title" from="basetextarea">
             <area>20,20,360,40</area>
