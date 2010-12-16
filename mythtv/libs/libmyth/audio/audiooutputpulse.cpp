@@ -226,10 +226,6 @@ void AudioOutputPulseAudio::WriteAudio(uchar *aubuf, int size)
     QString fn_log_tag = "WriteAudio, ";
     pa_stream_state_t sstate = pa_stream_get_state(pstream);
 
-    // Do not write anything to pulse server if we are in pause mode
-    if (IsPaused())
-        return;
-
     VBAUDIOTS(fn_log_tag + QString("writing %1 bytes").arg(size));
 
     /* NB This "if" check can be replaced with PA_STREAM_IS_GOOD() in
@@ -299,7 +295,8 @@ void AudioOutputPulseAudio::WriteAudio(uchar *aubuf, int size)
 
 int AudioOutputPulseAudio::GetBufferedOnSoundcard(void) const
 {
-    pa_usec_t latency;
+    pa_usec_t latency = (pa_usec_t) -1;
+    size_t buffered = 0;
 
     if (!pcontext || pa_context_get_state(pcontext) != PA_CONTEXT_READY)
         return 0;
@@ -307,13 +304,31 @@ int AudioOutputPulseAudio::GetBufferedOnSoundcard(void) const
     if (!pstream || pa_stream_get_state(pstream) != PA_STREAM_READY)
         return 0;
 
+    const pa_buffer_attr *buf_attr =  pa_stream_get_buffer_attr(pstream);
+    size_t bfree = pa_stream_writable_size(pstream);
+    buffered = buf_attr->tlength - bfree;
+
     pa_threaded_mainloop_lock(mainloop);
 
-    if(pa_stream_get_latency(pstream, &latency, NULL) < 0)
-        latency = 0;
+    while (pa_stream_get_latency(pstream, &latency, NULL) < 0)
+    {
+        if (pa_context_errno(pcontext) != PA_ERR_NODATA)
+        {
+            latency = 0;
+            break;
+        }
+        pa_threaded_mainloop_wait(mainloop);
+    }
 
     pa_threaded_mainloop_unlock(mainloop);
-    return (int)latency * samplerate * output_bytes_per_frame / 1000000;
+
+    if (latency < 0)
+    {
+        latency = 0;
+    }
+
+    return ((uint64_t)latency * samplerate *
+            output_bytes_per_frame / 1000000) + buffered;
 }
 
 int AudioOutputPulseAudio::GetVolumeChannel(int channel) const
