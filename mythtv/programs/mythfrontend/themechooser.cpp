@@ -75,7 +75,7 @@ ThemeChooser::ThemeChooser(MythScreenStack *parent,
     m_fullPreviewStateType(NULL),
     m_fullScreenName(NULL),
     m_fullScreenPreview(NULL),
-    m_includeDownloadableThemes(false),
+    m_refreshDownloadableThemes(false),
     m_downloadTheme(NULL),
     m_downloadState(dsIdle),
     m_popupMenu(NULL)
@@ -122,7 +122,7 @@ bool ThemeChooser::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'themechooser'");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Cannot load screen 'themechooser'");
         return false;
     }
 
@@ -140,6 +140,8 @@ bool ThemeChooser::Create(void)
 
 void ThemeChooser::Load(void)
 {
+    SetBusyPopupMessage(tr("Loading Installed Themes"));
+
     QString MythVersion = myth_source_path;
     QStringList themesSeen;
     QDir themes(GetConfDir() + "/themes");
@@ -184,93 +186,130 @@ void ThemeChooser::Load(void)
         }
     }
 
-    if (m_includeDownloadableThemes)
+    QString remoteThemesFile = GetConfDir();
+    remoteThemesFile.append("/tmp/themes.zip");
+    QString themeSite = QString("%1/%2")
+        .arg(gCoreContext->GetSetting("ThemeRepositoryURL",
+             "http://themes.mythtv.org/themes/repository")).arg(MythVersion);
+
+    int downloadFailures =
+        gCoreContext->GetNumSetting("ThemeInfoDownloadFailures", 0);
+    if ((!QFile::exists(remoteThemesFile)) &&
+        (downloadFailures < 2))
     {
-        QString site = QString("http://themes.mythtv.org/themes/repository/%1")
-                               .arg(MythVersion);
-        QString url = site;
+        VERBOSE(VB_GUI, LOC + QString("%1 does not exist, forcing remote theme "
+                "list download").arg(remoteThemesFile));
+        m_refreshDownloadableThemes = true;
+    }
+
+    if (m_refreshDownloadableThemes)
+    {
+        SetBusyPopupMessage(tr("Refreshing Downloadable Themes Information"));
+
+        QString url = themeSite;
         url.append("/themes.zip");
         QString destdir = GetMythUI()->GetThemeCacheDir();
         destdir.append("/themechooser");
+        QString versiondir = QString("%1/%2").arg(destdir).arg(MythVersion);
+        removeThemeDir(versiondir);
         QDir dir;
         dir.mkpath(destdir);
-        QString localFile = GetConfDir();
-        localFile.append("/tmp/themes.zip");
-        bool result = GetMythDownloadManager()->download(url, localFile);
+        bool result = GetMythDownloadManager()->download(url, remoteThemesFile);
 
-        if (result && extractZIP(localFile, destdir))
+        SetBusyPopupMessage(tr("Extracting Downloadable Themes Information"));
+
+        if (!result || !extractZIP(remoteThemesFile, destdir))
         {
-            QString themesPath = destdir;
-            themesPath.append("/").append(MythVersion);
-            themes.setPath(themesPath);
+            QFile::remove(remoteThemesFile);
 
-            QFileInfoList downloadableThemes = themes.entryInfoList();
-            for( QFileInfoList::iterator it =  downloadableThemes.begin();
-                                         it != downloadableThemes.end();
-                                       ++it )
+            downloadFailures++;
+            gCoreContext->SaveSetting("ThemeInfoDownloadFailures",
+                                      downloadFailures);
+        }
+    }
+
+    QDir remoteThemesDir(GetMythUI()->GetThemeCacheDir()
+                             .append("/themechooser/").append(MythVersion));
+
+    if ((QFile::exists(remoteThemesFile)) &&
+        (remoteThemesDir.exists()))
+    {
+        SetBusyPopupMessage(tr("Loading Downloadable Themes"));
+
+        VERBOSE(VB_GUI, LOC + QString("%1 and %2 exist, using cached remote "
+                                      "themes list").arg(remoteThemesFile)
+                                      .arg(remoteThemesDir.absolutePath()));
+
+        QString themesPath = remoteThemesDir.absolutePath();
+        themes.setPath(themesPath);
+
+        QFileInfoList downloadableThemes = themes.entryInfoList();
+        for( QFileInfoList::iterator it =  downloadableThemes.begin();
+                                     it != downloadableThemes.end();
+                                   ++it )
+        {
+            QString dirName = (*it).fileName();
+            QString themeName = dirName;
+            QString remoteDir = themeSite;
+            remoteDir.append("/").append(dirName);
+            QString localDir = themes.absolutePath();
+            localDir.append("/").append(dirName);
+
+            if (themesSeen.contains(dirName))
             {
-                QString dirName = (*it).fileName();
-                QString themeName = dirName;
-                QString remoteDir = site;
-                remoteDir.append("/").append(dirName);
-                QString localDir = themes.absolutePath();
-                localDir.append("/").append(dirName);
+                ThemeInfo remoteTheme((*it).absoluteFilePath());
+                ThemeInfo *localTheme = m_themeNameInfos[dirName];
 
-                if (themesSeen.contains(dirName))
+                themeName = remoteTheme.GetName();
+
+                int rmtMaj = remoteTheme.GetMajorVersion();
+                int rmtMin = remoteTheme.GetMinorVersion();
+                int locMaj = localTheme->GetMajorVersion();
+                int locMin = localTheme->GetMinorVersion();
+
+                if ((rmtMaj > locMaj) ||
+                    ((rmtMaj == locMaj) &&
+                     (rmtMin > locMin)))
                 {
-                    ThemeInfo remoteTheme((*it).absoluteFilePath());
-                    ThemeInfo *localTheme = m_themeNameInfos[dirName];
-
-                    themeName = remoteTheme.GetName();
-
-                    int rmtMaj = remoteTheme.GetMajorVersion();
-                    int rmtMin = remoteTheme.GetMinorVersion();
-                    int locMaj = localTheme->GetMajorVersion();
-                    int locMin = localTheme->GetMinorVersion();
-
-                    if ((rmtMaj > locMaj) ||
-                        ((rmtMaj == locMaj) &&
-                         (rmtMin > locMin)))
+                    if (loadThemeInfo(*it))
                     {
-                        if (loadThemeInfo(*it))
-                        {
-                            m_infoList << *it;
-                            m_themeStatuses[themeName] = "updateavailable";
-
-                            QFileInfo finfo(remoteTheme.GetPreviewPath());
-                            GetMythDownloadManager()->queueDownload(
-                                remoteDir.append("/").append(finfo.fileName()),
-                                localDir.append("/").append(finfo.fileName()),
-                                NULL);
-                        }
-                    }
-                    else if ((rmtMaj == locMaj) &&
-                             (rmtMin == locMin))
-                    {
-                        m_themeStatuses[themeName] = "uptodate";
-                    }
-                }
-                else
-                {
-                    ThemeInfo *remoteTheme = loadThemeInfo(*it);
-                    if (remoteTheme)
-                    {
-                        themeName = remoteTheme->GetName();
-                        themesSeen << dirName;
                         m_infoList << *it;
                         m_themeStatuses[themeName] = "updateavailable";
 
-                        QFileInfo finfo(remoteTheme->GetPreviewPath());
+                        QFileInfo finfo(remoteTheme.GetPreviewPath());
                         GetMythDownloadManager()->queueDownload(
                             remoteDir.append("/").append(finfo.fileName()),
                             localDir.append("/").append(finfo.fileName()),
                             NULL);
                     }
                 }
+                else if ((rmtMaj == locMaj) &&
+                         (rmtMin == locMin))
+                {
+                    m_themeStatuses[themeName] = "uptodate";
+                }
+            }
+            else
+            {
+                ThemeInfo *remoteTheme = loadThemeInfo(*it);
+                if (remoteTheme)
+                {
+                    themeName = remoteTheme->GetName();
+                    themesSeen << dirName;
+                    m_infoList << *it;
+                    m_themeStatuses[themeName] = "updateavailable";
+
+                    QFileInfo finfo(remoteTheme->GetPreviewPath());
+                    GetMythDownloadManager()->queueDownload(
+                        remoteDir.append("/").append(finfo.fileName()),
+                        localDir.append("/").append(finfo.fileName()),
+                        NULL);
+                }
             }
         }
-        QFile::remove(localFile);
     }
+
+    ResetBusyPopup();
 
     qSort(m_infoList.begin(), m_infoList.end(), sortThemeNames);
 }
@@ -402,22 +441,19 @@ void ThemeChooser::showPopupMenu(void)
                                    SLOT(toggleFullscreenPreview()));
     }
 
-    if (m_includeDownloadableThemes)
-        m_popupMenu->AddButton(tr("Hide Downloadable Themes"),
-                               SLOT(toggleDownloadableThemes()));
-    else
-        m_popupMenu->AddButton(tr("Show Downloadable Themes"),
-                               SLOT(toggleDownloadableThemes()));
+    m_popupMenu->AddButton(tr("Refresh Downloadable Themes"),
+                           SLOT(refreshDownloadableThemes()));
 
     MythUIButtonListItem *current = m_themes->GetItemCurrent();
     if (current)
     {
-        m_popupMenu->AddButton(tr("Select Theme"),
-                               SLOT(saveAndReload()));
-
         ThemeInfo *info = qVariantValue<ThemeInfo *>(current->GetData());
+
         if (info)
         {
+            m_popupMenu->AddButton(tr("Select Theme"),
+                                   SLOT(saveAndReload()));
+
             QString themeDir = GetConfDir() + "/themes/";
 
             if (info->GetPreviewPath().startsWith(themeDir))
@@ -505,9 +541,11 @@ void ThemeChooser::toggleFullscreenPreview(void)
     }
 }
 
-void ThemeChooser::toggleDownloadableThemes(void)
+void ThemeChooser::refreshDownloadableThemes(void)
 {
-    m_includeDownloadableThemes = !m_includeDownloadableThemes;
+    VERBOSE(VB_GUI, LOC + "Forcing remote theme list refresh");
+    m_refreshDownloadableThemes = true;
+    gCoreContext->SaveSetting("ThemeInfoDownloadFailures", 0);
     ReloadInBackground();
 }
 
@@ -521,6 +559,9 @@ void ThemeChooser::saveAndReload(void)
 void ThemeChooser::saveAndReload(MythUIButtonListItem *item)
 {
     ThemeInfo *info = qVariantValue<ThemeInfo *>(item->GetData());
+
+    if (!info)
+        return;
 
     if (!info->GetDownloadURL().isEmpty())
     {
@@ -749,7 +790,8 @@ void ThemeChooser::removeThemeDir(const QString &dirname)
 {
     QString themeDir = GetConfDir() + "/themes/";
 
-    if (!dirname.startsWith(themeDir))
+    if ((!dirname.startsWith(themeDir)) &&
+        (!dirname.startsWith(GetMythUI()->GetThemeCacheDir())))
         return;
 
     QDir dir(dirname);
