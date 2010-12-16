@@ -13,6 +13,7 @@ MythUIBusyDialog::MythUIBusyDialog(const QString &message,
         m_message = message;
     else
         m_message = tr("Please Wait...");
+    m_origMessage = m_message;
     m_messageText = NULL;
 }
 
@@ -27,6 +28,32 @@ bool MythUIBusyDialog::Create(void)
         m_messageText->SetText(m_message);
 
     return true;
+}
+
+void MythUIBusyDialog::SetMessage(const QString &message)
+{
+    m_newMessageLock.lock();
+    m_newMessage = message;
+    m_haveNewMessage = true;
+    m_newMessageLock.unlock();
+}
+
+void MythUIBusyDialog::Reset(void)
+{
+    SetMessage(m_origMessage);
+}
+
+void MythUIBusyDialog::Pulse(void)
+{
+    if (m_haveNewMessage && m_messageText)
+    {
+        m_newMessageLock.lock();
+        m_message = m_newMessage;
+        m_messageText->SetText(m_message);
+        m_newMessageLock.unlock();
+    }
+
+    MythUIType::Pulse();
 }
 
 bool MythUIBusyDialog::keyPressEvent(QKeyEvent *event)

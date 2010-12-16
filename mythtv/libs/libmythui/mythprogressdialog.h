@@ -36,9 +36,17 @@ class MPUBLIC MythUIBusyDialog : public MythScreenType
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *event);
+    void SetMessage(const QString &message);
+    void Reset(void);
+
+    virtual void Pulse(void);
 
   protected:
+    QString m_origMessage;
     QString m_message;
+    bool    m_haveNewMessage;
+    QString m_newMessage;
+    QMutex  m_newMessageLock;
 
     MythUIText *m_messageText;
 };

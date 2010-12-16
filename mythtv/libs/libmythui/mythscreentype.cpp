@@ -317,6 +317,18 @@ void MythScreenType::CloseBusyPopup(void)
     m_BusyPopup = NULL;
 }
 
+void MythScreenType::SetBusyPopupMessage(const QString &message)
+{
+    if (m_BusyPopup)
+        m_BusyPopup->SetMessage(message);
+}
+
+void MythScreenType::ResetBusyPopup(void)
+{
+    if (m_BusyPopup)
+        m_BusyPopup->Reset();
+}
+
 bool MythScreenType::IsInitialized(void) const
 {
     return m_IsInitialized;
