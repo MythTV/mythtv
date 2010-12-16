@@ -44,7 +44,7 @@
 
 #ifndef USING_MINGW
 typedef struct {
-    QMutex  mutex;
+    QSemaphore ready;
     uint    result;
     time_t  timeout;
     bool    background;
@@ -107,7 +107,7 @@ void MythSystemReaper::run(void)
             kill(pid, SIGTERM);
             usleep(500);
             kill(pid, SIGKILL);
-            pidData->mutex.unlock();
+            pidData->ready.release(1);
         }
         count = m_pidMap.size();
         m_mapLock.unlock();
@@ -167,8 +167,8 @@ void MythSystemReaper::run(void)
 
         if( pidData->background )
             delete pidData;
-        else
-            pidData->mutex.unlock();
+        else 
+            pidData->ready.release(1);
     }
 }
 
@@ -178,6 +178,8 @@ uint MythSystemReaper::waitPid( pid_t pid, time_t timeout, bool background,
     PidData_t  *pidData = new PidData_t;
     uint        result;
 
+    pidData->ready.release(1);  // Initialize 
+
     if( timeout > 0 )
         pidData->timeout = time(NULL) + timeout;
     else
@@ -185,14 +187,14 @@ uint MythSystemReaper::waitPid( pid_t pid, time_t timeout, bool background,
 
     pidData->background = background;
 
-    pidData->mutex.lock();
+    pidData->ready.acquire(1);
     m_mapLock.lock();
     m_pidMap.insert( pid, pidData );
     m_mapLock.unlock();
 
     if( !background ) {
         /* Now we wait for the thread to see the SIGCHLD */
-        while( !pidData->mutex.tryLock(100) )
+        while( !pidData->ready.tryAcquire(1,100) )
             if (processEvents)
                 qApp->processEvents();
 
