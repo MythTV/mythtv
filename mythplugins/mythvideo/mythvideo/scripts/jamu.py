@@ -306,6 +306,7 @@ __version__=u"v0.7.7"
  # 0.7.5 Added the TMDB MovieRating as videometadata table "rating" field
  # 0.7.6 Modifications to support MythTV python bindings changes
  # 0.7.7 Pull hostname from python bindings instead of socket libraries
+ # Added support of unicode characters within a jamu.conf file
 
 
 usage_txt=u'''
@@ -1246,7 +1247,7 @@ class Configuration(object):
             )
             sys.exit(1)
         cfg = ConfigParser.SafeConfigParser()
-        cfg.read(useroptions)
+        cfg.readfp(codecs.open(useroptions, "r", "utf8"))
         for section in cfg.sections():
             if section[:5] == 'File ':
                 self.config['config_file'] = section[5:]
