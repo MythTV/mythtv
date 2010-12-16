@@ -562,22 +562,43 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
 
 int AudioOutputALSA::GetBufferedOnSoundcard(void) const
 {
+
     if (pcm_handle == NULL)
     {
         VBERROR("getBufferedOnSoundcard() called with pcm_handle == NULL!");
         return 0;
     }
 
-    snd_pcm_sframes_t delay = 0;
+    snd_pcm_sframes_t delay = 0, buffered = 0;
+
+    if (snd_pcm_avail_delay(pcm_handle, &buffered, &delay) < 0)
+    {
+        return 0;
+    }
 
     snd_pcm_state_t state = snd_pcm_state(pcm_handle);
+
     if (state == SND_PCM_STATE_RUNNING || state == SND_PCM_STATE_DRAINING)
-        snd_pcm_delay(pcm_handle, &delay);
+    {
+        delay *= output_bytes_per_frame;
+    }
+    else
+    {
+        delay = 00;
+    }
 
-    if (delay <= 0)
-        return 0;
+    if (buffered < 0)
+    {
+        buffered = 0;
+    }
 
-    return delay * output_bytes_per_frame;
+    buffered *= output_bytes_per_frame;
+    if (buffered > soundcard_buffer_size)
+    {
+        buffered = soundcard_buffer_size;
+    }
+
+    return delay + buffered;
 }
 
 /*
