@@ -460,14 +460,29 @@ static void startManualSchedule(void)
         delete mansched;
 }
 
+static bool isLiveTVAvailable(void)
+{
+    if (RemoteGetFreeRecorderCount() > 0)
+        return true;
+
+    QString msg = QObject::tr("All tuners are currently busy.");
+    if (TV::ConfiguredTunerCards() < 1)
+        msg = QObject::tr("There are no configured tuners.");
+
+    ShowOkPopup(msg);
+    return false;
+}
+
 static void startTVInGuide(void)
 {
-    TV::StartTV(NULL, kStartTVInGuide);
+    if (isLiveTVAvailable())
+        TV::StartTV(NULL, kStartTVInGuide);
 }
 
 static void startTVNormal(void)
 {
-    TV::StartTV(NULL, kStartTVNoFlags);
+    if (isLiveTVAvailable())
+        TV::StartTV(NULL, kStartTVNoFlags);
 }
 
 static void showStatus(void)

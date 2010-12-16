@@ -155,7 +155,7 @@ EMBEDRETURNVOIDFINDER TV::RunProgramFinderPtr = NULL;
 /**
  * \brief If any cards are configured, return the number.
  */
-static int ConfiguredTunerCards(void)
+int TV::ConfiguredTunerCards(void)
 {
     int count = 0;
 
@@ -280,79 +280,13 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
 
             VERBOSE(VB_PLAYBACK, LOC + "tv->LiveTV() -- end");
         }
-        else if (!ConfiguredTunerCards())
-        {
-            // (cannot watch Live TV without a card :-)
-            PlayerContext *mctx = tv->GetPlayerReadLock(0, __FILE__, __LINE__);
-            tv->ShowNoRecorderDialog(mctx, kNoTuners);
-            tv->ReturnPlayerLock(mctx);
-            quitAll = true;
-            continue;
-        }
         else
         {
-            vector<ProgramInfo *> *reclist;
-            reclist = RemoteGetCurrentlyRecordingList();
-            if (reclist->empty())
-            {
-                VERBOSE(VB_PLAYBACK, LOC_ERR +
-                        "Failed to get recording show list");
-                PlayerContext *mctx = tv->GetPlayerReadLock(0, __FILE__, __LINE__);
-                tv->ShowNoRecorderDialog(mctx, kNoCurrRec);
-                tv->ReturnPlayerLock(mctx);
-                quitAll = true;
-                delete reclist;
-                continue;
-            }
-
-            ProgramInfo *p = NULL;
-            QStringList recTitles;
-            QString buttonTitle;
-            vector<ProgramInfo *>::iterator it = reclist->begin();
-            recTitles.append(tr("Exit"));
-            while (it != reclist->end())
-            {
-                p = *it;
-
-                if (p->GetRecordingStatus() == rsRecorded &&
-                    p->GetRecordingGroup()  == "LiveTV")
-                {
-                    buttonTitle = tr("Live TV, chan %1: %2")
-                        .arg(p->GetChanNum()).arg(p->GetTitle());
-                }
-                else
-                {
-                    buttonTitle = tr("Chan %1: %2")
-                        .arg(p->GetChanNum()).arg(p->GetTitle());
-                }
-
-                recTitles.append(buttonTitle);
-                it++;
-            }
-            DialogCode ret = MythPopupBox::ShowButtonPopup(
-                GetMythMainWindow(), "",
-                tr("All Tuners are Busy.\nSelect a Current Recording"),
-                recTitles, kDialogCodeButton1);
-
-            int idx = MythDialog::CalcItemIndex(ret) - 1;
-            if ((0 <= idx) && (idx < (int)reclist->size()))
-            {
-                p = reclist->at(idx);
-                if (curProgram)
-                    delete curProgram;
-                curProgram = new ProgramInfo(*p);
-            }
+            if (!ConfiguredTunerCards())
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "No tuners configured");
             else
-            {
-                quitAll = true;
-            }
-
-            while (!reclist->empty())
-            {
-                delete reclist->back();
-                reclist->pop_back();
-            }
-            delete reclist;
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "No tuners free for live tv");
+            quitAll = true;
             continue;
         }
 
