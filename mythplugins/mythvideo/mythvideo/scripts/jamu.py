@@ -302,7 +302,7 @@ __version__=u"v0.7.3"
  # 0.7.2 Fixed a bug where an inetref field was not properly initialized and caused an abort. Ticket #8243
  # 0.7.3 Fixed a bug where a user selected TMDB# was not being used.
  #       Minor change to fuzzy matching of a file named parsed title with those from TMDB and TVDB.
-
+ # Added support for unicode characters in a jamu.conf file
 
 usage_txt=u'''
 JAMU - Just.Another.Metadata.Utility is a versatile utility for downloading graphics and meta data
@@ -1255,7 +1255,7 @@ class Configuration(object):
             )
             sys.exit(1)
         cfg = ConfigParser.SafeConfigParser()
-        cfg.read(useroptions)
+        cfg.readfp(codecs.open(useroptions, "r", "utf8"))
         for section in cfg.sections():
             if section[:5] == 'File ':
                 self.config['config_file'] = section[5:]
