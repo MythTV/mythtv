@@ -31,10 +31,6 @@
 #if CONFIG_CYGWIN || defined(_WIN32)
 #include "system-windows.h"
 #else
-#if 0
-#include <sys/select.h>
-#include <sys/wait.h>
-#endif
 #include "system-unix.h"
 #endif
 
@@ -54,6 +50,7 @@ void MythSystem::initializePrivate(void)
 
 MythSystem::MythSystem(const QString &command, uint flags)
 {
+    m_semReady.release(1);  // initialize
     initializePrivate();
     SetCommand(command, flags);
 }
@@ -70,6 +67,7 @@ void MythSystem::SetCommand(const QString &command, uint flags)
 MythSystem::MythSystem(const QString &command, 
                        const QStringList &args, uint flags)
 {
+    m_semReady.release(1);  // initialize
     initializePrivate();
     SetCommand(command, args, flags);
 }
@@ -112,6 +110,7 @@ MythSystem::MythSystem(const MythSystem &other) :
 
     m_settings(other.m_settings)
 {
+    m_semReady.release(other.m_semReady.available());
 }
 
 // QBuffers may also need freeing
@@ -146,7 +145,7 @@ void MythSystem::Run(time_t timeout)
 
     d->Fork(timeout);
 
-    m_pmutex.lock();
+    m_semReady.acquire(1);
     emit started();
     d->Manage();
 }
@@ -169,9 +168,9 @@ uint MythSystem::Wait(time_t timeout)
         while( !timeout || time(NULL) < timeout )
         {
             // loop until timeout hits or process ends
-            if( m_pmutex.tryLock(100) )
+            if( m_semReady.tryAcquire(1,100) )
             {
-                m_pmutex.unlock();
+                m_semReady.release(1);
                 break;
             }
 
@@ -182,13 +181,13 @@ uint MythSystem::Wait(time_t timeout)
     {
         if( timeout > 0 )
         {
-            if( m_pmutex.tryLock(timeout*1000) )
-                m_pmutex.unlock();
+            if( m_semReady.tryAcquire(1, timeout*1000) )
+                m_semReady.release(1);
         }
         else
         {
-            m_pmutex.lock();
-            m_pmutex.unlock();
+            m_semReady.acquire(1);
+            m_semReady.release(1);
         }
     }
     return GetStatus();

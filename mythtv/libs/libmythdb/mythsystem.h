@@ -28,7 +28,7 @@ typedef enum MythSystemMask {
 #include <QString>
 #include <QStringList>
 #include <QBuffer>
-#include <QMutex>
+#include <QSemaphore>
 #include <QMap>
 #include <QThread>
 #include <QWaitCondition>
@@ -93,7 +93,7 @@ class MPUBLIC MythSystem : public QObject
 
         QBuffer *GetBuffer(int index) { return &m_stdbuff[index]; };
 
-        void Unlock() { m_pmutex.unlock(); };
+        void Unlock() { m_semReady.release(1); };
 
         friend class MythSystemPrivate;
 
@@ -111,7 +111,7 @@ class MPUBLIC MythSystem : public QObject
         void ProcessFlags(uint flags);
 
         uint        m_status;
-        QMutex      m_pmutex;
+        QSemaphore  m_semReady;
 
         QString     m_command;
         QString     m_logcmd;
