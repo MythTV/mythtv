@@ -613,10 +613,10 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
     m_infoLock->unlock();
     m_queueWaitCond.wakeAll();
 
-    // sleep for 200ms at a time for up to 20 seconds waiting for the download
+    // sleep for 200ms at a time for up to 10 seconds waiting for the download
     m_infoLock->lock();
     while ((!dlInfo->m_done) &&
-           (dlInfo->m_lastStat.secsTo(QDateTime::currentDateTime()) < 20))
+           (dlInfo->m_lastStat.secsTo(QDateTime::currentDateTime()) < 10))
     {
         m_infoLock->unlock();
         m_queueWaitLock.lock();
@@ -624,13 +624,20 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
         m_queueWaitLock.unlock();
         m_infoLock->lock();
     }
-    m_infoLock->unlock();
 
     bool success =
         dlInfo->m_done && (dlInfo->m_errorCode == QNetworkReply::NoError);
 
-    if (deleteInfo)
+    if (!dlInfo->m_done)
+    {
+        dlInfo->m_syncMode = false; // Let downloadFinished() cleanup for us
+        if (dlInfo->m_reply)
+            dlInfo->m_reply->abort();
+    }
+    else if (deleteInfo)
         delete dlInfo;
+
+    m_infoLock->unlock();
 
     return success;
 }

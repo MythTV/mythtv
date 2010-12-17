@@ -34,7 +34,7 @@ class AudioOutputALSA : public AudioOutputBase
     int TryOpenDevice(int open_mode, int try_ac3);
     int GetPCMInfo(int &card, int &device, int &subdevice);
     bool SetPreallocBufferSize(int size);
-    bool IncPreallocBufferSize(int buffer_time);
+    bool IncPreallocBufferSize(int requested, int buffer_time);
     inline int SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
                              uint channels, uint rate, uint buffer_time,
                              uint period_time);

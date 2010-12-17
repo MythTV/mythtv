@@ -24,8 +24,7 @@ static const GLuint kTextureOffset = 8 * sizeof(GLfloat);
 static const GLuint kVertexSize    = 16 * sizeof(GLfloat);
 
 static const QString kDefaultVertexShader =
-"GLSL_VERSION"
-"GLSL_EXTENSIONS"
+"GLSL_DEFINES"
 "attribute vec4 a_color;\n"
 "attribute vec2 a_texcoord0;\n"
 "varying   vec4 v_color;\n"
@@ -37,8 +36,7 @@ static const QString kDefaultVertexShader =
 "}\n";
 
 static const QString kDefaultFragmentShader =
-"GLSL_VERSION"
-"GLSL_EXTENSIONS"
+"GLSL_DEFINES"
 "uniform sampler2D s_texture0;\n"
 "varying vec4 v_color;\n"
 "varying vec2 v_texcoord0;\n"
@@ -48,8 +46,7 @@ static const QString kDefaultFragmentShader =
 "}\n";
 
 static const QString kSimpleVertexShader =
-"GLSL_VERSION"
-"GLSL_EXTENSIONS"
+"GLSL_DEFINES"
 "attribute vec4 a_color;\n"
 "varying   vec4 v_color;\n"
 "void main() {\n"
@@ -58,8 +55,7 @@ static const QString kSimpleVertexShader =
 "}\n";
 
 static const QString kSimpleFragmentShader =
-"GLSL_VERSION"
-"GLSL_EXTENSIONS"
+"GLSL_DEFINES"
 "varying vec4 v_color;\n"
 "void main(void)\n"
 "{\n"
@@ -1821,8 +1817,7 @@ void MythRenderOpenGL::OptimiseShaderSource(QString &source)
         source.replace("texture2D", "texture2DRect");
     }
 
-    source.replace("GLSL_VERSION", version);
-    source.replace("GLSL_EXTENSIONS", extensions);
+    source.replace("GLSL_DEFINES", version + extensions);
 
     VERBOSE(VB_EXTRA, "\n" + source);
 }

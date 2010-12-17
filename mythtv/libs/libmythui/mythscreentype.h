@@ -103,6 +103,8 @@ class MPUBLIC MythScreenType : public MythUIType
 
     void OpenBusyPopup(QString message = "");
     void CloseBusyPopup(void);
+    void SetBusyPopupMessage(const QString &message);
+    void ResetBusyPopup(void);
 
     bool m_FullScreen;
     bool m_IsDeleting;

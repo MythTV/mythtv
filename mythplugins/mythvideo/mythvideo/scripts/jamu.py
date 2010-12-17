@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.7.8"
+__version__=u"v0.7.9"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -307,6 +307,7 @@ __version__=u"v0.7.8"
  # 0.7.6 Modifications to support MythTV python bindings changes
  # 0.7.7 Pull hostname from python bindings instead of socket libraries
  # 0.7.8 Replace uses of MythVideo.getVideo()
+ # 0.7.9 Deal with jamu.conf entries that have unicode characters
 
 
 usage_txt=u'''
@@ -1247,7 +1248,7 @@ class Configuration(object):
             )
             sys.exit(1)
         cfg = ConfigParser.SafeConfigParser()
-        cfg.read(useroptions)
+        cfg.readfp(codecs.open(useroptions, "r", "utf8"))
         for section in cfg.sections():
             if section[:5] == 'File ':
                 self.config['config_file'] = section[5:]

@@ -43,7 +43,7 @@ class ThemeChooser : public MythScreenType
     void popupClosed(QString which, int result);
     void saveAndReload(void);
     void toggleFullscreenPreview(void);
-    void toggleDownloadableThemes(void);
+    void refreshDownloadableThemes(void);
     void removeTheme(void);
 
   signals:
@@ -72,7 +72,7 @@ class ThemeChooser : public MythScreenType
     MythUIImage      *m_fullScreenPreview;
 
     QFileInfoList     m_infoList;
-    bool              m_includeDownloadableThemes;
+    bool              m_refreshDownloadableThemes;
 
     QMap<QString, ThemeInfo*>  m_themeNameInfos;
     QMap<QString, ThemeInfo*>  m_themeFileNameInfos;

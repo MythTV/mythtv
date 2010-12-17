@@ -178,7 +178,7 @@ bool AudioOutputALSA::SetPreallocBufferSize(int size)
     int card, device, subdevice;
     bool ret = true;
 
-    VBAUDIO(QString("Setting preallocated buffer size to %1").arg(size));
+    VBERROR(QString("Setting hardware audio buffer size to %1").arg(size));
 
     if (GetPCMInfo(card, device, subdevice) < 0)
         return false;
@@ -193,9 +193,10 @@ bool AudioOutputALSA::SetPreallocBufferSize(int size)
 
     if (!pfile.open(QIODevice::ReadWrite))
     {
-        VBERROR(QString("Error opening %1: %2. "
-                        "Try to increase it with: echo %3 | sudo tee %1")
-                .arg(pfile.fileName()).arg(pfile.errorString()).arg(size));
+        VBERROR(QString("Error opening %1: %2. ")
+                .arg(pfile.fileName()).arg(pfile.errorString()));
+        VBERROR(QString("Try to manually increase audio buffer with: echo %1 "
+                        "| sudo tee %2").arg(size).arg(pfile.fileName()));
         return false;
     }
 
@@ -212,7 +213,7 @@ bool AudioOutputALSA::SetPreallocBufferSize(int size)
     return ret;
 }
 
-bool AudioOutputALSA::IncPreallocBufferSize(int buffer_time)
+bool AudioOutputALSA::IncPreallocBufferSize(int requested, int buffer_time)
 {
     int card, device, subdevice;
     bool ret = true;
@@ -242,21 +243,17 @@ bool AudioOutputALSA::IncPreallocBufferSize(int buffer_time)
     int cur  = pfile.readAll().trimmed().toInt();
     int max  = mfile.readAll().trimmed().toInt();
 
-    int size = (samplerate / 1000) *
-        (buffer_time / 1000) *
-        output_bytes_per_frame / 1024;
+    int size = ((int)(cur * (float)requested / (float)buffer_time)
+                / 64 + 1) * 64;
 
-    VBAUDIO(QString("Prealloc buffer cur: %1 need: %2 max: %3")
+    VBAUDIO(QString("Hardware audio buffer cur: %1 need: %2 max allowed: %3")
             .arg(cur).arg(size).arg(max));
 
-    if (size > max)
+    if (size > max || !size)
     {
         size = max;
         ret = false;
     }
-
-    if (!size)
-        ret = false;
 
     pfile.close();
     mfile.close();
@@ -424,8 +421,8 @@ bool AudioOutputALSA::OpenDevice()
     {
         // We need to increase preallocated buffer size in the driver
         // Set it and try again
-        if(!IncPreallocBufferSize(buffer_time))
-            VBERROR("Unable to sufficiently increase preallocated buffer size"
+        if(!IncPreallocBufferSize(buffer_time, err))
+            VBERROR("Unable to sufficiently increase ALSA hardware buffer size"
                     " - underruns are likely");
         return OpenDevice();
     }
@@ -565,24 +562,52 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
 
 int AudioOutputALSA::GetBufferedOnSoundcard(void) const
 {
+
     if (pcm_handle == NULL)
     {
         VBERROR("getBufferedOnSoundcard() called with pcm_handle == NULL!");
         return 0;
     }
 
-    snd_pcm_sframes_t delay = 0;
+    snd_pcm_sframes_t delay = 0, buffered = 0;
+
+    if (snd_pcm_avail_delay(pcm_handle, &buffered, &delay) < 0)
+    {
+        return 0;
+    }
 
     snd_pcm_state_t state = snd_pcm_state(pcm_handle);
+
     if (state == SND_PCM_STATE_RUNNING || state == SND_PCM_STATE_DRAINING)
-        snd_pcm_delay(pcm_handle, &delay);
+    {
+        delay *= output_bytes_per_frame;
+    }
+    else
+    {
+        delay = 00;
+    }
 
-    if (delay <= 0)
-        return 0;
+    if (buffered < 0)
+    {
+        buffered = 0;
+    }
 
-    return delay * output_bytes_per_frame;
+    buffered *= output_bytes_per_frame;
+    if (buffered > soundcard_buffer_size)
+    {
+        buffered = soundcard_buffer_size;
+    }
+
+    return delay + buffered;
 }
 
+/*
+ * Set the various ALSA audio parameters.
+ * Returns:
+ * < 0 : an error occurred
+ * 0   : Succeeded
+ * > 0 : Buffer timelength returned by ALSA which is less than what we asked for
+ */ 
 int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
                                    uint channels, uint rate, uint buffer_time,
                                    uint period_time)
@@ -601,7 +626,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
     if (handle == NULL)
     {
         Error("SetParameters() called with handle == NULL!");
-        return 0;
+        return -1;
     }
 
     snd_pcm_hw_params_alloca(&params);
@@ -657,7 +682,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
     // See if we need to increase the prealloc'd buffer size
     // If buffer_time is too small we could underrun
     // Make 10% leeway okay
-    if (buffer_time * 1.10f < (float)original_buffer_time && pbufsize < 0)
+    if ((buffer_time * 1.10f < (float)original_buffer_time) && pbufsize < 0)
     {
         VBAUDIO(QString("Requested %1us got %2 buffer time")
                 .arg(original_buffer_time).arg(buffer_time));
