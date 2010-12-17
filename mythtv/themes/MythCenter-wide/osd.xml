@@ -429,6 +429,22 @@
                 <fill color="#FFFFFF" alpha="255" />
                 <alphapulse min="180" max="255" change="4" />
             </shape>
+            <shape name="cuttoright">
+                <area>0,4,3,30</area>
+                <fill color="#FF0000" alpha="255" />
+            </shape>
+            <shape name="cuttoleft">
+                <area>0,4,3,30</area>
+                <fill color="#FF0000" alpha="255" />
+            </shape>
+            <shape name="keeptoright">
+                <area>0,4,3,30</area>
+                <fill color="#00FF00" alpha="255" />
+            </shape>
+            <shape name="keeptoleft">
+                <area>0,4,3,30</area>
+                <fill color="#00FF00" alpha="255" />
+            </shape>
         </editbar>
     </window>
 
