@@ -11559,9 +11559,12 @@ void TV::ShowOSDPromptDeleteRecording(PlayerContext *ctx, QString title,
         OSD *osd = GetOSDLock(ctx);
         if (osd && !osd->DialogVisible())
         {
-            QString message = QObject::tr("Cannot delete program") +
-                QString("%1 %2 ")
-                .arg(pginfo.GetTitle()).arg(pginfo.GetSubtitle());
+            QString message = QObject::tr("Cannot delete program ") +
+                QString("%1 ")
+                .arg(pginfo.GetTitle());
+
+            if (!pginfo.GetSubtitle().isEmpty())
+                message += QString("\"%1\" ").arg(pginfo.GetSubtitle());
 
             if (!pginfo.IsRecording())
             {
