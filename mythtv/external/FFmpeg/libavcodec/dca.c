@@ -459,6 +459,7 @@ static int dca_parse_frame_header(DCAContext * s)
     s->crc_present       = get_bits(&s->gb, 1);
     s->sample_blocks     = get_bits(&s->gb, 7) + 1;
     s->frame_size        = get_bits(&s->gb, 14) + 1;
+    av_log(0, AV_LOG_ERROR, "frame size %d\n", s->frame_size);
     if (s->frame_size < 95)
         return -1;
     s->amode             = get_bits(&s->gb, 6);

@@ -720,9 +720,12 @@ typedef struct AVFormatContext {
     int64_t file_size;
 
     /**
-     * Decoding: total stream bitrate in bit/s, 0 if not
-     * available. Never set it directly if the file_size and the
-     * duration are known as FFmpeg can compute it automatically.
+     * total stream bitrate in bit/s, 0 if not available.
+     * - muxing: Set by libavformat at least in those CBR cases where the user
+     *   normally needs this information and it isn't possible to infer from
+     *   the basic stream properties (e.g. when using DTS in IEC 61937 muxer)
+     * - demuxing: Never set it directly if the file_size and the duration are
+     *   known as FFmpeg can compute it automatically.
      */
     int bit_rate;
 
@@ -738,6 +741,10 @@ typedef struct AVFormatContext {
     int64_t data_offset; /**< offset of the first packet */
     int index_built;
 
+    /**
+     * Muxing: maximum stream bitrate in bit/s for muxers that support
+     * such a setting. Set by user.
+     */
     int mux_rate;
     unsigned int packet_size;
     int preload;
