@@ -223,7 +223,7 @@ bool AudioOutputBase::CanPassthrough(int samplerate, int channels) const
     ret &= samplerate >= 44100;
     // Will passthrough if surround audio was defined. Amplifier will
     // do the downmix if required
-    ret &= max_channels >= 6;
+    ret &= max_channels >= 6 && channels > 2;
     // Stereo content will always be decoded so it can later be upmixed
     // unless audio is configured for stereoo
     ret |= channels == 2 && max_channels == 2;
@@ -381,13 +381,79 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     ClearError();
 
+    int samplerate_tmp, channels_tmp;
+    if (settings.use_passthru)
+    {
+        samplerate_tmp = settings.samplerate;
+        channels_tmp = 2;
+        switch (settings.codec)
+        {
+            case CODEC_ID_AC3:
+                break;
+            case CODEC_ID_EAC3:
+                //E-AC3 is 2 channels, samplerate * 4
+                samplerate_tmp = settings.samplerate * 4;
+                break;
+            case CODEC_ID_DTS:
+                    // Can only do DTS core
+                if (output_settings->GetMaxBitrate() == 48000 * 16 * 2 ||
+                    settings.bitrate <= 48000 * 16 * 2)
+                {
+                    VBAUDIO("Setting DTS Core");
+                    break;
+                }
+                if (output_settings->canHDLL() &&
+                    settings.bitrate > 48000 * 16 * 2)
+                {
+                    VBAUDIO("Setting DTS-HD MA");
+                    //Assume DTS-HD MA. Use 8 channels, 192kHz, 16 bits 
+                    channels_tmp = 8;
+                    samplerate_tmp = 192000;
+                    break;
+                }
+                VBAUDIO("FoundSetting DTS-HD High-Res");
+                //Assume DTS-HD High-Res. Use 2 channels, 192kHz, 16 bits
+                samplerate_tmp = 192000;
+                break;
+            case CODEC_ID_TRUEHD:
+                channels_tmp = 8;
+                switch(settings.samplerate)
+                {
+                    case 48000:
+                    case 96000:
+                    case 192000:
+                        samplerate_tmp = 192000;
+                        break;
+                    case 44100:
+                    case 88200:
+                    case 176400:
+                        samplerate_tmp = 176400;
+                        break;
+                    default:
+                        VBAUDIO("TrueHD: Unsupported samplerate");
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
     // Check if anything has changed
-    bool general_deps = settings.format == format &&
-                        settings.samplerate  == source_samplerate &&
-                        settings.use_passthru == passthru &&
-                        lneeds_upmix == needs_upmix && lreenc == reenc &&
-                        lsource_channels == source_channels &&
-                        lneeds_downmix == needs_downmix;
+    bool general_deps =
+        settings.format == format &&
+        settings.samplerate  == source_samplerate &&
+        settings.use_passthru == passthru &&
+        lneeds_upmix == needs_upmix && lreenc == reenc &&
+        lsource_channels == source_channels &&
+        lneeds_downmix == needs_downmix;
+
+    //Check if DTS and passthrough settings have changed
+    general_deps &=
+        !(settings.use_passthru &&
+          settings.codec == CODEC_ID_DTS &&
+          (samplerate != samplerate_tmp ||
+           channels != channels_tmp));
 
     if (general_deps)
     {
@@ -529,35 +595,9 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     if (passthru)
     {
-        switch (settings.codec)
-        {
-            case CODEC_ID_EAC3:
-                samplerate *= 4;
-            case CODEC_ID_AC3:
-            case CODEC_ID_DTS:
-                channels = 2;
-                break;
-            case CODEC_ID_TRUEHD:
-                channels = 8;
-                switch(samplerate)
-                {
-                    case 48000:
-                    case 96000:
-                    case 192000:
-                        samplerate = 192000;
-                        break;
-                    case 44100:
-                    case 88200:
-                    case 176400:
-                        samplerate = 176400;
-                        break;
-                    default:
-                        VBAUDIO("TrueHD: Unsupported samplerate");
-                        break;
-                }
-                break;
-        }
-        //AC3, DTS, DTS-HD MA and TrueHD use 16 bits samples
+        //AC3, DTS, DTS-HD MA and TrueHD all use 16 bits samples
+        channels = channels_tmp;
+        samplerate = samplerate_tmp;
         format = output_format = FORMAT_S16;
         source_bytes_per_frame = channels *
             output_settings->SampleSize(format);

@@ -16,7 +16,6 @@
  *                         Use "adts" for ADTS encpsulation (AAC)
  *   AVCodecContext *ctx : CodecContext to be encaspulated
  */
-    
 SPDIFEncoder::SPDIFEncoder(QString muxer, AVCodecContext *ctx)
     : m_complete(false), m_oc(NULL), m_stream(NULL), m_size(0)
 {
@@ -126,7 +125,6 @@ SPDIFEncoder::~SPDIFEncoder(void)
  * unsigned char data: pointer to data to encode
  * int           size: size of data to encode
  */
-
 void SPDIFEncoder::WriteFrame(unsigned char *data, int size)
 {
     AVPacket packet;
@@ -168,9 +166,48 @@ void SPDIFEncoder::Reset()
 }
 
 /*
+ * Set the maximum mux rate
+ * If playing DTS-HD content, setting a mux rate of 1.536Mbit/s will
+ * cause the HD stream to be stripped out before encoding
+ * Input: rate = maximum max rate in bits per second
+ */
+bool SPDIFEncoder::SetMaxMuxRate(int rate)
+{
+    if (!m_oc)
+    {
+        return false;
+    }
+    m_oc->mux_rate = rate;
+    return true;
+}
+
+/*
+ * Retrieve passthrough bitrate
+ */
+int SPDIFEncoder::GetMaxMuxRate()
+{
+    if (!m_oc)
+    {
+        return 0;
+    }
+    return m_oc->mux_rate;
+}
+
+/*
+ * Retrieve passthrough bitrate
+ */
+int SPDIFEncoder::GetBitrate()
+{
+    if (!m_oc)
+    {
+        return -1;
+    }
+    return m_oc->bit_rate;
+}
+
+/*
  * funcIO: Internal callback function that will receive encoded frames
  */
-
 int SPDIFEncoder::funcIO(void *opaque, unsigned char *buf, int size)
 {
     SPDIFEncoder *enc = (SPDIFEncoder *)opaque;
@@ -183,7 +220,6 @@ int SPDIFEncoder::funcIO(void *opaque, unsigned char *buf, int size)
 /*
  * Destroy and free all allocated memory
  */
-
 void SPDIFEncoder::Destroy()
 {
     Reset();

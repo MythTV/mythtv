@@ -74,7 +74,7 @@ class MPUBLIC AudioOutputSettings
              */
         bool canHD()                    { return m_HD; };
             /**
-             * return true if device supports TrueHD or DTS-HD passthrough
+             * return true if device supports TrueHD or DTS-HD MA passthrough
              */
         bool canHDLL()                  { return m_HDLL; };
             /**
@@ -83,9 +83,6 @@ class MPUBLIC AudioOutputSettings
              * values are valid
              */
         bool IsInvalid()                { return m_invalid; };
-            /**
-             * return true if device supports TrueHD or DTS-HD passthrough
-             */
         void setAC3(bool b)             { m_AC3 = b; };
         void setDTS(bool b)             { m_DTS = b; };
         void setLPCM(bool b)            { m_LPCM = b; };
@@ -96,6 +93,7 @@ class MPUBLIC AudioOutputSettings
              * device
              */
         void SetBestSupportedChannels(int channels);
+        int  GetMaxBitrate();
 
     private:
         void SortSupportedChannels();

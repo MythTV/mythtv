@@ -24,7 +24,6 @@ extern "C" {
 
 class MPUBLIC SPDIFEncoder
 {
-
   public:
     SPDIFEncoder(QString muxer, AVCodecContext *ctx);
     ~SPDIFEncoder();
@@ -32,7 +31,10 @@ class MPUBLIC SPDIFEncoder
     int  GetData(unsigned char *buffer, int &dest_size);
     void Reset();
     bool Succeeded()  { return m_complete; };
-    
+    bool SetMaxMuxRate(int rate);
+    int  GetMaxMuxRate();
+    int  GetBitrate();
+
   private:
     static int funcIO(void *opaque, unsigned char *buf, int size);
     void Destroy();

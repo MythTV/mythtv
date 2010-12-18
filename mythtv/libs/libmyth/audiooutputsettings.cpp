@@ -274,9 +274,10 @@ AudioOutputSettings* AudioOutputSettings::GetCleaned(bool newcopy)
         // E-AC3 is transferred as sterep PCM at 4 times the rates
         // assume all amplifier supporting E-AC3 also supports 7.1 LPCM
         // as it's required under the bluray standard
+//#if LIBAVFORMAT_VERSION_INT > AV_VERSION_INT( 52, 83, 0 )
     aosettings->m_HD = (mchannels == 8 && BestSupportedRate() == 192000);
     aosettings->m_HDLL = (mchannels == 8 && BestSupportedRate() == 192000);
-
+//#endif
     if (mchannels == 2 && m_passthrough >= 0)
     {
         VERBOSE(VB_AUDIO, LOC + QString("may be AC3 or DTS capable"));
@@ -318,7 +319,7 @@ AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
     bool bHD = bLPCM && aosettings->m_HD &&
         gCoreContext->GetNumSetting("EAC3PassThru", false) &&
         !gCoreContext->GetNumSetting("Audio48kOverride", false);
-    bool bHDLL = bLPCM && aosettings->m_HD &&
+    bool bHDLL = bLPCM && aosettings->m_HDLL &&
         gCoreContext->GetNumSetting("TrueHDPassThru", false) &&
         !gCoreContext->GetNumSetting("Audio48kOverride", false);
 
@@ -339,4 +340,16 @@ AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
     aosettings->m_LPCM = bLPCM;
 
     return aosettings;
+}
+
+/*
+ * Return the highest passthrough bitrate available. 0 for no limit
+ */
+int AudioOutputSettings::GetMaxBitrate()
+{
+    if (!m_HD && !m_HDLL)
+        return 48000 * 16 * 2;   // DTS Core: 48kHz, 16 bits, 2 ch
+    if (!m_HDLL)
+        return 192000 * 16 * 2;  // E-AC3/DTS-HD High Res: 192k, 16 bits, 2 ch
+    return 0;                    // TrueHD or DTS-HD MA: no limit
 }

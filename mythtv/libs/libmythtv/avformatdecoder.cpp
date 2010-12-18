@@ -4026,26 +4026,35 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             if (!m_spdifenc)
             {
                 m_spdifenc = new SPDIFEncoder("spdif", ctx);
-                if (!m_spdifenc->Succeeded())
+                if (m_spdifenc->Succeeded())
                 {
-                    avcodeclock->unlock();
-                    delete m_spdifenc;
-                    return false;
+                    /*
+                     * Set the bitrate for DTS content.
+                     * We cannot distinguish between the various DTS types
+                     * (DTS core, DTS-HD High-Resolution and DTS-HD MA
+                     * We must start muxing to determine the bitrate
+                     */
+                    if (ctx->codec_id == CODEC_ID_DTS)
+                    {
+                        m_spdifenc->SetMaxMuxRate(m_audio->GetMaxBitrate());
+                        m_spdifenc->WriteFrame(tmp_pkt.data, tmp_pkt.size);
+                        SetupAudioStream();
+                    }
                 }
             }
-                // Extract core DTS unless we can process it
-            if (ctx->codec_id == CODEC_ID_DTS && !m_audio->CanHD())
+            else
             {
-                tmp_pkt.size = extract_core_dts(tmp_pkt.data, tmp_pkt.size);
-                if (tmp_pkt.size < 0)
+                if (m_spdifenc->Succeeded())
                 {
-                        // error extracting core dts
+                    m_spdifenc->WriteFrame(tmp_pkt.data, tmp_pkt.size);
+                }
+                else
+                {
+                    // Creation of the muxer previous failed, exit early
                     avcodeclock->unlock();
                     return false;
                 }
             }
-            data_size = tmp_pkt.size;
-            m_spdifenc->WriteFrame(tmp_pkt.data, data_size);
 
             ret = m_spdifenc->GetData((unsigned char *)audioSamples, data_size);
             if (ret < 0)
@@ -4053,6 +4062,8 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                 avcodeclock->unlock();
                 return true;
             }
+            // We have processed all the data, there can't be any left
+            tmp_pkt.size = 0;
         }
         else
         {
@@ -4680,7 +4691,9 @@ bool AvFormatDecoder::SetupAudioStream(void)
         }
 
         info = AudioInfo(ctx->codec_id, fmt, ctx->sample_rate,
-                         ctx->channels, using_passthru, orig_channels);
+                         ctx->channels, using_passthru, orig_channels,
+                         ctx->codec_id == CODEC_ID_DTS && m_spdifenc ?
+                         m_spdifenc->GetBitrate() : -1);
     }
 
     if (!ctx)
@@ -4690,7 +4703,17 @@ bool AvFormatDecoder::SetupAudioStream(void)
     }
 
     if (info == audioIn)
-        return false; // no change
+        return false;
+
+    if (audioIn.ChangedButBitrate(info) && m_spdifenc)
+    {
+        // stream has changed, we cannot re-use existing spdif muxer
+        delete m_spdifenc;
+        m_spdifenc = NULL;
+        info.bitrate = -1;
+    }
+    else if (m_spdifenc)
+        info.bitrate = m_spdifenc->GetBitrate();
 
     VERBOSE(VB_AUDIO, LOC + "Initializing audio parms from " +
             QString("audio track #%1").arg(currentTrack[kTrackTypeAudio]+1));
@@ -4705,11 +4728,8 @@ bool AvFormatDecoder::SetupAudioStream(void)
         m_audio->SetEffDsp(audioOut.sample_rate * 100);
     m_audio->SetAudioParams(audioOut.format, orig_channels, ctx->request_channels,
                             audioOut.codec_id, audioOut.sample_rate,
-                            audioOut.do_passthru);
+                            audioOut.do_passthru, audioOut.bitrate);
     m_audio->ReinitAudio();
-
-    delete m_spdifenc;
-    m_spdifenc = NULL;
 
     if (LCD *lcd = LCD::Get())
     {

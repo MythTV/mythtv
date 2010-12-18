@@ -153,6 +153,7 @@ class AudioOutputBase : public AudioOutput, public QThread
     AudioFormat format;
     AudioFormat output_format;
     int samplerate;
+    int bitrate;
     int effdsp; // from the recorded stream (NuppelVideo)
     int fragment_size;
     long soundcard_buffer_size;

@@ -18,15 +18,17 @@ class MPUBLIC AudioPlayer
     void  SetAudioOutput(AudioOutput *ao);
     void  SetAudioInfo(const QString &main_device,
                        const QString &passthru_device,
-                       uint           samplerate);
+                       uint           samplerate,
+                       int            bitrate = -1);
     void  SetAudioParams(AudioFormat format, int orig_channels, int channels,
-                         int codec, int samplerate, bool passthru);
+                         int codec, int samplerate, bool passthru,
+                         int bitrate = -1);
     void  SetEffDsp(int dsprate);
 
     void  CheckFormat(void);
-    void  SetNoAudio(void)        { no_audio_out = true;  }
-    bool  HasAudioIn(void) const  { return !no_audio_in;  }
-    bool  HasAudioOut(void) const { return !no_audio_out; }
+    void  SetNoAudio(void)        { m_no_audio_out = true;  }
+    bool  HasAudioIn(void) const  { return !m_no_audio_in;  }
+    bool  HasAudioOut(void) const { return !m_no_audio_out; }
 
     bool  Pause(bool pause);
     bool  IsPaused(void);
@@ -45,6 +47,7 @@ class MPUBLIC AudioPlayer
     bool  CanHD(void);
     bool  CanHDLL(void);
     uint  GetMaxChannels(void);
+    int   GetMaxBitrate(void);
     int64_t GetAudioTime(void);
 
     bool      IsMuted(void) { return GetMuteState() == kMuteAll; }
@@ -65,14 +68,15 @@ class MPUBLIC AudioPlayer
     int          m_codec;
     AudioFormat  m_format;
     int          m_samplerate;
+    int          m_bitrate;
     float        m_stretchfactor;
     bool         m_passthru;
     QMutex       m_lock;
     bool         m_muted_on_creation;
     QString      m_main_device;
     QString      m_passthru_device;
-    bool         no_audio_in;
-    bool         no_audio_out;
+    bool         m_no_audio_in;
+    bool         m_no_audio_out;
 };
 
 #endif // AUDIOPLAYER_H
