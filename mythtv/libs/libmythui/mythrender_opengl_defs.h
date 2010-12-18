@@ -226,6 +226,8 @@ typedef GLint ( * MYTH_GLGETUNIFORMLOCATION)
     (GLuint program, const char *name);
 typedef void  ( * MYTH_GLUNIFORM4F)
     (GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+typedef void  ( * MYTH_GLUNIFORMMATRIX4FV)
+    (GLint location, GLint size, GLboolean transpose, const GLfloat *values);
 typedef void ( * MYTH_GLVERTEXATTRIBPOINTER)
     (GLuint index, GLint size, GLenum type, GLboolean normalize,
      GLsizei stride, const GLvoid *ptr);
