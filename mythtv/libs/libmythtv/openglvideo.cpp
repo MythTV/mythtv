@@ -649,19 +649,24 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
 uint OpenGLVideo::AddFragmentProgram(OpenGLFilterType name,
                                      QString deint, FrameScanType field)
 {
-    if (!(gl_features & kGLExtFragProg))
+    uint ret = 0;
+    if (gl_context->GetProfile() == kGLHighProfile)
     {
-        VERBOSE(VB_PLAYBACK, LOC_ERR + "Fragment programs not supported");
-        return 0;
+        QString vertex, fragment;
+        GetProgramStrings(vertex, fragment, name, deint, field);
+        return gl_context->CreateShaderObject(vertex, fragment);
     }
-
-    QString program = GetProgramString(name, deint, field);
-
-    uint ret;
-    if (gl_context->CreateFragmentProgram(program, ret))
-        return ret;
-
-    return 0;
+    else if (gl_context->GetProfile() == kGLLegacyProfile)
+    {
+        QString program = GetProgramString(name, deint, field);
+        if (gl_context->CreateFragmentProgram(program, ret))
+            return ret;
+    }
+    else
+    {
+        VERBOSE(VB_PLAYBACK, LOC_ERR + "No OpenGL shader/program support");
+    }
+    return ret;
 }
 
 /**
@@ -1030,7 +1035,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         }
 
         if (type == kGLFilterYUV2RGB)
-            gl_context->SetFragmentParams(program, colourSpace->GetMatrix());
+            gl_context->SetProgramParams(program, colourSpace->GetMatrix());
 
         gl_context->DrawBitmap(textures, texture_count, target, &trect, &vrect,
                                program);
@@ -1552,6 +1557,36 @@ QString OpenGLVideo::GetProgramString(OpenGLFilterType name,
                 .arg(FilterToString(name)).arg(deint));
 
     return ret;
+}
+
+static const QString YUV2RGBVertexShader =
+"GLSL_DEFINES"
+"attribute vec4 a_color;\n"
+"attribute vec2 a_texcoord0;\n"
+"varying   vec2 v_texcoord0;\n"
+"void main() {\n"
+"    gl_Position = ftransform();\n"
+"    v_texcoord0 = a_texcoord0;\n"
+"}\n";
+
+static const QString YUV2RGBFragmentShader =
+"GLSL_DEFINES"
+"uniform sampler2D s_texture0;\n"
+"uniform mat4 m_colourMatrix;\n"
+"varying vec2 v_texcoord0;\n"
+"void main(void)\n"
+"{\n"
+"    vec4 yuva    = texture2D(s_texture0, v_texcoord0);\n"
+"    vec4 res     = vec4(yuva.arb, 1.0) * m_colourMatrix;\n"
+"    gl_FragColor = vec4(res.rgb, yuva.g);\n"
+"}\n";
+
+void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
+                                    OpenGLFilterType filter,
+                                    QString deint, FrameScanType field)
+{
+    vertex   = YUV2RGBVertexShader;
+    fragment = YUV2RGBFragmentShader;
 }
 
 uint OpenGLVideo::ParseOptions(QString options)

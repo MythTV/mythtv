@@ -18,7 +18,7 @@ class Matrix
     Matrix & operator*=(const Matrix &r);
     void product(int row, const Matrix &r);
     void debug(void);
-    float m[3][4];
+    float m[4][4];
 };
 
 typedef enum VideoCStd
