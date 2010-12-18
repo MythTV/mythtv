@@ -913,6 +913,26 @@ uint32_t bd_get_current_chapter(BLURAY *bd)
     return 0;
 }
 
+int64_t bd_seek_playitem(BLURAY *bd, unsigned clip_ref)
+{
+    uint32_t clip_pkt, out_pkt;
+    NAV_CLIP *clip;
+
+    if (bd->title &&
+        clip_ref < bd->title->clip_list.count) {
+
+      _change_angle(bd);
+
+      clip     = &bd->title->clip_list.clip[clip_ref];
+      clip_pkt = clip->start_pkt;
+      out_pkt  = clip->pos;
+
+      return _seek_internal(bd, clip, out_pkt, clip_pkt);
+    }
+
+    return bd->s_pos;
+}
+
 int64_t bd_seek_mark(BLURAY *bd, unsigned mark)
 {
     uint32_t clip_pkt, out_pkt;
@@ -1819,12 +1839,8 @@ static void _process_hdmv_vm_event(BLURAY *bd, HDMV_EVENT *hev)
             break;
 
         case HDMV_EVENT_PLAY_PI:
-#if 0
             _queue_event(bd, (BD_EVENT){BD_EVENT_SEEK, 0});
-            bd_seek_pi(bd, hev->param);
-#else
-            DEBUG(DBG_BLURAY|DBG_CRIT, "HDMV_EVENT_PLAY_PI: not implemented\n");
-#endif
+            bd_seek_playitem(bd, hev->param);
             break;
 
         case HDMV_EVENT_PLAY_PM:
