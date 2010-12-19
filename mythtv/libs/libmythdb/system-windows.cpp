@@ -287,8 +287,8 @@ void MythSystemManager::run(void)
                 if( ms->GetStatus() == GENERIC_EXIT_TIMEOUT )
                 {
                     VERBOSE(VB_GENERAL, 
-                        QString("Managed child (Handle: %1) timed out"
-                                ", issuing KILL signal").arg((long long)child));
+                        QString("Managed child (Handle: %1) timed out, "
+                                "issuing KILL signal").arg((long long)child));
                     // Prevent constant attempts to kill an obstinate child
                     ms->m_timeout = 0;
                     ms->Signal(SIGKILL);
@@ -613,7 +613,7 @@ void MythSystemWindows::Fork(time_t timeout)
     // set up command args
     QString cmd = GetCommand() + " " + GetArgs().join(" ");
     if (GetSetting("UseShell"))
-        cmd.prepend("cmd.exe ");
+        cmd.prepend("cmd.exe /c ");
 
     SetCommand( cmd );
 
