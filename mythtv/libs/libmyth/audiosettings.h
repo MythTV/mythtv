@@ -68,7 +68,17 @@ class MPUBLIC AudioSettings
     bool                use_passthru;
     AudioOutputSource   source;
     int                 upmixer;
+    /**
+     * If set to false, AudioOutput instance will not try to initially open
+     * the audio device
+     */
     bool                init;
+    /**
+     * custom contains a pointer to the audio device capabilities
+     * if defined, AudioOutput will not try to automatically discover them.
+     * This is used by the AudioTest setting screen where the user can
+     * manually override and immediately use them.
+     */
     AudioOutputSettings *custom;
 };
 

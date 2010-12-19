@@ -240,7 +240,7 @@ void AudioOutputBase::SetSourceBitrate(int rate)
         source_bitrate = rate;
 }
 
-/*
+/**
  * Set the timestretch factor
  *
  * You must hold the audio_buflock to call this safely
@@ -1046,7 +1046,7 @@ int AudioOutputBase::CheckFreeSpace(int &frames)
     return len;
 }
 
-/*
+/**
  * Copy frames into the audiobuffer, upmixing en route if necessary
  *
  * Returns the number of frames written, which may be less than requested

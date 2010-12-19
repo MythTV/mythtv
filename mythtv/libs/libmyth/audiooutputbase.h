@@ -111,7 +111,7 @@ class AudioOutputBase : public AudioOutput, public QThread
     virtual bool OpenDevice(void) = 0;
     virtual void CloseDevice(void) = 0;
     virtual void WriteAudio(uchar *aubuf, int size) = 0;
-    /*
+    /**
      * Return the size in bytes of frames currently in the audio buffer adjusted
      * with the audio playback latency
      */
@@ -119,7 +119,7 @@ class AudioOutputBase : public AudioOutput, public QThread
     // Default implementation only supports 2ch s16le at 48kHz
     virtual AudioOutputSettings* GetOutputSettings(void)
         { return new AudioOutputSettings; }
-    /// You need to call this from any implementation in the dtor.
+    // You need to call this from any implementation in the dtor.
     void KillAudio(void);
 
     // The following functions may be overridden, but don't need to be
@@ -204,20 +204,30 @@ class AudioOutputBase : public AudioOutput, public QThread
 
     bool audio_thread_exists;
 
-    /* Writes to the audiobuffer, reconfigures and audiobuffer resets can only
-       take place while holding this lock */
+    /**
+     *  Writes to the audiobuffer, reconfigures and audiobuffer resets can only
+     *  take place while holding this lock
+     */
     QMutex audio_buflock;
 
-    /** must hold avsync_lock to read or write 'audiotime' and
-        'audiotime_updated' */
+    /**
+     *  must hold avsync_lock to read or write 'audiotime' and
+     *  'audiotime_updated'
+     */
     QMutex avsync_lock;
 
-    // timecode of audio leaving the soundcard (same units as timecodes)
+    /**
+     * timecode of audio leaving the soundcard (same units as timecodes)
+     */
     int64_t audiotime;
 
-    /* Audio circular buffer */
-    int raud, waud;     /* read and write positions */
-    // timecode of audio most recently placed into buffer
+    /**
+     * Audio circular buffer
+     */
+    int raud, waud;     // read and write positions
+    /**
+     * timecode of audio most recently placed into buffer
+     */
     int64_t audbuf_timecode;
     AsyncLooseLock reset_active;
 
@@ -236,7 +246,9 @@ class AudioOutputBase : public AudioOutput, public QThread
     float *src_out;
     int kAudioSRCOutputSize;
     uint memory_corruption_test2;
-    /** main audio buffer */
+    /**
+     * main audio buffer
+     */
     uchar audiobuffer[kAudioRingBufferSize];
     uint memory_corruption_test3;
 };

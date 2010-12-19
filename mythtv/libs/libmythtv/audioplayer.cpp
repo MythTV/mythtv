@@ -5,10 +5,10 @@
 #define LOC QString("AudioPlayer: ")
 
 AudioPlayer::AudioPlayer(MythPlayer *parent, bool muted)
-  : m_parent(parent),    m_audioOutput(NULL),   m_channels(-1),
-    m_orig_channels(-1), m_codec(0),            m_format(FORMAT_NONE),
-    m_samplerate(44100), m_bitrate(-1),         m_stretchfactor(1.0f),
-    m_passthru(false),
+  : m_parent(parent),     m_audioOutput(NULL),   m_channels(-1),
+    m_orig_channels(-1),  m_codec(0),            m_format(FORMAT_NONE),
+    m_samplerate(44100),  m_bitrate(48000 * 16 * 2),
+    m_stretchfactor(1.0f),m_passthru(false),
     m_lock(QMutex::Recursive), m_muted_on_creation(muted), 
     m_main_device(QString::null), m_passthru_device(QString::null),
     m_no_audio_in(false), m_no_audio_out(false)
@@ -160,7 +160,7 @@ uint AudioPlayer::GetVolume(void)
     return m_audioOutput->GetCurrentVolume();
 }
 
-/*
+/**
  * Set audio output device parameters.
  * bitrate is only used for DTS
  */
@@ -184,7 +184,7 @@ void AudioPlayer::SetAudioInfo(const QString &main_device,
     m_bitrate    = bitrate;
 }
 
-/*
+/**
  * Set audio output parameters.
  * bitrate is only used for DTS
  */

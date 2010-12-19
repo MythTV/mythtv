@@ -601,7 +601,7 @@ int AudioOutputALSA::GetBufferedOnSoundcard(void) const
     return delay + buffered;
 }
 
-/*
+/**
  * Set the various ALSA audio parameters.
  * Returns:
  * < 0 : an error occurred

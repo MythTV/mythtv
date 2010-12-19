@@ -7,7 +7,7 @@
 #define LOC QString("SPDIFEncoder: ")
 #define LOC_ERR QString("SPDIFEncoder, Error: ")
 
-/*
+/**
  * SPDIFEncoder constructor
  * Args:
  *   QString muxer       : name of the muxer.
@@ -120,7 +120,7 @@ SPDIFEncoder::~SPDIFEncoder(void)
     Destroy();
 }
 
-/*
+/**
  * Encode data through created muxer
  * unsigned char data: pointer to data to encode
  * int           size: size of data to encode
@@ -139,7 +139,7 @@ void SPDIFEncoder::WriteFrame(unsigned char *data, int size)
     }
 }
 
-/*
+/**
  * Retrieve encoded data and copy it in the provided buffer.
  * Return -1 if there is no data to retrieve.
  * On return, dest_size will contain the length of the data copied
@@ -157,7 +157,7 @@ int SPDIFEncoder::GetData(unsigned char *buffer, int &dest_size)
     return -1;
 }
 
-/*
+/**
  * Reset the internal encoder buffer
  */
 void SPDIFEncoder::Reset()
@@ -165,7 +165,7 @@ void SPDIFEncoder::Reset()
     m_size = 0;
 }
 
-/*
+/**
  * Set the maximum mux rate
  * If playing DTS-HD content, setting a mux rate of 1.536Mbit/s will
  * cause the HD stream to be stripped out before encoding
@@ -181,7 +181,7 @@ bool SPDIFEncoder::SetMaxMuxRate(int rate)
     return true;
 }
 
-/*
+/**
  * Retrieve passthrough bitrate
  */
 int SPDIFEncoder::GetMaxMuxRate()
@@ -193,7 +193,7 @@ int SPDIFEncoder::GetMaxMuxRate()
     return m_oc->mux_rate;
 }
 
-/*
+/**
  * Retrieve passthrough bitrate
  */
 int SPDIFEncoder::GetBitrate()
@@ -205,7 +205,7 @@ int SPDIFEncoder::GetBitrate()
     return m_oc->bit_rate;
 }
 
-/*
+/**
  * funcIO: Internal callback function that will receive encoded frames
  */
 int SPDIFEncoder::funcIO(void *opaque, unsigned char *buf, int size)
@@ -217,7 +217,7 @@ int SPDIFEncoder::funcIO(void *opaque, unsigned char *buf, int size)
     return size;
 }
 
-/*
+/**
  * Destroy and free all allocated memory
  */
 void SPDIFEncoder::Destroy()
