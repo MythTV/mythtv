@@ -2677,11 +2677,15 @@ def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
                 command += "-a %d " % (audio1[AUDIO_ID])
             elif audio1[AUDIO_CODEC] == 'AC3':
                 command += "-c %d " % (audio1[AUDIO_ID])
+            elif audio1[AUDIO_CODEC] == 'EAC3':
+                command += "-c %d " % (audio1[AUDIO_ID])
 
         if audio2[AUDIO_ID] != -1: 
             if audio2[AUDIO_CODEC] == 'MP2':
                 command += "-a %d " % (audio2[AUDIO_ID])
             elif audio2[AUDIO_CODEC] == 'AC3':
+                command += "-c %d " % (audio2[AUDIO_ID])
+            elif audio2[AUDIO_CODEC] == 'EAC3':
                 command += "-c %d " % (audio2[AUDIO_ID])
 
     else:
@@ -2693,11 +2697,16 @@ def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
                 command += "-a %d " % (audio1[AUDIO_ID] & 255)
             elif audio1[AUDIO_CODEC] == 'AC3':
                 command += "-c %d " % (audio1[AUDIO_ID] & 255)
+            elif audio1[AUDIO_CODEC] == 'EAC3':
+                command += "-c %d " % (audio1[AUDIO_ID] & 255)
+
 
         if audio2[AUDIO_ID] != -1: 
             if audio2[AUDIO_CODEC] == 'MP2':
                 command += "-a %d " % (audio2[AUDIO_ID] & 255)
             elif audio2[AUDIO_CODEC] == 'AC3':
+                command += "-c %d " % (audio2[AUDIO_ID] & 255)
+            elif audio2[AUDIO_CODEC] == 'EAC3':
                 command += "-c %d " % (audio2[AUDIO_ID] & 255)
 
     mediafile = quoteFilename(mediafile)
