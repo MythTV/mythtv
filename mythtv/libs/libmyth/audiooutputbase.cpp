@@ -386,37 +386,42 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     {
         samplerate_tmp = settings.samplerate;
         channels_tmp = 2;
+        QString log;
+
         switch (settings.codec)
         {
             case CODEC_ID_AC3:
+                log = "AC3";
                 break;
             case CODEC_ID_EAC3:
                 //E-AC3 is 2 channels, samplerate * 4
                 samplerate_tmp = settings.samplerate * 4;
+                log = "Dolby Digital Plus (E-AC3)";
                 break;
             case CODEC_ID_DTS:
                     // Can only do DTS core
                 if (output_settings->GetMaxBitrate() == 48000 * 16 * 2 ||
                     settings.bitrate <= 48000 * 16 * 2)
                 {
-                    VBAUDIO("Setting DTS Core");
+                    log = "DTS Core";
                     break;
                 }
                 if (output_settings->canHDLL() &&
                     settings.bitrate > 48000 * 16 * 2)
                 {
-                    VBAUDIO("Setting DTS-HD MA");
+                    log = "DTS-HD MA";
                     //Assume DTS-HD MA. Use 8 channels, 192kHz, 16 bits 
                     channels_tmp = 8;
                     samplerate_tmp = 192000;
                     break;
                 }
-                VBAUDIO("FoundSetting DTS-HD High-Res");
+                log = "DTS-HD High-Res";
                 //Assume DTS-HD High-Res. Use 2 channels, 192kHz, 16 bits
                 samplerate_tmp = 192000;
                 break;
             case CODEC_ID_TRUEHD:
                 channels_tmp = 8;
+                log = "TrueHD";
                 switch(settings.samplerate)
                 {
                     case 48000:
@@ -437,6 +442,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             default:
                 break;
         }
+        VBAUDIO("Setting " + log + " Passthrough");
     }
 
     // Check if anything has changed

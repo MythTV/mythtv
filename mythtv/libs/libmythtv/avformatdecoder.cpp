@@ -4022,34 +4022,35 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             if (!m_spdifenc)
             {
                 m_spdifenc = new SPDIFEncoder("spdif", ctx);
-                if (m_spdifenc->Succeeded())
+                if (m_spdifenc->Succeeded() && ctx->codec_id == CODEC_ID_DTS)
                 {
                     /*
-                     * Set the bitrate for DTS content.
+                     * Set the maximum bitrate for DTS content.
                      * We cannot distinguish between the various DTS types
                      * (DTS core, DTS-HD High-Resolution and DTS-HD MA
                      * We must start muxing to determine the bitrate
                      */
-                    if (ctx->codec_id == CODEC_ID_DTS)
-                    {
-                        m_spdifenc->SetMaxMuxRate(m_audio->GetMaxBitrate());
-                        m_spdifenc->WriteFrame(tmp_pkt.data, tmp_pkt.size);
-                        SetupAudioStream();
-                    }
+                    m_spdifenc->SetMaxMuxRate(m_audio->GetMaxBitrate());
                 }
             }
-            else
+            if (!m_spdifenc->Succeeded())
             {
-                if (m_spdifenc->Succeeded())
-                {
-                    m_spdifenc->WriteFrame(tmp_pkt.data, tmp_pkt.size);
-                }
-                else
-                {
-                    // Creation of the muxer previous failed, exit early
-                    avcodeclock->unlock();
-                    return false;
-                }
+                // Creation of the muxer previous failed, exit early
+                avcodeclock->unlock();
+                return false;
+            }
+            m_spdifenc->WriteFrame(tmp_pkt.data, tmp_pkt.size);
+
+            /* Check if DTS stream bitrate changed which indicates change in
+             * DTS codec type. SPDIF muxer will report a new bitrate only if
+             * changing from DTS-HD to DTS core or vice versa.
+             * We call SetupAudioStream, only if changes are required will
+             * AudioOutput class reconfigure audio device.
+             */
+            if (ctx->codec_id == CODEC_ID_DTS &&
+                m_spdifenc->GetBitrate() != audioOut.bitrate)
+            {
+                SetupAudioStream();
             }
 
             ret = m_spdifenc->GetData((unsigned char *)audioSamples, data_size);
@@ -4689,7 +4690,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
         info = AudioInfo(ctx->codec_id, fmt, ctx->sample_rate,
                          ctx->channels, using_passthru, orig_channels,
                          ctx->codec_id == CODEC_ID_DTS && m_spdifenc ?
-                         m_spdifenc->GetBitrate() : -1);
+                         m_spdifenc->GetBitrate() : DEFAULT_BITRATE);
     }
 
     if (!ctx)
@@ -4706,10 +4707,12 @@ bool AvFormatDecoder::SetupAudioStream(void)
         // stream has changed, we cannot re-use existing spdif muxer
         delete m_spdifenc;
         m_spdifenc = NULL;
-        info.bitrate = -1;
+        info.bitrate = DEFAULT_BITRATE;
     }
     else if (m_spdifenc)
+    {
         info.bitrate = m_spdifenc->GetBitrate();
+    }
 
     VERBOSE(VB_AUDIO, LOC + "Initializing audio parms from " +
             QString("audio track #%1").arg(currentTrack[kTrackTypeAudio]+1));
@@ -4722,7 +4725,8 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
     if (audioOut.sample_rate > 0)
         m_audio->SetEffDsp(audioOut.sample_rate * 100);
-    m_audio->SetAudioParams(audioOut.format, orig_channels, ctx->request_channels,
+    m_audio->SetAudioParams(audioOut.format, orig_channels,
+                            ctx->request_channels,
                             audioOut.codec_id, audioOut.sample_rate,
                             audioOut.do_passthru, audioOut.bitrate);
     m_audio->ReinitAudio();
