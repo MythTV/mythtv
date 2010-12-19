@@ -250,12 +250,12 @@ void MythSystemManager::run(void)
         }
         HANDLE child = m_children[index];
 
-        // check for any newly exited processes
-        listLock.lock();
-
         // pop exited process off managed list, add to cleanup list
         MythSystemWindows  *ms = m_pMap.take(child);
         ChildListRebuild();
+        m_mapLock.unlock();
+
+        listLock.lock();
         msList.append(ms);
 
         DWORD               status;
@@ -267,7 +267,6 @@ void MythSystemManager::run(void)
                         "command=%2, status=%3, result=%4")
                 .arg((long long)child) .arg(ms->GetLogCmd()) .arg(status) 
                 .arg(ms->GetStatus()));
-
 
         // loop through running processes for any that require action
         MSMap_t::iterator   i;
