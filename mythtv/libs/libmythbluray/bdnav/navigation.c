@@ -280,6 +280,10 @@ uint8_t nav_lookup_aspect(NAV_CLIP *clip, int pid)
     CLPI_PROG *progs;
     int ii, jj;
 
+    if (clip->cl == NULL) {
+        return 0;
+    }
+
     progs = clip->cl->program.progs;
     for (ii = 0; ii < clip->cl->program.num_prog; ii++) {
         CLPI_PROG_STREAM *ps = progs[ii].streams;
@@ -307,8 +311,12 @@ _fill_mark(NAV_TITLE *title, NAV_MARK *mark, int entry)
     mark->mark_type = plm->mark_type;
     mark->clip_ref = plm->play_item_ref;
     clip = &title->clip_list.clip[mark->clip_ref];
-    mark->clip_pkt = clpi_lookup_spn(clip->cl, plm->time, 1,
-        title->pl->play_item[mark->clip_ref].clip[title->angle].stc_id);
+    if (clip->cl != NULL) {
+        mark->clip_pkt = clpi_lookup_spn(clip->cl, plm->time, 1,
+            title->pl->play_item[mark->clip_ref].clip[title->angle].stc_id);
+    } else {
+        mark->clip_pkt = clip->start_pkt;
+    }
     mark->title_pkt = clip->title_pkt + mark->clip_pkt;
     mark->clip_time = plm->time;
 
@@ -589,7 +597,7 @@ NAV_CLIP* nav_mark_search(NAV_TITLE *title, unsigned mark, uint32_t *clip_pkt, u
     if (mark > title->mark_list.count) {
         clip = &title->clip_list.clip[0];
         *clip_pkt = clip->start_pkt;
-        *out_pkt = clip->pos + *clip_pkt - clip->start_pkt;
+        *out_pkt = clip->pos;
         return clip;
     }
     clip = &title->clip_list.clip[title->mark_list.mark[mark].clip_ref];
@@ -622,7 +630,11 @@ NAV_CLIP* nav_packet_search(NAV_TITLE *title, uint32_t pkt, uint32_t *clip_pkt, 
         *clip_pkt = clip->end_pkt;
     } else {
         clip = &title->clip_list.clip[ii];
-        *clip_pkt = clpi_access_point(clip->cl, pkt - pos + clip->start_pkt, 0, 0, out_time);
+        if (clip->cl != NULL) {
+            *clip_pkt = clpi_access_point(clip->cl, pkt - pos + clip->start_pkt, 0, 0, out_time);
+        } else {
+            *clip_pkt = clip->start_pkt;
+        }
     }
     if(*out_time < clip->in_time)
         *out_time = 0;
@@ -655,6 +667,9 @@ NAV_CLIP* nav_packet_search(NAV_TITLE *title, uint32_t pkt, uint32_t *clip_pkt, 
 //    by the clip.
 uint32_t nav_angle_change_search(NAV_CLIP *clip, uint32_t pkt, uint32_t *time)
 {
+    if (clip->cl == NULL) {
+        return pkt;
+    }
     return clpi_access_point(clip->cl, pkt, 1, 1, time);
 }
 
@@ -680,8 +695,12 @@ NAV_CLIP* nav_time_search(NAV_TITLE *title, uint32_t tick, uint32_t *clip_pkt, u
         *clip_pkt = clip->end_pkt;
     } else {
         clip = &title->clip_list.clip[ii];
-        *clip_pkt = clpi_lookup_spn(clip->cl, tick - pos + pi->in_time, 1,
+        if (clip->cl != NULL) {
+            *clip_pkt = clpi_lookup_spn(clip->cl, tick - pos + pi->in_time, 1,
                       title->pl->play_item[clip->ref].clip[clip->angle].stc_id);
+        } else {
+            *clip_pkt = clip->start_pkt;
+        }
     }
     *out_pkt = clip->pos + *clip_pkt - clip->start_pkt;
     return clip;
@@ -694,8 +713,12 @@ void nav_clip_time_search(NAV_CLIP *clip, uint32_t tick, uint32_t *clip_pkt, uin
     if (tick >= clip->out_time) {
         *clip_pkt = clip->end_pkt;
     } else {
-        *clip_pkt = clpi_lookup_spn(clip->cl, tick, 1,
+        if (clip->cl != NULL) {
+            *clip_pkt = clpi_lookup_spn(clip->cl, tick, 1,
                clip->title->pl->play_item[clip->ref].clip[clip->angle].stc_id);
+        } else {
+            *clip_pkt = clip->start_pkt;
+        }
     }
     *out_pkt = clip->pos + *clip_pkt - clip->start_pkt;
 }

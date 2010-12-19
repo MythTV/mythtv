@@ -79,6 +79,7 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
 
     void  Init(void);
 
+    GLProfile GetProfile(void)       { return m_profile;        }
     int   GetMaxTextureSize(void)    { return m_max_tex_size;   }
     uint  GetFeatures(void)          { return m_exts_supported; }
     void  SetFeatures(uint features);
@@ -116,7 +117,7 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     bool CreateFragmentProgram(const QString &program, uint &prog);
     void DeleteFragmentProgram(uint prog);
     void EnableFragmentProgram(int fp);
-    void SetFragmentParams(uint fp, void* vals);
+    void SetProgramParams(uint prog, void* vals);
 
     uint CreateShaderObject(const QString &vert, const QString &frag);
     void DeleteShaderObject(uint obj);
@@ -274,6 +275,7 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     MYTH_GLDELETEOBJECT                  m_glDeleteObject;
     MYTH_GLGETUNIFORMLOCATION            m_glGetUniformLocation;
     MYTH_GLUNIFORM4F                     m_glUniform4f;
+    MYTH_GLUNIFORMMATRIX4FV              m_glUniformMatrix4fv;
     MYTH_GLVERTEXATTRIBPOINTER           m_glVertexAttribPointer;
     MYTH_GLENABLEVERTEXATTRIBARRAY       m_glEnableVertexAttribArray;
     MYTH_GLDISABLEVERTEXATTRIBARRAY      m_glDisableVertexAttribArray;

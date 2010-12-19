@@ -55,7 +55,7 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
         if (args < 0)
         {
             /* no existing parameters: add it behind device name */
-            passthru_device += ":AES0=6,AES1=0x82,AES2=0x00,AES3=0x01";
+            passthru_device += ":AES0=6"; //,AES1=0x82,AES2=0x00,AES3=0x01";
         }
         else
         {
@@ -66,12 +66,12 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
             if (args == passthru_device.length())
             {
                 /* ":" but no parameters */
-                passthru_device += "AES0=6,AES1=0x82,AES2=0x00,AES3=0x01";
+                passthru_device += "AES0=6"; //,AES1=0x82,AES2=0x00,AES3=0x01";
             }
             else if (passthru_device[args] != '{')
             {
                 /* a simple list of parameters: add it at the end of the list */
-                passthru_device += ",AES0=6,AES1=0x82,AES2=0x00,AES3=0x01";
+                passthru_device += ",AES0=6"; //,AES1=0x82,AES2=0x00,AES3=0x01";
             }
             else
             {
@@ -81,7 +81,7 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
                 while (len > 0 && passthru_device[len].isSpace());
                 if (passthru_device[len] == '}')
                     passthru_device = passthru_device.insert(
-                        len, " AES0=6 AES1 0x82 AES2=0x00 AES3=0x01");
+                        len, " AES0=6"); // AES1=0x82 AES2=0x00 AES3=0x01");
             }
         }
     }
@@ -407,7 +407,7 @@ bool AudioOutputALSA::OpenDevice()
     }
 
     period_time = 50000;  // aim for an interrupt every 50ms
-    buffer_time = period_time << 3; // buffer 400ms worth of samples
+    buffer_time = period_time << 2; // buffer 200ms worth of samples
 
     err = SetParameters(pcm_handle, format, channels, samplerate,
                         buffer_time, period_time);

@@ -696,7 +696,7 @@ AudioTest::AudioTest(QString main, QString passthrough,
     m_frontleft->setLabel(QObject::tr("Front Left"));
     connect(m_frontleft,
             SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
-    m_frontright = new TransButtonSetting("2");
+    m_frontright = new TransButtonSetting(m_channels == 2 ? "1" : "2");
     m_frontright->setLabel(QObject::tr("Front Right"));
     connect(m_frontright,
             SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));

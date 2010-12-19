@@ -14,6 +14,7 @@
 #include "fileringbuffer.h"
 #include "mythcontext.h"
 #include "remotefile.h"
+#include "compat.h"
 #include "util.h"
 
 #if HAVE_POSIX_FADVISE < 1

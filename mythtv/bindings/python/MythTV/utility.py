@@ -207,7 +207,9 @@ class databaseSearch( object ):
                     raise TypeError(errstr % (self.__name__, key))
                 res[0] = 'NOT '+res[0]
 
-            if len(res) == 3:
+            if len(res) == 0:
+                continue
+            elif len(res) == 3:
                 # normal processing
                 where.append(res[0])
                 fields.append(res[1])

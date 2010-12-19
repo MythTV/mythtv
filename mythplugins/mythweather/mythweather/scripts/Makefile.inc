@@ -24,12 +24,12 @@ uninstall:	uninstall-scripts uninstall-data
 
 install-scripts:
 	-[ "${SCRIPTS}" != "" ] && \
-	    ${INSTALL} -m 755 -d ${INSTDIR}/ && \
+	    ${INSTALL} -m 755 -d ${INSTALL_ROOT}${INSTDIR}/ && \
 	    for i in ${SCRIPTS} ; do ${INSTALL} -m 755 $$i ${INSTALL_ROOT}${INSTDIR}/ ; done
 
 install-data:
 	-[ "${DATA}" != "" ] && \
-	    ${INSTALL} -m 755 -d ${INSTDIR}/ && \
+	    ${INSTALL} -m 755 -d ${INSTALL_ROOT}${INSTDIR}/ && \
 	    for i in ${DATA} ; do ${INSTALL} -m 644 $$i ${INSTALL_ROOT}${INSTDIR}/ ; done
 
 uninstall-scripts:
