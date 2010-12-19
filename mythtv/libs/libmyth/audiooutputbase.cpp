@@ -448,12 +448,10 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         lsource_channels == source_channels &&
         lneeds_downmix == needs_downmix;
 
-    //Check if DTS and passthrough settings have changed
-    general_deps &=
-        !(settings.use_passthru &&
-          settings.codec == CODEC_ID_DTS &&
-          (samplerate != samplerate_tmp ||
-           channels != channels_tmp));
+    //Check if passthrough output settings have changed
+    general_deps &= !(settings.use_passthru &&
+                      (samplerate != samplerate_tmp ||
+                       channels != channels_tmp));
 
     if (general_deps)
     {
