@@ -4365,6 +4365,11 @@ void PlaybackBox::setGroupFilter(const QString &recGroup)
     if (m_groupnameAsAllProg)
         m_groupDisplayName = ProgramInfo::i18n(m_recGroup);
 
+    // Since the group filter is changing, the current position in the lists
+    // is meaningless -- so reset the lists so the position won't be saved.
+    m_recordingList->Reset();
+    m_groupList->Reset();
+
     UpdateUILists();
 
     if (gCoreContext->GetNumSetting("RememberRecGroup",1))
