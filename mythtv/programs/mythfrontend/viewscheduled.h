@@ -44,6 +44,7 @@ class ViewScheduled : public ScheduleCommon
     void customEdit();
     void deleteRule();
     void upcoming();
+    void upcomingScheduled();
     void details();
     void selected(MythUIButtonListItem *);
     void updateInfo(MythUIButtonListItem *);

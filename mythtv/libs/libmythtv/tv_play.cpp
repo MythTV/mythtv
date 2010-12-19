@@ -452,6 +452,8 @@ void TV::InitKeys(void)
             "Decrease program or channel rank"), "Left");
     REG_KEY("TV Frontend", "UPCOMING", QT_TRANSLATE_NOOP("MythControls",
             "List upcoming episodes"), "O");
+    REG_KEY("TV Frontend", "VIEWSCHEDULED", QT_TRANSLATE_NOOP("MythControls",
+            "List scheduled upcoming episodes"), "");
     REG_KEY("TV Frontend", "DETAILS", QT_TRANSLATE_NOOP("MythControls",
             "Show program details"), "U");
     REG_KEY("TV Frontend", "VIEWCARD", QT_TRANSLATE_NOOP("MythControls",

@@ -150,6 +150,7 @@ class PlaybackBox : public ScheduleCommon
     void ShowGroupPopup(void);
     void customEdit();
     void upcoming();
+    void upcomingScheduled();
     void details();
     void StopSelected(void);
     void showMetadataEditor();

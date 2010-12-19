@@ -74,6 +74,30 @@ void ScheduleCommon::ShowUpcoming(ProgramInfo *pginfo) const
 }
 
 /**
+*  \brief Show the upcoming recordings for this recording rule
+*/
+void ScheduleCommon::ShowUpcomingScheduled(ProgramInfo *pginfo) const
+{
+    if (!pginfo)
+        return;
+
+    RecordingInfo ri(*pginfo);
+    uint id;
+
+    if ((id = ri.GetRecordingRuleID()) <= 0)
+        return ShowUpcoming(pginfo->GetTitle());
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ProgLister *pl = new ProgLister(mainStack, plRecordid,
+                                    QString::number(id), "");
+
+    if (pl->Create())
+        mainStack->AddScreen(pl);
+    else
+        delete pl;
+}
+
+/**
 *  \brief Creates a dialog for editing the recording status,
 *         blocking until user leaves dialog.
 */
