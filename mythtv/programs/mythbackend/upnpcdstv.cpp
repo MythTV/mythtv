@@ -47,7 +47,7 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
             "FROM recorded "
             "%1 "
             "ORDER BY starttime DESC",
-        "" },
+        "", "starttime DESC" },
 
     {   "By Title",
         "title",
@@ -58,7 +58,7 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
             "%1 "
             "GROUP BY title "
             "ORDER BY title",
-        "WHERE title=:KEY" },
+        "WHERE title=:KEY", "title" },
 
     {   "By Genre",
         "category",
@@ -69,7 +69,7 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
             "%1 "
             "GROUP BY category "
             "ORDER BY category",
-        "WHERE category=:KEY" },
+        "WHERE category=:KEY", "category" },
 
     {   "By Date",
         "DATE_FORMAT(starttime, '%Y-%m-%d')",
@@ -80,7 +80,7 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
             "%1 "
             "GROUP BY name "
             "ORDER BY starttime DESC",
-        "WHERE DATE_FORMAT(starttime, '%Y-%m-%d') =:KEY" },
+        "WHERE DATE_FORMAT(starttime, '%Y-%m-%d') =:KEY", "starttime DESC" },
 
     {   "By Channel",
         "chanid",
@@ -92,7 +92,7 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
             "%1 "
             "GROUP BY name "
             "ORDER BY channel.chanid",
-        "WHERE channel.chanid=:KEY" },
+        "WHERE channel.chanid=:KEY", "channel.callsign" },
 
 
     {   "By Group",
@@ -103,7 +103,7 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
             "%1 "
             "GROUP BY recgroup "
             "ORDER BY recgroup",
-        "WHERE recgroup=:KEY" }
+        "WHERE recgroup=:KEY", "recgroup" }
 };
 
 int UPnpCDSTv::g_nRootCount = sizeof( g_RootNodes ) / sizeof( UPnpCDSRootInfo );

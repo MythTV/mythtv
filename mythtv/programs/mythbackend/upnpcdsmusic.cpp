@@ -53,7 +53,7 @@ UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] =
             "FROM music_songs song "
             "%1 "
             "ORDER BY name",
-        "" },
+        "", "name" },
 
 /*
 This is currently broken... need to handle list of items with single parent (like 'All Music')
@@ -66,7 +66,7 @@ This is currently broken... need to handle list of items with single parent (lik
             "FROM music_songs song "
             "%1 "
             "ORDER BY name",
-        "WHERE (DATEDIFF( CURDATE(), date_modified ) <= 30 ) " },
+        "WHERE (DATEDIFF( CURDATE(), date_modified ) <= 30 ) ", "" },
 */
     {   "By Album",
         "song.album_id",
@@ -77,7 +77,7 @@ This is currently broken... need to handle list of items with single parent (lik
             "%1 "
             "GROUP BY a.album_id "
             "ORDER BY a.album_name",
-        "WHERE song.album_id=:KEY" },
+        "WHERE song.album_id=:KEY", "song.album_name" },
 /*
 
     {   "By Artist",
@@ -89,7 +89,7 @@ This is currently broken... need to handle list of items with single parent (lik
             "%1 "
             "GROUP BY a.artist_id "
             "ORDER BY a.artist_name",
-        "WHERE song.artist_id=:KEY" },
+        "WHERE song.artist_id=:KEY", "" },
 */
 /*
 {   "By Genre",
@@ -101,7 +101,7 @@ This is currently broken... need to handle list of items with single parent (lik
             "%1 "
             "GROUP BY g.genre_id "
             "ORDER BY g.genre",
-        "WHERE song.genre_id=:KEY" },
+        "WHERE song.genre_id=:KEY", "" },
 
 */
 };
