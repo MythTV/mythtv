@@ -929,7 +929,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessKey( UPnpCDSRequest          *
     // ----------------------------------------------------------------------
     
     QString sKey = idPath.last().section( '=', 1, 1 );
-    sKey = QUrl::fromPercentEncoding(sKey.toLatin1());
+    sKey = QUrl::fromPercentEncoding(sKey.toUtf8());
 
     if (sKey.length() > 0)
     {

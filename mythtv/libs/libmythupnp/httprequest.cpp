@@ -828,8 +828,8 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
 
             if ((sName.length() != 0) && (sValue.length() !=0))
             {
-                sName  = QUrl::fromPercentEncoding(sName.toLatin1());
-                sValue = QUrl::fromPercentEncoding(sValue.toLatin1());
+                sName  = QUrl::fromPercentEncoding(sName.toUtf8());
+                sValue = QUrl::fromPercentEncoding(sValue.toUtf8());
 
                 mapParams.insert( sName.trimmed(), sValue );
                 nCount++;
@@ -1069,12 +1069,12 @@ void HTTPRequest::ProcessRequestLine( const QString &sLine )
         if (nCount > 1)
         {
             //m_sBaseUrl = tokens[1].section( '?', 0, 0).trimmed();
-            m_sBaseUrl = (QUrl::fromPercentEncoding(tokens[1].toLatin1())).section( '?', 0, 0).trimmed();
+            m_sBaseUrl = (QUrl::fromPercentEncoding(tokens[1].toUtf8())).section( '?', 0, 0).trimmed();
 
             // Process any Query String Parameters
 
             //QString sQueryStr = tokens[1].section( '?', 1, 1   );
-            QString sQueryStr = (QUrl::fromPercentEncoding(tokens[1].toLatin1())).section( '?', 1, 1 );
+            QString sQueryStr = (QUrl::fromPercentEncoding(tokens[1].toUtf8())).section( '?', 1, 1 );
 
             if (sQueryStr.length() > 0)
                 GetParameters( sQueryStr, m_mapParams );
@@ -1277,8 +1277,8 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
                     if (!oText.isNull())
                         sValue = oText.nodeValue();
 
-                    sName  = QUrl::fromPercentEncoding(sName.toLatin1());
-                    sValue = QUrl::fromPercentEncoding(sValue.toLatin1());
+                    sName  = QUrl::fromPercentEncoding(sName.toUtf8());
+                    sValue = QUrl::fromPercentEncoding(sValue.toUtf8());
 
                     m_mapParams.insert( sName.trimmed(), sValue );
                 }

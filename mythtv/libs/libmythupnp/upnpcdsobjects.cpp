@@ -115,7 +115,7 @@ QString CDSObject::GetPropValue(const QString &sName) const
     Properties::const_iterator it = m_properties.find(sName);
 
     if (it !=  m_properties.end() && *it)
-        return QUrl::fromPercentEncoding((*it)->m_sValue.toLatin1());
+        return QUrl::fromPercentEncoding((*it)->m_sValue.toUtf8());
     
     return "";
 }
