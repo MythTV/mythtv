@@ -625,9 +625,9 @@ class MythDB( DBCache ):
             return ('recorded.%s=%%s' % key, datetime.duck(value), 0)
 
         if key == 'olderthan':
-            return ('recorded.starttime>%s', datetime.duck(value), 0)
-        if key == 'newerthan':
             return ('recorded.starttime<%s', datetime.duck(value), 0)
+        if key == 'newerthan':
+            return ('recorded.starttime>%s', datetime.duck(value), 0)
 
 
         # recordedprogram matches
@@ -641,8 +641,9 @@ class MythDB( DBCache ):
             return ('people.name', 'recordedcredits', 4, 1)
 
         if key == 'livetv':
-            if value is None:
+            if (value is None) or (value == False):
                 return ('recorded.recgroup!=%s', 'LiveTV', 0)
+            return ()
 
         return None
 

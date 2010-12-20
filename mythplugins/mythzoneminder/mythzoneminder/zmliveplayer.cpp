@@ -12,10 +12,6 @@
  *
  * ============================================================ */
 
-#include <iostream>
-#include <sys/shm.h>
-#include <cstdlib>
-
 // qt
 #include <QDateTime>
 #include <QTimer>
