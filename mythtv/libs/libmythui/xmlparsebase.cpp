@@ -35,6 +35,7 @@
 #include "mythuiguidegrid.h"
 #include "mythuishape.h"
 #include "mythuibuttontree.h"
+#include "mythuivideo.h"
 #include "mythuieditbar.h"
 #include "mythfontproperties.h"
 
@@ -352,7 +353,8 @@ void XMLParseBase::ParseChildren(const QString &filename,
                      type == "webbrowser" ||
                      type == "guidegrid" ||
                      type == "shape" ||
-                     type == "editbar")
+                     type == "editbar" ||
+                     type == "video")
             {
                 ParseUIType(filename, info, type, parent, NULL, showWarnings);
             }
@@ -452,6 +454,8 @@ MythUIType *XMLParseBase::ParseUIType(
         uitype = new MythUIShape(parent, name);
     else if (type == "editbar")
         uitype = new MythUIEditBar(parent, name);
+    else if (type == "video")
+        uitype = new MythUIVideo(parent, name);
     else if (type == "window" && parent == GetGlobalObjectStore())
         uitype = new MythScreenType(parent, name);
     else
@@ -538,7 +542,8 @@ MythUIType *XMLParseBase::ParseUIType(
                      info.tagName() == "webbrowser" ||
                      info.tagName() == "guidegrid" ||
                      info.tagName() == "shape" ||
-                     info.tagName() == "editbar")
+                     info.tagName() == "editbar" ||
+                     info.tagName() == "video")
             {
                 ParseUIType(filename, info, info.tagName(),
                             uitype, screen, showWarnings);
@@ -724,7 +729,8 @@ bool XMLParseBase::doLoad(const QString &windowname,
                          type == "webbrowser" ||
                          type == "guidegrid" ||
                          type == "shape" ||
-                         type == "editbar")
+                         type == "editbar" ||
+                         type == "video")
                 {
                     ParseUIType(filename, e, type, parent, NULL, showWarnings);
                 }

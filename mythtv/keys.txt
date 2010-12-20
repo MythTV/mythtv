@@ -10,8 +10,10 @@ mythfrontend
 - D to delete in both "Watch a Recording" and "Delete a Recording".
 - E to edit recording options from any of the pages for scheduling
     recordings, the Program Finder, the EPG, and the Watch and Delete screens.
-- O to list the upcoming episodes for the currently selected show
-    on any page where a show title may be highlighed.
+- O to list the upcoming episodes for the currently selected show on
+    any page where a show title may be highlighed.  Note: the "TV
+    Frontend:VIEWSCHEDULED" keybinding is also available, which shows
+    only scheduled episodes.
 - I to get additional information about the currently selected item
 - Y on the "Upcoming Recordings" page switches which capture cards'
     items are displayed in the highlight color.

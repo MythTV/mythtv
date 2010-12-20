@@ -94,6 +94,7 @@ class OpenGLVideo
                            OpenGLFilterType filter,
                            QString deint = QString::null,
                            FrameScanType field = kScan_Progressive);
+    void CustomiseProgramString(QString &string);
     static QString FilterToString(OpenGLFilterType filter);
     static OpenGLFilterType StringToFilter(const QString &filter);
     QSize GetTextureSize(const QSize &size);
