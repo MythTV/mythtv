@@ -293,7 +293,7 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
         bHDLL = ((bLPCM && settings.canHDLL()) || bForceDigital) &&
             m_TrueHDPassThrough->boolValue() &&
             !gCoreContext->GetNumSetting("Audio48kOverride", false);
-            
+
         if (max_speakers > 2 && !bLPCM)
             max_speakers = 2;
         if (max_speakers == 2 && (bAC3 || bDTS))
