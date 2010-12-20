@@ -1166,7 +1166,6 @@ static const QString deint_end_bot =
 
 static const QString linearblend[2] = {
 "TEX current, tex, texture[1], %1;\n"
-"TEX prev, tex, texture[2], %1;\n"
 "ADD other, tex, {0.0, %3, 0.0, 0.0};\n"
 "TEX other, other, texture[1], %1;\n"
 "SUB mov, tex, {0.0, %3, 0.0, 0.0};\n"
@@ -1608,6 +1607,41 @@ static const QString OneFieldShader[2] = {
 "}\n"
 };
 
+static const QString LinearBlendShader[2] = {
+"GLSL_DEFINES"
+"uniform sampler2D s_texture0;\n"
+"uniform mat4 m_colourMatrix;\n"
+"varying vec2 v_texcoord0;\n"
+"void main(void)\n"
+"{\n"
+"    vec2 line  = vec2(0.0, %3);\n"
+"    vec4 yuva  = texture2D(s_texture0, v_texcoord0);\n"
+"    vec4 above = texture2D(s_texture0, v_texcoord0 + line);\n"
+"    vec4 below = texture2D(s_texture0, v_texcoord0 - line);\n"
+"    if (fract(v_texcoord0.y * %2) >= 0.5)\n"
+"        yuva = mix(above, below, 0.5);\n"
+"    vec4 res     = vec4(yuva.arb, 1.0) * m_colourMatrix;\n"
+"    gl_FragColor = vec4(res.rgb, yuva.g);\n"
+"}\n",
+
+"GLSL_DEFINES"
+"uniform sampler2D s_texture0;\n"
+"uniform mat4 m_colourMatrix;\n"
+"varying vec2 v_texcoord0;\n"
+"void main(void)\n"
+"{\n"
+"    vec2 line  = vec2(0.0, %3);\n"
+"    vec4 yuva  = texture2D(s_texture0, v_texcoord0);\n"
+"    vec4 above = texture2D(s_texture0, v_texcoord0 + line);\n"
+"    vec4 below = texture2D(s_texture0, v_texcoord0 - line);\n"
+"    if (fract(v_texcoord0.y * %2) < 0.5)\n"
+"        yuva = mix(above, below, 0.5);\n"
+"    vec4 res     = vec4(yuva.arb, 1.0) * m_colourMatrix;\n"
+"    gl_FragColor = vec4(res.rgb, yuva.g);\n"
+"}\n"
+};
+
+
 void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
                                     OpenGLFilterType filter,
                                     QString deint, FrameScanType field)
@@ -1619,6 +1653,9 @@ void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
             vertex = YUV2RGBVertexShader;
             if (deint == "openglonefield" || deint == "openglbobdeint")
                 fragment = OneFieldShader[bottom];
+            else if (deint == "opengllinearblend" ||
+                     deint == "opengldoubleratelinearblend")
+                fragment = LinearBlendShader[bottom];
             else
                 fragment = YUV2RGBFragmentShader;
             break;
