@@ -22,6 +22,7 @@ class BrowserApi : public QObject
     Q_OBJECT
   public:
     BrowserApi(QObject *parent);
+    ~BrowserApi(void);
 
     void setWebView(QWebView *view);
 

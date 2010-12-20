@@ -42,6 +42,11 @@ BrowserApi::BrowserApi(QObject *parent) : QObject(parent)
     gCoreContext->addListener(this);
 }
 
+BrowserApi::~BrowserApi(void)
+{
+    gCoreContext->removeListener(this);
+}
+
 void BrowserApi::setWebView(QWebView *view)
 {
     QWebPage *page = view->page();
