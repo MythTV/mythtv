@@ -1643,6 +1643,71 @@ static const QString LinearBlendShader[2] = {
 "}\n"
 };
 
+static const QString KernelShader[2] = {
+"GLSL_DEFINES"
+"uniform sampler2D s_texture1;\n"
+"uniform sampler2D s_texture2;\n"
+"uniform mat4 m_colourMatrix;\n"
+"varying vec2 v_texcoord0;\n"
+"void main(void)\n"
+"{\n"
+"    vec2 twoup   = v_texcoord0 - vec2(0.0, %4);\n"
+"    vec2 twodown = v_texcoord0 + vec2(0.0, %4);\n"
+"    vec4 yuva    = texture2D(s_texture1, v_texcoord0);\n"
+"    vec4 line0   = texture2D(s_texture1, twoup);\n"
+"    vec4 line1   = texture2D(s_texture1, v_texcoord0 - vec2(0.0, %3));\n"
+"    vec4 line3   = texture2D(s_texture1, v_texcoord0 + vec2(0.0, %3));\n"
+"    vec4 line4   = texture2D(s_texture1, twodown);\n"
+"    vec4 line00  = texture2D(s_texture2, twoup);\n"
+"    vec4 line20  = texture2D(s_texture2, v_texcoord0);\n"
+"    vec4 line40  = texture2D(s_texture2, twodown);\n"
+"    if (fract(v_texcoord0.y * %2) >= 0.5)\n"
+"    {\n"
+"        yuva = (yuva   * 0.125);\n"
+"        yuva = (line20 * 0.125) + yuva;\n"
+"        yuva = (line1  * 0.5) + yuva;\n"
+"        yuva = (line3  * 0.5) + yuva;\n"
+"        yuva = (line0  * -0.0625) + yuva;\n"
+"        yuva = (line4  * -0.0625) + yuva;\n"
+"        yuva = (line00 * -0.0625) + yuva;\n"
+"        yuva = (line40 * -0.0625) + yuva;\n"
+"    }\n"
+"    vec4 res     = vec4(yuva.arb, 1.0) * m_colourMatrix;\n"
+"    gl_FragColor = vec4(res.rgb, yuva.g);\n"
+"}\n",
+
+"GLSL_DEFINES"
+"uniform sampler2D s_texture0;\n"
+"uniform sampler2D s_texture1;\n"
+"uniform mat4 m_colourMatrix;\n"
+"varying vec2 v_texcoord0;\n"
+"void main(void)\n"
+"{\n"
+"    vec2 twoup   = v_texcoord0 - vec2(0.0, %4);\n"
+"    vec2 twodown = v_texcoord0 + vec2(0.0, %4);\n"
+"    vec4 yuva    = texture2D(s_texture1, v_texcoord0);\n"
+"    vec4 line0   = texture2D(s_texture1, twoup);\n"
+"    vec4 line1   = texture2D(s_texture1, v_texcoord0 - vec2(0.0, %3));\n"
+"    vec4 line3   = texture2D(s_texture1, v_texcoord0 + vec2(0.0, %3));\n"
+"    vec4 line4   = texture2D(s_texture1, twodown);\n"
+"    vec4 line00  = texture2D(s_texture0, twoup);\n"
+"    vec4 line20  = texture2D(s_texture0, v_texcoord0);\n"
+"    vec4 line40  = texture2D(s_texture0, twodown);\n"
+"    if (fract(v_texcoord0.y * %2) < 0.5)\n"
+"    {\n"
+"        yuva = (yuva   * 0.125);\n"
+"        yuva = (line20 * 0.125) + yuva;\n"
+"        yuva = (line1  * 0.5) + yuva;\n"
+"        yuva = (line3  * 0.5) + yuva;\n"
+"        yuva = (line0  * -0.0625) + yuva;\n"
+"        yuva = (line4  * -0.0625) + yuva;\n"
+"        yuva = (line00 * -0.0625) + yuva;\n"
+"        yuva = (line40 * -0.0625) + yuva;\n"
+"    }\n"
+"    vec4 res     = vec4(yuva.arb, 1.0) * m_colourMatrix;\n"
+"    gl_FragColor = vec4(res.rgb, yuva.g);\n"
+"}\n"
+};
 
 void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
                                     OpenGLFilterType filter,
@@ -1658,6 +1723,9 @@ void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
             else if (deint == "opengllinearblend" ||
                      deint == "opengldoubleratelinearblend")
                 fragment = LinearBlendShader[bottom];
+            else if (deint == "openglkerneldeint" ||
+                     deint == "opengldoubleratekerneldeint")
+                fragment = KernelShader[bottom];
             else
                 fragment = YUV2RGBFragmentShader;
             break;
