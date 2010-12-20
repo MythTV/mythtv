@@ -807,7 +807,10 @@ bool MythRenderOpenGL::CreateFragmentProgram(const QString &program, uint &prog)
     }
 
     if (success)
+    {
+        VERBOSE(VB_PLAYBACK|VB_EXTRA, "\n" + program + "\n");
         m_programs.push_back(glfp);
+    }
     else
         m_glDeleteProgramsARB(1, &glfp);
 
