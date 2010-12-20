@@ -275,8 +275,8 @@ AudioOutputSettings* AudioOutputSettings::GetCleaned(bool newcopy)
         // assume all amplifier supporting E-AC3 also supports 7.1 LPCM
         // as it's required under the bluray standard
 //#if LIBAVFORMAT_VERSION_INT > AV_VERSION_INT( 52, 83, 0 )
-    aosettings->m_HD = (mchannels == 2 && BestSupportedRate() == 192000);
-    aosettings->m_HDLL = (mchannels == 8 && BestSupportedRate() == 192000);
+    aosettings->m_HD = IsSupportedChannels(2) && IsSupportedRate(192000);
+    aosettings->m_HDLL = IsSupportedChannels(8) && IsSupportedRate(192000);
 //#endif
     if (mchannels == 2 && m_passthrough >= 0)
     {
