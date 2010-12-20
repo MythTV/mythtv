@@ -1004,8 +1004,8 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
     decoder->setWatchingRecording(watchingrecording);
     decoder->setTranscoding(transcoding);
     CheckExtraAudioDecode();
-    //noVideoTracks = !decoder->GetTrackCount(kTrackTypeVideo);
-
+    if (gCoreContext->GetNumSetting("AudioOnlyPlayback", false))
+        noVideoTracks = !decoder->GetTrackCount(kTrackTypeVideo);
 
     eof = false;
 
@@ -2803,8 +2803,8 @@ void MythPlayer::DecoderLoop(bool pause)
 
     while (!killdecoder && !IsErrored())
     {
-        //noVideoTracks = decoder &&
-        //            !decoder->GetTrackCount(kTrackTypeVideo);
+        if (gCoreContext->GetNumSetting("AudioOnlyPlayback", false))
+            noVideoTracks = decoder && !decoder->GetTrackCount(kTrackTypeVideo);
 
         DecoderPauseCheck();
 
