@@ -588,6 +588,8 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
 
     if (deinterlacer == "openglbobdeint" ||
         deinterlacer == "openglonefield" ||
+        deinterlacer == "opengllinearblend" ||
+        deinterlacer == "opengldoubleratelinearblend" ||
         deinterlacer == "opengldoubleratefieldorder")
     {
         ref_size = 0;
@@ -1165,19 +1167,19 @@ static const QString deint_end_bot =
 "CMP res,  prev, other, current;\n";
 
 static const QString linearblend[2] = {
-"TEX current, tex, texture[1], %1;\n"
+"TEX current, tex, texture[0], %1;\n"
 "ADD other, tex, {0.0, %3, 0.0, 0.0};\n"
-"TEX other, other, texture[1], %1;\n"
+"TEX other, other, texture[0], %1;\n"
 "SUB mov, tex, {0.0, %3, 0.0, 0.0};\n"
-"TEX mov, mov, texture[1], %1;\n"
+"TEX mov, mov, texture[0], %1;\n"
 "LRP other, 0.5, other, mov;\n"
 + field_calc + deint_end_top,
 
-"TEX current, tex, texture[1], %1;\n"
+"TEX current, tex, texture[0], %1;\n"
 "SUB other, tex, {0.0, %3, 0.0, 0.0};\n"
-"TEX other, other, texture[1], %1;\n"
+"TEX other, other, texture[0], %1;\n"
 "ADD mov, tex, {0.0, %3, 0.0, 0.0};\n"
-"TEX mov, mov, texture[1], %1;\n"
+"TEX mov, mov, texture[0], %1;\n"
 "LRP other, 0.5, other, mov;\n"
 + field_calc + deint_end_bot
 };
