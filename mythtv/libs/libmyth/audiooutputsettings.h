@@ -1,6 +1,7 @@
 /* -*- Mode: c++ -*-
  *
  * Copyright (C) foobum@gmail.com 2010
+ * Copyright (C) Jean-Yves Avenard 2010
  *
  * Licensed under the GPL v2 or a later version at your choosing.
  */
@@ -11,6 +12,10 @@
 #include <vector>
 
 #include "mythexp.h"
+
+extern "C" {
+#include "libavcodec/avcodec.h"  // to get codec id
+}
 
 using namespace std;
 
@@ -23,6 +28,17 @@ typedef enum {
     FORMAT_S32,
     FORMAT_FLT
 } AudioFormat;
+
+typedef enum {
+    FEATURE_NONE   = 0,
+    FEATURE_AC3    = 1 << 0,
+    FEATURE_DTS    = 1 << 1,
+    FEATURE_LPCM   = 1 << 2,
+    FEATURE_EAC3   = 1 << 3,
+    FEATURE_TRUEHD = 1 << 4,
+    FEATURE_DTSHD  = 1 << 5,
+    FEATURE_AAC    = 1 << 6,
+} DigitalFeature;
 
 static const int srs[] = { 8000,  11025, 16000, 22050, 32000,  44100,
                            48000, 64000, 88200, 96000, 176400, 192000 };
@@ -58,59 +74,92 @@ class MPUBLIC AudioOutputSettings
         void setPassthrough(int val)    { m_passthrough = val; };
         int  canPassthrough()           { return m_passthrough; };
             /**
-             * return true if device can or may support AC3
+             * return DigitalFeature mask.
+             * possible values are:
+             * - FEATURE_AC3
+             * - FEATURE_DTS
+             * - FEATURE_LPCM
+             * - FEATURE_EAC3
+             * - FEATURE_TRUEHD
+             * - FEATURE_DTSHD
              */
-        bool canAC3()                   { return m_AC3; };
+        unsigned int canFeature(DigitalFeature arg)
+        { return m_features & arg; };
+        unsigned int canFeature(unsigned int arg)
+        { return m_features & arg; };
+
+            /**
+             * return true if device can or may support AC3
+             * (deprecated, see canFeature())
+             */
+        bool canAC3()                   { return m_features & FEATURE_AC3; };
             /**
              * return true if device can or may support DTS
+             * (deprecated, see canFeature())
              */
-        bool canDTS()                   { return m_DTS; };
+        bool canDTS()                   { return m_features & FEATURE_DTS; };
             /**
              * return true if device supports multichannels PCM
+             * (deprecated, see canFeature())
              */
-        bool canLPCM()                  { return m_LPCM; };
-            /**
-             * return true if device supports E-AC3 or DTS-HD passthrough
-             */
-        bool canHD()                    { return m_HD; };
-            /**
-             * return true if device supports TrueHD or DTS-HD MA passthrough
-             */
-        bool canHDLL()                  { return m_HDLL; };
+        bool canLPCM()                  { return m_features & FEATURE_LPCM; };
             /**
              * return true if class instance is marked invalid.
              * if true, you can not assume any of the other method returned
              * values are valid
              */
         bool IsInvalid()                { return m_invalid; };
-        void setAC3(bool b)             { m_AC3 = b; };
-        void setDTS(bool b)             { m_DTS = b; };
-        void setLPCM(bool b)            { m_LPCM = b; };
-        void setHD(bool b)              { m_HD = b; };
-        void setHDLL(bool b)            { m_HDLL = b; };
+
+            /**
+             * set the provided digital feature
+             * possible values are:
+             * - FEATURE_AC3
+             * - FEATURE_DTS
+             * - FEATURE_LPCM
+             * - FEATURE_EAC3
+             * - FEATURE_TRUEHD
+             * - FEATURE_DTSHD
+             */
+        void setFeature(DigitalFeature arg)     { m_features |= arg; };
+        void setFeature(unsigned int arg)       { m_features |= arg; };
+
+            /**
+             * clear or set digital feature internal mask
+             */ 
+        void setFeature(bool val, DigitalFeature arg);
+
             /**
              * Force set the greatest number of channels supported by the audio
              * device
              */
         void SetBestSupportedChannels(int channels);
-        int  GetMaxBitrate();
+
+            /**
+             * return the highest bitrate supported. Currently only of value
+             * for DTS and DTS-HD playback
+             */
+        int  GetMaxBitrate(int codec = CODEC_ID_DTS);
 
     private:
         void SortSupportedChannels();
 
-        /* passthrough status
+        /** passthrough status
          * -1 : no
          * 0: unknown
          * 1: yes
          */
         int  m_passthrough;
-        bool m_AC3;
-        bool m_DTS;
-        bool m_LPCM;
-        bool m_HD;
-        bool m_HDLL;
+
+        unsigned int m_features;
 
         bool m_invalid;
+            /**
+             * will be set to true if we were able to retrieve the device ELD
+             * (EDID like Data). ELD contains information about the audio
+             * processing capabilities of the device connected to the audio card
+             * ELD is usually retrieve from EDID CEA-861-E extension.
+             */
+        bool m_has_eld;
 
         vector<int> m_sr, m_rates, m_channels;
         vector<AudioFormat> m_sf, m_formats;

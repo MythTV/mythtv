@@ -1,6 +1,7 @@
 /* -*- Mode: c++ -*-
  *
  * Copyright (C) Daniel Kristjansson 2008
+ * Copyright (C) Jean-Yves Avenard 2010
  *
  * Licensed under the GPL v2 or a later version at your choosing.
  */

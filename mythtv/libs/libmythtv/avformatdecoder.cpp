@@ -4607,11 +4607,11 @@ bool AvFormatDecoder::DoPassThrough(const AVCodecContext *ctx)
     if (ctx->codec_id == CODEC_ID_AC3)
         passthru = m_audio->CanAC3();
     else if (ctx->codec_id == CODEC_ID_DTS)
-        passthru = m_audio->CanDTS();
+        passthru = m_audio->CanDTS() || m_audio->CanDTSHD();
     else if (ctx->codec_id == CODEC_ID_EAC3)
-        passthru = m_audio->CanHD();
+        passthru = m_audio->CanEAC3();
     else if (ctx->codec_id == CODEC_ID_TRUEHD)
-        passthru = m_audio->CanHDLL();
+        passthru = m_audio->CanTrueHD();
     passthru &= m_audio->CanPassthrough(ctx->sample_rate, ctx->channels);
     passthru &= !internal_vol;
     passthru &= !transcoding && !disable_passthru;

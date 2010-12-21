@@ -106,7 +106,7 @@ AudioConfigSettings::AudioConfigSettings(ConfigurationWizard *parent) :
     m_OutputDevice(NULL),   m_MaxAudioChannels(NULL),
     m_AudioUpmix(NULL),     m_AudioUpmixType(NULL),
     m_AC3PassThrough(NULL), m_DTSPassThrough(NULL),
-    m_EAC3PassThrough(NULL),m_TrueHDPassThrough(NULL),
+    m_EAC3PassThrough(NULL),m_TrueHDPassThrough(NULL), m_DTSHDPassThrough(NULL),
     m_passthrough8(false),  m_parent(parent)
 {
     setLabel(QObject::tr("Audio System"));
@@ -148,6 +148,7 @@ AudioConfigSettings::AudioConfigSettings(ConfigurationWizard *parent) :
     m_DTSPassThrough = DTSPassThrough();
     m_EAC3PassThrough = EAC3PassThrough();
     m_TrueHDPassThrough = TrueHDPassThrough();
+    m_DTSHDPassThrough = DTSHDPassThrough();
 
     m_cgsettings = new HorizontalConfigurationGroup();
     m_cgsettings->setLabel(QObject::tr("Digital Audio Capabilities"));
@@ -155,6 +156,7 @@ AudioConfigSettings::AudioConfigSettings(ConfigurationWizard *parent) :
     m_cgsettings->addChild(m_DTSPassThrough);
     m_cgsettings->addChild(m_EAC3PassThrough);
     m_cgsettings->addChild(m_TrueHDPassThrough);
+    m_cgsettings->addChild(m_DTSHDPassThrough);
 
     TriggeredItem *sub1 = new TriggeredItem(m_triggerDigital, m_cgsettings);
 
@@ -190,6 +192,8 @@ AudioConfigSettings::AudioConfigSettings(ConfigurationWizard *parent) :
     connect(m_EAC3PassThrough, SIGNAL(valueChanged(const QString&)),
             this, SLOT(UpdateCapabilities(const QString&)));
     connect(m_TrueHDPassThrough, SIGNAL(valueChanged(const QString&)),
+            this, SLOT(UpdateCapabilities(const QString&)));
+    connect(m_DTSHDPassThrough, SIGNAL(valueChanged(const QString&)),
             this, SLOT(UpdateCapabilities(const QString&)));
     AudioRescan();
 }
@@ -255,7 +259,7 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
         // Test if everything is set yet
     if (!m_OutputDevice    || !m_MaxAudioChannels   ||
         !m_AC3PassThrough  || !m_DTSPassThrough     ||
-        !m_EAC3PassThrough || !m_TrueHDPassThrough)
+        !m_EAC3PassThrough || !m_TrueHDPassThrough  || !m_DTSHDPassThrough)
         return settings;
 
     if (!slotlock.tryLock()) // Doing a rescan of channels
@@ -266,8 +270,9 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
     bool bAC3 = true;
     bool bDTS = true;
     bool bLPCM = true;
-    bool bHD = true;
-    bool bHDLL = true;
+    bool bEAC3 = true;
+    bool bTRUEHD = true;
+    bool bDTSHD = true;
 
     QString out = m_OutputDevice->getValue();
     if (!audiodevs.contains(out))
@@ -281,17 +286,24 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
 
         realmax_speakers = max_speakers = settings.BestSupportedChannels();
 
-        bAC3  = (settings.canAC3() || bForceDigital) &&
+        bAC3  =
+            (settings.canFeature(FEATURE_AC3) || bForceDigital) &&
             m_AC3PassThrough->boolValue();
-        bDTS  = (settings.canDTS() || bForceDigital) &&
+        bDTS  =
+            (settings.canFeature(FEATURE_DTS) || bForceDigital) &&
             m_DTSPassThrough->boolValue();
-        bLPCM = settings.canLPCM() &&
+        bLPCM =
+            settings.canFeature(FEATURE_LPCM) &&
             !gCoreContext->GetNumSetting("StereoPCM", false);
-        bHD = ((bLPCM && settings.canHD()) || bForceDigital) &&
-            m_EAC3PassThrough->boolValue() &&
+        bEAC3 =
+            (settings.canFeature(FEATURE_EAC3) || bForceDigital) &&
             !gCoreContext->GetNumSetting("Audio48kOverride", false);
-        bHDLL = ((bLPCM && settings.canHDLL()) || bForceDigital) &&
-            m_TrueHDPassThrough->boolValue() &&
+        bTRUEHD =
+            ((bLPCM && settings.canFeature(FEATURE_TRUEHD)) || bForceDigital) &&
+            !gCoreContext->GetNumSetting("Audio48kOverride", false) &&
+            gCoreContext->GetNumSetting("HBRPassthru", true);
+        bDTSHD =
+            (settings.canFeature(FEATURE_DTSHD) || bForceDigital) &&
             !gCoreContext->GetNumSetting("Audio48kOverride", false);
 
         if (max_speakers > 2 && !bLPCM)
@@ -300,10 +312,13 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
             max_speakers = 6;
     }
 
-    m_triggerDigital->setValue(invalid || bForceDigital ||
-                               settings.canAC3() || settings.canDTS());
-    m_EAC3PassThrough->setEnabled(settings.canHD() && bLPCM);
-    m_TrueHDPassThrough->setEnabled(settings.canHDLL() & bLPCM);
+    m_triggerDigital->setValue(
+        invalid || bForceDigital ||
+        settings.canFeature(FEATURE_AC3 | FEATURE_DTS | FEATURE_EAC3 |
+                            FEATURE_TRUEHD | FEATURE_DTSHD));
+    m_EAC3PassThrough->setEnabled(bEAC3);
+    m_TrueHDPassThrough->setEnabled(bTRUEHD);
+    m_DTSHDPassThrough->setEnabled(bDTSHD);
 
     int cur_speakers = m_MaxAudioChannels->getValue().toInt();
 
@@ -342,9 +357,8 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
         }
     }
     settings.SetBestSupportedChannels(cur_speakers);
-    settings.setAC3(bAC3);
-    settings.setDTS(bDTS);
-    settings.setLPCM(bLPCM && (realmax_speakers > 2));
+    settings.setFeature(bAC3, FEATURE_AC3);
+    settings.setFeature(bLPCM && realmax_speakers > 2, FEATURE_LPCM);
 
     slotlock.unlock();
     return settings;
@@ -434,21 +448,30 @@ HostCheckBox *AudioConfigSettings::DTSPassThrough()
 HostCheckBox *AudioConfigSettings::EAC3PassThrough()
 {
     HostCheckBox *gc = new HostCheckBox("EAC3PassThru");
-    gc->setLabel(QObject::tr("E-AC3/DTS-HD"));
+    gc->setLabel(QObject::tr("E-AC3"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
-                    "supports E-AC3 (DD+) or DTS-HD. You must use a hdmi "
-                    "connection."));
+                    "supports E-AC3 (DD+). You must use a hdmi connection."));
     return gc;
 }
 
 HostCheckBox *AudioConfigSettings::TrueHDPassThrough()
 {
     HostCheckBox *gc = new HostCheckBox("TrueHDPassThru");
-    gc->setLabel(QObject::tr("TrueHD/DTS-HD MA"));
+    gc->setLabel(QObject::tr("TrueHD"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
                     "supports Dolby TrueHD. You must use a hdmi connection."));
+    return gc;
+}
+
+HostCheckBox *AudioConfigSettings::DTSHDPassThrough()
+{
+    HostCheckBox *gc = new HostCheckBox("DTSHDPassThru");
+    gc->setLabel(QObject::tr("DTS-HD"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
+                    "supports DTS-HD. You must use a hdmi connection."));
     return gc;
 }
 
@@ -1098,6 +1121,19 @@ HostComboBox *AudioAdvancedSettings::PassThroughOutputDevice()
     return gc;
 }
 
+HostCheckBox *AudioAdvancedSettings::HBRPassthrough()
+{
+    HostCheckBox *gc = new HostCheckBox("HBRPassthru");
+    gc->setLabel(QObject::tr("HBR passthrough support"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("HBR support is required for TrueHD and DTS-HD "
+                        "passthrough. If unchecked, Myth will limit the "
+                        "passthrough bitrate to 6.144Mbit/s."
+                        "This will disable True-HD passthrough, however will "
+                        "allow DTS-HD content to be sent as DTS-HD Hi-Res."));
+    return gc;
+}
+
 AudioAdvancedSettings::AudioAdvancedSettings(bool mpcm)
 {
     ConfigurationGroup *settings3 =
@@ -1121,16 +1157,21 @@ AudioAdvancedSettings::AudioAdvancedSettings(bool mpcm)
         new HorizontalConfigurationGroup(false, false);
     settings5->addChild(Audio48kOverride());
 
+    ConfigurationGroup *settings6 =
+        new HorizontalConfigurationGroup(false, false);
+    settings6->addChild(HBRPassthrough());
+
     addChild(settings4);
     addChild(settings5);
     addChild(settings3);
+    addChild(settings6);
 
     if (mpcm)
     {
-        ConfigurationGroup *settings6;
-        settings6 = new HorizontalConfigurationGroup(false, false);
-        settings6->addChild(MPCM());
-        addChild(settings6);
+        ConfigurationGroup *settings7;
+        settings7 = new HorizontalConfigurationGroup(false, false);
+        settings7->addChild(MPCM());
+        addChild(settings7);
     }
 }
 

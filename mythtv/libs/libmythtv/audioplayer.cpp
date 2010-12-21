@@ -294,32 +294,36 @@ void AudioPlayer::SetStretchFactor(float factor)
 // thread will trigger a deletion/recreation of the AudioOutput device, hence
 // they should be safe.
 
+inline bool TestFeature(AudioOutput *ao, DigitalFeature feature)
+{
+    if (!ao)
+        return false;
+    return ao->GetOutputSettingsUsers()->canFeature(feature);
+}
+
 bool AudioPlayer::CanAC3(void)
 {
-    if (!m_audioOutput)
-        return false;
-    return m_audioOutput->GetOutputSettingsUsers()->canAC3();
+    return TestFeature(m_audioOutput, FEATURE_AC3);
 }
 
 bool AudioPlayer::CanDTS(void)
 {
-    if (!m_audioOutput)
-        return false;
-    return m_audioOutput->GetOutputSettingsUsers()->canDTS();
+    return TestFeature(m_audioOutput, FEATURE_DTS);
 }
 
-bool AudioPlayer::CanHD(void)
+bool AudioPlayer::CanEAC3(void)
 {
-    if (!m_audioOutput)
-        return false;
-    return m_audioOutput->GetOutputSettingsUsers()->canHD();
+    return TestFeature(m_audioOutput, FEATURE_EAC3);
 }
 
-bool AudioPlayer::CanHDLL(void)
+bool AudioPlayer::CanTrueHD(void)
 {
-    if (!m_audioOutput)
-        return false;
-    return m_audioOutput->GetOutputSettingsUsers()->canHDLL();
+    return TestFeature(m_audioOutput, FEATURE_TRUEHD);
+}
+
+bool AudioPlayer::CanDTSHD(void)
+{
+    return TestFeature(m_audioOutput, FEATURE_DTSHD);
 }
 
 uint AudioPlayer::GetMaxChannels(void)
@@ -329,18 +333,18 @@ uint AudioPlayer::GetMaxChannels(void)
     return m_audioOutput->GetOutputSettingsUsers()->BestSupportedChannels();
 }
 
-int AudioPlayer::GetMaxBitrate(void)
+int AudioPlayer::GetMaxBitrate(int codec)
 {
     if (!m_audioOutput)
         return 48000 * 16 * 2;
-    return m_audioOutput->GetOutputSettingsUsers()->GetMaxBitrate();
+    return m_audioOutput->GetOutputSettingsUsers()->GetMaxBitrate(codec);
 }
 
-bool AudioPlayer::CanPassthrough(int samplerate, int channels)
+bool AudioPlayer::CanPassthrough(int samplerate, int channels, int codec)
 {
     if (!m_audioOutput)
         return false;
-    return m_audioOutput->CanPassthrough(samplerate, channels);
+    return m_audioOutput->CanPassthrough(samplerate, channels, codec);
 }
 
 void AudioPlayer::AddAudioData(char *buffer, int len, int64_t timecode)

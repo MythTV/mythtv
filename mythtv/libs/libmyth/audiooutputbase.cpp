@@ -213,7 +213,8 @@ AudioOutputSettings* AudioOutputBase::GetOutputSettingsUsers(void)
 /**
  * Test if we can output digital audio and if sample rate is supported
  */
-bool AudioOutputBase::CanPassthrough(int samplerate, int channels) const
+bool AudioOutputBase::CanPassthrough(int samplerate, int channels,
+                                     int codec) const
 {
     bool ret = false;
     ret = output_settings->IsSupportedFormat(FORMAT_S16);
@@ -406,7 +407,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
                     log = "DTS Core";
                     break;
                 }
-                if (output_settings->canHDLL() &&
+                if (output_settings->GetMaxBitrate() > 192000 * 16 * 2 &&
                     settings.bitrate > 48000 * 16 * 2)
                 {
                     log = "DTS-HD MA";
@@ -512,16 +513,12 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
            output_settings->canAC3() &&
            ((!output_settings->canLPCM() && configured_channels > 2) ||
             !output_settings->IsSupportedChannels(channels)));
-    VBAUDIO(QString("enc(%1), passthru(%2), canAC3(%3), canDTS(%4), canHD(%5), "
-                    "canHDLL(%6), canLPCM(%7), "
-                    "configured_channels(%8), %9 channels supported(%10)")
+    VBAUDIO(QString("enc(%1), passthru(%2), feature (0x%3) "
+                    "configured_channels(%4), %5 channels supported(%6)")
             .arg(enc)
             .arg(passthru)
-            .arg(output_settings->canAC3())
-            .arg(output_settings->canDTS())
-            .arg(output_settings->canHD())
-            .arg(output_settings->canHDLL())
-            .arg(output_settings->canLPCM())
+            .arg(output_settings->canFeature((DigitalFeature)~FEATURE_NONE),
+                 0, 16)
             .arg(configured_channels)
             .arg(channels)
             .arg(output_settings->IsSupportedChannels(channels)));

@@ -41,13 +41,14 @@ class MPUBLIC AudioPlayer
     float GetStretchFactor(void) { return m_stretchfactor;   }
     void  SetStretchFactor(float factor);
     bool  ToggleUpmix(void);
-    bool  CanPassthrough(int samplerate, int channels);
+    bool  CanPassthrough(int samplerate, int channels, int codec = 0);
     bool  CanAC3(void);
     bool  CanDTS(void);
-    bool  CanHD(void);
-    bool  CanHDLL(void);
+    bool  CanEAC3(void);
+    bool  CanTrueHD(void);
+    bool  CanDTSHD(void);
     uint  GetMaxChannels(void);
-    int   GetMaxBitrate(void);
+    int   GetMaxBitrate(int codec = CODEC_ID_DTS);
     int64_t GetAudioTime(void);
 
     bool      IsMuted(void) { return GetMuteState() == kMuteAll; }
