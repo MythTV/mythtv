@@ -313,6 +313,32 @@ class Recorded( DBDataWrite, CMPRecord ):
 
         self.update()
 
+    def exportMetadata(self):
+        """Exports data to a VideoMetadata object."""
+        # only work on existing entries
+        if self._wheredat is None:
+            return
+        metadata = VideoMetadata()
+
+        # pull direct matches
+        for tag in ('title', 'subtitle', 'description'):
+            if self[tag]:
+                metadata[tag] = self[tag]
+
+        # pull translated matches
+        for tagf,tagt in (('stars','userrating'),):
+            if self[tagf]:
+                metadata[tagt] = self[tagf]
+
+        # pull cast
+        for member in self.cast:
+            name = member.name
+            role = ' '.join([word.capitalize() for word in member.role.split('_')])
+            if role=='Writer': role = 'Author'
+            metadata.people.append({'name':name, 'job':role})
+
+        return metadata
+
     def __getstate__(self):
         data = DBDataWrite.__getstate__(self)
         data['cast'] = self.cast._picklelist()
@@ -887,6 +913,50 @@ class Video( VideoSchema, DBDataWrite, CMPVideo ):
 
         self.processed = True
         self.update()
+
+    def exportMetadata(self):
+        """Exports data to a VideoMetadata object."""
+        # only work on entries from the database
+        if self._wheredat is None:
+            return
+        metadata = VideoMetadata()
+
+        # pull direct tags
+        for tag in ('title', 'subtitle', 'tagline', 'season', 'episode',
+                    'inetref', 'homepage', 'trailer', 'userrating', 'year'):
+            if self[tag]:
+                metadata[tag] = self[tag]
+
+        # pull translated tags
+        for tagf, tagt in (('plot', 'description'), ('length', 'runtime')):
+            if self[tagf]:
+                metadata[tagt] = self[tagf]
+
+        # pull director
+        if self.director:
+            metadata.people.append({'name':self.director, 'job':'Director'})
+
+        # pull actors
+        for actor in self.cast:
+            metadata.people.append({'name':actor.cast, 'job':'Actor'})
+
+        # pull genres
+        for genre in self.genre:
+            metadata.categories.append(genre.genre)
+
+        # pull countries
+        for country in self.country:
+            metadata.countries.append(country.country)
+
+        # pull images
+        t1 = ['coverart', 'fanart', 'banner', 'screenshot']
+        t2 = ['coverfile', 'fanart', 'banner', 'screenshot']
+        mdtype = dict(zip(t2,t1))
+        for type in t2:
+            if self[type]:
+                metadata.images.append({'type':mdtype[type], 'filname':self[type]})
+
+        return metadata
 
     def __getstate__(self):
         data = DBDataWrite.__getstate__(self)
