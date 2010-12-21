@@ -489,8 +489,7 @@ class MPUBLIC ProgramInfo
     uint        QueryMplexID(void) const;
     QDateTime   QueryBookmarkTimeStamp(void) const;
     uint64_t    QueryBookmark(void) const;
-    QStringList QueryDVDBookmark(const QString &serialid,
-                                 bool delbookmark) const;
+    QStringList QueryDVDBookmark(const QString &serialid) const;
     bool        QueryIsEditing(void) const;
     bool        QueryIsInUse(QStringList &byWho) const;
     bool        QueryIsInUse(QString &byWho) const;
