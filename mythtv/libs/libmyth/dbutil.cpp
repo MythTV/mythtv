@@ -806,7 +806,7 @@ int DBUtil::CountClients(void)
     params << "-h" << DB.dbHostName;
     params << "-u" << DB.dbUserName;
     params << "-p" + DB.dbPassword;
-    params << "-e" << "SHOW PROCESSLIST";
+    params << "-e" << "\"SHOW PROCESSLIST\"";
 
     uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
     MythSystem  ms(cmd, params, flags);
