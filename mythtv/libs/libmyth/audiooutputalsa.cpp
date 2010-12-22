@@ -36,8 +36,7 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
     pbufsize(-1),
     m_card(-1),
     m_device(-1),
-    m_subdevice(-1),
-    m_autopassthrough(false)
+    m_subdevice(-1)
 {
     m_mixer.handle = NULL;
     m_mixer.elem = NULL;
@@ -45,7 +44,6 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
     // Set everything up
     if (passthru_device == "auto")
     {
-        m_autopassthrough = true;
         passthru_device = main_device;
 
         int len = passthru_device.length();
@@ -100,6 +98,8 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
     }
     else if (passthru_device.toLower() == "default")
         passthru_device = main_device;
+    else
+        m_discretedigital = true;
 
     InitSettings(settings);
     if (settings.init)
@@ -124,7 +124,7 @@ int AudioOutputALSA::TryOpenDevice(int open_mode, int try_ac3)
         err = snd_pcm_open(&pcm_handle, dev_ba.constData(),
                            SND_PCM_STREAM_PLAYBACK, open_mode);
         m_lastdevice = passthru_device;
-        if (!m_autopassthrough)
+        if (m_discretedigital)
             return err;
         if (err < 0)
         {
@@ -279,7 +279,7 @@ bool AudioOutputALSA::IncPreallocBufferSize(int requested, int buffer_time)
     return ret;
 }
 
-AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
+AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
 {
     snd_pcm_hw_params_t *params;
     snd_pcm_format_t afmt = SND_PCM_FORMAT_UNKNOWN;
@@ -295,7 +295,7 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
         pcm_handle = NULL;
     }
 
-    if((err = TryOpenDevice(OPEN_FLAGS, passthru || enc)) < 0)
+    if((err = TryOpenDevice(OPEN_FLAGS, passthrough)) < 0)
     {
         AERROR(QString("snd_pcm_open(\"%1\")").arg(m_lastdevice));
         delete settings;
@@ -307,7 +307,7 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
     if ((err = snd_pcm_hw_params_any(pcm_handle, params)) < 0)
     {
         snd_pcm_close(pcm_handle);
-        if((err = TryOpenDevice(OPEN_FLAGS&FILTER_FLAGS, passthru || enc)) < 0)
+        if((err = TryOpenDevice(OPEN_FLAGS&FILTER_FLAGS, passthrough)) < 0)
         {
             AERROR(QString("snd_pcm_open(\"%1\")").arg(m_lastdevice));
             delete settings;
@@ -355,7 +355,7 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
     QMap<QString, QString> *alsadevs = GetALSADevices("pcm");
     while(1)
     {
-        QString real_device = (((passthru || enc) && !m_autopassthrough) ?
+        QString real_device = (((passthru || enc) && m_discretedigital) ?
                                passthru_device : main_device);
 
         QString desc = alsadevs->value(real_device);
@@ -399,7 +399,7 @@ bool AudioOutputALSA::OpenDevice()
     if (pcm_handle != NULL)
         CloseDevice();
 
-    if ((err = TryOpenDevice(0, passthru || enc)) < 0)    
+    if ((err = TryOpenDevice(0, passthru || enc)) < 0)
     {
         AERROR(QString("snd_pcm_open(\"%1\")").arg(m_lastdevice));
         if (pcm_handle)

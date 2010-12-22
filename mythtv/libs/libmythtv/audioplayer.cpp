@@ -71,7 +71,7 @@ QString AudioPlayer::ReinitAudio(void)
                                           setVolume, m_passthru);
         if (m_no_audio_in)
             aos.init = false;
-            
+
         m_audioOutput = AudioOutput::OpenAudio(aos);
         if (!m_audioOutput)
         {
@@ -91,25 +91,26 @@ QString AudioPlayer::ReinitAudio(void)
         SetStretchFactor(m_stretchfactor);
     }
 
-    if (!firstinit)
+    if (!errMsg.isEmpty())
     {
-        if (!errMsg.isEmpty())
+        if (!firstinit)
         {
             VERBOSE(VB_IMPORTANT, LOC + "Disabling Audio" +
                     QString(", reason is: %1").arg(errMsg));
-            m_no_audio_out = true;
         }
-        else if (m_no_audio_out)
-        {
-            VERBOSE(VB_IMPORTANT, LOC + "Enabling Audio");
-            m_no_audio_out = false;
-        }
-        if (m_muted_on_creation)
-        {
-            SetMuteState(kMuteAll);
-            m_muted_on_creation = false;
-        }
+        m_no_audio_out = true;
     }
+    else if (m_no_audio_out)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "Enabling Audio");
+        m_no_audio_out = false;
+    }
+    if (m_muted_on_creation)
+    {
+        SetMuteState(kMuteAll);
+        m_muted_on_creation = false;
+    }
+
     return errMsg;
 }
 
@@ -203,7 +204,7 @@ void AudioPlayer::SetAudioParams(AudioFormat format, int orig_channels,
 
 void AudioPlayer::SetEffDsp(int dsprate)
 {
-    if (m_audioOutput || !m_no_audio_out)
+    if (!m_audioOutput || !m_no_audio_out)
         return;
     QMutexLocker lock(&m_lock);
     m_audioOutput->SetEffDsp(dsprate);
@@ -294,36 +295,37 @@ void AudioPlayer::SetStretchFactor(float factor)
 // thread will trigger a deletion/recreation of the AudioOutput device, hence
 // they should be safe.
 
-inline bool TestFeature(AudioOutput *ao, DigitalFeature feature)
+inline bool TestDigitalFeature(AudioOutput *ao, DigitalFeature feature)
 {
     if (!ao)
         return false;
-    return ao->GetOutputSettingsUsers()->canFeature(feature);
+
+    return ao->GetOutputSettingsUsers(true)->canFeature(feature);
 }
 
 bool AudioPlayer::CanAC3(void)
 {
-    return TestFeature(m_audioOutput, FEATURE_AC3);
+    return TestDigitalFeature(m_audioOutput, FEATURE_AC3);
 }
 
 bool AudioPlayer::CanDTS(void)
 {
-    return TestFeature(m_audioOutput, FEATURE_DTS);
+    return TestDigitalFeature(m_audioOutput, FEATURE_DTS);
 }
 
 bool AudioPlayer::CanEAC3(void)
 {
-    return TestFeature(m_audioOutput, FEATURE_EAC3);
+    return TestDigitalFeature(m_audioOutput, FEATURE_EAC3);
 }
 
 bool AudioPlayer::CanTrueHD(void)
 {
-    return TestFeature(m_audioOutput, FEATURE_TRUEHD);
+    return TestDigitalFeature(m_audioOutput, FEATURE_TRUEHD);
 }
 
 bool AudioPlayer::CanDTSHD(void)
 {
-    return TestFeature(m_audioOutput, FEATURE_DTSHD);
+    return TestDigitalFeature(m_audioOutput, FEATURE_DTSHD);
 }
 
 uint AudioPlayer::GetMaxChannels(void)

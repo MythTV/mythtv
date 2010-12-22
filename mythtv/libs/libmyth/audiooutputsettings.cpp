@@ -324,13 +324,11 @@ AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
 
     int cur_channels = gCoreContext->GetNumSetting("MaxChannels", 2);
     int max_channels = aosettings->BestSupportedChannels();
-    bool bForceDigital = gCoreContext->GetNumSetting(
-        "PassThruDeviceOverride", false);
 
-    bool bAC3  = (aosettings->canFeature(FEATURE_AC3) || bForceDigital) &&
+    bool bAC3  = aosettings->canFeature(FEATURE_AC3) &&
         gCoreContext->GetNumSetting("AC3PassThru", false);
 
-    bool bDTS  = (aosettings->canFeature(FEATURE_DTS) || bForceDigital) && 
+    bool bDTS  = aosettings->canFeature(FEATURE_DTS) && 
         gCoreContext->GetNumSetting("DTSPassThru", false);
 
     bool bLPCM = aosettings->canFeature(FEATURE_LPCM) &&
@@ -341,7 +339,7 @@ AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
         !gCoreContext->GetNumSetting("Audio48kOverride", false);
 
         // TrueHD requires HBR support.
-    bool bTRUEHD = bLPCM && aosettings->canFeature(FEATURE_TRUEHD) &&
+    bool bTRUEHD = aosettings->canFeature(FEATURE_TRUEHD) &&
         gCoreContext->GetNumSetting("TrueHDPassThru", false) &&
         !gCoreContext->GetNumSetting("Audio48kOverride", false) &&
         gCoreContext->GetNumSetting("HBRPassthru", true);
@@ -369,9 +367,6 @@ AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
     return aosettings;
 }
 
-/**
- * Return the highest passthrough bitrate available.
- */
 int AudioOutputSettings::GetMaxBitrate(int codec)
 {
     if (codec == CODEC_ID_DTS)
@@ -389,4 +384,38 @@ int AudioOutputSettings::GetMaxBitrate(int codec)
         return 192000 * 16 * 8;      // TrueHD or DTS-HD MA: 192k, 16 bits, 8 ch
     }
     return 48000 * 16 * 2;
+}
+
+#define ARG(x) ((tmp.isEmpty() ? "" : ",") + QString(x))
+    
+QString AudioOutputSettings::FeaturesToString(DigitalFeature arg)
+{
+    QString tmp;
+    DigitalFeature feature[] = {
+        FEATURE_AC3,
+        FEATURE_DTS,
+        FEATURE_LPCM,
+        FEATURE_EAC3,
+        FEATURE_TRUEHD,
+        FEATURE_DTSHD,
+        FEATURE_AAC,
+        (DigitalFeature)-1
+    };
+    const char *feature_str[] = {
+        "AC3",
+        "DTS",
+        "LPCM",
+        "EAC3",
+        "TRUEHD",
+        "DTSHD",
+        "AAC",
+        NULL
+    };
+    
+    for (unsigned int i = 0; feature[i] != (DigitalFeature)-1; i++)
+    {
+        if (arg & feature[i])
+            tmp += ARG(feature_str[i]);
+    }
+    return tmp;
 }

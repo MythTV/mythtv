@@ -107,7 +107,7 @@ AudioConfigSettings::AudioConfigSettings(ConfigurationWizard *parent) :
     m_AudioUpmix(NULL),     m_AudioUpmixType(NULL),
     m_AC3PassThrough(NULL), m_DTSPassThrough(NULL),
     m_EAC3PassThrough(NULL),m_TrueHDPassThrough(NULL), m_DTSHDPassThrough(NULL),
-    m_passthrough8(false),  m_parent(parent)
+    m_parent(parent)
 {
     setLabel(QObject::tr("Audio System"));
     setUseLabel(false);
@@ -137,7 +137,6 @@ AudioConfigSettings::AudioConfigSettings(ConfigurationWizard *parent) :
     devices.append(*adc);
 
     delete adc;
-    CheckPassthrough();
 
     ConfigurationGroup *maingroup = new VerticalConfigurationGroup(false,
                                                                    false);
@@ -233,6 +232,16 @@ void AudioConfigSettings::AudioRescan()
         delete adc;
     }
     m_OutputDevice->AudioRescan();
+    if (!CheckPassthrough())
+    {
+        QString msg =QObject::tr("Passthrough device is invalid or not useable."
+                                 " Check configuration in Advanced Settings:") +
+            gCoreContext->GetSetting("PassThruOutputDevice");
+        MythPopupBox::showOkPopup(
+            GetMythMainWindow(), QObject::tr("Warning"), msg);
+        VERBOSE(VB_IMPORTANT, QString("Audio device %1 isn't usable ")
+                .arg(name));
+    }
     slotlock.unlock();
     UpdateCapabilities(QString::null);
 }
@@ -254,7 +263,7 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
     int realmax_speakers = 8;
 
     bool invalid = false;
-    AudioOutputSettings settings;
+    AudioOutputSettings settings, settingsdigital;
 
         // Test if everything is set yet
     if (!m_OutputDevice    || !m_MaxAudioChannels   ||
@@ -265,8 +274,6 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
     if (!slotlock.tryLock()) // Doing a rescan of channels
         return settings;
 
-    bool bForceDigital = gCoreContext->GetNumSetting("PassThruDeviceOverride",
-                                                     false);
     bool bAC3 = true;
     bool bDTS = true;
     bool bLPCM = true;
@@ -282,28 +289,28 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
     }
     else
     {
+        bool bForceDigital =
+            gCoreContext->GetNumSetting("PassThruDeviceOverride", false);
+
         settings = audiodevs.value(out).settings;
+        settingsdigital = bForceDigital ?
+            audiodevs.value(gCoreContext->GetSetting("PassThruOutputDevice"))
+            .settings : settings;
 
         realmax_speakers = max_speakers = settings.BestSupportedChannels();
 
-        bAC3  =
-            (settings.canFeature(FEATURE_AC3) || bForceDigital) &&
+        bAC3  = settingsdigital.canFeature(FEATURE_AC3) &&
             m_AC3PassThrough->boolValue();
-        bDTS  =
-            (settings.canFeature(FEATURE_DTS) || bForceDigital) &&
+        bDTS  = settingsdigital.canFeature(FEATURE_DTS)  &&
             m_DTSPassThrough->boolValue();
-        bLPCM =
-            settings.canFeature(FEATURE_LPCM) &&
+        bLPCM = settings.canFeature(FEATURE_LPCM) &&
             !gCoreContext->GetNumSetting("StereoPCM", false);
-        bEAC3 =
-            (settings.canFeature(FEATURE_EAC3) || bForceDigital) &&
+        bEAC3 = settingsdigital.canFeature(FEATURE_EAC3) &&
             !gCoreContext->GetNumSetting("Audio48kOverride", false);
-        bTRUEHD =
-            ((bLPCM && settings.canFeature(FEATURE_TRUEHD)) || bForceDigital) &&
+        bTRUEHD = settingsdigital.canFeature(FEATURE_TRUEHD) &&
             !gCoreContext->GetNumSetting("Audio48kOverride", false) &&
             gCoreContext->GetNumSetting("HBRPassthru", true);
-        bDTSHD =
-            (settings.canFeature(FEATURE_DTSHD) || bForceDigital) &&
+        bDTSHD = settingsdigital.canFeature(FEATURE_DTSHD) &&
             !gCoreContext->GetNumSetting("Audio48kOverride", false);
 
         if (max_speakers > 2 && !bLPCM)
@@ -312,10 +319,9 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
             max_speakers = 6;
     }
 
-    m_triggerDigital->setValue(
-        invalid || bForceDigital ||
-        settings.canFeature(FEATURE_AC3 | FEATURE_DTS | FEATURE_EAC3 |
-                            FEATURE_TRUEHD | FEATURE_DTSHD));
+    m_triggerDigital->setValue(invalid || settingsdigital.canFeature(
+                                   FEATURE_AC3 | FEATURE_DTS | FEATURE_EAC3 |
+                                   FEATURE_TRUEHD | FEATURE_DTSHD));
     m_EAC3PassThrough->setEnabled(bEAC3);
     m_TrueHDPassThrough->setEnabled(bTRUEHD);
     m_DTSHDPassThrough->setEnabled(bDTSHD);
@@ -333,8 +339,7 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
     m_MaxAudioChannels->resetMaxCount(3);
     for (int i = 1; i <= max_speakers; i++)
     {
-        if (invalid || settings.IsSupportedChannels(i) ||
-            (bForceDigital && i >= 6))
+        if (invalid || settings.IsSupportedChannels(i))
         {
             QString txt;
 
@@ -356,6 +361,9 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
                                              i == cur_speakers);
         }
     }
+        // Return values is used by audio test
+        // where we mainly are interested by the number of channels
+        // if we support AC3 and/or LPCM
     settings.SetBestSupportedChannels(cur_speakers);
     settings.setFeature(bAC3, FEATURE_AC3);
     settings.setFeature(bLPCM && realmax_speakers > 2, FEATURE_LPCM);
@@ -385,7 +393,7 @@ void AudioConfigSettings::AudioAdvanced()
 
     if (audiosettings.exec() == kDialogCodeAccepted)
     {
-        CheckPassthrough();
+        AudioRescan();
         UpdateCapabilities(QString::null);
     }
 }
@@ -477,7 +485,8 @@ HostCheckBox *AudioConfigSettings::DTSHDPassThrough()
 
 bool AudioConfigSettings::CheckPassthrough()
 {
-    m_passthrough8 = false;
+    bool ok = true;
+
     if (gCoreContext->GetNumSetting("PassThruDeviceOverride", false))
     {
         QString name = gCoreContext->GetSetting("PassThruOutputDevice");
@@ -487,17 +496,14 @@ bool AudioConfigSettings::CheckPassthrough()
         {
             VERBOSE(VB_IMPORTANT, QString("Passthru device %1 isn't usable "
                                  "Check audio configuration").arg(name));
+            ok = false;
         }
-        else
-        {
-            if (adc->settings.BestSupportedChannels() >= 8)
-            {
-                m_passthrough8 = true;
-            }
-        }
+        // add it to list of known devices
+        audiodevs.insert(name, *adc);
+        devices.append(*adc);
         delete adc;
     }
-    return m_passthrough8;
+    return ok;
 }
 
 void AudioConfigSettings::StartAudioTest()

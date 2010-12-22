@@ -53,7 +53,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
 
     main_device(settings.GetMainDevice()),
     passthru_device(settings.GetPassthruDevice()),
-    passthru(false),
+    m_discretedigital(false),   passthru(false),
     enc(false),                 reenc(false),
     stretchfactor(1.0f),
     eff_stretchfactor(100000),
@@ -68,6 +68,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
 
     // private
     output_settingsraw(NULL),   output_settings(NULL),
+    output_settingsdigitalraw(NULL),   output_settingsdigital(NULL),
     need_resampler(false),      src_ctx(NULL),
 
     pSoundStretch(NULL),
@@ -132,6 +133,11 @@ AudioOutputBase::~AudioOutputBase()
     // We got this from a subclass, delete it
     delete output_settings;
     delete output_settingsraw;
+    if (output_settings != output_settingsdigital)
+    {
+        delete output_settingsdigital;
+        delete output_settingsdigitalraw;
+    }
 
     if (kAudioSRCOutputSize > 0)
         delete[] src_out;
@@ -150,13 +156,15 @@ void AudioOutputBase::InitSettings(const AudioSettings &settings)
             // this was likely provided by the AudioTest utility
         output_settings = new AudioOutputSettings;
         *output_settings = *settings.custom;
+        output_settingsdigital = output_settings;
         max_channels = output_settings->BestSupportedChannels();
         configured_channels = max_channels;
         return;
     }
 
     // Ask the subclass what we can send to the device
-    output_settings = GetOutputSettingsUsers();
+    output_settings = GetOutputSettingsUsers(false);
+    output_settingsdigital = GetOutputSettingsUsers(true);
 
     max_channels = output_settings->BestSupportedChannels();
     configured_channels = max_channels;
@@ -175,21 +183,29 @@ void AudioOutputBase::InitSettings(const AudioSettings &settings)
  * amended to take into account the digital audio
  * options (AC3, DTS, E-AC3 and TrueHD)
  */
-AudioOutputSettings* AudioOutputBase::GetOutputSettingsCleaned(void)
+AudioOutputSettings* AudioOutputBase::GetOutputSettingsCleaned(bool digital)
 {
         // If we've already checked the port, use the cache
         // version instead
-    if (output_settingsraw)
-        return output_settingsraw;
+    if (!m_discretedigital || !digital)
+    {
+        digital = false;
+        if (output_settingsraw)
+            return output_settingsraw;
+    }
+    else if (output_settingsdigitalraw)
+        return output_settingsdigitalraw;
 
-    AudioOutputSettings* aosettings = GetOutputSettings();
-
+    AudioOutputSettings* aosettings = GetOutputSettings(digital);
     if (aosettings)
         aosettings->GetCleaned();
     else
         aosettings = new AudioOutputSettings(true);
 
-    return (output_settingsraw = aosettings);
+    if (digital)
+        return (output_settingsdigitalraw = aosettings);
+    else
+        return (output_settingsraw = aosettings);
 }
 
 /**
@@ -197,17 +213,26 @@ AudioOutputSettings* AudioOutputBase::GetOutputSettingsCleaned(void)
  * amended to take into account the digital audio
  * options (AC3, DTS, E-AC3 and TrueHD) as well as the user settings
  */
-AudioOutputSettings* AudioOutputBase::GetOutputSettingsUsers(void)
+AudioOutputSettings* AudioOutputBase::GetOutputSettingsUsers(bool digital)
 {
-    if (output_settings)
-        return output_settings;
+    if (!m_discretedigital || !digital)
+    {
+        digital = false;
+        if (output_settings)
+            return output_settings;
+    }
+    else if (output_settingsdigital)
+        return output_settingsdigital;
 
     AudioOutputSettings* aosettings = new AudioOutputSettings;
 
-    *aosettings = *GetOutputSettingsCleaned();
+    *aosettings = *GetOutputSettingsCleaned(digital);
     aosettings->GetUsers();
 
-    return (output_settings = aosettings);
+    if (digital)
+        return (output_settingsdigital = aosettings);
+    else
+        return (output_settings = aosettings);
 }
 
 /**
@@ -217,8 +242,8 @@ bool AudioOutputBase::CanPassthrough(int samplerate, int channels,
                                      int codec) const
 {
     bool ret = false;
-    ret = output_settings->IsSupportedFormat(FORMAT_S16);
-    ret &= output_settings->IsSupportedRate(samplerate);
+    ret = output_settingsdigital->IsSupportedFormat(FORMAT_S16);
+    ret &= output_settingsdigital->IsSupportedRate(samplerate);
     // Don't know any cards that support spdif clocked at < 44100
     // Some US cable transmissions have 2ch 32k AC-3 streams
     ret &= samplerate >= 44100;
@@ -227,7 +252,7 @@ bool AudioOutputBase::CanPassthrough(int samplerate, int channels,
     ret &= max_channels >= 6 && channels > 2;
     // Stereo content will always be decoded so it can later be upmixed
     // unless audio is configured for stereoo
-    ret |= channels == 2 && max_channels == 2;
+    ret |= max_channels == 2;
 
     return ret;
 }
@@ -355,7 +380,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
         /* Might we reencode a bitstream that's been decoded for timestretch?
            If the device doesn't support the number of channels - see below */
-        if (output_settings->canAC3() &&
+        if (output_settingsdigital->canAC3() &&
             (settings.codec == CODEC_ID_AC3 || settings.codec == CODEC_ID_DTS))
         {
             lreenc = true;
@@ -401,13 +426,13 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
                 break;
             case CODEC_ID_DTS:
                     // Can only do DTS core
-                if (output_settings->GetMaxBitrate() == 48000 * 16 * 2 ||
+                if (output_settingsdigital->GetMaxBitrate() == 48000 * 16 * 2 ||
                     settings.bitrate <= 48000 * 16 * 2)
                 {
                     log = "DTS Core";
                     break;
                 }
-                if (output_settings->GetMaxBitrate() > 192000 * 16 * 2 &&
+                if (output_settingsdigital->GetMaxBitrate() > 192000 * 16 * 2 &&
                     settings.bitrate > 48000 * 16 * 2)
                 {
                     log = "DTS-HD MA";
@@ -509,16 +534,15 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
        and we have more than 2 channels but multichannel PCM is not supported
        or if the device just doesn't support the number of channels */
     enc = (!passthru &&
-           output_settings->IsSupportedFormat(FORMAT_S16) &&
-           output_settings->canAC3() &&
+           output_settingsdigital->IsSupportedFormat(FORMAT_S16) &&
+           output_settingsdigital->canAC3() &&
            ((!output_settings->canLPCM() && configured_channels > 2) ||
             !output_settings->IsSupportedChannels(channels)));
-    VBAUDIO(QString("enc(%1), passthru(%2), feature (0x%3) "
+    VBAUDIO(QString("enc(%1), passthru(%2), features (%3) "
                     "configured_channels(%4), %5 channels supported(%6)")
             .arg(enc)
             .arg(passthru)
-            .arg(output_settings->canFeature((DigitalFeature)~FEATURE_NONE),
-                 0, 16)
+            .arg(output_settingsdigital->FeaturesToString())
             .arg(configured_channels)
             .arg(channels)
             .arg(output_settings->IsSupportedChannels(channels)));
@@ -537,8 +561,12 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         need_resampler = true;
         dest_rate = 48000;
     }
-    else if ((need_resampler = !output_settings->IsSupportedRate(samplerate)))
-        dest_rate = output_settings->NearestSupportedRate(samplerate);
+    else if ((need_resampler = !(enc ? output_settingsdigital : output_settings)
+              ->IsSupportedRate(samplerate)))
+    {
+        dest_rate = (enc ? output_settingsdigital : output_settings)
+            ->NearestSupportedRate(samplerate);
+    }
 
     if (need_resampler && src_quality > QUALITY_DISABLED)
     {
@@ -613,7 +641,8 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     if (need_resampler || needs_upmix || needs_downmix ||
         stretchfactor != 1.0f || (internal_vol && SWVolume()) ||
         (enc && output_format != FORMAT_S16) ||
-        !output_settings->IsSupportedFormat(output_format))
+        !(enc ? output_settingsdigital : output_settings)
+        ->IsSupportedFormat(output_format))
     {
         VBAUDIO("Audio processing enabled");
         processing  = true;
@@ -1056,7 +1085,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
     int bpf   = bytes_per_frame;
     int off   = 0;
 
-    if (!needs_upmix)
+    if (!(needs_upmix && upmixer))
     {
         int num  = len;
 

@@ -65,7 +65,6 @@ class AudioConfigSettings : public VerticalConfigurationGroup
     ADCMap               audiodevs;
     AudioOutput::ADCVect devices;
     QMutex               slotlock;
-    bool                 m_passthrough8;
     ConfigurationWizard *m_parent;
 };
 

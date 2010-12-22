@@ -49,8 +49,8 @@ class AudioOutputBase : public AudioOutput, public QThread
     AudioOutputBase(const AudioSettings &settings);
     virtual ~AudioOutputBase();
 
-    AudioOutputSettings* GetOutputSettingsCleaned(void);
-    AudioOutputSettings* GetOutputSettingsUsers(void);
+    AudioOutputSettings* GetOutputSettingsCleaned(bool digital = true);
+    AudioOutputSettings* GetOutputSettingsUsers(bool digital = true);
 
     // reconfigure sound out for new params
     virtual void Reconfigure(const AudioSettings &settings);
@@ -117,7 +117,7 @@ class AudioOutputBase : public AudioOutput, public QThread
      */
     virtual int  GetBufferedOnSoundcard(void) const = 0;
     // Default implementation only supports 2ch s16le at 48kHz
-    virtual AudioOutputSettings* GetOutputSettings(void)
+    virtual AudioOutputSettings* GetOutputSettings(bool digital = false)
         { return new AudioOutputSettings; }
     // You need to call this from any implementation in the dtor.
     void KillAudio(void);
@@ -159,6 +159,7 @@ class AudioOutputBase : public AudioOutput, public QThread
     long soundcard_buffer_size;
 
     QString main_device, passthru_device;
+    bool    m_discretedigital;
 
     bool passthru, enc, reenc;
 
@@ -181,6 +182,8 @@ class AudioOutputBase : public AudioOutput, public QThread
     void SetAudiotime(int frames, int64_t timecode);
     AudioOutputSettings *output_settingsraw;
     AudioOutputSettings *output_settings;
+    AudioOutputSettings *output_settingsdigitalraw;
+    AudioOutputSettings *output_settingsdigital;
     bool need_resampler;
     SRC_STATE *src_ctx;
     soundtouch::SoundTouch    *pSoundStretch;

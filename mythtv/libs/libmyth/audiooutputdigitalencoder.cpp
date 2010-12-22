@@ -98,7 +98,8 @@ bool AudioOutputDigitalEncoder::Init(
     if (!m_spdifenc->Succeeded())
     {
         Dispose();
-        delete m_spdifenc;
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Could not create spdif muxer");
         return false;
     }
 

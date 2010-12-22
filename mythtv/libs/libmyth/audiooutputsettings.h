@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "mythexp.h"
+#include <QString>
 
 extern "C" {
 #include "libavcodec/avcodec.h"  // to get codec id
@@ -139,6 +140,14 @@ class MPUBLIC AudioOutputSettings
              * for DTS and DTS-HD playback
              */
         int  GetMaxBitrate(int codec = CODEC_ID_DTS);
+
+            /**
+             * Display in human readable form the digital features
+             * supported by the output device
+             */
+        QString FeaturesToString(DigitalFeature arg);
+        QString FeaturesToString(void)
+        { return FeaturesToString((DigitalFeature)m_features); };
 
     private:
         void SortSupportedChannels();
