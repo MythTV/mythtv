@@ -19,6 +19,19 @@ class MPUBLIC MythEvent : public QEvent
     MythEvent(int t) : QEvent((QEvent::Type)t)
     { }
 
+    MythEvent(int t, const QString lmessage) : QEvent((QEvent::Type)t)
+    {
+        message = lmessage;
+        extradata.append( "empty" );
+    }
+
+    MythEvent(int t, const QString lmessage, const QStringList &lextradata)
+           : QEvent((QEvent::Type)t)
+    {
+        message = lmessage;
+        extradata = lextradata;
+    }
+
     MythEvent(const QString lmessage) : QEvent(MythEventMessage)
     {
         message = lmessage;
@@ -51,6 +64,7 @@ class MPUBLIC MythEvent : public QEvent
     { return new MythEvent(message, extradata); }
 
     static Type MythEventMessage;
+    static Type MythUserMessage;
     static Type kExitToMainMenuEventType;
     static Type kMythPostShowEventType;
     static Type kEnableDrawingEventType;

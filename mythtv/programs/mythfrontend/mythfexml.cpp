@@ -55,6 +55,7 @@ MythFEXML::~MythFEXML()
 MythFEXMLMethod MythFEXML::GetMethod( const QString &sURI )
 {
     if (sURI == "GetScreenShot") return MFEXML_GetScreenShot;
+    if (sURI == "Message")       return MFEXML_Message;
 
     return( MFEXML_Unknown );
 }
@@ -79,6 +80,7 @@ bool MythFEXML::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest
             switch( GetMethod( pRequest->m_sMethod ))
             {
                 case MFEXML_GetScreenShot      : GetScreenShot    ( pRequest ); return true;
+                case MFEXML_Message            : SendMessage      ( pRequest ); return true;
 
 
                 default: 
@@ -139,3 +141,13 @@ void MythFEXML::GetScreenShot( HTTPRequest *pRequest )
     pRequest->m_sFileName = sFileName;
 }
 
+void MythFEXML::SendMessage( HTTPRequest *pRequest )
+{
+    pRequest->m_eResponseType = ResponseTypeNone;
+    QString sText = pRequest->m_mapParams[ "text" ];
+    VERBOSE(VB_GENERAL, QString("UPNP message: ") + sText);
+
+    MythMainWindow *window = GetMythMainWindow();
+    MythEvent* me = new MythEvent(MythEvent::MythUserMessage, sText);
+    qApp->postEvent(window, me);
+}

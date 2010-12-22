@@ -2,6 +2,8 @@
 
 QEvent::Type MythEvent::MythEventMessage =
     (QEvent::Type) QEvent::registerEventType();
+QEvent::Type MythEvent::MythUserMessage =
+    (QEvent::Type) QEvent::registerEventType();
 QEvent::Type MythEvent::kExitToMainMenuEventType =
     (QEvent::Type) QEvent::registerEventType();
 QEvent::Type MythEvent::kMythPostShowEventType =
