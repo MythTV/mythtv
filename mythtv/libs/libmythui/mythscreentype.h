@@ -98,7 +98,7 @@ class MPUBLIC MythScreenType : public MythUIType
     virtual void Load(void);   // ONLY to be used for loading data, NO UI WORK
     virtual void Init(void);   // UI work to draw data loaded
 
-    void LoadInBackground(void);
+    void LoadInBackground(QString message = "");
     void ReloadInBackground(void);
 
     void OpenBusyPopup(QString message = "");

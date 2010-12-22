@@ -3355,7 +3355,8 @@ bool TV::eventFilter(QObject *o, QEvent *e)
     if (QEvent::KeyPress == e->type())
         return ignoreKeyPresses?false:event(e);
 
-    if (e->type() == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::MythEventMessage ||
+        e->type() == MythEvent::MythUserMessage)
     {
         customEvent(e);
         return true;
@@ -8319,6 +8320,24 @@ void TV::PauseAudioUntilBuffered(PlayerContext *ctx)
 /// This handles all custom events
 void TV::customEvent(QEvent *e)
 {
+    if (e->type() == MythEvent::MythUserMessage)
+    {
+        MythEvent *me = (MythEvent *)e;
+        QString message = me->Message();
+
+        if (message.isEmpty())
+            return;
+
+        PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
+        OSD *osd = GetOSDLock(mctx);
+        if (osd)
+            osd->DialogShow(OSD_DLG_CONFIRM, message);
+        ReturnOSDLock(mctx, osd);
+        ReturnPlayerLock(mctx);
+
+        return;
+    }
+
     if (e->type() == MythEvent::kUpdateBrowseInfoEventType)
     {
         UpdateBrowseInfoEvent *b = (UpdateBrowseInfoEvent*)e;
@@ -9679,6 +9698,9 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         else if (valid && desc[0] == "PLAY")
         {
             DoPlay(actx);
+        }
+        else if (valid && desc[0] == "CONFIRM")
+        {
         }
         else
         {

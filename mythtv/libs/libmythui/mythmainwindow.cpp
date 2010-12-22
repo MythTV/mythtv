@@ -68,6 +68,7 @@ using namespace std;
 #include "mythpainter_qt.h"
 #include "mythgesture.h"
 #include "mythuihelper.h"
+#include "mythdialogbox.h"
 
 #ifdef USING_VDPAU
 #include "mythpainter_vdpau.h"
@@ -2099,6 +2100,14 @@ void MythMainWindow::customEvent(QEvent *ce)
                         message.mid(tokens[0].length() +
                                     tokens[1].length() + 2));
         }
+    }
+    else if ((MythEvent::Type)(ce->type()) == MythEvent::MythUserMessage)
+    {
+        MythEvent *me = (MythEvent *)ce;
+        QString message = me->Message();
+
+        if (!message.isEmpty())
+            ShowOkPopup(message);
     }
 }
 

@@ -113,6 +113,7 @@ class NetworkControl : public QTcpServer
     QString processPlay(NetworkCommand *nc, int clientID);
     QString processQuery(NetworkCommand *nc);
     QString processSet(NetworkCommand *nc);
+    QString processMessage(NetworkCommand *nc);
     QString processHelp(NetworkCommand *nc);
 
     void notifyDataAvailable(void);

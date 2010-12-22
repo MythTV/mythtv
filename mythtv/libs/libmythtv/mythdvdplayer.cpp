@@ -368,8 +368,7 @@ uint64_t MythDVDPlayer::GetBookmark(void)
             player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
             return 0;
         }
-        dvdbookmark = player_ctx->playingInfo->QueryDVDBookmark(serialid,
-                                                                false);
+        dvdbookmark = player_ctx->playingInfo->QueryDVDBookmark(serialid);
         if (!dvdbookmark.empty())
         {
             QStringList::Iterator it = dvdbookmark.begin();

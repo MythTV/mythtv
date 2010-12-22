@@ -2207,7 +2207,7 @@ uint64_t ProgramInfo::QueryBookmark(uint chanid, const QDateTime &recstartts)
  *  \return list containing title, audio track, subtitle, framenum
  */
 QStringList ProgramInfo::QueryDVDBookmark(
-    const QString &serialid, bool delbookmark) const
+    const QString &serialid) const
 {
     QStringList fields = QStringList();
     MSqlQuery query(MSqlQuery::InitCon());
@@ -2224,18 +2224,6 @@ QStringList ProgramInfo::QueryDVDBookmark(
             for(int i = 0; i < 4; i++)
                 fields.append(query.value(i).toString());
         }
-    }
-
-    if (delbookmark)
-    {
-        int days = -(gCoreContext->GetNumSetting("DVDBookmarkDays", 10));
-        QDateTime removedate = mythCurrentDateTime().addDays(days);
-        query.prepare(" DELETE from dvdbookmark "
-                        " WHERE timestamp < ? ");
-        query.addBindValue(removedate.toString(Qt::ISODate));
-
-        if (!query.exec())
-            MythDB::DBError("GetDVDBookmark deleting old entries", query);
     }
 
     return fields;

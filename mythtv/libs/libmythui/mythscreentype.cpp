@@ -266,12 +266,12 @@ void MythScreenType::Load(void)
     // Virtual
 }
 
-void MythScreenType::LoadInBackground(void)
+void MythScreenType::LoadInBackground(QString message)
 {
     m_IsLoading = true;
     m_ScreenStack->AllowReInit();
 
-    OpenBusyPopup();
+    OpenBusyPopup(message);
 
     ScreenLoadTask *loadTask = new ScreenLoadTask(this);
     QThreadPool::globalInstance()->start(loadTask);

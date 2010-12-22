@@ -774,7 +774,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
         if (tmprbuf->IsDVD() &&
             tmprbuf->DVD()->GetNameAndSerialNum(name, serialid))
         {
-            QStringList fields = pginfo->QueryDVDBookmark(serialid, false);
+            QStringList fields = pginfo->QueryDVDBookmark(serialid);
             if (!fields.empty())
             {
                 QStringList::Iterator it = fields.begin();

@@ -17,7 +17,8 @@
 typedef enum 
 {
     MFEXML_Unknown                =  0,
-    MFEXML_GetScreenShot          =  1
+    MFEXML_GetScreenShot          =  1,
+    MFEXML_Message                =  2,
 
 } MythFEXMLMethod;
 
@@ -42,6 +43,7 @@ class MythFEXML : public Eventing
     MythFEXMLMethod GetMethod( const QString &sURI );
 
     void GetScreenShot    ( HTTPRequest *pRequest );
+    void SendMessage      ( HTTPRequest *pRequest );
 
   public:
     MythFEXML( UPnpDevice *pDevice ,  const QString sSharePath);

@@ -160,16 +160,6 @@ HostComboBox *SetOnInsertDVD()
     return gc;
 }
 
-HostSlider *DVDBookmarkDays()
-{
-    HostSlider *gs = new HostSlider("DVDBookmarkDays",5, 50, 5);
-    gs->setLabel(QObject::tr("Remove DVD Bookmarks Older than (days)"));
-    gs->setValue(10);
-    gs->setHelpText((QObject::tr("Delete DVD Bookmarks that are older than the "
-                                 "number of days specified.")));
-    return gs;
-}
-
 HostSlider *SetDVDDriveSpeed()
 {
     HostSlider *gs = new HostSlider("DVDDriveSpeed", 2, 12, 2);
@@ -296,7 +286,6 @@ VideoGeneralSettings::VideoGeneralSettings()
     VConfigPage page2(pages, false);
     page2->addChild(SetOnInsertDVD());
     page2->addChild(SetDVDDriveSpeed());
-    page2->addChild(DVDBookmarkDays());
 
     // page 3
     VerticalConfigurationGroup *pctrl =

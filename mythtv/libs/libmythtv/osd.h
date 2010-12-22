@@ -16,6 +16,7 @@ using namespace std;
 #define OSD_DLG_EDITOR    "OSD_EDITOR"
 #define OSD_DLG_CUTPOINT  "OSD_CUTPOINT"
 #define OSD_DLG_DELETE    "OSD_DELETE"
+#define OSD_DLG_CONFIRM   "mythconfirmpopup"
 #define OSD_WIN_TELETEXT  "OSD_TELETEXT"
 #define OSD_WIN_SUBTITLE  "OSD_SUBTITLES"
 #define OSD_WIN_INTERACT  "OSD_INTERACTIVE"

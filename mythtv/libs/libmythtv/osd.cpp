@@ -904,6 +904,8 @@ void OSD::DialogShow(const QString &window, const QString &text, int updatefor)
         MythScreenType *dialog;
         if (window == OSD_DLG_EDITOR)
             dialog = new ChannelEditor(m_ParentObject, window.toLatin1());
+        else if (window == OSD_DLG_CONFIRM)
+            dialog = new MythConfirmationDialog(NULL, text, false);
         else
             dialog = new MythDialogBox(text, NULL, window.toLatin1(), false, true);
 
@@ -917,6 +919,12 @@ void OSD::DialogShow(const QString &window, const QString &text, int updatefor)
                 MythDialogBox *dbox = dynamic_cast<MythDialogBox*>(m_Dialog);
                 if (dbox)
                     dbox->SetReturnEvent(m_ParentObject, window);
+                MythConfirmationDialog *cbox = dynamic_cast<MythConfirmationDialog*>(m_Dialog);
+                if (cbox)
+                {
+                    cbox->SetReturnEvent(m_ParentObject, window);
+                    cbox->SetData("DIALOG_CONFIRM_X_X");
+                }
                 m_Children.insert(window, m_Dialog);
             }
         }

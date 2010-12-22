@@ -11,7 +11,7 @@ from utility import levenshtein
 from database import DBCache
 
 from subprocess import Popen
-import xml.etree.cElementTree as etree
+from lxml import etree
 import os
 
 class System( DBCache ):
@@ -119,23 +119,49 @@ class Metadata( DictData ):
             if xml is None: return
             for item in xml.getchildren():
                 self.append(item.attrib['name'])
+        def toXML(self):
+            eroot = etree.Element(self.__class__.__name__.lower())
+            for item in self:
+                e = etree.Element(self._subname)
+                e.set('name', item)
+                eroot.append(e)
+            return eroot
+
     class _subgroup_all( list ):
         def __init__(self, xml):
             list.__init__(self)
             if xml is None: return
             for item in xml.getchildren():
                 self.append(OrdDict(item.attrib.items()))
+        def toXML(self):
+            eroot = etree.Element(self.__class__.__name__.lower())
+            for item in self:
+                e = etree.Element(self._subname)
+                for k,v in item.items():
+                    e.set(k,v)
+                eroot.append(e)
+            return eroot
+
     class Certifications( OrdDict ):
         def __init__(self, xml):
             OrdDict.__init__(self)
             if xml is None: return
             for cert in xml.getchildren():
                 self[cert.attrib['locale']] = cert.attrib['name']
-    class Categories( _subgroup_name ): pass
-    class Countries( _subgroup_name ): pass
-    class Studios( _subgroup_name ): pass
-    class People( _subgroup_all ): pass
-    class Images( _subgroup_all ): pass
+        def toXML(self):
+            eroot = etree.Element('certifications')
+            for k,v in self.items():
+                e = etree.Element('certification')
+                e.set('locale', k)
+                e.set('name', v)
+                eroot.append(e)
+            return eroot
+
+    class Categories( _subgroup_name ): _subname = 'category'
+    class Countries( _subgroup_name ): _subname = 'country'
+    class Studios( _subgroup_name ): _subname = 'studio'
+    class People( _subgroup_all ): _subname = 'person'
+    class Images( _subgroup_all ): _subname = 'image'
 
     def __init__(self, xml=None):
         dict.__init__(self)
@@ -161,6 +187,21 @@ class Metadata( DictData ):
             if element.tag in self._groups:
                 self.__dict__[element.tag] = \
                     eval('self.%s(element)' % element.tag.capitalize())
+
+    def toXML(self):
+        eroot = etree.Element('item')
+        for k,v in self.items():
+            if v is None:
+                continue
+            v = self._inv_trans[self._global_type[k]](v)
+            e = etree.Element(k)
+            e.text = v
+            eroot.append(e)
+        for group in self._groups:
+            group = self.__getattr__(group)
+            if len(group):
+                eroot.append(group.toXML())
+        return eroot
 
 class VideoMetadata( Metadata ):
     _field_order = ['title','subtitle','tagline','description','season',

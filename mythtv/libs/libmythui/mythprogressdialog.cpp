@@ -15,6 +15,7 @@ MythUIBusyDialog::MythUIBusyDialog(const QString &message,
         m_message = tr("Please Wait...");
     m_origMessage = m_message;
     m_messageText = NULL;
+    m_haveNewMessage = false;
 }
 
 bool MythUIBusyDialog::Create(void)
