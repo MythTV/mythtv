@@ -311,6 +311,8 @@ void NetworkControl::processNetworkControlCommand(NetworkCommand *nc)
         result = saveScreenshot(nc);
     else if (is_abbrev("help", nc->getArg(0)))
         result = processHelp(nc);
+    else if (is_abbrev("message", nc->getArg(0)))
+        result = processMessage(nc);
     else if ((nc->getArg(0).toLower() == "exit") || (nc->getArg(0).toLower() == "quit"))
         QCoreApplication::postEvent(this,
                                 new NetworkControlCloseEvent(nc->getClient()));
@@ -1168,6 +1170,11 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
         helpText +=
             "exit                  - Terminates session\r\n\r\n";
     }
+    else if ((is_abbrev("message", command)))
+    {
+        helpText +=
+            "message               - Displays a simple text message popup\r\n";
+    }
 
     if (!helpText.isEmpty())
         return helpText;
@@ -1184,11 +1191,25 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
         "query              - Queries\r\n"
         "set                - Changes\r\n"
         "screenshot         - Capture screenshot\r\n"
+        "message            - Display a simple text message\r\n"
         "exit               - Exit Network Control\r\n"
         "\r\n"
         "Type 'help COMMANDNAME' for help on any specific command.\r\n";
 
     return helpText;
+}
+
+QString NetworkControl::processMessage(NetworkCommand *nc)
+{
+    if (nc->getArgCount() < 2)
+        return QString("ERROR: See 'help %1' for usage information")
+                       .arg(nc->getArg(0));
+
+    QString message = nc->getCommand().remove(0, 7).trimmed();
+    MythMainWindow *window = GetMythMainWindow();
+    MythEvent* me = new MythEvent(MythEvent::MythUserMessage, message);
+    qApp->postEvent(window, me);
+    return QString("OK");
 }
 
 void NetworkControl::notifyDataAvailable(void)
