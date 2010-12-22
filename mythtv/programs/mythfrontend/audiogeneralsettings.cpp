@@ -176,7 +176,7 @@ AudioConfigSettings::AudioConfigSettings(ConfigurationWizard *parent) :
     TransButtonSetting *advanced = new TransButtonSetting("advanced");
     advanced->setLabel(QObject::tr("Advanced Audio Settings"));
     advanced->setHelpText(QObject::tr("Enable extra audio settings. Under most "
-                                  "usage all options should be unchecked"));
+                                  "usage all options should be left alone"));
     connect(advanced, SIGNAL(pressed()), this, SLOT(AudioAdvanced()));
     addChild(advanced);
 
@@ -1096,7 +1096,8 @@ HostCheckBox *AudioAdvancedSettings::PassThroughOverride()
     gc->setLabel(QObject::tr("Separate digital output device"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Use a distinct digital output device from "
-                                "default."));
+                                "default."
+                                " (default is not checked)"));
     return gc;
 }
 
@@ -1121,6 +1122,18 @@ HostComboBox *AudioAdvancedSettings::PassThroughOutputDevice()
     return gc;
 }
 
+HostCheckBox *AudioAdvancedSettings::SPDIFRateOverride()
+{
+    HostCheckBox *gc = new HostCheckBox("SPDIFRateOverride");
+    gc->setLabel(QObject::tr("SPDIF 48k rate override"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("ALSA only. By default, let ALSA determine "
+                        "the passthrough sampling rate. If checked "
+                        "set the sampling rate to 48kHz for passthrough."
+                        " (default is not checked)"));
+    return gc;
+}
+
 HostCheckBox *AudioAdvancedSettings::HBRPassthrough()
 {
     HostCheckBox *gc = new HostCheckBox("HBRPassthru");
@@ -1130,7 +1143,8 @@ HostCheckBox *AudioAdvancedSettings::HBRPassthrough()
                         "passthrough. If unchecked, Myth will limit the "
                         "passthrough bitrate to 6.144Mbit/s."
                         "This will disable True-HD passthrough, however will "
-                        "allow DTS-HD content to be sent as DTS-HD Hi-Res."));
+                        "allow DTS-HD content to be sent as DTS-HD Hi-Res."
+                        " (default is checked)"));
     return gc;
 }
 
@@ -1156,6 +1170,9 @@ AudioAdvancedSettings::AudioAdvancedSettings(bool mpcm)
     ConfigurationGroup *settings5 =
         new HorizontalConfigurationGroup(false, false);
     settings5->addChild(Audio48kOverride());
+#if USING_ALSA
+    settings5->addChild(SPDIFRateOverride());
+#endif
 
     ConfigurationGroup *settings6 =
         new HorizontalConfigurationGroup(false, false);

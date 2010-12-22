@@ -113,6 +113,7 @@ class AudioAdvancedSettings : public VerticalConfigurationGroup
     HostCheckBox       *Audio48kOverride();
     HostCheckBox       *PassThroughOverride();
     HostComboBox       *PassThroughOutputDevice();
+    HostCheckBox       *SPDIFRateOverride();
     HostCheckBox       *HBRPassthrough();
 
     CheckBoxSetting    *m_triggerMPCM;

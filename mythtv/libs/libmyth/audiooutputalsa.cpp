@@ -48,14 +48,27 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
         m_autopassthrough = true;
         passthru_device = main_device;
 
-        /* to set the non-audio bit, use AES0=6 */
         int len = passthru_device.length();
         int args = passthru_device.indexOf(":");
+
+            /*
+             * AES description:
+             * AES0=6 AES1=0x82 AES2=0x00 AES3=0x01.
+             * AES0 = NON_AUDIO | PRO_MODE
+             * AES1 = original stream, original PCM coder
+             * AES2 = source and channel unspecified
+             * AES3 = sample rate unspecified
+             */
+        bool s48k = gCoreContext->GetNumSetting("SPDIFRateOverride", false);
+        QString iecarg = QString("AES0=6,AES1=0x82,AES2=0x00") +
+            (s48k ? QString() : QString(",AES3=0x01"));
+        QString iecarg2 = QString("AES0=6 AES1=0x82 AES2=0x00") +
+            (s48k ? QString() : QString(" AES3=0x01"));
 
         if (args < 0)
         {
             /* no existing parameters: add it behind device name */
-            passthru_device += ":AES0=6"; //,AES1=0x82,AES2=0x00,AES3=0x01";
+            passthru_device += ":" + iecarg;
         }
         else
         {
@@ -66,12 +79,12 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
             if (args == passthru_device.length())
             {
                 /* ":" but no parameters */
-                passthru_device += "AES0=6"; //,AES1=0x82,AES2=0x00,AES3=0x01";
+                passthru_device += iecarg;
             }
             else if (passthru_device[args] != '{')
             {
                 /* a simple list of parameters: add it at the end of the list */
-                passthru_device += ",AES0=6"; //,AES1=0x82,AES2=0x00,AES3=0x01";
+                passthru_device += "," + iecarg;
             }
             else
             {
@@ -80,8 +93,8 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
                     --len;
                 while (len > 0 && passthru_device[len].isSpace());
                 if (passthru_device[len] == '}')
-                    passthru_device = passthru_device.insert(
-                        len, " AES0=6"); // AES1=0x82 AES2=0x00 AES3=0x01");
+                    passthru_device =
+                        passthru_device.insert(len, " " + iecarg2);
             }
         }
     }
