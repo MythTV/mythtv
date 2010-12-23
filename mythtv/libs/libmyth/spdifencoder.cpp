@@ -20,8 +20,7 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, AVCodecContext *ctx)
     : m_complete(false), m_oc(NULL), m_stream(NULL), m_size(0)
 {
     QByteArray dev_ba     = muxer.toAscii();
-    AVOutputFormat *fmt =
-        av_guess_format(dev_ba.constData(), NULL, NULL);
+    AVOutputFormat *fmt;
 
     if (!(av_guess_format && avformat_alloc_context &&
           av_new_stream && av_write_header && av_write_frame &&
@@ -43,6 +42,7 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, AVCodecContext *ctx)
         return;
     }
 
+    fmt = av_guess_format(dev_ba.constData(), NULL, NULL);
     if (!fmt)
     {
         VERBOSE(VB_AUDIO, LOC_ERR + "av_guess_format");
