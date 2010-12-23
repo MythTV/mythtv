@@ -530,9 +530,6 @@ AudioTestThread::AudioTestThread(QObject *parent,
     m_parent(parent), m_channels(channels), m_device(main),
     m_passthrough(passthrough), m_interrupted(false), m_channel(-1), m_hd(hd)
 {
-    /* initialize libavcodec, and register all codecs and formats */
-    av_register_all();
-
     m_format = hd ? settings.BestSupportedFormat() : FORMAT_S16;
     m_samplerate = hd ? settings.BestSupportedRate() : 48000;
 
