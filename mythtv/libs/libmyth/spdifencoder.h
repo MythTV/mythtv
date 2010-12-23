@@ -11,6 +11,7 @@ extern "C" {
 #include "libavcodec/audioconvert.h"
 }
 
+#pragma weak av_register_all
 #pragma weak av_guess_format
 #pragma weak avformat_alloc_context
 #pragma weak av_new_stream

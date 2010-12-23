@@ -1,5 +1,7 @@
 #include "config.h"
 
+#include "mythcorecontext.h"
+
 #include "compat.h"
 #include "spdifencoder.h"
 #include "mythverbose.h"
@@ -22,7 +24,7 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, AVCodecContext *ctx)
     QByteArray dev_ba     = muxer.toAscii();
     AVOutputFormat *fmt;
 
-    if (!(av_guess_format && avformat_alloc_context &&
+    if (!(av_register_all && av_guess_format && avformat_alloc_context &&
           av_new_stream && av_write_header && av_write_frame &&
           av_write_trailer && av_set_parameters))
     {
@@ -42,6 +44,10 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, AVCodecContext *ctx)
         return;
     }
 
+    avcodeclock->lock();
+    av_register_all();
+    avcodeclock->unlock();
+        
     fmt = av_guess_format(dev_ba.constData(), NULL, NULL);
     if (!fmt)
     {
