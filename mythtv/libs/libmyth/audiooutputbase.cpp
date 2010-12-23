@@ -619,6 +619,8 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             delete encoder;
             encoder = NULL;
             enc = false;
+            // upmixing will fail if we needed the encoder
+            needs_upmix = false;
         }
     }
 
@@ -666,6 +668,10 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         .arg(main_device).arg(channels).arg(source_channels).arg(samplerate)
         .arg(output_settings->FormatToString(output_format)).arg(reenc));
 
+    audbuf_timecode = audiotime = frames_buffered = 0;
+    current_seconds = source_bitrate = -1;
+    effdsp = samplerate * 100;
+
     // Actually do the device specific open call
     if (!OpenDevice())
     {
@@ -675,6 +681,8 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             VBGENERAL("Aborting reconfigure");
         return;
     }
+
+    VBAUDIO(QString("Audio fragment size: %1").arg(fragment_size));
 
     // Only used for software volume
     if (set_initial_vol && internal_vol && SWVolume())
@@ -688,12 +696,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     VolumeBase::SetChannels(channels);
     VolumeBase::SyncVolume();
     VolumeBase::UpdateVolume();
-
-    VBAUDIO(QString("Audio fragment size: %1").arg(fragment_size));
-
-    audbuf_timecode = audiotime = frames_buffered = 0;
-    current_seconds = source_bitrate = -1;
-    effdsp = samplerate * 100;
 
     // Upmix Stereo to 5.1
     if (needs_upmix && source_channels == 2 && configured_channels > 2)
@@ -917,6 +919,9 @@ int64_t AudioOutputBase::GetAudiotime(void)
     int64_t soundcard_buffer = (int64_t)GetBufferedOnSoundcard(); // bytes
     int64_t main_buffer =(int64_t)audioready();
 
+    if (!effdsp)
+        effdsp = samplerate * 100;
+
     /* audioready tells us how many bytes are in audiobuffer
        scaled appropriately if output format != internal format */
 
@@ -961,6 +966,9 @@ void AudioOutputBase::SetAudiotime(int frames, int64_t timecode)
     int64_t processframes_stretched = 0LL;
     int64_t processframes_unstretched = 0LL;
     int64_t old_audbuf_timecode = audbuf_timecode;
+
+    if (!effdsp)
+        effdsp = samplerate * 100;
 
     if (needs_upmix && upmixer)
         processframes_unstretched -= (int64_t)upmixer->frameLatency();
