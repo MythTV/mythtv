@@ -601,6 +601,16 @@ void bd_user_input(BLURAY *bd, int64_t pts, uint32_t key);
  */
 void bd_mouse_select(BLURAY *bd, int64_t pts, uint16_t x, uint16_t y);
 
+struct meta_dl;
+/**
+ *
+ *  Get meta information about the bluray disc.
+ *
+ * @param bd  BLURAY object
+ * @return allocated META_DL (disclib) object, NULL on error
+ */
+struct meta_dl *bd_get_meta(BLURAY *bd);
+
 #ifdef __cplusplus
 };
 #endif

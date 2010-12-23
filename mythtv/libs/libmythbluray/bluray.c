@@ -30,6 +30,7 @@
 #include "util/strutl.h"
 #include "bdnav/navigation.h"
 #include "bdnav/index_parse.h"
+#include "bdnav/meta_parse.h"
 #include "hdmv/hdmv_vm.h"
 #include "decoders/graphics_controller.h"
 #include "file/file.h"
@@ -93,6 +94,7 @@ struct bluray {
     char             *device_path;
     BLURAY_DISC_INFO  disc_info;
     INDX_ROOT        *index;
+    META_ROOT        *meta;
     NAV_TITLE_LIST   *title_list;
 
     /* current playlist */
@@ -687,6 +689,18 @@ static int _index_open(BLURAY *bd)
 }
 
 /*
+ * meta open
+ */
+
+static int _meta_open(BLURAY *bd)
+{
+    if (!bd->meta){
+      bd->meta = meta_parse(bd->device_path);
+    }
+
+    return !!bd->meta;
+}
+/*
  * disc info
  */
 
@@ -750,6 +764,8 @@ BLURAY *bd_open(const char* device_path, const char* keyfile_path)
         _libbdplus_open(bd, keyfile_path);
 
         _index_open(bd);
+
+        bd->meta = NULL;
 
         bd->regs = bd_registers_init();
 
@@ -2000,5 +2016,26 @@ void bd_register_overlay_proc(BLURAY *bd, void *handle, bd_overlay_proc_f func)
 
     if (func) {
         bd->graphics_controller = gc_init(bd->regs, handle, func);
+    }
+}
+
+struct meta_dl *bd_get_meta(BLURAY *bd)
+{
+    if (!bd) {
+        return NULL;
+    }
+
+    if (!bd->meta) {
+        _meta_open(bd);
+    }
+
+    uint32_t psr_menu_lang = bd_psr_read(bd->regs, PSR_MENU_LANG);
+
+    if (psr_menu_lang != 0 && psr_menu_lang != 0xffffff) {
+        const char language_code[] = {(psr_menu_lang >> 16) & 0xff, (psr_menu_lang >> 8) & 0xff, psr_menu_lang & 0xff, 0 };
+        return meta_get(bd->meta, language_code);
+    }
+    else {
+        return meta_get(bd->meta, NULL);
     }
 }
