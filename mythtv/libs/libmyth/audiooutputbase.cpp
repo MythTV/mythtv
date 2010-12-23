@@ -96,7 +96,8 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     memory_corruption_test1(0xdeadbeef),
     src_out(NULL),              kAudioSRCOutputSize(0),
     memory_corruption_test2(0xdeadbeef),
-    memory_corruption_test3(0xdeadbeef)
+    memory_corruption_test3(0xdeadbeef),
+    m_configure_succeeded(true)
 {
     src_in = (float *)AOALIGN(src_in_buf);
     // The following are not bzero() because MS Windows doesn't like it.
@@ -679,6 +680,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             Error("Aborting reconfigure");
         else
             VBGENERAL("Aborting reconfigure");
+        m_configure_succeeded = false;
         return;
     }
 
@@ -720,6 +722,8 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     if (unpause_when_ready)
         pauseaudio = actually_paused = true;
+
+    m_configure_succeeded = true;
 
     StartOutputThread();
 
@@ -894,7 +898,7 @@ int AudioOutputBase::audioready()
  */
 int64_t AudioOutputBase::GetAudiotime(void)
 {
-    if (audbuf_timecode == 0LL)
+    if (audbuf_timecode == 0LL || !m_configure_succeeded)
         return 0LL;
 
     int64_t obpf = (int64_t)output_bytes_per_frame;
@@ -918,9 +922,6 @@ int64_t AudioOutputBase::GetAudiotime(void)
 
     int64_t soundcard_buffer = (int64_t)GetBufferedOnSoundcard(); // bytes
     int64_t main_buffer =(int64_t)audioready();
-
-    if (!effdsp)
-        effdsp = samplerate * 100;
 
     /* audioready tells us how many bytes are in audiobuffer
        scaled appropriately if output format != internal format */
@@ -967,8 +968,8 @@ void AudioOutputBase::SetAudiotime(int frames, int64_t timecode)
     int64_t processframes_unstretched = 0LL;
     int64_t old_audbuf_timecode = audbuf_timecode;
 
-    if (!effdsp)
-        effdsp = samplerate * 100;
+    if (!m_configure_succeeded)
+        return;
 
     if (needs_upmix && upmixer)
         processframes_unstretched -= (int64_t)upmixer->frameLatency();
@@ -1180,6 +1181,13 @@ bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
     int used     = kAudioRingBufferSize - afree;
     bool music   = false;
     int bdiff;
+
+    if (!m_configure_succeeded)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "AddFrames called with audio framework not "
+                "initialised");
+        return false;
+    }
 
     VBAUDIOTS(QString("AddFrames frames=%1, bytes=%2, used=%3, free=%4, "
                       "timecode=%5 needsupmix=%6")

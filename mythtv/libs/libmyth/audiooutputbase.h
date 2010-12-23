@@ -254,6 +254,7 @@ class AudioOutputBase : public AudioOutput, public QThread
      */
     uchar audiobuffer[kAudioRingBufferSize];
     uint memory_corruption_test3;
+    uint m_configure_succeeded;
 };
 
 #endif
