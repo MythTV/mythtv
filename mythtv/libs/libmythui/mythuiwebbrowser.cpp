@@ -63,25 +63,26 @@ void BrowserApi::attachObject(void)
 
 void BrowserApi::Play(void)
 {
-    MythEvent me(QString("MUSIC_COMMAND PLAY"));
+    MythEvent me(QString("MUSIC_COMMAND %1 PLAY").arg(gCoreContext->GetHostName()));
     gCoreContext->dispatch(me);
 }
 
 void BrowserApi::Stop(void)
 {
-    MythEvent me(QString("MUSIC_COMMAND STOP"));
+    MythEvent me(QString("MUSIC_COMMAND %1 STOP").arg(gCoreContext->GetHostName()));
     gCoreContext->dispatch(me);
 }
 
 void BrowserApi::Pause(void)
 {
-    MythEvent me(QString("MUSIC_COMMAND PAUSE"));
+    MythEvent me(QString("MUSIC_COMMAND %1 PAUSE %1").arg(gCoreContext->GetHostName()));
     gCoreContext->dispatch(me);
 }
 
 void BrowserApi::SetVolume(int volumn)
 {
-    MythEvent me(QString("MUSIC_COMMAND SET_VOLUME %1").arg(volumn));
+    MythEvent me(QString("MUSIC_COMMAND %1 SET_VOLUME %2")
+                .arg(gCoreContext->GetHostName()).arg(volumn));
     gCoreContext->dispatch(me);
 }
 
@@ -89,7 +90,8 @@ int BrowserApi::GetVolume(void)
 {
     m_gotAnswer = false;
 
-    MythEvent me(QString("MUSIC_COMMAND GET_VOLUME"));
+    MythEvent me(QString("MUSIC_COMMAND %1 GET_VOLUME")
+                .arg(gCoreContext->GetHostName()));
     gCoreContext->dispatch(me);
 
     QTime timer;
@@ -108,19 +110,22 @@ int BrowserApi::GetVolume(void)
 
 void BrowserApi::PlayFile(QString filename)
 {
-    MythEvent me(QString("MUSIC_COMMAND PLAY_FILE '%1'").arg(filename));
+    MythEvent me(QString("MUSIC_COMMAND %1 PLAY_FILE '%2'")
+                .arg(gCoreContext->GetHostName()).arg(filename));
     gCoreContext->dispatch(me);
 }
 
 void BrowserApi::PlayTrack(int trackID)
 {
-    MythEvent me(QString("MUSIC_COMMAND PLAY_TRACK %1").arg(trackID));
+    MythEvent me(QString("MUSIC_COMMAND %1 PLAY_TRACK %2")
+                .arg(gCoreContext->GetHostName()).arg(trackID));
     gCoreContext->dispatch(me);
 }
 
 void BrowserApi::PlayURL(QString url)
 {
-    MythEvent me(QString("MUSIC_COMMAND PLAY_URL %1").arg(url));
+    MythEvent me(QString("MUSIC_COMMAND %1 PLAY_URL %2")
+                .arg(gCoreContext->GetHostName()).arg(url));
     gCoreContext->dispatch(me);
 }
 
@@ -128,7 +133,8 @@ QString BrowserApi::GetMetadata(void)
 {
     m_gotAnswer = false;
 
-    MythEvent me(QString("MUSIC_COMMAND GET_METADATA"));
+    MythEvent me(QString("MUSIC_COMMAND %1 GET_METADATA")
+                .arg(gCoreContext->GetHostName()));
     gCoreContext->dispatch(me);
 
     QTime timer;
@@ -156,11 +162,11 @@ void BrowserApi::customEvent(QEvent *e)
             return;
 
         QStringList tokens = message.simplified().split(" ");
-        if ((tokens.size() >= 3) &&
-            (tokens[1] == "ANSWER"))
+        if ((tokens.size() >= 4) && (tokens[1] == "ANSWER") 
+            && (tokens[2] == gCoreContext->GetHostName()))
         {
-            m_answer = tokens[2];
-            for (int i = 3; i < tokens.size(); i++)
+            m_answer = tokens[3];
+            for (int i = 4; i < tokens.size(); i++)
                 m_answer += QString(" ") + tokens[i];
             m_gotAnswer = true;
         }
