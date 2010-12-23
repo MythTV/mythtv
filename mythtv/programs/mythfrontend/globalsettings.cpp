@@ -1525,21 +1525,6 @@ static HostCheckBox *AltClearSavedPosition()
     return gc;
 }
 
-// This currently does not work
-/*
-static HostLineEdit *UDPNotifyPort()
-{
-    HostLineEdit *ge = new HostLineEdit("UDPNotifyPort");
-    ge->setLabel(QObject::tr("UDP notify port"));
-    ge->setValue("6948");
-    ge->setHelpText(QObject::tr("During playback, MythTV will listen for "
-                    "connections from the \"mythtvosd\" or \"mythudprelay\" "
-                    "programs on this port. For additional information, see "
-                    "http://www.mythtv.org/wiki/MythNotify ."));
-    return ge;
-}
-*/
-
 static HostComboBox *PlaybackExitPrompt()
 {
     HostComboBox *gc = new HostComboBox("PlaybackExitPrompt");
@@ -2730,6 +2715,18 @@ static HostSpinBox *NetworkControlPort()
     return gs;
 }
 
+static HostLineEdit *UDPNotifyPort()
+{
+    HostLineEdit *ge = new HostLineEdit("UDPNotifyPort");
+    ge->setLabel(QObject::tr("UDP notify port"));
+    ge->setValue("6948");
+    ge->setHelpText(QObject::tr("MythTV will listen for "
+                    "connections from the \"mythtvosd\" or \"mythudprelay\" "
+                    "programs on this port. For additional information, see "
+                    "http://www.mythtv.org/wiki/MythNotify ."));
+    return ge;
+}
+
 static HostCheckBox *RealtimePriority()
 {
     HostCheckBox *gc = new HostCheckBox("RealtimePriority");
@@ -3380,6 +3377,7 @@ MainGeneralSettings::MainGeneralSettings()
     remotecontrol->addChild(LircDaemonDevice());
     remotecontrol->addChild(NetworkControlEnabled());
     remotecontrol->addChild(NetworkControlPort());
+    remotecontrol->addChild(UDPNotifyPort());
     addChild(remotecontrol);
 }
 
@@ -3540,7 +3538,6 @@ OSDSettings::OSDSettings()
     osd->addChild(SubtitleFont());
     osd->addChild(OSDCC708TextZoomPercentage());
     osd->addChild(SubtitleCodec());
-    //osd->addChild(UDPNotifyPort());
     addChild(osd);
 
     //VerticalConfigurationGroup *cc = new VerticalConfigurationGroup(false);

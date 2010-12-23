@@ -29,7 +29,7 @@ HEADERS += themeinfo.h mythxdisplay.h DisplayRes.h DisplayResScreen.h
 HEADERS += mythgenerictree.h mythuibuttontree.h mythuiutils.h
 HEADERS += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
 HEADERS += mythrender_base.h mythfontmanager.h mythuieditbar.h
-HEADERS += mythdisplay.h mythuivideo.h
+HEADERS += mythdisplay.h mythuivideo.h mythudplistener.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
 SOURCES += myththemebase.cpp  mythpainter_qimage.cpp mythpainter_yuva.cpp
@@ -46,7 +46,7 @@ SOURCES += themeinfo.cpp mythxdisplay.cpp DisplayRes.cpp DisplayResScreen.cpp
 SOURCES += mythgenerictree.cpp mythuibuttontree.cpp mythuiutils.cpp
 SOURCES += mythvirtualkeyboard.cpp mythuishape.cpp mythuiguidegrid.cpp
 SOURCES += mythfontmanager.cpp mythuieditbar.cpp
-SOURCES += mythdisplay.cpp mythuivideo.cpp
+SOURCES += mythdisplay.cpp mythuivideo.cpp mythudplistener.cpp
 
 
 inc.path = $${PREFIX}/include/mythtv/libmythui/
