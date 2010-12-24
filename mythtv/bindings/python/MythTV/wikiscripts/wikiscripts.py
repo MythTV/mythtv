@@ -7,110 +7,121 @@ from time import time
 from thread import start_new_thread, allocate_lock
 from time import sleep, time
 from MythTV import OrdDict
+import threading
 import cPickle
+import Queue
+import lxml
+import lxml.html
 import os
-
-try:
-    import lxml.html, lxml.etree
-except:
-    raise Exception("The wikiscripts module requires the 'lxml' libraries"
-                    " be available for use")
 
 BASEURL = 'http://mythtv.org/wiki'
 
-def getURL(**kwargs):
-    return '?'.join([BASEURL,
-                     '&'.join(['%s=%s' % (k,v) for k,v in kwargs.items()])])
+def getScripts():
+    return Script.getAll()
+
+def getPage(**kwargs):
+    url = "{0}?{1}".format(BASEURL,
+            '&'.join(['{0}={1}'.format(k,v) for k,v in kwargs.items()]))
+    return lxml.html.parse(url).getroot()
 
 def getWhatLinksHere(page):
-    root = lxml.html.parse(getURL(title='Special:WhatLinksHere',
-                                  limit='500', target=page))
-
+    root = getPage(title='Special:WhatLinksHere',
+                   limit='500', target=page)
     links = []
-    for link in root.getroot().xpath("//ul[@id='mw-whatlinkshere-list']/li"):
+    for link in root.xpath("//ul[@id='mw-whatlinkshere-list']/li"):
         links.append('_'.join(link.find('a').text.split(' ')))
     return links
 
-def getScripts():
-    scripts = []
-    for link in getWhatLinksHere('Template:Script_info'):
-        try:
-            scripts.append(Script(link))
-        except:
-            pass
-    if len(scripts) > 0:
-        Script.sema.wait()
-        for i in reversed(range(len(scripts))):
-            if (scripts[i].info is None) or (scripts[i].code is None):
-                scripts.pop(i)
-        scripts[0].dumpCache()
-        scripts.sort()
-    return scripts
-
-class WaitingSemaphore( object ):
-    def __init__(self, count):
-        self._lock = allocate_lock()
-        self._initial_value = count
-        self._value = count
-    def __enter__(self):
-        self.acquire()
-    def __exit__(self, extype, exvalue, trace):
-        self.release()
-    def acquire(self):
-        while True:
-            with self._lock:
-                if self._value > 0:
-                    self._value -= 1
-                    self._acquired = True
-                    return
-            sleep(0.1)
-    def release(self):
-        with self._lock:
-            self._value += 1
-    def wait(self):
-        while self._value < self._initial_value:
-            sleep(0.1)
-
 class Script( object ):
-    cache = {}
-    tmax = 4
-    sema = WaitingSemaphore(tmax)
-    xp_info = lxml.etree.XPath("//span[@id='script-info']/text()")
-    xp_names = lxml.etree.XPath("//div[@id='bodyContent']/div[@style='background: #EFEFEF; border: 1px dashed black; padding: 5px 5px 5px 5px;']/p/b/text()")
-    xp_code = lxml.etree.XPath("//div[@id='bodyContent']/div[@style='background: #EFEFEF; border: 1px dashed black; padding: 5px 5px 5px 5px;']/pre/text()")
+    _cache   = None
+    _queue   = Queue.Queue()
+    _pool    = []
+    _running = True
+    
 
-    def __init__(self, title):
-        self.url = getURL(title=title)
-        self.info = None
-        self.code = None
-        if not self.fromCache(title):
-            start_new_thread(self.readPage,(title,))
+    _valid = False
+    _xp_info = lxml.etree.XPath("//span[@id='script-info']/text()")
+    _xp_names = lxml.etree.XPath("//div[@id='bodyContent']/div[@style='background: #EFEFEF; border: 1px dashed black; padding: 5px 5px 5px 5px;']/p/b/text()")
+    _xp_code = lxml.etree.XPath("//div[@id='bodyContent']/div[@style='background: #EFEFEF; border: 1px dashed black; padding: 5px 5px 5px 5px;']/pre/text()")
+    _xp_cat = lxml.etree.XPath("//div[@id='mw-normal-catlinks']/span/a/text()")
+
+    @classmethod
+    def getAll(cls, refresh=False):
+        cls._running = True
+        scripts = []
+        try:
+            for link in getWhatLinksHere('Template:Script_info'):
+                scripts.append(cls(link))
+            cls._wait()
+        except KeyboardInterrupt:
+            cls._running = False
+            return []
+        cls._dumpCache()
+        scripts = [s for s in scripts if s.isValid()]
+        scripts.sort()
+        return scripts
+
+    @classmethod
+    def processQueue(cls):
+        while cls._running:
+            try:
+                script = cls._queue.get(False, 0.1)
+            except Queue.Empty:
+                sleep(0.1)
+                continue
+
+            script.processPage()
+            cls._queue.task_done()
+
+    @classmethod
+    def _wait(cls):
+        cls._queue.join()
+        cls._running = False
+        cls._pool = []
 
     def __cmp__(self, other):
-        if self.info.category < other.info.category:
-            return -1
-        elif self.info.category > other.info.category:
-            return 1
-        elif self.info.name < other.info.name:
+        if self.info.name < other.info.name:
             return -1
         elif self.info.name > other.info.name:
             return 1
         else:
             return 0
 
-    def readPage(self, title):
-        with self.sema:
-            try:
-                page = lxml.html.parse(self.url)
-                etree = page.getroot()
-                self.getInfo(etree)
-                self.getScript(etree)
-                self.toCache(title)
-            except:
-                pass
+    def __repr__(self):
+        return '<Script {0} at {1}>'.format(self.url, hex(id(self)))
+
+    def __init__(self, url, refresh=False, pool=4):
+        self.url = url
+        if self._cache is None:
+            self._loadCache(refresh)
+
+        if (url in self._cache) and not refresh:
+            self._fromCache(url)
+            return
+
+        self._queue.put(self)
+        if len(self._pool) == 0:
+            while pool:
+                pool -= 1
+                t = threading.Thread(target=self.processQueue)
+                t.start()
+                self._pool.append(t)
+        
+    def isValid(self): return self._valid
+
+    def processPage(self):
+        try:
+            etree = getPage(title=self.url)
+            self.getInfo(etree)
+            self.getScript(etree)
+            self.getCategory(etree)
+            self._toCache(self.url)
+            self._valid = True
+        except:
+            pass
 
     def getInfo(self, etree):
-        text = self.xp_info(etree)[0].strip().split('\n')
+        text = self._xp_info(etree)[0].strip().split('\n')
         for i in reversed(range(len(text))):
             if '=' not in text[i]:
                 text[i-1] += text.pop(i)
@@ -128,8 +139,8 @@ class Script( object ):
             if self.info.name == 'unnamed':
                 self.info.name = name
         else:
-            names = self.xp_names(etree)
-            code = self.xp_code(etree)
+            names = self._xp_names(etree)
+            code = self._xp_code(etree)
             name = ''
             size = 0
             for i in range(len(code)):
@@ -143,46 +154,55 @@ class Script( object ):
             if self.info.name == 'unnamed':
                 self.info.name = name
 
+    def getCategory(self, etree):
+        self.category = [str(c) for c in self._xp_cat(etree)]
+
     def saveScript(self, name, path):
         fd = open(path,'w')
         fd.write(self.code[name])
         fd.close()
 
-    def toCache(self, title):
-        self.cache[title] = OrdDict(())
-        self.cache[title].info = self.info
-        self.cache[title].code = self.code
-        self.cache[title].time = time()
+    def _toCache(self, title):
+        self._cache[title] = OrdDict(())
+        self._cache[title].info     = self.info
+        self._cache[title].code     = self.code
+        self._cache[title].category = self.category
+        self._cache[title].time     = time()
 
-    def fromCache(self, title):
-        if len(self.cache) == 0:
-            self.loadCache()
-        if title not in self.cache:
-            # no cache for current script
-            return False
-        if time()-self.cache[title].time > 1800:
+    def _fromCache(self, title):
+        if time()-self._cache[title].time > 1800:
             # cache has expired
             return False
-        self.info = self.cache[title].info
-        self.code = self.cache[title].code
+        self.info     = self._cache[title].info
+        self.code     = self._cache[title].code
+        self.category = self._cache[title].category
+        self._valid = True
         return True
 
-    def loadCache(self):
+    @classmethod
+    def _loadCache(cls, refresh):
+        if refresh:
+            cls._cache = {}
+            return
+
         path = '/tmp/mythwikiscripts.pickle'
         if os.access(path, os.F_OK):
             try:
                 fd = open(path,'r')
-                self.cache.update(cPickle.load(fd))
+                cls._cache = cPickle.load(fd)
                 fd.close()
             except:
                 os.remove(path)
-                self.cache = {}
+                cls._cache = {}
+        else:
+            cls._cache = {}
 
-    def dumpCache(self):
+    @classmethod
+    def _dumpCache(cls):
         path = '/tmp/mythwikiscripts.pickle'
         try:
             fd = open(path,'w')
-            self.cache = cPickle.dump(self.cache,fd)
+            cls._cache = cPickle.dump(cls._cache,fd)
             fd.close()
         except:
             os.remove(path)
