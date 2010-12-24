@@ -487,32 +487,33 @@ void MusicPlayer::customEvent(QEvent *event)
         }
         else if (me->Message().left(13) == "MUSIC_COMMAND")
         {
-            QStringList list = me->Message().split(' ');
+            QStringList list = me->Message().simplified().split(' ');
 
-            if (list.size() >= 2)
+            if (list.size() >= 3 && list[1] == gCoreContext->GetHostName())
             {
-                if (list[1] == "PLAY")
+                if (list[2] == "PLAY")
                     play();
-                else if (list[1] == "STOP")
+                else if (list[2] == "STOP")
                     stop();
-                else if (list[1] == "PAUSE")
+                else if (list[2] == "PAUSE")
                     pause();
-                else if (list[1] == "SET_VOLUME")
+                else if (list[2] == "SET_VOLUME")
                 {
                     if (list.size() >= 3)
                     {
-                        int volume = list[2].toInt();
+                        int volume = list[3].toInt();
                         if (volume >= 0 && volume <= 100) 
                             setVolume(volume);
                     }
                 }
-                else if (list[1] == "GET_VOLUME")
+                else if (list[2] == "GET_VOLUME")
                 {
-                    QString message = QString("MUSIC_CONTROL ANSWER %1").arg(getVolume());
+                    QString message = QString("MUSIC_CONTROL ANSWER %1 %2")
+                            .arg(gCoreContext->GetHostName()).arg(getVolume());
                     MythEvent me(message);
                     gCoreContext->dispatch(me);
                 }
-                else if (list[1] == "PLAY_FILE")
+                else if (list[2] == "PLAY_FILE")
                 {
                     int start = me->Message().indexOf("'");
                     int end = me->Message().lastIndexOf("'");
@@ -527,11 +528,11 @@ void MusicPlayer::customEvent(QEvent *event)
                     else
                         VERBOSE(VB_IMPORTANT, QString("MusicPlayer: got invalid MUSIC_COMMAND PLAY_FILE - %1").arg(me->Message()));
                 }
-                else if (list[1] == "PLAY_URL")
+                else if (list[2] == "PLAY_URL")
                 {
-                    if (list.size() == 3)
+                    if (list.size() == 4)
                     {
-                        QString filename = list[2];
+                        QString filename = list[3];
                         Metadata mdata;
                         mdata.setFilename(filename);
                         playFile(mdata);
@@ -539,11 +540,11 @@ void MusicPlayer::customEvent(QEvent *event)
                     else
                         VERBOSE(VB_IMPORTANT, QString("MusicPlayer: got invalid MUSIC_COMMAND PLAY_URL - %1").arg(me->Message()));
                 }
-                else if (list[1] == "PLAY_TRACK")
+                else if (list[2] == "PLAY_TRACK")
                 {
-                    if (list.size() == 3)
+                    if (list.size() == 4)
                     {
-                        int trackID = list[2].toInt();
+                        int trackID = list[3].toInt();
                         Metadata *mdata = gMusicData->all_music->getMetadata(trackID);
                         if (mdata)
                             playFile(*mdata);
@@ -551,16 +552,17 @@ void MusicPlayer::customEvent(QEvent *event)
                     else
                         VERBOSE(VB_IMPORTANT, QString("MusicPlayer: got invalid MUSIC_COMMAND PLAY_TRACK - %1").arg(me->Message()));
                 }
-                else if (list[1] == "GET_METADATA")
+                else if (list[2] == "GET_METADATA")
                 {
                     QString mdataStr;
                     Metadata *mdata = getCurrentMetadata();
                     if (mdata)
                         mdataStr = QString("%1 by %2 from %3").arg(mdata->Title()).arg(mdata->Artist()).arg(mdata->Album());
                     else
-                        mdataStr = "Unknown Track";
+                        mdataStr = "Unknown Track2";
 
-                    QString message = QString("MUSIC_CONTROL ANSWER %1").arg(mdataStr);
+                    QString message = QString("MUSIC_CONTROL ANSWER %1 %2")
+                            .arg(gCoreContext->GetHostName()).arg(mdataStr);
                     MythEvent me(message);
                     gCoreContext->dispatch(me);
                 }

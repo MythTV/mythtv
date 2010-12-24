@@ -27,7 +27,6 @@ using namespace std;
 #include "mythplayer.h"
 #include "DetectLetterbox.h"
 #include "programinfo.h"
-#include "udpnotify.h"
 #include "vsync.h"
 #include "lcddevice.h"
 #include "jobqueue.h"
@@ -844,7 +843,7 @@ TV::TV(void)
     : // Configuration variables from database
       baseFilters(""),
       db_channel_format("<num> <sign>"),
-      db_idle_timeout(0),           db_udpnotify_port(0),
+      db_idle_timeout(0),
       db_playback_exit_prompt(0),   db_autoexpire_default(0),
       db_auto_set_watched(false),   db_end_of_rec_exit_prompt(false),
       db_jump_prefer_osd(true),     db_use_gui_size_for_tv(false),
@@ -901,8 +900,6 @@ TV::TV(void)
       noHardwareDecoders(false),
       //Recorder switching info
       switchToRec(NULL),
-      // OSD info
-      udpnotify(NULL),
       // LCD Info
       lcdTitle(""), lcdSubtitle(""), lcdCallsign(""),
       // Window info (GUI is optional, transcoding, preview img, etc)
@@ -912,7 +909,7 @@ TV::TV(void)
       // Timers
       lcdTimerId(0),                keyListTimerId(0),
       networkControlTimerId(0),     jumpMenuTimerId(0),
-      pipChangeTimerId(0),          udpNotifyTimerId(0),
+      pipChangeTimerId(0),
       switchToInputTimerId(0),      ccInputTimerId(0),
       asInputTimerId(0),            queueInputTimerId(0),
       browseTimerId(0),             updateOSDPosTimerId(0),
@@ -947,7 +944,6 @@ void TV::InitFromDB(void)
 {
     QMap<QString,QString> kv;
     kv["LiveTVIdleTimeout"]        = "0";
-    kv["UDPNotifyPort"]            = "0";
     kv["BrowseMaxForward"]         = "240";
     kv["PlaybackExitPrompt"]       = "0";
     kv["AutoExpireDefault"]        = "0";
@@ -998,7 +994,6 @@ void TV::InitFromDB(void)
 
     // convert from minutes to ms.
     db_idle_timeout        = kv["LiveTVIdleTimeout"].toInt() * 60 * 1000;
-    db_udpnotify_port      = kv["UDPNotifyPort"].toInt();
     db_browse_max_forward  = kv["BrowseMaxForward"].toInt() * 60;
     db_playback_exit_prompt= kv["PlaybackExitPrompt"].toInt();
     db_autoexpire_default  = kv["AutoExpireDefault"].toInt();
@@ -1198,12 +1193,6 @@ TV::~TV(void)
 
     if (browsehelper)
         browsehelper->Stop();
-
-    if (udpnotify)
-    {
-        udpnotify->deleteLater();
-        udpnotify = NULL;
-    }
 
     gCoreContext->removeListener(this);
 
@@ -2429,12 +2418,6 @@ void TV::TeardownPlayer(PlayerContext *mctx, PlayerContext *ctx)
     }
 
     ctx->TeardownPlayer();
-
-    if ((mctx == ctx) && udpnotify)
-    {
-        udpnotify->deleteLater();
-        udpnotify = NULL;
-    }
 }
 
 void TV::timerEvent(QTimerEvent *te)
@@ -2760,20 +2743,6 @@ void TV::timerEvent(QTimerEvent *te)
         QMutexLocker locker(&timerIdLock);
         KillTimer(jumpMenuTimerId);
         jumpMenuTimerId = 0;
-        handled = true;
-    }
-
-    if (handled)
-        return;
-
-    if (timer_id == udpNotifyTimerId)
-    {
-        while (HasUDPNotifyEvent())
-            HandleUDPNotifyEvent();
-
-        QMutexLocker locker(&timerIdLock);
-        KillTimer(udpNotifyTimerId);
-        udpNotifyTimerId = 0;
         handled = true;
     }
 
@@ -5105,7 +5074,6 @@ bool TV::StartPlayer(PlayerContext *mctx, PlayerContext *ctx,
         return false;
     }
 
-    InitUDPNotifyEvent();
     bool ok = false;
     if (ctx->IsNullVideoDesired())
     {
@@ -11836,76 +11804,6 @@ void TV::RestoreScreenSaver(const PlayerContext *ctx)
 {
     if (ctx == GetPlayer(ctx, 0))
         GetMythUI()->RestoreScreensaver();
-}
-
-void TV::InitUDPNotifyEvent(void)
-{
-    if (db_udpnotify_port && !udpnotify)
-    {
-        udpnotify = new UDPNotify(db_udpnotify_port);
-        connect(udpnotify,
-                SIGNAL(AddUDPNotifyEvent(
-                        const QString&,const UDPNotifyOSDSet*)),
-                this,
-                SLOT(AddUDPNotifyEvent(
-                        const QString&,const UDPNotifyOSDSet*)),
-                Qt::DirectConnection);
-        connect(udpnotify, SIGNAL(ClearUDPNotifyEvents()),
-                this,      SLOT(ClearUDPNotifyEvents()),
-                Qt::DirectConnection);
-    }
-}
-
-void TV::AddUDPNotifyEvent(const QString &name, const UDPNotifyOSDSet *set)
-{
-    QMutexLocker locker(&timerIdLock);
-    udpnotifyEventName.enqueue(name);
-    udpnotifyEventSet.enqueue(set);
-    if (!udpNotifyTimerId)
-        udpNotifyTimerId = StartTimer(1, __LINE__);
-}
-
-void TV::ClearUDPNotifyEvents(void)
-{
-    QMutexLocker locker(&timerIdLock);
-    udpnotifyEventName.clear();
-    udpnotifyEventSet.clear();
-    if (udpNotifyTimerId)
-    {
-        KillTimer(udpNotifyTimerId);
-        udpNotifyTimerId = 0;
-    }
-}
-
-bool TV::HasUDPNotifyEvent(void) const
-{
-    QMutexLocker locker(&timerIdLock);
-    return !udpnotifyEventName.empty();
-}
-
-void TV::HandleUDPNotifyEvent(void)
-{
-    QString                name = QString::null;
-    const UDPNotifyOSDSet *set  = NULL;
-
-    timerIdLock.lock();
-    if (!udpnotifyEventName.empty())
-    {
-        name = udpnotifyEventName.dequeue();
-        set  = udpnotifyEventSet.dequeue();
-    }
-    timerIdLock.unlock();
-
-    PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-    OSD *osd = GetOSDLock(mctx);
-/*
-    if (osd && set)
-        osd->StartNotify(set);
-    else if (osd && !name.isEmpty())
-        osd->ClearNotify(name);
-*/
-    ReturnOSDLock(mctx, osd);
-    ReturnPlayerLock(mctx);
 }
 
 OSD *TV::GetOSDL(const char *file, int location)

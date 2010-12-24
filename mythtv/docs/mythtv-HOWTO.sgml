@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2010-06-25, v0.24.00pre
+<date>2010-12-24, v0.24.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -6730,7 +6730,7 @@ You can then press ESC until you return to the main screen.
 </article>
 <!-- Revision History
 v0.24.00, 2010-06-25.  First version.
-v0.24.00, 2010-08-10.  Merge in changes from release-fixes docs, make other edits.
+v0.24.00, 2010-12-23.  Merge in changes from release-fixes docs, make other edits.
 
 -->
 

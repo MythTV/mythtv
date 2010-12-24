@@ -133,6 +133,11 @@ Advanced options (experts only):
 
   --enable-mac-bundle      produce standalone OS X apps (e.g. mythfrontend.app)
 
+  --disable-libxml2        disable libxml2 support (disc metadata)
+  --libxml2-path=HDRLOC    location of directory containing
+                           'libxml/parser.h', not the
+                           directory with parser.h [$libxml2_path_default]
+
   --with-bindings=LIST     install the bindings specified in the
                            comma-separated list
                            Supported bindings: perl, python
@@ -1307,6 +1312,7 @@ MYTHTV_CONFIG_LIST='
     joystick_menu
     libfftw3
     libmpeg2external
+    libxml2
     lirc
     mheg
     opengl_video
@@ -1388,6 +1394,7 @@ PATHS_LIST='
     runprefix
     shlibdir
     x11_path
+    libxml2_path
 '
 
 CMDLINE_SET="
@@ -1925,6 +1932,7 @@ enable hdpvr
 enable iptv
 enable ivtv
 enable lamemp3
+enable libxml2
 enable lirc
 enable mheg
 enable mythtranscode
@@ -1944,6 +1952,7 @@ enable xvmcw
 # mythtv paths
 dvb_path_default="${sysroot}/usr/include"
 x11_path_default="${sysroot}/usr/X11R6/include"
+libxml2_path_default="${sysroot}/usr/include/libxml2"
 xvmc_lib=""
 
 # configurable options
@@ -3981,6 +3990,15 @@ fi
 enabled libfftw3 && check_lib2 fftw3.h fftw_init_threads -lfftw3_threads -lfftw3f -lfftw3 ||
     disable libfftw3
 
+enabled libxml2 && check_cc -I"$libxml2_path" <<EOF && add_extralibs "-lxml2" || disable libxml2
+#include <libxml/xmlversion.h>
+int main(void) {
+    if (LIBXML_VERSION > 20600)
+        return 1;
+    return 0;
+}
+EOF
+
 enabled x11 && check_lib X11/Xlib.h XQueryExtension -lX11 || disable x11
 enabled xrandr && check_lib X11/extensions/Xrandr.h XRRSelectInput -lXrandr || disable xrandr
 enabled xv && check_lib X11/extensions/Xv.h XvPutStill -lXv || disable xv
@@ -4395,6 +4413,7 @@ if enabled frontend; then
     echo "Windows (DirectX)         yes"
   fi
   echo "libfftw3 support          ${libfftw3-no}"
+  echo "libxml2 support           ${libxml2-no} [$libxml2_path]"
   echo
   echo "# Video Output Support"
   echo "x11 support               ${x11-no}"
@@ -4702,6 +4721,13 @@ fi
 
 if enabled dvb; then
   append CONFIG_INCLUDEPATH "$dvb_path"
+fi
+
+if enabled libxml2; then
+  if [ -d $libxml2_path ] ; then
+    append CONFIG_INCLUDEPATH "$libxml2_path"
+    append CCONFIG "using_libxml2"
+  fi
 fi
 
 if enabled x11; then

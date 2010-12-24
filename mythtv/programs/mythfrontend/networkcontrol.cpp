@@ -658,26 +658,30 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
     }
     else if (is_abbrev("music", nc->getArg(1)))
     {
+#if 0
         if (GetMythUI()->GetCurrentLocation().toLower() != "playmusic")
         {
             return QString("ERROR: You are in %1 mode and this command is "
                            "only for MythMusic")
                         .arg(GetMythUI()->GetCurrentLocation());
         }
+#endif
+
+        QString hostname = gCoreContext->GetHostName();
 
         if (nc->getArgCount() == 3)
         {
             if (is_abbrev("play", nc->getArg(2)))
-                message = "MUSIC_COMMAND PLAY";
+                message = QString("MUSIC_COMMAND %1 PLAY").arg(hostname);
             else if (is_abbrev("pause", nc->getArg(2)))
-                message = "MUSIC_COMMAND PAUSE";
+                message = QString("MUSIC_COMMAND %1 PAUSE").arg(hostname);
             else if (is_abbrev("stop", nc->getArg(2)))
-                message = "MUSIC_COMMAND STOP";
+                message = QString("MUSIC_COMMAND %1 STOP").arg(hostname);
             else if (is_abbrev("getvolume", nc->getArg(2)))
             {
                 gotAnswer = false;
 
-                MythEvent me(QString("MUSIC_COMMAND GET_VOLUME"));
+                MythEvent me(QString("MUSIC_COMMAND %1 GET_VOLUME").arg(hostname));
                 gCoreContext->dispatch(me);
 
                 QTime timer;
@@ -697,7 +701,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
             {
                 gotAnswer = false;
 
-                MythEvent me(QString("MUSIC_COMMAND GET_METADATA"));
+                MythEvent me(QString("MUSIC_COMMAND %1 GET_METADATA").arg(hostname));
                 gCoreContext->dispatch(me);
 
                 QTime timer;
@@ -719,16 +723,20 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
         else if (nc->getArgCount() > 3)
         {
             if (is_abbrev("setvolume", nc->getArg(2)))
-                message = QString("MUSIC_COMMAND SET_VOLUME %1")
+                message = QString("MUSIC_COMMAND %1 SET_VOLUME %2")
+                                .arg(hostname)
                                 .arg(nc->getArg(3));
             else if (is_abbrev("track", nc->getArg(2)))
-                message = QString("MUSIC_COMMAND PLAY_TRACK %1")
+                message = QString("MUSIC_COMMAND %1 PLAY_TRACK %2")
+                                .arg(hostname)
                                 .arg(nc->getArg(3));
             else if (is_abbrev("url", nc->getArg(2)))
-                message = QString("MUSIC_COMAMND PLAY_URL %1")
+                message = QString("MUSIC_COMMAND %1 PLAY_URL %2")
+                                .arg(hostname)
                                 .arg(nc->getArg(3));
             else if (is_abbrev("file", nc->getArg(2)))
-                message = QString("MUSIC_COMMAND PLAY_FILE '%1'")
+                message = QString("MUSIC_COMMAND %1 PLAY_FILE '%2'")
+                                .arg(hostname)
                                 .arg(nc->getFrom(3));
             else
                 return QString("ERROR: Invalid 'play music' command");
@@ -1250,11 +1258,12 @@ void NetworkControl::customEvent(QEvent *e)
         if (message.left(13) == "MUSIC_CONTROL")
         {
             QStringList tokens = message.simplified().split(" ");
-            if ((tokens.size() >= 3) &&
-                (tokens[1] == "ANSWER"))
+            if ((tokens.size() >= 4) &&
+                (tokens[1] == "ANSWER") &&
+                (tokens[2] == gCoreContext->GetHostName()))
             {
-                answer = tokens[2];
-                for (int i = 3; i < tokens.size(); i++)
+                answer = tokens[3];
+                for (int i = 4; i < tokens.size(); i++)
                     answer += QString(" ") + tokens[i];
                 gotAnswer = true;
             } 
