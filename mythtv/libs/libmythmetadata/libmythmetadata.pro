@@ -14,13 +14,13 @@ QMAKE_CLEAN += version.cpp
 HEADERS += cleanup.h  dbaccess.h  dirscan.h  globals.h  parentalcontrols.h
 HEADERS += videoscan.h  videoutils.h  videometadata.h  videometadatalistmanager.h
 HEADERS += quicksp.h metadatacommon.h metadatadownload.h metadataimagedownload.h
-#HEADERS += bluraymetadata.h
+HEADERS += bluraymetadata.h
 
 SOURCES += cleanup.cpp  dbaccess.cpp  dirscan.cpp  globals.cpp
 SOURCES += parentalcontrols.cpp  videoscan.cpp  videoutils.cpp
 SOURCES += videometadata.cpp  videometadatalistmanager.cpp
 SOURCES += metadatacommon.cpp metadatadownload.cpp metadataimagedownload.cpp
-#SOURCES += bluraymetadata.cpp
+SOURCES += bluraymetadata.cpp
 
 INCLUDEPATH += ../libmythdb ../libmythtv
 INCLUDEPATH += ../.. ../ ./ ../libmythupnp ../libmythui
@@ -29,7 +29,7 @@ DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch
 DEPENDPATH += ../libmythfreesurround
 DEPENDPATH += ../ ../libmythui ../libmythdb
 DEPENDPATH += ../libmythupnp ../libmythtv ../libmyth
-#DEPENDPATH += ../libmythbluray
+DEPENDPATH += ../libmythbluray
 
 LIBS += -L../libmythsamplerate   -lmythsamplerate-$${LIBVERSION}
 LIBS += -L../libmythsoundtouch   -lmythsoundtouch-$${LIBVERSION}
@@ -41,7 +41,8 @@ LIBS += -L../../external/FFmpeg/libavcodec -lmythavcodec
 LIBS += -L../../external/FFmpeg/libavcore  -lmythavcodec
 LIBS += -L../../external/FFmpeg/libavutil  -lmythavutil
 LIBS += -L../libmyth              -lmyth-$${LIBVERSION}
-#LIBS += -L../libmythbluray        -lmythbluray-$$LIBVERSION
+LIBS += -L../libmythtv              -lmythtv-$${LIBVERSION}
+LIBS += -L../libmythbluray        -lmythbluray-$${LIBVERSION}
 
 mingw {
 
