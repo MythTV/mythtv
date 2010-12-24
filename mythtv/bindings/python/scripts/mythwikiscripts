@@ -5,58 +5,87 @@ from time import time
 import os.path
 import sys
 
-if __name__ == '__main__':
-    banner = 'MythTV Interactive Script Downloader.'
-    tic = time()
-    scripts = getScripts()
-    print 'Loading took %0.2f seconds' % (time()-tic)
-
+def get_input(comment, items):
     while True:
-        print '  0: Quit'
-        for i in range(len(scripts)):
-            size = sum([len(c) for c in scripts[i].code.values()])
-            if i == 0:
-                print '%s:' % scripts[i].info['category']
-            elif scripts[i].info['category'] != scripts[i-1].info['category']:
-                print '%s:' % scripts[i].info['category']
-            print '  %d: %s - %s (%d)' % (i+1, scripts[i].info['name'], scripts[i].info['short'], size)
+        print '  0: Exit'
+        for i,item in enumerate(items):
+            print '  {0}: {1}'.format(i+1, item)
+        print comment
 
-        print '\nPlease choose script to install:'
-        i = -2
-        while (i >= len(scripts)) or (i < 0):
+        while True:
             try:
-                i = int(raw_input('> '))-1
-                script = scripts[i]
+                i = raw_input('> ')
+                if i == 'list':
+                    break
+                elif i in ('exit','0'):
+                    return -1
+
+                i = int(i)-1
+                if i in range(len(items)):
+                    return i
+                print "Selection is outside range. Use 'list' to list options."
+
             except KeyboardInterrupt:
                 sys.exit()
             except EOFError:
                 sys.exit()
             except:
                 print 'This input only accepts integers.  Use Ctrl-C to exit'
-            if i == -1:
-                sys.exit()
 
-        print 'Author: '+script.info['author']
-        print 'Description: '+script.info['long']
-        print 'Webpage: '+script.info['webpage']
+def selectCat(catlist):
+    keys = catlist.keys()
+    while True:
+        inp = get_input('Please choose a category.', keys)
+        if inp == -1:
+            return
+        selectScript(catlist[keys[inp]])
 
-        for name in script.code.keys():
-            if name[0] in ('/','~'):
-                path = name
-            else:
-                path = '~/bin/'+name
+def selectScript(scriptlist):
+    names = [s.info.name for s in scriptlist]
+    while True:
+        inp = get_input('Please choose a script.', names)
+        if inp == -1:
+            return
+        saveScript(scriptlist[inp])
 
-            try:
-                inp = raw_input('Save to [%s]:' % path)
-            except EOFError:
-                sys.exit()
-            except KeyboardInterrupt:
-                print '\n\n\n'
+def saveScript(script):
+    print 'Author:      '+script.info.author
+    print 'Description: '+script.info.long
+    print 'Webpage:     '+script.info.webpage
+
+    for name in script.code.keys():
+        if name[0] in ('/', '~'):
+            path = name
+        else:
+            path = '~/bin/'+name
+
+        try:
+            inp = raw_input('Save to [{0}]:'.format(path))
+        except EOFError:
+            sys.exit()
+        except KeyboardInterrupt:
+            continue
+        except:
+            sys.exit()
+
+        if len(inp):
+            path = inp
+        script.saveScript(name, os.path.expanduser(path))
+
+if __name__ == '__main__':
+    banner = 'MythTV Interactive Script Downloader.'
+    tic = time()
+    tmp = Script.getAll()
+    print 'Loading took %0.2f seconds' % (time()-tic)
+
+    scripts = {}
+    for script in tmp:
+        for cat in script.category:
+            if cat in ('Articles with unsupported titles',
+                       'HOWTO'):
                 continue
-            except:
-                sys.exit()
+            if cat not in scripts:
+                scripts[cat] = []
+            scripts[cat].append(script)
 
-            if len(inp):
-                path = inp
-            script.saveScript(name, os.path.expanduser(path))
-        print '\n\n\n'
+    selectCat(scripts)
