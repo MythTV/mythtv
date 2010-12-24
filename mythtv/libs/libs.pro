@@ -29,4 +29,4 @@ SUBDIRS += libmythtv
 
 # libmythmetadata
 SUBDIRS += libmythmetadata
-libmythmetadata.depends = $$LIBMYTHTVDEPS
+libmythmetadata.depends = $$LIBMYTHTVDEPS libmythtv
