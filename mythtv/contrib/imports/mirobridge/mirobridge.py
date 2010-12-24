@@ -568,7 +568,7 @@ class delOldRecorded( OldRecorded ):
         """
         DBDataWrite.delete(self)
 # end delOldRecorded()
-MythDB.searchOldRecorded.dbclass = delOldRecorded
+MythDB.searchOldRecorded.handler = delOldRecorded
 
 
 def hashFile(filename):
