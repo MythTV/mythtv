@@ -112,7 +112,8 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
         else if ((!inheritsClass || obj->inherits(inheritsClass))
                    && (!objName || obj->objectName() == oName))
             return obj;
-        if (recursiveSearch && (obj = qChildHelper(objName, inheritsClass,
+        if (recursiveSearch && (dynamic_cast<MythUIGroup *>(obj) != NULL) 
+                            && (obj = qChildHelper(objName, inheritsClass,
                                                    recursiveSearch,
                                                    obj->children())))
             return obj;
@@ -128,7 +129,7 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
  */
 MythUIType *MythUIType::GetChild(const QString &name) const
 {
-    QObject *ret = qChildHelper(name.toAscii().constData(), NULL, false, children());
+    QObject *ret = qChildHelper(name.toAscii().constData(), NULL, true, children());
     if (ret)
         return dynamic_cast<MythUIType *>(ret);
 
