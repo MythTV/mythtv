@@ -1450,7 +1450,24 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         }
 
         if (writemode)
+        {
+            QString dirPath = finfo.absolutePath();
+            QDir qdir(dirPath);
+            if (!qdir.exists())
+            {
+                if (!qdir.mkpath(dirPath))
+                {
+                    VERBOSE(VB_IMPORTANT, QString("ERROR: FileTransfer "
+                            "filename '%1' is in a subdirectory which does "
+                            "not exist, but can not be created.")
+                            .arg(filename));
+                    errlist << "filetransfer_unable_to_create_subdirectory";
+                    socket->writeStringList(errlist);
+                    return;
+                }
+            }
             ft = new FileTransfer(filename, socket, writemode);
+        }
         else
             ft = new FileTransfer(filename, socket, usereadahead, timeout_ms);
 
