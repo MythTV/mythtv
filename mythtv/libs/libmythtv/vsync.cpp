@@ -130,29 +130,20 @@ VideoSync::VideoSync(VideoOutput *video_output,
                      bool halve_frame_interval) :
     m_video_output(video_output),   m_frame_interval(frameint),
     m_refresh_interval(refreshint), m_interlaced(halve_frame_interval),
-    m_delay(-1)
+    m_nexttrigger(0), m_delay(-1)
 {
-    bzero(&m_nexttrigger, sizeof(m_nexttrigger));
+}
+
+int64_t VideoSync::GetTime(void)
+{
+    struct timeval now_tv;
+    gettimeofday(&now_tv, NULL);
+    return now_tv.tv_sec * 1000000LL + now_tv.tv_usec;
 }
 
 void VideoSync::Start(void)
 {
-    gettimeofday(&m_nexttrigger, NULL); // now
-}
-
-void VideoSync::OffsetTimeval(struct timeval& tv, int offset)
-{
-    tv.tv_usec += offset;
-    while (tv.tv_usec > 999999)
-    {
-        tv.tv_sec++;
-        tv.tv_usec -= 1000000;
-    }
-    while (tv.tv_usec < 0)
-    {
-        tv.tv_sec--;
-        tv.tv_usec += 1000000;
-    }
+    m_nexttrigger = GetTime();
 }
 
 /** \fn VideoSync::CalcDelay()
@@ -168,13 +159,11 @@ void VideoSync::OffsetTimeval(struct timeval& tv, int offset)
  */
 int VideoSync::CalcDelay()
 {
-    struct timeval now;
-    gettimeofday(&now, NULL);
+    int64_t now = GetTime();
     //cout << "CalcDelay: next: " << timeval_str(m_nexttrigger) << " now "
     // << timeval_str(now) << endl;
 
-    int ret_val = (m_nexttrigger.tv_sec - now.tv_sec) * 1000000 +
-                  (m_nexttrigger.tv_usec - now.tv_usec);
+    int ret_val = m_nexttrigger - now;
 
     //cout << "delay " << ret_val << endl;
 
@@ -186,9 +175,7 @@ int VideoSync::CalcDelay()
             ret_val = m_frame_interval * 4;
 
         // set nexttrigger to our new target time
-        m_nexttrigger.tv_sec = now.tv_sec;
-        m_nexttrigger.tv_usec = now.tv_usec;
-        OffsetTimeval(m_nexttrigger, ret_val);
+        m_nexttrigger = now + ret_val;
     }
 
     if (ret_val < -m_frame_interval)
@@ -196,9 +183,7 @@ int VideoSync::CalcDelay()
         ret_val = -m_frame_interval;
 
         // set nexttrigger to our new target time
-        m_nexttrigger.tv_sec = now.tv_sec;
-        m_nexttrigger.tv_usec = now.tv_usec;
-        OffsetTimeval(m_nexttrigger, ret_val);
+        m_nexttrigger = now + ret_val;
     }
 
     return ret_val;
@@ -216,9 +201,9 @@ void VideoSync::KeepPhase()
 {
     // cerr << m_delay << endl;
     if (m_delay < -(m_refresh_interval/2))
-        OffsetTimeval(m_nexttrigger, 200);
+        m_nexttrigger += 200;
     else if (m_delay > -500)
-        OffsetTimeval(m_nexttrigger, -2000);
+        m_nexttrigger += -2000;
 }
 
 #ifndef _WIN32
@@ -311,7 +296,7 @@ void DRMVideoSync::Start(void)
 void DRMVideoSync::WaitForFrame(int sync_delay)
 {
     // Offset for externally-provided A/V sync delay
-    OffsetTimeval(m_nexttrigger, sync_delay);
+    m_nexttrigger += sync_delay;
 
     m_delay = CalcDelay();
     //cerr << "WaitForFrame at : " << m_delay;
@@ -417,7 +402,7 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
     (void) sync_delay;
 #ifdef USING_OPENGL_VSYNC
     const QString msg1("First A/V Sync"), msg2("Second A/V Sync");
-    OffsetTimeval(m_nexttrigger, sync_delay);
+    m_nexttrigger += sync_delay;
 
     if (m_video_output && m_video_output->IsEmbedding())
     {
@@ -496,7 +481,7 @@ bool RTCVideoSync::TryInit(void)
 
 void RTCVideoSync::WaitForFrame(int sync_delay)
 {
-    OffsetTimeval(m_nexttrigger, sync_delay);
+    m_nexttrigger += sync_delay;
 
     m_delay = CalcDelay();
 
@@ -535,7 +520,7 @@ bool VDPAUVideoSync::TryInit(void)
 void VDPAUVideoSync::WaitForFrame(int sync_delay)
 {
     // Offset for externally-provided A/V sync delay
-    OffsetTimeval(m_nexttrigger, sync_delay);
+    m_nexttrigger += sync_delay;
     m_delay = CalcDelay();
 
     if (m_delay < 0)
@@ -566,7 +551,7 @@ bool BusyWaitVideoSync::TryInit(void)
 void BusyWaitVideoSync::WaitForFrame(int sync_delay)
 {
     // Offset for externally-provided A/V sync delay
-    OffsetTimeval(m_nexttrigger, sync_delay);
+    m_nexttrigger += sync_delay;
 
     m_delay = CalcDelay();
 
@@ -612,7 +597,7 @@ bool USleepVideoSync::TryInit(void)
 void USleepVideoSync::WaitForFrame(int sync_delay)
 {
     // Offset for externally-provided A/V sync delay
-    OffsetTimeval(m_nexttrigger, sync_delay);
+    m_nexttrigger += sync_delay;
 
     m_delay = CalcDelay();
     if (m_delay > 0)
