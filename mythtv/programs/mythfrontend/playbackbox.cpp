@@ -4345,10 +4345,19 @@ void PlaybackBox::showGroupFilter(void)
     {
         connect(recGroupPopup, SIGNAL(result(QString)),
                 SLOT(displayRecGroup(QString)));
+        connect(recGroupPopup, SIGNAL(Exiting()),
+                SLOT(groupSelectorClosed()));
         m_popupStack->AddScreen(recGroupPopup);
     }
     else
         delete recGroupPopup;
+}
+
+void PlaybackBox::groupSelectorClosed(void)
+{
+    if ((gCoreContext->GetNumSetting("QueryInitialFilter", 0) == 1) &&
+        ((m_titleList.size() <= 1)))
+        Close();
 }
 
 void PlaybackBox::setGroupFilter(const QString &recGroup)
