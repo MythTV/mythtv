@@ -13,6 +13,7 @@
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
 #include "mythprogressdialog.h"
+#include "mythuigroup.h"
 
 QEvent::Type ScreenLoadCompletionEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
@@ -31,7 +32,6 @@ class ScreenLoadTask : public QRunnable
 
     MythScreenType *m_parent;
 };
-
 
 MythScreenType::MythScreenType(MythScreenStack *parent, const QString &name,
                                bool fullscreen)
@@ -358,9 +358,9 @@ void MythScreenType::ShowMenu(void)
     // Virtual
 }
 
-void MythScreenType::SetTextFromMap(QHash<QString, QString> &infoMap)
+static void DoSetTextFromMap(MythUIType *UItype, QHash<QString, QString> &infoMap)
 {
-    QList<MythUIType *> *children = GetAllChildren();
+    QList<MythUIType *> *children = UItype->GetAllChildren();
 
     MythUIText *textType;
 
@@ -374,15 +374,25 @@ void MythScreenType::SetTextFromMap(QHash<QString, QString> &infoMap)
         textType = dynamic_cast<MythUIText *> (type);
         if (textType && infoMap.contains(textType->objectName()))
             textType->SetTextFromMap(infoMap);
+
+
+        MythUIGroup *group = dynamic_cast<MythUIGroup *> (type);
+        if (group)
+            DoSetTextFromMap(type, infoMap);
     }
 }
 
-void MythScreenType::ResetMap(QHash<QString, QString> &infoMap)
+void MythScreenType::SetTextFromMap(QHash<QString, QString> &infoMap)
+{
+    DoSetTextFromMap((MythUIType*) this, infoMap);
+}
+
+static void DoResetMap(MythUIType *UItype, QHash<QString, QString> &infoMap)
 {
     if (infoMap.isEmpty())
         return;
 
-    QList<MythUIType *> *children = GetAllChildren();
+    QList<MythUIType *> *children = UItype->GetAllChildren();
 
     MythUIText *textType;
     QMutableListIterator<MythUIType *> i(*children);
@@ -395,7 +405,16 @@ void MythScreenType::ResetMap(QHash<QString, QString> &infoMap)
         textType = dynamic_cast<MythUIText *> (type);
         if (textType && infoMap.contains(textType->objectName()))
             textType->Reset();
+
+        MythUIGroup *group = dynamic_cast<MythUIGroup *> (type);
+        if (group)
+            DoResetMap(type, infoMap);
     }
+}
+
+void MythScreenType::ResetMap(QHash<QString, QString> &infoMap)
+{
+    DoResetMap(this, infoMap);
 }
 
 bool MythScreenType::keyPressEvent(QKeyEvent *event)

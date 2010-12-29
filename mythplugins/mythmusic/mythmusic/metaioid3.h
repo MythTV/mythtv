@@ -46,6 +46,8 @@ class MetaIOID3 : public MetaIOTagLib
 
     bool writePlayCount(TagLib::ID3v2::Tag *tag, int playcount);
     bool writeRating(TagLib::ID3v2::Tag *tag, int rating);
+    bool writeAlbumArt(TagLib::ID3v2::Tag *tag, QByteArray *image,
+                       const AttachedPictureFrame::Type &type);
 
     Metadata* read(QString filename);
     static QImage getAlbumArt(QString filename, ImageType type);
@@ -56,6 +58,8 @@ class MetaIOID3 : public MetaIOTagLib
     AlbumArtList readAlbumArt(TagLib::ID3v2::Tag *tag);
     UserTextIdentificationFrame* find(TagLib::ID3v2::Tag *tag, const String &description);
     PopularimeterFrame* findPOPM(TagLib::ID3v2::Tag *tag, const String &email);
+    AttachedPictureFrame* findAPIC(TagLib::ID3v2::Tag *tag, const AttachedPictureFrame::Type &type,
+                                   const String &description = String::null);
 };
 
 #endif

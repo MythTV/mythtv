@@ -134,6 +134,7 @@ class PlaybackBox : public ScheduleCommon
 
   public slots:
     void displayRecGroup(const QString &newRecGroup = "");
+    void groupSelectorClosed(void);
 
   protected slots:
     void updateRecList(MythUIButtonListItem *);

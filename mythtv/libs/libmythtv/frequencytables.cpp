@@ -513,10 +513,6 @@ static void init_freq_tables(freq_table_map_t &fmap)
     fmap["atsc_vsb8_us3"] = new FrequencyTable(
         "ATSC Channel %1", 14, 473000000, 803000000, 6000000,
         DTVModulation::kModulation8VSB);
-    // UHF 70-83
-    fmap["atsc_vsb8_us4"] = new FrequencyTable(
-        "ATSC Channel %1", 70, 809000000, 887000000, 6000000,
-        DTVModulation::kModulation8VSB);
 #endif // !DEBUG_DVB_OFFSETS
 
     QString modStr[] = { "vsb8",  "qam256",   "qam128",   "qam64",   };

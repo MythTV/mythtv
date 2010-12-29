@@ -544,6 +544,25 @@ static int _libaacs_open(BLURAY *bd, const char *keyfile_path)
     return 0;
 }
 
+static uint8_t *_libaacs_get_vid(BLURAY *bd)
+{
+    if (bd->aacs) {
+#ifdef DLOPEN_CRYPTO_LIBS
+        fptr_p_void fptr = dl_dlsym(bd->h_libaacs, "aacs_get_vid");
+        if (fptr) {
+            return (uint8_t*)fptr(bd->aacs);
+        }
+        DEBUG(DBG_BLURAY, "aacs_get_vid() dlsym failed! (%p)", bd);
+        return NULL;
+#else
+        return aacs_get_vid(bd->aacs);
+#endif
+    }
+
+    DEBUG(DBG_BLURAY, "_libaacs_get_vid(): libaacs not initialized! (%p)", bd);
+    return NULL;
+}
+
 static void _libbdplus_close(BLURAY *bd)
 {
     if (bd->bdplus) {
@@ -656,7 +675,7 @@ static int _libbdplus_open(BLURAY *bd, const char *keyfile_path)
         return 0;
     }
 
-    bd->bdplus = bd->bdplus_init(bd->device_path, keyfile_path, vid);
+    bd->bdplus = bd->bdplus_init(bd->device_path, keyfile_path, _libaacs_get_vid(bd) ?: vid);
 
     if (bd->bdplus) {
         DEBUG(DBG_BLURAY,"libbdplus initialized\n");

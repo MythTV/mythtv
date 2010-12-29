@@ -92,7 +92,7 @@ class VideoSync
                                  uint frame_interval, uint refresh_interval,
                                  bool interlaced);
   protected:
-    static void OffsetTimeval(struct timeval& tv, int offset);
+    int64_t GetTime(void);
     int CalcDelay(void);
     void KeepPhase(void);
 
@@ -100,7 +100,7 @@ class VideoSync
     int m_frame_interval; // of video
     int m_refresh_interval; // of display
     bool m_interlaced;
-    struct timeval m_nexttrigger;
+    int64_t m_nexttrigger;
     int m_delay;
     
     static int m_forceskip;

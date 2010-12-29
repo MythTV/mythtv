@@ -386,6 +386,59 @@ AlbumArtList MetaIOID3::readAlbumArt(TagLib::ID3v2::Tag *tag)
 }
 
 /*!
+ * \brief Find an APIC tag by type and optionally description
+ *
+ * \param tag Pointer to TagLib::ID3v2::Tag object
+ * \param type Type of picture to search for
+ * \param description Description of picture to search for (optional)
+ * \returns Pointer to frame
+ */
+AttachedPictureFrame* MetaIOID3::findAPIC(TagLib::ID3v2::Tag *tag,
+                                        const AttachedPictureFrame::Type &type,
+                                        const String &description)
+{
+  TagLib::ID3v2::FrameList l = tag->frameList("APIC");
+  for(TagLib::ID3v2::FrameList::Iterator it = l.begin(); it != l.end(); ++it)
+  {
+    AttachedPictureFrame *f = static_cast<AttachedPictureFrame *>(*it);
+    if (f && f->type() == type &&
+        (description.isNull() || f->description() == description))
+      return f;
+  }
+  return NULL;
+}
+
+/*!
+ * \brief Write the albumart image to the file
+ *
+ * \param tag The ID3v2 tag object in which to look for Album Art
+ * \returns True if successful
+ */
+bool MetaIOID3::writeAlbumArt(TagLib::ID3v2::Tag *tag, QByteArray *image,
+                              const AttachedPictureFrame::Type &type)
+{
+    if (!tag || !image)
+        return false;
+
+    AttachedPictureFrame *apic = findAPIC(tag, type);
+
+    if (!apic)
+    {
+        apic = new AttachedPictureFrame();
+        tag->addFrame(apic);
+        apic->setType(type);
+    }
+
+    TagLib::ByteVector bytevector;
+    bytevector.setData(image->data());
+    delete image;
+
+    apic->setPicture(bytevector);
+
+    return true;
+}
+
+/*!
  * \brief Find the a custom comment tag by description.
  *        This is a copy of the same function in the
  *        TagLib::ID3v2::UserTextIdentificationFrame Class with a static
@@ -411,9 +464,6 @@ UserTextIdentificationFrame* MetaIOID3::find(TagLib::ID3v2::Tag *tag,
 
 /*!
  * \brief Find the POPM tag associated with MythTV
- *        This is a copy of the same function in the
- *        TagLib::ID3v2::UserTextIdentificationFrame Class with a static
- *        instead of dynamic cast.
  *
  * \param tag Pointer to TagLib::ID3v2::Tag object
  * \param email Email address associated with this POPM frame

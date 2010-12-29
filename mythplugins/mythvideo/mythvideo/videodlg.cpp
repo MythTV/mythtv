@@ -7,11 +7,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
-#include <QHttp>
-#include <QBuffer>
 #include <QUrl>
-#include <QImage>
-#include <QImageReader>
 
 #include <mythcontext.h>
 #include <compat.h>
