@@ -11,6 +11,10 @@ ifdef CONFIG_BINDINGS_PYTHON
     MAKE_SUBDIRS += bindings/python
 endif
 
+ifdef CONFIG_BINDINGS_PHP
+    MAKE_SUBDIRS += bindings/php
+endif
+
 
 SUBDIRS += $(MAKE_SUBDIRS) $(QT_SUBDIRS)
 
