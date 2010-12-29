@@ -3070,6 +3070,7 @@ case $target_os in
         enable  backend
         enable  darwin
         disable dvb
+        disable ffmpeg
         # Prevent linker problems on default Intel 10.5 XCode:
         ldver=$(ld -v 2>&1 | sed -e s/^[^-]*-//)
         osxver=$(uname -r | cut -c 1)
