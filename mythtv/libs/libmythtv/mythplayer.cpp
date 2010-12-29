@@ -238,6 +238,7 @@ MythPlayer::MythPlayer(bool muted)
       // Audio and video synchronization stuff
       videosync(NULL),              avsync_delay(0),
       avsync_adjustment(0),         avsync_avg(0),
+      avsync_predictor(0),          avsync_predictor_enabled(false),
       refreshrate(0),
       lastsync(false),              repeat_delay(0),
       disp_timecode(0),
@@ -874,7 +875,7 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
         video_frame_rate = fps;
         float temp_speed = (play_speed == 0.0f) ?
             audio.GetStretchFactor() : play_speed;
-        frame_interval = (int)(1000000.0f / video_frame_rate / temp_speed);
+        SetFrameInterval(kScan_Progressive, 1.0 / (video_frame_rate * temp_speed));
     }
 
     if (videoOutput)
@@ -1626,6 +1627,31 @@ int MythPlayer::NextCaptionTrack(int mode)
     return NextCaptionTrack(nextmode);
 }
 
+void MythPlayer::SetFrameInterval(FrameScanType scan, double frame_period)
+{
+    frame_interval = (int)(1000000.0f * frame_period + 0.5f);
+    if (!avsync_predictor_enabled)
+        avsync_predictor = 0;
+    avsync_predictor_enabled = false;
+
+    VERBOSE(VB_PLAYBACK, LOC + QString("SetFrameInterval ps:%1 scan:%2")
+            .arg(play_speed).arg(scan)
+           );
+    if (play_speed < 1 || play_speed > 2 || refreshrate <= 0)
+        return;
+
+    avsync_predictor_enabled = ((frame_interval-(frame_interval/200)) < refreshrate);
+}
+
+void MythPlayer::ResetAVSync(void)
+{
+    avsync_avg = 0;
+    if (!avsync_predictor_enabled || avsync_predictor >= refreshrate)
+        avsync_predictor = 0;
+    prevtc = 0;
+    VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, LOC + "A/V sync reset");
+}
+
 void MythPlayer::InitAVSync(void)
 {
     videosync->Start();
@@ -1648,6 +1674,8 @@ void MythPlayer::InitAVSync(void)
                        .arg(1000000.0 / refreshrate, 0, 'f', 3)
                        .arg(1000000.0 / frame_interval, 0, 'f', 3);
         VERBOSE(VB_PLAYBACK, LOC + msg);
+
+        SetFrameInterval(m_scan, 1.0 / (video_frame_rate * play_speed));
 
         // try to get preferential scheduling, but ignore if we fail to.
         myth_nice(-19);
@@ -1699,12 +1727,34 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
         ps = kScan_Progressive;
 
+    bool dropframe = false;
+    QString dbg;
+
+    if (avsync_predictor_enabled)
+    {
+        avsync_predictor += frame_interval;
+        if (avsync_predictor >= refreshrate)
+        {
+            int refreshperiodsinframe = avsync_predictor/refreshrate;
+            avsync_predictor -= refreshrate * refreshperiodsinframe;
+        }
+        else
+        {
+            dropframe = true;
+            dbg = "A/V predict drop frame, ";
+        }
+    }
+
     if (diverge < -MAXDIVERGE)
     {
+        dropframe = true;
         // If video is way behind of audio, adjust for it...
-        QString dbg = QString("Video is %1 frames behind audio (too slow), ")
+        dbg = QString("Video is %1 frames behind audio (too slow), ")
             .arg(-diverge);
+    }
 
+    if (dropframe)
+    {
         // Reset A/V Sync
         lastsync = true;
 
@@ -1801,13 +1851,16 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         int64_t currentaudiotime = audio.GetAudioTime();
         VERBOSE(VB_TIMESTAMP, LOC + QString(
                     "A/V timecodes audio %1 video %2 frameinterval %3 "
-                    "avdel %4 avg %5 tcoffset %6")
+                    "avdel %4 avg %5 tcoffset %6 "
+                    "avp %7 avpen %8")
                 .arg(currentaudiotime)
                 .arg(timecode)
                 .arg(frame_interval)
                 .arg(timecode - currentaudiotime)
                 .arg(avsync_avg)
                 .arg(tc_wrap[TC_AUDIO])
+                .arg(avsync_predictor)
+                .arg(avsync_predictor_enabled)
                  );
         if (currentaudiotime != 0 && timecode != 0)
         { // currentaudiotime == 0 after a seek
@@ -1853,7 +1906,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         }
         else
         {
-            avsync_avg = 0;
+            ResetAVSync();
         }
     }
 }
@@ -3491,6 +3544,7 @@ void MythPlayer::ClearAfterSeek(bool clearvideobuffers)
     commBreakMap.SetTracker(framesPlayed);
     commBreakMap.ResetLastSkip();
     needNewPauseFrame = true;
+    ResetAVSync();
 }
 
 void MythPlayer::SetPlayerInfo(TV *tv, QWidget *widget,
