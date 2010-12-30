@@ -196,6 +196,8 @@ bool MythUIButtonTree::UpdateList(MythUIButtonList *list, MythGenericTree *node)
             SLOT(handleSelect(MythUIButtonListItem *)));
     connect(list, SIGNAL(itemClicked(MythUIButtonListItem *)),
             SLOT(handleClick(MythUIButtonListItem *)));
+    connect(list, SIGNAL(itemVisible(MythUIButtonListItem *)),
+            SLOT(handleVisible(MythUIButtonListItem *)));
 
     return true;
 }
@@ -503,6 +505,19 @@ MythUIButtonListItem* MythUIButtonTree::GetItemCurrent() const
         return m_activeList->GetItemCurrent();
 
     return NULL;
+}
+
+ /*!
+ * \brief Handle a list item becoming visible
+ *
+ * \param item The list item
+ */
+void MythUIButtonTree::handleVisible(MythUIButtonListItem *item)
+{
+    if (!item)
+        return;
+
+    emit itemVisible(item);
 }
 
 /*!
