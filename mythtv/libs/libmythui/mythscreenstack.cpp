@@ -33,6 +33,11 @@ MythScreenStack::MythScreenStack(MythMainWindow *parent, const QString &name,
 
 MythScreenStack::~MythScreenStack()
 {
+    while (!m_Children.isEmpty())
+    {
+        MythScreenType *child = m_Children.back();
+        PopScreen(child, false, true); // Don't fade, do delete
+    }
 }
 
 void MythScreenStack::EnableEffects(void)
