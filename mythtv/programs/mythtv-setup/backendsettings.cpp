@@ -707,9 +707,9 @@ static HostSpinBox *UPNPRebuildDelay()
 {
     HostSpinBox *gc = new HostSpinBox("UPnP/RebuildDelay", 0, 1440, 1);
     gc->setLabel(QObject::tr("UPnP media update time"));
-    gc->setHelpText(QObject::tr("The number of minutes between mythbackend "
-                                "checking for new videos to serve via UPnP. "
-                                "0 = Off. "));
+    gc->setHelpText(QObject::tr("How often (in minutes) MythTV will check "
+                    "for new videos to serve via UPnP. "
+                    "0 = Off. "));
     gc->setValue(30);
     return gc;
 };
@@ -721,9 +721,8 @@ static GlobalComboBox *UPNPWmpSource()
     gc->addSelection(QObject::tr("Recordings"),"0");
     gc->addSelection(QObject::tr("Videos"),"1");
     gc->setValue("0");
-    gc->setHelpText(QObject::tr("This forces us to show WMP clients "
-                    " either the Recordings tree or the Video tree when "
-                    " they request a list of videos "));
+    gc->setHelpText(QObject::tr("Which tree to show a Windows Media Player client "
+                    "when it requests a list of videos."));
     return gc;
 };
 

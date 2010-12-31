@@ -567,7 +567,8 @@ void ProgFinder::selectShowData(QString progTitle, int newCurShow)
 
     MSqlBindings bindings;
     QString querystr = "WHERE program.title = :TITLE "
-                       "  AND program.endtime > :ENDTIME ";
+                       "  AND program.endtime > :ENDTIME "
+                       "  AND channel.visible = 1 ";
     bindings[":TITLE"] = progTitle;
     bindings[":ENDTIME"] = progStart.toString("yyyy-MM-ddThh:mm:50");
 
@@ -602,12 +603,14 @@ void ProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindings
 
     if (searchChar.contains('@'))
     {
-        where = "SELECT DISTINCT title FROM program WHERE ( "
-                   "title NOT REGEXP '^[A-Z0-9]' AND "
-                   "title NOT REGEXP '^The [A-Z0-9]' AND "
-                   "title NOT REGEXP '^A [A-Z0-9]' AND "
-                   "title NOT REGEXP '^An [A-Z0-9]' AND "
-                   "starttime > :STARTTIME ) ";
+        where = "SELECT DISTINCT title FROM program "
+                "LEFT JOIN channel ON program.chanid = channel.chanid "
+                "WHERE channel.visible = 1 AND "
+                "( title NOT REGEXP '^[A-Z0-9]' AND "
+                "  title NOT REGEXP '^The [A-Z0-9]' AND "
+                "  title NOT REGEXP '^A [A-Z0-9]' AND "
+                "  title NOT REGEXP '^An [A-Z0-9]' AND "
+                "  starttime > :STARTTIME ) ";
         if (!m_searchStr.isEmpty())
         {
             where += "AND title LIKE :SEARCH ";
@@ -625,11 +628,12 @@ void ProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindings
         QString three = QString("A ") + one;
         QString four = QString("An ") + one;
 
-        where = "SELECT DISTINCT title "
-                "FROM program "
-                "WHERE ( title LIKE :ONE OR title LIKE :TWO "
-                "        OR title LIKE :THREE "
-                "        OR title LIKE :FOUR ) "
+        where = "SELECT DISTINCT title FROM program "
+                "LEFT JOIN channel ON program.chanid = channel.chanid "
+                "WHERE channel.visible = 1 "
+                "AND ( title LIKE :ONE OR title LIKE :TWO "
+                "      OR title LIKE :THREE "
+                "      OR title LIKE :FOUR ) "
                 "AND starttime > :STARTTIME ";
         if (!m_searchStr.isEmpty())
             where += "AND title LIKE :SEARCH ";
@@ -782,44 +786,46 @@ void JaProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindin
     QDateTime progStart = QDateTime::currentDateTime();
     int charNum = m_alphabetList->GetCurrentPos();
 
-    where = "SELECT DISTINCT title FROM program ";
+    where = "SELECT DISTINCT title FROM program "
+            "LEFT JOIN channel ON program.chanid = channel.chanid "
+            "WHERE channel.visible = 1 ";
 
     switch (charNum) {
     case 0:
-        where += "WHERE ( title_pronounce >= 'あ' AND title_pronounce <= 'お') ";
+        where += "AND ( title_pronounce >= 'あ' AND title_pronounce <= 'お') ";
         break;
     case 1:
-        where += "WHERE ( title_pronounce >= 'か' AND title_pronounce <= 'ご') ";
+        where += "AND ( title_pronounce >= 'か' AND title_pronounce <= 'ご') ";
         break;
     case 2:
-        where += "WHERE ( title_pronounce >= 'さ' AND title_pronounce <= 'そ') ";
+        where += "AND ( title_pronounce >= 'さ' AND title_pronounce <= 'そ') ";
         break;
     case 3:
-        where += "WHERE ( title_pronounce >= 'た' AND title_pronounce <= 'ど') ";
+        where += "AND ( title_pronounce >= 'た' AND title_pronounce <= 'ど') ";
         break;
     case 4:
-        where += "WHERE ( title_pronounce >= 'な' AND title_pronounce <= 'の') ";
+        where += "AND ( title_pronounce >= 'な' AND title_pronounce <= 'の') ";
         break;
     case 5:
-        where += "WHERE ( title_pronounce >= 'は' AND title_pronounce <= 'ぽ') ";
+        where += "AND ( title_pronounce >= 'は' AND title_pronounce <= 'ぽ') ";
         break;
     case 6:
-        where += "WHERE ( title_pronounce >= 'ま' AND title_pronounce <= 'も') ";
+        where += "AND ( title_pronounce >= 'ま' AND title_pronounce <= 'も') ";
         break;
     case 7:
-        where += "WHERE ( title_pronounce >= 'や' AND title_pronounce <= 'よ') ";
+        where += "AND ( title_pronounce >= 'や' AND title_pronounce <= 'よ') ";
         break;
     case 8:
-        where += "WHERE ( title_pronounce >= 'ら' AND title_pronounce <= 'ろ') ";
+        where += "AND ( title_pronounce >= 'ら' AND title_pronounce <= 'ろ') ";
         break;
     case 9:
-        where += "WHERE ( title_pronounce >= 'わ' AND title_pronounce <= 'ん') ";
+        where += "AND ( title_pronounce >= 'わ' AND title_pronounce <= 'ん') ";
         break;
     case 10:
-        where += "WHERE ( title_pronounce >= 'Ａ' AND title_pronounce <= 'ｚ') ";
+        where += "AND ( title_pronounce >= 'Ａ' AND title_pronounce <= 'ｚ') ";
         break;
     case 11:
-        where += "WHERE ( title_pronounce >= '０' AND title_pronounce <= '９') ";
+        where += "AND ( title_pronounce >= '０' AND title_pronounce <= '９') ";
         break;
     }
 
@@ -890,21 +896,23 @@ void HeProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindin
     if (searchChar.isEmpty())
         searchChar = searchChars[0];
 
-    where = "SELECT DISTINCT title FROM program ";
+    where = "SELECT DISTINCT title FROM program "
+            "LEFT JOIN channel ON program.chanid = channel.chanid "
+            "WHERE channel.visible = 1 ";
 
     if (searchChar.contains('E'))
     {
-        where += "WHERE ( title REGEXP '^[A-Z]') ";
+        where += "AND ( title REGEXP '^[A-Z]') ";
     }
     else if (searchChar.contains('#'))
     {
-        where += "WHERE ( title REGEXP '^[0-9]') ";
+        where += "AND ( title REGEXP '^[0-9]') ";
     }
     else
     {
         QString one = searchChar + '%';
         bindings[":ONE"] = one;
-        where += "WHERE ( title LIKE :ONE ) ";
+        where += "AND ( title LIKE :ONE ) ";
     }
 
     where += "AND starttime > :STARTTIME ";
@@ -982,7 +990,10 @@ void RuProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings
 
   if (searchChar.contains('@'))
    {
-       where = "SELECT DISTINCT title FROM program WHERE ( "
+       where = "SELECT DISTINCT title FROM program "
+               "LEFT JOIN channel ON program.chanid = channel.chanid "
+               "WHERE channel.visible = 1 AND "
+               "( "
                   "title NOT REGEXP '^[A-Z0-9]' AND "
                   "title NOT REGEXP '^The [A-Z0-9]' AND "
                   "title NOT REGEXP '^A [A-Z0-9]' AND "
@@ -1006,12 +1017,13 @@ void RuProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings
        QString four = QString("An ") + one;
        QString five = QString("\"") + one;
 
-       where = "SELECT DISTINCT title "
-               "FROM program "
-               "WHERE ( title LIKE :ONE OR title LIKE :TWO "
-               "        OR title LIKE :THREE "
-               "        OR title LIKE :FOUR  "
-               "        OR title LIKE :FIVE )"
+       where = "SELECT DISTINCT title FROM program "
+               "LEFT JOIN channel ON program.chanid = channel.chanid "
+               "WHERE channel.visible = 1 "
+               "AND ( title LIKE :ONE OR title LIKE :TWO "
+               "      OR title LIKE :THREE "
+               "      OR title LIKE :FOUR  "
+               "      OR title LIKE :FIVE )"
                "AND starttime > :STARTTIME ";
        if (!m_searchStr.isEmpty())
            where += "AND title LIKE :SEARCH ";

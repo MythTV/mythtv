@@ -39,10 +39,12 @@ class MPUBLIC MythUIButtonTree : public MythUIType
   public slots:
     void handleSelect(MythUIButtonListItem* item);
     void handleClick(MythUIButtonListItem* item);
+    void handleVisible(MythUIButtonListItem* item);
 
   signals:
     void itemSelected(MythUIButtonListItem* item);
     void itemClicked(MythUIButtonListItem* item);
+    void itemVisible(MythUIButtonListItem* item);
     void nodeChanged(MythGenericTree* node);
 
   protected:
