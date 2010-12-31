@@ -40,7 +40,7 @@ long long getDiskSpace(const QString &file_on_disk,
                        long long &total, long long &used)
 {
     struct statfs statbuf;
-    bzero(&statbuf, sizeof(statbuf));
+    memset(&statbuf, 0, sizeof(statbuf));
     long long freespace = -1;
     QByteArray cstr = file_on_disk.toLocal8Bit();
 
@@ -82,7 +82,7 @@ bool extractZIP(const QString &zipFile, const QString &outDir)
     }
 
     ec = uz.extractAll(outDir);
-    
+
     if (ec != UnZip::Ok)
     {
         VERBOSE(VB_IMPORTANT,

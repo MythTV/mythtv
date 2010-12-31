@@ -3,10 +3,10 @@
 // Created     : Dec. 22, 2006
 //
 // Purpose     : uPnp Eventing Base Class Definition
-//                                                                            
+//
 // Copyright (c) 2006 David Blain <mythtv@theblains.net>
-//                                          
-// This library is free software; you can redistribute it and/or 
+//
+// This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or at your option any later version of the LGPL.
@@ -37,15 +37,15 @@ class QTextStream;
 //////////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////////
-        
+
 class UPNP_PUBLIC SubscriberInfo
 {
     public:
         SubscriberInfo()
             : nKey( 0 ), nDuration( 0 )
         {
-            bzero( &ttExpires, sizeof( ttExpires ) );
-            bzero( &ttLastNotified, sizeof( ttLastNotified ) );
+            memset( &ttExpires, 0, sizeof( ttExpires ) );
+            memset( &ttLastNotified, 0, sizeof( ttLastNotified ) );
             sUUID          = QUuid::createUuid().toString();
             sUUID          = sUUID.mid( 1, sUUID.length() - 2);
         }
@@ -53,8 +53,8 @@ class UPNP_PUBLIC SubscriberInfo
         SubscriberInfo( const QString &url, unsigned long duration )
             : nKey( 0 ), nDuration( duration )
         {
-            bzero( &ttExpires, sizeof( ttExpires ) );
-            bzero( &ttLastNotified, sizeof( ttLastNotified ) );
+            memset( &ttExpires, 0, sizeof( ttExpires ) );
+            memset( &ttLastNotified, 0, sizeof( ttLastNotified ) );
             sUUID          = QUuid::createUuid().toString();
             sUUID          = sUUID.mid( 1, sUUID.length() - 2);
             qURL           = url;
@@ -112,7 +112,7 @@ class UPNP_PUBLIC  StateVariableBase
 
     public:
 
-        explicit StateVariableBase( const QString &sName, bool bNotify = false ) 
+        explicit StateVariableBase( const QString &sName, bool bNotify = false )
         {
             m_bNotify = bNotify;
             m_sName   = sName;
@@ -121,14 +121,14 @@ class UPNP_PUBLIC  StateVariableBase
 
         virtual QString ToString() = 0;
 };
-  
+
 //////////////////////////////////////////////////////////////////////////////
 
 template< class T >
 class UPNP_PUBLIC  StateVariable : public StateVariableBase
 {
     private:
-        
+
         T     m_value;
 
     public:
@@ -149,14 +149,14 @@ class UPNP_PUBLIC  StateVariable : public StateVariableBase
 
         virtual QString ToString()
         {
-            return QString( "%1" ).arg( m_value );            
+            return QString( "%1" ).arg( m_value );
         }
 
         // ------------------------------------------------------------------
 
-        T GetValue()             
-        { 
-            return m_value; 
+        T GetValue()
+        {
+            return m_value;
         }
 
         // ------------------------------------------------------------------
@@ -179,7 +179,7 @@ template<>
 inline QString state_var_init(const QString*) { return QString(); }
 
 class UPNP_PUBLIC StateVariables
-{   
+{
     protected:
 
         virtual void Notify() = 0;
@@ -189,14 +189,14 @@ class UPNP_PUBLIC StateVariables
 
         // ------------------------------------------------------------------
 
-        StateVariables() { }     
+        StateVariables() { }
         virtual ~StateVariables()
         {
             SVMap::iterator it = m_map.begin();
             for (; it != m_map.end(); ++it)
                 delete *it;
             m_map.clear();
-        }     
+        }
 
         // ------------------------------------------------------------------
 
@@ -284,8 +284,8 @@ class UPNP_PUBLIC  Eventing : public HttpServerExtension,
 
         virtual void Notify           ( );
         void         NotifySubscriber ( SubscriberInfo *pInfo );
-        void         HandleSubscribe  ( HTTPRequest *pRequest ); 
-        void         HandleUnsubscribe( HTTPRequest *pRequest ); 
+        void         HandleSubscribe  ( HTTPRequest *pRequest );
+        void         HandleUnsubscribe( HTTPRequest *pRequest );
 
         // Implement UPnpServiceImpl methods that we can
 

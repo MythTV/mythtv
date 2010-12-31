@@ -4163,7 +4163,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                 {
                     QByteArray cdir = currentDir.toAscii();
                     getDiskSpace(cdir.constData(), totalKB, usedKB);
-                    bzero(&statbuf, sizeof(statbuf));
+                    memset(&statbuf, 0, sizeof(statbuf));
                     localStr = "1"; // Assume local
                     bSize = 0;
 
@@ -5462,7 +5462,7 @@ void MainServer::connectionClosed(MythSocket *socket)
         {
             list<uint> disconnectedSlaves;
             bool needsReschedule = false;
-    
+
             if (ismaster && pbs->isSlaveBackend())
             {
                 VERBOSE(VB_IMPORTANT,QString("Slave backend: %1 no longer connected")

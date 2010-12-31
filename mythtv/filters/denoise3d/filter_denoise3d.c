@@ -132,7 +132,7 @@ static void denoiseMMX(uint8_t *Frame,
         movq_r2r (mm2, mm3);
         movq_r2r (mm4, mm5);
         movq_r2r (mm6, mm7);
-        
+
         punpcklbw_m2r(mz, mm0);
         punpckhbw_m2r(mz, mm1);
         punpcklbw_m2r(mz, mm2);
@@ -154,7 +154,7 @@ static void denoiseMMX(uint8_t *Frame,
 
         movq_m2r (Line[X], mm4);
         movq_m2r (Line[X+8], mm6);
-        
+
         for (i = 0; i < 16; i++)
             cbuf[i] = Temporal[wbuf[i]];
 
@@ -186,7 +186,7 @@ static void denoiseMMX(uint8_t *Frame,
             movq_r2r (mm2, mm3);
             movq_r2r (mm4, mm5);
             movq_r2r (mm6, mm7);
-            
+
             punpcklbw_m2r(mz, mm0);
             punpckhbw_m2r(mz, mm1);
             punpcklbw_m2r(mz, mm2);
@@ -223,7 +223,7 @@ static void denoiseMMX(uint8_t *Frame,
             movq_r2r (mm2, mm3);
             movq_r2r (mm4, mm5);
             movq_r2r (mm6, mm7);
-            
+
             punpcklbw_m2r(mz, mm0);
             punpckhbw_m2r(mz, mm1);
             punpcklbw_m2r(mz, mm2);
@@ -411,7 +411,7 @@ static VideoFilter *NewDenoise3DFilter(VideoFrameType inpixfmt,
         return NULL;
     }
 
-    memset(filter, 0, sizeof(ThisFilter)); /*MS Windows doesn't like bzero()*/
+    memset(filter, 0, sizeof(ThisFilter));
 
     filter->vf.filter = &denoise3DFilter;
     filter->vf.cleanup = &Denoise3DFilterCleanup;
@@ -464,13 +464,13 @@ static VideoFilter *NewDenoise3DFilter(VideoFrameType inpixfmt,
     return (VideoFilter*) filter;
 }
 
-static FmtConv FmtList[] = 
+static FmtConv FmtList[] =
 {
     { FMT_YV12, FMT_YV12 },
     FMT_NULL
 };
 
-ConstFilterInfo filter_table[] = 
+ConstFilterInfo filter_table[] =
 {
     {
         filter_init: &NewDenoise3DFilter,

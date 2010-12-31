@@ -30,7 +30,7 @@ BorderDetector::BorderDetector(void)
     , debugLevel(0)
     , time_reported(false)
 {
-    bzero(&analyze_time, sizeof(analyze_time));
+    memset(&analyze_time, 0, sizeof(analyze_time));
     debugLevel = gCoreContext->GetNumSetting("BorderDetectorDebugLevel", 0);
 
     if (debugLevel >= 1)
