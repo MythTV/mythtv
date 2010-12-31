@@ -42,6 +42,7 @@ class MythGestureEvent : public QEvent
      * \brief The types of gestures supported by myth
      */
     enum Gesture {
+        Unknown,
 
         /* Horizontal and vertical lines */
         Up,
@@ -87,7 +88,7 @@ class MythGestureEvent : public QEvent
      * \sa Type
      */
     MythGestureEvent(Gesture gesture, Button button = LeftButton) :
-        QEvent(kEventType)
+        QEvent(kEventType), m_gesture(Unknown)
     {
         m_position = QPoint(0,0);
         m_button = button;

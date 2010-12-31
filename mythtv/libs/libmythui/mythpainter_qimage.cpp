@@ -138,7 +138,7 @@ void MythQImagePainter::Clear(QPaintDevice *device, const QRegion &region)
         bwidth = (bwidth - rects[i].left()) << 2;
 
         for (int row = rects[i].top(); row < bottom; row++)
-            bzero(dev->scanLine(row) + (rects[i].left() << 2), bwidth);
+            memset(dev->scanLine(row) + (rects[i].left() << 2), 0, bwidth);
     }
 }
 
@@ -150,7 +150,7 @@ void MythQImagePainter::DrawImage(const QRect &r, MythImage *im,
         VERBOSE(VB_IMPORTANT, "FATAL ERROR: DrawImage called with no painter");
         return;
     }
-    
+
     (void)alpha;
 
     CheckPaintMode(QRect(r.topLeft(), src.size()));
@@ -230,8 +230,8 @@ void MythQImagePainter::DrawRect(const QRect &area, bool drawFill,
     painter->setBrush(QBrush(Qt::NoBrush));
 }
 
-void MythQImagePainter::DrawRoundRect(const QRect &area, int radius, 
-                                      bool drawFill, const QColor &fillColor, 
+void MythQImagePainter::DrawRoundRect(const QRect &area, int radius,
+                                      bool drawFill, const QColor &fillColor,
                                       bool drawLine, int lineWidth,
                                       const QColor &lineColor)
 {

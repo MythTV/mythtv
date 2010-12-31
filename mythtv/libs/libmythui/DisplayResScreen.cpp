@@ -109,7 +109,7 @@ DisplayResVector DisplayResScreen::Convert(const QStringList& slist)
 //compares if the double f1 is equal with f2 and returns 1 if true and 0 if false
 bool DisplayResScreen::compare_rates(double f1, double f2, double precision)
 {
-    if (((f1 - precision) < f2) && 
+    if (((f1 - precision) < f2) &&
         ((f1 + precision) > f2))
         return true;
     else
@@ -130,7 +130,7 @@ int DisplayResScreen::FindBestMatch(const DisplayResVector& dsr,
         rate2x = true;
         videorate *= 2.0;
     }
-   
+
     // Amend vector with custom list
     for (uint i=0; i<dsr.size(); ++i)
     {
@@ -211,19 +211,19 @@ uint64_t DisplayResScreen::FindBestScreen(const DisplayResMap& resmap,
         // 3. search for matching height and rate (or any rate if rate = 0)
         // 4. search for 2x rate
         // 5. search for 1x rate
-    for (it = resmap.begin(); it != resmap.end(); it++)
+    for (it = resmap.begin(); it != resmap.end(); ++it)
     {
         extract_key(it->first);
         if (w == iwidth && h == iheight && compare_rates(frate, r, 0.01))
             return it->first;
     }
-    for (it = resmap.begin(); it != resmap.end(); it++)
+    for (it = resmap.begin(); it != resmap.end(); ++it)
     {
         extract_key(it->first);
         if (w == iwidth && h == iheight && r == 0)
             return it->first;
     }
-    for (it = resmap.begin(); it != resmap.end(); it++)
+    for (it = resmap.begin(); it != resmap.end(); ++it)
     {
         extract_key(it->first);
         if ((w == 0 && h == iheight &&
