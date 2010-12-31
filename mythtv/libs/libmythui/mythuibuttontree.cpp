@@ -30,6 +30,9 @@ MythUIButtonTree::MythUIButtonTree(MythUIType *parent, const QString &name)
 
     m_listTemplate = NULL;
     SetCanTakeFocus(true);
+    
+    connect(this, SIGNAL(TakingFocus()), this, SLOT(Select()));
+    connect(this, SIGNAL(LosingFocus()), this, SLOT(Deselect()));
 }
 
 MythUIButtonTree::~MythUIButtonTree()
@@ -405,6 +408,17 @@ void MythUIButtonTree::SetActive(bool active)
         SetTreeState();
 }
 
+void MythUIButtonTree::Select()
+{
+    SetActive(true);
+}
+
+void MythUIButtonTree::Deselect()
+{
+    SetActive(false);
+}
+
+
 /*!
  * \brief Move from list, or one level of the tree, to another
  *
@@ -473,6 +487,7 @@ void MythUIButtonTree::handleSelect(MythUIButtonListItem *item)
         m_activeList->Deselect();
     m_activeListID = name.section(' ',2,2).toInt();
     m_activeList = list;
+
 
     MythGenericTree *node = qVariantValue<MythGenericTree*> (item->GetData());
     SetCurrentNode(node);

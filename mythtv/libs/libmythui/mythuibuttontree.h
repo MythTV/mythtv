@@ -40,6 +40,8 @@ class MPUBLIC MythUIButtonTree : public MythUIType
     void handleSelect(MythUIButtonListItem* item);
     void handleClick(MythUIButtonListItem* item);
     void handleVisible(MythUIButtonListItem* item);
+    void Select();
+    void Deselect();
 
   signals:
     void itemSelected(MythUIButtonListItem* item);
