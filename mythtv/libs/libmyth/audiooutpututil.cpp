@@ -4,7 +4,17 @@ using namespace std;
 #include "mythconfig.h"
 #include "audiooutpututil.h"
 #include <sys/types.h>
+#if HAVE_BYTESWAP_H
 #include <byteswap.h>
+#elif HAVE_SYS_ENDIAN_H
+#include <sys/endian.h>
+#elif CONFIG_DARWIN
+#include <libkern/OSByteOrder.h>
+#define bswap_16 OSSwapInt16
+#define bswap_32 OSSwapInt32
+#else
+#error No bswap functions defined
+#endif
 
 #define LOC QString("AOUtil: ")
 #define LOC_ERR QString("AOUtil, ERROR: ")
