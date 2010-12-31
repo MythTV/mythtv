@@ -1205,6 +1205,7 @@ HAVE_LIST="
     attribute_may_alias
     attribute_packed
     bswap
+    byteswap_h
     closesocket
     cmov
     conio_h
@@ -1275,6 +1276,7 @@ HAVE_LIST="
     symver
     symver_gnu_asm
     symver_asm_label
+    sys_endian_h
     sys_mman_h
     sys_resource_h
     sys_select_h
@@ -3070,6 +3072,7 @@ case $target_os in
         enable  backend
         enable  darwin
         disable dvb
+        disable ffmpeg
         # Prevent linker problems on default Intel 10.5 XCode:
         ldver=$(ld -v 2>&1 | sed -e s/^[^-]*-//)
         osxver=$(uname -r | cut -c 1)
@@ -3581,11 +3584,13 @@ check_lib2 "windows.h psapi.h" GetProcessMemoryInfo -lpsapi
 check_func_headers windows.h GetProcessTimes
 check_func_headers windows.h VirtualAlloc
 
+check_header byteswap.h
 check_header conio.h
 check_header dlfcn.h
 check_header dxva2api.h
 check_header malloc.h
 check_header poll.h
+check_header sys/endian.h
 check_header sys/mman.h
 check_header sys/resource.h
 check_header sys/select.h

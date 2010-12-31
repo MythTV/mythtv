@@ -171,7 +171,7 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
 
     void CreateDefaultShaders(void);
     void DeleteDefaultShaders(void);
-    uint CreateShader(int type, const QString source);
+    uint CreateShader(int type, const QString &source);
     bool ValidateShaderObject(uint obj);
     bool CheckObjectStatus(uint obj);
     void OptimiseShaderSource(QString &source);

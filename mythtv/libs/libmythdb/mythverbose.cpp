@@ -21,7 +21,6 @@ bool         haveUserDefaultValues = false;
 int parse_verbose_arg(QString arg)
 {
     QString option;
-    bool reverseOption;
 
     verbose_mutex.lock();
 
@@ -41,7 +40,7 @@ int parse_verbose_arg(QString arg)
              it != verboseOpts.end(); ++it )
         {
             option = *it;
-            reverseOption = false;
+            bool reverseOption = false;
 
             if (option != "none" && option.left(2) == "no")
             {

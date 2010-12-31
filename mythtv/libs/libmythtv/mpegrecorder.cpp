@@ -421,8 +421,8 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
             usingv4l2 = true;
             requires_special_pause = true;
 
-            bzero(_stream_id,  sizeof(_stream_id));
-            bzero(_pid_status, sizeof(_pid_status));
+            memset(_stream_id, 0,  sizeof(_stream_id));
+            memset(_pid_status, 0, sizeof(_pid_status));
             memset(_continuity_counter, 0xff, sizeof(_continuity_counter));
 
             m_h264_parser.use_I_forKeyframes(false);
@@ -506,7 +506,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
 bool MpegRecorder::SetFormat(int chanfd)
 {
     struct v4l2_format vfmt;
-    bzero(&vfmt, sizeof(vfmt));
+    memset(&vfmt, 0, sizeof(vfmt));
 
     vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
@@ -532,7 +532,7 @@ bool MpegRecorder::SetFormat(int chanfd)
 bool MpegRecorder::SetLanguageMode(int chanfd)
 {
     struct v4l2_tuner vt;
-    bzero(&vt, sizeof(struct v4l2_tuner));
+    memset(&vt, 0, sizeof(struct v4l2_tuner));
     if (ioctl(chanfd, VIDIOC_G_TUNER, &vt) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to get audio mode" + ENO);
@@ -691,7 +691,7 @@ uint MpegRecorder::GetFilteredAudioBitRate(uint audio_layer) const
 bool MpegRecorder::SetIVTVDeviceOptions(int chanfd)
 {
     struct ivtv_ioctl_codec ivtvcodec;
-    bzero(&ivtvcodec, sizeof(ivtvcodec));
+    memset(&ivtvcodec, 0, sizeof(ivtvcodec));
 
     if (ioctl(chanfd, IVTV_IOC_G_CODEC, &ivtvcodec) < 0)
     {
@@ -748,7 +748,7 @@ static void add_ext_ctrl(vector<struct v4l2_ext_control> &ctrl_list,
                          uint32_t id, int32_t value)
 {
     struct v4l2_ext_control tmp_ctrl;
-    bzero(&tmp_ctrl, sizeof(struct v4l2_ext_control));
+    memset(&tmp_ctrl, 0, sizeof(struct v4l2_ext_control));
     tmp_ctrl.id    = id;
     tmp_ctrl.value = value;
     ctrl_list.push_back(tmp_ctrl);
@@ -784,7 +784,7 @@ static void set_ctrls(int fd, vector<struct v4l2_ext_control> &ext_ctrls)
     for (uint i = 0; i < ext_ctrls.size(); i++)
     {
         struct v4l2_ext_controls ctrls;
-        bzero(&ctrls, sizeof(struct v4l2_ext_controls));
+        memset(&ctrls, 0, sizeof(struct v4l2_ext_controls));
 
         int value = ext_ctrls[i].value;
 
@@ -859,7 +859,7 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
     if (ok)
     {
         struct v4l2_audio ain;
-        bzero(&ain, sizeof(ain));
+        memset(&ain, 0, sizeof(ain));
         ain.index = audioinput;
         if (ioctl(chanfd, VIDIOC_ENUMAUDIO, &ain) < 0)
         {
@@ -923,7 +923,7 @@ bool MpegRecorder::SetVBIOptions(int chanfd)
     if (!has_v4l2_vbi)
     {
         struct ivtv_sliced_vbi_format vbifmt;
-        bzero(&vbifmt, sizeof(struct ivtv_sliced_vbi_format));
+        memset(&vbifmt, 0, sizeof(struct ivtv_sliced_vbi_format));
         vbifmt.service_set = (1 == vbimode) ? VBI_TYPE_TELETEXT : VBI_TYPE_CC;
 
         if (ioctl(chanfd, IVTV_IOC_S_VBI_MODE, &vbifmt) < 0)
@@ -949,7 +949,7 @@ bool MpegRecorder::SetVBIOptions(int chanfd)
     if (has_v4l2_vbi)
     {
         struct v4l2_format vbifmt;
-        bzero(&vbifmt, sizeof(struct v4l2_format));
+        memset(&vbifmt, 0, sizeof(struct v4l2_format));
         vbifmt.type = V4L2_BUF_TYPE_SLICED_VBI_CAPTURE;
         vbifmt.fmt.sliced.service_set |= (1 == vbimode) ?
             V4L2_SLICED_VBI_625 : V4L2_SLICED_VBI_525;
@@ -998,7 +998,7 @@ bool MpegRecorder::SetVBIOptions(int chanfd)
         vbi_ctrl.value   = V4L2_MPEG_STREAM_VBI_FMT_IVTV;
 
         struct v4l2_ext_controls ctrls;
-        bzero(&ctrls, sizeof(struct v4l2_ext_controls));
+        memset(&ctrls, 0, sizeof(struct v4l2_ext_controls));
         ctrls.ctrl_class = V4L2_CTRL_CLASS_MPEG;
         ctrls.count      = 1;
         ctrls.controls   = &vbi_ctrl;
@@ -1389,8 +1389,8 @@ void MpegRecorder::ResetForNewFile(void)
 {
     DTVRecorder::ResetForNewFile();
 
-    bzero(_stream_id,  sizeof(_stream_id));
-    bzero(_pid_status, sizeof(_pid_status));
+    memset(_stream_id, 0,  sizeof(_stream_id));
+    memset(_pid_status, 0, sizeof(_pid_status));
     memset(_continuity_counter, 0xff, sizeof(_continuity_counter));
 
     if (driver == "hdpvr")

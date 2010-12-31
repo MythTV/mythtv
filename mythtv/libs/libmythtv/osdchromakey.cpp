@@ -89,7 +89,7 @@ void ChromaKeyOSD::DestroyShmImage(void)
     if (shm_infos.shmid > 0)
         shmctl(shm_infos.shmid, IPC_RMID, 0);
 
-    bzero(&shm_infos, sizeof(XShmSegmentInfo));
+    memset(&shm_infos, 0, sizeof(XShmSegmentInfo));
 }
 
 bool ChromaKeyOSD::Init(QSize new_size)

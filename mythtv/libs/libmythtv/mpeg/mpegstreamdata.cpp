@@ -82,7 +82,6 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
 {
     _local_utc_offset = calc_utc_offset();
 
-    // MS Windows doesn't like bzero()..
     memset(_si_time_offsets, 0, sizeof(_si_time_offsets));
 
     AddListeningPID(MPEG_PAT_PID);

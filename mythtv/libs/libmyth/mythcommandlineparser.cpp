@@ -780,7 +780,7 @@ QString MythCommandLineParser::GetHelpString(bool with_header) const
         msg << "--override-settings-file <file> " << endl
             << "                               "
             << "File containing KEY=VALUE pairs for settings" << endl
-            << "                               Use a comma seperated list to return multiple values"
+            << "                               Use a comma separated list to return multiple values"
             << endl;
     }
 

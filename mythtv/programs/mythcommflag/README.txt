@@ -23,7 +23,7 @@ for further processing.
 --outputmethod specifies the output format and will be explained
 later in this file, options are essentials and full
 
---method comma seperated list of commercial flagging methods to
+--method comma separated list of commercial flagging methods to
 use, by default all methods are employed. But you can choose other
 combinations or employ a single method. "mythcommflag --help"
 shows all options available.
@@ -150,7 +150,7 @@ applications but the change from one format to another
 indicates that a new clip is being played.
 
 The next column is the flag column, and is the most useful for
-many applications. In the verbose form this is a comma seperated
+many applications. In the verbose form this is a comma separated
 set of flags that the commercial flagger sets when a threshold
 in the detection values has been exceeded. The flags are: 
 "skipped", "blank", "scene", "logo", "aspect", and "rating".

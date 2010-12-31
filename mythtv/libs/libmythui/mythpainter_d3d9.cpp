@@ -87,10 +87,11 @@ void MythD3D9Painter::Begin(QPaintDevice *parent)
 
     DeleteBitmaps();
 
-    bool dummy;
-
     if (!m_target)
+    {
+        bool dummy;
         m_render->Test(dummy); // TODO recreate if necessary
+    }
     else if (!m_target->SetAsRenderTarget())
     {
         VERBOSE(VB_IMPORTANT, "Failed to enable offscreen buffer.");

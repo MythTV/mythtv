@@ -15,7 +15,7 @@ class ChromaKeyOSD
         current_size(QSize()), current_rect(QRect()),
         videoOutput(vo), img(NULL), image(NULL), painter(NULL), visible(false)
     {
-        bzero(&shm_infos, sizeof(XShmSegmentInfo));
+        memset(&shm_infos, 0, sizeof(XShmSegmentInfo));
     }
     ~ChromaKeyOSD(void);
 

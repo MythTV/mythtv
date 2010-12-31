@@ -164,7 +164,7 @@ bool Weather::SetupScreens()
             }
             else
             {
-            	delete ssetup;
+                delete ssetup;
             }
 
             m_firstSetup = false;

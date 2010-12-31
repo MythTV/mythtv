@@ -190,7 +190,7 @@ bool CoreAudioData::OpenAnalog()
 
     // Set up the audio output unit
     AudioStreamBasicDescription conv_in_desc;
-    bzero(&conv_in_desc, sizeof(AudioStreamBasicDescription));
+    memset(&conv_in_desc, 0, sizeof(AudioStreamBasicDescription));
     conv_in_desc.mSampleRate       = mCA->samplerate;
     conv_in_desc.mFormatID         = kAudioFormatLinearPCM;
     conv_in_desc.mFormatFlags      = formatFlags;
@@ -354,7 +354,7 @@ bool AudioOutputCA::RenderAudio(unsigned char *aubuf,
     if (written_size && (size > written_size))
     {
         // play silence on buffer underrun
-        bzero(aubuf + written_size, size - written_size);
+        memset(aubuf + written_size, 0, size - written_size);
     }
 
     /* update audiotime (bufferedBytes is read by GetBufferedOnSoundcard) */
@@ -414,7 +414,7 @@ OSStatus RenderCallbackAnalog(void                       *inRefCon,
                            inTimeStamp->mHostTime))
     {
         // play silence if RenderAudio returns false
-        bzero(ioData->mBuffers[0].mData, ioData->mBuffers[0].mDataByteSize);
+        memset(ioData->mBuffers[0].mData, 0, ioData->mBuffers[0].mDataByteSize);
         *ioActionFlags = kAudioUnitRenderAction_OutputIsSilence;
     }
     return noErr;
@@ -464,7 +464,7 @@ static OSStatus RenderCallbackSPDIF(AudioDeviceID        inDevice,
                         outOutputData->mBuffers[index].mDataByteSize,
                         inOutputTime->mHostTime))
         // play silence if RenderAudio returns false
-        bzero(outOutputData->mBuffers[index].mData,
+        memset(outOutputData->mBuffers[index].mData, 0,
               outOutputData->mBuffers[index].mDataByteSize);
 
     return noErr;
@@ -789,7 +789,7 @@ bool *CoreAudioData::ChannelsList(AudioDeviceID d, bool passthru)
     if ((list = (bool *)malloc((CHANNELS_MAX+1) * sizeof(bool))) == NULL)
         return NULL;
 
-    bzero(list, (CHANNELS_MAX+1) * sizeof(bool));
+    memset(list, 0, (CHANNELS_MAX+1) * sizeof(bool));
 
     streams = StreamsList(mDeviceID);
     if (!streams)
@@ -817,7 +817,7 @@ bool *CoreAudioData::ChannelsList(AudioDeviceID d, bool passthru)
                 }
             }
             free(formats);
-        }        
+        }
     }
 
     if (!founddigital)

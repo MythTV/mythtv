@@ -98,7 +98,6 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     memory_corruption_test3(0xdeadbeef)
 {
     src_in = (float *)AOALIGN(src_in_buf);
-    // The following are not bzero() because MS Windows doesn't like it.
     memset(&src_data,          0, sizeof(SRC_DATA));
     memset(src_in,             0, sizeof(float) * kAudioSRCInputSize);
     memset(audiobuffer,        0, sizeof(char)  * kAudioRingBufferSize);
@@ -1384,7 +1383,7 @@ void AudioOutputBase::OutputAudioLoop(void)
     if (zero_fragment_size > fragment_size)
         zero_fragment_size = fragment_size;
 
-    bzero(zeros, fragment_size);
+    memset(zeros, 0, fragment_size);
 
     while (!killaudio)
     {

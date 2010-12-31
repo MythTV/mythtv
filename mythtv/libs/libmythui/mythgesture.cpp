@@ -235,9 +235,9 @@ QString MythGesture::translate(void)
         /* if this is the first point, consider it the previous bin, too. */
         prev_bin = (prev_bin == 0) ? current_bin : prev_bin;
 
-        if (prev_bin == current_bin) 
+        if (prev_bin == current_bin)
             bin_count++;
-        else 
+        else
         {
 
             /* we are moving to a new bin -- consider adding to the
@@ -258,9 +258,9 @@ QString MythGesture::translate(void)
     /* add the last run of points to the sequence */
     sequence += '0' + current_bin;
     sequence_count++;
-    
+
     /* bail out on error cases */
-    if (sequence_count > max_sequence) 
+    if (sequence_count > max_sequence)
         sequence = '0';
 
     return sequence;

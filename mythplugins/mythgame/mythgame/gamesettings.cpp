@@ -169,7 +169,7 @@ class Command : public LineEditSetting, public GameDBStorage
         LineEditSetting(this), GameDBStorage(this, parent, "commandline")
     {
         setLabel(QObject::tr("Command"));
-        setHelpText(QObject::tr("Binary and optional parameters. Multiple commands seperated with \';\' . Use \%s for the rom name. \%d1, \%d2, \%d3 and \%d4 represent disks in a multidisk/game. %s auto appended if not specified"));
+        setHelpText(QObject::tr("Binary and optional parameters. Multiple commands separated with \';\' . Use \%s for the rom name. \%d1, \%d2, \%d3 and \%d4 represent disks in a multidisk/game. %s auto appended if not specified"));
     };
 };
 
@@ -218,7 +218,7 @@ class Extensions : public LineEditSetting, public GameDBStorage
         LineEditSetting(this), GameDBStorage(this, parent, "extensions")
     {
         setLabel(QObject::tr("File Extensions"));
-        setHelpText(QObject::tr("A Comma seperated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator"));
+        setHelpText(QObject::tr("A comma separated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator"));
     };
 };
 

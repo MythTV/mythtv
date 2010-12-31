@@ -18,7 +18,7 @@ TransportScanItem::TransportScanItem()
       friendlyNum(0),     SourceID(0),          UseTimer(false),
       scanning(false),    timeoutTune(1000)
 {
-    bzero(freq_offsets, sizeof(int)*3);
+    memset(freq_offsets, 0, sizeof(int)*3);
 
     tuning.Clear();
 }
@@ -32,7 +32,7 @@ TransportScanItem::TransportScanItem(uint           sourceid,
       friendlyNum(0),     SourceID(sourceid),   UseTimer(false),
       scanning(false),    timeoutTune(_timeoutTune)
 {
-    bzero(freq_offsets, sizeof(int)*3);
+    memset(freq_offsets, 0, sizeof(int)*3);
 
     tuning.Clear();
     tuning.sistandard = _si_std;
@@ -53,7 +53,7 @@ TransportScanItem::TransportScanItem(uint           _sourceid,
       SourceID(_sourceid), UseTimer(false),
       scanning(false),     timeoutTune(_timeoutTune)
 {
-    bzero(freq_offsets, sizeof(int) * 3);
+    memset(freq_offsets, 0, sizeof(int)*3);
     tuning = _tuning;
 }
 
@@ -67,7 +67,7 @@ TransportScanItem::TransportScanItem(uint                _sourceid,
       SourceID(_sourceid), UseTimer(false),
       scanning(false),     timeoutTune(_timeoutTune)
 {
-    bzero(freq_offsets, sizeof(int) * 3);
+    memset(freq_offsets, 0, sizeof(int)*3);
     expectedChannels = _tuning.channels;
 
     tuning.Clear();
@@ -95,7 +95,7 @@ TransportScanItem::TransportScanItem(uint sourceid,
       friendlyNum(fnum),  SourceID(sourceid),   UseTimer(false),
       scanning(false),    timeoutTune(tuneTO)
 {
-    bzero(freq_offsets, sizeof(int)*3);
+    memset(freq_offsets, 0, sizeof(int)*3);
 
     tuning.Clear();
 

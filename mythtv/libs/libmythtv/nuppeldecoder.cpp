@@ -59,7 +59,7 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
     memset(&tmppicture, 0, sizeof(AVPicture));
     planes[0] = planes[1] = planes[2] = 0;
     audioSamples = (short int*) (((long)audioSamples_buf + 15) & ~0xf);
-    bzero(audioSamples, AVCODEC_MAX_AUDIO_FRAME_SIZE * sizeof(short int));
+    memset(audioSamples, 0, AVCODEC_MAX_AUDIO_FRAME_SIZE * sizeof(short int));
 
     // set parent class variables
     positionMapType = MARK_KEYFRAME;

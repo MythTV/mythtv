@@ -28,7 +28,7 @@ AudioOutputNULL::AudioOutputNULL(const AudioSettings &settings) :
     locked_format(settings.format),
     locked_samplerate(settings.samplerate)
 {
-    bzero(pcm_output_buffer, sizeof(char) * NULLAUDIO_OUTPUT_BUFFER_SIZE);
+    memset(pcm_output_buffer, 0, sizeof(char) * NULLAUDIO_OUTPUT_BUFFER_SIZE);
     InitSettings(settings);
     if (settings.init)
         Reconfigure(settings);
@@ -89,7 +89,7 @@ int AudioOutputNULL::readOutputData(unsigned char *read_buffer, int max_length)
             current_buffer_size - amount_to_read);
     current_buffer_size -= amount_to_read;
     pcm_output_buffer_mutex.unlock();
-    
+
     return amount_to_read;
 }
 

@@ -19,12 +19,14 @@ class MPUBLIC MythEvent : public QEvent
     MythEvent(int t) : QEvent((QEvent::Type)t)
     { }
 
+    // lmessage is passed by value for thread safety reasons per DanielK
     MythEvent(int t, const QString lmessage) : QEvent((QEvent::Type)t)
     {
         message = lmessage;
         extradata.append( "empty" );
     }
 
+    // lmessage is passed by value for thread safety reasons per DanielK
     MythEvent(int t, const QString lmessage, const QStringList &lextradata)
            : QEvent((QEvent::Type)t)
     {
@@ -32,12 +34,14 @@ class MPUBLIC MythEvent : public QEvent
         extradata = lextradata;
     }
 
+    // lmessage is passed by value for thread safety reasons per DanielK
     MythEvent(const QString lmessage) : QEvent(MythEventMessage)
     {
         message = lmessage;
         extradata.append( "empty" );
     }
 
+    // lmessage is passed by value for thread safety reasons per DanielK
     MythEvent(const QString lmessage, const QStringList &lextradata)
            : QEvent((QEvent::Type)MythEventMessage)
     {
@@ -45,6 +49,7 @@ class MPUBLIC MythEvent : public QEvent
         extradata = lextradata;
     }
 
+    // lmessage is passed by value for thread safety reasons per DanielK
     MythEvent(const QString lmessage, const QString lextradata)
            : QEvent((QEvent::Type)MythEventMessage)
     {

@@ -164,7 +164,9 @@ class MythMainWindowPrivate
 
         AllowInput(true),
 
+        gesture(MythGesture()),
         gestureTimer(NULL),
+        hideMouseTimer(NULL),
 
         paintwin(NULL),
 
@@ -174,7 +176,9 @@ class MythMainWindowPrivate
         m_drawDisabledDepth(0),
         m_drawEnabled(true),
 
-        m_themeBase(NULL)
+        m_themeBase(NULL),
+
+        m_udpListener(NULL)
     {
     }
 

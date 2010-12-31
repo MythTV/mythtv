@@ -30,6 +30,9 @@ MythUIButtonTree::MythUIButtonTree(MythUIType *parent, const QString &name)
 
     m_listTemplate = NULL;
     SetCanTakeFocus(true);
+    
+    connect(this, SIGNAL(TakingFocus()), this, SLOT(Select()));
+    connect(this, SIGNAL(LosingFocus()), this, SLOT(Deselect()));
 }
 
 MythUIButtonTree::~MythUIButtonTree()
@@ -196,6 +199,8 @@ bool MythUIButtonTree::UpdateList(MythUIButtonList *list, MythGenericTree *node)
             SLOT(handleSelect(MythUIButtonListItem *)));
     connect(list, SIGNAL(itemClicked(MythUIButtonListItem *)),
             SLOT(handleClick(MythUIButtonListItem *)));
+    connect(list, SIGNAL(itemVisible(MythUIButtonListItem *)),
+            SLOT(handleVisible(MythUIButtonListItem *)));
 
     return true;
 }
@@ -403,6 +408,17 @@ void MythUIButtonTree::SetActive(bool active)
         SetTreeState();
 }
 
+void MythUIButtonTree::Select()
+{
+    SetActive(true);
+}
+
+void MythUIButtonTree::Deselect()
+{
+    SetActive(false);
+}
+
+
 /*!
  * \brief Move from list, or one level of the tree, to another
  *
@@ -472,6 +488,7 @@ void MythUIButtonTree::handleSelect(MythUIButtonListItem *item)
     m_activeListID = name.section(' ',2,2).toInt();
     m_activeList = list;
 
+
     MythGenericTree *node = qVariantValue<MythGenericTree*> (item->GetData());
     SetCurrentNode(node);
     SetTreeState();
@@ -505,6 +522,19 @@ MythUIButtonListItem* MythUIButtonTree::GetItemCurrent() const
     return NULL;
 }
 
+ /*!
+ * \brief Handle a list item becoming visible
+ *
+ * \param item The list item
+ */
+void MythUIButtonTree::handleVisible(MythUIButtonListItem *item)
+{
+    if (!item)
+        return;
+
+    emit itemVisible(item);
+}
+
 /*!
  * \copydoc MythUIType::keyPressEvent()
  */
@@ -518,17 +548,32 @@ bool MythUIButtonTree::keyPressEvent(QKeyEvent *event)
     {
         QString action = actions[i];
         handled = true;
-
-        if (action == "RIGHT")
+        if (m_activeList && m_activeList->m_layout == MythUIButtonList::LayoutGrid)
         {
-            SwitchList(true);
-        }
-        else if (action == "LEFT")
-        {
-            SwitchList(false);
+            if (action == "SELECT" && m_currentNode->childCount() > 0)
+            {
+                SwitchList(true);
+            }
+            else if (action == "ESCAPE" && m_currentDepth > 1)
+            {
+                SwitchList(false);
+            }
+            else
+                handled = false;
         }
         else
-            handled = false;
+        {
+            if (action == "RIGHT")
+            {
+                SwitchList(true);
+            }
+            else if (action == "LEFT")
+            {
+                SwitchList(false);
+            }
+            else
+                handled = false;
+        }
     }
 
     if (!handled && m_activeList)

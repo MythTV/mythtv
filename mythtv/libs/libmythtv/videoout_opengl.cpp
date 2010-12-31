@@ -43,7 +43,7 @@ VideoOutputOpenGL::VideoOutputOpenGL()
     gl_context(NULL), gl_videochain(NULL), gl_pipchain_active(NULL),
     gl_parent_win(0), gl_embed_win(0), gl_painter(NULL)
 {
-    bzero(&av_pause_frame, sizeof(av_pause_frame));
+    memset(&av_pause_frame, 0, sizeof(av_pause_frame));
     av_pause_frame.buf = NULL;
 
     if (gCoreContext->GetNumSetting("UseVideoModes", 0))

@@ -86,7 +86,7 @@ void DarwinAVCInfo::Update(uint64_t _guid, DarwinFirewireDevice *dev,
     if (tmp0)
     {
         char tmp1[1024];
-        bzero(tmp1, sizeof(tmp1));
+        memset(tmp1, 0, sizeof(tmp1));
         CFStringGetCString(tmp0, tmp1, sizeof(tmp1) - sizeof(char),
                            kCFStringEncodingMacRoman);
         product_name = QString("%1").arg(tmp1);

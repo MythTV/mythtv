@@ -66,7 +66,7 @@ static inline int __glCheck__(const QString &loc, const char* fileName, int n)
 {
     int error = glGetError();
     if (error)
-    { 
+    {
         VERBOSE(VB_IMPORTANT, QString("%1: %2 @ %3, %4")
             .arg(loc).arg((const char*)gluErrorString(error))
             .arg(fileName).arg(n));
@@ -275,7 +275,7 @@ void MythRenderOpenGL::Flush(bool use_fence)
     {
         glFlush();
     }
-    
+
     doneCurrent();
 }
 
@@ -1790,7 +1790,7 @@ void MythRenderOpenGL::DeleteDefaultShaders(void)
     }
 }
 
-uint MythRenderOpenGL::CreateShader(int type, const QString source)
+uint MythRenderOpenGL::CreateShader(int type, const QString &source)
 {
     uint result = m_glCreateShaderObject(type);
     QByteArray src = source.toAscii();

@@ -1498,7 +1498,7 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
         m_opaque = true; // MPEG images are always opaque.
 
         AVPicture retbuf;
-        bzero(&retbuf, sizeof(AVPicture));
+        memset(&retbuf, 0, sizeof(AVPicture));
 
         int bufflen = nContentWidth * nContentHeight * 3;
         unsigned char *outputbuf = new unsigned char[bufflen];

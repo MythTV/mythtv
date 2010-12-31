@@ -1337,7 +1337,7 @@ void MythRenderVDPAU::ClearVideoSurface(uint id)
     if (!tmp)
         return;
 
-    bzero(tmp, width * height);
+    memset(tmp, 0, width * height);
     memset(tmp + (width * height), 127, (width * height)>>1);
     uint32_t pitches[3] = {width, width, width>>1};
     void* const planes[3] = {tmp, tmp + (width * height), tmp + (width * height)};
@@ -1574,10 +1574,10 @@ bool MythRenderVDPAU::CheckHardwareSupport(void)
         else
             VERBOSE(VB_PLAYBACK, LOC + QString("HQ Scaling not supported."));
 
-        INIT_ST
         VdpBool supported = false;
 
 #ifdef VDP_DECODER_PROFILE_MPEG4_PART2_ASP
+        INIT_ST
         uint32_t tmp1, tmp2, tmp3, tmp4;
         vdp_st = vdp_decoder_query_capabilities(m_device,
                     VDP_DECODER_PROFILE_MPEG4_PART2_ASP, &supported,
