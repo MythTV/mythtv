@@ -406,9 +406,9 @@ class MovieDb(object):
 
 
     def getCategories(self, categories_et):
-        """Takes an element tree Element ('categories') and create a string of comma seperated film
+        """Takes an element tree Element ('categories') and create a string of comma separated film
         categories
-        return comma seperated sting of film category names
+        return comma separated string of film category names
 
         For example:
         <categories>
@@ -430,9 +430,9 @@ class MovieDb(object):
 
 
     def getStudios(self, studios_et):
-        """Takes an element tree Element ('studios') and create a string of comma seperated film
+        """Takes an element tree Element ('studios') and create a string of comma separated film
         studios names
-        return comma seperated sting of film studios names
+        return comma separated string of film studios names
 
         For example:
         <studios>
@@ -452,9 +452,9 @@ class MovieDb(object):
         return cat
 
     def getProductionCountries(self, countries_et):
-        """Takes an element tree Element ('countries') and create a string of comma seperated film
+        """Takes an element tree Element ('countries') and create a string of comma separated film
         countries
-        return comma seperated sting of countries associated with the film
+        return comma separated string of countries associated with the film
 
         For example:
         <countries>

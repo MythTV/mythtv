@@ -2463,7 +2463,7 @@ static void showUsage()
     cout << "-t/--createthumbnail infile thumblist outfile framecount\n";
     cout << "       (create one or more thumbnails)\n";
     cout << "       infile     - filename of recording to grab thumbs from\n";
-    cout << "       thumblist  - comma seperated list of required thumbs in seconds\n";
+    cout << "       thumblist  - comma separated list of required thumbs in seconds\n";
     cout << "       outfile    - name of file to save thumbs to eg 'thumb%1-%2.jpg'\n";
     cout << "                    %1 will be replaced with the no. of the thumb\n";
     cout << "                    %2 will be replaced with the frame no.\n";

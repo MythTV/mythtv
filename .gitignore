@@ -10,3 +10,4 @@ moc_*.cpp
 *.dll
 *.def
 object_script.*
+*~

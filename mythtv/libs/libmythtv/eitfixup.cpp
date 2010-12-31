@@ -863,7 +863,7 @@ void EITFixUp::FixUK(DBEventEIT &event) const
  */
 void EITFixUp::FixPBS(DBEventEIT &event) const
 {
-    /* Used for PBS ATSC Subtitles are seperated by a colon */
+    /* Used for PBS ATSC Subtitles are separated by a colon */
     int position = event.description.indexOf(':');
     if (position != -1)
     {
@@ -1121,7 +1121,7 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle) const
 void EITFixUp::FixAUStar(DBEventEIT &event) const
 {
     event.category = event.subtitle;
-    /* Used for DVB-S Subtitles are seperated by a colon */
+    /* Used for DVB-S Subtitles are separated by a colon */
     int position = event.description.indexOf(':');
     if (position != -1)
     {
