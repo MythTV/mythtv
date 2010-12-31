@@ -286,24 +286,24 @@
             <state name="default">
             </state>
             <state name="hd1080">
-                <imagetype name="hdtv">
+                <imagetype name="hd_1080">
                     <filename>shared/icons/hd_1080.png</filename>
                 </imagetype>
             </state>
             <state name="hd720">
-                <imagetype name="hdtv">
+                <imagetype name="hd_720">
                     <position>4,0</position>
                     <filename>shared/icons/hd_720.png</filename>
                 </imagetype>
             </state>
             <state name="hdtv">
-                <imagetype name="hdtv">
+                <imagetype name="hd">
                     <position>4,0</position>
                     <filename>shared/icons/hdtv.png</filename>
                 </imagetype>
             </state>
             <state name="widescreen">
-                <imagetype name="widescreen">
+                <imagetype name="16_9">
                     <position>5,1</position>
                     <filename>shared/icons/16_9.png</filename>
                 </imagetype>
