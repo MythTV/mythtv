@@ -1,5 +1,5 @@
 #ifndef _FRAME_H
-#define _FRAME_H 
+#define _FRAME_H
 
 #include <string.h>
 #include <stdint.h>
@@ -112,7 +112,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
             vf->pitches[1] = vf->pitches[2] = 0;
         }
     }
-        
+
     if (o)
     {
         memcpy(vf->offsets, o, 3 * sizeof(int));
@@ -146,7 +146,6 @@ static inline void clear(VideoFrame *vf)
     if (FMT_YV12 == vf->codec)
     {
         int uv_height = vf->height >> 1;
-        // MS Windows doesn't like bzero()..
         memset(vf->buf + vf->offsets[0],   0, vf->pitches[0] * vf->height);
         memset(vf->buf + vf->offsets[1], 127, vf->pitches[1] * uv_height);
         memset(vf->buf + vf->offsets[2], 127, vf->pitches[2] * uv_height);
