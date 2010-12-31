@@ -136,7 +136,7 @@ void AnalogSignalMonitor::UpdateValues(void)
         else
         {
             struct v4l2_tuner tuner;
-            bzero(&tuner, sizeof(tuner));
+            memset(&tuner, 0, sizeof(tuner));
 
             if (ioctl(videofd, VIDIOC_G_TUNER, &tuner, 0) < 0)
             {
@@ -152,7 +152,7 @@ void AnalogSignalMonitor::UpdateValues(void)
     else
     {
         struct video_tuner tuner;
-        bzero(&tuner, sizeof(tuner));
+        memset(&tuner, 0, sizeof(tuner));
 
         if (ioctl(videofd, VIDIOCGTUNER, &tuner, 0) < 0)
         {

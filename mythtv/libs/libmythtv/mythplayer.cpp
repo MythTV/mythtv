@@ -258,8 +258,8 @@ MythPlayer::MythPlayer(bool muted)
     itvEnabled         = gCoreContext->GetNumSetting("EnableMHEG", 0);
     db_prefer708       = gCoreContext->GetNumSetting("Prefer708Captions", 1);
 
-    bzero(&tc_lastval, sizeof(tc_lastval));
-    bzero(&tc_wrap,    sizeof(tc_wrap));
+    memset(&tc_lastval, 0, sizeof(tc_lastval));
+    memset(&tc_wrap,    0, sizeof(tc_wrap));
     tc_wrap[TC_AUDIO] = gCoreContext->GetNumSetting("AudioSyncOffset", 0);
 
     // Get VBI page number
@@ -976,7 +976,7 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
                         QString("OpenFile(): Could not read "
                                 "first %1 bytes of '%2'")
                         .arg(testreadsize)
-                        .arg(player_ctx->buffer->GetFilename())); 
+                        .arg(player_ctx->buffer->GetFilename()));
                 delete[] testbuf;
                 return -1;
             }
@@ -3913,8 +3913,8 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
     VideoFrame    *frame     = NULL;
     AVPicture      orig;
     AVPicture      retbuf;
-    bzero(&orig,   sizeof(AVPicture));
-    bzero(&retbuf, sizeof(AVPicture));
+    memset(&orig,   0, sizeof(AVPicture));
+    memset(&retbuf, 0, sizeof(AVPicture));
 
     using_null_videoout = true;
 
@@ -4323,7 +4323,7 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
     info.values.insert("progafter",  0);
 
     int playbackLen = (totalDuration > 0) ? totalDuration : totalLength;
-       
+
     if (livetv && player_ctx->tvchain)
     {
         info.values["progbefore"] = (int)player_ctx->tvchain->HasPrev();

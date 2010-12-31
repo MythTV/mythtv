@@ -265,8 +265,8 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       m_fps(0.0f),
       m_spdifenc(NULL)
 {
-    bzero(&params, sizeof(AVFormatParameters));
-    bzero(&readcontext, sizeof(readcontext));
+    memset(&params, 0, sizeof(AVFormatParameters));
+    memset(&readcontext, 0, sizeof(readcontext));
     // using preallocated AVFormatContext for our own ByteIOContext
     params.prealloced_context = 1;
     audioSamples = (short int *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
@@ -3982,7 +3982,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             if (!pkt)
             {
                 pkt = new AVPacket;
-                bzero(pkt, sizeof(AVPacket));
+                memset(pkt, 0, sizeof(AVPacket));
                 av_init_packet(pkt);
             }
 

@@ -208,7 +208,7 @@ bool DVBChannel::Open(DVBChannel *who)
     }
 
     dvb_frontend_info info;
-    bzero(&info, sizeof(info));
+    memset(&info, 0, sizeof(info));
     if (ioctl(fd_frontend, FE_GET_INFO, &info) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -1067,7 +1067,7 @@ bool DVBChannel::HasLock(bool *ok) const
         return master->HasLock(ok);
 
     fe_status_t status;
-    bzero(&status, sizeof(status));
+    memset(&status, 0, sizeof(status));
 
     int ret = ioctl(fd_frontend, FE_READ_STATUS, &status);
     if (ok)
@@ -1217,7 +1217,7 @@ static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
     int intermediate_freq, bool can_fec_auto)
 {
     dvb_frontend_parameters params;
-    bzero(&params, sizeof(params));
+    memset(&params, 0, sizeof(params));
 
     params.frequency = tuning.frequency;
     params.inversion = (fe_spectral_inversion_t) (int) tuning.inversion;

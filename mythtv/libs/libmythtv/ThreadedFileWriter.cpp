@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <fcntl.h>
+#include <string.h>
 
 // Qt headers
 #include <QString>
@@ -174,7 +175,7 @@ bool ThreadedFileWriter::Open(void)
         _setmode(fd, _O_BINARY);
 #endif
         buf = new char[TFW_DEF_BUF_SIZE + 1024];
-        bzero(buf, TFW_DEF_BUF_SIZE + 64);
+        memset(buf, 0, TFW_DEF_BUF_SIZE + 64);
 
         m_file_sync =  m_file_wpos = 0;
 
@@ -419,7 +420,7 @@ void ThreadedFileWriter::SetWriteBufferSize(uint newSize)
     delete [] buf;
     rpos = wpos = 0;
     buf = new char[newSize + 1024];
-    bzero(buf, newSize + 64);
+    memset(buf, 0, newSize + 64);
     tfw_buf_size = newSize;
 }
 

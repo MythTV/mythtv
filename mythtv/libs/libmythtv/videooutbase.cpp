@@ -345,7 +345,7 @@ VideoOutput::VideoOutput() :
     osd_painter(NULL),                  osd_image(NULL)
 
 {
-    bzero(&pip_tmp_image, sizeof(pip_tmp_image));
+    memset(&pip_tmp_image, 0, sizeof(pip_tmp_image));
     db_display_dim = QSize(gCoreContext->GetNumSetting("DisplaySizeWidth",  0),
                            gCoreContext->GetNumSetting("DisplaySizeHeight", 0));
 
@@ -1002,7 +1002,7 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
     {
         DoPipResize(pipw, piph);
 
-        bzero(&pip_tmp_image, sizeof(pip_tmp_image));
+        memset(&pip_tmp_image, 0, sizeof(pip_tmp_image));
 
         if (pip_tmp_buf && pip_scaling_context)
         {
@@ -1308,13 +1308,13 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
         }
         else if (FMT_AI44 == frame->codec)
         {
-            bzero(frame->buf, video_dim.width() * video_dim.height());
+            memset(frame->buf, 0, video_dim.width() * video_dim.height());
             yuv888_to_i44(frame->buf, osd_image, video_dim,
                           left, top, right, bottom, true);
         }
         else if (FMT_IA44 == frame->codec)
         {
-            bzero(frame->buf, video_dim.width() * video_dim.height());
+            memset(frame->buf, 0, video_dim.width() * video_dim.height());
             yuv888_to_i44(frame->buf, osd_image, video_dim,
                           left, top, right, bottom, false);
         }

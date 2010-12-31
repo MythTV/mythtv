@@ -154,7 +154,7 @@ VideoOutputXv::VideoOutputXv()
       chroma_osd(NULL)
 {
     VERBOSE(VB_PLAYBACK, LOC + "ctor");
-    bzero(&av_pause_frame, sizeof(av_pause_frame));
+    memset(&av_pause_frame, 0, sizeof(av_pause_frame));
 
     if (gCoreContext->GetNumSetting("UseVideoModes", 0))
         display_res = DisplayRes::GetDisplayRes(true);

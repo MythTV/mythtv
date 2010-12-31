@@ -653,7 +653,7 @@ void NuppelVideoRecorder::UpdateResolutions(void)
         AspectChange((AspectRatio)aspect, 0);
     }
 
-    if (w_out && tot_height && 
+    if (w_out && tot_height &&
         ((uint)tot_height != m_videoHeight ||
          (uint)w_out      != m_videoWidth))
     {
@@ -846,7 +846,7 @@ bool NuppelVideoRecorder::MJPEGInit(void)
     }
 
     struct video_capability vc;
-    bzero(&vc, sizeof(vc));
+    memset(&vc, 0, sizeof(vc));
     int ret = ioctl(init_fd, VIDIOCGCAP, &vc);
 
     if (ret < 0)
@@ -2735,7 +2735,7 @@ void NuppelVideoRecorder::doVbiThread(void)
     else if (VBIMode::NTSC_CC == vbimode)
     {
         ntsc_cc = new struct cc;
-        bzero(ntsc_cc, sizeof(struct cc));
+        memset(ntsc_cc, 0, sizeof(struct cc));
         ntsc_cc->fd = open(vbidev.constData(), O_RDONLY|O_NONBLOCK);
         ntsc_cc->code1 = -1;
         ntsc_cc->code2 = -1;
@@ -2763,7 +2763,7 @@ void NuppelVideoRecorder::doVbiThread(void)
     {
         // V4L v1 VBI ioctls
         struct vbi_format vfmt;
-        bzero(&vfmt, sizeof(vbi_format));
+        memset(&vfmt, 0, sizeof(vbi_format));
         if (ioctl(vbifd, VIDIOCGVBIFMT, &vfmt) < 0)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +

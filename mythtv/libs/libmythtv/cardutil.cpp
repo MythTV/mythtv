@@ -1475,7 +1475,7 @@ bool CardUtil::hasV4L2(int videofd)
     (void) videofd;
 #ifdef USING_V4L
     struct v4l2_capability vcap;
-    bzero(&vcap, sizeof(vcap));
+    memset(&vcap, 0, sizeof(vcap));
 
     return ((ioctl(videofd, VIDIOC_QUERYCAP, &vcap) >= 0) &&
             (vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE));
@@ -1496,7 +1496,7 @@ bool CardUtil::GetV4LInfo(
 #ifdef USING_V4L
     // First try V4L2 query
     struct v4l2_capability capability;
-    bzero(&capability, sizeof(struct v4l2_capability));
+    memset(&capability, 0, sizeof(struct v4l2_capability));
     if (ioctl(videofd, VIDIOC_QUERYCAP, &capability) >= 0)
     {
         card = QString::fromAscii((const char*)capability.card);
@@ -1529,7 +1529,7 @@ InputNames CardUtil::ProbeV4LVideoInputs(int videofd, bool &ok)
 
     // V4L v2 query
     struct v4l2_input vin;
-    bzero(&vin, sizeof(vin));
+    memset(&vin, 0, sizeof(vin));
     while (usingv4l2 && (ioctl(videofd, VIDIOC_ENUMINPUT, &vin) >= 0))
     {
         QString input((char *)vin.name);
@@ -1544,7 +1544,7 @@ InputNames CardUtil::ProbeV4LVideoInputs(int videofd, bool &ok)
 
     // V4L v1 query
     struct video_capability vidcap;
-    bzero(&vidcap, sizeof(vidcap));
+    memset(&vidcap, 0, sizeof(vidcap));
     if (ioctl(videofd, VIDIOCGCAP, &vidcap) != 0)
     {
         QString msg = QObject::tr("Could not query inputs.");
@@ -1556,7 +1556,7 @@ InputNames CardUtil::ProbeV4LVideoInputs(int videofd, bool &ok)
     for (int i = 0; i < vidcap.channels; i++)
     {
         struct video_channel test;
-        bzero(&test, sizeof(test));
+        memset(&test, 0, sizeof(test));
         test.channel = i;
 
         if (ioctl(videofd, VIDIOCGCHAN, &test) != 0)
@@ -1594,7 +1594,7 @@ InputNames CardUtil::ProbeV4LAudioInputs(int videofd, bool &ok)
 
     // V4L v2 query
     struct v4l2_audio ain;
-    bzero(&ain, sizeof(ain));
+    memset(&ain, 0, sizeof(ain));
     while (usingv4l2 && (ioctl(videofd, VIDIOC_ENUMAUDIO, &ain) >= 0))
     {
         QString input((char *)ain.name);
