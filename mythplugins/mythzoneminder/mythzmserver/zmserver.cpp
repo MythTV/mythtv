@@ -52,7 +52,7 @@
 
 // the maximum image size we are ever likely to get from ZM
 #define MAX_IMAGE_SIZE  (2048*1536*3)
- 
+
 #define ADD_STR(list,s)  list += s; list += "[]:[]";
 
 // error messages
@@ -282,7 +282,7 @@ void ZMServer::processRequest(char* buf, int nbytes)
         return;
 
     if (m_debug)
-        cout << "Processing: '" << tokens[0] << "'" << endl; 
+        cout << "Processing: '" << tokens[0] << "'" << endl;
 
     if (tokens[0] == "HELLO")
         handleHello();
@@ -379,7 +379,7 @@ void ZMServer::handleHello()
 long long ZMServer::getDiskSpace(const string &filename, long long &total, long long &used)
 {
     struct statfs statbuf;
-    bzero(&statbuf, sizeof(statbuf));
+    memset(&statbuf, 0, sizeof(statbuf));
     long long freespace = -1;
 
     total = used = -1;
@@ -760,7 +760,7 @@ void ZMServer::handleGetEventFrame(vector<string> tokens)
     int frameNo = atoi(tokens[3].c_str());
 
     if (m_debug)
-        cout << "Getting frame " << frameNo << " for event " << eventID 
+        cout << "Getting frame " << frameNo << " for event " << eventID
              << " on monitor " << monitorID << endl;
 
     string outStr("");
@@ -770,7 +770,7 @@ void ZMServer::handleGetEventFrame(vector<string> tokens)
     // try to find the frame file
     string filepath("");
     filepath = g_webPath + "/events/" + monitorID + "/" + eventID + "/";
-    sprintf(str, m_eventFileFormat.c_str(), frameNo); 
+    sprintf(str, m_eventFileFormat.c_str(), frameNo);
     filepath += str;
 
     FILE *fd;
@@ -814,7 +814,7 @@ void ZMServer::handleGetAnalyseFrame(vector<string> tokens)
     int frameNo = atoi(tokens[3].c_str());
 
     if (m_debug)
-        cout << "Getting anaylse frame " << frameNo << " for event " << eventID 
+        cout << "Getting anaylse frame " << frameNo << " for event " << eventID
              << " on monitor " << monitorID << endl;
 
     // get the 'alarm' frames from the Frames table for this event
@@ -866,7 +866,7 @@ void ZMServer::handleGetAnalyseFrame(vector<string> tokens)
     // try to find the analyse frame file
     string filepath("");
     filepath = g_webPath + "/events/" + monitorID + "/" + eventID + "/";
-    sprintf(str, m_analyseFileFormat.c_str(), frameID); 
+    sprintf(str, m_analyseFileFormat.c_str(), frameID);
     filepath += str;
 
     FILE *fd;
@@ -899,8 +899,8 @@ void ZMServer::handleGetLiveFrame(vector<string> tokens)
     static unsigned char buffer[MAX_IMAGE_SIZE];
     char str[100];
 
-    // we need to periodically kick the DB connection here to make sure it 
-    // stays alive because the user may have left the frontend on the live 
+    // we need to periodically kick the DB connection here to make sure it
+    // stays alive because the user may have left the frontend on the live
     // view which doesn't query the DB at all and eventually the connection
     // will timeout
     kickDatabase(m_debug);
@@ -1363,7 +1363,7 @@ int ZMServer::getFrame(unsigned char *buffer, int bufferSize, MONITOR *monitor)
         return 0;
 
     // sanity check last_read
-    if (monitor->shared_data->last_write_index < 0 || 
+    if (monitor->shared_data->last_write_index < 0 ||
             monitor->shared_data->last_write_index >= monitor->image_buffer_count)
         return 0;
 
@@ -1486,7 +1486,7 @@ void ZMServer::handleSetMonitorFunction(vector<string> tokens)
     monitor->enabled = newEnabled;
 
     if (m_debug)
-        cout << "SetMonitorFunction MonitorId: " << monitorID << endl << 
+        cout << "SetMonitorFunction MonitorId: " << monitorID << endl <<
                 "  oldEnabled: " << oldEnabled << endl <<
                 "  newEnabled: " << newEnabled << endl <<
                 " oldFunction: " << oldFunction << endl <<

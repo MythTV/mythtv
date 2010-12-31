@@ -67,7 +67,7 @@ extern "C" {
 #include "thumbfinder.h"
 
 // the amount to seek before the required frame
-#define PRE_SEEK_AMOUNT 50 
+#define PRE_SEEK_AMOUNT 50
 
 struct SeekAmount SeekAmounts[] =
 {
@@ -248,7 +248,7 @@ bool ThumbFinder::keyPressEvent(QKeyEvent *event)
 
 int  ThumbFinder::getChapterCount(const QString &menuTheme)
 {
-    QString filename = GetShareDir() + "mytharchive/themes/" + 
+    QString filename = GetShareDir() + "mytharchive/themes/" +
             menuTheme + "/theme.xml";
     QDomDocument doc("mydocument");
     QFile file(filename);
@@ -426,7 +426,7 @@ bool ThumbFinder::getThumbImages()
 {
     if (!getFileDetails(m_archiveItem))
     {
-        VERBOSE(VB_IMPORTANT, QString("ThumbFinder:: Failed to get file details for %1") 
+        VERBOSE(VB_IMPORTANT, QString("ThumbFinder:: Failed to get file details for %1")
                               .arg(m_archiveItem->filename));
         return false;
     }
@@ -580,7 +580,7 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
         AVStream *st = m_inputFC->streams[i];
         if (m_inputFC->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO)
         {
-            m_startTime = -1; 
+            m_startTime = -1;
             if (m_inputFC->streams[i]->start_time != (int) AV_NOPTS_VALUE)
                 m_startTime = m_inputFC->streams[i]->start_time;
             else
@@ -798,9 +798,9 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
 {
     AVPacket pkt;
     AVPicture orig;
-    AVPicture retbuf; 
-    bzero(&orig, sizeof(AVPicture));
-    bzero(&retbuf, sizeof(AVPicture));
+    AVPicture retbuf;
+    memset(&orig, 0, sizeof(AVPicture));
+    memset(&retbuf, 0, sizeof(AVPicture));
 
     av_init_packet(&pkt);
 

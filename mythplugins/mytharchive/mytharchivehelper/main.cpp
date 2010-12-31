@@ -1873,8 +1873,8 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
     AVPacket pkt;
     AVPicture orig;
     AVPicture retbuf;
-    bzero(&orig, sizeof(AVPicture));
-    bzero(&retbuf, sizeof(AVPicture));
+    memset(&orig, 0, sizeof(AVPicture));
+    memset(&retbuf, 0, sizeof(AVPicture));
 
     int bufflen = width * height * 4;
     unsigned char *outputbuf = new unsigned char[bufflen];
@@ -2439,7 +2439,7 @@ static int isRemote(QString filename)
         return 0;
 
     struct statfs statbuf;
-    bzero(&statbuf, sizeof(statbuf));
+    memset(&statbuf, 0, sizeof(statbuf));
 
 #if CONFIG_DARWIN
     if ((statfs(qPrintable(filename), &statbuf) == 0) &&
