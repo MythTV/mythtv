@@ -2,12 +2,12 @@
  * Quick DNR 0.8
  * (C)opyright 2003, Debabrata Banerjee
  * GNU GPL 2 or later
- * 
+ *
  * Pass options as:
  * quickdnr=quality (0-255 scale adjusted)
  * quickdnr=Luma_threshold:Chroma_threshold (0-255) for single threshold
  * quickdnr=Luma_threshold1:Luma_threshold2:Chroma_threshold1:Chroma_threshold2 for double
- * 
+ *
  */
 
 #include <stdio.h>
@@ -86,7 +86,7 @@ static int init_avg(ThisFilter *filter, VideoFrame *frame)
 {
     if (!alloc_avg(filter, frame->size))
         return 0;
-    
+
     if ((filter->offsets[0] != frame->offsets[0]) ||
         (filter->offsets[1] != frame->offsets[1]) ||
         (filter->offsets[2] != frame->offsets[2]) ||
@@ -130,7 +130,7 @@ static void init_vars(ThisFilter *tf, VideoFrame *frame,
 static int quickdnr(VideoFilter *f, VideoFrame *frame, int field)
 {
     (void)field;
-    ThisFilter *tf = (ThisFilter *)f; 
+    ThisFilter *tf = (ThisFilter *)f;
     int thr1[3], thr2[3], height[3];
     uint8_t *avg[3], *buf[3];
     int i, y;
@@ -157,20 +157,20 @@ static int quickdnr(VideoFilter *f, VideoFrame *frame, int field)
     }
 
     TF_END(tf, "QuickDNR: ");
- 
+
     return 0;
 }
 
 static int quickdnr2(VideoFilter *f, VideoFrame *frame, int field)
 {
     (void)field;
-    ThisFilter *tf = (ThisFilter *)f; 
+    ThisFilter *tf = (ThisFilter *)f;
     int thr1[3], thr2[3], height[3];
     uint8_t *avg[3], *buf[3];
     int i, y;
 
     TF_VARS;
- 
+
     TF_START;
 
     if (!init_avg(tf, frame))
@@ -198,7 +198,7 @@ static int quickdnr2(VideoFilter *f, VideoFrame *frame, int field)
     }
 
     TF_END(tf, "QuickDNR2: ");
- 
+
     return 0;
 }
 
@@ -228,7 +228,7 @@ static int quickdnrMMX(VideoFilter *f, VideoFrame *frame, int field)
       processor automatically does a prefetchT0 in these cases. The
       instruction is meant to be used to specify a different prefetch
       cache level, or to prefetch non-sequental data.
-    
+
       These prefetches are not available on all MMX processors so if
       we wanted to use them we would need to test for a prefetch
       capable processor before using them. -- dtk
@@ -321,9 +321,9 @@ static int quickdnr2MMX(VideoFilter *f, VideoFrame *frame, int field)
     int i, y;
 
     TF_VARS;
-  
+
     TF_START;
- 
+
     if (!init_avg(tf, frame))
         return 0;
 
@@ -364,7 +364,7 @@ static int quickdnr2MMX(VideoFilter *f, VideoFrame *frame, int field)
 
                 "paddb %%mm4, %%mm3   \n\t" // hack! No proper unsigned mmx compares!
                 "pcmpgtb %%mm5, %%mm3 \n\t" // compare diff with mask
-		 
+
                 "movq %%mm2, %%mm0    \n\t" // reload registers
                 "movq %%mm7, %%mm1    \n\t"
 
@@ -477,7 +477,7 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
         return NULL;
     }
 
-    memset(filter, 0, sizeof(ThisFilter)); /*MS Windows doesn't like bzero()*/
+    memset(filter, 0, sizeof(ThisFilter));
     filter->vf.cleanup        = &cleanup;
     filter->Luma_threshold1   = LUMA_THRESHOLD1_DEFAULT;
     filter->Chroma_threshold1 = CHROMA_THRESHOLD1_DEFAULT;
@@ -556,7 +556,7 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
 #endif
 
     TF_INIT(filter);
-  
+
 #ifdef QUICKDNR_DEBUG
     fprintf(stderr, "DNR Loaded: 0x%X Params: %u %u \n"
             "Luma1:   %3d 0x%X%X  Luma2:   0x%X%X\n"
@@ -581,13 +581,13 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
     return (VideoFilter*) filter;
 }
 
-static FmtConv FmtList[] = 
+static FmtConv FmtList[] =
 {
     { FMT_YV12, FMT_YV12 },
     FMT_NULL
 };
 
-ConstFilterInfo filter_table[] = 
+ConstFilterInfo filter_table[] =
 {
     {
         filter_init: &new_filter,

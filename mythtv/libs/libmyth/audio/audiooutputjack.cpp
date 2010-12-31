@@ -393,7 +393,7 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
     if (bytes_needed > bytes_read)
     {
         // play silence on buffer underrun
-        bzero(aubuf + bytes_read, bytes_needed - bytes_read);
+        memset(aubuf + bytes_read, 0, bytes_needed - bytes_read);
         if (!pauseaudio)
             VBERROR(QString("Having to insert silence because GetAudioData "
                             "hasn't returned enough data. Wanted: %1 Got: %2")
