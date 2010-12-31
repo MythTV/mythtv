@@ -19,33 +19,33 @@ class MPUBLIC MythEvent : public QEvent
     MythEvent(int t) : QEvent((QEvent::Type)t)
     { }
 
-    MythEvent(int t, const QString &lmessage) : QEvent((QEvent::Type)t)
+    MythEvent(int t, const QString lmessage) : QEvent((QEvent::Type)t)
     {
         message = lmessage;
         extradata.append( "empty" );
     }
 
-    MythEvent(int t, const QString &lmessage, const QStringList &lextradata)
+    MythEvent(int t, const QString lmessage, const QStringList &lextradata)
            : QEvent((QEvent::Type)t)
     {
         message = lmessage;
         extradata = lextradata;
     }
 
-    MythEvent(const QString &lmessage) : QEvent(MythEventMessage)
+    MythEvent(const QString lmessage) : QEvent(MythEventMessage)
     {
         message = lmessage;
         extradata.append( "empty" );
     }
 
-    MythEvent(const QString &lmessage, const QStringList &lextradata)
+    MythEvent(const QString lmessage, const QStringList &lextradata)
            : QEvent((QEvent::Type)MythEventMessage)
     {
         message = lmessage;
         extradata = lextradata;
     }
 
-    MythEvent(const QString &lmessage, const QString lextradata)
+    MythEvent(const QString lmessage, const QString lextradata)
            : QEvent((QEvent::Type)MythEventMessage)
     {
         message = lmessage;
