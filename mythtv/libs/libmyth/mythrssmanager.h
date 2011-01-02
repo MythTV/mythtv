@@ -8,7 +8,6 @@ using namespace std;
 #include <QMetaType>
 #include <QMutex>
 #include <QTimer>
-#include <QProcess>
 #include <QDateTime>
 #include <QByteArray>
 #include <QVariant>

@@ -36,6 +36,8 @@
 #include "scheduler.h"
 #include "mainserver.h"
 #include "cardutil.h"
+#include "mythsystem.h"
+#include "exitcodes.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -465,65 +467,50 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         QDomElement misc = pDoc->createElement("Miscellaneous");
         root.appendChild(misc);
 
-        QByteArray iscript = info_script.toAscii();
-        FILE *fp = popen(iscript.constData(), "r");
-
-        if (fp)
+        uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
+        MythSystem ms(info_script, flags);
+        ms.Run(10);
+        if (ms.Wait() != GENERIC_EXIT_OK)
         {
-            char buffer[256];
-            QString input = "";
-
-            while (fgets(buffer, sizeof(buffer), fp))
-            {
-                input.append(QString::fromLocal8Bit(buffer));
-            }
-
-            if (pclose(fp))
-            {
-                VERBOSE(VB_IMPORTANT, QString("Error running miscellaneous "
-                        "status information script: %1").arg(info_script));
-            }
-            else
-            {
-                QStringList output = input.split('\n', QString::SkipEmptyParts);
-
-                QStringList::iterator iter = output.begin();
-                for (; iter != output.end(); ++iter)
-                {
-                    QDomElement info = pDoc->createElement("Information");
-
-                    QStringList list = (*iter).split("[]:[]");
-                    unsigned int size = list.size();
-                    unsigned int hasAttributes = 0;
-
-                    if ((size > 0) && (!list[0].isEmpty()))
-                    {
-                        info.setAttribute("display", list[0]);
-                        hasAttributes++;
-                    }
-                    if ((size > 1) && (!list[1].isEmpty()))
-                    {
-                        info.setAttribute("name", list[1]);
-                        hasAttributes++;
-                    }
-                    if ((size > 2) && (!list[2].isEmpty()))
-                    {
-                        info.setAttribute("value", list[2]);
-                        hasAttributes++;
-                    }
-
-                    if (hasAttributes > 0)
-                        misc.appendChild(info);
-                }
-            }
+            VERBOSE(VB_IMPORTANT, QString("Error running miscellaneous "
+                    "status information script: %1").arg(info_script));
+            return;
         }
-        else
+    
+        QByteArray input = ms.ReadAll();
+
+        QStringList output = QString(input).split('\n', 
+                                                  QString::SkipEmptyParts);
+
+        QStringList::iterator iter;
+        for (iter = output.begin(); iter != output.end(); ++iter)
         {
-            VERBOSE(VB_IMPORTANT, QString("Failed to run miscellaneous status "
-                    "information script: %1").arg(info_script));
+            QDomElement info = pDoc->createElement("Information");
+
+            QStringList list = (*iter).split("[]:[]");
+            unsigned int size = list.size();
+            unsigned int hasAttributes = 0;
+
+            if ((size > 0) && (!list[0].isEmpty()))
+            {
+                info.setAttribute("display", list[0]);
+                hasAttributes++;
+            }
+            if ((size > 1) && (!list[1].isEmpty()))
+            {
+                info.setAttribute("name", list[1]);
+                hasAttributes++;
+            }
+            if ((size > 2) && (!list[2].isEmpty()))
+            {
+                info.setAttribute("value", list[2]);
+                hasAttributes++;
+            }
+
+            if (hasAttributes > 0)
+                misc.appendChild(info);
         }
     }
-
 }
 
 /////////////////////////////////////////////////////////////////////////////

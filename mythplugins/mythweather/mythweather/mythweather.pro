@@ -5,7 +5,7 @@ include ( ../../programs-libs.pro )
 QT += sql xml
 
 TEMPLATE = lib
-CONFIG += plugin thread debug
+CONFIG += plugin thread 
 TARGET = mythweather
 target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target

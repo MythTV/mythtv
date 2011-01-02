@@ -127,6 +127,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
         {
             VERBOSE(VB_IMPORTANT, "playbackbox.o: Could not find a button to "
                                   "assign focus to. What's in your theme?");
+            // TODO: is this OK?
             exit(0);
         }
     }
@@ -2272,6 +2273,7 @@ void PlaybackBoxMusic::wireUpTheme()
     {
         VERBOSE(VB_IMPORTANT, "playbackbox.o: Couldn't find a music tree list "
                               "in your theme");
+        // TODO: is this OK?
         exit(0);
     }
     connect(music_tree_list, SIGNAL(nodeSelected(int, IntVector*)),

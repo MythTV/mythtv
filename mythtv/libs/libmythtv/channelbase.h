@@ -12,7 +12,9 @@
 // MythTV headers
 #include "channelutil.h"
 #include "inputinfo.h"
+#include "mythsystem.h"
 #include "tv.h"
+#include "mythsystem.h"
 
 class TVRec;
 class ChannelBase;
@@ -167,11 +169,11 @@ class ChannelBase
     QWaitCondition  m_tuneCond;
 
   private:
-    mutable  ChannelThread   m_tuneThread;
-    Status   m_tuneStatus;
-    QMutex   m_thread_lock;
-    bool     m_abort_change;
-    pid_t    m_changer_pid;
+    mutable     ChannelThread   m_tuneThread;
+    Status      m_tuneStatus;
+    QMutex      m_thread_lock;
+    bool        m_abort_change;
+    MythSystem *m_changer;
 };
 
 #endif

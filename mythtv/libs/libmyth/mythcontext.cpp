@@ -787,7 +787,7 @@ QString MythContextPrivate::TestDBconnection(void)
 
             VERBOSE(VB_GENERAL, QString("Trying to wake up host %1, attempt %2")
                                 .arg(host).arg(attempt));
-            myth_system(m_DBparams.wolCommand.toLocal8Bit().constData());
+            myth_system(m_DBparams.wolCommand);
 
             VERBOSE(VB_GENERAL,
                     QString("Waiting for %1 seconds").arg(wakeupTime));

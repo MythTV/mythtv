@@ -10,6 +10,7 @@
 #include "mythverbose.h"
 #include "programinfo.h"
 #include "remoteutil.h"
+#include "exitcodes.h"
 
 #define LOC      QString("MythSystemEventHandler: ")
 #define LOC_ERR  QString("MythSystemEventHandler ERROR: ")
@@ -54,7 +55,7 @@ class SystemEventThread : public QRunnable
 
         QThreadPool::globalInstance()->reserveThread();
 
-        if (result)
+        if (result != GENERIC_EXIT_OK)
             VERBOSE(VB_IMPORTANT, LOC_WARN + QString("Command '%1' returned %2")
                     .arg(m_command).arg(result));
 

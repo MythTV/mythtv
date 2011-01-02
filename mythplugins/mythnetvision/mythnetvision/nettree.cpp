@@ -1,6 +1,5 @@
 // qt
 #include <QString>
-#include <QProcess>
 #include <QFileInfo>
 #include <QtAlgorithms>
 

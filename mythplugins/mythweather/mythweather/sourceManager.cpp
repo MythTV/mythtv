@@ -65,8 +65,9 @@ bool SourceManager::findScriptsDB()
         si->id = db.value(0).toInt();
         si->name = db.value(1).toString();
         si->updateTimeout = db.value(2).toUInt() * 1000;
-        si->scriptTimeout = db.value(3).toUInt() * 1000;
-        si->fileInfo = fi;
+        si->scriptTimeout = db.value(3).toUInt();
+        si->path = fi.absolutePath();
+        si->program = fi.absoluteFilePath();
         si->author = db.value(5).toString();
         si->version = db.value(6).toString();
         si->email = db.value(7).toString();
@@ -202,16 +203,6 @@ ScriptInfo *SourceManager::getSourceByName(const QString &name)
         if (src->name == name)
         {
             return src;
-          //  src = new ScriptInfo;
-          //  src->name = m_scripts[i]->name;
-          //  src->version = m_scripts[i]->version;
-          //  src->author = m_scripts[i]->author;
-          //  src->email = m_scripts[i]->email;
-          //  src->types = m_scripts[i]->types;
-          //  src->file = new QFileInfo(*m_scripts[i]->file);
-          //  src->scriptTimeout = m_scripts[i]->scriptTimeout;
-          //  src->updateTimeout = m_scripts[i]->updateTimeout;
-          //  src->id = m_scripts[i]->id;
         }
     }
 
@@ -297,13 +288,7 @@ void SourceManager::doUpdate(bool forceUpdate)
     for (int x = 0; x < m_sources.size(); x++)
     {
         src = m_sources.at(x);
-        if (src->isRunning())
-        {
-            VERBOSE(VB_GENERAL, tr("Script %1 is still running when trying to do update, "
-                    "Make sure it isn't hanging, make sure timeout values are sane... "
-                    "Not running this time around").arg(src->getName()));
-        }
-        else if (src->inUse())
+        if (src->inUse())
             src->startUpdate(forceUpdate);
     }
 }

@@ -4,8 +4,8 @@
 #include <QStringList>
 #include <QObject>
 #include <QTimer>
-#include <QProcess>
 #include <QFileInfo>
+#include "mythsystem.h"
 
 // MythWeather headers
 #include "weatherUtils.h"
@@ -13,7 +13,7 @@
 class WeatherScreen;
 
 /*
- * Instance indpendent information about a script
+ * Instance independent information about a script
  */
 class ScriptInfo
 {
@@ -23,7 +23,8 @@ class ScriptInfo
     QString author;
     QString email;
     QStringList types;
-    QFileInfo fileInfo;
+    QString program;
+    QString path;
     unsigned int scriptTimeout;
     unsigned int updateTimeout;
     int id;
@@ -41,9 +42,7 @@ class WeatherSource : public QObject
                               QString        program,
                               uint          &updateTimeout,
                               uint          &scriptTimeout);
-    static bool ProbeInfo(QString            workingDirectory,
-                          QString            program,
-                          struct ScriptInfo &scriptInfo);
+    static bool ProbeInfo(struct ScriptInfo &scriptInfo);
 
     WeatherSource(ScriptInfo *info);
     ~WeatherSource();
@@ -60,7 +59,6 @@ class WeatherSource : public QObject
     QString getLocale() { return m_locale; }
 
     void startUpdate(bool forceUpdate = false);
-    bool isRunning(void) const;
 
     int getScriptTimeout() { return m_info->scriptTimeout; }
     void setScriptTimeout(int timeout) { m_info->scriptTimeout = timeout; }
@@ -81,12 +79,9 @@ class WeatherSource : public QObject
 
   signals:
     void newData(QString, units_t,  DataMap);
-    void killProcess();
 
   private slots:
-    void read(void);
-    void processExit();
-    void scriptTimeout();
+    void processExit(uint status = 0);
     void updateTimeout();
 
   private:
@@ -95,13 +90,12 @@ class WeatherSource : public QObject
     bool m_ready;
     bool m_inuse;
     ScriptInfo *m_info;
-    QProcess *m_proc;
-    QString m_proc_debug;
+    MythSystem *m_ms;
     QString m_dir;
     QString m_locale;
+    QString m_cachefile;
     QByteArray m_buffer;
     units_t m_units;
-    QTimer *m_scriptTimer;
     QTimer *m_updateTimer;
     int m_connectCnt;
     DataMap m_data;

@@ -13,7 +13,7 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 # Input
 HEADERS += audio/audiooutput.h audio/audiooutputbase.h audio/audiooutputnull.h
 HEADERS += audio/audiooutpututil.h audio/audiooutputdownmix.h
-HEADERS += audio/audiooutputdigitalencoder.h audio/spdifencoder.h
+HEADERS += audio/audiooutputdigitalencoder.h udip/spdifencoder.h
 HEADERS += audio/audiosettings.h audio/audiooutputsettings.h audio/pink.h
 HEADERS += backendselect.h dbsettings.h dialogbox.h
 HEADERS += generictree.h langsettings.h

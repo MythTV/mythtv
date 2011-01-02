@@ -66,7 +66,6 @@ class NetSearch : public MythScreenType
     MythDownloadManager   *m_download;
     MetadataImageDownload *m_imageDownload;
     QFile                 *m_file;
-    QProcess              *m_externaldownload;
 
     QString             m_currentSearch;
     int                 m_currentGrabber;

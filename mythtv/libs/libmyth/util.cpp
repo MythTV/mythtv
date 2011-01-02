@@ -48,6 +48,7 @@ using namespace std;
 #include "mythsocket.h"
 #include "mythcoreutil.h"
 #include "remotefile.h"
+#include "mythsystem.h"
 
 #include "mythconfig.h" // for CONFIG_DARWIN
 
@@ -737,21 +738,21 @@ bool ping(const QString &host, int timeout)
                   .arg(timeout).arg(host);
 
     if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
-                         kMSProcessEvents))
+                         kMSProcessEvents) != GENERIC_EXIT_OK)
         return false;
 #else
     QString cmd = QString("ping -t %1 -c 1  %2  >/dev/null 2>&1")
                   .arg(timeout).arg(host);
 
     if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
-                         kMSProcessEvents))
+                         kMSProcessEvents) != GENERIC_EXIT_OK)
     {
         // ping command may not like -t argument. Simplify:
 
         cmd = QString("ping -c 1  %2  >/dev/null 2>&1").arg(host);
 
         if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
-                             kMSProcessEvents))
+                             kMSProcessEvents) != GENERIC_EXIT_OK)
             return false;
     }
 #endif
@@ -1181,12 +1182,12 @@ bool IsPulseAudioRunning(void)
 #if CONFIG_DARWIN || (__FreeBSD__) || defined(__OpenBSD__)
     const char *command = "ps -ax | grep -i pulseaudio | grep -v grep > /dev/null";
 #else
-    const char *command = "ps -ae | grep pulseaudio > /dev/null";
+    const char *command = "ps ch -C pulseaudio -o pid > /dev/null";
 #endif
     // Do NOT use kMSProcessEvents here, it will cause deadlock
-    bool res = myth_system(command, kMSDontBlockInputDevs | 
+    uint res = myth_system(command, kMSDontBlockInputDevs | 
                                     kMSDontDisableDrawing);
-    return !res;
+    return (res == GENERIC_EXIT_OK);
 }
 
 bool myth_nice(int val)
@@ -1327,6 +1328,53 @@ bool myth_FileIsBD(const QString &filename)
     }
 
     return false;
+}
+
+bool RemoveDirectory(QDir &aDir)
+{
+    if (!aDir.exists())//QDir::NoDotAndDotDot
+        return false;
+
+    QFileInfoList entries = aDir.entryInfoList(QDir::NoDotAndDotDot | 
+                                               QDir::Dirs | QDir::Files);
+    int count = entries.size();
+    bool has_err = false;
+
+    for (int idx = 0; idx < count && !has_err; idx++)
+    {
+        QFileInfo entryInfo = entries[idx];
+        QString path = entryInfo.absoluteFilePath();
+        if (entryInfo.isDir())
+        {
+            QDir dir(path);
+            has_err = RemoveDirectory(dir);
+        }
+        else
+        {
+            QFile file(path);
+            if (!file.remove())
+                has_err = true;
+        }
+    }
+
+    if (!has_err && !aDir.rmdir(aDir.absolutePath()))
+        has_err = true;
+
+    return(has_err);
+}
+
+MPUBLIC QString &ShellEscape(QString &string)
+{
+    if (string.contains("\""))
+        string = string.replace("\"", "\\\"");
+
+    if (string.contains(" "))
+    {
+        string.prepend("\"");
+        string.append("\"");
+    }
+
+    return string;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

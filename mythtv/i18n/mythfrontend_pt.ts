@@ -13071,7 +13071,7 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="364"/>
         <source>7.1</source>
-        <translation>7.1</translation>
+        <translation>2h {7.1?}</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="380"/>

@@ -116,7 +116,7 @@ bool RecordingSelector::Create(void)
 
 void RecordingSelector::Init(void)
 {
-    QString message = tr("Retrieving Recording List.\nPlease Wait...");
+    QString message = tr("Retrieving Recording List. Please Wait...");
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 

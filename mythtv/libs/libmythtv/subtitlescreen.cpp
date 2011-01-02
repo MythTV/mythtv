@@ -361,12 +361,6 @@ void SubtitleScreen::DisplayTextSubtitles(void)
 
     DeleteAllChildren();
     SetRedraw();
-    if (playPos == 0)
-    {
-        subs->Unlock();
-        return;
-    }
-
     QStringList rawsubs = subs->GetSubtitles(playPos);
     if (rawsubs.empty())
     {

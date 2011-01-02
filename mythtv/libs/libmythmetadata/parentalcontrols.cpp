@@ -217,8 +217,6 @@ class ParentalLevelChangeCheckerPrivate : public QObject
                 gCoreContext->GetSetting("VideoAdminPasswordThree"));
         m_pm.Add(ParentalLevel::plLow,
                 gCoreContext->GetSetting("VideoAdminPasswordTwo"));
-
-        m_passwordOK = false;
     }
 
     void Check(ParentalLevel::Level fromLevel, ParentalLevel::Level toLevel)
@@ -299,7 +297,6 @@ class ParentalLevelChangeCheckerPrivate : public QObject
             return true;
 
         // If we got here, there is a password, and there's no backing down.
-        m_passwordOK = false;
         MythScreenStack *popupStack =
                 GetMythMainWindow()->GetStack("popup stack");
 
@@ -320,14 +317,14 @@ class ParentalLevelChangeCheckerPrivate : public QObject
   private slots:
     void OnPasswordEntered(QString password)
     {
-        m_passwordOK = false;
+        bool ok = false;
 
         for (QStringList::iterator p = m_validPasswords.begin();
                 p != m_validPasswords.end(); ++p)
         {
             if (password == *p)
             {
-                m_passwordOK = true;
+                ok = true;
                 QString time_stamp =
                         QDateTime::currentDateTime().toString(Qt::ISODate);
 
@@ -337,15 +334,16 @@ class ParentalLevelChangeCheckerPrivate : public QObject
                 break;
             }
         }
+
+        emit SigDone(ok, ok ? m_toLevel : m_fromLevel);
     }
 
     void OnPasswordExit()
     {
-        emit SigDone(m_passwordOK, m_passwordOK ? m_toLevel : m_fromLevel);
+        emit SigDone(false, m_fromLevel);
     }
 
   private:
-    bool m_passwordOK;
     ParentalLevel::Level m_fromLevel;
     ParentalLevel::Level m_toLevel;
     PasswordManager m_pm;

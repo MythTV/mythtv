@@ -13,23 +13,6 @@
 #include <fcntl.h>
 #include <errno.h>
 
-# ifdef linux
-#   include <sys/vfs.h>
-#   include <sys/statvfs.h>
-#   include <sys/sysinfo.h>
-# else
-#   ifdef __FreeBSD__
-#     include <sys/param.h>
-#     include <sys/mount.h>
-#   endif
-#   if CONFIG_CYGWIN
-#     include <sys/statfs.h>
-#   endif
-#   ifndef _WIN32
-#     include <sys/sysctl.h>
-#   endif
-# endif
-
 // Qt headers
 #include <QApplication>
 #include <QRegExp>
@@ -45,14 +28,9 @@
 #include "mythdirs.h"
 #include "mythevent.h"
 #include "mythsocket.h"
+#include "mythsystem.h"
+#include "exitcodes.h"
 
-// Necessary for codec icon support
-
-#ifndef _MSC_VER
-extern "C" {
-#include <stdint.h>
-}
-#endif
 
 static QString LOC = "lcddevice: ";
 
@@ -161,11 +139,8 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
     }
 
     // check if the 'mythlcdserver' is running
-    int res = system("ret=`ps cax | grep -c mythlcdserver`; exit $ret");
-    if (WIFEXITED(res))
-        res = WEXITSTATUS(res);
-
-    if (res == 0)
+    uint flags = kMSRunShell | kMSDontBlockInputDevs | kMSDontDisableDrawing;
+    if (myth_system("ps ch -C mythlcdserver -o pid > /dev/null", flags) == 1)
     {
         // we need to start the mythlcdserver
         VERBOSE(VB_GENERAL, "Starting mythlcdserver");
@@ -782,109 +757,10 @@ QString LCD::quotedString(const QString &s)
 
 bool LCD::startLCDServer(void)
 {
-    QString LOC_ERR = QString("startLCDServer: Error: ");
-    QString command = GetInstallPrefix() + "/bin/mythlcdserver -v none&";
+    QString command = GetInstallPrefix() + "/bin/mythlcdserver -v none &";
+    uint flags = kMSDontBlockInputDevs | kMSDontDisableDrawing | 
+                 kMSRunBackground;
 
-#ifndef USING_MINGW
-    pid_t child = fork();
-
-    if (child < 0)
-    {
-        /* Fork failed */
-        VERBOSE(VB_IMPORTANT, (LOC_ERR + "fork() failed because %1")
-                .arg(strerror(errno)));
-        return false;
-    }
-    else if (child == 0)
-    {
-        /* Child */
-        /* Close all open file descriptors except stdout/stderr */
-        for (int i = sysconf(_SC_OPEN_MAX) - 1; i > 2; i--)
-            close(i);
-
-        /* Try to attach stdin to /dev/null */
-        int fd = open("/dev/null", O_RDONLY);
-        if (fd > 0)
-        {
-            // Note: dup2() will close old stdin descriptor.
-            if (dup2(fd, 0) < 0)
-            {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        "Cannot redirect /dev/null to standard input,"
-                        "\n\t\t\tfailed to duplicate file descriptor." + ENO);
-            }
-            close(fd);
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Cannot redirect /dev/null "
-                    "to standard input, failed to open." + ENO);
-        }
-
-        /* Run command */
-        execl("/bin/sh", "sh", "-c", command.toUtf8().constData(), (char *)0);
-        if (errno)
-        {
-            VERBOSE(VB_IMPORTANT, (LOC_ERR + "execl() failed because %1")
-                    .arg(strerror(errno)));
-        }
-
-        /* Failed to exec */
-        _exit(246); // this exit is ok
-    }
-    else
-    {
-        /* Parent */
-        int status;
-
-        int res = 0;
-
-        while (res == 0)
-        {
-            res = waitpid(child, &status, WNOHANG);
-            if (res == -1)
-            {
-                VERBOSE(VB_IMPORTANT,
-                        (LOC_ERR + "waitpid() failed because %1")
-                        .arg(strerror(errno)));
-                return false;
-            }
-
-            qApp->processEvents();
-
-
-            if (res > 0)
-                return (WEXITSTATUS(status) == 0);
-
-            usleep(100000);
-        }
-    }
-
-#else
-
-    STARTUPINFO si;
-    PROCESS_INFORMATION pi;
-    memset(&si, 0, sizeof(si));
-    memset(&pi, 0, sizeof(pi));
-    si.cb = sizeof(si);
-    QString cmd = QString("cmd.exe /c %1").arg(command);
-    if (!::CreateProcessA(NULL, cmd.toUtf8().data(), NULL, NULL,
-                          FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
-    {
-        VERBOSE(VB_IMPORTANT, (LOC_ERR + "CreateProcess() failed because %1")
-                .arg(::GetLastError()));
-        return false;
-    }
-    else
-    {
-        if (::WaitForSingleObject(pi.hProcess, INFINITE) == WAIT_FAILED)
-            VERBOSE(VB_IMPORTANT,
-                    (LOC_ERR + "WaitForSingleObject() failed because %1")
-                    .arg(::GetLastError()));
-        CloseHandle(pi.hProcess);
-        CloseHandle(pi.hThread);
-        return true;
-    }
-#endif
-    return false;
+    uint retval = myth_system(command, flags);
+    return( retval == GENERIC_EXIT_RUNNING );
 }

@@ -100,7 +100,7 @@
                     <filename>title/title_dvd.png</filename>
                 </imagetype>
             </state>
-            <state name="DISC_SETTINGS" from="DVD" />
+            <state name="DVD_SETTINGS" from="DVD" />
             <state name="MUSIC_SETTINGS">
                 <imagetype name="MUSIC_SETTINGS">
                     <filename>title/title_music_setup.png</filename>
@@ -265,6 +265,7 @@
             <!--   dvd_settings.xml  -->
             <state name="DVD_SETTINGS_GENERAL" from="DVD" />
             <state name="DVD_SETTINGS_PLAY" from="DVD" />
+            <state name="DVD_SETTINGS_RIP" from="DVD_RIP" />
 
             <!--   game_settings.xml  -->
             <state name="GAME_SETTINGS_GENERAL" from="GAME" />

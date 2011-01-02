@@ -20,6 +20,8 @@ using namespace std;
 #include <mythmainwindow.h>
 #include <mythdialogbox.h>
 #include <util.h>
+#include <mythsystem.h>
+#include <exitcodes.h>
 
 // mytharchive
 #include "archiveutil.h"
@@ -102,7 +104,7 @@ void checkTempDirectory()
     if (!dir.exists())
     {
         dir.mkdir(tempDir);
-        if( !chmod(qPrintable(tempDir), 0777) )
+        if( chmod(qPrintable(tempDir), 0777) )
             VERBOSE(VB_IMPORTANT, QString("Failed to change permissions on archive directory: %1")
                 .arg(strerror(errno)));
     }
@@ -111,7 +113,7 @@ void checkTempDirectory()
     if (!dir.exists())
     {
         dir.mkdir(workDir);
-        if( !chmod(qPrintable(workDir), 0777) )
+        if( chmod(qPrintable(workDir), 0777) )
             VERBOSE(VB_IMPORTANT, QString("Failed to change permissions on archive work directory: %1")
                 .arg(strerror(errno)));
     }
@@ -120,7 +122,7 @@ void checkTempDirectory()
     if (!dir.exists())
     {
         dir.mkdir(logDir);
-        if( !chmod(qPrintable(logDir), 0777) )
+        if( chmod(qPrintable(logDir), 0777) )
             VERBOSE(VB_IMPORTANT, QString("Failed to change permissions on archive log directory: %1")
                 .arg(strerror(errno)));
 
@@ -129,7 +131,7 @@ void checkTempDirectory()
     if (!dir.exists())
     {
         dir.mkdir(configDir);
-        if( !chmod(qPrintable(configDir), 0777) )
+        if( chmod(qPrintable(configDir), 0777) )
             VERBOSE(VB_IMPORTANT, QString("Failed to change permissions on archive config directory: %1")
                 .arg(strerror(errno)));
     }
@@ -233,16 +235,14 @@ bool getFileDetails(ArchiveItem *a)
     inFile.replace("\"", "\\\"");
     inFile.replace("`", "\\`");
 
-    QString outFile = tempDir + "/work/file.xml";
+    QString outFile = tempDir + "work/file.xml";
 
     // call mytharchivehelper to get files stream info etc.
     QString command = QString("mytharchivehelper -i \"%1\" \"%2\" %3 > /dev/null 2>&1")
             .arg(inFile).arg(outFile).arg(lenMethod);
 
-    int res = system(qPrintable(command));
-    if (WIFEXITED(res))
-        res = WEXITSTATUS(res);
-    if (res != 0)
+    uint flags = kMSDontBlockInputDevs | kMSDontDisableDrawing;
+    if (myth_system(command, flags) != GENERIC_EXIT_OK)
         return false;
 
     QDomDocument doc("mydocument");

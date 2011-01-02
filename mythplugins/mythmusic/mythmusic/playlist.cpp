@@ -9,7 +9,7 @@ using namespace std;
 #include <QApplication>
 #include <QTextStream>
 #include <QFileInfo>
-#include <Q3Process>
+#include <QObject>
 
 #include "playlist.h"
 #include "playlistcontainer.h"
@@ -19,6 +19,8 @@ using namespace std;
 #include <mythdb.h>
 #include <compat.h>
 #include <mythmediamonitor.h>
+#include <mythsystem.h>
+#include <exitcodes.h>
 
 const char *kID0err = "Song with ID of 0 in playlist, this shouldn't happen.";
 
@@ -1215,6 +1217,90 @@ void Playlist::computeSize(double &size_in_MB, double &size_in_sec)
     }
 }
 
+void Playlist::cdrecordData(int fd)
+{
+    if (!progress || !proc)
+        return;
+
+    QByteArray buf;
+    if (fd == 1) 
+    {
+        buf = proc->ReadAll();
+
+        // I would just use the QTextStream::readLine(), but wodim uses \r
+        // to update the same line, so I'm splitting it on \r or \n
+        // Track 01:    6 of  147 MB written (fifo 100%) [buf  99%]  16.3x.
+        QString data(buf);
+        QStringList list = data.split(QRegExp("[\\r\\n]"), 
+                                      QString::SkipEmptyParts);
+
+        for (int i = 0; i < list.size(); i++)
+        {
+            QString line = list.at(i);
+
+            if (line.mid(15, 2) == "of")
+            {
+                int mbdone  = line.mid(10, 5).trimmed().toInt();
+                int mbtotal = line.mid(17, 5).trimmed().toInt();
+
+                if (mbtotal > 0)
+                {
+                    progress->setProgress((mbdone * 100) / mbtotal);
+                }
+            }
+        }
+    }
+    else
+    {
+        buf = proc->ReadAllErr();
+
+        QTextStream text(buf);
+
+        while (!text.atEnd())
+        {
+            QString err = text.readLine();
+            if (err.contains("Drive needs to reload the media") ||
+                err.contains("Input/output error.") ||
+                err.contains("No disk / Wrong disk!"))
+            {
+                VERBOSE(VB_IMPORTANT, err);
+                proc->Term();
+            }
+        }
+    }
+}
+
+void Playlist::mkisofsData(int fd)
+{
+    if (!progress || !proc)
+        return;
+
+    QByteArray buf;
+    if (fd == 1) 
+        buf = proc->ReadAll();
+    else
+    {
+        buf = proc->ReadAllErr();
+
+        QTextStream text(buf);
+
+        while (!text.atEnd())
+        {
+	    QString line = text.readLine();
+	    if (line[6] == '%')
+	    {
+	        line = line.mid(0, 3);
+	        progress->setProgress(line.trimmed().toInt());
+	    }
+        }
+    }
+}
+
+void Playlist::processExit(uint retval)
+{
+    procExitVal = retval;
+}
+
 int Playlist::CreateCDMP3(void)
 {
     // Check & get global settings
@@ -1330,141 +1416,103 @@ int Playlist::CreateCDMP3(void)
 
     reclistfile.close();
 
-    MythProgressDialog *progress;
     progress = new MythProgressDialog(QObject::tr("Creating CD File System"),
                                       100);
     progress->setProgress(1);
 
-    QStringList args("mkisofs");
-    args += "-graft-points";
-    args += "-path-list";
-    args += tmprecordlist;
-    args += "-o";
-    args += tmprecordisofs;
-    args += "-J";
-    args += "-R";
+    QStringList args;
+    QString command;
 
-    VERBOSE(VB_GENERAL, "Running: " + args.join(" "));
+    command = "mkisofs";
+    args << "-graft-points";
+    args << "-path-list";
+    args << tmprecordlist;
+    args << "-o";
+    args << tmprecordisofs;
+    args << "-J";
+    args << "-R";
 
-    bool retval = 0;
+    uint flags = kMSRunShell | kMSStdErr | kMSBuffered |
+                 kMSDontDisableDrawing | kMSDontBlockInputDevs | 
+                 kMSRunBackground;
 
-    Q3Process isofs(args);
+    proc = new MythSystem(command, args, flags);
 
-    if (isofs.start())
-    {
-        while (1)
-        {
-            while (isofs.canReadLineStderr())
-            {
-                QString buf = isofs.readLineStderr();
-                if (buf[6] == '%')
-                {
-                    buf = buf.mid(0, 3);
-                    progress->setProgress(buf.trimmed().toInt());
-                }
-            }
-            if (isofs.isRunning())
-            {
-                qApp->processEvents();
-                usleep(100000);
-            }
-            else
-            {
-                if (!isofs.normalExit())
-                {
-                    VERBOSE(VB_IMPORTANT, "Unable to run 'mkisofs'");
-                    retval = 1;
-                }
-                break;
-            }
-        }
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, "Unable to run 'mkisofs'");
-        retval = 1;
-    }
+    connect(proc, SIGNAL(readDataReady(int)), this, SLOT(mkisofsData(int)), 
+            Qt::DirectConnection);
+    connect(proc, SIGNAL(finished()),         this, SLOT(processExit()), 
+            Qt::DirectConnection);
+    connect(proc, SIGNAL(error(uint)),        this, SLOT(processExit(uint)), 
+            Qt::DirectConnection);
+
+    procExitVal = GENERIC_EXIT_RUNNING;
+    proc->Run();
+
+    while( procExitVal == GENERIC_EXIT_RUNNING )
+        usleep( 100000 );
+
+    uint retval = procExitVal;
 
     progress->Close();
     progress->deleteLater();
+    proc->disconnect();
+    delete proc;
 
-    progress = new MythProgressDialog(QObject::tr("Burning CD"), 100);
-    progress->setProgress(2);
-
-    args = QStringList("cdrecord");
-    args += "-v";
-    //args += "-dummy";
-    args += "dev=";
-    args += scsidev;
-
-    if (writespeed.toInt() > 0)
+    if (retval)
     {
-        args += "-speed=";
-        args += writespeed;
-    }
-
-    args += "-data";
-    args += tmprecordisofs;
-
-    VERBOSE(VB_GENERAL, "Running: " + args.join(" "));
-
-    Q3Process burn(args);
-
-    if (burn.start())
-    {
-        while (1)
-        {
-            while (burn.canReadLineStderr())
-            {
-                QString err = burn.readLineStderr();
-                if (err == "cdrecord: Drive needs to reload the media" ||
-                    err == "cdrecord: Input/output error." ||
-                    err == "cdrecord: No disk / Wrong disk!")
-                {
-                    VERBOSE(VB_IMPORTANT, err);
-                    burn.kill();
-                    retval = 1;
-                }
-            }
-            while (burn.canReadLineStdout())
-            {
-                QString line = burn.readLineStdout();
-                if (line.mid(15, 2) == "of")
-                {
-                    int mbdone = line.mid(10, 5).trimmed().toInt();
-                    int mbtotal = line.mid(17, 5).trimmed().toInt();
-
-                    if (mbtotal > 0)
-                    {
-                        progress->setProgress((mbdone * 100) / mbtotal);
-                    }
-                }
-            }
-
-            if (burn.isRunning())
-            {
-                qApp->processEvents();
-                usleep(10000);
-            }
-            else
-            {
-                if (!burn.normalExit())
-                {
-                    VERBOSE(VB_IMPORTANT, "Unable to run 'cdrecord'");
-                    retval = 1;
-                }
-                break;
-            }
-        }
+        VERBOSE(VB_IMPORTANT, QString("Unable to run mkisofs: returns %1")
+                .arg(retval));
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "Unable to run 'cdrecord'");
-        retval = 1;
-    }
+        progress = new MythProgressDialog(QObject::tr("Burning CD"), 100);
+        progress->setProgress(2);
 
-    progress->Close();
-    progress->deleteLater();
+        command = "cdrecord";
+        args = QStringList();
+        args << "-v";
+        //args << "-dummy";
+        args << QString("dev=%1").arg(scsidev);
+
+        if (writespeed.toInt() > 0)
+        {
+            args << "-speed=";
+            args << writespeed;
+        }
+
+        args << "-data";
+        args << tmprecordisofs;
+
+        flags = kMSRunShell | kMSStdErr | kMSStdOut | kMSBuffered |
+                kMSDontDisableDrawing | kMSDontBlockInputDevs |
+                kMSRunBackground;
+
+        proc = new MythSystem(command, args, flags);
+        connect(proc, SIGNAL(readDataReady(int)), 
+                this, SLOT(cdrecordData(int)), Qt::DirectConnection);
+        connect(proc, SIGNAL(finished()),
+                this, SLOT(processExit()), Qt::DirectConnection);
+        connect(proc, SIGNAL(error(uint)),
+                this, SLOT(processExit(uint)), Qt::DirectConnection);
+        procExitVal = GENERIC_EXIT_RUNNING;
+        proc->Run();
+
+        while( procExitVal == GENERIC_EXIT_RUNNING )
+            usleep( 100000 );
+
+        retval = procExitVal;
+
+        progress->Close();
+        progress->deleteLater();
+        proc->disconnect();
+        delete proc;
+
+        if (retval)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Unable to run cdrecord: returns %1")
+                    .arg(retval));
+        }
+    }
 
     QFile::remove(tmprecordlist);
     QFile::remove(tmprecordisofs);

@@ -28,12 +28,8 @@ VideoSelector::VideoSelector(MythScreenStack *parent, QList<ArchiveItem *> *arch
               :MythScreenType(parent, "VideoSelector")
 {
     m_archiveList = archiveList;
-    m_currentParentalLevel = ParentalLevel::plNone;
+    m_currentParentalLevel = 1;
     m_videoList = NULL;
-
-    m_parentalLevelChecker = new ParentalLevelChangeChecker();
-    connect(m_parentalLevelChecker, SIGNAL(SigResultReady(bool, ParentalLevel::Level)),
-            this, SLOT(parentalLevelChanged(bool, ParentalLevel::Level)));
 }
 
 VideoSelector::~VideoSelector(void)
@@ -44,8 +40,6 @@ VideoSelector::~VideoSelector(void)
     while (!m_selectedList.isEmpty())
          delete m_selectedList.takeFirst();
     m_selectedList.clear();
-
-    delete m_parentalLevelChecker;
 }
 
 bool VideoSelector::Create(void)
@@ -92,8 +86,6 @@ bool VideoSelector::Create(void)
 
     SetFocusWidget(m_videoButtonList);
 
-    setParentalLevel(ParentalLevel::plLowest);
-
     updateSelectedList();
     updateVideoList();
 
@@ -120,19 +112,19 @@ bool VideoSelector::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "1")
         {
-            setParentalLevel(ParentalLevel::plLowest);
+            setParentalLevel(1);
         }
         else if (action == "2")
         {
-            setParentalLevel(ParentalLevel::plLow);
+            setParentalLevel(2);
         }
         else if (action == "3")
         {
-            setParentalLevel(ParentalLevel::plMedium);
+            setParentalLevel(3);
         }
         else if (action == "4")
         {
-            setParentalLevel(ParentalLevel::plHigh);
+            setParentalLevel(4);
         }
         else
             handled = false;
@@ -529,20 +521,79 @@ void VideoSelector::updateSelectedList()
     }
 }
 
-void VideoSelector::setParentalLevel(ParentalLevel::Level level)
+void VideoSelector::setParentalLevel(int which_level)
 {
-    m_parentalLevelChecker->Check(m_currentParentalLevel, level);
+    if (which_level < 1)
+        which_level = 1;
+
+    if (which_level > 4)
+        which_level = 4;
+
+    if ((which_level > m_currentParentalLevel) && !checkParentPassword())
+        which_level = m_currentParentalLevel;
+
+
+    if (m_currentParentalLevel != which_level)
+    {
+        m_currentParentalLevel = which_level;
+        updateVideoList();
+        m_plText->SetText(QString::number(which_level));
+    }
 }
 
-void VideoSelector::parentalLevelChanged(bool passwordValid, ParentalLevel::Level newLevel)
+bool VideoSelector::checkParentPassword()
 {
-    if (passwordValid)
+    QDateTime curr_time = QDateTime::currentDateTime();
+    QString last_time_stamp = gCoreContext->GetSetting("VideoPasswordTime");
+    QString password = gCoreContext->GetSetting("VideoAdminPassword");
+    if (password.length() < 1)
     {
-        m_currentParentalLevel = newLevel;
-        updateVideoList();
-        m_plText->SetText(QString::number(newLevel));
+        return true;
+    }
+
+    //  See if we recently (and succesfully) asked for a password
+    if (last_time_stamp.length() < 1)
+    {
+        //  Probably first time used
     }
     else
-        ShowOkPopup(tr("You need to enter a valid password for this parental level"));
+    {
+        QDateTime last_time = QDateTime::fromString(last_time_stamp,
+                                                    Qt::TextDate);
+        if (last_time.secsTo(curr_time) < 120)
+        {
+            //  Two minute window
+            last_time_stamp = curr_time.toString(Qt::TextDate);
+            gCoreContext->SetSetting("VideoPasswordTime", last_time_stamp);
+            gCoreContext->SaveSetting("VideoPasswordTime", last_time_stamp);
+            return true;
+        }
+    }
+
+    //  See if there is a password set
+    if (password.length() > 0)
+    {
+        bool ok = false;
+        MythPasswordDialog *pwd = new MythPasswordDialog(tr("Parental Pin:"),
+                &ok,
+                password,
+                GetMythMainWindow());
+        pwd->exec();
+        pwd->deleteLater();
+        if (ok)
+        {
+            //  All is good
+            last_time_stamp = curr_time.toString(Qt::TextDate);
+            gCoreContext->SetSetting("VideoPasswordTime", last_time_stamp);
+            gCoreContext->SaveSetting("VideoPasswordTime", last_time_stamp);
+            return true;
+        }
+    }
+    else
+    {
+        return true;
+    }
+
+    return false;
 }
 

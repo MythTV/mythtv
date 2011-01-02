@@ -586,20 +586,32 @@ int GameHandler::buildFileCount(QString directory, GameHandler *handler)
 
 void GameHandler::clearAllGameData(void)
 {
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *clearPopup = new MythDialogBox(tr("This will clear all game metadata "
-                            "from the database. Are you sure you "
-                            "want to do this?"), popupStack, "clearAllPopup");
+    QStringList buttonText;
+    buttonText += QObject::tr("No");
+    buttonText += QObject::tr("Yes");
 
-    if (clearPopup->Create())
+    DialogCode result = MythPopupBox::ShowButtonPopup(
+        GetMythMainWindow(),
+        QObject::tr("Are you sure?"),
+        QString(QObject::tr("This will clear all Game Meta Data\n"
+                            "from the database. Are you sure you\n"
+                            "want to do this?" )),
+        buttonText, kDialogCodeButton0);
+
+    switch (result)
     {
-        clearPopup->SetReturnEvent(this, "clearAllPopup");
-        clearPopup->AddButton(tr("No"));
-        clearPopup->AddButton(tr("Yes"));
-        popupStack->AddScreen(clearPopup);
-    }
-    else
-        delete clearPopup;
+        case kDialogCodeRejected:
+        case kDialogCodeButton0:
+        default:
+            // Do Nothing
+            break;
+        case kDialogCodeButton1:
+            MSqlQuery query(MSqlQuery::InitCon());
+            if (!query.exec("DELETE FROM gamemetadata;"))
+                MythDB::DBError("GameHandler::clearAllGameData - "
+                                "delete gamemetadata", query);
+            break;
+    };
 }
 
 void GameHandler::buildFileList(QString directory, GameHandler *handler,
@@ -938,25 +950,5 @@ void GameHandler::customEvent(QEvent *event)
                     break;
             };
         }
-        else if (resultid == "clearAllPopup")
-        {
-            int buttonNum = dce->GetResult();
-            switch (buttonNum)
-            {
-                case 1:
-                    clearAllMetadata();
-                    break;
-                default:
-                    break;
-            }
-        }
     }
-}
-
-void GameHandler::clearAllMetadata(void)
-{
-     MSqlQuery query(MSqlQuery::InitCon());
-     if (!query.exec("DELETE FROM gamemetadata;"))
-         MythDB::DBError("GameHandler::clearAllGameData - "
-                          "delete gamemetadata", query);
 }

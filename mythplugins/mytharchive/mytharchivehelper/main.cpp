@@ -59,6 +59,9 @@ using namespace std;
 #include <programinfo.h>
 #include <mythdirs.h>
 #include <mythconfig.h>
+#include <mythsystem.h>
+#include <util.h>
+
 extern "C" {
 #include <avcodec.h>
 #include <avformat.h>
@@ -91,11 +94,14 @@ NativeArchive::NativeArchive(void)
 {
     // create the lock file so the UI knows we're running
     QString tempDir = getTempDirectory();
-    QString command = QString("echo %1 > " + tempDir +
-                      "/logs/mythburn.lck").arg(getpid());
-    int res = system(qPrintable(command));
-    if (WIFEXITED(res) == 0)
+    QFile file(tempDir + "/logs/mythburn.lck");
+
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
         VERBOSE(VB_IMPORTANT, "NativeArchive: Failed to create lock file");
+
+    QString pid = QString("%1").arg(getpid());
+    file.write(pid.toAscii());
+    file.close();
 }
 
 NativeArchive::~NativeArchive(void)
@@ -198,10 +204,8 @@ static bool createISOImage(QString &sourceDirectory)
     QString command = mkisofs + " -R -J -V 'MythTV Archive' -o ";
     command += tempDirectory + "mythburn.iso " + sourceDirectory;
 
-    int res = system(qPrintable(command));
-    if (WIFEXITED(res))
-        res = WEXITSTATUS(res);
-    if (res != 0)
+    uint res = myth_system(command);
+    if (res != GENERIC_EXIT_OK)
     {
         VERBOSE(VB_JOBQUEUE, QString("ERROR: Failed while running mkisofs. Result: %1")
                 .arg(res));
@@ -256,15 +260,13 @@ static int burnISOImage(int mediaType, bool bEraseDVDRW, bool nativeFormat)
         }
     }
 
-    int res = system(qPrintable(command));
-    if (WIFEXITED(res))
-        res = WEXITSTATUS(res);
-    if (res == 0)
-        VERBOSE(VB_JOBQUEUE, "Finished burning ISO image");
-    else
+    uint res = myth_system(command);
+    if (res != GENERIC_EXIT_OK)
         VERBOSE(VB_JOBQUEUE,
                 QString("ERROR: Failed while running growisofs. Result: %1")
                 .arg(res));
+    else
+        VERBOSE(VB_JOBQUEUE, "Finished burning ISO image");
 
     return res;
 }
@@ -348,9 +350,13 @@ int NativeArchive::doNativeArchive(const QString &jobFile)
 
         saveDirectory += "work/";
 
-        int res = system(qPrintable("rm -fr " + saveDirectory + "*"));
-        if (!WIFEXITED(res) || WEXITSTATUS(res))
-            VERBOSE(VB_IMPORTANT, "NativeArchive: Failed to clear work directory");
+        QDir dir(saveDirectory);
+        if (dir.exists())
+        {
+            if (!RemoveDirectory(dir))
+                VERBOSE(VB_IMPORTANT, "NativeArchive: Failed to clear work directory");
+        }
+        dir.mkpath(saveDirectory);
     }
 
     VERBOSE(VB_JOBQUEUE, QString("Saving files to : %1").arg(saveDirectory));
@@ -445,7 +451,9 @@ int NativeArchive::exportRecording(QDomElement   &itemNode,
     // create the directory to hold this items files
     QDir dir(saveDirectory + title);
     if (!dir.exists())
-        dir.mkdir(saveDirectory + title);
+        dir.mkpath(saveDirectory + title);
+    if (!dir.exists())
+        VERBOSE(VB_IMPORTANT, strerror(errno));
 
     VERBOSE(VB_JOBQUEUE, "Creating xml file for " + title);
     QDomDocument doc("MYTHARCHIVEITEM");
@@ -1880,7 +1888,7 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
     unsigned char *outputbuf = new unsigned char[bufflen];
 
     int frameNo = -1, thumbCount = 0;
-    int frameFinished = 0;
+    int frameFinished;
     int keyFrame;
 
     while (av_read_frame(inputFC, &pkt) >= 0)
@@ -1893,7 +1901,7 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
                 thumbCount++;
 
                 avcodec_flush_buffers(codecCtx);
-                avcodec_decode_video2(codecCtx, frame, &frameFinished, &pkt);
+                avcodec_decode_video(codecCtx, frame, &frameFinished, pkt.data, pkt.size);
                 keyFrame = frame->key_frame;
 
                 while (!frameFinished || !keyFrame)
@@ -1905,7 +1913,7 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
                     if (pkt.stream_index == videostream)
                     {
                         frameNo++;
-                        avcodec_decode_video2(codecCtx, frame, &frameFinished, &pkt);
+                        avcodec_decode_video(codecCtx, frame, &frameFinished, pkt.data, pkt.size);
                         keyFrame = frame->key_frame;
                     }
                 }
@@ -1964,9 +1972,9 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
                                 if (pkt.stream_index == videostream)
                                 {
                                     frameNo++;
-                                    avcodec_decode_video2(codecCtx, frame,
+                                    avcodec_decode_video(codecCtx, frame,
                                                          &frameFinished,
-                                                         &pkt);
+                                                         pkt.data, pkt.size);
                                 }
                             }
                         }
@@ -2873,7 +2881,7 @@ int main(int argc, char **argv)
     else
         showUsage();
 
-    return res;
+    exit(res);
 }
 
 

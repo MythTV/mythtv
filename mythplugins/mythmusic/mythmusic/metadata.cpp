@@ -37,7 +37,7 @@ bool operator!=(const Metadata& a, const Metadata& b)
     return false;
 }
 
-static bool meta_less_than(const Metadata *item1, const Metadata *item2)
+bool meta_less_than(const Metadata *item1, const Metadata *item2)
 {
     return item1->compare(item2) < 0;
 }

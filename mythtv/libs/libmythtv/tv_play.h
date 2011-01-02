@@ -263,7 +263,6 @@ class MPUBLIC TV : public QObject
     static bool StartTV(ProgramInfo *tvrec = NULL,
                         uint flags = kStartTVNoFlags);
     static void SetFuncPtr(const char *, void *);
-    static int  ConfiguredTunerCards(void);
 
     // Used by EPG
     void ChangeVolume(PlayerContext*, bool up);

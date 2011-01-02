@@ -881,7 +881,6 @@
         <textarea name="message" from="basetextarea">
             <area>170,20,390,126</area>
             <align>allcenter</align>
-            <multiline>yes</multiline>
         </textarea>
     </window>
 

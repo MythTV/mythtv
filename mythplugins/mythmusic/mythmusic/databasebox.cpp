@@ -19,6 +19,8 @@ using namespace std;
 #include <uitypes.h>
 #include <uilistbtntype.h>
 #include <mythmediamonitor.h>
+#include <mythsystem.h>
+#include <exitcodes.h>
 
 // mythmusic
 #include "metadata.h"
@@ -43,6 +45,7 @@ DatabaseBox::DatabaseBox(MythMainWindow *parent,
     {
         VERBOSE(VB_IMPORTANT, "We are not going to get very far with a null "
                 "pointer to metadata");
+	// TODO: is this OK?
         exit(0);
     }
 
@@ -438,15 +441,11 @@ void DatabaseBox::BlankCDRW()
 
     record_progress->setProgress(1);
 
-    QString cmd = QString("cdrecord -v  dev= %1 -blank=%2")
+    QString cmd = QString("cdrecord -v dev=%1 -blank=%2")
         .arg(scsidev).arg(blanktype);
+    uint flags = kMSRunShell | kMSDontBlockInputDevs | kMSDontDisableDrawing;
 
-    VERBOSE(VB_GENERAL, QString("DatabaseBox::BlankCDRW()") +
-            QString(" cmd: '%1'").arg(cmd));
-
-    QByteArray command = cmd.toAscii();
-    errno = 0;
-    if (system(command.constData()) < 0 && errno)
+    if (myth_system(cmd, flags) != GENERIC_EXIT_OK)
     {
         VERBOSE(VB_IMPORTANT, QString("DatabaseBox::BlankCDRW()") +
                 QString(" cmd: '%1' Failed!").arg(cmd));

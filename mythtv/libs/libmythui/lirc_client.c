@@ -1,5 +1,6 @@
 /* NOTE: Extracted from LIRC release 0.8.4a -- dtk */
 /*       Updated to LIRC release 0.8.6 */
+/* Modified to use myth_system -- Gavin Hurlbut */
 
 /****************************************************************************
  ** lirc_client.c ***********************************************************
@@ -31,6 +32,7 @@
 #include <sys/wait.h>
 
 #include "lirc_client.h"
+#include "mythsystem.h"
 
 
 /* internal defines */
@@ -865,7 +867,7 @@ int lirc_readconfig(const struct lirc_state *state,
 	char *sha_bang, *filename;
 	const char *sha_bang2;
 	char *command;
-	int ret;
+	unsigned int ret;
 	
 	filename = NULL;
 	sha_bang = NULL;
@@ -925,10 +927,10 @@ int lirc_readconfig(const struct lirc_state *state,
 	strcat(command, " ");
 	strcat(command, filename);
 	
-	ret=system(command);
+	ret = myth_system_c(command, kMSNone, 0);
 	free(command);
 	
-	if(ret==-1 || WEXITSTATUS(ret)!=EXIT_SUCCESS)
+	if(ret!=EXIT_SUCCESS)
 	{
 		goto lirc_readconfig_compat;
 	}

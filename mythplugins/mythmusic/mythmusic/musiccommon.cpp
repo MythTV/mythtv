@@ -235,7 +235,7 @@ bool MusicCommon::CreateCommon(void)
 #endif
 
     m_controlVolume = gCoreContext->GetNumSetting("MythControlsVolume");
-    updateVolume();
+    updateVolume(gPlayer->getVolume(), gPlayer->isMuted());
 
     if (m_movingTracksState)
         m_movingTracksState->DisplayState("off");
@@ -263,7 +263,6 @@ bool MusicCommon::CreateCommon(void)
 
 void MusicCommon::switchView(int view)
 {
-    (void) view;
 #if 0
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -592,7 +591,6 @@ void MusicCommon::showVolume(void)
 
 void MusicCommon::showSpeed(bool show)
 {
-    (void) show;
 #if 0
     if (speed_status)
     {
@@ -1111,13 +1109,17 @@ void MusicCommon::customEvent(QEvent *event)
     }
     else if (event->type() == MusicPlayerEvent::VolumeChangeEvent)
     {
-        updateVolume();
+        MusicPlayerEvent *mpe = (MusicPlayerEvent*)(event);
+        updateVolume(mpe->Volume, mpe->IsMuted);
     }
     else if (event->type() == MusicPlayerEvent::TrackRemovedEvent)
     {
         //FIXME should just remove the list item
         if (m_currentPlaylist)
         {
+            MusicPlayerEvent *mpe = (MusicPlayerEvent*)(event);
+//            int trackID = mpe->TrackID;
+            // FIXME: should restore track position
             int pos = m_currentPlaylist->GetCurrentPos();
             int topPos = m_currentPlaylist->GetTopItemPos();
             updateUIPlaylist();
@@ -1130,6 +1132,8 @@ void MusicCommon::customEvent(QEvent *event)
     {
         if (m_currentPlaylist)
         {
+            MusicPlayerEvent *mpe = (MusicPlayerEvent*)(event);
+//            int trackID = mpe->TrackID;
             int pos = m_currentPlaylist->GetCurrentPos();
             int topPos = m_currentPlaylist->GetTopItemPos();
             updateUIPlaylist();
@@ -1140,6 +1144,7 @@ void MusicCommon::customEvent(QEvent *event)
     }
     else if (event->type() == MusicPlayerEvent::AllTracksRemovedEvent)
     {
+        MusicPlayerEvent *mpe = (MusicPlayerEvent*)(event);
         updateUIPlaylist();
         updatePlaylistStats();
     }
@@ -1168,7 +1173,7 @@ void MusicCommon::customEvent(QEvent *event)
     }
 }
 
-void MusicCommon::updateVolume(void)
+void MusicCommon::updateVolume(uint volume, bool muted)
 {
     if (!m_controlVolume)
     {
@@ -1190,14 +1195,12 @@ void MusicCommon::updateVolume(void)
 
     if (m_muteState)
     {
-        bool muted = gPlayer->isMuted();
         m_muteState->DisplayState(muted ? "on" : "off");
     }
 }
 
 void MusicCommon::editTrackInfo(Metadata *mdata)
 {
-    (void) mdata;
 #if 0
     if (!mdata)
         return;
@@ -1522,6 +1525,11 @@ bool MythMusicVolumeDialog::keyPressEvent(QKeyEvent *event)
     m_displayTimer->start(MUSICVOLUMEPOPUPTIME);
 
     return handled;
+}
+
+void MythMusicVolumeDialog::customEvent(QEvent *event)
+{
+
 }
 
 void MythMusicVolumeDialog::increaseVolume(void)

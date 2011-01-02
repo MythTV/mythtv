@@ -13275,7 +13275,7 @@ Il se peut que vous deviez utiliser le bouton d&apos;éjection sur le lecteur.</
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="364"/>
         <source>7.1</source>
         <translatorcomment>7.1</translatorcomment>
-        <translation>7.1</translation>
+        <translation>0 % {7.1?}</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="380"/>

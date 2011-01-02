@@ -192,14 +192,8 @@ static int unlockShutdown()
  */
 static bool isRunning(const char *program)
 {
-    QString sCommand = QString("ret=`ps cax | grep -c %1`; exit $ret")
-        .arg(program);
-    QByteArray aCommand = sCommand.toAscii();
-    int res = system(aCommand.constData());
-    if (WIFEXITED(res))
-        res = WEXITSTATUS(res);
-
-    return res;
+    QString command = QString("ps ch -C %1 -o pid > /dev/null").arg(program);
+    return (myth_system(command) == GENERIC_EXIT_OK);
 }
 
 static QDateTime getDailyWakeupTime(QString sPeriod)
@@ -627,8 +621,6 @@ static int shutdown()
                     + nvramCommand);
 
             shutdownmode = myth_system(nvramCommand);
-            if (WIFEXITED(shutdownmode))
-                shutdownmode = WEXITSTATUS(shutdownmode);
 
             VERBOSE(VB_IMPORTANT, (nvramCommand + " exited with code %2")
                                   .arg(shutdownmode));

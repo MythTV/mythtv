@@ -50,7 +50,7 @@ ChannelBase::ChannelBase(TVRec *parent)
     :
     m_pParent(parent), m_curchannelname(""),
     m_currentInputID(-1), m_commfree(false), m_cardid(0),
-    m_abort_change(false), m_changer_pid(-1)
+    m_abort_change(false), m_changer(NULL)
 {
     m_tuneStatus = changeUnknown;
     m_tuneThread.tuner = this;
@@ -60,6 +60,8 @@ ChannelBase::~ChannelBase(void)
 {
     ClearInputMap();
     TeardownAll();
+    if( m_changer )
+        delete m_changer;
 }
 
 void ChannelBase::TeardownAll(void)
@@ -68,9 +70,9 @@ void ChannelBase::TeardownAll(void)
     {
         m_thread_lock.lock();
         m_abort_change = true;
-#ifndef USING_MINGW
-        myth_system_abort(m_changer_pid);
-#endif
+	if( m_changer )
+            m_changer->Term(true);
+        
         m_tuneCond.wakeAll();
         m_thread_lock.unlock();
         m_tuneThread.wait();
@@ -725,12 +727,11 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
     uint  flags = kMSNone;
     uint result;
 
-    // Use myth_system, but since we need abort support, do it in pieces
-    myth_system_pre_flags(flags);
-    m_changer_pid = myth_system_fork(command, result); 
-    if( result == GENERIC_EXIT_RUNNING )
-        result = myth_system_wait(m_changer_pid, 30);
-    myth_system_post_flags(flags);
+    // This is being done using the class rather than the myth_system wrapper
+    // to accomodate use of Term in TeardownAll
+    m_changer = new MythSystem(command, flags);
+    m_changer->Run(30);
+    result = m_changer->Wait();
 
     return( result == 0 );
 #endif // !USING_MINGW

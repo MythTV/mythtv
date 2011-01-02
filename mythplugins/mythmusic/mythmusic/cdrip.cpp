@@ -43,6 +43,7 @@ using namespace std;
 #include <mythuibutton.h>
 #include <mythuiprogressbar.h>
 #include <mythuibuttonlist.h>
+#include <mythsystem.h>
 
 // MythUI headers
 #include <mythtv/libmythui/mythscreenstack.h>
@@ -326,22 +327,7 @@ void CDRipperThread::run(void)
     QString PostRipCDScript = gCoreContext->GetSetting("PostCDRipScript");
 
     if (!PostRipCDScript.isEmpty())
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("PostCDRipScript: %1").arg(PostRipCDScript));
-        pid_t child = fork();
-        if (child < 0)
-        {
-            perror("fork");
-        }
-        else if (child == 0)
-        {
-            QByteArray script = PostRipCDScript.toAscii();
-            execl("/bin/sh", "sh", "-c", script.constData(), NULL);
-            perror("exec");
-            _exit(1);
-        }
-    }
+	myth_system(PostRipCDScript);
 
     QApplication::postEvent(
         m_parent, new RipStatusEvent(RipStatusEvent::kFinishedEvent, ""));

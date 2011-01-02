@@ -76,6 +76,20 @@ static void my_av_print(void *ptr, int level, const char* fmt, va_list vl)
     }
 }
 
+static void DEBUGpts(Q3PtrList<MPEG2frame> *vFrame)
+{
+    int pos = vFrame->at();
+    for (vFrame->first(); vFrame->current(); vFrame->next())
+    {
+        int type = vFrame->current()->mpeg2_pic.flags & PIC_MASK_CODING_TYPE;
+        VERBOSE(MPF_IMPORTANT, QString("%1 %2 #%3 %4")
+               .arg(vFrame->at() == pos ? "->" : "  ").arg(type)
+               .arg(vFrame->current()->mpeg2_pic.temporal_reference)
+               .arg(vFrame->current()->pkt.pts));
+    }
+    vFrame->at(pos);
+}
+
 static QString PtsTime(int64_t pts)
 {
     bool is_neg = false;

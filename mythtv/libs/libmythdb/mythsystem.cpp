@@ -1,9 +1,9 @@
 
-// Own header
-#include "mythsystem.h"
-
 // compat header
 #include "compat.h"
+
+// Own header
+#include "mythsystem.h"
 
 // C++/C headers
 #include <cerrno>
@@ -12,29 +12,15 @@
 #include <fcntl.h>
 #include <time.h>
 #include <signal.h>  // for kill()
+#include <string.h>
 
 // QT headers
 #include <QCoreApplication>
 #include <QThread>
 #include <QMutex>
-#include <QSemaphore>
 #include <QMap>
-
-# ifdef linux
-#   include <sys/vfs.h>
-#   include <sys/statvfs.h>
-#   include <sys/sysinfo.h>
-# else
-#   ifdef __FreeBSD__
-#     include <sys/mount.h>
-#   endif
-#   if CONFIG_CYGWIN
-#     include <sys/statfs.h>
-#   endif
-#   ifndef _WIN32
-#     include <sys/sysctl.h>
-#   endif
-# endif
+#include <QString>
+#include <QStringList>
 
 // libmythdb headers
 #include "mythcorecontext.h"
@@ -42,296 +28,281 @@
 #include "mythverbose.h"
 #include "exitcodes.h"
 
-#ifndef USING_MINGW
-typedef struct {
-    QSemaphore ready;
-    uint    result;
-    time_t  timeout;
-    bool    background;
-} PidData_t;
+#if CONFIG_CYGWIN || defined(_WIN32)
+#include "system-windows.h"
+#else
+#include "system-unix.h"
+#endif
 
-typedef QMap<pid_t, PidData_t *> PidMap_t;
 
-class MythSystemReaper : public QThread
+/*******************************
+ * MythSystem method defines
+ ******************************/
+
+void MythSystem::initializePrivate(void)
 {
-    public:
-        void run(void);
-        uint waitPid( pid_t pid, time_t timeout, bool background = false,
-                      bool processEvents = true );
-        uint abortPid( pid_t pid );
-    private:
-        PidMap_t    m_pidMap;
-        QMutex      m_mapLock;
-};
+#if CONFIG_CYGWIN || defined(_WIN32)
+    d = new MythSystemWindows(this);
+#else
+    d = new MythSystemUnix(this);
+#endif
+}
 
-static class MythSystemReaper *reaper = NULL;
-
-void MythSystemReaper::run(void)
+MythSystem::MythSystem(const QString &command, uint flags)
 {
-    VERBOSE(VB_GENERAL | VB_EXTRA, "Starting reaper thread");
+    m_semReady.release(1);  // initialize
+    initializePrivate();
+    SetCommand(command, flags);
+}
 
-    // gCoreContext is set to NULL during shutdown, and we need this thread to
-    // exit during shutdown.
-    while( gCoreContext ) {
-        usleep(100000);
+/** \fn MythSystem::setCommand(const QString &command) 
+ *  \brief Resets an existing MythSystem object to a new command
+ */
+void MythSystem::SetCommand(const QString &command, uint flags)
+{
+    SetCommand(command, QStringList(), flags | kMSRunShell);
+}
 
-        time_t              now = time(NULL);
-        PidMap_t::iterator  i, next;
-        PidData_t          *pidData;
-        pid_t               pid;
-        int                 count;
 
-        m_mapLock.lock();
-        count = m_pidMap.size();
-        if( !count )
+MythSystem::MythSystem(const QString &command, 
+                       const QStringList &args, uint flags)
+{
+    m_semReady.release(1);  // initialize
+    initializePrivate();
+    SetCommand(command, args, flags);
+}
+
+/** \fn MythSystem::setCommand(const QString &command, 
+                               const QStringList &args)
+ *  \brief Resets an existing MythSystem object to a new command
+ */
+void MythSystem::SetCommand(const QString &command, 
+                            const QStringList &args, uint flags)
+{
+    m_status = GENERIC_EXIT_START;
+    m_command = QString(command).trimmed();
+    m_args = QStringList(args);
+
+    ProcessFlags(flags);
+
+    // check for execute rights
+    if (!GetSetting("UseShell") && !access(command.toUtf8().constData(), X_OK))
+        m_status = GENERIC_EXIT_CMD_NOT_FOUND;
+
+    m_logcmd = (m_command + " " + m_args.join(" ")).trimmed();
+
+    if( GetSetting("AnonLog") )
+    {
+        m_logcmd.truncate(m_logcmd.indexOf(" "));
+        m_logcmd.append(" (anonymized)");
+    }
+}
+
+
+MythSystem::MythSystem(const MythSystem &other) :
+    d(other.d),
+    m_status(other.m_status),
+
+    m_command(other.m_command),
+    m_logcmd(other.m_logcmd),
+    m_args(other.m_args),
+    m_directory(other.m_directory),
+
+    m_settings(other.m_settings)
+{
+    m_semReady.release(other.m_semReady.available());
+}
+
+// QBuffers may also need freeing
+MythSystem::~MythSystem(void)
+{
+    delete d;
+}
+
+
+void MythSystem::SetDirectory(const QString &directory)
+{
+    m_settings["SetDirectory"] = true;
+    m_directory = QString(directory);
+}
+
+/** \fn MythSystem::Run()
+ *  \brief Runs a command inside the /bin/sh shell. Returns immediately
+ */
+void MythSystem::Run(time_t timeout)
+{
+    if( !d )
+        m_status = GENERIC_EXIT_NO_HANDLER;
+
+    if( GetStatus() != GENERIC_EXIT_START )
+    {
+        emit error(GetStatus());
+        return;
+    }
+
+    // Handle any locking of drawing, etc
+    HandlePreRun();
+
+    d->Fork(timeout);
+
+    m_semReady.acquire(1);
+    emit started();
+    d->Manage();
+}
+
+// should there be a separate 'getstatus' call? or is using
+// Wait() for that purpose sufficient?
+uint MythSystem::Wait(time_t timeout)
+{
+    if( !d )
+        m_status = GENERIC_EXIT_NO_HANDLER;
+
+    if( (GetStatus() != GENERIC_EXIT_RUNNING) || GetSetting("RunInBackground") )
+        return GetStatus();
+
+    if( GetSetting("ProcessEvents") )
+    {
+        if( timeout > 0 )
+            timeout += time(NULL);
+
+        while( !timeout || time(NULL) < timeout )
         {
-            m_mapLock.unlock();
-            continue;
+            // loop until timeout hits or process ends
+            if( m_semReady.tryAcquire(1,100) )
+            {
+                m_semReady.release(1);
+                break;
+            }
+
+            qApp->processEvents();
         }
-
-        for( i = m_pidMap.begin(); i != m_pidMap.end(); i = next )
+    }
+    else
+    {
+        if( timeout > 0 )
         {
-            next    = i + 1;
-            pidData = i.value();
-            if( pidData->timeout == 0 || pidData->timeout > now )
-                continue;
-
-            // Timed out
-            pid = i.key();
-
-            next = m_pidMap.erase(i);
-            pidData->result = GENERIC_EXIT_TIMEOUT;
-            VERBOSE(VB_GENERAL | VB_EXTRA, 
-                QString("Child PID %1 timed out, killing")
-                .arg(pid));
-            kill(pid, SIGTERM);
-            usleep(500);
-            kill(pid, SIGKILL);
-            pidData->ready.release(1);
-        }
-        count = m_pidMap.size();
-        m_mapLock.unlock();
-
-        if (!count)
-            continue;
-
-        /* There's at least one child to wait on */
-        int         status;
-
-        pid = waitpid(-1, &status, WNOHANG);
-        if (pid <= 0)
-        {
-            if (pid < 0)
-                VERBOSE(VB_GENERAL | VB_EXTRA, 
-                    QString("waitpid() failed because %1")
-                    .arg(strerror(errno)));
-            continue;
-        }
-
-        m_mapLock.lock();
-        if (!m_pidMap.contains(pid))
-        {
-            VERBOSE(VB_GENERAL | VB_EXTRA, 
-                QString("Child PID %1 not found in map!")
-                .arg(pid));
-            m_mapLock.unlock();
-            continue;
-        }
-
-        pidData = m_pidMap.value(pid);
-        m_pidMap.remove(pid);
-        m_mapLock.unlock();
-
-        if( WIFEXITED(status) )
-        {
-            pidData->result = WEXITSTATUS(status);
-            VERBOSE(VB_GENERAL | VB_EXTRA, 
-                QString("PID %1: exited: status=%2, result=%3")
-                .arg(pid) .arg(status) .arg(pidData->result));
-        }
-        else if( WIFSIGNALED(status) )
-        {
-            pidData->result = GENERIC_EXIT_SIGNALLED;
-            VERBOSE(VB_GENERAL | VB_EXTRA, 
-                QString("PID %1: signal: status=%2, result=%3, signal=%4")
-                .arg(pid) .arg(status) .arg(pidData->result) 
-                .arg(WTERMSIG(status)));
+            if( m_semReady.tryAcquire(1, timeout*1000) )
+                m_semReady.release(1);
         }
         else
         {
-            pidData->result = GENERIC_EXIT_NOT_OK;
-            VERBOSE(VB_GENERAL | VB_EXTRA, 
-                QString("PID %1: other: status=%2, result=%3")
-                .arg(pid) .arg(status) .arg(pidData->result));
+            m_semReady.acquire(1);
+            m_semReady.release(1);
         }
-
-        if( pidData->background )
-            delete pidData;
-        else 
-            pidData->ready.release(1);
     }
+    return GetStatus();
 }
 
-uint MythSystemReaper::waitPid( pid_t pid, time_t timeout, bool background,
-                                bool processEvents )
+void MythSystem::Term(bool force)
 {
-    PidData_t  *pidData = new PidData_t;
-    uint        result;
+    if( !d )
+        m_status = GENERIC_EXIT_NO_HANDLER;
 
-    pidData->ready.release(1);  // Initialize 
+    if( m_status != GENERIC_EXIT_RUNNING )
+        return;
 
-    if( timeout > 0 )
-        pidData->timeout = time(NULL) + timeout;
-    else
-        pidData->timeout = 0;
-
-    pidData->background = background;
-
-    pidData->ready.acquire(1);
-    m_mapLock.lock();
-    m_pidMap.insert( pid, pidData );
-    m_mapLock.unlock();
-
-    if( !background ) {
-        /* Now we wait for the thread to see the SIGCHLD */
-        while( !pidData->ready.tryAcquire(1,100) )
-            if (processEvents)
-                qApp->processEvents();
-
-        result = pidData->result;
-        delete pidData;
-
-        return( result );
-    }
-
-    /* We are running in the background, the reaper will still catch the 
-       child */
-    return( GENERIC_EXIT_OK );
+    d->Term(force);
 }
 
-uint MythSystemReaper::abortPid( pid_t pid )
+void MythSystem::Signal( int sig )
 {
-    PidData_t  *pidData;
-    uint        result;
+    if( !d )
+        m_status = GENERIC_EXIT_NO_HANDLER;
 
-    m_mapLock.lock();
-    if (!m_pidMap.contains(pid))
-    {
-        VERBOSE(VB_GENERAL | VB_EXTRA, QString("Child PID %1 not found in map!")
-            .arg(pid));
-        m_mapLock.unlock();
-        return GENERIC_EXIT_NOT_OK;
-    }
+    if( m_status != GENERIC_EXIT_RUNNING )
+        return;
 
-    pidData = m_pidMap.value(pid);
-    m_pidMap.remove(pid);
-    m_mapLock.unlock();
-
-    delete pidData;
-
-    VERBOSE(VB_GENERAL | VB_EXTRA, 
-        QString("Child PID %1 aborted, killing") .arg(pid));
-    kill(pid, SIGTERM);
-    usleep(500);
-    kill(pid, SIGKILL);
-    result = GENERIC_EXIT_ABORTED;
-    return( result );
-}
-#endif
-
-
-
-/** \fn myth_system(const QString&, uint, uint)
- *  \brief Runs a system command inside the /bin/sh shell.
- *
- *  Note: Returns GENERIC_EXIT_NOT_OK if it cannot execute the command.
- *  \return Exit value from command as an unsigned int in range [0,255].
- */
-uint myth_system(const QString &command, uint flags, uint timeout)
-{
-    uint            result;
-
-    if( !(flags & kMSRunBackground) && command.endsWith("&") )
-    {
-        VERBOSE(VB_GENERAL | VB_EXTRA, "Adding background flag");
-        flags |= kMSRunBackground;
-    }
-
-    myth_system_pre_flags( flags );
-
-#ifndef USING_MINGW
-    pid_t   pid;
-
-    pid    = myth_system_fork( command, result );
-
-    if( result == GENERIC_EXIT_RUNNING )
-        result = myth_system_wait( pid, timeout, (flags & kMSRunBackground),
-                                   (flags & kMSProcessEvents) );
-#else
-    STARTUPINFO si;
-    PROCESS_INFORMATION pi;
-    QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(command);
-
-    memset(&si, 0, sizeof(si));
-    memset(&pi, 0, sizeof(pi));
-    si.cb = sizeof(si);
-    QString cmd = QString("cmd.exe /c %1").arg(command);
-    if (!::CreateProcessA(NULL, cmd.toUtf8().data(), NULL, NULL,
-                          FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
-    {
-        VERBOSE(VB_GENERAL | VB_EXTRA, 
-                (LOC_ERR + "CreateProcess() failed because %1")
-                .arg(::GetLastError()));
-        result = MYTHSYSTEM__EXIT__EXECL_ERROR;
-    }
-    else
-    {
-        if (::WaitForSingleObject(pi.hProcess, INFINITE) == WAIT_FAILED)
-            VERBOSE(VB_GENERAL | VB_EXTRA,
-                    (LOC_ERR + "WaitForSingleObject() failed because %1")
-                    .arg(::GetLastError()));
-        DWORD exitcode = GENERIC_EXIT_OK;
-        if (!GetExitCodeProcess(pi.hProcess, &exitcode))
-            VERBOSE(VB_GENERAL | VB_EXTRA, 
-                    (LOC_ERR + "GetExitCodeProcess() failed because %1")
-                    .arg(::GetLastError()));
-        CloseHandle(pi.hProcess);
-        CloseHandle(pi.hThread);
-        result = exitcode;
-    }
-#endif
-
-    myth_system_post_flags( flags );
-
-    return result;
+    d->Signal(sig);
 }
 
 
-void myth_system_pre_flags(uint &flags)
+void MythSystem::ProcessFlags(uint flags)
 {
-    bool isInUi = gCoreContext->HasGUI() && gCoreContext->IsUIThread();
-    if( isInUi )
+    if( m_status != GENERIC_EXIT_START )
     {
-        flags |= kMSInUi;
-    }
-    else
-    {
-        // These locks only happen in the UI, and only if the flags are cleared
-        // so as we are not in the UI, set the flags to simplify logic further
-        // down
-        flags &= ~kMSInUi;
-        flags |= kMSDontBlockInputDevs;
-        flags |= kMSDontDisableDrawing;
-        flags &= ~kMSProcessEvents;
+        VERBOSE(VB_IMPORTANT, QString("status: %1").arg(m_status));
+        return;
     }
 
-    if (flags & kMSRunBackground )
-        flags &= ~kMSProcessEvents;
+    if( flags & kMSRunBackground )
+        m_settings["RunInBackground"] = true;
 
+    if( m_command.endsWith("&") )
+    {
+        if (!GetSetting("RunInBackground"))
+            VERBOSE(VB_GENERAL, "Adding background flag");
+
+        // Remove the &
+        m_command.chop(1);
+        m_command = m_command.trimmed();
+        m_settings["RunInBackground"] = true;
+        m_settings["UseShell"]        = true;
+    }
+
+    m_settings["IsInUI"] = gCoreContext->HasGUI() && gCoreContext->IsUIThread();
+    if( GetSetting("IsInUI") )
+    {
+        // Check for UI-only locks
+        m_settings["BlockInputDevs"] = !(flags & kMSDontBlockInputDevs);
+        m_settings["DisableDrawing"] = !(flags & kMSDontDisableDrawing);
+        m_settings["ProcessEvents"]  = flags & kMSProcessEvents;
+    }
+
+    if( flags & kMSStdIn )
+        m_settings["UseStdin"] = true;
+    if( flags & kMSStdOut )
+        m_settings["UseStdout"] = true;
+    if( flags & kMSStdErr )
+        m_settings["UseStderr"] = true;
+    if( flags & kMSRunShell )
+        m_settings["UseShell"] = true;
+    if( flags & kMSNoRunShell ) // override for use with myth_system
+        m_settings["UseShell"] = false;
+    if( flags & kMSAbortOnJump )
+        m_settings["AbortOnJump"] = true;
+    if( flags & kMSSetPGID )
+        m_settings["SetPGID"] = true;
+    if( flags & kMSAutoCleanup && GetSetting("RunInBackground") )
+        m_settings["AutoCleanup"] = true;
+    if( flags & kMSAnonLog )
+        m_settings["AnonLog"] = true;
+}
+
+QByteArray  MythSystem::Read(int size)
+{ 
+    return m_stdbuff[1].read(size); 
+}
+
+QByteArray  MythSystem::ReadErr(int size)
+{ 
+    return m_stdbuff[2].read(size); 
+}
+
+QByteArray& MythSystem::ReadAll()
+{
+    return m_stdbuff[1].buffer();
+}
+
+QByteArray& MythSystem::ReadAllErr()
+{
+    return m_stdbuff[2].buffer();
+}
+
+int MythSystem::Write(const QByteArray &ba)
+{
+    if (!GetSetting("UseStdin"))
+        return 0;
+
+    m_stdbuff[0].buffer().append(ba.constData());
+    return ba.size();
+}
+
+void MythSystem::HandlePreRun()
+{
     // This needs to be a send event so that the MythUI locks the input devices
     // immediately instead of after existing events are processed
     // since this function could be called inside one of those events.
-    if( !(flags & kMSDontBlockInputDevs) )
+    if( GetSetting("BlockInputDevs") )
     {
         QEvent event(MythEvent::kLockInputDevicesEventType);
         QCoreApplication::sendEvent(gCoreContext->GetGUIObject(), &event);
@@ -340,135 +311,66 @@ void myth_system_pre_flags(uint &flags)
     // This needs to be a send event so that the MythUI m_drawState change is
     // flagged immediately instead of after existing events are processed
     // since this function could be called inside one of those events.
-    if( !(flags & kMSDontDisableDrawing) )
+    if( GetSetting("DisableDrawing") )
     {
         QEvent event(MythEvent::kPushDisableDrawingEventType);
         QCoreApplication::sendEvent(gCoreContext->GetGUIObject(), &event);
     }
 }
 
-void myth_system_post_flags(uint &flags)
+void MythSystem::HandlePostRun()
 {
-    // This needs to be a send event so that the MythUI m_drawState change is
-    // flagged immediately instead of after existing events are processed
-    // since this function could be called inside one of those events.
-    if( !(flags & kMSDontDisableDrawing) )
+    // Since this is *not* running in the UI thread (but rather the signal
+    // handler thread), we need to use postEvents
+    if( GetSetting("DisableDrawing") )
     {
-        QEvent event(MythEvent::kPopDisableDrawingEventType);
-        QCoreApplication::sendEvent(gCoreContext->GetGUIObject(), &event);
+        QEvent *event = new QEvent(MythEvent::kPopDisableDrawingEventType);
+        QCoreApplication::postEvent(gCoreContext->GetGUIObject(), event);
     }
 
     // This needs to be a post event so that the MythUI unlocks input devices
     // after all existing (blocked) events are processed and ignored.
-    if( !(flags & kMSDontBlockInputDevs) )
+    if( GetSetting("BlockInputDevs") )
     {
         QEvent *event = new QEvent(MythEvent::kUnlockInputDevicesEventType);
         QCoreApplication::postEvent(gCoreContext->GetGUIObject(), event);
     }
 }
 
-
-#ifndef USING_MINGW
-#define MAX_BUFLEN 1024
-pid_t myth_system_fork(const QString &command, uint &result)
+void MythSystem::JumpAbort(void)
 {
-    char cmdargs[MAX_BUFLEN];
-    strncpy(cmdargs, command.toUtf8().constData(), MAX_BUFLEN);
-    cmdargs[MAX_BUFLEN-1] = '\0';
+    if (!d)
+        return;
 
-    QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(cmdargs);
-
-    char locerr[MAX_BUFLEN];
-    strncpy(locerr, (const char *)LOC_ERR.constData(), MAX_BUFLEN);
-    locerr[MAX_BUFLEN-1] = '\0';
-
-    VERBOSE(VB_GENERAL | VB_EXTRA, QString("Launching: %1") .arg(cmdargs));
-
-    pid_t child = fork();
-
-    if (child < 0)
-    {
-        /* Fork failed, still in parent */
-        VERBOSE(VB_GENERAL | VB_EXTRA, (LOC_ERR + "fork() failed because %1")
-                .arg(strerror(errno)));
-        result = GENERIC_EXIT_NOT_OK;
-        return -1;
-    }
-    else if (child == 0)
-    {
-        /* Child - NOTE: it is not safe to use VERBOSE between the fork and
-         * execl calls in the child.  It causes occasional locking issues that
-         * cause deadlocked child processes. */
-
-        /* Close all open file descriptors except stdout/stderr */
-        for (int i = sysconf(_SC_OPEN_MAX) - 1; i > 2; i--)
-            close(i);
-
-        /* Try to attach stdin to /dev/null */
-        int fd = open("/dev/null", O_RDONLY);
-        if (fd >= 0)
-        {
-            // Note: dup2() will close old stdin descriptor.
-            if (dup2(fd, 0) < 0)
-            {
-                // Can't use VERBOSE due to locking fun.
-                cerr << locerr 
-                     << "Cannot redirect /dev/null to standard input,"
-                        "\n\t\t\tfailed to duplicate file descriptor: "
-                     << strerror(errno) << endl;
-            }
-            close(fd);
-        }
-        else
-        {
-            // Can't use VERBOSE due to locking fun.
-            cerr << locerr 
-                 << "Cannot redirect /dev/null to standard input, failed to "
-                    "open: " << strerror(errno) << endl;
-        }
-
-        /* Run command */
-        execl("/bin/sh", "sh", "-c", cmdargs, (char *)0);
-        if (errno)
-        {
-            // Can't use VERBOSE due to locking fun.
-            cerr << locerr << "execl() failed: " << strerror(errno) << endl;
-        }
-
-        /* Failed to exec */
-        _exit(MYTHSYSTEM__EXIT__EXECL_ERROR); // this exit is ok
-    }
-
-    /* Parent */
-    result = GENERIC_EXIT_RUNNING;
-    return child;
+    VERBOSE(VB_GENERAL, "Triggering Abort on Jumppoint");
+    d->JumpAbort();
 }
 
-uint myth_system_wait(pid_t pid, uint timeout, bool background, 
-                      bool processEvents)
+uint myth_system(const QString &command, uint flags, uint timeout)
 {
-    if( reaper == NULL )
-    {
-        reaper = new MythSystemReaper;
-        reaper->start();
-    }
-    VERBOSE(VB_GENERAL | VB_EXTRA, QString("PID %1: launched%2") .arg(pid)
-        .arg(background ? " in the background, not waiting" : ""));
-    return reaper->waitPid(pid, timeout, background, processEvents);
+    flags |= kMSRunShell | kMSAutoCleanup;
+    MythSystem *ms = new MythSystem(command, flags);
+    ms->Run(timeout);
+    uint result = ms->Wait(0);
+    if (!(flags & kMSRunBackground))
+        delete ms;
+
+    return result;
 }
 
-uint myth_system_abort(pid_t pid)
+void myth_system_jump_abort(void)
 {
-    if( reaper == NULL )
-    {
-        reaper = new MythSystemReaper;
-        reaper->start();
-    }
-    VERBOSE(VB_GENERAL | VB_EXTRA, QString("PID %1: aborted") .arg(pid));
-    return reaper->abortPid(pid);
+    MythSystem ms;
+    ms.JumpAbort();
 }
-#endif
 
+extern "C" {
+    unsigned int myth_system_c(char *command, uint flags, uint timeout)
+    {
+        QString cmd(command);
+        return myth_system(cmd, flags, timeout);
+    }
+}
 
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4

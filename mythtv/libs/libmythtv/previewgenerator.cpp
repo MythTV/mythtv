@@ -33,6 +33,8 @@
 #include "mythdirs.h"
 #include "mythverbose.h"
 #include "remoteutil.h"
+#include "mythsystem.h"
+#include "exitcodes.h"
 
 #define LOC QString("Preview: ")
 #define LOC_ERR QString("Preview Error: ")
@@ -241,10 +243,10 @@ bool PreviewGenerator::Run(void)
 
         command += " > /dev/null";
 
-        int ret = myth_system(command, kMSDontBlockInputDevs |
-                                       kMSDontDisableDrawing |
-                                       kMSProcessEvents);
-        if (ret)
+        uint ret = myth_system(command, kMSDontBlockInputDevs |
+                                        kMSDontDisableDrawing |
+                                        kMSProcessEvents);
+        if (ret != GENERIC_EXIT_OK)
         {
             msg = QString("Encountered problems running '%1'").arg(command);
             VERBOSE(VB_IMPORTANT, LOC_ERR + msg);

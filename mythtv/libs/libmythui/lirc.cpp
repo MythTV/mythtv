@@ -25,9 +25,6 @@ using namespace std;
 #include "lircevent.h"
 #include "lirc_client.h"
 
-// POSIX headers
-namespace POSIX
-{
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/select.h>
@@ -38,8 +35,6 @@ namespace POSIX
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/wait.h>
-};
-using namespace POSIX;
 
 #define LOC      QString("LIRC: ")
 #define LOC_WARN QString("LIRC, Warning: ")
@@ -205,8 +200,8 @@ bool LIRC::Init(void)
         addr.sun_family = AF_UNIX;
         strncpy(addr.sun_path, dev.constData(),107);
 
-        int ret = POSIX::connect(
-            lircd_socket, (struct sockaddr*) &addr, sizeof(addr));
+        int ret = ::connect(lircd_socket, (struct sockaddr*) &addr, 
+                            sizeof(addr));
 
         if (ret < 0)
         {
@@ -253,8 +248,8 @@ bool LIRC::Init(void)
             return false;
         }
 
-        int ret = POSIX::connect(
-            lircd_socket, (struct sockaddr*) &addr, sizeof(addr));
+        int ret = ::connect(lircd_socket, (struct sockaddr*) &addr, 
+                            sizeof(addr));
         if (ret < 0)
         {
             VERBOSE(vtype, LOC_ERR +

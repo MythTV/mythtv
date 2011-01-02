@@ -9,7 +9,6 @@ target.path = $${PREFIX}/bin
 INSTALLS = target
 
 QMAKE_CLEAN += $(TARGET)
-QMAKE_CFLAGS += -w
 
 # Input
 SOURCES += main.cpp transcode.cpp mpeg2fix.cpp helper.c

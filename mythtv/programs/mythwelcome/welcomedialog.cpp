@@ -128,10 +128,7 @@ void WelcomeDialog::checkAutoStart(void)
     // mythshutdown --startup returns 0 for automatic startup
     //                                1 for manual startup
     QString mythshutdown_exe = m_installDir + "/bin/mythshutdown --startup";
-    int state = system(mythshutdown_exe.toLocal8Bit().constData());
-
-    if (WIFEXITED(state))
-        state = WEXITSTATUS(state);
+    uint state = myth_system(mythshutdown_exe);
 
     VERBOSE(VB_GENERAL, "mythshutdown --startup returned: " << state);
 
@@ -266,13 +263,9 @@ bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
             QString mythshutdown_lock =
                 m_installDir + "/bin/mythshutdown --lock";
 
-            QByteArray tmp = mythshutdown_status.toAscii();
-            int statusCode = system(tmp.constData());
-            if (WIFEXITED(statusCode))
-                statusCode = WEXITSTATUS(statusCode);
-
+            uint statusCode = myth_system(mythshutdown_status);
             // is shutdown locked by a user
-            if (statusCode & 16)
+            if (!(statusCode & 0xFF00) && statusCode & 16)
             {
                 myth_system(mythshutdown_unlock);
             }
@@ -531,25 +524,25 @@ void WelcomeDialog::updateStatusMessage(void)
     }
 
     QString mythshutdown_status = m_installDir + "/bin/mythshutdown --status 0";
-    QByteArray tmpcmd = mythshutdown_status.toAscii();
-    int statusCode = system(tmpcmd.constData());
-    if (WIFEXITED(statusCode))
-        statusCode = WEXITSTATUS(statusCode);
+    uint statusCode = myth_system(mythshutdown_status);
 
-    if (statusCode & 1)
-        m_statusList.append(tr("MythTV is busy transcoding."));
-    if (statusCode & 2)
-        m_statusList.append(tr("MythTV is busy flagging commercials."));
-    if (statusCode & 4)
-        m_statusList.append(tr("MythTV is busy grabbing EPG data."));
-    if (statusCode & 16)
-        m_statusList.append(tr("MythTV is locked by a user."));
-    if (statusCode & 32)
-        m_statusList.append(tr("MythTV has running or pending jobs."));
-    if (statusCode & 64)
-        m_statusList.append(tr("MythTV is in a daily wakeup/shutdown period."));
-    if (statusCode & 128)
-        m_statusList.append(tr("MythTV is about to start a wakeup/shutdown period."));
+    if (!(statusCode & 0xFF00))
+    {
+        if (statusCode & 1)
+            m_statusList.append(tr("MythTV is busy transcoding."));
+        if (statusCode & 2)
+            m_statusList.append(tr("MythTV is busy flagging commercials."));
+        if (statusCode & 4)
+            m_statusList.append(tr("MythTV is busy grabbing EPG data."));
+        if (statusCode & 16)
+            m_statusList.append(tr("MythTV is locked by a user."));
+        if (statusCode & 32)
+            m_statusList.append(tr("MythTV has running or pending jobs."));
+        if (statusCode & 64)
+            m_statusList.append(tr("MythTV is in a daily wakeup/shutdown period."));
+        if (statusCode & 128)
+            m_statusList.append(tr("MythTV is about to start a wakeup/shutdown period."));
+    }
 
     if (m_statusList.empty())
     {
@@ -602,12 +595,9 @@ void WelcomeDialog::showMenu(void)
     m_menuPopup->SetReturnEvent(this, "action");
 
     QString mythshutdown_status = m_installDir + "/bin/mythshutdown --status 0";
-    QByteArray tmpcmd = mythshutdown_status.toAscii();
-    int statusCode = system(tmpcmd.constData());
-    if (WIFEXITED(statusCode))
-        statusCode = WEXITSTATUS(statusCode);
+    uint statusCode = myth_system(mythshutdown_status);
 
-    if (statusCode & 16)
+    if (!(statusCode & 0xFF00) && statusCode & 16)
         m_menuPopup->AddButton(tr("Unlock Shutdown"), SLOT(unlockShutdown()));
     else
         m_menuPopup->AddButton(tr("Lock Shutdown"), SLOT(lockShutdown()));
@@ -675,11 +665,8 @@ void WelcomeDialog::shutdownNow(void)
     // don't shutdown if we are about to start a wakeup/shutdown period
     QString mythshutdown_exe_status =
         m_installDir + "/bin/mythshutdown --status 0";
-    int statusCode = system(mythshutdown_exe_status.toLocal8Bit().constData());
-    if (WIFEXITED(statusCode))
-        statusCode = WEXITSTATUS(statusCode);
-
-    if (statusCode & 128)
+    uint statusCode = myth_system(mythshutdown_exe_status);
+    if (!(statusCode & 0xFF00) && statusCode & 128)
     {
         ShowOkPopup(tr("Cannot shutdown because MythTV is about to start "
                        "a wakeup/shutdown period."));
