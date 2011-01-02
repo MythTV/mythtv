@@ -3042,6 +3042,8 @@ case $target_os in
         enabled ppc && add_asflags -force_cpusubtype_ALL
         # Workaround compile errors from missing u_int/uint def
         CPPFLAGS=`echo $CPPFLAGS | sed 's/-D_POSIX_C_SOURCE=200112//'`
+        # Workaround compile errors from missing ru_maxrss
+        add_cppflags -D_DARWIN_C_SOURCE
         enable  appleremote
         enable  backend
         enable  darwin
