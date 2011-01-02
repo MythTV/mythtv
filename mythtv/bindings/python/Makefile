@@ -18,9 +18,8 @@ clean:
 
 distclean: clean
 
-python_build: setup.py setprefix.py
-	$(PYTHON) setup.py build
-	$(PYTHON) setprefix.py "$(REAL_PREFIX)"
+python_build: setup.py
+	$(PYTHON) setup.py build --mythtv-prefix="$(REAL_PREFIX)"
 
 install: setup.py
 	$(PYTHON) setup.py install --skip-build $(ROOT_FLAGS) $(PREFIX_FLAGS)

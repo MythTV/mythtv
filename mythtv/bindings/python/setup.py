@@ -4,6 +4,8 @@ from distutils.core import setup
 from distutils.cmd import Command
 from distutils.sysconfig import get_python_lib
 from distutils.command.install import INSTALL_SCHEMES
+from distutils.command.build import build as pybuild
+
 import os
 import glob
 
@@ -31,6 +33,38 @@ class uninstall(Command):
                     print 'unlinking '+os.path.join(install_path, fname)
                     os.unlink(os.path.join(install_path, fname))
 
+class build(pybuild):
+    user_options = pybuild.user_options + [('mythtv-prefix=', None, 'MythTV installation prefix')]
+    def initialize_options(self):
+        pybuild.initialize_options(self)
+        self.mythtv_prefix = None
+    def run(self):
+        pybuild.run(self)
+
+        # check for alternate prefix
+        if self.mythtv_prefix is None:
+            return
+
+        # find file
+        for path,dirs,files in os.walk('build'):
+            if 'static.py' in files:
+                break
+        else:
+            return
+
+        # read in and replace existing line
+        buff = []
+        path = os.path.join(path,'static.py')
+        with open(path) as fi:
+            for line in fi:
+                if 'INSTALL_PREFIX' in line:
+                    line = "INSTALL_PREFIX = '%s'\n" % self.mythtv_prefix
+                buff.append(line)
+
+        # push back to file
+        with open(path,'w') as fo:
+            fo.write(''.join(buff))
+
 setup(
         name='MythTV',
         version='0.24.0',
@@ -41,5 +75,6 @@ setup(
         url=['http://www.mythtv.org/'],
         scripts=['scripts/mythpython', 'scripts/mythwikiscripts'],
         requires=['MySQLdb','lxml'],
-        cmdclass={'uninstall':uninstall},
+        cmdclass={'uninstall':uninstall,
+                  'build':build},
         )
