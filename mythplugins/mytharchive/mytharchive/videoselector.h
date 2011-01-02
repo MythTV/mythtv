@@ -12,6 +12,7 @@
 
 // mythtv
 #include <mythscreentype.h>
+#include <metadata/parentalcontrols.h>
 
 // mytharchive
 #include "archiveutil.h"
@@ -21,7 +22,6 @@ class MythUIText;
 class MythUIButton;
 class MythUIButtonList;
 class MythUIButtonListItem;
-
 
 typedef struct
 {
@@ -62,20 +62,23 @@ class VideoSelector : public MythScreenType
     void titleChanged(MythUIButtonListItem *item);
     void toggleSelected(MythUIButtonListItem *item);
 
+    void parentalLevelChanged(bool passwordValid, ParentalLevel::Level newLevel);
+
   private:
     void updateVideoList(void);
     void updateSelectedList(void);
     void getVideoList(void);
     void wireUpTheme(void);
     std::vector<VideoInfo *> *getVideoListFromDB(void);
-    bool checkParentPassword(void);
-    void setParentalLevel(int which_level);
+    void setParentalLevel(ParentalLevel::Level level);
+
+    ParentalLevelChangeChecker *m_parentalLevelChecker;
 
     QList<ArchiveItem *>     *m_archiveList;
     std::vector<VideoInfo *> *m_videoList;
     QList<VideoInfo *>        m_selectedList;
 
-    int               m_currentParentalLevel;
+    ParentalLevel::Level      m_currentParentalLevel;
 
     MythUIText       *m_plText;
     MythUIButtonList *m_videoButtonList;

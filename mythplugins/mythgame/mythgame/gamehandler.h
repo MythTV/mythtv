@@ -81,7 +81,7 @@ class GameHandler : public QObject
     void UpdateGameDB(GameHandler *handler);
     void VerifyGameDB(GameHandler *handler);
 
-    static void clearAllGameData(void);
+    void clearAllGameData(void);
 
     static int buildFileCount(QString directory, GameHandler *handler);
     void buildFileList(QString directory, GameHandler *handler,
@@ -107,6 +107,8 @@ class GameHandler : public QObject
     QString SystemScreenShots() const { return screenshots; }
     uint GamePlayerID() const { return gameplayerid; }
     QString GameType() const { return gametype; }
+
+    void clearAllMetadata(void);
 
   protected:
     static GameHandler* GetHandler(RomInfo *rominfo);

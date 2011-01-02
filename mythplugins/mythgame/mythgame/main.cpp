@@ -51,7 +51,8 @@ static void GameCallback(void *data, QString &selection)
     }
     if (sel == "clear_game_data")
     {
-        GameHandler::clearAllGameData();
+        GameHandler *handler = new GameHandler();
+        handler->clearAllGameData();
     }
 
 }
