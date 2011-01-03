@@ -680,6 +680,9 @@ bool FillData::Run(SourceList &sourcelist)
                 QTextStream ostream(grabber_method_proc.ReadAll());
                 (*it).xmltvgrabber_prefmethod =
                                 ostream.readLine().simplified();
+
+                VERBOSE(VB_GENERAL, QString("Grabber prefers method: %1")
+                                    .arg((*it).xmltvgrabber_prefmethod));
             }
         }
 

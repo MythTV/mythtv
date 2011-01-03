@@ -582,7 +582,7 @@ bool DBUtil::DoBackup(const QString &backupScript, QString &filename)
             .arg(backupScript));
 
     QString command = backupScript + scriptArgs + " " + tempDatabaseConfFile;
-    uint status = myth_system(command, kMSDontBlockInputDevs);
+    uint status = myth_system(command, kMSDontBlockInputDevs|kMSAnonLog);
 
     if (hastemp)
     {
@@ -687,7 +687,7 @@ bool DBUtil::DoBackup(QString &filename)
     VERBOSE(VB_IMPORTANT, QString("Backing up database to file: '%1'")
             .arg(backupPathname));
 
-    uint status = myth_system(command, kMSDontBlockInputDevs);
+    uint status = myth_system(command, kMSDontBlockInputDevs|kMSAnonLog);
 
     QByteArray tmpfile = tempExtraConfFile.toLocal8Bit();
     unlink(tmpfile.constData());
@@ -808,7 +808,7 @@ int DBUtil::CountClients(void)
     params << "-p" + DB.dbPassword;
     params << "-e" << "\"SHOW PROCESSLIST\"";
 
-    uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
+    uint flags = kMSRunShell | kMSStdOut | kMSBuffered | kMSAnonLog;
     MythSystem  ms(cmd, params, flags);
     ms.Run(4);
     if (ms.Wait() != GENERIC_EXIT_OK)

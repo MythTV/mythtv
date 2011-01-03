@@ -14,7 +14,6 @@
 #include "inputinfo.h"
 #include "mythsystem.h"
 #include "tv.h"
-#include "mythsystem.h"
 
 class TVRec;
 class ChannelBase;

@@ -680,6 +680,15 @@ check_cmd(){
     "$@" >> $logfile 2>&1
 }
 
+check_python(){
+    log check_python
+    check_cmd $python <<EOF
+import sys
+if sys.version_info < (2,6):
+    sys.exit(1)
+EOF
+}
+
 check_py_lib(){
     log check_py_lib "$@"
     check_cmd $python <<EOF
@@ -3068,11 +3077,12 @@ case $target_os in
         enabled ppc && add_asflags -force_cpusubtype_ALL
         # Workaround compile errors from missing u_int/uint def
         CPPFLAGS=`echo $CPPFLAGS | sed 's/-D_POSIX_C_SOURCE=200112//'`
+        # Workaround compile errors from missing ru_maxrss
+        add_cppflags -D_DARWIN_C_SOURCE
         enable  appleremote
         enable  backend
         enable  darwin
         disable dvb
-        disable ffmpeg
         # Prevent linker problems on default Intel 10.5 XCode:
         ldver=$(ld -v 2>&1 | sed -e s/^[^-]*-//)
         osxver=$(uname -r | cut -c 1)
@@ -4184,6 +4194,7 @@ fi
 
 # Check for python dependencies
 if enabled bindings_python; then
+    check_python         || disable_bindings_python "Python 2.6"
     check_py_lib MySQLdb || disable_bindings_python "MySQLdb"
     check_py_lib lxml    || disable_bindings_python "lxml"
 fi

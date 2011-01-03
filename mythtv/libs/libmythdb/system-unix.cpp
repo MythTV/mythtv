@@ -265,7 +265,7 @@ void MythSystemManager::run(void)
             // unmanaged process has exited
             if( !m_pMap.contains(pid) )
             {
-                VERBOSE(VB_GENERAL, QString("Unmanaged child (PID: %1) has exited!")
+                VERBOSE(VB_GENERAL|VB_EXTRA, QString("Unmanaged child (PID: %1) has exited!")
                     .arg(pid));
                 m_mapLock.unlock();
                 continue;
@@ -280,7 +280,7 @@ void MythSystemManager::run(void)
             if( WIFEXITED(status) )
             {
                 ms->SetStatus(WEXITSTATUS(status));
-                VERBOSE(VB_GENERAL, 
+                VERBOSE(VB_GENERAL|VB_EXTRA, 
                     QString("Managed child (PID: %1) has exited! "
                             "command=%2, status=%3, result=%4")
                     .arg(pid) .arg(ms->GetLogCmd()) .arg(status) 
@@ -339,7 +339,7 @@ void MythSystemManager::run(void)
                 // issuing KILL signal after TERM failed in a timely manner
                 if( ms->GetStatus() == GENERIC_EXIT_TIMEOUT )
                 {
-                    VERBOSE(VB_GENERAL, 
+                    VERBOSE(VB_GENERAL|VB_EXTRA, 
                         QString("Managed child (PID: %1) timed out"
                                 ", issuing KILL signal").arg(pid));
                     // Prevent constant attempts to kill an obstinate child
@@ -350,7 +350,7 @@ void MythSystemManager::run(void)
                 // issuing TERM signal
                 else
                 {
-                    VERBOSE(VB_GENERAL, 
+                    VERBOSE(VB_GENERAL|VB_EXTRA, 
                         QString("Managed child (PID: %1) timed out"
                                 ", issuing TERM signal").arg(pid));
                     ms->SetStatus( GENERIC_EXIT_TIMEOUT );
@@ -547,7 +547,7 @@ void MythSystemUnix::Fork(time_t timeout)
     strncpy(locerr, (const char *)LOC_ERR.toUtf8().constData(), MAX_BUFLEN);
     locerr[MAX_BUFLEN-1] = '\0';
 
-    VERBOSE(VB_GENERAL, QString("Launching: %1").arg(GetLogCmd()));
+    VERBOSE(VB_GENERAL|VB_EXTRA, QString("Launching: %1").arg(GetLogCmd()));
 
     GetBuffer(0)->setBuffer(0);
     GetBuffer(1)->setBuffer(0);
@@ -637,7 +637,7 @@ void MythSystemUnix::Fork(time_t timeout)
 
         m_timeout = timeout;
 
-        VERBOSE(VB_GENERAL, QString("Managed child (PID: %1) has started! "
+        VERBOSE(VB_GENERAL|VB_EXTRA, QString("Managed child (PID: %1) has started! "
                                             "%2%3 command=%4, timeout=%5")
                     .arg(m_pid) .arg(GetSetting("UseShell") ? "*" : "")
                     .arg(GetSetting("RunInBackground") ? "&" : "")

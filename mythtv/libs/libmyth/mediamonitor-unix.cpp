@@ -254,27 +254,31 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
     if( VERBOSE_LEVEL_CHECK(VB_MEDIA|VB_EXTRA) )
         flags |= kMSStdErr;
 
-    MythSystem  udevinfo = new MythSystem("udevinfo", args, flags);
-    udevinfo.Run(4);
-    if( udevinfo.Wait() != GENERIC_EXIT_OK )
+    MythSystem *udevinfo = new MythSystem("udevinfo", args, flags);
+    udevinfo->Run(4);
+    if( udevinfo->Wait() != GENERIC_EXIT_OK )
     {
+        delete udevinfo;
         return ret;
     }
 
     if (VERBOSE_LEVEL_CHECK(VB_MEDIA|VB_EXTRA))
     {
-        QTextStream estream(udevinfo.ReadAllErr());
+        QTextStream estream(udevinfo->ReadAllErr());
         while( !estream.atEnd() )
             VERBOSE(VB_MEDIA+VB_EXTRA,
                     msg + " - udevadm info error...\n" + estream.readLine());
     }
 
-    QTextStream ostream(udevinfo.ReadAll());
+    QTextStream ostream(udevinfo->ReadAll());
     ret = ostream.readLine();
     if( ret.startsWith("device not found in database") )
     {
+        delete udevinfo;
         return ret;
     }
+
+    delete udevinfo;
   #endif // HAVE_LIBUDEV
 #endif // linux
 
