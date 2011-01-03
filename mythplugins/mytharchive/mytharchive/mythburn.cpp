@@ -54,7 +54,7 @@ MythBurn::MythBurn(MythScreenStack   *parent,
     // remove any old thumb images
     QString thumbDir = getTempDirectory() + "/config/thumbs";
     QDir dir(thumbDir);
-    if (dir.exists() && !RemoveDirectory(dir))
+    if (dir.exists() && !MythRemoveDirectory(dir))
         VERBOSE(VB_IMPORTANT, "MythBurn: Failed to clear thumb directory");
 
     m_bCreateISO = false;

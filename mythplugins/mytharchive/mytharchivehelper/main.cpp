@@ -353,7 +353,7 @@ int NativeArchive::doNativeArchive(const QString &jobFile)
         QDir dir(saveDirectory);
         if (dir.exists())
         {
-            if (!RemoveDirectory(dir))
+            if (!MythRemoveDirectory(dir))
                 VERBOSE(VB_IMPORTANT, "NativeArchive: Failed to clear work directory");
         }
         dir.mkpath(saveDirectory);

@@ -1330,7 +1330,7 @@ bool myth_FileIsBD(const QString &filename)
     return false;
 }
 
-bool RemoveDirectory(QDir &aDir)
+bool MythRemoveDirectory(QDir &aDir)
 {
     if (!aDir.exists())//QDir::NoDotAndDotDot
         return false;
@@ -1347,7 +1347,7 @@ bool RemoveDirectory(QDir &aDir)
         if (entryInfo.isDir())
         {
             QDir dir(path);
-            has_err = RemoveDirectory(dir);
+            has_err = MythRemoveDirectory(dir);
         }
         else
         {
