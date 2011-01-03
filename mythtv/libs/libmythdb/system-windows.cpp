@@ -262,7 +262,7 @@ void MythSystemManager::run(void)
         GetExitCodeProcess( child, &status );
 
         ms->SetStatus(status);
-        VERBOSE(VB_GENERAL, 
+        VERBOSE(VB_GENERAL|VB_EXTRA, 
                 QString("Managed child (Handle: %1) has exited! "
                         "command=%2, status=%3, result=%4")
                 .arg((long long)child) .arg(ms->GetLogCmd()) .arg(status) 
@@ -285,7 +285,7 @@ void MythSystemManager::run(void)
                 // issuing KILL signal after TERM failed in a timely manner
                 if( ms->GetStatus() == GENERIC_EXIT_TIMEOUT )
                 {
-                    VERBOSE(VB_GENERAL, 
+                    VERBOSE(VB_GENERAL|VB_EXTRA, 
                         QString("Managed child (Handle: %1) timed out, "
                                 "issuing KILL signal").arg((long long)child));
                     // Prevent constant attempts to kill an obstinate child
@@ -296,7 +296,7 @@ void MythSystemManager::run(void)
                 // issuing TERM signal
                 else
                 {
-                    VERBOSE(VB_GENERAL, 
+                    VERBOSE(VB_GENERAL|VB_EXTRA, 
                         QString("Managed child (Handle: %1) timed out"
                                 ", issuing TERM signal").arg((long long)child));
                     ms->SetStatus( GENERIC_EXIT_TIMEOUT );
@@ -517,7 +517,7 @@ void MythSystemWindows::Fork(time_t timeout)
     strncpy(locerr, (const char *)LOC_ERR.toUtf8().constData(), MAX_BUFLEN);
     locerr[MAX_BUFLEN-1] = '\0';
 
-    VERBOSE(VB_GENERAL, QString("Launching: %1").arg(GetLogCmd()));
+    VERBOSE(VB_GENERAL|VB_EXTRA, QString("Launching: %1").arg(GetLogCmd()));
 
     GetBuffer(0)->setBuffer(0);
     GetBuffer(1)->setBuffer(0);
@@ -651,7 +651,7 @@ void MythSystemWindows::Fork(time_t timeout)
 
         m_timeout = timeout;
 
-        VERBOSE(VB_GENERAL, QString("Managed child (Handle: %1) has started! "
+        VERBOSE(VB_GENERAL|VB_EXTRA, QString("Managed child (Handle: %1) has started! "
                                             "%2%3 command=%4, timeout=%5")
                     .arg((long long)m_child) 
                     .arg(GetSetting("UseShell") ? "*" : "")
