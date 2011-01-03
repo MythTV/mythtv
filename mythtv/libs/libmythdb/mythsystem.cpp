@@ -220,7 +220,7 @@ void MythSystem::ProcessFlags(uint flags)
 {
     if( m_status != GENERIC_EXIT_START )
     {
-        VERBOSE(VB_IMPORTANT|VB_EXTRA, QString("status: %1").arg(m_status));
+        VERBOSE(VB_SYSTEM|VB_EXTRA, QString("status: %1").arg(m_status));
         return;
     }
 
@@ -230,7 +230,7 @@ void MythSystem::ProcessFlags(uint flags)
     if( m_command.endsWith("&") )
     {
         if (!GetSetting("RunInBackground"))
-            VERBOSE(VB_GENERAL|VB_EXTRA, "Adding background flag");
+            VERBOSE(VB_SYSTEM|VB_EXTRA, "Adding background flag");
 
         // Remove the &
         m_command.chop(1);
@@ -342,7 +342,7 @@ void MythSystem::JumpAbort(void)
     if (!d)
         return;
 
-    VERBOSE(VB_GENERAL|VB_EXTRA, "Triggering Abort on Jumppoint");
+    VERBOSE(VB_SYSTEM|VB_EXTRA, "Triggering Abort on Jumppoint");
     d->JumpAbort();
 }
 

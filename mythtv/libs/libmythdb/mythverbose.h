@@ -88,11 +88,12 @@
                              1, "Media Manager debugging messages")           \
     F(VB_IDLE,      0x01000000, "idle",                                       \
                              1, "System idle messages")                       \
-    F(VB_CHANSCAN,  0x02000000, "channelscan",                          \
+    F(VB_CHANSCAN,  0x02000000, "channelscan",                                \
                              1, "Channel Scanning messages")                  \
     F(VB_GUI,       0x04000000, "gui",                                        \
                              1, "GUI related messages")                       \
-    /* space for more flags */                                                \
+    F(VB_SYSTEM,    0x08000000, "system",                                     \
+                             1, "External executable related messages")       \
     /* space for more flags */                                                \
     /* space for more flags */                                                \
     F(VB_EXTRA,     0x40000000, "extra",                                      \
