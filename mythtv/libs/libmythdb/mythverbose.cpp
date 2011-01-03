@@ -3,9 +3,7 @@
 #include <QtDebug>
 
 #include "mythverbose.h"
-
-#define GENERIC_EXIT_OK                             0
-#define GENERIC_EXIT_INVALID_CMDLINE              252
+#include "exitcodes.h"
 
 const unsigned int verboseDefaultInt = VB_IMPORTANT | VB_GENERAL;
 const char        *verboseDefaultStr = " important general";
