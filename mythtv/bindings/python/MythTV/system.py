@@ -30,9 +30,10 @@ class System( DBCache ):
             s = cls(path, db=db)
             res = s._runcmd(command)
             if len(res):
-                s.log(MythLog.FILE|MythLog.EXTRA, '---- Output ----', res)
+                s.log(MythLog.SYSTEM|MythLog.EXTRA, '---- Output ----', res)
             if len(s.stderr):
-                s.log(MythLog.FILE|MythLog.EXTRA, '---- Error  ----', s.stderr)
+                s.log(MythLog.SYSTEM|MythLog.EXTRA,
+                                               '---- Error  ----', s.stderr)
             return 0
         except (MythDBError,MythFileError):
             return -1
@@ -93,7 +94,7 @@ class System( DBCache ):
         return self._runcmd('%s %s' % (self.path, arg))
 
     def _runcmd(self, cmd):
-        self.log(MythLog.FILE, 'Running external command', cmd)
+        self.log(MythLog.SYSTEM, 'Running external command', cmd)
         fd = Popen(cmd, stdout=-1, stderr=-1, shell=True)
         self.returncode = fd.wait()
         stdout,self.stderr = fd.communicate()
