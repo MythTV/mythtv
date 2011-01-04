@@ -15,7 +15,7 @@
         - Initial release
         - 1/9/2004 - Improved seek support
         - ?/?/2009 - Extended to support many more filetypes and bug fixes
-        - ?/7/2010 - Add streaming support
+        - ?/7/2010 - Add streaming support 
 */
 
 // QT headers
@@ -131,7 +131,7 @@ bool avfDecoder::initialize()
     // give up if we dont have an audiooutput set
     if (!output())
     {
-        error("avfDecoder: initialise called with a NULL audiooutput");
+        error("avfDecoder: initialise called with a NULL audiooutput"); 
         return false;
     }
 
@@ -168,7 +168,7 @@ bool avfDecoder::initialize()
         if (!m_inputFormat)
         {
             error("Could not identify the stream type in "
-                  "avfDecoder::initialize");
+                  "avfDecoder::initialize"); 
             deinit();
             return false;
         }
@@ -525,8 +525,7 @@ bool avfDecoderFactory::supports(const QString &source) const
 const QString &avfDecoderFactory::extension() const
 {
     static QString ext(".mp3|.mp2|.ogg|.oga|.flac|.wma|.wav|.ac3|.oma|.omg|"
-                       ".atp|.ra|.dts|.aac|.m4a|.aa3|.tta|.mka|.aiff|.swa|.wv|"
-                       ".amr");
+                       ".atp|.ra|.dts|.aac|.m4a|.aa3|.tta|.mka|.aiff|.swa|.wv");
     return ext;
 }
 
