@@ -356,7 +356,8 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
         return result;
     }
 
-    query.prepare("SELECT DISTINCT dirname FROM storagegroup;");
+    query.prepare("SELECT DISTINCT dirname FROM storagegroup "
+                      "ORDER BY dirname DESC;");
     if (query.exec())
     {
         QString dirname;
