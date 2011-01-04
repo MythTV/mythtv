@@ -71,6 +71,9 @@ inline bool operator!=(const DialogCode &a, const QDialog::DialogCode &b)
 inline bool operator!=(const QDialog::DialogCode &a, const DialogCode &b)
 { return ((int)a) == ((int)b); }
 
+/*!
+ * \deprecated Due for removal, use libmythui's MythScreenType instead
+ */
 class MPUBLIC MythDialog : public QFrame
 {
     Q_OBJECT
@@ -130,6 +133,10 @@ class MPUBLIC MythDialog : public QFrame
     QFont defaultBigFont, defaultMediumFont, defaultSmallFont;
 };
 
+/*!
+ * \deprecated Due for removal, use libmythui's MythScreenType, MythDialogBox
+ *             or MythConfirmationDialog instead
+ */
 class MPUBLIC MythPopupBox : public MythDialog
 {
     Q_OBJECT
@@ -171,7 +178,7 @@ class MPUBLIC MythPopupBox : public MythDialog
         MythMainWindow *parent,
         const QString &title, const QString &message,
         const QString &button1msg, const QString &button2msg,
-        DialogCode default_button) MDEPRECATED;
+        DialogCode default_button);
 
     static DialogCode ShowButtonPopup(
         MythMainWindow *parent,
@@ -205,21 +212,21 @@ class MPUBLIC MythPopupBox : public MythDialog
     QColor       popupForegroundColor;
     int          hpadding, wpadding;
     bool         arrowAccel;
-} MDEPRECATED;
+};
 
-/** The MythTV progress bar dialog.
-
-    This dialog is responsible for displaying a progress bar box on
-    the screen. This is used when you have a known set of steps to
-    perform and the possibility of calling the \p setProgress call at
-    the end of each step.
-
-	If you do not know the number of steps, use \p MythBusyDialog
-	instead.
-
-    The dialog widget also updates the LCD display if present.
-
-*/
+/*!
+ *  This dialog is responsible for displaying a progress bar box on
+ *  the screen. This is used when you have a known set of steps to
+ *  perform and the possibility of calling the \p setProgress call at
+ *  the end of each step.
+ *
+ *  If you do not know the number of steps, use \p MythBusyDialog
+ *  instead.
+ *
+ *  The dialog widget also updates the LCD display if present.
+ *
+ * \deprecated Due for removal, use libmythui's MythUIProgressDialog instead
+ */
 class MPUBLIC MythProgressDialog: public MythDialog
 {
     Q_OBJECT
@@ -232,6 +239,7 @@ class MPUBLIC MythProgressDialog: public MythDialog
         \param cancelButton display cancel button
         \param target target for cancel signal
         \param slot slot for cancel signal
+        \deprecated Due for removal, use libmythui instead
       */
     MythProgressDialog(const QString& message, int totalSteps = 0,
                        bool cancelButton = false,
@@ -278,6 +286,8 @@ class MPUBLIC MythProgressDialog: public MythDialog
     is unknown.
 
     Ie. used by MythMusic when scanning the filesystem for musicfiles.
+
+ \deprecated Due for removal, use libmythui's MythUIBusyDialog instead
  */
 class MPUBLIC MythBusyDialog : public MythProgressDialog
 {
@@ -293,6 +303,7 @@ class MPUBLIC MythBusyDialog : public MythProgressDialog
         \param cancelButton display cancel button
         \param target target for cancel signal
         \param slot slot for cancel signal
+        \deprecated Due for removal, use libmythui's MythUIBusyDialog instead
      */
     MythBusyDialog(const QString &title,
                    bool cancelButton = false,
@@ -329,6 +340,9 @@ class MPUBLIC MythBusyDialog : public MythProgressDialog
     QTimer *timer;
 };
 
+/*!
+ * \deprecated Due for removal, use libmythui's MythScreenType instead
+ */
 class MPUBLIC MythThemedDialog : public MythDialog
 {
     Q_OBJECT
@@ -450,6 +464,9 @@ class MPUBLIC MythPasswordDialog: public MythDialog
     bool                *success_flag;
 };
 
+/*!
+ * \deprecated Due for removal, use libmythui's MythUISearchDialog instead
+ */
 class MPUBLIC MythSearchDialog: public MythPopupBox
 {
     Q_OBJECT
