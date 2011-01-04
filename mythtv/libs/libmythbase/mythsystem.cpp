@@ -151,9 +151,16 @@ void MythSystem::Run(time_t timeout)
 
     d->Fork(timeout);
 
-    m_semReady.acquire(1);
-    emit started();
-    d->Manage();
+    if( GetStatus() == GENERIC_EXIT_RUNNING )
+    {
+        m_semReady.acquire(1);
+        emit started();
+        d->Manage();
+    }
+    else
+    {
+        emit error(GetStatus());
+    }
 }
 
 // should there be a separate 'getstatus' call? or is using
@@ -230,6 +237,8 @@ void MythSystem::ProcessFlags(uint flags)
         return;
     }
 
+    m_settings["IsInUI"] = gCoreContext->HasGUI() && gCoreContext->IsUIThread();
+
     if( flags & kMSRunBackground )
         m_settings["RunInBackground"] = true;
 
@@ -243,9 +252,9 @@ void MythSystem::ProcessFlags(uint flags)
         m_command = m_command.trimmed();
         m_settings["RunInBackground"] = true;
         m_settings["UseShell"]        = true;
+        m_settings["IsInUI"]          = false;
     }
 
-    m_settings["IsInUI"] = gCoreContext->HasGUI() && gCoreContext->IsUIThread();
     if( GetSetting("IsInUI") )
     {
         // Check for UI-only locks

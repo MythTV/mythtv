@@ -633,6 +633,10 @@ void MythSystemWindows::Fork(time_t timeout)
     PROCESS_INFORMATION pi;
     ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
 
+    m_timeout = timeout;
+    if( timeout )
+        m_timeout += time(NULL);
+
     bool success = CreateProcess(NULL, 
                     command,       // command line 
                     NULL,          // process security attributes 
@@ -655,18 +659,13 @@ void MythSystemWindows::Fork(time_t timeout)
         m_child = pi.hProcess;
         SetStatus( GENERIC_EXIT_RUNNING );
 
-        m_timeout = timeout;
-
         VERBOSE(VB_SYSTEM|VB_EXTRA,
                 QString("Managed child (Handle: %1) has started! "
                         "%2%3 command=%4, timeout=%5")
                     .arg((long long)m_child) 
                     .arg(GetSetting("UseShell") ? "*" : "")
                     .arg(GetSetting("RunInBackground") ? "&" : "")
-                    .arg(GetLogCmd()) .arg(m_timeout));
-
-        if( timeout )
-            m_timeout += time(NULL);
+                    .arg(GetLogCmd()) .arg(timeout));
 
         /* close unused pipe ends */
         CLOSE(p_stdin[0]);
