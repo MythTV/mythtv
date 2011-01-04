@@ -15,7 +15,7 @@
         - Initial release
         - 1/9/2004 - Improved seek support
         - ?/?/2009 - Extended to support many more filetypes and bug fixes
-        - ?/7/2010 - Add streaming support 
+        - ?/7/2010 - Add streaming support
 */
 
 // QT headers
@@ -131,7 +131,7 @@ bool avfDecoder::initialize()
     // give up if we dont have an audiooutput set
     if (!output())
     {
-        error("avfDecoder: initialise called with a NULL audiooutput"); 
+        error("avfDecoder: initialise called with a NULL audiooutput");
         return false;
     }
 
@@ -168,7 +168,7 @@ bool avfDecoder::initialize()
         if (!m_inputFormat)
         {
             error("Could not identify the stream type in "
-                  "avfDecoder::initialize"); 
+                  "avfDecoder::initialize");
             deinit();
             return false;
         }
@@ -371,8 +371,6 @@ void avfDecoder::run()
     AVPacket pkt;
     char *s;
     int data_size, dec_len;
-    long len;
-    const uint8_t *ptr;
     uint fill, total;
     // account for possible frame expansion in aobase (upmix, float conv)
     uint thresh = bks * 12 / AudioOutputSettings::SampleSize(m_sampleFmt);
@@ -415,30 +413,22 @@ void avfDecoder::run()
                     break;
                 }
 
-                ptr = pkt.data;
-                len = pkt.size;
+                // Decode the stream to the output codec
+                // m_samples is the output buffer
+                // data_size is the size in bytes of the frame
+                // pkt is the AVPacket containing the frame
+                data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+                dec_len = avcodec_decode_audio3(m_audioDec, m_samples,
+                                                &data_size, &pkt);
 
-                while (len > 0 && !finish && !user_stop && seekTime <= 0.0)
+                if (dec_len >= 0)
                 {
-                    // Decode the stream to the output codec
-                    // m_samples is the output buffer
-                    // data_size is the size in bytes of the frame
-                    // ptr is the input buffer
-                    // len is the size of the input buffer
-                    data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-                    dec_len = avcodec_decode_audio2(m_audioDec, m_samples,
-                                                    &data_size, ptr, len);
-                    if (dec_len < 0)
-                        break;
-
                     s = (char *)m_samples;
                     // Copy the data to the output buffer
                     memcpy((char *)(output_buf + output_at), s, data_size);
 
                     // Increment the output pointer and count
                     output_at += data_size;
-                    len -= dec_len;
-                    ptr += dec_len;
                 }
 
                 av_free_packet(&pkt);
