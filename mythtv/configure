@@ -362,8 +362,8 @@ die(){
     echolog "$@"
     cat <<EOF
 
-If you think configure made a mistake, make sure you are using the latest
-version from SVN.  If the latest version fails, report the problem to the
+If you think configure made a mistake, make sure that you are using the latest
+version of MythTV from git.  If the latest version fails, report the problem to the
 mythtv-dev@mythtv.org mailing list or IRC #mythtv on irc.freenode.net
 EOF
     if disabled logging; then
