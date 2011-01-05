@@ -564,6 +564,13 @@ void NetSearch::showWebVideo()
         if (url.isEmpty())
             return;
 
+        if (!item->GetMediaURL().isEmpty() && item->GetMediaURL() != url)
+        {
+            VERBOSE(VB_GENERAL, QString("Trying to use internal player for %1").arg(item->GetMediaURL()));
+            GetMythMainWindow()->HandleMedia("Internal", item->GetMediaURL());
+            return;
+        }
+
         QString browser = gCoreContext->GetSetting("WebBrowserCommand", "");
         QString zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.0");
 
