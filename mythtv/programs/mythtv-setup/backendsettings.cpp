@@ -515,7 +515,6 @@ static GlobalLineEdit *startupCommand()
     return gc;
 };
 
-//HERE
 static HostSpinBox *JobQueueMaxSimultaneousJobs()
 {
     HostSpinBox *gc = new HostSpinBox("JobQueueMaxSimultaneousJobs", 1, 10, 1);
