@@ -794,41 +794,35 @@ bool DBUtil::ParseDBMSVersion()
  */
 int DBUtil::CountClients(void)
 {
-    DatabaseParams DB    = gCoreContext->GetDatabaseParams();
-    int            count = 0;
+    int count = 0;
 
-    // QSqlQuery doesn't know how to parse the results of "SHOW PROCESSLIST",
-    // so instead of a nice query.next loop, we have to do it in a hacky way
-
-    QString     cmd = "mysql";
-    QStringList params;
-
-    params << "-h" << DB.dbHostName;
-    params << "-u" << DB.dbUserName;
-    params << "-p" + DB.dbPassword;
-    params << "-e" << "\"SHOW PROCESSLIST\"";
-
-    uint flags = kMSRunShell | kMSStdOut | kMSBuffered | kMSAnonLog;
-    MythSystem  ms(cmd, params, flags);
-    ms.Run(4);
-    if (ms.Wait() != GENERIC_EXIT_OK)
-        return 0;
-
-    QByteArray result = ms.ReadAll();
-    if (result.isEmpty())
-        return 0;
-
-    QTextStream text(result);
-    while (!text.atEnd())
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (!query.isConnected())
     {
-        QByteArray dbname = DB.dbName.toAscii();
-        if (text.readLine().contains(dbname.constData()))
-            ++count;
+        VERBOSE(VB_GENERAL+VB_EXTRA, "DBUtil::CountClients(): "
+                "Not connected to DB");
+        return count;
+    }
+
+    DatabaseParams DB = gCoreContext->GetDatabaseParams();
+    query.prepare("SELECT COUNT(*) FROM INFORMATION_SCHEMA.PROCESSLIST "
+                  "WHERE DB = :DBNAME ;");
+    query.bindValue(":DBNAME", DB.dbName);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("DBUtil CountClients", query);
+        return count;
+    }
+
+    while (query.next())
+    {
+        count = query.value(0).toInt();
     }
 
     // On average, each myth program has 4 database connections,
     // but we round up just in case a new program is loading:
-    count = (count + 3)/4; 
+    count = (count + 3)/4;
 
     VERBOSE(VB_GENERAL+VB_EXTRA,
             QString("DBUtil::CountClients() found %1").arg(count));
