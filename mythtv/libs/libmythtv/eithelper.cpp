@@ -304,13 +304,13 @@ static inline void parse_dvb_component_descriptors(desc_list_t list,
 void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 {
     uint descCompression = (eit->TableID() > 0x80) ? 2 : 1;
-    uint fix = fixup[eit->OriginalNetworkID() << 16];
-    fix |= fixup[(((uint64_t)eit->TSID()) << 32) |
-                 (eit->OriginalNetworkID() << 16)];
-    fix |= fixup[(eit->OriginalNetworkID() << 16) | eit->ServiceID()];
-    fix |= fixup[(((uint64_t)eit->TSID()) << 32) |
+    uint fix = fixup.value(eit->OriginalNetworkID() << 16);
+    fix |= fixup.value((((uint64_t)eit->TSID()) << 32) |
+                 (eit->OriginalNetworkID() << 16));
+    fix |= fixup.value((eit->OriginalNetworkID() << 16) | eit->ServiceID());
+    fix |= fixup.value((((uint64_t)eit->TSID()) << 32) |
                  (uint64_t)(eit->OriginalNetworkID() << 16) |
-                  (uint64_t)eit->ServiceID()];
+                  (uint64_t)eit->ServiceID());
     fix |= EITFixUp::kFixGenericDVB;
 
     uint chanid = GetChanID(eit->ServiceID(), eit->OriginalNetworkID(),
@@ -493,7 +493,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
 {
     // set fixup for Premiere
-    uint fix = fixup[133 << 16];
+    uint fix = fixup.value(133 << 16);
     fix |= EITFixUp::kFixGenericDVB;
 
     QString title         = QString("");
@@ -656,7 +656,7 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
     subtitle.detach();
     db_events.enqueue(new DBEventEIT(chanid, title, subtitle,
                                      starttime, endtime,
-                                     fixup[atsc_key], subtitle_type,
+                                     fixup.value(atsc_key), subtitle_type,
                                      audio_properties, video_properties));
 }
 
