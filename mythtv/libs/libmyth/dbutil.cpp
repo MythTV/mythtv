@@ -804,20 +804,22 @@ int DBUtil::CountClients(void)
         return count;
     }
 
-    DatabaseParams DB = gCoreContext->GetDatabaseParams();
-    query.prepare("SELECT COUNT(*) FROM INFORMATION_SCHEMA.PROCESSLIST "
-                  "WHERE DB = :DBNAME ;");
-    query.bindValue(":DBNAME", DB.dbName);
-
-    if (!query.exec())
+    if (!query.exec("SHOW PROCESSLIST;"))
     {
         MythDB::DBError("DBUtil CountClients", query);
         return count;
     }
 
+    QSqlRecord record = query.record();
+    int db_index = record.indexOf("db");
+    QString dbName = gCoreContext->GetDatabaseParams().dbName;
+    QString inUseDB;
+
     while (query.next())
     {
-        count = query.value(0).toInt();
+        inUseDB = query.value(db_index).toString();
+        if (inUseDB == dbName)
+            ++count;
     }
 
     // On average, each myth program has 4 database connections,
