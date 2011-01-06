@@ -74,8 +74,8 @@ class MPUBLIC MythScreenType : public MythUIType
     bool IsLoading(void) { return m_IsLoading; }
     bool IsLoaded(void) { return m_IsLoaded; }
 
-    void SetTextFromMap(QHash<QString, QString> &infoMap);
-    void ResetMap(QHash<QString, QString> &infoMap);
+    void SetTextFromMap(InfoMap &infoMap);
+    void ResetMap(InfoMap &infoMap);
 
     virtual MythPainter *GetPainter(void);
 

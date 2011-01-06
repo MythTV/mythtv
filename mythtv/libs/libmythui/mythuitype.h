@@ -31,6 +31,8 @@ class MythUITextEdit;
 class MythUIProgressBar;
 class MythUIWebBrowser;
 
+typedef QHash<QString,QString> InfoMap;
+
 /**
  * \defgroup MythUI MythTV User Interface Library
  *
