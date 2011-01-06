@@ -48,6 +48,12 @@ void MythSystem::initializePrivate(void)
 #endif
 }
 
+MythSystem::MythSystem()
+{
+    m_semReady.release(1);  // initialize
+    initializePrivate();
+}
+
 MythSystem::MythSystem(const QString &command, uint flags)
 {
     m_semReady.release(1);  // initialize

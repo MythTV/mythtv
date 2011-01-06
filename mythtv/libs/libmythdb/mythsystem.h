@@ -41,7 +41,7 @@ class MPUBLIC MythSystem : public QObject
     Q_OBJECT
 
     public:
-        MythSystem() {};
+        MythSystem();
         MythSystem(const QString &, uint);
         MythSystem(const QString &, const QStringList &, uint);
         MythSystem(const MythSystem &other);
