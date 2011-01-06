@@ -203,7 +203,8 @@ void MythSystemIOHandler::remove(int fd)
     {
         PMap_t::iterator i;
         i = m_pMap.find(fd);
-        HandleRead(i.key(), i.value());
+        if ( i != m_pMap.end() )
+            HandleRead(i.key(), i.value());
     }
     m_pMap.remove(fd);
     BuildFDs();
