@@ -32,10 +32,6 @@ bool StreamingRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
     filename = lfilename;
 
-    if (m_context)
-        url_close(m_context);
-    m_context = NULL;
-
     int res = url_open(&m_context, filename.toAscii(), URL_RDONLY);
 
     if (res < 0 || !m_context)
@@ -46,6 +42,17 @@ bool StreamingRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     }
 
     return true;
+}
+
+bool StreamingRingBuffer::StartFromBeginning(void)
+{
+    if (m_context)
+    {
+        url_close(m_context);
+        m_context = NULL;
+    }
+
+    return OpenFile(filename);
 }
 
 long long StreamingRingBuffer::Seek(long long pos, int whence, bool has_lock)

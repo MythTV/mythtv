@@ -19,6 +19,7 @@ class StreamingRingBuffer : public RingBuffer
                           uint retry_ms = kDefaultOpenTimeout);
     virtual long long Seek(long long pos, int whence, bool has_lock);
     virtual long long GetRealFileSize(void);
+    bool StartFromBeginning(void);
 
   protected:
     virtual int safe_read(void *data, uint sz);

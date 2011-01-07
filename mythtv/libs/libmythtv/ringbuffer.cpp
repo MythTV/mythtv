@@ -1429,6 +1429,11 @@ const BDRingBuffer  *RingBuffer::BD(void) const
     return dynamic_cast<const BDRingBuffer*>(this);
 }
 
+const StreamingRingBuffer  *RingBuffer::Stream(void) const
+{
+    return dynamic_cast<const StreamingRingBuffer*>(this);
+}
+
 DVDRingBuffer *RingBuffer::DVD(void)
 {
     return dynamic_cast<DVDRingBuffer*>(this);
@@ -1437,6 +1442,11 @@ DVDRingBuffer *RingBuffer::DVD(void)
 BDRingBuffer  *RingBuffer::BD(void)
 {
     return dynamic_cast<BDRingBuffer*>(this);
+}
+
+StreamingRingBuffer  *RingBuffer::Stream(void)
+{
+    return dynamic_cast<StreamingRingBuffer*>(this);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
