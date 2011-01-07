@@ -3,10 +3,10 @@
 // Created     : Oct. 24, 2005
 //
 // Purpose     : UPnp Device Description parser/generator
-//                                                                            
+//
 // Copyright (c) 2005 David Blain <mythtv@theblains.net>
-//                                          
-// This library is free software; you can redistribute it and/or 
+//
+// This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or at your option any later version of the LGPL.
@@ -26,6 +26,7 @@
 
 #include <QDomDocument>
 #include <QUrl>
+#include <QHash>
 
 #include "compat.h"
 #include "upnpexp.h"
@@ -77,7 +78,7 @@ class UPNP_PUBLIC UPnpService
         QString     m_sControlURL;
         QString     m_sEventSubURL;
 
-        UPnpService() {}        
+        UPnpService() {}
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -144,7 +145,7 @@ class UPNP_PUBLIC UPnpDevice
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
-// 
+//
 //
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -157,7 +158,7 @@ class UPNP_PUBLIC UPnpDeviceDesc
         QString         m_sHostName;
         QUrl            m_HostUrl;
 
-    protected: 
+    protected:
 
         void    _InternalLoad( QDomNode  oNode, UPnpDevice *pCurDevice );
 
@@ -166,7 +167,7 @@ class UPNP_PUBLIC UPnpDeviceDesc
         void     ProcessDeviceList ( QDomNode oListNode, UPnpDevice *pDevice );
 
         void     OutputDevice( QTextStream &os,
-                               UPnpDevice *pDevice, 
+                               UPnpDevice *pDevice,
                                const QString &sUserAgent = "" );
 
         void     SetStrValue ( const QDomNode &n, QString &sValue );
@@ -229,7 +230,7 @@ class UPNP_PUBLIC DeviceLocation : public RefCounted
         QString     m_sURI;           // Service Type URI
         QString     m_sUSN;           // Unique Service Name
         QString     m_sLocation;      // URL to Device Description
-        TaskTime    m_ttExpires;        
+        TaskTime    m_ttExpires;
         QString     m_sSecurityPin;   // Use for MythXML methods needed pin
 
     public:
@@ -296,6 +297,34 @@ class UPNP_PUBLIC DeviceLocation : public RefCounted
             return pDevice->m_rootDevice.m_sFriendlyName
                    + " (" + pDevice->m_sHostName + "), "
                    + pDevice->m_rootDevice.m_sUDN;
+        }
+
+        void GetDeviceDetail(QHash<QString, QString> &map,
+                             bool bInQtThread = true)
+        {
+            map["location"] = m_sLocation;
+
+            UPnpDeviceDesc *pDevice = GetDeviceDesc(bInQtThread);
+            if (!pDevice)
+                return;
+
+            map["hostname"] = pDevice->m_sHostName;
+            map["name"] = pDevice->m_rootDevice.m_sFriendlyName;
+            map["modelname"] = pDevice->m_rootDevice.m_sModelName;
+            map["modelnumber"] = pDevice->m_rootDevice.m_sModelNumber;
+            map["modelurl"] = pDevice->m_rootDevice.m_sModelURL;
+            map["modeldescription"] = pDevice->m_rootDevice.m_sModelDescription;
+            map["manufacturer"] = pDevice->m_rootDevice.m_sManufacturer;
+            map["manufacturerurl"] = pDevice->m_rootDevice.m_sManufacturerURL;
+            map["devicetype"] = pDevice->m_rootDevice.m_sDeviceType;
+            map["serialnumber"] = pDevice->m_rootDevice.m_sSerialNumber;
+            map["UDN"] = pDevice->m_rootDevice.m_sUDN;
+            map["UPC"] = pDevice->m_rootDevice.m_sUPC;
+        }
+
+        const QString GetSecurityPin(void) const
+        {
+            return m_sSecurityPin;
         }
 };
 
