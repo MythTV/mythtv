@@ -1887,18 +1887,20 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         { // currentaudiotime == 0 after a seek
             // The time at the start of this frame (ie, now) is given by
             // last->timecode
-            int delta = (int)((timecode - prevtc)/play_speed) - (frame_interval / 1000);
-            prevtc = timecode;
-            //cerr << delta << " ";
-
-            // If the timecode is off by a frame (dropped frame) wait to sync
-            if (delta > (int) frame_interval / 1200 &&
-                delta < (int) frame_interval / 1000 * 3 &&
-                prevrp == 0)
+            if (prevtc != 0)
             {
-                // wait an extra frame interval
-                avsync_adjustment += frame_interval;
+                int delta = (int)((timecode - prevtc)/play_speed) - (frame_interval / 1000);
+                // If the timecode is off by a frame (dropped frame) wait to sync
+                if (delta > (int) frame_interval / 1200 &&
+                    delta < (int) frame_interval / 1000 * 3 &&
+                    prevrp == 0)
+                {
+                    // wait an extra frame interval
+                    VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, LOC + QString("A/V delay %1").arg(delta));
+                    avsync_adjustment += frame_interval;
+                }
             }
+            prevtc = timecode;
             prevrp = repeat_pict;
 
             avsync_delay = (timecode - currentaudiotime) * 1000;//usec
