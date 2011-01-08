@@ -514,6 +514,7 @@ class MPUBLIC MythPlayer
     void  InitAVSync(void);
     virtual void AVSync(VideoFrame *buffer, bool limit_delay = false);
     void  ResetAVSync(void);
+    int64_t AVSyncGetAudiotime(void);
     void  SetFrameInterval(FrameScanType scan, double speed);
     void  FallbackDeint(void);
     void  CheckExtraAudioDecode(void);

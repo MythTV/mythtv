@@ -1682,6 +1682,16 @@ void MythPlayer::InitAVSync(void)
     }
 }
 
+int64_t MythPlayer::AVSyncGetAudiotime(void)
+{
+    int64_t currentaudiotime = 0;
+    if (normal_speed)
+    {
+        currentaudiotime = audio.GetAudioTime();
+    }
+    return currentaudiotime;
+}
+ 
 #define MAXDIVERGE  3.0f
 #define DIVERGELIMIT 30.0f
 void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
@@ -1698,6 +1708,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
 
     float diverge = 0.0f;
     int frameDelay = m_double_framerate ? frame_interval / 2 : frame_interval;
+    int64_t currentaudiotime = 0;
 
     // attempt to reduce fps for standalone PIP
     if (player_ctx->IsPIP() && framesPlayed % 2)
@@ -1758,6 +1769,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         // Reset A/V Sync
         lastsync = true;
 
+        currentaudiotime = AVSyncGetAudiotime();
         if (!using_null_videoout &&
             videoOutput->hasHWAcceleration() &&
            !videoOutput->IsSyncLocked())
@@ -1787,6 +1799,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, LOC + QString("AVSync waitforframe %1 %2")
                 .arg(avsync_adjustment).arg(m_double_framerate));
         videosync->WaitForFrame(frameDelay + avsync_adjustment + repeat_delay);
+        currentaudiotime = AVSyncGetAudiotime();
         VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, LOC + "AVSync show");
         videoOutput->Show(ps);
 
@@ -1828,10 +1841,18 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     else
     {
         videosync->WaitForFrame(frameDelay);
+        currentaudiotime = AVSyncGetAudiotime();
     }
 
     if (output_jmeter)
-        output_jmeter->RecordCycleTime();
+    {
+        if (output_jmeter->RecordCycleTime())
+        {
+            VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, LOC + QString("A/V avsync_delay: %1, "
+                    "avsync_avg: %2")
+                    .arg(avsync_delay / 1000).arg(avsync_avg / 1000));
+        }
+    }
 
     avsync_adjustment = 0;
 
