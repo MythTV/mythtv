@@ -3,10 +3,10 @@
 // Created     : Oct. 24, 2005
 //
 // Purpose     : UPnp Device Description parser/generator
-//                                                                            
+//
 // Copyright (c) 2005 David Blain <mythtv@theblains.net>
-//                                          
-// This library is free software; you can redistribute it and/or 
+//
+// This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or at your option any later version of the LGPL.
@@ -24,6 +24,9 @@
 #include "upnp.h"
 #include "upnpdevice.h"
 #include "httpcomms.h"
+
+// MythDB
+#include "mythdb.h"
 
 #include <cerrno>
 
@@ -127,6 +130,10 @@ bool UPnpDeviceDesc::Load( const QDomDocument &xmlDevDesc )
 
 void UPnpDeviceDesc::_InternalLoad( QDomNode oNode, UPnpDevice *pCurDevice )
 {
+    QString pin = GetMythDB()->GetSetting( "SecurityPin", "");
+    pCurDevice->m_securityPin = (pin.isEmpty() || pin == "0000") ?
+                                false : true;
+
     for ( oNode = oNode.firstChild();
                  !oNode.isNull();
                   oNode = oNode.nextSibling() )
@@ -166,6 +173,11 @@ void UPnpDeviceDesc::_InternalLoad( QDomNode oNode, UPnpDevice *pCurDevice )
             { ProcessServiceList( oNode, pCurDevice ); continue; }
             if ( e.tagName() == "deviceList"       )
             { ProcessDeviceList ( oNode, pCurDevice ); continue; }
+
+            if ( e.tagName() == "mythtv:X_secure"  )
+            { SetBoolValue( e, pCurDevice->m_securityPin ); continue; }
+            if ( e.tagName() == "mythtv:X_protocol"  )
+            { SetStrValue( e, pCurDevice->m_protocolVersion ); continue; }
 
             // Not one of the expected element names... add to extra list.
 
@@ -223,7 +235,7 @@ void UPnpDeviceDesc::ProcessServiceList( QDomNode oListNode, UPnpDevice *pDevice
         {
             if ( e.tagName() == "service" )
             {
-                UPnpService *pService = new UPnpService(); 
+                UPnpService *pService = new UPnpService();
                 pDevice->m_listServices.append( pService );
 
                 SetStrValue( e.namedItem( "serviceType" ),
@@ -302,6 +314,20 @@ void UPnpDeviceDesc::SetNumValue( const QDomNode &n, int &nValue )
     }
 }
 
+void UPnpDeviceDesc::SetBoolValue( const QDomNode &n, bool &nValue )
+{
+    if (!n.isNull())
+    {
+        QDomText  oText = n.firstChild().toText();
+
+        if (!oText.isNull())
+        {
+            QString s = oText.nodeValue();
+            nValue = (s == "yes" || s == "true" || s.toInt());
+        }
+    }
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -315,7 +341,7 @@ QString  UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, int nPort )
     os << flush;
     return( sXML );
 }
-    
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -346,7 +372,7 @@ void UPnpDeviceDesc::GetValidXML(
 /////////////////////////////////////////////////////////////////////////////
 
 void UPnpDeviceDesc::OutputDevice( QTextStream &os,
-                                   UPnpDevice *pDevice, 
+                                   UPnpDevice *pDevice,
                                    const QString &sUserAgent )
 {
     if (pDevice == NULL)
@@ -363,7 +389,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     if (pDevice == &m_rootDevice)
         sFriendlyName = UPnp::g_pConfig->GetValue( "UPnP/FriendlyName",
                                                    sFriendlyName  );
-    
+
     os << "<device>\n";
     os << FormatValue( "deviceType"   , pDevice->m_sDeviceType );
     os << FormatValue( "friendlyName" , sFriendlyName          );
@@ -371,7 +397,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     // ----------------------------------------------------------------------
     // XBox 360 needs specific values in the Device Description.
     //
-    // -=>TODO: This should be externalized in a more generic/extension 
+    // -=>TODO: This should be externalized in a more generic/extension
     //          kind of way.
     // ----------------------------------------------------------------------
 
@@ -380,7 +406,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
         sUserAgent.startsWith( QString("Mozilla/4.0"), Qt::CaseInsensitive);
 
     os << FormatValue( "manufacturer" , pDevice->m_sManufacturer    );
-    os << FormatValue( "modelURL"     , pDevice->m_sModelURL        );    
+    os << FormatValue( "modelURL"     , pDevice->m_sModelURL        );
 
     if ( bIsXbox360 )
     {
@@ -399,10 +425,14 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     os << FormatValue( "UPC"              , pDevice->m_sUPC             );
     os << FormatValue( "presentationURL"  , pDevice->m_sPresentationURL );
 
+    // MythTV Custom information
+    os << FormatValue( "mythtv:X_secure" , pDevice->m_securityPin ? "true" : "false");
+    os << FormatValue( "mythtv:X_protocol", pDevice->m_protocolVersion );
+
     NameValues::const_iterator nit = pDevice->m_lstExtra.begin();
     for (; nit != pDevice->m_lstExtra.end(); ++nit)
     {
-        // -=>TODO: Hack to handle one element with attributes... need to 
+        // -=>TODO: Hack to handle one element with attributes... need to
         //          handle attributes in a more generic way.
 
         if ((*nit).sName == "dlna:X_DLNADOC")
@@ -496,7 +526,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
         {
             os << "<deviceList>";
 
-            for ( UPnpDevice *pEmbeddedDevice  = pDevice->m_listDevices.first(); 
+            for ( UPnpDevice *pEmbeddedDevice  = pDevice->m_listDevices.first();
                               pEmbeddedDevice != NULL;
                               pEmbeddedDevice  = pDevice->m_listDevices.next() )
             {
@@ -525,7 +555,7 @@ QString UPnpDeviceDesc::FormatValue( const QString &sName, const QString &sValue
 }
 
 /////////////////////////////////////////////////////////////////////////////
-              
+
 QString UPnpDeviceDesc::FormatValue( const QString &sName, int nValue )
 {
     return( QString( "<%1>%2</%1>\n" ).arg( sName ).arg(nValue) );
@@ -542,7 +572,7 @@ QString UPnpDeviceDesc::FindDeviceUDN( UPnpDevice *pDevice, QString sST )
 
     if (sST == pDevice->GetUDN())
         return sST;
-            
+
     // ----------------------------------------------------------------------
     // Check for matching Service
     // ----------------------------------------------------------------------

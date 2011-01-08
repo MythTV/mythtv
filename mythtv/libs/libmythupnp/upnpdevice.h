@@ -102,6 +102,10 @@ class UPNP_PUBLIC UPnpDevice
 
         NameValues      m_lstExtra;
 
+        /// MythTV specific information
+        bool            m_securityPin;
+        QString         m_protocolVersion;
+
         UPnpIconList    m_listIcons;
         UPnpServiceList m_listServices;
         UPnpDeviceList  m_listDevices;
@@ -112,6 +116,8 @@ class UPNP_PUBLIC UPnpDevice
         {
             m_sModelNumber  = MYTH_BINARY_VERSION;
             m_sSerialNumber = myth_source_version;
+            m_securityPin   = false;
+            m_protocolVersion = MYTH_PROTO_VERSION;
         }
         ~UPnpDevice()
         {
@@ -172,6 +178,7 @@ class UPNP_PUBLIC UPnpDeviceDesc
 
         void     SetStrValue ( const QDomNode &n, QString &sValue );
         void     SetNumValue ( const QDomNode &n, int     &nValue );
+        void     SetBoolValue( const QDomNode &n, bool    &nValue );
 
         QString  FormatValue ( const QString &sName, const QString &sValue );
         QString  FormatValue ( const QString &sName, int nValue );
@@ -322,9 +329,13 @@ class UPNP_PUBLIC DeviceLocation : public RefCounted
             map["UPC"] = pDevice->m_rootDevice.m_sUPC;
         }
 
-        const QString GetSecurityPin(void) const
+        bool NeedSecurityPin( bool bInQtThread = true )
         {
-            return m_sSecurityPin;
+            UPnpDeviceDesc *pDevice = GetDeviceDesc(bInQtThread);
+            if (!pDevice)
+                return false;
+
+            return pDevice->m_rootDevice.m_securityPin;
         }
 };
 
