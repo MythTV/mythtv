@@ -178,7 +178,7 @@ int VideoSync::CalcDelay()
         m_nexttrigger = now + ret_val;
     }
 
-    if (ret_val < -m_frame_interval)
+    if (ret_val < -m_frame_interval && m_frame_interval >= m_refresh_interval)
     {
         ret_val = -m_frame_interval;
 
@@ -196,6 +196,7 @@ int VideoSync::CalcDelay()
  *   delay > 0 which would cause continous rapid fire stuttering.
  *   This method is only useful for those sync methods where WaitForFrame
  *   targets hardware retrace rather than targeting nexttrigger.
+ *   NOTE: deprecated in favor of handling phase issues in mythplayer's AVSync.
  */
 void VideoSync::KeepPhase()
 {
@@ -293,7 +294,7 @@ void DRMVideoSync::Start(void)
     VideoSync::Start();
 }
 
-void DRMVideoSync::WaitForFrame(int sync_delay)
+int DRMVideoSync::WaitForFrame(int sync_delay)
 {
     // Offset for externally-provided A/V sync delay
     m_nexttrigger += sync_delay;
@@ -316,7 +317,7 @@ void DRMVideoSync::WaitForFrame(int sync_delay)
     if (m_delay > 0)
     {
         // Wait for any remaining retrace intervals in one pass.
-        int n = m_delay / m_refresh_interval + 1;
+        int n = (m_delay + m_refresh_interval - 1) / m_refresh_interval;
 
         drm_wait_vblank_t blank;
         blank.request.type = DRM_VBLANK_RELATIVE;
@@ -327,7 +328,7 @@ void DRMVideoSync::WaitForFrame(int sync_delay)
         //cerr  << " Delay " << m_delay << endl;
     }
 
-    KeepPhase();
+    return m_delay;
 }
 #endif /* !_WIN32 */
 
@@ -397,7 +398,7 @@ void OpenGLVideoSync::Start(void)
 #endif /* USING_OPENGL_VSYNC */
 }
 
-void OpenGLVideoSync::WaitForFrame(int sync_delay)
+int OpenGLVideoSync::WaitForFrame(int sync_delay)
 {
     (void) sync_delay;
 #ifdef USING_OPENGL_VSYNC
@@ -409,11 +410,11 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
         m_delay = CalcDelay();
         if (m_delay > 0)
             usleep(m_delay);
-        return;
+        return 0;
     }
 
     if (!m_context)
-        return;
+        return 0;
 
     unsigned int frameNum = m_context->GetVideoSyncCount();
 
@@ -427,12 +428,12 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
     // Wait for any remaining retrace intervals in one pass.
     if (m_delay > 0)
     {
-        uint n = m_delay / m_refresh_interval + 1;
+        uint n = (m_delay + m_refresh_interval - 1) / m_refresh_interval;
         m_context->WaitForVideoSync((n+1), (frameNum+n)%(n+1), &frameNum);
         m_delay = CalcDelay();
     }
 
-    KeepPhase();
+    return m_delay;
 #endif /* USING_OPENGL_VSYNC */
 }
 #endif /* !_WIN32 */
@@ -479,7 +480,7 @@ bool RTCVideoSync::TryInit(void)
     return true;
 }
 
-void RTCVideoSync::WaitForFrame(int sync_delay)
+int RTCVideoSync::WaitForFrame(int sync_delay)
 {
     m_nexttrigger += sync_delay;
 
@@ -494,6 +495,7 @@ void RTCVideoSync::WaitForFrame(int sync_delay)
         if ((val < 0) && (m_delay > 0))
             usleep(m_delay);
     }
+    return 0;
 }
 #endif /* __linux__ */
 
@@ -517,7 +519,7 @@ bool VDPAUVideoSync::TryInit(void)
     return true;
 }
 
-void VDPAUVideoSync::WaitForFrame(int sync_delay)
+int VDPAUVideoSync::WaitForFrame(int sync_delay)
 {
     // Offset for externally-provided A/V sync delay
     m_nexttrigger += sync_delay;
@@ -528,6 +530,7 @@ void VDPAUVideoSync::WaitForFrame(int sync_delay)
 
     VideoOutputVDPAU *vo = (VideoOutputVDPAU *)(m_video_output);
     vo->SetNextFrameDisplayTimeOffset(m_delay);
+    return 0;
 }
 #endif
 
@@ -548,7 +551,7 @@ bool BusyWaitVideoSync::TryInit(void)
     return true;
 }
 
-void BusyWaitVideoSync::WaitForFrame(int sync_delay)
+int BusyWaitVideoSync::WaitForFrame(int sync_delay)
 {
     // Offset for externally-provided A/V sync delay
     m_nexttrigger += sync_delay;
@@ -577,6 +580,7 @@ void BusyWaitVideoSync::WaitForFrame(int sync_delay)
         if (cnt > 1)
             m_cheat -= 200;
     }
+    return 0;
 }
 
 USleepVideoSync::USleepVideoSync(VideoOutput *vo,
@@ -594,7 +598,7 @@ bool USleepVideoSync::TryInit(void)
     return true;
 }
 
-void USleepVideoSync::WaitForFrame(int sync_delay)
+int USleepVideoSync::WaitForFrame(int sync_delay)
 {
     // Offset for externally-provided A/V sync delay
     m_nexttrigger += sync_delay;
@@ -602,5 +606,6 @@ void USleepVideoSync::WaitForFrame(int sync_delay)
     m_delay = CalcDelay();
     if (m_delay > 0)
         usleep(m_delay);
+    return 0;
 }
 

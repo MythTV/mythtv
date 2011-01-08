@@ -64,6 +64,7 @@ class VideoSync
     virtual void Start(void);
 
     /** \brief Waits for next a frame or field.
+     *   Returns delay to real frame timing in usec
      *
      *   Start(void), WaitForFrame(void), and Stop(void) should
      *   always be called from same thread, to prevent bad
@@ -72,7 +73,7 @@ class VideoSync
      *  \param sync_delay time until the desired frame or field
      *  \sa CalcDelay(void), KeepPhase(void)
      */
-    virtual void WaitForFrame(int sync_delay) = 0;
+    virtual int WaitForFrame(int sync_delay) = 0;
 
     /// \brief Returns the (minimum) refresh interval of the output device.
     int getRefreshInterval(void) const { return m_refresh_interval; }
@@ -123,7 +124,7 @@ class DRMVideoSync : public VideoSync
     QString getName(void) const { return QString("DRM"); }
     bool TryInit(void);
     void Start(void);
-    void WaitForFrame(int sync_delay);
+    int WaitForFrame(int sync_delay);
 
   private:
     int m_dri_fd;
@@ -164,7 +165,7 @@ class OpenGLVideoSync : public VideoSync
     QString getName(void) const { return QString("SGI OpenGL"); }
     bool TryInit(void);
     void Start(void);
-    void WaitForFrame(int sync_delay);
+    int WaitForFrame(int sync_delay);
 
   private:
     MythRenderOpenGL  *m_context;
@@ -192,7 +193,7 @@ class RTCVideoSync : public VideoSync
 
     QString getName(void) const { return QString("RTC"); }
     bool TryInit(void);
-    void WaitForFrame(int sync_delay);
+    int WaitForFrame(int sync_delay);
 
   private:
     int m_rtcfd;
@@ -212,7 +213,7 @@ class VDPAUVideoSync : public VideoSync
 
     QString getName(void) const { return QString("VDPAU"); }
     bool TryInit(void);
-    void WaitForFrame(int sync_delay);
+    int WaitForFrame(int sync_delay);
 
   private:
 };
@@ -239,7 +240,7 @@ class BusyWaitVideoSync : public VideoSync
 
     QString getName(void) const { return QString("USleep with busy wait"); }
     bool TryInit(void);
-    void WaitForFrame(int sync_delay);
+    int WaitForFrame(int sync_delay);
 
   private:
     int m_cheat;
@@ -266,6 +267,6 @@ class USleepVideoSync : public VideoSync
 
     QString getName(void) const { return QString("USleep"); }
     bool TryInit(void);
-    void WaitForFrame(int sync_delay);
+    int WaitForFrame(int sync_delay);
 };
 #endif /* VSYNC_H_INCLUDED */

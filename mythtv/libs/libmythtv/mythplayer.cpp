@@ -1708,6 +1708,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
 
     float diverge = 0.0f;
     int frameDelay = m_double_framerate ? frame_interval / 2 : frame_interval;
+    int vsync_delay_clock = 0;
     int64_t currentaudiotime = 0;
 
     // attempt to reduce fps for standalone PIP
@@ -1798,7 +1799,8 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         osdLock.unlock();
         VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, LOC + QString("AVSync waitforframe %1 %2")
                 .arg(avsync_adjustment).arg(m_double_framerate));
-        videosync->WaitForFrame(frameDelay + avsync_adjustment + repeat_delay);
+        vsync_delay_clock = videosync->WaitForFrame
+                            (frameDelay + avsync_adjustment + repeat_delay);
         currentaudiotime = AVSyncGetAudiotime();
         VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, LOC + "AVSync show");
         videoOutput->Show(ps);
@@ -1828,7 +1830,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
             videoOutput->PrepareFrame(buffer, ps, osd);
             osdLock.unlock();
             // Display the second field
-            videosync->WaitForFrame(frameDelay + avsync_adjustment);
+            vsync_delay_clock = videosync->WaitForFrame(frameDelay + avsync_adjustment);
             videoOutput->Show(ps);
         }
 
@@ -1840,7 +1842,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     }
     else
     {
-        videosync->WaitForFrame(frameDelay);
+        vsync_delay_clock = videosync->WaitForFrame(frameDelay);
         currentaudiotime = AVSyncGetAudiotime();
     }
 
@@ -1869,19 +1871,22 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
 
     if (audio.HasAudioOut() && normal_speed)
     {
+        // must be sampled here due to Show delays
         int64_t currentaudiotime = audio.GetAudioTime();
-        VERBOSE(VB_TIMESTAMP, LOC + QString(
+        VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, LOC + QString(
                     "A/V timecodes audio %1 video %2 frameinterval %3 "
                     "avdel %4 avg %5 tcoffset %6 "
-                    "avp %7 avpen %8")
+                    "avp %7 avpen %8 avdc %9")
                 .arg(currentaudiotime)
                 .arg(timecode)
                 .arg(frame_interval)
-                .arg(timecode - currentaudiotime)
+                .arg(timecode - currentaudiotime -
+                     (int)(vsync_delay_clock*audio.GetStretchFactor()+500)/1000)
                 .arg(avsync_avg)
                 .arg(tc_wrap[TC_AUDIO])
                 .arg(avsync_predictor)
                 .arg(avsync_predictor_enabled)
+                .arg(vsync_delay_clock)
                  );
         if (currentaudiotime != 0 && timecode != 0)
         { // currentaudiotime == 0 after a seek
@@ -1903,7 +1908,8 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
             prevtc = timecode;
             prevrp = repeat_pict;
 
-            avsync_delay = (timecode - currentaudiotime) * 1000;//usec
+            avsync_delay = (timecode - currentaudiotime) * 1000 -
+                            (int)(vsync_delay_clock*audio.GetStretchFactor()); //usec
             // prevents major jitter when pts resets during dvd title
             if (avsync_delay > 2000000 && limit_delay)
                 avsync_delay = 90000;
