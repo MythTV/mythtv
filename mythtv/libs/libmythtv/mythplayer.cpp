@@ -1860,7 +1860,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     {
         // If audio is way behind of video, adjust for it...
         // by cutting the frame rate in half for the length of this frame
-        avsync_adjustment = refreshrate;
+        avsync_adjustment = frame_interval;
         lastsync = true;
         VERBOSE(VB_PLAYBACK, LOC +
                 QString("Video is %1 frames ahead of audio,\n"
