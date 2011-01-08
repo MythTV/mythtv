@@ -145,6 +145,22 @@ class UPNP_PUBLIC UPnpDevice
 
             return m_sUDN;
         }
+
+        void toMap(QHash<QString, QString> &map)
+        {
+            map["name"] = m_sFriendlyName;
+            map["modelname"] = m_sModelName;
+            map["modelnumber"] = m_sModelNumber;
+            map["modelurl"] = m_sModelURL;
+            map["modeldescription"] = m_sModelDescription;
+            map["manufacturer"] = m_sManufacturer;
+            map["manufacturerurl"] = m_sManufacturerURL;
+            map["devicetype"] = m_sDeviceType;
+            map["serialnumber"] = m_sSerialNumber;
+            map["UDN"] = m_sUDN;
+            map["UPC"] = m_sUPC;
+            map["protocolversion"] = m_protocolVersion;
+        }
 };
 
 
@@ -203,6 +219,11 @@ class UPNP_PUBLIC UPnpDeviceDesc
         static UPnpDevice     *FindDevice( UPnpDevice *pDevice, const QString &sURI );
         static UPnpDeviceDesc *Retrieve  ( QString &sURL, bool bInQtThread = true   );
 
+        void toMap(QHash<QString, QString> &map)
+        {
+            map["hostname"] = m_sHostName;
+            m_rootDevice.toMap(map);
+        }
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -315,18 +336,7 @@ class UPNP_PUBLIC DeviceLocation : public RefCounted
             if (!pDevice)
                 return;
 
-            map["hostname"] = pDevice->m_sHostName;
-            map["name"] = pDevice->m_rootDevice.m_sFriendlyName;
-            map["modelname"] = pDevice->m_rootDevice.m_sModelName;
-            map["modelnumber"] = pDevice->m_rootDevice.m_sModelNumber;
-            map["modelurl"] = pDevice->m_rootDevice.m_sModelURL;
-            map["modeldescription"] = pDevice->m_rootDevice.m_sModelDescription;
-            map["manufacturer"] = pDevice->m_rootDevice.m_sManufacturer;
-            map["manufacturerurl"] = pDevice->m_rootDevice.m_sManufacturerURL;
-            map["devicetype"] = pDevice->m_rootDevice.m_sDeviceType;
-            map["serialnumber"] = pDevice->m_rootDevice.m_sSerialNumber;
-            map["UDN"] = pDevice->m_rootDevice.m_sUDN;
-            map["UPC"] = pDevice->m_rootDevice.m_sUPC;
+            pDevice->toMap(map);
         }
 
         bool NeedSecurityPin( bool bInQtThread = true )
