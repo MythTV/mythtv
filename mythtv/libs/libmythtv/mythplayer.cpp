@@ -1909,19 +1909,21 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
                 avsync_delay = 90000;
             avsync_avg = (avsync_delay + (avsync_avg * 3)) / 4;
 
+            int avsync_used = avsync_avg;
+            if (labs(avsync_used) > labs(avsync_delay))
+                avsync_used = avsync_delay;
+
             /* If the audio time codes and video diverge, shift
                the video by one interlaced field (1/2 frame) */
             if (!lastsync)
             {
-                if (avsync_avg > frame_interval * 3 / 2)
+                if (avsync_used > refreshrate)
                 {
                     avsync_adjustment += refreshrate;
-                    lastsync = true;
                 }
-                else if (avsync_avg < 0 - frame_interval * 3 / 2)
+                else if (avsync_used < 0 - refreshrate)
                 {
                     avsync_adjustment -= refreshrate;
-                    lastsync = true;
                 }
             }
             else
@@ -1931,6 +1933,10 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         {
             ResetAVSync();
         }
+    }
+    else
+    {
+        VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, LOC + QString("A/V no sync proc ns:%1").arg(normal_speed));
     }
 }
 
