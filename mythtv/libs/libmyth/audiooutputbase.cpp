@@ -854,7 +854,7 @@ void AudioOutputBase::Reset()
 void AudioOutputBase::SetTimecode(int64_t timecode)
 {
     audbuf_timecode = audiotime = timecode;
-    frames_buffered = (timecode * (int64_t)source_samplerate) / 1000LL;
+    frames_buffered = (timecode * source_samplerate) / 1000;
 }
 
 /**
@@ -911,10 +911,10 @@ int AudioOutputBase::audioready()
  */
 int64_t AudioOutputBase::GetAudiotime(void)
 {
-    if (audbuf_timecode == 0LL || !m_configure_succeeded)
-        return 0LL;
+    if (audbuf_timecode == 0 || !m_configure_succeeded)
+        return 0;
 
-    int64_t obpf = (int64_t)output_bytes_per_frame;
+    int obpf = output_bytes_per_frame;
     int64_t oldaudiotime;
 
     /* We want to calculate 'audiotime', which is the timestamp of the audio
@@ -933,11 +933,11 @@ int64_t AudioOutputBase::GetAudiotime(void)
 
     QMutexLocker lockav(&avsync_lock);
 
-    int64_t soundcard_buffer = (int64_t)GetBufferedOnSoundcard(); // bytes
-    int64_t main_buffer =(int64_t)audioready();
+    int soundcard_buffer = GetBufferedOnSoundcard(); // bytes
 
     /* audioready tells us how many bytes are in audiobuffer
        scaled appropriately if output format != internal format */
+    int main_buffer = audioready();
 
     oldaudiotime = audiotime;
 
@@ -946,8 +946,8 @@ int64_t AudioOutputBase::GetAudiotime(void)
        processing latencies are catered for in AddFrames/SetAudiotime
        to eliminate race */
     audiotime = audbuf_timecode - (
-        ((main_buffer + soundcard_buffer) * (int64_t)eff_stretchfactor ) /
-        ((int64_t)effdsp * obpf));
+        ((int64_t)(main_buffer + soundcard_buffer) * eff_stretchfactor) /
+        (effdsp * obpf));
 
     /* audiotime should never go backwards, but we might get a negative
        value if GetBufferedOnSoundcard() isn't updated by the driver very
@@ -977,42 +977,39 @@ int64_t AudioOutputBase::GetAudiotime(void)
  */
 void AudioOutputBase::SetAudiotime(int frames, int64_t timecode)
 {
-    int64_t processframes_stretched = 0LL;
-    int64_t processframes_unstretched = 0LL;
-    int64_t old_audbuf_timecode = audbuf_timecode;
+    int64_t processframes_stretched   = 0;
+    int64_t processframes_unstretched = 0;
+    int64_t old_audbuf_timecode       = audbuf_timecode;
 
     if (!m_configure_succeeded)
         return;
 
     if (needs_upmix && upmixer)
-        processframes_unstretched -= (int64_t)upmixer->frameLatency();
+        processframes_unstretched -= upmixer->frameLatency();
 
     if (pSoundStretch)
     {
-        processframes_unstretched -=
-            (int64_t)pSoundStretch->numUnprocessedSamples();
-        processframes_stretched   -=
-            (int64_t)pSoundStretch->numSamples();
+        processframes_unstretched -= pSoundStretch->numUnprocessedSamples();
+        processframes_stretched   -= pSoundStretch->numSamples();
     }
 
     if (encoder)
     {
         // the input buffered data is still in audio_bytes_per_sample format
         processframes_stretched -=
-            (int64_t)(encoder->Buffered() / output_bytes_per_frame);
+            encoder->Buffered() / output_bytes_per_frame;
     }
 
     audbuf_timecode =
-        timecode + (
-            ((int64_t)frames + processframes_unstretched * 100000LL) +
-            (processframes_stretched * (int64_t)eff_stretchfactor)
-                    ) / (int64_t)effdsp;
+        timecode + ((frames + processframes_unstretched * 100000) +
+                    (processframes_stretched * eff_stretchfactor)
+                   ) / effdsp;
 
     // check for timecode wrap and reset audiotime if detected
     // timecode will always be monotonic asc if not seeked and reset
     // happens if seek or pause happens
     if (audbuf_timecode < old_audbuf_timecode)
-        audiotime = 0LL;
+        audiotime = 0;
 
     VBAUDIOTS(QString("SetAudiotime atc=%1 tc=%2 f=%3 pfu=%4 pfs=%5")
               .arg(audbuf_timecode)
@@ -1032,10 +1029,10 @@ void AudioOutputBase::SetAudiotime(int frames, int64_t timecode)
  */
 int64_t AudioOutputBase::GetAudioBufferedTime(void)
 {
-    int64_t ret = audbuf_timecode - (int64_t)GetAudiotime();
+    int64_t ret = audbuf_timecode - GetAudiotime();
     // Pulse can give us values that make this -ve
-    if (ret < 0LL)
-        return 0LL;
+    if (ret < 0)
+        return 0;
     return ret;
 }
 
@@ -1222,8 +1219,8 @@ bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
     if (timecode < 0)
     {
         // Send original samples to mythmusic visualisation
-        timecode = (frames_buffered * 1000LL) / (int64_t)source_samplerate;
-        frames_buffered += (int64_t)frames;
+        timecode = (frames_buffered * 1000) / source_samplerate;
+        frames_buffered += frames;
         dispatchVisual((uchar *)in_buffer, len, timecode, source_channels,
                        output_settings->FormatToBits(format));
         music = true;
