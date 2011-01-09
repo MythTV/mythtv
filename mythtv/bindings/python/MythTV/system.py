@@ -11,7 +11,9 @@ from utility import levenshtein
 from database import DBCache
 
 from subprocess import Popen
+from select import select
 from lxml import etree
+import shlex
 import os
 
 class System( DBCache ):
@@ -40,24 +42,41 @@ class System( DBCache ):
         except MythError:
             return s.returncode
 
-    def __init__(self, path=None, setting=None, db=None):
+    def __init__(self, path=None, setting=None, db=None, useshell=True):
         DBCache.__init__(self, db=db)
         self.log = MythLog(self.logmodule, db=self)
         self.path = None
+
         if setting is not None:
+            # pull setting from database, substitute from argument if needed
             host = self.gethostname()
             self.path = self.settings[host][setting]
             if (self.path is None) and (path is None):
                 raise MythDBError(MythError.DB_SETTING, setting, host)
+
         if self.path is None:
+            # setting not given, use path from argument
             if path is None:
                 raise MythError('Invalid input to System()')
             self.path = path
+
+        cmd = self.path.split()[0]
         if self.path.startswith('/'):
-            if not os.access(self.path.split()[0], os.F_OK):
-                raise MythFileError('Defined grabber path does not exist.')
+            # test full given path
+            if not os.access(cmd, os.F_OK):
+                raise MythFileError('Defined executable path does not exist.')
+        else:
+            # search command from PATH
+            for folder in os.environ['PATH'].split(':'):
+                if os.access(os.path.join(folder,cmd), os.F_OK):
+                    self.path = os.path.join(folder,self.path)
+                    break
+            else:
+                raise MythFileError('Defined executable path does not exist.')
+                
         self.returncode = 0
         self.stderr = ''
+        self.useshell = useshell
 
     def __call__(self, *args): return self.command(*args)
 
@@ -93,15 +112,32 @@ class System( DBCache ):
         arg = ' '+' '.join(['%s' % a for a in args])
         return self._runcmd('%s %s' % (self.path, arg))
 
-    def _runcmd(self, cmd):
+    def _runshell(self, cmd):
         self.log(MythLog.SYSTEM, 'Running external command', cmd)
         fd = Popen(cmd, stdout=-1, stderr=-1, shell=True)
-        self.returncode = fd.wait()
-        stdout,self.stderr = fd.communicate()
+        return self._runshared(fd)
 
+    def _runnative(self, cmd):
+        self.log(MythLog.SYSTEM, 'Running external command', cmd)
+        args = shlex.split(cmd)
+        fd = Popen(args, stdout=-1, stderr=-1)
+        return self._runshared(fd)
+
+    def _runshared(self, fd):
+        pmap = {fd.stdout:'', fd.stderr:''}
+        while fd.poll() is None:
+            socks = select([fd.stdout, fd.stderr],[],[])
+            for sock in socks[0]:
+                pmap[sock] += sock.read()
+        self.stderr = pmap[fd.stderr]
+
+        self.returncode = fd.poll()
         if self.returncode:
             raise MythError(MythError.SYSTEM,self.returncode,cmd,self.stderr)
-        return stdout
+        return pmap[fd.stdout]
+
+    def _runcmd(self, cmd):
+        return self._runshell(cmd) if self.useshell else self._runnative(cmd)
 
 class Metadata( DictData ):
     _global_type = {'title':3,      'subtitle':3,       'tagline':3,
