@@ -404,6 +404,13 @@ void AudioOutputBase::SetupPassthrough(AudioSettings &settings,
     VBAUDIO("Setting " + log + " passthrough");
 }
 
+AudioOutputSettings *AudioOutputBase::OutputSettings(bool digital)
+{
+    if (digital)
+        return output_settingsdigital;
+    return output_settings;
+}
+
 /**
  * (Re)Configure AudioOutputBase
  *
@@ -544,6 +551,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
            output_settingsdigital->canAC3() &&
            ((!output_settings->canLPCM() && configured_channels > 2) ||
             !output_settings->IsSupportedChannels(channels)));
+
     VBAUDIO(QString("enc(%1), passthru(%2), features (%3) "
                     "configured_channels(%4), %5 channels supported(%6)")
             .arg(enc)
@@ -559,7 +567,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     // or if 48k override was checked in settings
     if ((samplerate != 48000 &&
          gCoreContext->GetNumSetting("Audio48kOverride", false)) ||
-        (enc && (samplerate > 48000 || (need_resampler && dest_rate > 48000))))
+         (enc && (samplerate > 48000 || (need_resampler && dest_rate > 48000))))
     {
         VBAUDIO("Forcing resample to 48 kHz");
         if (src_quality < 0)
@@ -567,11 +575,10 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         need_resampler = true;
         dest_rate = 48000;
     }
-    else if ((need_resampler = !(enc ? output_settingsdigital : output_settings)
-              ->IsSupportedRate(samplerate)))
+    else if (
+        (need_resampler = !OutputSettings(enc)->IsSupportedRate(samplerate)))
     {
-        dest_rate = (enc ? output_settingsdigital : output_settings)
-            ->NearestSupportedRate(samplerate);
+        dest_rate = OutputSettings(enc)->NearestSupportedRate(samplerate);
     }
 
     if (need_resampler && src_quality > QUALITY_DISABLED)
@@ -649,8 +656,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     if (need_resampler || needs_upmix || needs_downmix ||
         stretchfactor != 1.0f || (internal_vol && SWVolume()) ||
         (enc && output_format != FORMAT_S16) ||
-        !(enc ? output_settingsdigital : output_settings)
-        ->IsSupportedFormat(output_format))
+        !OutputSettings(enc)->IsSupportedFormat(output_format))
     {
         VBAUDIO("Audio processing enabled");
         processing  = true;
