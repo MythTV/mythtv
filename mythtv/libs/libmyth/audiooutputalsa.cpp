@@ -123,9 +123,12 @@ int AudioOutputALSA::TryOpenDevice(int open_mode, int try_ac3)
         VBAUDIO(QString("OpenDevice %1 for passthrough").arg(passthru_device));
         err = snd_pcm_open(&pcm_handle, dev_ba.constData(),
                            SND_PCM_STREAM_PLAYBACK, open_mode);
+
         m_lastdevice = passthru_device;
+
         if (m_discretedigital)
             return err;
+
         if (err < 0)
         {
             VBAUDIO(QString("Auto setting passthrough failed (%1), defaulting "
@@ -295,7 +298,7 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
         pcm_handle = NULL;
     }
 
-    if((err = TryOpenDevice(OPEN_FLAGS, passthrough)) < 0)
+    if ((err = TryOpenDevice(OPEN_FLAGS, passthrough)) < 0)
     {
         AERROR(QString("snd_pcm_open(\"%1\")").arg(m_lastdevice));
         delete settings;
@@ -307,7 +310,7 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
     if ((err = snd_pcm_hw_params_any(pcm_handle, params)) < 0)
     {
         snd_pcm_close(pcm_handle);
-        if((err = TryOpenDevice(OPEN_FLAGS&FILTER_FLAGS, passthrough)) < 0)
+        if ((err = TryOpenDevice(OPEN_FLAGS&FILTER_FLAGS, passthrough)) < 0)
         {
             AERROR(QString("snd_pcm_open(\"%1\")").arg(m_lastdevice));
             delete settings;
@@ -350,8 +353,9 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
 
     snd_pcm_close(pcm_handle);
     pcm_handle = NULL;
-        // Check if name or description contains information
-        // to know if device can accept passthrough or not
+
+    /* Check if name or description contains information
+       to know if device can accept passthrough or not */
     QMap<QString, QString> *alsadevs = GetALSADevices("pcm");
     while(1)
     {
@@ -461,7 +465,7 @@ void AudioOutputALSA::CloseDevice()
 
 template <class AudioDataType>
 static inline void _ReorderSmpteToAlsa(AudioDataType *buf, uint frames,
-                                         uint extrach)
+                                       uint extrach)
 {
     AudioDataType tmpC, tmpLFE, *buf2;
 
@@ -480,7 +484,7 @@ static inline void _ReorderSmpteToAlsa(AudioDataType *buf, uint frames,
 }
 
 static inline void ReorderSmpteToAlsa(void *buf, uint frames,
-                                        AudioFormat format, uint extrach)
+                                      AudioFormat format, uint extrach)
 {
     switch(AudioOutputSettings::FormatToBits(format))
     {
@@ -502,11 +506,11 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
         return;
     }
 
-        /* Audio received is using SMPTE channel ordering
-         * ALSA uses its own channel order.
-         * Do not re-order passthu audio */
+    //Audio received is in SMPTE channel order, reorder to ALSA unless passthru
     if (!passthru && (channels  == 6 || channels == 8))
+    {
         ReorderSmpteToAlsa(aubuf, frames, output_format, channels - 6);
+    }
 
     VERBOSE(VB_AUDIO+VB_TIMESTAMP,
             QString("WriteAudio: Preparing %1 bytes (%2 frames)")
@@ -575,19 +579,18 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
 
 int AudioOutputALSA::GetBufferedOnSoundcard(void) const
 {
-
     if (pcm_handle == NULL)
     {
         VBERROR("getBufferedOnSoundcard() called with pcm_handle == NULL!");
         return 0;
     }
 
-    snd_pcm_sframes_t delay = 0, buffered = 0;
+    snd_pcm_sframes_t delay = 0;
 
-    if (snd_pcm_avail_delay(pcm_handle, &buffered, &delay) < 0)
-    {
+    /* Delay is the total delay from writing to the pcm until the samples
+       hit the DAC - includes buffered samples and any fixed latencies */
+    if (snd_pcm_delay(pcm_handle, &delay) < 0)
         return 0;
-    }
 
     snd_pcm_state_t state = snd_pcm_state(pcm_handle);
 
@@ -597,21 +600,10 @@ int AudioOutputALSA::GetBufferedOnSoundcard(void) const
     }
     else
     {
-        delay = 00;
+        delay = 0;
     }
 
-    if (buffered < 0)
-    {
-        buffered = 0;
-    }
-
-    buffered *= output_bytes_per_frame;
-    if (buffered > soundcard_buffer_size)
-    {
-        buffered = soundcard_buffer_size;
-    }
-
-    return delay + buffered;
+    return delay;
 }
 
 /**
@@ -692,9 +684,14 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
                                                  &buffer_time, &dir);
     CHECKERR(QString("Unable to set buffer time %1").arg(buffer_time));
 
+<<<<<<< HEAD
     // See if we need to increase the prealloc'd buffer size
     // If buffer_time is too small we could underrun
     // Make 10% leeway okay
+=======
+    /* See if we need to increase the prealloc'd buffer size
+      If buffer_time is too small we could underrun - make 10% difference ok */
+>>>>>>> 516ef1d... Fix incorrect delay calc and tidy up in aoalsa
     if ((buffer_time * 1.10f < (float)original_buffer_time) && pbufsize < 0)
     {
         VBAUDIO(QString("Requested %1us got %2 buffer time")
