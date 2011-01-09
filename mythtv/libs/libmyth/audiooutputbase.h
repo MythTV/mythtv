@@ -178,6 +178,8 @@ class AudioOutputBase : public AudioOutput, public QThread
     int src_quality;
 
  private:
+    void SetupPassthrough(AudioSettings &settings, int &samplerate_tmp,
+                          int &channels_tmp);
     int CopyWithUpmix(char *buffer, int frames, int &org_waud);
     void SetAudiotime(int frames, int64_t timecode);
     AudioOutputSettings *output_settingsraw;

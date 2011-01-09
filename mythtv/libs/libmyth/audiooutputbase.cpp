@@ -341,6 +341,69 @@ bool AudioOutputBase::ToggleUpmix(void)
     return configured_channels == max_channels;
 }
 
+/*
+ * Setup samplerate and number of channels for passthrough
+ */
+void AudioOutputBase::SetupPassthrough(AudioSettings &settings,
+                                       int &samplerate_tmp, int &channels_tmp)
+{
+    samplerate_tmp = settings.samplerate;
+    channels_tmp = 2;
+    QString log;
+
+    switch (settings.codec)
+    {
+        case CODEC_ID_AC3:
+            log = "AC3";
+            break;
+        case CODEC_ID_EAC3:
+            samplerate_tmp = settings.samplerate * 4;
+            log = "Dolby Digital Plus (E-AC3)";
+            break;
+        case CODEC_ID_DTS:
+            if (output_settingsdigital->GetMaxBitrate() == 48000 * 16 * 2 ||
+                settings.bitrate <= 48000 * 16 * 2)
+            {
+                log = "DTS Core";
+                break;
+            }
+            if (output_settingsdigital->GetMaxBitrate() > 192000 * 16 * 2 &&
+                settings.bitrate > 48000 * 16 * 2)
+            {
+                log = "DTS-HD MA";
+                channels_tmp = 8;
+                samplerate_tmp = 192000;
+                break;
+            }
+            log = "DTS-HD High-Res";
+            samplerate_tmp = 192000;
+            break;
+        case CODEC_ID_TRUEHD:
+            channels_tmp = 8;
+            log = "TrueHD";
+            switch(settings.samplerate)
+            {
+                case 48000:
+                case 96000:
+                case 192000:
+                    samplerate_tmp = 192000;
+                    break;
+                case 44100:
+                case 88200:
+                case 176400:
+                    samplerate_tmp = 176400;
+                    break;
+                default:
+                    VBAUDIO("TrueHD: Unsupported samplerate");
+                    break;
+            }
+            break;
+        default:
+            break;
+    }
+    VBAUDIO("Setting " + log + " passthrough");
+}
+
 /**
  * (Re)Configure AudioOutputBase
  *
@@ -408,83 +471,25 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     ClearError();
 
+    bool general_deps = true;
+
+    /* Set samplerate_tmp and channels_tmp to appropriate values
+       if passing through */
     int samplerate_tmp, channels_tmp;
     if (settings.use_passthru)
     {
-        samplerate_tmp = settings.samplerate;
-        channels_tmp = 2;
-        QString log;
-
-        switch (settings.codec)
-        {
-            case CODEC_ID_AC3:
-                log = "AC3";
-                break;
-            case CODEC_ID_EAC3:
-                //E-AC3 is 2 channels, samplerate * 4
-                samplerate_tmp = settings.samplerate * 4;
-                log = "Dolby Digital Plus (E-AC3)";
-                break;
-            case CODEC_ID_DTS:
-                    // Can only do DTS core
-                if (output_settingsdigital->GetMaxBitrate() == 48000 * 16 * 2 ||
-                    settings.bitrate <= 48000 * 16 * 2)
-                {
-                    log = "DTS Core";
-                    break;
-                }
-                if (output_settingsdigital->GetMaxBitrate() > 192000 * 16 * 2 &&
-                    settings.bitrate > 48000 * 16 * 2)
-                {
-                    log = "DTS-HD MA";
-                    //Assume DTS-HD MA. Use 8 channels, 192kHz, 16 bits 
-                    channels_tmp = 8;
-                    samplerate_tmp = 192000;
-                    break;
-                }
-                log = "DTS-HD High-Res";
-                //Assume DTS-HD High-Res. Use 2 channels, 192kHz, 16 bits
-                samplerate_tmp = 192000;
-                break;
-            case CODEC_ID_TRUEHD:
-                channels_tmp = 8;
-                log = "TrueHD";
-                switch(settings.samplerate)
-                {
-                    case 48000:
-                    case 96000:
-                    case 192000:
-                        samplerate_tmp = 192000;
-                        break;
-                    case 44100:
-                    case 88200:
-                    case 176400:
-                        samplerate_tmp = 176400;
-                        break;
-                    default:
-                        VBAUDIO("TrueHD: Unsupported samplerate");
-                        break;
-                }
-                break;
-            default:
-                break;
-        }
-        VBAUDIO("Setting " + log + " Passthrough");
+        SetupPassthrough(settings, samplerate_tmp, channels_tmp);
+        general_deps = samplerate == samplerate_tmp && channels == channels_tmp;
     }
 
     // Check if anything has changed
-    bool general_deps =
+    general_deps &=
         settings.format == format &&
         settings.samplerate  == source_samplerate &&
         settings.use_passthru == passthru &&
         lneeds_upmix == needs_upmix && lreenc == reenc &&
         lsource_channels == source_channels &&
         lneeds_downmix == needs_downmix;
-
-    //Check if passthrough output settings have changed
-    general_deps &= !(settings.use_passthru &&
-                      (samplerate != samplerate_tmp ||
-                       channels != channels_tmp));
 
     if (general_deps)
     {
