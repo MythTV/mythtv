@@ -451,7 +451,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
         /* Might we reencode a bitstream that's been decoded for timestretch?
            If the device doesn't support the number of channels - see below */
-        if (output_settingsdigital->canAC3() &&
+        if (output_settingsdigital->canFeature(FEATURE_AC3) &&
             (settings.codec == CODEC_ID_AC3 || settings.codec == CODEC_ID_DTS))
         {
             lreenc = true;
@@ -547,9 +547,9 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
        and we have more than 2 channels but multichannel PCM is not supported
        or if the device just doesn't support the number of channels */
     enc = (!passthru &&
-           output_settingsdigital->IsSupportedFormat(FORMAT_S16) &&
-           output_settingsdigital->canAC3() &&
-           ((!output_settings->canLPCM() && configured_channels > 2) ||
+           output_settingsdigital->canFeature(FEATURE_AC3) &&
+           ((!output_settings->canFeature(FEATURE_LPCM) &&
+             configured_channels > 2) ||
             !output_settings->IsSupportedChannels(channels)));
 
     VBAUDIO(QString("enc(%1), passthru(%2), features (%3) "

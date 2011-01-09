@@ -283,24 +283,27 @@ AudioOutputSettings* AudioOutputSettings::GetCleaned(bool newcopy)
     {
         aosettings->setFeature(FEATURE_LPCM);
     }
+
+    if (IsSupportedFormat(FORMAT_S16))
+    {
         // E-AC3 is transferred as stereo PCM at 4 times the rates
         // assume all amplifier supporting E-AC3 also supports 7.1 LPCM
         // as it's mandatory under the bluray standard
 //#if LIBAVFORMAT_VERSION_INT > AV_VERSION_INT( 52, 83, 0 )
-    if (IsSupportedChannels(8) && IsSupportedRate(192000))
-    {
-        aosettings->setFeature(FEATURE_TRUEHD | FEATURE_DTSHD | FEATURE_EAC3);
-    }
+        if (IsSupportedChannels(8) && IsSupportedRate(192000))
+            aosettings->setFeature(FEATURE_TRUEHD | FEATURE_DTSHD | FEATURE_EAC3);
 //#endif
-    if (mchannels == 2 && m_passthrough >= 0)
-    {
-        VERBOSE(VB_AUDIO, LOC + QString("may be AC3 or DTS capable"));
-        aosettings->AddSupportedChannels(6);
+        if (m_passthrough >= 0)
+        {
+            if (mchannels == 2)
+            {
+                VERBOSE(VB_AUDIO, LOC + QString("may be AC3 or DTS capable"));
+                aosettings->AddSupportedChannels(6);
+            }
+            aosettings->setFeature(FEATURE_AC3 | FEATURE_DTS);
+        }
     }
-    if (m_passthrough >= 0)
-    {
-        aosettings->setFeature(FEATURE_AC3 | FEATURE_DTS);
-    }
+
     return aosettings;
 }
 
