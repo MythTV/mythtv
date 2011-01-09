@@ -466,7 +466,9 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
                 .arg(settings.samplerate/1000).arg(samplerate/1000)
                 .arg(quality_string(src_quality)));
 
-        src_ctx = src_new(2-src_quality, source_channels, &error);
+        int chans = needs_downmix ? channels : source_channels;
+
+        src_ctx = src_new(2-src_quality, chans, &error);
         if (error)
         {
             Error(QString("Error creating resampler: %1")
@@ -475,11 +477,11 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             return;
         }
 
-        src_data.src_ratio      = (double)samplerate / settings.samplerate;
-        src_data.data_in        = src_in;
-        int newsize             = ((long)((float)kAudioSRCInputSize *
-                                          samplerate / settings.samplerate) +
-                                   15) & ~0xf;
+        src_data.src_ratio = (double)samplerate / settings.samplerate;
+        src_data.data_in   = src_in;
+        int newsize        = (int)(kAudioSRCInputSize * src_data.src_ratio + 15)
+                             & ~0xf;
+
         if (kAudioSRCOutputSize < newsize)
         {
             kAudioSRCOutputSize = newsize;
