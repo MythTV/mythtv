@@ -89,43 +89,6 @@ static unsigned dbg_ident(const MythPlayer*);
 #define LOC_ERR  QString("Player(%1), Error: ").arg(dbg_ident(this),0,36)
 #define LOC_DEC  QString("Player(%1): ").arg(dbg_ident(m_mp),0,36)
 
-QEvent::Type PlayerTimer::kPlayerEventType =
-    (QEvent::Type) QEvent::registerEventType();
-
-PlayerTimer::PlayerTimer(MythPlayer *player) : m_mp(player), m_queue_size(0)
-{
-    if (!m_mp)
-        VERBOSE(VB_IMPORTANT, QString("PlayerTimer has no parent."));
-    PostNextEvent();
-}
-
-void PlayerTimer::PostNextEvent(void)
-{
-    QEvent *event = new QEvent(kPlayerEventType);
-    qApp->postEvent(this, event);
-    m_queue_size++;
-}
-
-bool PlayerTimer::event(QEvent *e)
-{
-    if (e->type() == kPlayerEventType)
-    {
-        // TODO this may fail if events are lost and the queue size is wrong
-        m_queue_size--;
-        uint max_queue = m_mp->GetFFRewSkip() == 1 ? 3 : 1;
-        while (m_queue_size < max_queue)
-            PostNextEvent();
-
-        if (m_mp && !m_mp->IsErrored())
-        {
-            m_mp->EventLoop();
-            m_mp->VideoLoop();
-        }
-        return true;
-    }
-    return false;
-}
-
 void DecoderThread::run(void)
 {
     if (!m_mp)
@@ -162,7 +125,6 @@ MythPlayer::MythPlayer(bool muted)
     : decoder(NULL),                decoder_change_lock(QMutex::Recursive),
       videoOutput(NULL),            player_ctx(NULL),
       decoderThread(NULL),          playerThread(NULL),
-      playerTimer(NULL),
       no_hardware_decoders(false),
       // Window stuff
       parentWidget(NULL), embedid(0),
@@ -288,12 +250,6 @@ MythPlayer::~MythPlayer(void)
     {
         delete decoderThread;
         decoderThread = NULL;
-    }
-
-    if (playerTimer)
-    {
-        delete playerTimer;
-        playerTimer = NULL;
     }
 
     if (interactiveTV)
@@ -2549,9 +2505,6 @@ bool MythPlayer::StartPlaying(void)
         InitialSeek();
     VideoStart();
 
-    if (playerTimer)
-        delete playerTimer;
-    playerTimer = new PlayerTimer(this);
     playerThread->setPriority(QThread::TimeCriticalPriority);
     return !IsErrored();
 }
@@ -2576,12 +2529,6 @@ void MythPlayer::StopPlaying()
 {
     VERBOSE(VB_PLAYBACK, LOC + QString("StopPlaying - begin"));
     playerThread->setPriority(QThread::NormalPriority);
-
-    if (playerTimer)
-    {
-        delete playerTimer;
-        playerTimer = NULL;
-    }
 
     DecoderEnd();
     VideoEnd();
