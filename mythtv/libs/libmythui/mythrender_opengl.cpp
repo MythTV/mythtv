@@ -2092,6 +2092,8 @@ uint MythRenderOpenGL::GetBufferSize(QSize size, uint fmt, uint type)
             bpp = 4;
             break;
         case GL_YCBCR_MESA:
+        case GL_YCBCR_422_APPLE:
+        case GL_RGB_422_APPLE:
             bpp = 2;
             break;
         default:
