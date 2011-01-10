@@ -80,20 +80,6 @@ enum
     kDisplayTeletextMenu        = 0x100,
 };
 
-class PlayerTimer : public QObject
-{
-    Q_OBJECT
-  public:
-    PlayerTimer(MythPlayer *mp);
-    void PostNextEvent(void);
-    virtual bool event(QEvent *e);
-    static enum QEvent::Type kPlayerEventType;
-
-  private:
-    MythPlayer *m_mp;
-    uint32_t    m_queue_size;
-};
-
 class DecoderThread : public QThread
 {
     Q_OBJECT
@@ -532,7 +518,6 @@ class MPUBLIC MythPlayer
     PlayerContext *player_ctx;
     DecoderThread *decoderThread;
     QThread       *playerThread;
-    PlayerTimer   *playerTimer;
     bool           no_hardware_decoders;
 
     // Window stuff
