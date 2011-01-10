@@ -27,32 +27,6 @@ std::map<Display*, MythXDisplay*>      xdisplays;
 
 #include <QMutex>
 
-
-/** \fn GetNumberXineramaScreens(void)
- *  \brief Returns number of Xinerama screens if Xinerama
- *         is available, or 0 if it is not available.
- */
-int GetNumberXineramaScreens(void)
-{
-    int nr_xinerama_screens = 0;
-
-#ifdef USING_X11
-    MythXDisplay *d = OpenMythXDisplay();
-    if (d)
-    {
-        nr_xinerama_screens = d->GetNumberXineramaScreens();
-        delete d;
-    }
-#else // if !USING_X11
-#if CONFIG_DARWIN
-    // Mac OS X when not using X11 server supports Xinerama.
-    if (QApplication::desktop())
-        nr_xinerama_screens = QApplication::desktop()->numScreens();
-#endif // CONFIG_DARWIN
-#endif // !USING_X11
-    return nr_xinerama_screens;
-}
-
 // Everything below this line is only compiled if using X11
 #ifdef USING_X11
 

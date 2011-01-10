@@ -30,7 +30,7 @@
 #include "playbackbox.h"
 #include "globalsettings.h"
 #include "recordingprofile.h"
-#include "mythxdisplay.h"
+#include "mythdisplay.h"
 #include "DisplayRes.h"
 #include "uitypes.h"
 #include "cardutil.h"
@@ -1754,7 +1754,7 @@ static HostCheckBox *SetupPinCodeRequired()
 static HostComboBox *XineramaScreen()
 {
     HostComboBox *gc = new HostComboBox("XineramaScreen", false);
-    int num = GetNumberXineramaScreens();
+    int num = MythDisplay::GetNumberXineramaScreens();
     for (int i=0; i<num; ++i)
         gc->addSelection(QString::number(i), QString::number(i));
     gc->addSelection(QObject::tr("All"), QString::number(-1));
@@ -3690,7 +3690,7 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(ThemePainter());
     screen->addChild(MenuTheme());
 
-    if (GetNumberXineramaScreens() > 1)
+    if (MythDisplay::GetNumberXineramaScreens() > 1)
     {
         screen->addChild(XineramaScreen());
         screen->addChild(XineramaMonitorAspectRatio());

@@ -23,6 +23,7 @@ class MPUBLIC MythDisplay
   public:
     static DisplayInfo GetDisplayInfo(void);
     static WId GetWindowID(void);
+    static int GetNumberXineramaScreens(void);
 };
 
 #endif // MYTHDISPLAY_H

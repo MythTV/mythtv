@@ -134,5 +134,25 @@ DisplayInfo MythDisplay::GetDisplayInfo(void)
     return ret;
 }
 
+int MythDisplay::GetNumberXineramaScreens(void)
+{
+    int nr_xinerama_screens = 0;
+
+#if defined(Q_WS_X11)
+    // TODO Qt is Xinerama aware so this should be unnecessary
+    MythXDisplay *d = OpenMythXDisplay();
+    if (d)
+    {
+        nr_xinerama_screens = d->GetNumberXineramaScreens();
+        delete d;
+    }
+#else
+    // Mac OS X when not using X11 server supports Xinerama.
+    if (QApplication::desktop())
+        nr_xinerama_screens = QApplication::desktop()->numScreens();
+#endif
+
+    return nr_xinerama_screens;
+}
 
 
