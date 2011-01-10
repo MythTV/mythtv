@@ -300,7 +300,8 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup* lookup)
     if (lookup->GetStep() == SEARCH)
     {
         args.append(QString("-M"));
-        args.append(lookup->GetTitle());
+        QString title = lookup->GetTitle();
+        args.append(ShellEscape(title));
     }
     else if (lookup->GetStep() == GETDATA)
     {
