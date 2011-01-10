@@ -25,6 +25,7 @@ class MythPainterWindowGL;
 class MythPainterWindowQt;
 class MythPainterWindowVDPAU;
 class MythPainterWindowD3D9;
+class MythRender;
 
 class MPUBLIC MythMainWindow : public QWidget
 {
@@ -85,6 +86,7 @@ class MPUBLIC MythMainWindow : public QWidget
 
     MythPainter *GetCurrentPainter();
     QWidget     *GetPaintWindow();
+    MythRender  *GetRenderDevice();
 
     bool screenShot(QString fname, int x, int y, int x2, int y2, int w, int h);
     bool screenShot(int x, int y, int x2, int y2);
