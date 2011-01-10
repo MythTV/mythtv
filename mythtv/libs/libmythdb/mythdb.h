@@ -82,6 +82,12 @@ class MPUBLIC MythDB
     static void destroyMythDB();
     static QString toCommaList(const QMap<QString, QVariant> &bindings,
                                uint indent = 0, uint softMaxColumn = 80);
+
+    static bool LoadDatabaseParamsFromDisk(
+        DatabaseParams &params, bool sanitize);
+    static bool SaveDatabaseParamsToDisk(
+        const DatabaseParams &params, const QString &confdir, bool overwrite);
+
   protected:
     MythDB();
    ~MythDB();

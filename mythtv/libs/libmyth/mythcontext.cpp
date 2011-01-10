@@ -71,11 +71,6 @@ class MythContextPrivate : public QObject
 
     void LoadDatabaseSettings(void);
 
-    bool LoadSettingsFile(void);
-    bool WriteSettingsFile(const DatabaseParams &params,
-                           bool overwrite = false);
-    bool FindSettingsProbs(void);
-
     bool    PromptForDatabaseParams(const QString &error);
     QString TestDBconnection(void);
     void    SilenceDBerrors(void);
@@ -464,30 +459,8 @@ NoDBfound:
  */
 void MythContextPrivate::LoadDatabaseSettings(void)
 {
-    if (!LoadSettingsFile())
-    {
-        VERBOSE(VB_IMPORTANT, "Unable to read configuration file mysql.txt");
-
-        // Sensible connection defaults.
-        m_DBparams.dbHostName    = "localhost";
-        m_DBparams.dbHostPing    = true;
-        m_DBparams.dbPort        = 0;
-        m_DBparams.dbUserName    = "mythtv";
-        m_DBparams.dbPassword    = "mythtv";
-        m_DBparams.dbName        = "mythconverg";
-        m_DBparams.dbType        = "QMYSQL3";
-        m_DBparams.localEnabled  = false;
-        m_DBparams.localHostName = "my-unique-identifier-goes-here";
-        m_DBparams.wolEnabled    = false;
-        m_DBparams.wolReconnect  = 0;
-        m_DBparams.wolRetry      = 5;
-        m_DBparams.wolCommand    = "echo 'WOLsqlServerCommand not set'";
-        gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
-    }
-
-    // Even if we have loaded the settings file, it may be incomplete,
-    // so we check for missing values and warn user
-    FindSettingsProbs();
+    gCoreContext->GetDB()->LoadDatabaseParamsFromDisk(m_DBparams, true);
+    gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
 
     QString hostname = m_DBparams.localHostName;
     if (hostname.isEmpty() ||
@@ -507,173 +480,6 @@ void MythContextPrivate::LoadDatabaseSettings(void)
     VERBOSE(VB_GENERAL, QString("Using localhost value of %1")
             .arg(hostname));
     gCoreContext->SetLocalHostname(hostname);
-}
-
-/**
- * Load mysql.txt and parse its values into m_DBparams
- */
-bool MythContextPrivate::LoadSettingsFile(void)
-{
-    Settings *oldsettings = gCoreContext->GetDB()->GetOldSettings();
-
-    if (!oldsettings->LoadSettingsFiles("mysql.txt", GetInstallPrefix(),
-                                        GetConfDir()))
-        return false;
-
-    m_DBparams.dbHostName = oldsettings->GetSetting("DBHostName");
-    m_DBparams.dbHostPing = oldsettings->GetSetting("DBHostPing") != "no";
-    m_DBparams.dbPort     = oldsettings->GetNumSetting("DBPort");
-    m_DBparams.dbUserName = oldsettings->GetSetting("DBUserName");
-    m_DBparams.dbPassword = oldsettings->GetSetting("DBPassword");
-    m_DBparams.dbName     = oldsettings->GetSetting("DBName");
-    m_DBparams.dbType     = oldsettings->GetSetting("DBType");
-
-    m_DBparams.localHostName = oldsettings->GetSetting("LocalHostName");
-    m_DBparams.localEnabled  = m_DBparams.localHostName.length() > 0;
-
-    m_DBparams.wolReconnect
-        = oldsettings->GetNumSetting("WOLsqlReconnectWaitTime");
-    m_DBparams.wolEnabled = m_DBparams.wolReconnect > 0;
-
-    m_DBparams.wolRetry   = oldsettings->GetNumSetting("WOLsqlConnectRetry");
-    m_DBparams.wolCommand = oldsettings->GetSetting("WOLsqlCommand");
-    gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
-
-    return true;
-}
-
-bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
-                                           bool overwrite)
-{
-    QString path = GetConfDir() + "/mysql.txt";
-    QFile   * f  = new QFile(path);
-
-    if (!overwrite && f->exists())
-    {
-        delete f;
-        return false;
-    }
-
-    QString dirpath = GetConfDir();
-    QDir createDir(dirpath);
-
-    if (!createDir.exists())
-    {
-        if (!createDir.mkdir(dirpath))
-        {
-            VERBOSE(VB_IMPORTANT, QString("Could not create %1").arg(dirpath));
-            return false;
-        }
-    }
-
-    if (!f->open(QIODevice::WriteOnly))
-    {
-        VERBOSE(VB_IMPORTANT, QString("Could not open settings file %1 "
-                                      "for writing").arg(path));
-        return false;
-    }
-
-    VERBOSE(VB_IMPORTANT, QString("Writing settings file %1").arg(path));
-    QTextStream s(f);
-    s << "DBHostName=" << params.dbHostName << endl;
-
-    s << "\n"
-      << "# By default, MythTV tries to ping the DB host to see if it exists.\n"
-      << "# If your DB host or network doesn't accept pings, set this to no:\n"
-      << "#\n";
-
-    if (params.dbHostPing)
-        s << "#DBHostPing=no" << endl << endl;
-    else
-        s << "DBHostPing=no" << endl << endl;
-
-    if (params.dbPort)
-        s << "DBPort=" << params.dbPort << endl;
-
-    s << "DBUserName=" << params.dbUserName << endl
-      << "DBPassword=" << params.dbPassword << endl
-      << "DBName="     << params.dbName     << endl
-      << "DBType="     << params.dbType     << endl
-      << endl
-      << "# Set the following if you want to use something other than this\n"
-      << "# machine's real hostname for identifying settings in the database.\n"
-      << "# This is useful if your hostname changes often, as otherwise you\n"
-      << "# will need to reconfigure mythtv every time.\n"
-      << "# NO TWO HOSTS MAY USE THE SAME VALUE\n"
-      << "#\n";
-
-    if (params.localEnabled)
-        s << "LocalHostName=" << params.localHostName << endl;
-    else
-        s << "#LocalHostName=my-unique-identifier-goes-here\n";
-
-    s << endl
-      << "# If you want your frontend to be able to wake your MySQL server\n"
-      << "# using WakeOnLan, have a look at the following settings:\n"
-      << "#\n"
-      << "#\n"
-      << "# The time the frontend waits (in seconds) between reconnect tries.\n"
-      << "# This should be the rough time your MySQL server needs for startup\n"
-      << "#\n";
-
-    if (params.wolEnabled)
-        s << "WOLsqlReconnectWaitTime=" << params.wolReconnect << endl;
-    else
-        s << "#WOLsqlReconnectWaitTime=0\n";
-
-    s << "#\n"
-      << "#\n"
-      << "# This is the number of retries to wake the MySQL server\n"
-      << "# until the frontend gives up\n"
-      << "#\n";
-
-    if (params.wolEnabled)
-        s << "WOLsqlConnectRetry=" << params.wolRetry << endl;
-    else
-        s << "#WOLsqlConnectRetry=5\n";
-
-    s << "#\n"
-      << "#\n"
-      << "# This is the command executed to wake your MySQL server.\n"
-      << "#\n";
-
-    if (params.wolEnabled)
-        s << "WOLsqlCommand=" << params.wolCommand << endl;
-    else
-        s << "#WOLsqlCommand=echo 'WOLsqlServerCommand not set'\n";
-
-    f->close();
-    return true;
-}
-
-bool MythContextPrivate::FindSettingsProbs(void)
-{
-    bool problems = false;
-
-    if (m_DBparams.dbHostName.isEmpty())
-    {
-        problems = true;
-        VERBOSE(VB_IMPORTANT, "DBHostName is not set in mysql.txt");
-        VERBOSE(VB_IMPORTANT, "Assuming localhost");
-        m_DBparams.dbHostName = "localhost";
-    }
-    if (m_DBparams.dbUserName.isEmpty())
-    {
-        problems = true;
-        VERBOSE(VB_IMPORTANT, "DBUserName is not set in mysql.txt");
-    }
-    if (m_DBparams.dbPassword.isEmpty())
-    {
-        problems = true;
-        VERBOSE(VB_IMPORTANT, "DBPassword is not set in mysql.txt");
-    }
-    if (m_DBparams.dbName.isEmpty())
-    {
-        problems = true;
-        VERBOSE(VB_IMPORTANT, "DBName is not set in mysql.txt");
-    }
-    gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
-    return problems;
 }
 
 bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
@@ -974,11 +780,7 @@ int MythContextPrivate::ChooseBackend(const QString &error)
     switch (selected)
     {
         case kDialogCodeButton0:
-            if (!WriteSettingsFile(m_DBparams, true))
-            {
-                VERBOSE(VB_IMPORTANT, "WriteSettingsFile failed.");
-                return -1;
-            }
+            MythDB::SaveDatabaseParamsToDisk(m_DBparams, GetConfDir(), true);
             // User prefers mysql.txt, so throw away default UPnP backend:
             m_XML->SetValue(kDefaultUSN, "");
             m_XML->Save();
@@ -1470,7 +1272,7 @@ bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
           params.wolRetry      != cur_params.wolRetry     ||
           params.wolCommand    != cur_params.wolCommand)))
     {
-        ret = d->WriteSettingsFile(params, true);
+        ret = MythDB::SaveDatabaseParamsToDisk(params, GetConfDir(), true);
         if (ret)
         {
             // Save the new settings:

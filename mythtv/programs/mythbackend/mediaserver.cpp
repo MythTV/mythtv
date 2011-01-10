@@ -9,6 +9,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mediaserver.h"
+#include "httpconfig.h"
 #include "mythxml.h"
 #include "mythdirs.h"
 
@@ -29,9 +30,11 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
+MediaServer::MediaServer(void) :
+    m_pUPnpCDS(NULL), m_pUPnpCMGR(NULL), upnpMedia(NULL),
+    m_sSharePath(GetShareDir())
 {
-    VERBOSE(VB_UPNP, QString("MediaServer::Begin"));
+    VERBOSE(VB_UPNP, "MediaServer:ctor:Begin");
 
     // ----------------------------------------------------------------------
     // Initialize Configuration class (Database for Servers)
@@ -44,16 +47,6 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
     // ----------------------------------------------------------------------
 
     int     nPort = g_pConfig->GetValue( "BackendStatusPort", 6544 );
-    QString sIP   = g_pConfig->GetValue( "BackendServerIP"  , ""   );
-
-    if (sIP.isEmpty())
-    {
-        VERBOSE(VB_IMPORTANT,
-                "MediaServer:: No BackendServerIP Address defined");
-        m_pHttpServer = NULL;
-        return;
-    }
-
 
     m_pHttpServer = new HttpServer();
 
@@ -66,9 +59,18 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
         return;
     }
 
-    m_sSharePath = GetShareDir();
     m_pHttpServer->m_sSharePath = m_sSharePath;
 
+    m_pHttpServer->RegisterExtension(new HttpConfig());
+
+    VERBOSE(VB_UPNP, "MediaServer:ctor:End");
+}
+
+void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = FALSE */)
+{
+    VERBOSE(VB_UPNP, "MediaServer:Init:Begin");
+
+    int     nPort     = g_pConfig->GetValue( "BackendStatusPort", 6544 );
     QString sFileName = g_pConfig->GetValue( "upnpDescXmlPath",
                                                 m_sSharePath );
     QString sDeviceType;
@@ -101,7 +103,18 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
 
     VERBOSE(VB_UPNP, "MediaServer::Registering MythXML Service." );
 
-    m_pHttpServer->RegisterExtension( new MythXML( pMythDevice , m_sSharePath));
+    if (m_pHttpServer)
+        m_pHttpServer->RegisterExtension(
+            new MythXML( pMythDevice , m_sSharePath));
+
+    QString sIP = g_pConfig->GetValue( "BackendServerIP"  , ""   );
+    if (sIP.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT,
+                "MediaServer:: No BackendServerIP Address defined - "
+                "Disabling UPnP");
+        return;
+    }
 
     if (sIP == "localhost" || sIP.startsWith("127."))
     {
@@ -190,7 +203,7 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
 
     }
 
-    VERBOSE(VB_UPNP, QString( "MediaServer::End" ));
+    VERBOSE(VB_UPNP, "MediaServer:Init:End");
 }
 
 //////////////////////////////////////////////////////////////////////////////

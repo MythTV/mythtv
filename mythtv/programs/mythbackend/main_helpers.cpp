@@ -312,17 +312,6 @@ void upnp_rebuild(int)
 
 }
 
-void showUsage(const MythCommandLineParser &cmdlineparser, const QString &version)
-{
-    QString    help  = cmdlineparser.GetHelpString(false);
-    QByteArray ahelp = help.toLocal8Bit();
-
-    cerr << qPrintable(version) << endl <<
-    "Valid options are: " << endl <<
-    "-h or --help                   List valid command line parameters"
-         << endl << ahelp.constData() << endl;
-}
-
 void setupLogfile(void)
 {
     if (!logfile.isEmpty())
@@ -683,7 +672,7 @@ int run_backend(const MythCommandLineParser &cmdline)
 
     bool ismaster = gCoreContext->IsMasterHost();
 
-    g_pUPnp = new MediaServer(ismaster, !cmdline.IsUPnPEnabled() );
+    g_pUPnp->Init(ismaster, cmdline.IsUPnPEnabled());
 
     if (!ismaster)
     {

@@ -20,4 +20,9 @@ extern MediaServer *g_pUPnp;
 extern QString      pidfile;
 extern QString      logfile;
 
+class BackendContext
+{
+    
+};
+
 #endif // _BACKEND_CONTEXT_H_

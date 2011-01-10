@@ -849,6 +849,7 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
         {
             QString sName  = (*it).section( '=', 0, 0 );
             QString sValue = (*it).section( '=', 1 );
+            sValue.replace("+"," ");
 
             if ((sName.length() != 0) && (sValue.length() !=0))
             {

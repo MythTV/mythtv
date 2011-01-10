@@ -1,0 +1,857 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+  <group human_label="Host Address Backend Setup" unique_label="server">
+    <group human_label="Local Backend" unique_label="local_server">
+      <setting
+         value="BackendServerIP" default_data="127.0.0.1"
+         setting_type="host" label="IP address"
+         help_text="Enter the IP address of this machine.
+                    Use an externally accessible address (ie, not 
+                    127.0.0.1) if you are going to be running a frontend
+                    on a different machine than this one."
+         data_type="localipaddress" />
+      <setting
+         value="BackendServerPort" default_data="6543"
+         setting_type="host" label="Port"
+         help_text= "Unless you've got good reason to, don't change this."
+         data_type="integer_range"
+         range_min="0" range_max="0xffff" />
+      <setting
+         value="BackendStatusPort" default_data="6544"
+         setting_type="host" label="Status Port"
+         help_text="Port which the server will listen to for HTTP requests."
+         data_type="integer_range"
+         range_min="0" range_max="0xffff" />
+      <setting
+         value="SecurityPin" default_data=""
+         setting_type="host" label="Security Pin (Required)"
+         help_text="Pin code required for a frontend to connect
+                    to the backend. Blank prevents all connections,
+                    0000 allows any client to connect."
+         data_type="string" />
+    </group>
+    <group human_label="Master Backend" unique_label="master_server">
+      <setting
+         value="MasterServerIP" default_data="127.0.0.1"
+         setting_type="global" label="IP address"
+         help_text="The IP address of the master backend server. All
+                    frontend and non-master backend machines will connect
+                    to this server.  If you only have one backend,
+                    this should be the same IP address as above."
+         data_type="ipaddress" />
+      <setting
+         value="MasterServerPort" default_data="6543"
+         setting_type="global" label="Port"
+         help_text="Unless you've got good reason to, don't change this."
+         data_type="integer_range"
+         range_min="0" range_max="0xffff" />
+    </group>
+    <group human_label="Locale Settings" unique_label="locale_settings">
+      <setting
+         value="TVFormat" default_data="ntsc"
+         setting_type="global" label="TV format"
+         help_text="The TV standard to use for viewing TV."
+         data_type="tvformat" />
+      <setting value="VbiFormat" default_data="ntsc"
+               setting_type="global" label="VBI format"
+               help_text="VBI stands for Vertical Blanking Interrupt.
+                          VBI is used to carry Teletext and
+                          Closed Captioning data."
+               data_type="select">
+        <option display="None" data="none" />
+        <option display="PAL Teletext" data="pal" />
+        <option display="NTSC Closed Caption" data="ntsc" />
+      </setting>
+      <setting value="FreqTable" default_data="us-cable"
+               setting_type="global" label="Channel frequency table"
+               help_text="Select the appropriate frequency table for
+                          your system. If you have an antenna, use a 
+                          '-bcast' frequency."
+               data_type="frequency_table" />
+      <setting value="TimeOffset" default_data=""
+               setting_type="global" label="Your Local Timezone (for XMLTV)"
+               help_text="Used if the XMLTV data comes from a different
+                          timezone than your own. This adjust the times in
+                          the XMLTV EPG data to compensate. 'Auto' converts
+                          the XMLTV time to local time using your computer's
+                          timezone. 'None' ignores the XMLTV timezone,
+                          interpreting times as local."
+               data_type="select">
+        <option display="None" data="none" />
+        <option display="Auto" data="auto" />
+        <option display="+0030" data="+0030" />
+        <option display="+0100" data="+0100" />
+        <option display="+0130" data="+0130" />
+        <option display="+0200" data="+0200" />
+        <option display="+0230" data="+0230" />
+        <option display="+0300" data="+0300" />
+        <option display="+0330" data="+0330" />
+        <option display="+0400" data="+0400" />
+        <option display="+0430" data="+0430" />
+        <option display="+0500" data="+0500" />
+        <option display="+0530" data="+0530" />
+        <option display="+0600" data="+0600" />
+        <option display="+0630" data="+0630" />
+        <option display="+0700" data="+0700" />
+        <option display="+0730" data="+0730" />
+        <option display="+0800" data="+0800" />
+        <option display="+0830" data="+0830" />
+        <option display="+0900" data="+0900" />
+        <option display="+0930" data="+0930" />
+        <option display="+1000" data="+1000" />
+        <option display="+1030" data="+1030" />
+        <option display="+1100" data="+1100" />
+        <option display="+1130" data="+1130" />
+        <option display="+1200" data="+1200" />
+        <option display="-1100" data="-1100" />
+        <option display="-1030" data="-1030" />
+        <option display="-1000" data="-1000" />
+        <option display="-0930" data="-0930" />
+        <option display="-0900" data="-0900" />
+        <option display="-0830" data="-0830" />
+        <option display="-0800" data="-0800" />
+        <option display="-0730" data="-0730" />
+        <option display="-0700" data="-0700" />
+        <option display="-0630" data="-0630" />
+        <option display="-0600" data="-0600" />
+        <option display="-0530" data="-0530" />
+        <option display="-0500" data="-0500" />
+        <option display="-0430" data="-0430" />
+        <option display="-0400" data="-0400" />
+        <option display="-0330" data="-0330" />
+        <option display="-0300" data="-0300" />
+        <option display="-0230" data="-0230" />
+        <option display="-0200" data="-0200" />
+        <option display="-0130" data="-0130" />
+        <option display="-0100" data="-0100" />
+        <option display="-0030" data="-0030" />
+      </setting>
+    </group>
+    <group human_label="Miscellaneous Settings"
+           unique_label="miscellaneous_settings">
+      <group human_label="File Management Settings"
+             unique_label="file_management_settings">
+        <setting
+           value="MasterBackendOverride" default_data="1"
+           setting_type="global" label="Master Backend Override"
+           help_text="If enabled, the master backend will stream and
+                      delete files if it finds them in the video directory.
+                      Useful if you are using a central storage location, like
+                      a NFS share, and your slave backend isn't running."
+           data_type="checkbox" />
+        <setting
+           value="DeletesFollowLinks" default_data="0"
+           setting_type="global"
+           label="Follow symbolic links when deleting files"
+           help_text="This will cause Myth to follow symlinks
+                      when recordings and related files are deleted, instead
+                      of deleting the symlink and leaving the actual file."
+           data_type="checkbox" />
+        <setting
+           value="TruncateDeletesSlowly" default_data="0"
+           setting_type="global" label="Delete files slowly"
+           help_text="Some filesystems use a lot of resources when
+                      deleting large recording files.  This option makes Myth
+                      delete the file slowly on this backend to lessen the
+                      impact."
+           data_type="checkbox" />
+<!--
+        <setting
+           value="HDRingbufferSize" default_data="9400"
+           setting_type="global" label="HD Ringbuffer size (KB)"
+           help_text="The HD device ringbuffer allows the
+                      backend to weather moments of stress.
+                      The larger the ringbuffer, the longer
+                      the moments of stress can be. However,
+                      setting the size too large can cause
+                      swapping, which is detrimental."
+           data_type="integer_select"
+           range_min="4700" range_max="94000" step="4700" />
+-->
+        <setting
+           value="StorageScheduler" default_data="BalancedFreeSpace"
+           setting_type="global" label="Storage Group Disk Scheduler"
+           help_text="This setting controls how the Storage Group
+                      scheduling code will balance new recordings across
+                      directories. 'Balanced Free Space' is the recommended
+		      method for most users."
+           data_type="select">
+          <option display="Balanced Free Space" data="BalancedFreeSpace" />
+          <option display="Balanced Disk I/O" data="BalancedDiskIO" />
+          <option display="Combination" data="Combination" />
+        </setting>
+      </group>
+      <setting
+         value="MiscStatusScript" default_data=""
+         setting_type="global" label="Miscellaneous Status Application"
+         help_text="External application or script that outputs
+                    extra information for inclusion in the
+                    backend status page.  See
+                    contrib/info/misc_status_info/README"
+         data_type="string" />
+      <setting
+         value="DisableAutomaticBackup" default_data="0"
+         setting_type="global" label="Disable Automatic Database Backup"
+         help_text="This will prevent Myth from backing up the database
+                    before upgrades. If disabled, you should have your
+                    own backup strategy in place."
+         data_type="checkbox" />
+      <setting
+         value="DisableFirewireReset" default_data="0"
+         setting_type="global" label="Disable Firewire Reset"
+         help_text="By default MythTV will reset the firewire bus when a
+                    firewire recorder stops responding to commands. But
+                    if this causes problems you can disable this here for
+                    Linux firewire recorders."
+         data_type="checkbox" />
+    </group>
+    <group human_label="EIT Scanner Options"
+           unique_label="eit_scanner_options">
+<!--
+      <setting
+         value="EITTransportTimeout" default_data="5"
+         setting_type="global" label="EIT Transport Timeout (mins)"
+         help_text="Maximum time to spend waiting for listings
+                    data on one DTV channel before checking for
+                    new listings data on the next channel."
+         data_type="integer_select"
+         range_min="1" range_max="15" step="1" />
+-->
+      <setting
+         value="EITIgnoresSource" default_data="0"
+         setting_type="global" label="Cross Source EIT"
+         help_text="If enabled, listings data collected on one Video Source
+                    will be applied to the first matching DVB channel on
+                    any Video Source. This is sometimes useful for DVB-S,
+                    but may insert bogus data into any ATSC listings
+                    stored in the same database."
+         data_type="checkbox" />
+      <setting
+         value="EITCrawIdleStart" default_data="60"
+         setting_type="global"
+         label="Backend Idle Before EIT Crawl (seconds)"
+         help_text="The minimum number of seconds after a recorder
+                    becomes idle to wait before MythTV begins
+                    collecting EIT listings data."
+         data_type="select">
+        <option display="30" data="30" />
+        <option display="60" data="60" />
+        <option display="120" data="120" />
+        <option display="300" data="300" />
+        <option display="600" data="600" />
+        <option display="1200" data="1200" />
+        <option display="2400" data="2400" />
+        <option display="3600" data="3600" />
+        <option display="7200" data="7200" />
+      </setting>
+    </group>
+    <group human_label="Shutdown/Wakeup Options"
+           unique_label="shutdown_wakeup_options">
+      <setting data_type="string" value="startupCommand"
+               label="Startup command"
+               default_data=""
+               setting_type="global"
+               help_text="This command is executed right after starting
+                          the BE. As a parameter \'$status\' is replaced by either
+                          \'auto\' if the machine was started automatically or
+                          \'user\' if a user switched it on." />
+      <setting data_type="checkbox" value="blockSDWUwithoutClient"
+               label="Block shutdown before client connected"
+               default_data="1"
+               setting_type="global"
+               help_text="If set, the automatic shutdown routine will
+                          be disabled until a client connects." />
+      <setting data_type="select" value="idleTimeoutSecs"
+               label="Idle shutdown timeout (secs)"
+               default_data="0"
+               setting_type="global"
+               help_text="The amount of time the master backend idles
+                          before it shuts down all backends.">
+        <option display="Disabled" data="0" />
+        <option display="5" data="5" />
+        <option display="15" data="15" />
+        <option display="30" data="30" />
+        <option display="60" data="60" />
+        <option display="120" data="120" />
+        <option display="300" data="300" />
+        <option display="600" data="600" />
+        <option display="1200" data="1200" />
+      </setting>
+      <setting data_type="select" value="idleWaitForRecordingTime"
+               label="Max. wait for recording (min)"
+               default_data="15"
+               setting_type="global"
+               help_text="The amount of time the master backend waits
+                          for a recording.  If it's idle but a recording starts
+                          within this time period, the backends won't shut down.">
+        <option display="5" data="5" />
+        <option display="15" data="15" />
+        <option display="30" data="30" />
+        <option display="60" data="60" />
+        <option display="120" data="120" />
+      </setting>
+      <setting data_type="select" value="StartupSecsBeforeRecording"
+               label="Startup before rec. (secs)"
+               default_data="120"
+               setting_type="global"
+               help_text="The amount of time the master backend will be
+                          woken up before a recording starts.">
+        <option display="5" data="5" />
+        <option display="15" data="15" />
+        <option display="30" data="30" />
+        <option display="60" data="60" />
+        <option display="120" data="120" />
+        <option display="300" data="300" />
+        <option display="600" data="600" />
+        <option display="1200" data="1200" />
+      </setting>
+      <setting data_type="string" value="WakeupTimeFormat"
+               label="Wakeup time format"
+               default_data="hh:mm yyyy-MM-dd"
+               setting_type="global"
+               help_text="The format of the time string passed to the
+                          'setWakeuptime Command' as $time. See
+                          QT::QDateTime.toString() for details. Set to 'time_t' for
+                          seconds since epoch." />
+      <setting data_type="string" value="SetWakeuptimeCommand"
+               label="Command to set Wakeup Time"
+               default_data=""
+               setting_type="global"
+               help_text="The command used to set the wakeup time (passed as
+                          $time) for the Master Backend" />
+      <setting data_type="string" value="ServerHaltCommand"
+               label="Server halt command"
+               default_data="sudo /sbin/halt -p"
+               setting_type="global"
+               help_text="The command used to halt the backends." />
+      <setting data_type="string" value="preSDWUCheckCommand"
+               label="Pre Shutdown check-command"
+               default_data=""
+               setting_type="global"
+               help_text="A command executed before the backend would
+                          shutdown. The return value determines if
+                          the backend can shutdown. 0 - yes,
+                          1 - restart idling,
+                          2 - reset the backend to wait for a frontend." />
+    </group>
+    <group human_label="Backend Wakeup settings"
+           unique_label="backend_wakeup_settings">
+
+      <group human_label="Master Backends"
+             unique_label="backend_wakeup_settings_master_backends">
+        <setting data_type="select" value="WOLbackendReconnectWaitTime"
+                 label="Delay between wake attempts (secs)"
+                 default_data="0"
+                 setting_type="global"
+                 help_text="Length of time the frontend waits between
+                            tries to wake up the master backend. This should be the
+                            time your master backend needs to startup.">
+          <option display="Disabled" data="0" />
+          <option display="1" data="1" />
+          <option display="2" data="2" />
+          <option display="4" data="4" />
+          <option display="8" data="8" />
+          <option display="15" data="15" />
+          <option display="30" data="30" />
+          <option display="60" data="60" />
+          <option display="120" data="120" />
+          <option display="300" data="300" />
+          <option display="600" data="600" />
+          <option display="1200" data="1200" />
+        </setting>
+        <setting data_type="select" value="WOLbackendConnectRetry"
+                 label="Wake Attempts"
+                 setting_type="global"
+                 help_text="Number of times the frontend will try to wake
+                            up the master backend."
+                 default_data="5">
+          <option display="1" data="1" />
+          <option display="2" data="2" />
+          <option display="5" data="5" />
+          <option display="10" data="10" />
+          <option display="20" data="20" />
+          <option display="40" data="40" />
+          <option display="60" data="60" />
+        </setting>
+        <setting data_type="string" value="WOLbackendCommand"
+                 label="Wake Command"
+                 default_data=""
+                 setting_type="global"
+                 help_text="The command used to wake up your master
+                            backend server. For example
+                            'sudo /etc/init.d/mythtv-backend restart'." />
+      </group>
+
+      <group human_label="Slave Backends"
+             unique_label="backend_wakeup_settings_slave_backends">
+        <setting data_type="string" value="SleepCommand"
+                 label="Sleep Command"
+                 default_data=""
+                 setting_type="host"
+                 help_text="The command used to put this slave to sleep.
+                            If set, the master backend will use this
+                            command to put this slave to sleep when it
+                            is not needed for recording." />
+        <setting data_type="string" value="WakeUpCommand"
+                 label="Wake Command"
+                 default_data=""
+                 setting_type="host"
+                 help_text="The command used to wake up this slave from sleep.
+                            This setting is not used on the master backend." />
+      </group>
+    </group>
+    <group human_label="Backend Control"
+           unique_label="backend_control">
+      <setting data_type="string" value="BackendStopCommand"
+               label="Backend Stop Command"
+               default_data="killall mythbackend"
+               setting_type="global"
+               help_text="The command used to stop the backend
+                          when running on the master backend server.
+                          For example 'sudo /etc/init.d/mythtv-backend stop'." />
+      <setting data_type="string" value="BackendStartCommand"
+               label="Backend Start Command"
+               default_data="mythbackend"
+               setting_type="global"
+               help_text="The command used to start the backend
+                          when running on the master backend server.
+                          For example, 'sudo /etc/init.d/mythtv-backend start'." />
+    </group>
+    <group human_label="Job Queue (Backend-Specific)"
+           unique_label="job_queue_host">
+      <setting data_type="select" value="JobQueueMaxSimultaneousJobs"
+               label="Maximum simultaneous jobs on this backend"
+               setting_type="host"
+               help_text="The Job Queue will be limited to running
+                          this many simultaneous jobs on this backend."
+               default_data="1">
+        <option display="0" data="0" />
+        <option display="1" data="1" />
+        <option display="2" data="2" />
+        <option display="3" data="3" />
+        <option display="4" data="4" />
+        <option display="5" data="5" />
+        <option display="6" data="6" />
+        <option display="7" data="7" />
+        <option display="8" data="8" />
+        <option display="9" data="9" />
+        <option display="10" data="10" />
+      </setting>
+      <setting data_type="select" value="JobQueueCheckFrequency"
+               label="Job Queue Check frequency (in seconds)"
+               setting_type="host"
+               help_text="When looking for new jobs to process, the
+                          Job Queue will wait this long between checks."
+               default_data="60">
+        <option display="5" data="5" />
+        <option display="10" data="10" />
+        <option display="15" data="15" />
+        <option display="30" data="30" />
+        <option display="60" data="60" />
+        <option display="90" data="90" />
+        <option display="200" data="200" />
+        <option display="300" data="300" />
+      </setting>
+      <setting data_type="timeofday" value="JobQueueWindowStart"
+               default_value="00:00" label="Job Queue Start Time"
+               setting_type="host"
+               help_text="This setting controls the start of the Job Queue time
+                          window which determines when new jobs will be
+                          started." />
+      <setting data_type="timeofday" value="JobQueueWindowEnd"
+               default_value="23:59" label="Job Queue End Time"
+               setting_type="host"
+               help_text="This setting controls the end of the Job Queue time
+                          window which determines when new jobs will be
+                          started." />
+      <setting data_type="select" value="JobQueueCPU"
+               label="CPU Usage"
+               setting_type="host"
+               help_text="This setting controls approximately how
+                          much CPU jobs in the queue may consume.
+                          On 'High', all available CPU time may be used
+                          which could cause problems on slower systems.">
+        <option display="Low"    data="0" />
+        <option display="Medium" data="1" />
+        <option display="High"   data="2" />
+      </setting>
+      <setting data_type="checkbox" value="JobAllowCommFlag"
+               label="Allow Commercial Detection jobs"
+               default_data="true"
+               setting_type="host"
+               help_text="Allow jobs of this type to run on this backend." />
+      <setting data_type="checkbox" value="JobAllowTranscode"
+               label="Allow Transcoding jobs"
+               default_data="true"
+               setting_type="host"
+               help_text="Allow jobs of this type to run on this backend." />
+      <setting data_type="checkbox" value="JobAllowUserJob1"
+               label="Allow User Job #1 on this backend"
+               default_data="0"
+               setting_type="host"
+               help_text="Allow jobs of this type to run on this backend." />
+      <setting data_type="checkbox" value="JobAllowUserJob2"
+               label="Allow User Job #2 on this backend"
+               default_data="0"
+               setting_type="host"
+               help_text="Allow jobs of this type to run on this backend." />
+      <setting data_type="checkbox" value="JobAllowUserJob3"
+               label="Allow User Job #3 on this backend"
+               default_data="0"
+               setting_type="host"
+               help_text="Allow jobs of this type to run on this backend." />
+      <setting data_type="checkbox" value="JobAllowUserJob4"
+               label="Allow User Job #4 on this backend"
+               default_data="0"
+               setting_type="host"
+               help_text="Allow jobs of this type to run on this backend." />
+    </group>
+    <group human_label="Job Queue (Global)"
+           unique_label="job_queue_global">
+      <setting data_type="checkbox" value="JobsRunOnRecordHost"
+               label="Run Jobs only on original recording backend" default_data="0"
+               setting_type="global"
+               help_text="If set, jobs in the queue will be required
+                          to run on the backend that made the
+                          original recording." />
+      <setting data_type="checkbox" value="AutoCommflagWhileRecording"
+               label="Start Auto-Commercial Flagging jobs when the recording starts"
+               default_data="0"
+               setting_type="global"
+               help_text="If set and Auto Commercial Flagging is ON for
+                          a recording, the flagging job will be started
+                          as soon as the recording starts.  NOT
+                          recommended on underpowered systems." />
+      <setting data_type="string" value="JobQueueCommFlagCommand"
+               label="Commercial Flagger command"
+               default_data="mythcommflag"
+               setting_type="global"
+               help_text="The program used to detect commercials in a
+                          recording.  The default is 'mythcommflag'
+                          if this setting is empty." />
+      <setting data_type="string" value="JobQueueTranscodeCommand"
+               label="Transcoder command"
+               default_data="mythtranscode"
+               setting_type="global"
+               help_text="The program used to transcode recordings.
+                          The default is 'mythtranscode' if this
+                          setting is empty." />
+      <setting data_type="checkbox" value="AutoTranscodeBeforeAutoCommflag"
+               label="Run Transcode Jobs before Auto-Commercial Flagging"
+               default_data="0"
+               setting_type="global"
+               help_text="If set, if both auto-transcode and
+                          auto commercial flagging are turned ON for a
+                          recording, transcoding will run first,
+                          otherwise, commercial flagging runs first." />
+      <setting data_type="checkbox" value="SaveTranscoding"
+               label="Save original files after transcoding (globally)"
+               default_data="0"
+               setting_type="global"
+               help_text="When set and the transcoder is active, the
+                          original files will be renamed to .old once the
+                          transcoding is complete." />
+    </group>
+    <group human_label="Job Queue (Job Commands)"
+           unique_label="job_queue_job_commands">
+      <setting data_type="string" value="UserJobDesc1"
+               label="User Job #1 Description"
+               default_data="User Job #1"
+               setting_type="global"
+               help_text="The Description for this User Job."   />
+      <setting data_type="string" value="UserJob1"
+               label="User Job #1 Command"
+               default_data=""
+               setting_type="global"
+               help_text="The command to run whenever this User Job
+                          number is scheduled." />
+      <setting data_type="string" value="UserJobDesc2"
+               label="User Job #2 Description"
+               default_data="User Job #2"
+               setting_type="global"
+               help_text="The Description for this User Job."   />
+      <setting data_type="string" value="UserJob2"
+               label="User Job #2 Command"
+               default_data=""
+               setting_type="global"
+               help_text="The command to run whenever this User Job
+                          number is scheduled." />
+      <setting data_type="string" value="UserJobDesc3"
+               label="User Job #3 Description"
+               default_data="User Job #3"
+               setting_type="global"
+               help_text="The Description for this User Job."   />
+      <setting data_type="string" value="UserJob3"
+               label="User Job #3 Command"
+               default_data=""
+               setting_type="global"
+               help_text="The command to run whenever this User Job
+                          number is scheduled." />
+      <setting data_type="string" value="UserJobDesc4"
+               label="User Job #4 Description"
+               default_data="User Job #4"
+               setting_type="global"
+               help_text="The Description for this User Job."   />
+      <setting data_type="string" value="UserJob4"
+               label="User Job #4 Command"
+               default_data=""
+               setting_type="global"
+               help_text="The command to run whenever this User Job
+                          number is scheduled." />
+    </group>
+    <group human_label="UPNP Server Settings"
+           unique_label="upnp_server_settings">
+<!--
+      <setting data_type="checkbox" value="UPnP/RecordingsUnderVideos"
+               label="Include Recordings in Video List" default_data="0"
+               setting_type="global"
+               help_text="If enabled, the master backend will include the
+                          list of recorded shows in the list of videos
+                          This is mainly to accommodate UPnP players which do not
+                          allow more than 1 video section."  />
+-->
+      <setting data_type="select" value="UPnP/WMPSource"
+               label="Video content to show a WMP Client"
+               default_data="0"
+               setting_type="global"
+               help_text="This forces us to show WMP clients
+                          either the Recordings tree or the Video tree
+                          when they request a list of videos ">
+        <option display="Recordings" data="0" />
+        <option display="Videos" data="1" />
+      </setting>
+      <setting data_type="select" value="UPnP/RebuildDelay"
+               label="UPnP Media Update Time"
+               setting_type="host"
+               help_text="The number of minutes between mythbackend checking
+                          for new videos to serve via upnp. 0 = Off. "
+               default_data="30">
+                <option display="30" data="30" />
+        <option display="Off" data="0" />
+        <option display="1" data="1" />
+        <option display="5" data="5" />
+        <option display="15" data="15" />
+        <option display="30" data="30" />
+        <option display="60" data="60" />
+        <option display="120" data="120" />
+        <option display="300" data="300" />
+        <option display="600" data="600" />
+        <option display="1440" data="1440" />
+      </setting>
+    </group>
+    <group human_label="Database Logging"
+           unique_label="database_logging">
+      <setting data_type="checkbox" value="LogEnabled"
+               label="Log MythTV events to database"
+               default_data="0"
+               setting_type="global"
+               help_text="If enabled, MythTV modules will send event
+                          details to the database, where they can be viewed with
+                          MythLog or periodically emailed to the administrator." />
+      <setting data_type="select" value="LogPrintLevel"
+               label="Log Print Threshold"
+               setting_type="host" default_data="-1"
+               help_text="This controls what messages will be printed
+                          out as well as being logged to the database.">
+        <option display="All Messages" data="8" />
+        <option display="Debug and Higher" data="7" />
+        <option display="Info and Higher" data="6" />
+        <option display="Notice and Higher" data="5" />
+        <option display="Warning and Higher" data="4" />
+        <option display="Error and Higher" data="3" />
+        <option display="Critical and Higher" data="2" />
+        <option display="Alert and Higher" data="1" />
+        <option display="Emergency Only" data="0" />
+        <option display="Disable Printed Output" data="-1" />
+      </setting>
+      <setting data_type="checkbox" value="LogCleanEnabled"
+               label="Automatic Log Cleaning Enabled" default_data="0"
+               setting_type="host"
+               help_text="This enables the periodic cleanup of the
+                          events stored in the Myth database (see 'Log MythTV
+                          events to database')." />
+      <setting data_type="select" value="LogCleanPeriod"
+               label="Log Cleanup Frequency (Days)" default_data="14"
+               setting_type="host"
+               help_text="The number of days between log cleanup runs.">
+        <option display="Never cleanup" data="0" />
+        <option display="1" data="1" />
+        <option display="2" data="2" />
+        <option display="4" data="4" />
+        <option display="7" data="7" />
+        <option display="14" data="14" />
+        <option display="30" data="30" />
+        <option display="60" data="60" />
+      </setting>
+      <setting data_type="select" value="LogCleanDays"
+               label="Number of days to keep acknowledged log entries"
+               default_data="14"
+               setting_type="host"
+               help_text="The number of days before a log entry that has been
+                          acknowledged will be deleted by the log cleanup
+                          process.">
+        <option display="Never cleanup" data="0" />
+        <option display="1" data="1" />
+        <option display="2" data="2" />
+        <option display="4" data="4" />
+        <option display="7" data="7" />
+        <option display="14" data="14" />
+        <option display="30" data="30" />
+        <option display="60" data="60" />
+      </setting>
+      <setting data_type="select" value="LogCleanMax"
+               label="Number of days to keep unacknowledged log entries"
+               default_data="30"
+               setting_type="host"
+               help_text="The number of days before a log entry that
+                          has NOT been acknowledged will be deleted by the log
+                          cleanup process.">
+        <option display="Never cleanup" data="0" />
+        <option display="1" data="1" />
+        <option display="2" data="2" />
+        <option display="4" data="4" />
+        <option display="7" data="7" />
+        <option display="14" data="14" />
+        <option display="30" data="30" />
+        <option display="60" data="60" />
+      </setting>
+      <setting data_type="select" value="LogMaxCount"
+               label="Maximum Number of Entries per Module"
+               default_data="100"
+               setting_type="host"
+               help_text="If there are more than this number of entries for a
+                          module, the oldest log entries will be deleted to
+                          reduce the count to this number.  Set to 0 to disable.">
+        <option display="Disabled" data="0" />
+        <option display="10" data="10" />
+        <option display="25" data="25" />
+        <option display="50" data="50" />
+        <option display="100" data="100" />
+        <option display="250" data="250" />
+        <option display="500" data="500" />
+      </setting>
+    </group>
+    <group human_label="Program Schedule Downloading Options"
+           unique_label="program_schedule_downloading_options">
+      <setting data_type="checkbox" value="MythFillEnabled"
+               label="Automatically run mythfilldatabase"
+               default_data="1"
+               setting_type="global"
+               help_text="This enables the automatic execution of
+                          mythfilldatabase." />
+      <setting data_type="string" value="MythFillDatabasePath"
+               setting_type="global"
+               label="mythfilldatabase Program"
+               default_data="mythfilldatabase"
+               help_text="Use 'mythfilldatabase' or the name of a custom
+                          script that will populate the program guide info
+                          for all your video sources." />
+      <setting data_type="string" value="MythFillDatabaseArgs"
+               setting_type="global"
+               label="mythfilldatabase Arguments"
+               default_data=""
+               help_text="Any arguments you want passed to the
+                          mythfilldatabase program." />
+      <setting data_type="string" value="MythFillDatabaseLog"
+               setting_type="global"
+               label="mythfilldatabase Log Path"
+               default_data=""
+               help_text="File or directory to use for logging
+                          output from the mythfilldatabase program.
+                          Leave blank to disable logging." />
+      <setting data_type="select" value="MythFillPeriod"
+               label="mythfilldatabase Run Frequency (Days)"
+               default_data="1"
+               setting_type="global"
+               help_text="The number of days between mythfilldatabase runs.">
+        <option display="1" data="1" />
+        <option display="2" data="2" />
+        <option display="3" data="3" />
+        <option display="4" data="4" />
+        <option display="5" data="5" />
+        <option display="6" data="6" />
+        <option display="7" data="7" />
+        <option display="8" data="8" />
+        <option display="9" data="9" />
+        <option display="10" data="10" />
+        <option display="20" data="20" />
+        <option display="30" data="30" />
+      </setting>
+
+      <setting data_type="select" value="MythFillMinHour"
+               label="mythfilldatabase Execution Start"
+               default_data="2"
+               setting_type="global"
+               help_text="This setting and the following one define a
+                          time period when the mythfilldatabase process is
+                          allowed to run.">
+        <option display="12 AM" data="0" />
+        <option display="1 AM"  data="1" />
+        <option display="2 AM"  data="2" />
+        <option display="3 AM"  data="3" />
+        <option display="4 AM"  data="4" />
+        <option display="5 AM"  data="5" />
+        <option display="6 AM"  data="6" />
+        <option display="7 AM"  data="7" />
+        <option display="8 AM"  data="8" />
+        <option display="9 AM"  data="9" />
+        <option display="10 AM" data="10" />
+        <option display="11 AM" data="11" />
+        <option display="12 PM" data="12" />
+        <option display="1 PM"  data="13" />
+        <option display="2 PM"  data="14" />
+        <option display="3 PM"  data="15" />
+        <option display="4 PM"  data="16" />
+        <option display="5 PM"  data="17" />
+        <option display="6 PM"  data="18" />
+        <option display="7 PM"  data="19" />
+        <option display="8 PM"  data="20" />
+        <option display="9 PM"  data="21" />
+        <option display="10 PM" data="22" />
+        <option display="11 PM" data="23" />
+      </setting>
+
+      <setting data_type="select" value="MythFillMaxHour"
+               label="mythfilldatabase Execution End"
+               default_data="5"
+               setting_type="global"
+               help_text="This setting and the preceding one define a
+                          time period when the mythfilldatabase process is
+                          allowed to run.">
+        <option display="12 AM" data="0" />
+        <option display="1 AM"  data="1" />
+        <option display="2 AM"  data="2" />
+        <option display="3 AM"  data="3" />
+        <option display="4 AM"  data="4" />
+        <option display="5 AM"  data="5" />
+        <option display="6 AM"  data="6" />
+        <option display="7 AM"  data="7" />
+        <option display="8 AM"  data="8" />
+        <option display="9 AM"  data="9" />
+        <option display="10 AM" data="10" />
+        <option display="11 AM" data="11" />
+        <option display="12 PM" data="12" />
+        <option display="1 PM"  data="13" />
+        <option display="2 PM"  data="14" />
+        <option display="3 PM"  data="15" />
+        <option display="4 PM"  data="16" />
+        <option display="5 PM"  data="17" />
+        <option display="6 PM"  data="18" />
+        <option display="7 PM"  data="19" />
+        <option display="8 PM"  data="20" />
+        <option display="9 PM"  data="21" />
+        <option display="10 PM" data="22" />
+        <option display="11 PM" data="23" />
+      </setting>
+      <setting data_type="checkbox" value="MythFillGrabberSuggestsTime"
+               label="Run mythfilldatabase at time suggested by the grabber."
+               default_data="1"
+               setting_type="global"
+               help_text="This setting allows a DataDirect guide data provider
+                          to specify the next download time in order to
+                          distribute load on their servers. If this setting is
+                          enabled, mythfilldatabase Execution Start/End times
+                          are ignored." />
+    </group>
+  </group>
+</config>
