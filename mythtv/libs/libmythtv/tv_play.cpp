@@ -365,13 +365,28 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
 
         while (true)
         {
-            qApp->processEvents();
+            if (qApp->hasPendingEvents())
+                qApp->processEvents();
 
             TVState state = tv->GetState(0);
-            bool is_err   = kState_Error == state;
-            bool is_none  = kState_None  == state;
-            if (is_err || is_none)
+            if ((kState_Error == state) || (kState_None == state))
                 break;
+
+            if (kState_ChangingState == state)
+                continue;
+
+            const PlayerContext *mctx = tv->GetPlayerReadLock(0, __FILE__, __LINE__);
+            if (mctx)
+            {
+                mctx->LockDeletePlayer(__FILE__, __LINE__);
+                if (mctx->player && !mctx->player->IsErrored())
+                {
+                    mctx->player->EventLoop();
+                    mctx->player->VideoLoop();
+                }
+            }
+            mctx->UnlockDeletePlayer(__FILE__, __LINE__);
+            tv->ReturnPlayerLock(mctx);
         }
 
         VERBOSE(VB_PLAYBACK, LOC + "StartTV -- process events end");
