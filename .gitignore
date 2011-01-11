@@ -9,5 +9,6 @@ moc_*.cpp
 *.exe
 *.dll
 *.def
+*.dylib
 object_script.*
 *~
