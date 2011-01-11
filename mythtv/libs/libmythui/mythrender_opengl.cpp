@@ -393,13 +393,23 @@ void MythRenderOpenGL::UpdateTexture(uint tex, void *buf)
 
 int MythRenderOpenGL::GetTextureType(bool &rect)
 {
+    static bool rects = true;
+    static bool check = true;
+    if (check)
+    {
+        check = false;
+        rects = !getenv("OPENGL_NORECT");
+        if (!rects)
+            VERBOSE(VB_GENERAL, LOC + "Disabling NPOT textures.");
+    }
+
     int ret = GL_TEXTURE_2D;
 
-    if (m_extensions.contains("GL_NV_texture_rectangle"))
+    if (m_extensions.contains("GL_NV_texture_rectangle") && rects)
         ret = GL_TEXTURE_RECTANGLE_NV;
-    else if (m_extensions.contains("GL_ARB_texture_rectangle"))
+    else if (m_extensions.contains("GL_ARB_texture_rectangle") && rects)
         ret = GL_TEXTURE_RECTANGLE_ARB;
-    else if (m_extensions.contains("GL_EXT_texture_rectangle"))
+    else if (m_extensions.contains("GL_EXT_texture_rectangle") && rects)
         ret = GL_TEXTURE_RECTANGLE_EXT;
 
     rect = (ret != GL_TEXTURE_2D);
@@ -1437,6 +1447,53 @@ void* MythRenderOpenGL::GetProcAddress(const QString &proc) const
 
 void MythRenderOpenGL::InitFeatures(void)
 {
+    static bool multitexture  = true;
+    static bool vertexarrays  = true;
+    static bool fragmentprog  = true;
+    static bool glslshaders   = true;
+    static bool framebuffers  = true;
+    static bool pixelbuffers  = true;
+    static bool vertexbuffers = true;
+    static bool fences        = true;
+    static bool ycbcrtextures = true;
+    static bool mipmapping    = true;
+    static bool check         = true;
+
+    if (check)
+    {
+        check = false;
+        multitexture  = !getenv("OPENGL_NOMULTITEX");
+        vertexarrays  = !getenv("OPENGL_NOVERTARRAY");
+        fragmentprog  = !getenv("OPENGL_NOFRAGPROG");
+        glslshaders   = !getenv("OPENGL_NOGLSL");
+        framebuffers  = !getenv("OPENGL_NOFBO");
+        pixelbuffers  = !getenv("OPENGL_NOPBO");
+        vertexbuffers = !getenv("OPENGL_NOVBO");
+        fences        = !getenv("OPENGL_NOFENCE");
+        ycbcrtextures = !getenv("OPENGL_NOYCBCR");
+        mipmapping    = !getenv("OPENGL_NOMIPMAP");
+        if (!multitexture)
+            VERBOSE(VB_GENERAL, LOC + "Disabling multi-texturing.");
+        if (!vertexarrays)
+            VERBOSE(VB_GENERAL, LOC + "Disabling Vertex Arrays.");
+        if (!fragmentprog)
+            VERBOSE(VB_GENERAL, LOC + "Disabling fragment programs.");
+        if (!glslshaders)
+            VERBOSE(VB_GENERAL, LOC + "Disabling GLSL.");
+        if (!framebuffers)
+            VERBOSE(VB_GENERAL, LOC + "Disabling Framebuffer Objects.");
+        if (!pixelbuffers)
+            VERBOSE(VB_GENERAL, LOC + "Disabling Pixel Buffer Objects.");
+        if (!vertexbuffers)
+            VERBOSE(VB_GENERAL, LOC + "Disabling Vertex Buffer Objects.");
+        if (!fences)
+            VERBOSE(VB_GENERAL, LOC + "Disabling fences.");
+        if (!ycbcrtextures)
+            VERBOSE(VB_GENERAL, LOC + "Disabling YCbCr textures.");
+        if (!mipmapping)
+            VERBOSE(VB_GENERAL, LOC + "Disabling mipmapping.");
+    }
+
     m_exts_supported = kGLFeatNone;
 
     GLint maxtexsz = 0;
@@ -1451,7 +1508,7 @@ void MythRenderOpenGL::InitFeatures(void)
         m_exts_supported += kGLExtRect;
 
     if (m_extensions.contains("GL_ARB_multitexture") &&
-        m_glActiveTexture)
+        m_glActiveTexture && multitexture)
     {
         m_exts_supported += kGLMultiTex;
         if (m_max_units < 3)
@@ -1468,7 +1525,7 @@ void MythRenderOpenGL::InitFeatures(void)
                     "Certain OpenGL features will not work"));
     }
 
-    if (m_extensions.contains("GL_EXT_vertex_array"))
+    if (m_extensions.contains("GL_EXT_vertex_array") && vertexarrays)
     {
         m_exts_supported += kGLVertexArray;
     }
@@ -1482,7 +1539,8 @@ void MythRenderOpenGL::InitFeatures(void)
     if (m_extensions.contains("GL_ARB_fragment_program") &&
         m_glGenProgramsARB   && m_glBindProgramARB &&
         m_glProgramStringARB && m_glDeleteProgramsARB &&
-        m_glGetProgramivARB  && m_glProgramLocalParameter4fARB)
+        m_glGetProgramivARB  && m_glProgramLocalParameter4fARB &&
+        fragmentprog)
         m_exts_supported += kGLExtFragProg;
 
     if (m_extensions.contains("GL_ARB_shader_objects") &&
@@ -1501,7 +1559,7 @@ void MythRenderOpenGL::InitFeatures(void)
         m_glEnableVertexAttribArray &&
         m_glDisableVertexAttribArray &&
         m_glBindAttribLocation &&
-        m_glVertexAttrib4f)
+        m_glVertexAttrib4f && glslshaders)
     {
         m_exts_supported += kGLSL;
     }
@@ -1509,39 +1567,41 @@ void MythRenderOpenGL::InitFeatures(void)
     if (m_extensions.contains("GL_EXT_framebuffer_object") &&
         m_glGenFramebuffersEXT      && m_glBindFramebufferEXT &&
         m_glFramebufferTexture2DEXT && m_glDeleteFramebuffersEXT &&
-        m_glCheckFramebufferStatusEXT)
+        m_glCheckFramebufferStatusEXT && framebuffers)
         m_exts_supported += kGLExtFBufObj;
 
     bool buffer_procs = m_glMapBufferARB  && m_glBindBufferARB &&
                         m_glGenBuffersARB && m_glDeleteBuffersARB &&
                         m_glBufferDataARB && m_glUnmapBufferARB;
 
-    if(m_extensions.contains("GL_ARB_pixel_buffer_object") && buffer_procs)
+    if(m_extensions.contains("GL_ARB_pixel_buffer_object")
+       && buffer_procs && pixelbuffers)
         m_exts_supported += kGLExtPBufObj;
 
-    if (m_extensions.contains("GL_ARB_vertex_buffer_object") && buffer_procs)
+    if (m_extensions.contains("GL_ARB_vertex_buffer_object")
+        && buffer_procs && vertexbuffers)
         m_exts_supported += kGLExtVBO;
 
     if(m_extensions.contains("GL_NV_fence") &&
         m_glGenFencesNV && m_glDeleteFencesNV &&
-        m_glSetFenceNV  && m_glFinishFenceNV)
+        m_glSetFenceNV  && m_glFinishFenceNV && fences)
         m_exts_supported += kGLNVFence;
 
     if(m_extensions.contains("GL_APPLE_fence") &&
         m_glGenFencesAPPLE && m_glDeleteFencesAPPLE &&
-        m_glSetFenceAPPLE  && m_glFinishFenceAPPLE)
+        m_glSetFenceAPPLE  && m_glFinishFenceAPPLE && fences)
         m_exts_supported += kGLAppleFence;
 
-    if (m_extensions.contains("GL_MESA_ycbcr_texture"))
+    if (m_extensions.contains("GL_MESA_ycbcr_texture") && ycbcrtextures)
         m_exts_supported += kGLMesaYCbCr;
 
-    if (m_extensions.contains("GL_APPLE_rgb_422"))
+    if (m_extensions.contains("GL_APPLE_rgb_422") && ycbcrtextures)
         m_exts_supported += kGLAppleRGB422;
 
-    if (m_extensions.contains("GL_APPLE_ycbcr_422"))
+    if (m_extensions.contains("GL_APPLE_ycbcr_422") && ycbcrtextures)
         m_exts_supported += kGLAppleYCbCr;
 
-    if (m_extensions.contains("GL_SGIS_generate_mipmap"))
+    if (m_extensions.contains("GL_SGIS_generate_mipmap") && mipmapping)
         m_exts_supported += kGLMipMaps;
 
     static bool debugged = false;

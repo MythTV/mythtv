@@ -166,7 +166,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     gl_letterbox_colour   = letterbox_colour;
 
     // Set OpenGL feature support
-    gl_features = ParseOptions(options) & gl_context->GetFeatures();
+    gl_features = gl_context->GetFeatures();
 
     if (viewportControl)
     {
@@ -1749,46 +1749,3 @@ void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
     CustomiseProgramString(vertex);
     CustomiseProgramString(fragment);
 }
-
-uint OpenGLVideo::ParseOptions(QString options)
-{
-    uint ret = kGLMaxFeat - 1;
-    QStringList list = options.split(",");
-
-    if (list.empty())
-        return ret;
-
-    for (QStringList::Iterator i = list.begin();
-         i != list.end(); ++i)
-    {
-        QString name = (*i).section('=', 0, 0).toLower();
-        QString opts = (*i).section('=', 1).toLower();
-
-        if (name == "opengloptions")
-        {
-            if (opts.contains("nofence"))
-            {
-                ret -= kGLAppleFence;
-                ret -= kGLNVFence;
-            }
-            if (opts.contains("noswap"))
-            {
-                // TODO disable swap
-            }
-            if (opts.contains("nopbo"))
-                ret -= kGLExtPBufObj;
-            if (opts.contains("nofbo"))
-                ret -= kGLExtFBufObj;
-            if (opts.contains("nofrag"))
-                ret -= kGLExtFragProg;
-            if (opts.contains("norect"))
-                ret -= kGLExtRect;
-            if (opts.contains("noycbcr"))
-                ret -= kGLMesaYCbCr;
-            return ret;
-        }
-    }
-
-    return ret;
-}
-

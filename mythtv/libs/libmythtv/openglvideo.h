@@ -103,7 +103,6 @@ class OpenGLVideo
     void SetTextureFilters(vector<GLuint> *textures, int filt, int clamp);
     void DeleteTextures(vector<GLuint> *textures);
     void TearDownDeinterlacer(void);
-    uint ParseOptions(QString options);
 
     MythRenderOpenGL *gl_context;
     QSize          video_disp_dim;
