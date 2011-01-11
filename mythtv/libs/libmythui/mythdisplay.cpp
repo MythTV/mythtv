@@ -15,6 +15,11 @@ extern "C" {
 }
 #endif
 
+#if !defined(Q_WS_X11)
+#include <QApplication>
+#include <QDesktopWidget>
+#endif
+
 WId MythDisplay::GetWindowID(void)
 {
     WId win = 0;

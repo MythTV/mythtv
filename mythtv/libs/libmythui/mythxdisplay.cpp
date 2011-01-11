@@ -20,9 +20,6 @@ typedef std::vector<XErrorEvent>       XErrorVectorType;
 std::map<Display*, XErrorVectorType>   xerrors;
 std::map<Display*, XErrorCallbackType> xerror_handlers;
 std::map<Display*, MythXDisplay*>      xdisplays;
-#else
-#include <QApplication>
-#include <QDesktopWidget>
 #endif // USING_X11
 
 #include <QMutex>
