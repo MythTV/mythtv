@@ -72,8 +72,8 @@ class OpenGLFilter
  */
 
 OpenGLVideo::OpenGLVideo() :
-    gl_context(NULL),         video_dim(0,0),
-    actual_video_dim(0,0),    viewportSize(0,0),
+    gl_context(NULL),         video_disp_dim(0,0),
+    video_dim(0,0),           viewportSize(0,0),
     masterViewportSize(0,0),  display_visible_rect(0,0,0,0),
     display_video_rect(0,0,0,0), video_rect(0,0,0,0),
     frameBufferRect(0,0,0,0), softwareDeinterlacer(QString::null),
@@ -137,27 +137,26 @@ void OpenGLVideo::Teardown(void)
  */
 
 bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspace,
-                       QSize videoDim, QRect displayVisibleRect,
+                       QSize videoDim, QSize videoDispDim,
+                       QRect displayVisibleRect,
                        QRect displayVideoRect, QRect videoRect,
                        bool viewport_control, QString options,
                        bool hw_accel,
                        LetterBoxColour letterbox_colour)
 {
-    gl_context            = glcontext;
-    if (!gl_context)
+    if (!glcontext)
         return false;
 
+    gl_context            = glcontext;
     OpenGLLocker ctx_lock(gl_context);
 
-    actual_video_dim      = videoDim;
     video_dim             = videoDim;
-    if (video_dim.height() == 1088)
-        video_dim.setHeight(1080);
+    video_disp_dim        = videoDispDim;
     display_visible_rect  = displayVisibleRect;
     display_video_rect    = displayVideoRect;
     video_rect            = videoRect;
     masterViewportSize    = QSize(1920, 1080);
-    frameBufferRect       = QRect(QPoint(0,0), video_dim);
+    frameBufferRect       = QRect(QPoint(0,0), video_disp_dim);
     softwareDeinterlacer  = "";
     hardwareDeinterlacing = false;
     colourSpace           = colourspace;
@@ -205,12 +204,12 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
 
     if (basic_features && !using_hardwaretex)
     {
-        tex = CreateVideoTexture(actual_video_dim, inputTextureSize, use_pbo);
+        tex = CreateVideoTexture(video_dim, inputTextureSize, use_pbo);
         ok = tex && AddFilter(kGLFilterYUV2RGB);
     }
     else if (using_ycbcrtex || using_hardwaretex)
     {
-        tex = CreateVideoTexture(actual_video_dim,
+        tex = CreateVideoTexture(video_dim,
                                  inputTextureSize, use_pbo);
         ok = tex && AddFilter(kGLFilterResize);
         if (ok && using_ycbcrtex)
@@ -246,7 +245,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
                 "Falling back to software conversion.\n\t\t\t"
                 "Any opengl filters will also be disabled.");
 
-        GLuint bgra32tex = CreateVideoTexture(actual_video_dim,
+        GLuint bgra32tex = CreateVideoTexture(video_dim,
                                               inputTextureSize, use_pbo);
 
         if (bgra32tex && AddFilter(kGLFilterResize))
@@ -285,11 +284,11 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
 void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
 {
     // to improve performance on slower cards
-    bool resize_up = ((video_dim.height() < display_video_rect.height()) ||
-                     (video_dim.width() < display_video_rect.width())) && allow;
+    bool resize_up = ((video_disp_dim.height() < display_video_rect.height()) ||
+                     (video_disp_dim.width() < display_video_rect.width())) && allow;
 
     // to ensure deinterlacing works correctly
-    bool resize_down = (video_dim.height() > display_video_rect.height()) &&
+    bool resize_down = (video_disp_dim.height() > display_video_rect.height()) &&
                         deinterlacing && allow;
 
     if (resize_up && (defaultUpsize == kGLFilterBicubic))
@@ -340,7 +339,7 @@ bool OpenGLVideo::OptimiseFilters(void)
                 uint tmp_buf, tmp_tex;
                 for (int i = 0; i < buffers_diff; i++)
                 {
-                    if (!AddFrameBuffer(tmp_buf, tmp_tex, video_dim))
+                    if (!AddFrameBuffer(tmp_buf, tmp_tex, video_disp_dim))
                         return false;
                     else
                     {
@@ -602,7 +601,7 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
 
         for (; ref_size > 0; ref_size--)
         {
-            GLuint tex = CreateVideoTexture(actual_video_dim, inputTextureSize, use_pbo);
+            GLuint tex = CreateVideoTexture(video_dim, inputTextureSize, use_pbo);
             if (tex)
             {
                 referenceTextures.push_back(tex);
@@ -698,8 +697,8 @@ bool OpenGLVideo::AddFrameBuffer(uint &framebuffer,
 
 void OpenGLVideo::SetViewPort(const QSize &viewPortSize)
 {
-    uint w = max(viewPortSize.width(),  video_dim.width());
-    uint h = max(viewPortSize.height(), video_dim.height());
+    uint w = max(viewPortSize.width(),  video_disp_dim.width());
+    uint h = max(viewPortSize.height(), video_disp_dim.height());
 
     viewportSize = QSize(w, h);
 
@@ -787,8 +786,8 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
 {
     OpenGLLocker ctx_lock(gl_context);
 
-    if (frame->width  != actual_video_dim.width()  ||
-        frame->height != actual_video_dim.height() ||
+    if (frame->width  != video_dim.width()  ||
+        frame->height != video_dim.height() ||
         frame->width  < 1 || frame->height < 1 ||
         frame->codec != FMT_YV12)
     {
@@ -819,12 +818,12 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
     else if (frame->interlaced_frame && !soft_bob)
     {
         pack_yv12interlaced(frame->buf, (unsigned char*)buf, frame->offsets,
-                            frame->pitches, actual_video_dim);
+                            frame->pitches, video_dim);
     }
     else
     {
         pack_yv12alpha(frame->buf, (unsigned char*)buf, frame->offsets,
-                       frame->pitches, actual_video_dim, NULL);
+                       frame->pitches, video_dim, NULL);
     }
 
     gl_context->UpdateTexture(inputTextures[0], buf);
@@ -881,7 +880,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
 
     vector<GLuint> inputs = inputTextures;
     QSize inputsize = inputTextureSize;
-    QSize realsize  = GetTextureSize(video_dim);
+    QSize realsize  = GetTextureSize(video_disp_dim);
 
     glfilt_map_t::iterator it;
     for (it = filters.begin(); it != filters.end(); it++)
@@ -892,9 +891,9 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         bool actual = softwarebob && (filter->outputBuffer == kDefaultBuffer);
 
         // texture coordinates
-        float trueheight = (float)(actual ? actual_video_dim.height() :
-                                          video_dim.height());
-        QRectF trect(QPoint(0, 0), QSize(video_dim.width(), trueheight));
+        float trueheight = (float)(actual ? video_dim.height() :
+                                          video_disp_dim.height());
+        QRectF trect(QPoint(0, 0), QSize(video_disp_dim.width(), trueheight));
 
         // only apply overscan on last filter
         if (filter->outputBuffer == kDefaultBuffer)
@@ -913,7 +912,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
             bool bot = (scan == kScan_Interlaced && topfieldfirst) ||
                        (scan == kScan_Intr2ndField && !topfieldfirst);
             bool first = filters.size() < 2;
-            float bob = (trueheight / (float)video_dim.height()) / 4.0f;
+            float bob = (trueheight / (float)video_disp_dim.height()) / 4.0f;
             if ((top && !first) || (bot && first))
             {
                 trect.setBottom(trect.bottom() / 2);
@@ -1543,7 +1542,7 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
 
     float lineHeight = 1.0f;
     float colWidth   = 1.0f;
-    QSize fb_size = GetTextureSize(video_dim);
+    QSize fb_size = GetTextureSize(video_disp_dim);
 
     if (!textureRects &&
        (inputTextureSize.height() > 0))

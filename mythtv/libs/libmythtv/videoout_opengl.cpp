@@ -242,7 +242,8 @@ bool VideoOutputOpenGL::SetupOpenGL(void)
     OpenGLLocker ctx_lock(gl_context);
     gl_videochain = new OpenGLVideo();
     success = gl_videochain->Init(gl_context, &videoColourSpace,
-                                  window.GetVideoDim(), dvr,
+                                  window.GetVideoDim(),
+                                  window.GetVideoDispDim(), dvr,
                                   window.GetDisplayVideoRect(),
                                   window.GetVideoRect(), true,
                                   GetFilters(), !codec_is_std(video_codec_id),
@@ -608,7 +609,7 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  *frame,
         VERBOSE(VB_PLAYBACK, LOC + "Initialise PiP.");
         gl_pipchains[pipplayer] = gl_pipchain = new OpenGLVideo();
         bool success = gl_pipchain->Init(gl_context, &videoColourSpace,
-                     QSize(pipVideoWidth, pipVideoHeight),
+                     pipVideoDim, pipVideoDim,
                      dvr, position,
                      QRect(0, 0, pipVideoWidth, pipVideoHeight),
                      false, GetFilters(), false);
@@ -629,7 +630,7 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  *frame,
         gl_pipchains[pipplayer] = gl_pipchain = new OpenGLVideo();
         bool success = gl_pipchain->Init(
             gl_context, &videoColourSpace,
-            QSize(pipVideoWidth, pipVideoHeight), dvr, position,
+            pipVideoDim, pipVideoDim, dvr, position,
             QRect(0, 0, pipVideoWidth, pipVideoHeight),
             false, GetFilters(), false);
 

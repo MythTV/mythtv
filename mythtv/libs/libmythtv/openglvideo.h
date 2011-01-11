@@ -41,7 +41,7 @@ class OpenGLVideo
    ~OpenGLVideo();
 
     bool Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspace,
-              QSize videoDim, QRect displayVisibleRect,
+              QSize videoDim, QSize videoDispDim, QRect displayVisibleRect,
               QRect displayVideoRect, QRect videoRect,
               bool viewport_control,  QString options,
               bool hwaccel,
@@ -72,7 +72,7 @@ class OpenGLVideo
     QSize GetViewPort(void)         const { return viewportSize; }
     void  SetVideoRect(const QRect &dispvidrect, const QRect &vidrect)
                       { display_video_rect = dispvidrect; video_rect = vidrect;}
-    QSize GetVideoSize(void)        const { return actual_video_dim;}
+    QSize GetVideoSize(void)        const { return video_dim;}
 
   private:
     void Teardown(void);
@@ -107,8 +107,8 @@ class OpenGLVideo
     uint ParseOptions(QString options);
 
     MythRenderOpenGL *gl_context;
+    QSize          video_disp_dim;
     QSize          video_dim;
-    QSize          actual_video_dim;
     QSize          viewportSize;
     QSize          masterViewportSize;
     QRect          display_visible_rect;
