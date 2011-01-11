@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # vim:ts=4:sw=4:ai:et:si:sts=4
 # 
-# Animated satellite map grabber for Environment Canada.
+# Static satellite map grabber for Environment Canada.
 #
 # This script downloads satellite map data from the Environment Canada 
 # website.  It uses the lists of JPEG images supplied by the page at
@@ -9,6 +9,7 @@
 #
 # The bulk of the code in this script was originally authored by 
 # Lucien Dunning (ldunning@gmail.com).
+# Based on envcan_animaps.pl by Joe Ripley <vitaminjoe@gmail.com>
 
 use strict;
 use warnings;
@@ -29,13 +30,13 @@ use Image::Magick;
 
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
 
-my $name = 'ENVCAN-Animated-Map';
-my $version = 0.4;
-my $author = 'Joe Ripley';
-my $email = 'vitaminjoe@gmail.com';
+my $name = 'ENVCAN-Static-Map';
+my $version = 0.1;
+my $author = 'Gavin Hurlbut';
+my $email = 'gjhurlbu@gmail.com';
 my $updateTimeout = 10*60;
 my $retrieveTimeout = 30;
-my @types = ('amdesc', 'updatetime', 'animatedimage', 'copyright');
+my @types = ('smdesc', 'updatetime', 'map', 'copyright');
 my $dir = "/tmp/envcan";
 
 getopts('Tvtlu:d:');
@@ -92,39 +93,35 @@ my @image_list;
 my $size;
 my $base_url = "http://www.weatheroffice.gc.ca";
 my $file     = $loc;
-my $path     = "$dir/$file-";
+my $path     = "$dir/$file";
 
 # Get list of images (at most 10)
 foreach my $line (split(/\n/, $response)) {
     if ($line =~ /theImagesComplete\[\d*\] \= \"(.*)\"\;/) {
         push (@image_list, $1);
-        if ($#image_list >= 10) { shift @image_list; }
+        if ($#image_list >= 1) { shift @image_list; }
     }
 }
 
-# Download map files, if necessary (maps are stale after 15 minutes)
-my $i = 0;
-my $outimage = Image::Magick->new;
-foreach my $image (@image_list) {
-    my $getImage = 1;
-    if (-f "$path$i" ) {
-        my @stats = stat(_);
-        if ($stats[9] > (time - 900)) { 
-            $outimage->Read( "$path$i" );
-            $i++; 
-            next; 
-        }
-    } 
+# Download map file, if necessary (maps are stale after 15 minutes)
+my $image = shift @image_list;
+my $ext = $image;
+$ext =~ s/.*\.(.*?)$/$1/;
 
-    getstore($base_url . $image, "$path$i");
-    $outimage->Read( "$path$i" );
-    $i++;
+my $cached = 0;
+if (-f "$path.$ext" ) {
+    my @stats = stat(_);
+    if ($stats[9] > (time - 900)) { 
+        $cached = 1;
+    }
+} 
+
+if (!$cached) {
+    getstore($base_url . $image, "$path.$ext");
 }
 
-$outimage->Write( filename => "$dir/$file.gif", delay => 75 );
-
-print "amdesc::$desc\n";
-print "animatedimage::$dir/$file.gif\n";
+print "smdesc::$desc\n";
+print "map::$path.$ext\n";
 print "updatetime::Last Updated on " . 
       UnixDate("now", "%b %d, %I:%M %p %Z") . "\n";
 print "copyright::Environment Canada\n";
