@@ -85,8 +85,7 @@ class OpenGLVideo
     uint AddFragmentProgram(OpenGLFilterType name,
                             QString deint = QString::null,
                             FrameScanType field = kScan_Progressive);
-    uint CreateVideoTexture(QSize size, QSize &tex_size,
-                            bool use_pbo = false);
+    uint CreateVideoTexture(QSize size, QSize &tex_size);
     QString GetProgramString(OpenGLFilterType filter,
                              QString deint = QString::null,
                              FrameScanType field = kScan_Progressive);
@@ -132,8 +131,7 @@ class OpenGLVideo
     uint           helperTexture;
     OpenGLFilterType defaultUpsize;
     uint           gl_features;
-    bool           using_ycbcrtex;
-    bool           using_hardwaretex;
+    uint           videoTextureType;
     LetterBoxColour gl_letterbox_colour;
 };
 #endif // _OPENGL_VIDEO_H__

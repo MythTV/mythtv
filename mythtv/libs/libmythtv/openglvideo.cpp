@@ -83,8 +83,7 @@ OpenGLVideo::OpenGLVideo() :
     inputUpdated(false),      refsNeeded(0),
     textureRects(false),      textureType(GL_TEXTURE_2D),
     helperTexture(0),         defaultUpsize(kGLFilterResize),
-    gl_features(0),           using_ycbcrtex(false),
-    using_hardwaretex(false),
+    gl_features(0),           videoTextureType(GL_BGRA),
     gl_letterbox_colour(kLetterBoxColour_Black)
 {
 }
@@ -130,8 +129,8 @@ void OpenGLVideo::Teardown(void)
  *  \param viewport_control   if true, this instance may permanently change
      the OpenGL viewport
  *  \param options            a string defining OpenGL features to disable
- *  \param osd                if true, this instance describes an OSD (rather
-     than video)
+ *  \param hw_accel           if true, a GPU decoder will copy frames directly
+     to an RGBA texture
  *  \param letterbox_colour   the colour used to clear unused areas of the
      window
  */
@@ -166,6 +165,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     inputUpdated          = false;
     gl_letterbox_colour   = letterbox_colour;
 
+    // Set OpenGL feature support
     gl_features = ParseOptions(options) & gl_context->GetFeatures();
 
     if (viewportControl)
@@ -176,77 +176,78 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
 
     SetViewPort(display_visible_rect.size());
 
-    using_hardwaretex   = hw_accel;
-    bool use_pbo        = !using_hardwaretex && (gl_features & kGLExtPBufObj);
-    bool basic_features = gl_features & kGLExtFragProg;
-    bool full_features  = basic_features && (gl_features & kGLExtFBufObj);
-    using_ycbcrtex      = !using_hardwaretex && !full_features &&
-                          (gl_features & kGLMesaYCbCr);
+    bool shaders = (gl_features & kGLExtFragProg) || (gl_features & kGLSL);
 
-    if (using_ycbcrtex)
-        basic_features = false;
+    // decide on best video input texture format
+    videoTextureType = GL_BGRA;
+    if (hw_accel)
+    {
+        videoTextureType = GL_RGBA;
+    }
+    //else if (shaders && (gl_features & kGLAppleRGB422))
+    //{
+    //    videoTextureType = GL_RGB_422_APPLE;
+    //}
+    else if (!shaders && (gl_features & kGLMesaYCbCr))
+        videoTextureType = GL_YCBCR_MESA;
+    else if (!shaders && (gl_features & kGLAppleYCbCr))
+        videoTextureType = GL_YCBCR_422_APPLE;
 
+    // colourspace adjustments require shaders to operate on YUV textures
+    if ((GL_BGRA != videoTextureType) && (GL_RGB_422_APPLE != videoTextureType))
+        colourSpace->SetSupportedAttributes(kPictureAttributeSupported_None);
+
+    // turn on bicubic filtering
     if (options.contains("openglbicubic"))
     {
-        if (full_features)
+        if (shaders && (gl_features & kGLExtFBufObj))
             defaultUpsize = kGLFilterBicubic;
         else
             VERBOSE(VB_PLAYBACK, LOC_ERR +
                 QString("No OpenGL feature support for Bicubic filter."));
     }
 
-    if (!using_hardwaretex &&
-        (defaultUpsize != kGLFilterBicubic) && (gl_features & kGLExtRect))
+    // decide on best input texture type
+    if ((GL_RGBA != videoTextureType) && (defaultUpsize != kGLFilterBicubic) &&
+        (gl_features & kGLExtRect))
+    {
         textureType = gl_context->GetTextureType(textureRects);
+    }
 
-    GLuint tex = 0;
+    // Create initial input texture and associated filter stage
+    GLuint tex = CreateVideoTexture(video_dim, inputTextureSize);
     bool    ok = false;
 
-    if (basic_features && !using_hardwaretex)
-    {
-        tex = CreateVideoTexture(video_dim, inputTextureSize, use_pbo);
+    if ((GL_BGRA == videoTextureType) || (GL_RGB_422_APPLE == videoTextureType))
         ok = tex && AddFilter(kGLFilterYUV2RGB);
-    }
-    else if (using_ycbcrtex || using_hardwaretex)
-    {
-        tex = CreateVideoTexture(video_dim,
-                                 inputTextureSize, use_pbo);
+    else
         ok = tex && AddFilter(kGLFilterResize);
-        if (ok && using_ycbcrtex)
-            VERBOSE(VB_PLAYBACK, LOC + QString("Using GL_MESA_ycbcr_texture for"
-                                               " colorspace conversion."));
-        else if (ok && using_hardwaretex)
-            VERBOSE(VB_PLAYBACK, LOC + QString("Using plain RGBA tex for hw accel."));
-        else
-        {
-            using_ycbcrtex = false;
-            using_hardwaretex = false;
-        }
-        colourSpace->SetSupportedAttributes(kPictureAttributeSupported_None);
-    }
 
     if (ok)
+    {
+        if (GL_RGBA == videoTextureType)
+            VERBOSE(VB_PLAYBACK, LOC + "Using raw RGBA input textures.");
+        else if ((GL_YCBCR_MESA == videoTextureType) ||
+                 (GL_YCBCR_422_APPLE == videoTextureType))
+            VERBOSE(VB_PLAYBACK, LOC + "Using YCbCr->BGRA input textures.");
+        else if (GL_RGB_422_APPLE == videoTextureType)
+            VERBOSE(VB_PLAYBACK, LOC + "Using Apple YCbCr input textures.");
+        else
+            VERBOSE(VB_PLAYBACK, LOC + "Using plain BGRA input textures.");
         inputTextures.push_back(tex);
+    }
     else
         Teardown();
 
     if (filters.empty())
     {
-        if (!basic_features)
-        {
-            VERBOSE(VB_PLAYBACK, LOC_ERR +
-                QString("No OpenGL extension available"
-                        " for colorspace conversion."));
-        }
-
-
         VERBOSE(VB_PLAYBACK, LOC +
-                "OpenGL colour conversion failed.\n\t\t\t"
+                "Failed to setup colourspace conversion.\n\t\t\t"
                 "Falling back to software conversion.\n\t\t\t"
                 "Any opengl filters will also be disabled.");
 
-        GLuint bgra32tex = CreateVideoTexture(video_dim,
-                                              inputTextureSize, use_pbo);
+        videoTextureType = GL_BGRA;
+        GLuint bgra32tex = CreateVideoTexture(video_dim, inputTextureSize);
 
         if (bgra32tex && AddFilter(kGLFilterResize))
         {
@@ -261,17 +262,15 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
         }
     }
 
-#ifdef MMX
-    bool mmx = true;
-#else
     bool mmx = false;
+#ifdef MMX
+    mmx = true;
 #endif
 
     CheckResize(false);
 
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("Using packed textures with%1 mmx and with%2 PBOs")
-            .arg(mmx ? "" : "out").arg(use_pbo ? "" : "out"));
+    VERBOSE(VB_PLAYBACK, LOC + QString("MMX: %1 PBO: %2")
+            .arg(mmx).arg((gl_features & kGLExtPBufObj) > 0));
 
     return true;
 }
@@ -571,8 +570,7 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
     if (!filters.count(kGLFilterYUV2RGB))
     {
         VERBOSE(VB_PLAYBACK, LOC_ERR +
-            QString("No YUV2RGB filter stage for OpenGL deinterlacing%1.")
-                .arg(using_ycbcrtex ? " (using GL_YCBCR_MESA tex)" : ""));
+            QString("No YUV2RGB filter stage for OpenGL deinterlacing%1."));
         return false;
     }
 
@@ -597,11 +595,9 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
     refsNeeded = ref_size;
     if (ref_size > 0)
     {
-        bool use_pbo = gl_features & kGLExtPBufObj;
-
         for (; ref_size > 0; ref_size--)
         {
-            GLuint tex = CreateVideoTexture(video_dim, inputTextureSize, use_pbo);
+            GLuint tex = CreateVideoTexture(video_dim, inputTextureSize);
             if (tex)
             {
                 referenceTextures.push_back(tex);
@@ -711,27 +707,35 @@ void OpenGLVideo::SetViewPort(const QSize &viewPortSize)
 }
 
 /**
- * \fn OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size,
-                                     bool use_pbo)
+ * \fn OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size)
  *  Create and initialise an OpenGL texture suitable for a YV12 video frame
  *  of the given size.
  */
 
-uint OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size,
-                                     bool use_pbo)
+uint OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size)
 {
-    uint tmp_tex;
-    if (using_ycbcrtex)
+    uint tmp_tex = 0;
+    bool use_pbo = gl_features & kGLExtPBufObj;
+    if (GL_YCBCR_MESA == videoTextureType)
+    {
         tmp_tex = gl_context->CreateTexture(size, use_pbo, textureType,
                                             GL_UNSIGNED_SHORT_8_8_MESA,
                                             GL_YCBCR_MESA, GL_YCBCR_MESA);
-    else if (using_hardwaretex)
+    }
+    else if (GL_YCBCR_422_APPLE == videoTextureType)
+    {
         tmp_tex = gl_context->CreateTexture(size, use_pbo, textureType,
-                                            GL_UNSIGNED_BYTE, GL_RGBA,
-                                            GL_RGBA, GL_LINEAR,
-                                            GL_CLAMP_TO_EDGE);
+                                            GL_UNSIGNED_SHORT_8_8_MESA,
+                                            GL_YCBCR_422_APPLE, GL_RGBA);
+    }
+    else if (GL_RGB_422_APPLE == videoTextureType)
+    {
+        tmp_tex = gl_context->CreateTexture(size, use_pbo, textureType,
+                                            GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA);
+    }
     else
         tmp_tex = gl_context->CreateTexture(size, use_pbo, textureType);
+
     tex_size = gl_context->GetTextureSize(textureType, size);
     if (!tmp_tex)
         return 0;
@@ -806,8 +810,11 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
         // software conversion
         AVPicture img_in, img_out;
         PixelFormat out_fmt = PIX_FMT_BGRA;
-        if (using_ycbcrtex)
+        if ((GL_YCBCR_MESA == videoTextureType) ||
+            (GL_YCBCR_422_APPLE == videoTextureType))
+        {
             out_fmt = PIX_FMT_UYVY422;
+        }
         avpicture_fill(&img_out, (uint8_t *)buf, out_fmt,
                        frame->width, frame->height);
         avpicture_fill(&img_in, (uint8_t *)frame->buf, PIX_FMT_YUV420P,
@@ -1713,10 +1720,11 @@ void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
                                     QString deint, FrameScanType field)
 {
     uint bottom = field == kScan_Intr2ndField;
+    vertex = YUV2RGBVertexShader;
     switch (filter)
     {
-        default:
-            vertex = YUV2RGBVertexShader;
+        case kGLFilterYUV2RGB:
+        {
             if (deint == "openglonefield" || deint == "openglbobdeint")
                 fragment = OneFieldShader[bottom];
             else if (deint == "opengllinearblend" ||
@@ -1727,6 +1735,15 @@ void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
                 fragment = KernelShader[bottom];
             else
                 fragment = YUV2RGBFragmentShader;
+            break;
+        }
+        case kGLFilterNone:
+        case kGLFilterResize:
+            break;
+        case kGLFilterBicubic:
+            break;
+        default:
+            VERBOSE(VB_PLAYBACK, LOC_ERR + "Unknown filter");
             break;
     }
     CustomiseProgramString(vertex);
