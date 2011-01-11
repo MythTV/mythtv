@@ -207,16 +207,6 @@ float MythXDisplay::GetRefreshRate(void)
         rate *= 2.0;
     }
 
-    // Assume 60Hz if rate isn't good:
-    if (rate < 20 || rate > 200)
-    {
-        VERBOSE(VB_PLAYBACK, QString("MythXGetRefreshRate(): "
-                "Unreasonable refresh rate %1Hz reported by X").arg(rate));
-        rate = 60;
-    }
-
-    rate = 1000000.0 / rate;
-
     return rate;
 }
 
