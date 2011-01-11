@@ -2620,8 +2620,8 @@ enable $arch
 # if no tune setting and we know cpu class look at $processor
 if enabled proc_opt_old; then
 # first try to tune based on processor info
-# Intel i7 processors (EMT64T capable)
-   if expr "$processor" : ".*Intel(R).*Core(TM) i7 CPU.*" > /dev/null ; then
+# Intel i3, i5, i7 processors (EMT64T capable)
+   if expr "$processor" : ".*Intel(R).*Core(TM) i[357] CPU.*" > /dev/null ; then
        cpu="core2"
 # EM64T era Intel Xeon
    elif expr "$processor" : ".*Intel(R) Xeon(R) CPU.*51[1-6][08]" > /dev/null ; then
