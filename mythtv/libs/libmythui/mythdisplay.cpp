@@ -20,6 +20,21 @@ extern "C" {
 #include <QDesktopWidget>
 #endif
 
+#define VALID_RATE(rate) (rate > 20.0 && rate < 200.0)
+
+float fix_rate(int video_rate)
+{
+    static const float default_rate = 1000000.0 / 60.0;
+    float fixed = default_rate;
+    if (video_rate > 0)
+    {
+        fixed = video_rate / 2;
+        if (fixed < default_rate)
+            fixed = default_rate;
+    }
+    return fixed;
+}
+
 WId MythDisplay::GetWindowID(void)
 {
     WId win = 0;
@@ -29,7 +44,7 @@ WId MythDisplay::GetWindowID(void)
     return win;
 }
 
-DisplayInfo MythDisplay::GetDisplayInfo(void)
+DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
 {
     DisplayInfo ret;
 
@@ -39,14 +54,14 @@ DisplayInfo MythDisplay::GetDisplayInfo(void)
         return ret;
 
     CFDictionaryRef ref = CGDisplayCurrentMode(disp);
+    float rate = 0.0f;
     if (ref)
-    {
-        float rate = get_float_CF(ref, kCGDisplayRefreshRate);
-        // N.B. A rate of zero typically indicates the internal macbook
-        // lcd display which does not have a rate in the traditional sense
-        if (rate > 20 && rate < 200)
-            ret.rate = 1000000.0f / rate;
-    }
+        rate = get_float_CF(ref, kCGDisplayRefreshRate);
+
+    if (VALID_RATE(rate))
+        ret.rate = 1000000.0f / rate;
+    else
+        ret.rate = fix_rate(video_rate);
 
     CGSize size_in_mm = CGDisplayScreenSize(disp);
     ret.size = QSize((uint) size_in_mm.width, (uint) size_in_mm.height);
@@ -57,23 +72,10 @@ DisplayInfo MythDisplay::GetDisplayInfo(void)
 
 #elif defined(Q_WS_WIN)
     HDC hdc = GetDC(GetWindowID());
+    int rate = 0;
     if (hdc)
     {
-        int rate = GetDeviceCaps(hdc, VREFRESH);
-        if (rate > 20 && rate < 200)
-        {
-            // see http://support.microsoft.com/kb/2006076
-            switch (rate)
-            {
-                case 23:  ret.rate = 41708; break; // 23.976Hz
-                case 29:  ret.rate = 33367; break; // 29.970Hz
-                case 47:  ret.rate = 20854; break; // 47.952Hz
-                case 59:  ret.rate = 16683; break; // 59.940Hz
-                case 71:  ret.rate = 13903; break; // 71.928Hz
-                case 119: ret.rate = 8342;  break; // 119.880Hz
-                default:  ret.rate = 1000000.0f / (float)rate;
-            }
-        }
+        rate       = GetDeviceCaps(hdc, VREFRESH);
         int width  = GetDeviceCaps(hdc, HORZSIZE);
         int height = GetDeviceCaps(hdc, VERTSIZE);
         ret.size   = QSize((uint)width, (uint)height);
@@ -82,12 +84,33 @@ DisplayInfo MythDisplay::GetDisplayInfo(void)
         ret.res    = QSize((uint)width, (uint)height);
     }
 
+    if (VALID_RATE(rate))
+    {
+        // see http://support.microsoft.com/kb/2006076
+        switch (rate)
+        {
+            case 23:  ret.rate = 41708; break; // 23.976Hz
+            case 29:  ret.rate = 33367; break; // 29.970Hz
+            case 47:  ret.rate = 20854; break; // 47.952Hz
+            case 59:  ret.rate = 16683; break; // 59.940Hz
+            case 71:  ret.rate = 13903; break; // 71.928Hz
+            case 119: ret.rate = 8342;  break; // 119.880Hz
+            default:  ret.rate = 1000000.0f / (float)rate;
+        }
+    }
+    else
+        ret.rate = fix_rate(video_rate);
+
 #elif defined (Q_WS_X11)
     MythXDisplay *disp = OpenMythXDisplay();
     if (!disp)
         return ret;
     
-    ret.rate = disp->GetRefreshRate();
+    float rate = disp->GetRefreshRate();
+    if (VALID_RATE(rate))
+        ret.rate = 1000000.0f / rate;
+    else
+        ret.rate = fix_rate(video_rate);
     ret.res  = disp->GetDisplaySize();
     ret.size = disp->GetDisplayDimensions();
     delete disp;

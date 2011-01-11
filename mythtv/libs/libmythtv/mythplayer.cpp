@@ -1616,9 +1616,7 @@ void MythPlayer::InitAVSync(void)
 
     repeat_delay = 0;
 
-    refreshrate = (int)MythDisplay::GetDisplayInfo().rate;
-    if (refreshrate <= 0)
-        refreshrate = frame_interval;
+    refreshrate = MythDisplay::GetDisplayInfo(frame_interval).Rate();
 
     if (!using_null_videoout)
     {
@@ -2108,8 +2106,8 @@ void MythPlayer::VideoStart(void)
     refreshrate = frame_interval;
 
     float temp_speed = (play_speed == 0.0) ? audio.GetStretchFactor() : play_speed;
-    uint fr_int = (int)(1000000.0 / video_frame_rate / temp_speed);
-    uint rf_int = (int)MythDisplay::GetDisplayInfo().rate;
+    int fr_int = (1000000.0 / video_frame_rate / temp_speed);
+    int rf_int = MythDisplay::GetDisplayInfo(fr_int).Rate();
 
     // Default to Interlaced playback to allocate the deinterlacer structures
     // Enable autodetection of interlaced/progressive from video stream
@@ -2123,7 +2121,7 @@ void MythPlayer::VideoStart(void)
 
     if (using_null_videoout)
     {
-        videosync = new USleepVideoSync(videoOutput, (int)fr_int, 0, false);
+        videosync = new USleepVideoSync(videoOutput, fr_int, 0, false);
     }
     else if (videoOutput)
     {
@@ -2135,7 +2133,7 @@ void MythPlayer::VideoStart(void)
         m_double_process = videoOutput->IsExtraProcessingRequired();
 
         videosync = VideoSync::BestMethod(
-            videoOutput, fr_int, rf_int, m_double_framerate);
+            videoOutput, (uint)fr_int, (uint)rf_int, m_double_framerate);
 
         // Make sure video sync can do it
         if (videosync != NULL && m_double_framerate)
@@ -2152,7 +2150,7 @@ void MythPlayer::VideoStart(void)
     if (!videosync)
     {
         videosync = new BusyWaitVideoSync(
-            videoOutput, (int)fr_int, (int)rf_int, m_double_framerate);
+            videoOutput, fr_int, rf_int, m_double_framerate);
     }
 
     if (isDummy)

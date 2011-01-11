@@ -67,30 +67,6 @@ MythXDisplay *OpenMythXDisplay(void)
     return NULL;
 }
 
-QSize MythXGetDisplayDimensions(void)
-{
-    QSize ret(-1,-1);
-    MythXDisplay *d = OpenMythXDisplay();
-    if (d)
-    {
-        ret = d->GetDisplayDimensions();
-        delete d;
-    }
-    return ret;
-}
-
-float MythXGetRefreshRate(void)
-{
-    float ret = -1;
-    MythXDisplay *d = OpenMythXDisplay();
-    if (d)
-    {
-        ret = d->GetRefreshRate();
-        delete d;
-    }
-    return ret;
-}
-
 MythXDisplay::MythXDisplay()
   : m_disp(NULL), m_screen_num(0), m_screen(NULL),
     m_depth(0), m_black(0), m_gc(0),
@@ -227,16 +203,6 @@ float MythXDisplay::GetRefreshRate(void)
                 "Doubling refresh rate for interlaced display.");
         rate *= 2.0;
     }
-
-    // Assume 60Hz if rate isn't good:
-    if (rate < 20 || rate > 200)
-    {
-        VERBOSE(VB_PLAYBACK, QString("MythXGetRefreshRate(): "
-                "Unreasonable refresh rate %1Hz reported by X").arg(rate));
-        rate = 60;
-    }
-
-    rate = 1000000.0 / rate;
 
     return rate;
 }
