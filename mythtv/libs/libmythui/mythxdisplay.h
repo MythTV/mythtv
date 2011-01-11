@@ -73,8 +73,6 @@ class MythXLocker
 MPUBLIC void          LockMythXDisplays(bool lock);
 MPUBLIC MythXDisplay *GetMythXDisplay(Display*);
 MPUBLIC MythXDisplay *OpenMythXDisplay(void);
-MPUBLIC QSize         MythXGetDisplayDimensions(void);
-MPUBLIC float         MythXGetRefreshRate(void);
 #define XLOCK(dpy, arg) { dpy->Lock(); arg; dpy->Unlock(); }
 #endif // USING_X11
 

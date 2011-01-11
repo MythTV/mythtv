@@ -70,30 +70,6 @@ MythXDisplay *OpenMythXDisplay(void)
     return NULL;
 }
 
-QSize MythXGetDisplayDimensions(void)
-{
-    QSize ret(-1,-1);
-    MythXDisplay *d = OpenMythXDisplay();
-    if (d)
-    {
-        ret = d->GetDisplayDimensions();
-        delete d;
-    }
-    return ret;
-}
-
-float MythXGetRefreshRate(void)
-{
-    float ret = -1;
-    MythXDisplay *d = OpenMythXDisplay();
-    if (d)
-    {
-        ret = d->GetRefreshRate();
-        delete d;
-    }
-    return ret;
-}
-
 MythXDisplay::MythXDisplay()
   : m_disp(NULL), m_screen_num(0), m_screen(NULL),
     m_depth(0), m_black(0), m_gc(0),
