@@ -1,4 +1,5 @@
 #include "mythcontext.h"
+#include "mythmainwindow.h"
 #include "mythplayer.h"
 #include "videooutbase.h"
 #include "videoout_opengl.h"
@@ -40,8 +41,10 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
 VideoOutputOpenGL::VideoOutputOpenGL()
     : VideoOutput(),
     gl_context_lock(QMutex::Recursive),
-    gl_context(NULL), gl_videochain(NULL), gl_pipchain_active(NULL),
-    gl_parent_win(0), gl_embed_win(0), gl_painter(NULL)
+    gl_context(NULL), gl_created_context(false),
+    gl_videochain(NULL), gl_pipchain_active(NULL),
+    gl_parent_win(0), gl_embed_win(0),
+    gl_painter(NULL), gl_created_painter(false)
 {
     memset(&av_pause_frame, 0, sizeof(av_pause_frame));
     av_pause_frame.buf = NULL;
@@ -55,11 +58,9 @@ VideoOutputOpenGL::~VideoOutputOpenGL()
     QMutexLocker locker(&gl_context_lock);
     TearDown();
 
-    if (gl_context)
-    {
+    if (gl_created_context)
         delete gl_context;
-        gl_context = NULL;
-    }
+    gl_context = NULL;
 }
 
 void VideoOutputOpenGL::TearDown(void)
@@ -90,11 +91,13 @@ void VideoOutputOpenGL::TearDown(void)
         gl_videochain = NULL;
     }
 
-    if (gl_painter)
-    {
+    if (gl_created_painter)
         delete gl_painter;
-        gl_painter = NULL;
-    }
+    else
+        gl_painter->SetSwapControl(true);
+
+    gl_painter = NULL;
+    gl_created_painter = false;
 
     while (!gl_pipchains.empty())
     {
@@ -198,33 +201,49 @@ bool VideoOutputOpenGL::SetupContext(void)
 {
     QMutexLocker locker(&gl_context_lock);
 
-    bool success = false;
-
     if (gl_context)
     {
         VERBOSE(VB_PLAYBACK, LOC + QString("Re-using context"));
-        success = true;
+        return true;
     }
-    else
-    {
-        QGLFormat fmt;
-        fmt.setDepth(false);
 
-        QGLWidget *device = (QGLWidget*)QWidget::find(gl_parent_win);
-        if (!device)
-        {
-            VERBOSE(VB_IMPORTANT, LOC + QString("Failed to cast parent to QGLWidget."));
-            return false;
-        }
-        gl_context  = new MythRenderOpenGL(fmt, device);
-        if (gl_context && gl_context->create())
-        {
-            gl_context->Init();
-            success = true;
-            VERBOSE(VB_GENERAL, LOC + QString("Created MythRenderOpenGL device."));
-        }
+    MythMainWindow* win = MythMainWindow::getMainWindow();
+    if (!win)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get MythMainWindow");
+        return false;
     }
-    return success;
+
+    gl_created_context = false;
+    //gl_context = dynamic_cast<MythRenderOpenGL*>(win->GetRenderDevice());
+    if (gl_context)
+    {
+        VERBOSE(VB_PLAYBACK, LOC + "Using main UI render context");
+        return true;
+    }
+
+    QGLFormat fmt;
+    fmt.setDepth(false);
+
+    QGLWidget *device = (QGLWidget*)QWidget::find(gl_parent_win);
+    if (!device)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to cast parent to QGLWidget");
+        return false;
+    }
+
+    gl_context = new MythRenderOpenGL(fmt, device);
+    if (gl_context && gl_context->create())
+    {
+        gl_context->Init();
+        VERBOSE(VB_GENERAL, LOC + QString("Created MythRenderOpenGL device."));
+        gl_created_context = true;
+        return true;
+    }
+
+    VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create MythRenderOpenGL device.");
+    delete gl_context;
+    return false;
 }
 
 bool VideoOutputOpenGL::SetupOpenGL(void)
@@ -270,12 +289,30 @@ void VideoOutputOpenGL::InitOSD(void)
 {
     QMutexLocker locker(&gl_context_lock);
 
-    gl_painter = new MythOpenGLPainter(gl_context,
-                                       (QGLWidget*)QWidget::find(gl_parent_win));
-    if (!gl_painter)
-        VERBOSE(VB_IMPORTANT, LOC + QString("Failed to create OpenGL OSD"));
+    gl_created_painter = false;
+    MythMainWindow *win = MythMainWindow::getMainWindow();
+    if (gl_created_context && gl_context)
+    {
+        QGLWidget *device = (QGLWidget*)QWidget::find(gl_parent_win);
+        gl_painter = new MythOpenGLPainter(gl_context, device);
+        if (!gl_painter)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create painter");
+            return;
+        }
+        gl_created_painter = true;
+    }
     else
-        gl_painter->SetSwapControl(false);
+    {
+        gl_painter = (MythOpenGLPainter*)win->GetCurrentPainter();
+        if (!gl_painter)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get painter");
+            return;
+        }
+        VERBOSE(VB_PLAYBACK, LOC + "Using main UI painter");
+    }
+    gl_painter->SetSwapControl(false);
 }
 
 bool VideoOutputOpenGL::CreateBuffers(void)
