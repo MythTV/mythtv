@@ -9,6 +9,7 @@ LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION -lmythupnp-$$LIBVERSION
 LIBS += -lmythavcodec
 LIBS += -lmythavcore
 LIBS += -lmythavutil
+LIBS += -lmythavformat
 
 # On Windows, libs are stored with the binaries:
 mingw:LIBS += -L$${SYSROOT}$${PREFIX}/bin
