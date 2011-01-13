@@ -1869,6 +1869,7 @@ uint MythRenderOpenGL::CreateShader(int type, const QString &source)
             m_glGetShaderInfoLog(result, length, NULL, log);
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to compile shader.");
             VERBOSE(VB_IMPORTANT, log);
+            VERBOSE(VB_IMPORTANT, source);
             free(log);
         }
         m_glDeleteShader(result);
