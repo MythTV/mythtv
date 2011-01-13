@@ -5570,7 +5570,7 @@ NULL
  *
  * mysqldump --skip-comments --skip-opt --compact --skip-quote-names \
  *     --create-options --ignore-table=mythconverg.schemalock mythconverg | \
- *   sed '/^SET.*;$/d;/^\/\*!40101.*$/d;s/^.*[^;]$/"&"/;s/^);$/");",/'
+ *   sed '/^\(SET\|INS\).*;$/d;/^\/\*!40101.*$/d;s/^.*[^;]$/"&"/;s/^).*;$/"&",/'
  *
  * command to get the initial data:
  *
