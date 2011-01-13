@@ -169,10 +169,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     gl_features = gl_context->GetFeatures();
 
     if (viewportControl)
-    {
-        gl_context->SetFeatures(gl_features);
         gl_context->SetFence();
-    }
 
     SetViewPort(display_visible_rect.size());
 
@@ -1448,7 +1445,7 @@ yadif_setup +
 
 static const QString bicubic =
 "TEMP coord, coord2, cdelta, parmx, parmy, a, b, c, d;\n"
-"MAD coord.xy, fragment.texcoord[0], {%6, %7}, {0.5, 0.5};\n"
+"MAD coord.xy, fragment.texcoord[0], {%6, %7}, {-0.5, -0.5};\n"
 "TEX parmx, coord.x, texture[1], 1D;\n"
 "TEX parmy, coord.y, texture[1], 1D;\n"
 "MUL cdelta.xz, parmx.rrgg, {-%5, 0, %5, 0};\n"
@@ -1546,6 +1543,12 @@ QString OpenGLVideo::GetProgramString(OpenGLFilterType name,
 void OpenGLVideo::CustomiseProgramString(QString &string)
 {
     string.replace("%1", textureRects ? "RECT" : "2D");
+
+    if (!textureRects)
+    {
+        string.replace("GLSL_SAMPLER", "sampler2D");
+        string.replace("GLSL_TEXTURE", "texture2D");
+    }
 
     float lineHeight = 1.0f;
     float colWidth   = 1.0f;
@@ -1715,6 +1718,33 @@ static const QString KernelShader[2] = {
 "}\n"
 };
 
+static const QString BicubicShader =
+"GLSL_DEFINES"
+"uniform sampler2D s_texture0;\n"
+"uniform sampler1D s_texture1;\n"
+"varying vec2 v_texcoord0;\n"
+"void main(void)\n"
+"{\n"
+"    vec2 coord = (v_texcoord0 * vec2(%6, %7)) - vec2(0.5, 0.5);\n"
+"    vec4 parmx = texture1D(s_texture1, coord.x);\n"
+"    vec4 parmy = texture1D(s_texture1, coord.y);\n"
+"    vec2 e_x = vec2(%5, 0.0);\n"
+"    vec2 e_y = vec2(0.0, %3);\n"
+"    vec2 coord10 = v_texcoord0 + parmx.x * e_x;\n"
+"    vec2 coord00 = v_texcoord0 - parmx.y * e_x;\n"
+"    vec2 coord11 = coord10     + parmy.x * e_y;\n"
+"    vec2 coord01 = coord00     + parmy.x * e_y;\n"
+"    coord10      = coord10     - parmy.y * e_y;\n"
+"    coord00      = coord00     - parmy.y * e_y;\n"
+"    vec4 tex00   = texture2D(s_texture0, coord00);\n"
+"    vec4 tex10   = texture2D(s_texture0, coord10);\n"
+"    vec4 tex01   = texture2D(s_texture0, coord01);\n"
+"    vec4 tex11   = texture2D(s_texture0, coord11);\n"
+"    tex00        = mix(tex00, tex01, parmy.z);\n"
+"    tex10        = mix(tex10, tex11, parmy.z);\n"
+"    gl_FragColor = mix(tex00, tex10, parmx.z);\n"
+"}\n";
+
 void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
                                     OpenGLFilterType filter,
                                     QString deint, FrameScanType field)
@@ -1741,6 +1771,7 @@ void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
         case kGLFilterResize:
             break;
         case kGLFilterBicubic:
+            fragment = BicubicShader;
             break;
         default:
             VERBOSE(VB_PLAYBACK, LOC_ERR + "Unknown filter");
