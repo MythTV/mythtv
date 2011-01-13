@@ -520,9 +520,9 @@ uint64_t BDRingBuffer::GetTotalReadPosition(void)
 
 int BDRingBuffer::safe_read(void *data, uint sz)
 {
+    int result = 0;
     if (m_is_hdmv_navigation)
     {
-        int result = 0;
         while (result == 0)
         {
             BD_EVENT event;
@@ -536,11 +536,11 @@ int BDRingBuffer::safe_read(void *data, uint sz)
     }
     else
     {
-        bd_read(bdnav, (unsigned char *)data, sz);
+        result = bd_read(bdnav, (unsigned char *)data, sz);
     }
 
     m_currentTime = bd_tell(bdnav);
-    return sz;
+    return result;
 }
 
 double BDRingBuffer::GetFrameRate(void)
