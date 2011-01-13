@@ -199,19 +199,7 @@ bool MythDVDPlayer::VideoLoop(void)
         return !IsErrored();
     }
 
-    if (videoPaused || isDummy)
-    {
-        usleep(frame_interval);
-        DisplayPauseFrame();
-    }
-    else
-        DisplayNormalFrame();
-
-    if (using_null_videoout && decoder)
-        decoder->UpdateFramesPlayed();
-    else
-        framesPlayed = videoOutput->GetFramesPlayed();
-    return !IsErrored();
+    return MythPlayer::VideoLoop();
 }
 
 void MythDVDPlayer::DisplayLastFrame(void)
