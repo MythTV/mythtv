@@ -82,7 +82,7 @@ static void HandleOverlayCallback(
 
 BDRingBuffer::BDRingBuffer(const QString &lfilename)
   : bdnav(NULL), m_is_hdmv_navigation(false),
-    m_numTitles(0), m_titleChanged(false)
+    m_numTitles(0), m_titleChanged(false), m_playerWait(false)
 {
     OpenFile(lfilename);
 }
@@ -709,11 +709,12 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
         case BD_EVENT_TITLE:
             VERBOSE(VB_PLAYBACK|VB_EXTRA,
                     QString("BDRingBuf: EVENT_TITLE %1").arg(ev.param));
+            WaitForPlayer();
             break;
         case BD_EVENT_END_OF_TITLE:
             VERBOSE(VB_PLAYBACK|VB_EXTRA,
                     QString("BDRingBuf: EVENT_END_OF_TITLE"));
-            // TODO: Signal the player to flush buffers before reading further.
+            WaitForPlayer();
             break;
         case BD_EVENT_PLAYLIST:
             VERBOSE(VB_PLAYBACK|VB_EXTRA,
@@ -725,6 +726,7 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
         case BD_EVENT_PLAYITEM:
             VERBOSE(VB_PLAYBACK|VB_EXTRA,
                     QString("BDRingBuf: EVENT_PLAYITEM %1").arg(ev.param));
+            WaitForPlayer();
             m_currentPlayitem = ev.param;
             break;
         case BD_EVENT_CHAPTER:
@@ -745,6 +747,7 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
         case BD_EVENT_SEEK:
             VERBOSE(VB_PLAYBACK|VB_EXTRA,
                     QString("BDRingBuf: EVENT_SEEK"));
+            WaitForPlayer();
             break;
 
         /* stream selection */
@@ -801,5 +804,20 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
                     QString("BDRingBuf: Unknown Event! %1 %2").arg(ev.event).arg(ev.param));
           break;
       }
+}
+
+void BDRingBuffer::WaitForPlayer(void)
+{
+    VERBOSE(VB_PLAYBACK, LOC + "Waiting for player's buffers to drain");
+    m_playerWait = true;
+    int count = 0;
+    while (m_playerWait && count++ < 200)
+        usleep(10000);
+    if (m_playerWait)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Player wait state was not cleared");
+        m_playerWait = false;
+    }
+    //Seek(0, SEEK_SET, true);
 }
 

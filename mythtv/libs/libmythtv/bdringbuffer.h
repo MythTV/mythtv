@@ -23,6 +23,10 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     BDRingBuffer(const QString &lfilename);
     virtual ~BDRingBuffer();
 
+    // Player interaction
+    bool BDWaitingForPlayer(void)     { return m_playerWait;  }
+    void SkipBDWaitingForPlayer(void) { m_playerWait = false; }
+
     uint32_t GetNumTitles(void) const { return m_numTitles; }
     int      GetCurrentTitle(void) const;
     uint64_t GetCurrentAngle(void) const { return m_currentAngle; }
@@ -76,6 +80,8 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     void ClickButton(int64_t pts, uint16_t x, uint16_t y); // Mouse
 
   protected:
+    void WaitForPlayer(void);
+
     BLURAY            *bdnav;
     bool               m_is_hdmv_navigation;
     uint32_t           m_numTitles;
@@ -104,6 +110,8 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     bool               m_secondaryVideoIsFullscreen;
 
     bool               m_titleChanged;
+
+    bool               m_playerWait;
 
   public:
     uint8_t            m_still;

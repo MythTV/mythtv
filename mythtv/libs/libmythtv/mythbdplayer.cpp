@@ -8,6 +8,43 @@ MythBDPlayer::MythBDPlayer(bool muted) : MythPlayer(muted)
 {
 }
 
+bool MythBDPlayer::VideoLoop(void)
+{
+    if (!player_ctx->buffer->IsBD())
+    {
+        SetErrored("RingBuffer is not a Blu-Ray disc.");
+        return !IsErrored();
+    }
+
+    int nbframes = videoOutput ? videoOutput->ValidVideoFrames() : 0;
+
+    // completely drain the video buffers for certain situations
+    bool drain = player_ctx->buffer->BD()->BDWaitingForPlayer() &&
+                 (nbframes > 0);
+
+    if (drain)
+    {
+        if (nbframes < 5 && videoOutput)
+            videoOutput->UpdatePauseFrame();
+
+        // if we go below the pre-buffering limit, the player will pause
+        // so do this 'manually'
+        DisplayNormalFrame(false);
+        return !IsErrored();
+    }
+
+    // clear the mythtv imposed wait state
+    if (player_ctx->buffer->BD()->BDWaitingForPlayer())
+    {
+        VERBOSE(VB_PLAYBACK, LOC + "Clearing Mythtv BD wait state");
+        ClearAfterSeek(true);
+        player_ctx->buffer->BD()->SkipBDWaitingForPlayer();
+        return !IsErrored();
+    }
+
+    return MythPlayer::VideoLoop();
+}
+
 int MythBDPlayer::GetNumChapters(void)
 {
     int num = 0;

@@ -25,6 +25,10 @@ class MythBDPlayer : public MythPlayer
     virtual bool SwitchAngle(int angle);
     virtual bool PrevAngle(void);
     virtual bool NextAngle(void);
+
+  protected:
+    // Playback
+    virtual bool VideoLoop(void);
 };
 
 #endif // MYTHBDPLAYER_H
