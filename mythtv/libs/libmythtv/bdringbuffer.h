@@ -26,6 +26,8 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     // Player interaction
     bool BDWaitingForPlayer(void)     { return m_playerWait;  }
     void SkipBDWaitingForPlayer(void) { m_playerWait = false; }
+    void IgnoreWaitStates(bool ignore) { m_ignorePlayerWait = ignore; }
+    bool StartFromBeginning(void);
 
     uint32_t GetNumTitles(void) const { return m_numTitles; }
     int      GetCurrentTitle(void) const;
@@ -112,6 +114,7 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     bool               m_titleChanged;
 
     bool               m_playerWait;
+    bool               m_ignorePlayerWait;
 
   public:
     uint8_t            m_still;

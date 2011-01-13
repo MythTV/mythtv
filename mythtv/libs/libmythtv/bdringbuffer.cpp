@@ -82,7 +82,8 @@ static void HandleOverlayCallback(
 
 BDRingBuffer::BDRingBuffer(const QString &lfilename)
   : bdnav(NULL), m_is_hdmv_navigation(false),
-    m_numTitles(0), m_titleChanged(false), m_playerWait(false)
+    m_numTitles(0), m_titleChanged(false), m_playerWait(false),
+    m_ignorePlayerWait(true)
 {
     OpenFile(lfilename);
 }
@@ -808,6 +809,9 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
 
 void BDRingBuffer::WaitForPlayer(void)
 {
+    if (m_ignorePlayerWait)
+        return;
+
     VERBOSE(VB_PLAYBACK, LOC + "Waiting for player's buffers to drain");
     m_playerWait = true;
     int count = 0;
@@ -819,5 +823,15 @@ void BDRingBuffer::WaitForPlayer(void)
         m_playerWait = false;
     }
     //Seek(0, SEEK_SET, true);
+}
+
+bool BDRingBuffer::StartFromBeginning(void)
+{
+    if (bdnav && m_is_hdmv_navigation)
+    {
+        VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + "Starting from beginning...");
+        return bd_play(bdnav);
+    }
+    return true;
 }
 
