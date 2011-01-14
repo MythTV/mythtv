@@ -834,7 +834,7 @@ bool BDRingBuffer::StartFromBeginning(void)
     if (bdnav && m_is_hdmv_navigation)
     {
         VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + "Starting from beginning...");
-        return bd_play(bdnav);
+        return true; //bd_play(bdnav);
     }
     return true;
 }
