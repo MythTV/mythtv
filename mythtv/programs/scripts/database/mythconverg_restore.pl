@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Restore Script';
-    $VERSION        = '1.0.16';
+    $VERSION        = '1.0.17';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -1435,9 +1435,9 @@ EOF
             $query = "UPDATE $table_name SET value = REPLACE(value, ?, ?)".
                      " WHERE value LIKE ?";
             $sth_update = $dbh->prepare($query);
-            $sth_update->bind_param(1, $old_hostname);
-            $sth_update->bind_param(2, $new_hostname);
-            $sth_update->bind_param(3, '%'.$old_hostname.'%');
+            $sth_update->bind_param(1, 'SGweightPerDir:'.$old_hostname.':');
+            $sth_update->bind_param(2, 'SGweightPerDir:'.$new_hostname.':');
+            $sth_update->bind_param(3, 'SGweightPerDir:'.$old_hostname.':%');
             $result = $sth_update->execute;
             if (!defined($result))
             {
