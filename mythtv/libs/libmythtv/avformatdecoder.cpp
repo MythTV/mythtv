@@ -1661,6 +1661,10 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         RemoveAudioStreams();
     }
 
+    // TODO this could probably be used by default
+    if (ringBuffer && ringBuffer->IsBD())
+        av_find_stream_info(ic);
+
     for (uint i = 0; i < ic->nb_streams; i++)
     {
         AVCodecContext *enc = ic->streams[i]->codec;
