@@ -317,28 +317,6 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     m_still = 0;
     m_inMenu = false;
 
-    VERBOSE(VB_IMPORTANT, LOC + QString("Found %1 relevant titles.")
-            .arg(m_numTitles));
-
-    // Loop through the relevant titles and find the longest
-    uint64_t titleLength = 0;
-    uint64_t margin      = 90000 << 4; // approx 30s
-    BLURAY_TITLE_INFO *titleInfo = NULL;
-    for( unsigned i = 0; i < m_numTitles; ++i)
-    {
-        titleInfo = bd_get_title_info(bdnav, i);
-        if (titleLength == 0 ||
-            (titleInfo->duration > (titleLength + margin)))
-        {
-            m_mainTitle = titleInfo->idx;
-            titleLength = titleInfo->duration;
-        }
-    }
-
-    bd_free_title_info(titleInfo);
-
-    SwitchTitle(m_mainTitle);
-
 #if 0
     // First, attempt to initialize the disc in HDMV navigation mode.
     // If this fails, fall back to the traditional built-in title switching
