@@ -37,7 +37,7 @@ class MythBackend {
             $host = setting('MasterServerIP');
             $port = setting('MasterServerPort');
             if (!$host || !$port)
-                trigger_error("MasterServerIP or MasterServerPort not found! You may"
+                trigger_error("MasterServerIP or MasterServerPort not found! You may "
                             ."need to check your mythweb.conf file or re-run mythtv-setup",
                             FATAL);
         }
