@@ -66,7 +66,7 @@ static QString extract_id(const QString &raw_request)
 /////////////////////////////////////////////////////////////////////////////
 
 MythXML::MythXML( UPnpDevice *pDevice , const QString &sSharePath)
-  : Eventing( "MythXML", "MYTHTV_Event", sSharePath)
+  : Eventing( "MythXML", "MYTHTV_Event", sSharePath), m_bIsMaster(false)
 {
     m_nPreRollSeconds = gCoreContext->GetNumSetting("RecordPreRoll", 0);
 
@@ -1328,7 +1328,7 @@ void MythXML::GetFileList( HttpWorkerThread *pThread,
 
     QStringList sStorageGroupDirs;
     QString hostname = gCoreContext->GetHostName();
-    
+
     if (StorageGroup::FindDirs(sStorageGroup, hostname, &sStorageGroupDirs))
     {
         pRequest->m_nResponseStatus = 200;

@@ -192,6 +192,7 @@ class ThreadData : public HttpWorkerData
 
         ThreadData( ThreadDataType  eType )
         {
+            m_nTrackNumber = 0;
             m_eType = eType;
         }
 

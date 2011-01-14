@@ -494,7 +494,7 @@ void AutoExpire::ExpireRecordings(void)
                    ((size_t)max(0LL, fsit->freeSpaceKB) < desired_space[fsit->fsID]))
             {
                 ProgramInfo *p = *it;
-                it++;
+                ++it;
 
                 VERBOSE(VB_FILE, QString("        Checking %1 => %2")
                         .arg(p->toString(ProgramInfo::kRecordingKey))
