@@ -939,8 +939,6 @@ QString Ripper::filenameFromMetadata(Metadata *track, bool createDir)
         VERBOSE(VB_GENERAL, QString("Invalid file storage definition."));
     }
 
-    filename = QString(filename.toLocal8Bit().constData());
-
     QStringList directoryList = filename.split("/");
     for (int i = 0; i < (directoryList.size() - 1); i++)
     {
