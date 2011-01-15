@@ -2288,6 +2288,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
 
         // hide the GUI paint window
         GetMythMainWindow()->GetPaintWindow()->hide();
+        qApp->processEvents();
     }
 
     VERBOSE(VB_PLAYBACK, LOC +
