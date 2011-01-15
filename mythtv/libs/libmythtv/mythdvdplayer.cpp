@@ -432,7 +432,7 @@ void MythDVDPlayer::SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
 {
     if (!player_ctx->buffer->IsDVD())
         return;
-    if (GoToDVDMenu("menu"))
+    if (GoToMenu("menu"))
     {
         if (player_ctx->buffer->DVD()->IsInMenu() &&
             !player_ctx->buffer->DVD()->IsInStillFrame())
@@ -502,7 +502,7 @@ void MythDVDPlayer::DisplayDVDButton(void)
     player_ctx->buffer->DVD()->ReleaseMenuButton();
 }
 
-bool MythDVDPlayer::GoToDVDMenu(QString str)
+bool MythDVDPlayer::GoToMenu(QString str)
 {
     if (!player_ctx->buffer->IsDVD())
         return false;

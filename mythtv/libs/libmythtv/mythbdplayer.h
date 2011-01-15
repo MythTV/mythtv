@@ -7,6 +7,7 @@ class MythBDPlayer : public MythPlayer
 {
   public:
     MythBDPlayer(bool muted = false);
+    virtual bool    GoToMenu(QString str);
     virtual int     GetNumChapters(void);
     virtual int     GetCurrentChapter(void);
     virtual void    GetChapterTimes(QList<long long> &times);

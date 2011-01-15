@@ -22,7 +22,7 @@ class MythDVDPlayer : public MythPlayer
 
     // DVD public stuff
     virtual void ChangeDVDTrack(bool ffw);
-    virtual bool GoToDVDMenu(QString str);
+    virtual bool GoToMenu(QString str);
     virtual void GoToDVDProgram(bool direction);
 
     // DVD ringbuffer methods

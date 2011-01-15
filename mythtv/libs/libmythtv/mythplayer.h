@@ -277,7 +277,7 @@ class MPUBLIC MythPlayer
 
     // DVD public stuff
     virtual void ChangeDVDTrack(bool ffw)       { (void) ffw;       }
-    virtual bool GoToDVDMenu(QString str)       { return false;     }
+    virtual bool GoToMenu(QString str)          { return false;     }
     virtual void GoToDVDProgram(bool direction) { (void) direction; }
 
     // Position Map Stuff

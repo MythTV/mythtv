@@ -13,6 +13,19 @@ void MythBDPlayer::PreProcessNormalFrame(void)
     DisplayMenu();
 }
 
+bool MythBDPlayer::GoToMenu(QString str)
+{
+    if (player_ctx->buffer->BD() && videoOutput)
+    {
+        int64_t pts = 0;
+        VideoFrame *frame = videoOutput->GetLastShownFrame();
+        if (frame)
+            pts = (int64_t)(frame->timecode  * 90);
+        return player_ctx->buffer->BD()->GoToMenu(str, pts);
+    }
+    return false;
+}
+
 void MythBDPlayer::DisplayMenu(void)
 {
     if (!player_ctx->buffer->IsBD())

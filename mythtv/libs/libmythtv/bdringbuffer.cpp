@@ -613,11 +613,11 @@ bool BDRingBuffer::GoToMenu(const QString str, int64_t pts)
             VERBOSE(VB_PLAYBACK, QString("BDRingBuf: Invoked Menu Successfully"));
             return true;
         }
-        else
-        {
-            m_inMenu = false;
-            return false;
-        }
+    }
+    else if (str.compare("popup") == 0)
+    {
+        PressButton(BD_VK_POPUP, pts);
+        return true;
     }
     else
         return false;

@@ -331,8 +331,7 @@ class MPUBLIC TV : public QObject
     bool ToggleHandleAction(PlayerContext*,
                             const QStringList &actions, bool isDVD);
     bool FFRewHandleAction(PlayerContext*, const QStringList &actions);
-    bool ActivePostQHandleAction(PlayerContext*,
-                                 const QStringList &actions, bool isDVD);
+    bool ActivePostQHandleAction(PlayerContext*, const QStringList &actions);
     bool HandleJumpToProgramAction(PlayerContext *ctx,
                                    const QStringList   &actions);
 
