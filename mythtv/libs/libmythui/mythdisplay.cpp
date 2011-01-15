@@ -22,7 +22,7 @@ extern "C" {
 
 #define VALID_RATE(rate) (rate > 20.0 && rate < 200.0)
 
-float fix_rate(int video_rate)
+static float fix_rate(int video_rate)
 {
     static const float default_rate = 1000000.0 / 60.0;
     float fixed = default_rate;
