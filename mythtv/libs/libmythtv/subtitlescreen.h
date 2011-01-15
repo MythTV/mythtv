@@ -17,12 +17,14 @@ class SubtitleScreen : public MythScreenType
     virtual ~SubtitleScreen();
 
     void EnableSubtitles(int type);
+    int  EnabledSubtitleType(void) { return m_subtitleType; }
 
     void ClearAllSubtitles(void);
     void ClearNonDisplayedSubtitles(void);
     void ClearDisplayedSubtitles(void);
     void ExpireSubtitles(void);
     void DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos);
+    void DisplayBDOverlay(BDOverlay* overlay);
 
     // MythScreenType methods
     virtual bool Create(void);
@@ -44,7 +46,7 @@ class SubtitleScreen : public MythScreenType
                            float aspect, vector<CC708String*> &list);
     MythFontProperties* Get708Font(CC708CharacterAttribute attr);
 
-    MythPlayer *m_player;
+    MythPlayer        *m_player;
     SubtitleReader    *m_subreader;
     CC608Reader       *m_608reader;
     CC708Reader       *m_708reader;

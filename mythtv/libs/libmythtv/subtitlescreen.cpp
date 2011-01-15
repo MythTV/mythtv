@@ -7,6 +7,7 @@
 #include "mythuiimage.h"
 #include "mythpainter.h"
 #include "subtitlescreen.h"
+#include "bdringbuffer.h"
 
 #define LOC      QString("Subtitles: ")
 #define LOC_WARN QString("Subtitles Warning: ")
@@ -548,6 +549,59 @@ void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
     QRect button = buttonPos.adjusted(0, 2, 0, 0);
     fg_image = fg_image.convertToFormat(QImage::Format_ARGB32);
     AddScaledImage(fg_image, button);
+}
+
+void SubtitleScreen::DisplayBDOverlay(BDOverlay *overlay)
+{
+    if (!overlay || !m_player)
+        return;
+
+    VideoOutput *vo = m_player->getVideoOutput();
+    if (!vo)
+        return;
+
+    // set the screen area
+    float tmp = 0.0;
+    QRect dummy;
+    vo->GetOSDBounds(dummy, m_safeArea, tmp, tmp, tmp);
+
+    // convert the palette to ARGB
+    uint32_t *origpalette = (uint32_t *)(overlay->m_palette);
+    QVector<unsigned int> palette;
+    for (int i = 0; i < 256; i++)
+    {
+        int y  = (origpalette[i] >> 0) & 0xff;
+        int cr = (origpalette[i] >> 8) & 0xff;
+        int cb = (origpalette[i] >> 16) & 0xff;
+        int a  = (origpalette[i] >> 24) & 0xff;
+        int r  = int(y + 1.4022 * (cr - 128));
+        int b  = int(y + 1.7710 * (cb - 128));
+        int g  = int(1.7047 * y - (0.1952 * b) - (0.5647 * r));
+        if (r < 0) r = 0;
+        if (g < 0) g = 0;
+        if (b < 0) b = 0;
+        if (r > 0xff) r = 0xff;
+        if (g > 0xff) g = 0xff;
+        if (b > 0xff) b = 0xff;
+        palette.push_back((a << 24) | (r << 16) | (g << 8) | b);
+    }
+
+    // convert the image to QImage
+    QImage img(overlay->m_position.size(), QImage::Format_Indexed8);
+    memcpy(img.bits(), overlay->m_data,
+           overlay->m_position.width() * overlay->m_position.height());
+    img.setColorTable(palette);
+    QImage converted = img.convertToFormat(QImage::Format_ARGB32);
+
+    // add to screen
+    AddScaledImage(converted, overlay->m_position);
+    SetRedraw();
+    m_refreshArea = false; // N.B. this disables some optimisations
+
+    // release the overlay
+    delete overlay->m_data;
+    delete overlay->m_palette;
+    delete overlay;
 }
 
 void SubtitleScreen::DisplayCC608Subtitles(void)

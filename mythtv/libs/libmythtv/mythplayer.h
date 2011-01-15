@@ -76,8 +76,9 @@ enum
     kDisplayTextSubtitle        = 0x020,
     kDisplayDVDButton           = 0x040,
     kDisplayRawTextSubtitle     = 0x080,
-    kDisplayAllCaptions         = 0x0ff,
-    kDisplayTeletextMenu        = 0x100,
+    kDisplayBDOverlay           = 0x0ff,
+    kDisplayAllCaptions         = 0x100,
+    kDisplayTeletextMenu        = 0x200,
 };
 
 class DecoderThread : public QThread

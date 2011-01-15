@@ -27,6 +27,7 @@ class MythPlayer;
 class TeletextScreen;
 class SubtitleScreen;
 struct AVSubtitle;
+class BDOverlay;
 
 enum OSDFunctionalType
 {
@@ -173,6 +174,7 @@ class OSD
     void EnableSubtitles(int type);
     void ClearSubtitles(void);
     void DisplayDVDButton(AVSubtitle* dvdButton, QRect &pos);
+    void DisplayBDOverlay(BDOverlay *overlay);
 
   private:
     void TearDown(void);

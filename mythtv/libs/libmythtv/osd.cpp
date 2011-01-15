@@ -17,6 +17,7 @@
 #include "mythuistatetype.h"
 
 // libmythtv
+#include "bdringbuffer.h"
 #include "channelutil.h"
 #include "teletextscreen.h"
 #include "subtitlescreen.h"
@@ -1145,5 +1146,17 @@ void OSD::DisplayDVDButton(AVSubtitle* dvdButton, QRect &pos)
     {
         EnableSubtitles(kDisplayDVDButton);
         sub->DisplayDVDButton(dvdButton, pos);
+    }
+}
+
+void OSD::DisplayBDOverlay(BDOverlay* overlay)
+{
+    SubtitleScreen* sub = InitSubtitles();
+    if (sub && overlay)
+    {
+        // this ensures we don't delete existing items
+        if (sub->EnabledSubtitleType() != kDisplayBDOverlay)
+            EnableSubtitles(kDisplayBDOverlay);
+        sub->DisplayBDOverlay(overlay);
     }
 }

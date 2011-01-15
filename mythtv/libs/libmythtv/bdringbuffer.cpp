@@ -24,66 +24,14 @@ static void HandleOverlayCallback(
     void *data, const bd_overlay_s * const overlay)
 {
     BDRingBuffer *bdrb = (BDRingBuffer*) data;
-
-    if (!bdrb)
-        return;
-
-    if (!overlay || overlay->plane == 1)
-        bdrb->m_inMenu = false;
-
-    if (!overlay || !overlay->img)
-        return;
-
-    bdrb->m_inMenu = true;
-
-    const BD_PG_RLE_ELEM *rlep = overlay->img;
-
-    uint8_t *yuvimg = (uint8_t*)malloc(overlay->w * overlay->h);
-    unsigned pixels = overlay->w * overlay->h;
-
-    for (unsigned i = 0; i < pixels; i += rlep->len, rlep++)
-    {
-        memset(yuvimg + i, rlep->color, rlep->len);
-    }
-
-    QImage qoverlay(yuvimg, overlay->w, overlay->h, QImage::Format_Indexed8);
-
-    uint32_t *origpalette = (uint32_t *)(overlay->palette);
-    QVector<unsigned int> palette;
-    for (int i = 0; i < 256; i++)
-    {
-        int y  = (origpalette[i] >> 0) & 0xff;
-        int cr = (origpalette[i] >> 8) & 0xff;
-        int cb = (origpalette[i] >> 16) & 0xff;
-        int a  = (origpalette[i] >> 24) & 0xff;
-        int r  = int(y + 1.4022 * (cr - 128));
-        int b  = int(y + 1.7710 * (cb - 128));
-        int g  = int(1.7047 * y - (0.1952 * b) - (0.5647 * r));
-        if (r < 0) r = 0;
-        if (g < 0) g = 0;
-        if (b < 0) b = 0;
-        if (r > 0xff) r = 0xff;
-        if (g > 0xff) g = 0xff;
-        if (b > 0xff) b = 0xff;
-        palette.push_back((a << 24) | (r << 16) | (g << 8) | b);
-    }
-
-    qoverlay.setColorTable(palette);
-    qoverlay.save(QString("%1/bluray.menuimg.%2.%3.jpg").arg(QDir::home().path()).arg(overlay->w).arg(overlay->h));
-
-    VERBOSE(VB_PLAYBACK|VB_EXTRA, QString("In Menu Callback, ready to draw "
-                        "an overlay of %1x%2 at %3,%4 (%5 pixels).")
-                        .arg(overlay->w).arg(overlay->h).arg(overlay->x)
-                        .arg(overlay->y).arg(pixels));
-
-    if (overlay->plane == 1)
-        bdrb->m_inMenu = true;
+    if (bdrb)
+        bdrb->SubmitOverlay(overlay);
 }
 
 BDRingBuffer::BDRingBuffer(const QString &lfilename)
   : bdnav(NULL), m_is_hdmv_navigation(false),
     m_numTitles(0), m_titleChanged(false), m_playerWait(false),
-    m_ignorePlayerWait(true)
+    m_ignorePlayerWait(true), m_overlayCleared(false)
 {
     OpenFile(lfilename);
 }
@@ -102,6 +50,8 @@ void BDRingBuffer::close(void)
         bd_close(bdnav);
         bdnav = NULL;
     }
+
+    ClearOverlays();
 }
 
 long long BDRingBuffer::Seek(long long pos, int whence, bool has_lock)
@@ -839,3 +789,78 @@ bool BDRingBuffer::StartFromBeginning(void)
     return true;
 }
 
+void BDRingBuffer::ClearOverlays(void)
+{
+    QMutexLocker lock(&m_overlayLock);
+
+    while (!m_overlayImages.isEmpty())
+    {
+        BDOverlay *img = m_overlayImages.takeFirst();
+        delete img->m_data;
+        delete img->m_palette;
+        delete img;
+    }
+    OverlayCleared(false);
+}
+
+BDOverlay* BDRingBuffer::GetOverlay(void)
+{
+    QMutexLocker lock(&m_overlayLock);
+    if (!m_overlayImages.isEmpty())
+        return m_overlayImages.takeFirst();
+    return NULL;
+}
+
+void BDRingBuffer::SubmitOverlay(const bd_overlay_s * const overlay)
+{
+    QMutexLocker lock(&m_overlayLock);
+
+    if (!overlay || overlay->plane == 1)
+        m_inMenu = false;
+
+    if (!overlay || !overlay->img)
+    {
+        VERBOSE(VB_PLAYBACK, LOC + "Null overlay submitted.");
+        OverlayCleared(true);
+        return;
+    }
+
+    VERBOSE(VB_PLAYBACK, LOC + QString("New overlay image %1x%2 %3+%4")
+        .arg(overlay->w).arg(overlay->h)
+        .arg(overlay->x).arg(overlay->y));
+    m_inMenu = true;
+
+    const BD_PG_RLE_ELEM *rlep = overlay->img;
+    static const unsigned palettesize = 256 * 4;
+    unsigned width   = (overlay->w + 0x3) & (~0x3);
+    unsigned pixels  = width * overlay->h;
+    unsigned actual  = overlay->w * overlay->h;
+    uint8_t *data    = (uint8_t*)malloc(pixels);
+    uint8_t *palette = (uint8_t*)malloc(palettesize);
+    memset(data, 0, pixels);
+
+    int line = 0;
+    int this_line = 0;
+    for (unsigned i = 0; i < actual; i += rlep->len, rlep++)
+    {
+        if ((rlep->color == 0 && rlep->len == 0) || this_line >= overlay->w)
+        {
+            this_line = 0;
+            line++;
+            i = (line * width) + 1;
+        }
+        else
+        {
+            this_line += rlep->len;
+            memset(data + i, rlep->color, rlep->len);
+        }
+    }
+
+    memcpy(palette, overlay->palette, palettesize);
+
+    QRect pos(overlay->x, overlay->y, width, overlay->h);
+    m_overlayImages.append(new BDOverlay(data, palette, pos));
+
+    if (overlay->plane == 1)
+        m_inMenu = true;
+}

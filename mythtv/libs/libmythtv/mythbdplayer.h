@@ -29,6 +29,12 @@ class MythBDPlayer : public MythPlayer
   protected:
     // Playback
     virtual bool VideoLoop(void);
+    virtual void PreProcessNormalFrame(void);
+
+  private:
+    void DisplayMenu(void);
+
+    bool m_inMenu;
 };
 
 #endif // MYTHBDPLAYER_H
