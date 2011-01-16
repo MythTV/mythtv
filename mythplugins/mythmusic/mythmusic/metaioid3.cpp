@@ -430,7 +430,7 @@ bool MetaIOID3::writeAlbumArt(TagLib::ID3v2::Tag *tag, QByteArray *image,
     }
 
     TagLib::ByteVector bytevector;
-    bytevector.setData(image->data());
+    bytevector.setData(image->data(), image->size());
     delete image;
 
     apic->setPicture(bytevector);
