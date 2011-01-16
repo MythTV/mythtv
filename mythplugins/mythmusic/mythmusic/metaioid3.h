@@ -47,7 +47,8 @@ class MetaIOID3 : public MetaIOTagLib
     bool writePlayCount(TagLib::ID3v2::Tag *tag, int playcount);
     bool writeRating(TagLib::ID3v2::Tag *tag, int rating);
     bool writeAlbumArt(TagLib::ID3v2::Tag *tag, QByteArray *image,
-                       const AttachedPictureFrame::Type &type);
+                       const AttachedPictureFrame::Type &type,
+                       const QString &mimetype);
 
     Metadata* read(QString filename);
     static QImage getAlbumArt(QString filename, ImageType type);
