@@ -2,9 +2,10 @@
 #define _UTIL_OSX_COCOA_H__
 
 #import "ApplicationServices/ApplicationServices.h"
+#include "mythexp.h"
 
-void *CreateOSXCocoaPool(void);
-void DeleteOSXCocoaPool(void*&);
+MPUBLIC void *CreateOSXCocoaPool(void);
+MPUBLIC void DeleteOSXCocoaPool(void*&);
 
 CGDirectDisplayID GetOSXCocoaDisplay(void* view);
 
