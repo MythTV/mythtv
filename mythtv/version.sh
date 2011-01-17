@@ -22,7 +22,7 @@ GITREPOPATH="exported"
 
 cd ${GITTREEDIR}
 
-SOURCE_VERSION=$(git describe --dirty || echo Unknown)
+SOURCE_VERSION=$(git describe --dirty || git describe || echo Unknown)
 
 case "${SOURCE_VERSION}" in
     exported|Unknown)
