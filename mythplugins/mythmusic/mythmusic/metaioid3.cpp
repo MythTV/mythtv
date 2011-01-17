@@ -415,7 +415,8 @@ AttachedPictureFrame* MetaIOID3::findAPIC(TagLib::ID3v2::Tag *tag,
  * \returns True if successful
  */
 bool MetaIOID3::writeAlbumArt(TagLib::ID3v2::Tag *tag, QByteArray *image,
-                              const AttachedPictureFrame::Type &type)
+                              const AttachedPictureFrame::Type &type,
+                              const QString &mimetype)
 {
     if (!tag || !image)
         return false;
@@ -430,9 +431,10 @@ bool MetaIOID3::writeAlbumArt(TagLib::ID3v2::Tag *tag, QByteArray *image,
     }
 
     TagLib::ByteVector bytevector;
-    bytevector.setData(image->data());
+    bytevector.setData(image->data(), image->size());
     delete image;
 
+    apic->setMimeType(QStringToTString(mimetype));
     apic->setPicture(bytevector);
 
     return true;

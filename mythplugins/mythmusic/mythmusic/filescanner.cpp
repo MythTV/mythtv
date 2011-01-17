@@ -109,12 +109,12 @@ void FileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_files,
             QString dir(filename);
             dir.remove(0, m_startdir.length());
 
-            newparentid = m_directoryid[QString(dir.toUtf8()).toLower()];
+            newparentid = m_directoryid[dir.toLower()];
 
             if (newparentid == 0)
             {
                 int id = GetDirectoryId(dir, parentid);
-                m_directoryid[QString(dir.toUtf8()).toLower()] = id;
+                m_directoryid[dir.toLower()] = id;
 
                 if (id > 0)
                 {
@@ -252,8 +252,7 @@ void FileScanner::AddFileToDB(const QString &filename)
         query.prepare("INSERT INTO music_albumart SET filename = :FILE, "
                       "directory_id = :DIRID, imagetype = :TYPE;");
         query.bindValue(":FILE", name);
-        query.bindValue(":DIRID", m_directoryid[
-                            QString(directory.toUtf8()).toLower()]);
+        query.bindValue(":DIRID", m_directoryid[directory.toLower()]);
         query.bindValue(":TYPE", AlbumArtImages::guessImageType(name));
 
         if (!query.exec() || query.numRowsAffected() <= 0)
@@ -274,24 +273,24 @@ void FileScanner::AddFileToDB(const QString &filename)
             QString album_cache_string;
 
             // Set values from cache
-            int did = m_directoryid[QString(directory.toUtf8()).toLower()];
+            int did = m_directoryid[directory.toLower()];
             if (did > 0)
                 data->setDirectoryId(did);
 
-            int aid = m_artistid[QString(data->Artist().toUtf8()).toLower()];
+            int aid = m_artistid[data->Artist().toLower()];
             if (aid > 0)
             {
                 data->setArtistId(aid);
 
                 // The album cache depends on the artist id
                 album_cache_string = data->getArtistId() + "#"
-                    + QString(data->Album().toUtf8()).toLower();
+                    + data->Album().toLower();
 
                 if (m_albumid[album_cache_string] > 0)
                     data->setAlbumId(m_albumid[album_cache_string]);
             }
 
-            int gid = m_genreid[QString(data->Genre().toUtf8()).toLower()];
+            int gid = m_genreid[data->Genre().toLower()];
             if (gid > 0)
                 data->setGenreId(gid);
 
@@ -299,14 +298,14 @@ void FileScanner::AddFileToDB(const QString &filename)
             data->dumpToDatabase();
 
             // Update the cache
-            m_artistid[QString(data->Artist().toUtf8()).toLower()] =
+            m_artistid[data->Artist().toLower()] =
                 data->getArtistId();
 
-            m_genreid[QString(data->Genre().toUtf8()).toLower()] =
+            m_genreid[data->Genre().toLower()] =
                 data->getGenreId();
 
             album_cache_string = data->getArtistId() + "#"
-                + QString(data->Album().toUtf8()).toLower();
+                + data->Album().toLower();
             m_albumid[album_cache_string] = data->getAlbumId();
             delete data;
         }
@@ -445,8 +444,7 @@ void FileScanner::RemoveFileFromDB (const QString &filename)
         query.prepare("DELETE FROM music_albumart WHERE filename= :FILE AND "
                       "directory_id= :DIRID;");
         query.bindValue(":FILE", sqlfilename);
-        query.bindValue(":DIRID", m_directoryid[
-                            QString(directory.toUtf8()).toLower()]);
+        query.bindValue(":DIRID", m_directoryid[directory.toLower()]);
 
         if (!query.exec() || query.numRowsAffected() <= 0)
         {
@@ -491,24 +489,24 @@ void FileScanner::UpdateFileInDB(const QString &filename)
             QString album_cache_string;
 
             // Set values from cache
-            int did = m_directoryid[QString(directory.toUtf8()).toLower()];
+            int did = m_directoryid[directory.toLower()];
             if (did > 0)
                 disk_meta->setDirectoryId(did);
 
-            int aid = m_artistid[QString(disk_meta->Artist().toUtf8()).toLower()];
+            int aid = m_artistid[disk_meta->Artist().toLower()];
             if (aid > 0)
             {
                 disk_meta->setArtistId(aid);
 
                 // The album cache depends on the artist id
                 album_cache_string = disk_meta->getArtistId() + "#" +
-                    QString(disk_meta->Album().toUtf8()).toLower();
+                    disk_meta->Album().toLower();
 
                 if (m_albumid[album_cache_string] > 0)
                     disk_meta->setAlbumId(m_albumid[album_cache_string]);
             }
 
-            int gid = m_genreid[QString(disk_meta->Genre().toUtf8()).toLower()];
+            int gid = m_genreid[disk_meta->Genre().toLower()];
             if (gid > 0)
                 disk_meta->setGenreId(gid);
 
@@ -516,12 +514,12 @@ void FileScanner::UpdateFileInDB(const QString &filename)
             disk_meta->dumpToDatabase();
 
             // Update the cache
-            m_artistid[QString(disk_meta->Artist().toUtf8()).toLower()]
+            m_artistid[disk_meta->Artist().toLower()]
                 = disk_meta->getArtistId();
-            m_genreid[QString(disk_meta->Genre().toUtf8()).toLower()]
+            m_genreid[disk_meta->Genre().toLower()]
                 = disk_meta->getGenreId();
             album_cache_string = disk_meta->getArtistId() + "#" +
-                QString(disk_meta->Album().toUtf8()).toLower();
+                disk_meta->Album().toLower();
             m_albumid[album_cache_string] = disk_meta->getAlbumId();
         }
 
