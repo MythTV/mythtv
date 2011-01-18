@@ -266,11 +266,12 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     m_still = 0;
     m_inMenu = false;
 
-#if 0
+    bool try_hdmv = NULL != getenv("MYTHTV_HDMV");
+
     // First, attempt to initialize the disc in HDMV navigation mode.
     // If this fails, fall back to the traditional built-in title switching
     // mode.
-    if (bd_play(bdnav))
+    if (try_hdmv && bd_play(bdnav))
     {
         VERBOSE(VB_IMPORTANT, LOC + QString("Using HDMV navigation mode."));
         m_is_hdmv_navigation = true;
@@ -282,7 +283,6 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         bd_register_overlay_proc(bdnav, this, HandleOverlayCallback);
     }
     else
-#endif
     {
         VERBOSE(VB_IMPORTANT, LOC + QString("Using title navigation mode - "
                                             "Found %1 relevant titles.")
