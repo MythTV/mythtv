@@ -38,6 +38,7 @@ struct SwsContext;
 
 extern "C" void HandleStreamChange(void*);
 extern "C" void HandleDVDStreamChange(void*);
+extern "C" void HandleBDStreamChange(void*);
 
 class AudioInfo
 {
@@ -87,6 +88,7 @@ class AvFormatDecoder : public DecoderBase
 {
     friend void HandleStreamChange(void*);
     friend void HandleDVDStreamChange(void*);
+    friend void HandleBDStreamChange(void*);
   public:
     static void GetDecoders(render_opts &opts);
     AvFormatDecoder(MythPlayer *parent, const ProgramInfo &pginfo,
@@ -147,6 +149,7 @@ class AvFormatDecoder : public DecoderBase
     virtual int SetTrack(uint type, int trackNo);
 
     int ScanStreams(bool novideo);
+    int FindStreamInfo(void);
 
     virtual int  GetNumChapters();
     virtual void GetChapterTimes(QList<long long> &times);

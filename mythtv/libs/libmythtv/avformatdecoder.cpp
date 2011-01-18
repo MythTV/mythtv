@@ -827,6 +827,25 @@ extern "C" void HandleDVDStreamChange(void* data)
     decoder->ScanStreams(true);
 }
 
+extern "C" void HandleBDStreamChange(void* data)
+{
+    AvFormatDecoder* decoder = (AvFormatDecoder*) data;
+
+    VERBOSE(VB_PLAYBACK, LOC + "HandleBDStreamChange(): resetting");
+
+    QMutexLocker locker(avcodeclock);
+    decoder->Reset(true, false);
+    decoder->CloseCodecs();
+    decoder->FindStreamInfo();
+    decoder->ScanStreams(false);
+}
+
+int AvFormatDecoder::FindStreamInfo(void)
+{
+    QMutexLocker lock(avcodeclock);
+    return av_find_stream_info(ic);
+}
+
 /**
  *  OpenFile opens a ringbuffer for playback.
  *
@@ -892,11 +911,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         return -1;
     }
 
-    int ret = -1;
-    {
-        QMutexLocker locker(avcodeclock);
-        ret = av_find_stream_info(ic);
-    }
+    int ret = FindStreamInfo();
+
     if (ringBuffer->IsDVD())
     {
         if (!ringBuffer->DVD()->StartFromBeginning())
@@ -922,6 +938,9 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     ic->streams_changed = HandleStreamChange;
     if (ringBuffer->IsDVD())
         ic->streams_changed = HandleDVDStreamChange;
+    else if (ringBuffer->IsBD())
+        ic->streams_changed = HandleBDStreamChange;
+
     ic->stream_change_data = this;
 
     fmt->flags &= ~AVFMT_NOFILE;
@@ -1660,10 +1679,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         ringBuffer->DVD()->AudioStreamsChanged(false);
         RemoveAudioStreams();
     }
-
-    // TODO this could probably be used by default
-    if (ringBuffer && ringBuffer->IsBD())
-        av_find_stream_info(ic);
 
     for (uint i = 0; i < ic->nb_streams; i++)
     {
