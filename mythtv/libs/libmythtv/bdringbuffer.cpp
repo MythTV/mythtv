@@ -4,6 +4,7 @@
 #include <cstring>
 
 #include "bdnav/mpls_parse.h"
+#include "bdnav/meta_parse.h"
 #include "bdnav/navigation.h"
 #include "bdnav/bdparse.h"
 #include "decoders/overlay.h"
@@ -104,7 +105,7 @@ long long BDRingBuffer::Seek(long long pos, int whence, bool has_lock)
     if (ret >= 0)
     {
         readpos = ret;
-        
+
         ignorereadpos = -1;
 
         if (readaheadrunning)
@@ -174,6 +175,20 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     {
         rwlock.unlock();
         return false;
+    }
+
+    m_metaDiscLibrary = bd_get_meta(bdnav);
+
+    if (m_metaDiscLibrary)
+    {
+        VERBOSE(VB_GENERAL, LOC + QString("Disc Title: %1 (%2)")
+                    .arg(m_metaDiscLibrary->di_name)
+                    .arg(m_metaDiscLibrary->language_code));
+        VERBOSE(VB_GENERAL, LOC + QString("Alternative Title: %1")
+                    .arg(m_metaDiscLibrary->di_alternative));
+        VERBOSE(VB_GENERAL, LOC + QString("Disc Number: %1 of %2")
+                    .arg(m_metaDiscLibrary->di_set_number)
+                    .arg(m_metaDiscLibrary->di_num_sets));
     }
 
     // Check disc to see encryption status, menu and navigation types.

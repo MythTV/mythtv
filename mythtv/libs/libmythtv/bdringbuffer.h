@@ -118,6 +118,7 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     void WaitForPlayer(void);
 
     BLURAY            *bdnav;
+    meta_dl           *m_metaDiscLibrary;
     bool               m_is_hdmv_navigation;
     uint32_t           m_numTitles;
     uint32_t           m_mainTitle; // Index number of main title
