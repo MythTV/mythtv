@@ -365,9 +365,8 @@ class MPUBLIC MythPlayer
     void JumpChapter(int chapter);
 
     // Playback
-    virtual bool PrebufferEnoughFrames(bool pause_audio = true,
-                                       int  min_buffers = 0);
-    void         SetBuffering(bool new_buffering, bool pause_audio = false);
+    virtual bool PrebufferEnoughFrames(int min_buffers = 0);
+    void         SetBuffering(bool new_buffering);
     void         RefreshPauseFrame(void);
     virtual void DisplayPauseFrame(void);
     virtual void DisplayNormalFrame(bool check_prebuffer = true);

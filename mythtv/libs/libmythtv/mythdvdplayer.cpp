@@ -61,10 +61,9 @@ void MythDVDPlayer::DecoderPauseCheck(void)
     MythPlayer::DecoderPauseCheck();
 }
 
-bool MythDVDPlayer::PrebufferEnoughFrames(bool pause_audio, int  min_buffers)
+bool MythDVDPlayer::PrebufferEnoughFrames(int min_buffers)
 {
-    bool instill = player_ctx->buffer->IsInDiscMenuOrStillFrame();
-    return MythPlayer::PrebufferEnoughFrames(!instill, 1);
+    return MythPlayer::PrebufferEnoughFrames(1);
 }
 
 bool MythDVDPlayer::DecoderGetFrameFFREW(void)

@@ -45,8 +45,7 @@ class MythDVDPlayer : public MythPlayer
     virtual void ResetPlaying(bool resetframes = true);
 
     // Private decoder stuff
-    virtual bool PrebufferEnoughFrames(bool pause_audio = true,
-                                       int  min_buffers = 0);
+    virtual bool PrebufferEnoughFrames(int min_buffers = 0);
     virtual void DecoderPauseCheck(void);
     virtual bool DecoderGetFrameFFREW(void);
     virtual bool DecoderGetFrameREW(void);

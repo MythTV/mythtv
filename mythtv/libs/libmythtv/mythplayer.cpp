@@ -1942,23 +1942,21 @@ void MythPlayer::DisplayPauseFrame(void)
     videosync->Start();
 }
 
-void MythPlayer::SetBuffering(bool new_buffering, bool pause_audio)
+void MythPlayer::SetBuffering(bool new_buffering)
 {
     if (!buffering && new_buffering)
     {
         VERBOSE(VB_PLAYBACK, LOC + "Waiting for video buffers...");
         buffering = true;
-        audio.Pause(pause_audio);
         buffering_start = QTime::currentTime();
     }
     else if (buffering && !new_buffering)
     {
         buffering = false;
-        audio.Pause(false);
     }
 }
 
-bool MythPlayer::PrebufferEnoughFrames(bool pause_audio, int min_buffers)
+bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
 {
     if (!videoOutput)
         return false;
@@ -1968,7 +1966,7 @@ bool MythPlayer::PrebufferEnoughFrames(bool pause_audio, int min_buffers)
                             videoOutput->EnoughPrebufferedFrames() :
                             videoOutput->EnoughDecodedFrames())))
     {
-        SetBuffering(true, pause_audio);
+        SetBuffering(true);
         usleep(frame_interval >> 3);
         int waited_for = buffering_start.msecsTo(QTime::currentTime());
         if ((waited_for & 100) == 100)
