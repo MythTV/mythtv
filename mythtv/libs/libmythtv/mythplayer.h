@@ -76,7 +76,6 @@ enum
     kDisplayTextSubtitle        = 0x020,
     kDisplayDVDButton           = 0x040,
     kDisplayRawTextSubtitle     = 0x080,
-    kDisplayBDOverlay           = 0x0ff,
     kDisplayAllCaptions         = 0x100,
     kDisplayTeletextMenu        = 0x200,
 };

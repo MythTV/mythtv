@@ -4,7 +4,7 @@
 #define LOC     QString("BDPlayer: ")
 #define LOC_ERR QString("BDPlayer error: ")
 
-MythBDPlayer::MythBDPlayer(bool muted) : MythPlayer(muted), m_inMenu(false)
+MythBDPlayer::MythBDPlayer(bool muted) : MythPlayer(muted)
 {
 }
 
@@ -31,30 +31,11 @@ void MythBDPlayer::DisplayMenu(void)
     if (!player_ctx->buffer->IsBD())
         return;
 
-    if (!player_ctx->buffer->BD()->IsInMenu())
-    {
-        if (m_inMenu)
-        {
-            m_inMenu = false;
-            player_ctx->buffer->BD()->ClearOverlays();
-            SetCaptionsEnabled(false, false);
-            osd->ClearSubtitles();
-        }
-        return;
-    }
-
-    if (player_ctx->buffer->BD()->OverlayCleared())
-    {
-        osd->ClearSubtitles();
-        player_ctx->buffer->BD()->OverlayCleared(false);
-    }
-
+    osdLock.lock();
     BDOverlay *overlay = NULL;
     while (NULL != (overlay = player_ctx->buffer->BD()->GetOverlay()))
-    {
-        m_inMenu = true;
         osd->DisplayBDOverlay(overlay);
-    }
+    osdLock.unlock();
 }
 
 bool MythBDPlayer::VideoLoop(void)

@@ -20,6 +20,7 @@ using namespace std;
 #define OSD_WIN_TELETEXT  "OSD_TELETEXT"
 #define OSD_WIN_SUBTITLE  "OSD_SUBTITLES"
 #define OSD_WIN_INTERACT  "OSD_INTERACTIVE"
+#define OSD_WIN_BDOVERLAY "OSD_BDOVERLAY"
 
 #define kOSDFadeTime 1000
 
@@ -139,6 +140,7 @@ class OSD
     bool    HasWindow(const QString &window);
     void    ResetWindow(const QString &window);
     void    PositionWindow(MythScreenType *window);
+    void    RemoveWindow(const QString &window);
 
     bool    DrawDirect(MythPainter* painter, QSize size, bool repaint = false);
     QRegion Draw(MythPainter* painter, QPaintDevice *device, QSize size,
@@ -174,12 +176,13 @@ class OSD
     void EnableSubtitles(int type);
     void ClearSubtitles(void);
     void DisplayDVDButton(AVSubtitle* dvdButton, QRect &pos);
+
     void DisplayBDOverlay(BDOverlay *overlay);
 
   private:
     void TearDown(void);
     void LoadWindows(void);
-    void RemoveWindow(const QString &window);
+
     void CheckExpiry(void);
     void SendHideEvent(void);
 

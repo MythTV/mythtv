@@ -3903,7 +3903,7 @@ bool TV::DiscMenuHandleAction(PlayerContext *ctx, const QStringList &actions)
             return true;
         }
 
-        if (!bdrb->IsInDiscMenuOrStillFrame())
+        if (!bdrb->IsInMenu())
             return false;
 
         handled = true;

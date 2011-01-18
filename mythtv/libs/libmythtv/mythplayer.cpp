@@ -1275,7 +1275,6 @@ void MythPlayer::ResetCaptions(void)
                 (textDisplayMode & kDisplayTextSubtitle)    ||
                 (textDisplayMode & kDisplayRawTextSubtitle) ||
                 (textDisplayMode & kDisplayDVDButton)       ||
-                (textDisplayMode & kDisplayBDOverlay)       ||
                 (textDisplayMode & kDisplayCC608)           ||
                 (textDisplayMode & kDisplayCC708)))
     {

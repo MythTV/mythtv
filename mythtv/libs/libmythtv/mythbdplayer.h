@@ -34,8 +34,6 @@ class MythBDPlayer : public MythPlayer
 
   private:
     void DisplayMenu(void);
-
-    bool m_inMenu;
 };
 
 #endif // MYTHBDPLAYER_H

@@ -295,8 +295,10 @@ using_frontend {
     # On screen display (video output overlay)
     HEADERS += osd.h                    teletextscreen.h
     HEADERS += subtitlescreen.h         interactivescreen.h
+    HEADERS += bdoverlayscreen.h
     SOURCES += osd.cpp                  teletextscreen.cpp
     SOURCES += subtitlescreen.cpp       interactivescreen.cpp
+    SOURCES += bdoverlayscreen.cpp
 
     # Video output
     HEADERS += videooutbase.h           videoout_null.h

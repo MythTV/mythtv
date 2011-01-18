@@ -21,12 +21,28 @@
 class BDOverlay
 {
   public:
-    BDOverlay(uint8_t *data, uint8_t *palette, QRect position)
-     : m_data(data), m_palette(palette), m_position(position) { }
+    static void DeleteOverlay(BDOverlay *overlay)
+    {
+        if (!overlay)
+            return;
+        if (overlay->m_data)
+            av_free(overlay->m_data);
+        if (overlay->m_palette)
+            av_free(overlay->m_palette);
+        delete overlay;
+        overlay = NULL;
+    }
+
+    BDOverlay(uint8_t *data, uint8_t *palette, QRect position, int plane,
+              int64_t pts)
+     : m_data(data), m_palette(palette), m_position(position),
+       m_plane(plane), m_pts(pts) { }
 
     uint8_t *m_data;
     uint8_t *m_palette;
     QRect    m_position;
+    int      m_plane;
+    int64_t  m_pts;
 };
 
 class MPUBLIC BDRingBuffer : public RingBuffer
@@ -44,8 +60,6 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     void ClearOverlays(void);
     BDOverlay* GetOverlay(void);
     void SubmitOverlay(const bd_overlay_s * const overlay);
-    bool OverlayCleared(void)         { return m_overlayCleared;    }
-    void OverlayCleared(bool cleared) { m_overlayCleared = cleared; }
 
 
     uint32_t GetNumTitles(void) const { return m_numTitles; }
@@ -137,7 +151,6 @@ class MPUBLIC BDRingBuffer : public RingBuffer
 
     QMutex             m_overlayLock;
     QList<BDOverlay*>  m_overlayImages;
-    bool               m_overlayCleared;
 
   public:
     uint8_t            m_still;

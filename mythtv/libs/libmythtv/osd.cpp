@@ -22,6 +22,7 @@
 #include "teletextscreen.h"
 #include "subtitlescreen.h"
 #include "interactivescreen.h"
+#include "bdoverlayscreen.h"
 #include "osd.h"
 
 #define LOC     QString("OSD: ")
@@ -789,6 +790,11 @@ MythScreenType *OSD::GetWindow(const QString &window)
         InteractiveScreen *screen = new InteractiveScreen(m_parent, window);
         new_window = (MythScreenType*) screen;
     }
+    else if (window == OSD_WIN_BDOVERLAY)
+    {
+        BDOverlayScreen *screen = new BDOverlayScreen(m_parent, window);
+        new_window = (MythScreenType*) screen;
+    }
     else
     {
         MythOSDWindow *screen = new MythOSDWindow(NULL, window, false);
@@ -1141,8 +1147,11 @@ void OSD::ClearSubtitles(void)
 
 void OSD::DisplayDVDButton(AVSubtitle* dvdButton, QRect &pos)
 {
+    if (!dvdButton)
+        return;
+
     SubtitleScreen* sub = InitSubtitles();
-    if (sub && dvdButton)
+    if (sub)
     {
         EnableSubtitles(kDisplayDVDButton);
         sub->DisplayDVDButton(dvdButton, pos);
@@ -1151,12 +1160,10 @@ void OSD::DisplayDVDButton(AVSubtitle* dvdButton, QRect &pos)
 
 void OSD::DisplayBDOverlay(BDOverlay* overlay)
 {
-    SubtitleScreen* sub = InitSubtitles();
-    if (sub && overlay)
-    {
-        // this ensures we don't delete existing items
-        if (sub->EnabledSubtitleType() != kDisplayBDOverlay)
-            EnableSubtitles(kDisplayBDOverlay);
-        sub->DisplayBDOverlay(overlay);
-    }
+    if (!overlay)
+        return;
+
+    BDOverlayScreen* bd = (BDOverlayScreen*)GetWindow(OSD_WIN_BDOVERLAY);
+    if (bd)
+        bd->DisplayBDOverlay(overlay);
 }

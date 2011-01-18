@@ -20,8 +20,7 @@
 #define LOC_WARN QString("BDRingBuf(%1) Warning: ").arg(filename)
 #define LOC_ERR  QString("BDRingBuf(%1) Error: ").arg(filename)
 
-static void HandleOverlayCallback(
-    void *data, const bd_overlay_s * const overlay)
+static void HandleOverlayCallback(void *data, const bd_overlay_s *const overlay)
 {
     BDRingBuffer *bdrb = (BDRingBuffer*) data;
     if (bdrb)
@@ -31,7 +30,7 @@ static void HandleOverlayCallback(
 BDRingBuffer::BDRingBuffer(const QString &lfilename)
   : bdnav(NULL), m_is_hdmv_navigation(false),
     m_numTitles(0), m_titleChanged(false), m_playerWait(false),
-    m_ignorePlayerWait(true), m_overlayCleared(false)
+    m_ignorePlayerWait(true)
 {
     OpenFile(lfilename);
 }
@@ -267,7 +266,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     m_still = 0;
     m_inMenu = false;
 
-#if 0
+#if 1
     // First, attempt to initialize the disc in HDMV navigation mode.
     // If this fails, fall back to the traditional built-in title switching
     // mode.
@@ -794,13 +793,7 @@ void BDRingBuffer::ClearOverlays(void)
     QMutexLocker lock(&m_overlayLock);
 
     while (!m_overlayImages.isEmpty())
-    {
-        BDOverlay *img = m_overlayImages.takeFirst();
-        delete img->m_data;
-        delete img->m_palette;
-        delete img;
-    }
-    OverlayCleared(false);
+        BDOverlay::DeleteOverlay(m_overlayImages.takeFirst());
 }
 
 BDOverlay* BDRingBuffer::GetOverlay(void)
@@ -815,29 +808,37 @@ void BDRingBuffer::SubmitOverlay(const bd_overlay_s * const overlay)
 {
     QMutexLocker lock(&m_overlayLock);
 
-    if (!overlay || overlay->plane == 1)
-        m_inMenu = false;
+    if (!overlay)
+        return;
 
-    if (!overlay || !overlay->img)
+    if ((overlay->w <= 0) || (overlay->w > 1920) ||
+        (overlay->x <  0) || (overlay->x > 1920) ||
+        (overlay->h <= 0) || (overlay->h > 1080) ||
+        (overlay->y <  0) || (overlay->y > 1080))
     {
-        VERBOSE(VB_PLAYBACK, LOC + "Null overlay submitted.");
-        OverlayCleared(true);
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+            QString("Invalid overlay size: %1x%2+%3+%4")
+            .arg(overlay->w).arg(overlay->h).arg(overlay->x).arg(overlay->y));
         return;
     }
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("New overlay image %1x%2 %3+%4")
-        .arg(overlay->w).arg(overlay->h)
-        .arg(overlay->x).arg(overlay->y));
-    m_inMenu = true;
+    if (!overlay->img)
+    {
+        m_inMenu = false;
+        QRect pos(overlay->x, overlay->y, overlay->w, overlay->h);
+        m_overlayImages.append(new BDOverlay(NULL, NULL, pos,
+                               overlay->plane, overlay->pts));
+        return;
+    }
 
     const BD_PG_RLE_ELEM *rlep = overlay->img;
     static const unsigned palettesize = 256 * 4;
     unsigned width   = (overlay->w + 0x3) & (~0x3);
-    unsigned pixels  = width * overlay->h;
+    unsigned pixels  = ((overlay->w + 0xf) & (~0xf)) *
+                       ((overlay->h + 0xf) & (~0xf));
     unsigned actual  = overlay->w * overlay->h;
-    uint8_t *data    = (uint8_t*)malloc(pixels);
-    uint8_t *palette = (uint8_t*)malloc(palettesize);
-    memset(data, 0, pixels);
+    uint8_t *data    = (uint8_t*)av_mallocz(pixels);
+    uint8_t *palette = (uint8_t*)av_mallocz(palettesize);
 
     int line = 0;
     int this_line = 0;
@@ -859,7 +860,8 @@ void BDRingBuffer::SubmitOverlay(const bd_overlay_s * const overlay)
     memcpy(palette, overlay->palette, palettesize);
 
     QRect pos(overlay->x, overlay->y, width, overlay->h);
-    m_overlayImages.append(new BDOverlay(data, palette, pos));
+    m_overlayImages.append(new BDOverlay(data, palette, pos,
+                           overlay->plane, overlay->pts));
 
     if (overlay->plane == 1)
         m_inMenu = true;

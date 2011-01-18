@@ -24,7 +24,6 @@ class SubtitleScreen : public MythScreenType
     void ClearDisplayedSubtitles(void);
     void ExpireSubtitles(void);
     void DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos);
-    void DisplayBDOverlay(BDOverlay* overlay);
 
     // MythScreenType methods
     virtual bool Create(void);
