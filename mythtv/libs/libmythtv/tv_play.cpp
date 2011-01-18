@@ -721,15 +721,15 @@ void TV::InitKeys(void)
             "Jump forward 10x the normal amount"), ">,.");
 
     /* Teletext keys */
-    REG_KEY("Teletext Menu", "NEXTPAGE",    QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("Teletext Menu", TV_NEXTPAGE,    QT_TRANSLATE_NOOP("MythControls",
             "Next Page"),             "Down");
-    REG_KEY("Teletext Menu", "PREVPAGE",    QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("Teletext Menu", TV_PREVPAGE,    QT_TRANSLATE_NOOP("MythControls",
             "Previous Page"),         "Up");
-    REG_KEY("Teletext Menu", "NEXTSUBPAGE", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("Teletext Menu", TV_NEXTSUBPAGE, QT_TRANSLATE_NOOP("MythControls",
             "Next Subpage"),          "Right");
-    REG_KEY("Teletext Menu", "PREVSUBPAGE", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("Teletext Menu", TV_PREVSUBPAGE, QT_TRANSLATE_NOOP("MythControls",
             "Previous Subpage"),      "Left");
-    REG_KEY("Teletext Menu", "TOGGLETT",    QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("Teletext Menu", TV_TOGGLETT,    QT_TRANSLATE_NOOP("MythControls",
             "Toggle Teletext"),       "T");
     REG_KEY("Teletext Menu", TV_MENURED,     QT_TRANSLATE_NOOP("MythControls",
             "Menu Red"),              "F2");
@@ -739,11 +739,11 @@ void TV::InitKeys(void)
             "Menu Yellow"),           "F4");
     REG_KEY("Teletext Menu", TV_MENUBLUE,    QT_TRANSLATE_NOOP("MythControls",
             "Menu Blue"),             "F5");
-    REG_KEY("Teletext Menu", "MENUWHITE",   QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("Teletext Menu", TV_MENUWHITE,   QT_TRANSLATE_NOOP("MythControls",
             "Menu White"),            "F6");
-    REG_KEY("Teletext Menu", "TOGGLEBACKGROUND",
+    REG_KEY("Teletext Menu", TV_TOGGLEBACKGROUND,
             QT_TRANSLATE_NOOP("MythControls", "Toggle Background"), "F7");
-    REG_KEY("Teletext Menu", "REVEAL",      QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("Teletext Menu", TV_REVEAL,      QT_TRANSLATE_NOOP("MythControls",
             "Reveal hidden Text"),    "F8");
 
 /*

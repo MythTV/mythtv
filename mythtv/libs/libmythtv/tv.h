@@ -14,6 +14,16 @@
 #define TV_MENUTEXT   "MENUTEXT"
 #define TV_MENUEPG    "MENUEPG"
 
+/* Teletext keys */
+#define TV_NEXTPAGE         "NEXTPAGE"
+#define TV_PREVPAGE         "PREVPAGE"
+#define TV_NEXTSUBPAGE      "NEXTSUBPAGE"
+#define TV_PREVSUBPAGE      "PREVSUBPAGE"
+#define TV_TOGGLETT         "TOGGLETT"
+#define TV_MENUWHITE        "MENUWHITE"
+#define TV_TOGGLEBACKGROUND "TOGGLEBACKGROUND"
+#define TV_REVEAL           "REVEAL"
+
 /** \brief ChannelChangeDirection is an enumeration of possible channel
  *         changing directions.
  */

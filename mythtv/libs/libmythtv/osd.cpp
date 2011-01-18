@@ -1054,15 +1054,15 @@ bool OSD::TeletextAction(const QString &action)
     if (!tt)
         return false;
 
-    if (action == "NEXTPAGE")
+    if (action == TV_NEXTPAGE)
         tt->KeyPress(TTKey::kNextPage);
-    else if (action == "PREVPAGE")
+    else if (action == TV_PREVPAGE)
         tt->KeyPress(TTKey::kPrevPage);
-    else if (action == "NEXTSUBPAGE")
+    else if (action == TV_NEXTSUBPAGE)
         tt->KeyPress(TTKey::kNextSubPage);
-    else if (action == "PREVSUBPAGE")
+    else if (action == TV_PREVSUBPAGE)
         tt->KeyPress(TTKey::kPrevSubPage);
-    else if (action == "TOGGLEBACKGROUND")
+    else if (action == TV_TOGGLEBACKGROUND)
         tt->KeyPress(TTKey::kTransparent);
     else if (action == TV_MENURED)
         tt->KeyPress(TTKey::kFlofRed);
@@ -1072,9 +1072,9 @@ bool OSD::TeletextAction(const QString &action)
         tt->KeyPress(TTKey::kFlofYellow);
     else if (action == TV_MENUBLUE)
         tt->KeyPress(TTKey::kFlofBlue);
-    else if (action == "MENUWHITE")
+    else if (action == TV_MENUWHITE)
         tt->KeyPress(TTKey::kFlofWhite);
-    else if (action == "REVEAL")
+    else if (action == TV_REVEAL)
         tt->KeyPress(TTKey::kRevealHidden);
     else if (action == "0" || action == "1" || action == "2" ||
              action == "3" || action == "4" || action == "5" ||
