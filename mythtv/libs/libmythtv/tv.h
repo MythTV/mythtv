@@ -5,6 +5,15 @@
 
 #include "videoouttypes.h"
 
+/* Interactive Television keys */
+#define TV_MENURED    "MENURED"
+#define TV_MENUGREEN  "MENUGREEN"
+#define TV_MENUYELLOW "MENYELLOW"
+#define TV_MENUBLUE   "MENUBLUE"
+#define TV_TEXTEXIT   "TEXTEXIT"
+#define TV_MENUTEXT   "MENUTEXT"
+#define TV_MENUEPG    "MENUEPG"
+
 /** \brief ChannelChangeDirection is an enumeration of possible channel
  *         changing directions.
  */

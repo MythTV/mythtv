@@ -1064,13 +1064,13 @@ bool OSD::TeletextAction(const QString &action)
         tt->KeyPress(TTKey::kPrevSubPage);
     else if (action == "TOGGLEBACKGROUND")
         tt->KeyPress(TTKey::kTransparent);
-    else if (action == "MENURED")
+    else if (action == TV_MENURED)
         tt->KeyPress(TTKey::kFlofRed);
-    else if (action == "MENUGREEN")
+    else if (action == TV_MENUGREEN)
         tt->KeyPress(TTKey::kFlofGreen);
-    else if (action == "MENUYELLOW")
+    else if (action == TV_MENUYELLOW)
         tt->KeyPress(TTKey::kFlofYellow);
-    else if (action == "MENUBLUE")
+    else if (action == TV_MENUBLUE)
         tt->KeyPress(TTKey::kFlofBlue);
     else if (action == "MENUWHITE")
         tt->KeyPress(TTKey::kFlofWhite);
