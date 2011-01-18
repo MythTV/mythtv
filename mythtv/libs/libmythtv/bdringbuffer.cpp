@@ -266,7 +266,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     m_still = 0;
     m_inMenu = false;
 
-#if 1
+#if 0
     // First, attempt to initialize the disc in HDMV navigation mode.
     // If this fails, fall back to the traditional built-in title switching
     // mode.
