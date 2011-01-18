@@ -269,6 +269,7 @@ bool OSD::IsVisible(void)
         if (child->IsVisible() &&
             child->objectName() != OSD_WIN_SUBTITLE &&
             child->objectName() != OSD_WIN_TELETEXT &&
+            child->objectName() != OSD_WIN_BDOVERLAY &&
             child->objectName() != OSD_WIN_INTERACT)
             return true;
 
@@ -283,6 +284,7 @@ void OSD::HideAll(bool keepsubs, MythScreenType* except)
         it.next();
         if (!((keepsubs && (it.key() == OSD_WIN_SUBTITLE ||
             it.key() == OSD_WIN_TELETEXT)) ||
+            (it.key() == OSD_WIN_BDOVERLAY) ||
             it.value() == except))
             HideWindow(it.key());
     }
