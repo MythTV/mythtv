@@ -45,9 +45,9 @@ LIBS += -L../libmyth              -lmyth-$${LIBVERSION}
 LIBS += -L../libmythtv              -lmythtv-$${LIBVERSION}
 LIBS += -L../libmythbluray        -lmythbluray-$${LIBVERSION}
 LIBS += -L../../external/FFmpeg/libswscale -lmythswscale
-LIBS += -L../libmythfreemheg        -lmythfreemheg-$${LIBVERSION}
-LIBS += -L../libmythlivemedia        -lmythlivemedia-$${LIBVERSION}
-LIBS += -L../libmythhdhomerun        -lmythhdhomerun-$${LIBVERSION}
+using_mheg:LIBS += -L../libmythfreemheg        -lmythfreemheg-$${LIBVERSION}
+using_live:LIBS += -L../libmythlivemedia        -lmythlivemedia-$${LIBVERSION}
+using_hdhomerun:LIBS += -L../libmythhdhomerun        -lmythhdhomerun-$${LIBVERSION}
 
 mingw {
 
