@@ -361,64 +361,67 @@
     <window name="gallery">
 
         <textarea name="title" from="basetextarea">
-            <area>70,15,460,50</area>
+            <area>12,20,890,30</area>
             <cutdown>yes</cutdown>
-            <font>baselarge</font>
+            <font>basemedium</font>
+            <align>left,vcenter</align>
         </textarea>
 
         <textarea name="author" from="basetextarea">
-            <area>550,15,220,50</area>
+            <area>910,20,200,30</area>
             <cutdown>yes</cutdown>
             <font>basemedium</font>
+            <align>left,vcenter</align>
         </textarea>
 
         <textarea name="nosites" from="basetextarea">
-            <area>550,15,220,50</area>
+            <area>12,0,1260,785</area>
+            <align>allcenter</align>
             <value>You haven't added any Sites/RSS Feeds yet!  To add a site, press MENU, then choose "Scan/Manage Subscriptions," then "Manage Site Subscriptions."</value>
         </textarea>
 
         <buttonlist name="videos">
-            <area>15,0,770,585</area>
+            <area>12,0,1260,785</area>
             <layout>grid</layout>
             <spacing>5</spacing>
-            <buttonarea>0,65,770,520</buttonarea>
+            <buttonarea>0,55,1260,720</buttonarea>
             <statetype name="buttonitem">
-                <area>0,0,150,125</area>
+                <area>0,0,175,160</area>
                 <state name="active">
                     <imagetype name="buttonbackground">
                         <filename>shared/grid_back_reg.png</filename>
                     </imagetype>
                     <imagetype name="buttonimage">
-                        <area>10,8,130,90</area>
+                        <area>10,8,155,125</area>
                         <preserveaspect>true</preserveaspect>
                         <filename>shared/grid_noimage.png</filename>
                     </imagetype>
                     <statetype name="nodetype">
-                        <position>80,55</position>
+                        <position>90,70</position>
                         <state name="subfolder">
                             <imagetype name="icon">
-                                <area>0,0,50,50</area>
+                                <area>0,0,70,70</area>
                                 <filename>shared/directory.png</filename>
                                 <preserveaspect>yes</preserveaspect>
                             </imagetype>
                         </state>
                         <state name="upfolder">
                             <imagetype name="icon">
-                                <area>0,0,50,50</area>
+                                <area>0,0,70,70</area>
                                 <filename>shared/updirectory.png</filename>
                                 <preserveaspect>yes</preserveaspect>
                             </imagetype>
                         </state>
                     </statetype>
                     <textarea name="buttontext">
-                        <area>5,98,140,25</area>
+                        <area>5,133,165,25</area>
                         <font>menufont</font>
                         <align>hcenter,bottom</align>
                     </textarea>
                     <textarea name="childcount" from="basetextarea">
-                        <area>65,72,55,20</area>
+                        <area>85,100,80,25</area>
                         <font>basesmallblack</font>
-                        <align>right</align>
+                        <align>center</align>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">
@@ -428,7 +431,7 @@
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
-                <position>640,20</position>
+                <position>1120,15</position>
                 <showempty>yes</showempty>
                 <state type="full">
                     <imagetype name="upon">
@@ -437,7 +440,7 @@
                 </state>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>700,20</position>
+                <position>1180,15</position>
                 <showempty>yes</showempty>
                 <state type="full">
                     <imagetype name="dnon">
