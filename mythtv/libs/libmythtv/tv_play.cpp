@@ -3854,39 +3854,7 @@ bool TV::DiscMenuHandleAction(PlayerContext *ctx, const QStringList &actions)
 
     if (dvdrb)
     {
-        int nb_buttons = dvdrb->NumMenuButtons();
-        if (nb_buttons == 0)
-            return false;
-
-        handled = true;
-        if (has_action(ACTION_UP, actions) ||
-            has_action(ACTION_CHANNELUP, actions))
-        {
-            dvdrb->MoveButtonUp();
-        }
-        else if (has_action(ACTION_DOWN, actions) ||
-                 has_action(ACTION_CHANNELDOWN, actions))
-        {
-            dvdrb->MoveButtonDown();
-        }
-        else if (has_action(ACTION_LEFT, actions) ||
-                 has_action(ACTION_SEEKRWND, actions))
-        {
-            dvdrb->MoveButtonLeft();
-        }
-        else if (has_action(ACTION_RIGHT, actions) ||
-                 has_action(ACTION_SEEKFFWD, actions))
-        {
-            dvdrb->MoveButtonRight();
-        }
-        else if (has_action(ACTION_SELECT, actions))
-        {
-            ctx->LockDeletePlayer(__FILE__, __LINE__);
-            dvdrb->ActivateButton();
-            ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-        }
-        else
-            handled = false;
+        handled = dvdrb->HandleAction(actions, 0);
     }
     else if (bdrb)
     {

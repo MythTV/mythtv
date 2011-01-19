@@ -67,11 +67,7 @@ class MPUBLIC DVDRingBuffer : public RingBuffer
     QRect       GetButtonCoords(void);
     void        ReleaseMenuButton(void);
     bool        IsInMenu(void) const { return m_inMenu; }
-    void        ActivateButton(void);
-    void        MoveButtonLeft(void);
-    void        MoveButtonRight(void);
-    void        MoveButtonUp(void);
-    void        MoveButtonDown(void);
+    bool        HandleAction(const QStringList &actions, int64_t pts);
 
     // Subtitles
     uint GetSubtitleLanguage(int key);
@@ -175,6 +171,11 @@ class MPUBLIC DVDRingBuffer : public RingBuffer
     MythDVDPlayer *m_parent;
 
     // Private menu/button stuff
+    void ActivateButton(void);
+    void MoveButtonLeft(void);
+    void MoveButtonRight(void);
+    void MoveButtonUp(void);
+    void MoveButtonDown(void);
     bool DVDButtonUpdate(bool b_mode);
     void ClearMenuSPUParameters(void);
     void ClearMenuButton(void);

@@ -957,6 +957,44 @@ void DVDRingBuffer::GoToPreviousProgram(void)
         dvdnav_prev_pg_search(m_dvdnav);
 }
 
+bool DVDRingBuffer::HandleAction(const QStringList &actions, int64_t pts)
+{
+    (void)pts;
+
+    if (!NumMenuButtons())
+        return false;
+
+    bool handled = true;
+    if (actions.contains(ACTION_UP) ||
+        actions.contains(ACTION_CHANNELUP))
+    {
+        MoveButtonUp();
+    }
+    else if (actions.contains(ACTION_DOWN) ||
+             actions.contains(ACTION_CHANNELDOWN))
+    {
+        MoveButtonDown();
+    }
+    else if (actions.contains(ACTION_LEFT) ||
+             actions.contains(ACTION_SEEKRWND))
+    {
+        MoveButtonLeft();
+    }
+    else if (actions.contains(ACTION_RIGHT) ||
+             actions.contains(ACTION_SEEKFFWD))
+    {
+        MoveButtonRight();
+    }
+    else if (actions.contains(ACTION_SELECT))
+    {
+        ActivateButton();
+    }
+    else
+        handled = false;
+
+    return handled;
+}
+
 void DVDRingBuffer::MoveButtonLeft(void)
 {
     if (NumMenuButtons() > 1)
