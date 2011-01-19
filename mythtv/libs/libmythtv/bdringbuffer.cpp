@@ -16,6 +16,7 @@
 #include "mythlocale.h"
 #include "mythdirs.h"
 #include "bluray.h"
+#include "tv.h" // for actions
 
 #define LOC      QString("BDRingBuf(%1): ").arg(filename)
 #define LOC_WARN QString("BDRingBuf(%1) Warning: ").arg(filename)
@@ -146,6 +147,88 @@ void BDRingBuffer::GetDescForPos(QString &desc) const
     desc = QObject::tr("Title %1 chapter %2")
                        .arg(m_currentTitleInfo->idx)
                        .arg(m_currentTitleInfo->chapters->idx);
+}
+
+bool BDRingBuffer::HandleAction(const QStringList &actions, int64_t pts)
+{
+    if (actions.contains(ACTION_MENUTEXT))
+    {
+        PressButton(BD_VK_POPUP, pts);
+        return true;
+    }
+
+    if (!IsInMenu())
+        return false;
+
+    bool handled = true;
+    if (actions.contains(ACTION_UP) ||
+        actions.contains(ACTION_CHANNELUP))
+    {
+        PressButton(BD_VK_UP, pts);
+    }
+    else if (actions.contains(ACTION_DOWN) ||
+             actions.contains(ACTION_CHANNELDOWN))
+    {
+        PressButton(BD_VK_DOWN, pts);
+    }
+    else if (actions.contains(ACTION_LEFT) ||
+             actions.contains(ACTION_SEEKRWND))
+    {
+        PressButton(BD_VK_LEFT, pts);
+    }
+    else if (actions.contains(ACTION_RIGHT) ||
+             actions.contains(ACTION_SEEKFFWD))
+    {
+        PressButton(BD_VK_RIGHT, pts);
+    }
+    else if (actions.contains(ACTION_0))
+    {
+        PressButton(BD_VK_0, pts);
+    }
+    else if (actions.contains(ACTION_1))
+    {
+        PressButton(BD_VK_1, pts);
+    }
+    else if (actions.contains(ACTION_2))
+    {
+        PressButton(BD_VK_2, pts);
+    }
+    else if (actions.contains(ACTION_3))
+    {
+        PressButton(BD_VK_3, pts);
+    }
+    else if (actions.contains(ACTION_4))
+    {
+        PressButton(BD_VK_4, pts);
+    }
+    else if (actions.contains(ACTION_5))
+    {
+        PressButton(BD_VK_5, pts);
+    }
+    else if (actions.contains(ACTION_6))
+    {
+        PressButton(BD_VK_6, pts);
+    }
+    else if (actions.contains(ACTION_7))
+    {
+        PressButton(BD_VK_7, pts);
+    }
+    else if (actions.contains(ACTION_8))
+    {
+        PressButton(BD_VK_8, pts);
+    }
+    else if (actions.contains(ACTION_9))
+    {
+        PressButton(BD_VK_9, pts);
+    }
+    else if (actions.contains(ACTION_SELECT))
+    {
+        PressButton(BD_VK_ENTER, pts);
+    }
+    else
+        handled = false;
+
+    return handled;
 }
 
 bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
