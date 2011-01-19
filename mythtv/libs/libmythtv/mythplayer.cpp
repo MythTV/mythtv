@@ -3600,7 +3600,7 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
     {
         QString action = actions[i];
         handled = true;
-        if (action == "LEFT")
+        if (action == ACTION_LEFT)
         {
             if (deleteMap.GetSeekAmount() > 0)
             {
@@ -3609,7 +3609,7 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
             else
                 HandleArbSeek(false);
         }
-        else if (action == "RIGHT")
+        else if (action == ACTION_RIGHT)
         {
             if (deleteMap.GetSeekAmount() > 0)
             {
@@ -3664,7 +3664,7 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
                 DoFastForward(fps * FFREW_MULTICOUNT / 2, true, true);
             }
         }
-        else if (action == "SELECT")
+        else if (action == ACTION_SELECT)
         {
             deleteMap.NewCut(frame, totalFrames);
             refresh = true;

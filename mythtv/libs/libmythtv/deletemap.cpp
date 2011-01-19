@@ -16,9 +16,9 @@ bool DeleteMap::HandleAction(QString &action, uint64_t frame,
     bool handled = true;
     if (action == "REVERSE")
         Reverse(frame, total);
-    else if (action == "UP")
+    else if (action == ACTION_UP)
         UpdateSeekAmount(1, rate);
-    else if (action == "DOWN")
+    else if (action == ACTION_DOWN)
         UpdateSeekAmount(-1, rate);
     else if (action == ACTION_CLEARMAP)
         Clear();

@@ -5,6 +5,7 @@
 
 #include "videoouttypes.h"
 
+/////////////// These are globally registered in MythMainWindow ////////////////
 #define ACTION_0 "0"
 #define ACTION_1 "1"
 #define ACTION_2 "2"
@@ -15,6 +16,18 @@
 #define ACTION_7 "7"
 #define ACTION_8 "8"
 #define ACTION_9 "9"
+
+#define ACTION_SELECT "SELECT"
+#define ACTION_UP     "UP"
+#define ACTION_DOWN   "DOWN"
+#define ACTION_LEFT   "LEFT"
+#define ACTION_RIGHT  "RIGHT"
+////////////////////////////////////////////////////////////////////////////////
+
+#define ACTION_CHANNELUP   "CHANNELUP"
+#define ACTION_CHANNELDOWN "CHANNELDOWN"
+#define ACTION_SEEKRWND    "SEEKRWND"
+#define ACTION_SEEKFFWD    "SEEKFFWD"
 
 #define ACTION_GUIDE             "GUIDE"
 #define ACTION_FINDER            "FINDER"
