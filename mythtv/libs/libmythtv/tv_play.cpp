@@ -703,21 +703,21 @@ void TV::InitKeys(void)
             "Menu EPG"),    "F12");
 
     /* Editing keys */
-    REG_KEY("TV Editing", "CLEARMAP",    QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Editing", ACTION_CLEARMAP,    QT_TRANSLATE_NOOP("MythControls",
             "Clear editing cut points"), "C,Q,Home");
-    REG_KEY("TV Editing", "INVERTMAP",   QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Editing", ACTION_INVERTMAP,   QT_TRANSLATE_NOOP("MythControls",
             "Invert Begin/End cut points"),"I");
-    REG_KEY("TV Editing", "SAVEMAP",     QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Editing", ACTION_SAVEMAP,     QT_TRANSLATE_NOOP("MythControls",
             "Save cut list"),"");
-    REG_KEY("TV Editing", "LOADCOMMSKIP",QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Editing", ACTION_LOADCOMMSKIP,QT_TRANSLATE_NOOP("MythControls",
             "Load cut list from commercial skips"), "Z,End");
-    REG_KEY("TV Editing", "NEXTCUT",     QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Editing", ACTION_NEXTCUT,     QT_TRANSLATE_NOOP("MythControls",
             "Jump to the next cut point"), "PgDown");
-    REG_KEY("TV Editing", "PREVCUT",     QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Editing", ACTION_PREVCUT,     QT_TRANSLATE_NOOP("MythControls",
             "Jump to the previous cut point"), "PgUp");
-    REG_KEY("TV Editing", "BIGJUMPREW",  QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Editing", ACTION_BIGJUMPREW,  QT_TRANSLATE_NOOP("MythControls",
             "Jump back 10x the normal amount"), ",,<");
-    REG_KEY("TV Editing", "BIGJUMPFWD",  QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Editing", ACTION_BIGJUMPFWD,  QT_TRANSLATE_NOOP("MythControls",
             "Jump forward 10x the normal amount"), ">,.");
 
     /* Teletext keys */

@@ -3618,7 +3618,7 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
             else
                 HandleArbSeek(true);
         }
-        else if (action == "LOADCOMMSKIP")
+        else if (action == ACTION_LOADCOMMSKIP)
         {
             if (commBreakMap.HasMap())
             {
@@ -3627,14 +3627,14 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
                 deleteMap.LoadCommBreakMap(totalFrames, map);
             }
         }
-        else if (action == "PREVCUT")
+        else if (action == ACTION_PREVCUT)
         {
             int old_seekamount = deleteMap.GetSeekAmount();
             deleteMap.SetSeekAmount(-2);
             HandleArbSeek(false);
             deleteMap.SetSeekAmount(old_seekamount);
         }
-        else if (action == "NEXTCUT")
+        else if (action == ACTION_NEXTCUT)
         {
             int old_seekamount = deleteMap.GetSeekAmount();
             deleteMap.SetSeekAmount(-2);
@@ -3642,7 +3642,7 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
             deleteMap.SetSeekAmount(old_seekamount);
         }
 #define FFREW_MULTICOUNT 10
-        else if (action == "BIGJUMPREW")
+        else if (action == ACTION_BIGJUMPREW)
         {
             if (deleteMap.GetSeekAmount() > 0)
                 DoRewind(deleteMap.GetSeekAmount() * FFREW_MULTICOUNT,
@@ -3653,7 +3653,7 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
                 DoRewind(fps * FFREW_MULTICOUNT / 2, true, true);
             }
         }
-        else if (action == "BIGJUMPFWD")
+        else if (action == ACTION_BIGJUMPFWD)
         {
             if (deleteMap.GetSeekAmount() > 0)
                 DoFastForward(deleteMap.GetSeekAmount() * FFREW_MULTICOUNT,
@@ -3687,7 +3687,7 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
             DisableEdit(false);
             refresh = false;
         }
-        else if (action == "SAVEMAP")
+        else if (action == ACTION_SAVEMAP)
         {
             deleteMap.SaveMap(totalFrames, player_ctx);
             refresh = true;
