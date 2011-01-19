@@ -31,7 +31,7 @@ case "${SOURCE_VERSION}" in
         fi
     ;;
     *)
-    BRANCH=$(git branch | sed -e '/^[^\*]/d' -e 's/^\* //' -e 's/(no branch)/exported/')
+    BRANCH=$(git branch --no-color | sed -e '/^[^\*]/d' -e 's/^\* //' -e 's/(no branch)/exported/')
     ;;
 esac
 
