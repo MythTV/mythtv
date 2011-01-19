@@ -520,6 +520,8 @@ void PlaybackBox::Init()
     m_recordingList->SetLCDTitles(tr("Recordings"),
                                   "titlesubtitle|shortdate|starttime");
 
+    m_recordingList->SetSearchFields("titlesubtitle");
+
     if (gCoreContext->GetNumSetting("QueryInitialFilter", 0) == 1)
         showGroupFilter();
     else if (!m_player)
