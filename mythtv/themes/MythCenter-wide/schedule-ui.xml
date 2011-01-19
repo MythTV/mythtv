@@ -702,7 +702,7 @@
         </textarea>
 
         <shape name="list_background" from="basebackground">
-            <area>20,48,1240,360</area>
+            <area>20,48,1240,390</area>
         </shape>
 
         <textarea name="prioritylabel" from="basetextarea">
@@ -770,7 +770,7 @@
                 <position>1214,-36</position>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>1210,356</position>
+                <position>1210,386</position>
             </statetype>
         </buttonlist>
 
