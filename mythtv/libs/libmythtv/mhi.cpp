@@ -399,10 +399,10 @@ bool MHIContext::OfferKey(QString key)
             m_keyProfile == 14 || m_keyProfile == 15)
             action = 4;
     }
-    else if (key == "0" || key == "1" || key == "2" ||
-             key == "3" || key == "4" || key == "5" ||
-             key == "6" || key == "7" || key == "8" ||
-             key == "9")
+    else if (key == ACTION_0 || key == ACTION_1 || key == ACTION_2 ||
+             key == ACTION_3 || key == ACTION_4 || key == ACTION_5 ||
+             key == ACTION_6 || key == ACTION_7 || key == ACTION_8 ||
+             key == ACTION_9)
     {
         if (m_keyProfile == 4 || m_keyProfile == 14)
             action = key.toInt() + 5;

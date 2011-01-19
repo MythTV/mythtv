@@ -5,6 +5,17 @@
 
 #include "videoouttypes.h"
 
+#define ACTION_0 "0"
+#define ACTION_1 "1"
+#define ACTION_2 "2"
+#define ACTION_3 "3"
+#define ACTION_4 "4"
+#define ACTION_5 "5"
+#define ACTION_6 "6"
+#define ACTION_7 "7"
+#define ACTION_8 "8"
+#define ACTION_9 "9"
+
 #define ACTION_GUIDE             "GUIDE"
 #define ACTION_FINDER            "FINDER"
 #define ACTION_TOGGLESLEEP       QString("TOGGLESLEEP")

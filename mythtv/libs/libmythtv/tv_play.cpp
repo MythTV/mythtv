@@ -3932,43 +3932,43 @@ bool TV::DiscMenuHandleAction(PlayerContext *ctx, const QStringList &actions)
         {
             bdrb->PressButton(BD_VK_RIGHT, pts);
         }
-        else if (has_action("0", actions))
+        else if (has_action(ACTION_0, actions))
         {
             bdrb->PressButton(BD_VK_0, pts);
         }
-        else if (has_action("1", actions))
+        else if (has_action(ACTION_1, actions))
         {
             bdrb->PressButton(BD_VK_1, pts);
         }
-        else if (has_action("2", actions))
+        else if (has_action(ACTION_2, actions))
         {
             bdrb->PressButton(BD_VK_2, pts);
         }
-        else if (has_action("3", actions))
+        else if (has_action(ACTION_3, actions))
         {
             bdrb->PressButton(BD_VK_3, pts);
         }
-        else if (has_action("4", actions))
+        else if (has_action(ACTION_4, actions))
         {
             bdrb->PressButton(BD_VK_4, pts);
         }
-        else if (has_action("5", actions))
+        else if (has_action(ACTION_5, actions))
         {
             bdrb->PressButton(BD_VK_5, pts);
         }
-        else if (has_action("6", actions))
+        else if (has_action(ACTION_6, actions))
         {
             bdrb->PressButton(BD_VK_6, pts);
         }
-        else if (has_action("7", actions))
+        else if (has_action(ACTION_7, actions))
         {
             bdrb->PressButton(BD_VK_7, pts);
         }
-        else if (has_action("8", actions))
+        else if (has_action(ACTION_8, actions))
         {
             bdrb->PressButton(BD_VK_8, pts);
         }
-        else if (has_action("9", actions))
+        else if (has_action(ACTION_9, actions))
         {
             bdrb->PressButton(BD_VK_9, pts);
         }

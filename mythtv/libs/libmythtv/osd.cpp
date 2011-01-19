@@ -1076,10 +1076,10 @@ bool OSD::TeletextAction(const QString &action)
         tt->KeyPress(TTKey::kFlofWhite);
     else if (action == ACTION_REVEAL)
         tt->KeyPress(TTKey::kRevealHidden);
-    else if (action == "0" || action == "1" || action == "2" ||
-             action == "3" || action == "4" || action == "5" ||
-             action == "6" || action == "7" || action == "8" ||
-             action == "9")
+    else if (action == ACTION_0 || action == ACTION_1 || action == ACTION_2 ||
+             action == ACTION_3 || action == ACTION_4 || action == ACTION_5 ||
+             action == ACTION_6 || action == ACTION_7 || action == ACTION_8 ||
+             action == ACTION_9)
         tt->KeyPress(action.toInt());
     else
         return false;
