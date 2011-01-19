@@ -502,6 +502,7 @@
             <area>30,60,1220,374</area>
             <buttonarea>0,0,1200,374</buttonarea>
             <spacing>4</spacing>
+            <searchposition>-1,450</searchposition>
             <statetype name="buttonitem">
                 <area>0,0,1200,24</area>
                 <state name="active">
@@ -718,6 +719,7 @@
 
         <buttonlist name="programs" from="basebuttonlist2">
             <position>24,60</position>
+            <searchposition>-1,450</searchposition>
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="rectypechar" from="buttontext">
@@ -1155,6 +1157,7 @@
             <area>30,60,1220,374</area>
             <buttonarea>0,0,1200,374</buttonarea>
             <spacing>4</spacing>
+            <searchposition>-1,450</searchposition>
             <statetype name="buttonitem">
                 <area>0,0,1200,24</area>
                 <state name="active">
@@ -1461,29 +1464,31 @@
         </textarea>
 
         <shape name="list_background" from="basebackground">
-            <area>20,48,1240,380</area>
+            <area>20,48,1240,360</area>
         </shape>
 
         <textarea name="callsignlabel" from="basetextarea">
-            <area>500,4,170,40</area>
+            <area>620,14,170,40</area>
             <value>Channel</value>
-            <align>right</align>
+            <align>left</align>
         </textarea>
 
         <textarea name="lastrecordedlabel" from="basetextarea">
-            <area>680,4,300,40</area>
+            <area>840,14,300,40</area>
             <value>Last Recorded</value>
             <align>right</align>
         </textarea>
 
         <textarea name="prioritylabel" from="basetextarea">
-            <area>1100,4,180,40</area>
+            <area>1065,14,180,40</area>
+            <align>right</align>
             <value>Priority</value>
         </textarea>
 
         <buttonlist name="programs" from="basebuttonlist2">
             <area>20,26,1280,420</area>
             <buttonarea>0,34,1240,340</buttonarea>
+            <searchposition>-1,450</searchposition>
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="rectype" from="buttontext">
@@ -1501,7 +1506,7 @@
                         <align>vcenter,right</align>
                     </textarea>
                     <textarea name="finalpriority" from="buttontext">
-                        <area>1140,2,40,24</area>
+                        <area>1160,2,40,24</area>
                         <align>vcenter,right</align>
                     </textarea>
                     <textarea name="dummy" from="buttontext">
@@ -1517,10 +1522,10 @@
                 <state name="selectedinactive" from="active" />
             </statetype>
             <statetype name="upscrollarrow">
-                <position>1212,0</position>
+                <position>1170,386</position>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>1212,386</position>
+                <position>1200,386</position>
             </statetype>
         </buttonlist>
 

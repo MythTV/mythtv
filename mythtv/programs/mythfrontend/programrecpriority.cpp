@@ -450,6 +450,7 @@ bool ProgramRecPriority::Create()
             SLOT(edit(MythUIButtonListItem*)));
 
     m_programList->SetLCDTitles(tr("Schedule Priorities"), "rec_type|titlesubtitle|progpriority|finalpriority");
+    m_programList->SetSearchFields("titlesubtitle");
 
     BuildFocusList();
     LoadInBackground();

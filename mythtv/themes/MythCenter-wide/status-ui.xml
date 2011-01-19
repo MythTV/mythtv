@@ -68,6 +68,7 @@
 
         <buttonlist name="log" from="basebuttonlist2">
             <position>18,108</position>
+            <searchposition>-1,490</searchposition>
         </buttonlist>
 
         <textarea name="helplabel">
