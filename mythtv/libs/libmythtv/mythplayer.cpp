@@ -1260,7 +1260,7 @@ bool MythPlayer::HandleTeletextAction(const QString &action)
     bool handled = true;
 
     osdLock.lock();
-    if (action == "MENU" || action == TV_TOGGLETT || action == "ESCAPE")
+    if (action == "MENU" || action == ACTION_TOGGLETT || action == "ESCAPE")
         DisableTeletext();
     else
         handled = osd->TeletextAction(action);

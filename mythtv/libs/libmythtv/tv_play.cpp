@@ -687,19 +687,19 @@ void TV::InitKeys(void)
             "video frame"), "");
 
     /* Interactive Television keys */
-    REG_KEY("TV Playback", TV_MENURED,    QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_MENURED,    QT_TRANSLATE_NOOP("MythControls",
             "Menu Red"),    "F2");
-    REG_KEY("TV Playback", TV_MENUGREEN,  QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_MENUGREEN,  QT_TRANSLATE_NOOP("MythControls",
             "Menu Green"),  "F3");
-    REG_KEY("TV Playback", TV_MENUYELLOW, QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_MENUYELLOW, QT_TRANSLATE_NOOP("MythControls",
             "Menu Yellow"), "F4");
-    REG_KEY("TV Playback", TV_MENUBLUE,   QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_MENUBLUE,   QT_TRANSLATE_NOOP("MythControls",
             "Menu Blue"),   "F5");
-    REG_KEY("TV Playback", TV_TEXTEXIT,   QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_TEXTEXIT,   QT_TRANSLATE_NOOP("MythControls",
             "Menu Exit"),   "F6");
-    REG_KEY("TV Playback", TV_MENUTEXT,   QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_MENUTEXT,   QT_TRANSLATE_NOOP("MythControls",
             "Menu Text"),   "F7");
-    REG_KEY("TV Playback", TV_MENUEPG,    QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_MENUEPG,    QT_TRANSLATE_NOOP("MythControls",
             "Menu EPG"),    "F12");
 
     /* Editing keys */
@@ -721,29 +721,29 @@ void TV::InitKeys(void)
             "Jump forward 10x the normal amount"), ">,.");
 
     /* Teletext keys */
-    REG_KEY("Teletext Menu", TV_NEXTPAGE,    QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("Teletext Menu", ACTION_NEXTPAGE,    QT_TRANSLATE_NOOP("MythControls",
             "Next Page"),             "Down");
-    REG_KEY("Teletext Menu", TV_PREVPAGE,    QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("Teletext Menu", ACTION_PREVPAGE,    QT_TRANSLATE_NOOP("MythControls",
             "Previous Page"),         "Up");
-    REG_KEY("Teletext Menu", TV_NEXTSUBPAGE, QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("Teletext Menu", ACTION_NEXTSUBPAGE, QT_TRANSLATE_NOOP("MythControls",
             "Next Subpage"),          "Right");
-    REG_KEY("Teletext Menu", TV_PREVSUBPAGE, QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("Teletext Menu", ACTION_PREVSUBPAGE, QT_TRANSLATE_NOOP("MythControls",
             "Previous Subpage"),      "Left");
-    REG_KEY("Teletext Menu", TV_TOGGLETT,    QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("Teletext Menu", ACTION_TOGGLETT,    QT_TRANSLATE_NOOP("MythControls",
             "Toggle Teletext"),       "T");
-    REG_KEY("Teletext Menu", TV_MENURED,     QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("Teletext Menu", ACTION_MENURED,     QT_TRANSLATE_NOOP("MythControls",
             "Menu Red"),              "F2");
-    REG_KEY("Teletext Menu", TV_MENUGREEN,   QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("Teletext Menu", ACTION_MENUGREEN,   QT_TRANSLATE_NOOP("MythControls",
             "Menu Green"),            "F3");
-    REG_KEY("Teletext Menu", TV_MENUYELLOW,  QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("Teletext Menu", ACTION_MENUYELLOW,  QT_TRANSLATE_NOOP("MythControls",
             "Menu Yellow"),           "F4");
-    REG_KEY("Teletext Menu", TV_MENUBLUE,    QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("Teletext Menu", ACTION_MENUBLUE,    QT_TRANSLATE_NOOP("MythControls",
             "Menu Blue"),             "F5");
-    REG_KEY("Teletext Menu", TV_MENUWHITE,   QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("Teletext Menu", ACTION_MENUWHITE,   QT_TRANSLATE_NOOP("MythControls",
             "Menu White"),            "F6");
-    REG_KEY("Teletext Menu", TV_TOGGLEBACKGROUND,
+    REG_KEY("Teletext Menu", ACTION_TOGGLEBACKGROUND,
             QT_TRANSLATE_NOOP("MythControls", "Toggle Background"), "F7");
-    REG_KEY("Teletext Menu", TV_REVEAL,      QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("Teletext Menu", ACTION_REVEAL,      QT_TRANSLATE_NOOP("MythControls",
             "Reveal hidden Text"),    "F8");
 
 /*
@@ -3897,7 +3897,7 @@ bool TV::DiscMenuHandleAction(PlayerContext *ctx, const QStringList &actions)
             }
         }
 
-        if (has_action(TV_MENUTEXT, actions))
+        if (has_action(ACTION_MENUTEXT, actions))
         {
             bdrb->PressButton(BD_VK_POPUP, pts);
             return true;

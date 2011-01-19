@@ -6,23 +6,23 @@
 #include "videoouttypes.h"
 
 /* Interactive Television keys */
-#define TV_MENURED    "MENURED"
-#define TV_MENUGREEN  "MENUGREEN"
-#define TV_MENUYELLOW "MENYELLOW"
-#define TV_MENUBLUE   "MENUBLUE"
-#define TV_TEXTEXIT   "TEXTEXIT"
-#define TV_MENUTEXT   "MENUTEXT"
-#define TV_MENUEPG    "MENUEPG"
+#define ACTION_MENURED    "MENURED"
+#define ACTION_MENUGREEN  "MENUGREEN"
+#define ACTION_MENUYELLOW "MENYELLOW"
+#define ACTION_MENUBLUE   "MENUBLUE"
+#define ACTION_TEXTEXIT   "TEXTEXIT"
+#define ACTION_MENUTEXT   "MENUTEXT"
+#define ACTION_MENUEPG    "MENUEPG"
 
 /* Teletext keys */
-#define TV_NEXTPAGE         "NEXTPAGE"
-#define TV_PREVPAGE         "PREVPAGE"
-#define TV_NEXTSUBPAGE      "NEXTSUBPAGE"
-#define TV_PREVSUBPAGE      "PREVSUBPAGE"
-#define TV_TOGGLETT         "TOGGLETT"
-#define TV_MENUWHITE        "MENUWHITE"
-#define TV_TOGGLEBACKGROUND "TOGGLEBACKGROUND"
-#define TV_REVEAL           "REVEAL"
+#define ACTION_NEXTPAGE         "NEXTPAGE"
+#define ACTION_PREVPAGE         "PREVPAGE"
+#define ACTION_NEXTSUBPAGE      "NEXTSUBPAGE"
+#define ACTION_PREVSUBPAGE      "PREVSUBPAGE"
+#define ACTION_TOGGLETT         "TOGGLETT"
+#define ACTION_MENUWHITE        "MENUWHITE"
+#define ACTION_TOGGLEBACKGROUND "TOGGLEBACKGROUND"
+#define ACTION_REVEAL           "REVEAL"
 
 /** \brief ChannelChangeDirection is an enumeration of possible channel
  *         changing directions.

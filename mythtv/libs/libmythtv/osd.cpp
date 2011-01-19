@@ -1054,27 +1054,27 @@ bool OSD::TeletextAction(const QString &action)
     if (!tt)
         return false;
 
-    if (action == TV_NEXTPAGE)
+    if (action == ACTION_NEXTPAGE)
         tt->KeyPress(TTKey::kNextPage);
-    else if (action == TV_PREVPAGE)
+    else if (action == ACTION_PREVPAGE)
         tt->KeyPress(TTKey::kPrevPage);
-    else if (action == TV_NEXTSUBPAGE)
+    else if (action == ACTION_NEXTSUBPAGE)
         tt->KeyPress(TTKey::kNextSubPage);
-    else if (action == TV_PREVSUBPAGE)
+    else if (action == ACTION_PREVSUBPAGE)
         tt->KeyPress(TTKey::kPrevSubPage);
-    else if (action == TV_TOGGLEBACKGROUND)
+    else if (action == ACTION_TOGGLEBACKGROUND)
         tt->KeyPress(TTKey::kTransparent);
-    else if (action == TV_MENURED)
+    else if (action == ACTION_MENURED)
         tt->KeyPress(TTKey::kFlofRed);
-    else if (action == TV_MENUGREEN)
+    else if (action == ACTION_MENUGREEN)
         tt->KeyPress(TTKey::kFlofGreen);
-    else if (action == TV_MENUYELLOW)
+    else if (action == ACTION_MENUYELLOW)
         tt->KeyPress(TTKey::kFlofYellow);
-    else if (action == TV_MENUBLUE)
+    else if (action == ACTION_MENUBLUE)
         tt->KeyPress(TTKey::kFlofBlue);
-    else if (action == TV_MENUWHITE)
+    else if (action == ACTION_MENUWHITE)
         tt->KeyPress(TTKey::kFlofWhite);
-    else if (action == TV_REVEAL)
+    else if (action == ACTION_REVEAL)
         tt->KeyPress(TTKey::kRevealHidden);
     else if (action == "0" || action == "1" || action == "2" ||
              action == "3" || action == "4" || action == "5" ||

@@ -413,19 +413,19 @@ bool MHIContext::OfferKey(QString key)
             m_keyProfile == 14 || m_keyProfile == 15)
             action = 15;
     }
-    else if (key == TV_TEXTEXIT)
+    else if (key == ACTION_TEXTEXIT)
         action = 16;
-    else if (key == TV_MENURED)
+    else if (key == ACTION_MENURED)
         action = 100;
-    else if (key == TV_MENUGREEN)
+    else if (key == ACTION_MENUGREEN)
         action = 101;
-    else if (key == TV_MENUYELLOW)
+    else if (key == ACTION_MENUYELLOW)
         action = 102;
-    else if (key == TV_MENUBLUE)
+    else if (key == ACTION_MENUBLUE)
         action = 103;
-    else if (key == TV_MENUTEXT)
+    else if (key == ACTION_MENUTEXT)
         action = m_keyProfile > 12 ? 105 : 104;
-    else if (key == TV_MENUEPG)
+    else if (key == ACTION_MENUEPG)
         action = m_keyProfile > 12 ? 300 : 0;
 
     if (action != 0)
