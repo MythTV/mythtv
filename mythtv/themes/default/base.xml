@@ -918,6 +918,56 @@
 
     </window>
 
+    <!-- Popup search dialog used to search button lists -->
+    <window name="MythSearchListDialog">
+        <area>-1,-1,620,165</area>
+        <imagetype name="backimg">
+            <area>0,0,620,165</area>
+            <filename>mythprogressdialog-background.png</filename>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>5,10,600,30</area>
+            <multiline>yes</multiline>
+            <align>allcenter</align>
+            <value>Search List</value>
+        </textarea>
+
+        <textedit name="searchedit" from="basetextedit">
+            <position>120,40</position>
+        </textedit>
+
+        <button name="prevbutton" from="basebutton">
+            <position>20,105</position>
+            <value>Previous</value>
+        </button>
+
+        <button name="nextbutton" from="basebutton">
+            <position>445,105</position>
+            <value>Next</value>
+        </button>
+
+        <statetype name="searchstate">
+            <area>210,120,200,30</area>
+            <state name="found">
+                <textarea name="statustext" from="basetextarea">
+                    <area>0,0,200,30</area>
+                    <align>allcenter</align>
+                    <font>basesmallgreen</font>
+                    <value>Found</value>
+                </textarea>
+            </state>
+            <state name="notfound">
+                <textarea name="statustext" from="basetextarea">
+                    <area>0,0,200,30</area>
+                    <align>allcenter</align>
+                    <font>basesmallred</font>
+                    <value>Not Found</value>
+                </textarea>
+            </state>
+        </statetype>
+    </window>
+
     <window name="MythFileBrowser">
         <area>-1,-1,730,510</area>
         <imagetype name="backimg">

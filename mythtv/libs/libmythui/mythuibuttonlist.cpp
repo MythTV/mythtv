@@ -13,6 +13,9 @@
 #include "mythmainwindow.h"
 #include "mythuistatetype.h"
 #include "lcddevice.h"
+#include "mythuibutton.h"
+#include "mythuitext.h"
+#include "mythuitextedit.h"
 
 #define LOC     QString("MythUIButtonList(%1): ").arg(objectName())
 #define LOC_ERR QString("MythUIButtonList(%1), Error: ").arg(objectName())
@@ -70,6 +73,10 @@ void MythUIButtonList::Const(void)
     m_topRows          = 0;
     m_bottomRows       = 0;
     m_lcdTitle         = "";
+
+    m_searchPosition   = MythPoint(-2, -2);
+    m_searchFields     = "**ALL**";
+    m_searchStartsWith = false;
 
     m_upArrow = m_downArrow = NULL;
 
@@ -2190,6 +2197,36 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
             if (item)
                 emit itemClicked(item);
         }
+        else if (action == "SEARCH")
+        {
+            MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+            SearchButtonListDialog *dlg = new SearchButtonListDialog(popupStack, "MythSearchListDialog", this, "");
+
+            if (dlg->Create())
+            {
+                if (m_searchPosition.x() != -2 || m_searchPosition.y() != -2)
+                {
+                    int x = m_searchPosition.x();
+                    int y = m_searchPosition.y();
+                    QRect screenArea = GetMythMainWindow()->GetUIScreenRect();
+                    QRect dialogArea = dlg->GetArea();
+
+                    if (x == -1)
+                        x = (screenArea.width() - dialogArea.width()) / 2;
+
+                    if (y == -1)
+                        y = (screenArea.height() - dialogArea.height()) / 2;
+
+                    dlg->SetPosition(x, y);
+                }
+
+                popupStack->AddScreen(dlg);
+            }
+            else
+                delete dlg;
+        }
+
         else
             handled = false;
     }
@@ -2369,6 +2406,10 @@ bool MythUIButtonList::ParseElement(
         m_drawFromBottom = parseBool(element);
         m_alignment |= Qt::AlignBottom;
     }
+    else if (element.tagName() == "searchposition")
+    {
+        m_searchPosition = parsePoint(element);
+    }
     else
     {
         return MythUIType::ParseElement(filename, element, showWarnings);
@@ -2427,6 +2468,9 @@ void MythUIButtonList::CopyFrom(MythUIType *base)
 
     m_clearing = false;
     m_selPosition = m_topPosition = m_itemCount = 0;
+
+    m_searchPosition = lb->m_searchPosition;
+    m_searchFields = lb->m_searchFields;
 
     MythUIType::CopyFrom(base);
 
@@ -2518,6 +2562,82 @@ void MythUIButtonList::updateLCD(void)
 
     if (!menuItems.isEmpty())
         lcddev->switchToMenu(menuItems, m_lcdTitle);
+}
+
+bool MythUIButtonList::Find(const QString &searchStr, bool startsWith)
+{
+    m_searchStr = searchStr;
+    m_searchStartsWith = startsWith;
+    return DoFind(false, true);
+}
+
+bool MythUIButtonList::FindNext(void)
+{
+    return DoFind(true, true);
+}
+
+bool MythUIButtonList::FindPrev(void)
+{
+    return DoFind(true, false);
+}
+
+bool MythUIButtonList::DoFind(bool doMove, bool searchForward)
+{
+    if (m_searchStr.isEmpty())
+        return true;
+
+    int startPos = GetCurrentPos();
+    int currPos = startPos;
+    bool found = false;
+
+    if (doMove)
+    {
+        if (searchForward)
+        {
+            currPos++;
+
+            if (currPos >= GetCount())
+                currPos = 0;
+        }
+        else
+        {
+            currPos--;
+
+            if (currPos < 0)
+                currPos = GetCount() - 1;
+        }
+    }
+
+    while (true)
+    {
+        found = GetItemAt(currPos)->FindText(m_searchStr, m_searchFields, m_searchStartsWith);
+
+        if (found)
+        {
+            SetItemCurrent(currPos);
+            return true;
+        }
+
+        if (searchForward)
+        {
+            currPos++;
+
+            if (currPos >= GetCount())
+                currPos = 0;
+        }
+        else
+        {
+            currPos--;
+
+            if (currPos < 0)
+                currPos = GetCount() - 1;
+        }
+
+        if (startPos == currPos)
+            break;
+    }
+
+    return false;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -2631,6 +2751,70 @@ QString MythUIButtonListItem::GetText(const QString &name) const
         return m_strings[name].text;
     else
         return QString();
+}
+
+bool MythUIButtonListItem::FindText(const QString &searchStr, const QString &fieldList,
+                                    bool startsWith) const
+{
+    if (fieldList.isEmpty())
+    {
+        if (startsWith)
+            return m_text.startsWith(searchStr, Qt::CaseInsensitive);
+        else
+            return m_text.contains(searchStr, Qt::CaseInsensitive);
+    }
+    else if (fieldList == "**ALL**")
+    {
+        if (startsWith)
+        {
+            if (m_text.startsWith(searchStr, Qt::CaseInsensitive))
+                return true;
+        }
+        else
+        {
+            if (m_text.contains(searchStr, Qt::CaseInsensitive))
+                return true;
+        }
+
+        QMap<QString, TextProperties>::const_iterator i = m_strings.constBegin();
+        while (i != m_strings.constEnd())
+        {
+            if (startsWith)
+            {
+                if (i.value().text.startsWith(searchStr, Qt::CaseInsensitive))
+                    return true;
+            }
+            else
+            {
+                if (i.value().text.contains(searchStr, Qt::CaseInsensitive))
+                    return true;
+            }
+
+            ++i;
+        }
+    }
+    else
+    {
+        QStringList fields = fieldList.split(',', QString::SkipEmptyParts);
+        for (int x = 0; x < fields.count(); x++)
+        {
+            if (m_strings.contains(fields.at(x).trimmed()))
+            {
+                if (startsWith)
+                {
+                    if (m_strings[fields.at(x)].text.startsWith(searchStr, Qt::CaseInsensitive))
+                        return true;
+                }
+                else
+                {
+                    if (m_strings[fields.at(x)].text.contains(searchStr, Qt::CaseInsensitive))
+                        return true;
+                }
+            }
+        }
+    }
+
+    return false;
 }
 
 void MythUIButtonListItem::SetFontState(const QString &state,
@@ -2973,4 +3157,97 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
     }
 
     m_parent->ItemVisible(this);
+}
+
+//---------------------------------------------------------
+// SearchButtonListDialog
+//---------------------------------------------------------
+SearchButtonListDialog::SearchButtonListDialog(MythScreenStack *parent, const char *name,
+                                   MythUIButtonList *parentList, QString searchText)
+         : MythScreenType(parent, name, false)
+{
+    m_parentList = parentList;
+    m_searchText = searchText;
+    m_startsWith = false;
+}
+
+SearchButtonListDialog::~SearchButtonListDialog(void)
+{
+}
+
+bool SearchButtonListDialog::Create(void)
+{
+    if (!CopyWindowFromBase("MythSearchListDialog", this))
+        return false;
+
+    bool err = false;
+    UIUtilE::Assign(this, m_searchEdit,  "searchedit", &err);
+    UIUtilE::Assign(this, m_prevButton,  "prevbutton", &err);
+    UIUtilE::Assign(this, m_nextButton,  "nextbutton", &err);
+    UIUtilW::Assign(this, m_searchState, "searchstate");
+
+    if (err)
+    {
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'MythSearchListDialog'");
+        return false;
+    }
+
+    m_searchEdit->SetText(m_searchText);
+
+    connect(m_searchEdit, SIGNAL(valueChanged()), SLOT(searchChanged()));
+    connect(m_prevButton, SIGNAL(Clicked()), SLOT(prevClicked()));
+    connect(m_nextButton, SIGNAL(Clicked()), SLOT(nextClicked()));
+
+    BuildFocusList();
+
+    return true;
+}
+
+bool SearchButtonListDialog::keyPressEvent(QKeyEvent *event)
+{
+    QStringList actions;
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Music", event, actions, false);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "0")
+        {
+            m_startsWith = !m_startsWith;
+            searchChanged();
+        }
+        else
+            handled = false;
+    }
+
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
+}
+
+void SearchButtonListDialog::searchChanged(void)
+{
+    bool found = m_parentList->Find(m_searchEdit->GetText(), m_startsWith);
+
+    if (m_searchState)
+        m_searchState->DisplayState(found ? "found" : "notfound");
+}
+
+void SearchButtonListDialog::nextClicked(void)
+{
+    bool found = m_parentList->FindNext();
+
+    if (m_searchState)
+        m_searchState->DisplayState(found ? "found" : "notfound");
+}
+
+void SearchButtonListDialog::prevClicked(void)
+{
+    bool found = m_parentList->FindPrev();
+
+    if (m_searchState)
+        m_searchState->DisplayState(found ? "found" : "notfound");
 }

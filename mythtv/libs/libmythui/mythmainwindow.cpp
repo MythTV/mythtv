@@ -1064,6 +1064,8 @@ void MythMainWindow::InitKeys()
         ,"Copy text from textedit"), "Ctrl+C");
     RegisterKey("Global", "PASTE", QT_TRANSLATE_NOOP("MythControls",
         "Paste text into textedit"), "Ctrl+V");
+    RegisterKey("Global", "SEARCH", QT_TRANSLATE_NOOP("MythControls",
+        "Show incremental search dialog"), "Ctrl+S");
 
     RegisterKey("Global", "0", QT_TRANSLATE_NOOP("MythControls","0"), "0");
     RegisterKey("Global", "1", QT_TRANSLATE_NOOP("MythControls","1"), "1");
