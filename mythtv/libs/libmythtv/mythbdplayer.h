@@ -30,6 +30,7 @@ class MythBDPlayer : public MythPlayer
   protected:
     // Playback
     virtual bool VideoLoop(void);
+    virtual void EventStart(void);
     virtual void PreProcessNormalFrame(void);
 
   private:

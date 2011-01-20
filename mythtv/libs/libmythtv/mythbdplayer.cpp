@@ -75,6 +75,24 @@ bool MythBDPlayer::VideoLoop(void)
     return MythPlayer::VideoLoop();
 }
 
+void MythBDPlayer::EventStart(void)
+{
+    player_ctx->LockPlayingInfo(__FILE__, __LINE__);
+    if (player_ctx->playingInfo)
+    {
+        QString name;
+        QString serialid;
+        if (player_ctx->playingInfo->GetTitle().isEmpty() &&
+            player_ctx->buffer->BD()->GetNameAndSerialNum(name, serialid))
+        {
+            player_ctx->playingInfo->SetTitle(name);
+        }
+    }
+    player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+
+    MythPlayer::EventStart();
+}
+
 int MythBDPlayer::GetNumChapters(void)
 {
     int num = 0;

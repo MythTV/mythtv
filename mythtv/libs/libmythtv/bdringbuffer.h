@@ -56,6 +56,7 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     void SkipBDWaitingForPlayer(void) { m_playerWait = false; }
     virtual void IgnoreWaitStates(bool ignore) { m_ignorePlayerWait = ignore; }
     virtual bool StartFromBeginning(void);
+    bool GetNameAndSerialNum(QString& _name, QString& _serialnum);
 
     void ClearOverlays(void);
     BDOverlay* GetOverlay(void);

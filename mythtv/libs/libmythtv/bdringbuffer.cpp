@@ -886,6 +886,19 @@ bool BDRingBuffer::StartFromBeginning(void)
     return true;
 }
 
+bool BDRingBuffer::GetNameAndSerialNum(QString &name, QString &serial)
+{
+    if (!m_metaDiscLibrary)
+        return false;
+
+    name   = QString(m_metaDiscLibrary->di_name);
+    serial = QString::number(m_metaDiscLibrary->di_set_number);
+
+    if (name.isEmpty() && serial.isEmpty())
+        return false;
+    return true;
+}
+
 void BDRingBuffer::ClearOverlays(void)
 {
     QMutexLocker lock(&m_overlayLock);
