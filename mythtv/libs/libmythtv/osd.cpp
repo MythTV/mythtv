@@ -1051,39 +1051,9 @@ bool OSD::TeletextAction(const QString &action)
         return false;
 
     TeletextScreen* tt = (TeletextScreen*)m_Children.value(OSD_WIN_TELETEXT);
-    if (!tt)
-        return false;
-
-    if (action == ACTION_NEXTPAGE)
-        tt->KeyPress(TTKey::kNextPage);
-    else if (action == ACTION_PREVPAGE)
-        tt->KeyPress(TTKey::kPrevPage);
-    else if (action == ACTION_NEXTSUBPAGE)
-        tt->KeyPress(TTKey::kNextSubPage);
-    else if (action == ACTION_PREVSUBPAGE)
-        tt->KeyPress(TTKey::kPrevSubPage);
-    else if (action == ACTION_TOGGLEBACKGROUND)
-        tt->KeyPress(TTKey::kTransparent);
-    else if (action == ACTION_MENURED)
-        tt->KeyPress(TTKey::kFlofRed);
-    else if (action == ACTION_MENUGREEN)
-        tt->KeyPress(TTKey::kFlofGreen);
-    else if (action == ACTION_MENUYELLOW)
-        tt->KeyPress(TTKey::kFlofYellow);
-    else if (action == ACTION_MENUBLUE)
-        tt->KeyPress(TTKey::kFlofBlue);
-    else if (action == ACTION_MENUWHITE)
-        tt->KeyPress(TTKey::kFlofWhite);
-    else if (action == ACTION_REVEAL)
-        tt->KeyPress(TTKey::kRevealHidden);
-    else if (action == ACTION_0 || action == ACTION_1 || action == ACTION_2 ||
-             action == ACTION_3 || action == ACTION_4 || action == ACTION_5 ||
-             action == ACTION_6 || action == ACTION_7 || action == ACTION_8 ||
-             action == ACTION_9)
-        tt->KeyPress(action.toInt());
-    else
-        return false;
-    return true;
+    if (tt)
+        return tt->KeyPress(action);
+    return false;
 }
 
 void OSD::TeletextReset(void)

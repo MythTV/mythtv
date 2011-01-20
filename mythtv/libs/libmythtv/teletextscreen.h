@@ -20,7 +20,7 @@ class TeletextScreen: public MythScreenType
     virtual void Pulse(void);
 
     // TeletextViewer interface methods
-    void KeyPress(uint key);
+    bool KeyPress(const QString &key);
     void SetPage(int page, int subpage);
     void SetDisplaying(bool display);
     void Reset(void);
