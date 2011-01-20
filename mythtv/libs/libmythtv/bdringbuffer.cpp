@@ -136,10 +136,9 @@ uint64_t BDRingBuffer::Seek(uint64_t pos)
 {
     VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + QString("Seeking to %1.")
                 .arg(pos));
-
-    bd_seek_time(bdnav, pos);
-
-    return GetReadPosition();
+    if (bdnav)
+        return bd_seek_time(bdnav, pos);
+    return 0;
 }
 
 void BDRingBuffer::GetDescForPos(QString &desc) const
@@ -404,8 +403,6 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
             }
         }
 
-        bd_free_title_info(titleInfo);
-
         SwitchTitle(m_mainTitle);
     }
 
@@ -491,10 +488,6 @@ bool BDRingBuffer::SwitchTitle(uint32_t index)
         bd_free_title_info(m_currentTitleInfo);
 
     m_currentTitleInfo = bd_get_title_info(bdnav, index);
-
-    if (!m_currentTitleInfo)
-        return false;
-
     bd_select_title(bdnav, index);
 
     return UpdateTitleInfo(index);
@@ -509,15 +502,14 @@ bool BDRingBuffer::SwitchPlaylist(uint32_t index)
         bd_free_title_info(m_currentTitleInfo);
 
     m_currentTitleInfo = bd_get_playlist_info(bdnav, index);
-
-    if (!m_currentTitleInfo)
-        return false;
-
     return UpdateTitleInfo(index);
 }
 
 bool BDRingBuffer::UpdateTitleInfo(uint32_t index)
 {
+    if (!m_currentTitleInfo)
+        return false;
+
     m_titleChanged = true;
     m_currentTitleLength = m_currentTitleInfo->duration;
     m_currentTitleAngleCount = m_currentTitleInfo->angle_count;
@@ -883,7 +875,6 @@ void BDRingBuffer::WaitForPlayer(void)
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Player wait state was not cleared");
         m_playerWait = false;
     }
-    //Seek(0, SEEK_SET, true);
 }
 
 bool BDRingBuffer::StartFromBeginning(void)

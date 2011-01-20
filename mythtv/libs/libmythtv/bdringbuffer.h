@@ -62,7 +62,6 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     BDOverlay* GetOverlay(void);
     void SubmitOverlay(const bd_overlay_s * const overlay);
 
-
     uint32_t GetNumTitles(void) const { return m_numTitles; }
     int      GetCurrentTitle(void) const;
     uint64_t GetCurrentAngle(void) const { return m_currentAngle; }
@@ -104,21 +103,25 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     bool SwitchPlaylist(uint32_t index);
     bool SwitchAngle(uint angle);
 
-    bool UpdateTitleInfo(uint32_t index);
-
     virtual int safe_read(void *data, uint sz);
     virtual long long Seek(long long pos, int whence, bool has_lock);
     uint64_t Seek(uint64_t pos);
 
-    bool HandleBDEvents(void);
-    void HandleBDEvent(BD_EVENT &event);
+  private:
 
-    // navigation
+    // private player interaction
+    void WaitForPlayer(void);
+
+    // private title handling
+    bool UpdateTitleInfo(uint32_t index);
+
+    // private menu handling methods
     void PressButton(int32_t key, int64_t pts); // Keyboard
     void ClickButton(int64_t pts, uint16_t x, uint16_t y); // Mouse
 
-  protected:
-    void WaitForPlayer(void);
+    // private bluray event handling
+    bool HandleBDEvents(void);
+    void HandleBDEvent(BD_EVENT &event);
 
     BLURAY            *bdnav;
     meta_dl           *m_metaDiscLibrary;
@@ -156,7 +159,6 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     QMutex             m_overlayLock;
     QList<BDOverlay*>  m_overlayImages;
 
-  public:
     uint8_t            m_still;
     volatile bool      m_inMenu;
 
