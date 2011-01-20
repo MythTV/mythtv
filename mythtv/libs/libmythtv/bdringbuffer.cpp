@@ -432,7 +432,14 @@ long long BDRingBuffer::GetReadPosition(void) const
 uint32_t BDRingBuffer::GetNumChapters(void)
 {
     if (m_currentTitleInfo)
-        return m_currentTitleInfo->chapter_count;
+        return m_currentTitleInfo->chapter_count - 1;
+    return 0;
+}
+
+uint32_t BDRingBuffer::GetCurrentChapter(void)
+{
+    if (bdnav)
+        return bd_get_current_chapter(bdnav);
     return 0;
 }
 
@@ -516,7 +523,7 @@ bool BDRingBuffer::UpdateTitleInfo(uint32_t index)
     m_currentTitleAngleCount = m_currentTitleInfo->angle_count;
     m_currentAngle = 0;
     m_titlesize = bd_get_title_size(bdnav);
-    uint32_t chapter_count = m_currentTitleInfo->chapter_count;
+    uint32_t chapter_count = GetNumChapters();
     VERBOSE(VB_IMPORTANT, LOC + QString("Selected title/playlist: index %1. "
                                         "Duration: %2 (%3 mins) "
                                         "Number of Chapters: %4 Number of Angles: %5 "

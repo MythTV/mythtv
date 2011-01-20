@@ -75,6 +75,7 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     virtual long long GetReadPosition(void) const; // RingBuffer
     uint64_t GetTotalReadPosition(void);
     uint32_t GetNumChapters(void);
+    uint32_t GetCurrentChapter(void);
     uint64_t GetNumAngles(void) { return m_currentTitleAngleCount; }
     uint64_t GetChapterStartTime(uint32_t chapter);
     uint64_t GetChapterStartFrame(uint32_t chapter);

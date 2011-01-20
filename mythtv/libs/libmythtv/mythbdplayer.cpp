@@ -95,32 +95,16 @@ void MythBDPlayer::EventStart(void)
 
 int MythBDPlayer::GetNumChapters(void)
 {
-    int num = 0;
     if (player_ctx->buffer->BD() && player_ctx->buffer->BD()->IsOpen())
-        num = player_ctx->buffer->BD()->GetNumChapters();
-    if (num > 1)
-        return num;
-    return 0;
+        return player_ctx->buffer->BD()->GetNumChapters();
+    return -1;
 }
 
 int MythBDPlayer::GetCurrentChapter(void)
 {
-    uint total = GetNumChapters();
-    if (!total)
-        return 0;
-
-    for (int i = (total - 1); i > -1 ; i--)
-    {
-        uint64_t frame = player_ctx->buffer->BD()->GetChapterStartFrame(i);
-        if (framesPlayed >= frame)
-        {
-            VERBOSE(VB_PLAYBACK, LOC +
-                    QString("GetCurrentChapter(selected chapter %1 framenum %2)")
-                            .arg(i + 1).arg(frame));
-            return i + 1;
-        }
-    }
-    return 0;
+    if (player_ctx->buffer->BD() && player_ctx->buffer->BD()->IsOpen())
+        return player_ctx->buffer->BD()->GetCurrentChapter() + 1;
+    return -1;
 }
 
 int64_t MythBDPlayer::GetChapter(int chapter)
