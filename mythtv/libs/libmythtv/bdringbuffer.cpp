@@ -151,6 +151,9 @@ void BDRingBuffer::GetDescForPos(QString &desc) const
 
 bool BDRingBuffer::HandleAction(const QStringList &actions, int64_t pts)
 {
+    if (!m_is_hdmv_navigation)
+        return false;
+
     if (actions.contains(ACTION_MENUTEXT))
     {
         PressButton(BD_VK_POPUP, pts);
