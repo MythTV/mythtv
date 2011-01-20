@@ -502,7 +502,7 @@ void MusicPlayer::customEvent(QEvent *event)
                     if (list.size() >= 3)
                     {
                         int volume = list[3].toInt();
-                        if (volume >= 0 && volume <= 100) 
+                        if (volume >= 0 && volume <= 100)
                             setVolume(volume);
                     }
                 }
@@ -929,16 +929,16 @@ void MusicPlayer::updateLastplay()
             sendMetadataChangedEvent(m_currentMetadata->ID());
         }
         // if all_music is still in scope we need to keep that in sync
-        if (gMusicData->all_music)
-        {
-            Metadata *mdata
-                = gMusicData->all_music->getMetadata(m_currentNode->getInt());
-            if (mdata)
-            {
-                mdata->incPlayCount();
-                mdata->setLastPlay();
-            }
-        }
+//         if (gMusicData->all_music)
+//         {
+//             Metadata *mdata
+//                 = gMusicData->all_music->getMetadata(m_currentNode->getInt());
+//             if (mdata)
+//             {
+//                 mdata->incPlayCount();
+//                 mdata->setLastPlay();
+//             }
+//         }
     }
 
     m_updatedLastplay = true;
