@@ -2300,12 +2300,8 @@ void TV::StopStuff(PlayerContext *mctx, PlayerContext *ctx,
 
     SetActive(mctx, 0, false);
 
-    if (ctx->buffer && ctx->buffer->IsDVD())
-    {
-        VERBOSE(VB_PLAYBACK,LOC + " StopStuff() -- "
-                "get dvd player out of still frame or wait status");
-        ctx->buffer->DVD()->IgnoreStillOrWait(true);
-    }
+    if (ctx->buffer)
+        ctx->buffer->IgnoreWaitStates(true);
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (stopPlayer)

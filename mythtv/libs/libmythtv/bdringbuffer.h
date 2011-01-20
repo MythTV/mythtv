@@ -54,8 +54,8 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     // Player interaction
     bool BDWaitingForPlayer(void)     { return m_playerWait;  }
     void SkipBDWaitingForPlayer(void) { m_playerWait = false; }
-    void IgnoreWaitStates(bool ignore) { m_ignorePlayerWait = ignore; }
-    bool StartFromBeginning(void);
+    virtual void IgnoreWaitStates(bool ignore) { m_ignorePlayerWait = ignore; }
+    virtual bool StartFromBeginning(void);
 
     void ClearOverlays(void);
     BDOverlay* GetOverlay(void);

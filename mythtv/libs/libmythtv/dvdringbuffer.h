@@ -90,7 +90,7 @@ class MPUBLIC DVDRingBuffer : public RingBuffer
                           uint retry_ms = kDefaultOpenTimeout);
     void PlayTitleAndPart(int _title, int _part)
         { dvdnav_part_play(m_dvdnav, _title, _part); }
-    bool StartFromBeginning(void);
+    virtual bool StartFromBeginning(void);
     void CloseDVD(void);
     bool nextTrack(void);
     void prevTrack(void);
@@ -104,7 +104,7 @@ class MPUBLIC DVDRingBuffer : public RingBuffer
     void GoToNextProgram(void);
     void GoToPreviousProgram(void);
 
-    void IgnoreStillOrWait(bool skip)     { m_skipstillorwait = skip;       }
+    virtual void IgnoreWaitStates(bool ignore) { m_skipstillorwait = ignore; }
     void AudioStreamsChanged(bool change) { m_audioStreamsChanged = change; }
     uint GetCurrentTime(void)             { return (m_currentTime / 90000); }
     uint TitleTimeLeft(void);

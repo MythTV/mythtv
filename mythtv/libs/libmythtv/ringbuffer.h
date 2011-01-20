@@ -64,7 +64,8 @@ class MPUBLIC RingBuffer : protected QThread
     const BDRingBuffer  *BD(void)  const;
     DVDRingBuffer *DVD(void);
     BDRingBuffer  *BD(void);
-
+    virtual bool StartFromBeginning(void)                   { return true;  }
+    virtual void IgnoreWaitStates(bool ignore)              { }
     virtual bool IsInDiscMenuOrStillFrame(void) const       { return false; }
     virtual bool HandleAction(const QStringList &, int64_t) { return false; }
 

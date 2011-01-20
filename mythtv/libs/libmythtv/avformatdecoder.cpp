@@ -913,19 +913,10 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     int ret = FindStreamInfo();
 
-    if (ringBuffer->IsDVD())
-    {
-        if (!ringBuffer->DVD()->StartFromBeginning())
-            return -1;
-        ringBuffer->DVD()->IgnoreStillOrWait(false);
-    }
-
-    if (ringBuffer->IsBD())
-    {
-        if (!ringBuffer->BD()->StartFromBeginning())
-            return -1;
-        ringBuffer->BD()->IgnoreWaitStates(false);
-    }
+    // Reset DVD/bluray ringbuffers
+    if (!ringBuffer->StartFromBeginning())
+        return -1;
+    ringBuffer->IgnoreWaitStates(false);
 
     if (ret < 0)
     {
