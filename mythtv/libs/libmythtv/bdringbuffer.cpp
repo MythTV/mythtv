@@ -134,7 +134,7 @@ long long BDRingBuffer::Seek(long long pos, int whence, bool has_lock)
 
 uint64_t BDRingBuffer::Seek(uint64_t pos)
 {
-    VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + QString("Seeking to %1.")
+    VERBOSE(VB_PLAYBACK, LOC + QString("Seeking to %1.")
                 .arg(pos));
     if (bdnav)
         return bd_seek_time(bdnav, pos);
@@ -756,50 +756,50 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
         /* current playback position */
 
         case BD_EVENT_ANGLE:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+            VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_ANGLE %1").arg(ev.param));
             m_currentAngle = ev.param;
             break;
         case BD_EVENT_TITLE:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+            VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_TITLE %1").arg(ev.param));
             WaitForPlayer();
             break;
         case BD_EVENT_END_OF_TITLE:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+            VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_END_OF_TITLE"));
             WaitForPlayer();
             break;
         case BD_EVENT_PLAYLIST:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+            VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_PLAYLIST %1").arg(ev.param));
             m_currentPlaylist = ev.param;
             m_currentTitle = bd_get_current_title(bdnav);
             SwitchPlaylist(m_currentPlaylist);
             break;
         case BD_EVENT_PLAYITEM:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+            VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_PLAYITEM %1").arg(ev.param));
             WaitForPlayer();
             m_currentPlayitem = ev.param;
             break;
         case BD_EVENT_CHAPTER:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+            VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_CHAPTER %1").arg(ev.param));
             m_currentChapter = ev.param;
             break;
         case BD_EVENT_STILL:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+            VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_STILL %1").arg(ev.param));
             m_still = ev.param;
             break;
         case BD_EVENT_STILL_TIME:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+            VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_STILL_TIME %1").arg(ev.param));
             // TODO: Handle still playback.  0 = infinite, 1-300 = seconds.
             break;
         case BD_EVENT_SEEK:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+            VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_SEEK"));
             WaitForPlayer();
             break;
@@ -807,54 +807,54 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
         /* stream selection */
 
         case BD_EVENT_AUDIO_STREAM:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+            VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_AUDIO_STREAM %1").arg(ev.param));
             m_currentAudioStream = ev.param;
             break;
         case BD_EVENT_IG_STREAM:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+            VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_IG_STREAM %1").arg(ev.param));
             m_currentIGStream = ev.param;
             break;
         case BD_EVENT_PG_TEXTST_STREAM:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+            VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_PG_TEXTST_STREAM %1").arg(ev.param));
             m_currentPGTextSTStream = ev.param;
             break;
         case BD_EVENT_SECONDARY_AUDIO_STREAM:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+            VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_SECONDARY_AUDIO_STREAM %1").arg(ev.param));
             m_currentSecondaryAudioStream = ev.param;
             break;
         case BD_EVENT_SECONDARY_VIDEO_STREAM:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+            VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_SECONDARY_VIDEO_STREAM %1").arg(ev.param));
             m_currentSecondaryVideoStream = ev.param;
             break;
 
         case BD_EVENT_PG_TEXTST:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+            VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_PG_TEXTST %1").arg(ev.param ? "enable" : "disable"));
             m_PGTextSTEnabled = ev.param;
             break;
         case BD_EVENT_SECONDARY_AUDIO:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+            VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_SECONDARY_AUDIO %1").arg(ev.param ? "enable" : "disable"));
             m_secondaryAudioEnabled = ev.param;
             break;
         case BD_EVENT_SECONDARY_VIDEO:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+            VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_SECONDARY_VIDEO %1").arg(ev.param ? "enable" : "disable"));
             m_secondaryVideoEnabled = ev.param;
             break;
         case BD_EVENT_SECONDARY_VIDEO_SIZE:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+            VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_SECONDARY_VIDEO_SIZE %1").arg(ev.param==0 ? "PIP" : "fullscreen"));
             m_secondaryVideoIsFullscreen = ev.param;
             break;
 
         default:
-            VERBOSE(VB_PLAYBACK|VB_EXTRA,
+            VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: Unknown Event! %1 %2").arg(ev.event).arg(ev.param));
           break;
       }
@@ -881,7 +881,7 @@ bool BDRingBuffer::StartFromBeginning(void)
 {
     if (bdnav && m_is_hdmv_navigation)
     {
-        VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + "Starting from beginning...");
+        VERBOSE(VB_PLAYBACK, LOC + "Starting from beginning...");
         return true; //bd_play(bdnav);
     }
     return true;
