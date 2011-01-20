@@ -3848,32 +3848,18 @@ bool TV::AudioSyncHandleAction(PlayerContext *ctx,
 
 bool TV::DiscMenuHandleAction(PlayerContext *ctx, const QStringList &actions)
 {
-    bool handled = false;
-    DVDRingBuffer *dvdrb = ctx->buffer->DVD();
-    BDRingBuffer  *bdrb  = ctx->buffer->BD();
-
-    if (dvdrb)
+    int64_t pts = 0;
+    VideoOutput *output = ctx->player->getVideoOutput();
+    if (output)
     {
-        handled = dvdrb->HandleAction(actions, 0);
-    }
-    else if (bdrb)
-    {
-        int64_t pts = 0;
-        VideoOutput *output = ctx->player->getVideoOutput();
-        if (output)
+        VideoFrame *frame = output->GetLastShownFrame();
+        if (frame)
         {
-            VideoFrame *frame = output->GetLastShownFrame();
-            if (frame)
-            {
-                // convert timecode (msec) to pts (90kHz)
-                pts = (int64_t)(frame->timecode  * 90);
-            }
+            // convert timecode (msec) to pts (90kHz)
+            pts = (int64_t)(frame->timecode  * 90);
         }
-
-        handled = bdrb->HandleAction(actions, pts);
     }
-
-    return handled;
+    return ctx->buffer->HandleAction(actions, pts);
 }
 
 bool TV::ActiveHandleAction(PlayerContext *ctx,

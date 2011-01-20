@@ -56,6 +56,7 @@ class MPUBLIC RingBuffer : protected QThread
     /// \brief Returns true if open for either reading or writing.
     virtual bool IsOpen(void) const = 0;
 
+    // DVD and bluray methods
     bool IsDisc(void) const { return IsDVD() || IsBD(); }
     bool IsDVD(void)  const { return DVD() != NULL;     }
     bool IsBD(void)   const { return BD()  != NULL;     }
@@ -64,7 +65,8 @@ class MPUBLIC RingBuffer : protected QThread
     DVDRingBuffer *DVD(void);
     BDRingBuffer  *BD(void);
 
-    virtual bool IsInDiscMenuOrStillFrame(void) const { return false; }
+    virtual bool IsInDiscMenuOrStillFrame(void) const       { return false; }
+    virtual bool HandleAction(const QStringList &, int64_t) { return false; }
 
     // General Commands
 

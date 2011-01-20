@@ -67,7 +67,7 @@ class MPUBLIC DVDRingBuffer : public RingBuffer
     QRect       GetButtonCoords(void);
     void        ReleaseMenuButton(void);
     bool        IsInMenu(void) const { return m_inMenu; }
-    bool        HandleAction(const QStringList &actions, int64_t pts);
+    virtual bool HandleAction(const QStringList &actions, int64_t pts);
 
     // Subtitles
     uint GetSubtitleLanguage(int key);

@@ -92,7 +92,7 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     int GetSubtitleLanguage(uint streamID);
 
     // commands
-    bool         HandleAction(const QStringList &actions, int64_t pts);
+    virtual bool HandleAction(const QStringList &actions, int64_t pts);
     virtual bool OpenFile(const QString &filename,
                           uint retry_ms = kDefaultOpenTimeout);
     void close(void);
