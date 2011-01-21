@@ -498,11 +498,16 @@ bool BDRingBuffer::SwitchPlaylist(uint32_t index)
     if (!bdnav)
         return false;
 
+    VERBOSE(VB_PLAYBACK, LOC + "SwitchPlaylist - start");
+
     if (m_currentTitleInfo)
         bd_free_title_info(m_currentTitleInfo);
 
     m_currentTitleInfo = bd_get_playlist_info(bdnav, index);
-    return UpdateTitleInfo(index);
+    bool result = UpdateTitleInfo(index);
+
+    VERBOSE(VB_PLAYBACK, LOC + "SwitchPlaylist - end");
+    return result;
 }
 
 bool BDRingBuffer::UpdateTitleInfo(uint32_t index)
@@ -544,6 +549,31 @@ bool BDRingBuffer::UpdateTitleInfo(uint32_t index)
                     .arg(framenum));
         }
     }
+
+    int still = BLURAY_STILL_NONE;
+    if (m_currentTitleInfo->clip_count)
+    {
+        for (uint i = 0; i < m_currentTitleInfo->clip_count; i++)
+        {
+            VERBOSE(VB_PLAYBACK, LOC + QString("Clip %1 stillmode %2 "
+                                               "stilltime %3 videostreams %4 "
+                                               "audiostreams %5")
+                    .arg(i).arg(m_currentTitleInfo->clips[i].still_mode)
+                    .arg(m_currentTitleInfo->clips[i].still_time)
+                    .arg(m_currentTitleInfo->clips[i].video_stream_count)
+                    .arg(m_currentTitleInfo->clips[i].audio_stream_count));
+            still |= m_currentTitleInfo->clips[i].still_mode;
+        }
+    }
+
+    if (m_currentTitleInfo->clip_count > 1)
+        VERBOSE(VB_IMPORTANT, LOC + "Warning: more than 1 clip, following still"
+                                    " frame analysis may be wrong");
+    if (still == BLURAY_STILL_TIME)
+        VERBOSE(VB_PLAYBACK, LOC + "Entering still frame.");
+    else if (still == BLURAY_STILL_INFINITE)
+        VERBOSE(VB_PLAYBACK, LOC + "Entering inifinite still frame.");
+
     return true;
 }
 
@@ -577,6 +607,7 @@ int BDRingBuffer::safe_read(void *data, uint sz)
     int result = 0;
     if (m_is_hdmv_navigation)
     {
+        HandleBDEvents();
         while (result == 0)
         {
             BD_EVENT event;
@@ -761,18 +792,18 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
             m_currentAngle = ev.param;
             break;
         case BD_EVENT_TITLE:
-            VERBOSE(VB_PLAYBACK,
-                    QString("BDRingBuf: EVENT_TITLE %1").arg(ev.param));
-            WaitForPlayer();
+            VERBOSE(VB_PLAYBACK, QString("BDRingBuf: EVENT_TITLE %1 (old %2)")
+                    .arg(ev.param).arg(m_currentTitle));
+            m_currentTitle = ev.param;
             break;
         case BD_EVENT_END_OF_TITLE:
-            VERBOSE(VB_PLAYBACK,
-                    QString("BDRingBuf: EVENT_END_OF_TITLE"));
+            VERBOSE(VB_PLAYBACK, QString("BDRingBuf: EVENT_END_OF_TITLE %1")
+                    .arg(m_currentTitle));
             WaitForPlayer();
             break;
         case BD_EVENT_PLAYLIST:
-            VERBOSE(VB_PLAYBACK,
-                    QString("BDRingBuf: EVENT_PLAYLIST %1").arg(ev.param));
+            VERBOSE(VB_PLAYBACK, QString("BDRingBuf: EVENT_PLAYLIST %1 (old %2)")
+                    .arg(ev.param).arg(m_currentPlaylist));
             m_currentPlaylist = ev.param;
             m_currentTitle = bd_get_current_title(bdnav);
             SwitchPlaylist(m_currentPlaylist);
@@ -780,10 +811,10 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
         case BD_EVENT_PLAYITEM:
             VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_PLAYITEM %1").arg(ev.param));
-            WaitForPlayer();
             m_currentPlayitem = ev.param;
             break;
         case BD_EVENT_CHAPTER:
+            // N.B. event chapter numbering 1...N, chapter seeks etc 0...
             VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_CHAPTER %1").arg(ev.param));
             m_currentChapter = ev.param;
@@ -796,12 +827,13 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
         case BD_EVENT_STILL_TIME:
             VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_STILL_TIME %1").arg(ev.param));
+            // sleep a little
+            usleep(10000);
             // TODO: Handle still playback.  0 = infinite, 1-300 = seconds.
             break;
         case BD_EVENT_SEEK:
             VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_SEEK"));
-            WaitForPlayer();
             break;
 
         /* stream selection */
