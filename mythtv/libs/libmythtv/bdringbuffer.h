@@ -81,7 +81,7 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     bool IsOpen(void)        const { return bdnav; }
     bool IsHDMVNavigation(void) const { return m_is_hdmv_navigation; }
     bool IsInMenu(void) const { return m_inMenu; }
-    bool IsInStillFrame(void) const { return m_still > 0; }
+    bool IsInStillFrame(void) const;
     virtual bool IsInDiscMenuOrStillFrame(void) const
         { return IsInMenu() || IsInStillFrame(); } // RingBuffer
     bool TitleChanged(void);
@@ -159,7 +159,8 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     QMutex             m_overlayLock;
     QList<BDOverlay*>  m_overlayImages;
 
-    uint8_t            m_still;
+    uint8_t            m_stillTime;
+    uint8_t            m_stillMode;
     volatile bool      m_inMenu;
 
 };

@@ -31,10 +31,12 @@ class MythBDPlayer : public MythPlayer
     // Playback
     virtual bool VideoLoop(void);
     virtual void EventStart(void);
+    virtual void DisplayPauseFrame(void);
     virtual void PreProcessNormalFrame(void);
 
   private:
     void DisplayMenu(void);
+    bool m_stillFrameShowing;
 };
 
 #endif // MYTHBDPLAYER_H

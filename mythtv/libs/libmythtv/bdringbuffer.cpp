@@ -32,7 +32,8 @@ static void HandleOverlayCallback(void *data, const bd_overlay_s *const overlay)
 BDRingBuffer::BDRingBuffer(const QString &lfilename)
   : bdnav(NULL), m_is_hdmv_navigation(false),
     m_numTitles(0), m_titleChanged(false), m_playerWait(false),
-    m_ignorePlayerWait(true)
+    m_ignorePlayerWait(true),
+    m_stillTime(0), m_stillMode(BLURAY_STILL_NONE)
 {
     OpenFile(lfilename);
 }
@@ -363,7 +364,8 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     m_secondaryAudioEnabled = false;
     m_secondaryVideoEnabled = false;
     m_secondaryVideoIsFullscreen = false;
-    m_still = 0;
+    m_stillMode = BLURAY_STILL_NONE;
+    m_stillTime = 0;
     m_inMenu = false;
 
     bool try_hdmv = NULL != getenv("MYTHTV_HDMV");
@@ -551,6 +553,7 @@ bool BDRingBuffer::UpdateTitleInfo(uint32_t index)
     }
 
     int still = BLURAY_STILL_NONE;
+    int time  = 0;
     if (m_currentTitleInfo->clip_count)
     {
         for (uint i = 0; i < m_currentTitleInfo->clip_count; i++)
@@ -563,16 +566,25 @@ bool BDRingBuffer::UpdateTitleInfo(uint32_t index)
                     .arg(m_currentTitleInfo->clips[i].video_stream_count)
                     .arg(m_currentTitleInfo->clips[i].audio_stream_count));
             still |= m_currentTitleInfo->clips[i].still_mode;
+            time = m_currentTitleInfo->clips[i].still_time;
         }
     }
 
-    if (m_currentTitleInfo->clip_count > 1)
+    if (m_currentTitleInfo->clip_count > 1 && still != BLURAY_STILL_NONE)
         VERBOSE(VB_IMPORTANT, LOC + "Warning: more than 1 clip, following still"
                                     " frame analysis may be wrong");
     if (still == BLURAY_STILL_TIME)
-        VERBOSE(VB_PLAYBACK, LOC + "Entering still frame.");
+    {
+        VERBOSE(VB_PLAYBACK, LOC +
+            QString("Entering still frame (%1 seconds) UNSUPPORTED").arg(time));
+    }
     else if (still == BLURAY_STILL_INFINITE)
-        VERBOSE(VB_PLAYBACK, LOC + "Entering inifinite still frame.");
+    {
+        VERBOSE(VB_PLAYBACK, LOC + "Entering infinite still frame.");
+    }
+
+    m_stillMode = still;
+    m_stillTime = time;
 
     return true;
 }
@@ -704,13 +716,11 @@ int BDRingBuffer::GetSubtitleLanguage(uint streamID)
 
 void BDRingBuffer::PressButton(int32_t key, int64_t pts)
 {
-    if (!bdnav)
-        return;
+    VERBOSE(VB_PLAYBACK, LOC + QString("Key %1 (pts %2)").arg(key).arg(pts));
+    // HACK for still frame menu navigation
+    pts = 1;
 
-    if (pts <= 0)
-        return;
-
-    if (key < 0)
+    if (!bdnav || pts <= 0 || key < 0)
         return;
 
     bd_user_input(bdnav, pts, key);
@@ -740,7 +750,8 @@ bool BDRingBuffer::GoToMenu(const QString str, int64_t pts)
     {
         if (bd_menu_call(bdnav, pts))
         {
-            VERBOSE(VB_PLAYBACK, QString("BDRingBuf: Invoked Menu Successfully"));
+            VERBOSE(VB_PLAYBACK,
+                QString("BDRingBuf: Invoked Top Menu (pts %1)").arg(pts));
             return true;
         }
     }
@@ -822,14 +833,11 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
         case BD_EVENT_STILL:
             VERBOSE(VB_PLAYBACK,
                     QString("BDRingBuf: EVENT_STILL %1").arg(ev.param));
-            m_still = ev.param;
             break;
         case BD_EVENT_STILL_TIME:
-            VERBOSE(VB_PLAYBACK,
-                    QString("BDRingBuf: EVENT_STILL_TIME %1").arg(ev.param));
+            // we use the clip information to determine the still frame status
             // sleep a little
             usleep(10000);
-            // TODO: Handle still playback.  0 = infinite, 1-300 = seconds.
             break;
         case BD_EVENT_SEEK:
             VERBOSE(VB_PLAYBACK,
@@ -890,6 +898,11 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
                     QString("BDRingBuf: Unknown Event! %1 %2").arg(ev.event).arg(ev.param));
           break;
       }
+}
+
+bool BDRingBuffer::IsInStillFrame(void) const
+{
+    return m_stillTime >= 0 && m_stillMode != BLURAY_STILL_NONE;
 }
 
 void BDRingBuffer::WaitForPlayer(void)

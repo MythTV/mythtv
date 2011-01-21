@@ -4,7 +4,8 @@
 #define LOC     QString("BDPlayer: ")
 #define LOC_ERR QString("BDPlayer error: ")
 
-MythBDPlayer::MythBDPlayer(bool muted) : MythPlayer(muted)
+MythBDPlayer::MythBDPlayer(bool muted)
+  : MythPlayer(muted), m_stillFrameShowing(false)
 {
 }
 
@@ -36,6 +37,17 @@ void MythBDPlayer::DisplayMenu(void)
     while (NULL != (overlay = player_ctx->buffer->BD()->GetOverlay()))
         osd->DisplayBDOverlay(overlay);
     osdLock.unlock();
+}
+
+void MythBDPlayer::DisplayPauseFrame(void)
+{
+    if (player_ctx->buffer->IsBD() &&
+        player_ctx->buffer->BD()->IsInStillFrame())
+    {
+        SetScanType(kScan_Progressive);
+    }
+    DisplayMenu();
+    MythPlayer::DisplayPauseFrame();
 }
 
 bool MythBDPlayer::VideoLoop(void)
@@ -70,6 +82,48 @@ bool MythBDPlayer::VideoLoop(void)
         ClearAfterSeek(true);
         player_ctx->buffer->BD()->SkipBDWaitingForPlayer();
         return !IsErrored();
+    }
+
+    if (player_ctx->buffer->BD()->IsInStillFrame())
+    {
+        if (nbframes > 1 && !m_stillFrameShowing)
+        {
+            videoOutput->UpdatePauseFrame();
+            DisplayNormalFrame(false);
+            return !IsErrored();
+        }
+
+        if (!m_stillFrameShowing)
+            needNewPauseFrame = true;
+
+        // we are in a still frame so pause video output
+        if (!videoPaused)
+        {
+            PauseVideo();
+            return !IsErrored();
+        }
+
+        // flag if we have no frame
+        if (nbframes == 0)
+        {
+            VERBOSE(VB_PLAYBACK, LOC +
+                    "Warning: In BD Still but no video frames in queue");
+            usleep(10000);
+            return !IsErrored();
+        }
+
+        if (!m_stillFrameShowing)
+            VERBOSE(VB_PLAYBACK, LOC + "Entering still frame.");
+        m_stillFrameShowing = true;
+    }
+    else
+    {
+        if (videoPaused && m_stillFrameShowing)
+        {
+            UnpauseVideo();
+            VERBOSE(VB_PLAYBACK, LOC + "Exiting still frame.");
+        }
+        m_stillFrameShowing = false;
     }
 
     return MythPlayer::VideoLoop();
