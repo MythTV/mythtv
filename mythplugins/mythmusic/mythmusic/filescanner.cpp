@@ -22,7 +22,7 @@ FileScanner::FileScanner ()
     MSqlQuery query(MSqlQuery::InitCon());
 
     // Cache the directory ids from the database
-    query.prepare("SELECT directory_id, LOWER(path) FROM music_directories");
+    query.prepare("SELECT directory_id, path FROM music_directories");
     if (query.exec())
     {
         while(query.next())
@@ -109,12 +109,12 @@ void FileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_files,
             QString dir(filename);
             dir.remove(0, m_startdir.length());
 
-            newparentid = m_directoryid[dir.toLower()];
+            newparentid = m_directoryid[dir];
 
             if (newparentid == 0)
             {
                 int id = GetDirectoryId(dir, parentid);
-                m_directoryid[dir.toLower()] = id;
+                m_directoryid[dir] = id;
 
                 if (id > 0)
                 {
@@ -252,7 +252,7 @@ void FileScanner::AddFileToDB(const QString &filename)
         query.prepare("INSERT INTO music_albumart SET filename = :FILE, "
                       "directory_id = :DIRID, imagetype = :TYPE;");
         query.bindValue(":FILE", name);
-        query.bindValue(":DIRID", m_directoryid[directory.toLower()]);
+        query.bindValue(":DIRID", m_directoryid[directory]);
         query.bindValue(":TYPE", AlbumArtImages::guessImageType(name));
 
         if (!query.exec() || query.numRowsAffected() <= 0)
@@ -273,7 +273,7 @@ void FileScanner::AddFileToDB(const QString &filename)
             QString album_cache_string;
 
             // Set values from cache
-            int did = m_directoryid[directory.toLower()];
+            int did = m_directoryid[directory];
             if (did > 0)
                 data->setDirectoryId(did);
 
@@ -444,7 +444,7 @@ void FileScanner::RemoveFileFromDB (const QString &filename)
         query.prepare("DELETE FROM music_albumart WHERE filename= :FILE AND "
                       "directory_id= :DIRID;");
         query.bindValue(":FILE", sqlfilename);
-        query.bindValue(":DIRID", m_directoryid[directory.toLower()]);
+        query.bindValue(":DIRID", m_directoryid[directory]);
 
         if (!query.exec() || query.numRowsAffected() <= 0)
         {
@@ -489,7 +489,7 @@ void FileScanner::UpdateFileInDB(const QString &filename)
             QString album_cache_string;
 
             // Set values from cache
-            int did = m_directoryid[directory.toLower()];
+            int did = m_directoryid[directory];
             if (did > 0)
                 disk_meta->setDirectoryId(did);
 
