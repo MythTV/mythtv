@@ -61,13 +61,13 @@
 
     <textarea name="title" from="basetextarea">
         <font>baselarge</font>
-        <area>0,20,800,50</area>
+        <area>0,20,1280,50</area>
         <align>center,vcenter</align>
         <value>Manage Site Subscriptions</value>
     </textarea>
 
     <buttonlist name="grabbers" from="basebuttonlist">
-        <area>50,110,700,390</area>
+        <area>280,110,700,390</area>
     </buttonlist>
 
   </window>
