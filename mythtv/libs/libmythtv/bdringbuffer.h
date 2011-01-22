@@ -63,9 +63,9 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     void SubmitOverlay(const bd_overlay_s * const overlay);
 
     uint32_t GetNumTitles(void) const { return m_numTitles; }
-    int      GetCurrentTitle(void) const;
+    int      GetCurrentTitle(void);
     uint64_t GetCurrentAngle(void) const { return m_currentAngle; }
-    int      GetTitleDuration(int title) const;
+    int      GetTitleDuration(int title);
     // Get the size in bytes of the current title (playlist item).
     uint64_t GetTitleSize(void) const { return m_titlesize; }
     // Get The total duration of the current title in 90Khz ticks.
@@ -86,7 +86,7 @@ class MPUBLIC BDRingBuffer : public RingBuffer
         { return IsInMenu() || IsInStillFrame(); } // RingBuffer
     bool TitleChanged(void);
 
-    void GetDescForPos(QString &desc) const;
+    void GetDescForPos(QString &desc);
     double GetFrameRate(void);
 
     int GetAudioLanguage(uint streamID);
@@ -114,6 +114,8 @@ class MPUBLIC BDRingBuffer : public RingBuffer
 
     // private title handling
     bool UpdateTitleInfo(uint32_t index);
+    BLURAY_TITLE_INFO* GetTitleInfo(uint32_t index);
+    BLURAY_TITLE_INFO* GetPlaylistInfo(uint32_t index);
 
     // private menu handling methods
     void PressButton(int32_t key, int64_t pts); // Keyboard
@@ -163,5 +165,8 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     uint8_t            m_stillMode;
     volatile bool      m_inMenu;
 
+    QHash<uint32_t,BLURAY_TITLE_INFO*> m_cachedTitleInfo;
+    QHash<uint32_t,BLURAY_TITLE_INFO*> m_cachedPlaylistInfo;
+    QMutex             m_infoLock;
 };
 #endif

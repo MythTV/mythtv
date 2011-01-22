@@ -33,7 +33,8 @@ BDRingBuffer::BDRingBuffer(const QString &lfilename)
   : bdnav(NULL), m_is_hdmv_navigation(false),
     m_numTitles(0), m_titleChanged(false), m_playerWait(false),
     m_ignorePlayerWait(true),
-    m_stillTime(0), m_stillMode(BLURAY_STILL_NONE)
+    m_stillTime(0), m_stillMode(BLURAY_STILL_NONE),
+    m_infoLock(QMutex::Recursive)
 {
     OpenFile(lfilename);
 }
@@ -47,8 +48,18 @@ void BDRingBuffer::close(void)
 {
     if (bdnav)
     {
-        if (m_currentTitleInfo)
-            bd_free_title_info(m_currentTitleInfo);
+        m_infoLock.lock();
+        QHash<uint32_t, BLURAY_TITLE_INFO*>::iterator it;
+
+        for (it = m_cachedTitleInfo.begin(); it !=m_cachedTitleInfo.end(); ++it)
+            bd_free_title_info(it.value());
+        m_cachedTitleInfo.clear();
+
+        for (it = m_cachedPlaylistInfo.begin(); it !=m_cachedPlaylistInfo.end(); ++it)
+            bd_free_title_info(it.value());
+        m_cachedPlaylistInfo.clear();
+        m_infoLock.unlock();
+
         bd_close(bdnav);
         bdnav = NULL;
     }
@@ -142,11 +153,14 @@ uint64_t BDRingBuffer::Seek(uint64_t pos)
     return 0;
 }
 
-void BDRingBuffer::GetDescForPos(QString &desc) const
+void BDRingBuffer::GetDescForPos(QString &desc)
 {
+    if (!m_infoLock.tryLock())
+        return;
     desc = QObject::tr("Title %1 chapter %2")
                        .arg(m_currentTitleInfo->idx)
                        .arg(m_currentTitleInfo->chapters->idx);
+    m_infoLock.unlock();
 }
 
 bool BDRingBuffer::HandleAction(const QStringList &actions, int64_t pts)
@@ -239,15 +253,11 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     VERBOSE(VB_IMPORTANT, LOC + QString("Opened BDRingBuffer device at %1")
             .arg(lfilename.toLatin1().data()));
 
+    QMutexLocker locker(&m_infoLock);
     rwlock.lockForWrite();
 
     if (bdnav)
-    {
-        if (m_currentTitleInfo)
-            bd_free_title_info(m_currentTitleInfo);
-        bd_close(bdnav);
-        bdnav = NULL;
-    }
+        close();
 
     filename = lfilename;
 
@@ -396,7 +406,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         BLURAY_TITLE_INFO *titleInfo = NULL;
         for( unsigned i = 0; i < m_numTitles; ++i)
         {
-            titleInfo = bd_get_title_info(bdnav, i);
+            titleInfo = GetTitleInfo(i);
             if (titleLength == 0 ||
                 (titleInfo->duration > (titleLength + margin)))
             {
@@ -430,6 +440,7 @@ long long BDRingBuffer::GetReadPosition(void) const
 
 uint32_t BDRingBuffer::GetNumChapters(void)
 {
+    QMutexLocker locker(&m_infoLock);
     if (m_currentTitleInfo)
         return m_currentTitleInfo->chapter_count - 1;
     return 0;
@@ -446,6 +457,7 @@ uint64_t BDRingBuffer::GetChapterStartTime(uint32_t chapter)
 {
     if (chapter < 0 || chapter >= GetNumChapters())
         return 0;
+    QMutexLocker locker(&m_infoLock);
     return (uint64_t)((long double)m_currentTitleInfo->chapters[chapter].start /
                                    90000.0f);
 }
@@ -454,30 +466,32 @@ uint64_t BDRingBuffer::GetChapterStartFrame(uint32_t chapter)
 {
     if (chapter < 0 || chapter >= GetNumChapters())
         return 0;
+    QMutexLocker locker(&m_infoLock);
     return (uint64_t)((long double)(m_currentTitleInfo->chapters[chapter].start *
                                     GetFrameRate()) / 90000.0f);
 }
 
-int BDRingBuffer::GetCurrentTitle(void) const
+int BDRingBuffer::GetCurrentTitle(void)
 {
+    QMutexLocker locker(&m_infoLock);
     if (m_currentTitleInfo)
         return m_currentTitleInfo->idx;
     return -1;
 }
 
-int BDRingBuffer::GetTitleDuration(int title) const
+int BDRingBuffer::GetTitleDuration(int title)
 {
+    QMutexLocker locker(&m_infoLock);
     int numTitles = GetNumTitles();
 
     if (!(numTitles > 0 && title >= 0 && title < numTitles))
         return 0;
 
-    BLURAY_TITLE_INFO *info = bd_get_title_info(bdnav, title);
+    BLURAY_TITLE_INFO *info = GetTitleInfo(title);
     if (!info)
         return 0;
 
     int duration = ((info->duration) / 90000.0f);
-    bd_free_title_info(info);
     return duration;
 }
 
@@ -486,10 +500,9 @@ bool BDRingBuffer::SwitchTitle(uint32_t index)
     if (!bdnav)
         return false;
 
-    if (m_currentTitleInfo)
-        bd_free_title_info(m_currentTitleInfo);
-
-    m_currentTitleInfo = bd_get_title_info(bdnav, index);
+    m_infoLock.lock();
+    m_currentTitleInfo = GetTitleInfo(index);
+    m_infoLock.unlock();
     bd_select_title(bdnav, index);
 
     return UpdateTitleInfo(index);
@@ -502,18 +515,59 @@ bool BDRingBuffer::SwitchPlaylist(uint32_t index)
 
     VERBOSE(VB_PLAYBACK, LOC + "SwitchPlaylist - start");
 
-    if (m_currentTitleInfo)
-        bd_free_title_info(m_currentTitleInfo);
-
-    m_currentTitleInfo = bd_get_playlist_info(bdnav, index);
+    m_infoLock.lock();
+    m_currentTitleInfo = GetPlaylistInfo(index);
+    m_infoLock.unlock();
     bool result = UpdateTitleInfo(index);
 
     VERBOSE(VB_PLAYBACK, LOC + "SwitchPlaylist - end");
     return result;
 }
 
+BLURAY_TITLE_INFO* BDRingBuffer::GetTitleInfo(uint32_t index)
+{
+    if (!bdnav)
+        return NULL;
+
+    QMutexLocker locker(&m_infoLock);
+    if (m_cachedTitleInfo.contains(index))
+        return m_cachedTitleInfo.value(index);
+
+    if (index > m_numTitles)
+        return NULL;
+
+    BLURAY_TITLE_INFO* result = bd_get_title_info(bdnav, index);
+    if (result)
+    {
+        VERBOSE(VB_PLAYBACK, QString("Found title %1 info").arg(index));
+        m_cachedTitleInfo.insert(index,result);
+        return result;
+    }
+    return NULL;
+}
+
+BLURAY_TITLE_INFO* BDRingBuffer::GetPlaylistInfo(uint32_t index)
+{
+    if (!bdnav)
+        return NULL;
+
+    QMutexLocker locker(&m_infoLock);
+    if (m_cachedPlaylistInfo.contains(index))
+        return m_cachedPlaylistInfo.value(index);
+
+    BLURAY_TITLE_INFO* result = bd_get_playlist_info(bdnav, index);
+    if (result)
+    {
+        VERBOSE(VB_PLAYBACK, QString("Found playlist %1 info").arg(index));
+        m_cachedPlaylistInfo.insert(index,result);
+        return result;
+    }
+    return NULL;
+}
+
 bool BDRingBuffer::UpdateTitleInfo(uint32_t index)
 {
+    QMutexLocker locker(&m_infoLock);
     if (!m_currentTitleInfo)
         return false;
 
@@ -642,6 +696,7 @@ int BDRingBuffer::safe_read(void *data, uint sz)
 
 double BDRingBuffer::GetFrameRate(void)
 {
+    QMutexLocker locker(&m_infoLock);
     if (bdnav && m_currentTitleInfo)
     {
         uint8_t rate = m_currentTitleInfo->clips->video_streams->rate;
@@ -675,6 +730,7 @@ double BDRingBuffer::GetFrameRate(void)
 
 int BDRingBuffer::GetAudioLanguage(uint streamID)
 {
+    QMutexLocker locker(&m_infoLock);
     if (!m_currentTitleInfo ||
         streamID >= m_currentTitleInfo->clips->audio_stream_count)
         return iso639_str3_to_key("und");
@@ -690,6 +746,7 @@ int BDRingBuffer::GetAudioLanguage(uint streamID)
 
 int BDRingBuffer::GetSubtitleLanguage(uint streamID)
 {
+    QMutexLocker locker(&m_infoLock);
     if (!m_currentTitleInfo)
         return iso639_str3_to_key("und");
 
