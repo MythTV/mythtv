@@ -137,6 +137,7 @@ SOURCES += minilzo.cpp              RTjpegN.cpp
 # Misc. needed by backend/frontend
 HEADERS += recordinginfo.h
 HEADERS += dbcheck.h
+HEADERS += videodbcheck.h
 HEADERS += tvremoteutil.h           tv.h
 HEADERS += jobqueue.h
 HEADERS += filtermanager.h          recordingprofile.h
@@ -163,6 +164,7 @@ HEADERS += streamingringbuffer.h
 
 SOURCES += recordinginfo.cpp
 SOURCES += dbcheck.cpp
+SOURCES += videodbcheck.cpp
 SOURCES += tvremoteutil.cpp         tv.cpp
 SOURCES += jobqueue.cpp
 SOURCES += filtermanager.cpp        recordingprofile.cpp

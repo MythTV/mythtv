@@ -18,7 +18,6 @@
 #include "fileassoc.h"
 #include "playersettings.h"
 #include "metadatasettings.h"
-#include "dbcheck.h"
 #include "videolist.h"
 
 #if defined(AEW_VG)
@@ -422,17 +421,6 @@ int mythplugin_init(const char *libversion)
     if (!gContext->TestPopupVersion("mythvideo", libversion,
                                     MYTH_BINARY_VERSION))
         return -1;
-
-    gCoreContext->ActivateSettingsCache(false);
-    bool upgraded = UpgradeVideoDatabaseSchema();
-    gCoreContext->ActivateSettingsCache(true);
-
-    if (!upgraded)
-    {
-        VERBOSE(VB_IMPORTANT,
-                "Couldn't upgrade video database schema, exiting.");
-        return -1;
-    }
 
     VideoGeneralSettings general;
     general.Load();

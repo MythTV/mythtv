@@ -1004,8 +1004,6 @@ class VideoGrabber( Grabber ):
                                   path[self.mode]))
         except KeyError:
             raise MythError('Invalid MythVideo grabber')
-        self._check_schema('mythvideo.DBSchemaVer',
-                                MVSCHEMA_VERSION, 'MythVideo')
         self.append('-l',lang)
 
 #### MYTHNETVISION ####
