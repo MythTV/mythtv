@@ -243,18 +243,24 @@
 
     <window name="browser">
 
+        <shape name="listbackground">
+            <area>0,550,1280,210</area>
+            <type>box</type>
+            <fill color="#000000" alpha="120" />
+        </shape>
+
         <buttonlist name="videos">
-            <area>15,440,770,150</area>
+            <area>20,550,1220,150</area>
             <layout>horizontal</layout>
             <scrollstyle>center</scrollstyle>
-            <spacing>9</spacing>
-            <buttonarea>38,0,690,155</buttonarea>
+            <spacing>5</spacing>
+            <buttonarea>40,0,1180,250</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
-                    <area>0,0,90,155</area>
+                    <area>0,0,160,160</area>
                     <imagetype name="buttonbackground" />
                     <imagetype name="buttonimage">
-                        <area>10,15,80,120</area>
+                        <area>10,15,140,140</area>
                         <preserveaspect>true</preserveaspect>
                         <filename>shared/grid_noimage.png</filename>
                     </imagetype>
@@ -282,14 +288,14 @@
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <position>5,7</position>
+                    <imagetype name="selectarrow">
+                        <position>30,115</position>
                         <filename>mv_browse_selector.png</filename>
                     </imagetype>
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
-                <position>0,42</position>
+                <position>0,52</position>
                 <showempty>yes</showempty>
                 <state type="full">
                     <imagetype name="upon">
@@ -298,7 +304,7 @@
                 </state>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>730,42</position>
+                <position>1195,52</position>
                 <state type="full">
                     <imagetype name="dnon">
                         <filename>right_arrow.png</filename>
@@ -308,18 +314,22 @@
         </buttonlist>
 
         <textarea name="title" from="basetextarea">
-            <area>40,15,700,100</area>
-            <multiline>yes</multiline>
+            <area>40,15,1200,100</area>
+            <multiline></multiline>
             <font>baseextralarge</font>
         </textarea>
 
         <imagetype name="preview">
-            <area>30,90,203,311</area>
+            <area>30,90,250,250</area>
             <preserveaspect>yes</preserveaspect>
         </imagetype>
 
+        <shape name="descriptionbackground" from="basebackground">
+            <area>310,90,940,340</area>
+        </shape>
+
         <textarea name="description" from="basetextarea">
-            <area>245,97,523,145</area>
+            <area>320,100,920,320</area>
             <multiline>yes</multiline>
         </textarea>
 
@@ -327,33 +337,37 @@
             <value>You haven't added any Sites/RSS Feeds yet!  To add a site, press MENU, then choose "Scan/Manage Subscriptions," then "Manage Site Subscriptions."</value>
         </textarea>
 
+        <shape name="detailsbackground" from="basebackground">
+            <area>310,450,940,80</area>
+        </shape>
+
         <textarea name="lenlbl" from="basetextarea">
-            <area>260,343,150,35</area>
+            <area>375,460,150,35</area>
+            <align>hcenter</align>
             <value>Runtime</value>
         </textarea>
 
         <textarea name="duration" from="basetextarea">
-            <area>260,373,350,35</area>
+            <area>375,490,350,35</area>
+            <align>hcenter</align>
         </textarea>
 
-        <textarea name="authlbl" from="basetextarea">
-            <area>470,343,90,35</area>
+        <textarea name="authlbl" from="lenlbl">
+            <area>650,460,300,35</area>
             <value>Author</value>
         </textarea>
 
-        <textarea name="author" from="basetextarea">
-            <area>470,373,100,35</area>
+        <textarea name="author" from="duration">
+            <area>650,490,300,35</area>
         </textarea>
 
-        <textarea name="userratinglbl" from="basetextarea">
-            <area>620,343,150,35</area>
-            <align>right,top</align>
+        <textarea name="userratinglbl" from="lenlbl">
+            <area>1020,460,200,35</area>
             <value>Rating</value>
         </textarea>
 
-        <textarea name="rating" from="basetextarea">
-            <area>670,373,100,35</area>
-            <align>hcenter,top</align>
+        <textarea name="rating" from="duration">
+            <area>1020,490,200,35</area>
         </textarea>
 
     </window>
