@@ -41,12 +41,13 @@ using namespace std;
 #include "metaiowavpack.h"
 
 // size of the buffer used for streaming
-#define BUFFER_SIZE 4096
+#define BUFFER_SIZE 8192
 
 // streaming callbacks
 static int ReadFunc(void *opaque, uint8_t *buf, int buf_size)
 {
     QIODevice *io = (QIODevice*)opaque;
+
     buf_size = min(buf_size, (int) io->bytesAvailable());
     return io->read((char*)buf, buf_size);
 }
@@ -157,6 +158,8 @@ bool avfDecoder::initialize()
         init_put_byte(m_byteIOContext, m_buffer, BUFFER_SIZE, 0, input(), &ReadFunc, &WriteFunc, &SeekFunc);
         filename = "stream";
 
+        m_byteIOContext->is_streamed = 1;
+
         // probe the stream
         AVProbeData probe_data;
         probe_data.filename = filename;
@@ -173,7 +176,7 @@ bool avfDecoder::initialize()
             return false;
         }
 
-        VERBOSE(VB_PLAYBACK, QString("avfDecoder: playing stream"));
+        VERBOSE(VB_PLAYBACK, QString("avfDecoder: playing stream, format probed is: %1").arg(m_inputFormat->long_name));
     }
 
     if (!m_samples)
