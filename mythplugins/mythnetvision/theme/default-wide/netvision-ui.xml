@@ -75,42 +75,42 @@
   <window name="rsseditor">
 
     <button name="edit" from="basebutton">
-        <position>110,50</position>
+        <position>350,50</position>
         <value>Edit</value>
     </button>
 
     <button name="new" from="basebutton">
-        <position>310,50</position>
+        <position>550,50</position>
         <value>New</value>
     </button>
 
     <button name="delete" from="basebutton">
-        <position>510,50</position>
+        <position>750,50</position>
         <value>Remove</value>
     </button>
 
     <buttonlist name="sites" from="basebuttonlist">
-        <area>50,110,700,220</area>
+        <area>50,110,1180,220</area>
     </buttonlist>
 
     <textarea name="title" from="basetextarea">
-        <area>210,335,550,50</area>
+        <area>260,335,970,50</area>
         <font>baseextralarge</font>
     </textarea>
 
     <textarea name="author" from="basetextarea">
-        <area>210,380,550,35</area>
+        <area>260,380,750,35</area>
         <template>Author: %1</template>
     </textarea>
 
       <textarea name="description" from="basetextarea">
-          <area>210,420,550,115</area>
+          <area>260,420,970,115</area>
           <multiline>true</multiline>
           <template>Description: %1</template>
       </textarea>
 
       <imagetype name="preview">
-          <area>38,330,150,240</area>
+          <area>38,330,200,290</area>
           <preserveaspect>true</preserveaspect>
       </imagetype>
 
@@ -120,78 +120,83 @@
 
         <textarea name="titlelab" from="basetextarea">
             <font>baselarge</font>
-            <area>0,20,800,50</area>
+            <area>0,20,1280,50</area>
             <align>center,vcenter</align>
             <value>Manage RSS Subscriptions</value>
         </textarea>
 
-        <textarea name="titlelabel" from="basetextarea">
-            <area>30,90,200,30</area>
-            <align>right,vcenter</align>
-            <value>Feed Name:</value>
-        </textarea>
+        <group name="controls">
+            <area>210,50,500,600</area>
 
-        <textedit name="title" from="basetextedit">
-            <position>245,80</position>
-        </textedit>
+            <textarea name="titlelabel" from="basetextarea">
+                <area>30,90,200,30</area>
+                <align>right,vcenter</align>
+                <value>Feed Name:</value>
+            </textarea>
 
-        <textarea name="urllabel" from="basetextarea">
-            <area>30,150,200,30</area>
-            <align>right,vcenter</align>
-            <value>Feed URL:</value>
-        </textarea>
+            <textedit name="title" from="basetextedit">
+                <position>245,80</position>
+            </textedit>
 
-        <textedit name="url" from="basetextedit">
-            <position>245,140</position>
-        </textedit>
+            <textarea name="urllabel" from="basetextarea">
+                <area>30,150,200,30</area>
+                <align>right,vcenter</align>
+                <value>Feed URL:</value>
+            </textarea>
 
-        <textarea name="desclabel" from="basetextarea">
-            <area>30,210,200,30</area>
-            <align>right,vcenter</align>
-            <value>Site Description:</value>
-        </textarea>
+            <textedit name="url" from="basetextedit">
+                <position>245,140</position>
+            </textedit>
 
-        <textedit name="description" from="basetextedit">
-            <position>245,200</position>
-        </textedit>
+            <textarea name="desclabel" from="basetextarea">
+                <area>30,210,200,30</area>
+                <align>right,vcenter</align>
+                <value>Site Description:</value>
+            </textarea>
 
-        <textarea name="authorlabel" from="basetextarea">
-            <area>30,270,200,30</area>
-            <align>right,vcenter</align>
-            <value>Feed Author:</value>
-        </textarea>
+            <textedit name="description" from="basetextedit">
+                <position>245,200</position>
+            </textedit>
 
-        <textedit name="author" from="basetextedit">
-            <position>245,260</position>
-        </textedit>
+            <textarea name="authorlabel" from="basetextarea">
+                <area>30,270,200,30</area>
+                <align>right,vcenter</align>
+                <value>Feed Author:</value>
+            </textarea>
 
-        <checkbox name="download" from="basecheckbox">
-            <position>245,330</position>
-        </checkbox>
+            <textedit name="author" from="basetextedit">
+                <position>245,260</position>
+            </textedit>
 
-        <textarea name="downloadlabel" from="basetextarea">
-            <area>295,335,400,28</area>
-            <value>Download this feed automatically</value>
-        </textarea>
+            <checkbox name="download" from="basecheckbox">
+                <position>245,330</position>
+            </checkbox>
 
-        <imagetype name="preview">
-            <area>245,380,90,90</area>
-        </imagetype>
+            <textarea name="downloadlabel" from="basetextarea">
+                <area>295,335,400,28</area>
+                <value>Download this feed automatically</value>
+            </textarea>
 
-        <button name="preview_browse" from="basebutton">
-            <position>355,405</position>
-            <value>Choose Image</value>
-        </button>
+            <imagetype name="preview">
+                <area>560,380,90,90</area>
+            </imagetype>
 
-        <button name="cancel" from="basebutton">
-            <position>245,510</position>
-            <value>Cancel</value>
-        </button>
+            <button name="preview_browse" from="basewidebutton">
+                <position>245,405</position>
+                <value>Choose Image</value>
+            </button>
 
-        <button name="ok" from="basebutton">
-            <position>470,510</position>
-            <value>Save</value>
-        </button>
+            <button name="cancel" from="basebutton">
+                <position>245,510</position>
+                <value>Cancel</value>
+            </button>
+
+            <button name="ok" from="basebutton">
+                <position>470,510</position>
+                <value>Save</value>
+            </button>
+
+    </group>
 
   </window>
 
