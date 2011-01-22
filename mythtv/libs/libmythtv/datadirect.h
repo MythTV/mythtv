@@ -354,7 +354,7 @@ class MPUBLIC DataDirectProcessor
                      QString inCookieFile, QString outCookieFile);
 
     static bool DDPost(QString    url,
-                       QString    postFilename, QString    inputFilename,
+                       QString    postFilename, QString   &inputFilename,
                        QString    userid,       QString    password,
                        QDateTime  pstartDate,   QDateTime  pendDate,
                        QString   &err_txt);
