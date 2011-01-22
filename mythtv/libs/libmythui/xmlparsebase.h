@@ -50,6 +50,7 @@ class MPUBLIC XMLParseBase
                                   MythUIType *parent);
 
     static bool LoadBaseTheme(void);
+    static bool LoadBaseTheme(const QString &baseTheme);
 
     static bool CopyWindowFromBase(const QString &windowname,
                                    MythScreenType *win);
