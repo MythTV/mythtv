@@ -502,7 +502,7 @@ bool PlaybackBox::Create()
     connect(m_artTimer[kArtworkCover], SIGNAL(timeout()), SLOT(coverartLoad()));
 
     BuildFocusList();
-    m_programInfoCache.ScheduleLoad();
+    m_programInfoCache.ScheduleLoad(false);
     LoadInBackground();
 
     return true;

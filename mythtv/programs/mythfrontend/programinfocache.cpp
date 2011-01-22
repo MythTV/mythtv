@@ -28,11 +28,13 @@ static void free_vec(VPI_ptr &v)
 class ProgramInfoLoader : public QRunnable
 {
   public:
-    ProgramInfoLoader(ProgramInfoCache &c) : m_cache(c) {}
+    ProgramInfoLoader(ProgramInfoCache &c, const bool updateUI)
+      : m_cache(c), m_updateUI(updateUI) {}
 
-    void run(void) { m_cache.Load(); }
+    void run(void) { m_cache.Load(m_updateUI); }
 
     ProgramInfoCache &m_cache;
+    bool              m_updateUI;
 };
 
 ProgramInfoCache::ProgramInfoCache(QObject *o) :
@@ -52,7 +54,7 @@ ProgramInfoCache::~ProgramInfoCache()
     free_vec(m_next_cache);
 }
 
-void ProgramInfoCache::ScheduleLoad(void)
+void ProgramInfoCache::ScheduleLoad(const bool updateUI)
 {
     QMutexLocker locker(&m_lock);
     if (!m_load_is_queued)
@@ -60,11 +62,11 @@ void ProgramInfoCache::ScheduleLoad(void)
         m_load_is_queued = true;
         m_loads_in_progress++;
         QThreadPool::globalInstance()->start(
-            new ProgramInfoLoader(*this));
+            new ProgramInfoLoader(*this, updateUI));
     }
 }
 
-void ProgramInfoCache::Load(void)
+void ProgramInfoCache::Load(const bool updateUI)
 {
     QMutexLocker locker(&m_lock);
     m_load_is_queued = false;
@@ -80,8 +82,9 @@ void ProgramInfoCache::Load(void)
     free_vec(m_next_cache);
     m_next_cache = tmp;
 
-    QCoreApplication::postEvent(
-        m_listener, new MythEvent("UPDATE_UI_LIST"));
+    if (updateUI)
+        QCoreApplication::postEvent(
+            m_listener, new MythEvent("UPDATE_UI_LIST"));
     
     m_loads_in_progress--;
     m_load_wait.wakeAll();
