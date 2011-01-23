@@ -33,6 +33,7 @@ HEADERS += proglist.h                   proglist_helpers.h
 HEADERS += playbackboxhelper.h          viewschedulediff.h
 HEADERS += themechooser.h               setupwizard_general.h
 HEADERS += setupwizard_audio.h          setupwizard_video.h
+HEADERS += grabbersettings.h
 
 SOURCES += main.cpp playbackbox.cpp viewscheduled.cpp audiogeneralsettings.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp
@@ -47,6 +48,7 @@ SOURCES += proglist.cpp                 proglist_helpers.cpp
 SOURCES += playbackboxhelper.cpp        viewschedulediff.cpp
 SOURCES += themechooser.cpp             setupwizard_general.cpp
 SOURCES += setupwizard_audio.cpp        setupwizard_video.cpp
+SOURCES += grabbersettings.cpp
 
 macx {
     mac_bundle {

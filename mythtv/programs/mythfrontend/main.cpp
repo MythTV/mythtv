@@ -37,6 +37,7 @@ using namespace std;
 #include "audiooutput.h"
 #include "globalsettings.h"
 #include "audiogeneralsettings.h"
+#include "grabbersettings.h"
 #include "profilegroup.h"
 #include "playgroup.h"
 #include "networkcontrol.h"
@@ -590,6 +591,16 @@ static void TVMenuCallback(void *data, QString &selection)
             mainStack->AddScreen(sw);
         else
             delete sw;
+    }
+    else if (sel == "settings grabbers")
+    {
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        GrabberSettings *gs = new GrabberSettings(mainStack, "grabbersettings");
+
+        if (gs->Create())
+            mainStack->AddScreen(gs);
+        else
+            delete gs;
     }
     else if (sel == "screensetupwizard")
     {
