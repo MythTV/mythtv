@@ -233,12 +233,12 @@ void GrabberSettings::Init(void)
 
     m_gameGrabberList.clear();
 
-    QString currentTVGrabber = gCoreContext->GetSetting("TelevisionGrabber",
+    QString currentTVGrabber = gCoreContext->GetSettingOnHost("TelevisionGrabber",
                                          QString("%1metadata/Television/%2")
-                                         .arg(GetShareDir()).arg("ttvdb.py"));
-    QString currentMovieGrabber = gCoreContext->GetSetting("MovieGrabber",
+                                         .arg(GetShareDir()).arg("ttvdb.py"), "");
+    QString currentMovieGrabber = gCoreContext->GetSettingOnHost("MovieGrabber",
                                          QString("%1metadata/Movie/%2")
-                                         .arg(GetShareDir()).arg("tmdb.py"));
+                                         .arg(GetShareDir()).arg("tmdb.py"), "");
     QString currentGameGrabber = gCoreContext->GetSetting("mythgame.MetadataGrabber",
                                          QString("%1metadata/Game/%2")
                                          .arg(GetShareDir()).arg("giantbomb.py"));
@@ -250,8 +250,8 @@ void GrabberSettings::Init(void)
 
 void GrabberSettings::slotSave(void)
 {
-    gCoreContext->SaveSetting("TelevisionGrabber", m_tvGrabberButtonList->GetDataValue().toString());
-    gCoreContext->SaveSetting("MovieGrabber", m_movieGrabberButtonList->GetDataValue().toString());
+    gCoreContext->SaveSettingOnHost("TelevisionGrabber", m_tvGrabberButtonList->GetDataValue().toString(), "");
+    gCoreContext->SaveSettingOnHost("MovieGrabber", m_movieGrabberButtonList->GetDataValue().toString(), "");
     gCoreContext->SaveSetting("mythgame.MetadataGrabber", m_gameGrabberButtonList->GetDataValue().toString());
 
     Close();
