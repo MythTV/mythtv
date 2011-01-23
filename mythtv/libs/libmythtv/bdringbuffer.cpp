@@ -503,7 +503,7 @@ bool BDRingBuffer::SwitchTitle(uint32_t index)
     m_infoLock.unlock();
     bd_select_title(bdnav, index);
 
-    return UpdateTitleInfo(index);
+    return UpdateTitleInfo();
 }
 
 bool BDRingBuffer::SwitchPlaylist(uint32_t index)
@@ -516,7 +516,7 @@ bool BDRingBuffer::SwitchPlaylist(uint32_t index)
     m_infoLock.lock();
     m_currentTitleInfo = GetPlaylistInfo(index);
     m_infoLock.unlock();
-    bool result = UpdateTitleInfo(index);
+    bool result = UpdateTitleInfo();
 
     VERBOSE(VB_PLAYBACK, LOC + "SwitchPlaylist - end");
     return result;
@@ -563,7 +563,7 @@ BLURAY_TITLE_INFO* BDRingBuffer::GetPlaylistInfo(uint32_t index)
     return NULL;
 }
 
-bool BDRingBuffer::UpdateTitleInfo(uint32_t index)
+bool BDRingBuffer::UpdateTitleInfo(void)
 {
     QMutexLocker locker(&m_infoLock);
     if (!m_currentTitleInfo)
@@ -575,17 +575,24 @@ bool BDRingBuffer::UpdateTitleInfo(uint32_t index)
     m_currentAngle = 0;
     m_titlesize = bd_get_title_size(bdnav);
     uint32_t chapter_count = GetNumChapters();
-    VERBOSE(VB_IMPORTANT, LOC + QString("Selected title/playlist: index %1. "
-                                        "Duration: %2 (%3 mins) "
-                                        "Number of Chapters: %4 Number of Angles: %5 "
-                                        "Title Size: %6")
-                                        .arg(index)
-                                        .arg(m_currentTitleLength)
-                                        .arg(m_currentTitleLength / (90000 * 60))
-                                        .arg(chapter_count)
-                                        .arg(m_currentTitleAngleCount)
-                                        .arg(m_titlesize));
-    VERBOSE(VB_PLAYBACK, LOC + QString("Frame Rate: %1").arg(GetFrameRate()));
+    uint64_t total_secs = m_currentTitleLength / 90000;
+    int hours = (int)total_secs / 60 / 60;
+    int minutes = ((int)total_secs / 60) - (hours * 60);
+    double secs = (double)total_secs - (double)(hours * 60 * 60 + minutes * 60);
+    QString duration = QString("%1:%2:%3")
+                        .arg(QString().sprintf("%02d", hours))
+                        .arg(QString().sprintf("%02d", minutes))
+                        .arg(QString().sprintf("%02.1f", secs));
+    VERBOSE(VB_IMPORTANT, LOC +
+        QString("New title info: Index %1 Playlist: %2 Duration: %3 Chapters: %5")
+                .arg(m_currentTitleInfo->idx).arg(m_currentTitleInfo->playlist)
+                .arg(duration).arg(chapter_count));
+    VERBOSE(VB_IMPORTANT, LOC +
+        QString("New title info: Clips: %6 Angles: %7 Title Size: %8 Frame Rate %9")
+                .arg(m_currentTitleInfo->clip_count)
+                .arg(m_currentTitleAngleCount).arg(m_titlesize)
+                .arg(GetFrameRate()));
+
     if (chapter_count)
     {
         for (uint i = 0; i < chapter_count; i++)
@@ -612,11 +619,12 @@ bool BDRingBuffer::UpdateTitleInfo(uint32_t index)
         {
             VERBOSE(VB_PLAYBACK, LOC + QString("Clip %1 stillmode %2 "
                                                "stilltime %3 videostreams %4 "
-                                               "audiostreams %5")
+                                               "audiostreams %5 igstreams %6")
                     .arg(i).arg(m_currentTitleInfo->clips[i].still_mode)
                     .arg(m_currentTitleInfo->clips[i].still_time)
                     .arg(m_currentTitleInfo->clips[i].video_stream_count)
-                    .arg(m_currentTitleInfo->clips[i].audio_stream_count));
+                    .arg(m_currentTitleInfo->clips[i].audio_stream_count)
+                    .arg(m_currentTitleInfo->clips[i].ig_stream_count));
             still |= m_currentTitleInfo->clips[i].still_mode;
             time = m_currentTitleInfo->clips[i].still_time;
         }

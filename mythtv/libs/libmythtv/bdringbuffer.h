@@ -113,7 +113,7 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     void WaitForPlayer(void);
 
     // private title handling
-    bool UpdateTitleInfo(uint32_t index);
+    bool UpdateTitleInfo(void);
     BLURAY_TITLE_INFO* GetTitleInfo(uint32_t index);
     BLURAY_TITLE_INFO* GetPlaylistInfo(uint32_t index);
 
