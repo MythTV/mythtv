@@ -9,7 +9,7 @@ TARGET = mythgame
 LIBS += -lmythmetadata-$$LIBVERSION
 
 installscripts.path = $${PREFIX}/share/mythtv/metadata/Game
-installscripts.files = scripts/*.py
+installscripts.files = scripts/*.py scripts/*.pl
 installgiantbomb.path = $${PREFIX}/share/mythtv/metadata/Game/giantbomb
 installgiantbomb.files = scripts/giantbomb/*.py
 installgiantbombxsl.path = $${PREFIX}/share/mythtv/metadata/Game/giantbomb/XSLT

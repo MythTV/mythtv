@@ -25,7 +25,16 @@ my $searchurl = $baseurl . "/maws/srch.php?search_text=";
 my $header = '<?xml version="1.0" encoding="UTF-8"?>
 <metadata>';
 my $footer = '</metadata>';
-our ($opt_M, $opt_D);
+my $version = '<grabber>
+  <name>MAWS MAME Database</name>
+  <author>Auric</author>
+  <thumbnail>maws.png</thumbnail>
+  <command>maws.pl</command>
+  <type>games</type>
+  <description>MAWS is a MAME information and aggregation site.</description>
+  <version>0.01</version>
+</grabber>';
+our ($opt_M, $opt_D, $opt_v);
 my @metaitems;
 #################################### Util Subs ############################################
 # If you copy this for another site, hopefully these won't need to changed
@@ -90,6 +99,10 @@ sub printitems {
 		print "    ".'<popularity>'.$item{'popularity'}.'</popularity>'."\n";
 		print "  ".'</item>'."\n";
 	}
+}
+
+sub printversion {
+        print "$version\n";
 }
 
 #################################### Site Specific Subs ##########################
@@ -228,9 +241,9 @@ sub queryinetref {
 }
 
 #################################### Main #####################################
-getopts('M:D:');
+getopts('vM:D:');
 
-unless (($opt_M) || ($opt_D)){
+unless (($opt_M) || ($opt_D) || ($opt_v)){
 	print "Error must have either -M search str or -D inetref\n";
 	cleanexit 1;
 }
@@ -240,16 +253,18 @@ $SIG{'HUP'} = \&cleanexit;
 $SIG{'TERM'} = \&cleanexit;
 $SIG{'QUIT'} = \&cleanexit;
 
-print "$header\n";
-
 if ($opt_M) {
 	search($opt_M);
+        print "$header\n";
 	printitems();
+        print "$footer\n";
 } elsif ($opt_D) {
 	queryinetref($opt_D);
+        print "$header\n";
 	printitems();
+        print "$footer\n";
+} elsif ($opt_v) {
+        printversion();
 }
-
-print "$footer\n";
 
 cleanexit 0;
