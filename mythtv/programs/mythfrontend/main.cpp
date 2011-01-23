@@ -28,6 +28,7 @@ using namespace std;
 #include "manualschedule.h"
 #include "playbackbox.h"
 #include "themechooser.h"
+#include "setupwizard_general.h"
 #include "customedit.h"
 #include "viewscheduled.h"
 #include "programrecpriority.h"
@@ -579,6 +580,16 @@ static void TVMenuCallback(void *data, QString &selection)
             mainStack->AddScreen(tp);
         else
             delete tp;
+    }
+    else if (sel == "settings setupwizard")
+    {
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        GeneralSetupWizard *sw = new GeneralSetupWizard(mainStack, "setupwizard");
+
+        if (sw->Create())
+            mainStack->AddScreen(sw);
+        else
+            delete sw;
     }
     else if (sel == "screensetupwizard")
     {
