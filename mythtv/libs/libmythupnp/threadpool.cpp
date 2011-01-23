@@ -326,14 +326,11 @@ ThreadPool::~ThreadPool( )
     while (it != m_lstThreads.end() )
     {
         WorkerThread *pThread = *it;
-
-        if (pThread != NULL)
-            delete pThread;
-
         it = m_lstThreads.erase( it );
+
+        if (pThread != NULL) 
+            pThread->deleteLater();
     }
-
-
 }
 
 /////////////////////////////////////////////////////////////////////////////
