@@ -30,12 +30,14 @@ static void HandleOverlayCallback(void *data, const bd_overlay_s *const overlay)
 }
 
 BDRingBuffer::BDRingBuffer(const QString &lfilename)
-  : bdnav(NULL), m_is_hdmv_navigation(false),
+  : bdnav(NULL), m_isHDMVNavigation(false), m_tryHDMVNavigation(false),
+    m_topMenuSupported(false), m_firstPlaySupported(false),
     m_numTitles(0), m_titleChanged(false), m_playerWait(false),
     m_ignorePlayerWait(true),
     m_stillTime(0), m_stillMode(BLURAY_STILL_NONE),
     m_infoLock(QMutex::Recursive)
 {
+    m_tryHDMVNavigation = NULL != getenv("MYTHTV_HDMV");
     OpenFile(lfilename);
 }
 
@@ -164,7 +166,7 @@ void BDRingBuffer::GetDescForPos(QString &desc)
 
 bool BDRingBuffer::HandleAction(const QStringList &actions, int64_t pts)
 {
-    if (!m_is_hdmv_navigation)
+    if (!m_isHDMVNavigation)
         return false;
 
     if (actions.contains(ACTION_MENUTEXT))
@@ -287,9 +289,14 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     }
 
     // Check disc to see encryption status, menu and navigation types.
+    m_topMenuSupported   = false;
+    m_firstPlaySupported = false;
     const BLURAY_DISC_INFO *discinfo = bd_get_disc_info(bdnav);
     if (discinfo)
     {
+        m_topMenuSupported   = discinfo->top_menu_supported;
+        m_firstPlaySupported = discinfo->first_play_supported;
+
         VERBOSE(VB_PLAYBACK, LOC + QString("*** Blu-ray Disc Information ***"));
         VERBOSE(VB_PLAYBACK, LOC + QString("First Play Supported: %1")
                 .arg(discinfo->first_play_supported ? "yes" : "no"));
@@ -378,15 +385,13 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     m_stillTime = 0;
     m_inMenu = false;
 
-    bool try_hdmv = NULL != getenv("MYTHTV_HDMV");
-
     // First, attempt to initialize the disc in HDMV navigation mode.
     // If this fails, fall back to the traditional built-in title switching
     // mode.
-    if (try_hdmv && bd_play(bdnav))
+    if (m_tryHDMVNavigation && m_firstPlaySupported && bd_play(bdnav))
     {
         VERBOSE(VB_IMPORTANT, LOC + QString("Using HDMV navigation mode."));
-        m_is_hdmv_navigation = true;
+        m_isHDMVNavigation = true;
 
         // Initialize the HDMV event queue
         HandleBDEvents();
@@ -677,7 +682,7 @@ uint64_t BDRingBuffer::GetTotalReadPosition(void)
 int BDRingBuffer::safe_read(void *data, uint sz)
 {
     int result = 0;
-    if (m_is_hdmv_navigation)
+    if (m_isHDMVNavigation)
     {
         HandleBDEvents();
         while (result == 0)
@@ -806,8 +811,14 @@ void BDRingBuffer::ClickButton(int64_t pts, uint16_t x, uint16_t y)
  */
 bool BDRingBuffer::GoToMenu(const QString str, int64_t pts)
 {
-    if (!m_is_hdmv_navigation || pts <= 0)
+    if (!m_isHDMVNavigation || pts < 0)
         return false;
+
+    if (!m_topMenuSupported)
+    {
+        VERBOSE(VB_PLAYBACK, LOC + "Top Menu not supported");
+        return false;
+    }
 
     VERBOSE(VB_PLAYBACK, LOC + QString("GoToMenu %1").arg(str));
 
@@ -985,7 +996,7 @@ void BDRingBuffer::WaitForPlayer(void)
 
 bool BDRingBuffer::StartFromBeginning(void)
 {
-    if (bdnav && m_is_hdmv_navigation)
+    if (bdnav && m_isHDMVNavigation)
     {
         VERBOSE(VB_PLAYBACK, LOC + "Starting from beginning...");
         return true; //bd_play(bdnav);

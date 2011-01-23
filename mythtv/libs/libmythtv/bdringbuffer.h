@@ -79,7 +79,7 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     uint64_t GetChapterStartTime(uint32_t chapter);
     uint64_t GetChapterStartFrame(uint32_t chapter);
     bool IsOpen(void)        const { return bdnav; }
-    bool IsHDMVNavigation(void) const { return m_is_hdmv_navigation; }
+    bool IsHDMVNavigation(void) const { return m_isHDMVNavigation; }
     bool IsInMenu(void) const { return m_inMenu; }
     bool IsInStillFrame(void) const;
     virtual bool IsInDiscMenuOrStillFrame(void) const
@@ -127,7 +127,11 @@ class MPUBLIC BDRingBuffer : public RingBuffer
 
     BLURAY            *bdnav;
     meta_dl           *m_metaDiscLibrary;
-    bool               m_is_hdmv_navigation;
+    bool               m_isHDMVNavigation;
+    bool               m_tryHDMVNavigation;
+    bool               m_topMenuSupported;
+    bool               m_firstPlaySupported;
+
     uint32_t           m_numTitles;
     uint32_t           m_mainTitle; // Index number of main title
     uint64_t           m_currentTitleLength; // Selected title's duration, in ticks (90Khz)
