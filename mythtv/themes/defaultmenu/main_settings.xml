@@ -56,15 +56,7 @@
         <text>Info Center Settings</text>
         <description>Configure weather, news, movie info, web, and recipes</description>
         <action>MENU info_settings.xml</action>
-        <depends>mythnews mythweather mythbookmarkmanager mythrecipe mythbrowser mythmovies</depends>
-    </button>
-
-    <button>
-        <type>ZONEMINDER</type>
-        <text>ZoneMinder Settings</text>
-        <description>Set up surveillance software</description>
-        <action>CONFIGPLUGIN mythzoneminder</action>
-        <depends>mythzoneminder</depends>
+        <depends>mythnews mythweather mythbookmarkmanager mythrecipe mythbrowser mythmovies mythzoneminder</depends>
     </button>
 
     <button>
@@ -72,6 +64,13 @@
         <text>System Event Handlers</text>
         <description>Configure System Event handler commands</description>
         <action>SYSTEM_EVENTS</action>
+    </button>
+
+    <button>
+        <type>SETTINGS_GRABBERS</type>
+        <text>Artwork and Data Sources</text>
+        <description>Configure sources of artwork and metadata</description>
+        <action>SETTINGS GRABBERS</action>
     </button>
 
 </mythmenu>

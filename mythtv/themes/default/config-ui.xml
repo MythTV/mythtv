@@ -401,4 +401,64 @@
 
     </window>
 
+    <window name="grabbersettings">
+
+        <textarea name="title" from="basetextarea">
+            <area>20,40,760,40</area>
+            <value>Artwork and Metadata Sources</value>
+            <align>hcenter,vcenter</align>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="helptext" from="basetextarea">
+            <area>50,350,700,280</area>
+            <multiline>yes</multiline>
+            <font>basesmall</font>
+            <align>allcenter</align>
+        </textarea>
+
+        <textarea name="moviegrabber_text" from="basetextarea">
+            <area>75,173,225,30</area>
+            <font>basesmall</font>
+            <value>Movie Metadata Source:</value>
+        </textarea>
+
+        <textarea name="tvgrabber_text" from="basetextarea">
+            <area>75,238,225,30</area>
+            <font>basesmall</font>
+            <value>Television Metadata Source:</value>
+        </textarea>
+
+        <textarea name="gamegrabber_text" from="basetextarea">
+            <area>75,303,225,30</area>
+            <font>basesmall</font>
+            <value>Game Metadata Source:</value>
+        </textarea>
+
+    <!--Widgets-->
+
+        <buttonlist name="moviegrabber" from="basewideselector">
+            <position>310,167</position>
+        </buttonlist>
+
+        <buttonlist name="tvgrabber" from="basewideselector">
+            <position>310,232</position>
+        </buttonlist>
+
+        <buttonlist name="gamegrabber" from="basewideselector">
+            <position>310,297</position>
+        </buttonlist>
+
+        <button name="cancel" from="basebutton">
+            <position>188,530</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="ok" from="basebutton">
+            <position>435,530</position>
+            <value>OK</value>
+        </button>
+
+    </window>
+
 </mythuitheme>
