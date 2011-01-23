@@ -1,20 +1,30 @@
 // qt
 #include <QString>
 #include <QVariant>
+#include <QFileInfo>
 
 // myth
-#include <mythcontext.h>
-#include <mythdbcon.h>
-#include <mythdirs.h>
-#include <mythprogressdialog.h>
+#include "mythcontext.h"
+#include "mythdbcon.h"
+#include "mythdirs.h"
+#include "mythprogressdialog.h"
+#include "mythcoreutil.h"
+#include "videoutils.h"
+#include "remotefile.h"
 
 #include "setupwizard_general.h"
 #include "setupwizard_audio.h"
 #include "setupwizard_video.h"
 
+const QString VIDEO_SAMPLE_HD_LOCATION =
+                  QString("http://www.fecitfacta.com/mythtv_video_test_HD_19000Kbps_H264.mkv");
+const QString VIDEO_SAMPLE_SD_LOCATION =
+                  QString("http://www.fecitfacta.com/mythtv_video_test_SD_6000Kbps_H264.mkv");
+
 VideoSetupWizard::VideoSetupWizard(MythScreenStack *parent, MythScreenType *general,
                                    MythScreenType *audio, const char *name)
-    : MythScreenType(parent, name),
+    : MythScreenType(parent, name),      m_downloadFile(QString()),
+      m_testType(ttNone),
       m_generalScreen(general),          m_audioScreen(audio),
       m_playbackProfileButtonList(NULL), m_testSDButton(NULL),
       m_testHDButton(NULL),              m_nextButton(NULL),
@@ -137,43 +147,112 @@ bool VideoSetupWizard::keyPressEvent(QKeyEvent *event)
 
 void VideoSetupWizard::testSDVideo(void)
 {
-    QString sdtestfile =
-           QString("%1themes/default/test_sd.mov")
-           .arg(GetShareDir());
-
+    QFileInfo qfile(VIDEO_SAMPLE_SD_LOCATION);
+    QString baseName = qfile.fileName();
+    QString sdtestfile = generate_file_url("Temp",
+                              gCoreContext->GetMasterHostName(), baseName);
     QString desiredpbp =
         m_playbackProfileButtonList->GetItemCurrent()->GetText();
-    QString currentpbp = m_vdp->GetDefaultProfileName(gCoreContext->GetHostName());
-
     QString desc = tr("A short test of your system's playback of "
                     "Standard Definition content with the %1 profile.")
                     .arg(desiredpbp);
     QString title = tr("Standard Definition Playback Test");
 
-    m_vdp->SetDefaultProfileName(desiredpbp, gCoreContext->GetHostName());
-    GetMythMainWindow()->HandleMedia("Internal", sdtestfile,
-                                     desc, title);
-    m_vdp->SetDefaultProfileName(currentpbp, gCoreContext->GetHostName());
+    if (!RemoteFile::Exists(sdtestfile))
+    {
+        m_testType = ttStandardDefinition;
+        DownloadSample(VIDEO_SAMPLE_SD_LOCATION);
+    }
+    else
+        playVideoTest(desc, title, sdtestfile);
 }
 
 void VideoSetupWizard::testHDVideo(void)
 {
-    QString hdtestfile =
-           QString("%1themes/default/test_hd.mov")
-           .arg(GetShareDir());
-
+    QFileInfo qfile(VIDEO_SAMPLE_HD_LOCATION);
+    QString baseName = qfile.fileName();
+    QString hdtestfile = generate_file_url("Temp",
+                              gCoreContext->GetMasterHostName(), baseName);
     QString desiredpbp =
         m_playbackProfileButtonList->GetItemCurrent()->GetText();
-    QString currentpbp = m_vdp->GetDefaultProfileName(gCoreContext->GetHostName());
-
     QString desc = tr("A short test of your system's playback of "
                     "High Definition content with the %1 profile.")
                     .arg(desiredpbp);
     QString title = tr("High Definition Playback Test");
 
+    if (!RemoteFile::Exists(hdtestfile))
+    {
+        m_testType = ttHighDefinition;
+        DownloadSample(VIDEO_SAMPLE_HD_LOCATION);
+    }
+    else
+        playVideoTest(desc, title, hdtestfile);
+}
+
+void VideoSetupWizard::playVideoTest(QString desc, QString title, QString file)
+{
+    QString desiredpbp =
+        m_playbackProfileButtonList->GetItemCurrent()->GetText();
+    QString currentpbp = m_vdp->GetDefaultProfileName(gCoreContext->GetHostName());
+
     m_vdp->SetDefaultProfileName(desiredpbp, gCoreContext->GetHostName());
-    GetMythMainWindow()->HandleMedia("Internal", hdtestfile,
-                                     desc, title);
+    GetMythMainWindow()->HandleMedia("Internal", file, desc, title);
     m_vdp->SetDefaultProfileName(currentpbp, gCoreContext->GetHostName());
 }
 
+void VideoSetupWizard::DownloadSample(QString url)
+{
+    QFileInfo qfile(url);
+    QString baseName = qfile.fileName();
+
+    OpenBusyPopup(tr("Downloading Video Sample..."));
+    m_downloadFile = RemoteDownloadFile(url, "Temp", baseName);
+}
+
+void VideoSetupWizard::customEvent(QEvent *e)
+{
+    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    {
+        MythEvent *me = (MythEvent *)e;
+        QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
+
+        if (tokens.isEmpty())
+            return;
+
+        if (tokens[0] == "DOWNLOAD_FILE")
+        {
+            QStringList args = me->ExtraDataList();
+            if ((tokens.size() != 2) ||
+                (args[1] != m_downloadFile))
+                return;
+
+            if (tokens[1] == "UPDATE")
+            {
+            }
+            else if (tokens[1] == "FINISHED")
+            {
+                int fileSize  = args[2].toInt();
+                int errorCode = args[4].toInt();
+
+                CloseBusyPopup();
+
+                QFileInfo file(m_downloadFile);
+                if ((m_downloadFile.startsWith("myth://")))
+                {
+                    if ((errorCode == 0) &&
+                        (fileSize > 0))
+                    {
+                        if (m_testType == ttHighDefinition)
+                            testHDVideo();
+                        else if (m_testType == ttStandardDefinition)
+                            testSDVideo();
+                    }
+                    else
+                    {
+                        ShowOkPopup(tr("Error downloading sample to backend."));
+                    }
+                }
+            }
+        }
+    }
+}
