@@ -598,3 +598,68 @@ QDateTime RFC822TimeToQDateTime(const QString& t)
     result.setTimeSpec(Qt::UTC);
     return result.toLocalTime();
 }
+
+MetaGrabberScript::MetaGrabberScript(const QString name,
+    const QString author,
+    const QString thumbnail,
+    const QString command,
+    const GrabberType type,
+    const QString typestring,
+    const QString description,
+    const float version
+    ) :
+    m_name(name),
+    m_author(author),
+    m_thumbnail(thumbnail),
+    m_command(command),
+    m_type(type),
+    m_typestring(typestring),
+    m_description(description),
+    m_version(version)
+{
+}
+
+MetaGrabberScript::~MetaGrabberScript()
+{
+}
+
+MetaGrabberScript* ParseGrabberVersion(const QDomElement& item)
+{
+    QString name, author, thumbnail, command, description, typestring;
+    float version = 0;
+    GrabberType type = GRAB_MOVIE;
+
+    name = item.firstChildElement("name").text();
+    author = item.firstChildElement("author").text();
+    thumbnail = item.firstChildElement("thumbnail").text();
+    command = item.firstChildElement("command").text();
+    description = item.firstChildElement("description").text();
+    version = item.firstChildElement("version").text().toFloat();
+    typestring = item.firstChildElement("type").text();
+
+    if (!typestring.isEmpty())
+    {
+        if (typestring.toLower() == "movie")
+            type = GRAB_MOVIE;
+        else if (typestring.toLower() == "television")
+            type = GRAB_TELEVISION;
+        else if (typestring.toLower() == "game")
+            type = GRAB_GAME;
+        else if (typestring.toLower() == "music")
+            type = GRAB_MUSIC;
+    }
+
+    return new MetaGrabberScript(name, author, thumbnail, command,
+                             type, typestring, description, version);
+}
+
+void MetaGrabberScript::toMap(MetadataMap &metadataMap)
+{
+    metadataMap["name"] = m_name;
+    metadataMap["author"] = m_author;
+    metadataMap["thumbnailfilename"] = m_thumbnail;
+    metadataMap["command"] = m_command;
+    metadataMap["description"] = m_description;
+    metadataMap["version"] = QString::number(m_version);
+    metadataMap["type"] = m_typestring;
+}

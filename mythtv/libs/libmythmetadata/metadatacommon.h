@@ -299,4 +299,52 @@ MPUBLIC QString nearestName(const QString& actual,
 
 MPUBLIC QDateTime RFC822TimeToQDateTime(const QString& t);
 
+enum GrabberType {
+    GRAB_MOVIE = 0,
+    GRAB_TELEVISION = 1,
+    GRAB_MUSIC = 2,
+    GRAB_GAME = 3
+};
+
+class MPUBLIC MetaGrabberScript : public QObject
+{
+  public:
+    MetaGrabberScript();
+    ~MetaGrabberScript();
+
+    MetaGrabberScript(
+        const QString name,
+        const QString author,
+        const QString thumbnail,
+        const QString command,
+        const GrabberType type,
+        const QString typestring,
+        const QString description,
+        const float version);
+
+    const QString GetName() { return m_name; };
+    const QString GetAuthor() { return m_author; };
+    const QString GetThumbnail() { return m_thumbnail; };
+    const QString GetCommand() { return m_command; };
+    const GrabberType GetType() { return m_type; };
+    const QString GetTypeString() { return m_typestring; };
+    const QString GetDescription() { return m_description; };
+    const float GetVersion() { return m_version; };
+
+    void toMap(MetadataMap &metadataMap);
+
+  private:
+    QString m_name;
+    QString m_author;
+    QString m_thumbnail;
+    QString m_command;
+    GrabberType m_type;
+    QString m_typestring;
+    QString m_description;
+    float m_version;
+};
+Q_DECLARE_METATYPE(MetaGrabberScript*)
+
+MPUBLIC MetaGrabberScript* ParseGrabberVersion(const QDomElement& item);
+
 #endif // METADATACOMMON_H_
