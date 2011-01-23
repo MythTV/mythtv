@@ -66,7 +66,7 @@ bool MythBDPlayer::VideoLoop(void)
 
     if (drain)
     {
-        if (nbframes < 5 && videoOutput)
+        if (nbframes < 2 && videoOutput)
             videoOutput->UpdatePauseFrame();
 
         // if we go below the pre-buffering limit, the player will pause
@@ -79,7 +79,6 @@ bool MythBDPlayer::VideoLoop(void)
     if (player_ctx->buffer->BD()->BDWaitingForPlayer())
     {
         VERBOSE(VB_PLAYBACK, LOC + "Clearing Mythtv BD wait state");
-        ClearAfterSeek(true);
         player_ctx->buffer->BD()->SkipBDWaitingForPlayer();
         return !IsErrored();
     }
