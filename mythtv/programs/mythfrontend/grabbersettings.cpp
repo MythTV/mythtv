@@ -57,6 +57,8 @@ bool GrabberSettings::Create()
                                           "information and artwork about television."));
     m_gameGrabberButtonList->SetHelpText(tr("Select a source to use when searching for "
                                             "information and artwork about video games."));
+    m_okButton->SetHelpText(tr("Save your changes and close this window."));
+    m_cancelButton->SetHelpText(tr("Discard your changes and close this window."));
 
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(slotSave()));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
