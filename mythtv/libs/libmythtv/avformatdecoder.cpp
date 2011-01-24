@@ -1804,8 +1804,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         if (dec.left(4) == "xvmc")
                             dvd_xvmc_enabled = true;
 
-                        if (ringBuffer->InDVDMenuOrStillFrame() &&
-                            dvd_xvmc_enabled)
+                        if (ringBuffer->IsDVD())
                         {
                             force_xv = true;
                             enc->pix_fmt = PIX_FMT_YUV420P;

@@ -69,7 +69,7 @@ int mythplugin_init(const char *libversion)
                 "Couldn't upgrade database to new schema, exiting.");
         return -1;
     }
-    gCoreContext->ActivateSettingsCache(false);
+    gCoreContext->ActivateSettingsCache(true);
 
     setupKeys();
 
