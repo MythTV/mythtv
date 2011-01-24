@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# @(#)$Header: /home/mythtv/mythtvrep/scripts/maws.pl,v 1.3 2010/06/04 07:48:49 mythtv Exp $
+# @(#)$Header: /home/mythtv/mythtvrep/scripts/maws.pl,v 1.9 2011/01/24 07:05:01 mythtv Exp $
 # Auric 2010/01/10 http://web.aanet.com.au/auric/
 #
 # MAWS metadata Grabber Script
@@ -25,19 +25,25 @@ my $searchurl = $baseurl . "/maws/srch.php?search_text=";
 my $header = '<?xml version="1.0" encoding="UTF-8"?>
 <metadata>';
 my $footer = '</metadata>';
-my $version = '<grabber>
-  <name>MAWS MAME Database</name>
-  <author>Auric</author>
-  <thumbnail>maws.png</thumbnail>
-  <command>maws.pl</command>
-  <type>games</type>
-  <description>MAWS is a MAME information and aggregation site.</description>
-  <version>0.01</version>
-</grabber>';
 our ($opt_M, $opt_D, $opt_v);
 my @metaitems;
+my $version = '$Revision: 1.9 $'; $version =~ s/\D*([\d\.]+)\D*/$1/; # rcs tag populated
+my $command = "maws.pl"; my $commandthumbnail = "maws.png"; my $author = "Auric";
 #################################### Util Subs ############################################
 # If you copy this for another site, hopefully these won't need to changed
+
+sub printversion {
+	#print '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+	print '<grabber>'."\n";
+	print '  <name>'.$site.'</name>'."\n";
+	print '  <command>'.$command.'</command>'."\n";
+	print '  <author>'.$author.'</author>'."\n";
+	print '  <thumbnail>'.$commandthumbnail.'</thumbnail>'."\n";
+	print '  <type>games</type>'."\n";
+	print '  <description>Search and Metadata downloads from the MAME MAWS db</description>'."\n";
+	print '  <version>'.$version.'</version>'."\n";
+	print '</grabber>'."\n";
+}
 
 sub cleanexit {
 	my $esig = shift @_;
@@ -99,10 +105,6 @@ sub printitems {
 		print "    ".'<popularity>'.$item{'popularity'}.'</popularity>'."\n";
 		print "  ".'</item>'."\n";
 	}
-}
-
-sub printversion {
-        print "$version\n";
 }
 
 #################################### Site Specific Subs ##########################
@@ -241,9 +243,14 @@ sub queryinetref {
 }
 
 #################################### Main #####################################
-getopts('vM:D:');
+getopts('M:D:v');
 
-unless (($opt_M) || ($opt_D) || ($opt_v)){
+if ($opt_v) {
+	printversion;
+	cleanexit 0;
+}
+
+unless (($opt_M) || ($opt_D)){
 	print "Error must have either -M search str or -D inetref\n";
 	cleanexit 1;
 }
@@ -253,18 +260,17 @@ $SIG{'HUP'} = \&cleanexit;
 $SIG{'TERM'} = \&cleanexit;
 $SIG{'QUIT'} = \&cleanexit;
 
+print "$header\n";
+
 if ($opt_M) {
 	search($opt_M);
-        print "$header\n";
 	printitems();
-        print "$footer\n";
 } elsif ($opt_D) {
 	queryinetref($opt_D);
-        print "$header\n";
 	printitems();
-        print "$footer\n";
-} elsif ($opt_v) {
-        printversion();
 }
 
+print "$footer\n";
+
 cleanexit 0;
+
