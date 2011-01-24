@@ -1,5 +1,10 @@
 #include "bdringbuffer.h"
+#include "mythbdplayer.h"
 #include "avformatdecoderbd.h"
+
+#define LOC QString("AFD_BD: ")
+#define LOC_ERR QString("AFD_BD Error: ")
+#define LOC_WARN QString("AFD_BD Warning: ")
 
 AvFormatDecoderBD::AvFormatDecoderBD(
     MythPlayer *parent, const ProgramInfo &pginfo,
@@ -8,6 +13,19 @@ AvFormatDecoderBD::AvFormatDecoderBD(
   : AvFormatDecoder(parent, pginfo, use_null_video_out, allow_private_decode,
                     no_hardware_decode, av_special_decode)
 {
+}
+
+void AvFormatDecoderBD::StreamChangeCheck(void)
+{
+    if (!ringBuffer->IsBD())
+        return;
+
+    if (m_parent->AtNormalSpeed() && ringBuffer->BD()->TitleChanged())
+    {
+        ResetPosMap();
+        SyncPositionMap();
+        UpdateFramesPlayed();
+    }
 }
 
 int AvFormatDecoderBD::GetSubtitleLanguage(uint subtitle_index,

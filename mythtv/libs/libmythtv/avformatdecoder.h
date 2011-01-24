@@ -233,6 +233,8 @@ class AvFormatDecoder : public DecoderBase
     float normalized_fps(AVStream *stream, AVCodecContext *enc);
     void av_update_stream_timings_video(AVFormatContext *ic);
 
+    virtual void StreamChangeCheck(void) { }
+    virtual void PostProcessTracks(void) { }
     virtual int GetSubtitleLanguage(uint subtitle_index, uint stream_index);
     virtual int GetAudioLanguage(uint audio_index, uint stream_index);
 

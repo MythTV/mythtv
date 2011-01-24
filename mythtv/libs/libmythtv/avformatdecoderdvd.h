@@ -13,6 +13,8 @@ public:
                     AVSpecialDecode av_special_decode = kAVSpecialDecode_None);
 
   private:
+    virtual void StreamChangeCheck(void);
+    virtual void PostProcessTracks(void);
     virtual int GetAudioLanguage(uint audio_index, uint stream_index);
 };
 
