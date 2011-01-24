@@ -370,6 +370,20 @@ bool FileAssocDialog::Create()
             SLOT(OnNewExtensionPressed()));
     connect(m_deleteButton, SIGNAL(Clicked()), SLOT(OnDeletePressed()));
 
+    m_extensionList->SetHelpText(tr("Select a file extension from this list "
+                                    "to modify or delete its settings."));
+    m_commandEdit->SetHelpText(tr("The command to use when playing this kind "
+                                  "of file.  To use MythTV's Internal player, "
+                                  "use \"Internal\" as the player.  For all other "
+                                  "players, you can use %s to substitute the filename."));
+    m_ignoreCheck->SetHelpText(tr("When checked, this will cause the file extension "
+                                  "to be ignored in scans of your library."));
+    m_defaultCheck->SetHelpText(tr("When checked, this will cause the global player "
+                                   "settings to override this one."));
+    m_doneButton->SetHelpText(tr("Save and exit this screen."));
+    m_newButton->SetHelpText(tr("Create a new file extension."));
+    m_deleteButton->SetHelpText(tr("Delete this file extension."));
+
     UpdateScreen();
 
     BuildFocusList();
