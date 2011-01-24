@@ -1445,7 +1445,7 @@ yadif_setup +
 
 static const QString bicubic =
 "TEMP coord, coord2, cdelta, parmx, parmy, a, b, c, d;\n"
-"MAD coord.xy, fragment.texcoord[0], {%6, %7}, {-0.5, -0.5};\n"
+"MAD coord.xy, fragment.texcoord[0], {%6, %7}, {0.5, 0.5};\n"
 "TEX parmx, coord.x, texture[1], 1D;\n"
 "TEX parmy, coord.y, texture[1], 1D;\n"
 "MUL cdelta.xz, parmx.rrgg, {-%5, 0, %5, 0};\n"
