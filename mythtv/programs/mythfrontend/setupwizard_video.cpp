@@ -230,7 +230,7 @@ void VideoSetupWizard::DownloadSample(QString url)
 void VideoSetupWizard::initProgressDialog()
 {
     QString message = tr("Downloading Video Sample...");
-    m_progressDialog = new MythUIProgressDialog("",
+    m_progressDialog = new MythUIProgressDialog(message,
                m_popupStack, "sampledownloadprogressdialog");
 
     if (m_progressDialog->Create())
