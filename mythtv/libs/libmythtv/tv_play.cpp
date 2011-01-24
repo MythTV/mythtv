@@ -429,7 +429,7 @@ void TV::InitKeys(void)
 {
     REG_KEY("TV Frontend", "PLAYBACK", QT_TRANSLATE_NOOP("MythControls",
             "Play Program"), "P");
-    REG_KEY("TV Frontend", "TOGGLERECORD", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Frontend", ACTION_TOGGLERECORD, QT_TRANSLATE_NOOP("MythControls",
             "Toggle recording status of current program"), "R");
     REG_KEY("TV Frontend", "DAYLEFT", QT_TRANSLATE_NOOP("MythControls",
             "Page the program guide back one day"), "Home");
@@ -439,7 +439,7 @@ void TV::InitKeys(void)
             "Page the program guide left"), ",,<");
     REG_KEY("TV Frontend", "PAGERIGHT", QT_TRANSLATE_NOOP("MythControls",
             "Page the program guide right"), ">,.");
-    REG_KEY("TV Frontend", "TOGGLEFAV", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Frontend", ACTION_TOGGLEFAV, QT_TRANSLATE_NOOP("MythControls",
             "Toggle the current channel as a favorite"), "?");
     REG_KEY("TV Frontend", "TOGGLEEPGORDER", QT_TRANSLATE_NOOP("MythControls",
             "Reverse the channel order in the program guide"), "");
@@ -527,9 +527,9 @@ void TV::InitKeys(void)
             "Jump to the start of the recording."), "Ctrl+B");
     REG_KEY("TV Playback", "TOGGLEBROWSE", QT_TRANSLATE_NOOP("MythControls",
             "Toggle channel browse mode"), "O");
-    REG_KEY("TV Playback", "TOGGLERECORD", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_TOGGLERECORD, QT_TRANSLATE_NOOP("MythControls",
             "Toggle recording status of current program"), "R");
-    REG_KEY("TV Playback", "TOGGLEFAV", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_TOGGLEFAV, QT_TRANSLATE_NOOP("MythControls",
             "Toggle the current channel as a favorite"), "?");
     REG_KEY("TV Playback", "VOLUMEDOWN", QT_TRANSLATE_NOOP("MythControls",
             "Volume down"), "[,{,F10,Volume Down");
@@ -539,7 +539,7 @@ void TV::InitKeys(void)
             "|,\\,F9,Volume Mute");
     REG_KEY("TV Playback", "CYCLEAUDIOCHAN", QT_TRANSLATE_NOOP("MythControls",
             "Cycle audio channels"), "");
-    REG_KEY("TV Playback", "TOGGLEUPMIX", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_TOGGLEUPMIX, QT_TRANSLATE_NOOP("MythControls",
             "Toggle audio upmixer"), "Ctrl+U");
     REG_KEY("TV Playback", "TOGGLEPIPMODE", QT_TRANSLATE_NOOP("MythControls",
             "Toggle Picture-in-Picture view"), "V");
@@ -647,13 +647,13 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "TOGGLEPICCONTROLS",
             QT_TRANSLATE_NOOP("MythControls", "Playback picture adjustments"),
              "F");
-    REG_KEY("TV Playback", "TOGGLESTUDIOLEVELS",
+    REG_KEY("TV Playback", ACTION_TOGGLESTUDIOLEVELS,
             QT_TRANSLATE_NOOP("MythControls", "Playback picture adjustments"),
              "");
-    REG_KEY("TV Playback", "TOGGLECHANCONTROLS",
+    REG_KEY("TV Playback", ACTION_TOGGLECHANCONTROLS,
             QT_TRANSLATE_NOOP("MythControls", "Recording picture adjustments "
             "for this channel"), "Ctrl+G");
-    REG_KEY("TV Playback", "TOGGLERECCONTROLS",
+    REG_KEY("TV Playback", ACTION_TOGGLERECCONTROLS,
             QT_TRANSLATE_NOOP("MythControls", "Recording picture adjustments "
             "for this recorder"), "G");
     REG_KEY("TV Playback", "CYCLECOMMSKIPMODE",
@@ -3676,7 +3676,7 @@ bool TV::BrowseHandleAction(PlayerContext *ctx, const QStringList &actions)
     {
         browsehelper->BrowseEnd(ctx, false);
     }
-    else if (has_action("TOGGLERECORD", actions))
+    else if (has_action(ACTION_TOGGLERECORD, actions))
         ToggleRecord(ctx);
     else
     {
@@ -4202,23 +4202,23 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
         ChangeAudioSync(ctx, 0);   // just display
     else if (has_action("TOGGLEPICCONTROLS", actions))
         DoTogglePictureAttribute(ctx, kAdjustingPicture_Playback);
-    else if (has_action("TOGGLESTUDIOLEVELS", actions))
+    else if (has_action(ACTION_TOGGLESTUDIOLEVELS, actions))
         DoToggleStudioLevels(ctx);
     else if (has_action("TOGGLESTRETCH", actions))
         ToggleTimeStretch(ctx);
-    else if (has_action("TOGGLEUPMIX", actions))
+    else if (has_action(ACTION_TOGGLEUPMIX, actions))
         ToggleUpmix(ctx);
     else if (has_action(ACTION_TOGGLESLEEP, actions))
         ToggleSleepTimer(ctx);
-    else if (has_action("TOGGLERECORD", actions) && islivetv)
+    else if (has_action(ACTION_TOGGLERECORD, actions) && islivetv)
         ToggleRecord(ctx);
-    else if (has_action("TOGGLEFAV", actions) && islivetv)
+    else if (has_action(ACTION_TOGGLEFAV, actions) && islivetv)
         ToggleChannelFavorite(ctx);
-    else if (has_action("TOGGLECHANCONTROLS", actions) && islivetv)
+    else if (has_action(ACTION_TOGGLECHANCONTROLS, actions) && islivetv)
         DoTogglePictureAttribute(ctx, kAdjustingPicture_Channel);
-    else if (has_action("TOGGLERECCONTROLS", actions) && islivetv)
+    else if (has_action(ACTION_TOGGLERECCONTROLS, actions) && islivetv)
         DoTogglePictureAttribute(ctx, kAdjustingPicture_Recording);
-    else if (has_action("TOGGLEINPUTS", actions) &&
+    else if (has_action(ACTION_TOGGLEINPUTS, actions) &&
              islivetv && !ctx->pseudoLiveTVState)
     {
         ToggleInputs(ctx);
@@ -9526,7 +9526,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         SetManualZoom(actx, true, tr("Zoom Mode ON"));
     else if (action == "TOGGLESTRETCH")
         ToggleTimeStretch(actx);
-    else if (action == "TOGGLEUPMIX")
+    else if (action == ACTION_TOGGLEUPMIX)
         ToggleUpmix(actx);
     else if (action.left(13) == "ADJUSTSTRETCH")
     {
@@ -9569,7 +9569,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
             (action.right(1).toInt() - 1);
         DoTogglePictureAttribute(actx, kAdjustingPicture_Playback);
     }
-    else if (action.left(18) == "TOGGLESTUDIOLEVELS")
+    else if (action.left(18) == ACTION_TOGGLESTUDIOLEVELS)
     {
         DoToggleStudioLevels(actx);
     }
@@ -9850,7 +9850,7 @@ void TV::FillOSDMenuAudio(const PlayerContext *ctx, OSD *osd,
                                  selected == "AUDIOTRACKS");
         }
         osd->DialogAddButton(tr("Adjust Audio Sync"),    "TOGGLEAUDIOSYNC");
-        osd->DialogAddButton(tr("Toggle Audio Upmixer"), "TOGGLEUPMIX");
+        osd->DialogAddButton(tr("Toggle Audio Upmixer"), ACTION_TOGGLEUPMIX);
     }
     else if (category == "AUDIOTRACKS")
     {
@@ -9977,7 +9977,7 @@ void TV::FillOSDMenuVideo(const PlayerContext *ctx, OSD *osd,
                 {
                     QString msg = studio_levels ? tr("Disable studio levels") :
                                                   tr("Enable studio levels");
-                    osd->DialogAddButton(msg, "TOGGLESTUDIOLEVELS");
+                    osd->DialogAddButton(msg, ACTION_TOGGLESTUDIOLEVELS);
                 }
                 else
                 {
