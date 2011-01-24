@@ -34,6 +34,10 @@ class MythBDPlayer : public MythPlayer
     virtual void DisplayPauseFrame(void);
     virtual void PreProcessNormalFrame(void);
 
+    // Private decoder stuff
+    virtual void CreateDecoder(char *testbuf, int testreadsize,
+                               bool allow_libmpeg2, bool no_accel);
+
   private:
     void DisplayMenu(void);
     bool m_stillFrameShowing;

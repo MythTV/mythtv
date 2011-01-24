@@ -180,9 +180,8 @@ class AvFormatDecoder : public DecoderBase
     void ScanTeletextCaptions(int av_stream_index);
     void ScanRawTextCaptions(int av_stream_index);
     void ScanDSMCCStreams(void);
-    int AutoSelectAudioTrack(void);
+    int  AutoSelectAudioTrack(void);
 
-  private:
     friend int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
     friend void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
 
@@ -234,7 +233,9 @@ class AvFormatDecoder : public DecoderBase
     float normalized_fps(AVStream *stream, AVCodecContext *enc);
     void av_update_stream_timings_video(AVFormatContext *ic);
 
-  private:
+    virtual int GetSubtitleLanguage(uint subtitle_index, uint stream_index);
+    virtual int GetAudioLanguage(uint audio_index, uint stream_index);
+
     PrivateDecoder *private_dec;
 
     bool is_db_ignored;

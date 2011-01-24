@@ -1,4 +1,5 @@
 #include "bdringbuffer.h"
+#include "avformatdecoderbd.h"
 #include "mythbdplayer.h"
 
 #define LOC     QString("BDPlayer: ")
@@ -341,3 +342,15 @@ bool MythBDPlayer::PrevAngle(void)
     return SwitchAngle(prev);
 }
 
+void MythBDPlayer::CreateDecoder(char *testbuf, int testreadsize,
+                               bool allow_libmpeg2, bool no_accel)
+{
+    if (AvFormatDecoderBD::CanHandle(testbuf, player_ctx->buffer->GetFilename(),
+                                     testreadsize))
+    {
+        SetDecoder(new AvFormatDecoderBD(this, *player_ctx->playingInfo,
+                                         using_null_videoout,
+                                         allow_libmpeg2, no_accel,
+                                         player_ctx->GetSpecialDecode()));
+    }
+}

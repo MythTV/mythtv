@@ -1964,19 +1964,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
         if (enc->codec_type == CODEC_TYPE_SUBTITLE)
         {
-            int lang;
-            if (ringBuffer && ringBuffer->IsBD())
-            {
-                lang = ringBuffer->BD()->
-                    GetSubtitleLanguage(subtitleStreamCount);
-            }
-            else
-            {
-                AVMetadataTag *metatag = av_metadata_get(ic->streams[i]->metadata,
-                                                        "language", NULL, 0);
-                lang = metatag ? get_canonical_lang(metatag->value) : iso639_str3_to_key("und");
-            }
-
+            int lang = GetSubtitleLanguage(subtitleStreamCount, i);
             int lang_indx = lang_sub_cnt[lang]++;
             subtitleStreamCount++;
 
@@ -1992,25 +1980,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
         if (enc->codec_type == CODEC_TYPE_AUDIO)
         {
-            int lang;
-            if (ringBuffer && ringBuffer->IsDVD())
-            {
-                lang = ringBuffer->DVD()->GetAudioLanguage(
-                    ringBuffer->DVD()->GetAudioTrackNum(ic->streams[i]->id));
-            }
-            else if (ringBuffer && ringBuffer->IsBD())
-            {
-                lang = ringBuffer->BD()->GetAudioLanguage(audioStreamCount);
-            }
-            else
-            {
-                AVMetadataTag *metatag = av_metadata_get(
-                    ic->streams[i]->metadata,
-                    "language", NULL, 0);
-                lang = metatag ? get_canonical_lang(metatag->value) :
-                    iso639_str3_to_key("und");
-            }
-
+            int lang = GetAudioLanguage(audioStreamCount, i);
             int channels  = ic->streams[i]->codec->channels;
             int lang_indx = lang_aud_cnt[lang]++;
             audioStreamCount++;
@@ -2140,6 +2110,21 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     ScanDSMCCStreams();
 
     return scanerror;
+}
+
+int AvFormatDecoder::GetSubtitleLanguage(uint subtitle_index, uint stream_index)
+{
+    (void)subtitle_index;
+     AVMetadataTag *metatag =
+        av_metadata_get(ic->streams[stream_index]->metadata,
+                        "language", NULL, 0);
+    return metatag ? get_canonical_lang(metatag->value) :
+                     iso639_str3_to_key("und");
+}
+
+int AvFormatDecoder::GetAudioLanguage(uint audio_index, uint stream_index)
+{
+    return GetSubtitleLanguage(audio_index, stream_index);
 }
 
 /**

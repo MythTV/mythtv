@@ -86,6 +86,10 @@ class MythDVDPlayer : public MythPlayer
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
     virtual int  SetTrack(uint type, int trackNo);
 
+    // Private decoder stuff
+    virtual void CreateDecoder(char *testbuf, int testreadsize,
+                               bool allow_libmpeg2, bool no_accel);
+
   private:
     void DoChangeDVDTrack(void);
     void SetDVDBookmark(uint64_t frame);

@@ -2,6 +2,7 @@
 #include "DetectLetterbox.h"
 #include "audiooutput.h"
 #include "myth_imgconvert.h"
+#include "avformatdecoderdvd.h"
 #include "mythdvdplayer.h"
 
 #define LOC      QString("DVDPlayer: ")
@@ -646,5 +647,18 @@ void MythDVDPlayer::StillFrameCheck(void)
             player_ctx->buffer->DVD()->SkipStillFrame();
             m_stillFrameLength = 0;
         }
+    }
+}
+
+void MythDVDPlayer::CreateDecoder(char *testbuf, int testreadsize,
+                                  bool allow_libmpeg2, bool no_accel)
+{
+    if (AvFormatDecoderDVD::CanHandle(testbuf, player_ctx->buffer->GetFilename(),
+                                     testreadsize))
+    {
+        SetDecoder(new AvFormatDecoderDVD(this, *player_ctx->playingInfo,
+                                         using_null_videoout,
+                                         allow_libmpeg2, no_accel,
+                                         player_ctx->GetSpecialDecode()));
     }
 }
