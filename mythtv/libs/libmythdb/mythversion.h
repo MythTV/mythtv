@@ -19,12 +19,16 @@
  *   ProgramInfo network protocol layout in the following files:
  *
  *   MythWeb
- *       mythplugins/mythweb/classes/MythBackend.php (version number)
- *       mythplugins/mythweb/modules/tv/includes/objects/Program.php (layout)
+ *       mythweb/modules/tv/classes/Program.php (layout)
  *
  *   MythTV Perl Bindings
  *       mythtv/bindings/perl/MythTV.pm (version number)
  *       mythtv/bindings/perl/MythTV/Program.pm (layout)
+ *
+ *   MythTV PHP Bindings
+ *       mythtv/bindings/php/MythBackend.php (version number)
+ *       mythtv/bindings/php/MythTVProgram.php (layout)
+ *       mythtv/bindings/php/MythTVRecording.php (layout)
  *
  *   MythTV Python Bindings
  *       mythtv/bindings/python/MythTV/static.py (version number)
