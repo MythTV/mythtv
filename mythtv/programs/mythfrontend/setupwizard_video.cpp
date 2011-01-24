@@ -120,6 +120,20 @@ void VideoSetupWizard::loadData(void)
 void VideoSetupWizard::slotNext(void)
 {
     save();
+
+    if (m_audioScreen)
+    {
+        m_audioScreen->Close();
+        m_audioScreen = NULL;
+    }
+
+    if (m_generalScreen)
+    {
+        m_generalScreen->Close();
+        m_generalScreen = NULL;
+    }
+
+    Close();
 }
 
 void VideoSetupWizard::save(void)
