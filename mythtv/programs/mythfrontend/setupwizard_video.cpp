@@ -30,8 +30,10 @@ VideoSetupWizard::VideoSetupWizard(MythScreenStack *parent, MythScreenType *gene
       m_testHDButton(NULL),              m_nextButton(NULL),
       m_prevButton(NULL)
 {
+    m_popupStack = GetMythMainWindow()->GetStack("popup stack");
     m_vdp = new VideoDisplayProfile();
     m_audioScreen->Hide();
+    gCoreContext->addListener(this);
 }
 
 bool VideoSetupWizard::Create()
@@ -90,6 +92,8 @@ VideoSetupWizard::~VideoSetupWizard()
 
     if (m_audioScreen)
         m_audioScreen->Show();
+
+    gCoreContext->removeListener(this);
 }
 
 void VideoSetupWizard::loadData(void)
@@ -205,8 +209,25 @@ void VideoSetupWizard::DownloadSample(QString url)
     QFileInfo qfile(url);
     QString baseName = qfile.fileName();
 
-    OpenBusyPopup(tr("Downloading Video Sample..."));
+    initProgressDialog();
     m_downloadFile = RemoteDownloadFile(url, "Temp", baseName);
+}
+
+void VideoSetupWizard::initProgressDialog()
+{
+    QString message = tr("Downloading Video Sample...");
+    m_progressDialog = new MythUIProgressDialog("",
+               m_popupStack, "sampledownloadprogressdialog");
+
+    if (m_progressDialog->Create())
+    {
+        m_popupStack->AddScreen(m_progressDialog, false);
+    }
+    else
+    {
+        delete m_progressDialog;
+        m_progressDialog = NULL;
+    }
 }
 
 void VideoSetupWizard::customEvent(QEvent *e)
@@ -228,13 +249,20 @@ void VideoSetupWizard::customEvent(QEvent *e)
 
             if (tokens[1] == "UPDATE")
             {
+                QString message = tr("Downloading Video Sample...\n"
+                                     "(%1 of %2 MB)").arg(args[2].toInt() / 1024.0 / 1024.0)
+                                     .arg(args[3].toInt() / 1024.0 / 1024.0);
+                m_progressDialog->SetMessage(message);
+                m_progressDialog->SetTotal(args[3].toInt());
+                m_progressDialog->SetProgress(args[2].toInt());
             }
             else if (tokens[1] == "FINISHED")
             {
                 int fileSize  = args[2].toInt();
                 int errorCode = args[4].toInt();
 
-                CloseBusyPopup();
+                if (m_progressDialog)
+                    m_progressDialog->Close();
 
                 QFileInfo file(m_downloadFile);
                 if ((m_downloadFile.startsWith("myth://")))

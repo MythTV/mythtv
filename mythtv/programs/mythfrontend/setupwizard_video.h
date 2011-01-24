@@ -11,6 +11,7 @@
 // libmythui
 #include <mythuibutton.h>
 #include <mythuibuttonlist.h>
+#include <mythprogressdialog.h>
 #include <mythscreentype.h>
 #include <mythdialogbox.h>
 
@@ -34,6 +35,8 @@ class VideoSetupWizard : public MythScreenType
     void save(void);
 
   private:
+    void initProgressDialog();
+
     enum TestType
     {
         ttNone = 0,
@@ -47,7 +50,9 @@ class VideoSetupWizard : public MythScreenType
     MythScreenType      *m_generalScreen;
     MythScreenType      *m_audioScreen;
 
-    MythUIButtonList    *m_playbackProfileButtonList;
+    MythUIButtonList     *m_playbackProfileButtonList;
+    MythScreenStack      *m_popupStack;
+    MythUIProgressDialog *m_progressDialog;
 
     MythUIButton        *m_testSDButton;
     MythUIButton        *m_testHDButton;
