@@ -250,8 +250,9 @@ void VideoSetupWizard::customEvent(QEvent *e)
             if (tokens[1] == "UPDATE")
             {
                 QString message = tr("Downloading Video Sample...\n"
-                                     "(%1 of %2 MB)").arg(args[2].toInt() / 1024.0 / 1024.0)
-                                     .arg(args[3].toInt() / 1024.0 / 1024.0);
+                                     "(%1 of %2 MB)")
+                                     .arg(QString::number(args[2].toInt() / 1024.0 / 1024.0, 'f', 2))
+                                     .arg(QString::number(args[3].toInt() / 1024.0 / 1024.0, 'f', 2));
                 m_progressDialog->SetMessage(message);
                 m_progressDialog->SetTotal(args[3].toInt());
                 m_progressDialog->SetProgress(args[2].toInt());
