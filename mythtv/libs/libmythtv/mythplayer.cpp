@@ -1202,22 +1202,21 @@ void MythPlayer::WindowResized(const QSize &new_size)
 
 void MythPlayer::EnableTeletext(int page)
 {
+    QMutexLocker locker(&osdLock);
     if (!osd)
         return;
 
-    osdLock.lock();
     osd->EnableTeletext(true, page);
     prevTextDisplayMode = textDisplayMode;
     textDisplayMode = kDisplayTeletextMenu;
-    osdLock.unlock();
 }
 
 void MythPlayer::DisableTeletext(void)
 {
+    QMutexLocker locker(&osdLock);
     if (!osd)
         return;
 
-    osdLock.lock();
     osd->EnableTeletext(false, 0);
     textDisplayMode = kDisplayNone;
 
@@ -1225,17 +1224,15 @@ void MythPlayer::DisableTeletext(void)
        re-enabled them. */
     if (prevTextDisplayMode & kDisplayAllCaptions)
         EnableCaptions(prevTextDisplayMode, false);
-    osdLock.unlock();
 }
 
 void MythPlayer::ResetTeletext(void)
 {
+    QMutexLocker locker(&osdLock);
     if (!osd)
         return;
 
-    osdLock.lock();
     osd->TeletextReset();
-    osdLock.unlock();
 }
 
 /** \fn MythPlayer::SetTeletextPage(uint)
@@ -1262,7 +1259,7 @@ bool MythPlayer::HandleTeletextAction(const QString &action)
     osdLock.lock();
     if (action == "MENU" || action == ACTION_TOGGLETT || action == "ESCAPE")
         DisableTeletext();
-    else
+    else if (osd)
         handled = osd->TeletextAction(action);
     osdLock.unlock();
 
@@ -1271,16 +1268,18 @@ bool MythPlayer::HandleTeletextAction(const QString &action)
 
 void MythPlayer::ResetCaptions(void)
 {
-    if (osd && ((textDisplayMode & kDisplayAVSubtitle)      ||
-                (textDisplayMode & kDisplayTextSubtitle)    ||
-                (textDisplayMode & kDisplayRawTextSubtitle) ||
-                (textDisplayMode & kDisplayDVDButton)       ||
-                (textDisplayMode & kDisplayCC608)           ||
-                (textDisplayMode & kDisplayCC708)))
+    QMutexLocker locker(&osdLock);
+    if (!osd)
+        return;
+
+    if (((textDisplayMode & kDisplayAVSubtitle)      ||
+         (textDisplayMode & kDisplayTextSubtitle)    ||
+         (textDisplayMode & kDisplayRawTextSubtitle) ||
+         (textDisplayMode & kDisplayDVDButton)       ||
+         (textDisplayMode & kDisplayCC608)           ||
+         (textDisplayMode & kDisplayCC708)))
     {
-        osdLock.lock();
         osd->ClearSubtitles();
-        osdLock.unlock();
     }
 }
 
@@ -1289,10 +1288,9 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
 {
     textDisplayMode &= ~mode;
     ResetCaptions();
-    if (!osd)
-        return;
 
     QMutexLocker locker(&osdLock);
+
     QString msg = "";
     if (kDisplayNUVTeletextCaptions & mode)
         msg += QObject::tr("TXT CAP");
@@ -1310,12 +1308,14 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
     {
         int type = toTrackType(mode);
         msg += decoder->GetTrackDesc(type, GetTrack(type));
-        osd->EnableSubtitles(preserve);
+        if (osd)
+            osd->EnableSubtitles(preserve);
     }
     if (kDisplayTextSubtitle & mode)
     {
         msg += QObject::tr("Text subtitles");
-        osd->EnableSubtitles(preserve);
+        if (osd)
+            osd->EnableSubtitles(preserve);
     }
     if (!msg.isEmpty() && osd_msg)
     {
@@ -2040,11 +2040,11 @@ void MythPlayer::PreProcessNormalFrame(void)
 {
 #ifdef USING_MHEG
     // handle Interactive TV
-    if (GetInteractiveTV() && osd)
+    if (GetInteractiveTV())
     {
         osdLock.lock();
         itvLock.lock();
-        if (videoOutput->GetOSDPainter())
+        if (osd && videoOutput->GetOSDPainter())
         {
             InteractiveScreen *window =
                 (InteractiveScreen*)osd->GetWindow(OSD_WIN_INTERACT);
@@ -3481,10 +3481,11 @@ void MythPlayer::WaitForSeek(uint64_t frame, bool override_seeks,
             need_clear = true;
         }
     }
-    if (need_clear && osd)
+    if (need_clear)
     {
         osdLock.lock();
-        osd->HideWindow("osd_message");
+        if (osd)
+            osd->HideWindow("osd_message");
         osdLock.unlock();
     }
     decoder->setExactSeeks(after);
@@ -3546,10 +3547,13 @@ bool MythPlayer::EnableEdit(void)
         return false;
     }
 
-    if (!osd || deleteMap.IsFileEditing(player_ctx))
+    if (deleteMap.IsFileEditing(player_ctx))
         return false;
 
-    osdLock.lock();
+    QMutexLocker locker(&osdLock);
+    if (!osd)
+        return false;
+
     speedBeforeEdit = play_speed;
     pausedBeforeEdit = Pause();
     deleteMap.SetEditing(true);
@@ -3565,13 +3569,16 @@ bool MythPlayer::EnableEdit(void)
         player_ctx->playingInfo->SaveEditing(true);
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     editUpdateTimer.start();
-    osdLock.unlock();
+
     return deleteMap.IsEditing();
 }
 
 void MythPlayer::DisableEdit(bool save)
 {
-    osdLock.lock();
+    QMutexLocker locker(&osdLock);
+    if (!osd)
+        return;
+
     deleteMap.SetEditing(false, osd);
     if (save)
         deleteMap.SaveMap(totalFrames, player_ctx);
@@ -3587,7 +3594,6 @@ void MythPlayer::DisableEdit(bool save)
         Play(speedBeforeEdit);
     else
         SetOSDStatus(QObject::tr("Paused"), kOSDTimeout_None);
-    osdLock.unlock();
 }
 
 bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
@@ -3705,8 +3711,11 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
     if (handled && refresh)
     {
         osdLock.lock();
-        deleteMap.UpdateOSD(framesPlayed, totalFrames, video_frame_rate,
-                            player_ctx, osd);
+        if (osd)
+        {
+            deleteMap.UpdateOSD(framesPlayed, totalFrames, video_frame_rate,
+                                player_ctx, osd);
+        }
         osdLock.unlock();
     }
 
@@ -4453,11 +4462,12 @@ int64_t MythPlayer::GetChapter(int chapter)
 InteractiveTV *MythPlayer::GetInteractiveTV(void)
 {
 #ifdef USING_MHEG
-    if (!interactiveTV && osd && itvEnabled)
+    if (!interactiveTV && itvEnabled)
     {
         QMutexLocker locker1(&osdLock);
         QMutexLocker locker2(&itvLock);
-        interactiveTV = new InteractiveTV(this);
+        if (osd)
+            interactiveTV = new InteractiveTV(this);
     }
 #endif // USING_MHEG
     return interactiveTV;
@@ -4610,28 +4620,26 @@ void MythPlayer::ToggleStudioLevels(void)
 
 void MythPlayer::SetOSDMessage(const QString &msg, OSDTimeout timeout)
 {
+    QMutexLocker locker(&osdLock);
     if (!osd)
         return;
 
-    osdLock.lock();
     QHash<QString,QString> info;
     info.insert("message_text", msg);
     osd->SetText("osd_message", info, timeout);
-    osdLock.unlock();
 }
 
 void MythPlayer::SetOSDStatus(const QString &title, OSDTimeout timeout)
 {
+    QMutexLocker locker(&osdLock);
     if (!osd)
         return;
 
-    osdLock.lock();
     osdInfo info;
     calcSliderPos(info);
     info.text.insert("title", title);
     osd->SetText("osd_status", info.text, timeout);
     osd->SetValues("osd_status", info.values, timeout);
-    osdLock.unlock();
 }
 
 static unsigned dbg_ident(const MythPlayer *player)
