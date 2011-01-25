@@ -326,10 +326,10 @@ class MPUBLIC MetaGrabberScript : public QObject
     const QString GetAuthor() { return m_author; };
     const QString GetThumbnail() { return m_thumbnail; };
     const QString GetCommand() { return m_command; };
-    const GrabberType GetType() { return m_type; };
+    GrabberType GetType() { return m_type; };
     const QString GetTypeString() { return m_typestring; };
     const QString GetDescription() { return m_description; };
-    const float GetVersion() { return m_version; };
+    float GetVersion() { return m_version; };
 
     void toMap(MetadataMap &metadataMap);
 
