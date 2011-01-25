@@ -10,6 +10,9 @@
 extern "C" {
 #endif
 
+typedef void (*callback_t)(void*);
+void    mythfile_open_register_callback(void* object, callback_t func);
+
 int     mythfile_check(int fileID);
 int     mythfile_open(const char *pathname, int flags);
 int     mythfile_close(int fileID);

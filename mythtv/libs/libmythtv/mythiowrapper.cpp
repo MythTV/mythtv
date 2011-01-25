@@ -38,6 +38,10 @@ QHash <int, int>          m_remotedirPositions;
 QHash <int, DIR *>        m_localdirs;
 QHash <int, QString>      m_dirnames;
 
+QMutex     m_callbackLock;
+void*      m_callbackObject = NULL;
+callback_t m_callback = NULL;
+
 #define LOC     QString("mythiowrapper: ")
 #define LOC_ERR QString("mythiowrapper: ERROR: ")
 
@@ -66,6 +70,23 @@ static int getNextFileID(void)
     VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("getNextFileID() = %1").arg(id));
 
     return id;
+}
+
+void mythfile_open_register_callback(void* object, callback_t func)
+{
+    m_callbackLock.lock();
+
+    if (m_callback && (m_callbackObject != object))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "mythfile_open_register_callback: "
+                                        "another object is already registered");
+        m_callbackLock.unlock();
+        return;
+    }
+
+    m_callback = func;
+    m_callbackObject = m_callback ? object : NULL;
+    m_callbackLock.unlock();
 }
 
 int mythfile_check(int id)
@@ -155,6 +176,11 @@ int mythfile_open(const char *pathname, int flags)
         m_filenames[fileID] = pathname;
         m_fileWrapperLock.unlock();
     }
+
+    m_callbackLock.lock();
+    if (m_callback && m_callbackObject)
+        m_callback(m_callbackObject);
+    m_callbackLock.unlock();
 
     return fileID;
 }
