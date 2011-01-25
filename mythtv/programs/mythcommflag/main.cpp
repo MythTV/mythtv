@@ -334,6 +334,7 @@ static int GetMarkupList(QString list, QString chanid, QString starttime)
     else
         pginfo.QueryCommBreakList(cutlist);
 
+    uint64_t lastStart = 0;
     for (it = cutlist.begin(); it != cutlist.end(); ++it)
     {
         if ((*it == MARK_COMM_START) ||
@@ -341,10 +342,22 @@ static int GetMarkupList(QString list, QString chanid, QString starttime)
         {
             if (!result.isEmpty())
                 result += ",";
-            result += QString("%1-").arg(it.key());
+            lastStart = it.key();
+            result += QString("%1-").arg(lastStart);
         }
         else
+        {
+            if (result.isEmpty())
+                result += "0-";
             result += QString("%1").arg(it.key());
+        }
+    }
+
+    if (result.endsWith('-'))
+    {
+        uint64_t lastFrame = pginfo.GetLastFrameInPosMap() + 60;
+        if (lastFrame > lastStart)
+            result += QString("%1").arg(lastFrame);
     }
 
     if (list == "cutlist")

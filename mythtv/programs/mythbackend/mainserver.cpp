@@ -4564,7 +4564,7 @@ bool MainServer::HandleDeleteFile(QString filename, QString storagegroup,
     return true;
 }
 
-// Helper function for the guts of HandleCommBreakQuery + HandleCutListQuery
+// Helper function for the guts of HandleCommBreakQuery + HandleCutlistQuery
 void MainServer::HandleCutMapQuery(const QString &chanid,
                                    const QString &starttime,
                                    PlaybackSock *pbs, bool commbreak)

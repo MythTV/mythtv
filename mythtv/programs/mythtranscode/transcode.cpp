@@ -428,12 +428,21 @@ int Transcode::TranscodeFile(
             }
             else
             {
+                if (cutStr.isEmpty())
+                    cutStr += "0-";
                 cutStr += QString("%1").arg((long)it.key());
                 new_frame_count -= (it.key() - lastStart);
             }
         }
         if (cutStr.isEmpty())
             cutStr = "Is Empty";
+        else if (cutStr.endsWith('-'))
+        {
+            long long lastFrame = (long long)m_proginfo->
+                                             GetLastFrameInPosMap() + 60;
+            if (lastFrame > lastStart)
+                cutStr += QString("%1").arg(lastFrame);
+        }
         VERBOSE(VB_GENERAL, QString("Cutlist        : %1").arg(cutStr));
         VERBOSE(VB_GENERAL, QString("Original Length: %1 frames")
                                     .arg((long)total_frame_count));

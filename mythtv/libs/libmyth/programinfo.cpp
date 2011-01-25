@@ -1502,6 +1502,26 @@ uint ProgramInfo::GetSecondsInRecording(void) const
     return (uint) ((recsecs>0) ? recsecs : max(startts.secsTo(endts),0));
 }
 
+/// \brief Returns last frame in position map or 0
+uint64_t ProgramInfo::GetLastFrameInPosMap(void) const
+{
+    uint64_t last_frame = 0;
+    frm_pos_map_t posMap;
+    QueryPositionMap(posMap, MARK_GOP_BYFRAME);
+    if (posMap.empty())
+    {
+        QueryPositionMap(posMap, MARK_GOP_START);
+        if (posMap.empty())
+            QueryPositionMap(posMap, MARK_KEYFRAME);
+    }
+    if (!posMap.empty())
+    {
+        frm_pos_map_t::const_iterator it = posMap.constEnd();
+        --it;
+        last_frame = it.key();
+    }
+    return last_frame;
+}
 
 QString ProgramInfo::toString(const Verbosity v, QString sep, QString grp)
     const
@@ -2679,7 +2699,6 @@ void ProgramInfo::QueryCutList(frm_dir_map_t &delMap) const
 {
     QueryMarkupMap(delMap, MARK_CUT_START);
     QueryMarkupMap(delMap, MARK_CUT_END, true);
-    QueryMarkupMap(delMap, MARK_PLACEHOLDER, true);
 }
 
 void ProgramInfo::SaveCutList(frm_dir_map_t &delMap) const
