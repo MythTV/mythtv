@@ -1408,14 +1408,7 @@ void VideoDialog::fetchVideos()
     {
         MythGenericTree *node = m_d->m_rootNode->getChildAt(0);
         if (node->getInt() == kSubFolder && node->childCount() > 1)
-        {
-            // Detach this node from it's parent so that the parent can be
-            // deleted without destroying the child.
-            node->DetachParent();
-            node->SetText(m_d->m_rootNode->GetText());
-            delete m_d->m_rootNode;
             m_d->m_rootNode = node;
-        }
         else if (node->getInt() == kUpFolder)
             m_d->m_treeLoaded = false;
     }
