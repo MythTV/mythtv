@@ -1,5 +1,6 @@
 #include <QHash>
 
+#include "bdnav/meta_data.h"
 #include "bluraymetadata.h"
 #include "mythdirs.h"
 
