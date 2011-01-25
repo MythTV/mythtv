@@ -130,13 +130,12 @@ MythPlayer::MythPlayer(bool muted)
       parentWidget(NULL), embedid(0),
       embx(-1), emby(-1), embw(-1), embh(-1),
       // State
+      decoderEof(false),
       decoderPaused(false), pauseDecoder(false), unpauseDecoder(false),
       killdecoder(false),   decoderSeek(-1),     decodeOneFrame(false),
       needNewPauseFrame(false),
       bufferPaused(false),  videoPaused(false),
       allpaused(false),     playing(false),
-
-      eof(false),
       m_double_framerate(false),    m_double_process(false),
       m_can_double(false),          m_deint_possible(true),
       livetv(false),
@@ -976,7 +975,7 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
     //noVideoTracks = !decoder->GetTrackCount(kTrackTypeVideo);
 
 
-    eof = false;
+    decoderEof = false;
 
     // Set 'no_video_decode' to true for audio only decodeing
     bool no_video_decode = false;
@@ -2279,7 +2278,7 @@ void MythPlayer::SwitchToProgram(void)
     {
         OpenDummy();
         ResetPlaying();
-        eof = false;
+        decoderEof = false;
         delete pginfo;
         return;
     }
@@ -2293,21 +2292,21 @@ void MythPlayer::SwitchToProgram(void)
                 QString("(card type: %1).")
                 .arg(player_ctx->tvchain->GetCardType(newid)));
         VERBOSE(VB_IMPORTANT, QString("\n") + player_ctx->tvchain->toString());
-        eof = true;
+        decoderEof = true;
         SetErrored(QObject::tr("Error opening switch program buffer"));
         delete pginfo;
         return;
     }
 
-    if (eof)
+    if (decoderEof)
     {
         discontinuity = true;
         ResetCaptions();
     }
 
     VERBOSE(VB_PLAYBACK, LOC + QString("SwitchToProgram(void) "
-            "discont: %1 newtype: %2 newid: %3 eof: %4")
-            .arg(discontinuity).arg(newtype).arg(newid).arg(eof));
+            "discont: %1 newtype: %2 newid: %3 decoderEof: %4")
+            .arg(discontinuity).arg(newtype).arg(newid).arg(decoderEof));
 
     if (discontinuity || newtype)
     {
@@ -2337,7 +2336,7 @@ void MythPlayer::SwitchToProgram(void)
     if (IsErrored())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "SwitchToProgram failed.");
-        eof = true;
+        decoderEof = true;
         return;
     }
 
@@ -2352,7 +2351,7 @@ void MythPlayer::SwitchToProgram(void)
         forcePositionMapSync = true;
     }
 
-    eof = false;
+    decoderEof = false;
     Play();
     VERBOSE(VB_PLAYBACK, LOC + "SwitchToProgram - end");
 }
@@ -2369,7 +2368,7 @@ void MythPlayer::FileChangedCallback(void)
         player_ctx->buffer->Reset(false, true, true);
     Play();
 
-    eof = false;
+    decoderEof = false;
 
     player_ctx->SetPlayerChangingBuffers(false);
 
@@ -2407,7 +2406,7 @@ void MythPlayer::JumpToProgram(void)
     {
         OpenDummy();
         ResetPlaying();
-        eof = false;
+        decoderEof = false;
         delete pginfo;
         return;
     }
@@ -2424,7 +2423,7 @@ void MythPlayer::JumpToProgram(void)
                 .arg(player_ctx->tvchain->GetCardType(newid)));
         VERBOSE(VB_IMPORTANT, QString("\n") + player_ctx->tvchain->toString());
 
-        eof = true;
+        decoderEof = true;
         SetErrored(QObject::tr("Error opening jump program file buffer"));
         delete pginfo;
         return;
@@ -2468,7 +2467,7 @@ void MythPlayer::JumpToProgram(void)
     if (nextpos > 10)
         DoFastForward(nextpos, true, false);
 
-    eof = false;
+    decoderEof = false;
     player_ctx->SetPlayerChangingBuffers(false);
     VERBOSE(VB_PLAYBACK, LOC + "JumpToProgram - end");
 }
@@ -2591,7 +2590,7 @@ void MythPlayer::EventLoop(void)
         player_ctx->tvchain->JumpToNext(true, 1);
         JumpToProgram();
     }
-    else if ((!allpaused || eof) && player_ctx->tvchain &&
+    else if ((!allpaused || decoderEof) && player_ctx->tvchain &&
              (decoder && !decoder->GetWaitForChange()))
     {
         // Switch to the next program in livetv
@@ -2642,7 +2641,7 @@ void MythPlayer::EventLoop(void)
     }
 
     // Handle end of file
-    if (eof)
+    if (decoderEof)
     {
         if (player_ctx->tvchain)
         {
@@ -2675,7 +2674,7 @@ void MythPlayer::EventLoop(void)
         if (fftime > 0)
         {
             DoFastForward(fftime);
-            if (eof)
+            if (decoderEof)
                return;
         }
     }
@@ -2737,7 +2736,7 @@ void MythPlayer::EventLoop(void)
                   && !player_ctx->IsPIP() &&
                   player_ctx->GetState() == kState_WatchingPreRecorded))
             {
-                eof = true;
+                decoderEof = true;
             }
         }
         else
@@ -2879,7 +2878,8 @@ void MythPlayer::DecoderLoop(bool pause)
             decoder_change_lock.unlock();
         }
 
-        bool obey_eof = eof && !(eof && player_ctx->tvchain && !allpaused);
+        bool obey_eof = decoderEof &&
+                        !(decoderEof && player_ctx->tvchain && !allpaused);
         if (isDummy || ((decoderPaused || ffrew_skip == 0 || obey_eof) &&
             !decodeOneFrame))
         {
@@ -4204,7 +4204,7 @@ bool MythPlayer::TranscodeGetNextFrame(
     if (!decoder->GetFrame(kDecodeAV))
         return false;
 
-    if (eof)
+    if (decoderEof)
         return false;
 
     if (honorCutList && !deleteMap.IsEmpty())
@@ -4229,7 +4229,7 @@ bool MythPlayer::TranscodeGetNextFrame(
             did_ff = 1;
         }
     }
-    if (eof)
+    if (decoderEof)
       return false;
     is_key = decoder->isLastFrameKey();
     return true;
