@@ -61,6 +61,7 @@
             <statetype name="buttonitem">
                 <area>0,0,180,40</area>
                 <state name="active">
+                    <area>0,0,180,40</area>
                     <shape name="background" from="basewidgetshape" />
                     <textarea name="buttontext" from="basetextarea">
                         <area>0,0,180,40</area>
