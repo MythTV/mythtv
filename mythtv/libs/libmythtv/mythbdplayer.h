@@ -27,6 +27,13 @@ class MythBDPlayer : public MythPlayer
     virtual bool PrevAngle(void);
     virtual bool NextAngle(void);
 
+    // Non-const gets
+    // Disable screen grabs for Bluray
+    virtual char *GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
+        int &buflen, int &vw, int &vh, float &ar) { return NULL; }
+    virtual char *GetScreenGrab(int secondsin, int &buflen,
+        int &vw, int &vh, float &ar) { return NULL; }
+
   protected:
     // Playback
     virtual bool VideoLoop(void);
@@ -37,6 +44,11 @@ class MythBDPlayer : public MythPlayer
     // Private decoder stuff
     virtual void CreateDecoder(char *testbuf, int testreadsize,
                                bool allow_libmpeg2, bool no_accel);
+
+    // Non-const gets
+    // Disable screen grabs for Bluray
+    virtual void SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
+                                   bool absolute) { return; }
 
   private:
     void DisplayMenu(void);

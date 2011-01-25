@@ -192,8 +192,8 @@ class MPUBLIC MythPlayer
     VideoOutput *getVideoOutput(void)         { return videoOutput; }
     virtual char *GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
                                        int &buflen, int &vw, int &vh, float &ar);
-    char        *GetScreenGrab(int secondsin, int &buflen,
-                               int &vw, int &vh, float &ar);
+    virtual char *GetScreenGrab(int secondsin, int &buflen,
+                                int &vw, int &vh, float &ar);
     InteractiveTV *GetInteractiveTV(void);
 
     // Title stuff
