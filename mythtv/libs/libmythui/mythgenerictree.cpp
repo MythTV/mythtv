@@ -154,6 +154,14 @@ MythGenericTree *MythGenericTree::addNode(MythGenericTree *child)
     return child;
 }
 
+void MythGenericTree::DetachParent(void)
+{
+    if (!m_parent)
+        return;
+
+    m_parent->removeNode(this);
+}
+
 void MythGenericTree::removeNode(MythGenericTree *child)
 {
     if (m_selected_subnode == child)
@@ -162,6 +170,7 @@ void MythGenericTree::removeNode(MythGenericTree *child)
     m_ordered_subnodes->removeAll(child);
     m_flatenedSubnodes->removeAll(child);
     m_subnodes->removeAll(child);
+    child->setParent(NULL);
 
     if (child && child->IsVisible())
         DecVisibleCount();

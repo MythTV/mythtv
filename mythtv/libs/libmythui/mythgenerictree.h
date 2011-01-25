@@ -29,6 +29,10 @@ class MPUBLIC MythGenericTree
                          bool selectable_flag = false, bool visible = true);
     MythGenericTree *addNode(MythGenericTree *child);
 
+    /// Detach this node/branch from it's parent without deleting it, it can
+    /// then be reattached elsewhere or used on it's own
+    void DetachParent(void);
+
     void removeNode(MythGenericTree *child);
     void deleteNode(MythGenericTree *child);
 
