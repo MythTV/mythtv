@@ -1,7 +1,6 @@
 #include <QImage>
 #include <QDir>
-
-#include <cstring>
+#include <QCoreApplication>
 
 #include "bdnav/mpls_parse.h"
 #include "bdnav/meta_parse.h"
@@ -17,6 +16,7 @@
 #include "mythdirs.h"
 #include "bluray.h"
 #include "tv.h" // for actions
+#include "mythiowrapper.h"
 
 #define LOC      QString("BDRingBuf: ")
 #define LOC_WARN QString("BDRingBuf Warning: ")
@@ -29,15 +29,23 @@ static void HandleOverlayCallback(void *data, const bd_overlay_s *const overlay)
         bdrb->SubmitOverlay(overlay);
 }
 
+static void file_opened_callback(void* bdr)
+{
+    BDRingBuffer *obj = (BDRingBuffer*)bdr;
+    if (obj)
+        obj->ProgressUpdate();
+}
+
 BDRingBuffer::BDRingBuffer(const QString &lfilename)
   : bdnav(NULL), m_isHDMVNavigation(false), m_tryHDMVNavigation(false),
     m_topMenuSupported(false), m_firstPlaySupported(false),
     m_numTitles(0), m_titleChanged(false), m_playerWait(false),
     m_ignorePlayerWait(true),
     m_stillTime(0), m_stillMode(BLURAY_STILL_NONE),
-    m_infoLock(QMutex::Recursive)
+    m_infoLock(QMutex::Recursive), m_mainThread(NULL)
 {
     m_tryHDMVNavigation = NULL != getenv("MYTHTV_HDMV");
+    m_mainThread = QThread::currentThread();
     OpenFile(lfilename);
 }
 
@@ -249,10 +257,26 @@ bool BDRingBuffer::HandleAction(const QStringList &actions, int64_t pts)
     return handled;
 }
 
+void BDRingBuffer::ProgressUpdate(void)
+{
+    // This thread check is probably unnecessary as processEvents should
+    // only handle events in the calling thread - and not all threads
+    if (QThread::currentThread() == m_mainThread)
+        if (qApp->hasPendingEvents())
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+}
+
 bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 {
     VERBOSE(VB_IMPORTANT, LOC + QString("Opened BDRingBuffer device at %1")
             .arg(lfilename.toLatin1().data()));
+
+    // Ask mythiowrapper to update this object on file open progress. Opening
+    // a bluray disc can involve opening several hundred files which can take
+    // several minutes when the disc structure is remote. The callback allows
+    // us to 'kick' the main UI - as the 'please wait' widget is still visible
+    // at this stage
+    mythfile_open_register_callback(this, file_opened_callback);
 
     QMutexLocker locker(&m_infoLock);
     rwlock.lockForWrite();
@@ -271,6 +295,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     if (!bdnav)
     {
         rwlock.unlock();
+        mythfile_open_register_callback(this, NULL);
         return false;
     }
 
@@ -431,6 +456,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
     rwlock.unlock();
 
+    mythfile_open_register_callback(this, NULL);
     return true;
 }
 

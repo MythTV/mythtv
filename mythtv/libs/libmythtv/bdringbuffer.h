@@ -51,6 +51,8 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     BDRingBuffer(const QString &lfilename);
     virtual ~BDRingBuffer();
 
+    void ProgressUpdate(void);
+
     // Player interaction
     bool BDWaitingForPlayer(void)     { return m_playerWait;  }
     void SkipBDWaitingForPlayer(void) { m_playerWait = false; }
@@ -172,5 +174,7 @@ class MPUBLIC BDRingBuffer : public RingBuffer
     QHash<uint32_t,BLURAY_TITLE_INFO*> m_cachedTitleInfo;
     QHash<uint32_t,BLURAY_TITLE_INFO*> m_cachedPlaylistInfo;
     QMutex             m_infoLock;
+
+    QThread           *m_mainThread;
 };
 #endif
