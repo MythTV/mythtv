@@ -108,7 +108,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
         fflush( stdout );
     }
 
-    while (!eof)
+    while (!decoderEof)
     {
         if (inuse_timer.elapsed() > 2534)
         {
