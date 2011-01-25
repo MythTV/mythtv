@@ -337,9 +337,9 @@ bool MythPlayer::Pause(void)
     }
     next_play_speed   = 0.0;
     next_normal_speed = false;
-    PauseDecoder();
     PauseVideo();
     audio.Pause(true);
+    PauseDecoder();
     PauseBuffer();
     allpaused = decoderPaused && videoPaused && bufferPaused;
     {
@@ -368,10 +368,10 @@ bool MythPlayer::Play(float speed, bool normal, bool unpauseaudio)
     }
 
     UnpauseBuffer();
+    UnpauseDecoder();
     if (unpauseaudio)
         audio.Pause(false);
     UnpauseVideo();
-    UnpauseDecoder();
     allpaused = false;
     next_play_speed   = speed;
     next_normal_speed = normal;
