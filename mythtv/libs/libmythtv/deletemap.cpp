@@ -344,7 +344,7 @@ void DeleteMap::NewCut(uint64_t frame, uint64_t total)
             // to beginning or end
             if (startframe == 1)
                 startframe = 0;
-            if (endframe == total - 1)
+            if (endframe >= total - 1)
                 endframe = total;
 
             // Don't cut the entire recording
@@ -554,7 +554,11 @@ void DeleteMap::CleanMap(uint64_t total)
         {
             int      thistype  = it.value();
             uint64_t thisframe = it.key();
-            if (lasttype == thistype)
+            if (thisframe >= total)
+            {
+                Delete(thisframe);
+            }
+            else if (lasttype == thistype)
             {
                 Delete(thistype == MARK_CUT_END ? thisframe :
                                                   (uint64_t)lastframe);
