@@ -30,7 +30,7 @@ MythUIButtonTree::MythUIButtonTree(MythUIType *parent, const QString &name)
 
     m_listTemplate = NULL;
     SetCanTakeFocus(true);
-    
+
     connect(this, SIGNAL(TakingFocus()), this, SLOT(Select()));
     connect(this, SIGNAL(LosingFocus()), this, SLOT(Deselect()));
 }
@@ -104,9 +104,10 @@ void MythUIButtonTree::SetTreeState(bool refreshAll)
             m_currentDepth = 1;
 
         node = route.at(m_currentDepth - 1);
-        if (m_currentDepth != m_oldDepth)
-            refreshAll = true;
     }
+
+    if (m_currentDepth != m_oldDepth)
+        refreshAll = true;
 
     m_oldDepth = m_currentDepth;
 
@@ -125,21 +126,21 @@ void MythUIButtonTree::SetTreeState(bool refreshAll)
         if (node)
             selectedNode = node->getSelectedChild(true);
 
-        if (refreshAll || m_activeListID <= listid)
+        if (refreshAll || m_activeListID < listid)
         {
             if (!UpdateList(list, node))
             {
                 listid++;
                 continue;
             }
+        }
 
-            if (m_active && (listid == m_activeListID))
-            {
-                m_activeList = list;
-                list->SetActive(true);
-                emit itemSelected(list->GetItemCurrent());
-                SetCurrentNode(selectedNode);
-            }
+        if (m_active && (listid == m_activeListID))
+        {
+            m_activeList = list;
+            list->SetActive(true);
+            emit itemSelected(list->GetItemCurrent());
+            SetCurrentNode(selectedNode);
         }
 
         listid++;
@@ -229,7 +230,7 @@ bool MythUIButtonTree::AssignTree(MythGenericTree *tree)
 
     m_rootNode = tree;
     m_currentNode = m_rootNode;
-    SetTreeState();
+    SetTreeState(true);
 
     return true;
 }
@@ -246,7 +247,7 @@ void MythUIButtonTree::Reset(void)
     m_activeListID = 0;
     m_active = true;
 
-    SetTreeState();
+    SetTreeState(true);
 
     MythUIType::Reset();
 }
