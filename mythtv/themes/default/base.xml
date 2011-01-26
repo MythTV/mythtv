@@ -1078,6 +1078,10 @@
             <value>Please Wait...</value>
         </textarea>
 
+        <progressbar name="progress" from="baseprogressbar">
+            <position>132,375</position>
+        </progressbar>
+
     </window>
 
 </mythuitheme>
