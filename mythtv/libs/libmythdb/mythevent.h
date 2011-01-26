@@ -70,6 +70,7 @@ class MPUBLIC MythEvent : public QEvent
 
     static Type MythEventMessage;
     static Type MythUserMessage;
+    static Type kUpdateTvProgressEventType;
     static Type kExitToMainMenuEventType;
     static Type kMythPostShowEventType;
     static Type kEnableDrawingEventType;
