@@ -5,7 +5,7 @@
 #import "util-osx.h"
 #elif defined(Q_WS_WIN)
 #include <windows.h>
-#elif defined(Q_WS_X11)
+#elif USING_X11
 #include "mythxdisplay.h"
 #elif USING_DIRECTFB
 #include <linux/fb.h>
@@ -15,7 +15,7 @@ extern "C" {
 }
 #endif
 
-#if !defined(Q_WS_X11)
+#if !USING_X11
 #include <QApplication>
 #include <QDesktopWidget>
 #endif
@@ -101,7 +101,7 @@ DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
     else
         ret.rate = fix_rate(video_rate);
 
-#elif defined (Q_WS_X11)
+#elif USING_X11
     MythXDisplay *disp = OpenMythXDisplay();
     if (!disp)
         return ret;
@@ -166,7 +166,7 @@ int MythDisplay::GetNumberXineramaScreens(void)
 {
     int nr_xinerama_screens = 0;
 
-#if defined(Q_WS_X11)
+#if USING_X11
     // TODO Qt is Xinerama aware so this should be unnecessary
     MythXDisplay *d = OpenMythXDisplay();
     if (d)
