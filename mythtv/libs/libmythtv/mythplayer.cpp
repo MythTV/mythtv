@@ -3673,6 +3673,7 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
         else if (action == ACTION_SELECT)
         {
             deleteMap.NewCut(frame, totalFrames);
+            SetOSDMessage(QObject::tr("New cut added."), kOSDTimeout_Short);
             refresh = true;
         }
         else if (action == "DELETE")
@@ -3704,8 +3705,15 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
             refresh = false;
         }
         else
+        {
             handled = deleteMap.HandleAction(action, frame, framesPlayed,
                                              totalFrames, video_frame_rate);
+            if (handled && (action == "CUTTOBEGINNING" ||
+                action == "CUTTOEND" || action == "NEWCUT"))
+            {
+                SetOSDMessage(QObject::tr("New cut added."), kOSDTimeout_Short);
+            }
+        }
     }
 
     if (handled && refresh)
