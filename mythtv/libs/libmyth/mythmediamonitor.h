@@ -5,7 +5,6 @@
 #include <QPointer>
 #include <QThread>
 #include <QMutex>
-#include <QEvent>
 #include <QList>
 
 #include "mythmedia.h"
@@ -17,22 +16,6 @@ struct MHData
     int      MediaType;
     QString  destination;
     QString  description;
-};
-
-class MPUBLIC MediaEvent : public QEvent
-{
-  public:
-    MediaEvent(MediaStatus oldStatus, MythMediaDevice *pDevice) :
-        QEvent(kEventType), m_OldStatus(oldStatus), m_Device(pDevice) {}
-
-    MediaStatus getOldStatus(void) const { return m_OldStatus; }
-    MythMediaDevice* getDevice(void) { return m_Device; }
-
-    static Type kEventType;
-
-  protected:
-    MediaStatus m_OldStatus;
-    QPointer<MythMediaDevice> m_Device;
 };
 
 class MediaMonitor;
@@ -92,6 +75,8 @@ class MPUBLIC MediaMonitor : public QObject
     static QString defaultCDWriter();
     static QString defaultDVDWriter();
 
+    static void ejectOpticalDisc(void);
+
     virtual QStringList GetCDROMBlockDevices(void) = 0;
 
   public slots:
@@ -112,7 +97,7 @@ class MPUBLIC MediaMonitor : public QObject
     const QString listDevices(void);
 
     static QString defaultDevice(const QString setting,
-                                 const QString label,  
+                                 const QString label,
                                  const char *hardCodedDefault);
     MythMediaDevice *selectDrivePopup(const QString label, bool mounted=false);
 

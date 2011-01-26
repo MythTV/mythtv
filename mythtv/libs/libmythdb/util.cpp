@@ -41,8 +41,6 @@ using namespace std;
 // Myth headers
 #include "mythcorecontext.h"
 #include "exitcodes.h"
-#include "mythxdisplay.h"
-#include "mythmediamonitor.h"
 #include "mythverbose.h"
 #include "msocketdevice.h"
 #include "mythsocket.h"
@@ -660,31 +658,7 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
 }
 
 /**
- * \brief Eject a disk, unmount a drive, open a tray
- *
- * If the Media Monitor is enabled, we use its fully-featured routine.
- * Otherwise, we guess a drive and use a primitive OS-specific command
- */
-void myth_eject()
-{
-    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
-    if (mon)
-        mon->ChooseAndEjectMedia();
-    else
-    {
-        VERBOSE(VB_MEDIA, "CD/DVD Monitor isn't enabled.");
-#ifdef __linux__
-        VERBOSE(VB_MEDIA, "Trying Linux 'eject -T' command");
-        myth_system("eject -T");
-#elif CONFIG_DARWIN
-        VERBOSE(VB_MEDIA, "Trying 'disktool -e disk1");
-        myth_system("disktool -e disk1");
-#endif
-    }
-}
-
-/**
- * \brief Quess whether a string is UTF-8
+ * \brief Guess whether a string is UTF-8
  *
  * \note  This does not attempt to \e validate the whole string.
  *        It just checks if it has any UTF-8 sequences in it.
@@ -1185,7 +1159,7 @@ bool IsPulseAudioRunning(void)
     const char *command = "ps ch -C pulseaudio -o pid > /dev/null";
 #endif
     // Do NOT use kMSProcessEvents here, it will cause deadlock
-    uint res = myth_system(command, kMSDontBlockInputDevs | 
+    uint res = myth_system(command, kMSDontBlockInputDevs |
                                     kMSDontDisableDrawing);
     return (res == GENERIC_EXIT_OK);
 }
@@ -1335,7 +1309,7 @@ bool MythRemoveDirectory(QDir &aDir)
     if (!aDir.exists())//QDir::NoDotAndDotDot
         return false;
 
-    QFileInfoList entries = aDir.entryInfoList(QDir::NoDotAndDotDot | 
+    QFileInfoList entries = aDir.entryInfoList(QDir::NoDotAndDotDot |
                                                QDir::Dirs | QDir::Files);
     int count = entries.size();
     bool has_err = false;

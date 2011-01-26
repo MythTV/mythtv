@@ -52,8 +52,11 @@ const char* MythMediaDevice::MediaErrorStrings[] =
     "MEDIAERR_UNSUPPORTED"
 };
 
-MythMediaDevice::MythMediaDevice(QObject* par, const char* DevicePath, 
-                                 bool SuperMount,  bool AllowEject) 
+QEvent::Type MediaEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+
+MythMediaDevice::MythMediaDevice(QObject* par, const char* DevicePath,
+                                 bool SuperMount,  bool AllowEject)
                : QObject(par)
 {
     m_DevicePath = DevicePath;
@@ -71,10 +74,10 @@ bool MythMediaDevice::openDevice()
     // Sanity check
     if (isDeviceOpen())
         return true;
- 
+
     QByteArray dev = m_DevicePath.toLocal8Bit();
     m_DeviceHandle = open(dev.constData(), O_RDONLY | O_NONBLOCK);
-    
+
     return isDeviceOpen();
 }
 
@@ -86,13 +89,13 @@ bool MythMediaDevice::closeDevice()
 
     int ret = close(m_DeviceHandle);
     m_DeviceHandle = -1;
-    
+
     return (ret != -1) ? true : false;
 }
 
-bool MythMediaDevice::isDeviceOpen() const 
-{ 
-    return (m_DeviceHandle >= 0) ? true : false; 
+bool MythMediaDevice::isDeviceOpen() const
+{
+    return (m_DeviceHandle >= 0) ? true : false;
 }
 
 bool MythMediaDevice::performMountCmd(bool DoMount)
@@ -107,7 +110,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
     if (isDeviceOpen())
         closeDevice();
 
-    if (!m_SuperMount) 
+    if (!m_SuperMount)
     {
         QString MountCommand;
 
@@ -121,7 +124,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
             MountCommand = QString("%1 %2")
                 .arg((DoMount) ? PATHTO_MOUNT : PATHTO_UNMOUNT)
                 .arg(m_DevicePath);
-    
+
         VERBOSE(VB_MEDIA, QString("Executing '%1'").arg(MountCommand));
         if (myth_system(MountCommand, kMSDontBlockInputDevs) != GENERIC_EXIT_OK)
         {
@@ -148,12 +151,12 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
         else
             VERBOSE(VB_GENERAL, QString("Failed to mount %1.")
                                        .arg(m_DevicePath));
-    } 
-    else 
+    }
+    else
     {
         VERBOSE(VB_MEDIA, "Disk inserted on a supermount device");
         // If it's a super mount then the OS will handle mounting /  unmounting.
-        // We just need to give derived classes a chance to perform their 
+        // We just need to give derived classes a chance to perform their
         // mount / unmount logic.
         if (DoMount)
         {
@@ -307,11 +310,11 @@ void MythMediaDevice::setSpeed(int speed)
             .arg(speed).arg(m_DevicePath));
 }
 
-MediaError MythMediaDevice::lock() 
-{ 
+MediaError MythMediaDevice::lock()
+{
     // We just open the device here, which may or may not do the trick,
     // derived classes can do more...
-    if (openDevice()) 
+    if (openDevice())
     {
         m_Locked = true;
         return MEDIAERR_OK;
@@ -321,9 +324,9 @@ MediaError MythMediaDevice::lock()
 }
 
 MediaError MythMediaDevice::unlock()
-{ 
+{
     m_Locked = false;
-    
+
     return MEDIAERR_OK;
 }
 
@@ -419,9 +422,9 @@ MediaStatus MythMediaDevice::setStatus( MediaStatus NewStatus, bool CloseIt )
 
     // If the status is changed we need to take some actions
     // depending on the old and new status.
-    if (NewStatus != OldStatus) 
+    if (NewStatus != OldStatus)
     {
-        switch (NewStatus) 
+        switch (NewStatus)
         {
             // the disk is not / should not be mounted.
             case MEDIASTAT_ERROR:
@@ -438,7 +441,7 @@ MediaStatus MythMediaDevice::setStatus( MediaStatus NewStatus, bool CloseIt )
                 // get rid of the compiler warning...
                 break;
         }
-        
+
         // Don't fire off transitions to / from unknown states
         if (m_Status != MEDIASTAT_UNKNOWN && OldStatus != MEDIASTAT_UNKNOWN)
             emit statusChanged(OldStatus, this);

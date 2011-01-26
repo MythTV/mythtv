@@ -25,6 +25,7 @@ using namespace std;
 #include "mythevent.h"
 #include "dbutil.h"
 #include "DisplayRes.h"
+#include "mythmediamonitor.h"
 
 #include "mythdb.h"
 #include "mythdirs.h"
@@ -211,7 +212,7 @@ static void plugin_cb(const QString &cmd)
 
 static void eject_cb(void)
 {
-    myth_eject();
+    MediaMonitor::ejectOpticalDisc();
 }
 
 MythContextPrivate::MythContextPrivate(MythContext *lparent)

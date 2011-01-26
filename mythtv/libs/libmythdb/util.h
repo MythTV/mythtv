@@ -31,8 +31,6 @@ MPUBLIC QDateTime myth_dt_from_string(const QString &dtstr);
 MPUBLIC bool getUptime(time_t &uptime);
 MPUBLIC bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
 
-MPUBLIC void myth_eject(void);
-
 MPUBLIC bool hasUtf8(const char *str);
 #define M_QSTRING_UNICODE(str) hasUtf8(str) ? QString::fromUtf8(str) : str
 
@@ -109,7 +107,7 @@ inline void rdtsc(uint64_t &x)
     asm("rdtsc \n"
         "mov %%eax, %0 \n"
         "mov %%edx, %1 \n"
-        : 
+        :
         : "m"(y.a), "m"(y.b)
         : "%eax", "%edx");
 }

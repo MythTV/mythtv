@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QMap>
 #include <QString>
+#include <QEvent>
+#include <QPointer>
 
 #include "mythexp.h"
 
@@ -166,6 +168,22 @@ class MPUBLIC MythMediaDevice : public QObject
                              ///  subclass needs it (MythCDRomLinux)
  private:
     ext_to_media_t m_ext_to_media; ///< Map of extension to media type.
+};
+
+class MPUBLIC MediaEvent : public QEvent
+{
+  public:
+    MediaEvent(MediaStatus oldStatus, MythMediaDevice *pDevice) :
+        QEvent(kEventType), m_OldStatus(oldStatus), m_Device(pDevice) {}
+
+    MediaStatus getOldStatus(void) const { return m_OldStatus; }
+    MythMediaDevice* getDevice(void) { return m_Device; }
+
+    static Type kEventType;
+
+  protected:
+    MediaStatus m_OldStatus;
+    QPointer<MythMediaDevice> m_Device;
 };
 
 #endif
