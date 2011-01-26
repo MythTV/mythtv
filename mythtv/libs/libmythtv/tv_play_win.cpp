@@ -4,12 +4,13 @@
 // MythTV
 #include "mythmainwindow.h"
 #include "mythverbose.h"
+#include "mythuiprogressbar.h"
 
 #include "tv_play_win.h"
 
 
 TvPlayWindow::TvPlayWindow(MythScreenStack *parent, const char *name)
-            : MythScreenType(parent, name)
+  : MythScreenType(parent, name), m_progressBar(NULL), m_progress(0)
 {
     SetCanTakeFocus(true);
 }
@@ -31,7 +32,25 @@ bool TvPlayWindow::Create()
         return false;
     }
 
+    m_progressBar = dynamic_cast<MythUIProgressBar*>(GetChild("progress"));
+    if (m_progressBar)
+    {
+        m_progressBar->SetStart(0);
+        m_progressBar->SetTotal(100);
+        m_progressBar->SetUsed(m_progress);
+    }
+
     return true;
+}
+
+void TvPlayWindow::UpdateProgress(void)
+{
+    if (!m_progressBar)
+        return;
+    m_progress++;
+    if (m_progress > 100)
+        m_progress = 0;
+    m_progressBar->SetUsed(m_progress);
 }
 
 /** \brief Mouse click/movement handler, recieves mouse gesture events
