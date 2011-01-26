@@ -1,7 +1,7 @@
 
 #include "recordingrule.h"
 
-// libmythdb
+// libmythbase
 #include "mythdb.h"
 
 // libmyth

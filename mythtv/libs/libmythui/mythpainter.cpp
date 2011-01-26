@@ -5,7 +5,7 @@
 // QT headers
 #include <QRect>
 
-// libmythdb headers
+// libmythbase headers
 #include "mythverbose.h"
 
 // libmythui headers

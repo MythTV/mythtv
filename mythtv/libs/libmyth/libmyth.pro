@@ -71,18 +71,18 @@ SOURCES += virtualkeyboard_qt.cpp
 
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../libmythfreesurround
-INCLUDEPATH += ../libmythdb
+INCLUDEPATH += ../libmythbase
 INCLUDEPATH += ../.. ../ ./ ../libmythupnp ../libmythui
 INCLUDEPATH += ../../external/FFmpeg
 DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch
 DEPENDPATH += ../libmythfreesurround
-DEPENDPATH += ../ ../libmythui ../libmythdb
+DEPENDPATH += ../ ../libmythui ../libmythbase
 DEPENDPATH += ../libmythupnp
 DEPENDPATH += ./audio
 
 LIBS += -L../libmythsamplerate   -lmythsamplerate-$${LIBVERSION}
 LIBS += -L../libmythsoundtouch   -lmythsoundtouch-$${LIBVERSION}
-LIBS += -L../libmythdb           -lmythdb-$${LIBVERSION}
+LIBS += -L../libmythbase           -lmythdb-$${LIBVERSION}
 LIBS += -L../libmythui           -lmythui-$${LIBVERSION}
 LIBS += -L../libmythupnp         -lmythupnp-$${LIBVERSION}
 LIBS += -L../libmythfreesurround -lmythfreesurround-$${LIBVERSION}

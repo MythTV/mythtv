@@ -26,7 +26,7 @@
 #include	<stdlib.h>
 #include	<string.h>
 
-#include	"libmythdb/mythconfig.h"
+#include	"libmythbase/mythconfig.h"
 
 #include	"samplerate.h"
 #include	"float_cast.h"

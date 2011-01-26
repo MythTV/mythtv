@@ -6,4 +6,4 @@
 ############################################################
 
 SOURCES += $$PWD/version.cpp
-DEPENDPATH += $$PWD/libs/libmythdb
+DEPENDPATH += $$PWD/libs/libmythbase

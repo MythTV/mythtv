@@ -7,7 +7,7 @@
 #include <QFile>
 #include <QIODevice>
 
-// Libmythdb
+// libmythbase
 #include "mythverbose.h"
 #include "mythdb.h"
 #include "mythdirs.h"

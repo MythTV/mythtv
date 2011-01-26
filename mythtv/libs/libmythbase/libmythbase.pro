@@ -2,7 +2,7 @@ include ( ../../settings.pro )
 include ( ../../version.pro )
 
 TEMPLATE = lib
-TARGET = mythdb-$$LIBVERSION
+TARGET = mythbase-$$LIBVERSION
 CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
@@ -57,7 +57,7 @@ inc.files += mythtranslation.h iso639.h iso3166.h mythmedia.h util.h
 inc2.path  = $${PREFIX}/include/mythtv/libmyth
 inc2.files = $${inc.files}
 
-inc3.path  = $${PREFIX}/include/mythtv/libmythdb
+inc3.path  = $${PREFIX}/include/mythtv/libmythbase
 inc3.files = $${inc.files}
 
 INSTALLS += inc inc2 inc3

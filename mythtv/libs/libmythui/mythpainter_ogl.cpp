@@ -13,7 +13,7 @@ using namespace std;
 #include <QPainter>
 #include <QGLWidget>
 
-// libmythdb headers
+// libmythbase headers
 #include "mythverbose.h"
 
 // Mythui headers

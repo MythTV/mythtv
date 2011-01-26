@@ -1,7 +1,7 @@
 INCLUDEPATH += ../.. ../../libs/ ../../libs/libmyth ../../libs/libmyth/audio
 INCLUDEPATH +=  ../../libs/libmythtv ../../external/FFmpeg
 INCLUDEPATH += ../../libs/libmythupnp ../../libs/libmythui ../../libs/libmythmetadata
-INCLUDEPATH += ../../libs/libmythlivemedia ../../libs/libmythdb ../../libmythhdhomerun
+INCLUDEPATH += ../../libs/libmythlivemedia ../../libs/libmythbase ../../libmythhdhomerun
 INCLUDEPATH += ../../libs/libmythdvdnav ../../libs/libmythbluray ../../libs/libmythsamplerate
 
 LIBS += -L../../libs/libmyth -L../../libs/libmythtv
@@ -10,7 +10,7 @@ LIBS += -L../../external/FFmpeg/libavcodec
 LIBS += -L../../external/FFmpeg/libavcore
 LIBS += -L../../external/FFmpeg/libavformat
 LIBS += -L../../external/FFmpeg/libswscale
-LIBS += -L../../libs/libmythdb
+LIBS += -L../../libs/libmythbase
 LIBS += -L../../libs/libmythui
 LIBS += -L../../libs/libmythupnp
 LIBS += -L../../libs/libmythmetadata
@@ -45,14 +45,14 @@ TARGETDEPS += ../../external/FFmpeg/libavcore/$$avLibName(avcore)
 TARGETDEPS += ../../external/FFmpeg/libavformat/$$avLibName(avformat)
 TARGETDEPS += ../../external/FFmpeg/libswscale/$$avLibName(swscale)
 TARGETDEPS += ../../libs/libmythupnp/libmythupnp-$${MYTH_SHLIB_EXT}
-TARGETDEPS += ../../libs/libmythdb/libmythdb-$${MYTH_SHLIB_EXT}
+TARGETDEPS += ../../libs/libmythbase/libmythbase-$${MYTH_SHLIB_EXT}
 using_live: TARGETDEPS += ../../libs/libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
 using_hdhomerun: TARGETDEPS += ../../libs/libmythhdhomerun/libmythhdhomerun-$${MYTH_SHLIB_EXT}
 
 DEPENDPATH += ../.. ../../libs ../../libs/libmyth ../../libs/libmyth/audio
 DEPENDPATH +=  ../../libs/libmythtv ../../external/FFmpeg
 DEPENDPATH += ../../libs/libmythupnp ../../libs/libmythui
-DEPENDPATH += ../../libs/libmythlivemedia ../../libmythdb ../../libmythhdhomerun
+DEPENDPATH += ../../libs/libmythlivemedia ../../libmythbase ../../libmythhdhomerun
 
 using_opengl:CONFIG += opengl
 

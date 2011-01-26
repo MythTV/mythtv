@@ -7,7 +7,7 @@
 #include <QDir>
 #include <QFile>
 
-// libmythdb headers
+// libmythbase headers
 #include "httpcomms.h"
 
 // libmyth headers

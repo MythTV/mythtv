@@ -36,7 +36,7 @@ using namespace std;
 #include <HIToolbox/Menus.h>   // For GetMBarHeight()
 #endif
 
-// libmythdb headers
+// libmythbase headers
 #include "mythdb.h"
 #include "mythverbose.h"
 #include "mythevent.h"

@@ -1,5 +1,5 @@
-SOURCES += ../libs/libmythdb/*.cpp
-SOURCES += ../libs/libmythdb/*.h
+SOURCES += ../libs/libmythbase/*.cpp
+SOURCES += ../libs/libmythbase/*.h
 SOURCES += ../libs/libmyth/*.cpp
 SOURCES += ../libs/libmyth/*.h
 SOURCES += ../libs/libmythtv/*.cpp

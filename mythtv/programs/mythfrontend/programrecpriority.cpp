@@ -15,7 +15,7 @@ using namespace std;
 #include "scheduledrecording.h"
 #include "storagegroup.h"
 
-// libmythdb
+// libmythbase
 #include "mythdb.h"
 #include "mythverbose.h"
 #include "remoteutil.h"

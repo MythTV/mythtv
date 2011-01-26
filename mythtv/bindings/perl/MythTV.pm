@@ -99,8 +99,8 @@ package MythTV;
     our $BACKEND_SEP    = '[]:[]';
     our $BACKEND_SEP_rx = qr/\[\]:\[\]/;
 
-# MYTH_PROTO_VERSION is defined in libmythdb in 
-# mythtv/libs/libmythdb/mythversion.h and should be the current MythTV 
+# MYTH_PROTO_VERSION is defined in libmythbase in 
+# mythtv/libs/libmythbase/mythversion.h and should be the current MythTV 
 # protocol version.
 #
 # Note: as of July 21, 2010, this is actually a string, to account for proto

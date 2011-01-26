@@ -29,7 +29,7 @@
 
 #include "frequencytablesetting.h"
 
-// Libmythdb headers
+// libmythbase headers
 #include "mythcorecontext.h"
 #include "mythlocale.h"
 

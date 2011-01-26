@@ -12,7 +12,7 @@ INSTALLS += target
 
 INCLUDEPATH += $${PREFIX}/include/mythtv
 INCLUDEPATH += $${PREFIX}/include/mythtv/libmythui
-INCLUDEPATH += $${PREFIX}/include/mythtv/libmythdb
+INCLUDEPATH += $${PREFIX}/include/mythtv/libmythbase
 
 installfiles.path = $${PREFIX}/share/mythtv/mythnews
 installfiles.files = news-sites.xml

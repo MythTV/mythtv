@@ -6,7 +6,7 @@
 #include <QDir>
 #include <QThreadPool>
 
-// libmythdb
+// libmythbase
 #include "compat.h"
 #include "mythcorecontext.h"
 #include "mythcoreutil.h"

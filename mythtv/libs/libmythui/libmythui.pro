@@ -6,11 +6,11 @@ CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
 
-INCLUDEPATH += ../libmythdb 
+INCLUDEPATH += ../libmythbase 
 INCLUDEPATH += ../.. ../
 INCLUDEPATH += ../../external/FFmpeg
 
-LIBS += -L../libmythdb -lmythdb-$$LIBVERSION
+LIBS += -L../libmythbase -lmythdb-$$LIBVERSION
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 

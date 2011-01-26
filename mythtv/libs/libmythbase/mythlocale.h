@@ -5,7 +5,7 @@
 #include <QString>
 #include <QMap>
 
-// Libmythdb
+// libmythbase
 #include "iso3166.h"
 #include "iso639.h"
 #include "mythexp.h"

@@ -48,7 +48,7 @@ There are also a few simple \ref testing "testing shortcuts".
 
 %MythTV is divided up into 20 libraries:
 <dl>
-  <dt>libmythdb
+  <dt>libmythbase
   <dd>Lowest-level %MythTV library. Used by the Plugins.
 
       Contains the \ref database_subsystem "database",
@@ -75,7 +75,7 @@ There are also a few simple \ref testing "testing shortcuts".
 
   <dt>libmythupnp            <dd>Simple uPnP (universal Plug and Play) support.
 
-      This library depends on libmythdb.
+      This library depends on libmythbase.
 
   <dt>libmyth                <dd>Core %MythTV library. Used by the Plugins.
       The
@@ -85,7 +85,7 @@ There are also a few simple \ref testing "testing shortcuts".
       \ref myth_media "media manager",
       and some old UI widgets are implemented by libmyth.
 
-      This library depends on libav*, libmythdb, libmythui, libmythupnp,
+      This library depends on libav*, libmythbase, libmythui, libmythupnp,
       libmythsamplerate, libmythsoundtouch and libmythfreesurround.
 
       Any changes to this library's ABI may trigger a MythTV binary version

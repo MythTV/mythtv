@@ -5,7 +5,7 @@
 // QT headers
 #include <QString>
 
-// libmythdb headers
+// libmythbase headers
 #include "mythverbose.h"
 
 bool ETPrintWarning::Child(const QString &container_name,

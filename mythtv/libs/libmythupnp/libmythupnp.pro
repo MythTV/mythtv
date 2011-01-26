@@ -29,9 +29,9 @@ SOURCES += httpserver.cpp upnpcds.cpp upnpcdsobjects.cpp bufferedsocketdevice.cp
 SOURCES += eventing.cpp upnpcmgr.cpp upnpmsrr.cpp upnptaskevent.cpp ssdpcache.cpp
 SOURCES += configuration.cpp soapclient.cpp mythxmlclient.cpp mmembuf.cpp
 
-INCLUDEPATH += ../libmythdb ..
-DEPENDPATH  += ../libmythdb ..
-LIBS      += -L../libmythdb -lmythdb-$$LIBVERSION
+INCLUDEPATH += ../libmythbase ..
+DEPENDPATH  += ../libmythbase ..
+LIBS      += -L../libmythbase -lmythdb-$$LIBVERSION
 
 LIBS += $$EXTRA_LIBS
 

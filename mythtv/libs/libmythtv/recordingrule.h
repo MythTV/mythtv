@@ -6,7 +6,7 @@
 #include <QDate>
 #include <QTime>
 
-// libmythdb
+// libmythbase
 #include "mythexp.h"
 
 // libmyth

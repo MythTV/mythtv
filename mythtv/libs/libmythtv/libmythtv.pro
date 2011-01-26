@@ -21,7 +21,7 @@ contains(INCLUDEPATH, /usr/local/include) {
 
 DEPENDPATH  += .
 DEPENDPATH  += ../libmyth ../libmyth/audio
-DEPENDPATH  += ../libmythdb ../libmythhdhomerun
+DEPENDPATH  += ../libmythbase ../libmythhdhomerun
 DEPENDPATH  += ../libmythdvdnav/
 DEPENDPATH  += ../libmythbluray/
 DEPENDPATH  += ./dvbdev ./mpeg ./iptv ./channelscan
@@ -33,7 +33,7 @@ DEPENDPATH  += ../libmythlivemedia/liveMedia/include
 DEPENDPATH  += ../libmythlivemedia/liveMedia
 DEPENDPATH  += ../libmythlivemedia/UsageEnvironment/include
 DEPENDPATH  += ../libmythlivemedia/UsageEnvironment
-DEPENDPATH  += ../libmythdb ../libmythui
+DEPENDPATH  += ../libmythbase ../libmythui
 
 INCLUDEPATH += .. ../.. # for avlib headers
 INCLUDEPATH += ../../external/FFmpeg
@@ -49,7 +49,7 @@ LIBS += -L../../external/FFmpeg/libswscale
 LIBS += -L../libmythui -L../libmythupnp
 LIBS += -L../libmythdvdnav
 LIBS += -L../libmythbluray
-LIBS += -L../libmythdb
+LIBS += -L../libmythbase
 LIBS += -lmyth-$$LIBVERSION
 LIBS += -lmythswscale
 LIBS += -lmythavformat
