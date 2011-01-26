@@ -33,7 +33,7 @@ DEPENDPATH += ../libmythbluray
 
 LIBS += -L../libmythsamplerate   -lmythsamplerate-$${LIBVERSION}
 LIBS += -L../libmythsoundtouch   -lmythsoundtouch-$${LIBVERSION}
-LIBS += -L../libmythbase           -lmythdb-$${LIBVERSION}
+LIBS += -L../libmythbase           -lmythbase-$${LIBVERSION}
 LIBS += -L../libmythui           -lmythui-$${LIBVERSION}
 LIBS += -L../libmythupnp         -lmythupnp-$${LIBVERSION}
 LIBS += -L../libmythfreesurround -lmythfreesurround-$${LIBVERSION}

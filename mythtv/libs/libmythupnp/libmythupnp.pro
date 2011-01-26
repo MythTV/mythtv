@@ -31,7 +31,7 @@ SOURCES += configuration.cpp soapclient.cpp mythxmlclient.cpp mmembuf.cpp
 
 INCLUDEPATH += ../libmythbase ..
 DEPENDPATH  += ../libmythbase ..
-LIBS      += -L../libmythbase -lmythdb-$$LIBVERSION
+LIBS      += -L../libmythbase -lmythbase-$$LIBVERSION
 
 LIBS += $$EXTRA_LIBS
 

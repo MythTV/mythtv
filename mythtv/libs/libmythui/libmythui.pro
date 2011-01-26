@@ -10,7 +10,7 @@ INCLUDEPATH += ../libmythbase
 INCLUDEPATH += ../.. ../
 INCLUDEPATH += ../../external/FFmpeg
 
-LIBS += -L../libmythbase -lmythdb-$$LIBVERSION
+LIBS += -L../libmythbase -lmythbase-$$LIBVERSION
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
