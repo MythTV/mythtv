@@ -8,6 +8,8 @@
 #include "bdnav/bdparse.h"
 #include "decoders/overlay.h"
 
+#include "mythmainwindow.h"
+#include "mythevent.h"
 #include "iso639.h"
 #include "bdringbuffer.h"
 #include "mythverbose.h"
@@ -261,9 +263,12 @@ void BDRingBuffer::ProgressUpdate(void)
 {
     // This thread check is probably unnecessary as processEvents should
     // only handle events in the calling thread - and not all threads
-    if (QThread::currentThread() == m_mainThread)
-        if (qApp->hasPendingEvents())
-            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+    if (QThread::currentThread() != m_mainThread)
+        return;
+
+    qApp->postEvent(GetMythMainWindow(),
+                    new MythEvent(MythEvent::kUpdateTvProgressEventType));
+    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 
 bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)

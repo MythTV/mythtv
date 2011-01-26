@@ -3278,7 +3278,8 @@ bool TV::eventFilter(QObject *o, QEvent *e)
         return ignoreKeyPresses?false:event(e);
 
     if (e->type() == MythEvent::MythEventMessage ||
-        e->type() == MythEvent::MythUserMessage)
+        e->type() == MythEvent::MythUserMessage  ||
+        e->type() == MythEvent::kUpdateTvProgressEventType)
     {
         customEvent(e);
         return true;
@@ -8131,6 +8132,12 @@ void TV::PauseAudioUntilBuffered(PlayerContext *ctx)
 /// This handles all custom events
 void TV::customEvent(QEvent *e)
 {
+    if (e->type() == MythEvent::kUpdateTvProgressEventType && myWindow)
+    {
+        myWindow->UpdateProgress();
+        return;
+    }
+
     if (e->type() == MythEvent::MythUserMessage)
     {
         MythEvent *me = (MythEvent *)e;
