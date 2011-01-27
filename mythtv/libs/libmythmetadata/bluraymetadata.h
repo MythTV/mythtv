@@ -23,6 +23,7 @@ class MPUBLIC BlurayMetadata : public QObject
     void toMap(MetadataMap &metadataMap);
 
     bool OpenDisc(void);
+    bool IsOpen() { return m_bdnav; };
     bool ParseDisc(void);
 
     QString      GetTitle(void) { return m_title; };
