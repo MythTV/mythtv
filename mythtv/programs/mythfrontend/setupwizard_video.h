@@ -75,7 +75,7 @@ class VideoSetupWizard : public MythScreenType
                        QString title,
                        QString file);
 
-    void DownloadSample(QString url);
+    void DownloadSample(QString url, QString dest);
 };
 
 #endif

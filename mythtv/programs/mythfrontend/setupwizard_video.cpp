@@ -167,10 +167,9 @@ bool VideoSetupWizard::keyPressEvent(QKeyEvent *event)
 
 void VideoSetupWizard::testSDVideo(void)
 {
-    QFileInfo qfile(VIDEO_SAMPLE_SD_FILENAME);
-    QString baseName = qfile.fileName();
     QString sdtestfile = generate_file_url("Temp",
-                              gCoreContext->GetMasterHostName(), baseName);
+                              gCoreContext->GetMasterHostName(),
+                              VIDEO_SAMPLE_SD_FILENAME);
     QString desiredpbp =
         m_playbackProfileButtonList->GetItemCurrent()->GetText();
     QString desc = tr("A short test of your system's playback of "
@@ -181,7 +180,7 @@ void VideoSetupWizard::testSDVideo(void)
     if (!RemoteFile::Exists(sdtestfile))
     {
         m_testType = ttStandardDefinition;
-        DownloadSample(VIDEO_SAMPLE_SD_LOCATION);
+        DownloadSample(VIDEO_SAMPLE_SD_LOCATION, VIDEO_SAMPLE_SD_FILENAME);
     }
     else
         playVideoTest(desc, title, sdtestfile);
@@ -189,10 +188,9 @@ void VideoSetupWizard::testSDVideo(void)
 
 void VideoSetupWizard::testHDVideo(void)
 {
-    QFileInfo qfile(VIDEO_SAMPLE_HD_FILENAME);
-    QString baseName = qfile.fileName();
     QString hdtestfile = generate_file_url("Temp",
-                              gCoreContext->GetMasterHostName(), baseName);
+                              gCoreContext->GetMasterHostName(),
+                              VIDEO_SAMPLE_HD_FILENAME);
     QString desiredpbp =
         m_playbackProfileButtonList->GetItemCurrent()->GetText();
     QString desc = tr("A short test of your system's playback of "
@@ -203,7 +201,7 @@ void VideoSetupWizard::testHDVideo(void)
     if (!RemoteFile::Exists(hdtestfile))
     {
         m_testType = ttHighDefinition;
-        DownloadSample(VIDEO_SAMPLE_HD_LOCATION);
+        DownloadSample(VIDEO_SAMPLE_HD_LOCATION, VIDEO_SAMPLE_HD_FILENAME);
     }
     else
         playVideoTest(desc, title, hdtestfile);
@@ -220,13 +218,10 @@ void VideoSetupWizard::playVideoTest(QString desc, QString title, QString file)
     m_vdp->SetDefaultProfileName(currentpbp, gCoreContext->GetHostName());
 }
 
-void VideoSetupWizard::DownloadSample(QString url)
+void VideoSetupWizard::DownloadSample(QString url, QString dest)
 {
-    QFileInfo qfile(url);
-    QString baseName = qfile.fileName();
-
     initProgressDialog();
-    m_downloadFile = RemoteDownloadFile(url, "Temp", baseName);
+    m_downloadFile = RemoteDownloadFile(url, "Temp", dest);
 }
 
 void VideoSetupWizard::initProgressDialog()
