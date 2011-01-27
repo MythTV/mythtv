@@ -652,7 +652,10 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
     handlers.at(selected).callback(pMedia);
 }
 
-// Signal handler.
+/**
+ * \brief Slot which is called when the device status changes and posts a
+ *        media event to the mainwindow
+ */
 void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
                                       MythMediaDevice* pMedia)
 {
