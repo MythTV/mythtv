@@ -17,9 +17,9 @@
 #include "setupwizard_video.h"
 
 const QString VIDEO_SAMPLE_HD_LOCATION =
-                  QString("http://www.fecitfacta.com/mythtv_video_test_HD_19000Kbps_H264.mkv");
+                  QString("http://services.mythtv.org/samples/video/?sample=HD");
 const QString VIDEO_SAMPLE_SD_LOCATION =
-                  QString("http://www.fecitfacta.com/mythtv_video_test_SD_6000Kbps_H264.mkv");
+                  QString("http://services.mythtv.org/samples/video/?sample=SD");
 
 VideoSetupWizard::VideoSetupWizard(MythScreenStack *parent, MythScreenType *general,
                                    MythScreenType *audio, const char *name)
