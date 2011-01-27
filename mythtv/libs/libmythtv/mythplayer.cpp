@@ -2284,7 +2284,7 @@ void MythPlayer::SwitchToProgram(void)
     }
 
     player_ctx->buffer->OpenFile(
-        pginfo->GetPlaybackURL(), RingBuffer::kDefaultOpenTimeout);
+        pginfo->GetPlaybackURL(), RingBuffer::kLiveTVOpenTimeout);
 
     if (!player_ctx->buffer->IsOpen())
     {
@@ -2414,7 +2414,7 @@ void MythPlayer::JumpToProgram(void)
     SendMythSystemPlayEvent("PLAY_CHANGED", pginfo);
 
     player_ctx->buffer->OpenFile(
-        pginfo->GetPlaybackURL(), RingBuffer::kDefaultOpenTimeout);
+        pginfo->GetPlaybackURL(), RingBuffer::kLiveTVOpenTimeout);
 
     if (!player_ctx->buffer->IsOpen())
     {
