@@ -3678,11 +3678,8 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
         }
         else if (action == "DELETE")
         {
-            if (IsInDelete(frame))
-            {
-                deleteMap.Delete(frame, totalFrames);
-                refresh = true;
-            }
+            deleteMap.Delete(frame, totalFrames);
+            refresh = true;
         }
         else if (action == "REVERT")
         {

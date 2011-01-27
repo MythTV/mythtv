@@ -8908,6 +8908,9 @@ void TV::ShowOSDCutpoint(PlayerContext *ctx, const QString &type)
             osd->DialogAddButton(QObject::tr("Add New Cut"),
                                  QString("DIALOG_CUTPOINT_NEWCUT_%1")
                                          .arg(frame));
+            osd->DialogAddButton(QObject::tr("Join Surrounding Cuts"),
+                                 QString("DIALOG_CUTPOINT_DELETE_%1")
+                                         .arg(frame));
         }
         if ("EDIT_CUT_POINTS" == type)
             osd->DialogAddButton(QObject::tr("Cut List Options"),
