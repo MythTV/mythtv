@@ -26,7 +26,7 @@ HEADERS += output.h
 HEADERS += settings.h
 HEADERS += uilistbtntype.h uitypes.h mythuifilebrowser.h
 HEADERS += volumebase.h visual.h xmlparse.h
-HEADERS += mythhdd.h mythcdrom.h storagegroupeditor.h dbutil.h
+HEADERS += storagegroupeditor.h dbutil.h
 HEADERS += mythcommandlineparser.h mythterminal.h
 HEADERS += mythhttppool.h mythhttphandler.h
 HEADERS += remoteutil.h
@@ -56,7 +56,7 @@ SOURCES += mythwidgets.cpp mythwizard.cpp schemawizard.cpp
 SOURCES += output.cpp
 SOURCES += settings.cpp
 SOURCES += uilistbtntype.cpp uitypes.cpp util.cpp mythuifilebrowser.cpp
-SOURCES += mythhdd.cpp mythcdrom.cpp storagegroupeditor.cpp dbutil.cpp
+SOURCES += storagegroupeditor.cpp dbutil.cpp
 SOURCES += mythcommandlineparser.cpp mythterminal.cpp
 SOURCES += mythhttppool.cpp mythhttphandler.cpp
 SOURCES += remoteutil.cpp
@@ -106,7 +106,7 @@ inc.files += settings.h uitypes.h xmlparse.h mythplugin.h mythdialogs.h
 inc.files += audio/audiooutput.h audio/audiosettings.h
 inc.files += audio/audiooutputsettings.h
 inc.files += dbutil.h
-inc.files += inetcomms.h mythcdrom.h mythwizard.h schemawizard.h
+inc.files += inetcomms.h mythwizard.h schemawizard.h
 inc.files += uilistbtntype.h generictree.h managedlist.h mythmediamonitor.h
 inc.files += visual.h volumebase.h output.h langsettings.h
 inc.files += mythexp.h mythpluginapi.h storagegroupeditor.h
@@ -168,8 +168,6 @@ mingw {
 macx {
     HEADERS += audio/audiooutputca.h
     SOURCES += audio/audiooutputca.cpp
-    HEADERS += mythcdrom-darwin.h
-    SOURCES += mythcdrom-darwin.cpp
 
     darwin_da {
         SOURCES -= mediamonitor-unix.cpp
@@ -190,16 +188,6 @@ macx {
 
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/$${FC}.framework/Frameworks
     LIBS           += -framework $$join(FWKS," -framework ")
-}
-
-linux {
-    SOURCES += mythcdrom-linux.cpp
-    HEADERS += mythcdrom-linux.h
-}
-
-freebsd {
-    SOURCES += mythcdrom-freebsd.cpp
-    HEADERS += mythcdrom-freebsd.h
 }
 
 INSTALLS += inc inc2
