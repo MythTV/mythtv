@@ -2751,16 +2751,6 @@ static HostCheckBox *EnableMediaMon()
     return gc;
 }
 
-static HostCheckBox *EnableMediaEvents()
-{
-    HostCheckBox *gc = new HostCheckBox("MediaChangeEvents");
-    gc->setLabel(QObject::tr("Use new media"));
-    gc->setHelpText(QObject::tr("This will cause MythTV to jump, "
-                    "to an appropriate plugin, when new media is inserted."));
-    gc->setValue(false);
-    return gc;
-}
-
 static HostLineEdit *IgnoreMedia()
 {
     HostLineEdit *ge = new HostLineEdit("IgnoreDevices");
@@ -2786,7 +2776,6 @@ class MythMediaSettings : public TriggeredConfigurationGroup
          setTrigger(enabled);
 
          ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
-         settings->addChild(EnableMediaEvents());
          settings->addChild(IgnoreMedia());
          addTarget("1", settings);
 

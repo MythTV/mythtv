@@ -287,9 +287,6 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
     // but the user can elect not to actually do monitoring:
     m_StartThread = gCoreContext->GetNumSetting("MonitorDrives");
 
-    // or not send status changed events:
-    m_SendEvent = gCoreContext->GetNumSetting("MediaChangeEvents");
-
     // User can specify that some devices are not monitored
     QString ignore = gCoreContext->GetSetting("IgnoreDevices", "");
 
@@ -299,8 +296,7 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
         m_IgnoreList = QStringList();  // Force empty list
 
     if (m_StartThread)
-        VERBOSE(VB_MEDIA, "Creating MediaMonitor, SendEvents="
-                          + (m_SendEvent?QString("true"):QString("false")));
+        VERBOSE(VB_MEDIA, "Creating MediaMonitor");
     else
 #ifdef USING_DARWIN_DA
         VERBOSE(VB_MEDIA, "MediaMonitor is disabled. Eject will not work");
@@ -672,7 +668,7 @@ void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
     // This gets called from outside the main thread so we need
     // to post an event back to the main thread.
     // We now send events for all non-error statuses, so plugins get ejects
-    if (m_SendEvent && stat != MEDIASTAT_ERROR && stat != MEDIASTAT_UNKNOWN)
+    if (stat != MEDIASTAT_ERROR && stat != MEDIASTAT_UNKNOWN)
     {
         // Should we ValidateAndLock() first?
         QEvent *e = new MediaEvent(stat, pMedia);
