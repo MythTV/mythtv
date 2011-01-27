@@ -20,6 +20,8 @@ const QString VIDEO_SAMPLE_HD_LOCATION =
                   QString("http://services.mythtv.org/samples/video/?sample=HD");
 const QString VIDEO_SAMPLE_SD_LOCATION =
                   QString("http://services.mythtv.org/samples/video/?sample=SD");
+const QString VIDEO_SAMPLE_HD_FILENAME = QString("mythtv_video_test_HD_19000Kbps_H264.mkv");
+const QString VIDEO_SAMPLE_SD_FILENAME = QString("mythtv_video_test_SD_6000Kbps_H264.mkv");
 
 VideoSetupWizard::VideoSetupWizard(MythScreenStack *parent, MythScreenType *general,
                                    MythScreenType *audio, const char *name)
@@ -165,7 +167,7 @@ bool VideoSetupWizard::keyPressEvent(QKeyEvent *event)
 
 void VideoSetupWizard::testSDVideo(void)
 {
-    QFileInfo qfile(VIDEO_SAMPLE_SD_LOCATION);
+    QFileInfo qfile(VIDEO_SAMPLE_SD_FILENAME);
     QString baseName = qfile.fileName();
     QString sdtestfile = generate_file_url("Temp",
                               gCoreContext->GetMasterHostName(), baseName);
@@ -187,7 +189,7 @@ void VideoSetupWizard::testSDVideo(void)
 
 void VideoSetupWizard::testHDVideo(void)
 {
-    QFileInfo qfile(VIDEO_SAMPLE_HD_LOCATION);
+    QFileInfo qfile(VIDEO_SAMPLE_HD_FILENAME);
     QString baseName = qfile.fileName();
     QString hdtestfile = generate_file_url("Temp",
                               gCoreContext->GetMasterHostName(), baseName);

@@ -17,6 +17,8 @@
 
 extern const QString VIDEO_SAMPLE_HD_LOCATION;
 extern const QString VIDEO_SAMPLE_SD_LOCATION;
+extern const QString VIDEO_SAMPLE_HD_FILENAME;
+extern const QString VIDEO_SAMPLE_SD_FILENAME;
 
 class VideoSetupWizard : public MythScreenType
 {
