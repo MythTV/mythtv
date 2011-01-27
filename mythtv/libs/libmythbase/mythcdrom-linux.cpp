@@ -382,12 +382,12 @@ MediaStatus MythCDROMLinux::checkMedia()
     switch (driveStatus())
     {
         case CDS_DISC_OK:
-            VERBOSE(VB_MEDIA, m_DevicePath + " Disk OK, type = "
+            VERBOSE(VB_MEDIA|VB_EXTRA, m_DevicePath + " Disk OK, type = "
                               + MediaTypeString(m_MediaType) );
             // further checking is required
             break;
         case CDS_TRAY_OPEN:
-            VERBOSE(VB_MEDIA, m_DevicePath + " Tray open or no disc");
+            VERBOSE(VB_MEDIA|VB_EXTRA, m_DevicePath + " Tray open or no disc");
             // First, send a message to the
             // plugins to forget the current media type
             setStatus(MEDIASTAT_OPEN, OpenedHere);
@@ -396,13 +396,13 @@ MediaStatus MythCDROMLinux::checkMedia()
             return MEDIASTAT_OPEN;
             break;
         case CDS_NO_DISC:
-            VERBOSE(VB_MEDIA, m_DevicePath + " No disc");
+            VERBOSE(VB_MEDIA|VB_EXTRA, m_DevicePath + " No disc");
             m_MediaType = MEDIATYPE_UNKNOWN;
             return setStatus(MEDIASTAT_NODISK, OpenedHere);
             break;
         case CDS_NO_INFO:
         case CDS_DRIVE_NOT_READY:
-            VERBOSE(VB_MEDIA, m_DevicePath + " No info or drive not ready");
+            VERBOSE(VB_MEDIA|VB_EXTRA, m_DevicePath + " No info or drive not ready");
             m_MediaType = MEDIATYPE_UNKNOWN;
             return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
         default:
