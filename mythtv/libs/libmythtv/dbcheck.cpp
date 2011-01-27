@@ -21,7 +21,7 @@ using namespace std;
    mythtv/bindings/perl/MythTV.pm
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1267";
+const QString currentDatabaseVersion = "1268";
 
 static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver);
 static bool performActualUpdate(
@@ -5559,6 +5559,16 @@ NULL
 NULL
 };
         if (!performActualUpdate(updates, "1267", dbver))
+            return false;
+    }
+
+    if (dbver == "1267")
+    {
+        const char *updates[] = {
+"ALTER TABLE channel MODIFY xmltvid VARCHAR(255) NOT NULL DEFAULT '';",
+NULL
+};
+        if (!performActualUpdate(updates, "1268", dbver))
             return false;
     }
 
