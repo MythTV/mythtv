@@ -4022,6 +4022,13 @@ fi
 enabled libfftw3 && check_lib2 fftw3.h fftw_init_threads -lfftw3_threads -lfftw3f -lfftw3 ||
     disable libfftw3
 
+if enabled libxml2 ; then
+   if pkg-config --exists libxml-2.0 ; then
+        libxml2_path=`pkg-config --cflags-only-I libxml-2.0|sed -n "s/-I\([^ ]*\) *$/\1/p"`
+   else
+        disable libxml2
+   fi
+fi
 enabled libxml2 && check_cc -I"$libxml2_path" <<EOF && add_extralibs "-lxml2" || disable libxml2
 #include <libxml/xmlversion.h>
 int main(void) {
