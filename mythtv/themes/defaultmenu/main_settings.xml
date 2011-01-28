@@ -73,4 +73,11 @@
         <action>SETTINGS GRABBERS</action>
     </button>
 
+    <button>
+        <type>SETTINGS_SETUPWIZARD</type>
+        <text>Setup Wizard</text>
+        <description>Perform basic configuration tasks</description>
+        <action>SETTINGS SETUPWIZARD</action>
+    </button>
+
 </mythmenu>
