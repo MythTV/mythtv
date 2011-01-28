@@ -1,83 +1,132 @@
-/**
- * \class BackendSelect
- * \brief Classes to Prompt user for a master backend.
- *
- * \author Originally based on masterselection.cpp/h by David Blain.
- */
 
 #include "backendselect.h"
-#include "mythdialogs.h"
-#include "mythconfigdialogs.h"
+
+// libmyth
 #include "mythcontext.h"
 
+// libmythupnp
 #include "mythxmlclient.h"
+#include "configuration.h"
 
+// libmythui
+#include "mythmainwindow.h"
+#include "mythdialogbox.h"
+#include "mythuibutton.h"
+#include "mythuistatetype.h"
 
-BackendSelect::BackendSelect(MythMainWindow *parent, DatabaseParams *params)
-    : MythDialog(parent, "BackEnd Selection", true),
-      m_PIN(QString::null), m_USN(QString::null),
-      m_DBparams(params), m_parent(parent), m_backends(NULL)
+// qt
+#include <QApplication>
+#include <QHash>
+
+BackendSelection::BackendSelection(MythScreenStack *parent, DatabaseParams *params,
+                                   XmlConfiguration *xmlconf, bool exitOnFinish)
+    : MythScreenType(parent, "BackEnd Selection"),
+      m_DBparams(params), m_XML(xmlconf), m_exitOnFinish(exitOnFinish),
+      m_backendList(NULL), m_manualButton(NULL), m_saveButton(NULL),
+      m_cancelButton(NULL)
 {
-    CreateUI();
-
-    UPnp::PerformSearch(gBackendURI);
-    UPnp::AddListener(this);
-
-    FillListBox();
-
-    m_backends->setFocus();
 }
 
-BackendSelect::~BackendSelect()
+BackendSelection::~BackendSelection()
 {
     UPnp::RemoveListener(this);
 
     ItemMap::iterator it;
     for (it = m_devices.begin(); it != m_devices.end(); ++it)
     {
-        ListBoxDevice *item = *it;
+        DeviceLocation *dev = *it;
 
-        if (item != NULL)
-            delete item;
+        if (dev)
+            dev->Release();
     }
 
     m_devices.clear();
 }
 
-void BackendSelect::Accept(QListWidgetItem *item)
-{
-    DeviceLocation *dev;
-    ListBoxDevice  *selected = dynamic_cast<ListBoxDevice*>(item);
+bool BackendSelection::m_backendChanged = false;
 
-    if (!selected)
+bool BackendSelection::prompt(DatabaseParams *dbParams,
+                              XmlConfiguration *xmlConfig)
+{
+    m_backendChanged = false;
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    if (!mainStack)
+        return false;
+
+    BackendSelection *backendSettings = new BackendSelection(mainStack,
+                                                             dbParams,
+                                                             xmlConfig, true);
+
+    if (backendSettings->Create())
+    {
+        mainStack->AddScreen(backendSettings, false);
+        qApp->exec();
+        mainStack->PopScreen(backendSettings, false);
+    }
+    else
+        delete backendSettings;
+
+    return m_backendChanged;
+}
+
+bool BackendSelection::Create(void)
+{
+    if (!LoadWindowFromXML("config-ui.xml", "backendselection", this))
+        return false;
+
+    m_backendList = dynamic_cast<MythUIButtonList*>(GetChild("backends"));
+    m_saveButton = dynamic_cast<MythUIButton*>(GetChild("save"));
+    m_cancelButton = dynamic_cast<MythUIButton*>(GetChild("cancel"));
+    m_manualButton = dynamic_cast<MythUIButton*>(GetChild("manual"));
+    //m_searchButton = dynamic_cast<MythUIButton*>(GetChild("search"));
+
+    connect(m_backendList, SIGNAL(itemClicked(MythUIButtonListItem *)),
+            SLOT(Accept(MythUIButtonListItem *)));
+
+    // connect(m_searchButton, SIGNAL(clicked()), SLOT(Search()));
+    connect(m_manualButton, SIGNAL(Clicked()), SLOT(Manual()));
+    connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Cancel()));
+    connect(m_saveButton, SIGNAL(Clicked()), SLOT(Accept()));
+
+    BuildFocusList();
+    LoadInBackground();
+
+    return true;
+}
+
+void BackendSelection::Accept(MythUIButtonListItem *item)
+{
+    if (!item)
         return;
 
-    dev = selected->m_dev;
+    DeviceLocation *dev = qVariantValue<DeviceLocation *>(item->GetData());
 
     if (!dev)
-        reject();
+        Close();
 
-    dev->AddRef();
-    if (Connect(dev))  // this does a Release()
-        accept();
-}
-
-void BackendSelect::Accept(void)
-{
-    QList<QListWidgetItem *>  selections = m_backends->selectedItems();
-
-    if (selections.empty())
+    if (ConnectBackend(dev))  // this does a Release()
     {
-        VERBOSE(VB_IMPORTANT,
-                "BackendSelect::Accept() - no QListWidget selected?");
-        return;
+        if (m_pinCode.length())
+            m_XML->SetValue(kDefaultPIN, m_pinCode);
+        m_XML->SetValue(kDefaultUSN, m_USN);
+        m_XML->Save();
+        Close();
     }
+}
 
-    Accept(selections[0]);
+void BackendSelection::Accept(void)
+{
+    MythUIButtonListItem *item = m_backendList->GetItemCurrent();
+
+    if (!item)
+        return;
+
+    Accept(item);
 }
 
 
-void BackendSelect::AddItem(DeviceLocation *dev)
+void BackendSelection::AddItem(DeviceLocation *dev)
 {
     if (!dev)
         return;
@@ -87,20 +136,37 @@ void BackendSelect::AddItem(DeviceLocation *dev)
     // The devices' USN should be unique. Don't add if it is already there:
     if (m_devices.find(USN) == m_devices.end())
     {
-        ListBoxDevice *item;
-        QString        name;
 
-        if (VERBOSE_LEVEL_CHECK(VB_UPNP))
-            name = dev->GetNameAndDetails(true);
-        else
-            name = dev->GetFriendlyName(true);
+        InfoMap infomap;
+        dev->GetDeviceDetail(infomap, true);
 
-        item = new ListBoxDevice(m_backends, name, dev);
-        m_devices.insert(USN, item);
+        // We only want the version number, not the library version info
+        infomap["version"] = infomap["modelnumber"].section('.', 0, 1);
 
-        // Pre-select at least one item:
-        if (m_backends->count() == 1)
-            m_backends->setCurrentRow(0);
+        MythUIButtonListItem *item;
+        item = new MythUIButtonListItem(m_backendList, infomap["modelname"],
+                                        qVariantFromValue(dev));
+        item->SetTextFromMap(infomap);
+
+        bool protoMatch = (infomap["protocolversion"] == MYTH_PROTO_VERSION);
+
+        QString status = "good";
+        if (!protoMatch)
+            status = "protocolmismatch";
+
+        // TODO: Not foolproof but if we can't get device details then it's
+        // probably because we could not connect to port 6544 - firewall?
+        // Maybe we can replace this with a more specific check
+        if (infomap["modelname"].isEmpty())
+            status = "blocked";
+
+        item->DisplayState(status, "connection");
+
+        bool needPin = dev->NeedSecurityPin();
+        item->DisplayState(needPin ? "yes" : "no", "securitypin");
+
+        dev->AddRef();
+        m_devices.insert(USN, dev);
     }
 
     dev->Release();
@@ -110,7 +176,7 @@ void BackendSelect::AddItem(DeviceLocation *dev)
  * Attempt UPnP connection to a backend device, get its DB details.
  * Will loop until a valid PIN is entered.
  */
-bool BackendSelect::Connect(DeviceLocation *dev)
+bool BackendSelection::ConnectBackend(DeviceLocation *dev)
 {
     QString          error;
     QString          message;
@@ -119,24 +185,21 @@ bool BackendSelect::Connect(DeviceLocation *dev)
 
     m_USN = dev->m_sUSN;
     xml   = new MythXMLClient(dev->m_sLocation);
-    stat  = xml->GetConnectionInfo(m_PIN, m_DBparams, message);
-    error = dev->GetFriendlyName(true);
-    if (error == "<Unknown>")
-        error = dev->m_sLocation;
-    error += ". " + message;
-    dev->Release();
+    stat  = xml->GetConnectionInfo(m_pinCode, m_DBparams, message);
+    QString backendName = dev->GetFriendlyName(true);
+    if (backendName == "<Unknown>")
+        backendName = dev->m_sLocation;
 
     switch (stat)
     {
         case UPnPResult_Success:
-            VERBOSE(VB_UPNP, "Connect() - success. New hostname: "
-                             + m_DBparams->dbHostName);
+            VERBOSE(VB_UPNP, QString("ConnectBackend() - success. New hostname: %1")
+                    .arg(m_DBparams->dbHostName));
             return true;
 
         case UPnPResult_HumanInterventionRequired:
             VERBOSE(VB_UPNP, error);
-            MythPopupBox::showOkPopup(m_parent, "",
-                                      tr(message.toLatin1().constData()));
+            ShowOkPopup(message);
             if (TryDBfromURL("", dev->m_sLocation))
             {
                 delete xml;
@@ -145,168 +208,46 @@ bool BackendSelect::Connect(DeviceLocation *dev)
             break;
 
         case UPnPResult_ActionNotAuthorized:
-            VERBOSE(VB_UPNP, "Access denied for " + error + ". Wrong PIN?");
-            if (TryDBfromURL(tr("Backend uses a PIN. "), dev->m_sLocation))
-                return true;
-            message = "Please enter the backend access PIN";
-            do
-            {
-                m_PIN = MythPopupBox::showPasswordPopup(
-                    m_parent, "Backend PIN entry",
-                    tr(message.toLatin1().constData()));
-
-                // User might have cancelled?
-                if (m_PIN.isEmpty())
-                    break;
-
-                stat = xml->GetConnectionInfo(m_PIN, m_DBparams, message);
-            }
-            while (stat == UPnPResult_ActionNotAuthorized);
-            if (stat == UPnPResult_Success)
-            {
-                delete xml;
-                return true;
-            }
+            VERBOSE(VB_UPNP, QString("Access denied for %1. Wrong PIN?")
+                    .arg(backendName));
+            PromptForPassword();
             break;
-
         default:
-            VERBOSE(VB_UPNP, "GetConnectionInfo() failed for " + error);
-            MythPopupBox::showOkPopup(m_parent, "",
-                                      tr(message.toLatin1().constData()));
+            VERBOSE(VB_UPNP, QString("GetConnectionInfo() failed for %1")
+                    .arg(backendName));
+            ShowOkPopup(message);
     }
 
     // Back to the list, so the user can choose a different backend:
-    m_backends->setFocus();
+    SetFocusWidget(m_backendList);
     delete xml;
     return false;
 }
 
-void BackendSelect::CreateUI(void)
+void BackendSelection::Cancel()
 {
-    // Probably should all be members, and deleted by ~BackendSelect()
-    QLabel         *label;
-    QGridLayout    *layout;
-    MythPushButton *cancel;
-    MythPushButton *manual;
-    MythPushButton *OK;
-#ifdef SEARCH_BUTTON
-    MythPushButton *search;
-#endif
-
-
-    label = new QLabel(tr("Please select default MythTV Backend Server"), this);
-
-    m_backends = new QListWidget(this);
-    OK         = new MythPushButton(tr("OK"), this);
-    cancel     = new MythPushButton(tr("Cancel"), this);
-    manual     = new MythPushButton(tr("Configure Manually"), this);
-#ifdef SEARCH_BUTTON
-    search     = new MythPushButton(tr("Search"), this);
-#endif
-
-
-    layout = new QGridLayout(this);
-    layout->setContentsMargins(40,40,40,40);
-    layout->addWidget(label, 0, 1, 1, 3);
-    layout->addWidget(m_backends, 1, 0, 1, 5);
-
-#ifdef SEARCH_BUTTON
-    layout->addWidget(search, 4, 0);
-    layout->addWidget(manual, 4, 1, 1, 2);
-#else
-    layout->addWidget(manual, 4, 0, 1, 2);
-#endif
-    layout->addWidget(cancel, 4, 3);
-    layout->addWidget(OK    , 4, 4);
-
-
-    // Catch Escape/Enter/Return key
-    m_backends->installEventFilter(this);
-
-    // Mouse double click on a list item
-    connect(m_backends, SIGNAL(itemActivated(QListWidgetItem *)),
-                                 SLOT(Accept(QListWidgetItem *)));
-#ifdef SEARCH_BUTTON
-    connect(search,     SIGNAL(clicked()),     SLOT(Search()));
-#endif
-    connect(manual,     SIGNAL(clicked()),     SLOT(Manual()));
-    connect(cancel,     SIGNAL(clicked()),     SLOT(reject()));
-    connect(OK,         SIGNAL(clicked()),     SLOT(Accept()));
+    Close();
 }
 
-void BackendSelect::customEvent(QEvent *e)
+void BackendSelection::Load()
 {
-    if (MythEvent::MythEventMessage != ((MythEvent::Type)(e->type())))
-        return;
-
-
-    MythEvent *me      = (MythEvent *)e;
-    QString    message = me->Message();
-    QString    URI     = me->ExtraData(0);
-    QString    URN     = me->ExtraData(1);
-    QString    URL     = me->ExtraData(2);
-
-
-    VERBOSE(VB_UPNP, "BackendSelect::customEvent(" + message
-                     + ", " + URI + ", " + URN + ", " + URL + ")");
-
-    if (message.startsWith("SSDP_ADD") &&
-        URI.startsWith("urn:schemas-mythtv-org:device:MasterMediaServer:"))
-    {
-        DeviceLocation *devLoc = UPnp::g_SSDPCache.Find(URI, URN);
-
-        if (devLoc != NULL)
-        {
-            devLoc->AddRef();
-            AddItem(devLoc);   // this does a Release()
-        }
-    }
-    else if (message.startsWith("SSDP_REMOVE"))
-    {
-        //-=>Note: This code will never get executed until
-        //         SSDPCache is changed to handle NotifyRemove correctly
-        RemoveItem(URN);
-    }
+    UPnp::AddListener(this);
+    UPnp::PerformSearch(gBackendURI);
 }
 
-/**
- * Allow key shortcuts in the backend list widget.
- *
- * Note that this has to use Qt style event codes, instead of the QStrings
- * returned by TranslateKeyPress(), because there is no translation table yet.
- */
-bool BackendSelect::eventFilter(QObject *obj, QEvent *event)
-{
-    if (event->type() == QEvent::KeyPress)
-    {
-        int key = ((QKeyEvent*)event)->key();
-
-        if (key == Qt::Key_Return || key == Qt::Key_Enter)
-        {
-            Accept();
-            return true;
-        }
-        else if (key == Qt::Key_Escape)
-        {
-            reject();
-            return true;
-        }
-    }
-
-    return QObject::eventFilter(obj, event);
-}
-
-void BackendSelect::FillListBox(void)
+void BackendSelection::Init(void)
 {
     EntryMap::Iterator  it;
     EntryMap            ourMap;
     DeviceLocation     *pDevLoc;
 
-
     SSDPCacheEntries *pEntries = UPnp::g_SSDPCache.Find(gBackendURI);
 
     if (!pEntries)
+    {
+        VERBOSE(VB_GENERAL, "Found zero backends, bailing");
         return;
+    }
 
     pEntries->AddRef();
     pEntries->Lock();
@@ -324,7 +265,6 @@ void BackendSelect::FillListBox(void)
         ourMap.insert(pDevLoc->m_sUSN, pDevLoc);
     }
 
-
     pEntries->Unlock();
     pEntries->Release();
 
@@ -335,38 +275,35 @@ void BackendSelect::FillListBox(void)
     }
 }
 
-void BackendSelect::Manual(void)
+void BackendSelection::Manual(void)
 {
-    done(kDialogCodeButton0);
+    Close();
 }
 
-void BackendSelect::RemoveItem(QString USN)
+void BackendSelection::RemoveItem(QString USN)
 {
     ItemMap::iterator it = m_devices.find(USN);
 
     if (it != m_devices.end())
     {
-        ListBoxDevice *item = *it;
+        DeviceLocation *dev = *it;
 
-        if (item != NULL)
-            delete item;
+        if (dev)
+            dev->Release();
 
         m_devices.erase(it);
     }
 }
 
-#ifdef SEARCH_BUTTON
-void BackendSelect::Search(void)
-{
-    UPnp::PerformSearch(gBackendURI);
-}
-#endif
+// void BackendSelection::Search(void)
+// {
+//     UPnp::PerformSearch(gBackendURI);
+// }
 
-bool BackendSelect::TryDBfromURL(const QString &error, QString URL)
+bool BackendSelection::TryDBfromURL(const QString &error, QString URL)
 {
-    if (MythPopupBox::showOkCancelPopup(m_parent, "",
-            error + tr("Shall I attempt to connect to this"
-                       " host with default database parameters?"), true))
+    if (ShowOkPopup(error + tr("Shall I attempt to connect to this"
+                    " host with default database parameters?")))
     {
         URL.remove("http://");
         URL.remove(QRegExp("[:/].*"));
@@ -377,3 +314,79 @@ bool BackendSelect::TryDBfromURL(const QString &error, QString URL)
     return false;
 }
 
+void BackendSelection::customEvent(QEvent *event)
+{
+    if (((MythEvent::Type)(event->type())) == MythEvent::MythEventMessage)
+    {
+        MythEvent *me      = (MythEvent *)event;
+        QString    message = me->Message();
+        QString    URI     = me->ExtraData(0);
+        QString    URN     = me->ExtraData(1);
+        QString    URL     = me->ExtraData(2);
+
+
+        VERBOSE(VB_UPNP, QString("BackendSelection::customEvent(%1, %2, %3, %4)")
+                .arg(message).arg(URI).arg(URN).arg(URL));
+
+        if (message.startsWith("SSDP_ADD") &&
+            URI.startsWith("urn:schemas-mythtv-org:device:MasterMediaServer:"))
+        {
+            DeviceLocation *devLoc = UPnp::g_SSDPCache.Find(URI, URN);
+
+            if (devLoc)
+            {
+                devLoc->AddRef();
+                AddItem(devLoc);   // this does a Release()
+            }
+        }
+        else if (message.startsWith("SSDP_REMOVE"))
+        {
+            //-=>Note: This code will never get executed until
+            //         SSDPCache is changed to handle NotifyRemove correctly
+            RemoveItem(URN);
+        }
+    }
+    else if (event->type() == DialogCompletionEvent::kEventType)
+    {
+        DialogCompletionEvent *dce = dynamic_cast<DialogCompletionEvent*>(event);
+
+        if (!dce)
+            return;
+
+        QString resultid = dce->GetId();
+
+        if (resultid == "password")
+        {
+            m_pinCode = dce->GetResultText();
+            Accept();
+        }
+    }
+}
+
+void BackendSelection::PromptForPassword(void)
+{
+    QString message = tr("Please enter the backend access PIN");
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    MythTextInputDialog *pwDialog = new MythTextInputDialog(popupStack,
+                                                            message,
+                                                            FilterNone,
+                                                            true);
+
+    if (pwDialog->Create())
+    {
+        pwDialog->SetReturnEvent(this, "password");
+        popupStack->AddScreen(pwDialog);
+    }
+    else
+        delete pwDialog;
+}
+
+void BackendSelection::Close(void)
+{
+    if (m_exitOnFinish)
+        qApp->quit();
+    else
+        MythScreenType::Close();
+}

@@ -1,76 +1,85 @@
 #ifndef __BACKENDSELECT_H__
 #define __BACKENDSELECT_H__
 
-#include <QListWidget>
+// libmythui
+#include "mythscreentype.h"
+#include "mythuibuttonlist.h"
 
-#include "mythdialogs.h"
 #include "upnpdevice.h"
 
-// define this to add a search button. In Nigel's testing, an extra ssdp
-// doesn't get any extra responses, so it is disabled by default.
-//#define SEARCH_BUTTON
+class MythUIButtonList;
+class MythUIButton;
 
+class XmlConfiguration;
 struct DatabaseParams;
 
-class ListBoxDevice : public QListWidgetItem
-{
-  public:
+// TODO: The following do not belong here, but I cannot think of a better
+//       location at this moment in time
+// Some common UPnP search and XML value strings
+const QString gBackendURI = "urn:schemas-mythtv-org:device:MasterMediaServer:1";
+const QString kDefaultBE  = "UPnP/MythFrontend/DefaultBackend/";
+const QString kDefaultPIN = kDefaultBE + "SecurityPin";
+const QString kDefaultUSN = kDefaultBE + "USN";
 
-    ListBoxDevice(QListWidget *parent, const QString &name, DeviceLocation *dev)
-        : QListWidgetItem(name, parent), m_dev(dev)
-    {
-        if (m_dev)
-            m_dev->AddRef();
-    }
+typedef QMap <QString, DeviceLocation*> ItemMap;
 
-    virtual ~ListBoxDevice()
-    {
-        if (m_dev)
-            m_dev->Release();
-    }
+/**
+ * \class BackendSelection
+ * \brief Classes to Prompt user for a master backend.
+ *
+ * \author Originally based on masterselection.cpp/h by David Blain.
+ */
 
-    DeviceLocation *m_dev;
-};
-
-typedef QMap <QString, ListBoxDevice *> ItemMap;
-
-
-class BackendSelect : public MythDialog 
+class BackendSelection : public MythScreenType
 {
     Q_OBJECT
 
   public:
-             BackendSelect(MythMainWindow *parent, DatabaseParams *params);
-    virtual ~BackendSelect();
+    BackendSelection(MythScreenStack *parent, DatabaseParams *params,
+                     XmlConfiguration *xmlConfig, bool exitOnFinish = false);
+    virtual ~BackendSelection();
 
-    void     customEvent(QEvent *e);
+    bool Create(void);
+    void customEvent(QEvent *event);
 
-    QString  m_PIN;
-    QString  m_USN;
+    static bool prompt(DatabaseParams *dbParams, XmlConfiguration *xmlConfig);
 
+  signals:
+//    void
 
   public slots:
-    void Accept(QListWidgetItem *);  ///< Invoked by mouse click
-    void Accept(void);   ///< Linked to the OK button
+    void Accept(void);
+    void Accept(MythUIButtonListItem *);
     void Manual(void);   ///< Linked to 'Configure Manually' button
-#ifdef SEARCH_BUTTON
-    void Search(void);
-#endif
+    void Cancel(void);  ///< Linked to 'Cancel' button
+    void Close(void);
 
-
-  protected:
-    void AddItem    (DeviceLocation *dev);
-    bool Connect    (DeviceLocation *dev);
-    void CreateUI   (void);
-    void FillListBox(void);
-    void RemoveItem (QString URN);
-    bool eventFilter(QObject *obj, QEvent *event);
+  private:
+    void Load(void);
+    void Init(void);
+    bool ConnectBackend(DeviceLocation *dev);
+    void AddItem(DeviceLocation *dev);
+    void RemoveItem(QString URN);
     bool TryDBfromURL(const QString &error, QString URL);
+    void PromptForPassword(void);
 
     DatabaseParams *m_DBparams;
-    ItemMap         m_devices;
-    MythMainWindow *m_parent;
-    QListWidget    *m_backends;
+    XmlConfiguration *m_XML;
+    bool m_exitOnFinish;
+    ItemMap m_devices;
+
+    MythUIButtonList *m_backendList;
+    MythUIButton *m_manualButton;
+    MythUIButton *m_saveButton;
+    MythUIButton *m_cancelButton;
+    //MythUIButton *m_searchButton;
+
+    QString m_pinCode;
+    QString m_USN;
+
+    static bool m_backendChanged;
 };
+
+Q_DECLARE_METATYPE(DeviceLocation*)
 
 #endif

@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
 // Program Name: mediarenderer.cpp
-//                                                                           
+//
 // Purpose - uPnp Media Renderer main Class
-//                                                                           
+//
 // Created By  : David Blain                    Created On : Jan. 15, 2007
-// Modified By :                                Modified On:                 
-//                                                                           
+// Modified By :                                Modified On:
+//
 /////////////////////////////////////////////////////////////////////////////
 
 #include "mediarenderer.h"
@@ -24,7 +24,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-MediaRenderer::MediaRenderer() 
+MediaRenderer::MediaRenderer()
 {
     VERBOSE(VB_UPNP, "MediaRenderer::Begin" );
 
@@ -51,6 +51,7 @@ MediaRenderer::MediaRenderer()
         // exit(BACKEND_BUGGY_EXIT_NO_BIND_STATUS);
         delete m_pHttpServer;
         m_pHttpServer = NULL;
+        InitializeSSDPOnly();
         return;
     }
 
@@ -92,7 +93,7 @@ MediaRenderer::MediaRenderer()
                                  "http-get:*:video/nupplevideo:*,"
                                  "http-get:*:video/x-ms-wmv:*";
         // ------------------------------------------------------------------
-        // Register the MythFEXML protocol... 
+        // Register the MythFEXML protocol...
         // ------------------------------------------------------------------
         VERBOSE(VB_UPNP, "MediaRenderer::Registering MythFEXML Service." );
         m_pHttpServer->RegisterExtension( new MythFEXML( RootDevice(),

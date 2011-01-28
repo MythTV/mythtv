@@ -48,12 +48,6 @@ using namespace std;
 
 MythContext *gContext = NULL;
 
-// Some common UPnP search and XML value strings
-const QString gBackendURI = "urn:schemas-mythtv-org:device:MasterMediaServer:1";
-const QString kDefaultBE  = "UPnP/MythFrontend/DefaultBackend/";
-const QString kDefaultPIN = kDefaultBE + "SecurityPin";
-const QString kDefaultUSN = kDefaultBE + "USN";
-
 class MythContextPrivate : public QObject
 {
     friend class MythContextSlotHandler;
@@ -941,58 +935,12 @@ int MythContextPrivate::ChooseBackend(const QString &error)
 
     // Tell the user what went wrong:
     if (error.length())
-        MythPopupBox::showOkPopup(GetMythMainWindow(), "DB connect failure",
-                                  error);
+        ShowOkPopup(error);
 
     VERBOSE(VB_GENERAL, "Putting up the UPnP backend chooser");
 
-    BackendSelect *BEsel = new BackendSelect(GetMythMainWindow(), &m_DBparams);
-    switch (BEsel->exec())
-    {
-        case kDialogCodeRejected:
-            VERBOSE(VB_IMPORTANT, "User canceled database configuration");
-            delete BEsel;
-            return 0;
+    BackendSelection::prompt(&m_DBparams, m_XML);
 
-        case kDialogCodeButton0:
-            VERBOSE(VB_IMPORTANT, "User requested Manual Config");
-            delete BEsel;
-            return -1;
-    }
-
-    QStringList buttons;
-    QString     message;
-
-    buttons += QObject::tr("Save database details");
-    buttons += QObject::tr("Save backend details");
-    buttons += QObject::tr("Don't Save");
-
-    message = QObject::tr("Save that backend or database as the default?");
-
-    DialogCode selected = MythPopupBox::ShowButtonPopup(
-        GetMythMainWindow(), "Save default", message, buttons,
-        kDialogCodeButton2);
-    switch (selected)
-    {
-        case kDialogCodeButton0:
-            if (!WriteSettingsFile(m_DBparams, true))
-            {
-                VERBOSE(VB_IMPORTANT, "WriteSettingsFile failed.");
-                return -1;
-            }
-            // User prefers mysql.txt, so throw away default UPnP backend:
-            m_XML->SetValue(kDefaultUSN, "");
-            m_XML->Save();
-            break;
-        case kDialogCodeButton1:
-            if (BEsel->m_PIN.length())
-                m_XML->SetValue(kDefaultPIN, BEsel->m_PIN);
-            m_XML->SetValue(kDefaultUSN, BEsel->m_USN);
-            m_XML->Save();
-            break;
-    }
-
-    delete BEsel;
     EndTempWindow();
 
     return 1;
