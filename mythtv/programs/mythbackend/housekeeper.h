@@ -33,6 +33,7 @@ class HouseKeeper
     void CleanupRecordedTables(void);
     void CleanupProgramListings(void);
     void RunStartupTasks(void);
+    void UpdateThemeChooserInfoCache(void);
 
     bool threadrunning;
     bool filldbRunning;

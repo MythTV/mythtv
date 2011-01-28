@@ -6,11 +6,15 @@
 #include <QList>
 #include <QDir>
 #include <QFileInfo>
+#include <QTimer>
+#include <QObject>
 
 // MythTV headers
-#include "themeinfo.h"
+#include "mythdialogbox.h"
 #include "mythdirs.h"
+#include "mythscreenstack.h"
 #include "mythscreentype.h"
+#include "themeinfo.h"
 
 class MythDialogBox;
 class MythUIButtonList;
@@ -43,6 +47,7 @@ class ThemeChooser : public MythScreenType
     void popupClosed(QString which, int result);
     void saveAndReload(void);
     void toggleFullscreenPreview(void);
+    void toggleThemeUpdateNotifications(void);
     void refreshDownloadableThemes(void);
     void removeTheme(void);
 
@@ -84,4 +89,28 @@ class ThemeChooser : public MythScreenType
     MythDialogBox      *m_popupMenu;
 };
 
+////////////////////////////////////////////////////////////////////////////
+
+class ThemeUpdateChecker : public QObject
+{
+    Q_OBJECT
+
+  public:
+    ThemeUpdateChecker();
+   ~ThemeUpdateChecker();
+
+  protected slots:
+    void checkForUpdate(void);
+
+  private:
+    QTimer    *m_updateTimer;
+    QString    m_mythVersion;
+    QString    m_infoPackage;
+    QString    m_lastKnownThemeVersion;
+    QString    m_currentVersion;
+    QString    m_newVersion;
+};
+
 #endif /* THEMECHOOSER */
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

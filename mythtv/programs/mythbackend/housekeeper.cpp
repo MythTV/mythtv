@@ -13,6 +13,7 @@ using namespace std;
 // Qt headers
 #include <QStringList>
 #include <QDateTime>
+#include <QDir>
 #include <QFileInfo>
 
 // MythTV headers
@@ -26,6 +27,12 @@ using namespace std;
 #include "programinfo.h"
 #include "eitcache.h"
 #include "scheduler.h"
+#include "mythcoreutil.h"
+#include "mythdownloadmanager.h"
+
+// Use this to determine what directories to look in on the download site
+extern const char *myth_source_path;
+extern const char *myth_binary_version;
 
 static bool HouseKeeper_filldb_running = false;
 
@@ -160,6 +167,7 @@ void HouseKeeper::RunHouseKeeping(void)
     int period, maxhr, minhr;
     QString dbTag;
     bool initialRun = true;
+    QFileInfo zipInfo(GetConfDir() + "/tmp/remotethemes/themes.zip");
 
     // wait a little for main server to come up and things to settle down
     sleep(10);
@@ -264,6 +272,15 @@ void HouseKeeper::RunHouseKeeping(void)
                 CleanupRecordedTables();
                 CleanupProgramListings();
                 updateLastrun("DailyCleanup");
+            }
+
+            if ((gCoreContext->GetNumSetting("ThemeUpdateNofications", 1)) &&
+                ((!zipInfo.exists()) ||
+                 (zipInfo.lastModified() < mythCurrentDateTime().addDays(-2)) ||
+                 (wantToRun("ThemeChooserInfoCacheUpdate", 1, 0, 24, true))))
+            {
+                UpdateThemeChooserInfoCache();
+                updateLastrun("ThemeChooserInfoCacheUpdate");
             }
         }
 
@@ -619,6 +636,56 @@ void HouseKeeper::CleanupProgramListings(void)
 
 }
 
+void HouseKeeper::UpdateThemeChooserInfoCache(void)
+{
+    QString MythVersion = myth_source_path;
+
+    // FIXME: For now, treat git master the same as svn trunk
+    if (MythVersion == "master")
+        MythVersion = "trunk";
+
+    if (MythVersion != "trunk")
+    {
+        MythVersion = myth_binary_version; // Example: 0.25.20101017-1
+        MythVersion.replace(QRegExp("\\.[0-9]{8,}.*"), "");
+    }
+
+    QString remoteThemesDir = GetConfDir();
+    remoteThemesDir.append("/tmp/remotethemes");
+
+    QDir dir(remoteThemesDir);
+    if (!dir.exists() && !dir.mkpath(remoteThemesDir))
+    {
+        VERBOSE(VB_IMPORTANT, QString("HouseKeeper: Error creating %1"
+                "directory for remote themes info cache.")
+                .arg(remoteThemesDir));
+        return;
+    }
+
+    QString remoteThemesFile = remoteThemesDir;
+    remoteThemesFile.append("/themes.zip");
+
+    QString url = QString("%1/%2/themes.zip")
+        .arg(gCoreContext->GetSetting("ThemeRepositoryURL",
+             "http://themes.mythtv.org/themes/repository")).arg(MythVersion);
+
+    bool result = GetMythDownloadManager()->download(url, remoteThemesFile);
+
+    if (!result)
+    {
+        VERBOSE(VB_IMPORTANT, QString("HouseKeeper: Error downloading %1"
+                "remote themes info package.").arg(url));
+        return;
+    }
+    
+    if (!extractZIP(remoteThemesFile, remoteThemesDir))
+    {
+        VERBOSE(VB_IMPORTANT, QString("HouseKeeper: Error extracting %1"
+                "remote themes info package.").arg(remoteThemesFile));
+        QFile::remove(remoteThemesFile);
+        return;
+    }
+}
 
 void HouseKeeper::RunStartupTasks(void)
 {

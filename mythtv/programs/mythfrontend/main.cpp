@@ -72,6 +72,7 @@ using namespace std;
 #include "mythdirs.h"
 #include "mythdb.h"
 #include "backendconnectionmanager.h"
+#include "themechooser.h"
 
 static ExitPrompter   *exitPopup = NULL;
 static MythThemedMenu *menu;
@@ -1509,6 +1510,10 @@ int main(int argc, char **argv)
     // Setup handler for USR2 signals to restart LIRC
     signal(SIGUSR2, &signal_USR2_handler);
 
+    ThemeUpdateChecker *themeUpdateChecker = NULL;
+    if (gCoreContext->GetNumSetting("ThemeUpdateNofications", 1))
+        themeUpdateChecker = new ThemeUpdateChecker();
+
     MythSystemEventHandler *sysEventHandler = new MythSystemEventHandler();
     GetMythMainWindow()->RegisterSystemEventHandler(sysEventHandler);
 
@@ -1520,6 +1525,9 @@ int main(int argc, char **argv)
     int ret = qApp->exec();
 
     PreviewGeneratorQueue::TeardownPreviewGeneratorQueue();
+
+    if (themeUpdateChecker)
+        delete themeUpdateChecker;
 
     delete sysEventHandler;
 
