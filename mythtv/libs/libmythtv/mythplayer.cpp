@@ -3565,7 +3565,7 @@ bool MythPlayer::EnableEdit(void)
     bool loadedAutoSave = deleteMap.LoadAutoSaveMap(totalFrames, player_ctx);
     if (loadedAutoSave)
     {
-        SetOSDMessage(QObject::tr("Using previously auto-saved cut list"),
+        SetOSDMessage(QObject::tr("Using previously auto-saved cuts"),
                       kOSDTimeout_Short);
     }
 
@@ -3688,13 +3688,13 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
         else if (action == "DELETE")
         {
             deleteMap.Delete(frame, totalFrames,
-                             QObject::tr("Delete cut area"));
+                             QObject::tr("Delete"));
             refresh = true;
         }
         else if (action == "REVERT")
         {
             deleteMap.LoadMap(totalFrames, player_ctx,
-                              QObject::tr("Load Cut List"));
+                              QObject::tr("Undo Changes"));
             refresh = true;
         }
         else if (action == "REVERTEXIT")

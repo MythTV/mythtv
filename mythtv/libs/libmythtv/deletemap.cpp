@@ -8,7 +8,7 @@
 #define LOC     QString("DelMap: ")
 #define LOC_ERR QString("DelMap Err: ")
 #define EDIT_CHECK if(!m_editing) \
-  { VERBOSE(VB_IMPORTANT, LOC_ERR + "Cannot edit outside editmode."); return; }
+  { VERBOSE(VB_IMPORTANT, LOC_ERR + "Cannot edit outside edit mode."); return; }
 
 DeleteMapUndoEntry::DeleteMapUndoEntry(frm_dir_map_t dm, QString msg) :
     deleteMap(dm), message(msg) { }
@@ -56,13 +56,13 @@ bool DeleteMap::Redo(void)
 QString DeleteMap::GetUndoMessage(void)
 {
     return (HasUndo() ? m_undoStack[m_undoStackPointer].message :
-            QObject::tr("(No more undo operations)"));
+            QObject::tr("(Nothing to undo)"));
 }
 
 QString DeleteMap::GetRedoMessage(void)
 {
     return (HasRedo() ? m_undoStack[m_undoStackPointer + 1].message :
-            QObject::tr("(No more redo operations)"));
+            QObject::tr("(Nothing to redo)"));
 }
 
 bool DeleteMap::HandleAction(QString &action, uint64_t frame,
@@ -76,7 +76,7 @@ bool DeleteMap::HandleAction(QString &action, uint64_t frame,
     else if (action == ACTION_DOWN)
         UpdateSeekAmount(-1, rate);
     else if (action == ACTION_CLEARMAP)
-        Clear(QObject::tr("Clear Cut List"));
+        Clear(QObject::tr("Clear Cuts"));
     else if (action == ACTION_INVERTMAP)
         ReverseAll(total);
     else if (action == "MOVEPREV")
@@ -84,13 +84,13 @@ bool DeleteMap::HandleAction(QString &action, uint64_t frame,
     else if (action == "MOVENEXT")
         MoveRelative(frame, total, true);
     else if (action == "CUTTOBEGINNING")
-        Add(frame, total, MARK_CUT_END, QObject::tr("Cut To Beginning"));
+        Add(frame, total, MARK_CUT_END, QObject::tr("Cut to Beginning"));
     else if (action == "CUTTOEND")
-        Add(frame, total, MARK_CUT_START, QObject::tr("Cut To End"));
+        Add(frame, total, MARK_CUT_START, QObject::tr("Cut to End"));
     else if (action == "NEWCUT")
         NewCut(frame, total);
     else if (action == "DELETE")
-        Delete(frame, total, QObject::tr("Delete Cut Area"));
+        Delete(frame, total, QObject::tr("Delete"));
     else if (action == "UNDO")
         Undo();
     else if (action == "REDO")
@@ -226,7 +226,7 @@ void DeleteMap::ReverseAll(uint64_t total)
         Add(it.key(), it.value() == MARK_CUT_END ? MARK_CUT_START :
                                                    MARK_CUT_END);
     CleanMap(total);
-    Push(QObject::tr("Invert Cut List"));
+    Push(QObject::tr("Reverse Cuts"));
 }
 
 /**
@@ -249,7 +249,7 @@ void DeleteMap::Add(uint64_t frame, uint64_t total, MarkTypes type,
         {
             // Delete the temporary mark before putting a real mark at its
             // location
-            Delete(frame, total, "");
+            Delete(frame, total);
         }
         else // Don't add a mark on top of a mark
             return;
@@ -466,14 +466,14 @@ void DeleteMap::MoveRelative(uint64_t frame, uint64_t total, bool right)
         {
             // If on a mark, don't collapse a cut region to 0;
             // instead, delete the region
-            Delete(frame, total, QObject::tr("Delete Cut Area"));
+            Delete(frame, total, QObject::tr("Delete"));
             return;
         }
         else if (MARK_PLACEHOLDER == type)
         {
             // Delete the temporary mark before putting a real mark at its
             // location
-            Delete(frame, total, "");
+            Delete(frame, total);
         }
     }
 
@@ -667,7 +667,7 @@ void DeleteMap::LoadCommBreakMap(uint64_t total, frm_dir_map_t &map)
         Add(it.key(), it.value() == MARK_COMM_START ?
                 MARK_CUT_START : MARK_CUT_END);
     CleanMap(total);
-    Push(QObject::tr("Load Commskip List"));
+    Push(QObject::tr("Load Detected Commercials"));
 }
 
 /// Loads the delete map from the database.
@@ -699,7 +699,7 @@ bool DeleteMap::LoadAutoSaveMap(uint64_t total, PlayerContext *ctx)
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     CleanMap(total);
     if (result)
-        Push(QObject::tr("Load Auto-Save Cut List"));
+        Push(QObject::tr("Load Auto-saved Cuts"));
     else
         m_deleteMap = tmpDeleteMap;
 
@@ -714,19 +714,19 @@ void DeleteMap::SaveMap(uint64_t total, PlayerContext *ctx, bool isAutoSave)
 
     if (!isAutoSave)
     {
-    // Remove temporary placeholder marks
-    QMutableMapIterator<uint64_t, MarkTypes> it(m_deleteMap);
-    while (it.hasNext())
-    {
-        it.next();
-        if (MARK_PLACEHOLDER == it.value())
+        // Remove temporary placeholder marks
+        QMutableMapIterator<uint64_t, MarkTypes> it(m_deleteMap);
+        while (it.hasNext())
         {
-            it.remove();
-            m_changed = true;
+            it.next();
+            if (MARK_PLACEHOLDER == it.value())
+            {
+                it.remove();
+                m_changed = true;
+            }
         }
-    }
 
-    CleanMap(total);
+        CleanMap(total);
     }
     ctx->LockPlayingInfo(__FILE__, __LINE__);
     ctx->playingInfo->SaveMarkupFlag(MARK_UPDATED_CUT);

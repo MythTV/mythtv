@@ -40,17 +40,17 @@ class DeleteMap
 
     void SetMap(const frm_dir_map_t &map);
     void LoadCommBreakMap(uint64_t total, frm_dir_map_t &map);
-    void SaveMap(uint64_t total, PlayerContext *ctx, bool isAutoSave=false);
-    void LoadMap(uint64_t total, PlayerContext *ctx, QString undoMessage="");
+    void SaveMap(uint64_t total, PlayerContext *ctx, bool isAutoSave = false);
+    void LoadMap(uint64_t total, PlayerContext *ctx, QString undoMessage = "");
     bool LoadAutoSaveMap(uint64_t total, PlayerContext *ctx);
     void CleanMap(uint64_t total);
 
-    void Clear(QString undoMessage="");
+    void Clear(QString undoMessage = "");
     void ReverseAll(uint64_t total);
     void Add(uint64_t frame, uint64_t total, MarkTypes type,
              QString undoMessage);
     void NewCut(uint64_t frame, uint64_t total);
-    void Delete(uint64_t frame, uint64_t total, QString undoMessage);
+    void Delete(uint64_t frame, uint64_t total, QString undoMessage = "");
     void Reverse(uint64_t frame, uint64_t total);
     void MoveRelative(uint64_t frame, uint64_t total, bool right);
     void Move(uint64_t frame, uint64_t to, uint64_t total);
