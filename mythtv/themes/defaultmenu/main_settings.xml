@@ -9,13 +9,6 @@
     </button>
 
     <button>
-        <type>SETUP_KEYS</type>
-        <text>Edit Keys</text>
-        <description>Change MythTV key bindings.</description>
-        <action>SETUP_KEYS</action>
-    </button>
-
-    <button>
         <type>SETTINGS_APPEARANCE</type>
         <text>Appearance</text>
         <description>Pick the theme, font, size, and locale</description>
@@ -32,28 +25,21 @@
     <button>
         <type>SETTINGS_AUDIOGENERAL</type>
         <text>Audio</text>
-        <description>Configure local audio output</description>
+        <description>Configure audio playback</description>
         <action>SETTINGS AUDIOGENERAL</action>
     </button>
 
     <button>
-        <type>SCREENSETUPWIZARD</type>
-        <text>Screen Setup Wizards</text>
-        <description>Compensate for TVs with overscan</description>
-        <action>SCREENSETUPWIZARD</action>
-    </button>
-
-    <button>
         <type>SETTINGS_TV</type>
-        <text>TV Settings</text>
-        <description>Settings for TV recording and playback</description>
+        <text>Video</text>
+        <description>Configure video recording and playback</description>
         <action>MENU tv_settings.xml</action>
     </button>
 
     <button>
         <type>SETTINGS_MEDIA</type>
         <text>Media Settings</text>
-        <description>Settings for all non-TV media</description>
+        <description>Configure music, video, and other media plugins</description>
         <action>MENU media_settings.xml</action>
         <depends>mythvideo mythmusic mythgallery mythfm mythgame mythburn mytharchive</depends>
     </button>
@@ -61,7 +47,7 @@
     <button>
         <type>SETTINGS_INFO_CENTER</type>
         <text>Info Center Settings</text>
-        <description>Configure weather, news, movie info, web, and recipes</description>
+        <description>Configure surveillance, weather, news, and the web</description>
         <action>MENU info_settings.xml</action>
         <depends>mythnews mythweather mythbookmarkmanager mythrecipe mythbrowser mythmovies mythzoneminder</depends>
     </button>
@@ -74,10 +60,24 @@
     </button>
 
     <button>
+        <type>SETUP_KEYS</type>
+        <text>Edit Keys</text>
+        <description>Change MythTV key bindings.</description>
+        <action>SETUP_KEYS</action>
+    </button>
+
+    <button>
         <type>SETTINGS_GRABBERS</type>
         <text>Artwork and Data Sources</text>
         <description>Configure sources of artwork and metadata</description>
         <action>SETTINGS GRABBERS</action>
+    </button>
+
+    <button>
+        <type>SCREENSETUPWIZARD</type>
+        <text>Screen Setup Wizards</text>
+        <description>Compensate for TVs with overscan</description>
+        <action>SCREENSETUPWIZARD</action>
     </button>
 
     <button>
