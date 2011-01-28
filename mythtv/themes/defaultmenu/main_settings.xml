@@ -9,6 +9,13 @@
     </button>
 
     <button>
+        <type>SETUP_KEYS</type>
+        <text>Edit Keys</text>
+        <description>Change MythTV key bindings.</description>
+        <action>SETUP_KEYS</action>
+    </button>
+
+    <button>
         <type>SETTINGS_APPEARANCE</type>
         <text>Appearance</text>
         <description>Pick the theme, font, size, and locale</description>
