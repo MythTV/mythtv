@@ -3431,6 +3431,18 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
     int selTrack = (1 == numStreams) ? 0 : -1;
     int wlang    = wtrack.language;
 
+    if (selTrack < 0 && numStreams)
+    {
+        VERBOSE(VB_AUDIO, LOC + "Trying to select default track");
+        for (uint i = 0; i < atracks.size(); i++) {
+            int idx = atracks[i].av_stream_index;
+            if (ic->streams[idx]->disposition & AV_DISPOSITION_DEFAULT) {
+                selTrack = i;
+                break;
+            }
+        }
+    }
+
     if ((selTrack < 0) && (wtrack.av_substream_index >= 0))
     {
         VERBOSE(VB_AUDIO, LOC + "Trying to reselect audio sub-stream");
