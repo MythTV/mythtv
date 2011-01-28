@@ -534,8 +534,8 @@ class MPUBLIC ProgramInfo
                            bool forceCheckLocal = false) const;
 
     // Edit flagging map
-    void QueryCutList(frm_dir_map_t &) const;
-    void SaveCutList(frm_dir_map_t &) const;
+    bool QueryCutList(frm_dir_map_t &, bool loadAutosave=false) const;
+    void SaveCutList(frm_dir_map_t &, bool isAutoSave=false) const;
 
     // Commercial flagging map
     void QueryCommBreakList(frm_dir_map_t &) const;

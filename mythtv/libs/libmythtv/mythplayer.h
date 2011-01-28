@@ -397,6 +397,10 @@ class MPUBLIC MythPlayer
     bool IsTemporaryMark(uint64_t frame);
     bool HasTemporaryMark(void);
     bool IsCutListSaved(PlayerContext *ctx) { return deleteMap.IsSaved(ctx); }
+    bool DeleteMapHasUndo(void) { return deleteMap.HasUndo(); }
+    bool DeleteMapHasRedo(void) { return deleteMap.HasRedo(); }
+    QString DeleteMapGetUndoMessage(void) { return deleteMap.GetUndoMessage(); }
+    QString DeleteMapGetRedoMessage(void) { return deleteMap.GetRedoMessage(); }
 
     // Reinit
     void ReinitOSD(void);

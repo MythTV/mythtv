@@ -723,6 +723,10 @@ void TV::InitKeys(void)
             "Jump back 10x the normal amount"), ",,<");
     REG_KEY("TV Editing", ACTION_BIGJUMPFWD,  QT_TRANSLATE_NOOP("MythControls",
             "Jump forward 10x the normal amount"), ">,.");
+//    REG_KEY("TV Editing", "UNDO",        QT_TRANSLATE_NOOP("MythControls",
+//            "Undo"), "Ctrl+Z");
+//    REG_KEY("TV Editing", "REDO",        QT_TRANSLATE_NOOP("MythControls",
+//            "Redo"), "Ctrl+Y");
 
     /* Teletext keys */
     REG_KEY("Teletext Menu", ACTION_NEXTPAGE,    QT_TRANSLATE_NOOP("MythControls",
@@ -8915,6 +8919,14 @@ void TV::ShowOSDCutpoint(PlayerContext *ctx, const QString &type)
         if ("EDIT_CUT_POINTS" == type)
             osd->DialogAddButton(QObject::tr("Cut List Options"),
                                  "DIALOG_CUTPOINT_CUTLISTOPTIONS_0", true);
+        if (ctx->player->DeleteMapHasUndo())
+            osd->DialogAddButton(QObject::tr("Undo") + " - " +
+                                 ctx->player->DeleteMapGetUndoMessage(),
+                                 QString("DIALOG_CUTPOINT_UNDO_0"));
+        if (ctx->player->DeleteMapHasRedo())
+            osd->DialogAddButton(QObject::tr("Redo") + " - " +
+                                 ctx->player->DeleteMapGetRedoMessage(),
+                                 QString("DIALOG_CUTPOINT_REDO_0"));
     }
     else if ("CUT_LIST_OPTIONS" == type)
     {

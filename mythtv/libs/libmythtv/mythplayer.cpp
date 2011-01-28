@@ -3529,6 +3529,7 @@ void MythPlayer::ClearAfterSeek(bool clearvideobuffers)
 void MythPlayer::SetPlayerInfo(TV *tv, QWidget *widget,
                                bool frame_exact_seek, PlayerContext *ctx)
 {
+    deleteMap.SetPlayerContext(ctx);
     m_tv = tv;
     parentWidget = widget;
     exactseeks   = frame_exact_seek;
@@ -3560,6 +3561,14 @@ bool MythPlayer::EnableEdit(void)
     osd->DialogQuit();
     ResetCaptions();
     osd->HideAll();
+
+    bool loadedAutoSave = deleteMap.LoadAutoSaveMap(totalFrames, player_ctx);
+    if (loadedAutoSave)
+    {
+        SetOSDMessage(QObject::tr("Using previously auto-saved cut list"),
+                      kOSDTimeout_Short);
+    }
+
     deleteMap.UpdateSeekAmount(0, video_frame_rate);
     deleteMap.UpdateOSD(framesPlayed, totalFrames, video_frame_rate,
                         player_ctx, osd);
@@ -3580,10 +3589,10 @@ void MythPlayer::DisableEdit(bool save)
         return;
 
     deleteMap.SetEditing(false, osd);
-    if (save)
-        deleteMap.SaveMap(totalFrames, player_ctx);
-    else
+    if (!save)
         deleteMap.LoadMap(totalFrames, player_ctx);
+    // Unconditionally save to remove temporary marks from the DB.
+    deleteMap.SaveMap(totalFrames, player_ctx);
     deleteMap.TrackerReset(framesPlayed, totalFrames);
     deleteMap.SetFileEditing(player_ctx, false);
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
@@ -3678,12 +3687,14 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
         }
         else if (action == "DELETE")
         {
-            deleteMap.Delete(frame, totalFrames);
+            deleteMap.Delete(frame, totalFrames,
+                             QObject::tr("Delete cut area"));
             refresh = true;
         }
         else if (action == "REVERT")
         {
-            deleteMap.LoadMap(totalFrames, player_ctx);
+            deleteMap.LoadMap(totalFrames, player_ctx,
+                              QObject::tr("Load Cut List"));
             refresh = true;
         }
         else if (action == "REVERTEXIT")
@@ -3703,12 +3714,24 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
         }
         else
         {
+            QString undoMessage = deleteMap.GetUndoMessage();
+            QString redoMessage = deleteMap.GetRedoMessage();
             handled = deleteMap.HandleAction(action, frame, framesPlayed,
                                              totalFrames, video_frame_rate);
             if (handled && (action == "CUTTOBEGINNING" ||
                 action == "CUTTOEND" || action == "NEWCUT"))
             {
                 SetOSDMessage(QObject::tr("New cut added."), kOSDTimeout_Short);
+            }
+            else if (handled && action == "UNDO")
+            {
+                SetOSDMessage(QObject::tr("Undo") + " - " + undoMessage,
+                              kOSDTimeout_Short);
+            }
+            else if (handled && action == "REDO")
+            {
+                SetOSDMessage(QObject::tr("Redo") + " - " + redoMessage,
+                              kOSDTimeout_Short);
             }
         }
     }

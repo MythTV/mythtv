@@ -10,6 +10,61 @@
 #define EDIT_CHECK if(!m_editing) \
   { VERBOSE(VB_IMPORTANT, LOC_ERR + "Cannot edit outside editmode."); return; }
 
+DeleteMapUndoEntry::DeleteMapUndoEntry(frm_dir_map_t dm, QString msg) :
+    deleteMap(dm), message(msg) { }
+
+DeleteMapUndoEntry::DeleteMapUndoEntry(void)
+{
+    frm_dir_map_t dm;
+    deleteMap = dm;
+    message = "";
+}
+
+void DeleteMap::Push(QString undoMessage)
+{
+    DeleteMapUndoEntry entry(m_deleteMap, undoMessage);
+    // Remove all "redo" entries
+    while (m_undoStack.size() > m_undoStackPointer + 1)
+        m_undoStack.pop_back();
+    m_undoStack.append(entry);
+    m_undoStackPointer ++;
+    SaveMap(0, m_ctx, true);
+}
+
+bool DeleteMap::Undo(void)
+{
+    if (!HasUndo())
+        return false;
+    m_undoStackPointer --;
+    m_deleteMap = m_undoStack[m_undoStackPointer].deleteMap;
+    m_changed = true;
+    SaveMap(0, m_ctx, true);
+    return true;
+}
+
+bool DeleteMap::Redo(void)
+{
+    if (!HasRedo())
+        return false;
+    m_undoStackPointer ++;
+    m_deleteMap = m_undoStack[m_undoStackPointer].deleteMap;
+    m_changed = true;
+    SaveMap(0, m_ctx, true);
+    return true;
+}
+
+QString DeleteMap::GetUndoMessage(void)
+{
+    return (HasUndo() ? m_undoStack[m_undoStackPointer].message :
+            QObject::tr("(No more undo operations)"));
+}
+
+QString DeleteMap::GetRedoMessage(void)
+{
+    return (HasRedo() ? m_undoStack[m_undoStackPointer + 1].message :
+            QObject::tr("(No more redo operations)"));
+}
+
 bool DeleteMap::HandleAction(QString &action, uint64_t frame,
                              uint64_t played, uint64_t total, double rate)
 {
@@ -21,7 +76,7 @@ bool DeleteMap::HandleAction(QString &action, uint64_t frame,
     else if (action == ACTION_DOWN)
         UpdateSeekAmount(-1, rate);
     else if (action == ACTION_CLEARMAP)
-        Clear();
+        Clear(QObject::tr("Clear Cut List"));
     else if (action == ACTION_INVERTMAP)
         ReverseAll(total);
     else if (action == "MOVEPREV")
@@ -29,13 +84,17 @@ bool DeleteMap::HandleAction(QString &action, uint64_t frame,
     else if (action == "MOVENEXT")
         MoveRelative(frame, total, true);
     else if (action == "CUTTOBEGINNING")
-        Add(frame, total, MARK_CUT_END);
+        Add(frame, total, MARK_CUT_END, QObject::tr("Cut To Beginning"));
     else if (action == "CUTTOEND")
-        Add(frame, total, MARK_CUT_START);
+        Add(frame, total, MARK_CUT_START, QObject::tr("Cut To End"));
     else if (action == "NEWCUT")
         NewCut(frame, total);
     else if (action == "DELETE")
-        Delete(frame, total);
+        Delete(frame, total, QObject::tr("Delete Cut Area"));
+    else if (action == "UNDO")
+        Undo();
+    else if (action == "REDO")
+        Redo();
     else
         handled = false;
     return handled;
@@ -150,10 +209,12 @@ bool DeleteMap::IsEmpty(void)
 }
 
 /// Clears the deleteMap.
-void DeleteMap::Clear(void)
+void DeleteMap::Clear(QString undoMessage)
 {
     m_deleteMap.clear();
     m_changed = true;
+    if (!undoMessage.isEmpty())
+        Push(undoMessage);
 }
 
 /// Reverses the direction of each mark in the map.
@@ -165,6 +226,7 @@ void DeleteMap::ReverseAll(uint64_t total)
         Add(it.key(), it.value() == MARK_CUT_END ? MARK_CUT_START :
                                                    MARK_CUT_END);
     CleanMap(total);
+    Push(QObject::tr("Invert Cut List"));
 }
 
 /**
@@ -172,7 +234,8 @@ void DeleteMap::ReverseAll(uint64_t total)
  *        existing redundant mark of that type is removed. This simplifies
  *        the cleanup code.
  */
-void DeleteMap::Add(uint64_t frame, uint64_t total, MarkTypes type)
+void DeleteMap::Add(uint64_t frame, uint64_t total, MarkTypes type,
+                    QString undoMessage)
 {
     EDIT_CHECK
     if ((MARK_CUT_START != type) && (MARK_CUT_END != type) &&
@@ -186,7 +249,7 @@ void DeleteMap::Add(uint64_t frame, uint64_t total, MarkTypes type)
         {
             // Delete the temporary mark before putting a real mark at its
             // location
-            Delete(frame, total);
+            Delete(frame, total, "");
         }
         else // Don't add a mark on top of a mark
             return;
@@ -241,10 +304,12 @@ void DeleteMap::Add(uint64_t frame, uint64_t total, MarkTypes type)
         Delete((uint64_t)remove);
     Add(frame, type);
     CleanMap(total);
+    if (!undoMessage.isEmpty())
+        Push(undoMessage);
 }
 
 /// Remove the mark at the given frame.
-void DeleteMap::Delete(uint64_t frame, uint64_t total)
+void DeleteMap::Delete(uint64_t frame, uint64_t total, QString undoMessage)
 {
     EDIT_CHECK
     if (m_deleteMap.isEmpty())
@@ -271,6 +336,8 @@ void DeleteMap::Delete(uint64_t frame, uint64_t total)
     if (prev != next)
         Delete(next);
     CleanMap(total);
+    if (!undoMessage.isEmpty())
+        Push(undoMessage);
 }
 
 /// Reverse the direction of the mark at the given frame.
@@ -278,7 +345,8 @@ void DeleteMap::Reverse(uint64_t frame, uint64_t total)
 {
     EDIT_CHECK
     int type = Delete(frame);
-    Add(frame, total, type == MARK_CUT_END ? MARK_CUT_START : MARK_CUT_END);
+    Add(frame, total, type == MARK_CUT_END ? MARK_CUT_START : MARK_CUT_END, "");
+    Push(QObject::tr("Reverse Mark Direction"));
 }
 
 /// Add a new cut marker (to start or end a cut region)
@@ -376,6 +444,7 @@ void DeleteMap::NewCut(uint64_t frame, uint64_t total)
         Add(frame, MARK_PLACEHOLDER);
 
     CleanMap(total);
+    Push(QObject::tr("New Cut"));
 }
 
 /// Move the previous (!right) or next (right) cut to frame.
@@ -397,14 +466,14 @@ void DeleteMap::MoveRelative(uint64_t frame, uint64_t total, bool right)
         {
             // If on a mark, don't collapse a cut region to 0;
             // instead, delete the region
-            Delete(frame, total);
+            Delete(frame, total, QObject::tr("Delete Cut Area"));
             return;
         }
         else if (MARK_PLACEHOLDER == type)
         {
             // Delete the temporary mark before putting a real mark at its
             // location
-            Delete(frame, total);
+            Delete(frame, total, "");
         }
     }
 
@@ -424,7 +493,7 @@ void DeleteMap::Move(uint64_t frame, uint64_t to, uint64_t total)
         else if (frame == total)
             type = MARK_CUT_END;
     }
-    Add(to, total, type);
+    Add(to, total, type, QObject::tr("Move Mark"));
 }
 
 /// Private addition to the deleteMap.
@@ -586,6 +655,7 @@ void DeleteMap::SetMap(const frm_dir_map_t &map)
     Clear();
     m_deleteMap = map;
     m_deleteMap.detach();
+    Push(QObject::tr("Set New Cut List"));
 }
 
 /// Loads the given commercial break map into the deleteMap.
@@ -597,10 +667,11 @@ void DeleteMap::LoadCommBreakMap(uint64_t total, frm_dir_map_t &map)
         Add(it.key(), it.value() == MARK_COMM_START ?
                 MARK_CUT_START : MARK_CUT_END);
     CleanMap(total);
+    Push(QObject::tr("Load Commskip List"));
 }
 
 /// Loads the delete map from the database.
-void DeleteMap::LoadMap(uint64_t total, PlayerContext *ctx)
+void DeleteMap::LoadMap(uint64_t total, PlayerContext *ctx, QString undoMessage)
 {
     if (!ctx || !ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
         return;
@@ -610,14 +681,39 @@ void DeleteMap::LoadMap(uint64_t total, PlayerContext *ctx)
     ctx->playingInfo->QueryCutList(m_deleteMap);
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     CleanMap(total);
+    if (!undoMessage.isEmpty())
+        Push(undoMessage);
+}
+
+/// Returns true if an auto-save map was loaded.
+/// Does nothing and returns false if not.
+bool DeleteMap::LoadAutoSaveMap(uint64_t total, PlayerContext *ctx)
+{
+    if (!ctx || !ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
+        return false;
+
+    frm_dir_map_t tmpDeleteMap = m_deleteMap;
+    Clear();
+    ctx->LockPlayingInfo(__FILE__, __LINE__);
+    bool result = ctx->playingInfo->QueryCutList(m_deleteMap, true);
+    ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+    CleanMap(total);
+    if (result)
+        Push(QObject::tr("Load Auto-Save Cut List"));
+    else
+        m_deleteMap = tmpDeleteMap;
+
+    return result;
 }
 
 /// Saves the delete map to the database.
-void DeleteMap::SaveMap(uint64_t total, PlayerContext *ctx)
+void DeleteMap::SaveMap(uint64_t total, PlayerContext *ctx, bool isAutoSave)
 {
     if (!ctx || !ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
         return;
 
+    if (!isAutoSave)
+    {
     // Remove temporary placeholder marks
     QMutableMapIterator<uint64_t, MarkTypes> it(m_deleteMap);
     while (it.hasNext())
@@ -631,9 +727,10 @@ void DeleteMap::SaveMap(uint64_t total, PlayerContext *ctx)
     }
 
     CleanMap(total);
+    }
     ctx->LockPlayingInfo(__FILE__, __LINE__);
     ctx->playingInfo->SaveMarkupFlag(MARK_UPDATED_CUT);
-    ctx->playingInfo->SaveCutList(m_deleteMap);
+    ctx->playingInfo->SaveCutList(m_deleteMap, isAutoSave);
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 }
 
