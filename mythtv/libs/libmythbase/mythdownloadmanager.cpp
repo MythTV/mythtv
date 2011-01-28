@@ -778,6 +778,11 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
 
         m_downloadReplies[dlInfo->m_reply] = dlInfo;
 
+        connect(dlInfo->m_reply, SIGNAL(error(QNetworkReply::NetworkError)), this,
+                SLOT(downloadError(QNetworkReply::NetworkError)));
+        connect(dlInfo->m_reply, SIGNAL(downloadProgress(qint64, qint64)),
+                this, SLOT(downloadProgress(qint64, qint64))); 
+
         m_downloadReplies.remove(reply);
         reply->deleteLater();
     }
@@ -845,7 +850,7 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
             {
                 VERBOSE(VB_FILE+VB_EXTRA, QString("downloadFinished(%1): "
                         "COMPLETE: %2, sending event to caller")
-                        .arg(dlInfo->m_url));
+                        .arg((long long)dlInfo).arg(dlInfo->m_url));
 
                 QStringList args;
                 args << dlInfo->m_url;
