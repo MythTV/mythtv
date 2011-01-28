@@ -183,7 +183,7 @@ class MPUBLIC MediaEvent : public QEvent
 
   protected:
     MediaStatus m_OldStatus;
-    MythMediaDevice *m_Device;
+    QPointer<MythMediaDevice> m_Device;
 };
 
 #endif
