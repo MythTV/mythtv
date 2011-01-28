@@ -14,6 +14,7 @@
 #include "remotefile.h"
 #include "mythdownloadmanager.h"
 #include "programtypes.h"
+#include "mythsystemevent.h"
 
 // LibMythUI headers
 #include "mythmainwindow.h"
@@ -748,6 +749,11 @@ void ThemeChooser::customEvent(QEvent *e)
             CloseBusyPopup();
             QStringList args = me->ExtraDataList();
             QFile::remove(args[0]);
+
+            QString event = QString("THEME_INSTALLED PATH %1")
+                                    .arg(GetConfDir() + "/themes/" +
+                                         m_downloadTheme->GetDirectoryName());
+            SendMythSystemEvent(event);
 
             gCoreContext->SaveSetting("Theme", m_downloadTheme->GetDirectoryName());
             GetMythMainWindow()->JumpTo("Reload Theme");
