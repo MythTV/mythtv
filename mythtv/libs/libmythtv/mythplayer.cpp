@@ -338,8 +338,8 @@ bool MythPlayer::Pause(void)
     next_normal_speed = false;
     PauseVideo();
     audio.Pause(true);
-    PauseDecoder();
     PauseBuffer();
+    PauseDecoder();
     allpaused = decoderPaused && videoPaused && bufferPaused;
     {
         QMutexLocker locker(&decoder_change_lock);
