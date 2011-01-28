@@ -235,12 +235,12 @@ void GrabberSettings::Init(void)
 
     m_gameGrabberList.clear();
 
-    QString currentTVGrabber = gCoreContext->GetSettingOnHost("TelevisionGrabber",
+    QString currentTVGrabber = gCoreContext->GetSetting("TelevisionGrabber",
                                          QString("%1metadata/Television/%2")
-                                         .arg(GetShareDir()).arg("ttvdb.py"), "");
-    QString currentMovieGrabber = gCoreContext->GetSettingOnHost("MovieGrabber",
+                                         .arg(GetShareDir()).arg("ttvdb.py"));
+    QString currentMovieGrabber = gCoreContext->GetSetting("MovieGrabber",
                                          QString("%1metadata/Movie/%2")
-                                         .arg(GetShareDir()).arg("tmdb.py"), "");
+                                         .arg(GetShareDir()).arg("tmdb.py"));
     QString currentGameGrabber = gCoreContext->GetSetting("mythgame.MetadataGrabber",
                                          QString("%1metadata/Game/%2")
                                          .arg(GetShareDir()).arg("giantbomb.py"));
