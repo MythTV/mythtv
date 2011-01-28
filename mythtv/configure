@@ -1330,6 +1330,7 @@ MYTHTV_CONFIG_LIST='
     libfftw3
     libmpeg2external
     libxml2
+    libudf
     lirc
     mheg
     opengl_video
@@ -1952,6 +1953,7 @@ enable iptv
 enable ivtv
 enable lamemp3
 enable libxml2
+enable libudf
 enable lirc
 enable mheg
 enable mythtranscode
@@ -4029,6 +4031,11 @@ int main(void) {
 }
 EOF
 
+enabled libudf && check_cc <<EOF || disable libudf
+#include <cdio/udf.h>
+int main(void){ return UDF_BLOCKSIZE > 0 ? 0 : 1; }
+EOF
+
 enabled x11 && check_lib X11/Xlib.h XQueryExtension -lX11 || disable x11
 enabled xrandr && check_lib X11/extensions/Xrandr.h XRRSelectInput -lXrandr || disable xrandr
 enabled xv && check_lib X11/extensions/Xv.h XvPutStill -lXv || disable xv
@@ -4763,6 +4770,10 @@ if enabled libxml2; then
     append CONFIG_INCLUDEPATH "$libxml2_path"
     append CCONFIG "using_libxml2"
   fi
+fi
+
+if enabled libudf; then
+  append CCONFIG "using_libudf"
 fi
 
 if enabled x11; then

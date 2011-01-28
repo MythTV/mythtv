@@ -100,6 +100,11 @@ use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }
 
+using_libudf {
+    DEFINES += USING_LIBUDF
+    LIBS += -ludf
+}
+
 mingw:LIBS += -lpthread -lws2_32
 
 QT += xml sql network

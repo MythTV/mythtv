@@ -14,6 +14,9 @@
 #include "mythcdrom-linux.h"
 #include "mythconfig.h"      // for HAVE_BIGENDIAN
 #include "mythverbose.h"
+#ifdef USING_LIBUDF
+#include <cdio/udf.h>
+#endif
 
 #define LOC     QString("MythCDROMLinux:")
 #define LOC_ERR QString("MythCDROMLinux, Error: ")
@@ -484,7 +487,33 @@ MediaStatus MythCDROMLinux::checkMedia()
                 }
 
                 VERBOSE(VB_MEDIA, QString("Volume ID: %1").arg(m_VolumeID));
+#ifdef USING_LIBUDF
+                // Check for a DVD/BD disk by reading the UDF root dir.
+                // This allows DVD's to play immediately upon insertion without
+                // calling mount, which either needs pmount or changes to fstab.
+                udf_t *pUdf = udf_open(m_DevicePath.toAscii());
+                if (NULL != pUdf)
+                {
+                    udf_dirent_t *pUdfRoot = udf_get_root(pUdf, true, 0);
+                    if (NULL != pUdfRoot)
+                    {
+                        if (NULL != udf_fopen(pUdfRoot, "VIDEO_TS"))
+                            m_MediaType = MEDIATYPE_DVD;
+                        else if (NULL != udf_fopen(pUdfRoot, "BDMV"))
+                            m_MediaType = MEDIATYPE_BD;
 
+                        udf_dirent_free(pUdfRoot);
+                    }
+                    udf_close(pUdf);
+
+                    if (MEDIATYPE_DATA != m_MediaType)
+                    {
+                        // pretend we're NOTMOUNTED so setStatus emits a signal
+                        m_Status = MEDIASTAT_NOTMOUNTED;
+                        return setStatus(MEDIASTAT_USEABLE, OpenedHere);
+                    }
+                }
+#endif
                 // the base class's onDeviceMounted will do fine
                 // grained detection of the type of data on this disc
                 if (isMounted())
