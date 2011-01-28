@@ -188,8 +188,6 @@ class MPUBLIC MythPopupBox : public MythDialog
 
     static bool showGetTextPopup(MythMainWindow *parent, QString title,
                                  QString message, QString& text) MDEPRECATED;
-    static QString showPasswordPopup(MythMainWindow *parent,
-                                     QString title, QString message) MDEPRECATED;
 
   public slots:
     virtual void AcceptItem(int);
@@ -431,37 +429,6 @@ class MPUBLIC MythThemedDialog : public MythDialog
     vector<UIType*>   focus_taking_widgets;
 
     QRect redrawRect;
-};
-
-class MPUBLIC MythPasswordDialog: public MythDialog
-{
-  Q_OBJECT
-
-    //
-    //  Very simple class, not themeable
-    //
-
-  public:
-
-    MythPasswordDialog(QString         message,
-                       bool           *success,
-                       QString         target,
-                       MythMainWindow *parent,
-                       const char     *name = "MythPasswordDialog",
-                       bool            setsize = true) MDEPRECATED;
-  public slots:
-
-    void checkPassword(const QString &);
-
-  protected:
-    ~MythPasswordDialog(); // use deleteLater() instead for thread safety
-    void keyPressEvent(QKeyEvent *e);
-
-  private:
-
-    MythLineEdit        *password_editor;
-    QString              target_text;
-    bool                *success_flag;
 };
 
 /*!
