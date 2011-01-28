@@ -2085,7 +2085,7 @@ void MythMainWindow::customEvent(QEvent *ce)
             QVector<MythScreenType *> screenList;
             (*it)->GetScreenList(screenList);
             QVector<MythScreenType *>::Iterator sit;
-            for (sit = screenList.begin(); sit != screenList.end(); ++it)
+            for (sit = screenList.begin(); sit != screenList.end(); ++sit)
             {
                 MythScreenType *screen = (*sit);
                 if (screen)
