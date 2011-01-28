@@ -8,7 +8,7 @@
 #include <QDomDocument>
 #include <QFile>
 
-// Mythui headers
+// libmythui headers
 #include "mythmainwindow.h"
 #include "mythdialogbox.h"
 #include "mythgesture.h"
@@ -20,10 +20,11 @@
 #include "lcddevice.h"
 #include "mythcorecontext.h"
 
-// Mythdb headers
+// libmythbase headers
 #include "mythverbose.h"
 #include "mythdb.h"
 #include "mythdirs.h"
+#include "mythmedia.h"
 
 MythThemedMenuState::MythThemedMenuState(MythScreenStack *parent,
                                          const QString &name)
@@ -936,4 +937,37 @@ bool MythThemedMenu::checkPinCode(const QString &password_setting)
         delete dialog;
 
     return false;
+}
+
+/**
+ * \copydoc MythUIType::mediaEvent()
+ */
+void MythThemedMenu::mediaEvent(MediaEvent* event)
+{
+    if (!event)
+        return;
+
+    MythMediaDevice *device = event->getDevice();
+
+    if (!device)
+        return;
+
+    MediaType type = device->getMediaType();
+    MediaStatus status = device->getStatus();
+
+    if ((status & ~MEDIASTAT_USEABLE) &&
+        (status & ~MEDIASTAT_MOUNTED))
+        return;
+
+    switch (type)
+    {
+        case MEDIATYPE_DVD :
+            // DVD Available
+            break;
+        case MEDIATYPE_BD :
+            // Blu-ray Available
+            break;
+        default :
+            return;
+    }
 }

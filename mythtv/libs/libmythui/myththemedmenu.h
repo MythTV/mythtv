@@ -84,6 +84,7 @@ class MPUBLIC MythThemedMenu : public MythThemedMenuState
     void aboutScreen();
     MythDialogBox* m_menuPopup;
     void customEvent(QEvent *event);
+    void mediaEvent(MediaEvent *event);
 
   protected:
     virtual bool keyPressEvent(QKeyEvent *e);
