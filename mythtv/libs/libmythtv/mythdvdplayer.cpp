@@ -260,6 +260,7 @@ void MythDVDPlayer::EventStart(void)
         QString name;
         QString serialid;
         if (player_ctx->playingInfo->GetTitle().isEmpty() &&
+            player_ctx->buffer->DVD() &&
             player_ctx->buffer->DVD()->GetNameAndSerialNum(name, serialid))
         {
             player_ctx->playingInfo->SetTitle(name);
