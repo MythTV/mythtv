@@ -10,6 +10,14 @@
     </button>
 
     <button>
+        <type>MUSIC_PLAYLIST</type>
+        <text>Music Tools</text>
+        <description>Select, import, or play music</description>
+        <action>PLUGIN mythmusic</action>
+        <depends>mythmusic</depends>
+    </button>
+
+    <button>
         <type>SETTINGS_VIDEO</type>
         <text>Videos Settings</text>
         <description>Configure playback and metadata</description>
