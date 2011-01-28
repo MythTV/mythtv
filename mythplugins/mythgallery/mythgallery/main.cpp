@@ -60,7 +60,10 @@ static void runGallery(void)
 static void handleMedia(MythMediaDevice *dev)
 {
     if (dev && dev->isUsable())
+    {
+        GetMythMainWindow()->JumpTo("Main Menu");
         run(dev);
+    }
 }
 
 static void setupKeys(void)

@@ -51,9 +51,9 @@ namespace
                 video_list = saved->GetSaved();
             }
         }
-    
+
         VideoDialog::BrowseType browse = static_cast<VideoDialog::BrowseType>(
-                             gCoreContext->GetNumSetting("mythvideo.db_group_type", 
+                             gCoreContext->GetNumSetting("mythvideo.db_group_type",
                                                      VideoDialog::BRS_FOLDER));
 
         if (!video_list)
@@ -215,9 +215,11 @@ namespace
             case 0 : // Do nothing
                 break;
             case 1 : // Display menu (mythdvd)*/
+                GetMythMainWindow()->JumpTo("Main Menu");
                 mythplugin_run();
                 break;
             case 2 : // play DVD or Blu-ray
+                GetMythMainWindow()->JumpTo("Main Menu");
                 playDisc();
                 break;
             default:

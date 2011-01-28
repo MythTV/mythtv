@@ -643,8 +643,6 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
     // if user didn't cancel, selected = handlers.at(choice);
     int selected = 0;
 
-
-    GetMythMainWindow()->JumpTo("Main Menu");
     handlers.at(selected).callback(pMedia);
 }
 
@@ -750,7 +748,7 @@ bool MediaMonitor::eventFilter(QObject *obj, QEvent *event)
             }
         }
 
-        return true;  // We ate the event
+        return false;  // Don't eat the event
     }
 
     // standard event processing
