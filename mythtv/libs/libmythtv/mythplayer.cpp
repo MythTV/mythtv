@@ -1718,27 +1718,8 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     {
         // Reset A/V Sync
         lastsync = true;
-
         currentaudiotime = AVSyncGetAudiotime();
-        if (!using_null_videoout &&
-            videoOutput->hasHWAcceleration() &&
-           !videoOutput->IsSyncLocked())
-        {
-            // If we are using certain hardware decoders, so we've already done
-            // the decoding; display the frame, but don't wait for A/V Sync.
-            // Excludes HW decoder/render methods that are locked to
-            // the vertical sync (e.g. VDPAU)
-            osdLock.lock();
-            videoOutput->PrepareFrame(buffer, kScan_Intr2ndField, osd);
-            osdLock.unlock();
-            videoOutput->Show(kScan_Intr2ndField);
-            VERBOSE(VB_PLAYBACK, LOC + dbg + "skipping A/V wait.");
-        }
-        else
-        {
-            // If we are using software decoding, skip this frame altogether.
-            VERBOSE(VB_PLAYBACK, LOC + dbg + "dropping frame to catch up.");
-        }
+        VERBOSE(VB_PLAYBACK, LOC + dbg + "dropping frame to catch up.");
     }
     else if (!using_null_videoout)
     {

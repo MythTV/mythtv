@@ -61,7 +61,6 @@ class VideoOutputVDPAU : public VideoOutput
         { return codec_is_vdpau(video_codec_id); }
     virtual bool hasHWAcceleration(void) const
         { return codec_is_vdpau(video_codec_id); }
-    virtual bool IsSyncLocked(void) const { return true; }
     void SetNextFrameDisplayTimeOffset(int delayus) { m_frame_delay = delayus; }
     virtual MythPainter* GetOSDPainter(void) { return (MythPainter*)m_osd_painter; }
 
