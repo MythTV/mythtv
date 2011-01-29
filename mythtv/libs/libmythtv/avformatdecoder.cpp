@@ -714,6 +714,18 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
     }
 }
 
+void AvFormatDecoder::SetEof(bool eof)
+{
+    if (!eof && ic && ic->pb)
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+            QString("Resetting byte context eof (livetv %1 was eof %2)")
+            .arg(livetv).arg(ic->pb->eof_reached));
+        ic->pb->eof_reached = 0;
+    }
+    DecoderBase::SetEof(eof);
+}
+
 void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset)
 {
     VERBOSE(VB_PLAYBACK, LOC + QString("Reset(%1, %2)")
@@ -3925,8 +3937,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                 if (retval == -EAGAIN)
                     continue;
 
-                ateof = true;
-                m_parent->SetEof();
+                SetEof(true);
                 delete pkt;
                 return false;
             }
