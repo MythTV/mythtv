@@ -922,8 +922,13 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     fmt->flags &= ~AVFMT_NOFILE;
 
-    if (!ringBuffer->isDVD() && !livetv)
+    if (!ringBuffer->isDVD() && !ringBuffer->isBD() && !livetv)
+    {
         av_estimate_timings(ic, 0);
+        // generate timings based on the video stream to avoid bogus ffmpeg
+        // values for duration and bitrate
+        av_update_stream_timings_video(ic);
+    }
 
     // Scan for the initial A/V streams
     ret = ScanStreams(novideo);
@@ -1797,8 +1802,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         if (dec.left(4) == "xvmc")
                             dvd_xvmc_enabled = true;
 
-                        if (ringBuffer->InDVDMenuOrStillFrame() &&
-                            dvd_xvmc_enabled)
+                        if (ringBuffer->IsDVD())
                         {
                             force_xv = true;
                             enc->pix_fmt = PIX_FMT_YUV420P;
@@ -4800,6 +4804,61 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
     }
     return true;
+}
+
+void AvFormatDecoder::av_update_stream_timings_video(AVFormatContext *ic)
+{
+    int64_t start_time, start_time1, end_time, end_time1;
+    int64_t duration, duration1;
+    AVStream *st = NULL;
+
+    start_time = INT64_MAX;
+    end_time = INT64_MIN;
+
+    for (uint i = 0; i < ic->nb_streams; i++)
+    {
+        AVStream *st1 = ic->streams[i];
+        if (st1 && st1->codec->codec_type == CODEC_TYPE_VIDEO)
+        {
+            st = st1;
+            break;
+        }
+    }
+    if (!st)
+        return;
+
+   duration = INT64_MIN;
+   if (st->start_time != (int64_t)AV_NOPTS_VALUE && st->time_base.den) {
+       start_time1= av_rescale_q(st->start_time, st->time_base, AV_TIME_BASE_Q);
+       if (start_time1 < start_time)
+           start_time = start_time1;
+       if (st->duration != (int64_t)AV_NOPTS_VALUE) {
+           end_time1 = start_time1
+                     + av_rescale_q(st->duration, st->time_base, AV_TIME_BASE_Q);
+           if (end_time1 > end_time)
+               end_time = end_time1;
+       }
+   }
+   if (st->duration != (int64_t)AV_NOPTS_VALUE) {
+       duration1 = av_rescale_q(st->duration, st->time_base, AV_TIME_BASE_Q);
+       if (duration1 > duration)
+           duration = duration1;
+   }
+    if (start_time != INT64_MAX) {
+        ic->start_time = start_time;
+        if (end_time != INT64_MIN) {
+            if (end_time - start_time > duration)
+                duration = end_time - start_time;
+        }
+    }
+    if (duration != INT64_MIN) {
+        ic->duration = duration;
+        if (ic->file_size > 0) {
+            /* compute the bitrate */
+            ic->bit_rate = (double)ic->file_size * 8.0 * AV_TIME_BASE /
+                (double)ic->duration;
+        }
+    }
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

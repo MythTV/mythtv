@@ -80,20 +80,6 @@ enum
     kDisplayTeletextMenu        = 0x100,
 };
 
-class PlayerTimer : public QObject
-{
-    Q_OBJECT
-  public:
-    PlayerTimer(MythPlayer *mp);
-    void PostNextEvent(void);
-    virtual bool event(QEvent *e);
-    static enum QEvent::Type kPlayerEventType;
-
-  private:
-    MythPlayer *m_mp;
-    uint32_t    m_queue_size;
-};
-
 class DecoderThread : public QThread
 {
     Q_OBJECT
@@ -138,7 +124,7 @@ class MPUBLIC MythPlayer
     void SetLength(int len)                   { totalLength = len; }
     void SetFramesPlayed(uint64_t played)     { framesPlayed = played; }
     void SetVideoFilters(const QString &override);
-    void SetEof(void)                         { eof = true; }
+    void SetEof(void)                         { decoderEof = true; }
     void SetPIPActive(bool is_active)         { pip_active = is_active; }
     void SetPIPVisible(bool is_visible)       { pip_visible = is_visible; }
 
@@ -188,7 +174,7 @@ class MPUBLIC MythPlayer
     // Bool Gets
     bool    GetRawAudioState(void) const;
     bool    GetLimitKeyRepeat(void) const     { return limitKeyRepeat; }
-    bool    GetEof(void) const                { return eof; }
+    bool    GetEof(void) const                { return decoderEof; }
     bool    IsErrored(void) const;
     bool    IsPlaying(uint wait_ms = 0, bool wait_for = true) const;
     bool    AtNormalSpeed(void) const         { return next_normal_speed; }
@@ -532,7 +518,6 @@ class MPUBLIC MythPlayer
     PlayerContext *player_ctx;
     DecoderThread *decoderThread;
     QThread       *playerThread;
-    PlayerTimer   *playerTimer;
     bool           no_hardware_decoders;
 
     // Window stuff
@@ -545,6 +530,7 @@ class MPUBLIC MythPlayer
     QWaitCondition decoderThreadUnpause;
     mutable QMutex decoderPauseLock;
     mutable QMutex decoderSeekLock;
+    bool           decoderEof;
     bool           decoderPaused;
     bool           pauseDecoder;
     bool           unpauseDecoder;
@@ -563,7 +549,6 @@ class MPUBLIC MythPlayer
     mutable QWaitCondition playingWaitCond;
     mutable QMutex vidExitLock;
     mutable QMutex playingLock;
-    bool     eof;             ///< At end of file/ringbuffer
     bool     m_double_framerate;///< Output fps is double Video (input) rate
     bool     m_double_process;///< Output filter must processed at double rate
     bool     m_can_double;    ///< VideoOutput capable of doubling frame rate

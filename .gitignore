@@ -5,3 +5,8 @@ moc_*.cpp
 *.so.*
 *.orig
 *.rej
+*kdev*
+*.exe
+*.dll
+*.def
+object_script.*

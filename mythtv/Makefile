@@ -65,7 +65,7 @@ $(addsuffix _distclean,$(SUBDIRS)): $(addsuffix /Makefile,$(SUBDIRS))
 	$(MAKE) -C $(subst _distclean,,$@) distclean
 
 $(addsuffix _install,$(SUBDIRS)): $(addsuffix /Makefile,$(SUBDIRS))
-	$(MAKE) -C $(subst _install,,$@) install
+	$(MAKE) -C $(subst _install,,$@) install INSTALL_ROOT=${INSTALL_ROOT}
 
 $(addsuffix _uninstall,$(SUBDIRS)): $(addsuffix /Makefile,$(SUBDIRS))
 	$(MAKE) -C $(subst _uninstall,,$@) uninstall

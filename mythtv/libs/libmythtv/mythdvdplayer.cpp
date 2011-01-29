@@ -218,10 +218,12 @@ void MythDVDPlayer::DisplayLastFrame(void)
 
     DisplayDVDButton();
 
+    osdLock.lock();
     videofiltersLock.lock();
     videoOutput->ProcessFrame(NULL, osd, videoFilters, pip_players,
                               kScan_Progressive);
     videofiltersLock.unlock();
+    osdLock.unlock();
 
     AVSync(NULL, true);
 }
@@ -258,6 +260,7 @@ void MythDVDPlayer::EventStart(void)
         QString name;
         QString serialid;
         if (player_ctx->playingInfo->GetTitle().isEmpty() &&
+            player_ctx->buffer->DVD() &&
             player_ctx->buffer->DVD()->GetNameAndSerialNum(name, serialid))
         {
             player_ctx->playingInfo->SetTitle(name);
@@ -495,8 +498,10 @@ void MythDVDPlayer::DisplayDVDButton(void)
     if (!numbuttons || !dvdSubtitle || (buttonversion == 0))
     {
         SetCaptionsEnabled(false, false);
+        osdLock.lock();
         if (osd)
             osd->ClearSubtitles();
+        osdLock.unlock();
         m_buttonVersion = 0;
         player_ctx->buffer->DVD()->ReleaseMenuButton();
         return;
@@ -504,7 +509,10 @@ void MythDVDPlayer::DisplayDVDButton(void)
 
     m_buttonVersion = buttonversion;
     QRect buttonPos = player_ctx->buffer->DVD()->GetButtonCoords();
-    osd->DisplayDVDButton(dvdSubtitle, buttonPos);
+    osdLock.lock();
+    if (osd)
+        osd->DisplayDVDButton(dvdSubtitle, buttonPos);
+    osdLock.unlock();
     textDisplayMode = kDisplayDVDButton;
     player_ctx->buffer->DVD()->ReleaseMenuButton();
 }

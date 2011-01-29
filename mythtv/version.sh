@@ -22,7 +22,7 @@ GITREPOPATH="exported"
 
 cd ${GITTREEDIR}
 
-SOURCE_VERSION=$(git describe --dirty || echo Unknown)
+SOURCE_VERSION=$(git describe --dirty || git describe || echo Unknown)
 
 case "${SOURCE_VERSION}" in
     exported|Unknown)
@@ -31,7 +31,7 @@ case "${SOURCE_VERSION}" in
         fi
     ;;
     *)
-    BRANCH=$(git branch | sed -e '/^[^\*]/d' -e 's/^\* //' -e 's/(no branch)/exported/')
+    BRANCH=$(git branch --no-color | sed -e '/^[^\*]/d' -e 's/^\* //' -e 's/(no branch)/exported/')
     ;;
 esac
 

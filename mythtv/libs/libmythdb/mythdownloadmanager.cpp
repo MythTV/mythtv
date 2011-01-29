@@ -613,10 +613,10 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
     m_infoLock->unlock();
     m_queueWaitCond.wakeAll();
 
-    // sleep for 200ms at a time for up to 20 seconds waiting for the download
+    // sleep for 200ms at a time for up to 10 seconds waiting for the download
     m_infoLock->lock();
     while ((!dlInfo->m_done) &&
-           (dlInfo->m_lastStat.secsTo(QDateTime::currentDateTime()) < 20))
+           (dlInfo->m_lastStat.secsTo(QDateTime::currentDateTime()) < 10))
     {
         m_infoLock->unlock();
         m_queueWaitLock.lock();
@@ -624,13 +624,20 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
         m_queueWaitLock.unlock();
         m_infoLock->lock();
     }
-    m_infoLock->unlock();
 
     bool success =
         dlInfo->m_done && (dlInfo->m_errorCode == QNetworkReply::NoError);
 
-    if (deleteInfo)
+    if (!dlInfo->m_done)
+    {
+        dlInfo->m_syncMode = false; // Let downloadFinished() cleanup for us
+        if (dlInfo->m_reply)
+            dlInfo->m_reply->abort();
+    }
+    else if (deleteInfo)
         delete dlInfo;
+
+    m_infoLock->unlock();
 
     return success;
 }
@@ -771,6 +778,11 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
 
         m_downloadReplies[dlInfo->m_reply] = dlInfo;
 
+        connect(dlInfo->m_reply, SIGNAL(error(QNetworkReply::NetworkError)), this,
+                SLOT(downloadError(QNetworkReply::NetworkError)));
+        connect(dlInfo->m_reply, SIGNAL(downloadProgress(qint64, qint64)),
+                this, SLOT(downloadProgress(qint64, qint64))); 
+
         m_downloadReplies.remove(reply);
         reply->deleteLater();
     }
@@ -838,7 +850,7 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
             {
                 VERBOSE(VB_FILE+VB_EXTRA, QString("downloadFinished(%1): "
                         "COMPLETE: %2, sending event to caller")
-                        .arg(dlInfo->m_url));
+                        .arg((long long)dlInfo).arg(dlInfo->m_url));
 
                 QStringList args;
                 args << dlInfo->m_url;
