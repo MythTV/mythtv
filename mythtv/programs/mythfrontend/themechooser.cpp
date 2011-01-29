@@ -882,7 +882,7 @@ ThemeUpdateChecker::ThemeUpdateChecker() :
     }
 
     m_infoPackage = QString("myth://Temp@%1/remotethemes/themes.zip")
-                            .arg(gCoreContext->GetMasterHostName());
+                            .arg(gCoreContext->GetSetting("MasterServerIP"));
 
     gCoreContext->SaveSetting("ThemeUpdateStatus", QString());
                                  
@@ -909,7 +909,7 @@ void ThemeUpdateChecker::checkForUpdate(void)
     {
         QString remoteThemeDir =
             QString("myth://Temp@%1/remotethemes/%2/%3")
-                    .arg(gCoreContext->GetMasterHostName())
+                    .arg(gCoreContext->GetSetting("MasterServerIP"))
                     .arg(m_mythVersion).arg(GetMythUI()->GetThemeName());
         QString infoXML = remoteThemeDir;
         infoXML.append("/themeinfo.xml");
