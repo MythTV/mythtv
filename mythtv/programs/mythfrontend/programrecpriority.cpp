@@ -426,7 +426,7 @@ bool ProgramRecPriority::Create()
     m_rectypePriorityText = dynamic_cast<MythUIText *>
                                                  (GetChild("rectypepriority"));
     m_recPriorityText = dynamic_cast<MythUIText *> (GetChild("recpriority"));
-    m_recPriorityBText = dynamic_cast<MythUIText *> (GetChild("recpriorityb"));
+    m_recPriorityBText = dynamic_cast<MythUIText *> (GetChild("recpriorityB"));
     m_finalPriorityText = dynamic_cast<MythUIText *> (GetChild("finalpriority"));
     m_recGroupText = dynamic_cast<MythUIText *> (GetChild("recordinggroup"));
     m_storageGroupText = dynamic_cast<MythUIText *> (GetChild("storagegroup"));
