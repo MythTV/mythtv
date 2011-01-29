@@ -10236,7 +10236,6 @@ void TV::FillOSDMenuNavigate(const PlayerContext *ctx, OSD *osd,
                                  "DIALOG_MENU_COMMSKIP_0",
                                  true, selected == "COMMSKIP");
         }
-        // FIXME need to check whether we are in HDMV navigation mode
         if (isbd)
         {
             osd->DialogAddButton(tr("Top menu"), ACTION_JUMPTODVDROOTMENU);
