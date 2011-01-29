@@ -110,6 +110,18 @@ class RemoteFileDownloadThread : public QRunnable
     MythDownloadInfo    *m_dlInfo;
 };
 
+/** \fn ShutdownMythDownloadManager(void)
+ *  \brief Deletes the running MythDownloadManager at program exit.
+ */
+void ShutdownMythDownloadManager(void)
+{
+    if (downloadManager)
+    {
+        delete downloadManager;
+        downloadManager = NULL;
+    }
+}
+
 /** \fn GetMythDownloadManger(void)
  *  \brief Gets the pointer to the MythDownloadManager singleton.
  *  \return Pointer to the MythDownloadManager instance
@@ -128,6 +140,8 @@ MythDownloadManager *GetMythDownloadManager(void)
 
         while (!downloadManager->isRunning())
             usleep(10000);
+
+        atexit(ShutdownMythDownloadManager);
     }
 
     return downloadManager;
