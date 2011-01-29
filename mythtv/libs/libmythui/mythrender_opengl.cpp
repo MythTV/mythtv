@@ -189,9 +189,9 @@ void MythRenderOpenGL::SetFeatures(uint features)
 {
     m_exts_used = features;
 
-    m_profile = kGLLegacyProfile;
-    VERBOSE(VB_GENERAL, LOC + "Forcing legacy profile.");
-    return;
+    //m_profile = kGLLegacyProfile;
+    //VERBOSE(VB_GENERAL, LOC + "Forcing legacy profile.");
+    //return;
 
     if ((m_exts_used & kGLExtVBO) && (m_exts_used & kGLSL) &&
         (m_exts_used & kGLExtFBufObj))
@@ -2186,7 +2186,8 @@ uint MythRenderOpenGL::GetBufferSize(QSize size, uint fmt, uint type)
     return size.width() * size.height() * bpp * bytes;
 }
 
-void MythRenderOpenGL::SetProgramParams(uint prog, void* vals)
+void MythRenderOpenGL::SetProgramParams(uint prog, void* vals,
+                                        const char* uniform)
 {
     makeCurrent();
     const float *v = (float*)vals;
@@ -2204,7 +2205,7 @@ void MythRenderOpenGL::SetProgramParams(uint prog, void* vals)
     else if (kGLHighProfile == m_profile)
     {
         EnableShaderObject(prog);
-        GLint loc = m_glGetUniformLocation(prog, "m_colourMatrix");
+        GLint loc = m_glGetUniformLocation(prog, uniform);
         m_glUniformMatrix4fv(loc, 1, GL_FALSE, v);
     }
 

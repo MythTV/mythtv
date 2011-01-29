@@ -117,7 +117,7 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     bool CreateFragmentProgram(const QString &program, uint &prog);
     void DeleteFragmentProgram(uint prog);
     void EnableFragmentProgram(int fp);
-    void SetProgramParams(uint prog, void* vals);
+    void SetProgramParams(uint prog, void* vals, const char* uniform);
 
     uint CreateShaderObject(const QString &vert, const QString &frag);
     void DeleteShaderObject(uint obj);
