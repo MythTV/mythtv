@@ -7,6 +7,7 @@
 #include <QThreadPool>
 
 // libmythdb
+#include "stdlib.h"
 #include "compat.h"
 #include "mythcorecontext.h"
 #include "mythcoreutil.h"
@@ -54,7 +55,7 @@ class MythDownloadInfo
     {
         m_url.detach();
         m_outFile.detach();
-    }       
+    }
 
     QString          m_url;
     QUrl             m_redirectedTo;
@@ -113,7 +114,7 @@ class RemoteFileDownloadThread : public QRunnable
 /** \fn ShutdownMythDownloadManager(void)
  *  \brief Deletes the running MythDownloadManager at program exit.
  */
-void ShutdownMythDownloadManager(void)
+static void ShutdownMythDownloadManager(void)
 {
     if (downloadManager)
     {
@@ -550,7 +551,7 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
     static const char dateFormat[] = "ddd, dd MMM yyyy hh:mm:ss 'GMT'";
     QUrl qurl(dlInfo->m_url);
     QNetworkRequest request;
-    
+
     if (dlInfo->m_request)
     {
         request = *dlInfo->m_request;
@@ -607,7 +608,7 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
     connect(dlInfo->m_reply, SIGNAL(error(QNetworkReply::NetworkError)), this,
             SLOT(downloadError(QNetworkReply::NetworkError)));
     connect(dlInfo->m_reply, SIGNAL(downloadProgress(qint64, qint64)),
-            this, SLOT(downloadProgress(qint64, qint64))); 
+            this, SLOT(downloadProgress(qint64, qint64)));
 }
 
 /** \fn MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo,
@@ -655,7 +656,7 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
 
     return success;
 }
-    
+
 /** \fn MythDownloadManager::removeListener(QObject *caller)
  *  \brief Disconnects the specify caller from any existing
  *         MythDownloadInfo instances.
@@ -795,7 +796,7 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
         connect(dlInfo->m_reply, SIGNAL(error(QNetworkReply::NetworkError)), this,
                 SLOT(downloadError(QNetworkReply::NetworkError)));
         connect(dlInfo->m_reply, SIGNAL(downloadProgress(qint64, qint64)),
-                this, SLOT(downloadProgress(qint64, qint64))); 
+                this, SLOT(downloadProgress(qint64, qint64)));
 
         m_downloadReplies.remove(reply);
         reply->deleteLater();
