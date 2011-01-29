@@ -1056,8 +1056,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
 
         if (!ReadFrameheader(&frameheader))
         {
-            ateof = true;
-            GetPlayer()->SetEof();
+            SetEof(true);
             return false;
         }
 
@@ -1065,8 +1064,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
         if (!ringBuffer->LiveMode() &&
             ((frameheader.frametype == 'Q') || (frameheader.frametype == 'K')))
         {
-            ateof = true;
-            GetPlayer()->SetEof();
+            SetEof(true);
             return false;
         }
 
@@ -1083,8 +1081,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
 
             if (!ReadFrameheader(&frameheader))
             {
-                ateof = true;
-                GetPlayer()->SetEof();
+                SetEof(true);
                 return false;
             }
             seeklen = 1;
@@ -1098,8 +1095,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
             if (ringBuffer->Read(dummy, sizetoskip) != sizetoskip)
             {
                 delete [] dummy;
-                ateof = true;
-                GetPlayer()->SetEof();
+                SetEof(true);
                 return false;
             }
 
@@ -1157,15 +1153,13 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                 VERBOSE(VB_IMPORTANT, QString("Broken packet: %1 %2")
                         .arg(frameheader.frametype)
                         .arg(frameheader.packetlength));
-                ateof = true;
-                GetPlayer()->SetEof();
+                SetEof(true);
                 return false;
             }
             if (ringBuffer->Read(strm, frameheader.packetlength) !=
                 frameheader.packetlength)
             {
-                ateof = true;
-                GetPlayer()->SetEof();
+                SetEof(true);
                 return false;
             }
         }

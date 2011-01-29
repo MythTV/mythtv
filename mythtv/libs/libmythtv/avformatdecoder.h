@@ -95,9 +95,11 @@ class AvFormatDecoder : public DecoderBase
                     AVSpecialDecode av_special_decode = kAVSpecialDecode_None);
    ~AvFormatDecoder();
 
+    virtual void SetEof(bool eof);
+
     void CloseCodecs();
     void CloseContext();
-    void Reset(void);
+    virtual void Reset(void);
     void Reset(bool reset_video_data = true, bool seek_reset = true);
 
     /// Perform an av_probe_input_format on the passed data to see if we

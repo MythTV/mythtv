@@ -130,7 +130,6 @@ MythPlayer::MythPlayer(bool muted)
       parentWidget(NULL), embedid(0),
       embx(-1), emby(-1), embw(-1), embh(-1),
       // State
-      decoderEof(false),
       decoderPaused(false), pauseDecoder(false), unpauseDecoder(false),
       killdecoder(false),   decoderSeek(-1),     decodeOneFrame(false),
       needNewPauseFrame(false),
@@ -967,9 +966,6 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
     decoder->setTranscoding(transcoding);
     CheckExtraAudioDecode();
     noVideoTracks = !decoder->GetTrackCount(kTrackTypeVideo);
-
-
-    decoderEof = false;
 
     // Set 'no_video_decode' to true for audio only decodeing
     bool no_video_decode = false;
@@ -2193,7 +2189,7 @@ void MythPlayer::SwitchToProgram(void)
     {
         OpenDummy();
         ResetPlaying();
-        decoderEof = false;
+        SetEof(false);
         delete pginfo;
         return;
     }
@@ -2207,13 +2203,13 @@ void MythPlayer::SwitchToProgram(void)
                 QString("(card type: %1).")
                 .arg(player_ctx->tvchain->GetCardType(newid)));
         VERBOSE(VB_IMPORTANT, QString("\n") + player_ctx->tvchain->toString());
-        decoderEof = true;
+        SetEof(true);
         SetErrored(QObject::tr("Error opening switch program buffer"));
         delete pginfo;
         return;
     }
 
-    if (decoderEof)
+    if (GetEof())
     {
         discontinuity = true;
         ResetCaptions();
@@ -2221,7 +2217,7 @@ void MythPlayer::SwitchToProgram(void)
 
     VERBOSE(VB_PLAYBACK, LOC + QString("SwitchToProgram(void) "
             "discont: %1 newtype: %2 newid: %3 decoderEof: %4")
-            .arg(discontinuity).arg(newtype).arg(newid).arg(decoderEof));
+            .arg(discontinuity).arg(newtype).arg(newid).arg(GetEof()));
 
     if (discontinuity || newtype)
     {
@@ -2251,9 +2247,11 @@ void MythPlayer::SwitchToProgram(void)
     if (IsErrored())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "SwitchToProgram failed.");
-        decoderEof = true;
+        SetEof(true);
         return;
     }
+
+    SetEof(false);
 
     // the bitrate is reset by player_ctx->buffer->OpenFile()...
     if (decoder)
@@ -2266,7 +2264,6 @@ void MythPlayer::SwitchToProgram(void)
         forcePositionMapSync = true;
     }
 
-    decoderEof = false;
     Play();
     VERBOSE(VB_PLAYBACK, LOC + "SwitchToProgram - end");
 }
@@ -2281,9 +2278,8 @@ void MythPlayer::FileChangedCallback(void)
         player_ctx->buffer->Reset(false, true);
     else
         player_ctx->buffer->Reset(false, true, true);
+    SetEof(false);
     Play();
-
-    decoderEof = false;
 
     player_ctx->SetPlayerChangingBuffers(false);
 
@@ -2322,7 +2318,7 @@ void MythPlayer::JumpToProgram(void)
     {
         OpenDummy();
         ResetPlaying();
-        decoderEof = false;
+        SetEof(false);
         delete pginfo;
         return;
     }
@@ -2338,8 +2334,7 @@ void MythPlayer::JumpToProgram(void)
                 QString("(card type: %1).")
                 .arg(player_ctx->tvchain->GetCardType(newid)));
         VERBOSE(VB_IMPORTANT, QString("\n") + player_ctx->tvchain->toString());
-
-        decoderEof = true;
+        SetEof(true);
         SetErrored(QObject::tr("Error opening jump program file buffer"));
         delete pginfo;
         return;
@@ -2363,6 +2358,8 @@ void MythPlayer::JumpToProgram(void)
         return;
     }
 
+    SetEof(false);
+
     // the bitrate is reset by player_ctx->buffer->OpenFile()...
     player_ctx->buffer->UpdateRawBitrate(decoder->GetRawBitrate());
     player_ctx->buffer->IgnoreLiveEOF(false);
@@ -2383,7 +2380,6 @@ void MythPlayer::JumpToProgram(void)
     if (nextpos > 10)
         DoFastForward(nextpos, true, false);
 
-    decoderEof = false;
     player_ctx->SetPlayerChangingBuffers(false);
     VERBOSE(VB_PLAYBACK, LOC + "JumpToProgram - end");
 }
@@ -2506,7 +2502,7 @@ void MythPlayer::EventLoop(void)
         player_ctx->tvchain->JumpToNext(true, 1);
         JumpToProgram();
     }
-    else if ((!allpaused || decoderEof) && player_ctx->tvchain &&
+    else if ((!allpaused || GetEof()) && player_ctx->tvchain &&
              (decoder && !decoder->GetWaitForChange()))
     {
         // Switch to the next program in livetv
@@ -2557,7 +2553,7 @@ void MythPlayer::EventLoop(void)
     }
 
     // Handle end of file
-    if (decoderEof)
+    if (GetEof())
     {
         if (player_ctx->tvchain)
         {
@@ -2590,7 +2586,7 @@ void MythPlayer::EventLoop(void)
         if (fftime > 0)
         {
             DoFastForward(fftime);
-            if (decoderEof)
+            if (GetEof())
                return;
         }
     }
@@ -2652,7 +2648,7 @@ void MythPlayer::EventLoop(void)
                   && !player_ctx->IsPIP() &&
                   player_ctx->GetState() == kState_WatchingPreRecorded))
             {
-                decoderEof = true;
+                SetEof(true);
             }
         }
         else
@@ -2755,6 +2751,22 @@ void MythPlayer::DecoderPauseCheck(void)
         UnpauseDecoder();
 }
 
+bool MythPlayer::GetEof(void)
+{
+    decoder_change_lock.lock();
+    bool eof = decoder ? decoder->GetEof() : true;
+    decoder_change_lock.unlock();
+    return eof;
+}
+
+void MythPlayer::SetEof(bool eof)
+{
+    decoder_change_lock.lock();
+    if (decoder)
+        decoder->SetEof(eof);
+    decoder_change_lock.unlock();
+}
+
 void MythPlayer::DecoderLoop(bool pause)
 {
     if (pause)
@@ -2796,8 +2808,8 @@ void MythPlayer::DecoderLoop(bool pause)
             decoder_change_lock.unlock();
         }
 
-        bool obey_eof = decoderEof &&
-                        !(decoderEof && player_ctx->tvchain && !allpaused);
+        bool obey_eof = GetEof() &&
+                        !(GetEof() && player_ctx->tvchain && !allpaused);
         if (isDummy || ((decoderPaused || ffrew_skip == 0 || obey_eof) &&
             !decodeOneFrame))
         {
@@ -4135,7 +4147,7 @@ bool MythPlayer::TranscodeGetNextFrame(
     if (!decoder->GetFrame(kDecodeAV))
         return false;
 
-    if (decoderEof)
+    if (GetEof())
         return false;
 
     if (honorCutList && !deleteMap.IsEmpty())
@@ -4160,7 +4172,7 @@ bool MythPlayer::TranscodeGetNextFrame(
             did_ff = 1;
         }
     }
-    if (decoderEof)
+    if (GetEof())
       return false;
     is_key = decoder->isLastFrameKey();
     return true;
