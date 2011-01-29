@@ -684,14 +684,8 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
                                                  &buffer_time, &dir);
     CHECKERR(QString("Unable to set buffer time %1").arg(buffer_time));
 
-<<<<<<< HEAD
-    // See if we need to increase the prealloc'd buffer size
-    // If buffer_time is too small we could underrun
-    // Make 10% leeway okay
-=======
     /* See if we need to increase the prealloc'd buffer size
       If buffer_time is too small we could underrun - make 10% difference ok */
->>>>>>> 516ef1d... Fix incorrect delay calc and tidy up in aoalsa
     if ((buffer_time * 1.10f < (float)original_buffer_time) && pbufsize < 0)
     {
         VBAUDIO(QString("Requested %1us got %2 buffer time")
