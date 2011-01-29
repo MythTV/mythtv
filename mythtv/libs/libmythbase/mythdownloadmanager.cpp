@@ -6,6 +6,8 @@
 #include <QDir>
 #include <QThreadPool>
 
+#include "stdlib.h"
+
 // libmythbase
 #include "compat.h"
 #include "mythcorecontext.h"
@@ -113,7 +115,7 @@ class RemoteFileDownloadThread : public QRunnable
 /** \fn ShutdownMythDownloadManager(void)
  *  \brief Deletes the running MythDownloadManager at program exit.
  */
-void ShutdownMythDownloadManager(void)
+static void ShutdownMythDownloadManager(void)
 {
     if (downloadManager)
     {
