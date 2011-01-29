@@ -189,9 +189,9 @@ void MythRenderOpenGL::SetFeatures(uint features)
 {
     m_exts_used = features;
 
-    //m_profile = kGLLegacyProfile;
-    //VERBOSE(VB_GENERAL, LOC + "Forcing legacy profile.");
-    //return;
+    m_profile = kGLLegacyProfile;
+    VERBOSE(VB_GENERAL, LOC + "Forcing legacy profile.");
+    return;
 
     if ((m_exts_used & kGLExtVBO) && (m_exts_used & kGLSL) &&
         (m_exts_used & kGLExtFBufObj))
