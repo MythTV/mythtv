@@ -69,9 +69,7 @@ bool DeleteMap::HandleAction(QString &action, uint64_t frame,
                              uint64_t played, uint64_t total, double rate)
 {
     bool handled = true;
-    if (action == "REVERSE")
-        Reverse(frame, total);
-    else if (action == ACTION_UP)
+    if (action == ACTION_UP)
         UpdateSeekAmount(1, rate);
     else if (action == ACTION_DOWN)
         UpdateSeekAmount(-1, rate);
@@ -338,15 +336,6 @@ void DeleteMap::Delete(uint64_t frame, uint64_t total, QString undoMessage)
     CleanMap(total);
     if (!undoMessage.isEmpty())
         Push(undoMessage);
-}
-
-/// Reverse the direction of the mark at the given frame.
-void DeleteMap::Reverse(uint64_t frame, uint64_t total)
-{
-    EDIT_CHECK
-    int type = Delete(frame);
-    Add(frame, total, type == MARK_CUT_END ? MARK_CUT_START : MARK_CUT_END, "");
-    Push(QObject::tr("Reverse Mark Direction"));
 }
 
 /// Add a new cut marker (to start or end a cut region)

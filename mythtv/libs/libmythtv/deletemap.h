@@ -51,7 +51,6 @@ class DeleteMap
              QString undoMessage);
     void NewCut(uint64_t frame, uint64_t total);
     void Delete(uint64_t frame, uint64_t total, QString undoMessage = "");
-    void Reverse(uint64_t frame, uint64_t total);
     void MoveRelative(uint64_t frame, uint64_t total, bool right);
     void Move(uint64_t frame, uint64_t to, uint64_t total);
 
