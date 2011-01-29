@@ -10201,7 +10201,8 @@ void TV::FillOSDMenuNavigate(const PlayerContext *ctx, OSD *osd,
     int num_angles    = GetNumAngles(ctx);
     TVState state     = ctx->GetState();
     bool isdvd        = state == kState_WatchingDVD;
-    bool isbd         = state == kState_WatchingBD;
+    bool isbd         = ctx->buffer && ctx->buffer->IsBD() &&
+                        ctx->buffer->BD()->IsHDMVNavigation();
     bool islivetv     = StateIsLiveTV(state);
     bool isrecording  = state == kState_WatchingPreRecorded;
     bool previouschan = false;
