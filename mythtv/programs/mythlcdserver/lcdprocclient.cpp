@@ -473,6 +473,7 @@ void LCDProcClient::init()
     setPriority("Channel", LOW);
     sendToServer("widget_add Channel topWidget string");
     sendToServer("widget_add Channel botWidget string");
+    sendToServer("widget_add Channel timeWidget string");
     sendToServer("widget_add Channel progressBar hbar");
 
     // The Generic Screen
@@ -1124,6 +1125,7 @@ void LCDProcClient::startChannel(QString channum, QString title, QString subtitl
         formatScrollingWidgets();
     }
 
+    channel_time = "";
     progress = 0.0;
     outputChannel();
 }
@@ -1679,12 +1681,13 @@ void LCDProcClient::setLevels(int numbLevels, float *values)
     }
 }
 
-void LCDProcClient::setChannelProgress(float value)
+void LCDProcClient::setChannelProgress(const QString &time, float value)
 {
     if (!lcd_ready)
         return;
 
     progress = value;
+    channel_time = time;
 
     if (progress < 0.0)
         progress = 0.0;
@@ -2160,6 +2163,9 @@ void LCDProcClient::outputChannel()
         aString += " ";
         aString += QString::number((int)rint(progress * lcdWidth * cellWidth));
         sendToServer(aString);
+
+        if (lcdHeight >= 4)
+            outputCenteredText("Channel", channel_time, "timeWidget", 3);
     }
     else
         sendToServer("widget_set Channel progressBar 1 1 0");
@@ -2313,6 +2319,7 @@ void LCDProcClient::removeWidgets()
 {
     sendToServer("widget_del Channel progressBar");
     sendToServer("widget_del Channel topWidget");
+    sendToServer("widget_del Channel timeWidget");
     sendToServer("screen_del Channel");
 
     sendToServer("widget_del Generic progressBar");

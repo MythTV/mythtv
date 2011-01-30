@@ -473,13 +473,14 @@ void LCD::setTunerLEDs(enum LCDTunerSet tuner, bool on)
     sendToServer(QString("UPDATE_LEDS %1").arg(lcd_ledmask));
 }
 
-void LCD::setChannelProgress(float value)
+void LCD::setChannelProgress(const QString time, float value)
 {
     if (!lcd_ready || !lcd_showchannel)
         return;
 
     value = std::min(std::max(0.0f, value), 1.0f);
-    sendToServer(QString("SET_CHANNEL_PROGRESS %1").arg(value));
+    sendToServer(QString("SET_CHANNEL_PROGRESS %1 %2").arg(quotedString(time))
+        .arg(value));
 }
 
 void LCD::setGenericProgress(float value)

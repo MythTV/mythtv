@@ -2930,6 +2930,7 @@ bool TV::HandleLCDTimerEvent(void)
     if (lcd)
     {
         float progress = 0.0f;
+        QString lcd_time_string;
         bool showProgress = true;
 
         if (StateIsLiveTV(GetState(actx)))
@@ -2944,10 +2945,16 @@ bool TV::HandleLCDTimerEvent(void)
         if (showProgress)
         {
             osdInfo info;
-            if (actx->CalcPlayerSliderPosition(info))
+            if (actx->CalcPlayerSliderPosition(info)) {
                 progress = info.values["position"] * 0.001f;
+
+                lcd_time_string = info.text["playedtime"] + " / " + info.text["totaltime"];
+                // if the string is longer than the LCD width, remove all spaces
+                if (lcd_time_string.length() > (int)lcd->getLCDWidth())
+                    lcd_time_string.remove(' ');
+            }
         }
-        lcd->setChannelProgress(progress);
+        lcd->setChannelProgress(lcd_time_string, progress);
     }
     ReturnPlayerLock(actx);
 
