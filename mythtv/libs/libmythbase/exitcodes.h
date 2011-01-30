@@ -133,13 +133,6 @@
 #define MESSAGE_EXIT_NO_TEMPLATE                  GENERIC_EXIT_START+1
 #define MESSAGE_EXIT_START                        GENERIC_EXIT_START+1
 
-// mythtvosd
-#define TVOSD_EXIT_OK                             GENERIC_EXIT_OK
-#define TVOSD_EXIT_INVALID_CMDLINE                GENERIC_EXIT_INVALID_CMDLINE
-#define TVOSD_EXIT_SOCKET_ERROR                   GENERIC_EXIT_SOCKET_ERROR
-#define TVOSD_EXIT_NO_TEMPLATE                    GENERIC_EXIT_START+1
-#define TVOSD_EXIT_START                          GENERIC_EXIT_START+1
-
 // mythwelcome
 #define WELCOME_BUGGY_EXIT_NO_THEME               GENERIC_EXIT_NO_THEME
 
