@@ -139,7 +139,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
             vis_button->setText(tr("4 Visualize"));
     }
 
-    if (class LCD *lcd = LCD::Get())
+    if (LCD *lcd = LCD::Get())
     {
         // Set please wait on the LCD
         QList<LCDTextItem> textItems;
@@ -206,7 +206,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
 
     updateForeground();
 
-    if (class LCD *lcd = LCD::Get())
+    if (LCD *lcd = LCD::Get())
     {
         lcd->switchToTime();
     }
@@ -231,7 +231,7 @@ PlaybackBoxMusic::~PlaybackBoxMusic(void)
         delete cd_reader_thread;
     }
 
-    if (class LCD *lcd = LCD::Get())
+    if (LCD *lcd = LCD::Get())
         lcd->switchToTime();
 
     gMusicData->all_music->save();
@@ -1259,13 +1259,13 @@ void PlaybackBoxMusic::showVolume(bool on_or_off)
                 volume_status->refresh();
                 volume_display_timer->setSingleShot(true);
                 volume_display_timer->start(2000);
-                if (class LCD *lcd = LCD::Get())
+                if (LCD *lcd = LCD::Get())
                     lcd->switchToVolume("Music");
 
                 volume_level =
                     (gPlayer->isMuted()) ? 0.0f : gPlayer->getVolume() * 0.01f;
 
-                if (class LCD *lcd = LCD::Get())
+                if (LCD *lcd = LCD::Get())
                     lcd->setVolumeLevel(volume_level);
             }
             else
@@ -1306,7 +1306,7 @@ void PlaybackBoxMusic::showSpeed(bool on_or_off)
         }
     }
 
-    if (class LCD *lcd = LCD::Get())
+    if (LCD *lcd = LCD::Get())
     {
         QString speed_text;
         float playSpeed = gPlayer->getSpeed();
@@ -1496,7 +1496,7 @@ void PlaybackBoxMusic::stopAll()
 {
     stopVisualizer();
 
-    if (class LCD *lcd = LCD::Get())
+    if (LCD *lcd = LCD::Get())
     {
         lcd->switchToTime();
     }
@@ -1596,7 +1596,7 @@ void PlaybackBoxMusic::seek(int pos)
 
             showProgressBar();
 
-            if (class LCD *lcd = LCD::Get())
+            if (LCD *lcd = LCD::Get())
             {
                 float percent_heard = maxTime <= 0 ? 0.0 : ((float)pos /
                                       (float)maxTime);
@@ -1622,27 +1622,27 @@ void PlaybackBoxMusic::setShuffleMode(MusicPlayer::ShuffleMode mode)
     {
         case MusicPlayer::SHUFFLE_INTELLIGENT:
             state = tr("Smart");
-            if (class LCD *lcd = LCD::Get())
+            if (LCD *lcd = LCD::Get())
                 lcd->setMusicShuffle(LCD::MUSIC_SHUFFLE_SMART);
             break;
         case MusicPlayer::SHUFFLE_RANDOM:
             state = tr("Rand");
-            if (class LCD *lcd = LCD::Get())
+            if (LCD *lcd = LCD::Get())
                 lcd->setMusicShuffle(LCD::MUSIC_SHUFFLE_RAND);
             break;
         case MusicPlayer::SHUFFLE_ALBUM:
             state = tr("Album");
-            if (class LCD *lcd = LCD::Get())
+            if (LCD *lcd = LCD::Get())
                 lcd->setMusicShuffle(LCD::MUSIC_SHUFFLE_ALBUM);
             break;
         case MusicPlayer::SHUFFLE_ARTIST:
             state = tr("Artist");
-            if (class LCD *lcd = LCD::Get())
+            if (LCD *lcd = LCD::Get())
                 lcd->setMusicShuffle(LCD::MUSIC_SHUFFLE_ARTIST);
             break;
         default:
             state = tr("None");
-            if (class LCD *lcd = LCD::Get())
+            if (LCD *lcd = LCD::Get())
                 lcd->setMusicShuffle(LCD::MUSIC_SHUFFLE_NONE);
             break;
     }
@@ -1721,17 +1721,17 @@ void PlaybackBoxMusic::setRepeatMode(MusicPlayer::RepeatMode mode)
     {
         case MusicPlayer::REPEAT_ALL:
             state = tr("All");
-            if (class LCD *lcd = LCD::Get())
+            if (LCD *lcd = LCD::Get())
                 lcd->setMusicRepeat (LCD::MUSIC_REPEAT_ALL);
             break;
         case MusicPlayer::REPEAT_TRACK:
             state = tr("Track");
-            if (class LCD *lcd = LCD::Get())
+            if (LCD *lcd = LCD::Get())
                 lcd->setMusicRepeat (LCD::MUSIC_REPEAT_TRACK);
             break;
         default:
             state = tr("None");
-            if (class LCD *lcd = LCD::Get())
+            if (LCD *lcd = LCD::Get())
                 lcd->setMusicRepeat (LCD::MUSIC_REPEAT_NONE);
             break;
     }
@@ -1964,7 +1964,7 @@ void PlaybackBoxMusic::customEvent(QEvent *event)
 
         if (curMeta)
         {
-            if (class LCD *lcd = LCD::Get())
+            if (LCD *lcd = LCD::Get())
             {
                 float percent_heard = (maxTime<=0) ? 
                     0.0:((float)rs / (float)curMeta->Length()) * 1000.0;
@@ -2259,7 +2259,7 @@ void PlaybackBoxMusic::end()
 {
     stop();
 
-    if (class LCD *lcd = LCD::Get())
+    if (LCD *lcd = LCD::Get())
         lcd->switchToTime ();
 }
 

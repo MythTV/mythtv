@@ -1604,7 +1604,7 @@ void UIListBtnType::Draw(QPainter *p, int order, int context, bool active_on)
         return;
 
     //  Put something on the LCD device (if one exists)
-    if (class LCD *lcddev = LCD::Get())
+    if (LCD *lcddev = LCD::Get())
     {
         if (m_active)
         {

@@ -1174,7 +1174,7 @@ TV::~TV(void)
     if (lastProgram)
         delete lastProgram;
 
-    if (class LCD * lcd = LCD::Get())
+    if (LCD *lcd = LCD::Get())
     {
         lcd->setFunctionLEDs(FUNC_TV, false);
         lcd->setFunctionLEDs(FUNC_MOVIE, false);
@@ -1710,7 +1710,7 @@ int TV::Playback(const ProgramInfo &rcinfo)
 
     ReturnPlayerLock(mctx);
 
-    if (class LCD * lcd = LCD::Get())
+    if (LCD *lcd = LCD::Get())
     {
         lcd->switchToChannel(rcinfo.GetChannelSchedulingID(),
                              rcinfo.GetTitle(), rcinfo.GetSubtitle());
@@ -7371,7 +7371,7 @@ void TV::UpdateLCD(void)
 
 void TV::ShowLCDChannelInfo(const PlayerContext *ctx)
 {
-    class LCD * lcd = LCD::Get();
+    LCD *lcd = LCD::Get();
     ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (!lcd || !ctx->playingInfo)
     {
@@ -7408,7 +7408,7 @@ static void format_time(int seconds, QString &tMin, QString &tHrsMin)
 
 void TV::ShowLCDDVDInfo(const PlayerContext *ctx)
 {
-    class LCD * lcd = LCD::Get();
+    LCD *lcd = LCD::Get();
 
     if (!lcd || !ctx->buffer || !ctx->buffer->IsDVD())
     {
@@ -7800,7 +7800,7 @@ void TV::ChangeVolume(PlayerContext *ctx, bool up)
                         kOSDTimeout_Med);
         SetUpdateOSDPosition(false);
 
-        if (LCD * lcd = LCD::Get())
+        if (LCD *lcd = LCD::Get())
         {
             QString appName = tr("Video");
 

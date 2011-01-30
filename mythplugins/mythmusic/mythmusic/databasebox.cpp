@@ -168,7 +168,7 @@ DatabaseBox::~DatabaseBox()
     gMusicData->all_playlists->getActive()->removeAllWidgets();
     gMusicData->all_playlists->getActive()->fillSonglistFromSongs();
 
-    if (class LCD * lcd = LCD::Get())
+    if (LCD *lcd = LCD::Get())
         lcd->switchToTime();
 
     delete rootNode;
@@ -189,7 +189,7 @@ void DatabaseBox::showWaiting()
 
         QString a_string = tr("All My Music ~ Loading Music Data ");
 
-        if (class LCD * lcd = LCD::Get())
+        if (LCD *lcd = LCD::Get())
         {
             // Set Loading Message on the LCD
             QList<LCDTextItem> textItems;
@@ -224,7 +224,7 @@ void DatabaseBox::keepFilling()
             checkTree();
 
             // make sure we get rid of the 'Loading Music Data' message
-            if (class LCD * lcd = LCD::Get())
+            if (LCD *lcd = LCD::Get())
                 lcd->switchToTime();
         }
         else

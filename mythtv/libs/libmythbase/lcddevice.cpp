@@ -77,9 +77,9 @@ LCD::LCD()
 
 bool LCD::m_enabled = false;
 bool LCD::m_server_unavailable = false;
-class LCD *LCD::m_lcd = NULL;
+LCD *LCD::m_lcd = NULL;
 
-class LCD * LCD::Get(void)
+LCD *LCD::Get(void)
 {
     if (m_enabled && m_lcd == NULL && m_server_unavailable == false)
         m_lcd = new LCD;
@@ -108,7 +108,7 @@ void LCD::SetupLCD (void)
 
     if (m_enabled && lcd_host.length() > 0 && lcd_port > 1024)
     {
-        class LCD * lcd = LCD::Get();
+        LCD *lcd = LCD::Get();
         if (lcd->connectToHost(lcd_host, lcd_port) == false)
         {
             delete m_lcd;

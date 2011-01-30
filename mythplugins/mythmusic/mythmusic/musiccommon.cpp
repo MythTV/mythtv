@@ -1,4 +1,4 @@
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  // ANSI C includes
+// ANSI C includes
 #include <cstdlib>
 
 // C++ includes
@@ -70,7 +70,7 @@ MusicCommon::MusicCommon(MythScreenStack *parent, const QString &name)
 
     m_cycleVisualizer = gCoreContext->GetNumSetting("VisualCycleOnSongChange");
 
-    if (class LCD *lcd = LCD::Get())
+    if (LCD *lcd = LCD::Get())
     {
         lcd->switchToTime();
         lcd->setFunctionLEDs(FUNC_MUSIC, true);
@@ -94,7 +94,7 @@ MusicCommon::~MusicCommon(void)
         m_mainvisual = NULL;
     }
 
-    if (class LCD *lcd = LCD::Get())
+    if (LCD *lcd = LCD::Get())
     {
         lcd->switchToTime();
         lcd->setFunctionLEDs(FUNC_MUSIC, false);
@@ -615,7 +615,7 @@ void MusicCommon::showSpeed(bool show)
         }
     }
 
-    if (class LCD *lcd = LCD::Get())
+    if (LCD *lcd = LCD::Get())
     {
         QString speed_text;
         float playSpeed = gPlayer->getSpeed();
@@ -708,7 +708,7 @@ void MusicCommon::setTrackOnLCD(Metadata *mdata)
 
 void MusicCommon::stopAll()
 {
-    if (class LCD *lcd = LCD::Get())
+    if (LCD *lcd = LCD::Get())
     {
         lcd->switchToTime();
     }
@@ -802,7 +802,7 @@ void MusicCommon::seek(int pos)
 
             updateProgressBar();
 
-            if (class LCD *lcd = LCD::Get())
+            if (LCD *lcd = LCD::Get())
             {
                 float percent_heard = m_maxTime <= 0 ? 0.0 : ((float)pos /
                                       (float)m_maxTime);
@@ -905,10 +905,10 @@ void MusicCommon::customEvent(QEvent *event)
         Metadata *curMeta = gPlayer->getCurrentMetadata();
         if (curMeta)
         {
-            if (class LCD *lcd = LCD::Get())
+            if (LCD *lcd = LCD::Get())
             {
-                float percent_heard = m_maxTime <= 0 ? 0.0:((float)rs /
-                                                        (float)curMeta->Length()) * 1000.0;
+                float percent_heard = m_maxTime <= 0 ? 
+                    0.0:((float)rs / (float)curMeta->Length()) * 1000.0;
 
                 QString lcd_time_string = time_string;
 

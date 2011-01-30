@@ -186,7 +186,7 @@ int main(int argc, char **argv)
 
     LCD::SetupLCD();
 
-    if (class LCD *lcd = LCD::Get())
+    if (LCD *lcd = LCD::Get())
         lcd->switchToTime();
 
     MythTranslation::load("mythfrontend");

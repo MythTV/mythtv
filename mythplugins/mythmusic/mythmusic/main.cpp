@@ -366,7 +366,7 @@ static int runMenu(QString which_menu)
 
     if (diag->foundTheme())
     {
-        if (class LCD * lcd = LCD::Get())
+        if (LCD *lcd = LCD::Get())
         {
             lcd->switchToTime();
         }
