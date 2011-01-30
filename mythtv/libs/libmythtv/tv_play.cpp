@@ -862,7 +862,8 @@ TV::TV(void)
       disableDrawUnusedRects(false),
       isEmbedded(false),            ignoreKeyPresses(false),
       // Timers
-      lcdTimerId(0),                keyListTimerId(0),
+      lcdTimerId(0),                lcdVolumeTimerId(0),
+      keyListTimerId(0),
       networkControlTimerId(0),     jumpMenuTimerId(0),
       pipChangeTimerId(0),
       switchToInputTimerId(0),      ccInputTimerId(0),
@@ -2398,6 +2399,8 @@ void TV::timerEvent(QTimerEvent *te)
     bool handled = true;
     if (timer_id == lcdTimerId)
         HandleLCDTimerEvent();
+    else if (timer_id == lcdVolumeTimerId)
+        HandleLCDVolumeTimerEvent();
     else if (timer_id == sleepTimerId)
         ShowOSDSleep();
     else if (timer_id == sleepDialogTimerId)
@@ -2953,6 +2956,21 @@ bool TV::HandleLCDTimerEvent(void)
     lcdTimerId = StartTimer(kLCDTimeout, __LINE__);
 
     return true;
+}
+
+void TV::HandleLCDVolumeTimerEvent()
+{
+    PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
+    LCD *lcd = LCD::Get();
+    if (lcd)
+    {
+        ShowLCDChannelInfo(actx);
+        lcd->switchToChannel(lcdCallsign, lcdTitle, lcdSubtitle);
+    }
+    ReturnPlayerLock(actx);
+
+    QMutexLocker locker(&timerIdLock);
+    KillTimer(lcdVolumeTimerId);
 }
 
 int  TV::StartTimer(int interval, int line)
@@ -7781,6 +7799,26 @@ void TV::ChangeVolume(PlayerContext *ctx, bool up)
                         kOSDFunctionalType_PictureAdjust, "%", curvol * 10,
                         kOSDTimeout_Med);
         SetUpdateOSDPosition(false);
+
+        if (LCD * lcd = LCD::Get())
+        {
+            QString appName = tr("Video");
+
+            if (StateIsLiveTV(GetState(ctx)))
+                appName = tr("TV");
+
+            if (ctx->buffer && ctx->buffer->IsDVD())
+                appName = tr("DVD");
+            
+            lcd->switchToVolume(appName);
+            lcd->setVolumeLevel((float)curvol / 100);
+
+            QMutexLocker locker(&timerIdLock);
+            if (lcdVolumeTimerId)
+                KillTimer(lcdVolumeTimerId);
+
+            lcdVolumeTimerId = StartTimer(2000, __LINE__);
+        }
     }
 }
 

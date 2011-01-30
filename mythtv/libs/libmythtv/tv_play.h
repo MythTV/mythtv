@@ -590,6 +590,7 @@ class MPUBLIC TV : public QObject
                               int level = 0, const QString selected = "");
     void UpdateLCD(void);
     bool HandleLCDTimerEvent(void);
+    void HandleLCDVolumeTimerEvent(void);
     void ShowLCDChannelInfo(const PlayerContext*);
     void ShowLCDDVDInfo(const PlayerContext*);
 
@@ -812,6 +813,7 @@ class MPUBLIC TV : public QObject
     typedef QMap<int,const PlayerContext*> TimerContextConstMap;
     mutable QMutex       timerIdLock;
     volatile int         lcdTimerId;
+    volatile int         lcdVolumeTimerId;
     volatile int         keyListTimerId;
     volatile int         networkControlTimerId;
     volatile int         jumpMenuTimerId;
