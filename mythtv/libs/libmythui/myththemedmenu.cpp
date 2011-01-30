@@ -280,6 +280,7 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
 void MythThemedMenu::aboutToShow()
 {
     MythScreenType::aboutToShow();
+    m_buttonList->updateLCD();
 }
 
 void MythThemedMenu::ShowMenu()

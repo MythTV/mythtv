@@ -169,6 +169,7 @@ class MPUBLIC MythUIButtonList : public MythUIType
     void RemoveItem(MythUIButtonListItem *item);
 
     void SetLCDTitles(const QString &title, const QString &columnList = "");
+    void updateLCD(void);
 
     void SetSearchFields(const QString &fields) { m_searchFields = fields; }
     bool Find(const QString &searchStr, bool startsWith = false);
@@ -221,8 +222,6 @@ class MPUBLIC MythUIButtonList : public MythUIType
     void SetPosition(void);
     void SetPositionArrowStates(void);
     void ItemVisible(MythUIButtonListItem *item);
-
-    void updateLCD(void);
 
     void SetActive(bool active);
 
