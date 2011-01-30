@@ -29,7 +29,7 @@ MythHDD::MythHDD(QObject *par, const char *DevicePath,
 /** \fn MythHDD::checkMedia(void)
  *  \brief Checks the status of this media device.
  */
-MediaStatus MythHDD::checkMedia(void)
+MythMediaStatus MythHDD::checkMedia(void)
 {
     if (isMounted())
     {

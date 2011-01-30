@@ -718,7 +718,7 @@ bool MythUIType::gestureEvent(MythGestureEvent *)
  *
  *  \param event Media event
  */
-void MythUIType::mediaEvent (MediaEvent*)
+void MythUIType::mediaEvent (MythMediaEvent*)
 {
     return;
 }

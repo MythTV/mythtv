@@ -13,7 +13,7 @@
 struct MHData
 {
     void   (*callback)(MythMediaDevice *mediadevice);
-    int      MediaType;
+    int      MythMediaType;
     QString  destination;
     QString  description;
 };
@@ -56,7 +56,7 @@ class MPUBLIC MediaMonitor : public QObject
     // first validate the pointer with ValidateAndLock(), if true is returned
     // it is safe to dereference the pointer. When finished call Unlock()
     QList<MythMediaDevice*> GetRemovable(bool mounted=false);
-    QList<MythMediaDevice*> GetMedias(MediaType mediatype);
+    QList<MythMediaDevice*> GetMedias(MythMediaType mediatype);
     MythMediaDevice*        GetMedia(const QString &path);
 
     void MonitorRegisterExtensions(uint mediaType, const QString &extensions);
@@ -80,7 +80,7 @@ class MPUBLIC MediaMonitor : public QObject
     virtual QStringList GetCDROMBlockDevices(void) = 0;
 
   public slots:
-    void mediaStatusChanged(MediaStatus oldStatus, MythMediaDevice* pMedia);
+    void mediaStatusChanged(MythMediaStatus oldStatus, MythMediaDevice* pMedia);
 
   protected:
     MediaMonitor(QObject *par, unsigned long interval, bool allowEject);

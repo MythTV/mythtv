@@ -258,7 +258,7 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
     VERBOSE(VB_MEDIA, QString("Unlocking disk %1, then eject()ing").arg(dev));
     device->unlock();
 
-    MediaError err = device->eject();
+    MythMediaError err = device->eject();
 
     if (err == MEDIAERR_UNSUPPORTED)
     {
@@ -410,7 +410,7 @@ void MediaMonitor::StartMonitoring(void)
     if (!m_Thread)
         m_Thread = new MonitorThread(this, m_MonitorPollingInterval);
 
-    qRegisterMetaType<MediaStatus>("MediaStatus");
+    qRegisterMetaType<MythMediaStatus>("MediaStatus");
 
     VERBOSE(VB_MEDIA, "Starting MediaMonitor");
     m_Active = true;
@@ -439,7 +439,7 @@ void MediaMonitor::StopMonitoring(void)
  *
  *   NOTE: This function can block.
  *
- *  \sa Unlock(MythMediaDevice *pMedia), GetMedias(MediaType mediatype)
+ *  \sa Unlock(MythMediaDevice *pMedia), GetMedias(MythMediaType mediatype)
  */
 bool MediaMonitor::ValidateAndLock(MythMediaDevice *pMedia)
 {
@@ -456,7 +456,7 @@ bool MediaMonitor::ValidateAndLock(MythMediaDevice *pMedia)
 /** \fn MediaMonitor::Unlock(MythMediaDevice *pMedia)
  *  \brief decrements the MythMediaDevices reference count
  *
- *  \sa ValidateAndLock(MythMediaDevice *pMedia), GetMedias(MediaType mediatype)
+ *  \sa ValidateAndLock(MythMediaDevice *pMedia), GetMedias(MythMediaType mediatype)
  */
 void MediaMonitor::Unlock(MythMediaDevice *pMedia)
 {
@@ -523,7 +523,7 @@ QString MediaMonitor::GetMountPath(const QString& devPath)
     return mountPath;
 }
 
-/** \fn MediaMonitor::GetMedias(MediaType mediatype)
+/** \fn MediaMonitor::GetMedias(MythMediaType mediatype)
  *  \brief Ask for available media. Must be locked with ValidateAndLock().
  *
  *   This method returns a list of MythMediaDevice pointers which match
@@ -541,7 +541,7 @@ QString MediaMonitor::GetMountPath(const QString& devPath)
  *  \sa ValidateAndLock(MythMediaDevice *pMedia)
  *  \sa Unlock(MythMediaDevice *pMedia)
  */
-QList<MythMediaDevice*> MediaMonitor::GetMedias(MediaType mediatype)
+QList<MythMediaDevice*> MediaMonitor::GetMedias(MythMediaType mediatype)
 {
     QMutexLocker locker(&m_DevicesLock);
 
@@ -590,7 +590,7 @@ void MediaMonitor::RegisterMediaHandler(const QString  &destination,
     if (m_handlerMap.count(destination) == 0)
     {
         MHData  mhd = { callback, mediaType, destination, description };
-        QString msg = MythMediaDevice::MediaTypeString((MediaType)mediaType);
+        QString msg = MythMediaDevice::MediaTypeString((MythMediaType)mediaType);
 
         if (extensions.length())
             msg += QString(", ext(%1)").arg(extensions);
@@ -624,7 +624,7 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
 
     while (itr != m_handlerMap.end())
     {
-        if (((*itr).MediaType & (int)pMedia->getMediaType()))
+        if (((*itr).MythMediaType & (int)pMedia->getMediaType()))
         {
             VERBOSE(VB_IMPORTANT, "Found a handler - '" + itr.key() + "'");
             handlers.append(*itr);
@@ -650,14 +650,14 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
  * \brief Slot which is called when the device status changes and posts a
  *        media event to the mainwindow
  */
-void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
+void MediaMonitor::mediaStatusChanged(MythMediaStatus oldStatus,
                                       MythMediaDevice* pMedia)
 {
     // If we're not active then ignore signal.
     if (!m_Active)
         return;
 
-    MediaStatus  stat = pMedia->getStatus();
+    MythMediaStatus  stat = pMedia->getStatus();
     QString      msg  = QString(" (%1, %2 -> %3)")
                         .arg(pMedia->MediaTypeString())
                         .arg(MythMediaDevice::MediaStatusStrings[oldStatus])
@@ -669,7 +669,7 @@ void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
     if (stat != MEDIASTAT_ERROR && stat != MEDIASTAT_UNKNOWN)
     {
         // Should we ValidateAndLock() first?
-        QEvent *e = new MediaEvent(stat, pMedia);
+        QEvent *e = new MythMediaEvent(stat, pMedia);
 
         VERBOSE(VB_MEDIA, "Posting MediaEvent" + msg);
 
@@ -721,9 +721,9 @@ bool MediaMonitor::shouldIgnore(const MythMediaDevice* device)
  */
 bool MediaMonitor::eventFilter(QObject *obj, QEvent *event)
 {
-    if (event->type() == MediaEvent::kEventType)
+    if (event->type() == MythMediaEvent::kEventType)
     {
-        MythMediaDevice *pDev = ((MediaEvent*)event)->getDevice();
+        MythMediaDevice *pDev = ((MythMediaEvent*)event)->getDevice();
 
         if (!pDev)
         {
@@ -742,7 +742,7 @@ bool MediaMonitor::eventFilter(QObject *obj, QEvent *event)
             QMap<QString, MHData>::Iterator itr = m_handlerMap.begin();
             while (itr != m_handlerMap.end())
             {
-                if ((*itr).MediaType & (int)pDev->getMediaType())
+                if ((*itr).MythMediaType & (int)pDev->getMediaType())
                     (*itr).callback(pDev);
                 itr++;
             }

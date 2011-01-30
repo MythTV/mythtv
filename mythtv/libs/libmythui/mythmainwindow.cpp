@@ -2066,9 +2066,9 @@ void MythMainWindow::customEvent(QEvent *ce)
         }
     }
 #endif
-    else if (ce->type() == MediaEvent::kEventType)
+    else if (ce->type() == MythMediaEvent::kEventType)
     {
-        MediaEvent *me = static_cast<MediaEvent*>(ce);
+        MythMediaEvent *me = static_cast<MythMediaEvent*>(ce);
 
         // A listener based system might be more efficient, but we should never
         // have that many screens open at once so impact should be minimal.

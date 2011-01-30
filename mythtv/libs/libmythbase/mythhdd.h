@@ -9,7 +9,7 @@ class MPUBLIC MythHDD : public MythMediaDevice
     MythHDD(QObject* par, const char* DevicePath,
             bool SuperMount, bool AllowEject);
 
-    virtual MediaStatus checkMedia(void);
+    virtual MythMediaStatus checkMedia(void);
 
     static MythHDD* Get(QObject* par, const char* devicePath,
                         bool SuperMount, bool AllowEject);

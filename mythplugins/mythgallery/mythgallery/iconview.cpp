@@ -350,8 +350,8 @@ void IconView::SetupMediaMonitor(void)
         if (mounted)
         {
             connect(m_currDevice,
-                SIGNAL(statusChanged(MediaStatus, MythMediaDevice*)),
-                SLOT(mediaStatusChanged(MediaStatus, MythMediaDevice*)));
+                SIGNAL(statusChanged(MythMediaStatus, MythMediaDevice*)),
+                SLOT(mediaStatusChanged(MythMediaStatus, MythMediaDevice*)));
 
             LoadDirectory(m_currDevice->getMountPath());
 
@@ -536,9 +536,9 @@ bool IconView::HandleMediaDeviceSelect(ThumbItem *item)
         item->SetPath(m_currDevice->getMountPath(), true);
 
         connect(m_currDevice,
-                SIGNAL(statusChanged(MediaStatus,
+                SIGNAL(statusChanged(MythMediaStatus,
                                      MythMediaDevice*)),
-                SLOT(mediaStatusChanged(MediaStatus,
+                SLOT(mediaStatusChanged(MythMediaStatus,
                                         MythMediaDevice*)));
 
         LoadDirectory(m_currDevice->getMountPath());
@@ -1432,7 +1432,7 @@ void IconView::CopyMarkedFiles(bool move)
     LoadDirectory(m_currDir);
 }
 
-void IconView::mediaStatusChanged(MediaStatus oldStatus,
+void IconView::mediaStatusChanged(MythMediaStatus oldStatus,
                                   MythMediaDevice *pMedia)
 {
     (void) oldStatus;
