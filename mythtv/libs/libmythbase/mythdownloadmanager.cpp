@@ -629,10 +629,16 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
     m_infoLock->unlock();
     m_queueWaitCond.wakeAll();
 
-    // sleep for 200ms at a time for up to 10 seconds waiting for the download
+    // timeout myth:// RemoteFile transfers 20 seconds from now
+    // timeout non-myth:// QNetworkAccessManager transfers 10 seconds after
+    //    their last progress update
+    QDateTime startedAt = QDateTime::currentDateTime();
     m_infoLock->lock();
     while ((!dlInfo->m_done) &&
-           (dlInfo->m_lastStat.secsTo(QDateTime::currentDateTime()) < 10))
+           (((!dlInfo->m_url.startsWith("myth://")) &&
+             (dlInfo->m_lastStat.secsTo(QDateTime::currentDateTime()) < 10)) ||
+            ((dlInfo->m_url.startsWith("myth://")) &&
+             (startedAt.secsTo(QDateTime::currentDateTime()) < 20))))
     {
         m_infoLock->unlock();
         m_queueWaitLock.lock();
