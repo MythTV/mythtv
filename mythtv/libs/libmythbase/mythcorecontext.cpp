@@ -615,9 +615,8 @@ QString MythCoreContext::GetMasterHostName(void)
     {
         QStringList strlist("QUERY_HOSTNAME");
 
-        SendReceiveStringList(strlist);
-
-        d->m_masterHostname = strlist[0];
+        if (SendReceiveStringList(strlist))
+            d->m_masterHostname = strlist[0];
     }
 
     QString ret = d->m_masterHostname;
