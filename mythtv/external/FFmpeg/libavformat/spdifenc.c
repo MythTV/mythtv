@@ -1,7 +1,7 @@
 /*
  * IEC958 muxer
  * Copyright (c) 2009 Bartlomiej Wolowiec
- * Copyright (c) 2010 Anssi Hannula <anssi.hannula@iki.fi>
+ * Copyright (c) 2010 Anssi Hannula
  * Copyright (c) 2010 Carl Eugen Hoyos
  *
  * This file is part of FFmpeg.
@@ -25,7 +25,6 @@
  * @file
  * IEC-61937 encapsulation of various formats, used by S/PDIF
  * @author Bartlomiej Wolowiec
- * @author Anssi Hannula
  */
 
 /*
@@ -47,7 +46,6 @@
 #include "spdif.h"
 #include "libavcodec/ac3.h"
 #include "libavcodec/dca.h"
-#include "libavcodec/dcadata.h"
 #include "libavcodec/aacadtsdec.h"
 
 typedef struct IEC958Context {
@@ -64,8 +62,6 @@ typedef struct IEC958Context {
     int hd_buf_size;                ///< size of the hd audio buffer
     int hd_buf_count;               ///< number of frames in the hd audio buffer
     int hd_buf_filled;              ///< amount of bytes in the hd audio buffer
-
-    int hd_skip;                    ///< counter used for skipping DTS-HD frames
 
     /// function, which generates codec dependent header information.
     /// Sets data_type and pkt_offset, and length_code, out_bytes, out_buf if necessary
@@ -86,21 +82,11 @@ static int spdif_header_ac3(AVFormatContext *s, AVPacket *pkt)
 static int spdif_header_eac3(AVFormatContext *s, AVPacket *pkt)
 {
     IEC958Context *ctx = s->priv_data;
-    static const int eac3_rates[3] = {48000, 44100, 32000};
     static const uint8_t eac3_repeat[4] = {6, 3, 2, 1};
-    int fscod = (pkt->data[4] & 0xc0) >> 6;
-    int cod2 = (pkt->data[4] & 0x30) >> 4;
     int repeat = 1;
-    int rate = 0;
 
-    if (fscod != 0x11) { /* no fscod2 */
-        rate = eac3_rates[fscod];
-        repeat = eac3_repeat[cod2]; /* numblkscod */
-    } else if (cod2 != 0x11) /* not reserved */
-        rate = eac3_rates[cod2] / 2; /* fscod2 */
-
-    /* output bitrate is 4x 16bit stereo at content sample rate */
-    s->bit_rate = 4 * 16 * 2 * rate;
+    if ((pkt->data[4] & 0xc0) != 0xc0) /* fscod */
+        repeat = eac3_repeat[(pkt->data[4] & 0x30) >> 4]; /* numblkscod */
 
     ctx->hd_buf = av_fast_realloc(ctx->hd_buf, &ctx->hd_buf_size, ctx->hd_buf_filled + pkt->size);
     if (!ctx->hd_buf)
@@ -113,58 +99,15 @@ static int spdif_header_eac3(AVFormatContext *s, AVPacket *pkt)
         ctx->pkt_offset = 0;
         return 0;
     }
-    ctx->data_type  = IEC958_EAC3;
-    ctx->pkt_offset = 24576;
-    ctx->out_buf    = ctx->hd_buf;
-    ctx->out_bytes  = ctx->hd_buf_filled;
+    ctx->data_type   = IEC958_EAC3;
+    ctx->pkt_offset  = 24576;
+    ctx->out_buf     = ctx->hd_buf;
+    ctx->out_bytes   = ctx->hd_buf_filled;
     ctx->length_code = ctx->hd_buf_filled;
 
-    ctx->hd_buf_count = 0;
+    ctx->hd_buf_count  = 0;
     ctx->hd_buf_filled = 0;
     return 0;
-}
-
-/*
- * DTS type IV (DTS-HD) can be transmitted with various frame repetition
- * periods; longer repetition periods allow for longer packets and therefore
- * higher bitrate. We don't have information about the maximum bitrate of the
- * incoming DTS-HD stream, so we use a repetition period which uses a stream
- * bitrate of 24.5 Mbps (which is the maximum allowed bitrate on bluray and
- * HDMI, 768 kHz IEC 60958 link) whenever possible.
- * The repetition period is measured in IEC 60958 frames (4 bytes).
- */
-enum {
-    DTS4_REP_PER_512   = 0x0,
-    DTS4_REP_PER_1024  = 0x1,
-    DTS4_REP_PER_2048  = 0x2,
-    DTS4_REP_PER_4096  = 0x3,
-    DTS4_REP_PER_8192  = 0x4,
-    DTS4_REP_PER_16384 = 0x5,
-};
-
-static void spdif_dts4_set_type(IEC958Context *ctx, int max_offset)
-{
-    ctx->data_type = IEC958_DTSHD;
-
-    if (max_offset >= 65536) {
-        ctx->pkt_offset = 65536;
-        ctx->data_type |= DTS4_REP_PER_16384 << 8;
-    } else if (max_offset >= 32768) {
-        ctx->pkt_offset = 32768;
-        ctx->data_type |= DTS4_REP_PER_8192 << 8;
-    } else if (max_offset >= 16384) {
-        ctx->pkt_offset = 16384;
-        ctx->data_type |= DTS4_REP_PER_4096 << 8;
-    } else if (max_offset >= 8192) {
-        ctx->pkt_offset = 8192;
-        ctx->data_type |= DTS4_REP_PER_2048 << 8;
-    } else if (max_offset >= 4096) {
-        ctx->pkt_offset = 4096;
-        ctx->data_type |= DTS4_REP_PER_1024 << 8;
-    } else {
-        ctx->pkt_offset = 2048;
-        ctx->data_type |= DTS4_REP_PER_512 << 8;
-    }
 }
 
 static int spdif_header_dts(AVFormatContext *s, AVPacket *pkt)
@@ -172,54 +115,26 @@ static int spdif_header_dts(AVFormatContext *s, AVPacket *pkt)
     IEC958Context *ctx = s->priv_data;
     uint32_t syncword_dts = AV_RB32(pkt->data);
     int blocks;
-    int sample_rate;
-    int core_size = 0;
-
-    if (pkt->size < 16)
-        return AVERROR_INVALIDDATA;
 
     switch (syncword_dts) {
     case DCA_MARKER_RAW_BE:
         blocks = (AV_RB16(pkt->data + 4) >> 2) & 0x7f;
-        core_size = ((AV_RB24(pkt->data + 5) >> 4) & 0x3fff) + 1;
-        sample_rate = dca_sample_rates[(pkt->data[8] >> 2) & 0x0f];
         break;
     case DCA_MARKER_RAW_LE:
         blocks = (AV_RL16(pkt->data + 4) >> 2) & 0x7f;
-        core_size = (((pkt->data[4] & 0x03) << 12)
-                    | (AV_RL16(pkt->data + 6) >> 4)) + 1;
-        sample_rate = dca_sample_rates[(pkt->data[9] >> 2) & 0x0f];
         break;
     case DCA_MARKER_14B_BE:
         blocks =
             (((pkt->data[5] & 0x07) << 4) | ((pkt->data[6] & 0x3f) >> 2));
-        core_size = (((AV_RB16(pkt->data + 6) & 0x3ff) << 4)
-                    | ((pkt->data[8] & 0x3c) >> 2) + 1) * 8 / 7;
-        sample_rate = dca_sample_rates[pkt->data[9] & 0x0f];
         break;
     case DCA_MARKER_14B_LE:
         blocks =
             (((pkt->data[4] & 0x07) << 4) | ((pkt->data[7] & 0x3f) >> 2));
-        core_size = (((AV_RL16(pkt->data + 6) & 0x3ff) << 4)
-                    | ((pkt->data[9] & 0x3c) >> 2) + 1) * 8 / 7;
-        sample_rate = dca_sample_rates[pkt->data[8] & 0x0f];
         break;
-    case DCA_HD_MARKER:
-        /* DCA-HD frames are only valid when paired with DCA core */
-        av_log(s, AV_LOG_DEBUG, "ignoring stray DTS-HD frame\n");
-        ctx->pkt_offset = 0;
-        return 0;
     default:
         av_log(s, AV_LOG_ERROR, "bad DTS syncword 0x%x\n", syncword_dts);
-        return 0 /*-1*/;
-    }
-
-    if (s->mux_rate && s->mux_rate < sample_rate * 32) {
-        av_log(s, AV_LOG_ERROR, "DTS bitrate exceeds specified limit\n");
         return -1;
     }
-
-        //av_log(s, AV_LOG_ERROR, "SYNC MARK %x, SAMPLE RATE %d, CORE SIZE %d, PKTSIZE %d\n", syncword_dts, sample_rate, core_size, pkt->size);
     blocks++;
     switch (blocks) {
     case  512 >> 5: ctx->data_type = IEC958_DTS1; break;
@@ -228,70 +143,9 @@ static int spdif_header_dts(AVFormatContext *s, AVPacket *pkt)
     default:
         av_log(s, AV_LOG_ERROR, "%i samples in DTS frame not supported\n",
                blocks << 5);
-        /* if such streams really exist, it might be possible to handle them
-         * as low bitrate DTS type IV (i.e. like DTS-HD) */
-        av_log_ask_for_sample(s, NULL);
         return -1;
     }
-
     ctx->pkt_offset = blocks << 7;
-    s->bit_rate     = sample_rate * 32;
-
-    /* discard any extra data or padding by default */
-    if (core_size < pkt->size) {
-        ctx->out_bytes = core_size;
-        ctx->length_code = core_size << 3;
-    }
-
-    /* check for a DTS-HD stream */
-    if (core_size + 3 < pkt->size
-        && AV_RB32(pkt->data + core_size) == DCA_HD_MARKER) {
-        const char dtshd_start_code[10] = { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfe, 0xfe };
-        int pkt_size = pkt->size;
-        int max_rate = s->mux_rate;
-
-        if (!max_rate)
-            max_rate = 768000 * 32; /* 768kHz IEC958 link, limit of HDMI v1.3a */
-
-        /* check for a too low rate for reasonable DCA-HD streams,
-         * e.g. in case of a non-HDMI S/PDIF link with less than 192kHz */
-        if (max_rate < 192000 * 32)
-            return 0; /* mux core only */
-
-        /* determine the pkt_offset and DTS IV subtype so that we get as close
-         * as possible to the requested rate while not exceeding it */
-        spdif_dts4_set_type(ctx, max_rate / sample_rate * (blocks << 5) / 8);
-        /* export the final bitrate in bit_rate */
-        s->bit_rate = sample_rate * ctx->pkt_offset / (blocks << 5) * 8;
-
-        /* If the bitrate is too high for transmitting at the selected
-         * repetition period setting, strip DTS-HD until a good amount
-         * of consecutive non-overflowing HD frames have been observed. */
-        if (sizeof(dtshd_start_code) + 2 + pkt_size
-                > ctx->pkt_offset - BURST_HEADER_SIZE) {
-            if (!ctx->hd_skip)
-                av_log(s, AV_LOG_WARNING, "DTS-HD bitrate too high, "
-                                          "temporarily sending core only\n");
-            ctx->hd_skip = sample_rate * 60 / (blocks << 5); /* 1 min */
-        }
-        if (ctx->hd_skip) {
-            pkt_size = core_size;
-            --ctx->hd_skip;
-        }
-
-        ctx->hd_buf = av_fast_realloc(ctx->hd_buf, &ctx->hd_buf_size,
-                                      sizeof(dtshd_start_code) + 2 + pkt_size);
-        if (!ctx->hd_buf)
-            return AVERROR(ENOMEM);
-
-        memcpy(ctx->hd_buf, dtshd_start_code, sizeof(dtshd_start_code));
-        AV_WB16(ctx->hd_buf + sizeof(dtshd_start_code), pkt_size);
-        memcpy(ctx->hd_buf + sizeof(dtshd_start_code) + 2, pkt->data, pkt_size);
-
-        ctx->out_buf     = ctx->hd_buf;
-        ctx->out_bytes   = sizeof(dtshd_start_code) + 2 + pkt_size;
-        ctx->length_code = ctx->out_bytes;
-    }
 
     return 0;
 }
@@ -422,7 +276,6 @@ static int spdif_header_truehd(AVFormatContext *s, AVPacket *pkt)
 static int spdif_write_header(AVFormatContext *s)
 {
     IEC958Context *ctx = s->priv_data;
-    int min_mux_rate = 0;
 
     switch (s->streams[0]->codec->codec_id) {
     case CODEC_ID_AC3:
@@ -430,8 +283,6 @@ static int spdif_write_header(AVFormatContext *s)
         break;
     case CODEC_ID_EAC3:
         ctx->header_info = spdif_header_eac3;
-        /* 4 * 16kHz IEC 60958 link */
-        min_mux_rate = 4 * 16000 * 32;
         break;
     case CODEC_ID_MP1:
     case CODEC_ID_MP2:
@@ -449,19 +300,11 @@ static int spdif_write_header(AVFormatContext *s)
         ctx->hd_buf = av_malloc(MAT_FRAME_SIZE);
         if (!ctx->hd_buf)
             return AVERROR(ENOMEM);
-        /* 705.6kHz IEC 60958 link */
-        min_mux_rate = 705600 * 32;
         break;
     default:
         av_log(s, AV_LOG_ERROR, "codec not supported\n");
         return -1;
     }
-
-    if (s->mux_rate && s->mux_rate < min_mux_rate) {
-        av_log(s, AV_LOG_ERROR, "stream bitrate exceeds specified limit\n");
-        return AVERROR(EINVAL);
-    }
-
     return 0;
 }
 
