@@ -601,7 +601,7 @@ MythMediaStatus MythCDROMLinux::checkMedia()
 
 MythMediaError MythCDROMLinux::lock()
 {
-    MediaError ret = MythMediaDevice::lock();
+    MythMediaError ret = MythMediaDevice::lock();
     if (ret == MEDIAERR_OK)
         ioctl(m_DeviceHandle, CDROM_LOCKDOOR, 1);
 
