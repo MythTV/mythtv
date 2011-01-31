@@ -441,7 +441,10 @@ int Transcode::TranscodeFile(
             long long lastFrame = (long long)m_proginfo->
                                              GetLastFrameInPosMap() + 60;
             if (lastFrame > lastStart)
+            {
+                new_frame_count -= (lastFrame - lastStart);
                 cutStr += QString("%1").arg(lastFrame);
+            }
         }
         VERBOSE(VB_GENERAL, QString("Cutlist        : %1").arg(cutStr));
         VERBOSE(VB_GENERAL, QString("Original Length: %1 frames")
