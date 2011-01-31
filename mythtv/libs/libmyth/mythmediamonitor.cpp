@@ -410,7 +410,7 @@ void MediaMonitor::StartMonitoring(void)
     if (!m_Thread)
         m_Thread = new MonitorThread(this, m_MonitorPollingInterval);
 
-    qRegisterMetaType<MythMediaStatus>("MediaStatus");
+    qRegisterMetaType<MythMediaStatus>("MythMediaStatus");
 
     VERBOSE(VB_MEDIA, "Starting MediaMonitor");
     m_Active = true;

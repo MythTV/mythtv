@@ -507,7 +507,7 @@ void MediaMonitorDarwin::StartMonitoring(void)
     if (!m_Thread)
         m_Thread = new MonitorThreadDarwin(this, m_MonitorPollingInterval);
 
-    qRegisterMetaType<MythMediaStatus>("MediaStatus");
+    qRegisterMetaType<MythMediaStatus>("MythMediaStatus");
 
     VERBOSE(VB_MEDIA, "Starting MediaMonitor");
     m_Active = true;
@@ -540,8 +540,8 @@ bool MediaMonitorDarwin::AddDevice(MythMediaDevice* pDevice)
     if (m_SendEvent)
     {
         pDevice->setStatus(MEDIASTAT_NODISK);
-        connect(pDevice, SIGNAL(statusChanged(MediaStatus, MythMediaDevice*)),
-                this, SLOT(mediaStatusChanged(MediaStatus, MythMediaDevice*)));
+        connect(pDevice, SIGNAL(statusChanged(MythMediaStatus, MythMediaDevice*)),
+                this, SLOT(mediaStatusChanged(MythMediaStatus, MythMediaDevice*)));
         pDevice->setStatus(MEDIASTAT_USEABLE);
     }
 
