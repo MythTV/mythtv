@@ -94,6 +94,9 @@ class DecoderBase
                          char testbuf[kDecoderProbeBufferSize],
                          int testbufsize = kDecoderProbeBufferSize) = 0;
 
+    virtual void SetEof(bool eof)  { ateof = eof;  }
+    bool         GetEof(void)      { return ateof; }
+
     void setExactSeeks(bool exact) { exactseeks = exact; }
     bool getExactSeeks(void) const { return exactseeks;  }
     void setLiveTVMode(bool live)  { livetv = live;      }

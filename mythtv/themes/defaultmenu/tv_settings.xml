@@ -4,7 +4,7 @@
     <button>
         <type>TV_SETTINGS_GENERAL</type>
         <text>General</text>
-        <description>TV navigation and recording preferences</description>
+        <description>General video and recording preferences</description>
         <action>SETTINGS GENERAL</action>
     </button>
 
@@ -18,14 +18,14 @@
     <button>
         <type>TV_SETTINGS_PLAYBACK</type>
         <text>Playback</text>
-        <description>Settings for viewing and playing TV</description>
+        <description>Settings for viewing and playing video content</description>
         <action>SETTINGS PLAYBACK</action>
     </button>
 
     <button>
         <type>TV_SETTINGS_PLAYBACK_OSD</type>
         <text>Playback OSD</text>
-        <description>Theme and settings for OSD</description>
+        <description>Settings for the On Screen Display</description>
         <action>SETTINGS OSD</action>
     </button>
 

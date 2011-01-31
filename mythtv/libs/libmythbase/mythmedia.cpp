@@ -126,7 +126,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
                 .arg(m_DevicePath);
 
         VERBOSE(VB_MEDIA, QString("Executing '%1'").arg(MountCommand));
-        if (myth_system(MountCommand, kMSDontBlockInputDevs) != GENERIC_EXIT_OK)
+        if (myth_system(MountCommand, kMSDontBlockInputDevs) == GENERIC_EXIT_OK)
         {
             if (DoMount)
             {

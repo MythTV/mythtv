@@ -17,7 +17,7 @@
 #include <QEvent>
 #include <QCoreApplication>
 
-// Libmythdb
+// libmythbase
 #include "mythverbose.h"
 
 // Mythui

@@ -493,6 +493,8 @@ typedef struct {
     uint32_t   param;
 } BD_EVENT;
 
+#define BLURAY_TITLE_FIRST_PLAY  0xffff
+#define BLURAY_TITLE_TOP_MENU    0
 /**
  *
  *  Get event from libbluray event queue.

@@ -18,19 +18,18 @@ HEADERS += audio/audiosettings.h audio/audiooutputsettings.h audio/pink.h
 HEADERS += backendselect.h dbsettings.h dialogbox.h
 HEADERS += generictree.h langsettings.h
 HEADERS += managedlist.h mythconfigdialogs.h mythconfiggroups.h
-HEADERS += mythcontext.h mythdeque.h mythdialogs.h
+HEADERS += mythcontext.h mythdialogs.h
 HEADERS += mythevent.h mythexp.h mythmediamonitor.h
 HEADERS += mythplugin.h mythpluginapi.h
 HEADERS += mythwidgets.h mythwizard.h schemawizard.h
 HEADERS += output.h
 HEADERS += settings.h
-HEADERS += uilistbtntype.h uitypes.h mythuifilebrowser.h
+HEADERS += uilistbtntype.h uitypes.h
 HEADERS += volumebase.h visual.h xmlparse.h
-HEADERS += mythhdd.h mythcdrom.h storagegroupeditor.h dbutil.h
+HEADERS += storagegroupeditor.h
 HEADERS += mythcommandlineparser.h mythterminal.h
-HEADERS += mythhttppool.h mythhttphandler.h
 HEADERS += remoteutil.h
-HEADERS += rawsettingseditor.h    autodeletedeque.h
+HEADERS += rawsettingseditor.h
 HEADERS += programinfo.h          programinfoupdater.h
 HEADERS += programtypes.h         recordingtypes.h
 HEADERS += mythrssmanager.h       netgrabbermanager.h
@@ -55,10 +54,9 @@ SOURCES += mythplugin.cpp
 SOURCES += mythwidgets.cpp mythwizard.cpp schemawizard.cpp
 SOURCES += output.cpp
 SOURCES += settings.cpp
-SOURCES += uilistbtntype.cpp uitypes.cpp util.cpp mythuifilebrowser.cpp
-SOURCES += mythhdd.cpp mythcdrom.cpp storagegroupeditor.cpp dbutil.cpp
+SOURCES += uilistbtntype.cpp uitypes.cpp util.cpp
+SOURCES += storagegroupeditor.cpp
 SOURCES += mythcommandlineparser.cpp mythterminal.cpp
-SOURCES += mythhttppool.cpp mythhttphandler.cpp
 SOURCES += remoteutil.cpp
 SOURCES += rawsettingseditor.cpp
 SOURCES += programinfo.cpp        programinfoupdater.cpp
@@ -71,18 +69,18 @@ SOURCES += virtualkeyboard_qt.cpp
 
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../libmythfreesurround
-INCLUDEPATH += ../libmythdb
+INCLUDEPATH += ../libmythbase
 INCLUDEPATH += ../.. ../ ./ ../libmythupnp ../libmythui
 INCLUDEPATH += ../../external/FFmpeg
 DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch
 DEPENDPATH += ../libmythfreesurround
-DEPENDPATH += ../ ../libmythui ../libmythdb
+DEPENDPATH += ../ ../libmythui ../libmythbase
 DEPENDPATH += ../libmythupnp
 DEPENDPATH += ./audio
 
 LIBS += -L../libmythsamplerate   -lmythsamplerate-$${LIBVERSION}
 LIBS += -L../libmythsoundtouch   -lmythsoundtouch-$${LIBVERSION}
-LIBS += -L../libmythdb           -lmythdb-$${LIBVERSION}
+LIBS += -L../libmythbase           -lmythbase-$${LIBVERSION}
 LIBS += -L../libmythui           -lmythui-$${LIBVERSION}
 LIBS += -L../libmythupnp         -lmythupnp-$${LIBVERSION}
 LIBS += -L../libmythfreesurround -lmythfreesurround-$${LIBVERSION}
@@ -105,15 +103,14 @@ inc.files += mythwidgets.h remotefile.h oldsettings.h volumecontrol.h
 inc.files += settings.h uitypes.h xmlparse.h mythplugin.h mythdialogs.h
 inc.files += audio/audiooutput.h audio/audiosettings.h
 inc.files += audio/audiooutputsettings.h
-inc.files += dbutil.h
-inc.files += inetcomms.h mythcdrom.h mythwizard.h schemawizard.h
+inc.files += inetcomms.h mythwizard.h schemawizard.h
 inc.files += uilistbtntype.h generictree.h managedlist.h mythmediamonitor.h
 inc.files += visual.h volumebase.h output.h langsettings.h
 inc.files += mythexp.h mythpluginapi.h storagegroupeditor.h
 inc.files += mythconfigdialogs.h mythconfiggroups.h
-inc.files += mythterminal.h mythdeque.h mythuifilebrowser.h
-inc.files += mythhttppool.h       remoteutil.h
-inc.files += programinfo.h        autodeletedeque.h
+inc.files += mythterminal.h
+inc.files += remoteutil.h
+inc.files += programinfo.h
 inc.files += programtypes.h       recordingtypes.h
 inc.files += mythrssmanager.h     netgrabbermanager.h
 inc.files += rssparse.h           netutils.h
@@ -168,8 +165,6 @@ mingw {
 macx {
     HEADERS += audio/audiooutputca.h
     SOURCES += audio/audiooutputca.cpp
-    HEADERS += mythcdrom-darwin.h
-    SOURCES += mythcdrom-darwin.cpp
 
     darwin_da {
         SOURCES -= mediamonitor-unix.cpp
@@ -190,16 +185,6 @@ macx {
 
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/$${FC}.framework/Frameworks
     LIBS           += -framework $$join(FWKS," -framework ")
-}
-
-linux {
-    SOURCES += mythcdrom-linux.cpp
-    HEADERS += mythcdrom-linux.h
-}
-
-freebsd {
-    SOURCES += mythcdrom-freebsd.cpp
-    HEADERS += mythcdrom-freebsd.h
 }
 
 INSTALLS += inc inc2

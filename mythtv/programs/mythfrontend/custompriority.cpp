@@ -4,7 +4,7 @@
 // qt
 #include <QSqlError>
 
-// libmythdb
+// libmythbase
 #include "mythdb.h"
 #include "mythverbose.h"
 

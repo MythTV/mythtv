@@ -147,8 +147,6 @@ class VideoOutput
 
     /// \brief Return true if HW Acceleration is running
     virtual bool hasHWAcceleration(void) const { return false; }
-    /// \brief Return true if video is automatically synced to the display rate
-    virtual bool IsSyncLocked(void) const      { return false; }
 
     /// \brief Sets the number of frames played
     virtual void SetFramesPlayed(long long fp) { framesPlayed = fp; };

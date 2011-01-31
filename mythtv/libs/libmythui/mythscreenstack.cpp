@@ -186,6 +186,15 @@ void MythScreenStack::GetDrawOrder(QVector<MythScreenType *> &screens)
     screens = m_DrawOrder;
 }
 
+void MythScreenStack::GetScreenList(QVector<MythScreenType *> &screens)
+{
+    if (m_InNewTransition)
+        CheckNewFadeTransition();
+    CheckDeletes();
+
+    screens = m_Children;
+}
+
 void MythScreenStack::ScheduleInitIfNeeded(void)
 {
     // make sure Init() is called outside the paintEvent

@@ -477,6 +477,8 @@ static void handleMedia(MythMediaDevice *cd)
         return;
     }
 
+    GetMythMainWindow()->JumpTo("Main Menu");
+
     if (gCoreContext->GetNumSetting("AutoPlayCD", 0))
     {
         // Empty the playlist to ensure CD is played first

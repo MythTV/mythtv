@@ -2695,18 +2695,67 @@ AutoExpireType ProgramInfo::QueryAutoExpire(void) const
     return kDisableAutoExpire;
 }
 
-void ProgramInfo::QueryCutList(frm_dir_map_t &delMap) const
+bool ProgramInfo::QueryCutList(frm_dir_map_t &delMap, bool loadAutoSave) const
 {
-    QueryMarkupMap(delMap, MARK_CUT_START);
-    QueryMarkupMap(delMap, MARK_CUT_END, true);
+    frm_dir_map_t autosaveMap;
+    QueryMarkupMap(autosaveMap, MARK_TMP_CUT_START);
+    QueryMarkupMap(autosaveMap, MARK_TMP_CUT_END, true);
+    QueryMarkupMap(autosaveMap, MARK_PLACEHOLDER, true);
+    bool result = !autosaveMap.isEmpty();
+
+    if (loadAutoSave)
+    {
+        // Convert the temporary marks into regular marks.
+        delMap.clear();
+        frm_dir_map_t::const_iterator i = autosaveMap.constBegin();
+        for (; i != autosaveMap.constEnd(); ++i)
+        {
+            uint64_t frame = i.key();
+            MarkTypes mark = i.value();
+            if (mark == MARK_TMP_CUT_START)
+                mark = MARK_CUT_START;
+            else if (mark == MARK_TMP_CUT_END)
+                mark = MARK_CUT_END;
+            delMap[frame] = mark;
+        }
+    }
+    else
+    {
+        QueryMarkupMap(delMap, MARK_CUT_START);
+        QueryMarkupMap(delMap, MARK_CUT_END, true);
+        QueryMarkupMap(delMap, MARK_PLACEHOLDER, true);
+    }
+
+    return result;
 }
 
-void ProgramInfo::SaveCutList(frm_dir_map_t &delMap) const
+void ProgramInfo::SaveCutList(frm_dir_map_t &delMap, bool isAutoSave) const
 {
-    ClearMarkupMap(MARK_CUT_START);
-    ClearMarkupMap(MARK_CUT_END);
+    if (!isAutoSave)
+    {
+        ClearMarkupMap(MARK_CUT_START);
+        ClearMarkupMap(MARK_CUT_END);
+    }
     ClearMarkupMap(MARK_PLACEHOLDER);
-    SaveMarkupMap(delMap);
+    ClearMarkupMap(MARK_TMP_CUT_START);
+    ClearMarkupMap(MARK_TMP_CUT_END);
+
+    frm_dir_map_t tmpDelMap;
+    frm_dir_map_t::const_iterator i = delMap.constBegin();
+    for (; i != delMap.constEnd(); ++i)
+    {
+        uint64_t frame = i.key();
+        MarkTypes mark = i.value();
+        if (isAutoSave)
+        {
+            if (mark == MARK_CUT_START)
+                mark = MARK_TMP_CUT_START;
+            else if (mark == MARK_CUT_END)
+                mark = MARK_TMP_CUT_END;
+        }
+        tmpDelMap[frame] = mark;
+    }
+    SaveMarkupMap(tmpDelMap);
 
     if (IsRecording())
     {

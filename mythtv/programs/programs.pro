@@ -5,7 +5,7 @@ TEMPLATE = subdirs
 # Directories
 using_frontend {
     SUBDIRS += mythavtest mythfrontend mythcommflag
-    SUBDIRS += mythtvosd mythjobqueue mythlcdserver
+    SUBDIRS += mythmessage mythjobqueue mythlcdserver
     SUBDIRS += mythwelcome mythshutdown
     SUBDIRS += mythpreviewgen
     !mingw: SUBDIRS += mythtranscode/replex

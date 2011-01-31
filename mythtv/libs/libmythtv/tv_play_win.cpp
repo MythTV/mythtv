@@ -35,6 +35,7 @@ bool TvPlayWindow::Create()
     m_progressBar = dynamic_cast<MythUIProgressBar*>(GetChild("progress"));
     if (m_progressBar)
     {
+        m_progressBar->SetVisible(false);
         m_progressBar->SetStart(0);
         m_progressBar->SetTotal(100);
         m_progressBar->SetUsed(m_progress);
@@ -51,6 +52,7 @@ void TvPlayWindow::UpdateProgress(void)
     if (m_progress > 100)
         m_progress = 0;
     m_progressBar->SetUsed(m_progress);
+    m_progressBar->SetVisible(true);
 }
 
 /** \brief Mouse click/movement handler, recieves mouse gesture events

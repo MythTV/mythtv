@@ -6,7 +6,9 @@
 #include <QDir>
 #include <QThreadPool>
 
-// libmythdb
+#include "stdlib.h"
+
+// libmythbase
 #include "compat.h"
 #include "mythcorecontext.h"
 #include "mythcoreutil.h"
@@ -110,6 +112,18 @@ class RemoteFileDownloadThread : public QRunnable
     MythDownloadInfo    *m_dlInfo;
 };
 
+/** \fn ShutdownMythDownloadManager(void)
+ *  \brief Deletes the running MythDownloadManager at program exit.
+ */
+static void ShutdownMythDownloadManager(void)
+{
+    if (downloadManager)
+    {
+        delete downloadManager;
+        downloadManager = NULL;
+    }
+}
+
 /** \fn GetMythDownloadManger(void)
  *  \brief Gets the pointer to the MythDownloadManager singleton.
  *  \return Pointer to the MythDownloadManager instance
@@ -128,6 +142,8 @@ MythDownloadManager *GetMythDownloadManager(void)
 
         while (!downloadManager->isRunning())
             usleep(10000);
+
+        atexit(ShutdownMythDownloadManager);
     }
 
     return downloadManager;
@@ -613,10 +629,16 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
     m_infoLock->unlock();
     m_queueWaitCond.wakeAll();
 
-    // sleep for 200ms at a time for up to 10 seconds waiting for the download
+    // timeout myth:// RemoteFile transfers 20 seconds from now
+    // timeout non-myth:// QNetworkAccessManager transfers 10 seconds after
+    //    their last progress update
+    QDateTime startedAt = QDateTime::currentDateTime();
     m_infoLock->lock();
     while ((!dlInfo->m_done) &&
-           (dlInfo->m_lastStat.secsTo(QDateTime::currentDateTime()) < 10))
+           (((!dlInfo->m_url.startsWith("myth://")) &&
+             (dlInfo->m_lastStat.secsTo(QDateTime::currentDateTime()) < 10)) ||
+            ((dlInfo->m_url.startsWith("myth://")) &&
+             (startedAt.secsTo(QDateTime::currentDateTime()) < 20))))
     {
         m_infoLock->unlock();
         m_queueWaitLock.lock();
@@ -778,6 +800,11 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
 
         m_downloadReplies[dlInfo->m_reply] = dlInfo;
 
+        connect(dlInfo->m_reply, SIGNAL(error(QNetworkReply::NetworkError)), this,
+                SLOT(downloadError(QNetworkReply::NetworkError)));
+        connect(dlInfo->m_reply, SIGNAL(downloadProgress(qint64, qint64)),
+                this, SLOT(downloadProgress(qint64, qint64))); 
+
         m_downloadReplies.remove(reply);
         reply->deleteLater();
     }
@@ -845,7 +872,7 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
             {
                 VERBOSE(VB_FILE+VB_EXTRA, QString("downloadFinished(%1): "
                         "COMPLETE: %2, sending event to caller")
-                        .arg(dlInfo->m_url));
+                        .arg((long long)dlInfo).arg(dlInfo->m_url));
 
                 QStringList args;
                 args << dlInfo->m_url;

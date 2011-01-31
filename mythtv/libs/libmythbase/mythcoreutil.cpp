@@ -26,7 +26,7 @@
 #include <QByteArray>
 #include <QStringList>
 
-// libmythdb headers
+// libmythbase headers
 #include "mythcorecontext.h"
 #include "mythverbose.h"
 #include "unzip.h"

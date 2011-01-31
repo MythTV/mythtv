@@ -10,6 +10,7 @@
 #include "xmlparsebase.h"
 #include "mythrect.h"
 #include "mythgesture.h"
+#include <mythmedia.h>
 
 class MythImage;
 class MythPainter;
@@ -131,6 +132,7 @@ class MPUBLIC MythUIType : public QObject, public XMLParseBase
 
     virtual bool keyPressEvent(QKeyEvent *);
     virtual bool gestureEvent(MythGestureEvent *);
+    virtual void mediaEvent(MediaEvent *);
 
     MythFontProperties *GetFont(const QString &text) const;
     bool AddFont(const QString &text, MythFontProperties *fontProp);

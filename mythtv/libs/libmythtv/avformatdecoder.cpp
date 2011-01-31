@@ -715,6 +715,18 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
     }
 }
 
+void AvFormatDecoder::SetEof(bool eof)
+{
+    if (!eof && ic && ic->pb)
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+            QString("Resetting byte context eof (livetv %1 was eof %2)")
+            .arg(livetv).arg(ic->pb->eof_reached));
+        ic->pb->eof_reached = 0;
+    }
+    DecoderBase::SetEof(eof);
+}
+
 void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset)
 {
     VERBOSE(VB_PLAYBACK, LOC + QString("Reset(%1, %2)")
@@ -3438,6 +3450,18 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
     int selTrack = (1 == numStreams) ? 0 : -1;
     int wlang    = wtrack.language;
 
+    if (selTrack < 0 && numStreams)
+    {
+        VERBOSE(VB_AUDIO, LOC + "Trying to select default track");
+        for (uint i = 0; i < atracks.size(); i++) {
+            int idx = atracks[i].av_stream_index;
+            if (ic->streams[idx]->disposition & AV_DISPOSITION_DEFAULT) {
+                selTrack = i;
+                break;
+            }
+        }
+    }
+
     if ((selTrack < 0) && (wtrack.av_substream_index >= 0))
     {
         VERBOSE(VB_AUDIO, LOC + "Trying to reselect audio sub-stream");
@@ -3920,8 +3944,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                 if (retval == -EAGAIN)
                     continue;
 
-                ateof = true;
-                m_parent->SetEof();
+                SetEof(true);
                 delete pkt;
                 return false;
             }

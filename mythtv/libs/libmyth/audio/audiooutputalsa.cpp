@@ -562,19 +562,18 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
 
 int AudioOutputALSA::GetBufferedOnSoundcard(void) const
 {
-
     if (pcm_handle == NULL)
     {
         VBERROR("getBufferedOnSoundcard() called with pcm_handle == NULL!");
         return 0;
     }
 
-    snd_pcm_sframes_t delay = 0, buffered = 0;
+    snd_pcm_sframes_t delay = 0;
 
-    if (snd_pcm_avail_delay(pcm_handle, &buffered, &delay) < 0)
-    {
+    /* Delay is the total delay from writing to the pcm until the samples
+       hit the DAC - includes buffered samples and any fixed latencies */
+    if (snd_pcm_delay(pcm_handle, &delay) < 0)
         return 0;
-    }
 
     snd_pcm_state_t state = snd_pcm_state(pcm_handle);
 
@@ -584,21 +583,10 @@ int AudioOutputALSA::GetBufferedOnSoundcard(void) const
     }
     else
     {
-        delay = 00;
+        delay = 0;
     }
 
-    if (buffered < 0)
-    {
-        buffered = 0;
-    }
-
-    buffered *= output_bytes_per_frame;
-    if (buffered > soundcard_buffer_size)
-    {
-        buffered = soundcard_buffer_size;
-    }
-
-    return delay + buffered;
+    return delay;
 }
 
 /*

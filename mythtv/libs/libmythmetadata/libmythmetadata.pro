@@ -22,18 +22,18 @@ SOURCES += videometadata.cpp  videometadatalistmanager.cpp
 SOURCES += metadatacommon.cpp metadatadownload.cpp metadataimagedownload.cpp
 SOURCES += bluraymetadata.cpp
 
-INCLUDEPATH += ../libmythdb ../libmythtv
+INCLUDEPATH += ../libmythbase ../libmythtv
 INCLUDEPATH += ../.. ../ ./ ../libmythupnp ../libmythui
 INCLUDEPATH += ../../external/FFmpeg ../libmyth ../libmythbluray
 DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch
 DEPENDPATH += ../libmythfreesurround
-DEPENDPATH += ../ ../libmythui ../libmythdb
+DEPENDPATH += ../ ../libmythui ../libmythbase
 DEPENDPATH += ../libmythupnp ../libmythtv ../libmyth
 DEPENDPATH += ../libmythbluray
 
 LIBS += -L../libmythsamplerate   -lmythsamplerate-$${LIBVERSION}
 LIBS += -L../libmythsoundtouch   -lmythsoundtouch-$${LIBVERSION}
-LIBS += -L../libmythdb           -lmythdb-$${LIBVERSION}
+LIBS += -L../libmythbase           -lmythbase-$${LIBVERSION}
 LIBS += -L../libmythui           -lmythui-$${LIBVERSION}
 LIBS += -L../libmythupnp         -lmythupnp-$${LIBVERSION}
 LIBS += -L../libmythfreesurround -lmythfreesurround-$${LIBVERSION}

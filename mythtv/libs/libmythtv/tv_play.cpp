@@ -514,7 +514,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "NEXTSOURCE", QT_TRANSLATE_NOOP("MythControls",
             "Next Video Source"), "Y");
     REG_KEY("TV Playback", "PREVSOURCE", QT_TRANSLATE_NOOP("MythControls",
-            "Previous Video Source"), "Ctrl+Y");
+            "Previous Video Source"), "");
     REG_KEY("TV Playback", "NEXTINPUT", QT_TRANSLATE_NOOP("MythControls",
             "Next Input"), "C");
     REG_KEY("TV Playback", "NEXTCARD", QT_TRANSLATE_NOOP("MythControls",
@@ -712,9 +712,9 @@ void TV::InitKeys(void)
     REG_KEY("TV Editing", ACTION_INVERTMAP,   QT_TRANSLATE_NOOP("MythControls",
             "Invert Begin/End cut points"),"I");
     REG_KEY("TV Editing", ACTION_SAVEMAP,     QT_TRANSLATE_NOOP("MythControls",
-            "Save cut list"),"");
+            "Save cuts"),"");
     REG_KEY("TV Editing", ACTION_LOADCOMMSKIP,QT_TRANSLATE_NOOP("MythControls",
-            "Load cut list from commercial skips"), "Z,End");
+            "Load cuts from detected commercials"), "Z,End");
     REG_KEY("TV Editing", ACTION_NEXTCUT,     QT_TRANSLATE_NOOP("MythControls",
             "Jump to the next cut point"), "PgDown");
     REG_KEY("TV Editing", ACTION_PREVCUT,     QT_TRANSLATE_NOOP("MythControls",
@@ -8908,7 +8908,18 @@ void TV::ShowOSDCutpoint(PlayerContext *ctx, const QString &type)
             osd->DialogAddButton(QObject::tr("Add New Cut"),
                                  QString("DIALOG_CUTPOINT_NEWCUT_%1")
                                          .arg(frame));
+            osd->DialogAddButton(QObject::tr("Join Surrounding Cuts"),
+                                 QString("DIALOG_CUTPOINT_DELETE_%1")
+                                         .arg(frame));
         }
+        if (ctx->player->DeleteMapHasUndo())
+            osd->DialogAddButton(QObject::tr("Undo") + " - " +
+                                 ctx->player->DeleteMapGetUndoMessage(),
+                                 QString("DIALOG_CUTPOINT_UNDO_0"));
+        if (ctx->player->DeleteMapHasRedo())
+            osd->DialogAddButton(QObject::tr("Redo") + " - " +
+                                 ctx->player->DeleteMapGetRedoMessage(),
+                                 QString("DIALOG_CUTPOINT_REDO_0"));
         if ("EDIT_CUT_POINTS" == type)
             osd->DialogAddButton(QObject::tr("Cut List Options"),
                                  "DIALOG_CUTPOINT_CUTLISTOPTIONS_0", true);
@@ -8917,28 +8928,28 @@ void TV::ShowOSDCutpoint(PlayerContext *ctx, const QString &type)
     {
         osd->DialogShow(OSD_DLG_CUTPOINT,
                         QObject::tr("Cut List Options"));
-        osd->DialogAddButton(QObject::tr("Clear Cut List"),
+        osd->DialogAddButton(QObject::tr("Clear Cuts"),
                              "DIALOG_CUTPOINT_CLEARMAP_0");
-        osd->DialogAddButton(QObject::tr("Invert Cut List"),
+        osd->DialogAddButton(QObject::tr("Reverse Cuts"),
                              "DIALOG_CUTPOINT_INVERTMAP_0");
         osd->DialogAddButton(QObject::tr("Undo Changes"),
                              "DIALOG_CUTPOINT_REVERT_0");
         osd->DialogAddButton(QObject::tr("Exit Without Saving"),
                              "DIALOG_CUTPOINT_REVERTEXIT_0");
-        osd->DialogAddButton(QObject::tr("Save Cut List"),
+        osd->DialogAddButton(QObject::tr("Save Cuts"),
                              "DIALOG_CUTPOINT_SAVEMAP_0");
-        osd->DialogAddButton(QObject::tr("Save Cut List and Exit"),
+        osd->DialogAddButton(QObject::tr("Save Cuts and Exit"),
                              "DIALOG_CUTPOINT_SAVEEXIT_0");
     }
     else if ("EXIT_EDIT_MODE" == type)
     {
         osd->DialogShow(OSD_DLG_CUTPOINT,
-                        QObject::tr("Exit Cut List Editor"));
-        osd->DialogAddButton(QObject::tr("Save Cut List and Exit"),
+                        QObject::tr("Exit Recording Editor"));
+        osd->DialogAddButton(QObject::tr("Save Cuts and Exit"),
                              "DIALOG_CUTPOINT_SAVEEXIT_0");
         osd->DialogAddButton(QObject::tr("Exit Without Saving"),
                              "DIALOG_CUTPOINT_REVERTEXIT_0");
-        osd->DialogAddButton(QObject::tr("Save Cut List"),
+        osd->DialogAddButton(QObject::tr("Save Cuts"),
                              "DIALOG_CUTPOINT_SAVEMAP_0");
         osd->DialogAddButton(QObject::tr("Undo Changes"),
                              "DIALOG_CUTPOINT_REVERT_0");
@@ -10190,7 +10201,8 @@ void TV::FillOSDMenuNavigate(const PlayerContext *ctx, OSD *osd,
     int num_angles    = GetNumAngles(ctx);
     TVState state     = ctx->GetState();
     bool isdvd        = state == kState_WatchingDVD;
-    bool isbd         = state == kState_WatchingBD;
+    bool isbd         = ctx->buffer && ctx->buffer->IsBD() &&
+                        ctx->buffer->BD()->IsHDMVNavigation();
     bool islivetv     = StateIsLiveTV(state);
     bool isrecording  = state == kState_WatchingPreRecorded;
     bool previouschan = false;
@@ -10224,7 +10236,6 @@ void TV::FillOSDMenuNavigate(const PlayerContext *ctx, OSD *osd,
                                  "DIALOG_MENU_COMMSKIP_0",
                                  true, selected == "COMMSKIP");
         }
-        // FIXME need to check whether we are in HDMV navigation mode
         if (isbd)
         {
             osd->DialogAddButton(tr("Top menu"), ACTION_JUMPTODVDROOTMENU);

@@ -10,13 +10,6 @@
     </button>
 
     <button>
-        <type>SETUP_KEYS</type>
-        <text>Edit Keys</text>
-        <description>Change MythTV key bindings.</description>
-        <action>SETUP_KEYS</action>
-    </button>
-
-    <button>
         <type>SETUP_MENU</type>
         <text>Setup</text>
         <description>Configure MythTV and plugins</description>

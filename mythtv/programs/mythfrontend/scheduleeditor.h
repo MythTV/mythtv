@@ -4,13 +4,13 @@
 #include "mythscreentype.h"
 #include "schedulecommon.h"
 
-// LibmythDB
+// libmythbase
 #include "mythdb.h"
 
-// Libmyth
+// libmyth
 #include "mythcontext.h"
 
-// Libmythtv
+// libmythtv
 #include "recordingrule.h"
 #include "recordinginfo.h"
 

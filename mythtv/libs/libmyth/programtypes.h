@@ -40,6 +40,8 @@ typedef QMap<uint64_t, uint64_t> frm_pos_map_t;
 typedef enum {
     MARK_ALL           = -100,
     MARK_UNSET         = -10,
+    MARK_TMP_CUT_END   = -5,
+    MARK_TMP_CUT_START = -4,
     MARK_UPDATED_CUT   = -3,
     MARK_PLACEHOLDER   = -2,
     MARK_CUT_END       = 0,

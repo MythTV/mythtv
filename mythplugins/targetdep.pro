@@ -16,6 +16,6 @@ DEPLIBS = $${LIBDIR}
 mingw : DEPLIBS = $${PREFIX}/bin
 
 TARGETDEPS += $${DEPLIBS}/libmyth-$${MYTH_SHLIB_EXT}
-TARGETDEPS += $${DEPLIBS}/libmythdb-$${MYTH_SHLIB_EXT}
+TARGETDEPS += $${DEPLIBS}/libmythbase-$${MYTH_SHLIB_EXT}
 TARGETDEPS += $${DEPLIBS}/libmythui-$${MYTH_SHLIB_EXT}
 TARGETDEPS += $${DEPLIBS}/libmythupnp-$${MYTH_SHLIB_EXT}

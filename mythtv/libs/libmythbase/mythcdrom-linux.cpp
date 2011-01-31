@@ -14,6 +14,9 @@
 #include "mythcdrom-linux.h"
 #include "mythconfig.h"      // for HAVE_BIGENDIAN
 #include "mythverbose.h"
+#ifdef USING_LIBUDF
+#include <cdio/udf.h>
+#endif
 
 #define LOC     QString("MythCDROMLinux:")
 #define LOC_ERR QString("MythCDROMLinux, Error: ")
@@ -382,12 +385,12 @@ MediaStatus MythCDROMLinux::checkMedia()
     switch (driveStatus())
     {
         case CDS_DISC_OK:
-            VERBOSE(VB_MEDIA, m_DevicePath + " Disk OK, type = "
+            VERBOSE(VB_MEDIA|VB_EXTRA, m_DevicePath + " Disk OK, type = "
                               + MediaTypeString(m_MediaType) );
             // further checking is required
             break;
         case CDS_TRAY_OPEN:
-            VERBOSE(VB_MEDIA, m_DevicePath + " Tray open or no disc");
+            VERBOSE(VB_MEDIA|VB_EXTRA, m_DevicePath + " Tray open or no disc");
             // First, send a message to the
             // plugins to forget the current media type
             setStatus(MEDIASTAT_OPEN, OpenedHere);
@@ -396,13 +399,13 @@ MediaStatus MythCDROMLinux::checkMedia()
             return MEDIASTAT_OPEN;
             break;
         case CDS_NO_DISC:
-            VERBOSE(VB_MEDIA, m_DevicePath + " No disc");
+            VERBOSE(VB_MEDIA|VB_EXTRA, m_DevicePath + " No disc");
             m_MediaType = MEDIATYPE_UNKNOWN;
             return setStatus(MEDIASTAT_NODISK, OpenedHere);
             break;
         case CDS_NO_INFO:
         case CDS_DRIVE_NOT_READY:
-            VERBOSE(VB_MEDIA, m_DevicePath + " No info or drive not ready");
+            VERBOSE(VB_MEDIA|VB_EXTRA, m_DevicePath + " No info or drive not ready");
             m_MediaType = MEDIATYPE_UNKNOWN;
             return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
         default:
@@ -484,7 +487,33 @@ MediaStatus MythCDROMLinux::checkMedia()
                 }
 
                 VERBOSE(VB_MEDIA, QString("Volume ID: %1").arg(m_VolumeID));
+#ifdef USING_LIBUDF
+                // Check for a DVD/BD disk by reading the UDF root dir.
+                // This allows DVD's to play immediately upon insertion without
+                // calling mount, which either needs pmount or changes to fstab.
+                udf_t *pUdf = udf_open(m_DevicePath.toAscii());
+                if (NULL != pUdf)
+                {
+                    udf_dirent_t *pUdfRoot = udf_get_root(pUdf, true, 0);
+                    if (NULL != pUdfRoot)
+                    {
+                        if (NULL != udf_fopen(pUdfRoot, "VIDEO_TS"))
+                            m_MediaType = MEDIATYPE_DVD;
+                        else if (NULL != udf_fopen(pUdfRoot, "BDMV"))
+                            m_MediaType = MEDIATYPE_BD;
 
+                        udf_dirent_free(pUdfRoot);
+                    }
+                    udf_close(pUdf);
+
+                    if (MEDIATYPE_DATA != m_MediaType)
+                    {
+                        // pretend we're NOTMOUNTED so setStatus emits a signal
+                        m_Status = MEDIASTAT_NOTMOUNTED;
+                        return setStatus(MEDIASTAT_USEABLE, OpenedHere);
+                    }
+                }
+#endif
                 // the base class's onDeviceMounted will do fine
                 // grained detection of the type of data on this disc
                 if (isMounted())

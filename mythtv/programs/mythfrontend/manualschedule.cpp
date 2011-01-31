@@ -4,7 +4,7 @@
 // qt
 #include <QDateTime>
 
-// libmythdb
+// libmythbase
 #include "mythdbcon.h"
 #include "mythverbose.h"
 

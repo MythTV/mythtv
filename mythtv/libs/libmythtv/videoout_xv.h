@@ -74,7 +74,6 @@ class VideoOutputXv : public VideoOutput
     virtual bool IsPBPSupported(void) const
         { return XVideo == VideoOutputSubType(); }
     virtual bool NeedExtraAudioDecode(void) const { return false; }
-    virtual bool hasHWAcceleration(void) const    { return false; }
 
     virtual QRect GetPIPRect(PIPLocation  location,
                              MythPlayer  *pipplayer = NULL,

@@ -56,7 +56,8 @@ class VideoFilterSettings
         kOrderByLength = 3,
         kOrderByFilename = 4,
         kOrderByID = 5,
-        kOrderBySeasonEp = 6
+        kOrderBySeasonEp = 6,
+        kOrderByDateAddedDescending = 7
     };
 
     int GetCategory() const { return category; }

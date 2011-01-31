@@ -22,6 +22,8 @@ extern "C" {
 #define LOC QString("GLVid: ")
 #define LOC_ERR QString("GLVid, Error: ")
 
+#define COLOUR_UNIFORM "m_colourMatrix"
+
 class OpenGLFilter
 {
     public:
@@ -1040,7 +1042,8 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         }
 
         if (type == kGLFilterYUV2RGB)
-            gl_context->SetProgramParams(program, colourSpace->GetMatrix());
+            gl_context->SetProgramParams(program, colourSpace->GetMatrix(),
+                                         COLOUR_UNIFORM);
 
         gl_context->DrawBitmap(textures, texture_count, target, &trect, &vrect,
                                program);
@@ -1569,6 +1572,8 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
     string.replace("%5", QString::number(colWidth, 'f', 8));
     string.replace("%6", QString::number((float)fb_size.width(), 'f', 1));
     string.replace("%7", QString::number((float)fb_size.height(), 'f', 1));
+
+    string.replace("COLOUR_UNIFORM", COLOUR_UNIFORM);
 }
 
 static const QString YUV2RGBVertexShader =
@@ -1583,37 +1588,37 @@ static const QString YUV2RGBVertexShader =
 static const QString YUV2RGBFragmentShader =
 "GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0;\n"
-"uniform mat4 m_colourMatrix;\n"
+"uniform mat4 COLOUR_UNIFORM;\n"
 "varying vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
 "    vec4 yuva    = GLSL_TEXTURE(s_texture0, v_texcoord0);\n"
-"    vec4 res     = vec4(yuva.arb, 1.0) * m_colourMatrix;\n"
+"    vec4 res     = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
 "    gl_FragColor = vec4(res.rgb, yuva.g);\n"
 "}\n";
 
 static const QString OneFieldShader[2] = {
 "GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0;\n"
-"uniform mat4 m_colourMatrix;\n"
+"uniform mat4 COLOUR_UNIFORM;\n"
 "varying vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
 "    vec2 field   = vec2(0.0, step(0.5, fract(v_texcoord0.y * %2)) * %3);\n"
 "    vec4 yuva    = GLSL_TEXTURE(s_texture0, v_texcoord0 + field);\n"
-"    vec4 res     = vec4(yuva.arb, 1.0) * m_colourMatrix;\n"
+"    vec4 res     = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
 "    gl_FragColor = vec4(res.rgb, yuva.g);\n"
 "}\n",
 
 "GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0;\n"
-"uniform mat4 m_colourMatrix;\n"
+"uniform mat4 COLOUR_UNIFORM;\n"
 "varying vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
 "    vec2 field   = vec2(0.0, step(0.5, 1 - fract(v_texcoord0.y * %2)) * %3);\n"
 "    vec4 yuva    = GLSL_TEXTURE(s_texture0, v_texcoord0 + field);\n"
-"    vec4 res     = vec4(yuva.arb, 1.0) * m_colourMatrix;\n"
+"    vec4 res     = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
 "    gl_FragColor = vec4(res.rgb, yuva.g);\n"
 "}\n"
 };
@@ -1621,7 +1626,7 @@ static const QString OneFieldShader[2] = {
 static const QString LinearBlendShader[2] = {
 "GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0;\n"
-"uniform mat4 m_colourMatrix;\n"
+"uniform mat4 COLOUR_UNIFORM;\n"
 "varying vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
@@ -1631,13 +1636,13 @@ static const QString LinearBlendShader[2] = {
 "    vec4 below = GLSL_TEXTURE(s_texture0, v_texcoord0 - line);\n"
 "    if (fract(v_texcoord0.y * %2) >= 0.5)\n"
 "        yuva = mix(above, below, 0.5);\n"
-"    vec4 res     = vec4(yuva.arb, 1.0) * m_colourMatrix;\n"
+"    vec4 res     = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
 "    gl_FragColor = vec4(res.rgb, yuva.g);\n"
 "}\n",
 
 "GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0;\n"
-"uniform mat4 m_colourMatrix;\n"
+"uniform mat4 COLOUR_UNIFORM;\n"
 "varying vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
@@ -1647,7 +1652,7 @@ static const QString LinearBlendShader[2] = {
 "    vec4 below = GLSL_TEXTURE(s_texture0, v_texcoord0 - line);\n"
 "    if (fract(v_texcoord0.y * %2) < 0.5)\n"
 "        yuva = mix(above, below, 0.5);\n"
-"    vec4 res     = vec4(yuva.arb, 1.0) * m_colourMatrix;\n"
+"    vec4 res     = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
 "    gl_FragColor = vec4(res.rgb, yuva.g);\n"
 "}\n"
 };
@@ -1656,7 +1661,7 @@ static const QString KernelShader[2] = {
 "GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture1;\n"
 "uniform GLSL_SAMPLER s_texture2;\n"
-"uniform mat4 m_colourMatrix;\n"
+"uniform mat4 COLOUR_UNIFORM;\n"
 "varying vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
@@ -1681,14 +1686,14 @@ static const QString KernelShader[2] = {
 "        yuva = (line00 * -0.0625) + yuva;\n"
 "        yuva = (line40 * -0.0625) + yuva;\n"
 "    }\n"
-"    vec4 res     = vec4(yuva.arb, 1.0) * m_colourMatrix;\n"
+"    vec4 res     = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
 "    gl_FragColor = vec4(res.rgb, yuva.g);\n"
 "}\n",
 
 "GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0;\n"
 "uniform GLSL_SAMPLER s_texture1;\n"
-"uniform mat4 m_colourMatrix;\n"
+"uniform mat4 COLOUR_UNIFORM;\n"
 "varying vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
@@ -1713,7 +1718,7 @@ static const QString KernelShader[2] = {
 "        yuva = (line00 * -0.0625) + yuva;\n"
 "        yuva = (line40 * -0.0625) + yuva;\n"
 "    }\n"
-"    vec4 res     = vec4(yuva.arb, 1.0) * m_colourMatrix;\n"
+"    vec4 res     = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
 "    gl_FragColor = vec4(res.rgb, yuva.g);\n"
 "}\n"
 };

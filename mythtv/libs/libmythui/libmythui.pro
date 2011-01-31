@@ -6,11 +6,11 @@ CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
 
-INCLUDEPATH += ../libmythdb 
+INCLUDEPATH += ../libmythbase
 INCLUDEPATH += ../.. ../
 INCLUDEPATH += ../../external/FFmpeg
 
-LIBS += -L../libmythdb -lmythdb-$$LIBVERSION
+LIBS += -L../libmythbase -lmythbase-$$LIBVERSION
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
@@ -23,7 +23,7 @@ HEADERS += mythuiimage.h mythuitext.h mythuistatetype.h  xmlparsebase.h
 HEADERS += mythuibutton.h myththemedmenu.h mythdialogbox.h
 HEADERS += mythuiclock.h mythuitextedit.h mythprogressdialog.h mythuispinbox.h
 HEADERS += mythuicheckbox.h mythuibuttonlist.h mythuigroup.h
-HEADERS += mythuiprogressbar.h mythuiwebbrowser.h
+HEADERS += mythuiprogressbar.h mythuiwebbrowser.h mythuifilebrowser.h
 HEADERS += screensaver.h screensaver-null.h x11colors.h
 HEADERS += themeinfo.h mythxdisplay.h DisplayRes.h DisplayResScreen.h
 HEADERS += mythgenerictree.h mythuibuttontree.h mythuiutils.h
@@ -34,8 +34,8 @@ HEADERS += mythdisplay.h mythuivideo.h mythudplistener.h
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
 SOURCES += myththemebase.cpp  mythpainter_qimage.cpp mythpainter_yuva.cpp
 SOURCES += mythpainter_qt.cpp xmlparsebase.cpp mythuihelper.cpp
-SOURCES += mythscreenstack.cpp mythgesture.cpp mythuitype.cpp mythscreentype.cpp 
-SOURCES += mythuiimage.cpp mythuitext.cpp
+SOURCES += mythscreenstack.cpp mythgesture.cpp mythuitype.cpp mythscreentype.cpp
+SOURCES += mythuiimage.cpp mythuitext.cpp mythuifilebrowser.cpp
 SOURCES += mythuistatetype.cpp mythfontproperties.cpp
 SOURCES += mythuibutton.cpp myththemedmenu.cpp mythdialogbox.cpp
 SOURCES += mythuiclock.cpp mythuitextedit.cpp mythprogressdialog.cpp
@@ -61,9 +61,8 @@ inc.files += mythuiclock.h mythgesture.h mythuitextedit.h mythprogressdialog.h
 inc.files += mythuispinbox.h mythuicheckbox.h mythuibuttonlist.h mythuigroup.h
 inc.files += mythuiprogressbar.h mythuiwebbrowser.h mythuiutils.h
 inc.files += x11colors.h mythgenerictree.h mythuibuttontree.h
-inc.files += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h 
-inc.files += mythuieditbar.h
-inc.files += mythuivideo.h
+inc.files += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
+inc.files += mythuieditbar.h mythuifilebrowser.h mythuivideo.h
 
 INSTALLS += inc
 

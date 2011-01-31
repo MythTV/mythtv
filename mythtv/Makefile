@@ -34,7 +34,7 @@ config.mak:
 # make -C mythtv
 PWD := $(shell pwd)
 
-version.cpp:	libs/libmythdb/mythversion.h
+version.cpp:	libs/libmythbase/mythversion.h
 	sh version.sh $(PWD)
 
 # explicit subdir dependencies
@@ -77,8 +77,8 @@ $(addsuffix _uninstall,$(SUBDIRS)): $(addsuffix /Makefile,$(SUBDIRS))
 clean: $(addsuffix _clean,$(SUBDIRS))
 
 distclean: $(addsuffix _distclean,$(SUBDIRS))
-	-rm -f libs/libmythdb/mythconfig.mak config.mak
-	-rm -f libs/libmythdb/mythconfig.h   config.h
+	-rm -f libs/libmythbase/mythconfig.mak config.mak
+	-rm -f libs/libmythbase/mythconfig.h   config.h
 	-rm -f libs/libavutil/avconfig.h
 	-rm -f external/FFmpeg/libavutil/avconfig.h
 	-rm -f config.ep                     version.cpp

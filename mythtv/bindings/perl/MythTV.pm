@@ -99,8 +99,8 @@ package MythTV;
     our $BACKEND_SEP    = '[]:[]';
     our $BACKEND_SEP_rx = qr/\[\]:\[\]/;
 
-# MYTH_PROTO_VERSION is defined in libmythdb in 
-# mythtv/libs/libmythdb/mythversion.h and should be the current MythTV 
+# MYTH_PROTO_VERSION is defined in libmythbase in 
+# mythtv/libs/libmythbase/mythversion.h and should be the current MythTV 
 # protocol version.
 #
 # Note: as of July 21, 2010, this is actually a string, to account for proto
@@ -114,7 +114,7 @@ package MythTV;
 # schema version supported in the main code.  We need to check that the schema
 # version in the database is as expected by the bindings, which are expected
 # to be kept in sync with the main code.
-    our $SCHEMA_VERSION = "1267";
+    our $SCHEMA_VERSION = "1269";
 
 # NUMPROGRAMLINES is defined in mythtv/libs/libmythtv/programinfo.h and is
 # the number of items in a ProgramInfo QStringList group used by

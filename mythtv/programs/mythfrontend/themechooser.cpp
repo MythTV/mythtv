@@ -14,6 +14,8 @@
 #include "remotefile.h"
 #include "mythdownloadmanager.h"
 #include "programtypes.h"
+#include "mythsystemevent.h"
+#include "util.h"
 
 // LibMythUI headers
 #include "mythmainwindow.h"
@@ -194,8 +196,17 @@ void ThemeChooser::Load(void)
 
     int downloadFailures =
         gCoreContext->GetNumSetting("ThemeInfoDownloadFailures", 0);
-    if ((!QFile::exists(remoteThemesFile)) &&
-        (downloadFailures < 2))
+    if (QFile::exists(remoteThemesFile))
+    {
+        QFileInfo finfo(remoteThemesFile);
+        if (finfo.lastModified() < mythCurrentDateTime().addSecs(-600))
+        {
+            VERBOSE(VB_GUI, LOC + QString("%1 is over 10 minutes old, forcing "
+                    "remote theme list download").arg(remoteThemesFile));
+            m_refreshDownloadableThemes = true;
+        }
+    }
+    else if (downloadFailures < 2) // (and themes.zip does not exist)
     {
         VERBOSE(VB_GUI, LOC + QString("%1 does not exist, forcing remote theme "
                 "list download").arg(remoteThemesFile));
@@ -461,6 +472,13 @@ void ThemeChooser::showPopupMenu(void)
                                        SLOT(removeTheme()));
         }
     }
+
+    if (gCoreContext->GetNumSetting("ThemeUpdateNofications", 1))
+        m_popupMenu->AddButton(tr("Disable Theme Update Notifications"),
+                               SLOT(toggleThemeUpdateNotifications()));
+    else
+        m_popupMenu->AddButton(tr("Enable Theme Update Notifications"),
+                               SLOT(toggleThemeUpdateNotifications()));
 }
 
 void ThemeChooser::popupClosed(QString which, int result)
@@ -541,6 +559,14 @@ void ThemeChooser::toggleFullscreenPreview(void)
     }
 }
 
+void ThemeChooser::toggleThemeUpdateNotifications(void)
+{
+    if (gCoreContext->GetNumSetting("ThemeUpdateNofications", 1))
+        gCoreContext->SaveSettingOnHost("ThemeUpdateNofications", "0", "");
+    else
+        gCoreContext->SaveSettingOnHost("ThemeUpdateNofications", "1", "");
+}
+
 void ThemeChooser::refreshDownloadableThemes(void)
 {
     VERBOSE(VB_GUI, LOC + "Forcing remote theme list refresh");
@@ -565,12 +591,24 @@ void ThemeChooser::saveAndReload(MythUIButtonListItem *item)
 
     if (!info->GetDownloadURL().isEmpty())
     {
-        QFileInfo qfile(info->GetDownloadURL());
+        QString downloadURL = info->GetDownloadURL();
+        QFileInfo qfile(downloadURL);
         QString baseName = qfile.fileName();
+
+        if (!gCoreContext->GetSetting("ThemeDownloadURL").isEmpty())
+        {
+            QStringList tokens =
+                gCoreContext->GetSetting("ThemeDownloadURL")
+                    .split(";", QString::SkipEmptyParts);
+            QString origURL = downloadURL;
+            downloadURL.replace(tokens[0], tokens[1]);
+            VERBOSE(VB_FILE, LOC + QString("Theme download URL overridden "
+                    "from %1 to %2.").arg(origURL).arg(downloadURL));
+        }
 
         OpenBusyPopup(tr("Downloading %1 Theme").arg(info->GetName()));
         m_downloadTheme = info;
-        m_downloadFile = RemoteDownloadFile(info->GetDownloadURL(),
+        m_downloadFile = RemoteDownloadFile(downloadURL,
                                             "Temp", baseName);
         m_downloadState = dsDownloadingOnBackend;
     }
@@ -749,6 +787,11 @@ void ThemeChooser::customEvent(QEvent *e)
             QStringList args = me->ExtraDataList();
             QFile::remove(args[0]);
 
+            QString event = QString("THEME_INSTALLED PATH %1")
+                                    .arg(GetConfDir() + "/themes/" +
+                                         m_downloadTheme->GetDirectoryName());
+            SendMythSystemEvent(event);
+
             gCoreContext->SaveSetting("Theme", m_downloadTheme->GetDirectoryName());
             GetMythMainWindow()->JumpTo("Reload Theme");
         }
@@ -819,6 +862,118 @@ void ThemeChooser::removeThemeDir(const QString &dirname)
     }
 
     dir.rmdir(dirname);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+ThemeUpdateChecker::ThemeUpdateChecker() :
+    m_updateTimer(new QTimer(this))
+{
+    m_mythVersion = myth_source_path;
+
+    // FIXME: For now, treat git master the same as svn trunk
+    if (m_mythVersion == "master")
+        m_mythVersion = "trunk";
+
+    if (m_mythVersion != "trunk")
+    {
+        m_mythVersion = myth_binary_version; // Example: 0.25.20101017-1
+        m_mythVersion.replace(QRegExp("\\.[0-9]{8,}.*"), "");
+    }
+
+    m_infoPackage = QString("myth://Temp@%1/remotethemes/themes.zip")
+                            .arg(gCoreContext->GetSetting("MasterServerIP"));
+
+    gCoreContext->SaveSetting("ThemeUpdateStatus", QString());
+                                 
+    connect(m_updateTimer, SIGNAL(timeout()), SLOT(checkForUpdate()));
+    m_updateTimer->start(60 * 60 * 1000); // Run once an hour
+
+    // Run once 15 seconds from now
+    QTimer::singleShot(15 * 1000, this, SLOT(checkForUpdate()));
+}
+
+ThemeUpdateChecker::~ThemeUpdateChecker()
+{
+    if (m_updateTimer)
+    {
+        m_updateTimer->stop();
+        delete m_updateTimer;
+        m_updateTimer = NULL;
+    }
+}
+
+void ThemeUpdateChecker::checkForUpdate(void)
+{
+    if (RemoteFile::Exists(m_infoPackage))
+    {
+        QString remoteThemeDir =
+            QString("myth://Temp@%1/remotethemes/%2/%3")
+                    .arg(gCoreContext->GetSetting("MasterServerIP"))
+                    .arg(m_mythVersion).arg(GetMythUI()->GetThemeName());
+        QString infoXML = remoteThemeDir;
+        infoXML.append("/themeinfo.xml");
+
+        if (RemoteFile::Exists(infoXML))
+        {
+            ThemeInfo *remoteTheme = new ThemeInfo(remoteThemeDir);
+            if (!remoteTheme)
+            {
+                VERBOSE(VB_IMPORTANT,
+                        QString("ThemeUpdateChecker::checkForUpdate(): "
+                                "Unable to create ThemeInfo for %1")
+                                .arg(infoXML));
+                return;
+            }
+                
+            ThemeInfo *localTheme = new ThemeInfo(GetMythUI()->GetThemeDir());
+            if (!localTheme)
+            {
+                VERBOSE(VB_IMPORTANT, "ThemeUpdateChecker::checkForUpdate(): " 
+                        "Unable to create ThemeInfo for current theme");
+                return;
+            }
+
+            int rmtMaj = remoteTheme->GetMajorVersion();
+            int rmtMin = remoteTheme->GetMinorVersion();
+            int locMaj = localTheme->GetMajorVersion();
+            int locMin = localTheme->GetMinorVersion();
+
+            if ((rmtMaj > locMaj) ||
+                ((rmtMaj == locMaj) &&
+                 (rmtMin > locMin)))
+            {
+                m_lastKnownThemeVersion =
+                    QString("%1-%2.%3").arg(GetMythUI()->GetThemeName())
+                                       .arg(rmtMaj).arg(rmtMin);
+
+                QString status = gCoreContext->GetSetting("ThemeUpdateStatus");
+                QString currentLocation = GetMythUI()->GetCurrentLocation(false, true);
+
+                if ((!status.startsWith(m_lastKnownThemeVersion)) &&
+                    (currentLocation == "mainmenu"))
+                {
+                    m_currentVersion = QString("%1.%2").arg(locMaj).arg(locMin);
+                    m_newVersion = QString("%1.%2").arg(rmtMaj).arg(rmtMin);
+
+                    gCoreContext->SaveSetting("ThemeUpdateStatus",
+                                         m_lastKnownThemeVersion + " notified");
+
+                    QString message = tr("Version %1 of the %2 theme is now "
+                                         "available in the Theme Chooser.  The "
+                                         "currently installed version is %3.")
+                                         .arg(m_newVersion)
+                                         .arg(GetMythUI()->GetThemeName())
+                                         .arg(m_currentVersion);
+
+                    ShowOkPopup(message);
+                }
+            }
+                
+            delete remoteTheme;
+            delete localTheme;
+        }
+    }
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

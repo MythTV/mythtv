@@ -36,7 +36,7 @@ using namespace std;
 #include <HIToolbox/Menus.h>   // For GetMBarHeight()
 #endif
 
-// libmythdb headers
+// libmythbase headers
 #include "mythdb.h"
 #include "mythverbose.h"
 #include "mythevent.h"
@@ -44,6 +44,7 @@ using namespace std;
 #include "compat.h"
 #include "mythsignalingtimer.h"
 #include "mythcorecontext.h"
+#include "mythmedia.h"
 
 // Libmythui headers
 #include "myththemebase.h"
@@ -1064,6 +1065,10 @@ void MythMainWindow::InitKeys()
         ,"Copy text from textedit"), "Ctrl+C");
     RegisterKey("Global", "PASTE", QT_TRANSLATE_NOOP("MythControls",
         "Paste text into textedit"), "Ctrl+V");
+    RegisterKey("Global", "UNDO", QT_TRANSLATE_NOOP("MythControls",
+        "Undo"), "Ctrl+Z");
+    RegisterKey("Global", "REDO", QT_TRANSLATE_NOOP("MythControls",
+        "Redo"), "Ctrl+Y");
     RegisterKey("Global", "SEARCH", QT_TRANSLATE_NOOP("MythControls",
         "Show incremental search dialog"), "Ctrl+S");
 
@@ -2061,6 +2066,45 @@ void MythMainWindow::customEvent(QEvent *ce)
         }
     }
 #endif
+    else if (ce->type() == MediaEvent::kEventType)
+    {
+        MediaEvent *me = static_cast<MediaEvent*>(ce);
+
+        // A listener based system might be more efficient, but we should never
+        // have that many screens open at once so impact should be minimal.
+        //
+        // This approach is simpler for everyone to follow. Plugin writers
+        // don't have to worry about adding their screens to the list because
+        // all screens receive media events.
+        //
+        // Events are even sent to hidden or backgrounded screens, this avoids
+        // the need for those to poll for changes when they become visible again
+        // however this needs to be kept in mind if media changes trigger
+        // actions which would not be appropriate when the screen doesn't have
+        // focus. It is the programmers responsibility to ignore events when
+        // necessary.
+        QVector<MythScreenStack *>::Iterator it;
+        for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
+        {
+            QVector<MythScreenType *> screenList;
+            (*it)->GetScreenList(screenList);
+            QVector<MythScreenType *>::Iterator sit;
+            for (sit = screenList.begin(); sit != screenList.end(); ++sit)
+            {
+                MythScreenType *screen = (*sit);
+                if (screen)
+                    screen->mediaEvent(me);
+            }
+        }
+
+        // Debugging
+        MythMediaDevice *device = me->getDevice();
+        if (device)
+        {
+            VERBOSE(VB_GENERAL, QString("Media Event: %1 - %2")
+                    .arg(device->getDevicePath()).arg(device->getStatus()));
+        }
+    }
     else if (ce->type() == ScreenSaverEvent::kEventType)
     {
         ScreenSaverEvent *sse = static_cast<ScreenSaverEvent *>(ce);

@@ -77,7 +77,7 @@ void DecoderBase::Reset(void)
     dontSyncPositionMap = false;
 
     waitingForChange = false;
-    ateof = false;
+    SetEof(false);
 }
 
 void DecoderBase::SeekReset(long long, uint, bool, bool)

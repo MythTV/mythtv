@@ -9,7 +9,7 @@
 #include <QKeyEvent>
 #include <QDomDocument>
 
-// Libmythdb headers
+// libmythbase headers
 #include "mythverbose.h"
 #include "mythdb.h"
 

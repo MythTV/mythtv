@@ -7,7 +7,7 @@
 #include <QFileInfo>
 #include <QApplication>
 
-// libmythdb
+// libmythbase
 #include "mythcorecontext.h"
 #include "mythstorage.h"
 #include "mythdirs.h"

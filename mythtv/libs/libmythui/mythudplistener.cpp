@@ -81,10 +81,10 @@ void MythUDPListener::Process(const QByteArray &buf)
     QDomElement docElem = doc.documentElement();
     if (!docElem.isNull())
     {
-        if (docElem.tagName() != "mythnotify")
+        if (docElem.tagName() != "mythmessage")
         {
             VERBOSE(VB_IMPORTANT, ERR +
-                "Unknown UDP packet (not <mythnotify> XML)");
+                "Unknown UDP packet (not <mythmessage> XML)");
             return;
         }
 
@@ -92,7 +92,7 @@ void MythUDPListener::Process(const QByteArray &buf)
         if (version.isEmpty())
         {
             VERBOSE(VB_IMPORTANT, ERR +
-                "<mythnotify> missing 'version' attribute");
+                "<mythmessage> missing 'version' attribute");
             return;
         }
     }
@@ -103,7 +103,7 @@ void MythUDPListener::Process(const QByteArray &buf)
         QDomElement e = n.toElement();
         if (!e.isNull())
         {
-            if (e.tagName() == "container")
+            if (e.tagName() == "text")
             {
                 QString msg = e.text();
                 VERBOSE(VB_GENERAL, LOC + msg);
