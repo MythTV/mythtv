@@ -426,7 +426,7 @@ bool ProgramRecPriority::Create()
     m_rectypePriorityText = dynamic_cast<MythUIText *>
                                                  (GetChild("rectypepriority"));
     m_recPriorityText = dynamic_cast<MythUIText *> (GetChild("recpriority"));
-    m_recPriorityBText = dynamic_cast<MythUIText *> (GetChild("recpriorityb"));
+    m_recPriorityBText = dynamic_cast<MythUIText *> (GetChild("recpriorityB"));
     m_finalPriorityText = dynamic_cast<MythUIText *> (GetChild("finalpriority"));
     m_recGroupText = dynamic_cast<MythUIText *> (GetChild("recordinggroup"));
     m_storageGroupText = dynamic_cast<MythUIText *> (GetChild("storagegroup"));
@@ -1111,12 +1111,30 @@ void ProgramRecPriority::changeRecPriority(int howMuch)
         {
             // No need to re-fill the entire list, just update this entry
             int progRecPriority = pgRecInfo->GetRecordingPriority();
+            int autorecpri = pgRecInfo->autoRecPriority;
             int finalRecPriority = progRecPriority +
-                                    pgRecInfo->autoRecPriority +
+                                    autorecpri +
                                     pgRecInfo->recTypeRecPriority;
 
             item->SetText(QString::number(progRecPriority), "progpriority");
             item->SetText(QString::number(finalRecPriority), "finalpriority");
+
+            if (m_recPriorityText)
+            {
+                QString msg = QString::number(progRecPriority);
+
+                if(autorecpri != 0)
+                    msg += tr(" + %1 automatic priority (%2hr)")
+                                .arg(autorecpri).arg(pgRecInfo->avg_delay);
+                m_recPriorityText->SetText(msg);
+            }
+
+            if (m_recPriorityBText)
+                m_recPriorityBText->SetText(QString::number(progRecPriority +
+                                                            autorecpri));
+
+            if (m_finalPriorityText)
+                m_finalPriorityText->SetText(QString::number(finalRecPriority));
         }
     }
 }
@@ -1572,7 +1590,7 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
 
         if(autorecpri != 0)
             msg += tr(" + %1 automatic priority (%2hr)")
-                        .arg(autorecpri).arg((pgRecInfo->avg_delay));
+                        .arg(autorecpri).arg(pgRecInfo->avg_delay);
         m_recPriorityText->SetText(msg);
     }
 

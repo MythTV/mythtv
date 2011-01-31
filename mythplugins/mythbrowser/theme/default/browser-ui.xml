@@ -53,9 +53,8 @@
             <statetype name="buttonitem">
                 <area>0,0,180,40</area>
                 <state name="active">
-                    <imagetype name="buttonbackground">
-                        <filename>horiz_selector.png</filename>
-                    </imagetype>
+                    <area>0,0,180,40</area>
+                    <shape name="background" from="basewidgetshape" />
                     <textarea name="buttontext" from="basetextarea">
                         <area>0,0,180,40</area>
                         <font>basesmall</font>
@@ -63,14 +62,12 @@
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <filename>horiz_selector_selected.png</filename>
-                    </imagetype>
+                    <shape name="background" from="baseselectedwidgetshape" />
                 </state>
                 <state name="selectedinactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <filename>horiz_selector_inactive.png</filename>
-                    </imagetype>
+                   <textarea name="buttontext">
+                        <font>basesmallgrey</font>
+                    </textarea>
                 </state>
             </statetype>
             <statetype name="downscrollarrow">
