@@ -12,7 +12,6 @@
 #include "rom_metadata.h"
 #include "rominfo.h"
 
-class MythUIProgressDialog;
 class MythMainWindow;
 class GameHandler;
 
@@ -52,7 +51,7 @@ Q_DECLARE_METATYPE(GameScan)
 
 typedef QMap<QString, GameScan> GameScanMap;
 
-class MythProgressDialog;
+class MythUIProgressDialog;
 class GameHandler : public QObject
 {
     Q_OBJECT
@@ -85,7 +84,7 @@ class GameHandler : public QObject
 
     static int buildFileCount(QString directory, GameHandler *handler);
     void buildFileList(QString directory, GameHandler *handler,
-                              MythProgressDialog *pdial, int* filecount);
+                       int* filecount);
 
     void processGames(GameHandler *);
     static void processAllGames(void);
@@ -133,7 +132,10 @@ class GameHandler : public QObject
     bool m_KeepAll;
 
   private:
+    void CreateProgress(QString message);
     static GameHandler *newInstance;
+
+    MythUIProgressDialog *m_progressDlg;
 };
 
 #endif
