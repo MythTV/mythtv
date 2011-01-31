@@ -1503,7 +1503,7 @@ uint ProgramInfo::GetSecondsInRecording(void) const
 }
 
 /// \brief Returns last frame in position map or 0
-uint64_t ProgramInfo::GetLastFrameInPosMap(void) const
+uint64_t ProgramInfo::QueryLastFrameInPosMap(void) const
 {
     uint64_t last_frame = 0;
     frm_pos_map_t posMap;
