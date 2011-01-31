@@ -177,7 +177,9 @@ class MythMainWindowPrivate
 
         m_themeBase(NULL),
 
-        m_udpListener(NULL)
+        m_udpListener(NULL),
+
+        m_pendingUpdate(false)
     {
     }
 
@@ -258,6 +260,8 @@ class MythMainWindowPrivate
 
     MythThemeBase *m_themeBase;
     MythUDPListener *m_udpListener;
+
+    bool m_pendingUpdate;
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
@@ -840,6 +844,9 @@ bool MythMainWindow::screenShot(void)
 
 bool MythMainWindow::event(QEvent *e)
 {
+    if (!updatesEnabled() && (e->type() == QEvent::UpdateRequest))
+        d->m_pendingUpdate = true;
+
     if (e->type() == QEvent::Show && !e->spontaneous())
     {
         QCoreApplication::postEvent(
@@ -1290,11 +1297,17 @@ void MythMainWindow::SetDrawEnabled(bool enable)
 
     if (enable)
     {
-        repaint(); // See #8952
+        if (d->m_pendingUpdate)
+        {
+            QApplication::postEvent(this, new QEvent(QEvent::UpdateRequest), Qt::LowEventPriority);
+            d->m_pendingUpdate = false;
+        }
         d->drawTimer->start(1000 / 70);
+
     }
     else
         d->drawTimer->stop();
+
 
     d->m_setDrawEnabledWait.wakeAll();
 }
