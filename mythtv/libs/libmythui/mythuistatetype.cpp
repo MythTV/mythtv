@@ -51,12 +51,7 @@ bool MythUIStateType::AddObject(const QString &name, MythUIType *object)
     else
         objectArea.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
 
-    if (objectArea.width() > m_Area.width() ||
-        objectArea.height() > m_Area.height())
-    {
-        m_Area.setWidth(objectArea.getWidth());
-        m_Area.setHeight(objectArea.getHeight());
-    }
+    ExpandArea(objectArea);
 
     return true;
 }
@@ -88,12 +83,7 @@ bool MythUIStateType::AddObject(StateType type, MythUIType *object)
     else
         objectArea.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
 
-    if (objectArea.width() > m_Area.width() ||
-        objectArea.height() > m_Area.height())
-    {
-        m_Area.setWidth(objectArea.getWidth());
-        m_Area.setHeight(objectArea.getHeight());
-    }
+    ExpandArea(objectArea);
 
     return true;
 }
@@ -104,7 +94,7 @@ bool MythUIStateType::DisplayState(const QString &name)
         return false;
 
     MythUIType *old = m_CurrentState;
-    
+
     QMap<QString, MythUIType *>::Iterator i = m_ObjectsByName.find(name.toLower());
     if (i != m_ObjectsByName.end())
         m_CurrentState = i.value();
