@@ -2099,7 +2099,7 @@ bool MythPlayer::FastForward(float seconds)
     if (!videoOutput)
         return false;
 
-    if (fftime >= 0)
+    if (fftime <= 0)
         fftime = (long long)(seconds * video_frame_rate);
     return fftime > CalcMaxFFTime(fftime, false);
 }
@@ -2109,7 +2109,7 @@ bool MythPlayer::Rewind(float seconds)
     if (!videoOutput)
         return false;
 
-    if (rewindtime >= 0)
+    if (rewindtime <= 0)
         rewindtime = (long long)(seconds * video_frame_rate);
     return (uint64_t)rewindtime >= framesPlayed;
 }
@@ -3366,8 +3366,11 @@ void MythPlayer::WaitForSeek(uint64_t frame, bool override_seeks,
                            (allpaused && !deleteMap.IsEditing()) ? true: after;
     decoder->setExactSeeks(before);
 
+    bool islivetvcur = (livetv && player_ctx->tvchain &&
+                        !player_ctx->tvchain->HasNext());
+
     uint64_t max = totalFrames;
-    if ((livetv || (watchingrecording && player_ctx->recorder &&
+    if ((islivetvcur || (watchingrecording && player_ctx->recorder &&
                    player_ctx->recorder->IsValidRecorder())))
     {
         max = (uint64_t)player_ctx->recorder->GetFramesWritten();
