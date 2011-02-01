@@ -138,11 +138,9 @@ void MythRenderOpenGL::makeCurrent()
 
 void MythRenderOpenGL::doneCurrent()
 {
-    // we don't explicitly call QGlContext::doneCurrent() as it should be
-    // unnecessary (makeCurrent() will switch contexts as necessary), it
-    // appears to cause performance issues and breaks rendering in certain
-    // situations
     m_lock_level--;
+    if (m_lock_level == 0)
+        QGLContext::doneCurrent();
     if (m_lock_level < 0)
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Mis-matched calls to makeCurrent()");
     m_lock->unlock();
