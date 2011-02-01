@@ -920,8 +920,11 @@ bool SubtitleScreen::InitialiseFont(int fontStretch)
     QString font = gCoreContext->GetSetting("OSDSubFont", "FreeSans");
     if (initialised)
     {
-        if (gTextSubFont->face().family() == font)
-            return gTextSubFont;
+        if (gTextSubFont->face().family() == font &&
+            gTextSubFont->face().stretch() == fontStretch)
+        {
+            return true;
+        }
         delete gTextSubFont;
     }
 
