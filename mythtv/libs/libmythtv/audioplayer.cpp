@@ -7,7 +7,7 @@
 AudioPlayer::AudioPlayer(MythPlayer *parent, bool muted)
   : m_parent(parent),     m_audioOutput(NULL),   m_channels(-1),
     m_orig_channels(-1),  m_codec(0),            m_format(FORMAT_NONE),
-    m_samplerate(44100),  m_bitrate(48000 * 16 * 2),
+    m_samplerate(44100),  m_codec_profile(0),
     m_stretchfactor(1.0f),m_passthru(false),
     m_lock(QMutex::Recursive), m_muted_on_creation(muted), 
     m_main_device(QString::null), m_passthru_device(QString::null),
@@ -85,7 +85,8 @@ QString AudioPlayer::ReinitAudio(void)
     else if (want_audio && !m_no_audio_in)
     {
         const AudioSettings settings(m_format, m_channels, m_codec,
-                                     m_samplerate, m_passthru, 0, m_bitrate);
+                                     m_samplerate, m_passthru, 0,
+                                     m_codec_profile);
         m_audioOutput->Reconfigure(settings);
         errMsg = m_audioOutput->GetError();
         SetStretchFactor(m_stretchfactor);
@@ -163,12 +164,12 @@ uint AudioPlayer::GetVolume(void)
 
 /**
  * Set audio output device parameters.
- * bitrate is only used for DTS
+ * codec_profile is currently only used for DTS
  */
 void AudioPlayer::SetAudioInfo(const QString &main_device,
                                const QString &passthru_device,
                                uint           samplerate,
-                               int            bitrate)
+                               int            codec_profile)
 {
     m_main_device = m_passthru_device = QString::null;
     if (!main_device.isEmpty())
@@ -182,16 +183,17 @@ void AudioPlayer::SetAudioInfo(const QString &main_device,
         m_passthru_device.detach();
     }
     m_samplerate = (int)samplerate;
-    m_bitrate    = bitrate;
+    m_codec_profile    = codec_profile;
 }
 
 /**
  * Set audio output parameters.
- * bitrate is only used for DTS
+ * codec_profile is currently only used for DTS
  */
 void AudioPlayer::SetAudioParams(AudioFormat format, int orig_channels,
                                  int channels, int codec,
-                                 int samplerate, bool passthru, int bitrate)
+                                 int samplerate, bool passthru,
+                                 int codec_profile)
 {
     m_format        = format;
     m_orig_channels = orig_channels;
@@ -199,7 +201,7 @@ void AudioPlayer::SetAudioParams(AudioFormat format, int orig_channels,
     m_codec         = codec;
     m_samplerate    = samplerate;
     m_passthru      = passthru;
-    m_bitrate       = bitrate;
+    m_codec_profile = codec_profile;
 }
 
 void AudioPlayer::SetEffDsp(int dsprate)
@@ -332,14 +334,14 @@ uint AudioPlayer::GetMaxChannels(void)
 {
     if (!m_audioOutput)
         return 2;
-    return m_audioOutput->GetOutputSettingsUsers()->BestSupportedChannels();
+    return m_audioOutput->GetOutputSettingsUsers(false)->BestSupportedChannels();
 }
 
-int AudioPlayer::GetMaxBitrate(int codec)
+int AudioPlayer::GetMaxHDRate()
 {
     if (!m_audioOutput)
-        return 48000 * 16 * 2;
-    return m_audioOutput->GetOutputSettingsUsers()->GetMaxBitrate(codec);
+        return 0;
+    return m_audioOutput->GetOutputSettingsUsers(true)->GetMaxHDRate();
 }
 
 bool AudioPlayer::CanPassthrough(int samplerate, int channels, int codec)

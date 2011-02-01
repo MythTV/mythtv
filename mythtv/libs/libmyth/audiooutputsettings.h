@@ -136,10 +136,10 @@ class MPUBLIC AudioOutputSettings
         void SetBestSupportedChannels(int channels);
 
             /**
-             * return the highest bitrate supported. Currently only of value
-             * for DTS and DTS-HD playback
+             * return the highest iec958 rate supported.
+             * return 0 if no HD rate are supported
              */
-        int  GetMaxBitrate(int codec = CODEC_ID_DTS);
+        int  GetMaxHDRate();
 
             /**
              * Display in human readable form the digital features

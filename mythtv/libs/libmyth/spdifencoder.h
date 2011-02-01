@@ -9,6 +9,7 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 #include "libavcodec/audioconvert.h"
+#include "libavcodec/opt.h"
 }
 
 class MPUBLIC SPDIFEncoder
@@ -20,9 +21,7 @@ class MPUBLIC SPDIFEncoder
     int  GetData(unsigned char *buffer, int &dest_size);
     void Reset();
     bool Succeeded()  { return m_complete; };
-    bool SetMaxMuxRate(int rate);
-    int  GetMaxMuxRate();
-    int  GetBitrate();
+    bool SetMaxHDRate(int rate);
 
   private:
     static int funcIO(void *opaque, unsigned char *buf, int size);

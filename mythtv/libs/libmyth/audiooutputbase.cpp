@@ -361,22 +361,32 @@ void AudioOutputBase::SetupPassthrough(AudioSettings &settings,
             log = "Dolby Digital Plus (E-AC3)";
             break;
         case CODEC_ID_DTS:
-            if (output_settingsdigital->GetMaxBitrate() == 48000 * 16 * 2 ||
-                settings.bitrate <= 48000 * 16 * 2)
+            switch(settings.codec_profile)
             {
-                log = "DTS Core";
-                break;
+                case FF_PROFILE_DTS_ES:
+                    log = "DTS-ES";
+                    break;
+                case FF_PROFILE_DTS_96_24:
+                    log = "DTS 96/24";
+                    break;
+                case FF_PROFILE_DTS_HD_HRA:
+                case FF_PROFILE_DTS_HD_MA:
+                    samplerate_tmp = 192000;
+                    if (output_settingsdigital->GetMaxHDRate() == 768000)
+                    {
+                        log = "DTS-HD MA";
+                        channels_tmp = 8;
+                    }
+                    else
+                    {
+                        log = "DTS-HD High-Res";
+                    }
+                    break;
+                case FF_PROFILE_DTS:
+                default:
+                    log = "DTS Core";
+                    break;
             }
-            if (output_settingsdigital->GetMaxBitrate() > 192000 * 16 * 2 &&
-                settings.bitrate > 48000 * 16 * 2)
-            {
-                log = "DTS-HD MA";
-                channels_tmp = 8;
-                samplerate_tmp = 192000;
-                break;
-            }
-            log = "DTS-HD High-Res";
-            samplerate_tmp = 192000;
             break;
         case CODEC_ID_TRUEHD:
             channels_tmp = 8;

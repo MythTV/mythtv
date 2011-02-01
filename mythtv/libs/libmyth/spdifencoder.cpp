@@ -172,43 +172,19 @@ void SPDIFEncoder::Reset()
 }
 
 /**
- * Set the maximum mux rate
- * If playing DTS-HD content, setting a mux rate of 1.536Mbit/s will
- * cause the HD stream to be stripped out before encoding
- * Input: rate = maximum max rate in bits per second
+ * Set the maximum HD rate.
+ * If playing DTS-HD content, setting a HD rate of 0 will only use the DTS-Core
+ * and the HD stream be stripped out before encoding
+ * Input: rate = maximum HD rate in Hz
  */
-bool SPDIFEncoder::SetMaxMuxRate(int rate)
+bool SPDIFEncoder::SetMaxHDRate(int rate)
 {
     if (!m_oc)
     {
         return false;
     }
-    m_oc->mux_rate = rate;
+    av_set_int(m_oc->priv_data, "dtshd_rate", rate);
     return true;
-}
-
-/**
- * Retrieve passthrough bitrate
- */
-int SPDIFEncoder::GetMaxMuxRate()
-{
-    if (!m_oc)
-    {
-        return 0;
-    }
-    return m_oc->mux_rate;
-}
-
-/**
- * Retrieve passthrough bitrate
- */
-int SPDIFEncoder::GetBitrate()
-{
-    if (!m_oc)
-    {
-        return -1;
-    }
-    return m_oc->bit_rate;
 }
 
 /**

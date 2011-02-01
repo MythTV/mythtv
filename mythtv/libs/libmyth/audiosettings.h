@@ -45,7 +45,7 @@ class MPUBLIC AudioSettings
                   int           samplerate,
                   bool          use_passthru,
                   int           upmixer_startup = 0,
-                  int           bitrate = 0);
+                  int           codec_profile = 0);
 
     AudioSettings(const QString    &main_device,
                   const QString    &passthru_device = QString::null);
@@ -63,8 +63,8 @@ class MPUBLIC AudioSettings
     AudioFormat         format;
     int                 channels;
     int                 codec;
+    int                 codec_profile;
     int                 samplerate;
-    int                 bitrate;
     bool                set_initial_vol;
     bool                use_passthru;
     AudioOutputSource   source;

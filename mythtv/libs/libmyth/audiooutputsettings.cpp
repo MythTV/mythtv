@@ -370,23 +370,18 @@ AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
     return aosettings;
 }
 
-int AudioOutputSettings::GetMaxBitrate(int codec)
+int AudioOutputSettings::GetMaxHDRate()
 {
-    if (codec == CODEC_ID_DTS)
+    if (!canFeature(FEATURE_DTSHD))
+        return 0;
+
+        // If no HBR or no LPCM, limit bitrate to 6.144Mbit/s
+    if (!gCoreContext->GetNumSetting("HBRPassthru", true) ||
+        !canFeature(FEATURE_LPCM))
     {
-        if (!canFeature(FEATURE_DTSHD))
-        {   // only supports DTS core
-            return 48000 * 16 * 2;   // DTS Core: 48kHz, 16 bits, 2 ch
-        }
-            // If no HBR or no LPCM, limit bitrate to 6.144Mbit/s
-        if (!gCoreContext->GetNumSetting("HBRPassthru", true) ||
-            !canFeature(FEATURE_LPCM))
-        {
-            return 192000 * 16 * 2;  // E-AC3/DTS-HD High Res: 192k, 16 bits, 2 ch
-        }
-        return 192000 * 16 * 8;      // TrueHD or DTS-HD MA: 192k, 16 bits, 8 ch
+        return 192000;  // E-AC3/DTS-HD High Res: 192k, 16 bits, 2 ch
     }
-    return 48000 * 16 * 2;
+    return 768000;      // TrueHD or DTS-HD MA: 192k, 16 bits, 8 ch
 }
 
 #define ARG(x) ((tmp.isEmpty() ? "" : ",") + QString(x))

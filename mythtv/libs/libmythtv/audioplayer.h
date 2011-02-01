@@ -48,7 +48,7 @@ class MPUBLIC AudioPlayer
     bool  CanTrueHD(void);
     bool  CanDTSHD(void);
     uint  GetMaxChannels(void);
-    int   GetMaxBitrate(int codec = CODEC_ID_DTS);
+    int   GetMaxHDRate(void);
     int64_t GetAudioTime(void);
 
     bool      IsMuted(void) { return GetMuteState() == kMuteAll; }
@@ -69,7 +69,7 @@ class MPUBLIC AudioPlayer
     int          m_codec;
     AudioFormat  m_format;
     int          m_samplerate;
-    int          m_bitrate;
+    int          m_codec_profile;
     float        m_stretchfactor;
     bool         m_passthru;
     QMutex       m_lock;

@@ -1685,8 +1685,8 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
 int AvFormatDecoder::ScanStreams(bool novideo)
 {
     int scanerror = 0;
-    bitrate = 0;
-    fps = 0;
+    bitrate       = 0;
+    fps           = 0;
 
     tracks[kTrackTypeAudio].clear();
     tracks[kTrackTypeSubtitle].clear();
@@ -1914,19 +1914,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 VERBOSE(VB_GENERAL, LOC + QString("codec %1 has %2 channels")
                         .arg(ff_codec_id_string(enc->codec_id))
                         .arg(enc->channels));
-
-#if 0
-                // HACK MULTICHANNEL DTS passthru disabled for multichannel,
-                // dont know how to handle this
-                // HACK BEGIN REALLY UGLY HACK FOR DTS PASSTHRU
-                if (enc->codec_id == CODEC_ID_DTS)
-                {
-                    enc->sample_rate = 48000;
-                    enc->channels = 2;
-                    // enc->bit_rate = what??;
-                }
-                // HACK END REALLY UGLY HACK FOR DTS PASSTHRU
-#endif
 
                 bitrate += enc->bit_rate;
                 break;
@@ -3661,10 +3648,11 @@ static vector<int> filter_lang(const sinfo_vec_t &tracks, int lang_key)
     return ret;
 }
 
-static int filter_max_ch(const AVFormatContext *ic,
-                         const sinfo_vec_t     &tracks,
-                         const vector<int>     &fs,
-                         enum CodecID           codecId = CODEC_ID_NONE)
+int AvFormatDecoder::filter_max_ch(const AVFormatContext *ic,
+                                   const sinfo_vec_t     &tracks,
+                                   const vector<int>     &fs,
+                                   enum CodecID           codecId,
+                                   int                    profile)
 {
     int selectedTrack = -1, max_seen = -1;
 
@@ -3676,6 +3664,12 @@ static int filter_max_ch(const AVFormatContext *ic,
         if ((codecId == CODEC_ID_NONE || codecId == ctx->codec_id) &&
             (max_seen < ctx->channels))
         {
+            if (codecId == CODEC_ID_DTS && profile > 0)
+            {
+                // we cannot decode dts-hd, so only select it if passthrough
+                if (!DoPassThrough(ctx) || ctx->profile != profile)
+                    continue;
+            }
             selectedTrack = *it;
             max_seen = ctx->channels;
         }
@@ -3805,12 +3799,18 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
 
         vector<int> flang = filter_lang(atracks, canonical_key);
 
-        selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_TRUEHD);
+        selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                                 FF_PROFILE_DTS_HD_MA);
+        if (selTrack < 0)
+            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_TRUEHD);
 
+        if (selTrack < 0)
+            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                                     FF_PROFILE_DTS_HD_HRA);
         if (selTrack < 0)
             selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_EAC3);
 
-        if (!transcoding && selTrack < 0)
+        if (selTrack < 0)
             selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS);
 
         if (selTrack < 0)
@@ -3828,12 +3828,21 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
             {
                 vector<int> flang = filter_lang(atracks, *it);
 
-                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_TRUEHD);
+                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                                         FF_PROFILE_DTS_HD_MA);
+                if (selTrack < 0)
+                    selTrack = filter_max_ch(ic, atracks, flang,
+                                             CODEC_ID_TRUEHD);
 
                 if (selTrack < 0)
-                    selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_EAC3);
+                    selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                                             FF_PROFILE_DTS_HD_HRA);
 
-                if (!transcoding && selTrack < 0)
+                if (selTrack < 0)
+                    selTrack = filter_max_ch(ic, atracks, flang,
+                                             CODEC_ID_EAC3);
+
+                if (selTrack < 0)
                     selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS);
 
                 if (selTrack < 0)
@@ -3849,7 +3858,14 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
             VERBOSE(VB_AUDIO, LOC + "Trying to select audio track (wo/lang)");
             vector<int> flang = filter_lang(atracks, -1);
 
-            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_TRUEHD);
+            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                                     FF_PROFILE_DTS_HD_MA);
+            if (selTrack < 0)
+                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_TRUEHD);
+
+            if (selTrack < 0)
+                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                                         FF_PROFILE_DTS_HD_HRA);
 
             if (selTrack < 0)
                 selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_EAC3);
@@ -4025,13 +4041,20 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                 m_spdifenc = new SPDIFEncoder("spdif", ctx);
                 if (m_spdifenc->Succeeded() && ctx->codec_id == CODEC_ID_DTS)
                 {
-                    /*
-                     * Set the maximum bitrate for DTS content.
-                     * We cannot distinguish between the various DTS types
-                     * (DTS core, DTS-HD High-Resolution and DTS-HD MA
-                     * We must start muxing to determine the bitrate
-                     */
-                    m_spdifenc->SetMaxMuxRate(m_audio->GetMaxBitrate());
+                    switch(ctx->profile)
+                    {
+                        case FF_PROFILE_DTS:
+                        case FF_PROFILE_DTS_ES:
+                        case FF_PROFILE_DTS_96_24:
+                            m_spdifenc->SetMaxHDRate(0);
+                            break;
+                        case FF_PROFILE_DTS_HD_HRA:
+                            m_spdifenc->SetMaxHDRate(m_audio->CanDTSHD() ?
+                                                     192000 : 0);
+                            break;
+                        case FF_PROFILE_DTS_HD_MA:
+                            m_spdifenc->SetMaxHDRate(m_audio->GetMaxHDRate());
+                    }
                 }
             }
             if (!m_spdifenc->Succeeded())
@@ -4041,18 +4064,6 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                 return false;
             }
             m_spdifenc->WriteFrame(tmp_pkt.data, tmp_pkt.size);
-
-            /* Check if DTS stream bitrate changed which indicates change in
-             * DTS codec type. SPDIF muxer will report a new bitrate only if
-             * changing from DTS-HD to DTS core or vice versa.
-             * We call SetupAudioStream, only if changes are required will
-             * AudioOutput class reconfigure audio device.
-             */
-            if (ctx->codec_id == CODEC_ID_DTS &&
-                m_spdifenc->GetBitrate() != audioOut.bitrate)
-            {
-                SetupAudioStream();
-            }
 
             ret = m_spdifenc->GetData((unsigned char *)audioSamples, data_size);
             if (ret < 0)
@@ -4614,7 +4625,19 @@ bool AvFormatDecoder::DoPassThrough(const AVCodecContext *ctx)
             passthru = m_audio->CanAC3();
             break;
         case CODEC_ID_DTS:
-            passthru = m_audio->CanDTS() || m_audio->CanDTSHD();
+            switch(ctx->profile)
+            {
+                case FF_PROFILE_DTS:
+                case FF_PROFILE_DTS_ES:
+                case FF_PROFILE_DTS_96_24:
+                    passthru = m_audio->CanDTS();
+                    break;
+                case FF_PROFILE_DTS_HD_HRA:
+                case FF_PROFILE_DTS_HD_MA:
+                    passthru = m_audio->CanDTSHD();
+                default:
+                    break;
+            }
             break;
         case CODEC_ID_EAC3:
             passthru = m_audio->CanEAC3();
@@ -4699,8 +4722,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
         info = AudioInfo(ctx->codec_id, fmt, ctx->sample_rate,
                          ctx->channels, using_passthru, orig_channels,
-                         ctx->codec_id == CODEC_ID_DTS && m_spdifenc ?
-                         m_spdifenc->GetBitrate() : DEFAULT_BITRATE);
+                         ctx->codec_id == CODEC_ID_DTS ? ctx->profile : 0);
     }
 
     if (!ctx)
@@ -4712,16 +4734,11 @@ bool AvFormatDecoder::SetupAudioStream(void)
     if (info == audioIn)
         return false;
 
-    if (audioIn.ChangedButBitrate(info) && m_spdifenc)
+    if (m_spdifenc)
     {
         // stream has changed, we cannot re-use existing spdif muxer
         delete m_spdifenc;
         m_spdifenc = NULL;
-        info.bitrate = DEFAULT_BITRATE;
-    }
-    else if (m_spdifenc)
-    {
-        info.bitrate = m_spdifenc->GetBitrate();
     }
 
     VERBOSE(VB_AUDIO, LOC + "Initializing audio parms from " +
@@ -4738,7 +4755,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
     m_audio->SetAudioParams(audioOut.format, orig_channels,
                             ctx->request_channels,
                             audioOut.codec_id, audioOut.sample_rate,
-                            audioOut.do_passthru, audioOut.bitrate);
+                            audioOut.do_passthru, audioOut.codec_profile);
     m_audio->ReinitAudio();
 
     if (LCD *lcd = LCD::Get())

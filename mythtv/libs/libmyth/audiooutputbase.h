@@ -50,7 +50,7 @@ class AudioOutputBase : public AudioOutput, public QThread
     virtual ~AudioOutputBase();
 
     AudioOutputSettings* GetOutputSettingsCleaned(bool digital = true);
-    AudioOutputSettings* GetOutputSettingsUsers(bool digital = true);
+    AudioOutputSettings* GetOutputSettingsUsers(bool digital = false);
 
     // reconfigure sound out for new params
     virtual void Reconfigure(const AudioSettings &settings);

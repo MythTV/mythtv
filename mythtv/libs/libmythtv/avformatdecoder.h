@@ -1,3 +1,4 @@
+
 #ifndef AVFORMATDECODER_H_
 #define AVFORMATDECODER_H_
 
@@ -39,52 +40,43 @@ struct SwsContext;
 extern "C" void HandleStreamChange(void*);
 extern "C" void HandleDVDStreamChange(void*);
 
-#define DEFAULT_BITRATE 1536000  // 48000 * 16 * 2
-
 class AudioInfo
 {
   public:
     AudioInfo() :
         codec_id(CODEC_ID_NONE), format(FORMAT_NONE), sample_size(-2),
-        sample_rate(-1), channels(-1), bitrate(DEFAULT_BITRATE),
+        sample_rate(-1), channels(-1), codec_profile(0),
         do_passthru(false), original_channels(-1)
     {;}
 
     AudioInfo(CodecID id, AudioFormat fmt, int sr, int ch, bool passthru,
-              int original_ch, int br = DEFAULT_BITRATE) :
+              int original_ch, int profile = 0) :
         codec_id(id), format(fmt),
         sample_size(ch * AudioOutputSettings::SampleSize(fmt)),
-        sample_rate(sr), channels(ch), bitrate(br), do_passthru(passthru),
-        original_channels(original_ch)
+            sample_rate(sr), channels(ch), codec_profile(profile),
+            do_passthru(passthru), original_channels(original_ch)
     {
     }
 
     CodecID codec_id;
     AudioFormat format;
-    int sample_size, sample_rate, channels, bitrate;
+    int sample_size, sample_rate, channels, codec_profile;
     bool do_passthru;
     int original_channels;
-    bool ChangedButBitrate(const AudioInfo &o) const
-    {
-        return !(codec_id==o.codec_id       && channels==o.channels       &&
-                sample_size==o.sample_size  && sample_rate==o.sample_rate &&
-                format==o.format            && do_passthru==o.do_passthru);
-    }
-
     bool operator==(const AudioInfo &o) const
     {
         return (codec_id==o.codec_id        && channels==o.channels       &&
                 sample_size==o.sample_size  && sample_rate==o.sample_rate &&
                 format==o.format            && do_passthru==o.do_passthru &&
                 original_channels==o.original_channels &&
-                bitrate == o.bitrate);
+                codec_profile == o.codec_profile);
     }
     QString toString() const
     {
-        return QString("id(%1) %2Hz %3ch %4bps %5 (br %6bps)")
+        return QString("id(%1) %2Hz %3ch %4bps %5 (profile %6)")
             .arg(ff_codec_id_string(codec_id),4).arg(sample_rate,6)
             .arg(channels,2).arg(AudioOutputSettings::FormatToBits(format),2)
-            .arg((do_passthru) ? "pt":"",3).arg(bitrate);
+            .arg((do_passthru) ? "pt":"",3).arg(codec_profile);
     }
 };
 
@@ -185,7 +177,12 @@ class AvFormatDecoder : public DecoderBase
     void ScanTeletextCaptions(int av_stream_index);
     void ScanRawTextCaptions(int av_stream_index);
     void ScanDSMCCStreams(void);
-    int AutoSelectAudioTrack(void);
+    int  AutoSelectAudioTrack(void);
+    int  filter_max_ch(const AVFormatContext *ic,
+                       const sinfo_vec_t     &tracks,
+                       const vector<int>     &fs,
+                       enum CodecID           codecId = CODEC_ID_NONE,
+                       int                    profile = -1);
 
   private:
     friend int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
