@@ -121,7 +121,7 @@ bool MythScreenType::SetFocusWidget(MythUIType *widget)
     m_CurrentFocusWidget = widget;
     m_CurrentFocusWidget->TakeFocus();
 
-    if (!widget->GetHelpText().isEmpty())
+    if (helpText && !widget->GetHelpText().isEmpty())
         helpText->SetText(widget->GetHelpText());
 
     return true;
