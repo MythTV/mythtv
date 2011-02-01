@@ -988,7 +988,9 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
         deleteMap.TrackerReset(0, totalFrames);
     }
 
+    // Determine the initial bookmark and update it for the cutlist
     bookmarkseek = GetBookmark();
+    deleteMap.TrackerWantsToJump(bookmarkseek, totalFrames, bookmarkseek);
 
     if (player_ctx->playingInfo->QueryAutoExpire() == kLiveTVAutoExpire)
         gCoreContext->SaveSetting("DefaultChanid",
