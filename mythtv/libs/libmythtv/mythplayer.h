@@ -567,7 +567,7 @@ class MPUBLIC MythPlayer
     int jumpchapter;
 
     // Bookmark stuff
-    long long bookmarkseek;
+    uint64_t bookmarkseek;
 
     // Seek
     /// If fftime>0, number of frames to seek forward.
