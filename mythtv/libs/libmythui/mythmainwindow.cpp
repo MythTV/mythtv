@@ -1417,6 +1417,16 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
                                        bool allowJumps)
 {
     actions.clear();
+
+    // Special case for custom QKeyEvent where the action is embedded directly
+    // in the QKeyEvent text property. Used by MythFEXML http extension
+    if (e->key() == 0 && !e->text().isEmpty() &&
+        e->modifiers() == Qt::NoModifier)
+    {
+        actions.append(e->text());
+        return false;
+    }
+
     int keynum = d->TranslateKeyNum(e);
 
     QStringList localActions;
