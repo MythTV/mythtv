@@ -1114,7 +1114,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
     int bpf   = bytes_per_frame;
     int off   = 0;
 
-    if (!(needs_upmix && upmixer))
+    if (!needs_upmix)
     {
         int num  = len;
 
