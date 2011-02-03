@@ -249,8 +249,6 @@ RingBuffer::~RingBuffer(void)
         delete [] readAheadBuffer;
         readAheadBuffer = NULL;
     }
-
-    rwlock.unlock();
 }
 
 /** \fn RingBuffer::Reset(bool, bool, bool)
