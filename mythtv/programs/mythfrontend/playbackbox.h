@@ -266,8 +266,6 @@ class PlaybackBox : public ScheduleCommon
 
     void UpdateProgressBar(void);
 
-    QString cutDown(const QString &, QFont *, int);
-
     void PlayX(const ProgramInfo &rec,
                bool ignoreBookmark,
                bool underNetworkControl);
