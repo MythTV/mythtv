@@ -37,7 +37,9 @@ SchemaUpgradeWizard::SchemaUpgradeWizard(const QString &DBSchemaSetting,
     switch (gCoreContext->GetNumSetting("DBSchemaAutoUpgrade"))
     {
         case  1: m_autoUpgrade = true; break;
+#if ENABLE_SCHEMA_DEVELOPER_MODE
         case -1: m_expertMode  = true; break;
+#endif
         default: break;
     }
 }
