@@ -918,7 +918,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     if (ringBuffer->IsStream())
     {
-        if (!ringBuffer->Stream()->StartFromBeginning())
+        if (!ringBuffer->StartFromBeginning())
             return -1;
     }
 
@@ -933,7 +933,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     int ret = FindStreamInfo();
 
     // Reset DVD/bluray ringbuffers
-    if (!ringBuffer->StartFromBeginning())
+    if (ringBuffer->IsDisc() && !ringBuffer->StartFromBeginning())
         return -1;
     ringBuffer->IgnoreWaitStates(false);
 
