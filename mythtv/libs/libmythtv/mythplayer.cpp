@@ -336,10 +336,10 @@ bool MythPlayer::Pause(void)
     }
     next_play_speed   = 0.0;
     next_normal_speed = false;
+    PauseDecoder();
     PauseVideo();
     audio.Pause(true);
     PauseBuffer();
-    PauseDecoder();
     allpaused = decoderPaused && videoPaused && bufferPaused;
     {
         QMutexLocker locker(&decoder_change_lock);
@@ -367,10 +367,10 @@ bool MythPlayer::Play(float speed, bool normal, bool unpauseaudio)
     }
 
     UnpauseBuffer();
-    UnpauseDecoder();
     if (unpauseaudio)
         audio.Pause(false);
     UnpauseVideo();
+    UnpauseDecoder();
     allpaused = false;
     next_play_speed   = speed;
     next_normal_speed = normal;
@@ -988,7 +988,10 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
         deleteMap.TrackerReset(0, totalFrames);
     }
 
+    // Determine the initial bookmark and update it for the cutlist
     bookmarkseek = GetBookmark();
+    deleteMap.TrackerReset(bookmarkseek, totalFrames);
+    deleteMap.TrackerWantsToJump(bookmarkseek, totalFrames, bookmarkseek);
 
     if (player_ctx->playingInfo->QueryAutoExpire() == kLiveTVAutoExpire)
         gCoreContext->SaveSetting("DefaultChanid",
@@ -2096,7 +2099,7 @@ bool MythPlayer::FastForward(float seconds)
     if (!videoOutput)
         return false;
 
-    if (fftime >= 0)
+    if (fftime <= 0)
         fftime = (long long)(seconds * video_frame_rate);
     return fftime > CalcMaxFFTime(fftime, false);
 }
@@ -2106,7 +2109,7 @@ bool MythPlayer::Rewind(float seconds)
     if (!videoOutput)
         return false;
 
-    if (rewindtime >= 0)
+    if (rewindtime <= 0)
         rewindtime = (long long)(seconds * video_frame_rate);
     return (uint64_t)rewindtime >= framesPlayed;
 }
@@ -2170,6 +2173,7 @@ void MythPlayer::SwitchToProgram(void)
         discontinuity, newtype, newid);
     if (!pginfo)
         return;
+    newtype = true; // force reloading of context and stream properties
 
     bool newIsDummy = player_ctx->tvchain->GetCardType(newid) == "DUMMY";
 
@@ -2295,6 +2299,7 @@ void MythPlayer::JumpToProgram(void)
         discontinuity, newtype, newid);
     if (!pginfo)
         return;
+    newtype = true; // force reloading of context and stream properties
 
     bool newIsDummy = player_ctx->tvchain->GetCardType(newid) == "DUMMY";
     SetPlayingInfo(*pginfo);
@@ -3363,8 +3368,11 @@ void MythPlayer::WaitForSeek(uint64_t frame, bool override_seeks,
                            (allpaused && !deleteMap.IsEditing()) ? true: after;
     decoder->setExactSeeks(before);
 
+    bool islivetvcur = (livetv && player_ctx->tvchain &&
+                        !player_ctx->tvchain->HasNext());
+
     uint64_t max = totalFrames;
-    if ((livetv || (watchingrecording && player_ctx->recorder &&
+    if ((islivetvcur || (watchingrecording && player_ctx->recorder &&
                    player_ctx->recorder->IsValidRecorder())))
     {
         max = (uint64_t)player_ctx->recorder->GetFramesWritten();
