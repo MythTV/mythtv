@@ -143,7 +143,7 @@ class IconView : public MythScreenType
     QString             m_errorStr;
 
   public slots:
-    void mediaStatusChanged(MediaStatus oldStatus, MythMediaDevice *pMedia);
+    void mediaStatusChanged(MythMediaStatus oldStatus, MythMediaDevice *pMedia);
     void HandleItemSelect(MythUIButtonListItem *);
     void UpdateText(MythUIButtonListItem *);
     void UpdateImage(MythUIButtonListItem *);

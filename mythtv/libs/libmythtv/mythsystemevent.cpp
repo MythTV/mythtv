@@ -136,7 +136,8 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
         if ((*it == "CARDID") ||
             (*it == "HOSTNAME") ||
             (*it == "SECS") ||
-            (*it == "SENDER"))
+            (*it == "SENDER") ||
+            (*it == "PATH"))
         {
             QString token = *it;
 

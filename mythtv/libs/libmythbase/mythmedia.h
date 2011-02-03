@@ -19,7 +19,7 @@ typedef enum {
     MEDIASTAT_USEABLE,
     MEDIASTAT_NOTMOUNTED,
     MEDIASTAT_MOUNTED
-} MediaStatus;
+} MythMediaStatus;
 
 typedef enum {
     MEDIATYPE_UNKNOWN  = 0x0001,
@@ -33,13 +33,14 @@ typedef enum {
     MEDIATYPE_MGALLERY = 0x0100,
     MEDIATYPE_BD       = 0x0200,
     MEDIATYPE_END      = 0x0400,
-} MediaType;
+} MythMediaType;
+// MediaType conflicts with a definition within OSX Quicktime Libraries.
 
 typedef enum {
     MEDIAERR_OK,
     MEDIAERR_FAILED,
     MEDIAERR_UNSUPPORTED
-} MediaError;
+} MythMediaError;
 
 typedef QMap<QString,uint> ext_cnt_t;
 typedef QMap<QString,uint> ext_to_media_t;
@@ -48,7 +49,7 @@ class MPUBLIC MythMediaDevice : public QObject
 {
     Q_OBJECT
     friend class MediaMonitorDarwin;   // So these can call setStatus(),
-    friend class MonitorThreadDarwin;  // and trigger posting of MediaEvents
+    friend class MonitorThreadDarwin;  // and trigger posting of MythMediaEvents
 
  public:
     MythMediaDevice(QObject* par, const char* DevicePath, bool SuperMount,
@@ -66,7 +67,7 @@ class MPUBLIC MythMediaDevice : public QObject
     const QString& getDeviceModel() const  { return m_DeviceModel;  }
     void setDeviceModel(const char *model) { m_DeviceModel = model; }
 
-    MediaStatus getStatus() const { return m_Status; }
+    MythMediaStatus getStatus() const { return m_Status; }
 
     const QString& getVolumeID() const { return m_VolumeID; }
     void  setVolumeID(const char *vol)  { m_VolumeID = vol; }
@@ -87,19 +88,19 @@ class MPUBLIC MythMediaDevice : public QObject
             || m_Status == MEDIASTAT_NOTMOUNTED;
     }
 
-    MediaType getMediaType() const { return m_MediaType; }
+    MythMediaType getMediaType() const { return m_MediaType; }
 
     bool isSuperMount()      const { return m_SuperMount; }
 
-    virtual MediaError  testMedia() { return MEDIAERR_UNSUPPORTED; }
+    virtual MythMediaError  testMedia() { return MEDIAERR_UNSUPPORTED; }
     virtual bool openDevice();
     virtual bool closeDevice();
     virtual bool isSameDevice(const QString &path);
     virtual void setSpeed(int speed);
-    virtual MediaStatus checkMedia() = 0;// Derived classes MUST implement this.
-    virtual MediaError eject(bool open_close = true);
-    virtual MediaError lock();
-    virtual MediaError unlock();
+    virtual MythMediaStatus checkMedia() = 0;// Derived classes MUST implement this.
+    virtual MythMediaError eject(bool open_close = true);
+    virtual MythMediaError lock();
+    virtual MythMediaError unlock();
     virtual bool performMountCmd( bool DoMount );
 
     bool mount()   { return performMountCmd(true);  }
@@ -119,10 +120,10 @@ class MPUBLIC MythMediaDevice : public QObject
 
     const char* MediaTypeString();
 
-    static const char* MediaTypeString(MediaType type);
+    static const char* MediaTypeString(MythMediaType type);
 
  signals:
-    void statusChanged(MediaStatus oldStatus, MythMediaDevice* pMedia);
+    void statusChanged(MythMediaStatus oldStatus, MythMediaDevice* pMedia);
 
  protected:
     virtual ~MythMediaDevice() {} // use deleteLater...
@@ -130,7 +131,7 @@ class MPUBLIC MythMediaDevice : public QObject
     /// Override this to perform any post mount logic.
     virtual void onDeviceMounted(void)
     {
-        MediaType type = DetectMediaType();
+        MythMediaType type = DetectMediaType();
         if (type != MEDIATYPE_UNKNOWN)
             m_MediaType = type;
     }
@@ -138,10 +139,10 @@ class MPUBLIC MythMediaDevice : public QObject
     /// Override this to perform any post unmount logic.
     virtual void onDeviceUnmounted() {};
 
-    MediaType DetectMediaType(void);
+    MythMediaType DetectMediaType(void);
     bool ScanMediaType(const QString &directory, ext_cnt_t &counts);
 
-    MediaStatus setStatus(MediaStatus newStat, bool CloseIt=false);
+    MythMediaStatus setStatus(MythMediaStatus newStat, bool CloseIt=false);
 
     QString m_DeviceModel;   ///< The device Manufacturer/Model. Read/write
     QString m_DevicePath;    ///< The path to this media's device.
@@ -154,9 +155,9 @@ class MPUBLIC MythMediaDevice : public QObject
                              ///  (e.g. /dev/hdc) Read only
     QString m_VolumeID;      ///< The volume ID of the media. Read/write
 
-    MediaStatus m_Status;    ///< The status of the media as of the
+    MythMediaStatus m_Status;    ///< The status of the media as of the
                              ///  last call to checkMedia. Read only
-    MediaType   m_MediaType; ///< The type of media. Read only
+    MythMediaType   m_MediaType; ///< The type of media. Read only
 
     bool m_AllowEject;       ///< Allow the user to eject the media?. Read only
     bool m_Locked;           ///< Is this media locked?.              Read only
@@ -170,19 +171,19 @@ class MPUBLIC MythMediaDevice : public QObject
     ext_to_media_t m_ext_to_media; ///< Map of extension to media type.
 };
 
-class MPUBLIC MediaEvent : public QEvent
+class MPUBLIC MythMediaEvent : public QEvent
 {
   public:
-    MediaEvent(MediaStatus oldStatus, MythMediaDevice *pDevice) :
+    MythMediaEvent(MythMediaStatus oldStatus, MythMediaDevice *pDevice) :
         QEvent(kEventType), m_OldStatus(oldStatus), m_Device(pDevice) {}
 
-    MediaStatus getOldStatus(void) const { return m_OldStatus; }
+    MythMediaStatus getOldStatus(void) const { return m_OldStatus; }
     MythMediaDevice* getDevice(void) { return m_Device; }
 
     static Type kEventType;
 
   protected:
-    MediaStatus m_OldStatus;
+    MythMediaStatus m_OldStatus;
     QPointer<MythMediaDevice> m_Device;
 };
 

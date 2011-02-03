@@ -396,7 +396,7 @@ VideoPlayerCommand &VideoPlayerCommand::operator=(const VideoPlayerCommand &rhs)
 
 void VideoPlayerCommand::Play() const
 {
-    class LCD *lcd = LCD::Get();
+    LCD *lcd = LCD::Get();
 
     if (lcd) {
         lcd->setFunctionLEDs(FUNC_TV, false);

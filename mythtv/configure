@@ -3009,7 +3009,7 @@ EOF
 check_host_cflags -std=c99
 
 case "$arch" in
-    alpha|ia64|mips|parisc|sparc)
+    alpha|ia64|mips|parisc|sparc|ppc)
         spic=$shared
     ;;
     x86)

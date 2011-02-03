@@ -52,7 +52,7 @@ const char* MythMediaDevice::MediaErrorStrings[] =
     "MEDIAERR_UNSUPPORTED"
 };
 
-QEvent::Type MediaEvent::kEventType =
+QEvent::Type MythMediaEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 MythMediaDevice::MythMediaDevice(QObject* par, const char* DevicePath,
@@ -175,9 +175,9 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
 /** \fn MythMediaDevice::DetectMediaType(void)
  *  \brief Returns guessed media type based on file extensions.
  */
-MediaType MythMediaDevice::DetectMediaType(void)
+MythMediaType MythMediaDevice::DetectMediaType(void)
 {
-    MediaType mediatype = MEDIATYPE_UNKNOWN;
+    MythMediaType mediatype = MEDIATYPE_UNKNOWN;
     ext_cnt_t ext_cnt;
 
     if (!ScanMediaType(m_MountPath, ext_cnt))
@@ -215,7 +215,7 @@ MediaType MythMediaDevice::DetectMediaType(void)
     {
         if (*cit > max_cnt)
         {
-            mediatype = (MediaType) cit.key();
+            mediatype = (MythMediaType) cit.key();
             max_cnt   = *cit;
         }
     }
@@ -262,7 +262,7 @@ bool MythMediaDevice::ScanMediaType(const QString &directory, ext_cnt_t &cnt)
 /** \fn MythMediaDevice::RegisterMediaExtensions(uint,const QString&)
  *  \brief Used to register media types with extensions.
  *
- *  \param mediatype  MediaType flag.
+ *  \param mediatype  MythMediaType flag.
  *  \param extensions Comma separated list of extensions like 'mp3,ogg,flac'.
  */
 void MythMediaDevice::RegisterMediaExtensions(uint mediatype,
@@ -273,7 +273,7 @@ void MythMediaDevice::RegisterMediaExtensions(uint mediatype,
         m_ext_to_media[*it] |= mediatype;
 }
 
-MediaError MythMediaDevice::eject(bool open_close)
+MythMediaError MythMediaDevice::eject(bool open_close)
 {
     (void) open_close;
 
@@ -310,7 +310,7 @@ void MythMediaDevice::setSpeed(int speed)
             .arg(speed).arg(m_DevicePath));
 }
 
-MediaError MythMediaDevice::lock()
+MythMediaError MythMediaDevice::lock()
 {
     // We just open the device here, which may or may not do the trick,
     // derived classes can do more...
@@ -323,7 +323,7 @@ MediaError MythMediaDevice::lock()
     return MEDIAERR_FAILED;
 }
 
-MediaError MythMediaDevice::unlock()
+MythMediaError MythMediaDevice::unlock()
 {
     m_Locked = false;
 
@@ -414,9 +414,9 @@ bool MythMediaDevice::findMountPath()
     return false;
 }
 
-MediaStatus MythMediaDevice::setStatus( MediaStatus NewStatus, bool CloseIt )
+MythMediaStatus MythMediaDevice::setStatus( MythMediaStatus NewStatus, bool CloseIt )
 {
-    MediaStatus OldStatus = m_Status;
+    MythMediaStatus OldStatus = m_Status;
 
     m_Status = NewStatus;
 
@@ -466,9 +466,9 @@ const char* MythMediaDevice::MediaTypeString()
     return MediaTypeString(m_MediaType);
 }
 
-const char* MythMediaDevice::MediaTypeString(MediaType type)
+const char* MythMediaDevice::MediaTypeString(MythMediaType type)
 {
-    // MediaType is currently a bitmask. If it is ever used as such,
+    // MythMediaType is currently a bitmask. If it is ever used as such,
     // this code will only output the main type.
 
     if (type == MEDIATYPE_UNKNOWN)

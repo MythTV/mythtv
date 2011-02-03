@@ -921,8 +921,11 @@ bool SubtitleScreen::InitialiseFont(int fontStretch)
     QString font = gCoreContext->GetSetting("OSDSubFont", "FreeSans");
     if (initialised)
     {
-        if (gTextSubFont->face().family() == font)
-            return gTextSubFont;
+        if (gTextSubFont->face().family() == font &&
+            gTextSubFont->face().stretch() == fontStretch)
+        {
+            return true;
+        }
         delete gTextSubFont;
     }
 
@@ -949,13 +952,14 @@ bool SubtitleScreen::Initialise708Fonts(int fontStretch)
 {
     static bool initialised = false;
     if (initialised)
+    {
+        foreach(MythFontProperties* font, gCC708Fonts)
+            font->face().setStretch(fontStretch);
         return true;
-
-    initialised = true;
+    }
 
     VERBOSE(VB_IMPORTANT, "Initialise708Fonts()");
 
-    // TODO remove extra fonts from settings page
     QStringList fonts;
     fonts.append("Droid Sans Mono"); // default
     fonts.append("FreeMono");        // mono serif
@@ -980,8 +984,9 @@ bool SubtitleScreen::Initialise708Fonts(int fontStretch)
             count++;
         }
     }
+    initialised = count > 0;
     VERBOSE(VB_PLAYBACK, LOC + QString("Loaded %1 CEA-708 fonts").arg(count));
-    return true;
+    return initialised;
 }
 
 MythFontProperties* SubtitleScreen::Get708Font(CC708CharacterAttribute attr)

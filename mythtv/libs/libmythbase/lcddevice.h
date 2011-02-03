@@ -177,7 +177,7 @@ class MPUBLIC LCD : public QObject, public MythSocketCBs
     LCD();
 
     static bool m_server_unavailable;
-    static class LCD * m_lcd;
+    static LCD *m_lcd;
     static bool m_enabled;
 
   public:
@@ -197,7 +197,7 @@ class MPUBLIC LCD : public QObject, public MythSocketCBs
         MUSIC_SHUFFLE_ARTIST = 4
     };
 
-    static class LCD * Get(void);
+    static LCD *Get(void);
     static void SetupLCD (void);
 
     // Used to actually connect to an LCD device
@@ -236,7 +236,7 @@ class MPUBLIC LCD : public QObject, public MythSocketCBs
     // While watching Live/Recording/Pause Buffer, occasionaly describe how
     // much of the program has been seen (between 0.0 and 1.0)
     // (e.g. [current time - start time] / [end time - start time]  )
-    void setChannelProgress(float percentViewed);
+    void setChannelProgress(const QString time, float percentViewed);
 
     // Show the Menu
     // QPtrList is a pointer to a bunch of menu items

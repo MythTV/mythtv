@@ -280,6 +280,7 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
 void MythThemedMenu::aboutToShow()
 {
     MythScreenType::aboutToShow();
+    m_buttonList->updateLCD();
 }
 
 void MythThemedMenu::ShowMenu()
@@ -942,7 +943,7 @@ bool MythThemedMenu::checkPinCode(const QString &password_setting)
 /**
  * \copydoc MythUIType::mediaEvent()
  */
-void MythThemedMenu::mediaEvent(MediaEvent* event)
+void MythThemedMenu::mediaEvent(MythMediaEvent* event)
 {
     if (!event)
         return;
@@ -952,8 +953,8 @@ void MythThemedMenu::mediaEvent(MediaEvent* event)
     if (!device)
         return;
 
-    MediaType type = device->getMediaType();
-    MediaStatus status = device->getStatus();
+    MythMediaType type = device->getMediaType();
+    MythMediaStatus status = device->getStatus();
 
     if ((status & ~MEDIASTAT_USEABLE) &&
         (status & ~MEDIASTAT_MOUNTED))

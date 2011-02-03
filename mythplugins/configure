@@ -474,7 +474,7 @@ if test x"$icc" != x ; then
     case "$icc" in
     /*)
     ;;
-    *) icc=/usr/share/color/icc/$icc
+    *) icc=$sysroot/usr/share/color/icc/$icc
     ;;
     esac
     # Verify the presence of the file.

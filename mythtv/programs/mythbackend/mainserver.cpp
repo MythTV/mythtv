@@ -3080,13 +3080,22 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
                                      PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
+    QStringList strList;
+
+    if ((sList.size() < 4) || (sList.size() > 5))
+    {
+        VERBOSE(VB_IMPORTANT, QString("HandleSGGetFileList: Invalid Request. "
+                                      "%1").arg(sList.join("[]:[]")));
+        strList << "EMPTY LIST";
+        SendResponse(pbssock, strList);
+        return;
+    }
 
     QString host = gCoreContext->GetHostName();
     QString wantHost = sList.at(1);
     QString groupname = sList.at(2);
     QString path = sList.at(3);
     bool fileNamesOnly = false;
-    QStringList strList;
 
     if (sList.size() >= 5)
         fileNamesOnly = sList.at(4).toInt();
@@ -3137,11 +3146,20 @@ void MainServer::HandleSGFileQuery(QStringList &sList,
                                      PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
+    QStringList strList;
+
+    if (sList.size() != 4)
+    {
+        VERBOSE(VB_IMPORTANT, QString("HandleSGFileQuery: Invalid Request. %1")
+                .arg(sList.join("[]:[]")));
+        strList << "EMPTY LIST";
+        SendResponse(pbssock, strList);
+        return;
+    }
 
     QString wantHost = sList.at(1);
     QString groupname = sList.at(2);
     QString filename = sList.at(3);
-    QStringList strList;
 
     bool slaveUnreachable = false;
 

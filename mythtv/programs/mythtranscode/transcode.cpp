@@ -436,12 +436,10 @@ int Transcode::TranscodeFile(
         }
         if (cutStr.isEmpty())
             cutStr = "Is Empty";
-        else if (cutStr.endsWith('-'))
+        else if (cutStr.endsWith('-') && (total_frame_count > lastStart))
         {
-            long long lastFrame = (long long)m_proginfo->
-                                             GetLastFrameInPosMap() + 60;
-            if (lastFrame > lastStart)
-                cutStr += QString("%1").arg(lastFrame);
+            new_frame_count -= (total_frame_count - lastStart);
+            cutStr += QString("%1").arg(total_frame_count);
         }
         VERBOSE(VB_GENERAL, QString("Cutlist        : %1").arg(cutStr));
         VERBOSE(VB_GENERAL, QString("Original Length: %1 frames")

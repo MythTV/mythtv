@@ -128,16 +128,16 @@ public:
         MythCDROM(par, DevicePath, SuperMount, AllowEject) {
     }
 
-    virtual MediaError testMedia(void);
+    virtual MythMediaError testMedia(void);
     virtual bool mediaChanged(void);
     virtual bool checkOK(void);
-    virtual MediaStatus checkMedia(void);
-    virtual MediaError eject(bool open_close = true);
+    virtual MythMediaStatus checkMedia(void);
+    virtual MythMediaError eject(bool open_close = true);
     virtual void setSpeed(int speed);
     virtual void setSpeed(const char *device, int speed);
     virtual bool isSameDevice(const QString &path);
-    virtual MediaError lock(void);
-    virtual MediaError unlock(void);
+    virtual MythMediaError lock(void);
+    virtual MythMediaError unlock(void);
 
 private:
     int driveStatus(void);
@@ -285,7 +285,7 @@ int MythCDROMLinux::SCSIstatus()
 }
 
 
-MediaError MythCDROMLinux::eject(bool open_close)
+MythMediaError MythCDROMLinux::eject(bool open_close)
 {
     if (!isDeviceOpen())
     {
@@ -323,7 +323,7 @@ bool MythCDROMLinux::checkOK()
 }
 
 // Helper function, perform a sanity check on the device
-MediaError MythCDROMLinux::testMedia()
+MythMediaError MythCDROMLinux::testMedia()
 {
     //cout << "MythCDROMLinux::testMedia - ";
     bool OpenedHere = false;
@@ -362,7 +362,7 @@ MediaError MythCDROMLinux::testMedia()
     return MEDIAERR_OK;
 }
 
-MediaStatus MythCDROMLinux::checkMedia()
+MythMediaStatus MythCDROMLinux::checkMedia()
 {
     bool OpenedHere = false;
 
@@ -599,16 +599,16 @@ MediaStatus MythCDROMLinux::checkMedia()
     return m_Status;
 }
 
-MediaError MythCDROMLinux::lock()
+MythMediaError MythCDROMLinux::lock()
 {
-    MediaError ret = MythMediaDevice::lock();
+    MythMediaError ret = MythMediaDevice::lock();
     if (ret == MEDIAERR_OK)
         ioctl(m_DeviceHandle, CDROM_LOCKDOOR, 1);
 
     return ret;
 }
 
-MediaError MythCDROMLinux::unlock()
+MythMediaError MythCDROMLinux::unlock()
 {
     if (isDeviceOpen() || openDevice())
     {

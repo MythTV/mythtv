@@ -43,7 +43,7 @@ class LCDProcClient : public QObject
     void setLevels(int numbLevels, float *values);
     void switchToChannel(QString channum = "", QString title = "", 
                          QString subtitle = "");
-    void setChannelProgress(float percentViewed);
+    void setChannelProgress(const QString &time, float percentViewed);
     void switchToMenu(QList<LCDMenuItem> *menuItems, QString app_name = "",
                       bool popMenu = true);
     void switchToGeneric(QList<LCDTextItem> *textItems);
@@ -169,6 +169,7 @@ class LCDProcClient : public QObject
 
     float EQlevels[10];
     float progress;
+    QString channel_time;
     /** true if the generic progress indicator is a busy
         (ie. doesn't have a known total steps */
     bool busy_progress;

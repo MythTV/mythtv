@@ -278,7 +278,6 @@ class MPUBLIC ProgramInfo
     QString MakeUniqueKey(void) const
         { return MakeUniqueKey(chanid, recstartts); }
     uint GetSecondsInRecording(void) const;
-    uint64_t GetLastFrameInPosMap(void) const;
     QString ChannelText(const QString&) const;
     QString GetPathname(void) const { return pathname; }
     QString GetBasename(void) const { return pathname.section('/', -1); }
@@ -504,6 +503,7 @@ class MPUBLIC ProgramInfo
     QString     QueryRecordingGroup(void) const;
     bool        QueryMarkupFlag(MarkTypes type) const;
     uint        QueryTranscoderID(void) const;
+    uint64_t    QueryLastFrameInPosMap(void) const;
     bool        Reload(void);
 
     // Slow DB sets

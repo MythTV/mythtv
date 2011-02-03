@@ -860,7 +860,7 @@ MythProgressDialog::MythProgressDialog(
 
     setTotalSteps(totalSteps);
 
-    if (class LCD * lcddev = LCD::Get())
+    if (LCD *lcddev = LCD::Get())
     {
         QList<LCDTextItem> textItems;
 
@@ -923,7 +923,7 @@ void MythProgressDialog::setProgress(int curprogress)
     if (curprogress % steps == 0)
     {
         qApp->processEvents();
-        if (LCD * lcddev = LCD::Get())
+        if (LCD *lcddev = LCD::Get())
         {
             float fProgress = (float)curprogress / m_totalSteps;
             lcddev->setGenericProgress(fProgress);

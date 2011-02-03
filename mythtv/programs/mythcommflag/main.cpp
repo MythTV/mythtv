@@ -355,7 +355,7 @@ static int GetMarkupList(QString list, QString chanid, QString starttime)
 
     if (result.endsWith('-'))
     {
-        uint64_t lastFrame = pginfo.GetLastFrameInPosMap() + 60;
+        uint64_t lastFrame = pginfo.QueryLastFrameInPosMap() + 60;
         if (lastFrame > lastStart)
             result += QString("%1").arg(lastFrame);
     }

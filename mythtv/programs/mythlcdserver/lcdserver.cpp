@@ -579,7 +579,7 @@ void LCDServer::setChannelProgress(const QStringList &tokens, QTcpSocket *socket
 
     QString flat = tokens.join(" ");
 
-    if (tokens.count() != 2)
+    if (tokens.count() != 3)
     {
         VERBOSE(VB_IMPORTANT, "LCDServer: bad SET_CHANNEL_PROGRESS command: "
                 << flat);
@@ -588,7 +588,7 @@ void LCDServer::setChannelProgress(const QStringList &tokens, QTcpSocket *socket
     }
 
     bool bOK;
-    float progress = tokens[1].toFloat(&bOK);
+    float progress = tokens[2].toFloat(&bOK);
     if (!bOK)
     {
         VERBOSE(VB_IMPORTANT, "LCDServer: bad float value in "
@@ -598,7 +598,7 @@ void LCDServer::setChannelProgress(const QStringList &tokens, QTcpSocket *socket
     }
 
     if (m_lcd)
-        m_lcd->setChannelProgress(progress);
+        m_lcd->setChannelProgress(tokens[1], progress);
 
     sendMessage(socket, "OK");
 }

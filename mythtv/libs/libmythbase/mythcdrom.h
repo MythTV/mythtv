@@ -14,7 +14,7 @@ class MPUBLIC MythCDROM : public MythMediaDevice
 
     virtual bool mediaChanged(void) { return false; }
     virtual bool checkOK(void)      { return true; }
-    virtual MediaStatus checkMedia(void)
+    virtual MythMediaStatus checkMedia(void)
     {
         return setStatus(MEDIASTAT_UNKNOWN, false);
     }

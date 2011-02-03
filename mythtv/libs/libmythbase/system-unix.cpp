@@ -626,6 +626,11 @@ void MythSystemUnix::Fork(time_t timeout)
     if (GetSetting("SetDirectory") && !dir.isEmpty())
         directory = strdup(dir.toUtf8().constData());
 
+    /* Do this before forking in case the child miserably fails */
+    m_timeout = timeout;
+    if( timeout )
+        m_timeout += time(NULL);
+
     pid_t child = fork();
 
     if (child < 0)
@@ -642,17 +647,12 @@ void MythSystemUnix::Fork(time_t timeout)
         m_pid = child;
         SetStatus( GENERIC_EXIT_RUNNING );
 
-        m_timeout = timeout;
-
         VERBOSE(VB_SYSTEM|VB_EXTRA,
                     QString("Managed child (PID: %1) has started! "
                             "%2%3 command=%4, timeout=%5")
                         .arg(m_pid) .arg(GetSetting("UseShell") ? "*" : "")
                         .arg(GetSetting("RunInBackground") ? "&" : "")
-                        .arg(GetLogCmd()) .arg(m_timeout));
-
-        if( timeout )
-            m_timeout += time(NULL);
+                        .arg(GetLogCmd()) .arg(timeout));
 
         /* close unused pipe ends */
         CLOSE(p_stdin[0]);

@@ -2106,7 +2106,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
     //  Put something on the LCD device (if one exists)
     //
 
-    if (class LCD *lcddev = LCD::Get())
+    if (LCD *lcddev = LCD::Get())
     {
         QString msg = current_node->getString();
         GenericTree *parent = current_node->getParent();

@@ -177,7 +177,9 @@ class MythMainWindowPrivate
 
         m_themeBase(NULL),
 
-        m_udpListener(NULL)
+        m_udpListener(NULL),
+
+        m_pendingUpdate(false)
     {
     }
 
@@ -258,6 +260,8 @@ class MythMainWindowPrivate
 
     MythThemeBase *m_themeBase;
     MythUDPListener *m_udpListener;
+
+    bool m_pendingUpdate;
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
@@ -840,6 +844,9 @@ bool MythMainWindow::screenShot(void)
 
 bool MythMainWindow::event(QEvent *e)
 {
+    if (!updatesEnabled() && (e->type() == QEvent::UpdateRequest))
+        d->m_pendingUpdate = true;
+
     if (e->type() == QEvent::Show && !e->spontaneous())
     {
         QCoreApplication::postEvent(
@@ -1290,11 +1297,17 @@ void MythMainWindow::SetDrawEnabled(bool enable)
 
     if (enable)
     {
-        repaint(); // See #8952
+        if (d->m_pendingUpdate)
+        {
+            QApplication::postEvent(this, new QEvent(QEvent::UpdateRequest), Qt::LowEventPriority);
+            d->m_pendingUpdate = false;
+        }
         d->drawTimer->start(1000 / 70);
+
     }
     else
         d->drawTimer->stop();
+
 
     d->m_setDrawEnabledWait.wakeAll();
 }
@@ -1404,6 +1417,16 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
                                        bool allowJumps)
 {
     actions.clear();
+
+    // Special case for custom QKeyEvent where the action is embedded directly
+    // in the QKeyEvent text property. Used by MythFEXML http extension
+    if (e->key() == 0 && !e->text().isEmpty() &&
+        e->modifiers() == Qt::NoModifier)
+    {
+        actions.append(e->text());
+        return false;
+    }
+
     int keynum = d->TranslateKeyNum(e);
 
     QStringList localActions;
@@ -2066,9 +2089,9 @@ void MythMainWindow::customEvent(QEvent *ce)
         }
     }
 #endif
-    else if (ce->type() == MediaEvent::kEventType)
+    else if (ce->type() == MythMediaEvent::kEventType)
     {
-        MediaEvent *me = static_cast<MediaEvent*>(ce);
+        MythMediaEvent *me = static_cast<MythMediaEvent*>(ce);
 
         // A listener based system might be more efficient, but we should never
         // have that many screens open at once so impact should be minimal.

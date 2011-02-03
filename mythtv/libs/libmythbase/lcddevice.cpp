@@ -77,9 +77,9 @@ LCD::LCD()
 
 bool LCD::m_enabled = false;
 bool LCD::m_server_unavailable = false;
-class LCD *LCD::m_lcd = NULL;
+LCD *LCD::m_lcd = NULL;
 
-class LCD * LCD::Get(void)
+LCD *LCD::Get(void)
 {
     if (m_enabled && m_lcd == NULL && m_server_unavailable == false)
         m_lcd = new LCD;
@@ -108,7 +108,7 @@ void LCD::SetupLCD (void)
 
     if (m_enabled && lcd_host.length() > 0 && lcd_port > 1024)
     {
-        class LCD * lcd = LCD::Get();
+        LCD *lcd = LCD::Get();
         if (lcd->connectToHost(lcd_host, lcd_port) == false)
         {
             delete m_lcd;
@@ -473,13 +473,14 @@ void LCD::setTunerLEDs(enum LCDTunerSet tuner, bool on)
     sendToServer(QString("UPDATE_LEDS %1").arg(lcd_ledmask));
 }
 
-void LCD::setChannelProgress(float value)
+void LCD::setChannelProgress(const QString time, float value)
 {
     if (!lcd_ready || !lcd_showchannel)
         return;
 
     value = std::min(std::max(0.0f, value), 1.0f);
-    sendToServer(QString("SET_CHANNEL_PROGRESS %1").arg(value));
+    sendToServer(QString("SET_CHANNEL_PROGRESS %1 %2").arg(quotedString(time))
+        .arg(value));
 }
 
 void LCD::setGenericProgress(float value)

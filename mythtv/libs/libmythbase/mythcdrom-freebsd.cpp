@@ -17,10 +17,10 @@ public:
         MythCDROM(par, DevicePath, SuperMount, AllowEject) {
     }
 
-    virtual MediaError testMedia(void);
-    virtual MediaError eject(bool open_close = true);
-    virtual MediaError lock(void);
-    virtual MediaError unlock(void);
+    virtual MythMediaError testMedia(void);
+    virtual MythMediaError eject(bool open_close = true);
+    virtual MythMediaError lock(void);
+    virtual MythMediaError unlock(void);
 };
 
 MythCDROM *GetMythCDROMFreeBSD(QObject* par, const char* devicePath,
@@ -29,7 +29,7 @@ MythCDROM *GetMythCDROMFreeBSD(QObject* par, const char* devicePath,
     return new MythCDROMFreeBSD(par, devicePath, SuperMount, AllowEject);
 }
 
-MediaError MythCDROMFreeBSD::eject(bool open_close)
+MythMediaError MythCDROMFreeBSD::eject(bool open_close)
 {
     if (!isDeviceOpen())
         openDevice();
@@ -42,7 +42,7 @@ MediaError MythCDROMFreeBSD::eject(bool open_close)
 }
 
 // Helper function, perform a sanity check on the device
-MediaError MythCDROMFreeBSD::testMedia()
+MythMediaError MythCDROMFreeBSD::testMedia()
 {
     //cout << "MythCDROMLinux::testMedia - ";
     bool OpenedHere = false;
@@ -73,16 +73,16 @@ MediaError MythCDROMFreeBSD::testMedia()
     return MEDIAERR_OK;
 }
 
-MediaError MythCDROMFreeBSD::lock() 
+MythMediaError MythCDROMFreeBSD::lock() 
 {
-    MediaError ret = MythMediaDevice::lock();
+    MythMediaError ret = MythMediaDevice::lock();
     if (ret == MEDIAERR_OK)
         ioctl(m_DeviceHandle, CDIOCPREVENT);
 
     return ret;
 }
 
-MediaError MythCDROMFreeBSD::unlock() 
+MythMediaError MythCDROMFreeBSD::unlock() 
 {
     if (isDeviceOpen() || openDevice()) 
     { 
