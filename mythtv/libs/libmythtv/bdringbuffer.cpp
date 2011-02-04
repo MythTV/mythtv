@@ -281,7 +281,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     // several minutes when the disc structure is remote. The callback allows
     // us to 'kick' the main UI - as the 'please wait' widget is still visible
     // at this stage
-    mythfile_open_register_callback(this, file_opened_callback);
+    mythfile_open_register_callback(lfilename, this, file_opened_callback);
 
     QMutexLocker locker(&m_infoLock);
     rwlock.lockForWrite();
@@ -300,7 +300,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     if (!bdnav)
     {
         rwlock.unlock();
-        mythfile_open_register_callback(this, NULL);
+        mythfile_open_register_callback(lfilename, this, NULL);
         return false;
     }
 
@@ -461,7 +461,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
     rwlock.unlock();
 
-    mythfile_open_register_callback(this, NULL);
+    mythfile_open_register_callback(lfilename, this, NULL);
     return true;
 }
 
