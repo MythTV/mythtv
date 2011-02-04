@@ -39,8 +39,8 @@ class MythFEXML : public Eventing
 
     // Implement UPnpServiceImpl methods that we can
 
-    virtual QString GetServiceType      () { return "urn:schemas-mythtv-org:service:MythTv:1"; }
-    virtual QString GetServiceId        () { return "urn:mythtv-org:serviceId:MYTHTV_1-0"; }
+    virtual QString GetServiceType      () { return "urn:schemas-mythtv-org:service:MythFrontend:1"; }
+    virtual QString GetServiceId        () { return "urn:mythtv-org:serviceId:MYTHFRONTEND_1-0"; }
     virtual QString GetServiceControlURL() { return m_sControlUrl.mid( 1 ); }
     virtual QString GetServiceDescURL   () { return m_sControlUrl.mid( 1 ) + "/GetServDesc"; }
 
