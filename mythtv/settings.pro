@@ -68,7 +68,7 @@ isEmpty(QMAKE_EXTENSION_SHLIB) {
 isEmpty(QMAKE_EXTENSION_LIB) {
     QMAKE_EXTENSION_LIB=a
 }
-# For dependencies on Myth library filenames in TARGETDEPS
+# For dependencies on Myth library filenames in POST_TARGETDEPS
 MYTH_SHLIB_EXT=$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 MYTH_LIB_EXT  =$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
 

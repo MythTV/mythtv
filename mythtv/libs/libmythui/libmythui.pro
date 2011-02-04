@@ -122,7 +122,7 @@ using_xrandr {
     # Add nvidia XV-EXTENSION support
     SOURCES += util-nvctrl.cpp
     LIBS += -L../libmythnvctrl -lmythnvctrl-$${LIBVERSION}
-    TARGETDEPS += ../libmythnvctrl/libmythnvctrl-$${MYTH_LIB_EXT}
+    POST_TARGETDEPS += ../libmythnvctrl/libmythnvctrl-$${MYTH_LIB_EXT}
 }
 
 cygwin:DEFINES += _WIN32
