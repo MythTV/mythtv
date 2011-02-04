@@ -53,34 +53,7 @@ QMultiHash<QString, Callback> m_fileOpenCallbacks;
 #define LOC     QString("mythiowrapper: ")
 #define LOC_ERR QString("mythiowrapper: ERROR: ")
 
-/////////////////////////////////////////////////////////////////////////////
-
-extern "C" {
-
-static int getNextFileID(void)
-{
-    int id = 100000;
-
-    for (; id < maxID; ++id)
-    {
-        if ((!m_localfiles.contains(id)) &&
-            (!m_remotefiles.contains(id)) &&
-            (!m_ringbuffers.contains(id)))
-            break;
-    }
-
-    if (id == maxID)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "getNextFileID(), too "
-                "many files are open.");
-    }
-
-    VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("getNextFileID() = %1").arg(id));
-
-    return id;
-}
-
-void mythfile_open_register_callback(const QString path, void* object,
+void mythfile_open_register_callback(const QString &path, void* object,
                                      callback_t func)
 {
     m_callbackLock.lock();
@@ -115,6 +88,33 @@ void mythfile_open_register_callback(const QString path, void* object,
         .arg(m_fileOpenCallbacks.size()));
 
     m_callbackLock.unlock();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+
+extern "C" {
+
+static int getNextFileID(void)
+{
+    int id = 100000;
+
+    for (; id < maxID; ++id)
+    {
+        if ((!m_localfiles.contains(id)) &&
+            (!m_remotefiles.contains(id)) &&
+            (!m_ringbuffers.contains(id)))
+            break;
+    }
+
+    if (id == maxID)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "getNextFileID(), too "
+                "many files are open.");
+    }
+
+    VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("getNextFileID() = %1").arg(id));
+
+    return id;
 }
 
 int mythfile_check(int id)
