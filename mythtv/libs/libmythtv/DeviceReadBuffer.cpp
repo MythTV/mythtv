@@ -1,6 +1,7 @@
 #include <algorithm>
 using namespace std;
 
+#include <QThread>
 #include "DeviceReadBuffer.h"
 #include "mythcorecontext.h"
 #include "tspacket.h"
@@ -109,10 +110,13 @@ void DeviceReadBuffer::Start(void)
         return;
     }
 
-    if (pthread_create(&thread, NULL, boot_ringbuffer, this) != 0)
+    thread.SetBuffer(this);
+    thread.start();
+
+    if (!thread.isRunning())
     {
         VERBOSE(VB_IMPORTANT,
-                LOC_ERR + QString("Start(): pthread_create failed.") + ENO);
+                LOC_ERR + QString("Start(): thread.run() failed.") + ENO);
 
         QMutexLocker locker(&lock);
         error = true;
@@ -148,7 +152,7 @@ void DeviceReadBuffer::Stop(void)
         run = false;
     }
 
-    pthread_join(thread, NULL);
+    thread.wait();
 }
 
 void DeviceReadBuffer::SetRequestPause(bool req)
@@ -243,10 +247,12 @@ void DeviceReadBuffer::IncrReadPointer(uint len)
     readPtr  = (readPtr == endPtr) ? buffer : readPtr;
 }
 
-void *DeviceReadBuffer::boot_ringbuffer(void *arg)
+void DRBThread::run(void)
 {
-    ((DeviceReadBuffer*) arg)->fill_ringbuffer();
-    return NULL;
+    if (!m_buffer)
+        return;
+
+    m_buffer->fill_ringbuffer();
 }
 
 void DeviceReadBuffer::fill_ringbuffer(void)
@@ -554,3 +560,7 @@ void DeviceReadBuffer::ReportStats(void)
     }
 #endif
 }
+
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */
