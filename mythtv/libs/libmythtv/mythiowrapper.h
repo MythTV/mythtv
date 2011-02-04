@@ -6,13 +6,13 @@
 
 #include "mythexp.h"
 
-typedef void (*callback_t)(void*);
-void    mythfile_open_register_callback(const QString &path, void* object,
-                                        callback_t func);
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef void (*callback_t)(void*);
+void    mythfile_open_register_callback(const char *pathname, void* object,
+                                        callback_t func);
 
 int     mythfile_check(int fileID);
 int     mythfile_open(const char *pathname, int flags);

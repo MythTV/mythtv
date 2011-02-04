@@ -53,43 +53,6 @@ QMultiHash<QString, Callback> m_fileOpenCallbacks;
 #define LOC     QString("mythiowrapper: ")
 #define LOC_ERR QString("mythiowrapper: ERROR: ")
 
-void mythfile_open_register_callback(const QString &path, void* object,
-                                     callback_t func)
-{
-    m_callbackLock.lock();
-    if (m_fileOpenCallbacks.contains(path))
-    {
-        // if we already have a callback registered for this path with this
-        // object then remove the callback and return (i.e. end callback)
-        QMutableHashIterator<QString,Callback> it(m_fileOpenCallbacks);
-        while (it.hasNext())
-        {
-            it.next();
-            if (object == it.value().m_object)
-            {
-                it.remove();
-                VERBOSE(VB_PLAYBACK, LOC +
-                    QString("Removing fileopen callback for %1").arg(path));
-                VERBOSE(VB_PLAYBACK, LOC + QString("%1 callbacks remaining")
-                    .arg(m_fileOpenCallbacks.size()));
-                m_callbackLock.unlock();
-                return;
-            }
-        }
-    }
-
-    QString new_path = path;
-    new_path.detach();
-    Callback new_callback(object, func);
-    m_fileOpenCallbacks.insert(path, new_callback);
-    VERBOSE(VB_PLAYBACK, LOC +
-        QString("Added fileopen callback for %1").arg(path));
-    VERBOSE(VB_PLAYBACK, LOC + QString("%1 callbacks open")
-        .arg(m_fileOpenCallbacks.size()));
-
-    m_callbackLock.unlock();
-}
-
 /////////////////////////////////////////////////////////////////////////////
 
 extern "C" {
@@ -115,6 +78,42 @@ static int getNextFileID(void)
     VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("getNextFileID() = %1").arg(id));
 
     return id;
+}
+
+void mythfile_open_register_callback(const char *pathname, void* object,
+                                     callback_t func)
+{
+    m_callbackLock.lock();
+    QString path(pathname);
+    if (m_fileOpenCallbacks.contains(path))
+    {
+        // if we already have a callback registered for this path with this
+        // object then remove the callback and return (i.e. end callback)
+        QMutableHashIterator<QString,Callback> it(m_fileOpenCallbacks);
+        while (it.hasNext())
+        {
+            it.next();
+            if (object == it.value().m_object)
+            {
+                it.remove();
+                VERBOSE(VB_PLAYBACK, LOC +
+                    QString("Removing fileopen callback for %1").arg(path));
+                VERBOSE(VB_PLAYBACK, LOC + QString("%1 callbacks remaining")
+                    .arg(m_fileOpenCallbacks.size()));
+                m_callbackLock.unlock();
+                return;
+            }
+        }
+    }
+
+    Callback new_callback(object, func);
+    m_fileOpenCallbacks.insert(path, new_callback);
+    VERBOSE(VB_PLAYBACK, LOC +
+        QString("Added fileopen callback for %1").arg(path));
+    VERBOSE(VB_PLAYBACK, LOC + QString("%1 callbacks open")
+        .arg(m_fileOpenCallbacks.size()));
+
+    m_callbackLock.unlock();
 }
 
 int mythfile_check(int id)
