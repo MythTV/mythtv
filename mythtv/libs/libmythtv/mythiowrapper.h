@@ -11,7 +11,7 @@ extern "C" {
 #endif
 
 typedef void (*callback_t)(void*);
-void    mythfile_open_register_callback(const QString &path, void* object,
+void    mythfile_open_register_callback(const QString path, void* object,
                                         callback_t func);
 
 int     mythfile_check(int fileID);

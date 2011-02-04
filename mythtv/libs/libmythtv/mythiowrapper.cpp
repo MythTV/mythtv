@@ -80,7 +80,7 @@ static int getNextFileID(void)
     return id;
 }
 
-void mythfile_open_register_callback(const QString &path, void* object,
+void mythfile_open_register_callback(const QString path, void* object,
                                      callback_t func)
 {
     m_callbackLock.lock();
