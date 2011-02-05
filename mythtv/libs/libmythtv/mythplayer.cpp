@@ -152,6 +152,7 @@ MythPlayer::MythPlayer(bool muted)
       // Playback misc.
       videobuf_retries(0),          framesPlayed(0),
       totalFrames(0),               totalLength(0),
+      totalDuration(0),
       rewindtime(0),
       // Input Video Attributes
       video_disp_dim(0,0), video_dim(0,0),
@@ -200,6 +201,7 @@ MythPlayer::MythPlayer(bool muted)
       avsync_adjustment(0),         avsync_avg(0),
       refreshrate(0),
       lastsync(false),              repeat_delay(0),
+      disp_timecode(0),
       // Time Code stuff
       prevtc(0),                    prevrp(0),
       savedAudioTimecodeOffset(0),
@@ -846,6 +848,11 @@ void MythPlayer::SetFileLength(int total, int frames)
 {
     totalLength = total;
     totalFrames = frames;
+}
+
+void MythPlayer::SetDuration(int duration)
+{
+    totalDuration = duration;
 }
 
 void MythPlayer::OpenDummy(void)
@@ -1608,8 +1615,9 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
 
     if (buffer)
     {
-        repeat_pict = buffer->repeat_pict;
-        timecode    = buffer->timecode;
+        repeat_pict   = buffer->repeat_pict;
+        timecode      = buffer->timecode;
+        disp_timecode = buffer->disp_timecode;
     }
 
     float diverge = 0.0f;
@@ -4230,8 +4238,8 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
     info.values.insert("progbefore", 0);
     info.values.insert("progafter",  0);
 
-    int playbackLen = totalLength;
-
+    int playbackLen = (totalDuration > 0) ? totalDuration : totalLength;
+       
     if (livetv && player_ctx->tvchain)
     {
         info.values["progbefore"] = (int)player_ctx->tvchain->HasPrev();
@@ -4248,7 +4256,7 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
         islive = true;
     }
 
-    float secsplayed = ((float)framesPlayed / video_frame_rate);
+    float secsplayed = (float)(disp_timecode / 1000.f);
     calcSliderPosPriv(info, paddedFields, playbackLen, secsplayed, islive);
 }
 

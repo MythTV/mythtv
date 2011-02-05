@@ -40,6 +40,7 @@ typedef struct VideoFrame_
 
     long long frameNumber;
     long long timecode;
+    int64_t   disp_timecode;
 
     unsigned char *priv[4]; // random empty storage
 
