@@ -59,6 +59,7 @@ class MPUBLIC MythUIButtonTree : public MythUIType
     void Init(void);
     void SetTreeState(bool refreshAll = false);
     bool UpdateList(MythUIButtonList *list, MythGenericTree *node);
+    bool DoSetCurrentNode(MythGenericTree *node);
 
     void SwitchList(bool right);
 
