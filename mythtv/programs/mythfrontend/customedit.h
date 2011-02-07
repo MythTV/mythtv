@@ -19,6 +19,7 @@ class CustomEdit : public MythScreenType
    ~CustomEdit(void);
 
    bool Create();
+   bool keyPressEvent(QKeyEvent *);
    void customEvent(QEvent *event);
 
   protected slots:

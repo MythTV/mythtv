@@ -805,7 +805,7 @@ void CustomEdit::storeRule(bool is_search, bool is_new)
 void CustomEdit::deleteRule(void)
 {
     MythUIButtonListItem* item = m_clauseList->GetItemCurrent();
-    if (!item)
+    if (!item || m_clauseList->GetCurrentPos() < m_maxex)
         return;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -845,3 +845,35 @@ void CustomEdit::customEvent(QEvent *event)
         }
     }
 }
+
+bool CustomEdit::keyPressEvent(QKeyEvent *event)
+{
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
+
+    bool handled = false;
+    QStringList actions;
+    handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend", event, actions);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "DELETE")
+        {
+            if (GetFocusWidget() == m_clauseList)
+                deleteRule();
+            // else if (GetFocusWidget() == m_ruleList)
+            //     deleteRecordingRule();
+        }
+        else
+            handled = false;
+    }
+
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
+}
+
