@@ -193,50 +193,50 @@ typedef int ( * MYTH_GLXGETVIDEOSYNCSGIPROC)
     (unsigned int *count);
 typedef int ( * MYTH_GLXWAITVIDEOSYNCSGIPROC)
     (int divisor, int remainder, unsigned int *count);
-typedef GLuint ( * MYTH_GLCREATESHADEROBJECT)
+typedef GLuint ( * MYTH_GLCREATESHADEROBJECTPROC)
     (GLenum shaderType);
-typedef void ( * MYTH_GLSHADERSOURCE)
+typedef void ( * MYTH_GLSHADERSOURCEPROC)
     (GLuint shader, int numOfStrings, const char **strings, int *lenOfStrings);
-typedef void ( * MYTH_GLCOMPILESHADER)
+typedef void ( * MYTH_GLCOMPILESHADERPROC)
     (GLuint shader);
-typedef void ( * MYTH_GLGETSHADER)
+typedef void ( * MYTH_GLGETSHADERPROC)
     (GLuint shader, GLenum pname, GLint *params);
-typedef void ( * MYTH_GLGETSHADERINFOLOG)
+typedef void ( * MYTH_GLGETSHADERINFOLOGPROC)
     (GLuint shader, GLint maxlength, GLint length, GLchar *infolog);
-typedef void ( * MYTH_GLDELETESHADER)
+typedef void ( * MYTH_GLDELETESHADERPROC)
     (GLuint shader);
-typedef GLuint ( * MYTH_GLCREATEPROGRAMOBJECT)
+typedef GLuint ( * MYTH_GLCREATEPROGRAMOBJECTPROC)
     (void);
-typedef void ( * MYTH_GLATTACHOBJECT)
+typedef void ( * MYTH_GLATTACHOBJECTPROC)
     (GLuint program, GLuint shader);
-typedef void ( * MYTH_GLLINKPROGRAM)
+typedef void ( * MYTH_GLLINKPROGRAMPROC)
     (GLuint program);
-typedef void ( * MYTH_GLUSEPROGRAM)
+typedef void ( * MYTH_GLUSEPROGRAMPROC)
     (GLuint program);
-typedef void ( * MYTH_GLGETINFOLOG)
+typedef void ( * MYTH_GLGETINFOLOGPROC)
     (GLuint object, int maxLen, int *len, char *log);
-typedef void ( * MYTH_GLGETOBJECTPARAMETERIV)
+typedef void ( * MYTH_GLGETOBJECTPARAMETERIVPROC)
     (GLuint object, GLenum type, int *param);
-typedef void ( * MYTH_GLDETACHOBJECT)
+typedef void ( * MYTH_GLDETACHOBJECTPROC)
     (GLuint program, GLuint shader);
-typedef void ( * MYTH_GLDELETEOBJECT)
+typedef void ( * MYTH_GLDELETEOBJECTPROC)
     (GLuint id);
-typedef GLint ( * MYTH_GLGETUNIFORMLOCATION)
+typedef GLint ( * MYTH_GLGETUNIFORMLOCATIONPROC)
     (GLuint program, const char *name);
-typedef void  ( * MYTH_GLUNIFORM4F)
+typedef void  ( * MYTH_GLUNIFORM4FPROC)
     (GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
-typedef void  ( * MYTH_GLUNIFORMMATRIX4FV)
+typedef void  ( * MYTH_GLUNIFORMMATRIX4FVPROC)
     (GLint location, GLint size, GLboolean transpose, const GLfloat *values);
-typedef void ( * MYTH_GLVERTEXATTRIBPOINTER)
+typedef void ( * MYTH_GLVERTEXATTRIBPOINTERPROC)
     (GLuint index, GLint size, GLenum type, GLboolean normalize,
      GLsizei stride, const GLvoid *ptr);
-typedef void ( * MYTH_GLENABLEVERTEXATTRIBARRAY)
+typedef void ( * MYTH_GLENABLEVERTEXATTRIBARRAYPROC)
     (GLuint index);
-typedef void ( * MYTH_GLDISABLEVERTEXATTRIBARRAY)
+typedef void ( * MYTH_GLDISABLEVERTEXATTRIBARRAYPROC)
     (GLuint index);
-typedef void ( * MYTH_GLBINDATTRIBLOCATION)
+typedef void ( * MYTH_GLBINDATTRIBLOCATIONPROC)
     (GLuint program, GLuint index, const GLcharARB *name);
-typedef void ( * MYTH_GLVERTEXATTRIB4F)
+typedef void ( * MYTH_GLVERTEXATTRIB4FPROC)
     (GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
 
 #endif
