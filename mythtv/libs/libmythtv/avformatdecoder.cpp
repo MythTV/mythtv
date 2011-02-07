@@ -404,6 +404,8 @@ static int64_t lsb3full(int64_t lsb, int64_t base_ts, int lsb_bits)
 
 int64_t AvFormatDecoder::NormalizeVideoTimecode(int64_t timecode)
 {
+    int64_t start_pts = 0, pts;
+
     AVStream *st = NULL;
     for (uint i = 0; i < ic->nb_streams; i++)
     {
@@ -417,19 +419,39 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(int64_t timecode)
     if (!st)
         return false;
 
-   // convert timecode and start_time to AV_TIME_BASE units
-   int64_t start_ts = av_rescale(ic->start_time,
-                                 st->time_base.den,
-                                 AV_TIME_BASE * (int64_t)st->time_base.num);
+    if (ic->start_time != AV_NOPTS_VALUE)
+        start_pts = av_rescale(ic->start_time,
+                               st->time_base.den,
+                               AV_TIME_BASE * (int64_t)st->time_base.num);
 
-   int64_t ts = av_rescale(timecode / 1000.0 * AV_TIME_BASE,
-                           st->time_base.den,
-                           AV_TIME_BASE * (int64_t)st->time_base.num);
+    pts = av_rescale(timecode / 1000.0,
+                     st->time_base.den,
+                     st->time_base.num);
 
-   // adjust for start time and wrap
-   ts = lsb3full(ts, start_ts, st->pts_wrap_bits);
+    // adjust for start time and wrap
+    pts = lsb3full(pts, start_pts, st->pts_wrap_bits);
 
-   return (int64_t)(av_q2d(st->time_base) * ts * 1000);
+    return (int64_t)(av_q2d(st->time_base) * pts * 1000);
+}
+
+int64_t AvFormatDecoder::NormalizeVideoTimecode(AVStream *st,
+                                                int64_t timecode)
+{
+    int64_t start_pts = 0, pts;
+
+    if (ic->start_time != AV_NOPTS_VALUE)
+        start_pts = av_rescale(ic->start_time,
+                               st->time_base.den,
+                               AV_TIME_BASE * (int64_t)st->time_base.num);
+
+    pts = av_rescale(timecode / 1000.0,
+                     st->time_base.den,
+                     st->time_base.num);
+
+    // adjust for start time and wrap
+    pts = lsb3full(pts, start_pts, st->pts_wrap_bits);
+
+    return (int64_t)(av_q2d(st->time_base) * pts * 1000);
 }
 
 int AvFormatDecoder::GetNumChapters()
@@ -963,12 +985,18 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         }
     }
 
+    // If watching pre-recorded television or video use ffmpeg duration
+    int64_t dur = ic->duration / (int64_t)AV_TIME_BASE;
+    if (dur > 0 && !livetv && !watchingrecording)
+    {
+        m_parent->SetDuration((int)dur);
+    }
+
     // If we don't have a position map, set up ffmpeg for seeking
     if (!recordingHasPositionMap && !livetv)
     {
         VERBOSE(VB_PLAYBACK, LOC +
                 "Recording has no position -- using libavformat seeking.");
-        int64_t dur = ic->duration / (int64_t)AV_TIME_BASE;
 
         if (dur > 0)
         {
@@ -2938,7 +2966,7 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 {
     int ret = 0, gotpicture = 0;
-    long long pts = 0;
+    int64_t pts = 0;
     AVCodecContext *context = curstream->codec;
     AVFrame mpa_pic;
     avcodec_get_frame_defaults(&mpa_pic);
@@ -3061,27 +3089,25 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     if (ringBuffer->isDVD())
     {
         if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
-            pts = (long long)pkt->dts;
+            pts = pkt->dts;
     }
     else if (private_dec && private_dec->NeedsReorderedPTS() &&
              mpa_pic.reordered_opaque != (int64_t)AV_NOPTS_VALUE)
     {
-        pts = (long long)mpa_pic.reordered_opaque;
+        pts = mpa_pic.reordered_opaque;
     }
     else if ((force_reordered_opaque || faulty_pts <= faulty_dts ||
              pkt->dts == (int64_t)AV_NOPTS_VALUE) &&
              mpa_pic.reordered_opaque != (int64_t)AV_NOPTS_VALUE)
     {
-        pts = (long long)mpa_pic.reordered_opaque;
+        pts = mpa_pic.reordered_opaque;
     }
     else if ((faulty_dts < faulty_pts || !reordered_pts_detected) &&
              pkt->dts != (int64_t)AV_NOPTS_VALUE)
     {
-        pts = (long long)pkt->dts;
+        pts = pkt->dts;
     }
-    pts = (long long)(av_q2d(curstream->time_base) * pts * 1000);
-
-    long long temppts = pts;
+    long long temppts = (long long)(av_q2d(curstream->time_base) * pts * 1000);
 
     // Validate the video pts against the last pts. If it's
     // a little bit smaller, equal or missing, compute
@@ -3097,8 +3123,8 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     }
 
     VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, LOC +
-            QString("video timecode %1 %2 %3 %4 %5").arg(mpa_pic.reordered_opaque).arg(pkt->pts).arg(pkt->dts)
-            .arg(temppts).arg(lastvpts));
+            QString("video timecode %1 %2 %3 %4 %5").arg(mpa_pic.reordered_opaque)
+                    .arg(pkt->pts).arg(pkt->dts).arg(temppts).arg(lastvpts));
 
 /* XXX: Broken.
     if (mpa_pic.qscale_table != NULL && mpa_pic.qstride > 0 &&
@@ -3122,10 +3148,11 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 */
 
     picframe->interlaced_frame = mpa_pic.interlaced_frame;
-    picframe->top_field_first = mpa_pic.top_field_first;
-    picframe->repeat_pict = mpa_pic.repeat_pict;
+    picframe->top_field_first  = mpa_pic.top_field_first;
+    picframe->repeat_pict      = mpa_pic.repeat_pict;
+    picframe->disp_timecode    = NormalizeVideoTimecode(curstream, temppts);
+    picframe->frameNumber      = framesPlayed;
 
-    picframe->frameNumber = framesPlayed;
     m_parent->ReleaseNextVideoFrame(picframe, temppts);
     if (private_dec && mpa_pic.data[3])
         context->release_buffer(context, &mpa_pic);

@@ -136,6 +136,7 @@ class MPUBLIC MythPlayer
                         float a = 1.33333, FrameScanType scan = kScan_Ignore,
                         bool video_codec_changed = false);
     void SetFileLength(int total, int frames);
+    void SetDuration(int duration);
     void SetForcedAspectRatio(int mpeg2_aspect_value, int letterbox_permission);
     void SetVideoResize(const QRect &videoRect);
 
@@ -583,6 +584,7 @@ class MPUBLIC MythPlayer
     uint64_t  framesPlayed;
     uint64_t  totalFrames;
     long long totalLength;
+    int64_t   totalDuration;
     long long rewindtime;
 
     // -- end state stuff --
@@ -692,6 +694,7 @@ class MPUBLIC MythPlayer
     bool       lastsync;
     bool       decode_extra_audio;
     int        repeat_delay;
+    int64_t    disp_timecode;
 
     // Time Code stuff
     int        prevtc;        ///< 32 bit timecode if last VideoFrame shown

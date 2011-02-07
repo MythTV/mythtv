@@ -152,6 +152,7 @@ MythPlayer::MythPlayer(bool muted)
       // Playback misc.
       videobuf_retries(0),          framesPlayed(0),
       totalFrames(0),               totalLength(0),
+      totalDuration(0),
       rewindtime(0),
       // Input Video Attributes
       video_disp_dim(0,0), video_dim(0,0),
@@ -200,6 +201,7 @@ MythPlayer::MythPlayer(bool muted)
       avsync_adjustment(0),         avsync_avg(0),
       refreshrate(0),
       lastsync(false),              repeat_delay(0),
+      disp_timecode(0),
       // Time Code stuff
       prevtc(0),                    prevrp(0),
       savedAudioTimecodeOffset(0),
@@ -336,10 +338,10 @@ bool MythPlayer::Pause(void)
     }
     next_play_speed   = 0.0;
     next_normal_speed = false;
+    PauseDecoder();
     PauseVideo();
     audio.Pause(true);
     PauseBuffer();
-    PauseDecoder();
     allpaused = decoderPaused && videoPaused && bufferPaused;
     {
         QMutexLocker locker(&decoder_change_lock);
@@ -367,10 +369,10 @@ bool MythPlayer::Play(float speed, bool normal, bool unpauseaudio)
     }
 
     UnpauseBuffer();
-    UnpauseDecoder();
     if (unpauseaudio)
         audio.Pause(false);
     UnpauseVideo();
+    UnpauseDecoder();
     allpaused = false;
     next_play_speed   = speed;
     next_normal_speed = normal;
@@ -848,6 +850,11 @@ void MythPlayer::SetFileLength(int total, int frames)
     totalFrames = frames;
 }
 
+void MythPlayer::SetDuration(int duration)
+{
+    totalDuration = duration;
+}
+
 void MythPlayer::OpenDummy(void)
 {
     isDummy = true;
@@ -990,6 +997,7 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
 
     // Determine the initial bookmark and update it for the cutlist
     bookmarkseek = GetBookmark();
+    deleteMap.TrackerReset(bookmarkseek, totalFrames);
     deleteMap.TrackerWantsToJump(bookmarkseek, totalFrames, bookmarkseek);
 
     if (player_ctx->playingInfo->QueryAutoExpire() == kLiveTVAutoExpire)
@@ -1607,8 +1615,9 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
 
     if (buffer)
     {
-        repeat_pict = buffer->repeat_pict;
-        timecode    = buffer->timecode;
+        repeat_pict   = buffer->repeat_pict;
+        timecode      = buffer->timecode;
+        disp_timecode = buffer->disp_timecode;
     }
 
     float diverge = 0.0f;
@@ -2098,7 +2107,7 @@ bool MythPlayer::FastForward(float seconds)
     if (!videoOutput)
         return false;
 
-    if (fftime >= 0)
+    if (fftime <= 0)
         fftime = (long long)(seconds * video_frame_rate);
     return fftime > CalcMaxFFTime(fftime, false);
 }
@@ -2108,7 +2117,7 @@ bool MythPlayer::Rewind(float seconds)
     if (!videoOutput)
         return false;
 
-    if (rewindtime >= 0)
+    if (rewindtime <= 0)
         rewindtime = (long long)(seconds * video_frame_rate);
     return (uint64_t)rewindtime >= framesPlayed;
 }
@@ -2172,6 +2181,7 @@ void MythPlayer::SwitchToProgram(void)
         discontinuity, newtype, newid);
     if (!pginfo)
         return;
+    newtype = true; // force reloading of context and stream properties
 
     bool newIsDummy = player_ctx->tvchain->GetCardType(newid) == "DUMMY";
 
@@ -2297,6 +2307,7 @@ void MythPlayer::JumpToProgram(void)
         discontinuity, newtype, newid);
     if (!pginfo)
         return;
+    newtype = true; // force reloading of context and stream properties
 
     bool newIsDummy = player_ctx->tvchain->GetCardType(newid) == "DUMMY";
     SetPlayingInfo(*pginfo);
@@ -3365,8 +3376,11 @@ void MythPlayer::WaitForSeek(uint64_t frame, bool override_seeks,
                            (allpaused && !deleteMap.IsEditing()) ? true: after;
     decoder->setExactSeeks(before);
 
+    bool islivetvcur = (livetv && player_ctx->tvchain &&
+                        !player_ctx->tvchain->HasNext());
+
     uint64_t max = totalFrames;
-    if ((livetv || (watchingrecording && player_ctx->recorder &&
+    if ((islivetvcur || (watchingrecording && player_ctx->recorder &&
                    player_ctx->recorder->IsValidRecorder())))
     {
         max = (uint64_t)player_ctx->recorder->GetFramesWritten();
@@ -4224,8 +4238,8 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
     info.values.insert("progbefore", 0);
     info.values.insert("progafter",  0);
 
-    int playbackLen = totalLength;
-
+    int playbackLen = (totalDuration > 0) ? totalDuration : totalLength;
+       
     if (livetv && player_ctx->tvchain)
     {
         info.values["progbefore"] = (int)player_ctx->tvchain->HasPrev();
@@ -4242,7 +4256,7 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
         islive = true;
     }
 
-    float secsplayed = ((float)framesPlayed / video_frame_rate);
+    float secsplayed = (float)(disp_timecode / 1000.f);
     calcSliderPosPriv(info, paddedFields, playbackLen, secsplayed, islive);
 }
 

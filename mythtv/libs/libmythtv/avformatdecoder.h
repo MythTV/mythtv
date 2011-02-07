@@ -157,6 +157,7 @@ class AvFormatDecoder : public DecoderBase
     virtual bool DoFastForward(long long desiredFrame, bool doflush = true);
 
     virtual int64_t NormalizeVideoTimecode(int64_t timecode);
+    virtual int64_t NormalizeVideoTimecode(AVStream *st, int64_t timecode);
 
     virtual int  GetTeletextDecoderType(void) const;
 
