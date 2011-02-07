@@ -31,7 +31,9 @@ CustomEdit::CustomEdit(MythScreenStack *parent, ProgramInfo *pginfo)
     else
         m_pginfo = new ProgramInfo();
 
-    m_prevItem = 0;
+    m_baseTitle = m_pginfo->GetTitle();
+    m_baseTitle.remove(QRegExp(" \\(.*\\)$"));
+
     m_maxex = 0;
     m_seSuffix = QString(" (%1)").arg(tr("stored search"));
     m_exSuffix = QString(" (%1)").arg(tr("stored example"));
@@ -99,11 +101,17 @@ bool CustomEdit::Create()
 
 void CustomEdit::loadData(void)
 {
-    QString baseTitle = m_pginfo->GetTitle();
-    baseTitle.remove(QRegExp(" \\(.*\\)$"));
-
     CustomRuleInfo rule;
+
+    // New Rule defaults
     rule.recordid = '0';
+    rule.title = m_baseTitle;
+    if (!m_baseTitle.isEmpty())
+    {
+        QString quoteTitle = m_baseTitle;
+        quoteTitle.replace("\'","\'\'");
+        rule.description = QString("program.title = '%1' ").arg(quoteTitle);
+    }
 
     new MythUIButtonListItem(m_ruleList, tr("<New rule>"),
                              qVariantFromValue(rule));
@@ -129,7 +137,7 @@ void CustomEdit::loadData(void)
                 new MythUIButtonListItem(m_ruleList, rule.title,
                                          qVariantFromValue(rule));
 
-            if (trimTitle == baseTitle ||
+            if (trimTitle == m_baseTitle ||
                 result.value(0).toUInt() == m_pginfo->GetRecordingRuleID())
                 m_ruleList->SetItemCurrent(item);
         }
@@ -139,28 +147,18 @@ void CustomEdit::loadData(void)
 
     loadClauses();
 
-    if (m_ruleList->GetCurrentPos() == 0 && !m_pginfo->GetTitle().isEmpty())
-    {
-        m_titleEdit->SetText(baseTitle);
-        QString quoteTitle = baseTitle;
-        quoteTitle.replace("\'","\'\'");
-        m_descriptionEdit->SetText("program.title = '" + quoteTitle + "' ");
-    }
     textChanged();
 }
 
 void CustomEdit::loadClauses()
 {
-    QString baseTitle = m_pginfo->GetTitle();
-    baseTitle.remove(QRegExp(" \\(.*\\)$"));
-
-    QString quoteTitle = baseTitle;
+    QString quoteTitle = m_baseTitle;
     quoteTitle.replace("\'","\'\'");
 
     CustomRuleInfo rule;
 
     rule.title = tr("Match an exact title");
-    if (!m_pginfo->GetTitle().isEmpty())
+    if (!m_baseTitle.isEmpty())
         rule.description = QString("program.title = '%1' ").arg(quoteTitle);
     else
         rule.description = "program.title = 'Nova' ";
@@ -517,11 +515,6 @@ void CustomEdit::loadClauses()
 
 void CustomEdit::ruleChanged(MythUIButtonListItem *item)
 {
-    int curItem = m_ruleList->GetCurrentPos();
-
-    if (curItem == m_prevItem)
-        return;
-
     if (!item)
         return;
 
@@ -532,8 +525,6 @@ void CustomEdit::ruleChanged(MythUIButtonListItem *item)
     m_subtitleEdit->SetText(rule.subtitle);
 
     textChanged();
-
-    m_prevItem = curItem;
 }
 
 void CustomEdit::textChanged(void)
@@ -807,6 +798,8 @@ void CustomEdit::storeRule(bool is_search, bool is_new)
             }
         }
     }
+
+
 }
 
 void CustomEdit::deleteRule(void)
@@ -848,7 +841,6 @@ void CustomEdit::customEvent(QEvent *event)
             {
                 storeRule(resulttext.contains(tr("as a search")),
                         !resulttext.startsWith(tr("Replace")));
-                loadData();
             }
         }
     }
