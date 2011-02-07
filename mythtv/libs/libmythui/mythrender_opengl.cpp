@@ -664,57 +664,57 @@ bool MythRenderOpenGL::CreateFrameBuffer(uint &fb, uint tex)
     glPushAttrib(GL_VIEWPORT_BIT);
     glViewport(0, 0, size.width(), size.height());
     m_glGenFramebuffersEXT(1, &glfb);
-    m_glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, glfb);
+    m_glBindFramebufferEXT(GL_FRAMEBUFFER, glfb);
     glBindTexture(m_textures[tex].m_type, tex);
     glTexImage2D(m_textures[tex].m_type, 0, m_textures[tex].m_internal_fmt,
                  (GLint) size.width(), (GLint) size.height(), 0,
                  m_textures[tex].m_data_fmt, m_textures[tex].m_data_type, NULL);
     m_glFramebufferTexture2DEXT(
-        GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+        GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
         m_textures[tex].m_type, tex, 0);
 
     GLenum status;
-    status = m_glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-    m_glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    status = m_glCheckFramebufferStatusEXT(GL_FRAMEBUFFER);
+    m_glBindFramebufferEXT(GL_FRAMEBUFFER, 0);
     glPopAttrib();
 
     bool success = false;
     switch (status)
     {
-        case GL_FRAMEBUFFER_COMPLETE_EXT:
+        case GL_FRAMEBUFFER_COMPLETE:
             VERBOSE(VB_PLAYBACK, LOC +
                     QString("Created frame buffer object (%1x%2).")
                     .arg(size.width()).arg(size.height()));
             success = true;
             break;
-        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
+        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
             VERBOSE(VB_PLAYBACK, LOC + "Frame buffer incomplete_ATTACHMENT");
             break;
-        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
+        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
             VERBOSE(VB_PLAYBACK, LOC +
                     "Frame buffer incomplete_MISSING_ATTACHMENT");
             break;
-        case GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT:
+        case GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT:
             VERBOSE(VB_PLAYBACK, LOC +
                     "Frame buffer incomplete_DUPLICATE_ATTACHMENT");
             break;
-        case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
+        case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
             VERBOSE(VB_PLAYBACK, LOC +
-                    "Frame buffer incomplete_DIMENSIONS_EXT");
+                    "Frame buffer incomplete_DIMENSIONS");
             break;
-        case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
+        case GL_FRAMEBUFFER_INCOMPLETE_FORMATS:
             VERBOSE(VB_PLAYBACK, LOC +
-                    "Frame buffer incomplete_FORMATS_EXT");
+                    "Frame buffer incomplete_FORMATS");
             break;
-        case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
+        case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
             VERBOSE(VB_PLAYBACK, LOC +
-                    "Frame buffer incomplete_DRAW_BUFFER_EXT");
+                    "Frame buffer incomplete_DRAW_BUFFER");
             break;
-        case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
+        case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
             VERBOSE(VB_PLAYBACK, LOC +
-                    "Frame buffer incomplete_READ_BUFFER_EXT");
+                    "Frame buffer incomplete_READ_BUFFER");
             break;
-        case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
+        case GL_FRAMEBUFFER_UNSUPPORTED:
             VERBOSE(VB_PLAYBACK, LOC + "Frame buffer unsupported.");
             break;
         default:
@@ -764,7 +764,7 @@ void MythRenderOpenGL::BindFramebuffer(uint fb)
         return;
 
     makeCurrent();
-    m_glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
+    m_glBindFramebufferEXT(GL_FRAMEBUFFER, fb);
     doneCurrent();
     m_active_fb = fb;
 }
