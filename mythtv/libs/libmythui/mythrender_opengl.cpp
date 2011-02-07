@@ -663,19 +663,18 @@ bool MythRenderOpenGL::CreateFrameBuffer(uint &fb, uint tex)
     EnableTextures(tex);
     glPushAttrib(GL_VIEWPORT_BIT);
     glViewport(0, 0, size.width(), size.height());
-    m_glGenFramebuffersEXT(1, &glfb);
-    m_glBindFramebufferEXT(GL_FRAMEBUFFER, glfb);
+    m_glGenFramebuffers(1, &glfb);
+    m_glBindFramebuffer(GL_FRAMEBUFFER, glfb);
     glBindTexture(m_textures[tex].m_type, tex);
     glTexImage2D(m_textures[tex].m_type, 0, m_textures[tex].m_internal_fmt,
                  (GLint) size.width(), (GLint) size.height(), 0,
                  m_textures[tex].m_data_fmt, m_textures[tex].m_data_type, NULL);
-    m_glFramebufferTexture2DEXT(
-        GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-        m_textures[tex].m_type, tex, 0);
+    m_glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                             m_textures[tex].m_type, tex, 0);
 
     GLenum status;
-    status = m_glCheckFramebufferStatusEXT(GL_FRAMEBUFFER);
-    m_glBindFramebufferEXT(GL_FRAMEBUFFER, 0);
+    status = m_glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    m_glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glPopAttrib();
 
     bool success = false;
@@ -725,7 +724,7 @@ bool MythRenderOpenGL::CreateFrameBuffer(uint &fb, uint tex)
     if (success)
         m_framebuffers.push_back(glfb);
     else
-        m_glDeleteFramebuffersEXT(1, &glfb);
+        m_glDeleteFramebuffers(1, &glfb);
 
     Flush(true);
     glCheck();
@@ -745,7 +744,7 @@ void MythRenderOpenGL::DeleteFrameBuffer(uint fb)
     {
         if (*it == fb)
         {
-            m_glDeleteFramebuffersEXT(1, &(*it));
+            m_glDeleteFramebuffers(1, &(*it));
             m_framebuffers.erase(it);
             break;
         }
@@ -764,7 +763,7 @@ void MythRenderOpenGL::BindFramebuffer(uint fb)
         return;
 
     makeCurrent();
-    m_glBindFramebufferEXT(GL_FRAMEBUFFER, fb);
+    m_glBindFramebuffer(GL_FRAMEBUFFER, fb);
     doneCurrent();
     m_active_fb = fb;
 }
@@ -1363,16 +1362,16 @@ void MythRenderOpenGL::InitProcs(void)
         GetProcAddress("glDeleteProgramsARB");
     m_glGetProgramivARB = (MYTH_GLGETPROGRAMIVARBPROC)
         GetProcAddress("glGetProgramivARB");
-    m_glGenFramebuffersEXT = (MYTH_GLGENFRAMEBUFFERSEXTPROC)
-        GetProcAddress("glGenFramebuffersEXT");
-    m_glBindFramebufferEXT = (MYTH_GLBINDFRAMEBUFFEREXTPROC)
-        GetProcAddress("glBindFramebufferEXT");
-    m_glFramebufferTexture2DEXT = (MYTH_GLFRAMEBUFFERTEXTURE2DEXTPROC)
-        GetProcAddress("glFramebufferTexture2DEXT");
-    m_glCheckFramebufferStatusEXT = (MYTH_GLCHECKFRAMEBUFFERSTATUSEXTPROC)
-        GetProcAddress("glCheckFramebufferStatusEXT");
-    m_glDeleteFramebuffersEXT = (MYTH_GLDELETEFRAMEBUFFERSEXTPROC)
-        GetProcAddress("glDeleteFramebuffersEXT");
+    m_glGenFramebuffers = (MYTH_GLGENFRAMEBUFFERSPROC)
+        GetProcAddress("glGenFramebuffers");
+    m_glBindFramebuffer = (MYTH_GLBINDFRAMEBUFFERPROC)
+        GetProcAddress("glBindFramebuffer");
+    m_glFramebufferTexture2D = (MYTH_GLFRAMEBUFFERTEXTURE2DPROC)
+        GetProcAddress("glFramebufferTexture2D");
+    m_glCheckFramebufferStatus = (MYTH_GLCHECKFRAMEBUFFERSTATUSPROC)
+        GetProcAddress("glCheckFramebufferStatus");
+    m_glDeleteFramebuffers = (MYTH_GLDELETEFRAMEBUFFERSPROC)
+        GetProcAddress("glDeleteFramebuffers");
     m_glGenFencesNV = (MYTH_GLGENFENCESNVPROC)
         GetProcAddress("glGenFencesNV");
     m_glDeleteFencesNV = (MYTH_GLDELETEFENCESNVPROC)
@@ -1563,9 +1562,9 @@ void MythRenderOpenGL::InitFeatures(void)
     }
 
     if (m_extensions.contains("GL_EXT_framebuffer_object") &&
-        m_glGenFramebuffersEXT      && m_glBindFramebufferEXT &&
-        m_glFramebufferTexture2DEXT && m_glDeleteFramebuffersEXT &&
-        m_glCheckFramebufferStatusEXT && framebuffers)
+        m_glGenFramebuffers        && m_glBindFramebuffer &&
+        m_glFramebufferTexture2D   && m_glDeleteFramebuffers &&
+        m_glCheckFramebufferStatus && framebuffers)
         m_exts_supported += kGLExtFBufObj;
 
     bool buffer_procs = m_glMapBufferARB  && m_glBindBufferARB &&
@@ -1673,11 +1672,11 @@ void MythRenderOpenGL::ResetProcs(void)
     m_glBufferDataARB = NULL;
     m_glUnmapBufferARB = NULL;
     m_glDeleteBuffersARB = NULL;
-    m_glGenFramebuffersEXT = NULL;
-    m_glBindFramebufferEXT = NULL;
-    m_glFramebufferTexture2DEXT = NULL;
-    m_glCheckFramebufferStatusEXT = NULL;
-    m_glDeleteFramebuffersEXT = NULL;
+    m_glGenFramebuffers = NULL;
+    m_glBindFramebuffer = NULL;
+    m_glFramebufferTexture2D = NULL;
+    m_glCheckFramebufferStatus = NULL;
+    m_glDeleteFramebuffers = NULL;
     m_glGenFencesNV = NULL;
     m_glDeleteFencesNV = NULL;
     m_glSetFenceNV = NULL;
@@ -1808,7 +1807,7 @@ void MythRenderOpenGL::DeleteFrameBuffers(void)
 {
     QVector<GLuint>::iterator it;
     for (it = m_framebuffers.begin(); it != m_framebuffers.end(); ++it)
-        m_glDeleteFramebuffersEXT(1, &(*(it)));
+        m_glDeleteFramebuffers(1, &(*(it)));
     m_framebuffers.clear();
     Flush(true);
 }

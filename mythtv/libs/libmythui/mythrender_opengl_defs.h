@@ -162,16 +162,16 @@ typedef GLboolean (APIENTRY * MYTH_GLUNMAPBUFFERARBPROC)
     (GLenum target);
 typedef void (APIENTRY * MYTH_GLDELETEBUFFERSARBPROC)
     (GLsizei n, const GLuint *buffers);
-typedef void (APIENTRY * MYTH_GLGENFRAMEBUFFERSEXTPROC)
+typedef void (APIENTRY * MYTH_GLGENFRAMEBUFFERSPROC)
     (GLsizei n, GLuint *framebuffers);
-typedef void (APIENTRY * MYTH_GLBINDFRAMEBUFFEREXTPROC)
+typedef void (APIENTRY * MYTH_GLBINDFRAMEBUFFERPROC)
     (GLenum target, GLuint framebuffer);
-typedef void (APIENTRY * MYTH_GLFRAMEBUFFERTEXTURE2DEXTPROC)
+typedef void (APIENTRY * MYTH_GLFRAMEBUFFERTEXTURE2DPROC)
     (GLenum target, GLenum attachment,
      GLenum textarget, GLuint texture, GLint level);
-typedef GLenum (APIENTRY * MYTH_GLCHECKFRAMEBUFFERSTATUSEXTPROC)
+typedef GLenum (APIENTRY * MYTH_GLCHECKFRAMEBUFFERSTATUSPROC)
     (GLenum target);
-typedef void (APIENTRY * MYTH_GLDELETEFRAMEBUFFERSEXTPROC)
+typedef void (APIENTRY * MYTH_GLDELETEFRAMEBUFFERSPROC)
     (GLsizei n, const GLuint *framebuffers);
 typedef void (APIENTRY * MYTH_GLDELETEFENCESNVPROC)
     (GLsizei n, const GLuint *fences);
