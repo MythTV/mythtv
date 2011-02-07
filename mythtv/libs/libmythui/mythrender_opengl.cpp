@@ -1436,9 +1436,17 @@ void MythRenderOpenGL::InitProcs(void)
 
 void* MythRenderOpenGL::GetProcAddress(const QString &proc) const
 {
-    void *result = getProcAddress(proc);
+    static const QString exts[4] = { "", "ARB", "EXT", "OES" };
+    void *result;
+    for (int i = 0; i < 4; i++)
+    {
+        result = getProcAddress(proc + exts[i]);
+        if (result)
+            break;
+    }
     if (result == NULL)
         VERBOSE(VB_EXTRA, LOC + QString("Extension not found: %1").arg(proc));
+
     return result;
 }
 
