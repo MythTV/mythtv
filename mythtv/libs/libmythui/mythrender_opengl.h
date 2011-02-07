@@ -233,12 +233,12 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     MYTH_GLDELETEPROGRAMSARBPROC         m_glDeleteProgramsARB;
     MYTH_GLGETPROGRAMIVARBPROC           m_glGetProgramivARB;
     // PixelBuffer Objects
-    MYTH_GLMAPBUFFERARBPROC              m_glMapBufferARB;
-    MYTH_GLBINDBUFFERARBPROC             m_glBindBufferARB;
-    MYTH_GLGENBUFFERSARBPROC             m_glGenBuffersARB;
-    MYTH_GLBUFFERDATAARBPROC             m_glBufferDataARB;
-    MYTH_GLUNMAPBUFFERARBPROC            m_glUnmapBufferARB;
-    MYTH_GLDELETEBUFFERSARBPROC          m_glDeleteBuffersARB;
+    MYTH_GLMAPBUFFERPROC                 m_glMapBuffer;
+    MYTH_GLBINDBUFFERPROC                m_glBindBuffer;
+    MYTH_GLGENBUFFERSPROC                m_glGenBuffers;
+    MYTH_GLBUFFERDATAPROC                m_glBufferData;
+    MYTH_GLUNMAPBUFFERPROC               m_glUnmapBuffer;
+    MYTH_GLDELETEBUFFERSPROC             m_glDeleteBuffers;
     // FrameBuffer Objects
     MYTH_GLGENFRAMEBUFFERSPROC           m_glGenFramebuffers;
     MYTH_GLBINDFRAMEBUFFERPROC           m_glBindFramebuffer;

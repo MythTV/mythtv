@@ -345,10 +345,10 @@ void* MythRenderOpenGL::GetTextureBuffer(uint tex, bool create_buffer)
 
     if (m_textures[tex].m_pbo)
     {
-        m_glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, m_textures[tex].m_pbo);
-        m_glBufferDataARB(GL_PIXEL_UNPACK_BUFFER_ARB,
+        m_glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_textures[tex].m_pbo);
+        m_glBufferData(GL_PIXEL_UNPACK_BUFFER,
                              m_textures[tex].m_data_size, NULL, GL_STREAM_DRAW);
-        return m_glMapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY);
+        return m_glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
     }
 
     if (m_textures[tex].m_data)
@@ -373,11 +373,11 @@ void MythRenderOpenGL::UpdateTexture(uint tex, void *buf)
 
     if (m_textures[tex].m_pbo)
     {
-        m_glUnmapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB);
+        m_glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
         glTexSubImage2D(m_textures[tex].m_type, 0, 0, 0, size.width(),
                         size.height(), m_textures[tex].m_data_fmt,
                         m_textures[tex].m_data_type, 0);
-        m_glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+        m_glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
     }
     else
     {
@@ -637,9 +637,9 @@ void MythRenderOpenGL::DeleteTexture(uint tex)
     if (m_textures[tex].m_data)
         delete m_textures[tex].m_data;
     if (m_textures[tex].m_pbo)
-        m_glDeleteBuffersARB(1, &(m_textures[tex].m_pbo));
+        m_glDeleteBuffers(1, &(m_textures[tex].m_pbo));
     if (m_textures[tex].m_vbo)
-        m_glDeleteBuffersARB(1, &(m_textures[tex].m_vbo));
+        m_glDeleteBuffers(1, &(m_textures[tex].m_vbo));
     m_textures.remove(tex);
 
     Flush(true);
@@ -1116,13 +1116,13 @@ void MythRenderOpenGL::DrawBitmapHigh(uint tex, const QRect *src,
     EnableTextures(tex);
     glBindTexture(m_textures[tex].m_type, tex);
 
-    m_glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_textures[tex].m_vbo);
+    m_glBindBuffer(GL_ARRAY_BUFFER, m_textures[tex].m_vbo);
     UpdateTextureVertices(tex, src, dst);
-    m_glBufferDataARB(GL_ARRAY_BUFFER_ARB, kVertexSize, NULL, GL_STREAM_DRAW);
-    void* target = m_glMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY);
+    m_glBufferData(GL_ARRAY_BUFFER, kVertexSize, NULL, GL_STREAM_DRAW);
+    void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
     if (target)
         memcpy(target, m_textures[tex].m_vertex_data, kVertexSize);
-    m_glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
+    m_glUnmapBuffer(GL_ARRAY_BUFFER);
 
     m_glEnableVertexAttribArray(VERTEX_INDEX);
     m_glEnableVertexAttribArray(TEXTURE_INDEX);
@@ -1139,7 +1139,7 @@ void MythRenderOpenGL::DrawBitmapHigh(uint tex, const QRect *src,
 
     m_glDisableVertexAttribArray(TEXTURE_INDEX);
     m_glDisableVertexAttribArray(VERTEX_INDEX);
-    m_glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+    m_glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void MythRenderOpenGL::DrawBitmapLegacy(uint *textures, uint texture_count,
@@ -1203,13 +1203,13 @@ void MythRenderOpenGL::DrawBitmapHigh(uint *textures, uint texture_count,
         }
     }
 
-    m_glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_textures[first].m_vbo);
+    m_glBindBuffer(GL_ARRAY_BUFFER, m_textures[first].m_vbo);
     UpdateTextureVertices(first, src, dst);
-    m_glBufferDataARB(GL_ARRAY_BUFFER_ARB, kVertexSize, NULL, GL_STREAM_DRAW);
-    void* target = m_glMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY);
+    m_glBufferData(GL_ARRAY_BUFFER, kVertexSize, NULL, GL_STREAM_DRAW);
+    void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
     if (target)
         memcpy(target, m_textures[first].m_vertex_data, kVertexSize);
-    m_glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
+    m_glUnmapBuffer(GL_ARRAY_BUFFER);
 
     m_glEnableVertexAttribArray(VERTEX_INDEX);
     m_glEnableVertexAttribArray(TEXTURE_INDEX);
@@ -1226,7 +1226,7 @@ void MythRenderOpenGL::DrawBitmapHigh(uint *textures, uint texture_count,
 
     m_glDisableVertexAttribArray(TEXTURE_INDEX);
     m_glDisableVertexAttribArray(VERTEX_INDEX);
-    m_glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+    m_glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void MythRenderOpenGL::DrawRectLegacy(const QRect &area, bool drawFill,
@@ -1292,7 +1292,7 @@ void MythRenderOpenGL::DrawRectHigh(const QRect &area, bool drawFill,
                                 VERTEX_SIZE * sizeof(GLfloat),
                                (const void *) kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        m_glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+        m_glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     if (drawLine)
@@ -1308,7 +1308,7 @@ void MythRenderOpenGL::DrawRectHigh(const QRect &area, bool drawFill,
                                 VERTEX_SIZE * sizeof(GLfloat),
                                (const void *) kVertexOffset);
         glDrawArrays(GL_LINE_LOOP, 0, 4);
-        m_glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+        m_glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     m_glDisableVertexAttribArray(VERTEX_INDEX);
@@ -1338,18 +1338,18 @@ void MythRenderOpenGL::InitProcs(void)
 
     m_glActiveTexture = (MYTH_GLACTIVETEXTUREPROC)
         GetProcAddress("glActiveTexture");
-    m_glMapBufferARB = (MYTH_GLMAPBUFFERARBPROC)
-        GetProcAddress("glMapBufferARB");
-    m_glBindBufferARB = (MYTH_GLBINDBUFFERARBPROC)
-        GetProcAddress("glBindBufferARB");
-    m_glGenBuffersARB = (MYTH_GLGENBUFFERSARBPROC)
-        GetProcAddress("glGenBuffersARB");
-    m_glBufferDataARB = (MYTH_GLBUFFERDATAARBPROC)
-        GetProcAddress("glBufferDataARB");
-    m_glUnmapBufferARB = (MYTH_GLUNMAPBUFFERARBPROC)
-        GetProcAddress("glUnmapBufferARB");
-    m_glDeleteBuffersARB = (MYTH_GLDELETEBUFFERSARBPROC)
-        GetProcAddress("glDeleteBuffersARB");
+    m_glMapBuffer = (MYTH_GLMAPBUFFERPROC)
+        GetProcAddress("glMapBuffer");
+    m_glBindBuffer = (MYTH_GLBINDBUFFERPROC)
+        GetProcAddress("glBindBuffer");
+    m_glGenBuffers = (MYTH_GLGENBUFFERSPROC)
+        GetProcAddress("glGenBuffers");
+    m_glBufferData = (MYTH_GLBUFFERDATAPROC)
+        GetProcAddress("glBufferData");
+    m_glUnmapBuffer = (MYTH_GLUNMAPBUFFERPROC)
+        GetProcAddress("glUnmapBuffer");
+    m_glDeleteBuffers = (MYTH_GLDELETEBUFFERSPROC)
+        GetProcAddress("glDeleteBuffers");
     m_glGenProgramsARB = (MYTH_GLGENPROGRAMSARBPROC)
         GetProcAddress("glGenProgramsARB");
     m_glBindProgramARB = (MYTH_GLBINDPROGRAMARBPROC)
@@ -1389,11 +1389,11 @@ void MythRenderOpenGL::InitProcs(void)
     m_glFinishFenceAPPLE = (MYTH_GLFINISHFENCEAPPLEPROC)
         GetProcAddress("glFinishFenceAPPLE");
     m_glCreateShaderObject = (MYTH_GLCREATESHADEROBJECT)
-        GetProcAddress("glCreateShaderObjectARB");
+        GetProcAddress("glCreateShaderObject");
     m_glShaderSource = (MYTH_GLSHADERSOURCE)
-        GetProcAddress("glShaderSourceARB");
+        GetProcAddress("glShaderSource");
     m_glCompileShader = (MYTH_GLCOMPILESHADER)
-        GetProcAddress("glCompileShaderARB");
+        GetProcAddress("glCompileShader");
     m_glGetShader = (MYTH_GLGETSHADER)
         GetProcAddress("glGetShaderiv");
     m_glGetShaderInfoLog = (MYTH_GLGETSHADERINFOLOG)
@@ -1401,27 +1401,27 @@ void MythRenderOpenGL::InitProcs(void)
     m_glDeleteShader = (MYTH_GLDELETESHADER)
         GetProcAddress("glDeleteShader");
     m_glCreateProgramObject = (MYTH_GLCREATEPROGRAMOBJECT)
-        GetProcAddress("glCreateProgramObjectARB");
+        GetProcAddress("glCreateProgramObject");
     m_glAttachObject = (MYTH_GLATTACHOBJECT)
-        GetProcAddress("glAttachObjectARB");
+        GetProcAddress("glAttachObject");
     m_glLinkProgram = (MYTH_GLLINKPROGRAM)
-        GetProcAddress("glLinkProgramARB");
+        GetProcAddress("glLinkProgram");
     m_glUseProgram = (MYTH_GLUSEPROGRAM)
-        GetProcAddress("glUseProgramObjectARB");
+        GetProcAddress("glUseProgramObject");
     m_glGetInfoLog = (MYTH_GLGETINFOLOG)
-        GetProcAddress("glGetInfoLogARB");
+        GetProcAddress("glGetInfoLog");
     m_glGetObjectParameteriv = (MYTH_GLGETOBJECTPARAMETERIV)
-        GetProcAddress("glGetObjectParameterivARB");
+        GetProcAddress("glGetObjectParameteriv");
     m_glDetachObject = (MYTH_GLDETACHOBJECT)
-        GetProcAddress("glDetachObjectARB");
+        GetProcAddress("glDetachObject");
     m_glDeleteObject = (MYTH_GLDELETEOBJECT)
-        GetProcAddress("glDeleteObjectARB");
+        GetProcAddress("glDeleteObject");
     m_glGetUniformLocation = (MYTH_GLGETUNIFORMLOCATION)
-        GetProcAddress("glGetUniformLocationARB");
+        GetProcAddress("glGetUniformLocation");
     m_glUniform4f = (MYTH_GLUNIFORM4F)
-        GetProcAddress("glUniform4fARB");
+        GetProcAddress("glUniform4f");
     m_glUniformMatrix4fv = (MYTH_GLUNIFORMMATRIX4FV)
-        GetProcAddress("glUniformMatrix4fvARB");
+        GetProcAddress("glUniformMatrix4fv");
     m_glVertexAttribPointer = (MYTH_GLVERTEXATTRIBPOINTER)
         GetProcAddress("glVertexAttribPointer");
     m_glEnableVertexAttribArray = (MYTH_GLENABLEVERTEXATTRIBARRAY)
@@ -1575,9 +1575,9 @@ void MythRenderOpenGL::InitFeatures(void)
         m_glCheckFramebufferStatus && framebuffers)
         m_exts_supported += kGLExtFBufObj;
 
-    bool buffer_procs = m_glMapBufferARB  && m_glBindBufferARB &&
-                        m_glGenBuffersARB && m_glDeleteBuffersARB &&
-                        m_glBufferDataARB && m_glUnmapBufferARB;
+    bool buffer_procs = m_glMapBuffer  && m_glBindBuffer &&
+                        m_glGenBuffers && m_glDeleteBuffers &&
+                        m_glBufferData && m_glUnmapBuffer;
 
     if(m_extensions.contains("GL_ARB_pixel_buffer_object")
        && buffer_procs && pixelbuffers)
@@ -1674,12 +1674,12 @@ void MythRenderOpenGL::ResetProcs(void)
     m_glProgramLocalParameter4fARB = NULL;
     m_glDeleteProgramsARB = NULL;
     m_glGetProgramivARB = NULL;
-    m_glMapBufferARB = NULL;
-    m_glBindBufferARB = NULL;
-    m_glGenBuffersARB = NULL;
-    m_glBufferDataARB = NULL;
-    m_glUnmapBufferARB = NULL;
-    m_glDeleteBuffersARB = NULL;
+    m_glMapBuffer = NULL;
+    m_glBindBuffer = NULL;
+    m_glGenBuffers = NULL;
+    m_glBufferData = NULL;
+    m_glUnmapBuffer = NULL;
+    m_glDeleteBuffers = NULL;
     m_glGenFramebuffers = NULL;
     m_glBindFramebuffer = NULL;
     m_glFramebufferTexture2D = NULL;
@@ -1725,15 +1725,15 @@ uint MythRenderOpenGL::CreatePBO(uint tex)
     if (!m_textures.contains(tex))
         return 0;
 
-    m_glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+    m_glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
     glTexImage2D(m_textures[tex].m_type, 0, m_textures[tex].m_internal_fmt,
                  m_textures[tex].m_size.width(),
                  m_textures[tex].m_size.height(), 0,
                  m_textures[tex].m_data_fmt, m_textures[tex].m_data_type, NULL);
 
     GLuint tmp_pbo;
-    m_glGenBuffersARB(1, &tmp_pbo);
-    m_glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+    m_glGenBuffers(1, &tmp_pbo);
+    m_glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
     Flush(true);
     return tmp_pbo;
@@ -1745,7 +1745,7 @@ uint MythRenderOpenGL::CreateVBO(void)
         return 0;
 
     GLuint tmp_vbo;
-    m_glGenBuffersARB(1, &tmp_vbo);
+    m_glGenBuffers(1, &tmp_vbo);
     return tmp_vbo;
 }
 
@@ -1796,7 +1796,7 @@ void MythRenderOpenGL::DeleteTextures(void)
         if (it.value().m_data)
             delete it.value().m_data;
         if (it.value().m_pbo)
-            m_glDeleteBuffersARB(1, &(it.value().m_pbo));
+            m_glDeleteBuffers(1, &(it.value().m_pbo));
     }
     m_textures.clear();
     Flush(true);
@@ -1902,7 +1902,7 @@ bool MythRenderOpenGL::ValidateShaderObject(uint obj)
 bool MythRenderOpenGL::CheckObjectStatus(uint obj)
 {
     int ok;
-    m_glGetObjectParameteriv(obj, GL_OBJECT_LINK_STATUS_ARB, &ok);
+    m_glGetObjectParameteriv(obj, GL_OBJECT_LINK_STATUS, &ok);
     if (ok > 0)
         return true;
 
@@ -1910,8 +1910,8 @@ bool MythRenderOpenGL::CheckObjectStatus(uint obj)
     int infologLength = 0;
     int charsWritten  = 0;
     char *infoLog;
-    m_glGetObjectParameteriv(obj, GL_OBJECT_INFO_LOG_LENGTH_ARB,
-                                &infologLength);
+    m_glGetObjectParameteriv(obj, GL_OBJECT_INFO_LOG_LENGTH,
+                             &infologLength);
     if (infologLength > 0)
     {
         infoLog = (char *)malloc(infologLength);
@@ -2082,18 +2082,18 @@ void MythRenderOpenGL::GetCachedVBO(GLuint type, const QRect &area)
         m_cachedVBOS.insert(ref, vbo);
         m_vboExpiry.append(ref);
 
-        m_glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
-        m_glBufferDataARB(GL_ARRAY_BUFFER_ARB, kTextureOffset, NULL, GL_STREAM_DRAW);
-        void* target = m_glMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY);
+        m_glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        m_glBufferData(GL_ARRAY_BUFFER, kTextureOffset, NULL, GL_STREAM_DRAW);
+        void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
         if (target)
             memcpy(target, vertices, kTextureOffset);
-        m_glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
+        m_glUnmapBuffer(GL_ARRAY_BUFFER);
 
         ExpireVBOS(MAX_VERTEX_CACHE);
         return;
     }
 
-    m_glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_cachedVBOS.value(ref));
+    m_glBindBuffer(GL_ARRAY_BUFFER, m_cachedVBOS.value(ref));
 }
 
 void MythRenderOpenGL::ExpireVBOS(uint max)
@@ -2105,7 +2105,7 @@ void MythRenderOpenGL::ExpireVBOS(uint max)
         if (m_cachedVBOS.contains(ref))
         {
             GLuint vbo = m_cachedVBOS.value(ref);
-            m_glDeleteBuffersARB(1, &vbo);
+            m_glDeleteBuffers(1, &vbo);
             m_cachedVBOS.remove(ref);
         }
     }

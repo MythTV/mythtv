@@ -17,10 +17,6 @@
 #define GL_TEXTURE_RECTANGLE_NV 0x84F5
 #endif
 
-#ifndef GL_FRAGMENT_PROGRAM_ARB
-#define GL_FRAGMENT_PROGRAM_ARB           0x8804
-#endif
-
 #ifndef GL_FRAMEBUFFER
 #define GL_FRAMEBUFFER          0x8D40
 #endif
@@ -59,20 +55,24 @@
 #define GL_MAX_TEXTURE_UNITS 0x84E2
 #endif
 
-#ifndef GL_ARRAY_BUFFER_ARB
-#define GL_ARRAY_BUFFER_ARB               0x8892
+#ifndef GL_ARRAY_BUFFER
+#define GL_ARRAY_BUFFER               0x8892
 #endif
 
-#ifndef GL_PIXEL_UNPACK_BUFFER_ARB
-#define GL_PIXEL_UNPACK_BUFFER_ARB        0x88EC
+#ifndef GL_PIXEL_UNPACK_BUFFER
+#define GL_PIXEL_UNPACK_BUFFER        0x88EC
 #endif
 
 #ifndef GL_STREAM_DRAW
-#define GL_STREAM_DRAW                    0x88E0
+#define GL_STREAM_DRAW                0x88E0
 #endif
 
 #ifndef GL_WRITE_ONLY
-#define GL_WRITE_ONLY                     0x88B9
+#define GL_WRITE_ONLY                 0x88B9
+#endif
+
+#ifndef GL_FRAGMENT_PROGRAM_ARB
+#define GL_FRAGMENT_PROGRAM_ARB           0x8804
 #endif
 
 #ifndef GL_PROGRAM_FORMAT_ASCII_ARB
@@ -110,11 +110,11 @@
 #ifndef GL_VERTEX_SHADER
 #define GL_VERTEX_SHADER                  0x8B31
 #endif
-#ifndef GL_OBJECT_LINK_STATUS_ARB
-#define GL_OBJECT_LINK_STATUS_ARB         0x8B82
+#ifndef GL_OBJECT_LINK_STATUS
+#define GL_OBJECT_LINK_STATUS             0x8B82
 #endif
-#ifndef GL_OBJECT_INFO_LOG_LENGTH_ARB
-#define GL_OBJECT_INFO_LOG_LENGTH_ARB     0x8B84
+#ifndef GL_OBJECT_INFO_LOG_LENGTH
+#define GL_OBJECT_INFO_LOG_LENGTH         0x8B84
 #endif
 
 #ifndef GL_COMPILE_STATUS
@@ -150,17 +150,17 @@ typedef void (APIENTRY * MYTH_GLPROGRAMLOCALPARAMETER4FARBPROC)
 typedef void (APIENTRY * MYTH_GLGETPROGRAMIVARBPROC)
     (GLenum target, GLenum pname, GLint *params);
 typedef ptrdiff_t MYTH_GLsizeiptr;
-typedef GLvoid* (APIENTRY * MYTH_GLMAPBUFFERARBPROC)
+typedef GLvoid* (APIENTRY * MYTH_GLMAPBUFFERPROC)
     (GLenum target, GLenum access);
-typedef void (APIENTRY * MYTH_GLBINDBUFFERARBPROC)
+typedef void (APIENTRY * MYTH_GLBINDBUFFERPROC)
     (GLenum target, GLuint buffer);
-typedef void (APIENTRY * MYTH_GLGENBUFFERSARBPROC)
+typedef void (APIENTRY * MYTH_GLGENBUFFERSPROC)
     (GLsizei n, GLuint *buffers);
-typedef void (APIENTRY * MYTH_GLBUFFERDATAARBPROC)
+typedef void (APIENTRY * MYTH_GLBUFFERDATAPROC)
     (GLenum target, MYTH_GLsizeiptr size, const GLvoid *data, GLenum usage);
-typedef GLboolean (APIENTRY * MYTH_GLUNMAPBUFFERARBPROC)
+typedef GLboolean (APIENTRY * MYTH_GLUNMAPBUFFERPROC)
     (GLenum target);
-typedef void (APIENTRY * MYTH_GLDELETEBUFFERSARBPROC)
+typedef void (APIENTRY * MYTH_GLDELETEBUFFERSPROC)
     (GLsizei n, const GLuint *buffers);
 typedef void (APIENTRY * MYTH_GLGENFRAMEBUFFERSPROC)
     (GLsizei n, GLuint *framebuffers);
