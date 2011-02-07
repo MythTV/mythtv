@@ -710,7 +710,8 @@ static void _mouse_move(GRAPHICS_CONTROLLER *gc, unsigned x, unsigned y, GC_NAV_
         if (x < button->x_pos || y < button->y_pos)
             continue;
 
-        BD_PG_OBJECT *object = _find_object_for_button(s, button, BTN_NORMAL);
+        /* Check for SELECTED state object (button that can be selected) */
+        BD_PG_OBJECT *object = _find_object_for_button(s, button, BTN_SELECTED);
         if (!object)
             continue;
 
@@ -724,10 +725,6 @@ static void _mouse_move(GRAPHICS_CONTROLLER *gc, unsigned x, unsigned y, GC_NAV_
             gc->valid_mouse_position = 1;
             return;
         }
-
-        // can button be selected ?
-        if (!_find_object_for_button(s, button, BTN_SELECTED))
-            return;
 
         new_btn_id = button->id;
         break;
