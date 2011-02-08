@@ -60,20 +60,22 @@ class MPUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
     uint       m_active_obj;
 
     // Procs
-    MYTH_GLCREATESHADEROBJECTPROC        m_glCreateShaderObject;
+    MYTH_GLGETSHADERIVPROC               m_glGetShaderiv;
+    MYTH_GLCREATESHADERPROC              m_glCreateShader;
     MYTH_GLSHADERSOURCEPROC              m_glShaderSource;
     MYTH_GLCOMPILESHADERPROC             m_glCompileShader;
-    MYTH_GLGETSHADERPROC                 m_glGetShader;
+    MYTH_GLATTACHSHADERPROC              m_glAttachShader;
     MYTH_GLGETSHADERINFOLOGPROC          m_glGetShaderInfoLog;
+    MYTH_GLDETACHSHADERPROC              m_glDetachShader;
     MYTH_GLDELETESHADERPROC              m_glDeleteShader;
-    MYTH_GLCREATEPROGRAMOBJECTPROC       m_glCreateProgramObject;
-    MYTH_GLATTACHOBJECTPROC              m_glAttachObject;
+
+    MYTH_GLCREATEPROGRAMPROC             m_glCreateProgram;
     MYTH_GLLINKPROGRAMPROC               m_glLinkProgram;
     MYTH_GLUSEPROGRAMPROC                m_glUseProgram;
-    MYTH_GLGETINFOLOGPROC                m_glGetInfoLog;
-    MYTH_GLGETOBJECTPARAMETERIVPROC      m_glGetObjectParameteriv;
-    MYTH_GLDETACHOBJECTPROC              m_glDetachObject;
-    MYTH_GLDELETEOBJECTPROC              m_glDeleteObject;
+    MYTH_GLDELETEPROGRAMPROC             m_glDeleteProgram;
+    MYTH_GLGETPROGRAMINFOLOGPROC         m_glGetProgramInfoLog;
+    MYTH_GLGETPROGRAMIVPROC              m_glGetProgramiv;
+
     MYTH_GLGETUNIFORMLOCATIONPROC        m_glGetUniformLocation;
     MYTH_GLUNIFORM4FPROC                 m_glUniform4f;
     MYTH_GLUNIFORMMATRIX4FVPROC          m_glUniformMatrix4fv;

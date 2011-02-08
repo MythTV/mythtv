@@ -101,20 +101,20 @@ void MythRenderOpenGL2::ResetProcs(void)
 {
     MythRenderOpenGL::ResetProcs();
 
-    m_glCreateShaderObject = NULL;
+    m_glCreateShader = NULL;
     m_glShaderSource = NULL;
     m_glCompileShader = NULL;
-    m_glGetShader = NULL;
+    m_glGetShaderiv = NULL;
     m_glGetShaderInfoLog = NULL;
     m_glDeleteShader = NULL;
-    m_glCreateProgramObject = NULL;
-    m_glAttachObject = NULL;
+    m_glCreateProgram = NULL;
+    m_glAttachShader = NULL;
     m_glLinkProgram = NULL;
     m_glUseProgram = NULL;
-    m_glGetInfoLog = NULL;
-    m_glGetObjectParameteriv = NULL;
-    m_glDetachObject = NULL;
-    m_glDeleteObject = NULL;
+    m_glGetProgramInfoLog = NULL;
+    m_glGetProgramiv = NULL;
+    m_glDetachShader = NULL;
+    m_glDeleteShader = NULL;
     m_glGetUniformLocation = NULL;
     m_glUniform4f = NULL;
     m_glUniformMatrix4fv = NULL;
@@ -139,17 +139,15 @@ bool MythRenderOpenGL2::InitFeatures(void)
             VERBOSE(VB_GENERAL, LOC + "Disabling GLSL.");
     }
 
-    if (m_extensions.contains("GL_ARB_shader_objects") &&
-        m_extensions.contains("GL_ARB_vertex_shader") &&
-        m_extensions.contains("GL_ARB_fragment_shader") &&
-        m_glShaderSource  && m_glCreateShaderObject &&
-        m_glCompileShader && m_glGetShader &&
+    // These should all be present for a valid OpenGL2.0/ES installation
+    if (m_glShaderSource  && m_glCreateShader &&
+        m_glCompileShader && m_glGetShaderiv &&
         m_glGetShaderInfoLog && m_glDeleteShader &&
-        m_glCreateProgramObject &&
-        m_glAttachObject  && m_glLinkProgram &&
-        m_glUseProgram    && m_glGetInfoLog &&
-        m_glDetachObject  && m_glGetObjectParameteriv &&
-        m_glDeleteObject  && m_glGetUniformLocation &&
+        m_glCreateProgram &&
+        m_glAttachShader  && m_glLinkProgram &&
+        m_glUseProgram    && m_glGetProgramInfoLog &&
+        m_glDetachShader  && m_glGetProgramiv &&
+        m_glDeleteShader  && m_glGetUniformLocation &&
         m_glUniform4f     && m_glUniformMatrix4fv &&
         m_glVertexAttribPointer &&
         m_glEnableVertexAttribArray &&
@@ -176,34 +174,34 @@ void MythRenderOpenGL2::InitProcs(void)
 {
     MythRenderOpenGL::InitProcs();
 
-    m_glCreateShaderObject = (MYTH_GLCREATESHADEROBJECTPROC)
-        GetProcAddress("glCreateShaderObject");
+    m_glCreateShader = (MYTH_GLCREATESHADERPROC)
+        GetProcAddress("glCreateShader");
     m_glShaderSource = (MYTH_GLSHADERSOURCEPROC)
         GetProcAddress("glShaderSource");
     m_glCompileShader = (MYTH_GLCOMPILESHADERPROC)
         GetProcAddress("glCompileShader");
-    m_glGetShader = (MYTH_GLGETSHADERPROC)
+    m_glGetShaderiv = (MYTH_GLGETSHADERIVPROC)
         GetProcAddress("glGetShaderiv");
     m_glGetShaderInfoLog = (MYTH_GLGETSHADERINFOLOGPROC)
         GetProcAddress("glGetShaderInfoLog");
-    m_glDeleteShader = (MYTH_GLDELETESHADERPROC)
-        GetProcAddress("glDeleteShader");
-    m_glCreateProgramObject = (MYTH_GLCREATEPROGRAMOBJECTPROC)
-        GetProcAddress("glCreateProgramObject");
-    m_glAttachObject = (MYTH_GLATTACHOBJECTPROC)
-        GetProcAddress("glAttachObject");
+    m_glDeleteProgram = (MYTH_GLDELETEPROGRAMPROC)
+        GetProcAddress("glDeleteProgram");
+    m_glCreateProgram = (MYTH_GLCREATEPROGRAMPROC)
+        GetProcAddress("glCreateProgram");
+    m_glAttachShader = (MYTH_GLATTACHSHADERPROC)
+        GetProcAddress("glAttachShader");
     m_glLinkProgram = (MYTH_GLLINKPROGRAMPROC)
         GetProcAddress("glLinkProgram");
     m_glUseProgram = (MYTH_GLUSEPROGRAMPROC)
-        GetProcAddress("glUseProgramObject");
-    m_glGetInfoLog = (MYTH_GLGETINFOLOGPROC)
-        GetProcAddress("glGetInfoLog");
-    m_glGetObjectParameteriv = (MYTH_GLGETOBJECTPARAMETERIVPROC)
-        GetProcAddress("glGetObjectParameteriv");
-    m_glDetachObject = (MYTH_GLDETACHOBJECTPROC)
-        GetProcAddress("glDetachObject");
-    m_glDeleteObject = (MYTH_GLDELETEOBJECTPROC)
-        GetProcAddress("glDeleteObject");
+        GetProcAddress("glUseProgram");
+    m_glGetProgramInfoLog = (MYTH_GLGETPROGRAMINFOLOGPROC)
+        GetProcAddress("glGetProgramInfoLog");
+    m_glGetProgramiv = (MYTH_GLGETPROGRAMIVPROC)
+        GetProcAddress("glGetProgramiv");
+    m_glDetachShader = (MYTH_GLDETACHSHADERPROC)
+        GetProcAddress("glDetachShader");
+    m_glDeleteShader = (MYTH_GLDELETESHADERPROC)
+        GetProcAddress("glDeleteShader");
     m_glGetUniformLocation = (MYTH_GLGETUNIFORMLOCATIONPROC)
         GetProcAddress("glGetUniformLocation");
     m_glUniform4f = (MYTH_GLUNIFORM4FPROC)
@@ -239,7 +237,7 @@ uint MythRenderOpenGL2::CreateShaderObject(const QString &vertex,
     OptimiseShaderSource(vert_shader);
     OptimiseShaderSource(frag_shader);
 
-    result = m_glCreateProgramObject();
+    result = m_glCreateProgram();
     if (!result)
         return 0;
 
@@ -265,11 +263,11 @@ void MythRenderOpenGL2::DeleteShaderObject(uint obj)
 
     GLuint vertex   = m_shader_objects[obj].m_vertex_shader;
     GLuint fragment = m_shader_objects[obj].m_fragment_shader;
-    m_glDetachObject(obj, vertex);
-    m_glDetachObject(obj, fragment);
-    m_glDeleteObject(vertex);
-    m_glDeleteObject(fragment);
-    m_glDeleteObject(obj);
+    m_glDetachShader(obj, vertex);
+    m_glDetachShader(obj, fragment);
+    m_glDeleteShader(vertex);
+    m_glDeleteShader(fragment);
+    m_glDeleteProgram(obj);
     m_shader_objects.remove(obj);
 
     Flush(true);
@@ -476,17 +474,17 @@ void MythRenderOpenGL2::DeleteDefaultShaders(void)
 
 uint MythRenderOpenGL2::CreateShader(int type, const QString &source)
 {
-    uint result = m_glCreateShaderObject(type);
+    uint result = m_glCreateShader(type);
     QByteArray src = source.toAscii();
     const char* tmp[1] = { src.constData() };
     m_glShaderSource(result, 1, tmp, NULL);
     m_glCompileShader(result);
     GLint compiled;
-    m_glGetShader(result, GL_COMPILE_STATUS, &compiled);
+    m_glGetShaderiv(result, GL_COMPILE_STATUS, &compiled);
     if (!compiled)
     {
         GLint length = 0;
-        m_glGetShader(result, GL_INFO_LOG_LENGTH, &length);
+        m_glGetShaderiv(result, GL_INFO_LOG_LENGTH, &length);
         if (length > 1)
         {
             char *log = (char*)malloc(sizeof(char) * length);
@@ -510,8 +508,8 @@ bool MythRenderOpenGL2::ValidateShaderObject(uint obj)
         !m_shader_objects[obj].m_vertex_shader)
         return false;
 
-    m_glAttachObject(obj, m_shader_objects[obj].m_fragment_shader);
-    m_glAttachObject(obj, m_shader_objects[obj].m_vertex_shader);
+    m_glAttachShader(obj, m_shader_objects[obj].m_fragment_shader);
+    m_glAttachShader(obj, m_shader_objects[obj].m_vertex_shader);
     m_glBindAttribLocation(obj, COLOR_INDEX,   "a_color");
     m_glBindAttribLocation(obj, TEXTURE_INDEX, "a_texcoord0");
     m_glLinkProgram(obj);
@@ -521,7 +519,7 @@ bool MythRenderOpenGL2::ValidateShaderObject(uint obj)
 bool MythRenderOpenGL2::CheckObjectStatus(uint obj)
 {
     int ok;
-    m_glGetObjectParameteriv(obj, GL_OBJECT_LINK_STATUS, &ok);
+    m_glGetProgramiv(obj, GL_OBJECT_LINK_STATUS, &ok);
     if (ok > 0)
         return true;
 
@@ -529,12 +527,11 @@ bool MythRenderOpenGL2::CheckObjectStatus(uint obj)
     int infologLength = 0;
     int charsWritten  = 0;
     char *infoLog;
-    m_glGetObjectParameteriv(obj, GL_OBJECT_INFO_LOG_LENGTH,
-                             &infologLength);
+    m_glGetProgramiv(obj, GL_OBJECT_INFO_LOG_LENGTH, &infologLength);
     if (infologLength > 0)
     {
         infoLog = (char *)malloc(infologLength);
-        m_glGetInfoLog(obj, infologLength, &charsWritten, infoLog);
+        m_glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog);
         VERBOSE(VB_IMPORTANT, QString("\n\n%1").arg(infoLog));
         free(infoLog);
     }
@@ -587,11 +584,11 @@ void MythRenderOpenGL2::DeleteShaders(void)
         GLuint object   = it.key();
         GLuint vertex   = it.value().m_vertex_shader;
         GLuint fragment = it.value().m_fragment_shader;
-        m_glDetachObject(object, vertex);
-        m_glDetachObject(object, fragment);
+        m_glDetachShader(object, vertex);
+        m_glDetachShader(object, fragment);
         m_glDeleteShader(vertex);
         m_glDeleteShader(fragment);
-        m_glDeleteObject(object);
+        m_glDeleteProgram(object);
     }
     m_shader_objects.clear();
     Flush(true);

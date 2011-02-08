@@ -32,33 +32,33 @@ typedef char GLcharARB;
 #define GL_INFO_LOG_LENGTH                0x8B84
 #endif
 
-typedef GLuint ( * MYTH_GLCREATESHADEROBJECTPROC)
+typedef GLuint ( * MYTH_GLCREATESHADERPROC)
     (GLenum shaderType);
 typedef void ( * MYTH_GLSHADERSOURCEPROC)
     (GLuint shader, int numOfStrings, const char **strings, int *lenOfStrings);
 typedef void ( * MYTH_GLCOMPILESHADERPROC)
     (GLuint shader);
-typedef void ( * MYTH_GLGETSHADERPROC)
+typedef void ( * MYTH_GLGETSHADERIVPROC)
     (GLuint shader, GLenum pname, GLint *params);
 typedef void ( * MYTH_GLGETSHADERINFOLOGPROC)
     (GLuint shader, GLint maxlength, GLint length, GLchar *infolog);
-typedef void ( * MYTH_GLDELETESHADERPROC)
+typedef void ( * MYTH_GLDELETEPROGRAMPROC)
     (GLuint shader);
-typedef GLuint ( * MYTH_GLCREATEPROGRAMOBJECTPROC)
+typedef GLuint ( * MYTH_GLCREATEPROGRAMPROC)
     (void);
-typedef void ( * MYTH_GLATTACHOBJECTPROC)
+typedef void ( * MYTH_GLATTACHSHADERPROC)
     (GLuint program, GLuint shader);
 typedef void ( * MYTH_GLLINKPROGRAMPROC)
     (GLuint program);
 typedef void ( * MYTH_GLUSEPROGRAMPROC)
     (GLuint program);
-typedef void ( * MYTH_GLGETINFOLOGPROC)
+typedef void ( * MYTH_GLGETPROGRAMINFOLOGPROC)
     (GLuint object, int maxLen, int *len, char *log);
-typedef void ( * MYTH_GLGETOBJECTPARAMETERIVPROC)
+typedef void ( * MYTH_GLGETPROGRAMIVPROC)
     (GLuint object, GLenum type, int *param);
-typedef void ( * MYTH_GLDETACHOBJECTPROC)
+typedef void ( * MYTH_GLDETACHSHADERPROC)
     (GLuint program, GLuint shader);
-typedef void ( * MYTH_GLDELETEOBJECTPROC)
+typedef void ( * MYTH_GLDELETESHADERPROC)
     (GLuint id);
 typedef GLint ( * MYTH_GLGETUNIFORMLOCATIONPROC)
     (GLuint program, const char *name);
