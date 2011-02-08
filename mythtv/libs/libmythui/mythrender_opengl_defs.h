@@ -143,8 +143,4 @@ typedef void ( * MYTH_GLSETFENCEAPPLEPROC)
     (GLuint fence);
 typedef void ( * MYTH_GLFINISHFENCEAPPLEPROC)
     (GLuint fence);
-typedef int ( * MYTH_GLXGETVIDEOSYNCSGIPROC)
-    (unsigned int *count);
-typedef int ( * MYTH_GLXWAITVIDEOSYNCSGIPROC)
-    (int divisor, int remainder, unsigned int *count);
 #endif

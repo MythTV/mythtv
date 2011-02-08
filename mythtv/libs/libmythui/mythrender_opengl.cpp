@@ -5,16 +5,8 @@
 #define LOC QString("OpenGL: ")
 #define LOC_ERR QString("OpenGL Error: ")
 
-#if defined(Q_WS_X11)
-#include <QX11Info>
-#include <GL/glx.h>
-#endif
-
 #include "mythrender_opengl1.h"
 #include "mythrender_opengl2.h"
-
-MYTH_GLXGETVIDEOSYNCSGIPROC  MythRenderOpenGL::g_glXGetVideoSyncSGI  = NULL;
-MYTH_GLXWAITVIDEOSYNCSGIPROC MythRenderOpenGL::g_glXWaitVideoSyncSGI = NULL;
 
 static const GLuint kTextureOffset = 8 * sizeof(GLfloat);
 
@@ -630,54 +622,6 @@ void MythRenderOpenGL::DrawRect(const QRect &area, bool drawFill,
     DrawRectPriv(area, drawFill, fillColor, drawLine,
                  lineWidth, lineColor, prog);
     doneCurrent();
-}
-
-bool MythRenderOpenGL::HasGLXWaitVideoSyncSGI(void)
-{
-    static bool initialised = false;
-    if (!initialised)
-    {
-        makeCurrent();
-        initialised = true;
-
-#if defined(Q_WS_X11)
-        int screen = DefaultScreen(QX11Info::display());
-        QString glxExt =
-            QString(QLatin1String(glXQueryExtensionsString(QX11Info::display(),
-                                                           screen)));
-        if (glxExt.contains(QLatin1String("GLX_SGI_video_sync")))
-        {
-            g_glXGetVideoSyncSGI = (MYTH_GLXGETVIDEOSYNCSGIPROC)
-                GetProcAddress("glXGetVideoSyncSGI");
-            g_glXWaitVideoSyncSGI = (MYTH_GLXWAITVIDEOSYNCSGIPROC)
-                GetProcAddress("glXWaitVideoSyncSGI");
-        }
-#endif
-        doneCurrent();
-    }
-    return g_glXGetVideoSyncSGI && g_glXWaitVideoSyncSGI;
-}
-
-unsigned int MythRenderOpenGL::GetVideoSyncCount(void)
-{
-    unsigned int count = 0;
-    if (HasGLXWaitVideoSyncSGI())
-    {
-        makeCurrent();
-        g_glXGetVideoSyncSGI(&count);
-        doneCurrent();
-    }
-    return count;
-}
-
-void MythRenderOpenGL::WaitForVideoSync(int div, int rem, unsigned int *count)
-{
-    if (HasGLXWaitVideoSyncSGI())
-    {
-        makeCurrent();
-        g_glXWaitVideoSyncSGI(div, rem, count);
-        doneCurrent();
-    }
 }
 
 void MythRenderOpenGL::Init2DState(void)

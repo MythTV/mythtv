@@ -147,10 +147,6 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
                   int lineWidth, const QColor &lineColor,
                   int target = 0, int prog = 0);
 
-    bool         HasGLXWaitVideoSyncSGI(void);
-    unsigned int GetVideoSyncCount(void);
-    void         WaitForVideoSync(int div, int rem, unsigned int *count);
-
   protected:
     virtual void DrawBitmapPriv(uint tex, const QRect *src, const QRect *dst,
                                 uint prog, int alpha,
@@ -247,9 +243,6 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     MYTH_GLDELETEFENCESAPPLEPROC         m_glDeleteFencesAPPLE;
     MYTH_GLSETFENCEAPPLEPROC             m_glSetFenceAPPLE;
     MYTH_GLFINISHFENCEAPPLEPROC          m_glFinishFenceAPPLE;
-    // GLX_SGI_video_sync
-    static MYTH_GLXGETVIDEOSYNCSGIPROC   g_glXGetVideoSyncSGI;
-    static MYTH_GLXWAITVIDEOSYNCSGIPROC  g_glXWaitVideoSyncSGI;
 };
 
 #endif
