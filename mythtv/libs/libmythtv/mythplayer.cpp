@@ -4679,6 +4679,22 @@ void MythPlayer::SetOSDStatus(const QString &title, OSDTimeout timeout)
     osd->SetValues("osd_status", info.values, timeout);
 }
 
+void MythPlayer::SaveTotalDuration(void)
+{
+    if (!decoder)
+        return;
+
+    decoder->SaveTotalDuration();
+}
+
+void MythPlayer::ResetTotalDuration(void)
+{
+    if (!decoder)
+        return;
+
+    decoder->ResetTotalDuration();
+}
+
 static unsigned dbg_ident(const MythPlayer *player)
 {
     static QMutex   dbg_lock;

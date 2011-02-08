@@ -627,6 +627,8 @@ static int DoFlagCommercials(
 
     if (result)
     {
+        cfp->SaveTotalDuration();
+
         frm_dir_map_t commBreakList;
         commDetector->GetCommercialBreakList(commBreakList);
         comms_found = commBreakList.size() / 2;

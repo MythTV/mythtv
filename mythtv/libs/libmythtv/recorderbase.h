@@ -257,6 +257,10 @@ class MPUBLIC RecorderBase
      */
     void FrameRateChange(uint framerate, long long frame);
 
+    /** \brief Note the total duration in the recordedmark table
+     */
+    void SetDuration(uint64_t duration);
+
     TVRec         *tvrec;
     RingBuffer    *ringBuffer;
     bool           weMadeBuffer;
