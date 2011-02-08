@@ -20,6 +20,15 @@
 #include "mythrender_base.h"
 #include "mythrender_opengl_defs.h"
 
+#ifdef GL_ES_VERSION_2_0
+#define GL_BGRA  GL_RGBA
+#define GL_RGBA8 GL_RGBA
+#define GL_TEXTURE_1D 0x0
+static inline const char* gluErrorString(int ) { return NULL; }
+static inline void glTexImage1D(GLenum, GLint, GLint, GLsizei, GLint,
+                                GLenum, GLenum, const GLvoid*) { };
+#endif
+
 typedef enum
 {
     kGLFeatNone    = 0x0000,

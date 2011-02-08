@@ -1196,19 +1196,18 @@ uint MythRenderOpenGL::GetBufferSize(QSize size, uint fmt, uint type)
     uint bytes;
     uint bpp;
 
-    switch (fmt)
+    if (fmt == GL_BGRA || fmt ==GL_RGBA)
     {
-        case GL_BGRA:
-        case GL_RGBA:
-            bpp = 4;
-            break;
-        case GL_YCBCR_MESA:
-        case GL_YCBCR_422_APPLE:
-        case GL_RGB_422_APPLE:
-            bpp = 2;
-            break;
-        default:
-            bpp =0;
+        bpp = 4;
+    }
+    else if (fmt == GL_YCBCR_MESA || fmt == GL_YCBCR_422_APPLE ||
+             fmt == GL_RGB_422_APPLE)
+    {
+        bpp = 2;
+    }
+    else
+    {
+        bpp =0;
     }
 
     switch (type)
