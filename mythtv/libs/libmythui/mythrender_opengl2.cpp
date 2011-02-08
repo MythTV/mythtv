@@ -15,12 +15,14 @@ static const GLuint kVertexSize    = 16 * sizeof(GLfloat);
 
 static const QString kDefaultVertexShader =
 "GLSL_DEFINES"
+"attribute vec2 a_position;\n"
 "attribute vec4 a_color;\n"
 "attribute vec2 a_texcoord0;\n"
 "varying   vec4 v_color;\n"
 "varying   vec2 v_texcoord0;\n"
+"uniform   mat4 u_projection;\n"
 "void main() {\n"
-"    gl_Position = ftransform();\n"
+"    gl_Position = u_projection * vec4(a_position, 0.0, 1.0);\n"
 "    v_texcoord0 = a_texcoord0;\n"
 "    v_color     = a_color;\n"
 "}\n";
@@ -37,10 +39,12 @@ static const QString kDefaultFragmentShader =
 
 static const QString kSimpleVertexShader =
 "GLSL_DEFINES"
+"attribute vec2 a_position;\n"
 "attribute vec4 a_color;\n"
 "varying   vec4 v_color;\n"
+"uniform   mat4 u_projection;\n"
 "void main() {\n"
-"    gl_Position = ftransform();\n"
+"    gl_Position = u_projection * vec4(a_position, 0.0, 1.0);\n"
 "    v_color     = a_color;\n"
 "}\n";
 
@@ -93,6 +97,7 @@ void MythRenderOpenGL2::Init2DState(void)
 void MythRenderOpenGL2::ResetVars(void)
 {
     MythRenderOpenGL::ResetVars();
+    memset(m_projection, 0, sizeof(m_projection));
     memset(m_shaders, 0, sizeof(m_shaders));
     m_active_obj = 0;
 }
@@ -319,6 +324,7 @@ void MythRenderOpenGL2::DrawBitmapPriv(uint tex, const QRect *src,
         prog = m_shaders[kShaderDefault];
 
     EnableShaderObject(prog);
+    SetShaderParams(prog, &m_projection[0][0], "u_projection");
     SetBlend(true);
 
     EnableTextures(tex);
@@ -364,6 +370,7 @@ void MythRenderOpenGL2::DrawBitmapPriv(uint *textures, uint texture_count,
     uint first = textures[0];
 
     EnableShaderObject(prog);
+    SetShaderParams(prog, &m_projection[0][0], "u_projection");
     SetBlend(false);
 
     EnableTextures(first);
@@ -416,6 +423,7 @@ void MythRenderOpenGL2::DrawRectPriv(const QRect &area, bool drawFill,
         prog = m_shaders[kShaderSimple];
 
     EnableShaderObject(prog);
+    SetShaderParams(prog, &m_projection[0][0], "u_projection");
     SetBlend(true);
     DisableTextures();
 
@@ -510,6 +518,7 @@ bool MythRenderOpenGL2::ValidateShaderObject(uint obj)
 
     m_glAttachShader(obj, m_shader_objects[obj].m_fragment_shader);
     m_glAttachShader(obj, m_shader_objects[obj].m_vertex_shader);
+    m_glBindAttribLocation(obj, VERTEX_INDEX,  "a_position");
     m_glBindAttribLocation(obj, COLOR_INDEX,   "a_color");
     m_glBindAttribLocation(obj, TEXTURE_INDEX, "a_texcoord0");
     m_glLinkProgram(obj);
@@ -569,11 +578,17 @@ void MythRenderOpenGL2::DeleteOpenGLResources(void)
 
 void MythRenderOpenGL2::SetMatrixView(void)
 {
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0, m_viewport.width(), m_viewport.height(), 0, 1, -1);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    float right = m_viewport.width();
+    float bottom = m_viewport.height();
+    memset(m_projection, 0, sizeof(m_projection));
+    if (right <= 0 || bottom <= 0)
+        return;
+    m_projection[0][0] = 2.0 / right;
+    m_projection[1][1] = 2.0 / -bottom;
+    m_projection[2][2] = 1.0;
+    m_projection[3][0] = -1.0;
+    m_projection[3][1] = 1.0;
+    m_projection[3][3] = 1.0;
 }
 
 void MythRenderOpenGL2::DeleteShaders(void)

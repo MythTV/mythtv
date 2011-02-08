@@ -57,7 +57,8 @@ class MPUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
     uint     m_shaders[kShaderCount];
 
     // State
-    uint       m_active_obj;
+    uint  m_active_obj;
+    float m_projection[4][4];
 
     // Procs
     MYTH_GLGETSHADERIVPROC               m_glGetShaderiv;

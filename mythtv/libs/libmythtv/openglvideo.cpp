@@ -1578,10 +1578,12 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
 
 static const QString YUV2RGBVertexShader =
 "GLSL_DEFINES"
+"attribute vec2 a_position;\n"
 "attribute vec2 a_texcoord0;\n"
 "varying   vec2 v_texcoord0;\n"
+"uniform   mat4 u_projection;\n"
 "void main() {\n"
-"    gl_Position = ftransform();\n"
+"    gl_Position = u_projection * vec4(a_position, 0.0, 1.0);\n"
 "    v_texcoord0 = a_texcoord0;\n"
 "}\n";
 
