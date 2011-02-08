@@ -40,22 +40,39 @@ typedef enum
     kGLMaxFeat     = 0x4000,
 } GLFeatures;
 
-typedef enum
+#define TEX_OFFSET 8
+class MythGLTexture
 {
-    kGLNoProfile     = 0x00,
-    kGLLegacyProfile = 0x01,
-    kGLHighProfile   = 0x02,
-} GLProfile;
+  public:
+    MythGLTexture() :
+        m_type(GL_TEXTURE_2D), m_data(NULL), m_data_size(0),
+        m_data_type(GL_UNSIGNED_BYTE), m_data_fmt(GL_BGRA),
+        m_internal_fmt(GL_RGBA8), m_pbo(0), m_vbo(0),
+        m_filter(GL_LINEAR), m_wrap(GL_CLAMP_TO_EDGE),
+        m_size(0,0), m_act_size(0,0)
+    {
+        memset(&m_vertex_data, 0, sizeof(m_vertex_data));
+    }
 
-typedef enum
-{
-    kShaderSimple  = 0,
-    kShaderDefault = 1,
-    kShaderCount   = 2,
-} DefaultShaders;
+    ~MythGLTexture()
+    {
+    }
 
-class MythGLTexture;
-class MythGLShaderObject;
+    GLuint  m_type;
+    unsigned char *m_data;
+    uint    m_data_size;
+    GLuint  m_data_type;
+    GLuint  m_data_fmt;
+    GLuint  m_internal_fmt;
+    GLuint  m_pbo;
+    GLuint  m_vbo;
+    GLuint  m_filter;
+    GLuint  m_wrap;
+    QSize   m_size;
+    QSize   m_act_size;
+    GLfloat m_vertex_data[16];
+};
+
 class MythRenderOpenGL;
 
 class MPUBLIC OpenGLLocker
@@ -70,6 +87,9 @@ class MPUBLIC OpenGLLocker
 class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
 {
   public:
+    static MythRenderOpenGL* Create(const QGLFormat& format,
+                                    QPaintDevice* device = NULL);
+
     MythRenderOpenGL(const QGLFormat& format, QPaintDevice* device);
     MythRenderOpenGL(const QGLFormat& format);
     virtual ~MythRenderOpenGL();
@@ -79,16 +99,14 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
 
     void  Init(void);
 
-    GLProfile GetProfile(void)       { return m_profile;        }
-    int   GetMaxTextureSize(void)    { return m_max_tex_size;   }
-    uint  GetFeatures(void)          { return m_exts_supported; }
-    void  SetFeatures(uint features);
+    int   GetMaxTextureSize(void)    { return m_max_tex_size; }
+    uint  GetFeatures(void)          { return m_exts_used;    }
 
     void  MoveResizeWindow(const QRect &rect);
     void  SetViewPort(const QSize &size);
     void  Flush(bool use_fence);
     void  SetBlend(bool enable);
-    void  SetColor(int r, int g, int b, int a);
+    virtual void SetColor(int r, int g, int b, int a) { }
     void  SetBackground(int r, int g, int b, int a);
     void  SetFence(void);
 
@@ -104,7 +122,7 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     QSize GetTextureSize(uint tex);
     void  SetTextureFilters(uint tex, uint filt, uint wrap);
     void  ActiveTexture(int active_tex);
-    uint  CreateHelperTexture(void);
+    virtual uint CreateHelperTexture(void) { return 0; }
     void  EnableTextures(uint type, uint tex_type = 0);
     void  DisableTextures(void);
     void  DeleteTexture(uint tex);
@@ -114,18 +132,14 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     void BindFramebuffer(uint fb);
     void ClearFramebuffer(void);
 
-    bool CreateFragmentProgram(const QString &program, uint &prog);
-    void DeleteFragmentProgram(uint prog);
-    void EnableFragmentProgram(int fp);
-    void SetProgramParams(uint prog, void* vals, const char* uniform);
+    virtual uint CreateShaderObject(const QString &vert, const QString &frag) = 0;
+    virtual void DeleteShaderObject(uint obj) = 0;
+    virtual void EnableShaderObject(uint obj) = 0;
+    virtual void SetShaderParams(uint prog, void* vals, const char* uniform) = 0;
 
-    uint CreateShaderObject(const QString &vert, const QString &frag);
-    void DeleteShaderObject(uint obj);
-    void EnableShaderObject(uint obj);
-
-    void DrawBitmap(uint tex, uint target, const QRect *src, const QRect *dst,
-                    uint prog, int alpha = 255, int red = 255, int green = 255,
-                    int blue = 255);
+    void DrawBitmap(uint tex, uint target, const QRect *src,
+                    const QRect *dst, uint prog, int alpha = 255,
+                    int red = 255, int green = 255, int blue = 255);
     void DrawBitmap(uint *textures, uint texture_count, uint target,
                     const QRectF *src, const QRectF *dst, uint prog);
     void DrawRect(const QRect &area, bool drawFill,
@@ -137,44 +151,32 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     unsigned int GetVideoSyncCount(void);
     void         WaitForVideoSync(int div, int rem, unsigned int *count);
 
-  private:
-    void DrawBitmapLegacy(uint tex, const QRect *src, const QRect *dst,
-                         uint prog, int alpha, int red, int green, int blue);
-    void DrawBitmapHigh(uint tex, const QRect *src, const QRect *dst,
-                        uint prog, int alpha, int red, int green, int blue);
-    void DrawBitmapLegacy(uint *textures, uint texture_count,
-                          const QRectF *src, const QRectF *dst, uint prog);
-    void DrawBitmapHigh(uint *textures, uint texture_count,
-                        const QRectF *src, const QRectF *dst, uint prog);
-    void DrawRectLegacy(const QRect &area, bool drawFill,
-                        const QColor &fillColor,  bool drawLine,
-                        int lineWidth, const QColor &lineColor, int prog);
-    void DrawRectHigh(const QRect &area, bool drawFill,
-                      const QColor &fillColor,  bool drawLine,
-                      int lineWidth, const QColor &lineColor, int prog);
+  protected:
+    virtual void DrawBitmapPriv(uint tex, const QRect *src, const QRect *dst,
+                                uint prog, int alpha,
+                                int red, int green, int blue) = 0;
+    virtual void DrawBitmapPriv(uint *textures, uint texture_count,
+                                const QRectF *src, const QRectF *dst,
+                                uint prog) = 0;
+    virtual void DrawRectPriv(const QRect &area, bool drawFill,
+                              const QColor &fillColor,  bool drawLine,
+                              int lineWidth, const QColor &lineColor,
+                              int prog) = 0;
 
-    void Init2DState(void);
-    void InitProcs(void);
+    virtual void Init2DState(void);
+    virtual void InitProcs(void);
     void* GetProcAddress(const QString &proc) const;
-    void InitFeatures(void);
-    void Reset(void);
-    void ResetVars(void);
-    void ResetProcs(void);
+    virtual bool InitFeatures(void);
+    virtual void ResetVars(void);
+    virtual void ResetProcs(void);
+    virtual void SetMatrixView(void) = 0;
 
     uint CreatePBO(uint tex);
     uint CreateVBO(void);
-    void DeleteOpenGLResources(void);
+    virtual void DeleteOpenGLResources(void);
     void DeleteTextures(void);
-    void DeletePrograms(void);
-    void DeleteShaderObjects(void);
+    virtual void DeleteShaders(void) = 0;
     void DeleteFrameBuffers(void);
-
-    void CreateDefaultShaders(void);
-    void DeleteDefaultShaders(void);
-    uint CreateShader(int type, const QString &source);
-    bool ValidateShaderObject(uint obj);
-    bool CheckObjectStatus(uint obj);
-    void OptimiseShaderSource(QString &source);
 
     bool UpdateTextureVertices(uint tex, const QRect *src, const QRect *dst);
     bool UpdateTextureVertices(uint tex, const QRectF *src, const QRectF *dst);
@@ -185,36 +187,32 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     bool ClearTexture(uint tex);
     uint GetBufferSize(QSize size, uint fmt, uint type);
 
-  private:
-    // GL resources
+    static void StoreBicubicWeights(float x, float *dst);
+
+  protected:
+    // Resources
     QHash<GLuint, MythGLTexture> m_textures;
-    QHash<GLuint, MythGLShaderObject> m_shader_objects;
-    QVector<GLuint>              m_programs;
     QVector<GLuint>              m_framebuffers;
     GLuint                       m_fence;
 
+    // Locking
     QMutex  *m_lock;
     int      m_lock_level;
 
     // profile
-    GLProfile m_profile;
     QString  m_extensions;
     uint     m_exts_supported;
     uint     m_exts_used;
     int      m_max_tex_size;
     int      m_max_units;
     int      m_default_texture_type;
-    uint     m_shaders[kShaderCount];
 
-    // basic GL state tracking
+    // State
     QSize    m_viewport;
     int      m_active_tex;
     int      m_active_tex_type;
-    int      m_active_prog;
-    uint     m_active_obj;
     int      m_active_fb;
     bool     m_blend;
-    uint32_t m_color;
     uint32_t m_background;
 
     // vertex cache
@@ -225,13 +223,7 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
 
     // Multi-texturing
     MYTH_GLACTIVETEXTUREPROC             m_glActiveTexture;
-    // Fragment programs
-    MYTH_GLGENPROGRAMSARBPROC            m_glGenProgramsARB;
-    MYTH_GLBINDPROGRAMARBPROC            m_glBindProgramARB;
-    MYTH_GLPROGRAMSTRINGARBPROC          m_glProgramStringARB;
-    MYTH_GLPROGRAMLOCALPARAMETER4FARBPROC m_glProgramLocalParameter4fARB;
-    MYTH_GLDELETEPROGRAMSARBPROC         m_glDeleteProgramsARB;
-    MYTH_GLGETPROGRAMIVARBPROC           m_glGetProgramivARB;
+
     // PixelBuffer Objects
     MYTH_GLMAPBUFFERPROC                 m_glMapBuffer;
     MYTH_GLBINDBUFFERPROC                m_glBindBuffer;
@@ -258,29 +250,6 @@ class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     // GLX_SGI_video_sync
     static MYTH_GLXGETVIDEOSYNCSGIPROC   g_glXGetVideoSyncSGI;
     static MYTH_GLXWAITVIDEOSYNCSGIPROC  g_glXWaitVideoSyncSGI;
-    // GLSL
-    MYTH_GLCREATESHADEROBJECTPROC        m_glCreateShaderObject;
-    MYTH_GLSHADERSOURCEPROC              m_glShaderSource;
-    MYTH_GLCOMPILESHADERPROC             m_glCompileShader;
-    MYTH_GLGETSHADERPROC                 m_glGetShader;
-    MYTH_GLGETSHADERINFOLOGPROC          m_glGetShaderInfoLog;
-    MYTH_GLDELETESHADERPROC              m_glDeleteShader;
-    MYTH_GLCREATEPROGRAMOBJECTPROC       m_glCreateProgramObject;
-    MYTH_GLATTACHOBJECTPROC              m_glAttachObject;
-    MYTH_GLLINKPROGRAMPROC               m_glLinkProgram;
-    MYTH_GLUSEPROGRAMPROC                m_glUseProgram;
-    MYTH_GLGETINFOLOGPROC                m_glGetInfoLog;
-    MYTH_GLGETOBJECTPARAMETERIVPROC      m_glGetObjectParameteriv;
-    MYTH_GLDETACHOBJECTPROC              m_glDetachObject;
-    MYTH_GLDELETEOBJECTPROC              m_glDeleteObject;
-    MYTH_GLGETUNIFORMLOCATIONPROC        m_glGetUniformLocation;
-    MYTH_GLUNIFORM4FPROC                 m_glUniform4f;
-    MYTH_GLUNIFORMMATRIX4FVPROC          m_glUniformMatrix4fv;
-    MYTH_GLVERTEXATTRIBPOINTERPROC       m_glVertexAttribPointer;
-    MYTH_GLENABLEVERTEXATTRIBARRAYPROC   m_glEnableVertexAttribArray;
-    MYTH_GLDISABLEVERTEXATTRIBARRAYPROC  m_glDisableVertexAttribArray;
-    MYTH_GLBINDATTRIBLOCATIONPROC        m_glBindAttribLocation;
-    MYTH_GLVERTEXATTRIB4FPROC            m_glVertexAttrib4f;
 };
 
 #endif

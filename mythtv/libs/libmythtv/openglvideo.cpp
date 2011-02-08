@@ -507,7 +507,7 @@ bool OpenGLVideo::RemoveFilter(OpenGLFilterType filter)
 
     temp = filters[filter]->fragmentPrograms;
     for (it = temp.begin(); it != temp.end(); it++)
-        gl_context->DeleteFragmentProgram(*it);
+        gl_context->DeleteShaderObject(*it);
     filters[filter]->fragmentPrograms.clear();
 
     temp = filters[filter]->frameBuffers;
@@ -532,13 +532,13 @@ void OpenGLVideo::TearDownDeinterlacer(void)
 
     if (tmp->fragmentPrograms.size() == 3)
     {
-        gl_context->DeleteFragmentProgram(tmp->fragmentPrograms[2]);
+        gl_context->DeleteShaderObject(tmp->fragmentPrograms[2]);
         tmp->fragmentPrograms.pop_back();
     }
 
     if (tmp->fragmentPrograms.size() == 2)
     {
-        gl_context->DeleteFragmentProgram(tmp->fragmentPrograms[1]);
+        gl_context->DeleteShaderObject(tmp->fragmentPrograms[1]);
         tmp->fragmentPrograms.pop_back();
     }
 
@@ -556,11 +556,10 @@ void OpenGLVideo::TearDownDeinterlacer(void)
 
 bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
 {
-    if (!(gl_features & kGLExtFragProg))
+    if (!(gl_features & kGLExtFragProg) && !(gl_features & kGLSL))
     {
         VERBOSE(VB_PLAYBACK, LOC_ERR +
-            QString("GL_ARB_fragment_program not available."
-                    " for OpenGL deinterlacing."));
+            QString("No shader support for OpenGL deinterlacing."));
         return false;
     }
 
@@ -645,24 +644,25 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
 uint OpenGLVideo::AddFragmentProgram(OpenGLFilterType name,
                                      QString deint, FrameScanType field)
 {
-    uint ret = 0;
-    if (gl_context->GetProfile() == kGLHighProfile)
+    if (!gl_context)
+        return 0;
+
+    QString vertex, fragment;
+    if (gl_features & kGLSL)
     {
-        QString vertex, fragment;
         GetProgramStrings(vertex, fragment, name, deint, field);
-        return gl_context->CreateShaderObject(vertex, fragment);
     }
-    else if (gl_context->GetProfile() == kGLLegacyProfile)
+    else if (gl_features & kGLExtFragProg)
     {
-        QString program = GetProgramString(name, deint, field);
-        if (gl_context->CreateFragmentProgram(program, ret))
-            return ret;
+        fragment = GetProgramString(name, deint, field);
     }
     else
     {
         VERBOSE(VB_PLAYBACK, LOC_ERR + "No OpenGL shader/program support");
+        return 0;
     }
-    return ret;
+
+    return gl_context->CreateShaderObject(vertex, fragment);
 }
 
 /**
@@ -1042,8 +1042,8 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         }
 
         if (type == kGLFilterYUV2RGB)
-            gl_context->SetProgramParams(program, colourSpace->GetMatrix(),
-                                         COLOUR_UNIFORM);
+            gl_context->SetShaderParams(program, colourSpace->GetMatrix(),
+                                        COLOUR_UNIFORM);
 
         gl_context->DrawBitmap(textures, texture_count, target, &trect, &vrect,
                                program);

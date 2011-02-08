@@ -135,8 +135,11 @@ mingw {
 
 using_opengl {
     DEFINES += USE_OPENGL_PAINTER
-    SOURCES += mythpainter_ogl.cpp mythrender_opengl.cpp
-    HEADERS += mythpainter_ogl.h   mythrender_opengl.h mythrender_opengl_defs.h
+    SOURCES += mythpainter_ogl.cpp    mythrender_opengl.cpp
+    SOURCES += mythrender_opengl1.cpp mythrender_opengl2.cpp
+    HEADERS += mythpainter_ogl.h    mythrender_opengl.h mythrender_opengl_defs.h
+    HEADERS += mythrender_opengl1.h mythrender_opengl_defs1.h
+    HEADERS += mythrender_opengl2.h mythrender_opengl_defs2.h
     inc.files += mythpainter_ogl.h
     QT += opengl
 

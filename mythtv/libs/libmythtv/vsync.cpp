@@ -363,7 +363,7 @@ bool OpenGLVideoSync::TryInit(void)
     m_device = new QPixmap(16,16);
     QGLFormat fmt;
     fmt.setDepth(false);
-    m_context = new MythRenderOpenGL(fmt, m_device);
+    m_context = MythRenderOpenGL::Create(fmt, m_device);
     if (m_context && m_context->create())
     {
         m_context->Init();
