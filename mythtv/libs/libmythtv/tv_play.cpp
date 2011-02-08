@@ -10249,7 +10249,8 @@ void TV::FillOSDMenuNavigate(const PlayerContext *ctx, OSD *osd,
     bool isbd         = ctx->buffer && ctx->buffer->IsBD() &&
                         ctx->buffer->BD()->IsHDMVNavigation();
     bool islivetv     = StateIsLiveTV(state);
-    bool isrecording  = state == kState_WatchingPreRecorded;
+    bool isrecording  = state == kState_WatchingPreRecorded ||
+                        state == kState_WatchingRecording;
     bool previouschan = false;
     if (islivetv)
     {
