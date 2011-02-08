@@ -35,13 +35,13 @@ typedef char GLcharARB;
 typedef GLuint ( * MYTH_GLCREATESHADERPROC)
     (GLenum shaderType);
 typedef void ( * MYTH_GLSHADERSOURCEPROC)
-    (GLuint shader, int numOfStrings, const char **strings, int *lenOfStrings);
+    (GLuint shader, int numOfStrings, const char **strings, const int *lenOfStrings);
 typedef void ( * MYTH_GLCOMPILESHADERPROC)
     (GLuint shader);
 typedef void ( * MYTH_GLGETSHADERIVPROC)
     (GLuint shader, GLenum pname, GLint *params);
 typedef void ( * MYTH_GLGETSHADERINFOLOGPROC)
-    (GLuint shader, GLint maxlength, GLint length, GLchar *infolog);
+    (GLuint shader, GLint maxlength, GLint *length, GLchar *infolog);
 typedef void ( * MYTH_GLDELETEPROGRAMPROC)
     (GLuint shader);
 typedef GLuint ( * MYTH_GLCREATEPROGRAMPROC)
