@@ -306,7 +306,8 @@ __version__=u"v0.7.7"
  # 0.7.5 Added the TMDB MovieRating as videometadata table "rating" field
  # 0.7.6 Modifications to support MythTV python bindings changes
  # 0.7.7 Pull hostname from python bindings instead of socket libraries
- # Added support of unicode characters within a jamu.conf file
+ #       Added support of unicode characters within a jamu.conf file
+ #       Replace 'xml' module version check with generic Python version, to correct failure in Python 2.7
 
 
 usage_txt=u'''
@@ -477,14 +478,10 @@ class OutStreamEncoder(object):
 sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
 sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
-try:
-    import xml
-except Exception, e:
-    print '''The python module xml must be installed. error(%s)''' % e
+if sys.version_info <= (2,5):
+    print '''JAMU requires Python 2.5 or newer to run.'''
     sys.exit(1)
-if xml.__version__ < u'41660':
-    print '''
-\n! Warning - The module xml (v41660 or greater) must be installed. Your version is different (v%s) than what Jamu was tested with. Jamu may not work on your installation.\nIt is recommended that you upgrade.\n''' % xml.__version__
+
 import xml.etree.cElementTree as ElementTree
 
 
