@@ -180,6 +180,8 @@ void MythRenderOpenGL2::InitProcs(void)
 {
     MythRenderOpenGL::InitProcs();
 
+    m_qualifiers = QString();
+
     m_glCreateShader = (MYTH_GLCREATESHADERPROC)
         GetProcAddress("glCreateShader");
     m_glShaderSource = (MYTH_GLSHADERSOURCEPROC)
@@ -564,7 +566,7 @@ void MythRenderOpenGL2::OptimiseShaderSource(QString &source)
 
     source.replace("GLSL_SAMPLER", sampler);
     source.replace("GLSL_TEXTURE", texture);
-    source.replace("GLSL_DEFINES", version + extensions);
+    source.replace("GLSL_DEFINES", version + extensions + m_qualifiers);
 
     VERBOSE(VB_EXTRA, "\n" + source);
 }

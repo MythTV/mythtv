@@ -7,6 +7,9 @@
 
 #include "mythrender_opengl1.h"
 #include "mythrender_opengl2.h"
+#ifdef GL_ES_VERSION_2_0
+#include "mythrender_opengl2es.h"
+#endif
 
 static const GLuint kTextureOffset = 8 * sizeof(GLfloat);
 
@@ -39,9 +42,15 @@ OpenGLLocker::~OpenGLLocker()
 
 MythRenderOpenGL* MythRenderOpenGL::Create(const QGLFormat& format, QPaintDevice* device)
 {
+#ifdef GL_ES_VERSION_2_0
+    if (device)
+        return new MythRenderOpenGL2ES(format, device);
+    return new MythRenderOpenGL2ES(format);
+#else
     if (device)
         return new MythRenderOpenGL1(format, device);
     return new MythRenderOpenGL1(format);
+#endif
 }
 
 MythRenderOpenGL::MythRenderOpenGL(const QGLFormat& format, QPaintDevice* device)
