@@ -440,11 +440,12 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
         return false;
     }
 
-    if (!(gl_features & kGLExtFragProg) && (filter == kGLFilterYUV2RGB))
+    if (!(gl_features & kGLExtFragProg) && !(gl_features & kGLSL) &&
+        (filter == kGLFilterYUV2RGB))
     {
         VERBOSE(VB_PLAYBACK, LOC_ERR +
-            QString("GL_ARB_fragment_program not available."
-                    " for colorspace conversion."));
+            QString("No shader support for OpenGL deinterlacing."));
+        return false;
     }
 
     bool success = true;
