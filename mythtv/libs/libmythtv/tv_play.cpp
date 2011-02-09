@@ -1681,7 +1681,7 @@ int TV::Playback(const ProgramInfo &rcinfo)
 
     mctx->SetPlayingInfo(&rcinfo);
     mctx->SetInitialTVState(false);
-    ScheduleStateChange(mctx);
+    HandleStateChange(mctx, mctx);
 
     ReturnPlayerLock(mctx);
 
