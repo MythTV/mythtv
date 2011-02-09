@@ -9,22 +9,11 @@ class MPUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
     MythRenderOpenGL2ES(const QGLFormat& format, QPaintDevice* device)
         : MythRenderOpenGL2(format, device)
     {
-        ResetVars();
-        ResetProcs();
     }
 
     MythRenderOpenGL2ES(const QGLFormat& format)
         : MythRenderOpenGL2(format)
     {
-        ResetVars();
-        ResetProcs();
-    }
-
-    ~MythRenderOpenGL2ES()
-    {
-        makeCurrent();
-        DeleteOpenGLResources();
-        doneCurrent();
     }
 
     virtual void InitProcs(void)

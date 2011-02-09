@@ -5,10 +5,11 @@
 #define LOC QString("OpenGL: ")
 #define LOC_ERR QString("OpenGL Error: ")
 
-#include "mythrender_opengl1.h"
 #include "mythrender_opengl2.h"
-#ifdef GL_ES_VERSION_2_0
+#ifdef USING_OPENGLES
 #include "mythrender_opengl2es.h"
+#else
+#include "mythrender_opengl1.h"
 #endif
 
 static const GLuint kTextureOffset = 8 * sizeof(GLfloat);
@@ -42,7 +43,7 @@ OpenGLLocker::~OpenGLLocker()
 
 MythRenderOpenGL* MythRenderOpenGL::Create(const QGLFormat& format, QPaintDevice* device)
 {
-#ifdef GL_ES_VERSION_2_0
+#ifdef USING_OPENGLES
     if (device)
         return new MythRenderOpenGL2ES(format, device);
     return new MythRenderOpenGL2ES(format);
