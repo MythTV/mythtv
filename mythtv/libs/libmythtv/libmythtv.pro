@@ -573,7 +573,6 @@ use_hidesyms {
 }
 
 mingw {
-    DEFINES -= USING_OPENGL_VSYNC
     DEFINES += USING_MINGW
 
     HEADERS += videoout_d3d.h
