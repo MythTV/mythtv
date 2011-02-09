@@ -160,6 +160,7 @@ bool MythRenderOpenGL2::InitFeatures(void)
         m_glBindAttribLocation &&
         m_glVertexAttrib4f && glslshaders)
     {
+        VERBOSE(VB_GENERAL, LOC + QString("GLSL supported"));
         m_exts_supported += kGLSL;
     }
 
@@ -549,7 +550,7 @@ bool MythRenderOpenGL2::CheckObjectStatus(uint obj)
 
 void MythRenderOpenGL2::OptimiseShaderSource(QString &source)
 {
-    QString version = "#version 120\n";
+    QString version = "#version 100\n";
     QString extensions = "";
     QString sampler = "sampler2D";
     QString texture = "texture2D";
