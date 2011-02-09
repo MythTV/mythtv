@@ -196,7 +196,8 @@ class MPUBLIC TV : public QObject
     bool HandleTrackAction(PlayerContext*, const QString &action);
 
     // LiveTV commands
-    bool LiveTV(bool showDialogs = true, bool startInGuide = false);
+    bool LiveTV(bool showDialogs = true);
+    bool StartLiveTVInGuide(void) { return db_start_in_guide; }
 
     // Embedding commands for the guidegrid to use in LiveTV
     bool StartEmbedding(PlayerContext*, WId wid, const QRect&);
