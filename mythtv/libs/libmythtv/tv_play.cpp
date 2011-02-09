@@ -866,7 +866,6 @@ TV::TV(void)
       isEmbedded(false),            ignoreKeyPresses(false),
       // Timers
       lcdTimerId(0),                lcdVolumeTimerId(0),
-      keyListTimerId(0),
       networkControlTimerId(0),     jumpMenuTimerId(0),
       pipChangeTimerId(0),
       switchToInputTimerId(0),      ccInputTimerId(0),
@@ -2553,49 +2552,6 @@ void TV::timerEvent(QTimerEvent *te)
     if (handled)
         return;
 
-    // Check if it matches keyListTimerId
-    QKeyEvent *keyEvent = NULL;
-    {
-        QMutexLocker locker(&timerIdLock);
-
-        if (timer_id == keyListTimerId)
-        {
-            keyEvent = keyList.dequeue();
-            if (keyList.empty())
-            {
-                KillTimer(keyListTimerId);
-                keyListTimerId = 0;
-            }
-        }
-    }
-
-    if (keyEvent)
-    {
-        PlayerContext *actx = GetPlayerWriteLock(-1, __FILE__, __LINE__);
-        if (actx->HasPlayer())
-        {
-            ProcessKeypress(actx, keyEvent);
-
-            delete keyEvent;
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT,
-                    "Ignoring key event for now because player is not set");
-
-            QMutexLocker locker(&timerIdLock);
-            keyList.push_front(keyEvent);
-            if (keyListTimerId)
-                KillTimer(keyListTimerId);
-            keyListTimerId = StartTimer(20, __LINE__);
-        }
-        ReturnPlayerLock(actx);
-        handled = true;
-    }
-
-    if (handled)
-        return;
-
     // Check if it matches networkControlTimerId
     QString netCmd = QString::null;
     {
@@ -3316,12 +3272,13 @@ bool TV::event(QEvent *e)
 
     if (QEvent::KeyPress == e->type())
     {
-        QKeyEvent *k = new QKeyEvent(*(QKeyEvent *)e);
-        QMutexLocker locker(&timerIdLock);
-        keyList.enqueue(k);
-        if (!keyListTimerId)
-            keyListTimerId = StartTimer(1, __LINE__);
-        return true;
+        bool handled = false;
+        PlayerContext *actx = GetPlayerWriteLock(-1, __FILE__, __LINE__);
+        if (actx->HasPlayer())
+            handled = ProcessKeypress(actx, (QKeyEvent *)e);
+        ReturnPlayerLock(actx);
+        if (handled)
+            return true;
     }
 
     switch (e->type())
@@ -3453,7 +3410,7 @@ static bool has_action(QString action, const QStringList &actions)
     return false;
 }
 
-void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
+bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
 {
     bool ignoreKeys = actx->IsPlayerChangingBuffers();
 #if DEBUG_ACTIONS
@@ -3476,7 +3433,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
                   "TV Playback", e, actions);
 
         if (handled || actions.isEmpty())
-            return;
+            return true;
 
         bool esc   = has_action("ESCAPE", actions) ||
                      has_action("BACK", actions);
@@ -3484,7 +3441,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
         bool play  = has_action(ACTION_PLAY, actions);
 
         if ((!esc || browsehelper->IsBrowsing()) && !pause && !play)
-            return;
+            return false;
     }
 
     OSD *osd = GetOSDLock(actx);
@@ -3542,7 +3499,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
     }
 
     if (handled)
-        return;
+        return true;
 
     // If text is already queued up, be more lax on what is ok.
     // This allows hex teletext entry and minor channel entry.
@@ -3554,7 +3511,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
         if (ok || txt=="_" || txt=="-" || txt=="#" || txt==".")
         {
             AddKeyToInputQueue(actx, txt.at(0).toLatin1());
-            return;
+            return true;
         }
     }
 
@@ -3573,7 +3530,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
                 if (actx->player->HandleTeletextAction(tt_actions[i]))
                 {
                     actx->UnlockDeletePlayer(__FILE__, __LINE__);
-                    return;
+                    return true;
                 }
             }
         }
@@ -3593,7 +3550,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
                 if (actx->player->ITVHandleAction(itv_actions[i]))
                 {
                     actx->UnlockDeletePlayer(__FILE__, __LINE__);
-                    return;
+                    return true;
                 }
             }
         }
@@ -3604,7 +3561,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
               "TV Playback", e, actions);
 
     if (handled || actions.isEmpty())
-        return;
+        return true;
 
     handled = false;
 
@@ -3631,7 +3588,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
 #endif // DEBUG_ACTIONS
 
     if (handled)
-        return;
+        return true;
 
     if (!handled)
     {
@@ -3648,6 +3605,8 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
             }
         }
     }
+
+    return true;
 }
 
 bool TV::BrowseHandleAction(PlayerContext *ctx, const QStringList &actions)
