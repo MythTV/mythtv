@@ -33,6 +33,7 @@ using namespace std;
 #include <QThread>
 #include <QTimer>
 #include <QObject>
+#include <QPointer>
 
 class ThreadPool;
 
@@ -107,7 +108,7 @@ class WorkerThread : public QThread
         CEvent              m_Initialized;
         bool                m_bInitialized;
                          
-        ThreadPool         *m_pThreadPool;
+        QPointer<ThreadPool> m_pThreadPool;
 
         volatile bool       m_bTermRequested;
         QString             m_sName;
@@ -148,8 +149,10 @@ class WorkerThread : public QThread
 
 typedef deque<WorkerThread*> WorkerThreadList;
 
-class ThreadPool
+class ThreadPool : public QObject
 {
+    Q_OBJECT
+
     friend class WorkerThread;
 
     protected:
