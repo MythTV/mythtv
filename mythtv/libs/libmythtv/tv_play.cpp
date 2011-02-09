@@ -266,7 +266,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
         else if (RemoteGetFreeRecorderCount())
         {
             VERBOSE(VB_PLAYBACK, LOC + "tv->LiveTV() -- begin");
-            if (!tv->LiveTV(showDialogs, startInGuide))
+            if (!tv->LiveTV(showDialogs))
             {
                 tv->SetExitPlayer(true, true);
                 quitAll = true;
@@ -276,6 +276,9 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
                 startSysEventSent = true;
                 SendMythSystemEvent("LIVETV_STARTED");
             }
+
+            if (!quitAll && (startInGuide || tv->StartLiveTVInGuide()))
+                tv->DoEditSchedule();
 
             VERBOSE(VB_PLAYBACK, LOC + "tv->LiveTV() -- end");
         }
@@ -1267,9 +1270,8 @@ TVState TV::GetState(const PlayerContext *actx) const
 /** \fn TV::LiveTV(bool,bool)
  *  \brief Starts LiveTV
  *  \param showDialogs if true error dialogs are shown, if false they are not
- *  \param startInGuide if true the EPG will be shown upon entering LiveTV
  */
-bool TV::LiveTV(bool showDialogs, bool startInGuide)
+bool TV::LiveTV(bool showDialogs)
 {
     requestDelete = false;
     allowRerecord = false;
@@ -1289,32 +1291,6 @@ bool TV::LiveTV(bool showDialogs, bool startInGuide)
             idleTimerId = StartTimer(db_idle_timeout, __LINE__);
             VERBOSE(VB_GENERAL, QString("Using Idle Timer. %1 minutes")
                     .arg(db_idle_timeout*(1.0f/60000.0f)));
-        }
-
-        if (startInGuide || db_start_in_guide)
-        {
-            MSqlQuery query(MSqlQuery::InitCon());
-            query.prepare("SELECT keylist FROM keybindings WHERE "
-                          "context = 'TV Playback' AND action = :GUIDE AND "
-                          "hostname = :HOSTNAME ;");
-            query.bindValue(":GUIDE", ACTION_GUIDE);
-            query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
-
-            if (query.exec() && query.isActive() && query.size() > 0)
-            {
-                query.next();
-
-                QKeySequence keyseq(query.value(0).toString());
-
-                int keynum = keyseq[0];
-                keynum &= ~Qt::UNICODE_ACCEL;
-
-                QMutexLocker locker(&timerIdLock);
-                keyList.push_front(
-                    new QKeyEvent(QEvent::KeyPress, keynum, 0, 0));
-                if (!keyListTimerId)
-                    keyListTimerId = StartTimer(1, __LINE__);
-            }
         }
 
         ReturnPlayerLock(actx);
