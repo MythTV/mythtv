@@ -48,7 +48,6 @@ class VideoOutputOpenGL : public VideoOutput
     virtual void RemovePIP(MythPlayer *pipplayer);
     virtual bool IsPIPSupported(void) const   { return false/*true*/; }
     virtual bool hasFullScreenOSD(void) const { return true; }
-    virtual bool IsSyncLocked(void) const     { return true; }
     virtual bool ApproveDeintFilter(const QString& filtername) const;
     virtual MythPainter *GetOSDPainter(void)  { return (MythPainter*)gl_painter; }
 
