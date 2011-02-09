@@ -1280,7 +1280,7 @@ bool TV::LiveTV(bool showDialogs, bool startInGuide)
         RequestNextRecorder(actx, showDialogs))
     {
         actx->SetInitialTVState(true);
-        ScheduleStateChange(actx);
+        HandleStateChange(actx, actx);
         switchToRec = NULL;
 
         // Start Idle Timer
