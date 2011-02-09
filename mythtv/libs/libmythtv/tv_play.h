@@ -189,7 +189,7 @@ class MPUBLIC TV : public QObject
     bool Init(bool createWindow = true);
 
     // User input processing commands
-    void ProcessKeypress(PlayerContext*, QKeyEvent *e);
+    bool ProcessKeypress(PlayerContext*, QKeyEvent *e);
     void ProcessNetworkControlCommand(PlayerContext *, const QString &command);
     void customEvent(QEvent *e);
     bool event(QEvent *e);
@@ -726,7 +726,6 @@ class MPUBLIC TV : public QObject
     int       idleDialogTimerId; ///< Timer for idle dialog.
 
     /// Queue of unprocessed key presses.
-    MythDeque<QKeyEvent*> keyList;
     MythTimer keyRepeatTimer; ///< Timeout timer for repeat key filtering
 
     // CC/Teletex input state variables
@@ -835,7 +834,6 @@ class MPUBLIC TV : public QObject
     typedef QMap<int,const PlayerContext*> TimerContextConstMap;
     mutable QMutex       timerIdLock;
     volatile int         lcdTimerId;
-    volatile int         keyListTimerId;
     volatile int         networkControlTimerId;
     volatile int         jumpMenuTimerId;
     volatile int         pipChangeTimerId;
