@@ -139,8 +139,10 @@ void MythRenderOpenGL::makeCurrent()
 void MythRenderOpenGL::doneCurrent()
 {
     m_lock_level--;
+#ifndef Q_OS_WIN32
     if (m_lock_level == 0)
         QGLContext::doneCurrent();
+#endif
     if (m_lock_level < 0)
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Mis-matched calls to makeCurrent()");
     m_lock->unlock();
