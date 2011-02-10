@@ -1695,81 +1695,6 @@ int TV::Playback(const ProgramInfo &rcinfo)
     return 1;
 }
 
-#ifdef PLAY_FROM_RECORDER
-int TV::PlayFromRecorder(int recordernum)
-{
-    int retval = 0;
-
-    PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-
-    if (mctx->recorder)
-    {
-        VERBOSE(VB_IMPORTANT, LOC +
-                QString("PlayFromRecorder(%1): Recorder already exists!")
-                .arg(recordernum));
-        ReturnPlayerLock(mctx);
-        return -1;
-    }
-
-    mctx->SetRecorder(RemoteGetExistingRecorder(recordernum));
-    if (!mctx->recorder)
-    {
-        ReturnPlayerLock(mctx);
-        return -1;
-    }
-
-    ProgramInfo pginfo;
-
-    if (mctx->recorder->IsValidRecorder())
-    {
-        ReturnPlayerLock(mctx);
-
-        // let the mainloop get the programinfo from encoder,
-        // connecting to encoder won't work from here
-        recorderPlaybackInfoLock.lock();
-        int my_timer = StartTimer(1, __LINE__);
-        recorderPlaybackInfoTimerId[my_timer] = my_timer;
-
-        bool done = false;
-        while (!recorderPlaybackInfoWaitCond
-               .wait(&recorderPlaybackInfoLock, 100) && !done)
-        {
-            QMap<int,ProgramInfo>::iterator it =
-                recorderPlaybackInfo.find(my_timer);
-            if (it != recorderPlaybackInfo.end())
-            {
-                pginfo = *it;
-                recorderPlaybackInfo.erase(it);
-                done = true;
-            }
-        }
-        recorderPlaybackInfoLock.unlock();
-
-        mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-    }
-
-    mctx->SetRecorder(NULL);
-    ReturnPlayerLock(mctx);
-
-    bool fileexists = false;
-    if (pginfo.IsMythStream())
-        fileexists = RemoteCheckFile(&pginfo);
-    else
-    {
-        QFile checkFile(pginfo.GetPlaybackURL(true));
-        fileexists = checkFile.exists();
-    }
-
-    if (fileexists)
-    {
-        Playback(pginfo);
-        retval = 1;
-    }
-
-    return retval;
-}
-#endif // PLAY_FROM_RECORDER
-
 bool TV::StateIsRecording(TVState state)
 {
     return (state == kState_RecordingOnly ||
@@ -2438,56 +2363,6 @@ void TV::timerEvent(QTimerEvent *te)
         ReturnPlayerLock(mctx);
         handled = true;
     }
-
-    if (handled)
-        return;
-
-#ifdef PLAY_FROM_RECORDER
-    // Check if it matches a recorderPlaybackInfoTimerId
-    bool do_pbinfo_fetch = false;
-    {
-        QMutexLocker locker(&recorderPlaybackInfoLock);
-        QMap<int,int>::iterator it = recorderPlaybackInfoTimerId.find(timer_id);
-        if (it != recorderPlaybackInfoTimerId.end())
-        {
-            KillTimer(timer_id);
-            recorderPlaybackInfoTimerId.erase(it);
-            do_pbinfo_fetch = true;
-        }
-    }
-
-    if (do_pbinfo_fetch)
-    {
-        PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-        mctx->recorder->Setup();
-
-        ProgramInfo *pbinfo = NULL;
-        bool ok = true;
-        if (mctx->recorder->IsRecording(&ok))
-        {
-            pbinfo = mctx->recorder->GetRecording();
-            if (pbinfo)
-                RemoteFillProgramInfo(*pbinfo, gCoreContext->GetHostName());
-        }
-        if (!ok || !pbinfo)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "lost contact with backend");
-            SetErrored(ctx);
-        }
-
-        ReturnPlayerLock(mctx);
-
-        QMutexLocker locker(&recorderPlaybackInfoLock);
-        if (pbinfo)
-        {
-            recorderPlaybackInfo[timer_id] = *pbinfo;
-            delete pbinfo;
-        }
-        recorderPlaybackInfo[timer_id] = ProgramInfo();
-        recorderPlaybackInfoWaitCond.wakeAll();
-        handled = true;
-    }
-#endif // PLAY_FROM_RECORDER
 
     if (handled)
         return;

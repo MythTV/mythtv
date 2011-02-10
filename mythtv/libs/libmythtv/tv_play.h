@@ -789,14 +789,6 @@ class MPUBLIC TV : public QObject
     mutable QMutex                 is_tunable_cache_lock;
     QMap< uint,vector<InputInfo> > is_tunable_cache_inputs;
 
-#ifdef PLAY_FROM_RECORDER
-    /// Info requested by PlayFromRecorder
-    QMutex                    recorderPlaybackInfoLock;
-    QWaitCondition            recorderPlaybackInfoWaitCond;
-    QMap<int,int>             recorderPlaybackInfoTimerId;
-    QMap<int,ProgramInfo>     recorderPlaybackInfo;
-#endif // PLAY_FROM_RECORDER
-
     // Channel group stuff
     /// \brief Lock necessary when modifying channel group variables.
     /// These are only modified in UI thread, so no lock is needed
