@@ -161,7 +161,7 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
     uint old_row = true_row_count;
     uint old_col = true_column_count;
     // these could be bigger if row/column lock is false, resp.
-    true_row_count    = (row_lock) ? row_count : max(row_count + 1, (uint)2);
+    true_row_count    = row_count; // (row_lock) ? row_count : max(row_count + 1, (uint)2);
     true_column_count = column_count;
 
     if (text && exists && (old_col == true_column_count) &&
