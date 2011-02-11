@@ -17,4 +17,4 @@ QMAKE_CLEAN += $(TARGET)
 # Input
 SOURCES += main.cpp
 
-mingw: LIBS += -lpthread -lwinmm -lws2_32
+mingw: LIBS += -lwinmm -lws2_32

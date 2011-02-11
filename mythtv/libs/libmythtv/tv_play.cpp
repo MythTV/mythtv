@@ -266,7 +266,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
         else if (RemoteGetFreeRecorderCount())
         {
             VERBOSE(VB_PLAYBACK, LOC + "tv->LiveTV() -- begin");
-            if (!tv->LiveTV(showDialogs, startInGuide))
+            if (!tv->LiveTV(showDialogs))
             {
                 tv->SetExitPlayer(true, true);
                 quitAll = true;
@@ -276,6 +276,9 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
                 startSysEventSent = true;
                 SendMythSystemEvent("LIVETV_STARTED");
             }
+
+            if (!quitAll && (startInGuide || tv->StartLiveTVInGuide()))
+                tv->DoEditSchedule();
 
             VERBOSE(VB_PLAYBACK, LOC + "tv->LiveTV() -- end");
         }
@@ -863,7 +866,6 @@ TV::TV(void)
       isEmbedded(false),            ignoreKeyPresses(false),
       // Timers
       lcdTimerId(0),                lcdVolumeTimerId(0),
-      keyListTimerId(0),
       networkControlTimerId(0),     jumpMenuTimerId(0),
       pipChangeTimerId(0),
       switchToInputTimerId(0),      ccInputTimerId(0),
@@ -1267,9 +1269,8 @@ TVState TV::GetState(const PlayerContext *actx) const
 /** \fn TV::LiveTV(bool,bool)
  *  \brief Starts LiveTV
  *  \param showDialogs if true error dialogs are shown, if false they are not
- *  \param startInGuide if true the EPG will be shown upon entering LiveTV
  */
-bool TV::LiveTV(bool showDialogs, bool startInGuide)
+bool TV::LiveTV(bool showDialogs)
 {
     requestDelete = false;
     allowRerecord = false;
@@ -1280,7 +1281,7 @@ bool TV::LiveTV(bool showDialogs, bool startInGuide)
         RequestNextRecorder(actx, showDialogs))
     {
         actx->SetInitialTVState(true);
-        ScheduleStateChange(actx);
+        HandleStateChange(actx, actx);
         switchToRec = NULL;
 
         // Start Idle Timer
@@ -1289,32 +1290,6 @@ bool TV::LiveTV(bool showDialogs, bool startInGuide)
             idleTimerId = StartTimer(db_idle_timeout, __LINE__);
             VERBOSE(VB_GENERAL, QString("Using Idle Timer. %1 minutes")
                     .arg(db_idle_timeout*(1.0f/60000.0f)));
-        }
-
-        if (startInGuide || db_start_in_guide)
-        {
-            MSqlQuery query(MSqlQuery::InitCon());
-            query.prepare("SELECT keylist FROM keybindings WHERE "
-                          "context = 'TV Playback' AND action = :GUIDE AND "
-                          "hostname = :HOSTNAME ;");
-            query.bindValue(":GUIDE", ACTION_GUIDE);
-            query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
-
-            if (query.exec() && query.isActive() && query.size() > 0)
-            {
-                query.next();
-
-                QKeySequence keyseq(query.value(0).toString());
-
-                int keynum = keyseq[0];
-                keynum &= ~Qt::UNICODE_ACCEL;
-
-                QMutexLocker locker(&timerIdLock);
-                keyList.push_front(
-                    new QKeyEvent(QEvent::KeyPress, keynum, 0, 0));
-                if (!keyListTimerId)
-                    keyListTimerId = StartTimer(1, __LINE__);
-            }
         }
 
         ReturnPlayerLock(actx);
@@ -1706,7 +1681,7 @@ int TV::Playback(const ProgramInfo &rcinfo)
 
     mctx->SetPlayingInfo(&rcinfo);
     mctx->SetInitialTVState(false);
-    ScheduleStateChange(mctx);
+    HandleStateChange(mctx, mctx);
 
     ReturnPlayerLock(mctx);
 
@@ -1719,81 +1694,6 @@ int TV::Playback(const ProgramInfo &rcinfo)
 
     return 1;
 }
-
-#ifdef PLAY_FROM_RECORDER
-int TV::PlayFromRecorder(int recordernum)
-{
-    int retval = 0;
-
-    PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-
-    if (mctx->recorder)
-    {
-        VERBOSE(VB_IMPORTANT, LOC +
-                QString("PlayFromRecorder(%1): Recorder already exists!")
-                .arg(recordernum));
-        ReturnPlayerLock(mctx);
-        return -1;
-    }
-
-    mctx->SetRecorder(RemoteGetExistingRecorder(recordernum));
-    if (!mctx->recorder)
-    {
-        ReturnPlayerLock(mctx);
-        return -1;
-    }
-
-    ProgramInfo pginfo;
-
-    if (mctx->recorder->IsValidRecorder())
-    {
-        ReturnPlayerLock(mctx);
-
-        // let the mainloop get the programinfo from encoder,
-        // connecting to encoder won't work from here
-        recorderPlaybackInfoLock.lock();
-        int my_timer = StartTimer(1, __LINE__);
-        recorderPlaybackInfoTimerId[my_timer] = my_timer;
-
-        bool done = false;
-        while (!recorderPlaybackInfoWaitCond
-               .wait(&recorderPlaybackInfoLock, 100) && !done)
-        {
-            QMap<int,ProgramInfo>::iterator it =
-                recorderPlaybackInfo.find(my_timer);
-            if (it != recorderPlaybackInfo.end())
-            {
-                pginfo = *it;
-                recorderPlaybackInfo.erase(it);
-                done = true;
-            }
-        }
-        recorderPlaybackInfoLock.unlock();
-
-        mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-    }
-
-    mctx->SetRecorder(NULL);
-    ReturnPlayerLock(mctx);
-
-    bool fileexists = false;
-    if (pginfo.IsMythStream())
-        fileexists = RemoteCheckFile(&pginfo);
-    else
-    {
-        QFile checkFile(pginfo.GetPlaybackURL(true));
-        fileexists = checkFile.exists();
-    }
-
-    if (fileexists)
-    {
-        Playback(pginfo);
-        retval = 1;
-    }
-
-    return retval;
-}
-#endif // PLAY_FROM_RECORDER
 
 bool TV::StateIsRecording(TVState state)
 {
@@ -2467,56 +2367,6 @@ void TV::timerEvent(QTimerEvent *te)
     if (handled)
         return;
 
-#ifdef PLAY_FROM_RECORDER
-    // Check if it matches a recorderPlaybackInfoTimerId
-    bool do_pbinfo_fetch = false;
-    {
-        QMutexLocker locker(&recorderPlaybackInfoLock);
-        QMap<int,int>::iterator it = recorderPlaybackInfoTimerId.find(timer_id);
-        if (it != recorderPlaybackInfoTimerId.end())
-        {
-            KillTimer(timer_id);
-            recorderPlaybackInfoTimerId.erase(it);
-            do_pbinfo_fetch = true;
-        }
-    }
-
-    if (do_pbinfo_fetch)
-    {
-        PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-        mctx->recorder->Setup();
-
-        ProgramInfo *pbinfo = NULL;
-        bool ok = true;
-        if (mctx->recorder->IsRecording(&ok))
-        {
-            pbinfo = mctx->recorder->GetRecording();
-            if (pbinfo)
-                RemoteFillProgramInfo(*pbinfo, gCoreContext->GetHostName());
-        }
-        if (!ok || !pbinfo)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "lost contact with backend");
-            SetErrored(ctx);
-        }
-
-        ReturnPlayerLock(mctx);
-
-        QMutexLocker locker(&recorderPlaybackInfoLock);
-        if (pbinfo)
-        {
-            recorderPlaybackInfo[timer_id] = *pbinfo;
-            delete pbinfo;
-        }
-        recorderPlaybackInfo[timer_id] = ProgramInfo();
-        recorderPlaybackInfoWaitCond.wakeAll();
-        handled = true;
-    }
-#endif // PLAY_FROM_RECORDER
-
-    if (handled)
-        return;
-
     // Check if it matches a signalMonitorTimerId
     ctx = NULL;
     {
@@ -2571,49 +2421,6 @@ void TV::timerEvent(QTimerEvent *te)
             ctx->UpdateTVChain();
 
         ReturnPlayerLock(mctx);
-        handled = true;
-    }
-
-    if (handled)
-        return;
-
-    // Check if it matches keyListTimerId
-    QKeyEvent *keyEvent = NULL;
-    {
-        QMutexLocker locker(&timerIdLock);
-
-        if (timer_id == keyListTimerId)
-        {
-            keyEvent = keyList.dequeue();
-            if (keyList.empty())
-            {
-                KillTimer(keyListTimerId);
-                keyListTimerId = 0;
-            }
-        }
-    }
-
-    if (keyEvent)
-    {
-        PlayerContext *actx = GetPlayerWriteLock(-1, __FILE__, __LINE__);
-        if (actx->HasPlayer())
-        {
-            ProcessKeypress(actx, keyEvent);
-
-            delete keyEvent;
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT,
-                    "Ignoring key event for now because player is not set");
-
-            QMutexLocker locker(&timerIdLock);
-            keyList.push_front(keyEvent);
-            if (keyListTimerId)
-                KillTimer(keyListTimerId);
-            keyListTimerId = StartTimer(20, __LINE__);
-        }
-        ReturnPlayerLock(actx);
         handled = true;
     }
 
@@ -3340,12 +3147,13 @@ bool TV::event(QEvent *e)
 
     if (QEvent::KeyPress == e->type())
     {
-        QKeyEvent *k = new QKeyEvent(*(QKeyEvent *)e);
-        QMutexLocker locker(&timerIdLock);
-        keyList.enqueue(k);
-        if (!keyListTimerId)
-            keyListTimerId = StartTimer(1, __LINE__);
-        return true;
+        bool handled = false;
+        PlayerContext *actx = GetPlayerWriteLock(-1, __FILE__, __LINE__);
+        if (actx->HasPlayer())
+            handled = ProcessKeypress(actx, (QKeyEvent *)e);
+        ReturnPlayerLock(actx);
+        if (handled)
+            return true;
     }
 
     switch (e->type())
@@ -3477,7 +3285,7 @@ static bool has_action(QString action, const QStringList &actions)
     return false;
 }
 
-void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
+bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
 {
     bool ignoreKeys = actx->IsPlayerChangingBuffers();
 #if DEBUG_ACTIONS
@@ -3500,7 +3308,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
                   "TV Playback", e, actions);
 
         if (handled || actions.isEmpty())
-            return;
+            return true;
 
         bool esc   = has_action("ESCAPE", actions) ||
                      has_action("BACK", actions);
@@ -3508,7 +3316,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
         bool play  = has_action(ACTION_PLAY, actions);
 
         if ((!esc || browsehelper->IsBrowsing()) && !pause && !play)
-            return;
+            return false;
     }
 
     OSD *osd = GetOSDLock(actx);
@@ -3566,7 +3374,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
     }
 
     if (handled)
-        return;
+        return true;
 
     // If text is already queued up, be more lax on what is ok.
     // This allows hex teletext entry and minor channel entry.
@@ -3578,7 +3386,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
         if (ok || txt=="_" || txt=="-" || txt=="#" || txt==".")
         {
             AddKeyToInputQueue(actx, txt.at(0).toLatin1());
-            return;
+            return true;
         }
     }
 
@@ -3597,7 +3405,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
                 if (actx->player->HandleTeletextAction(tt_actions[i]))
                 {
                     actx->UnlockDeletePlayer(__FILE__, __LINE__);
-                    return;
+                    return true;
                 }
             }
         }
@@ -3617,7 +3425,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
                 if (actx->player->ITVHandleAction(itv_actions[i]))
                 {
                     actx->UnlockDeletePlayer(__FILE__, __LINE__);
-                    return;
+                    return true;
                 }
             }
         }
@@ -3628,7 +3436,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
               "TV Playback", e, actions);
 
     if (handled || actions.isEmpty())
-        return;
+        return true;
 
     handled = false;
 
@@ -3655,7 +3463,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
 #endif // DEBUG_ACTIONS
 
     if (handled)
-        return;
+        return true;
 
     if (!handled)
     {
@@ -3672,6 +3480,8 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
             }
         }
     }
+
+    return true;
 }
 
 bool TV::BrowseHandleAction(PlayerContext *ctx, const QStringList &actions)
@@ -10249,7 +10059,8 @@ void TV::FillOSDMenuNavigate(const PlayerContext *ctx, OSD *osd,
     bool isbd         = ctx->buffer && ctx->buffer->IsBD() &&
                         ctx->buffer->BD()->IsHDMVNavigation();
     bool islivetv     = StateIsLiveTV(state);
-    bool isrecording  = state == kState_WatchingPreRecorded;
+    bool isrecording  = state == kState_WatchingPreRecorded ||
+                        state == kState_WatchingRecording;
     bool previouschan = false;
     if (islivetv)
     {

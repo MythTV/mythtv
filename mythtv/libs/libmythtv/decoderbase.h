@@ -233,6 +233,7 @@ class DecoderBase
 
     long long framesPlayed;
     long long framesRead;
+    int64_t totalDuration;
     long long lastKey;
     int keyframedist;
     long long indexOffset;

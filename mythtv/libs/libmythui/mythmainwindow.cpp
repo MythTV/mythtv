@@ -952,7 +952,7 @@ void MythMainWindow::Init(void)
         d->painter = new MythOpenGLPainter();
         QGLFormat fmt;
         fmt.setDepth(false);
-        d->render = new MythRenderOpenGL(fmt);
+        d->render = MythRenderOpenGL::Create(fmt);
         MythRenderOpenGL *gl = dynamic_cast<MythRenderOpenGL*>(d->render);
         d->paintwin = new MythPainterWindowGL(this, d, gl);
         QGLWidget *qgl = dynamic_cast<QGLWidget *>(d->paintwin);

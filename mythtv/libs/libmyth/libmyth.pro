@@ -89,12 +89,12 @@ LIBS += -L../../external/FFmpeg/libavcore  -lmythavcore
 LIBS += -L../../external/FFmpeg/libavutil  -lmythavutil
 LIBS += -L../../external/FFmpeg/libavformat  -lmythavformat
 
-TARGETDEPS += ../libmythsamplerate/libmythsamplerate-$${MYTH_LIB_EXT}
-TARGETDEPS += ../libmythsoundtouch/libmythsoundtouch-$${MYTH_LIB_EXT}
-TARGETDEPS += ../libmythfreesurround/libmythfreesurround-$${MYTH_LIB_EXT}
-TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
-TARGETDEPS += ../../external/FFmpeg/libavcore/$$avLibName(avcore)
-TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
+POST_TARGETDEPS += ../libmythsamplerate/libmythsamplerate-$${MYTH_LIB_EXT}
+POST_TARGETDEPS += ../libmythsoundtouch/libmythsoundtouch-$${MYTH_LIB_EXT}
+POST_TARGETDEPS += ../libmythfreesurround/libmythfreesurround-$${MYTH_LIB_EXT}
+POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
+POST_TARGETDEPS += ../../external/FFmpeg/libavcore/$$avLibName(avcore)
+POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
 
 # Install headers so that plugins can compile independently
 inc.path = $${PREFIX}/include/mythtv/
@@ -159,7 +159,7 @@ mingw {
     SOURCES += audio/audiooutputdx.cpp
     HEADERS += mediamonitor-windows.h   audio/audiooutputwin.h
     HEADERS += audio/audiooutputdx.h
-    LIBS += -lpthread -lwinmm -lws2_32
+    LIBS += -lwinmm -lws2_32
 }
 
 macx {

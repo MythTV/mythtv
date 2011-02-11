@@ -94,8 +94,7 @@ HttpServer::~HttpServer()
 {
     while (!m_extensions.empty())
     {
-        delete m_extensions.back();
-        m_extensions.pop_back();
+        delete m_extensions.takeFirst();
     }
 }
 

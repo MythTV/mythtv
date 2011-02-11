@@ -739,6 +739,7 @@ void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset)
         ResetPosMap();
         framesPlayed = 0;
         framesRead = 0;
+        totalDuration = 0;
         seen_gop = false;
         seq_count = 0;
     }
@@ -2739,6 +2740,8 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 
     if (on_frame)
         framesRead++;
+
+    totalDuration += av_q2d(curstream->time_base) * pkt->duration * 1000000; // usec
 
     justAfterChange = false;
 

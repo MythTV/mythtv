@@ -187,14 +187,15 @@ class MPUBLIC TV : public QObject
     bool Init(bool createWindow = true);
 
     // User input processing commands
-    void ProcessKeypress(PlayerContext*, QKeyEvent *e);
+    bool ProcessKeypress(PlayerContext*, QKeyEvent *e);
     void ProcessNetworkControlCommand(PlayerContext *, const QString &command);
     void customEvent(QEvent *e);
     bool event(QEvent *e);
     bool HandleTrackAction(PlayerContext*, const QString &action);
 
     // LiveTV commands
-    bool LiveTV(bool showDialogs = true, bool startInGuide = false);
+    bool LiveTV(bool showDialogs = true);
+    bool StartLiveTVInGuide(void) { return db_start_in_guide; }
 
     // Embedding commands for the guidegrid to use in LiveTV
     bool StartEmbedding(PlayerContext*, WId wid, const QRect&);
@@ -710,7 +711,6 @@ class MPUBLIC TV : public QObject
     int       idleDialogTimerId; ///< Timer for idle dialog.
 
     /// Queue of unprocessed key presses.
-    MythDeque<QKeyEvent*> keyList;
     MythTimer keyRepeatTimer; ///< Timeout timer for repeat key filtering
 
     // CC/Teletex input state variables
@@ -789,14 +789,6 @@ class MPUBLIC TV : public QObject
     mutable QMutex                 is_tunable_cache_lock;
     QMap< uint,vector<InputInfo> > is_tunable_cache_inputs;
 
-#ifdef PLAY_FROM_RECORDER
-    /// Info requested by PlayFromRecorder
-    QMutex                    recorderPlaybackInfoLock;
-    QWaitCondition            recorderPlaybackInfoWaitCond;
-    QMap<int,int>             recorderPlaybackInfoTimerId;
-    QMap<int,ProgramInfo>     recorderPlaybackInfo;
-#endif // PLAY_FROM_RECORDER
-
     // Channel group stuff
     /// \brief Lock necessary when modifying channel group variables.
     /// These are only modified in UI thread, so no lock is needed
@@ -814,7 +806,6 @@ class MPUBLIC TV : public QObject
     mutable QMutex       timerIdLock;
     volatile int         lcdTimerId;
     volatile int         lcdVolumeTimerId;
-    volatile int         keyListTimerId;
     volatile int         networkControlTimerId;
     volatile int         jumpMenuTimerId;
     volatile int         pipChangeTimerId;

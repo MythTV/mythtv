@@ -82,7 +82,7 @@ BD_PRIVATE void                 gc_decode_ts(GRAPHICS_CONTROLLER *p,
  * run graphics controller
  */
 
-BD_PRIVATE void                 gc_run(GRAPHICS_CONTROLLER *p,
+BD_PRIVATE int                  gc_run(GRAPHICS_CONTROLLER *p,
                                        /* in */  gc_ctrl_e msg, uint32_t param,
                                        /* out */ GC_NAV_CMDS *cmds);
 

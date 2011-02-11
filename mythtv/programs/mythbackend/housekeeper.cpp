@@ -556,8 +556,9 @@ void HouseKeeper::CleanupProgramListings(void)
 
     MSqlQuery query(MSqlQuery::InitCon());
     QString querystr;
-    // We keep seven days of guide data
-    int offset = 7;
+    // Keep as many days of listings data as we keep matching, non-recorded
+    // oldrecorded entries to allow for easier post-mortem analysis
+    int offset = gCoreContext->GetNumSetting( "CleanOldRecorded", 10);
 
     query.prepare("DELETE FROM oldprogram WHERE airdate < "
                   "DATE_SUB(CURRENT_DATE, INTERVAL 320 DAY);");
@@ -624,13 +625,11 @@ void HouseKeeper::CleanupProgramListings(void)
     if (!query.exec())
         MythDB::DBError("HouseKeeper Cleaning Program Listings", query);
 
-    int cleanOldRecorded = gCoreContext->GetNumSetting( "CleanOldRecorded", 10);
-
     query.prepare("DELETE FROM oldrecorded WHERE "
                   "recstatus <> :RECORDED AND duplicate = 0 AND "
                   "endtime < DATE_SUB(CURRENT_DATE, INTERVAL :CLEAN DAY);");
     query.bindValue(":RECORDED", rsRecorded);
-    query.bindValue(":CLEAN", cleanOldRecorded);
+    query.bindValue(":CLEAN", offset);
     if (!query.exec())
         MythDB::DBError("HouseKeeper Cleaning Program Listings", query);
 

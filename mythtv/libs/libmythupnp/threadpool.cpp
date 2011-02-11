@@ -405,7 +405,7 @@ WorkerThread *ThreadPool::GetWorkerThread()
 
 WorkerThread *ThreadPool::AddWorkerThread( bool bMakeAvailable, long nTimeout )
 {
-    QString sName = m_sName + "_WorkerThread"; 
+    QString sName = QString(m_sName + "_WorkerThread"); 
     long nThreadCount;
 
     VERBOSE( VB_UPNP, QString( "ThreadPool:AddWorkerThread - %1" ).arg( sName ));

@@ -232,7 +232,7 @@ bool VideoOutputOpenGL::SetupContext(void)
         return false;
     }
 
-    gl_context = new MythRenderOpenGL(fmt, device);
+    gl_context = MythRenderOpenGL::Create(fmt, device);
     if (gl_context && gl_context->create())
     {
         gl_context->Init();

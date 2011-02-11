@@ -16,10 +16,13 @@
 
 typedef enum 
 {
-    MFEXML_Unknown                =  0,
-    MFEXML_GetScreenShot          =  1,
-    MFEXML_Message                =  2,
-
+    MFEXML_Unknown = 0,
+    MFEXML_GetServiceDescription,
+    MFEXML_GetScreenShot,
+    MFEXML_Message,
+    MFEXML_Action,
+    MFEXML_ActionList,
+    MFEXML_ActionListTest,
 } MythFEXMLMethod;
 
 class MythFEXML : public Eventing
@@ -29,12 +32,15 @@ class MythFEXML : public Eventing
     QString m_sControlUrl;
     QString m_sServiceDescFileName;
 
+    QStringList m_actionList;
+    QHash<QString,QStringList> m_actionDescriptions;
+
   protected:
 
     // Implement UPnpServiceImpl methods that we can
 
-    virtual QString GetServiceType      () { return "urn:schemas-mythtv-org:service:MythTv:1"; }
-    virtual QString GetServiceId        () { return "urn:mythtv-org:serviceId:MYTHTV_1-0"; }
+    virtual QString GetServiceType      () { return "urn:schemas-mythtv-org:service:MythFrontend:1"; }
+    virtual QString GetServiceId        () { return "urn:mythtv-org:serviceId:MYTHFRONTEND_1-0"; }
     virtual QString GetServiceControlURL() { return m_sControlUrl.mid( 1 ); }
     virtual QString GetServiceDescURL   () { return m_sControlUrl.mid( 1 ) + "/GetServDesc"; }
 
@@ -44,6 +50,10 @@ class MythFEXML : public Eventing
 
     void GetScreenShot    ( HTTPRequest *pRequest );
     void SendMessage      ( HTTPRequest *pRequest );
+    void SendAction       ( HTTPRequest *pRequest );
+    void GetActionList    ( HTTPRequest *pRequest );
+    void GetActionListTest( HTTPRequest *pRequest );
+    void InitActions      ( void );
 
   public:
     MythFEXML( UPnpDevice *pDevice ,  const QString sSharePath);

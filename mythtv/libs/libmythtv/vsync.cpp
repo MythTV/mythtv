@@ -43,10 +43,6 @@
 #include "videoout_vdpau.h"
 #endif
 
-#ifdef USING_OPENGL_VSYNC
-#include "mythrender_opengl.h"
-#endif // USING_OPENGL_VSYNC
-
 #ifdef __linux__
 #include <linux/rtc.h>
 #endif
@@ -101,15 +97,6 @@ VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
 #endif
 #ifndef _WIN32
     TESTVIDEOSYNC(DRMVideoSync);
-#ifdef USING_OPENGL_VSYNC
-/*
-    if (gCoreContext->GetNumSetting("UseOpenGLVSync", 1) &&
-       (getenv("NO_OPENGL_VSYNC") == NULL))
-    {
-        TESTVIDEOSYNC(OpenGLVideoSync);
-    }
-*/
-#endif
 #endif // _WIN32
 #ifdef __linux__
     TESTVIDEOSYNC(RTCVideoSync);
@@ -329,112 +316,6 @@ int DRMVideoSync::WaitForFrame(int sync_delay)
     }
 
     return m_delay;
-}
-#endif /* !_WIN32 */
-
-#ifndef _WIN32
-OpenGLVideoSync::OpenGLVideoSync(VideoOutput *video_output,
-                                 int frame_interval, int refresh_interval,
-                                 bool interlaced) :
-    VideoSync(video_output, frame_interval, refresh_interval, interlaced),
-    m_context(NULL), m_device(NULL)
-{
-    VERBOSE(VB_IMPORTANT, LOC + "OpenGLVideoSync()");
-}
-
-OpenGLVideoSync::~OpenGLVideoSync()
-{
-    VERBOSE(VB_IMPORTANT, LOC + "~OpenGLVideoSync()");
-#ifdef USING_OPENGL_VSYNC
-    if (m_context)
-        delete m_context;
-    if (m_device)
-        delete m_device;
-#endif
-}
-
-/** \fn OpenGLVideoSync::TryInit(void)
- *  \brief Try to create an OpenGL surface so we can use glXWaitVideoSyncSGI:
- *  \return true if this method can be employed, false if it cannot.
- */
-bool OpenGLVideoSync::TryInit(void)
-{
-#ifdef USING_OPENGL_VSYNC
-    m_device = new QPixmap(16,16);
-    QGLFormat fmt;
-    fmt.setDepth(false);
-    m_context = new MythRenderOpenGL(fmt, m_device);
-    if (m_context && m_context->create())
-    {
-        m_context->Init();
-        if (m_context->HasGLXWaitVideoSyncSGI())
-            return true;
-
-        VERBOSE(VB_IMPORTANT, LOC +
-            "OpenGLVideoSync: GLX_SGI_video_sync extension not "
-            "supported by driver.");
-    }
-
-    VERBOSE(VB_PLAYBACK, LOC + "OpenGLVideoSync: "
-            "Failed to Initialize OpenGL V-Sync");
-
-#endif /* USING_OPENGL_VSYNC */
-    return false;
-}
-
-void OpenGLVideoSync::Start(void)
-{
-#ifdef USING_OPENGL_VSYNC
-    if (!m_context)
-        return;
-
-    if (!(m_video_output && m_video_output->IsEmbedding()))
-    {
-        unsigned int count = m_context->GetVideoSyncCount();
-        m_context->WaitForVideoSync(2, (count+1)%2, &count);
-    }
-    // Initialize next trigger
-    VideoSync::Start();
-#endif /* USING_OPENGL_VSYNC */
-}
-
-int OpenGLVideoSync::WaitForFrame(int sync_delay)
-{
-    (void) sync_delay;
-#ifdef USING_OPENGL_VSYNC
-    const QString msg1("First A/V Sync"), msg2("Second A/V Sync");
-    m_nexttrigger += sync_delay;
-
-    if (m_video_output && m_video_output->IsEmbedding())
-    {
-        m_delay = CalcDelay();
-        if (m_delay > 0)
-            usleep(m_delay);
-        return 0;
-    }
-
-    if (!m_context)
-        return 0;
-
-    unsigned int frameNum = m_context->GetVideoSyncCount();
-
-    // Always sync to the next retrace execpt when we are very late.
-    if ((m_delay = CalcDelay()) > -(m_refresh_interval/2))
-    {
-        m_context->WaitForVideoSync(2, (frameNum+1)%2 ,&frameNum);
-        m_delay = CalcDelay();
-    }
-
-    // Wait for any remaining retrace intervals in one pass.
-    if (m_delay > 0)
-    {
-        uint n = (m_delay + m_refresh_interval - 1) / m_refresh_interval;
-        m_context->WaitForVideoSync((n+1), (frameNum+n)%(n+1), &frameNum);
-        m_delay = CalcDelay();
-    }
-
-    return m_delay;
-#endif /* USING_OPENGL_VSYNC */
 }
 #endif /* !_WIN32 */
 

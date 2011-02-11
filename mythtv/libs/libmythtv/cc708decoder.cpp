@@ -178,6 +178,7 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
             short character = CCtableG0[code-0x20];
             append_character(cc, service_num, character);
             i++;
+            SEND_STR;
         }
         else if (code <= 0x9f)
         {

@@ -105,7 +105,7 @@ using_libudf {
     LIBS += -ludf
 }
 
-mingw:LIBS += -lpthread -lws2_32
+mingw:LIBS += -lws2_32
 
 QT += xml sql network
 

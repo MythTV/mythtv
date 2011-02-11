@@ -1275,6 +1275,11 @@ int main(int argc, char **argv)
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     g_pUPnp  = new MediaRenderer();
+    if (!g_pUPnp->initialized())
+    {
+        delete g_pUPnp;
+        g_pUPnp = NULL;
+    }
 
     // Override settings as early as possible to cover bootstrapped screens
     // such as the language prompt

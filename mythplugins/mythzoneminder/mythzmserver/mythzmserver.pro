@@ -14,7 +14,7 @@ macx {
     CONFIG += qt
     QT += sql
 }
-!macx:LIBS = $$system(mysql_config --libs)
+LIBS = $$system(mysql_config --libs)
 
 linux: DEFINES += linux
 
