@@ -159,7 +159,7 @@ mingw {
     SOURCES += audio/audiooutputdx.cpp
     HEADERS += mediamonitor-windows.h   audio/audiooutputwin.h
     HEADERS += audio/audiooutputdx.h
-    LIBS += -lpthread -lwinmm -lws2_32
+    LIBS += -lwinmm -lws2_32
 }
 
 macx {

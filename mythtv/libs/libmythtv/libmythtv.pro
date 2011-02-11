@@ -579,7 +579,6 @@ mingw {
     SOURCES -= NuppelVideoRecorder.cpp
     SOURCES += videoout_d3d.cpp
 
-    LIBS += -lpthread
     LIBS += -lws2_32
 }
 

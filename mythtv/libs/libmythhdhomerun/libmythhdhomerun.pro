@@ -30,7 +30,7 @@ mingw {
     HEADERS += hdhomerun_os_windows.h
     SOURCES += hdhomerun_os_windows.c hdhomerun_sock_windows.c
     SOURCES -= hdhomerun_os_posix.c
-    LIBS += -lws2_32 -liphlpapi -lpthread
+    LIBS += -lws2_32 -liphlpapi
 }
 
 LIBS += $$EXTRALIBS 

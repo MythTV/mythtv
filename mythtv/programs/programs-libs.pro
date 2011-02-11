@@ -32,7 +32,6 @@ using_mheg:LIBS += -L../../libs/libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_hdhomerun:LIBS += -L../../libs/libmythhdhomerun -lmythhdhomerun-$$LIBVERSION
 
 mingw {
-    LIBS += -lpthread
     CONFIG += console
 }
 
