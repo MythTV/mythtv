@@ -971,7 +971,7 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
     decoder->setWatchingRecording(watchingrecording);
     decoder->setTranscoding(transcoding);
     CheckExtraAudioDecode();
-    //noVideoTracks = !decoder->GetTrackCount(kTrackTypeVideo);
+    noVideoTracks = !decoder->GetTrackCount(kTrackTypeVideo);
 
     // Set 'no_video_decode' to true for audio only decodeing
     bool no_video_decode = false;
@@ -2139,7 +2139,7 @@ void MythPlayer::VideoStart(void)
 
 bool MythPlayer::VideoLoop(void)
 {
-    if (videoPaused || isDummy || noVideoTracks)
+    if (videoPaused || isDummy /*|| noVideoTracks*/)
     {
         usleep(frame_interval);
         DisplayPauseFrame();
@@ -2595,7 +2595,7 @@ void MythPlayer::EventLoop(void)
 
     // Disable rewind if we are too close to the beginning of the buffer
     if (CalcRWTime(-ffrew_skip) > 0 &&
-       (!noVideoTracks && (framesPlayed <= keyframedist)))
+       (/*!noVideoTracks && */(framesPlayed <= keyframedist)))
     {
         VERBOSE(VB_PLAYBACK, LOC + "Near start, stopping rewind.");
         float stretch = (ffrew_skip > 0) ? 1.0f : audio.GetStretchFactor();
@@ -2844,10 +2844,12 @@ void MythPlayer::DecoderLoop(bool pause)
 
     while (!killdecoder && !IsErrored())
     {
-        //noVideoTracks = decoder &&
-        //            !decoder->GetTrackCount(kTrackTypeVideo);
-
         DecoderPauseCheck();
+
+        decoder_change_lock.lock();
+        if (decoder)
+            noVideoTracks = !decoder->GetTrackCount(kTrackTypeVideo);
+        decoder_change_lock.unlock();
 
         if (forcePositionMapSync)
         {
@@ -2887,8 +2889,8 @@ void MythPlayer::DecoderLoop(bool pause)
 
         DecodeType dt = (audio.HasAudioOut() && normal_speed) ?
             kDecodeAV : kDecodeVideo;
-        if (noVideoTracks && audio.HasAudioOut())
-            dt = kDecodeAudio;
+        //if (noVideoTracks && audio.HasAudioOut())
+        //    dt = kDecodeAudio;
         DecoderGetFrame(dt);
         decodeOneFrame = false;
     }
