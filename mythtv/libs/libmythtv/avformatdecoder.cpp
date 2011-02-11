@@ -916,11 +916,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     InitByteContext();
 
-    if (ringBuffer->IsStream())
-    {
-        if (!ringBuffer->StartFromBeginning())
-            return -1;
-    }
+    if (ringBuffer->IsStream() && !ringBuffer->StartFromBeginning())
+        return -1;
 
     int err = av_open_input_stream(&ic, ic->pb, filename, fmt, &params);
     if (err < 0)
