@@ -122,7 +122,7 @@ using_xrandr {
     # Add nvidia XV-EXTENSION support
     SOURCES += util-nvctrl.cpp
     LIBS += -L../libmythnvctrl -lmythnvctrl-$${LIBVERSION}
-    TARGETDEPS += ../libmythnvctrl/libmythnvctrl-$${MYTH_LIB_EXT}
+    POST_TARGETDEPS += ../libmythnvctrl/libmythnvctrl-$${MYTH_LIB_EXT}
 }
 
 cygwin:DEFINES += _WIN32
@@ -135,8 +135,18 @@ mingw {
 
 using_opengl {
     DEFINES += USE_OPENGL_PAINTER
-    SOURCES += mythpainter_ogl.cpp mythrender_opengl.cpp
-    HEADERS += mythpainter_ogl.h   mythrender_opengl.h mythrender_opengl_defs.h
+    SOURCES += mythpainter_ogl.cpp    mythrender_opengl.cpp
+    SOURCES += mythrender_opengl2.cpp
+    HEADERS += mythpainter_ogl.h    mythrender_opengl.h mythrender_opengl_defs.h
+    HEADERS += mythrender_opengl2.h mythrender_opengl_defs2.h
+    using_opengles {
+        DEFINES += USING_OPENGLES
+        HEADERS += mythrender_opengl2es.h
+    }
+    !using_opengles {
+        SOURCES += mythrender_opengl1.cpp
+        HEADERS += mythrender_opengl1.h mythrender_opengl_defs1.h
+    }
     inc.files += mythpainter_ogl.h
     QT += opengl
 

@@ -91,7 +91,7 @@ void MythUIButtonTree::SetTreeState(bool refreshAll)
         return;
 
     if (!m_currentNode)
-        SetCurrentNode(m_rootNode->getSelectedChild());
+        DoSetCurrentNode(m_rootNode->getSelectedChild());
 
     QList<MythGenericTree*> route = m_currentNode->getRoute();
 
@@ -138,7 +138,7 @@ void MythUIButtonTree::SetTreeState(bool refreshAll)
             m_activeList = list;
             list->SetActive(true);
             emit itemSelected(list->GetItemCurrent());
-            SetCurrentNode(selectedNode);
+            DoSetCurrentNode(selectedNode);
         }
 
         listid++;
@@ -267,7 +267,7 @@ bool MythUIButtonTree::SetNodeById(QList<int> route)
     MythGenericTree *node = m_rootNode->findNode(route);
     if (node && node->isSelectable())
     {
-        SetCurrentNode(node);
+        DoSetCurrentNode(node);
         SetTreeState();
         return true;
     }
@@ -286,11 +286,11 @@ bool MythUIButtonTree::SetNodeByString(QStringList route)
 {
     if (!m_rootNode)
     {
-        SetCurrentNode(NULL);
+        DoSetCurrentNode(NULL);
         return false;
     }
 
-    MythGenericTree *foundNode = m_rootNode->getChildAt(0);
+    MythGenericTree *foundNode = m_rootNode;
 
     bool foundit = false;
     if (!route.isEmpty())
@@ -304,11 +304,20 @@ bool MythUIButtonTree::SetNodeByString(QStringList route)
                     MythGenericTree *node = foundNode->getChildByName(route[i]);
                     if (node)
                     {
+                        node->becomeSelectedChild();
                         foundNode = node;
                         foundit = true;
                     }
                     else
+                    {
+                        node = foundNode->getChildAt(0);
+                        if (node)
+                        {
+                            node->becomeSelectedChild();
+                            foundNode = node;
+                        }
                         break;
+                    }
                 }
             }
             else
@@ -316,8 +325,12 @@ bool MythUIButtonTree::SetNodeByString(QStringList route)
         }
     }
 
-    SetCurrentNode(foundNode);
-    SetTreeState();
+    DoSetCurrentNode(foundNode);
+
+    m_currentDepth = qMax(0, (int)(foundNode->currentDepth() - m_depthOffset - m_numLists));
+    m_activeListID = qMin(foundNode->currentDepth() - m_depthOffset - 1, (int)(m_numLists - 1));
+
+    SetTreeState(true);
 
     return foundit;
 }
@@ -332,6 +345,19 @@ bool MythUIButtonTree::SetNodeByString(QStringList route)
  */
 bool MythUIButtonTree::SetCurrentNode(MythGenericTree *node)
 {
+    if (!node)
+        return false;
+
+    if (node == m_currentNode)
+        return true;
+
+    QStringList route = node->getRouteByString();
+
+    return SetNodeByString(route);
+}
+
+bool MythUIButtonTree::DoSetCurrentNode(MythGenericTree *node)
+{
     if (node)
     {
         if (node == m_currentNode)
@@ -341,10 +367,6 @@ bool MythUIButtonTree::SetCurrentNode(MythGenericTree *node)
         node->becomeSelectedChild();
         emit nodeChanged(m_currentNode);
         return true;
-        // Ensure that this node exists in the current tree
-        //QList<int> route = node->getRouteById();
-        //if (SetNodeById(route))
-        //    return true;
     }
 
     return false;
@@ -367,7 +389,7 @@ void MythUIButtonTree::RemoveItem(MythUIButtonListItem *item, bool deleteNode)
 
     if (node && node->getParent())
     {
-        SetCurrentNode(node->getParent());
+        DoSetCurrentNode(node->getParent());
         if (deleteNode)
             node->getParent()->deleteNode(node);
         else
@@ -494,7 +516,7 @@ void MythUIButtonTree::handleSelect(MythUIButtonListItem *item)
 
 
     MythGenericTree *node = qVariantValue<MythGenericTree*> (item->GetData());
-    SetCurrentNode(node);
+    DoSetCurrentNode(node);
     SetTreeState();
 }
 
@@ -509,7 +531,7 @@ void MythUIButtonTree::handleClick(MythUIButtonListItem *item)
         return;
 
     MythGenericTree *node = qVariantValue<MythGenericTree*> (item->GetData());
-    if (SetCurrentNode(node))
+    if (DoSetCurrentNode(node))
         emit itemClicked(item);
 }
 

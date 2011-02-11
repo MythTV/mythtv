@@ -10,14 +10,15 @@
 #include <QThread>
 #include <QWaitCondition>
 #include <QMutex>
+#include <QPointer>
 #include <sys/select.h>
 #include "mythsystem.h"
 
 class MythSystemUnix;
 
-typedef QMap<pid_t, MythSystemUnix *> MSMap_t;
+typedef QMap<pid_t, QPointer<MythSystemUnix> > MSMap_t;
 typedef QMap<int, QBuffer *> PMap_t;
-typedef QList<MythSystemUnix *> MSList_t;
+typedef QList<QPointer<MythSystemUnix> > MSList_t;
 
 class MythSystemIOHandler: public QThread
 {

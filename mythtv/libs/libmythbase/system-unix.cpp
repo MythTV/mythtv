@@ -335,6 +335,8 @@ void MythSystemManager::run(void)
             next = i + 1;
             pid  = i.key();
             ms   = i.value();
+            if (!ms)
+                continue;
 
             // handle processes beyond marked timeout
             if( ms->m_timeout > 0 && ms->m_timeout < now )
@@ -442,6 +444,10 @@ void MythSystemSignalManager::run(void)
             }
             MythSystemUnix *ms = msList.takeFirst();
             listLock.unlock();
+
+            // This can happen if it has been deleted already
+            if (!ms)
+                continue;
 
             ms->m_parent->HandlePostRun();
 

@@ -128,7 +128,6 @@ Advanced options (experts only):
   --enable-crystalhd       enable Broadcom CrystalHD hardware decoder support
   --disable-opengl-video   disable OpenGL based video display
   --disable-quartz-video   disable Mac OS X CoreVideo based video display
-  --disable-opengl-vsync   disable OpenGL vsync method
   --disable-directfb       disable DirectFB (Linux non-X11 video)
 
   --enable-mac-bundle      produce standalone OS X apps (e.g. mythfrontend.app)
@@ -1334,7 +1333,6 @@ MYTHTV_CONFIG_LIST='
     lirc
     mheg
     opengl_video
-    opengl_vsync
     qtdbus
     qtwebkit
     quartz_video
@@ -1382,6 +1380,7 @@ USING_LIST='
     darwin_da
     mythtranscode
     opengl
+    opengles
     vdpau
 '
 
@@ -1737,9 +1736,9 @@ hdpvr_deps="backend v4l"
 hdhomerun_deps="backend"
 mpegtsraw_demuxer_deps="merge_libavformat_mpegts_c"
 mythtranscode_deps="backend frontend"
-opengl_deps_any="agl_h GL_gl_h darwin windows x11"
+opengl_deps_any="agl_h GL_gl_h GLES2_gl2_h darwin windows x11"
+opengles_deps="GLES2_gl2_h"
 opengl_video_deps="opengl"
-opengl_vsync_deps="opengl"
 v4l_deps="backend linux_videodev_h linux_videodev2_h"
 vdpau_deps="opengl vdpau_vdpau_h vdpau_vdpau_x11_h"
 xrandr_deps="x11"
@@ -1958,7 +1957,7 @@ enable lirc
 enable mheg
 enable mythtranscode
 enable opengl
-enable opengl_vsync
+enable opengles
 enable opengl_video
 enable quartz_video
 enable symbol_visibility
@@ -3097,7 +3096,6 @@ EOF
             disable mmx
             enable disable_mmx_for_debugging   # prevent later call to die
         fi
-        disable opengl_vsync
         disable v4l
         disable x11
         # Workaround compile errors from missing gmtime_r/localtime_r/uint def
@@ -4054,7 +4052,7 @@ if enabled x11; then
 fi
 
 if enabled x11; then
-    check_libx gl_lib GL/gl.h glBegin -lGL || check_libx gl_lib GL/gl.h glBegin -lopengl32 || disable opengl
+    check_libx gl_lib GLES2/gl2.h glClear -lGLESv2 || check_libx gl_lib GL/gl.h glBegin -lGL || check_libx gl_lib GL/gl.h glBegin -lopengl32 || disable opengl
     check_libx glu_lib GL/glu.h gluBeginSurface -lGLU || disable opengl
 fi
 
@@ -4480,7 +4478,6 @@ fi
   if test x"$target_os" = x"darwin" ; then
     echo "Quartz video              ${quartz_video-no}"
   fi
-  echo "OpenGL vsync              ${opengl_vsync-no}"
   echo "DirectFB                  ${directfb-no}"
   if test x"$target_os" = x"mingw32" ; then
     echo "Windows (Direct3D)        yes"
@@ -4493,6 +4490,7 @@ echo "# Misc Features"
 echo "multi threaded libavcodec ${threads-no}"
 echo "Frontend                  ${frontend-no}"
 echo "Backend                   ${backend-no}"
+echo "OpenGL ES 2.0             ${opengles-no}"
 echo
 
 echo "# Bindings"
@@ -4823,6 +4821,7 @@ cat <<EOF >> $MYTH_CONFIG_MAK
 # Note: Qt uses QMAKE_INCDIR_QT to build an absolute path for include
 #       directories, it cannot be modified.
 QMAKE_LIBDIR_QT-=${sysroot}${libdir}
+QMAKE_LIBDIR-=${sysroot}${libdir}
 LATE_LIBS+=-L${sysroot}${libdir}
 EOF
 

@@ -65,17 +65,17 @@ using_hdhomerun: LIBS += -L../libmythhdhomerun -lmythhdhomerun-$$LIBVERSION
 using_backend: LIBS += -lmp3lame
 LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 
-TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
-TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
-TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
-TARGETDEPS += ../../external/FFmpeg/libavcore/$$avLibName(avcore)
-TARGETDEPS += ../../external/FFmpeg/libavformat/$$avLibName(avformat)
-TARGETDEPS += ../../external/FFmpeg/libswscale/$$avLibName(swscale)
-TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
-TARGETDEPS += ../libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
-using_mheg: TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
-using_live: TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
-using_hdhomerun: TARGETDEPS += ../libmythhdhomerun/libmythhdhomerun-$${MYTH_SHLIB_EXT}
+POST_TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
+POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
+POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
+POST_TARGETDEPS += ../../external/FFmpeg/libavcore/$$avLibName(avcore)
+POST_TARGETDEPS += ../../external/FFmpeg/libavformat/$$avLibName(avformat)
+POST_TARGETDEPS += ../../external/FFmpeg/libswscale/$$avLibName(swscale)
+POST_TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
+POST_TARGETDEPS += ../libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
+using_mheg: POST_TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
+using_live: POST_TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
+using_hdhomerun: POST_TARGETDEPS += ../libmythhdhomerun/libmythhdhomerun-$${MYTH_SHLIB_EXT}
 
 QMAKE_CXXFLAGS += $${FREETYPE_CFLAGS}
 QMAKE_LFLAGS_SHLIB += $${FREETYPE_LIBS}
@@ -347,7 +347,6 @@ using_frontend {
         SOURCES += util-opengl.cpp
         QT += opengl
     }
-    using_opengl_vsync:DEFINES += USING_OPENGL_VSYNC
 
     using_opengl_video:DEFINES += USING_OPENGL_VIDEO
     using_opengl_video:HEADERS += openglvideo.h   videoout_opengl.h
@@ -574,14 +573,12 @@ use_hidesyms {
 }
 
 mingw {
-    DEFINES -= USING_OPENGL_VSYNC
     DEFINES += USING_MINGW
 
     HEADERS += videoout_d3d.h
     SOURCES -= NuppelVideoRecorder.cpp
     SOURCES += videoout_d3d.cpp
 
-    LIBS += -lpthread
     LIBS += -lws2_32
 }
 

@@ -380,7 +380,7 @@ _extrapolate_title(NAV_TITLE *title)
         mark->number = ii;
     }
     title->chap_list.count = jj;
-    if (prev->duration == 0) {
+    if (prev != NULL && prev->duration == 0) {
         prev->duration = title->duration - prev->title_time;
     }
 }

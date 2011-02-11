@@ -2880,22 +2880,6 @@ class WatchListSettings : public TriggeredConfigurationGroup
     };
 };
 
-#ifdef USING_OPENGL_VSYNC
-/*
-static HostCheckBox *UseOpenGLVSync()
-{
-    HostCheckBox *gc = new HostCheckBox("UseOpenGLVSync");
-    gc->setLabel(QObject::tr("Enable OpenGL vertical sync for timing"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr(
-                        "If supported by your hardware/drivers, "
-                        "MythTV will use OpenGL vertical syncing for "
-                        "video timing, reducing frame jitter."));
-    return gc;
-}
-*/
-#endif
-
 static HostCheckBox *LCDShowTime()
 {
     HostCheckBox *gc = new HostCheckBox("LCDShowTime");
@@ -3403,9 +3387,6 @@ PlaybackSettings::PlaybackSettings()
 
     general1->addChild(columns);
     general1->addChild(LiveTVIdleTimeout());
-#ifdef USING_OPENGL_VSYNC
-    //general1->addChild(UseOpenGLVSync());
-#endif // USING_OPENGL_VSYNC
     addChild(general1);
 
     VerticalConfigurationGroup* general2 =

@@ -19,6 +19,7 @@ class CustomEdit : public MythScreenType
    ~CustomEdit(void);
 
    bool Create();
+   bool keyPressEvent(QKeyEvent *);
    void customEvent(QEvent *event);
 
   protected slots:
@@ -39,8 +40,8 @@ class CustomEdit : public MythScreenType
     void deleteRule(void);
 
     ProgramInfo *m_pginfo;
+    QString m_baseTitle;
 
-    int m_prevItem;
     int m_maxex;
 
     QString m_seSuffix;

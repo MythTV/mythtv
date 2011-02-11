@@ -635,6 +635,7 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
     QDateTime startedAt = QDateTime::currentDateTime();
     m_infoLock->lock();
     while ((!dlInfo->m_done) &&
+           (dlInfo->m_errorCode == QNetworkReply::NoError) &&
            (((!dlInfo->m_url.startsWith("myth://")) &&
              (dlInfo->m_lastStat.secsTo(QDateTime::currentDateTime()) < 10)) ||
             ((dlInfo->m_url.startsWith("myth://")) &&
@@ -653,7 +654,8 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
     if (!dlInfo->m_done)
     {
         dlInfo->m_syncMode = false; // Let downloadFinished() cleanup for us
-        if (dlInfo->m_reply)
+        if ((dlInfo->m_reply) &&
+            (dlInfo->m_errorCode == QNetworkReply::NoError))
             dlInfo->m_reply->abort();
     }
     else if (deleteInfo)

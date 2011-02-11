@@ -44,6 +44,7 @@ class MediaRenderer : public UPnp
         DeviceLocation *GetDefaultMaster();
         void            SetDefaultMaster( DeviceLocation *pDeviceLoc,
                                           const QString  &sPin );
+        bool initialized() { return (m_pHttpServer != NULL); }
 
 };
 

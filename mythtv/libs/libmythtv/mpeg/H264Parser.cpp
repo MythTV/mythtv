@@ -1,5 +1,6 @@
 // MythTV headers
 #include "H264Parser.h"
+#include <iostream>
 
 extern "C" {
 // from libavcodec
@@ -92,9 +93,13 @@ static const float eps = 1E-5;
 
 H264Parser::H264Parser(void)
 {
+    rbsp_buffer_size = 188 * 2;
+    rbsp_buffer = new uint8_t[rbsp_buffer_size];
+    if (rbsp_buffer == 0)
+        rbsp_buffer_size = 0;
+
     Reset();
     I_is_keyframe = true;
-    memset(&gb, 0, sizeof(gb));
 }
 
 void H264Parser::Reset(void)
@@ -144,8 +149,46 @@ void H264Parser::Reset(void)
 
     AU_offset = frame_start_offset = keyframe_start_offset = 0;
     on_frame = on_key_frame = false;
+
+    resetRBSP();
 }
 
+
+QString H264Parser::NAL_type_str(uint8_t type)
+{
+    switch (type)
+    {
+      case UNKNOWN:
+        return "UNKNOWN";
+      case SLICE:
+        return "SLICE";
+      case SLICE_DPA:
+        return "SLICE_DPA";
+      case SLICE_DPB:
+        return "SLICE_DPB";
+      case SLICE_DPC:
+        return "SLICE_DPC";
+      case SLICE_IDR:
+        return "SLICE_IDR";
+      case SEI:
+        return "SEI";
+      case SPS:
+        return "SPS";
+      case PPS:
+        return "PPS";
+      case AU_DELIMITER:
+        return "AU_DELIMITER";
+      case END_SEQUENCE:
+        return "END_SEQUENCE";
+      case END_STREAM:
+        return "END_STREAM";
+      case FILLER_DATA:
+        return "FILLER_DATA";
+      case SPS_EXT:
+        return "SPS_EXT";
+    }
+    return "OTHER";
+}
 
 bool H264Parser::new_AU(void)
 {
@@ -183,28 +226,28 @@ bool H264Parser::new_AU(void)
       one or more of the following ways.
 
       - frame_num differs in value. The value of frame_num used to
-      test this condition is the value of frame_num that appears in
-      the syntax of the slice header, regardless of whether that value
-      is inferred to have been equal to 0 for subsequent use in the
-      decoding process due to the presence of
-      memory_management_control_operation equal to 5.
+        test this condition is the value of frame_num that appears in
+        the syntax of the slice header, regardless of whether that value
+        is inferred to have been equal to 0 for subsequent use in the
+        decoding process due to the presence of
+        memory_management_control_operation equal to 5.
           Note: If the current picture is an IDR picture FrameNum and
           PrevRefFrameNum are set equal to 0.
       - pic_parameter_set_id differs in value.
       - field_pic_flag differs in value.
       - bottom_field_flag is present in both and differs in value.
-      - nal_ref_idc differs in value with one of the nal_ref_idc values
-      being equal to 0.
+      - nal_ref_idc differs in value with one of the nal_ref_idc
+        values being equal to 0.
       - pic_order_cnt_type is equal to 0 for both and either
-      pic_order_cnt_lsb differs in value, or delta_pic_order_cnt_bottom
-      differs in value.
+        pic_order_cnt_lsb differs in value, or delta_pic_order_cnt_bottom
+        differs in value.
       - pic_order_cnt_type is equal to 1 for both and either
-      delta_pic_order_cnt[0] differs in value, or
-      delta_pic_order_cnt[1] differs in value.
+        delta_pic_order_cnt[0] differs in value, or
+        delta_pic_order_cnt[1] differs in value.
       - nal_unit_type differs in value with one of the nal_unit_type values
-      being equal to 5.
+        being equal to 5.
       - nal_unit_type is equal to 5 for both and idr_pic_id differs in
-      value.
+        value.
 
       NOTE – Some of the VCL NAL units in redundant coded pictures or some
       non-VCL NAL units (e.g. an access unit delimiter NAL unit) may also
@@ -230,6 +273,9 @@ bool H264Parser::new_AU(void)
         else if ((bottom_field_flag != -1 && prev_bottom_field_flag != -1) &&
                  bottom_field_flag != prev_bottom_field_flag)
             result = true;
+        else if ((nal_ref_idc == 0 || prev_nal_ref_idc == 0) &&
+                 nal_ref_idc != prev_nal_ref_idc)
+            result = true;
         else if ((pic_order_cnt_type == 0 && prev_pic_order_cnt_type == 0) &&
                  (pic_order_cnt_lsb != prev_pic_order_cnt_lsb ||
                   delta_pic_order_cnt_bottom !=
@@ -253,6 +299,7 @@ bool H264Parser::new_AU(void)
     prev_pic_parameter_set_id = pic_parameter_set_id;
     prev_field_pic_flag = field_pic_flag;
     prev_bottom_field_flag = bottom_field_flag;
+    prev_nal_ref_idc = nal_ref_idc;
     prev_pic_order_cnt_lsb = pic_order_cnt_lsb;
     prev_delta_pic_order_cnt_bottom = delta_pic_order_cnt_bottom;
     prev_delta_pic_order_cnt[0] = delta_pic_order_cnt[0];
@@ -263,22 +310,144 @@ bool H264Parser::new_AU(void)
     return result;
 }
 
+void H264Parser::resetRBSP(void)
+{
+    rbsp_index = 0;
+    consecutive_zeros = 0;
+    have_unfinished_NAL = false;
+}
+
+bool H264Parser::fillRBSP(const uint8_t *byteP, uint32_t byte_count,
+                          bool found_start_code)
+{
+    /*
+      bitstream buffer, must be FF_INPUT_BUFFER_PADDING_SIZE
+      bytes larger then the actual data
+    */
+    uint32_t required_size = rbsp_index + byte_count +
+                             FF_INPUT_BUFFER_PADDING_SIZE;
+    if (rbsp_buffer_size < required_size)
+    {
+        // Round up to packet size
+        required_size = ((required_size / 188) + 1) * 188;
+
+        /* Need a bigger buffer */
+        uint8_t *new_buffer = new uint8_t[required_size];
+
+        if (new_buffer == NULL)
+        {
+            /* Allocation failed. Discard the new bytes */
+            std::cerr << "H264Parser::fillRBSP: "
+                      << "FAILED to allocate RBSP buffer!\n";
+            return false;
+        }
+
+        /* Copy across bytes from old buffer */
+        memcpy(new_buffer, rbsp_buffer, rbsp_index);
+        delete [] rbsp_buffer;
+        rbsp_buffer = new_buffer;
+        rbsp_buffer_size = required_size;
+    }
+
+    /* Fill rbsp while we have data */
+    while (byte_count)
+    {
+        /* Copy the byte into the rbsp, unless it
+         * is the 0x03 in a 0x000003 */
+        if (consecutive_zeros < 2 || *byteP != 0x03)
+            rbsp_buffer[rbsp_index++] = *byteP;
+
+        if (*byteP == 0)
+            ++consecutive_zeros;
+        else
+            consecutive_zeros = 0;
+
+        ++byteP;
+        --byte_count;
+    }
+
+    /* If we've found the next start code then that, plus the first byte of
+     * the next NAL, plus the preceding zero bytes will all be in the rbsp
+     * buffer. Move rbsp_index++ back to the end of the actual rbsp data. We
+     * need to know the correct size of the rbsp to decode some NALs. */
+    if (found_start_code)
+    {
+        if (rbsp_index >= 4)
+        {
+            rbsp_index -= 4;
+            while (rbsp_index > 0 && rbsp_buffer[rbsp_index-1] == 0)
+                --rbsp_index;
+        }
+        else
+        {
+            /* This should never happen. */
+            std::cerr << "H264Parser::fillRBSP: "
+                      << "Found start code, rbsp_index is "
+                      << rbsp_index << " but it should be >4\n";
+        }
+    }
+
+    /* Stick some 0xff on the end for get_bits to run into */
+    memset(&rbsp_buffer[rbsp_index], 0xff, FF_INPUT_BUFFER_PADDING_SIZE);
+    return true;
+}
+
 uint32_t H264Parser::addBytes(const uint8_t  *bytes,
                               const uint32_t  byte_count,
                               const uint64_t  stream_offset)
 {
-    const uint8_t *byteP = bytes;
-    const uint8_t *endP = bytes + byte_count;
-    uint8_t        first_byte;
+    const uint8_t *startP = bytes;
+    const uint8_t *endP;
+    bool           found_start_code;
 
-    state_changed = is_keyframe = false;
+    state_changed = false;
+    on_frame      = false;
+    on_key_frame  = false;
 
-    while (byteP < endP)
+    while (startP < bytes + byte_count && !on_frame)
     {
-        byteP = ff_find_start_code(byteP, endP, &sync_accumulator);
+        endP = ff_find_start_code(startP,
+                                  bytes + byte_count, &sync_accumulator);
 
-        if ((sync_accumulator & 0xffffff00) == 0x00000100)
+        found_start_code = ((sync_accumulator & 0xffffff00) == 0x00000100);
+
+        /* Between startP and endP we potentially have some more
+         * bytes of a NAL that we've been parsing (plus some bytes of
+         * start code) */
+        if (have_unfinished_NAL)
         {
+            if (!fillRBSP(startP, endP - startP, found_start_code))
+            {
+                resetRBSP();
+                return endP - bytes;
+            }
+            processRBSP(found_start_code); /* Call may set have_uinfinished_NAL
+                                            * to false */
+        }
+
+        /* Dealt with everything up to endP */
+        startP = endP;
+
+        if (found_start_code)
+        {
+            if (have_unfinished_NAL)
+            {
+                /* We've found a new start code, without completely
+                 * parsing the previous NAL. Either there's a
+                 * problem with the stream or with this parser.
+                 */
+                std::cerr << "H264Parser::addBytes: Found new start code, "
+                          << "but previous NAL is incomplete!\n";
+            }
+
+            /* Prepare for accepting the new NAL */
+            resetRBSP();
+
+            /* If we find the start of an AU somewhere from here
+             * to the next start code, the offset to associate with
+             * it is the one passed in to this call, not any of the
+             * subsequent calls. */
+            pkt_offset = stream_offset; // + (startP - bytes);
 /*
   nal_unit_type specifies the type of RBSP data structure contained in
   the NAL unit as specified in Table 7-1. VCL NAL units
@@ -299,92 +468,104 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
   10 End of sequence end_of_seq_rbsp( )
   11 End of stream end_of_stream_rbsp( )
 */
-            first_byte = *(byteP - 1);
-            nal_unit_type = first_byte & 0x1f;
-            nal_ref_idc = (first_byte >> 5) & 0x3;
+            nal_unit_type = sync_accumulator & 0x1f;
+            nal_ref_idc = (sync_accumulator >> 5) & 0x3;
 
             if (nal_unit_type == SPS || nal_unit_type == PPS ||
                 nal_unit_type == SEI || NALisSlice(nal_unit_type))
             {
-                /*
-                  bitstream buffer, must be FF_INPUT_BUFFER_PADDING_SIZE
-                  bytes larger then the actual read bits
-                */
-                if (byteP + 1 + FF_INPUT_BUFFER_PADDING_SIZE < endP)
-                {
-                    init_get_bits(&gb, byteP, 8 * (endP - byteP));
-
-                    if (nal_unit_type == SEI)
-                    {
-                        decode_SEI(&gb);
-                        set_AU_pending(stream_offset);
-                    }
-                    else if (nal_unit_type == SPS)
-                    {
-                        decode_SPS(&gb);
-                        set_AU_pending(stream_offset);
-                    }
-                    else if (nal_unit_type == PPS)
-                    {
-                        decode_PPS(&gb);
-                        set_AU_pending(stream_offset);
-                    }
-                    else
-                    {
-                        decode_Header(&gb);
-                        if (new_AU())
-                            set_AU_pending(stream_offset);
-                    }
-
-                    byteP += (get_bits_count(&gb) / 8);
-                }
+                /* This is a NAL we need to parse. We may have the body
+                 * of it in the part of the stream past to us this call,
+                 * or we may get the rest in subsequent calls to addBytes.
+                 * Either way, we set have_unfinished_NAL, so that we
+                 * start filling the rbsp buffer */
+                have_unfinished_NAL = true;
             }
-            else if (!AU_pending)
-            {
-                if (nal_unit_type == AU_DELIMITER ||
+            else if (nal_unit_type == AU_DELIMITER ||
                     (nal_unit_type > SPS_EXT &&
                      nal_unit_type < AUXILIARY_SLICE))
-                {
-                    AU_pending = true;
-                    AU_offset = stream_offset;
-                }
-                else if ((nal_ref_idc == 0 || prev_nal_ref_idc == 0) &&
-                         nal_ref_idc != prev_nal_ref_idc)
-                {
-                    AU_pending = true;
-                    AU_offset = stream_offset;
-                }
-            }
-
-            if (AU_pending && NALisSlice(nal_unit_type))
             {
-                /* Once we know the slice type of a new AU, we can
-                 * determine if it is a keyframe or just a frame */
-
-                AU_pending = false;
-                state_changed = true;
-
-                on_frame = true;
-                frame_start_offset = AU_offset;
-
-                if (is_keyframe)
-                {
-                    on_key_frame = true;
-                    keyframe_start_offset = AU_offset;
-                }
-                else
-                    on_key_frame = false;
+                set_AU_pending();
             }
-            else
-                on_frame = on_key_frame = false;
-
-            prev_nal_ref_idc = nal_ref_idc;
-
-            return byteP - bytes;
         }
     }
 
-    return byteP - bytes;
+    return startP - bytes;
+}
+
+
+void H264Parser::processRBSP(bool rbsp_complete)
+{
+    GetBitContext gb;
+
+    init_get_bits(&gb, rbsp_buffer, 8 * rbsp_index);
+
+    if (nal_unit_type == SEI)
+    {
+        /* SEI cannot be parsed without knowing its size. If
+         * we haven't got the whole rbsp, return and wait for
+         * the rest */
+        if (!rbsp_complete)
+            return;
+
+        set_AU_pending();
+
+        decode_SEI(&gb);
+    }
+    else if (nal_unit_type == SPS)
+    {
+        /* Best wait until we have the whole thing */
+        if (!rbsp_complete)
+            return;
+
+        set_AU_pending();
+
+        decode_SPS(&gb);
+    }
+    else if (nal_unit_type == PPS)
+    {
+        /* Best wait until we have the whole thing */
+        if (!rbsp_complete)
+            return;
+
+        set_AU_pending();
+
+        decode_PPS(&gb);
+    }
+    else
+    {
+        /* Need only parse the header. So return only
+         * if we have insufficient bytes */
+        if (!rbsp_complete && rbsp_index < MAX_SLICE_HEADER_SIZE)
+            return;
+
+        decode_Header(&gb);
+
+        if (new_AU())
+            set_AU_pending();
+    }
+
+    /* If we got this far, we managed to parse a sufficient
+     * prefix of the current NAL. We can go onto the next. */
+    have_unfinished_NAL = false;
+
+    if (AU_pending && NALisSlice(nal_unit_type))
+    {
+        /* Once we know the slice type of a new AU, we can
+         * determine if it is a keyframe or just a frame */
+
+        AU_pending = false;
+        state_changed = true;
+
+        on_frame = true;
+        frame_start_offset = AU_offset;
+
+        if (is_keyframe || au_contains_keyframe_message)
+        {
+            on_key_frame = true;
+            keyframe_start_offset = AU_offset;
+        }
+    }
 }
 
 /*
@@ -394,9 +575,11 @@ bool H264Parser::decode_Header(GetBitContext *gb)
 {
     uint first_mb_in_slice;
 
+    is_keyframe = false;
+
     if (log2_max_frame_num == 0 || pic_order_present_flag == -1)
     {
-        // SPS or PPS has not been parsed yet
+        /* SPS or PPS has not been parsed yet */
         return false;
     }
 
@@ -600,7 +783,14 @@ void H264Parser::decode_SPS(GetBitContext * gb)
         {
             for (int idx = 0; idx < ((chroma_format_idc != 3) ? 8 : 12); ++idx)
             {
-                get_bits1(gb);  // scaling_list
+                if (get_bits1(gb)) // Scaling list presnent
+                {
+                    int sl_n = ((idx < 6) ? 16 : 64);
+                    for(int sl_i = 0; sl_i < sl_n; sl_i++)
+                    {
+                        get_se_golomb(gb);
+                    }
+                }
             }
         }
     }
@@ -838,30 +1028,34 @@ void H264Parser::decode_SEI(GetBitContext *gb)
 
     int type = 0, size = 0;
 
-    do {
-        type += show_bits(gb, 8);
-    } while (get_bits(gb, 8) == 255);
-
-    do {
-        size += show_bits(gb, 8);
-    } while (get_bits(gb, 8) == 255);
-
-    switch (type)
+    /* A message requires at least 2 bytes, and then
+     * there's the stop bit plus alignment, so there
+     * can be no message in less than 24 bits */
+    while (get_bits_left(gb) >= 24)
     {
-        case SEI_TYPE_RECOVERY_POINT:
-            recovery_frame_cnt = get_ue_golomb(gb);
-            exact_match_flag = get_bits1(gb);
-            broken_link_flag = get_bits1(gb);
-            changing_group_slice_idc = get_bits(gb, 2);
-            is_keyframe |= (recovery_frame_cnt >= 0);
-            return;
+        do {
+            type += show_bits(gb, 8);
+        } while (get_bits(gb, 8) == 255);
 
-        default:
-            skip_bits(gb, size * 8);
-            break;
+        do {
+            size += show_bits(gb, 8);
+        } while (get_bits(gb, 8) == 255);
+
+        switch (type)
+        {
+            case SEI_TYPE_RECOVERY_POINT:
+                recovery_frame_cnt = get_ue_golomb(gb);
+                exact_match_flag = get_bits1(gb);
+                broken_link_flag = get_bits1(gb);
+                changing_group_slice_idc = get_bits(gb, 2);
+                au_contains_keyframe_message = (recovery_frame_cnt == 0);
+                return;
+
+            default:
+                skip_bits(gb, size * 8);
+                break;
+        }
     }
-
-    align_get_bits(gb);
 }
 
 void H264Parser::vui_parameters(GetBitContext * gb)
@@ -1015,7 +1209,7 @@ void H264Parser::vui_parameters(GetBitContext * gb)
 
 uint H264Parser::frameRate(void) const
 {
-    uint64_t	num;
+    uint64_t    num;
     uint64_t    fps;
 
     num   = 500 * (uint64_t)timeScale; /* 1000 * 0.5 */
