@@ -1004,19 +1004,23 @@ bool MythRenderOpenGL::UpdateTextureVertices(uint tex, const QRect *src,
         return false;
 
     GLfloat *data = m_textures[tex].m_vertex_data;
+    QSize    size = m_textures[tex].m_size;
+
+    int width  = std::min(src->width(),  size.width());
+    int height = std::min(src->height(), size.height());
 
     data[0 + TEX_OFFSET] = src->left();
-    data[1 + TEX_OFFSET] = src->top() + src->height();
+    data[1 + TEX_OFFSET] = src->top() + height;
 
-    data[6 + TEX_OFFSET] = src->left() + src->width();
+    data[6 + TEX_OFFSET] = src->left() + width;
     data[7 + TEX_OFFSET] = src->top();
 
     if (!IsRectTexture(m_textures[tex].m_type))
     {
-        data[0 + TEX_OFFSET] /= (float)m_textures[tex].m_size.width();
-        data[6 + TEX_OFFSET] /= (float)m_textures[tex].m_size.width();
-        data[1 + TEX_OFFSET] /= (float)m_textures[tex].m_size.height();
-        data[7 + TEX_OFFSET] /= (float)m_textures[tex].m_size.height();
+        data[0 + TEX_OFFSET] /= (float)size.width();
+        data[6 + TEX_OFFSET] /= (float)size.width();
+        data[1 + TEX_OFFSET] /= (float)size.height();
+        data[7 + TEX_OFFSET] /= (float)size.height();
     }
 
     data[2 + TEX_OFFSET] = data[0 + TEX_OFFSET];
@@ -1026,8 +1030,8 @@ bool MythRenderOpenGL::UpdateTextureVertices(uint tex, const QRect *src,
 
     data[2] = data[0] = dst->left();
     data[5] = data[1] = dst->top();
-    data[4] = data[6] = dst->left() + std::min(src->width(), dst->width());
-    data[3] = data[7] = dst->top() + std::min(src->height(), dst->height());
+    data[4] = data[6] = dst->left() + std::min(width, dst->width());
+    data[3] = data[7] = dst->top()  + std::min(height, dst->height());
 
     return true;
 }
