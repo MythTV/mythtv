@@ -831,7 +831,8 @@ void NetTree::showWebVideo()
         if (url.isEmpty())
             return;
 
-        if (!item->GetMediaURL().isEmpty() && item->GetMediaURL() != url)
+        if (!item->GetMediaURL().startsWith("mythflash") &&
+            !item->GetMediaURL().isEmpty() && item->GetMediaURL() != url)
         {
             VERBOSE(VB_GENERAL, QString("Trying to use internal player for %1").arg(item->GetMediaURL()));
             GetMythMainWindow()->HandleMedia("Internal", item->GetMediaURL());
