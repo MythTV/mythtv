@@ -368,8 +368,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
 
         while (true)
         {
-            if (qApp->hasPendingEvents())
-                qApp->processEvents();
+            qApp->processEvents();
 
             TVState state = tv->GetState(0);
             if ((kState_Error == state) || (kState_None == state))
