@@ -1,4 +1,8 @@
 void strings_null() {
+    ThemeUI::tr("Internet Video Browser");
+    ThemeUI::tr("No sites configured!");
+    ThemeUI::tr("Videos - Gallery");
+    ThemeUI::tr("Videos - Tree");
     ThemeUI::tr("%DATE%, %TIME%");
     ThemeUI::tr("No search scripts found!  This usually indicates missing prerequisites.");
     ThemeUI::tr("Page %1");

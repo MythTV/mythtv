@@ -1,4 +1,7 @@
 void strings_null() {
+    ThemeUI::tr("Bookmark Manager");
+    ThemeUI::tr("Cancel");
+    ThemeUI::tr("OK");
     ThemeUI::tr("%DATE%, %TIME%");
     ThemeUI::tr("Edit RSS News Feeds");
     ThemeUI::tr("You can edit the name, URL, and icon path for the selected RSS Feed on this screen.  You can also designate the item as a podcast.\n\nWhen you have finished editing, select \"OK\" or \"Cancel\" to continue.");
@@ -8,8 +11,6 @@ void strings_null() {
     ThemeUI::tr("Podcast:");
     ThemeUI::tr("Genre:");
     ThemeUI::tr("Channel:");
-    ThemeUI::tr("Cancel");
-    ThemeUI::tr("OK");
     ThemeUI::tr("News Subscriptions");
     ThemeUI::tr("Choose the news sites you would like to read.");
     ThemeUI::tr("News Feeds");
