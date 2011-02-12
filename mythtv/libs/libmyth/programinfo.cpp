@@ -3327,6 +3327,39 @@ void ProgramInfo::SaveFrameRate(uint64_t frame, uint framerate)
 }
 
 
+/// \brief Store the Total Duration at frame 0 in the recordedmarkup table
+void ProgramInfo::SaveTotalDuration(int64_t duration)
+{
+    if (!IsRecording())
+        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("DELETE FROM recordedmarkup "
+                  " WHERE chanid=:CHANID "
+                  " AND starttime=:STARTTIME "
+                  " AND type=:TYPE");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+    query.bindValue(":TYPE", MARK_DURATION_MS);
+
+    if (!query.exec())
+        MythDB::DBError("Duration delete", query);
+
+    query.prepare("INSERT INTO recordedmarkup"
+                  "    (chanid, starttime, mark, type, data)"
+                  "    VALUES"
+                  " ( :CHANID, :STARTTIME, 0, :TYPE, :DATA);");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+    query.bindValue(":TYPE", MARK_DURATION_MS);
+    query.bindValue(":DATA", (uint)(duration / 1000));
+
+    if (!query.exec())
+        MythDB::DBError("Duration insert", query);
+}
+
+
 /// \brief Store the Resolution at frame in the recordedmarkup table
 /// \note  All frames until the next one with a stored resolution
 ///        are assumed to have the same resolution
@@ -3425,6 +3458,16 @@ uint ProgramInfo::QueryAverageFrameRate(void) const
 {
     return load_markup_datum(MARK_VIDEO_RATE, chanid, recstartts);
 }
+
+/** \brief If present in recording this loads total duration of the
+ *         main video stream from database's stream markup table.
+ */
+int64_t ProgramInfo::QueryTotalDuration(void) const
+{
+    int64_t msec = load_markup_datum(MARK_DURATION_MS, chanid, recstartts);
+    return msec * 1000;
+}
+
 
 void ProgramInfo::SaveResolutionProperty(VideoProperty vid_flags)
 {

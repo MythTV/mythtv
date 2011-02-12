@@ -1171,4 +1171,12 @@ int to_track_type(const QString &str)
     return ret;
 }
 
+void DecoderBase::SaveTotalDuration(void)
+{
+    if (!m_playbackinfo || !totalDuration)
+        return;
+
+    m_playbackinfo->SaveTotalDuration(totalDuration);
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

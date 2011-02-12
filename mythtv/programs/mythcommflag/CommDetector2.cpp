@@ -599,6 +599,8 @@ bool CommDetector2::go(void)
         QTime passTime, clock;
         struct timeval getframetime;
 
+        player->ResetTotalDuration();
+
         if (searchingForLogo(logoFinder, *currentPass))
             emit statusUpdate(QObject::tr("Performing Logo Identification"));
 
@@ -715,6 +717,11 @@ bool CommDetector2::go(void)
 
             player->DiscardVideoFrame(currentFrame);
         }
+
+        // Save total duration only on the last pass, which hopefully does
+        // no skipping.
+        if (passno + 1 == npasses)
+            player->SaveTotalDuration();
 
         currentPass->insert(currentPass->end(),
                             finishedAnalyzers.begin(),

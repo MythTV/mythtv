@@ -178,6 +178,8 @@ bool MythCommFlagPlayer::RebuildSeekTable(
         fflush( stdout );
     }
 
+    SaveTotalDuration();
+
     SetPlaying(false);
     killdecoder = true;
 

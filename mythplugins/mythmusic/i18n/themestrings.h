@@ -1,4 +1,7 @@
 void strings_null() {
+    ThemeUI::tr("Playing:");
+    ThemeUI::tr("None");
+    ThemeUI::tr("%TITLE%  by  %ARTIST%");
     ThemeUI::tr("Please Wait...");
     ThemeUI::tr("Track Information");
     ThemeUI::tr("Compilation:");
@@ -54,7 +57,6 @@ void strings_null() {
     ThemeUI::tr("Import Files");
     ThemeUI::tr("Scan");
     ThemeUI::tr("Cover Art");
-    ThemeUI::tr("All ready in database");
     ThemeUI::tr("Import CD");
     ThemeUI::tr("Artist");
     ThemeUI::tr("Album");

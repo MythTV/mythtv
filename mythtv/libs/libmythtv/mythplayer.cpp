@@ -340,8 +340,8 @@ bool MythPlayer::Pause(void)
     next_normal_speed = false;
     PauseVideo();
     audio.Pause(true);
-    PauseBuffer();
     PauseDecoder();
+    PauseBuffer();
     allpaused = decoderPaused && videoPaused && bufferPaused;
     {
         QMutexLocker locker(&decoder_change_lock);
@@ -4342,7 +4342,7 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
 
     int playbackLen = totalDuration;
 
-    if (totalDuration == 0 || interactiveTV || noVideoTracks)
+    if (totalDuration == 0 || noVideoTracks)
         playbackLen = totalLength;
 
     if (livetv && player_ctx->tvchain)
@@ -4361,7 +4361,7 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
         islive = true;
     }
 
-    float secsplayed = (interactiveTV || noVideoTracks) ?
+    float secsplayed = noVideoTracks ? 
         (float)(framesPlayed / video_frame_rate) :
         (float)(disp_timecode / 1000.f);
 
@@ -4677,6 +4677,22 @@ void MythPlayer::SetOSDStatus(const QString &title, OSDTimeout timeout)
     info.text.insert("title", title);
     osd->SetText("osd_status", info.text, timeout);
     osd->SetValues("osd_status", info.values, timeout);
+}
+
+void MythPlayer::SaveTotalDuration(void)
+{
+    if (!decoder)
+        return;
+
+    decoder->SaveTotalDuration();
+}
+
+void MythPlayer::ResetTotalDuration(void)
+{
+    if (!decoder)
+        return;
+
+    decoder->ResetTotalDuration();
 }
 
 static unsigned dbg_ident(const MythPlayer *player)

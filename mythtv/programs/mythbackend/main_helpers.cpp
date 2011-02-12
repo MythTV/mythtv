@@ -303,15 +303,6 @@ void log_rotate_handler(int)
     log_rotate(0);
 }
 
-void upnp_rebuild(int)
-{
-    if (gCoreContext->IsMasterHost())
-    {
-        g_pUPnp->RebuildMediaMap();
-    }
-
-}
-
 void showUsage(const MythCommandLineParser &cmdlineparser, const QString &version)
 {
     QString    help  = cmdlineparser.GetHelpString(false);
@@ -430,10 +421,7 @@ int handle_command(const MythCommandLineParser &cmdline)
 
     if (cmdline.WantUPnPRebuild())
     {
-        VERBOSE(VB_GENERAL, "Rebuilding UPNP Media Map");
-
-        UPnpMedia *rebuildit = new UPnpMedia(false,false);
-        rebuildit->BuildMediaMap();
+        VERBOSE(VB_GENERAL, "Rebuilding UPNP Media Map is no longer supported.  Rescan videos using MythVideo.");
 
         return BACKEND_EXIT_OK;
     }
@@ -768,12 +756,6 @@ int run_backend(const MythCommandLineParser &cmdline)
         httpStatus = new HttpStatus(&tvList, sched, expirer, ismaster);
         if (httpStatus)
             pHS->RegisterExtension(httpStatus);
-    }
-
-    if (ismaster)
-    {
-        // kill -USR1 mythbackendpid will force a upnpmedia rebuild
-        signal(SIGUSR1, &upnp_rebuild);
     }
 
     VERBOSE(VB_IMPORTANT, QString("Enabled verbose msgs: %1")
