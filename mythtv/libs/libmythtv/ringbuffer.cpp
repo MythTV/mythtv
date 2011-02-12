@@ -932,6 +932,14 @@ bool RingBuffer::WaitForAvail(int count)
     int avail = ReadBufAvail();
     count = (ateof && avail < count) ? avail : count;
 
+    if (livetvchain && setswitchtonext && avail < count)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "Checking to see if there's a "
+                              "new livetv program to switch to..");
+        livetvchain->ReloadAll();
+        return false;
+    }
+
     MythTimer t;
     t.start();
     while ((avail < count) && !stopreads &&
@@ -941,7 +949,7 @@ bool RingBuffer::WaitForAvail(int count)
         generalWait.wait(&rwlock, 250);
         avail = ReadBufAvail();
 
-        if ((ateof || setswitchtonext) && avail < count)
+        if (ateof && avail < count)
             count = avail;
 
         if (avail < count)
@@ -960,28 +968,13 @@ bool RingBuffer::WaitForAvail(int count)
                         " seconds for data \n\t\t\tto become available..." +
                         QString(" %2 < %3")
                         .arg(avail).arg(count));
-                if (livetvchain)
-                {
-                    VERBOSE(VB_IMPORTANT, "Checking to see if there's a "
-                                          "new livetv program to switch to..");
-                    livetvchain->ReloadAll();
-                }
             }
 
-            bool quit = livetvchain && (livetvchain->NeedsToSwitch() ||
-                                        livetvchain->NeedsToJump() ||
-                                        setswitchtonext);
-
-            if (elapsed > 16000 || quit)
+            if (elapsed > 16000)
             {
-                if (!quit)
-                    VERBOSE(VB_IMPORTANT, LOC_ERR + "Waited " +
-                            QString("%1").arg(elapsed/1000) +
-                            " seconds for data, aborting.");
-                else
-                    VERBOSE(VB_IMPORTANT, LOC + "Timing out wait due to "
-                            "impending livetv switch.");
-
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Waited " +
+                        QString("%1").arg(elapsed/1000) +
+                        " seconds for data, aborting.");
                 return false;
             }
         }
