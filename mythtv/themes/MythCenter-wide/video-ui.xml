@@ -1478,7 +1478,7 @@
             <value>Blu-ray Region:</value>
         </textarea>
 
-        <buttonlist name="bluraymount" from="basewideselector">
+        <buttonlist name="blurayregionlist" from="basewideselector">
             <position>550,375</position>
         </buttonlist>
 
