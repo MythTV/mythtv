@@ -2766,7 +2766,7 @@ void MythPlayer::DecoderLoop(bool pause)
         DecoderPauseCheck();
 
         decoder_change_lock.lock();
-        if (decoder)
+        if (gCoreContext->GetNumSetting("AudioOnlyPlayback", false) && decoder)
             noVideoTracks = !decoder->GetTrackCount(kTrackTypeVideo);
         decoder_change_lock.unlock();
 
