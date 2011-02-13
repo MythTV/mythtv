@@ -121,8 +121,8 @@ RingBuffer *RingBuffer::Create(
     bool is_dvd = false;
     bool is_bd  = false;
 
-    if (lfilename.startsWith("http://") || lfilename.startsWith("rtmp://") ||
-        lfilename.startsWith("rtmpe://") || lfilename.startsWith("rtmpt://"))
+    if (lfilename.startsWith("http://") ||
+        lfilename.contains(QRegExp("^rtmp.?://")))
     {
         return new StreamingRingBuffer(lfilename);
     }

@@ -784,7 +784,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
          && !mrl.startsWith("bd:")
          && !mrl.startsWith("myth:")
          && !mrl.startsWith("http:")
-         && !mrl.startsWith("rtmp")))
+         && !mrl.contains(QRegExp("^rtmp.?://"))))
     {
         QString errorText = QObject::tr("Failed to open \n '%1' in %2 \n"
                                         "Check if the video exists")
