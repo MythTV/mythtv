@@ -2120,10 +2120,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             (db_use_fixed_size) ? player_bounds.size() :
             QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
         mainWindow->setGeometry(player_bounds);
-
-        // hide the GUI paint window
         GetMythMainWindow()->GetPaintWindow()->hide();
-        qApp->processEvents();
     }
 
     VERBOSE(VB_PLAYBACK, LOC +
