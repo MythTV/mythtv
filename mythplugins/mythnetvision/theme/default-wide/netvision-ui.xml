@@ -104,7 +104,7 @@
     </textarea>
 
       <textarea name="description" from="basetextarea">
-          <area>260,420,970,115</area>
+          <area>260,420,970,215</area>
           <multiline>true</multiline>
           <template>Description: %1</template>
       </textarea>
