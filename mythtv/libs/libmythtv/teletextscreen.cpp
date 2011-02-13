@@ -68,6 +68,7 @@ void TeletextScreen::CleanUp(void)
     for (int i = 0; i < m_rowImages.size(); i++)
         delete m_rowImages.value(i);
     m_rowImages.clear();
+    SetRedraw();
 }
 
 QImage* TeletextScreen::GetRowImage(int row, QRect &rect)

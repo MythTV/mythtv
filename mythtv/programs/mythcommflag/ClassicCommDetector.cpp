@@ -397,6 +397,8 @@ bool ClassicCommDetector::go()
 
     emit breathe();
 
+    player->ResetTotalDuration();
+
     while (!player->GetEof())
     {
         struct timeval startTime;

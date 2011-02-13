@@ -867,7 +867,7 @@ void MythXML::GetVideoArt( HTTPRequest *pRequest )
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT coverart FROM upnpmedia WHERE intid = :ITEMID");
+    query.prepare("SELECT coverfile FROM videometadata WHERE intid = :ITEMID");
     query.bindValue(":ITEMID", sId);
 
     if (!query.exec())
@@ -889,6 +889,24 @@ void MythXML::GetVideoArt( HTTPRequest *pRequest )
         pRequest->m_sFileName = sFileName;
         return;
     }
+
+    // ----------------------------------------------------------------------
+    // Not there? Perhaps we need to look in a storage group?
+    // ----------------------------------------------------------------------
+    StorageGroup sgroup("Coverart");
+    sFileName = sgroup.FindRecordingFile( sFileName );
+
+    if (sFileName != "")
+    {
+        VERBOSE(VB_IMPORTANT, QString("Found coverart '%1'").arg(sFileName));
+
+        pRequest->m_eResponseType   = ResponseTypeFile;
+        pRequest->m_nResponseStatus = 200;
+        pRequest->m_sFileName = sFileName;
+        return;
+    }
+
+    VERBOSE(VB_IMPORTANT, QString("Not found '%1'").arg(sFileName));
 
 }
 
@@ -1752,8 +1770,6 @@ void MythXML::GetVideo( HttpWorkerThread *pThread,
 
     if (pData == NULL)
     {
-        QString sBasePath = "";
-
         // ------------------------------------------------------------------
         // Load Track's FileName
         // ------------------------------------------------------------------
@@ -1762,7 +1778,7 @@ void MythXML::GetVideo( HttpWorkerThread *pThread,
 
         if (query.isConnected())
         {
-            query.prepare("SELECT filepath FROM upnpmedia WHERE intid = :KEY" );
+            query.prepare("SELECT filename FROM videometadata WHERE intid = :KEY" );
             query.bindValue(":KEY", sId );
 
             if (!query.exec())
@@ -1773,8 +1789,15 @@ void MythXML::GetVideo( HttpWorkerThread *pThread,
 
             if (query.next())
             {
-                pRequest->m_sFileName = QString( "%1/%2" ).arg( sBasePath )
-                                        .arg( query.value(0).toString() );
+                QString sFileName = query.value(0).toString();
+
+                if (!QFile::exists( sFileName ))
+                {
+                    StorageGroup sgroup("Videos");
+                    sFileName = sgroup.FindRecordingFile( sFileName );
+                }
+
+                pRequest->m_sFileName = sFileName;
             }
         }
 

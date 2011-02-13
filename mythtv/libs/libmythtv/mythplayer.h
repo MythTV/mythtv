@@ -291,6 +291,9 @@ class MPUBLIC MythPlayer
     // Public picture controls
     void ToggleStudioLevels(void);
 
+    void SaveTotalDuration(void);
+    void ResetTotalDuration(void);
+
   protected:
     // Initialization
     void OpenDummy(void);

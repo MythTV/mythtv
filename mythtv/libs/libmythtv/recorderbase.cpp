@@ -376,5 +376,12 @@ void RecorderBase::FrameRateChange(uint framerate, long long frame)
         curRecording->SaveFrameRate(frame, framerate);
 }
 
+void RecorderBase::SetDuration(uint64_t duration)
+{
+    if (curRecording)
+        curRecording->SaveTotalDuration(duration);
+}
+
+
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -12,7 +12,7 @@ void strings_null() {
     ThemeUI::tr("Temperature:  %1");
     ThemeUI::tr("Chance of Precipitation:  %1");
     ThemeUI::tr("Weather Screen Settings");
-    ThemeUI::tr("This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.\n\nWhen you are done configuring the Weather Plugin, click \"Finish\" to continue.");
+    ThemeUI::tr("This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.\n\nWhen you are done configuring the weather plugin, click \"Finish\" to continue.");
     ThemeUI::tr("Retrieve data in background:");
     ThemeUI::tr("Seconds to display each page:");
     ThemeUI::tr("OK");
@@ -50,7 +50,7 @@ void strings_null() {
     ThemeUI::tr("Wind Direction:");
     ThemeUI::tr("Visibility:");
     ThemeUI::tr("Feels Like:");
-    ThemeUI::tr("General weather plugin options");
+    ThemeUI::tr("General weather options");
     ThemeUI::tr("Screen Settings");
     ThemeUI::tr("Choose which weather forecasts to display");
     ThemeUI::tr("Source Settings");

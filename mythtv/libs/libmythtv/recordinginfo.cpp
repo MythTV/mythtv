@@ -1057,6 +1057,11 @@ void RecordingInfo::FinishedRecording(bool prematurestop)
     {
         recstatus = rsRecorded;
 
+        uint starttime = recstartts.toTime_t();
+        uint endtime   = recendts.toTime_t();
+        int64_t duration = ((int64_t)endtime - (int64_t)starttime) * 1000000;
+        SaveTotalDuration(duration);
+
         QString msg = "Finished recording";
         QString msg_subtitle = subtitle.isEmpty() ? "" :
                                         QString(" \"%1\"").arg(subtitle);
