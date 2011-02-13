@@ -139,8 +139,10 @@ void MythRenderOpenGL::makeCurrent()
 void MythRenderOpenGL::doneCurrent()
 {
     m_lock_level--;
+#ifndef Q_OS_WIN32
     if (m_lock_level == 0)
         QGLContext::doneCurrent();
+#endif
     if (m_lock_level < 0)
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Mis-matched calls to makeCurrent()");
     m_lock->unlock();
@@ -891,24 +893,27 @@ void MythRenderOpenGL::DrawBitmap(uint tex, uint target, const QRect *src,
         prog = 0;
 
     double srcx1, srcx2, srcy1, srcy2;
+    QSize  size = m_textures[tex].m_size;
+    int width   = std::min(src->width(), size.width());
+    int height  = std::min(src->height(), size.height());
 
     if (tex && !IsRectTexture(m_textures[tex].m_type))
     {
-        srcx1 = src->x() / (double)m_textures[tex].m_size.width();
-        srcx2 = srcx1 + src->width() / (double)m_textures[tex].m_size.width();
-        srcy1 = src->y() / (double)m_textures[tex].m_size.height();
-        srcy2 = srcy1 + src->height() / (double)m_textures[tex].m_size.height();
+        srcx1 = src->x() / (double)size.width();
+        srcx2 = srcx1 + width / (double)size.width();
+        srcy1 = src->y() / (double)size.height();
+        srcy2 = srcy1 + height / (double)size.height();
     }
     else
     {
         srcx1 = src->x();
-        srcx2 = srcx1 + src->width();
+        srcx2 = srcx1 + width;
         srcy1 = src->y();
-        srcy2 = srcy1 + src->height();
+        srcy2 = srcy1 + height;
     }
 
-    int width = std::min(src->width(), dst->width());
-    int height = std::min(src->height(), dst->height());
+    width = std::min(width, dst->width());
+    height = std::min(height, dst->height());
 
     makeCurrent();
 
