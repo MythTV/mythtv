@@ -151,7 +151,7 @@ void MythFEXML::GetScreenShot(HTTPRequest *pRequest)
 
 void MythFEXML::SendMessage(HTTPRequest *pRequest)
 {
-    pRequest->m_eResponseType = ResponseTypeNone;
+    pRequest->m_eResponseType = ResponseTypeHTML;
     QString sText = pRequest->m_mapParams[ "text" ];
     VERBOSE(VB_GENERAL, QString("UPNP message: ") + sText);
 
@@ -162,7 +162,7 @@ void MythFEXML::SendMessage(HTTPRequest *pRequest)
 
 void MythFEXML::SendAction(HTTPRequest *pRequest)
 {
-    pRequest->m_eResponseType = ResponseTypeNone;
+    pRequest->m_eResponseType = ResponseTypeHTML;
     QString sText = pRequest->m_mapParams["action"];
     VERBOSE(VB_UPNP, QString("UPNP Action: ") + sText);
 
