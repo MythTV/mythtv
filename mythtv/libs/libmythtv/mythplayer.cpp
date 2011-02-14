@@ -966,7 +966,7 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
     decoder->setWatchingRecording(watchingrecording);
     decoder->setTranscoding(transcoding);
     CheckExtraAudioDecode();
-    //noVideoTracks = !decoder->GetTrackCount(kTrackTypeVideo);
+    noVideoTracks = !decoder->GetTrackCount(kTrackTypeVideo);
 
 
     decoderEof = false;
@@ -2073,7 +2073,7 @@ void MythPlayer::VideoStart(void)
 
 bool MythPlayer::VideoLoop(void)
 {
-    if (videoPaused || isDummy || noVideoTracks)
+    if (videoPaused || isDummy /*|| noVideoTracks*/)
     {
         usleep(frame_interval);
         DisplayPauseFrame();
@@ -2529,7 +2529,7 @@ void MythPlayer::EventLoop(void)
 
     // Disable rewind if we are too close to the beginning of the buffer
     if (CalcRWTime(-ffrew_skip) > 0 &&
-       (!noVideoTracks && (framesPlayed <= keyframedist)))
+       (/*!noVideoTracks && */(framesPlayed <= keyframedist)))
     {
         VERBOSE(VB_PLAYBACK, LOC + "Near start, stopping rewind.");
         float stretch = (ffrew_skip > 0) ? 1.0f : audio.GetStretchFactor();
@@ -2762,10 +2762,12 @@ void MythPlayer::DecoderLoop(bool pause)
 
     while (!killdecoder && !IsErrored())
     {
-        //noVideoTracks = decoder &&
-        //            !decoder->GetTrackCount(kTrackTypeVideo);
-
         DecoderPauseCheck();
+
+        decoder_change_lock.lock();
+        if (decoder)
+            noVideoTracks = !decoder->GetTrackCount(kTrackTypeVideo);
+        decoder_change_lock.unlock();
 
         if (forcePositionMapSync)
         {
@@ -2805,8 +2807,8 @@ void MythPlayer::DecoderLoop(bool pause)
 
         DecodeType dt = (audio.HasAudioOut() && normal_speed) ?
             kDecodeAV : kDecodeVideo;
-        if (noVideoTracks && audio.HasAudioOut())
-            dt = kDecodeAudio;
+        //if (noVideoTracks && audio.HasAudioOut())
+        //    dt = kDecodeAudio;
         DecoderGetFrame(dt);
         decodeOneFrame = false;
     }
@@ -4238,8 +4240,11 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
     info.values.insert("progbefore", 0);
     info.values.insert("progafter",  0);
 
-    int playbackLen = (totalDuration > 0) ? totalDuration : totalLength;
-       
+    int playbackLen = totalDuration;
+
+    if (totalDuration == 0 || noVideoTracks)
+        playbackLen = totalLength;
+
     if (livetv && player_ctx->tvchain)
     {
         info.values["progbefore"] = (int)player_ctx->tvchain->HasPrev();
@@ -4256,7 +4261,10 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
         islive = true;
     }
 
-    float secsplayed = (float)(disp_timecode / 1000.f);
+    float secsplayed = noVideoTracks ? 
+        (float)(framesPlayed / video_frame_rate) :
+        (float)(disp_timecode / 1000.f);
+
     calcSliderPosPriv(info, paddedFields, playbackLen, secsplayed, islive);
 }
 

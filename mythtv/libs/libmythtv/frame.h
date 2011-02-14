@@ -2,6 +2,7 @@
 #define _FRAME_H 
 
 #include <string.h>
+#include <stdint.h>
 #include "fourcc.h"
 
 #ifdef __cplusplus
