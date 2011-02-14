@@ -296,7 +296,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
         tv->setUnderNetworkControl(initByNetworkCommand);
 
         // Process Events
-        VERBOSE(VB_PLAYBACK, LOC + "StartTV -- process events begin");
+        VERBOSE(VB_GENERAL, LOC + "Entering main playback loop.");
 
         while (true)
         {
@@ -323,7 +323,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
             tv->ReturnPlayerLock(mctx);
         }
 
-        VERBOSE(VB_PLAYBACK, LOC + "StartTV -- process events end");
+        VERBOSE(VB_GENERAL, LOC + "Exiting main playback loop.");
 
         if (tv->getJumpToProgram())
         {
@@ -875,7 +875,7 @@ TV::TV(void)
       pseudoChangeChanTimerId(0),   speedChangeTimerId(0),
       errorRecoveryTimerId(0),      exitPlayerTimerId(0)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "ctor -- begin");
+    VERBOSE(VB_GENERAL, LOC + "Creating TV object");
     ctorTime.start();
 
     setObjectName("TV");
@@ -894,7 +894,7 @@ TV::TV(void)
 
     InitFromDB();
 
-    VERBOSE(VB_PLAYBACK, LOC + "ctor -- end");
+    VERBOSE(VB_PLAYBACK, LOC + "Finished creating TV object");
 }
 
 void TV::InitFromDB(void)
@@ -1093,7 +1093,10 @@ bool TV::Init(bool createWindow)
         myWindow = new TvPlayWindow(mainStack, "Playback");
 
         if (myWindow->Create())
+        {
             mainStack->AddScreen(myWindow, false);
+            VERBOSE(VB_GENERAL, LOC + "Created TvPlayWindow.");
+        }
         else
         {
             delete myWindow;
@@ -1841,14 +1844,14 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
                 chanid = 0;
         }
 
-        VERBOSE(VB_IMPORTANT, "Spawning LiveTV Recorder -- begin");
+        VERBOSE(VB_IMPORTANT, LOC + "Spawning LiveTV Recorder -- begin");
 
         if (chanid && !channum.isEmpty())
             ctx->recorder->SpawnLiveTV(ctx->tvchain->GetID(), false, channum);
         else
             ctx->recorder->SpawnLiveTV(ctx->tvchain->GetID(), false, "");
 
-        VERBOSE(VB_IMPORTANT, "Spawning LiveTV Recorder -- end");
+        VERBOSE(VB_IMPORTANT, LOC + "Spawning LiveTV Recorder -- end");
 
         if (!ctx->ReloadTVChain())
         {
@@ -1867,8 +1870,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
 
             bool opennow = (ctx->tvchain->GetCardType(-1) != "DUMMY");
 
-            VERBOSE(VB_IMPORTANT, QString("We have a playbackURL(%1) & "
-                                          "cardtype(%2)")
+            VERBOSE(VB_IMPORTANT, LOC + QString("playbackURL(%1) cardtype(%2)")
                     .arg(playbackURL).arg(ctx->tvchain->GetCardType(-1)));
 
             ctx->SetRingBuffer(
@@ -1879,7 +1881,6 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             ctx->buffer->SetLiveMode(ctx->tvchain);
         }
 
-        VERBOSE(VB_IMPORTANT, "We have a RingBuffer");
 
         if (ctx->playingInfo && StartRecorder(ctx,-1))
         {
@@ -2114,6 +2115,8 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         // we no longer need the contents of myWindow
         if (myWindow)
             myWindow->DeleteAllChildren();
+
+        VERBOSE(VB_GENERAL, LOC + "Main UI disabled.");
     }
 
     VERBOSE(VB_PLAYBACK, LOC +
@@ -4758,7 +4761,10 @@ bool TV::StartPlayer(PlayerContext *mctx, PlayerContext *ctx,
     }
 
     if (ok)
+    {
+        VERBOSE(VB_GENERAL, LOC + QString("Created player."));
         SetSpeedChangeTimer(25, __LINE__);
+    }
 
     VERBOSE(VB_PLAYBACK, LOC + QString("StartPlayer(%1, %2, %3) -- end %4")
             .arg(find_player_index(ctx)).arg(StateToString(desiredState))
