@@ -2252,6 +2252,9 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             GetMythMainWindow()->PushDrawDisabled();
         }
         DrawUnusedRects();
+        // we no longer need the contents of myWindow
+        if (myWindow)
+            myWindow->DeleteAllChildren();
     }
 
     VERBOSE(VB_PLAYBACK, LOC +
