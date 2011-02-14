@@ -23,6 +23,7 @@ typedef enum
     MFEXML_Action,
     MFEXML_ActionList,
     MFEXML_ActionListTest,
+    MFEXML_GetRemote,
 } MythFEXMLMethod;
 
 class MythFEXML : public Eventing
@@ -53,6 +54,7 @@ class MythFEXML : public Eventing
     void SendAction       ( HTTPRequest *pRequest );
     void GetActionList    ( HTTPRequest *pRequest );
     void GetActionListTest( HTTPRequest *pRequest );
+    void GetRemote        ( HTTPRequest *pRequest );
     void InitActions      ( void );
 
   public:
