@@ -4242,7 +4242,7 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
 
     int playbackLen = totalDuration;
 
-    if (totalDuration == 0 || noVideoTracks)
+    if (totalDuration == 0 || noVideoTracks || decoder->GetCodecDecoderName() == "nuppel")
         playbackLen = totalLength;
 
     if (livetv && player_ctx->tvchain)
@@ -4261,7 +4261,7 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
         islive = true;
     }
 
-    float secsplayed = noVideoTracks ? 
+    float secsplayed = (noVideoTracks || decoder->GetCodecDecoderName() == "nuppel") ? 
         (float)(framesPlayed / video_frame_rate) :
         (float)(disp_timecode / 1000.f);
 
