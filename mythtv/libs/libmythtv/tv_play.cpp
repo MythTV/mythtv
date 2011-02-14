@@ -1101,9 +1101,8 @@ bool TV::Init(bool createWindow)
         }
 
         MythMainWindow *mainWindow = GetMythMainWindow();
-        //QPalette p = mainWindow->palette();
-        //p.setColor(mainWindow->backgroundRole(), Qt::black);
-        //mainWindow->setPalette(p);
+        if (mainWindow->GetPaintWindow())
+            mainWindow->GetPaintWindow()->update();
         mainWindow->installEventFilter(this);
         qApp->processEvents();
     }
