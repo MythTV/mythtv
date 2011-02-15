@@ -7515,7 +7515,7 @@ void TV::DoEditSchedule(int editType)
     vector<bool> do_pause;
     do_pause.insert(do_pause.begin(), true, player.size());
     do_pause[find_player_index(actx)] = pause_active;
-    VERBOSE(VB_IMPORTANT, QString("pause_active: %1").arg(pause_active));
+    VERBOSE(VB_PLAYBACK, LOC + QString("Pausing player: %1").arg(pause_active));
 
     saved_pause = DoSetPauseState(actx, do_pause);
 

@@ -1951,7 +1951,7 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
         if ((waited_for & 100) == 100)
         {
             VERBOSE(VB_IMPORTANT, LOC +
-                    QString("Waited 100ms for video buffers %1")
+                    QString("Waited 100ms for video frames from decoder %1")
                     .arg(videoOutput->GetFrameStatus()));
             if (audio.IsBufferAlmostFull())
             {
@@ -2951,7 +2951,7 @@ bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
             if (++videobuf_retries >= 2000)
             {
                 VERBOSE(VB_IMPORTANT, LOC +
-                        "Timed out waiting for free video buffers.");
+                        "Decoder timed out waiting for free video buffers.");
                 videobuf_retries = 0;
             }
             return false;
@@ -3975,7 +3975,8 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
         decodeOneFrame = true;
         usleep(10000);
         if ((tries & 10) == 10)
-            VERBOSE(VB_PLAYBACK, LOC + QString("Waited 100ms for video frame"));
+            VERBOSE(VB_PLAYBACK, LOC +
+                QString("ScreenGrab: Waited 100ms for video frame"));
     }
 
     if (!(frame = videoOutput->GetLastDecodedFrame()))
