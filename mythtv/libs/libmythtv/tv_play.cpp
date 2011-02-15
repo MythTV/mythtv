@@ -1162,9 +1162,8 @@ bool TV::Init(bool createWindow)
         }
 
         MythMainWindow *mainWindow = GetMythMainWindow();
-        //QPalette p = mainWindow->palette();
-        //p.setColor(mainWindow->backgroundRole(), Qt::black);
-        //mainWindow->setPalette(p);
+        if (mainWindow->GetPaintWindow())
+            mainWindow->GetPaintWindow()->update();
         mainWindow->installEventFilter(this);
         qApp->processEvents();
     }
@@ -2021,13 +2020,6 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
 
         VERBOSE(VB_IMPORTANT, "We have a RingBuffer");
 
-        if (GetMythMainWindow() && !weDisabledGUI)
-        {
-            weDisabledGUI = true;
-            GetMythMainWindow()->PushDrawDisabled();
-            DrawUnusedRects();
-        }
-
         if (ctx->playingInfo && StartRecorder(ctx,-1))
         {
             // Cache starting frame rate for this recorder
@@ -2045,7 +2037,6 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         }
         else if (!ctx->IsPIP())
         {
-            GetMythUI()->DisableScreensaver();
             if (!lastLockSeenTime.isValid() ||
                 (lastLockSeenTime < timerOffTime))
             {
@@ -2093,15 +2084,6 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
 
         if (ctx->buffer && ctx->buffer->IsOpen())
         {
-            GetMythUI()->DisableScreensaver();
-
-            if (GetMythMainWindow() && !weDisabledGUI)
-            {
-                weDisabledGUI = true;
-                GetMythMainWindow()->PushDrawDisabled();
-                DrawUnusedRects();
-            }
-
             if (desiredNextState == kState_WatchingRecording)
             {
                 ctx->LockPlayingInfo(__FILE__, __LINE__);
@@ -2253,6 +2235,8 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
              TRANSITION(kState_None, kState_WatchingRecording) ||
              TRANSITION(kState_None, kState_WatchingLiveTV))
     {
+        if (!ctx->IsPIP())
+            GetMythUI()->DisableScreensaver();
         MythMainWindow *mainWindow = GetMythMainWindow();
         mainWindow->setBaseSize(player_bounds.size());
         mainWindow->setMinimumSize(
@@ -2262,6 +2246,15 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
         mainWindow->setGeometry(player_bounds);
         GetMythMainWindow()->GetPaintWindow()->hide();
+        if (!weDisabledGUI)
+        {
+            weDisabledGUI = true;
+            GetMythMainWindow()->PushDrawDisabled();
+        }
+        DrawUnusedRects();
+        // we no longer need the contents of myWindow
+        if (myWindow)
+            myWindow->DeleteAllChildren();
     }
 
     VERBOSE(VB_PLAYBACK, LOC +
