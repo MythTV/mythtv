@@ -134,7 +134,7 @@ class PendingInfo
 };
 typedef QMap<uint,PendingInfo> PendingMap;
 
-class MPUBLIC TVRec : public SignalMonitorListener
+class MTV_PUBLIC TVRec : public SignalMonitorListener
 {
     friend class TuningRequest;
     friend class SignalMonitor;

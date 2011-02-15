@@ -18,6 +18,7 @@ using namespace std;
 #include <QList>
 
 #include "mythobservable.h"
+#include "mythexp.h"
 
 class QObject;
 class Buffer;

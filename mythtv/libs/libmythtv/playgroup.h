@@ -3,11 +3,12 @@
 
 #include <QStringList>
 
+#include "mythtvexp.h"
 #include "settings.h"
 
 class ProgramInfo;
 
-class MPUBLIC PlayGroup
+class MTV_PUBLIC PlayGroup
 {
   public:
     static QStringList GetNames(void);
@@ -17,7 +18,7 @@ class MPUBLIC PlayGroup
                           int defval);
 };
 
-class MPUBLIC PlayGroupEditor : public QObject, public ConfigurationDialog
+class MTV_PUBLIC PlayGroupEditor : public QObject, public ConfigurationDialog
 {
     Q_OBJECT
 

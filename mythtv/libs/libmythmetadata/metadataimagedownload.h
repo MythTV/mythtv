@@ -5,7 +5,7 @@
 #include <QString>
 #include <QStringList>
 
-#include "mythexp.h"
+#include "mythmetaexp.h"
 #include "metadatacommon.h"
 
 typedef struct {
@@ -14,7 +14,7 @@ typedef struct {
     QString url;
 } ThumbnailData;
 
-class MPUBLIC ImageDLEvent : public QEvent
+class META_PUBLIC ImageDLEvent : public QEvent
 {
   public:
     ImageDLEvent(MetadataLookup *lookup) :
@@ -27,7 +27,7 @@ class MPUBLIC ImageDLEvent : public QEvent
     static Type kEventType;
 };
 
-class MPUBLIC ThumbnailDLEvent : public QEvent
+class META_PUBLIC ThumbnailDLEvent : public QEvent
 {
   public:
     ThumbnailDLEvent(ThumbnailData *data) :
@@ -40,7 +40,7 @@ class MPUBLIC ThumbnailDLEvent : public QEvent
     static Type kEventType;
 };
 
-class MPUBLIC MetadataImageDownload : public QThread
+class META_PUBLIC MetadataImageDownload : public QThread
 {
   public:
 
@@ -66,13 +66,13 @@ class MPUBLIC MetadataImageDownload : public QThread
     QMutex                     m_mutex;
 };
 
-MPUBLIC QString getDownloadFilename(QString title, QString url);
-MPUBLIC QString getDownloadFilename(ArtworkType type, MetadataLookup *lookup,
+META_PUBLIC QString getDownloadFilename(QString title, QString url);
+META_PUBLIC QString getDownloadFilename(ArtworkType type, MetadataLookup *lookup,
                                     QString url);
 
-MPUBLIC QString getLocalWritePath(MetadataType metadatatype, ArtworkType type);
-MPUBLIC QString getStorageGroupURL(ArtworkType type, QString host);
+META_PUBLIC QString getLocalWritePath(MetadataType metadatatype, ArtworkType type);
+META_PUBLIC QString getStorageGroupURL(ArtworkType type, QString host);
 
-MPUBLIC void cleanThumbnailCacheDir(void);
+META_PUBLIC void cleanThumbnailCacheDir(void);
 
 #endif /* METADATAIMAGEDOWNLOAD_H */

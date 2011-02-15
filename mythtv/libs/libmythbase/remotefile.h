@@ -7,11 +7,11 @@
 #include <QStringList>
 #include <QMutex>
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
 class MythSocket;
 
-class MPUBLIC RemoteFile
+class MBASE_PUBLIC RemoteFile
 {
   public:
     RemoteFile(const QString &url = "",

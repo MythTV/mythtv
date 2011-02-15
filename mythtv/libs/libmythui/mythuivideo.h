@@ -11,7 +11,7 @@
  *
  * \brief Video widget, displays raw image data
  */
-class MPUBLIC MythUIVideo : public MythUIType
+class MUI_PUBLIC MythUIVideo : public MythUIType
 {
   public:
     MythUIVideo(MythUIType *parent, const QString &name);

@@ -5,12 +5,12 @@
 #include <QMutex>
 #include <QString>
 
-#include "mythexp.h"
+#include "mythuiexp.h"
 
 class MythFontReference;
 typedef QMultiHash<QString, MythFontReference*> FontPathToReference;
 
-class MPUBLIC MythFontManager
+class MUI_PUBLIC MythFontManager
 {
   public:
     MythFontManager() {}
@@ -35,7 +35,7 @@ class MPUBLIC MythFontManager
 
 };
 
-MPUBLIC MythFontManager *GetGlobalFontManager(void);
+MUI_PUBLIC MythFontManager *GetGlobalFontManager(void);
 
 class MythFontReference
 {

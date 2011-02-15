@@ -5,7 +5,7 @@
 #include <QWidget>
 #include <QSize>
 
-#include "mythexp.h"
+#include "mythuiexp.h"
 
 class DisplayInfo
 {
@@ -19,7 +19,7 @@ class DisplayInfo
     float rate;
 };
 
-class MPUBLIC MythDisplay
+class MUI_PUBLIC MythDisplay
 {
   public:
     static DisplayInfo GetDisplayInfo(int video_rate = 0);

@@ -1337,7 +1337,7 @@ bool MythRemoveDirectory(QDir &aDir)
     return(has_err);
 }
 
-MPUBLIC QString &ShellEscape(QString &string)
+ MBASE_PUBLIC  QString &ShellEscape(QString &string)
 {
     if (string.contains("\""))
         string = string.replace("\"", "\\\"");

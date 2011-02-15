@@ -3,6 +3,7 @@
 
 using namespace std;
 
+#include "mythtvexp.h"
 #include "programtypes.h"
 #include "mythscreentype.h"
 
@@ -48,7 +49,7 @@ enum OSDTimeout
     kOSDTimeout_Long   = 3,
 };
 
-class MPUBLIC OSDHideEvent : public QEvent
+class MTV_PUBLIC OSDHideEvent : public QEvent
 {
   public:
     OSDHideEvent(enum OSDFunctionalType osdFunctionalType)

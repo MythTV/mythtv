@@ -3,10 +3,10 @@
 #import <CoreFoundation/CFDictionary.h> 
 #import "ApplicationServices/ApplicationServices.h"
 #include <QWindowsStyle>
-#include "mythexp.h"
+#include "mythuiexp.h"
 
-MPUBLIC int   get_int_CF(CFDictionaryRef dict, CFStringRef key);
-MPUBLIC float get_float_CF(CFDictionaryRef dict, CFStringRef key);
+MUI_PUBLIC int   get_int_CF(CFDictionaryRef dict, CFStringRef key);
+MUI_PUBLIC float get_float_CF(CFDictionaryRef dict, CFStringRef key);
 CGDirectDisplayID GetOSXDisplay(WId win);
 
 #endif

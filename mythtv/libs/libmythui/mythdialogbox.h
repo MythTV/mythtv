@@ -27,7 +27,7 @@ class MythUIStateType;
  *  The result may be in the format of an int, text or a void pointer
  *  dependant on the dialog type and information it is conveying.
  */
-class MPUBLIC DialogCompletionEvent : public QEvent
+class MUI_PUBLIC DialogCompletionEvent : public QEvent
 {
   public:
     DialogCompletionEvent(const QString &id, int result, QString text,
@@ -57,7 +57,7 @@ class MPUBLIC DialogCompletionEvent : public QEvent
  *  Sends out a DialogCompletionEvent event and the Selected() signal
  *  containing the result when the user selects the Ok button.
  */
-class MPUBLIC MythDialogBox : public MythScreenType
+class MUI_PUBLIC MythDialogBox : public MythScreenType
 {
     Q_OBJECT
   public:
@@ -119,7 +119,7 @@ class MPUBLIC MythDialogBox : public MythScreenType
  *  Sends out a DialogCompletionEvent event and the haveResult() signal
  *  containing the result.
  */
-class MPUBLIC MythConfirmationDialog : public MythScreenType
+class MUI_PUBLIC MythConfirmationDialog : public MythScreenType
 {
     Q_OBJECT
 
@@ -157,7 +157,7 @@ class MPUBLIC MythConfirmationDialog : public MythScreenType
  *  Sends out a DialogCompletionEvent event and the haveResult() signal
  *  containing the result when the user selects the Ok button.
  */
-class MPUBLIC MythTextInputDialog : public MythScreenType
+class MUI_PUBLIC MythTextInputDialog : public MythScreenType
 {
     Q_OBJECT
 
@@ -201,7 +201,7 @@ class MPUBLIC MythTextInputDialog : public MythScreenType
  * haveResult(QString) signal will be generated. Both pass the selected
  * string back to the caller.
  */
-class MPUBLIC MythUISearchDialog : public MythScreenType
+class MUI_PUBLIC MythUISearchDialog : public MythScreenType
 {
   Q_OBJECT
 
@@ -237,7 +237,7 @@ class MPUBLIC MythUISearchDialog : public MythScreenType
     void slotUpdateList(void);
 };
 
-MPUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent = NULL,
+MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent = NULL,
                                              const char *slot = NULL, bool showCancel = false);
 
 Q_DECLARE_METATYPE(const char*)

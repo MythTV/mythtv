@@ -8,9 +8,9 @@
 // libmythbase
 #include "iso3166.h"
 #include "iso639.h"
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
-class MPUBLIC MythLocale
+class MBASE_PUBLIC MythLocale
 {
   public:
     MythLocale(QString localeName = QString());

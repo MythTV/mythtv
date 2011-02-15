@@ -1,6 +1,7 @@
 #ifndef _RECORDING_INFO_H_
 #define _RECORDING_INFO_H_
 
+#include "mythtvexp.h"
 #include "programinfo.h"
 
 class RecordingRule;
@@ -25,7 +26,7 @@ class RecordingRule;
 
 typedef AutoDeleteDeque<RecordingInfo*> RecordingList;
 
-class MPUBLIC RecordingInfo : public ProgramInfo
+class MTV_PUBLIC RecordingInfo : public ProgramInfo
 {
   public:
     RecordingInfo(void) : record(NULL) {}

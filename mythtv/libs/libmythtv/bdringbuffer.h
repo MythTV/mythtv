@@ -45,7 +45,7 @@ class BDOverlay
     int64_t  m_pts;
 };
 
-class MPUBLIC BDRingBuffer : public RingBuffer
+class MTV_PUBLIC BDRingBuffer : public RingBuffer
 {
   public:
     BDRingBuffer(const QString &lfilename);

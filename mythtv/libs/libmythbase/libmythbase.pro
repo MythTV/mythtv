@@ -11,7 +11,7 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
 HEADERS += mythsocket.h mythsocket_cb.h mythsocketthread.h msocketdevice.h
-HEADERS += mythexp.h mythdbcon.h mythdb.h mythdbparams.h oldsettings.h
+HEADERS += mythbaseexp.h mythdbcon.h mythdb.h mythdbparams.h oldsettings.h
 HEADERS += mythverbose.h mythversion.h compat.h mythconfig.h
 HEADERS += mythobservable.h mythevent.h httpcomms.h mcodecs.h
 HEADERS += mythtimer.h mythsignalingtimer.h mythdirs.h exitcodes.h
@@ -47,7 +47,7 @@ mingw {
 
 # Install headers to same location as libmyth to make things easier
 inc.path = $${PREFIX}/include/mythtv/
-inc.files  = mythverbose.h mythdbcon.h mythdbparams.h mythexp.h mythdb.h
+inc.files  = mythverbose.h mythdbcon.h mythdbparams.h mythbaseexp.h mythdb.h
 inc.files += compat.h mythversion.h mythconfig.h mythconfig.mak
 inc.files += mythobservable.h mythevent.h httpcomms.h mcodecs.h
 inc.files += mythtimer.h lcddevice.h exitcodes.h mythdirs.h mythstorage.h
@@ -68,6 +68,7 @@ INSTALLS += inc inc2 inc3
 
 DEFINES += RUNPREFIX=\\\"$${RUNPREFIX}\\\"
 DEFINES += LIBDIRNAME=\\\"$${LIBDIRNAME}\\\"
+DEFINES += MBASE_API
 
 linux:DEFINES += linux
 

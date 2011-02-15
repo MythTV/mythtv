@@ -10,9 +10,9 @@ using namespace std;
 #include <QString>
 
 // MythTV headers
-#include "mythexp.h"
+#include "mythtvexp.h"
 
-class MPUBLIC SourceUtil
+class MTV_PUBLIC SourceUtil
 {
   public:
     static bool    HasDigitalChannel(uint sourceid);

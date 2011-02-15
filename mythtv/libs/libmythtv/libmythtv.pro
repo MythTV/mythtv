@@ -135,6 +135,7 @@ HEADERS += minilzo.h                RTjpegN.h
 SOURCES += minilzo.cpp              RTjpegN.cpp
 
 # Misc. needed by backend/frontend
+HEADERS += mythtvexp.h
 HEADERS += recordinginfo.h
 HEADERS += dbcheck.h
 HEADERS += videodbcheck.h
@@ -585,3 +586,4 @@ mingw {
 include ( ../libs-targetfix.pro )
 
 LIBS += $$LATE_LIBS
+DEFINES += MTV_API

@@ -8,6 +8,7 @@
 #include <QString>
 
 // MythTV
+#include "mythtvexp.h"
 #include "settings.h"
 #include "mythwidgets.h"
 #include "mythwizard.h"
@@ -114,7 +115,7 @@ class ChannelDBStorage : public SimpleDBStorage
 class OnAirGuide;
 class XmltvID;
 
-class MPUBLIC ChannelOptionsCommon: public VerticalConfigurationGroup
+class MTV_PUBLIC ChannelOptionsCommon: public VerticalConfigurationGroup
 {
     Q_OBJECT
 
@@ -131,17 +132,17 @@ class MPUBLIC ChannelOptionsCommon: public VerticalConfigurationGroup
     XmltvID    *xmltvID;
 };
 
-class MPUBLIC ChannelOptionsFilters: public VerticalConfigurationGroup {
+class MTV_PUBLIC ChannelOptionsFilters: public VerticalConfigurationGroup {
   public:
     ChannelOptionsFilters(const ChannelID& id);
 };
 
-class MPUBLIC ChannelOptionsV4L: public VerticalConfigurationGroup {
+class MTV_PUBLIC ChannelOptionsV4L: public VerticalConfigurationGroup {
   public:
     ChannelOptionsV4L(const ChannelID& id);
 };
 
-class MPUBLIC ChannelTVFormat : public ComboBoxSetting, public ChannelDBStorage
+class MTV_PUBLIC ChannelTVFormat : public ComboBoxSetting, public ChannelDBStorage
 {
   public:
     ChannelTVFormat(const ChannelID &id);

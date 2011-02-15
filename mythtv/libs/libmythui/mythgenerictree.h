@@ -10,13 +10,13 @@
 #include <QMap>
 #include <QHash>
 
-#include "mythexp.h"
+#include "mythuiexp.h"
 
 #include "mythuibuttonlist.h"
 
 class SortableMythGenericTreeList;
 
-class MPUBLIC MythGenericTree
+class MUI_PUBLIC MythGenericTree
 {
     typedef QVector<int> IntVector;
 

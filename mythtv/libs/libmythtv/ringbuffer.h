@@ -15,7 +15,7 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 class ThreadedFileWriter;
 class DVDRingBuffer;
@@ -23,7 +23,7 @@ class BDRingBuffer;
 class LiveTVChain;
 class RemoteFile;
 
-class MPUBLIC RingBuffer : protected QThread
+class MTV_PUBLIC RingBuffer : protected QThread
 {
   public:
     static RingBuffer *Create(const QString &lfilename, bool write,

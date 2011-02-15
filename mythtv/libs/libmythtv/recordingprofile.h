@@ -1,6 +1,7 @@
 #ifndef RECORDINGPROFILE_H
 #define RECORDINGPROFILE_H
 
+#include "mythtvexp.h"
 #include "settings.h"
 #include "mythdbcon.h"
 #include "mythwidgets.h"
@@ -37,7 +38,7 @@ class TranscodeResize;
 class TranscodeLossless;
 class TranscodeFilters;
 
-class MPUBLIC RecordingProfile : public QObject, public ConfigurationWizard
+class MTV_PUBLIC RecordingProfile : public QObject, public ConfigurationWizard
 {
   Q_OBJECT
   protected:

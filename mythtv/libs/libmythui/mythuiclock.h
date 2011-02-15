@@ -22,7 +22,7 @@
  *
  * \ingroup MythUI_Widgets
  */
-class MPUBLIC MythUIClock : public MythUIText
+class MUI_PUBLIC MythUIClock : public MythUIText
 {
   public:
     MythUIClock(MythUIType *parent, const QString &name);

@@ -1,12 +1,12 @@
-#ifndef UPNPEXP_H_
-#define UPNPEXP_H_
+#ifndef MYTHMETAEXP_H_
+#define MYTHMETAEXP_H_
 
 #include <QtCore/qglobal.h>
 
-#ifdef UPNP_API
-# define UPNP_PUBLIC Q_DECL_EXPORT
+#ifdef META_API
+# define META_PUBLIC Q_DECL_EXPORT
 #else
-# define UPNP_PUBLIC Q_DECL_IMPORT
+# define META_PUBLIC Q_DECL_IMPORT
 #endif
 
 #if (__GNUC__ >= 4)
@@ -19,4 +19,4 @@
 # define MDEPRECATED
 #endif
 
-#endif // UPNPEXP_H_
+#endif // MYTHMETAEXP_H_

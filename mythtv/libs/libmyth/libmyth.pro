@@ -5,6 +5,8 @@ TARGET = myth-$$LIBVERSION
 CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
+DEFINES += MYTH_API
+
 
 QT += network xml sql
 
@@ -34,6 +36,7 @@ HEADERS += programinfo.h          programinfoupdater.h
 HEADERS += programtypes.h         recordingtypes.h
 HEADERS += mythrssmanager.h       netgrabbermanager.h
 HEADERS += rssparse.h             netutils.h
+HEADERS += mythexp.h
 
 # remove when everything is switched to mythui
 HEADERS += virtualkeyboard_qt.h

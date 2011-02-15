@@ -75,7 +75,7 @@ class MythWebView : public QWebView
  *
  * \ingroup MythUI_Widgets
  */
-class MPUBLIC MythUIWebBrowser : public MythUIType
+class MUI_PUBLIC MythUIWebBrowser : public MythUIType
 {
   Q_OBJECT
 

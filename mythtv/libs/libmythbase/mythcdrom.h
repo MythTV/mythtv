@@ -3,7 +3,7 @@
 
 #include "mythmedia.h"
 
-class MPUBLIC MythCDROM : public MythMediaDevice
+class MBASE_PUBLIC MythCDROM : public MythMediaDevice
 {
     Q_OBJECT
   protected:

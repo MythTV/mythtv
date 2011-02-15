@@ -11,46 +11,46 @@ using namespace std;
 #include <stdint.h>
 #include <time.h>
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 #include "mythtimer.h"
 #include "mythsystem.h"
 #include "mythevent.h"
 
 class QFile;
 
-MPUBLIC QDateTime mythCurrentDateTime();
-MPUBLIC int calc_utc_offset(void);
-MPUBLIC QString getTimeZoneID(void);
-MPUBLIC bool checkTimeZone(void);
-MPUBLIC bool checkTimeZone(const QStringList &master_settings);
+ MBASE_PUBLIC  QDateTime mythCurrentDateTime();
+ MBASE_PUBLIC  int calc_utc_offset(void);
+ MBASE_PUBLIC  QString getTimeZoneID(void);
+ MBASE_PUBLIC  bool checkTimeZone(void);
+ MBASE_PUBLIC  bool checkTimeZone(const QStringList &master_settings);
 
-MPUBLIC QDateTime MythUTCToLocal(const QDateTime &utc);
-MPUBLIC int MythSecsTo(const QDateTime &from, const QDateTime &to);
-MPUBLIC QDateTime myth_dt_from_string(const QString &dtstr);
+ MBASE_PUBLIC  QDateTime MythUTCToLocal(const QDateTime &utc);
+ MBASE_PUBLIC  int MythSecsTo(const QDateTime &from, const QDateTime &to);
+ MBASE_PUBLIC  QDateTime myth_dt_from_string(const QString &dtstr);
 
-MPUBLIC bool getUptime(time_t &uptime);
-MPUBLIC bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
+ MBASE_PUBLIC  bool getUptime(time_t &uptime);
+ MBASE_PUBLIC  bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
 
-MPUBLIC bool hasUtf8(const char *str);
+ MBASE_PUBLIC  bool hasUtf8(const char *str);
 #define M_QSTRING_UNICODE(str) hasUtf8(str) ? QString::fromUtf8(str) : str
 
-MPUBLIC bool ping(const QString &host, int timeout);
-MPUBLIC bool telnet(const QString &host, int port);
+ MBASE_PUBLIC  bool ping(const QString &host, int timeout);
+ MBASE_PUBLIC  bool telnet(const QString &host, int port);
 
-MPUBLIC long long copy(QFile &dst, QFile &src, uint block_size = 0);
-MPUBLIC QString createTempFile(QString name_template = "/tmp/mythtv_XXXXXX",
+ MBASE_PUBLIC  long long copy(QFile &dst, QFile &src, uint block_size = 0);
+ MBASE_PUBLIC  QString createTempFile(QString name_template = "/tmp/mythtv_XXXXXX",
                                bool dir = false);
-MPUBLIC void makeFileAccessible(QString filename);
+ MBASE_PUBLIC  void makeFileAccessible(QString filename);
 
-MPUBLIC QString getResponse(const QString &query, const QString &def);
-MPUBLIC int     intResponse(const QString &query, int def);
+ MBASE_PUBLIC  QString getResponse(const QString &query, const QString &def);
+ MBASE_PUBLIC  int     intResponse(const QString &query, int def);
 
-MPUBLIC QString getSymlinkTarget(const QString &start_file,
+ MBASE_PUBLIC  QString getSymlinkTarget(const QString &start_file,
                                  QStringList   *intermediaries = NULL,
                                  unsigned       maxLinks       = 255);
 
-MPUBLIC void sendPlaybackStart();
-MPUBLIC void sendPlaybackEnd();
+ MBASE_PUBLIC  void sendPlaybackStart();
+ MBASE_PUBLIC  void sendPlaybackEnd();
 
 inline float clamp(float val, float minimum, float maximum)
 {
@@ -71,22 +71,22 @@ inline int   lerp(float r, int a, int b)
 inline float sq(float a) { return a*a; }
 inline int   sq(int   a) { return a*a; }
 
-MPUBLIC bool IsMACAddress(QString MAC);
-MPUBLIC bool WakeOnLAN(QString MAC);
-MPUBLIC QString FileHash(QString filename);
+ MBASE_PUBLIC  bool IsMACAddress(QString MAC);
+ MBASE_PUBLIC  bool WakeOnLAN(QString MAC);
+ MBASE_PUBLIC  QString FileHash(QString filename);
 
 /// Is A/V Sync destruction daemon is running on this host?
-MPUBLIC bool IsPulseAudioRunning(void);
+ MBASE_PUBLIC  bool IsPulseAudioRunning(void);
 
-MPUBLIC bool myth_nice(int val);
-MPUBLIC void myth_yield(void);
-MPUBLIC bool myth_ioprio(int val); // range -1..8, smaller is higher priority
+ MBASE_PUBLIC  bool myth_nice(int val);
+ MBASE_PUBLIC  void myth_yield(void);
+ MBASE_PUBLIC  bool myth_ioprio(int val); // range -1..8, smaller is higher priority
 
-MPUBLIC bool myth_FileIsDVD(const QString &filename);
-MPUBLIC bool myth_FileIsBD(const QString &filename);
+ MBASE_PUBLIC  bool myth_FileIsDVD(const QString &filename);
+ MBASE_PUBLIC  bool myth_FileIsBD(const QString &filename);
 
-MPUBLIC bool MythRemoveDirectory(QDir &aDir);
-MPUBLIC QString &ShellEscape(QString &string);
+ MBASE_PUBLIC  bool MythRemoveDirectory(QDir &aDir);
+ MBASE_PUBLIC  QString &ShellEscape(QString &string);
 
 // CPU Tick timing function
 #ifdef MMX

@@ -6,7 +6,7 @@ using namespace std;
 
 class MythPlayer;
 
-class MPUBLIC DetectLetterbox
+class MTV_PUBLIC DetectLetterbox
 {
 public:
     DetectLetterbox(MythPlayer* const player);

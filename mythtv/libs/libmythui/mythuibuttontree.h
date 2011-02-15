@@ -13,7 +13,7 @@ class MythUIButtonListItem;
  *
  * \ingroup MythUI_Widgets
  */
-class MPUBLIC MythUIButtonTree : public MythUIType
+class MUI_PUBLIC MythUIButtonTree : public MythUIType
 {
     Q_OBJECT
   public:

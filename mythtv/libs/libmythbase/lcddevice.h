@@ -10,12 +10,12 @@
 #include <QMutex>
 #include <QList>
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 #include "mythsocket_cb.h"
 
 enum CHECKED_STATE {CHECKED = 0, UNCHECKED, NOTCHECKABLE };
 
-class MPUBLIC LCDMenuItem
+class MBASE_PUBLIC LCDMenuItem
 {
   public:
     LCDMenuItem(bool item_selected, CHECKED_STATE item_checked,
@@ -56,7 +56,7 @@ class MPUBLIC LCDMenuItem
 
 enum TEXT_ALIGNMENT {ALIGN_LEFT, ALIGN_RIGHT, ALIGN_CENTERED };
 
-class MPUBLIC LCDTextItem
+class MBASE_PUBLIC LCDTextItem
 {
   public:
     LCDTextItem(unsigned int row, TEXT_ALIGNMENT align, QString text,
@@ -169,7 +169,7 @@ enum LCDFunctionSet {
 	FUNC_NEWS = 7 << 1,
 };
 
-class MPUBLIC LCD : public QObject, public MythSocketCBs
+class MBASE_PUBLIC LCD : public QObject, public MythSocketCBs
 {
     Q_OBJECT
 

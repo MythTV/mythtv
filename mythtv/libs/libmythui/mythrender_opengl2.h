@@ -13,7 +13,7 @@ typedef enum
 
 class MythGLShaderObject;
 
-class MPUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
+class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
 {
   public:
     MythRenderOpenGL2(const QGLFormat& format, QPaintDevice* device);

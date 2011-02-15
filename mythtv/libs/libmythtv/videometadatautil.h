@@ -5,9 +5,9 @@
 #include <QString>
 
 // MythTV headers
-#include "mythexp.h" // for MPUBLIC
+#include "mythtvexp.h"
 
-class MPUBLIC VideoMetaDataUtil
+class MTV_PUBLIC VideoMetaDataUtil
 {
   public:
     static QString GetArtPath(const QString &basename, const QString &type);

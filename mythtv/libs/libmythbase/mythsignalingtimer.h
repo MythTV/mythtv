@@ -8,7 +8,7 @@
 #include <QThread>
 #include <QMutex>
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
 /** \class MythSignalingTimer
  *  This class is essentially a workaround for a Qt 4.5.2 bug where it
@@ -16,7 +16,7 @@
  *  timer firing. This lost millisecond is not a huge issue for infrequent
  *  timers, but causes 7% lost CPU in the MythUI animate() handling.
  */
-class MPUBLIC MythSignalingTimer : private QThread
+class MBASE_PUBLIC MythSignalingTimer : private QThread
 {
     Q_OBJECT
 

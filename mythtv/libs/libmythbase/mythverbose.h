@@ -16,7 +16,7 @@
 # endif
 #endif
 
-#include "mythexp.h"  // MPUBLIC, et c.
+#include "mythbaseexp.h"  //  MBASE_PUBLIC , et c.
 
 /// This MAP is for the various VERBOSITY flags, used to select which
 /// messages we want printed to the console.
@@ -113,9 +113,9 @@ enum VerboseMask
 
 /// This global variable is set at startup with the flags
 /// of the verbose messages we want to see.
-extern MPUBLIC unsigned int print_verbose_messages;
+extern MBASE_PUBLIC unsigned int print_verbose_messages;
 #ifdef __cplusplus
-  extern MPUBLIC QMutex verbose_mutex;
+  extern MBASE_PUBLIC QMutex verbose_mutex;
 #endif
 
 // Helper for checking verbose flags outside of VERBOSE macro
@@ -231,11 +231,11 @@ extern MPUBLIC unsigned int print_verbose_messages;
 
 #ifdef  __cplusplus
     /// Verbose helper function for ENO macro
-    extern MPUBLIC QString safe_eno_to_string(int errnum);
+    extern MBASE_PUBLIC QString safe_eno_to_string(int errnum);
 
-    extern MPUBLIC QString verboseString;
+    extern MBASE_PUBLIC QString verboseString;
 
-    MPUBLIC int parse_verbose_arg(QString arg);
+    MBASE_PUBLIC int parse_verbose_arg(QString arg);
 
     /// This can be appended to the VERBOSE args with either
     /// "+" (with QStrings) or "<<" (with c strings). It uses

@@ -2,7 +2,7 @@
 #define MYTHVERSION_H_
 
 #include "qglobal.h"
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
 #if ( QT_VERSION < 0x040500 )
 #error You need Qt version >= 4.5.0 to compile MythTV.
@@ -37,7 +37,7 @@
 #define MYTH_PROTO_VERSION "64"
 #define MYTH_PROTO_TOKEN "8675309J"
 
-MPUBLIC const char *GetMythSourceVersion();
+ MBASE_PUBLIC  const char *GetMythSourceVersion();
 
 #endif
 

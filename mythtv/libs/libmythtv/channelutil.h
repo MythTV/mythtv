@@ -13,7 +13,7 @@ using namespace std;
 #include <QString>
 
 // MythTV headers
-#include "mythexp.h"
+#include "mythtvexp.h"
 #include "dtvmultiplex.h"
 #include "dbchannelinfo.h"
 
@@ -22,7 +22,7 @@ class NetworkInformationTable;
 /** \class ChannelUtil
  *  \brief Collection of helper utilities for channel DB use
  */
-class MPUBLIC ChannelUtil
+class MTV_PUBLIC ChannelUtil
 {
   public:
     // Multiplex Stuff

@@ -18,7 +18,7 @@ class MythImage;
  *
  * \ingroup MythUI_Widgets
  */
-class MPUBLIC MythUIShape : public MythUIType
+class MUI_PUBLIC MythUIShape : public MythUIType
 {
   public:
     MythUIShape(MythUIType *parent, const QString &name);

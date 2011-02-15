@@ -11,7 +11,7 @@
 #include <QDomElement>
 #include <QEvent>
 
-#include "mythexp.h"
+#include "mythmetaexp.h"
 
 enum LookupStep {
     SEARCH = 0,
@@ -79,7 +79,7 @@ typedef QMultiMap< PeopleType, PersonInfo > PeopleMap;
 
 typedef QHash<QString,QString> MetadataMap;
 
-class MPUBLIC MetadataLookup : public QObject
+class META_PUBLIC MetadataLookup : public QObject
 {
   public:
     MetadataLookup(void);
@@ -287,17 +287,17 @@ class MPUBLIC MetadataLookup : public QObject
 };
 Q_DECLARE_METATYPE(MetadataLookup*)
 
-MPUBLIC MetadataLookup* ParseMetadataItem(const QDomElement& item,
+META_PUBLIC MetadataLookup* ParseMetadataItem(const QDomElement& item,
                                           MetadataLookup *lookup,
                                           bool passseas = true);
-MPUBLIC PeopleMap ParsePeople(QDomElement people);
-MPUBLIC ArtworkMap ParseArtwork(QDomElement artwork);
+META_PUBLIC PeopleMap ParsePeople(QDomElement people);
+META_PUBLIC ArtworkMap ParseArtwork(QDomElement artwork);
 
-MPUBLIC int editDistance(const QString& s, const QString& t);
-MPUBLIC QString nearestName(const QString& actual,
+META_PUBLIC int editDistance(const QString& s, const QString& t);
+META_PUBLIC QString nearestName(const QString& actual,
                             const QStringList& candidates);
 
-MPUBLIC QDateTime RFC822TimeToQDateTime(const QString& t);
+META_PUBLIC QDateTime RFC822TimeToQDateTime(const QString& t);
 
 enum GrabberType {
     GRAB_MOVIE = 0,
@@ -306,7 +306,7 @@ enum GrabberType {
     GRAB_GAME = 3
 };
 
-class MPUBLIC MetaGrabberScript : public QObject
+class META_PUBLIC MetaGrabberScript : public QObject
 {
   public:
     MetaGrabberScript();
@@ -345,6 +345,6 @@ class MPUBLIC MetaGrabberScript : public QObject
 };
 Q_DECLARE_METATYPE(MetaGrabberScript*)
 
-MPUBLIC MetaGrabberScript* ParseGrabberVersion(const QDomElement& item);
+META_PUBLIC MetaGrabberScript* ParseGrabberVersion(const QDomElement& item);
 
 #endif // METADATACOMMON_H_

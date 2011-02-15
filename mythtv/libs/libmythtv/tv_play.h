@@ -161,7 +161,7 @@ class AskProgramInfo
     ProgramInfo *info;
 };
 
-class MPUBLIC TV : public QObject
+class MTV_PUBLIC TV : public QObject
 {
     friend class PlaybackBox;
     friend class GuideGrid;

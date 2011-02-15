@@ -11,9 +11,9 @@
 #include <X11/Xlib.h>
 #include <vector>
 
-#include "mythexp.h"
+#include "mythuiexp.h"
 
-class MPUBLIC MythXDisplay
+class MUI_PUBLIC MythXDisplay
 {
   public:
     MythXDisplay();
@@ -70,9 +70,9 @@ class MythXLocker
     MythXDisplay *disp;
 };
 
-MPUBLIC void          LockMythXDisplays(bool lock);
-MPUBLIC MythXDisplay *GetMythXDisplay(Display*);
-MPUBLIC MythXDisplay *OpenMythXDisplay(void);
+MUI_PUBLIC void          LockMythXDisplays(bool lock);
+MUI_PUBLIC MythXDisplay *GetMythXDisplay(Display*);
+MUI_PUBLIC MythXDisplay *OpenMythXDisplay(void);
 #define XLOCK(dpy, arg) { dpy->Lock(); arg; dpy->Unlock(); }
 #endif // USING_X11
 

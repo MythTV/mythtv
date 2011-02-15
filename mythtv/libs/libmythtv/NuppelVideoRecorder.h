@@ -35,7 +35,7 @@ using namespace std;
 #include "filter.h"
 #include "minilzo.h"
 
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 struct video_audio;
 struct VBIData;
@@ -47,7 +47,7 @@ class FilterManager;
 class FilterChain;
 class AudioInput;
 
-class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Input
+class MTV_PUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Input
 {
  public:
     NuppelVideoRecorder(TVRec *rec, ChannelBase *channel);

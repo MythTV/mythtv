@@ -3,6 +3,7 @@
 
 #include <QString>
 
+#include "mythtvexp.h"
 #include "settings.h"
 #include "mythwidgets.h"
 
@@ -110,7 +111,7 @@ private:
     Is_default* is_default;
 };
 
-class MPUBLIC ProfileGroupEditor :
+class MTV_PUBLIC ProfileGroupEditor :
     public QObject, public ConfigurationDialog
 {
     Q_OBJECT

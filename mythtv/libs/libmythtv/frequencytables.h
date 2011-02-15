@@ -15,7 +15,7 @@ using namespace std;
 // MythTV includes
 #include "dtvchannel.h"
 
-#include "mythexp.h"
+#include "mythtvexp.h"
 #include "dtvconfparser.h"
 #include "dtvconfparserhelpers.h"
 
@@ -30,7 +30,7 @@ bool teardown_frequency_tables(void);
 freq_table_list_t get_matching_freq_tables(
     const QString &format, const QString &modulation, const QString &country);
 
-MPUBLIC long long get_center_frequency(
+MTV_PUBLIC long long get_center_frequency(
     QString format, QString modulation, QString country, int freqid);
 
 int get_closest_freqid(

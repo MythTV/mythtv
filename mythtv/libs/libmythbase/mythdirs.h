@@ -2,24 +2,24 @@
 #define MYTHDIRS_H_
 
 #include <QString>
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
-MPUBLIC void InitializeMythDirs(void);
+ MBASE_PUBLIC  void InitializeMythDirs(void);
 
-MPUBLIC QString GetInstallPrefix(void);
-MPUBLIC QString GetShareDir(void);
-MPUBLIC QString GetLibraryDir(void);
-MPUBLIC QString GetConfDir(void);
-MPUBLIC QString GetThemesParentDir(void);
-MPUBLIC QString GetPluginsDir(void);
-MPUBLIC QString GetTranslationsDir(void);
-MPUBLIC QString GetFiltersDir(void);
+ MBASE_PUBLIC  QString GetInstallPrefix(void);
+ MBASE_PUBLIC  QString GetShareDir(void);
+ MBASE_PUBLIC  QString GetLibraryDir(void);
+ MBASE_PUBLIC  QString GetConfDir(void);
+ MBASE_PUBLIC  QString GetThemesParentDir(void);
+ MBASE_PUBLIC  QString GetPluginsDir(void);
+ MBASE_PUBLIC  QString GetTranslationsDir(void);
+ MBASE_PUBLIC  QString GetFiltersDir(void);
 
-MPUBLIC QString GetPluginsNameFilter(void);
-MPUBLIC QString FindPluginName(const QString &plugname);
-MPUBLIC QString GetTranslationsNameFilter(void);
-MPUBLIC QString FindTranslation(const QString &translation);
-MPUBLIC QString GetFontsDir(void);
+ MBASE_PUBLIC  QString GetPluginsNameFilter(void);
+ MBASE_PUBLIC  QString FindPluginName(const QString &plugname);
+ MBASE_PUBLIC  QString GetTranslationsNameFilter(void);
+ MBASE_PUBLIC  QString FindTranslation(const QString &translation);
+ MBASE_PUBLIC  QString GetFontsDir(void);
 
 #endif
 

@@ -7,7 +7,7 @@
 #include <QEvent>
 #include <QPointer>
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
 typedef enum {
     MEDIASTAT_ERROR,        ///< Unable to mount, but could be usable
@@ -45,7 +45,7 @@ typedef enum {
 typedef QMap<QString,uint> ext_cnt_t;
 typedef QMap<QString,uint> ext_to_media_t;
 
-class MPUBLIC MythMediaDevice : public QObject
+class MBASE_PUBLIC MythMediaDevice : public QObject
 {
     Q_OBJECT
     friend class MediaMonitorDarwin;   // So these can call setStatus(),
@@ -171,7 +171,7 @@ class MPUBLIC MythMediaDevice : public QObject
     ext_to_media_t m_ext_to_media; ///< Map of extension to media type.
 };
 
-class MPUBLIC MythMediaEvent : public QEvent
+class MBASE_PUBLIC MythMediaEvent : public QEvent
 {
   public:
     MythMediaEvent(MythMediaStatus oldStatus, MythMediaDevice *pDevice) :

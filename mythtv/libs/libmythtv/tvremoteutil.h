@@ -7,7 +7,7 @@
 #include <vector>
 using namespace std;
 
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 class ProgramInfo;
 class RemoteEncoder;
@@ -27,27 +27,27 @@ class TunerStatus
     QDateTime endTime;
 };
 
-MPUBLIC uint RemoteGetState(uint cardid);
-MPUBLIC uint RemoteGetFlags(uint cardid);
-MPUBLIC bool RemoteRecordPending(
+MTV_PUBLIC uint RemoteGetState(uint cardid);
+MTV_PUBLIC uint RemoteGetFlags(uint cardid);
+MTV_PUBLIC bool RemoteRecordPending(
     uint cardid, const ProgramInfo *pginfo, int secsleft, bool hasLater);
-MPUBLIC bool RemoteStopLiveTV(uint cardid);
-MPUBLIC bool RemoteStopRecording(uint cardid);
-MPUBLIC void RemoteStopRecording(const ProgramInfo *pginfo);
-MPUBLIC void RemoteCancelNextRecording(uint cardid, bool cancel);
-MPUBLIC RemoteEncoder *RemoteRequestRecorder(void);
-MPUBLIC RemoteEncoder *RemoteRequestNextFreeRecorder(int curr);
-MPUBLIC
+MTV_PUBLIC bool RemoteStopLiveTV(uint cardid);
+MTV_PUBLIC bool RemoteStopRecording(uint cardid);
+MTV_PUBLIC void RemoteStopRecording(const ProgramInfo *pginfo);
+MTV_PUBLIC void RemoteCancelNextRecording(uint cardid, bool cancel);
+MTV_PUBLIC RemoteEncoder *RemoteRequestRecorder(void);
+MTV_PUBLIC RemoteEncoder *RemoteRequestNextFreeRecorder(int curr);
+MTV_PUBLIC
 RemoteEncoder *RemoteRequestFreeRecorderFromList(
     const QStringList &qualifiedRecorders);
-MPUBLIC RemoteEncoder *RemoteGetExistingRecorder(const ProgramInfo *pginfo);
-MPUBLIC RemoteEncoder *RemoteGetExistingRecorder(int recordernum);
-MPUBLIC vector<InputInfo> RemoteRequestFreeInputList(
+MTV_PUBLIC RemoteEncoder *RemoteGetExistingRecorder(const ProgramInfo *pginfo);
+MTV_PUBLIC RemoteEncoder *RemoteGetExistingRecorder(int recordernum);
+MTV_PUBLIC vector<InputInfo> RemoteRequestFreeInputList(
     uint cardid, const vector<uint> &excluded_cardids);
-MPUBLIC InputInfo RemoteRequestBusyInputID(uint cardid);
-MPUBLIC bool RemoteIsBusy(uint cardid, TunedInputInfo &busy_input);
+MTV_PUBLIC InputInfo RemoteRequestBusyInputID(uint cardid);
+MTV_PUBLIC bool RemoteIsBusy(uint cardid, TunedInputInfo &busy_input);
 
-MPUBLIC bool RemoteGetRecordingStatus(
+MTV_PUBLIC bool RemoteGetRecordingStatus(
     vector<TunerStatus> *tunerList, bool list_inactive);
 
 #endif // _TV_REMOTE_UTIL_H_

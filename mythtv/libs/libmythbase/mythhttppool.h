@@ -13,9 +13,9 @@ using namespace std;
 #include <QUrl>
 
 // MythTV headers
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
-class MPUBLIC MythHttpListener
+class MBASE_PUBLIC MythHttpListener
 {
   public:
     virtual void Update(QHttp::Error      error,
@@ -41,7 +41,7 @@ class MythHttpHandler;
 typedef QMap<QString,MythHttpHandler*> HostToHandler;
 typedef QMultiMap<QUrl,MythHttpListener*> UrlToListener;
 
-class MPUBLIC MythHttpPool
+class MBASE_PUBLIC MythHttpPool
 {
   public:
     MythHttpPool(uint max_connections = 20);

@@ -671,7 +671,7 @@ private:
     const CardInput& m_parent;
 };
 
-class MPUBLIC CaptureCardEditor : public QObject, public ConfigurationDialog
+class MTV_PUBLIC CaptureCardEditor : public QObject, public ConfigurationDialog
 {
     Q_OBJECT
 
@@ -693,7 +693,7 @@ class MPUBLIC CaptureCardEditor : public QObject, public ConfigurationDialog
     ListBoxSetting *listbox;
 };
 
-class MPUBLIC VideoSourceEditor : public QObject, public ConfigurationDialog
+class MTV_PUBLIC VideoSourceEditor : public QObject, public ConfigurationDialog
 {
     Q_OBJECT
 
@@ -719,7 +719,7 @@ class MPUBLIC VideoSourceEditor : public QObject, public ConfigurationDialog
     ListBoxSetting *listbox;
 };
 
-class MPUBLIC CardInputEditor : public QObject, public ConfigurationDialog
+class MTV_PUBLIC CardInputEditor : public QObject, public ConfigurationDialog
 {
     Q_OBJECT
 

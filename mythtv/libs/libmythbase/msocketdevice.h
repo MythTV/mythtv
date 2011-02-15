@@ -47,11 +47,11 @@
 #include <QIODevice>
 #include <QHostAddress> // int->QHostAddress conversion
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
 class MSocketDevicePrivate;
 
-class MPUBLIC MSocketDevice: public QIODevice
+class MBASE_PUBLIC MSocketDevice: public QIODevice
 {
 public:
     enum Type { Stream, Datagram };

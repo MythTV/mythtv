@@ -5,7 +5,7 @@
 #include <QString>
 
 #include "mythdb.h"
-#include "mythexp.h"
+#include "mythbaseexp.h"
 #include "mythobservable.h"
 #include "mythsocket_cb.h"
 #include "mythverbose.h"
@@ -38,7 +38,7 @@ enum LogPriorities
  *  \sa NuppelVideoPlayer::StartPlaying(void)
  *  \sa MythCoreContext:addPrivRequest(MythPrivRequest::Type, void*)
  */
-class MPUBLIC MythPrivRequest
+class MBASE_PUBLIC MythPrivRequest
 {
   public:
     typedef enum { MythRealtime, MythExit, PrivEnd } Type;
@@ -60,7 +60,7 @@ class MPUBLIC MythPrivRequest
  *   It also contains support for database error printing, and
  *   database message logging.
  */
-class MPUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
+class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
 {
   public:
     MythCoreContext(const QString &binversion, QObject *eventHandler);
@@ -181,10 +181,10 @@ class MPUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
 };
 
 /// This global variable contains the MythCoreContext instance for the app
-extern MPUBLIC MythCoreContext *gCoreContext;
+extern MBASE_PUBLIC MythCoreContext *gCoreContext;
 
 /// This global variable is used to makes certain calls to avlib threadsafe.
-extern MPUBLIC QMutex *avcodeclock;
+extern MBASE_PUBLIC QMutex *avcodeclock;
 
 #endif
 

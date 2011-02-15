@@ -11,7 +11,7 @@ using namespace std;
 #include <QTextCodec>
 
 // MythTV headers
-#include "mythexp.h"
+#include "mythtvexp.h"
 #include "mythconfig.h"
 #include "avformatdecoder.h"
 #include "privatedecoder.h"

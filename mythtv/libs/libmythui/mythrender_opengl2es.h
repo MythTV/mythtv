@@ -3,7 +3,7 @@
 
 #include "mythrender_opengl2.h"
 
-class MPUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
+class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
 {
   public:
     MythRenderOpenGL2ES(const QGLFormat& format, QPaintDevice* device)

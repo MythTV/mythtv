@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,7 +26,7 @@ off_t   mythfile_tell(int fileID);
 #endif
 ssize_t mythfile_read(int fileID, void *buf, size_t count);
 ssize_t mythfile_write(int fileID, void *buf, size_t count);
-MPUBLIC int     mythfile_stat(const char *path, struct stat *buf);
+MTV_PUBLIC int     mythfile_stat(const char *path, struct stat *buf);
 int     mythfile_stat_fd(int fileID, struct stat *buf);
 int     mythfile_exists(const char *path, const char *file);
 

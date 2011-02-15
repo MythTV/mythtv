@@ -5,9 +5,9 @@
 
 #include "quicksp.h"
 #include "videometadata.h"
-#include "mythexp.h"
+#include "mythmetaexp.h"
 
-class MPUBLIC VideoMetadataListManager
+class META_PUBLIC VideoMetadataListManager
 {
   public:
     typedef simple_ref_ptr<VideoMetadata> VideoMetadataPtr;

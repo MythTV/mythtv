@@ -1,9 +1,10 @@
 #ifndef CHANNELGROUPSETTINGS_H
 #define CHANNELGROUPSETTINGS_H
 
+#include "mythtvexp.h"
 #include "settings.h"
 
-class MPUBLIC ChannelGroupConfig: public ConfigurationWizard
+class MTV_PUBLIC ChannelGroupConfig: public ConfigurationWizard
 {
  public:
     ChannelGroupConfig(QString _name);
@@ -13,7 +14,7 @@ class MPUBLIC ChannelGroupConfig: public ConfigurationWizard
     QString name;
 };
 
-class MPUBLIC ChannelGroupEditor : public QObject, public ConfigurationDialog
+class MTV_PUBLIC ChannelGroupEditor : public QObject, public ConfigurationDialog
 {
     Q_OBJECT
 

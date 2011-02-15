@@ -4,7 +4,7 @@
 #include "mythrender_opengl.h"
 #include "mythrender_opengl_defs1.h"
 
-class MPUBLIC MythRenderOpenGL1 : public MythRenderOpenGL
+class MUI_PUBLIC MythRenderOpenGL1 : public MythRenderOpenGL
 {
   public:
     MythRenderOpenGL1(const QGLFormat& format, QPaintDevice* device);

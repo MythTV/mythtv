@@ -11,7 +11,7 @@
 #include <QMutex>
 #include <QMap>
 
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 class ProgramInfo;
 class RecordingInfo;
@@ -108,7 +108,7 @@ typedef struct runningjobinfo {
     ProgramInfo *pginfo;
 } RunningJobInfo;
 
-class MPUBLIC JobQueue : public QObject
+class MTV_PUBLIC JobQueue : public QObject
 {
     Q_OBJECT
   public:

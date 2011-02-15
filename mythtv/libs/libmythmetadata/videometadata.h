@@ -7,7 +7,7 @@
 #include <QString>
 
 #include "parentalcontrols.h"
-#include "mythexp.h"
+#include "mythmetaexp.h"
 
 class MSqlQuery;
 class VideoMetadataListManager;
@@ -20,7 +20,7 @@ struct SortData;
 
 typedef QHash<QString,QString> MetadataMap;
 
-class MPUBLIC VideoMetadata
+class META_PUBLIC VideoMetadata
 {
   public:
     typedef std::pair<int, QString> genre_entry;
@@ -234,11 +234,11 @@ class MPUBLIC VideoMetadata
     class VideoMetadataImp *m_imp;
 };
 
-MPUBLIC void ClearMap(MetadataMap &metadataMap);
+META_PUBLIC void ClearMap(MetadataMap &metadataMap);
 
-MPUBLIC bool operator==(const VideoMetadata &a, const VideoMetadata &b);
-MPUBLIC bool operator!=(const VideoMetadata &a, const VideoMetadata &b);
+META_PUBLIC bool operator==(const VideoMetadata &a, const VideoMetadata &b);
+META_PUBLIC bool operator!=(const VideoMetadata &a, const VideoMetadata &b);
 
-MPUBLIC bool operator<(const VideoMetadata::SortKey &lhs, const VideoMetadata::SortKey &rhs);
+META_PUBLIC bool operator<(const VideoMetadata::SortKey &lhs, const VideoMetadata::SortKey &rhs);
 
 #endif

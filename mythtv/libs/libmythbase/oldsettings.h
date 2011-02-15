@@ -16,7 +16,7 @@ using namespace std;
 #include <QString>
 #include <QPixmap>
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
 /**This class contains configuration information.
   *This object is threadsafe.
@@ -24,7 +24,7 @@ using namespace std;
   */
 
 class QPixmap;
-class MPUBLIC Settings {
+class MBASE_PUBLIC Settings {
 public:
         Settings(QString strSettingFile = "settings.txt");
         ~Settings();

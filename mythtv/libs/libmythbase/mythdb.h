@@ -4,7 +4,7 @@
 #include <QMap>
 #include <QString>
 #include <QVariant>
-#include "mythexp.h"
+#include "mythbaseexp.h"
 #include "mythdbcon.h"
 #include "mythdbparams.h"
 
@@ -12,7 +12,7 @@ class MythDBPrivate;
 class Settings;
 class MDBManager;
 
-class MPUBLIC MythDB
+class MBASE_PUBLIC MythDB
 {
   public:
     MDBManager *GetDBManager(void);
@@ -90,7 +90,7 @@ class MPUBLIC MythDB
     MythDBPrivate *d;
 };
 
-MPUBLIC MythDB *GetMythDB();
-MPUBLIC void DestroyMythDB();
+ MBASE_PUBLIC  MythDB *GetMythDB();
+ MBASE_PUBLIC  void DestroyMythDB();
 
 #endif

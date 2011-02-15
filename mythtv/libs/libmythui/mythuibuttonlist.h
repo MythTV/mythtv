@@ -20,7 +20,7 @@ struct TextProperties {
     QString state;
 };
 
-class MPUBLIC MythUIButtonListItem
+class MUI_PUBLIC MythUIButtonListItem
 {
   public:
     enum CheckState {
@@ -112,7 +112,7 @@ class MPUBLIC MythUIButtonListItem
  *
  * \ingroup MythUI_Widgets
  */
-class MPUBLIC MythUIButtonList : public MythUIType
+class MUI_PUBLIC MythUIButtonList : public MythUIType
 {
     Q_OBJECT
   public:
@@ -301,7 +301,7 @@ class MPUBLIC MythUIButtonList : public MythUIType
 
 Q_DECLARE_METATYPE(MythUIButtonListItem *)
 
-class MPUBLIC SearchButtonListDialog : public MythScreenType
+class MUI_PUBLIC SearchButtonListDialog : public MythScreenType
 {
     Q_OBJECT
   public:

@@ -1,10 +1,10 @@
 #ifndef MYTHDBPARAMS_H_
 #define MYTHDBPARAMS_H_
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
 /// Structure containing the basic Database parameters
-struct MPUBLIC DatabaseParams
+struct MBASE_PUBLIC DatabaseParams
 {
     QString dbHostName;         ///< database server
     bool    dbHostPing;         ///< Can we test connectivity using ping?

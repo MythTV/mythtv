@@ -5,9 +5,9 @@
 #include <QString>
 #include <QMap>
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
-class MPUBLIC MythTranslation
+class MBASE_PUBLIC MythTranslation
 {
 
   public:

@@ -7,6 +7,7 @@
 #include <QMutex>
 #include <QList>
 
+#include "mythexp.h"
 #include "mythmedia.h"
 
 /// Stores details of media handlers

@@ -29,7 +29,7 @@
 #include "commbreakmap.h"
 #include "audioplayer.h"
 
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 extern "C" {
 #include "filter.h"
@@ -96,7 +96,7 @@ class DecoderThread : public QThread
     bool        m_start_paused;
 };
 
-class MPUBLIC MythPlayer
+class MTV_PUBLIC MythPlayer
 {
     // Do NOT add a decoder class to this list
     friend class PlayerContext;

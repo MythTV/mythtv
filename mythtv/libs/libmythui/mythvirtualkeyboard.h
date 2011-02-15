@@ -33,7 +33,7 @@ struct KeyDefinition
  *
  * \ingroup MythUI_Widgets
  */
-class MPUBLIC MythUIVirtualKeyboard : public MythScreenType
+class MUI_PUBLIC MythUIVirtualKeyboard : public MythScreenType
 {
   Q_OBJECT
 

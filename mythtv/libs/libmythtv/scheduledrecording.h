@@ -1,9 +1,9 @@
 #ifndef SCHEDULEDRECORDING_H
 #define SCHEDULEDRECORDING_H
 
-#include "mythexp.h"
+#include "mythtvexp.h"
 
-class MPUBLIC ScheduledRecording
+class MTV_PUBLIC ScheduledRecording
 {
   public:
     ScheduledRecording();

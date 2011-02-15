@@ -6,7 +6,7 @@
 class MythPlayer;
 class AudioOutput;
 
-class MPUBLIC AudioPlayer
+class MTV_PUBLIC AudioPlayer
 {
   public:
     AudioPlayer(MythPlayer *parent, bool muted);

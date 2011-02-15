@@ -38,7 +38,7 @@ struct ButtonIcon
  *  \brief Private class that controls the settings of buttons, logos,
  *         backgrounds, texts, and more, for the MythThemedMenu class.
  */
-class MPUBLIC MythThemedMenuState : public MythScreenType
+class MUI_PUBLIC MythThemedMenuState : public MythScreenType
 {
   public:
     MythThemedMenuState(MythScreenStack *parent, const QString &name);
@@ -62,7 +62,7 @@ class MPUBLIC MythThemedMenuState : public MythScreenType
 };
 
 /// \brief Themed menu class, used for main menus in %MythTV frontend
-class MPUBLIC MythThemedMenu : public MythThemedMenuState
+class MUI_PUBLIC MythThemedMenu : public MythThemedMenuState
 {
     Q_OBJECT
   public:

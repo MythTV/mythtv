@@ -3,7 +3,7 @@
 
 #include "mythmedia.h"
 
-class MPUBLIC MythHDD : public MythMediaDevice
+class MBASE_PUBLIC MythHDD : public MythMediaDevice
 {
   public:
     MythHDD(QObject* par, const char* DevicePath,

@@ -4,7 +4,7 @@
 #ifndef _SIGNALMONITORLISTENER_H_
 #define _SIGNALMONITORLISTENER_H_
 
-#include "mythexp.h"
+#include "mythtvexp.h"
 #include "signalmonitorvalue.h"
 
 typedef enum {
@@ -18,7 +18,7 @@ typedef enum {
     kStatusRotorPosition,
 } SignalMonitorMessageType;
 
-class MPUBLIC SignalMonitorListener
+class MTV_PUBLIC SignalMonitorListener
 {
   protected:
     virtual ~SignalMonitorListener() { }
@@ -54,7 +54,7 @@ class MPUBLIC SignalMonitorListener
     virtual void StatusSignalStrength(const SignalMonitorValue&) = 0;
 };
 
-class MPUBLIC DVBSignalMonitorListener : public SignalMonitorListener
+class MTV_PUBLIC DVBSignalMonitorListener : public SignalMonitorListener
 {
   protected:
     virtual ~DVBSignalMonitorListener() { }

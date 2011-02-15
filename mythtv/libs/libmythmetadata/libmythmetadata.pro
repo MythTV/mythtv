@@ -5,6 +5,7 @@ TARGET = mythmetadata-$$LIBVERSION
 CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
+DEFINES += META_API
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 QMAKE_CLEAN += version.cpp
@@ -14,7 +15,7 @@ QMAKE_CLEAN += version.cpp
 HEADERS += cleanup.h  dbaccess.h  dirscan.h  globals.h  parentalcontrols.h
 HEADERS += videoscan.h  videoutils.h  videometadata.h  videometadatalistmanager.h
 HEADERS += quicksp.h metadatacommon.h metadatadownload.h metadataimagedownload.h
-HEADERS += bluraymetadata.h
+HEADERS += bluraymetadata.h mythmetaexp.h
 
 SOURCES += cleanup.cpp  dbaccess.cpp  dirscan.cpp  globals.cpp
 SOURCES += parentalcontrols.cpp  videoscan.cpp  videoutils.cpp

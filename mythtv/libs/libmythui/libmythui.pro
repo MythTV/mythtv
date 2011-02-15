@@ -30,6 +30,7 @@ HEADERS += mythgenerictree.h mythuibuttontree.h mythuiutils.h
 HEADERS += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
 HEADERS += mythrender_base.h mythfontmanager.h mythuieditbar.h
 HEADERS += mythdisplay.h mythuivideo.h mythudplistener.h
+HEADERS += mythuiexp.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
 SOURCES += myththemebase.cpp  mythpainter_qimage.cpp mythpainter_yuva.cpp
@@ -156,6 +157,7 @@ using_opengl {
 
 QT += xml sql network webkit
 DEFINES += USING_QTWEBKIT
+DEFINES += MUI_API
 
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden

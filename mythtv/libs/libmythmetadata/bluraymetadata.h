@@ -6,7 +6,7 @@
 #include <QString>
 
 #include "mythimage.h"
-#include "mythexp.h"
+#include "mythmetaexp.h"
 #include "bluray.h"
 
 typedef QList< QPair < uint,QString > > BlurayTitles;
@@ -14,7 +14,7 @@ typedef QList< QPair < uint,QString > > BlurayTitles;
 typedef QHash<QString,QString> MetadataMap;
 
 struct meta_dl;
-class MPUBLIC BlurayMetadata : public QObject
+class META_PUBLIC BlurayMetadata : public QObject
 {
   public:
     BlurayMetadata(const QString path);

@@ -3,17 +3,17 @@
 
 #include <cstdlib>
 
-#include "mythexp.h"
+#include "mythuiexp.h"
 
 class QString;
 
-struct MPUBLIC ETPrintWarning
+struct MUI_PUBLIC ETPrintWarning
 {
     static bool Child(const QString &container_name, const QString &child_name);
     static bool Container(const QString &child_name);
 };
 
-struct MPUBLIC ETPrintError
+struct MUI_PUBLIC ETPrintError
 {
     static bool Child(const QString &container_name, const QString &child_name);
     static bool Container(const QString &child_name);

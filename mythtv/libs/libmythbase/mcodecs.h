@@ -36,7 +36,7 @@
 
 #define QBase64 QCodecs
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
 class QByteArray;
 class QIODevice;
@@ -82,7 +82,7 @@ namespace QCodecs
    *                breaks, too.
    * @return        quoted-printable encoded string.
    */
-  MPUBLIC QByteArray quotedPrintableEncode(const QByteArray & in,
+  MBASE_PUBLIC QByteArray quotedPrintableEncode(const QByteArray & in,
                                         bool useCRLF = true);
 
   /**
@@ -103,7 +103,7 @@ namespace QCodecs
    *                CRLF line breaks and the output will have CRLF line
    *                breaks, too.
    */
-  MPUBLIC void quotedPrintableEncode(const QByteArray & in, QByteArray& out,
+  MBASE_PUBLIC void quotedPrintableEncode(const QByteArray & in, QByteArray& out,
                                     bool useCRLF);
 
   /**
@@ -114,7 +114,7 @@ namespace QCodecs
    * @param in  data to be decoded.
    * @return    decoded string.
    */
-  MPUBLIC QByteArray quotedPrintableDecode(const QByteArray & in);
+  MBASE_PUBLIC QByteArray quotedPrintableDecode(const QByteArray & in);
 
   /**
    * Decodes a quoted-printable encoded data.
@@ -133,7 +133,7 @@ namespace QCodecs
    * @param in   data to be decoded.
    * @param out  decoded data.
    */
-  MPUBLIC void quotedPrintableDecode(const QByteArray & in, QByteArray& out);
+  MBASE_PUBLIC void quotedPrintableDecode(const QByteArray & in, QByteArray& out);
 
 
   /**
@@ -147,7 +147,7 @@ namespace QCodecs
    * @param in   data to be uuencoded
    * @return     uuencoded string.
    */
-  MPUBLIC QByteArray uuencode( const QByteArray& in );
+  MBASE_PUBLIC QByteArray uuencode( const QByteArray& in );
 
   /**
    * Encodes the given data using the uuencode algorithm.
@@ -164,7 +164,7 @@ namespace QCodecs
    * @param in   data to be uuencoded.
    * @param out  uudecoded data.
    */
-  MPUBLIC void uuencode( const QByteArray& in, QByteArray& out );
+  MBASE_PUBLIC void uuencode( const QByteArray& in, QByteArray& out );
 
   /**
    * Decodes the given data using the uudecode algorithm.
@@ -176,7 +176,7 @@ namespace QCodecs
    * @param in   data to be decoded.
    * @return     decoded string.
    */
-  MPUBLIC QByteArray uudecode( const QByteArray& in );
+  MBASE_PUBLIC QByteArray uudecode( const QByteArray& in );
 
   /**
    * Decodes the given data using the uudecode algorithm.
@@ -197,7 +197,7 @@ namespace QCodecs
    * @param in   data to be decoded.
    * @param out  uudecoded data.
    */
-  MPUBLIC void uudecode( const QByteArray& in, QByteArray& out );
+  MBASE_PUBLIC void uudecode( const QByteArray& in, QByteArray& out );
 
 
   /**
@@ -213,7 +213,7 @@ namespace QCodecs
    *
    * @return           base64 encoded string.
    */
-  MPUBLIC QByteArray base64Encode( const QByteArray& in, bool insertLFs = false);
+  MBASE_PUBLIC QByteArray base64Encode( const QByteArray& in, bool insertLFs = false);
 
   /**
    * Encodes the given data using the base64 algorithm.
@@ -236,7 +236,7 @@ namespace QCodecs
    * @param out       encoded data.
    * @param insertLFs limit the number of characters per line.
    */
-  MPUBLIC void base64Encode( const QByteArray& in, QByteArray& out,
+  MBASE_PUBLIC void base64Encode( const QByteArray& in, QByteArray& out,
                             bool insertLFs = false );
 
   /**
@@ -246,7 +246,7 @@ namespace QCodecs
    * @param in   data to be decoded.
    * @return     decoded string.
    */
-  MPUBLIC QByteArray base64Decode( const QByteArray& in );
+  MBASE_PUBLIC QByteArray base64Decode( const QByteArray& in );
 
   /**
    * Decodes the given data that was encoded with the base64
@@ -265,7 +265,7 @@ namespace QCodecs
    * @param in   data to be decoded.
    * @param out  decoded data.
    */
-  MPUBLIC void base64Decode( const QByteArray& in, QByteArray& out );
+  MBASE_PUBLIC void base64Decode( const QByteArray& in, QByteArray& out );
 
 }
 
@@ -315,7 +315,7 @@ class QMD5Private;
  * @author Dirk Mueller <mueller@kde.org>, Dawit Alemayehu <adawit@kde.org>
  */
 
-class MPUBLIC QMD5
+class MBASE_PUBLIC QMD5
 {
 public:
 
