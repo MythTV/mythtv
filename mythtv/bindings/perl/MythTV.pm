@@ -241,18 +241,11 @@ package MythTV;
                ."MythTV installation to $conf.\n";
             #print $dev->getfriendlyname(), "\n";
         }
-    # This should really point to a different UDN, but leaving this as-is won't
-    # hurt the perl code.
-        my $m_udn = $upnp->{udn};
-        $m_udn =~ s/^uuid\W+//;
     # Save the config.xml
         open CONF, ">$conf/config.xml" or die "Can't write to $conf/config.xml:  $!\n";
         print CONF <<EOF;
 <Configuration>
   <UPnP>
-    <UDN>
-      <MediaRenderer>$m_udn</MediaRenderer>
-    </UDN>
     <MythFrontend>
       <DefaultBackend>
         <USN>$upnp->{usn}</USN>
