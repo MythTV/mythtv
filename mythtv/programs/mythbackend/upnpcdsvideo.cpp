@@ -294,7 +294,7 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
     // ----------------------------------------------------------------------
 
     QString sName      = sTitle;
-    if( not sSubtitle.isEmpty() )
+    if( !sSubtitle.isEmpty() )
     {
         sName += " - " + sSubtitle;
     }
