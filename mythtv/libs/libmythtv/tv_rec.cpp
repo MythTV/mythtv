@@ -3,7 +3,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <unistd.h>
-#include <pthread.h>
 #include <sched.h> // for sched_yield
 
 // C++ headers
@@ -105,10 +104,6 @@ TVRec::TVRec(int capturecardnum)
        // Various components TVRec coordinates
     : recorder(NULL), channel(NULL), signalMonitor(NULL),
       scanner(NULL),
-      // Event processing thread, runs RunTV()
-      event_thread(pthread_t()),
-      // Recorder thread, runs RecorderBase::StartRecording()
-      recorder_thread(pthread_t()),
       // Configuration variables from database
       transcodeFirst(false),
       earlyCommFlag(false),         runJobOnHostOnly(false),
@@ -267,7 +262,8 @@ bool TVRec::Init(void)
     overRecordSecCat  = gCoreContext->GetNumSetting("CategoryOverTime") * 60;
     overRecordCategory= gCoreContext->GetSetting("OverTimeCategory");
 
-    pthread_create(&event_thread, NULL, EventThread, this);
+    EventThread.SetParent(this);
+    EventThread.start();
 
     WaitForEventThreadSleep();
 
@@ -290,7 +286,7 @@ void TVRec::TeardownAll(void)
     if (HasFlags(kFlagRunMainLoop))
     {
         ClearFlags(kFlagRunMainLoop);
-        pthread_join(event_thread, NULL);
+        EventThread.wait();
     }
 
     TeardownSignalMonitor();
@@ -1154,7 +1150,7 @@ void TVRec::TeardownRecorder(bool killFile)
         gCoreContext->dispatch(me);
 
         recorder->StopRecording();
-        pthread_join(recorder_thread, NULL);
+        RecorderThread.wait();
     }
     ClearFlags(kFlagRecorderRunning);
 
@@ -1297,25 +1293,27 @@ V4LChannel *TVRec::GetV4LChannel(void)
 #endif // USING_V4L
 }
 
-/** \fn TVRec::EventThread(void*)
- *  \brief Thunk that allows event pthread to call RunTV().
+/** \fn TVReEventThread::run(void)
+ *  \brief Thunk that allows event thread to call RunTV().
  */
-void *TVRec::EventThread(void *param)
+void TVRecEventThread::run(void)
 {
-    TVRec *thetv = (TVRec *)param;
-    thetv->RunTV();
-    return NULL;
+    if (!m_parent)
+        return;
+
+    m_parent->RunTV();
 }
 
-/** \fn TVRec::RecorderThread(void*)
- *  \brief Thunk that allows recorder pthread to
+/** \fn TVReRecordThread::run(void)
+ *  \brief Thunk that allows recorder thread to
  *         call RecorderBase::StartRecording().
  */
-void *TVRec::RecorderThread(void *param)
+void TVRecRecordThread::run(void)
 {
-    RecorderBase *recorder = (RecorderBase *)param;
-    recorder->StartRecording();
-    return NULL;
+    if (!m_parent || !m_parent->recorder)
+        return;
+
+    m_parent->recorder->StartRecording();
 }
 
 static bool get_use_eit(uint cardid)
@@ -4142,7 +4140,8 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
     }
 #endif
 
-    pthread_create(&recorder_thread, NULL, TVRec::RecorderThread, recorder);
+    RecorderThread.SetParent(this);
+    RecorderThread.start();
 
     // Wait for recorder to start.
     stateChangeLock.unlock();
