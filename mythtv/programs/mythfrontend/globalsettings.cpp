@@ -2227,22 +2227,6 @@ static HostComboBox *MythTimeFormat()
     return gc;
 }
 
-static HostComboBox *ThemePainter()
-{
-    HostComboBox *gc = new HostComboBox("ThemePainter");
-    gc->setLabel(QObject::tr("Paint engine"));
-#ifdef USING_MINGW
-    gc->addSelection(QObject::tr("Direct3D"), "d3d9");
-#endif
-    gc->addSelection(QObject::tr("Qt"), "qt");
-#ifdef USING_OPENGL
-    gc->addSelection(QObject::tr("OpenGL"), "opengl");
-#endif
-    gc->setHelpText(QObject::tr("This selects what MythTV uses to draw. If "
-                    "you have decent hardware, select OpenGL."));
-    return gc;
-}
-
 static HostComboBox *ChannelFormat()
 {
     HostComboBox *gc = new HostComboBox("ChannelFormat");
@@ -3657,7 +3641,6 @@ AppearanceSettings::AppearanceSettings()
     VerticalConfigurationGroup* screen = new VerticalConfigurationGroup(false);
     screen->setLabel(QObject::tr("Theme") + " / " + QObject::tr("Screen Settings"));
 
-    screen->addChild(ThemePainter());
     screen->addChild(MenuTheme());
 
     if (MythDisplay::GetNumberXineramaScreens() > 1)
