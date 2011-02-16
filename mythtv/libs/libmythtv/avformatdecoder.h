@@ -120,6 +120,8 @@ class AvFormatDecoder : public DecoderBase
 
     bool isLastFrameKey(void) { return false; }
 
+    bool isCodecMPEG(void) { return codec_is_mpeg; }
+
     /// This is a No-op for this class.
     void WriteStoredData(RingBuffer *rb, bool storevid, long timecodeOffset)
                            { (void)rb; (void)storevid; (void)timecodeOffset;}
@@ -336,6 +338,7 @@ class AvFormatDecoder : public DecoderBase
     AudioInfo         audioOut;
 
     float m_fps;
+    bool  codec_is_mpeg;
 
     // SPDIF Encoder for digital passthrough
     SPDIFEncoder     *m_spdifenc;

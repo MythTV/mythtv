@@ -4362,9 +4362,9 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
         islive = true;
     }
 
-    float secsplayed = (noVideoTracks || decoder->GetCodecDecoderName() == "nuppel") ? 
-        (float)(framesPlayed / video_frame_rate) :
-        (float)(disp_timecode / 1000.f);
+    float secsplayed = decoder->isCodecMPEG() ?
+        (float)(disp_timecode / 1000.f) :
+        (float)(framesPlayed / video_frame_rate);
 
     calcSliderPosPriv(info, paddedFields, playbackLen, secsplayed, islive);
 }

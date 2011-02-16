@@ -261,6 +261,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       disable_passthru(false),
       dummy_frame(NULL),
       m_fps(0.0f),
+      codec_is_mpeg(false),
       m_spdifenc(NULL)
 {
     memset(&params, 0, sizeof(AVFormatParameters));
@@ -1720,6 +1721,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                                           "codec id, skipping.").arg(i));
                     continue;
                 }
+
+                codec_is_mpeg = CODEC_IS_FFMPEG_MPEG(enc->codec_id);
 
                 // HACK -- begin
                 // ffmpeg is unable to compute H.264 bitrates in mpegts?
