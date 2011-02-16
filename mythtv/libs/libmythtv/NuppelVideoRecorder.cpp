@@ -1110,7 +1110,7 @@ void NuppelVideoRecorder::StartRecording(void)
         return;
     }
 
-    if (SpawnChildren() < 0)
+    if (!SpawnChildren())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't spawn children");
         errored = true;
@@ -1863,53 +1863,48 @@ void NuppelVideoRecorder::DoV4L2(void)        {}
 void NuppelVideoRecorder::DoMJPEG(void)       {}
 #endif // USING_V4L
 
-int NuppelVideoRecorder::SpawnChildren(void)
+bool NuppelVideoRecorder::SpawnChildren(void)
 {
-    int result;
-
     childrenLive = true;
 
-    result = pthread_create(&write_tid, NULL,
-                            NuppelVideoRecorder::WriteThread, this);
-
-    if (result)
+    WriteThread.SetParent(this);
+    WriteThread.start();
+    if (!WriteThread.isRunning())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't spawn writer thread, exiting");
-        return -1;
+        return false;
     }
 
-    result = pthread_create(&audio_tid, NULL,
-                            NuppelVideoRecorder::AudioThread, this);
-
-    if (result)
+    AudioThread.SetParent(this);
+    AudioThread.start();
+    if (!AudioThread.isRunning())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't spawn audio thread, exiting");
-        return -1;
+        return false;
     }
 
     if (vbimode)
     {
-        result = pthread_create(&vbi_tid, NULL,
-                                NuppelVideoRecorder::VbiThread, this);
-
-        if (result)
+        VbiThread.SetParent(this);
+        VbiThread.start();
+        if (!VbiThread.isRunning())
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't spawn vbi thread, exiting");
-            return -1;
+            return false;
         }
     }
 
-    return 0;
+    return true;
 }
 
 void NuppelVideoRecorder::KillChildren(void)
 {
     childrenLive = false;
 
-    pthread_join(write_tid, NULL);
-    pthread_join(audio_tid, NULL);
+    WriteThread.wait();
+    AudioThread.wait();
     if (vbimode)
-        pthread_join(vbi_tid, NULL);
+        VbiThread.wait();        
 #ifdef USING_FFMPEG_THREADS
     if (useavcodec && encoding_thread_count > 1)
         avcodec_thread_free(mpa_vidctx);
@@ -2330,31 +2325,28 @@ void NuppelVideoRecorder::Reset(void)
         curRecording->ClearPositionMap(MARK_KEYFRAME);
 }
 
-void *NuppelVideoRecorder::WriteThread(void *param)
+void NVRWriteThread::run(void)
 {
-    NuppelVideoRecorder *nvr = (NuppelVideoRecorder *)param;
+    if (!m_parent)
+        return;
 
-    nvr->doWriteThread();
-
-    return NULL;
+    m_parent->doWriteThread();
 }
 
-void *NuppelVideoRecorder::AudioThread(void *param)
+void NVRAudioThread::run(void)
 {
-    NuppelVideoRecorder *nvr = (NuppelVideoRecorder *)param;
+    if (!m_parent)
+        return;
 
-    nvr->doAudioThread();
-
-    return NULL;
+    m_parent->doAudioThread();
 }
 
-void *NuppelVideoRecorder::VbiThread(void *param)
+void NVRVbiThread::run(void)
 {
-    NuppelVideoRecorder *nvr = (NuppelVideoRecorder *)param;
+    if (!m_parent)
+        return;
 
-    nvr->doVbiThread();
-
-    return NULL;
+    m_parent->doVbiThread();
 }
 
 void NuppelVideoRecorder::doAudioThread(void)
