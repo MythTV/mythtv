@@ -4191,12 +4191,12 @@ fi
 
 if enabled gxx; then
     if enabled symbol_visibility; then
-        if expr "$gxx_version" : '^4' > /dev/null; then
+        if expr "$gxx_version" : '^4\.[2-9]' > /dev/null; then
             check_cxxflags -fvisibility-inlines-hidden
             append CCONFIG "use_hidesyms"
         else
             disable symbol_visibility
-            warn "--enable-symbol-visibility requires gcc 4.x"
+            warn "--enable-symbol-visibility requires gcc 4.2 or higher"
         fi
     fi
     if expr "$gxx_version" : '^4\.[3-9]' > /dev/null; then
