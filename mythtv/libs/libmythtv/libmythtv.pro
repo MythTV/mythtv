@@ -247,6 +247,7 @@ SOURCES += channelscan/scaninfo.cpp channelscan/channelimporter.cpp
 
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = playgroup.h
+inc.files += mythtvexp.h
 
 INSTALLS += inc
 

@@ -64,6 +64,7 @@ inc.files += mythuiprogressbar.h mythuiwebbrowser.h mythuiutils.h
 inc.files += x11colors.h mythgenerictree.h mythuibuttontree.h
 inc.files += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
 inc.files += mythuieditbar.h mythuifilebrowser.h mythuivideo.h
+inc.files += mythuiexp.h
 
 INSTALLS += inc
 

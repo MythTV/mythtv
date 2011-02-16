@@ -60,7 +60,7 @@ inc.path = $${PREFIX}/include/mythtv/metadata/
 inc.files = cleanup.h  dbaccess.h  dirscan.h  globals.h  parentalcontrols.h
 inc.files += videoscan.h  videoutils.h  videometadata.h  videometadatalistmanager.h
 inc.files += quicksp.h metadatacommon.h metadatadownload.h metadataimagedownload.h
-inc.files += bluraymetadata.h
+inc.files += bluraymetadata.h mythmetaexp.h
 
 INSTALLS += inc
 
