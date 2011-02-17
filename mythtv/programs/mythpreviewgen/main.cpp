@@ -111,7 +111,7 @@ int preview_helper(const QString &_chanid, const QString &starttime,
                         "Cannot locate recording made on '%1' at '%2'")
                     .arg(chanid).arg(starttime));
             delete pginfo;
-            return PREVIEWGEN_EXIT_NOT_OK;
+            return GENERIC_EXIT_NOT_OK;
         }
         pginfo->SetPathname(pginfo->GetPlaybackURL(false, true));
     }
@@ -121,7 +121,7 @@ int preview_helper(const QString &_chanid, const QString &starttime,
         {
             VERBOSE(VB_IMPORTANT, QString(
                         "Cannot read this file '%1'").arg(infile));
-            return PREVIEWGEN_EXIT_NOT_OK;
+            return GENERIC_EXIT_NOT_OK;
         }
         pginfo = new ProgramInfo(
             infile, ""/*plot*/, ""/*title*/, ""/*subtitle*/, ""/*director*/,
@@ -131,7 +131,7 @@ int preview_helper(const QString &_chanid, const QString &starttime,
     else
     {
         VERBOSE(VB_IMPORTANT, "Cannot locate recording to preview");
-        return PREVIEWGEN_EXIT_NOT_OK;
+        return GENERIC_EXIT_NOT_OK;
     }
 
     PreviewGenerator *previewgen = new PreviewGenerator(
@@ -150,7 +150,7 @@ int preview_helper(const QString &_chanid, const QString &starttime,
 
     delete pginfo;
 
-    return (ok) ? PREVIEWGEN_EXIT_OK : PREVIEWGEN_EXIT_NOT_OK;
+    return (ok) ? GENERIC_EXIT_OK : GENERIC_EXIT_NOT_OK;
 }
 
 int main(int argc, char **argv)
@@ -172,10 +172,10 @@ int main(int argc, char **argv)
         if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
         {
             if (cmdline_err)
-                return PREVIEWGEN_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
 
             if (cmdline.WantsToExit())
-                return PREVIEWGEN_EXIT_OK;
+                return GENERIC_EXIT_OK;
         }
     }
 
@@ -197,17 +197,17 @@ int main(int argc, char **argv)
         if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
         {
             if (cmdline_err)
-                return PREVIEWGEN_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
 
             if (cmdline.WantsToExit())
-                return PREVIEWGEN_EXIT_OK;
+                return GENERIC_EXIT_OK;
         }
         else
         {
             cerr << "Invalid argument: " << a.argv()[argpos] << endl;
             QByteArray help = cmdline.GetHelpString(true).toLocal8Bit();
             cout << help.constData();
-            return PREVIEWGEN_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
 
@@ -216,7 +216,7 @@ int main(int argc, char **argv)
         cerr << "--generate-preview must be accompanied by either " <<endl
              << "\nboth --chanid and --starttime parameters, " << endl
              << "\nor the --infile parameter." << endl;
-        return PREVIEWGEN_EXIT_INVALID_CMDLINE;
+        return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -244,7 +244,7 @@ int main(int argc, char **argv)
     if (!gContext->Init(false))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext.");
-        return PREVIEWGEN_EXIT_NO_MYTHCONTEXT;
+        return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
     gCoreContext->SetBackend(false); // TODO Required?
 

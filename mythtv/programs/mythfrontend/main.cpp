@@ -885,7 +885,7 @@ static int reloadTheme(void)
         VERBOSE(VB_IMPORTANT, QString("Couldn't find theme '%1'")
                 .arg(themename));
         cleanup();
-        return FRONTEND_BUGGY_EXIT_NO_THEME;
+        return GENERIC_EXIT_NO_THEME;
     }
 
     MythTranslation::reload();
@@ -902,7 +902,7 @@ static int reloadTheme(void)
     GetMythMainWindow()->SetEffectsEnabled(true);
 
     if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
-        return FRONTEND_BUGGY_EXIT_NO_THEME;
+        return GENERIC_EXIT_NO_THEME;
 
     LCD::SetupLCD();
     if (LCD *lcd = LCD::Get())
@@ -1155,7 +1155,7 @@ int main(int argc, char **argv)
         if (arg == "-h" || arg == "--help" || arg == "--usage")
         {
             ShowUsage(cmdline);
-            return FRONTEND_EXIT_OK;
+            return GENERIC_EXIT_OK;
         }
     }
 
@@ -1164,9 +1164,9 @@ int main(int argc, char **argv)
         if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
         {
             if (cmdline_err)
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             if (cmdline.WantsToExit())
-                return FRONTEND_EXIT_OK;
+                return GENERIC_EXIT_OK;
         }
     }
 
@@ -1218,7 +1218,7 @@ int main(int argc, char **argv)
                 {
                     cerr << "Invalid or missing argument"
                             " to -l/--logfile option\n";
-                    return FRONTEND_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
                 }
                 else
                 {
@@ -1228,15 +1228,15 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing argument to -l/--logfile option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
         {
             if (cmdline_err)
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             if (cmdline.WantsToExit())
-                return FRONTEND_EXIT_OK;
+                return GENERIC_EXIT_OK;
         }
     }
     QMap<QString,QString> settingsOverride = cmdline.GetSettingsOverride();
@@ -1296,7 +1296,7 @@ int main(int argc, char **argv)
     if (!gContext->Init(true, g_pUPnp, bPromptForBackend, bBypassAutoDiscovery))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        return FRONTEND_EXIT_NO_MYTHCONTEXT;
+        return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
     if (!GetMythDB()->HaveSchema())
@@ -1342,12 +1342,12 @@ int main(int argc, char **argv)
         {
             if (cmdline_err)
             {
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             if (cmdline.WantsToExit())
             {
-                return FRONTEND_EXIT_OK;
+                return GENERIC_EXIT_OK;
             }
         }
         else if ((argpos + 1 == a.argc()) &&
@@ -1359,7 +1359,7 @@ int main(int argc, char **argv)
         {
             cerr << "Invalid argument: " << a.argv()[argpos] << endl;
             ShowUsage(cmdline);
-            return FRONTEND_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
 
@@ -1374,7 +1374,7 @@ int main(int argc, char **argv)
                 .arg(*it).arg(value);
             cout << out.toLocal8Bit().constData() << endl;
         }
-        return FRONTEND_EXIT_OK;
+        return GENERIC_EXIT_OK;
     }
 
     QString fileprefix = GetConfDir();
@@ -1392,7 +1392,7 @@ int main(int argc, char **argv)
         gCoreContext->SaveSetting("Language", "");
         gCoreContext->SaveSetting("Country", "");
 
-        return FRONTEND_EXIT_OK;
+        return GENERIC_EXIT_OK;
     }
 
     // Create privileged thread, then drop privs
@@ -1428,7 +1428,7 @@ int main(int argc, char **argv)
     {
         VERBOSE(VB_IMPORTANT, QString("Couldn't find theme '%1'")
                 .arg(themename));
-        return FRONTEND_EXIT_NO_THEME;
+        return GENERIC_EXIT_NO_THEME;
     }
 
     GetMythUI()->LoadQtConfig();
@@ -1439,7 +1439,7 @@ int main(int argc, char **argv)
     {
         VERBOSE(VB_IMPORTANT, QString("Couldn't find theme '%1'")
                 .arg(themename));
-        return FRONTEND_EXIT_NO_THEME;
+        return GENERIC_EXIT_NO_THEME;
     }
 
     MythMainWindow *mainWindow = GetMythMainWindow();
@@ -1450,7 +1450,7 @@ int main(int argc, char **argv)
     {
         VERBOSE(VB_IMPORTANT,
                 "Couldn't upgrade database to new schema, exiting.");
-        return FRONTEND_EXIT_DB_OUTOFDATE;
+        return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
     WriteDefaults();
@@ -1481,10 +1481,10 @@ int main(int argc, char **argv)
         {
             qApp->exec();
 
-            return FRONTEND_EXIT_OK;
+            return GENERIC_EXIT_OK;
         }
         else
-            return FRONTEND_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
@@ -1507,7 +1507,7 @@ int main(int argc, char **argv)
 
     if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
     {
-        return FRONTEND_EXIT_NO_THEME;
+        return GENERIC_EXIT_NO_THEME;
     }
 
     // Setup handler for USR1 signals to reload theme

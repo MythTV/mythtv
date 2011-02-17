@@ -208,7 +208,6 @@ MediaRenderer::MediaRenderer()
     if (!m_pHttpServer->listen(QHostAddress::Any, nPort))
     {
         VERBOSE(VB_IMPORTANT, "MediaRenderer::HttpServer Create Error");
-        // exit(BACKEND_BUGGY_EXIT_NO_BIND_STATUS);
         delete m_pHttpServer;
         m_pHttpServer = NULL;
         InitializeSSDPOnly();
@@ -281,7 +280,6 @@ MediaRenderer::MediaRenderer()
     else
     {
         VERBOSE(VB_IMPORTANT, "MediaRenderer::Unable to Initialize UPnp Stack");
-        // exit(BACKEND_BUGGY_EXIT_NO_BIND_STATUS);
     }
 
 

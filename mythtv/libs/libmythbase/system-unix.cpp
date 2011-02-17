@@ -297,12 +297,7 @@ void MythSystemManager::run(void)
                 // Don't override a timed out process which gets killed, but
                 // otherwise set the return status appropriately
                 int sig = WTERMSIG(status);
-                if( sig == 9 )
-                    ms->SetStatus( GENERIC_EXIT_ABORTED );
-                else if( sig == 11 )
-                    ms->SetStatus( GENERIC_EXIT_TERMINATED );
-                else
-                    ms->SetStatus( GENERIC_EXIT_SIGNALLED );
+                ms->SetStatus( GENERIC_EXIT_KILLED );
 
                 VERBOSE(VB_SYSTEM, 
                     QString("Managed child (PID: %1) has signalled! "
@@ -699,7 +694,7 @@ void MythSystemUnix::Fork(time_t timeout)
                 cerr << locerr 
                      << "Cannot redirect input pipe to standard input: "
                      << strerror(errno) << endl;
-                _exit(MYTHSYSTEM__EXIT__PIPE_FAILURE);
+                _exit(GENERIC_EXIT_PIPE_FAILURE);
             }
         }
         else
@@ -734,7 +729,7 @@ void MythSystemUnix::Fork(time_t timeout)
                 cerr << locerr
                      << "Cannot redirect output pipe to standard output: "
                      << strerror(errno) << endl;
-                _exit(MYTHSYSTEM__EXIT__PIPE_FAILURE);
+                _exit(GENERIC_EXIT_PIPE_FAILURE);
             }
         }
 
@@ -747,7 +742,7 @@ void MythSystemUnix::Fork(time_t timeout)
                 cerr << locerr
                      << "Cannot redirect error pipe to standard error: " 
                      << strerror(errno) << endl;
-                _exit(MYTHSYSTEM__EXIT__PIPE_FAILURE);
+                _exit(GENERIC_EXIT_PIPE_FAILURE);
             }
         }
 
@@ -783,7 +778,7 @@ void MythSystemUnix::Fork(time_t timeout)
         }
 
         /* Failed to exec */
-        _exit(MYTHSYSTEM__EXIT__EXECL_ERROR); // this exit is ok
+        _exit(GENERIC_EXIT_DAEMONIZING_ERROR); // this exit is ok
     }
 
     /* Parent */

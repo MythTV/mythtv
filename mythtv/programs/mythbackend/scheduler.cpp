@@ -145,7 +145,7 @@ bool Scheduler::VerifyCards(void)
     if (!query.exec("SELECT count(*) FROM capturecard") || !query.next())
     {
         MythDB::DBError("verifyCards() -- main query 1", query);
-        error = BACKEND_EXIT_NO_CAP_CARD;
+        error = GENERIC_EXIT_DB_ERROR;
         return false;
     }
 
@@ -155,7 +155,7 @@ bool Scheduler::VerifyCards(void)
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "No capture cards are defined in the database.\n\t\t\t"
                 "Perhaps you should re-read the installation instructions?");
-        error = BACKEND_EXIT_NO_CAP_CARD;
+        error = GENERIC_EXIT_SETUP_ERROR;
         return false;
     }
 
@@ -164,7 +164,7 @@ bool Scheduler::VerifyCards(void)
     if (!query.exec())
     {
         MythDB::DBError("verifyCards() -- main query 2", query);
-        error = BACKEND_EXIT_NO_CHAN_DATA;
+        error = GENERIC_EXIT_DB_ERROR;
         return false;
     }
 
@@ -200,7 +200,7 @@ bool Scheduler::VerifyCards(void)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "No channel sources defined in the database");
-        error = BACKEND_EXIT_NO_CHAN_DATA;
+        error = GENERIC_EXIT_SETUP_ERROR;
         return false;
     }
 

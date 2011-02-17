@@ -181,7 +181,7 @@ MainServer::MainServer(bool master, int port,
     encoderList(tvList), mythserver(NULL), masterServerReconnect(NULL),
     masterServer(NULL), ismaster(master), masterBackendOverride(false),
     m_sched(sched), m_expirer(expirer), deferredDeleteTimer(NULL),
-    autoexpireUpdateTimer(NULL), m_exitCode(BACKEND_EXIT_OK)
+    autoexpireUpdateTimer(NULL), m_exitCode(GENERIC_EXIT_OK)
 {
     PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
         PreviewGenerator::kLocalAndRemote, ~0, 0);
@@ -204,7 +204,7 @@ MainServer::MainServer(bool master, int port,
     {
         VERBOSE(VB_IMPORTANT, QString("Failed to bind port %1. Exiting.")
                 .arg(port));
-        SetExitCode(BACKEND_BUGGY_EXIT_NO_BIND_MAIN, false);
+        SetExitCode(GENERIC_EXIT_SOCKET_ERROR, false);
         return;
     }
 

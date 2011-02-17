@@ -414,16 +414,16 @@ int handle_command(const MythCommandLineParser &cmdline)
             }
 
             RemoteSendMessage(eventString);
-            return BACKEND_EXIT_OK;
+            return GENERIC_EXIT_OK;
         }
-        return BACKEND_EXIT_NO_MYTHCONTEXT;
+        return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
     if (cmdline.WantUPnPRebuild())
     {
         VERBOSE(VB_GENERAL, "Rebuilding UPNP Media Map is no longer supported.  Rescan videos using MythVideo.");
 
-        return BACKEND_EXIT_OK;
+        return GENERIC_EXIT_OK;
     }
 
     if (cmdline.SetVerbose())
@@ -435,13 +435,13 @@ int handle_command(const MythCommandLineParser &cmdline)
 
             RemoteSendMessage(message);
             VERBOSE(VB_IMPORTANT, QString("Sent '%1' message").arg(message));
-            return BACKEND_EXIT_OK;
+            return GENERIC_EXIT_OK;
         }
         else
         {
             VERBOSE(VB_IMPORTANT,
                     "Unable to connect to backend, verbose level unchanged ");
-            return BACKEND_EXIT_NO_CONNECT;
+            return GENERIC_EXIT_CONNECT_ERROR;
         }
     }
 
@@ -451,13 +451,13 @@ int handle_command(const MythCommandLineParser &cmdline)
         {
             RemoteSendMessage("CLEAR_SETTINGS_CACHE");
             VERBOSE(VB_IMPORTANT, "Sent CLEAR_SETTINGS_CACHE message");
-            return BACKEND_EXIT_OK;
+            return GENERIC_EXIT_OK;
         }
         else
         {
             VERBOSE(VB_IMPORTANT, "Unable to connect to backend, settings "
                     "cache will not be cleared.");
-            return BACKEND_EXIT_NO_CONNECT;
+            return GENERIC_EXIT_CONNECT_ERROR;
         }
     }
 
@@ -481,7 +481,7 @@ int handle_command(const MythCommandLineParser &cmdline)
 
         print_verbose_messages |= VB_SCHEDULE;
         sched->PrintList(true);
-        return BACKEND_EXIT_OK;
+        return GENERIC_EXIT_OK;
     }
 
     if (cmdline.Reschedule())
@@ -496,7 +496,7 @@ int handle_command(const MythCommandLineParser &cmdline)
         else
             VERBOSE(VB_IMPORTANT, "Cannot connect to master for reschedule");
 
-        return (ok) ? BACKEND_EXIT_OK : BACKEND_EXIT_NO_CONNECT;
+        return (ok) ? GENERIC_EXIT_OK : GENERIC_EXIT_CONNECT_ERROR;
     }
 
     if (cmdline.ScanVideos())
@@ -511,18 +511,18 @@ int handle_command(const MythCommandLineParser &cmdline)
         else
             VERBOSE(VB_IMPORTANT, "Cannot connect to master for video scan");
 
-        return (ok) ? BACKEND_EXIT_OK : BACKEND_EXIT_NO_CONNECT;
+        return (ok) ? GENERIC_EXIT_OK : GENERIC_EXIT_CONNECT_ERROR;
     }
 
     if (!cmdline.GetPrintExpire().isEmpty())
     {
         expirer = new AutoExpire();
         expirer->PrintExpireList(cmdline.GetPrintExpire());
-        return BACKEND_EXIT_OK;
+        return GENERIC_EXIT_OK;
     }
 
     // This should never actually be reached..
-    return BACKEND_EXIT_OK;
+    return GENERIC_EXIT_OK;
 }
 
 int connect_to_master(void)
@@ -536,7 +536,7 @@ int connect_to_master(void)
         {
             VERBOSE(VB_IMPORTANT, "Master backend is incompatible with "
                     "this backend.\nCannot become a slave.");
-            return BACKEND_EXIT_NO_CONNECT;
+            return GENERIC_EXIT_CONNECT_ERROR;
         }
 
         QStringList tempMonitorDone("DONE");
@@ -583,7 +583,7 @@ int connect_to_master(void)
                     "Unable to run with invalid time settings. Exiting.");
             tempMonitorConnection->writeStringList(tempMonitorDone);
             tempMonitorConnection->DownRef();
-            return BACKEND_EXIT_INVALID_TIMEZONE;
+            return GENERIC_EXIT_INVALID_TIMEZONE;
         }
         else
         {
@@ -597,14 +597,14 @@ int connect_to_master(void)
     if (tempMonitorConnection)
         tempMonitorConnection->DownRef();
 
-    return BACKEND_EXIT_OK;
+    return GENERIC_EXIT_OK;
 }
 
 int setup_basics(const MythCommandLineParser &cmdline)
 {
     ofstream pidfs;
     if (!openPidfile(pidfs, cmdline.GetPIDFilename()))
-        return BACKEND_EXIT_OPENING_PIDFILE_ERROR;
+        return GENERIC_EXIT_PERMISSIONS_ERROR;
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to ignore SIGPIPE");
@@ -612,12 +612,12 @@ int setup_basics(const MythCommandLineParser &cmdline)
     if (cmdline.IsDaemonizeEnabled() && (daemon(0, 1) < 0))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to daemonize" + ENO);
-        return BACKEND_EXIT_DAEMONIZING_ERROR;
+        return GENERIC_EXIT_DAEMONIZING_ERROR;
     }
 
     QString username = cmdline.GetUsername();
     if (!username.isEmpty() && !setUser(username))
-        return BACKEND_EXIT_PERMISSIONS_ERROR;
+        return GENERIC_EXIT_PERMISSIONS_ERROR;
 
     if (pidfs)
     {
@@ -625,7 +625,7 @@ int setup_basics(const MythCommandLineParser &cmdline)
         pidfs.close();
     }
 
-    return BACKEND_EXIT_OK;
+    return GENERIC_EXIT_OK;
 }
 
 void print_warnings(const MythCommandLineParser &cmdline)
@@ -659,12 +659,12 @@ void print_warnings(const MythCommandLineParser &cmdline)
 int run_backend(const MythCommandLineParser &cmdline)
 {
     if (!setup_context(cmdline))
-        return BACKEND_EXIT_NO_MYTHCONTEXT;
+        return GENERIC_EXIT_NO_MYTHCONTEXT;
 
     if (!UpgradeTVDatabaseSchema(true, true))
     {
         VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema");
-        return BACKEND_EXIT_DB_OUTOFDATE;
+        return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
     ///////////////////////////////////////////
@@ -676,7 +676,7 @@ int run_backend(const MythCommandLineParser &cmdline)
     if (!ismaster)
     {
         int ret = connect_to_master();
-        if (BACKEND_EXIT_OK != ret)
+        if (ret != GENERIC_EXIT_OK)
             return ret;
     }
 
@@ -687,7 +687,7 @@ int run_backend(const MythCommandLineParser &cmdline)
         cerr << "No setting found for this machine's BackendServerIP.\n"
              << "Please run setup on this machine and modify the first page\n"
              << "of the general settings.\n";
-        return BACKEND_EXIT_NO_IP_ADDRESS;
+        return GENERIC_EXIT_SETUP_ERROR;
     }
 
     MythSystemEventHandler *sysEventHandler = new MythSystemEventHandler();
@@ -712,7 +712,7 @@ int run_backend(const MythCommandLineParser &cmdline)
     if (fatal_error)
     {
         delete sysEventHandler;
-        return BACKEND_EXIT_CAP_CARD_SETUP_ERROR;
+        return GENERIC_EXIT_SETUP_ERROR;
     }
 
     if (ismaster)
@@ -765,7 +765,7 @@ int run_backend(const MythCommandLineParser &cmdline)
         ismaster, port, &tvList, sched, expirer);
 
     int exitCode = mainServer->GetExitCode();
-    if (exitCode != BACKEND_EXIT_OK)
+    if (exitCode != GENERIC_EXIT_OK)
     {
         VERBOSE(VB_IMPORTANT, "Backend exiting, MainServer initialization "
                 "error.");

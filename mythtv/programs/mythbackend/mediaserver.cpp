@@ -59,7 +59,6 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
     if (!m_pHttpServer->listen(QHostAddress::Any, nPort))
     {
         VERBOSE(VB_IMPORTANT, "MediaServer::HttpServer Create Error");
-        // exit(BACKEND_BUGGY_EXIT_NO_BIND_STATUS);
         delete m_pHttpServer;
         m_pHttpServer = NULL;
         return;

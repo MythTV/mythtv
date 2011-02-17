@@ -36,12 +36,14 @@
 // default location of zoneminders config file
 #define ZM_CONFIG "/etc/zm.conf"
 
+// Care should be taken to keep these in sync with the exit codes in
+// libmythbase/exitcodes.h (which is not included here to keep this code 
+// separate from mythtv libraries).
 #define EXIT_OK                      0
-#define EXIT_INVALID_CMDLINE         255
-#define EXIT_OPENING_LOGFILE_ERROR   254
-#define EXIT_DAEMONIZING_ERROR       253
-#define EXIT_SOCKET_ERROR            252
-#define EXIT_VERSION_ERROR           251
+#define EXIT_INVALID_CMDLINE         132
+#define EXIT_OPENING_LOGFILE_ERROR   136  // mapped to _PERMISSIONS_ERROR
+#define EXIT_DAEMONIZING_ERROR       145
+#define EXIT_SOCKET_ERROR            135
 
 using namespace std;
 

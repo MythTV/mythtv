@@ -231,37 +231,37 @@ static int getStatus(bool bWantRecStatus)
     if (isRunning("mythtranscode"))
     {
         VERBOSE(VB_IMPORTANT, "Transcoding in progress...");
-        res += 1;
+        res |= 1;
     }
 
     if (isRunning("mythcommflag"))
     {
         VERBOSE(VB_IMPORTANT, "Commercial Detection in progress...");
-        res += 2;
+        res |= 2;
     }
 
-    if (isRunning("mythfilldatabas"))
+    if (isRunning("mythfilldatabase"))
     {
         VERBOSE(VB_IMPORTANT, "Grabbing EPG data in progress...");
-        res += 4;
+        res |= 4;
     }
 
     if (bWantRecStatus && isRecording())
     {
         VERBOSE(VB_IMPORTANT, "Recording in progress...");
-        res += 8;
+        res |= 8;
     }
 
     if (getGlobalSetting("MythShutdownLock", "0") != "0")
     {
         VERBOSE(VB_IMPORTANT, "Shutdown is locked");
-        res += 16;
+        res |= 16;
     }
 
     if (JobQueue::HasRunningOrPendingJobs(15))
     {
         VERBOSE(VB_IMPORTANT, "Has queued or pending jobs");
-        res += 32;
+        res |= 32;
     }
 
     QDateTime dtPeriod1Start = getDailyWakeupTime("DailyWakeupStartPeriod1");
@@ -805,13 +805,13 @@ int main(int argc, char **argv)
             {
                 if (parse_verbose_arg(a.argv()[argpos+1]) ==
                         GENERIC_EXIT_INVALID_CMDLINE)
-                    return FRONTEND_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
                 ++argpos;
             }
             else
             {
                 cerr << "Missing argument to -v/--verbose option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
 
@@ -867,7 +867,7 @@ int main(int argc, char **argv)
             {
                 cout << "mythshutdown: Missing argument to "
                                 "-w/--setwakeup option" << endl;
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             bSetWakeupTime = true;
@@ -903,7 +903,7 @@ int main(int argc, char **argv)
         {
             cout << "Invalid argument: " << a.argv()[argpos] << endl;
             showUsage();
-            return FRONTEND_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
 
@@ -913,7 +913,7 @@ int main(int argc, char **argv)
     {
         cout << "mythshutdown: Could not initialize MythContext. "
                 "Exiting." << endl;
-        return FRONTEND_EXIT_NO_MYTHCONTEXT;
+        return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
 

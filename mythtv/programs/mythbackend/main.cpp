@@ -106,10 +106,10 @@ int main(int argc, char **argv)
         if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
         {
             if (cmdline_err)
-                return BACKEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
 
             if (cmdline.WantsToExit())
-                return BACKEND_EXIT_OK;
+                return GENERIC_EXIT_OK;
         }
     }
 
@@ -131,17 +131,17 @@ int main(int argc, char **argv)
         if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
         {
             if (cmdline_err)
-                return BACKEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
 
             if (cmdline.WantsToExit())
-                return BACKEND_EXIT_OK;
+                return GENERIC_EXIT_OK;
         }
         else
         {
             cerr << "Invalid argument: " << a.argv()[argpos] << endl;
             QByteArray help = cmdline.GetHelpString(true).toLocal8Bit();
             cout << help.constData();
-            return BACKEND_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
 
@@ -158,7 +158,7 @@ int main(int argc, char **argv)
     CleanupGuard callCleanup(cleanup);
 
     int exitCode = setup_basics(cmdline);
-    if (BACKEND_EXIT_OK != exitCode)
+    if (exitCode != GENERIC_EXIT_OK)
         return exitCode;
 
     {
@@ -176,7 +176,7 @@ int main(int argc, char **argv)
     if (cmdline.HasBackendCommand())
     {
         if (!setup_context(cmdline))
-            return BACKEND_EXIT_NO_MYTHCONTEXT;
+            return GENERIC_EXIT_NO_MYTHCONTEXT;
         return handle_command(cmdline);
     }
 

@@ -71,13 +71,13 @@ int main(int argc, char *argv[])
             cout << "   Refresh Tree views only.\n";
             cout << "\n";
             cout << "Run with no options to only update trees which need update.\n";
-            return FILLDB_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
         else
         {
             fprintf(stderr, "illegal option: '%s' (use --help)\n",
                     a.argv()[argpos]);
-            return FILLDB_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
 
         ++argpos;
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         delete gContext;
-        return FILLDB_EXIT_NO_MYTHCONTEXT;
+        return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
     MythTranslation::load("mythfrontend");
@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
 
     VERBOSE(VB_IMPORTANT, "MythFillNetvision run complete.");
 
-    return FILLDB_EXIT_OK;
+    return GENERIC_EXIT_OK;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

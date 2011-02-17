@@ -97,9 +97,9 @@ int main(int argc, char *argv[])
         if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
         {
             if (cmdline_err)
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             if (cmdline.WantsToExit())
-                return FRONTEND_EXIT_OK;
+                return GENERIC_EXIT_OK;
         }
     }
 
@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
     if (!gContext->Init())
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        return TV_EXIT_NO_MYTHCONTEXT;
+        return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
     gCoreContext->SetAppName(binname);
@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
         QString msg = QString("Fatal Error: Couldn't find theme '%1'.")
             .arg(themename);
         VERBOSE(VB_IMPORTANT, msg);
-        return TV_EXIT_NO_THEME;
+        return GENERIC_EXIT_NO_THEME;
     }
 
     GetMythUI()->LoadQtConfig();
@@ -196,7 +196,7 @@ int main(int argc, char *argv[])
     {
         VERBOSE(VB_IMPORTANT, "Fatal Error: Audio not configured, you need "
                 "to run 'mythfrontend', not 'mythtv'.");
-        return TV_EXIT_NO_AUDIO;
+        return GENERIC_EXIT_SETUP_ERROR;
     }
 #endif
 
@@ -216,7 +216,7 @@ int main(int argc, char *argv[])
     if (!tv->Init())
     {
         VERBOSE(VB_IMPORTANT, "Fatal Error: Could not initialize TV class.");
-        return TV_EXIT_NO_TV;
+        return GENERIC_EXIT_NOT_OK;
     }
 
     if (filename.isEmpty())
@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
     }
     delete gContext;
 
-    return TV_EXIT_OK;
+    return GENERIC_EXIT_OK;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

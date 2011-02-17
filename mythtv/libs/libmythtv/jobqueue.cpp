@@ -1946,8 +1946,8 @@ void JobQueue::DoTranscodeThread(int jobID)
         uint result = myth_system(command);
         int status = GetJobStatus(jobID);
 
-        if ((result == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
-            (result == MYTHSYSTEM__EXIT__CMD_NOT_FOUND))
+        if ((result == GENERIC_EXIT_DAEMONIZING_ERROR) ||
+            (result == GENERIC_EXIT_CMD_NOT_FOUND))
         {
             ChangeJobStatus(jobID, JOB_ERRORED,
                 "ERROR: Unable to find mythtranscode, check backend logs.");
@@ -1963,7 +1963,7 @@ void JobQueue::DoTranscodeThread(int jobID)
                     QString("%1 for %2").arg(msg).arg(details.constData()));
             gCoreContext->LogEntry("transcode", LP_WARNING, msg, detailstr);
         }
-        else if (result == TRANSCODE_EXIT_RESTART && retrylimit > 0)
+        else if (result == GENERIC_EXIT_RESTART && retrylimit > 0)
         {
             VERBOSE(VB_JOBQUEUE, LOC + "Transcode command restarting");
             retry = true;
@@ -2135,8 +2135,8 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
 
     runningJobsLock->lock();
 
-    if ((breaksFound == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
-        (breaksFound == MYTHSYSTEM__EXIT__CMD_NOT_FOUND))
+    if ((breaksFound == GENERIC_EXIT_DAEMONIZING_ERROR) ||
+        (breaksFound == GENERIC_EXIT_CMD_NOT_FOUND))
     {
         comment = tr("Unable to find mythcommflag");
         ChangeJobStatus(jobID, JOB_ERRORED, comment);
@@ -2148,7 +2148,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
         ChangeJobStatus(jobID, JOB_ABORTED, comment);
         priority = LP_WARNING;
     }
-    else if (breaksFound == COMMFLAG_EXIT_NO_PROGRAM_DATA)
+    else if (breaksFound == GENERIC_EXIT_NO_RECORDING_DATA)
     {
         comment = tr("Unable to open file or init decoder");
         ChangeJobStatus(jobID, JOB_ERRORED, comment);
@@ -2252,8 +2252,8 @@ void JobQueue::DoUserJobThread(int jobID)
                                        .arg(command));
     uint result = myth_system(command);
 
-    if ((result == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
-        (result == MYTHSYSTEM__EXIT__CMD_NOT_FOUND))
+    if ((result == GENERIC_EXIT_DAEMONIZING_ERROR) ||
+        (result == GENERIC_EXIT_CMD_NOT_FOUND))
     {
         msg = QString("User Job '%1' failed, unable to find "
                       "executable, check your PATH and backend logs.")

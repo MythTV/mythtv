@@ -2531,7 +2531,7 @@ int main(int argc, char **argv)
     {
         cout << "mytharchivehelper: Could not initialize MythContext. "
                 "Exiting." << endl;
-        return FRONTEND_EXIT_NO_MYTHCONTEXT;
+        return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
     int res = 0;
@@ -2567,13 +2567,13 @@ int main(int argc, char **argv)
             {
                 if (parse_verbose_arg(a.argv()[argpos+1]) ==
                         GENERIC_EXIT_INVALID_CMDLINE)
-                    return FRONTEND_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
                 ++argpos;
             }
             else
             {
                 cerr << "Missing argument to -v/--verbose option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-t") ||
@@ -2589,7 +2589,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing infile in -t/--grabthumbnail option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             if (a.argc()-1 > argpos)
@@ -2600,7 +2600,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing thumblist in -t/--grabthumbnail option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             if (a.argc()-1 > argpos)
@@ -2611,7 +2611,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing outfile in -t/--grabthumbnail option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             if (a.argc()-1 > argpos)
@@ -2633,7 +2633,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing argument to -p/--getdbparameters option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-r") ||
@@ -2648,7 +2648,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing argument to -r/--isremote option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-b") ||
@@ -2662,14 +2662,14 @@ int main(int argc, char **argv)
                 if (mediaType < 0 || mediaType > 2)
                 {
                     cerr << "Invalid mediatype given: " << mediaType << "\n";
-                    return FRONTEND_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
                 }
                 ++argpos;
             }
             else
             {
                 cerr << "Missing argument to -b/--burndvd option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             if (a.argc()-1 > argpos)
@@ -2679,7 +2679,7 @@ int main(int argc, char **argv)
                 if (value < 0 || value > 1)
                 {
                     cerr << "Invalid erasedvd parameter given: " << value << "\n";
-                    return FRONTEND_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
                 }
                 bEraseDVDRW = (value == 1);
                 ++argpos;
@@ -2687,7 +2687,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing argument to -b/--burndvd option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             if (a.argc()-1 > argpos)
@@ -2697,7 +2697,7 @@ int main(int argc, char **argv)
                 if (value < 0 || value > 1)
                 {
                     cerr << "Invalid native format parameter given: " << value << "\n";
-                    return FRONTEND_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
                 }
                 bNativeFormat = (value == 1);
                 ++argpos;
@@ -2705,7 +2705,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing argument to -b/--burndvd option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-n") ||
@@ -2720,7 +2720,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing argument to -r/--nawarchive option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-f") ||
@@ -2735,7 +2735,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing filename argument to -f/--importarchive option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             if (a.argc()-1 > argpos)
@@ -2747,7 +2747,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing chanID argument to -f/--importarchive option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-l") ||
@@ -2762,7 +2762,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing argument to -l/--log option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-h") ||
@@ -2783,7 +2783,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing infile in -i/--getfileinfo option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             if (a.argc()-1 > argpos)
@@ -2794,7 +2794,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing outfile in -i/--getfileinfo option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             if (a.argc()-1 > argpos)
@@ -2806,7 +2806,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing method in -i/--getfileinfo option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-s") ||
@@ -2822,7 +2822,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing supfile in -s/--sup2dast option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             if (a.argc()-1 > argpos)
@@ -2833,7 +2833,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing ifofile in -s/--sup2dast option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             if (a.argc()-1 > argpos)
@@ -2845,14 +2845,14 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing delay in -s/--sup2dast option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else
         {
             cout << "Invalid argument: " << a.argv()[argpos] << endl;
             showUsage();
-            return FRONTEND_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
 
