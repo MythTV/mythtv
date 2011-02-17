@@ -3,7 +3,7 @@
 
 #include <QtCore/qglobal.h>
 
-#ifdef MYTH_API
+#if defined(MYTH_API) || defined(MPLUGIN_API)
 # define MPUBLIC Q_DECL_EXPORT
 #else
 # define MPUBLIC Q_DECL_IMPORT

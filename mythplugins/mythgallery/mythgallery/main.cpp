@@ -118,7 +118,7 @@ static void setupKeys(void)
         MEDIATYPE_MGALLERY, "gif,jpg,png");
 }
 
-int mythplugin_init(const char *libversion)
+MPUBLIC int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythgallery", libversion,
                                     MYTH_BINARY_VERSION))

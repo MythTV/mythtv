@@ -80,7 +80,7 @@ static void setupKeys(void)
         "Internet Television Client - Site/Tree View"), "", runNetTree);
 }
 
-int mythplugin_init(const char *libversion)
+MPUBLIC int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythnetvision",
                                     libversion,

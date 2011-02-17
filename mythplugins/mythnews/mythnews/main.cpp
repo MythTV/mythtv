@@ -55,7 +55,7 @@ static void setupKeys(void)
         QT_TRANSLATE_NOOP("MythControls", "Cancel news item updating"), "C");
 }
 
-int mythplugin_init(const char *libversion)
+MPUBLIC int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythnews",
                                     libversion,

@@ -36,6 +36,8 @@ mingw:DEFINES += USING_MINGW
 
 QT += sql xml network
 
+DEFINES += MPLUGIN_API
+
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }

@@ -559,7 +559,7 @@ static void setupKeys(void)
                           "mka,aiff,swa,wv");
 }
 
-int mythplugin_init(const char *libversion)
+MPUBLIC int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythmusic", libversion,
                                     MYTH_BINARY_VERSION))

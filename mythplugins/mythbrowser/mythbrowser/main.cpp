@@ -56,7 +56,7 @@ static void setupKeys(void)
         "Internal Web Browser"), handleMedia);
 }
 
-int mythplugin_init(const char *libversion)
+MPUBLIC int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythbrowser", libversion, MYTH_BINARY_VERSION))
         return -1;
