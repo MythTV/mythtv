@@ -134,7 +134,7 @@ static void setupKeys(void)
         "", "", runZMEventView);
 }
 
-MPUBLIC int mythplugin_init(const char *libversion)
+int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythzoneminder",
                                     libversion,

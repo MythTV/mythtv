@@ -418,7 +418,7 @@ namespace
     }
 }
 
-MPUBLIC int mythplugin_init(const char *libversion)
+int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythvideo", libversion,
                                     MYTH_BINARY_VERSION))

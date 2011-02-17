@@ -309,7 +309,7 @@ static void initKeys(void)
         "", "", runBurnDVD);
 }
 
-MPUBLIC int mythplugin_init(const char *libversion)
+int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mytharchive", libversion,
                                     MYTH_BINARY_VERSION))

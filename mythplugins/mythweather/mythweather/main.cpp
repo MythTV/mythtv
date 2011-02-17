@@ -60,7 +60,7 @@ static void setupKeys()
         "Search List"), "u");
 }
 
-MPUBLIC int mythplugin_init(const char *libversion)
+int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythweather", libversion,
                                     MYTH_BINARY_VERSION))

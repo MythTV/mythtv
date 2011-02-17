@@ -123,7 +123,7 @@ static void setupKeys(void)
         "Download metadata for current item"), "W");
 }
 
-MPUBLIC int mythplugin_init(const char *libversion)
+int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythgame", libversion,
                                     MYTH_BINARY_VERSION))
