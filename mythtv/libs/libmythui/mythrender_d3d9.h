@@ -5,12 +5,13 @@
 #include <d3d9.h>
 
 #include "mythimage.h"
+#include "mythuiexp.h"
 
 class MythD3DVertexBuffer;
 class MythD3DSurface;
 class MythRenderD3D9;
 
-class D3D9Image
+class MUI_PUBLIC D3D9Image
 {
   public:
     D3D9Image(MythRenderD3D9 *render, QSize size, bool video = false);
@@ -36,7 +37,7 @@ class D3D9Image
     IDirect3DSurface9      *m_surface;
 };
 
-class MythRenderD3D9
+class MUI_PUBLIC MythRenderD3D9
 {
   public:
     MythRenderD3D9();
