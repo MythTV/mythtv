@@ -10039,7 +10039,6 @@ void TV::FillOSDMenuVideo(const PlayerContext *ctx, OSD *osd,
             cur_mode = " " + cur_mode;
             scan_type = kScan_Detect;
         }
-        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
         osd->DialogAddButton(tr("Detect") + cur_mode, "SELECTSCAN_0", false,
                              scan_type == kScan_Detect);
