@@ -75,8 +75,6 @@ extern void ff_read_frame_flush(AVFormatContext *s);
 
 #define MAX_AC3_FRAME_SIZE 6144
 
-static const bool force_reordered_opaque = false;
-
 static const float eps = 1E-5;
 
 static const int max_video_queue_size = 180;
@@ -681,6 +679,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         last_pts_for_fault_detection = 0;
         last_dts_for_fault_detection = 0;
         pts_detected = false;
+        reordered_pts_detected = false;
 
         ff_read_frame_flush(ic);
 
@@ -2818,6 +2817,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                 last_pts_for_fault_detection = 0;
                 last_dts_for_fault_detection = 0;
                 pts_detected = false;
+                reordered_pts_detected = false;
 
                 // fps debugging info
                 float avFPS = normalized_fps(stream, context);
@@ -2924,6 +2924,7 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             last_pts_for_fault_detection = 0;
             last_dts_for_fault_detection = 0;
             pts_detected = false;
+            reordered_pts_detected = false;
 
             // fps debugging info
             float avFPS = normalized_fps(stream, context);
@@ -3005,9 +3006,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     avcodeclock->lock();
     if (private_dec)
     {
-        if (QString(ic->iformat->name).contains("avi"))
-            pkt->pts = pkt->dts;
-        if (!pts_detected)
+        if (QString(ic->iformat->name).contains("avi") || !pts_detected)
             pkt->pts = pkt->dts;
         // TODO disallow private decoders for dvd playback
         // N.B. we do not reparse the frame as it breaks playback for
@@ -3123,14 +3122,12 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     {
         pts = mpa_pic.reordered_opaque;
     }
-    else if ((force_reordered_opaque || faulty_pts <= faulty_dts ||
-             pkt->dts == (int64_t)AV_NOPTS_VALUE) &&
-             mpa_pic.reordered_opaque != (int64_t)AV_NOPTS_VALUE)
+    else if (faulty_pts <= faulty_dts && reordered_pts_detected)
     {
-        pts = mpa_pic.reordered_opaque;
+        if (mpa_pic.reordered_opaque != (int64_t)AV_NOPTS_VALUE)
+            pts = mpa_pic.reordered_opaque;
     }
-    else if ((faulty_dts < faulty_pts || !reordered_pts_detected) &&
-             pkt->dts != (int64_t)AV_NOPTS_VALUE)
+    else if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
     {
         pts = pkt->dts;
     }
