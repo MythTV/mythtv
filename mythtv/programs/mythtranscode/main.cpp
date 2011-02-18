@@ -66,6 +66,7 @@ static void usage(char *progname)
     cerr << "\t                or -ro: Pass a comma-separated list of\n";
     cerr << "\t                        recordingprofile options to override\n";
     cerr << "\t                        values in the database.\n";
+    cerr << "\t--audiotrack <trackno>: Selects the audiotrack for transcoding.\n";
     cerr << "\t--verbose level  or -v: Use '-v help' for level info\n";
     cerr << "\t--help           or -h: Prints this help statement.\n";
 }
@@ -149,6 +150,7 @@ int main(int argc, char *argv[])
     frm_dir_map_t deleteMap;
     frm_pos_map_t posMap;
     srand(time(NULL));
+    int AudioTrackNo = -1;
 
     QCoreApplication a(argc, argv);
 
@@ -474,6 +476,22 @@ int main(int argc, char *argv[])
 
             ++argpos;
         }
+        else if (!strcmp(a.argv()[argpos],"--audiotrack"))
+        {
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
+            {
+                AudioTrackNo = QString(a.argv()[argpos + 1]).toInt();
+            }
+            else
+            {
+                cerr << "Invalid or missing argument to --audiotrack "
+                        "option\n";
+                usage(a.argv()[0]);
+                return GENERIC_EXIT_INVALID_CMDLINE;
+            }
+
+            ++argpos;
+        }
         else if (!strcmp(a.argv()[argpos],"-h") ||
                  !strcmp(a.argv()[argpos],"--help"))
         {
@@ -639,7 +657,7 @@ int main(int argc, char *argv[])
         result = transcode->TranscodeFile(infile, outfile,
                                           profilename, useCutlist,
                                           (fifosync || keyframesonly), jobID,
-                                          fifodir, deleteMap);
+                                          fifodir, deleteMap, AudioTrackNo);
         if ((result == REENCODE_OK) && (jobID >= 0))
             JobQueue::ChangeJobArgs(jobID, "RENAME_TO_NUV");
     }

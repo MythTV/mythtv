@@ -363,7 +363,8 @@ int Transcode::TranscodeFile(
     const QString &profileName,
     bool honorCutList, bool framecontrol,
     int jobID, QString fifodir,
-    frm_dir_map_t &deleteMap)
+    frm_dir_map_t &deleteMap,
+    int AudioTrackNo)
 {
     QDateTime curtime = QDateTime::currentDateTime();
     QDateTime statustime = curtime;
@@ -716,6 +717,12 @@ int Transcode::TranscodeFile(
         if (player_ctx)
             delete player_ctx;
         return REENCODE_ERROR;
+    }
+
+    if (AudioTrackNo > -1)
+    {
+        VERBOSE(VB_GENERAL, QString("Set audiotrack number to %1").arg(AudioTrackNo));
+        player->GetDecoder()->SetTrack(kTrackTypeAudio, AudioTrackNo);
     }
 
     int vidSize = 0;
