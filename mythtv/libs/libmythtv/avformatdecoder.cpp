@@ -1630,7 +1630,7 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
                     VERBOSE(VB_PLAYBACK, LOC + QString(
                                 "Teletext stream #%1 (%2) is in the %3 language"
                                 " on page %4 %5.")
-                            .arg(k).arg((type == 1) ? "Caption" : "Menu")
+                            .arg(k).arg((type == 2) ? "Caption" : "Menu")
                             .arg(iso639_key_toName(language))
                             .arg(magazine).arg(pagenum));
                 }
