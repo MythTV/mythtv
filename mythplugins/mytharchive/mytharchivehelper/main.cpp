@@ -1391,7 +1391,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
         {
             if (!dir.mkdir(path))
             {
-                VERBOSE(VB_JOBQUEUE, QString("ERROR: Couldn't create directory '%s'").arg(path));
+                VERBOSE(VB_JOBQUEUE, QString("ERROR: Couldn't create directory '%1'").arg(path));
                 return 1;
             }
         }
