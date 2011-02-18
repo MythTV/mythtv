@@ -12,7 +12,7 @@ using namespace std;
 #include <libkern/OSByteOrder.h>
 #define bswap_16 OSSwapInt16
 #define bswap_32 OSSwapInt32
-#else
+#elif HAVE_BIGENDIAN
 #error No bswap functions defined
 #endif
 
