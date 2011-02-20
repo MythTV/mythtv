@@ -465,10 +465,12 @@ void MythSystemSignalManager::run(void)
 
             ms->disconnect();
 
+            bool cleanup = ms->m_parent->doAutoCleanup();
+
             ms->Unlock();
 
-            if( ms->m_parent->doAutoCleanup() )
-                delete ms;
+            if( cleanup )
+                ms->deleteLater();
         }
     }
 }
