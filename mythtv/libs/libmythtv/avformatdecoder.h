@@ -290,6 +290,7 @@ class AvFormatDecoder : public DecoderBase
     int64_t last_dts_for_fault_detection;
     bool pts_detected;
     bool reordered_pts_detected;
+    bool pts_selected;
 
     bool using_null_videoout;
     MythCodecID video_codec_id;
