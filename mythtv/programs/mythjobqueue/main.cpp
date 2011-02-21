@@ -293,13 +293,10 @@ int main(int argc, char *argv[])
         pidfs.close();
     }
 
-    extern const char *myth_source_version;
-    extern const char *myth_source_path;
-
     VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
                             .arg(binname)
-                            .arg(myth_source_path)
-                            .arg(myth_source_version));
+                            .arg(MYTH_SOURCE_PATH)
+                            .arg(MYTH_SOURCE_VERSION));
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))

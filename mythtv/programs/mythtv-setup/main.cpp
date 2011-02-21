@@ -297,13 +297,10 @@ int main(int argc, char *argv[])
 
     QMap<QString, QString> settingsOverride;
 
-    extern const char *myth_source_version;
-    extern const char *myth_source_path;
-
     VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
                             .arg(binname)
-                            .arg(myth_source_path)
-                            .arg(myth_source_version));
+                            .arg(MYTH_SOURCE_PATH)
+                            .arg(MYTH_SOURCE_VERSION));
 
 
     for(int argpos = 1; argpos < a.argc(); ++argpos)
@@ -512,8 +509,8 @@ int main(int argc, char *argv[])
         {
             VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
                                     .arg(binname)
-                                    .arg(myth_source_path)
-                                    .arg(myth_source_version));
+                                    .arg(MYTH_SOURCE_PATH)
+                                    .arg(MYTH_SOURCE_VERSION));
 
             signal(SIGHUP, &log_rotate_handler);
         }

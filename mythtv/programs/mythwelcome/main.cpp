@@ -52,13 +52,10 @@ static void showUsage(const MythCommandLineParser &cmdlineparser)
 
     QString binname = "mythwelcome";
 
-    extern const char *myth_source_version;
-    extern const char *myth_source_path;
-
     VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
                             .arg(binname)
-                            .arg(myth_source_path)
-                            .arg(myth_source_version));
+                            .arg(MYTH_SOURCE_PATH)
+                            .arg(MYTH_SOURCE_VERSION));
 
     cerr << "Valid options are: " << endl <<
             "-v or --verbose debug-level    Use '-v help' for level info" << endl <<

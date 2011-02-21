@@ -162,11 +162,9 @@ int main(int argc, char **argv)
         return exitCode;
 
     {
-        extern const char *myth_source_version;
-        extern const char *myth_source_path;
         QString versionStr = QString("%1 version: %2 [%3] www.mythtv.org")
-            .arg(basename(argv[0])).arg(myth_source_path)
-            .arg(myth_source_version);
+            .arg(basename(argv[0])).arg(MYTH_SOURCE_PATH)
+            .arg(MYTH_SOURCE_VERSION);
         VERBOSE(VB_IMPORTANT, versionStr);
     }
 

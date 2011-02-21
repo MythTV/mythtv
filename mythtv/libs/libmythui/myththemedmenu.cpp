@@ -25,6 +25,7 @@
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythmedia.h"
+#include "mythversion.h"
 
 MythThemedMenuState::MythThemedMenuState(MythScreenStack *parent,
                                          const QString &name)
@@ -327,9 +328,6 @@ void MythThemedMenu::ShowMenu()
 
 }
 
-extern const char *myth_source_version;
-extern const char *myth_source_path;
-
 void MythThemedMenu::aboutScreen()
 {
     QString distro_line;
@@ -343,8 +341,8 @@ void MythThemedMenu::aboutScreen()
     }
 
     QString label = tr("Revision: %1\n Branch: %2\n %3")
-                        .arg(myth_source_version)
-                        .arg(myth_source_path)
+                        .arg(MYTH_SOURCE_VERSION)
+                        .arg(MYTH_SOURCE_PATH)
                         .arg(distro_line);
 
     MythScreenStack* mainStack = GetMythMainWindow()->GetMainStack();

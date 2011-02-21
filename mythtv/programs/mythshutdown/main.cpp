@@ -734,13 +734,10 @@ static void showUsage()
 {
     QString binname = "mythshutdown";
 
-    extern const char *myth_source_version;
-    extern const char *myth_source_path;
-
     VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
                             .arg(binname)
-                            .arg(myth_source_path)
-                            .arg(myth_source_version));
+                            .arg(MYTH_SOURCE_PATH)
+                            .arg(MYTH_SOURCE_VERSION));
 
     cout << "Usage of mythshutdown\n";
     cout << "-w/--setwakeup time      (sets the wakeup time. time=yyyy-MM-ddThh:mm:ss\n";

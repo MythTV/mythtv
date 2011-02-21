@@ -533,8 +533,6 @@ bool DDStructureParser::characters(const QString& pchars)
     return true;
 }
 
-extern const char *myth_source_version;
-
 DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
     listings_provider(lp % DD_PROVIDER_COUNT),
     userid(user),                   password(pass),
@@ -546,7 +544,7 @@ DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
     {
         QMutexLocker locker(&user_agent_lock);
         user_agent = QString("MythTV/%1.%2")
-            .arg(MYTH_BINARY_VERSION).arg(myth_source_version);
+            .arg(MYTH_BINARY_VERSION).arg(MYTH_SOURCE_VERSION);
     }
 
     DataDirectURLs urls0(

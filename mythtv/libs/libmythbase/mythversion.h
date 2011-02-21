@@ -3,6 +3,7 @@
 
 #include "qglobal.h"
 #include "mythbaseexp.h"
+#include "version.h"
 
 #if ( QT_VERSION < 0x040500 )
 #error You need Qt version >= 4.5.0 to compile MythTV.

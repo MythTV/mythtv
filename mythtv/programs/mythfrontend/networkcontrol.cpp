@@ -905,14 +905,11 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
     }
     else if (is_abbrev("version", nc->getArg(1)))
     {
-        extern const char *myth_source_version;
-        extern const char *myth_source_path;
-
         int dbSchema = gCoreContext->GetNumSetting("DBSchemaVer");
 
         return QString("VERSION: %1/%2 %3 %4 QT/%5 DBSchema/%6")
-                       .arg(myth_source_version)
-                       .arg(myth_source_path)
+                       .arg(MYTH_SOURCE_VERSION)
+                       .arg(MYTH_SOURCE_PATH)
                        .arg(MYTH_BINARY_VERSION)
                        .arg(MYTH_PROTO_VERSION)
                        .arg(QT_VERSION_STR)

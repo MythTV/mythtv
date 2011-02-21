@@ -5,5 +5,5 @@
 #        "exported" is reported as the revision.           #
 ############################################################
 
-SOURCES += $$PWD/version.cpp
+HEADERS += $$PWD/libs/libmythbase/version.h
 DEPENDPATH += $$PWD/libs/libmythbase

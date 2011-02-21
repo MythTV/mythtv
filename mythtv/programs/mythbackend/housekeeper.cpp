@@ -29,10 +29,7 @@ using namespace std;
 #include "scheduler.h"
 #include "mythcoreutil.h"
 #include "mythdownloadmanager.h"
-
-// Use this to determine what directories to look in on the download site
-extern const char *myth_source_path;
-extern const char *myth_binary_version;
+#include "mythversion.h"
 
 static bool HouseKeeper_filldb_running = false;
 
@@ -637,7 +634,7 @@ void HouseKeeper::CleanupProgramListings(void)
 
 void HouseKeeper::UpdateThemeChooserInfoCache(void)
 {
-    QString MythVersion = myth_source_path;
+    QString MythVersion = MYTH_SOURCE_PATH;
 
     // FIXME: For now, treat git master the same as svn trunk
     if (MythVersion == "master")
@@ -645,7 +642,7 @@ void HouseKeeper::UpdateThemeChooserInfoCache(void)
 
     if (MythVersion != "trunk")
     {
-        MythVersion = myth_binary_version; // Example: 0.25.20101017-1
+        MythVersion = MYTH_BINARY_VERSION; // Example: 0.25.20101017-1
         MythVersion.replace(QRegExp("\\.[0-9]{8,}.*"), "");
     }
 

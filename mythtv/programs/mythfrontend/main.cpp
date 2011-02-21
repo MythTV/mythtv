@@ -1183,13 +1183,10 @@ int main(int argc, char **argv)
 
     QString binname = finfo.baseName();
 
-    extern const char *myth_source_version;
-    extern const char *myth_source_path;
-
     VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
                             .arg(binname)
-                            .arg(myth_source_path)
-                            .arg(myth_source_version));
+                            .arg(MYTH_SOURCE_PATH)
+                            .arg(MYTH_SOURCE_VERSION));
 
     bool ResetSettings = false;
 
@@ -1249,8 +1246,8 @@ int main(int argc, char **argv)
         {
             VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
                                     .arg(binname)
-                                    .arg(myth_source_path)
-                                    .arg(myth_source_version));
+                                    .arg(MYTH_SOURCE_PATH)
+                                    .arg(MYTH_SOURCE_VERSION));
 
             signal(SIGHUP, &log_rotate_handler);
         }

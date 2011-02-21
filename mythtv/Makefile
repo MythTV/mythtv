@@ -23,9 +23,10 @@ SUBDIRS += $(MAKE_SUBDIRS) $(QT_SUBDIRS)
 	distclean $(addsuffix _distclean,$(SUBDIRS))  \
 	install   $(addsuffix _install,  $(SUBDIRS))  \
 	uninstall $(addsuffix _uninstall,$(SUBDIRS))  \
-	version.cpp
+	libs/libmythbase/version.h force
 
-all: version.cpp subdirs
+all: libs/libmythbase/version.h subdirs
+force:
 
 config.mak:
 	$(error run configure to create $@)
@@ -34,7 +35,7 @@ config.mak:
 # make -C mythtv
 PWD := $(shell pwd)
 
-version.cpp:	libs/libmythbase/mythversion.h
+libs/libmythbase/version.h:	version.sh force
 	sh version.sh $(PWD)
 
 # explicit subdir dependencies
@@ -59,7 +60,7 @@ locales/Makefile: locales/locales.pro
 $(addsuffix /Makefile,$(QT_SUBDIRS)): %/Makefile :
 	cd $*; $(QMAKE) QMAKE=$(QMAKE) -o $(@F) $(<F)
 
-$(SUBDIRS): $(addsuffix /Makefile,$(SUBDIRS)) version.cpp
+$(SUBDIRS): $(addsuffix /Makefile,$(SUBDIRS)) libs/libmythbase/version.h
 	$(MAKE) -C $@
 
 $(addsuffix _clean,$(SUBDIRS)): $(addsuffix /Makefile,$(SUBDIRS))
@@ -79,9 +80,10 @@ clean: $(addsuffix _clean,$(SUBDIRS))
 distclean: $(addsuffix _distclean,$(SUBDIRS))
 	-rm -f libs/libmythbase/mythconfig.mak config.mak
 	-rm -f libs/libmythbase/mythconfig.h   config.h
+	-rm -f libs/libmythbase/version.h
 	-rm -f libs/libavutil/avconfig.h
 	-rm -f external/FFmpeg/libavutil/avconfig.h
-	-rm -f config.ep                     version.cpp
+	-rm -f config.ep
 	-rm -f $(addsuffix /Makefile,$(QT_SUBDIRS))
 
 install: $(addsuffix _install,$(SUBDIRS))
