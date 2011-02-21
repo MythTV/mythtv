@@ -518,6 +518,17 @@ QString MediaMonitor::GetMountPath(const QString& devPath)
             mountPath = pMedia->getMountPath();
             c_monitor->Unlock(pMedia);
         }
+        // The media monitor could be inactive.
+        // Create a fake media device just to lookup mount map:
+        else
+        {
+            pMedia = MythCDROM::get(NULL, devPath.toAscii(), true, false);
+            if (pMedia && pMedia->findMountPath())
+                mountPath = pMedia->getMountPath();
+            else
+                VERBOSE(VB_MEDIA, "MediaMonitor::GetMountPath() - failed");
+            // need some way to delete the media device.
+        }
     }
 
     return mountPath;
