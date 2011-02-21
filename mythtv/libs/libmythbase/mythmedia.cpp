@@ -401,6 +401,12 @@ bool MythMediaDevice::findMountPath()
         QStringList deviceNames;
         getSymlinkTarget(deviceName, &deviceNames);
 
+#if CONFIG_DARWIN
+        // match short-style BSD node names:
+        if (m_DevicePath.startsWith("disk"))
+            deviceNames << deviceName.mid(5);   // remove 5 chars - /dev/
+#endif
+
         // Deal with escaped spaces
         if (mountPoint.contains("\\040"))
             mountPoint.replace("\\040", " ");
