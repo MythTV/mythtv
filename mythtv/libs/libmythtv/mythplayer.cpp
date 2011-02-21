@@ -2341,14 +2341,12 @@ void MythPlayer::FileChangedCallback(void)
 void MythPlayer::JumpToProgram(void)
 {
     VERBOSE(VB_PLAYBACK, LOC + "JumpToProgram - start");
-    bool discontinuity = false, newtype = false;
+    bool d1 = false, d2 = false;
     int newid = -1;
     long long nextpos = player_ctx->tvchain->GetJumpPos();
-    ProgramInfo *pginfo = player_ctx->tvchain->GetSwitchProgram(
-        discontinuity, newtype, newid);
+    ProgramInfo *pginfo = player_ctx->tvchain->GetSwitchProgram(d1, d2, newid);
     if (!pginfo)
         return;
-    newtype = true; // force reloading of context and stream properties
 
     bool newIsDummy = player_ctx->tvchain->GetCardType(newid) == "DUMMY";
     SetPlayingInfo(*pginfo);
@@ -2385,14 +2383,8 @@ void MythPlayer::JumpToProgram(void)
         return;
     }
 
-    bool wasDummy = isDummy;
-    if (newtype || wasDummy)
-    {
-        if (OpenFile() < 0)
-            SetErrored(QObject::tr("Error opening jump program file"));
-    }
-    else
-        ResetPlaying();
+    if (OpenFile() < 0)
+        SetErrored(QObject::tr("Error opening jump program file"));
 
     if (IsErrored() || !decoder)
     {
