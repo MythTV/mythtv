@@ -28,9 +28,17 @@ using namespace std;
 
 static const QString PATHTO_PMOUNT("/usr/bin/pmount");
 static const QString PATHTO_PUMOUNT("/usr/bin/pumount");
-static const QString PATHTO_MOUNT("/bin/mount");
+#if CONFIG_DARWIN
+    static const QString PATHTO_MOUNT("/sbin/mount");
+#else
+    static const QString PATHTO_MOUNT("/bin/mount");
+#endif
 static const QString PATHTO_UNMOUNT("/bin/umount");
 static const QString PATHTO_MOUNTS("/proc/mounts");
+
+#if CONFIG_DARWIN
+#   define USE_MOUNT_COMMAND
+#endif
 
 const char* MythMediaDevice::MediaStatusStrings[] =
 {
@@ -349,9 +357,9 @@ bool MythMediaDevice::findMountPath()
         return false;
     }
 
-#if CONFIG_DARWIN
+#ifdef USE_MOUNT_COMMAND
     // HACK. TODO: replace with something using popen()?
-    if (myth_system("/sbin/mount > /tmp/mounts") != GENERIC_EXIT_OK)
+    if (myth_system(PATHTO_MOUNT + " > /tmp/mounts") != GENERIC_EXIT_OK)
         return false;
     QFile mountFile("/tmp/mounts");
 #else
@@ -372,7 +380,13 @@ bool MythMediaDevice::findMountPath()
 
 
         // Extract the mount point and device name.
+#ifdef USE_MOUNT_COMMAND
+        stream >> deviceName;
+        stream >> mountPoint;   // throw away the "on" between path and mount
+        stream >> mountPoint;
+#else
         stream >> deviceName >> mountPoint;
+#endif
         stream.readLine(); // skip the rest of the line
 
         if (deviceName.isNull())
@@ -386,6 +400,12 @@ bool MythMediaDevice::findMountPath()
 
         QStringList deviceNames;
         getSymlinkTarget(deviceName, &deviceNames);
+
+#if CONFIG_DARWIN
+        // match short-style BSD node names:
+        if (m_DevicePath.startsWith("disk"))
+            deviceNames << deviceName.mid(5);   // remove 5 chars - /dev/
+#endif
 
         // Deal with escaped spaces
         if (mountPoint.contains("\\040"))

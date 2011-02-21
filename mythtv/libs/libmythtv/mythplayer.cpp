@@ -1088,9 +1088,9 @@ void MythPlayer::InitFilters(void)
  *         of frames ready for display if we can't find a frame in the
  *         available queue.
  */
-VideoFrame *MythPlayer::GetNextVideoFrame(bool allow_unsafe)
+VideoFrame *MythPlayer::GetNextVideoFrame(void)
 {
-    return videoOutput->GetNextFreeFrame(false, allow_unsafe);
+    return videoOutput->GetNextFreeFrame();
 }
 
 /** \fn MythPlayer::ReleaseNextVideoFrame(VideoFrame*, int64_t)
