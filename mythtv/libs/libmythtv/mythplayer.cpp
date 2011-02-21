@@ -2241,13 +2241,11 @@ void MythPlayer::SwitchToProgram(void)
         return;
 
     VERBOSE(VB_PLAYBACK, LOC + "SwitchToProgram - start");
-    bool discontinuity = false, newtype = false;
+    bool d1 = false, d2 = false;
     int newid = -1;
-    ProgramInfo *pginfo = player_ctx->tvchain->GetSwitchProgram(
-        discontinuity, newtype, newid);
+    ProgramInfo *pginfo = player_ctx->tvchain->GetSwitchProgram(d1, d2, newid);
     if (!pginfo)
         return;
-    newtype = true; // force reloading of context and stream properties
 
     bool newIsDummy = player_ctx->tvchain->GetCardType(newid) == "DUMMY";
 
@@ -2280,38 +2278,18 @@ void MythPlayer::SwitchToProgram(void)
     }
 
     if (GetEof())
-    {
-        discontinuity = true;
         ResetCaptions();
-    }
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("SwitchToProgram(void) "
-            "discont: %1 newtype: %2 newid: %3 decoderEof: %4")
-            .arg(discontinuity).arg(newtype).arg(newid).arg(GetEof()));
+    VERBOSE(VB_PLAYBACK, LOC + QString("newid: %1 decoderEof: %2")
+                                       .arg(newid).arg(GetEof()));
 
-    if (discontinuity || newtype)
-    {
-        player_ctx->tvchain->SetProgram(*pginfo);
-        decoder->SetProgramInfo(*pginfo);
+    player_ctx->tvchain->SetProgram(*pginfo);
+    decoder->SetProgramInfo(*pginfo);
 
-        player_ctx->buffer->Reset(true);
-        if (newtype)
-        {
-            if (OpenFile() < 0)
-                SetErrored(QObject::tr("Error opening switch program file"));
-        }
-        else
-            ResetPlaying();
-    }
-    else
-    {
-        player_ctx->SetPlayerChangingBuffers(true);
-        if (decoder)
-        {
-            decoder->SetReadAdjust(player_ctx->buffer->SetAdjustFilesize());
-            decoder->SetWaitForChange();
-        }
-    }
+    player_ctx->buffer->Reset(true);
+    if (OpenFile() < 0)
+        SetErrored(QObject::tr("Error opening switch program file"));
+
     delete pginfo;
 
     if (IsErrored())
@@ -2328,11 +2306,8 @@ void MythPlayer::SwitchToProgram(void)
         player_ctx->buffer->UpdateRawBitrate(decoder->GetRawBitrate());
     player_ctx->buffer->Unpause();
 
-    if (discontinuity || newtype)
-    {
-        CheckTVChain();
-        forcePositionMapSync = true;
-    }
+    CheckTVChain();
+    forcePositionMapSync = true;
 
     Play();
     VERBOSE(VB_PLAYBACK, LOC + "SwitchToProgram - end");
