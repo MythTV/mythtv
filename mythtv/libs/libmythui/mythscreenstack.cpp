@@ -81,6 +81,8 @@ void MythScreenStack::AddScreen(MythScreenType *screen, bool allowFade)
     screen->aboutToShow();
 
     m_topScreen = screen;
+
+    emit topScreenChanged(m_topScreen);
 }
 
 void MythScreenStack::PopScreen(bool allowFade,
@@ -157,7 +159,12 @@ void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
     }
 
     if (m_topScreen)
+    {
         m_topScreen->SetRedraw();
+
+        if (!allowFade || !m_DoTransitions)
+            emit topScreenChanged(m_topScreen);
+    }
     else
     {
         // Screen still needs to be redrawn if we have popped the last screen
@@ -165,6 +172,9 @@ void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
         MythScreenType *mainscreen = mainwindow->GetMainStack()->GetTopScreen();
         if (mainscreen)
             mainscreen->SetRedraw();
+
+        if (!allowFade || !m_DoTransitions)
+            emit topScreenChanged(NULL);
     }
 }
 
@@ -350,6 +360,7 @@ void MythScreenStack::CheckDeletes(void)
     if (changed)
     {
         RecalculateDrawOrder();
+        emit topScreenChanged(GetTopScreen());
     }
 }
 

@@ -41,6 +41,9 @@ class MUI_PUBLIC MythScreenStack : public QObject
 
     MythPainter *GetPainter(void);
 
+  signals:
+    void topScreenChanged(MythScreenType *screen);
+
   private slots:
     void doInit(void);
 
