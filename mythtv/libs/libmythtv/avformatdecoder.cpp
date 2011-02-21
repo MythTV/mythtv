@@ -267,6 +267,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       last_dts_for_fault_detection(0),
       pts_detected(false),
       reordered_pts_detected(false),
+      pts_selected(true),
       using_null_videoout(use_null_videoout),
       video_codec_id(kCodec_NONE),
       no_hardware_decoders(no_hardware_decode),
@@ -3116,29 +3117,34 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     {
         if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
             pts = pkt->dts;
+        pts_selected = false;
     }
     else if (private_dec && private_dec->NeedsReorderedPTS() &&
              mpa_pic.reordered_opaque != (int64_t)AV_NOPTS_VALUE)
     {
         pts = mpa_pic.reordered_opaque;
+        pts_selected = true;
     }
     else if (faulty_pts <= faulty_dts && reordered_pts_detected)
     {
         if (mpa_pic.reordered_opaque != (int64_t)AV_NOPTS_VALUE)
             pts = mpa_pic.reordered_opaque;
+        pts_selected = true;
     }
     else if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
     {
         pts = pkt->dts;
+        pts_selected = false;
     }
-    long long temppts = (long long)(av_q2d(curstream->time_base) * pts * 1000);
+    long long vpts = (long long)(av_q2d(curstream->time_base) * pts * 1000);
 
+    long long temppts = vpts;
     // Validate the video pts against the last pts. If it's
     // a little bit smaller, equal or missing, compute
     // it from the last. Otherwise assume a wraparound.
     if (!ringBuffer->isDVD() &&
         temppts <= lastvpts &&
-        (temppts + 10000 > lastvpts || temppts <= 0))
+        (temppts + (1000 / fps) > lastvpts || temppts <= 0))
     {
         temppts = lastvpts;
         temppts += (long long)(1000 / fps);
@@ -3147,8 +3153,11 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     }
 
     VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, LOC +
-            QString("video timecode %1 %2 %3 %4 %5").arg(mpa_pic.reordered_opaque)
-                    .arg(pkt->pts).arg(pkt->dts).arg(temppts).arg(lastvpts));
+            QString("video timecode %1 %2 %3 %4 %5 %6 (%7 active)%8")
+                    .arg(mpa_pic.reordered_opaque).arg(pkt->pts).arg(pkt->dts)
+                    .arg(vpts).arg(temppts).arg(lastvpts)
+                    .arg((pts_selected) ? "reordered" : "dts")
+                    .arg((vpts != temppts) ? " fixup" : ""));
 
 /* XXX: Broken.
     if (mpa_pic.qscale_table != NULL && mpa_pic.qstride > 0 &&
@@ -3264,7 +3273,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
     // it from the last. Otherwise assume a wraparound.
     if (!ringBuffer->isDVD() &&
         temppts <= lastvpts &&
-        (temppts + 10000 > lastvpts || temppts <= 0))
+        (temppts + (1000 / fps) > lastvpts || temppts <= 0))
     {
         temppts = lastvpts;
         temppts += (long long)(1000 / fps);
@@ -3273,8 +3282,9 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
     }
 
     VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, LOC +
-            QString("ProcessVideoFrame timecode %1 %2 %3")
-            .arg(mpa_pic->reordered_opaque).arg(temppts).arg(lastvpts));
+            QString("ProcessVideoFrame timecode %1 %2 %3%4")
+            .arg(mpa_pic->reordered_opaque).arg(pts).arg(temppts).arg(lastvpts)
+            .arg((pts != temppts) ? " fixup" : ""));
 
     picframe->interlaced_frame = mpa_pic->interlaced_frame;
     picframe->top_field_first = mpa_pic->top_field_first;
