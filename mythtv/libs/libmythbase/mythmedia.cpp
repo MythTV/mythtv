@@ -349,7 +349,14 @@ bool MythMediaDevice::findMountPath()
         return false;
     }
 
+#if CONFIG_DARWIN
+    // HACK. TODO: replace with something using popen()?
+    if (myth_system("/sbin/mount > /tmp/mounts") != GENERIC_EXIT_OK)
+        return false;
+    QFile mountFile("/tmp/mounts");
+#else
     QFile mountFile(PATHTO_MOUNTS);
+#endif
 
     // Try to open the mounts file so we can search it for our device.
     if (!mountFile.open(QIODevice::ReadOnly))
