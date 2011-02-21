@@ -12,3 +12,5 @@ moc_*.cpp
 *.dylib
 object_script.*
 *~
+.DS_Store
+
