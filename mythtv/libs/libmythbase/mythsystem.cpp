@@ -368,7 +368,7 @@ uint myth_system(const QString &command, uint flags, uint timeout)
     ms->Run(timeout);
     uint result = ms->Wait(0);
     if (!ms->GetSetting("RunInBackground"))
-        delete ms;
+        ms->deleteLater();
 
     return result;
 }

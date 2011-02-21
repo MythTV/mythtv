@@ -4,11 +4,11 @@
 #include <vector>
 #include <utility> // for std::pair
 
-#include "mythexp.h"
+#include "mythmetaexp.h"
 
 class SingleValueImp;
 
-class MPUBLIC SingleValue
+class META_PUBLIC SingleValue
 {
   public:
     typedef std::pair<int, QString> entry;
@@ -33,7 +33,7 @@ class MPUBLIC SingleValue
 };
 
 class MultiValueImp;
-class MPUBLIC MultiValue
+class META_PUBLIC MultiValue
 {
   public:
     struct entry
@@ -62,7 +62,7 @@ class MPUBLIC MultiValue
     MultiValueImp *m_imp;
 };
 
-class MPUBLIC VideoCategory : public SingleValue
+class META_PUBLIC VideoCategory : public SingleValue
 {
   public:
     static VideoCategory &GetCategory();
@@ -72,7 +72,7 @@ class MPUBLIC VideoCategory : public SingleValue
     ~VideoCategory();
 };
 
-class MPUBLIC VideoCountry : public SingleValue
+class META_PUBLIC VideoCountry : public SingleValue
 {
   public:
     static VideoCountry &getCountry();
@@ -82,7 +82,7 @@ class MPUBLIC VideoCountry : public SingleValue
     ~VideoCountry();
 };
 
-class MPUBLIC VideoGenre : public SingleValue
+class META_PUBLIC VideoGenre : public SingleValue
 {
   public:
     static VideoGenre &getGenre();
@@ -92,7 +92,7 @@ class MPUBLIC VideoGenre : public SingleValue
     ~VideoGenre();
 };
 
-class MPUBLIC VideoGenreMap : public MultiValue
+class META_PUBLIC VideoGenreMap : public MultiValue
 {
   public:
     static VideoGenreMap &getGenreMap();
@@ -102,7 +102,7 @@ class MPUBLIC VideoGenreMap : public MultiValue
     ~VideoGenreMap();
 };
 
-class MPUBLIC VideoCountryMap : public MultiValue
+class META_PUBLIC VideoCountryMap : public MultiValue
 {
   public:
     static VideoCountryMap &getCountryMap();
@@ -112,7 +112,7 @@ class MPUBLIC VideoCountryMap : public MultiValue
     ~VideoCountryMap();
 };
 
-class MPUBLIC VideoCast : public SingleValue
+class META_PUBLIC VideoCast : public SingleValue
 {
   public:
     static VideoCast &GetCast();
@@ -122,7 +122,7 @@ class MPUBLIC VideoCast : public SingleValue
     ~VideoCast();
 };
 
-class MPUBLIC VideoCastMap : public MultiValue
+class META_PUBLIC VideoCastMap : public MultiValue
 {
   public:
     static VideoCastMap &getCastMap();
@@ -132,10 +132,10 @@ class MPUBLIC VideoCastMap : public MultiValue
     ~VideoCastMap();
 };
 
-class MPUBLIC FileAssociations
+class META_PUBLIC FileAssociations
 {
   public:
-    struct file_association
+    struct META_PUBLIC file_association
     {
         unsigned int id;
         QString extension;

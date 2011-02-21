@@ -2,7 +2,7 @@
 #define VIDEOUTILS_H_
 
 #include "parentalcontrols.h"
-#include "mythexp.h"
+#include "mythmetaexp.h"
 
 template <typename T>
 inline void CheckedSet(T *uiItem, const QString &value)
@@ -17,41 +17,41 @@ inline void CheckedSet(T *uiItem, const QString &value)
 }
 
 template <>
-MPUBLIC void CheckedSet(class MythUIStateType *uiItem, const QString &state);
+META_PUBLIC void CheckedSet(class MythUIStateType *uiItem, const QString &state);
 
-MPUBLIC void CheckedSet(class MythUIType *container, const QString &itemName,
+META_PUBLIC void CheckedSet(class MythUIType *container, const QString &itemName,
         const QString &value);
 
-MPUBLIC void CheckedSet(class MythUIImage *uiItem, const QString &filename);
+META_PUBLIC void CheckedSet(class MythUIImage *uiItem, const QString &filename);
 
-MPUBLIC QStringList GetVideoDirsByHost(QString host);
-MPUBLIC QStringList GetVideoDirs();
+META_PUBLIC QStringList GetVideoDirsByHost(QString host);
+META_PUBLIC QStringList GetVideoDirs();
 
-MPUBLIC bool IsDefaultCoverFile(const QString &coverfile);
-MPUBLIC bool IsDefaultScreenshot(const QString &screenshot);
-MPUBLIC bool IsDefaultBanner(const QString &banner);
-MPUBLIC bool IsDefaultFanart(const QString &fanart);
+META_PUBLIC bool IsDefaultCoverFile(const QString &coverfile);
+META_PUBLIC bool IsDefaultScreenshot(const QString &screenshot);
+META_PUBLIC bool IsDefaultBanner(const QString &banner);
+META_PUBLIC bool IsDefaultFanart(const QString &fanart);
 
 class VideoMetadata;
 
-MPUBLIC QString GetDisplayUserRating(float userrating);
-MPUBLIC QString GetDisplayLength(int length);
-MPUBLIC QString GetDisplaySeasonEpisode(int seasEp, int digits);
-MPUBLIC QString GetDisplayBrowse(bool browse);
-MPUBLIC QString GetDisplayWatched(bool watched);
-MPUBLIC QString GetDisplayProcessed(bool processed);
-MPUBLIC QString GetDisplayYear(int year);
-MPUBLIC QString GetDisplayRating(const QString &rating);
+META_PUBLIC QString GetDisplayUserRating(float userrating);
+META_PUBLIC QString GetDisplayLength(int length);
+META_PUBLIC QString GetDisplaySeasonEpisode(int seasEp, int digits);
+META_PUBLIC QString GetDisplayBrowse(bool browse);
+META_PUBLIC QString GetDisplayWatched(bool watched);
+META_PUBLIC QString GetDisplayProcessed(bool processed);
+META_PUBLIC QString GetDisplayYear(int year);
+META_PUBLIC QString GetDisplayRating(const QString &rating);
 
-MPUBLIC QString GetDisplayGenres(const VideoMetadata &item);
-MPUBLIC QString GetDisplayCountries(const VideoMetadata &item);
-MPUBLIC QStringList GetDisplayCast(const VideoMetadata &item);
+META_PUBLIC QString GetDisplayGenres(const VideoMetadata &item);
+META_PUBLIC QString GetDisplayCountries(const VideoMetadata &item);
+META_PUBLIC QStringList GetDisplayCast(const VideoMetadata &item);
 
-MPUBLIC QString TrailerToState(const QString &trailerFile);
-MPUBLIC QString ParentalLevelToState(const ParentalLevel &level);
-MPUBLIC QString WatchedToState(bool watched);
+META_PUBLIC QString TrailerToState(const QString &trailerFile);
+META_PUBLIC QString ParentalLevelToState(const ParentalLevel &level);
+META_PUBLIC QString WatchedToState(bool watched);
 
-MPUBLIC bool isHostMaster(const QString &host);
+META_PUBLIC bool isHostMaster(const QString &host);
 
 // this needs to be an inline and pull in the storage group and context
 // headers since it this used in dbcheck.cpp.

@@ -10,7 +10,7 @@
 #include "xmlparsebase.h"
 #include "mythmainwindow.h"
 
-class MPUBLIC MythFontProperties: public XMLParseBase
+class MUI_PUBLIC MythFontProperties: public XMLParseBase
 {
   public:
     MythFontProperties();
@@ -81,7 +81,7 @@ class MPUBLIC MythFontProperties: public XMLParseBase
     friend class FontMap;
 };
 
-class MPUBLIC FontMap
+class MUI_PUBLIC FontMap
 {
   public:
     FontMap() {}
@@ -99,7 +99,7 @@ class MPUBLIC FontMap
     QMap<QString, MythFontProperties> m_FontMap;
 };
 
-MPUBLIC FontMap *GetGlobalFontMap(void);
+MUI_PUBLIC FontMap *GetGlobalFontMap(void);
 
 
 // FIXME: remove legacy crap
@@ -109,6 +109,6 @@ struct fontProp {
     QColor color;
     QColor dropColor;
 };
-extern MPUBLIC QMap<QString, fontProp> globalFontMap;
+extern MUI_PUBLIC QMap<QString, fontProp> globalFontMap;
 
 #endif

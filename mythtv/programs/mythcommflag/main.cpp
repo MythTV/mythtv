@@ -160,14 +160,14 @@ static int BuildVideoMarkup(ProgramInfo *program_info, bool useDB)
     {
         VERBOSE(VB_IMPORTANT,
                 QString("Unable to create RingBuffer for %1").arg(filename));
-        return COMMFLAG_EXIT_NO_RINGBUFFER;
+        return GENERIC_EXIT_PERMISSIONS_ERROR;
     }
 
     if (useDB && !MSqlQuery::testDBConnection())
     {
         VERBOSE(VB_IMPORTANT, "Unable to open DB connection for commercial flagging.");
         delete tmprbuf;
-        return COMMFLAG_EXIT_DB_ERROR;
+        return GENERIC_EXIT_DB_ERROR;
     }
 
     MythCommFlagPlayer *cfp = new MythCommFlagPlayer();
@@ -184,7 +184,7 @@ static int BuildVideoMarkup(ProgramInfo *program_info, bool useDB)
 
     delete ctx;
 
-    return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
+    return GENERIC_EXIT_OK;
 }
 
 static int QueueCommFlagJob(uint chanid, QString starttime)
@@ -201,7 +201,7 @@ static int QueueCommFlagJob(uint chanid, QString starttime)
                 .arg(chanid).arg(starttime);
             cerr << tmp.toLocal8Bit().constData() << endl;
         }
-        return COMMFLAG_EXIT_NO_PROGRAM_DATA;
+        return GENERIC_EXIT_NO_RECORDING_DATA;
     }
 
     bool result = JobQueue::QueueJob(
@@ -215,7 +215,7 @@ static int QueueCommFlagJob(uint chanid, QString starttime)
                 .arg(chanid).arg(starttime);
             cerr << tmp.toLocal8Bit().constData() << endl;
         }
-        return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
+        return GENERIC_EXIT_OK;
     }
     else
     {
@@ -225,10 +225,10 @@ static int QueueCommFlagJob(uint chanid, QString starttime)
                 .arg(chanid).arg(starttime);
             cerr << tmp.toLocal8Bit().constData() << endl;
         }
-        return COMMFLAG_EXIT_DB_ERROR;
+        return GENERIC_EXIT_DB_ERROR;
     }
 
-    return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
+    return GENERIC_EXIT_OK;
 }
 
 static int CopySkipListToCutList(QString chanid, QString starttime)
@@ -244,7 +244,7 @@ static int CopySkipListToCutList(QString chanid, QString starttime)
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
                 .arg(chanid).arg(starttime));
-        return COMMFLAG_BUGGY_EXIT_NO_CHAN_DATA;
+        return GENERIC_EXIT_NO_RECORDING_DATA;
     }
 
     pginfo.QueryCommBreakList(cutlist);
@@ -255,7 +255,7 @@ static int CopySkipListToCutList(QString chanid, QString starttime)
             cutlist[it.key()] = MARK_CUT_END;
     pginfo.SaveCutList(cutlist);
 
-    return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
+    return GENERIC_EXIT_OK;
 }
 
 static int ClearSkipList(QString chanid, QString starttime)
@@ -268,7 +268,7 @@ static int ClearSkipList(QString chanid, QString starttime)
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
                 .arg(chanid).arg(starttime));
-        return COMMFLAG_BUGGY_EXIT_NO_CHAN_DATA;
+        return GENERIC_EXIT_NO_RECORDING_DATA;
     }
 
     frm_dir_map_t skiplist;
@@ -276,7 +276,7 @@ static int ClearSkipList(QString chanid, QString starttime)
 
     VERBOSE(VB_IMPORTANT, "Commercial skip list cleared");
 
-    return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
+    return GENERIC_EXIT_OK;
 }
 
 static int SetCutList(QString chanid, QString starttime, QString newCutList)
@@ -302,14 +302,14 @@ static int SetCutList(QString chanid, QString starttime, QString newCutList)
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
                 .arg(chanid).arg(starttime));
-        return COMMFLAG_BUGGY_EXIT_NO_CHAN_DATA;
+        return GENERIC_EXIT_NO_RECORDING_DATA;
     }
 
     pginfo.SaveCutList(cutlist);
 
     VERBOSE(VB_IMPORTANT, QString("Cutlist set to: %1").arg(newCutList));
 
-    return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
+    return GENERIC_EXIT_OK;
 }
 
 static int GetMarkupList(QString list, QString chanid, QString starttime)
@@ -326,7 +326,7 @@ static int GetMarkupList(QString list, QString chanid, QString starttime)
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
                 .arg(chanid).arg(starttime));
-        return COMMFLAG_BUGGY_EXIT_NO_CHAN_DATA;
+        return GENERIC_EXIT_NO_RECORDING_DATA;
     }
 
     if (list == "cutlist")
@@ -368,7 +368,7 @@ static int GetMarkupList(QString list, QString chanid, QString starttime)
             .arg(result).toLocal8Bit().constData();
     }
 
-    return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
+    return GENERIC_EXIT_OK;
 }
 
 static void streamOutCommercialBreakList(
@@ -717,7 +717,7 @@ static int FlagCommercials(
                                0, NULL, outputfilename);
 
         global_program_info = NULL;
-        return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
+        return GENERIC_EXIT_OK;
     }
 
 
@@ -747,7 +747,7 @@ static int FlagCommercials(
                     "(the program is already being flagged elsewhere)\n";
         }
         global_program_info = NULL;
-        return COMMFLAG_EXIT_IN_USE;
+        return GENERIC_EXIT_IN_USE;
     }
 
     QString filename = get_filename(program_info);
@@ -758,7 +758,7 @@ static int FlagCommercials(
         VERBOSE(VB_IMPORTANT,
                 QString("Unable to create RingBuffer for %1").arg(filename));
         global_program_info = NULL;
-        return COMMFLAG_EXIT_NO_RINGBUFFER;
+        return GENERIC_EXIT_PERMISSIONS_ERROR;
     }
 
     if (useDB && !MSqlQuery::testDBConnection())
@@ -766,7 +766,7 @@ static int FlagCommercials(
         VERBOSE(VB_IMPORTANT, "Unable to open commflag DB connection");
         delete tmprbuf;
         global_program_info = NULL;
-        return COMMFLAG_EXIT_DB_ERROR;
+        return GENERIC_EXIT_DB_ERROR;
     }
 
     MythCommFlagPlayer *cfp = new MythCommFlagPlayer();
@@ -802,7 +802,7 @@ static int FlagCommercials(
         delete ctx;
         global_program_info = NULL;
 
-        return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
+        return GENERIC_EXIT_OK;
     }
 
     if (program_info->GetRecordingEndTime() > QDateTime::currentDateTime())
@@ -882,7 +882,7 @@ static int FlagCommercials(
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
                 .arg(chanid).arg(starttime));
-        return COMMFLAG_EXIT_NO_PROGRAM_DATA;
+        return GENERIC_EXIT_NO_RECORDING_DATA;
     }
 
     int ret = FlagCommercials(&pginfo, outputfilename, useDB);
@@ -895,7 +895,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     int argpos = 1;
     bool isVideo = false;
-    int result = COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
+    int result = GENERIC_EXIT_OK;
 
     QString filename;
     QString outputfilename = QString::null;
@@ -941,7 +941,7 @@ int main(int argc, char *argv[])
             {
                 VERBOSE(VB_IMPORTANT,
                         "Missing or invalid parameters for --chanid option");
-                return COMMFLAG_EXIT_INVALID_CHANID;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             chanid = QString(a.argv()[++argpos]).toUInt();
@@ -954,7 +954,7 @@ int main(int argc, char *argv[])
             {
                 VERBOSE(VB_IMPORTANT,
                         "Missing or invalid parameters for --starttime option");
-                return COMMFLAG_EXIT_INVALID_STARTTIME;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             starttime += a.argv()[++argpos];
@@ -1087,7 +1087,7 @@ int main(int argc, char *argv[])
                 !strncmp(a.argv()[argpos + 1], "--", 2))
             {
                 cerr << "Missing or invalid parameter for --allstart\n";
-                return COMMFLAG_EXIT_INVALID_STARTTIME;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             allStart = a.argv()[++argpos];
@@ -1098,7 +1098,7 @@ int main(int argc, char *argv[])
                 !strncmp(a.argv()[argpos + 1], "--", 2))
             {
                 cerr << "Missing or invalid parameter for --allend\n";
-                return COMMFLAG_EXIT_INVALID_STARTTIME;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             allEnd = a.argv()[++argpos];
@@ -1174,7 +1174,7 @@ int main(int argc, char *argv[])
             else
             {
                 VERBOSE(VB_IMPORTANT, "Missing argument to -V option");
-                return COMMFLAG_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-v") ||
@@ -1184,7 +1184,7 @@ int main(int argc, char *argv[])
             {
                 if (parse_verbose_arg(a.argv()[argpos+1]) ==
                         GENERIC_EXIT_INVALID_CMDLINE)
-                    return COMMFLAG_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
 
                 ++argpos;
             }
@@ -1192,13 +1192,13 @@ int main(int argc, char *argv[])
             {
                 VERBOSE(VB_IMPORTANT,
                         "Missing argument to -v/--verbose option");
-                return COMMFLAG_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
         {
             if (cmdline_err)
-                return COMMFLAG_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
         }
         else if (!strcmp(a.argv()[argpos],"-h") ||
                  !strcmp(a.argv()[argpos],"--help"))
@@ -1246,13 +1246,13 @@ int main(int argc, char *argv[])
                     "      if either is used.\n\n"
                     "If no command line arguments are specified, all\n"
                     "unflagged videos will be flagged.\n\n");
-            return COMMFLAG_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
         else
         {
             VERBOSE(VB_IMPORTANT, QString("Illegal option: '%1' (use --help)")
                     .arg(a.argv()[argpos]));
-            return COMMFLAG_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
 
         ++argpos;
@@ -1266,7 +1266,7 @@ int main(int argc, char *argv[])
             false/*bypass auto discovery*/, !useDB/*ignoreDB*/))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        return COMMFLAG_EXIT_NO_MYTHCONTEXT;
+        return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
     gCoreContext->SetAppName(binname);
@@ -1296,7 +1296,7 @@ int main(int argc, char *argv[])
         {
             cerr << "mythcommflag: ERROR: Unable to find DB info for "
                  << "JobQueue ID# " << jobID << endl;
-            return COMMFLAG_EXIT_NO_PROGRAM_DATA;
+            return GENERIC_EXIT_NO_RECORDING_DATA;
         }
     }
 
@@ -1316,7 +1316,7 @@ int main(int argc, char *argv[])
         {
             cerr << "mythcommflag: ERROR: Unable to find DB info for "
                  << fullfile.dirName().toLocal8Bit().constData() << endl;
-            return COMMFLAG_EXIT_NO_PROGRAM_DATA;
+            return GENERIC_EXIT_NO_RECORDING_DATA;
         }
     }
 
@@ -1325,7 +1325,7 @@ int main(int argc, char *argv[])
     {
         VERBOSE(VB_IMPORTANT, "You must specify both the Channel ID "
                 "and the Start Time.");
-        return COMMFLAG_EXIT_INVALID_CMDLINE;
+        return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
     if (clearSkiplist)
@@ -1452,7 +1452,7 @@ int main(int argc, char *argv[])
             (filename.right(4).toLower() == "mpeg"))
         {
             result = BuildVideoMarkup(pginfo, useDB);
-            if (COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS != result)
+            if (result != GENERIC_EXIT_OK)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
                         "Failed to build video markup");
@@ -1566,7 +1566,7 @@ int main(int argc, char *argv[])
         else
         {
             MythDB::DBError("Querying recorded programs", query);
-            return COMMFLAG_EXIT_DB_ERROR;
+            return GENERIC_EXIT_DB_ERROR;
         }
     }
 

@@ -1,5 +1,5 @@
 include ( ../../settings.pro )
-include ( ../../version.pro )
+#include ( ../../version.pro )
 
 TEMPLATE = lib
 TARGET = mythbase-$$LIBVERSION
@@ -11,7 +11,7 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
 HEADERS += mythsocket.h mythsocket_cb.h mythsocketthread.h msocketdevice.h
-HEADERS += mythexp.h mythdbcon.h mythdb.h mythdbparams.h oldsettings.h
+HEADERS += mythbaseexp.h mythdbcon.h mythdb.h mythdbparams.h oldsettings.h
 HEADERS += mythverbose.h mythversion.h compat.h mythconfig.h
 HEADERS += mythobservable.h mythevent.h httpcomms.h mcodecs.h
 HEADERS += mythtimer.h mythsignalingtimer.h mythdirs.h exitcodes.h
@@ -20,7 +20,7 @@ HEADERS += mythcorecontext.h mythsystem.h mythlocale.h storagegroup.h
 HEADERS += mythcoreutil.h mythdownloadmanager.h mythtranslation.h
 HEADERS += unzip.h unzip_p.h zipentry_p.h iso639.h iso3166.h mythmedia.h
 HEADERS += util.h mythhdd.h mythcdrom.h autodeletedeque.h dbutil.h
-HEADERS += mythhttppool.h mythhttphandler.h mythdeque.h
+HEADERS += mythhttppool.h mythhttphandler.h mythdeque.h version.h
 
 SOURCES += mythsocket.cpp mythsocketthread.cpp msocketdevice.cpp
 SOURCES += mythdbcon.cpp mythdb.cpp oldsettings.cpp mythverbose.cpp
@@ -47,8 +47,8 @@ mingw {
 
 # Install headers to same location as libmyth to make things easier
 inc.path = $${PREFIX}/include/mythtv/
-inc.files  = mythverbose.h mythdbcon.h mythdbparams.h mythexp.h mythdb.h
-inc.files += compat.h mythversion.h mythconfig.h mythconfig.mak
+inc.files  = mythverbose.h mythdbcon.h mythdbparams.h mythbaseexp.h mythdb.h
+inc.files += compat.h mythversion.h mythconfig.h mythconfig.mak version.h
 inc.files += mythobservable.h mythevent.h httpcomms.h mcodecs.h
 inc.files += mythtimer.h lcddevice.h exitcodes.h mythdirs.h mythstorage.h
 inc.files += mythsocket.h mythsocket_cb.h msocketdevice.h
@@ -68,6 +68,7 @@ INSTALLS += inc inc2 inc3
 
 DEFINES += RUNPREFIX=\\\"$${RUNPREFIX}\\\"
 DEFINES += LIBDIRNAME=\\\"$${LIBDIRNAME}\\\"
+DEFINES += MBASE_API
 
 linux:DEFINES += linux
 

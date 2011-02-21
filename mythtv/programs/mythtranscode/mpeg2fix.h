@@ -172,7 +172,7 @@ class MPEG2fixup
     int AddFrame(MPEG2frame *f);
     int InitAV(const char *inputfile, const char *type, int64_t offset);
     void ScanAudio();
-    bool ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec);
+    int ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec);
     void WriteFrame(const char *filename, MPEG2frame *f);
     void WriteFrame(const char *filename, AVPacket *pkt);
     void WriteYUV(const char *filename, const mpeg2_info_t *info);
@@ -286,11 +286,14 @@ class MPEG2fixup
             cout << args << endl; \
         } \
     } while (0)
-    #define TRANSCODE_EXIT_OK                         0
-    #define TRANSCODE_EXIT_UNKNOWN_ERROR              -10
-    #define TRANSCODE_BUGGY_EXIT_WRITE_FRAME_ERROR    -11
-    #define TRANSCODE_BUGGY_EXIT_DEADLOCK             -12
+
+    // Be sure to keep these the same as in libmythbase/exitcodes.h or expect
+    // odd behavior eventually
+    #define GENERIC_EXIT_OK                     0
+    #define GENERIC_EXIT_NOT_OK               128
+    #define GENERIC_EXIT_WRITE_FRAME_ERROR    149
+    #define GENERIC_EXIT_DEADLOCK             150
 #else
-   #include "mythcontext.h"
    #include "exitcodes.h"
+   #include "mythcontext.h"
 #endif

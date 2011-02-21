@@ -135,6 +135,7 @@ HEADERS += minilzo.h                RTjpegN.h
 SOURCES += minilzo.cpp              RTjpegN.cpp
 
 # Misc. needed by backend/frontend
+HEADERS += mythtvexp.h
 HEADERS += recordinginfo.h
 HEADERS += dbcheck.h
 HEADERS += videodbcheck.h
@@ -231,7 +232,7 @@ SOURCES += mpeg/H264Parser.cpp
 
 # Channels, and the multiplexes that transmit them
 HEADERS += frequencies.h            frequencytables.h
-SOURCES += frequencies.c            frequencytables.cpp
+SOURCES += frequencies.cpp          frequencytables.cpp
 
 HEADERS += channelutil.h            dbchannelinfo.h
 SOURCES += channelutil.cpp          dbchannelinfo.cpp
@@ -246,6 +247,7 @@ SOURCES += channelscan/scaninfo.cpp channelscan/channelimporter.cpp
 
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = playgroup.h
+inc.files += mythtvexp.h
 
 INSTALLS += inc
 
@@ -585,3 +587,4 @@ mingw {
 include ( ../libs-targetfix.pro )
 
 LIBS += $$LATE_LIBS
+DEFINES += MTV_API

@@ -9,11 +9,11 @@
 #include <QMutex>
 
 // MythTV headers
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 using namespace std;
 
-class MPUBLIC FIFOWriter
+class MTV_PUBLIC FIFOWriter
 {
   public:
     FIFOWriter(int count, bool sync);

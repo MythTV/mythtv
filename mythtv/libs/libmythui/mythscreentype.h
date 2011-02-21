@@ -16,7 +16,7 @@ class MythUIBusyDialog;
  * \brief Event that can be dispatched from a MythScreenType when it has
  *        completed loading.
  */
-class MPUBLIC ScreenLoadCompletionEvent : public QEvent
+class MUI_PUBLIC ScreenLoadCompletionEvent : public QEvent
 {
   public:
     ScreenLoadCompletionEvent(const QString &id) :
@@ -36,7 +36,7 @@ class MPUBLIC ScreenLoadCompletionEvent : public QEvent
  *
  * \ingroup MythUI_Widgets
  */
-class MPUBLIC MythScreenType : public MythUIType
+class MUI_PUBLIC MythScreenType : public MythUIType
 {
     Q_OBJECT
 

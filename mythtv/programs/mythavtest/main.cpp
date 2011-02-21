@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <iostream>
+
 using namespace std;
 
 #include <QString>
@@ -23,57 +24,6 @@ using namespace std;
 #include "mythuihelper.h"
 #include "mythmainwindow.h"
 
-static void *run_priv_thread(void *data)
-{
-    (void)data;
-    while (true)
-    {
-        gCoreContext->waitPrivRequest();
-
-        for (MythPrivRequest req = gCoreContext->popPrivRequest();
-             true; req = gCoreContext->popPrivRequest())
-        {
-            bool done = false;
-
-            switch (req.getType())
-            {
-            case MythPrivRequest::MythRealtime:
-                {
-                    pthread_t *target_thread = (pthread_t *)(req.getData());
-                    // Raise the given thread to realtime priority
-                    struct sched_param sp = {1};
-                    if (target_thread)
-                    {
-                        int status = pthread_setschedparam(
-                            *target_thread, SCHED_FIFO, &sp);
-                        if (status)
-                        {
-                            // perror("pthread_setschedparam");
-                            VERBOSE(VB_GENERAL, "Realtime priority would require SUID as root.");
-                        }
-                        else
-                            VERBOSE(VB_GENERAL, "Using realtime priority.");
-                    }
-                    else
-                    {
-                        VERBOSE(VB_IMPORTANT, "Unexpected NULL thread ptr "
-                                "for MythPrivRequest::MythRealtime");
-                    }
-                }
-                break;
-            case MythPrivRequest::MythExit:
-                pthread_exit(NULL);
-                break;
-            case MythPrivRequest::PrivEnd:
-                done = true; // queue is empty
-                break;
-            }
-            if (done)
-                break; // from processing the queue
-        }
-    }
-    return NULL; // will never happen
-}
 
 int main(int argc, char *argv[])
 {
@@ -97,9 +47,9 @@ int main(int argc, char *argv[])
         if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
         {
             if (cmdline_err)
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             if (cmdline.WantsToExit())
-                return FRONTEND_EXIT_OK;
+                return GENERIC_EXIT_OK;
         }
     }
 
@@ -146,7 +96,7 @@ int main(int argc, char *argv[])
     if (!gContext->Init())
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        return TV_EXIT_NO_MYTHCONTEXT;
+        return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
     gCoreContext->SetAppName(binname);
@@ -163,17 +113,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    // Create priveledged thread, then drop privs
-    pthread_t priv_thread;
-    bool priv_thread_created = true;
-
-    int status = pthread_create(&priv_thread, NULL, run_priv_thread, NULL);
-    if (status)
-    {
-        VERBOSE(VB_IMPORTANT, QString("Warning: ") +
-                "Failed to create priveledged thread." + ENO);
-        priv_thread_created = false;
-    }
     setuid(getuid());
 
     QString themename = gCoreContext->GetSetting("Theme");
@@ -183,7 +122,7 @@ int main(int argc, char *argv[])
         QString msg = QString("Fatal Error: Couldn't find theme '%1'.")
             .arg(themename);
         VERBOSE(VB_IMPORTANT, msg);
-        return TV_EXIT_NO_THEME;
+        return GENERIC_EXIT_NO_THEME;
     }
 
     GetMythUI()->LoadQtConfig();
@@ -196,7 +135,7 @@ int main(int argc, char *argv[])
     {
         VERBOSE(VB_IMPORTANT, "Fatal Error: Audio not configured, you need "
                 "to run 'mythfrontend', not 'mythtv'.");
-        return TV_EXIT_NO_AUDIO;
+        return GENERIC_EXIT_SETUP_ERROR;
     }
 #endif
 
@@ -216,7 +155,7 @@ int main(int argc, char *argv[])
     if (!tv->Init())
     {
         VERBOSE(VB_IMPORTANT, "Fatal Error: Could not initialize TV class.");
-        return TV_EXIT_NO_TV;
+        return GENERIC_EXIT_NOT_OK;
     }
 
     if (filename.isEmpty())
@@ -228,15 +167,9 @@ int main(int argc, char *argv[])
         ProgramInfo pginfo(filename);
         TV::StartTV(&pginfo, kStartTVNoFlags);
     }
-
-    if (priv_thread_created)
-    {
-        gCoreContext->addPrivRequest(MythPrivRequest::MythExit, NULL);
-        pthread_join(priv_thread, NULL);
-    }
     delete gContext;
 
-    return TV_EXIT_OK;
+    return GENERIC_EXIT_OK;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -5,7 +5,7 @@
 #include <QString>
 
 #include "mythdb.h"
-#include "mythexp.h"
+#include "mythbaseexp.h"
 #include "mythobservable.h"
 #include "mythsocket_cb.h"
 #include "mythverbose.h"
@@ -28,28 +28,6 @@ enum LogPriorities
     LP_DEBUG     = 7
 };
 
-/** \class MythPrivRequest
- *  \brief Container for requests that require privledge escalation.
- *
- *   Currently this is used for just one thing, increasing the
- *   priority of the video output thread to a real-time priority.
- *   These requests are made by calling gCoreContext->addPrivRequest().
- *
- *  \sa NuppelVideoPlayer::StartPlaying(void)
- *  \sa MythCoreContext:addPrivRequest(MythPrivRequest::Type, void*)
- */
-class MPUBLIC MythPrivRequest
-{
-  public:
-    typedef enum { MythRealtime, MythExit, PrivEnd } Type;
-    MythPrivRequest(Type t, void *data) : m_type(t), m_data(data) {}
-    Type getType() const { return m_type; }
-    void *getData() const { return m_data; }
-  private:
-    Type m_type;
-    void *m_data;
-};
-
 /** \class MythCoreContext
  *  \brief This class contains the runtime context for MythTV.
  *
@@ -60,7 +38,7 @@ class MPUBLIC MythPrivRequest
  *   It also contains support for database error printing, and
  *   database message logging.
  */
-class MPUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
+class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
 {
   public:
     MythCoreContext(const QString &binversion, QObject *eventHandler);
@@ -154,10 +132,6 @@ class MPUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
     void ActivateSettingsCache(bool activate = true);
     void OverrideSettingForSession(const QString &key, const QString &value);
 
-    void addPrivRequest(MythPrivRequest::Type t, void *data);
-    void waitPrivRequest() const;
-    MythPrivRequest popPrivRequest();
-
     void dispatch(const MythEvent &event);
     void dispatchNow(const MythEvent &event) MDEPRECATED;
 
@@ -181,10 +155,10 @@ class MPUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
 };
 
 /// This global variable contains the MythCoreContext instance for the app
-extern MPUBLIC MythCoreContext *gCoreContext;
+extern MBASE_PUBLIC MythCoreContext *gCoreContext;
 
 /// This global variable is used to makes certain calls to avlib threadsafe.
-extern MPUBLIC QMutex *avcodeclock;
+extern MBASE_PUBLIC QMutex *avcodeclock;
 
 #endif
 

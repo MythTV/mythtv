@@ -12,7 +12,7 @@ using namespace std;
 #include <QMutex>
 #include <QString>
 
-#include "mythexp.h" // MPUBLIC - Symbol Visibility
+#include "mythtvexp.h" // MTV_PUBLIC - Symbol Visibility
 #include "mpegdescriptors.h"
 #include "programinfo.h" // for subtitle types and audio and video properties
 
@@ -527,8 +527,8 @@ typedef enum
     kCategoryLast,
 } MythCategoryType;
 
-MPUBLIC QString myth_category_type_to_string(uint category_type);
-MPUBLIC MythCategoryType string_to_myth_category_type(const QString &type);
+MTV_PUBLIC QString myth_category_type_to_string(uint category_type);
+MTV_PUBLIC MythCategoryType string_to_myth_category_type(const QString &type);
 
 class ContentDescriptor : public MPEGDescriptor
 {

@@ -5,7 +5,7 @@
 #include <QRect>
 #include <QHash>
 
-#include "mythexp.h"
+#include "mythuiexp.h"
 #include "mythimage.h"
 #include "mythxdisplay.h"
 #include "mythrender_base.h"
@@ -48,7 +48,7 @@ class VDPAUDecoder;
 class VDPAUVideoMixer;
 class VDPAULayer;
 
-class MPUBLIC MythRenderVDPAU : public MythRender
+class MUI_PUBLIC MythRenderVDPAU : public MythRender
 {
   public:
     static bool gVDPAUSupportChecked;

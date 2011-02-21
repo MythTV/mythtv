@@ -12,7 +12,7 @@
  *
  * \ingroup MythUI_Widgets
  */
-class MPUBLIC MythUICheckBox : public MythUIType
+class MUI_PUBLIC MythUICheckBox : public MythUIType
 {
     Q_OBJECT
 

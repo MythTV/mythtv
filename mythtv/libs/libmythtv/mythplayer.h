@@ -29,7 +29,7 @@
 #include "commbreakmap.h"
 #include "audioplayer.h"
 
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 extern "C" {
 #include "filter.h"
@@ -96,7 +96,7 @@ class DecoderThread : public QThread
     bool        m_start_paused;
 };
 
-class MPUBLIC MythPlayer
+class MTV_PUBLIC MythPlayer
 {
     // Do NOT add a decoder class to this list
     friend class PlayerContext;
@@ -216,13 +216,13 @@ class MPUBLIC MythPlayer
     void SetCutList(const frm_dir_map_t &newCutList);
 
     // Decoder stuff..
-    VideoFrame *GetNextVideoFrame(bool allow_unsafe = true);
+    VideoFrame *GetNextVideoFrame(void);
     VideoFrame *GetRawVideoFrame(long long frameNumber = -1);
     VideoFrame *GetCurrentFrame(int &w, int &h);
     virtual void ReleaseNextVideoFrame(VideoFrame *buffer, int64_t timecode,
                                        bool wrap = true);
     void ReleaseNextVideoFrame(void)
-        { videoOutput->ReleaseFrame(GetNextVideoFrame(false)); }
+        { videoOutput->ReleaseFrame(GetNextVideoFrame()); }
     void ReleaseCurrentFrame(VideoFrame *frame);
     void DiscardVideoFrame(VideoFrame *buffer);
     void DiscardVideoFrames(bool next_frame_keyframe);

@@ -3,7 +3,7 @@
 
 #include <QStringList>
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 #include "mythdbcon.h"
 
 enum MythDBBackupStatus
@@ -27,7 +27,7 @@ enum MythDBBackupStatus
  *
  *  \sa HouseKeeper::RunHouseKeeping(void)
  */
-class MPUBLIC DBUtil
+class MBASE_PUBLIC DBUtil
 {
   public:
     DBUtil();

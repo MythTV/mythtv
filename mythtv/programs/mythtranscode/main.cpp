@@ -66,6 +66,7 @@ static void usage(char *progname)
     cerr << "\t                or -ro: Pass a comma-separated list of\n";
     cerr << "\t                        recordingprofile options to override\n";
     cerr << "\t                        values in the database.\n";
+    cerr << "\t--audiotrack <trackno>: Selects the audiotrack for transcoding.\n";
     cerr << "\t--verbose level  or -v: Use '-v help' for level info\n";
     cerr << "\t--help           or -h: Prints this help statement.\n";
 }
@@ -149,6 +150,7 @@ int main(int argc, char *argv[])
     frm_dir_map_t deleteMap;
     frm_pos_map_t posMap;
     srand(time(NULL));
+    int AudioTrackNo = -1;
 
     QCoreApplication a(argc, argv);
 
@@ -179,7 +181,7 @@ int main(int argc, char *argv[])
             {
                 cerr << "Missing argument to -s/--starttime option\n";
                 usage(a.argv()[0]);
-                return TRANSCODE_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-c") ||
@@ -195,7 +197,7 @@ int main(int argc, char *argv[])
             {
                 cerr << "Missing argument to -c/--chanid option\n";
                 usage(a.argv()[0]);
-                return TRANSCODE_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos], "-j"))
@@ -208,7 +210,7 @@ int main(int argc, char *argv[])
             {
                 cerr << "Missing argument to -j option\n";
                 usage(a.argv()[0]);
-                return TRANSCODE_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-i") ||
@@ -224,7 +226,7 @@ int main(int argc, char *argv[])
             {
                 cerr << "Missing argument to -i/--infile option\n";
                 usage(a.argv()[0]);
-                return TRANSCODE_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"--video"))
@@ -246,7 +248,7 @@ int main(int argc, char *argv[])
             {
                 cerr << "Missing argument to -o/--outfile option\n";
                 usage(a.argv()[0]);
-                return TRANSCODE_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-V"))
@@ -259,7 +261,7 @@ int main(int argc, char *argv[])
             else
             {
                 cerr << "Missing argument to -V option\n";
-                return TRANSCODE_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-v") ||
@@ -269,13 +271,13 @@ int main(int argc, char *argv[])
             {
                 if (parse_verbose_arg(a.argv()[argpos+1]) ==
                         GENERIC_EXIT_INVALID_CMDLINE)
-                    return TRANSCODE_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
 
                 ++argpos;
             } else
             {
                 cerr << "Missing argument to -v/--verbose option\n";
-                return TRANSCODE_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-p") ||
@@ -290,7 +292,7 @@ int main(int argc, char *argv[])
             {
                 cerr << "Missing argument to -p/--profile option\n";
                 usage(a.argv()[0]);
-                return TRANSCODE_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-l") ||
@@ -326,7 +328,7 @@ int main(int argc, char *argv[])
             {
                 cerr << "Missing argument to -l/--honorcutlist option\n";
                 usage(a.argv()[0]);
-                return TRANSCODE_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"--inversecut"))
@@ -336,7 +338,7 @@ int main(int argc, char *argv[])
             {
                 cerr << "--inversecut option can only be used with --infile\n";
                 usage(a.argv()[0]);
-                return TRANSCODE_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
@@ -371,7 +373,7 @@ int main(int argc, char *argv[])
             {
                 cerr << "Missing argument to --inversecut option\n";
                 usage(a.argv()[0]);
-                return TRANSCODE_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-k") ||
@@ -396,7 +398,7 @@ int main(int argc, char *argv[])
             {
                 cerr << "Missing argument to -f/--fifodir option\n";
                 usage(a.argv()[0]);
-                return TRANSCODE_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-ro") ||
@@ -411,7 +413,7 @@ int main(int argc, char *argv[])
             {
                 cerr << "Missing argument to -ro/--recorderOptions option\n";
                 usage(a.argv()[0]);
-                return TRANSCODE_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"--fifosync"))
@@ -443,7 +445,7 @@ int main(int argc, char *argv[])
             {
                 cerr << "Missing argument to -e/--ostream option\n";
                 usage(a.argv()[0]);
-                return TRANSCODE_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-O") ||
@@ -469,7 +471,23 @@ int main(int argc, char *argv[])
                 cerr << "Invalid or missing argument to -O/--override-setting "
                         "option\n";
                 usage(a.argv()[0]);
-                return TRANSCODE_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
+            }
+
+            ++argpos;
+        }
+        else if (!strcmp(a.argv()[argpos],"--audiotrack"))
+        {
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
+            {
+                AudioTrackNo = QString(a.argv()[argpos + 1]).toInt();
+            }
+            else
+            {
+                cerr << "Invalid or missing argument to --audiotrack "
+                        "option\n";
+                usage(a.argv()[0]);
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             ++argpos;
@@ -478,13 +496,13 @@ int main(int argc, char *argv[])
                  !strcmp(a.argv()[argpos],"--help"))
         {
             usage(a.argv()[0]);
-            return TRANSCODE_EXIT_OK;
+            return GENERIC_EXIT_OK;
         }
         else
         {
             cerr << "Unknown option: " << a.argv()[argpos] << endl;
             usage(a.argv()[0]);
-            return TRANSCODE_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
 
@@ -496,7 +514,7 @@ int main(int argc, char *argv[])
     if (!gContext->Init(false))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        return TRANSCODE_EXIT_NO_MYTHCONTEXT;
+        return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
     gCoreContext->SetAppName(binname);
@@ -527,7 +545,7 @@ int main(int argc, char *argv[])
         {
             cerr << "mythtranscode: ERROR: Unable to find DB info for "
                  << "JobQueue ID# " << jobID << endl;
-            return TRANSCODE_EXIT_NO_RECORDING_DATA;
+            return GENERIC_EXIT_NO_RECORDING_DATA;
         }
     }
 
@@ -535,32 +553,32 @@ int main(int argc, char *argv[])
         (found_infile && (found_chanid || found_starttime)) )
     {
          cerr << "Must specify -i OR -c AND -s options!\n";
-         return TRANSCODE_EXIT_INVALID_CMDLINE;
+         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     if (isVideo && !found_infile)
     {
          cerr << "Must specify --infile to use --video\n";
-         return TRANSCODE_EXIT_INVALID_CMDLINE;
+         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     if (jobID >= 0 && (found_infile || build_index))
     {
          cerr << "Can't specify -j with --buildindex, --video or --infile\n";
-         return TRANSCODE_EXIT_INVALID_CMDLINE;
+         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     if ((jobID >= 0) && build_index)
     {
          cerr << "Can't specify both -j and --buildindex\n";
-         return TRANSCODE_EXIT_INVALID_CMDLINE;
+         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     if (keyframesonly && !fifodir.isEmpty())
     {
          cerr << "Cannot specify both --fifodir and --allkeys\n";
-         return TRANSCODE_EXIT_INVALID_CMDLINE;
+         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     if (fifosync && fifodir.isEmpty())
     {
          cerr << "Must specify --fifodir to use --fifosync\n";
-         return TRANSCODE_EXIT_INVALID_CMDLINE;
+         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
     VERBOSE(VB_IMPORTANT, QString("Enabled verbose msgs: %1").arg(verboseString));
@@ -568,7 +586,7 @@ int main(int argc, char *argv[])
     if (!MSqlQuery::testDBConnection())
     {
         printf("couldn't open db\n");
-        return TRANSCODE_EXIT_DB_ERROR;
+        return GENERIC_EXIT_DB_ERROR;
     }
 
     ProgramInfo *pginfo = NULL;
@@ -590,7 +608,7 @@ int main(int argc, char *argv[])
                 .arg(chanid).arg(starttime);
             cerr << msg.toLocal8Bit().constData() << endl;
             delete pginfo;
-            return TRANSCODE_EXIT_NO_RECORDING_DATA;
+            return GENERIC_EXIT_NO_RECORDING_DATA;
         }
 
         infile = pginfo->GetPlaybackURL(false, true);
@@ -614,7 +632,7 @@ int main(int argc, char *argv[])
                "Mythtranscode is currently unable to transcode remote "
                "files.")
                .arg(infile));
-        return TRANSCODE_EXIT_REMOTE_FILE;
+        return GENERIC_EXIT_REMOTE_FILE;
     }
 
     if (outfile.isNull() && !build_index)
@@ -639,12 +657,12 @@ int main(int argc, char *argv[])
         result = transcode->TranscodeFile(infile, outfile,
                                           profilename, useCutlist,
                                           (fifosync || keyframesonly), jobID,
-                                          fifodir, deleteMap);
+                                          fifodir, deleteMap, AudioTrackNo);
         if ((result == REENCODE_OK) && (jobID >= 0))
             JobQueue::ChangeJobArgs(jobID, "RENAME_TO_NUV");
     }
 
-    int exitcode = TRANSCODE_EXIT_OK;
+    int exitcode = GENERIC_EXIT_OK;
     if ((result == REENCODE_MPEG2TRANS) || mpeg2 || build_index)
     {
         void (*update_func)(float) = NULL;
@@ -707,7 +725,7 @@ int main(int argc, char *argv[])
             JobQueue::ChangeJobStatus(jobID, JOB_RETRY);
         VERBOSE(VB_GENERAL, QString("Transcoding %1 aborted because of "
                                     "cutlist update").arg(infile));
-        exitcode = TRANSCODE_EXIT_ERROR_CUTLIST_UPDATE;
+        exitcode = GENERIC_EXIT_RESTART;
     }
     else if (result == REENCODE_STOPPED)
     {
@@ -715,7 +733,7 @@ int main(int argc, char *argv[])
             JobQueue::ChangeJobStatus(jobID, JOB_ABORTING);
         VERBOSE(VB_GENERAL, QString("Transcoding %1 stopped because of "
                                     "stop command").arg(infile));
-        exitcode = TRANSCODE_EXIT_STOPPED;
+        exitcode = GENERIC_EXIT_KILLED;
     }
     else
     {
@@ -1084,7 +1102,7 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
         if (status == JOB_ABORTING)                     // Stop command was sent
             JobQueue::ChangeJobStatus(jobID, JOB_ABORTED, "Job Aborted");
         else if (status != JOB_ERRORING)                // Recoverable error
-            resultCode = TRANSCODE_EXIT_RESTART;
+            resultCode = GENERIC_EXIT_RESTART;
         else                                            // Unrecoverable error
             JobQueue::ChangeJobStatus(jobID, JOB_ERRORED,
                                       "Unrecoverable error");

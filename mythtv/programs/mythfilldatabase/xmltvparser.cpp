@@ -636,7 +636,7 @@ bool XMLTVParser::parseFile(
     {
         VERBOSE(VB_IMPORTANT, "Don't use tv_grab_na_dd, use the"
             "internal datadirect grabber.");
-        exit(FILLDB_BUGGY_EXIT_SRC_IS_DD);
+        exit(GENERIC_EXIT_SETUP_ERROR);
     }
 
     QString aggregatedTitle;

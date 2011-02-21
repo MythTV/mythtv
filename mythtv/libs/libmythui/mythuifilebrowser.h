@@ -20,7 +20,7 @@ class MythUITextEdit;
 class MythUIImage;
 class MythUIStateType;
 
-class MPUBLIC MFileInfo : public QFileInfo
+class MUI_PUBLIC MFileInfo : public QFileInfo
 {
   public:
     MFileInfo(QString fileName = "", QString sgDir = "", bool isDir = false,
@@ -72,7 +72,7 @@ class MPUBLIC MFileInfo : public QFileInfo
 
 Q_DECLARE_METATYPE(MFileInfo)
 
-class MPUBLIC MythUIFileBrowser : public MythScreenType
+class MUI_PUBLIC MythUIFileBrowser : public MythScreenType
 {
     Q_OBJECT
 

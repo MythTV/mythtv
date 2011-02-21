@@ -11,7 +11,7 @@
  *
  * \ingroup MythUI_Widgets
  */
-class MPUBLIC MythUIProgressBar : public MythUIType
+class MUI_PUBLIC MythUIProgressBar : public MythUIType
 {
   public:
     MythUIProgressBar(MythUIType *parent, const QString &name);

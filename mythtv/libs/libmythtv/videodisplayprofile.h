@@ -11,6 +11,7 @@ using namespace std;
 #include <QSize>
 #include <QMap>
 
+#include "mythtvexp.h"
 #include "mythcontext.h"
 
 typedef QMap<QString,QString>     pref_map_t;
@@ -77,7 +78,7 @@ class ProfileItem
 };
 typedef vector<ProfileItem>       item_list_t;
 
-class MPUBLIC VideoDisplayProfile
+class MTV_PUBLIC VideoDisplayProfile
 {
   public:
     VideoDisplayProfile();

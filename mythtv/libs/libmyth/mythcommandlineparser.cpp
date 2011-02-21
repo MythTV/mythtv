@@ -145,7 +145,7 @@ bool MythCommandLineParser::PreParse(
         else
         {
             cerr << "Missing argument to --setverbose option\n";
-            return BACKEND_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
         return true;
     }
@@ -163,11 +163,9 @@ bool MythCommandLineParser::PreParse(
     else if ((parseTypes & kCLPQueryVersion) &&
              !strcmp(argv[argpos],"--version"))
     {
-        extern const char *myth_source_version;
-        extern const char *myth_source_path;
         cout << "Please attach all output as a file in bug reports." << endl;
-        cout << "MythTV Version   : " << myth_source_version << endl;
-        cout << "MythTV Branch    : " << myth_source_path << endl;
+        cout << "MythTV Version   : " << MYTH_SOURCE_VERSION << endl;
+        cout << "MythTV Branch    : " << MYTH_SOURCE_PATH << endl;
         cout << "Network Protocol : " << MYTH_PROTO_VERSION << endl;
         cout << "Library API      : " << MYTH_BINARY_VERSION << endl;
         cout << "QT Version       : " << QT_VERSION_STR << endl;
@@ -709,10 +707,8 @@ QString MythCommandLineParser::GetHelpString(bool with_header) const
 
     if (with_header)
     {
-        extern const char *myth_source_version;
-        extern const char *myth_source_path;
         QString versionStr = QString("%1 version: %2 [%3] www.mythtv.org")
-            .arg(binname).arg(myth_source_path).arg(myth_source_version);
+            .arg(binname).arg(MYTH_SOURCE_PATH).arg(MYTH_SOURCE_VERSION);
         msg << versionStr << endl;
         msg << "Valid options are: " << endl;
     }

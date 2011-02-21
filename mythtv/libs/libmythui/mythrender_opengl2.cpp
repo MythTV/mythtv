@@ -231,7 +231,7 @@ void MythRenderOpenGL2::InitProcs(void)
 uint MythRenderOpenGL2::CreateShaderObject(const QString &vertex,
                                           const QString &fragment)
 {
-    if (!m_exts_supported & kGLSL)
+    if (!(m_exts_supported & kGLSL))
         return 0;
 
     OpenGLLocker locker(this);

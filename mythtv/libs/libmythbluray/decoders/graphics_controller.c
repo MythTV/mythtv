@@ -167,6 +167,69 @@ static BD_PG_OBJECT *_find_object_for_button(PG_DISPLAY_SET *s,
  * util
  */
 
+static int _is_button_enabled(GRAPHICS_CONTROLLER *gc, BD_IG_PAGE *page, unsigned button_id)
+{
+    unsigned ii;
+    for (ii = 0; ii < page->num_bogs; ii++) {
+        if (gc->enabled_button[ii] == button_id) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+static uint16_t _find_selected_button_id(GRAPHICS_CONTROLLER *gc)
+{
+    /* executed when playback condition changes (ex. new page, popup-on, ...) */
+    PG_DISPLAY_SET *s         = gc->igs;
+    BD_IG_PAGE     *page      = NULL;
+    unsigned        page_id   = bd_psr_read(gc->regs, PSR_MENU_PAGE_ID);
+    unsigned        button_id = bd_psr_read(gc->regs, PSR_SELECTED_BUTTON_ID);
+    unsigned        ii;
+
+    page = _find_page(&s->ics->interactive_composition, page_id);
+    if (!page) {
+        TRACE("_find_selected_button_id(): unknown page #%d (have %d pages)\n",
+              page_id, s->ics->interactive_composition.num_pages);
+        return 0xffff;
+    }
+
+    /* run 5.9.8.3 */
+
+    /* 1) always use page->default_selected_button_id_ref if it is valid */
+    if (_find_button_page(page, page->default_selected_button_id_ref, NULL) &&
+        _is_button_enabled(gc, page, page->default_selected_button_id_ref)) {
+
+        TRACE("_find_selected_button_id() -> default #%d\n", page->default_selected_button_id_ref);
+        return page->default_selected_button_id_ref;
+    }
+
+    /* 2) fallback to current PSR10 value if it is valid */
+    for (ii = 0; ii < page->num_bogs; ii++) {
+        BD_IG_BOG *bog = &page->bog[ii];
+
+        if (button_id == gc->enabled_button[ii]) {
+            if (_find_button_bog(bog, gc->enabled_button[ii])) {
+                TRACE("_find_selected_button_id() -> PSR10 #%d\n", gc->enabled_button[ii]);
+                return gc->enabled_button[ii];
+            }
+        }
+    }
+
+    /* 3) fallback to find first valid_button_id_ref from page */
+    for (ii = 0; ii < page->num_bogs; ii++) {
+        BD_IG_BOG *bog = &page->bog[ii];
+
+        if (_find_button_bog(bog, gc->enabled_button[ii])) {
+            TRACE("_find_selected_button_id() -> first valid #%d\n", gc->enabled_button[ii]);
+            return gc->enabled_button[ii];
+        }
+    }
+
+    TRACE("_find_selected_button_id(): not found -> 0xffff\n");
+    return 0xffff;
+}
+
 static void _reset_enabled_button(GRAPHICS_CONTROLLER *gc)
 {
     PG_DISPLAY_SET *s       = gc->igs;
@@ -189,7 +252,7 @@ static void _reset_enabled_button(GRAPHICS_CONTROLLER *gc)
     }
 }
 
-static void _gc_clear_osd(GRAPHICS_CONTROLLER *gc, int plane)
+static void _clear_osd(GRAPHICS_CONTROLLER *gc, int plane)
 {
     if (gc->overlay_proc) {
         /* clear plane */
@@ -214,10 +277,20 @@ static void _gc_clear_osd(GRAPHICS_CONTROLLER *gc, int plane)
     }
 }
 
+static void _select_page(GRAPHICS_CONTROLLER *gc, uint16_t page_id)
+{
+    bd_psr_write(gc->regs, PSR_MENU_PAGE_ID, page_id);
+    _clear_osd(gc, 1);
+    _reset_enabled_button(gc);
+
+    uint16_t button_id = _find_selected_button_id(gc);
+    bd_psr_write(gc->regs, PSR_SELECTED_BUTTON_ID, button_id);
+}
+
 static void _gc_reset(GRAPHICS_CONTROLLER *gc)
 {
-    _gc_clear_osd(gc, 0);
-    _gc_clear_osd(gc, 1);
+    _clear_osd(gc, 0);
+    _clear_osd(gc, 1);
 
     gc->popup_visible = 0;
 
@@ -292,13 +365,9 @@ void gc_decode_ts(GRAPHICS_CONTROLLER *gc, uint16_t pid, uint8_t *block, unsigne
             return;
         }
 
-        bd_psr_write(gc->regs, PSR_MENU_PAGE_ID, 0);
-
-        gc->ig_drawn = 0;
         gc->popup_visible = 0;
 
-        _gc_clear_osd(gc, 1);
-        _reset_enabled_button(gc);
+        _select_page(gc, 0);
 
         bd_mutex_unlock(&gc->mutex);
     }
@@ -347,6 +416,7 @@ static void _render_button(GRAPHICS_CONTROLLER *gc, BD_IG_BUTTON *button, BD_PG_
 
     if (gc->overlay_proc) {
         gc->overlay_proc(gc->overlay_proc_handle, &ov);
+        gc->ig_drawn = 1;
     }
 }
 
@@ -364,7 +434,7 @@ static void _render_page(GRAPHICS_CONTROLLER *gc,
     if (s->ics->interactive_composition.ui_model == IG_UI_MODEL_POPUP && !gc->popup_visible) {
         TRACE("_render_page(): popup menu not visible\n");
 
-        _gc_clear_osd(gc, 1);
+        _clear_osd(gc, 1);
 
         return;
     }
@@ -385,10 +455,6 @@ static void _render_page(GRAPHICS_CONTROLLER *gc,
 
     TRACE("rendering page #%d using palette #%d. page has %d bogs\n",
           page->id, page->palette_id_ref, page->num_bogs);
-
-    if (selected_button_id == 0xffff) {
-        selected_button_id = page->default_selected_button_id_ref;
-    }
 
     for (ii = 0; ii < page->num_bogs; ii++) {
         BD_IG_BOG    *bog      = &page->bog[ii];
@@ -440,6 +506,10 @@ static int _user_input(GRAPHICS_CONTROLLER *gc, bd_vk_key_e key, GC_NAV_CMDS *cm
 
     if (s->ics->interactive_composition.ui_model == IG_UI_MODEL_POPUP && !gc->popup_visible) {
         TRACE("_user_input(): popup menu not visible\n");
+        return -1;
+    }
+    if (!gc->ig_drawn) {
+        ERROR("_user_input(): menu not visible\n");
         return -1;
     }
 
@@ -504,7 +574,7 @@ static int _user_input(GRAPHICS_CONTROLLER *gc, bd_vk_key_e key, GC_NAV_CMDS *cm
     }
 
     /* render page ? */
-    if (new_btn_id != cur_btn_id || activated_btn_id >= 0 || !gc->ig_drawn) {
+    if (new_btn_id != cur_btn_id || activated_btn_id >= 0) {
 
         bd_psr_write(gc->regs, PSR_SELECTED_BUTTON_ID, new_btn_id);
 
@@ -557,11 +627,7 @@ static void _set_button_page(GRAPHICS_CONTROLLER *gc, uint32_t param, GC_NAV_CMD
 
         /* page changes */
 
-        bd_psr_write(gc->regs, PSR_MENU_PAGE_ID, page_id);
-
-        _reset_enabled_button(gc);
-        _gc_clear_osd(gc, 1);
-
+        _select_page(gc, page_id);
 
     } else {
         /* page does not change */
@@ -592,15 +658,10 @@ static void _set_button_page(GRAPHICS_CONTROLLER *gc, uint32_t param, GC_NAV_CMD
         }
     }
 
-    if (!button) {
-        button_id = 0xffff; // run 5.9.7.4 and 5.9.8.3
-    } else {
+    if (button) {
         gc->enabled_button[bog_idx] = button_id;
+        bd_psr_write(gc->regs, PSR_SELECTED_BUTTON_ID, button_id);
     }
-
-    bd_psr_write(gc->regs, PSR_SELECTED_BUTTON_ID, button_id);
-
-    gc->ig_drawn = 0;
 
     _render_page(gc, 0xffff, cmds);
 }
@@ -648,64 +709,24 @@ static void _enable_button(GRAPHICS_CONTROLLER *gc, uint32_t button_id, unsigned
     }
 }
 
-static int _is_button_enabled(GRAPHICS_CONTROLLER *gc, BD_IG_PAGE *page, unsigned button_id)
-{
-    unsigned ii;
-    for (ii = 0; ii < page->num_bogs; ii++) {
-        if (gc->enabled_button[ii] == button_id) {
-            return 1;
-        }
-    }
-    return 0;
-}
-
 static void _update_selected_button(GRAPHICS_CONTROLLER *gc)
 {
+    /* executed after IG command sequence terminates */
     unsigned button_id = bd_psr_read(gc->regs, PSR_SELECTED_BUTTON_ID);
 
-    TRACE("_update_enabled_button(): currently enabled button is #%d\n", button_id);
+    TRACE("_update_selected_button(): currently enabled button is #%d\n", button_id);
 
-    // special case: triggered only after enable button disables selected button
+    /* special case: triggered only after enable button disables selected button */
     if (button_id & 0x10000) {
         button_id &= 0xffff;
         bd_psr_write(gc->regs, PSR_SELECTED_BUTTON_ID, button_id);
-        TRACE("_update_enabled_button() -> #%d [last enabled]\n", button_id);
+        TRACE("_update_selected_button() -> #%d [last enabled]\n", button_id);
         return;
     }
 
-   if (button_id == 0xffff) {
-        PG_DISPLAY_SET *s       = gc->igs;
-        BD_IG_PAGE     *page    = NULL;
-        unsigned        page_id = bd_psr_read(gc->regs, PSR_MENU_PAGE_ID);
-
-        page = _find_page(&s->ics->interactive_composition, page_id);
-        if (!page) {
-            TRACE("_update_enabled_button(): unknown page #%d (have %d pages)\n",
-                  page_id, s->ics->interactive_composition.num_pages);
-            return;
-        }
-
-        // run 5.9.8.3
-
-        if (_find_button_page(page, page->default_selected_button_id_ref, NULL) &&
-            _is_button_enabled(gc, page, page->default_selected_button_id_ref)) {
-
-            button_id = page->default_selected_button_id_ref;
-
-        } else {
-            unsigned ii;
-            for (ii = 0; ii < page->num_bogs; ii++) {
-
-                BD_IG_BOG *bog = &page->bog[ii];
-                if (_find_button_bog(bog, gc->enabled_button[ii])) {
-                    button_id = gc->enabled_button[ii];
-                    break;
-                }
-            }
-        }
-
+    if (button_id == 0xffff) {
+        button_id = _find_selected_button_id(gc);
         bd_psr_write(gc->regs, PSR_SELECTED_BUTTON_ID, button_id);
-        TRACE("_update_enabled_button() -> #%d\n", button_id);
     }
 }
 
@@ -719,6 +740,11 @@ static int _mouse_move(GRAPHICS_CONTROLLER *gc, unsigned x, unsigned y, GC_NAV_C
     unsigned        ii;
 
     gc->valid_mouse_position = 0;
+
+    if (!gc->ig_drawn) {
+        ERROR("_mouse_move(): menu not visible\n");
+        return -1;
+    }
 
     page = _find_page(&s->ics->interactive_composition, page_id);
     if (!page) {
@@ -747,10 +773,10 @@ static int _mouse_move(GRAPHICS_CONTROLLER *gc, unsigned x, unsigned y, GC_NAV_C
             continue;
 
         /* mouse is over button */
+        gc->valid_mouse_position = 1;
 
         /* is button already selected? */
         if (button->id == cur_btn_id) {
-            gc->valid_mouse_position = 1;
             return 0;
         }
 
@@ -762,11 +788,9 @@ static int _mouse_move(GRAPHICS_CONTROLLER *gc, unsigned x, unsigned y, GC_NAV_C
         bd_psr_write(gc->regs, PSR_SELECTED_BUTTON_ID, new_btn_id);
 
         _render_page(gc, -1, cmds);
-
-        gc->valid_mouse_position = 1;
     }
 
-     return gc->valid_mouse_position;
+    return gc->valid_mouse_position;
 }
 
 int gc_run(GRAPHICS_CONTROLLER *gc, gc_ctrl_e ctrl, uint32_t param, GC_NAV_CMDS *cmds)
@@ -826,9 +850,7 @@ int gc_run(GRAPHICS_CONTROLLER *gc, gc_ctrl_e ctrl, uint32_t param, GC_NAV_CMDS 
             gc->popup_visible = !!param;
 
             if (gc->popup_visible) {
-                bd_psr_write(gc->regs, PSR_MENU_PAGE_ID, 0);
-                _reset_enabled_button(gc);
-                _gc_clear_osd(gc, 1);
+                _select_page(gc, 0);
             }
 
             /* fall thru */

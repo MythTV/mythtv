@@ -1,16 +1,16 @@
 #ifndef CLEANUP_H_
 #define CLEANUP_H_
 
-#include "mythexp.h"
+#include "mythmetaexp.h"
 
-class MPUBLIC CleanupProc
+class META_PUBLIC CleanupProc
 {
   public:
     virtual void doClean() = 0;
     virtual ~CleanupProc();
 };
 
-class MPUBLIC CleanupHooks
+class META_PUBLIC CleanupHooks
 {
   public:
     static CleanupHooks *getInstance();
@@ -27,7 +27,7 @@ class MPUBLIC CleanupHooks
 };
 
 template <typename T>
-class MPUBLIC SimpleCleanup : public CleanupProc
+class META_PUBLIC SimpleCleanup : public CleanupProc
 {
   public:
     SimpleCleanup(T *inst) : m_inst(inst)

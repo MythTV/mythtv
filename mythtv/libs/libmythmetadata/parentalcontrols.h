@@ -4,9 +4,9 @@
 #include <QObject> // for moc
 #include <QMetaType>
 
-#include "mythexp.h"
+#include "mythmetaexp.h"
 
-class MPUBLIC ParentalLevel
+class META_PUBLIC ParentalLevel
 {
   public:
     enum Level { plNone = 0, plLowest = 1, plLow = 2, plMedium = 3,
@@ -34,14 +34,14 @@ class MPUBLIC ParentalLevel
 };
 Q_DECLARE_METATYPE(ParentalLevel*)
 
-bool operator!=(const ParentalLevel &lhs, const ParentalLevel &rhs) MPUBLIC;
-bool operator==(const ParentalLevel &lhs, const ParentalLevel &rhs) MPUBLIC;
-bool operator<(const ParentalLevel &lhs, const ParentalLevel &rhs) MPUBLIC;
-bool operator>(const ParentalLevel &lhs, const ParentalLevel &rhs) MPUBLIC;
-bool operator<=(const ParentalLevel &lhs, const ParentalLevel &rhs) MPUBLIC;
-bool operator>=(const ParentalLevel &lhs, const ParentalLevel &rhs) MPUBLIC;
+META_PUBLIC bool operator!=(const ParentalLevel &lhs, const ParentalLevel &rhs);
+META_PUBLIC bool operator==(const ParentalLevel &lhs, const ParentalLevel &rhs);
+META_PUBLIC bool operator<(const ParentalLevel &lhs, const ParentalLevel &rhs);
+META_PUBLIC bool operator>(const ParentalLevel &lhs, const ParentalLevel &rhs);
+META_PUBLIC bool operator<=(const ParentalLevel &lhs, const ParentalLevel &rhs);
+META_PUBLIC bool operator>=(const ParentalLevel &lhs, const ParentalLevel &rhs);
 
-class MPUBLIC ParentalLevelChangeChecker : public QObject
+class META_PUBLIC ParentalLevelChangeChecker : public QObject
 {
     Q_OBJECT
 

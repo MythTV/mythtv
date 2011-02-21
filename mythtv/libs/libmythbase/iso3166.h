@@ -10,9 +10,9 @@ using namespace std;
 #include <QStringList>
 #include <QMap>
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
-extern MPUBLIC QMap<int, QString> _iso3166_key_to_english_name;
+extern MBASE_PUBLIC QMap<int, QString> _iso3166_key_to_english_name;
 
 /** \file iso3166.h
  *  \brief ISO 3166-1 support functions
@@ -28,9 +28,9 @@ extern MPUBLIC QMap<int, QString> _iso3166_key_to_english_name;
 
 typedef QMap<QString, QString> CodeToNameMap;
 
-MPUBLIC CodeToNameMap GetISO3166EnglishCountryMap(void);
-MPUBLIC QString GetISO3166EnglishCountryName(QString iso3166Code);
-MPUBLIC CodeToNameMap GetISO3166CountryMap();
-MPUBLIC QString GetISO3166CountryName(QString iso3166Code);
+ MBASE_PUBLIC  CodeToNameMap GetISO3166EnglishCountryMap(void);
+ MBASE_PUBLIC  QString GetISO3166EnglishCountryName(QString iso3166Code);
+ MBASE_PUBLIC  CodeToNameMap GetISO3166CountryMap();
+ MBASE_PUBLIC  QString GetISO3166CountryName(QString iso3166Code);
 
 #endif // _ISO_3166_1_H_

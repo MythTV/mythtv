@@ -12,6 +12,7 @@
 #include "mythmainwindow.h"
 #include "mythscreenstack.h"
 #include "mythsystem.h"
+#include "mythverbose.h"
 
 void ExitPrompter::quit()
 {
@@ -62,16 +63,18 @@ static bool DBusHalt(void)
 
 void ExitPrompter::halt()
 {
-
     QString halt_cmd = gCoreContext->GetSetting("HaltCommand","");
+    int ret = -1;
+
     if (!halt_cmd.isEmpty()) /* Use user specified command if it exists */
     {
-        myth_system(halt_cmd);
-    } else if (!DBusHalt()) /* If supported, use DBus to shutdown */
-    {
-        myth_system("sudo /sbin/halt -p"); 
+        ret = myth_system(halt_cmd);
+        if (ret != 0)
+            VERBOSE(VB_IMPORTANT, "User defined HaltCommand failed, falling back to alternative methods.");
     }
 
+    if (ret != 0 && !DBusHalt()) /* If supported, use DBus to shutdown */
+        myth_system("sudo /sbin/halt -p"); 
 }
 
 static bool DBusReboot(void)
@@ -118,16 +121,18 @@ static bool DBusReboot(void)
 
 void ExitPrompter::reboot()
 {
-
     QString reboot_cmd = gCoreContext->GetSetting("RebootCommand","");
+    int ret = -1;
+
     if (!reboot_cmd.isEmpty()) /* Use user specified command if it exists */
     {
-        myth_system(reboot_cmd);
-    } else if (!DBusReboot()) /* If supported, use DBus to reboot */
-    {
-        myth_system("sudo /sbin/reboot");
+        ret = myth_system(reboot_cmd);
+        if (ret != 0)
+            VERBOSE(VB_IMPORTANT, "User defined RebootCommand failed, falling back to alternative methods.");
     }
 
+    if (ret != 0 && !DBusReboot()) /* If supported, use DBus to reboot */
+        myth_system("sudo /sbin/reboot");
 }
 
 void ExitPrompter::handleExit()

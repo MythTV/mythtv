@@ -27,6 +27,8 @@ HEADERS += weatherSetup.h weatherUtils.h
 SOURCES += main.cpp weather.cpp weatherSource.cpp sourceManager.cpp weatherScreen.cpp
 SOURCES += dbcheck.cpp weatherSetup.cpp weatherUtils.cpp
 
+DEFINES += MPLUGIN_API
+
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }

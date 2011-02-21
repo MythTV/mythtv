@@ -6,9 +6,9 @@
 #include <QHash>
 #include <QMap>
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
-class MPUBLIC StorageGroup
+class MBASE_PUBLIC StorageGroup
 {
   public:
     StorageGroup(const QString group = "", const QString hostname = "",

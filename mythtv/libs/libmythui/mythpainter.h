@@ -15,12 +15,12 @@ class QColor;
 
 #include "compat.h"
 
-#include "mythexp.h"
+#include "mythuiexp.h"
 
 class MythFontProperties;
 class MythImage;
 
-class MPUBLIC MythPainter
+class MUI_PUBLIC MythPainter
 {
   public:
     MythPainter() : m_Parent(0), m_CacheSize(0) { }

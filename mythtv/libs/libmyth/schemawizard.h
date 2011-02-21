@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QString>
 
+#include "mythexp.h"
 #include "dbutil.h"
 #include "mythmainwindow.h"
 #include "mythprogressdialog.h"

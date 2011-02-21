@@ -9,12 +9,12 @@
 #include <QMutex>
 #include <QList>
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
 class QSemaphore;
 
 /// \brief QSqlDatabase wrapper, used by MSqlQuery. Do not use directly.
-class MPUBLIC MSqlDatabase
+class MBASE_PUBLIC MSqlDatabase
 {
   friend class MDBManager;
   friend class MSqlQuery;
@@ -37,7 +37,7 @@ class MPUBLIC MSqlDatabase
 };
 
 /// \brief DB connection pool, used by MSqlQuery. Do not use directly.
-class MPUBLIC MDBManager
+class MBASE_PUBLIC MDBManager
 {
   friend class MSqlQuery;
   public:
@@ -77,10 +77,10 @@ typedef struct _MSqlQueryInfo
 typedef QMap<QString, QVariant> MSqlBindings;
 
 /// \brief Add the entries in addfrom to the map in output
-MPUBLIC void MSqlAddMoreBindings(MSqlBindings &output, MSqlBindings &addfrom);
+ MBASE_PUBLIC  void MSqlAddMoreBindings(MSqlBindings &output, MSqlBindings &addfrom);
 
 /// \brief Given a partial query string and a bindings object, escape the string
-MPUBLIC void MSqlEscapeAsAQuery(QString &query, MSqlBindings &bindings);
+ MBASE_PUBLIC  void MSqlEscapeAsAQuery(QString &query, MSqlBindings &bindings);
 
 /** \brief QSqlQuery wrapper that fetches a DB connection from the connection pool.
  *
@@ -101,7 +101,7 @@ MPUBLIC void MSqlEscapeAsAQuery(QString &query, MSqlBindings &bindings);
  *   will crash if closed and reopend - so we never close them and keep them in
  *   a pool.
  */
-class MPUBLIC MSqlQuery : public QSqlQuery
+class MBASE_PUBLIC MSqlQuery : public QSqlQuery
 {
   public:
     /// \brief Get DB connection from pool

@@ -6,10 +6,11 @@
 #include "mythpainter.h"
 #include "mythimage.h"
 #include "mythrender_d3d9.h"
+#include "mythuiexp.h"
 
 class MythRenderD3D9;
 
-class MythD3D9Painter : public MythPainter
+class MUI_PUBLIC MythD3D9Painter : public MythPainter
 {
   public:
     MythD3D9Painter(MythRenderD3D9 *render = NULL);

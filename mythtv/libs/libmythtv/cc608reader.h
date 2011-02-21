@@ -7,7 +7,7 @@
 
 #include "cc608decoder.h"
 
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 #define MAXTBUFFER 60
 
@@ -55,7 +55,7 @@ class CC608Buffer
 
 class MythPlayer;
 
-class MPUBLIC CC608Reader : public CC608Input
+class MTV_PUBLIC CC608Reader : public CC608Input
 {
   public:
     CC608Reader(MythPlayer *parent);

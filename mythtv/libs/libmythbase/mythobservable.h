@@ -3,12 +3,12 @@
 
 #include <QSet>
 #include "mythevent.h"
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
 class QObject;
 class QMutex;
 
-class MPUBLIC MythObservable
+class MBASE_PUBLIC MythObservable
 {
   public:
     MythObservable();

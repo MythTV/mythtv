@@ -5,12 +5,39 @@
 #include <QWaitCondition>
 #include <QString>
 #include <QMutex>
+#include <QThread>
 
-#include <pthread.h>
+#include <fcntl.h>
 #include <stdint.h>
+
+class ThreadedFileWriter;
+
+class TFWWriteThread : public QThread
+{
+    Q_OBJECT
+  public:
+    TFWWriteThread(void) : m_ptr(NULL) {};
+    void SetPtr(ThreadedFileWriter *ptr) { m_ptr = ptr; };
+    void run(void);
+  private:
+    ThreadedFileWriter *m_ptr;
+};
+
+class TFWSyncThread : public QThread
+{
+    Q_OBJECT
+  public:
+    TFWSyncThread(void) : m_ptr(NULL) {};
+    void SetPtr(ThreadedFileWriter *ptr) { m_ptr = ptr; };
+    void run(void);
+  private:
+    ThreadedFileWriter *m_ptr;
+};
 
 class ThreadedFileWriter
 {
+    friend class TFWWriteThread;
+    friend class TFWSyncThread;
   public:
     ThreadedFileWriter(const QString &fname, int flags, mode_t mode);
     ~ThreadedFileWriter();
@@ -30,10 +57,7 @@ class ThreadedFileWriter
     void Flush(void);
 
   protected:
-    static void *boot_writer(void *);
     void DiskLoop(void);
-
-    static void *boot_syncer(void *);
     void SyncLoop(void);
 
     uint BufUsedPriv(void) const;
@@ -67,8 +91,8 @@ class ThreadedFileWriter
     unsigned long   tfw_buf_size;
 
     // threads
-    pthread_t       writer;
-    pthread_t       syncer;
+    TFWWriteThread  writer;
+    TFWSyncThread   syncer;
 
     // wait conditions
     QWaitCondition  bufferEmpty;

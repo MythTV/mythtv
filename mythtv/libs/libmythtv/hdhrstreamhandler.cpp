@@ -1,7 +1,6 @@
 // -*- Mode: c++ -*-
 
 // POSIX headers
-#include <pthread.h>
 #include <fcntl.h>
 #include <unistd.h>
 #ifndef USING_MINGW
@@ -108,8 +107,7 @@ HDHRStreamHandler::HDHRStreamHandler(const QString &devicename) :
     _devicename(devicename),
 
     _start_stop_lock(QMutex::Recursive),
-    _running(false),
-    _reader_thread(),
+    _run(false),
 
     _pid_lock(QMutex::Recursive),
     _open_pid_filters(0),
@@ -182,11 +180,12 @@ void HDHRStreamHandler::RemoveListener(MPEGStreamData *data)
     VERBOSE(VB_RECORD, LOC + "RemoveListener("<<data<<") -- end");
 }
 
-void *run_hdhr_stream_handler_thunk(void *param)
+void HDHRReadThread::run(void)
 {
-    HDHRStreamHandler *mon = (HDHRStreamHandler*) param;
-    mon->Run();
-    return NULL;
+    if (!m_parent)
+        return;
+
+    m_parent->Run();
 }
 
 void HDHRStreamHandler::Start(void)
@@ -197,21 +196,14 @@ void HDHRStreamHandler::Start(void)
 
     if (!IsRunning())
     {
-        QMutex is_running_lock;
-        int rval = pthread_create(&_reader_thread, NULL,
-                                  run_hdhr_stream_handler_thunk, this);
+        _run = true;
+        _reader_thread.SetParent(this);
+        _reader_thread.start();
 
-        if (0 != rval)
+        if (!_reader_thread.isRunning())
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Start: Failed to create thread." + ENO);
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Start: Failed to create thread.");
             return;
-        }
-
-        is_running_lock.lock();
-        while (!IsRunning())
-        {
-            _running_state_changed.wait(&is_running_lock, 100);
         }
     }
 }
@@ -222,14 +214,13 @@ void HDHRStreamHandler::Stop(void)
 
     if (IsRunning())
     {
-        SetRunning(false);
-        pthread_join(_reader_thread, NULL);
+        _run = false;
+        _reader_thread.wait();
     }
 }
 
 void HDHRStreamHandler::Run(void)
 {
-    SetRunning(true);
     RunTS();
 }
 
@@ -269,7 +260,7 @@ void HDHRStreamHandler::RunTS(void)
 
     VERBOSE(VB_RECORD, LOC + "RunTS(): begin");
 
-    while (IsRunning() && !_error)
+    while (_run && !_error)
     {
         UpdateFiltersFromStreamData();
 
@@ -317,8 +308,6 @@ void HDHRStreamHandler::RunTS(void)
 
     hdhomerun_device_stream_stop(_hdhomerun_device);
     VERBOSE(VB_RECORD, LOC + "RunTS(): " + "end");
-
-    SetRunning(false);
 }
 
 bool HDHRStreamHandler::AddPIDFilter(uint pid, bool do_update)
@@ -547,12 +536,6 @@ bool HDHRStreamHandler::UpdateFilters(void)
 #endif // DEBUG_PID_FILTERS
 
     return filter == new_filter;
-}
-
-void HDHRStreamHandler::SetRunning(bool is_running)
-{
-    _running = is_running;
-    _running_state_changed.wakeAll();
 }
 
 PIDPriority HDHRStreamHandler::GetPIDPriority(uint pid) const

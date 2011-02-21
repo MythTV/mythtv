@@ -6,12 +6,12 @@
 #include <QMutex>
 #include <QList>
 
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 class ProgramInfo;
 class MythSocket;
 
-struct MPUBLIC LiveTVChainEntry
+struct MTV_PUBLIC LiveTVChainEntry
 {
     uint chanid;
     QDateTime starttime;
@@ -23,7 +23,7 @@ struct MPUBLIC LiveTVChainEntry
     QString inputname;
 };
 
-class MPUBLIC LiveTVChain
+class MTV_PUBLIC LiveTVChain
 {
   public:
     LiveTVChain();

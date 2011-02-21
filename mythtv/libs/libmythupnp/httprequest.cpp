@@ -837,7 +837,11 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
 {
     long nCount = 0;
 
-    sParams.replace( "%26", "&" );
+    VERBOSE(VB_UPNP|VB_EXTRA, QString("sParams: '%1'").arg(sParams));
+
+    // This looks odd, but it is here to cope with stupid UPnP clients that
+    // forget to de-escape the URLs.  We can't map %26 here as well, as that
+    // breaks anything that is trying to pass & as part of a name or value.
     sParams.replace( "&amp;", "&" );
 
     if (sParams.length() > 0)

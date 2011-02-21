@@ -2669,7 +2669,7 @@ void ProgramInfo::UpdateLastDelete(bool setTime) const
     }
     else
     {
-        query.prepare("UPDATE record SET last_delete = '0000-00-00T00:00:00' "
+        query.prepare("UPDATE record SET last_delete = '0000-00-00 00:00:00' "
                       "WHERE recordid = :RECORDID");
     }
     query.bindValue(":RECORDID", recordid);

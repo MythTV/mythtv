@@ -162,7 +162,7 @@ void MythWizard::Show()
 void MythWizard::setFont( const QFont & font )
 {
     QCoreApplication::postEvent( this, new QEvent( QEvent::LayoutRequest ) );
-    setFont( font );
+    MythDialog::setFont( font );
 }
 
 void MythWizard::addPage( QWidget * page, const QString & title )

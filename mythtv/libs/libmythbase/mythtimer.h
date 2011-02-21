@@ -2,9 +2,9 @@
 #define MYTHTIMER_H_
 
 #include <QTime>
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
-class MPUBLIC MythTimer
+class MBASE_PUBLIC MythTimer
 {
   public:
     MythTimer() : m_running(false) {}

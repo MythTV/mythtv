@@ -9,7 +9,7 @@
 // MythTV headers
 #include "channelutil.h" // for DBChanList
 
-class MPUBLIC InputInfo
+class MTV_PUBLIC InputInfo
 {
   public:
     InputInfo() : name(QString::null),
@@ -41,7 +41,7 @@ class MPUBLIC InputInfo
     uint    mplexid;  ///< mplexid restriction if applicable
 };
 
-class MPUBLIC TunedInputInfo : public InputInfo
+class MTV_PUBLIC TunedInputInfo : public InputInfo
 {
   public:
     TunedInputInfo() : chanid(0) { }
@@ -62,7 +62,7 @@ class MPUBLIC TunedInputInfo : public InputInfo
     uint chanid;
 };
 
-class MPUBLIC ChannelInputInfo : public InputInfo
+class MTV_PUBLIC ChannelInputInfo : public InputInfo
 {
   public:
     ChannelInputInfo() :

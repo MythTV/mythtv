@@ -2,13 +2,13 @@
 #ifndef _MYTHSOCKET_CB_H_
 #define _MYTHSOCKET_CB_H_
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
 #define kMythSocketShortTimeout  7000
 #define kMythSocketLongTimeout  30000
 
 class MythSocket;
-class MPUBLIC MythSocketCBs
+class MBASE_PUBLIC MythSocketCBs
 {
   public:
     virtual ~MythSocketCBs() {}

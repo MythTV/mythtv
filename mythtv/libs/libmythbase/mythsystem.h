@@ -1,7 +1,7 @@
 #ifndef MYTHSYSTEM_H_
 #define MYTHSYSTEM_H_
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 #include "compat.h"
 #include <signal.h>
 
@@ -36,7 +36,7 @@ typedef enum MythSystemMask {
 typedef QMap<QString, bool> Setting_t;
 
 class MythSystemPrivate;
-class MPUBLIC MythSystem : public QObject
+class MBASE_PUBLIC MythSystem : public QObject
 {
     Q_OBJECT
 
@@ -122,7 +122,7 @@ class MPUBLIC MythSystem : public QObject
         QBuffer     m_stdbuff[3];
 };
 
-class MPUBLIC MythSystemPrivate : public QObject
+class MBASE_PUBLIC MythSystemPrivate : public QObject
 {
     Q_OBJECT
 
@@ -163,15 +163,15 @@ class MPUBLIC MythSystemPrivate : public QObject
 };
 
 
-MPUBLIC unsigned int myth_system(const QString &command, 
+ MBASE_PUBLIC  unsigned int myth_system(const QString &command, 
                                  uint flags = kMSNone,
                                  uint timeout = 0);
-MPUBLIC void myth_system_jump_abort(void);
+ MBASE_PUBLIC  void myth_system_jump_abort(void);
 extern "C" {
 #endif
 
 /* C prototype */
-MPUBLIC unsigned int myth_system_c(char *command, uint flags, uint timeout);
+ MBASE_PUBLIC  unsigned int myth_system_c(char *command, uint flags, uint timeout);
 
 #ifdef __cplusplus
 }

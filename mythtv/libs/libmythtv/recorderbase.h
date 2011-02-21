@@ -11,7 +11,7 @@
 
 #include <pthread.h>
 
-#include "mythexp.h"
+#include "mythtvexp.h"
 #include "mythtimer.h"
 #include "programtypes.h" // for MarkTypes, frm_pos_map_t
 
@@ -32,7 +32,7 @@ class RecordingProfile;
  *
  *  \sa TVRec
  */
-class MPUBLIC RecorderBase
+class MTV_PUBLIC RecorderBase
 {
     friend class Transcode; // for access to SetIntOption(), SetStrOption()
 

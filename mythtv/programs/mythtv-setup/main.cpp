@@ -166,7 +166,7 @@ static int reloadTheme(void)
     {
         VERBOSE(VB_IMPORTANT, QString("Couldn't find theme '%1'")
                 .arg(themename));
-        return FRONTEND_BUGGY_EXIT_NO_THEME;
+        return GENERIC_EXIT_NO_THEME;
     }
 
     MythTranslation::reload();
@@ -183,7 +183,7 @@ static int reloadTheme(void)
     GetMythMainWindow()->SetEffectsEnabled(true);
 
     if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
-        return FRONTEND_BUGGY_EXIT_NO_THEME;
+        return GENERIC_EXIT_NO_THEME;
 
     return 0;
 }
@@ -297,13 +297,10 @@ int main(int argc, char *argv[])
 
     QMap<QString, QString> settingsOverride;
 
-    extern const char *myth_source_version;
-    extern const char *myth_source_path;
-
     VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
                             .arg(binname)
-                            .arg(myth_source_path)
-                            .arg(myth_source_version));
+                            .arg(MYTH_SOURCE_PATH)
+                            .arg(MYTH_SOURCE_VERSION));
 
 
     for(int argpos = 1; argpos < a.argc(); ++argpos)
@@ -317,7 +314,7 @@ int main(int argc, char *argv[])
                 if (display.startsWith("-"))
                 {
                     cerr << "Invalid or missing argument to -display option\n";
-                    return BACKEND_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
                 }
                 else
                     ++argpos;
@@ -325,7 +322,7 @@ int main(int argc, char *argv[])
             else
             {
                 cerr << "Missing argument to -display option\n";
-                return BACKEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-geometry") ||
@@ -338,7 +335,7 @@ int main(int argc, char *argv[])
                 {
                     cerr << "Invalid or missing argument to "
                         "-geometry option\n";
-                    return BACKEND_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
                 }
                 else
                     ++argpos;
@@ -346,7 +343,7 @@ int main(int argc, char *argv[])
             else
             {
                 cerr << "Missing argument to -geometry option\n";
-                return BACKEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-l") ||
@@ -359,7 +356,7 @@ int main(int argc, char *argv[])
                 {
                     cerr << "Invalid or missing argument"
                             " to -l/--logfile option\n";
-                    return BACKEND_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
                 }
                 else
                 {
@@ -369,7 +366,7 @@ int main(int argc, char *argv[])
             else
             {
                 cerr << "Missing argument to -l/--logfile option\n";
-                return BACKEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-v") ||
@@ -379,13 +376,13 @@ int main(int argc, char *argv[])
             {
                 if (parse_verbose_arg(a.argv()[argpos+1]) ==
                         GENERIC_EXIT_INVALID_CMDLINE)
-                    return BACKEND_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
                 ++argpos;
             }
             else
             {
                 cerr << "Missing argument to -v/--verbose option\n";
-                return BACKEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-O") ||
@@ -398,7 +395,7 @@ int main(int argc, char *argv[])
                 {
                     cerr << "Invalid or missing argument to "
                             "-O/--override-setting option\n";
-                    return BACKEND_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
                 }
 
                 QStringList pairs = tmpArg.split(",");
@@ -416,7 +413,7 @@ int main(int argc, char *argv[])
             {
                 cerr << "Invalid or missing argument to "
                         "-O/--override-setting option\n";
-                return BACKEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             ++argpos;
@@ -465,7 +462,7 @@ int main(int argc, char *argv[])
             {
                 cerr << "Missing scan number for import, please run "
                      << "--scan-list to list importable scans." << endl;
-                return BACKEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"--scan-save-only"))
@@ -500,7 +497,7 @@ int main(int argc, char *argv[])
         {
             cerr << "Invalid argument: " << a.argv()[argpos] << endl;
             print_usage();
-            return BACKEND_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
 
@@ -512,8 +509,8 @@ int main(int argc, char *argv[])
         {
             VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
                                     .arg(binname)
-                                    .arg(myth_source_path)
-                                    .arg(myth_source_version));
+                                    .arg(MYTH_SOURCE_PATH)
+                                    .arg(MYTH_SOURCE_VERSION));
 
             signal(SIGHUP, &log_rotate_handler);
         }
@@ -593,7 +590,7 @@ int main(int argc, char *argv[])
             {
                 cerr << "But no cards have been defined on this host"
                      << endl;
-                return BACKEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
             cerr << "Valid cards: " << endl;
             for (uint i = 0; i < cardids.size(); i++)
@@ -605,7 +602,7 @@ int main(int argc, char *argv[])
                         CardUtil::GetVideoDevice(cardids[i])
                         .toAscii().constData());
             }
-            return BACKEND_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
 
         if (!okInputName)
@@ -617,7 +614,7 @@ int main(int argc, char *argv[])
             {
                 cerr << inputnames[i].toAscii().constData() << endl;
             }
-            return BACKEND_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
 
@@ -632,7 +629,7 @@ int main(int argc, char *argv[])
                  << scanTableName.toLocal8Bit().constData() << endl
                  << "Please make sure it is in the format freq_std-"
                     "modulation-country." << endl;
-            return BACKEND_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
         QString freq_std = scanTableName.mid(0, firstBreak).toLower();
         QString mod      = scanTableName.mid(
@@ -662,7 +659,7 @@ int main(int argc, char *argv[])
                 startChan, freq_std, mod, tbl);
             ret = a.exec();
         }
-        return (ret) ? GENERIC_EXIT_NOT_OK : BACKEND_EXIT_OK;
+        return (ret) ? GENERIC_EXIT_NOT_OK : GENERIC_EXIT_OK;
     }
 
     if (doScanList)
@@ -679,7 +676,7 @@ int main(int argc, char *argv[])
         }
         cout<<endl;
 
-        return BACKEND_EXIT_OK;
+        return GENERIC_EXIT_OK;
     }
 
     if (scanImport)
@@ -693,7 +690,7 @@ int main(int argc, char *argv[])
             ci.Process(list);
         }
         cout<<"*** SCAN IMPORT END ***"<<endl;
-        return BACKEND_EXIT_OK;
+        return GENERIC_EXIT_OK;
     }
 
     MythTranslation::load("mythfrontend");
@@ -704,7 +701,7 @@ int main(int argc, char *argv[])
     {
         VERBOSE(VB_IMPORTANT, QString("Couldn't find theme '%1'")
                 .arg(themename));
-        return FRONTEND_BUGGY_EXIT_NO_THEME;
+        return GENERIC_EXIT_NO_THEME;
     }
 
     MythMainWindow *mainWindow = GetMythMainWindow();
@@ -717,7 +714,7 @@ int main(int argc, char *argv[])
     if (LanguageSelection::prompt())
     {
         if (!reloadTheme())
-            return FRONTEND_BUGGY_EXIT_NO_THEME;
+            return GENERIC_EXIT_NO_THEME;
     }
 
     if (!UpgradeTVDatabaseSchema(true))
@@ -736,7 +733,7 @@ int main(int argc, char *argv[])
 
     // Let the user select buttons, type values, scan for channels, etc.
     if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
-        return FRONTEND_BUGGY_EXIT_NO_THEME;
+        return GENERIC_EXIT_NO_THEME;
 
     ExpertSettingsEditor *expertEditor = NULL;
     if (expertMode)
@@ -752,7 +749,7 @@ int main(int argc, char *argv[])
             expertEditor = NULL;
             VERBOSE(VB_IMPORTANT, "Unable to create expert settings editor "
                     "window");
-            return BACKEND_EXIT_OK;
+            return GENERIC_EXIT_OK;
         }
     }
 

@@ -1,3 +1,6 @@
+#include <algorithm>
+using namespace std;
+
 #include "mythverbose.h"
 #include "mythrender_opengl.h"
 #include "mythxdisplay.h"
@@ -1006,8 +1009,8 @@ bool MythRenderOpenGL::UpdateTextureVertices(uint tex, const QRect *src,
     GLfloat *data = m_textures[tex].m_vertex_data;
     QSize    size = m_textures[tex].m_size;
 
-    int width  = std::min(src->width(),  size.width());
-    int height = std::min(src->height(), size.height());
+    int width  = min(src->width(),  size.width());
+    int height = min(src->height(), size.height());
 
     data[0 + TEX_OFFSET] = src->left();
     data[1 + TEX_OFFSET] = src->top() + height;
@@ -1030,8 +1033,8 @@ bool MythRenderOpenGL::UpdateTextureVertices(uint tex, const QRect *src,
 
     data[2] = data[0] = dst->left();
     data[5] = data[1] = dst->top();
-    data[4] = data[6] = dst->left() + std::min(width, dst->width());
-    data[3] = data[7] = dst->top()  + std::min(height, dst->height());
+    data[4] = data[6] = dst->left() + min(width, dst->width());
+    data[3] = data[7] = dst->top()  + min(height, dst->height());
 
     return true;
 }

@@ -5,6 +5,8 @@ TARGET = myth-$$LIBVERSION
 CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
+DEFINES += MYTH_API
+
 
 QT += network xml sql
 
@@ -54,7 +56,7 @@ SOURCES += mythplugin.cpp
 SOURCES += mythwidgets.cpp mythwizard.cpp schemawizard.cpp
 SOURCES += output.cpp
 SOURCES += settings.cpp
-SOURCES += uilistbtntype.cpp uitypes.cpp util.cpp
+SOURCES += uilistbtntype.cpp uitypes.cpp
 SOURCES += storagegroupeditor.cpp
 SOURCES += mythcommandlineparser.cpp mythterminal.cpp
 SOURCES += remoteutil.cpp

@@ -1,6 +1,8 @@
 #ifndef FREQUENCIES_H
 #define FREQUENCIES_H
 
+#include "mythtvexp.h"
+
 /*
  * Worldwide channel/frequency list
  *
@@ -106,6 +108,6 @@ typedef struct CHANLISTS {
 
 /* --------------------------------------------------------------------- */
 
-extern struct CHANLISTS   chanlists[];
+extern MTV_PUBLIC struct CHANLISTS   chanlists[];
 
 #endif

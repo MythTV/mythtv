@@ -822,7 +822,7 @@ void MPEG2fixup::AddSequence(MPEG2frame *frame1, MPEG2frame *frame2)
     }
 }
 
-bool MPEG2fixup::ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec)
+int MPEG2fixup::ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec)
 {
     int state = -1;
     int last_pos = 0;
@@ -1252,11 +1252,11 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
                 {
                     VERBOSE(MPF_IMPORTANT, "Found end of file without finding "
                                            " any frames");
-                    return TRANSCODE_EXIT_UNKNOWN_ERROR;
+                    return GENERIC_EXIT_NOT_OK;
                 }
                 MPEG2frame *tmpFrame = GetPoolFrame(&vFrame.last()->pkt);
                 if (tmpFrame == NULL)
-                    return TRANSCODE_EXIT_UNKNOWN_ERROR;
+                    return GENERIC_EXIT_NOT_OK;
                 vFrame.append(tmpFrame);
                 real_file_end = true;
                 file_end = true;
@@ -1295,7 +1295,7 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
 
         MPEG2frame *tmpFrame = GetPoolFrame(pkt);
         if (tmpFrame == NULL)
-            return TRANSCODE_EXIT_UNKNOWN_ERROR;
+            return GENERIC_EXIT_NOT_OK;
         switch (inputFC->streams[pkt->stream_index]->codec->codec_type)
         {
 
@@ -1318,7 +1318,7 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
             default:
                 framePool.enqueue(tmpFrame);
                 av_free_packet(pkt);
-                return TRANSCODE_EXIT_UNKNOWN_ERROR;
+                return GENERIC_EXIT_NOT_OK;
         }
     }
 }
@@ -1865,11 +1865,11 @@ int MPEG2fixup::Start()
     QByteArray ainfile = infile.toLocal8Bit();
     if (! InitAV(ainfile.constData(), format, 0))
     {
-        return (TRANSCODE_EXIT_UNKNOWN_ERROR);
+        return (GENERIC_EXIT_NOT_OK);
     }
 
     if (! FindStart())
-        return (TRANSCODE_EXIT_UNKNOWN_ERROR);
+        return (GENERIC_EXIT_NOT_OK);
 
     av_init_packet(&pkt);
 
@@ -1979,7 +1979,7 @@ int MPEG2fixup::Start()
                                        .arg(expectedvPTS)
                                        .arg(expectedDTS)
                                        .arg(ptsIncrement));
-                    return TRANSCODE_EXIT_UNKNOWN_ERROR;
+                    return GENERIC_EXIT_NOT_OK;
                 }
                 //reorder frames in presentation order (to the next I/P frame)
                 Lreorder = ReorderDTStoPTS(&vFrame);
@@ -2058,7 +2058,7 @@ int MPEG2fixup::Start()
                                                .arg(frame_count));
                             if(GetFrameTypeT(curFrame) != 'I')
                                 if (ConvertToI(&Lreorder, frame_pos))
-                                  return TRANSCODE_BUGGY_EXIT_WRITE_FRAME_ERROR;
+                                  return GENERIC_EXIT_WRITE_FRAME_ERROR;
                             WriteFrame(QString("save%1.yuv").arg(frame_count),
                                        curFrame);
                         }
@@ -2097,7 +2097,7 @@ int MPEG2fixup::Start()
                              (GetFrameTypeT(curFrame) == 'P')))
                         {
                             if (ConvertToI(&Lreorder, frame_pos))
-                                return TRANSCODE_BUGGY_EXIT_WRITE_FRAME_ERROR;
+                                return GENERIC_EXIT_WRITE_FRAME_ERROR;
                             ptsorder_eq_dtsorder = true;
                         }
                         else if (! new_discard_state &&
@@ -2202,7 +2202,7 @@ int MPEG2fixup::Start()
                         int ret = InsertFrame(GetFrameNum(vFrame.current()),
                                                deltaPTS, ptsIncrement, 0);
                         if(ret < 0)
-                            return TRANSCODE_BUGGY_EXIT_WRITE_FRAME_ERROR;
+                            return GENERIC_EXIT_WRITE_FRAME_ERROR;
                         for (vFrame.at(frame_pos + Lreorder.count()); ret;
                              vFrame.next(), --ret)
                         {
@@ -2244,7 +2244,7 @@ int MPEG2fixup::Start()
                                 .arg(PtsTime(vFrame.current()->pkt.dts))
                                 .arg(vFrame.current()->pkt.pos));
                         if (AddFrame(vFrame.current()))
-                            return TRANSCODE_BUGGY_EXIT_DEADLOCK;
+                            return GENERIC_EXIT_DEADLOCK;
 
                         if (vFrame.current() == markedFrame)
                         {
@@ -2415,7 +2415,7 @@ int MPEG2fixup::Start()
                         .arg(PtsTime(af->current()->pkt.pts))
                         .arg(af->current()->pkt.pos));
                 if (AddFrame(af->current()))
-                    return TRANSCODE_BUGGY_EXIT_DEADLOCK;
+                    return GENERIC_EXIT_DEADLOCK;
                 framePool.enqueue(af->first());
 
                 af->remove();
@@ -2572,12 +2572,12 @@ int MPEG2fixup::BuildKeyframeIndex(QString &file,
     /*============ initialise AV ===============*/
     QByteArray fname = file.toLocal8Bit();
     if (!InitAV(fname.constData(), NULL, 0))
-        return TRANSCODE_EXIT_UNKNOWN_ERROR;
+        return GENERIC_EXIT_NOT_OK;
 
     if (mkvfile)
     {
         VERBOSE(MPF_IMPORTANT, "Seek tables are not required for MKV");
-        return TRANSCODE_EXIT_UNKNOWN_ERROR;
+        return GENERIC_EXIT_NOT_OK;
     }
 
     av_init_packet(&pkt);

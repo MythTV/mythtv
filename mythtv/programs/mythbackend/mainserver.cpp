@@ -181,7 +181,7 @@ MainServer::MainServer(bool master, int port,
     encoderList(tvList), mythserver(NULL), masterServerReconnect(NULL),
     masterServer(NULL), ismaster(master), masterBackendOverride(false),
     m_sched(sched), m_expirer(expirer), deferredDeleteTimer(NULL),
-    autoexpireUpdateTimer(NULL), m_exitCode(BACKEND_EXIT_OK)
+    autoexpireUpdateTimer(NULL), m_exitCode(GENERIC_EXIT_OK)
 {
     PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
         PreviewGenerator::kLocalAndRemote, ~0, 0);
@@ -204,7 +204,7 @@ MainServer::MainServer(bool master, int port,
     {
         VERBOSE(VB_IMPORTANT, QString("Failed to bind port %1. Exiting.")
                 .arg(port));
-        SetExitCode(BACKEND_BUGGY_EXIT_NO_BIND_MAIN, false);
+        SetExitCode(GENERIC_EXIT_SOCKET_ERROR, false);
         return;
     }
 
@@ -1747,16 +1747,16 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
     SendResponse(pbssock, strlist);
 }
 
-void *MainServer::SpawnDeleteThread(void *param)
+void DeleteThread::run(void)
 {
-    DeleteStruct *ds = (DeleteStruct *)param;
+    if (!m_parent)
+        return;
 
-    MainServer *ms = ds->ms;
-    ms->DoDeleteThread(ds);
+    MainServer *ms = m_parent->ms;
+    ms->DoDeleteThread(m_parent);
 
-    delete ds;
-
-    return NULL;
+    delete m_parent;
+    this->deleteLater();
 }
 
 void MainServer::DoDeleteThread(const DeleteStruct *ds)
@@ -2508,12 +2508,9 @@ void MainServer::DoHandleDeleteRecording(
 
         recinfo.SaveDeletePendingFlag(true);
 
-        pthread_t deleteThread;
-        pthread_attr_t attr;
-        pthread_attr_init(&attr);
-        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-        pthread_create(&deleteThread, &attr, SpawnDeleteThread, ds);
-        pthread_attr_destroy(&attr);
+        DeleteThread *deleteThread = new DeleteThread;
+        deleteThread->SetParent(ds);
+        deleteThread->start();
     }
     else
     {
@@ -4470,16 +4467,16 @@ void MainServer::GetFilesystemInfos(vector <FileSystemInfo> &fsInfos)
     }
 }
 
-void *MainServer::SpawnTruncateThread(void *param)
+void TruncateThread::run(void)
 {
-    DeleteStruct *ds = (DeleteStruct *)param;
+    if (!m_parent)
+        return;
 
-    MainServer *ms = ds->ms;
-    ms->DoTruncateThread(ds);
+    MainServer *ms = m_parent->ms;
+    ms->DoTruncateThread(m_parent);
 
-    delete ds;
-
-    return NULL;
+    delete m_parent;
+    this->deleteLater();
 }
 
 void MainServer::DoTruncateThread(const DeleteStruct *ds)
@@ -4571,12 +4568,9 @@ bool MainServer::HandleDeleteFile(QString filename, QString storagegroup,
         ds->fd = fd;
         ds->size = size;
 
-        pthread_t truncateThread;
-        pthread_attr_t attr;
-        pthread_attr_init(&attr);
-        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-        pthread_create(&truncateThread, &attr, SpawnTruncateThread, ds);
-        pthread_attr_destroy(&attr);
+        TruncateThread *truncateThread = new TruncateThread;
+        truncateThread->SetParent(ds);
+        truncateThread->run();
     }
 
     return true;

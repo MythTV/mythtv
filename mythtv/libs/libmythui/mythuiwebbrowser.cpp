@@ -3,7 +3,7 @@
  * \author Paul Harrison <mythtv@dsl.pipex.com>
  * \brief Provide a web browser widget.
  *
- * This requires qt4.4.0 or later to function properly.
+ * This requires qt4.5.0 or later to function properly.
  *
  */
 
@@ -30,7 +30,12 @@
 #include "mythdirs.h"
 #include "mythuihelper.h"
 #include "mythcorecontext.h"
+#include "mythdownloadmanager.h"
+#include "mythdialogbox.h"
+#include "mythprogressdialog.h"
 
+#define MUSIC_EXTENSIONS "mp3,mp2,ogg,oga,flac,wma,wav,ac3,oma,omg,atp,ra,dts,aac,m4a,aa3,tta,mka,aiff,swa,wv"
+#define VIDEO_EXTENSIONS "mpeg,mpg,wmv,avi"
 
 /**
  * @class BrowserApi
@@ -182,9 +187,13 @@ MythWebView::MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser)
            : QWebView(parent)
 {
     m_parentBrowser = parentBrowser;
+    m_busyPopup = NULL;
 
-    connect(this->page(), SIGNAL(unsupportedContent(QNetworkReply *)),
+    connect(page(), SIGNAL(unsupportedContent(QNetworkReply *)),
             this, SLOT(handleUnsupportedContent(QNetworkReply *)));
+
+    connect(page(), SIGNAL(downloadRequested(const QNetworkRequest &)),
+            this, SLOT(handleDownloadRequested(QNetworkRequest)));
 
     page()->setForwardUnsupportedContent(true);
 
@@ -259,6 +268,17 @@ void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
 {
     if (reply->error() == QNetworkReply::NoError)
     {
+        QVariant header = reply->header(QNetworkRequest::ContentTypeHeader);
+
+        if (header != QVariant())
+            VERBOSE(VB_IMPORTANT, QString("MythWebView::handleUnsupportedContent - %1")
+                                          .arg(header.toString()));
+
+        m_downloadRequest = reply->request();
+        showDownloadMenu();
+
+        emit titleChanged(title());
+
         return;
     }
 
@@ -305,6 +325,189 @@ void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
     page()->mainFrame()->setHtml(html, reply->url());
 
     emit statusBarMessage(title);
+}
+
+void  MythWebView::handleDownloadRequested(const QNetworkRequest &request)
+{
+    QFileInfo fi(request.url().path());
+    QString basename(fi.baseName());
+    QString extension = fi.suffix();
+
+    m_downloadRequest = request;
+
+    QFileInfo savefi(m_parentBrowser->GetDefaultSaveDirectory());
+    QString saveBaseName(savefi.baseName());
+    if (saveBaseName.isEmpty())
+        saveBaseName = basename;
+    QString saveFilename = savefi.absolutePath() + '/' + saveBaseName + '.' + extension;
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    QString msg = tr("Enter filename to save file");
+    MythTextInputDialog *input = new MythTextInputDialog(popupStack, msg, FilterNone, false, saveFilename);
+
+    if (input->Create())
+    {
+        input->SetReturnEvent(this, "filenamedialog");
+        popupStack->AddScreen(input);
+    }
+    else
+        delete input;
+}
+
+void MythWebView::doDownload(const QString &saveFilename)
+{
+    if (saveFilename.isEmpty())
+        return;
+
+    openBusyPopup(QObject::tr("Downloading file. Please wait..."));
+
+    GetMythDownloadManager()->queueDownload(m_downloadRequest.url().toString(), saveFilename, this);
+}
+
+void MythWebView::openBusyPopup(const QString &message)
+{
+    if (m_busyPopup)
+        return;
+
+    QString msg(tr("Downloading..."));
+    if (!message.isEmpty())
+        msg = message;
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    m_busyPopup = new MythUIBusyDialog(msg, popupStack, "downloadbusydialog");
+
+    if (m_busyPopup->Create())
+        popupStack->AddScreen(m_busyPopup, false);
+}
+
+void MythWebView::closeBusyPopup(void)
+{
+    if (m_busyPopup)
+        m_busyPopup->Close();
+    m_busyPopup = NULL;
+}
+
+void MythWebView::customEvent(QEvent *event)
+{
+    if (event->type() == DialogCompletionEvent::kEventType)
+    {
+        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+
+        // make sure the user didn't ESCAPE out of the dialog
+        if (dce->GetResult() < 0)
+            return;
+
+        QString resultid   = dce->GetId();
+        QString resulttext = dce->GetResultText();
+
+        if (resultid == "filenamedialog")
+            doDownload(resulttext);
+        else if (resultid == "downloadmenu")
+        {
+            if (resulttext == tr("Play the file"))
+            {
+                QFileInfo fi(m_downloadRequest.url().path());
+                QString basename(fi.baseName());
+                QString extension = fi.suffix();
+
+                if (isMusicFile(extension))
+                {
+                    MythEvent me(QString("MUSIC_COMMAND %1 PLAY_URL %2")
+                        .arg(gCoreContext->GetHostName()).arg(m_downloadRequest.url().toString()));
+                    gCoreContext->dispatch(me);
+                }
+                else if (isVideoFile(extension))
+                {
+                    //NOTE: before this will work internal_play_media() needs updating to support http: urls
+                    GetMythMainWindow()->HandleMedia("Internal", m_downloadRequest.url().toString());
+                }
+                else
+                    VERBOSE(VB_IMPORTANT, QString("MythWebView: Asked to play a file with extension '%1' but don't know how")
+                                                  .arg(extension));
+            }
+            else if (resulttext == tr("Download the file"))
+            {
+                handleDownloadRequested(m_downloadRequest);
+            }
+        }
+    }
+    else if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
+    {
+        MythEvent *me = (MythEvent *)event;
+        QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
+
+        if (tokens.isEmpty())
+            return;
+
+        if (tokens[0] == "DOWNLOAD_FILE")
+        {
+            QStringList args = me->ExtraDataList();
+            if (tokens[1] == "UPDATE")
+            {
+                // could update a progressbar here
+            }
+            else if (tokens[1] == "FINISHED")
+            {
+                int fileSize  = args[2].toInt();
+                int errorCode = args[4].toInt();
+
+                closeBusyPopup();
+
+                if ((errorCode != 0) || (fileSize == 0))
+                    ShowOkPopup(tr("ERROR downloading file."));
+
+                MythEvent me(QString("BROWSER_DOWNLOAD_FINISHED"), args);
+                gCoreContext->dispatch(me);
+            }
+        }
+    }
+}
+
+void MythWebView::showDownloadMenu(void)
+{
+    QFileInfo fi(m_downloadRequest.url().path());
+    QString basename(fi.baseName());
+    QString extension = fi.suffix();
+
+    bool isPlayable = isMusicFile(extension) | isVideoFile(extension);
+
+    QString label = tr("What do you want to do with this file?");
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    MythDialogBox *menu = new MythDialogBox(label, popupStack, "downloadmenu");
+
+    if (!menu->Create())
+    {
+        delete menu;
+        return;
+    }
+
+    menu->SetReturnEvent(this, "downloadmenu");
+
+    if (isPlayable)
+        menu->AddButton(tr("Play the file"));
+    menu->AddButton(tr("Download the file"));
+    menu->AddButton(tr("Cancel"));
+
+    popupStack->AddScreen(menu);
+}
+
+bool MythWebView::isMusicFile(const QString &extension)
+{
+    QStringList list = QString(MUSIC_EXTENSIONS).split(",");
+    return list.contains(extension, Qt::CaseInsensitive);
+}
+
+bool MythWebView::isVideoFile(const QString &extension)
+{
+    //the internal player is currently broken for all file formats
+    //so for the moment ignore all video files
+    return false;
+
+    QStringList list = QString(VIDEO_EXTENSIONS).split(",");
+    return list.contains(extension, Qt::CaseInsensitive);
 }
 
 /**
@@ -357,6 +560,7 @@ MythUIWebBrowser::MythUIWebBrowser(MythUIType *parent, const QString &name)
       m_inputToggled(false), m_lastMouseAction(""),
       m_mouseKeyCount(0),    m_lastMouseActionTime()
 {
+    m_defaultSaveDir = QDir::homePath() + "/";
     SetCanTakeFocus(true);
 }
 
@@ -428,6 +632,30 @@ void MythUIWebBrowser::Init(void)
     connect(this, SIGNAL(LosingFocus()),
             this, SLOT(slotLosingFocus(void)));
 
+    // find what screen we are on
+    m_parentScreen = NULL;
+    QObject *parentObject = parent();
+    while(parentObject)
+    {
+        m_parentScreen = dynamic_cast<MythScreenType *>(parentObject);
+        if (m_parentScreen)
+            break;
+
+        parentObject = parentObject->parent();
+    }
+
+    if (!m_parentScreen)
+        VERBOSE(VB_IMPORTANT, "MythUIWebBrowser: failed to find our parent screen");
+
+    // connect to the topScreenChanged signals on each screen stack
+    for (int x = 0; x < GetMythMainWindow()->GetStackCount(); x++)
+    {
+        MythScreenStack *stack = GetMythMainWindow()->GetStackAt(x);
+        if (stack)
+            connect(stack, SIGNAL(topScreenChanged(MythScreenType *)),
+                    this, SLOT(slotTopScreenChanged(MythScreenType *)));
+    }
+
     // set up the icon cache directory
     QString path = GetConfDir();
     QDir dir(path);
@@ -451,7 +679,7 @@ void MythUIWebBrowser::Init(void)
         QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled,
                                                      false);
     }
-    
+
     QImage image = QImage(m_Area.size(), QImage::Format_ARGB32);
     m_image = GetPainter()->GetFormatImage();
     m_image->Assign(image);
@@ -609,12 +837,16 @@ void MythUIWebBrowser::SetZoom(float zoom)
         return;
 
     m_zoom = zoom;
-#if QT_VERSION >= 0x040500
     m_browser->setZoomFactor(m_zoom);
-#else
-    m_browser->setTextSizeMultiplier(m_zoom);
-#endif
     UpdateBuffer();
+}
+
+void MythUIWebBrowser::SetDefaultSaveDirectory(const QString &saveDir)
+{
+    if (!saveDir.isEmpty())
+        m_defaultSaveDir = saveDir;
+    else
+        m_defaultSaveDir = QDir::homePath() + "/";
 }
 
 /** \fn MythUIWebBrowser::GetZoom()
@@ -770,6 +1002,35 @@ void MythUIWebBrowser::slotLosingFocus(void)
     m_browser->hide();
 
     UpdateBuffer();
+}
+
+void MythUIWebBrowser::slotTopScreenChanged(MythScreenType* screen)
+{
+    (void) screen;
+
+    if (!m_parentScreen)
+        return;
+
+    // is our containing screen the top screen?
+    for (int x = GetMythMainWindow()->GetStackCount() - 1; x >= 0; x--)
+    {
+        MythScreenStack *stack = GetMythMainWindow()->GetStackAt(x);
+
+        // ignore stacks with no screens on them
+        if (!stack->GetTopScreen())
+            continue;
+
+        if (stack->GetTopScreen() == m_parentScreen)
+        {
+            SetActive(true);
+            break;
+        }
+        else
+        {
+            SetActive(false);
+            break;
+        }
+    }
 }
 
 void MythUIWebBrowser::UpdateBuffer(void)
@@ -1085,6 +1346,7 @@ void MythUIWebBrowser::CopyFrom(MythUIType *base)
     m_widgetUrl = browser->m_widgetUrl;
     m_userCssFile = browser->m_userCssFile;
     m_updateInterval = browser->m_updateInterval;
+    m_defaultSaveDir = browser->m_defaultSaveDir;
 
     Init();
 }

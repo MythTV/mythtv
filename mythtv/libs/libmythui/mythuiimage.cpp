@@ -3,6 +3,7 @@
 
 // C
 #include <cstdlib>
+#include <time.h>
 
 // POSIX
 #include <stdint.h>

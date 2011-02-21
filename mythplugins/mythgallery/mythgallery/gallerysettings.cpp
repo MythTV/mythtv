@@ -78,6 +78,15 @@ static HostLineEdit *MythGalleryImportDirs()
     return gc;
 };
 
+static HostCheckBox *MythGalleryAutoLoad()
+{
+    HostCheckBox *gc = new HostCheckBox("GalleryAutoLoad");
+    gc->setLabel(QObject::tr("Automatically load MythGallery to display pictures"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("When a new CD-Rom or removable storage device containing pictures is detected then load MythGallery to display the content."));
+    return gc;
+}
+
 #ifdef USING_OPENGL
 
 static HostCheckBox *SlideshowUseOpenGL()
@@ -218,6 +227,7 @@ GallerySettings::GallerySettings()
     general->addChild(MythGalleryThumbnailLocation());
     general->addChild(MythGallerySortOrder());
     general->addChild(MythGalleryImportDirs());
+    general->addChild(MythGalleryAutoLoad());
     general->addChild(MythGalleryMoviePlayerCmd());
     addChild(general);
 

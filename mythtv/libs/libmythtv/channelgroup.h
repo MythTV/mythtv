@@ -9,9 +9,9 @@ using namespace std;
 #include <QString>
 
 // mythtv
-#include "mythexp.h"
+#include "mythtvexp.h"
 
-class MPUBLIC ChannelGroupItem
+class MTV_PUBLIC ChannelGroupItem
 {
   public:
     ChannelGroupItem(const ChannelGroupItem&);
@@ -32,7 +32,7 @@ typedef vector<ChannelGroupItem> ChannelGroupList;
 
 /** \class ChannelGroup
 */
-class MPUBLIC ChannelGroup
+class MTV_PUBLIC ChannelGroup
 {
   public:
     // ChannelGroup 

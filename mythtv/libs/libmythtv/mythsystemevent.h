@@ -9,12 +9,12 @@
 #include "rawsettingseditor.h"
 
 // Helper commands for formatting and sending a MythSystemEvent
-MPUBLIC void SendMythSystemEvent(const QString msg);
-MPUBLIC void SendMythSystemRecEvent(const QString msg,
+MTV_PUBLIC void SendMythSystemEvent(const QString msg);
+MTV_PUBLIC void SendMythSystemRecEvent(const QString msg,
                                     const RecordingInfo *pginfo);
-MPUBLIC void SendMythSystemPlayEvent(const QString msg,
+MTV_PUBLIC void SendMythSystemPlayEvent(const QString msg,
                                      const ProgramInfo *pginfo);
-MPUBLIC void SendMythSystemHostEvent(const QString msg, const QString &hostname,
+MTV_PUBLIC void SendMythSystemHostEvent(const QString msg, const QString &hostname,
                                      const QString args);
 
 /** \class MythSystemEventHandler
@@ -24,7 +24,7 @@ MPUBLIC void SendMythSystemHostEvent(const QString msg, const QString &hostname,
  *  the appropriate event handler command on the local system if one is
  *  configured.
  */
-class MPUBLIC MythSystemEventHandler : public QObject
+class MTV_PUBLIC MythSystemEventHandler : public QObject
 {
     Q_OBJECT
 
@@ -50,7 +50,7 @@ class MPUBLIC MythSystemEventHandler : public QObject
  *  This class extends RawSettingsEditor and automatically populates the
  *  settings list with the MythSystemEvent handler command settings names.
  */
-class MPUBLIC MythSystemEventEditor : public RawSettingsEditor
+class MTV_PUBLIC MythSystemEventEditor : public RawSettingsEditor
 {
     Q_OBJECT
 

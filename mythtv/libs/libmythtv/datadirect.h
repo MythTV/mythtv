@@ -6,7 +6,7 @@
 #include <QXmlDefaultHandler>
 #include <QMap>
 
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 #include <vector>
 using namespace std;
@@ -251,7 +251,7 @@ typedef vector<DataDirectLineup>           DDLineupList;
 typedef vector<DataDirectLineupMap>        DDLineupChannels;
 typedef QMap<QString,DDLineupChannels>     DDLineupMap;   // lineupid ->
 
-class MPUBLIC DataDirectProcessor
+class MTV_PUBLIC DataDirectProcessor
 {
     friend class DDStructureParser;
   public:

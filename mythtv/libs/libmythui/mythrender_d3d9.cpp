@@ -1,5 +1,7 @@
-using namespace std;
 #define _WIN32_WINNT 0x500
+
+#include <algorithm>
+using std::min;
 
 #include <QRect>
 #include <QMap>
@@ -90,6 +92,13 @@ bool D3D9Image::SetAsRenderTarget(void)
     return m_valid;
 }
 
+bool D3D9Image::UpdateImage(IDirect3DSurface9 *surface)
+{
+    if (m_valid)
+        return m_render->StretchRect(m_texture, surface, false);
+    return false;
+}
+
 bool D3D9Image::UpdateImage(const MythImage *img)
 {
     bool result = true;
@@ -141,6 +150,10 @@ QRect D3D9Image::GetRect(void)
     return m_render->GetRect(m_vertexbuffer);
 }
 
+#define mD3DFMT_YV12 (D3DFORMAT)MAKEFOURCC('Y','V','1','2')
+#define mD3DFMT_IYUV (D3DFORMAT)MAKEFOURCC('I','Y','U','V')
+#define mD3DFMT_I420 (D3DFORMAT)MAKEFOURCC('I','4','2','0')
+#define mD3DFMT_YV16 (D3DFORMAT)MAKEFOURCC('Y','V','1','6')
 #define D3DFVF_TEXTUREVERTEX (D3DFVF_XYZRHW|D3DFVF_DIFFUSE|D3DFVF_TEX1|D3DFVF_TEX2)
 #define D3DFVF_VERTEX        (D3DFVF_XYZRHW|D3DFVF_DIFFUSE)
 #define D3DLOC QString("MythRenderD3D9: ")
@@ -149,8 +162,8 @@ QRect D3D9Image::GetRect(void)
 MythRenderD3D9::MythRenderD3D9(void)
   : m_d3d(NULL), m_d3dDevice(NULL),
     m_adaptor_fmt(D3DFMT_UNKNOWN),
-    m_videosurface_fmt((D3DFORMAT)MAKEFOURCC('Y','V','1','2')),
-    m_surface_fmt(D3DFMT_A8R8G8B8), m_texture_fmt(D3DFMT_A8R8G8B8),
+    m_videosurface_fmt(D3DFMT_UNKNOWN),
+    m_surface_fmt(D3DFMT_UNKNOWN), m_texture_fmt(D3DFMT_A8R8G8B8),
     m_rect_vertexbuffer(NULL), m_default_surface(NULL), m_current_surface(NULL),
     m_lock(QMutex::Recursive),
     m_blend(true), m_multi_texturing(true), m_texture_vertices(true)
@@ -196,6 +209,7 @@ bool MythRenderD3D9::FormatSupported(D3DFORMAT surface, D3DFORMAT adaptor)
                                           adaptor, 0, D3DRTYPE_SURFACE, surface);
     if (SUCCEEDED(hr))
     {
+        // NB CheckDeviceFormatConversion is not fuly implemented in Wine as of 1.3.6
         hr = m_d3d->CheckDeviceFormatConversion(D3DADAPTER_DEFAULT,
                                                 D3DDEVTYPE_HAL, surface, adaptor);
         if (SUCCEEDED(hr))
@@ -206,7 +220,6 @@ bool MythRenderD3D9::FormatSupported(D3DFORMAT surface, D3DFORMAT adaptor)
 
 static const QString toString(D3DFORMAT fmt)
 {
-    QString res = "Unknown";
     switch (fmt)
     {
         case D3DFMT_A8:
@@ -215,10 +228,26 @@ static const QString toString(D3DFORMAT fmt)
             return "A8R8G8B8";
         case D3DFMT_X8R8G8B8:
             return "X8R8G8B8";
+        case D3DFMT_A8B8G8R8:
+            return "A8B8G8R8";
+        case D3DFMT_X8B8G8R8:
+            return "X8B8G8R8";
+        case mD3DFMT_YV12:
+            return "YV12";
+        case D3DFMT_UYVY:
+            return "UYVY";
+        case D3DFMT_YUY2:
+            return "YUY2";
+        case mD3DFMT_IYUV:
+            return "IYUV";
+        case mD3DFMT_I420:
+            return "I420";
+        case mD3DFMT_YV16:
+            return "YV16";
         default:
-            return res;
+            break;
     }
-    return res;
+    return QString().setNum((ulong)fmt,16);
 }
 
 bool MythRenderD3D9::Create(QSize size, HWND window)
@@ -228,7 +257,6 @@ bool MythRenderD3D9::Create(QSize size, HWND window)
     typedef LPDIRECT3D9 (WINAPI *LPFND3DC)(UINT SDKVersion);
     static  HINSTANCE hD3DLib            = NULL;
     static  LPFND3DC  OurDirect3DCreate9 = NULL;
-    D3DCAPS9 d3dCaps;
 
     if (!hD3DLib)
     {
@@ -256,12 +284,12 @@ bool MythRenderD3D9::Create(QSize size, HWND window)
         return false;
     }
 
+    D3DCAPS9 d3dCaps;
     ZeroMemory(&d3dCaps, sizeof(d3dCaps));
     if (D3D_OK != m_d3d->GetDeviceCaps(
             D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &d3dCaps))
     {
         VERBOSE(VB_IMPORTANT, D3DERR + "Could not read adapter capabilities.");
-        return false;
     }
 
     D3DDISPLAYMODE d3ddm;
@@ -271,28 +299,77 @@ bool MythRenderD3D9::Create(QSize size, HWND window)
         return false;
     }
 
-    // TODO - check adaptor format is reasonable and try alternatives
     m_adaptor_fmt = d3ddm.Format;
-    bool default_ok = FormatSupported(m_videosurface_fmt, m_adaptor_fmt);
-    if (!default_ok)
-        m_videosurface_fmt = m_adaptor_fmt;
-
     VERBOSE(VB_GENERAL, D3DLOC +
-        QString("Default Adaptor Format %1 - Hardware YV12 to RGB %2 ")
-            .arg(toString(m_adaptor_fmt))
-            .arg(default_ok ? "supported" : "unsupported"));
+            QString("Default Adaptor Format %1.").arg(toString(m_adaptor_fmt)));
 
-    // TODO - try alternative formats if necessary
-    if (!FormatSupported(m_surface_fmt, m_adaptor_fmt))
-        VERBOSE(VB_IMPORTANT, D3DERR + QString("%1 surface format not supported.")
-                                          .arg(toString(m_surface_fmt)));
+    // Find the best h/w supported video surface format
+    static const D3DFORMAT vfmt[] =
+    {
+        mD3DFMT_YV12,
+        D3DFMT_UYVY,
+        D3DFMT_YUY2,
+        mD3DFMT_IYUV,
+        mD3DFMT_I420,
+        mD3DFMT_YV16,
+        D3DFMT_A8R8G8B8,
+        D3DFMT_X8R8G8B8,
+        D3DFMT_A8B8G8R8,
+        D3DFMT_X8B8G8R8
+    };
+
+    for (unsigned i = 0; i < sizeof vfmt / sizeof vfmt[0]; ++i)
+    {
+        if (FormatSupported(vfmt[i], m_adaptor_fmt))
+        {
+            m_videosurface_fmt = vfmt[i];
+            break;
+        }
+    }
+
+    if (D3DFMT_UNKNOWN != m_videosurface_fmt)
+    {
+        VERBOSE(VB_GENERAL, D3DLOC +
+                QString("Best Video Surface Format %1.").arg(toString(m_videosurface_fmt)));
+    }
     else
-        VERBOSE(VB_GENERAL, D3DLOC + QString("Using %1 surface format.")
-                                          .arg(toString(m_surface_fmt)));
+    {
+        VERBOSE(VB_IMPORTANT, D3DERR + "Failed to agree video surface format");
+    }
+
+    // Find the best backing surface format
+    static const D3DFORMAT bfmt[] =
+    {
+        D3DFMT_A8R8G8B8,
+        D3DFMT_X8R8G8B8,
+        D3DFMT_A8B8G8R8,
+        D3DFMT_X8B8G8R8,
+        D3DFMT_R8G8B8
+    };
+
+    for (unsigned i = 0; i < sizeof bfmt / sizeof bfmt[0]; ++i)
+    {
+        if (SUCCEEDED(m_d3d->CheckDeviceType(D3DADAPTER_DEFAULT,
+                      D3DDEVTYPE_HAL, m_adaptor_fmt, bfmt[i], TRUE)))
+        {
+            m_surface_fmt = bfmt[i];
+            break;
+        }
+    }
+
+    if (D3DFMT_UNKNOWN != m_surface_fmt)
+    {
+        VERBOSE(VB_GENERAL, D3DLOC +
+                QString("Best surface format: %1.").arg(toString(m_surface_fmt)));
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, D3DERR + "Failed to agree surface format");
+    }
 
     D3DPRESENT_PARAMETERS d3dpp;
     ZeroMemory(&d3dpp, sizeof(D3DPRESENT_PARAMETERS));
-    d3dpp.BackBufferFormat       = m_adaptor_fmt;
+    d3dpp.BackBufferFormat       = m_surface_fmt;
     d3dpp.hDeviceWindow          = window;
     d3dpp.Windowed               = TRUE;
     d3dpp.BackBufferWidth        = size.width();
@@ -312,10 +389,19 @@ bool MythRenderD3D9::Create(QSize size, HWND window)
         return false;
     }
 
+    VERBOSE(VB_GENERAL, D3DLOC + QString("Device backbuffer format: %1.")
+                                      .arg(toString(d3dpp.BackBufferFormat)));
+
+    if (D3DFMT_UNKNOWN == m_videosurface_fmt)
+        m_videosurface_fmt = d3dpp.BackBufferFormat;
+
+    if (D3DFMT_UNKNOWN == m_surface_fmt)
+        m_surface_fmt = d3dpp.BackBufferFormat;
+
     VERBOSE(VB_GENERAL, D3DLOC +
                QString("Hardware YV12 to RGB conversion %1.")
                .arg(m_videosurface_fmt != (D3DFORMAT)MAKEFOURCC('Y','V','1','2') ?
-                 "unavailable" : "enabled"));
+                 "unavailable" : "available"));
 
     static bool debugged = false;
     if (!debugged)
@@ -414,11 +500,18 @@ bool MythRenderD3D9::End(void)
     return true;
 }
 
+void MythRenderD3D9::CopyFrame(void* surface, D3D9Image *img)
+{
+    if (surface && img)
+        img->UpdateImage((IDirect3DSurface9*)surface);
+}
+
 bool MythRenderD3D9::StretchRect(IDirect3DTexture9 *texture,
-                              IDirect3DSurface9 *surface)
+                                 IDirect3DSurface9 *surface,
+                                 bool known_surface)
 {
     if (!m_textures.contains(texture) ||
-        !m_surfaces.contains(surface))
+       (known_surface && !m_surfaces.contains(surface)))
         return false;
 
     QMutexLocker locker(&m_lock);
@@ -742,22 +835,25 @@ bool MythRenderD3D9::UpdateSurface(IDirect3DSurface9 *surface,
         return false;
 
     D3DFORMAT format = m_surfaces[surface].m_fmt;
-    if (format == D3DFMT_A8R8G8B8)
+    switch (format)
     {
-        int i;
-        uint pitch = image->width() << 2;
-        uint8_t *dst = buf;
-        uint8_t *src = (uint8_t*)image->bits();
-        for (i = 0; i < image->height(); i++)
-        {
-            memcpy(dst, src, pitch);
-            dst += d3dpitch;
-            src += pitch;
-        }
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, D3DERR + "Surface format not supported.");
+        case D3DFMT_A8R8G8B8:
+        case D3DFMT_X8R8G8B8:
+            {
+                uint pitch = image->width() << 2;
+                uint8_t *dst = buf;
+                uint8_t *src = (uint8_t*)image->bits();
+                for (int i = 0; i < image->height(); i++)
+                {
+                    memcpy(dst, src, pitch);
+                    dst += d3dpitch;
+                    src += pitch;
+                }
+            }
+            break;
+        default:
+            VERBOSE(VB_IMPORTANT, D3DERR + "Surface format not supported.");
+            break;
     }
 
     ReleaseBuffer(surface);
@@ -871,8 +967,8 @@ bool MythRenderD3D9::UpdateVertexBuffer(IDirect3DVertexBuffer9* vertexbuffer,
     int height = dst.height();
     if (!video)
     {
-        width  = std::min(src.width(),  width);
-        height = std::min(src.height(), height);
+        width  = min(src.width(),  width);
+        height = min(src.height(), height);
     }
     QRect dest(dst.left(), dst.top(), width, height);
 

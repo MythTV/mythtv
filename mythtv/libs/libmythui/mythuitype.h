@@ -59,7 +59,7 @@ typedef QHash<QString,QString> InfoMap;
  *
  * \ingroup MythUI_Widgets
  */
-class MPUBLIC MythUIType : public QObject, public XMLParseBase
+class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
 {
     Q_OBJECT
 

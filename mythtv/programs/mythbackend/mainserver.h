@@ -31,9 +31,47 @@ class MythServer;
 class VideoScanner;
 class QTimer;
 
+typedef struct deletestruct
+{
+    MainServer *ms;
+    uint chanid;
+    QDateTime recstartts;
+    QDateTime recendts;
+    QString filename;
+    int fd;
+    off_t size;
+    QString title;
+    bool forceMetadataDelete;
+} DeleteStruct;
+
+class DeleteThread : public QThread
+{
+    Q_OBJECT
+  public:
+    DeleteThread() : m_parent(NULL) {}
+    void SetParent(DeleteStruct *parent) { m_parent = parent; }
+    void run(void);
+  private:
+    DeleteStruct *m_parent;
+};
+
+class TruncateThread : public QThread
+{
+    Q_OBJECT
+  public:
+    TruncateThread() : m_parent(NULL) {}
+    void SetParent(DeleteStruct *parent) { m_parent = parent; }
+    void run(void);
+  private:
+    DeleteStruct *m_parent;
+};
+
 class MainServer : public QObject, public MythSocketCBs
 {
     Q_OBJECT
+
+    friend class DeleteThread;
+    friend class TruncateThread;
   public:
     MainServer(bool master, int port,
                QMap<int, EncoderLink *> *tvList,
@@ -73,18 +111,6 @@ class MainServer : public QObject, public MythSocketCBs
     void newConnection(MythSocket *);
 
   private:
-    typedef struct deletestruct
-    {
-        MainServer *ms;
-        uint chanid;
-        QDateTime recstartts;
-        QDateTime recendts;
-        QString filename;
-        int fd;
-        off_t size;
-        QString title;
-        bool forceMetadataDelete;
-    } DeleteStruct;
 
     void ProcessRequestWork(MythSocket *sock);
     void HandleAnnounce(QStringList &slist, QStringList commands,

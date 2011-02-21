@@ -15,6 +15,7 @@ using namespace std;
 #include <QRect>
 #include <QThread>
 
+#include "mythtvexp.h"
 #include "mythdeque.h"
 #include "tv.h"
 #include "videoouttypes.h"
@@ -59,7 +60,7 @@ class PlayerThread : public QThread
     MythPlayer *m_player;
 };
 
-class MPUBLIC PlayerContext
+class MTV_PUBLIC PlayerContext
 {
   public:
     PlayerContext(const QString &inUseID = QString("Unknown"));

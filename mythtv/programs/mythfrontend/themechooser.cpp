@@ -16,6 +16,7 @@
 #include "programtypes.h"
 #include "mythsystemevent.h"
 #include "util.h"
+#include "mythversion.h"
 
 // LibMythUI headers
 #include "mythmainwindow.h"
@@ -29,10 +30,6 @@
 #define LOC      QString("ThemeChooser: ")
 #define LOC_WARN QString("ThemeChooser, Warning: ")
 #define LOC_ERR  QString("ThemeChooser, Error: ")
-
-// Use this to determine what directories to look in on the download site
-extern const char *myth_source_path;
-extern const char *myth_binary_version;
 
 /*!
 * \class RemoteFileDownloadThread
@@ -144,7 +141,7 @@ void ThemeChooser::Load(void)
 {
     SetBusyPopupMessage(tr("Loading Installed Themes"));
 
-    QString MythVersion = myth_source_path;
+    QString MythVersion = MYTH_SOURCE_PATH;
     QStringList themesSeen;
     QDir themes(GetConfDir() + "/themes");
     themes.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
@@ -156,7 +153,7 @@ void ThemeChooser::Load(void)
 
     if (MythVersion != "trunk")
     {
-        MythVersion = myth_binary_version; // Example: 0.25.20101017-1
+        MythVersion = MYTH_BINARY_VERSION; // Example: 0.25.20101017-1
         MythVersion.replace(QRegExp("\\.[0-9]{8,}.*"), "");
     }
 
@@ -869,7 +866,7 @@ void ThemeChooser::removeThemeDir(const QString &dirname)
 ThemeUpdateChecker::ThemeUpdateChecker() :
     m_updateTimer(new QTimer(this))
 {
-    m_mythVersion = myth_source_path;
+    m_mythVersion = MYTH_SOURCE_PATH;
 
     // FIXME: For now, treat git master the same as svn trunk
     if (m_mythVersion == "master")
@@ -877,7 +874,7 @@ ThemeUpdateChecker::ThemeUpdateChecker() :
 
     if (m_mythVersion != "trunk")
     {
-        m_mythVersion = myth_binary_version; // Example: 0.25.20101017-1
+        m_mythVersion = MYTH_BINARY_VERSION; // Example: 0.25.20101017-1
         m_mythVersion.replace(QRegExp("\\.[0-9]{8,}.*"), "");
     }
 

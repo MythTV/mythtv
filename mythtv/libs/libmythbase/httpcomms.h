@@ -7,10 +7,10 @@
 #include <QHttp>
 #include <QUrl>
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
 class QTimer;
-class MPUBLIC HttpComms : public QObject
+class MBASE_PUBLIC HttpComms : public QObject
 {
     Q_OBJECT
   public:

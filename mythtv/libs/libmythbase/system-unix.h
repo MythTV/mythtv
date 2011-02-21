@@ -1,7 +1,7 @@
 #ifndef SYSTEM_UNIX_H_
 #define SYSTEM_UNIX_H_
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 #include <signal.h>
 #include <QObject>
 #include <QMap>
@@ -68,7 +68,7 @@ class MythSystemSignalManager : public QThread
 };
 
 
-class MPUBLIC MythSystemUnix : public MythSystemPrivate
+class MBASE_PUBLIC MythSystemUnix : public MythSystemPrivate
 {
     Q_OBJECT
 

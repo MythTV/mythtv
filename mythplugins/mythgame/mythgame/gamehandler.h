@@ -63,7 +63,8 @@ class GameHandler : public QObject
         commandline(QString::null), workingpath(QString::null),
         screenshots(QString::null), gameplayerid(0),
         gametype(QString::null),
-        m_RemoveAll(false),         m_KeepAll(false) {}
+        m_RemoveAll(false),         m_KeepAll(false),
+        m_progressDlg(NULL) {}
 
     static void updateSettings(GameHandler*);
     static GameHandler *getHandler(uint i);

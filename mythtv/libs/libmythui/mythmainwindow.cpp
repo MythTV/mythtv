@@ -572,6 +572,11 @@ void MythMainWindow::PopScreenStack()
     d->stackList.pop_back();
 }
 
+int MythMainWindow::GetStackCount(void)
+{
+    return d->stackList.size();
+}
+
 MythScreenStack *MythMainWindow::GetMainStack(void)
 {
     return d->mainStack;
@@ -585,6 +590,14 @@ MythScreenStack *MythMainWindow::GetStack(const QString &stackname)
         if ((*it)->objectName() == stackname)
             return *it;
     }
+    return NULL;
+}
+
+MythScreenStack* MythMainWindow::GetStackAt(int pos)
+{
+    if (pos >= 0 && pos < d->stackList.size())
+        return d->stackList.at(pos);
+
     return NULL;
 }
 
@@ -944,11 +957,20 @@ void MythMainWindow::Init(void)
         d->render = NULL;
     }
 
-    QString painter = GetMythDB()->GetSetting("ThemePainter", "qt");
-#ifdef USE_OPENGL_PAINTER
-    if (painter == "opengl")
+    QString painter = GetMythDB()->GetSetting("UIPainter", "auto");
+#ifdef USING_MINGW
+    if (painter == "auto" || painter == "d3d9")
     {
-        VERBOSE(VB_GENERAL, "Using the OpenGL painter");
+        VERBOSE(VB_GENERAL, "Using the D3D9 painter");
+        d->painter = new MythD3D9Painter();
+        d->paintwin = new MythPainterWindowD3D9(this, d);
+    }
+#endif
+#ifdef USE_OPENGL_PAINTER
+    if ((painter == "auto" && (!d->painter && !d->paintwin)) ||
+        painter == "opengl")
+    {
+        VERBOSE(VB_GENERAL, "Trying the OpenGL painter");
         d->painter = new MythOpenGLPainter();
         QGLFormat fmt;
         fmt.setDepth(false);
@@ -956,20 +978,33 @@ void MythMainWindow::Init(void)
         MythRenderOpenGL *gl = dynamic_cast<MythRenderOpenGL*>(d->render);
         d->paintwin = new MythPainterWindowGL(this, d, gl);
         QGLWidget *qgl = dynamic_cast<QGLWidget *>(d->paintwin);
-        if (qgl && !qgl->isValid())
+        if (qgl)
         {
-            VERBOSE(VB_IMPORTANT, "Failed to create OpenGL painter. "
-                                  "Check your OpenGL installation.");
-            delete d->painter;
-            d->painter = NULL;
-            delete d->paintwin;
-            d->paintwin = NULL;
-            d->render = NULL; // deleted by the painterwindow
+            bool teardown = false;
+            if (!qgl->isValid())
+            {
+                VERBOSE(VB_IMPORTANT, "Failed to create OpenGL painter. "
+                                      "Check your OpenGL installation.");
+                teardown = true;
+            }
+            else if (painter == "auto" && !qgl->format().directRendering())
+            {
+                VERBOSE(VB_IMPORTANT, "OpenGL is using software rendering. "
+                                      "Falling back to Qt painter.");
+                teardown = true;
+            }
+            if (teardown)
+            {
+                delete d->painter;
+                d->painter = NULL;
+                delete d->paintwin;
+                d->paintwin = NULL;
+                d->render = NULL; // deleted by the painterwindow
+            }
+            else
+                gl->Init();
         }
-        else
-            gl->Init();
     }
-    else
 #endif
 #ifdef USING_VDPAU
     if (painter == "vdpau")
@@ -977,14 +1012,6 @@ void MythMainWindow::Init(void)
         VERBOSE(VB_GENERAL, "Using the VDPAU painter");
         d->painter = new MythVDPAUPainter();
         d->paintwin = new MythPainterWindowVDPAU(this, d);
-    }
-#endif
-#ifdef USING_MINGW
-    if (painter == "d3d9")
-    {
-        VERBOSE(VB_GENERAL, "Using the D3D9 painter");
-        d->painter = new MythD3D9Painter();
-        d->paintwin = new MythPainterWindowD3D9(this, d);
     }
 #endif
 
@@ -1197,7 +1224,12 @@ void MythMainWindow::Show(void)
 void MythMainWindow::attach(QWidget *child)
 {
 #ifdef USING_MINGW
-#warning TODO FIXME MythMainWindow::attach() does not always work on MS Windows!
+# ifdef _MSC_VER
+#  pragma message( "TODO FIXME MythMainWindow::attach() does not always work on MS Windows!")
+# else
+#  warning TODO FIXME MythMainWindow::attach() does not always work on MS Windows!
+# endif
+
     // if windows are created on different threads,
     // or if setFocus() is called from a thread other than the main UI thread,
     // setFocus() hangs the thread that called it

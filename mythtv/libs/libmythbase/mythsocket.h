@@ -7,12 +7,12 @@
 
 #include "msocketdevice.h"
 #include "mythsocket_cb.h"
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
 class QHostAddress;
 class MythSocketThread;
 
-class MPUBLIC MythSocket : public MSocketDevice
+class MBASE_PUBLIC MythSocket : public MSocketDevice
 {
     friend class MythSocketThread;
     friend class QList<MythSocket*>;

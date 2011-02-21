@@ -28,6 +28,8 @@ SOURCES += newssite.cpp   newsarticle.cpp
 SOURCES += newsdbutil.cpp dbcheck.cpp
 SOURCES += main.cpp
 
+DEFINES += MPLUGIN_API
+
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }

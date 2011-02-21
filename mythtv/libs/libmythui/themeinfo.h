@@ -7,7 +7,7 @@
 #include <QHash>
 #include <QFileInfo>
 
-#include "mythexp.h"
+#include "mythuiexp.h"
 
 #include "xmlparsebase.h" // for VERBOSE_XML && Xml Parsing helpers
 
@@ -18,7 +18,7 @@ typedef enum {
     THEME_MENU  = 0x04
 } ThemeType;
 
-class MPUBLIC ThemeInfo : public XMLParseBase
+class MUI_PUBLIC ThemeInfo : public XMLParseBase
 {
   public:
     ThemeInfo(QString theme);

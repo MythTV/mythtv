@@ -7,7 +7,7 @@
 
 class MythFontProperties;
 
-class MPUBLIC MythYUVAPainter : public MythQImagePainter
+class MUI_PUBLIC MythYUVAPainter : public MythQImagePainter
 {
   public:
     MythYUVAPainter() : MythQImagePainter() { }

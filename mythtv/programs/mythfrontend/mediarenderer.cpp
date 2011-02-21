@@ -144,6 +144,12 @@ class MythFrontendStatus : public HttpServerExtension
            << "\">Status page</a>)\r\n"
            << "  </div>\r\n";
 
+        pRequest->m_response
+           << "  <div class=\"content\">\r\n"
+           << "    <h2>Services</h2>\r\n"
+           << "    <a href=\"MythFE/GetRemote\">Remote Control</a>\r\n"
+           << "  </div>\r\n";
+
         double load[3];
         if (getloadavg(load, 3) != -1)
         {
@@ -202,7 +208,6 @@ MediaRenderer::MediaRenderer()
     if (!m_pHttpServer->listen(QHostAddress::Any, nPort))
     {
         VERBOSE(VB_IMPORTANT, "MediaRenderer::HttpServer Create Error");
-        // exit(BACKEND_BUGGY_EXIT_NO_BIND_STATUS);
         delete m_pHttpServer;
         m_pHttpServer = NULL;
         InitializeSSDPOnly();
@@ -275,7 +280,6 @@ MediaRenderer::MediaRenderer()
     else
     {
         VERBOSE(VB_IMPORTANT, "MediaRenderer::Unable to Initialize UPnp Stack");
-        // exit(BACKEND_BUGGY_EXIT_NO_BIND_STATUS);
     }
 
 

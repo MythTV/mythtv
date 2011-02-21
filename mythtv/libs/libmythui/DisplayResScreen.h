@@ -9,7 +9,7 @@
 
 #include <stdint.h>   // for uint64_t
 
-#include "mythexp.h"
+#include "mythuiexp.h"
 
 class DisplayResScreen;
 
@@ -21,7 +21,7 @@ typedef std::map<uint64_t, DisplayResScreen> DisplayResMap;
 typedef DisplayResMap::iterator           DisplayResMapIt;
 typedef DisplayResMap::const_iterator     DisplayResMapCIt;
 
-class MPUBLIC DisplayResScreen
+class MUI_PUBLIC DisplayResScreen
 {
   public:
     // Constructors, initializers

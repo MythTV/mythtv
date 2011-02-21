@@ -16,6 +16,7 @@
 #import <agl.h>
 #endif
 
+#include "mythuiexp.h"
 #include "mythverbose.h"
 #include "mythrender_base.h"
 #include "mythrender_opengl_defs.h"
@@ -84,7 +85,7 @@ class MythGLTexture
 
 class MythRenderOpenGL;
 
-class MPUBLIC OpenGLLocker
+class MUI_PUBLIC OpenGLLocker
 {
   public:
     OpenGLLocker(MythRenderOpenGL *render);
@@ -93,7 +94,7 @@ class MPUBLIC OpenGLLocker
     MythRenderOpenGL *m_render;
 };
 
-class MPUBLIC MythRenderOpenGL : public QGLContext, public MythRender
+class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
 {
   public:
     static MythRenderOpenGL* Create(const QGLFormat& format,

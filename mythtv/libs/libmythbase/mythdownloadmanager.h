@@ -10,12 +10,12 @@
 #include <QNetworkReply>
 #include <QWaitCondition>
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
 class MythDownloadInfo;
 class RemoteFileDownloadThread;
 
-class MPUBLIC MythDownloadManager : public QThread
+class MBASE_PUBLIC MythDownloadManager : public QThread
 {
     Q_OBJECT
 
@@ -102,7 +102,7 @@ class MPUBLIC MythDownloadManager : public QThread
     friend class RemoteFileDownloadThread;
 };
 
-MPUBLIC MythDownloadManager *GetMythDownloadManager(void);
+ MBASE_PUBLIC  MythDownloadManager *GetMythDownloadManager(void);
 
 #endif
 

@@ -57,7 +57,6 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     schedulingEnabled(true),
     m_tvList(tvList),
     expirer(NULL),
-    threadrunning(false),
     m_mainServer(NULL),
     resetIdleTime(false),
     m_isShuttingDown(false),
@@ -87,19 +86,16 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
         return;
     }
 
-    threadrunning = runthread;
-
     fsInfoCacheFillTime = QDateTime::currentDateTime().addSecs(-1000);
 
     if (runthread)
     {
-        int err = pthread_create(&schedThread, NULL, SchedulerThread, this);
-        if (err != 0)
+        schedThread.SetParent(this);
+        schedThread.start(QThread::LowPriority);
+
+        if (!schedThread.isRunning())
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Failed to start scheduler thread: error %1")
-                    .arg(err));
-            threadrunning = false;
+            VERBOSE(VB_IMPORTANT, QString("Failed to start scheduler thread"));
         }
 
         WakeUpSlaves();
@@ -120,10 +116,10 @@ Scheduler::~Scheduler()
         worklist.pop_back();
     }
 
-    if (threadrunning)
+    if (schedThread.isRunning())
     {
-        pthread_cancel(schedThread);
-        pthread_join(schedThread, NULL);
+        schedThread.terminate();
+        schedThread.wait();
     }
 }
 
@@ -145,7 +141,7 @@ bool Scheduler::VerifyCards(void)
     if (!query.exec("SELECT count(*) FROM capturecard") || !query.next())
     {
         MythDB::DBError("verifyCards() -- main query 1", query);
-        error = BACKEND_EXIT_NO_CAP_CARD;
+        error = GENERIC_EXIT_DB_ERROR;
         return false;
     }
 
@@ -155,7 +151,7 @@ bool Scheduler::VerifyCards(void)
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "No capture cards are defined in the database.\n\t\t\t"
                 "Perhaps you should re-read the installation instructions?");
-        error = BACKEND_EXIT_NO_CAP_CARD;
+        error = GENERIC_EXIT_SETUP_ERROR;
         return false;
     }
 
@@ -164,7 +160,7 @@ bool Scheduler::VerifyCards(void)
     if (!query.exec())
     {
         MythDB::DBError("verifyCards() -- main query 2", query);
-        error = BACKEND_EXIT_NO_CHAN_DATA;
+        error = GENERIC_EXIT_DB_ERROR;
         return false;
     }
 
@@ -200,7 +196,7 @@ bool Scheduler::VerifyCards(void)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "No channel sources defined in the database");
-        error = BACKEND_EXIT_NO_CHAN_DATA;
+        error = GENERIC_EXIT_SETUP_ERROR;
         return false;
     }
 
@@ -1446,9 +1442,10 @@ void Scheduler::UpdateNextRecord(void)
             if (nextRecMap[recid].isNull() || !next_record.isValid())
             {
                 subquery.prepare("UPDATE record "
-                                 "SET next_record = '0000-00-00T00:00:00' "
+                                 "SET next_record = '0000-00-00 00:00:00' "
                                  "WHERE recordid = :RECORDID;");
                 subquery.bindValue(":RECORDID", recid);
+
             }
             else
             {
@@ -2674,15 +2671,12 @@ void Scheduler::WakeUpSlaves(void)
     }
 }
 
-void *Scheduler::SchedulerThread(void *param)
+void ScheduleThread::run(void)
 {
-    // Lower scheduling priority, to avoid problems with recordings.
-    if (setpriority(PRIO_PROCESS, 0, 9))
-        VERBOSE(VB_IMPORTANT, LOC + "Setting priority failed." + ENO);
-    Scheduler *sched = static_cast<Scheduler*>(param);
-    sched->RunScheduler();
+    if (!m_parent)
+        return;
 
-    return NULL;
+    m_parent->RunScheduler();
 }
 
 void Scheduler::UpdateManuals(int recordid)
@@ -3532,7 +3526,8 @@ void Scheduler::AddNewRecords(void)
 
         RecStatusType newrecstatus = p->GetRecordingStatus();
         // Check for rsOffLine
-        if ((threadrunning || specsched) && !cardMap.contains(p->GetCardID()))
+        if ((schedThread.isRunning() || specsched) && 
+            !cardMap.contains(p->GetCardID()))
             newrecstatus = rsOffLine;
 
         // Check for rsTooManyRecordings

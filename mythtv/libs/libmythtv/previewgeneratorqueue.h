@@ -9,8 +9,9 @@
 #include <QMap>
 #include <QSet>
 
+#include "mythtvexp.h"
 #include "previewgenerator.h"
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 class ProgramInfo;
 class QSize;
@@ -30,7 +31,7 @@ class PreviewGenState
 };
 typedef QMap<QString,PreviewGenState> PreviewMap;
 
-class MPUBLIC PreviewGeneratorQueue : public QThread
+class MTV_PUBLIC PreviewGeneratorQueue : public QThread
 {
     Q_OBJECT
 

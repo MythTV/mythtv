@@ -3,16 +3,16 @@
 
 #include <QString>
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
-MPUBLIC long long getDiskSpace(const QString&,long long&,long long&);
+ MBASE_PUBLIC  long long getDiskSpace(const QString&,long long&,long long&);
 
-MPUBLIC bool extractZIP(const QString &zipFile, const QString &outDir);
+ MBASE_PUBLIC  bool extractZIP(const QString &zipFile, const QString &outDir);
 
-MPUBLIC QString RemoteDownloadFile(const QString &url,
+ MBASE_PUBLIC  QString RemoteDownloadFile(const QString &url,
                                    const QString &storageGroup,
                                    const QString &filename = "");
-MPUBLIC QString RemoteDownloadFileNow(const QString &url,
+ MBASE_PUBLIC  QString RemoteDownloadFileNow(const QString &url,
                                       const QString &storageGroup,
                                       const QString &filename = "");
 

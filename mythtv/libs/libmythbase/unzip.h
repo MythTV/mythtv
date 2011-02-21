@@ -34,7 +34,7 @@
 
 #include <zlib.h>
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
 class UnzipPrivate;
 class QIODevice;
@@ -44,7 +44,7 @@ class QStringList;
 class QString;
 
 
-class MPUBLIC UnZip
+class MBASE_PUBLIC UnZip
 {
 public:
 	enum ErrorCode

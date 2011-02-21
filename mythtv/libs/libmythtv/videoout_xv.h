@@ -96,7 +96,6 @@ class VideoOutputXv : public VideoOutput
 
   private:
     virtual bool hasFullScreenOSD(void) const { return chroma_osd; }
-    VideoFrame *GetNextFreeFrame(bool allow_unsafe);
     void DiscardFrame(VideoFrame*);
     void DiscardFrames(bool next_frame_keyframe);
 

@@ -5,6 +5,7 @@
 #include <QHash>
 #include <QObject>
 
+#include "mythexp.h"
 #include "mythscreentype.h"
 
 #include "mythuibutton.h"

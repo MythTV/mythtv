@@ -13,7 +13,7 @@
  *
  * \ingroup MythUI_Widgets
  */
-class MPUBLIC MythUISpinBox : public MythUIButtonList
+class MUI_PUBLIC MythUISpinBox : public MythUIButtonList
 {
     Q_OBJECT
   public:

@@ -26,6 +26,8 @@ SOURCES += main.cpp gamehandler.cpp rominfo.cpp gameui.cpp unzip.c
 SOURCES += gamesettings.cpp dbcheck.cpp rom_metadata.cpp romedit.cpp
 SOURCES += gamedetails.cpp
 
+DEFINES += MPLUGIN_API
+
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }

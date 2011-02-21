@@ -5,6 +5,7 @@ TARGET = mythupnp-$$LIBVERSION
 CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
+DEFINES += UPNP_API
 
 setting.path = $${PREFIX}/share/mythtv/
 setting.files += CDS_scpd.xml CMGR_scpd.xml MSRR_scpd.xml MXML_scpd.xml

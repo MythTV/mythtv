@@ -5,7 +5,7 @@
 #include <QPixmap>
 
 // MythDB
-#include "mythexp.h"
+#include "mythuiexp.h"
 
 // MythUI
 #include "mythuitype.h"
@@ -22,7 +22,7 @@ class MythFontProperties;
  *
  * \ingroup MythUI_Widgets
  */
-class MPUBLIC MythUIGuideGrid : public MythUIType
+class MUI_PUBLIC MythUIGuideGrid : public MythUIType
 {
   public:
     MythUIGuideGrid(MythUIType *parent, const QString &name);

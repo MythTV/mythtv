@@ -61,11 +61,12 @@ extern AutoExpire *expirer;
 AutoExpire::AutoExpire(QMap<int, EncoderLink *> *tvList)
 {
     encoderList = tvList;
-    expire_thread_running = true;
 
     Init();
 
-    pthread_create(&expire_thread, NULL, ExpirerThread, this);
+    expire_thread_run = true;
+    expireThread.SetParent(this);
+    expireThread.start();
     gCoreContext->addListener(this);
 }
 
@@ -75,7 +76,7 @@ AutoExpire::AutoExpire(QMap<int, EncoderLink *> *tvList)
 AutoExpire::AutoExpire(void)
 {
     encoderList = NULL;
-    expire_thread_running = false;
+    expire_thread_run = false;
     Init();
 }
 
@@ -100,14 +101,14 @@ AutoExpire::~AutoExpire()
         instance_cond.wait(&instance_lock);
     instance_lock.unlock();
 
-    if (expire_thread_running)
+    if (expireThread.isRunning())
     {
         gCoreContext->removeListener(this);
-        expire_thread_running = false;
-        pthread_kill(expire_thread, SIGALRM); // try to speed up join..
+        expire_thread_run = false;
+        expireThread.quit();
         VERBOSE(VB_IMPORTANT, LOC + "Warning: Stopping auto expire thread "
                 "can take several seconds. Please be patient.");
-        pthread_join(expire_thread, NULL);
+        expireThread.wait();
     }
 }
 
@@ -276,7 +277,7 @@ void AutoExpire::RunExpirer(void)
 
     timer.start();
 
-    while (expire_thread_running)
+    while (expire_thread_run)
     {
         curTime = QDateTime::currentDateTime();
         // recalculate auto expire parameters
@@ -323,7 +324,7 @@ void AutoExpire::RunExpirer(void)
 void AutoExpire::Sleep(int sleepTime)
 {
     int minSleep = 5, timeExpended = 0;
-    while (expire_thread_running && timeExpended < sleepTime)
+    while (expireThread.isRunning() && timeExpended < sleepTime)
     {
         if (timeExpended > (sleepTime - minSleep))
             minSleep = sleepTime - timeExpended;
@@ -608,15 +609,15 @@ void AutoExpire::SendDeleteMessages(pginfolist_t &deleteList)
     }
 }
 
-/** \fn AutoExpire::ExpirerThread(void *)
- *  \brief This calls RunExpirer() from within a new pthread.
+/** \fn ExpireThread::run(void)
+ *  \brief This calls RunExpirer() from within a new thread.
  */
-void *AutoExpire::ExpirerThread(void *param)
+void ExpireThread::run(void)
 {
-    AutoExpire *expirer = static_cast<AutoExpire *>(param);
-    expirer->RunExpirer();
+    if (!m_parent)
+        return;
 
-    return NULL;
+    m_parent->RunExpirer();
 }
 
 /** \fn AutoExpire::ExpireEpisodesOverMax()
@@ -997,22 +998,25 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
     }
 }
 
-/** \fn SpawnUpdateThread(void*)
+/** \fn UpdateThread::run(void)
  *  \brief This is used by Update(QMap<int, EncoderLink*> *, bool)
  *         to run CalcParams(vector<EncoderLink*>).
  *
  *  \param autoExpireInstance AutoExpire instance on which to call CalcParams.
  */
-void *SpawnUpdateThread(void *autoExpireInstance)
+void UpdateThread::run(void)
 {
+    if (!m_parent)
+        return;
+
     sleep(5);
-    AutoExpire *ae = static_cast<AutoExpire*>(autoExpireInstance);
-    ae->CalcParams();
-    ae->instance_lock.lock();
-    ae->update_pending = false;
-    ae->instance_cond.wakeAll();
-    ae->instance_lock.unlock();
-    return NULL;
+    m_parent->CalcParams();
+    m_parent->instance_lock.lock();
+    m_parent->update_pending = false;
+    m_parent->instance_cond.wakeAll();
+    m_parent->instance_lock.unlock();
+
+    this->deleteLater();
 }
 
 /**
@@ -1063,12 +1067,9 @@ void AutoExpire::Update(int encoder, int fsID, bool immediately)
     else
     {
         // create thread to do work
-        pthread_attr_t attr;
-        pthread_attr_init(&attr);
-        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-        pthread_create(&expirer->update_thread, &attr,
-                       SpawnUpdateThread, expirer);
-        pthread_attr_destroy(&attr);
+        expirer->updateThread = new UpdateThread;
+        expirer->updateThread->SetParent(expirer);
+        expirer->updateThread->start();
     }
 }
 

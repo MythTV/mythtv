@@ -7,7 +7,7 @@
 #include <QString>
 
 // MythTV headers
-#include "mythexp.h"
+#include "mythbaseexp.h"
 #include "mythdbcon.h"
 
 class StorageUser
@@ -18,7 +18,7 @@ class StorageUser
     virtual ~StorageUser() { }
 };
 
-class MPUBLIC Storage
+class MBASE_PUBLIC Storage
 {
   public:
     Storage() { }
@@ -31,7 +31,7 @@ class MPUBLIC Storage
     virtual void SetSaveRequired(void) { };
 };
 
-class MPUBLIC DBStorage : public Storage
+class MBASE_PUBLIC DBStorage : public Storage
 {
   public:
     DBStorage(StorageUser *_user, QString _table, QString _column) :
@@ -48,7 +48,7 @@ class MPUBLIC DBStorage : public Storage
     QString      columnname;
 };
 
-class MPUBLIC SimpleDBStorage : public DBStorage
+class MBASE_PUBLIC SimpleDBStorage : public DBStorage
 {
   public:
     SimpleDBStorage(StorageUser *_user,
@@ -70,7 +70,7 @@ class MPUBLIC SimpleDBStorage : public DBStorage
     QString initval;
 };
 
-class MPUBLIC GenericDBStorage : public SimpleDBStorage
+class MBASE_PUBLIC GenericDBStorage : public SimpleDBStorage
 {
   public:
     GenericDBStorage(StorageUser *_user,
@@ -92,7 +92,7 @@ class MPUBLIC GenericDBStorage : public SimpleDBStorage
     QString keyvalue;
 };
 
-class MPUBLIC TransientStorage : public Storage
+class MBASE_PUBLIC TransientStorage : public Storage
 {
   public:
     TransientStorage() { }
@@ -102,7 +102,7 @@ class MPUBLIC TransientStorage : public Storage
     virtual void Save(void) { }
 };
 
-class MPUBLIC HostDBStorage : public SimpleDBStorage
+class MBASE_PUBLIC HostDBStorage : public SimpleDBStorage
 {
   public:
     HostDBStorage(StorageUser *_user, const QString &name);
@@ -115,7 +115,7 @@ class MPUBLIC HostDBStorage : public SimpleDBStorage
     QString settingname;
 };
 
-class MPUBLIC GlobalDBStorage : public SimpleDBStorage
+class MBASE_PUBLIC GlobalDBStorage : public SimpleDBStorage
 {
   public:
     GlobalDBStorage(StorageUser *_user, const QString &name);

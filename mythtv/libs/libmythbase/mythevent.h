@@ -5,7 +5,7 @@
 #include <QEvent>
 #include <QHash>
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
 /** \class MythEvent
     \brief This class is used as a container for messages.
@@ -13,7 +13,7 @@
     Any subclass of this that adds data to the event should override
     the clone method. As example, see OutputEvent in output.h.
  */
-class MPUBLIC MythEvent : public QEvent
+class MBASE_PUBLIC MythEvent : public QEvent
 {
   public:
     MythEvent(int t) : QEvent((QEvent::Type)t)
@@ -86,7 +86,7 @@ class MPUBLIC MythEvent : public QEvent
     QStringList extradata;
 };
 
-class MPUBLIC ExternalKeycodeEvent : public QEvent
+class MBASE_PUBLIC ExternalKeycodeEvent : public QEvent
 {
   public:
     ExternalKeycodeEvent(const int key) :
@@ -100,7 +100,7 @@ class MPUBLIC ExternalKeycodeEvent : public QEvent
     int keycode;
 };
 
-class MPUBLIC UpdateBrowseInfoEvent : public QEvent
+class MBASE_PUBLIC UpdateBrowseInfoEvent : public QEvent
 {
   public:
     UpdateBrowseInfoEvent(const QHash<QString,QString> &infoMap) :

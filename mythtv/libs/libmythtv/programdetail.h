@@ -10,9 +10,9 @@ using namespace std;
 #include <QDateTime>
 
 // MythTV headers
-#include "mythexp.h"
+#include "mythtvexp.h"
 
-class MPUBLIC ProgramDetail
+class MTV_PUBLIC ProgramDetail
 {
   public:
     QString   channame;
@@ -23,7 +23,7 @@ class MPUBLIC ProgramDetail
 };
 typedef vector<ProgramDetail> ProgramDetailList;
 
-MPUBLIC bool GetProgramDetailList(
+MTV_PUBLIC bool GetProgramDetailList(
     QDateTime         &nextRecordingStart,
     bool              *hasConflicts = NULL,
     ProgramDetailList *list = NULL);

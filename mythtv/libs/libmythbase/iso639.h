@@ -9,9 +9,9 @@ using namespace std;
 #include <QStringList>
 #include <QMap>
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
-extern MPUBLIC QMap<int, QString> _iso639_key_to_english_name;
+extern MBASE_PUBLIC QMap<int, QString> _iso639_key_to_english_name;
 
 /** \file iso639.h
  *  \brief ISO 639-1 and ISO 639-2 support functions
@@ -34,14 +34,14 @@ extern MPUBLIC QMap<int, QString> _iso639_key_to_english_name;
  */
 
 /// Converts a 2 or 3 character iso639 string to a language name in English.
-MPUBLIC QString     iso639_str_toName(const unsigned char *iso639);
+ MBASE_PUBLIC  QString     iso639_str_toName(const unsigned char *iso639);
 /// Converts a canonical key to language name in English
-MPUBLIC QString     iso639_key_toName(int iso639_2);
-MPUBLIC void        iso639_clear_language_list(void);
-MPUBLIC QStringList iso639_get_language_list(void);
-MPUBLIC vector<int> iso639_get_language_key_list(void);
-MPUBLIC int         iso639_key_to_canonical_key(int iso639_2);
-MPUBLIC QString     iso639_str2_to_str3(const QString &str2);
+ MBASE_PUBLIC  QString     iso639_key_toName(int iso639_2);
+ MBASE_PUBLIC  void        iso639_clear_language_list(void);
+ MBASE_PUBLIC  QStringList iso639_get_language_list(void);
+ MBASE_PUBLIC  vector<int> iso639_get_language_key_list(void);
+ MBASE_PUBLIC  int         iso639_key_to_canonical_key(int iso639_2);
+ MBASE_PUBLIC  QString     iso639_str2_to_str3(const QString &str2);
 
 static inline QString iso639_key_to_str3(int code)
 {
@@ -97,7 +97,7 @@ static inline QString iso639_str_to_canonoical_str(const QString &str3)
 
 typedef QMap<QString, QString> CodeToNameMap;
 
-MPUBLIC QString GetISO639LanguageName(QString iso639Code);
-MPUBLIC QString GetISO639EnglishLanguageName(QString iso639Code);
+ MBASE_PUBLIC  QString GetISO639LanguageName(QString iso639Code);
+ MBASE_PUBLIC  QString GetISO639EnglishLanguageName(QString iso639Code);
 
 #endif // _ISO_639_2_H_

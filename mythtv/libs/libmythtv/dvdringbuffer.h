@@ -27,7 +27,7 @@ extern "C" {
 
 class MythDVDPlayer;
 
-class MPUBLIC DVDRingBuffer : public RingBuffer
+class MTV_PUBLIC DVDRingBuffer : public RingBuffer
 {
   public:
     DVDRingBuffer(const QString &lfilename);

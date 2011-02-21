@@ -14,11 +14,11 @@ using namespace std;
 #include <QVariant>
 
 // MythTV headers
-#include "mythexp.h" // for MPUBLIC
+#include "mythtvexp.h" 
 
 // TODO: Refactor DBChannel, PixmapChannel and ChannelInfo into a single class
 
-class MPUBLIC DBChannel
+class MTV_PUBLIC DBChannel
 {
   public:
     DBChannel(const DBChannel&);
@@ -44,7 +44,7 @@ class MPUBLIC DBChannel
 };
 typedef vector<DBChannel> DBChanList;
 
-class MPUBLIC ChannelInfo
+class MTV_PUBLIC ChannelInfo
 {
  public:
     ChannelInfo() : chanid(-1), sourceid(-1), favid(-1) {}
@@ -63,7 +63,7 @@ class MPUBLIC ChannelInfo
 
 Q_DECLARE_METATYPE(ChannelInfo*)
 
-class MPUBLIC PixmapChannel : public DBChannel
+class MTV_PUBLIC PixmapChannel : public DBChannel
 {
   public:
     PixmapChannel(const PixmapChannel &other) :
@@ -78,7 +78,7 @@ class MPUBLIC PixmapChannel : public DBChannel
     QString m_localIcon;
 };
 
-class MPUBLIC ChannelInsertInfo
+class MTV_PUBLIC ChannelInsertInfo
 {
   public:
     ChannelInsertInfo(void) :

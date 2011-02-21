@@ -28,9 +28,17 @@ using namespace std;
 
 static const QString PATHTO_PMOUNT("/usr/bin/pmount");
 static const QString PATHTO_PUMOUNT("/usr/bin/pumount");
-static const QString PATHTO_MOUNT("/bin/mount");
+#if CONFIG_DARWIN
+    static const QString PATHTO_MOUNT("/sbin/mount");
+#else
+    static const QString PATHTO_MOUNT("/bin/mount");
+#endif
 static const QString PATHTO_UNMOUNT("/bin/umount");
 static const QString PATHTO_MOUNTS("/proc/mounts");
+
+#if CONFIG_DARWIN
+#   define USE_MOUNT_COMMAND
+#endif
 
 const char* MythMediaDevice::MediaStatusStrings[] =
 {
@@ -349,7 +357,14 @@ bool MythMediaDevice::findMountPath()
         return false;
     }
 
+#ifdef USE_MOUNT_COMMAND
+    // HACK. TODO: replace with something using popen()?
+    if (myth_system(PATHTO_MOUNT + " > /tmp/mounts") != GENERIC_EXIT_OK)
+        return false;
+    QFile mountFile("/tmp/mounts");
+#else
     QFile mountFile(PATHTO_MOUNTS);
+#endif
 
     // Try to open the mounts file so we can search it for our device.
     if (!mountFile.open(QIODevice::ReadOnly))
@@ -364,9 +379,20 @@ bool MythMediaDevice::findMountPath()
         QString deviceName;
 
 
+#ifdef USE_MOUNT_COMMAND
+        // Extract mount point and device name from something like:
+        //   /dev/disk0s3 on / (hfs, local, journaled)   - Mac OS X
+        //   /dev/hdd on /tmp/AAA BBB type udf (ro)      - Linux
+        stream >> deviceName;
+        mountPoint = stream.readLine();
+        mountPoint.remove(" on ");
+        mountPoint.remove(QRegExp(" type \\w.*"));   // Linux
+        mountPoint.remove(QRegExp(" \\(\\w.*"));     // Mac OS X
+#else
         // Extract the mount point and device name.
         stream >> deviceName >> mountPoint;
         stream.readLine(); // skip the rest of the line
+#endif
 
         if (deviceName.isNull())
             break;
@@ -379,6 +405,12 @@ bool MythMediaDevice::findMountPath()
 
         QStringList deviceNames;
         getSymlinkTarget(deviceName, &deviceNames);
+
+#if CONFIG_DARWIN
+        // match short-style BSD node names:
+        if (m_DevicePath.startsWith("disk"))
+            deviceNames << deviceName.mid(5);   // remove 5 chars - /dev/
+#endif
 
         // Deal with escaped spaces
         if (mountPoint.contains("\\040"))

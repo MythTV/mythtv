@@ -1,6 +1,6 @@
 #include "ringbuffer.h"
 
-class MPUBLIC FileRingBuffer : public RingBuffer
+class MTV_PUBLIC FileRingBuffer : public RingBuffer
 {
     friend class RingBuffer;
   public:

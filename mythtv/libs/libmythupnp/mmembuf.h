@@ -58,8 +58,6 @@
 #include <QByteArray>
 #include <QList>
 
-#include "mythexp.h"
-
 class MMembuf
 {
 public:

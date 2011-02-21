@@ -63,6 +63,7 @@ MythFEXMLMethod MythFEXML::GetMethod(const QString &sURI)
     if (sURI == "SendAction")    return MFEXML_Action;
     if (sURI == "GetActionList") return MFEXML_ActionList;
     if (sURI == "GetActionTest") return MFEXML_ActionListTest;
+    if (sURI == "GetRemote")     return MFEXML_GetRemote;
 
     return( MFEXML_Unknown );
 }
@@ -101,6 +102,9 @@ bool MythFEXML::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest
             break;
         case MFEXML_ActionListTest:
             GetActionListTest(pRequest);
+            break;
+        case MFEXML_GetRemote:
+            GetRemote(pRequest);
             break;
         default:
             UPnp::FormatErrorResponse(pRequest, UPnPResult_InvalidAction);
@@ -151,7 +155,7 @@ void MythFEXML::GetScreenShot(HTTPRequest *pRequest)
 
 void MythFEXML::SendMessage(HTTPRequest *pRequest)
 {
-    pRequest->m_eResponseType = ResponseTypeNone;
+    pRequest->m_eResponseType = ResponseTypeHTML;
     QString sText = pRequest->m_mapParams[ "text" ];
     VERBOSE(VB_GENERAL, QString("UPNP message: ") + sText);
 
@@ -162,7 +166,7 @@ void MythFEXML::SendMessage(HTTPRequest *pRequest)
 
 void MythFEXML::SendAction(HTTPRequest *pRequest)
 {
-    pRequest->m_eResponseType = ResponseTypeNone;
+    pRequest->m_eResponseType = ResponseTypeHTML;
     QString sText = pRequest->m_mapParams["action"];
     VERBOSE(VB_UPNP, QString("UPNP Action: ") + sText);
 
@@ -178,6 +182,27 @@ void MythFEXML::SendAction(HTTPRequest *pRequest)
     qApp->postEvent(window, (QEvent*)ke);
 }
 
+static const QString PROCESS_ACTION =
+    "  <script type =\"text/javascript\">\n"
+    "    function postaction(action) {\n"
+    "      var myForm = document.createElement(\"form\");\n"
+    "      myForm.method =\"Post\";\n"
+    "      myForm.action =\"SendAction?\";\n"
+    "      myForm.target =\"post_target\";\n"
+    "      var myInput = document.createElement(\"input\");\n"
+    "      myInput.setAttribute(\"name\", \"action\");\n"
+    "      myInput.setAttribute(\"value\", action);\n"
+    "      myForm.appendChild(myInput);\n"
+    "      document.body.appendChild(myForm);\n"
+    "      myForm.submit();\n"
+    "      document.body.removeChild(myForm);\n"
+    "    }\n"
+    "  </script>\n";
+
+static const QString HIDDEN_IFRAME =
+    "    <iframe id=\"hidden_target\" name=\"post_target\" src=\"\""
+    " style=\"width:0;height:0;border:0px solid #fff;\"></iframe>\n";
+
 void MythFEXML::GetActionListTest(HTTPRequest *pRequest)
 {
     InitActions();
@@ -186,25 +211,8 @@ void MythFEXML::GetActionListTest(HTTPRequest *pRequest)
     pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
 
     pRequest->m_response <<
-        "<html>\n"
-        "  <script type =\"text/javascript\">\n"
-        "    function postaction(action) {\n"
-        "      var myForm = document.createElement(\"form\");\n"
-        "      myForm.method =\"Post\";\n"
-        "      myForm.action =\"SendAction?\";\n"
-        "      myForm.target =\"post_target\";\n"
-        "      var myInput = document.createElement(\"input\");\n"
-        "      myInput.setAttribute(\"name\", \"action\");\n"
-        "      myInput.setAttribute(\"value\", action);\n"
-        "      myForm.appendChild(myInput);\n"
-        "      document.body.appendChild(myForm);\n"
-        "      myForm.submit();\n"
-        "      document.body.removeChild(myForm);\n"
-        "    }\n"
-        "  </script>\n"
-        "  <body>\n"
-        "    <iframe id=\"hidden_target\" name=\"post_target\" src=\"\""
-        " style=\"width:0;height:0;border:0px solid #fff;\"></iframe>\n";
+        "<html>\n" << PROCESS_ACTION <<
+        "  <body>\n" << HIDDEN_IFRAME;
 
     QHashIterator<QString,QStringList> contexts(m_actionDescriptions);
     while (contexts.hasNext())
@@ -258,6 +266,63 @@ void MythFEXML::GetActionList(HTTPRequest *pRequest)
         pRequest->m_response << "</context>";
     }
     pRequest->m_response << "</mythactions>";
+}
+
+#define BUTTON(action,desc) \
+  QString("      <input class=\"bigb\" type=\"button\" value=\"%1\" onClick=\"postaction('%2');\"></input>\r\n").arg(action).arg(desc)
+
+void MythFEXML::GetRemote(HTTPRequest *pRequest)
+{
+    InitActions();
+
+    pRequest->m_eResponseType = ResponseTypeHTML;
+    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
+
+    pRequest->m_response <<
+        "<html>\n" << PROCESS_ACTION <<
+        "  <style type=\"text/css\" title=\"Default\" media=\"all\">\r\n"
+        "  <!--\r\n"
+        "  body {\r\n"
+        "    margin: 0px;\r\n"
+        "    width : 310px;\r\n"
+        "  }\r\n"
+        "  -->\r\n"
+        "  .bigb {\r\n"
+        "    width : 100px;\r\n"
+        "    height: 50px;\r\n"
+        "    margin: 0px;\r\n"
+        "    text-align: center;\r\n"
+        "  }\r\n"
+        "  </style>\r\n"
+        "  <title>MythFrontend Control</title>\r\n" <<
+        "  <body>\n" << HIDDEN_IFRAME;
+
+    pRequest->m_response <<
+        "    <div>\r\n" <<
+        BUTTON("1","1") << BUTTON("2","2") << BUTTON("3","3") <<
+        "    </div>\r\n" <<
+        "    <div>\r\n" <<
+        BUTTON("4","4") << BUTTON("5","5") << BUTTON("6","6") <<
+        "    </div>\r\n" <<
+        "    <div>\r\n" <<
+        BUTTON("7","7") << BUTTON("8","8") << BUTTON("9","9") <<
+        "    </div>\r\n" <<
+        "    <div>\r\n" <<
+        BUTTON("MENU","MENU") << BUTTON("0","0") << BUTTON("INFO","INFO") <<
+        "    </div>\r\n" <<
+        "    <div>\r\n" <<
+        BUTTON("Back","ESCAPE") << BUTTON("^","UP") << BUTTON("MUTE","MUTE") <<
+        "    </div>\r\n" <<
+        "    <div>\r\n" <<
+        BUTTON("<","LEFT") << BUTTON("Enter","SELECT") << BUTTON(">","RIGHT") <<
+        "    </div>\r\n" <<
+        "    <div>\r\n" <<
+        BUTTON("<<","JUMPRWND") << BUTTON("v","DOWN") << BUTTON(">>","JUMPFFWD") <<
+        "    </div>\r\n";
+
+    pRequest->m_response <<
+        "  </body>\n"
+        "</html>\n";
 }
 
 void MythFEXML::InitActions(void)

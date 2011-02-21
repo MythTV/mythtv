@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
     if (a.argc() == 0)
     {
         printHelp();
-        return MESSAGE_EXIT_OK;
+        return GENERIC_EXIT_OK;
     }
 
     for (int argpos = 1; argpos < a.argc(); ++argpos)
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
         if (arg.startsWith("-h") || arg.startsWith("--help"))
         {
             printHelp();
-            return MESSAGE_EXIT_OK;
+            return GENERIC_EXIT_OK;
         }
     }
 
@@ -140,6 +140,6 @@ int main(int argc, char *argv[])
 
     sock->deleteLater();
    
-    return MESSAGE_EXIT_OK;
+    return GENERIC_EXIT_OK;
 }
 

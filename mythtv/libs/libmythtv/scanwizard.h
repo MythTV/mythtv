@@ -33,6 +33,7 @@
 #define SCANWIZARD_H
 
 // MythTV headers
+#include "mythtvexp.h"
 #include "mythdbcon.h"
 #include "mythwizard.h"
 #include "settings.h"
@@ -40,7 +41,7 @@
 class ScanWizardConfig;
 class ChannelScannerGUI;
 
-class MPUBLIC ScanWizard : public QObject, public ConfigurationWizard
+class MTV_PUBLIC ScanWizard : public QObject, public ConfigurationWizard
 {
     Q_OBJECT
 

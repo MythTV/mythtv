@@ -16,7 +16,7 @@
 # endif
 #endif
 
-#include "mythexp.h"  // MPUBLIC, et c.
+#include "mythbaseexp.h"  //  MBASE_PUBLIC , et c.
 
 /// This MAP is for the various VERBOSITY flags, used to select which
 /// messages we want printed to the console.
@@ -113,9 +113,9 @@ enum VerboseMask
 
 /// This global variable is set at startup with the flags
 /// of the verbose messages we want to see.
-extern MPUBLIC unsigned int print_verbose_messages;
+extern MBASE_PUBLIC unsigned int print_verbose_messages;
 #ifdef __cplusplus
-  extern MPUBLIC QMutex verbose_mutex;
+  extern MBASE_PUBLIC QMutex verbose_mutex;
 #endif
 
 // Helper for checking verbose flags outside of VERBOSE macro
@@ -131,34 +131,18 @@ extern MPUBLIC unsigned int print_verbose_messages;
 
 #ifndef MYTHCONTEXT_H_
     #ifdef  __cplusplus
-        #ifdef WIN32
-            #define VERBOSE(mask, ...)                        \
-                do {                                                 \
-                    if (VERBOSE_LEVEL_CHECK(mask))                   \
-                    {                                                \
-                        QDateTime dtmp = QDateTime::currentDateTime(); \
-                        QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
-                        verbose_mutex.lock(); \
-                        std::cout << dtime.toLocal8Bit().constData() << " " \
-                             << QString(__VA_ARGS__).toLocal8Bit().constData() << std::endl; \
-                        verbose_mutex.unlock(); \
-                    }                                                \
-               } while (0)
-
-        #else
-                #define VERBOSE(mask,args...)                        \
-                do {                                                 \
-                    if (VERBOSE_LEVEL_CHECK(mask))                   \
-                    {                                                \
-                        QDateTime dtmp = QDateTime::currentDateTime(); \
-                        QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
-                        verbose_mutex.lock(); \
-                        std::cout << dtime.toLocal8Bit().constData() << " " \
-                             << QString(args).toLocal8Bit().constData() << std::endl; \
-                        verbose_mutex.unlock(); \
-                    }                                                \
-               } while (0)
-        #endif
+        #define VERBOSE(mask, ...)                                                   \
+        do {                                                                         \
+            if (VERBOSE_LEVEL_CHECK(mask))                                           \
+            {                                                                        \
+                QDateTime dtmp = QDateTime::currentDateTime();                       \
+                QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz");            \
+                verbose_mutex.lock();                                                \
+                std::cout << dtime.toLocal8Bit().constData() << " "                  \
+                     << QString(__VA_ARGS__).toLocal8Bit().constData() << std::endl; \
+                verbose_mutex.unlock();                                              \
+            }                                                                        \
+        } while (0)
     #else
         #if HAVE_GETTIMEOFDAY
             #define VERBOSEDATE                              \
@@ -175,12 +159,12 @@ extern MPUBLIC unsigned int print_verbose_messages;
         #else
             #define VERBOSEDATE ;
         #endif
-        #define VERBOSE(mask,args...)                        \
+        #define VERBOSE(mask, ...)                           \
         do { \
             if (VERBOSE_LEVEL_CHECK(mask))                   \
             {                                                \
                 VERBOSEDATE                                  \
-                printf(args);                                \
+                printf(__VA_ARGS__);                         \
                 putchar('\n');                               \
             } \
         } while (0)
@@ -194,7 +178,7 @@ extern MPUBLIC unsigned int print_verbose_messages;
     // VERBOSE macro, since those threads may wish to use the VERBOSE macro
     // and this will cause a deadlock.
 
-    #define VERBOSE(mask,args...) \
+    #define VERBOSE(mask, ...) \
         do { \
             if (VERBOSE_LEVEL_CHECK(mask))                   \
             { \
@@ -202,7 +186,7 @@ extern MPUBLIC unsigned int print_verbose_messages;
                 QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
                 verbose_mutex.lock(); \
                 std::cout << dtime.toLocal8Bit().constData() << " " \
-                     << QString(args).toLocal8Bit().constData() << std::endl; \
+                     << QString(__VA_ARGS__).toLocal8Bit().constData() << std::endl; \
                 verbose_mutex.unlock(); \
             } \
         } while (0)
@@ -211,14 +195,14 @@ extern MPUBLIC unsigned int print_verbose_messages;
 
     // use a slower non-deadlockable version in release builds
 
-    #define VERBOSE(mask,args...) \
+    #define VERBOSE(mask, ...) \
         do { \
             if (VERBOSE_LEVEL_CHECK(mask))                   \
             { \
                 QDateTime dtmp = QDateTime::currentDateTime(); \
                 QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
                 QTextStream ssMsg(&dtime);                  \
-                ssMsg << " " << args;                                   \
+                ssMsg << " " << __VA_ARGS__;              \
                 verbose_mutex.lock();                      \
                 std::cout << ssMsg.string()->toLocal8Bit().constData() << \
                     std::endl; \
@@ -231,11 +215,11 @@ extern MPUBLIC unsigned int print_verbose_messages;
 
 #ifdef  __cplusplus
     /// Verbose helper function for ENO macro
-    extern MPUBLIC QString safe_eno_to_string(int errnum);
+    extern MBASE_PUBLIC QString safe_eno_to_string(int errnum);
 
-    extern MPUBLIC QString verboseString;
+    extern MBASE_PUBLIC QString verboseString;
 
-    MPUBLIC int parse_verbose_arg(QString arg);
+    MBASE_PUBLIC int parse_verbose_arg(QString arg);
 
     /// This can be appended to the VERBOSE args with either
     /// "+" (with QStrings) or "<<" (with c strings). It uses

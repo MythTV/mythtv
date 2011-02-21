@@ -8,7 +8,7 @@
  * \brief Create a group of widgets.
  * \ingroup MythUI_Widgets
  */
-class MPUBLIC MythUIGroup : public MythUIType
+class MUI_PUBLIC MythUIGroup : public MythUIType
 {
 
   public:

@@ -26,6 +26,7 @@
 #include "util/macro.h"
 #include "util/strutl.h"
 #include "util/logging.h"
+#include "util/mutex.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -38,6 +39,9 @@ typedef struct {
 } NV_TIMER;
 
 struct hdmv_vm_s {
+
+    BD_MUTEX       mutex;
+
     /* state */
     uint32_t       pc;            /* program counter */
     BD_REGISTERS  *regs;          /* player registers */
@@ -243,6 +247,8 @@ HDMV_VM *hdmv_vm_init(const char *disc_root, BD_REGISTERS *regs)
 
     p->regs         = regs;
 
+    bd_mutex_init(&p->mutex);
+
     return  p;
 }
 
@@ -257,6 +263,8 @@ static void _free_ig_object(HDMV_VM *p)
 void hdmv_vm_free(HDMV_VM **p)
 {
     if (p && *p) {
+
+        bd_mutex_destroy(&(*p)->mutex);
 
         mobj_free(&(*p)->movie_objects);
 
@@ -313,14 +321,17 @@ static int _resume_object(HDMV_VM *p)
 
 static int _jump_object(HDMV_VM *p, int object)
 {
-    if (object < 0 || object > p->movie_objects->num_objects) {
+    if (object < 0 || object >= p->movie_objects->num_objects) {
         DEBUG(DBG_HDMV|DBG_CRIT, "_jump_object(): invalid object %d\n", object);
         return -1;
     }
 
     DEBUG(DBG_HDMV, "_jump_object(): jumping to object %d\n", object);
 
-    hdmv_vm_select_object(p, object);
+    _free_ig_object(p);
+
+    p->pc     = 0;
+    p->object = &p->movie_objects->objects[object];
 
     return 0;
 }
@@ -882,23 +893,20 @@ static int _hdmv_step(HDMV_VM *p)
 
 int hdmv_vm_select_object(HDMV_VM *p, int object)
 {
-    if (object >= 0) {
-        if (object >= p->movie_objects->num_objects) {
-            DEBUG(DBG_HDMV|DBG_CRIT, "hdmv_vm_select_object(): invalid object reference (%d) !\n", object);
-            return -1;
-        }
+    int result;
+    bd_mutex_lock(&p->mutex);
 
-        _free_ig_object(p);
+    result = _jump_object(p, object);
 
-        p->pc     = 0;
-        p->object = &p->movie_objects->objects[object];
-    }
-
-    return 0;
+    bd_mutex_unlock(&p->mutex);
+    return result;
 }
 
 int hdmv_vm_set_object(HDMV_VM *p, int num_nav_cmds, void *nav_cmds)
 {
+    int result = -1;
+    bd_mutex_lock(&p->mutex);
+
     p->object = NULL;
 
     _free_ig_object(p);
@@ -909,48 +917,69 @@ int hdmv_vm_set_object(HDMV_VM *p, int num_nav_cmds, void *nav_cmds)
         ig_object->cmds     = calloc(num_nav_cmds, sizeof(MOBJ_CMD));
         memcpy(ig_object->cmds, nav_cmds, num_nav_cmds * sizeof(MOBJ_CMD));
 
-#if 0
-        /* ??? */
-        if (!p->ig_object && p->object) {
-            _suspend_object(p);
-        }
-#endif
         p->pc        = 0;
         p->ig_object = ig_object;
         p->object    = ig_object;
+
+        result = 0;
     }
 
-    return 0;
+    bd_mutex_unlock(&p->mutex);
+
+    return result;
 }
 
 int hdmv_vm_get_event(HDMV_VM *p, HDMV_EVENT *ev)
 {
-    return _get_event(p, ev);
+    int result;
+    bd_mutex_lock(&p->mutex);
+
+    result = _get_event(p, ev);
+
+    bd_mutex_unlock(&p->mutex);
+    return result;
 }
 
 int hdmv_vm_running(HDMV_VM *p)
 {
-    return !!p->object;
+    int result;
+    bd_mutex_lock(&p->mutex);
+
+    result = !!p->object;
+
+    bd_mutex_unlock(&p->mutex);
+    return result;
 }
 
 int hdmv_vm_resume(HDMV_VM *p)
 {
-    return _resume_object(p);
+    int result;
+    bd_mutex_lock(&p->mutex);
+
+    result = _resume_object(p);
+
+    bd_mutex_unlock(&p->mutex);
+    return result;
 }
 
 int hdmv_vm_suspend(HDMV_VM *p)
 {
+    int result = -1;
+    bd_mutex_lock(&p->mutex);
+
     if (p->object && !p->ig_object) {
         _suspend_object(p);
-        return 0;
+        result = 0;
     }
-    return -1;
+
+    bd_mutex_unlock(&p->mutex);
+    return result;
 }
 
 /* terminate program after MAX_LOOP instructions */
 #define MAX_LOOP 1000000
 
-int hdmv_vm_run(HDMV_VM *p, HDMV_EVENT *ev)
+static int _vm_run(HDMV_VM *p, HDMV_EVENT *ev)
 {
     int max_loop = MAX_LOOP;
 
@@ -998,4 +1027,13 @@ int hdmv_vm_run(HDMV_VM *p, HDMV_EVENT *ev)
     return -1;
 }
 
+int hdmv_vm_run(HDMV_VM *p, HDMV_EVENT *ev)
+{
+    int result;
+    bd_mutex_lock(&p->mutex);
 
+    result = _vm_run(p, ev);
+
+    bd_mutex_unlock(&p->mutex);
+    return result;
+}
