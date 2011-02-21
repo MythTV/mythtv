@@ -572,6 +572,11 @@ void MythMainWindow::PopScreenStack()
     d->stackList.pop_back();
 }
 
+int MythMainWindow::GetStackCount(void)
+{
+    return d->stackList.size();
+}
+
 MythScreenStack *MythMainWindow::GetMainStack(void)
 {
     return d->mainStack;
@@ -585,6 +590,14 @@ MythScreenStack *MythMainWindow::GetStack(const QString &stackname)
         if ((*it)->objectName() == stackname)
             return *it;
     }
+    return NULL;
+}
+
+MythScreenStack* MythMainWindow::GetStackAt(int pos)
+{
+    if (pos >= 0 && pos < d->stackList.size())
+        return d->stackList.at(pos);
+
     return NULL;
 }
 

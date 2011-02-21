@@ -42,8 +42,10 @@ class MUI_PUBLIC MythMainWindow : public QWidget
 
     void AddScreenStack(MythScreenStack *stack, bool main = false);
     void PopScreenStack();
+    int GetStackCount(void);
     MythScreenStack *GetMainStack();
     MythScreenStack *GetStack(const QString &stackname);
+    MythScreenStack *GetStackAt(int pos);
 
     bool TranslateKeyPress(const QString &context, QKeyEvent *e,
                            QStringList &actions, bool allowJumps = true)
