@@ -79,8 +79,7 @@ class VideoBuffers
 
     void SetPrebuffering(bool normal);
 
-    VideoFrame *GetNextFreeFrame(bool allow_unsafe,
-                                 BufferType enqueue_to = kVideoBuffer_limbo);
+    VideoFrame *GetNextFreeFrame(BufferType enqueue_to = kVideoBuffer_limbo);
     void ReleaseFrame(VideoFrame *frame);
     void DeLimboFrame(VideoFrame *frame);
     void StartDisplayingFrame(void);
@@ -132,8 +131,7 @@ class VideoBuffers
   private:
     frame_queue_t         *queue(BufferType type);
     const frame_queue_t   *queue(BufferType type) const;
-    VideoFrame            *GetNextFreeFrameInternal(
-        bool allow_unsafe, BufferType enqueue_to);
+    VideoFrame            *GetNextFreeFrameInternal(BufferType enqueue_to);
 
     frame_queue_t          available, used, limbo, pause, displayed, decode;
     vbuffer_map_t          vbufferMap; // videobuffers to buffer's index

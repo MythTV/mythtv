@@ -209,8 +209,7 @@ void VideoBuffers::SetPrebuffering(bool normal)
         needprebufferframes_normal : needprebufferframes_small;
 }
 
-VideoFrame *VideoBuffers::GetNextFreeFrameInternal(
-    bool allow_unsafe, BufferType enqueue_to)
+VideoFrame *VideoBuffers::GetNextFreeFrameInternal(BufferType enqueue_to)
 {
     QMutexLocker locker(&global_lock);
     VideoFrame *frame = available.dequeue();
@@ -232,16 +231,6 @@ VideoFrame *VideoBuffers::GetNextFreeFrameInternal(
         frame = available.dequeue();
     }
 
-    // only way this should be triggered if we're in unsafe mode
-    if (!frame && allow_unsafe)
-    {
-        VERBOSE(VB_PLAYBACK,
-                QString("GetNextFreeFrame() is getting a busy frame %1. "
-                        "      %2")
-                .arg(DebugString(frame, true)).arg(GetStatus()));
-        frame = used.dequeue();
-    }
-
     if (frame)
         safeEnqueue(enqueue_to, frame);
 
@@ -252,17 +241,13 @@ VideoFrame *VideoBuffers::GetNextFreeFrameInternal(
  * \fn VideoBuffers::GetNextFreeFrame(bool,bool,BufferType)
  *  Gets a frame from available buffers list.
  *
- * \param allow_unsafe allows busy buffers to be used if no available
- *                     buffers exist. Historic, should never be used.
  * \param enqueue_to   put new frame in some state other than limbo.
  */
-VideoFrame *VideoBuffers::GetNextFreeFrame(bool allow_unsafe,
-                                           BufferType enqueue_to)
+VideoFrame *VideoBuffers::GetNextFreeFrame(BufferType enqueue_to)
 {
     for (uint tries = 1; true; tries++)
     {
-        VideoFrame *frame = VideoBuffers::GetNextFreeFrameInternal(
-            allow_unsafe, enqueue_to);
+        VideoFrame *frame = VideoBuffers::GetNextFreeFrameInternal(enqueue_to);
 
         if (frame)
             return frame;

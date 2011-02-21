@@ -1335,11 +1335,6 @@ void VideoOutputXv::StopEmbedding(void)
     MoveResize();
 }
 
-VideoFrame *VideoOutputXv::GetNextFreeFrame(bool /*allow_unsafe*/)
-{
-    return vbuffers.GetNextFreeFrame(false);
-}
-
 /**
  * \fn VideoOutputXv::DiscardFrame(VideoFrame *frame)
  *  Frame is ready to be reused by decoder added to the

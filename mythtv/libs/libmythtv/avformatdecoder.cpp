@@ -2185,7 +2185,7 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
     }
     nd->directrendering = true;
 
-    VideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame(true);
+    VideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame();
 
     if (!frame)
         return -1;
@@ -2252,7 +2252,7 @@ void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
 int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
-    VideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame(false);
+    VideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame();
 
     pic->data[0] = frame->buf;
     pic->data[1] = frame->priv[0];
@@ -2882,7 +2882,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         AVPicture tmppicture;
 
         VideoFrame *xf = picframe;
-        picframe = m_parent->GetNextVideoFrame(false);
+        picframe = m_parent->GetNextVideoFrame();
 
         unsigned char *buf = picframe->buf;
         avpicture_fill(&tmppicture, buf, PIX_FMT_YUV420P, context->width,
@@ -4154,7 +4154,7 @@ bool AvFormatDecoder::GenerateDummyVideoFrame(void)
     if (!m_parent->getVideoOutput())
         return false;
 
-    VideoFrame *frame = m_parent->GetNextVideoFrame(true);
+    VideoFrame *frame = m_parent->GetNextVideoFrame();
     if (!frame)
         return false;
 
