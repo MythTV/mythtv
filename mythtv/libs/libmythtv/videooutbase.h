@@ -187,9 +187,8 @@ class VideoOutput
      * \param allow_unsafe if true then that are queued for display can be
      *       returned as frames to decode onto, this defaults to false.
      */
-    virtual VideoFrame *GetNextFreeFrame(bool with_lock = false,
-                                         bool allow_unsafe = false)
-        { return vbuffers.GetNextFreeFrame(with_lock, allow_unsafe); }
+    virtual VideoFrame *GetNextFreeFrame(bool allow_unsafe = false)
+        { return vbuffers.GetNextFreeFrame(allow_unsafe); }
     /// \brief Releases a frame from the ready for decoding queue onto the
     ///        queue of frames ready for display.
     virtual void ReleaseFrame(VideoFrame *frame) { vbuffers.ReleaseFrame(frame); }

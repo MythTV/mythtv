@@ -1090,7 +1090,7 @@ void MythPlayer::InitFilters(void)
  */
 VideoFrame *MythPlayer::GetNextVideoFrame(bool allow_unsafe)
 {
-    return videoOutput->GetNextFreeFrame(false, allow_unsafe);
+    return videoOutput->GetNextFreeFrame(allow_unsafe);
 }
 
 /** \fn MythPlayer::ReleaseNextVideoFrame(VideoFrame*, int64_t)

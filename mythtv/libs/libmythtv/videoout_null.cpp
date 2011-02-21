@@ -40,13 +40,11 @@ VideoOutputNull::~VideoOutputNull()
     VERBOSE(VB_PLAYBACK, "~VideoOutputNull()");
     QMutexLocker locker(&global_lock);
 
-    vbuffers.LockFrame(&av_pause_frame, "DeletePauseFrame");
     if (av_pause_frame.buf)
     {
         delete [] av_pause_frame.buf;
         memset(&av_pause_frame, 0, sizeof(av_pause_frame));
     }
-    vbuffers.UnlockFrame(&av_pause_frame, "DeletePauseFrame");
 
     vbuffers.DeleteBuffers();
 }
@@ -61,8 +59,6 @@ void VideoOutputNull::Zoom(ZoomDirection direction)
 
 void VideoOutputNull::CreatePauseFrame(void)
 {
-    vbuffers.LockFrame(&av_pause_frame, "CreatePauseFrame");
-
     if (av_pause_frame.buf)
     {
         delete [] av_pause_frame.buf;
@@ -78,8 +74,6 @@ void VideoOutputNull::CreatePauseFrame(void)
     av_pause_frame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
 
     clear(&av_pause_frame);
-
-    vbuffers.UnlockFrame(&av_pause_frame, "CreatePauseFrame");
 }
 
 bool VideoOutputNull::InputChanged(const QSize &input_size,
@@ -191,9 +185,7 @@ void VideoOutputNull::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     if (!buffer)
         buffer = vbuffers.GetScratchFrame();
 
-    vbuffers.LockFrame(buffer, "PrepareFrame");
     framesPlayed = buffer->frameNumber + 1;
-    vbuffers.UnlockFrame(buffer, "PrepareFrame");
 }
 
 void VideoOutputNull::Show(FrameScanType )
@@ -209,33 +201,20 @@ void VideoOutputNull::UpdatePauseFrame(void)
     QMutexLocker locker(&global_lock);
 
     // Try used frame first, then fall back to scratch frame.
-    vbuffers.LockFrame(&av_pause_frame, "UpdatePauseFrame -- pause");
-
     vbuffers.begin_lock(kVideoBuffer_used);
     VideoFrame *used_frame = NULL;
     if (vbuffers.size(kVideoBuffer_used) > 0)
-    {
         used_frame = vbuffers.head(kVideoBuffer_used);
-        if (!vbuffers.TryLockFrame(used_frame, "UpdatePauseFrame -- used"))
-            used_frame = NULL;
-    }
+
     if (used_frame)
-    {
         CopyFrame(&av_pause_frame, used_frame);
-        vbuffers.UnlockFrame(used_frame, "UpdatePauseFrame -- used");
-    }
     vbuffers.end_lock();
 
-    if (!used_frame &&
-        vbuffers.TryLockFrame(vbuffers.GetScratchFrame(),
-                              "UpdatePauseFrame -- scratch"))
+    if (!used_frame)
     {
         vbuffers.GetScratchFrame()->frameNumber = framesPlayed - 1;
         CopyFrame(&av_pause_frame, vbuffers.GetScratchFrame());
-        vbuffers.UnlockFrame(vbuffers.GetScratchFrame(),
-                             "UpdatePauseFrame -- scratch");
     }
-    vbuffers.UnlockFrame(&av_pause_frame, "UpdatePauseFrame - used");
 }
 
 void VideoOutputNull::ProcessFrame(VideoFrame *frame, OSD *osd,

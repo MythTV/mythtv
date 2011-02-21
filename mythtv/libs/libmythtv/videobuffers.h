@@ -65,8 +65,7 @@ class VideoBuffers
 
     void Init(uint numdecode, bool extra_for_pause,
               uint need_free, uint needprebuffer_normal,
-              uint needprebuffer_small, uint keepprebuffer,
-              bool enable_frame_locking = false);
+              uint needprebuffer_small, uint keepprebuffer);
 
     bool CreateBuffers(VideoFrameType type, int width, int height,
                        vector<unsigned char*> bufs,
@@ -80,7 +79,7 @@ class VideoBuffers
 
     void SetPrebuffering(bool normal);
 
-    VideoFrame *GetNextFreeFrame(bool with_lock, bool allow_unsafe,
+    VideoFrame *GetNextFreeFrame(bool allow_unsafe,
                                  BufferType enqueue_to = kVideoBuffer_limbo);
     void ReleaseFrame(VideoFrame *frame);
     void DeLimboFrame(VideoFrame *frame);
@@ -123,12 +122,6 @@ class VideoBuffers
     uint size() const { return numbuffers; }
     uint allocSize() const { return buffers.size(); }
 
-    void LockFrame(const VideoFrame *, const char* owner);
-    void LockFrames(vector<const VideoFrame*>&, const char* owner);
-    bool TryLockFrame(const VideoFrame *, const char* owner);
-    void UnlockFrame(const VideoFrame *, const char* owner);
-    void UnlockFrames(vector<const VideoFrame*>&, const char* owner);
-
     void Clear(uint i);
     void Clear(void);
 
@@ -140,7 +133,7 @@ class VideoBuffers
     frame_queue_t         *queue(BufferType type);
     const frame_queue_t   *queue(BufferType type) const;
     VideoFrame            *GetNextFreeFrameInternal(
-        bool with_lock, bool allow_unsafe, BufferType enqueue_to);
+        bool allow_unsafe, BufferType enqueue_to);
 
     frame_queue_t          available, used, limbo, pause, displayed, decode;
     vbuffer_map_t          vbufferMap; // videobuffers to buffer's index
@@ -160,10 +153,6 @@ class VideoBuffers
     uint                   vpos;
 
     mutable QMutex         global_lock;
-
-    bool                   use_frame_locks;
-    QMutex                 frame_lock;
-    frame_lock_map_t       frame_locks;
 };
 
 #endif // __VIDEOBUFFERS_H__

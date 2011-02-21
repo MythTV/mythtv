@@ -517,8 +517,6 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
  */
 void VideoOutputXv::CreatePauseFrame(VOSType subtype)
 {
-    vbuffers.LockFrame(&av_pause_frame, "CreatePauseFrame");
-
     if (av_pause_frame.buf)
     {
         delete [] av_pause_frame.buf;
@@ -534,8 +532,6 @@ void VideoOutputXv::CreatePauseFrame(VOSType subtype)
     av_pause_frame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
 
     clear(&av_pause_frame);
-
-    vbuffers.UnlockFrame(&av_pause_frame, "CreatePauseFrame");
 }
 
 /**
@@ -551,7 +547,7 @@ bool VideoOutputXv::InitVideoBuffers(bool use_xv, bool use_shm)
 
     // Create ffmpeg VideoFrames
     if (!done)
-        vbuffers.Init(31, true, 1, 12, 4, 2, false);
+        vbuffers.Init(31, true, 1, 12, 4, 2);
 
     // Fall back to XVideo if there is an xv_port
     if (!done && use_xv)
@@ -1341,7 +1337,7 @@ void VideoOutputXv::StopEmbedding(void)
 
 VideoFrame *VideoOutputXv::GetNextFreeFrame(bool /*allow_unsafe*/)
 {
-    return vbuffers.GetNextFreeFrame(false, false);
+    return vbuffers.GetNextFreeFrame(false);
 }
 
 /**
@@ -1390,10 +1386,8 @@ void VideoOutputXv::PrepareFrameXv(VideoFrame *frame)
     XvImage *image = NULL;
     {
         QMutexLocker locker(&global_lock);
-        vbuffers.LockFrame(frame, "PrepareFrameXv");
         framesPlayed = frame->frameNumber + 1;
         image        = (XvImage*) xv_buffers[frame->buf];
-        vbuffers.UnlockFrame(frame, "PrepareFrameXv");
     }
 
     if (vbuffers.GetScratchFrame() == frame)
@@ -1410,13 +1404,9 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
     if (!buffer)
         buffer = vbuffers.GetScratchFrame();
 
-    vbuffers.LockFrame(buffer, "PrepareFrameMem");
-
     framesPlayed = buffer->frameNumber + 1;
     int width = buffer->width;
     int height = buffer->height;
-
-    vbuffers.UnlockFrame(buffer, "PrepareFrameMem");
 
     // bad way to throttle frame display for non-Xv mode.
     // calculate fps we can do and skip enough frames so we don't exceed.
@@ -1463,7 +1453,6 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
     avpicture_fill(&image_out, (uint8_t *)sbuf, PIX_FMT_YUV420P,
                    out_width, out_height);
 
-    vbuffers.LockFrame(buffer, "PrepareFrameMem");
     if ((out_width  == width) &&
         (out_height == height))
     {
@@ -1481,7 +1470,6 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
         sws_scale(scontext, image_in.data, image_in.linesize, 0, height,
                   image_out.data, image_out.linesize);
     }
-    vbuffers.UnlockFrame(buffer, "PrepareFrameMem");
 
     avpicture_fill(&image_in, (uint8_t *)XJ_non_xv_image->data,
                    non_xv_av_format, out_width, out_height);
@@ -1606,14 +1594,9 @@ void VideoOutputXv::ShowXVideo(FrameScanType scan)
 {
     VideoFrame *frame = GetLastShownFrame();
 
-    vbuffers.LockFrame(frame, "ShowXVideo");
-
     XvImage *image = (XvImage*) xv_buffers[frame->buf];
     if (!image)
-    {
-        vbuffers.UnlockFrame(frame, "ShowXVideo");
         return;
-    }
 
     const QRect video_rect         = window.GetVideoRect();
     const QRect display_video_rect = (vsz_enabled && chroma_osd) ?
@@ -1632,10 +1615,8 @@ void VideoOutputXv::ShowXVideo(FrameScanType scan)
         dest_y += xv_dest_y_incr;
     }
 
-    vbuffers.UnlockFrame(frame, "ShowXVideo");
     {
         QMutexLocker locker(&global_lock);
-        vbuffers.LockFrame(frame, "ShowXVideo");
         int video_height = (3 != field) ?
             (video_rect.height()/2) : video_rect.height();
         disp->Lock();
@@ -1647,7 +1628,6 @@ void VideoOutputXv::ShowXVideo(FrameScanType scan)
                       display_video_rect.width(),
                       display_video_rect.height(), False);
         disp->Unlock();
-        vbuffers.UnlockFrame(frame, "ShowXVideo");
     }
 }
 
@@ -1793,33 +1773,22 @@ void VideoOutputXv::UpdatePauseFrame(void)
     if (VideoOutputSubType() <= XVideo)
     {
         // Try used frame first, then fall back to scratch frame.
-        vbuffers.LockFrame(&av_pause_frame, "UpdatePauseFrame -- pause");
-
         vbuffers.begin_lock(kVideoBuffer_used);
+
         VideoFrame *used_frame = NULL;
         if (vbuffers.size(kVideoBuffer_used) > 0)
-        {
             used_frame = vbuffers.head(kVideoBuffer_used);
-            if (!vbuffers.TryLockFrame(used_frame, "UpdatePauseFrame -- used"))
-                used_frame = NULL;
-        }
+
         if (used_frame)
-        {
             CopyFrame(&av_pause_frame, used_frame);
-            vbuffers.UnlockFrame(used_frame, "UpdatePauseFrame -- used");
-        }
+
         vbuffers.end_lock();
 
-        if (!used_frame &&
-            vbuffers.TryLockFrame(vbuffers.GetScratchFrame(),
-                                  "UpdatePauseFrame -- scratch"))
+        if (!used_frame)
         {
             vbuffers.GetScratchFrame()->frameNumber = framesPlayed - 1;
             CopyFrame(&av_pause_frame, vbuffers.GetScratchFrame());
-            vbuffers.UnlockFrame(vbuffers.GetScratchFrame(),
-                                 "UpdatePauseFrame -- scratch");
         }
-        vbuffers.UnlockFrame(&av_pause_frame, "UpdatePauseFrame - used");
     }
 }
 
@@ -1836,13 +1805,9 @@ void VideoOutputXv::ProcessFrameMem(VideoFrame *frame, OSD *osd,
         vector<const VideoFrame*> locks;
         locks.push_back(frame);
         locks.push_back(&av_pause_frame);
-        vbuffers.LockFrames(locks, "ProcessFrameMem -- pause");
         CopyFrame(frame, &av_pause_frame);
-        vbuffers.UnlockFrames(locks, "ProcessFrameMem -- pause");
         pauseframe = true;
     }
-
-    vbuffers.LockFrame(frame, "ProcessFrameMem");
 
     bool safepauseframe = pauseframe && !IsBobDeint();
     if (!pauseframe || safepauseframe)
@@ -1873,8 +1838,6 @@ void VideoOutputXv::ProcessFrameMem(VideoFrame *frame, OSD *osd,
     {
         m_deintFilter->ProcessFrame(frame, scan);
     }
-
-    vbuffers.UnlockFrame(frame, "ProcessFrameMem");
 }
 
 // this is documented in videooutbase.cpp
