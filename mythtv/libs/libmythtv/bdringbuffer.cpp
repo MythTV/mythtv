@@ -424,9 +424,6 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         VERBOSE(VB_IMPORTANT, LOC + QString("Using HDMV navigation mode."));
         m_isHDMVNavigation = true;
 
-        // Initialize the HDMV event queue
-        HandleBDEvents();
-
         // Register the Menu Overlay Callback
         bd_register_overlay_proc(bdnav, this, HandleOverlayCallback);
     }
