@@ -1,5 +1,6 @@
 include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
+include ( ../../../mythtv/version.pro )
 include ( ../../programs-libs.pro )
 
 QT += network xml sql

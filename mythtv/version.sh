@@ -36,12 +36,11 @@ case "${SOURCE_VERSION}" in
 esac
 
 cat > .vers.new <<EOF
-#include "mythbaseexp.h"
 #include "mythversion.h"
 
-const MBASE_PUBLIC char *myth_source_version = "${SOURCE_VERSION}";
-const MBASE_PUBLIC char *myth_source_path = "${BRANCH}";
-const MBASE_PUBLIC char *myth_binary_version = MYTH_BINARY_VERSION;
+const char *myth_source_version = "${SOURCE_VERSION}";
+const char *myth_source_path = "${BRANCH}";
+const char *myth_binary_version = MYTH_BINARY_VERSION;
 EOF
 
 # check if the version strings are changed and update version.pro if necessary

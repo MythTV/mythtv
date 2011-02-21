@@ -1,5 +1,6 @@
 include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
+include ( ../../../mythtv/version.pro )
 include ( ../../programs-libs.pro )
 
 INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libavutil

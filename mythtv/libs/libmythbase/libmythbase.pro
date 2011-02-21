@@ -1,5 +1,5 @@
 include ( ../../settings.pro )
-include ( ../../version.pro )
+#include ( ../../version.pro )
 
 TEMPLATE = lib
 TARGET = mythbase-$$LIBVERSION
