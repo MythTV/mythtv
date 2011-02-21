@@ -2850,7 +2850,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
         pts = pkt->dts;
         pts_selected = false;
     }
-    
+
     VERBOSE(VB_PLAYBACK+VB_TIMESTAMP+VB_EXTRA, LOC +
             QString("video packet timestamps reordered %1 pts %2 dts %3 (%4 active)")
             .arg(mpa_pic.reordered_opaque).arg(pkt->pts).arg(pkt->dts)
