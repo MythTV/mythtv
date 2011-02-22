@@ -232,7 +232,7 @@ SOURCES += mpeg/H264Parser.cpp
 
 # Channels, and the multiplexes that transmit them
 HEADERS += frequencies.h            frequencytables.h
-SOURCES += frequencies.c            frequencytables.cpp
+SOURCES += frequencies.cpp          frequencytables.cpp
 
 HEADERS += channelutil.h            dbchannelinfo.h
 SOURCES += channelutil.cpp          dbchannelinfo.cpp
