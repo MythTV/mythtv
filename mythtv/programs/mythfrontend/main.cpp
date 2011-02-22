@@ -3,7 +3,6 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <cerrno>
-#include <pthread.h>
 
 #include <iostream>
 using namespace std;
@@ -993,65 +992,6 @@ static int internal_media_init()
     return 0;
 }
 
-static void *run_priv_thread(void *data)
-{
-    VERBOSE(VB_PLAYBACK, QString("user: %1 effective user: %2 run_priv_thread")
-                            .arg(getuid()).arg(geteuid()));
-
-    (void)data;
-    while (true)
-    {
-        gCoreContext->waitPrivRequest();
-
-        for (MythPrivRequest req = gCoreContext->popPrivRequest();
-             true; req = gCoreContext->popPrivRequest())
-        {
-            bool done = false;
-            switch (req.getType())
-            {
-            case MythPrivRequest::MythRealtime:
-                if (gCoreContext->GetNumSetting("RealtimePriority", 1))
-                {
-                    pthread_t *target_thread = (pthread_t *)(req.getData());
-                    // Raise the given thread to realtime priority
-                    struct sched_param sp = {1};
-                    if (target_thread)
-                    {
-                        int status = pthread_setschedparam(
-                            *target_thread, SCHED_FIFO, &sp);
-                        if (status)
-                        {
-                            // perror("pthread_setschedparam");
-                            VERBOSE(VB_GENERAL, "Realtime priority would"
-                                                " require SUID as root.");
-                        }
-                        else
-                            VERBOSE(VB_GENERAL, "Using realtime priority.");
-                    }
-                    else
-                    {
-                        VERBOSE(VB_IMPORTANT, "Unexpected NULL thread ptr for"
-                                              " MythPrivRequest::MythRealtime");
-                    }
-                }
-                else
-                    VERBOSE(VB_GENERAL, "The realtime priority"
-                                        " setting is not enabled.");
-                break;
-            case MythPrivRequest::MythExit:
-                pthread_exit(NULL);
-                break;
-            case MythPrivRequest::PrivEnd:
-                done = true; // queue is empty
-                break;
-            }
-            if (done)
-                break; // from processing the current queue
-        }
-    }
-    return NULL; // will never happen
-}
-
 static void CleanupMyOldInUsePrograms(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1392,21 +1332,6 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_OK;
     }
 
-    // Create privileged thread, then drop privs
-    pthread_t priv_thread;
-    bool priv_thread_created = true;
-
-    VERBOSE(VB_PLAYBACK, QString("user: %1 effective user: %2 before "
-                            "privileged thread").arg(getuid()).arg(geteuid()));
-    int status = pthread_create(&priv_thread, NULL, run_priv_thread, NULL);
-    VERBOSE(VB_PLAYBACK, QString("user: %1 effective user: %2 after "
-                            "privileged thread").arg(getuid()).arg(geteuid()));
-    if (status)
-    {
-        VERBOSE(VB_IMPORTANT, QString("Warning: ") +
-                "Failed to create priveledged thread." + ENO);
-        priv_thread_created = false;
-    }
     setuid(getuid());
 
     VERBOSE(VB_IMPORTANT,
@@ -1537,12 +1462,6 @@ int main(int argc, char **argv)
 
     if (mon)
         mon->deleteLater();
-
-    if (priv_thread_created)
-    {
-        gCoreContext->addPrivRequest(MythPrivRequest::MythExit, NULL);
-        pthread_join(priv_thread, NULL);
-    }
 
     delete networkControl;
 

@@ -1,6 +1,5 @@
 #include <unistd.h>
 #include <iostream>
-#include <pthread.h>
 
 using namespace std;
 
@@ -25,57 +24,6 @@ using namespace std;
 #include "mythuihelper.h"
 #include "mythmainwindow.h"
 
-static void *run_priv_thread(void *data)
-{
-    (void)data;
-    while (true)
-    {
-        gCoreContext->waitPrivRequest();
-
-        for (MythPrivRequest req = gCoreContext->popPrivRequest();
-             true; req = gCoreContext->popPrivRequest())
-        {
-            bool done = false;
-
-            switch (req.getType())
-            {
-            case MythPrivRequest::MythRealtime:
-                {
-                    pthread_t *target_thread = (pthread_t *)(req.getData());
-                    // Raise the given thread to realtime priority
-                    struct sched_param sp = {1};
-                    if (target_thread)
-                    {
-                        int status = pthread_setschedparam(
-                            *target_thread, SCHED_FIFO, &sp);
-                        if (status)
-                        {
-                            // perror("pthread_setschedparam");
-                            VERBOSE(VB_GENERAL, "Realtime priority would require SUID as root.");
-                        }
-                        else
-                            VERBOSE(VB_GENERAL, "Using realtime priority.");
-                    }
-                    else
-                    {
-                        VERBOSE(VB_IMPORTANT, "Unexpected NULL thread ptr "
-                                "for MythPrivRequest::MythRealtime");
-                    }
-                }
-                break;
-            case MythPrivRequest::MythExit:
-                pthread_exit(NULL);
-                break;
-            case MythPrivRequest::PrivEnd:
-                done = true; // queue is empty
-                break;
-            }
-            if (done)
-                break; // from processing the queue
-        }
-    }
-    return NULL; // will never happen
-}
 
 int main(int argc, char *argv[])
 {
@@ -165,17 +113,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    // Create priveledged thread, then drop privs
-    pthread_t priv_thread;
-    bool priv_thread_created = true;
-
-    int status = pthread_create(&priv_thread, NULL, run_priv_thread, NULL);
-    if (status)
-    {
-        VERBOSE(VB_IMPORTANT, QString("Warning: ") +
-                "Failed to create priveledged thread." + ENO);
-        priv_thread_created = false;
-    }
     setuid(getuid());
 
     QString themename = gCoreContext->GetSetting("Theme");
@@ -229,12 +166,6 @@ int main(int argc, char *argv[])
     {
         ProgramInfo pginfo(filename);
         TV::StartTV(&pginfo, kStartTVNoFlags);
-    }
-
-    if (priv_thread_created)
-    {
-        gCoreContext->addPrivRequest(MythPrivRequest::MythExit, NULL);
-        pthread_join(priv_thread, NULL);
     }
     delete gContext;
 

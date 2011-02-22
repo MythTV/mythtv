@@ -79,11 +79,6 @@ class MythCoreContextPrivate : public QObject
 
     MythLocale *m_locale;
     QString language;
-
-    QMutex                 m_privMutex;
-    queue<MythPrivRequest> m_privRequests;
-    QWaitCondition         m_privQueued;
-
 };
 
 MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
@@ -1067,32 +1062,6 @@ void MythCoreContext::LogEntry(const QString &module, int priority,
             VERBOSE(VB_IMPORTANT, tmp.constData());
         }
     }
-}
-
-void MythCoreContext::addPrivRequest(MythPrivRequest::Type t, void *data)
-{
-    QMutexLocker lockit(&d->m_privMutex);
-    d->m_privRequests.push(MythPrivRequest(t, data));
-    d->m_privQueued.wakeAll();
-}
-
-void MythCoreContext::waitPrivRequest() const
-{
-    d->m_privMutex.lock();
-    while (d->m_privRequests.empty())
-        d->m_privQueued.wait(&d->m_privMutex);
-    d->m_privMutex.unlock();
-}
-
-MythPrivRequest MythCoreContext::popPrivRequest()
-{
-    QMutexLocker lockit(&d->m_privMutex);
-    MythPrivRequest ret_val(MythPrivRequest::PrivEnd, NULL);
-    if (!d->m_privRequests.empty()) {
-        ret_val = d->m_privRequests.front();
-        d->m_privRequests.pop();
-    }
-    return ret_val;
 }
 
 void MythCoreContext::dispatch(const MythEvent &event)
