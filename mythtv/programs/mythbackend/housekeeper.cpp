@@ -31,8 +31,6 @@ using namespace std;
 #include "mythdownloadmanager.h"
 #include "mythversion.h"
 
-static bool HouseKeeper_filldb_running = false;
-
 HouseKeeper::HouseKeeper(bool runthread, bool master, Scheduler *lsched)
                         : threadrunning(runthread), filldbRunning(false),
                           isMaster(master),         sched(lsched)
@@ -41,13 +39,25 @@ HouseKeeper::HouseKeeper(bool runthread, bool master, Scheduler *lsched)
 
     if (runthread)
     {
-        pthread_t hkthread;
-        pthread_create(&hkthread, NULL, doHouseKeepingThread, this);
+        HouseKeepingThread.SetParent(this);
+        HouseKeepingThread.start();
     }
 }
 
 HouseKeeper::~HouseKeeper()
 {
+    if (HouseKeepingThread.isRunning())
+    {
+        HouseKeepingThread.terminate();
+        HouseKeepingThread.wait();
+    }
+
+    if (FillDBThread && FillDBThread->isRunning())
+    {
+        FillDBThread->terminate();
+        FillDBThread->wait();
+        delete FillDBThread;
+    }
 }
 
 bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
@@ -195,7 +205,7 @@ void HouseKeeper::RunHouseKeeping(void)
             // Run mythfilldatabase to grab the TV listings
             if (gCoreContext->GetNumSetting("MythFillEnabled", 1))
             {
-                if (HouseKeeper_filldb_running)
+                if (FillDBThread && FillDBThread->isRunning())
                 {
                     VERBOSE(VB_GENERAL, "mythfilldatabase still running, "
                                         "skipping checks.");
@@ -327,11 +337,13 @@ void HouseKeeper::flushLogs()
     }
 }
 
-void *HouseKeeper::runMFDThread(void *param)
+void MFDThread::run(void)
 {
-    HouseKeeper *keep = static_cast<HouseKeeper *>(param);
-    keep->RunMFD();
-    return NULL;
+    if (!m_parent)
+        return;
+
+    m_parent->RunMFD();
+    this->deleteLater();
 }
 
 void HouseKeeper::RunMFD(void)
@@ -381,20 +393,19 @@ void HouseKeeper::RunMFD(void)
         VERBOSE(VB_IMPORTANT, QString("MythFillDatabase command '%1' failed")
                                         .arg(command));
     }
-
-    HouseKeeper_filldb_running = false;
 }
 
 void HouseKeeper::runFillDatabase()
 {
-    if (HouseKeeper_filldb_running)
+    if (FillDBThread && FillDBThread->isRunning())
         return;
 
-    HouseKeeper_filldb_running = true;
+    if (FillDBThread)
+        delete FillDBThread;
 
-    pthread_t housekeep_thread;
-    pthread_create(&housekeep_thread, NULL, runMFDThread, this);
-    pthread_detach(housekeep_thread);
+    FillDBThread = new MFDThread;
+    FillDBThread->SetParent(this);
+    FillDBThread->start();
 }
 
 void HouseKeeper::CleanupMyOldRecordings(void)
@@ -690,12 +701,12 @@ void HouseKeeper::RunStartupTasks(void)
 }
 
 
-void *HouseKeeper::doHouseKeepingThread(void *param)
+void HKThread::run(void)
 {
-    HouseKeeper *hkeeper = static_cast<HouseKeeper*>(param);
-    hkeeper->RunHouseKeeping();
+    if (!m_parent)
+        return;
 
-    return NULL;
+    m_parent->RunHouseKeeping();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

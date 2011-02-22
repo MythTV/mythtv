@@ -2,20 +2,45 @@
 #define HOUSEKEEPER_H_
 
 #include <QDateTime>
+#include <QThread>
+#include <QPointer>
 
 class Scheduler;
 class QString;
+class HouseKeeper;
+
+class HKThread : public QThread
+{
+    Q_OBJECT
+  public:
+    HKThread() : m_parent(NULL) {}
+    void SetParent(HouseKeeper *parent) { m_parent = parent; }
+    void run(void);
+  private:
+    HouseKeeper *m_parent;
+};
+
+class MFDThread : public QThread
+{
+    Q_OBJECT
+  public:
+    MFDThread() : m_parent(NULL) {}
+    void SetParent(HouseKeeper *parent) { m_parent = parent; }
+    void run(void);
+  private:
+    HouseKeeper *m_parent;
+};
+
 class HouseKeeper
 {
+    friend class HKThread;
+    friend class MFDThread;
   public:
     HouseKeeper(bool runthread, bool master, Scheduler *lsched = NULL);
    ~HouseKeeper();
 
-    
   protected:
     void RunHouseKeeping(void);
-    static void *doHouseKeepingThread(void *param);
-
     void RunMFD(void);
     static void *runMFDThread(void *param);
 
@@ -40,6 +65,8 @@ class HouseKeeper
     bool isMaster;
 
     Scheduler *sched;
+    HKThread  HouseKeepingThread;
+    QPointer<MFDThread> FillDBThread;
 };
 
 #endif

@@ -57,7 +57,6 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     schedulingEnabled(true),
     m_tvList(tvList),
     expirer(NULL),
-    threadrunning(false),
     m_mainServer(NULL),
     resetIdleTime(false),
     m_isShuttingDown(false),
@@ -87,19 +86,16 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
         return;
     }
 
-    threadrunning = runthread;
-
     fsInfoCacheFillTime = QDateTime::currentDateTime().addSecs(-1000);
 
     if (runthread)
     {
-        int err = pthread_create(&schedThread, NULL, SchedulerThread, this);
-        if (err != 0)
+        schedThread.SetParent(this);
+        schedThread.start(QThread::LowPriority);
+
+        if (!schedThread.isRunning())
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Failed to start scheduler thread: error %1")
-                    .arg(err));
-            threadrunning = false;
+            VERBOSE(VB_IMPORTANT, QString("Failed to start scheduler thread"));
         }
 
         WakeUpSlaves();
@@ -120,10 +116,10 @@ Scheduler::~Scheduler()
         worklist.pop_back();
     }
 
-    if (threadrunning)
+    if (schedThread.isRunning())
     {
-        pthread_cancel(schedThread);
-        pthread_join(schedThread, NULL);
+        schedThread.terminate();
+        schedThread.wait();
     }
 }
 
@@ -2675,15 +2671,12 @@ void Scheduler::WakeUpSlaves(void)
     }
 }
 
-void *Scheduler::SchedulerThread(void *param)
+void ScheduleThread::run(void)
 {
-    // Lower scheduling priority, to avoid problems with recordings.
-    if (setpriority(PRIO_PROCESS, 0, 9))
-        VERBOSE(VB_IMPORTANT, LOC + "Setting priority failed." + ENO);
-    Scheduler *sched = static_cast<Scheduler*>(param);
-    sched->RunScheduler();
+    if (!m_parent)
+        return;
 
-    return NULL;
+    m_parent->RunScheduler();
 }
 
 void Scheduler::UpdateManuals(int recordid)
@@ -3533,7 +3526,8 @@ void Scheduler::AddNewRecords(void)
 
         RecStatusType newrecstatus = p->GetRecordingStatus();
         // Check for rsOffLine
-        if ((threadrunning || specsched) && !cardMap.contains(p->GetCardID()))
+        if ((schedThread.isRunning() || specsched) && 
+            !cardMap.contains(p->GetCardID()))
             newrecstatus = rsOffLine;
 
         // Check for rsTooManyRecordings
