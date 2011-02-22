@@ -32,14 +32,13 @@
 #   error no mutex support found
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #if defined(_WIN32)
 
 #include <errno.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 typedef CRITICAL_SECTION BD_MUTEX;
 
