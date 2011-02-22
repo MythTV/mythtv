@@ -31,7 +31,7 @@ class META_PUBLIC VideoMetadata
     typedef std::vector<cast_entry> cast_list;
 
   public:
-    class SortKey
+    class META_PUBLIC SortKey
     {
       public:
         SortKey();
