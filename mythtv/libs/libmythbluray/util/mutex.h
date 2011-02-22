@@ -37,6 +37,10 @@
 
 #include <errno.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef CRITICAL_SECTION BD_MUTEX;
 
 #define bd_mutex_lock(m) \
@@ -135,5 +139,8 @@ static int bd_mutex_unlock(BD_MUTEX *p)
 
 #endif // HAVE_PTHREAD_H
 
+#ifdef __cplusplus
+};
+#endif
 
 #endif // LIBBLURAY_MUTEX_H_
