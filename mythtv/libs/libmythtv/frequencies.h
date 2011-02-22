@@ -108,6 +108,6 @@ typedef struct CHANLISTS {
 
 /* --------------------------------------------------------------------- */
 
-MTV_PUBLIC extern struct CHANLISTS   chanlists[];
+extern MTV_PUBLIC struct CHANLISTS   chanlists[];
 
 #endif
