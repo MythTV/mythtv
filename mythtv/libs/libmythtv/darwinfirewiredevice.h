@@ -3,12 +3,27 @@
 
 #include "firewiredevice.h"
 
+#include <QThread>
+
 class DFDPriv;
 class DarwinAVCInfo;
 
+class DarwinFirewireDevice;
+
+class DarwinControllerThread : public QThread
+{
+    Q_OBJECT
+  public:
+    ControllerThread() : m_parent(NULL) {}
+    void SetParent(DarwinFirewireDevice *parent) { m_parent = parent; }
+    void run(void);
+  private:
+    DarwinFirewireDevice *m_parent;
+};
+
 class DarwinFirewireDevice : public FirewireDevice
 {
-    friend void *dfd_controller_thunk(void *param);
+    friend class DarwinControllerThread;
     friend void dfd_update_device_list_item(DarwinFirewireDevice *dev,
                                        uint64_t guid, void *item);
     friend int dfd_no_data_notification(void *cb_data);
