@@ -135,7 +135,7 @@ class META_PUBLIC VideoCastMap : public MultiValue
 class META_PUBLIC FileAssociations
 {
   public:
-    struct file_association
+    struct META_PUBLIC file_association
     {
         unsigned int id;
         QString extension;
