@@ -178,7 +178,7 @@ static int _is_button_enabled(GRAPHICS_CONTROLLER *gc, BD_IG_PAGE *page, unsigne
     return 0;
 }
 
-static int _find_selected_button_id(GRAPHICS_CONTROLLER *gc)
+static uint16_t _find_selected_button_id(GRAPHICS_CONTROLLER *gc)
 {
     /* executed when playback condition changes (ex. new page, popup-on, ...) */
     PG_DISPLAY_SET *s         = gc->igs;
@@ -252,7 +252,7 @@ static void _reset_enabled_button(GRAPHICS_CONTROLLER *gc)
     }
 }
 
-static void _gc_clear_osd(GRAPHICS_CONTROLLER *gc, int plane)
+static void _clear_osd(GRAPHICS_CONTROLLER *gc, int plane)
 {
     if (gc->overlay_proc) {
         /* clear plane */
@@ -280,14 +280,17 @@ static void _gc_clear_osd(GRAPHICS_CONTROLLER *gc, int plane)
 static void _select_page(GRAPHICS_CONTROLLER *gc, uint16_t page_id)
 {
     bd_psr_write(gc->regs, PSR_MENU_PAGE_ID, page_id);
-    _gc_clear_osd(gc, 1);
+    _clear_osd(gc, 1);
     _reset_enabled_button(gc);
+
+    uint16_t button_id = _find_selected_button_id(gc);
+    bd_psr_write(gc->regs, PSR_SELECTED_BUTTON_ID, button_id);
 }
 
 static void _gc_reset(GRAPHICS_CONTROLLER *gc)
 {
-    _gc_clear_osd(gc, 0);
-    _gc_clear_osd(gc, 1);
+    _clear_osd(gc, 0);
+    _clear_osd(gc, 1);
 
     gc->popup_visible = 0;
 
@@ -431,7 +434,7 @@ static void _render_page(GRAPHICS_CONTROLLER *gc,
     if (s->ics->interactive_composition.ui_model == IG_UI_MODEL_POPUP && !gc->popup_visible) {
         TRACE("_render_page(): popup menu not visible\n");
 
-        _gc_clear_osd(gc, 1);
+        _clear_osd(gc, 1);
 
         return;
     }
@@ -452,10 +455,6 @@ static void _render_page(GRAPHICS_CONTROLLER *gc,
 
     TRACE("rendering page #%d using palette #%d. page has %d bogs\n",
           page->id, page->palette_id_ref, page->num_bogs);
-
-    if (selected_button_id == 0xffff) {
-        selected_button_id = page->default_selected_button_id_ref;
-    }
 
     for (ii = 0; ii < page->num_bogs; ii++) {
         BD_IG_BOG    *bog      = &page->bog[ii];
@@ -659,15 +658,10 @@ static void _set_button_page(GRAPHICS_CONTROLLER *gc, uint32_t param, GC_NAV_CMD
         }
     }
 
-    if (!button) {
-        button_id = 0xffff; // run 5.9.7.4 and 5.9.8.3
-    } else {
+    if (button) {
         gc->enabled_button[bog_idx] = button_id;
+        bd_psr_write(gc->regs, PSR_SELECTED_BUTTON_ID, button_id);
     }
-
-    bd_psr_write(gc->regs, PSR_SELECTED_BUTTON_ID, button_id);
-
-    gc->ig_drawn = 0;
 
     _render_page(gc, 0xffff, cmds);
 }
