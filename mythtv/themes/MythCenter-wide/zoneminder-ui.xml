@@ -652,23 +652,23 @@
 
     <window name="zmplayer">
 
-        <font name="label" from="basesmall">
+        <fontdef name="label" from="basesmall">
             <color>#ffff00</color>
             <size>16</size>
             <weight>bold</weight>
-        </font>
+        </fontdef>
 
-        <font name="data" from="basesmall">
+        <fontdef name="data" from="basesmall">
             <color>#ffffff</color>
             <size>14</size>
             <weight>bold</weight>
-        </font>
+        </fontdef>
 
-        <font name="buttons" from="basesmall">
+        <fontdef name="buttons" from="basesmall">
             <color>#ffffff</color>
             <size>12</size>
             <weight>bold</weight>
-        </font>
+        </fontdef>
 
         <textarea name="pagetitle" from="basetextarea">
             <area>30,10,570,40</area>

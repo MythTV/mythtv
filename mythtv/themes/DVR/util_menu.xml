@@ -8,6 +8,13 @@
     </button>
 
     <button>
+        <type>NET_VIDEO</type>
+        <text>Internet Video</text>
+        <action>MENU netvisionmenu.xml</action>
+        <depends>mythnetvision</depends>
+    </button>
+
+    <button>
         <type>MUSIC</type>
         <text>Music</text>
         <action>PLUGIN mythmusic</action>

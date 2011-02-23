@@ -3,7 +3,7 @@
  * \author Paul Harrison <mythtv@dsl.pipex.com>
  * \brief Provide a web browser widget.
  *
- * This requires qt4.4.0 or later to function properly.
+ * This requires qt4.5.0 or later to function properly.
  *
  */
 
@@ -458,11 +458,7 @@ void MythUIWebBrowser::SetZoom(float zoom)
         return;
 
     m_zoom = zoom;
-#if QT_VERSION >= 0x040500
     m_browser->setZoomFactor(m_zoom);
-#else
-    m_browser->setTextSizeMultiplier(m_zoom);
-#endif
     UpdateBuffer();
 }
 

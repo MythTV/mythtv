@@ -75,8 +75,6 @@ extern void ff_read_frame_flush(AVFormatContext *s);
 
 #define MAX_AC3_FRAME_SIZE 6144
 
-static const bool force_reordered_opaque = false;
-
 static const float eps = 1E-5;
 
 static const int max_video_queue_size = 180;
@@ -263,6 +261,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       last_dts_for_fault_detection(0),
       pts_detected(false),
       reordered_pts_detected(false),
+      pts_selected(true),
       using_null_videoout(use_null_videoout),
       video_codec_id(kCodec_NONE),
       no_hardware_decoders(no_hardware_decode),
@@ -679,6 +678,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         last_pts_for_fault_detection = 0;
         last_dts_for_fault_detection = 0;
         pts_detected = false;
+        reordered_pts_detected = false;
 
         ff_read_frame_flush(ic);
 
@@ -739,6 +739,18 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         if (decoded_video_frame)
             m_parent->DiscardVideoFrame(decoded_video_frame);
     }
+}
+
+void AvFormatDecoder::SetEof(bool eof)
+{
+    if (!eof && ic && ic->pb)
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+            QString("Resetting byte context eof (livetv %1 was eof %2)")
+            .arg(livetv).arg(ic->pb->eof_reached));
+        ic->pb->eof_reached = 0;
+    }
+    DecoderBase::SetEof(eof);
 }
 
 void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset)
@@ -1616,7 +1628,7 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
                     VERBOSE(VB_PLAYBACK, LOC + QString(
                                 "Teletext stream #%1 (%2) is in the %3 language"
                                 " on page %4 %5.")
-                            .arg(k).arg((type == 1) ? "Caption" : "Menu")
+                            .arg(k).arg((type == 2) ? "Caption" : "Menu")
                             .arg(iso639_key_toName(language))
                             .arg(magazine).arg(pagenum));
                 }
@@ -2791,6 +2803,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                 last_pts_for_fault_detection = 0;
                 last_dts_for_fault_detection = 0;
                 pts_detected = false;
+                reordered_pts_detected = false;
 
                 // fps debugging info
                 float avFPS = normalized_fps(stream, context);
@@ -2897,6 +2910,7 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             last_pts_for_fault_detection = 0;
             last_dts_for_fault_detection = 0;
             pts_detected = false;
+            reordered_pts_detected = false;
 
             // fps debugging info
             float avFPS = normalized_fps(stream, context);
@@ -2978,9 +2992,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     avcodeclock->lock();
     if (private_dec)
     {
-        if (QString(ic->iformat->name).contains("avi"))
-            pkt->pts = pkt->dts;
-        if (!pts_detected)
+        if (QString(ic->iformat->name).contains("avi") || !pts_detected)
             pkt->pts = pkt->dts;
         // TODO disallow private decoders for dvd playback
         // N.B. we do not reparse the frame as it breaks playback for
@@ -3090,31 +3102,34 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     {
         if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
             pts = pkt->dts;
+        pts_selected = false;
     }
     else if (private_dec && private_dec->NeedsReorderedPTS() &&
              mpa_pic.reordered_opaque != (int64_t)AV_NOPTS_VALUE)
     {
         pts = mpa_pic.reordered_opaque;
+        pts_selected = true;
     }
-    else if ((force_reordered_opaque || faulty_pts <= faulty_dts ||
-             pkt->dts == (int64_t)AV_NOPTS_VALUE) &&
-             mpa_pic.reordered_opaque != (int64_t)AV_NOPTS_VALUE)
+    else if (faulty_pts <= faulty_dts && reordered_pts_detected)
     {
-        pts = mpa_pic.reordered_opaque;
+        if (mpa_pic.reordered_opaque != (int64_t)AV_NOPTS_VALUE)
+            pts = mpa_pic.reordered_opaque;
+        pts_selected = true;
     }
-    else if ((faulty_dts < faulty_pts || !reordered_pts_detected) &&
-             pkt->dts != (int64_t)AV_NOPTS_VALUE)
+    else if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
     {
         pts = pkt->dts;
+        pts_selected = false;
     }
-    long long temppts = (long long)(av_q2d(curstream->time_base) * pts * 1000);
+    long long vpts = (long long)(av_q2d(curstream->time_base) * pts * 1000);
 
+    long long temppts = vpts;
     // Validate the video pts against the last pts. If it's
     // a little bit smaller, equal or missing, compute
     // it from the last. Otherwise assume a wraparound.
     if (!ringBuffer->isDVD() &&
         temppts <= lastvpts &&
-        (temppts + 10000 > lastvpts || temppts <= 0))
+        (temppts + (1000 / fps) > lastvpts || temppts <= 0))
     {
         temppts = lastvpts;
         temppts += (long long)(1000 / fps);
@@ -3123,8 +3138,11 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     }
 
     VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, LOC +
-            QString("video timecode %1 %2 %3 %4 %5").arg(mpa_pic.reordered_opaque)
-                    .arg(pkt->pts).arg(pkt->dts).arg(temppts).arg(lastvpts));
+            QString("video timecode %1 %2 %3 %4 %5 %6 (%7 active)%8")
+                    .arg(mpa_pic.reordered_opaque).arg(pkt->pts).arg(pkt->dts)
+                    .arg(vpts).arg(temppts).arg(lastvpts)
+                    .arg((pts_selected) ? "reordered" : "dts")
+                    .arg((vpts != temppts) ? " fixup" : ""));
 
 /* XXX: Broken.
     if (mpa_pic.qscale_table != NULL && mpa_pic.qstride > 0 &&
@@ -3240,7 +3258,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
     // it from the last. Otherwise assume a wraparound.
     if (!ringBuffer->isDVD() &&
         temppts <= lastvpts &&
-        (temppts + 10000 > lastvpts || temppts <= 0))
+        (temppts + (1000 / fps) > lastvpts || temppts <= 0))
     {
         temppts = lastvpts;
         temppts += (long long)(1000 / fps);
@@ -3249,8 +3267,9 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
     }
 
     VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, LOC +
-            QString("ProcessVideoFrame timecode %1 %2 %3")
-            .arg(mpa_pic->reordered_opaque).arg(temppts).arg(lastvpts));
+            QString("ProcessVideoFrame timecode %1 %2 %3%4")
+            .arg(mpa_pic->reordered_opaque).arg(pts).arg(temppts).arg(lastvpts)
+            .arg((pts != temppts) ? " fixup" : ""));
 
     picframe->interlaced_frame = mpa_pic->interlaced_frame;
     picframe->top_field_first = mpa_pic->top_field_first;
@@ -4305,8 +4324,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                 if (retval == -EAGAIN)
                     continue;
 
-                ateof = true;
-                m_parent->SetEof();
+                SetEof(true);
                 delete pkt;
                 return false;
             }

@@ -36,8 +36,21 @@ class System( DBCache ):
             if path is None:
                 raise MythError('Invalid input to System()')
             self.path = path
-        if not os.access(self.path, os.F_OK):
-            raise MythFileError('Defined grabber path does not exist.')
+
+        cmd = self.path.split()[0]
+        if self.path.startswith('/'):
+            # test full given path
+            if not os.access(cmd, os.F_OK):
+                raise MythFileError('Defined executable path does not exist.')
+        else:
+            # search command from PATH
+            for folder in os.environ['PATH'].split(':'):
+                if os.access(os.path.join(folder,cmd), os.F_OK):
+                    self.path = os.path.join(folder,self.path)
+                    break
+            else:
+                raise MythFileError('Defined executable path does not exist.')
+
         self.returncode = 0
         self.stderr = ''
 

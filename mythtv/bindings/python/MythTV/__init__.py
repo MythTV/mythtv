@@ -53,8 +53,10 @@ from methodheap import *
 from sys import version_info
 if version_info >= (2, 6): # 2.6 or newer
     exec(import26)
-else:
+elif version_info >= (2, 5):
     exec(importall)
+else:
+    raise Exception("The MythTV Python bindings will only operate against Python 2.5 or later.")
 
 __version__ = OWN_VERSION
 static.mysqldb = MySQLdb.version_info

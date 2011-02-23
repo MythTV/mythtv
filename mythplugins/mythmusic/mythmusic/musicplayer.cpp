@@ -990,8 +990,9 @@ void MusicPlayer::decoderHandlerReady(void)
     VERBOSE(VB_PLAYBACK, QString ("decoder handler is ready, decoding %1").
             arg(getDecoder()->getFilename()));
 
-    if (getDecoder()->getFilename().contains("cda") == 1)
-        dynamic_cast<CdDecoder*>(getDecoder())->setDevice(m_CDdevice);
+    CdDecoder *cddecoder = dynamic_cast<CdDecoder*>(getDecoder());
+    if (cddecoder)
+        cddecoder->setDevice(m_CDdevice);
 
     getDecoder()->setOutput(m_output);
     //getDecoder()-> setBlockSize(2 * 1024);
