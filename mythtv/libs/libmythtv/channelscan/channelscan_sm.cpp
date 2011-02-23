@@ -28,7 +28,6 @@
  */
 
 // C includes
-#include <pthread.h>
 #include <unistd.h>
 
 // C++ includes
@@ -164,8 +163,7 @@ ChannelScanSM::ChannelScanSM(
       // Misc
       channelsFound(999),
       currentInfo(NULL),
-      analogSignalHandler(new AnalogSignalHandler(this)),
-      scanner_thread_running(false)
+      analogSignalHandler(new AnalogSignalHandler(this))
 {
     inputname.detach();
 
@@ -1401,15 +1399,16 @@ V4LChannel *ChannelScanSM::GetV4LChannel(void)
 #endif
 }
 
-/** \fn ChannelScanSM::SpawnScanner(void*)
- *  \brief Thunk that allows scanner_thread pthread to
+/** \fn ScannerThread::run(void)
+ *  \brief Thunk that allows scannerThread thread to
  *         call ChannelScanSM::RunScanner().
  */
-void *ChannelScanSM::SpawnScanner(void *param)
+void ScannerThread::run(void)
 {
-    ChannelScanSM *scanner = (ChannelScanSM *)param;
-    scanner->RunScanner();
-    return NULL;
+    if (!m_parent)
+        return;
+
+    m_parent->RunScanner();
 }
 
 /** \fn ChannelScanSM::StartScanner(void)
@@ -1417,7 +1416,8 @@ void *ChannelScanSM::SpawnScanner(void *param)
  */
 void ChannelScanSM::StartScanner(void)
 {
-    pthread_create(&scanner_thread, NULL, SpawnScanner, this);
+    scannerThread.SetParent(this);
+    scannerThread.start();
 }
 
 /** \fn ChannelScanSM::RunScanner(void)
@@ -1427,7 +1427,6 @@ void ChannelScanSM::RunScanner(void)
 {
     VERBOSE(VB_CHANSCAN, LOC + "ChannelScanSM::RunScanner -- begin");
 
-    scanner_thread_running = true;
     threadExit = false;
 
     while (!threadExit)
@@ -1437,7 +1436,6 @@ void ChannelScanSM::RunScanner(void)
 
         usleep(250);
     }
-    scanner_thread_running = false;
 
     VERBOSE(VB_CHANSCAN, LOC + "ChannelScanSM::RunScanner -- end");
 }
@@ -1669,8 +1667,8 @@ void ChannelScanSM::StopScanner(void)
 
     threadExit = true;
 
-    if (scanner_thread_running)
-        pthread_join(scanner_thread, NULL);
+    if (scannerThread.isRunning())
+        scannerThread.wait();
 
     if (signalMonitor)
         signalMonitor->Stop();
