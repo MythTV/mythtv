@@ -163,8 +163,7 @@ void GeneralSetupWizard::OnSubmitPromptReturn(bool submit)
 
 void GeneralSetupWizard::slotView(void)
 {
-    if (gCoreContext->GetSetting("HardwareProfilePublicUUID").isEmpty() ||
-        gCoreContext->GetSetting("HardwareProfilePublicUUID") == "-1")
+    if (gCoreContext->GetSetting("HardwareProfilePublicUUID").isEmpty())
     {
         ShowOkPopup(tr("You haven't submitted your hardware profile yet! "
                        "Please submit your profile to visit it online."));
@@ -212,8 +211,7 @@ void GeneralSetupWizard::slotView(void)
 
 void GeneralSetupWizard::slotDelete(void)
 {
-    if (gCoreContext->GetSetting("HardwareProfileUUID").isEmpty() ||
-        gCoreContext->GetSetting("HardwareProfileUUID") == "-1")
+    if (gCoreContext->GetSetting("HardwareProfileUUID").isEmpty())
     {
         ShowOkPopup(tr("You haven't submitted your hardware profile yet!"));
         return;
@@ -246,8 +244,8 @@ void GeneralSetupWizard::OnDeletePromptReturn(bool submit)
                 m_busyPopup->Close();
                 m_busyPopup = NULL;
             }
-            gCoreContext->SaveSetting("HardwareProfileUUID", "-1");
-            gCoreContext->SaveSetting("HardwareProfilePublicUUID", "-1");
+            gCoreContext->SaveSetting("HardwareProfileUUID", "");
+            gCoreContext->SaveSetting("HardwareProfilePublicUUID", "");
             ShowOkPopup(tr("Hardware profile deleted."));
         }
         else

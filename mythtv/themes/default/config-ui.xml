@@ -477,37 +477,22 @@
             <align>allcenter</align>
         </textarea>
 
-        <textarea name="ldate_text" from="basetextarea">
-            <area>75,173,225,30</area>
-            <font>basesmall</font>
-            <value>Long Date Format:</value>
-        </textarea>
-
-        <textarea name="sdate_text" from="basetextarea">
-            <area>75,238,225,30</area>
-            <font>basesmall</font>
-            <value>Short Date Format:</value>
-        </textarea>
-
-        <textarea name="time_text" from="basetextarea">
-            <area>75,303,225,30</area>
-            <font>basesmall</font>
-            <value>Time Format:</value>
-        </textarea>
-
     <!--Widgets-->
 
-        <buttonlist name="longdate" from="basewideselector">
+        <button name="submit" from="basewidebutton">
             <position>310,167</position>
-        </buttonlist>
+            <value>Submit your hardware profile</value>
+        </button>
 
-        <buttonlist name="shortdate" from="basewideselector">
+        <button name="view" from="basewidebutton">
             <position>310,232</position>
-        </buttonlist>
+            <value>View your hardware profile</value>
+        </button>
 
-        <buttonlist name="timeformat" from="basewideselector">
+        <button name="delete" from="basewidebutton">
             <position>310,297</position>
-        </buttonlist>
+            <value>Delete your hardware profile</value>
+        </button>
 
         <button name="cancel" from="basebutton">
             <position>188,530</position>
