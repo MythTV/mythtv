@@ -56,9 +56,21 @@ void HardwareProfile::OnPromptReturn(bool submit)
 {
     if (submit)
     {
+        CreateBusyDialog(tr("Submitting your hardware profile..."));
         GenerateUUID();
         if (SubmitResults())
+        {
+            if (m_busyPopup)
+            {
+                m_busyPopup->Close();
+                m_busyPopup = NULL;
+            }
             gCoreContext->SaveSetting("HardwareProfileUUID", m_uuid);
+            ShowOkPopup(tr("Hardware profile submitted. Thank you for supporting "
+                           "MythTV!"));
+        }
+        else
+            ShowOkPopup(tr("Encountered a problem while submitting your profile."));
     }
     else
         gCoreContext->SaveSetting("HardwareProfileUUID", "-1");
@@ -66,8 +78,6 @@ void HardwareProfile::OnPromptReturn(bool submit)
 
 void HardwareProfile::GenerateUUID(void)
 {
-    CreateBusyDialog(tr("Generating a unique ID for this system..."));
-
     QString fileprefix = GetConfDir() + "/HardwareProfile";
     QDir dir(fileprefix);
     if (!dir.exists())
@@ -100,8 +110,6 @@ void HardwareProfile::GenerateUUID(void)
 
 bool HardwareProfile::SubmitResults(void)
 {
-    CreateBusyDialog(tr("Submitting your hardware profile..."));
-
     if (m_uuid.isEmpty() || m_hardwareProfile.isEmpty())
         return false;
 
@@ -116,28 +124,9 @@ bool HardwareProfile::SubmitResults(void)
 
     system.Run();
     if (system.Wait() == GENERIC_EXIT_OK)
-    {
-        if (m_busyPopup)
-        {
-            m_busyPopup->Close();
-            m_busyPopup = NULL;
-        }
-
-        ShowOkPopup(tr("Hardware profile submitted. Thank you for supporting "
-                       "MythTV!"));
         return true;
-    }
     else
-    {
-        if (m_busyPopup)
-        {
-            m_busyPopup->Close();
-            m_busyPopup = NULL;
-        }
-
-        ShowOkPopup(tr("Encountered a problem while submitting your profile."));
         return false;
-    }
 
     return false;
 }

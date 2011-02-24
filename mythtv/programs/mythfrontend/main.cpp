@@ -1467,6 +1467,13 @@ int main(int argc, char **argv)
     if (themeUpdateChecker)
         delete themeUpdateChecker;
 
+#ifdef __linux__
+#ifdef CONFIG_BINDINGS_PYTHON
+    if (hardwareProfile)
+        delete hardwareProfile;
+#endif
+#endif
+
     delete sysEventHandler;
 
     pmanager->DestroyAllPlugins();
@@ -1475,7 +1482,6 @@ int main(int argc, char **argv)
         mon->deleteLater();
 
     delete networkControl;
-    delete hardwareProfile;
 
     DestroyMythMainWindow();
 
