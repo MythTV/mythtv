@@ -480,17 +480,17 @@
     <!--Widgets-->
 
         <button name="submit" from="basewidebutton">
-            <position>310,167</position>
+            <position>250,167</position>
             <value>Submit your hardware profile</value>
         </button>
 
         <button name="view" from="basewidebutton">
-            <position>310,232</position>
+            <position>250,232</position>
             <value>View your hardware profile</value>
         </button>
 
         <button name="delete" from="basewidebutton">
-            <position>310,297</position>
+            <position>250,297</position>
             <value>Delete your hardware profile</value>
         </button>
 
