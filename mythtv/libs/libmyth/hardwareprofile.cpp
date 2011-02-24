@@ -16,6 +16,9 @@
 #include "mythdialogbox.h"
 #include "mythprogressdialog.h"
 
+const QString SMOLT_SERVER_LOCATION =
+                  QString("http://smolt.mythvantage.com/");
+
 HardwareProfile::HardwareProfile() :
     m_popupStack(NULL),              m_busyPopup(NULL),
     m_uuid(QString()),               m_hardwareProfile(QString())
@@ -30,7 +33,7 @@ HardwareProfile::~HardwareProfile()
 
 bool HardwareProfile::Prompt(bool force)
 {
-    if (m_uuid.isEmpty() || m_uuid != "-1" || force)
+    if (m_uuid.isEmpty() || force)
         return true;
     else
         return false;

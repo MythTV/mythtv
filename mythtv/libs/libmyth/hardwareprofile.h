@@ -14,6 +14,8 @@
 
 class MythUIBusyDialog;
 
+extern const QString SMOLT_SERVER_LOCATION;
+
 class MPUBLIC HardwareProfile : public QObject
 {
     Q_OBJECT
