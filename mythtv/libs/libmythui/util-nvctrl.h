@@ -6,7 +6,7 @@
 #include <stdlib.h>
 using namespace std;
 
-typedef map<uint, double> t_screenrate;
+typedef map<unsigned int, double> t_screenrate;
 
 int GetNvidiaRates(t_screenrate& screenmap);
 

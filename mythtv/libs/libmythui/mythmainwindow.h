@@ -49,7 +49,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
 
     bool TranslateKeyPress(const QString &context, QKeyEvent *e,
                            QStringList &actions, bool allowJumps = true)
-                           __attribute__ ((warn_unused_result));
+                           MUNUSED_RESULT;
 
     void ResetKeys(void);
     void ClearKey(const QString &context, const QString &action);
