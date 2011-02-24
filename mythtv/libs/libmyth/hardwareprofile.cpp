@@ -17,8 +17,8 @@
 #include "mythprogressdialog.h"
 
 HardwareProfile::HardwareProfile() :
-    m_popupStack(NULL),              m_uuid(QString()),
-    m_hardwareProfile(QString())
+    m_popupStack(NULL),              m_busyPopup(NULL),
+    m_uuid(QString()),               m_hardwareProfile(QString())
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
     m_uuid = gCoreContext->GetSetting("HardwareProfileUUID");
@@ -30,7 +30,7 @@ HardwareProfile::~HardwareProfile()
 
 bool HardwareProfile::Prompt(bool force)
 {
-    if (m_uuid.isEmpty() || force)
+    if (m_uuid.isEmpty() || m_uuid != "-1" || force)
         return true;
     else
         return false;
@@ -117,22 +117,29 @@ bool HardwareProfile::SubmitResults(void)
     system.Run();
     if (system.Wait() == GENERIC_EXIT_OK)
     {
+        if (m_busyPopup)
+        {
+            m_busyPopup->Close();
+            m_busyPopup = NULL;
+        }
+
         ShowOkPopup(tr("Hardware profile submitted. Thank you for supporting "
                        "MythTV!"));
         return true;
     }
     else
     {
+        if (m_busyPopup)
+        {
+            m_busyPopup->Close();
+            m_busyPopup = NULL;
+        }
+
         ShowOkPopup(tr("Encountered a problem while submitting your profile."));
         return false;
     }
 
-    if (m_busyPopup)
-    {
-        m_busyPopup->Close();
-        m_busyPopup = NULL;
-    }
-
+    return false;
 }
 
 void HardwareProfile::CreateBusyDialog(QString message)
