@@ -1,9 +1,9 @@
 #include <math.h>
 
-using namespace std;
 #include "mythconfig.h"
 #include "audiooutpututil.h"
 #include <sys/types.h>
+#include <inttypes.h>
 #if HAVE_BYTESWAP_H
 #include <byteswap.h>
 #elif HAVE_SYS_ENDIAN_H
