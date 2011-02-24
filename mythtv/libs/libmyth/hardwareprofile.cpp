@@ -61,7 +61,7 @@ void HardwareProfile::OnPromptReturn(bool submit)
     {
         CreateBusyDialog(tr("Submitting your hardware profile..."));
         GenerateUUID();
-        if (SubmitResults())
+        if (SubmitProfile())
         {
             if (m_busyPopup)
             {
@@ -153,7 +153,7 @@ bool HardwareProfile::WriteUUIDToFile(QString uuid)
         return false;
 }
 
-bool HardwareProfile::SubmitResults(void)
+bool HardwareProfile::SubmitProfile(void)
 {
     if (m_uuid.isEmpty())
         return false;
@@ -166,6 +166,27 @@ bool HardwareProfile::SubmitResults(void)
     QStringList args;
     args << "--submitOnly";
     args << "-a";
+    MythSystem system(cmd, args, kMSRunShell | kMSStdOut | kMSBuffered);
+
+    system.Run();
+    if (system.Wait() == GENERIC_EXIT_OK)
+        return true;
+    else
+        return false;
+
+    return false;
+}
+
+bool HardwareProfile::DeleteProfile(void)
+{
+    if (m_uuid.isEmpty())
+        return false;
+
+    VERBOSE(VB_GENERAL, QString("Deleting the following hardware profile: %1")
+                            .arg(m_uuid));
+
+    QString cmd = GetShareDir() + "hardwareprofile/deleteProfile.py";
+    QStringList args;
     MythSystem system(cmd, args, kMSRunShell | kMSStdOut | kMSBuffered);
 
     system.Run();

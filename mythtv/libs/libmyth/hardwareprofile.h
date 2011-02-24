@@ -30,7 +30,9 @@ class MPUBLIC HardwareProfile : public QObject
     void GenerateUUID(void);
     QString GetUUIDFromFile(void);
     bool WriteUUIDToFile(QString uuid);
-    bool SubmitResults(void);
+
+    bool SubmitProfile(void);
+    bool DeleteProfile(void);
 
   public slots:
     void OnPromptReturn(bool submit);
