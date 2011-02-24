@@ -379,15 +379,20 @@ bool MythMediaDevice::findMountPath()
         QString deviceName;
 
 
-        // Extract the mount point and device name.
 #ifdef USE_MOUNT_COMMAND
+        // Extract mount point and device name from something like:
+        //   /dev/disk0s3 on / (hfs, local, journaled)   - Mac OS X
+        //   /dev/hdd on /tmp/AAA BBB type udf (ro)      - Linux
         stream >> deviceName;
-        stream >> mountPoint;   // throw away the "on" between path and mount
-        stream >> mountPoint;
+        mountPoint = stream.readLine();
+        mountPoint.remove(" on ");
+        mountPoint.remove(QRegExp(" type \\w.*"));   // Linux
+        mountPoint.remove(QRegExp(" \\(\\w.*"));     // Mac OS X
 #else
+        // Extract the mount point and device name.
         stream >> deviceName >> mountPoint;
-#endif
         stream.readLine(); // skip the rest of the line
+#endif
 
         if (deviceName.isNull())
             break;
