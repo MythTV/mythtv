@@ -26,6 +26,8 @@ class MPUBLIC HardwareProfile : public QObject
     void ShowPrompt(void);
 
     void GenerateUUID(void);
+    QString GetUUIDFromFile(void);
+    bool WriteUUIDToFile(QString uuid);
     bool SubmitResults(void);
 
   public slots:

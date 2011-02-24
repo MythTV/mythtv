@@ -83,22 +83,33 @@ void HardwareProfile::GenerateUUID(void)
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    QString cmd = GetShareDir() + "hardwareprofile/sendProfile.py";
-    QStringList args;
-    args << "-p";
-    MythSystem system(cmd, args, kMSRunShell | kMSStdOut | kMSBuffered);
+    QString fileUUID = GetUUIDFromFile();
 
-    system.Run();
-    system.Wait();
-    m_hardwareProfile = system.ReadAll();
-
-    QString hwuuid_file = GetConfDir() + "/HardwareProfile/hw-uuid";
-    QFile file(hwuuid_file);
-    if (file.open( QIODevice::ReadOnly ))
+    if (fileUUID.isEmpty() && m_uuid.isEmpty())
     {
-        QTextStream stream(&file);
-        m_uuid = stream.readLine();
-        file.close();
+        VERBOSE(VB_GENERAL, QString("No UUID in DB or File, generating new UUID..."));
+
+        QString cmd = GetShareDir() + "hardwareprofile/sendProfile.py";
+        QStringList args;
+        args << "-p";
+        MythSystem system(cmd, args, kMSRunShell | kMSStdOut | kMSBuffered);
+
+        system.Run();
+        system.Wait();
+        m_hardwareProfile = system.ReadAll();
+        m_uuid = GetUUIDFromFile();
+    }
+    else if (fileUUID.isEmpty())
+    {
+        VERBOSE(VB_GENERAL, QString("Writing Database UUID to local file: %1")
+                        .arg(m_uuid));
+        WriteUUIDToFile(m_uuid);
+    }
+    else
+    {
+        VERBOSE(VB_GENERAL, QString("Profile UUID found in local file: %1")
+                           .arg(fileUUID));
+        m_uuid = fileUUID;
     }
 
     if (m_busyPopup)
@@ -108,13 +119,45 @@ void HardwareProfile::GenerateUUID(void)
     }
 }
 
+QString HardwareProfile::GetUUIDFromFile()
+{
+    QString ret;
+
+    QString hwuuid_file = GetConfDir() + "/HardwareProfile/hw-uuid";
+    QFile file(hwuuid_file);
+    if (file.open( QIODevice::ReadOnly ))
+    {
+        QTextStream stream(&file);
+        ret = stream.readLine();
+        file.close();
+    }
+
+    return ret;
+}
+
+bool HardwareProfile::WriteUUIDToFile(QString uuid)
+{
+    QString hwuuid_file = GetConfDir() + "/HardwareProfile/hw-uuid";
+    QFile file(hwuuid_file);
+    if (file.open(QIODevice::WriteOnly))
+    {
+        QTextStream stream(&file);
+        stream << uuid;
+        file.close();
+        return true;
+    }
+    else
+        return false;
+}
+
 bool HardwareProfile::SubmitResults(void)
 {
-    if (m_uuid.isEmpty() || m_hardwareProfile.isEmpty())
+    if (m_uuid.isEmpty())
         return false;
 
-    VERBOSE(VB_GENERAL, QString("Submitting the following hardware profile:\n%1")
-                        .arg(m_hardwareProfile));
+    if (!m_hardwareProfile.isEmpty())
+        VERBOSE(VB_GENERAL, QString("Submitting the following hardware profile:\n%1")
+                            .arg(m_hardwareProfile));
 
     QString cmd = GetShareDir() + "hardwareprofile/sendProfile.py";
     QStringList args;
