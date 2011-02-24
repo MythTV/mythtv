@@ -1,5 +1,8 @@
 #define _WIN32_WINNT 0x500
 
+#include <algorithm> 
+using std::min; 
+
 #include <QRect>
 #include <QMap>
 #include <QMutex>
