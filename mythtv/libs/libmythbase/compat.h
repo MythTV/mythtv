@@ -11,9 +11,15 @@
 #endif
 
 #ifdef _MSC_VER
-    typedef __int64             int64_t;    // Define it from MSVC's internal type
 
-    #define uint64_t            __int64
+    #ifdef restrict 
+    #undef restrict
+    #endif
+
+    #include <inttypes.h>
+    #include <direct.h>
+    #include <process.h>
+
     #define strtoll             _strtoi64
     #define strncasecmp         _strnicmp
     #define snprintf            _snprintf
@@ -23,6 +29,22 @@
     #else
         typedef int   ssize_t;
     #endif
+
+    // Check for execute, only checking existance in MSVC
+    #define X_OK    0
+
+    #define rint( x )               floor(x + 0.5)
+    #define round( x )              floor(x + 0.5)
+    #define getpid()                _getpid()
+    #define ftruncate( fd, fsize )  _chsize( fd, fsize ) 
+
+    #ifndef S_ISCHR
+    #   ifdef S_IFCHR
+    #       define S_ISCHR(m) (((m) & S_IFMT) == S_IFCHR)
+    #   else
+    #       define S_ISCHR(m) 0
+    #   endif
+    #endif /* !S_ISCHR */
 
 #endif
 
@@ -75,30 +97,6 @@ typedef unsigned int uint;
 #undef DeleteFile
 #endif
 
-// Dealing with Microsoft min/max mess:
-// assume that under Windows the code is compiled with NOMINMAX defined
-// which disables #define's for min/max.
-// however, Microsoft  violates the C++ standard even with
-// NOMINMAX on, and defines templates _cpp_min and _cpp_max
-// instead of templates min/max
-// define the correct templates here
-
-#if defined(__cplusplus) && defined(_WIN32) && !defined(USING_MINGW)
-template<class _Ty> inline
-        const _Ty& max(const _Ty& _X, const _Ty& _Y)
-        {return (_X < _Y ? _Y : _X); }
-template<class _Ty, class _Pr> inline
-        const _Ty& max(const _Ty& _X, const _Ty& _Y, _Pr _P)
-        {return (_P(_X, _Y) ? _Y : _X); }
-
-template<class _Ty> inline
-        const _Ty& min(const _Ty& _X, const _Ty& _Y)
-        {return (_Y < _X ? _Y : _X); }
-template<class _Ty, class _Pr> inline
-        const _Ty& min(const _Ty& _X, const _Ty& _Y, _Pr _P)
-        {return (_P(_Y, _X) ? _Y : _X); }
-#endif // defined(__cplusplus) && defined(_WIN32)
-
 #ifdef _WIN32
 #undef M_PI
 #define M_PI 3.14159265358979323846
@@ -121,25 +119,6 @@ inline int random(void)
 #if defined(__cplusplus) && defined(USING_MINGW)
 #define setenv(x, y, z) ::SetEnvironmentVariableA(x, y)
 #define unsetenv(x) 0
-#endif
-
-#if defined(__cplusplus) && defined(_MSC_VER)
-inline unsigned int usleep( unsigned int us )
-{
-    Sleep( (us + 999) / 1000 );
-    return 0;
-}
-
-inline int close( int fd )
-{
-    return _close( fd );
-}
-
-inline int write( int fd, const void *buffer, unsigned int count )
-{
-    return _write( fd, buffer, count );
-}
-
 #endif
 
 #if defined(__cplusplus) && defined(USING_MINGW)
@@ -315,29 +294,7 @@ inline const char *dlerror(void)
 #endif
 
 #if defined(_MSC_VER)
-#define EPOCHFILETIME (116444736000000000i64)
-
-#define gettimeofday( tv, tz )                   \
-{                                                \
-    FILETIME        ft;                          \
-    LARGE_INTEGER   li;                          \
-    __int64         t;                           \
-    static int      tzflag;                      \
-                                                 \
-    if (tv)                                      \
-    {                                            \
-        GetSystemTimeAsFileTime(&ft);            \
-        li.LowPart  = ft.dwLowDateTime;          \
-        li.HighPart = ft.dwHighDateTime;         \
-        t  = li.QuadPart;                        \
-        t -= EPOCHFILETIME;                      \
-        t /= 10;                                 \
-        tv->tv_sec  = (long)(t / 1000000);       \
-        tv->tv_usec = (long)(t % 1000000);       \
-    }                                            \
-                                                 \
-}
-
+#  define S_IRUSR _S_IREAD
 #endif
 
 #ifdef USING_MINGW

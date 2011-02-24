@@ -13,6 +13,11 @@
 #include <algorithm>
 using namespace std;
 
+#ifdef USING_MINGW
+#include <winsock2.h>
+#include <unistd.h>
+#endif
+
 #include "compat.h"
 #include "mythconfig.h"       // for CONFIG_DARWIN
 #include "mythcorecontext.h"
@@ -21,12 +26,6 @@ using namespace std;
 #include "exitcodes.h"
 
 #include "mythversion.h"
-
-#ifdef USING_MINGW
-#include <winsock2.h>
-#include <unistd.h>
-#include "compat.h"
-#endif
 
 #define LOC      QString("MythCoreContext: ")
 #define LOC_WARN QString("MythCoreContext, Warning: ")
