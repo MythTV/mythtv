@@ -73,7 +73,7 @@ class MPUBLIC MythContext
 extern MPUBLIC MythContext *gContext;
 
 /// Service type for the backend's UPnP server
-extern MPUBLIC const QString gBackendURI;
+extern const QString gBackendURI;
 
 #endif
 

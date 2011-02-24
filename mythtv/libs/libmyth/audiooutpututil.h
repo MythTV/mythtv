@@ -1,7 +1,6 @@
 #ifndef AUDIOOUTPUTUTIL
 #define AUDIOOUTPUTUTIL
 
-using namespace std;
 #include "mythverbose.h"
 #include "audiooutputsettings.h"
 extern "C" {

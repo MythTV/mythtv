@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QDir>
 
+#include "compat.h"
 #include "remoteutil.h"
 #include "programinfo.h"
 #include "mythcorecontext.h"

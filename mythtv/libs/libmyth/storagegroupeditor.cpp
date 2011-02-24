@@ -2,6 +2,7 @@
 #include <QFile>
 #include <QRegExp>
 #include <QUrl>
+#include <QVector>
 
 #include "storagegroupeditor.h"
 #include "mythcorecontext.h"
@@ -361,7 +362,7 @@ void StorageGroupListEditor::Load(void)
     QStringList names;
     QStringList masterNames;
     bool createAddDefaultButton = false;
-    bool createAddSpecialGroupButton[StorageGroup::kSpecialGroups.size()];
+    QVector< bool > createAddSpecialGroupButton( StorageGroup::kSpecialGroups.size() );
     bool isMaster = (gCoreContext->GetSetting("MasterServerIP","master") ==
                      gCoreContext->GetSetting("BackendServerIP","me"));
 
@@ -480,46 +481,6 @@ MythDialog* StorageGroupListEditor::dialogWidget(MythMainWindow* parent,
     connect(dialog, SIGNAL(menuButtonPressed()), this, SLOT(doDelete()));
     connect(dialog, SIGNAL(deleteButtonPressed()), this, SLOT(doDelete()));
     return dialog;
-}
-
-void StorageGroup::ClearGroupToUseCache(void)
-{
-    QMutexLocker locker(&s_groupToUseLock);
-    s_groupToUseCache.clear();
-}
-
-QString StorageGroup::GetGroupToUse(
-    const QString &host, const QString &sgroup)
-{
-    QString tmpGroup = sgroup;
-    QString groupKey = QString("%1:%2").arg(sgroup).arg(host);
-
-    QMutexLocker locker(&s_groupToUseLock);
-
-    if (s_groupToUseCache.contains(groupKey))
-    {
-        tmpGroup = s_groupToUseCache[groupKey];
-    }
-    else
-    {
-        if (StorageGroup::FindDirs(sgroup, host))
-        {
-            s_groupToUseCache[groupKey] = sgroup;
-        }
-        else
-        {
-            VERBOSE(VB_FILE+VB_EXTRA,
-                    QString("GetGroupToUse(): "
-                            "falling back to Videos Storage Group for host %1 "
-                            "since it does not have a %2 Storage Group.")
-                    .arg(host).arg(sgroup));
-
-            tmpGroup = "Videos";
-            s_groupToUseCache[groupKey] = tmpGroup;
-        }
-    }
-
-    return tmpGroup;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
