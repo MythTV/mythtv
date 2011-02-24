@@ -1,16 +1,19 @@
 #ifndef GENERALSETUPWIZARD_H
 #define GENERALSETUPWIZARD_H
 
-#include <uitypes.h>
-#include <mythwidgets.h>
-#include <mythdialogs.h>
+#include "uitypes.h"
+#include "mythwidgets.h"
+#include "mythdialogs.h"
 
 // libmythui
-#include <mythuibutton.h>
-#include <mythuicheckbox.h>
-#include <mythuibuttonlist.h>
-#include <mythscreentype.h>
-#include <mythdialogbox.h>
+#include "mythuitext.h"
+#include "mythuibutton.h"
+#include "mythuicheckbox.h"
+#include "mythscreentype.h"
+#include "mythdialogbox.h"
+#include "mythprogressdialog.h"
+
+class HardwareProfile;
 
 class GeneralSetupWizard : public MythScreenType
 {
@@ -26,17 +29,34 @@ class GeneralSetupWizard : public MythScreenType
 
     void save(void);
 
-  private:
-    MythUIButtonList    *m_ldateButtonList;
-    MythUIButtonList    *m_sdateButtonList;
-    MythUIButtonList    *m_timeButtonList;
+  public slots:
+    void OnSubmitPromptReturn(bool submit);
+    void OnDeletePromptReturn(bool submit);
 
-    MythUIButton        *m_nextButton;
-    MythUIButton        *m_cancelButton;
+  private:
+    void CreateBusyDialog(QString message);
+
+    MythUIButton     *m_submitButton;
+    MythUIButton     *m_viewButton;
+    MythUIButton     *m_deleteButton;
+
+    MythUIButton     *m_nextButton;
+    MythUIButton     *m_cancelButton;
+
+    MythUIText       *m_profileLocation;
+
+    MythScreenStack  *m_popupStack;
+    MythUIBusyDialog *m_busyPopup;
+
+    HardwareProfile  *m_hardwareProfile;
 
   private slots:
     void loadData(void);
     void slotNext(void);
+
+    void slotSubmit(void);
+    void slotView(void);
+    void slotDelete(void);
 };
 
 #endif

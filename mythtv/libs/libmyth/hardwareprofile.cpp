@@ -20,71 +20,15 @@ const QString SMOLT_SERVER_LOCATION =
                   QString("http://smolt.mythvantage.com/");
 
 HardwareProfile::HardwareProfile() :
-    m_popupStack(NULL),              m_busyPopup(NULL),
     m_uuid(QString()),               m_publicuuid(QString()),
     m_hardwareProfile(QString())
 {
-    m_popupStack = GetMythMainWindow()->GetStack("popup stack");
     m_uuid = gCoreContext->GetSetting("HardwareProfileUUID");
     m_publicuuid = gCoreContext->GetSetting("HardwareProfilePublicUUID");
 }
 
 HardwareProfile::~HardwareProfile()
 {
-}
-
-bool HardwareProfile::Prompt(bool force)
-{
-    if (m_uuid.isEmpty() || force)
-        return true;
-    else
-        return false;
-}
-
-void HardwareProfile::ShowPrompt()
-{
-    QString message = QObject::tr("Would you like to share your "
-                          "hardware profile with the MythTV developers? "
-                          "Profiles are anonymous and are a great way to "
-                          "help with future development.");
-    MythConfirmationDialog *confirmdialog =
-            new MythConfirmationDialog(m_popupStack,message);
-
-    if (confirmdialog->Create())
-        m_popupStack->AddScreen(confirmdialog);
-
-    connect(confirmdialog, SIGNAL(haveResult(bool)),
-            SLOT(OnPromptReturn(bool)));
-}
-
-void HardwareProfile::OnPromptReturn(bool submit)
-{
-    if (submit)
-    {
-        CreateBusyDialog(tr("Submitting your hardware profile..."));
-        GenerateUUIDs();
-        if (SubmitProfile())
-        {
-            if (m_busyPopup)
-            {
-                m_busyPopup->Close();
-                m_busyPopup = NULL;
-            }
-            gCoreContext->SaveSetting("HardwareProfileUUID", m_uuid);
-            gCoreContext->SaveSetting("HardwareProfilePublicUUID", m_publicuuid);
-    VERBOSE(VB_GENERAL, QString("Profile URL: %1")
-                            .arg(GetProfileURL()));
-            ShowOkPopup(tr("Hardware profile submitted. Thank you for supporting "
-                           "MythTV!"));
-        }
-        else
-            ShowOkPopup(tr("Encountered a problem while submitting your profile."));
-    }
-    else
-    {
-        gCoreContext->SaveSetting("HardwareProfileUUID", "-1");
-        gCoreContext->SaveSetting("HardwareProfilePublicUUID", "-1");
-    }
 }
 
 void HardwareProfile::GenerateUUIDs(void)
@@ -125,16 +69,9 @@ void HardwareProfile::GenerateUUIDs(void)
         m_uuid = fileUUID;
     }
 
-    // Get the Public UUID from file if necessary
+    // Get the Public UUID from file
 
-    if (m_publicuuid.isEmpty())
-        m_publicuuid = GetPublicUUIDFromFile();
-
-    if (m_busyPopup)
-    {
-        m_busyPopup->Close();
-        m_busyPopup = NULL;
-    }
+    m_publicuuid = GetPublicUUIDFromFile();
 }
 
 QString HardwareProfile::GetPrivateUUIDFromFile()
@@ -247,21 +184,6 @@ QString HardwareProfile::GetProfileURL()
     {
         ret = SMOLT_SERVER_LOCATION + "client/show/?uuid=" + m_publicuuid;
     }
-    else
-        ret = tr("No Profile Exists");
 
     return ret;
 }
-
-void HardwareProfile::CreateBusyDialog(QString message)
-{
-    if (m_busyPopup)
-        return;
-
-    m_busyPopup = new MythUIBusyDialog(message, m_popupStack,
-            "hardwareprofilebusydialog");
-
-    if (m_busyPopup->Create())
-        m_popupStack->AddScreen(m_busyPopup);
-}
-

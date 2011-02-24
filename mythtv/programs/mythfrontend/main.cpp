@@ -43,7 +43,6 @@ using namespace std;
 #include "dvdringbuffer.h"
 #include "scheduledrecording.h"
 #include "mythsystemevent.h"
-#include "hardwareprofile.h"
 
 #include "compat.h"  // For SIG* on MinGW
 #include "exitcodes.h"
@@ -1390,16 +1389,6 @@ int main(int argc, char **argv)
     if (LanguageSelection::prompt())
         GetMythMainWindow()->JumpTo("Reload Theme");
 
-#ifdef __linux__
-#ifdef CONFIG_BINDINGS_PYTHON
-    // If this is the first time loading this frontend, prompt to send
-    // the hardware profile.
-    HardwareProfile *hardwareProfile = new HardwareProfile();
-    if (hardwareProfile && hardwareProfile->Prompt())
-        hardwareProfile->ShowPrompt();
-#endif
-#endif
-
     internal_media_init();
 
     CleanupMyOldInUsePrograms();
@@ -1466,13 +1455,6 @@ int main(int argc, char **argv)
 
     if (themeUpdateChecker)
         delete themeUpdateChecker;
-
-#ifdef __linux__
-#ifdef CONFIG_BINDINGS_PYTHON
-    if (hardwareProfile)
-        delete hardwareProfile;
-#endif
-#endif
 
     delete sysEventHandler;
 

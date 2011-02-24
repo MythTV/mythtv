@@ -24,31 +24,21 @@ class MPUBLIC HardwareProfile : public QObject
     HardwareProfile();
    ~HardwareProfile(void);
 
-    bool Prompt(bool force = false);
-    void ShowPrompt(void);
-
     void GenerateUUIDs(void);
 
     QString GetPrivateUUIDFromFile(void);
     bool WritePrivateUUIDToFile(QString uuid);
-
     QString GetPublicUUIDFromFile(void);
 
     bool SubmitProfile(void);
     bool DeleteProfile(void);
 
-    QString GetPublicUUID(void);
+    QString GetPublicUUID(void) {return m_publicuuid; };
+    QString GetPrivateUUID(void) {return m_uuid; };
+
     QString GetProfileURL(void);
 
-  public slots:
-    void OnPromptReturn(bool submit);
-
   private:
-    void CreateBusyDialog(QString message);
-
-    MythScreenStack *m_popupStack;
-    MythUIBusyDialog *m_busyPopup;
-
     QString m_uuid;
     QString m_publicuuid;
     QString m_hardwareProfile;
