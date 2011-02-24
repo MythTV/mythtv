@@ -21,10 +21,12 @@ const QString SMOLT_SERVER_LOCATION =
 
 HardwareProfile::HardwareProfile() :
     m_popupStack(NULL),              m_busyPopup(NULL),
-    m_uuid(QString()),               m_hardwareProfile(QString())
+    m_uuid(QString()),               m_publicuuid(QString()),
+    m_hardwareProfile(QString())
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
     m_uuid = gCoreContext->GetSetting("HardwareProfileUUID");
+    m_publicuuid = gCoreContext->GetSetting("HardwareProfilePublicUUID");
 }
 
 HardwareProfile::~HardwareProfile()
@@ -60,7 +62,7 @@ void HardwareProfile::OnPromptReturn(bool submit)
     if (submit)
     {
         CreateBusyDialog(tr("Submitting your hardware profile..."));
-        GenerateUUID();
+        GenerateUUIDs();
         if (SubmitProfile())
         {
             if (m_busyPopup)
@@ -69,6 +71,9 @@ void HardwareProfile::OnPromptReturn(bool submit)
                 m_busyPopup = NULL;
             }
             gCoreContext->SaveSetting("HardwareProfileUUID", m_uuid);
+            gCoreContext->SaveSetting("HardwareProfilePublicUUID", m_publicuuid);
+    VERBOSE(VB_GENERAL, QString("Profile URL: %1")
+                            .arg(GetProfileURL()));
             ShowOkPopup(tr("Hardware profile submitted. Thank you for supporting "
                            "MythTV!"));
         }
@@ -76,17 +81,22 @@ void HardwareProfile::OnPromptReturn(bool submit)
             ShowOkPopup(tr("Encountered a problem while submitting your profile."));
     }
     else
+    {
         gCoreContext->SaveSetting("HardwareProfileUUID", "-1");
+        gCoreContext->SaveSetting("HardwareProfilePublicUUID", "-1");
+    }
 }
 
-void HardwareProfile::GenerateUUID(void)
+void HardwareProfile::GenerateUUIDs(void)
 {
     QString fileprefix = GetConfDir() + "/HardwareProfile";
     QDir dir(fileprefix);
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    QString fileUUID = GetUUIDFromFile();
+    // Generate the Private Hardware UUID (or recover them from the DB or file)
+
+    QString fileUUID = GetPrivateUUIDFromFile();
 
     if (fileUUID.isEmpty() && m_uuid.isEmpty())
     {
@@ -100,20 +110,25 @@ void HardwareProfile::GenerateUUID(void)
         system.Run();
         system.Wait();
         m_hardwareProfile = system.ReadAll();
-        m_uuid = GetUUIDFromFile();
+        m_uuid = GetPrivateUUIDFromFile();
     }
     else if (fileUUID.isEmpty())
     {
         VERBOSE(VB_GENERAL, QString("Writing Database UUID to local file: %1")
                         .arg(m_uuid));
-        WriteUUIDToFile(m_uuid);
+        WritePrivateUUIDToFile(m_uuid);
     }
-    else
+    else if (m_uuid.isEmpty())
     {
         VERBOSE(VB_GENERAL, QString("Profile UUID found in local file: %1")
                            .arg(fileUUID));
         m_uuid = fileUUID;
     }
+
+    // Get the Public UUID from file if necessary
+
+    if (m_publicuuid.isEmpty())
+        m_publicuuid = GetPublicUUIDFromFile();
 
     if (m_busyPopup)
     {
@@ -122,7 +137,7 @@ void HardwareProfile::GenerateUUID(void)
     }
 }
 
-QString HardwareProfile::GetUUIDFromFile()
+QString HardwareProfile::GetPrivateUUIDFromFile()
 {
     QString ret;
 
@@ -138,7 +153,33 @@ QString HardwareProfile::GetUUIDFromFile()
     return ret;
 }
 
-bool HardwareProfile::WriteUUIDToFile(QString uuid)
+QString HardwareProfile::GetPublicUUIDFromFile()
+{
+    QString ret;
+
+    QString pubuuid_file = GetConfDir() + "/HardwareProfile/uuiddb.cfg";
+    QString pubuuid;
+    QFile pubfile(pubuuid_file);
+    if (pubfile.open( QIODevice::ReadOnly ))
+    {
+        QString s;
+        QTextStream stream(&pubfile);
+        while ( !stream.atEnd() )
+        {
+            s = stream.readLine();
+            if (s.contains(m_uuid))
+            {
+                ret = s.section("=",1,1);
+                ret = ret.trimmed();
+            }
+        }
+        pubfile.close();
+    }
+
+    return ret;
+}
+
+bool HardwareProfile::WritePrivateUUIDToFile(QString uuid)
 {
     QString hwuuid_file = GetConfDir() + "/HardwareProfile/hw-uuid";
     QFile file(hwuuid_file);
@@ -196,6 +237,20 @@ bool HardwareProfile::DeleteProfile(void)
         return false;
 
     return false;
+}
+
+QString HardwareProfile::GetProfileURL()
+{
+    QString ret;
+
+    if (!m_publicuuid.isEmpty())
+    {
+        ret = SMOLT_SERVER_LOCATION + "client/show/?uuid=" + m_publicuuid;
+    }
+    else
+        ret = tr("No Profile Exists");
+
+    return ret;
 }
 
 void HardwareProfile::CreateBusyDialog(QString message)
