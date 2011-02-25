@@ -205,25 +205,15 @@ bool VideoOutputD3D::Init(int width, int height, float aspect,
     VideoOutput::Init(width, height, aspect, winid,
                       winx, winy, winw, winh, codec_id, embedid);
 
-    if (db_vdisp_profile)
-        db_vdisp_profile->SetVideoRenderer("direct3d");
+    SetProfile();
 
     bool success = true;
     success &= SetupContext();
     InitDisplayMeasurements(width, height, false);
 
-    vbuffers.Init(kNumBuffers, true, kNeedFreeFrames,
-                  kPrebufferFramesNormal, kPrebufferFramesSmall,
-                  kKeepPrebuffer);
-    success &= vbuffers.CreateBuffers(FMT_YV12,
-                                      window.GetVideoDim().width(),
-                                      window.GetVideoDim().height());
-    m_pauseFrame.height = vbuffers.GetScratchFrame()->height;
-    m_pauseFrame.width  = vbuffers.GetScratchFrame()->width;
-    m_pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
-    m_pauseFrame.size   = vbuffers.GetScratchFrame()->size;
-    m_pauseFrame.buf    = new unsigned char[m_pauseFrame.size + 128];
-    m_pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
+    success &= CreateBuffers();
+    success &= InitBuffers();
+    success &= CreatePauseFrame();
 
     MoveResize();
 
@@ -241,6 +231,39 @@ bool VideoOutputD3D::Init(int width, int height, float aspect,
             VERBOSE(VB_IMPORTANT, LOC + "Failed to create D3D9 osd painter.");
     }
     return success;
+}
+
+void VideoOutputD3D::SetProfile(void)
+{
+    if (db_vdisp_profile)
+        db_vdisp_profile->SetVideoRenderer("direct3d");
+}
+
+bool VideoOutputD3D::CreateBuffers(void)
+{
+    vbuffers.Init(kNumBuffers, true, kNeedFreeFrames,
+                  kPrebufferFramesNormal, kPrebufferFramesSmall,
+                  kKeepPrebuffer);
+    return true;
+
+}
+
+bool VideoOutputD3D::InitBuffers(void)
+{
+    return vbuffers.CreateBuffers(FMT_YV12,
+                                  window.GetVideoDim().width(),
+                                  window.GetVideoDim().height());
+}
+
+bool VideoOutputD3D::CreatePauseFrame(void)
+{
+    m_pauseFrame.height = vbuffers.GetScratchFrame()->height;
+    m_pauseFrame.width  = vbuffers.GetScratchFrame()->width;
+    m_pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
+    m_pauseFrame.size   = vbuffers.GetScratchFrame()->size;
+    m_pauseFrame.buf    = new unsigned char[m_pauseFrame.size + 128];
+    m_pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
+    return true;
 }
 
 void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t,
@@ -422,6 +445,7 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
         return;
     }
 
+    bool sw_frame = (frame && (frame->codec == FMT_YV12));
     bool deint_proc = m_deinterlacing && (m_deintFilter != NULL);
 
     bool pauseframe = false;
@@ -432,10 +456,10 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
         pauseframe = true;
     }
 
-    if (filterList)
+    if (filterList && sw_frame)
         filterList->ProcessFrame(frame);
 
-    bool safepauseframe = pauseframe && !IsBobDeint();
+    bool safepauseframe = pauseframe && !IsBobDeint() && sw_frame;
     if (deint_proc && m_deinterlaceBeforeOSD &&
        (!pauseframe || safepauseframe))
     {
@@ -456,7 +480,7 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
         m_render_valid |= m_render->Test(m_render_reset);
         if (m_render_reset)
             SetupContext();
-        if (m_render_valid && m_video)
+        if (m_render_valid && m_video && sw_frame)
             UpdateFrame(frame, m_video);
     }
 }
