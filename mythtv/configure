@@ -121,6 +121,7 @@ Advanced options (experts only):
   --disable-xv             disable XVideo   (X11 video output accel.)
   --enable-vdpau           enable NVidia VDPAU hardware acceleration.
   --enable-crystalhd       enable Broadcom CrystalHD hardware decoder support
+  --enable-dxva2           enable hardware accelerated decoding on windows
   --disable-opengl-video   disable OpenGL based video display
   --disable-quartz-video   disable Mac OS X CoreVideo based video display
   --disable-directfb       disable DirectFB (Linux non-X11 video)
@@ -1371,6 +1372,7 @@ USING_LIST='
     bindings_php
     darwin_da
     mythtranscode
+    dxva2
     opengl
     opengles
     vdpau
@@ -3861,6 +3863,12 @@ if enabled crystalhd; then
         disable crystalhd;
 fi
 
+if enabled dxva2; then
+    enabled dxva2api_h && enabled windows || disable dxva2
+else
+    disable dxva2
+fi
+
 enabled debug && add_cflags -g"$debuglevel" && add_asflags -g"$debuglevel"
 enabled debug && add_cxxflags -g"$debuglevel"
 
@@ -4418,6 +4426,7 @@ fi
   echo "DirectFB                  ${directfb-no}"
   if test x"$target_os" = x"mingw32" ; then
     echo "Windows (Direct3D)        yes"
+    echo "DXVA2 support             ${dxva2-no}"
   fi
   echo "MHEG support              ${mheg}"
   echo
