@@ -92,6 +92,13 @@ bool D3D9Image::SetAsRenderTarget(void)
     return m_valid;
 }
 
+bool D3D9Image::UpdateImage(IDirect3DSurface9 *surface)
+{
+    if (m_valid)
+        return m_render->StretchRect(m_texture, surface, false);
+    return false;
+}
+
 bool D3D9Image::UpdateImage(const MythImage *img)
 {
     bool result = true;
@@ -493,11 +500,18 @@ bool MythRenderD3D9::End(void)
     return true;
 }
 
+void MythRenderD3D9::CopyFrame(void* surface, D3D9Image *img)
+{
+    if (surface && img)
+        img->UpdateImage((IDirect3DSurface9*)surface);
+}
+
 bool MythRenderD3D9::StretchRect(IDirect3DTexture9 *texture,
-                              IDirect3DSurface9 *surface)
+                                 IDirect3DSurface9 *surface,
+                                 bool known_surface)
 {
     if (!m_textures.contains(texture) ||
-        !m_surfaces.contains(surface))
+       (known_surface && !m_surfaces.contains(surface)))
         return false;
 
     QMutexLocker locker(&m_lock);

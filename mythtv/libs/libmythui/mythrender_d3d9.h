@@ -20,6 +20,7 @@ class MUI_PUBLIC D3D9Image
     bool     IsValid(void) const { return m_valid; }
     QSize    GetSize(void) const { return m_size;  }
     bool     SetAsRenderTarget(void);
+    bool     UpdateImage(IDirect3DSurface9 *surface);
     bool     UpdateImage(const MythImage *img);
     bool     UpdateVertices(const QRect &dvr, const QRect &vr, int alpha = 255,
                             bool video = false);
@@ -46,10 +47,13 @@ class MUI_PUBLIC MythRenderD3D9
     bool Create(QSize size, HWND window);
     bool Test(bool &reset);
 
+    IDirect3DDevice9* GetDevice(void) { return m_d3dDevice; }
     bool ClearBuffer(void);
     bool Begin(void);
     bool End(void);
-    bool StretchRect(IDirect3DTexture9 *texture, IDirect3DSurface9 *surface);
+    void CopyFrame(void* surface, D3D9Image *img);
+    bool StretchRect(IDirect3DTexture9 *texture, IDirect3DSurface9 *surface,
+                     bool known_surface = true);
     bool DrawTexturedQuad(IDirect3DVertexBuffer9 *vertexbuffer);
     void DrawRect(const QRect &rect,  const QColor &color);
     bool Present(HWND win);
