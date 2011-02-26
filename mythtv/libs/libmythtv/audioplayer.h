@@ -58,6 +58,7 @@ class MPUBLIC AudioPlayer
     MuteState IncrMuteState(void);
 
     void AddAudioData(char *buffer, int len, int64_t timecode);
+    int64_t LengthLastData(void);
     bool GetBufferStatus(uint &fill, uint &total);
     bool IsBufferAlmostFull(void);
 

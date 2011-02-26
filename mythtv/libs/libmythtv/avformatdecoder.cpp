@@ -282,8 +282,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       dummy_frame(NULL),
       // DVD
       dvd_xvmc_enabled(false), dvd_video_codec_changed(false),
-      m_fps(0.0f),
-      m_spdifenc(NULL)
+      m_fps(0.0f)
 {
     bzero(&params, sizeof(AVFormatParameters));
     bzero(&readcontext, sizeof(readcontext));
@@ -355,9 +354,6 @@ AvFormatDecoder::~AvFormatDecoder()
         lcd->setVariousLEDs(VARIOUS_SPDIF, false);
         lcd->setSpeakerLEDs(SPEAKER_71, false);    // should clear any and all speaker LEDs
     }
-
-    if (m_spdifenc)
-        delete m_spdifenc;
 }
 
 void AvFormatDecoder::CloseCodecs()
@@ -4082,42 +4078,9 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
         if (audioOut.do_passthru)
         {
-            if (!m_spdifenc)
-            {
-                m_spdifenc = new SPDIFEncoder("spdif", ctx);
-                if (m_spdifenc->Succeeded() && ctx->codec_id == CODEC_ID_DTS)
-                {
-                    switch(ctx->profile)
-                    {
-                        case FF_PROFILE_DTS:
-                        case FF_PROFILE_DTS_ES:
-                        case FF_PROFILE_DTS_96_24:
-                            m_spdifenc->SetMaxHDRate(0);
-                            break;
-                        case FF_PROFILE_DTS_HD_HRA:
-                            m_spdifenc->SetMaxHDRate(m_audio->CanDTSHD() ?
-                                                     192000 : 0);
-                            break;
-                        case FF_PROFILE_DTS_HD_MA:
-                            m_spdifenc->SetMaxHDRate(m_audio->GetMaxHDRate());
-                    }
-                }
-            }
-            if (!m_spdifenc->Succeeded())
-            {
-                // Creation of the muxer previous failed, exit early
-                avcodeclock->unlock();
-                return false;
-            }
-            m_spdifenc->WriteFrame(tmp_pkt.data, tmp_pkt.size);
-
-            ret = m_spdifenc->GetData((unsigned char *)audioSamples, data_size);
-            if (ret < 0)
-            {
-                avcodeclock->unlock();
-                return true;
-            }
-            // We have processed all the data, there can't be any left
+            memcpy(audioSamples, tmp_pkt.data, tmp_pkt.size);
+            data_size = tmp_pkt.size;
+             // We have processed all the data, there can't be any left
             tmp_pkt.size = 0;
         }
         else
@@ -4168,21 +4131,16 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
         long long temppts = lastapts;
 
-        // calc for next frame
-        lastapts += (long long)
-            ((double)(data_size * 1000) /
-             (ctx->sample_rate * ctx->channels *
-              av_get_bits_per_sample_format(ctx->sample_fmt)>>3));
-
-        VERBOSE(VB_PLAYBACK+VB_TIMESTAMP,
-                LOC + QString("audio timecode %1 %2 %3 %4")
-                .arg(pkt->pts).arg(pkt->dts).arg(temppts).arg(lastapts));
-
         if (audSubIdx != -1)
             extract_mono_channel(audSubIdx, &audioOut,
                                  (char *)audioSamples, data_size);
 
         m_audio->AddAudioData((char *)audioSamples, data_size, temppts);
+        lastapts += m_audio->LengthLastData();
+
+        VERBOSE(VB_TIMESTAMP,
+                LOC + QString("audio timecode %1 %2 %3 %4")
+                .arg(pkt->pts).arg(pkt->dts).arg(temppts).arg(lastapts));
 
         allowedquit |=
             ringBuffer->InDVDMenuOrStillFrame() ||
@@ -4778,13 +4736,6 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
     if (info == audioIn)
         return false;
-
-    if (m_spdifenc)
-    {
-        // stream has changed, we cannot re-use existing spdif muxer
-        delete m_spdifenc;
-        m_spdifenc = NULL;
-    }
 
     VERBOSE(VB_AUDIO, LOC + "Initializing audio parms from " +
             QString("audio track #%1").arg(currentTrack[kTrackTypeAudio]+1));

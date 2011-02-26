@@ -656,12 +656,12 @@ void AudioTestThread::run()
                 int top = m_samplerate / 1000 * 3;
                 for (int j = 0; j < top && !m_interrupted; j++)
                 {
-                    AudioOutputUtil::GeneratePinkSamples(frames, m_channels,
-                                                         current, 1000,
-                                                         m_hd ? 32 : 16);
-                    if (!m_audioOutput->AddFrames(frames, 1000, -1))
+                    AudioOutputUtil::GeneratePinkFrames(frames, m_channels,
+                                                        current, 1000,
+                                                        m_hd ? 32 : 16);
+                    if (!m_audioOutput->AddFrames(frames, 1000 , -1))
                     {
-                        VERBOSE(VB_AUDIO, "AddAudioData() "
+                        VERBOSE(VB_AUDIO, "AddData() "
                                 "Audio buffer overflow, audio data lost!");
                     }
                      // a tad less than 1/48th of a second to avoid underruns

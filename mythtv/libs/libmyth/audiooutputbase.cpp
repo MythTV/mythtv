@@ -17,6 +17,7 @@
 #include "audiooutputdownmix.h"
 #include "SoundTouch.h"
 #include "freesurround.h"
+#include "spdifencoder.h"
 
 #define LOC QString("AO: ")
 #define LOC_ERR QString("AO, ERROR: ")
@@ -97,7 +98,8 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     src_out(NULL),              kAudioSRCOutputSize(0),
     memory_corruption_test2(0xdeadbeef),
     memory_corruption_test3(0xdeadbeef),
-    m_configure_succeeded(true)
+    m_configure_succeeded(true),m_length_last_data(0),
+    m_spdifenc(NULL)
 {
     src_in = (float *)AOALIGN(src_in_buf);
     // The following are not bzero() because MS Windows doesn't like it.
@@ -343,25 +345,25 @@ bool AudioOutputBase::ToggleUpmix(void)
 
 /*
  * Setup samplerate and number of channels for passthrough
+ * Create SPDIF encoder and true if successful
  */
-void AudioOutputBase::SetupPassthrough(AudioSettings &settings,
+bool AudioOutputBase::SetupPassthrough(int codec, int codec_profile,
                                        int &samplerate_tmp, int &channels_tmp)
 {
-    samplerate_tmp = settings.samplerate;
     channels_tmp = 2;
     QString log;
 
-    switch (settings.codec)
+    switch (codec)
     {
         case CODEC_ID_AC3:
             log = "AC3";
             break;
         case CODEC_ID_EAC3:
-            samplerate_tmp = settings.samplerate * 4;
+            samplerate_tmp = samplerate_tmp * 4;
             log = "Dolby Digital Plus (E-AC3)";
             break;
         case CODEC_ID_DTS:
-            switch(settings.codec_profile)
+            switch(codec_profile)
             {
                 case FF_PROFILE_DTS_ES:
                     log = "DTS-ES";
@@ -391,7 +393,7 @@ void AudioOutputBase::SetupPassthrough(AudioSettings &settings,
         case CODEC_ID_TRUEHD:
             channels_tmp = 8;
             log = "TrueHD";
-            switch(settings.samplerate)
+            switch(samplerate_tmp)
             {
                 case 48000:
                 case 96000:
@@ -412,6 +414,39 @@ void AudioOutputBase::SetupPassthrough(AudioSettings &settings,
             break;
     }
     VBAUDIO("Setting " + log + " passthrough");
+
+    if (m_spdifenc)
+    {
+        delete m_spdifenc;
+    }
+
+    m_spdifenc = new SPDIFEncoder("spdif", codec);
+    if (m_spdifenc->Succeeded() && codec == CODEC_ID_DTS)
+    {
+        switch(codec_profile)
+        {
+            case FF_PROFILE_DTS:
+            case FF_PROFILE_DTS_ES:
+            case FF_PROFILE_DTS_96_24:
+                m_spdifenc->SetMaxHDRate(0);
+                break;
+            case FF_PROFILE_DTS_HD_HRA:
+                m_spdifenc->SetMaxHDRate(
+                    OutputSettings(true)->canFeature(FEATURE_DTSHD) ?
+                    192000 : 0);
+                break;
+            case FF_PROFILE_DTS_HD_MA:
+                m_spdifenc->SetMaxHDRate(OutputSettings(true)->GetMaxHDRate());
+        }
+    }
+
+    if (!m_spdifenc->Succeeded())
+    {
+        delete m_spdifenc;
+        m_spdifenc = NULL;
+        return false;
+    }
+    return true;
 }
 
 AudioOutputSettings *AudioOutputBase::OutputSettings(bool digital)
@@ -495,7 +530,9 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     int samplerate_tmp, channels_tmp;
     if (settings.use_passthru)
     {
-        SetupPassthrough(settings, samplerate_tmp, channels_tmp);
+        samplerate_tmp = settings.samplerate;
+        SetupPassthrough(settings.codec, settings.codec_profile,
+                         samplerate_tmp, channels_tmp);
         general_deps = samplerate == samplerate_tmp && channels == channels_tmp;
     }
 
@@ -859,7 +896,7 @@ void AudioOutputBase::Reset()
  * Set the timecode of the samples most recently added to the audiobuffer
  *
  * Used by mythmusic for seeking since it doesn't provide timecodes to
- * AddFrames()
+ * AddData()
  */
 void AudioOutputBase::SetTimecode(int64_t timecode)
 {
@@ -953,7 +990,7 @@ int64_t AudioOutputBase::GetAudiotime(void)
 
     /* timecode is the stretch adjusted version
        of major post-stretched buffer contents
-       processing latencies are catered for in AddFrames/SetAudiotime
+       processing latencies are catered for in AddData/SetAudiotime
        to eliminate race */
     audiotime = audbuf_timecode - (
         ((int64_t)(main_buffer + soundcard_buffer) * eff_stretchfactor) /
@@ -983,7 +1020,7 @@ int64_t AudioOutputBase::GetAudiotime(void)
 /**
  * Set the timecode of the top of the ringbuffer
  * Exclude all other processing elements as they dont vary
- * between AddFrames calls
+ * between AddData calls
  */
 void AudioOutputBase::SetAudiotime(int frames, int64_t timecode)
 {
@@ -1193,26 +1230,34 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
 bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
                                 int64_t timecode)
 {
-    int org_waud = waud,               afree = audiofree();
-    int frames   = in_frames;
+    return AddData(in_buffer, in_frames * source_bytes_per_frame, timecode);
+}
+
+/**
+ * Add data to the audiobuffer and perform any required processing
+ *
+ * Returns false if there's not enough space right now
+ */
+bool AudioOutputBase::AddData(void *in_buffer, int in_len,
+                              int64_t timecode)
+{
+    int org_waud = waud;
+    int afree    = audiofree();
+    int frames   = in_len / source_bytes_per_frame;
     void *buffer = in_buffer;
     int bpf      = bytes_per_frame;
-    int len      = frames * source_bytes_per_frame;
+    int len      = in_len;
     int used     = kAudioRingBufferSize - afree;
     bool music   = false;
     int bdiff;
 
     if (!m_configure_succeeded)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "AddFrames called with audio framework not "
+        VERBOSE(VB_IMPORTANT, LOC + "AddData called with audio framework not "
                 "initialised");
+        m_length_last_data = 0;
         return false;
     }
-
-    VBAUDIOTS(QString("AddFrames frames=%1, bytes=%2, used=%3, free=%4, "
-                      "timecode=%5 needsupmix=%6")
-              .arg(frames).arg(len).arg(used).arg(afree).arg(timecode)
-              .arg(needs_upmix));
 
     /* See if we're waiting for new samples to be buffered before we unpause
        post channel change, seek, etc. Wait for 4 fragments to be buffered */
@@ -1221,6 +1266,28 @@ bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
         unpause_when_ready = false;
         Pause(false);
     }
+
+    if (passthru && m_spdifenc)
+    {
+        // mux into an IEC958 packet
+        m_spdifenc->WriteFrame((unsigned char *)in_buffer, len);
+        len = m_spdifenc->GetProcessedSize();
+        if (len > 0)
+        {
+            buffer = in_buffer = m_spdifenc->GetProcessedBuffer();
+            m_spdifenc->Reset();
+            frames = len / source_bytes_per_frame;
+        }
+        else
+            frames = 0;
+    }
+    m_length_last_data = (int64_t)
+        ((double)(len * 1000) / (source_samplerate * source_bytes_per_frame));
+
+    VBAUDIOTS(QString("AddData frames=%1, bytes=%2, used=%3, free=%4, "
+                      "timecode=%5 needsupmix=%6")
+              .arg(frames).arg(len).arg(used).arg(afree).arg(timecode)
+              .arg(needs_upmix));
 
     // Don't write new samples if we're resetting the buffer or reconfiguring
     QMutexLocker lock(&audio_buflock);
@@ -1263,11 +1330,11 @@ bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
 
     if (len > afree)
     {
-        VBAUDIOTS("Buffer is full, AddFrames returning false");
+        VBAUDIOTS("Buffer is full, AddData returning false");
         return false; // would overflow
     }
 
-    int frames_remaining = in_frames;
+    int frames_remaining = frames;
     int frames_final = 0;
     int maxframes = (kAudioSRCInputSize /
                      (passthru ? channels : source_channels)) & ~0xf;

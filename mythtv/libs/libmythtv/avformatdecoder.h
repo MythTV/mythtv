@@ -284,7 +284,7 @@ class AvFormatDecoder : public DecoderBase
     uint32_t  start_code_state;
 
     long long lastvpts;
-    long long lastapts;
+    long long  lastapts;
     long long lastccptsu;
 
     int64_t faulty_pts;
@@ -346,9 +346,6 @@ class AvFormatDecoder : public DecoderBase
     bool dvd_video_codec_changed;
 
     float m_fps;
-
-    // SPDIF Encoder for digital passthrough
-    SPDIFEncoder     *m_spdifenc;
 };
 
 #endif

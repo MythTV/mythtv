@@ -43,6 +43,9 @@ private:
     int tail;
 };
 
+// Forward declaration of SPDIF encoder
+class SPDIFEncoder;
+
 class AudioOutputBase : public AudioOutput, public QThread
 {
  public:
@@ -75,6 +78,8 @@ class AudioOutputBase : public AudioOutput, public QThread
 
     // timecode is in milliseconds.
     virtual bool AddFrames(void *buffer, int frames, int64_t timecode);
+    virtual bool AddData(void *buffer, int len, int64_t timecode);
+    virtual int64_t LengthLastData(void) { return m_length_last_data; }
 
     virtual void SetTimecode(int64_t timecode);
     virtual bool IsPaused(void) const { return actually_paused; }
@@ -178,9 +183,9 @@ class AudioOutputBase : public AudioOutput, public QThread
     int src_quality;
 
  private:
-    void SetupPassthrough(AudioSettings &settings, int &samplerate_tmp,
-                          int &channels_tmp);
-    AudioOutputSettings* OutputSettings(bool digital);
+    bool SetupPassthrough(int codec, int codec_profile,
+                          int &samplerate_tmp, int &channels_tmp);
+    AudioOutputSettings* OutputSettings(bool digital = true);
     int CopyWithUpmix(char *buffer, int frames, int &org_waud);
     void SetAudiotime(int frames, int64_t timecode);
     AudioOutputSettings *output_settingsraw;
@@ -258,6 +263,10 @@ class AudioOutputBase : public AudioOutput, public QThread
     uchar audiobuffer[kAudioRingBufferSize];
     uint memory_corruption_test3;
     uint m_configure_succeeded;
+    int64_t m_length_last_data;
+
+    // SPDIF Encoder for digital passthrough
+    SPDIFEncoder     *m_spdifenc;
 };
 
 #endif

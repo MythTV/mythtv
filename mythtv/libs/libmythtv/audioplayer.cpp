@@ -363,9 +363,17 @@ void AudioPlayer::AddAudioData(char *buffer, int len, int64_t timecode)
     if (samplesize <= 0)
         return;
 
-    if (!m_audioOutput->AddFrames(buffer, len / samplesize, timecode))
+    if (!m_audioOutput->AddData(buffer, len, timecode))
         VERBOSE(VB_PLAYBACK, LOC + "AddAudioData(): "
                 "Audio buffer overflow, audio data lost!");
+}
+
+int64_t AudioPlayer::LengthLastData(void)
+{
+    if (!m_audioOutput)
+        return 0;
+    else
+        return m_audioOutput->LengthLastData();
 }
 
 bool AudioPlayer::GetBufferStatus(uint &fill, uint &total)

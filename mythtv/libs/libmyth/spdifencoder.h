@@ -15,10 +15,12 @@ extern "C" {
 class MPUBLIC SPDIFEncoder
 {
   public:
-    SPDIFEncoder(QString muxer, AVCodecContext *ctx);
+    SPDIFEncoder(QString muxer, int codec_id);
     ~SPDIFEncoder();
     void WriteFrame(unsigned char *data, int size);
     int  GetData(unsigned char *buffer, int &dest_size);
+    int  GetProcessedSize() { return m_size; };
+    unsigned char *GetProcessedBuffer() { return m_buffer; };
     void Reset();
     bool Succeeded()  { return m_complete; };
     bool SetMaxHDRate(int rate);

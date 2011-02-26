@@ -18,7 +18,7 @@
  *                         Use "adts" for ADTS encpsulation (AAC)
  *   AVCodecContext *ctx : CodecContext to be encaspulated
  */
-SPDIFEncoder::SPDIFEncoder(QString muxer, AVCodecContext *ctx)
+SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
     : m_complete(false), m_oc(NULL), m_stream(NULL), m_size(0)
 {
     QByteArray dev_ba     = muxer.toAscii();
@@ -102,21 +102,11 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, AVCodecContext *ctx)
 
     AVCodecContext *codec = m_stream->codec;
 
-    codec->codec_type     = ctx->codec_type;
-    codec->codec_id       = ctx->codec_id;
-    codec->sample_rate    = ctx->sample_rate;
-    codec->sample_fmt     = ctx->sample_fmt;
-    codec->channels       = ctx->channels;
-    codec->bit_rate       = ctx->bit_rate;
-    codec->extradata      = new uint8_t[ctx->extradata_size];
-    codec->extradata_size = ctx->extradata_size;
-    memcpy(codec->extradata, ctx->extradata, ctx->extradata_size);
-
+    codec->codec_id       = (CodecID)codec_id;
     av_write_header(m_oc);
 
-    VERBOSE(VB_AUDIO, LOC + QString("Creating %1 encoder (%2, %3Hz)")
-            .arg(muxer).arg(ff_codec_id_string((CodecID)codec->codec_type))
-            .arg(codec->sample_rate));
+    VERBOSE(VB_AUDIO, LOC + QString("Creating %1 encoder (for %2)")
+            .arg(muxer).arg(ff_codec_id_string((CodecID)codec_id)));
 
     m_complete = true;
 }
