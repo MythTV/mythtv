@@ -34,7 +34,6 @@ using namespace std;
 #include "interactivetv.h"
 #include "dvdringbuffer.h"
 #include "bdringbuffer.h"
-#include "streamingringbuffer.h"
 #include "videodisplayprofile.h"
 #include "mythuihelper.h"
 
@@ -918,9 +917,6 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     InitByteContext();
 
-    if (ringBuffer->IsStream() && !ringBuffer->StartFromBeginning())
-        return -1;
-
     int err = av_open_input_stream(&ic, ic->pb, filename, fmt, &params);
     if (err < 0)
     {
@@ -932,7 +928,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     int ret = FindStreamInfo();
 
     // Reset DVD/bluray ringbuffers
-    if (ringBuffer->IsDisc() && !ringBuffer->StartFromBeginning())
+    if (!ringBuffer->StartFromBeginning())
         return -1;
     ringBuffer->IgnoreWaitStates(false);
 

@@ -44,35 +44,15 @@ bool StreamingRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     return true;
 }
 
-bool StreamingRingBuffer::StartFromBeginning(void)
-{
-    if (m_context)
-    {
-        url_close(m_context);
-        m_context = NULL;
-    }
-
-    return OpenFile(filename);
-}
-
 long long StreamingRingBuffer::Seek(long long pos, int whence, bool has_lock)
 {
-    if (m_context)
-    {
-        if (url_seek(m_context, pos, whence) < 0)
-        {
-            ateof = true;
-            return 0;
-        }
-        return pos;
-    }
     return 0;
 }
 
 int StreamingRingBuffer::safe_read(void *data, uint sz)
 {
     if (m_context)
-        return url_read_complete(m_context, (unsigned char*)data, sz);
+        return url_read(m_context, (unsigned char*)data, sz);
     return 0;
 }
 

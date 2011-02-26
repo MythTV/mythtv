@@ -1058,7 +1058,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
 
     len = 0;
     int i = 0;
-    while (upmixer && i < frames)
+    while (i < frames)
     {
         int nFrames;
 

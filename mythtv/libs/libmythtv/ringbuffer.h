@@ -20,7 +20,6 @@ extern "C" {
 class ThreadedFileWriter;
 class DVDRingBuffer;
 class BDRingBuffer;
-class StreamingRingBuffer;
 class LiveTVChain;
 class RemoteFile;
 
@@ -61,13 +60,10 @@ class MTV_PUBLIC RingBuffer : protected QThread
     bool IsDisc(void) const { return IsDVD() || IsBD(); }
     bool IsDVD(void)  const { return DVD() != NULL;     }
     bool IsBD(void)   const { return BD()  != NULL;     }
-    bool IsStream(void) const { return Stream() != NULL;  }
-    const StreamingRingBuffer *Stream(void) const;
     const DVDRingBuffer *DVD(void) const;
     const BDRingBuffer  *BD(void)  const;
     DVDRingBuffer *DVD(void);
     BDRingBuffer  *BD(void);
-    StreamingRingBuffer *Stream(void);
     virtual bool StartFromBeginning(void)                   { return true;  }
     virtual void IgnoreWaitStates(bool ignore)              { }
     virtual bool IsInDiscMenuOrStillFrame(void) const       { return false; }
