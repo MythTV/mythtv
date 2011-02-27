@@ -45,10 +45,15 @@ class VideoOutputD3D : public VideoOutput
     void RemovePIP(MythPlayer *pipplayer);
     bool IsPIPSupported(void) const { return false; /*true*/}
     virtual MythPainter *GetOSDPainter(void) { return (MythPainter*)m_osd_painter; }
+    bool hasHWAcceleration(void) const { return !codec_is_std(video_codec_id); }
 
   private:
     void TearDown(void);
     bool SetupContext(void);
+    bool CreateBuffers(void);
+    bool InitBuffers(void);
+    bool CreatePauseFrame(void);
+    void SetProfile(void);
     void DestroyContext(void);
     void UpdateFrame(VideoFrame *frame, D3D9Image *img);
 

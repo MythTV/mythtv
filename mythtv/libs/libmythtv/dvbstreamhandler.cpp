@@ -1,7 +1,6 @@
 // -*- Mode: c++ -*-
 
 // POSIX headers
-#include <pthread.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/select.h>
@@ -95,8 +94,6 @@ DVBStreamHandler::DVBStreamHandler(const QString &dvb_device) :
     _allow_retune(false),
 
     _start_stop_lock(QMutex::Recursive),
-    _running(false),
-    _reader_thread(pthread_t()),
     _using_section_reader(false),
 
     _device_read_buffer(NULL),
@@ -105,7 +102,8 @@ DVBStreamHandler::DVBStreamHandler(const QString &dvb_device) :
 
     _pid_lock(QMutex::Recursive),
     _open_pid_filters(0),
-    _listener_lock(QMutex::Recursive)
+    _listener_lock(QMutex::Recursive),
+    _run(false)
 {
 }
 
@@ -188,11 +186,12 @@ void DVBStreamHandler::RemoveListener(MPEGStreamData *data)
     VERBOSE(VB_RECORD, LOC + "RemoveListener("<<data<<") -- end");
 }
 
-void *run_dvb_stream_handler_thunk(void *param)
+void DVBReadThread::run(void)
 {
-    DVBStreamHandler *mon = (DVBStreamHandler*) param;
-    mon->Run();
-    return NULL;
+    if (!m_parent)
+        return;
+
+    m_parent->Run();
 }
 
 void DVBStreamHandler::Start(void)
@@ -209,21 +208,13 @@ void DVBStreamHandler::Start(void)
 
     if (!IsRunning())
     {
-        QMutex is_running_lock;
-        int rval = pthread_create(&_reader_thread, NULL,
-                                  run_dvb_stream_handler_thunk, this);
+        _reader_thread.SetParent(this);
+        _reader_thread.start();
 
-        if (0 != rval)
+        if (!_reader_thread.isRunning())
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Start: Failed to create thread." + ENO);
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Start: Failed to create thread.");
             return;
-        }
-
-        is_running_lock.lock();
-        while (!IsRunning())
-        {
-            _running_state_changed.wait(&is_running_lock, 100);
         }
     }
 }
@@ -236,16 +227,15 @@ void DVBStreamHandler::Stop(void)
     {
         if (_device_read_buffer)
             _device_read_buffer->Stop();
-        SetRunning(false);
-        pthread_join(_reader_thread, NULL);
+        _run = false;
+        _reader_thread.wait();
     }
 }
 
 void DVBStreamHandler::Run(void)
 {
-    SetRunning(true);
-
     _using_section_reader = !SupportsTSMonitoring() && _allow_section_reader;
+    _run = true;
 
     if (_using_section_reader)
         RunSR();
@@ -317,7 +307,7 @@ void DVBStreamHandler::RunTS(void)
     fd_set fd_select_set;
     FD_ZERO(        &fd_select_set);
     FD_SET (dvr_fd, &fd_select_set);
-    while (IsRunning() && !_error)
+    while (_run && !_error)
     {
         RetuneMonitor();
         UpdateFiltersFromStreamData();
@@ -407,8 +397,6 @@ void DVBStreamHandler::RunTS(void)
     delete[] buffer;
 
     VERBOSE(VB_RECORD, LOC + "RunTS(): " + "end");
-
-    SetRunning(false);
 }
 
 /** \fn DVBStreamHandler::RunSR(void)
@@ -426,7 +414,7 @@ void DVBStreamHandler::RunSR(void)
 
     VERBOSE(VB_RECORD, LOC + "RunSR(): begin");
 
-    while (IsRunning())
+    while (_run)
     {
         RetuneMonitor();
         UpdateFiltersFromStreamData();
@@ -988,12 +976,6 @@ bool PIDInfo::Close(const QString &dvb_dev)
     }
 
     return true;
-}
-
-void DVBStreamHandler::SetRunning(bool is_running)
-{
-    _running = is_running;
-    _running_state_changed.wakeAll();
 }
 
 PIDPriority DVBStreamHandler::GetPIDPriority(uint pid) const

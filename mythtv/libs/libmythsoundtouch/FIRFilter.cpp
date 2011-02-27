@@ -178,7 +178,7 @@ void FIRFilter::setCoefficients(const SAMPLETYPE *coeffs, uint newLength, uint u
     assert(length == newLength);
 
     resultDivFactor = uResultDivFactor;
-    resultDivider = (SAMPLETYPE)pow(2, resultDivFactor);
+    resultDivider = (SAMPLETYPE)pow( (SAMPLETYPE)2, (int)resultDivFactor);
 
     delete[] filterCoeffs;
     filterCoeffs = new SAMPLETYPE[length];

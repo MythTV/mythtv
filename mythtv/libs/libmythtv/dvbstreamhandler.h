@@ -8,6 +8,7 @@ using namespace std;
 
 #include <QMap>
 #include <QMutex>
+#include <QThread>
 
 #include "util.h"
 #include "DeviceReadBuffer.h"
@@ -45,9 +46,20 @@ class PIDInfo
 };
 typedef QMap<uint,PIDInfo*> PIDInfoMap;
 
+class DVBReadThread : public QThread
+{
+    Q_OBJECT
+  public:
+    DVBReadThread() : m_parent(NULL) {}
+    void SetParent(DVBStreamHandler *parent) { m_parent = parent; }
+    void run(void);
+  private:
+    DVBStreamHandler *m_parent;
+};
+
 class DVBStreamHandler : public ReaderPausedCB
 {
-    friend void *run_dvb_stream_handler_thunk(void *param);
+    friend class DVBReadThread;
 
   public:
     static DVBStreamHandler *Get(const QString &dvb_device);
@@ -60,7 +72,7 @@ class DVBStreamHandler : public ReaderPausedCB
 
     void RetuneMonitor(void);
 
-    bool IsRunning(void) const { return _running; }
+    bool IsRunning(void) const { return _reader_thread.isRunning(); }
     bool IsRetuneAllowed(void) const { return _allow_retune; }
 
     void SetRetuneAllowed(bool              allow,
@@ -88,8 +100,6 @@ class DVBStreamHandler : public ReaderPausedCB
     bool RemoveAllPIDFilters(void);
     void CycleFiltersByPriority(void);
 
-    void SetRunning(bool);
-
     PIDPriority GetPIDPriority(uint pid) const;
     bool SupportsTSMonitoring(void);
 
@@ -101,9 +111,7 @@ class DVBStreamHandler : public ReaderPausedCB
     bool              _allow_retune;
 
     mutable QMutex     _start_stop_lock;
-    bool              _running;
-    QWaitCondition    _running_state_changed;
-    pthread_t         _reader_thread;
+    DVBReadThread     _reader_thread;
     bool              _using_section_reader;
     DeviceReadBuffer *_device_read_buffer;
     DTVSignalMonitor *_sigmon;
@@ -126,6 +134,8 @@ class DVBStreamHandler : public ReaderPausedCB
     static QMutex                          _handlers_lock;
     static QMap<QString,DVBStreamHandler*> _handlers;
     static QMap<QString,uint>              _handlers_refcnt;
+
+    bool              _run;
 };
 
 #endif // _DVBSTREAMHANDLER_H_

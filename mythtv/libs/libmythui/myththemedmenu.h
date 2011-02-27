@@ -1,6 +1,7 @@
 #ifndef MYTHTHEMEDMENU_H_
 #define MYTHTHEMEDMENU_H_
 
+#include "mythversion.h"
 #include "mythscreentype.h"
 #include "mythdialogbox.h"
 #include "mythuistatetype.h"

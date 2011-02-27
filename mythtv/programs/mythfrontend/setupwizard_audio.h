@@ -43,8 +43,9 @@ class AudioSetupWizard : public MythScreenType
 
     MythUICheckBox      *m_dtsCheck;
     MythUICheckBox      *m_ac3Check;
-    MythUICheckBox      *m_hdCheck;
-    MythUICheckBox      *m_hdplusCheck;
+    MythUICheckBox      *m_eac3Check;
+    MythUICheckBox      *m_truehdCheck;
+    MythUICheckBox      *m_dtshdCheck;
 
     MythUIButton        *m_testSpeakerButton;
 

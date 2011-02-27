@@ -8,6 +8,7 @@ using namespace std;
 
 #include <QMap>
 #include <QMutex>
+#include <QThread>
 
 #include "util.h"
 #include "DeviceReadBuffer.h"
@@ -39,9 +40,20 @@ typedef QMap<uint,int> FilterMap;
 
 //#define RETUNE_TIMEOUT 5000
 
+class HDHRReadThread : public QThread
+{
+    Q_OBJECT
+  public:
+    HDHRReadThread() : m_parent(NULL) {}
+    void SetParent(HDHRStreamHandler *parent) { m_parent = parent; }
+    void run(void);
+  private:
+    HDHRStreamHandler *m_parent;
+};
+
 class HDHRStreamHandler : public ReaderPausedCB
 {
-    friend void *run_hdhr_stream_handler_thunk(void *param);
+    friend class HDHRReadThread;
 
   public:
     static HDHRStreamHandler *Get(const QString &devicename);
@@ -50,7 +62,7 @@ class HDHRStreamHandler : public ReaderPausedCB
     void AddListener(MPEGStreamData *data);
     void RemoveListener(MPEGStreamData *data);
 
-    bool IsRunning(void) const { return _running; }
+    bool IsRunning(void) const { return _reader_thread.isRunning(); }
     void GetTunerStatus(struct hdhomerun_tuner_status_t *status);
     bool IsConnected(void) const;
     vector<DTVTunerType> GetTunerTypes(void) const { return _tuner_types; }
@@ -94,8 +106,6 @@ class HDHRStreamHandler : public ReaderPausedCB
     bool RemoveAllPIDFilters(void);
     bool UpdateFilters(void);
 
-    void SetRunning(bool);
-
     PIDPriority GetPIDPriority(uint pid) const;
 
   private:
@@ -106,9 +116,8 @@ class HDHRStreamHandler : public ReaderPausedCB
     HDHRTuneMode         _tune_mode; // debug self check
 
     mutable QMutex    _start_stop_lock;
-    bool              _running;
-    QWaitCondition    _running_state_changed;
-    pthread_t         _reader_thread;
+    HDHRReadThread    _reader_thread;
+    bool              _run;
 
     mutable QMutex    _pid_lock;
     vector<uint>      _eit_pids;

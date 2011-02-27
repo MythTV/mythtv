@@ -1747,16 +1747,16 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
     SendResponse(pbssock, strlist);
 }
 
-void *MainServer::SpawnDeleteThread(void *param)
+void DeleteThread::run(void)
 {
-    DeleteStruct *ds = (DeleteStruct *)param;
+    if (!m_parent)
+        return;
 
-    MainServer *ms = ds->ms;
-    ms->DoDeleteThread(ds);
+    MainServer *ms = m_parent->ms;
+    ms->DoDeleteThread(m_parent);
 
-    delete ds;
-
-    return NULL;
+    delete m_parent;
+    this->deleteLater();
 }
 
 void MainServer::DoDeleteThread(const DeleteStruct *ds)
@@ -2508,12 +2508,9 @@ void MainServer::DoHandleDeleteRecording(
 
         recinfo.SaveDeletePendingFlag(true);
 
-        pthread_t deleteThread;
-        pthread_attr_t attr;
-        pthread_attr_init(&attr);
-        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-        pthread_create(&deleteThread, &attr, SpawnDeleteThread, ds);
-        pthread_attr_destroy(&attr);
+        DeleteThread *deleteThread = new DeleteThread;
+        deleteThread->SetParent(ds);
+        deleteThread->start();
     }
     else
     {
@@ -4470,16 +4467,16 @@ void MainServer::GetFilesystemInfos(vector <FileSystemInfo> &fsInfos)
     }
 }
 
-void *MainServer::SpawnTruncateThread(void *param)
+void TruncateThread::run(void)
 {
-    DeleteStruct *ds = (DeleteStruct *)param;
+    if (!m_parent)
+        return;
 
-    MainServer *ms = ds->ms;
-    ms->DoTruncateThread(ds);
+    MainServer *ms = m_parent->ms;
+    ms->DoTruncateThread(m_parent);
 
-    delete ds;
-
-    return NULL;
+    delete m_parent;
+    this->deleteLater();
 }
 
 void MainServer::DoTruncateThread(const DeleteStruct *ds)
@@ -4571,12 +4568,9 @@ bool MainServer::HandleDeleteFile(QString filename, QString storagegroup,
         ds->fd = fd;
         ds->size = size;
 
-        pthread_t truncateThread;
-        pthread_attr_t attr;
-        pthread_attr_init(&attr);
-        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-        pthread_create(&truncateThread, &attr, SpawnTruncateThread, ds);
-        pthread_attr_destroy(&attr);
+        TruncateThread *truncateThread = new TruncateThread;
+        truncateThread->SetParent(ds);
+        truncateThread->run();
     }
 
     return true;

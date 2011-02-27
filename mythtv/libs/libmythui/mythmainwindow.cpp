@@ -967,7 +967,7 @@ void MythMainWindow::Init(void)
     }
 #endif
 #ifdef USE_OPENGL_PAINTER
-    if (painter == "auto" && (!d->painter && !d->paintwin) ||
+    if ((painter == "auto" && (!d->painter && !d->paintwin)) ||
         painter == "opengl")
     {
         VERBOSE(VB_GENERAL, "Trying the OpenGL painter");
@@ -1224,7 +1224,12 @@ void MythMainWindow::Show(void)
 void MythMainWindow::attach(QWidget *child)
 {
 #ifdef USING_MINGW
-#warning TODO FIXME MythMainWindow::attach() does not always work on MS Windows!
+# ifdef _MSC_VER
+#  pragma message( "TODO FIXME MythMainWindow::attach() does not always work on MS Windows!")
+# else
+#  warning TODO FIXME MythMainWindow::attach() does not always work on MS Windows!
+# endif
+
     // if windows are created on different threads,
     // or if setFocus() is called from a thread other than the main UI thread,
     // setFocus() hangs the thread that called it

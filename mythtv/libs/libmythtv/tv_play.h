@@ -25,6 +25,7 @@ using namespace std;
 #include <QHash>
 #include <QTime>
 #include <QMap>
+#include <QPointer>
 
 // MythTV
 #include "mythdeque.h"
@@ -708,10 +709,10 @@ class MTV_PUBLIC TV : public QObject
     mutable QMutex chanEditMapLock; ///< Lock for chanEditMap and ddMap
     InfoMap   chanEditMap;          ///< Channel Editing initial map
 
-    DDKeyMap      ddMap;                ///< DataDirect channel map
-    uint          ddMapSourceId;        ///< DataDirect channel map sourceid
-    bool          ddMapLoaderRunning;   ///< DataDirect thread running
-    TVDDMapThread ddMapLoader;          ///< DataDirect map loader thread
+    DDKeyMap      ddMap;                 ///< DataDirect channel map
+    uint          ddMapSourceId;         ///< DataDirect channel map sourceid
+    bool          ddMapLoaderRunning;    ///< DataDirect thread running
+    QPointer<TVDDMapThread> ddMapLoader; ///< DataDirect map loader thread
 
     /// Vector or sleep timer sleep times in seconds,
     /// with the appropriate UI message.

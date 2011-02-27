@@ -25,7 +25,7 @@ class AudioOutputDX : public AudioOutputBase
     virtual void CloseDevice(void);
     virtual void WriteAudio(unsigned char *buffer, int size);
     virtual int  GetBufferedOnSoundcard(void) const;
-    AudioOutputSettings* GetOutputSettings(void);
+    AudioOutputSettings* GetOutputSettings(bool passthrough = false);
 
   protected:
     AudioOutputDXPrivate *m_priv;
