@@ -4,7 +4,7 @@ import os,re
 import commands
 import os_detect
 
-SMOON_URL = "http://smolt.mythvantage.com/"
+SMOON_URL = "http://smolt.mythtv.org/"
 SECURE = 0
 from user import home
 HW_UUID = home + "/.mythtv/HardwareProfile/hw-uuid"

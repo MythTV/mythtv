@@ -17,7 +17,7 @@
 #include "mythprogressdialog.h"
 
 const QString SMOLT_SERVER_LOCATION =
-                  QString("http://smolt.mythvantage.com/");
+                  QString("http://smolt.mythtv.org/");
 
 HardwareProfile::HardwareProfile() :
     m_uuid(QString()),               m_publicuuid(QString()),

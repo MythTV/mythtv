@@ -157,7 +157,14 @@ void GeneralSetupWizard::OnSubmitPromptReturn(bool submit)
                 m_profileLocation->SetText(m_hardwareProfile->GetProfileURL());
         }
         else
+        {
+            if (m_busyPopup)
+            {
+                m_busyPopup->Close();
+                m_busyPopup = NULL;
+            }
             ShowOkPopup(tr("Encountered a problem while submitting your profile."));
+        }
     }
 }
 
@@ -249,7 +256,14 @@ void GeneralSetupWizard::OnDeletePromptReturn(bool submit)
             ShowOkPopup(tr("Hardware profile deleted."));
         }
         else
+        {
+            if (m_busyPopup)
+            {
+                m_busyPopup->Close();
+                m_busyPopup = NULL;
+            }
             ShowOkPopup(tr("Encountered a problem while deleting your profile."));
+        }
     }
 }
 
