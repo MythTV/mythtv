@@ -64,12 +64,9 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     virtual AudioFormat GetFormat(void) const { return FORMAT_S16; };
     virtual int GetBytesPerFrame(void) const { return 4; };
 
-    virtual AudioOutputSettings* GetOutputSettingsCleaned(bool digital = true)
-        { return new AudioOutputSettings; }
-    virtual AudioOutputSettings* GetOutputSettingsUsers(bool digital = true)
-        { return new AudioOutputSettings; }
-    virtual bool CanPassthrough(int samplerate, int channels, int codec) const
-        { return false; }
+    virtual AudioOutputSettings* GetOutputSettingsCleaned(bool digital = true);
+    virtual AudioOutputSettings* GetOutputSettingsUsers(bool digital = true);
+    virtual bool CanPassthrough(int samplerate, int channels, int codec) const;
 
     // dsprate is in 100 * samples/second
     virtual void SetEffDsp(int dsprate) = 0;
