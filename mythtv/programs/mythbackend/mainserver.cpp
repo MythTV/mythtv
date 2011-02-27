@@ -2267,6 +2267,11 @@ void MainServer::DoHandleStopRecording(
     if (pbs)
         pbssock = pbs->getSocket();
 
+    if (recinfo.GetRecordingStatus() == rsRecording)
+        recinfo.SetRecordingStatus(rsRecorded);
+    else if (recinfo.GetRecordingStatus() != rsRecorded)
+        recinfo.SetRecordingStatus(rsFailed);
+
     if (ismaster && recinfo.GetHostname() != gCoreContext->GetHostName())
     {
         PlaybackSock *slave = GetSlaveByHostname(recinfo.GetHostname());
@@ -2278,7 +2283,6 @@ void MainServer::DoHandleStopRecording(
             if (num > 0)
             {
                 (*encoderList)[num]->StopRecording();
-                recinfo.SetRecordingStatus(rsRecorded);
                 if (m_sched)
                     m_sched->UpdateRecStatus(&recinfo);
             }
@@ -2297,7 +2301,6 @@ void MainServer::DoHandleStopRecording(
             // recording has stopped and the status should be updated.
             // Continue so that the master can try to update the endtime
             // of the file is in a shared directory.
-            recinfo.SetRecordingStatus(rsRecorded);
             if (m_sched)
                 m_sched->UpdateRecStatus(&recinfo);
         }
@@ -2325,7 +2328,6 @@ void MainServer::DoHandleStopRecording(
 
             if (ismaster)
             {
-                recinfo.SetRecordingStatus(rsRecorded);
                 if (m_sched)
                     m_sched->UpdateRecStatus(&recinfo);
             }
@@ -2408,7 +2410,8 @@ void MainServer::DoHandleDeleteRecording(
     {
         recinfo.ApplyRecordRecGroupChange("Deleted");
         recinfo.SaveAutoExpire(kDeletedAutoExpire, true);
-        if (recinfo.GetRecordingStatus() == rsRecording)
+        if (recinfo.GetRecordingStatus() == rsRecording ||
+            recinfo.GetRecordingStatus() == rsTuning)
             DoHandleStopRecording(recinfo, NULL);
         if (forgetHistory)
             recinfo.ForgetHistory();
@@ -2416,6 +2419,11 @@ void MainServer::DoHandleDeleteRecording(
         SendResponse(pbssock, outputlist);
         return;
     }
+
+    if (recinfo.GetRecordingStatus() == rsRecording)
+        recinfo.SetRecordingStatus(rsRecorded);
+    else if (recinfo.GetRecordingStatus() != rsRecorded)
+        recinfo.SetRecordingStatus(rsFailed);
 
     // If this recording was made by a another recorder, and that
     // recorder is available, tell it to do the deletion.
@@ -2430,7 +2438,6 @@ void MainServer::DoHandleDeleteRecording(
             if (num > 0)
             {
                 (*encoderList)[num]->StopRecording();
-                recinfo.SetRecordingStatus(rsRecorded);
                 if (m_sched)
                     m_sched->UpdateRecStatus(&recinfo);
             }
@@ -2471,7 +2478,6 @@ void MainServer::DoHandleDeleteRecording(
 
             if (ismaster)
             {
-                recinfo.SetRecordingStatus(rsRecorded);
                 if (m_sched)
                     m_sched->UpdateRecStatus(&recinfo);
             }
