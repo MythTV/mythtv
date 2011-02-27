@@ -62,6 +62,8 @@ bool MythBrowser::Create(void)
 
     m_browserList.append(page);
     page->getBrowser()->SetZoom(m_zoom);
+    page->getBrowser()->SetDefaultSaveDirectory(m_defaultSaveDir);
+
     page->SetActive(true);
 
     connect(page, SIGNAL(loadProgress(int)),
@@ -371,10 +373,9 @@ bool MythBrowser::keyPressEvent(QKeyEvent *event)
             else
                 SetFocusWidget(m_pageList);
         }
-
         else if (action == "ESCAPE")
         {
-            GetScreenStack()->PopScreen(false, true);
+            GetScreenStack()->PopScreen(true, true);
         }
         else if (action == "PREVTAB")
         {

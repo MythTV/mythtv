@@ -25,6 +25,8 @@ class MythBrowser : public MythScreenType
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
 
+    void setDefaultSaveDirectory(const QString saveDir) { m_defaultSaveDir = saveDir; }
+
   public slots:
     void slotOpenURL(const QString &url);
 
@@ -68,6 +70,7 @@ class MythBrowser : public MythScreenType
     int       m_currentBrowser;
     QUrl      m_url;
     float     m_zoom;
+    QString   m_defaultSaveDir;
 
     Bookmark  m_editBookmark;
 
