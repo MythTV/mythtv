@@ -24,30 +24,10 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
     QByteArray dev_ba     = muxer.toAscii();
     AVOutputFormat *fmt;
 
-    if (!(av_register_all && av_guess_format && avformat_alloc_context &&
-          av_new_stream && av_write_header && av_write_frame &&
-          av_write_trailer && av_set_parameters))
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't find libavformat");
-        return;
-    }
-
-    if (!avcodec_close)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't find libavcodec");
-        return;
-    }
-
-    if (!(av_freep && av_alloc_put_byte))
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't find libavutil");
-        return;
-    }
-
     avcodeclock->lock();
     av_register_all();
     avcodeclock->unlock();
-        
+
     fmt = av_guess_format(dev_ba.constData(), NULL, NULL);
     if (!fmt)
     {
