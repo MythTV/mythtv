@@ -59,13 +59,10 @@ class AudioReencodeBuffer : public AudioOutput
     virtual void Reconfigure(const AudioSettings &settings)
     {
         ClearError();
-        bytes_per_frame = channels *
-                           AudioOutputSettings::SampleSize(settings.format);
 
         channels = settings.channels;
-
-        if ((uint)settings.channels > 2)
-            Error(QString("Invalid channel count %1").arg(channels));
+        bytes_per_frame = channels *
+                           AudioOutputSettings::SampleSize(settings.format);
     }
 
     // dsprate is in 100 * samples/second
