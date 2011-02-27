@@ -35,6 +35,9 @@ QEvent::Type MusicPlayerEvent::TrackAddedEvent = (QEvent::Type) QEvent::register
 QEvent::Type MusicPlayerEvent::TrackRemovedEvent = (QEvent::Type) QEvent::registerEventType();
 QEvent::Type MusicPlayerEvent::AllTracksRemovedEvent = (QEvent::Type) QEvent::registerEventType();
 QEvent::Type MusicPlayerEvent::MetadataChangedEvent = (QEvent::Type) QEvent::registerEventType();
+QEvent::Type MusicPlayerEvent::TrackStatsChangedEvent = (QEvent::Type) QEvent::registerEventType();
+QEvent::Type MusicPlayerEvent::AlbumArtChangedEvent = (QEvent::Type) QEvent::registerEventType();
+QEvent::Type MusicPlayerEvent::CDChangedEvent = (QEvent::Type) QEvent::registerEventType();
 
 MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
     :QObject(parent)
@@ -916,26 +919,11 @@ MusicPlayer::ShuffleMode MusicPlayer::toggleShuffleMode(void)
 
 void MusicPlayer::updateLastplay()
 {
-    // FIXME this is ugly having to keep two metadata objects in sync
-    if (m_currentNode && m_currentNode->getInt() > 0)
+    if (m_currentMetadata)
     {
-        if (m_currentMetadata)
-        {
-            m_currentMetadata->incPlayCount();
-            m_currentMetadata->setLastPlay();
-            sendMetadataChangedEvent(m_currentMetadata->ID());
-        }
-        // if all_music is still in scope we need to keep that in sync
-//         if (gMusicData->all_music)
-//         {
-//             Metadata *mdata
-//                 = gMusicData->all_music->getMetadata(m_currentNode->getInt());
-//             if (mdata)
-//             {
-//                 mdata->incPlayCount();
-//                 mdata->setLastPlay();
-//             }
-//         }
+        m_currentMetadata->incPlayCount();
+        m_currentMetadata->setLastPlay();
+        sendTrackStatsChangedEvent(m_currentMetadata->ID());
     }
 
     m_updatedLastplay = true;
@@ -971,6 +959,24 @@ void MusicPlayer::sendVolumeChangedEvent(void)
 void MusicPlayer::sendMetadataChangedEvent(int trackID)
 {
     MusicPlayerEvent me(MusicPlayerEvent::MetadataChangedEvent, trackID);
+    dispatch(me);
+}
+
+void MusicPlayer::sendTrackStatsChangedEvent(int trackID)
+{
+    MusicPlayerEvent me(MusicPlayerEvent::TrackStatsChangedEvent, trackID);
+    dispatch(me);
+}
+
+void MusicPlayer::sendAlbumArtChangedEvent(int trackID)
+{
+    MusicPlayerEvent me(MusicPlayerEvent::AlbumArtChangedEvent, trackID);
+    dispatch(me);
+}
+
+void MusicPlayer::sendCDChangedEvent(void)
+{
+    MusicPlayerEvent me(MusicPlayerEvent::CDChangedEvent, -1);
     dispatch(me);
 }
 
