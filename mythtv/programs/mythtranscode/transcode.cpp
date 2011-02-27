@@ -80,7 +80,7 @@ class AudioReencodeBuffer : public AudioOutput
     // timecode is in milliseconds.
     virtual bool AddFrames(void *buffer, int frames, int64_t timecode)
     {
-        AddData(buffer, frames * bytes_per_frame, timecode);
+        return AddData(buffer, frames * bytes_per_frame, timecode);
     }
 
     // timecode is in milliseconds.
