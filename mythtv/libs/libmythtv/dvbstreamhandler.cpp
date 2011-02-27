@@ -102,7 +102,8 @@ DVBStreamHandler::DVBStreamHandler(const QString &dvb_device) :
 
     _pid_lock(QMutex::Recursive),
     _open_pid_filters(0),
-    _listener_lock(QMutex::Recursive)
+    _listener_lock(QMutex::Recursive),
+    _run(false)
 {
 }
 
@@ -210,7 +211,7 @@ void DVBStreamHandler::Start(void)
         _reader_thread.SetParent(this);
         _reader_thread.start();
 
-        if (_reader_thread.isRunning())
+        if (!_reader_thread.isRunning())
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Start: Failed to create thread.");
             return;
@@ -226,6 +227,7 @@ void DVBStreamHandler::Stop(void)
     {
         if (_device_read_buffer)
             _device_read_buffer->Stop();
+        _run = false;
         _reader_thread.wait();
     }
 }
@@ -233,6 +235,7 @@ void DVBStreamHandler::Stop(void)
 void DVBStreamHandler::Run(void)
 {
     _using_section_reader = !SupportsTSMonitoring() && _allow_section_reader;
+    _run = true;
 
     if (_using_section_reader)
         RunSR();
@@ -304,7 +307,7 @@ void DVBStreamHandler::RunTS(void)
     fd_set fd_select_set;
     FD_ZERO(        &fd_select_set);
     FD_SET (dvr_fd, &fd_select_set);
-    while (IsRunning() && !_error)
+    while (_run && !_error)
     {
         RetuneMonitor();
         UpdateFiltersFromStreamData();
@@ -411,7 +414,7 @@ void DVBStreamHandler::RunSR(void)
 
     VERBOSE(VB_RECORD, LOC + "RunSR(): begin");
 
-    while (IsRunning())
+    while (_run)
     {
         RetuneMonitor();
         UpdateFiltersFromStreamData();
