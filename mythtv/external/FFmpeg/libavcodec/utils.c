@@ -471,17 +471,11 @@ int attribute_align_arg avcodec_open(AVCodecContext *avctx, AVCodec *codec)
         goto end;
 
     if (codec->priv_data_size > 0) {
-      if(!avctx->priv_data){
         avctx->priv_data = av_mallocz(codec->priv_data_size);
         if (!avctx->priv_data) {
             ret = AVERROR(ENOMEM);
             goto end;
         }
-        if(codec->priv_class){ //this can be droped once all user apps use   avcodec_get_context_defaults3()
-            *(AVClass**)avctx->priv_data= codec->priv_class;
-            av_opt_set_defaults(avctx->priv_data);
-        }
-      }
     } else {
         avctx->priv_data = NULL;
     }
@@ -948,19 +942,6 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
         snprintf(buf + strlen(buf), buf_size - strlen(buf),
                  ", %d kb/s", bitrate / 1000);
     }
-}
-
-const char *av_get_profile_name(const AVCodec *codec, int profile)
-{
-    const AVProfile *p;
-    if (profile == FF_PROFILE_UNKNOWN || !codec->profiles)
-        return NULL;
-
-    for (p = codec->profiles; p->profile != FF_PROFILE_UNKNOWN; p++)
-        if (p->profile == profile)
-            return p->name;
-
-    return NULL;
 }
 
 unsigned avcodec_version( void )

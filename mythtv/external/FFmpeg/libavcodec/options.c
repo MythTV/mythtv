@@ -331,11 +331,6 @@ static const AVOption options[]={
 {"aac_low", NULL, 0, FF_OPT_TYPE_CONST, FF_PROFILE_AAC_LOW, INT_MIN, INT_MAX, A|E, "profile"},
 {"aac_ssr", NULL, 0, FF_OPT_TYPE_CONST, FF_PROFILE_AAC_SSR, INT_MIN, INT_MAX, A|E, "profile"},
 {"aac_ltp", NULL, 0, FF_OPT_TYPE_CONST, FF_PROFILE_AAC_LTP, INT_MIN, INT_MAX, A|E, "profile"},
-{"dts", NULL, 0, FF_OPT_TYPE_CONST, FF_PROFILE_DTS, INT_MIN, INT_MAX, A|E, "profile"},
-{"dts_es", NULL, 0, FF_OPT_TYPE_CONST, FF_PROFILE_DTS_ES, INT_MIN, INT_MAX, A|E, "profile"},
-{"dts_96_24", NULL, 0, FF_OPT_TYPE_CONST, FF_PROFILE_DTS_96_24, INT_MIN, INT_MAX, A|E, "profile"},
-{"dts_hd_hra", NULL, 0, FF_OPT_TYPE_CONST, FF_PROFILE_DTS_HD_HRA, INT_MIN, INT_MAX, A|E, "profile"},
-{"dts_hd_ma", NULL, 0, FF_OPT_TYPE_CONST, FF_PROFILE_DTS_HD_MA, INT_MIN, INT_MAX, A|E, "profile"},
 {"level", NULL, OFFSET(level), FF_OPT_TYPE_INT, FF_LEVEL_UNKNOWN, INT_MIN, INT_MAX, V|A|E, "level"},
 {"unknown", NULL, 0, FF_OPT_TYPE_CONST, FF_LEVEL_UNKNOWN, INT_MIN, INT_MAX, V|A|E, "level"},
 {"lowres", "decode at 1= 1/2, 2=1/4, 3=1/8 resolutions", OFFSET(lowres), FF_OPT_TYPE_INT, 0, 0, INT_MAX, V|D},
@@ -470,36 +465,6 @@ void avcodec_get_context_defaults2(AVCodecContext *s, enum AVMediaType codec_typ
     s->palctrl = NULL;
     s->reget_buffer= avcodec_default_reget_buffer;
     s->reordered_opaque= AV_NOPTS_VALUE;
-}
-
-int avcodec_get_context_defaults3(AVCodecContext *s, AVCodec *codec){
-    avcodec_get_context_defaults2(s, codec ? codec->type : AVMEDIA_TYPE_UNKNOWN);
-    if(codec && codec->priv_data_size){
-        if(!s->priv_data){
-            s->priv_data= av_mallocz(codec->priv_data_size);
-            if (!s->priv_data) {
-                return AVERROR(ENOMEM);
-            }
-        }
-        if(codec->priv_class){
-            *(AVClass**)s->priv_data= codec->priv_class;
-            av_opt_set_defaults(s->priv_data);
-        }
-    }
-    return 0;
-}
-
-AVCodecContext *avcodec_alloc_context3(AVCodec *codec){
-    AVCodecContext *avctx= av_malloc(sizeof(AVCodecContext));
-
-    if(avctx==NULL) return NULL;
-
-    if(avcodec_get_context_defaults3(avctx, codec) < 0){
-        av_free(avctx);
-        return NULL;
-    }
-
-    return avctx;
 }
 
 AVCodecContext *avcodec_alloc_context2(enum AVMediaType codec_type){

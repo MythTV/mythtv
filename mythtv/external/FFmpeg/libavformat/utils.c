@@ -2252,7 +2252,6 @@ int av_find_stream_info(AVFormatContext *ic)
     if (!duration_error) return AVERROR(ENOMEM);
 
     for(i=0;i<ic->nb_streams;i++) {
-        AVCodec *codec;
         st = ic->streams[i];
         if (st->codec->codec_id == CODEC_ID_AAC) {
             st->codec->sample_rate = 0;
@@ -2273,17 +2272,9 @@ int av_find_stream_info(AVFormatContext *ic)
             }
         }
         assert(!st->codec->codec);
-        codec = avcodec_find_decoder(st->codec->codec_id);
-
-        /* Force decoding of at least one frame of codec data
-         * this makes sure the codec initializes the channel configuration
-         * and does not trust the values from the container.
-         */
-        if (codec && codec->capabilities & CODEC_CAP_CHANNEL_CONF)
-            st->codec->channels = 0;
-
         //try to just open decoders, in case this is enough to get parameters
         if(!has_codec_parameters(st->codec)){
+            AVCodec *codec = avcodec_find_decoder(st->codec->codec_id);
             if (codec)
                 avcodec_open(st->codec, codec);
         }
@@ -2825,10 +2816,6 @@ int av_set_parameters(AVFormatContext *s, AVFormatParameters *ap)
         s->priv_data = av_mallocz(s->oformat->priv_data_size);
         if (!s->priv_data)
             return AVERROR(ENOMEM);
-        if (s->oformat->priv_class) {
-            *(const AVClass**)s->priv_data= s->oformat->priv_class;
-            av_opt_set_defaults(s->priv_data);
-        }
     } else
         s->priv_data = NULL;
 

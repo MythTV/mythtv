@@ -321,8 +321,6 @@ typedef struct AVOutputFormat {
 
     const AVMetadataConv *metadata_conv;
 
-    const AVClass *priv_class; ///< AVClass for the private context
-
     /* private fields */
     struct AVOutputFormat *next;
 } AVOutputFormat;
