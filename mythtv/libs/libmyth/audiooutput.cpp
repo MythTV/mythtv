@@ -213,6 +213,23 @@ void AudioOutput::SetStretchFactor(float /*factor*/)
 {
 }
 
+AudioOutputSettings* AudioOutput::GetOutputSettingsCleaned(bool /*digital*/)
+{
+    return new AudioOutputSettings;
+}
+
+AudioOutputSettings* AudioOutput::GetOutputSettingsUsers(bool /*digital*/)
+{
+    return new AudioOutputSettings;
+}
+
+bool AudioOutput::CanPassthrough(int /*samplerate*/,
+                                 int /*channels*/,
+                                 int /*codec*/) const
+{
+    return false;
+}
+
 void AudioOutput::Error(const QString &msg)
 {
     lastError = msg;
