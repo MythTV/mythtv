@@ -94,11 +94,12 @@ bool AudioOutputDigitalEncoder::Init(
         delete m_spdifenc;
     }
 
-    m_spdifenc = new SPDIFEncoder("spdif", av_context);
+    m_spdifenc = new SPDIFEncoder("spdif", CODEC_ID_AC3);
     if (!m_spdifenc->Succeeded())
     {
         Dispose();
-        delete m_spdifenc;
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Could not create spdif muxer");
         return false;
     }
 
@@ -143,7 +144,7 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, bool isFloat)
 
         if (!m_spdifenc)
         {
-            m_spdifenc = new SPDIFEncoder("spdif", av_context);
+            m_spdifenc = new SPDIFEncoder("spdif", CODEC_ID_AC3);
         }
         m_spdifenc->WriteFrame(m_encodebuffer, outsize);
         m_spdifenc->GetData(out + outlen, data_size);

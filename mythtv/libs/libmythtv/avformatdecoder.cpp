@@ -72,10 +72,6 @@ static int cc608_parity(uint8_t byte);
 static int cc608_good_parity(const int *parity_table, uint16_t data);
 static void cc608_build_parity_table(int *parity_table);
 
-static int dts_decode_header(uint8_t *indata_ptr, int *rate,
-                             int *nblks, int *sfreq);
-static int extract_core_dts(unsigned char *data, int len);
-
 static QSize get_video_dim(const AVCodecContext &ctx)
 {
     return QSize(ctx.width >> ctx.lowres, ctx.height >> ctx.lowres);
@@ -262,8 +258,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       disable_passthru(false),
       dummy_frame(NULL),
       m_fps(0.0f),
-      codec_is_mpeg(false),
-      m_spdifenc(NULL)
+      codec_is_mpeg(false)
 {
     memset(&params, 0, sizeof(AVFormatParameters));
     memset(&readcontext, 0, sizeof(readcontext));
@@ -335,9 +330,6 @@ AvFormatDecoder::~AvFormatDecoder()
         lcd->setVariousLEDs(VARIOUS_SPDIF, false);
         lcd->setSpeakerLEDs(SPEAKER_71, false);    // should clear any and all speaker LEDs
     }
-
-    if (m_spdifenc)
-        delete m_spdifenc;
 }
 
 void AvFormatDecoder::CloseCodecs()
@@ -1675,8 +1667,8 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
 int AvFormatDecoder::ScanStreams(bool novideo)
 {
     int scanerror = 0;
-    bitrate = 0;
-    fps = 0;
+    bitrate       = 0;
+    fps           = 0;
 
     tracks[kTrackTypeAudio].clear();
     tracks[kTrackTypeSubtitle].clear();
@@ -1858,19 +1850,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 VERBOSE(VB_GENERAL, LOC + QString("codec %1 has %2 channels")
                         .arg(ff_codec_id_string(enc->codec_id))
                         .arg(enc->channels));
-
-#if 0
-                // HACK MULTICHANNEL DTS passthru disabled for multichannel,
-                // dont know how to handle this
-                // HACK BEGIN REALLY UGLY HACK FOR DTS PASSTHRU
-                if (enc->codec_id == CODEC_ID_DTS)
-                {
-                    enc->sample_rate = 48000;
-                    enc->channels = 2;
-                    // enc->bit_rate = what??;
-                }
-                // HACK END REALLY UGLY HACK FOR DTS PASSTHRU
-#endif
 
                 bitrate += enc->bit_rate;
                 break;
@@ -3371,10 +3350,11 @@ static vector<int> filter_lang(const sinfo_vec_t &tracks, int lang_key)
     return ret;
 }
 
-static int filter_max_ch(const AVFormatContext *ic,
-                         const sinfo_vec_t     &tracks,
-                         const vector<int>     &fs,
-                         enum CodecID           codecId = CODEC_ID_NONE)
+int AvFormatDecoder::filter_max_ch(const AVFormatContext *ic,
+                                   const sinfo_vec_t     &tracks,
+                                   const vector<int>     &fs,
+                                   enum CodecID           codecId,
+                                   int                    profile)
 {
     int selectedTrack = -1, max_seen = -1;
 
@@ -3386,6 +3366,12 @@ static int filter_max_ch(const AVFormatContext *ic,
         if ((codecId == CODEC_ID_NONE || codecId == ctx->codec_id) &&
             (max_seen < ctx->channels))
         {
+            if (codecId == CODEC_ID_DTS && profile > 0)
+            {
+                // we cannot decode dts-hd, so only select it if passthrough
+                if (!DoPassThrough(ctx) || ctx->profile != profile)
+                    continue;
+            }
             selectedTrack = *it;
             max_seen = ctx->channels;
         }
@@ -3527,12 +3513,18 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
 
         vector<int> flang = filter_lang(atracks, canonical_key);
 
-        selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_TRUEHD);
+        selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                                 FF_PROFILE_DTS_HD_MA);
+        if (selTrack < 0)
+            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_TRUEHD);
 
+        if (selTrack < 0)
+            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                                     FF_PROFILE_DTS_HD_HRA);
         if (selTrack < 0)
             selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_EAC3);
 
-        if (!transcoding && selTrack < 0)
+        if (selTrack < 0)
             selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS);
 
         if (selTrack < 0)
@@ -3550,12 +3542,21 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
             {
                 vector<int> flang = filter_lang(atracks, *it);
 
-                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_TRUEHD);
+                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                                         FF_PROFILE_DTS_HD_MA);
+                if (selTrack < 0)
+                    selTrack = filter_max_ch(ic, atracks, flang,
+                                             CODEC_ID_TRUEHD);
 
                 if (selTrack < 0)
-                    selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_EAC3);
+                    selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                                             FF_PROFILE_DTS_HD_HRA);
 
-                if (!transcoding && selTrack < 0)
+                if (selTrack < 0)
+                    selTrack = filter_max_ch(ic, atracks, flang,
+                                             CODEC_ID_EAC3);
+
+                if (selTrack < 0)
                     selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS);
 
                 if (selTrack < 0)
@@ -3571,7 +3572,14 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
             VERBOSE(VB_AUDIO, LOC + "Trying to select audio track (wo/lang)");
             vector<int> flang = filter_lang(atracks, -1);
 
-            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_TRUEHD);
+            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                                     FF_PROFILE_DTS_HD_MA);
+            if (selTrack < 0)
+                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_TRUEHD);
+
+            if (selTrack < 0)
+                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                                         FF_PROFILE_DTS_HD_HRA);
 
             if (selTrack < 0)
                 selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_EAC3);
@@ -3742,36 +3750,10 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
         if (audioOut.do_passthru)
         {
-            if (!m_spdifenc)
-            {
-                m_spdifenc = new SPDIFEncoder("spdif", ctx);
-                if (!m_spdifenc->Succeeded())
-                {
-                    avcodeclock->unlock();
-                    delete m_spdifenc;
-                    return false;
-                }
-            }
-                // Extract core DTS unless we can process it
-            if (ctx->codec_id == CODEC_ID_DTS && !m_audio->CanHD())
-            {
-                tmp_pkt.size = extract_core_dts(tmp_pkt.data, tmp_pkt.size);
-                if (tmp_pkt.size < 0)
-                {
-                        // error extracting core dts
-                    avcodeclock->unlock();
-                    return false;
-                }
-            }
+            memcpy(audioSamples, tmp_pkt.data, tmp_pkt.size);
             data_size = tmp_pkt.size;
-            m_spdifenc->WriteFrame(tmp_pkt.data, data_size);
-
-            ret = m_spdifenc->GetData((unsigned char *)audioSamples, data_size);
-            if (ret < 0)
-            {
-                avcodeclock->unlock();
-                return true;
-            }
+             // We have processed all the data, there can't be any left
+            tmp_pkt.size = 0;
         }
         else
         {
@@ -3821,21 +3803,16 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
         long long temppts = lastapts;
 
-        // calc for next frame
-        lastapts += (long long)
-            ((double)(data_size * 1000) /
-             (ctx->sample_rate * ctx->channels *
-              av_get_bits_per_sample_format(ctx->sample_fmt)>>3));
-
-        VERBOSE(VB_PLAYBACK+VB_TIMESTAMP,
-                LOC + QString("audio timecode %1 %2 %3 %4")
-                .arg(pkt->pts).arg(pkt->dts).arg(temppts).arg(lastapts));
-
         if (audSubIdx != -1)
             extract_mono_channel(audSubIdx, &audioOut,
                                  (char *)audioSamples, data_size);
 
         m_audio->AddAudioData((char *)audioSamples, data_size, temppts);
+        lastapts += m_audio->LengthLastData();
+
+        VERBOSE(VB_TIMESTAMP,
+                LOC + QString("audio timecode %1 %2 %3 %4")
+                .arg(pkt->pts).arg(pkt->dts).arg(temppts).arg(lastapts));
 
         allowedquit |=
             ringBuffer->IsInDiscMenuOrStillFrame() ||
@@ -4261,14 +4238,33 @@ bool AvFormatDecoder::DoPassThrough(const AVCodecContext *ctx)
 {
     bool passthru = false;
 
-    if (ctx->codec_id == CODEC_ID_AC3)
-        passthru = m_audio->CanAC3();
-    else if (ctx->codec_id == CODEC_ID_DTS)
-        passthru = m_audio->CanDTS();
-    else if (ctx->codec_id == CODEC_ID_EAC3)
-        passthru = m_audio->CanHD();
-    else if (ctx->codec_id == CODEC_ID_TRUEHD)
-        passthru = m_audio->CanHDLL();
+    switch(ctx->codec_id)
+    {
+        case CODEC_ID_AC3:
+            passthru = m_audio->CanAC3();
+            break;
+        case CODEC_ID_DTS:
+            switch(ctx->profile)
+            {
+                case FF_PROFILE_DTS:
+                case FF_PROFILE_DTS_ES:
+                case FF_PROFILE_DTS_96_24:
+                    passthru = m_audio->CanDTS();
+                    break;
+                case FF_PROFILE_DTS_HD_HRA:
+                case FF_PROFILE_DTS_HD_MA:
+                    passthru = m_audio->CanDTSHD();
+                default:
+                    break;
+            }
+            break;
+        case CODEC_ID_EAC3:
+            passthru = m_audio->CanEAC3();
+            break;
+        case CODEC_ID_TRUEHD:
+            passthru = m_audio->CanTrueHD();
+            break;
+    }
     passthru &= m_audio->CanPassthrough(ctx->sample_rate, ctx->channels);
     passthru &= !internal_vol;
     passthru &= !transcoding && !disable_passthru;
@@ -4344,7 +4340,8 @@ bool AvFormatDecoder::SetupAudioStream(void)
         }
 
         info = AudioInfo(ctx->codec_id, fmt, ctx->sample_rate,
-                         ctx->channels, using_passthru, orig_channels);
+                         ctx->channels, using_passthru, orig_channels,
+                         ctx->codec_id == CODEC_ID_DTS ? ctx->profile : 0);
     }
 
     if (!ctx)
@@ -4354,7 +4351,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
     }
 
     if (info == audioIn)
-        return false; // no change
+        return false;
 
     VERBOSE(VB_AUDIO, LOC + "Initializing audio parms from " +
             QString("audio track #%1").arg(currentTrack[kTrackTypeAudio]+1));
@@ -4367,13 +4364,11 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
     if (audioOut.sample_rate > 0)
         m_audio->SetEffDsp(audioOut.sample_rate * 100);
-    m_audio->SetAudioParams(audioOut.format, orig_channels, ctx->request_channels,
+    m_audio->SetAudioParams(audioOut.format, orig_channels,
+                            ctx->request_channels,
                             audioOut.codec_id, audioOut.sample_rate,
-                            audioOut.do_passthru);
+                            audioOut.do_passthru, audioOut.codec_profile);
     m_audio->ReinitAudio();
-
-    delete m_spdifenc;
-    m_spdifenc = NULL;
 
     if (LCD *lcd = LCD::Get())
     {
@@ -4493,107 +4488,6 @@ void AvFormatDecoder::av_update_stream_timings_video(AVFormatContext *ic)
                 (double)ic->duration;
         }
     }
-}
-
-static int extract_core_dts(unsigned char *data, int len)
-{
-    int rate, sfreq, nblks;
-
-    int enc_len = dts_decode_header(data, &rate, &nblks, &sfreq);
-    if (enc_len < 0)
-        return enc_len;
-
-    int nr_samples = nblks * 32;
-    int block_len = nr_samples * 2 * 2;
-
-    if (enc_len == 0 || enc_len > len)
-    {
-        return len;
-    }
-
-    enc_len = (enc_len < block_len - 8) ? enc_len : block_len - 8;
-
-    return enc_len;
-}
-
-// defines from libavcodec/dca.h
-#define DCA_MARKER_RAW_BE 0x7FFE8001
-#define DCA_MARKER_RAW_LE 0xFE7F0180
-#define DCA_MARKER_14B_BE 0x1FFFE800
-#define DCA_MARKER_14B_LE 0xFF1F00E8
-#define DCA_HD_MARKER 0x64582025
-
-static int dts_decode_header(uint8_t *indata_ptr, int *rate,
-                             int *nblks, int *sfreq)
-{
-    uint id = ((indata_ptr[0] << 24) | (indata_ptr[1] << 16) |
-               (indata_ptr[2] << 8) | (indata_ptr[3]));
-
-    switch (id)
-    {
-        case DCA_MARKER_RAW_BE:
-            break;
-        case DCA_MARKER_RAW_LE:
-        case DCA_MARKER_14B_BE:
-        case DCA_MARKER_14B_LE:
-        case DCA_HD_MARKER:
-            VERBOSE(VB_AUDIO+VB_EXTRA, LOC +
-                    QString("DTS: Unsupported frame (id 0x%1)").arg(id, 8, 16));
-            return -1;
-            break;
-        default:
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("DTS: Unknown frame (id 0x%1)").arg(id, 8, 16));
-            return -1;
-    }
-
-    int ftype = indata_ptr[4] >> 7;
-
-    int surp = (indata_ptr[4] >> 2) & 0x1f;
-    surp = (surp + 1) % 32;
-
-    *nblks = (indata_ptr[4] & 0x01) << 6 | (indata_ptr[5] >> 2);
-    ++*nblks;
-
-    int fsize = (indata_ptr[5] & 0x03) << 12 |
-                (indata_ptr[6] << 4) | (indata_ptr[7] >> 4);
-    ++fsize;
-
-    *sfreq = (indata_ptr[8] >> 2) & 0x0f;
-    *rate = (indata_ptr[8] & 0x03) << 3 | ((indata_ptr[9] >> 5) & 0x07);
-
-    if (ftype != 1)
-    {
-        VERBOSE(VB_IMPORTANT, LOC +
-                QString("DTS: Termination frames not handled (ftype %1)")
-                .arg(ftype));
-        return -1;
-    }
-
-    if (*sfreq != 13)
-    {
-        VERBOSE(VB_IMPORTANT, LOC +
-                QString("DTS: Only 48kHz supported (sfreq %1)").arg(*sfreq));
-        return -1;
-    }
-
-    if ((fsize > 8192) || (fsize < 96))
-    {
-        VERBOSE(VB_IMPORTANT, LOC +
-                QString("DTS: fsize: %1 invalid").arg(fsize));
-        return -1;
-    }
-
-    if (*nblks != 8 && *nblks != 16 && *nblks != 32 &&
-        *nblks != 64 && *nblks != 128 && ftype == 1)
-    {
-        VERBOSE(VB_IMPORTANT, LOC +
-                QString("DTS: nblks %1 not valid for normal frame")
-                .arg(*nblks));
-        return -1;
-    }
-
-    return fsize;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

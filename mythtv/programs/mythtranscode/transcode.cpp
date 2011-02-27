@@ -68,7 +68,7 @@ class AudioReencodeBuffer : public AudioOutput
             Error(QString("Invalid channel count %1").arg(channels));
     }
 
-    // dsprate is in 100 * samples/second
+    // dsprate is in 100 * frames/second
     virtual void SetEffDsp(int dsprate)
     {
         eff_audiorate = (dsprate / 100);
@@ -83,26 +83,33 @@ class AudioReencodeBuffer : public AudioOutput
     // timecode is in milliseconds.
     virtual bool AddFrames(void *buffer, int frames, int64_t timecode)
     {
+        AddData(buffer, frames * bytes_per_frame, timecode);
+    }
+
+    // timecode is in milliseconds.
+    virtual bool AddData(void *buffer, int len, int64_t timecode)
+    {
         int freebuf = bufsize - audiobuffer_len;
 
-        if (frames * bytes_per_frame > freebuf)
+        if (len > freebuf)
         {
-            bufsize += frames * bytes_per_frame - freebuf;
+            bufsize += len - freebuf;
             unsigned char *tmpbuf = new unsigned char[bufsize];
             memcpy(tmpbuf, audiobuffer, audiobuffer_len);
             delete [] audiobuffer;
             audiobuffer = tmpbuf;
         }
 
-        ab_len[ab_count] = frames * bytes_per_frame;
+        ab_len[ab_count] = len;
         ab_offset[ab_count] = audiobuffer_len;
 
         memcpy(audiobuffer + audiobuffer_len, buffer,
-               frames * bytes_per_frame);
-        audiobuffer_len += frames * bytes_per_frame;
+               len);
+        audiobuffer_len += len;
 
-        // last_audiotime is at the end of the sample
-        last_audiotime = timecode + frames * 1000 / eff_audiorate;
+        // last_audiotime is at the end of the frame
+        last_audiotime = timecode + (len / bytes_per_frame) * 1000 /
+            eff_audiorate;
 
         ab_time[ab_count] = last_audiotime;
         ab_count++;

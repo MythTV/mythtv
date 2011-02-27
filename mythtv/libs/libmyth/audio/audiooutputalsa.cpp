@@ -36,8 +36,7 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
     pbufsize(-1),
     m_card(-1),
     m_device(-1),
-    m_subdevice(-1),
-    m_autopassthrough(false)
+    m_subdevice(-1)
 {
     m_mixer.handle = NULL;
     m_mixer.elem = NULL;
@@ -45,17 +44,29 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
     // Set everything up
     if (passthru_device == "auto")
     {
-        m_autopassthrough = true;
         passthru_device = main_device;
 
-        /* to set the non-audio bit, use AES0=6 */
         int len = passthru_device.length();
         int args = passthru_device.indexOf(":");
+
+            /*
+             * AES description:
+             * AES0=6 AES1=0x82 AES2=0x00 AES3=0x01.
+             * AES0 = NON_AUDIO | PRO_MODE
+             * AES1 = original stream, original PCM coder
+             * AES2 = source and channel unspecified
+             * AES3 = sample rate unspecified
+             */
+        bool s48k = gCoreContext->GetNumSetting("SPDIFRateOverride", false);
+        QString iecarg = QString("AES0=6,AES1=0x82,AES2=0x00") +
+            (s48k ? QString() : QString(",AES3=0x01"));
+        QString iecarg2 = QString("AES0=6 AES1=0x82 AES2=0x00") +
+            (s48k ? QString() : QString(" AES3=0x01"));
 
         if (args < 0)
         {
             /* no existing parameters: add it behind device name */
-            passthru_device += ":AES0=6"; //,AES1=0x82,AES2=0x00,AES3=0x01";
+            passthru_device += ":" + iecarg;
         }
         else
         {
@@ -66,12 +77,12 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
             if (args == passthru_device.length())
             {
                 /* ":" but no parameters */
-                passthru_device += "AES0=6"; //,AES1=0x82,AES2=0x00,AES3=0x01";
+                passthru_device += iecarg;
             }
             else if (passthru_device[args] != '{')
             {
                 /* a simple list of parameters: add it at the end of the list */
-                passthru_device += ",AES0=6"; //,AES1=0x82,AES2=0x00,AES3=0x01";
+                passthru_device += "," + iecarg;
             }
             else
             {
@@ -80,13 +91,15 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
                     --len;
                 while (len > 0 && passthru_device[len].isSpace());
                 if (passthru_device[len] == '}')
-                    passthru_device = passthru_device.insert(
-                        len, " AES0=6"); // AES1=0x82 AES2=0x00 AES3=0x01");
+                    passthru_device =
+                        passthru_device.insert(len, " " + iecarg2);
             }
         }
     }
     else if (passthru_device.toLower() == "default")
         passthru_device = main_device;
+    else
+        m_discretedigital = true;
 
     InitSettings(settings);
     if (settings.init)
@@ -110,9 +123,12 @@ int AudioOutputALSA::TryOpenDevice(int open_mode, int try_ac3)
         VBAUDIO(QString("OpenDevice %1 for passthrough").arg(passthru_device));
         err = snd_pcm_open(&pcm_handle, dev_ba.constData(),
                            SND_PCM_STREAM_PLAYBACK, open_mode);
+
         m_lastdevice = passthru_device;
-        if (!m_autopassthrough)
+
+        if (m_discretedigital)
             return err;
+
         if (err < 0)
         {
             VBAUDIO(QString("Auto setting passthrough failed (%1), defaulting "
@@ -266,7 +282,7 @@ bool AudioOutputALSA::IncPreallocBufferSize(int requested, int buffer_time)
     return ret;
 }
 
-AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
+AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
 {
     snd_pcm_hw_params_t *params;
     snd_pcm_format_t afmt = SND_PCM_FORMAT_UNKNOWN;
@@ -282,7 +298,7 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
         pcm_handle = NULL;
     }
 
-    if((err = TryOpenDevice(OPEN_FLAGS, passthru || enc)) < 0)
+    if ((err = TryOpenDevice(OPEN_FLAGS, passthrough)) < 0)
     {
         AERROR(QString("snd_pcm_open(\"%1\")").arg(m_lastdevice));
         delete settings;
@@ -294,7 +310,7 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
     if ((err = snd_pcm_hw_params_any(pcm_handle, params)) < 0)
     {
         snd_pcm_close(pcm_handle);
-        if((err = TryOpenDevice(OPEN_FLAGS&FILTER_FLAGS, passthru || enc)) < 0)
+        if ((err = TryOpenDevice(OPEN_FLAGS&FILTER_FLAGS, passthrough)) < 0)
         {
             AERROR(QString("snd_pcm_open(\"%1\")").arg(m_lastdevice));
             delete settings;
@@ -337,12 +353,13 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
 
     snd_pcm_close(pcm_handle);
     pcm_handle = NULL;
-        // Check if name or description contains information
-        // to know if device can accept passthrough or not
+
+    /* Check if name or description contains information
+       to know if device can accept passthrough or not */
     QMap<QString, QString> *alsadevs = GetALSADevices("pcm");
     while(1)
     {
-        QString real_device = (((passthru || enc) && !m_autopassthrough) ?
+        QString real_device = (((passthru || enc) && m_discretedigital) ?
                                passthru_device : main_device);
 
         QString desc = alsadevs->value(real_device);
@@ -386,7 +403,7 @@ bool AudioOutputALSA::OpenDevice()
     if (pcm_handle != NULL)
         CloseDevice();
 
-    if ((err = TryOpenDevice(0, passthru || enc)) < 0)    
+    if ((err = TryOpenDevice(0, passthru || enc)) < 0)
     {
         AERROR(QString("snd_pcm_open(\"%1\")").arg(m_lastdevice));
         if (pcm_handle)
@@ -448,7 +465,7 @@ void AudioOutputALSA::CloseDevice()
 
 template <class AudioDataType>
 static inline void _ReorderSmpteToAlsa(AudioDataType *buf, uint frames,
-                                         uint extrach)
+                                       uint extrach)
 {
     AudioDataType tmpC, tmpLFE, *buf2;
 
@@ -467,7 +484,7 @@ static inline void _ReorderSmpteToAlsa(AudioDataType *buf, uint frames,
 }
 
 static inline void ReorderSmpteToAlsa(void *buf, uint frames,
-                                        AudioFormat format, uint extrach)
+                                      AudioFormat format, uint extrach)
 {
     switch(AudioOutputSettings::FormatToBits(format))
     {
@@ -489,11 +506,11 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
         return;
     }
 
-        /* Audio received is using SMPTE channel ordering
-         * ALSA uses its own channel order.
-         * Do not re-order passthu audio */
+    //Audio received is in SMPTE channel order, reorder to ALSA unless passthru
     if (!passthru && (channels  == 6 || channels == 8))
+    {
         ReorderSmpteToAlsa(aubuf, frames, output_format, channels - 6);
+    }
 
     VERBOSE(VB_AUDIO+VB_TIMESTAMP,
             QString("WriteAudio: Preparing %1 bytes (%2 frames)")
@@ -589,7 +606,7 @@ int AudioOutputALSA::GetBufferedOnSoundcard(void) const
     return delay;
 }
 
-/*
+/**
  * Set the various ALSA audio parameters.
  * Returns:
  * < 0 : an error occurred
@@ -667,9 +684,8 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
                                                  &buffer_time, &dir);
     CHECKERR(QString("Unable to set buffer time %1").arg(buffer_time));
 
-    // See if we need to increase the prealloc'd buffer size
-    // If buffer_time is too small we could underrun
-    // Make 10% leeway okay
+    /* See if we need to increase the prealloc'd buffer size
+      If buffer_time is too small we could underrun - make 10% difference ok */
     if ((buffer_time * 1.10f < (float)original_buffer_time) && pbufsize < 0)
     {
         VBAUDIO(QString("Requested %1us got %2 buffer time")

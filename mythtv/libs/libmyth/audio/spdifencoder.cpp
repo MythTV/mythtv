@@ -1,5 +1,7 @@
 #include "config.h"
 
+#include "mythcorecontext.h"
+
 #include "compat.h"
 #include "spdifencoder.h"
 #include "mythverbose.h"
@@ -7,7 +9,7 @@
 #define LOC QString("SPDIFEncoder: ")
 #define LOC_ERR QString("SPDIFEncoder, Error: ")
 
-/*
+/**
  * SPDIFEncoder constructor
  * Args:
  *   QString muxer       : name of the muxer.
@@ -16,15 +18,13 @@
  *                         Use "adts" for ADTS encpsulation (AAC)
  *   AVCodecContext *ctx : CodecContext to be encaspulated
  */
-    
-SPDIFEncoder::SPDIFEncoder(QString muxer, AVCodecContext *ctx)
+SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
     : m_complete(false), m_oc(NULL), m_stream(NULL), m_size(0)
 {
     QByteArray dev_ba     = muxer.toAscii();
-    AVOutputFormat *fmt =
-        av_guess_format(dev_ba.constData(), NULL, NULL);
+    AVOutputFormat *fmt;
 
-    if (!(av_guess_format && avformat_alloc_context &&
+    if (!(av_register_all && av_guess_format && avformat_alloc_context &&
           av_new_stream && av_write_header && av_write_frame &&
           av_write_trailer && av_set_parameters))
     {
@@ -44,6 +44,11 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, AVCodecContext *ctx)
         return;
     }
 
+    avcodeclock->lock();
+    av_register_all();
+    avcodeclock->unlock();
+        
+    fmt = av_guess_format(dev_ba.constData(), NULL, NULL);
     if (!fmt)
     {
         VERBOSE(VB_AUDIO, LOC_ERR + "av_guess_format");
@@ -97,21 +102,11 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, AVCodecContext *ctx)
 
     AVCodecContext *codec = m_stream->codec;
 
-    codec->codec_type     = ctx->codec_type;
-    codec->codec_id       = ctx->codec_id;
-    codec->sample_rate    = ctx->sample_rate;
-    codec->sample_fmt     = ctx->sample_fmt;
-    codec->channels       = ctx->channels;
-    codec->bit_rate       = ctx->bit_rate;
-    codec->extradata      = new uint8_t[ctx->extradata_size];
-    codec->extradata_size = ctx->extradata_size;
-    memcpy(codec->extradata, ctx->extradata, ctx->extradata_size);
-
+    codec->codec_id       = (CodecID)codec_id;
     av_write_header(m_oc);
 
-    VERBOSE(VB_AUDIO, LOC + QString("Creating %1 encoder (%2, %3Hz)")
-            .arg(muxer).arg(ff_codec_id_string((CodecID)codec->codec_type))
-            .arg(codec->sample_rate));
+    VERBOSE(VB_AUDIO, LOC + QString("Creating %1 encoder (for %2)")
+            .arg(muxer).arg(ff_codec_id_string((CodecID)codec_id)));
 
     m_complete = true;
 }
@@ -121,12 +116,11 @@ SPDIFEncoder::~SPDIFEncoder(void)
     Destroy();
 }
 
-/*
+/**
  * Encode data through created muxer
  * unsigned char data: pointer to data to encode
  * int           size: size of data to encode
  */
-
 void SPDIFEncoder::WriteFrame(unsigned char *data, int size)
 {
     AVPacket packet;
@@ -141,7 +135,7 @@ void SPDIFEncoder::WriteFrame(unsigned char *data, int size)
     }
 }
 
-/*
+/**
  * Retrieve encoded data and copy it in the provided buffer.
  * Return -1 if there is no data to retrieve.
  * On return, dest_size will contain the length of the data copied
@@ -159,7 +153,7 @@ int SPDIFEncoder::GetData(unsigned char *buffer, int &dest_size)
     return -1;
 }
 
-/*
+/**
  * Reset the internal encoder buffer
  */
 void SPDIFEncoder::Reset()
@@ -167,10 +161,25 @@ void SPDIFEncoder::Reset()
     m_size = 0;
 }
 
-/*
+/**
+ * Set the maximum HD rate.
+ * If playing DTS-HD content, setting a HD rate of 0 will only use the DTS-Core
+ * and the HD stream be stripped out before encoding
+ * Input: rate = maximum HD rate in Hz
+ */
+bool SPDIFEncoder::SetMaxHDRate(int rate)
+{
+    if (!m_oc)
+    {
+        return false;
+    }
+    av_set_int(m_oc->priv_data, "dtshd_rate", rate);
+    return true;
+}
+
+/**
  * funcIO: Internal callback function that will receive encoded frames
  */
-
 int SPDIFEncoder::funcIO(void *opaque, unsigned char *buf, int size)
 {
     SPDIFEncoder *enc = (SPDIFEncoder *)opaque;
@@ -180,10 +189,9 @@ int SPDIFEncoder::funcIO(void *opaque, unsigned char *buf, int size)
     return size;
 }
 
-/*
+/**
  * Destroy and free all allocated memory
  */
-
 void SPDIFEncoder::Destroy()
 {
     Reset();
