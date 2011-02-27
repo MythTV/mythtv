@@ -312,3 +312,4 @@ Other key 1             i                 Information
 
 Other key 2             c                 Change tuner card input
 
+
