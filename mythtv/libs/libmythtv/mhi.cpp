@@ -42,7 +42,7 @@ MHIContext::MHIContext(InteractiveTV *parent)
     : m_parent(parent),     m_dsmcc(NULL),
       m_keyProfile(0),
       m_engine(NULL),       m_stop(false),
-      m_stopped(false),     m_updated(false),
+      m_updated(false),
       m_displayWidth(StdDisplayWidth), m_displayHeight(StdDisplayHeight),
       m_face_loaded(false), m_currentChannel(-1),
       m_isLive(false),      m_currentCard(0),
@@ -132,13 +132,13 @@ void MHIContext::StopEngine()
 {
     if (m_engine)
     {
-        while (!m_stopped)
+        while (m_engineThread.isRunning())
         {
             m_stop = true;
             m_engine_wait.wakeAll();
             usleep(1000);
         }
-        pthread_join(m_engineThread, NULL);
+        m_engineThread.wait();
     }
 }
 
@@ -191,8 +191,9 @@ void MHIContext::Restart(uint chanid, uint cardid, bool isLive)
         m_isLive = isLive;
         // Don't set the NBI version here.  Restart is called
         // after the PMT is processed.
-        m_stopped = pthread_create(&m_engineThread, NULL,
-                                   StartMHEGEngine, this) != 0;
+        m_engineThread.SetParent(this);
+        m_engineThread.start();
+
         m_audioTag = -1;
         m_videoTag = -1;
         m_tuningTo = -1;
@@ -200,13 +201,13 @@ void MHIContext::Restart(uint chanid, uint cardid, bool isLive)
 }
 
 // Thread function to run the MHEG engine.
-void *MHIContext::StartMHEGEngine(void *param)
+void MHEGEngineThread::run(void)
 {
     //VERBOSE(VB_GENERAL, "Starting MHEG Engine");
-    MHIContext *context = (MHIContext*) param;
-    context->RunMHEGEngine();
-    context->m_stopped = true;
-    return NULL;
+    if (!m_parent)
+        return;
+
+    m_parent->RunMHEGEngine();
 }
 
 void MHIContext::RunMHEGEngine(void)
