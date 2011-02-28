@@ -182,7 +182,7 @@ void FirewireSignalMonitor::AddData(const unsigned char *data, uint len)
  */
 void FirewireSignalMonitor::UpdateValues(void)
 {
-    if (!running || exit)
+    if (!monitor_thread.isRunning() || exit)
         return;
 
     if (!IsChannelTuned())

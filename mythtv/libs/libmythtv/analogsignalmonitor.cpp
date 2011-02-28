@@ -118,7 +118,7 @@ bool AnalogSignalMonitor::handleHDPVR(int videofd)
 
 void AnalogSignalMonitor::UpdateValues(void)
 {
-    if (!running || exit)
+    if (!monitor_thread.isRunning() || exit)
         return;
 
     int videofd = channel->GetFd();
