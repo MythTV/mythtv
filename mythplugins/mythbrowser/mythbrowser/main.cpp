@@ -19,7 +19,7 @@
 
 using namespace std;
 
-static int handleMedia(const QString &url, const QString &, const QString &, const QString &, const QString &, int, int, int, const QString &)
+static int handleMedia(const QString &url, const QString &plot, const QString &, const QString &, const QString &, int, int, int, const QString &)
 {
     if (url.isEmpty())
     {
@@ -31,16 +31,28 @@ static int handleMedia(const QString &url, const QString &, const QString &, con
     float zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.4").toFloat();
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    MythScreenType *mythbrowser;
-    if (urls[0].startsWith("mythflash://"))
-        mythbrowser = new MythFlashPlayer(mainStack, urls);
-    else
-        mythbrowser = new MythBrowser(mainStack, urls, zoom);
 
-    if (mythbrowser->Create())
-        mainStack->AddScreen(mythbrowser);
+    if (urls[0].startsWith("mythflash://"))
+    {
+        MythFlashPlayer *flashplayer = new MythFlashPlayer(mainStack, urls);
+        if (flashplayer->Create())
+            mainStack->AddScreen(flashplayer);
+        else
+            delete flashplayer;
+    }
     else
-        delete mythbrowser;
+    {
+        MythBrowser *mythbrowser = new MythBrowser(mainStack, urls, zoom);
+
+        // plot is used to set a default save directory
+        if (!plot.isEmpty())
+            mythbrowser->setDefaultSaveDirectory(plot);
+
+        if (mythbrowser->Create())
+            mainStack->AddScreen(mythbrowser);
+        else
+            delete mythbrowser;
+    }
 
     return 0;
 }

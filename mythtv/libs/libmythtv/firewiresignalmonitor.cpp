@@ -1,7 +1,6 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2006, Daniel Thor Kristjansson
 
-#include <pthread.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/select.h>
@@ -43,7 +42,6 @@ FirewireSignalMonitor::FirewireSignalMonitor(
     FirewireChannel *_channel,
     uint64_t _flags) :
     DTVSignalMonitor(db_cardnum, _channel, _flags),
-    dtvMonitorRunning(false),
     stb_needs_retune(true),
     stb_needs_to_wait_for_pat(false),
     stb_needs_to_wait_for_power(false)
@@ -74,10 +72,10 @@ void FirewireSignalMonitor::Stop(void)
 {
     VERBOSE(VB_CHANNEL, LOC + "Stop() -- begin");
     SignalMonitor::Stop();
-    if (dtvMonitorRunning)
+    if (table_monitor_thread.isRunning())
     {
-        dtvMonitorRunning = false;
-        pthread_join(table_monitor_thread, NULL);
+        dtvMonitorRun = false;
+        table_monitor_thread.wait();
     }
     VERBOSE(VB_CHANNEL, LOC + "Stop() -- end");
 }
@@ -125,18 +123,18 @@ void FirewireSignalMonitor::HandlePMT(uint pnum, const ProgramMapTable *pmt)
     DTVSignalMonitor::HandlePMT(pnum, pmt);
 }
 
-void *FirewireSignalMonitor::TableMonitorThread(void *param)
+void FWSignalThread::run(void)
 {
-    FirewireSignalMonitor *mon = (FirewireSignalMonitor*) param;
-    mon->RunTableMonitor();
-    return NULL;
+    if (!m_parent)
+        return;
+
+    m_parent->RunTableMonitor();
 }
 
 void FirewireSignalMonitor::RunTableMonitor(void)
 {
     stb_needs_to_wait_for_pat = true;
     stb_wait_for_pat_timer.start();
-    dtvMonitorRunning = true;
 
     VERBOSE(VB_CHANNEL, LOC + "RunTableMonitor(): -- begin");
 
@@ -144,7 +142,6 @@ void FirewireSignalMonitor::RunTableMonitor(void)
     if (!lchan)
     {
         VERBOSE(VB_CHANNEL, LOC + "RunTableMonitor(): -- err end");
-        dtvMonitorRunning = false;
         return;
     }
 
@@ -153,7 +150,7 @@ void FirewireSignalMonitor::RunTableMonitor(void)
     dev->OpenPort();
     dev->AddListener(this);
 
-    while (dtvMonitorRunning && GetStreamData())
+    while (dtvMonitorRun && GetStreamData())
         usleep(100000);
 
     VERBOSE(VB_CHANNEL, LOC + "RunTableMonitor(): -- shutdown ");
@@ -161,14 +158,12 @@ void FirewireSignalMonitor::RunTableMonitor(void)
     dev->RemoveListener(this);
     dev->ClosePort();
 
-    dtvMonitorRunning = false;
-
     VERBOSE(VB_CHANNEL, LOC + "RunTableMonitor(): -- end");
 }
 
 void FirewireSignalMonitor::AddData(const unsigned char *data, uint len)
 {
-    if (!dtvMonitorRunning)
+    if (!table_monitor_thread.isRunning())
         return;
 
     if (GetStreamData())
@@ -193,7 +188,7 @@ void FirewireSignalMonitor::UpdateValues(void)
     if (!IsChannelTuned())
         return;
 
-    if (dtvMonitorRunning)
+    if (table_monitor_thread.isRunning())
     {
         EmitStatus();
         if (IsAllGood())
@@ -276,13 +271,14 @@ void FirewireSignalMonitor::UpdateValues(void)
                    kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
                    kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
     {
-        pthread_create(&table_monitor_thread, NULL,
-                       TableMonitorThread, this);
+	dtvMonitorRun = true;
+        table_monitor_thread.SetParent(this);
+        table_monitor_thread.start();
 
         VERBOSE(VB_CHANNEL, LOC + "UpdateValues() -- "
                 "Waiting for table monitor to start");
 
-        while (!dtvMonitorRunning)
+        while (!table_monitor_thread.isRunning())
             usleep(50);
 
         VERBOSE(VB_CHANNEL, LOC + "UpdateValues() -- "

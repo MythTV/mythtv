@@ -22,7 +22,7 @@ class AudioOutputOSS : public AudioOutputBase
     virtual void CloseDevice(void);
     virtual void WriteAudio(unsigned char *aubuf, int size);
     virtual int  GetBufferedOnSoundcard(void) const;
-    AudioOutputSettings* GetOutputSettings(void);
+    AudioOutputSettings* GetOutputSettings(bool /*digital*/);
 
   private:
     void VolumeInit(void);

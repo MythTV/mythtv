@@ -8,13 +8,26 @@
 #define _LINUX_FIREWIRE_DEVICE_H_
 
 #include "firewiredevice.h"
+#include <QThread>
 
 class LFDPriv;
 class LinuxAVCInfo;
+class LinuxFirewireDevice;
+
+class LinuxControllerThread : public QThread
+{
+    Q_OBJECT
+  public:
+    LinuxControllerThread() : m_parent(NULL) {}
+    void SetParent(LinuxFirewireDevice *parent) { m_parent = parent; }
+    void run(void);
+  private:
+    LinuxFirewireDevice *m_parent;
+};
 
 class LinuxFirewireDevice : public FirewireDevice
 {
-    friend void *linux_firewire_device_port_handler_thunk(void *param);
+    friend class LinuxControllerThread;
     friend int linux_firewire_device_tspacket_handler(
         unsigned char *tspacket, int len, uint dropped, void *callback_data);
 

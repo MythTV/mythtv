@@ -68,6 +68,10 @@ static bool performActualUpdate(const QString updates[], QString version,
 
 bool UpgradeMusicDatabaseSchema(void)
 {
+#if IGNORE_SCHEMA_VER_MISMATCH
+    return true;
+#endif
+
     SchemaUpgradeWizard  * DBup;
 
 

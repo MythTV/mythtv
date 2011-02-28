@@ -46,7 +46,7 @@ AudioOutputOSS::~AudioOutputOSS()
     KillAudio();
 }
 
-AudioOutputSettings* AudioOutputOSS::GetOutputSettings()
+AudioOutputSettings* AudioOutputOSS::GetOutputSettings(bool /*digital*/)
 {
     AudioOutputSettings *settings = new AudioOutputSettings();
 

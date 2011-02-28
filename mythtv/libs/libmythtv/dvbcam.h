@@ -6,6 +6,7 @@ using namespace std;
 
 #include <QString>
 #include <QMutex>
+#include <QThread>
 
 #include "mpegtables.h"
 
@@ -15,8 +16,22 @@ class ChannelBase;
 class cCiHandler;
 typedef QMap<const ChannelBase*, ProgramMapTable*> pmt_list_t;
 
+class DVBCam;
+
+class CiHandlerThread : public QThread
+{
+    Q_OBJECT
+  public:
+    CiHandlerThread() : m_parent(NULL) {}
+    void SetParent(DVBCam *parent) { m_parent = parent; }
+    void run(void);
+  private:
+    DVBCam *m_parent;
+};
+
 class DVBCam
 {
+    friend class CiHandlerThread;
   public:
     DVBCam(const QString &device);
     ~DVBCam();
@@ -28,7 +43,6 @@ class DVBCam
     void SetTimeOffset(double offset_in_seconds);
 
   private:
-    static void *CiHandlerThreadHelper(void*);
     void CiHandlerLoop(void);
     void HandleUserIO(void);
     void HandlePMT(void);
@@ -42,7 +56,7 @@ class DVBCam
     bool            exitCiThread;
     bool            ciThreadRunning;
 
-    pthread_t       ciHandlerThread;
+    CiHandlerThread ciHandlerThread;
 
     pmt_list_t      PMTList;
     pmt_list_t      PMTAddList;

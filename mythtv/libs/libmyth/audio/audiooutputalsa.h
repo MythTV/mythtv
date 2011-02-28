@@ -28,7 +28,7 @@ class AudioOutputALSA : public AudioOutputBase
     virtual void CloseDevice(void);
     virtual void WriteAudio(uchar *aubuf, int size);
     virtual int  GetBufferedOnSoundcard(void) const;
-    AudioOutputSettings* GetOutputSettings(bool passthrough = false);
+    AudioOutputSettings* GetOutputSettings(bool passthrough);
 
   private:
     int TryOpenDevice(int open_mode, int try_ac3);

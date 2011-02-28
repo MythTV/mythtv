@@ -12,6 +12,7 @@
 
 class AudioOutput;
 class MainVisual;
+class Playlist;
 
 class MusicPlayerEvent : public MythEvent
 {
@@ -37,6 +38,9 @@ class MusicPlayerEvent : public MythEvent
         static Type TrackRemovedEvent;
         static Type AllTracksRemovedEvent;
         static Type MetadataChangedEvent;
+        static Type TrackStatsChangedEvent;
+        static Type AlbumArtChangedEvent;
+        static Type CDChangedEvent;
 };
 
 class MusicPlayer : public QObject, public MythObservable
@@ -117,6 +121,9 @@ class MusicPlayer : public QObject, public MythObservable
     Metadata    *getDisplayMetadata(void) { return &m_displayMetadata; }
     void         refreshMetadata(void);
     void         sendMetadataChangedEvent(int trackID);
+    void         sendTrackStatsChangedEvent(int trackID);
+    void         sendAlbumArtChangedEvent(int trackID);
+    void         sendCDChangedEvent(void);
 
     void         toMap(QHash<QString, QString> &infoMap);
 

@@ -680,8 +680,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
 
         // Tell the user what went wrong:
         if (error.length())
-            MythPopupBox::showOkPopup(GetMythMainWindow(), "DB connect failure",
-                                      error);
+            ShowOkPopup(error);
 
         // ask user for database parameters
         DatabaseSettings settings(m_DBhostCp);
