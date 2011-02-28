@@ -1,6 +1,3 @@
-// POSIX
-#include <pthread.h>
-
 // C
 #include <cstdlib>
 
@@ -27,6 +24,9 @@ extern "C"
 #include <QMap>
 #include <QStringList>
 #include <QDateTime>
+#include <QThread>
+#include <QMutex>
+#include <QWaitCondition>
 
 #include <Q3PtrList>
 #include <Q3PtrQueue>
@@ -112,9 +112,23 @@ class PTSOffsetQueue
     int vid_id;
 };
 
+class MPEG2replex;
+
+class MPEG2ReplexThread : public QThread
+{
+    Q_OBJECT
+  public:
+    MPEG2ReplexThread() : m_parent(NULL) {}
+    void SetParent(MPEG2replex *parent) { m_parent = parent; }
+    void run(void);
+  private:
+    MPEG2replex *m_parent;
+};
+
 //container for all multiplex related variables
 class MPEG2replex
 {
+    friend class MPEG2ReplexThread;
   public:
     MPEG2replex();
     ~MPEG2replex();
@@ -131,8 +145,10 @@ class MPEG2replex
     int exttype[N_AUDIO];
     int exttypcnt[N_AUDIO];
 
-    pthread_mutex_t mutex;
-    pthread_cond_t cond;
+    QMutex mutex;
+    QWaitCondition cond;
+    MPEG2ReplexThread thread;
+
     audio_frame_t extframe[N_AUDIO];
     sequence_t seq_head;
 
@@ -241,8 +257,6 @@ class MPEG2fixup
 
     frm_dir_map_t delMap;
     frm_dir_map_t saveMap;
-
-    pthread_t thread;
 
     AVFormatContext *inputFC;
     int vid_id;
