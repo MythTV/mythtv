@@ -37,9 +37,6 @@ class IPTVSignalMonitor : public QObject, public DTVSignalMonitor, public TSData
     // implements TSDataListener
     void AddData(const unsigned char *data, unsigned int dataSize);
 
-  public slots:
-    void deleteLater(void);
-
   protected:
     IPTVSignalMonitor(void);
     IPTVSignalMonitor(const IPTVSignalMonitor&);
