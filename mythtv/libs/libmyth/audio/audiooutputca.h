@@ -18,7 +18,7 @@ public:
     AudioOutputCA(const AudioSettings &settings);
     virtual ~AudioOutputCA();
     
-    AudioOutputSettings* GetOutputSettings(void);
+    AudioOutputSettings* GetOutputSettings(bool /*digital*/);
 
     virtual int64_t GetAudiotime(void);
 
