@@ -148,9 +148,6 @@ void GeneralSetupWizard::OnSubmitPromptReturn(bool submit)
                 m_busyPopup->Close();
                 m_busyPopup = NULL;
             }
-            m_hardwareProfile->GenerateUUIDs();
-            gCoreContext->SaveSetting("HardwareProfileUUID", m_hardwareProfile->GetPrivateUUID());
-            gCoreContext->SaveSetting("HardwareProfilePublicUUID", m_hardwareProfile->GetPublicUUID());
             ShowOkPopup(tr("Hardware profile submitted. Thank you for supporting "
                            "MythTV!"));
             if (m_profileLocation)
@@ -251,8 +248,6 @@ void GeneralSetupWizard::OnDeletePromptReturn(bool submit)
                 m_busyPopup->Close();
                 m_busyPopup = NULL;
             }
-            gCoreContext->SaveSetting("HardwareProfileUUID", "");
-            gCoreContext->SaveSetting("HardwareProfilePublicUUID", "");
             ShowOkPopup(tr("Hardware profile deleted."));
         }
         else

@@ -4,6 +4,7 @@
 // QT headers
 #include <QObject>
 #include <QString>
+#include <QDateTime>
 
 // MythDB headers
 #include "mythexp.h"
@@ -30,18 +31,20 @@ class MPUBLIC HardwareProfile : public QObject
     bool WritePrivateUUIDToFile(QString uuid);
     QString GetPublicUUIDFromFile(void);
 
+    bool NeedsUpdate(void);
     bool SubmitProfile(void);
     bool DeleteProfile(void);
 
-    QString GetPublicUUID(void) {return m_publicuuid; };
-    QString GetPrivateUUID(void) {return m_uuid; };
-
-    QString GetProfileURL(void);
+    QString   GetPublicUUID(void) { return m_publicuuid; };
+    QString   GetPrivateUUID(void) { return m_uuid; };
+    QDateTime GetLastUpdate(void) { return m_lastUpdate; };
+    QString   GetProfileURL(void);
 
   private:
-    QString m_uuid;
-    QString m_publicuuid;
-    QString m_hardwareProfile;
+    QString   m_uuid;
+    QString   m_publicuuid;
+    QDateTime m_lastUpdate;
+    QString   m_hardwareProfile;
 };
 
 #endif

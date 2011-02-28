@@ -43,6 +43,7 @@ using namespace std;
 #include "dvdringbuffer.h"
 #include "scheduledrecording.h"
 #include "mythsystemevent.h"
+#include "hardwareprofile.h"
 
 #include "compat.h"  // For SIG* on MinGW
 #include "exitcodes.h"
@@ -1426,6 +1427,15 @@ int main(int argc, char **argv)
                     QString("NetworkControl failed to bind to port %1.")
                     .arg(networkPort));
     }
+
+#ifdef __linux__
+#ifdef CONFIG_BINDINGS_PYTHON
+    HardwareProfile *profile = new HardwareProfile();
+    if (profile && profile->NeedsUpdate())
+        profile->SubmitProfile();
+    delete profile;
+#endif
+#endif
 
     if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
     {

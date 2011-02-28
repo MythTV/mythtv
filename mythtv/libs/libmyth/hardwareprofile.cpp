@@ -21,10 +21,12 @@ const QString SMOLT_SERVER_LOCATION =
 
 HardwareProfile::HardwareProfile() :
     m_uuid(QString()),               m_publicuuid(QString()),
-    m_hardwareProfile(QString())
+    m_lastUpdate(QDateTime()),       m_hardwareProfile(QString())
 {
     m_uuid = gCoreContext->GetSetting("HardwareProfileUUID");
     m_publicuuid = gCoreContext->GetSetting("HardwareProfilePublicUUID");
+    QString lastupdate = gCoreContext->GetSetting("HardwareProfileLastUpdated");
+    m_lastUpdate = QDateTime::fromString(lastupdate, Qt::ISODate);
 }
 
 HardwareProfile::~HardwareProfile()
@@ -131,6 +133,19 @@ bool HardwareProfile::WritePrivateUUIDToFile(QString uuid)
         return false;
 }
 
+bool HardwareProfile::NeedsUpdate(void)
+{
+    if (!m_lastUpdate.isNull() &&
+        (m_lastUpdate.addMonths(1) < QDateTime::currentDateTime()) &&
+        !m_uuid.isEmpty())
+    {
+        VERBOSE(VB_GENERAL, QString("Last hardware profile update was > 30 days ago, update required..."));
+        return true;
+    }
+
+    return false;
+}
+
 bool HardwareProfile::SubmitProfile(void)
 {
     if (m_uuid.isEmpty())
@@ -148,7 +163,14 @@ bool HardwareProfile::SubmitProfile(void)
 
     system.Run();
     if (system.Wait() == GENERIC_EXIT_OK)
+    {
+        GenerateUUIDs();
+        gCoreContext->SaveSetting("HardwareProfileUUID", GetPrivateUUID());
+        gCoreContext->SaveSetting("HardwareProfilePublicUUID", GetPublicUUID());
+        gCoreContext->SaveSetting("HardwareProfileLastUpdated",
+                                  QDateTime::currentDateTime().toString(Qt::ISODate));
         return true;
+    }
     else
         return false;
 
@@ -169,7 +191,13 @@ bool HardwareProfile::DeleteProfile(void)
 
     system.Run();
     if (system.Wait() == GENERIC_EXIT_OK)
+    {
+        gCoreContext->SaveSetting("HardwareProfileUUID", "");
+        gCoreContext->SaveSetting("HardwareProfilePublicUUID", "");
+        gCoreContext->SaveSetting("HardwareProfileLastUpdated",
+                                  QDateTime::currentDateTime().toString(Qt::ISODate));
         return true;
+    }
     else
         return false;
 
