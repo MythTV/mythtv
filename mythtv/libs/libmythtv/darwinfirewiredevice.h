@@ -14,7 +14,7 @@ class DarwinControllerThread : public QThread
 {
     Q_OBJECT
   public:
-    ControllerThread() : m_parent(NULL) {}
+    DarwinControllerThread() : m_parent(NULL) {}
     void SetParent(DarwinFirewireDevice *parent) { m_parent = parent; }
     void run(void);
   private:
