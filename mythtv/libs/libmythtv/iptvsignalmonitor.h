@@ -5,10 +5,28 @@
 
 #include "dtvsignalmonitor.h"
 
-class IPTVChannel;
+#include <QThread>
+#include <QObject>
 
-class IPTVSignalMonitor : public DTVSignalMonitor, public TSDataListener
+class IPTVChannel;
+class IPTVSignalMonitor;
+
+class IPTVMonitorThread : public QThread
 {
+    Q_OBJECT
+  public:
+    IPTVMonitorThread() : m_parent(NULL) {}
+    void SetParent(IPTVSignalMonitor *parent) { m_parent = parent; }
+    void run(void);
+  private:
+    IPTVSignalMonitor *m_parent;
+};
+
+class IPTVSignalMonitor : public QObject, public DTVSignalMonitor, public TSDataListener
+{
+    Q_OBJECT
+
+    friend class IPTVMonitorThread;
   public:
     IPTVSignalMonitor(int db_cardnum, IPTVChannel *_channel,
                       uint64_t _flags = 0);
@@ -28,14 +46,12 @@ class IPTVSignalMonitor : public DTVSignalMonitor, public TSDataListener
 
     virtual void UpdateValues(void);
 
-    static void *TableMonitorThread(void *param);
     void RunTableMonitor(void);
 
     IPTVChannel *GetChannel(void);
 
   protected:
-    bool               dtvMonitorRunning;
-    pthread_t          table_monitor_thread;
+    IPTVMonitorThread  table_monitor_thread;
 };
 
 #endif // _IPTVSIGNALMONITOR_H_

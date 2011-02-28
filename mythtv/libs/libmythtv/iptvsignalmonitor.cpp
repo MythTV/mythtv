@@ -32,8 +32,7 @@
 IPTVSignalMonitor::IPTVSignalMonitor(int db_cardnum,
                                      IPTVChannel *_channel,
                                      uint64_t _flags) :
-    DTVSignalMonitor(db_cardnum, _channel, _flags),
-    dtvMonitorRunning(false), table_monitor_thread(pthread_t())
+    DTVSignalMonitor(db_cardnum, _channel, _flags)
 {
     bool isLocked = false;
     IPTVChannelInfo chaninfo = GetChannel()->GetCurrentChanInfo();
@@ -69,20 +68,20 @@ void IPTVSignalMonitor::Stop(void)
     DBG_SM("Stop", "begin");
     GetChannel()->GetFeeder()->RemoveListener(this);
     SignalMonitor::Stop();
-    if (dtvMonitorRunning)
+    if (table_monitor_thread.isRunning())
     {
         GetChannel()->GetFeeder()->Stop();
-        dtvMonitorRunning = false;
-        pthread_join(table_monitor_thread, NULL);
+        table_monitor_thread.wait();
     }
     DBG_SM("Stop", "end");
 }
 
-void *IPTVSignalMonitor::TableMonitorThread(void *param)
+void IPTVMonitorThread::run(void)
 {
-    IPTVSignalMonitor *mon = (IPTVSignalMonitor*) param;
-    mon->RunTableMonitor();
-    return NULL;
+    if (!m_parent)
+        return;
+
+    m_parent->RunTableMonitor();
 }
 
 /** \fn IPTVSignalMonitor::RunTableMonitor(void)
@@ -90,7 +89,6 @@ void *IPTVSignalMonitor::TableMonitorThread(void *param)
 void IPTVSignalMonitor::RunTableMonitor(void)
 {
     DBG_SM("Run", "begin");
-    dtvMonitorRunning = true;
 
     GetStreamData()->AddListeningPID(0);
 
@@ -98,7 +96,6 @@ void IPTVSignalMonitor::RunTableMonitor(void)
     GetChannel()->GetFeeder()->Run();
     GetChannel()->GetFeeder()->RemoveListener(this);
 
-    dtvMonitorRunning = false;
     DBG_SM("Run", "end");
 }
 
@@ -122,7 +119,7 @@ void IPTVSignalMonitor::UpdateValues(void)
     if (!IsChannelTuned())
         return;
 
-    if (dtvMonitorRunning)
+    if (table_monitor_thread.isRunning())
     {
         EmitStatus();
         if (IsAllGood())
@@ -150,10 +147,11 @@ void IPTVSignalMonitor::UpdateValues(void)
                    kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
                    kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
     {
-        pthread_create(&table_monitor_thread, NULL,
-                       TableMonitorThread, this);
+        table_monitor_thread.SetParent(this);
+        table_monitor_thread.start();
+
         DBG_SM("UpdateValues", "Waiting for table monitor to start");
-        while (!dtvMonitorRunning)
+        while (!table_monitor_thread.isRunning())
             usleep(50);
         DBG_SM("UpdateValues", "Table monitor started");
     }
