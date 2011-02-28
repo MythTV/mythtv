@@ -77,7 +77,7 @@ class AudioOutputDXPrivate
                FreeLibrary(dsound_dll);
         }
 
-        int InitDirectSound(void);
+        int InitDirectSound(bool passthrough = false);
         void ResetDirectSound(void);
         void DestroyDSBuffer(void);
         void FillBuffer(unsigned char *buffer, int size);
@@ -110,6 +110,8 @@ AudioOutputDX::AudioOutputDX(const AudioSettings &settings) :
     InitSettings(settings);
     if (passthru_device == "auto" || passthru_device.toLower() == "default")
         passthru_device = main_device;
+    else
+        m_discretedigital = true;
     if (settings.init)
         Reconfigure(settings);
 }
@@ -179,7 +181,7 @@ void AudioOutputDXPrivate::ResetDirectSound(void)
     device_list.clear();
 }
 
-int AudioOutputDXPrivate::InitDirectSound(void)
+int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
 {
     LPFNDSC OurDirectSoundCreate;
     LPFNDSE OurDirectSoundEnumerate;
@@ -195,7 +197,7 @@ int AudioOutputDXPrivate::InitDirectSound(void)
     }
 
     if (parent)  // parent can be NULL only when called from GetDXDevices()
-        device_name = parent->m_UseSPDIF ?
+        device_name = passthrough ?
                       parent->passthru_device : parent->main_device;
     device_name = device_name.section(':', 1);
     device_num  = device_name.toInt(&ok, 10);
@@ -378,13 +380,13 @@ bool AudioOutputDXPrivate::StartPlayback(void)
     return true;
 }
 
-AudioOutputSettings* AudioOutputDX::GetOutputSettings(void)
+AudioOutputSettings* AudioOutputDX::GetOutputSettings(bool passthrough)
 {
     AudioOutputSettings *settings = new AudioOutputSettings();
     DSCAPS devcaps;
     devcaps.dwSize = sizeof(DSCAPS);
 
-    m_priv->InitDirectSound();
+    m_priv->InitDirectSound(passthrough);
     if ((!m_priv->dsobject || !m_priv->dsound_dll) ||
         FAILED(IDirectSound_GetCaps(m_priv->dsobject, &devcaps)) )
     {
@@ -431,7 +433,7 @@ bool AudioOutputDX::OpenDevice(void)
     CloseDevice();
 
     m_UseSPDIF = passthru || enc;
-    m_priv->InitDirectSound();
+    m_priv->InitDirectSound(m_UseSPDIF);
     if (!m_priv->dsobject || !m_priv->dsound_dll)
     {
         Error("DirectSound initialization failed");
@@ -607,7 +609,7 @@ void AudioOutputDX::SetVolumeChannel(int channel, int volume)
 QMap<int, QString> *AudioOutputDX::GetDXDevices(void)
 {
     AudioOutputDXPrivate *tmp_priv = new AudioOutputDXPrivate(NULL);
-    tmp_priv->InitDirectSound();
+    tmp_priv->InitDirectSound(false);
     QMap<int, QString> *dxdevs = new QMap<int, QString>(tmp_priv->device_list);
     delete tmp_priv;
     return dxdevs;

@@ -1346,6 +1346,13 @@ void ButtonSetting::setEnabled(bool fEnabled)
         button->setEnabled(fEnabled);
 }
 
+void ButtonSetting::setLabel(QString str)
+{
+    if (button)
+        button->setText(str);
+    Setting::setLabel(str);
+}
+
 void ButtonSetting::setHelpText(const QString &str)
 {
     if (button)

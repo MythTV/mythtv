@@ -43,14 +43,17 @@ private:
     int tail;
 };
 
+// Forward declaration of SPDIF encoder
+class SPDIFEncoder;
+
 class AudioOutputBase : public AudioOutput, public QThread
 {
  public:
     AudioOutputBase(const AudioSettings &settings);
     virtual ~AudioOutputBase();
 
-    AudioOutputSettings* GetOutputSettingsCleaned(void);
-    AudioOutputSettings* GetOutputSettingsUsers(void);
+    AudioOutputSettings* GetOutputSettingsCleaned(bool digital = true);
+    AudioOutputSettings* GetOutputSettingsUsers(bool digital = false);
 
     // reconfigure sound out for new params
     virtual void Reconfigure(const AudioSettings &settings);
@@ -61,8 +64,11 @@ class AudioOutputBase : public AudioOutput, public QThread
     // timestretch
     virtual void SetStretchFactor(float factor);
     virtual float GetStretchFactor(void) const;
+    virtual int GetChannels(void) const { return channels; }
+    virtual AudioFormat GetFormat(void) const { return format; };
+    virtual int GetBytesPerFrame(void) const { return source_bytes_per_frame; };
 
-    virtual bool CanPassthrough(int samplerate, int channels) const;
+    virtual bool CanPassthrough(int samplerate, int channels, int codec) const;
     virtual bool ToggleUpmix(void);
 
     virtual void Reset(void);
@@ -72,6 +78,8 @@ class AudioOutputBase : public AudioOutput, public QThread
 
     // timecode is in milliseconds.
     virtual bool AddFrames(void *buffer, int frames, int64_t timecode);
+    virtual bool AddData(void *buffer, int len, int64_t timecode);
+    virtual int64_t LengthLastData(void) { return m_length_last_data; }
 
     virtual void SetTimecode(int64_t timecode);
     virtual bool IsPaused(void) const { return actually_paused; }
@@ -108,18 +116,23 @@ class AudioOutputBase : public AudioOutput, public QThread
     virtual bool OpenDevice(void) = 0;
     virtual void CloseDevice(void) = 0;
     virtual void WriteAudio(uchar *aubuf, int size) = 0;
+    /**
+     * Return the size in bytes of frames currently in the audio buffer adjusted
+     * with the audio playback latency
+     */
     virtual int  GetBufferedOnSoundcard(void) const = 0;
     // Default implementation only supports 2ch s16le at 48kHz
-    virtual AudioOutputSettings* GetOutputSettings(void)
+    virtual AudioOutputSettings* GetOutputSettings(bool digital = false)
         { return new AudioOutputSettings; }
-    /// You need to call this from any implementation in the dtor.
+    // You need to call this from any implementation in the dtor.
     void KillAudio(void);
 
     // The following functions may be overridden, but don't need to be
     virtual bool StartOutputThread(void);
     virtual void StopOutputThread(void);
 
-    int GetAudioData(uchar *buffer, int buf_size, bool fill_buffer, int *local_raud = NULL);
+    int GetAudioData(uchar *buffer, int buf_size, bool fill_buffer,
+                     int *local_raud = NULL);
 
     void OutputAudioLoop(void);
 
@@ -145,11 +158,13 @@ class AudioOutputBase : public AudioOutput, public QThread
     AudioFormat format;
     AudioFormat output_format;
     int samplerate;
+    int bitrate;
     int effdsp; // from the recorded stream (NuppelVideo)
     int fragment_size;
     long soundcard_buffer_size;
 
     QString main_device, passthru_device;
+    bool    m_discretedigital;
 
     bool passthru, enc, reenc;
 
@@ -168,10 +183,15 @@ class AudioOutputBase : public AudioOutput, public QThread
     int src_quality;
 
  private:
+    bool SetupPassthrough(int codec, int codec_profile,
+                          int &samplerate_tmp, int &channels_tmp);
+    AudioOutputSettings* OutputSettings(bool digital = true);
     int CopyWithUpmix(char *buffer, int frames, int &org_waud);
     void SetAudiotime(int frames, int64_t timecode);
     AudioOutputSettings *output_settingsraw;
     AudioOutputSettings *output_settings;
+    AudioOutputSettings *output_settingsdigitalraw;
+    AudioOutputSettings *output_settingsdigital;
     bool need_resampler;
     SRC_STATE *src_ctx;
     soundtouch::SoundTouch    *pSoundStretch;
@@ -181,8 +201,8 @@ class AudioOutputBase : public AudioOutput, public QThread
     int source_channels;
     int source_samplerate;
     int source_bytes_per_frame;
-    bool needs_upmix;
     bool upmix_default;
+    bool needs_upmix;
     bool needs_downmix;
     int surround_mode;
     float old_stretchfactor;
@@ -195,20 +215,30 @@ class AudioOutputBase : public AudioOutput, public QThread
 
     bool audio_thread_exists;
 
-    /* Writes to the audiobuffer, reconfigures and audiobuffer resets can only
-       take place while holding this lock */
+    /**
+     *  Writes to the audiobuffer, reconfigures and audiobuffer resets can only
+     *  take place while holding this lock
+     */
     QMutex audio_buflock;
 
-    /** must hold avsync_lock to read or write 'audiotime' and
-        'audiotime_updated' */
+    /**
+     *  must hold avsync_lock to read or write 'audiotime' and
+     *  'audiotime_updated'
+     */
     QMutex avsync_lock;
 
-    // timecode of audio leaving the soundcard (same units as timecodes)
+    /**
+     * timecode of audio leaving the soundcard (same units as timecodes)
+     */
     int64_t audiotime;
 
-    /* Audio circular buffer */
-    int raud, waud;     /* read and write positions */
-    // timecode of audio most recently placed into buffer
+    /**
+     * Audio circular buffer
+     */
+    int raud, waud;     // read and write positions
+    /**
+     * timecode of audio most recently placed into buffer
+     */
     int64_t audbuf_timecode;
     AsyncLooseLock reset_active;
 
@@ -227,9 +257,16 @@ class AudioOutputBase : public AudioOutput, public QThread
     float *src_out;
     int kAudioSRCOutputSize;
     uint memory_corruption_test2;
-    /** main audio buffer */
+    /**
+     * main audio buffer
+     */
     uchar audiobuffer[kAudioRingBufferSize];
     uint memory_corruption_test3;
+    uint m_configure_succeeded;
+    int64_t m_length_last_data;
+
+    // SPDIF Encoder for digital passthrough
+    SPDIFEncoder     *m_spdifenc;
 };
 
 #endif

@@ -451,6 +451,9 @@ static bool performActualUpdate(
 bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
                              const bool upgradeIfNoUI)
 {
+#if IGNORE_SCHEMA_VER_MISMATCH
+    return true;
+#endif
     SchemaUpgradeWizard  * DBup;
 
 

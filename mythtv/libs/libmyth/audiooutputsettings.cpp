@@ -1,6 +1,6 @@
 /* -*- Mode: c++ -*-
  *
- * Copyright (C) foobum@gmail.com 2010
+ * Copyright (C) 2010 foobum@gmail.com and jyavenard@gmail.com
  *
  * Licensed under the GPL v2 or a later version at your choosing.
  */
@@ -14,11 +14,15 @@ using namespace std;
 #include "mythverbose.h"
 #include "mythcorecontext.h"
 
+extern "C" {
+#include "libavutil/avutil.h"    // to check version of libavformat
+}
+
 #define LOC QString("AO: ")
 
 AudioOutputSettings::AudioOutputSettings(bool invalid) :
-    m_passthrough(-1), m_AC3(false), m_DTS(false), m_LPCM(false),
-    m_invalid(invalid)
+    m_passthrough(-1),  m_features(FEATURE_NONE),
+    m_invalid(invalid), m_has_eld(false)
 {
     m_sr.assign(srs,  srs  +
                 sizeof(srs)  / sizeof(int));
@@ -48,9 +52,8 @@ AudioOutputSettings& AudioOutputSettings::operator=(
     m_formats       = rhs.m_formats;
     m_channels      = rhs.m_channels;
     m_passthrough   = rhs.m_passthrough;
-    m_AC3           = rhs.m_AC3;
-    m_DTS           = rhs.m_DTS;
-    m_LPCM          = rhs.m_LPCM;
+    m_features      = rhs.m_features;
+    m_has_eld       = rhs.m_has_eld;
     m_invalid       = rhs.m_invalid;
     m_sr_it         = m_sr.begin() + (rhs.m_sr_it - rhs.m_sr.begin());
     m_sf_it         = m_sf.begin() + (rhs.m_sf_it - rhs.m_sf.begin());
@@ -245,6 +248,14 @@ void AudioOutputSettings::SetBestSupportedChannels(int channels)
     m_channels.push_back(channels);
 }
 
+void AudioOutputSettings::setFeature(bool val, DigitalFeature arg)
+{
+    if (val)
+        m_features |= arg;
+    else
+        m_features &= ~arg;
+};
+
 /**
  * Returns capabilities supported by the audio device
  * amended to take into account the digital audio
@@ -268,13 +279,30 @@ AudioOutputSettings* AudioOutputSettings::GetCleaned(bool newcopy)
 
     int mchannels = BestSupportedChannels();
 
-    aosettings->m_LPCM = (mchannels > 2);
-    if (mchannels == 2 && m_passthrough >= 0)
+    if (mchannels > 2)
     {
-        VERBOSE(VB_AUDIO, LOC + QString("AC3 or DTS capable"));
-        aosettings->AddSupportedChannels(6);
+        aosettings->setFeature(FEATURE_LPCM);
     }
-    aosettings->m_DTS = aosettings->m_AC3 = (m_passthrough >= 0);
+
+    if (IsSupportedFormat(FORMAT_S16))
+    {
+        // E-AC3 is transferred as stereo PCM at 4 times the rates
+        // assume all amplifier supporting E-AC3 also supports 7.1 LPCM
+        // as it's mandatory under the bluray standard
+//#if LIBAVFORMAT_VERSION_INT > AV_VERSION_INT( 52, 83, 0 )
+        if (IsSupportedChannels(8) && IsSupportedRate(192000))
+            aosettings->setFeature(FEATURE_TRUEHD | FEATURE_DTSHD | FEATURE_EAC3);
+//#endif
+        if (m_passthrough >= 0)
+        {
+            if (mchannels == 2)
+            {
+                VERBOSE(VB_AUDIO, LOC + QString("may be AC3 or DTS capable"));
+                aosettings->AddSupportedChannels(6);
+            }
+            aosettings->setFeature(FEATURE_AC3 | FEATURE_DTS);
+        }
+    }
 
     return aosettings;
 }
@@ -299,15 +327,29 @@ AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
 
     int cur_channels = gCoreContext->GetNumSetting("MaxChannels", 2);
     int max_channels = aosettings->BestSupportedChannels();
-    bool bAdv = gCoreContext->GetNumSetting("AdvancedAudioSettings", false);
-    bool bForceDigital = bAdv &&
-        gCoreContext->GetNumSetting("PassThruDeviceOverride", false);
-    bool bAC3  = (aosettings->m_AC3 || bForceDigital) &&
+
+    bool bAC3  = aosettings->canFeature(FEATURE_AC3) &&
         gCoreContext->GetNumSetting("AC3PassThru", false);
-    bool bDTS  = (aosettings->m_DTS || bForceDigital) && 
+
+    bool bDTS  = aosettings->canFeature(FEATURE_DTS) && 
         gCoreContext->GetNumSetting("DTSPassThru", false);
-    bool bLPCM = aosettings->m_LPCM &&
-        !(bAdv && gCoreContext->GetNumSetting("StereoPCM", false));
+
+    bool bLPCM = aosettings->canFeature(FEATURE_LPCM) &&
+        !gCoreContext->GetNumSetting("StereoPCM", false);
+
+    bool bEAC3 = aosettings->canFeature(FEATURE_EAC3) &&
+        gCoreContext->GetNumSetting("EAC3PassThru", false) &&
+        !gCoreContext->GetNumSetting("Audio48kOverride", false);
+
+        // TrueHD requires HBR support.
+    bool bTRUEHD = aosettings->canFeature(FEATURE_TRUEHD) &&
+        gCoreContext->GetNumSetting("TrueHDPassThru", false) &&
+        !gCoreContext->GetNumSetting("Audio48kOverride", false) &&
+        gCoreContext->GetNumSetting("HBRPassthru", true);
+
+    bool bDTSHD = aosettings->canFeature(FEATURE_DTSHD) &&
+        gCoreContext->GetNumSetting("DTSHDPassThru", false) &&
+        !gCoreContext->GetNumSetting("Audio48kOverride", false);
 
     if (max_channels > 2 && !bLPCM)
         max_channels = 2;
@@ -318,9 +360,60 @@ AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
         cur_channels = max_channels;
 
     aosettings->SetBestSupportedChannels(cur_channels);
-    aosettings->m_AC3 = bAC3;
-    aosettings->m_DTS = bDTS;
-    aosettings->m_LPCM = bLPCM;
+    aosettings->setFeature(bAC3, FEATURE_AC3);
+    aosettings->setFeature(bDTS, FEATURE_DTS);
+    aosettings->setFeature(bLPCM, FEATURE_LPCM);
+    aosettings->setFeature(bEAC3, FEATURE_EAC3);
+    aosettings->setFeature(bTRUEHD, FEATURE_TRUEHD);
+    aosettings->setFeature(bDTSHD, FEATURE_DTSHD);
 
     return aosettings;
+}
+
+int AudioOutputSettings::GetMaxHDRate()
+{
+    if (!canFeature(FEATURE_DTSHD))
+        return 0;
+
+        // If no HBR or no LPCM, limit bitrate to 6.144Mbit/s
+    if (!gCoreContext->GetNumSetting("HBRPassthru", true) ||
+        !canFeature(FEATURE_LPCM))
+    {
+        return 192000;  // E-AC3/DTS-HD High Res: 192k, 16 bits, 2 ch
+    }
+    return 768000;      // TrueHD or DTS-HD MA: 192k, 16 bits, 8 ch
+}
+
+#define ARG(x) ((tmp.isEmpty() ? "" : ",") + QString(x))
+    
+QString AudioOutputSettings::FeaturesToString(DigitalFeature arg)
+{
+    QString tmp;
+    DigitalFeature feature[] = {
+        FEATURE_AC3,
+        FEATURE_DTS,
+        FEATURE_LPCM,
+        FEATURE_EAC3,
+        FEATURE_TRUEHD,
+        FEATURE_DTSHD,
+        FEATURE_AAC,
+        (DigitalFeature)-1
+    };
+    const char *feature_str[] = {
+        "AC3",
+        "DTS",
+        "LPCM",
+        "EAC3",
+        "TRUEHD",
+        "DTSHD",
+        "AAC",
+        NULL
+    };
+    
+    for (unsigned int i = 0; feature[i] != (DigitalFeature)-1; i++)
+    {
+        if (arg & feature[i])
+            tmp += ARG(feature_str[i]);
+    }
+    return tmp;
 }

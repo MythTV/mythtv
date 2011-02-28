@@ -48,11 +48,11 @@ AudioOutput *AudioOutput::OpenAudio(
     const QString &main_device, const QString &passthru_device,
     AudioFormat format, int channels, int codec, int samplerate,
     AudioOutputSource source, bool set_initial_vol, bool passthru,
-    int upmixer_startup)
+    int upmixer_startup, AudioOutputSettings *custom)
 {
     AudioSettings settings(
         main_device, passthru_device, format, channels, codec, samplerate,
-        source, set_initial_vol, passthru, upmixer_startup);
+        source, set_initial_vol, passthru, upmixer_startup, custom);
 
     return OpenAudio(settings);
 }
@@ -211,6 +211,23 @@ AudioOutput::~AudioOutput()
 
 void AudioOutput::SetStretchFactor(float /*factor*/)
 {
+}
+
+AudioOutputSettings* AudioOutput::GetOutputSettingsCleaned(bool /*digital*/)
+{
+    return new AudioOutputSettings;
+}
+
+AudioOutputSettings* AudioOutput::GetOutputSettingsUsers(bool /*digital*/)
+{
+    return new AudioOutputSettings;
+}
+
+bool AudioOutput::CanPassthrough(int /*samplerate*/,
+                                 int /*channels*/,
+                                 int /*codec*/) const
+{
+    return false;
 }
 
 void AudioOutput::Error(const QString &msg)

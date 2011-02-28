@@ -28,7 +28,7 @@ class AudioOutputALSA : public AudioOutputBase
     virtual void CloseDevice(void);
     virtual void WriteAudio(uchar *aubuf, int size);
     virtual int  GetBufferedOnSoundcard(void) const;
-    AudioOutputSettings* GetOutputSettings(void);
+    AudioOutputSettings* GetOutputSettings(bool passthrough = false);
 
   private:
     int TryOpenDevice(int open_mode, int try_ac3);
@@ -46,9 +46,6 @@ class AudioOutputALSA : public AudioOutputBase
     int          pbufsize;
     int          m_card, m_device, m_subdevice;
     QMutex       killAudioLock;
-    snd_pcm_sframes_t (*pcm_write_func)(snd_pcm_t*, const void*,
-                                        snd_pcm_uframes_t);
-    bool         m_autopassthrough;
     QString      m_lastdevice;
 
     struct {
