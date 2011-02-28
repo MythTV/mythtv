@@ -122,7 +122,7 @@ class AudioOutputBase : public AudioOutput, public QThread
      */
     virtual int  GetBufferedOnSoundcard(void) const = 0;
     // Default implementation only supports 2ch s16le at 48kHz
-    virtual AudioOutputSettings* GetOutputSettings(bool digital = false)
+    virtual AudioOutputSettings* GetOutputSettings(bool digital)
         { return new AudioOutputSettings; }
     // You need to call this from any implementation in the dtor.
     void KillAudio(void);

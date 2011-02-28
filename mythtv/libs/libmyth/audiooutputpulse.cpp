@@ -52,7 +52,7 @@ AudioOutputPulseAudio::~AudioOutputPulseAudio()
     }
 }
 
-AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings()
+AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings(bool /*digital*/)
 {
     AudioFormat fmt;
     m_aosettings = new AudioOutputSettings();

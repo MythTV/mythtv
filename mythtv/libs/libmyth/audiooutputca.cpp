@@ -234,7 +234,7 @@ bool CoreAudioData::OpenAnalog()
     return true;
 }
 
-AudioOutputSettings* AudioOutputCA::GetOutputSettings()
+AudioOutputSettings* AudioOutputCA::GetOutputSettings(bool /*digital*/)
 {
     AudioOutputSettings *settings = new AudioOutputSettings();
 
