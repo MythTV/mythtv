@@ -1277,19 +1277,19 @@
         </imagetype>
 
         <progressbar name="progress">
-        <area>170,150,10,10</area>
-        <layout>horizontal</layout>
-        <style>reveal</style>
-        <imagetype name="background">
-            <filename>mm_progress-bg.png</filename>
-        </imagetype>
-        <imagetype name="progressimage">
-            <filename>mm_progress-fg.png</filename>
-        </imagetype>
-    </progressbar>
+            <area>170,150,10,10</area>
+            <layout>horizontal</layout>
+            <style>reveal</style>
+            <imagetype name="background">
+                <filename>mm_progress-bg.png</filename>
+            </imagetype>
+            <imagetype name="progressimage">
+                <filename>mm_progress-fg.png</filename>
+            </imagetype>
+        </progressbar>
     </window>
 
-        <window name="volume_popup">
+    <window name="volume_popup">
         <area>-1,-1,620,165</area>
         <imagetype name="backimg">
             <area>0,0,620,165</area>
