@@ -44,6 +44,7 @@ class GeneralSetupWizard : public MythScreenType
     MythUIButton     *m_cancelButton;
 
     MythUIText       *m_profileLocation;
+    MythUIText       *m_adminPassword;
 
     MythScreenStack  *m_popupStack;
     MythUIBusyDialog *m_busyPopup;

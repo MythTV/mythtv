@@ -20,7 +20,7 @@ GeneralSetupWizard::GeneralSetupWizard(MythScreenStack *parent, const char *name
       m_submitButton(NULL),    m_viewButton(NULL),
       m_deleteButton(NULL),    m_nextButton(NULL),
       m_cancelButton(NULL),    m_profileLocation(NULL),
-      m_busyPopup(NULL)
+      m_adminPassword(NULL),   m_busyPopup(NULL)
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
     m_hardwareProfile = new HardwareProfile();
@@ -44,6 +44,7 @@ bool GeneralSetupWizard::Create()
     m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
 
     m_profileLocation = dynamic_cast<MythUIText *> (GetChild("profiletext"));
+    m_adminPassword = dynamic_cast<MythUIText *> (GetChild("profilepassword"));
 
     if (!m_submitButton || !m_viewButton || !m_deleteButton ||
         !m_nextButton || !m_cancelButton)
@@ -84,6 +85,9 @@ bool GeneralSetupWizard::Create()
 
     if (m_profileLocation)
         m_profileLocation->Hide();
+
+    if (m_adminPassword)
+        m_adminPassword->Hide();
 #endif
 #endif
 
@@ -103,6 +107,9 @@ void GeneralSetupWizard::loadData()
 
     if (m_profileLocation)
         m_profileLocation->SetText(m_hardwareProfile->GetProfileURL());
+
+    if (m_adminPassword)
+        m_adminPassword->SetText(m_hardwareProfile->GetAdminPasswordFromFile());
 }
 
 void GeneralSetupWizard::slotNext(void)
@@ -152,6 +159,8 @@ void GeneralSetupWizard::OnSubmitPromptReturn(bool submit)
                            "MythTV!"));
             if (m_profileLocation)
                 m_profileLocation->SetText(m_hardwareProfile->GetProfileURL());
+            if (m_adminPassword)
+                m_adminPassword->SetText(m_hardwareProfile->GetAdminPasswordFromFile());
         }
         else
         {
@@ -250,7 +259,9 @@ void GeneralSetupWizard::OnDeletePromptReturn(bool submit)
             }
             ShowOkPopup(tr("Hardware profile deleted."));
             if (m_profileLocation)
-                m_profileLocation->SetText(m_hardwareProfile->GetProfileURL());
+                m_profileLocation->SetText("");
+            if (m_adminPassword)
+                m_adminPassword->SetText("");
         }
         else
         {

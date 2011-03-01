@@ -18,6 +18,8 @@
 
 const QString SMOLT_SERVER_LOCATION =
                   QString("http://smolt.mythtv.org/");
+const QString SMOLT_TOKEN =
+                  QString("smolt_token-smolt.mythtv.org");
 
 HardwareProfile::HardwareProfile() :
     m_uuid(QString()),               m_publicuuid(QString()),
@@ -113,6 +115,25 @@ QString HardwareProfile::GetPublicUUIDFromFile()
             }
         }
         pubfile.close();
+    }
+
+    return ret;
+}
+
+QString HardwareProfile::GetAdminPasswordFromFile()
+{
+    QString ret;
+
+    if (gCoreContext->GetSetting("HardwareProfileUUID").isEmpty())
+        return ret;
+
+    QString token_file = GetConfDir() + "/HardwareProfile/" + SMOLT_TOKEN;
+    QFile file(token_file);
+    if (file.open( QIODevice::ReadOnly ))
+    {
+        QTextStream stream(&file);
+        ret = stream.readLine();
+        file.close();
     }
 
     return ret;

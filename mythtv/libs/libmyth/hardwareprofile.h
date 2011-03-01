@@ -16,6 +16,7 @@
 class MythUIBusyDialog;
 
 extern const QString SMOLT_SERVER_LOCATION;
+extern const QString SMOLT_TOKEN;
 
 class MPUBLIC HardwareProfile : public QObject
 {
@@ -30,6 +31,7 @@ class MPUBLIC HardwareProfile : public QObject
     QString GetPrivateUUIDFromFile(void);
     bool WritePrivateUUIDToFile(QString uuid);
     QString GetPublicUUIDFromFile(void);
+    QString GetAdminPasswordFromFile(void);
 
     bool NeedsUpdate(void);
     bool SubmitProfile(void);
