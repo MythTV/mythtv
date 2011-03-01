@@ -4152,9 +4152,10 @@ fi
 
 # Check for python dependencies
 if enabled bindings_python; then
-    check_python         || disable_bindings_python "Python 2.6"
-    check_py_lib MySQLdb || disable_bindings_python "MySQLdb"
-    check_py_lib lxml    || disable_bindings_python "lxml"
+    check_python               || disable_bindings_python "Python 2.6"
+    check_py_lib MySQLdb       || disable_bindings_python "MySQLdb"
+    check_py_lib lxml          || disable_bindings_python "lxml"
+    check_py_lib urlgrabber    || disable_bindings_python "urlgrabber"
 fi
 
 # Check for perl dependencies
