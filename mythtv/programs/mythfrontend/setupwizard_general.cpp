@@ -249,6 +249,8 @@ void GeneralSetupWizard::OnDeletePromptReturn(bool submit)
                 m_busyPopup = NULL;
             }
             ShowOkPopup(tr("Hardware profile deleted."));
+            if (m_profileLocation)
+                m_profileLocation->SetText(m_hardwareProfile->GetProfileURL());
         }
         else
         {

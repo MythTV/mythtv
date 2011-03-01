@@ -208,7 +208,7 @@ QString HardwareProfile::GetProfileURL()
 {
     QString ret;
 
-    if (!m_publicuuid.isEmpty())
+    if (!gCoreContext->GetSetting("HardwareProfileUUID").isEmpty())
     {
         ret = SMOLT_SERVER_LOCATION + "client/show/?uuid=" + m_publicuuid;
     }
