@@ -283,7 +283,7 @@ bool AudioOutputCA::OpenDevice()
 {
     bool deviceOpened = false;
 
-    if (passthru)
+    if (passthru || enc)
     {
         if (!d->FindAC3Stream())
         {
