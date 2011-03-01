@@ -1553,7 +1553,7 @@
             <value>Volume</value>
         </textarea>
 
-        <statetype name="mute_state">
+        <statetype name="mutestate">
             <position>20,90</position>
             <state name="off">
                 <imagetype name="statusimage">
@@ -1567,14 +1567,14 @@
             </state>
         </statetype>
 
-        <progressbar name="volume_progress" from="baseprogressbar">
+        <progressbar name="volumeprogress" from="baseprogressbar">
             <position>60,80</position>
         </progressbar>
 
-        <textarea name="volume_text" from="basetextarea">
+        <textarea name="volume" from="basetextarea">
             <area>70,120,300,30</area>
             <align>left,top</align>
-            <value>0%</value>
+            <template>%VOLUMEPERCENT%</template>
         </textarea>
     </window>
 

@@ -1472,16 +1472,12 @@ MythMusicVolumeDialog::~MythMusicVolumeDialog(void)
 
 bool MythMusicVolumeDialog::Create(void)
 {
-    bool err = false;
+    if (!LoadWindowFromXML("music-ui.xml", "volume_popup", this))
+         return false;
 
-    err = LoadWindowFromXML("music-ui.xml", "volume_popup", this);
-
-    if (!err)
-        return false;
-
-    UIUtilW::Assign(this, m_volText,     "volume_text");
-    UIUtilW::Assign(this, m_volProgress, "volume_progress");
-    UIUtilW::Assign(this, m_muteState,   "mute_state");
+    UIUtilW::Assign(this, m_volText,     "volume");
+    UIUtilW::Assign(this, m_volProgress, "volumeprogress");
+    UIUtilW::Assign(this, m_muteState,   "mutestate");
 
     if (m_volProgress)
          m_volProgress->SetTotal(100);
@@ -1573,11 +1569,7 @@ TrackInfoDialog::~TrackInfoDialog(void)
 
 bool TrackInfoDialog::Create(void)
 {
-    bool err = false;
-
-    err = LoadWindowFromXML("music-ui.xml", "trackdetail_popup", this);
-
-    if (!err)
+    if (!LoadWindowFromXML("music-ui.xml", "trackdetail_popup", this))
         return false;
 
     MetadataMap metadataMap;
