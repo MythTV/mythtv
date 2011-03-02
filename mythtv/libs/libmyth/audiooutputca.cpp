@@ -17,7 +17,7 @@
  * $Id$
  *
  * = AUTHORS
- * Jeremiah Morris, Andrew Kimpton, Nigel Pearson
+ * Jeremiah Morris, Andrew Kimpton, Nigel Pearson, Jean-Yves Avenard
  *****************************************************************************/
 
 #include <CoreServices/CoreServices.h>
@@ -30,6 +30,10 @@ using namespace std;
 #include "audiooutputca.h"
 #include "config.h"
 #include "SoundTouch.h"
+
+#define LOC QString("CoreAudio: ")
+#define LOC_WARN QString("CoreAudio, Warning: ")
+#define LOC_ERR QString("CoreAudio, Error: ")
 
 #define CHANNELS_MIN 1
 #define CHANNELS_MAX 8
@@ -266,11 +270,16 @@ AudioOutputSettings* AudioOutputCA::GetOutputSettings()
     else
     {
         for (int i = CHANNELS_MIN; i <= CHANNELS_MAX; i++)
+        {
             if (channels[i])
             {
                 Debug(QString("Support %1 channels").arg(i));
+                // In case 8 channels are supported but not 6, fake 6
+                if (i == 8 && !channels[6])
+                    settings->AddSupportedChannels(6);
                 settings->AddSupportedChannels(i);
             }
+        }
         free(channels);
     }
 
@@ -333,6 +342,35 @@ void AudioOutputCA::CloseDevice()
         d->CloseSPDIF();
 }
 
+template <class AudioDataType>
+static inline void _ReorderSmpteToCA(AudioDataType *buf, uint frames)
+{
+    AudioDataType tmpLS, tmpRS, tmpRLs, tmpRRs, *buf2;
+    for (uint i = 0; i < frames; i++)
+    {
+        buf = buf2 = buf + 4;
+        tmpRLs = *buf++;
+        tmpRRs = *buf++;
+        tmpLS = *buf++;
+        tmpRS = *buf++;
+        
+        *buf2++ = tmpLS;
+        *buf2++ = tmpRS;
+        *buf2++ = tmpRLs;
+        *buf2++ = tmpRRs;
+    }
+}
+
+static inline void ReorderSmpteToCA(void *buf, uint frames, AudioFormat format)
+{
+    switch(AudioOutputSettings::FormatToBits(format))
+    {
+        case  8: _ReorderSmpteToCA((uchar *)buf, frames); break;
+        case 16: _ReorderSmpteToCA((short *)buf, frames); break;
+        default: _ReorderSmpteToCA((int   *)buf, frames); break;
+    }
+}
+
 /** Object-oriented part of callback */
 bool AudioOutputCA::RenderAudio(unsigned char *aubuf,
                                 int size, unsigned long long timestamp)
@@ -355,6 +393,12 @@ bool AudioOutputCA::RenderAudio(unsigned char *aubuf,
     {
         // play silence on buffer underrun
         bzero(aubuf + written_size, size - written_size);
+    }
+
+    //Audio received is in SMPTE channel order, reorder to CA unless passthru
+    if (!passthru && channels == 8)
+    {
+        ReorderSmpteToCA(aubuf, size / output_bytes_per_frame, output_format);
     }
 
     /* update audiotime (bufferedBytes is read by GetBufferedOnSoundcard) */
