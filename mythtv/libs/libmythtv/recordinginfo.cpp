@@ -608,22 +608,27 @@ void RecordingInfo::ApplyStorageGroupChange(const QString &newstoragegroup)
     SendUpdateEvent();
 }
 
-/** \fn RecordingInfo::ApplyRecordRecTitleChange(const QString &newTitle, const QString &newSubtitle)
- *  \brief Sets the recording title and subtitle, both in this RecordingInfo
- *         and in the database.
+/** \fn RecordingInfo::ApplyRecordRecTitleChange(const QString &newTitle, const QString &newSubtitle, const QString &newDescription)
+ *  \brief Sets the recording title, subtitle, and description both in this
+ *         RecordingInfo and in the database.
  *  \param newTitle New recording title.
  *  \param newSubtitle New recording subtitle
+ *  \param newDescription New recording description
  */
-void RecordingInfo::ApplyRecordRecTitleChange(const QString &newTitle, const QString &newSubtitle)
+void RecordingInfo::ApplyRecordRecTitleChange(const QString &newTitle,
+        const QString &newSubtitle, const QString &newDescription)
 {
     MSqlQuery query(MSqlQuery::InitCon());
+    QString sql = "UPDATE recorded SET title = :TITLE, subtitle = :SUBTITLE ";
+    if (newDescription != NULL)
+        sql += ", description = :DESCRIPTION ";
+    sql += " WHERE chanid = :CHANID AND starttime = :START ;";
 
-    query.prepare("UPDATE recorded"
-                  " SET title = :TITLE, subtitle = :SUBTITLE"
-                  " WHERE chanid = :CHANID"
-                  " AND starttime = :START ;");
+    query.prepare(sql);
     query.bindValue(":TITLE", newTitle);
     query.bindValue(":SUBTITLE", newSubtitle);
+    if (newDescription != NULL)
+        query.bindValue(":DESCRIPTION", newDescription);
     query.bindValue(":CHANID", chanid);
     query.bindValue(":START", recstartts);
 
@@ -632,6 +637,8 @@ void RecordingInfo::ApplyRecordRecTitleChange(const QString &newTitle, const QSt
 
     title = newTitle;
     subtitle = newSubtitle;
+    if (newDescription != NULL)
+        description = newDescription;
 
     SendUpdateEvent();
 }

@@ -409,28 +409,37 @@
         </imagetype>
 
         <textarea name="label" from="basetextarea">
-            <area>12,15,470,160</area>
+            <area>12,15,470,60</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
             <value>Edit Recording Metadata</value>
         </textarea>
 
         <textarea name="titlelabel" from="basetextarea">
-            <area>58,180,300,30</area>
+            <area>58,80,300,30</area>
             <value>Title:</value>
         </textarea>
 
         <textedit name="title" from="basetextedit">
-            <position>58,210</position>
+            <position>58,110</position>
         </textedit>
 
         <textarea name="subtitlelabel" from="basetextarea">
-            <area>58,310,300,30</area>
+            <area>58,170,300,30</area>
             <value>Subtitle:</value>
         </textarea>
 
         <textedit name="subtitle" from="basetextedit">
-            <position>58,340</position>
+            <position>58,200</position>
+        </textedit>
+
+        <textarea name="descriptionlabel" from="basetextarea">
+            <area>58,260,300,30</area>
+            <value>Description:</value>
+        </textarea>
+
+        <textedit name="description" from="basemultilinetextarea">
+            <position>58,290</area>
         </textedit>
 
         <button name="ok" from="basebutton">

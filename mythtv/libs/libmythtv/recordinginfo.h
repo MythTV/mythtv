@@ -207,7 +207,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     void ApplyRecordPlayGroupChange(const QString &newrecgroup);
     void ApplyStorageGroupChange(const QString &newstoragegroup);
     void ApplyRecordRecTitleChange(const QString &newTitle,
-                                   const QString &newSubtitle);
+                                   const QString &newSubtitle,
+                                   const QString &newDescription);
     void ApplyTranscoderProfileChange(const QString &profile) const;//pi
     void ApplyTranscoderProfileChangeById(int);
 

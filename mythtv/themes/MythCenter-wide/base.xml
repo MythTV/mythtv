@@ -753,6 +753,38 @@
         </textarea>
     </textedit>
 
+    <!-- Base definition of a multi-line textedit -->
+    <textedit name="basemultilinetextedit">
+        <area>0,0,376,110</area>
+        <statetype name="background">
+            <state name="active">
+                <area>0,0,376,110</area>
+                <shape name="background" from="basewidgetshape" />
+                <shape name="textbackground">
+                    <area>10,10,356,90</area>
+                    <type>roundbox</type>
+                    <cornerradius>4</cornerradius>
+                    <fill color="#FFFFFF" alpha="200" />
+                </shape>
+            </state>
+            <state name="selected" from="active">
+                <shape name="background" from="baseselectedwidgetshape" />
+                <shape name="textbackground">
+                    <fill color="#FFFFFF" alpha="255" />
+                </shape>
+            </state>
+            <state name="inactive" from="active" />
+        </statetype>
+        <imagetype name="cursor">
+            <filename>cursor.png</filename>
+        </imagetype>
+        <textarea name="text">
+            <area>12,12,352,103</area>
+            <font>basesmall_textedit</font>
+            <multiline>yes</multiline>
+        </textarea>
+    </textedit>
+
     <!-- Base definition of a progressbar -->
     <progressbar name="baseprogressbar">
         <area>0,0,536,38</area>
