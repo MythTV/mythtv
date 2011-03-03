@@ -19,6 +19,7 @@
 
 import ConfigParser
 import os
+import logging
 
 class _Gate:
     def __init__(self, the_only_config_file):
@@ -33,10 +34,12 @@ class _Gate:
         assert 2 <= len(args) <= 3
         if len(args) == 2:
             self, data_set = args
-            return self._grants("any", data_set)
+            distro = 'any'
         else:
             self, distro, data_set = args
-            return self._grants(distro, data_set)
+        res = self._grants(distro, data_set)
+        logging.debug('Section "%s", key "%s" --> "%s"' % (distro, data_set, str(res)))
+        return res
 
     def _grants(self, distro, data_set):
         try:

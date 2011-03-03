@@ -17,7 +17,11 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import smolt
-import simplejson, urllib
+from request import ConnSetup, Request
+
+import json
+import urllib
+import urllib2
 from i18n import _
 import config
 
@@ -40,8 +44,9 @@ def rating(profile, smoonURL):
     print ""
     print _("Current rating for vendor/model.")
     print ""
-    scanURL='%s/client/host_rating?vendor=%s&system=%s' % (smoonURL, urllib.quote(hardware().host.systemVendor), urllib.quote(hardware().host.systemModel))
-    r = simplejson.load(urllib.urlopen(scanURL))['ratings']
+    req = Request('/client/host_rating?vendor=%s&system=%s' % (urllib.quote(hardware().host.systemVendor),
+                                                               urllib.quote(hardware().host.systemModel)))
+    r = json.load(req.open())['ratings']
     rating_system = { '0' : _('Unrated/Unknown'),
                       '1' : _('Non-working'),
                       '2' : _('Partially-working'),
@@ -68,11 +73,11 @@ def scan(profile, smoonURL):
     devices.append('System/%s/%s' % ( urllib.quote(hardware().host.systemVendor), urllib.quote(hardware().host.systemModel) ))
     for dev in devices:
         searchDevices = "%s|%s" % (searchDevices, dev)
-    scanURL='%s/smolt-w/api.php' % smoonURL
-    scanData = 'action=query&titles=%s&format=json' % searchDevices
     try:
-         r = simplejson.load(urllib.urlopen(scanURL, scanData))
-    except ValueError:
+        req = Request('/smolt-w/api.php')
+        req.add_data('action=query&titles=%s&format=json' % searchDevices)
+        r = json.load(req.open())
+    except urllib2.HTTPError:
         print "Could not wiki for errata!"
         return
     found = []
@@ -95,6 +100,7 @@ def scan(profile, smoonURL):
 if __name__ == "__main__":  
     # read the profile
     smoonURL = get_config_attr("SMOON_URL", "http://smolts.org/")
+    ConnSetup(smoonURL)
     try:
         profile = smolt.Hardware()
     except smolt.SystemBusError, e:

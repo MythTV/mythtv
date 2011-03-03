@@ -5,6 +5,74 @@ import time
 import os
 import urlgrabber
 import string
+from i18n import _
+
+from smolt import smoltProtocol
+
+# functions used to overwrite their respective methods in the _hardware class
+# they should be updated whenever _hardware is updated.
+
+def hardware_get_sendable_host(self, protocol_version=smoltProtocol):
+    return {'uuid' :            self.host.UUID,
+    'os' :              self.host.os,
+    'default_runlevel': self.host.defaultRunlevel,
+    'language' :        self.host.language,
+    'platform' :        self.host.platform,
+    'bogomips' :        self.host.bogomips,
+    'cpu_vendor' :      self.host.cpuVendor,
+    'cpu_model' :       self.host.cpuModel,
+    'cpu_stepping' :    self.host.cpu_stepping,
+    'cpu_family' :      self.host.cpu_family,
+    'cpu_model_num' :   self.host.cpu_model_num,
+    'num_cpus':         self.host.numCpus,
+    'cpu_speed' :       self.host.cpuSpeed,
+    'system_memory' :   self.host.systemMemory,
+    'system_swap' :     self.host.systemSwap,
+    'vendor' :          self.host.systemVendor,
+    'system' :          self.host.systemModel,
+    'kernel_version' :  self.host.kernelVersion,
+    'formfactor' :      self.host.formfactor,
+    'selinux_enabled':  self.host.selinux_enabled,
+    'selinux_policy':   self.host.selinux_policy,
+    'selinux_enforce':  self.host.selinux_enforce,
+    'myth_remote':      self.host.mythRemote,
+    'myth_role':        self.host.mythRole,
+    'myth_theme':       self.host.mythTheme,
+    'myth_plugins':      self.host.mythPlugins,
+    'myth_tuner':       self.host.mythTuner
+    }
+
+def hardware_hostIter(self):
+    '''Iterate over host information.'''
+    yield _('UUID'), self.host.UUID
+    yield _('OS'), self.host.os
+    yield _('Default run level'), self.host.defaultRunlevel
+    yield _('Language'), self.host.language
+    yield _('Platform'), self.host.platform
+    yield _('BogoMIPS'), self.host.bogomips
+    yield _('CPU Vendor'), self.host.cpuVendor
+    yield _('CPU Model'), self.host.cpuModel
+    yield _('CPU Stepping'), self.host.cpu_stepping
+    yield _('CPU Family'), self.host.cpu_family
+    yield _('CPU Model Num'), self.host.cpu_model_num
+    yield _('Number of CPUs'), self.host.numCpus
+    yield _('CPU Speed'), self.host.cpuSpeed
+    yield _('System Memory'), self.host.systemMemory
+    yield _('System Swap'), self.host.systemSwap
+    yield _('Vendor'), self.host.systemVendor
+    yield _('System'), self.host.systemModel
+    yield _('Form factor'), self.host.formfactor
+    yield _('Kernel'), self.host.kernelVersion
+    yield _('SELinux Enabled'), self.host.selinux_enabled
+    yield _('SELinux Policy'), self.host.selinux_policy
+    yield _('SELinux Enforce'), self.host.selinux_enforce
+    yield _('MythTV Remote'), self.host.mythRemote
+    yield _('MythTV Role'), self.host.mythRole
+    yield _('MythTV Theme'), self.host.mythTheme
+    yield _('MythTV Plugin'), self.host.mythPlugins
+    yield _('MythTV Tuner'), self.host.mythTuner
+
+#  start of myth specific functions
 
 def runMythRemote():
     smoltfile=home+"/.mythtv/smolt.info"

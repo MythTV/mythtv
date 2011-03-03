@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python
 
 # smolt - Fedora hardware profiler
 #
@@ -19,9 +19,9 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import sys
-import urlgrabber.grabber
 from optparse import OptionParser
 from urlparse import urljoin
+import urllib2
 
 sys.path.append('/usr/share/smolt/client')
 
@@ -29,6 +29,7 @@ from i18n import _
 import smolt
 from smolt import error
 from smolt import debug
+from request import Request, ConnSetup
 
 def serverMessage(page):
     for line in page.split("\n"):
@@ -71,21 +72,22 @@ parser.add_option('--uuidFile',
 
 
 (opts, args) = parser.parse_args()
+ConnSetup(opts.smoonURL, opts.user_agent, opts.timeout, None)
 
 smolt.DEBUG = opts.DEBUG
 smolt.hw_uuid_file = opts.uuidFile
 # read the profile
 profile = smolt.Hardware()
 
-grabber = urlgrabber.grabber.URLGrabber(user_agent=opts.user_agent, timeout=opts.timeout)
-
 delHostString = 'uuid=%s' % profile.host.UUID
 
 try:
-    o=grabber.urlopen(urljoin(opts.smoonURL + '/', '/client/delete'), data=delHostString, http_headers=(
-                    ('Content-length', '%i' % len(delHostString)),
-                    ('Content-type', 'application/x-www-form-urlencoded')))
-except urlgrabber.grabber.URLGrabError, e:
+    req = Request('/client/delete')
+    req.add_header('Content-length', '%i' % len(delHostString))
+    req.add_header('Content-type', 'application/x-www-form-urlencoded')
+    req.add_data(delHostString)
+    o = req.open()
+except urllib2.URLError, e:
     sys.stderr.write(_('Error contacting Server:'))
     sys.stderr.write(str(e))
     sys.stderr.write('\n')

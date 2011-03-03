@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # smolt - Fedora hardware profiler
@@ -38,11 +38,12 @@ sys.path.append('/usr/share/smolt/client')
 from i18n import _
 import smolt
 from smolt import debug
-from smolt import error
+from smolt import error, ServerError
 from smolt import get_config_attr
 from smolt import to_ascii
 from scan import scan, rating
 from gate import GateFromConfig
+from request import ConnSetup
 
 parser = OptionParser(version = smolt.clientVersion)
 
@@ -100,7 +101,7 @@ parser.add_option('-c', '--checkin',
                   dest = 'checkin',
                   default = False,
                   action = 'store_true',
-                  help = _('this is an automated checkin, will only run if the "smolt" service has been started'))
+                  help = _('do an automated checkin as when run from cron (implies --autoSend)'))
 parser.add_option('-S', '--scanOnly',
                   dest = 'scanOnly',
                   default = False,
@@ -143,13 +144,11 @@ if opts.httpproxy == None:
 else:
     proxies = {'http':opts.httpproxy}
 
-if opts.checkin and os.path.exists('/var/lock/subsys/smolt'):
+ConnSetup(opts.smoonURL, opts.user_agent, opts.timeout, opts.httpproxy)
+
+if opts.checkin:
     # Smolt is set to run
     opts.autoSend = True
-elif opts.checkin:
-    # Tried to check in but checkins are disabled
-    print _('Smolt set to checkin but checkins are disabled (hint: service smolt start)')
-    sys.exit(6)
 
 # read the profile
 try:
@@ -159,9 +158,12 @@ except smolt.UUIDError, e:
     sys.exit(9)
 
 if opts.new_pub:
-    pub_uuid = profile.regenerate_pub_uuid(user_agent=opts.user_agent,
-                              smoonURL=opts.smoonURL,
-                              timeout=opts.timeout)
+    try:
+        pub_uuid = profile.regenerate_pub_uuid(smoonURL=opts.smoonURL)
+    except ServerError, e:
+        error(_('Error contacting server: %s') % str(e))
+        sys.exit(1)
+
     print _('Success!  Your new public UUID is: %s' % pub_uuid)
     sys.exit(0)
 
@@ -174,7 +176,7 @@ if not opts.autoSend:
     if opts.printOnly:
         for line in profile.getProfile():
             if not line.startswith('#'):
-                print line
+                print line.encode('utf-8')
         sys.exit(0)
 
     def inner_indent(text):
@@ -263,19 +265,15 @@ if not opts.autoSend:
 
 if opts.retry:
     while 1:
-        result, pub_uuid, admin = profile.send(user_agent=opts.user_agent,
-                              smoonURL=opts.smoonURL,
-                              timeout=opts.timeout,
-                              proxies=proxies)
+        result, pub_uuid, admin = profile.send(smoonURL=opts.smoonURL,
+                              batch=opts.checkin)
         if not result:
             sys.exit(0)
         error(_('Retry Enabled - Retrying'))
         time.sleep(30)
 else:
-    result, pub_uuid, admin = profile.send(user_agent=opts.user_agent,
-                                    smoonURL=opts.smoonURL,
-                                    timeout=opts.timeout,
-                                    proxies=proxies)
+    result, pub_uuid, admin = profile.send(smoonURL=opts.smoonURL,
+                                    batch=opts.checkin)
 
     if result:
         print _('Could not send - Exiting')
@@ -287,7 +285,7 @@ if opts.userName:
     else:
         password = opts.password
 
-    if profile.register(userName=opts.userName, password=password, user_agent=opts.user_agent, smoonURL=opts.smoonURL, timeout=opts.timeout):
+    if profile.register(userName=opts.userName, password=password, smoonURL=opts.smoonURL):
         print _('Registration Failed, Try again')
 if not opts.submitOnly and not opts.checkin:
     scan(profile, opts.smoonURL)
@@ -305,6 +303,6 @@ if pub_uuid:
     if not smolt.secure:
         print _('\tAdmin Password: %s') % admin
 
-else:
+elif not opts.checkin:
     print _('No Public UUID found!  Please re-run with -n to generate a new public uuid')
 

@@ -32,27 +32,36 @@
 
 from i18n import _
 
-import dbus
+#import dbus
+import platform
 import software
 import commands
-import urlgrabber.grabber
 import sys
 import os
 from urlparse import urljoin
 from urlparse import urlparse
 from urllib import urlencode
 import urllib
-import simplejson
-from simplejson import JSONEncoder
+import urllib2
+import json
+from json import JSONEncoder
 import datetime
+import logging
 
 import config
 from smolt_config import get_config_attr
 from fs_util import get_fslist
+from devicelist import cat
+from request import Request
 
 from gate import Gate
+from devicelist import get_device_list
 from uuiddb import UuidDb
+import logging
+from logging.handlers import RotatingFileHandler
 import codecs
+import MultipartPostHandler
+import urllib2
 
 try:
     import subprocess
@@ -64,6 +73,7 @@ WITHHELD_MAGIC_STRING = 'WITHHELD'
 SELINUX_ENABLED = 1
 SELINUX_DISABLED = 0
 SELINUX_WITHHELD = -1
+
 
 fs_types = get_config_attr("FS_TYPES", ["ext2", "ext3", "xfs", "reiserfs"])
 fs_mounts = dict.fromkeys(get_config_attr("FS_MOUNTS", ["/", "/home", "/etc", "/var", "/boot"]), True)
@@ -79,9 +89,14 @@ clientVersion = '1.3.2'
 smoltProtocol = '0.97'
 supported_protocols = ['0.97',]
 user_agent = 'smolt/%s' % smoltProtocol
-timeout = 60.0
+timeout = 120.0
 proxies = None
 DEBUG = False
+
+#note this is located here so that smoltProtocol, can be imported into smolt_mythtv
+if Gate().grants("MythTV"):
+    import smolt_mythtv
+
 
 PCI_BASE_CLASS_STORAGE =        1
 PCI_CLASS_STORAGE_SCSI =        0
@@ -147,6 +162,38 @@ PCI_CLASS_SERIAL_SSA =          2
 PCI_CLASS_SERIAL_USB =          3
 PCI_CLASS_SERIAL_FIBER =        4
 PCI_CLASS_SERIAL_SMBUS =        5
+
+
+# Taken from the DMI spec
+FORMFACTOR_LIST = [ "Unknown",
+                "Other",
+                "Unknown",
+                "Desktop",
+                "Low Profile Desktop",
+                "Pizza Box",
+                "Mini Tower",
+                "Tower",
+                "Portable",
+                "Laptop",
+                "Notebook",
+                "Hand Held",
+                "Docking Station",
+                "All In One",
+                "Sub Notebook",
+                "Space-saving",
+                "Lunch Box",
+                "Main Server Chassis",
+                "Expansion Chassis",
+                "Sub Chassis",
+                "Bus Expansion Chassis",
+                "Peripheral Chassis",
+                "RAID Chassis",
+                "Rack Mount Chassis",
+                "Sealed-case PC",
+                "Multi-system",
+                "CompactPCI",
+                "AdvancedTCA"
+    ]
 
 def to_ascii(o, current_encoding='utf-8'):
     if not isinstance(o, basestring):
@@ -218,7 +265,7 @@ class Device:
                 self.driver = 'Unknown'
 
 class Host:
-    def __init__(self, hostInfo):
+    def __init__(self):
         cpuInfo = read_cpuinfo()
         memory = read_memory()
         self.UUID = getUUID()
@@ -245,31 +292,26 @@ class Host:
                     status, lang = commands.getstatusoutput("grep LANG /etc/sysconfig/i18n")
                     if status == 0:
                         self.language = lang.split('"')[1]
+                    else:
+                        self.language = 'Unknown'
                 except:
                     self.language = 'Unknown'
         else:
             self.language = WITHHELD_MAGIC_STRING
 
-        try:
-            tempform = hostInfo['system.kernel.machine']
-        except KeyError:
-            try:
-                tempform = hostInfo['kernel.machine']
-            except KeyError:
-                tempform = 'Unknown'
+        tempform = platform.machine()
         self.platform = Gate().process('arch', tempform, WITHHELD_MAGIC_STRING)
 
         if Gate().grants('vendor'):
-            self.systemVendor = hostInfo.get('system.vendor')
-            if not self.systemVendor:
-                self.systemVendor = hostInfo.get('system.hardware.vendor')
+            #self.systemVendor = hostInfo.get('system.vendor'
+            self.systemVendor = cat('/sys/devices/virtual/dmi/id/sys_vendor')[0].strip()
             if not self.systemVendor:
                 self.systemVendor = 'Unknown'
         else:
             self.systemVendor = WITHHELD_MAGIC_STRING
 
         if Gate().grants('model'):
-            self.systemModel = hostInfo.get('system.product')
+            self.systemModel = cat('/sys/devices/virtual/dmi/id/product_name')[0].strip() + ' ' + cat('/sys/devices/virtual/dmi/id/product_version')[0].strip()
             if not self.systemModel:
                 self.systemModel = hostInfo.get('system.hardware.product')
                 if hostInfo.get('system.hardware.version'):
@@ -281,7 +323,8 @@ class Host:
 
         if Gate().grants('form_factor'):
             try:
-                self.formfactor = hostInfo['system.formfactor']
+                formfactor_id = int(cat('/sys/devices/virtual/dmi/id/chassis_type')[0].strip())
+                self.formfactor = FORMFACTOR_LIST[formfactor_id]
             except:
                 self.formfactor = 'Unknown'
         else:
@@ -343,14 +386,15 @@ class Host:
             self.selinux_enabled = SELINUX_WITHHELD
             self.selinux_policy = WITHHELD_MAGIC_STRING
             self.selinux_enforce = WITHHELD_MAGIC_STRING
-        #MYTHTV STUFF
-        self.mythRemote = "Not Installed"
-        self.mythTheme = "Not Installed"
-        self.mythPlugins = "Not Installed"
-        self.mythRole = "Not Installed"
-        self.mythTuner = "Not Installed"
+
+    #MYTHTV STUFF
         if Gate().grants("MythTV"):
-            import smolt_mythtv
+            self.mythRemote = "Not Installed"
+            self.mythTheme = "Not Installed"
+            self.mythPlugins = "Not Installed"
+            self.mythRole = "Not Installed"
+            self.mythTuner = "Not Installed"
+
             if Gate().grants('MythRemote'):
                 self.mythRemote = smolt_mythtv.runMythRemote()
             if Gate().grants('MythTheme'):
@@ -416,10 +460,10 @@ def serverMessage(page):
         if 'UUID:' in line:
             return line.strip()[6:]
         if 'ServerMessage:' in line:
-            print _('Server Message: "%s"') % line.split('ServerMessage: ')[1]
             if 'Critical' in line:
-                raise ServerError, _('Could not contact server: %s') % line.split('ServerMessage: ')[1]
-
+                raise ServerError, line.split('ServerMessage: ')[1]
+            else:
+                print _('Server Message: "%s"') % line.split('ServerMessage: ')[1]
 
 def error(message):
     print >> sys.stderr, message
@@ -470,101 +514,120 @@ class PubUUIDError(Exception):
 class _Hardware:
     devices = {}
     def __init__(self):
-        try:
-            systemBus = dbus.SystemBus()
-        except:
-            raise SystemBusError, _('Could not bind to dbus.  Is dbus running?')
+#        try:
+#            systemBus = dbus.SystemBus()
+#        except:
+#            raise SystemBusError, _('Could not bind to dbus.  Is dbus running?')
+#
+#        try:
+#            mgr = self.dbus_get_interface(systemBus, 'org.freedesktop.Hal', '/org/freedesktop/Hal/Manager', 'org.freedesktop.Hal.Manager')
+#            all_dev_lst = mgr.GetAllDevices()
+#        except:
+#            raise SystemBusError, _('Could not connect to hal, is it running?\nRun "service haldaemon start" as root')
+#
+#        self.systemBus = systemBus
 
-        try:
-            mgr = self.dbus_get_interface(systemBus, 'org.freedesktop.Hal', '/org/freedesktop/Hal/Manager', 'org.freedesktop.Hal.Manager')
-            all_dev_lst = mgr.GetAllDevices()
-        except:
-            raise SystemBusError, _('Could not connect to hal, is it running?\nRun "service haldaemon start" as root')
-
-        self.systemBus = systemBus
-        for udi in all_dev_lst:
-            props = self.get_properties_for_udi (udi)
-            if Gate().grants('devices'):
-                self.devices[udi] = Device(props, self)
-            if udi == '/org/freedesktop/Hal/devices/computer':
-                try:
-                    vendor = props['system.vendor']
-                    if len(vendor.strip()) == 0:
-                        vendor = None
-                except KeyError:
-                    try:
-                        vendor = props['vendor']
-                        if len(vendor.strip()) == 0:
-                            vendor = None
-                    except KeyError:
-                        vendor = None
-                try:
-                    product = props['system.product']
-                    if len(product.strip()) == 0:
-                        product = None
-                except KeyError:
-                    try:
-                        product = props['product']
-                        if len(product.strip()) == 0:
-                            product = None
-                    except KeyError:
-                        product = None
-
-                # This could be done with python-dmidecode but it would pull
-                # In an extra dep on smolt.  It may not be worth it
-                if vendor is None or product is None:
-                    try:
-                        dmiOutput = subprocess.Popen('/usr/sbin/dmidecode r 2> /dev/null', shell=True, stdout=subprocess.PIPE).stdout
-                    except NameError:
-                        i, dmiOutput, e = os.popen('/usr/sbin/dmidecode', 'r')
-                    section = None
-                    sysvendor = None
-                    sysproduct = None
-                    boardvendor = None
-                    boardproduct = None
-                    for line in dmiOutput:
-                        line = line.strip()
-                        if "Information" in line:
-                            section = line
-                        elif section is None:
-                            continue
-                        elif line.startswith("Manufacturer: ") and section.startswith("System"):
-                            sysvendor = line.split("Manufacturer: ", 1)[1]
-                        elif line.startswith("Product Name: ") and section.startswith("System"):
-                            sysproduct = line.split("Product Name: ", 1)[1]
-                        elif line.startswith("Manufacturer: ") and section.startswith("Base Board"):
-                            boardvendor = line.split("Manufacturer: ", 1)[1]
-                        elif line.startswith("Product Name: ") and section.startswith("Base Board"):
-                            boardproduct = line.split("Product Name: ", 1)[1]
-                    status = dmiOutput.close()
-                    if status is None:
-                        if sysvendor not in (None, 'System Manufacturer') and sysproduct not in (None, 'System Name'):
-                            props['system.vendor'] = sysvendor
-                            props['system.product'] = sysproduct
-                        elif boardproduct is not None and boardproduct is not None:
-                            props['system.vendor'] = boardvendor
-                            props['system.product'] = boardproduct
-                self.host = Host(props)
+        if Gate().grants('devices'):
+                self.devices = get_device_list()
+#        for udi in all_dev_lst:
+#            props = self.get_properties_for_udi (udi)
+#            if udi == '/org/freedesktop/Hal/devices/computer':
+#                try:
+#                    vendor = props['system.vendor']
+#                    if len(vendor.strip()) == 0:
+#                        vendor = None
+#                except KeyError:
+#                    try:
+#                        vendor = props['vendor']
+#                        if len(vendor.strip()) == 0:
+#                            vendor = None
+#                    except KeyError:
+#                        vendor = None
+#                try:
+#                    product = props['system.product']
+#                    if len(product.strip()) == 0:
+#                        product = None
+#                except KeyError:
+#                    try:
+#                        product = props['product']
+#                        if len(product.strip()) == 0:
+#                            product = None
+#                    except KeyError:
+#                        product = None
+#
+#                # This could be done with python-dmidecode but it would pull
+#                # In an extra dep on smolt.  It may not be worth it
+#                if vendor is None or product is None:
+#                    try:
+#                        dmiOutput = subprocess.Popen('/usr/sbin/dmidecode r 2> /dev/null', shell=True, stdout=subprocess.PIPE).stdout
+#                    except NameError:
+#                        i, dmiOutput, e = os.popen('/usr/sbin/dmidecode', 'r')
+#                    section = None
+#                    sysvendor = None
+#                    sysproduct = None
+#                    boardvendor = None
+#                    boardproduct = None
+#                    for line in dmiOutput:
+#                        line = line.strip()
+#                        if "Information" in line:
+#                            section = line
+#                        elif section is None:
+#                            continue
+#                        elif line.startswith("Manufacturer: ") and section.startswith("System"):
+#                            sysvendor = line.split("Manufacturer: ", 1)[1]
+#                        elif line.startswith("Product Name: ") and section.startswith("System"):
+#                            sysproduct = line.split("Product Name: ", 1)[1]
+#                        elif line.startswith("Manufacturer: ") and section.startswith("Base Board"):
+#                            boardvendor = line.split("Manufacturer: ", 1)[1]
+#                        elif line.startswith("Product Name: ") and section.startswith("Base Board"):
+#                            boardproduct = line.split("Product Name: ", 1)[1]
+#                    status = dmiOutput.close()
+#                    if status is None:
+#                        if sysvendor not in (None, 'System Manufacturer') and sysproduct not in (None, 'System Name'):
+#                            props['system.vendor'] = sysvendor
+#                            props['system.product'] = sysproduct
+#                        elif boardproduct is not None and boardproduct is not None:
+#                            props['system.vendor'] = boardvendor
+#                            props['system.product'] = boardproduct
+                self.host = Host()
 
         self.fss = get_file_systems()
 
-    def get_properties_for_udi (self, udi):
-        dev = self.dbus_get_interface(self.systemBus, 'org.freedesktop.Hal',
-                                      udi, 'org.freedesktop.Hal.Device')
-        return dev.GetAllProperties()
+        self.distro_specific = self.get_distro_specific_data()
 
-    def dbus_get_interface(self, bus, service, object, interface):
-        iface = None
-        # dbus-python bindings as of version 0.40.0 use new api
-        if getattr(dbus, 'version', (0,0,0)) >= (0,40,0):
-            # newer api: get_object(), dbus.Interface()
-            proxy = bus.get_object(service, object)
-            iface = dbus.Interface(proxy, interface)
-        else:
-            # deprecated api: get_service(), get_object()
-            svc = bus.get_service(service)
-            iface = svc.get_object(object, interface)
-        return iface
+    def get_distro_specific_data(self):
+        dist_dict = {}
+        import distros.all
+        for d in distros.all.get():
+            key = d.key()
+            if d.detected():
+                logging.info('Distro "%s" detected' % (key))
+                d.gather(debug=True)
+                dist_dict[key] = {
+                    'data':d.data(),
+                    'html':d.html(),
+                    'rst':d.rst(),
+                    'rst_excerpt':d.rst_excerpt(),
+                }
+        return dist_dict
+
+#    def get_properties_for_udi (self, udi):
+#        dev = self.dbus_get_interface(self.systemBus, 'org.freedesktop.Hal',
+#                                      udi, 'org.freedesktop.Hal.Device')
+#        return dev.GetAllProperties()
+
+#    def dbus_get_interface(self, bus, service, object, interface):
+#        iface = None
+#        # dbus-python bindings as of version 0.40.0 use new api
+#        if getattr(dbus, 'version', (0,0,0)) >= (0,40,0):
+#            # newer api: get_object(), dbus.Interface()
+#            proxy = bus.get_object(service, object)
+#            iface = dbus.Interface(proxy, interface)
+#        else:
+#            # deprecated api: get_service(), get_object()
+#            svc = bus.get_service(service)
+#            iface = svc.get_object(object, interface)
+#        return iface
 
     def get_sendable_devices(self, protocol_version=smoltProtocol):
         my_devices = []
@@ -615,12 +678,7 @@ class _Hardware:
                 'formfactor' :      self.host.formfactor,
                 'selinux_enabled':  self.host.selinux_enabled,
                 'selinux_policy':   self.host.selinux_policy,
-                'selinux_enforce':  self.host.selinux_enforce,
-                'myth_remote':      self.host.mythRemote,
-                'myth_role':        self.host.mythRole,
-                'myth_theme':       self.host.mythTheme,
-                'myth_plugins':      self.host.mythPlugins,
-                'myth_tuner':       self.host.mythTuner
+                'selinux_enforce':  self.host.selinux_enforce
                 }
 
     def get_sendable_fss(self, protocol_version=smoltProtocol):
@@ -628,6 +686,9 @@ class _Hardware:
 
     def write_pub_uuid(self,smoonURL,pub_uuid):
         smoonURLparsed=urlparse(smoonURL)
+        if pub_uuid is None:
+            return
+
         try:
             UuidDb().set_pub_uuid(getUUID(), smoonURLparsed[1], pub_uuid)
         except Exception, e:
@@ -643,8 +704,29 @@ class _Hardware:
             sys.stderr.write(_('\tYour admin token  could not be cached: %s\n' % e))
         return
 
+    def get_submission_data(self, prefered_protocol=None):
+        send_host_obj = self.get_sendable_host(prefered_protocol)
+        send_host_obj['devices'] = self.get_sendable_devices(prefered_protocol)
+        send_host_obj['fss'] = self.get_sendable_fss(prefered_protocol)
+        send_host_obj['smolt_protocol'] = prefered_protocol
 
-    def send(self, user_agent=user_agent, smoonURL=smoonURL, timeout=timeout, proxies=proxies):
+        dist_data_dict = {}
+        for k, v in self.distro_specific.items():
+            dist_data_dict[k] = v['data']
+        send_host_obj['distro_specific'] = dist_data_dict
+
+        return send_host_obj
+
+    def get_distro_specific_html(self):
+        lines = []
+        if not self.distro_specific:
+            lines.append(_('No distribution-specific data yet'))
+        else:
+            for k, v in self.distro_specific.items():
+                lines.append(v['html'])
+        return '\n'.join(lines)
+
+    def send(self, smoonURL=smoonURL, batch=False):
         def serialize(object, human=False):
             if human:
                 indent = 2
@@ -655,17 +737,17 @@ class _Hardware:
             return JSONEncoder(indent=indent, sort_keys=sort_keys).encode(object)
 
         reset_resolver()
-        grabber = urlgrabber.grabber.URLGrabber(user_agent=user_agent, timeout=timeout, proxies=proxies)
         #first find out the server desired protocol
         try:
-            token = grabber.urlopen(urljoin(smoonURL + "/", '/tokens/token_json?uuid=%s' % self.host.UUID, False))
-        except urlgrabber.grabber.URLGrabError, e:
+            req = Request('/tokens/token_json?uuid=%s' % self.host.UUID)
+            token = req.open()
+        except urllib2.URLError, e:
             error(_('Error contacting Server: %s') % e)
             return (1, None, None)
         tok_str = token.read()
         try:
             try:
-                tok_obj = simplejson.loads(tok_str)
+                tok_obj = json.loads(tok_str)
                 if tok_obj['prefered_protocol'] in supported_protocols:
                     prefered_protocol = tok_obj['prefered_protocol']
                 else:
@@ -678,49 +760,83 @@ class _Hardware:
         finally:
             token.close()
 
-        send_host_obj = self.get_sendable_host(prefered_protocol)
-        my_devices = self.get_sendable_devices(prefered_protocol)
-        my_fss = self.get_sendable_fss(prefered_protocol)
+        send_host_obj = self.get_submission_data(prefered_protocol)
 
-        send_host_obj['devices'] = my_devices
-        send_host_obj['fss'] = my_fss
-        send_host_obj['smolt_protocol'] = prefered_protocol
 
         debug('smoon server URL: %s' % smoonURL)
 
         serialized_host_obj_machine = serialize(send_host_obj, human=False)
-        send_host_str = ('uuid=%s&host=' + \
-                         serialized_host_obj_machine + \
-                         '&token=%s&smolt_protocol=%s') % \
-                         (self.host.UUID, tok, smoltProtocol)
+
+        # Log-dump submission data
+        log_matrix = {
+            '.json':serialize(send_host_obj, human=True),
+            '-distro.html':self.get_distro_specific_html(),
+            '.rst':'\n'.join(map(to_ascii, self.getProfile())),
+        }
+        logdir = os.path.expanduser('~/.smolt/')
+        try:
+            if not os.path.exists(logdir):
+                os.mkdir(logdir, 1700)
+
+            for k, v in log_matrix.items():
+                filename = os.path.expanduser(os.path.join(
+                        logdir, 'submission%s' % k))
+                r = RotatingFileHandler(filename, \
+                        maxBytes=1000000, backupCount=9)
+                r.stream.write(v)
+                r.doRollover()
+                r.close()
+                os.remove(filename)
+        except:
+            pass
+        del logdir
+        del log_matrix
+
 
         debug('sendHostStr: %s' % serialized_host_obj_machine)
         debug('Sending Host')
 
+        if batch:
+            entry_point = "/client/batch_add_json"
+            logging.debug('Submitting in asynchronous mode')
+        else:
+            entry_point = "/client/add_json"
+            logging.debug('Submitting in synchronous mode')
+        request_url = urljoin(smoonURL + "/", entry_point, False)
+        logging.debug('Sending request to %s' % request_url)
         try:
-            o = grabber.urlopen(urljoin(smoonURL + "/", "/client/add_json", False), data=send_host_str,
-                                http_headers=(
-                            ('Content-length', '%i' % len(send_host_str)),
-                            ('Content-type', 'application/x-www-form-urlencoded')))
-        except urlgrabber.grabber.URLGrabError, e:
+            opener = urllib2.build_opener(MultipartPostHandler.MultipartPostHandler)
+            params = {  'uuid':self.host.UUID,
+                        'host':serialized_host_obj_machine,
+                        'token':tok,
+                        'smolt_protocol':smoltProtocol}
+            o = opener.open(request_url, params)
+
+        except Exception, e:
             error(_('Error contacting Server: %s') % e)
             return (1, None, None)
         else:
             try:
-                pub_uuid = serverMessage(o.read())
+                server_response = serverMessage(o.read())
             except ServerError, e:
                 error(_('Error contacting server: %s') % e)
                 return (1, None, None)
+
             o.close()
-            self.write_pub_uuid(smoonURL,pub_uuid)
+            if batch:
+                pub_uuid = None
+            else:
+                pub_uuid = server_response
+            self.write_pub_uuid(smoonURL, pub_uuid)
 
             try:
-                admin_token = grabber.urlopen(urljoin(smoonURL + "/", '/tokens/admin_token_json?uuid=%s' % self.host.UUID, False))
-            except urlgrabber.grabber.URLGrabError, e:
+                req = Request('/tokens/admin_token_json?uuid=%s' % self.host.UUID)
+                admin_token = req.open()
+            except urllib2.URLError, e:
                 error(_('An error has occured while contacting the server: %s' % e))
                 sys.exit(1)
             admin_str = admin_token.read()
-            admin_obj = simplejson.loads(admin_str)
+            admin_obj = json.loads(admin_str)
             if admin_obj['prefered_protocol'] in supported_protocols:
                 prefered_protocol = admin_obj['prefered_protocol']
             else:
@@ -732,16 +848,26 @@ class _Hardware:
                 self.write_admin_token(smoonURL,admin,admin_token_file)
         return (0, pub_uuid, admin)
 
-    def regenerate_pub_uuid(self, user_agent=user_agent, smoonURL=smoonURL, timeout=timeout):
-        grabber = urlgrabber.grabber.URLGrabber(user_agent=user_agent, timeout=timeout)
+    def regenerate_pub_uuid(self, smoonURL=smoonURL):
         try:
-            new_uuid = grabber.urlopen(urljoin(smoonURL + "/", '/client/regenerate_pub_uuid?uuid=%s' % self.host.UUID))
-        except urlgrabber.grabber.URLGrabError, e:
-            error(_('Error contacting Server: %s') % e)
-            sys.exit(0)
-        pub_uuid = simplejson.loads(new_uuid.read())['pub_uuid']
-        self.write_pub_uuid(smoonURL,pub_uuid)
-        return pub_uuid
+            req = Request('/client/regenerate_pub_uuid?uuid=%s' % self.host.UUID)
+            new_uuid = req.open()
+        except urllib2.URLError, e:
+            raise ServerError, str(e)
+
+        response = new_uuid.read()  # Either JSON or an error page in (X)HTML
+        try:
+            response_dict = json.loads(response)
+        except Exception, e:
+            serverMessage(response)
+            raise ServerError, _('Reply from server could not be interpreted')
+        else:
+            try:
+                pub_uuid = response_dict['pub_uuid']
+            except KeyError:
+                raise ServerError, _('Reply from server could not be interpreted')
+            self.write_pub_uuid(smoonURL,pub_uuid)
+            return pub_uuid
 
 
     def get_general_info_excerpt(self):
@@ -778,6 +904,8 @@ class _Hardware:
         return '\n'.join(lines)
 
     def get_distro_info_excerpt(self):
+        for k, v in self.distro_specific.items():
+            return v['rst_excerpt']
         return "No data, yet"
 
     def getProfile(self):
@@ -820,6 +948,11 @@ class _Hardware:
             for fs in self.fss:
                 printBuffer.append(str(fs))
 
+            for k, v in self.distro_specific.items():
+                printBuffer.append('')
+                printBuffer.append('')
+                printBuffer.append(v['rst'])
+
             printBuffer.append('')
         return printBuffer
 
@@ -848,30 +981,21 @@ class _Hardware:
         yield _('SELinux Enabled'), self.host.selinux_enabled
         yield _('SELinux Policy'), self.host.selinux_policy
         yield _('SELinux Enforce'), self.host.selinux_enforce
-        yield _('MythTV Remote'), self.host.mythRemote
-        yield _('MythTV Role'), self.host.mythRole
-        yield _('MythTV Theme'), self.host.mythTheme
-        yield _('MythTV Plugin'), self.host.mythPlugins
-        yield _('MythTV Tuner'), self.host.mythTuner
 
     def deviceIter(self):
         '''Iterate over our devices.'''
         for device in self.devices:
-            try:
-                Bus = self.devices[device].bus
-                VendorID = self.devices[device].vendorid
-                DeviceID = self.devices[device].deviceid
-                SubsysVendorID = self.devices[device].subsysvendorid
-                SubsysDeviceID = self.devices[device].subsysdeviceid
-                Driver = self.devices[device].driver
-                Type = self.devices[device].type
-                Description = self.devices[device].description
-                Description = Description.decode('latin1')
-            except:
-                continue
-            else:
-                if not ignoreDevice(self.devices[device]):
-                    yield VendorID, DeviceID, SubsysVendorID, SubsysDeviceID, Bus, Driver, Type, Description
+            Bus = self.devices[device].bus
+            VendorID = self.devices[device].vendorid
+            DeviceID = self.devices[device].deviceid
+            SubsysVendorID = self.devices[device].subsysvendorid
+            SubsysDeviceID = self.devices[device].subsysdeviceid
+            Driver = self.devices[device].driver
+            Type = self.devices[device].type
+            Description = self.devices[device].description
+            #Description = Description.decode('latin1')
+            if not ignoreDevice(self.devices[device]):
+                yield VendorID, DeviceID, SubsysVendorID, SubsysDeviceID, Bus, Driver, Type, Description
 
 
 _hardware_instance = None
@@ -880,6 +1004,11 @@ def Hardware():
     global _hardware_instance
     if _hardware_instance == None:
         _hardware_instance = _Hardware()
+        #if enabled then insert the myth specific items into hardware
+        if Gate().grants("MythTV"):
+            _Hardware.get_sendable_host = smolt_mythtv.hardware_get_sendable_host
+            _Hardware.hostIter = smolt_mythtv.hardware_hostIter
+
     return _hardware_instance
 
 
@@ -1317,21 +1446,21 @@ def getUUID():
     hw_uuid = UUID
     return UUID
 
-def getPubUUID(user_agent=user_agent, smoonURL=smoonURL, timeout=timeout):
-	smoonURLparsed=urlparse(smoonURL)
-	res = UuidDb().get_pub_uuid(getUUID(), smoonURLparsed[1])
-	if res:
-		return res
+def getPubUUID(smoonURL=smoonURL):
+    smoonURLparsed=urlparse(smoonURL)
+    res = UuidDb().get_pub_uuid(getUUID(), smoonURLparsed[1])
+    if res:
+        return res
 
-	grabber = urlgrabber.grabber.URLGrabber(user_agent=user_agent, timeout=timeout, proxies=proxies)
-	try:
-		o = grabber.urlopen(urljoin(smoonURL + "/", '/client/pub_uuid/%s' % getUUID()))
-		pudict = simplejson.loads(o.read())
-		o.close()
-		UuidDb().set_pub_uuid(getUUID(), smoonURLparsed[1], pudict["pub_uuid"])
-		return pudict["pub_uuid"]
-	except Exception, e:
-		error(_('Error determining public UUID: %s') % e)
-		sys.stderr.write(_("Unable to determine Public UUID!  This could be a network error or you've\n"))
-		sys.stderr.write(_("not submitted your profile yet.\n"))
-		raise PubUUIDError, 'Could not determine Public UUID!\n'
+    try:
+        req = Request('/client/pub_uuid/%s' % getUUID())
+        o = req.open()
+        pudict = json.loads(o.read())
+        o.close()
+        UuidDb().set_pub_uuid(getUUID(), smoonURLparsed[1], pudict["pub_uuid"])
+        return pudict["pub_uuid"]
+    except Exception, e:
+        error(_('Error determining public UUID: %s') % e)
+        sys.stderr.write(_("Unable to determine Public UUID!  This could be a network error or you've\n"))
+        sys.stderr.write(_("not submitted your profile yet.\n"))
+        raise PubUUIDError, 'Could not determine Public UUID!\n'
