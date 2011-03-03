@@ -2838,7 +2838,8 @@ void TV::PrepareToExitPlayer(PlayerContext *ctx, int line, bool bookmark) const
     ctx->LockDeletePlayer(__FILE__, line);
     if (ctx->player)
     {
-        if (bookmark_it && !(ctx->player->IsNearEnd()))
+        if (bookmark_it && (!(ctx->player->IsNearEnd()) ||
+                            StateIsRecording(GetState(ctx))))
             ctx->player->SetBookmark();
         if (db_auto_set_watched)
             ctx->player->SetWatched();
