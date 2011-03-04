@@ -24,6 +24,7 @@
 #include "upnp.h"
 #include "upnpdevice.h"
 #include "httpcomms.h"
+#include "mythverbose.h"
 
 // MythDB
 #include "mythdb.h"
@@ -353,7 +354,7 @@ void UPnpDeviceDesc::GetValidXML(
 //    os.setEncoding( QTextStream::UnicodeUTF8 );
 
     os << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-          "<root xmlns=\"urn:schemas-upnp-org:device-1-0\">\n"
+          "<root xmlns=\"urn:schemas-upnp-org:device-1-0\"  xmlns:mythtv=\"mythtv.org\">\n"
             "<specVersion>\n"
               "<major>1</major>\n"
               "<minor>0</minor>\n"
