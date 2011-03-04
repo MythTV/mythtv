@@ -39,7 +39,7 @@ typedef CRITICAL_SECTION pthread_mutex_t;
 #if HAVE_GETTIMEOFDAY == 0
 /* replacement gettimeofday implementation */
 #include <sys/timeb.h>
-static inline int _private_gettimeofday( struct timeval *tv, void *tz )
+static __inline int _private_gettimeofday( struct timeval *tv, void *tz )
 {
   struct timeb t;
   ftime( &t );
@@ -51,7 +51,9 @@ static inline int _private_gettimeofday( struct timeval *tv, void *tz )
 #endif
 
 #include <io.h> /* read() */
+#ifndef lseek64
 #define lseek64 _lseeki64
+#endif
 
 #else
 

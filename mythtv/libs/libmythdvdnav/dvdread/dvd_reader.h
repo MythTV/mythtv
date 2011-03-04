@@ -25,6 +25,7 @@
 
 #ifdef _MSC_VER
 #include <config.h>
+#include "compat.h"
 
 #include <stdio.h>
 #include <stdlib.h>

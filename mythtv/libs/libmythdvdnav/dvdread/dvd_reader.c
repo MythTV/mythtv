@@ -38,7 +38,7 @@
 #ifndef HAVE_GETTIMEOFDAY
 /* replacement gettimeofday implementation */
 #include <sys/timeb.h>
-static inline int _private_gettimeofday( struct timeval *tv, void *tz )
+static __inline int _private_gettimeofday( struct timeval *tv, void *tz )
 {
   struct timeb t;
   ftime( &t );
@@ -49,7 +49,6 @@ static inline int _private_gettimeofday( struct timeval *tv, void *tz )
 #define gettimeofday(TV, TZ) _private_gettimeofday((TV), (TZ))
 #endif
 #include <io.h> /* read() */
-#define lseek64 _lseeki64
 #endif
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__bsdi__) || defined(__APPLE__)
@@ -630,6 +629,9 @@ static dvd_file_t *DVDOpenFileUDF( dvd_reader_t *dvd, char *filename )
  *     or -1 on file not found.
  *     or -2 on path not found.
  */
+
+#ifndef _MSC_VER
+
 static int findDirFile( const char *path, const char *file, char *filename )
 {
   DIR *dir;
@@ -656,8 +658,47 @@ static int findDirFile( const char *path, const char *file, char *filename )
     }
   }
   closedir(dir);
+
   return -1;
 }
+
+#else
+
+static int findDirFile( const char *path, const char *file, char *filename )
+{
+  WIN32_FIND_DATA findData;
+  HANDLE          hFind;
+
+  if (!strncmp(path, "myth://", 7) && mythfile_exists(path, file))
+  {
+    sprintf( filename, "%s%s%s", path,
+            ( ( path[ strlen( path ) - 1 ] == '/' ) ? "" : "/" ),
+               file );
+    return 0;
+  }
+
+  if ((hFind = FindFirstFile( path, &findData )) == INVALID_HANDLE_VALUE)
+      return -2;
+
+  do
+  {
+    if( !strcasecmp( findData.cFileName, file ) ) 
+    {
+      sprintf( filename, "%s%s%s", path,
+               ( ( path[ strlen( path ) - 1 ] == '/' ) ? "" : "/" ),
+               findData.cFileName );
+      FindClose( hFind );
+      return 0;
+    }
+  }
+  while( FindNextFile( hFind, &findData));
+
+  FindClose( hFind );
+
+  return -1;
+}
+
+#endif
 
 static int findDVDFile( dvd_reader_t *dvd, const char *file, char *filename )
 {
