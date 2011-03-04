@@ -25,8 +25,4 @@
 void vm_print_mnemonic(vm_cmd_t *command);
 void vm_print_cmd(int row, vm_cmd_t *command);
 
-#ifndef PRIx64 
-#define PRIx64 "llx"
-#endif
-
 #endif /* LIBDVDNAV_VMCMD_H */
