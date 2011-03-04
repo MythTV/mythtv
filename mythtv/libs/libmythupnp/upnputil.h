@@ -49,6 +49,7 @@ template <class T> inline const T& Max( const T &x, const T &y )
 typedef struct timeval              TaskTime;
 typedef QMap< QString, QString >    QStringMap;
 
+
 /////////////////////////////////////////////////////////////////////////////
 
 class NameValue;

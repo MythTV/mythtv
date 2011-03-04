@@ -23,6 +23,7 @@
 
 #include "upnp.h"
 #include "mythevent.h"
+#include "mythverbose.h"
 
 int SSDPCacheEntries::g_nAllocated = 0;       // Debugging only
 

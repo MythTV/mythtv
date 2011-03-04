@@ -26,6 +26,7 @@
 
 #include <QStringList>
 #include <QFile>
+#include <QDateTime>
 
 #include "upnp.h"
 #include "upnptasksearch.h"
