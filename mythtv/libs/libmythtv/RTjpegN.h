@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define __RTJPEG_H__
 
 #include "mythconfig.h"
+#include "mythtvexp.h"
 
 /*
  * Macros and definitions used internally to RTjpeg
@@ -108,12 +109,12 @@ private:
     int bcomp(int16_t *rblock, int16_t *old, uint16_t *mask);
 #endif
     
-    int16_t block[64] __attribute__ ((aligned (32)));
-    int32_t ws[64*4] __attribute__ ((aligned (32)));
-    int32_t lqt[64] __attribute__ ((aligned (32)));
-    int32_t cqt[64] __attribute__ ((aligned (32)));
-    int32_t liqt[64] __attribute__ ((aligned (32)));
-    int32_t ciqt[64] __attribute__ ((aligned (32)));
+    int16_t block[64] MALIGN32;
+    int32_t ws[64*4] MALIGN32;
+    int32_t lqt[64] MALIGN32;
+    int32_t cqt[64] MALIGN32;
+    int32_t liqt[64] MALIGN32;
+    int32_t ciqt[64] MALIGN32;
     int32_t lb8;
     int32_t cb8;
     int32_t Ywidth;

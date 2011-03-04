@@ -19,10 +19,12 @@
 # define MHIDDEN     __attribute__((visibility("hidden")))
 # define MUNUSED     __attribute__((unused))
 # define MDEPRECATED __attribute__((deprecated))
+# define MALIGN32    __attribute__ ((aligned (32)))
 #else
 # define MHIDDEN
 # define MUNUSED
 # define MDEPRECATED
+# define MALIGN32
 #endif
 
 #endif // MYTHTVEXP_H_

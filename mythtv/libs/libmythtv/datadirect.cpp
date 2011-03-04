@@ -2138,7 +2138,7 @@ static QString html_escape(QString str)
             new_str += str[i];
         else
         {
-            new_str += QString("\%%1").arg((int)str[1].toLatin1(), 0, 16);
+            new_str += QString("%%1").arg((int)str[1].toLatin1(), 0, 16);
         }
     }
 

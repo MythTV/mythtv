@@ -10,6 +10,8 @@
 using namespace std;
 
 // MythTV headers
+
+#include "compat.h"
 #include "previewgeneratorqueue.h"
 #include "mythconfig.h"
 #include "tv_rec.h"

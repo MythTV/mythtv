@@ -45,13 +45,6 @@ const int  RingBuffer::kLiveTVOpenTimeout  = 10000;
 #define LOC_WARN QString("RingBuf(%1) Warning: ").arg(filename)
 #define LOC_ERR  QString("RingBuf(%1) Error: ").arg(filename)
 
-#define PNG_MIN_SIZE   20 /* header plus one empty chunk */
-#define NUV_MIN_SIZE  204 /* header size? */
-#define MPEG_MIN_SIZE 376 /* 2 TS packets */
-
-/* should be minimum of the above test sizes */
-const uint RingBuffer::kReadTestSize = PNG_MIN_SIZE;
-
 QMutex      RingBuffer::subExtLock;
 QStringList RingBuffer::subExt;
 QStringList RingBuffer::subExtNoCheck;

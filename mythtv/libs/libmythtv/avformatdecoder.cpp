@@ -2,6 +2,7 @@
 #include <cassert>
 #include <unistd.h>
 #include <cmath>
+#include <stdint.h>
 
 // C++ headers
 #include <algorithm>
@@ -61,6 +62,20 @@ extern void ff_read_frame_flush(AVFormatContext *s);
 #include "libswscale/swscale.h"
 #include "ivtv_myth.h"
 }
+
+#ifdef _MSC_VER
+// MSVC isn't C99 compliant...
+# ifdef AV_TIME_BASE_Q
+#  undef AV_TIME_BASE_Q
+# endif
+#define AV_TIME_BASE_Q  GetAVTimeBaseQ()
+
+__inline AVRational GetAVTimeBaseQ()
+{
+    AVRational av = {1, AV_TIME_BASE};
+    return av;
+}
+#endif
 
 #define LOC QString("AFD: ")
 #define LOC_ERR QString("AFD Error: ")
@@ -1573,7 +1588,9 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
             {
                 int type = td.TeletextType(k);
                 int language = td.CanonicalLanguageKey(k);
-                int magazine = td.TeletextMagazineNum(k)?:8;
+                int magazine = td.TeletextMagazineNum(k);
+                if (magazine == 0)
+                    magazine = 8;
                 int pagenum  = td.TeletextPageNum(k);
                 int lang_idx = (magazine << 8) | pagenum;
                 StreamInfo si(av_index, language, lang_idx, 0, 0);

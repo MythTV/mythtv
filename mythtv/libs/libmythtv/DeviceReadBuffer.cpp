@@ -335,7 +335,11 @@ bool DeviceReadBuffer::HandlePausing(void)
 bool DeviceReadBuffer::Poll(void) const
 {
 #ifdef USING_MINGW
-#warning mingw DeviceReadBuffer::Poll
+# ifdef _MSC_VER
+#  pragma message( "mingw DeviceReadBuffer::Poll" )
+# else
+#  warning mingw DeviceReadBuffer::Poll
+# endif
     VERBOSE(VB_IMPORTANT, LOC_ERR +
             "mingw DeviceReadBuffer::Poll is not implemented");
     return false;
@@ -396,7 +400,11 @@ bool DeviceReadBuffer::Poll(void) const
 bool DeviceReadBuffer::CheckForErrors(ssize_t len, uint &errcnt)
 {
 #ifdef USING_MINGW
-#warning mingw DeviceReadBuffer::CheckForErrors
+# ifdef _MSC_VER
+#  pragma message( "mingw DeviceReadBuffer::CheckForErrors" )
+# else
+#  warning mingw DeviceReadBuffer::CheckForErrors
+# endif
     VERBOSE(VB_IMPORTANT, LOC_ERR +
             "mingw DeviceReadBuffer::CheckForErrors is not implemented");
     return false;

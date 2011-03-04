@@ -131,7 +131,7 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
             }
 
             subpagenum= (b2 + b3 * 256) & 0x3f7f;
-            pagenum = (magazine?:8)*256 + b1;
+            pagenum = (magazine ? magazine : 8)*256 + b1;
 
             lang = "\0\4\2\6\1\5\3\7"[b4 >> 5] + (latin1 ? 0 : 8);
             flags = b4 & 0x1F;
@@ -143,7 +143,7 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
             break;
 
         default: // Page Data
-            m_teletext_reader->AddTeletextData((magazine?:8), packet,
+            m_teletext_reader->AddTeletextData((magazine ? magazine : 8), packet,
                                                buf, vbimode);
             break;
     }

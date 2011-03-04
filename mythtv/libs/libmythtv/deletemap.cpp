@@ -1,4 +1,5 @@
 #include <cmath>
+#include <stdint.h>
 
 #include "mythverbose.h"
 #include "mythcontext.h"

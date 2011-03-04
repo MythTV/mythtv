@@ -386,17 +386,6 @@ void TeletextReader::AddTeletextData(int magazine, int row,
 
     switch (row)
     {
-        case 1 ... 24: // Page Data
-            if (vbimode == VBI_DVB || vbimode == VBI_DVB_SUBTITLE)
-            {
-                for (uint j = 0; j < 40; j++)
-                    ttpage->data[row][j] = m_bitswap[buf[j]];
-            }
-            else
-            {
-                memcpy(ttpage->data[row], buf, 40);
-            }
-            break;
         case 26:
             /* XXX TODO: Level 1.5, 2.5, 3.5
             *      Character location & override
@@ -426,7 +415,7 @@ void TeletextReader::AddTeletextData(int magazine, int row,
                 default:
                     return;
             }
-            if (b1 != 0 || not(b2 & 8))
+            if (b1 != 0 || !(b2 & 8))
                 return;
 
             for (int i = 0; i < 6; ++i)
@@ -457,7 +446,8 @@ void TeletextReader::AddTeletextData(int magazine, int row,
                 }
 
                 int x = (b2 >> 7) | ((b3 >> 5) & 0x06);
-                ttpage->floflink[i] = ((magazine ^ x) ?: 8) * 256 + b1;
+                int nTmp = (magazine ^ x);
+                ttpage->floflink[i] = ( nTmp ? nTmp : 8) * 256 + b1;
                 ttpage->flof = 1;
             }
             break;
@@ -466,6 +456,20 @@ void TeletextReader::AddTeletextData(int magazine, int row,
             break;
 
         default: /// other packet codes...
+        
+            if (( row >= 1 ) && ( row <= 24 ))  // Page Data
+            {
+                if (vbimode == VBI_DVB || vbimode == VBI_DVB_SUBTITLE)
+                {
+                    for (uint j = 0; j < 40; j++)
+                        ttpage->data[row][j] = m_bitswap[buf[j]];
+                }
+                else
+                {
+                    memcpy(ttpage->data[row], buf, 40);
+                }
+            }
+
             break;
     }
 }

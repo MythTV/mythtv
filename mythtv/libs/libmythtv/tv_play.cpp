@@ -7069,13 +7069,13 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
     QString lockMsg = (slock=="L") ? tr("Partial Lock") : tr("No Lock");
     QString sigMsg  = allGood ? tr("Lock") : lockMsg;
 
-    QString sigDesc = tr("Signal %1\%").arg(sig,2);
+    QString sigDesc = tr("Signal %1%").arg(sig,2);
     if (snr > 0.0f)
         sigDesc += " | " + tr("S/N %1dB").arg(log10f(snr), 3, 'f', 1);
     if (ber != 0xffffffff)
         sigDesc += " | " + tr("BE %1", "Bit Errors").arg(ber, 2);
     if ((pos >= 0) && (pos < 100))
-        sigDesc += " | " + tr("Rotor %1\%").arg(pos,2);
+        sigDesc += " | " + tr("Rotor %1%").arg(pos,2);
 
     if (tuned == 1)
         tuneCode = 't';
@@ -8550,7 +8550,7 @@ static PictureAttribute next(
                kPictureAttributeSupported_Hue);
     }
 
-    return next((PictureAttributeSupported)sup, attr);
+    return ::next((PictureAttributeSupported)sup, (PictureAttribute) attr);
 }
 
 void TV::DoToggleStudioLevels(const PlayerContext *ctx)
