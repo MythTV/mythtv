@@ -5,12 +5,53 @@
 #ifndef __COMPAT_H__
 #define __COMPAT_H__
 
-// Turn off the visual studio warnings (identifier was truncated)
-#ifdef _MSC_VER
-#pragma warning(disable:4786)
+#ifdef _WIN32
+# ifndef _MSC_VER
+#  define close wsock_close
+# endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+#include <windows.h>
+
+# undef DialogBox
+# undef LoadImage
+# undef LoadIcon
+# undef GetObject
+# undef DrawText
+# undef CreateDialog
+# undef CreateFont
+# undef DeleteFile
+# undef GetCurrentTime
+
+#ifndef _MSC_VER
+# include <winsock2.h>
+# include <ws2tcpip.h>
+#else
+#  include <io.h>
+# endif
+
+# define setsockopt(a, b, c, d, e) setsockopt(a, b, c, (const char*)(d), e)
+# undef close
+# include <stdio.h>        // for snprintf(), used by inline dlerror()
+# include <unistd.h>       // for usleep()
+#else
+# include <sys/time.h>     // Mac OS X needs this before sys/resource
+# include <sys/resource.h> // for setpriority
+# include <sys/socket.h>
+# include <sys/wait.h>     // For WIFEXITED on Mac OS X
+#endif
+
+#ifdef USING_MINGW
+#include <unistd.h>       // for usleep()
+#include <sys/time.h>
 #endif
 
 #ifdef _MSC_VER
+    // Turn off the visual studio warnings (identifier was truncated)
+    #pragma warning(disable:4786)
 
     #ifdef restrict 
     #undef restrict
@@ -46,60 +87,27 @@
     #   endif
     #endif /* !S_ISCHR */
 
-#endif
+    #ifndef S_ISBLK
+    #   define S_ISBLK(m) 0
+    #endif 
 
-#ifdef _WIN32
-#ifndef _MSC_VER
- #define close wsock_close
-#endif
+    #ifndef S_ISREG
+    #   define S_ISREG(m) 1
+    #endif 
 
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
-#include <windows.h>
-#ifndef _MSC_VER
-    #include <winsock2.h>
-    #include <ws2tcpip.h>
-#else
-    #include <io.h>
-#endif
-#define setsockopt(a, b, c, d, e) setsockopt(a, b, c, (const char*)(d), e)
-#undef close
-#include <stdio.h>        // for snprintf(), used by inline dlerror()
-#ifndef _MSC_VER
-#include <unistd.h>       // for usleep()
-#endif
-#else
-#include <sys/time.h>     // Mac OS X needs this before sys/resource
-#include <sys/resource.h> // for setpriority
-#include <sys/socket.h>
-#include <sys/wait.h>     // For WIFEXITED on Mac OS X
-#endif
-
-#ifdef USING_MINGW
-#include <unistd.h>       // for usleep()
-#include <sys/time.h>
+    #ifndef S_ISDIR
+    #  ifdef S_IFDIR
+    #       define S_ISDIR(m) (((m) & S_IFDIR) == S_IFDIR )
+    #   else
+    #       define S_ISDIR(m) 0
+    #   endif
+    #endif 
 #endif
 
 #ifdef _WIN32
 typedef unsigned int uint;
-#endif
-
-#ifdef _WIN32
-#undef DialogBox
-#undef LoadImage
-#undef LoadIcon
-#undef GetObject
-#undef DrawText
-#undef CreateDialog
-#undef CreateFont
-#undef DeleteFile
-#endif
-
-#ifdef _WIN32
-#undef M_PI
-#define M_PI 3.14159265358979323846
+# undef M_PI
+# define M_PI 3.14159265358979323846
 #endif
 
 #ifdef USING_MINGW
@@ -282,6 +290,7 @@ inline const char *dlerror(void)
 #endif
 
 #include "mythconfig.h"
+
 #if CONFIG_DARWIN && ! defined (_SUSECONDS_T)
     typedef int32_t suseconds_t;   // 10.3 or earlier don't have this
 #endif
@@ -295,6 +304,9 @@ inline const char *dlerror(void)
 
 #if defined(_MSC_VER)
 #  define S_IRUSR _S_IREAD
+#  ifndef lseek64
+#    define lseek64( f, o, w ) _lseeki64( f, o, w )
+#  endif
 #endif
 
 #ifdef USING_MINGW
