@@ -8,6 +8,10 @@
 #include "mythrender_d3d9.h"
 #include "mythpainter_d3d9.h"
 
+#ifdef USING_DXVA2
+#include "dxva2decoder.h"
+#endif
+
 class VideoOutputD3D : public VideoOutput
 {
   public:
@@ -39,6 +43,11 @@ class VideoOutputD3D : public VideoOutput
     bool hasFullScreenOSD(void) const { return true; }
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
+    static MythCodecID GetBestSupportedCodec(uint width, uint height,
+                                             uint stream_type,
+                                             bool no_acceleration,
+                                             PixelFormat &pix_fmt);
+
     void ShowPIP(VideoFrame  *frame,
                  MythPlayer  *pipplayer,
                  PIPLocation  loc);
@@ -46,6 +55,8 @@ class VideoOutputD3D : public VideoOutput
     bool IsPIPSupported(void) const { return false; /*true*/}
     virtual MythPainter *GetOSDPainter(void) { return (MythPainter*)m_osd_painter; }
     bool hasHWAcceleration(void) const { return !codec_is_std(video_codec_id); }
+    virtual bool ApproveDeintFilter(const QString& filtername) const;
+    void* GetDXVA2Decoder(void);
 
   private:
     void TearDown(void);
@@ -72,6 +83,13 @@ class VideoOutputD3D : public VideoOutput
     D3D9Image                   *m_pip_active;
 
     MythD3D9Painter        *m_osd_painter;
+
+    bool CreateDecoder(void);
+    void DeleteDecoder(void);
+#ifdef USING_DXVA2
+    DXVA2Decoder *m_decoder;
+#endif
+    void         *m_pause_surface;
 };
 
 #endif

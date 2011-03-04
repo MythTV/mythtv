@@ -48,6 +48,10 @@ extern "C" {
 }
 #endif // USING_VDPAU
 
+#ifdef USING_DXVA2
+#include "videoout_d3d.h"
+#endif
+
 extern "C" {
 #include "libavutil/avutil.h"
 #include "libavcodec/ac3_parser.h"
@@ -103,6 +107,7 @@ int  get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic);
 void release_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic);
 void render_slice_vdpau(struct AVCodecContext *s, const AVFrame *src,
                         int offset[4], int y, int type, int height);
+int  get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic);
 
 static AVCodec *find_vdpau_decoder(AVCodec *c, enum CodecID id)
 {
@@ -207,6 +212,10 @@ void AvFormatDecoder::GetDecoders(render_opts &opts)
 #ifdef USING_VDPAU
     opts.decoders->append("vdpau");
     (*opts.equiv_decoders)["vdpau"].append("dummy");
+#endif
+#ifdef USING_DXVA2
+    opts.decoders->append("dxva2");
+    (*opts.equiv_decoders)["dxva2"].append("dummy");
 #endif
 
     PrivateDecoder::GetDecoders(opts);
@@ -1249,6 +1258,12 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         enc->draw_horiz_band = render_slice_vdpau;
         enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
     }
+    else if (CODEC_IS_DXVA2(codec, enc))
+    {
+        enc->get_buffer      = get_avf_buffer_dxva2;
+        enc->get_format      = get_format_dxva2;
+        enc->release_buffer  = release_avf_buffer;
+    }
     else if (codec && codec->capabilities & CODEC_CAP_DR1)
     {
         enc->flags          |= CODEC_FLAG_EMU_EDGE;
@@ -1778,6 +1793,25 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         handled = true;
                     }
 #endif // USING_VDPAU
+#ifdef USING_DXVA2
+                    MythCodecID dxva2_mcid;
+                    PixelFormat pix_fmt = PIX_FMT_YUV420P;
+                    dxva2_mcid = VideoOutputD3D::GetBestSupportedCodec(
+                        width, height, mpeg_version(enc->codec_id),
+                        no_hardware_decoders, pix_fmt);
+
+                    if (dxva2_mcid >= video_codec_id)
+                    {
+                        enc->codec_id = (CodecID)myth2av_codecid(dxva2_mcid);
+                        video_codec_id = dxva2_mcid;
+                        handled = true;
+                        if (!no_hardware_decoders &&
+                            codec_is_dxva2(video_codec_id))
+                        {
+                            enc->pix_fmt = pix_fmt;
+                        }
+                    }
+#endif // USING_DXVA2
                 }
 
                 if (!handled)
@@ -2298,6 +2332,36 @@ void render_slice_vdpau(struct AVCodecContext *s, const AVFrame *src,
         VERBOSE(VB_IMPORTANT, LOC +
                 "render_slice_vdpau called with bad avctx or src");
     }
+}
+
+int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic)
+{
+    AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
+    VideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame();
+    for (int i = 0; i < 4; i++)
+    {
+        pic->data[i]     = NULL;
+        pic->linesize[i] = 0;
+    }
+    pic->reordered_opaque = c->reordered_opaque;
+    pic->opaque      = frame;
+    pic->type        = FF_BUFFER_TYPE_USER;
+    pic->age         = 256 * 256 * 256 *64;
+    frame->pix_fmt   = c->pix_fmt;
+
+#ifdef USING_DXVA2
+    if (nd->GetPlayer()->getVideoOutput())
+    {
+        VideoOutputD3D *vo =
+            dynamic_cast<VideoOutputD3D*>(nd->GetPlayer()->getVideoOutput());
+        if (vo)
+            c->hwaccel_context = (dxva_context*)vo->GetDXVA2Decoder();
+        pic->data[0] = (uint8_t*)frame->buf;
+        pic->data[3] = (uint8_t*)frame->buf;
+    }
+#endif
+
+    return 0;
 }
 
 void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint len)
