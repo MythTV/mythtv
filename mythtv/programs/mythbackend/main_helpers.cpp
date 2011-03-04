@@ -660,15 +660,15 @@ int run_backend(const MythCommandLineParser &cmdline)
     if (!setup_context(cmdline))
         return BACKEND_EXIT_NO_MYTHCONTEXT;
 
-    if (!UpgradeTVDatabaseSchema(true, true))
+    bool ismaster = gCoreContext->IsMasterHost();
+
+    if (!UpgradeTVDatabaseSchema(ismaster, ismaster))
     {
         VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema");
         return BACKEND_EXIT_DB_OUTOFDATE;
     }
 
     ///////////////////////////////////////////
-
-    bool ismaster = gCoreContext->IsMasterHost();
 
     g_pUPnp = new MediaServer(ismaster, !cmdline.IsUPnPEnabled() );
 
