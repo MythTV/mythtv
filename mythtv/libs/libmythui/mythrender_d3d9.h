@@ -3,7 +3,7 @@
 
 #include <QMap>
 
-#include <windows.h>
+#include <compat.h>
 #include <d3d9.h>
 
 #include "mythimage.h"
