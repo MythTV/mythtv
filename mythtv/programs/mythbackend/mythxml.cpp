@@ -18,6 +18,7 @@
 #include <QEventLoop>
 #include <QImage>
 
+#include "compat.h"
 #include "mythxml.h"
 #include "backendutil.h"
 

@@ -1487,7 +1487,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             for (it = checkfiles.begin(); it != checkfiles.end(); ++it)
             {
                 if (dir.exists(*it) &&
-                    QFileInfo(dir, *it).size() >= RingBuffer::kReadTestSize)
+                    QFileInfo(dir, *it).size() >= kReadTestSize)
                 {
                     retlist<<*it;
                 }
@@ -2572,7 +2572,7 @@ void MainServer::HandleUndeleteRecording(QStringList &slist, PlaybackSock *pbs)
 void MainServer::DoHandleUndeleteRecording(
     RecordingInfo &recinfo, PlaybackSock *pbs)
 {
-    bool ret = -1;
+    int ret = -1;
     bool undelete_possible =
             gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete", 0);
     MythSocket *pbssock = NULL;

@@ -162,8 +162,9 @@ int main(int argc, char **argv)
         return exitCode;
 
     {
+        QFileInfo sName( argv[0] );
         QString versionStr = QString("%1 version: %2 [%3] www.mythtv.org")
-            .arg(basename(argv[0])).arg(MYTH_SOURCE_PATH)
+            .arg(sName.baseName()).arg(MYTH_SOURCE_PATH)
             .arg(MYTH_SOURCE_VERSION);
         VERBOSE(VB_IMPORTANT, versionStr);
     }
