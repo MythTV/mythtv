@@ -136,6 +136,8 @@ DXVA2Decoder::DXVA2Decoder(uint num_bufs, MythCodecID codec_id,
     m_context.cfg = &m_config;
     m_context.surface_count = num_bufs;
     m_context.surface = new IDirect3DSurface9*[num_bufs];
+    for (int i = 0; i < num_bufs; i++)
+        m_context.surface[i] = NULL;
 }
 
 DXVA2Decoder::~DXVA2Decoder(void)
