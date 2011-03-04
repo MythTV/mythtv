@@ -18,6 +18,7 @@
    Or, point your browser to http://www.gnu.org/copyleft/gpl.html
 
 */
+#include "compat.h"
 
 #include "Variables.h"
 #include "Ingredients.h"

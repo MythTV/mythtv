@@ -138,8 +138,8 @@ public:
 
     // This is called whenever a key is pressed while this
     // interactible is set to interactive.
-    virtual void KeyEvent(MHEngine */*engine*/, int /*nCode*/) {}
-    virtual void InteractionCompleted(MHEngine */*engine*/) {}
+    virtual void KeyEvent(MHEngine * /*engine*/, int /*nCode*/) {}
+    virtual void InteractionCompleted(MHEngine * /*engine*/) {}
 
     void InteractSetInteractionStatus(bool newStatus, MHEngine *engine);
     bool InteractGetInteractionStatus(void) { return m_fInteractionStatus; }

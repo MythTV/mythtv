@@ -101,7 +101,7 @@ public:
     virtual void SetVariableValue(const MHUnion &) { InvalidAction("SetVariableValue"); }
 
     // Actions on Text objects
-    virtual void GetTextData(MHRoot */*pDestination*/, MHEngine *) { InvalidAction("GetTextData"); }
+    virtual void GetTextData(MHRoot * /*pDestination*/, MHEngine *) { InvalidAction("GetTextData"); }
     virtual void SetBackgroundColour(const MHColour &/*colour*/, MHEngine *) { InvalidAction("SetBackgroundColour"); }
     virtual void SetTextColour(const MHColour &/*colour*/, MHEngine *) { InvalidAction("SetTextColour"); }
     virtual void SetFontAttributes(const MHOctetString &/*fontAttrs*/, MHEngine *) { InvalidAction("SetFontAttributes"); }
@@ -117,11 +117,11 @@ public:
     virtual void CallActionSlot(int, MHEngine *) { InvalidAction("CallActionSlot"); }
     virtual void Move(int, MHEngine *) { InvalidAction("Move"); }
     virtual void MoveTo(int, MHEngine *) { InvalidAction("MoveTo"); }
-    virtual void GetTokenPosition(MHRoot */*pResult*/, MHEngine *) { InvalidAction("GetTokenPosition"); }
+    virtual void GetTokenPosition(MHRoot * /*pResult*/, MHEngine *) { InvalidAction("GetTokenPosition"); }
 
     // Actions on ListGroups
-    virtual void AddItem(int /*nIndex*/, MHRoot */*pItem*/, MHEngine *) { InvalidAction("GetCellItem"); }
-    virtual void DelItem(MHRoot */*pItem*/, MHEngine *) { InvalidAction("GetCellItem"); }
+    virtual void AddItem(int /*nIndex*/, MHRoot * /*pItem*/, MHEngine *) { InvalidAction("GetCellItem"); }
+    virtual void DelItem(MHRoot * /*pItem*/, MHEngine *) { InvalidAction("GetCellItem"); }
     virtual void GetCellItem(int /*nCell*/, const MHObjectRef &/*itemDest*/, MHEngine *) { InvalidAction("GetCellItem"); }
     virtual void GetListItem(int /*nCell*/, const MHObjectRef &/*itemDest*/, MHEngine *) { InvalidAction("GetCellItem"); }
     virtual void GetItemStatus(int /*nCell*/, const MHObjectRef &/*itemDest*/, MHEngine *) { InvalidAction("GetItemStatus"); }
@@ -130,19 +130,19 @@ public:
     virtual void ToggleItem(int /*nCell*/, MHEngine *) { InvalidAction("ToggleItem"); }
     virtual void ScrollItems(int /*nCell*/, MHEngine *) { InvalidAction("ScrollItems"); }
     virtual void SetFirstItem(int /*nCell*/, MHEngine *) { InvalidAction("SetFirstItem"); }
-    virtual void GetFirstItem(MHRoot */*pResult*/, MHEngine *) { InvalidAction("GetFirstItem"); }
-    virtual void GetListSize(MHRoot */*pResult*/, MHEngine *) { InvalidAction("GetListSize"); }
+    virtual void GetFirstItem(MHRoot * /*pResult*/, MHEngine *) { InvalidAction("GetFirstItem"); }
+    virtual void GetListSize(MHRoot * /*pResult*/, MHEngine *) { InvalidAction("GetListSize"); }
 
     // Actions on Visibles.
     virtual void SetPosition(int /*nXPosition*/, int /*nYPosition*/, MHEngine *) { InvalidAction("SetPosition"); }
-    virtual void GetPosition(MHRoot */*pXPosN*/, MHRoot */*pYPosN*/) { InvalidAction("GetPosition"); }
+    virtual void GetPosition(MHRoot * /*pXPosN*/, MHRoot * /*pYPosN*/) { InvalidAction("GetPosition"); }
     virtual void SetBoxSize(int /*nWidth*/, int /*nHeight*/, MHEngine *) { InvalidAction("SetBoxSize"); }
-    virtual void GetBoxSize(MHRoot */*pWidthDest*/, MHRoot */*HeightDest*/) { InvalidAction("GetBoxSize"); }
+    virtual void GetBoxSize(MHRoot * /*pWidthDest*/, MHRoot * /*HeightDest*/) { InvalidAction("GetBoxSize"); }
     virtual void SetPaletteRef(const MHObjectRef /*newPalette*/, MHEngine *) { InvalidAction("SetPaletteRef"); }
     virtual void BringToFront(MHEngine *) { InvalidAction("BringToFront"); }
     virtual void SendToBack(MHEngine *) { InvalidAction("SendToBack"); }
-    virtual void PutBefore(const MHRoot */*pRef*/, MHEngine *) { InvalidAction("PutBefore"); }
-    virtual void PutBehind(const MHRoot */*pRef*/, MHEngine *) { InvalidAction("PutBehind"); }
+    virtual void PutBefore(const MHRoot * /*pRef*/, MHEngine *) { InvalidAction("PutBefore"); }
+    virtual void PutBehind(const MHRoot * /*pRef*/, MHEngine *) { InvalidAction("PutBehind"); }
     virtual void ResetPosition()  { InvalidAction("ResetPosition"); } // Used internally by ListGroup
 
     // Actions on LineArt
@@ -155,26 +155,26 @@ public:
     virtual void SetTransparency(int /*nTransPerCent*/, MHEngine *) { InvalidAction("SetTransparency"); }
     virtual void ScaleBitmap(int /*xScale*/, int /*yScale*/, MHEngine *) { InvalidAction("ScaleBitmap"); } 
     virtual void SetBitmapDecodeOffset(int /*newXOffset*/, int /*newYOffset*/, MHEngine *) { InvalidAction("SetBitmapDecodeOffset"); }
-    virtual void GetBitmapDecodeOffset(MHRoot */*pXOffset*/, MHRoot */*pYOffset*/) { InvalidAction("GetBitmapDecodeOffset"); }
+    virtual void GetBitmapDecodeOffset(MHRoot * /*pXOffset*/, MHRoot * /*pYOffset*/) { InvalidAction("GetBitmapDecodeOffset"); }
 
     // Actions on Dynamic Line Art
     virtual void Clear() { InvalidAction(""); }
-    virtual void GetLineWidth(MHRoot */*pResult*/) { InvalidAction("GetLineWidth"); }
-    virtual void GetLineStyle(MHRoot */*pResult*/) { InvalidAction("GetLineStyle"); }
-    virtual void GetLineColour(MHRoot */*pResult*/) { InvalidAction("GetLineColour"); }
-    virtual void GetFillColour(MHRoot */*pResult*/) { InvalidAction("GetFillColour"); }
+    virtual void GetLineWidth(MHRoot * /*pResult*/) { InvalidAction("GetLineWidth"); }
+    virtual void GetLineStyle(MHRoot * /*pResult*/) { InvalidAction("GetLineStyle"); }
+    virtual void GetLineColour(MHRoot * /*pResult*/) { InvalidAction("GetLineColour"); }
+    virtual void GetFillColour(MHRoot * /*pResult*/) { InvalidAction("GetFillColour"); }
     virtual void DrawArcSector(bool /*fIsSector*/, int /*x*/, int /*y*/, int /*width*/, int /*height*/, int /*start*/,
         int /*arc*/, MHEngine *) { InvalidAction("DrawArc/Sector"); }
     virtual void DrawLine(int /*x1*/, int /*y1*/, int /*x2*/, int /*y2*/, MHEngine *) { InvalidAction("DrawLine"); }
     virtual void DrawOval(int /*x1*/, int /*y1*/, int /*width*/, int /*height*/, MHEngine *) { InvalidAction("DrawOval"); }
     virtual void DrawRectangle(int /*x1*/, int /*y1*/, int /*x2*/, int /*y2*/, MHEngine *) { InvalidAction("DrawRectangle"); }
-    virtual void DrawPoly(bool /*fIsPolygon*/, int /*nPoints*/, const int */*xArray*/, const int */*yArray*/, MHEngine *)
+    virtual void DrawPoly(bool /*fIsPolygon*/, int /*nPoints*/, const int * /*xArray*/, const int * /*yArray*/, MHEngine *)
          { InvalidAction("DrawPoly(gon/line)"); }
 
     // Actions on Video streams.
     virtual void ScaleVideo(int /*xScale*/, int /*yScale*/, MHEngine *) { InvalidAction("ScaleVideo"); }
     virtual void SetVideoDecodeOffset(int /*newXOffset*/, int /*newYOffset*/, MHEngine *) { InvalidAction("SetVideoDecodeOffset"); }
-    virtual void GetVideoDecodeOffset(MHRoot * /*pXOffset*/, MHRoot */*pYOffset*/, MHEngine *) { InvalidAction("GetVideoDecodeOffset"); }
+    virtual void GetVideoDecodeOffset(MHRoot * /*pXOffset*/, MHRoot * /*pYOffset*/, MHEngine *) { InvalidAction("GetVideoDecodeOffset"); }
 
     // Actions on Interactibles.
     virtual void SetInteractionStatus(bool /*newStatus*/, MHEngine *) { InvalidAction("SetInteractionStatus"); }
@@ -183,13 +183,13 @@ public:
     virtual bool GetHighlightStatus(void) { InvalidAction("GetHighlightStatus"); return false; }
 
     // Actions on Sliders.
-    virtual void Step(int /*nbSteps*/, MHEngine */*engine*/) { InvalidAction("Step"); }
-    virtual void SetSliderValue(int /*nbSteps*/, MHEngine */*engine*/) { InvalidAction("SetSliderValue"); }
+    virtual void Step(int /*nbSteps*/, MHEngine * /*engine*/) { InvalidAction("Step"); }
+    virtual void SetSliderValue(int /*nbSteps*/, MHEngine * /*engine*/) { InvalidAction("SetSliderValue"); }
     virtual int GetSliderValue(void) { InvalidAction("GetSliderValue"); return 0; }
-    virtual void SetPortion(int /*newPortion*/, MHEngine */*engine*/) { InvalidAction("SetPortion"); }
+    virtual void SetPortion(int /*newPortion*/, MHEngine * /*engine*/) { InvalidAction("SetPortion"); }
     virtual int GetPortion(void) { InvalidAction("GetPortion"); return 0; }
     // Additional action defined in UK MHEG.
-    virtual void SetSliderParameters(int /*newMin*/, int /*newMax*/, int /*newStep*/, MHEngine */*engine*/)
+    virtual void SetSliderParameters(int /*newMin*/, int /*newMax*/, int /*newStep*/, MHEngine * /*engine*/)
          { InvalidAction("SetSliderParameters"); }
 
 protected:

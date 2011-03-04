@@ -36,7 +36,7 @@
 #include <time.h>
 #endif
 
-#include "../../config.h"
+#include "config.h"
 
 /*
  * Resident programs are subroutines to provide various string and date functions
