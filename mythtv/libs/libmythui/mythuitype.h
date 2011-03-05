@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QList>
 #include <QFont>
+#include <QColor>
 
 #include "xmlparsebase.h"
 #include "mythrect.h"
@@ -226,6 +227,8 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     QString m_helptext;
 
     bool m_deferload;
+
+    QColor m_BorderColor;
 
     friend class XMLParseBase;
 };

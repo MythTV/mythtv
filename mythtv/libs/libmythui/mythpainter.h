@@ -23,7 +23,8 @@ class MythImage;
 class MUI_PUBLIC MythPainter
 {
   public:
-    MythPainter() : m_Parent(0), m_CacheSize(0) { }
+    MythPainter() : m_Parent(0), m_CacheSize(0),
+                    m_showBorders(false), m_showNames(false) { }
     virtual ~MythPainter();
 
     virtual QString GetName(void) = 0;
@@ -62,6 +63,15 @@ class MUI_PUBLIC MythPainter
     // make friend so only callable from image
     virtual void DeleteFormatImage(MythImage *im);
 
+    void SetDebugMode(bool showBorders, bool showNames)
+    {
+        m_showBorders = showBorders;
+        m_showNames = showNames;
+    }
+
+    bool ShowBorders(void) { return m_showBorders; }
+    bool ShowTypeNames(void) { return m_showNames; }
+
   protected:
     virtual void DeleteFormatImagePriv(MythImage *im) { (void) im; }
     void CheckFormatImage(MythImage *im);
@@ -73,6 +83,9 @@ class MUI_PUBLIC MythPainter
     static int        m_MaxCacheSize;
     QList<MythImage*> m_allocatedImages;
     QMutex            m_allocationLock;
+
+    bool m_showBorders;
+    bool m_showNames;
 };
 
 #endif

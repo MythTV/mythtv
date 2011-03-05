@@ -926,6 +926,24 @@ static void getScreenShot(void)
     (void) GetMythMainWindow()->screenShot();
 }
 
+static void setDebugShowBorders(void)
+{
+    MythPainter *p = GetMythPainter();
+    p->SetDebugMode(!p->ShowBorders(), p->ShowTypeNames());
+
+    if (GetMythMainWindow()->GetMainStack()->GetTopScreen())
+        GetMythMainWindow()->GetMainStack()->GetTopScreen()->SetRedraw();
+}
+
+static void setDebugShowNames(void)
+{
+    MythPainter *p = GetMythPainter();
+    p->SetDebugMode(p->ShowBorders(), !p->ShowTypeNames());
+
+    if (GetMythMainWindow()->GetMainStack()->GetTopScreen())
+        GetMythMainWindow()->GetMainStack()->GetTopScreen()->SetRedraw();
+}
+
 static void InitJumpPoints(void)
 {
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Reload Theme"),
@@ -960,6 +978,11 @@ static void InitJumpPoints(void)
 
      REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "ScreenShot"),
          "", "", getScreenShot, false);
+
+     REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "Toggle Show Widget Borders"),
+         "", "", setDebugShowBorders, false);
+     REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "Toggle Show Widget Names"),
+         "", "", setDebugShowNames, false);
 
     TV::InitKeys();
 
