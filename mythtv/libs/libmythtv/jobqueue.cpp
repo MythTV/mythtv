@@ -28,6 +28,9 @@ using namespace std;
 #include "mythdirs.h"
 #include "mythverbose.h"
 
+// windows.h - avoid a conflict with Qt::ChildJobThread::SetJob
+#undef SetJob
+
 #ifndef O_STREAMING
 #define O_STREAMING 0
 #endif
@@ -182,8 +185,6 @@ void JobQueue::ProcessQueue(void)
 
     for (;;)
     {
-        pthread_testcancel();
-
         startedJobAlready = false;
         sleepTime = gCoreContext->GetNumSetting("JobQueueCheckFrequency", 30);
         maxJobs = gCoreContext->GetNumSetting("JobQueueMaxSimultaneousJobs", 3);
