@@ -54,6 +54,7 @@ JobQueue::JobQueue(bool master)
     jobsRunning = 0;
 
 #ifndef USING_VALGRIND
+    processQueue = false;
     queueThreadCondLock.lock();
     queueThread.SetParent(this);
     queueThread.start();
@@ -69,7 +70,7 @@ JobQueue::JobQueue(bool master)
 
 JobQueue::~JobQueue(void)
 {
-    queueThread.terminate();
+    processQueue = false;
     queueThread.wait();
 
     gCoreContext->removeListener(this);
@@ -147,6 +148,8 @@ void JobQueue::RunQueueProcessor(void)
     queueThreadCond.wakeAll();
     queueThreadCondLock.unlock();
 
+    processQueue = true;
+
     RecoverQueue();
 
     sleep(10);
@@ -183,7 +186,7 @@ void JobQueue::ProcessQueue(void)
     bool startedJobAlready = false;
     QMap<int, RunningJobInfo>::Iterator rjiter;
 
-    for (;;)
+    while (processQueue)
     {
         startedJobAlready = false;
         sleepTime = gCoreContext->GetNumSetting("JobQueueCheckFrequency", 30);

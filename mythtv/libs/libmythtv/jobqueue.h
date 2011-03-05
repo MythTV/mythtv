@@ -260,6 +260,7 @@ class MTV_PUBLIC JobQueue : public QObject
     QueueProcessorThread queueThread;
     QWaitCondition queueThreadCond;
     QMutex queueThreadCondLock;
+    bool processQueue;
 };
 
 #endif
