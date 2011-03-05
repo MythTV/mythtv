@@ -578,6 +578,7 @@ mingw {
     DEFINES += USING_MINGW
 
     HEADERS += videoout_d3d.h
+    HEADERS -= NuppelVideoRecorder.h
     SOURCES -= NuppelVideoRecorder.cpp
     SOURCES += videoout_d3d.cpp
 
