@@ -1495,17 +1495,17 @@
         </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>170,15,415,34</area>
+            <area>170,15,400,34</area>
             <font>baselarge</font>
         </textarea>
 
         <textarea name="artist" from="basetextarea">
-            <area>170,50,415,27</area>
+            <area>170,50,400,27</area>
             <font>basemedium</font>
         </textarea>
 
         <textarea name="album" from="basetextarea">
-            <area>170,77,415,27</area>
+            <area>170,77,400,27</area>
             <font>basemedium</font>
         </textarea>
 
@@ -1513,7 +1513,7 @@
         </statetype>
 
         <textarea name="info" from="basetextarea">
-            <area>170,125,250,25</area>
+            <area>170,125,200,25</area>
         </textarea>
 
         <textarea name="time" from="basetextarea">
