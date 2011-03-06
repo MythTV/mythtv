@@ -1603,12 +1603,12 @@
         </textarea>
 
         <textarea name="title" from="basetextarea">
-            <area>330,50,460,40</area>
+            <area>330,50,460,35</area>
             <font>basemedium</font>
         </textarea>
 
         <textarea name="artistlbl" from="titlelbl">
-            <area>170,100,150,35</area>
+            <area>200,100,120,35</area>
             <value>Artist:</value>
         </textarea>
 
@@ -1617,39 +1617,39 @@
         </textarea>
 
         <textarea name="albumlbl" from="titlelbl">
-            <area>170,150,150,35</area>
+            <area>195,150,125,35</area>
             <value>Album:</value>
         </textarea>
 
         <textarea name="album" from="title">
-            <area>330,150,460,90</area>
+            <area>330,150,460,35</area>
         </textarea>
 
         <textarea name="genrelbl" from="titlelbl">
-            <area>170,250,150,35</area>
+            <area>195,250,125,35</area>
             <value>Genre:</value>
         </textarea>
 
         <textarea name="genre" from="title">
-            <area>330,250,460,90</area>
+            <area>330,250,460,35</area>
         </textarea>
 
         <textarea name="tracknumlbl" from="titlelbl">
-            <area>410,200,150,35</area>
+            <area>480,200,150,35</area>
             <value>Track No.:</value>
         </textarea>
 
         <textarea name="tracknum" from="title">
-            <area>570,200,100,290</area>
+            <area>640,200,100,35</area>
         </textarea>
 
         <textarea name="lenlbl" from="titlelbl">
-            <area>170,200,150,35</area>
+            <area>195,200,125,35</area>
             <value>Length:</value>
         </textarea>
 
         <textarea name="length" from="title">
-            <area>330,200,177,35</area>
+            <area>330,200,140,35</area>
         </textarea>
 
         <textarea name="yearlbl" from="titlelbl">
