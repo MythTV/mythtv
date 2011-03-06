@@ -423,8 +423,8 @@ bool AudioOutputALSA::OpenDevice()
             return false;
     }
 
-    period_time = 50000;  // aim for an interrupt every 50ms
-    buffer_time = period_time << 2; // buffer 200ms worth of samples
+    buffer_time = 500000; // buffer 0.5s worth of samples
+    period_time = 16;     // aim for an interrupt every (1/16th of buffer_time)
 
     err = SetParameters(pcm_handle, format, channels, samplerate,
                         buffer_time, period_time);
@@ -617,11 +617,11 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
                                    uint channels, uint rate, uint buffer_time,
                                    uint period_time)
 {
-    int err, dir;
-    snd_pcm_hw_params_t *params;
-    snd_pcm_sw_params_t *swparams;
-    snd_pcm_uframes_t buffer_size;
-    snd_pcm_uframes_t period_size;
+    int err;
+    snd_pcm_hw_params_t  *params;
+    snd_pcm_sw_params_t  *swparams;
+    snd_pcm_uframes_t     period_size, period_size_min, period_size_max;
+    snd_pcm_uframes_t     buffer_size, buffer_size_min, buffer_size_max;
 
     VBAUDIO(QString("SetParameters(format=%1, channels=%2, rate=%3, "
                     "buffer_time=%4, period_time=%5)")
@@ -678,14 +678,25 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
     }
 
     /* set the buffer time */
-    dir = 0;
+    err = snd_pcm_hw_params_get_buffer_size_min(params, &buffer_size_min);
+    err = snd_pcm_hw_params_get_buffer_size_max(params, &buffer_size_max);
+    err = snd_pcm_hw_params_get_period_size_min(params, &period_size_min, NULL);
+    err = snd_pcm_hw_params_get_period_size_max(params, &period_size_max, NULL);
+    VBAUDIO(QString("Buffer size range from %1 to %2")
+            .arg(buffer_size_min)
+            .arg(buffer_size_max));
+    VBAUDIO(QString("Period size range from %1 to %2")
+            .arg(period_size_min)
+            .arg(period_size_max));
+
+    /* set the buffer time */
     uint original_buffer_time = buffer_time;
     err = snd_pcm_hw_params_set_buffer_time_near(handle, params,
-                                                 &buffer_time, &dir);
+                                                 &buffer_time, NULL);
     CHECKERR(QString("Unable to set buffer time %1").arg(buffer_time));
 
     /* See if we need to increase the prealloc'd buffer size
-      If buffer_time is too small we could underrun - make 10% difference ok */
+       If buffer_time is too small we could underrun - make 10% difference ok */
     if ((buffer_time * 1.10f < (float)original_buffer_time) && pbufsize < 0)
     {
         VBAUDIO(QString("Requested %1us got %2 buffer time")
@@ -696,11 +707,10 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
     VBAUDIO(QString("Buffer time = %1 us").arg(buffer_time));
 
     /* set the period time */
-    dir = 1;
-    err = snd_pcm_hw_params_set_period_time_near(handle, params,
-                                                 &period_time, &dir);
+    err = snd_pcm_hw_params_set_periods_near(handle, params,
+                                             &period_time, NULL);
     CHECKERR(QString("Unable to set period time %1").arg(period_time));
-    VBAUDIO(QString("Period time = %1 us").arg(period_time));
+    VBAUDIO(QString("Period time = %1 periods").arg(period_time));
 
     /* write the parameters to device */
     err = snd_pcm_hw_params(handle, params);
@@ -720,7 +730,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
     CHECKERR("Unable to get current swparams");
 
     /* start the transfer after period_size */
-    err = snd_pcm_sw_params_set_start_threshold(handle, swparams, buffer_size);
+    err = snd_pcm_sw_params_set_start_threshold(handle, swparams, period_size);
     CHECKERR("Unable to set start threshold");
 
     /* allow the transfer when at least period_size samples can be processed */
