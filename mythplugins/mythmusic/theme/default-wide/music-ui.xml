@@ -1245,17 +1245,17 @@
         </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>170,15,415,34</area>
+            <area>170,15,400,35</area>
             <font>baselarge</font>
         </textarea>
 
         <textarea name="artist" from="basetextarea">
-            <area>170,50,415,35</area>
+            <area>170,55,400,35</area>
             <font>basemedium</font>
         </textarea>
 
         <textarea name="album" from="basetextarea">
-            <area>170,80,415,35</area>
+            <area>170,90,400,35</area>
             <font>basemedium</font>
         </textarea>
 
