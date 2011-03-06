@@ -698,7 +698,8 @@ MPUBLIC bool LoadFromRecorded(
     bool                possiblyInProgressRecordingsOnly,
     const QMap<QString,uint32_t> &inUseMap,
     const QMap<QString,bool> &isJobRunning,
-    const QMap<QString, ProgramInfo*> &recMap);
+    const QMap<QString, ProgramInfo*> &recMap,
+    bool                sortDescending = false);
 
 template<typename TYPE>
 bool LoadFromScheduler(

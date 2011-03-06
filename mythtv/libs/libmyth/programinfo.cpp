@@ -4282,7 +4282,8 @@ bool LoadFromRecorded(
     bool possiblyInProgressRecordingsOnly,
     const QMap<QString,uint32_t> &inUseMap,
     const QMap<QString,bool> &isJobRunning,
-    const QMap<QString, ProgramInfo*> &recMap)
+    const QMap<QString, ProgramInfo*> &recMap,
+    bool sortDescending)
 {
     destination.clear();
 
@@ -4295,6 +4296,10 @@ bool LoadFromRecorded(
     QString thequery = ProgramInfo::kFromRecordedQuery;
     if (possiblyInProgressRecordingsOnly)
         thequery += "WHERE r.endtime >= NOW() AND r.starttime <= NOW() ";
+
+    thequery += "ORDER BY r.starttime ";
+    if (sortDescending)
+        thequery += "DESC ";
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(thequery);

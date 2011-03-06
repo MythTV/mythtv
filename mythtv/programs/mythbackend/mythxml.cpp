@@ -1011,6 +1011,8 @@ void MythXML::GetAlbumArt( HTTPRequest *pRequest )
 
 void MythXML::GetRecorded( HTTPRequest *pRequest )
 {
+    bool    bDescending = pRequest->m_mapParams[ "Descending"  ].toInt();
+
     QMap<QString,ProgramInfo*> recMap;
     if (sched)
         recMap = sched->GetRecording();
@@ -1020,7 +1022,7 @@ void MythXML::GetRecorded( HTTPRequest *pRequest )
 
     ProgramList progList;
     LoadFromRecorded( progList, false,
-                      inUseMap, isJobRunning, recMap );
+                      inUseMap, isJobRunning, recMap, bDescending );
 
     QMap<QString,ProgramInfo*>::iterator mit = recMap.begin();
     for (; mit != recMap.end(); mit = recMap.erase(mit))

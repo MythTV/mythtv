@@ -1560,7 +1560,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     ProgramList destination;
     LoadFromRecorded(
         destination, (type == "Recording"),
-        inUseMap, isJobRunning, recMap);
+        inUseMap, isJobRunning, recMap, (type == "Delete"));
 
     QMap<QString,ProgramInfo*>::iterator mit = recMap.begin();
     for (; mit != recMap.end(); mit = recMap.erase(mit))
