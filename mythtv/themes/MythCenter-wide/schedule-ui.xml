@@ -1208,26 +1208,26 @@
         </buttonlist>
 
         <textarea name="title" from="basetextarea">
-            <area>30,454,1200,50</area>
+            <area>30,454,1220,40</area>
             <font>baselarge</font>
         </textarea>
         <textarea name="channel" from="basetextarea">
             <area>30,494,360,30</area>
         </textarea>
         <textarea name="timedate" from="basetextarea">
-            <area>410,490,520,30</area>
+            <area>410,494,520,30</area>
         </textarea>
         <textarea name="description" from="basetextarea">
-            <area>30,524,1200,150</area>
+            <area>30,524,1220,160</area>
             <multiline>yes</multiline>
             <template>%"|SUBTITLE|"\n%%YEARSTARS| %%DESCRIPTION%</template>
         </textarea>
         <textarea name="type" from="basetextarea">
-            <area>30,670,560,30</area>
+            <area>30,685,560,30</area>
             <font>basemedium_highlight</font>
         </textarea>
         <textarea name="programid" from="basetextarea">
-            <area>800,670,440,30</area>
+            <area>800,685,450,30</area>
             <align>right</align>
         </textarea>
         <textarea name="msg" from="basetextarea">
