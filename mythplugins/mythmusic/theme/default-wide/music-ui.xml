@@ -1340,7 +1340,7 @@
         </shape>
 
         <imagetype name="coverart">
-            <area>25,100,300,300</area>
+            <area>25,90,300,300</area>
             <filename>mm_nothumb.png</filename>
             <preserveaspect>true</preserveaspect>
         </imagetype>
@@ -1353,7 +1353,7 @@
         </textarea>
 
         <textarea name="title" from="basetextarea">
-            <area>520,50,500,40</area>
+            <area>520,50,630,35</area>
             <font>basemedium</font>
         </textarea>
 
@@ -1363,7 +1363,7 @@
         </textarea>
 
         <textarea name="artist" from="title">
-            <area>520,100,500,35</area>
+            <area>520,100,630,35</area>
         </textarea>
 
         <textarea name="albumlbl" from="titlelbl">
@@ -1372,7 +1372,7 @@
         </textarea>
 
         <textarea name="album" from="title">
-            <area>520,150,500,90</area>
+            <area>520,150,630,35</area>
         </textarea>
 
         <textarea name="genrelbl" from="titlelbl">
@@ -1381,7 +1381,7 @@
         </textarea>
 
         <textarea name="genre" from="title">
-            <area>520,250,500,90</area>
+            <area>520,250,500,35</area>
         </textarea>
 
         <textarea name="tracknumlbl" from="titlelbl">
@@ -1390,7 +1390,7 @@
         </textarea>
 
         <textarea name="tracknum" from="title">
-            <area>880,200,100,290</area>
+            <area>880,200,100,35</area>
         </textarea>
 
         <textarea name="lenlbl" from="titlelbl">
@@ -1447,7 +1447,7 @@
         </textarea>
 
         <textarea name="filename" from="title">
-            <area>520,505,600,90</area>
+            <area>520,505,630,90</area>
             <font>basesmall</font>
             <multiline>yes</multiline>
         </textarea>
