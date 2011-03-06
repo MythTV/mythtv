@@ -20,13 +20,13 @@ using namespace std;
 #include "mythverbose.h"
 #include "audiooutputnull.h"
 
+#define CHANNELS_MIN 1
+#define CHANNELS_MAX 8
+
 AudioOutputNULL::AudioOutputNULL(const AudioSettings &settings) :
     AudioOutputBase(settings),
     pcm_output_buffer_mutex(QMutex::NonRecursive),
-    current_buffer_size(0),
-    locked_channels(settings.channels),
-    locked_format(settings.format),
-    locked_samplerate(settings.samplerate)
+    current_buffer_size(0)
 {
     bzero(pcm_output_buffer, sizeof(char) * NULLAUDIO_OUTPUT_BUFFER_SIZE);
     InitSettings(settings);
@@ -41,20 +41,43 @@ AudioOutputNULL::~AudioOutputNULL()
 
 bool AudioOutputNULL::OpenDevice()
 {
-    VERBOSE(VB_GENERAL, "Opening NULL audio device.");
+    VERBOSE(VB_GENERAL, "Opening NULL audio device, will fail.");
 
     fragment_size = NULLAUDIO_OUTPUT_BUFFER_SIZE / 2;
     soundcard_buffer_size = NULLAUDIO_OUTPUT_BUFFER_SIZE;
 
-    format = locked_format;
-    channels = locked_channels;
-    samplerate = locked_samplerate;
-
-    return true;
+    return false;
 }
 
 void AudioOutputNULL::CloseDevice()
 {
+}
+
+AudioOutputSettings* AudioOutputNULL::GetOutputSettings(bool /*digital*/)
+{
+    // Pretend that we support everything
+    AudioFormat fmt;
+    int rate;
+    AudioOutputSettings *settings = new AudioOutputSettings();
+
+    while ((rate = settings->GetNextRate()))
+    {
+        settings->AddSupportedRate(rate);
+    }
+
+    while ((fmt = settings->GetNextFormat()))
+    {
+        settings->AddSupportedFormat(fmt);
+    }
+
+    for (uint channels = CHANNELS_MIN; channels <= CHANNELS_MAX; channels++)
+    {
+        settings->AddSupportedChannels(channels);
+    }
+
+    settings->setPassthrough(-1);   // no passthrough
+
+    return settings;
 }
 
 

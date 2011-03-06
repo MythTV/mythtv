@@ -234,7 +234,7 @@ bool CoreAudioData::OpenAnalog()
     return true;
 }
 
-AudioOutputSettings* AudioOutputCA::GetOutputSettings()
+AudioOutputSettings* AudioOutputCA::GetOutputSettings(bool /*digital*/)
 {
     AudioOutputSettings *settings = new AudioOutputSettings();
 
@@ -283,7 +283,7 @@ bool AudioOutputCA::OpenDevice()
 {
     bool deviceOpened = false;
 
-    if (passthru)
+    if (passthru || enc)
     {
         if (!d->FindAC3Stream())
         {
