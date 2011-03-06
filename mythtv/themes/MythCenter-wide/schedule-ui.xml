@@ -145,7 +145,7 @@
         </textarea>
 
         <textarea name="subtitle" from="basetextarea">
-            <area>40,80,620,30</area>
+            <area>40,80,640,30</area>
             <align>left,vcenter</align>
             <font>basesmall</font>
         </textarea>
@@ -157,7 +157,7 @@
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
-            <area>680,80,550,30</area>
+            <area>710,80,530,30</area>
             <align>right,vcenter</align>
             <font>basesmallyellow</font>
         </textarea>
