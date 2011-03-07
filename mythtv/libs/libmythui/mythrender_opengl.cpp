@@ -29,7 +29,7 @@ static inline int __glCheck__(const QString &loc, const char* fileName, int n)
     return error;
 }
 
-#define MAX_VERTEX_CACHE 50
+#define MAX_VERTEX_CACHE 500
 #define glCheck() __glCheck__(LOC, __FILE__, __LINE__)
 
 OpenGLLocker::OpenGLLocker(MythRenderOpenGL *render) : m_render(render)
