@@ -2,7 +2,7 @@
 #include <QLibrary>
 
 #include "mythverbose.h"
-#include "Initguid.h"
+#include "initguid.h"
 #include "mythrender_d3d9.h"
 #include "dxva2decoder.h"
 
