@@ -246,6 +246,13 @@ bool AudioOutputALSA::IncPreallocBufferSize(int requested, int buffer_time)
     VBAUDIO(QString("Hardware audio buffer cur: %1 need: %2 max allowed: %3")
             .arg(cur).arg(size).arg(max));
 
+    if (cur == max)
+    {
+        // It's already the maximum it can be, no point trying further
+        pfile.close();
+        mfile.close();
+        return false;
+    }
     if (size > max || !size)
     {
         size = max;
