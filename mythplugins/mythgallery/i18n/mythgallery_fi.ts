@@ -281,6 +281,14 @@
         <translation>Tämä on kaksoispisteillä erotettu lista tietopoluista. Jos listassa oleva polku on hakemisto, sen sisältö kopioidaan. Jos se on ajettava ohjelma, se ajetaan.</translation>
     </message>
     <message>
+        <source>Automatically load MythGallery to display pictures</source>
+        <translation>Automaattisesti käynnistä MythGallery näyttämään kuvat</translation>
+    </message>
+    <message>
+        <source>When a new CD-Rom or removable storage device containing pictures is detected then load MythGallery to display the content.</source>
+        <translation>Käynnistä MythGallery näyttämään kuvat kun huomataan kuvia sisältävä CD-Rom tai irroitettava muistilaite.</translation>
+    </message>
+    <message>
         <source>Type of transition</source>
         <translation>Diaesityksen kuvanvaihtotyyli</translation>
     </message>

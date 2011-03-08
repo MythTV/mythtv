@@ -530,6 +530,12 @@ Aseta tyhjä DVD asemaan ja valitse alla oleva optio.</translation>
 <context>
     <name>RecordingSelector</name>
     <message>
+        <source>Retrieving Recording List.
+Please Wait...</source>
+        <translation>Listaa tallenteet.
+Odota...</translation>
+    </message>
+    <message>
         <source>Clear All</source>
         <translation>Tyhjennä Kaikki</translation>
     </message>
@@ -547,7 +553,7 @@ Aseta tyhjä DVD asemaan ja valitse alla oleva optio.</translation>
     </message>
     <message>
         <source>Retrieving Recording List. Please Wait...</source>
-        <translation>Hakee nauhoitusluetteloa...</translation>
+        <translation type="obsolete">Hakee nauhoitusluetteloa...</translation>
     </message>
     <message>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!</source>

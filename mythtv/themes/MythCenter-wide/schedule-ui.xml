@@ -145,7 +145,7 @@
         </textarea>
 
         <textarea name="subtitle" from="basetextarea">
-            <area>40,80,620,30</area>
+            <area>40,80,640,30</area>
             <align>left,vcenter</align>
             <font>basesmall</font>
         </textarea>
@@ -157,7 +157,7 @@
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
-            <area>680,80,550,30</area>
+            <area>710,80,530,30</area>
             <align>right,vcenter</align>
             <font>basesmallyellow</font>
         </textarea>
@@ -1205,26 +1205,26 @@
         </buttonlist>
 
         <textarea name="title" from="basetextarea">
-            <area>30,454,1200,50</area>
+            <area>30,454,1220,40</area>
             <font>baselarge</font>
         </textarea>
         <textarea name="channel" from="basetextarea">
             <area>30,494,360,30</area>
         </textarea>
         <textarea name="timedate" from="basetextarea">
-            <area>410,490,520,30</area>
+            <area>410,494,520,30</area>
         </textarea>
         <textarea name="description" from="basetextarea">
-            <area>30,524,1200,150</area>
+            <area>30,524,1220,160</area>
             <multiline>yes</multiline>
             <template>%"|SUBTITLE|"\n%%YEARSTARS| %%DESCRIPTION%</template>
         </textarea>
         <textarea name="type" from="basetextarea">
-            <area>30,670,560,30</area>
+            <area>30,685,560,30</area>
             <font>basemedium_highlight</font>
         </textarea>
         <textarea name="programid" from="basetextarea">
-            <area>800,670,440,30</area>
+            <area>800,685,450,30</area>
             <align>right</align>
         </textarea>
         <textarea name="msg" from="basetextarea">
@@ -1411,22 +1411,22 @@
         </buttonlist>
 
         <textarea name="title" from="basetextarea">
-            <area>90,50,1040,46</area>
+            <area>90,50,1075,40</area>
             <font>baselarge</font>
         </textarea>
         <textarea name="timedate" from="basetextarea">
-            <area>90,290,540,28</area>
+            <area>90,290,540,30</area>
         </textarea>
         <textarea name="channel" from="basetextarea">
-            <area>780,290,380,36</area>
+            <area>780,290,385,30</area>
             <align>right</align>
         </textarea>
         <textarea name="rectypestatus" from="basetextarea">
-            <area>90,254,600,36</area>
+            <area>90,254,600,30</area>
             <font>basesmallyellow</font>
         </textarea>
         <textarea name="description" from="basetextarea">
-            <area>90,90,1040,176</area>
+            <area>90,90,1075,160</area>
             <multiline>yes</multiline>
             <template>%"|SUBTITLE|"\n%%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
