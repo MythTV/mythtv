@@ -60,6 +60,18 @@ MythQtPainter::MythQtPainter() :
 
 MythQtPainter::~MythQtPainter()
 {
+    DeletePixmaps();
+}
+
+void MythQtPainter::DeletePixmaps(void)
+{
+    QMutexLocker locker(&m_imageDeleteLock);
+    while (!m_imageDeleteList.empty())
+    {
+        QPixmap *pm = m_imageDeleteList.front();
+        m_imageDeleteList.pop_front();
+        delete pm;
+    }
 }
 
 void MythQtPainter::Begin(QPaintDevice *parent)
@@ -76,13 +88,7 @@ void MythQtPainter::Begin(QPaintDevice *parent)
     painter = new QPainter(parent);
     clipRegion = QRegion(QRect(0, 0, 0, 0));
 
-    QMutexLocker locker(&m_imageDeleteLock);
-    while (!m_imageDeleteList.empty())
-    {
-        QPixmap *pm = m_imageDeleteList.front();
-        m_imageDeleteList.pop_front();
-        delete pm;
-    }
+    DeletePixmaps();
 }
 
 void MythQtPainter::End(void)
@@ -127,144 +133,9 @@ void MythQtPainter::DrawImage(const QRect &r, MythImage *im,
     painter->setOpacity(1.0);
 }
 
-void MythQtPainter::DrawText(const QRect &r, const QString &msg,
-                             int flags, const MythFontProperties &font,
-                             int alpha, const QRect &boundRect)
+MythImage *MythQtPainter::GetFormatImagePriv()
 {
-    if (!painter)
-    {
-        VERBOSE(VB_IMPORTANT, "FATAL ERROR: DrawText called with no painter");
-        return;
-    }
-
-    (void)alpha;
-
-    painter->setOpacity(static_cast<float>(alpha) / 255.0);
-    
-    painter->setFont(font.face());
-
-    if (font.hasShadow())
-    {
-        QPoint shadowOffset;
-        QColor shadowColor;
-        int shadowAlpha;
-
-        font.GetShadow(shadowOffset, shadowColor, shadowAlpha);
-
-        shadowColor.setAlpha(shadowAlpha);
-
-        QRect a = r;
-        a.translate(shadowOffset.x(), shadowOffset.y());
-
-        painter->setPen(shadowColor);
-        painter->drawText(a, flags, msg);
-    }
-
-    if (font.hasOutline() && alpha > 128)
-    {
-        QColor outlineColor;
-        int outlineSize, outlineAlpha;
-
-        font.GetOutline(outlineColor, outlineSize, outlineAlpha);
-
-        if (GetMythMainWindow()->GetUIScreenRect().height() > 700)
-            outlineSize = 1;
-
-        painter->setPen(outlineColor);
-
-        QRect a = r;
-        a.translate(0 - outlineSize, 0 - outlineSize);
-        painter->drawText(a, flags, msg);
-
-        for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
-        {
-            a.translate(1, 0);
-            painter->drawText(a, flags, msg);
-        }
-
-        for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
-        {
-            a.translate(0, 1);
-            painter->drawText(a, flags, msg);
-        }
-
-        for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
-        {
-            a.translate(-1, 0);
-            painter->drawText(a, flags, msg);
-        }
-
-        for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
-        {
-            a.translate(0, -1);
-            painter->drawText(a, flags, msg);
-        }
-    }
-
-    painter->setPen(QPen(font.GetBrush(), 0));
-    painter->drawText(r, flags, msg);
-    painter->setOpacity(1.0);
-}
-
-void MythQtPainter::DrawRect(const QRect &area,
-                             bool drawFill, const QColor &fillColor, 
-                             bool drawLine, int lineWidth, const QColor &lineColor)
-{
-    if (drawLine)
-        painter->setPen(QPen(lineColor, lineWidth));
-    else
-        painter->setPen(QPen(Qt::NoPen));
-
-    if (drawFill)
-        painter->setBrush(QBrush(fillColor));
-    else
-        painter->setBrush(QBrush(Qt::NoBrush));
-
-    painter->drawRect(area);
-
-    painter->setBrush(QBrush(Qt::NoBrush));
-}
-
-void MythQtPainter::DrawRoundRect(const QRect &area, int radius, 
-                                  bool drawFill, const QColor &fillColor, 
-                                  bool drawLine, int lineWidth, const QColor &lineColor)
-{
-    painter->setRenderHint(QPainter::Antialiasing);
-
-    if (drawLine)
-        painter->setPen(QPen(lineColor, lineWidth));
-    else
-        painter->setPen(QPen(Qt::NoPen));
-
-    if (drawFill)
-        painter->setBrush(QBrush(fillColor));
-    else
-        painter->setBrush(QBrush(Qt::NoBrush));
-
-    if ((area.width() / 2) < radius)
-        radius = area.width() / 2;
-
-    if ((area.height() / 2) < radius)
-        radius = area.height() / 2;
-
-    QRectF r(area);
-    if (lineWidth > 0)
-        r.adjust(lineWidth / 2, lineWidth / 2, -lineWidth / 2, -lineWidth / 2);
-
-    painter->drawRoundedRect(r, (qreal)radius, (qreal)radius);
-
-    painter->setRenderHint(QPainter::Antialiasing, false);
-
-    painter->setBrush(QBrush(Qt::NoBrush));
-}
-
-MythImage *MythQtPainter::GetFormatImage()
-{
-    m_allocationLock.lock();
-    MythImage *result = new MythQtImage(this);
-    m_allocatedImages.append(result);
-    m_allocationLock.unlock();
-    return result;
+    return new MythQtImage(this);
 }
 
 void MythQtPainter::DeleteFormatImagePriv(MythImage *im)

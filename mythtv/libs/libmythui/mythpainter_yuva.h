@@ -14,23 +14,25 @@ class MUI_PUBLIC MythYUVAPainter : public MythQImagePainter
    ~MythYUVAPainter();
 
     QString GetName(void) { return QString("YUVA"); }
-    void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
-                   int alpha);
-    void DrawText(const QRect &dest, const QString &msg, int flags,
-                  const MythFontProperties &font, int alpha,
-                  const QRect &boundRect);
-    void DrawRect(const QRect &area, bool drawFill, const QColor &fillColor,
-                  bool drawLine, int lineWidth, const QColor &lineColor);
-    void DrawRoundRect(const QRect &area, int radius,
-                       bool drawFill, const QColor &fillColor,
-                       bool drawLine, int lineWidth, const QColor &lineColor);
+
+    virtual void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
+                           int alpha);
+    virtual void DrawText(const QRect &dest, const QString &msg, int flags,
+                          const MythFontProperties &font, int alpha,
+                          const QRect &boundRect);
+    virtual void DrawRect(const QRect &area, const QBrush &fillBrush,
+                          const QPen &linePen, int alpha);
+    virtual void DrawRoundRect(const QRect &area, int cornerRadius,
+                               const QBrush &fillBrush, const QPen &linePen,
+                               int alpha);
+    virtual void DrawEllipse(const QRect &area, const QBrush &fillBrush,
+                             const QPen &linePen, int alpha);
 
   protected:
     MythFontProperties* GetConvertedFont(const MythFontProperties &font);
 
     QMap<QString, MythFontProperties*> m_convertedFonts;
     std::list<QString> m_expireList;
-    int m_fontStretch;
 };
 
 #endif

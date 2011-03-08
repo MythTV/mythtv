@@ -39,10 +39,8 @@ MythUIGuideGrid::MythUIGuideGrid(MythUIType *parent, const QString &name)
     m_cutdown = true;
 
     m_selType = "box";
-    m_selLineColor = QColor();
-    m_selFillColor = QColor();
-    m_drawSelLine = false;
-    m_drawSelFill = false;
+    m_drawSelLine = QPen(Qt::NoPen);
+    m_drawSelFill = QBrush(Qt::NoBrush);
 
     for (uint x = 0; x < RECSTATUSSIZE; x++)
         m_recImages[x] = NULL;
@@ -130,22 +128,21 @@ bool MythUIGuideGrid::ParseElement(
 
         if (!lineColor.isEmpty())
         {
-            m_selLineColor = QColor(lineColor);
-            m_drawSelLine = true;
+            m_drawSelLine = QPen(QColor(lineColor));
+            m_drawSelLine.setWidth(2);
         }
         else
         {
-            m_drawSelLine = false;
+            m_drawSelLine = QPen(Qt::NoPen);
         }
 
         if (!fillColor.isEmpty())
         {
-            m_selFillColor = QColor(fillColor);
-            m_drawSelFill = true;
+            m_drawSelFill = QBrush(QColor(fillColor));
         }
         else
         {
-            m_drawSelFill = false;
+            m_drawSelFill = QBrush(Qt::NoBrush);
         }
    }
     else if (element.tagName() == "recordingcolor")
@@ -264,8 +261,6 @@ void MythUIGuideGrid::CopyFrom(MythUIType *base)
     m_solidColor = gg->m_solidColor;
 
     m_selType = gg->m_selType;
-    m_selLineColor = gg->m_selLineColor;
-    m_selFillColor = gg->m_selFillColor;
     m_drawSelLine = gg->m_drawSelLine;
     m_drawSelFill = gg->m_drawSelFill;
 
@@ -290,13 +285,6 @@ QColor MythUIGuideGrid::calcColor(const QColor &color, int alphaMod)
 {
     QColor newColor(color);
     newColor.setAlpha((int)(color.alpha() * (alphaMod / 255.0)));
-    return newColor;
-}
-
-QColor MythUIGuideGrid::calcColor(const QColor &color, int alpha, int alphaMod)
-{
-    QColor newColor(color);
-    newColor.setAlpha((int)(alpha * (alphaMod / 255.0)));
     return newColor;
 }
 
@@ -344,46 +332,42 @@ void MythUIGuideGrid::drawCurrent(MythPainter *p, UIGTCon *data, int alphaMod)
 
     if (m_selType == "roundbox")
     {
-        QColor fillColor = calcColor(m_selFillColor, alphaMod);
-        QColor lineColor = calcColor(m_selLineColor, alphaMod);
-
+        QPen pen = m_drawSelLine;
         if (status == 1)
-            lineColor = m_recordingColor;
+            pen.setColor(m_recordingColor);
         else if (status == 2)
-            lineColor = m_conflictingColor;
+            pen.setColor(m_conflictingColor);
 
-        p->DrawRoundRect(area, 10, m_drawSelFill, fillColor,
-                         m_drawSelLine, 2, lineColor);
+        p->DrawRoundRect(area, 10, m_drawSelFill, pen, alphaMod);
     }
     else if (m_selType == "highlight")
     {
-        QColor fillColor;
-        QColor lineColor = calcColor(m_selFillColor, alphaMod);
+        QBrush brush = m_drawSelFill;
+        QPen   pen   = m_drawSelLine;
 
         if (m_drawCategoryColors && data->categoryColor.isValid())
-            fillColor = calcColor(data->categoryColor, m_categoryAlpha, alphaMod);
+            brush.setColor(calcColor(data->categoryColor, m_categoryAlpha));
         else
-            fillColor = calcColor(m_solidColor, m_categoryAlpha, alphaMod);
+            brush.setColor(calcColor(m_solidColor, m_categoryAlpha));
 
         if (status == 1)
-            lineColor = m_recordingColor;
+            pen.setColor(m_recordingColor);
         else if (status == 2)
-            lineColor = m_conflictingColor;
+            pen.setColor(m_conflictingColor);
 
-        p->DrawRect(area, true, fillColor.lighter(), m_drawSelLine, 2, lineColor);
+        brush.setColor(brush.color().lighter());
+        p->DrawRect(area, brush, pen, alphaMod);
     }
     else
     {
         // default to "box" selection type
-        QColor fillColor = calcColor(m_selFillColor, alphaMod);
-        QColor lineColor = calcColor(m_selLineColor, alphaMod);
-
+        QPen pen = m_drawSelLine;
         if (status == 1)
-            lineColor = m_recordingColor;
+            pen.setColor(m_recordingColor);
         else if (status == 2)
-            lineColor = m_conflictingColor;
+            pen.setColor(m_conflictingColor);
 
-        p->DrawRect(area, m_drawSelFill, fillColor, m_drawSelLine, 2, lineColor);
+        p->DrawRect(area, m_drawSelFill, pen, alphaMod);
     }
 }
 
@@ -442,8 +426,8 @@ void MythUIGuideGrid::drawBox(MythPainter *p, UIGTCon *data, const QColor &color
     area.translate(m_Area.x(), m_Area.y());
     area.adjust(breakin, breakin, -breakin, -breakin);
 
-    QColor fillColor = calcColor(color, m_categoryAlpha, alphaMod);
-    p->DrawRect(area, true, fillColor, false, 0, QColor());
+    static const QPen nopen(Qt::NoPen);
+    p->DrawRect(area, QBrush(calcColor(color, m_categoryAlpha)), nopen, alphaMod);
 }
 
 void MythUIGuideGrid::drawBackground(MythPainter *p, UIGTCon *data, int alphaMod)
@@ -457,9 +441,9 @@ void MythUIGuideGrid::drawBackground(MythPainter *p, UIGTCon *data, int alphaMod
     QColor fillColor;
 
     if (m_drawCategoryColors && data->categoryColor.isValid())
-        fillColor = calcColor(data->categoryColor, m_categoryAlpha, alphaMod);
+        fillColor = calcColor(data->categoryColor, m_categoryAlpha);
     else
-        fillColor = calcColor(m_solidColor, m_categoryAlpha, alphaMod);
+        fillColor = calcColor(m_solidColor, m_categoryAlpha);
 
     if (m_verticalLayout)
     {
@@ -519,9 +503,10 @@ void MythUIGuideGrid::drawBackground(MythPainter *p, UIGTCon *data, int alphaMod
     if (area.height() <= 1)
         area.setHeight(2);
 
-    p->DrawRect(area, true, fillColor, false, 0, QColor());
+    static const QPen nopen(Qt::NoPen);
+    p->DrawRect(area, QBrush(fillColor), nopen, alphaMod);
     if (overArea.width() > 0)
-        p->DrawRect(overArea, true, overColor, false, 0, QColor());
+        p->DrawRect(overArea, QBrush(overColor), nopen, alphaMod);
 }
 
 void MythUIGuideGrid::drawText(MythPainter *p, UIGTCon *data, int alphaMod)

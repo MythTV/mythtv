@@ -3,6 +3,8 @@
 
 // QT
 #include <QPixmap>
+#include <QPen>
+#include <QBrush>
 
 // MythDB
 #include "mythuiexp.h"
@@ -101,8 +103,7 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     void drawRecType(MythPainter *p, UIGTCon *data, int alpaMod);
     void drawCurrent(MythPainter *p, UIGTCon *data, int alpaMod);
 
-    QColor calcColor(const QColor &color, int alpha, int alphaMod);
-    QColor calcColor(const QColor &color, int alphaMod);
+    QColor calcColor(const QColor &color, int alpha);
 
     QList<UIGTCon*> *allData;
     UIGTCon selectedItem;
@@ -122,10 +123,8 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     QColor m_solidColor;
 
     QString m_selType;
-    QColor  m_selLineColor;
-    QColor  m_selFillColor;
-    bool    m_drawSelLine;
-    bool    m_drawSelFill;
+    QPen    m_drawSelLine;
+    QBrush  m_drawSelFill;
 
     QColor m_recordingColor;
     QColor m_conflictingColor;
