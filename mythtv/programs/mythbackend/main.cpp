@@ -122,9 +122,7 @@ int main(int argc, char **argv)
     // such as socket notifications :[
     QApplication a(argc, argv);
 #endif
-
-    QFileInfo finfo(a.argv()[0]);
-    QString binname = finfo.baseName();
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHBACKEND);
 
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
@@ -162,15 +160,13 @@ int main(int argc, char **argv)
         return exitCode;
 
     {
-        QFileInfo sName( argv[0] );
         QString versionStr = QString("%1 version: %2 [%3] www.mythtv.org")
-            .arg(sName.baseName()).arg(MYTH_SOURCE_PATH)
+            .arg(MYTH_APPNAME_MYTHBACKEND).arg(MYTH_SOURCE_PATH)
             .arg(MYTH_SOURCE_VERSION);
         VERBOSE(VB_IMPORTANT, versionStr);
     }
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    gCoreContext->SetAppName(binname);
 
     if (cmdline.HasBackendCommand())
     {

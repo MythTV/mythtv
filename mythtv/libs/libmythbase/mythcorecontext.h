@@ -11,6 +11,20 @@
 #include "mythverbose.h"
 #include "mythlocale.h"
 
+#define MYTH_APPNAME_MYTHBACKEND "mythbackend"
+#define MYTH_APPNAME_MYTHJOBQUEUE "mythjobqueue"
+#define MYTH_APPNAME_MYTHFRONTEND "mythfrontend"
+#define MYTH_APPNAME_MYTHTV_SETUP "mythtv-setup"
+#define MYTH_APPNAME_MYTHFILLDATABASE "mythfilldatabase"
+#define MYTH_APPNAME_MYTHCOMMFLAG "mythcommflag"
+#define MYTH_APPNAME_MYTHPREVIEWGEN "mythpreviewgen"
+#define MYTH_APPNAME_MYTHTRANSCODE "mythtranscode"
+#define MYTH_APPNAME_MYTHWELCOME "mythwelcome"
+#define MYTH_APPNAME_MYTHSHUTDOWN "mythshutdown"
+#define MYTH_APPNAME_MYTHMESSAGE "mythmessage"
+#define MYTH_APPNAME_MYTHLCDSERVER "mythlcdserver"
+#define MYTH_APPNAME_MYTHAVTEST "mythavtest"
+
 class MDBManager;
 class MythCoreContextPrivate;
 class MythSocket;
@@ -45,9 +59,6 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
     virtual ~MythCoreContext();
 
     bool Init(void);
-
-    void    SetAppName(QString appName);
-    QString GetAppName(void);
 
     void SetLocalHostname(const QString &hostname);
     void SetServerSocket(MythSocket *serverSock);

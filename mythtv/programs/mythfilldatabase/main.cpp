@@ -87,8 +87,7 @@ int main(int argc, char *argv[])
     int sourceid = -1;
     QString fromddfile_lineupid;
 
-    QFileInfo finfo(a.argv()[0]);
-    QString binname = finfo.baseName();
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFILLDATABASE);
 
     myth_nice(19);
 
@@ -555,8 +554,6 @@ int main(int argc, char *argv[])
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
-
-    gCoreContext->SetAppName(binname);
 
     MythTranslation::load("mythfrontend");
 

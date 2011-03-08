@@ -50,7 +50,6 @@ class MythCoreContextPrivate : public QObject
     QObject         *m_GUIcontext;
     QObject         *m_GUIobject;
     QString          m_appBinaryVersion;
-    QString          m_appName;
 
     QMutex  m_hostnameLock;      ///< Locking for thread-safe copying of:
     QString m_localHostname;     ///< hostname from mysql.txt or gethostname()
@@ -185,16 +184,6 @@ MythCoreContext::~MythCoreContext()
 {
     delete d;
     d = NULL;
-}
-
-void MythCoreContext::SetAppName(QString appName)
-{
-    d->m_appName = appName;
-}
-
-QString MythCoreContext::GetAppName(void)
-{
-    return d->m_appName;
 }
 
 bool MythCoreContext::SetupCommandSocket(MythSocket *serverSock,

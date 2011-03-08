@@ -194,7 +194,7 @@ void MythDownloadManager::run(void)
     m_manager = new QNetworkAccessManager(this);
     m_diskCache = new QNetworkDiskCache(this);
     m_diskCache->setCacheDirectory(GetConfDir() + "/Cache-" +
-                                   gCoreContext->GetAppName() + "-" +
+                                   QCoreApplication::applicationName() + "-" +
                                    gCoreContext->GetHostName());
     m_manager->setCache(m_diskCache);
 

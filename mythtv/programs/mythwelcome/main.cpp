@@ -50,10 +50,8 @@ static void showUsage(const MythCommandLineParser &cmdlineparser)
     QString    help  = cmdlineparser.GetHelpString(false);
     QByteArray ahelp = help.toLocal8Bit();
 
-    QString binname = "mythwelcome";
-
     VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
-                            .arg(binname)
+                            .arg(MYTH_APPNAME_MYTHWELCOME)
                             .arg(MYTH_SOURCE_PATH)
                             .arg(MYTH_SOURCE_VERSION));
 
@@ -91,8 +89,7 @@ int main(int argc, char **argv)
 
     QApplication a(argc, argv);
 
-    QFileInfo finfo(a.argv()[0]);
-    QString binname = finfo.baseName();
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHWELCOME);
 
     // Check command line arguments
     for (int argpos = 1; argpos < a.argc(); ++argpos)
@@ -163,8 +160,6 @@ int main(int argc, char **argv)
                         "Exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
-
-    gCoreContext->SetAppName(binname);
 
     if (!MSqlQuery::testDBConnection())
     {

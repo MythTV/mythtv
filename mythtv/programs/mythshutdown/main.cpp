@@ -732,10 +732,8 @@ static int startup()
 
 static void showUsage()
 {
-    QString binname = "mythshutdown";
-
     VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
-                            .arg(binname)
+                            .arg(MYTH_APPNAME_MYTHSHUTDOWN)
                             .arg(MYTH_SOURCE_PATH)
                             .arg(MYTH_SOURCE_VERSION));
 
@@ -779,6 +777,8 @@ int main(int argc, char **argv)
     print_verbose_messages = VB_NONE;
 
     QCoreApplication a(argc, argv);
+
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHSHUTDOWN);
 
     bool bLockShutdown = false;
     bool bUnlockShutdown = false;

@@ -919,9 +919,7 @@ int main(int argc, char *argv[])
     QString newCutList = QString::null;
     QMap<QString, QString> settingsOverride;
 
-    QFileInfo finfo(a.argv()[0]);
-
-    QString binname = finfo.baseName();
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHCOMMFLAG);
 
     print_verbose_messages = VB_IMPORTANT;
     verboseString = "important";
@@ -1269,8 +1267,6 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
-    gCoreContext->SetAppName(binname);
-
     MythTranslation::load("mythfrontend");
 
     if (settingsOverride.size())
@@ -1379,7 +1375,7 @@ int main(int argc, char *argv[])
     if (!quiet)
     {
         VERBOSE(VB_IMPORTANT, QString("%1 version: %2 www.mythtv.org")
-                                .arg(binname).arg(MYTH_BINARY_VERSION));
+                  .arg(MYTH_APPNAME_MYTHCOMMFLAG).arg(MYTH_BINARY_VERSION));
 
         VERBOSE(VB_IMPORTANT, QString("Enabled verbose msgs: %1").arg(verboseString));
 

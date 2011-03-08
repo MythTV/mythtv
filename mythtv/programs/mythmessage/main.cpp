@@ -45,6 +45,8 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
+    QCoreApplication::setApplicationName("mythmessage");
+
     QHostAddress address = QHostAddress::Broadcast;
     unsigned short port = 6948;
 
