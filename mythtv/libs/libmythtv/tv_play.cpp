@@ -10582,7 +10582,7 @@ void TV::FillOSDMenuJumpRec(PlayerContext* ctx, const QString category,
 
         QMutexLocker locker(&progListsLock);
         progLists.clear();
-        vector<ProgramInfo*> *infoList = RemoteGetRecordedList(false);
+        vector<ProgramInfo*> *infoList = RemoteGetRecordedList(0);
         bool LiveTVInAllPrograms = gCoreContext->GetNumSetting("LiveTVInAllPrograms",0);
         if (infoList)
         {

@@ -189,7 +189,7 @@ class MythBE( FileOps ):
         """
         Returns a list of all Program objects which have already recorded
         """
-        return self._getSortedPrograms('QUERY_RECORDINGS Play')
+        return self._getSortedPrograms('QUERY_RECORDINGS Ascending')
 
     def getExpiring(self):
         """

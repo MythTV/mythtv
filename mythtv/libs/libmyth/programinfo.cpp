@@ -4277,13 +4277,28 @@ bool LoadFromOldRecorded(
     return true;
 }
 
+/** \fn ProgramInfo::LoadFromRecorded(void)
+ *  \brief Load a ProgramList from the recorded table.
+ *  \param destination     ProgramList to fill
+ *  \param possiblyInProgressRecordingsOnly  return only in-progress
+ *                                           recordings or empty list
+ *  \param inUseMap        in-use programs map
+ *  \param isJobRunning    job map
+ *  \param recMap          recording map
+ *  \param sort            sort order, negative for descending, 0 for
+ *                         unsorted, positive for ascending
+ *  \return true if it succeeds, false if it fails.
+ *  \sa QueryInUseMap(void)
+ *      QueryJobsRunning(int)
+ *      Scheduler::GetRecording()
+ */
 bool LoadFromRecorded(
     ProgramList &destination,
     bool possiblyInProgressRecordingsOnly,
     const QMap<QString,uint32_t> &inUseMap,
     const QMap<QString,bool> &isJobRunning,
     const QMap<QString, ProgramInfo*> &recMap,
-    bool sortDescending)
+    int sort)
 {
     destination.clear();
 
@@ -4297,8 +4312,9 @@ bool LoadFromRecorded(
     if (possiblyInProgressRecordingsOnly)
         thequery += "WHERE r.endtime >= NOW() AND r.starttime <= NOW() ";
 
-    thequery += "ORDER BY r.starttime ";
-    if (sortDescending)
+    if (sort)
+        thequery += "ORDER BY r.starttime ";
+    if (sort < 0)
         thequery += "DESC ";
 
     MSqlQuery query(MSqlQuery::InitCon());

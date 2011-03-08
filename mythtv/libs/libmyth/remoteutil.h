@@ -30,7 +30,7 @@ class MPUBLIC FileSystemInfo
     int weight;
 };
 
-MPUBLIC vector<ProgramInfo *> *RemoteGetRecordedList(bool deltype);
+MPUBLIC vector<ProgramInfo *> *RemoteGetRecordedList(int sort);
 MPUBLIC vector<FileSystemInfo> RemoteGetFreeSpace(void);
 MPUBLIC bool RemoteGetLoad(float load[3]);
 MPUBLIC bool RemoteGetUptime(time_t &uptime);

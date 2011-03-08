@@ -70,7 +70,7 @@ EOF
     my $myth = new MythTV();
 
 # Load all of the recordings
-    my %rows = $myth->backend_rows('QUERY_RECORDINGS Delete');
+    my %rows = $myth->backend_rows('QUERY_RECORDINGS Descending');
 
 # Parse each recording, and delete anything in the "Deleted" recgroup
     my $i = 0;
