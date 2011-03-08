@@ -200,7 +200,7 @@
     </message>
     <message>
         <source>Delete ALL channels?</source>
-        <translation>Poista kaikki kanvat?</translation>
+        <translation>Poista kaikki kanavat?</translation>
     </message>
     <message>
         <source>Delete all unassigned channels?</source>
@@ -212,7 +212,7 @@
     </message>
     <message>
         <source>Icon Import Options</source>
-        <translation>Kanavalogojen tuonnin asetukstet</translation>
+        <translation>Kanavalogojen tuonnin asetukset</translation>
     </message>
     <message>
         <source>Download all icons...</source>
@@ -8855,7 +8855,7 @@ Useimmat DVB-S transponderit lähettävät 27.5 miljoonaa symbolia sekunnissa.</
     </message>
     <message>
         <source>(Delete all capture cards on %1)</source>
-        <translation>(Poista 1%:n kaikki TV-kortit)</translation>
+        <translation>(Poista kaikki TV-kortit palvelimelta %1)</translation>
     </message>
     <message>
         <source>This is updated on every successful channel change.</source>
@@ -9244,7 +9244,7 @@ Useimmat DVB-S transponderit lähettävät 27.5 miljoonaa symbolia sekunnissa.</
     </message>
     <message>
         <source>Recording Groups</source>
-        <translation>Nauoitusryhmät</translation>
+        <translation>Tallennusryhmät</translation>
     </message>
     <message>
         <source>Recording Type Priority Settings</source>
@@ -9357,7 +9357,7 @@ Useimmat DVB-S transponderit lähettävät 27.5 miljoonaa symbolia sekunnissa.</
     </message>
     <message>
         <source>This is the format to use to display the date. See http://doc.trolltech.com/3.3/qdate.html#toString for a list of valid format specifiers.</source>
-        <translation>Tämä on muoto, jolla aika näytetään. Katso http://doc.trolltech.com/3.3/qdate.html#toString mähdäksesi listan mahdollisista muotovaihtoehdoista.</translation>
+        <translation>Tämä on muoto, jolla aika näytetään. Katso http://doc.trolltech.com/3.3/qdate.html#toString nähdäksesi listan mahdollisista muotovaihtoehdoista.</translation>
     </message>
     <message>
         <source>Command to Set Wakeup Time</source>
@@ -9410,7 +9410,7 @@ Useimmat DVB-S transponderit lähettävät 27.5 miljoonaa symbolia sekunnissa.</
     </message>
     <message>
         <source>No grabber</source>
-        <translation>E itarttujaa</translation>
+        <translation>Ei kaappaajaa</translation>
     </message>
     <message>
         <source>Loading...</source>
@@ -10014,7 +10014,7 @@ Käytä Eject-nappia aseman alareunassa.</translation>
     </message>
     <message>
         <source>Audio Capabilities</source>
-        <translation>Audio ominaisuudet</translation>
+        <translation type="obsolete">Audio ominaisuudet</translation>
     </message>
     <message>
         <source> is invalid or not useable.</source>
@@ -10026,23 +10026,19 @@ Käytä Eject-nappia aseman alareunassa.</translation>
     </message>
     <message>
         <source>No digital passthrough</source>
-        <translation>Ei digitaalista läpivientiä</translation>
-    </message>
-    <message>
-        <source>LPCM</source>
-        <translation></translation>
+        <translation type="obsolete">Ei digitaalista läpivientiä</translation>
     </message>
     <message>
         <source>Enable if your amplifier or TV supports multi-channel LPCM. If unchecked Dolby Digital support is required for multi-channel audio</source>
-        <translation>Valitse jos vahvistimesi tai TV tukee monikanavaista LPCM :ää. Jos et valitse, monikanavaäänelle vaaditaan Dolby Digital tuki</translation>
+        <translation type="obsolete">Valitse jos vahvistimesi tai TV tukee monikanavaista LPCM :ää. Jos et valitse, monikanavaäänelle vaaditaan Dolby Digital tuki</translation>
     </message>
     <message>
         <source>Analog or LPCM</source>
-        <translation>Analooginen tai LPCM</translation>
+        <translation type="obsolete">Analooginen tai LPCM</translation>
     </message>
     <message>
         <source>Enable if analog output or if your amplifier or TV supports multi-channel LPCM. If unchecked with digital output, Dolby Digital support is required for multi-channel audio</source>
-        <translation>Valitse jos analooginen ulostulo, tai vahvistimesi tai TV tukee monikanavaista LPCM :ää. Jos et valitse ja käytössä on digitaalinen ulostulo, monikanavaäänelle vaaditaan Dolby Digital tuki</translation>
+        <translation type="obsolete">Valitse jos analooginen ulostulo, tai vahvistimesi tai TV tukee monikanavaista LPCM :ää. Jos et valitse ja käytössä on digitaalinen ulostulo, monikanavaäänelle vaaditaan Dolby Digital tuki</translation>
     </message>
     <message>
         <source>7.1</source>
@@ -10067,6 +10063,14 @@ Käytä Eject-nappia aseman alareunassa.</translation>
     <message>
         <source>Set the audio surround-upconversion quality.</source>
         <translation>Aseta tilaääneksi muunnoksen laatu.</translation>
+    </message>
+    <message>
+        <source>Stereo PCM Only</source>
+        <translation>Vain stereo PCM</translation>
+    </message>
+    <message>
+        <source>Enable if your amplifier or sound decoder only supports 2 channels PCM (typically an old HDMI 1.0 device). Multi-channels audio will be re-encoded to AC3 when required</source>
+        <translation>Valitse jos vahvistimesi tai muu äänilaitteesi tukee vain 2 kanavaista PCM:ää (yleensä vanha HDMI 1.0 laite). Monikanavaäänet muunnetaan AC3:ksi tarpeen mukaan.</translation>
     </message>
     <message>
         <source>Advanced audio configuration</source>
@@ -11351,6 +11355,10 @@ ei voi olla tyhjä.</translation>
     <message>
         <source>Scan for available audio devices. Custom entry will be scanned and capability entries populated.</source>
         <translation>Etsi käytettävissä olevia audiolaitteita. Laite skannataan ja kerätään tiedot sen ominaisuuksista.</translation>
+    </message>
+    <message>
+        <source>Digital Audio Capabilities</source>
+        <translation>Digitaalisen audion ominaisuudet</translation>
     </message>
     <message>
         <source>Enable if your amplifier or sound decoder supports AC3/Dolby Digital. You must use a digital connection. Uncheck if using an analog connection.</source>
@@ -13391,11 +13399,11 @@ Valitse nykyinen tallennus</translation>
     </message>
     <message>
         <source>Open Live TV PIP</source>
-        <translation>Käynnistä  Kuva kuvassa -toiminto Katso televisiossa -tilassa</translation>
+        <translation>Käynnistä Kuva kuvassa -toiminto Katso televisiota -tilassa</translation>
     </message>
     <message>
         <source>Open Live TV PBP</source>
-        <translation>Käynnistä  Kuvsta kuvaan -toiminto Katso televisiossa -tilassa</translation>
+        <translation>Käynnistä Kuvasta kuvaan -toiminto Katso televisiota -tilassa</translation>
     </message>
     <message>
         <source>Open Recording PIP</source>

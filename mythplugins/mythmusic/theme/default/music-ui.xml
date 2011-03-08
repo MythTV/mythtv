@@ -1495,17 +1495,17 @@
         </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>170,15,415,34</area>
+            <area>170,15,400,34</area>
             <font>baselarge</font>
         </textarea>
 
         <textarea name="artist" from="basetextarea">
-            <area>170,50,415,27</area>
+            <area>170,50,400,27</area>
             <font>basemedium</font>
         </textarea>
 
         <textarea name="album" from="basetextarea">
-            <area>170,77,415,27</area>
+            <area>170,77,400,27</area>
             <font>basemedium</font>
         </textarea>
 
@@ -1513,7 +1513,7 @@
         </statetype>
 
         <textarea name="info" from="basetextarea">
-            <area>170,125,250,25</area>
+            <area>170,125,200,25</area>
         </textarea>
 
         <textarea name="time" from="basetextarea">
@@ -1537,6 +1537,171 @@
                 <filename>mm_progress-fg.png</filename>
             </imagetype>
         </progressbar>
+    </window>
+
+    <window name="volume_popup">
+        <area>-1,-1,620,165</area>
+        <imagetype name="backimg">
+            <area>0,0,620,165</area>
+            <filename>mythprogressdialog-background.png</filename>
+        </imagetype>
+
+        <textarea name="message" from="basetextarea">
+            <area>20,20,540,60</area>
+            <multiline>yes</multiline>
+            <align>allcenter</align>
+            <value>Volume</value>
+        </textarea>
+
+        <statetype name="mute_state">
+            <position>20,90</position>
+            <state name="off">
+                <imagetype name="statusimage">
+                    <filename>mm_volume.png</filename>
+                </imagetype>
+            </state>
+            <state name="on">
+                <imagetype name="statusimage">
+                    <filename>mm_volume_muted.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+
+        <progressbar name="volume_progress" from="baseprogressbar">
+            <position>60,80</position>
+        </progressbar>
+
+        <textarea name="volume_text" from="basetextarea">
+            <area>70,120,300,30</area>
+            <align>left,top</align>
+            <value>0%</value>
+        </textarea>
+    </window>
+
+    <window name="trackdetail_popup">
+        <area>-1,-1,800,600</area>
+
+        <shape name="background" from="basebackground">
+            <area>0,0,800,600</area>
+            <type>roundbox</type>
+            <fill color="#303030" alpha="255" />
+            <line color="#FFFFFF" alpha="255" width="2" />
+            <cornerradius>12</cornerradius>
+        </shape>
+
+        <imagetype name="coverart">
+            <area>10,100,180,180</area>
+            <filename>mm_nothumb.png</filename>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
+
+        <textarea name="titlelbl" from="basetextarea">
+            <area>170,50,150,35</area>
+            <font>basemediumyellow</font>
+            <value>Title:</value>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="title" from="basetextarea">
+            <area>330,50,460,35</area>
+            <font>basemedium</font>
+        </textarea>
+
+        <textarea name="artistlbl" from="titlelbl">
+            <area>200,100,120,35</area>
+            <value>Artist:</value>
+        </textarea>
+
+        <textarea name="artist" from="title">
+            <area>330,100,460,35</area>
+        </textarea>
+
+        <textarea name="albumlbl" from="titlelbl">
+            <area>195,150,125,35</area>
+            <value>Album:</value>
+        </textarea>
+
+        <textarea name="album" from="title">
+            <area>330,150,460,35</area>
+        </textarea>
+
+        <textarea name="genrelbl" from="titlelbl">
+            <area>195,250,125,35</area>
+            <value>Genre:</value>
+        </textarea>
+
+        <textarea name="genre" from="title">
+            <area>330,250,460,35</area>
+        </textarea>
+
+        <textarea name="tracknumlbl" from="titlelbl">
+            <area>480,200,150,35</area>
+            <value>Track No.:</value>
+        </textarea>
+
+        <textarea name="tracknum" from="title">
+            <area>640,200,100,35</area>
+        </textarea>
+
+        <textarea name="lenlbl" from="titlelbl">
+            <area>195,200,125,35</area>
+            <value>Length:</value>
+        </textarea>
+
+        <textarea name="length" from="title">
+            <area>330,200,140,35</area>
+        </textarea>
+
+        <textarea name="yearlbl" from="titlelbl">
+            <area>170,300,150,35</area>
+            <value>Year:</value>
+        </textarea>
+
+        <textarea name="year" from="title">
+            <area>330,300,80,35</area>
+        </textarea>
+
+        <textarea name="ratinglbl" from="titlelbl">
+            <area>170,350,150,35</area>
+            <align>right,top</align>
+            <value>Rating:</value>
+        </textarea>
+
+        <statetype name="rating_state" from="baseratingstate">
+            <position>330,355</position>
+        </statetype>
+
+        <textarea name="lastplaylbl" from="titlelbl">
+            <area>110,400,210,35</area>
+            <value>Last Played:</value>
+        </textarea>
+
+        <textarea name="lastplayed" from="title">
+            <area>330,400,460,35</area>
+            <value>Last Value</value>
+        </textarea>
+
+        <textarea name="playcountlbl" from="titlelbl">
+            <area>170,450,150,35</area>
+            <value>Played:</value>
+        </textarea>
+
+        <textarea name="playcount" from="title">
+            <area>330,450,460,35</area>
+            <template>%playcount% times</template>
+        </textarea>
+
+        <textarea name="filenamelbl" from="titlelbl">
+            <area>170,500,150,35</area>
+            <value>Filename:</value>
+        </textarea>
+
+        <textarea name="filename" from="title">
+            <area>330,505,460,90</area>
+            <font>basesmall</font>
+            <multiline>yes</multiline>
+        </textarea>
+
     </window>
 
 </mythuitheme>
