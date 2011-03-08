@@ -4125,7 +4125,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         // calc for next frame
         lastapts += (long long)
             ((double)(data_size * 1000) /
-             (ctx->sample_rate * ctx->channels *
+             (ctx->sample_rate * (audioOut.do_passthru ?  2 : ctx->channels) *
               av_get_bits_per_sample_format(ctx->sample_fmt)>>3));
 
         VERBOSE(VB_PLAYBACK+VB_TIMESTAMP,

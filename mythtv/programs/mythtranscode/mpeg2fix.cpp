@@ -836,7 +836,7 @@ void MPEG2fixup::AddSequence(MPEG2frame *frame1, MPEG2frame *frame2)
     }
 }
 
-bool MPEG2fixup::ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec)
+int MPEG2fixup::ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec)
 {
     int state = -1;
     int last_pos = 0;

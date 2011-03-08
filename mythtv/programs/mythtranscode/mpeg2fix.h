@@ -172,7 +172,7 @@ class MPEG2fixup
     int AddFrame(MPEG2frame *f);
     int InitAV(const char *inputfile, const char *type, int64_t offset);
     void ScanAudio();
-    bool ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec);
+    int ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec);
     void WriteFrame(const char *filename, MPEG2frame *f);
     void WriteFrame(const char *filename, AVPacket *pkt);
     void WriteYUV(const char *filename, const mpeg2_info_t *info);
