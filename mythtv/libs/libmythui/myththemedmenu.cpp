@@ -242,9 +242,9 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
                     QCoreApplication::exit();
                 }
             }
-            else if ((action == "EXIT" || QObject::tr("MythTV Setup") ==
-                      GetMythMainWindow()->windowTitle()) &&
-                     lastScreen)
+            else if ((action == "EXIT" || (action == "ESCAPE" &&
+                      (QCoreApplication::applicationName() ==
+                        MYTH_APPNAME_MYTHTV_SETUP))) && lastScreen)
             {
                 if (callbacks)
                     m_state->m_callback(m_state->m_callbackdata, selExit);
