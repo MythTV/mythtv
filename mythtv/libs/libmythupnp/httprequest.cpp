@@ -1106,6 +1106,8 @@ void HTTPRequest::ProcessRequestLine( const QString &sLine )
             //m_sBaseUrl = tokens[1].section( '?', 0, 0).trimmed();
             m_sBaseUrl = (QUrl::fromPercentEncoding(tokens[1].toUtf8())).section( '?', 0, 0).trimmed();
 
+            m_sResourceUrl = m_sBaseUrl;  // Save complete url without paramaters
+
             // Process any Query String Parameters
 
             //QString sQueryStr = tokens[1].section( '?', 1, 1   );

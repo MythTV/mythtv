@@ -117,6 +117,7 @@ class UPNP_PUBLIC HTTPRequest
         QString             m_sRawRequest;
 
         QString             m_sBaseUrl;
+        QString             m_sResourceUrl;
         QString             m_sMethod;
 
         QStringMap          m_mapParams;
