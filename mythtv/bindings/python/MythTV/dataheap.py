@@ -588,6 +588,25 @@ class Guide( DBData, CMPRecord ):
                 raw.append(None)
         return cls.fromRaw(raw, db)
 
+    @classmethod
+    def fromJSON(cls, prog, db=None):
+        dat = {}
+        for key in ('ChanId','Title','SubTitle','Category'):
+            dat[key.lower()] = prog[key]
+        for key,key2 in (('CatType', 'category_type'),):
+            dat[key2] = prog[key]
+        for key in ('StartTime', 'EndTime'):
+            dat[key.lower()] = datetime.fromIso(prog[key])
+        dat['airdate'] = dat['starttime'].year
+
+        raw = []
+        for key in db.tablefields[cls._table]:
+            if key in dat:
+                raw.append(dat[key])
+            else:
+                raw.append(None)
+        return cls.fromRaw(raw, db)
+
 #### MYTHVIDEO ####
 
 class Video( VideoSchema, DBDataWrite, CMPVideo ):

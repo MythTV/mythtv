@@ -663,3 +663,22 @@ class ParseSet( ParseEnum ):
 
     def keys(self):
         return self._enum.keys()
+
+def CopyData(dfrom, dto, keys, lower=False):
+    def copystraight(dfrom, dto, key): dto[key] = dfrom[key]
+    def copylower(dfrom, dto, key): dto[key.lower()] = dfrom[key]
+
+    copydata = copystraight
+    if lower: copydata = copylower
+
+    for key in keys:
+        if key in dfrom:
+            copydata(dfrom, dto, key)
+
+def CopyData2(dfrom, dto, keys):
+    if hasattr(keys, 'items'):
+        keys = keys.items()
+
+    for key,key2 in keys:
+        if key in dfrom:
+            dto[key2] = dfrom[key]
