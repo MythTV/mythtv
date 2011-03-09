@@ -61,7 +61,7 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
         virtual QFileInfo*          GetAlbumArt         ( int Id, int Width, int Height ) = 0;
 
         virtual QFileInfo*          GetPreviewImage     ( int              ChanId,
-                                                          const QDateTime &tStartTime,
+                                                          const QDateTime &StartTime,
                                                           int              Width,    
                                                           int              Height,   
                                                           int              SecsIn ) = 0;
