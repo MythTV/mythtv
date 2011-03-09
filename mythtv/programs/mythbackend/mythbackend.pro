@@ -21,7 +21,7 @@ QMAKE_CLEAN += $(TARGET)
 HEADERS += autoexpire.h encoderlink.h filetransfer.h httpstatus.h mainserver.h
 HEADERS += playbacksock.h scheduler.h server.h housekeeper.h backendutil.h
 HEADERS += upnpcdstv.h upnpcdsmusic.h upnpcdsvideo.h mediaserver.h
-HEADERS += mythxml.h main_helpers.h backendcontext.h
+HEADERS += internetContent.h main_helpers.h backendcontext.h
 
 HEADERS += serviceHosts/mythServiceHost.h    serviceHosts/guideServiceHost.h
 HEADERS += serviceHosts/contentServiceHost.h serviceHosts/dvrServiceHost.h
@@ -33,7 +33,7 @@ SOURCES += autoexpire.cpp encoderlink.cpp filetransfer.cpp httpstatus.cpp
 SOURCES += main.cpp mainserver.cpp playbacksock.cpp scheduler.cpp server.cpp
 SOURCES += housekeeper.cpp backendutil.cpp
 SOURCES += upnpcdstv.cpp upnpcdsmusic.cpp upnpcdsvideo.cpp mediaserver.cpp
-SOURCES += mythxml.cpp main_helpers.cpp backendcontext.cpp
+SOURCES += internetContent.cpp main_helpers.cpp backendcontext.cpp
 
 SOURCES += services/myth.cpp services/guide.cpp services/content.cpp 
 SOURCES += services/dvr.cpp
