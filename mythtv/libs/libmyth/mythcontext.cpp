@@ -476,7 +476,7 @@ void MythContextPrivate::LoadDatabaseSettings(void)
         m_DBparams.wolEnabled    = false;
         m_DBparams.wolReconnect  = 0;
         m_DBparams.wolRetry      = 5;
-        m_DBparams.wolCommand    = "echo 'WOLsqlServerCommand not set'";
+        m_DBparams.wolCommand    = "echo 'WOLsqlCommand not set'";
         gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
     }
 
@@ -635,7 +635,7 @@ bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
     if (params.wolEnabled)
         s << "WOLsqlCommand=" << params.wolCommand << endl;
     else
-        s << "#WOLsqlCommand=echo 'WOLsqlServerCommand not set'\n";
+        s << "#WOLsqlCommand=echo 'WOLsqlCommand not set'\n";
 
     f->close();
     return true;
