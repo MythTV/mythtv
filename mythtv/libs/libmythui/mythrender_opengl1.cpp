@@ -280,7 +280,8 @@ void MythRenderOpenGL1::SetMatrixView(void)
 {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0, m_viewport.width(), m_viewport.height(), 0, 1, -1);
+    glOrtho(m_viewport.left(), m_viewport.left() + m_viewport.width(),
+            m_viewport.top() + m_viewport.height(), m_viewport.top(), 1, -1);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }

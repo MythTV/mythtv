@@ -113,7 +113,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     uint  GetFeatures(void)          { return m_exts_used;    }
 
     void  MoveResizeWindow(const QRect &rect);
-    void  SetViewPort(const QSize &size);
+    void  SetViewPort(const QRect &rect);
     void  Flush(bool use_fence);
     void  SetBlend(bool enable);
     virtual void SetColor(int r, int g, int b, int a) { }
@@ -214,7 +214,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     int      m_default_texture_type;
 
     // State
-    QSize    m_viewport;
+    QRect    m_viewport;
     int      m_active_tex;
     int      m_active_tex_type;
     int      m_active_fb;

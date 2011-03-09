@@ -107,15 +107,15 @@ void MythRenderOpenGL::MoveResizeWindow(const QRect &rect)
         parent->setGeometry(rect);
 }
 
-void MythRenderOpenGL::SetViewPort(const QSize &size)
+void MythRenderOpenGL::SetViewPort(const QRect &rect)
 {
-    if (size.width() == m_viewport.width() &&
-        size.height() == m_viewport.height())
+    if (rect == m_viewport)
         return;
 
     makeCurrent();
-    m_viewport = size;
-    glViewport(0, 0, m_viewport.width(), m_viewport.height());
+    m_viewport = rect;
+    glViewport(m_viewport.left(), m_viewport.top(),
+               m_viewport.width(), m_viewport.height());
     SetMatrixView();
     doneCurrent();
 }
@@ -476,7 +476,7 @@ bool MythRenderOpenGL::CreateFrameBuffer(uint &fb, uint tex)
     glCheck();
 
     EnableTextures(tex);
-    QSize tmp_viewport = m_viewport;
+    QRect tmp_viewport = m_viewport;
     glViewport(0, 0, size.width(), size.height());
     m_glGenFramebuffers(1, &glfb);
     m_glBindFramebuffer(GL_FRAMEBUFFER, glfb);
@@ -490,7 +490,8 @@ bool MythRenderOpenGL::CreateFrameBuffer(uint &fb, uint tex)
     GLenum status;
     status = m_glCheckFramebufferStatus(GL_FRAMEBUFFER);
     m_glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, tmp_viewport.width(), tmp_viewport.height());
+    glViewport(tmp_viewport.left(), tmp_viewport.top(),
+               tmp_viewport.width(), tmp_viewport.height());
 
     bool success = false;
     switch (status)
@@ -876,7 +877,7 @@ void MythRenderOpenGL::ResetVars(void)
     m_max_units       = 0;
     m_default_texture_type = GL_TEXTURE_2D;
 
-    m_viewport        = QSize();
+    m_viewport        = QRect();
     m_active_tex      = 0;
     m_active_tex_type = 0;
     m_active_fb       = 0;

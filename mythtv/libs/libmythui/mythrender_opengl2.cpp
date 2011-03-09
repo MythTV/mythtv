@@ -581,16 +581,18 @@ void MythRenderOpenGL2::DeleteOpenGLResources(void)
 
 void MythRenderOpenGL2::SetMatrixView(void)
 {
-    float right = m_viewport.width();
-    float bottom = m_viewport.height();
+    float left   = m_viewport.left();
+    float top    = m_viewport.top();
+    float right  = left + m_viewport.width();
+    float bottom = top + m_viewport.height();
     memset(m_projection, 0, sizeof(m_projection));
     if (right <= 0 || bottom <= 0)
         return;
-    m_projection[0][0] = 2.0 / right;
-    m_projection[1][1] = 2.0 / -bottom;
+    m_projection[0][0] = 2.0 / (right - left);
+    m_projection[1][1] = 2.0 / (top - bottom);
     m_projection[2][2] = 1.0;
-    m_projection[3][0] = -1.0;
-    m_projection[3][1] = 1.0;
+    m_projection[3][0] = -((right + left) / (right - left));
+    m_projection[3][1] = -((top + bottom) / (top - bottom));
     m_projection[3][3] = 1.0;
 }
 

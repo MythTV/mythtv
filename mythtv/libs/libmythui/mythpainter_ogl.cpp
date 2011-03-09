@@ -100,7 +100,7 @@ void MythOpenGLPainter::Begin(QPaintDevice *parent)
     if (target || swapControl)
     {
         realRender->BindFramebuffer(target);
-        realRender->SetViewPort(QSize(realParent->width(), realParent->height()));
+        realRender->SetViewPort(QRect(0, 0, realParent->width(), realParent->height()));
         realRender->SetColor(255, 255, 255, 255);
         realRender->SetBackground(0, 0, 0, 0);
         realRender->ClearFramebuffer();
