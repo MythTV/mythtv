@@ -6,6 +6,7 @@ TEMPLATE = subdirs
 SUBDIRS += libmythsamplerate
 SUBDIRS += libmythsoundtouch libmythdvdnav
 SUBDIRS += libmythbluray libmythfreesurround libmythbase
+SUBDIRS += libmythservicecontracts
 
 using_mheg:SUBDIRS += libmythfreemheg
 using_live:SUBDIRS += libmythlivemedia
@@ -20,6 +21,7 @@ libmythui.depends = libmythbase
 libmythupnp.depends = libmythbase
 libmyth.depends =  libmythbase libmythui libmythupnp
 libmyth.depends += libmythsamplerate libmythsoundtouch libmythfreesurround
+libmythupnp.depends = libmythbase libmythservicecontracts
 
 LIBMYTHTVDEPS = $$SUBDIRS
 

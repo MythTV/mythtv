@@ -32,33 +32,9 @@ typedef enum
     MXML_Unknown                =  0,
     MXML_GetServiceDescription  =  1,
 
-    MXML_GetProgramGuide        =  2,
-    MXML_GetHosts               =  3,
-    MXML_GetKeys                =  4,
-    MXML_GetSetting             =  5,
-    MXML_PutSetting             =  6,
-
-    MXML_GetChannelIcon         =  7,
-    MXML_GetRecorded            =  8,
-    MXML_GetPreviewImage        =  9,
-
-    MXML_GetRecording           = 10,
-    MXML_GetMusic               = 11,
-
-    MXML_GetExpiring            = 12,
-    MXML_GetProgramDetails      = 13,
-    MXML_GetVideo               = 14,
-
-    MXML_GetConnectionInfo      = 15,
-    MXML_GetAlbumArt            = 16,
-    MXML_GetVideoArt            = 17,
     MXML_GetInternetSearch      = 18,
     MXML_GetInternetSources     = 19,
     MXML_GetInternetContent     = 20,
-
-    MXML_GetFile                = 21,
-    MXML_GetFileList            = 22,
-    MXML_GetFileLinks           = 23,
 
 } MythXMLMethod;
 
@@ -93,45 +69,11 @@ class MythXML : public Eventing
 
         MythXMLMethod GetMethod( const QString &sURI );
 
-        void    GetProgramGuide( HTTPRequest *pRequest );
-        void    GetProgramDetails( HTTPRequest *pRequest );
-
-        void    GetHosts       ( HTTPRequest *pRequest );
-        void    GetKeys        ( HTTPRequest *pRequest );
-        void    GetSetting     ( HTTPRequest *pRequest );
-        void    PutSetting     ( HTTPRequest *pRequest );
-
-        void    GetChannelIcon ( HTTPRequest *pRequest );
-        void    GetRecorded    ( HTTPRequest *pRequest );
-        void    GetPreviewImage( HTTPRequest *pRequest );
-
-        void    GetConnectionInfo( HTTPRequest *pRequest );
-        void    GetAlbumArt    ( HTTPRequest *pRequest );
-        void    GetVideoArt    ( HTTPRequest *pRequest );
-
-        void    GetExpiring    ( HTTPRequest *pRequest );
-
-        void    GetFile        ( HttpWorkerThread *pThread,
-                                 HTTPRequest      *pRequest );
-        void    GetFileList    ( HttpWorkerThread *pThread,
-                                 HTTPRequest      *pRequest,
-                                 bool              bShowLinks );
-
-        void    GetRecording   ( HttpWorkerThread *pThread,
-                                 HTTPRequest      *pRequest );
-
-        void    GetMusic       ( HttpWorkerThread *pThread,
-                                 HTTPRequest      *pRequest );
-
-        void    GetVideo       ( HttpWorkerThread *pThread,
-                                 HTTPRequest      *pRequest );
-
         void    GetInternetSearch( HTTPRequest *pRequest );
         void    GetInternetSources( HTTPRequest *pRequest );
         void    GetInternetContent( HTTPRequest *pRequest );
 
         void    GetDeviceDesc  ( HTTPRequest *pRequest );
-        void    GetFile        ( HTTPRequest *pRequest, QString sFileName );
 
     public:
                  MythXML( UPnpDevice *pDevice , const QString &sSharePath);

@@ -25,6 +25,7 @@
 # undef CreateFont
 # undef DeleteFile
 # undef GetCurrentTime
+# undef SetJob
 
 #ifndef _MSC_VER
 # include <winsock2.h>

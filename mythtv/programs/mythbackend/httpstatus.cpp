@@ -128,7 +128,9 @@ void HttpStatus::GetStatusXML( HTTPRequest *pRequest )
 
     pRequest->m_eResponseType   = ResponseTypeXML;
     pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
-    pRequest->m_response << doc.toString();
+
+    QTextStream stream( &pRequest->m_response );
+    stream << doc.toString();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -144,7 +146,8 @@ void HttpStatus::GetStatusHTML( HTTPRequest *pRequest )
 
     FillStatusXML( &doc );
 
-    PrintStatus( pRequest->m_response, &doc );
+    QTextStream stream( &pRequest->m_response );
+    PrintStatus( stream, &doc );
 }
 
 void HttpStatus::FillStatusXML( QDomDocument *pDoc )

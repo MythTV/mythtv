@@ -34,6 +34,8 @@ DEPENDPATH  += ../libmythlivemedia/liveMedia
 DEPENDPATH  += ../libmythlivemedia/UsageEnvironment/include
 DEPENDPATH  += ../libmythlivemedia/UsageEnvironment
 DEPENDPATH  += ../libmythbase ../libmythui
+DEPENDPATH  += ../libmythupnp
+
 
 INCLUDEPATH += .. ../.. # for avlib headers
 INCLUDEPATH += ../../external/FFmpeg

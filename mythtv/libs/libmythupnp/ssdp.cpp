@@ -4,7 +4,7 @@
 //
 // Purpose     : SSDP Discovery Service Implmenetation
 //                                                                            
-// Copyright (c) 2005 David Blain <mythtv@theblains.net>
+// Copyright (c) 2005 David Blain <dblain@mythtv.org>
 //                                          
 // This library is free software; you can redistribute it and/or 
 // modify it under the terms of the GNU Lesser General Public
@@ -610,10 +610,11 @@ void SSDPExtension::GetDeviceDesc( HTTPRequest *pRequest )
                          .arg( m_nServicePort )
                          .arg( sUserAgent ));
 
+    QTextStream stream( &(pRequest->m_response) );
 
     UPnp::g_UPnpDeviceDesc.GetValidXML( pRequest->GetHostAddress(), 
                                         m_nServicePort,
-                                        pRequest->m_response,
+                                        stream,
                                         sUserAgent  );
 }
 

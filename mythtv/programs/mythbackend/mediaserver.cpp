@@ -16,6 +16,11 @@
 #include "upnpcdsmusic.h"
 #include "upnpcdsvideo.h"
 
+#include "serviceHosts/mythServiceHost.h"
+#include "serviceHosts/guideServiceHost.h"
+#include "serviceHosts/contentServiceHost.h"
+#include "serviceHosts/dvrServiceHost.h"
+
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -100,6 +105,11 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
     VERBOSE(VB_UPNP, "MediaServer::Registering MythXML Service." );
 
     m_pHttpServer->RegisterExtension( new MythXML( pMythDevice , m_sSharePath));
+
+    m_pHttpServer->RegisterExtension( new MythServiceHost   ( m_sSharePath ));
+    m_pHttpServer->RegisterExtension( new GuideServiceHost  ( m_sSharePath ));
+    m_pHttpServer->RegisterExtension( new ContentServiceHost( m_sSharePath ));
+    m_pHttpServer->RegisterExtension( new DvrServiceHost    ( m_sSharePath ));
 
     if (sIP == "localhost" || sIP.startsWith("127."))
     {
