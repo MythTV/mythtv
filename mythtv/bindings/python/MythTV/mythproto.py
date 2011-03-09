@@ -830,7 +830,7 @@ class Program( DictData, RECSTATUS, AUDIO_PROPS, VIDEO_PROPS, \
                     ('endtime', prog['EndTime']),
                     ('recstartts', prog['Recording']['StartTs']),
                     ('recendts', prog['Recording']['EndTs']),
-                    ('lastmodified', prog['LastModified')):
+                    ('lastmodified', prog['LastModified'])):
             if v:
                 dat[k] = str(datetime.fromIso(v).timestamp())
 
