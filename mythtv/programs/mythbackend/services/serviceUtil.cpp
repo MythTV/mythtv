@@ -62,6 +62,8 @@ void FillProgramInfo( DTC::Program *pProgram,
         pProgram->setDescription( pInfo->GetDescription() );
     }
 
+    pProgram->setSerializeChannel( bIncChannel );
+
     if ( bIncChannel )
     {
         // Build Channel Child Element
@@ -73,6 +75,8 @@ void FillProgramInfo( DTC::Program *pProgram,
 
     if ( pInfo->GetRecordingStatus() != rsUnknown )
     {
+        pProgram->setSerializeRecording( true );
+
         DTC::RecordingInfo *pRecording = pProgram->Recording();
 
         pRecording->setStatus  ( pInfo->GetRecordingStatus()    );

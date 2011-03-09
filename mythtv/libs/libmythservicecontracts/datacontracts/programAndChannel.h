@@ -73,6 +73,7 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
 
         ChannelInfo(QObject *parent = 0) 
             : QObject   ( parent ),
+              m_ChanId  ( 0      ),
               m_SourceId( 0      ),
               m_InputId ( 0      ),
               m_CommFree( 0      )   
@@ -127,8 +128,8 @@ class SERVICE_PUBLIC Program : public QObject
     Q_PROPERTY( QDate       Airdate      READ Airdate      WRITE setAirdate      DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString     Description  READ Description  WRITE setDescription  DESIGNABLE SerializeDetails )
 
-    Q_PROPERTY( QObject*    Channel      READ Channel   )
-    Q_PROPERTY( QObject*    Recording    READ Recording )
+    Q_PROPERTY( QObject*    Channel      READ Channel   DESIGNABLE SerializeChannel )
+    Q_PROPERTY( QObject*    Recording    READ Recording DESIGNABLE SerializeRecording )
 
     PROPERTYIMP    ( QDateTime   , StartTime    )
     PROPERTYIMP    ( QDateTime   , EndTime      )
@@ -153,17 +154,22 @@ class SERVICE_PUBLIC Program : public QObject
 
     // Used only by Serializer
     PROPERTYIMP( bool, SerializeDetails )
+    PROPERTYIMP( bool, SerializeChannel )
+    PROPERTYIMP( bool, SerializeRecording )
 
     public:
 
         Program(QObject *parent = 0) 
-            : QObject        ( parent ),
-              m_Repeat       ( false  ),
-              m_Stars        ( 0      ),
-              m_FileSize     ( 0      ),
-              m_ProgramFlags ( 0      ),
-              m_Channel      ( NULL   ),
-              m_Recording    ( NULL   ) 
+            : QObject               ( parent ),
+              m_Repeat              ( false  ),
+              m_Stars               ( 0      ),
+              m_FileSize            ( 0      ),
+              m_ProgramFlags        ( 0      ),
+              m_Channel             ( NULL   ),
+              m_Recording           ( NULL   ),
+              m_SerializeDetails    ( false  ),
+              m_SerializeChannel    ( false  ),
+              m_SerializeRecording  ( false  )
         {
         }
         
@@ -174,22 +180,25 @@ class SERVICE_PUBLIC Program : public QObject
 
         void Copy( const Program &src )
         {
-            m_StartTime    = src.m_StartTime    ;
-            m_EndTime      = src.m_EndTime      ;
-            m_Title        = src.m_Title        ;
-            m_SubTitle     = src.m_SubTitle     ;
-            m_Category     = src.m_Category     ;
-            m_CatType      = src.m_CatType      ;
-            m_Repeat       = src.m_Repeat       ;
-            m_SeriesId     = src.m_SeriesId     ;
-            m_ProgramId    = src.m_ProgramId    ;
-            m_Stars        = src.m_Stars        ;
-            m_FileSize     = src.m_FileSize     ;
-            m_LastModified = src.m_LastModified ;
-            m_ProgramFlags = src.m_ProgramFlags ;
-            m_Hostname     = src.m_Hostname     ;
-            m_Airdate      = src.m_Airdate      ;
-            m_Description  = src.m_Description  ;
+            m_StartTime         = src.m_StartTime;
+            m_EndTime           = src.m_EndTime;
+            m_Title             = src.m_Title;
+            m_SubTitle          = src.m_SubTitle;
+            m_Category          = src.m_Category;
+            m_CatType           = src.m_CatType;
+            m_Repeat            = src.m_Repeat;
+            m_SeriesId          = src.m_SeriesId;
+            m_ProgramId         = src.m_ProgramId;
+            m_Stars             = src.m_Stars;
+            m_FileSize          = src.m_FileSize;
+            m_LastModified      = src.m_LastModified;
+            m_ProgramFlags      = src.m_ProgramFlags;
+            m_Hostname          = src.m_Hostname;
+            m_Airdate           = src.m_Airdate;
+            m_Description       = src.m_Description;
+            m_SerializeDetails  = src.m_SerializeDetails;
+            m_SerializeChannel  = src.m_SerializeChannel;    
+            m_SerializeRecording= src.m_SerializeRecording;  
 
             if ( src.m_Channel != NULL)
                 Channel()->Copy( src.m_Channel );
