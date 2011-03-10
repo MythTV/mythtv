@@ -36,7 +36,7 @@ HtmlServerExtension::HtmlServerExtension( const QString sSharePath)
 {
     // Cache the absolute path for the share directory.
 
-    QDir dir( sSharePath );
+    QDir dir( sSharePath + "/html" );
 
     dir.makeAbsolute();
 
@@ -59,10 +59,13 @@ bool HtmlServerExtension::ProcessRequest( HttpWorkerThread *, HTTPRequest *pRequ
 {
     if (pRequest)
     {
-        if ( pRequest->m_sBaseUrl.startsWith("/html") == false)
+        if ( pRequest->m_sBaseUrl.startsWith("/") == false)
             return( false );
 
         QFileInfo oInfo( m_sAbsoluteSharePath + pRequest->m_sResourceUrl );
+
+        if (oInfo.isDir())
+            oInfo.setFile( oInfo.filePath() + "/index.html" );
 
         if (oInfo.exists() == true )
         {

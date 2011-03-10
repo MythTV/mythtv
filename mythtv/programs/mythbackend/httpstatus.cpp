@@ -72,7 +72,7 @@ HttpStatus::~HttpStatus()
 
 HttpStatusMethod HttpStatus::GetMethod( const QString &sURI )
 {
-    if (sURI.isEmpty()                 ) return( HSM_GetStatusHTML   );
+    if (sURI == "Status"               ) return( HSM_GetStatusHTML   );
     if (sURI == "GetStatusHTML"        ) return( HSM_GetStatusHTML   );
     if (sURI == "GetStatus"            ) return( HSM_GetStatusXML    );
     if (sURI == "xml"                  ) return( HSM_GetStatusXML    );
@@ -91,8 +91,11 @@ bool HttpStatus::ProcessRequest( HttpWorkerThread * /* pThread */,
     {
         if (pRequest)
         {
-            if (pRequest->m_sBaseUrl != "/")
+            if ((pRequest->m_sBaseUrl     != "/Status" ) &&
+                (pRequest->m_sResourceUrl != "/Status" ))
+            {
                 return( false );
+            }
 
             switch( GetMethod( pRequest->m_sMethod ))
             {

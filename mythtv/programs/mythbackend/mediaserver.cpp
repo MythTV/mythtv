@@ -15,7 +15,6 @@
 #include "upnpcdstv.h"
 #include "upnpcdsmusic.h"
 #include "upnpcdsvideo.h"
-#include "htmlserver.h"
 
 #include "serviceHosts/mythServiceHost.h"
 #include "serviceHosts/guideServiceHost.h"
@@ -59,7 +58,6 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
         return;
     }
 
-
     m_pHttpServer = new HttpServer();
 
     if (!m_pHttpServer->listen(QHostAddress::Any, nPort))
@@ -102,8 +100,6 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
     m_pHttpServer->RegisterExtension( new GuideServiceHost  ( m_sSharePath ));
     m_pHttpServer->RegisterExtension( new ContentServiceHost( m_sSharePath ));
     m_pHttpServer->RegisterExtension( new DvrServiceHost    ( m_sSharePath ));
-
-    m_pHttpServer->RegisterExtension( new HtmlServerExtension( m_sSharePath ));
 
     if (sIP == "localhost" || sIP.startsWith("127."))
     {
