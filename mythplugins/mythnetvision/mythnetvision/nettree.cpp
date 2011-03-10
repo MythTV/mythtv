@@ -15,6 +15,8 @@
 #include <netutils.h>
 #include <mythrssmanager.h>
 #include <netgrabbermanager.h>
+#include <mythcoreutil.h>
+#include <metadata/videoutils.h>
 
 // mythnetvision
 #include "treeeditor.h"
@@ -46,11 +48,11 @@ NetTree::NetTree(DialogType type, MythScreenStack *parent, const char *name)
       m_noSites(NULL),               m_thumbImage(NULL),
       m_downloadable(NULL),          m_busyPopup(NULL),
       m_menuPopup(NULL),             m_popupStack(),
-      m_type(type),                  m_lock(QMutex::Recursive)
+      m_progressDialog(NULL),        m_downloadFile(QString()),
+      m_type(type)
 {
     m_imageDownload = new MetadataImageDownload(this);
     m_gdt = new GrabberDownloadThread(this);
-    m_download = new MythDownloadManager();
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
     m_updateFreq = gCoreContext->GetNumSetting(
                        "mythNetTree.updateFreq", 6);
@@ -58,12 +60,11 @@ NetTree::NetTree(DialogType type, MythScreenStack *parent, const char *name)
                        "mythnetvision.rssBackgroundFetch", 0);
     m_treeAutoUpdate = gCoreContext->GetNumSetting(
                        "mythnetvision.backgroundFetch", 0);
+    gCoreContext->addListener(this);
 }
 
 bool NetTree::Create()
 {
-    QMutexLocker locker(&m_lock);
-
     QString windowName = "gallery";
 
     switch (m_type)
@@ -136,8 +137,6 @@ bool NetTree::Create()
 
 void NetTree::Load()
 {
-    QMutexLocker locker(&m_lock);
-
     m_grabberList = findAllDBTreeGrabbersByHost(VIDEO);
     m_rssList = findAllDBRSS();
 
@@ -159,8 +158,6 @@ void NetTree::Init()
 
 NetTree::~NetTree()
 {
-    QMutexLocker locker(&m_lock);
-
     qDeleteAll(m_grabberList);
     m_grabberList.clear();
 
@@ -184,24 +181,18 @@ NetTree::~NetTree()
         m_gdt = NULL;
     }
 
-    if (m_download)
-    {
-        delete m_download;
-        m_download = NULL;
-    }
-
     m_rssList.clear();
 
     qDeleteAll(m_videos);
     m_videos.clear();
 
     cleanCacheDir();
+
+    gCoreContext->removeListener(this);
 }
 
 void NetTree::cleanCacheDir()
 {
-    QMutexLocker locker(&m_lock);
-
     QString cache = QString("%1/MythNetvision/thumbcache")
                        .arg(GetConfDir());
     QDir cacheDir(cache);
@@ -221,8 +212,6 @@ void NetTree::cleanCacheDir()
 
 void NetTree::loadData(void)
 {
-    QMutexLocker locker(&m_lock);
-
     if (m_type == DLG_TREE)
         m_siteMap->AssignTree(m_siteGeneric);
     else
@@ -272,8 +261,6 @@ void NetTree::loadData(void)
 
 void NetTree::UpdateItem(MythUIButtonListItem *item)
 {
-    QMutexLocker locker(&m_lock);
-
     if (!item)
         return;
 
@@ -371,8 +358,6 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
 
 void NetTree::handleSelect(MythUIButtonListItem *item)
 {
-    QMutexLocker locker(&m_lock);
-
     MythGenericTree *node = GetNodePtrFromButton(item);
     int nodeInt = node->getInt();
 
@@ -394,8 +379,6 @@ void NetTree::handleSelect(MythUIButtonListItem *item)
 
 void NetTree::handleDirSelect(MythGenericTree *node)
 {
-    QMutexLocker locker(&m_lock);
-
     if (m_imageDownload && m_imageDownload->isRunning())
         m_imageDownload->cancel();
 
@@ -405,8 +388,6 @@ void NetTree::handleDirSelect(MythGenericTree *node)
 
 bool NetTree::goBack()
 {
-    QMutexLocker locker(&m_lock);
-
     bool handled = false;
 
     if (m_imageDownload && m_imageDownload->isRunning())
@@ -485,8 +466,6 @@ void NetTree::createBusyDialog(QString title)
 
 void NetTree::showMenu(void)
 {
-    QMutexLocker locker(&m_lock);
-
     QString label = tr("Playback/Download Options");
 
     MythDialogBox *menuPopup = new MythDialogBox(label, m_popupStack,
@@ -528,8 +507,6 @@ void NetTree::showMenu(void)
 
 void NetTree::showViewMenu()
 {
-    QMutexLocker locker(&m_lock);
-
     QString label = tr("View Options");
 
     MythDialogBox *menuPopup = new MythDialogBox(label, m_popupStack,
@@ -556,8 +533,6 @@ void NetTree::showViewMenu()
 
 void NetTree::showManageMenu()
 {
-    QMutexLocker locker(&m_lock);
-
     QString label = tr("Subscription Management");
 
     MythDialogBox *menuPopup = new MythDialogBox(label, m_popupStack,
@@ -590,32 +565,24 @@ void NetTree::showManageMenu()
 
 void NetTree::switchTreeView()
 {
-    QMutexLocker locker(&m_lock);
-
     m_type = DLG_TREE;
     switchView();
 }
 
 void NetTree::switchGalleryView()
 {
-    QMutexLocker locker(&m_lock);
-
     m_type = DLG_GALLERY;
     switchView();
 }
 
 void NetTree::switchBrowseView()
 {
-    QMutexLocker locker(&m_lock);
-
     m_type = DLG_BROWSER;
     switchView();
 }
 
 void NetTree::switchView()
 {
-    QMutexLocker locker(&m_lock);
-
     NetTree *nettree =
             new NetTree(m_type, GetMythMainWindow()->GetMainStack(), "nettree");
 
@@ -633,8 +600,6 @@ void NetTree::switchView()
 
 void NetTree::fillTree()
 {
-    QMutexLocker locker(&m_lock);
-
     // First let's add all the RSS
 
     m_rssGeneric = new MythGenericTree(
@@ -782,8 +747,6 @@ int NetTree::AddFileNode(MythGenericTree *where_to_add, ResultItem *video)
 
 void NetTree::showWebVideo()
 {
-    QMutexLocker locker(&m_lock);
-
     ResultItem *item;
 
     if (m_type == DLG_TREE)
@@ -863,10 +826,8 @@ void NetTree::showWebVideo()
     }
 }
 
-void NetTree::doPlayVideo()
+void NetTree::doPlayVideo(QString filename)
 {
-    QMutexLocker locker(&m_lock);
-
     ResultItem *item;
     if (m_type == DLG_TREE)
         item = qVariantValue<ResultItem *>(m_siteMap->GetCurrentNode()->GetData());
@@ -883,13 +844,11 @@ void NetTree::doPlayVideo()
     if (!item)
         return;
 
-    GetMythMainWindow()->HandleMedia("Internal", getVideoDownloadFilename(item));
+    GetMythMainWindow()->HandleMedia("Internal", filename);
 }
 
 void NetTree::slotDeleteVideo()
 {
-    QMutexLocker locker(&m_lock);
-
     QString message = tr("Are you sure you want to delete this file?");
 
     MythConfirmationDialog *confirmdialog =
@@ -907,8 +866,6 @@ void NetTree::slotDeleteVideo()
 
 void NetTree::doDeleteVideo(bool remove)
 {
-    QMutexLocker locker(&m_lock);
-
     if (!remove)
         return;
 
@@ -941,8 +898,6 @@ void NetTree::doDeleteVideo(bool remove)
 
 void NetTree::doDownloadAndPlay()
 {
-    QMutexLocker locker(&m_lock);
-
     ResultItem *item;
     if (m_type == DLG_TREE)
         item = qVariantValue<ResultItem *>(m_siteMap->GetCurrentNode()->GetData());
@@ -959,24 +914,48 @@ void NetTree::doDownloadAndPlay()
     if (!item)
         return;
 
-    QString filename = getVideoDownloadFilename(item);
+    QString baseFilename = getVideoDownloadFilename(item);
 
-    VERBOSE(VB_GENERAL, QString("Downloading %1").arg(filename));
+    QString finalFilename = generate_file_url("Default",
+                              gCoreContext->GetMasterHostName(),
+                              baseFilename);
+
+    VERBOSE(VB_GENERAL, QString("Downloading %1 to %2").arg(item->GetMediaURL())
+                                                       .arg(finalFilename));
 
     // Does the file already exist?
-    bool exists;
-    if (filename.startsWith("myth://"))
-        exists = RemoteFile::Exists(filename);
-    else
-        exists = QFile::exists(filename);
+    bool exists = RemoteFile::Exists(finalFilename);
 
     if (exists)
     {
-        doPlayVideo();
+        doPlayVideo(finalFilename);
         return;
     }
+    else
+        DownloadVideo(item->GetMediaURL(), baseFilename);
+}
 
-    m_download->queueDownload(item->GetMediaURL(), filename, this);
+void NetTree::DownloadVideo(QString url, QString dest)
+{
+    initProgressDialog();
+    m_downloadFile = RemoteDownloadFile(url, "Default", dest);
+}
+
+void NetTree::initProgressDialog()
+{
+    QString message = tr("Downloading Video...");
+    m_progressDialog = new MythUIProgressDialog(message,
+               m_popupStack, "videodownloadprogressdialog");
+
+    if (m_progressDialog->Create())
+    {
+        m_popupStack->AddScreen(m_progressDialog, false);
+    }
+    else
+    {
+        delete m_progressDialog;
+        m_progressDialog = NULL;
+    }
 }
 
 QString NetTree::getVideoDownloadFilename(ResultItem *item)
@@ -991,16 +970,11 @@ QString NetTree::getVideoDownloadFilename(ResultItem *item)
                            .arg(QString::number(urlChecksum))
                            .arg(QString::number(titleChecksum)).arg(ext);
 
-
-    QString finalFilename = GetConfDir() + "/" + basefilename;
-
-    return finalFilename;
+    return basefilename;
 }
 
 void NetTree::slotItemChanged()
 {
-    QMutexLocker locker(&m_lock);
-
     ResultItem *item;
     RSSSite *site;
 
@@ -1258,27 +1232,7 @@ void NetTree::toggleTreeUpdates()
 
 void NetTree::customEvent(QEvent *event)
 {
-    QMutexLocker locker(&m_lock);
-
-    if (event->type() == MythEvent::MythEventMessage)
-    {
-        MythEvent *me = (MythEvent *)event;
-
-        if (me->Message().left(17) == "DOWNLOAD_COMPLETE")
-        {
-            QStringList tokens = me->Message()
-                .split(" ", QString::SkipEmptyParts);
-
-            if (tokens.size() != 2)
-            {
-                VERBOSE(VB_IMPORTANT, "Bad DOWNLOAD_COMPLETE message");
-                return;
-            }
-
-            GetMythMainWindow()->HandleMedia("Internal", tokens.takeAt(1));
-        }
-    }
-    else if (event->type() == ThumbnailDLEvent::kEventType)
+    if (event->type() == ThumbnailDLEvent::kEventType)
     {
         ThumbnailDLEvent *tde = (ThumbnailDLEvent *)event;
 
@@ -1330,4 +1284,54 @@ void NetTree::customEvent(QEvent *event)
     {
         doTreeRefresh();
     }
+    else if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
+    {
+        MythEvent *me = (MythEvent *)event;
+        QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
+
+        if (tokens.isEmpty())
+            return;
+
+        if (tokens[0] == "DOWNLOAD_FILE")
+        {
+            QStringList args = me->ExtraDataList();
+            if ((tokens.size() != 2) ||
+                (args[1] != m_downloadFile))
+                return;
+
+            if (tokens[1] == "UPDATE")
+            {
+                QString message = tr("Downloading Video...\n"
+                                     "(%1 of %2 MB)")
+                                     .arg(QString::number(args[2].toInt() / 1024.0 / 1024.0, 'f', 2))
+                                     .arg(QString::number(args[3].toInt() / 1024.0 / 1024.0, 'f', 2));
+                m_progressDialog->SetMessage(message);
+                m_progressDialog->SetTotal(args[3].toInt());
+                m_progressDialog->SetProgress(args[2].toInt());
+            }
+            else if (tokens[1] == "FINISHED")
+            {
+                int fileSize  = args[2].toInt();
+                int errorCode = args[4].toInt();
+
+                if (m_progressDialog)
+                    m_progressDialog->Close();
+
+                QFileInfo file(m_downloadFile);
+                if ((m_downloadFile.startsWith("myth://")))
+                {
+                    if ((errorCode == 0) &&
+                        (fileSize > 0))
+                    {
+                        doPlayVideo(m_downloadFile);
+                    }
+                    else
+                    {
+                        ShowOkPopup(tr("Error downloading video to backend."));
+                    }
+                }
+            }
+        }
+    }
+
 }
