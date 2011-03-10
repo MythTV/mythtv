@@ -13,10 +13,10 @@ class QPoint;
 class QColor;
 
 //  #include "mythfontproperties.h"
-
 #include "compat.h"
-
 #include "mythuiexp.h"
+
+#include <list>
 
 class MythFontProperties;
 class MythImage;
