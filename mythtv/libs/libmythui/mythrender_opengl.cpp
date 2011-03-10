@@ -638,6 +638,16 @@ void MythRenderOpenGL::DrawRect(const QRect &area, bool drawFill,
     doneCurrent();
 }
 
+void MythRenderOpenGL::DrawRoundRect(const QRect &area, int cornerRadius,
+                                     const QBrush &fillBrush,
+                                     const QPen &linePen, int alpha)
+{
+    makeCurrent();
+    BindFramebuffer(0);
+    DrawRoundRectPriv(area, cornerRadius, fillBrush, linePen, alpha);
+    doneCurrent();
+}
+
 void MythRenderOpenGL::Init2DState(void)
 {
     SetBlend(false);

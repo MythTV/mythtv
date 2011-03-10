@@ -196,8 +196,26 @@ void MythOpenGLPainter::DrawRect(const QRect &area, const QBrush &fillBrush,
         realRender->DrawRect(area, style != Qt::NoBrush, fillBrush.color(),
                              linePen.style() != Qt::NoPen, linePen.width(),
                              linePen.color(), alpha);
+        return;
     }
     MythPainter::DrawRect(area, fillBrush, linePen, alpha);
+}
+
+void MythOpenGLPainter::DrawRoundRect(const QRect &area, int cornerRadius,
+                                      const QBrush &fillBrush,
+                                      const QPen &linePen, int alpha)
+{
+    if (realRender && realRender->RectanglesAreAccelerated())
+    {
+        if (fillBrush.style() == Qt::SolidPattern ||
+            fillBrush.style() == Qt::NoBrush)
+        {
+            realRender->DrawRoundRect(area, cornerRadius, fillBrush,
+                                      linePen, alpha);
+            return;
+        }
+    }
+    MythPainter::DrawRoundRect(area, cornerRadius, fillBrush, linePen, alpha);
 }
 
 void MythOpenGLPainter::DeleteFormatImagePriv(MythImage *im)

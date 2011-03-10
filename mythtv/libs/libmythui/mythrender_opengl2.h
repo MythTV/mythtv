@@ -7,8 +7,12 @@
 typedef enum
 {
     kShaderSimple  = 0,
-    kShaderDefault = 1,
-    kShaderCount   = 2,
+    kShaderDefault,
+    kShaderCircle,
+    kShaderCircleEdge,
+    kShaderVertLine,
+    kShaderHorizLine,
+    kShaderCount,
 } DefaultShaders;
 
 class MythGLShaderObject;
@@ -25,6 +29,8 @@ class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
     virtual void EnableShaderObject(uint obj);
     virtual void SetShaderParams(uint obj, void* vals, const char* uniform);
 
+    virtual bool RectanglesAreAccelerated(void) { return true; }
+
   protected:
     virtual void DrawBitmapPriv(uint tex, const QRect *src, const QRect *dst,
                                 uint prog, int alpha,
@@ -36,6 +42,10 @@ class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
                               const QColor &fillColor,  bool drawLine,
                               int lineWidth, const QColor &lineColor,
                               int prog);
+    virtual void DrawRoundRectPriv(const QRect &area, int cornerRadius,
+                                   const QBrush &fillBrush, const QPen &linePen,
+                                   int alpha);
+
     virtual void Init2DState(void);
     virtual void InitProcs(void);
     virtual void DeleteShaders(void);
@@ -59,6 +69,7 @@ class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
     // State
     uint  m_active_obj;
     float m_projection[4][4];
+    float m_parameters[4][4];
     QString m_qualifiers;
 
     // Procs

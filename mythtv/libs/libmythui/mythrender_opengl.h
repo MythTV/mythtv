@@ -156,6 +156,10 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
                   const QColor &fillColor, bool drawLine,
                   int lineWidth, const QColor &lineColor,
                   int target = 0, int prog = 0);
+    void DrawRoundRect(const QRect &area, int cornerRadius,
+                       const QBrush &fillBrush, const QPen &linePen,
+                       int alpha);
+    virtual bool RectanglesAreAccelerated(void) { return false; }
 
   protected:
     virtual void DrawBitmapPriv(uint tex, const QRect *src, const QRect *dst,
@@ -168,6 +172,9 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
                               const QColor &fillColor,  bool drawLine,
                               int lineWidth, const QColor &lineColor,
                               int prog) = 0;
+    virtual void DrawRoundRectPriv(const QRect &area, int cornerRadius,
+                                   const QBrush &fillBrush, const QPen &linePen,
+                                   int alpha) = 0;
 
     virtual void Init2DState(void);
     virtual void InitProcs(void);

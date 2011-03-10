@@ -31,6 +31,9 @@ class MUI_PUBLIC MythRenderOpenGL1 : public MythRenderOpenGL
                               const QColor &fillColor,  bool drawLine,
                               int lineWidth, const QColor &lineColor,
                               int prog);
+    virtual void DrawRoundRectPriv(const QRect &area, int cornerRadius,
+                                   const QBrush &fillBrush, const QPen &linePen,
+                                   int alpha) { }
 
     virtual void Init2DState(void);
     virtual void InitProcs(void);
