@@ -213,6 +213,20 @@ bool ServiceHost::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
                 return wsdl.GetWSDL( pRequest );
             }
 
+            if (( pRequest->m_eType   == RequestTypeGet ) &&
+                ( pRequest->m_sMethod == "version"         ))
+            {
+
+                int nClassIdx = m_oMetaObject.indexOfClassInfo( "version" );
+
+                if (nClassIdx >=0)
+                {
+                    QString sVersion = m_oMetaObject.classInfo( nClassIdx ).value();
+
+                    return FormatResponse( pRequest, QVariant( sVersion ));
+                }
+            }
+
             // --------------------------------------------------------------
 
             if (m_Methods.contains( pRequest->m_sMethod ))

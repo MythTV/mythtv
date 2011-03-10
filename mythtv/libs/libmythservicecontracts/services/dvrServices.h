@@ -48,6 +48,8 @@
 class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
+    Q_CLASSINFO( "version"    , "1.0" );
+
 
     public slots:
 

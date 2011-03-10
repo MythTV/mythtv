@@ -51,6 +51,7 @@
 class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
+    Q_CLASSINFO( "version"    , "1.0" );
     Q_CLASSINFO( "PutSetting_Method", "POST" )
 
     public slots:
