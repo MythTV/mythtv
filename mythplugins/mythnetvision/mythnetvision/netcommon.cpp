@@ -62,7 +62,7 @@ QString GetMythXMLURL(void)
     int MasterStatusPort = gCoreContext->GetNumSettingOnHost("BackendStatusPort",
                                                           MasterHost);
 
-    return QString("http://%1:%2/Myth/").arg(MasterIP).arg(MasterStatusPort);
+    return QString("http://%1:%2/InternetContent/").arg(MasterIP).arg(MasterStatusPort);
 }
 
 QUrl GetMythXMLSearch(QString url, QString query, QString grabber,
