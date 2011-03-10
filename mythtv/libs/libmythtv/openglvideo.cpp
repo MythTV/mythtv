@@ -1002,8 +1002,9 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
             QRectF piprectf = vrect.adjusted(-10, -10, +10, +10);
             QRect  piprect(piprectf.left(), piprectf.top(),
                            piprectf.width(), piprectf.height());
-            gl_context->DrawRect(piprect, true, QColor(127, 0, 0, 255),
-                                 false, 0, QColor());
+            static const QPen nopen(Qt::NoPen);
+            static const QBrush redbrush(QBrush(QColor(127, 0, 0, 255)));
+            gl_context->DrawRect(piprect, redbrush, nopen, 255);
         }
 
         // bind correct textures

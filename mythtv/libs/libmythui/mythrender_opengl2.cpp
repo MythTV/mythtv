@@ -481,55 +481,10 @@ void MythRenderOpenGL2::DrawBitmapPriv(uint *textures, uint texture_count,
     m_glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void MythRenderOpenGL2::DrawRectPriv(const QRect &area, bool drawFill,
-                                     const QColor &fillColor,  bool drawLine,
-                                     int lineWidth, const QColor &lineColor,
-                                     int prog)
+void MythRenderOpenGL2::DrawRectPriv(const QRect &area, const QBrush &fillBrush,
+                                     const QPen &linePen, int alpha)
 {
-    if (prog && !m_shader_objects.contains(prog))
-        prog = 0;
-    if (prog == 0)
-        prog = m_shaders[kShaderSimple];
-
-    EnableShaderObject(prog);
-    SetShaderParams(prog, &m_projection[0][0], "u_projection");
-    SetBlend(true);
-    DisableTextures();
-
-    m_glEnableVertexAttribArray(VERTEX_INDEX);
-
-    if (drawFill)
-    {
-        m_glVertexAttrib4f(COLOR_INDEX,
-                           fillColor.red() / 255.0,
-                           fillColor.green() / 255.0,
-                           fillColor.blue() / 255.0,
-                           fillColor.alpha() / 255.0);
-        GetCachedVBO(GL_TRIANGLE_STRIP, area);
-        m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
-                                VERTEX_SIZE * sizeof(GLfloat),
-                               (const void *) kVertexOffset);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        m_glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-
-    if (drawLine)
-    {
-        glLineWidth(lineWidth);
-        m_glVertexAttrib4f(COLOR_INDEX,
-                           lineColor.red() / 255.0,
-                           lineColor.green() / 255.0,
-                           lineColor.blue() / 255.0,
-                           lineColor.alpha() / 255.0);
-        GetCachedVBO(GL_LINE_LOOP, area);
-        m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
-                                VERTEX_SIZE * sizeof(GLfloat),
-                               (const void *) kVertexOffset);
-        glDrawArrays(GL_LINE_LOOP, 0, 4);
-        m_glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-
-    m_glDisableVertexAttribArray(VERTEX_INDEX);
+    DrawRoundRectPriv(area, 1, fillBrush, linePen, alpha);
 }
 
 void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,

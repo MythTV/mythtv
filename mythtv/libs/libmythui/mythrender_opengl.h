@@ -152,10 +152,8 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
                     int red = 255, int green = 255, int blue = 255);
     void DrawBitmap(uint *textures, uint texture_count, uint target,
                     const QRectF *src, const QRectF *dst, uint prog);
-    void DrawRect(const QRect &area, bool drawFill,
-                  const QColor &fillColor, bool drawLine,
-                  int lineWidth, const QColor &lineColor,
-                  int target = 0, int prog = 0);
+    void DrawRect(const QRect &area, const QBrush &fillBrush,
+                  const QPen &linePen, int alpha);
     void DrawRoundRect(const QRect &area, int cornerRadius,
                        const QBrush &fillBrush, const QPen &linePen,
                        int alpha);
@@ -168,10 +166,8 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     virtual void DrawBitmapPriv(uint *textures, uint texture_count,
                                 const QRectF *src, const QRectF *dst,
                                 uint prog) = 0;
-    virtual void DrawRectPriv(const QRect &area, bool drawFill,
-                              const QColor &fillColor,  bool drawLine,
-                              int lineWidth, const QColor &lineColor,
-                              int prog) = 0;
+    virtual void DrawRectPriv(const QRect &area, const QBrush &fillBrush,
+                              const QPen &linePen, int alpha) = 0;
     virtual void DrawRoundRectPriv(const QRect &area, int cornerRadius,
                                    const QBrush &fillBrush, const QPen &linePen,
                                    int alpha) = 0;

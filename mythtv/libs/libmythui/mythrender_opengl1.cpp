@@ -354,33 +354,27 @@ void MythRenderOpenGL1::DrawBitmapPriv(uint *textures, uint texture_count,
     glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void MythRenderOpenGL1::DrawRectPriv(const QRect &area, bool drawFill,
-                                     const QColor &fillColor,  bool drawLine,
-                                     int lineWidth, const QColor &lineColor,
-                                     int prog)
+void MythRenderOpenGL1::DrawRectPriv(const QRect &area, const QBrush &fillBrush,
+                                     const QPen &linePen, int alpha)
 {
-    if (prog && !m_programs.contains(prog))
-        prog = 0;
-
-    EnableShaderObject(prog);
     SetBlend(true);
     DisableTextures();
     glEnableClientState(GL_VERTEX_ARRAY);
 
-    if (drawFill)
+    if (fillBrush.style() != Qt::NoBrush)
     {
-        SetColor(fillColor.red(), fillColor.green(),
-                 fillColor.blue(), fillColor.alpha());
+        SetColor(fillBrush.color().red(), fillBrush.color().green(),
+                 fillBrush.color().blue(), fillBrush.color().alpha());
         GLfloat *vertices = GetCachedVertices(GL_TRIANGLE_STRIP, area);
         glVertexPointer(2, GL_FLOAT, 0, vertices);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 
-    if (drawLine)
+    if (linePen.style() != Qt::NoPen)
     {
-        SetColor(lineColor.red(), lineColor.green(),
-                 lineColor.blue(), lineColor.alpha());
-        glLineWidth(lineWidth);
+        SetColor(linePen.color().red(), linePen.color().green(),
+                 linePen.color().blue(), linePen.color().alpha());
+        glLineWidth(linePen.width());
         GLfloat *vertices = GetCachedVertices(GL_LINE_LOOP, area);
         glVertexPointer(2, GL_FLOAT, 0, vertices);
         glDrawArrays(GL_LINE_LOOP, 0, 4);

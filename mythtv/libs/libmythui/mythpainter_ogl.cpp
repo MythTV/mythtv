@@ -188,14 +188,10 @@ void MythOpenGLPainter::DrawImage(const QRect &r, MythImage *im,
 void MythOpenGLPainter::DrawRect(const QRect &area, const QBrush &fillBrush,
                                  const QPen &linePen, int alpha)
 {
-    int style = fillBrush.style();
-    if (style == Qt::SolidPattern || style == Qt::NoBrush)
+    if ((fillBrush.style() == Qt::SolidPattern ||
+         fillBrush.style() == Qt::NoBrush) && realRender)
     {
-        if (!realRender)
-            return;
-        realRender->DrawRect(area, style != Qt::NoBrush, fillBrush.color(),
-                             linePen.style() != Qt::NoPen, linePen.width(),
-                             linePen.color(), alpha);
+        realRender->DrawRect(area, fillBrush, linePen, alpha);
         return;
     }
     MythPainter::DrawRect(area, fillBrush, linePen, alpha);

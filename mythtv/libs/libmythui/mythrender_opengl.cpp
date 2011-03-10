@@ -623,18 +623,12 @@ void MythRenderOpenGL::DrawBitmap(uint *textures, uint texture_count,
     doneCurrent();
 }
 
-void MythRenderOpenGL::DrawRect(const QRect &area, bool drawFill,
-                                const QColor &fillColor,  bool drawLine,
-                                int lineWidth, const QColor &lineColor,
-                                int target, int prog)
+void MythRenderOpenGL::DrawRect(const QRect &area, const QBrush &fillBrush,
+                                const QPen &linePen, int alpha)
 {
-    if (target && !m_framebuffers.contains(target))
-        target = 0;
-
     makeCurrent();
-    BindFramebuffer(target);
-    DrawRectPriv(area, drawFill, fillColor, drawLine,
-                 lineWidth, lineColor, prog);
+    BindFramebuffer(0);
+    DrawRectPriv(area, fillBrush, linePen, alpha);
     doneCurrent();
 }
 
