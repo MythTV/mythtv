@@ -44,6 +44,7 @@ INCLUDEPATH += ./serializers
 
 DEPENDPATH  += ../libmythbase ..
 LIBS      += -L../libmythbase -lmythbase-$$LIBVERSION
+LIBS      += -L../libmythservicecontracts -lmythservicecontracts-$$LIBVERSION
 
 LIBS += $$EXTRA_LIBS
 
