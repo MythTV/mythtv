@@ -16,6 +16,7 @@
 #include "dbaccess.h"
 #include "videometadatalistmanager.h"
 #include "videoutils.h"
+#include "netutils.h"
 
 struct SortData
 {
