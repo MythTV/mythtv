@@ -8,9 +8,6 @@
 #include "netgrabbermanager.h"
 #include "mythrssmanager.h"
 
-// Generic Data Formatting
-MPUBLIC QString GetDisplaySeasonEpisode(int seasEp, int digits);
-
 // Tree DB Utils
 
 MPUBLIC bool findTreeGrabberInDB(const QString &commandline, ArticleType type);

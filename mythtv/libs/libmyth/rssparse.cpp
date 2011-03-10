@@ -9,6 +9,7 @@
 #include <QRegExp>
 
 #include "rssparse.h"
+#include "videoutils.h"
 #include "netutils.h"
 #include "mythcontext.h"
 #include "mythdirs.h"
