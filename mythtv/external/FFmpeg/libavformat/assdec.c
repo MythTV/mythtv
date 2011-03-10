@@ -202,13 +202,13 @@ static int read_seek2(AVFormatContext *s, int stream_index,
     return 0;
 }
 
-AVInputFormat ass_demuxer = {
-    "ass",
-    NULL_IF_CONFIG_SMALL("Advanced SubStation Alpha subtitle format"),
-    sizeof(ASSContext),
-    probe,
-    read_header,
-    read_packet,
-    read_close,
-    .read_seek2  = read_seek2,
+AVInputFormat ff_ass_demuxer = {
+    .name           = "ass",
+    .long_name      = NULL_IF_CONFIG_SMALL("Advanced SubStation Alpha subtitle format"),
+    .priv_data_size = sizeof(ASSContext),
+    .read_probe     = probe,
+    .read_header    = read_header,
+    .read_packet    = read_packet,
+    .read_close     = read_close,
+    .read_seek2     = read_seek2,
 };

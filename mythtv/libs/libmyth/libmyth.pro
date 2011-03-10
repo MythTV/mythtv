@@ -87,7 +87,6 @@ LIBS += -L../libmythui           -lmythui-$${LIBVERSION}
 LIBS += -L../libmythupnp         -lmythupnp-$${LIBVERSION}
 LIBS += -L../libmythfreesurround -lmythfreesurround-$${LIBVERSION}
 LIBS += -L../../external/FFmpeg/libavcodec -lmythavcodec
-LIBS += -L../../external/FFmpeg/libavcore  -lmythavcore
 LIBS += -L../../external/FFmpeg/libavutil  -lmythavutil
 LIBS += -L../../external/FFmpeg/libavformat  -lmythavformat
 
@@ -95,7 +94,6 @@ POST_TARGETDEPS += ../libmythsamplerate/libmythsamplerate-$${MYTH_LIB_EXT}
 POST_TARGETDEPS += ../libmythsoundtouch/libmythsoundtouch-$${MYTH_LIB_EXT}
 POST_TARGETDEPS += ../libmythfreesurround/libmythfreesurround-$${MYTH_LIB_EXT}
 POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
-POST_TARGETDEPS += ../../external/FFmpeg/libavcore/$$avLibName(avcore)
 POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
 
 # Install headers so that plugins can compile independently

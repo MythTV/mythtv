@@ -1,7 +1,7 @@
 include $(SUBDIR)../config.mak
 
 NAME = swscale
-FFLIBS = avcodec avcore avutil
+FFLIBS = avcodec avutil
 
 HEADERS = swscale.h
 
@@ -20,4 +20,3 @@ TESTPROGS = colorspace swscale
 DIRS = bfin mlib ppc sparc x86
 
 include $(SUBDIR)../subdir.mak
-$(SUBDIR)swscale-test$(EXESUF): ELIBS = -lavcore

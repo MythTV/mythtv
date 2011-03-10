@@ -52,6 +52,7 @@ typedef struct {
     unsigned page_count; ///< number of page buffered
     OGGPage page; ///< current page
     unsigned serial_num; ///< serial number
+    int64_t last_granule; ///< last packet granule
 } OGGStreamContext;
 
 typedef struct OGGPageList {
@@ -110,13 +111,13 @@ static int ogg_write_page(AVFormatContext *s, OGGPage *page, int extra_flags)
     return 0;
 }
 
-static int64_t ogg_granule_to_timestamp(OGGStreamContext *oggstream, OGGPage *page)
+static int64_t ogg_granule_to_timestamp(OGGStreamContext *oggstream, int64_t granule)
 {
     if (oggstream->kfgshift)
-        return (page->granule>>oggstream->kfgshift) +
-            (page->granule & ((1<<oggstream->kfgshift)-1));
+        return (granule>>oggstream->kfgshift) +
+            (granule & ((1<<oggstream->kfgshift)-1));
     else
-        return page->granule;
+        return granule;
 }
 
 static int ogg_compare_granule(AVFormatContext *s, OGGPage *next, OGGPage *page)
@@ -128,9 +129,9 @@ static int ogg_compare_granule(AVFormatContext *s, OGGPage *next, OGGPage *page)
     if (next->granule == -1 || page->granule == -1)
         return 0;
 
-    next_granule = av_rescale_q(ogg_granule_to_timestamp(st2->priv_data, next),
+    next_granule = av_rescale_q(ogg_granule_to_timestamp(st2->priv_data, next->granule),
                                 st2->time_base, AV_TIME_BASE_Q);
-    cur_granule  = av_rescale_q(ogg_granule_to_timestamp(st->priv_data, page),
+    cur_granule  = av_rescale_q(ogg_granule_to_timestamp(st->priv_data, page->granule),
                                 st ->time_base, AV_TIME_BASE_Q);
     return next_granule > cur_granule;
 }
@@ -174,7 +175,16 @@ static int ogg_buffer_data(AVFormatContext *s, AVStream *st,
     OGGStreamContext *oggstream = st->priv_data;
     int total_segments = size / 255 + 1;
     uint8_t *p = data;
-    int i, segments, len;
+    int i, segments, len, flush = 0;
+
+    // Handles VFR by flushing page because this frame needs to have a timestamp
+    if (st->codec->codec_id == CODEC_ID_THEORA &&
+        ogg_granule_to_timestamp(oggstream, granule) >
+        ogg_granule_to_timestamp(oggstream, oggstream->last_granule) + 1) {
+        if (oggstream->page.granule != -1)
+            ogg_buffer_page(s, oggstream);
+        flush = 1;
+    }
 
     for (i = 0; i < total_segments; ) {
         OGGPage *page = &oggstream->page;
@@ -202,18 +212,24 @@ static int ogg_buffer_data(AVFormatContext *s, AVStream *st,
             ogg_buffer_page(s, oggstream);
         }
     }
+
+    if (flush && oggstream->page.granule != -1)
+        ogg_buffer_page(s, oggstream);
+
     return 0;
 }
 
 static uint8_t *ogg_write_vorbiscomment(int offset, int bitexact,
-                                        int *header_len, AVMetadata *m)
+                                        int *header_len, AVMetadata **m, int framing_bit)
 {
     const char *vendor = bitexact ? "ffmpeg" : LIBAVFORMAT_IDENT;
     int size;
     uint8_t *p, *p0;
     unsigned int count;
 
-    size = offset + ff_vorbiscomment_length(m, vendor, &count);
+    ff_metadata_conv(m, ff_vorbiscomment_metadata_conv, NULL);
+
+    size = offset + ff_vorbiscomment_length(*m, vendor, &count) + framing_bit;
     p = av_mallocz(size);
     if (!p)
         return NULL;
@@ -221,6 +237,8 @@ static uint8_t *ogg_write_vorbiscomment(int offset, int bitexact,
 
     p += offset;
     ff_vorbiscomment_write(&p, m, vendor, count);
+    if (framing_bit)
+        bytestream_put_byte(&p, 1);
 
     *header_len = size;
     return p0;
@@ -228,7 +246,7 @@ static uint8_t *ogg_write_vorbiscomment(int offset, int bitexact,
 
 static int ogg_build_flac_headers(AVCodecContext *avctx,
                                   OGGStreamContext *oggstream, int bitexact,
-                                  AVMetadata *m)
+                                  AVMetadata **m)
 {
     enum FLACExtradataFormat format;
     uint8_t *streaminfo;
@@ -254,7 +272,7 @@ static int ogg_build_flac_headers(AVCodecContext *avctx,
     bytestream_put_buffer(&p, streaminfo, FLAC_STREAMINFO_SIZE);
 
     // second packet: VorbisComment
-    p = ogg_write_vorbiscomment(4, bitexact, &oggstream->header_len[1], m);
+    p = ogg_write_vorbiscomment(4, bitexact, &oggstream->header_len[1], m, 0);
     if (!p)
         return AVERROR(ENOMEM);
     oggstream->header[1] = p;
@@ -268,7 +286,7 @@ static int ogg_build_flac_headers(AVCodecContext *avctx,
 
 static int ogg_build_speex_headers(AVCodecContext *avctx,
                                    OGGStreamContext *oggstream, int bitexact,
-                                   AVMetadata *m)
+                                   AVMetadata **m)
 {
     uint8_t *p;
 
@@ -285,7 +303,7 @@ static int ogg_build_speex_headers(AVCodecContext *avctx,
     AV_WL32(&oggstream->header[0][68], 0);  // set extra_headers to 0
 
     // second packet: VorbisComment
-    p = ogg_write_vorbiscomment(0, bitexact, &oggstream->header_len[1], m);
+    p = ogg_write_vorbiscomment(0, bitexact, &oggstream->header_len[1], m, 0);
     if (!p)
         return AVERROR(ENOMEM);
     oggstream->header[1] = p;
@@ -336,7 +354,7 @@ static int ogg_write_header(AVFormatContext *s)
         if (st->codec->codec_id == CODEC_ID_FLAC) {
             int err = ogg_build_flac_headers(st->codec, oggstream,
                                              st->codec->flags & CODEC_FLAG_BITEXACT,
-                                             s->metadata);
+                                             &s->metadata);
             if (err) {
                 av_log(s, AV_LOG_ERROR, "Error writing FLAC headers\n");
                 av_freep(&st->priv_data);
@@ -345,13 +363,18 @@ static int ogg_write_header(AVFormatContext *s)
         } else if (st->codec->codec_id == CODEC_ID_SPEEX) {
             int err = ogg_build_speex_headers(st->codec, oggstream,
                                               st->codec->flags & CODEC_FLAG_BITEXACT,
-                                              s->metadata);
+                                              &s->metadata);
             if (err) {
                 av_log(s, AV_LOG_ERROR, "Error writing Speex headers\n");
                 av_freep(&st->priv_data);
                 return err;
             }
         } else {
+            uint8_t *p;
+            const char *cstr = st->codec->codec_id == CODEC_ID_VORBIS ? "vorbis" : "theora";
+            int header_type = st->codec->codec_id == CODEC_ID_VORBIS ? 3 : 0x81;
+            int framing_bit = st->codec->codec_id == CODEC_ID_VORBIS ? 1 : 0;
+
             if (ff_split_xiph_headers(st->codec->extradata, st->codec->extradata_size,
                                       st->codec->codec_id == CODEC_ID_VORBIS ? 30 : 42,
                                       oggstream->header, oggstream->header_len) < 0) {
@@ -359,6 +382,17 @@ static int ogg_write_header(AVFormatContext *s)
                 av_freep(&st->priv_data);
                 return -1;
             }
+
+            p = ogg_write_vorbiscomment(7, st->codec->flags & CODEC_FLAG_BITEXACT,
+                                        &oggstream->header_len[1], &s->metadata,
+                                        framing_bit);
+            if (!p)
+                return AVERROR(ENOMEM);
+
+            oggstream->header[1] = p;
+            bytestream_put_byte(&p, header_type);
+            bytestream_put_buffer(&p, cstr, 6);
+
             if (st->codec->codec_id == CODEC_ID_THEORA) {
                 /** KFGSHIFT is the width of the less significant section of the granule position
                     The less significant section is the frame count since the last keyframe */
@@ -440,6 +474,8 @@ static int ogg_write_packet(AVFormatContext *s, AVPacket *pkt)
 
     ogg_write_pages(s, 0);
 
+    oggstream->last_granule = granule;
+
     return 0;
 }
 
@@ -466,7 +502,7 @@ static int ogg_write_trailer(AVFormatContext *s)
     return 0;
 }
 
-AVOutputFormat ogg_muxer = {
+AVOutputFormat ff_ogg_muxer = {
     "ogg",
     NULL_IF_CONFIG_SMALL("Ogg"),
     "application/ogg",
@@ -477,5 +513,4 @@ AVOutputFormat ogg_muxer = {
     ogg_write_header,
     ogg_write_packet,
     ogg_write_trailer,
-    .metadata_conv = ff_vorbiscomment_metadata_conv,
 };

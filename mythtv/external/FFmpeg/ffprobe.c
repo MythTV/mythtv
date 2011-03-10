@@ -35,7 +35,6 @@ static int do_show_format  = 0;
 static int do_show_packets = 0;
 static int do_show_streams = 0;
 
-static int convert_tags                 = 0;
 static int show_value_unit              = 0;
 static int use_value_prefix             = 0;
 static int use_byte_value_binary_prefix = 0;
@@ -220,8 +219,6 @@ static void show_stream(AVFormatContext *fmt_ctx, int stream_idx)
     printf("r_frame_rate=%d/%d\n",         stream->r_frame_rate.num,   stream->r_frame_rate.den);
     printf("avg_frame_rate=%d/%d\n",       stream->avg_frame_rate.num, stream->avg_frame_rate.den);
     printf("time_base=%d/%d\n",            stream->time_base.num,      stream->time_base.den);
-    if (stream->language[0])
-        printf("language=%s\n",            stream->language);
     printf("start_time=%s\n",   time_value_string(val_str, sizeof(val_str), stream->start_time,
                                                   &stream->time_base));
     printf("duration=%s\n",     time_value_string(val_str, sizeof(val_str), stream->duration,
@@ -255,8 +252,6 @@ static void show_format(AVFormatContext *fmt_ctx)
     printf("bit_rate=%s\n",         value_string(val_str, sizeof(val_str), fmt_ctx->bit_rate,
                                                  unit_bit_per_second_str));
 
-    if (convert_tags)
-        av_metadata_conv(fmt_ctx, NULL, fmt_ctx->iformat->metadata_conv);
     while ((tag = av_metadata_get(fmt_ctx->metadata, "", tag, AV_METADATA_IGNORE_SUFFIX)))
         printf("TAG:%s=%s\n", tag->key, tag->value);
 
@@ -269,6 +264,7 @@ static int open_input_file(AVFormatContext **fmt_ctx_ptr, const char *filename)
     AVFormatContext *fmt_ctx;
 
     fmt_ctx = avformat_alloc_context();
+    set_context_opts(fmt_ctx, avformat_opts, AV_OPT_FLAG_DECODING_PARAM, NULL);
 
     if ((err = av_open_input_file(&fmt_ctx, filename, iformat, 0, NULL)) < 0) {
         print_error(filename, err);
@@ -281,7 +277,7 @@ static int open_input_file(AVFormatContext **fmt_ctx_ptr, const char *filename)
         return err;
     }
 
-    dump_format(fmt_ctx, 0, filename, 0);
+    av_dump_format(fmt_ctx, 0, filename, 0);
 
     /* bind a decoder to each input stream */
     for (i = 0; i < fmt_ctx->nb_streams; i++) {
@@ -353,9 +349,12 @@ static void opt_input_file(const char *arg)
 
 static void show_help(void)
 {
+    av_log_set_callback(log_callback_help);
     show_usage();
     show_help_options(options, "Main options:\n", 0, 0);
     printf("\n");
+    av_opt_show2(avformat_opts, NULL,
+                 AV_OPT_FLAG_DECODING_PARAM, 0);
 }
 
 static void opt_pretty(void)
@@ -368,7 +367,6 @@ static void opt_pretty(void)
 
 static const OptionDef options[] = {
 #include "cmdutils_common_opts.h"
-    { "convert_tags", OPT_BOOL, {(void*)&convert_tags}, "convert tag names to the FFmpeg generic tag names" },
     { "f", HAS_ARG, {(void*)opt_format}, "force format", "format" },
     { "unit", OPT_BOOL, {(void*)&show_value_unit}, "show unit of the displayed values" },
     { "prefix", OPT_BOOL, {(void*)&use_value_prefix}, "use SI prefixes for the displayed values" },
@@ -381,15 +379,20 @@ static const OptionDef options[] = {
     { "show_format",  OPT_BOOL, {(void*)&do_show_format} , "show format/container info" },
     { "show_packets", OPT_BOOL, {(void*)&do_show_packets}, "show packets info" },
     { "show_streams", OPT_BOOL, {(void*)&do_show_streams}, "show streams info" },
+    { "default", OPT_FUNC2 | HAS_ARG | OPT_AUDIO | OPT_VIDEO | OPT_EXPERT, {(void*)opt_default}, "generic catch all option", "" },
     { NULL, },
 };
 
 int main(int argc, char **argv)
 {
+    int ret;
+
     av_register_all();
 #if CONFIG_AVDEVICE
     avdevice_register_all();
 #endif
+
+    avformat_opts = avformat_alloc_context();
 
     show_banner();
     parse_options(argc, argv, options, opt_input_file);
@@ -401,5 +404,9 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    return probe_file(input_filename);
+    ret = probe_file(input_filename);
+
+    av_free(avformat_opts);
+
+    return ret;
 }

@@ -148,12 +148,30 @@
 %endmacro
 
 %macro ABS1_MMX 2    ; a, tmp
+    pxor       %2, %2
+    pcmpgtw    %2, %1
+    pxor       %1, %2
+    psubw      %1, %2
+%endmacro
+
+%macro ABS2_MMX 4    ; a, b, tmp0, tmp1
+    pxor       %3, %3
+    pxor       %4, %4
+    pcmpgtw    %3, %1
+    pcmpgtw    %4, %2
+    pxor       %1, %3
+    pxor       %2, %4
+    psubw      %1, %3
+    psubw      %2, %4
+%endmacro
+
+%macro ABS1_MMX2 2   ; a, tmp
     pxor    %2, %2
     psubw   %2, %1
     pmaxsw  %1, %2
 %endmacro
 
-%macro ABS2_MMX 4    ; a, b, tmp0, tmp1
+%macro ABS2_MMX2 4   ; a, b, tmp0, tmp1
     pxor    %3, %3
     pxor    %4, %4
     psubw   %3, %1
@@ -415,4 +433,14 @@
     packuswb   %4, %5
     movh     [%7], %3
     movh  [%7+%8], %4
+%endmacro
+
+%macro PMINUB_MMX 3 ; dst, src, tmp
+    mova     %3, %1
+    psubusb  %3, %2
+    psubb    %1, %3
+%endmacro
+
+%macro PMINUB_MMXEXT 3 ; dst, src, ignored
+    pminub   %1, %2
 %endmacro

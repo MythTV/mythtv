@@ -68,7 +68,7 @@ static AVStream *add_audio_stream(AVFormatContext *oc, enum CodecID codec_id)
     c->codec_type = AVMEDIA_TYPE_AUDIO;
 
     /* put sample parameters */
-    c->sample_fmt = SAMPLE_FMT_S16;
+    c->sample_fmt = AV_SAMPLE_FMT_S16;
     c->bit_rate = 64000;
     c->sample_rate = 44100;
     c->channels = 2;
@@ -481,7 +481,7 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    dump_format(oc, 0, filename, 1);
+    av_dump_format(oc, 0, filename, 1);
 
     /* now that all the parameters are set, we can open the audio and
        video codecs and allocate the necessary encode buffers */

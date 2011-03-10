@@ -25,7 +25,7 @@
  */
 
 #include "avcodec.h"
-#include "opt.h"
+#include "libavutil/opt.h"
 #include <float.h>              /* FLT_MIN, FLT_MAX */
 
 static const char* context_to_name(void* ptr) {
@@ -117,8 +117,8 @@ static const AVOption options[]={
 {"delay", NULL, OFFSET(delay), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
 {"qcomp", "video quantizer scale compression (VBR)", OFFSET(qcompress), FF_OPT_TYPE_FLOAT, 0.5, -FLT_MAX, FLT_MAX, V|E},
 {"qblur", "video quantizer scale blur (VBR)", OFFSET(qblur), FF_OPT_TYPE_FLOAT, 0.5, 0, FLT_MAX, V|E},
-{"qmin", "min video quantizer scale (VBR)", OFFSET(qmin), FF_OPT_TYPE_INT, 2, 0, 63, V|E},
-{"qmax", "max video quantizer scale (VBR)", OFFSET(qmax), FF_OPT_TYPE_INT, 31, 0, 63, V|E},
+{"qmin", "min video quantizer scale (VBR)", OFFSET(qmin), FF_OPT_TYPE_INT, 2, 0, 69, V|E},
+{"qmax", "max video quantizer scale (VBR)", OFFSET(qmax), FF_OPT_TYPE_INT, 31, 0, 69, V|E},
 {"qdiff", "max difference between the quantizer scale (VBR)", OFFSET(max_qdiff), FF_OPT_TYPE_INT, 3, INT_MIN, INT_MAX, V|E},
 {"bf", "use 'frames' B frames", OFFSET(max_b_frames), FF_OPT_TYPE_INT, DEFAULT, 0, FF_MAX_B_FRAMES, V|E},
 {"b_qfactor", "qp factor between p and b frames", OFFSET(b_quant_factor), FF_OPT_TYPE_FLOAT, 1.25, -FLT_MAX, FLT_MAX, V|E},
@@ -160,7 +160,7 @@ static const AVOption options[]={
 {"very", "strictly conform to a older more strict version of the spec or reference software", 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_VERY_STRICT, INT_MIN, INT_MAX, V|D|E, "strict"},
 {"strict", "strictly conform to all the things in the spec no matter what consequences", 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_STRICT, INT_MIN, INT_MAX, V|D|E, "strict"},
 {"normal", NULL, 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_NORMAL, INT_MIN, INT_MAX, V|D|E, "strict"},
-#if LIBAVCODEC_VERSION_MAJOR < 53
+#if FF_API_INOFFICIAL
 {"inofficial", "allow unofficial extensions (deprecated - use unofficial)", 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_UNOFFICIAL, INT_MIN, INT_MAX, V|D|E, "strict"},
 #endif
 {"unofficial", "allow unofficial extensions", 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_UNOFFICIAL, INT_MIN, INT_MAX, V|D|E, "strict"},
@@ -250,6 +250,7 @@ static const AVOption options[]={
 {"vis_qp", "visualize quantization parameter (QP), lower QP are tinted greener", 0, FF_OPT_TYPE_CONST, FF_DEBUG_VIS_QP, INT_MIN, INT_MAX, V|D, "debug"},
 {"vis_mb_type", "visualize block types", 0, FF_OPT_TYPE_CONST, FF_DEBUG_VIS_MB_TYPE, INT_MIN, INT_MAX, V|D, "debug"},
 {"buffers", "picture buffer allocations", 0, FF_OPT_TYPE_CONST, FF_DEBUG_BUFFERS, INT_MIN, INT_MAX, V|D, "debug"},
+{"thread_ops", "threading operations", 0, FF_OPT_TYPE_CONST, FF_DEBUG_THREADS, INT_MIN, INT_MAX, V|D, "debug"},
 {"vismv", "visualize motion vectors (MVs)", OFFSET(debug_mv), FF_OPT_TYPE_INT, DEFAULT, 0, INT_MAX, V|D, "debug_mv"},
 {"pf", "forward predicted MVs of P-frames", 0, FF_OPT_TYPE_CONST, FF_DEBUG_VIS_MV_P_FOR, INT_MIN, INT_MAX, V|D, "debug_mv"},
 {"bf", "forward predicted MVs of B-frames", 0, FF_OPT_TYPE_CONST, FF_DEBUG_VIS_MV_B_FOR, INT_MIN, INT_MAX, V|D, "debug_mv"},
@@ -331,9 +332,14 @@ static const AVOption options[]={
 {"aac_low", NULL, 0, FF_OPT_TYPE_CONST, FF_PROFILE_AAC_LOW, INT_MIN, INT_MAX, A|E, "profile"},
 {"aac_ssr", NULL, 0, FF_OPT_TYPE_CONST, FF_PROFILE_AAC_SSR, INT_MIN, INT_MAX, A|E, "profile"},
 {"aac_ltp", NULL, 0, FF_OPT_TYPE_CONST, FF_PROFILE_AAC_LTP, INT_MIN, INT_MAX, A|E, "profile"},
+{"dts", NULL, 0, FF_OPT_TYPE_CONST, FF_PROFILE_DTS, INT_MIN, INT_MAX, A|E, "profile"},
+{"dts_es", NULL, 0, FF_OPT_TYPE_CONST, FF_PROFILE_DTS_ES, INT_MIN, INT_MAX, A|E, "profile"},
+{"dts_96_24", NULL, 0, FF_OPT_TYPE_CONST, FF_PROFILE_DTS_96_24, INT_MIN, INT_MAX, A|E, "profile"},
+{"dts_hd_hra", NULL, 0, FF_OPT_TYPE_CONST, FF_PROFILE_DTS_HD_HRA, INT_MIN, INT_MAX, A|E, "profile"},
+{"dts_hd_ma", NULL, 0, FF_OPT_TYPE_CONST, FF_PROFILE_DTS_HD_MA, INT_MIN, INT_MAX, A|E, "profile"},
 {"level", NULL, OFFSET(level), FF_OPT_TYPE_INT, FF_LEVEL_UNKNOWN, INT_MIN, INT_MAX, V|A|E, "level"},
 {"unknown", NULL, 0, FF_OPT_TYPE_CONST, FF_LEVEL_UNKNOWN, INT_MIN, INT_MAX, V|A|E, "level"},
-{"lowres", "decode at 1= 1/2, 2=1/4, 3=1/8 resolutions", OFFSET(lowres), FF_OPT_TYPE_INT, 0, 0, INT_MAX, V|D},
+{"lowres", "decode at 1= 1/2, 2=1/4, 3=1/8 resolutions", OFFSET(lowres), FF_OPT_TYPE_INT, 0, 0, INT_MAX, V|A|D},
 {"skip_threshold", "frame skip threshold", OFFSET(frame_skip_threshold), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"skip_factor", "frame skip factor", OFFSET(frame_skip_factor), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"skip_exp", "frame skip exponent", OFFSET(frame_skip_exp), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
@@ -382,7 +388,7 @@ static const AVOption options[]={
 {"ivlc", "intra vlc table", 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_INTRA_VLC, INT_MIN, INT_MAX, V|E, "flags2"},
 {"b_sensitivity", "adjusts sensitivity of b_frame_strategy 1", OFFSET(b_sensitivity), FF_OPT_TYPE_INT, 40, 1, INT_MAX, V|E},
 {"compression_level", NULL, OFFSET(compression_level), FF_OPT_TYPE_INT, FF_COMPRESSION_DEFAULT, INT_MIN, INT_MAX, V|A|E},
-#if LIBAVCODEC_VERSION_MAJOR < 53
+#if FF_API_USE_LPC
 {"use_lpc", "sets whether to use LPC mode (FLAC)", OFFSET(use_lpc), FF_OPT_TYPE_INT, -1, INT_MIN, INT_MAX, A|E},
 #endif
 {"lpc_coeff_precision", "LPC coefficient precision (FLAC)", OFFSET(lpc_coeff_precision), FF_OPT_TYPE_INT, DEFAULT, 0, INT_MAX, A|E},
@@ -425,6 +431,11 @@ static const AVOption options[]={
 {"levinson", NULL, 0, FF_OPT_TYPE_CONST, AV_LPC_TYPE_LEVINSON, INT_MIN, INT_MAX, A|E, "lpc_type"},
 {"cholesky", NULL, 0, FF_OPT_TYPE_CONST, AV_LPC_TYPE_CHOLESKY, INT_MIN, INT_MAX, A|E, "lpc_type"},
 {"lpc_passes", "number of passes to use for Cholesky factorization during LPC analysis", OFFSET(lpc_passes), FF_OPT_TYPE_INT, -1, INT_MIN, INT_MAX, A|E},
+{"slices", "number of slices, used in parallelized decoding", OFFSET(slices), FF_OPT_TYPE_INT, 0, 0, INT_MAX, V|E},
+{"thread_type", "select multithreading type", OFFSET(thread_type), FF_OPT_TYPE_INT, FF_THREAD_SLICE|FF_THREAD_FRAME, 0, INT_MAX, V|E|D, "thread_type"},
+{"slice", NULL, 0, FF_OPT_TYPE_CONST, FF_THREAD_SLICE, INT_MIN, INT_MAX, V|E|D, "thread_type"},
+{"frame", NULL, 0, FF_OPT_TYPE_CONST, FF_THREAD_FRAME, INT_MIN, INT_MAX, V|E|D, "thread_type"},
+{"vbv_delay", "initial buffer fill time in periods of 27Mhz clock", 0, FF_OPT_TYPE_INT64, 0, 0, INT64_MAX},
 {NULL},
 };
 
@@ -460,11 +471,41 @@ void avcodec_get_context_defaults2(AVCodecContext *s, enum AVMediaType codec_typ
     s->execute2= avcodec_default_execute2;
     s->sample_aspect_ratio= (AVRational){0,1};
     s->pix_fmt= PIX_FMT_NONE;
-    s->sample_fmt= SAMPLE_FMT_NONE;
+    s->sample_fmt= AV_SAMPLE_FMT_NONE;
 
     s->palctrl = NULL;
     s->reget_buffer= avcodec_default_reget_buffer;
     s->reordered_opaque= AV_NOPTS_VALUE;
+}
+
+int avcodec_get_context_defaults3(AVCodecContext *s, AVCodec *codec){
+    avcodec_get_context_defaults2(s, codec ? codec->type : AVMEDIA_TYPE_UNKNOWN);
+    if(codec && codec->priv_data_size){
+        if(!s->priv_data){
+            s->priv_data= av_mallocz(codec->priv_data_size);
+            if (!s->priv_data) {
+                return AVERROR(ENOMEM);
+            }
+        }
+        if(codec->priv_class){
+            *(AVClass**)s->priv_data= codec->priv_class;
+            av_opt_set_defaults(s->priv_data);
+        }
+    }
+    return 0;
+}
+
+AVCodecContext *avcodec_alloc_context3(AVCodec *codec){
+    AVCodecContext *avctx= av_malloc(sizeof(AVCodecContext));
+
+    if(avctx==NULL) return NULL;
+
+    if(avcodec_get_context_defaults3(avctx, codec) < 0){
+        av_free(avctx);
+        return NULL;
+    }
+
+    return avctx;
 }
 
 AVCodecContext *avcodec_alloc_context2(enum AVMediaType codec_type){

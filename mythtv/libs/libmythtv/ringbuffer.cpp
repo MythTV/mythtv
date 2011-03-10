@@ -27,7 +27,7 @@
 #include "compat.h"
 #include "util.h"
 
-#if HAVE_POSIX_FADVISE < 1
+#ifndef HAVE_POSIX_FADVISE
 static int posix_fadvise(int, off_t, off_t, int) { return 0; }
 #define POSIX_FADV_SEQUENTIAL 0
 #define POSIX_FADV_WILLNEED 0

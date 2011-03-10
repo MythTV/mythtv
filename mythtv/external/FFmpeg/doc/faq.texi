@@ -2,11 +2,12 @@
 
 @settitle FFmpeg FAQ
 @titlepage
-@sp 7
 @center @titlefont{FFmpeg FAQ}
-@sp 3
 @end titlepage
 
+@top
+
+@contents
 
 @chapter General Questions
 
@@ -146,7 +147,7 @@ that match @code{*jpg} to the @file{/tmp} directory in the sequence of
 @file{img001.jpg}, @file{img002.jpg} and so on.
 
 @example
-  x=1; for i in *jpg; do counter=$(printf %03d $x); ln "$i" /tmp/img"$counter".jpg; x=$(($x+1)); done
+  x=1; for i in *jpg; do counter=$(printf %03d $x); ln -s "$i" /tmp/img"$counter".jpg; x=$(($x+1)); done
 @end example
 
 If you want to sequence them by oldest modified first, substitute
@@ -221,11 +222,11 @@ default.
 @item needed stuff
 -acodec libfaac -vcodec mpeg4 width<=320 height<=240
 @item working stuff
-4mv, title
+mv4, title
 @item non-working stuff
 B-frames
 @item example command line
-ffmpeg -i input -acodec libfaac -ab 128kb -vcodec mpeg4 -b 1200kb -mbd 2 -flags +4mv -trellis 2 -aic 2 -cmp 2 -subcmp 2 -s 320x180 -metadata title=X output.mp4
+ffmpeg -i input -acodec libfaac -ab 128kb -vcodec mpeg4 -b 1200kb -mbd 2 -flags +mv4 -trellis 2 -aic 2 -cmp 2 -subcmp 2 -s 320x180 -metadata title=X output.mp4
 @end table
 
 @section How do I encode videos which play on the PSP?
@@ -234,11 +235,11 @@ ffmpeg -i input -acodec libfaac -ab 128kb -vcodec mpeg4 -b 1200kb -mbd 2 -flags 
 @item needed stuff
 -acodec libfaac -vcodec mpeg4 width*height<=76800 width%16=0 height%16=0 -ar 24000 -r 30000/1001 or 15000/1001 -f psp
 @item working stuff
-4mv, title
+mv4, title
 @item non-working stuff
 B-frames
 @item example command line
-ffmpeg -i input -acodec libfaac -ab 128kb -vcodec mpeg4 -b 1200kb -ar 24000 -mbd 2 -flags +4mv -trellis 2 -aic 2 -cmp 2 -subcmp 2 -s 368x192 -r 30000/1001 -metadata title=X -f psp output.mp4
+ffmpeg -i input -acodec libfaac -ab 128kb -vcodec mpeg4 -b 1200kb -ar 24000 -mbd 2 -flags +mv4 -trellis 2 -aic 2 -cmp 2 -subcmp 2 -s 368x192 -r 30000/1001 -metadata title=X -f psp output.mp4
 @item needed stuff for H.264
 -acodec libfaac -vcodec libx264 width*height<=76800 width%16=0? height%16=0? -ar 48000 -coder 1 -r 30000/1001 or 15000/1001 -f psp
 @item working stuff for H.264
@@ -255,7 +256,7 @@ ffmpeg -i input -acodec libfaac -ab 128kb -ac 2 -ar 48000 -vcodec libx264 -level
 
 @section Which are good parameters for encoding high quality MPEG-4?
 
-'-mbd rd -flags +4mv+aic -trellis 2 -cmp 2 -subcmp 2 -g 300 -pass 1/2',
+'-mbd rd -flags +mv4+aic -trellis 2 -cmp 2 -subcmp 2 -g 300 -pass 1/2',
 things to try: '-bf 2', '-flags qprd', '-flags mv0', '-flags skiprd'.
 
 @section Which are good parameters for encoding high quality MPEG-1/MPEG-2?
@@ -422,7 +423,7 @@ read "Programming Religion" at (@url{http://www.tux.org/lkml/#s15}).
 
 The build process creates ffmpeg_g, ffplay_g, etc. which contain full debug
 information. Those binaries are stripped to create ffmpeg, ffplay, etc. If
-you need the debug information, used the *_g versions.
+you need the debug information, use the *_g versions.
 
 @section I do not like the LGPL, can I contribute code under the GPL instead?
 

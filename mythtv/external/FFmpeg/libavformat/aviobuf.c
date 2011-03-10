@@ -113,6 +113,20 @@ void put_byte(ByteIOContext *s, int b)
         flush_buffer(s);
 }
 
+void put_nbyte(ByteIOContext *s, int b, int count)
+{
+    while (count > 0) {
+        int len = FFMIN(s->buf_end - s->buf_ptr, count);
+        memset(s->buf_ptr, b, len);
+        s->buf_ptr += len;
+
+        if (s->buf_ptr >= s->buf_end)
+            flush_buffer(s);
+
+        count -= len;
+    }
+}
+
 void put_buffer(ByteIOContext *s, const unsigned char *buf, int size)
 {
     while (size > 0) {
@@ -257,12 +271,39 @@ void put_be32(ByteIOContext *s, unsigned int val)
     put_byte(s, val);
 }
 
+#if FF_API_OLD_AVIO
 void put_strz(ByteIOContext *s, const char *str)
 {
-    if (str)
-        put_buffer(s, (const unsigned char *) str, strlen(str) + 1);
-    else
+    avio_put_str(s, str);
+}
+#endif
+
+int avio_put_str(ByteIOContext *s, const char *str)
+{
+    int len = 1;
+    if (str) {
+        len += strlen(str);
+        put_buffer(s, (const unsigned char *) str, len);
+    } else
         put_byte(s, 0);
+    return len;
+}
+
+int avio_put_str16le(ByteIOContext *s, const char *str)
+{
+    const uint8_t *q = str;
+    int ret = 0;
+
+    while (*q) {
+        uint32_t ch;
+        uint16_t tmp;
+
+        GET_UTF8(ch, *q++, break;)
+        PUT_UTF16(ch, tmp, put_le16(s, tmp);ret += 2;)
+    }
+    put_le16(s, 0);
+    ret += 2;
+    return ret;
 }
 
 int ff_get_v_length(uint64_t val){
@@ -566,6 +607,28 @@ int ff_get_line(ByteIOContext *s, char *buf, int maxlen)
     buf[i] = 0;
     return i;
 }
+
+#define GET_STR16(type, read) \
+    int avio_get_str16 ##type(ByteIOContext *pb, int maxlen, char *buf, int buflen)\
+{\
+    char* q = buf;\
+    int ret = 0;\
+    while (ret + 1 < maxlen) {\
+        uint8_t tmp;\
+        uint32_t ch;\
+        GET_UTF16(ch, (ret += 2) <= maxlen ? read(pb) : 0, break;)\
+        if (!ch)\
+            break;\
+        PUT_UTF8(ch, tmp, if (q - buf < buflen - 1) *q++ = tmp;)\
+    }\
+    *q = 0;\
+    return ret;\
+}\
+
+GET_STR16(le, get_le16)
+GET_STR16(be, get_be16)
+
+#undef GET_STR16
 
 uint64_t get_be64(ByteIOContext *s)
 {

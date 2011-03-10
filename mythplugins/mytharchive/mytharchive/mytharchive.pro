@@ -12,7 +12,6 @@ DEPENDPATH *= $${INCLUDEPATH}
 LIBS += -lmythswscale
 LIBS += -lmythavformat
 LIBS += -lmythavcodec
-LIBS += -lmythavcore
 LIBS += -lmythavutil
 LIBS += -lmythmetadata-$$LIBVERSION
 

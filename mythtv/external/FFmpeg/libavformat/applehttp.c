@@ -90,22 +90,48 @@ static void make_absolute_url(char *buf, int size, const char *base,
                               const char *rel)
 {
     char *sep;
-    if (!base || strstr(rel, "://")) {
+    /* Absolute path, relative to the current server */
+    if (base && strstr(base, "://") && rel[0] == '/') {
+        if (base != buf)
+            av_strlcpy(buf, base, size);
+        sep = strstr(buf, "://");
+        if (sep) {
+            sep += 3;
+            sep = strchr(sep, '/');
+            if (sep)
+                *sep = '\0';
+        }
+        av_strlcat(buf, rel, size);
+        return;
+    }
+    /* If rel actually is an absolute url, just copy it */
+    if (!base || strstr(rel, "://") || rel[0] == '/') {
         av_strlcpy(buf, rel, size);
         return;
     }
     if (base != buf)
         av_strlcpy(buf, base, size);
+    /* Remove the file name from the base url */
     sep = strrchr(buf, '/');
     if (sep)
         sep[1] = '\0';
-    while (av_strstart(rel, "../", NULL)) {
-        if (sep) {
-            sep[0] = '\0';
-            sep = strrchr(buf, '/');
-            if (sep)
-                sep[1] = '\0';
+    else
+        buf[0] = '\0';
+    while (av_strstart(rel, "../", NULL) && sep) {
+        /* Remove the path delimiter at the end */
+        sep[0] = '\0';
+        sep = strrchr(buf, '/');
+        /* If the next directory name to pop off is "..", break here */
+        if (!strcmp(sep ? &sep[1] : buf, "..")) {
+            /* Readd the slash we just removed */
+            av_strlcat(buf, "/", size);
+            break;
         }
+        /* Cut off the directory name */
+        if (sep)
+            sep[1] = '\0';
+        else
+            buf[0] = '\0';
         rel += 3;
     }
     av_strlcat(buf, rel, size);
@@ -169,7 +195,7 @@ struct variant_info {
 static void handle_variant_args(struct variant_info *info, const char *key,
                                 int key_len, char **dest, int *dest_len)
 {
-    if (strncmp(key, "BANDWIDTH", key_len)) {
+    if (!strncmp(key, "BANDWIDTH=", key_len)) {
         *dest     =        info->bandwidth;
         *dest_len = sizeof(info->bandwidth);
     }
@@ -294,7 +320,7 @@ static int applehttp_read_header(AVFormatContext *s, AVFormatParameters *ap)
     /* If this isn't a live stream, calculate the total duration of the
      * stream. */
     if (c->finished) {
-        int duration = 0;
+        int64_t duration = 0;
         for (i = 0; i < c->variants[0]->n_segments; i++)
             duration += c->variants[0]->segments[i]->duration;
         s->duration = duration * AV_TIME_BASE;
@@ -567,7 +593,7 @@ static int applehttp_probe(AVProbeData *p)
     return 0;
 }
 
-AVInputFormat applehttp_demuxer = {
+AVInputFormat ff_applehttp_demuxer = {
     "applehttp",
     NULL_IF_CONFIG_SMALL("Apple HTTP Live Streaming format"),
     sizeof(AppleHTTPContext),

@@ -36,10 +36,7 @@ const char *ff_codec_id_string(enum CodecID codec_id)
         case CODEC_ID_NONE:             return "NONE";
         case CODEC_ID_MPEG1VIDEO:       return "MPEG1VIDEO";
         case CODEC_ID_MPEG2VIDEO:       return "MPEG2VIDEO";
-        case CODEC_ID_MPEG2VIDEO_XVMC:
-            return "MPEG2VIDEO_XVMC";
-        case CODEC_ID_MPEG2VIDEO_XVMC_VLD:
-            return "MPEG2VIDEO_XVMC_VLD";
+        case CODEC_ID_MPEG2VIDEO_XVMC:  return "MPEG2VIDEO_XVMC";
         case CODEC_ID_H261:             return "H261";
         case CODEC_ID_H263:             return "H263";
         case CODEC_ID_RV10:             return "RV10";
@@ -75,8 +72,7 @@ const char *ff_codec_id_string(enum CodecID codec_id)
         case CODEC_ID_CLJR:             return "CLJR";
         case CODEC_ID_MDEC:             return "MDEC";
         case CODEC_ID_ROQ:              return "ROQ";
-        case CODEC_ID_INTERPLAY_VIDEO:
-            return "INTERPLAY_VIDEO";
+        case CODEC_ID_INTERPLAY_VIDEO:  return "INTERPLAY_VIDEO";
         case CODEC_ID_XAN_WC3:          return "XAN_WC3";
         case CODEC_ID_XAN_WC4:          return "XAN_WC4";
         case CODEC_ID_RPZA:             return "RPZA";
@@ -147,8 +143,7 @@ const char *ff_codec_id_string(enum CodecID codec_id)
         case CODEC_ID_ADPCM_IMA_DK3:    return "ADPCM_IMA_DK3";
         case CODEC_ID_ADPCM_IMA_DK4:    return "ADPCM_IMA_DK4";
         case CODEC_ID_ADPCM_IMA_WS:     return "ADPCM_IMA_WS";
-        case CODEC_ID_ADPCM_IMA_SMJPEG:
-            return "ADPCM_IMA_SMJPEG";
+        case CODEC_ID_ADPCM_IMA_SMJPEG: return "ADPCM_IMA_SMJPEG";
         case CODEC_ID_ADPCM_MS:         return "ADPCM_MS";
         case CODEC_ID_ADPCM_4XM:        return "ADPCM_4XM";
         case CODEC_ID_ADPCM_XA:         return "ADPCM_XA";
@@ -207,8 +202,7 @@ const char *ff_codec_id_string(enum CodecID codec_id)
         case CODEC_ID_TEXT:             return "TEXT SUBTITLE";
         case CODEC_ID_XSUB:             return "XSUB SUBTITLE";
         case CODEC_ID_SSA:              return "SSA SUBTITLE";
-        case CODEC_ID_HDMV_PGS_SUBTITLE:
-            return "HDMV_PGS_SUBTITLE";
+        case CODEC_ID_HDMV_PGS_SUBTITLE: return "HDMV_PGS_SUBTITLE";
         case CODEC_ID_DVB_TELETEXT:     return "DVB_TELETEXT";
 
         case CODEC_ID_MPEG2VBI:         return "MPEG2VBI";

@@ -63,7 +63,7 @@ ff_rdt_parse_open(AVFormatContext *ic, int first_stream_of_set_idx,
     do {
         s->n_streams++;
     } while (first_stream_of_set_idx + s->n_streams < ic->nb_streams &&
-             s->streams[s->n_streams]->priv_data == s->streams[0]->priv_data);
+             s->streams[s->n_streams]->id == s->streams[0]->id);
     s->prev_set_id    = -1;
     s->prev_stream_id = -1;
     s->prev_timestamp = -1;
@@ -76,11 +76,6 @@ ff_rdt_parse_open(AVFormatContext *ic, int first_stream_of_set_idx,
 void
 ff_rdt_parse_close(RDTDemuxContext *s)
 {
-    int i;
-
-    for (i = 1; i < s->n_streams; i++)
-        s->streams[i]->priv_data = NULL;
-
     av_free(s);
 }
 
@@ -337,8 +332,9 @@ get_cache:
 
 int
 ff_rdt_parse_packet(RDTDemuxContext *s, AVPacket *pkt,
-                    const uint8_t *buf, int len)
+                    uint8_t **bufptr, int len)
 {
+    uint8_t *buf = bufptr ? *bufptr : NULL;
     int seq_no, flags = 0, stream_id, set_id, is_keyframe;
     uint32_t timestamp;
     int rv= 0;
@@ -421,7 +417,7 @@ rdt_parse_sdp_line (AVFormatContext *s, int st_index,
         int n, first = -1;
 
         for (n = 0; n < s->nb_streams; n++)
-            if (s->streams[n]->priv_data == stream->priv_data) {
+            if (s->streams[n]->id == stream->id) {
                 int count = s->streams[n]->index + 1;
                 if (first == -1) first = n;
                 if (rdt->nb_rmst < count) {
@@ -462,10 +458,9 @@ add_dstream(AVFormatContext *s, AVStream *orig_st)
 {
     AVStream *st;
 
-    if (!(st = av_new_stream(s, 0)))
+    if (!(st = av_new_stream(s, orig_st->id)))
         return NULL;
     st->codec->codec_type = orig_st->codec->codec_type;
-    st->priv_data         = orig_st->priv_data;
     st->first_dts         = orig_st->first_dts;
 
     return st;
@@ -527,7 +522,7 @@ rdt_new_context (void)
 {
     PayloadContext *rdt = av_mallocz(sizeof(PayloadContext));
 
-    av_open_input_stream(&rdt->rmctx, NULL, "", &rdt_demuxer, NULL);
+    av_open_input_stream(&rdt->rmctx, NULL, "", &ff_rdt_demuxer, NULL);
 
     return rdt;
 }
@@ -558,7 +553,7 @@ static RTPDynamicProtocolHandler ff_rdt_ ## n ## _handler = { \
     .open             = rdt_new_context, \
     .close            = rdt_free_context, \
     .parse_packet     = rdt_parse_packet \
-};
+}
 
 RDT_HANDLER(live_video, "x-pn-multirate-realvideo-live", AVMEDIA_TYPE_VIDEO);
 RDT_HANDLER(live_audio, "x-pn-multirate-realaudio-live", AVMEDIA_TYPE_AUDIO);

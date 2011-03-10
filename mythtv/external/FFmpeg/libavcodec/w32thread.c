@@ -20,6 +20,7 @@
 //#define DEBUG
 
 #include "avcodec.h"
+#include "thread.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -69,10 +70,10 @@ static unsigned WINAPI attribute_align_arg thread_func(void *v){
 }
 
 /**
- * Free what has been allocated by avcodec_thread_init().
+ * Free what has been allocated by ff_thread_init().
  * Must be called after decoding has finished, especially do not call while avcodec_thread_execute() is running.
  */
-void avcodec_thread_free(AVCodecContext *s){
+void ff_thread_free(AVCodecContext *s){
     ThreadContext *c= s->thread_opaque;
     int i;
 
@@ -124,12 +125,18 @@ static int avcodec_thread_execute2(AVCodecContext *s, int (*func)(AVCodecContext
     avcodec_thread_execute(s, NULL, arg, ret, count, 0);
 }
 
-int avcodec_thread_init(AVCodecContext *s, int thread_count){
+int ff_thread_init(AVCodecContext *s, int thread_count){
     int i;
     ThreadContext *c;
     uint32_t threadid;
 
+    if(!(s->thread_type & FF_THREAD_SLICE)){
+        av_log(s, AV_LOG_WARNING, "The requested thread algorithm is not supported with this thread library.\n");
+        return 0;
+    }
+
     s->thread_count= thread_count;
+    s->active_thread_type= FF_THREAD_SLICE;
 
     if (thread_count <= 1)
         return 0;
@@ -163,6 +170,6 @@ int avcodec_thread_init(AVCodecContext *s, int thread_count){
 
     return 0;
 fail:
-    avcodec_thread_free(s);
+    ff_thread_free(s);
     return -1;
 }

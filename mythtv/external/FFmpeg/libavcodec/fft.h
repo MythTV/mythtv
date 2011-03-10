@@ -44,7 +44,10 @@ struct FFTContext {
     void (*imdct_calc)(struct FFTContext *s, FFTSample *output, const FFTSample *input);
     void (*imdct_half)(struct FFTContext *s, FFTSample *output, const FFTSample *input);
     void (*mdct_calc)(struct FFTContext *s, FFTSample *output, const FFTSample *input);
-    int permutation;
+    int fft_permutation;
+#define FF_FFT_PERM_DEFAULT   0
+#define FF_FFT_PERM_SWAP_LSBS 1
+    int mdct_permutation;
 #define FF_MDCT_PERM_NONE       0
 #define FF_MDCT_PERM_INTERLEAVE 1
 };
@@ -106,8 +109,6 @@ extern SINTABLE(65536);
  * @param inverse         if 0 perform the forward transform, if 1 perform the inverse
  */
 int ff_fft_init(FFTContext *s, int nbits, int inverse);
-void ff_fft_permute_c(FFTContext *s, FFTComplex *z);
-void ff_fft_calc_c(FFTContext *s, FFTComplex *z);
 
 void ff_fft_init_altivec(FFTContext *s);
 void ff_fft_init_mmx(FFTContext *s);
