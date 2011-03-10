@@ -752,6 +752,15 @@ static int FlagCommercials(
 
     QString filename = get_filename(program_info);
 
+    QFile file(filename);
+    if (file.size() == 0)
+    {
+        VERBOSE(VB_IMPORTANT, QString("File %1 is zero-byte, aborting.")
+                .arg(filename));
+        global_program_info = NULL;
+        return GENERIC_EXIT_PERMISSIONS_ERROR;
+    }
+
     RingBuffer *tmprbuf = RingBuffer::Create(filename, false);
     if (!tmprbuf)
     {
