@@ -311,7 +311,8 @@ void DVBCam::SetPMT(const ChannelBase *chan, const ProgramMapTable *pmt)
 
 void DVBCam::SetTimeOffset(double offset_in_seconds)
 {
-    ciHandler->SetTimeOffset(offset_in_seconds);
+    if (ciHandler)
+        ciHandler->SetTimeOffset(offset_in_seconds);
 }
 
 static const char *cplm_info[] =
