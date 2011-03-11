@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+#include <QPainter>
 #include <QGLContext>
 #include <QHash>
 #include <QMutex>
