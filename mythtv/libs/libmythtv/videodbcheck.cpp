@@ -3,8 +3,6 @@
  * including changes to those parts that were previously MythVideo, should
  * be done in mythtv/libs/libmythtv/dbcheck.cpp. */
 
-using namespace std;
-
 #include <QString>
 #include <QStringList>
 

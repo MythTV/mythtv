@@ -11,7 +11,8 @@ from logging import MythLog
 from altdict import DictData
 from connections import BEConnection
 from database import DBCache
-from utility import SplitInt, CMPRecord, datetime, ParseEnum
+from utility import SplitInt, CMPRecord, datetime, \
+                    ParseEnum, CopyData, CopyData2
 
 from datetime import date
 from time import sleep
@@ -812,6 +813,37 @@ class Program( DictData, RECSTATUS, AUDIO_PROPS, VIDEO_PROPS, \
         return cls(raw, db)
 
     @classmethod
+    def fromJSON(cls, prog, db=None):
+        dat = {}
+        CopyData(prog, dat, ('Title', 'SubTitle', 'SeriesId', 'ProgramId',
+                             'Airdate', 'Category', 'Hostname', 'ProgramFlags',
+                             'Stars', 'FileSize', 'Description'), True)
+        CopyData(prog['Channel'], dat,
+                ('ChanId', 'CallSign', 'ChanNum', 'InputId', 'SourceId'), True)
+        CopyData2(prog['Channel'], dat, (('ChannelName', 'channame'),))
+        CopyData(prog['Recording'], dat,
+                ('DupMethod', 'PlayGroup', 'RecType', 'RecordId'), True)
+        CopyData2(prog['Recording'], dat, (('DupInType', 'dupin'),
+                                           ('Status', 'recstatus')))
+
+        for k,v in (('starttime', prog['StartTime']),
+                    ('endtime', prog['EndTime']),
+                    ('recstartts', prog['Recording']['StartTs']),
+                    ('recendts', prog['Recording']['EndTs']),
+                    ('lastmodified', prog['LastModified'])):
+            if v:
+                dat[k] = str(datetime.fromIso(v).timestamp())
+
+        raw = []
+        defs = (0,0,0,'',0,'')
+        for i,v in enumerate(cls._field_order):
+            if v in dat:
+                raw.append(dat[v])
+            else:
+                raw.append(defs[cls._field_type[i]])
+        return cls(raw, db)
+
+    @classmethod
     def fromRecorded(cls, rec):
         be = FileOps(db=rec._db)
         return be.getRecording(rec.chanid, rec.starttime)
@@ -848,8 +880,8 @@ class Program( DictData, RECSTATUS, AUDIO_PROPS, VIDEO_PROPS, \
 
     def _openXML(self):
         xml = XMLConnection(self.hostname, 6544)
-        return xml._queryObject('GetRecording', ChanId=self.chanid, \
-                                    StartTime=self.starttime.isoformat())
+        return xml._request('Content/GetRecording', ChanId=self.chanid, \
+                            StartTime=self.starttime.isoformat()).open()
 
     def open(self, type='r'):
         """Program.open(type='r') -> file or FileTransfer object"""

@@ -170,6 +170,14 @@ void MythUIProgressDialog::customEvent(QEvent *event)
     {
         ProgressUpdateEvent *pue = dynamic_cast<ProgressUpdateEvent*>(event);
 
+        if (!pue)
+        {
+            VERBOSE(VB_IMPORTANT, "MythUIProgressDialog::customEvent() "
+                    "Error, event claims to be a progress update but fails "
+                    "to cast");
+            return;
+        }
+
         QString message = pue->GetMessage();
         if (!message.isEmpty())
             m_message = message;

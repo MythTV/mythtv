@@ -19,6 +19,8 @@
 
 */
 
+#include "compat.h"
+
 #include "Link.h"
 #include "Ingredients.h"
 #include "Root.h"

@@ -34,6 +34,8 @@ DEPENDPATH  += ../libmythlivemedia/liveMedia
 DEPENDPATH  += ../libmythlivemedia/UsageEnvironment/include
 DEPENDPATH  += ../libmythlivemedia/UsageEnvironment
 DEPENDPATH  += ../libmythbase ../libmythui
+DEPENDPATH  += ../libmythupnp
+
 
 INCLUDEPATH += .. ../.. # for avlib headers
 INCLUDEPATH += ../../external/FFmpeg
@@ -578,8 +580,13 @@ mingw {
     DEFINES += USING_MINGW
 
     HEADERS += videoout_d3d.h
+    HEADERS -= NuppelVideoRecorder.h
     SOURCES -= NuppelVideoRecorder.cpp
     SOURCES += videoout_d3d.cpp
+
+    using_dxva2: DEFINES += USING_DXVA2
+    using_dxva2: HEADERS += dxva2decoder.h
+    using_dxva2: SOURCES += dxva2decoder.cpp
 
     LIBS += -lws2_32
 }

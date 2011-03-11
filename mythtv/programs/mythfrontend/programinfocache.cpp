@@ -73,9 +73,9 @@ void ProgramInfoCache::Load(const bool updateUI)
 
     locker.unlock();
     /**/
-    // the param to RemoteGetRecordedList doesn't actually matter
+    // Get an unsorted list (sort = 0) from RemoteGetRecordedList
     // we sort the list later anyway.
-    vector<ProgramInfo*> *tmp = RemoteGetRecordedList(false);
+    vector<ProgramInfo*> *tmp = RemoteGetRecordedList(0);
     /**/
     locker.relock();
 

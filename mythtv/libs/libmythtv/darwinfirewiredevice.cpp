@@ -6,9 +6,6 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-// POSIX headers
-#include <pthread.h>
-
 // OS X headers
 #undef always_inline
 #include <IOKit/IOMessage.h>
@@ -32,6 +29,8 @@ using namespace std;
 #include <AVCVideoServices/StringLogger.h>
 #include <AVCVideoServices/AVSShared.h>
 #include <AVCVideoServices/MPEG2Receiver.h>
+
+#include <QThread>
 
 // header not used because it also requires MPEG2Transmitter.h
 //#include <AVCVideoServices/FireWireMPEG.h>
@@ -65,7 +64,6 @@ static IOReturn dfd_tspacket_handler_thunk(
     long unsigned int tsPacketCount, UInt32 **ppBuf, void *callback_data);
 static void dfd_update_device_list(void *dfd, io_iterator_t iterator);
 static void dfd_streaming_log_message(char *pString);
-void *dfd_controller_thunk(void *param);
 void dfd_stream_msg(long unsigned int msg, long unsigned int param1,
                     long unsigned int param2, void *callback_data);
 int dfd_no_data_notification(void *callback_data);
@@ -96,7 +94,7 @@ class DFDPriv
         }
     }
 
-    pthread_t                 controller_thread;
+    DarwinControllerThread    controllerThread;
     CFRunLoopRef              controller_thread_cf_ref;
     bool                      controller_thread_running;
 
@@ -180,8 +178,8 @@ void DarwinFirewireDevice::StartController(void)
 {
     m_lock.unlock();
 
-    pthread_create(&m_priv->controller_thread, NULL,
-                   dfd_controller_thunk, this);
+    m_priv->controllerThread.SetParent(this);
+    m_priv->controllerThread.start();
 
     m_lock.lock();
     while (!m_priv->controller_thread_running)
@@ -875,10 +873,12 @@ void DarwinFirewireDevice::HandleDeviceChange(uint messageType)
 
 // Various message callbacks.
 
-void *dfd_controller_thunk(void *param)
+void DarwinControllerThread::run(void)
 {
-    ((DarwinFirewireDevice*)param)->RunController();
-    return NULL;
+    if (!m_parent)
+        return;
+
+    m_parent->RunController();
 }
 
 void dfd_update_device_list_item(

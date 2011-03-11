@@ -21,35 +21,11 @@ using namespace std;
 MythUIShape::MythUIShape(MythUIType *parent, const QString &name)
           : MythUIType(parent, name)
 {
-    m_image = NULL;
     m_type = "box";
     m_fillBrush = QBrush(Qt::NoBrush);
     m_linePen = QPen(Qt::NoPen);
     m_cornerRadius = 10;
     m_cropRect = MythRect(0,0,0,0);
-}
-
-MythUIShape::~MythUIShape()
-{
-    if (m_image)
-    {
-        m_image->DownRef();
-        m_image = NULL;
-    }
-}
-
-/**
- *  \copydoc MythUIType::Reset()
- */
-void MythUIShape::Reset()
-{
-    if (m_image)
-    {
-        m_image->DownRef();
-        m_image = NULL;
-    }
-    
-    MythUIType::Reset();
 }
 
 void MythUIShape::SetCropRect(int x, int y, int width, int height)
@@ -82,123 +58,12 @@ void MythUIShape::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     QRect area = GetArea();
     area.translate(xoffset, yoffset);
 
-    if (!m_image || m_image->isNull())
-    {
-        if (m_type == "box")
-            DrawRect(area, m_fillBrush, m_linePen);
-        else if (m_type == "roundbox")
-            DrawRoundRect(area, m_cornerRadius, m_fillBrush, m_linePen);
-        else if (m_type == "ellipse")
-            DrawEllipse(area, m_fillBrush, m_linePen);
-    }
-
-    if (m_image)
-    {
-        QRect dest = QRect(area.x(), area.y(), m_image->width(), m_image->height());
-        QRect srcRect;
-        m_cropRect.CalculateArea(m_Area);
-        if (!m_cropRect.isEmpty())
-            srcRect = m_cropRect.toQRect();
-        else
-            srcRect = m_image->rect();
-        p->DrawImage(dest, m_image, srcRect, CalcAlpha(alphaMod));
-    }
-}
-
-void MythUIShape::DrawRect(const QRect &area,const QBrush &fillBrush,
-                           const QPen &linePen)
-{
-    if (m_image)
-    {
-        m_image->DownRef();
-        m_image = NULL;
-    }
-
-    QImage image(QSize(area.width(), area.height()), QImage::Format_ARGB32);
-    image.fill(0x00000000);
-    QPainter painter(&image);
-
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    painter.setPen(linePen);
-    painter.setBrush(fillBrush);
-    
-    int lineWidth = linePen.width();
-    QRect r(lineWidth, lineWidth,
-            area.width() - (lineWidth * 2), area.height() - (lineWidth * 2));
-    painter.drawRect(r);
-
-    painter.end();
-
-    m_image = GetPainter()->GetFormatImage();
-    m_image->UpRef();
-    m_image->Assign(image);
-}
-
-void MythUIShape::DrawRoundRect(const QRect &area, int radius,
-                                const QBrush &fillBrush, const QPen &linePen)
-{
-    if (m_image)
-    {
-        m_image->DownRef();
-        m_image = NULL;
-    }
-
-    QImage image(QSize(area.width(), area.height()), QImage::Format_ARGB32);
-    image.fill(0x00000000);
-    QPainter painter(&image);
-
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    painter.setPen(linePen);
-    painter.setBrush(fillBrush);
-
-    if ((area.width() / 2) < radius)
-        radius = area.width() / 2;
-
-    if ((area.height() / 2) < radius)
-        radius = area.height() / 2;
-
-    int lineWidth = linePen.width();
-    QRect r(lineWidth, lineWidth,
-            area.width() - (lineWidth * 2), area.height() - (lineWidth * 2));
-    painter.drawRoundedRect(r, (qreal)radius, qreal(radius));
-
-    painter.end();
-
-    m_image = GetPainter()->GetFormatImage();
-    m_image->UpRef();
-    m_image->Assign(image);
-}
-
-void MythUIShape::DrawEllipse(const QRect &area,const QBrush &fillBrush,
-                              const QPen &linePen)
-{
-    if (m_image)
-    {
-        m_image->DownRef();
-        m_image = NULL;
-    }
-
-    QImage image(QSize(area.width(), area.height()), QImage::Format_ARGB32);
-    image.fill(0x00000000);
-    QPainter painter(&image);
-
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    painter.setPen(linePen);
-    painter.setBrush(fillBrush);
-    
-    int lineWidth = linePen.width();
-    QRect r(lineWidth, lineWidth,
-            area.width() - (lineWidth * 2), area.height() - (lineWidth * 2));
-    painter.drawEllipse(r);
-
-    painter.end();
-
-    m_image = GetPainter()->GetFormatImage();
-    m_image->UpRef();
-    m_image->Assign(image);
+    if (m_type == "box")
+        p->DrawRect(area, m_fillBrush, m_linePen, alphaMod);
+    else if (m_type == "roundbox")
+        p->DrawRoundRect(area, m_cornerRadius, m_fillBrush, m_linePen, alphaMod);
+    else if (m_type == "ellipse")
+        p->DrawEllipse(area, m_fillBrush, m_linePen, alphaMod);
 }
 
 /**
@@ -281,10 +146,6 @@ void MythUIShape::CopyFrom(MythUIType *base)
         VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
         return;
     }
-
-    m_image = shape->m_image;
-    if (m_image)
-        m_image->UpRef();
 
     m_type = shape->m_type;
     m_fillBrush = shape->m_fillBrush;

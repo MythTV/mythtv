@@ -133,6 +133,7 @@ mingw {
     DEFINES += USING_MINGW
     HEADERS += mythpainter_d3d9.h   mythrender_d3d9.h
     SOURCES += mythpainter_d3d9.cpp mythrender_d3d9.cpp
+    using_dxva2: DEFINES += USING_DXVA2
 }
 
 using_opengl {

@@ -88,7 +88,8 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
 
     // if a override encoding is specified and the default ISO 6937 encoding
     // would be used copy the override encoding in front of the text
-    unsigned char dst[raw_length + encoding_override_length];
+    unsigned char *dst = new unsigned char[ raw_length + encoding_override_length ];
+
     uint length = 0;
     if (encoding_override && src[0] >= 0x20) {
         memcpy(dst, encoding_override, encoding_override_length);
@@ -104,13 +105,14 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
         else if (src[i] == 0x8A)
             dst[length++] = 0x20;
     }
-    const unsigned char *buf = dst;
 
     // Exit on empty string, sans formatting.
-    if (!length)
-        return "";
 
-    return decode_text(buf, length);
+    QString sStr = (!length) ? "" : decode_text(dst, length);
+
+    delete [] dst;
+
+    return sStr;
 }
 
 static QString decode_text(const unsigned char *buf, uint length)
@@ -164,7 +166,7 @@ QString dvb_decode_short_name(const unsigned char *src, uint raw_length)
         return "";
     }
 
-    unsigned char dst[raw_length];
+    unsigned char *dst = new unsigned char[raw_length];
     uint length = 0;
 
     // check for emphasis control codes
@@ -179,12 +181,12 @@ QString dvb_decode_short_name(const unsigned char *src, uint raw_length)
                     dst[length++] = 0x20;
             }
 
+    QString sStr = (!length) ? dvb_decode_text(src, raw_length) 
+                             : decode_text(dst, length);
+                                     
+    delete [] dst;
 
-    if (!length)
-        return dvb_decode_text(src, raw_length);
-
-    const unsigned char *buf = dst;
-    return decode_text(buf, length);
+    return sStr;
 }
 
 QMutex            ContentDescriptor::categoryLock;

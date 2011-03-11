@@ -12,7 +12,7 @@
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythbase, libmyth, libmythtv, libmythav* and
 /// libmythui class methods used by plug-ins.
-#define MYTH_BINARY_VERSION "0.25.20110221-1"
+#define MYTH_BINARY_VERSION "0.25.20110310-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
@@ -35,8 +35,8 @@
  *       mythtv/bindings/python/MythTV/static.py (version number)
  *       mythtv/bindings/python/MythTV/mythproto.py (layout)
  */
-#define MYTH_PROTO_VERSION "64"
-#define MYTH_PROTO_TOKEN "8675309J"
+#define MYTH_PROTO_VERSION "65"
+#define MYTH_PROTO_TOKEN "D2BB94C2"
 
  MBASE_PUBLIC  const char *GetMythSourceVersion();
 

@@ -166,7 +166,7 @@ SignalMonitor::SignalMonitor(int _capturecardnum, ChannelBase *_channel,
     : channel(_channel),
       capturecardnum(_capturecardnum), flags(wait_for_mask),
       update_rate(25),                 minimum_update_rate(5),
-      running(false),                  exit(false),
+      exit(false),
       update_done(false),              notify_frontend(true),
       is_tuned(false),                 tablemon(false),
       eit_scan(false),                 error(""),
@@ -226,19 +226,19 @@ void SignalMonitor::Start(bool waitfor_tune)
             m_channelTimer.start();
         }
 
-        if (!running)
+        if (!monitor_thread.isRunning())
         {
-            int rval = pthread_create(
-                &monitor_thread, NULL, SpawnMonitorLoop, this);
+            monitor_thread.SetParent(this);
+            monitor_thread.start();
 
-            if (0 != rval)
+            if (!monitor_thread.isRunning())
             {
                 VERBOSE(VB_IMPORTANT, "Failed to create signal monitor thread");
                 return;
             }
         }
 
-        while (!running)
+        while (!monitor_thread.isRunning())
             usleep(50);
     }
     DBG_SM("Start", "end");
@@ -252,10 +252,10 @@ void SignalMonitor::Stop()
     DBG_SM("Stop", "begin");
     {
         QMutexLocker locker(&startStopLock);
-        if (running)
+        if (monitor_thread.isRunning())
         {
             exit = true;
-            pthread_join(monitor_thread, NULL);
+            monitor_thread.wait();
         }
     }
     DBG_SM("Stop", "end");
@@ -291,9 +291,9 @@ void SignalMonitor::Kick()
  */
 QStringList SignalMonitor::GetStatusList(bool kick)
 {
-    if (kick && running)
+    if (kick && monitor_thread.isRunning())
         Kick();
-    else if (!running)
+    else if (!monitor_thread.isRunning())
         UpdateValues();
 
     QStringList list;
@@ -312,9 +312,6 @@ QStringList SignalMonitor::GetStatusList(bool kick)
  */
 void SignalMonitor::MonitorLoop()
 {
-    //signal(SIGALRM, ALRMhandler);
-
-    running = true;
     exit = false;
 
     while (!exit)
@@ -341,19 +338,17 @@ void SignalMonitor::MonitorLoop()
         MythEvent me(QString("SIGNAL %1").arg(capturecardnum), slist);
         gCoreContext->dispatch(me);
     }
-
-    //signal(SIGALRM, SIG_DFL);
-
-    running = false;
 }
 
-/** \fn SignalMonitor::SpawnMonitorLoop(void*)
+/** \fn  SignalLoopThread::run(void)
  *  \brief Runs MonitorLoop() within the monitor_thread pthread.
  */
-void* SignalMonitor::SpawnMonitorLoop(void* self)
+void SignalLoopThread::run(void)
 {
-    ((SignalMonitor*)self)->MonitorLoop();
-    return NULL;
+    if (!m_parent)
+        return;
+
+    m_parent->MonitorLoop();
 }
 
 /** \fn  SignalMonitor::WaitForLock(int)
@@ -376,9 +371,9 @@ bool SignalMonitor::WaitForLock(int timeout)
 
     MythTimer t;
     t.start();
-    if (running)
+    if (monitor_thread.isRunning())
     {
-        while (t.elapsed()<timeout && running)
+        while (t.elapsed()<timeout && monitor_thread.isRunning())
         {
             Kick();
             statusLock.lock();
@@ -389,12 +384,12 @@ bool SignalMonitor::WaitForLock(int timeout)
 
             usleep(50);
         }
-        if (!running)
+        if (!monitor_thread.isRunning())
             return WaitForLock(timeout-t.elapsed());
     }
     else
     {
-        while (t.elapsed()<timeout && !running)
+        while (t.elapsed()<timeout && !monitor_thread.isRunning())
         {
             UpdateValues();
             statusLock.lock();
@@ -405,7 +400,7 @@ bool SignalMonitor::WaitForLock(int timeout)
 
             usleep(50);
         }
-        if (running)
+        if (monitor_thread.isRunning())
             return WaitForLock(timeout-t.elapsed());
     }
     return false;

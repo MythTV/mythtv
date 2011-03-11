@@ -134,6 +134,14 @@
         </textarea>
     </textedit>
 
+    <!-- Base definition of a short multi-line textedit -->
+    <textedit name="baseshortmultilinetextedit" from="baseshorttextedit">
+        <area>0,0,318,90</area>
+        <textarea name="text">
+            <multiline>true</multiline>
+        </textarea>
+    </textedit>
+
     <!-- Base definition of a button -->
     <button name="basebutton">
         <area>0,0,223,53</area>

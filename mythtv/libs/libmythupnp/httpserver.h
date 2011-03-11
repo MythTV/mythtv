@@ -98,6 +98,8 @@ class UPNP_PUBLIC HttpServer : public QTcpServer,
         QReadWriteLock          m_rwlock;
         HttpServerExtensionList m_extensions;
 
+        HttpServerExtension*    m_pHtmlServer;
+
         virtual WorkerThread *CreateWorkerThread( ThreadPool *,
                                                   const QString &sName );
         virtual void          incomingConnection     ( int socket );

@@ -1,7 +1,6 @@
 #ifndef MYTHPAINTER_OPENGL_H_
 #define MYTHPAINTER_OPENGL_H_
 
-#include <QMap>
 #include <QMutex>
 #include <QGLWidget>
 
@@ -29,29 +28,19 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
 
     virtual void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
                            int alpha);
-    virtual void DrawText(const QRect &dest, const QString &msg, int flags,
-                          const MythFontProperties &font, int alpha,
-                          const QRect &boundRect);
-    virtual void DrawRect(const QRect &area,
-                          bool drawFill, const QColor &fillColor, 
-                          bool drawLine, int lineWidth, const QColor &lineColor);
-    virtual void DrawRoundRect(const QRect &area, int radius, 
-                               bool drawFill, const QColor &fillColor, 
-                               bool drawLine, int lineWidth, const QColor &lineColor);
+    virtual void DrawRect(const QRect &area, const QBrush &fillBrush,
+                          const QPen &linePen, int alpha);
+    virtual void DrawRoundRect(const QRect &area, int cornerRadius,
+                               const QBrush &fillBrush, const QPen &linePen,
+                               int alpha);
 
   protected:
+    virtual MythImage* GetFormatImagePriv(void) { return new MythImage(this); }
     virtual void DeleteFormatImagePriv(MythImage *im);
-    void       ExpireImages(uint max = 0);
+
     void       ClearCache(void);
     void       DeleteTextures(void);
     int        GetTextureFromCache(MythImage *im);
-    MythImage *GetImageFromString(const QString &msg, int flags, const QRect &r,
-                                  const MythFontProperties &font);
-    MythImage *GetImageFromRect(const QSize &size, int radius,
-                                bool drawFill, const QColor &fillColor,
-                                bool drawLine, int lineWidth,
-                                const QColor &lineColor);
-
 
     QGLWidget        *realParent;
     MythRenderOpenGL *realRender;
@@ -60,8 +49,6 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
 
     QMap<MythImage *, uint>    m_ImageIntMap;
     std::list<MythImage *>     m_ImageExpireList;
-    QMap<QString, MythImage *> m_StringToImageMap;
-    std::list<QString>         m_StringExpireList;
     std::list<uint>            m_textureDeleteList;
     QMutex                     m_textureDeleteLock;
 };

@@ -24,6 +24,10 @@
 
 #include "mythiowrapper.h"
 
+#ifndef _MSC_VER
+#  define HAS_DIR
+#endif
+
 const int maxID = 1024 * 1024;
 
 QReadWriteLock            m_fileWrapperLock;
@@ -35,8 +39,11 @@ QHash <int, QString>      m_filenames;
 QReadWriteLock            m_dirWrapperLock;
 QHash <int, QStringList>  m_remotedirs;
 QHash <int, int>          m_remotedirPositions;
-QHash <int, DIR *>        m_localdirs;
 QHash <int, QString>      m_dirnames;
+
+#ifdef HAS_DIR
+QHash <int, DIR *>        m_localdirs;
+#endif
 
 class Callback
 {
@@ -385,6 +392,8 @@ int mythfile_exists(const char *path, const char *file)
 
 //////////////////////////////////////////////////////////////////////////////
 
+#ifdef HAS_DIR
+
 static int getNextDirID(void)
 {
     int id = 100000;
@@ -527,7 +536,7 @@ char *mythdir_readdir(int dirID)
 
     return result;
 }
-
+#endif
 } // extern "C"
 
 /////////////////////////////////////////////////////////////////////////////

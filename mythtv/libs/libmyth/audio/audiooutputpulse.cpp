@@ -45,9 +45,14 @@ AudioOutputPulseAudio::AudioOutputPulseAudio(const AudioSettings &settings) :
 AudioOutputPulseAudio::~AudioOutputPulseAudio()
 {
     KillAudio();
+    if (pcontext)
+    {
+        pa_context_unref(pcontext);
+        pcontext = NULL;
+    }
 }
 
-AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings()
+AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings(bool /*digital*/)
 {
     AudioFormat fmt;
     m_aosettings = new AudioOutputSettings();
@@ -106,6 +111,7 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings()
     }
 
     pa_context_disconnect(pcontext);
+    pa_context_unref(pcontext);
     pcontext = NULL;
     pa_threaded_mainloop_stop(mainloop);
     mainloop = NULL;
@@ -210,6 +216,7 @@ void AudioOutputPulseAudio::CloseDevice()
     {
         pa_context_drain(pcontext, NULL, NULL);
         pa_context_disconnect(pcontext);
+        pa_context_unref(pcontext);
         pcontext = NULL;
     }
 

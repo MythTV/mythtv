@@ -35,7 +35,7 @@
 static int psrc_set_converter (SRC_PRIVATE	*psrc, int converter_type) ;
 
 
-static INLINE int 
+static __inline int 
 is_bad_src_ratio (double ratio)
 {	return (ratio < (1.0 / SRC_MAX_RATIO) || ratio > (1.0 * SRC_MAX_RATIO)) ;
 } /* is_bad_src_ratio */

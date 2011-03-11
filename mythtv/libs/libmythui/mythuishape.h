@@ -22,9 +22,7 @@ class MUI_PUBLIC MythUIShape : public MythUIType
 {
   public:
     MythUIShape(MythUIType *parent, const QString &name);
-    ~MythUIShape();
 
-    void Reset(void);
     void SetCropRect(int x, int y, int width, int height);
     void SetCropRect(const MythRect &rect);
     void SetFillBrush(QBrush fill);
@@ -39,14 +37,7 @@ class MUI_PUBLIC MythUIShape : public MythUIType
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
 
-    void DrawRect(const QRect &area, const QBrush &fillBrush,
-                  const QPen &linePen);
-    void DrawRoundRect(const QRect &area, int radius, const QBrush &fillBrush,
-                       const QPen &linePen);
-    void DrawEllipse(const QRect &area, const QBrush &fillBrush,
-                     const QPen &linePen);
   private:
-    MythImage     *m_image;
     QString        m_type;
     QBrush         m_fillBrush;
     QPen           m_linePen;

@@ -1,10 +1,9 @@
+#include "compat.h"
 #include "mythdisplay.h"
 #include "mythmainwindow.h"
 
 #if defined(Q_WS_MAC) 
 #import "util-osx.h"
-#elif defined(Q_WS_WIN)
-#include <windows.h>
 #elif USING_X11
 #include "mythxdisplay.h"
 #elif USING_DIRECTFB

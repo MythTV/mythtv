@@ -488,7 +488,7 @@ bool ProgramMapTable::IsProgramEncrypted(void) const
     desc_list_t descs = MPEGDescriptor::ParseOnlyInclude(
         ProgramInfo(), ProgramInfoLength(), DescriptorID::conditional_access);
 
-    bool encrypted = false;
+    uint encrypted = 0;
     QMap<uint,uint> encryption_system;
     for (uint i = 0; i < descs.size(); i++)
     {
@@ -499,7 +499,7 @@ bool ProgramMapTable::IsProgramEncrypted(void) const
         //VERBOSE(VB_IMPORTANT, "DTVsm: "<<cad.toString());
     }
 
-    return encrypted;
+    return encrypted != 0;
 }
 
 /** \fn ProgramMapTable::IsStreamEncrypted(uint i) const
@@ -512,7 +512,7 @@ bool ProgramMapTable::IsStreamEncrypted(uint i) const
     desc_list_t descs = MPEGDescriptor::ParseOnlyInclude(
         StreamInfo(i), StreamInfoLength(i), DescriptorID::conditional_access);
 
-    bool encrypted = false;
+    uint encrypted = 0;
     QMap<uint,uint> encryption_system;
     for (uint j = 0; j < descs.size(); j++)
     {
@@ -523,7 +523,7 @@ bool ProgramMapTable::IsStreamEncrypted(uint i) const
         //VERBOSE(VB_IMPORTANT, "DTVsm: "<<cad.toString());
     }
 
-    return encrypted;
+    return encrypted != 0;
 }
 
 bool ProgramMapTable::IsStillPicture(QString sistandard) const

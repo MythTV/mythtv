@@ -35,7 +35,7 @@ AudioOutputJACK::AudioOutputJACK(const AudioSettings &settings) :
         Reconfigure(settings);
 }
 
-AudioOutputSettings* AudioOutputJACK::GetOutputSettings()
+AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
 {
     int rate = 0;
     int i = 0;

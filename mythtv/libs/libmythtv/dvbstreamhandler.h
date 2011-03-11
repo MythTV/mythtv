@@ -134,6 +134,8 @@ class DVBStreamHandler : public ReaderPausedCB
     static QMutex                          _handlers_lock;
     static QMap<QString,DVBStreamHandler*> _handlers;
     static QMap<QString,uint>              _handlers_refcnt;
+
+    bool              _run;
 };
 
 #endif // _DVBSTREAMHANDLER_H_

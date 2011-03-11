@@ -33,7 +33,9 @@
 #endif
 
 // copied from libavutil/internal.h
+extern "C" {
 #include "libavutil/common.h" // for AV_GCC_VERSION_AT_LEAST()
+}
 #ifndef av_alias
 #if HAVE_ATTRIBUTE_MAY_ALIAS && (!defined(__ICC) || __ICC > 1110) && AV_GCC_VERSION_AT_LEAST(3,3)
 #   define av_alias __attribute__((may_alias))

@@ -467,7 +467,7 @@ static GlobalCheckBox *RerecordWatched()
 {
     GlobalCheckBox *bc = new GlobalCheckBox("RerecordWatched");
     bc->setLabel(QObject::tr("Re-record watched"));
-    bc->setValue(true);
+    bc->setValue(false);
     bc->setHelpText(QObject::tr("If enabled, programs that have been marked as "
                     "watched and are Auto-Expired will be re-recorded if "
                     "they are shown again."));

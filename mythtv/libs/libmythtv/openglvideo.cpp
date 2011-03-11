@@ -705,7 +705,7 @@ void OpenGLVideo::SetViewPort(const QSize &viewPortSize)
 
     VERBOSE(VB_PLAYBACK, LOC + QString("Viewport: %1x%2")
             .arg(w).arg(h));
-    gl_context->SetViewPort(viewportSize);
+    gl_context->SetViewPort(QRect(QPoint(),viewportSize));
 }
 
 /**
@@ -975,11 +975,11 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
                     if (gl_letterbox_colour == kLetterBoxColour_Gray25)
                         gl_context->SetBackground(127, 127, 127, 127);
                     gl_context->ClearFramebuffer();
-                    gl_context->SetViewPort(display_visible_rect.size());
+                    gl_context->SetViewPort(QRect(QPoint(), display_visible_rect.size()));
                 }
                 else
                 {
-                    gl_context->SetViewPort(masterViewportSize);
+                    gl_context->SetViewPort(QRect(QPoint(), masterViewportSize));
                 }
 
                 break;
@@ -988,7 +988,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
                 if (!filter->frameBuffers.empty())
                 {
                     gl_context->BindFramebuffer(filter->frameBuffers[0]);
-                    gl_context->SetViewPort(frameBufferRect.size());
+                    gl_context->SetViewPort(QRect(QPoint(), frameBufferRect.size()));
                     target = filter->frameBuffers[0];
                 }
                 break;
@@ -1002,8 +1002,9 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
             QRectF piprectf = vrect.adjusted(-10, -10, +10, +10);
             QRect  piprect(piprectf.left(), piprectf.top(),
                            piprectf.width(), piprectf.height());
-            gl_context->DrawRect(piprect, true, QColor(127, 0, 0, 255),
-                                 false, 0, QColor());
+            static const QPen nopen(Qt::NoPen);
+            static const QBrush redbrush(QBrush(QColor(127, 0, 0, 255)));
+            gl_context->DrawRect(piprect, redbrush, nopen, 255);
         }
 
         // bind correct textures

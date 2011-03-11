@@ -292,13 +292,12 @@ int main(int argc, char *argv[])
 #endif
     QApplication a(argc, argv, use_display);
 
-    QFileInfo finfo(a.argv()[0]);
-    QString binname = finfo.baseName();
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHTV_SETUP);
 
     QMap<QString, QString> settingsOverride;
 
     VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
-                            .arg(binname)
+                            .arg(MYTH_APPNAME_MYTHTV_SETUP)
                             .arg(MYTH_SOURCE_PATH)
                             .arg(MYTH_SOURCE_VERSION));
 
@@ -508,7 +507,7 @@ int main(int argc, char *argv[])
         else
         {
             VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
-                                    .arg(binname)
+                                    .arg(MYTH_APPNAME_MYTHTV_SETUP)
                                     .arg(MYTH_SOURCE_PATH)
                                     .arg(MYTH_SOURCE_VERSION));
 
@@ -553,8 +552,6 @@ int main(int argc, char *argv[])
         if (!InitializeMythSchema())
             return GENERIC_EXIT_DB_ERROR;
     }
-
-    gCoreContext->SetAppName(binname);
 
     if (use_display)
     {

@@ -639,6 +639,7 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
         dec_name["ffmpeg"]   = QObject::tr("Standard");
         dec_name["macaccel"] = QObject::tr("Mac hardware acceleration");
         dec_name["vdpau"]    = QObject::tr("NVidia VDPAU acceleration");
+        dec_name["dxva2"]    = QObject::tr("Windows hardware acceleration");
     }
 
     QString ret = decoder;
@@ -672,6 +673,12 @@ QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
         msg += QObject::tr(
             "VDPAU will attempt to use the graphics hardware to "
             "accelerate video decoding and playback.");
+
+    if (decoder == "dxva2")
+        msg += QObject::tr(
+            "DXVA2 will use the graphics hardware to "
+            "accelerate video decoding and playback "
+            "(requires Windows Vista or later).");
 
     return msg;
 }

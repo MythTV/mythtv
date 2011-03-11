@@ -103,10 +103,38 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
     }
 
 #ifdef USING_PULSE
-    if (willsuspendpa &&
-        !main_device.contains("pulse", Qt::CaseInsensitive))
+    if (willsuspendpa)
     {
-        pulsestatus = PulseHandler::Suspend(PulseHandler::kPulseSuspend);
+        bool ispulse = false;
+#ifdef USE_ALSA
+        // Check if using ALSA, that the device doesn't contain the word
+        // "pulse" in its hint
+        if (main_device.startsWith("ALSA:"))
+        {
+            QString device_name = main_device;
+
+            device_name.remove(0, 5);
+            QMap<QString, QString> *alsadevs =
+                AudioOutputALSA::GetALSADevices("pcm");
+            if (!alsadevs->empty() && alsadevs->contains(device_name))
+            {
+                if (alsadevs->value(device_name).contains("pulse",
+                                                          Qt::CaseInsensitive))
+                {
+                    ispulse = true;
+                }
+            }
+            delete alsadevs;
+        }
+#endif
+        if (main_device.contains("pulse", Qt::CaseInsensitive))
+        {
+            ispulse = true;
+        }
+        if (!ispulse)
+        {
+            pulsestatus = PulseHandler::Suspend(PulseHandler::kPulseSuspend);
+        }
     }
 #endif
 
@@ -183,6 +211,23 @@ AudioOutput::~AudioOutput()
 
 void AudioOutput::SetStretchFactor(float /*factor*/)
 {
+}
+
+AudioOutputSettings* AudioOutput::GetOutputSettingsCleaned(bool /*digital*/)
+{
+    return new AudioOutputSettings;
+}
+
+AudioOutputSettings* AudioOutput::GetOutputSettingsUsers(bool /*digital*/)
+{
+    return new AudioOutputSettings;
+}
+
+bool AudioOutput::CanPassthrough(int /*samplerate*/,
+                                 int /*channels*/,
+                                 int /*codec*/) const
+{
+    return false;
 }
 
 void AudioOutput::Error(const QString &msg)

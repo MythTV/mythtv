@@ -83,27 +83,27 @@ static int prepare_data (SINC_FILTER *filter, SRC_DATA *data, int half_filter_ch
 
 static void sinc_reset (SRC_PRIVATE *psrc) ;
 
-static INLINE increment_t
+static __inline increment_t
 double_to_fp (double x)
 {	return (lrint ((x) * FP_ONE)) ;
 } /* double_to_fp */
 
-static INLINE increment_t
+static __inline increment_t
 int_to_fp (int x)
 {	return (((increment_t) (x)) << SHIFT_BITS) ;
 } /* int_to_fp */
 
-static INLINE int
+static __inline int
 fp_to_int (increment_t x)
 {	return (((x) >> SHIFT_BITS)) ;
 } /* fp_to_int */
 
-static INLINE increment_t
+static __inline increment_t
 fp_fraction_part (increment_t x)
 {	return ((x) & ((((increment_t) 1) << SHIFT_BITS) - 1)) ;
 } /* fp_fraction_part */
 
-static INLINE double
+static __inline double
 fp_to_double (increment_t x)
 {	return fp_fraction_part (x) * INV_FP_ONE ;
 } /* fp_to_double */
@@ -273,7 +273,7 @@ sinc_reset (SRC_PRIVATE *psrc)
 **	Beware all ye who dare pass this point. There be dragons here.
 */
 
-static INLINE double
+static __inline double
 calc_output_single (SINC_FILTER *filter, increment_t increment, increment_t start_filter_index)
 {	double		fraction, left, right, icoeff ;
 	increment_t	filter_index, max_filter_index ;
@@ -419,7 +419,7 @@ sinc_mono_vari_process (SRC_PRIVATE *psrc, SRC_DATA *data)
 	return SRC_ERR_NO_ERROR ;
 } /* sinc_mono_vari_process */
 
-static INLINE void
+static __inline void
 calc_output_stereo (SINC_FILTER *filter, increment_t increment, increment_t start_filter_index, double scale, float * output)
 {	double		fraction, left [2], right [2], icoeff ;
 	increment_t	filter_index, max_filter_index ;
@@ -567,7 +567,7 @@ sinc_stereo_vari_process (SRC_PRIVATE *psrc, SRC_DATA *data)
 	return SRC_ERR_NO_ERROR ;
 } /* sinc_stereo_vari_process */
 
-static INLINE void
+static __inline void
 calc_output_quad (SINC_FILTER *filter, increment_t increment, increment_t start_filter_index, double scale, float * output)
 {	double		fraction, left [4], right [4], icoeff ;
 	increment_t	filter_index, max_filter_index ;
@@ -721,7 +721,7 @@ sinc_quad_vari_process (SRC_PRIVATE *psrc, SRC_DATA *data)
 	return SRC_ERR_NO_ERROR ;
 } /* sinc_quad_vari_process */
 
-static INLINE void
+static __inline void
 calc_output_hex (SINC_FILTER *filter, increment_t increment, increment_t start_filter_index, double scale, float * output)
 {	double		fraction, left [6], right [6], icoeff ;
 	increment_t	filter_index, max_filter_index ;
@@ -881,7 +881,7 @@ sinc_hex_vari_process (SRC_PRIVATE *psrc, SRC_DATA *data)
 	return SRC_ERR_NO_ERROR ;
 } /* sinc_hex_vari_process */
 
-static INLINE void
+static __inline void
 calc_output_multi (SINC_FILTER *filter, increment_t increment, increment_t start_filter_index, int channels, double scale, float * output)
 {	double		fraction, icoeff ;
 	/* The following line is 1999 ISO Standard C. If your compiler complains, get a better compiler. */

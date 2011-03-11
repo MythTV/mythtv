@@ -9,6 +9,7 @@
 #include "mythverbose.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
+#include "util.h"
 
 #include "netgrabbermanager.h"
 #include "netutils.h"
@@ -267,7 +268,8 @@ VERBOSE(VB_IMPORTANT, "Search::executeSearch");
     }
 
     args.append("-S");
-    args.append(query);
+    QString term = query;
+    args.append(ShellEscape(term));
 
     VERBOSE(VB_GENERAL|VB_EXTRA, LOC + QString("Internet Search Query: %1 %2")
                                         .arg(cmd).arg(args.join(" ")));

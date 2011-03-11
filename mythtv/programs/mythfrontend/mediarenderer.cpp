@@ -8,6 +8,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
+#include <QTextStream>
 #include "mediarenderer.h"
 #include "mythfexml.h"
 #include "compat.h"
@@ -39,9 +40,10 @@ class MythFrontendStatus : public HttpServerExtension
         QString masterip   = gCoreContext->GetSetting("MasterServerIP");
         QString masterport = gCoreContext->GetSettingOnHost("BackendStatusPort", masterhost, "6544");
 
-        pRequest->m_response.setCodec("UTF-8");
+        QTextStream stream ( &pRequest->m_response );
+        stream.setCodec("UTF-8");
 
-        pRequest->m_response
+        stream
            << "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
            << "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n"
            << "<html xmlns=\"http://www.w3.org/1999/xhtml\""
@@ -136,7 +138,7 @@ class MythFrontendStatus : public HttpServerExtension
            << "<body>\r\n\r\n"
            << "  <h1>MythFrontend Status</h1>\r\n";
 
-        pRequest->m_response
+        stream
            << "  <div class=\"content\">\r\n"
            << "    <h2>Master Backend</h2>\r\n"
            << masterhost << "&nbsp(<a href=\"http://"
@@ -144,7 +146,7 @@ class MythFrontendStatus : public HttpServerExtension
            << "\">Status page</a>)\r\n"
            << "  </div>\r\n";
 
-        pRequest->m_response
+        stream
            << "  <div class=\"content\">\r\n"
            << "    <h2>Services</h2>\r\n"
            << "    <a href=\"MythFE/GetRemote\">Remote Control</a>\r\n"
@@ -153,7 +155,7 @@ class MythFrontendStatus : public HttpServerExtension
         double load[3];
         if (getloadavg(load, 3) != -1)
         {
-            pRequest->m_response
+            stream
                << "  <div class=\"content\">\r\n"
                << "    <h2>Machine Information</h2>\r\n"
                << "    <div class=\"loadstatus\">\r\n"
@@ -167,7 +169,9 @@ class MythFrontendStatus : public HttpServerExtension
                << "  </div>\r\n";
         }
 
-        pRequest->m_response << "</body>\r\n</html>\r\n";
+        stream << "</body>\r\n</html>\r\n";
+        stream.flush();
+
         return true;
     }
 };

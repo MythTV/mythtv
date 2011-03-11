@@ -4,9 +4,6 @@
 #ifndef SIGNALMONITOR_H
 #define SIGNALMONITOR_H
 
-// C headers
-#include <pthread.h>
-
 // C++ headers
 #include <vector>
 #include <algorithm>
@@ -14,6 +11,7 @@ using namespace std;
 
 // Qt headers
 #include <QMutex>
+#include <QThread>
 
 // MythTV headers
 #include "signalmonitorvalue.h"
@@ -28,9 +26,22 @@ using namespace std;
 inline QString sm_flags_to_string(uint64_t);
 
 class TVRec;
+class SignalMonitor;
+
+class SignalLoopThread : public QThread
+{
+    Q_OBJECT
+  public:
+    SignalLoopThread() : m_parent(NULL) {}
+    void SetParent(SignalMonitor *parent) { m_parent = parent; }
+    void run(void);
+  private:
+    SignalMonitor *m_parent;
+};
 
 class SignalMonitor
 {
+    friend class SignalLoopThread;
   public:
     /// Returns true iff the card type supports signal monitoring.
     static inline bool IsRequired(const QString &cardtype);
@@ -117,7 +128,6 @@ class SignalMonitor
     SignalMonitor(int db_cardnum, ChannelBase *_channel,
                   uint64_t wait_for_mask);
 
-    static void* SpawnMonitorLoop(void*);
     virtual void MonitorLoop();
 
     bool IsChannelTuned(void);
@@ -198,14 +208,13 @@ class SignalMonitor
     static const uint64_t kDVBSigMon_WaitForPos = 0x8000000000ULL;
 
   protected:
-    pthread_t    monitor_thread;
+    SignalLoopThread monitor_thread;
     ChannelBase *channel;
     TVRec       *pParent;
     int          capturecardnum;
     uint64_t     flags;
     int          update_rate;
     uint         minimum_update_rate;
-    bool         running;
     bool         exit;
     bool         update_done;
     bool         notify_frontend;

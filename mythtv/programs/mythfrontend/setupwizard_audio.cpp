@@ -21,9 +21,10 @@ AudioSetupWizard::AudioSetupWizard(MythScreenStack *parent, MythScreenType *prev
       m_outputlist(NULL),                m_testThread(NULL),
       m_generalScreen(previous),         m_audioDeviceButtonList(NULL),
       m_speakerNumberButtonList(NULL),   m_dtsCheck(NULL),
-      m_ac3Check(NULL),                  m_hdCheck(NULL),
-      m_hdplusCheck(NULL),               m_testSpeakerButton(NULL),
-      m_nextButton(NULL),                m_prevButton(NULL)
+      m_ac3Check(NULL),                  m_eac3Check(NULL),
+      m_truehdCheck(NULL),               m_dtshdCheck(NULL),
+      m_testSpeakerButton(NULL),         m_nextButton(NULL),
+      m_prevButton(NULL)
 {
     m_generalScreen->Hide();
 }
@@ -43,8 +44,9 @@ bool AudioSetupWizard::Create()
 
     m_dtsCheck = dynamic_cast<MythUICheckBox *> (GetChild("dtscheck"));
     m_ac3Check = dynamic_cast<MythUICheckBox *> (GetChild("ac3check"));
-    m_hdCheck = dynamic_cast<MythUICheckBox *> (GetChild("hdcheck"));
-    m_hdplusCheck = dynamic_cast<MythUICheckBox *> (GetChild("hdpluscheck"));
+    m_eac3Check = dynamic_cast<MythUICheckBox *> (GetChild("eac3check"));
+    m_truehdCheck = dynamic_cast<MythUICheckBox *> (GetChild("truehdcheck"));
+    m_dtshdCheck = dynamic_cast<MythUICheckBox *> (GetChild("dtshdcheck"));
 
     m_testSpeakerButton = dynamic_cast<MythUIButton *> (GetChild("testspeakers"));
 
@@ -52,9 +54,8 @@ bool AudioSetupWizard::Create()
     m_prevButton = dynamic_cast<MythUIButton *> (GetChild("previous"));
 
     if (!m_audioDeviceButtonList || !m_speakerNumberButtonList ||
-        !m_dtsCheck || !m_ac3Check ||
-        !m_hdCheck || !m_hdplusCheck ||
-        !m_testSpeakerButton ||!m_nextButton || !m_prevButton)
+        !m_dtsCheck || !m_ac3Check || !m_eac3Check || !m_truehdCheck ||
+        !m_dtshdCheck || !m_testSpeakerButton || !m_nextButton || !m_prevButton)
     {
         VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
         return false;
@@ -71,13 +72,17 @@ bool AudioSetupWizard::Create()
     if (ac3Setting == 1)
         m_ac3Check->SetCheckState(MythUIStateType::Full);
 
-    int hdSetting = gCoreContext->GetNumSetting("EAC3PassThru", 0);
-    if (hdSetting == 1)
-        m_hdCheck->SetCheckState(MythUIStateType::Full);
+    int eac3Setting = gCoreContext->GetNumSetting("EAC3PassThru", 0);
+    if (eac3Setting == 1)
+        m_eac3Check->SetCheckState(MythUIStateType::Full);
 
-    int hdplusSetting = gCoreContext->GetNumSetting("TrueHDPassThru", 0);
-    if (hdplusSetting == 1)
-        m_hdplusCheck->SetCheckState(MythUIStateType::Full);
+    int truehdSetting = gCoreContext->GetNumSetting("TrueHDPassThru", 0);
+    if (truehdSetting == 1)
+        m_truehdCheck->SetCheckState(MythUIStateType::Full);
+
+    int dtshdSetting = gCoreContext->GetNumSetting("DTSHDPassThru", 0);
+    if (dtshdSetting == 1)
+        m_dtshdCheck->SetCheckState(MythUIStateType::Full);
 
     // Help Text
 
@@ -95,11 +100,12 @@ bool AudioSetupWizard::Create()
                                    "is capable of playing DTS.") );
     m_ac3Check->SetHelpText( tr("Select this checkbox if your receiver "
                                    "is capable of playing AC-3 (Dolby Digital).") );
-    m_hdCheck->SetHelpText( tr("Select this checkbox if your receiver "
-                                   "is capable of playing E-AC-3 (Dolby Digital Plus) "
-                                   "or DTS-HD.") );
-    m_hdplusCheck->SetHelpText( tr("Select this checkbox if your receiver "
-                                   "is capable of playing TrueHD or DTS-HD MA.") );
+    m_eac3Check->SetHelpText( tr("Select this checkbox if your receiver "
+                                   "is capable of playing E-AC-3 (Dolby Digital Plus).") );
+    m_truehdCheck->SetHelpText( tr("Select this checkbox if your receiver "
+                                   "is capable of playing TrueHD.") );
+    m_dtshdCheck->SetHelpText( tr("Select this checkbox if your receiver "
+                                   "is capable of playing DTS-HD.") );
 
     // Buttons
     m_testSpeakerButton->SetHelpText( tr("Test your audio settings by playing "
@@ -217,15 +223,20 @@ void AudioSetupWizard::save(void)
         dtsState = 1;
     gCoreContext->SaveSetting("DTSPassThru", dtsState);
 
-    int hdState = 0;
-    if (m_hdCheck->GetCheckState() == MythUIStateType::Full)
-        hdState = 1;
-    gCoreContext->SaveSetting("EAC3PassThru", hdState);
+    int eac3State = 0;
+    if (m_eac3Check->GetCheckState() == MythUIStateType::Full)
+        eac3State = 1;
+    gCoreContext->SaveSetting("EAC3PassThru", eac3State);
 
-    int hdplusState = 0;
-    if (m_hdplusCheck->GetCheckState() == MythUIStateType::Full)
-        hdplusState = 1;
-    gCoreContext->SaveSetting("TrueHDPassThru", hdplusState);
+    int truehdState = 0;
+    if (m_truehdCheck->GetCheckState() == MythUIStateType::Full)
+        truehdState = 1;
+    gCoreContext->SaveSetting("TrueHDPassThru", truehdState);
+
+    int dtshdState = 0;
+    if (m_dtshdCheck->GetCheckState() == MythUIStateType::Full)
+        dtshdState = 1;
+    gCoreContext->SaveSetting("DTSHDPassThru", truehdState);
 }
 
 void AudioSetupWizard::slotPrevious(void)

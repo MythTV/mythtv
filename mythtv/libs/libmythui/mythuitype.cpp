@@ -58,6 +58,8 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
     m_Fonts = new FontMap();
     m_focusOrder = 0;
     m_Painter = NULL;
+
+    m_BorderColor = QColor(rand() % 255, rand()  % 255, rand()  % 255);
 }
 
 MythUIType::~MythUIType()
@@ -451,6 +453,21 @@ void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
     {
         (*it)->Draw(p, xoffset + m_Area.x(), yoffset + m_Area.y(),
                     CalcAlpha(alphaMod), clipRect);
+    }
+
+    if (p->ShowBorders())
+    {
+        static const QBrush nullbrush(Qt::NoBrush);
+        p->DrawRect(realArea, nullbrush, QPen(m_BorderColor), 255);
+
+        if (p->ShowTypeNames())
+        {
+            MythFontProperties font;
+            font.SetFace(QFont("Droid Sans"));
+            font.SetColor(m_BorderColor);
+            font.SetPointSize(8);
+            p->DrawText(realArea, objectName(), 0, font, 255, realArea);
+        }
     }
 }
 

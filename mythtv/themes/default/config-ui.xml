@@ -471,43 +471,28 @@
         </textarea>
 
         <textarea name="helptext" from="basetextarea">
-            <area>50,350,700,280</area>
+            <area>30,470,740,50</area>
             <multiline>yes</multiline>
             <font>basesmall</font>
             <align>allcenter</align>
         </textarea>
 
-        <textarea name="ldate_text" from="basetextarea">
-            <area>75,173,225,30</area>
-            <font>basesmall</font>
-            <value>Long Date Format:</value>
-        </textarea>
-
-        <textarea name="sdate_text" from="basetextarea">
-            <area>75,238,225,30</area>
-            <font>basesmall</font>
-            <value>Short Date Format:</value>
-        </textarea>
-
-        <textarea name="time_text" from="basetextarea">
-            <area>75,303,225,30</area>
-            <font>basesmall</font>
-            <value>Time Format:</value>
-        </textarea>
-
     <!--Widgets-->
 
-        <buttonlist name="longdate" from="basewideselector">
-            <position>310,167</position>
-        </buttonlist>
+        <button name="submit" from="basewidebutton">
+            <position>250,167</position>
+            <value>Submit your hardware profile</value>
+        </button>
 
-        <buttonlist name="shortdate" from="basewideselector">
-            <position>310,232</position>
-        </buttonlist>
+        <button name="view" from="basewidebutton">
+            <position>250,232</position>
+            <value>View your hardware profile</value>
+        </button>
 
-        <buttonlist name="timeformat" from="basewideselector">
-            <position>310,297</position>
-        </buttonlist>
+        <button name="delete" from="basewidebutton">
+            <position>250,297</position>
+            <value>Delete your hardware profile</value>
+        </button>
 
         <button name="cancel" from="basebutton">
             <position>188,530</position>
@@ -531,7 +516,7 @@
         </textarea>
 
         <textarea name="helptext" from="basetextarea">
-            <area>50,350,700,280</area>
+            <area>30,470,740,50</area>
             <multiline>yes</multiline>
             <font>basesmall</font>
             <align>allcenter</align>
@@ -544,33 +529,39 @@
         </textarea>
 
         <textarea name="speaktext_text" from="basetextarea">
-            <area>75,168,225,30</area>
+            <area>75,148,225,30</area>
             <font>basesmall</font>
             <value>Number of Speakers:</value>
         </textarea>
 
         <textarea name="ac3_text" from="basetextarea">
-            <area>310,230,375,30</area>
+            <area>310,200,375,30</area>
             <font>basesmall</font>
             <value>My speaker supports Dolby Digital</value>
         </textarea>
 
         <textarea name="dts_text" from="basetextarea">
-            <area>310,275,375,30</area>
+            <area>310,245,375,30</area>
             <font>basesmall</font>
             <value>My speaker supports DTS</value>
         </textarea>
 
-        <textarea name="hd_text" from="basetextarea">
-            <area>310,320,375,30</area>
+        <textarea name="eac3_text" from="basetextarea">
+            <area>310,290,375,30</area>
             <font>basesmall</font>
-            <value>My speaker supports E-AC-3 of DTS-HD</value>
+            <value>My speaker supports E-AC-3</value>
         </textarea>
 
-        <textarea name="hdplus_text" from="basetextarea">
-            <area>310,365,375,30</area>
+        <textarea name="truehd_text" from="basetextarea">
+            <area>310,335,375,30</area>
             <font>basesmall</font>
-            <value>My speaker supports TrueHD or DTS-HD MA</value>
+            <value>My speaker supports TrueHD</value>
+        </textarea>
+
+        <textarea name="dtshd_text" from="basetextarea">
+            <area>310,380,375,30</area>
+            <font>basesmall</font>
+            <value>My speaker supports DTS-HD</value>
         </textarea>
 
     <!--Widgets-->
@@ -580,27 +571,31 @@
         </buttonlist>
 
         <buttonlist name="speakers" from="basewideselector">
-            <position>310,162</position>
+            <position>310,142</position>
         </buttonlist>
 
         <checkbox name="ac3check" from="basecheckbox">
-            <position>250,227</position>
+            <position>250,197</position>
         </checkbox>
 
         <checkbox name="dtscheck" from="basecheckbox">
-            <position>250,272</position>
+            <position>250,242</position>
         </checkbox>
 
-        <checkbox name="hdcheck" from="basecheckbox">
-            <position>250,317</position>
+        <checkbox name="eac3check" from="basecheckbox">
+            <position>250,287</position>
         </checkbox>
 
-        <checkbox name="hdpluscheck" from="basecheckbox">
-            <position>250,362</position>
+        <checkbox name="truehdcheck" from="basecheckbox">
+            <position>250,332</position>
+        </checkbox>
+
+        <checkbox name="dtshdcheck" from="basecheckbox">
+            <position>250,377</position>
         </checkbox>
 
         <button name="testspeakers" from="basewidebutton">
-            <position>250,407</position>
+            <position>250,422</position>
         </button>
 
         <button name="previous" from="basebutton">
@@ -625,7 +620,7 @@
         </textarea>
 
         <textarea name="helptext" from="basetextarea">
-            <area>50,350,700,280</area>
+            <area>30,470,740,50</area>
             <multiline>yes</multiline>
             <font>basesmall</font>
             <align>allcenter</align>

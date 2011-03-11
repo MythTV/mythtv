@@ -37,6 +37,8 @@ int main(int argc, char **argv)
 
     debug_level = 0;  // don't show any debug messages by default
 
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHLCDSERVER);
+
     //  Check command line arguments
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {

@@ -13,6 +13,7 @@
 
 #include "mythmainwindow.h"
 
+#include <QTextStream>
 #include <QCoreApplication>
 #include <QTextStream>
 #include <QDir>
@@ -210,7 +211,9 @@ void MythFEXML::GetActionListTest(HTTPRequest *pRequest)
     pRequest->m_eResponseType = ResponseTypeHTML;
     pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
 
-    pRequest->m_response <<
+    QTextStream stream( &pRequest->m_response );
+
+    stream <<
         "<html>\n" << PROCESS_ACTION <<
         "  <body>\n" << HIDDEN_IFRAME;
 
@@ -224,14 +227,14 @@ void MythFEXML::GetActionListTest(HTTPRequest *pRequest)
             QStringList split = action.split(",");
             if (split.size() == 2)
             {
-                pRequest->m_response <<
+                stream <<
                     QString("    <div>%1&nbsp;<input type=\"button\" value=\"%2\" onClick=\"postaction('%2');\"></input>&nbsp;%3</div>\n")
                         .arg(contexts.key()).arg(split[0]).arg(split[1]);
             }
         }
     }
 
-    pRequest->m_response <<
+    stream <<
         "  </body>\n"
         "</html>\n";
 
@@ -244,13 +247,15 @@ void MythFEXML::GetActionList(HTTPRequest *pRequest)
     pRequest->m_eResponseType = ResponseTypeXML;
     pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
 
-    pRequest->m_response << "<mythactions version=\"1\">";
+    QTextStream stream( &pRequest->m_response );
+
+    stream << "<mythactions version=\"1\">";
 
     QHashIterator<QString,QStringList> contexts(m_actionDescriptions);
     while (contexts.hasNext())
     {
         contexts.next();
-        pRequest->m_response << QString("<context name=\"%1\">")
+        stream << QString("<context name=\"%1\">")
                                         .arg(contexts.key());
         QStringList actions = contexts.value();
         foreach (QString action, actions)
@@ -258,14 +263,14 @@ void MythFEXML::GetActionList(HTTPRequest *pRequest)
             QStringList split = action.split(",");
             if (split.size() == 2)
             {
-                pRequest->m_response <<
+                stream <<
                     QString("<action name=\"%1\">%2</action>")
                     .arg(split[0]).arg(split[1]);
             }
         }
-        pRequest->m_response << "</context>";
+        stream << "</context>";
     }
-    pRequest->m_response << "</mythactions>";
+    stream << "</mythactions>";
 }
 
 #define BUTTON(action,desc) \
@@ -278,7 +283,9 @@ void MythFEXML::GetRemote(HTTPRequest *pRequest)
     pRequest->m_eResponseType = ResponseTypeHTML;
     pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
 
-    pRequest->m_response <<
+    QTextStream stream( &pRequest->m_response );
+
+    stream <<
         "<html>\n" << PROCESS_ACTION <<
         "  <style type=\"text/css\" title=\"Default\" media=\"all\">\r\n"
         "  <!--\r\n"
@@ -297,7 +304,7 @@ void MythFEXML::GetRemote(HTTPRequest *pRequest)
         "  <title>MythFrontend Control</title>\r\n" <<
         "  <body>\n" << HIDDEN_IFRAME;
 
-    pRequest->m_response <<
+    stream <<
         "    <div>\r\n" <<
         BUTTON("1","1") << BUTTON("2","2") << BUTTON("3","3") <<
         "    </div>\r\n" <<
@@ -320,7 +327,7 @@ void MythFEXML::GetRemote(HTTPRequest *pRequest)
         BUTTON("<<","JUMPRWND") << BUTTON("v","DOWN") << BUTTON(">>","JUMPFFWD") <<
         "    </div>\r\n";
 
-    pRequest->m_response <<
+    stream <<
         "  </body>\n"
         "</html>\n";
 }

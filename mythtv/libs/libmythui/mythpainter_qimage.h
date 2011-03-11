@@ -37,32 +37,24 @@ class MUI_PUBLIC MythQImagePainter : public MythPainter
     virtual void DrawText(const QRect &dest, const QString &msg, int flags,
                           const MythFontProperties &font, int alpha,
                           const QRect &boundRect);
-    virtual void DrawRect(const QRect &area,
-                          bool drawFill, const QColor &fillColor, 
-                          bool drawLine, int lineWidth,
-                          const QColor &lineColor);
-    virtual void DrawRoundRect(const QRect &area, int radius, 
-                               bool drawFill, const QColor &fillColor, 
-                               bool drawLine, int lineWidth,
-                               const QColor &lineColor);
+    virtual void DrawRect(const QRect &area, const QBrush &fillBrush,
+                          const QPen &linePen, int alpha);
+    virtual void DrawRoundRect(const QRect &area, int cornerRadius,
+                               const QBrush &fillBrush, const QPen &linePen,
+                               int alpha);
+    virtual void DrawEllipse(const QRect &area, const QBrush &fillBrush,
+                             const QPen &linePen, int alpha);
 
   protected:
-    void       CheckPaintMode(const QRect &area);
-    void       ExpireImages(uint max = 0);
-    MythImage *GetImageFromString(const QString &msg, int flags, const QRect &r,
-                                  const MythFontProperties &font);
-    MythImage *GetImageFromRect(const QSize &size, int radius,
-                                bool drawFill, const QColor &fillColor,
-                                bool drawLine, int lineWidth,
-                                const QColor &lineColor);
+    virtual MythImage* GetFormatImagePriv(void) { return new MythImage(this); }
+    virtual void DeleteFormatImagePriv(MythImage *im) { }
+
+    void CheckPaintMode(const QRect &area);
 
     QPainter *painter;
     QRegion   clipRegion;
     QRegion   paintedRegion;
     bool      copy;
-
-    QMap<QString, MythImage *> m_StringToImageMap;
-    std::list<QString>         m_StringExpireList;
 };
 
 #endif

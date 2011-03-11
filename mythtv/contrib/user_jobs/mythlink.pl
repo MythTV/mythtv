@@ -318,7 +318,7 @@ EOF
 
     }
     else {
-        %rows = $Myth->backend_rows('QUERY_RECORDINGS DELETE');
+        %rows = $Myth->backend_rows('QUERY_RECORDINGS Descending');
     }
     foreach my $row (@{$rows{'rows'}}) {
         my $show = new MythTV::Recording(@$row);
@@ -390,7 +390,7 @@ EOF
     sub do_rename {
         $q  = 'UPDATE recorded SET basename=? WHERE chanid=? AND starttime=FROM_UNIXTIME(?)';
         $sh = $dbh->prepare($q);
-        my %rows = $Myth->backend_rows('QUERY_RECORDINGS Delete');
+        my %rows = $Myth->backend_rows('QUERY_RECORDINGS Descending');
         foreach my $row (@{$rows{'rows'}}) {
             my $show = new MythTV::Recording(@$row);
         # File doesn't exist locally

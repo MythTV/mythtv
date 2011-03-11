@@ -29,7 +29,7 @@ static inline int __glCheck__(const QString &loc, const char* fileName, int n)
     return error;
 }
 
-#define MAX_VERTEX_CACHE 50
+#define MAX_VERTEX_CACHE 500
 #define glCheck() __glCheck__(LOC, __FILE__, __LINE__)
 
 OpenGLLocker::OpenGLLocker(MythRenderOpenGL *render) : m_render(render)
@@ -107,15 +107,15 @@ void MythRenderOpenGL::MoveResizeWindow(const QRect &rect)
         parent->setGeometry(rect);
 }
 
-void MythRenderOpenGL::SetViewPort(const QSize &size)
+void MythRenderOpenGL::SetViewPort(const QRect &rect)
 {
-    if (size.width() == m_viewport.width() &&
-        size.height() == m_viewport.height())
+    if (rect == m_viewport)
         return;
 
     makeCurrent();
-    m_viewport = size;
-    glViewport(0, 0, m_viewport.width(), m_viewport.height());
+    m_viewport = rect;
+    glViewport(m_viewport.left(), m_viewport.top(),
+               m_viewport.width(), m_viewport.height());
     SetMatrixView();
     doneCurrent();
 }
@@ -476,7 +476,7 @@ bool MythRenderOpenGL::CreateFrameBuffer(uint &fb, uint tex)
     glCheck();
 
     EnableTextures(tex);
-    QSize tmp_viewport = m_viewport;
+    QRect tmp_viewport = m_viewport;
     glViewport(0, 0, size.width(), size.height());
     m_glGenFramebuffers(1, &glfb);
     m_glBindFramebuffer(GL_FRAMEBUFFER, glfb);
@@ -490,7 +490,8 @@ bool MythRenderOpenGL::CreateFrameBuffer(uint &fb, uint tex)
     GLenum status;
     status = m_glCheckFramebufferStatus(GL_FRAMEBUFFER);
     m_glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, tmp_viewport.width(), tmp_viewport.height());
+    glViewport(tmp_viewport.left(), tmp_viewport.top(),
+               tmp_viewport.width(), tmp_viewport.height());
 
     bool success = false;
     switch (status)
@@ -622,18 +623,22 @@ void MythRenderOpenGL::DrawBitmap(uint *textures, uint texture_count,
     doneCurrent();
 }
 
-void MythRenderOpenGL::DrawRect(const QRect &area, bool drawFill,
-                                const QColor &fillColor,  bool drawLine,
-                                int lineWidth, const QColor &lineColor,
-                                int target, int prog)
+void MythRenderOpenGL::DrawRect(const QRect &area, const QBrush &fillBrush,
+                                const QPen &linePen, int alpha)
 {
-    if (target && !m_framebuffers.contains(target))
-        target = 0;
-
     makeCurrent();
-    BindFramebuffer(target);
-    DrawRectPriv(area, drawFill, fillColor, drawLine,
-                 lineWidth, lineColor, prog);
+    BindFramebuffer(0);
+    DrawRectPriv(area, fillBrush, linePen, alpha);
+    doneCurrent();
+}
+
+void MythRenderOpenGL::DrawRoundRect(const QRect &area, int cornerRadius,
+                                     const QBrush &fillBrush,
+                                     const QPen &linePen, int alpha)
+{
+    makeCurrent();
+    BindFramebuffer(0);
+    DrawRoundRectPriv(area, cornerRadius, fillBrush, linePen, alpha);
     doneCurrent();
 }
 
@@ -876,7 +881,7 @@ void MythRenderOpenGL::ResetVars(void)
     m_max_units       = 0;
     m_default_texture_type = GL_TEXTURE_2D;
 
-    m_viewport        = QSize();
+    m_viewport        = QRect();
     m_active_tex      = 0;
     m_active_tex_type = 0;
     m_active_fb       = 0;

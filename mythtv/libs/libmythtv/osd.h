@@ -1,8 +1,6 @@
 #ifndef OSD_H
 #define OSD_H
 
-using namespace std;
-
 #include "mythtvexp.h"
 #include "programtypes.h"
 #include "mythscreentype.h"

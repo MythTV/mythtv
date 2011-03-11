@@ -143,18 +143,12 @@ int zoh_set_converter (SRC_PRIVATE *psrc, int src_enum) ;
 */
 
 #ifdef _MSC_VER
-// this is only needed because the is used in .c files
-// if they were .cpp, this could be removed
-# define INLINE __inline
 # include <inttypes.h>
-
 #else
-# define INLINE  inline
 long int lrint (double flt);
 #endif
 
-
-static INLINE double 
+static __inline double 
 fmod_one (double x)
 {	double res ;
 

@@ -22,6 +22,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "upnp.h"
+#include "mythverbose.h"
+
 #include "upnptaskcache.h"
 #include "multicast.h"
 #include "broadcast.h"

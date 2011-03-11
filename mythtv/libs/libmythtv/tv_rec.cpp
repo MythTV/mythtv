@@ -10,6 +10,8 @@
 using namespace std;
 
 // MythTV headers
+
+#include "compat.h"
 #include "previewgeneratorqueue.h"
 #include "mythconfig.h"
 #include "tv_rec.h"
@@ -870,8 +872,10 @@ void TVRec::FinishedRecording(RecordingInfo *curRec)
     VERBOSE(VB_RECORD, LOC + QString("FinishedRecording(%1) in recgroup: %2")
             .arg(curRec->GetTitle()).arg(recgrp));
 
-    if (curRec->GetRecordingStatus() != rsFailed)
+    if (curRec->GetRecordingStatus() == rsRecording)
         curRec->SetRecordingStatus(rsRecorded);
+    else if (curRec->GetRecordingStatus() != rsRecorded)
+        curRec->SetRecordingStatus(rsFailed);
     curRec->SetRecordingEndTime(mythCurrentDateTime());
 
     if (tvchain)

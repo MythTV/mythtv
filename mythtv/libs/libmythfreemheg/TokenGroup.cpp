@@ -64,7 +64,7 @@ void MHTokenGroupItem::PrintMe(FILE *fd, int nTabs) const
     PrintTabs(fd, nTabs); fprintf(fd, ")\n");
 }
 
-void MHMovement::Initialise(MHParseNode *p, MHEngine */*engine*/)
+void MHMovement::Initialise(MHParseNode *p, MHEngine * /*engine*/)
 {
     for (int i = 0; i < p->GetSeqCount(); i++) m_Movement.Append(p->GetSeqN(i)->GetIntValue());
 }

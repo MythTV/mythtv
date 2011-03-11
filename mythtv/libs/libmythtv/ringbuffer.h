@@ -17,6 +17,13 @@ extern "C" {
 
 #include "mythtvexp.h"
 
+#define PNG_MIN_SIZE   20 /* header plus one empty chunk */
+#define NUV_MIN_SIZE  204 /* header size? */
+#define MPEG_MIN_SIZE 376 /* 2 TS packets */
+
+/* should be minimum of the above test sizes */
+#define kReadTestSize PNG_MIN_SIZE
+
 class ThreadedFileWriter;
 class DVDRingBuffer;
 class BDRingBuffer;
@@ -210,7 +217,6 @@ class MTV_PUBLIC RingBuffer : protected QThread
     // constants
   public:
     static const uint kBufferSize;
-    static const uint kReadTestSize;
 };
 
 #endif // _RINGBUFFER_H_

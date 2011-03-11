@@ -1,6 +1,7 @@
 // -*- Mode: c++ -*-
 
 #include <stdint.h>
+#include <QSize>
 #include "compat.h"
 #include "util-opengl.h"
 

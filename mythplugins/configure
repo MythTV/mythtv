@@ -234,6 +234,8 @@ echo "   $0$CONFIGURATION_OPTS" >> config.log
 for opt do
   optval="${opt#*=}"
   case "$opt" in
+  --targetos=*) targetos=`echo $opt | cut -d '=' -f 2`
+  ;;
   --prefix=*) prefix=`echo $opt | cut -d '=' -f 2`
   ;;
   --libdir-name=*) libdir_name=`echo $opt | cut -d '=' -f 2`;
@@ -315,7 +317,7 @@ has_library()
         done
     fi
 
-    LIBPATHS="`echo $LIBPATHS $sysroot$prefix/$libdir_name $sysroot/$libdir_name $sysroot/usr/$libdir_name $sysroot/usr/local/$libdir_name $sysroot/usr/X11R6/$libdir_name | sed s/'\/ '/' '/g` "
+    LIBPATHS="`echo $LIBPATHS $prefix/$libdir_name $sysroot/$libdir_name $sysroot/usr/$libdir_name $sysroot/usr/local/$libdir_name $sysroot/usr/X11R6/$libdir_name | sed s/'\/ '/' '/g` "
 
     HAS_IT="no"
     for LIBPATH in $LIBPATHS ; do
@@ -328,7 +330,7 @@ has_library()
 
 has_header()
 {
-    HPATHS="$sysroot$prefix/include $sysroot/usr/local/include $sysroot/usr/include $sysroot/usr/include/g++-v3 $sysroot/usr/X11R6/include $sysroot/"
+    HPATHS="$prefix/include $sysroot/usr/local/include $sysroot/usr/include $sysroot/usr/include/g++-v3 $sysroot/usr/X11R6/include $sysroot/"
     INCL=`echo $DYLD_LIBRARY_PATH $LD_LIBRARY_PATH | sed s/':'/' '/g`
     HPATHS="$HPATHS `echo $INCL | sed s/$libdir_name/include/g` "
 
@@ -503,7 +505,7 @@ if test "$music" != "no" ; then
         cdaudio="yes"
     fi
 
-    if test "$cdaudio" = "no" -a "$targetos" != "Darwin"; then
+    if test "$cdaudio" = "no" -a "$targetos" != "Darwin" -a "`echo ${targetos} | cut -c1-5`" != "MINGW"; then
         echo "MythMusic requires libcdaudio."
     fi
 
@@ -585,13 +587,13 @@ rm -f $TMPC $TMPE
 ###########################################################
 
 # bring in mythtv config
-if [ -e $sysroot$prefix/include/mythtv/mythconfig.mak ] ; then
+if [ -e $prefix/include/mythtv/mythconfig.mak ] ; then
   rm mythconfig.mak 2> /dev/null
-  ln -s $sysroot$prefix/include/mythtv/mythconfig.mak mythconfig.mak
+  ln -s $prefix/include/mythtv/mythconfig.mak mythconfig.mak
 else
-  echo "ERROR: mythconfig.mak not found at $sysroot$prefix/include/mythtv/mythconfig.mak"
+  echo "ERROR: mythconfig.mak not found at $prefix/include/mythtv/mythconfig.mak"
   echo "Did you make AND install MythTV first?"
-  echo "Are you using the correct prefix ($prefix) and sysroot ($sysroot)?"
+  echo "Are you using the correct prefix ($prefix)?"
   echo "Bailing out!!"
   exit
 fi

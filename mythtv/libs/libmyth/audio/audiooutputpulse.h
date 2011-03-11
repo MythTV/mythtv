@@ -35,7 +35,7 @@ class AudioOutputPulseAudio : public AudioOutputBase
     void Drain(void);
 
   protected:
-    AudioOutputSettings* GetOutputSettings(void);
+    AudioOutputSettings* GetOutputSettings(bool digital);
     bool OpenDevice(void);
     void CloseDevice(void);
     void WriteAudio(unsigned char *aubuf, int size);

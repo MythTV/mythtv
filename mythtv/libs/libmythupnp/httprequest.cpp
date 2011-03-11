@@ -4,7 +4,7 @@
 //
 // Purpose     : Http Request/Response
 //                                                                            
-// Copyright (c) 2005 David Blain <mythtv@theblains.net>
+// Copyright (c) 2005 David Blain <dblain@mythtv.org>
 //                                          
 // This library is free software; you can redistribute it and/or 
 // modify it under the terms of the GNU Lesser General Public
@@ -47,6 +47,10 @@
 
 #include "compat.h"
 #include "mythverbose.h"
+
+#include "serializers/xmlSerializer.h"
+#include "serializers/soapSerializer.h"
+#include "serializers/jsonSerializer.h"
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0
@@ -118,46 +122,9 @@ HTTPRequest::HTTPRequest() : m_procReqLineExp ( "[ \r\n][ \r\n]*"  ),
                              m_bSOAPRequest   ( false ),
                              m_eResponseType  ( ResponseTypeUnknown),
                              m_nResponseStatus( 200 ),
-                             m_response       ( &m_aBuffer,
-                                                QIODevice::WriteOnly ),
                              m_pPostProcess   ( NULL )
 {
-    m_response.setCodec(QTextCodec::codecForName("UTF-8"));
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void HTTPRequest::Reset()
-{
-    m_eType          = RequestTypeUnknown;
-    m_eContentType   = ContentType_Unknown;
-    m_nMajor         = 0;
-    m_nMinor         = 0;
-    m_bSOAPRequest   = false;
-    m_eResponseType  = ResponseTypeUnknown;
-    m_nResponseStatus= 200;
-    m_pPostProcess   = NULL;
-
-    m_response << flush;
-    m_aBuffer.truncate( 0 );
-
-    m_sRawRequest.clear();
-    m_sBaseUrl.clear();
-    m_sMethod.clear();
-
-    m_mapParams.clear();
-    m_mapHeaders.clear();
-
-    m_sPayload.clear();
-
-    m_sProtocol.clear();
-    m_sNameSpace.clear();
-
-    m_mapRespHeaders.clear();
-
-    m_sFileName.clear();
+    m_response.open( QIODevice::ReadWrite );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -278,9 +245,9 @@ long HTTPRequest::SendResponse( void )
     // ----------------------------------------------------------------------
     // Write out Header.
     // ----------------------------------------------------------------------
+    const QByteArray &buffer = m_response.buffer();
 
-    m_response << flush;
-    QString    rHeader = BuildHeader( m_aBuffer.size() );
+    QString    rHeader = BuildHeader( buffer.length() );
     QByteArray sHeader = rHeader.toUtf8();
     nBytes  = WriteBlockDirect( sHeader.constData(), sHeader.length() );
 
@@ -288,7 +255,7 @@ long HTTPRequest::SendResponse( void )
     // Write out Response buffer.
     // ----------------------------------------------------------------------
 
-    if (( m_eType != RequestTypeHead ) && ( m_aBuffer.size() > 0 ))
+    if (( m_eType != RequestTypeHead ) && ( buffer.length() > 0 ))
     {
 #if 0
         VERBOSE(VB_UPNP, QString("HTTPRequest::SendResponse : DATA : %1 : ")
@@ -298,7 +265,7 @@ long HTTPRequest::SendResponse( void )
 
         cout << endl;
 #endif
-        nBytes += WriteBlockDirect( m_aBuffer.constData(), m_aBuffer.size() );
+        nBytes += SendData( &m_response, 0, m_response.size() );
     }
 
     // ----------------------------------------------------------------------
@@ -471,17 +438,15 @@ long HTTPRequest::SendResponseFile( QString sFileName )
 
 #define SENDFILE_BUFFER_SIZE 65536
 
-qint64 HTTPRequest::SendFile( QFile &file, qint64 llStart, qint64 llBytes )
+qint64 HTTPRequest::SendData( QIODevice *pDevice, qint64 llStart, qint64 llBytes )
 {
     qint64 sent = 0;
-
-#if CONFIG_DARWIN || CONFIG_CYGWIN || defined(__FreeBSD__) || defined(USING_MINGW)
 
     // ----------------------------------------------------------------------
     // Set out file position to requested start location.
     // ----------------------------------------------------------------------
 
-    if ( file.seek( llStart ) == false)
+    if ( pDevice->seek( llStart ) == false)
         return -1;
 
     char   aBuffer[ SENDFILE_BUFFER_SIZE ];
@@ -491,11 +456,11 @@ qint64 HTTPRequest::SendFile( QFile &file, qint64 llStart, qint64 llBytes )
     qint64 llBytesRead      = 0;
     qint64 llBytesWritten   = 0;
 
-    while ((sent < llBytes) && !file.atEnd())
+    while ((sent < llBytes) && !pDevice->atEnd())
     {
         llBytesToRead  = std::min( (qint64)SENDFILE_BUFFER_SIZE, llBytesRemaining );
         
-        if (( llBytesRead = file.read( aBuffer, llBytesToRead )) != -1 )
+        if (( llBytesRead = pDevice->read( aBuffer, llBytesToRead )) != -1 )
         {
             if (( llBytesWritten = WriteBlockDirect( aBuffer, llBytesRead )) == -1)
                 return -1;
@@ -506,6 +471,21 @@ qint64 HTTPRequest::SendFile( QFile &file, qint64 llStart, qint64 llBytes )
             llBytesRemaining -= llBytesRead;
         }
     }
+
+    return sent;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// 
+/////////////////////////////////////////////////////////////////////////////
+
+qint64 HTTPRequest::SendFile( QFile &file, qint64 llStart, qint64 llBytes )
+{
+    qint64 sent = 0;
+
+#if CONFIG_DARWIN || CONFIG_CYGWIN || defined(__FreeBSD__) || defined(USING_MINGW)
+
+    sent = SendData( (QIODevice *)(&file), llStart, llBytes );
 
 #else
 
@@ -565,7 +545,9 @@ void HTTPRequest::FormatErrorResponse( bool  bServerError,
     m_eResponseType   = ResponseTypeXML;
     m_nResponseStatus = 500;
 
-    m_response << "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
+    QTextStream stream( &m_response );
+
+    stream << "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 
     QString sWhere = ( bServerError ) ? "s:Server" : "s:Client";
 
@@ -573,19 +555,36 @@ void HTTPRequest::FormatErrorResponse( bool  bServerError,
     {
         m_mapRespHeaders[ "EXT" ] = "";
 
-        m_response << SOAP_ENVELOPE_BEGIN
-                   << "<s:Fault>"
-                   << "<faultcode>"   << sWhere       << "</faultcode>"
-                   << "<faultstring>" << sFaultString << "</faultstring>";
+        stream << SOAP_ENVELOPE_BEGIN
+               << "<s:Fault>"
+               << "<faultcode>"   << sWhere       << "</faultcode>"
+               << "<faultstring>" << sFaultString << "</faultstring>";
     }
 
     if (sDetails.length() > 0)
     {
-        m_response << "<detail>" << sDetails << "</detail>";
+        stream << "<detail>" << sDetails << "</detail>";
     }
 
     if (m_bSOAPRequest)
-        m_response << "</s:Fault>" << SOAP_ENVELOPE_END;
+        stream << "</s:Fault>" << SOAP_ENVELOPE_END;
+
+    stream.flush();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void HTTPRequest::FormatActionResponse( Serializer *pSer )
+{
+    m_eResponseType     = ResponseTypeOther;
+    m_sResponseTypeText = pSer->GetContentType();
+    m_nResponseStatus   = 200;
+
+    pSer->AddHeaders( m_mapRespHeaders );
+
+    //m_response << pFormatter->ToString();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -597,51 +596,55 @@ void HTTPRequest::FormatActionResponse(const NameValues &args)
     m_eResponseType   = ResponseTypeXML;
     m_nResponseStatus = 200;
 
-    m_response << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n";
+    QTextStream stream( &m_response );
+
+    stream << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n";
 
     if (m_bSOAPRequest)
     {
         m_mapRespHeaders[ "EXT" ] = "";
 
-        m_response << SOAP_ENVELOPE_BEGIN
-                   << "<u:" << m_sMethod << "Response xmlns:u=\""
-                   << m_sNameSpace << "\">\r\n";
+        stream << SOAP_ENVELOPE_BEGIN
+               << "<u:" << m_sMethod << "Response xmlns:u=\""
+               << m_sNameSpace << "\">\r\n";
     }
     else
-        m_response << "<" << m_sMethod << "Response>\r\n";
+        stream << "<" << m_sMethod << "Response>\r\n";
 
     NameValues::const_iterator nit = args.begin();
     for (; nit != args.end(); ++nit)
     {
-        m_response << "<" << (*nit).sName;
+        stream << "<" << (*nit).sName;
 
         if ((*nit).pAttributes)
         {
             NameValues::const_iterator nit2 = (*nit).pAttributes->begin();
             for (; nit2 != (*nit).pAttributes->end(); ++nit2)
             {
-                m_response << " " << (*nit2).sName << "='"
-                           << Encode( (*nit2).sValue ) << "'";
+                stream << " " << (*nit2).sName << "='"
+                       << Encode( (*nit2).sValue ) << "'";
             }
         }
 
-        m_response << ">";
+        stream << ">";
 
         if (m_bSOAPRequest)
-            m_response << Encode( (*nit).sValue );
+            stream << Encode( (*nit).sValue );
         else
-            m_response << (*nit).sValue;
+            stream << (*nit).sValue;
 
-        m_response << "</" << (*nit).sName << ">\r\n";
+        stream << "</" << (*nit).sName << ">\r\n";
     }
 
     if (m_bSOAPRequest)
     {
-        m_response << "</u:" << m_sMethod << "Response>\r\n"
+        stream << "</u:" << m_sMethod << "Response>\r\n"
                    << SOAP_ENVELOPE_END;
     }
     else
-        m_response << "</" << m_sMethod << "Response>\r\n";
+        stream << "</" << m_sMethod << "Response>\r\n";
+
+    stream.flush();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -653,7 +656,11 @@ void HTTPRequest::FormatRawResponse(const QString &sXML)
     m_eResponseType   = ResponseTypeXML;
     m_nResponseStatus = 200;
 
-    m_response << sXML;
+    QTextStream stream( &m_response );
+
+    stream << sXML;
+
+    stream.flush();
 }
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1099,6 +1106,8 @@ void HTTPRequest::ProcessRequestLine( const QString &sLine )
             //m_sBaseUrl = tokens[1].section( '?', 0, 0).trimmed();
             m_sBaseUrl = (QUrl::fromPercentEncoding(tokens[1].toUtf8())).section( '?', 0, 0).trimmed();
 
+            m_sResourceUrl = m_sBaseUrl;  // Save complete url without paramaters
+
             // Process any Query String Parameters
 
             //QString sQueryStr = tokens[1].section( '?', 1, 1   );
@@ -1282,11 +1291,29 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
     // XML Document Loaded... now parse it
     // --------------------------------------------------------------
 
-    m_sNameSpace    = sSOAPAction.section( '#', 0, 0).remove( 0, 1);
-    m_sMethod       = sSOAPAction.section( '#', 1 );
-    m_sMethod.remove( m_sMethod.length()-1, 1 );
+    if (sSOAPAction.contains( '#' ))
+    {
+        m_sNameSpace    = sSOAPAction.section( '#', 0, 0).remove( 0, 1);
+        m_sMethod       = sSOAPAction.section( '#', 1 );
+        m_sMethod.remove( m_sMethod.length()-1, 1 );
+    }
+    if (sSOAPAction.contains( '/' ))
+    {
+        int nPos       = sSOAPAction.lastIndexOf( '/' );
+        m_sNameSpace   = sSOAPAction.mid( 1, nPos );
+        m_sMethod      = sSOAPAction.mid( nPos + 1, sSOAPAction.length() - nPos - 2  );
+    }
+    else
+    {
+        m_sNameSpace = QString::null;
+        m_sMethod    = sSOAPAction;
+        m_sMethod.remove( QChar( '\"' ) );
+    }
 
     QDomNodeList oNodeList = doc.elementsByTagNameNS( m_sNameSpace, m_sMethod );
+
+    if (oNodeList.count() == 0)
+        oNodeList = doc.elementsByTagNameNS( "http://schemas.xmlsoap.org/soap/envelope/", "Body" );
 
     if (oNodeList.count() > 0)
     {
@@ -1323,6 +1350,34 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
     }
 
     return bSuccess;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+Serializer *HTTPRequest::GetSerializer()
+{
+    Serializer *pSerializer = NULL;
+
+    if (m_bSOAPRequest) 
+        pSerializer = (Serializer *)new SoapSerializer( &m_response, m_sNameSpace, m_sMethod );
+    else
+    {
+        QString sAccept = GetHeaderValue( "Accept", "*/*" );
+        
+        if (sAccept.contains( "application/json", Qt::CaseInsensitive ))    
+            pSerializer = (Serializer *)new JSONSerializer( &m_response, m_sMethod );
+        else if (sAccept.contains( "text/javascript", Qt::CaseInsensitive ))    
+            pSerializer = (Serializer *)new JSONSerializer( &m_response, m_sMethod );
+    }
+
+    // Default to XML
+
+    if (pSerializer == NULL)
+        pSerializer = (Serializer *)new XmlSerializer( &m_response, m_sMethod );
+
+    return pSerializer;
 }
 
 /////////////////////////////////////////////////////////////////////////////
