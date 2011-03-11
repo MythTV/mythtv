@@ -38,7 +38,7 @@ class DVBCam
 
     bool Start();
     bool Stop();
-    bool IsRunning() const { return ciThreadRunning; }
+    bool IsRunning() const { return ciHandlerThread.isRunning(); }
     void SetPMT(const ChannelBase *chan, const ProgramMapTable *pmt);
     void SetTimeOffset(double offset_in_seconds);
 
@@ -54,7 +54,6 @@ class DVBCam
     cCiHandler     *ciHandler;
 
     bool            exitCiThread;
-    bool            ciThreadRunning;
 
     CiHandlerThread ciHandlerThread;
 
