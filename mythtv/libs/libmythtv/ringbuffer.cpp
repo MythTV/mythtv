@@ -237,11 +237,22 @@ RingBuffer::~RingBuffer(void)
 {
     KillReadAheadThread();
 
+    rwlock.lockForWrite();
+
     if (readAheadBuffer) // this only runs if thread is terminated
     {
         delete [] readAheadBuffer;
         readAheadBuffer = NULL;
     }
+
+    if (tfw)
+    {
+        tfw->Flush();
+        delete tfw;
+        tfw = NULL;
+    }
+
+    rwlock.unlock();
 }
 
 /** \fn RingBuffer::Reset(bool, bool, bool)
