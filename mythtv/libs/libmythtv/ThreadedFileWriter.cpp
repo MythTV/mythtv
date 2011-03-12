@@ -29,8 +29,8 @@ static int posix_fadvise(int, off_t, off_t, int) { return 0; }
 #  endif
 #endif
 
-#define LOC QString("TFW: ")
-#define LOC_ERR QString("TFW, Error: ")
+#define LOC QString("TFW(%1): ").arg(fd)
+#define LOC_ERR QString("TFW(%1), Error: ").arg(fd)
 
 const uint ThreadedFileWriter::TFW_DEF_BUF_SIZE   = 2*1024*1024;
 const uint ThreadedFileWriter::TFW_MAX_WRITE_SIZE = TFW_DEF_BUF_SIZE / 4;
@@ -83,7 +83,7 @@ static uint safe_write(int fd, const void *data, uint sz, bool &ok)
             }
             errcnt++;
             VERBOSE(VB_IMPORTANT, LOC_ERR + "safe_write(): File I/O " +
-                    QString(" errcnt: %1").arg(errcnt) + ENO + QString(" errno: %1").arg(errno));
+                    QString(" errcnt: %1").arg(errcnt) + ENO);
 
             if (errcnt == 3)
                 break;
@@ -102,6 +102,11 @@ static uint safe_write(int fd, const void *data, uint sz, bool &ok)
     ok = (errcnt < 3);
     return tot;
 }
+
+#undef LOC
+#undef LOC_ERR
+#define LOC QString("TFW(%1:%2): ").arg(filename).arg(fd)
+#define LOC_ERR QString("TFW(%1:%2), Error: ").arg(filename).arg(fd)
 
 /** \fn TFWWriteThread::start()
  *  \brief Thunk that runs ThreadedFileWriter::DiskLoop(void)
