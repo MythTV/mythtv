@@ -306,8 +306,29 @@ MythImage* MythPainter::GetImageFromRect(const QRect &area, int radius,
     uint64_t hash3 = ((0xffffffff & (uint64_t)linePen.color().rgba())) +
                      ((0xffffffff & (uint64_t)fillBrush.color().rgba()) << 32);
 
-    QString incoming = QString("RECT") + QString::number(hash1) +
-                       QString::number(hash2) + QString::number(hash3);
+    QString incoming("R");
+    if (fillBrush.style() == Qt::LinearGradientPattern && fillBrush.gradient())
+    {
+        const QLinearGradient *gradient = static_cast<const QLinearGradient*>(fillBrush.gradient());
+        if (gradient)
+        {
+            incoming = QString::number(
+                             ((0xfff & (uint64_t)gradient->start().x())) +
+                             ((0xfff & (uint64_t)gradient->start().y()) << 12) +
+                             ((0xfff & (uint64_t)gradient->finalStop().x()) << 24) +
+                             ((0xfff & (uint64_t)gradient->finalStop().y()) << 36));
+            QGradientStops stops = gradient->stops();
+            for (int i = 0; i < stops.size(); i++)
+            {
+                incoming += QString::number(
+                             ((0xfff * (uint64_t)(stops[i].first * 100))) +
+                             ((uint64_t)stops[i].second.rgba() << 12));
+            }
+        }
+    }
+
+    incoming += QString::number(hash1) + QString::number(hash2) +
+                QString::number(hash3);
 
     if (m_StringToImageMap.contains(incoming))
     {
