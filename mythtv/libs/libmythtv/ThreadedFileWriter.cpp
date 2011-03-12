@@ -394,11 +394,6 @@ void ThreadedFileWriter::Sync(void)
 {
     if (fd >= 0)
     {
-        /// Toss any data the kernel wrote to disk on it's own from
-        /// the cache, so we don't get penalized for preserving it
-        /// during the sync.
-        (void) posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
-
 #if defined(_POSIX_SYNCHRONIZED_IO) && _POSIX_SYNCHRONIZED_IO > 0
         // fdatasync tries to avoid updating metadata, but will in
         // practice always update metadata if any data is written
@@ -407,10 +402,6 @@ void ThreadedFileWriter::Sync(void)
 #else
         fsync(fd);
 #endif
-
-        // Toss any data we just synced from cache, so we don't
-        // get penalized for it between now and the next sync.
-        (void) posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
     }
 }
 
