@@ -14,7 +14,12 @@
 // Own header
 #include "mythpainter.h"
 
-int MythPainter::m_MaxCacheSize = 1024 * 1024 * 64;
+MythPainter::MythPainter()
+  : m_Parent(0), m_HardwareCacheSize(0), m_ItemCacheSize(256),
+    m_showBorders(false), m_showNames(false)
+{
+    SetMaxHardwareCacheSize(64);
+}
 
 MythPainter::~MythPainter(void)
 {
@@ -397,12 +402,17 @@ void MythPainter::ExpireImages(uint max)
 }
 
 // the following assume graphics hardware operates natively at 32bpp
-void MythPainter::IncreaseCacheSize(QSize size)
+void MythPainter::SetMaxHardwareCacheSize(int mb)
 {
-    m_CacheSize += size.width() * size.height() * 4;
+    m_MaxHardwareCacheSize = 1024 * 1024 * mb;
 }
 
-void MythPainter::DecreaseCacheSize(QSize size)
+void MythPainter::IncreaseHardwareCacheSize(QSize size)
 {
-    m_CacheSize -= size.width() * size.height() * 4;
+    m_HardwareCacheSize += size.width() * size.height() * 4;
+}
+
+void MythPainter::DecreaseHardwareCacheSize(QSize size)
+{
+    m_HardwareCacheSize -= size.width() * size.height() * 4;
 }

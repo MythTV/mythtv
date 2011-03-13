@@ -24,9 +24,7 @@ class MythImage;
 class MUI_PUBLIC MythPainter
 {
   public:
-    MythPainter()
-      : m_Parent(0), m_CacheSize(0), m_ItemCacheSize(256),
-        m_showBorders(false), m_showNames(false) { }
+    MythPainter();
     virtual ~MythPainter();
 
     virtual QString GetName(void) = 0;
@@ -72,6 +70,8 @@ class MUI_PUBLIC MythPainter
     bool ShowBorders(void) { return m_showBorders; }
     bool ShowTypeNames(void) { return m_showNames; }
 
+    void SetMaxHardwareCacheSize(int mb);
+
   protected:
     void DrawTextPriv(MythImage *im, const QString &msg, int flags,
                       const QRect &r, const MythFontProperties &font);
@@ -89,12 +89,12 @@ class MUI_PUBLIC MythPainter
     virtual void ExpireImages(uint max = 0);
 
     void CheckFormatImage(MythImage *im);
-    void IncreaseCacheSize(QSize size);
-    void DecreaseCacheSize(QSize size);
+    void IncreaseHardwareCacheSize(QSize size);
+    void DecreaseHardwareCacheSize(QSize size);
 
     QPaintDevice     *m_Parent;
-    int               m_CacheSize;
-    static int        m_MaxCacheSize;
+    int               m_HardwareCacheSize;
+    int               m_MaxHardwareCacheSize;
     int               m_ItemCacheSize;
     QList<MythImage*> m_allocatedImages;
     QMutex            m_allocationLock;

@@ -128,7 +128,7 @@ void MythVDPAUPainter::DeleteBitmaps(void)
     {
         uint bitmap = m_bitmapDeleteList.front();
         m_bitmapDeleteList.pop_front();
-        DecreaseCacheSize(m_render->GetBitmapSize(bitmap));
+        DecreaseHardwareCacheSize(m_render->GetBitmapSize(bitmap));
         m_render->DestroyBitmapSurface(bitmap);
     }
 }
@@ -179,8 +179,8 @@ uint MythVDPAUPainter::GetTextureFromCache(MythImage *im)
         m_render->UploadMythImage(newbitmap, im);
         m_ImageBitmapMap[im] = newbitmap;
         m_ImageExpireList.push_back(im);
-        IncreaseCacheSize(im->size());
-        while (m_CacheSize > m_MaxCacheSize)
+        IncreaseHardwareCacheSize(im->size());
+        while (m_HardwareCacheSize > m_MaxHardwareCacheSize)
         {
             MythImage *expiredIm = m_ImageExpireList.front();
             m_ImageExpireList.pop_front();
