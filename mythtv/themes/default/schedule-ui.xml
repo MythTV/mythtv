@@ -1277,12 +1277,13 @@
 
         <shape name="background" from="basebackground">
             <area>40,60,720,500</area>
+            <fill color="#000000"/>
         </shape>
 
         <webbrowser name="browser">
             <area>40,65,710,490</area>
             <zoom>1.0</zoom>
-            <background color="#000000" alpha="1"/>
+            <background color="#000000"/>
         </webbrowser>
     </window>
 
