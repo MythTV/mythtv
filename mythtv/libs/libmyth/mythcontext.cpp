@@ -1276,8 +1276,7 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
 
         QString warning = QObject::tr(
             "This application is not compatible "
-            "with the installed MythTV libraries. "
-            "Please recompile after a make distclean");
+            "with the installed MythTV libraries.");
         if (gui)
         {
             d->TempMainWindow(false);
@@ -1358,8 +1357,7 @@ bool MythContext::TestPopupVersion(const QString &name,
 
     QString err = QObject::tr(
         "Plugin %1 is not compatible with the installed MythTV "
-        "libraries. Please recompile the plugin after a make "
-        "distclean");
+        "libraries.");
 
     VERBOSE(VB_GENERAL, QString("Plugin %1 (%2) binary version does not "
                                 "match libraries (%3)")
