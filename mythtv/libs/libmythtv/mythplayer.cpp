@@ -2222,7 +2222,8 @@ void MythPlayer::SwitchToProgram(void)
     if (discontinuity || newtype)
     {
         player_ctx->tvchain->SetProgram(*pginfo);
-        decoder->SetProgramInfo(*pginfo);
+        if (decoder)
+            decoder->SetProgramInfo(*pginfo);
 
         player_ctx->buffer->Reset(true);
         if (newtype)
@@ -3146,7 +3147,8 @@ void MythPlayer::ChangeSpeed(void)
     if (skip_changed && videoOutput)
     {
         videoOutput->SetPrebuffering(ffrew_skip == 1);
-        decoder->setExactSeeks(exactseeks && ffrew_skip == 1);
+        if (decoder)
+            decoder->setExactSeeks(exactseeks && ffrew_skip == 1);
         if (play_speed != 0.0f && !(last_speed == 0.0f && ffrew_skip == 1))
             DoJumpToFrame(framesPlayed + fftime - rewindtime);
     }
@@ -4243,6 +4245,9 @@ int MythPlayer::GetSecondsBehind(void) const
 
 void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
 {
+    if (!decoder)
+        return;
+
     bool islive = false;
     int chapter = GetCurrentChapter() + 1;
     int title = GetCurrentTitle() + 1;
