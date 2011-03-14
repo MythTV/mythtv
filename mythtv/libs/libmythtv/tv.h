@@ -4,7 +4,7 @@
 #include <QString>
 
 #include "videoouttypes.h"
-#include "mythui_actions.h"
+#include "mythuiactions.h"
 #include "tv_actions.h"
 
 /** \brief ChannelChangeDirection is an enumeration of possible channel
