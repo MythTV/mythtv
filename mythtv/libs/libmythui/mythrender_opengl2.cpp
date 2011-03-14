@@ -1,3 +1,4 @@
+#include "math.h"
 #include "mythrender_opengl2.h"
 
 #define LOC QString("OpenGL2: ")
@@ -163,6 +164,8 @@ void MythRenderOpenGL2::ResetVars(void)
 {
     MythRenderOpenGL::ResetVars();
     memset(m_projection, 0, sizeof(m_projection));
+    memset(m_scale, 0, sizeof(m_scale));
+    memset(m_rotate, 0, sizeof(m_rotate));
     memset(m_parameters, 0, sizeof(m_parameters));
     memset(m_shaders, 0, sizeof(m_shaders));
     m_active_obj = 0;
@@ -840,6 +843,22 @@ void MythRenderOpenGL2::SetMatrixView(void)
     m_projection[3][0] = -((right + left) / (right - left));
     m_projection[3][1] = -((top + bottom) / (top - bottom));
     m_projection[3][3] = 1.0;
+}
+
+void MythRenderOpenGL2::SetRotation(int degrees)
+{
+    float rotation = degrees * (M_PI / 180.0);
+    m_rotate[0][0] = m_rotate[1][1] = cos(rotation);
+    m_rotate[1][0] = sin(rotation);
+    m_rotate[0][1] = -m_rotate[1][0];
+    m_rotate[2][2] = m_rotate[3][3] = 1.0;
+}
+
+void MythRenderOpenGL2::SetScaling(int horizontal, int vertical)
+{
+    m_scale[0][0] = horizontal / 100.0;
+    m_scale[1][1] = vertical   / 100.0;
+    m_scale[2][2] = m_scale[3][3] = 1.0;
 }
 
 void MythRenderOpenGL2::DeleteShaders(void)

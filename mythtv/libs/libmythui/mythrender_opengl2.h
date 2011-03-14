@@ -53,6 +53,8 @@ class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
     virtual void DeleteOpenGLResources(void);
     virtual void SetMatrixView(void);
 
+    void SetScaling(int horizontal, int vertical);
+    void SetRotation(int degrees);
     void CreateDefaultShaders(void);
     void DeleteDefaultShaders(void);
     uint CreateShader(int type, const QString &source);
@@ -67,6 +69,8 @@ class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
     // State
     uint  m_active_obj;
     float m_projection[4][4];
+    float m_scale[4][4];
+    float m_rotate[4][4];
     float m_parameters[4][4];
     QString m_qualifiers;
 
