@@ -11,6 +11,7 @@ public:
                     bool allow_private_decode = true,
                     bool no_hardware_decode = false,
                     AVSpecialDecode av_special_decode = kAVSpecialDecode_None);
+    virtual void Reset(void);
 
   private:
     virtual void StreamChangeCheck(void);

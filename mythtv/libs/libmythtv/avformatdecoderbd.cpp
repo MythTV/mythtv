@@ -15,6 +15,12 @@ AvFormatDecoderBD::AvFormatDecoderBD(
 {
 }
 
+void AvFormatDecoderBD::Reset()
+{
+    AvFormatDecoder::Reset();
+    SyncPositionMap();
+}
+
 void AvFormatDecoderBD::StreamChangeCheck(void)
 {
     if (!ringBuffer->IsBD())

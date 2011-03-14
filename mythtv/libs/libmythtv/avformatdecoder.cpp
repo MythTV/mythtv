@@ -764,9 +764,6 @@ void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset)
 void AvFormatDecoder::Reset()
 {
     DecoderBase::Reset();
-
-    if (ringBuffer->IsDVD())
-        SyncPositionMap();
 }
 
 bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
