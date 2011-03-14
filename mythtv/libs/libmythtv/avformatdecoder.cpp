@@ -743,27 +743,21 @@ void AvFormatDecoder::SetEof(bool eof)
     DecoderBase::SetEof(eof);
 }
 
-void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset)
+void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset, bool reset_file)
 {
-    VERBOSE(VB_PLAYBACK, LOC + QString("Reset(%1, %2)")
-            .arg(reset_video_data).arg(seek_reset));
+    VERBOSE(VB_PLAYBACK, LOC + QString("Reset: Video %1, Seek %2, File %3")
+            .arg(reset_video_data).arg(seek_reset).arg(reset_file));
+
     if (seek_reset)
         SeekReset(0, 0, true, false);
 
+    DecoderBase::Reset(reset_video_data, false, reset_file);
+
     if (reset_video_data)
     {
-        ResetPosMap();
-        framesPlayed = 0;
-        framesRead = 0;
-        totalDuration = 0;
         seen_gop = false;
         seq_count = 0;
     }
-}
-
-void AvFormatDecoder::Reset()
-{
-    DecoderBase::Reset();
 }
 
 bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
@@ -861,7 +855,7 @@ extern "C" void HandleBDStreamChange(void* data)
     VERBOSE(VB_PLAYBACK, LOC + "HandleBDStreamChange(): resetting");
 
     QMutexLocker locker(avcodeclock);
-    decoder->Reset(true, false);
+    decoder->Reset(true, false, false);
     decoder->CloseCodecs();
     decoder->FindStreamInfo();
     decoder->ScanStreams(false);

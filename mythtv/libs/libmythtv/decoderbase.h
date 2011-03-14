@@ -88,7 +88,7 @@ class DecoderBase
     DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo);
     virtual ~DecoderBase();
 
-    virtual void Reset(void);
+    virtual void Reset(bool reset_video_data, bool seek_reset, bool reset_file);
 
     virtual int OpenFile(RingBuffer *rbuffer, bool novideo,
                          char testbuf[kDecoderProbeBufferSize],

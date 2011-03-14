@@ -15,9 +15,9 @@ AvFormatDecoderBD::AvFormatDecoderBD(
 {
 }
 
-void AvFormatDecoderBD::Reset()
+void AvFormatDecoderBD::Reset(bool reset_video_data, bool seek_reset, bool reset_file)
 {
-    AvFormatDecoder::Reset();
+    AvFormatDecoder::Reset(reset_video_data, seek_reset, reset_file);
     SyncPositionMap();
 }
 

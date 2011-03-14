@@ -11,7 +11,7 @@ class AvFormatDecoderBD : public AvFormatDecoder
                     bool allow_private_decode = true,
                     bool no_hardware_decode = false,
                     AVSpecialDecode av_special_decode = kAVSpecialDecode_None);
-    virtual void Reset(void);
+    virtual void Reset(bool reset_video_data, bool seek_reset, bool reset_file);
 
   private:
     virtual void StreamChangeCheck(void);

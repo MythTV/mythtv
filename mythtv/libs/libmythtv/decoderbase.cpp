@@ -67,18 +67,30 @@ void DecoderBase::SetProgramInfo(const ProgramInfo &pginfo)
     m_playbackinfo = new ProgramInfo(pginfo);
 }
 
-void DecoderBase::Reset(void)
+void DecoderBase::Reset(bool reset_video_data, bool seek_reset, bool reset_file)
 {
-    SeekReset(0, 0, true, true);
+    VERBOSE(VB_PLAYBACK, LOC + QString("Reset: Video %1, Seek %2, File %3")
+            .arg(reset_video_data).arg(seek_reset).arg(reset_file));
 
-    ResetPosMap();
-    framesPlayed = 0;
-    framesRead = 0;
-    totalDuration = 0;
-    dontSyncPositionMap = false;
+    if (seek_reset)
+    {
+        SeekReset(0, 0, true, true);
+    }
 
-    waitingForChange = false;
-    SetEof(false);
+    if (reset_video_data)
+    {
+        ResetPosMap();
+        framesPlayed = 0;
+        framesRead = 0;
+        totalDuration = 0;
+        dontSyncPositionMap = false;
+    }
+
+    if (reset_file)
+    {
+        waitingForChange = false;
+        SetEof(false);
+    }
 }
 
 void DecoderBase::SeekReset(long long, uint, bool, bool)

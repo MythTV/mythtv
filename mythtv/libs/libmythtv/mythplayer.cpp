@@ -2227,7 +2227,7 @@ void MythPlayer::ResetPlaying(bool resetframes)
         framesPlayed = 0;
     if (decoder)
     {
-        decoder->Reset();
+        decoder->Reset(true, true, true);
         if (decoder->IsErrored())
             SetErrored("Unable to reset video decoder");
     }

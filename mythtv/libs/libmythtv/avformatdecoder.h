@@ -103,8 +103,7 @@ class AvFormatDecoder : public DecoderBase
 
     void CloseCodecs();
     void CloseContext();
-    virtual void Reset(void);
-    void Reset(bool reset_video_data = true, bool seek_reset = true);
+    virtual void Reset(bool reset_video_data, bool seek_reset, bool reset_file);
 
     /// Perform an av_probe_input_format on the passed data to see if we
     /// can decode it with this class.
