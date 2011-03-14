@@ -214,13 +214,21 @@ MythPlayer::MythPlayer(bool muted)
     detect_letter_box = new DetectLetterbox(this);
 
     vbimode = VBIMode::Parse(gCoreContext->GetSetting("VbiFormat"));
+
+    defaultDisplayAspect =
+        gCoreContext->GetFloatSettingOnHost("XineramaMonitorAspectRatio",
+                                            gCoreContext->GetHostName(), 1.3333);
+    captionsEnabledbyDefault = gCoreContext->GetNumSetting("DefaultCCMode");
     decode_extra_audio = gCoreContext->GetNumSetting("DecodeExtraAudio", 0);
     itvEnabled         = gCoreContext->GetNumSetting("EnableMHEG", 0);
     db_prefer708       = gCoreContext->GetNumSetting("Prefer708Captions", 1);
-
+    allowAudioOnly     = gCoreContext->GetNumSetting("AudioOnlyPlayback", false);
+    clearSavedPosition = gCoreContext->GetNumSetting("ClearSavedPosition", 1);
+    endExitPrompt      = gCoreContext->GetNumSetting("EndOfRecordingExitPrompt");
+    pip_default_loc    = (PIPLocation)gCoreContext->GetNumSetting("PIPLocation", kPIPTopLeft);
+    tc_wrap[TC_AUDIO]  = gCoreContext->GetNumSetting("AudioSyncOffset", 0);
     memset(&tc_lastval, 0, sizeof(tc_lastval));
     memset(&tc_wrap,    0, sizeof(tc_wrap));
-    tc_wrap[TC_AUDIO] = gCoreContext->GetNumSetting("AudioSyncOffset", 0);
 
     // Get VBI page number
     QString mypage = gCoreContext->GetSetting("VBIpageNr", "888");
@@ -859,13 +867,9 @@ void MythPlayer::OpenDummy(void)
 {
     isDummy = true;
 
-    float displayAspect =
-        gCoreContext->GetFloatSettingOnHost("XineramaMonitorAspectRatio",
-                                        gCoreContext->GetHostName(), 1.3333);
-
     if (!videoOutput)
     {
-        SetVideoParams(720, 576, 25.00, 15, displayAspect);
+        SetVideoParams(720, 576, 25.00, 15, defaultDisplayAspect);
     }
 
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
@@ -971,8 +975,7 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
     decoder->setWatchingRecording(watchingrecording);
     decoder->setTranscoding(transcoding);
     CheckExtraAudioDecode();
-    if (gCoreContext->GetNumSetting("AudioOnlyPlayback", false))
-        noVideoTracks = !decoder->GetTrackCount(kTrackTypeVideo);
+    noVideoTracks = allowAudioOnly && !decoder->GetTrackCount(kTrackTypeVideo);
 
     // Set 'no_video_decode' to true for audio only decodeing
     bool no_video_decode = false;
@@ -2064,7 +2067,7 @@ void MythPlayer::VideoStart(void)
         }
 #endif // USING_MHEG
 
-        SetCaptionsEnabled(gCoreContext->GetNumSetting("DefaultCCMode"), false);
+        SetCaptionsEnabled(captionsEnabledbyDefault, false);
         osdLock.unlock();
     }
 
@@ -2460,11 +2463,8 @@ void MythPlayer::InitialSeek(void)
     if (bookmarkseek > 30)
     {
         DoFastForward(bookmarkseek, true, false);
-        if (gCoreContext->GetNumSetting("ClearSavedPosition", 1) &&
-            !player_ctx->IsPIP())
-        {
+        if (clearSavedPosition && !player_ctx->IsPIP())
             ClearBookmark(false);
-        }
     }
     UnpauseDecoder();
 }
@@ -2682,8 +2682,7 @@ void MythPlayer::EventLoop(void)
     {
         if (jumpto == totalFrames)
         {
-            if (!(gCoreContext->GetNumSetting("EndOfRecordingExitPrompt") == 1
-                  && !player_ctx->IsPIP() &&
+            if (!(endExitPrompt == 1 && !player_ctx->IsPIP() &&
                   player_ctx->GetState() == kState_WatchingPreRecorded))
             {
                 SetEof(true);
@@ -2815,8 +2814,7 @@ void MythPlayer::DecoderLoop(bool pause)
         DecoderPauseCheck();
 
         decoder_change_lock.lock();
-        if (gCoreContext->GetNumSetting("AudioOnlyPlayback", false) && decoder)
-            noVideoTracks = !decoder->GetTrackCount(kTrackTypeVideo);
+        noVideoTracks = allowAudioOnly && !decoder->GetTrackCount(kTrackTypeVideo);
         decoder_change_lock.unlock();
 
         if (forcePositionMapSync)
@@ -2994,7 +2992,7 @@ PIPLocation MythPlayer::GetNextPIPLocation(void) const
         return kPIP_END;
 
     if (pip_players.isEmpty())
-        return (PIPLocation)gCoreContext->GetNumSetting("PIPLocation", kPIPTopLeft);
+        return pip_default_loc;
 
     // order of preference, could be stored in db if we want it configurable
     PIPLocation ols[] =
