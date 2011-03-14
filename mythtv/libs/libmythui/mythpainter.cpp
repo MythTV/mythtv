@@ -15,10 +15,10 @@
 #include "mythpainter.h"
 
 MythPainter::MythPainter()
-  : m_Parent(0), m_HardwareCacheSize(0), m_ItemCacheSize(256),
+  : m_Parent(0), m_HardwareCacheSize(0), m_SoftwareCacheSize(0),
     m_showBorders(false), m_showNames(false)
 {
-    SetMaxHardwareCacheSize(64);
+    SetMaximumCacheSizes(96, 96);
 }
 
 MythPainter::~MythPainter(void)
@@ -283,10 +283,11 @@ MythImage *MythPainter::GetImageFromString(const QString &msg,
     MythImage *im = GetFormatImage();
     if (im)
     {
+        m_SoftwareCacheSize += im->byteCount();
         DrawTextPriv(im, msg, flags, r, font);
         m_StringToImageMap[incoming] = im;
         m_StringExpireList.push_back(incoming);
-        ExpireImages(m_ItemCacheSize);
+        ExpireImages(m_MaxSoftwareCacheSize);
     }
     return im;
 }
@@ -345,10 +346,11 @@ MythImage* MythPainter::GetImageFromRect(const QRect &area, int radius,
     MythImage *im = GetFormatImage();
     if (im)
     {
+        m_SoftwareCacheSize += im->byteCount();
         DrawRectPriv(im, area, radius, ellipse, fillBrush, linePen);
         m_StringToImageMap[incoming] = im;
         m_StringExpireList.push_back(incoming);
-        ExpireImages(m_ItemCacheSize);
+        ExpireImages(m_MaxSoftwareCacheSize);
     }
     return im;
 }
@@ -383,9 +385,12 @@ void MythPainter::CheckFormatImage(MythImage *im)
     }
 }
 
-void MythPainter::ExpireImages(uint max)
+void MythPainter::ExpireImages(int max)
 {
-    while (m_StringExpireList.size() > max)
+    if (m_StringExpireList.size() < 1)
+        return;
+
+    while (m_SoftwareCacheSize > max)
     {
         QString oldmsg = m_StringExpireList.front();
         m_StringExpireList.pop_front();
@@ -397,14 +402,20 @@ void MythPainter::ExpireImages(uint max)
         m_StringToImageMap.remove(oldmsg);
 
         if (oldim)
+        {
+            m_SoftwareCacheSize -= oldim->byteCount();
             oldim->DownRef();
+        }
     }
 }
 
 // the following assume graphics hardware operates natively at 32bpp
-void MythPainter::SetMaxHardwareCacheSize(int mb)
+void MythPainter::SetMaximumCacheSizes(int hardware, int software)
 {
-    m_MaxHardwareCacheSize = 1024 * 1024 * mb;
+    m_MaxHardwareCacheSize = 1024 * 1024 * hardware;
+    m_MaxSoftwareCacheSize = 1024 * 1024 * software;
+    VERBOSE(VB_GUI, QString("MythPainter cache sizes: Hardware %1Mb, Software %2Mb")
+        .arg(hardware).arg(software));
 }
 
 void MythPainter::IncreaseHardwareCacheSize(QSize size)
