@@ -300,16 +300,14 @@ MythImage* MythPainter::GetImageFromRect(const QRect &area, int radius,
     if (area.width() <= 0 || area.height() <= 0)
         return NULL;
 
-    uint64_t hash1 = ((0xfff & (uint64_t)area.left())) +
-                     ((0xfff & (uint64_t)area.top())        << 12) +
-                     ((0xfff & (uint64_t)area.width())      << 24) +
-                     ((0xfff & (uint64_t)area.height())     << 36) +
-                     ((0xfff & (uint64_t)fillBrush.style()) << 48) +
-                     ((0xf   & (uint64_t)linePen.width())   << 60);
-    uint64_t hash2 = ((0xfff & (uint64_t)radius)) +
-                     ((0xfff & (uint64_t)linePen.style()) << 12) +
-                     ((0xfff & (uint64_t)ellipse)         << 24);
-    uint64_t hash3 = ((0xffffffff & (uint64_t)linePen.color().rgba())) +
+    uint64_t hash1 = ((0xfff & (uint64_t)area.width())) +
+                     ((0xfff & (uint64_t)area.height())     << 12) +
+                     ((0xff  & (uint64_t)fillBrush.style()) << 24) +
+                     ((0xff  & (uint64_t)linePen.width())   << 32) +
+                     ((0xff  & (uint64_t)radius)            << 40) +
+                     ((0xff  & (uint64_t)linePen.style())   << 48) +
+                     ((0xff  & (uint64_t)ellipse)           << 56);
+    uint64_t hash2 = ((0xffffffff & (uint64_t)linePen.color().rgba())) +
                      ((0xffffffff & (uint64_t)fillBrush.color().rgba()) << 32);
 
     QString incoming("R");
@@ -333,8 +331,7 @@ MythImage* MythPainter::GetImageFromRect(const QRect &area, int radius,
         }
     }
 
-    incoming += QString::number(hash1) + QString::number(hash2) +
-                QString::number(hash3);
+    incoming += QString::number(hash1) + QString::number(hash2);
 
     if (m_StringToImageMap.contains(incoming))
     {
