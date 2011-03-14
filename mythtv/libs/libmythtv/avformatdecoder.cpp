@@ -794,26 +794,18 @@ bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
 
 void AvFormatDecoder::InitByteContext(void)
 {
-    int streamed = 0;
-    int buffer_size = 32768;
-
-    if (ringBuffer->IsDVD())
-    {
-        streamed = 1;
-        buffer_size = 2048;
-    }
-    else if (ringBuffer->LiveMode())
-        streamed = 1;
+    int buf_size = ringBuffer->BestBufferSize();
+    int streamed = ringBuffer->IsStreamed();
+    VERBOSE(VB_PLAYBACK, LOC + QString("Buffer size: %1, streamed %2")
+        .arg(buf_size).arg(streamed));
 
     readcontext.prot = &AVF_RingBuffer_Protocol;
     readcontext.flags = 0;
     readcontext.is_streamed = streamed;
     readcontext.max_packet_size = 0;
     readcontext.priv_data = avfRingBuffer;
-
-    unsigned char* buffer = (unsigned char *)av_malloc(buffer_size);
-
-    ic->pb = av_alloc_put_byte(buffer, buffer_size, 0,
+    unsigned char* buffer = (unsigned char *)av_malloc(buf_size);
+    ic->pb = av_alloc_put_byte(buffer, buf_size, 0,
                                &readcontext,
                                AVF_Read_Packet,
                                AVF_Write_Packet,
