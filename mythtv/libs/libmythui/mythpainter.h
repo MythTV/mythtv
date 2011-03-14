@@ -90,9 +90,6 @@ class MUI_PUBLIC MythPainter
 
     void CheckFormatImage(MythImage *im);
 
-    void IncreaseHardwareCacheSize(QSize size);
-    void DecreaseHardwareCacheSize(QSize size);
-
     QPaintDevice *m_Parent;
     int m_HardwareCacheSize;
     int m_MaxHardwareCacheSize;

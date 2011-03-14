@@ -1291,11 +1291,12 @@ bool MythRenderVDPAU::DrawBitmap(uint id, uint target,
     return ok;
 }
 
-QSize MythRenderVDPAU::GetBitmapSize(uint id)
+int MythRenderVDPAU::GetBitmapSize(uint id)
 {
     if (!m_bitmapSurfaces.contains(id))
-        return QSize();
-    return m_bitmapSurfaces[id].m_size;
+        return 0;
+    QSize sz = m_bitmapSurfaces[id].m_size;
+    return sz.width() * sz.height() * 4;
 }
 
 void* MythRenderVDPAU::GetRender(uint id)

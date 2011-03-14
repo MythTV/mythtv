@@ -131,6 +131,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
                         uint filter = GL_LINEAR, uint wrap = GL_CLAMP_TO_EDGE);
     QSize GetTextureSize(uint type, const QSize &size);
     QSize GetTextureSize(uint tex);
+    int   GetTextureDataSize(uint tex);
     void  SetTextureFilters(uint tex, uint filt, uint wrap);
     void  ActiveTexture(int active_tex);
     virtual uint CreateHelperTexture(void) { return 0; }

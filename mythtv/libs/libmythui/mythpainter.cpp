@@ -417,13 +417,3 @@ void MythPainter::SetMaximumCacheSizes(int hardware, int software)
     VERBOSE(VB_GUI, QString("MythPainter cache sizes: Hardware %1Mb, Software %2Mb")
         .arg(hardware).arg(software));
 }
-
-void MythPainter::IncreaseHardwareCacheSize(QSize size)
-{
-    m_HardwareCacheSize += size.width() * size.height() * 4;
-}
-
-void MythPainter::DecreaseHardwareCacheSize(QSize size)
-{
-    m_HardwareCacheSize -= size.width() * size.height() * 4;
-}

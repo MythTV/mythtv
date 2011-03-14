@@ -140,7 +140,7 @@ void MythD3D9Painter::DeleteBitmaps(void)
     {
         D3D9Image *img = m_bitmapDeleteList.front();
         m_bitmapDeleteList.pop_front();
-        DecreaseHardwareCacheSize(img->GetSize());
+        m_HardwareCacheSize -= img->GetDataSize();
         delete img;
     }
 }
@@ -224,7 +224,7 @@ D3D9Image* MythD3D9Painter::GetImageFromCache(MythImage *im)
     if (newimage && newimage->IsValid())
     {
         CheckFormatImage(im);
-        IncreaseHardwareCacheSize(newimage->GetSize());
+        m_HardwareCacheSize += newimage->GetDataSize();
         newimage->UpdateImage(im);
         m_ImageBitmapMap[im] = newimage;
         m_ImageExpireList.push_back(im);

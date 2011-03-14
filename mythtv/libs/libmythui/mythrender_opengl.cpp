@@ -356,6 +356,13 @@ QSize MythRenderOpenGL::GetTextureSize(uint tex)
     return m_textures[tex].m_size;
 }
 
+int MythRenderOpenGL::GetTextureDataSize(uint tex)
+{
+    if (!m_textures.contains(tex))
+        return 0;
+    return m_textures[tex].m_data_size;
+}
+
 void MythRenderOpenGL::SetTextureFilters(uint tex, uint filt, uint wrap)
 {
     if (!m_textures.contains(tex))

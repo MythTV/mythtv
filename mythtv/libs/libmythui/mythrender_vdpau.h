@@ -117,7 +117,7 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
                     const QRect *dst, int alpha = 0, int red = 0,
                     int blue = 0, int green = 0, bool blend = false);
 
-    QSize GetBitmapSize(uint id);
+    int   GetBitmapSize(uint id);
     void* GetRender(uint id);
     uint  GetSurfaceOwner(VdpVideoSurface surface);
     void  ClearVideoSurface(uint id);
