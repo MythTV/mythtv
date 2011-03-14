@@ -7574,7 +7574,7 @@ void TV::DoEditSchedule(int editType)
         }
     }
 
-    // If the video is paused, don't paint it's unused rects & chromakey
+    // If the video is paused, don't paint its unused rects & chromakey
     disableDrawUnusedRects = pause_active;
 
     // We are embedding in a mythui window so assuming no one

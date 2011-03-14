@@ -195,7 +195,7 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
         if ((Length() == 0xfff) && (TableIDExtension() == 0xffff) &&
             (Section() == 0xff) && (LastSection() == 0xff))
         {
-            VERBOSE(VB_SIPARSER, "PSIPTable: PAT: All values a maximums");
+            VERBOSE(VB_SIPARSER, "PSIPTable: PAT: All values at maximums");
             return false;
         }
 
@@ -213,7 +213,7 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
 
         if (psipdata() + Length() - 9 > bufend)
         {
-            VERBOSE(VB_SIPARSER, "PSIPTable: PMT: reported length to large");
+            VERBOSE(VB_SIPARSER, "PSIPTable: PMT: reported length too large");
             return false;
         }
 
