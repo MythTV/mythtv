@@ -303,8 +303,6 @@ MythPlayer::~MythPlayer(void)
 
 void MythPlayer::SetWatchingRecording(bool mode)
 {
-    QMutexLocker locker(&decoder_change_lock);
-
     watchingrecording = mode;
     if (decoder)
         decoder->setWatchingRecording(mode);
@@ -352,7 +350,6 @@ bool MythPlayer::Pause(void)
     PauseBuffer();
     allpaused = decoderPaused && videoPaused && bufferPaused;
     {
-        QMutexLocker locker(&decoder_change_lock);
         if (using_null_videoout && decoder)
             decoder->UpdateFramesPlayed();
         else if (videoOutput && !using_null_videoout)
@@ -1285,7 +1282,6 @@ void MythPlayer::ResetCaptions(void)
     }
 }
 
-// caller has decoder_changed_lock
 void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
 {
     textDisplayMode &= ~mode;
@@ -1326,7 +1322,6 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
     }
 }
 
-// caller has decoder_changed_lock
 void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
 {
     QMutexLocker locker(&osdLock);
@@ -1422,7 +1417,6 @@ void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
 
 QStringList MythPlayer::GetTracks(uint type)
 {
-    QMutexLocker locker(&decoder_change_lock);
     if (decoder)
         return decoder->GetTracks(type);
     return QStringList();
@@ -1431,7 +1425,6 @@ QStringList MythPlayer::GetTracks(uint type)
 int MythPlayer::SetTrack(uint type, int trackNo)
 {
     int ret = -1;
-    QMutexLocker locker(&decoder_change_lock);
     if (!decoder)
         return ret;
 
@@ -1487,7 +1480,6 @@ void MythPlayer::EnableSubtitles(bool enable)
 
 int MythPlayer::GetTrack(uint type)
 {
-    QMutexLocker locker(&decoder_change_lock);
     if (decoder)
         return decoder->GetTrack(type);
     return -1;
@@ -1495,23 +1487,21 @@ int MythPlayer::GetTrack(uint type)
 
 int MythPlayer::ChangeTrack(uint type, int dir)
 {
-    QMutexLocker locker(&decoder_change_lock);
-    if (decoder)
+    if (!decoder)
+        return -1;
+
+    int retval = decoder->ChangeTrack(type, dir);
+    if (retval >= 0)
     {
-        int retval = decoder->ChangeTrack(type, dir);
-        if (retval >= 0)
-        {
-            SetOSDMessage(decoder->GetTrackDesc(type, GetTrack(type)),
-                          kOSDTimeout_Med);
-            return retval;
-        }
+        SetOSDMessage(decoder->GetTrackDesc(type, GetTrack(type)),
+                      kOSDTimeout_Med);
+        return retval;
     }
     return -1;
 }
 
 void MythPlayer::ChangeCaptionTrack(int dir)
 {
-    QMutexLocker locker(&decoder_change_lock);
     if (!decoder || (dir < 0))
         return;
 
