@@ -2779,8 +2779,12 @@ void MythPlayer::DecoderPauseCheck(void)
         UnpauseDecoder();
 }
 
+//// FIXME - move the eof ownership back into MythPlayer
 bool MythPlayer::GetEof(void)
 {
+    if (QThread::currentThread() == (QThread*)playerThread)
+        return decoder ? decoder->GetEof() : true;
+
     decoder_change_lock.lock();
     bool eof = decoder ? decoder->GetEof() : true;
     decoder_change_lock.unlock();
@@ -2789,11 +2793,19 @@ bool MythPlayer::GetEof(void)
 
 void MythPlayer::SetEof(bool eof)
 {
+    if (QThread::currentThread() == (QThread*)playerThread)
+    {
+        if (decoder)
+            decoder->SetEof(eof);
+        return;
+    }
+
     decoder_change_lock.lock();
     if (decoder)
         decoder->SetEof(eof);
     decoder_change_lock.unlock();
 }
+//// FIXME end
 
 void MythPlayer::DecoderLoop(bool pause)
 {
