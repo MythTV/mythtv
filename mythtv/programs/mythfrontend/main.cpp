@@ -1105,6 +1105,7 @@ int main(int argc, char **argv)
         kCLPGetSettings          |
         kCLPQueryVersion         |
         kCLPVerbose              |
+        kCLPNoUPnP               |
 #ifdef USING_X11
         kCLPDisplay              |
 #endif // USING_X11
@@ -1235,11 +1236,15 @@ int main(int argc, char **argv)
     CleanupGuard callCleanup(cleanup);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    g_pUPnp  = new MediaRenderer();
-    if (!g_pUPnp->initialized())
+
+    if (cmdline.IsUPnPEnabled())
     {
-        delete g_pUPnp;
-        g_pUPnp = NULL;
+        g_pUPnp  = new MediaRenderer();
+        if (!g_pUPnp->initialized())
+        {
+            delete g_pUPnp;
+            g_pUPnp = NULL;
+        }
     }
 
     // Override settings as early as possible to cover bootstrapped screens
