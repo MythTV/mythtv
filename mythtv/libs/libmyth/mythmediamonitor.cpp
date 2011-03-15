@@ -456,7 +456,7 @@ void MediaMonitor::StopMonitoring(void)
  *
  *   NOTE: This function can block.
  *
- *  \sa Unlock(MythMediaDevice *pMedia), GetMedias(MythMediaType mediatype)
+ *  \sa Unlock(MythMediaDevice *pMedia), GetMedias(unsigned mediatypes)
  */
 bool MediaMonitor::ValidateAndLock(MythMediaDevice *pMedia)
 {
@@ -473,7 +473,7 @@ bool MediaMonitor::ValidateAndLock(MythMediaDevice *pMedia)
 /** \fn MediaMonitor::Unlock(MythMediaDevice *pMedia)
  *  \brief decrements the MythMediaDevices reference count
  *
- *  \sa ValidateAndLock(MythMediaDevice *pMedia), GetMedias(MythMediaType mediatype)
+ *  \sa ValidateAndLock(MythMediaDevice *pMedia), GetMedias(unsigned mediatypes)
  */
 void MediaMonitor::Unlock(MythMediaDevice *pMedia)
 {
@@ -552,7 +552,7 @@ QString MediaMonitor::GetMountPath(const QString& devPath)
     return mountPath;
 }
 
-/** \fn MediaMonitor::GetMedias(MythMediaType mediatype)
+/** \fn MediaMonitor::GetMedias(unsigned mediatypes)
  *  \brief Ask for available media. Must be locked with ValidateAndLock().
  *
  *   This method returns a list of MythMediaDevice pointers which match
@@ -570,7 +570,7 @@ QString MediaMonitor::GetMountPath(const QString& devPath)
  *  \sa ValidateAndLock(MythMediaDevice *pMedia)
  *  \sa Unlock(MythMediaDevice *pMedia)
  */
-QList<MythMediaDevice*> MediaMonitor::GetMedias(MythMediaType mediatype)
+QList<MythMediaDevice*> MediaMonitor::GetMedias(unsigned mediatypes)
 {
     QMutexLocker locker(&m_DevicesLock);
 
@@ -579,7 +579,7 @@ QList<MythMediaDevice*> MediaMonitor::GetMedias(MythMediaType mediatype)
     QList<MythMediaDevice*>::iterator it = m_Devices.begin();
     for (;it != m_Devices.end(); ++it)
     {
-        if (((*it)->getMediaType() & mediatype) &&
+        if (((*it)->getMediaType() & mediatypes) &&
             (((*it)->getStatus() == MEDIASTAT_USEABLE) ||
              ((*it)->getStatus() == MEDIASTAT_MOUNTED) ||
              ((*it)->getStatus() == MEDIASTAT_NOTMOUNTED)))

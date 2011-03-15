@@ -630,7 +630,7 @@ bool IconView::HandleMediaEscape(MediaMonitor *mon)
 {
     bool handled = false;
     QDir curdir(m_currDir);
-    QList<MythMediaDevice*> removables = mon->GetMedias(MEDIATYPE_DATA);
+    QList<MythMediaDevice*> removables = mon->GetMedias(MEDIATYPE_DATA|MEDIATYPE_MGALLERY);
     QList<MythMediaDevice*>::iterator it = removables.begin();
     for (; !handled && (it != removables.end()); ++it)
     {
