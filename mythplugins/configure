@@ -175,6 +175,9 @@ MythMusic related options:
   --enable-fftw            enable fftw visualizers [$fftw]
   --enable-sdl             use SDL for the synaesthesia output [$sdl]
 
+MythNetvision related options:
+  --enable-mythnetvision      build the mythnetvision plugin [$netvision]
+
 MythNews related options:
   --enable-mythnews        build the mythnews plugin [$news]
 
@@ -186,9 +189,6 @@ MythWeather related options:
 
 MythZoneMinder related options:
   --enable-mythzoneminder  build the mythzoneminder plugin [$zoneminder]
-
-MythNetvision related options:
-  --enable-mythnetvision      build the mythnetvision plugin [$netvision]
 
 EOF
 exit 0
@@ -644,6 +644,13 @@ else
   echo "        MythMusic      plugin will not be built"
 fi
 
+if test "$netvision" = "yes" ; then
+  echo "        MythNetvision  plugin will be built"
+  echo "SUBDIRS += mythnetvision" >> ./config.pro
+else
+  echo "        MythNetvision  plugin will not be built"
+fi
+
 if test "$news" = "yes" ; then
   echo "        MythNews       plugin will be built"
   echo "SUBDIRS += mythnews" >> ./config.pro
@@ -670,13 +677,6 @@ if test "$zoneminder" = "yes" ; then
   echo "SUBDIRS += mythzoneminder" >> ./config.pro
 else
   echo "        MythZoneMinder plugin will not be built"
-fi
-
-if test "$netvision" = "yes" ; then
-  echo "        MythNetvision  plugin will be built"
-  echo "SUBDIRS += mythnetvision" >> ./config.pro
-else
-  echo "        MythNetvision  plugin will not be built"
 fi
 
 ###########################################################
