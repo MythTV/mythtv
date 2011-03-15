@@ -219,7 +219,7 @@ void HttpComms::headerReceived(const QHttpResponseHeader &resp)
     }
     else if ((resp.statusCode() == 401))
     {
-        // Toggle the sate of our authentication pending flag
+        // Toggle the state of our authentication pending flag
         // if we've gotten this after having tried to authenticate
         // once then we've failed authentication and turning the pending off will allow us to exit.
         m_authNeeded = !m_authNeeded;
@@ -381,7 +381,7 @@ QString HttpComms::getHttp(QString     &url,
     return res;
 }
 
-// getHttpFile - static function for grabbing a file from an http url
+// getHttpFile - static function for grabbing a file from a http url
 //      this is a synchronous function, it will block according to the vars
 bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS,
                             int maxRetries, int maxRedirects,
@@ -510,7 +510,7 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
 }
 
 /**
- *  \brief Static function for performing an http post request to a url.
+ *  \brief Static function for performing a http post request to a url.
  *
  *   This is a synchronous function, it will block according to the vars.
  */
