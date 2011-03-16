@@ -283,7 +283,7 @@ MythImage *MythPainter::GetImageFromString(const QString &msg,
     MythImage *im = GetFormatImage();
     if (im)
     {
-        m_SoftwareCacheSize += im->byteCount();
+        m_SoftwareCacheSize += im->bytesPerLine() * im->height();
         DrawTextPriv(im, msg, flags, r, font);
         m_StringToImageMap[incoming] = im;
         m_StringExpireList.push_back(incoming);
@@ -343,7 +343,7 @@ MythImage* MythPainter::GetImageFromRect(const QRect &area, int radius,
     MythImage *im = GetFormatImage();
     if (im)
     {
-        m_SoftwareCacheSize += im->byteCount();
+        m_SoftwareCacheSize += (im->bytesPerLine() * im->height());
         DrawRectPriv(im, area, radius, ellipse, fillBrush, linePen);
         m_StringToImageMap[incoming] = im;
         m_StringExpireList.push_back(incoming);
@@ -400,7 +400,7 @@ void MythPainter::ExpireImages(int max)
 
         if (oldim)
         {
-            m_SoftwareCacheSize -= oldim->byteCount();
+            m_SoftwareCacheSize -= oldim->bytesPerLine() * oldim->height();
             oldim->DownRef();
         }
     }
