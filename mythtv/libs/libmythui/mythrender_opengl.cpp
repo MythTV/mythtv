@@ -766,8 +766,10 @@ bool MythRenderOpenGL::InitFeatures(void)
     }
 
     GLint maxtexsz = 0;
+    GLint maxunits = 0;
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxtexsz);
-    glGetIntegerv(GL_MAX_TEXTURE_UNITS, &m_max_units);
+    glGetIntegerv(GL_MAX_TEXTURE_UNITS, &maxunits);
+    m_max_units = maxunits;
     m_max_tex_size = (maxtexsz) ? maxtexsz : 512;
 
     m_extensions = (const char*) glGetString(GL_EXTENSIONS);
