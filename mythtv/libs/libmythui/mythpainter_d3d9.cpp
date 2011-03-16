@@ -52,9 +52,7 @@ void MythD3D9Painter::Teardown(void)
     DeleteBitmaps();
 
     m_ImageBitmapMap.clear();
-    m_StringToImageMap.clear();
     m_ImageExpireList.clear();
-    m_StringExpireList.clear();
     m_bitmapDeleteList.clear();
 
     if (m_render)
