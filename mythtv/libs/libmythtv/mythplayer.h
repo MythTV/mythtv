@@ -613,9 +613,6 @@ class MTV_PUBLIC MythPlayer
     bool     m_scan_initialized;
     /// Video (input) Number of frames between key frames (often inaccurate)
     uint     keyframedist;
-    /// Stream has no video tracks
-    bool     noVideoTracks;
-    bool     allowAudioOnly;
 
     // Buffering
     bool     buffering;
