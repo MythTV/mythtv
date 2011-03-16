@@ -150,6 +150,8 @@ MythRenderOpenGL2::MythRenderOpenGL2(const QGLFormat& format)
 
 MythRenderOpenGL2::~MythRenderOpenGL2()
 {
+    if (!isValid())
+        return;
     makeCurrent();
     DeleteOpenGLResources();
     doneCurrent();

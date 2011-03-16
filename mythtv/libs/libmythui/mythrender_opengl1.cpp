@@ -19,6 +19,8 @@ MythRenderOpenGL1::MythRenderOpenGL1(const QGLFormat& format)
 
 MythRenderOpenGL1::~MythRenderOpenGL1()
 {
+    if (!isValid())
+        return;
     makeCurrent();
     DeleteOpenGLResources();
     doneCurrent();
