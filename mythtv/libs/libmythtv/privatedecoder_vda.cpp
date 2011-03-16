@@ -9,6 +9,10 @@
 #include "myth_imgconvert.h"
 #include "util-osx-cocoa.h"
 #include "privatedecoder_vda.h"
+#ifdef USING_QUARTZ_VIDEO
+#undef CodecType
+#import  "QuickTime/ImageCompression.h"
+#endif
 
 extern "C" {
 #include "libavformat/avformat.h"
@@ -191,7 +195,11 @@ bool PrivateDecoderVDA::Init(const QString &decoder,
         CFDictionaryCreateMutable(kCFAllocatorDefault, 1,
                                   &kCFTypeDictionaryKeyCallBacks,
                                   &kCFTypeDictionaryValueCallBacks);
+#ifdef USING_QUARTZ_VIDEO
+    OSType cvPixelFormatType = k422YpCbCr8PixelFormat;
+#else
     OSType cvPixelFormatType = kCVPixelFormatType_422YpCbCr8;
+#endif
     CFNumberRef pixelFormat  = CFNumberCreate(kCFAllocatorDefault,
                                               kCFNumberSInt32Type,
                                               &cvPixelFormatType);

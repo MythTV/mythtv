@@ -51,9 +51,13 @@ using namespace std;
 
 #include "util-osx.h"
 
+#ifdef USING_QUARTZ_VIDEO
+#import <QuartzCore/CoreVideo.h>
+#else
 #import <CoreGraphics/CGBase.h>
 #import <CoreGraphics/CGDisplayConfiguration.h>
 #import <CoreGraphics/CGImage.h>
+#endif
 #import <Carbon/Carbon.h>
 #import <QuickTime/QuickTime.h>
 
