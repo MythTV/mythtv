@@ -2816,13 +2816,15 @@ void MythPlayer::DecoderLoop(bool pause)
     {
         DecoderPauseCheck();
 
-        decoder_change_lock.lock();
+        if (!decoder_change_lock.tryLock(1))
+            continue;
         noVideoTracks = allowAudioOnly && !decoder->GetTrackCount(kTrackTypeVideo);
         decoder_change_lock.unlock();
 
         if (forcePositionMapSync)
         {
-            decoder_change_lock.lock();
+            if (!decoder_change_lock.tryLock(1))
+                continue;
             if (decoder)
             {
                 forcePositionMapSync = false;
@@ -2833,7 +2835,8 @@ void MythPlayer::DecoderLoop(bool pause)
 
         if (decoderSeek >= 0)
         {
-            decoder_change_lock.lock();
+            if (!decoder_change_lock.tryLock(1))
+                continue;
             if (decoder)
             {
                 decoderSeekLock.lock();
@@ -2928,17 +2931,19 @@ bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
         videobuf_retries = 0;
     }
 
-    if (killdecoder)
+    if (!decoder_change_lock.tryLock(5))
         return false;
-    if (!decoder)
+    if (killdecoder || !decoder || IsErrored())
     {
-        VERBOSE(VB_IMPORTANT, LOC + "DecoderGetFrame() called with NULL decoder.");
+        decoder_change_lock.unlock();
         return false;
     }
-    else if (ffrew_skip == 1 || decodeOneFrame)
+
+    if (ffrew_skip == 1 || decodeOneFrame)
         ret = decoder->GetFrame(decodetype);
     else if (ffrew_skip != 0)
         ret = DecoderGetFrameFFREW();
+    decoder_change_lock.unlock();
     return ret;
 }
 
@@ -4547,16 +4552,21 @@ bool MythPlayer::SetVideoByComponentTag(int tag)
  */
 void MythPlayer::SetDecoder(DecoderBase *dec)
 {
-    QMutexLocker locker(&decoder_change_lock);
     PauseDecoder();
 
-    if (!decoder)
-        decoder = dec;
-    else
     {
-        DecoderBase *d = decoder;
-        decoder = dec;
-        delete d;
+        while (!decoder_change_lock.tryLock(10))
+            VERBOSE(VB_IMPORTANT, LOC + QString("Waited 10ms for decoder lock"));
+
+        if (!decoder)
+            decoder = dec;
+        else
+        {
+            DecoderBase *d = decoder;
+            decoder = dec;
+            delete d;
+        }
+        decoder_change_lock.unlock();
     }
 }
 
