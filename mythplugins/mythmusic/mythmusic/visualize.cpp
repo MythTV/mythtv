@@ -104,6 +104,9 @@ void Spectrum::resize(const QSize &newsize)
 
     size = newsize;
 
+    analyzerBarWidth = size.width() / 64;
+    if (analyzerBarWidth < 6)
+        analyzerBarWidth = 6;
     scale.setMax(192, size.width() / analyzerBarWidth);
 
     rects.resize( scale.range() );
