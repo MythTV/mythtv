@@ -4167,27 +4167,30 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
 bool AvFormatDecoder::HasVideo(const AVFormatContext *ic)
 {
-    if (!ic || !ic->cur_pmt_sect)
-        return true;
-
-    const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
-    const PSIPTable psip(pes);
-    const ProgramMapTable pmt(psip);
-
-    bool has_video = false;
-    for (uint i = 0; i < pmt.StreamCount(); i++)
+    if (ic && ic->cur_pmt_sect)
     {
-        // MythTV remaps OpenCable Video to normal video during recording
-        // so "dvb" is the safest choice for system info type, since this
-        // will ignore other uses of the same stream id in DVB countries.
-        has_video |= pmt.IsVideo(i, "dvb");
+        const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
+        const PSIPTable psip(pes);
+        const ProgramMapTable pmt(psip);
 
-        // MHEG may explicitly select a private stream as video
-        has_video |= ((i == (uint)selectedTrack[kTrackTypeVideo].av_stream_index) &&
-                      (pmt.StreamType(i) == StreamID::PrivData));
+        for (uint i = 0; i < pmt.StreamCount(); i++)
+        {
+            // MythTV remaps OpenCable Video to normal video during recording
+            // so "dvb" is the safest choice for system info type, since this
+            // will ignore other uses of the same stream id in DVB countries.
+            if (pmt.IsVideo(i, "dvb"))
+                return true;
+
+            // MHEG may explicitly select a private stream as video
+            if ((i == (uint)selectedTrack[kTrackTypeVideo].av_stream_index) &&
+                (pmt.StreamType(i) == StreamID::PrivData))
+            {
+                return true;
+            }
+        }
     }
 
-    return has_video;
+    return GetTrackCount(kTrackTypeVideo);
 }
 
 bool AvFormatDecoder::GenerateDummyVideoFrame(void)
