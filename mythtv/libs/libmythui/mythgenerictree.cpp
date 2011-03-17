@@ -18,7 +18,7 @@ class SortableMythGenericTreeList : public QList<MythGenericTree*>
     void SetAttributeIndex(int index)
                                 { m_attributeIndex = (index >= 0) ? index : 0; }
 
-//     static bool sortByAttribute(MythGenericTree *one, MythGenericTree *two)
+//     static int sortByAttribute(MythGenericTree *one, MythGenericTree *two)
 //     {
 //         int onea = one->getAttribute(m_attributeIndex);
 //         int twoa = two->getAttribute(m_attributeIndex);
@@ -31,14 +31,14 @@ class SortableMythGenericTreeList : public QList<MythGenericTree*>
 //             return 1;
 //     }
 
-    static bool sortByString(MythGenericTree *one, MythGenericTree *two)
+    static int sortByString(MythGenericTree *one, MythGenericTree *two)
     {
         QString ones = one->getString().toLower();
         QString twos = two->getString().toLower();
         return QString::localeAwareCompare(ones, twos);
     }
 
-    static bool sortBySelectable(MythGenericTree *one, MythGenericTree *two)
+    static int sortBySelectable(MythGenericTree *one, MythGenericTree *two)
     {
         bool onesel = one->isSelectable();
         bool twosel = two->isSelectable();
@@ -51,7 +51,7 @@ class SortableMythGenericTreeList : public QList<MythGenericTree*>
             return -1;
     }
 
-//     static bool sortByAttributeThenString(MythGenericTree *one, MythGenericTree *two)
+//     static int sortByAttributeThenString(MythGenericTree *one, MythGenericTree *two)
 //     {
 //         //
 //         //  Sort by attribute (ordering index), but, it if those are
