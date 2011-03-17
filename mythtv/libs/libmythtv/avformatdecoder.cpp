@@ -2083,6 +2083,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     // video params are set properly
     if (selectedTrack[kTrackTypeVideo].av_stream_index == -1)
     {
+        VERBOSE(VB_PLAYBACK, LOC + QString("No video track found/selected."));
         QString tvformat = gCoreContext->GetSetting("TVFormat").toLower();
         if (tvformat == "ntsc" || tvformat == "ntsc-jp" ||
             tvformat == "pal-m" || tvformat == "atsc")
@@ -4413,7 +4414,8 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
     if (!ctx)
     {
-        VERBOSE(VB_PLAYBACK, LOC + "No codec context. Returning false");
+        if (GetTrackCount(kTrackTypeAudio))
+            VERBOSE(VB_PLAYBACK, LOC + "No codec context. Returning false");
         return false;
     }
 
