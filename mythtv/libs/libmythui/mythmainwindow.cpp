@@ -915,6 +915,10 @@ void MythMainWindow::Init(void)
 #endif
 
     setWindowFlags(flags);
+
+    d->screenRect = QRect(d->xbase, d->ybase, d->screenwidth, d->screenheight);
+    d->uiScreenRect = QRect(0, 0, d->screenwidth, d->screenheight);
+
     Show();
 
     if (d->does_fill_screen && !GetMythUI()->IsGeometryOverridden())
@@ -922,9 +926,6 @@ void MythMainWindow::Init(void)
         VERBOSE(VB_GENERAL, "Using Full Screen Window");
         setWindowState(Qt::WindowFullScreen);
     }
-
-    d->screenRect = QRect(d->xbase, d->ybase, d->screenwidth, d->screenheight);
-    d->uiScreenRect = QRect(0, 0, d->screenwidth, d->screenheight);
 
     setGeometry(d->xbase, d->ybase, d->screenwidth, d->screenheight);
     setFixedSize(QSize(d->screenwidth, d->screenheight));
