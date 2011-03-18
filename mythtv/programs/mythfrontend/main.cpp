@@ -1397,6 +1397,15 @@ int main(int argc, char **argv)
     mainWindow->Init();
     mainWindow->setWindowTitle(QObject::tr("MythTV Frontend"));
 
+    // We must reload the translation after a language change and this
+    // also means clearing the cached/loaded theme strings, so reload the
+    // theme which also triggers a translation reload
+    if (LanguageSelection::prompt())
+    {
+        if (!reloadTheme())
+            return GENERIC_EXIT_NO_THEME;
+    }
+
     if (!UpgradeTVDatabaseSchema(upgradeAllowed))
     {
         VERBOSE(VB_IMPORTANT,
@@ -1411,12 +1420,6 @@ int main(int argc, char **argv)
     mainWindow->ResetKeys();
 
     InitJumpPoints();
-
-    // We must reload the translation after a language change and this
-    // also means clearing the cached/loaded theme strings, so reload the
-    // theme which also triggers a translation reload
-    if (LanguageSelection::prompt())
-        GetMythMainWindow()->JumpTo("Reload Theme");
 
     internal_media_init();
 
