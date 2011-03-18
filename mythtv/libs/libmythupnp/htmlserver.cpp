@@ -41,6 +41,13 @@ HtmlServerExtension::HtmlServerExtension( const QString sSharePath)
     dir.makeAbsolute();
 
     m_sAbsoluteSharePath =  dir.absolutePath();
+
+    if (getenv("MYTHHTMLDIR"))
+    {
+        QString sTempSharePath = getenv("MYTHHTMLDIR");
+        if (!sTempSharePath.isEmpty())
+            m_sAbsoluteSharePath = sTempSharePath;
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
