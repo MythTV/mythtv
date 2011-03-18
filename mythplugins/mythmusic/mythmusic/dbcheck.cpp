@@ -83,22 +83,32 @@ bool UpgradeMusicDatabaseSchema(void)
     DBup->CompareAndWait(3);
 
     if (DBup->versionsBehind == 0)  // same schema
+    {
+        delete DBup;
         return true;
+    }
 
     if (DBup->DBver.isEmpty())
+    {
+        delete DBup;
         return doUpgradeMusicDatabaseSchema(DBup->DBver);
+    }
 
     // Pop up messages, questions, warnings, et c.
     switch (DBup->PromptForUpgrade("Music", true, false))
     {
         case MYTH_SCHEMA_USE_EXISTING:
+            delete DBup;
             return true;
         case MYTH_SCHEMA_ERROR:
         case MYTH_SCHEMA_EXIT:
+            delete DBup;
             return false;
         case MYTH_SCHEMA_UPGRADE:
             break;
     }
+
+    delete DBup;
 
     return doUpgradeMusicDatabaseSchema(DBup->DBver);
 }

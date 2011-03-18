@@ -472,6 +472,7 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     {
         gCoreContext->ActivateSettingsCache(true);
         GetMythDB()->SetSuppressDBMessages(false);
+        delete DBup;
         return true;
     }
 
@@ -485,14 +486,18 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
         case MYTH_SCHEMA_USE_EXISTING:
             gCoreContext->ActivateSettingsCache(true);
             GetMythDB()->SetSuppressDBMessages(false);
+            delete DBup;
             return true;
         case MYTH_SCHEMA_ERROR:
         case MYTH_SCHEMA_EXIT:
             GetMythDB()->SetSuppressDBMessages(false);
+            delete DBup;
             return false;
         case MYTH_SCHEMA_UPGRADE:
             break;
     }
+
+    delete DBup;
 
     MSqlQuery query(MSqlQuery::InitCon());
     if (!query.exec(QString("ALTER DATABASE %1 DEFAULT"
