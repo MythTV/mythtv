@@ -102,6 +102,7 @@ public:
     OutputListeners();
     virtual ~OutputListeners();
 
+    bool hasVisual(void) { return visuals.size(); }
     void addVisual(MythTV::Visual *);
     void removeVisual(MythTV::Visual *);
 

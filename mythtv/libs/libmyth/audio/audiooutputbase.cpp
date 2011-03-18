@@ -1292,14 +1292,17 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
     QMutexLocker lock(&audio_buflock);
 
     // Mythmusic doesn't give us timestamps
-    if (timecode < 0)
+    if (hasVisual())
     {
-        // Send original samples to mythmusic visualisation
-        timecode = (frames_buffered * 1000) / source_samplerate;
-        frames_buffered += frames;
+        if (timecode < 0)
+        {
+            // Send original samples to mythmusic visualisation
+            timecode = (frames_buffered * 1000) / source_samplerate;
+            frames_buffered += frames;
+            music = true;
+        }
         dispatchVisual((uchar *)in_buffer, len, timecode, source_channels,
                        output_settings->FormatToBits(format));
-        music = true;
     }
 
     // Calculate amount of free space required in ringbuffer
