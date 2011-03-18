@@ -18,6 +18,55 @@ AudioPlayer::AudioPlayer(MythPlayer *parent, bool muted)
 AudioPlayer::~AudioPlayer()
 {
     DeleteOutput();
+    m_visuals.clear();
+}
+
+void AudioPlayer::addVisual(MythTV::Visual *vis)
+{
+    if (!m_audioOutput)
+        return;
+
+    QMutexLocker lock(&m_lock);
+    Visuals::iterator it = std::find(m_visuals.begin(), m_visuals.end(), vis);
+    if (it == m_visuals.end())
+    {
+        m_visuals.push_back(vis);
+        m_audioOutput->addVisual(vis);
+    }
+}
+
+void AudioPlayer::removeVisual(MythTV::Visual *vis)
+{
+    if (!m_audioOutput)
+        return;
+
+    QMutexLocker lock(&m_lock);
+    Visuals::iterator it = std::find(m_visuals.begin(), m_visuals.end(), vis);
+    if (it != m_visuals.end())
+    {
+        m_visuals.erase(it);
+        m_audioOutput->removeVisual(vis);
+    }
+}
+
+void AudioPlayer::AddVisuals(void)
+{
+    if (!m_audioOutput)
+        return;
+
+    QMutexLocker lock(&m_lock);
+    for (uint i = 0; i < m_visuals.size(); i++)
+        m_audioOutput->addVisual(m_visuals[i]);
+}
+
+void AudioPlayer::RemoveVisuals(void)
+{
+    if (!m_audioOutput)
+        return;
+
+    QMutexLocker lock(&m_lock);
+    for (uint i = 0; i < m_visuals.size(); i++)
+        m_audioOutput->removeVisual(m_visuals[i]);
 }
 
 void AudioPlayer::Reset(void)
@@ -31,6 +80,7 @@ void AudioPlayer::Reset(void)
 
 void AudioPlayer::DeleteOutput(void)
 {
+    RemoveVisuals();
     QMutexLocker locker(&m_lock);
     if (m_audioOutput)
     {
@@ -81,6 +131,7 @@ QString AudioPlayer::ReinitAudio(void)
         {
             errMsg = m_audioOutput->GetError();
         }
+        AddVisuals();
     }
     else if (want_audio && !m_no_audio_in)
     {
@@ -150,7 +201,9 @@ void AudioPlayer::PauseAudioUntilBuffered()
 void AudioPlayer::SetAudioOutput(AudioOutput *ao)
 {
     m_lock.lock();
+    RemoveVisuals();
     m_audioOutput = ao;
+    AddVisuals();
     m_lock.unlock();
 }
 

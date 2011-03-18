@@ -6,11 +6,19 @@
 class MythPlayer;
 class AudioOutput;
 
+namespace MythTV
+{
+    class Visual;
+}
+
 class MTV_PUBLIC AudioPlayer
 {
   public:
     AudioPlayer(MythPlayer *parent, bool muted);
    ~AudioPlayer();
+
+    void addVisual(MythTV::Visual *vis);
+    void removeVisual(MythTV::Visual *vis);
 
     void  Reset(void);
     void  DeleteOutput(void);
@@ -63,6 +71,10 @@ class MTV_PUBLIC AudioPlayer
     bool IsBufferAlmostFull(void);
 
   private:
+    void AddVisuals(void);
+    void RemoveVisuals(void);
+
+  private:
     MythPlayer  *m_parent;
     AudioOutput *m_audioOutput;
     int          m_channels;
@@ -79,6 +91,7 @@ class MTV_PUBLIC AudioPlayer
     QString      m_passthru_device;
     bool         m_no_audio_in;
     bool         m_no_audio_out;
+    vector<MythTV::Visual*> m_visuals;
 };
 
 #endif // AUDIOPLAYER_H
