@@ -18,7 +18,7 @@
  *
  * \ingroup MythUI_Widgets
  */
-class MPUBLIC MythUIStateType : public MythUIType
+class MUI_PUBLIC MythUIStateType : public MythUIType
 {
   public:
     enum StateType { None = 0, Off, Half, Full }; // Can be used for tri-state checks, two state toggles, etc.

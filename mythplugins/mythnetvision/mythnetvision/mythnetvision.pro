@@ -34,6 +34,8 @@ HEADERS += netsearch.h treeeditor.h nettree.h
 SOURCES += rsseditor.cpp netsearch.cpp searcheditor.cpp netcommon.cpp
 SOURCES += treeeditor.cpp nettree.cpp main.cpp
 
+DEFINES += MPLUGIN_API
+
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }

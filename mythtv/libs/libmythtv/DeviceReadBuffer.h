@@ -5,11 +5,11 @@
 #define _DEVICEREADBUFFER_H_
 
 #include <unistd.h>
-#include <pthread.h>
 
 #include <QMutex>
 #include <QWaitCondition>
 #include <QString>
+#include <QThread>
 
 #include "util.h"
 
@@ -21,6 +21,19 @@ class ReaderPausedCB
     virtual void ReaderPaused(int fd) = 0;
 };
 
+class DeviceReadBuffer;
+
+class DRBThread : public QThread
+{
+    Q_OBJECT
+  public:
+    DRBThread(void) : m_buffer(NULL) {};
+    void SetBuffer( DeviceReadBuffer *buffer ) { m_buffer = buffer; };
+    void run(void);
+  private:
+    DeviceReadBuffer *m_buffer;
+};
+
 /** \class DeviceReadBuffer
  *  \brief Buffers reads from device files.
  *
@@ -30,6 +43,8 @@ class ReaderPausedCB
  */
 class DeviceReadBuffer
 {
+    friend class DRBThread;
+
   public:
     DeviceReadBuffer(ReaderPausedCB *callback, bool use_poll = true);
    ~DeviceReadBuffer();
@@ -52,7 +67,6 @@ class DeviceReadBuffer
     uint Read(unsigned char *buf, uint count);
 
   private:
-    static void *boot_ringbuffer(void *);
     void fill_ringbuffer(void);
 
     void SetPaused(bool);
@@ -77,7 +91,6 @@ class DeviceReadBuffer
     int              _stream_fd;
 
     ReaderPausedCB  *readerPausedCB;
-    pthread_t        thread;
 
     // Data for managing the device ringbuffer
     mutable QMutex   lock;
@@ -107,6 +120,12 @@ class DeviceReadBuffer
     size_t           avg_used;
     size_t           avg_cnt;
     MythTimer        lastReport;
+
+    DRBThread        thread;
 };
 
 #endif // _DEVICEREADBUFFER_H_
+
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */

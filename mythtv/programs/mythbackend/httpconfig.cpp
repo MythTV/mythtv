@@ -4,7 +4,6 @@
 // MythTV headers
 #include "httpconfig.h"
 #include "backendutil.h"
-#include "mythxml.h"
 #include "mythcontext.h"
 #include "mythdb.h"
 #include "mythdirs.h"
@@ -22,11 +21,11 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
     if (!request)
         return false;
 
-    VERBOSE(VB_IMPORTANT, QString("ProcessRequest '%1' '%2'")
+    VERBOSE(VB_IMPORTANT, QString("HttpConfig::ProcessRequest '%1' '%2'")
             .arg(request->m_sBaseUrl).arg(request->m_sMethod));
 
     if (request->m_sBaseUrl != "/" &&
-        request->m_sBaseUrl.left(7) != "/config")
+        request->m_sBaseUrl.left(7).toLower() != "/config")
     {
         return false;
     }
@@ -46,14 +45,15 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
         }
         else
         {
-            request->m_response << "<html><body><dl>";
+            QTextStream os(&request->m_response);
+            os << "<html><body><dl>";
             QStringMap::const_iterator it = request->m_mapParams.begin();
             for (; it!=request->m_mapParams.end(); ++it)
             {
-                request->m_response << "<dt>"<<it.key()<<"</dt><dd>"
+                os << "<dt>"<<it.key()<<"</dt><dd>"
                                     <<*it<<"</dd>\r\n";
             }
-            request->m_response << "</dl></body></html>";
+            os << "</dl></body></html>";
             handled = true;
         }
     }
@@ -91,8 +91,10 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
     return handled;
 }
 
-void HttpConfig::PrintHeader(QTextStream &os, const QString &form)
+void HttpConfig::PrintHeader(QBuffer &buffer, const QString &form)
 {
+    QTextStream os(&buffer);
+
     os.setCodec("UTF-8");
 
     os << "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
@@ -149,8 +151,10 @@ void HttpConfig::PrintHeader(QTextStream &os, const QString &form)
        << "    </div>\r\n";
 }
 
-void HttpConfig::PrintFooter(QTextStream &os)
+void HttpConfig::PrintFooter(QBuffer &buffer)
 {
+    QTextStream os(&buffer);
+
     os << "    <div class=\"form_buttons_bottom\"\r\n"
        << "         id=\"form_buttons_bottom\">\r\n"
        << "      <input type=\"submit\" value=\"Save Changes\" />\r\n"
@@ -160,8 +164,10 @@ void HttpConfig::PrintFooter(QTextStream &os)
        << "</html>\r\n";
 }
 
-void HttpConfig::PrintSettings(QTextStream &os, const MythSettingList &settings)
+void HttpConfig::PrintSettings(QBuffer &buffer, const MythSettingList &settings)
 {
+    QTextStream os(&buffer);
+
     MythSettingList::const_iterator it = settings.begin();
     for (; it != settings.end(); ++it)
         os << (*it)->ToHTML(1);

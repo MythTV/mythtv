@@ -6,15 +6,15 @@
 #include <QString>
 
 #include "mythimage.h"
-#include "mythexp.h"
+#include "mythmetaexp.h"
 #include "bluray.h"
-#include "bdnav/meta_data.h"
 
 typedef QList< QPair < uint,QString > > BlurayTitles;
 
 typedef QHash<QString,QString> MetadataMap;
 
-class MPUBLIC BlurayMetadata : public QObject
+struct meta_dl;
+class META_PUBLIC BlurayMetadata : public QObject
 {
   public:
     BlurayMetadata(const QString path);
@@ -22,7 +22,9 @@ class MPUBLIC BlurayMetadata : public QObject
 
     void toMap(MetadataMap &metadataMap);
 
-    void Parse(void);
+    bool OpenDisc(void);
+    bool IsOpen() { return m_bdnav; };
+    bool ParseDisc(void);
 
     QString      GetTitle(void) { return m_title; };
     QString      GetAlternateTitle(void) { return m_alttitle; };

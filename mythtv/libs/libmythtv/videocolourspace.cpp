@@ -1,8 +1,10 @@
 #include "math.h"
 
+#include "compat.h"
 #include "mythcorecontext.h"
 #include "mythverbose.h"
 #include "videocolourspace.h"
+
 
 #define LOC QString("ColourSpace: ")
 

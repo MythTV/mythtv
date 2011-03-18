@@ -5,7 +5,7 @@
 #include <QWidget>
 #include <QSize>
 
-#include "mythexp.h"
+#include "mythuiexp.h"
 
 class DisplayInfo
 {
@@ -13,16 +13,18 @@ class DisplayInfo
     DisplayInfo(void)  : size(QSize(0,0)), res(QSize(0,0)), rate(-1) { }
     DisplayInfo(int r) : size(QSize(0,0)), res(QSize(0,0)), rate(r)  { }
 
+    int Rate(void) { return (int)(rate + 0.5); }
     QSize size;
     QSize res;
     float rate;
 };
 
-class MPUBLIC MythDisplay
+class MUI_PUBLIC MythDisplay
 {
   public:
-    static DisplayInfo GetDisplayInfo(void);
+    static DisplayInfo GetDisplayInfo(int video_rate = 0);
     static WId GetWindowID(void);
+    static int GetNumberXineramaScreens(void);
 };
 
 #endif // MYTHDISPLAY_H

@@ -15,7 +15,14 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-#include "mythexp.h"
+#include "mythtvexp.h"
+
+#define PNG_MIN_SIZE   20 /* header plus one empty chunk */
+#define NUV_MIN_SIZE  204 /* header size? */
+#define MPEG_MIN_SIZE 376 /* 2 TS packets */
+
+/* should be minimum of the above test sizes */
+#define kReadTestSize PNG_MIN_SIZE
 
 class ThreadedFileWriter;
 class DVDRingBuffer;
@@ -23,7 +30,7 @@ class BDRingBuffer;
 class LiveTVChain;
 class RemoteFile;
 
-class MPUBLIC RingBuffer : protected QThread
+class MTV_PUBLIC RingBuffer : protected QThread
 {
   public:
     static RingBuffer *Create(const QString &lfilename, bool write,
@@ -55,7 +62,10 @@ class MPUBLIC RingBuffer : protected QThread
     bool      IsNearEnd(double fps, uint vvf) const;
     /// \brief Returns true if open for either reading or writing.
     virtual bool IsOpen(void) const = 0;
+    virtual bool IsStreamed(void)     { return LiveMode(); }
+    virtual int  BestBufferSize(void) { return 32768; }
 
+    // DVD and bluray methods
     bool IsDisc(void) const { return IsDVD() || IsBD(); }
     bool IsDVD(void)  const { return DVD() != NULL;     }
     bool IsBD(void)   const { return BD()  != NULL;     }
@@ -63,8 +73,10 @@ class MPUBLIC RingBuffer : protected QThread
     const BDRingBuffer  *BD(void)  const;
     DVDRingBuffer *DVD(void);
     BDRingBuffer  *BD(void);
-
-    virtual bool IsInDiscMenuOrStillFrame(void) const { return false; }
+    virtual bool StartFromBeginning(void)                   { return true;  }
+    virtual void IgnoreWaitStates(bool ignore)              { }
+    virtual bool IsInDiscMenuOrStillFrame(void) const       { return false; }
+    virtual bool HandleAction(const QStringList &, int64_t) { return false; }
 
     // General Commands
 
@@ -207,7 +219,6 @@ class MPUBLIC RingBuffer : protected QThread
     // constants
   public:
     static const uint kBufferSize;
-    static const uint kReadTestSize;
 };
 
 #endif // _RINGBUFFER_H_

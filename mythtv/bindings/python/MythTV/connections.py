@@ -10,12 +10,13 @@ from utility import deadlinesocket
 
 from time import sleep, time
 from select import select
-from urllib import urlopen
 from thread import start_new_thread, allocate_lock, get_ident
 import lxml.etree as etree
 import weakref
+import urllib2
 import socket
 import Queue
+import json
 import re
 
 try:
@@ -529,6 +530,22 @@ class XMLConnection( object ):
     'db' allows an existing database connection. Will only be used if
         either 'backend' or 'port' is not defined.
     """
+
+    class _Request( urllib2.Request ):
+        def open(self): return urllib2.urlopen(self)
+        def read(self): return self.open().read()
+
+        def setJSON(self):
+            if self.get_header('Accept') != 'application/json':
+                self.add_header('Accept', 'application/json')
+
+        def readEtree(self):
+            return etree.fromstring(self.read())
+
+        def readJSON(self):
+            self.setJSON()
+            return json.loads(self.read())
+
     def __repr__(self):
         return "<%s 'http://%s:%d/' at %s>" % \
                 (str(self.__class__).split("'")[1].split(".")[-1], 
@@ -546,47 +563,22 @@ class XMLConnection( object ):
             ip, port = reLOC.match(res['location']).group(1,2)
             yield cls(ip, port)
 
-    def _queryObject(self, path=None, **keyvars):
+    def _request(self, path='', **keyvars):
         """
-        obj._query(path=None, **keyvars) -> file object
+        obj._request(path=None, **keyvars) -> Request object
 
         'path' is an optional page to access.
         'keyvars' are a series of optional variables to specify on the URL.
-        """
-        url = 'http://%s:%d/' % (self.host, self.port)
-        if path == 'xml':
-            url += 'xml'
-        elif path is not None:
-            url += 'Myth/%s' % path
-        if len(keyvars) > 0:
-            fields = []
-            for key in keyvars:
-                fields.append('%s=%s' % (key, keyvars[key]))
-            url += '?'+'&'.join(fields)
-        self.log(self.log.NETWORK, 'Executing query', url)
-        ufd = urlopen(url)
-        return ufd
 
-    def _query(self, path=None, **keyvars):
+        The request object supports open() and read(), as well as supports
+            editing of HTTP headers and POST data. 
         """
-        obj._query(path=None, **keyvars) -> xml string
-
-        'path' is an optional page to access.
-        'keyvars' are a series of optional variables to specify on the URL.
-        """
-        ufd = self._queryObject(path, **keyvars)
-        res = ufd.read()
-        ufd.close()
-        return res
-
-    def _queryTree(self, path=None, **keyvars):
-        """
-        obj._queryTree(path=None, **keyvars) -> xml element tree
-
-        'path' is an optional page to access.
-        'keyvars' are a series of optional variables to specify on the URL.
-        """
-        return etree.fromstring(self._query(path, **keyvars))
+        url = 'http://{0.host}:{0.port}/{1}'.format(self, path)
+        if keyvars:
+            url += '?' + '&'.join(['{0}={1}'.format(*item)
+                                for item in keyvars.items()])
+        self.log(self.log.NETWORK, 'Generating request', url)
+        return self._Request(url)
 
     def getConnectionInfo(self, pin=0):
         """Return dbconn dict from backend connection info."""
@@ -594,11 +586,14 @@ class XMLConnection( object ):
         conv = {'Host':'DBHostName',    'Port':'DBPort',
                 'UserName':'DBUserName','Password':'DBPassword',
                 'Name':'DBName'}
-        tree = self._queryTree('GetConnectionInfo', Pin=pin)
-        if tree.tag == 'GetConnectionInfoResponse':
-            for child in tree.find('Info').find('Database'):
-                if child.tag in conv:
-                    dbconn[conv[child.tag]] = child.text
-            if 'DBPort' in dbconn:
-                dbconn['DBPort'] = int(dbconn['DBPort'])
+
+        try:
+            dat = self._request('Myth/GetConnectionInfo', Pin=pin).readJSON()
+            for k,v in dat['ConnectionInfo']['Database'].items():
+                if k in conv:
+                    dbconn[conv[k]] = v
+        except:
+            raise
+            pass
+
         return dbconn

@@ -32,6 +32,9 @@
 #   error no mutex support found
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #if defined(_WIN32)
 
@@ -135,5 +138,8 @@ static int bd_mutex_unlock(BD_MUTEX *p)
 
 #endif // HAVE_PTHREAD_H
 
+#ifdef __cplusplus
+};
+#endif
 
 #endif // LIBBLURAY_MUTEX_H_

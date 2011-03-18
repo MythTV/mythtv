@@ -8,7 +8,7 @@
 #include <QHash>
 #include <QMap>
 
-#include "mythexp.h"
+#include "mythtvexp.h"
 #include "videoouttypes.h"
 #include "tv.h"
 
@@ -16,7 +16,7 @@ class QStringList;
 class ProgramInfo;
 class MythSocket;
 
-class MPUBLIC RemoteEncoder
+class MTV_PUBLIC RemoteEncoder
 {
   public:
     RemoteEncoder(int num, const QString &host, short port);

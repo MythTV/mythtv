@@ -23,9 +23,7 @@
 
 // POSIX headers
 #include <sys/types.h>
-#ifndef _MSC_VER
 #include <sys/time.h>
-#endif
 #include <cerrno>
 
 // Qt headers
@@ -36,6 +34,7 @@
 #include "upnp.h"
 #include "compat.h"
 #include "mythconfig.h" // for HAVE_GETIFADDRS
+#include "mythverbose.h"
 
 // POSIX headers 2, needs to be after compat.h for OS X
 #ifndef USING_MINGW

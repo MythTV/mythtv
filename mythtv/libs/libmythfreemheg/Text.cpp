@@ -18,6 +18,8 @@
    Or, point your browser to http://www.gnu.org/copyleft/gpl.html
 
 */
+#include "compat.h"
+
 #include "Text.h"
 #include "Visible.h"
 #include "Presentable.h"

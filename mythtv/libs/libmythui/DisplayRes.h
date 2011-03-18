@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "DisplayResScreen.h"
-#include "mythexp.h"
+#include "mythuiexp.h"
 
 /** \class DisplayRes
  *  \brief The DisplayRes module allows for the display resolution
@@ -29,7 +29,7 @@ typedef enum
     MAX_MODES    = 5,
 } tmode;
 
-class MPUBLIC DisplayRes
+class MUI_PUBLIC DisplayRes
 {
   public:
     /** \brief Factory method that returns a DisplayRes singleton
@@ -172,6 +172,6 @@ class MPUBLIC DisplayRes
  *   class if needed, and returns a copy of vector returned by
  *   GetVideoModes(void).
  */
-MPUBLIC const DisplayResVector GetVideoModes(void);
+MUI_PUBLIC const DisplayResVector GetVideoModes(void);
 
 #endif

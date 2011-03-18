@@ -7,6 +7,7 @@
 
 #include "upnp.h"
 #include "upnpmsrr.h"
+#include "mythverbose.h"
 
 #include <cmath>
 #include <QRegExp>

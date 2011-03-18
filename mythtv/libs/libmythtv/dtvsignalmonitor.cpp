@@ -550,7 +550,7 @@ bool DTVSignalMonitor::WaitForLock(int timeout)
 
     MythTimer t;
     t.start();
-    while (t.elapsed()<timeout && running)
+    while (t.elapsed()<timeout && monitor_thread.isRunning())
     {
         SignalMonitorList slist =
             SignalMonitorValue::Parse(GetStatusList());

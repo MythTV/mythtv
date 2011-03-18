@@ -210,7 +210,7 @@ DVBChannel *DVBSignalMonitor::GetDVBChannel(void)
  */
 void DVBSignalMonitor::UpdateValues(void)
 {
-    if (!running || exit)
+    if (!monitor_thread.isRunning() || exit)
         return;
 
     if (streamHandlerStarted)

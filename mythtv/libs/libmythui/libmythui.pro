@@ -6,11 +6,11 @@ CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
 
-INCLUDEPATH += ../libmythdb 
+INCLUDEPATH += ../libmythbase
 INCLUDEPATH += ../.. ../
 INCLUDEPATH += ../../external/FFmpeg
 
-LIBS += -L../libmythdb -lmythdb-$$LIBVERSION
+LIBS += -L../libmythbase -lmythbase-$$LIBVERSION
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
@@ -23,19 +23,20 @@ HEADERS += mythuiimage.h mythuitext.h mythuistatetype.h  xmlparsebase.h
 HEADERS += mythuibutton.h myththemedmenu.h mythdialogbox.h
 HEADERS += mythuiclock.h mythuitextedit.h mythprogressdialog.h mythuispinbox.h
 HEADERS += mythuicheckbox.h mythuibuttonlist.h mythuigroup.h
-HEADERS += mythuiprogressbar.h mythuiwebbrowser.h
+HEADERS += mythuiprogressbar.h mythuiwebbrowser.h mythuifilebrowser.h
 HEADERS += screensaver.h screensaver-null.h x11colors.h
 HEADERS += themeinfo.h mythxdisplay.h DisplayRes.h DisplayResScreen.h
 HEADERS += mythgenerictree.h mythuibuttontree.h mythuiutils.h
 HEADERS += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
 HEADERS += mythrender_base.h mythfontmanager.h mythuieditbar.h
 HEADERS += mythdisplay.h mythuivideo.h mythudplistener.h
+HEADERS += mythuiexp.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
 SOURCES += myththemebase.cpp  mythpainter_qimage.cpp mythpainter_yuva.cpp
 SOURCES += mythpainter_qt.cpp xmlparsebase.cpp mythuihelper.cpp
-SOURCES += mythscreenstack.cpp mythgesture.cpp mythuitype.cpp mythscreentype.cpp 
-SOURCES += mythuiimage.cpp mythuitext.cpp
+SOURCES += mythscreenstack.cpp mythgesture.cpp mythuitype.cpp mythscreentype.cpp
+SOURCES += mythuiimage.cpp mythuitext.cpp mythuifilebrowser.cpp
 SOURCES += mythuistatetype.cpp mythfontproperties.cpp
 SOURCES += mythuibutton.cpp myththemedmenu.cpp mythdialogbox.cpp
 SOURCES += mythuiclock.cpp mythuitextedit.cpp mythprogressdialog.cpp
@@ -61,9 +62,9 @@ inc.files += mythuiclock.h mythgesture.h mythuitextedit.h mythprogressdialog.h
 inc.files += mythuispinbox.h mythuicheckbox.h mythuibuttonlist.h mythuigroup.h
 inc.files += mythuiprogressbar.h mythuiwebbrowser.h mythuiutils.h
 inc.files += x11colors.h mythgenerictree.h mythuibuttontree.h
-inc.files += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h 
-inc.files += mythuieditbar.h
-inc.files += mythuivideo.h
+inc.files += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
+inc.files += mythuieditbar.h mythuifilebrowser.h mythuivideo.h
+inc.files += mythuiexp.h mythuiactions.h
 
 INSTALLS += inc
 
@@ -123,7 +124,7 @@ using_xrandr {
     # Add nvidia XV-EXTENSION support
     SOURCES += util-nvctrl.cpp
     LIBS += -L../libmythnvctrl -lmythnvctrl-$${LIBVERSION}
-    TARGETDEPS += ../libmythnvctrl/libmythnvctrl-$${MYTH_LIB_EXT}
+    POST_TARGETDEPS += ../libmythnvctrl/libmythnvctrl-$${MYTH_LIB_EXT}
 }
 
 cygwin:DEFINES += _WIN32
@@ -132,12 +133,23 @@ mingw {
     DEFINES += USING_MINGW
     HEADERS += mythpainter_d3d9.h   mythrender_d3d9.h
     SOURCES += mythpainter_d3d9.cpp mythrender_d3d9.cpp
+    using_dxva2: DEFINES += USING_DXVA2
 }
 
 using_opengl {
     DEFINES += USE_OPENGL_PAINTER
-    SOURCES += mythpainter_ogl.cpp mythrender_opengl.cpp
-    HEADERS += mythpainter_ogl.h   mythrender_opengl.h mythrender_opengl_defs.h
+    SOURCES += mythpainter_ogl.cpp    mythrender_opengl.cpp
+    SOURCES += mythrender_opengl2.cpp
+    HEADERS += mythpainter_ogl.h    mythrender_opengl.h mythrender_opengl_defs.h
+    HEADERS += mythrender_opengl2.h mythrender_opengl_defs2.h
+    using_opengles {
+        DEFINES += USING_OPENGLES
+        HEADERS += mythrender_opengl2es.h
+    }
+    !using_opengles {
+        SOURCES += mythrender_opengl1.cpp
+        HEADERS += mythrender_opengl1.h mythrender_opengl_defs1.h
+    }
     inc.files += mythpainter_ogl.h
     QT += opengl
 
@@ -147,6 +159,7 @@ using_opengl {
 
 QT += xml sql network webkit
 DEFINES += USING_QTWEBKIT
+DEFINES += MUI_API
 
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden

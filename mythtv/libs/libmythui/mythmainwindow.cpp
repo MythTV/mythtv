@@ -36,7 +36,7 @@ using namespace std;
 #include <HIToolbox/Menus.h>   // For GetMBarHeight()
 #endif
 
-// libmythdb headers
+// libmythbase headers
 #include "mythdb.h"
 #include "mythverbose.h"
 #include "mythevent.h"
@@ -44,6 +44,7 @@ using namespace std;
 #include "compat.h"
 #include "mythsignalingtimer.h"
 #include "mythcorecontext.h"
+#include "mythmedia.h"
 
 // Libmythui headers
 #include "myththemebase.h"
@@ -157,10 +158,7 @@ class MythMainWindowPrivate
         mainStack(NULL),
 
         painter(NULL),
-
-#ifdef USE_OPENGL_PAINTER
         render(NULL),
-#endif
 
         AllowInput(true),
 
@@ -172,13 +170,16 @@ class MythMainWindowPrivate
 
         oldpaintwin(NULL),
         oldpainter(NULL),
+        oldrender(NULL),
 
         m_drawDisabledDepth(0),
         m_drawEnabled(true),
 
         m_themeBase(NULL),
 
-        m_udpListener(NULL)
+        m_udpListener(NULL),
+
+        m_pendingUpdate(false)
     {
     }
 
@@ -231,10 +232,8 @@ class MythMainWindowPrivate
     MythScreenStack *mainStack;
 
     MythPainter *painter;
+    MythRender  *render;
 
-#ifdef USE_OPENGL_PAINTER
-    MythRenderOpenGL *render;
-#endif
 
     bool AllowInput;
 
@@ -251,6 +250,7 @@ class MythMainWindowPrivate
 
     QWidget *oldpaintwin;
     MythPainter *oldpainter;
+    MythRender *oldrender;
 
     QMutex m_drawDisableLock;
     QMutex m_setDrawEnabledLock;
@@ -260,6 +260,8 @@ class MythMainWindowPrivate
 
     MythThemeBase *m_themeBase;
     MythUDPListener *m_udpListener;
+
+    bool m_pendingUpdate;
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
@@ -423,6 +425,7 @@ MythMainWindow::MythMainWindow(const bool useDB)
     d->paintwin = NULL;
     d->oldpainter = NULL;
     d->oldpaintwin = NULL;
+    d->oldrender = NULL;
 
     //Init();
 
@@ -551,6 +554,11 @@ QWidget *MythMainWindow::GetPaintWindow(void)
     return d->paintwin;
 }
 
+MythRender *MythMainWindow::GetRenderDevice()
+{
+    return d->render;
+}
+
 void MythMainWindow::AddScreenStack(MythScreenStack *stack, bool main)
 {
     d->stackList.push_back(stack);
@@ -562,6 +570,11 @@ void MythMainWindow::PopScreenStack()
 {
     delete d->stackList.back();
     d->stackList.pop_back();
+}
+
+int MythMainWindow::GetStackCount(void)
+{
+    return d->stackList.size();
 }
 
 MythScreenStack *MythMainWindow::GetMainStack(void)
@@ -577,6 +590,14 @@ MythScreenStack *MythMainWindow::GetStack(const QString &stackname)
         if ((*it)->objectName() == stackname)
             return *it;
     }
+    return NULL;
+}
+
+MythScreenStack* MythMainWindow::GetStackAt(int pos)
+{
+    if (pos >= 0 && pos < d->stackList.size())
+        return d->stackList.at(pos);
+
     return NULL;
 }
 
@@ -836,6 +857,9 @@ bool MythMainWindow::screenShot(void)
 
 bool MythMainWindow::event(QEvent *e)
 {
+    if (!updatesEnabled() && (e->type() == QEvent::UpdateRequest))
+        d->m_pendingUpdate = true;
+
     if (e->type() == QEvent::Show && !e->spontaneous())
     {
         QCoreApplication::postEvent(
@@ -892,20 +916,21 @@ void MythMainWindow::Init(void)
 
     setWindowFlags(flags);
 
+    d->screenRect = QRect(d->xbase, d->ybase, d->screenwidth, d->screenheight);
+    d->uiScreenRect = QRect(0, 0, d->screenwidth, d->screenheight);
+
+    Show();
+
     if (d->does_fill_screen && !GetMythUI()->IsGeometryOverridden())
     {
         VERBOSE(VB_GENERAL, "Using Full Screen Window");
         setWindowState(Qt::WindowFullScreen);
     }
 
-    d->screenRect = QRect(d->xbase, d->ybase, d->screenwidth, d->screenheight);
-    d->uiScreenRect = QRect(0, 0, d->screenwidth, d->screenheight);
-
     setGeometry(d->xbase, d->ybase, d->screenwidth, d->screenheight);
     setFixedSize(QSize(d->screenwidth, d->screenheight));
 
     GetMythUI()->ThemeWidget(this);
-    Show();
 
     if (!GetMythDB()->GetNumSetting("HideMouseCursor", 0))
         setMouseTracking(true); // Required for mouse cursor auto-hide
@@ -927,30 +952,60 @@ void MythMainWindow::Init(void)
         d->painter = NULL;
     }
 
-    QString painter = GetMythDB()->GetSetting("ThemePainter", "qt");
-#ifdef USE_OPENGL_PAINTER
-    if (painter == "opengl")
+    if (d->render)
     {
-        VERBOSE(VB_GENERAL, "Using the OpenGL painter");
+        d->oldrender = d->render;
+        d->render = NULL;
+    }
+
+    QString painter = GetMythDB()->GetSetting("UIPainter", "auto");
+#ifdef USING_MINGW
+    if (painter == "auto" || painter == "d3d9")
+    {
+        VERBOSE(VB_GENERAL, "Using the D3D9 painter");
+        d->painter = new MythD3D9Painter();
+        d->paintwin = new MythPainterWindowD3D9(this, d);
+    }
+#endif
+#ifdef USE_OPENGL_PAINTER
+    if ((painter == "auto" && (!d->painter && !d->paintwin)) ||
+        painter == "opengl")
+    {
+        VERBOSE(VB_GENERAL, "Trying the OpenGL painter");
         d->painter = new MythOpenGLPainter();
         QGLFormat fmt;
         fmt.setDepth(false);
-        d->render  = new MythRenderOpenGL(fmt);
-        d->paintwin = new MythPainterWindowGL(this, d, d->render);
+        d->render = MythRenderOpenGL::Create(fmt);
+        MythRenderOpenGL *gl = dynamic_cast<MythRenderOpenGL*>(d->render);
+        d->paintwin = new MythPainterWindowGL(this, d, gl);
         QGLWidget *qgl = dynamic_cast<QGLWidget *>(d->paintwin);
-        if (qgl && !qgl->isValid())
+        if (qgl)
         {
-            VERBOSE(VB_IMPORTANT, "Failed to create OpenGL painter. "
-                                  "Check your OpenGL installation.");
-            delete d->painter;
-            d->painter = NULL;
-            delete d->paintwin;
-            d->paintwin = NULL;
+            bool teardown = false;
+            if (!qgl->isValid())
+            {
+                VERBOSE(VB_IMPORTANT, "Failed to create OpenGL painter. "
+                                      "Check your OpenGL installation.");
+                teardown = true;
+            }
+            else if (painter == "auto" && !qgl->format().directRendering())
+            {
+                VERBOSE(VB_IMPORTANT, "OpenGL is using software rendering. "
+                                      "Falling back to Qt painter.");
+                teardown = true;
+            }
+            if (teardown)
+            {
+                delete d->painter;
+                d->painter = NULL;
+                delete d->paintwin;
+                d->paintwin = NULL;
+                d->render = NULL; // deleted by the painterwindow
+            }
+            else
+                gl->Init();
         }
-        else
-            d->render->Init();
     }
-    else
 #endif
 #ifdef USING_VDPAU
     if (painter == "vdpau")
@@ -958,14 +1013,6 @@ void MythMainWindow::Init(void)
         VERBOSE(VB_GENERAL, "Using the VDPAU painter");
         d->painter = new MythVDPAUPainter();
         d->paintwin = new MythPainterWindowVDPAU(this, d);
-    }
-#endif
-#ifdef USING_MINGW
-    if (painter == "d3d9")
-    {
-        VERBOSE(VB_GENERAL, "Using the D3D9 painter");
-        d->painter = new MythD3D9Painter();
-        d->paintwin = new MythPainterWindowD3D9(this, d);
     }
 #endif
 
@@ -999,19 +1046,19 @@ void MythMainWindow::Init(void)
 
 void MythMainWindow::InitKeys()
 {
-    RegisterKey("Global", "UP", QT_TRANSLATE_NOOP("MythControls",
+    RegisterKey("Global", ACTION_UP, QT_TRANSLATE_NOOP("MythControls",
         "Up Arrow"),               "Up");
-    RegisterKey("Global", "DOWN", QT_TRANSLATE_NOOP("MythControls",
+    RegisterKey("Global", ACTION_DOWN, QT_TRANSLATE_NOOP("MythControls",
         "Down Arrow"),           "Down");
-    RegisterKey("Global", "LEFT", QT_TRANSLATE_NOOP("MythControls",
+    RegisterKey("Global", ACTION_LEFT, QT_TRANSLATE_NOOP("MythControls",
         "Left Arrow"),           "Left");
-    RegisterKey("Global", "RIGHT", QT_TRANSLATE_NOOP("MythControls",
+    RegisterKey("Global", ACTION_RIGHT, QT_TRANSLATE_NOOP("MythControls",
         "Right Arrow"),         "Right");
     RegisterKey("Global", "NEXT", QT_TRANSLATE_NOOP("MythControls",
         "Move to next widget"),   "Tab");
     RegisterKey("Global", "PREVIOUS", QT_TRANSLATE_NOOP("MythControls",
         "Move to preview widget"), "Backtab");
-    RegisterKey("Global", "SELECT", QT_TRANSLATE_NOOP("MythControls",
+    RegisterKey("Global", ACTION_SELECT, QT_TRANSLATE_NOOP("MythControls",
         "Select"), "Return,Enter,Space");
     RegisterKey("Global", "BACKSPACE", QT_TRANSLATE_NOOP("MythControls",
         "Backspace"),       "Backspace");
@@ -1053,17 +1100,23 @@ void MythMainWindow::InitKeys()
         ,"Copy text from textedit"), "Ctrl+C");
     RegisterKey("Global", "PASTE", QT_TRANSLATE_NOOP("MythControls",
         "Paste text into textedit"), "Ctrl+V");
+    RegisterKey("Global", "UNDO", QT_TRANSLATE_NOOP("MythControls",
+        "Undo"), "Ctrl+Z");
+    RegisterKey("Global", "REDO", QT_TRANSLATE_NOOP("MythControls",
+        "Redo"), "Ctrl+Y");
+    RegisterKey("Global", "SEARCH", QT_TRANSLATE_NOOP("MythControls",
+        "Show incremental search dialog"), "Ctrl+S");
 
-    RegisterKey("Global", "0", QT_TRANSLATE_NOOP("MythControls","0"), "0");
-    RegisterKey("Global", "1", QT_TRANSLATE_NOOP("MythControls","1"), "1");
-    RegisterKey("Global", "2", QT_TRANSLATE_NOOP("MythControls","2"), "2");
-    RegisterKey("Global", "3", QT_TRANSLATE_NOOP("MythControls","3"), "3");
-    RegisterKey("Global", "4", QT_TRANSLATE_NOOP("MythControls","4"), "4");
-    RegisterKey("Global", "5", QT_TRANSLATE_NOOP("MythControls","5"), "5");
-    RegisterKey("Global", "6", QT_TRANSLATE_NOOP("MythControls","6"), "6");
-    RegisterKey("Global", "7", QT_TRANSLATE_NOOP("MythControls","7"), "7");
-    RegisterKey("Global", "8", QT_TRANSLATE_NOOP("MythControls","8"), "8");
-    RegisterKey("Global", "9", QT_TRANSLATE_NOOP("MythControls","9"), "9");
+    RegisterKey("Global", ACTION_0, QT_TRANSLATE_NOOP("MythControls","0"), "0");
+    RegisterKey("Global", ACTION_1, QT_TRANSLATE_NOOP("MythControls","1"), "1");
+    RegisterKey("Global", ACTION_2, QT_TRANSLATE_NOOP("MythControls","2"), "2");
+    RegisterKey("Global", ACTION_3, QT_TRANSLATE_NOOP("MythControls","3"), "3");
+    RegisterKey("Global", ACTION_4, QT_TRANSLATE_NOOP("MythControls","4"), "4");
+    RegisterKey("Global", ACTION_5, QT_TRANSLATE_NOOP("MythControls","5"), "5");
+    RegisterKey("Global", ACTION_6, QT_TRANSLATE_NOOP("MythControls","6"), "6");
+    RegisterKey("Global", ACTION_7, QT_TRANSLATE_NOOP("MythControls","7"), "7");
+    RegisterKey("Global", ACTION_8, QT_TRANSLATE_NOOP("MythControls","8"), "8");
+    RegisterKey("Global", ACTION_9, QT_TRANSLATE_NOOP("MythControls","9"), "9");
 
     RegisterKey("Global", "SYSEVENT01", QT_TRANSLATE_NOOP("MythControls",
         "Trigger System Key Event #1"), "");
@@ -1145,6 +1198,10 @@ void MythMainWindow::ReinitDone(void)
     delete d->oldpaintwin;
     d->oldpaintwin = NULL;
 
+    // For OpenGL contexts (at least), deleting the painter window also
+    // deletes the render context
+    d->oldrender = NULL;
+
     d->paintwin->move(0, 0);
     d->paintwin->setFixedSize(size());
     d->paintwin->raise();
@@ -1168,7 +1225,12 @@ void MythMainWindow::Show(void)
 void MythMainWindow::attach(QWidget *child)
 {
 #ifdef USING_MINGW
-#warning TODO FIXME MythMainWindow::attach() does not always work on MS Windows!
+# ifdef _MSC_VER
+#  pragma message( "TODO FIXME MythMainWindow::attach() does not always work on MS Windows!")
+# else
+#  warning TODO FIXME MythMainWindow::attach() does not always work on MS Windows!
+# endif
+
     // if windows are created on different threads,
     // or if setFocus() is called from a thread other than the main UI thread,
     // setFocus() hangs the thread that called it
@@ -1268,11 +1330,17 @@ void MythMainWindow::SetDrawEnabled(bool enable)
 
     if (enable)
     {
-        repaint(); // See #8952
+        if (d->m_pendingUpdate)
+        {
+            QApplication::postEvent(this, new QEvent(QEvent::UpdateRequest), Qt::LowEventPriority);
+            d->m_pendingUpdate = false;
+        }
         d->drawTimer->start(1000 / 70);
+
     }
     else
         d->drawTimer->stop();
+
 
     d->m_setDrawEnabledWait.wakeAll();
 }
@@ -1382,6 +1450,16 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
                                        bool allowJumps)
 {
     actions.clear();
+
+    // Special case for custom QKeyEvent where the action is embedded directly
+    // in the QKeyEvent text property. Used by MythFEXML http extension
+    if (e->key() == 0 && !e->text().isEmpty() &&
+        e->modifiers() == Qt::NoModifier)
+    {
+        actions.append(e->text());
+        return false;
+    }
+
     int keynum = d->TranslateKeyNum(e);
 
     QStringList localActions;
@@ -2044,6 +2122,45 @@ void MythMainWindow::customEvent(QEvent *ce)
         }
     }
 #endif
+    else if (ce->type() == MythMediaEvent::kEventType)
+    {
+        MythMediaEvent *me = static_cast<MythMediaEvent*>(ce);
+
+        // A listener based system might be more efficient, but we should never
+        // have that many screens open at once so impact should be minimal.
+        //
+        // This approach is simpler for everyone to follow. Plugin writers
+        // don't have to worry about adding their screens to the list because
+        // all screens receive media events.
+        //
+        // Events are even sent to hidden or backgrounded screens, this avoids
+        // the need for those to poll for changes when they become visible again
+        // however this needs to be kept in mind if media changes trigger
+        // actions which would not be appropriate when the screen doesn't have
+        // focus. It is the programmers responsibility to ignore events when
+        // necessary.
+        QVector<MythScreenStack *>::Iterator it;
+        for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
+        {
+            QVector<MythScreenType *> screenList;
+            (*it)->GetScreenList(screenList);
+            QVector<MythScreenType *>::Iterator sit;
+            for (sit = screenList.begin(); sit != screenList.end(); ++sit)
+            {
+                MythScreenType *screen = (*sit);
+                if (screen)
+                    screen->mediaEvent(me);
+            }
+        }
+
+        // Debugging
+        MythMediaDevice *device = me->getDevice();
+        if (device)
+        {
+            VERBOSE(VB_GENERAL, QString("Media Event: %1 - %2")
+                    .arg(device->getDevicePath()).arg(device->getStatus()));
+        }
+    }
     else if (ce->type() == ScreenSaverEvent::kEventType)
     {
         ScreenSaverEvent *sse = static_cast<ScreenSaverEvent *>(ce);

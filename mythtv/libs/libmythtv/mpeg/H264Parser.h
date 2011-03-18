@@ -23,6 +23,7 @@
 #ifndef H264PARSER_H
 #define H264PARSER_H
 
+#include <QString>
 #include <stdint.h>
 #include "mythconfig.h"
 #include "compat.h" // for uint on Darwin, MinGW
@@ -32,7 +33,9 @@
 #endif
 
 // copied from libavutil/internal.h
+extern "C" {
 #include "libavutil/common.h" // for AV_GCC_VERSION_AT_LEAST()
+}
 #ifndef av_alias
 #if HAVE_ATTRIBUTE_MAY_ALIAS && (!defined(__ICC) || __ICC > 1110) && AV_GCC_VERSION_AT_LEAST(3,3)
 #   define av_alias __attribute__((may_alias))
@@ -47,6 +50,10 @@ extern "C" {
 
 class H264Parser {
   public:
+
+    enum {
+        MAX_SLICE_HEADER_SIZE = 256
+    };
 
     // ITU-T Rec. H.264 table 7-1
     enum NAL_unit_type {
@@ -101,12 +108,14 @@ class H264Parser {
     };
 
     H264Parser(void);
-    ~H264Parser(void) {;}
+    ~H264Parser(void) {delete [] rbsp_buffer;}
 
     uint32_t addBytes(const uint8_t  *bytes,
                       const uint32_t  byte_count,
                       const uint64_t  stream_offset);
     void Reset(void);
+
+    QString NAL_type_str(uint8_t type);
 
     bool stateChanged(void) const { return state_changed; }
 
@@ -158,16 +167,21 @@ class H264Parser {
   private:
     enum constants {EXTENDED_SAR = 255};
 
-    inline void set_AU_pending(const uint64_t & stream_offset)
+    inline void set_AU_pending(void)
         {
             if (!AU_pending)
             {
                 AU_pending = true;
-                AU_offset = stream_offset;
+                AU_offset = pkt_offset;
+                au_contains_keyframe_message = false;
             }
         }
 
     bool new_AU(void);
+    void resetRBSP(void);
+    bool fillRBSP(const uint8_t *byteP, uint32_t byte_count,
+                  bool found_start_code);
+    void processRBSP(bool rbsp_complete);
     bool decode_Header(GetBitContext *gb);
     void decode_SPS(GetBitContext *gb);
     void decode_PPS(GetBitContext * gb);
@@ -177,11 +191,16 @@ class H264Parser {
     bool       AU_pending;
     bool       state_changed;
     bool       seen_sps;
+    bool       au_contains_keyframe_message;
     bool       is_keyframe;
     bool       I_is_keyframe;
 
     uint32_t   sync_accumulator;
-    GetBitContext gb;
+    uint8_t   *rbsp_buffer;
+    uint32_t   rbsp_buffer_size;
+    uint32_t   rbsp_index;
+    uint32_t   consecutive_zeros;
+    bool       have_unfinished_NAL;
 
     int        prev_frame_num, frame_num;
     uint       slice_type;
@@ -218,7 +237,7 @@ class H264Parser {
     uint32_t   unitsInTick, timeScale;
     bool       fixedRate;
 
-    uint64_t   AU_offset, frame_start_offset, keyframe_start_offset;
+    uint64_t   pkt_offset, AU_offset, frame_start_offset, keyframe_start_offset;
     bool       on_frame, on_key_frame;
 };
 

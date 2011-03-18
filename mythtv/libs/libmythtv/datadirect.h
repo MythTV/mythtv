@@ -6,7 +6,7 @@
 #include <QXmlDefaultHandler>
 #include <QMap>
 
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 #include <vector>
 using namespace std;
@@ -251,7 +251,7 @@ typedef vector<DataDirectLineup>           DDLineupList;
 typedef vector<DataDirectLineupMap>        DDLineupChannels;
 typedef QMap<QString,DDLineupChannels>     DDLineupMap;   // lineupid ->
 
-class MPUBLIC DataDirectProcessor
+class MTV_PUBLIC DataDirectProcessor
 {
     friend class DDStructureParser;
   public:
@@ -354,7 +354,7 @@ class MPUBLIC DataDirectProcessor
                      QString inCookieFile, QString outCookieFile);
 
     static bool DDPost(QString    url,
-                       QString    postFilename, QString    inputFilename,
+                       QString    postFilename, QString   &inputFilename,
                        QString    userid,       QString    password,
                        QDateTime  pstartDate,   QDateTime  pendDate,
                        QString   &err_txt);

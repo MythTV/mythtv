@@ -16,6 +16,7 @@
 #include "dbaccess.h"
 #include "videometadatalistmanager.h"
 #include "videoutils.h"
+#include "netutils.h"
 
 struct SortData
 {
@@ -910,7 +911,7 @@ int VideoMetadata::UpdateHashedDBRecord(const QString &hash,
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT intid FROM videometadata WHERE "
+    query.prepare("SELECT intid,filename FROM videometadata WHERE "
                   "hash = :HASH");
     query.bindValue(":HASH", hash);
 
@@ -924,6 +925,7 @@ int VideoMetadata::UpdateHashedDBRecord(const QString &hash,
         return -1;
 
     int intid = query.value(0).toInt();
+    QString oldfilename = query.value(1).toString();
 
     query.prepare("UPDATE videometadata SET filename = :FILENAME, "
                   "host = :HOST WHERE intid = :INTID");
@@ -933,7 +935,18 @@ int VideoMetadata::UpdateHashedDBRecord(const QString &hash,
 
     if (!query.exec() || !query.isActive())
     {
-        MythDB::DBError("Video hashed metadata update", query);
+        MythDB::DBError("Video hashed metadata update (videometadata)", query);
+        return -1;
+    }
+
+    query.prepare("UPDATE filemarkup SET filename = :FILENAME "
+                  "WHERE filename = :OLDFILENAME");
+    query.bindValue(":FILENAME", file_name);
+    query.bindValue(":OLDFILENAME", oldfilename);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("Video hashed metadata update (filemarkup)", query);
         return -1;
     }
 

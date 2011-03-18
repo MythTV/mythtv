@@ -7,6 +7,7 @@ class MythBDPlayer : public MythPlayer
 {
   public:
     MythBDPlayer(bool muted = false);
+    virtual bool    GoToMenu(QString str);
     virtual int     GetNumChapters(void);
     virtual int     GetCurrentChapter(void);
     virtual void    GetChapterTimes(QList<long long> &times);
@@ -25,6 +26,33 @@ class MythBDPlayer : public MythPlayer
     virtual bool SwitchAngle(int angle);
     virtual bool PrevAngle(void);
     virtual bool NextAngle(void);
+
+    // Non-const gets
+    // Disable screen grabs for Bluray
+    virtual char *GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
+        int &buflen, int &vw, int &vh, float &ar) { return NULL; }
+    virtual char *GetScreenGrab(int secondsin, int &buflen,
+        int &vw, int &vh, float &ar) { return NULL; }
+
+  protected:
+    // Playback
+    virtual bool VideoLoop(void);
+    virtual void EventStart(void);
+    virtual void DisplayPauseFrame(void);
+    virtual void PreProcessNormalFrame(void);
+
+    // Private decoder stuff
+    virtual void CreateDecoder(char *testbuf, int testreadsize,
+                               bool allow_libmpeg2, bool no_accel);
+
+    // Non-const gets
+    // Disable screen grabs for Bluray
+    virtual void SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
+                                   bool absolute) { return; }
+
+  private:
+    void DisplayMenu(void);
+    bool m_stillFrameShowing;
 };
 
 #endif // MYTHBDPLAYER_H

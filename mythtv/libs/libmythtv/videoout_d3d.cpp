@@ -30,6 +30,8 @@ const int kPrebufferFramesNormal = 10;
 const int kPrebufferFramesSmall = 4;
 const int kKeepPrebuffer = 2;
 
+#define NUM_DXVA2_BUFS 30
+
 #define LOC      QString("VideoOutputD3D: ")
 #define LOC_WARN QString("VideoOutputD3D Warning: ")
 #define LOC_ERR  QString("VideoOutputD3D Error: ")
@@ -39,7 +41,6 @@ void VideoOutputD3D::GetRenderOptions(render_opts &opts,
 {
     opts.renderers->append("direct3d");
     opts.deints->insert("direct3d", cpudeints);
-    (*opts.osds)["direct3d"].append("softblend");
     (*opts.osds)["direct3d"].append("direct3d");
     (*opts.safe_renderers)["dummy"].append("direct3d");
     (*opts.safe_renderers)["nuppel"].append("direct3d");
@@ -47,7 +48,12 @@ void VideoOutputD3D::GetRenderOptions(render_opts &opts,
         (*opts.safe_renderers)["ffmpeg"].append("direct3d");
     if (opts.decoders->contains("crystalhd"))
         (*opts.safe_renderers)["crystalhd"].append("direct3d");
-    opts.priorities->insert("direct3d", 55);
+    opts.priorities->insert("direct3d", 70);
+
+#ifdef USING_DXVA2
+    if (opts.decoders->contains("dxva2"))
+        (*opts.safe_renderers)["dxva2"].append("direct3d");
+#endif
 }
 
 VideoOutputD3D::VideoOutputD3D(void)
@@ -58,6 +64,10 @@ VideoOutputD3D::VideoOutputD3D(void)
     m_osd_painter(NULL)
 {
     m_pauseFrame.buf = NULL;
+#ifdef USING_DXVA2
+    m_decoder = NULL;
+#endif
+    m_pause_surface = NULL;
 }
 
 VideoOutputD3D::~VideoOutputD3D()
@@ -80,6 +90,7 @@ void VideoOutputD3D::TearDown(void)
     delete m_osd_painter;
     m_osd_painter = NULL;
 
+    DeleteDecoder();
     DestroyContext();
 }
 
@@ -128,25 +139,27 @@ bool VideoOutputD3D::InputChanged(const QSize &input_size,
                                   void        *codec_private,
                                   bool        &aspect_only)
 {
-    VERBOSE(VB_PLAYBACK, LOC + QString("InputChanged(%1,%2,%3) %4")
-            .arg(input_size.width()).arg(input_size.height()).arg(aspect)
-            .arg(toString(av_codec_id)));
-
     QMutexLocker locker(&m_lock);
 
-    if (!codec_is_std(av_codec_id))
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-            QString("New video codec is not supported."));
-        errorState = kError_Unknown;
-        return false;
-    }
+    QSize cursize = window.GetActualVideoDim();
 
-    if (input_size == window.GetActualVideoDim())
+    VERBOSE(VB_PLAYBACK, LOC +
+        QString("InputChanged from %1: %2x%3 aspect %4 to %5: %6x%7 aspect %9")
+            .arg(toString(video_codec_id)).arg(cursize.width())
+            .arg(cursize.height()).arg(window.GetVideoAspect())
+            .arg(toString(av_codec_id)).arg(input_size.width())
+            .arg(input_size.height()).arg(aspect));
+
+
+    bool cid_changed = (video_codec_id != av_codec_id);
+    bool res_changed = input_size  != cursize;
+    bool asp_changed = aspect      != window.GetVideoAspect();
+
+    if (!res_changed && !cid_changed)
     {
-        aspect_only = video_codec_id == av_codec_id;
-        if (window.GetVideoAspect() != aspect)
+        if (asp_changed)
         {
+            aspect_only = true;
             VideoAspectRatioChanged(aspect);
             MoveResize();
         }
@@ -159,6 +172,7 @@ bool VideoOutputD3D::InputChanged(const QSize &input_size,
              aspect, m_hWnd, disp.left(), disp.top(),
              disp.width(), disp.height(), av_codec_id, m_hEmbedWnd))
     {
+        BestDeint();
         return true;
     }
 
@@ -205,25 +219,23 @@ bool VideoOutputD3D::Init(int width, int height, float aspect,
     VideoOutput::Init(width, height, aspect, winid,
                       winx, winy, winw, winh, codec_id, embedid);
 
-    if (db_vdisp_profile)
-        db_vdisp_profile->SetVideoRenderer("direct3d");
+    VERBOSE(VB_PLAYBACK, LOC + QString("Init with codec: %1")
+                         .arg(toString(codec_id)));
+    SetProfile();
 
     bool success = true;
     success &= SetupContext();
     InitDisplayMeasurements(width, height, false);
 
-    vbuffers.Init(kNumBuffers, true, kNeedFreeFrames,
-                  kPrebufferFramesNormal, kPrebufferFramesSmall,
-                  kKeepPrebuffer);
-    success &= vbuffers.CreateBuffers(FMT_YV12,
-                                      window.GetVideoDim().width(),
-                                      window.GetVideoDim().height());
-    m_pauseFrame.height = vbuffers.GetScratchFrame()->height;
-    m_pauseFrame.width  = vbuffers.GetScratchFrame()->width;
-    m_pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
-    m_pauseFrame.size   = vbuffers.GetScratchFrame()->size;
-    m_pauseFrame.buf    = new unsigned char[m_pauseFrame.size + 128];
-    m_pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
+    if (codec_is_dxva2(video_codec_id))
+    {
+        if (!CreateDecoder())
+            return false;
+    }
+
+    success &= CreateBuffers();
+    success &= InitBuffers();
+    success &= CreatePauseFrame();
 
     MoveResize();
 
@@ -243,6 +255,67 @@ bool VideoOutputD3D::Init(int width, int height, float aspect,
     return success;
 }
 
+void VideoOutputD3D::SetProfile(void)
+{
+    if (db_vdisp_profile)
+        db_vdisp_profile->SetVideoRenderer("direct3d");
+}
+
+bool VideoOutputD3D::CreateBuffers(void)
+{
+    if (codec_is_dxva2(video_codec_id))
+    {
+        vbuffers.Init(NUM_DXVA2_BUFS, false, 2, 1, 4, 1);
+        VERBOSE(VB_PLAYBACK, LOC + QString("Created %1 empty DXVA2 buffers.")
+                                           .arg(NUM_DXVA2_BUFS));
+        return true;
+    }
+
+    vbuffers.Init(kNumBuffers, true, kNeedFreeFrames,
+                  kPrebufferFramesNormal, kPrebufferFramesSmall,
+                  kKeepPrebuffer);
+    return true;
+
+}
+
+bool VideoOutputD3D::InitBuffers(void)
+{
+#ifdef USING_DXVA2
+    if ((codec_is_dxva2(video_codec_id)) && m_decoder)
+    {
+        QMutexLocker locker(&m_lock);
+        const QSize video_dim = window.GetVideoDim();
+        bool ok = true;
+        for (int i = 0; i < NUM_DXVA2_BUFS; i++)
+        {
+            ok &= vbuffers.CreateBuffer(video_dim.width(),
+                                        video_dim.height(), i,
+                                        m_decoder->GetSurface(i), FMT_DXVA2);
+        }
+        if (ok)
+            VERBOSE(VB_PLAYBACK, LOC + "Initialised DXVA2 buffers.");
+        return ok;
+    }
+#endif
+    return vbuffers.CreateBuffers(FMT_YV12,
+                                  window.GetVideoDim().width(),
+                                  window.GetVideoDim().height());
+}
+
+bool VideoOutputD3D::CreatePauseFrame(void)
+{
+    if (codec_is_dxva2(video_codec_id))
+        return true;
+
+    m_pauseFrame.height = vbuffers.GetScratchFrame()->height;
+    m_pauseFrame.width  = vbuffers.GetScratchFrame()->width;
+    m_pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
+    m_pauseFrame.size   = vbuffers.GetScratchFrame()->size;
+    m_pauseFrame.buf    = new unsigned char[m_pauseFrame.size + 128];
+    m_pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
+    return true;
+}
+
 void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t,
                                   OSD *osd)
 {
@@ -254,10 +327,11 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t,
         return;
     }
 
-    if (!buffer)
+    if (!buffer && codec_is_std(video_codec_id))
         buffer = vbuffers.GetScratchFrame();
 
-    framesPlayed = buffer->frameNumber + 1;
+    if (buffer)
+        framesPlayed = buffer->frameNumber + 1;
 
     if (!m_render || !m_video)
         return;
@@ -350,14 +424,24 @@ void VideoOutputD3D::UpdatePauseFrame(void)
 {
     QMutexLocker locker(&m_lock);
     VideoFrame *used_frame = vbuffers.head(kVideoBuffer_used);
-    if (!used_frame)
-        used_frame = vbuffers.GetScratchFrame();
 
-    CopyFrame(&m_pauseFrame, used_frame);
+    if (codec_is_std(video_codec_id))
+    {
+        if (!used_frame)
+            used_frame = vbuffers.GetScratchFrame();
+        CopyFrame(&m_pauseFrame, used_frame);
+    }
+    else if (codec_is_dxva2(video_codec_id))
+    {
+        m_pause_surface = used_frame->buf;
+    }
 }
 
 void VideoOutputD3D::UpdateFrame(VideoFrame *frame, D3D9Image *img)
 {
+    if (codec_is_dxva2(video_codec_id))
+        return;
+
     // TODO - add a size check
     bool hardware_conv = false;
     uint pitch = 0;
@@ -414,6 +498,9 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
                                   const PIPMap &pipPlayers,
                                   FrameScanType scan)
 {
+    if (!m_render || !m_video)
+        return;
+
     QMutexLocker locker(&m_lock);
     if (IsErrored())
     {
@@ -422,20 +509,31 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
         return;
     }
 
+    bool gpu = codec_is_dxva2(video_codec_id);
+
+    if (gpu && frame && frame->codec != FMT_DXVA2)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Wrong frame format");
+        return;
+    }
+
     bool deint_proc = m_deinterlacing && (m_deintFilter != NULL);
 
     bool pauseframe = false;
     if (!frame)
     {
-        frame = vbuffers.GetScratchFrame();
-        CopyFrame(vbuffers.GetScratchFrame(), &m_pauseFrame);
+        if (!gpu)
+        {
+            frame = vbuffers.GetScratchFrame();
+            CopyFrame(vbuffers.GetScratchFrame(), &m_pauseFrame);
+        }
         pauseframe = true;
     }
 
-    if (filterList)
+    if (filterList && !gpu)
         filterList->ProcessFrame(frame);
 
-    bool safepauseframe = pauseframe && !IsBobDeint();
+    bool safepauseframe = pauseframe && !IsBobDeint() && !gpu;
     if (deint_proc && m_deinterlaceBeforeOSD &&
        (!pauseframe || safepauseframe))
     {
@@ -451,13 +549,30 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
         m_deintFilter->ProcessFrame(frame, scan);
     }
 
-    if (m_render)
+    // Test the device
+    m_render_valid |= m_render->Test(m_render_reset);
+    if (m_render_reset)
+        SetupContext();
+
+    // Update a software decoded frame
+    if (m_render_valid && !gpu)
+        UpdateFrame(frame, m_video);
+
+    // Update a GPU decoded frame
+    if (m_render_valid && gpu)
     {
-        m_render_valid |= m_render->Test(m_render_reset);
+        m_render_valid = m_render->Test(m_render_reset);
         if (m_render_reset)
-            SetupContext();
-        if (m_render_valid && m_video)
-            UpdateFrame(frame, m_video);
+            CreateDecoder();
+
+        if (m_render_valid && frame)
+        {
+            m_render->CopyFrame(frame->buf, m_video);
+        }
+        else if (m_render_valid && pauseframe)
+        {
+            m_render->CopyFrame(m_pause_surface, m_video);
+        }
     }
 }
 
@@ -543,10 +658,78 @@ QStringList VideoOutputD3D::GetAllowedRenderers(
     MythCodecID myth_codec_id, const QSize &video_dim)
 {
     QStringList list;
-
-    if (codec_is_std(myth_codec_id) && !getenv("NO_DIRECT3D"))
-            list += "direct3d";
-
+    if (codec_is_std(myth_codec_id) || (codec_is_dxva2_hw(myth_codec_id) &&
+        !getenv("NO_DXVA2")))
+    {
+        list += "direct3d";
+    }
     return list;
 }
+
+bool VideoOutputD3D::ApproveDeintFilter(const QString& filtername) const
+{
+    if (codec_is_std(video_codec_id))
+    {
+        return !filtername.contains("bobdeint") &&
+               !filtername.contains("opengl") &&
+               !filtername.contains("vdpau");
+    }
+
+    return false;
+}
+
+MythCodecID VideoOutputD3D::GetBestSupportedCodec(
+    uint width,       uint height,
+    uint stream_type, bool no_acceleration,
+    PixelFormat &pix_fmt)
+{
+#ifdef USING_DXVA2
+    QSize size(width, height);
+    bool use_cpu = no_acceleration;
+    VideoDisplayProfile vdp;
+    vdp.SetInput(size);
+    QString dec = vdp.GetDecoder();
+
+    MythCodecID test_cid = (MythCodecID)(kCodec_MPEG1_DXVA2 + (stream_type - 1));
+    use_cpu |= !codec_is_dxva2_hw(test_cid);
+    pix_fmt = PIX_FMT_DXVA2_VLD;
+    if ((dec == "dxva2") && !getenv("NO_DXVA2") && !use_cpu)
+        return test_cid;
+#endif
+    return (MythCodecID)(kCodec_MPEG1 + (stream_type - 1));
+}
+
+
+void* VideoOutputD3D::GetDXVA2Decoder(void)
+{
+#ifdef USING_DXVA2
+    if (m_decoder)
+        return (void*)&m_decoder->m_context;
+#endif
+    return NULL;
+}
+
+bool VideoOutputD3D::CreateDecoder(void)
+{
+#ifdef USING_DXVA2
+    QMutexLocker locker(&m_lock);
+    if (m_decoder)
+        DeleteDecoder();
+    QSize video_dim = window.GetVideoDim();
+    m_decoder = new DXVA2Decoder(NUM_DXVA2_BUFS, video_codec_id,
+                                 video_dim.width(), video_dim.height());
+    return (m_decoder && m_decoder->Init(m_render));
+#endif
+    return false;
+}
+
+void VideoOutputD3D::DeleteDecoder(void)
+{
+#ifdef USING_DXVA2
+    QMutexLocker locker(&m_lock);
+    delete m_decoder;
+    m_decoder = NULL;
+#endif
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

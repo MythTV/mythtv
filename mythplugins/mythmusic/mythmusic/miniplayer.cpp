@@ -23,7 +23,7 @@ MiniPlayer::~MiniPlayer(void)
     m_displayTimer->disconnect();
     m_displayTimer = NULL;
 
-    if (class LCD *lcd = LCD::Get())
+    if (LCD *lcd = LCD::Get())
         lcd->switchToTime ();
 }
 

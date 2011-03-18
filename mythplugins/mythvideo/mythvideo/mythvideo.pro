@@ -21,13 +21,13 @@ INSTALLS += installscripts installscriptsjamumods installscriptmodules target
 
 # Input
 
-HEADERS += videofilter.h dbcheck.h
+HEADERS += videofilter.h
 HEADERS += globalsettings.h fileassoc.h editmetadata.h
 HEADERS += videodlg.h videopopups.h videolist.h
 HEADERS += playercommand.h playersettings.h
 HEADERS += metadatasettings.h
 
-SOURCES += main.cpp videofilter.cpp dbcheck.cpp
+SOURCES += main.cpp videofilter.cpp
 SOURCES += globalsettings.cpp fileassoc.cpp editmetadata.cpp
 SOURCES += videodlg.cpp videopopups.cpp videolist.cpp
 SOURCES += playercommand.cpp playersettings.cpp metadatasettings.cpp
@@ -35,6 +35,8 @@ SOURCES += playercommand.cpp playersettings.cpp metadatasettings.cpp
 mingw:DEFINES += USING_MINGW
 
 QT += sql xml network
+
+DEFINES += MPLUGIN_API
 
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden

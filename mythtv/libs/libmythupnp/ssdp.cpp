@@ -4,7 +4,7 @@
 //
 // Purpose     : SSDP Discovery Service Implmenetation
 //                                                                            
-// Copyright (c) 2005 David Blain <mythtv@theblains.net>
+// Copyright (c) 2005 David Blain <dblain@mythtv.org>
 //                                          
 // This library is free software; you can redistribute it and/or 
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "upnp.h"
+#include "mythverbose.h"
 
 #include "upnptasksearch.h"
 #include "upnptaskcache.h"
@@ -47,25 +48,20 @@
 /////////////////////////////////////////////////////////////////////////////
 
 SSDP::SSDP( int nServicePort ) :
-    m_procReqLineExp("[ \r\n][ \r\n]*"),
-    m_nPort(SSDP_PORT),
-    m_nSearchPort(SSDP_SEARCHPORT),
-    m_nServicePort(nServicePort),
-    m_pNotifyTask(NULL),
-    m_bTermRequested(false),
-    m_lock(QMutex::NonRecursive)
+    m_procReqLineExp     ("[ \r\n][ \r\n]*"),
+    m_nPort              ( SSDP_PORT ),
+    m_nSearchPort        ( SSDP_SEARCHPORT ),
+    m_nServicePort       ( nServicePort ),
+    m_pNotifyTask        ( NULL ),
+    m_bTermRequested     ( false ),
+    m_lock               ( QMutex::NonRecursive )
 {
-    m_nPort =
-        UPnp::g_pConfig->GetValue( "UPnP/SSDP/Port"      , SSDP_PORT       );
-    m_nSearchPort =
-        UPnp::g_pConfig->GetValue( "UPnP/SSDP/SearchPort", SSDP_SEARCHPORT );
+    m_nPort       = UPnp::g_pConfig->GetValue( "UPnP/SSDP/Port", SSDP_PORT);
+    m_nSearchPort = UPnp::g_pConfig->GetValue( "UPnP/SSDP/SearchPort", SSDP_SEARCHPORT );
 
-    m_Sockets[ SocketIdx_Search    ] =
-        new MSocketDevice( MSocketDevice::Datagram );
-    m_Sockets[ SocketIdx_Multicast ] =
-        new QMulticastSocket( SSDP_GROUP, m_nPort );
-    m_Sockets[ SocketIdx_Broadcast ] =
-        new QBroadcastSocket( "255.255.255.255", m_nPort );
+    m_Sockets[ SocketIdx_Search    ] = new MSocketDevice( MSocketDevice::Datagram );
+    m_Sockets[ SocketIdx_Multicast ] = new QMulticastSocket( SSDP_GROUP, m_nPort );
+    m_Sockets[ SocketIdx_Broadcast ] = new QBroadcastSocket( "255.255.255.255", m_nPort );
 
     m_Sockets[ SocketIdx_Search    ]->setBlocking( false );
     m_Sockets[ SocketIdx_Multicast ]->setBlocking( false );
@@ -73,8 +69,8 @@ SSDP::SSDP( int nServicePort ) :
 
     // Setup SearchSocket
     QHostAddress ip4addr( QHostAddress::Any );
-    m_Sockets[ SocketIdx_Search ]->bind( ip4addr, m_nSearchPort ); 
 
+    m_Sockets[ SocketIdx_Search ]->bind( ip4addr          , m_nSearchPort ); 
     m_Sockets[ SocketIdx_Search ]->bind( QHostAddress::Any, m_nSearchPort );
 
 }
@@ -614,10 +610,11 @@ void SSDPExtension::GetDeviceDesc( HTTPRequest *pRequest )
                          .arg( m_nServicePort )
                          .arg( sUserAgent ));
 
+    QTextStream stream( &(pRequest->m_response) );
 
     UPnp::g_UPnpDeviceDesc.GetValidXML( pRequest->GetHostAddress(), 
                                         m_nServicePort,
-                                        pRequest->m_response,
+                                        stream,
                                         sUserAgent  );
 }
 

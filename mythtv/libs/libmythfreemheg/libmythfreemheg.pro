@@ -1,6 +1,8 @@
 include ( ../../settings.pro )
 
+INCLUDEPATH += ../libmythbase
 INCLUDEPATH += ../libmythtv
+INCLUDEPATH += ../..
 
 TEMPLATE = lib
 TARGET = mythfreemheg-$$LIBVERSION

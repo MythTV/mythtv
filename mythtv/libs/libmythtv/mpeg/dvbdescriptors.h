@@ -12,7 +12,7 @@ using namespace std;
 #include <QMutex>
 #include <QString>
 
-#include "mythexp.h" // MPUBLIC - Symbol Visibility
+#include "mythtvexp.h" // MTV_PUBLIC - Symbol Visibility
 #include "mpegdescriptors.h"
 #include "programinfo.h" // for subtitle types and audio and video properties
 
@@ -380,14 +380,14 @@ class ComponentDescriptor : public MPEGDescriptor
     {
         switch(ComponentType())
         {
-            case 0x2 ... 0x4:
-            case 0x6 ... 0x8:
+            case 0x2: case 0x3: case 0x4:
+            case 0x6: case 0x7: case 0x8:
                 return VID_WIDESCREEN;
             case 0x09:
             case 0x0D:
                 return VID_HDTV;
-            case 0x0A ... 0x0C:
-            case 0x0E ... 0x10:
+            case 0x0A: case 0x0B: case 0x0C:
+            case 0x0E: case 0x0F: case 0x10:
                 return VID_WIDESCREEN | VID_HDTV;
             default:
                 return VID_UNKNOWN;
@@ -398,11 +398,11 @@ class ComponentDescriptor : public MPEGDescriptor
     {
         switch(ComponentType())
         {
-            case 0x3 ... 0x4:
-            case 0x7 ... 0x8:
+            case 0x3: case 0x4:
+            case 0x7: case 0x8:
                 return VID_WIDESCREEN;
-            case 0x0B ... 0x0C:
-            case 0x0F ... 0x10:
+            case 0x0B: case 0x0C:
+            case 0x0F: case 0x10:
                 return VID_WIDESCREEN | VID_HDTV;
             default:
                 return VID_UNKNOWN;
@@ -458,7 +458,7 @@ class ComponentDescriptor : public MPEGDescriptor
             case 0x3:
                 properties |= AUD_DOLBY;
                 break;
-            case 0x4 ... 0x5:
+            case 0x4: case 0x5:
                 properties |= AUD_SURROUND;
                 break;
         }
@@ -503,9 +503,9 @@ class ComponentDescriptor : public MPEGDescriptor
         {
             case 0x1:
             case 0x3:
-            case 0x10 ... 0x13:
+            case 0x10: case 0x11: case 0x12: case 0x13:
                 return SUB_NORMAL;
-            case 0x20 ... 0x23:
+            case 0x20: case 0x21: case 0x22: case 0x23:
                 return SUB_HARDHEAR;
             default:
                 return SUB_UNKNOWN;
@@ -527,8 +527,8 @@ typedef enum
     kCategoryLast,
 } MythCategoryType;
 
-MPUBLIC QString myth_category_type_to_string(uint category_type);
-MPUBLIC MythCategoryType string_to_myth_category_type(const QString &type);
+MTV_PUBLIC QString myth_category_type_to_string(uint category_type);
+MTV_PUBLIC MythCategoryType string_to_myth_category_type(const QString &type);
 
 class ContentDescriptor : public MPEGDescriptor
 {

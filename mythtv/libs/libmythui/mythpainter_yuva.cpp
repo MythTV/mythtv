@@ -43,29 +43,50 @@ void MythYUVAPainter::DrawText(const QRect &dest, const QString &msg, int flags,
     }
 }
 
-void MythYUVAPainter::DrawRect(const QRect &area, bool drawFill,
-                               const QColor &fillColor, bool drawLine,
-                               int lineWidth, const QColor &lineColor)
+void MythYUVAPainter::DrawRect(const QRect &area, const QBrush &fillBrush,
+                               const QPen &linePen, int alpha)
 {
-    QColor yuv_fill_color = rgb_to_yuv(fillColor);
-    QColor yuv_line_color = rgb_to_yuv(lineColor);
-    MythQImagePainter::DrawRect(area, drawFill, yuv_fill_color, drawLine,
-                                lineWidth, yuv_line_color);
-}
+    QBrush brush(fillBrush);
+    brush.setColor(rgb_to_yuv(brush.color()));
+    QPen pen(linePen);
+    pen.setColor(rgb_to_yuv(pen.color()));
 
-void MythYUVAPainter::DrawRoundRect(const QRect &area, int radius,
-                                    bool drawFill, const QColor &fillColor,
-                                    bool drawLine, int lineWidth,
-                                    const QColor &lineColor)
-{
-    QColor yuv_fill_color = rgb_to_yuv(fillColor);
-    QColor yuv_line_color = rgb_to_yuv(lineColor);
-    MythImage *im = GetImageFromRect(area.size(), radius, drawFill, yuv_fill_color,
-                                     drawLine, lineWidth, yuv_line_color);
+    MythImage *im = GetImageFromRect(area, 0, 0, brush, pen);
     if (im)
         im->SetToYUV();
-    MythQImagePainter::DrawRoundRect(area, radius, drawFill, yuv_fill_color,
-                                       drawLine, lineWidth, yuv_line_color);
+
+    MythQImagePainter::DrawRect(area, brush, pen, alpha);
+}
+
+void MythYUVAPainter::DrawRoundRect(const QRect &area, int cornerRadius,
+                                    const QBrush &fillBrush, const QPen &linePen,
+                                    int alpha)
+{
+    QBrush brush(fillBrush);
+    brush.setColor(rgb_to_yuv(brush.color()));
+    QPen pen(linePen);
+    pen.setColor(rgb_to_yuv(pen.color()));
+
+    MythImage *im = GetImageFromRect(area, cornerRadius, 0, brush, pen);
+    if (im)
+        im->SetToYUV();
+
+    MythQImagePainter::DrawRoundRect(area, cornerRadius, brush, pen, alpha);
+}
+
+void MythYUVAPainter::DrawEllipse(const QRect &area, const QBrush &fillBrush,
+                                  const QPen &linePen, int alpha)
+{
+    QBrush brush(fillBrush);
+    brush.setColor(rgb_to_yuv(brush.color()));
+    QPen pen(linePen);
+    pen.setColor(rgb_to_yuv(pen.color()));
+
+    MythImage *im = GetImageFromRect(area, 0, 1, brush, pen);
+    if (im)
+        im->SetToYUV();
+
+    MythQImagePainter::DrawEllipse(area, brush, pen, alpha);
 }
 
 MythFontProperties* MythYUVAPainter::GetConvertedFont(const MythFontProperties &font)

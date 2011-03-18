@@ -7,7 +7,7 @@
 #include <QString>
 
 #include "parentalcontrols.h"
-#include "mythexp.h"
+#include "mythmetaexp.h"
 
 class MSqlQuery;
 class VideoMetadataListManager;
@@ -20,7 +20,19 @@ struct SortData;
 
 typedef QHash<QString,QString> MetadataMap;
 
-class MPUBLIC VideoMetadata
+#ifdef _MSC_VER
+// --------------------------------------------------------------------------
+// -=>NOTE: MSVC requires any referenced class to have an definition.  
+//          VideoList only exists in the MythVideo plugin :(
+//
+//          This is a temp HACK and should be removed once
+//          mythvideo is finished being merged into mythtv proper.
+// --------------------------------------------------------------------------
+class VideoList {};
+
+#endif
+
+class META_PUBLIC VideoMetadata
 {
   public:
     typedef std::pair<int, QString> genre_entry;
@@ -31,7 +43,7 @@ class MPUBLIC VideoMetadata
     typedef std::vector<cast_entry> cast_list;
 
   public:
-    class SortKey
+    class META_PUBLIC SortKey
     {
       public:
         SortKey();
@@ -234,11 +246,11 @@ class MPUBLIC VideoMetadata
     class VideoMetadataImp *m_imp;
 };
 
-MPUBLIC void ClearMap(MetadataMap &metadataMap);
+META_PUBLIC void ClearMap(MetadataMap &metadataMap);
 
-MPUBLIC bool operator==(const VideoMetadata &a, const VideoMetadata &b);
-MPUBLIC bool operator!=(const VideoMetadata &a, const VideoMetadata &b);
+META_PUBLIC bool operator==(const VideoMetadata &a, const VideoMetadata &b);
+META_PUBLIC bool operator!=(const VideoMetadata &a, const VideoMetadata &b);
 
-MPUBLIC bool operator<(const VideoMetadata::SortKey &lhs, const VideoMetadata::SortKey &rhs);
+META_PUBLIC bool operator<(const VideoMetadata::SortKey &lhs, const VideoMetadata::SortKey &rhs);
 
 #endif

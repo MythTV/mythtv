@@ -1,20 +1,22 @@
 #ifndef UPNPEXP_H_
 #define UPNPEXP_H_
 
-#if (__GNUC__ >= 4)
-#define UPNP_HIDDEN __attribute__((visibility("hidden")))
-#define UPNP_PUBLIC __attribute__((visibility("default")))
+#include <QtCore/qglobal.h>
+
+#ifdef UPNP_API
+# define UPNP_PUBLIC Q_DECL_EXPORT
 #else
-#define UPNP_HIDDEN
-#ifdef _MSC_VER
-	#ifdef UPNP_API
-		#define UPNP_PUBLIC __declspec( dllexport )
-	#else
-		#define UPNP_PUBLIC __declspec( dllimport )
-	#endif
-#else
-	#define UPNP_PUBLIC
+# define UPNP_PUBLIC Q_DECL_IMPORT
 #endif
+
+#if ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2)))
+# define MHIDDEN     __attribute__((visibility("hidden")))
+# define MUNUSED     __attribute__((unused))
+# define MDEPRECATED __attribute__((deprecated))
+#else
+# define MHIDDEN
+# define MUNUSED
+# define MDEPRECATED
 #endif
 
 #endif // UPNPEXP_H_

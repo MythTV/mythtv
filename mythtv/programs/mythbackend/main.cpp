@@ -109,10 +109,10 @@ int main(int argc, char **argv)
         if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
         {
             if (cmdline_err)
-                return BACKEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
 
             if (cmdline.WantsToExit())
-                return BACKEND_EXIT_OK;
+                return GENERIC_EXIT_OK;
         }
     }
 
@@ -125,26 +125,24 @@ int main(int argc, char **argv)
     // such as socket notifications :[
     QApplication a(argc, argv);
 #endif
-
-    QFileInfo finfo(a.argv()[0]);
-    QString binname = finfo.baseName();
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHBACKEND);
 
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
         if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
         {
             if (cmdline_err)
-                return BACKEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
 
             if (cmdline.WantsToExit())
-                return BACKEND_EXIT_OK;
+                return GENERIC_EXIT_OK;
         }
         else
         {
             cerr << "Invalid argument: " << a.argv()[argpos] << endl;
             QByteArray help = cmdline.GetHelpString(true).toLocal8Bit();
             cout << help.constData();
-            return BACKEND_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
 
@@ -161,25 +159,22 @@ int main(int argc, char **argv)
     CleanupGuard callCleanup(cleanup);
 
     int exitCode = setup_basics(cmdline);
-    if (BACKEND_EXIT_OK != exitCode)
+    if (exitCode != GENERIC_EXIT_OK)
         return exitCode;
 
     {
-        extern const char *myth_source_version;
-        extern const char *myth_source_path;
         QString versionStr = QString("%1 version: %2 [%3] www.mythtv.org")
-            .arg(basename(argv[0])).arg(myth_source_path)
-            .arg(myth_source_version);
+            .arg(MYTH_APPNAME_MYTHBACKEND).arg(MYTH_SOURCE_PATH)
+            .arg(MYTH_SOURCE_VERSION);
         VERBOSE(VB_IMPORTANT, versionStr);
     }
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    gCoreContext->SetAppName(binname);
 
     if (cmdline.HasBackendCommand())
     {
         if (!setup_context(cmdline))
-            return BACKEND_EXIT_NO_MYTHCONTEXT;
+            return GENERIC_EXIT_NO_MYTHCONTEXT;
         return handle_command(cmdline);
     }
 

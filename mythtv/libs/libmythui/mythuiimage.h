@@ -20,7 +20,7 @@ class ImageLoadThread;
  *
  * \ingroup MythUI_Widgets
  */
-class MPUBLIC MythUIImage : public MythUIType
+class MUI_PUBLIC MythUIImage : public MythUIType
 {
   public:
     MythUIImage(const QString &filepattern, int low, int high, int delayms,

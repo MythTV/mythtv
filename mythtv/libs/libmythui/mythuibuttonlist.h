@@ -10,6 +10,7 @@
 #include "mythuiimage.h"
 #include "mythuitext.h"
 #include "mythuigroup.h"
+#include "mythscreentype.h"
 
 class MythUIButtonList;
 class MythUIStateType;
@@ -19,7 +20,7 @@ struct TextProperties {
     QString state;
 };
 
-class MPUBLIC MythUIButtonListItem
+class MUI_PUBLIC MythUIButtonListItem
 {
   public:
     enum CheckState {
@@ -43,6 +44,9 @@ class MPUBLIC MythUIButtonListItem
     void SetTextFromMap(InfoMap &infoMap, const QString &state="");
     void SetTextFromMap(QMap<QString, TextProperties> &stringMap);
     QString GetText(const QString &name="") const;
+
+    bool FindText(const QString &searchStr, const QString &fieldList = "**ALL**",
+                  bool startsWith = false) const;
 
     void SetFontState(const QString &state, const QString &name="");
 
@@ -108,7 +112,7 @@ class MPUBLIC MythUIButtonListItem
  *
  * \ingroup MythUI_Widgets
  */
-class MPUBLIC MythUIButtonList : public MythUIType
+class MUI_PUBLIC MythUIButtonList : public MythUIType
 {
     Q_OBJECT
   public:
@@ -165,6 +169,12 @@ class MPUBLIC MythUIButtonList : public MythUIType
     void RemoveItem(MythUIButtonListItem *item);
 
     void SetLCDTitles(const QString &title, const QString &columnList = "");
+    void updateLCD(void);
+
+    void SetSearchFields(const QString &fields) { m_searchFields = fields; }
+    bool Find(const QString &searchStr, bool startsWith = false);
+    bool FindNext(void);
+    bool FindPrev(void);
 
   public slots:
     void Select();
@@ -213,12 +223,12 @@ class MPUBLIC MythUIButtonList : public MythUIType
     void SetPositionArrowStates(void);
     void ItemVisible(MythUIButtonListItem *item);
 
-    void updateLCD(void);
-
     void SetActive(bool active);
 
     int PageUp(void);
     int PageDown(void);
+
+    bool DoFind(bool doMove, bool searchForward);
 
     /* methods for subclasses to override */
     virtual void CalculateVisibleItems(void);
@@ -241,6 +251,11 @@ class MPUBLIC MythUIButtonList : public MythUIType
     int         m_alignment;
 
     MythRect m_contentsRect;
+
+    MythPoint m_searchPosition;
+    QString   m_searchFields;
+    QString   m_searchStr;
+    bool      m_searchStartsWith;
 
     int m_itemWidth;
     int m_itemHeight;
@@ -285,5 +300,33 @@ class MPUBLIC MythUIButtonList : public MythUIType
 };
 
 Q_DECLARE_METATYPE(MythUIButtonListItem *)
+
+class MUI_PUBLIC SearchButtonListDialog : public MythScreenType
+{
+    Q_OBJECT
+  public:
+    SearchButtonListDialog(MythScreenStack *parent, const char *name,
+                           MythUIButtonList *parentList, QString searchText);
+    ~SearchButtonListDialog(void);
+
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *event);
+
+  protected slots:
+    void searchChanged(void);
+    void prevClicked(void);
+    void nextClicked(void);
+
+  protected:
+    bool               m_startsWith;
+
+    MythUIButtonList  *m_parentList;
+    QString            m_searchText;
+
+    MythUITextEdit    *m_searchEdit;
+    MythUIButton      *m_prevButton;
+    MythUIButton      *m_nextButton;
+    MythUIStateType   *m_searchState;
+};
 
 #endif

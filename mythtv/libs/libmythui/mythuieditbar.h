@@ -12,7 +12,7 @@
  *
  * \ingroup MythUI_Widgets
  */
-class MPUBLIC MythUIEditBar : public MythUIType
+class MUI_PUBLIC MythUIEditBar : public MythUIType
 {
   public:
     MythUIEditBar(MythUIType *parent, const QString &name);

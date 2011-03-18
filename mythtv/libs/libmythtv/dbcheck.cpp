@@ -12,6 +12,7 @@ using namespace std;
 #include "mythdb.h"
 #include "mythverbose.h"
 #include "diseqcsettings.h" // for convert_diseqc_db()
+#include "videodbcheck.h"
 
 #define MINIMUM_DBMS_VERSION 5,0,15
 
@@ -20,7 +21,7 @@ using namespace std;
    mythtv/bindings/perl/MythTV.pm
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1266";
+const QString currentDatabaseVersion = "1270";
 
 static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver);
 static bool performActualUpdate(
@@ -451,7 +452,7 @@ static bool performActualUpdate(
 bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
                              const bool upgradeIfNoUI)
 {
-#if IGNORE_SCHEMA_VER_MISMATCH
+#ifdef IGNORE_SCHEMA_VER_MISMATCH
     return true;
 #endif
     SchemaUpgradeWizard  * DBup;
@@ -731,8 +732,7 @@ NULL
 "ALTER TABLE people ADD UNIQUE name (name(41));",
 "CREATE TABLE programgenres ( "
 "    chanid int unsigned NOT NULL, "
-"    starttime timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP "
-"                        ON UPDATE CURRENT_TIMESTAMP, "
+"    starttime timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, "
 "    relevance char(1) NOT NULL, "
 "    genre char(30), "
 "    PRIMARY KEY (chanid, starttime, relevance) "
@@ -748,8 +748,7 @@ NULL
         const char *updates[] = {
 "CREATE TABLE IF NOT EXISTS programgenres ( "
 "    chanid int unsigned NOT NULL, "
-"    starttime timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP "
-"                        ON UPDATE CURRENT_TIMESTAMP, "
+"    starttime timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, "
 "    relevance char(1) NOT NULL, "
 "    genre char(30), "
 "    PRIMARY KEY (chanid, starttime, relevance) "
@@ -2020,7 +2019,7 @@ NULL
 "UPDATE settings SET value = 'MythFillGrabberSuggestsTime' "
     "WHERE value = 'HonorGrabberNextSuggestedMythfilldatabaseRunTime';",
 "UPDATE settings SET value = 'MythFillSuggestedRunTime', "
-    "    data = '1970-01-01T00:00:00' "
+    "    data = '1970-01-01 00:00:00' "
     "WHERE value = 'NextSuggestedMythfilldatabaseRun';",
 NULL
 };
@@ -5550,6 +5549,64 @@ NULL
             return false;
     }
 
+    if (dbver == "1266")
+    {
+        if (!doUpgradeVideoDatabaseSchema())
+            return false;
+
+        const char *updates[] = {
+"DELETE FROM settings WHERE value = 'mythvideo.DBSchemaVer'",
+NULL
+};
+        if (!performActualUpdate(updates, "1267", dbver))
+            return false;
+    }
+
+    if (dbver == "1267")
+    {
+        const char *updates[] = {
+"ALTER TABLE channel MODIFY xmltvid VARCHAR(255) NOT NULL DEFAULT '';",
+NULL
+};
+        if (!performActualUpdate(updates, "1268", dbver))
+            return false;
+    }
+
+    if (dbver == "1268")
+    {
+
+        const char *updates[] = {
+"DELETE FROM keybindings WHERE action='PREVSOURCE' AND keylist='Ctrl+Y';",
+NULL
+};
+        if (!performActualUpdate(updates, "1269", dbver))
+            return false;
+    }
+
+
+    if (dbver == "1269")
+    {
+        const char *updates[] = {
+"DELETE FROM profilegroups WHERE id >= 15;",
+"DELETE FROM recordingprofiles WHERE profilegroup >= 15;",
+"INSERT INTO profilegroups SET id = '15', name = 'ASI Recorder (DVEO)',"
+" cardtype = 'ASI', is_default = 1;",
+"INSERT INTO recordingprofiles SET name = \"Default\", profilegroup = 15;",
+"INSERT INTO recordingprofiles SET name = \"Live TV\", profilegroup = 15;",
+"INSERT INTO recordingprofiles SET name = \"High Quality\", profilegroup = 15;",
+"INSERT INTO recordingprofiles SET name = \"Low Quality\", profilegroup = 15;",
+"INSERT INTO profilegroups SET id = '16', name = 'OCUR Recorder (CableLabs)',"
+" cardtype = 'OCUR', is_default = 1;",
+"INSERT INTO recordingprofiles SET name = \"Default\", profilegroup = 16;",
+"INSERT INTO recordingprofiles SET name = \"Live TV\", profilegroup = 16;",
+"INSERT INTO recordingprofiles SET name = \"High Quality\", profilegroup = 16;",
+"INSERT INTO recordingprofiles SET name = \"Low Quality\", profilegroup = 16;",
+NULL
+};
+        if (!performActualUpdate(updates, "1270", dbver))
+            return false;
+    }
+
     return true;
 }
 
@@ -5570,7 +5627,7 @@ NULL
  *
  * mysqldump --skip-comments --skip-opt --compact --skip-quote-names \
  *     --create-options --ignore-table=mythconverg.schemalock mythconverg | \
- *   sed '/^SET.*;$/d;/^\/\*!40101.*$/d;s/^.*[^;]$/"&"/;s/^);$/");",/'
+ *   sed '/^\(SET\|INS\).*;$/d;/^\/\*!40101.*$/d;s/^.*[^;]$/"&"/;s/^).*;$/"&",/'
  *
  * command to get the initial data:
  *

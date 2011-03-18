@@ -909,23 +909,23 @@
         </textarea>
 
         <textarea name="extension_text" from="basetextarea">
-            <area>340,200,200,40</area>
+            <area>140,200,400,40</area>
             <value>Extension:</value>
             <align>right,vcenter</align>
         </textarea>
 
         <textarea name="command_text" from="extension_text">
-            <position>340,260</position>
+            <position>140,260</position>
             <value>Command:</value>
         </textarea>
 
         <textarea name="default_text" from="extension_text">
-            <position>340,320</position>
+            <position>140,320</position>
             <value>Use default player:</value>
         </textarea>
 
         <textarea name="ignore_text" from="extension_text">
-            <position>340,380</position>
+            <position>140,380</position>
             <value>Ignore:</value>
         </textarea>
 
@@ -1478,7 +1478,7 @@
             <value>Blu-ray Region:</value>
         </textarea>
 
-        <buttonlist name="bluraymount" from="basewideselector">
+        <buttonlist name="blurayregionlist" from="basewideselector">
             <position>550,375</position>
         </buttonlist>
 

@@ -15,7 +15,7 @@ DEPLIBS = $${LIBDIR}
 # On Windows, dlls were installed with exes:
 mingw : DEPLIBS = $${PREFIX}/bin
 
-TARGETDEPS += $${DEPLIBS}/libmyth-$${MYTH_SHLIB_EXT}
-TARGETDEPS += $${DEPLIBS}/libmythdb-$${MYTH_SHLIB_EXT}
-TARGETDEPS += $${DEPLIBS}/libmythui-$${MYTH_SHLIB_EXT}
-TARGETDEPS += $${DEPLIBS}/libmythupnp-$${MYTH_SHLIB_EXT}
+POST_TARGETDEPS += $${DEPLIBS}/libmyth-$${MYTH_SHLIB_EXT}
+POST_TARGETDEPS += $${DEPLIBS}/libmythbase-$${MYTH_SHLIB_EXT}
+POST_TARGETDEPS += $${DEPLIBS}/libmythui-$${MYTH_SHLIB_EXT}
+POST_TARGETDEPS += $${DEPLIBS}/libmythupnp-$${MYTH_SHLIB_EXT}

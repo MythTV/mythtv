@@ -87,8 +87,7 @@ int main(int argc, char *argv[])
     int sourceid = -1;
     QString fromddfile_lineupid;
 
-    QFileInfo finfo(a.argv()[0]);
-    QString binname = finfo.baseName();
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFILLDATABASE);
 
     myth_nice(19);
 
@@ -126,13 +125,13 @@ int main(int argc, char *argv[])
                 !strncmp(a.argv()[argpos + 2], "--", 2))
             {
                 printf("missing or invalid parameters for --file option\n");
-                return FILLDB_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             if (!fromfile_name.isEmpty())
             {
                 printf("only one --file option allowed\n");
-                return FILLDB_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             fromfile_id = atoi(a.argv()[++argpos]);
@@ -150,13 +149,13 @@ int main(int argc, char *argv[])
                 !strncmp(a.argv()[argpos + 4], "--", 2))
             {
                 printf("missing or invalid parameters for --dd-file option\n");
-                return FILLDB_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             if (!fromfile_name.isEmpty())
             {
                 printf("only one --dd-file option allowed\n");
-                return FILLDB_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             fromfile_id = atoi(a.argv()[++argpos]);
@@ -174,13 +173,13 @@ int main(int argc, char *argv[])
                 !strncmp(a.argv()[argpos + 2], "--", 2))
             {
                 printf("missing or invalid parameters for --xawchannels option\n");
-                return FILLDB_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             if (!fromxawfile_name.isEmpty())
             {
                 printf("only one --xawchannels option allowed\n");
-                return FILLDB_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             fromxawfile_id = atoi(a.argv()[++argpos]);
@@ -206,7 +205,7 @@ int main(int argc, char *argv[])
             if (((argpos + 1) >= a.argc()))
             {
                 printf("missing parameter for --graboptions option\n");
-                return FILLDB_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             fill_data.graboptions = QString(" ") + QString(a.argv()[++argpos]);
@@ -216,7 +215,7 @@ int main(int argc, char *argv[])
             if (((argpos + 1) >= a.argc()))
             {
                 printf("missing parameter for --sourceid option\n");
-                return FILLDB_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             sourceid = QString(a.argv()[++argpos]).toInt();
@@ -226,13 +225,13 @@ int main(int argc, char *argv[])
             if (!sourceid)
             {
                 printf("--cardtype option must follow a --sourceid option\n");
-                return FILLDB_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             if (((argpos + 1) >= a.argc()))
             {
                 printf("missing parameter for --cardtype option\n");
-                return FILLDB_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             fill_data.chan_data.cardtype =
@@ -243,7 +242,7 @@ int main(int argc, char *argv[])
             if (((argpos + 1) >= a.argc()))
             {
                 printf("missing parameter for --max-days option\n");
-                return FILLDB_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             fill_data.maxDays = QString(a.argv()[++argpos]).toUInt();
@@ -279,7 +278,7 @@ int main(int argc, char *argv[])
             if (((argpos + 1) >= a.argc()))
             {
                 printf("missing parameter for --refresh-day option\n");
-                return FILLDB_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
             bool ok = true;
@@ -394,7 +393,7 @@ int main(int argc, char *argv[])
                 {
                     cerr << "Unknown icon group '" << a.argv()[argpos]
                             << "' for --reset-icon-map option" << endl;
-                    return FILLDB_EXIT_UNKNOWN_ICON_GROUP;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
                 }
             }
         }
@@ -525,7 +524,7 @@ int main(int argc, char *argv[])
             cout << "\n";
             cout << "  --manual and --update cannot be used together.\n";
             cout << "\n";
-            return FILLDB_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
         else if (!strcmp(a.argv()[argpos], "--no-delete"))
         {
@@ -541,7 +540,7 @@ int main(int argc, char *argv[])
         {
             fprintf(stderr, "illegal option: '%s' (use --help)\n",
                     a.argv()[argpos]);
-            return FILLDB_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
 
         ++argpos;
@@ -553,10 +552,8 @@ int main(int argc, char *argv[])
     if (!gContext->Init(false))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        return FILLDB_EXIT_NO_MYTHCONTEXT;
+        return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
-
-    gCoreContext->SetAppName(binname);
 
     MythTranslation::load("mythfrontend");
 
@@ -599,7 +596,7 @@ int main(int argc, char *argv[])
 
         if (!fill_data.GrabDataFromFile(fromfile_id, fromfile_name))
         {
-            return FILLDB_EXIT_GRAB_DATA_FAILED;
+            return GENERIC_EXIT_NOT_OK;
         }
 
         updateLastRunEnd(query);
@@ -685,13 +682,13 @@ int main(int argc, char *argv[])
                                      "Could not find any defined channel "
                                      "sources - did you run the setup "
                                      "program?");
-                  return FILLDB_EXIT_NO_CHAN_SRC;
+                  return GENERIC_EXIT_SETUP_ERROR;
              }
         }
         else
         {
              MythDB::DBError("loading channel sources", sourcequery);
-             return FILLDB_EXIT_DB_ERROR;
+             return GENERIC_EXIT_DB_ERROR;
         }
 
         if (!fill_data.Run(sourcelist))
@@ -706,7 +703,7 @@ int main(int argc, char *argv[])
 
     if (fill_data.only_update_channels && !fill_data.need_post_grab_proc)
     {
-        return FILLDB_EXIT_OK;
+        return GENERIC_EXIT_OK;
     }
 
     if (reset_iconmap)
@@ -731,7 +728,7 @@ int main(int argc, char *argv[])
         if (!query.exec())
         {
             MythDB::DBError("Querying sources", query);
-            return FILLDB_EXIT_DB_ERROR;
+            return GENERIC_EXIT_DB_ERROR;
         }
 
         while (query.next())
@@ -995,7 +992,7 @@ int main(int argc, char *argv[])
 
     VERBOSE(VB_IMPORTANT, "mythfilldatabase run complete.");
 
-    return FILLDB_EXIT_OK;
+    return GENERIC_EXIT_OK;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

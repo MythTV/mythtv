@@ -45,13 +45,6 @@ const int  RingBuffer::kLiveTVOpenTimeout  = 10000;
 #define LOC_WARN QString("RingBuf(%1) Warning: ").arg(filename)
 #define LOC_ERR  QString("RingBuf(%1) Error: ").arg(filename)
 
-#define PNG_MIN_SIZE   20 /* header plus one empty chunk */
-#define NUV_MIN_SIZE  204 /* header size? */
-#define MPEG_MIN_SIZE 376 /* 2 TS packets */
-
-/* should be minimum of the above test sizes */
-const uint RingBuffer::kReadTestSize = PNG_MIN_SIZE;
-
 QMutex      RingBuffer::subExtLock;
 QStringList RingBuffer::subExt;
 QStringList RingBuffer::subExtNoCheck;
@@ -244,10 +237,19 @@ RingBuffer::~RingBuffer(void)
 {
     KillReadAheadThread();
 
+    rwlock.lockForWrite();
+
     if (readAheadBuffer) // this only runs if thread is terminated
     {
         delete [] readAheadBuffer;
         readAheadBuffer = NULL;
+    }
+
+    if (tfw)
+    {
+        tfw->Flush();
+        delete tfw;
+        tfw = NULL;
     }
 
     rwlock.unlock();
@@ -934,6 +936,14 @@ bool RingBuffer::WaitForAvail(int count)
     int avail = ReadBufAvail();
     count = (ateof && avail < count) ? avail : count;
 
+    if (livetvchain && setswitchtonext && avail < count)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "Checking to see if there's a "
+                              "new livetv program to switch to..");
+        livetvchain->ReloadAll();
+        return false;
+    }
+
     MythTimer t;
     t.start();
     while ((avail < count) && !stopreads &&
@@ -943,7 +953,7 @@ bool RingBuffer::WaitForAvail(int count)
         generalWait.wait(&rwlock, 250);
         avail = ReadBufAvail();
 
-        if ((ateof || setswitchtonext) && avail < count)
+        if (ateof && avail < count)
             count = avail;
 
         if (avail < count)
@@ -962,28 +972,13 @@ bool RingBuffer::WaitForAvail(int count)
                         " seconds for data \n\t\t\tto become available..." +
                         QString(" %2 < %3")
                         .arg(avail).arg(count));
-                if (livetvchain)
-                {
-                    VERBOSE(VB_IMPORTANT, "Checking to see if there's a "
-                                          "new livetv program to switch to..");
-                    livetvchain->ReloadAll();
-                }
             }
 
-            bool quit = livetvchain && (livetvchain->NeedsToSwitch() ||
-                                        livetvchain->NeedsToJump() ||
-                                        setswitchtonext);
-
-            if (elapsed > 16000 || quit)
+            if (elapsed > 16000)
             {
-                if (!quit)
-                    VERBOSE(VB_IMPORTANT, LOC_ERR + "Waited " +
-                            QString("%1").arg(elapsed/1000) +
-                            " seconds for data, aborting.");
-                else
-                    VERBOSE(VB_IMPORTANT, LOC + "Timing out wait due to "
-                            "impending livetv switch.");
-
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Waited " +
+                        QString("%1").arg(elapsed/1000) +
+                        " seconds for data, aborting.");
                 return false;
             }
         }
@@ -1117,9 +1112,9 @@ int RingBuffer::ReadPriv(void *buf, int count, bool peek)
     {
         VERBOSE(VB_FILE, LOC + loc_desc + ": !WaitForReadsAllowed()");
         rwlock.unlock();
+        stopreads = true; // this needs to be outside the lock
         rwlock.lockForWrite();
         wanttoread = 0;
-        stopreads = true;
         rwlock.unlock();
         return 0;
     }
@@ -1128,10 +1123,10 @@ int RingBuffer::ReadPriv(void *buf, int count, bool peek)
     {
         VERBOSE(VB_FILE, LOC + loc_desc + ": !WaitForAvail()");
         rwlock.unlock();
+        stopreads = true; // this needs to be outside the lock
         rwlock.lockForWrite();
         ateof = true;
         wanttoread = 0;
-        stopreads = true;
         rwlock.unlock();
         return 0;
     }

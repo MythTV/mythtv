@@ -11,7 +11,7 @@ using namespace std;
 #include "mythtv/mythdb.h"
 #include "mythtv/schemawizard.h"
 
-const QString currentDatabaseVersion = "1017";
+const QString currentDatabaseVersion = "1018";
 
 static bool doUpgradeMusicDatabaseSchema(QString &dbver);
 
@@ -68,6 +68,10 @@ static bool performActualUpdate(const QString updates[], QString version,
 
 bool UpgradeMusicDatabaseSchema(void)
 {
+#ifdef IGNORE_SCHEMA_VER_MISMATCH
+    return true;
+#endif
+
     SchemaUpgradeWizard  * DBup;
 
 
@@ -118,7 +122,8 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
 "    length INT UNSIGNED NOT NULL,"
 "    filename TEXT NOT NULL,"
 "    rating INT UNSIGNED NOT NULL DEFAULT 5,"
-"    lastplay TIMESTAMP NOT NULL,"
+"    lastplay TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP "
+"                       ON UPDATE CURRENT_TIMESTAMP,"
 "    playcount INT UNSIGNED NOT NULL DEFAULT 0,"
 "    INDEX (artist),"
 "    INDEX (album),"
@@ -405,7 +410,8 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
 "    playlist_id int(11) unsigned NOT NULL auto_increment PRIMARY KEY,"
 "    playlist_name varchar(255) NOT NULL default '',"
 "    playlist_songs text NOT NULL,"
-"    last_accessed timestamp NOT NULL,"
+"    last_accessed timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP "
+"                            ON UPDATE CURRENT_TIMESTAMP,"
 "    length int(11) unsigned NOT NULL default '0',"
 "    songcount smallint(8) unsigned NOT NULL default '0',"
 "    hostname VARCHAR(255) NOT NULL default ''"
@@ -422,7 +428,8 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
 "    length int(11) unsigned NOT NULL default '0',"
 "    numplays int(11) unsigned NOT NULL default '0',"
 "    rating tinyint(4) unsigned NOT NULL default '0',"
-"    lastplay timestamp NOT NULL,"
+"    lastplay timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP "
+"                       ON UPDATE CURRENT_TIMESTAMP,"
 "    date_entered datetime default NULL,"
 "    date_modified datetime default NULL,"
 "    format varchar(4) NOT NULL default '0',"
@@ -769,6 +776,18 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 };
 
         if (!performActualUpdate(updates, "1017", dbver))
+            return false;
+    }
+
+    if (dbver == "1017")
+    {
+        const QString updates[] = {
+"ALTER TABLE music_playlists MODIFY COLUMN last_accessed "
+"  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;",
+""
+};
+
+        if (!performActualUpdate(updates, "1018", dbver))
             return false;
     }
 

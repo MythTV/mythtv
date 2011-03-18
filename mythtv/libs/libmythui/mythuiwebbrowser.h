@@ -16,6 +16,8 @@
 
 
 class MythUIWebBrowser;
+class MythUIBusyDialog;
+class MythScreenType;
 
 class BrowserApi : public QObject
 {
@@ -61,12 +63,25 @@ class MythWebView : public QWebView
     ~MythWebView(void);
 
     virtual void keyPressEvent(QKeyEvent *event);
+    virtual void customEvent(QEvent *e);
 
   protected slots:
     void  handleUnsupportedContent(QNetworkReply *reply);
+    void  handleDownloadRequested(const QNetworkRequest &request);
+
   private:
+    void showDownloadMenu(void);
+    void doDownload(const QString &saveFilename);
+    void openBusyPopup(const QString &message);
+    void closeBusyPopup(void);
+
+    bool isMusicFile(const QString &extension);
+    bool isVideoFile(const QString &extension);
+
     MythUIWebBrowser *m_parentBrowser;
     BrowserApi       *m_api;
+    QNetworkRequest   m_downloadRequest;
+    MythUIBusyDialog *m_busyPopup;
 };
 
 /**
@@ -75,7 +90,7 @@ class MythWebView : public QWebView
  *
  * \ingroup MythUI_Widgets
  */
-class MPUBLIC MythUIWebBrowser : public MythUIType
+class MUI_PUBLIC MythUIWebBrowser : public MythUIType
 {
   Q_OBJECT
 
@@ -111,6 +126,9 @@ class MPUBLIC MythUIWebBrowser : public MythUIType
 
     QVariant evaluateJavaScript(const QString& scriptSource);
 
+    void SetDefaultSaveDirectory(const QString &saveDir);
+    QString GetDefaultSaveDirectory(void) { return m_defaultSaveDir; }
+
   public slots:
     void Back(void);
     void Forward(void);
@@ -124,6 +142,7 @@ class MPUBLIC MythUIWebBrowser : public MythUIType
     void titleChanged(const QString &title);   /// a pages title has changed
     void statusBarMessage(const QString &text);/// link hit test messages
     void iconChanged(void);                    /// a pages fav icon has changed
+    void fileDownloaded(QString filename);     /// a file has been downloaded
 
   protected slots:
     void slotLoadStarted(void);
@@ -135,6 +154,7 @@ class MPUBLIC MythUIWebBrowser : public MythUIType
     void slotStatusBarMessage(const QString &text);
     void slotIconChanged(void);
     void slotLinkClicked(const QUrl &url);
+    void slotTopScreenChanged(MythScreenType *screen);
 
   protected:
     void Finalize(void);
@@ -150,6 +170,8 @@ class MPUBLIC MythUIWebBrowser : public MythUIType
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
 
+    MythScreenType *m_parentScreen;
+
     MythWebView *m_browser;
 
     MythImage   *m_image;
@@ -163,6 +185,7 @@ class MPUBLIC MythUIWebBrowser : public MythUIType
     QColor       m_bgColor;
     QUrl         m_widgetUrl;
     QString      m_userCssFile;
+    QString      m_defaultSaveDir;
 
     bool         m_inputToggled;
     QString      m_lastMouseAction;

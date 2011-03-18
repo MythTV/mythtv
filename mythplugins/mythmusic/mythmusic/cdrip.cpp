@@ -210,7 +210,7 @@ void CDRipperThread::run(void)
     QApplication::postEvent(m_parent,
         new RipStatusEvent(RipStatusEvent::kOverallStartEvent, m_totalSectors));
 
-    if (class LCD * lcd = LCD::Get())
+    if (LCD *lcd = LCD::Get())
     {
         QString lcd_tots = QObject::tr("Importing ") + tots;
         QList<LCDTextItem> textItems;
@@ -423,7 +423,7 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
                                        curpos - start));
             }
 
-            if (class LCD * lcd = LCD::Get())
+            if (LCD *lcd = LCD::Get())
             {
                 float fProgress = (float)(m_totalSectorsDone + (curpos - start))
                                              / m_totalSectors;
@@ -939,8 +939,6 @@ QString Ripper::filenameFromMetadata(Metadata *track, bool createDir)
         VERBOSE(VB_GENERAL, QString("Invalid file storage definition."));
     }
 
-    filename = QString(filename.toLocal8Bit().constData());
-
     QStringList directoryList = filename.split("/");
     for (int i = 0; i < (directoryList.size() - 1); i++)
     {
@@ -1179,7 +1177,7 @@ void Ripper::RipComplete(bool result)
         m_somethingwasripped = true;
     }
 
-    if (class LCD * lcd = LCD::Get())
+    if (LCD *lcd = LCD::Get())
         lcd->switchToTime();
 }
 
@@ -1435,7 +1433,7 @@ RipStatus::~RipStatus(void)
     if (m_ripperThread)
         delete m_ripperThread;
 
-    if (class LCD * lcd = LCD::Get())
+    if (LCD *lcd = LCD::Get())
         lcd->switchToTime();
 }
 

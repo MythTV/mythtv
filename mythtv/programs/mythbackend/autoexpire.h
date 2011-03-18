@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-#include <pthread.h>
-
 #include <vector>
 using namespace std;
 
@@ -15,6 +13,8 @@ using namespace std;
 #include <QSet>
 #include <QMap>
 #include <QDateTime>
+#include <QThread>
+#include <QPointer>
 
 class ProgramInfo;
 class EncoderLink;
@@ -34,10 +34,36 @@ enum ExpireMethodType {
     emNormalDeletedPrograms = 10003
 };
 
+class AutoExpire;
+
+class ExpireThread : public QThread
+{
+    Q_OBJECT
+  public:
+    ExpireThread() : m_parent(NULL) {}
+    void SetParent(AutoExpire *parent) { m_parent = parent; }
+    void run(void);
+  private:
+    AutoExpire *m_parent;
+};
+
+class UpdateThread : public QThread
+{
+    Q_OBJECT
+  public:
+    UpdateThread() : m_parent(NULL) {}
+    void SetParent(AutoExpire *parent) { m_parent = parent; }
+    void run(void);
+  private:
+    AutoExpire *m_parent;
+};
+
 class AutoExpire : public QObject
 {
     Q_OBJECT
 
+    friend class ExpireThread;
+    friend class UpdateThread;
   public:
     AutoExpire(QMap<int, EncoderLink *> *encoderList);
     AutoExpire(void);
@@ -61,7 +87,6 @@ class AutoExpire : public QObject
 
   protected:
     void RunExpirer(void);
-    static void *ExpirerThread(void *param);
 
   private:
     void Init(void);
@@ -84,9 +109,9 @@ class AutoExpire : public QObject
     // main expire info
     QSet<QString> dont_expire_set;
     QSet<QString> deleted_set;
-    pthread_t     expire_thread;
+    ExpireThread  expireThread;
     uint          desired_freq;
-    bool          expire_thread_running;
+    bool          expire_thread_run;
 
     QMap<int, uint64_t> desired_space;
     QMap<int, int>      used_encoders;
@@ -97,10 +122,8 @@ class AutoExpire : public QObject
     MainServer *mainServer;
 
     // update info
-    bool          update_pending;
-    pthread_t     update_thread;
-
-    friend void *SpawnUpdateThread(void *param);
+    bool                    update_pending;
+    QPointer<UpdateThread>  updateThread;
 };
 
 #endif

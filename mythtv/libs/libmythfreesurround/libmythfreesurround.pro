@@ -4,7 +4,7 @@ TEMPLATE = lib
 TARGET = mythfreesurround-$$LIBVERSION
 CONFIG += thread staticlib warn_off
 
-INCLUDEPATH += ../../external/FFmpeg ../libmythdb .. ../..
+INCLUDEPATH += ../../external/FFmpeg ../libmythbase .. ../..
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 

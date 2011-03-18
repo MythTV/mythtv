@@ -28,6 +28,7 @@ using namespace std;
 
 #include "threadpool.h"
 #include "upnp.h"       // only needed for Config... remove once config is moved.
+#include "mythverbose.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -326,14 +327,11 @@ ThreadPool::~ThreadPool( )
     while (it != m_lstThreads.end() )
     {
         WorkerThread *pThread = *it;
-
-        if (pThread != NULL)
-            delete pThread;
-
         it = m_lstThreads.erase( it );
+
+        if (pThread != NULL) 
+            pThread->deleteLater();
     }
-
-
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -367,15 +365,13 @@ WorkerThread *ThreadPool::GetWorkerThread()
         // --------------------------------------------------------------
         
         m_mList.lock();
+        if ( m_lstAvailableThreads.size() > 0)
         {
-            if ( m_lstAvailableThreads.size() > 0)
-            {
-                pThread = m_lstAvailableThreads.front();                
-                m_lstAvailableThreads.pop_front();
-            }
-        
-            nThreadCount = m_lstThreads.size();
+            pThread = m_lstAvailableThreads.front();                
+            m_lstAvailableThreads.pop_front();
         }
+        
+        nThreadCount = m_lstThreads.size();
         m_mList.unlock();
 
         if (pThread == NULL)
@@ -410,7 +406,8 @@ WorkerThread *ThreadPool::GetWorkerThread()
 
 WorkerThread *ThreadPool::AddWorkerThread( bool bMakeAvailable, long nTimeout )
 {
-    QString sName = m_sName + "_WorkerThread"; 
+    QString sName = QString(m_sName + "_WorkerThread"); 
+    long nThreadCount;
 
     VERBOSE( VB_UPNP, QString( "ThreadPool:AddWorkerThread - %1" ).arg( sName ));
 
@@ -428,23 +425,21 @@ WorkerThread *ThreadPool::AddWorkerThread( bool bMakeAvailable, long nTimeout )
             // ------------------------------------------------------
 
             m_mList.lock();
-            {
+            m_lstThreads.push_back( pThread );
+            nThreadCount = m_lstThreads.size();
 
-                m_lstThreads.push_back( pThread );
+            VERBOSE(VB_IMPORTANT|VB_EXTRA, QString("ThreadPool:%1: thread pool size %2") .arg(m_sName) .arg(nThreadCount));
                 
-                if (bMakeAvailable)
-                {
-                    m_lstAvailableThreads.push_back( pThread );
-                
-                    m_threadAvail.wakeAll();
-                }
+            if (bMakeAvailable)
+            {
+                m_lstAvailableThreads.push_back( pThread );
+                m_threadAvail.wakeAll();
             }
             m_mList.unlock();
 
         }
         else
         {
-
             // ------------------------------------------------------
             // It's taking longer than 5 seconds to initialize this thread.... 
             // give up on it.
@@ -478,16 +473,21 @@ void ThreadPool::ThreadAvailable ( WorkerThread *pThread )
 
 void ThreadPool::ThreadTerminating ( WorkerThread *pThread )
 {
-    m_mList.lock();
-    {
-        WorkerThreadList::iterator it =
-            find(m_lstAvailableThreads.begin(),
-                 m_lstAvailableThreads.end(), pThread);
-        m_lstAvailableThreads.erase(it);
+    long nThreadCount;
 
-        // Need to leave in m_lstThreads so that we can
-        // delete the ptr in destructor
-    }
+    m_mList.lock();
+    WorkerThreadList::iterator it = find(m_lstAvailableThreads.begin(),
+                                         m_lstAvailableThreads.end(), pThread);
+    m_lstAvailableThreads.erase(it);
+
+    it = find(m_lstThreads.begin(), m_lstThreads.end(), pThread);
+    m_lstThreads.erase(it);
+
+    nThreadCount = m_lstThreads.size();
+    VERBOSE(VB_IMPORTANT|VB_EXTRA, QString("ThreadPool:%1: thread pool size %2") .arg(m_sName) .arg(nThreadCount));
+
+    pThread->deleteLater();
+
     m_mList.unlock();
 }
 

@@ -5,6 +5,7 @@ TARGET = mythupnp-$$LIBVERSION
 CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
+DEFINES += UPNP_API
 
 setting.path = $${PREFIX}/share/mythtv/
 setting.files += CDS_scpd.xml CMGR_scpd.xml MSRR_scpd.xml MXML_scpd.xml
@@ -22,16 +23,28 @@ HEADERS += httpserver.h upnpcds.h upnpcdsobjects.h bufferedsocketdevice.h upnpms
 HEADERS += eventing.h upnpcmgr.h upnptaskevent.h upnptaskcache.h ssdpcache.h
 HEADERS += upnpimpl.h multicast.h broadcast.h configuration.h
 HEADERS += soapclient.h mythxmlclient.h mmembuf.h upnpexp.h
+HEADERS += servicehost.h wsdl.h htmlserver.h
+
+HEADERS += serializers/serializer.h     serializers/xmlSerializer.h 
+HEADERS += serializers/jsonSerializer.h serializers/soapSerializer.h
 
 SOURCES += httprequest.cpp upnp.cpp ssdp.cpp taskqueue.cpp upnputil.cpp
 SOURCES += upnpdevice.cpp upnptasknotify.cpp upnptasksearch.cpp threadpool.cpp
 SOURCES += httpserver.cpp upnpcds.cpp upnpcdsobjects.cpp bufferedsocketdevice.cpp
 SOURCES += eventing.cpp upnpcmgr.cpp upnpmsrr.cpp upnptaskevent.cpp ssdpcache.cpp
 SOURCES += configuration.cpp soapclient.cpp mythxmlclient.cpp mmembuf.cpp
+SOURCES += multicast.cpp htmlserver.cpp
+SOURCES += servicehost.cpp wsdl.cpp
 
-INCLUDEPATH += ../libmythdb ..
-DEPENDPATH  += ../libmythdb ..
-LIBS      += -L../libmythdb -lmythdb-$$LIBVERSION
+SOURCES += serializers/serializer.cpp     serializers/xmlSerializer.cpp
+SOURCES += serializers/jsonSerializer.cpp 
+
+INCLUDEPATH += ../libmythbase ../libmythservicecontracts ..
+INCLUDEPATH += ./serializers
+
+DEPENDPATH  += ../libmythbase ..
+LIBS      += -L../libmythbase -lmythbase-$$LIBVERSION
+LIBS      += -L../libmythservicecontracts -lmythservicecontracts-$$LIBVERSION
 
 LIBS += $$EXTRA_LIBS
 
@@ -47,7 +60,11 @@ inc.files += upnpdevice.h upnptasknotify.h upnptasksearch.h threadpool.h upnputi
 inc.files += httpserver.h httpstatus.h upnpcds.h upnpcdsobjects.h
 inc.files += eventing.h upnpcmgr.h upnptaskevent.h upnptaskcache.h ssdpcache.h
 inc.files += upnpimpl.h multicast.h broadcast.h configuration.h
-inc.files += soapclient.h mythxmlclient.h mmembuf.h
+inc.files += soapclient.h mythxmlclient.h mmembuf.h 
+inc.files += servicehost.h wsdl.h htmlserver.h
+
+inc.files += serializers/serializer.h     serializers/xmlSerializer.h 
+inc.files += serializers/jsonSerializer.h serializers/soapSerializer.h
 
 INSTALLS += inc
 

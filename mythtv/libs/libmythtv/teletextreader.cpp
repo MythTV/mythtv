@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include "vbilut.h"
+#include "tv.h"
 
 #define MAGAZINE(page) (page / 256)
 
@@ -28,7 +29,7 @@ TeletextReader::~TeletextReader()
 {
 }
 
-void TeletextReader::KeyPress(unsigned int key)
+bool TeletextReader::KeyPress(const QString &key)
 {
     int newPage        = m_curpage;
     int newSubPage     = m_cursubpage;
@@ -37,154 +38,136 @@ void TeletextReader::KeyPress(unsigned int key)
     TeletextSubPage *curpage = FindSubPage(m_curpage, m_cursubpage);
     TeletextPage *page;
 
-    switch (key)
+    if (key == ACTION_0 || key == ACTION_1 || key == ACTION_2 ||
+        key == ACTION_3 || key == ACTION_4 || key == ACTION_5 ||
+        key == ACTION_6 || key == ACTION_7 || key == ACTION_8 ||
+        key == ACTION_9)
     {
-        case TTKey::k0 ... TTKey::k9:
-            numeric_input = true;
-            m_curpage_showheader = true;
-            if (m_pageinput[0] == ' ')
-                m_pageinput[0] = '0' + static_cast<int> (key);
-            else if (m_pageinput[1] == ' ')
-                m_pageinput[1] = '0' + static_cast<int> (key);
-            else if (m_pageinput[2] == ' ')
-            {
-                m_pageinput[2] = '0' + static_cast<int> (key);
-                newPage = ((m_pageinput[0] - '0') * 256) +
-                    ((m_pageinput[1] - '0') * 16) +
-                    (m_pageinput[2] - '0');
-                newSubPage = -1;
-            }
-            else
-            {
-                m_pageinput[0] = '0' + static_cast<int> (key);
-                m_pageinput[1] = ' ';
-                m_pageinput[2] = ' ';
-            }
-
-            PageUpdated(m_curpage, m_cursubpage);
-            break;
-
-        case TTKey::kNextPage:
+        numeric_input = true;
+        m_curpage_showheader = true;
+        if (m_pageinput[0] == ' ')
+            m_pageinput[0] = '0' + key.toInt();
+        else if (m_pageinput[1] == ' ')
+            m_pageinput[1] = '0' + key.toInt();
+        else if (m_pageinput[2] == ' ')
         {
-            TeletextPage *ttpage = FindPage(m_curpage, 1);
-            if (ttpage)
-                newPage = ttpage->pagenum;
+            m_pageinput[2] = '0' + key.toInt();
+            newPage = ((m_pageinput[0] - '0') * 256) +
+                      ((m_pageinput[1] - '0') * 16) +
+                      (m_pageinput[2] - '0');
+            newSubPage = -1;
+        }
+        else
+        {
+            m_pageinput[0] = '0' + key.toInt();
+            m_pageinput[1] = ' ';
+            m_pageinput[2] = ' ';
+        }
+
+        PageUpdated(m_curpage, m_cursubpage);
+    }
+    else if (key == ACTION_NEXTPAGE)
+    {
+        TeletextPage *ttpage = FindPage(m_curpage, 1);
+        if (ttpage)
+            newPage = ttpage->pagenum;
+        newSubPage = -1;
+        m_curpage_showheader = true;
+    }
+    else if (key == ACTION_PREVPAGE)
+    {
+        TeletextPage *ttpage = FindPage(m_curpage, -1);
+        if (ttpage)
+            newPage = ttpage->pagenum;
+        newSubPage = -1;
+        m_curpage_showheader = true;
+    }
+    else if (key == ACTION_NEXTSUBPAGE)
+    {
+        TeletextSubPage *ttpage = FindSubPage(m_curpage, m_cursubpage, 1);
+        if (ttpage)
+            newSubPage = ttpage->subpagenum;
+        m_curpage_showheader = true;
+    }
+    else if (key == ACTION_PREVSUBPAGE)
+    {
+        TeletextSubPage *ttpage = FindSubPage(m_curpage, m_cursubpage, -1);
+        if (ttpage)
+            newSubPage = ttpage->subpagenum;
+        m_curpage_showheader = true;
+    }
+    else if (key == ACTION_TOGGLEBACKGROUND)
+    {
+        m_transparent = !m_transparent;
+        PageUpdated(m_curpage, m_cursubpage);
+    }
+    else if (key == ACTION_REVEAL)
+    {
+        m_revealHidden = !m_revealHidden;
+        PageUpdated(m_curpage, m_cursubpage);
+    }
+    else if (key == ACTION_MENURED)
+    {
+        if (!curpage)
+            return true;
+
+        if ((page = FindPage(curpage->floflink[0])) != NULL)
+        {
+            newPage = page->pagenum;
             newSubPage = -1;
             m_curpage_showheader = true;
-            break;
-        }
-
-        case TTKey::kPrevPage:
-        {
-            TeletextPage *ttpage = FindPage(m_curpage, -1);
-            if (ttpage)
-                newPage = ttpage->pagenum;
-            newSubPage = -1;
-            m_curpage_showheader = true;
-            break;
-        }
-
-        case TTKey::kNextSubPage:
-        {
-            TeletextSubPage *ttpage = FindSubPage(m_curpage, m_cursubpage, 1);
-            if (ttpage)
-                newSubPage = ttpage->subpagenum;
-            m_curpage_showheader = true;
-            break;
-        }
-
-        case TTKey::kPrevSubPage:
-        {
-            TeletextSubPage *ttpage = FindSubPage(m_curpage, m_cursubpage, -1);
-            if (ttpage)
-                newSubPage = ttpage->subpagenum;
-            m_curpage_showheader = true;
-            break;
-        }
-
-        case TTKey::kHold:
-            break;
-
-        case TTKey::kTransparent:
-            m_transparent = !m_transparent;
-            PageUpdated(m_curpage, m_cursubpage);
-            break;
-
-        case TTKey::kRevealHidden:
-            m_revealHidden = !m_revealHidden;
-            PageUpdated(m_curpage, m_cursubpage);
-            break;
-
-        case TTKey::kFlofRed:
-        {
-            if (!curpage)
-                return;
-
-            if ((page = FindPage(curpage->floflink[0])) != NULL)
-            {
-                newPage = page->pagenum;
-                newSubPage = -1;
-                m_curpage_showheader = true;
-            }
-            break;
-        }
-
-        case TTKey::kFlofGreen:
-        {
-            if (!curpage)
-                return;
-
-            if ((page = FindPage(curpage->floflink[1])) != NULL)
-            {
-                newPage = page->pagenum;
-                newSubPage = -1;
-                m_curpage_showheader = true;
-            }
-            break;
-        }
-
-        case TTKey::kFlofYellow:
-        {
-            if (!curpage)
-                return;
-
-            if ((page = FindPage(curpage->floflink[2])) != NULL)
-            {
-                newPage = page->pagenum;
-                newSubPage = -1;
-                m_curpage_showheader = true;
-            }
-            break;
-        }
-
-        case TTKey::kFlofBlue:
-        {
-            if (!curpage)
-                return;
-
-            if ((page = FindPage(curpage->floflink[3])) != NULL)
-            {
-                newPage = page->pagenum;
-                newSubPage = -1;
-                m_curpage_showheader = true;
-            }
-            break;
-        }
-
-        case TTKey::kFlofWhite:
-        {
-            if (!curpage)
-                return;
-
-            if ((page = FindPage(curpage->floflink[4])) != NULL)
-            {
-                newPage = page->pagenum;
-                newSubPage = -1;
-                m_curpage_showheader = true;
-            }
-            break;
         }
     }
+    else if (key == ACTION_MENUGREEN)
+    {
+        if (!curpage)
+            return true;
+
+        if ((page = FindPage(curpage->floflink[1])) != NULL)
+        {
+            newPage = page->pagenum;
+            newSubPage = -1;
+            m_curpage_showheader = true;
+        }
+    }
+    else if (key == ACTION_MENUYELLOW)
+    {
+        if (!curpage)
+            return true;
+
+        if ((page = FindPage(curpage->floflink[2])) != NULL)
+        {
+            newPage = page->pagenum;
+            newSubPage = -1;
+            m_curpage_showheader = true;
+        }
+    }
+    else if (key == ACTION_MENUBLUE)
+    {
+        if (!curpage)
+            return true;
+
+        if ((page = FindPage(curpage->floflink[3])) != NULL)
+        {
+            newPage = page->pagenum;
+            newSubPage = -1;
+            m_curpage_showheader = true;
+        }
+    }
+    else if (key == ACTION_MENUWHITE)
+    {
+        if (!curpage)
+            return true;
+
+        if ((page = FindPage(curpage->floflink[4])) != NULL)
+        {
+            newPage = page->pagenum;
+            newSubPage = -1;
+            m_curpage_showheader = true;
+        }
+    }
+    else
+        return false;
 
     if (newPage < 0x100)
         newPage = 0x100;
@@ -205,6 +188,8 @@ void TeletextReader::KeyPress(unsigned int key)
         m_revealHidden = false;
         PageUpdated(m_curpage, m_cursubpage);
     }
+
+    return true;
 }
 
 QString TeletextReader::GetPage(void)
@@ -401,17 +386,6 @@ void TeletextReader::AddTeletextData(int magazine, int row,
 
     switch (row)
     {
-        case 1 ... 24: // Page Data
-            if (vbimode == VBI_DVB || vbimode == VBI_DVB_SUBTITLE)
-            {
-                for (uint j = 0; j < 40; j++)
-                    ttpage->data[row][j] = m_bitswap[buf[j]];
-            }
-            else
-            {
-                memcpy(ttpage->data[row], buf, 40);
-            }
-            break;
         case 26:
             /* XXX TODO: Level 1.5, 2.5, 3.5
             *      Character location & override
@@ -441,7 +415,7 @@ void TeletextReader::AddTeletextData(int magazine, int row,
                 default:
                     return;
             }
-            if (b1 != 0 || not(b2 & 8))
+            if (b1 != 0 || !(b2 & 8))
                 return;
 
             for (int i = 0; i < 6; ++i)
@@ -472,7 +446,8 @@ void TeletextReader::AddTeletextData(int magazine, int row,
                 }
 
                 int x = (b2 >> 7) | ((b3 >> 5) & 0x06);
-                ttpage->floflink[i] = ((magazine ^ x) ?: 8) * 256 + b1;
+                int nTmp = (magazine ^ x);
+                ttpage->floflink[i] = ( nTmp ? nTmp : 8) * 256 + b1;
                 ttpage->flof = 1;
             }
             break;
@@ -481,6 +456,20 @@ void TeletextReader::AddTeletextData(int magazine, int row,
             break;
 
         default: /// other packet codes...
+        
+            if (( row >= 1 ) && ( row <= 24 ))  // Page Data
+            {
+                if (vbimode == VBI_DVB || vbimode == VBI_DVB_SUBTITLE)
+                {
+                    for (uint j = 0; j < 40; j++)
+                        ttpage->data[row][j] = m_bitswap[buf[j]];
+                }
+                else
+                {
+                    memcpy(ttpage->data[row], buf, 40);
+                }
+            }
+
             break;
     }
 }

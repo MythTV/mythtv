@@ -117,10 +117,10 @@ int main(int argc, char *argv[])
         if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
         {
             if (cmdline_err)
-                return JOBQUEUE_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
 
             if (cmdline.WantsToExit())
-                return JOBQUEUE_EXIT_OK;
+                return GENERIC_EXIT_OK;
         }
     }
 
@@ -129,11 +129,9 @@ int main(int argc, char *argv[])
     int argpos = 1;
     bool daemonize = false;
 
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHJOBQUEUE);
+
     QString filename;
-
-    QFileInfo finfo(a.argv()[0]);
-
-    QString binname = finfo.baseName();
 
     while (argpos < a.argc())
     {
@@ -144,13 +142,13 @@ int main(int argc, char *argv[])
             {
                 if (parse_verbose_arg(a.argv()[argpos+1]) ==
                         GENERIC_EXIT_INVALID_CMDLINE)
-                    return JOBQUEUE_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
 
                 ++argpos;
             } else
             {
                 cerr << "Missing argument to -v/--verbose option\n";
-                return JOBQUEUE_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-l") ||
@@ -162,7 +160,7 @@ int main(int argc, char *argv[])
                 if (logfile.startsWith("-"))
                 {
                     cerr << "Invalid or missing argument to -l/--logfile option\n";
-                    return JOBQUEUE_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
                 }
                 else
                 {
@@ -179,7 +177,7 @@ int main(int argc, char *argv[])
                 if (pidfile.startsWith("-"))
                 {
                     cerr << "Invalid or missing argument to -p/--pidfile option\n";
-                    return JOBQUEUE_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
                 }
                 else
                 {
@@ -202,7 +200,7 @@ int main(int argc, char *argv[])
                 {
                     cerr << "Invalid or missing argument to "
                             "-O/--override-setting option\n";
-                    return JOBQUEUE_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
                 }
 
                 QStringList pairs = tmpArg.split(",");
@@ -234,20 +232,20 @@ int main(int argc, char *argv[])
                     "-p or --pidfile filename       Write PID of mythjobqueue to filename " <<
                     "-d or --daemon                 Runs mythjobqueue as a daemon" << endl <<
                     endl;
-            return JOBQUEUE_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
         else if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
         {
             if (cmdline_err)
-                return JOBQUEUE_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
 
             if (cmdline.WantsToExit())
-                return JOBQUEUE_EXIT_OK;
+                return GENERIC_EXIT_OK;
         }
         else
         {
             printf("illegal option: '%s' (use --help)\n", a.argv()[argpos]);
-            return JOBQUEUE_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
 
         ++argpos;
@@ -274,7 +272,7 @@ int main(int argc, char *argv[])
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "Could not open pid file" + ENO);
-            return JOBQUEUE_EXIT_OPENING_PIDFILE_ERROR;
+            return GENERIC_EXIT_PERMISSIONS_ERROR;
         }
     }
 
@@ -284,7 +282,7 @@ int main(int argc, char *argv[])
     if (daemonize && (daemon(0, 1) < 0))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to daemonize" + ENO);
-        return JOBQUEUE_EXIT_DAEMONIZING_ERROR;
+        return GENERIC_EXIT_DAEMONIZING_ERROR;
     }
 
     if (pidfs)
@@ -293,22 +291,17 @@ int main(int argc, char *argv[])
         pidfs.close();
     }
 
-    extern const char *myth_source_version;
-    extern const char *myth_source_path;
-
     VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
-                            .arg(binname)
-                            .arg(myth_source_path)
-                            .arg(myth_source_version));
+                            .arg(MYTH_APPNAME_MYTHJOBQUEUE)
+                            .arg(MYTH_SOURCE_PATH)
+                            .arg(MYTH_SOURCE_VERSION));
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to init MythContext, exiting.");
-        return JOBQUEUE_EXIT_NO_MYTHCONTEXT;
+        return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
-
-    gCoreContext->SetAppName(binname);
 
     if (settingsOverride.size())
     {
@@ -324,7 +317,7 @@ int main(int argc, char *argv[])
     if (!gCoreContext->ConnectToMasterServer())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to connect to master server");
-        return GENERIC_EXIT_UNKNOWN_ERROR;
+        return GENERIC_EXIT_CONNECT_ERROR;
     }
 
     jobqueue = new JobQueue(false);
@@ -336,7 +329,7 @@ int main(int argc, char *argv[])
     if (sysEventHandler)
         delete sysEventHandler;
 
-    return exitCode ? exitCode : JOBQUEUE_EXIT_OK;
+    return exitCode ? exitCode : GENERIC_EXIT_OK;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

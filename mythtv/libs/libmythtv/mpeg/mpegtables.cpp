@@ -195,7 +195,7 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
         if ((Length() == 0xfff) && (TableIDExtension() == 0xffff) &&
             (Section() == 0xff) && (LastSection() == 0xff))
         {
-            VERBOSE(VB_SIPARSER, "PSIPTable: PAT: All values a maximums");
+            VERBOSE(VB_SIPARSER, "PSIPTable: PAT: All values at maximums");
             return false;
         }
 
@@ -213,7 +213,7 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
 
         if (psipdata() + Length() - 9 > bufend)
         {
-            VERBOSE(VB_SIPARSER, "PSIPTable: PMT: reported length to large");
+            VERBOSE(VB_SIPARSER, "PSIPTable: PMT: reported length too large");
             return false;
         }
 
@@ -488,7 +488,7 @@ bool ProgramMapTable::IsProgramEncrypted(void) const
     desc_list_t descs = MPEGDescriptor::ParseOnlyInclude(
         ProgramInfo(), ProgramInfoLength(), DescriptorID::conditional_access);
 
-    bool encrypted = false;
+    uint encrypted = 0;
     QMap<uint,uint> encryption_system;
     for (uint i = 0; i < descs.size(); i++)
     {
@@ -499,7 +499,7 @@ bool ProgramMapTable::IsProgramEncrypted(void) const
         //VERBOSE(VB_IMPORTANT, "DTVsm: "<<cad.toString());
     }
 
-    return encrypted;
+    return encrypted != 0;
 }
 
 /** \fn ProgramMapTable::IsStreamEncrypted(uint i) const
@@ -512,7 +512,7 @@ bool ProgramMapTable::IsStreamEncrypted(uint i) const
     desc_list_t descs = MPEGDescriptor::ParseOnlyInclude(
         StreamInfo(i), StreamInfoLength(i), DescriptorID::conditional_access);
 
-    bool encrypted = false;
+    uint encrypted = 0;
     QMap<uint,uint> encryption_system;
     for (uint j = 0; j < descs.size(); j++)
     {
@@ -523,7 +523,7 @@ bool ProgramMapTable::IsStreamEncrypted(uint i) const
         //VERBOSE(VB_IMPORTANT, "DTVsm: "<<cad.toString());
     }
 
-    return encrypted;
+    return encrypted != 0;
 }
 
 bool ProgramMapTable::IsStillPicture(QString sistandard) const

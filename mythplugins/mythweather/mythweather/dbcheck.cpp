@@ -8,7 +8,7 @@
 
 #include "dbcheck.h"
 
-const QString currentDatabaseVersion = "1005";
+const QString currentDatabaseVersion = "1006";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -124,7 +124,8 @@ bool InitializeDatabase()
     {
         QStringList updates;
         updates << "ALTER TABLE weathersourcesettings ADD COLUMN updated "
-                   "TIMESTAMP;";
+                   "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP "
+                   "          ON UPDATE CURRENT_TIMESTAMP;";
 
         if (!performActualUpdate(updates, "1001", dbver))
             return false;
@@ -201,6 +202,17 @@ bool InitializeDatabase()
                    "  MODIFY location varchar(128) CHARACTER SET utf8 NOT NULL;";
 
         if (!performActualUpdate(updates, "1005", dbver))
+            return false;
+    }
+
+    if (dbver == "1005")
+    {
+        QStringList updates;
+        updates << "ALTER TABLE weathersourcesettings MODIFY COLUMN updated "
+                   "  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP "
+                   "            ON UPDATE CURRENT_TIMESTAMP;";
+
+        if (!performActualUpdate(updates, "1006", dbver))
             return false;
     }
 

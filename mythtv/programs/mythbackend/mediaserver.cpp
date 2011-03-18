@@ -10,13 +10,17 @@
 
 #include "mediaserver.h"
 #include "httpconfig.h"
-#include "mythxml.h"
+#include "internetContent.h"
 #include "mythdirs.h"
 
 #include "upnpcdstv.h"
 #include "upnpcdsmusic.h"
 #include "upnpcdsvideo.h"
-#include "upnpmedia.h"
+
+#include "serviceHosts/mythServiceHost.h"
+#include "serviceHosts/guideServiceHost.h"
+#include "serviceHosts/contentServiceHost.h"
+#include "serviceHosts/dvrServiceHost.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -31,7 +35,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 MediaServer::MediaServer(void) :
-    m_pUPnpCDS(NULL), m_pUPnpCMGR(NULL), upnpMedia(NULL),
+    m_pUPnpCDS(NULL), m_pUPnpCMGR(NULL),
     m_sSharePath(GetShareDir())
 {
     VERBOSE(VB_UPNP, "MediaServer:ctor:Begin");
@@ -46,23 +50,6 @@ MediaServer::MediaServer(void) :
     // Create mini HTTP Server
     // ----------------------------------------------------------------------
 
-    int     nPort = g_pConfig->GetValue( "BackendStatusPort", 6544 );
-
-    m_pHttpServer = new HttpServer();
-
-    if (!m_pHttpServer->listen(QHostAddress::Any, nPort))
-    {
-        VERBOSE(VB_IMPORTANT, "MediaServer::HttpServer Create Error");
-        // exit(BACKEND_BUGGY_EXIT_NO_BIND_STATUS);
-        delete m_pHttpServer;
-        m_pHttpServer = NULL;
-        return;
-    }
-
-    m_pHttpServer->m_sSharePath = m_sSharePath;
-
-    m_pHttpServer->RegisterExtension(new HttpConfig());
-
     VERBOSE(VB_UPNP, "MediaServer:ctor:End");
 }
 
@@ -71,20 +58,35 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = FALSE */)
     VERBOSE(VB_UPNP, "MediaServer:Init:Begin");
 
     int     nPort     = g_pConfig->GetValue( "BackendStatusPort", 6544 );
+
+	if (!m_pHttpServer)
+	{
+		m_pHttpServer = new HttpServer();
+
+		m_pHttpServer->m_sSharePath = m_sSharePath;
+
+		m_pHttpServer->RegisterExtension(new HttpConfig());
+	}
+
+    if (!m_pHttpServer->isListening())
+	{
+		if (!m_pHttpServer->listen(QHostAddress::Any, nPort))
+		{
+			VERBOSE(VB_IMPORTANT, "MediaServer::HttpServer Create Error");
+			delete m_pHttpServer;
+			m_pHttpServer = NULL;
+			return;
+		}
+	}
+
     QString sFileName = g_pConfig->GetValue( "upnpDescXmlPath",
                                                 m_sSharePath );
     QString sDeviceType;
 
     if ( bIsMaster )
-    {
         sFileName  += "devicemaster.xml";
-        sDeviceType = "urn:schemas-mythtv-org:device:MasterMediaServer:1";
-    }
     else
-    {
         sFileName += "deviceslave.xml";
-        sDeviceType = "urn:schemas-mythtv-org:device:SlaveMediaServer:1";
-    }
 
     // ------------------------------------------------------------------
     // Make sure our device Description is loaded.
@@ -94,18 +96,18 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = FALSE */)
 
     g_UPnpDeviceDesc.Load( sFileName );
 
-    UPnpDevice *pMythDevice = UPnpDeviceDesc::FindDevice( RootDevice(),
-                                                            sDeviceType );
-
     // ------------------------------------------------------------------
-    // Register the MythXML protocol...
+    // Register Http Server Extensions...
     // ------------------------------------------------------------------
 
-    VERBOSE(VB_UPNP, "MediaServer::Registering MythXML Service." );
+    VERBOSE(VB_UPNP, "MediaServer::Registering Http Server Extensions." );
 
-    if (m_pHttpServer)
-        m_pHttpServer->RegisterExtension(
-            new MythXML( pMythDevice , m_sSharePath));
+    m_pHttpServer->RegisterExtension( new InternetContent   ( m_sSharePath ));
+
+    m_pHttpServer->RegisterExtension( new MythServiceHost   ( m_sSharePath ));
+    m_pHttpServer->RegisterExtension( new GuideServiceHost  ( m_sSharePath ));
+    m_pHttpServer->RegisterExtension( new ContentServiceHost( m_sSharePath ));
+    m_pHttpServer->RegisterExtension( new DvrServiceHost    ( m_sSharePath ));
 
     QString sIP = g_pConfig->GetValue( "BackendServerIP"  , ""   );
     if (sIP.isEmpty())
@@ -190,9 +192,6 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = FALSE */)
             VERBOSE(VB_UPNP, "MediaServer::Registering UPnpCDSVideo Extension");
 
             RegisterExtension(new UPnpCDSVideo());
-
-            upnpMedia = new UPnpMedia(true,true);
-            //upnpMedia->BuildMediaMap();
         }
 
         // VERBOSE(VB_UPNP, QString( "MediaServer::Adding Context Listener" ));

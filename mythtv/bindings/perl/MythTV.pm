@@ -99,22 +99,22 @@ package MythTV;
     our $BACKEND_SEP    = '[]:[]';
     our $BACKEND_SEP_rx = qr/\[\]:\[\]/;
 
-# MYTH_PROTO_VERSION is defined in libmythdb in 
-# mythtv/libs/libmythdb/mythversion.h and should be the current MythTV 
+# MYTH_PROTO_VERSION is defined in libmythbase in 
+# mythtv/libs/libmythbase/mythversion.h and should be the current MythTV 
 # protocol version.
 #
 # Note: as of July 21, 2010, this is actually a string, to account for proto
 # versions of the form "58a".  This will get used if protocol versions are 
 # changed on a fixes branch ongoing.
-    our $PROTO_VERSION = "64";
-    our $PROTO_TOKEN = "8675309J";
+    our $PROTO_VERSION = "65";
+    our $PROTO_TOKEN = "D2BB94C2";
 
 # currentDatabaseVersion is defined in libmythtv in
 # mythtv/libs/libmythtv/dbcheck.cpp and should be the current MythTV core
 # schema version supported in the main code.  We need to check that the schema
 # version in the database is as expected by the bindings, which are expected
 # to be kept in sync with the main code.
-    our $SCHEMA_VERSION = "1266";
+    our $SCHEMA_VERSION = "1270";
 
 # NUMPROGRAMLINES is defined in mythtv/libs/libmythtv/programinfo.h and is
 # the number of items in a ProgramInfo QStringList group used by
@@ -241,18 +241,11 @@ package MythTV;
                ."MythTV installation to $conf.\n";
             #print $dev->getfriendlyname(), "\n";
         }
-    # This should really point to a different UDN, but leaving this as-is won't
-    # hurt the perl code.
-        my $m_udn = $upnp->{udn};
-        $m_udn =~ s/^uuid\W+//;
     # Save the config.xml
         open CONF, ">$conf/config.xml" or die "Can't write to $conf/config.xml:  $!\n";
         print CONF <<EOF;
 <Configuration>
   <UPnP>
-    <UDN>
-      <MediaRenderer>$m_udn</MediaRenderer>
-    </UDN>
     <MythFrontend>
       <DefaultBackend>
         <USN>$upnp->{usn}</USN>

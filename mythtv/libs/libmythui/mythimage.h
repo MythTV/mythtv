@@ -16,7 +16,7 @@ enum FillDirection {FillLeftToRight, FillTopToBottom};
 class QNetworkReply;
 class MythUIHelper;
 
-class MPUBLIC MythImageReader: public QImageReader
+class MUI_PUBLIC MythImageReader: public QImageReader
 {
   public:
     MythImageReader(const QString &fileName);
@@ -27,7 +27,7 @@ class MPUBLIC MythImageReader: public QImageReader
     QNetworkReply *m_networkReply;
 };
 
-class MPUBLIC MythImage : public QImage
+class MUI_PUBLIC MythImage : public QImage
 {
   public:
     MythImage(MythPainter *parent);

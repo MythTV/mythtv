@@ -422,7 +422,7 @@ int BiopObjLocation::Process(const unsigned char *data)
 
 // A Lite profile body is used to refer to an object referenced through
 // a different PMT, We don't support that, at least at the moment.
-int ProfileBodyLite::Process(const unsigned char */*data*/)
+int ProfileBodyLite::Process(const unsigned char * /*data*/)
 {
     VERBOSE(VB_DSMCC, "Found LiteProfileBody - Not Implemented Yet");
     return 0;

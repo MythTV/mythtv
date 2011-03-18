@@ -1,20 +1,35 @@
 #ifndef FIFOWRITER
 #define FIFOWRITER
 
-// POSIX headers
-#include <pthread.h>
-
 // Qt headers
 #include <QString>
 #include <QMutex>
+#include <QWaitCondition>
+#include <QThread>
 
 // MythTV headers
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 using namespace std;
 
-class MPUBLIC FIFOWriter
+class FIFOWriter;
+
+class FIFOThread : public QThread
 {
+    Q_OBJECT
+  public:
+    FIFOThread() : m_parent(NULL), m_id(-1) {}
+    void SetId(int id) { m_id = id; }
+    void SetParent(FIFOWriter *parent) { m_parent = parent; }
+    void run(void);
+  private:
+    FIFOWriter *m_parent;
+    int m_id;
+};
+
+class MTV_PUBLIC FIFOWriter
+{
+    friend class FIFOThread;
   public:
     FIFOWriter(int count, bool sync);
    ~FIFOWriter();
@@ -24,8 +39,7 @@ class MPUBLIC FIFOWriter
     void FIFODrain(void);
 
   private:
-    void FIFOWriteThread(void);
-    static void *FIFOStartThread(void *param);
+    void FIFOWriteThread(int id);
 
     struct fifo_buf 
     {
@@ -34,9 +48,9 @@ class MPUBLIC FIFOWriter
         long blksize;
      } **fifo_buf, **fb_inptr, **fb_outptr;
 
-     pthread_t *fifothrds;
-     pthread_mutex_t *fifo_lock;
-     pthread_cond_t *full_cond, *empty_cond;
+     FIFOThread     *fifothrds;
+     QMutex         *fifo_lock;
+     QWaitCondition *full_cond, *empty_cond;
 
      QString *filename, *fbdesc;
 
@@ -44,7 +58,6 @@ class MPUBLIC FIFOWriter
      int *killwr, *fbcount;
      int num_fifos;
      bool usesync;
-     int cur_id;
 };
 
 #endif

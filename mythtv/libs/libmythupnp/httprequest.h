@@ -4,7 +4,7 @@
 //
 // Purpose     : Http Request/Response
 //                                                                            
-// Copyright (c) 2005 David Blain <mythtv@theblains.net>
+// Copyright (c) 2005 David Blain <dblain@mythtv.org>
 //                                          
 // This library is free software; you can redistribute it and/or 
 // modify it under the terms of the GNU Lesser General Public
@@ -26,6 +26,7 @@
 
 #include <QFile>
 #include <QRegExp>
+#include <QBuffer>
 #include <QTextStream>
 
 using namespace std;
@@ -33,6 +34,7 @@ using namespace std;
 #include "upnpexp.h"
 #include "upnputil.h"
 #include "bufferedsocketdevice.h"
+#include "serializers/serializer.h"
 
 #define SOAP_ENVELOPE_BEGIN  "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" " \
                              "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"     \
@@ -106,8 +108,6 @@ class UPNP_PUBLIC HTTPRequest
 
         QRegExp             m_procReqLineExp;
         QRegExp             m_parseRangeExp;
-        QByteArray          m_aBuffer;
-
 
     public:    
         
@@ -117,6 +117,7 @@ class UPNP_PUBLIC HTTPRequest
         QString             m_sRawRequest;
 
         QString             m_sBaseUrl;
+        QString             m_sResourceUrl;
         QString             m_sMethod;
 
         QStringMap          m_mapParams;
@@ -142,7 +143,7 @@ class UPNP_PUBLIC HTTPRequest
 
         QString             m_sFileName;
 
-        QTextStream         m_response;
+        QBuffer             m_response;
 
         IPostProcess       *m_pPostProcess;
 
@@ -169,6 +170,7 @@ class UPNP_PUBLIC HTTPRequest
 
         QString         BuildHeader         ( long long nSize );
 
+        qint64          SendData            ( QIODevice *pDevice, qint64 llStart, qint64 llBytes );
         qint64          SendFile            ( QFile &file, qint64 llStart, qint64 llBytes );
 
 
@@ -177,14 +179,13 @@ class UPNP_PUBLIC HTTPRequest
                         HTTPRequest     ();
         virtual        ~HTTPRequest     () {};
 
-        void            Reset           ();
-
         bool            ParseRequest    ();
 
         void            FormatErrorResponse ( bool  bServerError, 
                                               const QString &sFaultString, 
                                               const QString &sDetails );
 
+        void            FormatActionResponse( Serializer *ser );
         void            FormatActionResponse( const NameValues &pArgs );
         void            FormatFileResponse  ( const QString &sFileName );
         void            FormatRawResponse   ( const QString &sXML );
@@ -195,6 +196,8 @@ class UPNP_PUBLIC HTTPRequest
         QString         GetHeaderValue  ( const QString &sKey, QString sDefault );
 
         bool            GetKeepAlive    ();
+
+        Serializer *    GetSerializer   ();
 
         static QString  GetMimeType     ( const QString &sFileExtension );
         static QString  TestMimeType    ( const QString &sFileName );

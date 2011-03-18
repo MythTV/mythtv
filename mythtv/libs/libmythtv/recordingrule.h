@@ -6,8 +6,8 @@
 #include <QDate>
 #include <QTime>
 
-// libmythdb
-#include "mythexp.h"
+// libmythbase
+#include "mythtvexp.h"
 
 // libmyth
 #include "programinfo.h"
@@ -26,7 +26,7 @@
  *
  */
 
-class MPUBLIC RecordingRule
+class MTV_PUBLIC RecordingRule
 {
 
   public:

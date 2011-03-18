@@ -1351,7 +1351,10 @@ int bd_select_angle(BLURAY *bd, unsigned angle)
 
 unsigned bd_get_current_angle(BLURAY *bd)
 {
-    return bd->title->angle;
+    if (bd->title) {
+        return bd->title->angle;
+    }
+    return 0;
 }
 
 
@@ -1741,13 +1744,10 @@ static int _play_hdmv(BLURAY *bd, unsigned id_ref)
     return 1;
 }
 
-#define TITLE_FIRST_PLAY 0xffff   /* 10.4.3.2 (E) */
-#define TITLE_TOP_MENU   0x0000   /* 5.2.3.3 */
-
 int bd_play_title(BLURAY *bd, unsigned title)
 {
     /* first play object ? */
-    if (title == TITLE_FIRST_PLAY) {
+    if (title == BLURAY_TITLE_FIRST_PLAY) {
         INDX_PLAY_ITEM *p = &bd->index->first_play;
 
         bd_psr_write(bd->regs, PSR_TITLE_NUMBER, 0xffff); /* 5.2.3.3 */
@@ -1775,7 +1775,7 @@ int bd_play_title(BLURAY *bd, unsigned title)
     }
 
     /* top menu ? */
-    if (title == TITLE_TOP_MENU) {
+    if (title == BLURAY_TITLE_TOP_MENU) {
         INDX_PLAY_ITEM *p = &bd->index->top_menu;
 
         bd_psr_write(bd->regs, PSR_TITLE_NUMBER, 0); /* 5.2.3.3 */
@@ -1827,7 +1827,7 @@ int bd_play(BLURAY *bd)
     bd_psr_register_cb(bd->regs, _process_psr_event, bd);
     _queue_initial_psr_events(bd);
 
-    return bd_play_title(bd, TITLE_FIRST_PLAY);
+    return bd_play_title(bd, BLURAY_TITLE_FIRST_PLAY);
 }
 
 int bd_menu_call(BLURAY *bd, int64_t pts)
@@ -1841,7 +1841,7 @@ int bd_menu_call(BLURAY *bd, int64_t pts)
         return 0;
     }
 
-    return bd_play_title(bd, TITLE_TOP_MENU);
+    return bd_play_title(bd, BLURAY_TITLE_TOP_MENU);
 }
 
 static void _run_gc(BLURAY *bd, gc_ctrl_e msg, uint32_t param)

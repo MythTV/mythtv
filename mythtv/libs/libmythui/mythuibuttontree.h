@@ -13,7 +13,7 @@ class MythUIButtonListItem;
  *
  * \ingroup MythUI_Widgets
  */
-class MPUBLIC MythUIButtonTree : public MythUIType
+class MUI_PUBLIC MythUIButtonTree : public MythUIType
 {
     Q_OBJECT
   public:
@@ -59,6 +59,7 @@ class MPUBLIC MythUIButtonTree : public MythUIType
     void Init(void);
     void SetTreeState(bool refreshAll = false);
     bool UpdateList(MythUIButtonList *list, MythGenericTree *node);
+    bool DoSetCurrentNode(MythGenericTree *node);
 
     void SwitchList(bool right);
 
@@ -67,6 +68,7 @@ class MPUBLIC MythUIButtonTree : public MythUIType
     uint m_numLists;
     uint m_visibleLists;
     uint m_currentDepth;
+    int  m_depthOffset;
     uint m_oldDepth;
     QList<MythUIButtonList*> m_buttonlists;
     MythUIButtonList *m_listTemplate;

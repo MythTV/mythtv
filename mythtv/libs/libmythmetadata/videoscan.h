@@ -3,11 +3,11 @@
 
 #include <QObject> // for moc
 
-#include "mythexp.h"
+#include "mythmetaexp.h"
 
 class QStringList;
 
-class MPUBLIC VideoScanner : public QObject
+class META_PUBLIC VideoScanner : public QObject
 {
     Q_OBJECT
 

@@ -1,7 +1,0 @@
-<mythnotify version="1">
-  <container name="notify_alert_text">
-    <textarea name="notify_text">
-      <value>%alert_text%</value>
-    </textarea>
-  </container>
-</mythnotify>

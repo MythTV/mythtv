@@ -18,7 +18,7 @@ ChannelChangeMonitor::ChannelChangeMonitor(
 
 void ChannelChangeMonitor::UpdateValues(void)
 {
-    if (!running || exit)
+    if (!monitor_thread.isRunning() || exit)
         return;
 
     if (!IsChannelTuned())

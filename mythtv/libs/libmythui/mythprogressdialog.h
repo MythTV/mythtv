@@ -8,7 +8,7 @@
 #include "mythuitext.h"
 #include "mythuiprogressbar.h"
 
-class MPUBLIC ProgressUpdateEvent : public QEvent
+class MUI_PUBLIC ProgressUpdateEvent : public QEvent
 {
   public:
     ProgressUpdateEvent(uint count, uint total=0, QString message="") :
@@ -27,7 +27,7 @@ class MPUBLIC ProgressUpdateEvent : public QEvent
     QString m_message;
 };
 
-class MPUBLIC MythUIBusyDialog : public MythScreenType
+class MUI_PUBLIC MythUIBusyDialog : public MythScreenType
 {
     Q_OBJECT
   public:
@@ -51,7 +51,7 @@ class MPUBLIC MythUIBusyDialog : public MythScreenType
     MythUIText *m_messageText;
 };
 
-class MPUBLIC MythUIProgressDialog : public MythScreenType
+class MUI_PUBLIC MythUIProgressDialog : public MythScreenType
 {
     Q_OBJECT
   public:
@@ -77,6 +77,6 @@ class MPUBLIC MythUIProgressDialog : public MythScreenType
     MythUIProgressBar *m_progressBar;
 };
 
-MPUBLIC MythUIBusyDialog  *ShowBusyPopup(const QString &message);
+MUI_PUBLIC MythUIBusyDialog  *ShowBusyPopup(const QString &message);
 
 #endif

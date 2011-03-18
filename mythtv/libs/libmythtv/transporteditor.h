@@ -34,6 +34,7 @@
 
 #include <QObject>
 
+#include "mythtvexp.h"
 #include "settings.h"
 
 class VideoSourceSelector;
@@ -68,7 +69,7 @@ class TransportList : public ListBoxSetting, public TransientStorage
 };
 
 // Page for selecting a transport to be created/edited
-class MPUBLIC TransportListEditor : public QObject, public ConfigurationDialog
+class MTV_PUBLIC TransportListEditor : public QObject, public ConfigurationDialog
 {
     Q_OBJECT
 

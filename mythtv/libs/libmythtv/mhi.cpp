@@ -42,7 +42,7 @@ MHIContext::MHIContext(InteractiveTV *parent)
     : m_parent(parent),     m_dsmcc(NULL),
       m_keyProfile(0),
       m_engine(NULL),       m_stop(false),
-      m_stopped(false),     m_updated(false),
+      m_updated(false),
       m_displayWidth(StdDisplayWidth), m_displayHeight(StdDisplayHeight),
       m_face_loaded(false), m_currentChannel(-1),
       m_isLive(false),      m_currentCard(0),
@@ -132,13 +132,13 @@ void MHIContext::StopEngine()
 {
     if (m_engine)
     {
-        while (!m_stopped)
+        while (m_engineThread.isRunning())
         {
             m_stop = true;
             m_engine_wait.wakeAll();
             usleep(1000);
         }
-        pthread_join(m_engineThread, NULL);
+        m_engineThread.wait();
     }
 }
 
@@ -191,8 +191,9 @@ void MHIContext::Restart(uint chanid, uint cardid, bool isLive)
         m_isLive = isLive;
         // Don't set the NBI version here.  Restart is called
         // after the PMT is processed.
-        m_stopped = pthread_create(&m_engineThread, NULL,
-                                   StartMHEGEngine, this) != 0;
+        m_engineThread.SetParent(this);
+        m_engineThread.start();
+
         m_audioTag = -1;
         m_videoTag = -1;
         m_tuningTo = -1;
@@ -200,13 +201,13 @@ void MHIContext::Restart(uint chanid, uint cardid, bool isLive)
 }
 
 // Thread function to run the MHEG engine.
-void *MHIContext::StartMHEGEngine(void *param)
+void MHEGEngineThread::run(void)
 {
     //VERBOSE(VB_GENERAL, "Starting MHEG Engine");
-    MHIContext *context = (MHIContext*) param;
-    context->RunMHEGEngine();
-    context->m_stopped = true;
-    return NULL;
+    if (!m_parent)
+        return;
+
+    m_parent->RunMHEGEngine();
 }
 
 void MHIContext::RunMHEGEngine(void)
@@ -375,57 +376,57 @@ bool MHIContext::OfferKey(QString key)
     // The UK uses 3, 4 and 5 and NZ 13, 14 and 15.  These are
     // similar but the NZ profile also provides an EPG key.
 
-    if (key == "UP")
+    if (key == ACTION_UP)
     {
         if (m_keyProfile == 4 || m_keyProfile == 5 ||
             m_keyProfile == 14 || m_keyProfile == 15)
             action = 1;
     }
-    else if (key == "DOWN")
+    else if (key == ACTION_DOWN)
     {
         if (m_keyProfile == 4 || m_keyProfile == 5 ||
             m_keyProfile == 14 || m_keyProfile == 15)
             action = 2;
     }
-    else if (key == "LEFT")
+    else if (key == ACTION_LEFT)
     {
         if (m_keyProfile == 4 || m_keyProfile == 5 ||
             m_keyProfile == 14 || m_keyProfile == 15)
             action = 3;
     }
-    else if (key == "RIGHT")
+    else if (key == ACTION_RIGHT)
     {
         if (m_keyProfile == 4 || m_keyProfile == 5 ||
             m_keyProfile == 14 || m_keyProfile == 15)
             action = 4;
     }
-    else if (key == "0" || key == "1" || key == "2" ||
-             key == "3" || key == "4" || key == "5" ||
-             key == "6" || key == "7" || key == "8" ||
-             key == "9")
+    else if (key == ACTION_0 || key == ACTION_1 || key == ACTION_2 ||
+             key == ACTION_3 || key == ACTION_4 || key == ACTION_5 ||
+             key == ACTION_6 || key == ACTION_7 || key == ACTION_8 ||
+             key == ACTION_9)
     {
         if (m_keyProfile == 4 || m_keyProfile == 14)
             action = key.toInt() + 5;
     }
-    else if (key == "SELECT")
+    else if (key == ACTION_SELECT)
     {
         if (m_keyProfile == 4 || m_keyProfile == 5 ||
             m_keyProfile == 14 || m_keyProfile == 15)
             action = 15;
     }
-    else if (key == "TEXTEXIT")
+    else if (key == ACTION_TEXTEXIT)
         action = 16;
-    else if (key == "MENURED")
+    else if (key == ACTION_MENURED)
         action = 100;
-    else if (key == "MENUGREEN")
+    else if (key == ACTION_MENUGREEN)
         action = 101;
-    else if (key == "MENUYELLOW")
+    else if (key == ACTION_MENUYELLOW)
         action = 102;
-    else if (key == "MENUBLUE")
+    else if (key == ACTION_MENUBLUE)
         action = 103;
-    else if (key == "MENUTEXT")
+    else if (key == ACTION_MENUTEXT)
         action = m_keyProfile > 12 ? 105 : 104;
-    else if (key == "MENUEPG")
+    else if (key == ACTION_MENUEPG)
         action = m_keyProfile > 12 ? 300 : 0;
 
     if (action != 0)

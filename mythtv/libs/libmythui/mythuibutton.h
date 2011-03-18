@@ -18,7 +18,7 @@
  *
  * \ingroup MythUI_Widgets
  */
-class MPUBLIC MythUIButton : public MythUIType
+class MUI_PUBLIC MythUIButton : public MythUIType
 {
     Q_OBJECT
   public:

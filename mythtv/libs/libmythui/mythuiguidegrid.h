@@ -3,9 +3,11 @@
 
 // QT
 #include <QPixmap>
+#include <QPen>
+#include <QBrush>
 
 // MythDB
-#include "mythexp.h"
+#include "mythuiexp.h"
 
 // MythUI
 #include "mythuitype.h"
@@ -22,7 +24,7 @@ class MythFontProperties;
  *
  * \ingroup MythUI_Widgets
  */
-class MPUBLIC MythUIGuideGrid : public MythUIType
+class MUI_PUBLIC MythUIGuideGrid : public MythUIType
 {
   public:
     MythUIGuideGrid(MythUIType *parent, const QString &name);
@@ -101,8 +103,7 @@ class MPUBLIC MythUIGuideGrid : public MythUIType
     void drawRecType(MythPainter *p, UIGTCon *data, int alpaMod);
     void drawCurrent(MythPainter *p, UIGTCon *data, int alpaMod);
 
-    QColor calcColor(const QColor &color, int alpha, int alphaMod);
-    QColor calcColor(const QColor &color, int alphaMod);
+    QColor calcColor(const QColor &color, int alpha);
 
     QList<UIGTCon*> *allData;
     UIGTCon selectedItem;
@@ -122,10 +123,8 @@ class MPUBLIC MythUIGuideGrid : public MythUIType
     QColor m_solidColor;
 
     QString m_selType;
-    QColor  m_selLineColor;
-    QColor  m_selFillColor;
-    bool    m_drawSelLine;
-    bool    m_drawSelFill;
+    QPen    m_drawSelLine;
+    QBrush  m_drawSelFill;
 
     QColor m_recordingColor;
     QColor m_conflictingColor;

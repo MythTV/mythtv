@@ -31,7 +31,7 @@
 #define _CHANNEL_SCANNER_H_
 
 // MythTV headers
-#include "mythexp.h"
+#include "mythtvexp.h"
 #include "dtvconfparser.h"
 #include "scanmonitor.h"
 #include "channelscantypes.h"
@@ -45,7 +45,7 @@ class ChannelBase;
 // do_delete_channels, do_rename_channels, atsc_format
 // TODO implement deletion of stale channels..
 
-class MPUBLIC ChannelScanner
+class MTV_PUBLIC ChannelScanner
 {
     friend class ScanMonitor;
 

@@ -32,7 +32,6 @@
 #include "mythplayer.h"
 #include "videodisplayprofile.h"
 #include "decoderbase.h"
-#include "mythxdisplay.h"
 #include "mythcorecontext.h"
 #include "dithertable.h"
 
@@ -100,7 +99,7 @@ VideoOutWindow::VideoOutWindow() :
     if (desktop)
     {
         screen_num = desktop->primaryScreen();
-        using_xinerama  = (GetNumberXineramaScreens() > 1);
+        using_xinerama  = MythDisplay::GetNumberXineramaScreens() > 1;
         if (using_xinerama)
         {
             screen_num = gCoreContext->GetNumSetting("XineramaScreen", screen_num);

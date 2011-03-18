@@ -16,35 +16,37 @@
     </textedit>
 
     <buttonlist name="sites" from="basebuttonlist">
-        <area>30,110,200,250</area>
+        <area>40,110,270,230</area>
+        <searchposition>-1,370</searchposition>
     </buttonlist>
 
     <buttonlist name="results" from="basebuttonlist">
-        <area>250,110,520,250</area>
+        <area>330,110,910,250</area>
+        <searchposition>-1,370</searchposition>
     </buttonlist>
 
     <imagetype name="preview">
-        <area>30,380,190,190</area>
+        <area>40,400,250,250</area>
         <preserveaspect>true</preserveaspect>
     </imagetype>
 
     <textarea name="title" from="basetextarea">
-        <area>240,370,520,50</area>
-        <font>baseextralarge</font>
+        <area>330,380,910,50</area>
+        <font>baselarge</font>
     </textarea>
 
     <textarea name="author" from="basetextarea">
-        <area>240,415,520,35</area>
+        <area>330,425,880,35</area>
         <template>Author: %1</template>
     </textarea>
 
     <textarea name="filesize_str" from="basetextarea">
-        <area>240,450,520,35</area>
+        <area>330,460,520,35</area>
         <template>Size: %1</template>
     </textarea>
 
     <textarea name="description" from="basetextarea">
-        <area>240,485,520,105</area>
+        <area>330,495,910,220</area>
         <multiline>true</multiline>
         <template>Description: %1</template>
     </textarea>
@@ -59,13 +61,13 @@
 
     <textarea name="title" from="basetextarea">
         <font>baselarge</font>
-        <area>0,20,800,50</area>
+        <area>0,20,1280,50</area>
         <align>center,vcenter</align>
         <value>Manage Site Subscriptions</value>
     </textarea>
 
     <buttonlist name="grabbers" from="basebuttonlist">
-        <area>50,110,700,390</area>
+        <area>280,110,700,390</area>
     </buttonlist>
 
   </window>
@@ -73,42 +75,42 @@
   <window name="rsseditor">
 
     <button name="edit" from="basebutton">
-        <position>110,50</position>
+        <position>350,50</position>
         <value>Edit</value>
     </button>
 
     <button name="new" from="basebutton">
-        <position>310,50</position>
+        <position>550,50</position>
         <value>New</value>
     </button>
 
     <button name="delete" from="basebutton">
-        <position>510,50</position>
+        <position>750,50</position>
         <value>Remove</value>
     </button>
 
     <buttonlist name="sites" from="basebuttonlist">
-        <area>50,110,700,220</area>
+        <area>50,110,1180,220</area>
     </buttonlist>
 
     <textarea name="title" from="basetextarea">
-        <area>210,335,550,50</area>
+        <area>260,335,970,50</area>
         <font>baseextralarge</font>
     </textarea>
 
     <textarea name="author" from="basetextarea">
-        <area>210,380,550,35</area>
+        <area>260,380,750,35</area>
         <template>Author: %1</template>
     </textarea>
 
       <textarea name="description" from="basetextarea">
-          <area>210,420,550,115</area>
+          <area>260,420,970,215</area>
           <multiline>true</multiline>
           <template>Description: %1</template>
       </textarea>
 
       <imagetype name="preview">
-          <area>38,330,150,240</area>
+          <area>38,330,200,290</area>
           <preserveaspect>true</preserveaspect>
       </imagetype>
 
@@ -118,112 +120,117 @@
 
         <textarea name="titlelab" from="basetextarea">
             <font>baselarge</font>
-            <area>0,20,800,50</area>
+            <area>0,20,1280,50</area>
             <align>center,vcenter</align>
             <value>Manage RSS Subscriptions</value>
         </textarea>
 
-        <textarea name="titlelabel" from="basetextarea">
-            <area>30,90,200,30</area>
-            <align>right,vcenter</align>
-            <value>Feed Name:</value>
-        </textarea>
+        <group name="controls">
+            <area>210,50,500,600</area>
 
-        <textedit name="title" from="basetextedit">
-            <position>245,80</position>
-        </textedit>
+            <textarea name="titlelabel" from="basetextarea">
+                <area>30,90,200,30</area>
+                <align>right,vcenter</align>
+                <value>Feed Name:</value>
+            </textarea>
 
-        <textarea name="urllabel" from="basetextarea">
-            <area>30,150,200,30</area>
-            <align>right,vcenter</align>
-            <value>Feed URL:</value>
-        </textarea>
+            <textedit name="title" from="basetextedit">
+                <position>245,80</position>
+            </textedit>
 
-        <textedit name="url" from="basetextedit">
-            <position>245,140</position>
-        </textedit>
+            <textarea name="urllabel" from="basetextarea">
+                <area>30,150,200,30</area>
+                <align>right,vcenter</align>
+                <value>Feed URL:</value>
+            </textarea>
 
-        <textarea name="desclabel" from="basetextarea">
-            <area>30,210,200,30</area>
-            <align>right,vcenter</align>
-            <value>Site Description:</value>
-        </textarea>
+            <textedit name="url" from="basetextedit">
+                <position>245,140</position>
+            </textedit>
 
-        <textedit name="description" from="basetextedit">
-            <position>245,200</position>
-        </textedit>
+            <textarea name="desclabel" from="basetextarea">
+                <area>30,210,200,30</area>
+                <align>right,vcenter</align>
+                <value>Site Description:</value>
+            </textarea>
 
-        <textarea name="authorlabel" from="basetextarea">
-            <area>30,270,200,30</area>
-            <align>right,vcenter</align>
-            <value>Feed Author:</value>
-        </textarea>
+            <textedit name="description" from="basetextedit">
+                <position>245,200</position>
+            </textedit>
 
-        <textedit name="author" from="basetextedit">
-            <position>245,260</position>
-        </textedit>
+            <textarea name="authorlabel" from="basetextarea">
+                <area>30,270,200,30</area>
+                <align>right,vcenter</align>
+                <value>Feed Author:</value>
+            </textarea>
 
-        <checkbox name="download" from="basecheckbox">
-            <position>245,330</position>
-        </checkbox>
+            <textedit name="author" from="basetextedit">
+                <position>245,260</position>
+            </textedit>
 
-        <textarea name="downloadlabel" from="basetextarea">
-            <area>295,335,400,28</area>
-            <value>Download this feed automatically</value>
-        </textarea>
+            <checkbox name="download" from="basecheckbox">
+                <position>245,330</position>
+            </checkbox>
 
-        <imagetype name="preview">
-            <area>245,380,90,90</area>
-        </imagetype>
+            <textarea name="downloadlabel" from="basetextarea">
+                <area>295,335,400,28</area>
+                <value>Download this feed automatically</value>
+            </textarea>
 
-        <button name="preview_browse" from="basebutton">
-            <position>355,405</position>
-            <value>Choose Image</value>
-        </button>
+            <imagetype name="preview">
+                <area>560,380,90,90</area>
+            </imagetype>
 
-        <button name="cancel" from="basebutton">
-            <position>245,510</position>
-            <value>Cancel</value>
-        </button>
+            <button name="preview_browse" from="basewidebutton">
+                <position>245,405</position>
+                <value>Choose Image</value>
+            </button>
 
-        <button name="ok" from="basebutton">
-            <position>470,510</position>
-            <value>Save</value>
-        </button>
+            <button name="cancel" from="basebutton">
+                <position>245,510</position>
+                <value>Cancel</value>
+            </button>
+
+            <button name="ok" from="basebutton">
+                <position>470,510</position>
+                <value>Save</value>
+            </button>
+
+    </group>
 
   </window>
 
   <window name="tree">
 
     <buttontree name="videos">
-        <area>0,10,800,310</area>
-        <numlists>2</numlists>
+        <area>40,40,1200,290</area>
+        <numlists>3</numlists>
         <spacing>10</spacing>
         <buttonlist name="listtemplate" from="basebuttonlist" />
     </buttontree>
 
     <textarea name="title" from="basetextarea">
-        <area>210,330,550,50</area>
+        <area>330,350,910,50</area>
         <font>baseextralarge</font>
     </textarea>
 
     <textarea name="author" from="basetextarea">
-        <area>210,375,550,35</area>
+        <area>330,395,550,35</area>
         <template>Author: %1</template>
     </textarea>
 
     <textarea name="date" from="basetextarea">
-        <area>210,410,550,35</area>
+        <area>330,430,550,35</area>
         <template>Posted: %1</template>
     </textarea>
 
       <textarea name="filesize_str" from="basetextarea">
-          <area>210,445,550,35</area>
+          <area>330,465,550,35</area>
           <template>Size: %1</template>
       </textarea>
 
       <textarea name="description" from="basetextarea">
-          <area>210,480,550,115</area>
+          <area>330,500,910,115</area>
           <multiline>true</multiline>
           <template>Description: %1</template>
       </textarea>
@@ -233,7 +240,7 @@
       </textarea>
 
       <imagetype name="preview">
-          <area>38,330,150,240</area>
+          <area>40,400,250,250</area>
           <preserveaspect>true</preserveaspect>
       </imagetype>
 
@@ -241,18 +248,24 @@
 
     <window name="browser">
 
+        <shape name="listbackground">
+            <area>0,550,1280,210</area>
+            <type>box</type>
+            <fill color="#000000" alpha="120" />
+        </shape>
+
         <buttonlist name="videos">
-            <area>15,440,770,150</area>
+            <area>20,550,1220,150</area>
             <layout>horizontal</layout>
             <scrollstyle>center</scrollstyle>
-            <spacing>9</spacing>
-            <buttonarea>38,0,690,155</buttonarea>
+            <spacing>5</spacing>
+            <buttonarea>40,0,1180,250</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
-                    <area>0,0,90,155</area>
+                    <area>0,0,160,160</area>
                     <imagetype name="buttonbackground" />
                     <imagetype name="buttonimage">
-                        <area>10,15,80,120</area>
+                        <area>10,15,140,140</area>
                         <preserveaspect>true</preserveaspect>
                         <filename>shared/grid_noimage.png</filename>
                     </imagetype>
@@ -280,14 +293,14 @@
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <position>5,7</position>
+                    <imagetype name="selectarrow">
+                        <position>30,115</position>
                         <filename>mv_browse_selector.png</filename>
                     </imagetype>
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
-                <position>0,42</position>
+                <position>0,52</position>
                 <showempty>yes</showempty>
                 <state type="full">
                     <imagetype name="upon">
@@ -296,7 +309,7 @@
                 </state>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>730,42</position>
+                <position>1195,52</position>
                 <state type="full">
                     <imagetype name="dnon">
                         <filename>right_arrow.png</filename>
@@ -306,18 +319,22 @@
         </buttonlist>
 
         <textarea name="title" from="basetextarea">
-            <area>40,15,700,100</area>
-            <multiline>yes</multiline>
+            <area>40,15,1200,100</area>
+            <multiline></multiline>
             <font>baseextralarge</font>
         </textarea>
 
         <imagetype name="preview">
-            <area>30,90,203,311</area>
+            <area>30,90,250,250</area>
             <preserveaspect>yes</preserveaspect>
         </imagetype>
 
+        <shape name="descriptionbackground" from="basebackground">
+            <area>310,90,940,340</area>
+        </shape>
+
         <textarea name="description" from="basetextarea">
-            <area>245,97,523,145</area>
+            <area>320,100,920,320</area>
             <multiline>yes</multiline>
         </textarea>
 
@@ -325,33 +342,37 @@
             <value>You haven't added any Sites/RSS Feeds yet!  To add a site, press MENU, then choose "Scan/Manage Subscriptions," then "Manage Site Subscriptions."</value>
         </textarea>
 
+        <shape name="detailsbackground" from="basebackground">
+            <area>310,450,940,80</area>
+        </shape>
+
         <textarea name="lenlbl" from="basetextarea">
-            <area>260,343,150,35</area>
+            <area>375,460,150,35</area>
+            <align>hcenter</align>
             <value>Runtime</value>
         </textarea>
 
         <textarea name="duration" from="basetextarea">
-            <area>260,373,350,35</area>
+            <area>375,490,350,35</area>
+            <align>hcenter</align>
         </textarea>
 
-        <textarea name="authlbl" from="basetextarea">
-            <area>470,343,90,35</area>
+        <textarea name="authlbl" from="lenlbl">
+            <area>650,460,300,35</area>
             <value>Author</value>
         </textarea>
 
-        <textarea name="author" from="basetextarea">
-            <area>470,373,100,35</area>
+        <textarea name="author" from="duration">
+            <area>650,490,300,35</area>
         </textarea>
 
-        <textarea name="userratinglbl" from="basetextarea">
-            <area>620,343,150,35</area>
-            <align>right,top</align>
+        <textarea name="userratinglbl" from="lenlbl">
+            <area>1020,460,200,35</area>
             <value>Rating</value>
         </textarea>
 
-        <textarea name="rating" from="basetextarea">
-            <area>670,373,100,35</area>
-            <align>hcenter,top</align>
+        <textarea name="rating" from="duration">
+            <area>1020,490,200,35</area>
         </textarea>
 
     </window>
@@ -359,64 +380,67 @@
     <window name="gallery">
 
         <textarea name="title" from="basetextarea">
-            <area>70,15,460,50</area>
+            <area>12,20,890,30</area>
             <cutdown>yes</cutdown>
-            <font>baselarge</font>
+            <font>basemedium</font>
+            <align>left,vcenter</align>
         </textarea>
 
         <textarea name="author" from="basetextarea">
-            <area>550,15,220,50</area>
+            <area>910,20,200,30</area>
             <cutdown>yes</cutdown>
             <font>basemedium</font>
+            <align>left,vcenter</align>
         </textarea>
 
         <textarea name="nosites" from="basetextarea">
-            <area>550,15,220,50</area>
+            <area>12,0,1260,785</area>
+            <align>allcenter</align>
             <value>You haven't added any Sites/RSS Feeds yet!  To add a site, press MENU, then choose "Scan/Manage Subscriptions," then "Manage Site Subscriptions."</value>
         </textarea>
 
         <buttonlist name="videos">
-            <area>15,0,770,585</area>
+            <area>12,0,1260,785</area>
             <layout>grid</layout>
             <spacing>5</spacing>
-            <buttonarea>0,65,770,520</buttonarea>
+            <buttonarea>0,55,1260,720</buttonarea>
             <statetype name="buttonitem">
-                <area>0,0,150,125</area>
+                <area>0,0,175,160</area>
                 <state name="active">
                     <imagetype name="buttonbackground">
                         <filename>shared/grid_back_reg.png</filename>
                     </imagetype>
                     <imagetype name="buttonimage">
-                        <area>10,8,130,90</area>
+                        <area>10,8,155,125</area>
                         <preserveaspect>true</preserveaspect>
                         <filename>shared/grid_noimage.png</filename>
                     </imagetype>
                     <statetype name="nodetype">
-                        <position>80,55</position>
+                        <position>90,70</position>
                         <state name="subfolder">
                             <imagetype name="icon">
-                                <area>0,0,50,50</area>
+                                <area>0,0,70,70</area>
                                 <filename>shared/directory.png</filename>
                                 <preserveaspect>yes</preserveaspect>
                             </imagetype>
                         </state>
                         <state name="upfolder">
                             <imagetype name="icon">
-                                <area>0,0,50,50</area>
+                                <area>0,0,70,70</area>
                                 <filename>shared/updirectory.png</filename>
                                 <preserveaspect>yes</preserveaspect>
                             </imagetype>
                         </state>
                     </statetype>
                     <textarea name="buttontext">
-                        <area>5,98,140,25</area>
+                        <area>5,133,165,25</area>
                         <font>menufont</font>
                         <align>hcenter,bottom</align>
                     </textarea>
                     <textarea name="childcount" from="basetextarea">
-                        <area>65,72,55,20</area>
+                        <area>85,100,80,25</area>
                         <font>basesmallblack</font>
-                        <align>right</align>
+                        <align>center</align>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">
@@ -426,7 +450,7 @@
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
-                <position>640,20</position>
+                <position>1120,15</position>
                 <showempty>yes</showempty>
                 <state type="full">
                     <imagetype name="upon">
@@ -435,7 +459,7 @@
                 </state>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>700,20</position>
+                <position>1180,15</position>
                 <showempty>yes</showempty>
                 <state type="full">
                     <imagetype name="dnon">

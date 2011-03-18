@@ -91,6 +91,7 @@ bool ViewScheduled::Create()
             SLOT(selected(MythUIButtonListItem*)));
 
     m_schedulesList->SetLCDTitles(tr("Scheduled Recordings"), "shortstarttimedate|channel|titlesubtitle|card");
+    m_schedulesList->SetSearchFields("titlesubtitle");
 
     if (m_groupList)
     {

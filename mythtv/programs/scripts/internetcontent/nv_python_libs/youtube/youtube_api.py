@@ -183,7 +183,7 @@ class Videos(object):
         self.config[u'urls'] = {}
 
         # v2 api calls - An example that must be customized for each target site
-        self.config[u'urls'][u'video.search'] = 'http://gdata.youtube.com/feeds/api/videos?vq=%s&max-results=%s&start-index=%s&orderby=rating&Ir=%s'
+        self.config[u'urls'][u'video.search'] = 'http://gdata.youtube.com/feeds/api/videos?vq=%s&max-results=%s&start-index=%s&orderby=relevance&Ir=%s'
 
 
         # Functions that parse video data from RSS data

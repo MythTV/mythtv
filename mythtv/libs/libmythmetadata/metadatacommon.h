@@ -11,7 +11,7 @@
 #include <QDomElement>
 #include <QEvent>
 
-#include "mythexp.h"
+#include "mythmetaexp.h"
 
 enum LookupStep {
     SEARCH = 0,
@@ -79,7 +79,7 @@ typedef QMultiMap< PeopleType, PersonInfo > PeopleMap;
 
 typedef QHash<QString,QString> MetadataMap;
 
-class MPUBLIC MetadataLookup : public QObject
+class META_PUBLIC MetadataLookup : public QObject
 {
   public:
     MetadataLookup(void);
@@ -287,16 +287,64 @@ class MPUBLIC MetadataLookup : public QObject
 };
 Q_DECLARE_METATYPE(MetadataLookup*)
 
-MPUBLIC MetadataLookup* ParseMetadataItem(const QDomElement& item,
+META_PUBLIC MetadataLookup* ParseMetadataItem(const QDomElement& item,
                                           MetadataLookup *lookup,
                                           bool passseas = true);
-MPUBLIC PeopleMap ParsePeople(QDomElement people);
-MPUBLIC ArtworkMap ParseArtwork(QDomElement artwork);
+META_PUBLIC PeopleMap ParsePeople(QDomElement people);
+META_PUBLIC ArtworkMap ParseArtwork(QDomElement artwork);
 
-MPUBLIC int editDistance(const QString& s, const QString& t);
-MPUBLIC QString nearestName(const QString& actual,
+META_PUBLIC int editDistance(const QString& s, const QString& t);
+META_PUBLIC QString nearestName(const QString& actual,
                             const QStringList& candidates);
 
-MPUBLIC QDateTime RFC822TimeToQDateTime(const QString& t);
+META_PUBLIC QDateTime RFC822TimeToQDateTime(const QString& t);
+
+enum GrabberType {
+    GRAB_MOVIE = 0,
+    GRAB_TELEVISION = 1,
+    GRAB_MUSIC = 2,
+    GRAB_GAME = 3
+};
+
+class META_PUBLIC MetaGrabberScript : public QObject
+{
+  public:
+    MetaGrabberScript();
+    ~MetaGrabberScript();
+
+    MetaGrabberScript(
+        const QString name,
+        const QString author,
+        const QString thumbnail,
+        const QString command,
+        const GrabberType type,
+        const QString typestring,
+        const QString description,
+        const float version);
+
+    const QString GetName() { return m_name; };
+    const QString GetAuthor() { return m_author; };
+    const QString GetThumbnail() { return m_thumbnail; };
+    const QString GetCommand() { return m_command; };
+    GrabberType GetType() { return m_type; };
+    const QString GetTypeString() { return m_typestring; };
+    const QString GetDescription() { return m_description; };
+    float GetVersion() { return m_version; };
+
+    void toMap(MetadataMap &metadataMap);
+
+  private:
+    QString m_name;
+    QString m_author;
+    QString m_thumbnail;
+    QString m_command;
+    GrabberType m_type;
+    QString m_typestring;
+    QString m_description;
+    float m_version;
+};
+Q_DECLARE_METATYPE(MetaGrabberScript*)
+
+META_PUBLIC MetaGrabberScript* ParseGrabberVersion(const QDomElement& item);
 
 #endif // METADATACOMMON_H_

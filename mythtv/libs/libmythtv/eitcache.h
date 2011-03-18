@@ -14,7 +14,7 @@
 #include <QMap>
 
 // MythTV headers
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 typedef QMap<uint, uint64_t> event_map_t;
 typedef QMap<uint, event_map_t*> key_map_t;
@@ -57,7 +57,7 @@ class EITCache
     static const uint kVersionMax;
 
   public:
-    static MPUBLIC void ClearChannelLocks(void);
+    static MTV_PUBLIC void ClearChannelLocks(void);
 };
 
 #endif // _EIT_CACHE_H

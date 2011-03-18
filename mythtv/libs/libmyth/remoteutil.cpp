@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QDir>
 
+#include "compat.h"
 #include "remoteutil.h"
 #include "programinfo.h"
 #include "mythcorecontext.h"
@@ -11,13 +12,15 @@
 #include "storagegroup.h"
 #include "mythevent.h"
 
-vector<ProgramInfo *> *RemoteGetRecordedList(bool deltype)
+vector<ProgramInfo *> *RemoteGetRecordedList(int sort)
 {
     QString str = "QUERY_RECORDINGS ";
-    if (deltype)
-        str += "Delete";
+    if (sort < 0)
+        str += "Descending";
+    else if (sort > 0)
+        str += "Ascending";
     else
-        str += "Play";
+        str += "Unsorted";
 
     QStringList strlist(str);
 

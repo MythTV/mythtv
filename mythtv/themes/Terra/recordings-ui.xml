@@ -635,22 +635,31 @@
         </textarea>
 
         <textarea name="titlelabel" from="basetextarea">
-            <area>889,250,378,30</area>
+            <area>889,225,378,30</area>
             <value>Title</value>
             <align>hcenter</align>
             <font>basemedium</font>
         </textarea>
 
         <textedit name="title" from="baseshorttextedit">
-            <position>919,285</position>
+            <position>919,250</position>
         </textedit>
 
         <textarea name="subtitlelabel" from="titlelabel">
-            <position>889,380</position>
+            <position>889,305</position>
             <value>Subtitle</value>
         </textarea>
 
         <textedit name="subtitle" from="baseshorttextedit">
+            <position>919,330</position>
+        </textedit>
+
+        <textarea name="descriptionlabel" from="titlelabel">
+            <position>889,385</position>
+            <value>Description</value>
+        </textarea>
+
+        <textedit name="description" from="baseshortmultilinetextedit">
             <position>919,415</position>
         </textedit>
 

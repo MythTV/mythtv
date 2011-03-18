@@ -27,7 +27,7 @@ class ProgramInfoCache
     ProgramInfoCache(QObject *o);
     ~ProgramInfoCache();
 
-    void ScheduleLoad(void);
+    void ScheduleLoad(const bool updateUI = true);
     bool IsLoadInProgress(void) const;
     void WaitForLoadToComplete(void) const;
 
@@ -46,7 +46,7 @@ class ProgramInfoCache
     ProgramInfo *GetProgramInfo(const QString &piKey) const;
 
   private:
-    void Load(void);
+    void Load(const bool updateUI = true);
     void Clear(void);
 
   private:

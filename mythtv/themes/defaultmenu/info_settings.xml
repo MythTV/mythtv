@@ -2,6 +2,14 @@
 <mythmenu name="INFO_SETUP">
 
     <button>
+        <type>ZONEMINDER</type>
+        <text>ZoneMinder Settings</text>
+        <description>Set up surveillance software</description>
+        <action>CONFIGPLUGIN mythzoneminder</action>
+        <depends>mythzoneminder</depends>
+    </button>
+
+    <button>
         <type>SETTINGS_WEATHER</type>
         <text>Weather Settings</text>
         <description>Weather locale and sources</description>

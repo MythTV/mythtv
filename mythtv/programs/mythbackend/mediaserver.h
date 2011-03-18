@@ -17,7 +17,6 @@
 #include "upnpcds.h"
 #include "upnpcmgr.h"
 #include "upnpmsrr.h"
-#include "upnpmedia.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -34,7 +33,6 @@ class MediaServer : public UPnp
 
         UPnpCDS         *m_pUPnpCDS;     // Do not delete (auto deleted)
         UPnpCMGR        *m_pUPnpCMGR;    // Do not delete (auto deleted)
-        UPnpMedia       *upnpMedia;
 
         QString          m_sSharePath;
 
@@ -43,8 +41,6 @@ class MediaServer : public UPnp
         void Init(bool bMaster, bool bDisableUPnp = false);
 
         virtual ~MediaServer();
-
-        void RebuildMediaMap(void) { upnpMedia->BuildMediaMap(); };
 
         void     RegisterExtension  ( UPnpCDSExtension    *pExtension );
         void     UnregisterExtension( UPnpCDSExtension    *pExtension );

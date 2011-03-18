@@ -1,3 +1,4 @@
+
 #ifndef AVFORMATDECODER_H_
 #define AVFORMATDECODER_H_
 
@@ -38,44 +39,45 @@ struct SwsContext;
 
 extern "C" void HandleStreamChange(void*);
 extern "C" void HandleDVDStreamChange(void*);
+extern "C" void HandleBDStreamChange(void*);
 
 class AudioInfo
 {
   public:
     AudioInfo() :
         codec_id(CODEC_ID_NONE), format(FORMAT_NONE), sample_size(-2),
-        sample_rate(-1), channels(-1), do_passthru(false),
-        original_channels(-1)
+        sample_rate(-1), channels(-1), codec_profile(0),
+        do_passthru(false), original_channels(-1)
     {;}
 
     AudioInfo(CodecID id, AudioFormat fmt, int sr, int ch, bool passthru,
-              int original_ch) :
+              int original_ch, int profile = 0) :
         codec_id(id), format(fmt),
         sample_size(ch * AudioOutputSettings::SampleSize(fmt)),
-        sample_rate(sr), channels(ch), do_passthru(passthru),
-        original_channels(original_ch)
+            sample_rate(sr), channels(ch), codec_profile(profile),
+            do_passthru(passthru), original_channels(original_ch)
     {
     }
 
     CodecID codec_id;
     AudioFormat format;
-    int sample_size, sample_rate, channels;
+    int sample_size, sample_rate, channels, codec_profile;
     bool do_passthru;
     int original_channels;
-
     bool operator==(const AudioInfo &o) const
     {
         return (codec_id==o.codec_id        && channels==o.channels       &&
                 sample_size==o.sample_size  && sample_rate==o.sample_rate &&
                 format==o.format            && do_passthru==o.do_passthru &&
-                original_channels==o.original_channels);
+                original_channels==o.original_channels &&
+                codec_profile == o.codec_profile);
     }
     QString toString() const
     {
-        return QString("id(%1) %2Hz %3ch %4bps %5")
+        return QString("id(%1) %2Hz %3ch %4bps %5 (profile %6)")
             .arg(ff_codec_id_string(codec_id),4).arg(sample_rate,6)
             .arg(channels,2).arg(AudioOutputSettings::FormatToBits(format),2)
-            .arg((do_passthru) ? "pt":"",3);
+            .arg((do_passthru) ? "pt":"",3).arg(codec_profile);
     }
 };
 
@@ -87,6 +89,7 @@ class AvFormatDecoder : public DecoderBase
 {
     friend void HandleStreamChange(void*);
     friend void HandleDVDStreamChange(void*);
+    friend void HandleBDStreamChange(void*);
   public:
     static void GetDecoders(render_opts &opts);
     AvFormatDecoder(MythPlayer *parent, const ProgramInfo &pginfo,
@@ -96,10 +99,11 @@ class AvFormatDecoder : public DecoderBase
                     AVSpecialDecode av_special_decode = kAVSpecialDecode_None);
    ~AvFormatDecoder();
 
+    virtual void SetEof(bool eof);
+
     void CloseCodecs();
     void CloseContext();
-    void Reset(void);
-    void Reset(bool reset_video_data = true, bool seek_reset = true);
+    virtual void Reset(bool reset_video_data, bool seek_reset, bool reset_file);
 
     /// Perform an av_probe_input_format on the passed data to see if we
     /// can decode it with this class.
@@ -115,6 +119,8 @@ class AvFormatDecoder : public DecoderBase
     virtual bool GetFrame(DecodeType); // DecoderBase
 
     bool isLastFrameKey(void) { return false; }
+
+    bool isCodecMPEG(void) { return codec_is_mpeg; }
 
     /// This is a No-op for this class.
     void WriteStoredData(RingBuffer *rb, bool storevid, long timecodeOffset)
@@ -147,6 +153,7 @@ class AvFormatDecoder : public DecoderBase
     virtual int SetTrack(uint type, int trackNo);
 
     int ScanStreams(bool novideo);
+    int FindStreamInfo(void);
 
     virtual int  GetNumChapters();
     virtual void GetChapterTimes(QList<long long> &times);
@@ -177,9 +184,13 @@ class AvFormatDecoder : public DecoderBase
     void ScanTeletextCaptions(int av_stream_index);
     void ScanRawTextCaptions(int av_stream_index);
     void ScanDSMCCStreams(void);
-    int AutoSelectAudioTrack(void);
+    int  AutoSelectAudioTrack(void);
+    int  filter_max_ch(const AVFormatContext *ic,
+                       const sinfo_vec_t     &tracks,
+                       const vector<int>     &fs,
+                       enum CodecID           codecId = CODEC_ID_NONE,
+                       int                    profile = -1);
 
-  private:
     friend int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
     friend void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
 
@@ -231,7 +242,11 @@ class AvFormatDecoder : public DecoderBase
     float normalized_fps(AVStream *stream, AVCodecContext *enc);
     void av_update_stream_timings_video(AVFormatContext *ic);
 
-  private:
+    virtual void StreamChangeCheck(void) { }
+    virtual void PostProcessTracks(void) { }
+    virtual int GetSubtitleLanguage(uint subtitle_index, uint stream_index);
+    virtual int GetAudioLanguage(uint audio_index, uint stream_index);
+
     PrivateDecoder *private_dec;
 
     bool is_db_ignored;
@@ -271,7 +286,7 @@ class AvFormatDecoder : public DecoderBase
     uint32_t  start_code_state;
 
     long long lastvpts;
-    long long lastapts;
+    long long  lastapts;
     long long lastccptsu;
 
     int64_t faulty_pts;
@@ -280,6 +295,7 @@ class AvFormatDecoder : public DecoderBase
     int64_t last_dts_for_fault_detection;
     bool pts_detected;
     bool reordered_pts_detected;
+    bool pts_selected;
 
     bool using_null_videoout;
     MythCodecID video_codec_id;
@@ -328,9 +344,7 @@ class AvFormatDecoder : public DecoderBase
     AudioInfo         audioOut;
 
     float m_fps;
-
-    // SPDIF Encoder for digital passthrough
-    SPDIFEncoder     *m_spdifenc;
+    bool  codec_is_mpeg;
 };
 
 #endif

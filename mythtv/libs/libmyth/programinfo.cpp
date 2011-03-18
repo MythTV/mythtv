@@ -1502,6 +1502,26 @@ uint ProgramInfo::GetSecondsInRecording(void) const
     return (uint) ((recsecs>0) ? recsecs : max(startts.secsTo(endts),0));
 }
 
+/// \brief Returns last frame in position map or 0
+uint64_t ProgramInfo::QueryLastFrameInPosMap(void) const
+{
+    uint64_t last_frame = 0;
+    frm_pos_map_t posMap;
+    QueryPositionMap(posMap, MARK_GOP_BYFRAME);
+    if (posMap.empty())
+    {
+        QueryPositionMap(posMap, MARK_GOP_START);
+        if (posMap.empty())
+            QueryPositionMap(posMap, MARK_KEYFRAME);
+    }
+    if (!posMap.empty())
+    {
+        frm_pos_map_t::const_iterator it = posMap.constEnd();
+        --it;
+        last_frame = it.key();
+    }
+    return last_frame;
+}
 
 QString ProgramInfo::toString(const Verbosity v, QString sep, QString grp)
     const
@@ -2649,7 +2669,7 @@ void ProgramInfo::UpdateLastDelete(bool setTime) const
     }
     else
     {
-        query.prepare("UPDATE record SET last_delete = '0000-00-00T00:00:00' "
+        query.prepare("UPDATE record SET last_delete = '0000-00-00 00:00:00' "
                       "WHERE recordid = :RECORDID");
     }
     query.bindValue(":RECORDID", recordid);
@@ -2675,19 +2695,67 @@ AutoExpireType ProgramInfo::QueryAutoExpire(void) const
     return kDisableAutoExpire;
 }
 
-void ProgramInfo::QueryCutList(frm_dir_map_t &delMap) const
+bool ProgramInfo::QueryCutList(frm_dir_map_t &delMap, bool loadAutoSave) const
 {
-    QueryMarkupMap(delMap, MARK_CUT_START);
-    QueryMarkupMap(delMap, MARK_CUT_END, true);
-    QueryMarkupMap(delMap, MARK_PLACEHOLDER, true);
+    frm_dir_map_t autosaveMap;
+    QueryMarkupMap(autosaveMap, MARK_TMP_CUT_START);
+    QueryMarkupMap(autosaveMap, MARK_TMP_CUT_END, true);
+    QueryMarkupMap(autosaveMap, MARK_PLACEHOLDER, true);
+    bool result = !autosaveMap.isEmpty();
+
+    if (loadAutoSave)
+    {
+        // Convert the temporary marks into regular marks.
+        delMap.clear();
+        frm_dir_map_t::const_iterator i = autosaveMap.constBegin();
+        for (; i != autosaveMap.constEnd(); ++i)
+        {
+            uint64_t frame = i.key();
+            MarkTypes mark = i.value();
+            if (mark == MARK_TMP_CUT_START)
+                mark = MARK_CUT_START;
+            else if (mark == MARK_TMP_CUT_END)
+                mark = MARK_CUT_END;
+            delMap[frame] = mark;
+        }
+    }
+    else
+    {
+        QueryMarkupMap(delMap, MARK_CUT_START);
+        QueryMarkupMap(delMap, MARK_CUT_END, true);
+        QueryMarkupMap(delMap, MARK_PLACEHOLDER, true);
+    }
+
+    return result;
 }
 
-void ProgramInfo::SaveCutList(frm_dir_map_t &delMap) const
+void ProgramInfo::SaveCutList(frm_dir_map_t &delMap, bool isAutoSave) const
 {
-    ClearMarkupMap(MARK_CUT_START);
-    ClearMarkupMap(MARK_CUT_END);
+    if (!isAutoSave)
+    {
+        ClearMarkupMap(MARK_CUT_START);
+        ClearMarkupMap(MARK_CUT_END);
+    }
     ClearMarkupMap(MARK_PLACEHOLDER);
-    SaveMarkupMap(delMap);
+    ClearMarkupMap(MARK_TMP_CUT_START);
+    ClearMarkupMap(MARK_TMP_CUT_END);
+
+    frm_dir_map_t tmpDelMap;
+    frm_dir_map_t::const_iterator i = delMap.constBegin();
+    for (; i != delMap.constEnd(); ++i)
+    {
+        uint64_t frame = i.key();
+        MarkTypes mark = i.value();
+        if (isAutoSave)
+        {
+            if (mark == MARK_CUT_START)
+                mark = MARK_TMP_CUT_START;
+            else if (mark == MARK_CUT_END)
+                mark = MARK_TMP_CUT_END;
+        }
+        tmpDelMap[frame] = mark;
+    }
+    SaveMarkupMap(tmpDelMap);
 
     if (IsRecording())
     {
@@ -3259,6 +3327,39 @@ void ProgramInfo::SaveFrameRate(uint64_t frame, uint framerate)
 }
 
 
+/// \brief Store the Total Duration at frame 0 in the recordedmarkup table
+void ProgramInfo::SaveTotalDuration(int64_t duration)
+{
+    if (!IsRecording())
+        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("DELETE FROM recordedmarkup "
+                  " WHERE chanid=:CHANID "
+                  " AND starttime=:STARTTIME "
+                  " AND type=:TYPE");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+    query.bindValue(":TYPE", MARK_DURATION_MS);
+
+    if (!query.exec())
+        MythDB::DBError("Duration delete", query);
+
+    query.prepare("INSERT INTO recordedmarkup"
+                  "    (chanid, starttime, mark, type, data)"
+                  "    VALUES"
+                  " ( :CHANID, :STARTTIME, 0, :TYPE, :DATA);");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+    query.bindValue(":TYPE", MARK_DURATION_MS);
+    query.bindValue(":DATA", (uint)(duration / 1000));
+
+    if (!query.exec())
+        MythDB::DBError("Duration insert", query);
+}
+
+
 /// \brief Store the Resolution at frame in the recordedmarkup table
 /// \note  All frames until the next one with a stored resolution
 ///        are assumed to have the same resolution
@@ -3357,6 +3458,16 @@ uint ProgramInfo::QueryAverageFrameRate(void) const
 {
     return load_markup_datum(MARK_VIDEO_RATE, chanid, recstartts);
 }
+
+/** \brief If present in recording this loads total duration of the
+ *         main video stream from database's stream markup table.
+ */
+int64_t ProgramInfo::QueryTotalDuration(void) const
+{
+    int64_t msec = load_markup_datum(MARK_DURATION_MS, chanid, recstartts);
+    return msec * 1000;
+}
+
 
 void ProgramInfo::SaveResolutionProperty(VideoProperty vid_flags)
 {
@@ -4166,12 +4277,28 @@ bool LoadFromOldRecorded(
     return true;
 }
 
+/** \fn ProgramInfo::LoadFromRecorded(void)
+ *  \brief Load a ProgramList from the recorded table.
+ *  \param destination     ProgramList to fill
+ *  \param possiblyInProgressRecordingsOnly  return only in-progress
+ *                                           recordings or empty list
+ *  \param inUseMap        in-use programs map
+ *  \param isJobRunning    job map
+ *  \param recMap          recording map
+ *  \param sort            sort order, negative for descending, 0 for
+ *                         unsorted, positive for ascending
+ *  \return true if it succeeds, false if it fails.
+ *  \sa QueryInUseMap(void)
+ *      QueryJobsRunning(int)
+ *      Scheduler::GetRecording()
+ */
 bool LoadFromRecorded(
     ProgramList &destination,
     bool possiblyInProgressRecordingsOnly,
     const QMap<QString,uint32_t> &inUseMap,
     const QMap<QString,bool> &isJobRunning,
-    const QMap<QString, ProgramInfo*> &recMap)
+    const QMap<QString, ProgramInfo*> &recMap,
+    int sort)
 {
     destination.clear();
 
@@ -4184,6 +4311,11 @@ bool LoadFromRecorded(
     QString thequery = ProgramInfo::kFromRecordedQuery;
     if (possiblyInProgressRecordingsOnly)
         thequery += "WHERE r.endtime >= NOW() AND r.starttime <= NOW() ";
+
+    if (sort)
+        thequery += "ORDER BY r.starttime ";
+    if (sort < 0)
+        thequery += "DESC ";
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(thequery);

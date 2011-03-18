@@ -503,10 +503,8 @@ void StatusBox::doListingsStatus()
 
     mfdNextRunStart.replace('T', ' ');
 
-    extern const char *myth_source_version;
-    extern const char *myth_source_path;
-    AddLogLine(tr("Mythfrontend version: %1 (%2)").arg(myth_source_path)
-                                                  .arg(myth_source_version));
+    AddLogLine(tr("Mythfrontend version: %1 (%2)").arg(MYTH_SOURCE_PATH)
+                                                  .arg(MYTH_SOURCE_VERSION));
     AddLogLine(tr("Last mythfilldatabase guide update:"));
     AddLogLine(tr("Started:   %1").arg(mfdLastRunStart));
 

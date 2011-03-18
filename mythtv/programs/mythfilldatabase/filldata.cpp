@@ -44,7 +44,7 @@ bool updateLastRunEnd(MSqlQuery &query)
     query.prepare("UPDATE settings SET data = :ENDTIME "
                   "WHERE value='mythfilldatabaseLastRunEnd'");
 
-    query.bindValue(":ENDTIME", qdtNow.toString("yyyy-MM-dd hh:mm"));
+    query.bindValue(":ENDTIME", qdtNow);
 
     if (!query.exec())
     {
@@ -60,7 +60,7 @@ bool updateLastRunStart(MSqlQuery &query)
     query.prepare("UPDATE settings SET data = :STARTTIME "
                   "WHERE value='mythfilldatabaseLastRunStart'");
 
-    query.bindValue(":STARTTIME", qdtNow.toString("yyyy-MM-dd hh:mm"));
+    query.bindValue(":STARTTIME", qdtNow);
 
     if (!query.exec())
     {
@@ -443,9 +443,7 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
 
     if (!succeeded)
     {
-        if (systemcall_status == GENERIC_EXIT_SIGNALLED ||
-            systemcall_status == GENERIC_EXIT_ABORTED ||
-            systemcall_status == GENERIC_EXIT_TERMINATED)
+        if (systemcall_status == GENERIC_EXIT_KILLED)
         {
             interrupted = true;
             status = QString(QObject::tr("FAILED: xmltv ran but was interrupted."));

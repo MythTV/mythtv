@@ -8,7 +8,7 @@
 #include <QDomDocument>
 #include <QFile>
 
-// Mythui headers
+// libmythui headers
 #include "mythmainwindow.h"
 #include "mythdialogbox.h"
 #include "mythgesture.h"
@@ -20,10 +20,12 @@
 #include "lcddevice.h"
 #include "mythcorecontext.h"
 
-// Mythdb headers
+// libmythbase headers
 #include "mythverbose.h"
 #include "mythdb.h"
 #include "mythdirs.h"
+#include "mythmedia.h"
+#include "mythversion.h"
 
 MythThemedMenuState::MythThemedMenuState(MythScreenStack *parent,
                                          const QString &name)
@@ -240,9 +242,9 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
                     QCoreApplication::exit();
                 }
             }
-            else if ((action == "EXIT" || QObject::tr("MythTV Setup") ==
-                      GetMythMainWindow()->windowTitle()) &&
-                     lastScreen)
+            else if ((action == "EXIT" || (action == "ESCAPE" &&
+                      (QCoreApplication::applicationName() ==
+                        MYTH_APPNAME_MYTHTV_SETUP))) && lastScreen)
             {
                 if (callbacks)
                     m_state->m_callback(m_state->m_callbackdata, selExit);
@@ -279,6 +281,7 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
 void MythThemedMenu::aboutToShow()
 {
     MythScreenType::aboutToShow();
+    m_buttonList->updateLCD();
 }
 
 void MythThemedMenu::ShowMenu()
@@ -325,9 +328,6 @@ void MythThemedMenu::ShowMenu()
 
 }
 
-extern const char *myth_source_version;
-extern const char *myth_source_path;
-
 void MythThemedMenu::aboutScreen()
 {
     QString distro_line;
@@ -341,8 +341,8 @@ void MythThemedMenu::aboutScreen()
     }
 
     QString label = tr("Revision: %1\n Branch: %2\n %3")
-                        .arg(myth_source_version)
-                        .arg(myth_source_path)
+                        .arg(MYTH_SOURCE_VERSION)
+                        .arg(MYTH_SOURCE_PATH)
                         .arg(distro_line);
 
     MythScreenStack* mainStack = GetMythMainWindow()->GetMainStack();
@@ -936,4 +936,37 @@ bool MythThemedMenu::checkPinCode(const QString &password_setting)
         delete dialog;
 
     return false;
+}
+
+/**
+ * \copydoc MythUIType::mediaEvent()
+ */
+void MythThemedMenu::mediaEvent(MythMediaEvent* event)
+{
+    if (!event)
+        return;
+
+    MythMediaDevice *device = event->getDevice();
+
+    if (!device)
+        return;
+
+    MythMediaType type = device->getMediaType();
+    MythMediaStatus status = device->getStatus();
+
+    if ((status & ~MEDIASTAT_USEABLE) &&
+        (status & ~MEDIASTAT_MOUNTED))
+        return;
+
+    switch (type)
+    {
+        case MEDIATYPE_DVD :
+            // DVD Available
+            break;
+        case MEDIATYPE_BD :
+            // Blu-ray Available
+            break;
+        default :
+            return;
+    }
 }

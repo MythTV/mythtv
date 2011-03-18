@@ -4,7 +4,7 @@
 #include <QVector>
 #include <QObject>
 
-#include "mythexp.h"
+#include "mythuiexp.h"
 
 class QString;
 
@@ -12,7 +12,7 @@ class MythScreenType;
 class MythMainWindow;
 class MythPainter;
 
-class MPUBLIC MythScreenStack : public QObject
+class MUI_PUBLIC MythScreenStack : public QObject
 {
   Q_OBJECT
 
@@ -29,6 +29,7 @@ class MPUBLIC MythScreenStack : public QObject
     MythScreenType *GetTopScreen(void) const;
 
     void GetDrawOrder(QVector<MythScreenType *> &screens);
+    void GetScreenList(QVector<MythScreenType *> &screens);
     void ScheduleInitIfNeeded(void);
     void AllowReInit(void) { m_DoInit = true; }
     int TotalScreens() const;
@@ -39,6 +40,9 @@ class MPUBLIC MythScreenStack : public QObject
     QString GetLocation(bool fullPath) const;
 
     MythPainter *GetPainter(void);
+
+  signals:
+    void topScreenChanged(MythScreenType *screen);
 
   private slots:
     void doInit(void);

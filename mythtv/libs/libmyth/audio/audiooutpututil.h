@@ -1,7 +1,6 @@
 #ifndef AUDIOOUTPUTUTIL
 #define AUDIOOUTPUTUTIL
 
-using namespace std;
 #include "mythverbose.h"
 #include "audiooutputsettings.h"
 extern "C" {
@@ -19,8 +18,8 @@ class MPUBLIC AudioOutputUtil
                              bool music, bool upmix);
     static void MuteChannel(int obits, int channels, int ch,
                             void *buffer, int bytes);
-    static char *GeneratePinkSamples(char *frames, int channels,
-                                     int channel, int count, int bits = 16);
+    static char *GeneratePinkFrames(char *frames, int channels,
+                                    int channel, int count, int bits = 16);
 };
 
 #endif

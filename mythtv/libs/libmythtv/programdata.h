@@ -15,12 +15,12 @@ using namespace std;
 #include <QMap>
 
 // MythTV headers
-#include "mythexp.h"
+#include "mythtvexp.h"
 #include "listingsources.h"
 
 class MSqlQuery;
 
-class MPUBLIC DBPerson
+class MTV_PUBLIC DBPerson
 {
   public:
     typedef enum
@@ -60,14 +60,14 @@ class MPUBLIC DBPerson
 };
 typedef vector<DBPerson> DBCredits;
 
-class MPUBLIC EventRating
+class MTV_PUBLIC EventRating
 {
   public:
     QString system;
     QString rating;
 };
 
-class MPUBLIC DBEvent
+class MTV_PUBLIC DBEvent
 {
   public:
     DBEvent(uint _listingsource) :
@@ -171,7 +171,7 @@ class MPUBLIC DBEvent
     QList<EventRating> ratings;
 };
 
-class MPUBLIC DBEventEIT : public DBEvent
+class MTV_PUBLIC DBEventEIT : public DBEvent
 {
   public:
     DBEventEIT(uint             _chanid,
@@ -216,7 +216,7 @@ class MPUBLIC DBEventEIT : public DBEvent
     uint32_t      fixup;
 };
 
-class MPUBLIC ProgInfo : public DBEvent
+class MTV_PUBLIC ProgInfo : public DBEvent
 {
   public:
     ProgInfo() :
@@ -253,7 +253,7 @@ class MPUBLIC ProgInfo : public DBEvent
     QString       clumpmax;
 };
 
-class MPUBLIC ProgramData
+class MTV_PUBLIC ProgramData
 {
   public:
     static void HandlePrograms(uint sourceid,

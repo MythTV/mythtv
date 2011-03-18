@@ -8,7 +8,7 @@ target.path = $${LIBDIR}
 
 INCLUDEPATH += . ../../
 INCLUDEPATH += ./dvdnav
-INCLUDEPATH += ../libmythdb
+INCLUDEPATH += ../libmythbase
 INCLUDEPATH += ../libmythtv
 
 # for -ldl

@@ -1,8 +1,7 @@
 #ifndef OSD_H
 #define OSD_H
 
-using namespace std;
-
+#include "mythtvexp.h"
 #include "programtypes.h"
 #include "mythscreentype.h"
 
@@ -20,6 +19,7 @@ using namespace std;
 #define OSD_WIN_TELETEXT  "OSD_TELETEXT"
 #define OSD_WIN_SUBTITLE  "OSD_SUBTITLES"
 #define OSD_WIN_INTERACT  "OSD_INTERACTIVE"
+#define OSD_WIN_BDOVERLAY "OSD_BDOVERLAY"
 
 #define kOSDFadeTime 1000
 
@@ -27,6 +27,7 @@ class MythPlayer;
 class TeletextScreen;
 class SubtitleScreen;
 struct AVSubtitle;
+class BDOverlay;
 
 enum OSDFunctionalType
 {
@@ -46,7 +47,7 @@ enum OSDTimeout
     kOSDTimeout_Long   = 3,
 };
 
-class MPUBLIC OSDHideEvent : public QEvent
+class MTV_PUBLIC OSDHideEvent : public QEvent
 {
   public:
     OSDHideEvent(enum OSDFunctionalType osdFunctionalType)
@@ -138,6 +139,7 @@ class OSD
     bool    HasWindow(const QString &window);
     void    ResetWindow(const QString &window);
     void    PositionWindow(MythScreenType *window);
+    void    RemoveWindow(const QString &window);
 
     bool    DrawDirect(MythPainter* painter, QSize size, bool repaint = false);
     QRegion Draw(MythPainter* painter, QPaintDevice *device, QSize size,
@@ -174,10 +176,12 @@ class OSD
     void ClearSubtitles(void);
     void DisplayDVDButton(AVSubtitle* dvdButton, QRect &pos);
 
+    void DisplayBDOverlay(BDOverlay *overlay);
+
   private:
     void TearDown(void);
     void LoadWindows(void);
-    void RemoveWindow(const QString &window);
+
     void CheckExpiry(void);
     void SendHideEvent(void);
 

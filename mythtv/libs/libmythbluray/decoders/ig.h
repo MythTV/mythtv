@@ -131,6 +131,9 @@ typedef struct bd_ig_interactive_composition_s {
 
 } BD_IG_INTERACTIVE_COMPOSITION;
 
+#define IG_UI_MODEL_ALWAYS_ON 0
+#define IG_UI_MODEL_POPUP     1
+
 /*
  * segment
  */

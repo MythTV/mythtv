@@ -21,7 +21,7 @@ contains(INCLUDEPATH, /usr/local/include) {
 
 DEPENDPATH  += .
 DEPENDPATH  += ../libmyth ../libmyth/audio
-DEPENDPATH  += ../libmythdb ../libmythhdhomerun
+DEPENDPATH  += ../libmythbase ../libmythhdhomerun
 DEPENDPATH  += ../libmythdvdnav/
 DEPENDPATH  += ../libmythbluray/
 DEPENDPATH  += ./dvbdev ./mpeg ./iptv ./channelscan
@@ -33,7 +33,9 @@ DEPENDPATH  += ../libmythlivemedia/liveMedia/include
 DEPENDPATH  += ../libmythlivemedia/liveMedia
 DEPENDPATH  += ../libmythlivemedia/UsageEnvironment/include
 DEPENDPATH  += ../libmythlivemedia/UsageEnvironment
-DEPENDPATH  += ../libmythdb ../libmythui
+DEPENDPATH  += ../libmythbase ../libmythui
+DEPENDPATH  += ../libmythupnp
+
 
 INCLUDEPATH += .. ../.. # for avlib headers
 INCLUDEPATH += ../../external/FFmpeg
@@ -49,7 +51,7 @@ LIBS += -L../../external/FFmpeg/libswscale
 LIBS += -L../libmythui -L../libmythupnp
 LIBS += -L../libmythdvdnav
 LIBS += -L../libmythbluray
-LIBS += -L../libmythdb
+LIBS += -L../libmythbase
 LIBS += -lmyth-$$LIBVERSION
 LIBS += -lmythswscale
 LIBS += -lmythavformat
@@ -58,31 +60,36 @@ LIBS += -lmythavcore
 LIBS += -lmythavutil
 LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
 LIBS += -lmythdvdnav-$$LIBVERSION
-LIBS += -lmythbluray-$$LIBVERSION    -lmythdb-$$LIBVERSION
+LIBS += -lmythbluray-$$LIBVERSION    -lmythbase-$$LIBVERSION
 using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_live: LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_hdhomerun: LIBS += -L../libmythhdhomerun -lmythhdhomerun-$$LIBVERSION
 using_backend: LIBS += -lmp3lame
 LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 
-TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
-TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
-TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
-TARGETDEPS += ../../external/FFmpeg/libavcore/$$avLibName(avcore)
-TARGETDEPS += ../../external/FFmpeg/libavformat/$$avLibName(avformat)
-TARGETDEPS += ../../external/FFmpeg/libswscale/$$avLibName(swscale)
-TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
-TARGETDEPS += ../libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
-using_mheg: TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
-using_live: TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
-using_hdhomerun: TARGETDEPS += ../libmythhdhomerun/libmythhdhomerun-$${MYTH_SHLIB_EXT}
+POST_TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
+POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
+POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
+POST_TARGETDEPS += ../../external/FFmpeg/libavcore/$$avLibName(avcore)
+POST_TARGETDEPS += ../../external/FFmpeg/libavformat/$$avLibName(avformat)
+POST_TARGETDEPS += ../../external/FFmpeg/libswscale/$$avLibName(swscale)
+POST_TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
+POST_TARGETDEPS += ../libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
+using_mheg: POST_TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
+using_live: POST_TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
+using_hdhomerun: POST_TARGETDEPS += ../libmythhdhomerun/libmythhdhomerun-$${MYTH_SHLIB_EXT}
 
 QMAKE_CXXFLAGS += $${FREETYPE_CFLAGS}
 QMAKE_LFLAGS_SHLIB += $${FREETYPE_LIBS}
 
 macx {
     # Mac OS X Frameworks
-    FWKS = AGL ApplicationServices Carbon Cocoa CoreFoundation CoreVideo OpenGL QuickTime IOKit
+    FWKS = AGL ApplicationServices Carbon Cocoa CoreFoundation OpenGL QuickTime IOKit
+    using_quartz_video {
+        FWKS += QuartzCore
+    } else {
+        FWKS += CoreVideo
+    }
 
     using_firewire:using_backend: FWKS += IOKit
 
@@ -135,8 +142,10 @@ HEADERS += minilzo.h                RTjpegN.h
 SOURCES += minilzo.cpp              RTjpegN.cpp
 
 # Misc. needed by backend/frontend
+HEADERS += mythtvexp.h
 HEADERS += recordinginfo.h
 HEADERS += dbcheck.h
+HEADERS += videodbcheck.h
 HEADERS += tvremoteutil.h           tv.h
 HEADERS += jobqueue.h
 HEADERS += filtermanager.h          recordingprofile.h
@@ -163,6 +172,7 @@ HEADERS += streamingringbuffer.h
 
 SOURCES += recordinginfo.cpp
 SOURCES += dbcheck.cpp
+SOURCES += videodbcheck.cpp
 SOURCES += tvremoteutil.cpp         tv.cpp
 SOURCES += jobqueue.cpp
 SOURCES += filtermanager.cpp        recordingprofile.cpp
@@ -229,7 +239,7 @@ SOURCES += mpeg/H264Parser.cpp
 
 # Channels, and the multiplexes that transmit them
 HEADERS += frequencies.h            frequencytables.h
-SOURCES += frequencies.c            frequencytables.cpp
+SOURCES += frequencies.cpp          frequencytables.cpp
 
 HEADERS += channelutil.h            dbchannelinfo.h
 SOURCES += channelutil.cpp          dbchannelinfo.cpp
@@ -244,6 +254,7 @@ SOURCES += channelscan/scaninfo.cpp channelscan/channelimporter.cpp
 
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = playgroup.h
+inc.files += mythtvexp.h
 
 INSTALLS += inc
 
@@ -275,9 +286,11 @@ using_frontend {
     # A/V decoders
     HEADERS += decoderbase.h
     HEADERS += nuppeldecoder.h          avformatdecoder.h
+    HEADERS += avformatdecoderbd.h      avformatdecoderdvd.h
     HEADERS += privatedecoder.h
     SOURCES += decoderbase.cpp
     SOURCES += nuppeldecoder.cpp        avformatdecoder.cpp
+    SOURCES += avformatdecoderbd.cpp    avformatdecoderdvd.cpp
     SOURCES += privatedecoder.cpp
 
     using_crystalhd {
@@ -295,8 +308,10 @@ using_frontend {
     # On screen display (video output overlay)
     HEADERS += osd.h                    teletextscreen.h
     HEADERS += subtitlescreen.h         interactivescreen.h
+    HEADERS += bdoverlayscreen.h
     SOURCES += osd.cpp                  teletextscreen.cpp
     SOURCES += subtitlescreen.cpp       interactivescreen.cpp
+    SOURCES += bdoverlayscreen.cpp
 
     # Video output
     HEADERS += videooutbase.h           videoout_null.h
@@ -341,7 +356,6 @@ using_frontend {
         SOURCES += util-opengl.cpp
         QT += opengl
     }
-    using_opengl_vsync:DEFINES += USING_OPENGL_VSYNC
 
     using_opengl_video:DEFINES += USING_OPENGL_VIDEO
     using_opengl_video:HEADERS += openglvideo.h   videoout_opengl.h
@@ -568,17 +582,21 @@ use_hidesyms {
 }
 
 mingw {
-    DEFINES -= USING_OPENGL_VSYNC
     DEFINES += USING_MINGW
 
     HEADERS += videoout_d3d.h
+    HEADERS -= NuppelVideoRecorder.h
     SOURCES -= NuppelVideoRecorder.cpp
     SOURCES += videoout_d3d.cpp
 
-    LIBS += -lpthread
+    using_dxva2: DEFINES += USING_DXVA2
+    using_dxva2: HEADERS += dxva2decoder.h
+    using_dxva2: SOURCES += dxva2decoder.cpp
+
     LIBS += -lws2_32
 }
 
 include ( ../libs-targetfix.pro )
 
 LIBS += $$LATE_LIBS
+DEFINES += MTV_API

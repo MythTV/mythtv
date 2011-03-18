@@ -5,7 +5,7 @@
 #include <QRect>
 #include <QDomDocument>
 
-// Libmythdb
+// libmythbase
 #include "mythverbose.h"
 
 // Mythui

@@ -214,12 +214,9 @@ Metadata *MetaIOID3::read(QString filename)
             == TStringToQString(musicbrainz->fieldList().front()));
     }
 
-    // Length
-    if (!tag->frameListMap()["TLEN"].isEmpty())
-    {
-        int length = tag->frameListMap()["TLEN"].front()->toString().toInt();
-        metadata->setLength(length);
-    }
+    // TLEN - Ignored intentionally, some encoders write bad values
+    // e.g. Lame under certain circumstances will always write a length of
+    // 27 hours
 
     // Album Art
     if (!tag->frameListMap()["APIC"].isEmpty())
@@ -231,16 +228,11 @@ Metadata *MetaIOID3::read(QString filename)
 
     metadata->setCompilation(compilation);
 
-    if (metadata->Length() <= 0)
-    {
-        TagLib::FileRef *fileref = new TagLib::FileRef(mpegfile);
-        metadata->setLength(getTrackLength(fileref));
-        // FileRef takes ownership of mpegfile, and is responsible for it's
-        // deletion. Messy.
-        delete fileref;
-    }
-    else
-        delete mpegfile;
+    TagLib::FileRef *fileref = new TagLib::FileRef(mpegfile);
+    metadata->setLength(getTrackLength(fileref));
+    // FileRef takes ownership of mpegfile, and is responsible for it's
+    // deletion. Messy.
+    delete fileref;
 
     return metadata;
 }
@@ -415,7 +407,8 @@ AttachedPictureFrame* MetaIOID3::findAPIC(TagLib::ID3v2::Tag *tag,
  * \returns True if successful
  */
 bool MetaIOID3::writeAlbumArt(TagLib::ID3v2::Tag *tag, QByteArray *image,
-                              const AttachedPictureFrame::Type &type)
+                              const AttachedPictureFrame::Type &type,
+                              const QString &mimetype)
 {
     if (!tag || !image)
         return false;
@@ -430,9 +423,10 @@ bool MetaIOID3::writeAlbumArt(TagLib::ID3v2::Tag *tag, QByteArray *image,
     }
 
     TagLib::ByteVector bytevector;
-    bytevector.setData(image->data());
+    bytevector.setData(image->data(), image->size());
     delete image;
 
+    apic->setMimeType(QStringToTString(mimetype));
     apic->setPicture(bytevector);
 
     return true;

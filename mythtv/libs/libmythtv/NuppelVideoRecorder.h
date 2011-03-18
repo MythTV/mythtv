@@ -6,7 +6,7 @@
 
 #include <sys/time.h>
 #include <time.h>
-#include <pthread.h>
+#include <QThread>
 #ifdef MMX
 #undef MMX
 #define MMXBLAH
@@ -35,7 +35,7 @@ using namespace std;
 #include "filter.h"
 #include "minilzo.h"
 
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 struct video_audio;
 struct VBIData;
@@ -47,8 +47,46 @@ class FilterManager;
 class FilterChain;
 class AudioInput;
 
-class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Input
+class NuppelVideoRecorder;
+
+class NVRWriteThread : public QThread
 {
+    Q_OBJECT
+  public:
+    NVRWriteThread() : m_parent(NULL) {}
+    void run(void);
+    void SetParent(NuppelVideoRecorder *parent) { m_parent = parent; }
+  private:
+    NuppelVideoRecorder *m_parent;
+};
+
+class NVRAudioThread : public QThread
+{
+    Q_OBJECT
+  public:
+    NVRAudioThread() : m_parent(NULL) {}
+    void run(void);
+    void SetParent(NuppelVideoRecorder *parent) { m_parent = parent; }
+  private:
+    NuppelVideoRecorder *m_parent;
+};
+
+class NVRVbiThread : public QThread
+{
+    Q_OBJECT
+  public:
+    NVRVbiThread() : m_parent(NULL) {}
+    void run(void);
+    void SetParent(NuppelVideoRecorder *parent) { m_parent = parent; }
+  private:
+    NuppelVideoRecorder *m_parent;
+};
+
+class MTV_PUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Input
+{
+    friend class NVRWriteThread;
+    friend class NVRAudioThread;
+    friend class NVRVbiThread;
  public:
     NuppelVideoRecorder(TVRec *rec, ChannelBase *channel);
    ~NuppelVideoRecorder();
@@ -107,10 +145,6 @@ class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Input
     void SetNewVideoParams(double newaspect);
 
  protected:
-    static void *WriteThread(void *param);
-    static void *AudioThread(void *param);
-    static void *VbiThread(void *param);
-
     void doWriteThread(void);
     void doAudioThread(void);
     void doVbiThread(void);
@@ -126,7 +160,7 @@ class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Input
 
     bool MJPEGInit(void);
  
-    int SpawnChildren(void);
+    bool SpawnChildren(void);
     void KillChildren(void);
     
     void BufferIt(unsigned char *buf, int len = -1, bool forcekey = false);
@@ -210,9 +244,9 @@ class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Input
 
     bool childrenLive;
 
-    pthread_t write_tid;
-    pthread_t audio_tid;
-    pthread_t vbi_tid;
+    NVRWriteThread WriteThread;
+    NVRAudioThread AudioThread;
+    NVRVbiThread   VbiThread;
 
     bool recording;
     bool errored;

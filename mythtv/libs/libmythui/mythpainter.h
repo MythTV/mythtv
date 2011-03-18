@@ -1,6 +1,7 @@
 #ifndef MYTHPAINTER_H_
 #define MYTHPAINTER_H_
 
+#include <QMap>
 #include <QString>
 #include <QWidget>
 #include <QPaintDevice>
@@ -12,18 +13,18 @@ class QPoint;
 class QColor;
 
 //  #include "mythfontproperties.h"
-
 #include "compat.h"
+#include "mythuiexp.h"
 
-#include "mythexp.h"
+#include <list>
 
 class MythFontProperties;
 class MythImage;
 
-class MPUBLIC MythPainter
+class MUI_PUBLIC MythPainter
 {
   public:
-    MythPainter() : m_Parent(0), m_CacheSize(0) { }
+    MythPainter();
     virtual ~MythPainter();
 
     virtual QString GetName(void) = 0;
@@ -48,31 +49,63 @@ class MPUBLIC MythPainter
 
     virtual void DrawText(const QRect &dest, const QString &msg, int flags,
                           const MythFontProperties &font, int alpha,
-                          const QRect &boundRect) = 0;
+                          const QRect &boundRect);
+    virtual void DrawRect(const QRect &area, const QBrush &fillBrush,
+                          const QPen &linePen, int alpha);
+    virtual void DrawRoundRect(const QRect &area, int cornerRadius,
+                               const QBrush &fillBrush, const QPen &linePen,
+                               int alpha);
+    virtual void DrawEllipse(const QRect &area, const QBrush &fillBrush,
+                             const QPen &linePen, int alpha);
 
-    virtual void DrawRect(const QRect &area,
-                          bool drawFill, const QColor &fillColor,
-                          bool drawLine, int lineWidth, const QColor &lineColor) = 0;
-    virtual void DrawRoundRect(const QRect &area, int radius,
-                               bool drawFill, const QColor &fillColor,
-                               bool drawLine, int lineWidth, const QColor &lineColor) = 0;
+    MythImage *GetFormatImage();
+    void DeleteFormatImage(MythImage *im);
 
-    virtual MythImage *GetFormatImage();
+    void SetDebugMode(bool showBorders, bool showNames)
+    {
+        m_showBorders = showBorders;
+        m_showNames = showNames;
+    }
 
-    // make friend so only callable from image
-    virtual void DeleteFormatImage(MythImage *im);
+    bool ShowBorders(void) { return m_showBorders; }
+    bool ShowTypeNames(void) { return m_showNames; }
+
+    void SetMaximumCacheSizes(int hardware, int software);
 
   protected:
-    virtual void DeleteFormatImagePriv(MythImage *im) { (void) im; }
-    void CheckFormatImage(MythImage *im);
-    void IncreaseCacheSize(QSize size);
-    void DecreaseCacheSize(QSize size);
+    void DrawTextPriv(MythImage *im, const QString &msg, int flags,
+                      const QRect &r, const MythFontProperties &font);
+    void DrawRectPriv(MythImage *im, const QRect &area, int radius, int ellipse,
+                      const QBrush &fillBrush, const QPen &linePen);
 
-    QPaintDevice     *m_Parent;
-    int               m_CacheSize;
-    static int        m_MaxCacheSize;
+    MythImage *GetImageFromString(const QString &msg, int flags, const QRect &r,
+                                  const MythFontProperties &font);
+    MythImage *GetImageFromRect(const QRect &area, int radius, int ellipse,
+                                const QBrush &fillBrush,
+                                const QPen &linePen);
+
+    virtual MythImage* GetFormatImagePriv(void) = 0;
+    virtual void DeleteFormatImagePriv(MythImage *im) = 0;
+    void ExpireImages(int max = 0);
+
+    void CheckFormatImage(MythImage *im);
+
+    QPaintDevice *m_Parent;
+    int m_HardwareCacheSize;
+    int m_MaxHardwareCacheSize;
+
+  private:
+    int m_SoftwareCacheSize;
+    int m_MaxSoftwareCacheSize;
+
     QList<MythImage*> m_allocatedImages;
     QMutex            m_allocationLock;
+
+    QMap<QString, MythImage *> m_StringToImageMap;
+    std::list<QString>         m_StringExpireList;
+
+    bool m_showBorders;
+    bool m_showNames;
 };
 
 #endif

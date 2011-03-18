@@ -161,7 +161,7 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
     uint old_row = true_row_count;
     uint old_col = true_column_count;
     // these could be bigger if row/column lock is false, resp.
-    true_row_count    = (row_lock) ? row_count : max(row_count + 1, (uint)2);
+    true_row_count    = row_count; // (row_lock) ? row_count : max(row_count + 1, (uint)2);
     true_column_count = column_count;
 
     if (text && exists && (old_col == true_column_count) &&
@@ -332,6 +332,7 @@ void CC708Window::SetWindowStyle(uint style)
     // It appears that ths is missused by broadcasters (FOX -- Dollhouse)
     fill_opacity   = k708AttrOpacityTransparent;
     /// HACK -- end
+    changed = true;
 }
 
 void CC708Window::AddChar(QChar ch)
@@ -355,6 +356,7 @@ void CC708Window::AddChar(QChar ch)
     if (ch.toAscii() == 0x0D)
     {
         Scroll(pen.row + 1, 0);
+        changed = true;
         return;
     }
 
@@ -363,6 +365,7 @@ void CC708Window::AddChar(QChar ch)
         DecrPenLocation();
         GetCCChar().attr      = pen.attr;
         GetCCChar().character = QChar(' ');
+        changed = true;
         return;
     }
 
@@ -379,6 +382,7 @@ void CC708Window::AddChar(QChar ch)
     int c = pen.column;
     int r = pen.row;
     IncrPenLocation();
+    changed = true;
 
     VERBOSE(VB_VBI, QString("AddChar(%1) at (c %2, r %3) -> (%4,%5)")
             .arg(dbg_char).arg(c).arg(r).arg(pen.column).arg(pen.row));
@@ -406,6 +410,7 @@ void CC708Window::Scroll(int row, int col)
             text[(true_column_count * (true_row_count - 1)) + i] = tmp;
 
         pen.row = true_row_count - 1;
+        changed = true;
     }
     else
     {

@@ -169,10 +169,10 @@ class MPUBLIC MythPopupBox : public MythDialog
     static bool showOkPopup(MythMainWindow *parent,
                             const QString  &title,
                             const QString  &message,
-                            QString         button_msg = QString()) MDEPRECATED;
+                            QString         button_msg = QString());
 
     static bool showOkCancelPopup(MythMainWindow *parent, QString title,
-                                  QString message, bool focusOk) MDEPRECATED;
+                                  QString message, bool focusOk);
 
     static DialogCode Show2ButtonPopup(
         MythMainWindow *parent,
@@ -184,12 +184,10 @@ class MPUBLIC MythPopupBox : public MythDialog
         MythMainWindow *parent,
         const QString &title, const QString &message,
         const QStringList &buttonmsgs,
-        DialogCode default_button) MDEPRECATED;
+        DialogCode default_button);
 
     static bool showGetTextPopup(MythMainWindow *parent, QString title,
-                                 QString message, QString& text) MDEPRECATED;
-    static QString showPasswordPopup(MythMainWindow *parent,
-                                     QString title, QString message) MDEPRECATED;
+                                 QString message, QString& text);
 
   public slots:
     virtual void AcceptItem(int);
@@ -244,7 +242,7 @@ class MPUBLIC MythProgressDialog: public MythDialog
     MythProgressDialog(const QString& message, int totalSteps = 0,
                        bool cancelButton = false,
                        const QObject * target = NULL,
-                       const char * slot = NULL) MDEPRECATED;
+                       const char * slot = NULL);
 
     /* \brief Close the dialog.
 
@@ -308,7 +306,7 @@ class MPUBLIC MythBusyDialog : public MythProgressDialog
     MythBusyDialog(const QString &title,
                    bool cancelButton = false,
                    const QObject * target = NULL,
-                   const char * slot = NULL) MDEPRECATED;
+                   const char * slot = NULL);
 
     /** \brief Setup a timer to 'move' the spinner
 
@@ -352,10 +350,10 @@ class MPUBLIC MythThemedDialog : public MythDialog
                      const QString  &window_name,
                      const QString  &theme_filename = QString(),
                      const char     *name = "MythThemedDialog",
-                     bool            setsize = true) MDEPRECATED;
+                     bool            setsize = true);
     MythThemedDialog(MythMainWindow *parent,
                      const char     *name = "MythThemedDialog",
-                     bool            setsize = true) MDEPRECATED;
+                     bool            setsize = true);
 
     virtual bool loadThemedWindow(QString window_name, QString theme_filename);
     virtual void loadWindow(QDomElement &);
@@ -433,37 +431,6 @@ class MPUBLIC MythThemedDialog : public MythDialog
     QRect redrawRect;
 };
 
-class MPUBLIC MythPasswordDialog: public MythDialog
-{
-  Q_OBJECT
-
-    //
-    //  Very simple class, not themeable
-    //
-
-  public:
-
-    MythPasswordDialog(QString         message,
-                       bool           *success,
-                       QString         target,
-                       MythMainWindow *parent,
-                       const char     *name = "MythPasswordDialog",
-                       bool            setsize = true) MDEPRECATED;
-  public slots:
-
-    void checkPassword(const QString &);
-
-  protected:
-    ~MythPasswordDialog(); // use deleteLater() instead for thread safety
-    void keyPressEvent(QKeyEvent *e);
-
-  private:
-
-    MythLineEdit        *password_editor;
-    QString              target_text;
-    bool                *success_flag;
-};
-
 /*!
  * \deprecated Due for removal, use libmythui's MythUISearchDialog instead
  */
@@ -474,7 +441,7 @@ class MPUBLIC MythSearchDialog: public MythPopupBox
   public:
 
     MythSearchDialog(MythMainWindow *parent,
-                     const char     *name = "MythSearchDialog") MDEPRECATED;
+                     const char     *name = "MythSearchDialog");
 
   public:
     void setCaption(QString text);

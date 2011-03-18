@@ -10,9 +10,6 @@
 #include <vector>
 using namespace std;
 
-// POSIX
-#include <pthread.h>
-
 // Qt
 #include <QReadWriteLock>
 #include <QWaitCondition>
@@ -28,6 +25,7 @@ using namespace std;
 #include <QHash>
 #include <QTime>
 #include <QMap>
+#include <QPointer>
 
 // MythTV
 #include "mythdeque.h"
@@ -161,12 +159,28 @@ class AskProgramInfo
     ProgramInfo *info;
 };
 
-class MPUBLIC TV : public QObject
+class TV;
+
+class TVDDMapThread : public QThread
+{
+    Q_OBJECT
+  public:
+    TVDDMapThread() : m_parent(NULL), m_sourceid(0) {}
+    void run(void);
+    void SetParent(TV *parent)      { m_parent = parent; }
+    void SetSourceId(uint sourceid) { m_sourceid = sourceid; }
+  private:
+    TV   *m_parent;
+    uint  m_sourceid;
+};
+
+class MTV_PUBLIC TV : public QObject
 {
     friend class PlaybackBox;
     friend class GuideGrid;
     friend class TvPlayWindow;
     friend class TVBrowseHelper;
+    friend class TVDDMapThread;
 
     Q_OBJECT
   public:
@@ -187,14 +201,15 @@ class MPUBLIC TV : public QObject
     bool Init(bool createWindow = true);
 
     // User input processing commands
-    void ProcessKeypress(PlayerContext*, QKeyEvent *e);
+    bool ProcessKeypress(PlayerContext*, QKeyEvent *e);
     void ProcessNetworkControlCommand(PlayerContext *, const QString &command);
     void customEvent(QEvent *e);
     bool event(QEvent *e);
     bool HandleTrackAction(PlayerContext*, const QString &action);
 
     // LiveTV commands
-    bool LiveTV(bool showDialogs = true, bool startInGuide = false);
+    bool LiveTV(bool showDialogs = true);
+    bool StartLiveTVInGuide(void) { return db_start_in_guide; }
 
     // Embedding commands for the guidegrid to use in LiveTV
     bool StartEmbedding(PlayerContext*, WId wid, const QRect&);
@@ -331,8 +346,7 @@ class MPUBLIC TV : public QObject
     bool ToggleHandleAction(PlayerContext*,
                             const QStringList &actions, bool isDVD);
     bool FFRewHandleAction(PlayerContext*, const QStringList &actions);
-    bool ActivePostQHandleAction(PlayerContext*,
-                                 const QStringList &actions, bool isDVD);
+    bool ActivePostQHandleAction(PlayerContext*, const QStringList &actions);
     bool HandleJumpToProgramAction(PlayerContext *ctx,
                                    const QStringList   &actions);
 
@@ -591,6 +605,7 @@ class MPUBLIC TV : public QObject
                               int level = 0, const QString selected = "");
     void UpdateLCD(void);
     bool HandleLCDTimerEvent(void);
+    void HandleLCDVolumeTimerEvent(void);
     void ShowLCDChannelInfo(const PlayerContext*);
     void ShowLCDDVDInfo(const PlayerContext*);
 
@@ -693,10 +708,11 @@ class MPUBLIC TV : public QObject
 
     mutable QMutex chanEditMapLock; ///< Lock for chanEditMap and ddMap
     InfoMap   chanEditMap;          ///< Channel Editing initial map
-    DDKeyMap  ddMap;                ///< DataDirect channel map
-    uint      ddMapSourceId;        ///< DataDirect channel map sourceid
-    bool      ddMapLoaderRunning;   ///< Is DataDirect loader thread running
-    pthread_t ddMapLoader;          ///< DataDirect map loader thread
+
+    DDKeyMap      ddMap;                 ///< DataDirect channel map
+    uint          ddMapSourceId;         ///< DataDirect channel map sourceid
+    bool          ddMapLoaderRunning;    ///< DataDirect thread running
+    QPointer<TVDDMapThread> ddMapLoader; ///< DataDirect map loader thread
 
     /// Vector or sleep timer sleep times in seconds,
     /// with the appropriate UI message.
@@ -710,7 +726,6 @@ class MPUBLIC TV : public QObject
     int       idleDialogTimerId; ///< Timer for idle dialog.
 
     /// Queue of unprocessed key presses.
-    MythDeque<QKeyEvent*> keyList;
     MythTimer keyRepeatTimer; ///< Timeout timer for repeat key filtering
 
     // CC/Teletex input state variables
@@ -789,14 +804,6 @@ class MPUBLIC TV : public QObject
     mutable QMutex                 is_tunable_cache_lock;
     QMap< uint,vector<InputInfo> > is_tunable_cache_inputs;
 
-#ifdef PLAY_FROM_RECORDER
-    /// Info requested by PlayFromRecorder
-    QMutex                    recorderPlaybackInfoLock;
-    QWaitCondition            recorderPlaybackInfoWaitCond;
-    QMap<int,int>             recorderPlaybackInfoTimerId;
-    QMap<int,ProgramInfo>     recorderPlaybackInfo;
-#endif // PLAY_FROM_RECORDER
-
     // Channel group stuff
     /// \brief Lock necessary when modifying channel group variables.
     /// These are only modified in UI thread, so no lock is needed
@@ -813,7 +820,7 @@ class MPUBLIC TV : public QObject
     typedef QMap<int,const PlayerContext*> TimerContextConstMap;
     mutable QMutex       timerIdLock;
     volatile int         lcdTimerId;
-    volatile int         keyListTimerId;
+    volatile int         lcdVolumeTimerId;
     volatile int         networkControlTimerId;
     volatile int         jumpMenuTimerId;
     volatile int         pipChangeTimerId;

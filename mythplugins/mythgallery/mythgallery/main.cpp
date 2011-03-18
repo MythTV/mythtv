@@ -59,8 +59,14 @@ static void runGallery(void)
 
 static void handleMedia(MythMediaDevice *dev)
 {
+    if (! gCoreContext->GetNumSetting("GalleryAutoLoad", 0))
+        return;
+
     if (dev && dev->isUsable())
+    {
+        GetMythMainWindow()->JumpTo("Main Menu");
         run(dev);
+    }
 }
 
 static void setupKeys(void)

@@ -152,12 +152,14 @@ void RSSSite::retrieve(void)
     m_data.resize(0);
     m_articleList.clear();
     m_urlReq = QUrl(m_url);
-    m_manager = new QNetworkAccessManager();
+    if (!m_manager)
+    {
+        m_manager = new QNetworkAccessManager();
+        connect(m_manager, SIGNAL(finished(QNetworkReply*)), this,
+                       SLOT(slotCheckRedirect(QNetworkReply*)));
+    }
 
     m_reply = m_manager->get(QNetworkRequest(m_urlReq));
-
-    connect(m_manager, SIGNAL(finished(QNetworkReply*)), this,
-                       SLOT(slotCheckRedirect(QNetworkReply*)));
 }
 
 QUrl RSSSite::redirectUrl(const QUrl& possibleRedirectUrl,

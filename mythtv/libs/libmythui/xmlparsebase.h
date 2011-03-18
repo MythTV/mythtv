@@ -14,7 +14,7 @@ void VERBOSE_XML(
     unsigned int verbose_type,
     const QString &filename, const QDomElement &element, QString msg);
 
-class MPUBLIC XMLParseBase
+class MUI_PUBLIC XMLParseBase
 {
   public:
     static QString getFirstText(QDomElement &element);
@@ -50,6 +50,7 @@ class MPUBLIC XMLParseBase
                                   MythUIType *parent);
 
     static bool LoadBaseTheme(void);
+    static bool LoadBaseTheme(const QString &baseTheme);
 
     static bool CopyWindowFromBase(const QString &windowname,
                                    MythScreenType *win);

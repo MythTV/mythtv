@@ -470,6 +470,11 @@ bool VideoFilterSettings::meta_less_than(const VideoMetadata &lhs,
             ret = lhs.GetID() < rhs.GetID();
             break;
         }
+        case kOrderByDateAddedDescending:
+        {
+            ret = lhs.GetInsertdate() > rhs.GetInsertdate();
+            break;
+        }
         default:
         {
             VERBOSE(VB_IMPORTANT, QString("Error: unknown sort type %1")
@@ -813,6 +818,8 @@ void VideoFilterDialog::fillWidgets()
                            VideoFilterSettings::kOrderByFilename);
     new MythUIButtonListItem(m_orderbyList, QObject::tr("Video ID"),
                            VideoFilterSettings::kOrderByID);
+    new MythUIButtonListItem(m_orderbyList, QObject::tr("Date Added"),
+                           VideoFilterSettings::kOrderByDateAddedDescending);
     m_orderbyList->SetValueByData(m_settings.getOrderby());
 
     // Text Filter

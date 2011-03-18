@@ -1,5 +1,6 @@
 #include <QHash>
 
+#include "bdnav/meta_data.h"
 #include "bluraymetadata.h"
 #include "mythdirs.h"
 
@@ -18,7 +19,7 @@ BlurayMetadata::~BlurayMetadata()
        bd_close(m_bdnav);
 }
 
-void BlurayMetadata::Parse(void)
+bool BlurayMetadata::OpenDisc(void)
 {
     QString keyfile = QString("%1/KEYDB.cfg").arg(GetConfDir());
     QByteArray keyarray = keyfile.toAscii();
@@ -27,12 +28,20 @@ void BlurayMetadata::Parse(void)
     m_bdnav = bd_open(m_path.toLatin1().data(), keyfilepath);
 
     if (!m_bdnav)
-        return;
+        return false;
+
+    return true;
+}
+
+bool BlurayMetadata::ParseDisc(void)
+{
+    if (!m_bdnav && !OpenDisc())
+        return false;
 
     m_metadata = bd_get_meta(m_bdnav);
 
     if (!m_metadata)
-        return;
+        return false;
 
     m_title = QString(m_metadata->di_name);
     m_alttitle = QString(m_metadata->di_alternative);
@@ -55,6 +64,8 @@ void BlurayMetadata::Parse(void)
                                .arg(m_metadata->thumbnails[i].path);
         m_images.append(filepath);
     }
+
+    return true;
 }
 
 void BlurayMetadata::toMap(MetadataMap &metadataMap)

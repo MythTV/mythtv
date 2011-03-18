@@ -708,8 +708,13 @@ void MHEngine::CheckContentRequests()
         if (m_Context->CheckCarouselObject(pContent->m_FileName) &&
             m_Context->GetCarouselData(pContent->m_FileName, text))
         {
-            pContent->m_pRequester->ContentArrived((const unsigned char *)text.data(),
-                                                   text.size(), this);
+            // If the content is not recognized catch the exception and continue
+            try {
+                pContent->m_pRequester->ContentArrived((const unsigned char *)text.data(),
+                                                       text.size(), this);
+            }
+            catch (char const *) {
+            }
             // Remove from the list.
             delete pContent;
             it = m_ExternContentTable.erase(it);

@@ -4,9 +4,9 @@
 #include <QColor>
 #include <QString>
 
-#include "mythexp.h"
+#include "mythuiexp.h"
 
-MPUBLIC QColor createColor(const QString &color);
+MUI_PUBLIC QColor createColor(const QString &color);
 
 #endif
 

@@ -32,9 +32,6 @@ using namespace std;
 #include "mediamonitor-unix.h"
 #endif
 
-QEvent::Type MediaEvent::kEventType =
-    (QEvent::Type) QEvent::registerEventType();
-
 MediaMonitor *MediaMonitor::c_monitor = NULL;
 
 // MonitorThread
@@ -261,7 +258,7 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
     VERBOSE(VB_MEDIA, QString("Unlocking disk %1, then eject()ing").arg(dev));
     device->unlock();
 
-    MediaError err = device->eject();
+    MythMediaError err = device->eject();
 
     if (err == MEDIAERR_UNSUPPORTED)
     {
@@ -290,9 +287,6 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
     // but the user can elect not to actually do monitoring:
     m_StartThread = gCoreContext->GetNumSetting("MonitorDrives");
 
-    // or not send status changed events:
-    m_SendEvent = gCoreContext->GetNumSetting("MediaChangeEvents");
-
     // User can specify that some devices are not monitored
     QString ignore = gCoreContext->GetSetting("IgnoreDevices", "");
 
@@ -302,8 +296,7 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
         m_IgnoreList = QStringList();  // Force empty list
 
     if (m_StartThread)
-        VERBOSE(VB_MEDIA, "Creating MediaMonitor, SendEvents="
-                          + (m_SendEvent?QString("true"):QString("false")));
+        VERBOSE(VB_MEDIA, "Creating MediaMonitor");
     else
 #ifdef USING_DARWIN_DA
         VERBOSE(VB_MEDIA, "MediaMonitor is disabled. Eject will not work");
@@ -417,7 +410,7 @@ void MediaMonitor::StartMonitoring(void)
     if (!m_Thread)
         m_Thread = new MonitorThread(this, m_MonitorPollingInterval);
 
-    qRegisterMetaType<MediaStatus>("MediaStatus");
+    qRegisterMetaType<MythMediaStatus>("MythMediaStatus");
 
     VERBOSE(VB_MEDIA, "Starting MediaMonitor");
     m_Active = true;
@@ -446,7 +439,7 @@ void MediaMonitor::StopMonitoring(void)
  *
  *   NOTE: This function can block.
  *
- *  \sa Unlock(MythMediaDevice *pMedia), GetMedias(MediaType mediatype)
+ *  \sa Unlock(MythMediaDevice *pMedia), GetMedias(MythMediaType mediatype)
  */
 bool MediaMonitor::ValidateAndLock(MythMediaDevice *pMedia)
 {
@@ -463,7 +456,7 @@ bool MediaMonitor::ValidateAndLock(MythMediaDevice *pMedia)
 /** \fn MediaMonitor::Unlock(MythMediaDevice *pMedia)
  *  \brief decrements the MythMediaDevices reference count
  *
- *  \sa ValidateAndLock(MythMediaDevice *pMedia), GetMedias(MediaType mediatype)
+ *  \sa ValidateAndLock(MythMediaDevice *pMedia), GetMedias(MythMediaType mediatype)
  */
 void MediaMonitor::Unlock(MythMediaDevice *pMedia)
 {
@@ -525,12 +518,23 @@ QString MediaMonitor::GetMountPath(const QString& devPath)
             mountPath = pMedia->getMountPath();
             c_monitor->Unlock(pMedia);
         }
+        // The media monitor could be inactive.
+        // Create a fake media device just to lookup mount map:
+        else
+        {
+            pMedia = MythCDROM::get(NULL, devPath.toAscii(), true, false);
+            if (pMedia && pMedia->findMountPath())
+                mountPath = pMedia->getMountPath();
+            else
+                VERBOSE(VB_MEDIA, "MediaMonitor::GetMountPath() - failed");
+            // need some way to delete the media device.
+        }
     }
 
     return mountPath;
 }
 
-/** \fn MediaMonitor::GetMedias(MediaType mediatype)
+/** \fn MediaMonitor::GetMedias(MythMediaType mediatype)
  *  \brief Ask for available media. Must be locked with ValidateAndLock().
  *
  *   This method returns a list of MythMediaDevice pointers which match
@@ -548,7 +552,7 @@ QString MediaMonitor::GetMountPath(const QString& devPath)
  *  \sa ValidateAndLock(MythMediaDevice *pMedia)
  *  \sa Unlock(MythMediaDevice *pMedia)
  */
-QList<MythMediaDevice*> MediaMonitor::GetMedias(MediaType mediatype)
+QList<MythMediaDevice*> MediaMonitor::GetMedias(MythMediaType mediatype)
 {
     QMutexLocker locker(&m_DevicesLock);
 
@@ -597,7 +601,7 @@ void MediaMonitor::RegisterMediaHandler(const QString  &destination,
     if (m_handlerMap.count(destination) == 0)
     {
         MHData  mhd = { callback, mediaType, destination, description };
-        QString msg = MythMediaDevice::MediaTypeString((MediaType)mediaType);
+        QString msg = MythMediaDevice::MediaTypeString((MythMediaType)mediaType);
 
         if (extensions.length())
             msg += QString(", ext(%1)").arg(extensions);
@@ -631,7 +635,7 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
 
     while (itr != m_handlerMap.end())
     {
-        if (((*itr).MediaType & (int)pMedia->getMediaType()))
+        if (((*itr).MythMediaType & (int)pMedia->getMediaType()))
         {
             VERBOSE(VB_IMPORTANT, "Found a handler - '" + itr.key() + "'");
             handlers.append(*itr);
@@ -650,20 +654,21 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
     // if user didn't cancel, selected = handlers.at(choice);
     int selected = 0;
 
-
-    GetMythMainWindow()->JumpTo("Main Menu");
     handlers.at(selected).callback(pMedia);
 }
 
-// Signal handler.
-void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
+/**
+ * \brief Slot which is called when the device status changes and posts a
+ *        media event to the mainwindow
+ */
+void MediaMonitor::mediaStatusChanged(MythMediaStatus oldStatus,
                                       MythMediaDevice* pMedia)
 {
     // If we're not active then ignore signal.
     if (!m_Active)
         return;
 
-    MediaStatus  stat = pMedia->getStatus();
+    MythMediaStatus  stat = pMedia->getStatus();
     QString      msg  = QString(" (%1, %2 -> %3)")
                         .arg(pMedia->MediaTypeString())
                         .arg(MythMediaDevice::MediaStatusStrings[oldStatus])
@@ -672,10 +677,10 @@ void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
     // This gets called from outside the main thread so we need
     // to post an event back to the main thread.
     // We now send events for all non-error statuses, so plugins get ejects
-    if (m_SendEvent && stat != MEDIASTAT_ERROR && stat != MEDIASTAT_UNKNOWN)
+    if (stat != MEDIASTAT_ERROR && stat != MEDIASTAT_UNKNOWN)
     {
         // Should we ValidateAndLock() first?
-        QEvent *e = new MediaEvent(stat, pMedia);
+        QEvent *e = new MythMediaEvent(stat, pMedia);
 
         VERBOSE(VB_MEDIA, "Posting MediaEvent" + msg);
 
@@ -727,9 +732,9 @@ bool MediaMonitor::shouldIgnore(const MythMediaDevice* device)
  */
 bool MediaMonitor::eventFilter(QObject *obj, QEvent *event)
 {
-    if (event->type() == MediaEvent::kEventType)
+    if (event->type() == MythMediaEvent::kEventType)
     {
-        MythMediaDevice *pDev = ((MediaEvent*)event)->getDevice();
+        MythMediaDevice *pDev = ((MythMediaEvent*)event)->getDevice();
 
         if (!pDev)
         {
@@ -748,13 +753,13 @@ bool MediaMonitor::eventFilter(QObject *obj, QEvent *event)
             QMap<QString, MHData>::Iterator itr = m_handlerMap.begin();
             while (itr != m_handlerMap.end())
             {
-                if ((*itr).MediaType & (int)pDev->getMediaType())
+                if ((*itr).MythMediaType & (int)pDev->getMediaType())
                     (*itr).callback(pDev);
                 itr++;
             }
         }
 
-        return true;  // We ate the event
+        return false;  // Don't eat the event
     }
 
     // standard event processing
@@ -888,4 +893,28 @@ const QString MediaMonitor::listDevices(void)
     }
 
     return list.join(", ");
+}
+
+/**
+ * \brief Eject a disk, unmount a drive, open a tray
+ *
+ * If the Media Monitor is enabled, we use its fully-featured routine.
+ * Otherwise, we guess a drive and use a primitive OS-specific command
+ */
+void MediaMonitor::ejectOpticalDisc()
+{
+    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
+    if (mon)
+        mon->ChooseAndEjectMedia();
+    else
+    {
+        VERBOSE(VB_MEDIA, "CD/DVD Monitor isn't enabled.");
+#ifdef __linux__
+        VERBOSE(VB_MEDIA, "Trying Linux 'eject -T' command");
+        myth_system("eject -T");
+#elif CONFIG_DARWIN
+        VERBOSE(VB_MEDIA, "Trying 'disktool -e disk1");
+        myth_system("disktool -e disk1");
+#endif
+    }
 }

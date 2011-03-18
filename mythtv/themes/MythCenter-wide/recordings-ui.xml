@@ -68,6 +68,7 @@
             <spacing>4</spacing>
             <scrollstyle>center</scrollstyle>
             <wrapstyle>items</wrapstyle>
+            <searchposition>-1,390</searchposition>
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="name">
@@ -91,6 +92,7 @@
             <buttonarea>0,36,880,270</buttonarea>
             <wrapstyle>captive</wrapstyle>
             <spacing>0</spacing>
+            <searchposition>-1,390</searchposition>
             <statetype name="buttonitem">
                 <state name="active">
                 <area>0,0,100%,30</area>
@@ -389,6 +391,7 @@
             <spacing>4</spacing>
             <scrollstyle>center</scrollstyle>
             <wrapstyle>items</wrapstyle>
+            <searchposition>-1,390</searchposition>
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="name">
@@ -412,6 +415,7 @@
             <buttonarea>0,36,880,270</buttonarea>
             <wrapstyle>captive</wrapstyle>
             <spacing>0</spacing>
+            <searchposition>-1,390</searchposition>
             <statetype name="buttonitem">
                 <state name="active">
                 <area>0,0,100%,30</area>
@@ -818,32 +822,41 @@
         </imagetype>
 
         <textarea name="label" from="basetextarea">
-            <area>12,14,470,160</area>
+            <area>12,15,470,60</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
             <value>Edit Recording Metadata</value>
         </textarea>
 
         <textarea name="titlelabel" from="basetextarea">
-            <area>58,180,300,30</area>
+            <area>58,80,300,30</area>
             <value>Title:</value>
         </textarea>
 
         <textedit name="title" from="basetextedit">
-            <position>58,210</position>
+            <position>58,110</position>
         </textedit>
 
         <textarea name="subtitlelabel" from="basetextarea">
-            <area>58,310,300,30</area>
+            <area>58,170,300,30</area>
             <value>Subtitle:</value>
         </textarea>
 
         <textedit name="subtitle" from="basetextedit">
-            <position>58,340</position>
+            <position>58,200</position>
+        </textedit>
+
+        <textarea name="descriptionlabel" from="basetextarea">
+            <area>58,260,300,30</area>
+            <value>Description:</value>
+        </textarea>
+
+        <textedit name="description" from="basemultilinetextedit">
+            <position>58,290</position>
         </textedit>
 
         <button name="ok" from="basebutton">
-            <position>174,434</position>
+            <position>175,434</position>
             <value>OK</value>
         </button>
     </window>

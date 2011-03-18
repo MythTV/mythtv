@@ -37,7 +37,9 @@ SchemaUpgradeWizard::SchemaUpgradeWizard(const QString &DBSchemaSetting,
     switch (gCoreContext->GetNumSetting("DBSchemaAutoUpgrade"))
     {
         case  1: m_autoUpgrade = true; break;
+#if ENABLE_SCHEMA_DEVELOPER_MODE
         case -1: m_expertMode  = true; break;
+#endif
         default: break;
     }
 }
@@ -198,7 +200,8 @@ MythSchemaUpgrade SchemaUpgradeWizard::GuiPrompt(const QString &message,
     if (upgradable)
         dlg->AddButton(tr("Upgrade"));
     if (expert)
-        dlg->AddButton(tr("Use current schema"));
+        // Not translated. This string can't appear in released builds.
+        dlg->AddButton("Use current schema");
 
     DialogCode selected = dlg->exec();
     dlg->deleteLater();
@@ -362,9 +365,9 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
             message = tr("Warning: MythTV wants to upgrade your database,")
                       + "\n" + tr("for the %1 schema, from %2 to %3.");
             if (m_expertMode)
-                message += "\n\n" +
-                           tr("You can try using the old schema,"
-                              " but that may cause problems.");
+                // Not translated. This string can't appear in released builds.
+                message += "\n\nYou can try using the old schema,"
+                           " but that may cause problems.";
         }
     }
     else if (!validDBMS)
@@ -383,8 +386,9 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
     else   // This client is too old
     {
         if (m_expertMode)
-            message = tr("Warning: MythTV database has newer"
-                         " %1 schema (%2) than expected (%3).");
+            // Not translated. This string can't appear in released builds.
+            message = "Warning: MythTV database has newer"
+                      " %1 schema (%2) than expected (%3).";
         else
         {
             message = tr("Error: MythTV database has newer"

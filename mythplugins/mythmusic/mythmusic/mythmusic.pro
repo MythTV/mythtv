@@ -83,6 +83,8 @@ mingw {
     LIBS += -lwsock32
 }
 
+DEFINES += MPLUGIN_API
+
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
     QMAKE_CXXFLAGS_SHLIB += -fvisibility=hidden

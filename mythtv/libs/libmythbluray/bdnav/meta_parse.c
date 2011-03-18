@@ -178,25 +178,29 @@ META_ROOT *meta_parse(const char *device_path)
 
 META_DL *meta_get(META_ROOT *meta_root, const char *language_code)
 {
+    unsigned i;
+
     if (meta_root == NULL || meta_root->dl_count == 0) {
         DEBUG(DBG_DIR, "meta_get not possible, no info available!\n");
         return NULL;
     }
 
     if (language_code) {
-        uint8_t i;
         for (i = 0; i < meta_root->dl_count; i++) {
             if (strcasecmp(language_code, meta_root->dl_entries[i].language_code) == 0) {
                 return &meta_root->dl_entries[i];
             }
         }
-        for (i = 0; i < meta_root->dl_count; i++) {
-            if (strcasecmp(DEFAULT_LANGUAGE, meta_root->dl_entries[i].language_code) == 0) {
-                DEBUG(DBG_DIR, "requested disclib language '%s' not found, using default '"DEFAULT_LANGUAGE"'\n", language_code);
-                return &meta_root->dl_entries[i];
-            }
+        DEBUG(DBG_DIR, "requested disclib language '%s' not found\n", language_code);
+    }
+
+    for (i = 0; i < meta_root->dl_count; i++) {
+        if (strcasecmp(DEFAULT_LANGUAGE, meta_root->dl_entries[i].language_code) == 0) {
+            DEBUG(DBG_DIR, "using default disclib language '"DEFAULT_LANGUAGE"'\n");
+            return &meta_root->dl_entries[i];
         }
     }
+
     DEBUG(DBG_DIR, "requested disclib language '%s' or default '"DEFAULT_LANGUAGE"' not found, using '%s' instead\n", language_code, meta_root->dl_entries[0].language_code);
     return &meta_root->dl_entries[0];
 }

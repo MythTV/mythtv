@@ -102,7 +102,7 @@ void BackendConnectionManager::customEvent(QEvent *event)
                 {
                     delete error;
                     delete popupStack;
-                    qApp->exit(FRONTEND_EXIT_INVALID_TIMEZONE);
+                    qApp->exit(GENERIC_EXIT_INVALID_TIMEZONE);
                 }
             }
             m_first_time = false;

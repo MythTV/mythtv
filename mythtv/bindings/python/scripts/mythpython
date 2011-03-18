@@ -25,7 +25,6 @@ if __name__ == '__main__':
         print '  protocol versions'
         print_version('backend', static.PROTO_VERSION)
         print_version('schema', static.SCHEMA_VERSION)
-        print_version('video schema', static.MVSCHEMA_VERSION)
         print_version('music schema', static.MUSICSCHEMA_VERSION)
         print_version('netvision schema', static.NVSCHEMA_VERSION)
         sys.exit(0)

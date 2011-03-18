@@ -17,10 +17,12 @@
 #include "mythuistatetype.h"
 
 // libmythtv
+#include "bdringbuffer.h"
 #include "channelutil.h"
 #include "teletextscreen.h"
 #include "subtitlescreen.h"
 #include "interactivescreen.h"
+#include "bdoverlayscreen.h"
 #include "osd.h"
 
 #define LOC     QString("OSD: ")
@@ -267,6 +269,7 @@ bool OSD::IsVisible(void)
         if (child->IsVisible() &&
             child->objectName() != OSD_WIN_SUBTITLE &&
             child->objectName() != OSD_WIN_TELETEXT &&
+            child->objectName() != OSD_WIN_BDOVERLAY &&
             child->objectName() != OSD_WIN_INTERACT)
             return true;
 
@@ -281,6 +284,7 @@ void OSD::HideAll(bool keepsubs, MythScreenType* except)
         it.next();
         if (!((keepsubs && (it.key() == OSD_WIN_SUBTITLE ||
             it.key() == OSD_WIN_TELETEXT)) ||
+            (it.key() == OSD_WIN_BDOVERLAY) ||
             it.value() == except))
             HideWindow(it.key());
     }
@@ -788,6 +792,11 @@ MythScreenType *OSD::GetWindow(const QString &window)
         InteractiveScreen *screen = new InteractiveScreen(m_parent, window);
         new_window = (MythScreenType*) screen;
     }
+    else if (window == OSD_WIN_BDOVERLAY)
+    {
+        BDOverlayScreen *screen = new BDOverlayScreen(m_parent, window);
+        new_window = (MythScreenType*) screen;
+    }
     else
     {
         MythOSDWindow *screen = new MythOSDWindow(NULL, window, false);
@@ -1042,39 +1051,9 @@ bool OSD::TeletextAction(const QString &action)
         return false;
 
     TeletextScreen* tt = (TeletextScreen*)m_Children.value(OSD_WIN_TELETEXT);
-    if (!tt)
-        return false;
-
-    if (action == "NEXTPAGE")
-        tt->KeyPress(TTKey::kNextPage);
-    else if (action == "PREVPAGE")
-        tt->KeyPress(TTKey::kPrevPage);
-    else if (action == "NEXTSUBPAGE")
-        tt->KeyPress(TTKey::kNextSubPage);
-    else if (action == "PREVSUBPAGE")
-        tt->KeyPress(TTKey::kPrevSubPage);
-    else if (action == "TOGGLEBACKGROUND")
-        tt->KeyPress(TTKey::kTransparent);
-    else if (action == "MENURED")
-        tt->KeyPress(TTKey::kFlofRed);
-    else if (action == "MENUGREEN")
-        tt->KeyPress(TTKey::kFlofGreen);
-    else if (action == "MENUYELLOW")
-        tt->KeyPress(TTKey::kFlofYellow);
-    else if (action == "MENUBLUE")
-        tt->KeyPress(TTKey::kFlofBlue);
-    else if (action == "MENUWHITE")
-        tt->KeyPress(TTKey::kFlofWhite);
-    else if (action == "REVEAL")
-        tt->KeyPress(TTKey::kRevealHidden);
-    else if (action == "0" || action == "1" || action == "2" ||
-             action == "3" || action == "4" || action == "5" ||
-             action == "6" || action == "7" || action == "8" ||
-             action == "9")
-        tt->KeyPress(action.toInt());
-    else
-        return false;
-    return true;
+    if (tt)
+        return tt->KeyPress(action);
+    return false;
 }
 
 void OSD::TeletextReset(void)
@@ -1140,10 +1119,23 @@ void OSD::ClearSubtitles(void)
 
 void OSD::DisplayDVDButton(AVSubtitle* dvdButton, QRect &pos)
 {
+    if (!dvdButton)
+        return;
+
     SubtitleScreen* sub = InitSubtitles();
-    if (sub && dvdButton)
+    if (sub)
     {
         EnableSubtitles(kDisplayDVDButton);
         sub->DisplayDVDButton(dvdButton, pos);
     }
+}
+
+void OSD::DisplayBDOverlay(BDOverlay* overlay)
+{
+    if (!overlay)
+        return;
+
+    BDOverlayScreen* bd = (BDOverlayScreen*)GetWindow(OSD_WIN_BDOVERLAY);
+    if (bd)
+        bd->DisplayBDOverlay(overlay);
 }

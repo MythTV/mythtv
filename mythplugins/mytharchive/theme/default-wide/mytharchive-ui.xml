@@ -137,6 +137,7 @@ Common MythArchive window definitions
 
         <buttonlist name="recordinglist" from="basebuttonlist">
             <area>60,130,1145,205</area>
+            <searchposition>-1,370</searchposition>
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="buttontext">
@@ -323,6 +324,7 @@ Common MythArchive window definitions
 
         <buttonlist name="videolist" from="basebuttonlist">
             <area>70,130,1130,235</area>
+            <searchposition>-1,390</searchposition>
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="buttontext">

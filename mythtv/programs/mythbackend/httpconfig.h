@@ -17,10 +17,10 @@ class HttpConfig : public HttpServerExtension
     bool ProcessRequest(HttpWorkerThread *pThread, HTTPRequest *pRequest);
 
   private:
-    static void PrintHeader(QTextStream&, const QString &form);
-    static void PrintFooter(QTextStream&);
+    static void PrintHeader(QBuffer&, const QString &form);
+    static void PrintFooter(QBuffer&);
     static bool LoadSettings(MythSettingList&, const QString &hostname);
-    static void PrintSettings(QTextStream&, const MythSettingList&);
+    static void PrintSettings(QBuffer&, const MythSettingList&);
 
     MythSettingList database_settings;
     MythSettingList general_settings;

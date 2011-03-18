@@ -60,9 +60,7 @@ using namespace std;
 
 DVBCam::DVBCam(const QString &aDevice)
     : device(aDevice),        numslots(0),
-      ciHandler(NULL),
-      exitCiThread(false),    ciThreadRunning(false),
-      ciHandlerThread(pthread_t()),
+      ciHandler(NULL),        exitCiThread(false),
       have_pmt(false),        pmt_sent(false),
       pmt_updated(false),     pmt_added(false)
 {
@@ -103,13 +101,14 @@ bool DVBCam::Start()
         return false;
     }
 
-    if (pthread_create(&ciHandlerThread, NULL, CiHandlerThreadHelper, this))
+    ciHandlerThread.SetParent(this);
+    ciHandlerThread.start();
+
+    if (!ciHandlerThread.isRunning())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create CI handler thread");
         return false;
     }
-
-    ciThreadRunning = true;
 
     VERBOSE(VB_DVBCAM, LOC + "CI handler successfully initialized!");
 
@@ -118,10 +117,10 @@ bool DVBCam::Start()
 
 bool DVBCam::Stop()
 {
-    if (ciThreadRunning)
+    if (ciHandlerThread.isRunning())
     {
         exitCiThread = true;
-        pthread_join(ciHandlerThread, NULL);
+        ciHandlerThread.wait();
     }
 
     if (ciHandler)
@@ -144,10 +143,12 @@ bool DVBCam::Stop()
     return true;
 }
 
-void *DVBCam::CiHandlerThreadHelper(void *dvbcam)
+void CiHandlerThread::run(void)
 {
-    ((DVBCam*)dvbcam)->CiHandlerLoop();
-    return NULL;
+    if (!m_parent)
+        return;
+
+    m_parent->CiHandlerLoop();
 }
 
 void DVBCam::HandleUserIO(void)
@@ -272,7 +273,6 @@ void DVBCam::CiHandlerLoop()
         usleep(10 * 1000);
     }
 
-    ciThreadRunning = false;
     VERBOSE(VB_DVBCAM, LOC + "CiHandler thread stopped");
 }
 
@@ -311,7 +311,8 @@ void DVBCam::SetPMT(const ChannelBase *chan, const ProgramMapTable *pmt)
 
 void DVBCam::SetTimeOffset(double offset_in_seconds)
 {
-    ciHandler->SetTimeOffset(offset_in_seconds);
+    if (ciHandler)
+        ciHandler->SetTimeOffset(offset_in_seconds);
 }
 
 static const char *cplm_info[] =

@@ -1,14 +1,21 @@
 void strings_null() {
     ThemeUI::tr("Games");
+    ThemeUI::tr("Play Games");
+    ThemeUI::tr("System:");
+    ThemeUI::tr("Year:");
+    ThemeUI::tr("Genre:");
+    ThemeUI::tr("Favorite:");
+    ThemeUI::tr("Yes");
+    ThemeUI::tr("No");
+    ThemeUI::tr("Emulator:");
+    ThemeUI::tr("Done");
+    ThemeUI::tr("Play");
     ThemeUI::tr("Released %1");
     ThemeUI::tr("%DATE%, %TIME%");
     ThemeUI::tr("Cancel");
-    ThemeUI::tr("Play");
     ThemeUI::tr("Edit Metadata");
     ThemeUI::tr("Modify your game's metadata.");
     ThemeUI::tr("Title:");
-    ThemeUI::tr("Genre:");
-    ThemeUI::tr("Year:");
     ThemeUI::tr("Country:");
     ThemeUI::tr("Publisher:");
     ThemeUI::tr("Plot:");
@@ -19,12 +26,6 @@ void strings_null() {
     ThemeUI::tr("Click here to search existing coverart...");
     ThemeUI::tr("Click here to search existing screenshots...");
     ThemeUI::tr("Click here to search existing fanart...");
-    ThemeUI::tr("Done");
-    ThemeUI::tr("Play Games");
-    ThemeUI::tr("System:");
-    ThemeUI::tr("Favorite:");
-    ThemeUI::tr("No");
-    ThemeUI::tr("Yes");
     ThemeUI::tr("ROM Name:");
     ThemeUI::tr("ROM Path:");
     ThemeUI::tr("/path/to/the/thing.jpg");
@@ -32,7 +33,7 @@ void strings_null() {
     ThemeUI::tr("Game:");
     ThemeUI::tr("Type:");
     ThemeUI::tr("Filename:");
-    ThemeUI::tr("Rompath:");
+    ThemeUI::tr("ROM path:");
     ThemeUI::tr("System(s):");
     ThemeUI::tr("CRC:");
     ThemeUI::tr("Edit Game Information");

@@ -39,9 +39,9 @@
 
     <button>
         <type>MENU_UTILITIES_SETUP</type>
-        <text>Utilities / Setup</text>
+        <text>Setup</text>
         <description>Configure MythTV and plugins</description>
-        <action>MENU util_menu.xml</action>
+        <action>MENU main_settings.xml</action>
     </button>
 
 </mythmenu>

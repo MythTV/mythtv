@@ -15,13 +15,13 @@ using namespace std;
 
 // MythTV headers
 #include "settings.h"
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 class InputInfo;
 class CardInput;
 typedef QMap<int,QString> InputNames;
 
-MPUBLIC QString get_on_cardid(const QString&, uint);
+MTV_PUBLIC QString get_on_cardid(const QString&, uint);
 
 bool set_on_source(const QString&, uint, uint, const QString);
 
@@ -38,7 +38,7 @@ typedef enum
 /** \class CardUtil
  *  \brief Collection of helper utilities for capture card DB use
  */
-class MPUBLIC CardUtil
+class MTV_PUBLIC CardUtil
 {
   public:
     /// \brief all the different capture cards

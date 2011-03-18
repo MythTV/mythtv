@@ -287,6 +287,7 @@ QString XMLParseBase::parseText(QDomElement &element)
 }
 
 static MythUIType *globalObjectStore = NULL;
+static QStringList loadedBaseFiles;
 
 MythUIType *XMLParseBase::GetGlobalObjectStore(void)
 {
@@ -300,6 +301,9 @@ void XMLParseBase::ClearGlobalObjectStore(void)
     delete globalObjectStore;
     globalObjectStore = NULL;
     GetGlobalObjectStore();
+
+    // clear any loaded base xml files which will force a reload the next time they are used
+    loadedBaseFiles.clear();
 }
 
 void XMLParseBase::ParseChildren(const QString &filename,
@@ -679,6 +683,14 @@ bool XMLParseBase::doLoad(const QString &windowname,
         QDomElement e = n.toElement();
         if (!e.isNull())
         {
+            if (e.tagName() == "include")
+            {
+                QString include = getFirstText(e);
+
+                if (!include.isEmpty())
+                    LoadBaseTheme(include);
+            }
+
             if (onlywindows && e.tagName() == "window")
             {
                 QString name = e.attribute("name", "");
@@ -777,6 +789,51 @@ bool XMLParseBase::LoadBaseTheme(void)
                     QString("No theme file '%1'").arg(themefile));
         }
     }
+
+    return ok;
+}
+
+bool XMLParseBase::LoadBaseTheme(const QString &baseTheme)
+{
+    VERBOSE(VB_GUI, LOC +
+            QString("Asked to load base file from '%1'").arg(baseTheme));
+
+    if (loadedBaseFiles.contains(baseTheme))
+    {
+        VERBOSE(VB_GUI, LOC +
+                QString("Base file already loaded '%1'").arg(baseTheme));
+        return true;
+    }
+
+    bool ok = false;
+    bool loadOnlyWindows = false;
+    bool showWarnings = true;
+
+    const QStringList searchpath = GetMythUI()->GetThemeSearchPath();
+
+    QStringList::const_iterator it = searchpath.begin();
+    for (; it != searchpath.end(); ++it)
+    {
+        QString themefile = *it + baseTheme;
+        if (doLoad(QString(), GetGlobalObjectStore(), themefile,
+                   loadOnlyWindows, showWarnings))
+        {
+            VERBOSE(VB_GUI, LOC +
+                    QString("Loaded base theme from '%1'").arg(themefile));
+            // Don't complain about duplicate definitions after first
+            // successful load (set showWarnings to false).
+            showWarnings = false;
+            ok = true;
+        }
+        else
+        {
+            VERBOSE(VB_GUI|VB_FILE, LOC_WARN +
+                    QString("No theme file '%1'").arg(themefile));
+        }
+    }
+
+    if (ok)
+        loadedBaseFiles.append(baseTheme);
 
     return ok;
 }

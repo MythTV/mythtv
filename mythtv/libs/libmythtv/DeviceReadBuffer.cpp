@@ -1,6 +1,7 @@
 #include <algorithm>
 using namespace std;
 
+#include <QThread>
 #include "DeviceReadBuffer.h"
 #include "mythcorecontext.h"
 #include "tspacket.h"
@@ -109,10 +110,13 @@ void DeviceReadBuffer::Start(void)
         return;
     }
 
-    if (pthread_create(&thread, NULL, boot_ringbuffer, this) != 0)
+    thread.SetBuffer(this);
+    thread.start();
+
+    if (!thread.isRunning())
     {
         VERBOSE(VB_IMPORTANT,
-                LOC_ERR + QString("Start(): pthread_create failed.") + ENO);
+                LOC_ERR + QString("Start(): thread.run() failed.") + ENO);
 
         QMutexLocker locker(&lock);
         error = true;
@@ -148,7 +152,7 @@ void DeviceReadBuffer::Stop(void)
         run = false;
     }
 
-    pthread_join(thread, NULL);
+    thread.wait();
 }
 
 void DeviceReadBuffer::SetRequestPause(bool req)
@@ -243,10 +247,12 @@ void DeviceReadBuffer::IncrReadPointer(uint len)
     readPtr  = (readPtr == endPtr) ? buffer : readPtr;
 }
 
-void *DeviceReadBuffer::boot_ringbuffer(void *arg)
+void DRBThread::run(void)
 {
-    ((DeviceReadBuffer*) arg)->fill_ringbuffer();
-    return NULL;
+    if (!m_buffer)
+        return;
+
+    m_buffer->fill_ringbuffer();
 }
 
 void DeviceReadBuffer::fill_ringbuffer(void)
@@ -329,7 +335,11 @@ bool DeviceReadBuffer::HandlePausing(void)
 bool DeviceReadBuffer::Poll(void) const
 {
 #ifdef USING_MINGW
-#warning mingw DeviceReadBuffer::Poll
+# ifdef _MSC_VER
+#  pragma message( "mingw DeviceReadBuffer::Poll" )
+# else
+#  warning mingw DeviceReadBuffer::Poll
+# endif
     VERBOSE(VB_IMPORTANT, LOC_ERR +
             "mingw DeviceReadBuffer::Poll is not implemented");
     return false;
@@ -390,7 +400,11 @@ bool DeviceReadBuffer::Poll(void) const
 bool DeviceReadBuffer::CheckForErrors(ssize_t len, uint &errcnt)
 {
 #ifdef USING_MINGW
-#warning mingw DeviceReadBuffer::CheckForErrors
+# ifdef _MSC_VER
+#  pragma message( "mingw DeviceReadBuffer::CheckForErrors" )
+# else
+#  warning mingw DeviceReadBuffer::CheckForErrors
+# endif
     VERBOSE(VB_IMPORTANT, LOC_ERR +
             "mingw DeviceReadBuffer::CheckForErrors is not implemented");
     return false;
@@ -554,3 +568,7 @@ void DeviceReadBuffer::ReportStats(void)
     }
 #endif
 }
+
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */

@@ -1,6 +1,3 @@
-// POSIX
-#include <pthread.h>
-
 // C
 #include <cstdlib>
 
@@ -27,6 +24,9 @@ extern "C"
 #include <QMap>
 #include <QStringList>
 #include <QDateTime>
+#include <QThread>
+#include <QMutex>
+#include <QWaitCondition>
 
 #include <Q3PtrList>
 #include <Q3PtrQueue>
@@ -112,9 +112,23 @@ class PTSOffsetQueue
     int vid_id;
 };
 
+class MPEG2replex;
+
+class MPEG2ReplexThread : public QThread
+{
+    Q_OBJECT
+  public:
+    MPEG2ReplexThread() : m_parent(NULL) {}
+    void SetParent(MPEG2replex *parent) { m_parent = parent; }
+    void run(void);
+  private:
+    MPEG2replex *m_parent;
+};
+
 //container for all multiplex related variables
 class MPEG2replex
 {
+    friend class MPEG2ReplexThread;
   public:
     MPEG2replex();
     ~MPEG2replex();
@@ -131,8 +145,10 @@ class MPEG2replex
     int exttype[N_AUDIO];
     int exttypcnt[N_AUDIO];
 
-    pthread_mutex_t mutex;
-    pthread_cond_t cond;
+    QMutex mutex;
+    QWaitCondition cond;
+    MPEG2ReplexThread thread;
+
     audio_frame_t extframe[N_AUDIO];
     sequence_t seq_head;
 
@@ -172,7 +188,7 @@ class MPEG2fixup
     int AddFrame(MPEG2frame *f);
     int InitAV(const char *inputfile, const char *type, int64_t offset);
     void ScanAudio();
-    bool ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec);
+    int ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec);
     void WriteFrame(const char *filename, MPEG2frame *f);
     void WriteFrame(const char *filename, AVPacket *pkt);
     void WriteYUV(const char *filename, const mpeg2_info_t *info);
@@ -242,8 +258,6 @@ class MPEG2fixup
     frm_dir_map_t delMap;
     frm_dir_map_t saveMap;
 
-    pthread_t thread;
-
     AVFormatContext *inputFC;
     int vid_id;
     int ext_count;
@@ -286,11 +300,14 @@ class MPEG2fixup
             cout << args << endl; \
         } \
     } while (0)
-    #define TRANSCODE_EXIT_OK                         0
-    #define TRANSCODE_EXIT_UNKNOWN_ERROR              -10
-    #define TRANSCODE_BUGGY_EXIT_WRITE_FRAME_ERROR    -11
-    #define TRANSCODE_BUGGY_EXIT_DEADLOCK             -12
+
+    // Be sure to keep these the same as in libmythbase/exitcodes.h or expect
+    // odd behavior eventually
+    #define GENERIC_EXIT_OK                     0
+    #define GENERIC_EXIT_NOT_OK               128
+    #define GENERIC_EXIT_WRITE_FRAME_ERROR    149
+    #define GENERIC_EXIT_DEADLOCK             150
 #else
-   #include "mythcontext.h"
    #include "exitcodes.h"
+   #include "mythcontext.h"
 #endif

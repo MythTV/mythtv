@@ -40,15 +40,12 @@ class AudioOutputNULL : public AudioOutputBase
     virtual void CloseDevice(void);
     virtual void WriteAudio(unsigned char *aubuf, int size);
     virtual int  GetBufferedOnSoundcard(void) const;
+    virtual AudioOutputSettings* GetOutputSettings(bool digital);
 
   private:
     QMutex        pcm_output_buffer_mutex;
     unsigned char pcm_output_buffer[NULLAUDIO_OUTPUT_BUFFER_SIZE];
     int           current_buffer_size;
-
-    int           locked_channels;
-    AudioFormat   locked_format;
-    int           locked_samplerate;
 };
 
 #endif

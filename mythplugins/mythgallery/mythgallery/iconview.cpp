@@ -350,8 +350,8 @@ void IconView::SetupMediaMonitor(void)
         if (mounted)
         {
             connect(m_currDevice,
-                SIGNAL(statusChanged(MediaStatus, MythMediaDevice*)),
-                SLOT(mediaStatusChanged(MediaStatus, MythMediaDevice*)));
+                SIGNAL(statusChanged(MythMediaStatus, MythMediaDevice*)),
+                SLOT(mediaStatusChanged(MythMediaStatus, MythMediaDevice*)));
 
             LoadDirectory(m_currDevice->getMountPath());
 
@@ -480,9 +480,9 @@ bool IconView::keyPressEvent(QKeyEvent *event)
                 handled = false;
         }
 
-        if (action == "ESCAPE") 
+        if (action == "ESCAPE")
         {
-            if (GetMythMainWindow()->IsExitingToMain()) 
+            if (GetMythMainWindow()->IsExitingToMain())
             {
                 while ( m_currDir != m_galleryDir &&
                         HandleSubDirEscape(m_galleryDir) );
@@ -536,9 +536,9 @@ bool IconView::HandleMediaDeviceSelect(ThumbItem *item)
         item->SetPath(m_currDevice->getMountPath(), true);
 
         connect(m_currDevice,
-                SIGNAL(statusChanged(MediaStatus,
+                SIGNAL(statusChanged(MythMediaStatus,
                                      MythMediaDevice*)),
-                SLOT(mediaStatusChanged(MediaStatus,
+                SLOT(mediaStatusChanged(MythMediaStatus,
                                         MythMediaDevice*)));
 
         LoadDirectory(m_currDevice->getMountPath());
@@ -738,7 +738,7 @@ void IconView::customEvent(QEvent *event)
             MythUIButtonListItem *item = m_imageList->GetItemAt(pos);
             if (QFile(thumbitem->GetImageFilename()).exists())
                 item->SetImage(thumbitem->GetImageFilename());
- 
+
             if (m_imageList->GetCurrentPos() == pos)
                 UpdateImage(item);
         }
@@ -993,7 +993,7 @@ void IconView::HandleDeleteCurrent(void)
 
     if (!thumbitem)
         return;
-    
+
     QString title = tr("Delete Current File or Folder");
     QString msg = (thumbitem->IsDir()) ?
         tr("Deleting 1 folder, including any subfolders and files.") :
@@ -1007,10 +1007,10 @@ void IconView::DoDeleteCurrent(bool doDelete)
     if (doDelete)
     {
         ThumbItem *thumbitem = GetCurrentThumb();
-        
+
         if (!thumbitem)
             return;
-            
+
         QFileInfo fi;
         fi.setFile(thumbitem->GetPath());
         GalleryUtil::Delete(fi);
@@ -1050,7 +1050,7 @@ void IconView::HandleSettings(void)
 
 void IconView::HandleEject(void)
 {
-    myth_eject();
+    MediaMonitor::ejectOpticalDisc();
 }
 
 void IconView::HandleImport(void)
@@ -1432,7 +1432,7 @@ void IconView::CopyMarkedFiles(bool move)
     LoadDirectory(m_currDir);
 }
 
-void IconView::mediaStatusChanged(MediaStatus oldStatus,
+void IconView::mediaStatusChanged(MythMediaStatus oldStatus,
                                   MythMediaDevice *pMedia)
 {
     (void) oldStatus;

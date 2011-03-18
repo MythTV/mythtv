@@ -219,43 +219,43 @@ public:
 class MHSelectItem: public MHActionInt {
 public:
     MHSelectItem(): MHActionInt(":SelectItem") {}
-    virtual void CallAction(MHEngine *engine, MHRoot */*pTarget*/, int nArg) { Target(engine)->SelectItem(nArg, engine); }
+    virtual void CallAction(MHEngine *engine, MHRoot * /*pTarget*/, int nArg) { Target(engine)->SelectItem(nArg, engine); }
 };
 
 class MHDeselectItem: public MHActionInt {
 public:
     MHDeselectItem(): MHActionInt(":DeselectItem") {}
-    virtual void CallAction(MHEngine *engine, MHRoot */*pTarget*/, int nArg) { Target(engine)->DeselectItem(nArg, engine); }
+    virtual void CallAction(MHEngine *engine, MHRoot * /*pTarget*/, int nArg) { Target(engine)->DeselectItem(nArg, engine); }
 };
 
 class MHToggleItem: public MHActionInt {
 public:
     MHToggleItem(): MHActionInt(":ToggleItem") {}
-    virtual void CallAction(MHEngine *engine, MHRoot */*pTarget*/, int nArg) { Target(engine)->ToggleItem(nArg, engine); }
+    virtual void CallAction(MHEngine *engine, MHRoot * /*pTarget*/, int nArg) { Target(engine)->ToggleItem(nArg, engine); }
 };
 
 class MHScrollItems: public MHActionInt {
 public:
     MHScrollItems(): MHActionInt(":ScrollItems") {}
-    virtual void CallAction(MHEngine *engine, MHRoot */*pTarget*/, int nArg) { Target(engine)->ScrollItems(nArg, engine); }
+    virtual void CallAction(MHEngine *engine, MHRoot * /*pTarget*/, int nArg) { Target(engine)->ScrollItems(nArg, engine); }
 };
 
 class MHSetFirstItem: public MHActionInt {
 public:
     MHSetFirstItem(): MHActionInt(":SetFirstItem") {}
-    virtual void CallAction(MHEngine *engine, MHRoot */*pTarget*/, int nArg) { Target(engine)->SetFirstItem(nArg, engine); }
+    virtual void CallAction(MHEngine *engine, MHRoot * /*pTarget*/, int nArg) { Target(engine)->SetFirstItem(nArg, engine); }
 };
 
 class MHGetFirstItem: public MHActionObjectRef {
 public:
     MHGetFirstItem(): MHActionObjectRef(":GetFirstItem") {}
-    virtual void CallAction(MHEngine *engine, MHRoot */*pTarget*/, MHRoot *pArg) { Target(engine)->GetFirstItem(pArg, engine); }
+    virtual void CallAction(MHEngine *engine, MHRoot * /*pTarget*/, MHRoot *pArg) { Target(engine)->GetFirstItem(pArg, engine); }
 };
 
 class MHGetListSize: public MHActionObjectRef {
 public:
     MHGetListSize(): MHActionObjectRef(":GetListSize") {}
-    virtual void CallAction(MHEngine *engine, MHRoot */*pTarget*/, MHRoot *pArg) {Target(engine)->GetListSize(pArg, engine); }
+    virtual void CallAction(MHEngine *engine, MHRoot * /*pTarget*/, MHRoot *pArg) {Target(engine)->GetListSize(pArg, engine); }
 };
 
 #endif

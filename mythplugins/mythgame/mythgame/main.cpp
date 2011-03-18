@@ -71,7 +71,7 @@ static int runMenu(QString which_menu)
 
     if (menu->foundTheme())
     {
-        if (LCD * lcd = LCD::Get())
+        if (LCD *lcd = LCD::Get())
             lcd->switchToTime();
 
         GetMythMainWindow()->GetMainStack()->AddScreen(menu);

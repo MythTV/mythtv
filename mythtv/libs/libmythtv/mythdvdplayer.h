@@ -22,7 +22,7 @@ class MythDVDPlayer : public MythPlayer
 
     // DVD public stuff
     virtual void ChangeDVDTrack(bool ffw);
-    virtual bool GoToDVDMenu(QString str);
+    virtual bool GoToMenu(QString str);
     virtual void GoToDVDProgram(bool direction);
 
     // DVD ringbuffer methods
@@ -45,8 +45,7 @@ class MythDVDPlayer : public MythPlayer
     virtual void ResetPlaying(bool resetframes = true);
 
     // Private decoder stuff
-    virtual bool PrebufferEnoughFrames(bool pause_audio = true,
-                                       int  min_buffers = 0);
+    virtual bool PrebufferEnoughFrames(int min_buffers = 0);
     virtual void DecoderPauseCheck(void);
     virtual bool DecoderGetFrameFFREW(void);
     virtual bool DecoderGetFrameREW(void);
@@ -86,6 +85,10 @@ class MythDVDPlayer : public MythPlayer
 
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
     virtual int  SetTrack(uint type, int trackNo);
+
+    // Private decoder stuff
+    virtual void CreateDecoder(char *testbuf, int testreadsize,
+                               bool allow_libmpeg2, bool no_accel);
 
   private:
     void DoChangeDVDTrack(void);

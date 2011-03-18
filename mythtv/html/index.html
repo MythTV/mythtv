@@ -1,0 +1,49 @@
+<html>
+<head>
+<title>
+MythTV mythbackend Internal Web Server
+</title>
+<link rel="stylesheet"    href="/css/site.css"       type="text/css">
+<link rel="icon"          href="/images/favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+<script language="JavaScript" type="text/javascript" src="/js/jquery.min.js"></script>
+<script language="JavaScript" type="text/javascript" src="/js/jquery-ui.min.js"></script>
+
+
+<script language="JavaScript" type="text/javascript">
+function loadContent(contentURL) {
+    var html = $.ajax({
+        url: contentURL,
+        async: false
+    }).responseText;
+
+    $("#content").html(html);
+}
+
+$(document).ready(function() {
+    loadContent('/info.html');
+});
+
+</script>
+</head>
+<body>
+<!-- Header -->
+<div id="header">
+    <div id="header_logo">
+        <a href="http://www.mythtv.org"><img src="/images/mythtv.png" class="png" width="180" height="64" border="0" alt="MythTV"></a>
+    </div>
+    <div id="header_text">
+<!--
+        <ul>
+            <li class="cur"><a href="/Status/GetStatusHTML">Backend Status</a></li>
+            <li class="cur"><a href="javascript:loadContent('/info.html')">Info</a></li>
+        </ul>
+-->
+    </div>
+    <div id="header-end"></div>
+</div><!-- header -->
+
+<div id="content">
+</div>
+</body>
+</html>

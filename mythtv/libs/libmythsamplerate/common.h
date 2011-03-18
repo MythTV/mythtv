@@ -142,7 +142,13 @@ int zoh_set_converter (SRC_PRIVATE *psrc, int src_enum) ;
 **	Common static inline functions.
 */
 
-static inline double
+#ifdef _MSC_VER
+# include <inttypes.h>
+#else
+long int lrint (double flt);
+#endif
+
+static __inline double 
 fmod_one (double x)
 {	double res ;
 

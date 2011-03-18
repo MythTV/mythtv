@@ -28,8 +28,8 @@ DecoderBase::DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo)
       current_aspect(1.33333), fps(29.97),
       bitrate(4000),
 
-      framesPlayed(0), framesRead(0), lastKey(0), keyframedist(-1),
-      indexOffset(0),
+      framesPlayed(0), framesRead(0), totalDuration(0),
+      lastKey(0), keyframedist(-1), indexOffset(0),
 
       ateof(false), exitafterdecoded(false), transcoding(false),
 
@@ -67,17 +67,30 @@ void DecoderBase::SetProgramInfo(const ProgramInfo &pginfo)
     m_playbackinfo = new ProgramInfo(pginfo);
 }
 
-void DecoderBase::Reset(void)
+void DecoderBase::Reset(bool reset_video_data, bool seek_reset, bool reset_file)
 {
-    SeekReset(0, 0, true, true);
+    VERBOSE(VB_PLAYBACK, LOC + QString("Reset: Video %1, Seek %2, File %3")
+            .arg(reset_video_data).arg(seek_reset).arg(reset_file));
 
-    ResetPosMap();
-    framesPlayed = 0;
-    framesRead = 0;
-    dontSyncPositionMap = false;
+    if (seek_reset)
+    {
+        SeekReset(0, 0, true, true);
+    }
 
-    waitingForChange = false;
-    ateof = false;
+    if (reset_video_data)
+    {
+        ResetPosMap();
+        framesPlayed = 0;
+        framesRead = 0;
+        totalDuration = 0;
+        dontSyncPositionMap = false;
+    }
+
+    if (reset_file)
+    {
+        waitingForChange = false;
+        SetEof(false);
+    }
 }
 
 void DecoderBase::SeekReset(long long, uint, bool, bool)
@@ -804,6 +817,7 @@ void DecoderBase::FileChanged(void)
     ResetPosMap();
     framesPlayed = 0;
     framesRead = 0;
+    totalDuration = 0;
 
     waitingForChange = false;
     justAfterChange = true;
@@ -1167,6 +1181,14 @@ int to_track_type(const QString &str)
     else if (str.left(7) == "RAWTEXT")
         ret = kTrackTypeRawText;
     return ret;
+}
+
+void DecoderBase::SaveTotalDuration(void)
+{
+    if (!m_playbackinfo || !totalDuration)
+        return;
+
+    m_playbackinfo->SaveTotalDuration(totalDuration);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

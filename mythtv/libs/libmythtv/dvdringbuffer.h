@@ -27,7 +27,7 @@ extern "C" {
 
 class MythDVDPlayer;
 
-class MPUBLIC DVDRingBuffer : public RingBuffer
+class MTV_PUBLIC DVDRingBuffer : public RingBuffer
 {
   public:
     DVDRingBuffer(const QString &lfilename);
@@ -47,6 +47,8 @@ class MPUBLIC DVDRingBuffer : public RingBuffer
     void GetPartAndTitle(int &_part, int &_title) const
         { _part  = m_part; _title = m_title; }
     uint GetTotalTimeOfTitle(void);
+    virtual bool IsStreamed(void)     { return true; }
+    virtual int  BestBufferSize(void) { return 2048; }
 
     uint GetCellStart(void);
     bool PGCLengthChanged(void);
@@ -67,11 +69,7 @@ class MPUBLIC DVDRingBuffer : public RingBuffer
     QRect       GetButtonCoords(void);
     void        ReleaseMenuButton(void);
     bool        IsInMenu(void) const { return m_inMenu; }
-    void        ActivateButton(void);
-    void        MoveButtonLeft(void);
-    void        MoveButtonRight(void);
-    void        MoveButtonUp(void);
-    void        MoveButtonDown(void);
+    virtual bool HandleAction(const QStringList &actions, int64_t pts);
 
     // Subtitles
     uint GetSubtitleLanguage(int key);
@@ -94,7 +92,7 @@ class MPUBLIC DVDRingBuffer : public RingBuffer
                           uint retry_ms = kDefaultOpenTimeout);
     void PlayTitleAndPart(int _title, int _part)
         { dvdnav_part_play(m_dvdnav, _title, _part); }
-    bool StartFromBeginning(void);
+    virtual bool StartFromBeginning(void);
     void CloseDVD(void);
     bool nextTrack(void);
     void prevTrack(void);
@@ -108,7 +106,7 @@ class MPUBLIC DVDRingBuffer : public RingBuffer
     void GoToNextProgram(void);
     void GoToPreviousProgram(void);
 
-    void IgnoreStillOrWait(bool skip)     { m_skipstillorwait = skip;       }
+    virtual void IgnoreWaitStates(bool ignore) { m_skipstillorwait = ignore; }
     void AudioStreamsChanged(bool change) { m_audioStreamsChanged = change; }
     uint GetCurrentTime(void)             { return (m_currentTime / 90000); }
     uint TitleTimeLeft(void);
@@ -175,6 +173,11 @@ class MPUBLIC DVDRingBuffer : public RingBuffer
     MythDVDPlayer *m_parent;
 
     // Private menu/button stuff
+    void ActivateButton(void);
+    void MoveButtonLeft(void);
+    void MoveButtonRight(void);
+    void MoveButtonUp(void);
+    void MoveButtonDown(void);
     bool DVDButtonUpdate(bool b_mode);
     void ClearMenuSPUParameters(void);
     void ClearMenuButton(void);

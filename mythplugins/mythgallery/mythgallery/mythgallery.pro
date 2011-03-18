@@ -39,6 +39,8 @@ opengl {
 #The following line was inserted by qt3to4
 QT += network opengl sql xml
 
+DEFINES += MPLUGIN_API
+
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }

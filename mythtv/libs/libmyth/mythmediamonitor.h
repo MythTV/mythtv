@@ -5,34 +5,18 @@
 #include <QPointer>
 #include <QThread>
 #include <QMutex>
-#include <QEvent>
 #include <QList>
 
+#include "mythexp.h"
 #include "mythmedia.h"
 
 /// Stores details of media handlers
 struct MHData
 {
     void   (*callback)(MythMediaDevice *mediadevice);
-    int      MediaType;
+    int      MythMediaType;
     QString  destination;
     QString  description;
-};
-
-class MPUBLIC MediaEvent : public QEvent
-{
-  public:
-    MediaEvent(MediaStatus oldStatus, MythMediaDevice *pDevice) :
-        QEvent(kEventType), m_OldStatus(oldStatus), m_Device(pDevice) {}
-
-    MediaStatus getOldStatus(void) const { return m_OldStatus; }
-    MythMediaDevice* getDevice(void) { return m_Device; }
-
-    static Type kEventType;
-
-  protected:
-    MediaStatus m_OldStatus;
-    QPointer<MythMediaDevice> m_Device;
 };
 
 class MediaMonitor;
@@ -73,7 +57,7 @@ class MPUBLIC MediaMonitor : public QObject
     // first validate the pointer with ValidateAndLock(), if true is returned
     // it is safe to dereference the pointer. When finished call Unlock()
     QList<MythMediaDevice*> GetRemovable(bool mounted=false);
-    QList<MythMediaDevice*> GetMedias(MediaType mediatype);
+    QList<MythMediaDevice*> GetMedias(MythMediaType mediatype);
     MythMediaDevice*        GetMedia(const QString &path);
 
     void MonitorRegisterExtensions(uint mediaType, const QString &extensions);
@@ -92,10 +76,12 @@ class MPUBLIC MediaMonitor : public QObject
     static QString defaultCDWriter();
     static QString defaultDVDWriter();
 
+    static void ejectOpticalDisc(void);
+
     virtual QStringList GetCDROMBlockDevices(void) = 0;
 
   public slots:
-    void mediaStatusChanged(MediaStatus oldStatus, MythMediaDevice* pMedia);
+    void mediaStatusChanged(MythMediaStatus oldStatus, MythMediaDevice* pMedia);
 
   protected:
     MediaMonitor(QObject *par, unsigned long interval, bool allowEject);
@@ -112,7 +98,7 @@ class MPUBLIC MediaMonitor : public QObject
     const QString listDevices(void);
 
     static QString defaultDevice(const QString setting,
-                                 const QString label,  
+                                 const QString label,
                                  const char *hardCodedDefault);
     MythMediaDevice *selectDrivePopup(const QString label, bool mounted=false);
 

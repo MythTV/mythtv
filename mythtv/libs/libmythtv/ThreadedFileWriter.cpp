@@ -13,6 +13,7 @@
 
 // Qt headers
 #include <QString>
+#include <QThread>
 
 // MythTV headers
 #include "ThreadedFileWriter.h"
@@ -28,8 +29,8 @@ static int posix_fadvise(int, off_t, off_t, int) { return 0; }
 #  endif
 #endif
 
-#define LOC QString("TFW: ")
-#define LOC_ERR QString("TFW, Error: ")
+#define LOC QString("TFW(%1): ").arg(fd)
+#define LOC_ERR QString("TFW(%1), Error: ").arg(fd)
 
 const uint ThreadedFileWriter::TFW_DEF_BUF_SIZE   = 2*1024*1024;
 const uint ThreadedFileWriter::TFW_MAX_WRITE_SIZE = TFW_DEF_BUF_SIZE / 4;
@@ -82,7 +83,7 @@ static uint safe_write(int fd, const void *data, uint sz, bool &ok)
             }
             errcnt++;
             VERBOSE(VB_IMPORTANT, LOC_ERR + "safe_write(): File I/O " +
-                    QString(" errcnt: %1").arg(errcnt) + ENO + QString(" errno: %1").arg(errno));
+                    QString(" errcnt: %1").arg(errcnt) + ENO);
 
             if (errcnt == 3)
                 break;
@@ -102,27 +103,34 @@ static uint safe_write(int fd, const void *data, uint sz, bool &ok)
     return tot;
 }
 
-/** \fn ThreadedFileWriter::boot_writer(void*)
+#undef LOC
+#undef LOC_ERR
+#define LOC QString("TFW(%1:%2): ").arg(filename).arg(fd)
+#define LOC_ERR QString("TFW(%1:%2), Error: ").arg(filename).arg(fd)
+
+/** \fn TFWWriteThread::start()
  *  \brief Thunk that runs ThreadedFileWriter::DiskLoop(void)
  */
-void *ThreadedFileWriter::boot_writer(void *wotsit)
+void TFWWriteThread::run(void)
 {
+    if (!m_ptr)
+        return;
+
 #ifndef USING_MINGW
     signal(SIGXFSZ, SIG_IGN);
 #endif
-    ThreadedFileWriter *fw = (ThreadedFileWriter *)wotsit;
-    fw->DiskLoop();
-    return NULL;
+    m_ptr->DiskLoop();
 }
 
-/** \fn ThreadedFileWriter::boot_syncer(void*)
+/** \fn TFWSyncThread::boot_syncer(void*)
  *  \brief Thunk that runs ThreadedFileWriter::SyncLoop(void)
  */
-void *ThreadedFileWriter::boot_syncer(void *wotsit)
+void TFWSyncThread::run(void)
 {
-    ThreadedFileWriter *fw = (ThreadedFileWriter *)wotsit;
-    fw->SyncLoop();
-    return NULL;
+    if (!m_ptr)
+        return;
+
+    m_ptr->SyncLoop();
 }
 
 /** \fn ThreadedFileWriter::ThreadedFileWriter(const QString&,int,mode_t)
@@ -182,22 +190,23 @@ bool ThreadedFileWriter::Open(void)
         tfw_buf_size = TFW_DEF_BUF_SIZE;
         tfw_min_write_size = TFW_MIN_WRITE_SIZE;
 
-        bool res = 0;
-        res = pthread_create(&writer, NULL, boot_writer, this);
-        if (res)
+        writer.SetPtr(this);
+        writer.start();
+
+        if (!writer.isRunning())
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Starting writer thread. ") +
-                    safe_eno_to_string(res));
+                    QString("Starting writer thread. "));
             return false;
         }
 
-        res = pthread_create(&syncer, NULL, boot_syncer, this);
-        if (res)
+        syncer.SetPtr(this);
+        syncer.start();
+
+        if (!syncer.isRunning())
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Starting syncer thread. ") +
-                    safe_eno_to_string(res));
+                    QString("Starting syncer thread. "));
             return false;
         }
 
@@ -218,10 +227,10 @@ ThreadedFileWriter::~ThreadedFileWriter()
         in_dtor = true; /* tells child thread to exit */
 
         bufferSyncWait.wakeAll();
-        pthread_join(syncer, NULL);
+        syncer.wait();
 
         bufferHasData.wakeAll();
-        pthread_join(writer, NULL);
+        writer.wait();
         close(fd);
         fd = -1;
     }
@@ -385,11 +394,6 @@ void ThreadedFileWriter::Sync(void)
 {
     if (fd >= 0)
     {
-        /// Toss any data the kernel wrote to disk on it's own from
-        /// the cache, so we don't get penalized for preserving it
-        /// during the sync.
-        (void) posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
-
 #if defined(_POSIX_SYNCHRONIZED_IO) && _POSIX_SYNCHRONIZED_IO > 0
         // fdatasync tries to avoid updating metadata, but will in
         // practice always update metadata if any data is written
@@ -398,10 +402,6 @@ void ThreadedFileWriter::Sync(void)
 #else
         fsync(fd);
 #endif
-
-        // Toss any data we just synced from cache, so we don't
-        // get penalized for it between now and the next sync.
-        (void) posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
     }
 }
 

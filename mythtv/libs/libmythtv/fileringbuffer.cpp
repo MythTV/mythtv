@@ -176,7 +176,7 @@ static QString local_sub_filename(QFileInfo &fileInfo)
     for (; cit != candidates.end(); ++cit)
     {
         QFileInfo fi(dirName + "/" + *cit);
-        if (fi.exists() && (fi.size() >= RingBuffer::kReadTestSize))
+        if (fi.exists() && (fi.size() >= kReadTestSize))
             return fi.absoluteFilePath();
     }
 

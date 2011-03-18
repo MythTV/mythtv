@@ -211,13 +211,20 @@ bool ThemeInfo::parseThemeInfo()
                                                 parseText(ce).toUtf8(), NULL,
                                                 QCoreApplication::UnicodeUTF8);
                         }
-                        else if (ce.tagName() == "downloadurl")
+                    }
+                }
+            }
+            else if (e.tagName() == "downloadinfo")
+            {
+                for (QDomNode child = e.firstChild(); !child.isNull();
+                        child = child.nextSibling())
+                {
+                    QDomElement ce = child.toElement();
+                    if (!ce.isNull())
+                    {
+                        if (ce.tagName() == "url")
                         {
                             m_downloadurl = getFirstText(ce);
-                        }
-                        else if (ce.tagName() == "themesite")
-                        {
-                            m_themesite = getFirstText(ce);
                         }
                     }
                 }

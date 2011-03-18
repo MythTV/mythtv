@@ -10,11 +10,11 @@ using namespace std;
 #include <QMap>
 
 // MythTV headers
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 typedef vector<uint> InputGroupList;
 
-class MPUBLIC InputGroupMap
+class MTV_PUBLIC InputGroupMap
 {
   public:
     InputGroupMap() { Build(); }

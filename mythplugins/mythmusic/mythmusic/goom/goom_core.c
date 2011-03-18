@@ -656,9 +656,9 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 	 */
 
 	if (goomlimit!=0)
-		tentacle_update(p2 + c_offset, p1 + c_offset, resolx, c_resoly, data, (float)accelvar/goomlimit, curGState->drawTentacle);
+        tentacle_update((gint32*)(p2 + c_offset), (gint32*)(p1 + c_offset), resolx, c_resoly, data, (float)accelvar/goomlimit, curGState->drawTentacle);
 	else
-		tentacle_update(p2 + c_offset, p1 + c_offset, resolx, c_resoly, data,0.0f, curGState->drawTentacle);
+        tentacle_update((gint32*)(p2 + c_offset), (gint32*)(p1 + c_offset), resolx, c_resoly, data,0.0f, curGState->drawTentacle);
 
 /*
 	{

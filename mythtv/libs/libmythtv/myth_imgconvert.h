@@ -26,6 +26,8 @@
 #ifndef MYTH_IMGCONVERT_H
 #define MYTH_IMGCONVERT_H
 
+#include "mythtvexp.h"
+
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
@@ -35,7 +37,7 @@ extern "C" {
  * utility function to replace deprecated img_convert with
  * the software scaler (swscale).
  */
-MPUBLIC int myth_sws_img_convert(AVPicture *dst, PixelFormat dst_pix_fmt,
+MTV_PUBLIC int myth_sws_img_convert(AVPicture *dst, PixelFormat dst_pix_fmt,
                                  AVPicture *src, PixelFormat pix_fmt,
                                  int width, int height);
 

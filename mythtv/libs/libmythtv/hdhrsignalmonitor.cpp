@@ -90,7 +90,7 @@ HDHRChannel *HDHRSignalMonitor::GetHDHRChannel(void)
  */
 void HDHRSignalMonitor::UpdateValues(void)
 {
-    if (!running || exit)
+    if (!monitor_thread.isRunning() || exit)
         return;
 
     if (streamHandlerStarted)

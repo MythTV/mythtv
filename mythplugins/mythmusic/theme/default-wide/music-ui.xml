@@ -1245,17 +1245,17 @@
         </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>170,15,415,34</area>
+            <area>170,15,400,35</area>
             <font>baselarge</font>
         </textarea>
 
         <textarea name="artist" from="basetextarea">
-            <area>170,50,415,35</area>
+            <area>170,55,400,35</area>
             <font>basemedium</font>
         </textarea>
 
         <textarea name="album" from="basetextarea">
-            <area>170,80,415,35</area>
+            <area>170,90,400,35</area>
             <font>basemedium</font>
         </textarea>
 
@@ -1277,19 +1277,19 @@
         </imagetype>
 
         <progressbar name="progress">
-        <area>170,150,10,10</area>
-        <layout>horizontal</layout>
-        <style>reveal</style>
-        <imagetype name="background">
-            <filename>mm_progress-bg.png</filename>
-        </imagetype>
-        <imagetype name="progressimage">
-            <filename>mm_progress-fg.png</filename>
-        </imagetype>
-    </progressbar>
+            <area>170,150,10,10</area>
+            <layout>horizontal</layout>
+            <style>reveal</style>
+            <imagetype name="background">
+                <filename>mm_progress-bg.png</filename>
+            </imagetype>
+            <imagetype name="progressimage">
+                <filename>mm_progress-fg.png</filename>
+            </imagetype>
+        </progressbar>
     </window>
 
-        <window name="volume_popup">
+    <window name="volume_popup">
         <area>-1,-1,620,165</area>
         <imagetype name="backimg">
             <area>0,0,620,165</area>
@@ -1303,7 +1303,7 @@
             <value>Volume</value>
         </textarea>
 
-        <statetype name="mute_state">
+        <statetype name="mutestate">
             <position>20,90</position>
             <state name="off">
                 <imagetype name="statusimage">
@@ -1317,14 +1317,14 @@
             </state>
         </statetype>
 
-        <progressbar name="volume_progress" from="baseprogressbar">
+        <progressbar name="volumeprogress" from="baseprogressbar">
             <position>60,80</position>
         </progressbar>
 
-        <textarea name="volume_text" from="basetextarea">
+        <textarea name="volume" from="basetextarea">
             <area>70,120,300,30</area>
             <align>left,top</align>
-            <value>0%</value>
+            <template>%VOLUMEPERCENT%</template>
         </textarea>
     </window>
 
@@ -1340,7 +1340,7 @@
         </shape>
 
         <imagetype name="coverart">
-            <area>25,100,300,300</area>
+            <area>25,90,300,300</area>
             <filename>mm_nothumb.png</filename>
             <preserveaspect>true</preserveaspect>
         </imagetype>
@@ -1353,7 +1353,7 @@
         </textarea>
 
         <textarea name="title" from="basetextarea">
-            <area>520,50,500,40</area>
+            <area>520,50,630,35</area>
             <font>basemedium</font>
         </textarea>
 
@@ -1363,7 +1363,7 @@
         </textarea>
 
         <textarea name="artist" from="title">
-            <area>520,100,500,35</area>
+            <area>520,100,630,35</area>
         </textarea>
 
         <textarea name="albumlbl" from="titlelbl">
@@ -1372,7 +1372,7 @@
         </textarea>
 
         <textarea name="album" from="title">
-            <area>520,150,500,90</area>
+            <area>520,150,630,35</area>
         </textarea>
 
         <textarea name="genrelbl" from="titlelbl">
@@ -1381,7 +1381,7 @@
         </textarea>
 
         <textarea name="genre" from="title">
-            <area>520,250,500,90</area>
+            <area>520,250,500,35</area>
         </textarea>
 
         <textarea name="tracknumlbl" from="titlelbl">
@@ -1390,7 +1390,7 @@
         </textarea>
 
         <textarea name="tracknum" from="title">
-            <area>880,200,100,290</area>
+            <area>880,200,100,35</area>
         </textarea>
 
         <textarea name="lenlbl" from="titlelbl">
@@ -1447,7 +1447,7 @@
         </textarea>
 
         <textarea name="filename" from="title">
-            <area>520,505,600,90</area>
+            <area>520,505,630,90</area>
             <font>basesmall</font>
             <multiline>yes</multiline>
         </textarea>

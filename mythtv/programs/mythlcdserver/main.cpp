@@ -25,9 +25,6 @@ using namespace std;
 
 #include "lcdserver.h"
 
-#define LCD_EXIT_DAEMONIZING_ERROR                FRONTEND_EXIT_START-1
-#define LCD_EXIT_NO_TRANSCODE_SUPPORT             FRONTEND_EXIT_START-2
-
 int main(int argc, char **argv)
 {
     QCoreApplication a(argc, argv);
@@ -39,6 +36,8 @@ int main(int argc, char **argv)
     QString logfile = "";
 
     debug_level = 0;  // don't show any debug messages by default
+
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHLCDSERVER);
 
     //  Check command line arguments
     for (int argpos = 1; argpos < a.argc(); ++argpos)
@@ -64,14 +63,14 @@ int main(int argc, char **argv)
                 if (special_port < 1 || special_port > 65534)
                 {
                     VERBOSE(VB_IMPORTANT, "lcdserver: Bad port number");
-                    return FRONTEND_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
                 }
             }
             else
             {
                 VERBOSE(VB_IMPORTANT, "lcdserver: Missing argument to "
                                 "-p/--port option");
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-m") ||
@@ -86,7 +85,7 @@ int main(int argc, char **argv)
             {
                 VERBOSE(VB_IMPORTANT, "lcdserver: Missing argument to "
                                 "-m/--startupmessage");
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-t") ||
@@ -100,14 +99,14 @@ int main(int argc, char **argv)
                 if (message_time < 1 || message_time > 1000)
                 {
                     VERBOSE(VB_IMPORTANT, "lcdserver: Bad show message time");
-                    return FRONTEND_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
                 }
             }
             else
             {
                 VERBOSE(VB_IMPORTANT, "lcdserver: Missing argument to "
                                 "-t/--messagetime");
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-v") ||
@@ -117,14 +116,14 @@ int main(int argc, char **argv)
             {
                 if (parse_verbose_arg(a.argv()[argpos+1]) ==
                         GENERIC_EXIT_INVALID_CMDLINE)
-                    return FRONTEND_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
 
                 ++argpos;
             }
             else
             {
                 cerr << "Missing argument to -v/--verbose option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-l") ||
@@ -136,7 +135,7 @@ int main(int argc, char **argv)
                 if (logfile.startsWith("-"))
                 {
                     cerr << "Invalid or missing argument to -l/--logfile option\n";
-                    return FRONTEND_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
                 }
                 else
                 {
@@ -146,7 +145,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing argument to -l/--logfile option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else if (!strcmp(a.argv()[argpos],"-x") ||
@@ -161,14 +160,14 @@ int main(int argc, char **argv)
                 if (debug_level < 0 || debug_level > 10)
                 {
                     VERBOSE(VB_IMPORTANT, "lcdserver: Bad debug level");
-                    return FRONTEND_EXIT_INVALID_CMDLINE;
+                    return GENERIC_EXIT_INVALID_CMDLINE;
                 }
             }
             else
             {
                 VERBOSE(VB_IMPORTANT, "lcdserver: Missing argument to "
                                 "-x/--debuglevel");
-                return FRONTEND_EXIT_INVALID_CMDLINE;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
         else
@@ -193,7 +192,7 @@ int main(int argc, char **argv)
                  << endl <<
 "                              [number between 0 and 10] (default 0)"
                  << endl;
-            return FRONTEND_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
 
@@ -208,7 +207,7 @@ int main(int argc, char **argv)
         if (logfd < 0)
         {
             perror("open(logfile)");
-            return FRONTEND_EXIT_OPENING_LOGFILE_ERROR;
+            return GENERIC_EXIT_PERMISSIONS_ERROR;
         }
     }
 
@@ -233,7 +232,7 @@ int main(int argc, char **argv)
         {
             VERBOSE(VB_IMPORTANT, "lcdserver: Failed to run as a daemon. "
                             "Bailing out.");
-            return LCD_EXIT_DAEMONIZING_ERROR;
+            return GENERIC_EXIT_DAEMONIZING_ERROR;
         }
         cout << endl;
     }
@@ -244,7 +243,7 @@ int main(int argc, char **argv)
     {
         VERBOSE(VB_IMPORTANT, "lcdserver: Could not initialize MythContext. "
                         "Exiting.");
-        return FRONTEND_EXIT_NO_MYTHCONTEXT;
+        return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
     MythTranslation::load("mythfrontend");
@@ -263,6 +262,6 @@ int main(int argc, char **argv)
     a.exec();
 
     delete gContext;
-    return FRONTEND_EXIT_OK;
+    return GENERIC_EXIT_OK;
 }
 

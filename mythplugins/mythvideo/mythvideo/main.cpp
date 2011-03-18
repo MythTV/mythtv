@@ -18,7 +18,6 @@
 #include "fileassoc.h"
 #include "playersettings.h"
 #include "metadatasettings.h"
-#include "dbcheck.h"
 #include "videolist.h"
 
 #if defined(AEW_VG)
@@ -52,9 +51,9 @@ namespace
                 video_list = saved->GetSaved();
             }
         }
-    
+
         VideoDialog::BrowseType browse = static_cast<VideoDialog::BrowseType>(
-                             gCoreContext->GetNumSetting("mythvideo.db_group_type", 
+                             gCoreContext->GetNumSetting("mythvideo.db_group_type",
                                                      VideoDialog::BRS_FOLDER));
 
         if (!video_list)
@@ -216,9 +215,11 @@ namespace
             case 0 : // Do nothing
                 break;
             case 1 : // Display menu (mythdvd)*/
+                GetMythMainWindow()->JumpTo("Main Menu");
                 mythplugin_run();
                 break;
             case 2 : // play DVD or Blu-ray
+                GetMythMainWindow()->JumpTo("Main Menu");
                 playDisc();
                 break;
             default:
@@ -422,17 +423,6 @@ int mythplugin_init(const char *libversion)
     if (!gContext->TestPopupVersion("mythvideo", libversion,
                                     MYTH_BINARY_VERSION))
         return -1;
-
-    gCoreContext->ActivateSettingsCache(false);
-    bool upgraded = UpgradeVideoDatabaseSchema();
-    gCoreContext->ActivateSettingsCache(true);
-
-    if (!upgraded)
-    {
-        VERBOSE(VB_IMPORTANT,
-                "Couldn't upgrade video database schema, exiting.");
-        return -1;
-    }
 
     VideoGeneralSettings general;
     general.Load();

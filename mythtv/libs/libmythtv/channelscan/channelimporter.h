@@ -17,7 +17,7 @@
 #include <QString>
 
 // MythTV headers
-#include "mythexp.h"
+#include "mythtvexp.h"
 #include "scaninfo.h"
 #include "channelscantypes.h"
 #include "mythmainwindow.h"
@@ -73,7 +73,7 @@ class ChannelImporterUniquenessStats
     uint max_atscmajcnt;
 };
 
-class MPUBLIC ChannelImporter
+class MTV_PUBLIC ChannelImporter
 {
   public:
     ChannelImporter(bool gui, bool interactive,

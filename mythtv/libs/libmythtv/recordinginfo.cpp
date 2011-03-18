@@ -608,30 +608,37 @@ void RecordingInfo::ApplyStorageGroupChange(const QString &newstoragegroup)
     SendUpdateEvent();
 }
 
-/** \fn RecordingInfo::ApplyRecordRecTitleChange(const QString &newTitle, const QString &newSubtitle)
- *  \brief Sets the recording title and subtitle, both in this RecordingInfo
- *         and in the database.
+/** \fn RecordingInfo::ApplyRecordRecTitleChange(const QString &newTitle, const QString &newSubtitle, const QString &newDescription)
+ *  \brief Sets the recording title, subtitle, and description both in this
+ *         RecordingInfo and in the database.
  *  \param newTitle New recording title.
  *  \param newSubtitle New recording subtitle
+ *  \param newDescription New recording description
  */
-void RecordingInfo::ApplyRecordRecTitleChange(const QString &newTitle, const QString &newSubtitle)
+void RecordingInfo::ApplyRecordRecTitleChange(const QString &newTitle,
+        const QString &newSubtitle, const QString &newDescription)
 {
     MSqlQuery query(MSqlQuery::InitCon());
+    QString sql = "UPDATE recorded SET title = :TITLE, subtitle = :SUBTITLE ";
+    if (newDescription != NULL)
+        sql += ", description = :DESCRIPTION ";
+    sql += " WHERE chanid = :CHANID AND starttime = :START ;";
 
-    query.prepare("UPDATE recorded"
-                  " SET title = :TITLE, subtitle = :SUBTITLE"
-                  " WHERE chanid = :CHANID"
-                  " AND starttime = :START ;");
+    query.prepare(sql);
     query.bindValue(":TITLE", newTitle);
     query.bindValue(":SUBTITLE", newSubtitle);
+    if (newDescription != NULL)
+        query.bindValue(":DESCRIPTION", newDescription);
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":START", recstartts.toString("yyyyMMddhhmmss"));
+    query.bindValue(":START", recstartts);
 
     if (!query.exec())
         MythDB::DBError("RecTitle update", query);
 
     title = newTitle;
     subtitle = newSubtitle;
+    if (newDescription != NULL)
+        description = newDescription;
 
     SendUpdateEvent();
 }
@@ -1057,6 +1064,11 @@ void RecordingInfo::FinishedRecording(bool prematurestop)
     {
         recstatus = rsRecorded;
 
+        uint starttime = recstartts.toTime_t();
+        uint endtime   = recendts.toTime_t();
+        int64_t duration = ((int64_t)endtime - (int64_t)starttime) * 1000000;
+        SaveTotalDuration(duration);
+
         QString msg = "Finished recording";
         QString msg_subtitle = subtitle.isEmpty() ? "" :
                                         QString(" \"%1\"").arg(subtitle);
@@ -1136,8 +1148,8 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup)
                    ":CATEGORY,:SERIESID,:PROGRAMID,:FINDID,:RECORDID,"
                    ":STATION,:RECTYPE,:RECSTATUS,:DUPLICATE,:REACTIVATE);");
     result.bindValue(":CHANID", chanid);
-    result.bindValue(":START", startts.toString(Qt::ISODate));
-    result.bindValue(":END", endts.toString(Qt::ISODate));
+    result.bindValue(":START", startts);
+    result.bindValue(":END", endts);
     result.bindValue(":TITLE", title);
     result.bindValue(":SUBTITLE", subtitle);
     result.bindValue(":DESC", description);

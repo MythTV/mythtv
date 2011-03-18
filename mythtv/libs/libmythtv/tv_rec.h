@@ -1,15 +1,13 @@
 #ifndef TVREC_H
 #define TVREC_H
 
-// POSIX headers
-#include <pthread.h>
-
 // Qt headers
 #include <QWaitCondition>
 #include <QStringList>
 #include <QDateTime>
 #include <QString>
 #include <QMap>
+#include <QThread>
 
 // MythTV headers
 #include "inputinfo.h"
@@ -134,10 +132,37 @@ class PendingInfo
 };
 typedef QMap<uint,PendingInfo> PendingMap;
 
-class MPUBLIC TVRec : public SignalMonitorListener
+class TVRec;
+
+class TVRecEventThread : public QThread
+{
+    Q_OBJECT
+  public:
+    TVRecEventThread() : m_parent(NULL) {}
+    void run(void);
+    void SetParent(TVRec *parent) { m_parent = parent; }
+  private:
+    TVRec *m_parent;
+};
+
+class TVRecRecordThread : public QThread
+{
+    Q_OBJECT
+  public:
+    TVRecRecordThread() : m_parent(NULL) {}
+    void run(void);
+    void SetParent(TVRec *parent) { m_parent = parent; }
+  private:
+    TVRec *m_parent;
+};
+
+
+class MTV_PUBLIC TVRec : public SignalMonitorListener
 {
     friend class TuningRequest;
     friend class SignalMonitor;
+    friend class TVRecEventThread;
+    friend class TVRecRecordThread;
 
   public:
     TVRec(int capturecardnum);
@@ -240,8 +265,6 @@ class MPUBLIC TVRec : public SignalMonitorListener
   protected:
     void RunTV(void);
     bool WaitForEventThreadSleep(bool wake = true, ulong time = ULONG_MAX);
-    static void *EventThread(void *param);
-    static void *RecorderThread(void *param);
     bool SetupDTVSignalMonitor(bool EITscan);
 
   private:
@@ -325,9 +348,9 @@ class MPUBLIC TVRec : public SignalMonitorListener
 
     // Various threads
     /// Event processing thread, runs RunTV().
-    pthread_t event_thread;
+    TVRecEventThread EventThread;
     /// Recorder thread, runs RecorderBase::StartRecording()
-    pthread_t recorder_thread;
+    TVRecRecordThread RecorderThread;
 
     // Configuration variables from database
     bool    transcodeFirst;

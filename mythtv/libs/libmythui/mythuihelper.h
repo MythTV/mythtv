@@ -7,7 +7,7 @@
 #include <QMutex>
 #include <QThreadPool>
 
-#include "mythexp.h"
+#include "mythuiexp.h"
 #include "themeinfo.h"
 
 #define DEFAULT_UI_THEME "Terra"
@@ -30,7 +30,7 @@ typedef enum ImageCacheMode
     kCacheForceStat       = 0x4,
 } ImageCacheMode;
 
-struct MPUBLIC MythUIMenuCallbacks
+struct MUI_PUBLIC MythUIMenuCallbacks
 {
     void (*exec_program)(const QString &cmd);
     void (*exec_program_tv)(const QString &cmd);
@@ -39,7 +39,7 @@ struct MPUBLIC MythUIMenuCallbacks
     void (*eject)(void);
 };
 
-class MPUBLIC MythUIHelper
+class MUI_PUBLIC MythUIHelper
 {
   public:
     void Init(MythUIMenuCallbacks &cbs);
@@ -154,8 +154,8 @@ class MPUBLIC MythUIHelper
     QStringList m_currentLocation;
 };
 
-MPUBLIC MythUIHelper *GetMythUI();
-MPUBLIC void DestroyMythUI();
+MUI_PUBLIC MythUIHelper *GetMythUI();
+MUI_PUBLIC void DestroyMythUI();
 
 #endif
 

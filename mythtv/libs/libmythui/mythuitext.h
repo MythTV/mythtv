@@ -22,7 +22,7 @@ class MythFontProperties;
  *
  *  \ingroup MythUI_Widgets
  */
-class MPUBLIC MythUIText : public MythUIType, public StorageUser
+class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
 {
   public:
     MythUIText(MythUIType *parent, const QString &name);

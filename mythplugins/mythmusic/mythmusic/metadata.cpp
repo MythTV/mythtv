@@ -388,12 +388,14 @@ void Metadata::dumpToDatabase()
         strQuery = "INSERT INTO music_songs ( directory_id,"
                    " artist_id, album_id,  name,         genre_id,"
                    " year,      track,     length,       filename,"
-                   " rating,    format,    date_entered, date_modified ) "
+                   " rating,    format,    date_entered, date_modified,"
+                   " numplays) "
                    "VALUES ( "
                    " :DIRECTORY, "
                    " :ARTIST,   :ALBUM,    :TITLE,       :GENRE,"
                    " :YEAR,     :TRACKNUM, :LENGTH,      :FILENAME,"
-                   " :RATING,   :FORMAT,   :DATE_ADD,    :DATE_MOD );";
+                   " :RATING,   :FORMAT,   :DATE_ADD,    :DATE_MOD,"
+                   " :PLAYCOUNT );";
     }
     else
     {
@@ -410,6 +412,7 @@ void Metadata::dumpToDatabase()
                    ", rating = :RATING"
                    ", format = :FORMAT"
                    ", date_modified = :DATE_MOD "
+                   ", numplays = :PLAYCOUNT "
                    "WHERE song_id= :ID ;";
     }
 
@@ -427,6 +430,7 @@ void Metadata::dumpToDatabase()
     query.bindValue(":RATING", m_rating);
     query.bindValue(":FORMAT", m_format);
     query.bindValue(":DATE_MOD", QDateTime::currentDateTime());
+    query.bindValue(":PLAYCOUNT", m_playcount);
 
     if (m_id < 1)
         query.bindValue(":DATE_ADD",  QDateTime::currentDateTime());

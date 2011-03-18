@@ -29,7 +29,7 @@
 #include "commbreakmap.h"
 #include "audioplayer.h"
 
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 extern "C" {
 #include "filter.h"
@@ -76,8 +76,8 @@ enum
     kDisplayTextSubtitle        = 0x020,
     kDisplayDVDButton           = 0x040,
     kDisplayRawTextSubtitle     = 0x080,
-    kDisplayAllCaptions         = 0x0ff,
-    kDisplayTeletextMenu        = 0x100,
+    kDisplayAllCaptions         = 0x100,
+    kDisplayTeletextMenu        = 0x200,
 };
 
 class DecoderThread : public QThread
@@ -96,7 +96,7 @@ class DecoderThread : public QThread
     bool        m_start_paused;
 };
 
-class MPUBLIC MythPlayer
+class MTV_PUBLIC MythPlayer
 {
     // Do NOT add a decoder class to this list
     friend class PlayerContext;
@@ -124,7 +124,7 @@ class MPUBLIC MythPlayer
     void SetLength(int len)                   { totalLength = len; }
     void SetFramesPlayed(uint64_t played)     { framesPlayed = played; }
     void SetVideoFilters(const QString &override);
-    void SetEof(void)                         { eof = true; }
+    void SetEof(bool eof);
     void SetPIPActive(bool is_active)         { pip_active = is_active; }
     void SetPIPVisible(bool is_visible)       { pip_visible = is_visible; }
 
@@ -175,7 +175,7 @@ class MPUBLIC MythPlayer
     // Bool Gets
     bool    GetRawAudioState(void) const;
     bool    GetLimitKeyRepeat(void) const     { return limitKeyRepeat; }
-    bool    GetEof(void) const                { return eof; }
+    bool    GetEof(void);
     bool    IsErrored(void) const;
     bool    IsPlaying(uint wait_ms = 0, bool wait_for = true) const;
     bool    AtNormalSpeed(void) const         { return next_normal_speed; }
@@ -192,8 +192,8 @@ class MPUBLIC MythPlayer
     VideoOutput *getVideoOutput(void)         { return videoOutput; }
     virtual char *GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
                                        int &buflen, int &vw, int &vh, float &ar);
-    char        *GetScreenGrab(int secondsin, int &buflen,
-                               int &vw, int &vh, float &ar);
+    virtual char *GetScreenGrab(int secondsin, int &buflen,
+                                int &vw, int &vh, float &ar);
     InteractiveTV *GetInteractiveTV(void);
 
     // Title stuff
@@ -216,13 +216,13 @@ class MPUBLIC MythPlayer
     void SetCutList(const frm_dir_map_t &newCutList);
 
     // Decoder stuff..
-    VideoFrame *GetNextVideoFrame(bool allow_unsafe = true);
+    VideoFrame *GetNextVideoFrame(void);
     VideoFrame *GetRawVideoFrame(long long frameNumber = -1);
     VideoFrame *GetCurrentFrame(int &w, int &h);
     virtual void ReleaseNextVideoFrame(VideoFrame *buffer, int64_t timecode,
                                        bool wrap = true);
     void ReleaseNextVideoFrame(void)
-        { videoOutput->ReleaseFrame(GetNextVideoFrame(false)); }
+        { videoOutput->ReleaseFrame(GetNextVideoFrame()); }
     void ReleaseCurrentFrame(VideoFrame *frame);
     void DiscardVideoFrame(VideoFrame *buffer);
     void DiscardVideoFrames(bool next_frame_keyframe);
@@ -276,7 +276,7 @@ class MPUBLIC MythPlayer
 
     // DVD public stuff
     virtual void ChangeDVDTrack(bool ffw)       { (void) ffw;       }
-    virtual bool GoToDVDMenu(QString str)       { return false;     }
+    virtual bool GoToMenu(QString str)          { return false;     }
     virtual void GoToDVDProgram(bool direction) { (void) direction; }
 
     // Position Map Stuff
@@ -290,6 +290,9 @@ class MPUBLIC MythPlayer
 
     // Public picture controls
     void ToggleStudioLevels(void);
+
+    void SaveTotalDuration(void);
+    void ResetTotalDuration(void);
 
   protected:
     // Initialization
@@ -365,9 +368,8 @@ class MPUBLIC MythPlayer
     void JumpChapter(int chapter);
 
     // Playback
-    virtual bool PrebufferEnoughFrames(bool pause_audio = true,
-                                       int  min_buffers = 0);
-    void         SetBuffering(bool new_buffering, bool pause_audio = false);
+    virtual bool PrebufferEnoughFrames(int min_buffers = 0);
+    void         SetBuffering(bool new_buffering);
     void         RefreshPauseFrame(void);
     virtual void DisplayPauseFrame(void);
     virtual void DisplayNormalFrame(bool check_prebuffer = true);
@@ -398,6 +400,10 @@ class MPUBLIC MythPlayer
     bool IsTemporaryMark(uint64_t frame);
     bool HasTemporaryMark(void);
     bool IsCutListSaved(PlayerContext *ctx) { return deleteMap.IsSaved(ctx); }
+    bool DeleteMapHasUndo(void) { return deleteMap.HasUndo(); }
+    bool DeleteMapHasRedo(void) { return deleteMap.HasRedo(); }
+    QString DeleteMapGetUndoMessage(void) { return deleteMap.GetUndoMessage(); }
+    QString DeleteMapGetRedoMessage(void) { return deleteMap.GetRedoMessage(); }
 
     // Reinit
     void ReinitOSD(void);
@@ -525,6 +531,7 @@ class MPUBLIC MythPlayer
     QWidget *parentWidget;
     WId embedid;
     int embx, emby, embw, embh;
+    float defaultDisplayAspect;
 
     // State
     QWaitCondition decoderThreadPause;
@@ -549,7 +556,6 @@ class MPUBLIC MythPlayer
     mutable QWaitCondition playingWaitCond;
     mutable QMutex vidExitLock;
     mutable QMutex playingLock;
-    bool     eof;             ///< At end of file/ringbuffer
     bool     m_double_framerate;///< Output fps is double Video (input) rate
     bool     m_double_process;///< Output filter must processed at double rate
     bool     m_can_double;    ///< VideoOutput capable of doubling frame rate
@@ -568,7 +574,9 @@ class MPUBLIC MythPlayer
     int jumpchapter;
 
     // Bookmark stuff
-    long long bookmarkseek;
+    uint64_t bookmarkseek;
+    int      clearSavedPosition;
+    int      endExitPrompt;
 
     // Seek
     /// If fftime>0, number of frames to seek forward.
@@ -589,7 +597,6 @@ class MPUBLIC MythPlayer
 
     // -- end state stuff --
 
-
     // Input Video Attributes
     QSize    video_disp_dim;  ///< Video (input) width & height
     QSize    video_dim;       ///< Video (input) buffer width & height
@@ -606,11 +613,11 @@ class MPUBLIC MythPlayer
     bool     m_scan_initialized;
     /// Video (input) Number of frames between key frames (often inaccurate)
     uint     keyframedist;
-    /// Stream has no video tracks
-    bool     noVideoTracks;
+
     // Buffering
     bool     buffering;
     QTime    buffering_start;
+
     // General Caption/Teletext/Subtitle support
     uint     textDisplayMode;
     uint     prevTextDisplayMode;
@@ -625,6 +632,7 @@ class MPUBLIC MythPlayer
     TeletextReader ttxReader;
     /// This allows us to enable captions/subtitles later if the streams
     /// are not immediately available when the video starts playing.
+    bool      captionsEnabledbyDefault;
     bool      textDesired;
     bool      enableCaptions;
     bool      disableCaptions;
@@ -652,6 +660,7 @@ class MPUBLIC MythPlayer
     PIPMap         pip_players;
     volatile bool  pip_active;
     volatile bool  pip_visible;
+    PIPLocation    pip_default_loc;
 
     // Filters
     QMutex   videofiltersLock;

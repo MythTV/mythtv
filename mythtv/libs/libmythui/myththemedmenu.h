@@ -1,6 +1,7 @@
 #ifndef MYTHTHEMEDMENU_H_
 #define MYTHTHEMEDMENU_H_
 
+#include "mythversion.h"
 #include "mythscreentype.h"
 #include "mythdialogbox.h"
 #include "mythuistatetype.h"
@@ -38,7 +39,7 @@ struct ButtonIcon
  *  \brief Private class that controls the settings of buttons, logos,
  *         backgrounds, texts, and more, for the MythThemedMenu class.
  */
-class MPUBLIC MythThemedMenuState : public MythScreenType
+class MUI_PUBLIC MythThemedMenuState : public MythScreenType
 {
   public:
     MythThemedMenuState(MythScreenStack *parent, const QString &name);
@@ -62,7 +63,7 @@ class MPUBLIC MythThemedMenuState : public MythScreenType
 };
 
 /// \brief Themed menu class, used for main menus in %MythTV frontend
-class MPUBLIC MythThemedMenu : public MythThemedMenuState
+class MUI_PUBLIC MythThemedMenu : public MythThemedMenuState
 {
     Q_OBJECT
   public:
@@ -84,6 +85,7 @@ class MPUBLIC MythThemedMenu : public MythThemedMenuState
     void aboutScreen();
     MythDialogBox* m_menuPopup;
     void customEvent(QEvent *event);
+    void mediaEvent(MythMediaEvent *event);
 
   protected:
     virtual bool keyPressEvent(QKeyEvent *e);

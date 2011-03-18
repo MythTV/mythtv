@@ -533,8 +533,6 @@ bool DDStructureParser::characters(const QString& pchars)
     return true;
 }
 
-extern const char *myth_source_version;
-
 DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
     listings_provider(lp % DD_PROVIDER_COUNT),
     userid(user),                   password(pass),
@@ -546,7 +544,7 @@ DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
     {
         QMutexLocker locker(&user_agent_lock);
         user_agent = QString("MythTV/%1.%2")
-            .arg(MYTH_BINARY_VERSION).arg(myth_source_version);
+            .arg(MYTH_BINARY_VERSION).arg(MYTH_SOURCE_VERSION);
     }
 
     DataDirectURLs urls0(
@@ -943,7 +941,7 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
 
 bool DataDirectProcessor::DDPost(
     QString    ddurl,
-    QString    postFilename, QString    inputFile,
+    QString    postFilename, QString   &inputFile,
     QString    userid,       QString    password,
     QDateTime  pstartDate,   QDateTime  pendDate,
     QString   &err_txt)
@@ -987,7 +985,9 @@ bool DataDirectProcessor::DDPost(
     password.replace('\'', "'\\''");
     userid.replace('\'', "'\\''");
 
-    QString outfile = (inputFile.isEmpty() ? "/tmp/crap" : inputFile);
+    if (inputFile.isEmpty()) {
+        inputFile = QString("/tmp/mythtv_ddp_data");
+    }
 
     QString command;
     {
@@ -996,7 +996,7 @@ bool DataDirectProcessor::DDPost(
             "wget --http-user='%1' --http-passwd='%2' --post-file='%3' "
             " %4 --user-agent='%5' --output-document=%6")
             .arg(userid).arg(password).arg(postFilename).arg(ddurl)
-            .arg(user_agent).arg(outfile);
+            .arg(user_agent).arg(inputFile);
     }
 
 #ifdef USING_MINGW
@@ -1022,7 +1022,7 @@ bool DataDirectProcessor::DDPost(
         return false;
 
 #ifndef USING_MINGW
-    command = QString("gzip -d %1").arg(outfile+".gz");
+    command = QString("gzip -df %1").arg(inputFile+".gz");
     if (myth_system(command) != GENERIC_EXIT_OK)
         return false;
 #endif
@@ -2138,7 +2138,7 @@ static QString html_escape(QString str)
             new_str += str[i];
         else
         {
-            new_str += QString("\%%1").arg((int)str[1].toLatin1(), 0, 16);
+            new_str += QString("%%1").arg((int)str[1].toLatin1(), 0, 16);
         }
     }
 

@@ -88,11 +88,14 @@ class DecoderBase
     DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo);
     virtual ~DecoderBase();
 
-    virtual void Reset(void);
+    virtual void Reset(bool reset_video_data, bool seek_reset, bool reset_file);
 
     virtual int OpenFile(RingBuffer *rbuffer, bool novideo,
                          char testbuf[kDecoderProbeBufferSize],
                          int testbufsize = kDecoderProbeBufferSize) = 0;
+
+    virtual void SetEof(bool eof)  { ateof = eof;  }
+    bool         GetEof(void)      { return ateof; }
 
     void setExactSeeks(bool exact) { exactseeks = exact; }
     bool getExactSeeks(void) const { return exactseeks;  }
@@ -120,6 +123,7 @@ class DecoderBase
     virtual int64_t NormalizeVideoTimecode(int64_t timecode) { return timecode; }
 
     virtual bool isLastFrameKey() = 0;
+    virtual bool isCodecMPEG() { return false; }
     virtual void WriteStoredData(RingBuffer *rb, bool storevid,
                                  long timecodeOffset) = 0;
     virtual void ClearStoredData(void) { return; };
@@ -195,6 +199,9 @@ class DecoderBase
     virtual bool SetAudioByComponentTag(int) { return false; }
     virtual bool SetVideoByComponentTag(int) { return false; }
 
+    void SaveTotalDuration(void);
+    void ResetTotalDuration(void) { totalDuration = 0; }
+
   protected:
     virtual int  AutoSelectTrack(uint type);
     inline  void AutoSelectTracks(void);
@@ -230,6 +237,7 @@ class DecoderBase
 
     long long framesPlayed;
     long long framesRead;
+    int64_t totalDuration;
     long long lastKey;
     int keyframedist;
     long long indexOffset;

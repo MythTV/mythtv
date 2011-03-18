@@ -68,6 +68,7 @@ void TeletextScreen::CleanUp(void)
     for (int i = 0; i < m_rowImages.size(); i++)
         delete m_rowImages.value(i);
     m_rowImages.clear();
+    SetRedraw();
 }
 
 QImage* TeletextScreen::GetRowImage(int row, QRect &rect)
@@ -229,10 +230,11 @@ void TeletextScreen::Pulse(void)
     OptimiseDisplayedArea();
 }
 
-void TeletextScreen::KeyPress(uint key)
+bool TeletextScreen::KeyPress(const QString &key)
 {
     if (m_teletextReader)
-        m_teletextReader->KeyPress(key);
+        return m_teletextReader->KeyPress(key);
+    return false;
 }
 
 void TeletextScreen::SetPage(int page, int subpage)
@@ -400,7 +402,8 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
         ch = page[x] & 0x7F;
         switch (ch)
         {
-            case 0x00 ... 0x07: // alpha + foreground color
+            case 0x00: case 0x01: case 0x02: case 0x03: 
+            case 0x04: case 0x05: case 0x06: case 0x07: // alpha + foreground color
                 fgcolor = ch & 7;
                 mosaic = false;
                 conceal = false;
@@ -426,7 +429,9 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
             case 0x0d: // double height
                 doubleheight = (row < (kTeletextRows-1)) && (x < (kTeletextColumns - 1));
                 goto ctrl;
-            case 0x10 ... 0x17: // graphics + foreground color
+
+            case 0x10: case 0x11: case 0x12: case 0x13: 
+            case 0x14: case 0x15: case 0x16: case 0x17: // graphics + foreground color
                 fgcolor = ch & 7;
                 mosaic = true;
                 conceal = false;
@@ -463,12 +468,14 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
                     ch = last_ch;
             break;
 
-            case 0x80 ... 0x9f: // these aren't used
-                ch = ' '; // BAD_CHAR;
-                break;
             default:
-                if (conceal && !m_teletextReader->RevealHidden())
-                    ch = ' ';
+                if ((ch >= 0x80) && (ch <=0x9f)) // these aren't used
+                    ch = ' '; // BAD_CHAR;
+                else
+                {
+                    if (conceal && !m_teletextReader->RevealHidden())
+                        ch = ' ';
+                }
                 break;
         }
 

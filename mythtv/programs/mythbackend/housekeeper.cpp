@@ -13,6 +13,7 @@ using namespace std;
 // Qt headers
 #include <QStringList>
 #include <QDateTime>
+#include <QDir>
 #include <QFileInfo>
 
 // MythTV headers
@@ -26,8 +27,9 @@ using namespace std;
 #include "programinfo.h"
 #include "eitcache.h"
 #include "scheduler.h"
-
-static bool HouseKeeper_filldb_running = false;
+#include "mythcoreutil.h"
+#include "mythdownloadmanager.h"
+#include "mythversion.h"
 
 HouseKeeper::HouseKeeper(bool runthread, bool master, Scheduler *lsched)
                         : threadrunning(runthread), filldbRunning(false),
@@ -37,13 +39,25 @@ HouseKeeper::HouseKeeper(bool runthread, bool master, Scheduler *lsched)
 
     if (runthread)
     {
-        pthread_t hkthread;
-        pthread_create(&hkthread, NULL, doHouseKeepingThread, this);
+        HouseKeepingThread.SetParent(this);
+        HouseKeepingThread.start();
     }
 }
 
 HouseKeeper::~HouseKeeper()
 {
+    if (HouseKeepingThread.isRunning())
+    {
+        HouseKeepingThread.terminate();
+        HouseKeepingThread.wait();
+    }
+
+    if (FillDBThread && FillDBThread->isRunning())
+    {
+        FillDBThread->terminate();
+        FillDBThread->wait();
+        delete FillDBThread;
+    }
 }
 
 bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
@@ -160,6 +174,7 @@ void HouseKeeper::RunHouseKeeping(void)
     int period, maxhr, minhr;
     QString dbTag;
     bool initialRun = true;
+    QFileInfo zipInfo(GetConfDir() + "/tmp/remotethemes/themes.zip");
 
     // wait a little for main server to come up and things to settle down
     sleep(10);
@@ -190,7 +205,7 @@ void HouseKeeper::RunHouseKeeping(void)
             // Run mythfilldatabase to grab the TV listings
             if (gCoreContext->GetNumSetting("MythFillEnabled", 1))
             {
-                if (HouseKeeper_filldb_running)
+                if (FillDBThread && FillDBThread->isRunning())
                 {
                     VERBOSE(VB_GENERAL, "mythfilldatabase still running, "
                                         "skipping checks.");
@@ -265,6 +280,15 @@ void HouseKeeper::RunHouseKeeping(void)
                 CleanupProgramListings();
                 updateLastrun("DailyCleanup");
             }
+
+            if ((gCoreContext->GetNumSetting("ThemeUpdateNofications", 1)) &&
+                ((!zipInfo.exists()) ||
+                 (zipInfo.lastModified() < mythCurrentDateTime().addDays(-2)) ||
+                 (wantToRun("ThemeChooserInfoCacheUpdate", 1, 0, 24, true))))
+            {
+                UpdateThemeChooserInfoCache();
+                updateLastrun("ThemeChooserInfoCacheUpdate");
+            }
         }
 
         dbTag = QString("JobQueueRecover-%1").arg(gCoreContext->GetHostName());
@@ -313,11 +337,13 @@ void HouseKeeper::flushLogs()
     }
 }
 
-void *HouseKeeper::runMFDThread(void *param)
+void MFDThread::run(void)
 {
-    HouseKeeper *keep = static_cast<HouseKeeper *>(param);
-    keep->RunMFD();
-    return NULL;
+    if (!m_parent)
+        return;
+
+    m_parent->RunMFD();
+    this->deleteLater();
 }
 
 void HouseKeeper::RunMFD(void)
@@ -367,20 +393,19 @@ void HouseKeeper::RunMFD(void)
         VERBOSE(VB_IMPORTANT, QString("MythFillDatabase command '%1' failed")
                                         .arg(command));
     }
-
-    HouseKeeper_filldb_running = false;
 }
 
 void HouseKeeper::runFillDatabase()
 {
-    if (HouseKeeper_filldb_running)
+    if (FillDBThread && FillDBThread->isRunning())
         return;
 
-    HouseKeeper_filldb_running = true;
+    if (FillDBThread)
+        delete FillDBThread;
 
-    pthread_t housekeep_thread;
-    pthread_create(&housekeep_thread, NULL, runMFDThread, this);
-    pthread_detach(housekeep_thread);
+    FillDBThread = new MFDThread;
+    FillDBThread->SetParent(this);
+    FillDBThread->start();
 }
 
 void HouseKeeper::CleanupMyOldRecordings(void)
@@ -518,7 +543,7 @@ void HouseKeeper::CleanupRecordedTables(void)
         while (query.next())
         {
             deleteQuery.bindValue(":CHANID", query.value(0).toString());
-            deleteQuery.bindValue(":STARTTIME", query.value(1).toString());
+            deleteQuery.bindValue(":STARTTIME", query.value(1).toDateTime());
             if (!deleteQuery.exec())
                 MythDB::DBError("HouseKeeper Cleaning Recorded Tables",
                                 deleteQuery);
@@ -539,8 +564,9 @@ void HouseKeeper::CleanupProgramListings(void)
 
     MSqlQuery query(MSqlQuery::InitCon());
     QString querystr;
-    // We keep seven days of guide data
-    int offset = 7;
+    // Keep as many days of listings data as we keep matching, non-recorded
+    // oldrecorded entries to allow for easier post-mortem analysis
+    int offset = gCoreContext->GetNumSetting( "CleanOldRecorded", 10);
 
     query.prepare("DELETE FROM oldprogram WHERE airdate < "
                   "DATE_SUB(CURRENT_DATE, INTERVAL 320 DAY);");
@@ -607,18 +633,66 @@ void HouseKeeper::CleanupProgramListings(void)
     if (!query.exec())
         MythDB::DBError("HouseKeeper Cleaning Program Listings", query);
 
-    int cleanOldRecorded = gCoreContext->GetNumSetting( "CleanOldRecorded", 10);
-
     query.prepare("DELETE FROM oldrecorded WHERE "
                   "recstatus <> :RECORDED AND duplicate = 0 AND "
                   "endtime < DATE_SUB(CURRENT_DATE, INTERVAL :CLEAN DAY);");
     query.bindValue(":RECORDED", rsRecorded);
-    query.bindValue(":CLEAN", cleanOldRecorded);
+    query.bindValue(":CLEAN", offset);
     if (!query.exec())
         MythDB::DBError("HouseKeeper Cleaning Program Listings", query);
 
 }
 
+void HouseKeeper::UpdateThemeChooserInfoCache(void)
+{
+    QString MythVersion = MYTH_SOURCE_PATH;
+
+    // FIXME: For now, treat git master the same as svn trunk
+    if (MythVersion == "master")
+        MythVersion = "trunk";
+
+    if (MythVersion != "trunk")
+    {
+        MythVersion = MYTH_BINARY_VERSION; // Example: 0.25.20101017-1
+        MythVersion.replace(QRegExp("\\.[0-9]{8,}.*"), "");
+    }
+
+    QString remoteThemesDir = GetConfDir();
+    remoteThemesDir.append("/tmp/remotethemes");
+
+    QDir dir(remoteThemesDir);
+    if (!dir.exists() && !dir.mkpath(remoteThemesDir))
+    {
+        VERBOSE(VB_IMPORTANT, QString("HouseKeeper: Error creating %1"
+                "directory for remote themes info cache.")
+                .arg(remoteThemesDir));
+        return;
+    }
+
+    QString remoteThemesFile = remoteThemesDir;
+    remoteThemesFile.append("/themes.zip");
+
+    QString url = QString("%1/%2/themes.zip")
+        .arg(gCoreContext->GetSetting("ThemeRepositoryURL",
+             "http://themes.mythtv.org/themes/repository")).arg(MythVersion);
+
+    bool result = GetMythDownloadManager()->download(url, remoteThemesFile);
+
+    if (!result)
+    {
+        VERBOSE(VB_IMPORTANT, QString("HouseKeeper: Error downloading %1"
+                "remote themes info package.").arg(url));
+        return;
+    }
+    
+    if (!extractZIP(remoteThemesFile, remoteThemesDir))
+    {
+        VERBOSE(VB_IMPORTANT, QString("HouseKeeper: Error extracting %1"
+                "remote themes info package.").arg(remoteThemesFile));
+        QFile::remove(remoteThemesFile);
+        return;
+    }
+}
 
 void HouseKeeper::RunStartupTasks(void)
 {
@@ -627,12 +701,12 @@ void HouseKeeper::RunStartupTasks(void)
 }
 
 
-void *HouseKeeper::doHouseKeepingThread(void *param)
+void HKThread::run(void)
 {
-    HouseKeeper *hkeeper = static_cast<HouseKeeper*>(param);
-    hkeeper->RunHouseKeeping();
+    if (!m_parent)
+        return;
 
-    return NULL;
+    m_parent->RunHouseKeeping();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

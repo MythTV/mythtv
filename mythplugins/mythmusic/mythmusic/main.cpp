@@ -366,7 +366,7 @@ static int runMenu(QString which_menu)
 
     if (diag->foundTheme())
     {
-        if (class LCD * lcd = LCD::Get())
+        if (LCD *lcd = LCD::Get())
         {
             lcd->switchToTime();
         }
@@ -476,6 +476,8 @@ static void handleMedia(MythMediaDevice *cd)
         gCDdevice = QString::null;
         return;
     }
+
+    GetMythMainWindow()->JumpTo("Main Menu");
 
     if (gCoreContext->GetNumSetting("AutoPlayCD", 0))
     {

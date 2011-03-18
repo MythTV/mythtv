@@ -3,7 +3,7 @@
 
 #include "mythplayer.h"
 
-class MPUBLIC MythCommFlagPlayer : public MythPlayer
+class MTV_PUBLIC MythCommFlagPlayer : public MythPlayer
 {
   public:
     MythCommFlagPlayer(bool muted = false) : MythPlayer(muted) { }

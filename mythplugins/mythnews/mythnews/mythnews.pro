@@ -12,7 +12,7 @@ INSTALLS += target
 
 INCLUDEPATH += $${PREFIX}/include/mythtv
 INCLUDEPATH += $${PREFIX}/include/mythtv/libmythui
-INCLUDEPATH += $${PREFIX}/include/mythtv/libmythdb
+INCLUDEPATH += $${PREFIX}/include/mythtv/libmythbase
 
 installfiles.path = $${PREFIX}/share/mythtv/mythnews
 installfiles.files = news-sites.xml
@@ -27,6 +27,8 @@ SOURCES += mythnews.cpp   mythnewsconfig.cpp mythnewseditor.cpp
 SOURCES += newssite.cpp   newsarticle.cpp
 SOURCES += newsdbutil.cpp dbcheck.cpp
 SOURCES += main.cpp
+
+DEFINES += MPLUGIN_API
 
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden

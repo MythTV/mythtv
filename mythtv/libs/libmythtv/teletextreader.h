@@ -22,33 +22,6 @@ typedef enum
     kTTColorTransparent = 8,
 } TTColor;
 
-class TTKey
-{
-  public:
-    static const uint k0            = 0;
-    static const uint k1            = 1;
-    static const uint k2            = 2;
-    static const uint k3            = 3;
-    static const uint k4            = 4;
-    static const uint k5            = 5;
-    static const uint k6            = 6;
-    static const uint k7            = 7;
-    static const uint k8            = 8;
-    static const uint k9            = 9;
-    static const uint kNextPage     = 10;
-    static const uint kPrevPage     = 11;
-    static const uint kNextSubPage  = 12;
-    static const uint kPrevSubPage  = 13;
-    static const uint kHold         = 14;
-    static const uint kTransparent  = 15;
-    static const uint kFlofRed      = 16;
-    static const uint kFlofGreen    = 17;
-    static const uint kFlofYellow   = 18;
-    static const uint kFlofBlue     = 19;
-    static const uint kFlofWhite    = 20;
-    static const uint kRevealHidden = 21;
-};
-
 #define TP_SUPPRESS_HEADER  0x01
 #define TP_UPDATE_INDICATOR 0x02
 #define TP_INTERRUPTED_SEQ  0x04
@@ -101,7 +74,7 @@ class TeletextReader
 
     // OSD/Player methods
     void Reset(void);
-    void KeyPress(uint key);
+    bool KeyPress(const QString &key);
     QString GetPage(void);
     void SetPage(int page, int subpage);
     void SetSubPage(int subpage)        { m_cursubpage = subpage;      }

@@ -22,7 +22,7 @@ GITREPOPATH="exported"
 
 cd ${GITTREEDIR}
 
-SOURCE_VERSION=$(git describe --dirty || echo Unknown)
+SOURCE_VERSION=$(git describe --dirty || git describe || echo Unknown)
 
 case "${SOURCE_VERSION}" in
     exported|Unknown)
@@ -31,21 +31,19 @@ case "${SOURCE_VERSION}" in
         fi
     ;;
     *)
-    BRANCH=$(git branch | sed -e '/^[^\*]/d' -e 's/^\* //' -e 's/(no branch)/exported/')
+    BRANCH=$(git branch --no-color | sed -e '/^[^\*]/d' -e 's/^\* //' -e 's/(no branch)/exported/')
     ;;
 esac
 
 cat > .vers.new <<EOF
-#include "mythexp.h"
-#include "mythversion.h"
-
-const MPUBLIC char *myth_source_version = "${SOURCE_VERSION}";
-const MPUBLIC char *myth_source_path = "${BRANCH}";
-const MPUBLIC char *myth_binary_version = MYTH_BINARY_VERSION;
+#ifndef MYTH_SOURCE_VERSION
+#define MYTH_SOURCE_VERSION "${SOURCE_VERSION}"
+#define MYTH_SOURCE_PATH    "${BRANCH}"
+#endif
 EOF
 
 # check if the version strings are changed and update version.pro if necessary
-if ! cmp -s .vers.new version.cpp; then
-   mv -f .vers.new version.cpp
+if ! cmp -s .vers.new libs/libmythbase/version.h; then
+   mv -f .vers.new libs/libmythbase/version.h
 fi
 rm -f .vers.new

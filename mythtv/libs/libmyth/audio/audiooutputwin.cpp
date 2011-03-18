@@ -139,7 +139,7 @@ AudioOutputWin::~AudioOutputWin()
     }
 }
 
-AudioOutputSettings* AudioOutputWin::GetOutputSettings(void)
+AudioOutputSettings* AudioOutputWin::GetOutputSettings(bool /*digital*/)
 {
     AudioOutputSettings *settings = new AudioOutputSettings();
 

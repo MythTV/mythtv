@@ -3,6 +3,7 @@
 
 // C
 #include <cstdlib>
+#include <time.h>
 
 // POSIX
 #include <stdint.h>
@@ -17,7 +18,7 @@
 #include <QEvent>
 #include <QCoreApplication>
 
-// Libmythdb
+// libmythbase
 #include "mythverbose.h"
 
 // Mythui

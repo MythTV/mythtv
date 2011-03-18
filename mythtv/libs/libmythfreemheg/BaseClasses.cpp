@@ -140,7 +140,7 @@ void MHOctetString::Append(const MHOctetString &str)
 }
 
 // Colour
-void MHColour::Initialise(MHParseNode *p, MHEngine */*engine*/)
+void MHColour::Initialise(MHParseNode *p, MHEngine * /*engine*/)
 {
     if (p->m_nNodeType == MHParseNode::PNInt) m_nColIndex = p->GetIntValue();
     else p->GetStringValue(m_ColStr);

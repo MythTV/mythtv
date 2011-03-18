@@ -3,6 +3,7 @@
 
 #include <QWidget>
 
+#include "mythuiactions.h"
 #include "mythuitype.h"
 #include "mythscreenstack.h"
 
@@ -25,8 +26,9 @@ class MythPainterWindowGL;
 class MythPainterWindowQt;
 class MythPainterWindowVDPAU;
 class MythPainterWindowD3D9;
+class MythRender;
 
-class MPUBLIC MythMainWindow : public QWidget
+class MUI_PUBLIC MythMainWindow : public QWidget
 {
     Q_OBJECT
     friend class MythPainterWindowGL;
@@ -41,12 +43,14 @@ class MPUBLIC MythMainWindow : public QWidget
 
     void AddScreenStack(MythScreenStack *stack, bool main = false);
     void PopScreenStack();
+    int GetStackCount(void);
     MythScreenStack *GetMainStack();
     MythScreenStack *GetStack(const QString &stackname);
+    MythScreenStack *GetStackAt(int pos);
 
     bool TranslateKeyPress(const QString &context, QKeyEvent *e,
                            QStringList &actions, bool allowJumps = true)
-                           __attribute__ ((warn_unused_result));
+                           MUNUSED_RESULT;
 
     void ResetKeys(void);
     void ClearKey(const QString &context, const QString &action);
@@ -85,6 +89,7 @@ class MPUBLIC MythMainWindow : public QWidget
 
     MythPainter *GetCurrentPainter();
     QWidget     *GetPaintWindow();
+    MythRender  *GetRenderDevice();
 
     bool screenShot(QString fname, int x, int y, int x2, int y2, int w, int h);
     bool screenShot(int x, int y, int x2, int y2);
@@ -155,11 +160,11 @@ class MPUBLIC MythMainWindow : public QWidget
     MythMainWindowPrivate *d;
 };
 
-MPUBLIC MythMainWindow *GetMythMainWindow();
-MPUBLIC bool HasMythMainWindow();
-MPUBLIC void DestroyMythMainWindow();
+MUI_PUBLIC MythMainWindow *GetMythMainWindow();
+MUI_PUBLIC bool HasMythMainWindow();
+MUI_PUBLIC void DestroyMythMainWindow();
 
-MPUBLIC MythPainter *GetMythPainter();
+MUI_PUBLIC MythPainter *GetMythPainter();
 
 #endif
 

@@ -4,9 +4,6 @@
 #ifndef SIGNALMONITOR_H
 #define SIGNALMONITOR_H
 
-// C headers
-#include <pthread.h>
-
 // C++ headers
 #include <vector>
 #include <algorithm>
@@ -14,6 +11,7 @@ using namespace std;
 
 // Qt headers
 #include <QMutex>
+#include <QThread>
 
 // MythTV headers
 #include "signalmonitorvalue.h"
@@ -28,9 +26,22 @@ using namespace std;
 inline QString sm_flags_to_string(uint64_t);
 
 class TVRec;
+class SignalMonitor;
+
+class SignalLoopThread : public QThread
+{
+    Q_OBJECT
+  public:
+    SignalLoopThread() : m_parent(NULL) {}
+    void SetParent(SignalMonitor *parent) { m_parent = parent; }
+    void run(void);
+  private:
+    SignalMonitor *m_parent;
+};
 
 class SignalMonitor
 {
+    friend class SignalLoopThread;
   public:
     /// Returns true iff the card type supports signal monitoring.
     static inline bool IsRequired(const QString &cardtype);
@@ -117,7 +128,6 @@ class SignalMonitor
     SignalMonitor(int db_cardnum, ChannelBase *_channel,
                   uint64_t wait_for_mask);
 
-    static void* SpawnMonitorLoop(void*);
     virtual void MonitorLoop();
 
     bool IsChannelTuned(void);
@@ -132,8 +142,8 @@ class SignalMonitor
     /// We've seen a PMT,
     /// which maps program to audio, video and other stream PIDs
     static const uint64_t kDTVSigMon_PMTSeen    = 0x0000000002ULL;
-    /// We've seen an MGT,
-    /// which ells us on which PIDs to find VCT and other ATSC tables
+    /// We've seen a MGT,
+    /// which tells us on which PIDs to find VCT and other ATSC tables
     static const uint64_t kDTVSigMon_MGTSeen    = 0x0000000004ULL;
     /// We've seen a VCT, which maps ATSC Channels to
     /// MPEG program numbers, and provides additional data
@@ -142,10 +152,10 @@ class SignalMonitor
     static const uint64_t kDTVSigMon_TVCTSeen   = 0x0000000010ULL;
     /// We've seen a CVCT, the cable version of the VCT
     static const uint64_t kDTVSigMon_CVCTSeen   = 0x0000000020ULL;
-    /// We've seen an NIT,
+    /// We've seen a NIT,
     /// which tells us where to find SDT and other DVB tables
     static const uint64_t kDTVSigMon_NITSeen    = 0x0000000040ULL;
-    /// We've seen an SDT, which maps DVB Channels to MPEG
+    /// We've seen a SDT, which maps DVB Channels to MPEG
     /// program numbers, and provides additional data
     static const uint64_t kDTVSigMon_SDTSeen    = 0x0000000080ULL;
     /// We've seen the FireWire STB power state
@@ -198,14 +208,13 @@ class SignalMonitor
     static const uint64_t kDVBSigMon_WaitForPos = 0x8000000000ULL;
 
   protected:
-    pthread_t    monitor_thread;
+    SignalLoopThread monitor_thread;
     ChannelBase *channel;
     TVRec       *pParent;
     int          capturecardnum;
     uint64_t     flags;
     int          update_rate;
     uint         minimum_update_rate;
-    bool         running;
     bool         exit;
     bool         update_done;
     bool         notify_frontend;

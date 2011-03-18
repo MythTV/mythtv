@@ -25,8 +25,52 @@
     <button>
         <type>SETTINGS_AUDIOGENERAL</type>
         <text>Audio</text>
-        <description>Configure local audio output</description>
+        <description>Configure audio playback</description>
         <action>SETTINGS AUDIOGENERAL</action>
+    </button>
+
+    <button>
+        <type>SETTINGS_TV</type>
+        <text>Video</text>
+        <description>Configure video recording and playback</description>
+        <action>MENU tv_settings.xml</action>
+    </button>
+
+    <button>
+        <type>SETTINGS_MEDIA</type>
+        <text>Media Settings</text>
+        <description>Configure music, video, and other media plugins</description>
+        <action>MENU media_settings.xml</action>
+        <depends>mythvideo mythmusic mythgallery mythfm mythgame mythburn mytharchive</depends>
+    </button>
+
+    <button>
+        <type>SETTINGS_INFO_CENTER</type>
+        <text>Info Center Settings</text>
+        <description>Configure surveillance, weather, news, and the web</description>
+        <action>MENU info_settings.xml</action>
+        <depends>mythnews mythweather mythbookmarkmanager mythrecipe mythbrowser mythmovies mythzoneminder</depends>
+    </button>
+
+    <button>
+        <type>SETTINGS_SYSTEM_EVENTS</type>
+        <text>System Event Handlers</text>
+        <description>Configure System Event handler commands</description>
+        <action>SYSTEM_EVENTS</action>
+    </button>
+
+    <button>
+        <type>SETUP_KEYS</type>
+        <text>Edit Keys</text>
+        <description>Change MythTV key bindings.</description>
+        <action>SETUP_KEYS</action>
+    </button>
+
+    <button>
+        <type>SETTINGS_GRABBERS</type>
+        <text>Artwork and Data Sources</text>
+        <description>Configure sources of artwork and metadata</description>
+        <action>SETTINGS GRABBERS</action>
     </button>
 
     <button>
@@ -37,41 +81,10 @@
     </button>
 
     <button>
-        <type>SETTINGS_TV</type>
-        <text>TV Settings</text>
-        <description>Settings for TV recording and playback</description>
-        <action>MENU tv_settings.xml</action>
-    </button>
-
-    <button>
-        <type>SETTINGS_MEDIA</type>
-        <text>Media Settings</text>
-        <description>Settings for all non-TV media</description>
-        <action>MENU media_settings.xml</action>
-        <depends>mythvideo mythmusic mythgallery mythfm mythgame mythburn mytharchive</depends>
-    </button>
-
-    <button>
-        <type>SETTINGS_INFO_CENTER</type>
-        <text>Info Center Settings</text>
-        <description>Configure weather, news, movie info, web, and recipes</description>
-        <action>MENU info_settings.xml</action>
-        <depends>mythnews mythweather mythbookmarkmanager mythrecipe mythbrowser mythmovies</depends>
-    </button>
-
-    <button>
-        <type>ZONEMINDER</type>
-        <text>ZoneMinder Settings</text>
-        <description>Set up surveillance software</description>
-        <action>CONFIGPLUGIN mythzoneminder</action>
-        <depends>mythzoneminder</depends>
-    </button>
-
-    <button>
-        <type>SETTINGS_SYSTEM_EVENTS</type>
-        <text>System Event Handlers</text>
-        <description>Configure System Event handler commands</description>
-        <action>SYSTEM_EVENTS</action>
+        <type>SETTINGS_SETUPWIZARD</type>
+        <text>Setup Wizard</text>
+        <description>Perform basic configuration tasks</description>
+        <action>SETTINGS SETUPWIZARD</action>
     </button>
 
 </mythmenu>

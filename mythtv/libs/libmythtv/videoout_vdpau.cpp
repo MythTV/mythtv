@@ -178,7 +178,7 @@ bool VideoOutputVDPAU::InitBuffers(void)
     const QSize video_dim = codec_is_std(video_codec_id) ?
                             window.GetVideoDim() : window.GetActualVideoDim();
 
-    vbuffers.Init(m_buffer_size, false, 2, 1, 4, 1, false);
+    vbuffers.Init(m_buffer_size, false, 2, 1, 4, 1);
 
     bool ok = false;
     if (codec_is_vdpau(video_codec_id))

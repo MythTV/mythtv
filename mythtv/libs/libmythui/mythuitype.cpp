@@ -58,6 +58,8 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
     m_Fonts = new FontMap();
     m_focusOrder = 0;
     m_Painter = NULL;
+
+    m_BorderColor = QColor(rand() % 255, rand()  % 255, rand()  % 255);
 }
 
 MythUIType::~MythUIType()
@@ -112,7 +114,7 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
         else if ((!inheritsClass || obj->inherits(inheritsClass))
                    && (!objName || obj->objectName() == oName))
             return obj;
-        if (recursiveSearch && (dynamic_cast<MythUIGroup *>(obj) != NULL) 
+        if (recursiveSearch && (dynamic_cast<MythUIGroup *>(obj) != NULL)
                             && (obj = qChildHelper(objName, inheritsClass,
                                                    recursiveSearch,
                                                    obj->children())))
@@ -452,6 +454,21 @@ void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
         (*it)->Draw(p, xoffset + m_Area.x(), yoffset + m_Area.y(),
                     CalcAlpha(alphaMod), clipRect);
     }
+
+    if (p->ShowBorders())
+    {
+        static const QBrush nullbrush(Qt::NoBrush);
+        p->DrawRect(realArea, nullbrush, QPen(m_BorderColor), 255);
+
+        if (p->ShowTypeNames())
+        {
+            MythFontProperties font;
+            font.SetFace(QFont("Droid Sans"));
+            font.SetColor(m_BorderColor);
+            font.SetPointSize(8);
+            p->DrawText(realArea, objectName(), 0, font, 255, realArea);
+        }
+    }
 }
 
 void MythUIType::SetPosition(int x, int y)
@@ -707,12 +724,20 @@ void MythUIType::customEvent(QEvent *)
 /** \brief Mouse click/movement handler, receives mouse gesture events from the
  *         QCoreApplication event loop. Should not be used directly.
  *
- *  \param uitype The mythuitype receiving the event
  *  \param event Mouse event
  */
-bool MythUIType::gestureEvent(MythGestureEvent *ge)
+bool MythUIType::gestureEvent(MythGestureEvent *)
 {
     return false;
+}
+
+/** \brief Media/Device status event handler, received from MythMediaMonitor
+ *
+ *  \param event Media event
+ */
+void MythUIType::mediaEvent (MythMediaEvent*)
+{
+    return;
 }
 
 void MythUIType::LoseFocus(void)
@@ -853,7 +878,7 @@ bool MythUIType::ParseElement(
     const QString &filename, QDomElement &element, bool showWarnings)
 {
     //FIXME add movement etc.
-    
+
     if (element.tagName() == "position")
         SetPosition(parsePoint(element));
     else if (element.tagName() == "area")
@@ -1003,7 +1028,7 @@ void MythUIType::LoadNow(void)
  */
 bool MythUIType::ContainsPoint(const QPoint &point) const
 {
-    if (m_Area.contains(point - m_Area.topLeft()))
+    if (m_Area.contains(point))
         return true;
 
     return false;

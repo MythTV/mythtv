@@ -11,8 +11,8 @@ class MythBackend {
 
 // MYTH_PROTO_VERSION is defined in libmyth in mythtv/libs/libmyth/mythcontext.h
 // and should be the current MythTV protocol version.
-    static $protocol_version        = '64';
-    static $protocol_token          = '8675309J';
+    static $protocol_version        = '65';
+    static $protocol_token          = 'D2BB94C2';
 
 // The character string used by the backend to separate records
     static $backend_separator       = '[]:[]';
@@ -37,7 +37,7 @@ class MythBackend {
             $host = setting('MasterServerIP');
             $port = setting('MasterServerPort');
             if (!$host || !$port)
-                trigger_error("MasterServerIP or MasterServerPort not found! You may"
+                trigger_error("MasterServerIP or MasterServerPort not found! You may "
                             ."need to check your mythweb.conf file or re-run mythtv-setup",
                             FATAL);
         }
@@ -210,7 +210,7 @@ class MythBackend {
  * Request something from the backend's HTTP API
 /**/
     public function httpRequest($path, $args = array()) {
-        $url = "http://{$this->ip}:{$this->port_http}/Myth/{$path}?";
+        $url = "http://{$this->ip}:{$this->port_http}/{$path}?";
         foreach ($args as $key => $value) {
             $url .= urlencode($key).'='.urlencode($value).'&';
         }

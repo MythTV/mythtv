@@ -1,4 +1,5 @@
 include ( ../../settings.pro)
+include ( ../../version.pro)
 include ( ../programs-libs.pro)
 
 QT += network xml sql qt3support
@@ -29,5 +30,5 @@ INCLUDEPATH += ../../libs/
         DEPENDPATH  += ../../libs/libmythmpeg2
         INCLUDEPATH += ../../libs/libmythmpeg2
         LIBS += -L../../libs/libmythmpeg2 -lmythmpeg2-$$LIBVERSION
-        TARGETDEPS += ../../libs/libmythmpeg2/libmythmpeg2-$${MYTH_LIB_EXT}
+        POST_TARGETDEPS += ../../libs/libmythmpeg2/libmythmpeg2-$${MYTH_LIB_EXT}
 }

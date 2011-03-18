@@ -30,7 +30,7 @@ extern "C" void diskAppearedCallback(DADiskRef disk, void *context);
 extern "C" void diskDisappearedCallback(DADiskRef disk, void *context);
 extern "C" void diskChangedCallback(DADiskRef disk,
                                     CFArrayRef keys, void *context);
-extern "C" MediaType MediaTypeForBSDName(const char *bsdName);
+extern "C" MythMediaType MediaTypeForBSDName(const char *bsdName);
 
 static mach_port_t sMasterPort;
 
@@ -38,11 +38,11 @@ static mach_port_t sMasterPort;
 /**
  * Guess the media that a volume/partition is on
  */
-MediaType FindMediaType(io_service_t service)
+MythMediaType FindMediaType(io_service_t service)
 {
     kern_return_t  kernResult;
     io_iterator_t  iter;
-    MediaType      mediaType = MEDIATYPE_UNKNOWN;
+    MythMediaType  mediaType = MEDIATYPE_UNKNOWN;
     QString        msg = QString("FindMediaType() - ");
     bool           isWholeMedia = false;
 
@@ -107,7 +107,7 @@ MediaType FindMediaType(io_service_t service)
 /**
  * Given a BSD device node name, guess its media type
  */
-MediaType MediaTypeForBSDName(const char *bsdName)
+MythMediaType MediaTypeForBSDName(const char *bsdName)
 {
     CFMutableDictionaryRef  matchingDict;
     kern_return_t           kernResult;
@@ -115,7 +115,7 @@ MediaType MediaTypeForBSDName(const char *bsdName)
     io_service_t            service;
     QString                 msg = QString("MediaTypeForBSDName(%1)")
                                   .arg(bsdName);
-    MediaType               mediaType;
+    MythMediaType           mediaType;
 
 
     if (!bsdName || !*bsdName)
@@ -254,7 +254,7 @@ void diskAppearedCallback(DADiskRef disk, void *context)
     const char          *BSDname = DADiskGetBSDName(disk);
     CFDictionaryRef      details;
     bool                 isCDorDVD;
-    MediaType            mediaType;
+    MythMediaType        mediaType;
     QString              model;
     MonitorThreadDarwin *mtd;
     QString              msg = "diskAppearedCallback() - ";
@@ -507,7 +507,7 @@ void MediaMonitorDarwin::StartMonitoring(void)
     if (!m_Thread)
         m_Thread = new MonitorThreadDarwin(this, m_MonitorPollingInterval);
 
-    qRegisterMetaType<MediaStatus>("MediaStatus");
+    qRegisterMetaType<MythMediaStatus>("MythMediaStatus");
 
     VERBOSE(VB_MEDIA, "Starting MediaMonitor");
     m_Active = true;
@@ -540,8 +540,8 @@ bool MediaMonitorDarwin::AddDevice(MythMediaDevice* pDevice)
     if (m_SendEvent)
     {
         pDevice->setStatus(MEDIASTAT_NODISK);
-        connect(pDevice, SIGNAL(statusChanged(MediaStatus, MythMediaDevice*)),
-                this, SLOT(mediaStatusChanged(MediaStatus, MythMediaDevice*)));
+        connect(pDevice, SIGNAL(statusChanged(MythMediaStatus, MythMediaDevice*)),
+                this, SLOT(mediaStatusChanged(MythMediaStatus, MythMediaDevice*)));
         pDevice->setStatus(MEDIASTAT_USEABLE);
     }
 

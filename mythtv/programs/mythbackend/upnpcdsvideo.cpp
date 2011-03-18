@@ -1,7 +1,7 @@
 // Program Name: upnpcdsvideo.cpp
-//
-// Purpose - uPnp Content Directory Extension for MythVideo Videos
-//
+//                                                                            
+// Purpose - UPnP Content Directory Extension for MythVideo Videos
+//                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
 // POSIX headers
@@ -13,22 +13,22 @@
 // MythTV headers
 #include "upnpcdsvideo.h"
 #include "httprequest.h"
-#include "upnpmedia.h"
 #include "util.h"
 #include "mythcorecontext.h"
+#include "storagegroup.h"
 
 #define LOC QString("UPnpCDSVideo: ")
 #define LOC_WARN QString("UPnpCDSVideo, Warning: ")
 #define LOC_ERR QString("UPnpCDSVideo, Error: ")
 
-UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] =
+UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] = 
 {
-    {   "VideoRoot",
+    {   "All Videos", 
         "*",
         "SELECT 0 as key, "
           "title as name, "
           "1 as children "
-            "FROM upnpmedia "
+            "FROM videometadata "
             "%1 "
             "ORDER BY title",
         "", "title" }
@@ -47,7 +47,7 @@ int UPnpCDSVideo::g_nRootCount = 1;
 UPnpCDSRootInfo *UPnpCDSVideo::GetRootInfo( int nIdx )
 {
     if ((nIdx >=0 ) && ( nIdx < g_nRootCount ))
-        return &(g_RootNodes[ nIdx ]);
+        return &(g_RootNodes[ nIdx ]); 
 
     return NULL;
 }
@@ -67,7 +67,7 @@ int UPnpCDSVideo::GetRootCount()
 
 QString UPnpCDSVideo::GetTableName( QString sColumn )
 {
-    return "upnpmedia";
+    return "videometadata";
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -76,9 +76,10 @@ QString UPnpCDSVideo::GetTableName( QString sColumn )
 
 QString UPnpCDSVideo::GetItemListSQL( QString sColumn )
 {
-    return "SELECT intid, title, filepath, " \
-           "itemtype, itemproperties, parentid, "\
-           "coverart FROM upnpmedia WHERE class = 'VIDEO'";
+    return "SELECT intid, title, subtitle, filename, director, plot, "
+            "rating, year, userrating, length, " 
+            "season, episode, coverfile, insertdate, host FROM videometadata";
+
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -89,12 +90,12 @@ void UPnpCDSVideo::BuildItemQuery( MSqlQuery &query, const QStringMap &mapParams
 {
     int nVideoID = mapParams[ "Id" ].toInt();
 
-    QString sSQL = QString( "%1 AND intid=:VIDEOID ORDER BY title DESC" )
-                                                    .arg( GetItemListSQL( ) );
+    QString sSQL = QString( "WHERE %1 AND intid=:VIDEOID ORDER BY title DESC" )
+                    .arg( GetItemListSQL( ) );
 
     query.prepare( sSQL );
 
-    query.bindValue( ":VIDEOID", (int)nVideoID    );
+    query.bindValue( ":VIDEOID", (int)nVideoID );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -213,10 +214,7 @@ int UPnpCDSVideo::GetDistinctCount( UPnpCDSRootInfo *pInfo )
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT COUNT(*) FROM upnpmedia WHERE class = 'VIDEO' "
-                    "AND parentid = :ROOTID");
-
-    query.bindValue(":ROOTID", STARTING_VIDEO_OBJECTID);
+    query.prepare("SELECT COUNT(*) FROM videometadata");
 
     if (query.exec() && query.next())
     {
@@ -226,246 +224,118 @@ int UPnpCDSVideo::GetDistinctCount( UPnpCDSRootInfo *pInfo )
     return nCount;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-UPnpCDSExtensionResults *UPnpCDSVideo::ProcessItem( UPnpCDSRequest          *pRequest,
-                                                    UPnpCDSExtensionResults *pResults,
-                                                    QStringList             &idPath )
-{
-    pResults->m_nTotalMatches   = 0;
-    pResults->m_nUpdateID       = 1;
-
-    if (pRequest->m_sObjectId.length() == 0)
-        return pResults;
-
-    QStringList tokens = pRequest->m_sObjectId
-        .split('/', QString::SkipEmptyParts);
-    QString     sId    = tokens.last();
-
-    if (sId.startsWith("Id"))
-        sId = sId.right( sId.length() - 2);
-
-    switch( pRequest->m_eBrowseFlag )
-    {
-        case CDS_BrowseMetadata:
-        {
-            // --------------------------------------------------------------
-            // Return 1 Item
-            // --------------------------------------------------------------
-
-            QStringMap  mapParams;
-
-            mapParams.insert( "Id", sId );
-
-            MSqlQuery query(MSqlQuery::InitCon());
-
-            if (query.isConnected())
-            {
-                BuildItemQuery( query, mapParams );
-
-                if (query.exec() && query.next())
-                {
-                        AddItem( pRequest, pRequest->m_sParentId, pResults, false, query );
-                        pResults->m_nTotalMatches = 1;
-                }
-            }
-
-            break;
-        }
-
-        case CDS_BrowseDirectChildren:
-        {
-            pRequest->m_sParentId = sId;
-
-            CreateItems( pRequest, pResults, 0, "", false );
-
-            break;
-        }
-    }
-
-    return pResults;
-}
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpCDSVideo::CreateItems( UPnpCDSRequest          *pRequest,
-                                UPnpCDSExtensionResults *pResults,
-                                int                      nNodeIdx,
-                                const QString           &sKey,
-                                bool                     bAddRef )
-{
-    pResults->m_nTotalMatches = 0;
-    pResults->m_nUpdateID     = 1;
-
-    UPnpCDSRootInfo *pInfo = GetRootInfo( nNodeIdx );
-
-    if (pInfo == NULL)
-        return;
-
-    if (pRequest->m_nRequestedCount == 0)
-        pRequest->m_nRequestedCount = SHRT_MAX;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    if (query.isConnected())
-    {
-        QString ParentClause;
-        QString sWhere;
-
-        if ( sKey.length() > 0)
-        {
-           sWhere = QString( "WHERE %1=:KEY " )
-                       .arg( pInfo->column );
-        }
-
-        if (pRequest->m_sObjectId.startsWith("Videos"))
-        {
-            if (!pRequest->m_sParentId.isEmpty())
-            {
-                if (pRequest->m_sParentId == "Videos/0")
-                {
-                    pRequest->m_sParentId = QString("%1")
-                                .arg(STARTING_VIDEO_OBJECTID);
-                }
-            }
-            else
-            {
-                QStringList tokens =
-                    pRequest->m_sObjectId.split('=', QString::SkipEmptyParts);
-                pRequest->m_sParentId = tokens.last();
-            }
-
-            if (pRequest->m_sSearchClass.isEmpty())
-                ParentClause = " AND parentid = \"" + pRequest->m_sParentId + "\"";
-            else
-                pRequest->m_sParentId = '8';
-
-            if (pRequest->m_sObjectId.startsWith("Videos/0"))
-            {
-                pRequest->m_sObjectId = "Videos/0";
-            }
-
-            /*
-            VERBOSE(VB_UPNP, QString("pRequest->m_sParentId=:%1: , "
-                                     "pRequest->m_sObjectId=:%2:, sKey=:%3:")
-                                                 .arg(pRequest->m_sParentId)
-                                                 .arg(pRequest->m_sObjectId)
-                                                 .arg(sKey));
-             */
-
-            if ((!pRequest->m_sParentId.isEmpty()) && (pRequest->m_sParentId != "8"))
-                pResults->m_nTotalMatches = GetCount( "parentid", pRequest->m_sParentId );
-        }
-        else
-            VERBOSE( VB_UPNP, QString( "UPnpCDSVideo::CreateItems: ******* ParentID Does NOT Start with 'Videos' ParentId = {0}" )
-                                  .arg( pRequest->m_sParentId ));
-
-        QString sSQL = QString( "%1 %2 LIMIT %3, %4" )
-                          .arg( GetItemListSQL( pInfo->column )  )
-                          .arg( sWhere + ParentClause )
-                          .arg( pRequest->m_nStartingIndex  )
-                          .arg( pRequest->m_nRequestedCount );
-
-        query.prepare  ( sSQL );
-        //VERBOSE(VB_UPNP, QString("sSQL = %1").arg(sSQL));
-        if ( sKey.length() )
-            query.bindValue(":KEY", sKey );
-
-        if (query.exec())
-        {
-            while(query.next())
-                AddItem( pRequest, pRequest->m_sObjectId, pResults, bAddRef, query );
-
-        }
-    }
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
+void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest, 
                             const QString           &sObjectId,
                             UPnpCDSExtensionResults *pResults,
                             bool                     bAddRef,
                             MSqlQuery               &query )
 {
+
     int            nVidID       = query.value( 0).toInt();
     QString        sTitle       = query.value( 1).toString();
-    QString        sFileName    = query.value( 2).toString();
-    QString        sItemType    = query.value( 3).toString();
-    QString        sParentID    = query.value( 5).toString();
-    QString        sCoverArt    = query.value( 6).toString();
-
-    // VERBOSE(VB_UPNP,QString("ID = %1, Title = %2, fname = %3 sObjectId = %4").arg(nVidID).arg(sTitle).arg(sFileName).arg(sObjectId));
+    QString        sSubtitle    = query.value( 2).toString();
+    QString        sFilePath    = query.value( 3).toString();
+    QString        sDirector    = query.value( 4).toString();
+    QString        sPlot        = query.value( 5).toString();
+    QString        sRating      = query.value( 6).toString();
+    // int             nYear        = query.value( 7).toInt();
+    // int             nUserRating  = query.value( 8).toInt();
+    int            nLength      = query.value( 9).toInt();
+    // int             nSeason      = query.value(10).toInt();
+    // int             nEpisode     = query.value(11).toInt();
+    QString        sCoverArt    = query.value(12).toString();
+    QDateTime      dtInsertDate = query.value(13).toDateTime();
+    QString        sHostName    = query.value(14).toString();
 
     // ----------------------------------------------------------------------
     // Cache Host ip Address & Port
     // ----------------------------------------------------------------------
-    QString sServerIp = gCoreContext->GetSetting("BackendServerIp"   );
-    QString sPort     = gCoreContext->GetSetting("BackendStatusPort" );
 
+    // If the host-name is empty then we assume it is our local host
+    // otherwise, we look up the host's IP address and port.  When the
+    // client then trys to play the video it will be directed to the
+    // host which actually has the content.
+    if (!m_mapBackendIp.contains( sHostName ))
+    {
+        if (sHostName.isEmpty())
+        {
+            m_mapBackendIp[sHostName] = 
+                gCoreContext->GetSetting( "BackendServerIP" );
+        }
+        else
+        {
+            m_mapBackendIp[sHostName] = 
+                gCoreContext->GetSettingOnHost( "BackendServerIp", sHostName);
+        }
+    }
+
+    if (!m_mapBackendPort.contains( sHostName ))
+    {
+        if (sHostName.isEmpty())
+        {
+            m_mapBackendPort[sHostName] = 
+                gCoreContext->GetSetting( "BackendStatusPort" );
+        }
+        else
+        {
+            m_mapBackendPort[sHostName] = 
+                gCoreContext->GetSettingOnHost("BackendStatusPort", sHostName);
+        }
+    }
+    
+    
     // ----------------------------------------------------------------------
     // Build Support Strings
     // ----------------------------------------------------------------------
 
     QString sName      = sTitle;
+    if( !sSubtitle.isEmpty() )
+    {
+        sName += " - " + sSubtitle;
+    }
 
     QString sURIBase   = QString( "http://%1:%2/Myth/" )
-                            .arg( sServerIp )
-                            .arg( sPort     );
+                            .arg( m_mapBackendIp  [sHostName] ) 
+                            .arg( m_mapBackendPort[sHostName] );
 
     QString sURIParams = QString( "/Id%1" ).arg( nVidID );
     QString sId        = QString( "Videos/0/item%1").arg( sURIParams );
 
-    if (sParentID == QString("%1").arg(STARTING_VIDEO_OBJECTID))
-    {
-        sParentID = "Videos/0";
-    }
-    else
-    {
-        sParentID = QString( "Videos/0/item/Id%1")
-                       .arg( sParentID );
-    }
+    QString sParentID = "Videos/0";
 
     QString sAlbumArtURI= QString( "%1GetVideoArt%2")
                         .arg( sURIBase   )
                         .arg( sURIParams );
 
-    CDSObject *pItem = NULL;
-
-    if (sItemType == "FOLDER")
-    {
-        pItem   = CDSObject::CreateStorageFolder( sId, sName, sParentID);
-        pItem->SetChildCount( GetCount( "parentid",QString( "%1" ).arg( nVidID )) );
-
-        pItem->SetPropValue( "storageUsed", "0" );  //-=>TODO: need proper value
-    }
-    else if (sItemType == "FILE" )
-        pItem   = CDSObject::CreateVideoItem( sId, sName, sParentID );
-
-    if (!pItem)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "AddItem(): " +
-        QString("sItemType has unknown type '%1'").arg(sItemType));
-
-        return;
-    }
+    CDSObject *pItem = CDSObject::CreateVideoItem( sId, sName, sParentID );
 
     pItem->m_bRestricted  = false;
     pItem->m_bSearchable  = true;
     pItem->m_sWriteStatus = "WRITABLE";
 
+    pItem->SetPropValue( "longDescription", sPlot );
+    // ?? pItem->SetPropValue( "description"    , sTitle );
+    pItem->SetPropValue( "director"       , sDirector );
+
     pItem->SetPropValue( "genre"          , "[Unknown Genre]"     );
     pItem->SetPropValue( "actor"          , "[Unknown Author]"    );
-    pItem->SetPropValue( "creator"        , "[Unknown Author]"    );
-    pItem->SetPropValue( "album"          , "[Unknown Series]"    );
+    pItem->SetPropValue( "creator"        , "[Unknown Creator]"   );
+    pItem->SetPropValue( "album"          , "[Unknown Album]"     );
 
-    if ((!sCoverArt.isEmpty()) && (sCoverArt != "No Cover"))
+    //pItem->SetPropValue( "producer"       , );
+    //pItem->SetPropValue( "rating"         , );
+    //pItem->SetPropValue( "actor"          , );
+    //pItem->SetPropValue( "publisher"      , );
+    //pItem->SetPropValue( "language"       , );
+    //pItem->SetPropValue( "relation"       , );
+    //pItem->SetPropValue( "region"         , );
+
+    if ((sCoverArt != "") && (sCoverArt != "No Cover"))
         pItem->SetPropValue( "albumArtURI"    , sAlbumArtURI);
 
     if ( bAddRef )
@@ -476,10 +346,15 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
         pItem->SetPropValue( "refID", sRefId );
     }
 
-    QFileInfo fInfo( sFileName );
-    QDateTime fDate = fInfo.lastModified();
+    QString sFullFileName = sFilePath;
+    if (!QFile::exists( sFullFileName ))
+    {
+        StorageGroup sgroup("Videos");
+        sFullFileName = sgroup.FindRecordingFile( sFullFileName );
+    }
+    QFileInfo fInfo( sFullFileName );
 
-    pItem->SetPropValue( "date", fDate.toString( "yyyy-MM-dd"));
+    pItem->SetPropValue( "date", dtInsertDate.toString( "yyyy-MM-dd"));
     pResults->Add( pItem );
 
     // ----------------------------------------------------------------------
@@ -496,8 +371,9 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
     Resource *pRes = pItem->AddResource( sProtocol, sURI );
 
     pRes->AddAttribute( "size"      , QString("%1").arg(fInfo.size()) );
-    pRes->AddAttribute( "duration"  , "0:01:00.000"      );
 
+    QString sDur;
+    sDur.sprintf("%02d:%02d:00", (nLength / 60), nLength % 60 );
+
+    pRes->AddAttribute( "duration"  , sDur      );
 }
-
-// vim:ts=4:sw=4:ai:et:si:sts=4

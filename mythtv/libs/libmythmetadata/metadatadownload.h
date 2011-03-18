@@ -9,7 +9,7 @@
 
 typedef QList<MetadataLookup*> MetadataLookupList;
 
-class MPUBLIC MetadataLookupEvent : public QEvent
+class META_PUBLIC MetadataLookupEvent : public QEvent
 {
   public:
     MetadataLookupEvent(MetadataLookupList lul) : QEvent(kEventType),
@@ -21,7 +21,7 @@ class MPUBLIC MetadataLookupEvent : public QEvent
     static Type kEventType;
 };
 
-class MPUBLIC MetadataLookupFailure : public QEvent
+class META_PUBLIC MetadataLookupFailure : public QEvent
 {
   public:
     MetadataLookupFailure(MetadataLookupList lul) : QEvent(kEventType),
@@ -33,7 +33,7 @@ class MPUBLIC MetadataLookupFailure : public QEvent
     static Type kEventType;
 };
 
-class MPUBLIC MetadataDownload : public QThread
+class META_PUBLIC MetadataDownload : public QThread
 {
   public:
 

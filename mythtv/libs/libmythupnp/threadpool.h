@@ -33,6 +33,9 @@ using namespace std;
 #include <QThread>
 #include <QTimer>
 #include <QObject>
+#include <QPointer>
+
+#include "upnpexp.h"
 
 class ThreadPool;
 
@@ -44,7 +47,7 @@ class ThreadPool;
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-class CEvent 
+class UPNP_PUBLIC CEvent 
 {
     private:
 
@@ -72,7 +75,7 @@ class CEvent
 /////////////////////////////////////////////////////////////////////////////
 
 class WorkerThread;
-class WorkerEvent : public QObject
+class UPNP_PUBLIC WorkerEvent : public QObject
 {
     Q_OBJECT
 
@@ -96,7 +99,7 @@ class WorkerEvent : public QObject
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-class WorkerThread : public QThread
+class UPNP_PUBLIC WorkerThread : public QThread
 {
     Q_OBJECT
 
@@ -107,7 +110,7 @@ class WorkerThread : public QThread
         CEvent              m_Initialized;
         bool                m_bInitialized;
                          
-        ThreadPool         *m_pThreadPool;
+        QPointer<ThreadPool> m_pThreadPool;
 
         volatile bool       m_bTermRequested;
         QString             m_sName;
@@ -148,8 +151,10 @@ class WorkerThread : public QThread
 
 typedef deque<WorkerThread*> WorkerThreadList;
 
-class ThreadPool
+class UPNP_PUBLIC ThreadPool : public QObject
 {
+    Q_OBJECT
+
     friend class WorkerThread;
 
     protected:

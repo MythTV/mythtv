@@ -30,7 +30,7 @@
 #include "playbackbox.h"
 #include "globalsettings.h"
 #include "recordingprofile.h"
-#include "mythxdisplay.h"
+#include "mythdisplay.h"
 #include "DisplayRes.h"
 #include "uitypes.h"
 #include "cardutil.h"
@@ -467,7 +467,7 @@ static GlobalCheckBox *RerecordWatched()
 {
     GlobalCheckBox *bc = new GlobalCheckBox("RerecordWatched");
     bc->setLabel(QObject::tr("Re-record watched"));
-    bc->setValue(true);
+    bc->setValue(false);
     bc->setHelpText(QObject::tr("If enabled, programs that have been marked as "
                     "watched and are Auto-Expired will be re-recorded if "
                     "they are shown again."));
@@ -1754,7 +1754,7 @@ static HostCheckBox *SetupPinCodeRequired()
 static HostComboBox *XineramaScreen()
 {
     HostComboBox *gc = new HostComboBox("XineramaScreen", false);
-    int num = GetNumberXineramaScreens();
+    int num = MythDisplay::GetNumberXineramaScreens();
     for (int i=0; i<num; ++i)
         gc->addSelection(QString::number(i), QString::number(i));
     gc->addSelection(QObject::tr("All"), QString::number(-1));
@@ -2224,22 +2224,6 @@ static HostComboBox *MythTimeFormat()
     gc->setHelpText(QObject::tr("Your preferred time format. You must choose "
                     "a format with \"AM\" or \"PM\" in it, otherwise your "
                     "time display will be 24-hour or \"military\" time."));
-    return gc;
-}
-
-static HostComboBox *ThemePainter()
-{
-    HostComboBox *gc = new HostComboBox("ThemePainter");
-    gc->setLabel(QObject::tr("Paint engine"));
-#ifdef USING_MINGW
-    gc->addSelection(QObject::tr("Direct3D"), "d3d9");
-#endif
-    gc->addSelection(QObject::tr("Qt"), "qt");
-#ifdef USING_OPENGL
-    gc->addSelection(QObject::tr("OpenGL"), "opengl");
-#endif
-    gc->setHelpText(QObject::tr("This selects what MythTV uses to draw. If "
-                    "you have decent hardware, select OpenGL."));
     return gc;
 }
 
@@ -2751,16 +2735,6 @@ static HostCheckBox *EnableMediaMon()
     return gc;
 }
 
-static HostCheckBox *EnableMediaEvents()
-{
-    HostCheckBox *gc = new HostCheckBox("MediaChangeEvents");
-    gc->setLabel(QObject::tr("Use new media"));
-    gc->setHelpText(QObject::tr("This will cause MythTV to jump, "
-                    "to an appropriate plugin, when new media is inserted."));
-    gc->setValue(false);
-    return gc;
-}
-
 static HostLineEdit *IgnoreMedia()
 {
     HostLineEdit *ge = new HostLineEdit("IgnoreDevices");
@@ -2786,7 +2760,6 @@ class MythMediaSettings : public TriggeredConfigurationGroup
          setTrigger(enabled);
 
          ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
-         settings->addChild(EnableMediaEvents());
          settings->addChild(IgnoreMedia());
          addTarget("1", settings);
 
@@ -2890,22 +2863,6 @@ class WatchListSettings : public TriggeredConfigurationGroup
          addTarget("0", new VerticalConfigurationGroup(true));
     };
 };
-
-#ifdef USING_OPENGL_VSYNC
-/*
-static HostCheckBox *UseOpenGLVSync()
-{
-    HostCheckBox *gc = new HostCheckBox("UseOpenGLVSync");
-    gc->setLabel(QObject::tr("Enable OpenGL vertical sync for timing"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr(
-                        "If supported by your hardware/drivers, "
-                        "MythTV will use OpenGL vertical syncing for "
-                        "video timing, reducing frame jitter."));
-    return gc;
-}
-*/
-#endif
 
 static HostCheckBox *LCDShowTime()
 {
@@ -3414,9 +3371,6 @@ PlaybackSettings::PlaybackSettings()
 
     general1->addChild(columns);
     general1->addChild(LiveTVIdleTimeout());
-#ifdef USING_OPENGL_VSYNC
-    //general1->addChild(UseOpenGLVSync());
-#endif // USING_OPENGL_VSYNC
     addChild(general1);
 
     VerticalConfigurationGroup* general2 =
@@ -3687,10 +3641,9 @@ AppearanceSettings::AppearanceSettings()
     VerticalConfigurationGroup* screen = new VerticalConfigurationGroup(false);
     screen->setLabel(QObject::tr("Theme") + " / " + QObject::tr("Screen Settings"));
 
-    screen->addChild(ThemePainter());
     screen->addChild(MenuTheme());
 
-    if (GetNumberXineramaScreens() > 1)
+    if (MythDisplay::GetNumberXineramaScreens() > 1)
     {
         screen->addChild(XineramaScreen());
         screen->addChild(XineramaMonitorAspectRatio());

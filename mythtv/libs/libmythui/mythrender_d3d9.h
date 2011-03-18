@@ -1,16 +1,25 @@
 #ifndef MYTHRENDER_D3D9_H
 #define MYTHRENDER_D3D9_H
 
-#include <windows.h>
+#include <QMap>
+
+#include <compat.h>
 #include <d3d9.h>
 
 #include "mythimage.h"
+#include "mythuiexp.h"
+
+#ifdef USING_DXVA2
+#include "dxva2api.h"
+#else
+typedef void* IDirect3DDeviceManager9;
+#endif
 
 class MythD3DVertexBuffer;
 class MythD3DSurface;
 class MythRenderD3D9;
 
-class D3D9Image
+class MUI_PUBLIC D3D9Image
 {
   public:
     D3D9Image(MythRenderD3D9 *render, QSize size, bool video = false);
@@ -18,7 +27,9 @@ class D3D9Image
 
     bool     IsValid(void) const { return m_valid; }
     QSize    GetSize(void) const { return m_size;  }
+    int      GetDataSize(void) const { return m_size.width() * m_size.height() * 4; }
     bool     SetAsRenderTarget(void);
+    bool     UpdateImage(IDirect3DSurface9 *surface);
     bool     UpdateImage(const MythImage *img);
     bool     UpdateVertices(const QRect &dvr, const QRect &vr, int alpha = 255,
                             bool video = false);
@@ -36,9 +47,21 @@ class D3D9Image
     IDirect3DSurface9      *m_surface;
 };
 
-class MythRenderD3D9
+class MUI_PUBLIC D3D9Locker
 {
   public:
+    D3D9Locker(MythRenderD3D9 *render);
+   ~D3D9Locker();
+    IDirect3DDevice9* Acquire(void);
+  private:
+    MythRenderD3D9 *m_render;
+};
+
+class MUI_PUBLIC MythRenderD3D9
+{
+  public:
+    static void* ResolveAddress(const char* lib, const char* proc);
+
     MythRenderD3D9();
     ~MythRenderD3D9();
 
@@ -48,7 +71,9 @@ class MythRenderD3D9
     bool ClearBuffer(void);
     bool Begin(void);
     bool End(void);
-    bool StretchRect(IDirect3DTexture9 *texture, IDirect3DSurface9 *surface);
+    void CopyFrame(void* surface, D3D9Image *img);
+    bool StretchRect(IDirect3DTexture9 *texture, IDirect3DSurface9 *surface,
+                     bool known_surface = true);
     bool DrawTexturedQuad(IDirect3DVertexBuffer9 *vertexbuffer);
     void DrawRect(const QRect &rect,  const QColor &color);
     bool Present(HWND win);
@@ -75,15 +100,17 @@ class MythRenderD3D9
 
   private:
     bool                    FormatSupported(D3DFORMAT surface, D3DFORMAT adaptor);
-    bool                    SetTexture(IDirect3DTexture9 *texture, int num = 0);
+    bool                    SetTexture(IDirect3DDevice9* dev,
+                                       IDirect3DTexture9 *texture,
+                                       int num = 0);
     void                    DeleteTextures(void);
     void                    DeleteVertexBuffers(void);
     void                    DeleteSurfaces(void);
     void                    Init2DState(void);
-    void                    EnableBlending(bool enable);
-    void                    MultiTexturing(bool enable,
+    void                    EnableBlending(IDirect3DDevice9* dev, bool enable);
+    void                    MultiTexturing(IDirect3DDevice9* dev, bool enable,
                                            IDirect3DTexture9 *texture = NULL);
-    void                    SetTextureVertices(bool enable);
+    void                    SetTextureVertices(IDirect3DDevice9* dev, bool enable);
 
   private:
     QMap<IDirect3DTexture9*, QSize>                    m_textures;
@@ -91,7 +118,7 @@ class MythRenderD3D9
     QMap<IDirect3DSurface9*, MythD3DSurface>           m_surfaces;
 
     IDirect3D9             *m_d3d;
-    IDirect3DDevice9       *m_d3dDevice;
+    IDirect3DDevice9       *m_rootD3DDevice;
     D3DFORMAT               m_adaptor_fmt;
     D3DFORMAT               m_videosurface_fmt;
     D3DFORMAT               m_surface_fmt;
@@ -104,6 +131,20 @@ class MythRenderD3D9
     bool                    m_blend;
     bool                    m_multi_texturing;
     bool                    m_texture_vertices;
+
+  public:
+    IDirect3DDevice9* AcquireDevice(void);
+    void              ReleaseDevice(void);
+    IDirect3DDeviceManager9* GetDeviceManager(void) { return m_deviceManager; }
+
+  private:
+    void CreateDeviceManager(void);
+    void DestroyDeviceManager(void);
+
+  private:
+    IDirect3DDeviceManager9 *m_deviceManager;
+    HANDLE                   m_deviceHandle;
+    uint                     m_deviceManagerToken;
 };
 
 #endif // MYTHRENDER_D3D9_H

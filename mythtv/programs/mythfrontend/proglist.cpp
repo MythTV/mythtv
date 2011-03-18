@@ -154,8 +154,8 @@ bool ProgLister::Create()
     connect(m_progList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             this,       SLOT(  HandleClicked()));
 
-    m_progList->SetLCDTitles(
-        tr("Program List"), "title|channel|shortstarttimedate");
+    m_progList->SetLCDTitles(tr("Program List"), "title|channel|shortstarttimedate");
+    m_progList->SetSearchFields("titlesubtitle");
 
     BuildFocusList();
 

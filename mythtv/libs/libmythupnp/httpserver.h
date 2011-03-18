@@ -57,8 +57,10 @@ class HttpServer;
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-class UPNP_PUBLIC HttpServerExtension
+class UPNP_PUBLIC HttpServerExtension : public QObject
 {
+    Q_OBJECT
+
     public:
 
         QString     m_sName;
@@ -77,7 +79,7 @@ class UPNP_PUBLIC HttpServerExtension
 //        virtual bool  Uninitialize  ( ) = 0;
 };
 
-typedef QList<HttpServerExtension*> HttpServerExtensionList;
+typedef QList<QPointer<HttpServerExtension> > HttpServerExtensionList;
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -95,6 +97,8 @@ class UPNP_PUBLIC HttpServer : public QTcpServer,
 
         QReadWriteLock          m_rwlock;
         HttpServerExtensionList m_extensions;
+
+        HttpServerExtension*    m_pHtmlServer;
 
         virtual WorkerThread *CreateWorkerThread( ThreadPool *,
                                                   const QString &sName );

@@ -22,6 +22,8 @@ QString toString(MarkTypes type)
     switch (type)
     {
         case MARK_UNSET:        return "UNSET";
+        case MARK_TMP_CUT_END:  return "TMP_CUT_END";
+        case MARK_TMP_CUT_START:return "TMP_CUT_START";
         case MARK_UPDATED_CUT:  return "UPDATED_CUT";
         case MARK_PLACEHOLDER:  return "PLACEHOLDER";
         case MARK_CUT_END:      return "CUT_END";

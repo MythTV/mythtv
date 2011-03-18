@@ -11,7 +11,7 @@
 
 #include <pthread.h>
 
-#include "mythexp.h"
+#include "mythtvexp.h"
 #include "mythtimer.h"
 #include "programtypes.h" // for MarkTypes, frm_pos_map_t
 
@@ -32,7 +32,7 @@ class RecordingProfile;
  *
  *  \sa TVRec
  */
-class MPUBLIC RecorderBase
+class MTV_PUBLIC RecorderBase
 {
     friend class Transcode; // for access to SetIntOption(), SetStrOption()
 
@@ -256,6 +256,10 @@ class MPUBLIC RecorderBase
     /** \brief Note a change in video frame rate in the recordedmark table
      */
     void FrameRateChange(uint framerate, long long frame);
+
+    /** \brief Note the total duration in the recordedmark table
+     */
+    void SetDuration(uint64_t duration);
 
     TVRec         *tvrec;
     RingBuffer    *ringBuffer;

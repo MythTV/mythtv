@@ -1,9 +1,9 @@
 #include <math.h>
 
-using namespace std;
 #include "mythconfig.h"
 #include "audiooutpututil.h"
 #include <sys/types.h>
+#include <inttypes.h>
 #if HAVE_BYTESWAP_H
 #include <byteswap.h>
 #elif HAVE_SYS_ENDIAN_H
@@ -12,7 +12,7 @@ using namespace std;
 #include <libkern/OSByteOrder.h>
 #define bswap_16 OSSwapInt16
 #define bswap_32 OSSwapInt32
-#else
+#elif HAVE_BIGENDIAN
 #error No bswap functions defined
 #endif
 
@@ -650,8 +650,8 @@ void AudioOutputUtil::MuteChannel(int obits, int channels, int ch,
 #define LE_INT(v)		(v)
 #endif
 
-char *AudioOutputUtil::GeneratePinkSamples(char *frames, int channels,
-                                           int channel, int count, int bits)
+char *AudioOutputUtil::GeneratePinkFrames(char *frames, int channels,
+                                          int channel, int count, int bits)
 {
     pink_noise_t pink;
 

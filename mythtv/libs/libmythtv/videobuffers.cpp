@@ -14,8 +14,6 @@ extern "C" {
 #include "compat.h"
 #include "mythverbose.h"
 
-#define DEBUG_FRAME_LOCKS 0
-
 #define TRY_LOCK_SPINS                 100
 #define TRY_LOCK_SPINS_BEFORE_WARNING   10
 #define TRY_LOCK_SPIN_WAIT             100 /* usec */
@@ -89,13 +87,6 @@ YUVInfo::YUVInfo(uint w, uint h, uint sz, const int *p, const int *o)
  *  being displayed at the end of the next
  *  DoneDisplayingFrame(), finally adding them to available.
  *
- *  Frame locking is also available, the locks are reqursive
- *  QMutex locks. If more than one frame lock is needed the
- *  LockFrames should generally be called with all the needed
- *  locks in the list, and no locks currently held. This
- *  function will spin until all the locks can be held at
- *  once, avoiding deadlocks from mismatched locking order.
- *
  *  The only method that returns with a lock held on the VideoBuffers
  *  object itself, preventing anyone else from using the VideoBuffers
  *  class, inluding to unlocking frames, is the begin_lock(BufferType).
@@ -113,8 +104,7 @@ VideoBuffers::VideoBuffers()
     : numbuffers(0), needfreeframes(0), needprebufferframes(0),
       needprebufferframes_normal(0), needprebufferframes_small(0),
       keepprebufferframes(0), need_extra_for_pause(false), rpos(0), vpos(0),
-      global_lock(QMutex::Recursive), use_frame_locks(true),
-      frame_lock(QMutex::Recursive)
+      global_lock(QMutex::Recursive)
 {
 }
 
@@ -143,14 +133,10 @@ VideoBuffers::~VideoBuffers()
  *                             after SetPrebuffering(false) has been called.
  * \param keepprebuffer        number of buffers in used or limbo that are considered
  *                             enough for decent playback.
- * \param enable_frame_locking if true, the frames will be locked with a mutex,
- *                             this makes XvMC decoding safe, but adds some CPU
- *                             overhead. It is normally left off.
  */
 void VideoBuffers::Init(uint numdecode, bool extra_for_pause,
                         uint need_free, uint needprebuffer_normal,
-                        uint needprebuffer_small, uint keepprebuffer,
-                        bool enable_frame_locking)
+                        uint needprebuffer_small, uint keepprebuffer)
 {
     QMutexLocker locker(&global_lock);
 
@@ -179,7 +165,6 @@ void VideoBuffers::Init(uint numdecode, bool extra_for_pause,
     needprebufferframes_small   = needprebuffer_small;
     keepprebufferframes         = keepprebuffer;
     need_extra_for_pause        = extra_for_pause;
-    use_frame_locks             = enable_frame_locking;
 
     for (uint i = 0; i < numdecode; i++)
         enqueue(kVideoBuffer_avail, at(i));
@@ -224,8 +209,7 @@ void VideoBuffers::SetPrebuffering(bool normal)
         needprebufferframes_normal : needprebufferframes_small;
 }
 
-VideoFrame *VideoBuffers::GetNextFreeFrameInternal(
-    bool with_lock, bool allow_unsafe, BufferType enqueue_to)
+VideoFrame *VideoBuffers::GetNextFreeFrameInternal(BufferType enqueue_to)
 {
     QMutexLocker locker(&global_lock);
     VideoFrame *frame = available.dequeue();
@@ -247,36 +231,8 @@ VideoFrame *VideoBuffers::GetNextFreeFrameInternal(
         frame = available.dequeue();
     }
 
-    // only way this should be triggered if we're in unsafe mode
-    if (!frame && allow_unsafe)
-    {
-        VERBOSE(VB_PLAYBACK,
-                QString("GetNextFreeFrame() is getting a busy frame %1. "
-                        "      %2")
-                .arg(DebugString(frame, true)).arg(GetStatus()));
-        frame = used.dequeue();
-    }
-
     if (frame)
-    {
         safeEnqueue(enqueue_to, frame);
-
-        bool success = true;
-        if (with_lock)
-            success = TryLockFrame(frame, "GetNextFreeFrame");
-
-        if (!success)
-        {
-            safeEnqueue(kVideoBuffer_avail, frame);
-            VERBOSE(VB_IMPORTANT,
-                QString("GetNextFreeFrame() unable to lock frame %1. "
-                        "Dropping %2. w/lock(%3) unsafe(%4)")
-                    .arg(DebugString(frame)).arg(GetStatus())
-                    .arg(with_lock).arg(allow_unsafe));
-            DiscardFrame(frame);
-            frame = NULL;
-        }
-    }
 
     return frame;
 }
@@ -285,20 +241,13 @@ VideoFrame *VideoBuffers::GetNextFreeFrameInternal(
  * \fn VideoBuffers::GetNextFreeFrame(bool,bool,BufferType)
  *  Gets a frame from available buffers list.
  *
- * \param with_lock    locks the frame, so that UnlockFrame() must be
- *                     called before anyone else can use it.
- * \param allow_unsafe allows busy buffers to be used if no available
- *                     buffers exist. Historic, should never be used.
  * \param enqueue_to   put new frame in some state other than limbo.
  */
-VideoFrame *VideoBuffers::GetNextFreeFrame(bool with_lock,
-                                           bool allow_unsafe,
-                                           BufferType enqueue_to)
+VideoFrame *VideoBuffers::GetNextFreeFrame(BufferType enqueue_to)
 {
     for (uint tries = 1; true; tries++)
     {
-        VideoFrame *frame = VideoBuffers::GetNextFreeFrameInternal(
-            with_lock, allow_unsafe, enqueue_to);
+        VideoFrame *frame = VideoBuffers::GetNextFreeFrameInternal(enqueue_to);
 
         if (frame)
             return frame;
@@ -396,27 +345,7 @@ void VideoBuffers::DoneDisplayingFrame(VideoFrame *frame)
 void VideoBuffers::DiscardFrame(VideoFrame *frame)
 {
     QMutexLocker locker(&global_lock);
-
-    bool ok = TryLockFrame(frame, "DiscardFrame A");
-    for (uint i=0; i<5 && !ok; i++)
-    {
-        global_lock.unlock();
-        usleep(50);
-        global_lock.lock();
-        ok = TryLockFrame(frame, "DiscardFrame B");
-    }
-
-    if (ok)
-    {
-        safeEnqueue(kVideoBuffer_avail, frame);
-        UnlockFrame(frame, "DiscardFrame");
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, QString("VideoBuffers::DiscardFrame(): "
-                                      "Unable to obtain lock on %1, %2")
-                .arg(DebugString(frame, true)).arg(GetStatus()));
-    }
+    safeEnqueue(kVideoBuffer_avail, frame);
 }
 
 frame_queue_t *VideoBuffers::queue(BufferType type)
@@ -732,146 +661,6 @@ void VideoBuffers::ClearAfterSeek(void)
             vpos = rpos = 0;
         }
     }
-}
-
-void VideoBuffers::LockFrame(const VideoFrame *frame, const char* owner)
-{
-    if (!use_frame_locks)
-        return;
-
-    QMutex *mutex = NULL;
-    (void)owner;
-
-    if (!frame)
-        return;
-
-    frame_lock.lock();
-#if DEBUG_FRAME_LOCKS
-    if (owner!="")
-        VERBOSE(VB_PLAYBACK, QString("locking frame:   %1 %2 %3")
-                .arg(DebugString(frame)).arg(GetStatus()).arg(owner));
-#endif
-
-    frame_lock_map_t::iterator it = frame_locks.find(frame);
-    if (it == frame_locks.end())
-        mutex = frame_locks[frame] = new QMutex(QMutex::Recursive);
-    else
-        mutex = it->second;
-
-    frame_lock.unlock();
-
-    mutex->lock();
-}
-
-void VideoBuffers::LockFrames(vector<const VideoFrame*>& vec,
-                              const char* owner)
-{
-    if (!use_frame_locks)
-        return;
-
-    (void)owner;
-    bool ok;
-    vector<bool> oks;
-    oks.resize(vec.size());
-
-#if DEBUG_FRAME_LOCKS
-    VERBOSE(VB_PLAYBACK, QString("lock frames:     %1 %2 %3")
-            .arg(DebugString(vec)).arg(GetStatus()).arg(owner));
-#endif
-    do
-    {
-        ok = true;
-        for (uint i=0; i<vec.size(); i++)
-            ok &= oks[i] = TryLockFrame(vec[i], "");
-        if (!ok)
-        {
-            for (uint i=0; i<vec.size(); i++)
-                if (oks[i])
-                    UnlockFrame(vec[i], "");
-            usleep(50);
-#if DEBUG_FRAME_LOCKS
-            VERBOSE(VB_PLAYBACK, QString("no lock, frames: %1 %2 %3")
-                    .arg(DebugString(vec)).arg(GetStatus()).arg(owner));
-#endif
-        }
-    }
-    while (!ok);
-}
-
-bool VideoBuffers::TryLockFrame(const VideoFrame *frame, const char* owner)
-{
-    if (!use_frame_locks)
-        return true;
-
-    QMutex *mutex = NULL;
-    (void)owner;
-
-    if (!frame)
-        return true;
-
-    frame_lock.lock();
-#if DEBUG_FRAME_LOCKS
-    if (owner!="")
-        VERBOSE(VB_PLAYBACK, QString("try lock frame:  %1 %2 %3")
-                .arg(DebugString(frame)).arg(GetStatus()).arg(owner));
-#endif
-
-    frame_lock_map_t::iterator it = frame_locks.find(frame);
-    if (it == frame_locks.end())
-        mutex = frame_locks[frame] = new QMutex(QMutex::Recursive);
-    else
-        mutex = it->second;
-
-    bool ok = mutex->tryLock();
-
-#if DEBUG_FRAME_LOCKS
-    if (owner!="")
-    {
-        QString str = (ok) ? "got lock:        " : "try lock failed: ";
-        VERBOSE(VB_PLAYBACK, str.append(DebugString(frame)));
-    }
-#endif
-    frame_lock.unlock();
-
-    return ok;
-}
-
-void VideoBuffers::UnlockFrame(const VideoFrame *frame, const char* owner)
-{
-    if (!use_frame_locks)
-        return;
-
-    (void)owner;
-
-    if (!frame)
-        return;
-
-    frame_lock.lock();
-#if DEBUG_FRAME_LOCKS
-    if (owner!="")
-        VERBOSE(VB_PLAYBACK, QString("unlocking frame: %1 %2 %3")
-                .arg(DebugString(frame)).arg(GetStatus()).arg(owner));
-#endif
-
-    frame_lock_map_t::iterator it = frame_locks.find(frame);
-    it->second->unlock();
-
-    frame_lock.unlock();
-}
-
-void VideoBuffers::UnlockFrames(vector<const VideoFrame*>& vec,
-                                const char* owner)
-{
-    if (!use_frame_locks)
-        return;
-
-    (void)owner;
-#if DEBUG_FRAME_LOCKS
-    VERBOSE(VB_PLAYBACK, QString("unlocking frames:%1 %2 %3")
-            .arg(DebugString(vec)).arg(GetStatus()).arg(owner));
-#endif
-    for (uint i=0; i<vec.size(); i++)
-        UnlockFrame(vec[i], "");
 }
 
 bool VideoBuffers::CreateBuffers(VideoFrameType type, int width, int height)

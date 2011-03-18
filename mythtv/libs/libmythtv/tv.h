@@ -4,6 +4,8 @@
 #include <QString>
 
 #include "videoouttypes.h"
+#include "mythuiactions.h"
+#include "tv_actions.h"
 
 /** \brief ChannelChangeDirection is an enumeration of possible channel
  *         changing directions.

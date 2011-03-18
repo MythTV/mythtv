@@ -3,10 +3,10 @@
 // Created     : Oct. 24, 2005
 //
 // Purpose     : UPnp Main Class
-//                                                                            
+//
 // Copyright (c) 2005 David Blain <mythtv@theblains.net>
-//                                          
-// This library is free software; you can redistribute it and/or 
+//
+// This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or at your option any later version of the LGPL.
@@ -22,6 +22,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "upnp.h"
+#include "mythverbose.h"
+
 #include "upnptaskcache.h"
 #include "multicast.h"
 #include "broadcast.h"
@@ -132,7 +134,7 @@ bool UPnp::Initialize( QStringList &sIPAddrList, int nServicePort, HttpServer *p
             new SSDPExtension( m_nServicePort, m_pHttpServer->m_sSharePath));
 
     // ----------------------------------------------------------------------
-    // Add Task to keep SSDPCache purged of stale entries.  
+    // Add Task to keep SSDPCache purged of stale entries.
     // ----------------------------------------------------------------------
 
     UPnp::g_pTaskQueue->AddTask( new SSDPCacheTask() );
@@ -214,7 +216,7 @@ void UPnp::CleanUp()
         g_pConfig = NULL;
     }
 
-} 
+}
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -251,23 +253,23 @@ QString UPnp::GetResultDesc( UPnPResultCode eCode )
     switch( eCode )
     {
         case UPnPResult_Success                     : return "Success";
-        case UPnPResult_InvalidAction               : return "Invalid Action"; 
-        case UPnPResult_InvalidArgs                 : return "Invalid Args"; 
-        case UPnPResult_ActionFailed                : return "Action Failed"; 
-        case UPnPResult_ArgumentValueInvalid        : return "Argument Value Invalid"; 
-        case UPnPResult_ArgumentValueOutOfRange     : return "Argument Value Out Of Range"; 
-        case UPnPResult_OptionalActionNotImplemented: return "Optional Action Not Implemented"; 
-        case UPnPResult_OutOfMemory                 : return "Out Of Memory"; 
-        case UPnPResult_HumanInterventionRequired   : return "Human Intervention Required"; 
-        case UPnPResult_StringArgumentTooLong       : return "String Argument Too Long"; 
-        case UPnPResult_ActionNotAuthorized         : return "Action Not Authorized"; 
-        case UPnPResult_SignatureFailure            : return "Signature Failure"; 
-        case UPnPResult_SignatureMissing            : return "Signature Missing"; 
-        case UPnPResult_NotEncrypted                : return "Not Encrypted"; 
-        case UPnPResult_InvalidSequence             : return "Invalid Sequence"; 
-        case UPnPResult_InvalidControlURL           : return "Invalid Control URL"; 
-        case UPnPResult_NoSuchSession               : return "No Such Session"; 
-        case UPnPResult_MS_AccessDenied             : return "Access Denied"; 
+        case UPnPResult_InvalidAction               : return "Invalid Action";
+        case UPnPResult_InvalidArgs                 : return "Invalid Args";
+        case UPnPResult_ActionFailed                : return "Action Failed";
+        case UPnPResult_ArgumentValueInvalid        : return "Argument Value Invalid";
+        case UPnPResult_ArgumentValueOutOfRange     : return "Argument Value Out Of Range";
+        case UPnPResult_OptionalActionNotImplemented: return "Optional Action Not Implemented";
+        case UPnPResult_OutOfMemory                 : return "Out Of Memory";
+        case UPnPResult_HumanInterventionRequired   : return "Human Intervention Required";
+        case UPnPResult_StringArgumentTooLong       : return "String Argument Too Long";
+        case UPnPResult_ActionNotAuthorized         : return "Action Not Authorized";
+        case UPnPResult_SignatureFailure            : return "Signature Failure";
+        case UPnPResult_SignatureMissing            : return "Signature Missing";
+        case UPnPResult_NotEncrypted                : return "Not Encrypted";
+        case UPnPResult_InvalidSequence             : return "Invalid Sequence";
+        case UPnPResult_InvalidControlURL           : return "Invalid Control URL";
+        case UPnPResult_NoSuchSession               : return "No Such Session";
+        case UPnPResult_MS_AccessDenied             : return "Access Denied";
 
         case UPnPResult_CDS_NoSuchObject            : return "No Such Object";
         case UPnPResult_CDS_InvalidCurrentTagValue  : return "Invalid CurrentTagValue";
@@ -303,10 +305,10 @@ QString UPnp::GetResultDesc( UPnPResultCode eCode )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////////////
 
-void UPnp::FormatErrorResponse( HTTPRequest   *pRequest, 
+void UPnp::FormatErrorResponse( HTTPRequest   *pRequest,
                                 UPnPResultCode  eCode,
                                 const QString &msg )
 {
@@ -314,7 +316,7 @@ void UPnp::FormatErrorResponse( HTTPRequest   *pRequest,
 
     if (pRequest != NULL)
     {
-        QString sDetails = ""; 
+        QString sDetails = "";
 
         if (pRequest->m_bSOAPRequest)
             sDetails = "<UPnPResult xmlns=\"urn:schemas-upnp-org:control-1-0\">";
@@ -327,12 +329,12 @@ void UPnp::FormatErrorResponse( HTTPRequest   *pRequest,
                        .arg( eCode )
                        .arg( HTTPRequest::Encode( sMsg ) );
 
-        if (pRequest->m_bSOAPRequest)     
+        if (pRequest->m_bSOAPRequest)
             sDetails += "</UPnPResult>";
 
 
         pRequest->FormatErrorResponse ( true,   // -=>TODO: Should make this dynamic
-                                        "UPnPResult", 
+                                        "UPnPResult",
                                         sDetails );
     }
     else

@@ -502,7 +502,7 @@ bool PlaybackBox::Create()
     connect(m_artTimer[kArtworkCover], SIGNAL(timeout()), SLOT(coverartLoad()));
 
     BuildFocusList();
-    m_programInfoCache.ScheduleLoad();
+    m_programInfoCache.ScheduleLoad(false);
     LoadInBackground();
 
     return true;
@@ -519,6 +519,8 @@ void PlaybackBox::Init()
     m_groupList->SetLCDTitles(tr("Groups"));
     m_recordingList->SetLCDTitles(tr("Recordings"),
                                   "titlesubtitle|shortdate|starttime");
+
+    m_recordingList->SetSearchFields("titlesubtitle");
 
     if (gCoreContext->GetNumSetting("QueryInitialFilter", 0) == 1)
         showGroupFilter();
@@ -2837,7 +2839,7 @@ void PlaybackBox::showRecordingPopup()
     m_popupMenu->AddButton(tr("Show Program Details"),
                             SLOT(showProgramDetails()));
 
-    m_popupMenu->AddButton(tr("Change Recording Title"),
+    m_popupMenu->AddButton(tr("Change Recording Metadata"),
                             SLOT(showMetadataEditor()));
 
     m_popupMenu->AddButton(tr("Custom Edit"),
@@ -4581,8 +4583,9 @@ void PlaybackBox::showMetadataEditor()
 
     if (editMetadata->Create())
     {
-        connect(editMetadata, SIGNAL(result(const QString &, const QString &)),
-                SLOT(saveRecMetadata(const QString &, const QString &)));
+        connect(editMetadata, SIGNAL(result(const QString &, const QString &,
+                const QString &)), SLOT(saveRecMetadata(const QString &,
+                const QString &, const QString &)));
         mainStack->AddScreen(editMetadata);
     }
     else
@@ -4590,7 +4593,8 @@ void PlaybackBox::showMetadataEditor()
 }
 
 void PlaybackBox::saveRecMetadata(const QString &newTitle,
-                                  const QString &newSubtitle)
+                                  const QString &newSubtitle,
+                                  const QString &newDescription)
 {
     MythUIButtonListItem *item = m_recordingList->GetItemCurrent();
 
@@ -4605,7 +4609,7 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
     QString groupname = m_groupList->GetItemCurrent()->GetData().toString();
 
     if (groupname == pginfo->GetTitle().toLower() &&
-        newTitle != groupname)
+        newTitle != pginfo->GetTitle())
     {
         m_recordingList->RemoveItem(item);
     }
@@ -4619,12 +4623,12 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
         item->SetText(tempSubTitle, "titlesubtitle");
         item->SetText(newTitle, "title");
         item->SetText(newSubtitle, "subtitle");
-
-        UpdateUIListItem(item, true); // Why?
+        if (newDescription != NULL)
+            item->SetText(newDescription, "description");
     }
 
     RecordingInfo ri(*pginfo);
-    ri.ApplyRecordRecTitleChange(newTitle, newSubtitle);
+    ri.ApplyRecordRecTitleChange(newTitle, newSubtitle, newDescription);
     *pginfo = ri;
 }
 
@@ -4836,6 +4840,10 @@ void GroupSelector::AcceptItem(MythUIButtonListItem *item)
     if (!item)
         return;
 
+    // ignore the dividers
+    if (item->GetData().toString().isEmpty())
+        return;
+
     QString group = item->GetData().toString();
     emit result(group);
     Close();
@@ -5000,7 +5008,7 @@ RecMetadataEdit::RecMetadataEdit(MythScreenStack *lparent, ProgramInfo *pginfo)
                 : MythScreenType(lparent, "recmetadataedit"),
                     m_progInfo(pginfo)
 {
-    m_titleEdit = m_subtitleEdit = NULL;
+    m_titleEdit = m_subtitleEdit = m_descriptionEdit = NULL;
 }
 
 bool RecMetadataEdit::Create()
@@ -5010,6 +5018,7 @@ bool RecMetadataEdit::Create()
 
     m_titleEdit = dynamic_cast<MythUITextEdit*>(GetChild("title"));
     m_subtitleEdit = dynamic_cast<MythUITextEdit*>(GetChild("subtitle"));
+    m_descriptionEdit = dynamic_cast<MythUITextEdit*>(GetChild("description"));
     MythUIButton *okButton = dynamic_cast<MythUIButton*>(GetChild("ok"));
 
     if (!m_titleEdit || !m_subtitleEdit || !okButton)
@@ -5023,6 +5032,11 @@ bool RecMetadataEdit::Create()
     m_titleEdit->SetMaxLength(128);
     m_subtitleEdit->SetText(m_progInfo->GetSubtitle());
     m_subtitleEdit->SetMaxLength(128);
+    if (m_descriptionEdit)
+    {
+        m_descriptionEdit->SetText(m_progInfo->GetDescription());
+        m_descriptionEdit->SetMaxLength(255);
+    }
 
     connect(okButton, SIGNAL(Clicked()), SLOT(SaveChanges()));
 
@@ -5035,11 +5049,14 @@ void RecMetadataEdit::SaveChanges()
 {
     QString newRecTitle = m_titleEdit->GetText();
     QString newRecSubtitle = m_subtitleEdit->GetText();
+    QString newRecDescription = NULL;
+    if (m_descriptionEdit)
+       newRecDescription = m_descriptionEdit->GetText();
 
     if (newRecTitle.isEmpty())
         return;
 
-    emit result(newRecTitle, newRecSubtitle);
+    emit result(newRecTitle, newRecSubtitle, newRecDescription);
     Close();
 }
 

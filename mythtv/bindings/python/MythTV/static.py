@@ -5,12 +5,11 @@ Contains any static and global variables for MythTV Python Bindings
 """
 
 OWN_VERSION = (0,25,-1,1)
-SCHEMA_VERSION = 1266
-MVSCHEMA_VERSION = 1038
+SCHEMA_VERSION = 1270
 NVSCHEMA_VERSION = 1007
-MUSICSCHEMA_VERSION = 1017
-PROTO_VERSION = '64'
-PROTO_TOKEN = '8675309J'
+MUSICSCHEMA_VERSION = 1018
+PROTO_VERSION = '65'
+PROTO_TOKEN = 'D2BB94C2'
 BACKEND_SEP = '[]:[]'
 INSTALL_PREFIX = '/usr/local'
 
@@ -220,11 +219,8 @@ class MythSchema( object ):
     _schema_name = 'Database'
     _schema_update = None
 
-class VideoSchema( object ):
-    _schema_value = 'mythvideo.DBSchemaVer'
-    _schema_local = MVSCHEMA_VERSION
-    _schema_name = 'MythVideo'
-    _schema_update = None
+class VideoSchema( MythSchema ):
+    pass
 
 class MusicSchema( object ):
     _schema_value = 'MusicDBSchemaVer'

@@ -41,7 +41,7 @@ class OpenGLVideo
    ~OpenGLVideo();
 
     bool Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspace,
-              QSize videoDim, QRect displayVisibleRect,
+              QSize videoDim, QSize videoDispDim, QRect displayVisibleRect,
               QRect displayVideoRect, QRect videoRect,
               bool viewport_control,  QString options,
               bool hwaccel,
@@ -72,7 +72,7 @@ class OpenGLVideo
     QSize GetViewPort(void)         const { return viewportSize; }
     void  SetVideoRect(const QRect &dispvidrect, const QRect &vidrect)
                       { display_video_rect = dispvidrect; video_rect = vidrect;}
-    QSize GetVideoSize(void)        const { return actual_video_dim;}
+    QSize GetVideoSize(void)        const { return video_dim;}
 
   private:
     void Teardown(void);
@@ -85,8 +85,7 @@ class OpenGLVideo
     uint AddFragmentProgram(OpenGLFilterType name,
                             QString deint = QString::null,
                             FrameScanType field = kScan_Progressive);
-    uint CreateVideoTexture(QSize size, QSize &tex_size,
-                            bool use_pbo = false);
+    uint CreateVideoTexture(QSize size, QSize &tex_size);
     QString GetProgramString(OpenGLFilterType filter,
                              QString deint = QString::null,
                              FrameScanType field = kScan_Progressive);
@@ -104,11 +103,10 @@ class OpenGLVideo
     void SetTextureFilters(vector<GLuint> *textures, int filt, int clamp);
     void DeleteTextures(vector<GLuint> *textures);
     void TearDownDeinterlacer(void);
-    uint ParseOptions(QString options);
 
     MythRenderOpenGL *gl_context;
+    QSize          video_disp_dim;
     QSize          video_dim;
-    QSize          actual_video_dim;
     QSize          viewportSize;
     QSize          masterViewportSize;
     QRect          display_visible_rect;
@@ -132,8 +130,7 @@ class OpenGLVideo
     uint           helperTexture;
     OpenGLFilterType defaultUpsize;
     uint           gl_features;
-    bool           using_ycbcrtex;
-    bool           using_hardwaretex;
+    uint           videoTextureType;
     LetterBoxColour gl_letterbox_colour;
 };
 #endif // _OPENGL_VIDEO_H__

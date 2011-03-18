@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdint.h>
 #include "fourcc.h"
+#include "mythtvexp.h" // for MUNUSED
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,10 +65,10 @@ typedef struct VideoFrame_
 static inline void init(VideoFrame *vf, VideoFrameType _codec,
                         unsigned char *_buf, int _width, int _height, int _size,
                         const int *p = 0,
-                        const int *o = 0) __attribute__ ((unused));
-static inline void clear(VideoFrame *vf) __attribute__ ((unused));
+                        const int *o = 0) MUNUSED;
+static inline void clear(VideoFrame *vf) MUNUSED;
 static inline bool compatible(const VideoFrame *a,
-                              const VideoFrame *b) __attribute__ ((unused));
+                              const VideoFrame *b) MUNUSED;
 static inline int  bitsperpixel(VideoFrameType type);
 
 static inline void init(VideoFrame *vf, VideoFrameType _codec,

@@ -11,6 +11,7 @@
 #include <QMap>
 #include <QSet>
 
+#include "mythtvexp.h"
 #include "programinfo.h"
 #include "util.h"
 
@@ -22,7 +23,7 @@ class QEvent;
 
 typedef QMap<QString,QDateTime> FileTimeStampMap;
 
-class MPUBLIC PreviewGenerator : public QThread
+class MTV_PUBLIC PreviewGenerator : public QThread
 {
     friend int preview_helper(const QString &chanid,
                               const QString &starttime,
