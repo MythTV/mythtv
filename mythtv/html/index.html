@@ -20,7 +20,19 @@ function loadContent(contentURL) {
     $("#content").html(html);
 }
 
+function interceptMenuClicks() {
+    $('#menu ul li a').click(function(event) {
+        event.preventDefault();
+        if ($(this).hasClass("intercept")){
+            loadContent(this.href);
+        } else {
+            document.location = this.href;
+        }
+    });
+}
+
 $(document).ready(function() {
+    interceptMenuClicks();
     loadContent('/misc/overview.html');
 });
 
@@ -33,31 +45,28 @@ $(document).ready(function() {
         <a href="/"><img src="/images/mythtv.png" class="png" width="180" height="64" border="0" alt="MythTV"></a>
     </div>
     <div id="header_text">
-<!--
-        <ul>
-            <li class="cur"><a href="/Status/GetStatusHTML">Backend Status</a></li>
-            <li class="cur"><a href="javascript:loadContent('/info.html')">Info</a></li>
-        </ul>
--->
     </div>
-    <div id="header-end"></div>
+    <div id="header_end">
+    </div>
 </div><!-- header -->
 
 <div id="menu-bg">
-	<div id="menu">
-	  <ul>
-        <!-- FIXME, make this more lynx-friendly so even text users can get to basic setup -->
-		<!--
-		<li><a href='/setup'>Backend Setup</a></li>
-		<li><a href='/misc/upcoming.html'>Upcoming Recordings</a></li>
-		<li><a href='/misc/storage.html'>Storage</a></li>
-		<li><a href='/misc/jobqueue.html'>JobQueue</a></li>
-		<li><a href='/misc/guidedata.html'>Guide Data</a></li>
-		-->
-		<li><a href='/Status/GetStatusHTML'>Backend Status</a></li>
-		<li><a href="/misc/wsdl.html" onClick="javascript:loadContent('/misc/wsdl.html')">WSDL Links</a></li>
-	  </ul>
-	</div>
+    <div id="menu-title" align=center>
+        MythBackend
+    </div>
+    <div id="menu">
+      <ul>
+        <li><a class='menuitem' href='/setup'>Backend Setup</a></li>
+        <!-- other possible ideas
+        <li><a class='menuitem' href='/misc/upcoming.html'>Upcoming Recordings</a></li>
+        <li><a class='menuitem' href='/misc/storage.html'>Storage</a></li>
+        <li><a class='menuitem' href='/misc/jobqueue.html'>JobQueue</a></li>
+        <li><a class='menuitem' href='/misc/guidedata.html'>Guide Data</a></li>
+        -->
+        <li><a class='menuitem' href='/Status/GetStatusHTML'>Backend Status</a></li>
+        <li><a class='menuitem intercept' href='/misc/wsdl.html'>WSDL Links</a></li>
+      </ul>
+    </div>
 </div>
 
 <div id="content">

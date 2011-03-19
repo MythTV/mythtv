@@ -147,7 +147,7 @@
         border:             none;
     }
 
-    #header-end {
+    #header_end {
         background-image:   url("/img/blue_fade_top.png");
         background-repeat:  repeat-x;
         margin-top:         40px;
@@ -176,9 +176,20 @@
         background-color:   black; 
     }
 
+    #menu-title {
+        font-size:          14px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        color:              #E4D6CD;
+        position:           fixed;
+        top:                80px;
+        left:               10px;
+        width:              180px;
+    }
+
     #menu {
         position:           fixed;
-        top:                90px;
+        top:                110px;
         left:               10px;
         width:              180px;
     }
@@ -187,7 +198,7 @@
         list-style: none;
         margin: 0;
         padding: 0;
-	}
+    }
 
     #menu li a {
         height: 32px;
@@ -198,8 +209,8 @@
     }
 
     #menu li a:active, #menu li a:focus {
-		outline: none;
-	}
+        outline: none;
+    }
 
     #menu li a:link, #menu li a:visited {
         color: #E4D6CD;

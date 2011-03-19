@@ -1,0 +1,110 @@
+<html>
+<head>
+<title>
+MythTV Backend Setup
+</title>
+<link rel="stylesheet" type="text/css" href="/css/site.css">
+<link rel="stylesheet" type="text/css" href="/css/jquery-ui.css">
+
+<link rel="icon"          href="/images/favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+<script language="JavaScript" type="text/javascript" src="/js/jquery.min.js"></script>
+<script language="JavaScript" type="text/javascript" src="/js/jquery-ui.min.js"></script>
+<script language="JavaScript" type="text/javascript" src="/setup/js/util.js"></script>
+<script language="JavaScript" type="text/javascript">
+
+function loadSetupPage(pageName) {
+    loadContent("/setup/" + pageName + ".html");
+
+    $.getScript("/setup/js/" + pageName + ".js");
+}
+
+function loadContent(contentURL, jsURL) {
+    var html = $.ajax({
+      url: contentURL,
+        async: false
+     }).responseText;
+
+    $("#content").html(html);
+    $("#secttabs").tabs();
+
+    if (jsURL) {
+        $.getScript(jsURL);
+    }
+}
+
+function getCurrentTab(id) {
+    var selected = $(id).tabs('option', 'selected');
+    return selected;
+}
+
+function addTab(id, url, label) {
+    $(id).tabs("add", url, label);
+}
+
+function removeTab(id, index) {
+    $(id).tabs("remove", index);
+}
+
+function interceptMenuClicks() {
+    $('#menu ul li a').click(function(event) {
+        event.preventDefault();
+        if (this.href.match("/Config/") == "/Config/") {
+            loadContent(this.href, "/setup/js/Config.js");
+        } else {
+            loadSetupPage(setupPageName(this.href));
+        }
+    });
+}
+
+$(document).ready(function() {
+    interceptMenuClicks();
+    $("#tabs").tabs();
+    loadContent('/setup/Overview.html');
+});
+
+</script>
+
+
+</head>
+<body>
+
+<!-- Header -->
+<div id="header">
+    <div id="header_logo">
+        <a href="/"><img src="/images/mythtv.png" class="png" width="180" height="64" border="0" alt="MythTV"></a>
+    </div>
+
+    <div id="header_title">
+    </div>
+
+    <div id="header_end">
+    </div>
+</div><!-- header -->
+
+<div id="menu-bg">
+    <div id="menu-title" align=center>
+        MythBackend Setup
+    </div>
+
+    <div id="menu">
+        <ul>
+            <li><a class='menuitem' href='/Config/Database'>Database</a></li>
+            <li><a class='menuitem' href='/Config/General'>General</a></li>
+            <!-- some possible other menu items
+            <li><a class='menuitem hidden' href="javascript:loadSetupPage('tuning')">Tuning</a></li>
+            <li><a class='menuitem hidden' href="javascript:loadSetupPage('storagegroups')">Storage Groups</a></li>
+            -->
+            <!--
+            <li><a class='menuitem hidden' href="javascript:loadSetupPage('jobqueue')">Job Queue</a></li>
+            <li><a class='menuitem hidden' href="javascript:loadSetupPage('systemevents')">System Events</a></li>
+            -->
+        </ul>
+    </div>
+</div>
+
+<div id="content">
+</div>
+
+</body>
+</html>

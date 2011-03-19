@@ -21,22 +21,22 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
     if (!request)
         return false;
 
-    VERBOSE(VB_IMPORTANT, QString("HttpConfig::ProcessRequest '%1' '%2'")
-            .arg(request->m_sBaseUrl).arg(request->m_sMethod));
-
-    if (request->m_sBaseUrl != "/" &&
-        request->m_sBaseUrl.left(7).toLower() != "/config")
+    if (!request->m_sBaseUrl.startsWith("/Config"))
     {
         return false;
     }
 
+    VERBOSE(VB_IMPORTANT, QString("HttpConfig::ProcessRequest '%1' '%2'")
+            .arg(request->m_sBaseUrl).arg(request->m_sMethod));
+
     bool handled = false;
-    if (request->m_sMethod.toLower() == "save")
+    if (request->m_sMethod == "Save")
     {
+        // FIXME, this is always false, what's it for
         if (request->m_sBaseUrl.right(7) == "config" &&
             !database_settings.empty())
         {
-            PrintHeader(request->m_response, "config");
+            PrintHeader(request->m_response, "Config/Database");
             check_settings(database_settings, request->m_mapParams);
             load_settings(database_settings, "");
             PrintSettings(request->m_response, database_settings);
@@ -57,10 +57,9 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
             handled = true;
         }
     }
-
-    if ((request->m_sMethod.toLower() == "config") || (NULL == gContext))
+    else if ((request->m_sMethod == "Database") || (NULL == gContext))
     {
-        PrintHeader(request->m_response, "config");
+        PrintHeader(request->m_response, "Config/Database");
         QString fn = GetShareDir() + "backend-config/"
             "config_backend_database.xml";
         parse_settings(database_settings, fn);
@@ -69,9 +68,9 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
         PrintFooter(request->m_response);
         handled = true;
     }
-    else if (request->m_sMethod.toLower() == "general")
+    else if (request->m_sMethod == "General")
     {
-        PrintHeader(request->m_response, "config/general");
+        PrintHeader(request->m_response, "Config/General");
         QString fn = GetShareDir() + "backend-config/"
             "config_backend_general.xml";
         parse_settings(general_settings, fn);
@@ -104,47 +103,13 @@ void HttpConfig::PrintHeader(QBuffer &buffer, const QString &form)
        << "<head>\r\n"
        << "  <meta http-equiv=\"Content-Type\"\r\n"
        << "        content=\"text/html; charset=UTF-8\" />\r\n"
-       << "  <style type=\"text/css\" title=\"Default\" media=\"all\">\r\n"
-       << "  body {\r\n"
-       << "    background-color:#fff;\r\n"
-       << "    font:11px verdana, arial, helvetica, sans-serif;\r\n"
-       << "    margin:20px;\r\n"
-       << "  }\r\n"
-       << "  h1 {\r\n"
-       << "    font-size:28px;\r\n"
-       << "    font-weight:900;\r\n"
-       << "    color:#ccc;\r\n"
-       << "    letter-spacing:0.5em;\r\n"
-       << "    margin-bottom:30px;\r\n"
-       << "    width:650px;\r\n"
-       << "    text-align:center;\r\n"
-       << "  }\r\n"
-       << "  h2 {\r\n"
-       << "    font-size:18px;\r\n"
-       << "    font-weight:800;\r\n"
-       << "    color:#360;\r\n"
-       << "    border:none;\r\n"
-       << "    letter-spacing:0.3em;\r\n"
-       << "    padding:0px;\r\n"
-       << "    margin-bottom:10px;\r\n"
-       << "    margin-top:0px;\r\n"
-       << "  }\r\n"
-       << "  h3 {\r\n"
-       << "    font-size:14px;\r\n"
-       << "    font-weight:800;\r\n"
-       << "    color:#360;\r\n"
-       << "    border:none;\r\n"
-       << "    letter-spacing:0.3em;\r\n"
-       << "    padding:0px;\r\n"
-       << "    margin-bottom:10px;\r\n"
-       << "    margin-top:0px;\r\n"
-       << "  }\r\n"
-       << "  </style>\r\n"
+       << "  <link rel='stylesheet' href='/setup/css/Config.css' type='text/css'>\r\n"
        << "  <title>MythTV Config</title>"
        << "</head>\r\n"
        << "<body>\r\n\r\n"
-       << "  <h1>MythTV Configuration</h1>\r\n"
-       << "  <form action=\"/" << form << "/save\" method=\"POST\">\r\n"
+       << "<div class=\"config\">\r\n"
+       << "  <h1 class=\"config\">MythTV Configuration</h1>\r\n"
+       << "  <form id=\"config_form\" action=\"/" << form << "/Save\" method=\"POST\">\r\n"
        << "    <div class=\"form_buttons_top\"\r\n"
        << "         id=\"form_buttons_top\">\r\n"
        << "      <input type=\"submit\" value=\"Save Changes\" />\r\n"
@@ -160,6 +125,7 @@ void HttpConfig::PrintFooter(QBuffer &buffer)
        << "      <input type=\"submit\" value=\"Save Changes\" />\r\n"
        << "    </div>\r\n"
        << "  </form>\r\n"
+       << "</div>\r\n"
        << "</body>\r\n"
        << "</html>\r\n";
 }

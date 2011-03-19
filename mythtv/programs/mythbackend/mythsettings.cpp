@@ -149,7 +149,7 @@ QString MythSettingGroup::ToHTML(uint depth) const
         QString("<div class=\"group\" id=\"%1\">\r\n").arg(unique_label);
     if (!human_label.isEmpty())
     {
-        ret += indent(depth+1) + QString("<h%1>%2</h%3>\r\n")
+        ret += indent(depth+1) + QString("<h%1 class=\"config\">%2</h%3>\r\n")
             .arg(depth+1).arg(human_label).arg(depth+1);
     }
 
