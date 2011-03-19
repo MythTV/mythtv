@@ -62,6 +62,7 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
 
         virtual DTC::ConnectionInfo* GetConnectionInfo  ( const QString   &Pin ) = 0;
 
+        virtual DTC::StringList*    GetHostName         ( ) = 0;
         virtual DTC::StringList*    GetHosts            ( ) = 0;
         virtual DTC::StringList*    GetKeys             ( ) = 0;
 

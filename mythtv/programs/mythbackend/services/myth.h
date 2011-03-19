@@ -36,6 +36,7 @@ class Myth : public MythServices
 
         DTC::ConnectionInfo* GetConnectionInfo  ( const QString   &Pin );
 
+        DTC::StringList*    GetHostName         ( );
         DTC::StringList*    GetHosts            ( );
         DTC::StringList*    GetKeys             ( );
 

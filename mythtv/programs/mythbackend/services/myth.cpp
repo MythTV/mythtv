@@ -92,6 +92,27 @@ DTC::ConnectionInfo* Myth::GetConnectionInfo( const QString  &sPin )
 //
 /////////////////////////////////////////////////////////////////////////////
 
+DTC::StringList* Myth::GetHostName( )
+{
+    if (!gCoreContext)
+    {
+        throw( QString( "No MythCoreContext in GetHostName." ));
+    }
+
+    // ----------------------------------------------------------------------
+    // return the results of the query
+    // ----------------------------------------------------------------------
+
+    DTC::StringList *pResults = new DTC::StringList();
+
+    pResults->Values().append( gCoreContext->GetHostName() );
+
+    return pResults;
+}
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 DTC::StringList* Myth::GetHosts( )
 {
     MSqlQuery query(MSqlQuery::InitCon());
