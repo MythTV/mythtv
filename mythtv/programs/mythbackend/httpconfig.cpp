@@ -46,7 +46,7 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
         else
         {
             QTextStream os(&request->m_response);
-            os << "<html><body><dl>";
+            os << "<html><body><h3>Save functionality is not hooked up yet</h3><dl>";
             QStringMap::const_iterator it = request->m_mapParams.begin();
             for (; it!=request->m_mapParams.end(); ++it)
             {
