@@ -23,6 +23,7 @@ HEADERS += datacontracts/recording.h           datacontracts/settingList.h
 HEADERS += datacontracts/stringList.h          datacontracts/successFail.h
 HEADERS += datacontracts/wolInfo.h             datacontracts/programList.h
 HEADERS += datacontracts/encoder.h             datacontracts/encoderList.h
+HEADERS += datacontracts/storageGroupDir.h     datacontracts/storageGroupDirList.h
 
 SOURCES += service.cpp
 

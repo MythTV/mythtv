@@ -31,6 +31,8 @@
 #include "datacontracts/stringList.h"
 #include "datacontracts/settingList.h"
 #include "datacontracts/successFail.h"
+#include "datacontracts/storageGroupDirList.h"
+
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -52,7 +54,9 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
     Q_CLASSINFO( "version"    , "1.0" );
-    Q_CLASSINFO( "PutSetting_Method", "POST" )
+    Q_CLASSINFO( "PutSetting_Method",            "POST" )
+    Q_CLASSINFO( "AddStorageGroupDir_Method",    "POST" )
+    Q_CLASSINFO( "RemoveStorageGroupDir_Method", "POST" )
 
     public slots:
 
@@ -60,6 +64,17 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
 
         virtual DTC::StringList*    GetHosts            ( ) = 0;
         virtual DTC::StringList*    GetKeys             ( ) = 0;
+
+        virtual DTC::StorageGroupDirList*  GetStorageGroupDirs ( const QString   &GroupName,
+                                                                 const QString   &HostName ) = 0;
+
+        virtual DTC::SuccessFail*   AddStorageGroupDir  ( const QString   &GroupName,
+                                                          const QString   &DirName,
+                                                          const QString   &HostName ) = 0;
+
+        virtual DTC::SuccessFail*   RemoveStorageGroupDir  ( const QString   &GroupName,
+                                                             const QString   &DirName,
+                                                             const QString   &HostName ) = 0;
 
         virtual DTC::SettingList*   GetSetting          ( const QString   &HostName, 
                                                           const QString   &Key, 

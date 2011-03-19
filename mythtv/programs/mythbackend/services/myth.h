@@ -39,6 +39,17 @@ class Myth : public MythServices
         DTC::StringList*    GetHosts            ( );
         DTC::StringList*    GetKeys             ( );
 
+        DTC::StorageGroupDirList*  GetStorageGroupDirs ( const QString   &GroupName,
+                                                         const QString   &HostName );
+
+        DTC::SuccessFail*   AddStorageGroupDir  ( const QString   &GroupName,
+                                                  const QString   &DirName,
+                                                  const QString   &HostName );
+
+        DTC::SuccessFail*   RemoveStorageGroupDir  ( const QString   &GroupName,
+                                                     const QString   &DirName,
+                                                     const QString   &HostName );
+
         DTC::SettingList*   GetSetting          ( const QString   &HostName, 
                                                   const QString   &Key, 
                                                   const QString   &Default );
