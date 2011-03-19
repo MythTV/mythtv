@@ -23,7 +23,7 @@ extern "C" {
 #   include "dvbchannel.h"
 #endif
 
-#ifdef USING_V4L
+#ifdef USING_V4L2
 #   include "analogsignalmonitor.h"
 #   include "v4lchannel.h"
 #endif
@@ -95,7 +95,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
     }
 #endif
 
-#ifdef USING_V4L
+#ifdef USING_V4L2
     if ((cardtype.toUpper() == "HDPVR"))
     {
         V4LChannel *chan = dynamic_cast<V4LChannel*>(channel);

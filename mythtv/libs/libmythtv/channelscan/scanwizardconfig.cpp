@@ -27,14 +27,14 @@ static QString card_types(void)
     cardTypes += "'DVB'";
 #endif // USING_DVB
 
-#ifdef USING_V4L
+#if defined(USING_V4L) || defined(USING_V4L2)
     if (!cardTypes.isEmpty())
         cardTypes += ",";
     cardTypes += "'V4L'";
 # ifdef USING_IVTV
     cardTypes += ",'MPEG'";
 # endif // USING_IVTV
-#endif // USING_V4L
+#endif // USING_V4L || USING_V4L2
 
 #ifdef USING_IPTV
     if (!cardTypes.isEmpty())

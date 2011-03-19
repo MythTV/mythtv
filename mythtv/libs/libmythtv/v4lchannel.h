@@ -4,11 +4,11 @@
 #define CHANNEL_H
 
 #include "dtvchannel.h"
-#ifdef USING_V4L
+#ifdef USING_V4L2
 #include <linux/videodev2.h> // needed for v4l2_std_id type
 #else
 typedef uint64_t v4l2_std_id;
-#endif //USING_V4L
+#endif //USING_V4L2
 
 using namespace std;
 

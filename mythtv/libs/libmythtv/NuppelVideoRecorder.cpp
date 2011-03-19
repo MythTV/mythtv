@@ -42,9 +42,13 @@ extern "C" {
 #include "libswscale/swscale.h"
 }
 
+#if defined(USING_V4L) || defined(USING_V4L2)
 #ifdef USING_V4L
 #include <linux/videodev.h>
+#endif
+#ifdef USING_V4L2
 #include <linux/videodev2.h>
+#endif
 
 #include "go7007_myth.h"
 
@@ -55,9 +59,9 @@ extern "C" {
 extern "C" {
 #include "vbitext/vbi.h"
 }
-#else  // USING_V4l
+#else  // USING_V4L || USING_V4L2
 #define VT_WIDTH 0
-#endif // USING_V4l
+#endif // USING_V4l || USING_V4L2
 
 #define KEYFRAMEDIST   30
 
@@ -1019,7 +1023,7 @@ bool NuppelVideoRecorder::Open(void)
 
 void NuppelVideoRecorder::ProbeV4L2(void)
 {
-#ifdef USING_V4L
+#if defined(USING_V4L) || defined(USING_V4L2)
     usingv4l2 = true;
 
     struct v4l2_capability vcap;
@@ -1049,7 +1053,7 @@ void NuppelVideoRecorder::ProbeV4L2(void)
     QString driver = (char *)vcap.driver;
     if (driver == "go7007")
         go7007 = true;
-#endif // USING_V4L
+#endif // USING_V4L || USING_V4L2
 }
 
 void NuppelVideoRecorder::StartRecording(void)
@@ -2460,7 +2464,7 @@ void NuppelVideoRecorder::doAudioThread(void)
         audio_device->Close();
 }
 
-#ifdef USING_V4L
+#if defined(USING_V4L) || defined(USING_V4L2)
 struct VBIData
 {
     NuppelVideoRecorder *nvr;
@@ -2634,9 +2638,9 @@ void NuppelVideoRecorder::FormatTeletextSubtitles(struct VBIData *vbidata)
         act_text_buffer = 0;
     textbuffer[act]->freeToEncode = 1;
 }
-#else  // USING_V4L
+#else  // USING_V4L || USING_V4L2
 void NuppelVideoRecorder::FormatTeletextSubtitles(struct VBIData *vbidata) {}
-#endif // USING_V4L
+#endif // USING_V4L || USING_V4L2
 
 void NuppelVideoRecorder::FormatCC(struct cc *cc)
 {
@@ -2863,7 +2867,7 @@ void NuppelVideoRecorder::doVbiThread(void)
     //VERBOSE(VB_RECORD, LOC + "vbi end");
 }
 
-#else  // USING_V4L
+#else  // USING_V4L 
 void NuppelVideoRecorder::doVbiThread(void) { }
 #endif // USING_V4L
 

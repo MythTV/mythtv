@@ -57,7 +57,7 @@ using namespace std;
 
 #include "channelgroup.h"
 
-#ifdef USING_V4L
+#if defined(USING_V4L) || defined(USING_V4L2)
 #include "v4lchannel.h"
 #endif
 
@@ -206,7 +206,7 @@ bool TVRec::CreateChannel(const QString &startchannel)
     }
     else // "V4L" or "MPEG", ie, analog TV
     {
-#ifdef USING_V4L
+#if defined(USING_V4L) || defined(USING_V4L2)
         channel = new V4LChannel(this, genOpt.videodev);
         if (!channel->Open())
             return false;
@@ -1082,11 +1082,11 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
     }
     else
     {
-#ifdef USING_V4L
+#if defined(USING_V4L) || defined(USING_V4L2)
         // V4L/MJPEG/GO7007 from here on
         recorder = new NuppelVideoRecorder(this, channel);
         recorder->SetOption("skipbtaudio", genOpt.skip_btaudio);
-#endif // USING_V4L
+#endif // USING_V4L || USING_V4L2
     }
 
     if (recorder)
@@ -1292,11 +1292,11 @@ FirewireChannel *TVRec::GetFirewireChannel(void)
 
 V4LChannel *TVRec::GetV4LChannel(void)
 {
-#ifdef USING_V4L
+#if defined(USING_V4L) || defined(USING_V4L2)
     return dynamic_cast<V4LChannel*>(channel);
 #else
     return NULL;
-#endif // USING_V4L
+#endif // USING_V4L || USING_V4L2
 }
 
 /** \fn TVRec::EventThread(void*)
@@ -4137,7 +4137,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
                                   channel->GetCurrentName());
     }
 
-#ifdef USING_V4L
+#if defined(USING_V4L) || defined(USING_V4L2)
     if (GetV4LChannel())
     {
         channel->InitPictureAttributes();

@@ -1394,7 +1394,7 @@ const DVBChannel *ChannelScanSM::GetDVBChannel(void) const
 
 V4LChannel *ChannelScanSM::GetV4LChannel(void)
 {
-#ifdef USING_V4L
+#if defined(USING_V4L) || defined(USING_V4L2)
     return dynamic_cast<V4LChannel*>(channel);
 #else
     return NULL;

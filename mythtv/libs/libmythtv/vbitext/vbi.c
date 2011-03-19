@@ -14,8 +14,12 @@
 //       compiling with -std=c99.  We could remove this in the .pro file,
 //       but that would disable it for all .c files.
 #undef __STRICT_ANSI__
+#ifdef USING_V4L
 #include <linux/videodev.h>
+#endif
+#ifdef USING_V4L2
 #include <linux/videodev2.h>
+#endif
 
 // vbitext headers
 #include "vt.h"
@@ -29,8 +33,13 @@ static int rawbuf_size;                // its current size
 
 
 /***** bttv api *****/
+#ifdef USING_V4L
 #define BTTV_VBISIZE           _IOR('v' , BASE_VIDIOCPRIVATE+8, int)
-
+#else // !USING_V4L
+#ifdef USING_V4L2
+#define BTTV_VBISIZE           _IOR('v' , BASE_VIDIOC_PRIVATE+8, int)
+#endif // USING_V4L2
+#endif // !USING_V4L
 
 static void
 error(const char *str, ...)
