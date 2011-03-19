@@ -103,7 +103,7 @@ void HttpConfig::PrintHeader(QBuffer &buffer, const QString &form)
        << "<head>\r\n"
        << "  <meta http-equiv=\"Content-Type\"\r\n"
        << "        content=\"text/html; charset=UTF-8\" />\r\n"
-       << "  <link rel='stylesheet' href='/setup/css/Config.css' type='text/css'>\r\n"
+       << "  <link rel=\"stylesheet\" href=\"/setup/css/Config.css\" type=\"text/css\">\r\n"
        << "  <title>MythTV Config</title>"
        << "</head>\r\n"
        << "<body>\r\n\r\n"
