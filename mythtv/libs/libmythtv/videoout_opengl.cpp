@@ -393,7 +393,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
         }
     }
 
-    if (osd && gl_painter)
+    if (osd && gl_painter && !window.IsEmbedding())
         osd->DrawDirect(gl_painter, GetTotalOSDBounds().size(), true);
 
     gl_context->Flush(false);

@@ -1689,7 +1689,8 @@ void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
     }
 
     ShowPIPs(frame, pipPlayers);
-    DisplayOSD(frame, osd);
+    if (osd && !window.IsEmbedding())
+        DisplayOSD(frame, osd);
 
     if (m_deinterlacing &&
         m_deintFilter != NULL &&
