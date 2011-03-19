@@ -1420,6 +1420,13 @@ QStringList MythPlayer::GetTracks(uint type)
     return QStringList();
 }
 
+uint MythPlayer::GetTrackCount(uint type)
+{
+    if (decoder)
+        return decoder->GetTrackCount(type);
+    return 0;
+}
+
 int MythPlayer::SetTrack(uint type, int trackNo)
 {
     int ret = -1;
