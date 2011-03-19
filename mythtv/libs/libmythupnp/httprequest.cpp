@@ -704,8 +704,13 @@ void HTTPRequest::SetRequestProtocol( const QString &sLine )
 
 ContentType HTTPRequest::SetContentType( const QString &sType )
 {
-    if (sType == "application/x-www-form-urlencoded") return( m_eContentType = ContentType_Urlencoded );
-    if (sType == "text/xml"                         ) return( m_eContentType = ContentType_XML        );
+    if ((sType == "application/x-www-form-urlencoded"          ) ||
+        (sType.startsWith("application/x-www-form-urlencoded;")))
+        return( m_eContentType = ContentType_Urlencoded );
+
+    if ((sType == "text/xml"                                   ) ||
+        (sType.startsWith("text/xml;")                         ))
+        return( m_eContentType = ContentType_XML        );
 
     return( m_eContentType = ContentType_Unknown );
 }
