@@ -1,0 +1,74 @@
+  div.status {
+    font:11px verdana, arial, helvetica, sans-serif;
+    margin:20px;
+  }
+  h1.status {
+    font-size:28px;
+    font-weight:900;
+    color:#ccc;
+    letter-spacing:0.5em;
+    margin-bottom:30px;
+    width:650px;
+    text-align:center;
+  }
+  h2.status {
+    font-size:18px;
+    font-weight:800;
+    color:#360;
+    border:none;
+    letter-spacing:0.3em;
+    padding:0px;
+    margin-bottom:10px;
+    margin-top:0px;
+  }
+  hr.status {
+    display:none;
+  }
+  div.content {
+    width:650px;
+    border-top:1px solid #000;
+    border-right:1px solid #000;
+    border-bottom:1px solid #000;
+    border-left:10px solid #000;
+    padding:10px;
+    margin-bottom:30px;
+    -moz-border-radius:8px 0px 0px 8px;
+  }
+  div.schedule a {
+    display:block;
+    color:#000;
+    text-decoration:none;
+    padding:.2em .8em;
+    border:thin solid #fff;
+    width:350px;
+  }
+  div.schedule a span {
+    display:none;
+  }
+  div.schedule a:hover {
+    background-color:#F4F4F4;
+    border-top:thin solid #000;
+    border-bottom:thin solid #000;
+    border-left:thin solid #000;
+    cursor:default;
+  }
+  div.schedule a:hover span {
+    display:block;
+    position:absolute;
+    background-color:#F4F4F4;
+    color:#000;
+    left:400px;
+    margin-top:-20px;
+    width:280px;
+    padding:5px;
+    border:thin dashed #000;
+  }
+  div.loadstatus {
+    width:325px;
+    height:7em;
+  }
+  .jobfinished { color: #0000ff; }
+  .jobaborted { color: #7f0000; }
+  .joberrored { color: #ff0000; }
+  .jobrunning { color: #005f00; }
+  .jobqueued  {  }

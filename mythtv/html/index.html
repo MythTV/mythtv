@@ -23,10 +23,10 @@ function loadContent(contentURL) {
 function interceptMenuClicks() {
     $('#menu ul li a').click(function(event) {
         event.preventDefault();
-        if ($(this).hasClass("intercept")){
-            loadContent(this.href);
-        } else {
+        if (this.href.match("/setup") == "/setup") {
             document.location = this.href;
+        } else {
+            loadContent(this.href);
         }
     });
 }
@@ -64,7 +64,7 @@ $(document).ready(function() {
         <li><a class='menuitem' href='/misc/guidedata.html'>Guide Data</a></li>
         -->
         <li><a class='menuitem' href='/Status/GetStatusHTML'>Backend Status</a></li>
-        <li><a class='menuitem intercept' href='/misc/wsdl.html'>WSDL Links</a></li>
+        <li><a class='menuitem' href='/misc/wsdl.html'>WSDL Links</a></li>
       </ul>
     </div>
 </div>

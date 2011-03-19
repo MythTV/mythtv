@@ -543,93 +543,16 @@ void HttpStatus::PrintStatus( QTextStream &os, QDomDocument *pDoc )
        << "<head>\r\n"
        << "  <meta http-equiv=\"Content-Type\""
        << "content=\"text/html; charset=UTF-8\" />\r\n"
-       << "  <style type=\"text/css\" title=\"Default\" media=\"all\">\r\n"
-       << "  <!--\r\n"
-       << "  body {\r\n"
-       << "    background-color:#fff;\r\n"
-       << "    font:11px verdana, arial, helvetica, sans-serif;\r\n"
-       << "    margin:20px;\r\n"
-       << "  }\r\n"
-       << "  h1 {\r\n"
-       << "    font-size:28px;\r\n"
-       << "    font-weight:900;\r\n"
-       << "    color:#ccc;\r\n"
-       << "    letter-spacing:0.5em;\r\n"
-       << "    margin-bottom:30px;\r\n"
-       << "    width:650px;\r\n"
-       << "    text-align:center;\r\n"
-       << "  }\r\n"
-       << "  h2 {\r\n"
-       << "    font-size:18px;\r\n"
-       << "    font-weight:800;\r\n"
-       << "    color:#360;\r\n"
-       << "    border:none;\r\n"
-       << "    letter-spacing:0.3em;\r\n"
-       << "    padding:0px;\r\n"
-       << "    margin-bottom:10px;\r\n"
-       << "    margin-top:0px;\r\n"
-       << "  }\r\n"
-       << "  hr {\r\n"
-       << "    display:none;\r\n"
-       << "  }\r\n"
-       << "  div.content {\r\n"
-       << "    width:650px;\r\n"
-       << "    border-top:1px solid #000;\r\n"
-       << "    border-right:1px solid #000;\r\n"
-       << "    border-bottom:1px solid #000;\r\n"
-       << "    border-left:10px solid #000;\r\n"
-       << "    padding:10px;\r\n"
-       << "    margin-bottom:30px;\r\n"
-       << "    -moz-border-radius:8px 0px 0px 8px;\r\n"
-       << "  }\r\n"
-       << "  div.schedule a {\r\n"
-       << "    display:block;\r\n"
-       << "    color:#000;\r\n"
-       << "    text-decoration:none;\r\n"
-       << "    padding:.2em .8em;\r\n"
-       << "    border:thin solid #fff;\r\n"
-       << "    width:350px;\r\n"
-       << "  }\r\n"
-       << "  div.schedule a span {\r\n"
-       << "    display:none;\r\n"
-       << "  }\r\n"
-       << "  div.schedule a:hover {\r\n"
-       << "    background-color:#F4F4F4;\r\n"
-       << "    border-top:thin solid #000;\r\n"
-       << "    border-bottom:thin solid #000;\r\n"
-       << "    border-left:thin solid #000;\r\n"
-       << "    cursor:default;\r\n"
-       << "  }\r\n"
-       << "  div.schedule a:hover span {\r\n"
-       << "    display:block;\r\n"
-       << "    position:absolute;\r\n"
-       << "    background-color:#F4F4F4;\r\n"
-       << "    color:#000;\r\n"
-       << "    left:400px;\r\n"
-       << "    margin-top:-20px;\r\n"
-       << "    width:280px;\r\n"
-       << "    padding:5px;\r\n"
-       << "    border:thin dashed #000;\r\n"
-       << "  }\r\n"
-       << "  div.loadstatus {\r\n"
-       << "    width:325px;\r\n"
-       << "    height:7em;\r\n"
-       << "  }\r\n"
-       << "  .jobfinished { color: #0000ff; }\r\n"
-       << "  .jobaborted { color: #7f0000; }\r\n"
-       << "  .joberrored { color: #ff0000; }\r\n"
-       << "  .jobrunning { color: #005f00; }\r\n"
-       << "  .jobqueued  {  }\r\n"
-       << "  -->\r\n"
-       << "  </style>\r\n"
+       << "  <link rel=\"stylesheet\" href=\"/css/Status.css\" type=\"text/css\">\r\n"
        << "  <title>MythTV Status - "
        << docElem.attribute( "date", qdtNow.toString(shortdateformat)  )
        << " "
        << docElem.attribute( "time", qdtNow.toString(timeformat) ) << " - "
        << docElem.attribute( "version", MYTH_BINARY_VERSION ) << "</title>\r\n"
        << "</head>\r\n"
-       << "<body>\r\n\r\n"
-       << "  <h1>MythTV Status</h1>\r\n";
+       << "<body bgcolor=\"#fff\">\r\n"
+       << "<div class=\"status\">\r\n"
+       << "  <h1 class=\"status\">MythTV Status</h1>\r\n";
 
     int nNumEncoders = 0;
 
@@ -669,7 +592,7 @@ void HttpStatus::PrintStatus( QTextStream &os, QDomDocument *pDoc )
     if (!node.isNull())
         PrintMiscellaneousInfo( os, node.toElement());
 
-    os << "\r\n</body>\r\n</html>\r\n";
+    os << "\r\n</div>\r\n</body>\r\n</html>\r\n";
 
 }
 
@@ -686,7 +609,7 @@ int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
         return 0;
 
     os << "  <div class=\"content\">\r\n"
-       << "    <h2>Encoder Status</h2>\r\n";
+       << "    <h2 class=\"status\">Encoder Status</h2>\r\n";
 
     QDomNode node = encoders.firstChild();
 
@@ -834,7 +757,7 @@ int HttpStatus::PrintScheduled( QTextStream &os, QDomElement scheduled )
     int     nNumRecordings= scheduled.attribute( "count", "0" ).toInt();
 
     os << "  <div class=\"content\">\r\n"
-       << "    <h2>Schedule</h2>\r\n";
+       << "    <h2 class=\"status\">Schedule</h2>\r\n";
 
     if (nNumRecordings == 0)
     {
@@ -960,7 +883,7 @@ int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
     int nNumJobs= jobs.attribute( "count", "0" ).toInt();
 
     os << "  <div class=\"content\">\r\n"
-       << "    <h2>Job Queue</h2>\r\n";
+       << "    <h2 class=\"status\">Job Queue</h2>\r\n";
 
     if (nNumJobs != 0)
     {
@@ -1104,7 +1027,7 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
         return( 0 );
 
     os << "<div class=\"content\">\r\n"
-       << "    <h2>Machine Information</h2>\r\n";
+       << "    <h2 class=\"status\">Machine Information</h2>\r\n";
 
     // load average ---------------------
 
@@ -1355,7 +1278,7 @@ int HttpStatus::PrintMiscellaneousInfo( QTextStream &os, QDomElement info )
         QString display, linebreak;
         //QString name, value;
         os << "<div class=\"content\">\r\n"
-           << "    <h2>Miscellaneous</h2>\r\n";
+           << "    <h2 class=\"status\">Miscellaneous</h2>\r\n";
         for (unsigned int i = 0; i < count; i++)
         {
             QDomNode node = nodes.item(i);
