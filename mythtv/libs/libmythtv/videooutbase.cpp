@@ -400,6 +400,14 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
     (void)embedid;
 
     video_codec_id = codec_id;
+    bool wasembedding = window.IsEmbedding();
+    QRect oldrect;
+    if (wasembedding)
+    {
+        oldrect = window.GetDisplayVisibleRect();
+        StopEmbedding();
+    }
+
     bool mainSuccess = window.Init(
         QSize(width, height), aspect,
         QRect(winx, winy, winw, winh),
@@ -414,6 +422,11 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
     adjustfill      = db_adjustfill >= kAdjustFill_AutoDetect_DefaultOff ?
         (AdjustFillMode) (db_adjustfill - kAdjustFill_AutoDetect_DefaultOff) : db_adjustfill;
 */
+    if (wasembedding)
+    {
+        VERBOSE(VB_PLAYBACK, LOC + "Restoring embedded playback");
+        EmbedInWidget(oldrect.x(), oldrect.y(), oldrect.width(), oldrect.height());
+    }
 
     VideoAspectRatioChanged(aspect); // apply aspect ratio and letterbox mode
 
