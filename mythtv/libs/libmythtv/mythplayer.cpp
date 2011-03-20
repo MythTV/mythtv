@@ -2444,12 +2444,13 @@ bool MythPlayer::StartPlaying(void)
 
     bool seek = bookmarkseek > 30;
     EventStart();
-    DecoderStart(seek);
+    DecoderStart(true);
     if (seek)
         InitialSeek();
     VideoStart();
 
     playerThread->setPriority(QThread::TimeCriticalPriority);
+    UnpauseDecoder();
     return !IsErrored();
 }
 
@@ -2462,7 +2463,6 @@ void MythPlayer::InitialSeek(void)
         if (clearSavedPosition && !player_ctx->IsPIP())
             ClearBookmark(false);
     }
-    UnpauseDecoder();
 }
 
 
