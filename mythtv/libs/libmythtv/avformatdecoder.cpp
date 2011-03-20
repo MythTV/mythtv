@@ -257,6 +257,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       start_code_state(0xffffffff),
       lastvpts(0),                  lastapts(0),
       lastccptsu(0),
+      firstvpts(0),                 firstvptsinuse(false),
       faulty_pts(0),                faulty_dts(0),
       last_pts_for_fault_detection(0),
       last_dts_for_fault_detection(0),
@@ -728,6 +729,12 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         GetFrame(kDecodeVideo);
         if (decoded_video_frame)
             m_parent->DiscardVideoFrame(decoded_video_frame);
+    }
+
+    if (doflush)
+    {
+        firstvpts = 0;
+        firstvptsinuse = true;
     }
 }
 
@@ -2628,7 +2635,8 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
                 gopset = false;
                 prevgoppos = 0;
-                lastapts = lastvpts = lastccptsu = 0;
+                firstvpts = lastapts = lastvpts = lastccptsu = 0;
+                firstvptsinuse = true;
                 faulty_pts = faulty_dts = 0;
                 last_pts_for_fault_detection = 0;
                 last_dts_for_fault_detection = 0;
@@ -2735,7 +2743,8 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 
             gopset = false;
             prevgoppos = 0;
-            lastapts = lastvpts = lastccptsu = 0;
+            firstvpts = lastapts = lastvpts = lastccptsu = 0;
+            firstvptsinuse = true;
             faulty_pts = faulty_dts = 0;
             last_pts_for_fault_detection = 0;
             last_dts_for_fault_detection = 0;
@@ -3006,6 +3015,8 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
     framesPlayed++;
 
     lastvpts = temppts;
+    if (!firstvpts && firstvptsinuse)
+        firstvpts = temppts;
 
     return true;
 }
@@ -3809,6 +3820,16 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             else
                 skipaudio = false;
         }
+
+        // skip any audio frames preceding first video frame
+        if (firstvptsinuse && firstvpts && (lastapts < firstvpts))
+        {
+            VERBOSE(VB_PLAYBACK+VB_TIMESTAMP,
+                LOC + QString("discarding early audio timecode %1 %2 %3")
+                .arg(pkt->pts).arg(pkt->dts).arg(lastapts));
+            break;
+        }
+        firstvptsinuse = false;
 
         avcodeclock->lock();
         data_size = 0;
