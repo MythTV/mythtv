@@ -7,6 +7,7 @@
 
 #if CONFIG_DARWIN
 #include <vector>
+using std::vector;
 #endif
 
 #if defined(__linux__) || defined(__FreeBSD__)

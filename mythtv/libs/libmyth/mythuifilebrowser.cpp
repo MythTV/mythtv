@@ -499,10 +499,14 @@ void MythUIFileBrowser::updateRemoteFileList()
         item->SetText(QString("0"), "filesize");
         item->SetText(m_parentDir, "fullpath");
         item->DisplayState(type, "nodetype");
-        m_backButton->SetEnabled(true);
+        if (m_backButton)
+            m_backButton->SetEnabled(true);
     }
     else
-        m_backButton->SetEnabled(false);
+    {
+        if (m_backButton)
+            m_backButton->SetEnabled(false);
+    }
 
     QStringList::const_iterator it = slist.begin();
     while (it != slist.end())
@@ -667,7 +671,9 @@ void MythUIFileBrowser::updateLocalFileList()
         }
     }
 
-    m_backButton->SetEnabled(showBackButton);
+    if (m_backButton)
+        m_backButton->SetEnabled(showBackButton);
+
     m_locationEdit->SetText(m_subDirectory);
 }
 
