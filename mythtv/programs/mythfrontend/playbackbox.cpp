@@ -4820,6 +4820,10 @@ void GroupSelector::AcceptItem(MythUIButtonListItem *item)
     if (!item)
         return;
 
+    // ignore the dividers
+    if (item->GetData().toString().isEmpty())
+        return;
+
     QString group = item->GetData().toString();
     emit result(group);
     Close();

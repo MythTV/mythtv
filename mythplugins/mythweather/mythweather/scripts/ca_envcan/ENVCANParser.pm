@@ -11,7 +11,7 @@ use strict;
 use POSIX;
 use XML::Simple;
 
-our $VERSION = 0.4;
+our $VERSION = 0.5;
 
 my %results;
 my %directions = (  N  => "North",      NNE => "North Northeast",
@@ -93,7 +93,7 @@ sub doParse {
                 $results{'weather_icon'} = getIcon($1);
             }
             $results{'temp'}     = sprintf("%.0f", $1) 
-                if ($item->{description} =~ /Temperature:\<\/b\>\s*(-?\d*\.?\d*)\260\C\s*\<br\/\>/s);
+                if ($item->{description} =~ /Temperature:\<\/b\>\s*(-?\d*\.?\d*)\&deg\;\C\s*\<br\/\>/s);
             $results{'pressure'} = sprintf("%d", $1 * 10)
                 if ($item->{description} =~ /Pressure \/ Tendency:\<\/b\>\s*(\d*\.?\d*) kPa\s*.*\<br\/\>/s);
             $results{'visibility'} = sprintf("%.1f", $1)
@@ -105,7 +105,7 @@ sub doParse {
                 $results{'windchill'} = $1; 
             }
             $results{'dewpoint'} = sprintf("%.0f", $1)
-                if ($item->{description} =~ /Dewpoint:\<\/b\>\s*(-?\d*\.?\d*)\260\C\s*\<br\/\>/s);
+                if ($item->{description} =~ /Dewpoint:\<\/b\>\s*(-?\d*\.?\d*)\&deg\;\C\s*\<br\/\>/s);
             if ($item->{description} =~ /(\d*\:\d*[\w ]*\d*[\w *]\d*)\s*\<br\/\>/s) {
                 $results{'observation_time'} = "Last updated at ". $1;
                 $results{'updatetime'} = "Last updated at ". $1;

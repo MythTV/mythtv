@@ -111,9 +111,12 @@ MythRenderOpenGL::MythRenderOpenGL(const QGLFormat& format)
 
 MythRenderOpenGL::~MythRenderOpenGL()
 {
-    makeCurrent();
-    DeleteOpenGLResources();
-    doneCurrent();
+    if (isValid())
+    {
+        makeCurrent();
+        DeleteOpenGLResources();
+        doneCurrent();
+    }
     if (m_lock)
         delete m_lock;
 }
@@ -1213,8 +1216,10 @@ void MythRenderOpenGL::InitFeatures(void)
     m_exts_supported = kGLFeatNone;
 
     GLint maxtexsz = 0;
+    GLint maxunits = 0;
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxtexsz);
-    glGetIntegerv(GL_MAX_TEXTURE_UNITS, &m_max_units);
+    glGetIntegerv(GL_MAX_TEXTURE_UNITS, &maxunits);
+    m_max_units = maxunits;
     m_max_tex_size = (maxtexsz) ? maxtexsz : 512;
 
     m_extensions = (const char*) glGetString(GL_EXTENSIONS);

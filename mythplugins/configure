@@ -375,6 +375,9 @@ if test "$opengl" != "no" ; then
     if test -f $sysroot/System/Library/Frameworks/AGL.framework/Versions/A/AGL ; then
         opengl="yes"
     fi
+    if test "`echo ${targetos} | cut -c1-5`" = "MINGW" ; then
+        opengl="yes"
+    fi
 fi
 
 if ! disabled libvisual; then
@@ -388,11 +391,9 @@ fi
 
 if ! disabled fftw; then
     disable fftw_lib3
-    if has_library libfftw3f_threads ; then
-        if has_library libfftw3_threads ; then
-            if has_header fftw3.h ; then
-                enable fftw_lib3
-            fi
+    if has_library libfftw3_threads ; then
+        if has_header fftw3.h ; then
+            enable fftw_lib3
         fi
     fi
 fi
@@ -813,7 +814,11 @@ if test "$music" = "yes" ; then
         if enabled sdl; then
             echo "        libvisual      support will be included in MythMusic"
             echo "#define LIBVISUAL_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
-            echo "INCLUDEPATH += /usr/include/libvisual-0.4" >> ./mythmusic/mythmusic/config.pro
+            if [ "`echo ${targetos} | cut -c1-5`" = "MINGW" ]; then
+                echo "INCLUDEPATH += $prefix/include/libvisual-0.4" >> ./mythmusic/mythmusic/config.pro
+            else
+                echo "INCLUDEPATH += `pkg-config --cflags-only-I libvisual-0.4 | sed s/-I//g`" >> ./mythmusic/mythmusic/config.pro
+            fi
             echo "LIBS += -lvisual-0.4" >> ./mythmusic/mythmusic/config.pro
         else
             echo "        libvisual      support will not be included in MythMusic (requires SDL support)"
