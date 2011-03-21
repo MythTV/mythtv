@@ -133,7 +133,7 @@ QString AudioPlayer::ReinitAudio(void)
         }
         AddVisuals();
     }
-    else if (want_audio && !m_no_audio_in)
+    else if (!m_no_audio_in && m_audioOutput)
     {
         const AudioSettings settings(m_format, m_channels, m_codec,
                                      m_samplerate, m_passthru, 0,
