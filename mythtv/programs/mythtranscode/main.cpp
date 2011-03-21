@@ -163,6 +163,7 @@ int main(int argc, char *argv[])
     int found_infile = 0;
     int update_index = 1;
     int isVideo = 0;
+    bool passthru = false;
 
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
@@ -480,6 +481,10 @@ int main(int argc, char *argv[])
             usage(a.argv()[0]);
             return TRANSCODE_EXIT_OK;
         }
+        else if (!strcmp(a.argv()[argpos],"--passthrough"))
+        {
+            passthru = true;
+        }
         else
         {
             cerr << "Unknown option: " << a.argv()[argpos] << endl;
@@ -639,7 +644,8 @@ int main(int argc, char *argv[])
         result = transcode->TranscodeFile(infile, outfile,
                                           profilename, useCutlist,
                                           (fifosync || keyframesonly), jobID,
-                                          fifodir, deleteMap);
+                                          fifodir, deleteMap,
+                                          passthru);
         if ((result == REENCODE_OK) && (jobID >= 0))
             JobQueue::ChangeJobArgs(jobID, "RENAME_TO_NUV");
     }

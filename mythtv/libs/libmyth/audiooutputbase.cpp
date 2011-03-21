@@ -350,69 +350,11 @@ bool AudioOutputBase::ToggleUpmix(void)
 bool AudioOutputBase::SetupPassthrough(int codec, int codec_profile,
                                        int &samplerate_tmp, int &channels_tmp)
 {
-    channels_tmp = 2;
-    QString log;
+    QString log = AudioOutputSettings::GetPassthroughParams(
+        codec, codec_profile,
+        samplerate_tmp, channels_tmp,
+        output_settingsdigital->GetMaxHDRate() == 768000);
 
-    switch (codec)
-    {
-        case CODEC_ID_AC3:
-            log = "AC3";
-            break;
-        case CODEC_ID_EAC3:
-            samplerate_tmp = samplerate_tmp * 4;
-            log = "Dolby Digital Plus (E-AC3)";
-            break;
-        case CODEC_ID_DTS:
-            switch(codec_profile)
-            {
-                case FF_PROFILE_DTS_ES:
-                    log = "DTS-ES";
-                    break;
-                case FF_PROFILE_DTS_96_24:
-                    log = "DTS 96/24";
-                    break;
-                case FF_PROFILE_DTS_HD_HRA:
-                case FF_PROFILE_DTS_HD_MA:
-                    samplerate_tmp = 192000;
-                    if (output_settingsdigital->GetMaxHDRate() == 768000)
-                    {
-                        log = "DTS-HD MA";
-                        channels_tmp = 8;
-                    }
-                    else
-                    {
-                        log = "DTS-HD High-Res";
-                    }
-                    break;
-                case FF_PROFILE_DTS:
-                default:
-                    log = "DTS Core";
-                    break;
-            }
-            break;
-        case CODEC_ID_TRUEHD:
-            channels_tmp = 8;
-            log = "TrueHD";
-            switch(samplerate_tmp)
-            {
-                case 48000:
-                case 96000:
-                case 192000:
-                    samplerate_tmp = 192000;
-                    break;
-                case 44100:
-                case 88200:
-                case 176400:
-                    samplerate_tmp = 176400;
-                    break;
-                default:
-                    VBAUDIO("TrueHD: Unsupported samplerate");
-                    break;
-            }
-            break;
-        default:
-            break;
-    }
     VBAUDIO("Setting " + log + " passthrough");
 
     if (m_spdifenc)
@@ -437,6 +379,7 @@ bool AudioOutputBase::SetupPassthrough(int codec, int codec_profile,
                 break;
             case FF_PROFILE_DTS_HD_MA:
                 m_spdifenc->SetMaxHDRate(OutputSettings(true)->GetMaxHDRate());
+                break;
         }
     }
 

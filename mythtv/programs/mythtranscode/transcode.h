@@ -20,7 +20,8 @@ class Transcode : public QObject
         const QString &outputname,
         const QString &profileName,
         bool honorCutList, bool framecontrol, int jobID,
-        QString fifodir, frm_dir_map_t &deleteMap);
+        QString fifodir, frm_dir_map_t &deleteMap,
+        bool passthru = false);
     void ShowProgress(bool val) { showprogress = val; }
     void SetRecorderOptions(QString options) { recorderOptions = options; }
 
