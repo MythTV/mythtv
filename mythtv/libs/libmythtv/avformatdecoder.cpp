@@ -4452,8 +4452,6 @@ bool AvFormatDecoder::SetupAudioStream(void)
             QString("\n\t\t\tfrom %1 to %2")
             .arg(old_in.toString()).arg(audioOut.toString()));
 
-    if (audioOut.sample_rate > 0)
-        m_audio->SetEffDsp(audioOut.sample_rate * 100);
     m_audio->SetAudioParams(audioOut.format, orig_channels,
                             ctx->request_channels,
                             audioOut.codec_id, audioOut.sample_rate,
