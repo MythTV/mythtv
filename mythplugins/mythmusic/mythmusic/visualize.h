@@ -13,8 +13,7 @@
 #define VISUALIZE_H
 
 // C++ headers
-#include <vector>
-using namespace std;
+#include <QVector>
 
 // MythTV headers
 #include <visual.h>
@@ -66,8 +65,8 @@ class Spectrum : public VisualBase
     inline double clamp(double cur, double max, double min);
 
     QColor startColor, targetColor;
-    vector<QRect> rects;
-    vector<double> magnitudes;
+    QVector<QRect> rects;
+    QVector<double> magnitudes;
     QSize size;
     LogScale scale;
     double scaleFactor, falloff;
@@ -161,8 +160,8 @@ class Gears : public QGLWidget, public VisualBase
 		
   private:
     QColor startColor, targetColor;
-    vector<QRect> rects;
-    vector<double> magnitudes;
+    QVector<QRect> rects;
+    QVector<double> magnitudes;
     QSize size;
     LogScale scale;
     double scaleFactor, falloff;

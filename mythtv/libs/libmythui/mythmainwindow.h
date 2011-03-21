@@ -3,6 +3,7 @@
 
 #include <QWidget>
 
+#include "mythuiactions.h"
 #include "mythuitype.h"
 #include "mythscreenstack.h"
 

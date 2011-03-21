@@ -423,6 +423,7 @@ class MTV_PUBLIC MythPlayer
 
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
     QStringList GetTracks(uint type);
+    uint GetTrackCount(uint type);
     virtual int SetTrack(uint type, int trackNo);
     int  GetTrack(uint type);
     int  ChangeTrack(uint type, int dir);
@@ -531,6 +532,7 @@ class MTV_PUBLIC MythPlayer
     QWidget *parentWidget;
     WId embedid;
     int embx, emby, embw, embh;
+    float defaultDisplayAspect;
 
     // State
     QWaitCondition decoderThreadPause;
@@ -574,6 +576,8 @@ class MTV_PUBLIC MythPlayer
 
     // Bookmark stuff
     uint64_t bookmarkseek;
+    int      clearSavedPosition;
+    int      endExitPrompt;
 
     // Seek
     /// If fftime>0, number of frames to seek forward.
@@ -594,7 +598,6 @@ class MTV_PUBLIC MythPlayer
 
     // -- end state stuff --
 
-
     // Input Video Attributes
     QSize    video_disp_dim;  ///< Video (input) width & height
     QSize    video_dim;       ///< Video (input) buffer width & height
@@ -611,11 +614,11 @@ class MTV_PUBLIC MythPlayer
     bool     m_scan_initialized;
     /// Video (input) Number of frames between key frames (often inaccurate)
     uint     keyframedist;
-    /// Stream has no video tracks
-    bool     noVideoTracks;
+
     // Buffering
     bool     buffering;
     QTime    buffering_start;
+
     // General Caption/Teletext/Subtitle support
     uint     textDisplayMode;
     uint     prevTextDisplayMode;
@@ -630,6 +633,7 @@ class MTV_PUBLIC MythPlayer
     TeletextReader ttxReader;
     /// This allows us to enable captions/subtitles later if the streams
     /// are not immediately available when the video starts playing.
+    bool      captionsEnabledbyDefault;
     bool      textDesired;
     bool      enableCaptions;
     bool      disableCaptions;
@@ -657,6 +661,7 @@ class MTV_PUBLIC MythPlayer
     PIPMap         pip_players;
     volatile bool  pip_active;
     volatile bool  pip_visible;
+    PIPLocation    pip_default_loc;
 
     // Filters
     QMutex   videofiltersLock;

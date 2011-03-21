@@ -99,11 +99,6 @@ class VideoOutputXv : public VideoOutput
     void DiscardFrame(VideoFrame*);
     void DiscardFrames(bool next_frame_keyframe);
 
-    void ProcessFrameMem(VideoFrame *frame, OSD *osd,
-                         FilterChain *filterList,
-                         const PIPMap &pipPlayers,
-                         FrameScanType scan);
-
     void PrepareFrameXv(VideoFrame *);
     void PrepareFrameMem(VideoFrame *, FrameScanType);
 

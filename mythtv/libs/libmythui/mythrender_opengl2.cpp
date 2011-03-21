@@ -1,3 +1,4 @@
+#include "math.h"
 #include "mythrender_opengl2.h"
 
 #define LOC QString("OpenGL2: ")
@@ -78,7 +79,7 @@ static const QString kCircleFragmentShader =
 "{\n"
 "    float dis = distance(v_position.xy, u_parameters[0].xy);\n"
 "    float mult = smoothstep(u_parameters[0].z, u_parameters[0].w, dis);\n"
-"    gl_FragColor = v_color * mult;\n"
+"    gl_FragColor = v_color * vec4(1.0, 1.0, 1.0, mult);\n"
 "}\n";
 
 static const QString kCircleEdgeFragmentShader =
@@ -91,36 +92,34 @@ static const QString kCircleEdgeFragmentShader =
 "    float dis = distance(v_position.xy, u_parameters[0].xy);\n"
 "    float rad = u_parameters[0].z;\n"
 "    float wid = u_parameters[0].w;\n"
-"    float mult = smoothstep(rad + wid, rad, dis) * smoothstep(rad - wid, rad, dis);\n"
-"    gl_FragColor = v_color * mult;\n"
+"    float mult = smoothstep(rad + wid, rad + (wid - 1.0), dis) * smoothstep(rad - (wid + 1.0), rad - wid, dis);\n"
+"    gl_FragColor = v_color * vec4(1.0, 1.0, 1.0, mult);\n"
 "}\n";
 
 static const QString kVertLineFragmentShader =
 "GLSL_DEFINES"
-"#define Y u_parameters[0].y\n"
 "varying vec4 v_color;\n"
 "varying vec2 v_position;\n"
 "uniform mat4 u_parameters;\n"
 "void main(void)\n"
 "{\n"
 "    float dis = abs(u_parameters[0].x - v_position.x);\n"
-"    float wid = Y * 2.0;\n"
-"    float mult = smoothstep(Y + wid, Y, dis) * smoothstep(Y - wid, Y, dis);\n"
-"    gl_FragColor = v_color * mult;\n"
+"    float y = u_parameters[0].y * 2.0;\n"
+"    float mult = smoothstep(y, y - 0.1, dis) * smoothstep(-0.1, 0.0, dis);\n"
+"    gl_FragColor = v_color * vec4(1.0, 1.0, 1.0, mult);\n"
 "}\n";
 
 static const QString kHorizLineFragmentShader =
 "GLSL_DEFINES"
-"#define X u_parameters[0].y\n"
 "varying vec4 v_color;\n"
 "varying vec2 v_position;\n"
 "uniform mat4 u_parameters;\n"
 "void main(void)\n"
 "{\n"
 "    float dis = abs(u_parameters[0].x - v_position.y);\n"
-"    float wid = X * 2.0;\n"
-"    float mult = smoothstep(X + wid, X, dis) * smoothstep(X - wid, X, dis);\n"
-"    gl_FragColor = v_color * mult;\n"
+"    float x = u_parameters[0].y * 2.0;\n"
+"    float mult = smoothstep(x, x - 0.1, dis) * smoothstep(-0.1, 0.0, dis);\n"
+"    gl_FragColor = v_color * vec4(1.0, 1.0, 1.0, mult);\n"
 "}\n";
 
 class MythGLShaderObject
@@ -151,6 +150,8 @@ MythRenderOpenGL2::MythRenderOpenGL2(const QGLFormat& format)
 
 MythRenderOpenGL2::~MythRenderOpenGL2()
 {
+    if (!isValid())
+        return;
     makeCurrent();
     DeleteOpenGLResources();
     doneCurrent();
@@ -165,6 +166,8 @@ void MythRenderOpenGL2::ResetVars(void)
 {
     MythRenderOpenGL::ResetVars();
     memset(m_projection, 0, sizeof(m_projection));
+    memset(m_scale, 0, sizeof(m_scale));
+    memset(m_rotate, 0, sizeof(m_rotate));
     memset(m_parameters, 0, sizeof(m_parameters));
     memset(m_shaders, 0, sizeof(m_shaders));
     m_active_obj = 0;
@@ -519,7 +522,7 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
 
         // Set the radius
         m_parameters[0][2] = rad;
-        m_parameters[0][3] = rad - 1; // ??
+        m_parameters[0][3] = rad - 1.0;
 
         // Enable the Circle shader
         SetShaderParams(elip, &m_projection[0][0], "u_projection");
@@ -605,8 +608,8 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
                           (linePen.color().alpha() / 255.0) * (alpha / 255.0));
 
         // Set the radius and width
-        m_parameters[0][2] = rad - linePen.width();
-        m_parameters[0][3] = 2 * linePen.width();
+        m_parameters[0][2] = rad - linePen.width() / 2.0 + 0.5;
+        m_parameters[0][3] = linePen.width() / 2.0 + 0.25;
 
         // Enable the edge shader
         SetShaderParams(edge, &m_projection[0][0], "u_projection");
@@ -653,12 +656,12 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
 
         // Vertical lines
         SetShaderParams(vline, &m_projection[0][0], "u_projection");
-        m_parameters[0][1] = linePen.width();
+        m_parameters[0][1] = linePen.width() / 2.0;
         QRect vl(area.left(), area.top() + rad,
-                 2 * linePen.width(), area.height() - dia);
+                 linePen.width(), area.height() - dia);
 
         // Draw the left line segment
-        m_parameters[0][0] = vl.left();
+        m_parameters[0][0] = vl.left() + linePen.width();
         SetShaderParams(vline, &m_parameters[0][0], "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, vl);
         m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
@@ -667,7 +670,7 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Draw the right line segment
-        vl.translate(area.width() - 2 * linePen.width(), 0);
+        vl.translate(area.width() - linePen.width(), 0);
         m_parameters[0][0] = vl.left();
         SetShaderParams(vline, &m_parameters[0][0], "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, vl);
@@ -676,13 +679,13 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
                                (const void *) kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-        // Vertical lines
+        // Horizontal lines
         SetShaderParams(hline, &m_projection[0][0], "u_projection");
         QRect hl(area.left() + rad, area.top(),
-                 area.width() - dia, 2 * linePen.width());
+                 area.width() - dia, linePen.width());
 
         // Draw the top line segment
-        m_parameters[0][0] = hl.top();
+        m_parameters[0][0] = hl.top() + linePen.width();
         SetShaderParams(hline, &m_parameters[0][0], "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, hl);
         m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
@@ -691,7 +694,7 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Draw the bottom line segment
-        hl.translate(0, area.height() - 2 * linePen.width());
+        hl.translate(0, area.height() - linePen.width());
         m_parameters[0][0] = hl.top();
         SetShaderParams(hline, &m_parameters[0][0], "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, hl);
@@ -842,6 +845,22 @@ void MythRenderOpenGL2::SetMatrixView(void)
     m_projection[3][0] = -((right + left) / (right - left));
     m_projection[3][1] = -((top + bottom) / (top - bottom));
     m_projection[3][3] = 1.0;
+}
+
+void MythRenderOpenGL2::SetRotation(int degrees)
+{
+    float rotation = degrees * (M_PI / 180.0);
+    m_rotate[0][0] = m_rotate[1][1] = cos(rotation);
+    m_rotate[1][0] = sin(rotation);
+    m_rotate[0][1] = -m_rotate[1][0];
+    m_rotate[2][2] = m_rotate[3][3] = 1.0;
+}
+
+void MythRenderOpenGL2::SetScaling(int horizontal, int vertical)
+{
+    m_scale[0][0] = horizontal / 100.0;
+    m_scale[1][1] = vertical   / 100.0;
+    m_scale[2][2] = m_scale[3][3] = 1.0;
 }
 
 void MythRenderOpenGL2::DeleteShaders(void)

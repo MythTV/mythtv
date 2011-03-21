@@ -7574,7 +7574,7 @@ void TV::DoEditSchedule(int editType)
         }
     }
 
-    // If the video is paused, don't paint it's unused rects & chromakey
+    // If the video is paused, don't paint its unused rects & chromakey
     disableDrawUnusedRects = pause_active;
 
     // We are embedding in a mythui window so assuming no one
@@ -9673,12 +9673,15 @@ void TV::FillOSDMenuAudio(const PlayerContext *ctx, OSD *osd,
 {
     QStringList tracks;
     uint curtrack = ~0;
+    bool avsync = true;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->player)
     {
         tracks = ctx->player->GetTracks(kTrackTypeAudio);
         if (!tracks.empty())
             curtrack = (uint) ctx->player->GetTrack(kTrackTypeAudio);
+        avsync = (ctx->player->GetTrackCount(kTrackTypeVideo) > 0) &&
+                  !tracks.empty();
     }
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
@@ -9701,7 +9704,8 @@ void TV::FillOSDMenuAudio(const PlayerContext *ctx, OSD *osd,
                                  "DIALOG_MENU_AUDIOTRACKS_0", true,
                                  selected == "AUDIOTRACKS");
         }
-        osd->DialogAddButton(tr("Adjust Audio Sync"),    "TOGGLEAUDIOSYNC");
+        if (avsync)
+            osd->DialogAddButton(tr("Adjust Audio Sync"), "TOGGLEAUDIOSYNC");
         osd->DialogAddButton(tr("Toggle Audio Upmixer"), ACTION_TOGGLEUPMIX);
     }
     else if (category == "AUDIOTRACKS")

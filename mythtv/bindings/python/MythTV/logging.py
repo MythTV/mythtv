@@ -119,17 +119,20 @@ class MythLog( LOGLEVEL ):
         if lstr:
             level = cls.NONE
             for l in lstr.split(','):
-                if l in ('all','most','none'):
-                    # set initial bitfield
-                    level = eval('MythLog.'+l.upper())
-                elif l in bwlist:
-                    # update bitfield OR
-                    level |= eval('MythLog.'+l.upper())
-                elif len(l) > 2:
-                    if l[0:2] == 'no':
-                        if l[2:] in bwlist:
-                            # update bitfield NOT
-                            level &= level^eval('MythLog.'+l[2:].upper())
+                try:
+                    if l in ('all','most','none'):
+                        # set initial bitfield
+                        level = getattr(cls, l.upper())
+                    elif l in bwlist:
+                        # update bitfield OR
+                        level |= getattr(cls, l.upper())
+                    elif len(l) > 2:
+                        if l[0:2] == 'no':
+                            if l[2:] in bwlist:
+                                # update bitfield NOT
+                                level &= level^getattr(self, l[2:].upper())
+                except AttributeError:
+                    pass
             return level
         else:
             level = []

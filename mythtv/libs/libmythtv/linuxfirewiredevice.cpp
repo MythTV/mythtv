@@ -326,6 +326,17 @@ bool LinuxFirewireDevice::ClosePort(void)
 
         VERBOSE(VB_RECORD, LOC + "Waiting for port handler thread to stop");
         m_priv->run_port_handler = false;
+
+        // Since the thread also waits on this lock which we have locked,
+        // we need to allow the thread to claim the lock long enough to get to
+        // the end of its loop so it can exit.
+	while (m_priv->port_handler_thread.isRunning())
+        {
+            m_lock.unlock();
+            usleep(5000);
+            m_lock.lock();
+        }
+
         m_priv->port_handler_thread.wait();
 
         remove_handle(GetInfoPtr()->fw_handle);

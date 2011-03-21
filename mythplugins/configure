@@ -175,6 +175,9 @@ MythMusic related options:
   --enable-fftw            enable fftw visualizers [$fftw]
   --enable-sdl             use SDL for the synaesthesia output [$sdl]
 
+MythNetvision related options:
+  --enable-mythnetvision      build the mythnetvision plugin [$netvision]
+
 MythNews related options:
   --enable-mythnews        build the mythnews plugin [$news]
 
@@ -186,9 +189,6 @@ MythWeather related options:
 
 MythZoneMinder related options:
   --enable-mythzoneminder  build the mythzoneminder plugin [$zoneminder]
-
-MythNetvision related options:
-  --enable-mythnetvision      build the mythnetvision plugin [$netvision]
 
 EOF
 exit 0
@@ -377,6 +377,9 @@ if test "$opengl" != "no" ; then
     if test -f $sysroot/System/Library/Frameworks/AGL.framework/Versions/A/AGL ; then
         opengl="yes"
     fi
+    if test "`echo ${targetos} | cut -c1-5`" = "MINGW" ; then
+        opengl="yes"
+    fi
 fi
 
 if ! disabled libvisual; then
@@ -390,11 +393,9 @@ fi
 
 if ! disabled fftw; then
     disable fftw_lib3
-    if has_library libfftw3f_threads ; then
-        if has_library libfftw3_threads ; then
-            if has_header fftw3.h ; then
-                enable fftw_lib3
-            fi
+    if has_library libfftw3_threads ; then
+        if has_header fftw3.h ; then
+            enable fftw_lib3
         fi
     fi
 fi
@@ -644,6 +645,13 @@ else
   echo "        MythMusic      plugin will not be built"
 fi
 
+if test "$netvision" = "yes" ; then
+  echo "        MythNetvision  plugin will be built"
+  echo "SUBDIRS += mythnetvision" >> ./config.pro
+else
+  echo "        MythNetvision  plugin will not be built"
+fi
+
 if test "$news" = "yes" ; then
   echo "        MythNews       plugin will be built"
   echo "SUBDIRS += mythnews" >> ./config.pro
@@ -670,13 +678,6 @@ if test "$zoneminder" = "yes" ; then
   echo "SUBDIRS += mythzoneminder" >> ./config.pro
 else
   echo "        MythZoneMinder plugin will not be built"
-fi
-
-if test "$netvision" = "yes" ; then
-  echo "        MythNetvision  plugin will be built"
-  echo "SUBDIRS += mythnetvision" >> ./config.pro
-else
-  echo "        MythNetvision  plugin will not be built"
 fi
 
 ###########################################################
@@ -815,7 +816,11 @@ if test "$music" = "yes" ; then
         if enabled sdl; then
             echo "        libvisual      support will be included in MythMusic"
             echo "#define LIBVISUAL_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
-            echo "INCLUDEPATH += /usr/include/libvisual-0.4" >> ./mythmusic/mythmusic/config.pro
+            if [ "`echo ${targetos} | cut -c1-5`" = "MINGW" ]; then
+                echo "INCLUDEPATH += $prefix/include/libvisual-0.4" >> ./mythmusic/mythmusic/config.pro
+            else
+                echo "INCLUDEPATH += `pkg-config --cflags-only-I libvisual-0.4 | sed s/-I//g`" >> ./mythmusic/mythmusic/config.pro
+            fi
             echo "LIBS += -lvisual-0.4" >> ./mythmusic/mythmusic/config.pro
         else
             echo "        libvisual      support will not be included in MythMusic (requires SDL support)"

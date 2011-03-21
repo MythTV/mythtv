@@ -356,6 +356,13 @@ QSize MythRenderOpenGL::GetTextureSize(uint tex)
     return m_textures[tex].m_size;
 }
 
+int MythRenderOpenGL::GetTextureDataSize(uint tex)
+{
+    if (!m_textures.contains(tex))
+        return 0;
+    return m_textures[tex].m_data_size;
+}
+
 void MythRenderOpenGL::SetTextureFilters(uint tex, uint filt, uint wrap)
 {
     if (!m_textures.contains(tex))
@@ -759,8 +766,10 @@ bool MythRenderOpenGL::InitFeatures(void)
     }
 
     GLint maxtexsz = 0;
+    GLint maxunits = 0;
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxtexsz);
-    glGetIntegerv(GL_MAX_TEXTURE_UNITS, &m_max_units);
+    glGetIntegerv(GL_MAX_TEXTURE_UNITS, &maxunits);
+    m_max_units = maxunits;
     m_max_tex_size = (maxtexsz) ? maxtexsz : 512;
 
     m_extensions = (const char*) glGetString(GL_EXTENSIONS);

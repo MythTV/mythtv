@@ -408,7 +408,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
     else if (command == "QUERY_FILE_EXISTS")
     {
-        if (listline.size() < 3)
+        if (listline.size() < 2)
             VERBOSE(VB_IMPORTANT, "Bad QUERY_FILE_EXISTS command");
         else
             HandleQueryFileExists(listline, pbs);

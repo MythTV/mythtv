@@ -526,7 +526,7 @@ bool MythWebView::isVideoFile(const QString &extension)
  *           <url>http://www.google.com/</url>
  *           <area>20,55,760,490</area>
  *           <zoom>1.4</zoom>
- *           <background color="white" alpha="255" />
+ *           <background color="white"/>
  *      </webbrowser>
  *
  * area is the screen area the widget should use.
@@ -764,6 +764,7 @@ void MythUIWebBrowser::SetBackgroundColor(QColor color)
     if (!m_browser)
         return;
 
+    color.setAlpha(255);
     QPalette palette = m_browser->page()->palette();
     palette.setBrush(QPalette::Window, QBrush(color));
     palette.setBrush(QPalette::Base, QBrush(color));

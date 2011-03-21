@@ -142,8 +142,8 @@ class SignalMonitor
     /// We've seen a PMT,
     /// which maps program to audio, video and other stream PIDs
     static const uint64_t kDTVSigMon_PMTSeen    = 0x0000000002ULL;
-    /// We've seen an MGT,
-    /// which ells us on which PIDs to find VCT and other ATSC tables
+    /// We've seen a MGT,
+    /// which tells us on which PIDs to find VCT and other ATSC tables
     static const uint64_t kDTVSigMon_MGTSeen    = 0x0000000004ULL;
     /// We've seen a VCT, which maps ATSC Channels to
     /// MPEG program numbers, and provides additional data
@@ -152,10 +152,10 @@ class SignalMonitor
     static const uint64_t kDTVSigMon_TVCTSeen   = 0x0000000010ULL;
     /// We've seen a CVCT, the cable version of the VCT
     static const uint64_t kDTVSigMon_CVCTSeen   = 0x0000000020ULL;
-    /// We've seen an NIT,
+    /// We've seen a NIT,
     /// which tells us where to find SDT and other DVB tables
     static const uint64_t kDTVSigMon_NITSeen    = 0x0000000040ULL;
-    /// We've seen an SDT, which maps DVB Channels to MPEG
+    /// We've seen a SDT, which maps DVB Channels to MPEG
     /// program numbers, and provides additional data
     static const uint64_t kDTVSigMon_SDTSeen    = 0x0000000080ULL;
     /// We've seen the FireWire STB power state

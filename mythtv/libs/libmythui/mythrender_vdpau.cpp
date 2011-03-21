@@ -1,6 +1,7 @@
 #include "math.h"
 
 #include <QSize>
+#include <QThread>
 
 #include "mythverbose.h"
 #include "mythrender_vdpau.h"
@@ -162,7 +163,7 @@ class VDPAUVideoSurface : public VDPAUResource
     VDPAUVideoSurface(uint id, QSize size, VdpChromaType type)
       : VDPAUResource(id, size), m_type(type), m_needs_reset(false)
     {
-        m_owner = pthread_self();
+        m_owner = QThread::currentThread();
         memset(&m_render, 0, sizeof(struct vdpau_render_state));
         m_render.surface = m_id;
     }
@@ -177,7 +178,7 @@ class VDPAUVideoSurface : public VDPAUResource
     VdpChromaType      m_type;
     vdpau_render_state m_render;
     bool               m_needs_reset;
-    pthread_t          m_owner;
+    QThread*           m_owner;
 };
 
 class VDPAUBitmapSurface : public VDPAUResource
@@ -1291,11 +1292,12 @@ bool MythRenderVDPAU::DrawBitmap(uint id, uint target,
     return ok;
 }
 
-QSize MythRenderVDPAU::GetBitmapSize(uint id)
+int MythRenderVDPAU::GetBitmapSize(uint id)
 {
     if (!m_bitmapSurfaces.contains(id))
-        return QSize();
-    return m_bitmapSurfaces[id].m_size;
+        return 0;
+    QSize sz = m_bitmapSurfaces[id].m_size;
+    return sz.width() * sz.height() * 4;
 }
 
 void* MythRenderVDPAU::GetRender(uint id)
@@ -1354,7 +1356,7 @@ void MythRenderVDPAU::ChangeVideoSurfaceOwner(uint id)
     if (!m_videoSurfaces.contains(id))
         return;
 
-    m_videoSurfaces[id].m_owner = pthread_self();
+    m_videoSurfaces[id].m_owner = QThread::currentThread();
 }
 
 void MythRenderVDPAU::Decode(uint id, struct vdpau_render_state *render)
@@ -1932,7 +1934,7 @@ void MythRenderVDPAU::ResetVideoSurfaces(void)
     LOCK_ALL
 
     bool ok = true;
-    pthread_t this_thread = pthread_self();
+    QThread *this_thread = QThread::currentThread();
     QHash<uint, VDPAUVideoSurface>::iterator it;
     int surfaces_owned = 0;
 
@@ -1957,7 +1959,7 @@ void MythRenderVDPAU::ResetVideoSurfaces(void)
 
     VERBOSE(VB_IMPORTANT, LOC +
         QString("Attempting to reset %1 video surfaces owned by this thread %2")
-            .arg(surfaces_owned).arg(this_thread));
+            .arg(surfaces_owned).arg((long long)this_thread));
 
     // update old surfaces to map old vdpvideosurface to new vdpvideosurface
     QHash<uint, uint>::iterator old;

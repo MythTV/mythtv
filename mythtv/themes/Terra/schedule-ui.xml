@@ -1197,7 +1197,7 @@
 
         <webbrowser name="browser">
             <area>40,40,1200,645</area>
-            <background color="#484537" alpha="0"/>
+            <background color="#484537"/>
         </webbrowser>
 
         <imagetype name="topbar" from="basetopbar" />

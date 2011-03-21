@@ -1105,6 +1105,7 @@ int main(int argc, char **argv)
         kCLPGetSettings          |
         kCLPQueryVersion         |
         kCLPVerbose              |
+        kCLPNoUPnP               |
 #ifdef USING_X11
         kCLPDisplay              |
 #endif // USING_X11
@@ -1235,11 +1236,15 @@ int main(int argc, char **argv)
     CleanupGuard callCleanup(cleanup);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    g_pUPnp  = new MediaRenderer();
-    if (!g_pUPnp->initialized())
+
+    if (cmdline.IsUPnPEnabled())
     {
-        delete g_pUPnp;
-        g_pUPnp = NULL;
+        g_pUPnp  = new MediaRenderer();
+        if (!g_pUPnp->initialized())
+        {
+            delete g_pUPnp;
+            g_pUPnp = NULL;
+        }
     }
 
     // Override settings as early as possible to cover bootstrapped screens
@@ -1392,6 +1397,15 @@ int main(int argc, char **argv)
     mainWindow->Init();
     mainWindow->setWindowTitle(QObject::tr("MythTV Frontend"));
 
+    // We must reload the translation after a language change and this
+    // also means clearing the cached/loaded theme strings, so reload the
+    // theme which also triggers a translation reload
+    if (LanguageSelection::prompt())
+    {
+        if (!reloadTheme())
+            return GENERIC_EXIT_NO_THEME;
+    }
+
     if (!UpgradeTVDatabaseSchema(upgradeAllowed))
     {
         VERBOSE(VB_IMPORTANT,
@@ -1406,12 +1420,6 @@ int main(int argc, char **argv)
     mainWindow->ResetKeys();
 
     InitJumpPoints();
-
-    // We must reload the translation after a language change and this
-    // also means clearing the cached/loaded theme strings, so reload the
-    // theme which also triggers a translation reload
-    if (LanguageSelection::prompt())
-        GetMythMainWindow()->JumpTo("Reload Theme");
 
     internal_media_init();
 

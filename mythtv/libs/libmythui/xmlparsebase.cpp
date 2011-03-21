@@ -287,6 +287,7 @@ QString XMLParseBase::parseText(QDomElement &element)
 }
 
 static MythUIType *globalObjectStore = NULL;
+static QStringList loadedBaseFiles;
 
 MythUIType *XMLParseBase::GetGlobalObjectStore(void)
 {
@@ -300,6 +301,9 @@ void XMLParseBase::ClearGlobalObjectStore(void)
     delete globalObjectStore;
     globalObjectStore = NULL;
     GetGlobalObjectStore();
+
+    // clear any loaded base xml files which will force a reload the next time they are used
+    loadedBaseFiles.clear();
 }
 
 void XMLParseBase::ParseChildren(const QString &filename,
@@ -788,8 +792,6 @@ bool XMLParseBase::LoadBaseTheme(void)
 
     return ok;
 }
-
-static QStringList loadedBaseFiles;
 
 bool XMLParseBase::LoadBaseTheme(const QString &baseTheme)
 {

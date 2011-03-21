@@ -27,6 +27,7 @@ class MUI_PUBLIC D3D9Image
 
     bool     IsValid(void) const { return m_valid; }
     QSize    GetSize(void) const { return m_size;  }
+    int      GetDataSize(void) const { return m_size.width() * m_size.height() * 4; }
     bool     SetAsRenderTarget(void);
     bool     UpdateImage(IDirect3DSurface9 *surface);
     bool     UpdateImage(const MythImage *img);

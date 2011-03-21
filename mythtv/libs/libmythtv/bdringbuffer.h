@@ -51,6 +51,8 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     BDRingBuffer(const QString &lfilename);
     virtual ~BDRingBuffer();
 
+    virtual bool IsStreamed(void) { return true; }
+
     void ProgressUpdate(void);
 
     // Player interaction
