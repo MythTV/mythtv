@@ -540,7 +540,7 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
         | PA_STREAM_NO_REMIX_CHANNELS;
 
     pa_stream_connect_playback(pstream, NULL, &buffer_settings,
-                               (pa_stream_flags_t)flags, &volume_control, NULL);
+                               (pa_stream_flags_t)flags, NULL, NULL);
 
     pa_context_state_t cstate;
     pa_stream_state_t sstate;
