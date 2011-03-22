@@ -417,3 +417,76 @@ QString AudioOutputSettings::FeaturesToString(DigitalFeature arg)
     }
     return tmp;
 }
+
+QString AudioOutputSettings::GetPassthroughParams(int codec, int codec_profile,
+                                               int &samplerate,
+                                               int &channels,
+                                               bool canDTSHDMA)
+{
+    QString log;
+
+    channels = 2;
+
+    switch (codec)
+    {
+        case CODEC_ID_AC3:
+            log = "AC3";
+            break;
+        case CODEC_ID_EAC3:
+            samplerate = samplerate * 4;
+            log = "Dolby Digital Plus (E-AC3)";
+            break;
+        case CODEC_ID_DTS:
+            switch(codec_profile)
+            {
+                case FF_PROFILE_DTS_ES:
+                    log = "DTS-ES";
+                    break;
+                case FF_PROFILE_DTS_96_24:
+                    log = "DTS 96/24";
+                    break;
+                case FF_PROFILE_DTS_HD_HRA:
+                case FF_PROFILE_DTS_HD_MA:
+                    samplerate = 192000;
+                    if (canDTSHDMA)
+                    {
+                        log = "DTS-HD MA";
+                        channels = 8;
+                    }
+                    else
+                    {
+                        log = "DTS-HD High-Res";
+                    }
+                    break;
+                case FF_PROFILE_DTS:
+                default:
+                    log = "DTS Core";
+                    break;
+            }
+            break;
+        case CODEC_ID_TRUEHD:
+            channels = 8;
+            log = "TrueHD";
+            switch(samplerate)
+            {
+                case 48000:
+                case 96000:
+                case 192000:
+                    samplerate = 192000;
+                    break;
+                case 44100:
+                case 88200:
+                case 176400:
+                    samplerate = 176400;
+                    break;
+                default:
+                    log = "TrueHD: Unsupported samplerate";
+                    break;
+            }
+            break;
+        default:
+            break;
+    }
+    return log;
+}
+

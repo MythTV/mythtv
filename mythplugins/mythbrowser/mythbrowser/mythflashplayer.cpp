@@ -78,6 +78,8 @@ bool MythFlashPlayer::keyPressEvent(QKeyEvent *event)
 
         if (action == "PAUSE")
             evaluateJavaScript("play();");
+        else if (action == "INFO")
+            evaluateJavaScript("info();");
         else if (action == "SEEKFFWD")
             evaluateJavaScript(QString("seek(%1);").arg(m_fftime));
         else if (action == "SEEKRWND")

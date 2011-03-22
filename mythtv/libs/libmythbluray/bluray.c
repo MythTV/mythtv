@@ -1556,37 +1556,16 @@ int bd_set_player_setting(BLURAY *bd, uint32_t idx, uint32_t value)
     return 0;
 }
 
-static uint32_t _string_to_uint32(const char *s, int n)
-{
-    uint32_t val = 0;
-
-    if (n > 4)
-        n = 4;
-
-    if (!s || !*s) {
-        return (INT64_C(1) << (8*n)) - 1; /* default: all bits one */
-    }
-
-    while (n--) {
-        val = (val << 8) | *s;
-        if (*s) {
-            s++;
-        }
-    }
-
-    return val;
-}
-
 int bd_set_player_setting_str(BLURAY *bd, uint32_t idx, const char *s)
 {
     switch (idx) {
         case BLURAY_PLAYER_SETTING_AUDIO_LANG:
         case BLURAY_PLAYER_SETTING_PG_LANG:
         case BLURAY_PLAYER_SETTING_MENU_LANG:
-            return bd_set_player_setting(bd, idx, _string_to_uint32(s, 3));
+            return bd_set_player_setting(bd, idx, str_to_uint32(s, 3));
 
         case BLURAY_PLAYER_SETTING_COUNTRY_CODE:
-            return bd_set_player_setting(bd, idx, _string_to_uint32(s, 2));
+            return bd_set_player_setting(bd, idx, str_to_uint32(s, 2));
 
         default:
             return 0;

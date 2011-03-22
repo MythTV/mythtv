@@ -152,7 +152,7 @@ QString AudioPlayer::ReinitAudio(void)
         }
         m_no_audio_out = true;
     }
-    else if (m_no_audio_out)
+    else if (m_no_audio_out && m_audioOutput)
     {
         VERBOSE(VB_IMPORTANT, LOC + "Enabling Audio");
         m_no_audio_out = false;
@@ -200,8 +200,9 @@ void AudioPlayer::PauseAudioUntilBuffered()
 
 void AudioPlayer::SetAudioOutput(AudioOutput *ao)
 {
+    // delete current audio class if any
+    DeleteOutput();
     m_lock.lock();
-    RemoveVisuals();
     m_audioOutput = ao;
     AddVisuals();
     m_lock.unlock();
@@ -397,14 +398,20 @@ int AudioPlayer::GetMaxHDRate()
     return m_audioOutput->GetOutputSettingsUsers(true)->GetMaxHDRate();
 }
 
-bool AudioPlayer::CanPassthrough(int samplerate, int channels, int codec)
+bool AudioPlayer::CanPassthrough(int samplerate, int channels,
+                                 int codec, int profile)
 {
     if (!m_audioOutput)
         return false;
-    return m_audioOutput->CanPassthrough(samplerate, channels, codec);
+    return m_audioOutput->CanPassthrough(samplerate, channels, codec, profile);
 }
 
-void AudioPlayer::AddAudioData(char *buffer, int len, int64_t timecode)
+/*
+ * if frames = -1 : let AudioOuput calculate value
+ * if frames = 0 && len > 0: will calculate according to len
+ */
+void AudioPlayer::AddAudioData(char *buffer, int len,
+                               int64_t timecode, int frames)
 {
     if (!m_audioOutput || m_no_audio_out)
         return;
@@ -416,9 +423,20 @@ void AudioPlayer::AddAudioData(char *buffer, int len, int64_t timecode)
     if (samplesize <= 0)
         return;
 
-    if (!m_audioOutput->AddData(buffer, len, timecode))
+    if (frames == 0 && len > 0)
+        frames = len / samplesize;
+
+    if (!m_audioOutput->AddData(buffer, len, timecode, frames))
         VERBOSE(VB_PLAYBACK, LOC + "AddAudioData(): "
                 "Audio buffer overflow, audio data lost!");
+}
+
+bool AudioPlayer::NeedDecodingBeforePassthrough(void)
+{
+    if (!m_audioOutput)
+        return true;
+    else
+        return m_audioOutput->NeedDecodingBeforePassthrough();
 }
 
 int64_t AudioPlayer::LengthLastData(void)

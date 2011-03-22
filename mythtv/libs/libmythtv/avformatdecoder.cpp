@@ -279,7 +279,6 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       itv(NULL),
       // Audio
       audioSamples(NULL),
-      internal_vol(false),
       disable_passthru(false),
       dummy_frame(NULL),
       m_fps(0.0f),
@@ -296,8 +295,6 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
     bool debug = VERBOSE_LEVEL_CHECK(VB_LIBAV);
     av_log_set_level((debug) ? AV_LOG_DEBUG : AV_LOG_ERROR);
     av_log_set_callback(myth_av_log);
-
-    internal_vol = gCoreContext->GetNumSetting("MythControlsVolume", 0);
 
     audioIn.sample_size = -32; // force SetupAudioStream to run once
     itv = m_parent->GetInteractiveTV();
@@ -3660,7 +3657,7 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
             if (selTrack < 0)
                 selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_EAC3);
 
-            if (!transcoding && selTrack < 0)
+            if (selTrack < 0)
                 selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS);
 
             if (selTrack < 0)
@@ -3730,6 +3727,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
     int ret             = 0;
     int data_size       = 0;
     bool firstloop      = true;
+    int frames          = -1;
 
     avcodeclock->lock();
     int audIdx = selectedTrack[kTrackTypeAudio].av_stream_index;
@@ -3791,6 +3789,9 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
             ret = avcodec_decode_audio3(ctx, audioSamples,
                                         &data_size, &tmp_pkt);
+            frames = data_size /
+                (ctx->channels *
+                 av_get_bits_per_sample_format(ctx->sample_fmt)>>3);
             already_decoded = true;
             reselectAudioTrack |= ctx->channels;
         }
@@ -3836,6 +3837,20 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
         if (audioOut.do_passthru)
         {
+            if (!already_decoded)
+            {
+                if (m_audio->NeedDecodingBeforePassthrough())
+                {
+                    data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+                    ret = avcodec_decode_audio3(ctx, audioSamples, &data_size,
+                                                &tmp_pkt);
+                    frames = data_size /
+                        (ctx->channels *
+                         av_get_bits_per_sample_format(ctx->sample_fmt)>>3);
+                }
+                else
+                    frames = -1;
+            }
             memcpy(audioSamples, tmp_pkt.data, tmp_pkt.size);
             data_size = tmp_pkt.size;
              // We have processed all the data, there can't be any left
@@ -3857,6 +3872,9 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                 data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
                 ret = avcodec_decode_audio3(ctx, audioSamples, &data_size,
                                             &tmp_pkt);
+                frames = data_size /
+                    (ctx->channels *
+                     av_get_bits_per_sample_format(ctx->sample_fmt)>>3);
             }
 
             // When decoding some audio streams the number of
@@ -3893,8 +3911,16 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             extract_mono_channel(audSubIdx, &audioOut,
                                  (char *)audioSamples, data_size);
 
-        m_audio->AddAudioData((char *)audioSamples, data_size, temppts);
-        lastapts += m_audio->LengthLastData();
+        m_audio->AddAudioData((char *)audioSamples, data_size, temppts, frames);
+        if (audioOut.do_passthru && !m_audio->NeedDecodingBeforePassthrough())
+        {
+            lastapts += m_audio->LengthLastData();
+        }
+        else
+        {
+            lastapts += (long long)
+                ((double)(frames * 1000) / ctx->sample_rate);
+        }
 
         VERBOSE(VB_TIMESTAMP,
                 LOC + QString("audio timecode %1 %2 %3 %4")
@@ -4325,38 +4351,11 @@ inline bool AvFormatDecoder::DecoderWillDownmix(const AVCodecContext *ctx)
 
 bool AvFormatDecoder::DoPassThrough(const AVCodecContext *ctx)
 {
-    bool passthru = false;
+    bool passthru;
 
-    switch(ctx->codec_id)
-    {
-        case CODEC_ID_AC3:
-            passthru = m_audio->CanAC3();
-            break;
-        case CODEC_ID_DTS:
-            switch(ctx->profile)
-            {
-                case FF_PROFILE_DTS:
-                case FF_PROFILE_DTS_ES:
-                case FF_PROFILE_DTS_96_24:
-                    passthru = m_audio->CanDTS();
-                    break;
-                case FF_PROFILE_DTS_HD_HRA:
-                case FF_PROFILE_DTS_HD_MA:
-                    passthru = m_audio->CanDTSHD();
-                default:
-                    break;
-            }
-            break;
-        case CODEC_ID_EAC3:
-            passthru = m_audio->CanEAC3();
-            break;
-        case CODEC_ID_TRUEHD:
-            passthru = m_audio->CanTrueHD();
-            break;
-    }
-    passthru &= m_audio->CanPassthrough(ctx->sample_rate, ctx->channels);
-    passthru &= !internal_vol;
-    passthru &= !transcoding && !disable_passthru;
+    passthru = m_audio->CanPassthrough(ctx->sample_rate, ctx->channels,
+                                       ctx->codec_id, ctx->profile);
+    passthru &= !disable_passthru;
 
     return passthru;
 }
@@ -4452,8 +4451,6 @@ bool AvFormatDecoder::SetupAudioStream(void)
             QString("\n\t\t\tfrom %1 to %2")
             .arg(old_in.toString()).arg(audioOut.toString()));
 
-    if (audioOut.sample_rate > 0)
-        m_audio->SetEffDsp(audioOut.sample_rate * 100);
     m_audio->SetAudioParams(audioOut.format, orig_channels,
                             ctx->request_channels,
                             audioOut.codec_id, audioOut.sample_rate,
