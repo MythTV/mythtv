@@ -57,7 +57,7 @@ VideoVisual::~VideoVisual()
 int64_t VideoVisual::SetLastUpdate(void)
 {
     QDateTime now = QDateTime::currentDateTime();
-    int64_t result = m_lastUpdate.msecsTo(now);
+    int64_t result = m_lastUpdate.time().msecsTo(now.time());
     m_lastUpdate = now;
     return result;
 }

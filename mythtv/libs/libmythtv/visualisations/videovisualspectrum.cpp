@@ -77,6 +77,10 @@ void VideoVisualSpectrum::Draw(const QRect &area, MythPainter *painter,
 
     double magL, magR, tmp;
     double falloff = (((double)SetLastUpdate()) / 40.0) * m_falloff;
+    if (falloff < 0.0)
+        falloff = 0.0;
+    if (falloff > 2048.0)
+        falloff = 2048.0;
     for (int l = 0, r = m_scale.range(); l < m_scale.range(); l++, r++)
     {
         int index = m_scale[l];
