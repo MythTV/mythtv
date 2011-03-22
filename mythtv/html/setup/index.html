@@ -4,6 +4,7 @@
 MythTV Backend Setup
 </title>
 <link rel="stylesheet" type="text/css" href="/css/site.css">
+<link rel="stylesheet" type="text/css" href="/setup/css/Config.css">
 <link rel="stylesheet" type="text/css" href="/css/jquery-ui.css">
 
 <link rel="icon"          href="/images/favicon.ico" type="image/x-icon">
@@ -11,8 +12,27 @@ MythTV Backend Setup
 <script language="JavaScript" type="text/javascript" src="/js/jquery.min.js"></script>
 <script language="JavaScript" type="text/javascript" src="/js/jquery-ui.min.js"></script>
 <script language="JavaScript" type="text/javascript" src="/setup/js/util.js"></script>
+<script language="JavaScript" type="text/javascript" src="/setup/js/Config.js"></script>
 <script language="JavaScript" type="text/javascript" src="/setup/js/form_inputs.js"></script>
 <script language="JavaScript" type="text/javascript">
+
+function loadConfigDatabaseForm() {
+  $.ajax({
+    type: "GET",
+    url: "/Config/Database/XML",
+    dataType: "xml",
+    success: configDrawDatabaseForm
+  }).error(function() { alert("Error downloading xml");});
+}
+
+function loadConfigGeneralForm() {
+  $.ajax({
+    type: "GET",
+    url: "/Config/General/XML",
+    dataType: "xml",
+    success: configDrawGeneralForm
+  }).error(function() { alert("Error downloading xml");});
+}
 
 function loadSetupPage(pageName) {
     loadContent("/setup/" + pageName + ".html");
@@ -98,6 +118,10 @@ $(document).ready(function() {
             <li><a class='menuitem' href="javascript:loadSetupPage('jobqueue')">Job Queue</a></li>
             <li><a class='menuitem' href="javascript:loadSetupPage('systemevents')">System Events</a></li>
             -->
+			<li>--</li>
+			<li><b><a class='menuitem' href='#'>Javascript test below</a></b></li>
+            <li><a class='menuitem' href='javascript:loadConfigDatabaseForm()'>Database (javascript)</a></li>
+            <li><a class='menuitem' href='javascript:loadConfigGeneralForm()'>General (javascript)</a></li>
         </ul>
     </div>
 </div>
