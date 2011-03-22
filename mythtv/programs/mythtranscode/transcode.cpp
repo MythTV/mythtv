@@ -9,7 +9,6 @@
 
 #include "transcode.h"
 #include "audiooutput.h"
-#include "spdifencoder.h"
 #include "recordingprofile.h"
 #include "mythcorecontext.h"
 #include "jobqueue.h"
@@ -51,7 +50,6 @@ class AudioReencodeBuffer : public AudioOutput
         memset(ab_offset, 0, sizeof(ab_offset));
         memset(ab_time, 0, sizeof(ab_time));
         m_initpassthru = passthru;
-        m_spdifenc = NULL;
     }
 
     ~AudioReencodeBuffer()
@@ -68,50 +66,7 @@ class AudioReencodeBuffer : public AudioOutput
         channels        = settings.channels;
         bytes_per_frame = channels *
             AudioOutputSettings::SampleSize(settings.format);
-        m_samplerate    = settings.samplerate;
-
-        if (m_passthru)
-        {
-            QString log = AudioOutputSettings::GetPassthroughParams(
-                settings.codec,
-                settings.codec_profile,
-                m_samplerate, channels,
-                true);
-            VERBOSE(VB_AUDIO, "Setting " + log + " passthrough");
-
-            bytes_per_frame = channels *
-                AudioOutputSettings::SampleSize(FORMAT_S16);
-
-            if (m_spdifenc)
-            {
-                delete m_spdifenc;
-            }
-
-            m_spdifenc = new SPDIFEncoder("spdif", settings.codec);
-            if (m_spdifenc->Succeeded() && settings.codec == CODEC_ID_DTS)
-            {
-                switch(settings.codec_profile)
-                {
-                    case FF_PROFILE_DTS:
-                    case FF_PROFILE_DTS_ES:
-                    case FF_PROFILE_DTS_96_24:
-                        m_spdifenc->SetMaxHDRate(0);
-                        break;
-                    case FF_PROFILE_DTS_HD_HRA:
-                        m_spdifenc->SetMaxHDRate(192000);
-                        break;
-                    case FF_PROFILE_DTS_HD_MA:
-                        m_spdifenc->SetMaxHDRate(768000);
-                        break;
-                }
-            }
-            if (!m_spdifenc->Succeeded())
-            {
-                delete m_spdifenc;
-                m_spdifenc = NULL;
-            }
-        }
-        eff_audiorate   = m_samplerate * 100;
+        eff_audiorate   = settings.samplerate;
     }
 
     // dsprate is in 100 * frames/second
@@ -126,39 +81,17 @@ class AudioReencodeBuffer : public AudioOutput
         ab_count = 0;
     }
 
-    virtual int64_t LengthLastData(void) { return m_length_last_data; }
-
     // timecode is in milliseconds.
     virtual bool AddFrames(void *buffer, int frames, int64_t timecode)
     {
-        return AddData(buffer, frames * bytes_per_frame, timecode);
+        return AddData(buffer, frames * bytes_per_frame, timecode, frames);
     }
 
     // timecode is in milliseconds.
-    virtual bool AddData(void *buffer, int len, int64_t timecode)
+    virtual bool AddData(void *buffer, int len, int64_t timecode, int frames)
     {
         int freebuf = bufsize - audiobuffer_len;
         int newlen;
-
-        if (m_passthru && m_spdifenc)
-        {
-                /*
-                 * mux into an IEC958 packet. The resulting data will be dumped.
-                 * We do so to estimate timestamps
-                 */
-            m_spdifenc->WriteFrame((unsigned char *)buffer, len);
-            newlen = m_spdifenc->GetProcessedSize();
-            if (newlen > 0)
-            {
-                m_spdifenc->Reset();
-            }
-        }
-        else
-        {
-            newlen = len;
-        }
-        m_length_last_data = (int64_t)
-            ((double)(newlen * 1000) / (m_samplerate * bytes_per_frame));
 
         if (len > freebuf)
         {
@@ -177,7 +110,7 @@ class AudioReencodeBuffer : public AudioOutput
         audiobuffer_len += len;
 
         // last_audiotime is at the end of the frame
-        last_audiotime = timecode + (newlen / bytes_per_frame) * 1000 /
+        last_audiotime = timecode + frames * 1000 /
             eff_audiorate;
 
         ab_time[ab_count] = last_audiotime;
@@ -295,11 +228,7 @@ class AudioReencodeBuffer : public AudioOutput
     int audiobuffer_len, channels, bits, bytes_per_frame, eff_audiorate;
     long long last_audiotime;
 private:
-    int                 m_samplerate;
     bool                m_passthru, m_initpassthru;
-    // SPDIF Encoder for digital passthrough
-    SPDIFEncoder       *m_spdifenc;
-    int64_t             m_length_last_data;
 };
 
 Transcode::Transcode(ProgramInfo *pginfo) :

@@ -242,19 +242,52 @@ AudioOutputSettings* AudioOutputBase::GetOutputSettingsUsers(bool digital)
  * Test if we can output digital audio and if sample rate is supported
  */
 bool AudioOutputBase::CanPassthrough(int samplerate, int channels,
-                                     int codec) const
+                                     int codec, int profile) const
 {
-    bool ret = false;
-    ret = output_settingsdigital->IsSupportedFormat(FORMAT_S16);
+    bool ret = !internal_vol;;
+    DigitalFeature arg = FEATURE_NONE;
+
+    switch(codec)
+    {
+        case CODEC_ID_AC3:
+            arg = FEATURE_AC3;
+            break;
+        case CODEC_ID_DTS:
+            switch(profile)
+            {
+                case FF_PROFILE_DTS:
+                case FF_PROFILE_DTS_ES:
+                case FF_PROFILE_DTS_96_24:
+                    arg = FEATURE_DTS;
+                    break;
+                case FF_PROFILE_DTS_HD_HRA:
+                case FF_PROFILE_DTS_HD_MA:
+                    arg = FEATURE_DTSHD;
+                default:
+                    break;
+            }
+            break;
+        case CODEC_ID_EAC3:
+            arg = FEATURE_EAC3;
+            break;
+        case CODEC_ID_TRUEHD:
+            arg = FEATURE_TRUEHD;
+            break;
+    }
+    // we can't passthrough any other codecs than those defined above
+    ret &= output_settingsdigital->canFeature(arg);
+    ret &= output_settingsdigital->IsSupportedFormat(FORMAT_S16);
     ret &= output_settingsdigital->IsSupportedRate(samplerate);
     // Don't know any cards that support spdif clocked at < 44100
     // Some US cable transmissions have 2ch 32k AC-3 streams
     ret &= samplerate >= 44100;
+    if (!ret)
+        return false;
     // Will passthrough if surround audio was defined. Amplifier will
     // do the downmix if required
     ret &= max_channels >= 6 && channels > 2;
     // Stereo content will always be decoded so it can later be upmixed
-    // unless audio is configured for stereoo
+    // unless audio is configured for stereoo. We can passthrough otherwise
     ret |= max_channels == 2;
 
     return ret;
@@ -1173,7 +1206,8 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
 bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
                                 int64_t timecode)
 {
-    return AddData(in_buffer, in_frames * source_bytes_per_frame, timecode);
+    return AddData(in_buffer, in_frames * source_bytes_per_frame, timecode,
+                   in_frames);
 }
 
 /**
@@ -1182,7 +1216,7 @@ bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
  * Returns false if there's not enough space right now
  */
 bool AudioOutputBase::AddData(void *in_buffer, int in_len,
-                              int64_t timecode)
+                              int64_t timecode, int /*in_frames*/)
 {
     int org_waud = waud;
     int afree    = audiofree();

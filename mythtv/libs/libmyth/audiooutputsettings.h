@@ -84,9 +84,9 @@ class MPUBLIC AudioOutputSettings
              * - FEATURE_TRUEHD
              * - FEATURE_DTSHD
              */
-        unsigned int canFeature(DigitalFeature arg)
+        bool canFeature(DigitalFeature arg)
         { return m_features & arg; };
-        unsigned int canFeature(unsigned int arg)
+        bool canFeature(unsigned int arg)
         { return m_features & arg; };
 
             /**
