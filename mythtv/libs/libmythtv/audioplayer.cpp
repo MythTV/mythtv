@@ -101,7 +101,7 @@ QString AudioPlayer::ReinitAudio(void)
         }
         m_no_audio_out = true;
     }
-    else if (m_no_audio_out)
+    else if (m_no_audio_out && m_audioOutput)
     {
         VERBOSE(VB_IMPORTANT, LOC + "Enabling Audio");
         m_no_audio_out = false;
@@ -149,6 +149,8 @@ void AudioPlayer::PauseAudioUntilBuffered()
 
 void AudioPlayer::SetAudioOutput(AudioOutput *ao)
 {
+    // delete current audio class if any
+    DeleteOutput();
     m_lock.lock();
     m_audioOutput = ao;
     m_lock.unlock();
