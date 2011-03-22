@@ -50,7 +50,6 @@ class NetTree : public MythScreenType
     bool keyPressEvent(QKeyEvent *);
 
     void populateResultList(ResultItem::resultList list);
-    QString getVideoDownloadFilename(ResultItem *item);
 
   public slots:
 
