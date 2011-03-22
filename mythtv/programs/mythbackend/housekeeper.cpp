@@ -174,7 +174,6 @@ void HouseKeeper::RunHouseKeeping(void)
     int period, maxhr, minhr;
     QString dbTag;
     bool initialRun = true;
-    QFileInfo zipInfo(GetConfDir() + "/tmp/remotethemes/themes.zip");
 
     // wait a little for main server to come up and things to settle down
     sleep(10);
@@ -282,9 +281,7 @@ void HouseKeeper::RunHouseKeeping(void)
             }
 
             if ((gCoreContext->GetNumSetting("ThemeUpdateNofications", 1)) &&
-                ((!zipInfo.exists()) ||
-                 (zipInfo.lastModified() < mythCurrentDateTime().addDays(-2)) ||
-                 (wantToRun("ThemeChooserInfoCacheUpdate", 1, 0, 24, true))))
+                (wantToRun("ThemeChooserInfoCacheUpdate", 1, 0, 24, true)))
             {
                 UpdateThemeChooserInfoCache();
                 updateLastrun("ThemeChooserInfoCacheUpdate");
