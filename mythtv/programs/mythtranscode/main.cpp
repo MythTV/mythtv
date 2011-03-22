@@ -57,6 +57,7 @@ static void usage(char *progname)
     cerr << "\t                        If --fifodir is specified, 'audout' and 'vidout'\n";
     cerr << "\t                        will be created in the specified directory\n";
     cerr << "\t--fifosync            : Enforce fifo sync\n";
+    cerr << "\t--passthrough         : Will pass through raw, unprocessed audio data stream\n";
     cerr << "\t--buildindex     or -b: Build a new keyframe index\n";
     cerr << "\t                        (use only if audio and video fifos are read independantly)\n";
     cerr << "\t--video               : Specifies that this is not a mythtv recording\n";
