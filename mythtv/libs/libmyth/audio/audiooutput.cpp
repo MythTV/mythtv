@@ -225,7 +225,8 @@ AudioOutputSettings* AudioOutput::GetOutputSettingsUsers(bool /*digital*/)
 
 bool AudioOutput::CanPassthrough(int /*samplerate*/,
                                  int /*channels*/,
-                                 int /*codec*/) const
+                                 int /*codec*/,
+                                 int /*profile*/) const
 {
     return false;
 }
