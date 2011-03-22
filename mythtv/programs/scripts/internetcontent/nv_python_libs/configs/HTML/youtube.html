@@ -31,7 +31,7 @@
                 wmode: 'opaque'
             };
             var atts = { id: "myytplayer" };
-            swfobject.embedSWF("http://www.youtube.com/apiplayer?enablejsapi=1&playerapiid=ytplayer", 
+            swfobject.embedSWF("http://www.youtube.com/v/" + gup('videocode') + "?enablejsapi=1&playerapiid=ytplayer&autohide=1",
                                "myth_player", window.innerWidth, window.innerHeight, "8", null, null, params, atts);
 
             function onYouTubePlayerReady(playerId) {
