@@ -23,6 +23,7 @@ extern "C" {
 #include "DisplayRes.h"
 #include "videodisplayprofile.h"
 #include "videocolourspace.h"
+#include "visualisations/videovisual.h"
 
 using namespace std;
 
@@ -34,6 +35,8 @@ class OSD;
 class FilterChain;
 class FilterManager;
 class OpenGLContextGLX;
+class AudioPlayer;
+class MythRender;
 
 typedef QMap<MythPlayer*,PIPLocation> PIPMap;
 
@@ -243,6 +246,13 @@ class VideoOutput
     QRect   GetImageRect(const QRect &rect, QRect *display = NULL);
     QRect   GetSafeRect(void);
 
+    // Visualisations
+    bool ToggleVisualisation(AudioPlayer *audio);
+    virtual bool CanVisualise(AudioPlayer *audio, MythRender *render);
+    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render);
+    void DestroyVisualisation(void);
+
+
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
                      int needprebuffer_normal, int needprebuffer_small,
@@ -323,6 +333,9 @@ class VideoOutput
     // OSD painter and surface
     MythYUVAPainter *osd_painter;
     MythImage       *osd_image;
+
+    // Visualisation
+    VideoVisual     *m_visual;
 };
 
 #endif

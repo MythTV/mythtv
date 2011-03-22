@@ -618,6 +618,9 @@ class MTV_PUBLIC TV : public QObject
     void DVDJumpForward(PlayerContext*);
     bool DiscMenuHandleAction(PlayerContext*, const QStringList &actions);
 
+    // Visualisations
+    void ToggleVisualisation(const PlayerContext*);
+
     // Program jumping stuff
     void SetLastProgram(const ProgramInfo *rcinfo);
     ProgramInfo *GetLastProgram(void) const;

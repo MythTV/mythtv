@@ -64,6 +64,11 @@ class VideoOutputVDPAU : public VideoOutput
     void SetNextFrameDisplayTimeOffset(int delayus) { m_frame_delay = delayus; }
     virtual MythPainter* GetOSDPainter(void) { return (MythPainter*)m_osd_painter; }
 
+    virtual bool CanVisualise(AudioPlayer *audio, MythRender *render)
+        { return VideoOutput::CanVisualise(audio, m_render);       }
+    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render)
+        { return VideoOutput::SetupVisualisation(audio, m_render); }
+
   private:
     virtual bool hasFullScreenOSD(void) const { return true; }
     void TearDown(void);
