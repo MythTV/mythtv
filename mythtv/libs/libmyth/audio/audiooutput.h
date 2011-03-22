@@ -75,7 +75,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 
     virtual bool AddFrames(void *buffer, int frames, int64_t timecode) = 0;
     virtual bool AddData(void *buffer, int len, int64_t timecode) = 0;
-    virtual int64_t LengthLastData(void) { return 0; }
+    virtual int64_t LengthLastData(void) = 0;
 
     virtual void SetTimecode(int64_t timecode) = 0;
     virtual bool IsPaused(void) const = 0;

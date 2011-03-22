@@ -57,6 +57,7 @@ static void usage(char *progname)
     cerr << "\t                        If --fifodir is specified, 'audout' and 'vidout'\n";
     cerr << "\t                        will be created in the specified directory\n";
     cerr << "\t--fifosync            : Enforce fifo sync\n";
+    cerr << "\t--passthrough         : Will pass through raw, unprocessed audio data stream\n";
     cerr << "\t--buildindex     or -b: Build a new keyframe index\n";
     cerr << "\t                        (use only if audio and video fifos are read independantly)\n";
     cerr << "\t--video               : Specifies that this is not a mythtv recording\n";
@@ -164,6 +165,7 @@ int main(int argc, char *argv[])
     int found_infile = 0;
     int update_index = 1;
     int isVideo = 0;
+    bool passthru = false;
 
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
@@ -497,6 +499,10 @@ int main(int argc, char *argv[])
             usage(a.argv()[0]);
             return GENERIC_EXIT_OK;
         }
+        else if (!strcmp(a.argv()[argpos],"--passthrough"))
+        {
+            passthru = true;
+        }
         else
         {
             cerr << "Unknown option: " << a.argv()[argpos] << endl;
@@ -654,7 +660,8 @@ int main(int argc, char *argv[])
         result = transcode->TranscodeFile(infile, outfile,
                                           profilename, useCutlist,
                                           (fifosync || keyframesonly), jobID,
-                                          fifodir, deleteMap, AudioTrackNo);
+                                          fifodir, deleteMap, AudioTrackNo,
+                                          passthru);
         if ((result == REENCODE_OK) && (jobID >= 0))
             JobQueue::ChangeJobArgs(jobID, "RENAME_TO_NUV");
     }

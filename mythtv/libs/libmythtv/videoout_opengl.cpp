@@ -252,6 +252,13 @@ bool VideoOutputOpenGL::SetupOpenGL(void)
         return false;
 
     const QRect dvr = window.GetDisplayVisibleRect();
+
+    if (video_codec_id == kCodec_NONE)
+    {
+        gl_context->SetViewPort(QRect(QPoint(),dvr.size()));
+        return true;
+    }
+
     if (window.GetPIPState() >= kPIPStandAlone)
     {
         QRect tmprect = QRect(QPoint(0,0), dvr.size());
@@ -346,10 +353,10 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD *osd,
                                      FrameScanType scan)
 {
     QMutexLocker locker(&gl_context_lock);
-    if (!gl_videochain || !gl_context)
+    if (!gl_context)
         return;
 
-    bool sw_frame = codec_is_std(video_codec_id);
+    bool sw_frame = codec_is_std(video_codec_id) && video_codec_id != kCodec_NONE;
     bool deint_proc = m_deinterlacing && (m_deintFilter != NULL);
     OpenGLLocker ctx_lock(gl_context);
 
@@ -383,17 +390,18 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD *osd,
         m_deintFilter->ProcessFrame(frame, scan);
     }
 
-    bool soft_bob = m_deinterlacing && (m_deintfiltername == "bobdeint");
-
     if (gl_videochain && sw_frame)
+    {
+        bool soft_bob = m_deinterlacing && (m_deintfiltername == "bobdeint");
         gl_videochain->UpdateInputFrame(frame, soft_bob);
+    }
 }
 
 void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
                                      OSD *osd)
 {
     (void)osd;
-    if (!gl_videochain || !gl_context)
+    if (!gl_context)
         return;
 
     OpenGLLocker ctx_lock(gl_context);
@@ -409,11 +417,20 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     framesPlayed = buffer->frameNumber + 1;
     gl_context_lock.unlock();
 
-    gl_videochain->SetVideoRect(vsz_enabled ? vsz_desired_display_rect :
-                                              window.GetDisplayVideoRect(),
-                                window.GetVideoRect());
-    gl_videochain->PrepareFrame(buffer->top_field_first, t,
-                                m_deinterlacing, framesPlayed);
+    if (gl_videochain)
+    {
+        gl_videochain->SetVideoRect(vsz_enabled ? vsz_desired_display_rect :
+                                                  window.GetDisplayVideoRect(),
+                                    window.GetVideoRect());
+        gl_videochain->PrepareFrame(buffer->top_field_first, t,
+                                    m_deinterlacing, framesPlayed);
+    }
+    else
+    {
+        gl_context->BindFramebuffer(0);
+        gl_context->SetBackground(0, 0, 0, 0);
+        gl_context->ClearFramebuffer();
+    }
 
     QMap<MythPlayer*,OpenGLVideo*>::iterator it = gl_pipchains.begin();
     for (; it != gl_pipchains.end(); ++it)
@@ -426,7 +443,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
         }
     }
 
-    if (osd && gl_painter)
+    if (osd && gl_painter && !window.IsEmbedding())
         osd->DrawDirect(gl_painter, GetTotalOSDBounds().size(), true);
 
     gl_context->Flush(false);
@@ -488,7 +505,7 @@ void VideoOutputOpenGL::UpdatePauseFrame(void)
 
 void VideoOutputOpenGL::InitPictureAttributes(void)
 {
-    if (!gl_context)
+    if (!gl_context || video_codec_id == kCodec_NONE)
         return;
 
     videoColourSpace.SetSupportedAttributes((PictureAttributeSupported)
@@ -650,7 +667,9 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  *frame,
                      dvr, position,
                      QRect(0, 0, pipVideoWidth, pipVideoHeight),
                      false, GetFilters(), false);
-        gl_pipchain->SetMasterViewport(gl_videochain->GetViewPort());
+        QSize viewport = gl_videochain ? gl_videochain->GetViewPort() :
+                                         window.GetDisplayVisibleRect().size();
+        gl_pipchain->SetMasterViewport(viewport);
         if (!success)
         {
             pipplayer->ReleaseCurrentFrame(pipimage);
@@ -671,7 +690,10 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  *frame,
             QRect(0, 0, pipVideoWidth, pipVideoHeight),
             false, GetFilters(), false);
 
-        gl_pipchain->SetMasterViewport(gl_videochain->GetViewPort());
+        QSize viewport = gl_videochain ? gl_videochain->GetViewPort() :
+                                         window.GetDisplayVisibleRect().size();
+        gl_pipchain->SetMasterViewport(viewport);
+
         if (!success)
         {
             pipplayer->ReleaseCurrentFrame(pipimage);

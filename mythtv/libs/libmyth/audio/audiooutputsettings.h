@@ -149,6 +149,13 @@ class MPUBLIC AudioOutputSettings
         QString FeaturesToString(void)
         { return FeaturesToString((DigitalFeature)m_features); };
 
+            /**
+             * Setup samplerate and number of channels for passthrough
+             */
+        static QString GetPassthroughParams(int codec, int codec_profile,
+                                         int &samplerate, int &channels,
+                                         bool canDTSHDMA);
+
     private:
         void SortSupportedChannels();
 

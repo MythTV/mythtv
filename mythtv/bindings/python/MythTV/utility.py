@@ -42,7 +42,8 @@ class SchemaUpdate( object ):
         schema = origschema
         try:
             while True:
-                newschema = eval('self.up%d()' % schema)
+                
+                newschema = getattr(self, 'up%d' % schema)()
                 self.log(MythLog.DATABASE,
                          'successfully updated from %d to %d' %\
                                 (schema, newschema))

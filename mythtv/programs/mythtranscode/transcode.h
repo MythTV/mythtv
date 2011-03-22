@@ -21,7 +21,7 @@ class Transcode : public QObject
         const QString &profileName,
         bool honorCutList, bool framecontrol, int jobID,
         QString fifodir, frm_dir_map_t &deleteMap,
-        int AudioTrackNo);
+        int AudioTrackNo, bool passthru = false);
     void ShowProgress(bool val) { showprogress = val; }
     void SetRecorderOptions(QString options) { recorderOptions = options; }
 

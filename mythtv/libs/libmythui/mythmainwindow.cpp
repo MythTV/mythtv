@@ -916,21 +916,20 @@ void MythMainWindow::Init(void)
 
     setWindowFlags(flags);
 
-    d->screenRect = QRect(d->xbase, d->ybase, d->screenwidth, d->screenheight);
-    d->uiScreenRect = QRect(0, 0, d->screenwidth, d->screenheight);
-
-    Show();
-
     if (d->does_fill_screen && !GetMythUI()->IsGeometryOverridden())
     {
         VERBOSE(VB_GENERAL, "Using Full Screen Window");
         setWindowState(Qt::WindowFullScreen);
     }
 
+    d->screenRect = QRect(d->xbase, d->ybase, d->screenwidth, d->screenheight);
+    d->uiScreenRect = QRect(0, 0, d->screenwidth, d->screenheight);
+
     setGeometry(d->xbase, d->ybase, d->screenwidth, d->screenheight);
     setFixedSize(QSize(d->screenwidth, d->screenheight));
 
     GetMythUI()->ThemeWidget(this);
+    Show();
 
     if (!GetMythDB()->GetNumSetting("HideMouseCursor", 0))
         setMouseTracking(true); // Required for mouse cursor auto-hide

@@ -1420,6 +1420,13 @@ QStringList MythPlayer::GetTracks(uint type)
     return QStringList();
 }
 
+uint MythPlayer::GetTrackCount(uint type)
+{
+    if (decoder)
+        return decoder->GetTrackCount(type);
+    return 0;
+}
+
 int MythPlayer::SetTrack(uint type, int trackNo)
 {
     int ret = -1;
@@ -2437,12 +2444,13 @@ bool MythPlayer::StartPlaying(void)
 
     bool seek = bookmarkseek > 30;
     EventStart();
-    DecoderStart(seek);
+    DecoderStart(true);
     if (seek)
         InitialSeek();
     VideoStart();
 
     playerThread->setPriority(QThread::TimeCriticalPriority);
+    UnpauseDecoder();
     return !IsErrored();
 }
 
@@ -2455,7 +2463,6 @@ void MythPlayer::InitialSeek(void)
         if (clearSavedPosition && !player_ctx->IsPIP())
             ClearBookmark(false);
     }
-    UnpauseDecoder();
 }
 
 

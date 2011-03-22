@@ -210,7 +210,7 @@ class Metadata( DictData ):
         DictData._fillNone(self)
         for subgroup in self._groups:
             self.__dict__[subgroup] = \
-                eval('self.%s(None)' % subgroup.capitalize())
+                getattr(self, subgroup.capitalize())(None)
 
     def _process(self, xml):
         for element in xml.getchildren():
@@ -223,7 +223,7 @@ class Metadata( DictData ):
                                 (element.text)
             if element.tag in self._groups:
                 self.__dict__[element.tag] = \
-                    eval('self.%s(element)' % element.tag.capitalize())
+                    getattr(self, element.tag.capitalize())(element)
 
     def toXML(self):
         eroot = etree.Element('item')
