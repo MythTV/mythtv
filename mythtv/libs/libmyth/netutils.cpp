@@ -834,3 +834,17 @@ ResultItem::resultList getRSSArticles(const QString &feedtitle,
     return ret;
 }
 
+QString GetDownloadFilename(QString title, QString url)
+{
+    QByteArray urlarr(url.toLatin1());
+    quint16 urlChecksum = qChecksum(urlarr.data(), urlarr.length());
+    QByteArray titlearr(title.toLatin1());
+    quint16 titleChecksum = qChecksum(titlearr.data(), titlearr.length());
+    QUrl qurl(url);
+    QString ext = QFileInfo(qurl.path()).suffix();
+    QString basefilename = QString("download_%1_%2.%3")
+                           .arg(QString::number(urlChecksum))
+                           .arg(QString::number(titleChecksum)).arg(ext);
+
+    return basefilename;
+}

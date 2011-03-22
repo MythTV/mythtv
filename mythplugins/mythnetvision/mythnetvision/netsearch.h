@@ -6,6 +6,7 @@
 #include <mythuibuttonlist.h>
 #include <mythuitextedit.h>
 #include <mythuiprogressbar.h>
+#include <mythprogressdialog.h>
 #include <mythuistatetype.h>
 #include <mythscreentype.h>
 #include <mythdialogbox.h>
@@ -32,7 +33,6 @@ class NetSearch : public MythScreenType
     bool keyPressEvent(QKeyEvent *);
 
     void populateResultList(ResultItem::resultList list);
-    QString getDownloadFilename(ResultItem *item);
 
   public slots:
 
@@ -43,6 +43,7 @@ class NetSearch : public MythScreenType
     virtual void Load();
     virtual void Init();
 
+    void initProgressDialog();
     void cleanCacheDir(void);
 
     MythUIButtonList   *m_searchResultList;
@@ -58,8 +59,9 @@ class NetSearch : public MythScreenType
     MythUIBusyDialog   *m_busyPopup;
     MythConfirmationDialog *m_okPopup;
 
-    MythDialogBox      *m_menuPopup;
-    MythScreenStack    *m_popupStack;
+    MythDialogBox        *m_menuPopup;
+    MythScreenStack      *m_popupStack;
+    MythUIProgressDialog *m_progressDialog;
 
     QNetworkAccessManager *m_netSearch;
     QNetworkReply         *m_reply;
@@ -70,7 +72,7 @@ class NetSearch : public MythScreenType
     QString             m_currentSearch;
     int                 m_currentGrabber;
     QString             m_currentCmd;
-    QString             m_currentDownload;
+    QString             m_downloadFile;
     uint                m_pagenum;
     uint                m_maxpage;
     bool                m_playing;
@@ -82,14 +84,12 @@ class NetSearch : public MythScreenType
     QMap<MythUIButtonListItem*,ResultItem> m_rssitems;
     DialogType          m_dialogType;
 
-    mutable QMutex      m_lock;
-
     NetSearch::DialogType m_type;
 
   private slots:
     void showWebVideo(void);
     void doDownloadAndPlay(void);
-    void doPlayVideo(void);
+    void doPlayVideo(QString filename);
     void showMenu(void);
     void getMoreResults();
     void getLastResults();
@@ -107,6 +107,7 @@ class NetSearch : public MythScreenType
     void slotDownloadFinished(void);
     void slotDeleteVideo(void);
     void doDeleteVideo(bool remove);
+    void DownloadVideo(QString url, QString dest);
 
     void customEvent(QEvent *levent);
 };

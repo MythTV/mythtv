@@ -84,9 +84,9 @@ class MPUBLIC AudioOutputSettings
              * - FEATURE_TRUEHD
              * - FEATURE_DTSHD
              */
-        unsigned int canFeature(DigitalFeature arg)
+        bool canFeature(DigitalFeature arg)
         { return m_features & arg; };
-        unsigned int canFeature(unsigned int arg)
+        bool canFeature(unsigned int arg)
         { return m_features & arg; };
 
             /**
@@ -148,6 +148,13 @@ class MPUBLIC AudioOutputSettings
         QString FeaturesToString(DigitalFeature arg);
         QString FeaturesToString(void)
         { return FeaturesToString((DigitalFeature)m_features); };
+
+            /**
+             * Setup samplerate and number of channels for passthrough
+             */
+        static QString GetPassthroughParams(int codec, int codec_profile,
+                                         int &samplerate, int &channels,
+                                         bool canDTSHDMA);
 
     private:
         void SortSupportedChannels();

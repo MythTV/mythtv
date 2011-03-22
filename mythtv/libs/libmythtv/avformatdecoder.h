@@ -337,7 +337,6 @@ class AvFormatDecoder : public DecoderBase
 
     // Audio
     short int        *audioSamples;
-    bool              internal_vol;
     bool              disable_passthru;
 
     VideoFrame       *dummy_frame;

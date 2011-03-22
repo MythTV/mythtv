@@ -68,7 +68,8 @@ class AudioOutputBase : public AudioOutput, public QThread
     virtual AudioFormat GetFormat(void) const { return format; };
     virtual int GetBytesPerFrame(void) const { return source_bytes_per_frame; };
 
-    virtual bool CanPassthrough(int samplerate, int channels, int codec) const;
+    virtual bool CanPassthrough(int samplerate, int channels,
+                                int codec, int profile) const;
     virtual bool ToggleUpmix(void);
 
     virtual void Reset(void);
@@ -78,8 +79,9 @@ class AudioOutputBase : public AudioOutput, public QThread
 
     // timecode is in milliseconds.
     virtual bool AddFrames(void *buffer, int frames, int64_t timecode);
-    virtual bool AddData(void *buffer, int len, int64_t timecode);
-    virtual int64_t LengthLastData(void) { return m_length_last_data; }
+    virtual bool AddData(void *buffer, int len, int64_t timecode, int frames);
+    virtual bool NeedDecodingBeforePassthrough() const { return false; };
+    virtual int64_t LengthLastData(void) const { return m_length_last_data; }
 
     virtual void SetTimecode(int64_t timecode);
     virtual bool IsPaused(void) const { return actually_paused; }

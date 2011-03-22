@@ -314,7 +314,7 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
         if (dlfile.contains("%SHAREDIR%"))
             dlfile.replace("%SHAREDIR%", GetShareDir());
         else
-            dlfile = getDownloadFilename(video->GetTitle(),
+            dlfile = GetDownloadFilename(video->GetTitle(),
                                           video->GetThumbnail());
 
         if (QFile::exists(dlfile))
@@ -885,7 +885,8 @@ void NetTree::doDeleteVideo(bool remove)
     if (!item)
         return;
 
-    QString filename = getVideoDownloadFilename(item);
+    QString filename = GetDownloadFilename(item->GetTitle(),
+                                          item->GetMediaURL());
 
     if (filename.startsWith("myth://"))
         RemoteFile::DeleteFile(filename);
@@ -914,7 +915,8 @@ void NetTree::doDownloadAndPlay()
     if (!item)
         return;
 
-    QString baseFilename = getVideoDownloadFilename(item);
+    QString baseFilename = GetDownloadFilename(item->GetTitle(),
+                                          item->GetMediaURL());
 
     QString finalFilename = generate_file_url("Default",
                               gCoreContext->GetMasterHostName(),
@@ -958,21 +960,6 @@ void NetTree::initProgressDialog()
     }
 }
 
-QString NetTree::getVideoDownloadFilename(ResultItem *item)
-{
-    QByteArray urlarr(item->GetMediaURL().toLatin1());
-    quint16 urlChecksum = qChecksum(urlarr.data(), urlarr.length());
-    QByteArray titlearr(item->GetTitle().toLatin1());
-    quint16 titleChecksum = qChecksum(titlearr.data(), titlearr.length());
-    QUrl qurl(item->GetMediaURL());
-    QString ext = QFileInfo(qurl.path()).suffix();
-    QString basefilename = QString("download_%1_%2.%3")
-                           .arg(QString::number(urlChecksum))
-                           .arg(QString::number(titleChecksum)).arg(ext);
-
-    return basefilename;
-}
-
 void NetTree::slotItemChanged()
 {
     ResultItem *item;
@@ -1012,7 +999,7 @@ void NetTree::slotItemChanged()
             }
             else
             {
-                QString sFilename = getDownloadFilename(item->GetTitle(), item->GetThumbnail());
+                QString sFilename = GetDownloadFilename(item->GetTitle(), item->GetThumbnail());
 
                 bool exists = QFile::exists(sFilename);
                 if (exists)
@@ -1114,7 +1101,7 @@ void NetTree::slotItemChanged()
                 else
                     title = m_siteButtonList->GetItemCurrent()->GetText();
 
-                QString sFilename = getDownloadFilename(title, url);
+                QString sFilename = GetDownloadFilename(title, url);
 
                 bool exists = QFile::exists(sFilename);
                 if (exists && !url.isEmpty())

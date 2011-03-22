@@ -36,7 +36,8 @@ using namespace std;
 class AudioReencodeBuffer : public AudioOutput
 {
  public:
-    AudioReencodeBuffer(AudioFormat audio_format, int audio_channels)
+    AudioReencodeBuffer(AudioFormat audio_format, int audio_channels,
+                        bool passthru)
     {
         Reset();
         const AudioSettings settings(audio_format, audio_channels, 0, 0, false);
@@ -48,9 +49,10 @@ class AudioReencodeBuffer : public AudioOutput
         memset(ab_len, 0, sizeof(ab_len));
         memset(ab_offset, 0, sizeof(ab_offset));
         memset(ab_time, 0, sizeof(ab_time));
+        m_initpassthru = passthru;
     }
 
-   ~AudioReencodeBuffer()
+    ~AudioReencodeBuffer()
     {
         delete [] audiobuffer;
     }
@@ -60,9 +62,11 @@ class AudioReencodeBuffer : public AudioOutput
     {
         ClearError();
 
-        channels = settings.channels;
+        m_passthru      = settings.use_passthru;
+        channels        = settings.channels;
         bytes_per_frame = channels *
-                           AudioOutputSettings::SampleSize(settings.format);
+            AudioOutputSettings::SampleSize(settings.format);
+        eff_audiorate   = settings.samplerate;
     }
 
     // dsprate is in 100 * frames/second
@@ -80,13 +84,14 @@ class AudioReencodeBuffer : public AudioOutput
     // timecode is in milliseconds.
     virtual bool AddFrames(void *buffer, int frames, int64_t timecode)
     {
-        return AddData(buffer, frames * bytes_per_frame, timecode);
+        return AddData(buffer, frames * bytes_per_frame, timecode, frames);
     }
 
     // timecode is in milliseconds.
-    virtual bool AddData(void *buffer, int len, int64_t timecode)
+    virtual bool AddData(void *buffer, int len, int64_t timecode, int frames)
     {
         int freebuf = bufsize - audiobuffer_len;
+        int newlen;
 
         if (len > freebuf)
         {
@@ -105,7 +110,7 @@ class AudioReencodeBuffer : public AudioOutput
         audiobuffer_len += len;
 
         // last_audiotime is at the end of the frame
-        last_audiotime = timecode + (len / bytes_per_frame) * 1000 /
+        last_audiotime = timecode + frames * 1000 /
             eff_audiorate;
 
         ab_time[ab_count] = last_audiotime;
@@ -209,6 +214,11 @@ class AudioReencodeBuffer : public AudioOutput
     virtual void bufferOutputData(bool){ return; }
     virtual int readOutputData(unsigned char*, int ){ return 0; }
 
+    /**
+     * Test if we can output digital audio
+     */
+    virtual bool CanPassthrough(int, int, int) const { return m_initpassthru; }
+
     int bufsize;
     int ab_count;
     int ab_len[128];
@@ -217,6 +227,8 @@ class AudioReencodeBuffer : public AudioOutput
     unsigned char *audiobuffer;
     int audiobuffer_len, channels, bits, bytes_per_frame, eff_audiorate;
     long long last_audiotime;
+private:
+    bool                m_passthru, m_initpassthru;
 };
 
 Transcode::Transcode(ProgramInfo *pginfo) :
@@ -368,7 +380,8 @@ int Transcode::TranscodeFile(
     bool honorCutList, bool framecontrol,
     int jobID, QString fifodir,
     frm_dir_map_t &deleteMap,
-    int AudioTrackNo)
+    int AudioTrackNo,
+    bool passthru)
 {
     QDateTime curtime = QDateTime::currentDateTime();
     QDateTime statustime = curtime;
@@ -396,7 +409,8 @@ int Transcode::TranscodeFile(
         statustime = statustime.addSecs(5);
     }
 
-    AudioOutput *audioOutput = new AudioReencodeBuffer(FORMAT_NONE, 0);
+    AudioOutput *audioOutput = new AudioReencodeBuffer(FORMAT_NONE, 0,
+                                                       passthru);
     AudioReencodeBuffer *arb = ((AudioReencodeBuffer*)audioOutput);
     player->GetAudio()->SetAudioOutput(audioOutput);
     player->SetTranscoding(true);
