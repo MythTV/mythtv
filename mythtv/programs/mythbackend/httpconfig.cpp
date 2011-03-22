@@ -75,6 +75,18 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
             handled = true;
         }
     }
+    else if (request->m_sMethod == "XML")
+    {
+        QString fn = GetShareDir() + "backend-config/";
+
+        if (request->m_sBaseUrl == "/Config/Database")
+            fn += "config_backend_database.xml";
+        else if (request->m_sBaseUrl == "/Config/General")
+            fn += "config_backend_general.xml";
+
+        request->FormatFileResponse(fn);
+        return true;
+    }
     else if ((request->m_sMethod == "Database") || (NULL == gContext))
     {
         PrintHeader(request->m_response, "Config/Database");
