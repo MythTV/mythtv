@@ -26,6 +26,7 @@
 
 #include <QFileInfo>
 #include <QDir>
+#include <QTextStream>
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -68,6 +69,24 @@ bool HtmlServerExtension::ProcessRequest( HttpWorkerThread *, HTTPRequest *pRequ
     {
         if ( pRequest->m_sBaseUrl.startsWith("/") == false)
             return( false );
+
+        // Temporary until we get authentication enabled
+        if ((pRequest->m_sResourceUrl.startsWith("/setup")) &&
+            (!getenv("MYTHHTMLSETUP")))
+        {
+            QTextStream os(&pRequest->m_response);
+            os << "<html><body><h3>Web-based Setup is currently disabled.</h3>"
+                  "</body></html>";
+
+            pRequest->m_eResponseType = ResponseTypeHTML;
+            pRequest->m_mapRespHeaders[ "Cache-Control" ] =
+                "no-cache=\"Ext\", max-age = 0";
+
+            VERBOSE(VB_IMPORTANT, QString("WARNING: Attempt to access "
+                    "Web-based Setup which is currently disabled. URL: %1")
+                    .arg(pRequest->m_sResourceUrl));
+            return true;
+        }
 
         QFileInfo oInfo( m_sAbsoluteSharePath + pRequest->m_sResourceUrl );
 

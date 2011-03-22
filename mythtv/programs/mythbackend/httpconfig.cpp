@@ -26,6 +26,24 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
         return false;
     }
 
+    // Temporary until we get authentication enabled
+    if (!getenv("MYTHHTMLSETUP"))
+    {
+        QTextStream os(&request->m_response);
+        os << "<html><body><h3>Web-based Setup is currently disabled.</h3>"
+              "</body></html>";
+
+        request->m_eResponseType = ResponseTypeHTML;
+        request->m_mapRespHeaders[ "Cache-Control" ] =
+            "no-cache=\"Ext\", max-age = 0";
+
+        VERBOSE(VB_IMPORTANT, QString("WARNING: Attempt to access "
+                "Web-based Setup which is currently disabled. URL: %1")
+                .arg(request->m_sResourceUrl));
+
+        return true;
+    }
+
     VERBOSE(VB_IMPORTANT, QString("HttpConfig::ProcessRequest '%1' '%2'")
             .arg(request->m_sBaseUrl).arg(request->m_sMethod));
 
