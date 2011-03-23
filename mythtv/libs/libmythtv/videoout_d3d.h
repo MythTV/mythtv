@@ -59,9 +59,9 @@ class VideoOutputD3D : public VideoOutput
     void* GetDXVA2Decoder(void);
 
     virtual bool CanVisualise(AudioPlayer *audio, MythRender *render)
-        { return VideoOutput::CanVisualise(audio, m_render);       }
+        { return VideoOutput::CanVisualise(audio, (MythRender*)m_render); }
     virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render)
-        { return VideoOutput::SetupVisualisation(audio, m_render); }
+        { return VideoOutput::SetupVisualisation(audio, (MythRender*)m_render); }
 
   private:
     void TearDown(void);
