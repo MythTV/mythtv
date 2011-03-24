@@ -23,7 +23,8 @@ function loadContent(contentURL) {
 function interceptMenuClicks() {
     $('#menu ul li a').click(function(event) {
         event.preventDefault();
-        if (this.href.match("/setup") == "/setup") {
+        if ((this.href.match("/setup") == "/setup") ||
+            (this.href.match("/samples") == "/samples")) {
             document.location = this.href;
         } else {
             loadContent(this.href);
