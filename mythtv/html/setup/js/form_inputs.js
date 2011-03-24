@@ -5,8 +5,8 @@ function getHostsOptionList() {
         hostOptions = "";
         $.ajaxSetup({ async: false });
         $.getJSON("/Myth/GetHosts", function(data) {
-            $.each(data.StringList.Values, function(i, value) {
-                hostOptions += "<option>" + value + "</option>";
+            $.each(data.QStringList, function(i, value) {
+                hostOptions += "<option value='" + value + "'>" + value + "</option>";
             });
         });
         $.ajaxSetup({ async: true });
