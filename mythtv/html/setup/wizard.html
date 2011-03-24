@@ -1,7 +1,7 @@
 <html>
 <head>
 <title>
-MythTV Setup
+MythTV Setup Wizard
 </title>
 <link rel="stylesheet" type="text/css" href="/css/site.css">
 <link rel="stylesheet" type="text/css" href="/css/jquery-ui.css">
@@ -59,7 +59,6 @@ function interceptMenuClicks() {
 $(document).ready(function() {
     interceptMenuClicks();
     $("#tabs").tabs();
-    loadContent('/setup/overview.html');
 });
 
 </script>
@@ -83,20 +82,21 @@ $(document).ready(function() {
 
 <div id="menu-bg">
     <div id="menu-title" align=center>
-        Setup
+        Setup Wizard
     </div>
 
     <div id="menu">
         <ul>
-            <li><a class='menuitem' href='/setup/wizard.html'>Setup Wizard</a></li>
-            <li><a class='menuitem' href='/setup/advanced.html'>Advanced Setup</a></li>
+            <li><a class='menuitem' href='/setup/menuitem1.html'>Optional Menu Item #1</a></li>
+            <li><a class='menuitem' href='/setup/menuitem2.html'>Optional Menu Item #2</a></li>
         </ul>
         <br>
-        <center><a class='menuitem' href='/'>Back To Main Menu</a></center>
+        <center><a class='menuitem' href='/setup'>Back To Setup Menu</a></center>
     </div>
 </div>
 
 <div id="content">
+    <div style='position:absolute; top: 150px; width: 600px; text-align: center'><b><font size=+3>Wizard would go here</font></b></div>
 </div>
 
 </body>

@@ -1,7 +1,6 @@
 var sgTabIDs = new Array();
 var sgTabNames = new Array();
 var sgTabCount = 0;
-var sgLocalHostName = "";
 
 function appendTabRow(tabID, id, group, host, dir) {
     var rowNum = $('#sgtable-' + tabID + ' tr').length;
@@ -10,9 +9,7 @@ function appendTabRow(tabID, id, group, host, dir) {
 }
 
 function initStorageGroups() {
-    var sgLocalHostOnly = 0;
-
-    sgLocalHostName = getServerHostName();
+    var selectedHost = $("#sgShowHost").val();
 
     $("#storagegrouptabs").tabs();
 
@@ -33,7 +30,8 @@ function initStorageGroups() {
     $.getJSON("/Myth/GetStorageGroupDirs", function(data) {
         var sgTabID;
         $.each(data.StorageGroupDirList.StorageGroupDirs, function(i, value) {
-            if (sgLocalHostOnly && value.HostName != sgLocalHostName) {
+            if ((selectedHost != "ALL") &&
+                (selectedHost != value.HostName)) {
                 return true;
             }
 
@@ -44,7 +42,7 @@ function initStorageGroups() {
                 sgTabIDs[value.GroupName] = sgTabID;
                 sgTabNames[sgTabID] = value.GroupName;
                 $("#storagegrouptabs").tabs("add", "#sgtabs-" + sgTabID, value.GroupName, sgTabID);
-                $("#sgtabs-" + sgTabID).html("<div id='sgtabs-" + sgTabID + "-add'><a href='javascript:addDir(" + sgTabID + ")'>Add Directory</a></div><div id='sgtabs-" + sgTabID + "-edit' style='display: none'><table border=0 cellpadding=2 cellspacing=2><tr><th align=right>Host:</th><td>" + hostsSelect("sgtabs-" + sgTabID + "-edit-hostname") + "</td></tr><tr><th align=right>Directory</th><td><input id='sgtabs-" + sgTabID + "-edit-dirname' size=40><input type=hidden id='sgtabs-" + sgTabID + "-edit-groupname' value='" + value.GroupName + "'></td></tr><tr><td colspan=2><a href='javascript:saveDir(" + sgTabID + ")'>Save</a> <a href='javascript:cancelDir(" + sgTabID + ")'>Cancel</a></td></tr></table><hr></div><table id='sgtable-" + sgTabID + "' border=1 cellpadding=2 cellspacing=2><th>DirID</th><th>Host Name</th><th>Dir Name</th><th>Actions</th></tr></table>");
+                $("#sgtabs-" + sgTabID).html("<div id='sgtabs-" + sgTabID + "-add'><a href='javascript:addDir(" + sgTabID + ")'>Add Directory</a></div><div id='sgtabs-" + sgTabID + "-edit' style='display: none'><b>Adding new Storage Group Directory</b><br><table border=0 cellpadding=2 cellspacing=2><tr><th align=right>Host:</th><td>" + hostsSelect("sgtabs-" + sgTabID + "-edit-hostname") + "</td></tr><tr><th align=right>New Directory:</th><td><input id='sgtabs-" + sgTabID + "-edit-dirname' size=40><input type=button onClick='javascript:browseForNewDir(" + sgTabID + ")' value='Browse'><input type=hidden id='sgtabs-" + sgTabID + "-edit-groupname' value='" + value.GroupName + "'></td></tr><tr><td colspan=2><a href='javascript:saveDir(" + sgTabID + ")'>Save</a> <a href='javascript:cancelDir(" + sgTabID + ")'>Cancel</a></td></tr></table><hr></div><table id='sgtable-" + sgTabID + "' border=1 cellpadding=4 cellspacing=0 width='100%'><th>DirID</th><th>Host Name</th><th>Dir Name</th><th>Actions</th></tr></table><br><a href='javascript:deleteStorageGroup(" + sgTabID + ")'>Delete Storage Group</a>");
             }
 
             appendTabRow(sgTabID, value.Id, value.GroupNme, value.HostName, value.DirName);
@@ -72,6 +70,12 @@ function saveDir(tabID) {
 function cancelDir(tabID) {
     $("#sgtabs-" + tabID + "-add").css("display", "");
     $("#sgtabs-" + tabID + "-edit").css("display", "none");
+}
+
+function deleteStorageGroup( tabID ) {
+    alert("Are you sure?  Deleting Storage Groups is not hooked up yet anyway "
+        + ", but you can delete all directories in a Storage Group "
+        + "individually.");
 }
 
 function addStorageGroupDir( group, dir, host ) {
@@ -130,6 +134,14 @@ function removeStorageGroupTableRow( tabID, rowID ) {
         alert("json remove call failed.");
     }
 }
+
+function browseForNewDir( tabID ) {
+    alert( "Browsing for new directories is not hooked up yet. "
+        + "You will have to manually type in the directory name to add to "
+        + "the " + sgTabNames[tabID] + " group.");
+}
+
+//////////////////////////////////////////////////////////////////////////////
 
 initStorageGroups();
 

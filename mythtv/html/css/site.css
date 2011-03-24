@@ -22,7 +22,6 @@
 
     #header {
         background-color:       black;
-        background-image:       url("/img/shine.png");
         background-position:    left -4px;
         background-repeat:      repeat-x;
         position:           fixed;
@@ -60,7 +59,6 @@
         border-left:            1px solid #889;
         white-space:            nowrap;
         background-color:       black;
-        background-image:       url("/img/shine.png");
         background-position:    left -2px;
         background-repeat:      repeat-x;
     }
@@ -148,23 +146,24 @@
     }
 
     #header_end {
-        background-image:   url("/img/blue_fade_top.png");
         background-repeat:  repeat-x;
         margin-top:         40px;
         height:             36px;
     }
 
     #header_title {
-        font-size:          14px;
+        font-size:          24px;
         font-family:        sans-serif;
         font-weight:        bold;
         color:              #E4D6CD;
         position:           fixed;
         top:                0px;
-        left:               200px;
+        left:               0px;
         right:              0px;
         height:             38px;
-        z-index:            99
+        z-index:            98;
+        text-align:         center;
+        padding:            6px 200px 0 200px;
     }
 
     #menu-bg {
@@ -187,11 +186,16 @@
         width:              180px;
     }
 
+    #menu a, a:visited {
+        color:              #26c;
+    }
+
     #menu {
         position:           fixed;
         top:                110px;
         left:               10px;
         width:              180px;
+        color:              #E4D6CD;
     }
 
     #menu ul {
@@ -236,7 +240,6 @@
     }
 
     #footer-start {
-        background-image:       url("/img/blue_fade_bottom.png");
         background-repeat:      repeat-x;
         background-position:    top;
         margin-top:             -38px;
@@ -248,7 +251,6 @@
     #footer {
         background-color:       black;
         color:                  #ccd;
-        background-image:       url("/img/shine.png");
         background-position:    left -6px;
         background-repeat:      repeat-x;
         position:               fixed;

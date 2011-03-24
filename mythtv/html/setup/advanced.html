@@ -1,7 +1,7 @@
 <html>
 <head>
 <title>
-MythTV Setup
+MythTV Backend Advanced Setup
 </title>
 <link rel="stylesheet" type="text/css" href="/css/site.css">
 <link rel="stylesheet" type="text/css" href="/css/jquery-ui.css">
@@ -83,16 +83,24 @@ $(document).ready(function() {
 
 <div id="menu-bg">
     <div id="menu-title" align=center>
-        Setup
+        Advanced Setup
     </div>
 
     <div id="menu">
         <ul>
-            <li><a class='menuitem' href='/setup/wizard.html'>Setup Wizard</a></li>
-            <li><a class='menuitem' href='/setup/advanced.html'>Advanced Setup</a></li>
+            <li><a class='menuitem' href='/Config/Database'>Database</a></li>
+            <li><a class='menuitem' href='/Config/General'>General</a></li>
+            <!-- some possible other menu items
+            <li><a class='menuitem' href="javascript:loadSetupPage('tuning')">Tuning</a></li>
+            -->
+            <li><a class='menuitem' href="javascript:loadSetupPage('storagegroups')">Storage Groups</a></li>
+            <!--
+            <li><a class='menuitem' href="javascript:loadSetupPage('jobqueue')">Job Queue</a></li>
+            <li><a class='menuitem' href="javascript:loadSetupPage('systemevents')">System Events</a></li>
+            -->
         </ul>
         <br>
-        <center><a class='menuitem' href='/'>Back To Main Menu</a></center>
+        <center><a class='menuitem' href='/setup'>Back To Setup Menu</a></center>
     </div>
 </div>
 
