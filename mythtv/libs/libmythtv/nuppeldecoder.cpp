@@ -1258,7 +1258,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
 
                     if (data_size)
                         m_audio->AddAudioData((char *)audioSamples, data_size,
-                                              frameheader.timecode);
+                                              frameheader.timecode, 0);
 
                     pkt.size -= ret;
                     pkt.data += ret;
@@ -1283,7 +1283,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                 VERBOSE(VB_PLAYBACK+VB_EXTRA, QString("A audio timecode %1")
                                               .arg(frameheader.timecode));
                 m_audio->AddAudioData((char *)strm, frameheader.packetlength,
-                                      frameheader.timecode);
+                                      frameheader.timecode, 0);
             }
         }
 

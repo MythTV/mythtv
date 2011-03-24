@@ -752,6 +752,10 @@ void TV::InitKeys(void)
     REG_KEY("Teletext Menu", ACTION_REVEAL,      QT_TRANSLATE_NOOP("MythControls",
             "Reveal hidden Text"),    "F8");
 
+    /* Visualisations */
+    REG_KEY("TV Playback", ACTION_TOGGLEVISUALISATION,
+            QT_TRANSLATE_NOOP("MythControls", "Toggle audio visualisation"), "");
+
 /*
   keys already used:
 
@@ -4030,6 +4034,8 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
         ToggleAdjustFill(ctx);
     else if (has_action("TOGGLEAUDIOSYNC", actions))
         ChangeAudioSync(ctx, 0);   // just display
+    else if (has_action(ACTION_TOGGLEVISUALISATION, actions))
+        ToggleVisualisation(ctx);
     else if (has_action("TOGGLEPICCONTROLS", actions))
         DoTogglePictureAttribute(ctx, kAdjustingPicture_Playback);
     else if (has_action(ACTION_TOGGLESTUDIOLEVELS, actions))
@@ -4073,6 +4079,18 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
         handled = false;
 
     return handled;
+}
+
+void TV::ToggleVisualisation(const PlayerContext *ctx)
+{
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    if (ctx->player && ctx->player->CanVisualise())
+    {
+        bool on = ctx->player->ToggleVisualisation();
+        SetOSDMessage(ctx, on ? tr("Visualisation On") :
+                                tr("Visualisation Off"));
+    }
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
 bool TV::PxPHandleAction(PlayerContext *ctx, const QStringList &actions)
@@ -9411,6 +9429,8 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
     }
     else if (action.left(15) == "TOGGLEAUDIOSYNC")
         ChangeAudioSync(actx, 0);
+    else if (action == ACTION_TOGGLEVISUALISATION)
+        ToggleVisualisation(actx);
     else if (action.left(11) == ACTION_TOGGLESLEEP)
     {
         ToggleSleepTimer(actx, action.left(13));
@@ -9674,9 +9694,11 @@ void TV::FillOSDMenuAudio(const PlayerContext *ctx, OSD *osd,
     QStringList tracks;
     uint curtrack = ~0;
     bool avsync = true;
+    bool visual = false;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->player)
     {
+        visual = ctx->player->CanVisualise();
         tracks = ctx->player->GetTracks(kTrackTypeAudio);
         if (!tracks.empty())
             curtrack = (uint) ctx->player->GetTrack(kTrackTypeAudio);
@@ -9703,6 +9725,11 @@ void TV::FillOSDMenuAudio(const PlayerContext *ctx, OSD *osd,
             osd->DialogAddButton(tr("Select Audio Track"),
                                  "DIALOG_MENU_AUDIOTRACKS_0", true,
                                  selected == "AUDIOTRACKS");
+        }
+        if (visual)
+        {
+            osd->DialogAddButton(tr("Toggle Visualisation"),
+                                 ACTION_TOGGLEVISUALISATION);
         }
         if (avsync)
             osd->DialogAddButton(tr("Adjust Audio Sync"), "TOGGLEAUDIOSYNC");

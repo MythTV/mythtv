@@ -499,6 +499,9 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
                               m_pip_ready ? m_pip_layer : 0, 0))
         VERBOSE(VB_PLAYBACK, LOC_ERR + QString("Prepare frame failed."));
 
+    if (m_visual)
+        m_visual->Draw(GetTotalOSDBounds(), m_osd_painter, NULL);
+
     if (osd && m_osd_painter && !window.IsEmbedding())
         osd->DrawDirect(m_osd_painter, GetTotalOSDBounds().size(), true);
 

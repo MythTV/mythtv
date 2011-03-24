@@ -193,7 +193,7 @@ NetTree::~NetTree()
 
 void NetTree::cleanCacheDir()
 {
-    QString cache = QString("%1/MythNetvision/thumbcache")
+    QString cache = QString("%1/thumbcache")
                        .arg(GetConfDir());
     QDir cacheDir(cache);
     QStringList thumbs = cacheDir.entryList(QDir::Files);
@@ -314,8 +314,8 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
         if (dlfile.contains("%SHAREDIR%"))
             dlfile.replace("%SHAREDIR%", GetShareDir());
         else
-            dlfile = GetDownloadFilename(video->GetTitle(),
-                                          video->GetThumbnail());
+            dlfile = getDownloadFilename(video->GetTitle(),
+                         video->GetThumbnail());
 
         if (QFile::exists(dlfile))
             item->SetImage(dlfile);
@@ -999,7 +999,7 @@ void NetTree::slotItemChanged()
             }
             else
             {
-                QString sFilename = GetDownloadFilename(item->GetTitle(), item->GetThumbnail());
+                QString sFilename = getDownloadFilename(item->GetTitle(), item->GetThumbnail());
 
                 bool exists = QFile::exists(sFilename);
                 if (exists)

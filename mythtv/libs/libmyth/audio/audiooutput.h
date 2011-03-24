@@ -66,7 +66,8 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 
     virtual AudioOutputSettings* GetOutputSettingsCleaned(bool digital = true);
     virtual AudioOutputSettings* GetOutputSettingsUsers(bool digital = true);
-    virtual bool CanPassthrough(int samplerate, int channels, int codec) const;
+    virtual bool CanPassthrough(int samplerate, int channels,
+                                int codec, int profile) const;
 
     // dsprate is in 100 * samples/second
     virtual void SetEffDsp(int dsprate) = 0;
@@ -74,8 +75,35 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     virtual void Reset(void) = 0;
 
     virtual bool AddFrames(void *buffer, int frames, int64_t timecode) = 0;
-    virtual bool AddData(void *buffer, int len, int64_t timecode) = 0;
-    virtual int64_t LengthLastData(void) = 0;
+        /**
+         * AddData:
+         * Add data to the audiobuffer for playback
+         * 
+         * in:
+         *     buffer  : pointer to audio data
+         *     len     : length of audio data added
+         *     timecode: timecode of the first sample added
+         *     frames  : number of frames added. 
+         * out:
+         *     return false if there wasn't enough space in audio buffer to
+         *     process all the data
+         */
+    virtual bool AddData(void *buffer, int len,
+                         int64_t timecode, int frames) = 0;
+        /**
+         * NeedDecodingBeforePassthrough:
+         * returns true if AudioOutput class can determine the length in
+         * millisecond of native audio frames bitstreamed passed to AddData.
+         * If false, LengthLastData method must be implemented
+         */
+    virtual bool NeedDecodingBeforePassthrough(void) const { return true; };
+        /**
+         * LengthLastData:
+         * returns the length of the last data added in millisecond.
+         * This function must be implemented if NeedDecodingBeforePassthrough
+         * returned false
+         */
+    virtual int64_t LengthLastData(void) const { return -1; };
 
     virtual void SetTimecode(int64_t timecode) = 0;
     virtual bool IsPaused(void) const = 0;
