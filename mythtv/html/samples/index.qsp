@@ -26,7 +26,7 @@ function GetSettingValue()
 	var sKey = $("#Settings").val();
 
     jQuery.getJSON(
-        "Myth/GetSetting",
+        "/Myth/GetSetting",
         { "Key": sKey },
         function( data ) 
         {
