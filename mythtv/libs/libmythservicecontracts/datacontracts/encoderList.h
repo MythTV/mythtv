@@ -37,9 +37,26 @@ class SERVICE_PUBLIC EncoderList : public QObject
     Q_OBJECT
     Q_CLASSINFO( "version", "1.0" );
 
+    // We need to know the type that will ultimately be contained in 
+    // any QVariantList or QVariantMap.  We do his by specifying
+    // A Q_CLASSINFO entry with "<PropName>_type" as the key
+    // and the type name as the value
+
+    Q_CLASSINFO( "Encoders_type", "DTC::Encoder");
+
     Q_PROPERTY( QVariantList Encoders READ Encoders DESIGNABLE true )
 
     PROPERTYIMP_RO_REF( QVariantList, Encoders )
+
+    public:
+
+        static void InitializeCustomTypes()
+        {
+            qRegisterMetaType< EncoderList  >();
+            qRegisterMetaType< EncoderList* >();
+
+            Encoder::InitializeCustomTypes();
+        }
 
     public:
 
@@ -73,6 +90,7 @@ class SERVICE_PUBLIC EncoderList : public QObject
 
 } // namespace DTC
 
-Q_DECLARE_METATYPE( DTC::EncoderList )
+Q_DECLARE_METATYPE( DTC::EncoderList  )
+Q_DECLARE_METATYPE( DTC::EncoderList* )
 
 #endif

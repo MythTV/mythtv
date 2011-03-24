@@ -42,12 +42,16 @@ class UPNP_PUBLIC Serializer
 {
     protected:
 
-        virtual void BeginSerialize() {}
+        virtual void BeginSerialize( QString &sName ) {}
         virtual void EndSerialize  () {}
 
         virtual void BeginObject( const QString &sName, const QObject  *pObject ) = 0;
         virtual void EndObject  ( const QString &sName, const QObject  *pObject ) = 0;
-        virtual void AddProperty( const QString &sName, const QVariant &vValue  ) = 0;
+
+        virtual void AddProperty( const QString       &sName, 
+                                  const QVariant      &vValue,
+                                  const QMetaObject   *pMetaParent,
+                                  const QMetaProperty *pMetaProp ) = 0;
 
         //////////////////////////////////////////////////////////////////////
 
@@ -56,8 +60,8 @@ class UPNP_PUBLIC Serializer
 
     public:
 
-        void Serialize( const QObject *pObject, const QString &_sName = QString() );
-        void Serialize( const QVariant &vValue, const QString &sName );
+        virtual void Serialize( const QObject *pObject, const QString &_sName = QString() );
+        virtual void Serialize( const QVariant &vValue, const QString &sName );
 
         //////////////////////////////////////////////////////////////////////
         // Helper Methods

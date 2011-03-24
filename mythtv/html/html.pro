@@ -10,7 +10,7 @@ win32:QMAKE_COPY_DIR = sh ./cpsimple
 
 html.path = $${PREFIX}/share/mythtv/html/
 html.files = index.html overview.html
-html.files += css images js misc setup
+html.files += css images js misc setup samples
 
 INSTALLS += html
 

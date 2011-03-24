@@ -20,7 +20,6 @@ HEADERS += services/contentServices.h services/dvrServices.h
 HEADERS += datacontracts/connectionInfo.h      datacontracts/databaseInfo.h
 HEADERS += datacontracts/programAndChannel.h   datacontracts/programGuide.h
 HEADERS += datacontracts/recording.h           datacontracts/settingList.h
-HEADERS += datacontracts/stringList.h          datacontracts/successFail.h
 HEADERS += datacontracts/wolInfo.h             datacontracts/programList.h
 HEADERS += datacontracts/encoder.h             datacontracts/encoderList.h
 HEADERS += datacontracts/storageGroupDir.h     datacontracts/storageGroupDirList.h
@@ -47,7 +46,6 @@ incDatacontracts.path = $${PREFIX}/include/mythtv/libmythservicecontracts/dataco
 incDatacontracts.files  = datacontracts/connectionInfo.h      datacontracts/databaseInfo.h
 incDatacontracts.files += datacontracts/programAndChannel.h   datacontracts/programGuide.h
 incDatacontracts.files += datacontracts/recording.h           datacontracts/settingList.h
-incDatacontracts.files += datacontracts/stringList.h          datacontracts/successFail.h
 incDatacontracts.files += datacontracts/wolInfo.h
 
 INSTALLS += inc incServices incDatacontracts

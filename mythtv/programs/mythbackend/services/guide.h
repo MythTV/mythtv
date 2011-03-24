@@ -22,6 +22,8 @@
 #ifndef GUIDE_H
 #define GUIDE_H
 
+#include <QScriptEngine>
+
 #include "serviceUtil.h"
 
 #include "services/guideServices.h"
@@ -49,9 +51,60 @@ class Guide : public GuideServices
         DTC::Program*       GetProgramDetails   ( int              ChanId,
                                                   const QDateTime &StartTime );
 
-        QFileInfo*          GetChannelIcon      ( int              ChanId,
+        QFileInfo           GetChannelIcon      ( int              ChanId,
                                                   int              Width ,
                                                   int              Height );
 };
+
+// --------------------------------------------------------------------------
+// The following class wrapper is due to a limitation in Qt Script Engine.  It
+// requires all methods that return pointers to user classes that are derived from
+// QObject actually return QObject* (not the user class *).  If the user class pointer
+// is returned, the script engine treats it as a QVariant and doesn't create a
+// javascript prototype wrapper for it.
+// 
+// This class allows us to keep the rich return types in the main API class while
+// offering the script engine a class it can work with.
+// 
+// Only API Classes that return custom classes needs to implement these wrappers.
+//
+// We should continue to look for a cleaning solution to this problem.
+// --------------------------------------------------------------------------
+
+class ScriptableGuide : public QObject
+{
+    Q_OBJECT
+
+    private:
+
+        Guide    m_obj;
+
+    public:
+    
+        Q_INVOKABLE ScriptableGuide( QObject *parent = 0 ) : QObject( parent ) {}
+
+    public slots:
+
+        QObject* GetProgramGuide( const QDateTime &StartTime  ,
+                                  const QDateTime &EndTime    ,
+                                  int              StartChanId,
+                                  int              NumChannels,
+                                  bool             Details     )
+        {
+            return m_obj.GetProgramGuide( StartTime, EndTime, StartChanId, NumChannels, Details );
+        }
+
+        QObject* GetProgramDetails( int ChanId, const QDateTime &StartTime )
+        {
+            return m_obj.GetProgramDetails( ChanId, StartTime );
+        }
+
+        QFileInfo GetChannelIcon( int ChanId, int Width, int Height )
+        {
+            return m_obj.GetChannelIcon( ChanId, Width, Height );
+        }
+};
+
+Q_SCRIPT_DECLARE_QMETAOBJECT( ScriptableGuide, QObject*);
 
 #endif 

@@ -340,3 +340,28 @@ void UPnp::FormatErrorResponse( HTTPRequest   *pRequest,
     else
         VERBOSE( VB_IMPORTANT, "UPnp::FormatErrorResponse : Response not created - pRequest == NULL" );
 }
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+void UPnp::FormatRedirectResponse( HTTPRequest   *pRequest,
+                                   const QString &hostName )
+{
+    pRequest->m_eResponseType     = ResponseTypeOther;
+    pRequest->m_nResponseStatus   = 301;
+
+    QStringList sItems = pRequest->m_sRawRequest.split( ' ' );
+
+    QString sUrl = "http://" + pRequest->m_mapHeaders[ "host" ] + sItems[1];
+
+    QUrl url( sUrl );
+
+    url.setHost( hostName );
+
+    pRequest->m_mapRespHeaders[ "Location" ] = url.toString();
+
+    VERBOSE( VB_UPNP, QString( "Sending http redirect to: %1").arg( url.toString() ) );
+
+    pRequest->SendResponse();
+}

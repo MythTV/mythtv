@@ -17,6 +17,8 @@
 #include "upnpcdsmusic.h"
 #include "upnpcdsvideo.h"
 
+#include <QScriptEngine>
+
 #include "serviceHosts/mythServiceHost.h"
 #include "serviceHosts/guideServiceHost.h"
 #include "serviceHosts/contentServiceHost.h"
@@ -117,6 +119,25 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = FALSE */)
                 "Disabling UPnP");
         return;
     }
+
+    // ------------------------------------------------------------------
+    // Register Service Types with Scripting Engine
+    //
+    // -=>NOTE: We need to know the actual type at compile time for this 
+    //          to work, so it needs to be done here.  I'm still looking
+    //          into ways that we may encapsulate this in the service 
+    //          classes.
+    // ------------------------------------------------------------------
+
+
+     QScriptEngine* pEngine = m_pHttpServer->ScriptEngine();
+
+     pEngine->globalObject().setProperty("Myth"   , pEngine->scriptValueFromQMetaObject< ScriptableMyth >() );
+     pEngine->globalObject().setProperty("Guide"  , pEngine->scriptValueFromQMetaObject< ScriptableGuide>() );
+     pEngine->globalObject().setProperty("Content", pEngine->scriptValueFromQMetaObject< Content        >() );
+     pEngine->globalObject().setProperty("Dvr"    , pEngine->scriptValueFromQMetaObject< ScriptableDvr  >() );
+
+    // ------------------------------------------------------------------
 
     if (sIP == "localhost" || sIP.startsWith("127."))
     {

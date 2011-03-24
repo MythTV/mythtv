@@ -92,28 +92,18 @@ DTC::ConnectionInfo* Myth::GetConnectionInfo( const QString  &sPin )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::StringList* Myth::GetHostName( )
+QString Myth::GetHostName( )
 {
     if (!gCoreContext)
-    {
         throw( QString( "No MythCoreContext in GetHostName." ));
-    }
 
-    // ----------------------------------------------------------------------
-    // return the results of the query
-    // ----------------------------------------------------------------------
-
-    DTC::StringList *pResults = new DTC::StringList();
-
-    pResults->Values().append( gCoreContext->GetHostName() );
-
-    return pResults;
+    return gCoreContext->GetHostName();
 }
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::StringList* Myth::GetHosts( )
+QStringList Myth::GetHosts( )
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -136,21 +126,19 @@ DTC::StringList* Myth::GetHosts( )
     // return the results of the query
     // ----------------------------------------------------------------------
 
-    DTC::StringList *pResults = new DTC::StringList();
-
-    //pResults->setObjectName( "HostList" );
+    QStringList oList;
 
     while (query.next())
-        pResults->Values().append( query.value(0).toString() );
+        oList.append( query.value(0).toString() );
 
-    return pResults;
+    return oList;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::StringList *Myth::GetKeys(  ) 
+QStringList Myth::GetKeys() 
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -170,14 +158,14 @@ DTC::StringList *Myth::GetKeys(  )
     // return the results of the query
     // ----------------------------------------------------------------------
 
-    DTC::StringList *pResults = new DTC::StringList();
-
+    QStringList oResults;
+    
     //pResults->setObjectName( "KeyList" );
 
     while (query.next())
-        pResults->Values().append( query.value(0).toString() );
+        oResults.append( query.value(0).toString() );
 
-    return pResults;
+    return oResults;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -253,9 +241,9 @@ DTC::StorageGroupDirList *Myth::GetStorageGroupDirs( const QString &sGroupName,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::SuccessFail *Myth::AddStorageGroupDir( const QString &sGroupName,
-                                            const QString &sDirName, 
-                                            const QString &sHostName )
+bool Myth::AddStorageGroupDir( const QString &sGroupName,
+                               const QString &sDirName, 
+                               const QString &sHostName )
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -287,16 +275,10 @@ DTC::SuccessFail *Myth::AddStorageGroupDir( const QString &sGroupName,
         throw( QString( "Database Error executing query." ));
     }
 
-    DTC::SuccessFail *pResults = new DTC::SuccessFail();
-
     if (query.next())
     {
         if (query.value(0).toInt() > 0)
-        {
-            pResults->setResult( false );
-
-            return pResults;
-        }
+            return false;
     }
 
     query.prepare("INSERT storagegroup "
@@ -309,25 +291,21 @@ DTC::SuccessFail *Myth::AddStorageGroupDir( const QString &sGroupName,
 
     if (!query.exec())
     {
-        delete pResults;
-
         MythDB::DBError("MythAPI::AddStorageGroupDir()", query);
 
         throw( QString( "Database Error executing query." ));
     }
 
-    pResults->setResult( true );
-
-    return pResults;
+    return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::SuccessFail *Myth::RemoveStorageGroupDir( const QString &sGroupName,
-                                               const QString &sDirName, 
-                                               const QString &sHostName )
+bool Myth::RemoveStorageGroupDir( const QString &sGroupName,
+                                  const QString &sDirName, 
+                                  const QString &sHostName )
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -359,11 +337,7 @@ DTC::SuccessFail *Myth::RemoveStorageGroupDir( const QString &sGroupName,
         throw( QString( "Database Error executing query." ));
     }
 
-    DTC::SuccessFail *pResults = new DTC::SuccessFail();
-
-    pResults->setResult( true );
-
-    return pResults;
+    return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -478,21 +452,18 @@ DTC::SettingList *Myth::GetSetting( const QString &sHostName,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::SuccessFail *Myth::PutSetting( const QString &sHostName, 
-                                    const QString &sKey, 
-                                    const QString &sValue ) 
-
+bool Myth::PutSetting( const QString &sHostName, 
+                       const QString &sKey, 
+                       const QString &sValue ) 
 {
+    bool bResult = false;
+
     if (!sKey.isEmpty())
     {
-        DTC::SuccessFail *pResults = new DTC::SuccessFail();
-
         if ( gCoreContext->SaveSettingOnHost( sKey, sValue, sHostName ) )
-            pResults->setResult( true );
-        else
-            pResults->setResult( false );
+            bResult = true;
 
-        return pResults;
+        return bResult;
     }
 
     throw ( QString( "Key Required" ));

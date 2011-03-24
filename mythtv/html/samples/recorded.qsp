@@ -1,0 +1,91 @@
+<html>
+<head>
+<title>
+MythTV mythbackend Internal Web Server
+</title>
+<link rel="stylesheet"    href="/css/site.css"       type="text/css">
+<link rel="icon"          href="/images/favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+<!-- Header -->
+<div id="header">
+    <div id="header_logo">
+        <a href="/"><img src="/images/mythtv.png" class="png" width="180" height="64" border="0" alt="MythTV"></a>
+    </div>
+
+    <div id="header_title">
+    </div>
+
+    <div id="header_end">
+    </div>
+</div><!-- header -->
+
+<div id="menu-bg">
+    <div id="menu-title" align=center>
+        Setup
+    </div>
+
+    <div id="menu">
+        <ul>
+            <li><a class='menuitem' href='/samples/index.qsp'>Server Side Script</a></li>
+            <li><a class='menuitem' href='/samples/recorded.qsp'>Recorded Sample</a></li>
+        </ul>
+        <br>
+        <center><a class='menuitem' href='/'>Back To Main Menu</a></center>
+    </div>
+</div>
+
+<div id="content">
+<br>
+<h3>Sample Server Side Script Page... List of Recorded Programs<super>*</super></h3>
+<super>*</super>This would be better implemented as an ajax call.
+<hr>
+<table border="1">
+<%
+
+	var oDvr = new Dvr();
+
+	var list = oDvr.GetRecorded( true, 0, -1);
+
+	for (var nIdx=0; nIdx < list.Programs.length; nIdx++)
+	{
+		var program = list.Programs[ nIdx ];
+%>		
+  <tr>
+	<td><img src="/Content/GetPreviewImage?ChanId=<%= program.Channel.ChanId%>&StartTime=<%= ISODateString( program.StartTime ) %>" ></img></td>
+	
+	<td><%= program.StartTime %></td>
+	<td><%= ISODateString( program.StartTime ) %></td>
+	<td><%=program.Description %></td>
+  </tr>
+<%
+    } 
+
+%>
+</table>
+<% 
+%>
+</div>
+<div id="debug" > </div>
+</div> <!-- content -->
+<%
+
+function ISODateString(d)
+{ 
+  function pad(n)
+  {
+    return n<10 ? '0'+n : n
+  } 
+  return d.getFullYear()+'-'      
+   + pad(d.getMonth()+1)+'-'      
+   + pad(d.getDate())+'T'      
+   + pad(d.getHours())+':'     
+   + pad(d.getMinutes())+':'      
+   + pad(d.getSeconds())
+}
+
+%>
+</body>
+</html>

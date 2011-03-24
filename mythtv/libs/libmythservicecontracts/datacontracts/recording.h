@@ -79,6 +79,14 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
 
     public:
 
+        static void InitializeCustomTypes()
+        {
+            qRegisterMetaType< RecordingInfo  >();
+            qRegisterMetaType< RecordingInfo* >();
+        }
+
+    public:
+
         RecordingInfo(QObject *parent = 0) 
             : QObject           ( parent          ),
               m_Status          ( rsUnknown       ),
@@ -117,6 +125,7 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
 
 } // namespace DTC
 
-Q_DECLARE_METATYPE( DTC::RecordingInfo )
+Q_DECLARE_METATYPE( DTC::RecordingInfo  )
+Q_DECLARE_METATYPE( DTC::RecordingInfo* )
 
 #endif

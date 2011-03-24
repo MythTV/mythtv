@@ -36,6 +36,7 @@
 #include <QThread>
 #include <QTcpServer>
 #include <QReadWriteLock>
+#include <QScriptEngine>
 
 // MythTV headers
 #include "upnputil.h"
@@ -77,6 +78,7 @@ class UPNP_PUBLIC HttpServerExtension : public QObject
         virtual bool  ProcessRequest( HttpWorkerThread *pThread,
                                       HTTPRequest      *pRequest ) = 0;
 //        virtual bool  Uninitialize  ( ) = 0;
+
 };
 
 typedef QList<QPointer<HttpServerExtension> > HttpServerExtensionList;
@@ -119,6 +121,8 @@ class UPNP_PUBLIC HttpServer : public QTcpServer,
 
         void     DelegateRequest    ( HttpWorkerThread *pThread,
                                       HTTPRequest      *pRequest );
+
+        QScriptEngine* ScriptEngine();
 
 };
 

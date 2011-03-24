@@ -22,6 +22,8 @@
 #ifndef MYTH_H
 #define MYTH_H
 
+#include <QScriptEngine>
+
 #include "services/mythServices.h"
 
 class Myth : public MythServices
@@ -30,35 +32,112 @@ class Myth : public MythServices
 
     public:
     
-        Q_INVOKABLE Myth( QObject *parent = 0 ) {}
+        Q_INVOKABLE Myth( QObject *parent = 0 ) : MythServices( parent ) {}
 
     public:
 
         DTC::ConnectionInfo* GetConnectionInfo  ( const QString   &Pin );
 
-        DTC::StringList*    GetHostName         ( );
-        DTC::StringList*    GetHosts            ( );
-        DTC::StringList*    GetKeys             ( );
+        QString             GetHostName         ( );
+        QStringList         GetHosts            ( );
+        QStringList         GetKeys             ( );
 
         DTC::StorageGroupDirList*  GetStorageGroupDirs ( const QString   &GroupName,
                                                          const QString   &HostName );
 
-        DTC::SuccessFail*   AddStorageGroupDir  ( const QString   &GroupName,
+        bool                AddStorageGroupDir  ( const QString   &GroupName,
                                                   const QString   &DirName,
                                                   const QString   &HostName );
 
-        DTC::SuccessFail*   RemoveStorageGroupDir  ( const QString   &GroupName,
-                                                     const QString   &DirName,
-                                                     const QString   &HostName );
+        bool                RemoveStorageGroupDir( const QString   &GroupName,
+                                                   const QString   &DirName,
+                                                   const QString   &HostName );
 
         DTC::SettingList*   GetSetting          ( const QString   &HostName, 
                                                   const QString   &Key, 
                                                   const QString   &Default );
 
-        DTC::SuccessFail*   PutSetting          ( const QString   &HostName, 
+        bool                PutSetting          ( const QString   &HostName, 
                                                   const QString   &Key, 
                                                   const QString   &Value   );
-
 };
+
+// --------------------------------------------------------------------------
+// The following class wrapper is due to a limitation in Qt Script Engine.  It
+// requires all methods that return pointers to user classes that are derived from
+// QObject actually return QObject* (not the user class *).  If the user class pointer
+// is returned, the script engine treats it as a QVariant and doesn't create a
+// javascript prototype wrapper for it.
+// 
+// This class allows us to keep the rich return types in the main API class while
+// offering the script engine a class it can work with.
+// 
+// Only API Classes that return custom classes needs to implement these wrappers.
+//
+// We should continue to look for a cleaning solution to this problem.
+// --------------------------------------------------------------------------
+
+class ScriptableMyth : public QObject
+{
+    Q_OBJECT
+
+    private:
+
+        Myth    m_obj;
+
+    public:
+    
+        Q_INVOKABLE ScriptableMyth( QObject *parent = 0 ) : QObject( parent ) {}
+
+    public slots:
+
+        QObject* GetConnectionInfo  ( const QString   &Pin )
+        {
+            return m_obj.GetConnectionInfo( Pin );
+        }
+
+        QString     GetHostName() { return m_obj.GetHostName(); }
+        QStringList GetHosts   () { return m_obj.GetHosts();    }
+        QStringList GetKeys    () { return m_obj.GetKeys ();    }
+
+        QObject* GetStorageGroupDirs ( const QString   &GroupName,
+                                       const QString   &HostName )
+        {
+            return m_obj.GetStorageGroupDirs( GroupName, HostName );
+        }
+
+        bool AddStorageGroupDir ( const QString   &GroupName,
+                                  const QString   &DirName,
+                                  const QString   &HostName )
+        {
+            return m_obj.AddStorageGroupDir( GroupName, DirName, HostName );
+        }
+
+        bool RemoveStorageGroupDir  ( const QString   &GroupName,
+                                      const QString   &DirName,
+                                      const QString   &HostName )
+        {
+            return m_obj.RemoveStorageGroupDir( GroupName, DirName, HostName );
+        }
+
+        QObject* GetSetting ( const QString   &HostName, 
+                              const QString   &Key, 
+                              const QString   &Default )
+        {
+            return m_obj.GetSetting( HostName, Key, Default );
+        }
+
+        bool PutSetting( const QString   &HostName, 
+                         const QString   &Key, 
+                         const QString   &Value   )
+        {
+            return m_obj.PutSetting( HostName, Key, Value );
+        }
+};
+
+
+Q_SCRIPT_DECLARE_QMETAOBJECT( ScriptableMyth, QObject*);
+
+
 
 #endif 

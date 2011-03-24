@@ -155,6 +155,10 @@ class UPNP_PUBLIC UPnp
                                                     UPnPResultCode  eCode, 
                                                     const QString &sMsg = "" );
 
+        static void            FormatRedirectResponse( HTTPRequest   *pRequest,
+                                                       const QString &hostName );
+
+
 };
 
 #endif

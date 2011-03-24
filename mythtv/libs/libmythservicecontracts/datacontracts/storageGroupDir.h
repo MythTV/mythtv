@@ -28,6 +28,14 @@ class SERVICE_PUBLIC StorageGroupDir : public QObject
 
     public:
 
+        static void InitializeCustomTypes()
+        {
+            qRegisterMetaType< StorageGroupDir   >();
+            qRegisterMetaType< StorageGroupDir*  >();
+        }
+
+    public:
+
         StorageGroupDir(QObject *parent = 0) 
             : QObject         ( parent ),
               m_Id            ( 0      )
@@ -50,6 +58,7 @@ class SERVICE_PUBLIC StorageGroupDir : public QObject
 
 } // namespace DTC
 
-Q_DECLARE_METATYPE( DTC::StorageGroupDir )
+Q_DECLARE_METATYPE( DTC::StorageGroupDir  )
+Q_DECLARE_METATYPE( DTC::StorageGroupDir* )
 
 #endif

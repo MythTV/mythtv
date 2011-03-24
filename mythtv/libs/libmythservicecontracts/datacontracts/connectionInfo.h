@@ -34,6 +34,7 @@ namespace DTC
 class SERVICE_PUBLIC ConnectionInfo : public QObject
 {
     Q_OBJECT
+
     Q_CLASSINFO( "version"    , "1.0" );
 
     Q_PROPERTY( QObject*    Database    READ Database   )
@@ -41,6 +42,17 @@ class SERVICE_PUBLIC ConnectionInfo : public QObject
 
     PROPERTYIMP_PTR( DatabaseInfo, Database   )
     PROPERTYIMP_PTR( WOLInfo     , WOL        )
+
+    public:
+
+        static void InitializeCustomTypes()
+        {
+            qRegisterMetaType< ConnectionInfo   >();
+            qRegisterMetaType< ConnectionInfo*  >();
+
+            DatabaseInfo::InitializeCustomTypes();
+            WOLInfo     ::InitializeCustomTypes();
+        }
 
     public:
 
@@ -75,6 +87,7 @@ typedef ConnectionInfo* ConnectionInfoPtr;
 
 } // namespace DTC
 
-Q_DECLARE_METATYPE( DTC::ConnectionInfo )
+Q_DECLARE_METATYPE( DTC::ConnectionInfo  )
+Q_DECLARE_METATYPE( DTC::ConnectionInfo* )
 
 #endif

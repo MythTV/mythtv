@@ -32,12 +32,13 @@
 #include "programinfo.h"
 #include "previewgenerator.h"
 #include "backendutil.h"
+#include "httprequest.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QFileInfo* Content::GetFile( const QString &sStorageGroup, const QString &sFileName )
+QFileInfo Content::GetFile( const QString &sStorageGroup, const QString &sFileName )
 {
     QString sGroup = sStorageGroup;
 
@@ -67,7 +68,7 @@ QFileInfo* Content::GetFile( const QString &sStorageGroup, const QString &sFileN
     {
         VERBOSE( VB_UPNP, QString("GetFile - Unable to find %1.").arg(sFileName));
 
-        return NULL;
+        return QFileInfo();
     }
 
     // ----------------------------------------------------------------------
@@ -76,19 +77,19 @@ QFileInfo* Content::GetFile( const QString &sStorageGroup, const QString &sFileN
 
     if (QFile::exists( sFullFileName ))
     {
-        return new QFileInfo( sFullFileName );
+        return QFileInfo( sFullFileName );
     }
 
     VERBOSE( VB_UPNP, QString("GetFile - File Does not exist %1.").arg(sFullFileName));
 
-    return NULL;
+    return QFileInfo();
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::StringList* Content::GetFileList( const QString &sStorageGroup )
+QStringList Content::GetFileList( const QString &sStorageGroup )
 {
 
     if (sStorageGroup.isEmpty())
@@ -101,7 +102,7 @@ DTC::StringList* Content::GetFileList( const QString &sStorageGroup )
 
     QStringList      sStorageGroupDirs;
     QString          hostname    = gCoreContext->GetHostName();
-    DTC::StringList *pStringList = new DTC::StringList();
+    QStringList      oStringList;
 
     if (StorageGroup::FindDirs(sStorageGroup, hostname, &sStorageGroupDirs))
     {
@@ -129,19 +130,19 @@ DTC::StringList* Content::GetFileList( const QString &sStorageGroup )
                 }
                 else
                 */
-                pStringList->Values().append( (*fit).fileName() );
+                oStringList.append( (*fit).fileName() );
             }
         }
     }
 
-    return pStringList;
+    return oStringList;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QFileInfo* Content::GetVideoArt( int nId )
+QFileInfo Content::GetVideoArt( int nId )
 {
     VERBOSE(VB_UPNP, QString("GetVideoArt ID = %1").arg(nId));
 
@@ -158,7 +159,7 @@ QFileInfo* Content::GetVideoArt( int nId )
         MythDB::DBError("GetVideoArt ", query);
 
     if (!query.next())
-        return NULL;
+        return QFileInfo();
 
     QString sFileName = query.value(0).toString();
 
@@ -167,7 +168,7 @@ QFileInfo* Content::GetVideoArt( int nId )
     // ----------------------------------------------------------------------
 
     if (QFile::exists( sFileName ))
-        return new QFileInfo( sFileName );
+        return QFileInfo( sFileName );
 
     // ----------------------------------------------------------------------
     // Not there? Perhaps we need to look in a storage group?
@@ -180,7 +181,7 @@ QFileInfo* Content::GetVideoArt( int nId )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QFileInfo* Content::GetAlbumArt( int nId, int nWidth, int nHeight )
+QFileInfo Content::GetAlbumArt( int nId, int nWidth, int nHeight )
 {
     QString sFullFileName;
 
@@ -211,10 +212,10 @@ QFileInfo* Content::GetAlbumArt( int nId, int nWidth, int nHeight )
     }
 
     if (!QFile::exists( sFullFileName ))
-        return NULL;
+        return QFileInfo();
 
     if ((nWidth == 0) && (nHeight == 0))
-        return new QFileInfo( sFullFileName );
+        return QFileInfo( sFullFileName );
 
     QString sNewFileName = QString( "%1.%2x%3.png" )
                               .arg( sFullFileName )
@@ -226,7 +227,7 @@ QFileInfo* Content::GetAlbumArt( int nId, int nWidth, int nHeight )
     // ----------------------------------------------------------------------
 
     if (QFile::exists( sNewFileName ))
-        return new QFileInfo( sNewFileName );
+        return QFileInfo( sNewFileName );
 
     // ----------------------------------------------------------------------
     // Must generate Albumart Image, Generate Image and save.
@@ -237,7 +238,7 @@ QFileInfo* Content::GetAlbumArt( int nId, int nWidth, int nHeight )
     QImage *pImage = new QImage( sFullFileName);
 
     if (!pImage)
-        return NULL;
+        return QFileInfo();
 
     if (fAspect <= 0)
            fAspect = (float)(pImage->width()) / pImage->height();
@@ -256,14 +257,14 @@ QFileInfo* Content::GetAlbumArt( int nId, int nWidth, int nHeight )
 
     delete pImage;
 
-    return new QFileInfo( sNewFileName );
+    return QFileInfo( sNewFileName );
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QFileInfo* Content::GetPreviewImage(       int        nChanId,
+QFileInfo Content::GetPreviewImage(        int        nChanId,
                                      const QDateTime &dtStartTime,
                                            int        nWidth,    
                                            int        nHeight,   
@@ -289,7 +290,7 @@ QFileInfo* Content::GetPreviewImage(       int        nChanId,
     {
         VERBOSE(VB_IMPORTANT, QString( "GetPreviewImage: no recording for start time '%1'" )
                                  .arg( dtStartTime.toString() ));
-        return NULL;
+        return QFileInfo();
     }
 
     if ( pginfo.GetHostname() != gCoreContext->GetHostName())
@@ -298,9 +299,9 @@ QFileInfo* Content::GetPreviewImage(       int        nChanId,
                           .arg( gCoreContext->GetHostName())
                           .arg( pginfo.GetHostname() );
 
-        VERBOSE(VB_IMPORTANT, sMsg);
+        VERBOSE(VB_UPNP, sMsg);
 
-        throw sMsg;
+        throw HttpRedirectException( pginfo.GetHostname() );
     }
 
     QString sFileName = GetPlaybackURL(&pginfo);
@@ -330,7 +331,7 @@ QFileInfo* Content::GetPreviewImage(       int        nChanId,
             pginfo.SetPathname(sFileName);
 
         if (!pginfo.IsLocal())
-            return NULL;
+            return QFileInfo();
 
         PreviewGenerator *previewgen = new PreviewGenerator( &pginfo, 
                                                              QString(), 
@@ -343,7 +344,7 @@ QFileInfo* Content::GetPreviewImage(       int        nChanId,
         previewgen->deleteLater();
 
         if (!ok)
-            return NULL;
+            return QFileInfo();
     }
 
     float fAspect = 0.0;
@@ -351,7 +352,7 @@ QFileInfo* Content::GetPreviewImage(       int        nChanId,
     QImage *pImage = new QImage(sPreviewFileName);
 
     if (!pImage)
-        return NULL;
+        return QFileInfo();
 
     if (fAspect <= 0)
         fAspect = (float)(pImage->width()) / pImage->height();
@@ -359,7 +360,7 @@ QFileInfo* Content::GetPreviewImage(       int        nChanId,
     if (fAspect == 0)
     {
         delete pImage;
-        return NULL;
+        return QFileInfo();
     }
 
     bool bDefaultPixmap = (nWidth == 0) && (nHeight == 0);
@@ -388,7 +389,7 @@ QFileInfo* Content::GetPreviewImage(       int        nChanId,
     if (QFile::exists( sNewFileName ))
     {
         delete pImage;
-        return new QFileInfo( sNewFileName );
+        return QFileInfo( sNewFileName );
     }
 
     QImage img = pImage->scaled( nWidth, nHeight, Qt::IgnoreAspectRatio,
@@ -401,15 +402,15 @@ QFileInfo* Content::GetPreviewImage(       int        nChanId,
 
     delete pImage;
 
-    return new QFileInfo( sNewFileName );
+    return QFileInfo( sNewFileName );
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QFileInfo* Content::GetRecording( int              nChanId,
-                                  const QDateTime &dtStartTime )
+QFileInfo Content::GetRecording( int              nChanId,
+                                 const QDateTime &dtStartTime )
 {
     if (!dtStartTime.isValid())
         throw( "StartTime is invalid" );
@@ -426,21 +427,23 @@ QFileInfo* Content::GetRecording( int              nChanId,
                                    "failed" )
                                     .arg( nChanId )
                                     .arg( dtStartTime.toString() ));
-        return NULL;
+        return QFileInfo();
     }
 
     if ( pginfo.GetHostname() != gCoreContext->GetHostName())
     {
         // We only handle requests for local resources
 
-        QString sMsg = QString( "GetRecording - To access this "
-                                   "recording, send request to %1." )
+        QString sMsg = QString( "GetRecording: Wrong Host '%1' request from '%2'." )
+                          .arg( gCoreContext->GetHostName())
                           .arg( pginfo.GetHostname() );
 
         VERBOSE( VB_UPNP, sMsg );
-        
-        throw sMsg;
+
+        throw HttpRedirectException( pginfo.GetHostname() );
     }
+
+
 
     QString sFileName( GetPlaybackURL(&pginfo) );
 
@@ -449,16 +452,16 @@ QFileInfo* Content::GetRecording( int              nChanId,
     // ----------------------------------------------------------------------
 
     if (QFile::exists( sFileName ))
-        return new QFileInfo( sFileName );
+        return QFileInfo( sFileName );
 
-    return NULL;
+    return QFileInfo();
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QFileInfo* Content::GetMusic( int nId )
+QFileInfo Content::GetMusic( int nId )
 {
     QString sBasePath = gCoreContext->GetSetting( "MusicLocation", "");
     QString sFileName;
@@ -483,7 +486,7 @@ QFileInfo* Content::GetMusic( int nId )
         if (!query.exec())
         {
             MythDB::DBError("GetMusic()", query);
-            return NULL;
+            return QFileInfo();
         }
 
         if (query.next())
@@ -499,16 +502,16 @@ QFileInfo* Content::GetMusic( int nId )
     // ----------------------------------------------------------------------
 
     if (QFile::exists( sFileName ))
-        return new QFileInfo( sFileName );
+        return QFileInfo( sFileName );
 
-    return NULL;
+    return QFileInfo();
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QFileInfo* Content::GetVideo( int nId )
+QFileInfo Content::GetVideo( int nId )
 {
     QString sFileName;
 
@@ -526,7 +529,7 @@ QFileInfo* Content::GetVideo( int nId )
         if (!query.exec())
         {
             MythDB::DBError("GetVideo()", query);
-            return NULL;
+            return QFileInfo();
         }
 
         if (query.next())
@@ -534,11 +537,11 @@ QFileInfo* Content::GetVideo( int nId )
     }
 
     if (sFileName.isEmpty())
-        return NULL;
+        return QFileInfo();
 
     if (!QFile::exists( sFileName ))
         return GetFile( "Videos", sFileName );
 
-    return new QFileInfo( sFileName );
+    return QFileInfo( sFileName );
 }
 

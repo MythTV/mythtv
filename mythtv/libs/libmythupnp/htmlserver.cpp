@@ -91,7 +91,14 @@ bool HtmlServerExtension::ProcessRequest( HttpWorkerThread *, HTTPRequest *pRequ
         QFileInfo oInfo( m_sAbsoluteSharePath + pRequest->m_sResourceUrl );
 
         if (oInfo.isDir())
-            oInfo.setFile( oInfo.filePath() + "/index.html" );
+        {
+            QString sIndexFileName = oInfo.filePath() + "/index.qsp";
+
+            if (QFile::exists( sIndexFileName ))
+                oInfo.setFile( sIndexFileName );
+            else 
+                oInfo.setFile( oInfo.filePath() + "/index.html" );
+        }
 
         if (oInfo.exists() == true )
         {
@@ -108,9 +115,30 @@ bool HtmlServerExtension::ProcessRequest( HttpWorkerThread *, HTTPRequest *pRequ
                 if (oInfo.exists())
                 {
                     if (oInfo.isSymLink())
-                        pRequest->FormatFileResponse( oInfo.symLinkTarget() );
-                    else
-                        pRequest->FormatFileResponse( sResName );
+                        sResName = oInfo.symLinkTarget();
+
+                    // ------------------------------------------------------
+                    // Is this a Qt Server Page (File contains script)...
+                    // ------------------------------------------------------
+
+                    if (oInfo.suffix().compare( "qsp", Qt::CaseInsensitive ) == 0)
+                    {
+
+                        pRequest->m_eResponseType = ResponseTypeHTML;
+
+                        QTextStream stream( &pRequest->m_response );
+                        
+                        m_Scripting.EvaluatePage( &stream, sResName );
+
+                        return true;
+
+                    }
+
+                    // ------------------------------------------------------
+                    // Return the file.
+                    // ------------------------------------------------------
+
+                    pRequest->FormatFileResponse( sResName );
 
                     return true;
                 }

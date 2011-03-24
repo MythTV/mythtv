@@ -51,6 +51,17 @@ class SERVICE_PUBLIC GuideServices : public Service  //, public QScriptable ???
     Q_OBJECT
     Q_CLASSINFO( "version"    , "1.0" );
 
+    public:
+
+        // Must call InitializeCustomTypes for each unique Custom Type used
+        // in public slots below.
+
+        GuideServices( QObject *parent = 0 ) : Service( parent )
+        {
+            DTC::ProgramGuide::InitializeCustomTypes();
+            DTC::Program     ::InitializeCustomTypes();
+        }
+
     public slots:
 
         virtual DTC::ProgramGuide*  GetProgramGuide     ( const QDateTime &StartTime  ,
@@ -62,7 +73,7 @@ class SERVICE_PUBLIC GuideServices : public Service  //, public QScriptable ???
         virtual DTC::Program*       GetProgramDetails   ( int              ChanId,
                                                           const QDateTime &StartTime ) = 0;
 
-        virtual QFileInfo*          GetChannelIcon      ( int              ChanId,
+        virtual QFileInfo           GetChannelIcon      ( int              ChanId,
                                                           int              Width ,
                                                           int              Height ) = 0;
 };

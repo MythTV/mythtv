@@ -22,6 +22,8 @@
 #ifndef DVR_H
 #define DVR_H
 
+#include <QScriptEngine>
+
 #include "services/dvrServices.h"
 
 class Dvr : public DvrServices
@@ -43,5 +45,54 @@ class Dvr : public DvrServices
 
         DTC::EncoderList* Encoders            ( );
 };
+
+// --------------------------------------------------------------------------
+// The following class wrapper is due to a limitation in Qt Script Engine.  It
+// requires all methods that return pointers to user classes that are derived from
+// QObject actually return QObject* (not the user class *).  If the user class pointer
+// is returned, the script engine treats it as a QVariant and doesn't create a
+// javascript prototype wrapper for it.
+// 
+// This class allows us to keep the rich return types in the main API class while
+// offering the script engine a class it can work with.
+// 
+// Only API Classes that return custom classes needs to implement these wrappers.
+//
+// We should continue to look for a cleaning solution to this problem.
+// --------------------------------------------------------------------------
+
+class ScriptableDvr : public QObject
+{
+    Q_OBJECT
+
+    private:
+
+        Dvr    m_obj;
+
+    public:
+    
+        Q_INVOKABLE ScriptableDvr( QObject *parent = 0 ) : QObject( parent ) {}
+
+    public slots:
+
+        QObject* GetExpiring         ( int              StartIndex, 
+                                       int              Count      )
+        {
+            return m_obj.GetExpiring( StartIndex, Count );
+        }
+
+        QObject* GetRecorded         ( bool             Descending,
+                                       int              StartIndex,
+                                       int              Count      )
+        {
+            return m_obj.GetRecorded( Descending, StartIndex, Count );
+        }
+
+        QObject* Encoders            () { return m_obj.Encoders(); }
+
+
+};
+
+Q_SCRIPT_DECLARE_QMETAOBJECT( ScriptableDvr, QObject*);
 
 #endif 

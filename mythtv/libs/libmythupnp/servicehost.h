@@ -80,7 +80,7 @@ class UPNP_PUBLIC ServiceHost : public HttpServerExtension
     protected:
 
         virtual bool FormatResponse( HTTPRequest *pRequest, QObject   *pResults );
-        virtual bool FormatResponse( HTTPRequest *pRequest, QFileInfo *pResults );
+        virtual bool FormatResponse( HTTPRequest *pRequest, QFileInfo  oInfo    );
         virtual bool FormatResponse( HTTPRequest *pRequest, QVariant   vValue   );
 
     public:

@@ -25,6 +25,13 @@
 
 #include <QMetaClassInfo>
 
+// --------------------------------------------------------------------------
+// This version should be bumped if the serializer code is changed in a way
+// that changes the schema layout of the rendered XML.
+// --------------------------------------------------------------------------
+
+#define XML_SERIALIZER_VERSION "1.1"
+
 //////////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -62,7 +69,7 @@ QString XmlSerializer::GetContentType()
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void XmlSerializer::BeginSerialize() 
+void XmlSerializer::BeginSerialize( QString &sName ) 
 {
     m_pXmlWriter->writeStartDocument( "1.0" );
 //    m_pXmlWriter->writeStartElement( m_sRequestName + "Response" );
@@ -91,6 +98,9 @@ void XmlSerializer::BeginObject( const QString &sName, const QObject  *pObject )
 
     if (nIdx >=0)
         m_pXmlWriter->writeAttribute( "version", pMeta->classInfo( nIdx ).value() );
+
+    m_pXmlWriter->writeAttribute( "serializerVersion", XML_SERIALIZER_VERSION );
+
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -106,13 +116,16 @@ void XmlSerializer::EndObject  ( const QString &sName, const QObject  *pObject )
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void XmlSerializer::AddProperty( const QString &sName, const QVariant &vValue )
+void XmlSerializer::AddProperty( const QString       &sName, 
+                                 const QVariant      &vValue,
+                                 const QMetaObject   *pMetaParent,
+                                 const QMetaProperty *pMetaProp )
 {
     if (sName != "Description")
     {
         m_pXmlWriter->writeStartElement( sName );
 
-        RenderValue( sName, vValue );
+        RenderValue( GetContentName( sName, pMetaParent, pMetaProp ), vValue );
 
         m_pXmlWriter->writeEndElement();
     }
@@ -128,7 +141,7 @@ void XmlSerializer::RenderValue( const QString &sName, const QVariant &vValue )
 {
 
     // -----------------------------------------------------------------------
-    // See if this value is actually a child object
+    // See if this value is actually a QObject
     // -----------------------------------------------------------------------
 
     if ( vValue.canConvert< QObject* >()) 
@@ -138,7 +151,6 @@ void XmlSerializer::RenderValue( const QString &sName, const QVariant &vValue )
         SerializeObjectProperties( pObject );
         return;
     }
-
 
     // -----------------------------------------------------------------------
     // Handle QVariant special cases...
@@ -179,14 +191,19 @@ void XmlSerializer::RenderValue( const QString &sName, const QVariant &vValue )
 
 void XmlSerializer::RenderList( const QString &sName, const QVariantList &list )
 {
-    QString sItemName = GetItemName( sName );
+//    QString sItemName;
 
     QListIterator< QVariant > it( list );
 
     while (it.hasNext())
     {
-        m_pXmlWriter->writeStartElement( sItemName );
-        RenderValue( sName, it.next() );
+        QVariant vValue = it.next();
+
+//        if (sItemName.isEmpty())
+//            sItemName = GetItemName( QMetaType::typeName( vValue.userType() ) );
+
+        m_pXmlWriter->writeStartElement( sName );
+        RenderValue( sName, vValue );
         m_pXmlWriter->writeEndElement();
     }
 }
@@ -203,7 +220,7 @@ void XmlSerializer::RenderStringList( const QString &sName, const QStringList &l
 
     while (it.hasNext())
     {
-        m_pXmlWriter->writeStartElement( sItemName );
+        m_pXmlWriter->writeStartElement( "String" );
         m_pXmlWriter->writeCharacters ( it.next() );
         m_pXmlWriter->writeEndElement();
     }
@@ -238,9 +255,31 @@ void XmlSerializer::RenderMap( const QString &sName, const QVariantMap &map )
 
 QString XmlSerializer::GetItemName( const QString &sName )
 {
-    if (sName.endsWith( "s" ))
-        return sName.left( sName.length() - 1);
+    QString sTypeName( sName );
 
-    return "Value";
+    if (sName.at(0) == 'Q')
+        sTypeName = sName.mid( 1 );
+
+    sTypeName.remove( "DTC::"    );
+    sTypeName.remove( QChar('*') );
+
+    return sTypeName;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+QString XmlSerializer::GetContentName( const QString        &sName, 
+                                       const QMetaObject   *pMetaObject,
+                                       const QMetaProperty *pMetaProp )
+{
+    QString sMethodClassInfo = sName + "_type";
+
+    int nClassIdx = pMetaObject->indexOfClassInfo( sMethodClassInfo.toAscii() );
+
+    if (nClassIdx >=0)
+        return GetItemName( pMetaObject->classInfo( nClassIdx ).value() );
+
+    return sName;
+}

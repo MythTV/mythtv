@@ -81,10 +81,10 @@ function addStorageGroupDir( group, dir, host ) {
     $.post("/Myth/AddStorageGroupDir",
         { GroupName: group, DirName: dir, HostName: host},
         function(data) {
-            if (data.SuccessFail.Result == "true")
+            if (data.bool == "true")
                 result = 1;
             else
-                alert("data.SuccessFail.Result != true");
+                alert("data.bool != true");
         }, "json").error(function(data) {
             alert("Error: unable to add Storage Group Directory");
         });
@@ -103,10 +103,10 @@ function removeStorageGroupDir( group, dir, host ) {
     $.post("/Myth/RemoveStorageGroupDir",
         { GroupName: group, DirName: dir, HostName: host},
         function(data) {
-            if (data.SuccessFail.Result == "true")
+            if (data.bool == "true")
                 result = 1;
             else
-                alert("data.SuccessFail.Result != true");
+                alert("data.bool != true");
         }, "json").error(function(data) {
             alert("Error: unable to remove Storage Group Directory");
         });

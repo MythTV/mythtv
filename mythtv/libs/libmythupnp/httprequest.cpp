@@ -1297,6 +1297,8 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
     // XML Document Loaded... now parse it
     // --------------------------------------------------------------
 
+    QString sService;
+
     if (sSOAPAction.contains( '#' ))
     {
         m_sNameSpace    = sSOAPAction.section( '#', 0, 0).remove( 0, 1);
@@ -1308,6 +1310,10 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
         int nPos       = sSOAPAction.lastIndexOf( '/' );
         m_sNameSpace   = sSOAPAction.mid( 1, nPos );
         m_sMethod      = sSOAPAction.mid( nPos + 1, sSOAPAction.length() - nPos - 2  );
+
+        nPos           = m_sNameSpace.lastIndexOf( '/', -2);
+        sService       = m_sNameSpace.mid( nPos + 1, m_sNameSpace.length() - nPos - 2  );
+        m_sNameSpace   = m_sNameSpace.mid( 0, nPos );
     }
     else
     {

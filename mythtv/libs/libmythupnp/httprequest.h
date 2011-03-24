@@ -256,4 +256,41 @@ class BufferedSocketDeviceRequest : public HTTPRequest
 
 };
 
+/////////////////////////////////////////////////////////////////////////////
+// 
+/////////////////////////////////////////////////////////////////////////////
+
+class UPNP_PUBLIC HttpException
+{
+    public:
+        int     code;
+        QString msg;
+
+        HttpException( int nCode = -1, const QString &sMsg = "") 
+               : code( nCode ), msg ( sMsg  ) 
+        {}
+
+        // Needed to force a v-table.
+        virtual ~HttpException() 
+        {}
+};
+
+class UPNP_PUBLIC HttpRedirectException : public HttpException
+{
+    public:
+
+        QString hostName;
+      //int     port;
+
+        HttpRedirectException( const QString &sHostName = "", 
+                                     int      nCode     = -1, 
+                               const QString &sMsg      = "" ) 
+               : HttpException( nCode, sMsg ), hostName( sHostName )
+        {}
+
+        virtual ~HttpRedirectException() 
+        {}
+
+};
+
 #endif
