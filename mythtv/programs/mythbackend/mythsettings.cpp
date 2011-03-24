@@ -531,4 +531,5 @@ bool check_settings(MythSettingList &database_settings,
                     const QMap<QString,QString> &params)
 {
     // TODO
+    return false;
 }

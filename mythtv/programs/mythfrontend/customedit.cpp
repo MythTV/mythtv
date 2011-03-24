@@ -178,7 +178,7 @@ void CustomEdit::loadClauses()
     rule.title = tr("Match words in the title");
     rule.subtitle.clear();
     if (!m_pginfo->GetTitle().isEmpty())
-        rule.description = QString("program.title LIKE '\%%1\%' ")
+        rule.description = QString("program.title LIKE '%%1%' ")
                                    .arg(quoteTitle);
     else
         rule.description = "program.title LIKE 'CSI: %' ";
@@ -191,7 +191,7 @@ void CustomEdit::loadClauses()
     {
         QString subt = m_pginfo->GetSubtitle();
         subt.replace("\'","\'\'");
-        rule.description = QString("program.subtitle LIKE '\%%1\%' ")
+        rule.description = QString("program.subtitle LIKE '%%1%' ")
                                    .arg(subt);
     }
     else

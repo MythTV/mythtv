@@ -1316,7 +1316,7 @@ static HostComboBox *MenuTheme()
     return gc;
 }
 
-static HostComboBox __attribute__ ((unused)) *DecodeVBIFormat()
+static HostComboBox MUNUSED *DecodeVBIFormat()
 {
     QString beVBI = gCoreContext->GetSetting("VbiFormat");
     QString fmt = beVBI.toLower().left(4);
