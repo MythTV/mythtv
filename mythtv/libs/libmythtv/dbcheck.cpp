@@ -478,7 +478,7 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     if (!upgradeAllowed)
         VERBOSE(VB_IMPORTANT, "Not allowed to upgrade the database.");
 
-    // Pop up messages, questions, warnings, et c.
+    // Pop up messages, questions, warnings, etc.
     switch (DBup->PromptForUpgrade("TV", upgradeAllowed,
                                    upgradeIfNoUI, MINIMUM_DBMS_VERSION))
     {
