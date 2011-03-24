@@ -1,8 +1,6 @@
 var hostOptions = "";
 
-function hostsSelect(id) {
-    var result = "<select id='" + id + "'>";
-
+function getHostsOptionList() {
     if (hostOptions.length == 0) {
         hostOptions = "";
         $.ajaxSetup({ async: false });
@@ -14,7 +12,13 @@ function hostsSelect(id) {
         $.ajaxSetup({ async: true });
     }
 
-    result += hostOptions;
+    return hostOptions;
+}
+
+function hostsSelect(id) {
+    var result = "<select id='" + id + "'>";
+
+    result += getHostsOptionList();
 
     result += "</select>";
 

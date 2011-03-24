@@ -1,5 +1,13 @@
 <h3>Storage Groups</h3>
-Show only Local Storage Groups: <input id='sgLocalHostOnly' type='checkbox' onClick='javascript:initStorageGroups()'><br>
+<div id='sgHostSelect'></div>
+
+<script language="JavaScript" type="text/javascript">
+$("#sgHostSelect").html("Host: <select id='sgShowHost' "
+    + "onChange='javascript:initStorageGroups()'><option value='ALL'>"
+    + "Display ALL Hosts</option>" + getHostsOptionList() + "</select>");
+</script>
+<br>
+
 <!--
 <a href='javascript:addTab("#storagegrouptabs", "/setup/StorageGroups/Wizard.tab_newgroup.html", "New Group")'>Create New Storage Group</a>
 -->
