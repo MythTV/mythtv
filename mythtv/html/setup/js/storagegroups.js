@@ -13,12 +13,6 @@ function initStorageGroups() {
 
     $("#storagegrouptabs").tabs();
 
-    if ($("#sgLocalHostOnly").is(':checked')) {
-        sgLocalHostOnly = 1;
-    } else {
-        sgLocalHostOnly = 0;
-    }
-
     while (sgTabCount > 0) {
         $("#storagegrouptabs").tabs("remove", 0);
         sgTabCount--;
