@@ -44,9 +44,6 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
         return true;
     }
 
-    VERBOSE(VB_IMPORTANT, QString("HttpConfig::ProcessRequest '%1' '%2'")
-            .arg(request->m_sBaseUrl).arg(request->m_sMethod));
-
     bool handled = false;
     if (request->m_sMethod == "Save")
     {
