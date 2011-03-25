@@ -6,50 +6,25 @@ MythTV mythbackend Internal Web Server
 <link rel="stylesheet"    href="/css/site.css"       type="text/css">
 <link rel="icon"          href="/images/favicon.ico" type="image/x-icon">
 <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+<script language="JavaScript" type="text/javascript" src="/js/util.js"></script>
 <script language="JavaScript" type="text/javascript" src="/js/jquery.min.js"></script>
-<script language="JavaScript" type="text/javascript" src="/js/jquery-ui.min.js"></script>
 
 
 <script language="JavaScript" type="text/javascript">
-function loadContent(contentURL) {
-    var html = $.ajax({
-        url: contentURL,
-        async: false
-    }).responseText;
-
-    $("#content").html(html);
-}
-
-function interceptMenuClicks() {
-    $('#menu ul li a').click(function(event) {
-        event.preventDefault();
-        if ((this.href.match("/setup") == "/setup") ||
-            (this.href.match("/samples") == "/samples")) {
-            document.location = this.href;
-        } else {
-            loadContent(this.href);
-        }
-    });
-}
 
 $(document).ready(function() {
-    interceptMenuClicks();
     loadContent('/misc/overview.html');
 });
 
 </script>
 </head>
 <body>
-<!-- Header -->
+
 <div id="header">
     <div id="header_logo">
         <a href="/"><img src="/images/mythtv.png" class="png" width="180" height="64" border="0" alt="MythTV"></a>
     </div>
-    <div id="header_text">
-    </div>
-    <div id="header_end">
-    </div>
-</div><!-- header -->
+</div>
 
 <div id="menu-bg">
     <div id="menu-title" align=center>
@@ -58,16 +33,10 @@ $(document).ready(function() {
     <div id="menu">
       <ul>
         <li><a class='menuitem' href='/setup'>Setup</a></li>
-        <!-- other possible ideas
-        <li><a class='menuitem' href='/misc/upcoming.html'>Upcoming Recordings</a></li>
-        <li><a class='menuitem' href='/misc/storage.html'>Storage</a></li>
-        <li><a class='menuitem' href='/misc/jobqueue.html'>JobQueue</a></li>
-        <li><a class='menuitem' href='/misc/guidedata.html'>Guide Data</a></li>
-        -->
-        <li><a class='menuitem' href='/Status/GetStatusHTML'>Backend Status</a></li>
-        <li><a class='menuitem' href='/misc/wsdl.html'>WSDL Links</a></li>
+        <li><a class='menuitem' href="javascript:loadContent('/Status/GetStatusHTML')">Backend Status</a></li>
+        <li><a class='menuitem' href="javascript:loadContent('/misc/wsdl.html')">WSDL Links</a></li>
         <li><hr></li>
-        <li><a class='menuitem' href='/samples/index.qsp'>Sample Pages</a></li>
+        <li><a class='menuitem' href='/samples'>Sample Pages</a></li>
 
       </ul>
       <br>
