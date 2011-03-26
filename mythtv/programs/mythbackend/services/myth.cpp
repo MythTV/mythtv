@@ -469,3 +469,48 @@ bool Myth::PutSetting( const QString &sHostName,
     throw ( QString( "Key Required" ));
 }
 
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Myth::ChangePassword( const QString   &sUserName,
+                           const QString   &sOldPassword,
+                           const QString   &sNewPassword )
+{
+    bool bResult = false;
+
+    if (sUserName.isEmpty())
+    {
+        throw ( QString( "UserName not supplied when trying to change "
+                         "password." ) );
+    }
+
+    if (sOldPassword.isEmpty())
+    {
+        throw ( QString( "Old Password not supplied when trying to change "
+                         "password for '%1'." ).arg(sUserName) );
+    }
+
+    if (sNewPassword.isEmpty())
+    {
+        throw ( QString( "New Password not supplied when trying to change "
+                         "password for '%1'." ).arg(sUserName) );
+    }
+
+    if (sOldPassword !=
+        gCoreContext->GetSetting( "HTTP/Protected/Password", ""))
+    {
+        throw ( QString( "Incorrect Old Password supplied when trying to "
+                         "change password for '%1'." ).arg(sUserName) );
+    }
+
+    if (gCoreContext->SaveSettingOnHost( "HTTP/Protected/Password", sNewPassword,
+                                    QString() ) )
+    {
+        gCoreContext->ClearSettingsCache();
+        bResult = true;
+    }
+
+    return bResult;
+}
+

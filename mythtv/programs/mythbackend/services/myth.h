@@ -60,6 +60,10 @@ class Myth : public MythServices
         bool                PutSetting          ( const QString   &HostName, 
                                                   const QString   &Key, 
                                                   const QString   &Value   );
+
+        bool                ChangePassword      ( const QString   &UserName,
+                                                  const QString   &OldPassword,
+                                                  const QString   &NewPassword );
 };
 
 // --------------------------------------------------------------------------
