@@ -26,6 +26,7 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
         return false;
     }
 
+/*
     // Temporary until we get authentication enabled
     if (!getenv("MYTHHTMLSETUP"))
     {
@@ -43,7 +44,7 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
 
         return true;
     }
-
+*/
     bool handled = false;
     if (request->m_sMethod == "Save")
     {

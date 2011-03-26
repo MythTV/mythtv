@@ -103,6 +103,17 @@ static MIMETypes g_MIMETypes[] =
     { "m4a" , "audio/x-m4a"                },
 };
 
+static const char *Static401Error = 
+    "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\""
+        "\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">"
+    "<HTML>"
+      "<HEAD>"
+        "<TITLE>Error</TITLE>"
+        "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=ISO-8859-1\">"
+      "</HEAD>"
+      "<BODY><H1>401 Unauthorized.</H1></BODY>"
+    "</HTML>";
+
 static const int g_nMIMELength = sizeof( g_MIMETypes) / sizeof( MIMETypes );
 static const int g_on          = 1;
 static const int g_off         = 0;
@@ -1013,6 +1024,23 @@ bool HTTPRequest::ParseRequest()
             return false;
         }
 
+        if (IsUrlProtected( m_sBaseUrl ))
+        {
+            if (!Authenticated())
+            {
+                m_eResponseType   = ResponseTypeHTML;
+                m_nResponseStatus = 401;
+                m_mapRespHeaders[ "WWW-Authenticate" ] = "Basic realm=\"MythTv\"";
+
+                m_response.write( Static401Error );
+
+                SendResponse();
+
+                return true;
+            }
+        }
+
+
         bSuccess = true;
 
         SetContentType( m_mapHeaders[ "content-type" ] );
@@ -1409,6 +1437,61 @@ QString HTTPRequest::Encode(const QString &sIn)
     //VERBOSE(VB_UPNP, QString("HTTPRequest::Encode Output : %1").arg(sStr));
     return sStr;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool HTTPRequest::IsUrlProtected( const QString &sBaseUrl )
+{
+    QString sProtected = UPnp::g_pConfig->GetValue( "HTTP/Protected/Urls", "/setup" );
+
+    QStringList oList = sProtected.split( ';' );
+
+    for( int nIdx = 0; nIdx < oList.count(); nIdx++)
+    {
+        if (sBaseUrl.startsWith( oList[nIdx], Qt::CaseInsensitive ))
+            return true;
+    }
+
+    return false;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool HTTPRequest::Authenticated()
+{
+    QStringList oList = m_mapHeaders[ "authorization" ].split( ' ' );
+
+    if (oList.count() < 2)
+        return false;
+
+    if (oList[0].compare( "basic", Qt::CaseInsensitive ) != 0)
+        return false;
+
+    QString sCredentials = QByteArray::fromBase64( oList[1].toUtf8() );
+    
+    oList = sCredentials.split( ':' );
+
+    if (oList.count() < 2)
+        return false;
+
+    QString sUserName = UPnp::g_pConfig->GetValue( "HTTP/Protected/UserName", "admin" );
+    
+
+    if (oList[0].compare( sUserName, Qt::CaseInsensitive ) != 0)
+        return false;
+
+    QString sPassword = UPnp::g_pConfig->GetValue( "HTTP/Protected/Password", "mythtv" );
+
+    if (oList[1] != sPassword )
+        return false;
+    
+    return true;
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

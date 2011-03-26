@@ -173,6 +173,8 @@ class UPNP_PUBLIC HTTPRequest
         qint64          SendData            ( QIODevice *pDevice, qint64 llStart, qint64 llBytes );
         qint64          SendFile            ( QFile &file, qint64 llStart, qint64 llBytes );
 
+        bool            IsUrlProtected      ( const QString &sBaseUrl );
+        bool            Authenticated       ();
 
     public:
         

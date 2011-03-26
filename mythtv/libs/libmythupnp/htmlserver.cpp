@@ -69,7 +69,7 @@ bool HtmlServerExtension::ProcessRequest( HttpWorkerThread *, HTTPRequest *pRequ
     {
         if ( pRequest->m_sBaseUrl.startsWith("/") == false)
             return( false );
-
+/*
         // Temporary until we get authentication enabled
         if ((pRequest->m_sResourceUrl.startsWith("/setup")) &&
             (!getenv("MYTHHTMLSETUP")))
@@ -87,7 +87,7 @@ bool HtmlServerExtension::ProcessRequest( HttpWorkerThread *, HTTPRequest *pRequ
                     .arg(pRequest->m_sResourceUrl));
             return true;
         }
-
+*/
         QFileInfo oInfo( m_sAbsoluteSharePath + pRequest->m_sResourceUrl );
 
         if (oInfo.isDir())
