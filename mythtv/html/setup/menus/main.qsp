@@ -1,0 +1,24 @@
+    <div id="menu-title" align=center>
+        Setup
+    </div>
+
+    <div id="menu">
+        <ul>
+            <li><a class='menuitem' href="javascript:loadScreen('/setup/menus/wizard.html', '/setup/wizard.html', '/setup/js/wizard.js')">Setup Wizard</a></li>
+            <li><a class='menuitem' href="javascript:loadScreen('/setup/menus/advanced.html')">Advanced Setup</a></li>
+<%
+    var myth = new Myth();
+    var sList = myth.GetSetting( '', 'EnableWebSetupDevMode', '');
+
+    if (sList.Settings['EnableWebSetupDevMode'] == 1)
+    {
+        os.write("<li><a class='menuitem' href=\"javascript:loadScreen('/setup/menus/expert.html', '/setup/expert.html')\">Expert/Dev Setup</a></li>");
+    }
+%>
+            <li><hr></li>
+            <li><a class='menuitem' href="javascript:loadSetupPage('password')">Change Password</a></li>
+        </ul>
+        <br>
+        <center><a class='menuitem' href='/'>Back To Main Menu</a></center>
+    </div>
+</div>

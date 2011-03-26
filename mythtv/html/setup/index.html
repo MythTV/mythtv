@@ -5,6 +5,7 @@ MythTV Setup
 </title>
 <link rel="stylesheet" type="text/css" href="/css/site.css">
 <link rel="stylesheet" type="text/css" href="/css/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="/setup/css/setup.css">
 
 <link rel="icon"          href="/images/favicon.ico" type="image/x-icon">
 <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
@@ -16,8 +17,9 @@ MythTV Setup
 <script language="JavaScript" type="text/javascript">
 
 $(document).ready(function() {
-    loadMenu('/setup/menus/main.html');
+    loadMenu('/setup/menus/main.qsp');
     loadContent('/setup/overview.html');
+    showHostName();
 });
 
 </script>
@@ -31,6 +33,8 @@ $(document).ready(function() {
 </div>
 
 <div id="menu-bg">
+</div>
+<div id="hostname">
 </div>
 
 <div id="content">

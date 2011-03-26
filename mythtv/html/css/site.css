@@ -74,6 +74,16 @@
         padding:            6px 200px 0 200px;
     }
 
+    #hostname {
+        position:           fixed;
+        bottom:             10px;
+        left:               0px;
+        width:              200px;
+        height:             20;
+        color:              #26c;
+        text-align:         center;
+    }
+
     #menu-bg {
         position:           fixed;
         top:                40px;
