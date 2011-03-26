@@ -1030,7 +1030,7 @@ bool HTTPRequest::ParseRequest()
             {
                 m_eResponseType   = ResponseTypeHTML;
                 m_nResponseStatus = 401;
-                m_mapRespHeaders[ "WWW-Authenticate" ] = "Basic realm=\"MythTv\"";
+                m_mapRespHeaders[ "WWW-Authenticate" ] = "Basic realm=\"MythTV\"";
 
                 m_response.write( Static401Error );
 

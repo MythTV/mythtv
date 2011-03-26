@@ -32,7 +32,7 @@
 
 MythXMLClient::MythXMLClient( const QUrl &url, bool bInQtThread )
               :   SOAPClient( url,
-                              "urn:schemas-mythtv-org:service:MythTv:1",
+                              "urn:schemas-mythtv-org:service:MythTV:1",
                               "/Myth")
 {
     m_bInQtThread = bInQtThread;
