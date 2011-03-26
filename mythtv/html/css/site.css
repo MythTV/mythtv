@@ -59,6 +59,21 @@
         height:             36px;
     }
 
+    #header_warning {
+        font-size:          24px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        color:              red;
+        position:           fixed;
+        top:                0px;
+        left:               0px;
+        right:              0px;
+        height:             38px;
+        z-index:            98;
+        text-align:         center;
+        padding:            6px 200px 0 200px;
+	}
+
     #header_title {
         font-size:          24px;
         font-family:        sans-serif;

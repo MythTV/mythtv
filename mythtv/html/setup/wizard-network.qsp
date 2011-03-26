@@ -15,4 +15,7 @@
     <tr><th align=right>Security PIN:</th>
         <td><input id='SecurityPin' type='password' size=10></td></tr>
 </table>
+<hr>
+If the setting you are looking for is not available here, you can go to
+the <a href="javascript:loadScreen('/setup/menus/advanced.html', '/Config/General', '/setup/js/Config.js')">Advanced General Setup Screen</a>
 </div>
