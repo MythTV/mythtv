@@ -27,6 +27,7 @@
 #include <QFileInfo>
 #include <QTextCodec>
 #include <QStringList>
+#include <QCryptographicHash>
 
 #include "mythconfig.h"
 #if !( CONFIG_DARWIN || CONFIG_CYGWIN || defined(__FreeBSD__) || defined(USING_MINGW))
@@ -1484,9 +1485,16 @@ bool HTTPRequest::Authenticated()
     if (oList[0].compare( sUserName, Qt::CaseInsensitive ) != 0)
         return false;
 
-    QString sPassword = UPnp::g_pConfig->GetValue( "HTTP/Protected/Password", "mythtv" );
+    QString sPassword = UPnp::g_pConfig->GetValue( "HTTP/Protected/Password", 
+                                 /* mythtv */ "8hDRxR1+E/n3/s3YUOhF+lUw7n4=" );
 
-    if (oList[1] != sPassword )
+    QCryptographicHash crypto( QCryptographicHash::Sha1 );
+
+    crypto.addData( oList[1].toUtf8() );
+
+    QString sPasswordHash( crypto.result().toBase64() );
+
+    if (sPasswordHash != sPassword )
         return false;
     
     return true;

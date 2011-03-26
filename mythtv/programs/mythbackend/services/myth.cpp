@@ -22,6 +22,7 @@
 #include "myth.h"
 
 #include <QDir>
+#include <QCryptographicHash>
 
 #include "mythcorecontext.h"
 #include "storagegroup.h"
@@ -497,14 +498,22 @@ bool Myth::ChangePassword( const QString   &sUserName,
                          "password for '%1'." ).arg(sUserName) );
     }
 
-    if (sOldPassword !=
-        gCoreContext->GetSetting( "HTTP/Protected/Password", ""))
+    QCryptographicHash crypto( QCryptographicHash::Sha1 );
+
+    crypto.addData( sOldPassword.toUtf8() );
+
+    QString sPasswordHash( crypto.result().toBase64() );
+
+    if ( sPasswordHash != gCoreContext->GetSetting( "HTTP/Protected/Password", ""))
     {
         throw ( QString( "Incorrect Old Password supplied when trying to "
                          "change password for '%1'." ).arg(sUserName) );
     }
 
-    if (gCoreContext->SaveSettingOnHost( "HTTP/Protected/Password", sNewPassword,
+    crypto.reset();
+    crypto.addData( sNewPassword.toUtf8() );
+
+    if (gCoreContext->SaveSettingOnHost( "HTTP/Protected/Password", crypto.result().toBase64(),
                                     QString() ) )
     {
         gCoreContext->ClearSettingsCache();
