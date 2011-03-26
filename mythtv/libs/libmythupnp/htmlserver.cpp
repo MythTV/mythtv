@@ -103,7 +103,10 @@ bool HtmlServerExtension::ProcessRequest( HttpWorkerThread *, HTTPRequest *pRequ
                     // Is this a Qt Server Page (File contains script)...
                     // ------------------------------------------------------
 
-                    if (oInfo.suffix().compare( "qsp", Qt::CaseInsensitive ) == 0)
+                    QString sSuffix = oInfo.suffix();
+
+                    if ((sSuffix.compare( "qsp", Qt::CaseInsensitive ) == 0) ||
+                        (sSuffix.compare( "qjs", Qt::CaseInsensitive ) == 0)) 
                     {
                         pRequest->m_eResponseType = ResponseTypeHTML;
 

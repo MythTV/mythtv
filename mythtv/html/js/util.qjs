@@ -1,6 +1,9 @@
-var gHostName = "";
+<% var myth = new Myth(); %>
+
+var gHostName = "<%= myth.GetHostName() %>";
 
 function getHostName() {
+/*
     if (gHostName.length == 0) {
         $.ajaxSetup({ async: false });
         $.post("/Myth/GetHostName",
@@ -11,7 +14,7 @@ function getHostName() {
             });
         $.ajaxSetup({ async: true });
     }
-
+ */
     return gHostName;
 }
 
