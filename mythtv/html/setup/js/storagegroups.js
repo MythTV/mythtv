@@ -4,8 +4,11 @@ var sgTabCount = 0;
 
 function appendTabRow(tabID, id, group, host, dir) {
     var rowNum = $('#sgtable-' + tabID + ' tr').length;
+    var altText;
+    if ((rowNum/2) % 1 == 0)
+        altText = "class='alt' ";
     var rowID = "sgtable-" + tabID + "-" + rowNum;
-    $("#sgtable-" + tabID + " tr:last").after("<tr id='" + rowID + "'><td>" + id +"</td><td>" + host + "</td><td>" + dir + "</td><td><a href=\"javascript:removeStorageGroupTableRow(" + tabID + ", '" + rowID + "')\">Delete</a></tr>");
+    $("#sgtable-" + tabID + " tr:last").after("<tr " + altText + "id='" + rowID + "'><td>" + id +"</td><td>" + host + "</td><td>" + dir + "</td><td><a href=\"javascript:removeStorageGroupTableRow(" + tabID + ", '" + rowID + "')\">Delete</a></tr>");
 }
 
 function initStorageGroups() {
@@ -36,7 +39,7 @@ function initStorageGroups() {
                 sgTabIDs[value.GroupName] = sgTabID;
                 sgTabNames[sgTabID] = value.GroupName;
                 $("#storagegrouptabs").tabs("add", "#sgtabs-" + sgTabID, value.GroupName, sgTabID);
-                $("#sgtabs-" + sgTabID).html("<div id='sgtabs-" + sgTabID + "-add'><a href='javascript:addDir(" + sgTabID + ")'>Add Directory</a></div><div id='sgtabs-" + sgTabID + "-edit' style='display: none'><b>Adding new Storage Group Directory</b><br><table border=0 cellpadding=2 cellspacing=2><tr><th align=right>Host:</th><td>" + hostsSelect("sgtabs-" + sgTabID + "-edit-hostname") + "</td></tr><tr><th align=right>New Directory:</th><td><input id='sgtabs-" + sgTabID + "-edit-dirname' size=40><input type=button onClick='javascript:browseForNewDir(" + sgTabID + ")' value='Browse'><input type=hidden id='sgtabs-" + sgTabID + "-edit-groupname' value='" + value.GroupName + "'></td></tr><tr><td colspan=2><a href='javascript:saveDir(" + sgTabID + ")'>Save</a> <a href='javascript:cancelDir(" + sgTabID + ")'>Cancel</a></td></tr></table><hr></div><table id='sgtable-" + sgTabID + "' border=1 cellpadding=4 cellspacing=0 width='100%'><th>DirID</th><th>Host Name</th><th>Dir Name</th><th>Actions</th></tr></table><br><a href='javascript:deleteStorageGroup(" + sgTabID + ")'>Delete Storage Group</a>");
+                $("#sgtabs-" + sgTabID).html("<div id='sgtabs-" + sgTabID + "-add'><a href='javascript:addDir(" + sgTabID + ")'>Add Directory</a></div><div id='sgtabs-" + sgTabID + "-edit' style='display: none'><b>Adding new Storage Group Directory</b><br><table border=0 cellpadding=2 cellspacing=2><tr><th align=right>Host:</th><td>" + hostsSelect("sgtabs-" + sgTabID + "-edit-hostname") + "</td></tr><tr><th align=right>New Directory:</th><td><input id='sgtabs-" + sgTabID + "-edit-dirname' size=40><input type=button onClick='javascript:browseForNewDir(" + sgTabID + ")' value='Browse'><input type=hidden id='sgtabs-" + sgTabID + "-edit-groupname' value='" + value.GroupName + "'></td></tr><tr><td colspan=2><a href='javascript:saveDir(" + sgTabID + ")'>Save</a> <a href='javascript:cancelDir(" + sgTabID + ")'>Cancel</a></td></tr></table><hr></div><table id='sgtable-" + sgTabID + "' border=1 cellpadding=4 cellspacing=0 width='100%'><th>DirID</th><th>Host Name</th><th>Directory Path</th><th>Actions</th></tr></table><br><a href='javascript:deleteStorageGroup(" + sgTabID + ")'>Delete Storage Group</a>");
             }
 
             appendTabRow(sgTabID, value.Id, value.GroupNme, value.HostName, value.DirName);

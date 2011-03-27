@@ -172,3 +172,45 @@
         padding-top: 6em;
     }
 
+    table
+    {
+        width:100%;
+        border-collapse:collapse;
+    }
+
+    table td, table th
+    {
+        font-size:1.2em;
+        border:1px solid #E4D6CD;
+        padding:7px 7px 2px 7px;
+    }
+
+    table th
+    {
+
+        font-size:          14px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+
+        text-align:center;
+        padding-top:5px;
+        padding-bottom:4px;
+        background-color:#004570;
+        color:#fff;
+    }
+
+    table tr td
+    {
+        font-size:          14px;
+        font-family:        sans-serif;
+        color:#000;
+    }
+
+    table tr.alt td
+    {
+        font-size:          14px;
+        font-family:        sans-serif;
+        color:#000;
+        background-color:#EFEFFF;
+    }
+
