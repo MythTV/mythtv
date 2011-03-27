@@ -1,6 +1,6 @@
 <div id='wizard-network' class='wizardtab'>
-<input type=button value='Prev' onClick='javascript:$("#wizardtabs").tabs("select", "#ui-tabs-1")'>
-<input type=button value='Next' onClick='javascript:$("#wizardtabs").tabs("select", "#ui-tabs-3")'>
+<input type=button value='Prev' onClick='javascript:$("#wizardtabs").tabs("select", 0)'>
+<input type=button value='Next' onClick='javascript:$("#wizardtabs").tabs("select", 2)'>
 <h2>Network Setup</h2>
 <table border=0 cellpadding=2 cellspacing=2>
     <tr><th align=right>Master Backend:</th><td id='MasterServerIP'><b>
