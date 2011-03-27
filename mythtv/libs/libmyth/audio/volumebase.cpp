@@ -10,9 +10,9 @@ using namespace std;
 #include "mythcorecontext.h"
 
 VolumeBase::VolumeBase() :
-    internal_vol(false), volume(80), 
-    current_mute_state(kMuteOff)
+    volume(80), current_mute_state(kMuteOff)
 {
+    internal_vol = gCoreContext->GetNumSetting("MythControlsVolume", 0);
     swvol = swvol_setting =
         (gCoreContext->GetSetting("MixerDevice", "default").toLower() == "software");
 }
