@@ -244,7 +244,7 @@ AudioOutputSettings* AudioOutputBase::GetOutputSettingsUsers(bool digital)
 bool AudioOutputBase::CanPassthrough(int samplerate, int channels,
                                      int codec, int profile) const
 {
-    bool ret = !internal_vol;;
+    bool ret = !internal_vol;
     DigitalFeature arg = FEATURE_NONE;
 
     switch(codec)
@@ -287,7 +287,7 @@ bool AudioOutputBase::CanPassthrough(int samplerate, int channels,
     // do the downmix if required
     ret &= max_channels >= 6 && channels > 2;
     // Stereo content will always be decoded so it can later be upmixed
-    // unless audio is configured for stereoo. We can passthrough otherwise
+    // unless audio is configured for stereo. We can passthrough otherwise
     ret |= max_channels == 2;
 
     return ret;
@@ -548,7 +548,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     killaudio = pauseaudio = false;
     was_paused = true;
-    internal_vol = gCoreContext->GetNumSetting("MythControlsVolume", 0);
 
     // Don't try to do anything if audio hasn't been
     // initialized yet (e.g. rubbish was provided)
