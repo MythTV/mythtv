@@ -423,6 +423,12 @@ int Transcode::TranscodeFile(
         return REENCODE_ERROR;
     }
 
+    if (AudioTrackNo > -1)
+    {
+        VERBOSE(VB_GENERAL, QString("Set audiotrack number to %1").arg(AudioTrackNo));
+        player->GetDecoder()->SetTrack(kTrackTypeAudio, AudioTrackNo);
+    }
+
     long long total_frame_count = player->GetTotalFrameCount();
     long long new_frame_count = total_frame_count;
     if (honorCutList && m_proginfo)
@@ -735,12 +741,6 @@ int Transcode::TranscodeFile(
         if (player_ctx)
             delete player_ctx;
         return REENCODE_ERROR;
-    }
-
-    if (AudioTrackNo > -1)
-    {
-        VERBOSE(VB_GENERAL, QString("Set audiotrack number to %1").arg(AudioTrackNo));
-        player->GetDecoder()->SetTrack(kTrackTypeAudio, AudioTrackNo);
     }
 
     int vidSize = 0;
