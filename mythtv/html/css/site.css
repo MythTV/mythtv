@@ -214,3 +214,13 @@
         background-color:#EFEFFF;
     }
 
+    table td.invisible
+    {
+        display:none;
+    }
+
+    table th.invisible
+    {
+        display:none;
+    }
+
