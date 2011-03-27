@@ -560,19 +560,24 @@ bool DBUtil::DoBackup(const QString &backupScript, QString &filename)
     QString  backupFilename = CreateBackupFilename(dbParams.dbName + "-" +
                                                    dbSchemaVer, ".sql");
     QString      scriptArgs = gCoreContext->GetSetting("BackupDBScriptArgs");
+    QString rotate = "rotate=-1";
     if (!scriptArgs.isEmpty())
+    {
         scriptArgs.prepend(" ");
+        if (scriptArgs.contains("rotate", Qt::CaseInsensitive))
+            rotate = "";
+    }
 
 
     QString privateinfo =
         QString("DBHostName=%1\nDBPort=%2\n"
                 "DBUserName=%3\nDBPassword=%4\n"
                 "DBName=%5\nDBSchemaVer=%6\n"
-                "DBBackupDirectory=%7\nDBBackupFilename=%8\n")
+                "DBBackupDirectory=%7\nDBBackupFilename=%8\n%9\n")
         .arg(dbParams.dbHostName).arg(dbParams.dbPort)
         .arg(dbParams.dbUserName).arg(dbParams.dbPassword)
         .arg(dbParams.dbName).arg(dbSchemaVer)
-        .arg(backupDirectory).arg(backupFilename);
+        .arg(backupDirectory).arg(backupFilename).arg(rotate);
     QString tempDatabaseConfFile = QString::null;
     bool hastemp = CreateTemporaryDBConf(privateinfo, tempDatabaseConfFile);
     if (!hastemp)
