@@ -3,18 +3,6 @@
 var gHostName = "<%= myth.GetHostName() %>";
 
 function getHostName() {
-/*
-    if (gHostName.length == 0) {
-        $.ajaxSetup({ async: false });
-        $.post("/Myth/GetHostName",
-            function(data) {
-                gHostName = data.QString;
-            }, "json").error(function(data) {
-                alert("Error: unable to retrieve backend hostname");
-            });
-        $.ajaxSetup({ async: true });
-    }
- */
     return gHostName;
 }
 
