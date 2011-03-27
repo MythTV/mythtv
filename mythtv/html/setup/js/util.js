@@ -29,18 +29,3 @@ function setupPageName(path) {
     return basename(path).replace( /\\/g, '/').replace( /\.[^\.]$/, '' );
 }
 
-/////////////////////////////////////////////////////////////////////////
-var serverHostName = "";
-
-function getServerHostName() {
-    if (serverHostName.length == 0) {
-        $.ajaxSetup({ async: false });
-        $.getJSON("/Myth/GetHostName", function(data) {
-            serverHostName = data.StringList.Values[0];
-        });
-        $.ajaxSetup({ async: true });
-    }
-
-    return serverHostName;
-}
-
