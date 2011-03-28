@@ -280,8 +280,8 @@ static void push_onto_del(QStringList &list, const ProgramInfo &pginfo)
     list.clear();
     list.push_back(QString::number(pginfo.GetChanID()));
     list.push_back(pginfo.GetRecordingStartTime(ISODate));
-    list.push_back(false /* force Delete */);
-    list.push_back(false); /* forget history */
+    list.push_back(QString() /* force Delete */);
+    list.push_back(QString()); /* forget history */
 }
 
 static bool extract_one_del(
