@@ -46,6 +46,11 @@ class UPNP_PUBLIC HtmlServerExtension : public HttpServerExtension
                  HtmlServerExtension( const QString sSharePath);
         virtual ~HtmlServerExtension( );
 
+        // Special case, this extension is called if no other extension
+        // processes the request.  
+
+        virtual QStringList GetBasePaths() { return QStringList(); }
+
         bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
 
         QScriptEngine* ScriptEngine()

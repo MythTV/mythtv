@@ -39,6 +39,8 @@ class InternetContent : public HttpServerExtension
                  InternetContent( const QString &sSharePath);
         virtual ~InternetContent();
 
+        virtual QStringList GetBasePaths();
+
         bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
 
 };

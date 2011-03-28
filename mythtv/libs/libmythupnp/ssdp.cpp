@@ -575,6 +575,18 @@ SSDPMethod SSDPExtension::GetMethod( const QString &sURI )
 //
 /////////////////////////////////////////////////////////////////////////////
 
+QStringList SSDPExtension::GetBasePaths() 
+{
+    // -=>TODO: This is very inefficient... should look into making 
+    //          it a unique path.
+
+    return QStringList( "/" );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 bool SSDPExtension::ProcessRequest( HttpWorkerThread *, HTTPRequest *pRequest )
 {
     if (pRequest)
