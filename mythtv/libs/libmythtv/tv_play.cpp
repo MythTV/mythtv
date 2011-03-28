@@ -386,8 +386,8 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
                     mctx->player->EventLoop();
                     mctx->player->VideoLoop();
                 }
+                mctx->UnlockDeletePlayer(__FILE__, __LINE__);
             }
-            mctx->UnlockDeletePlayer(__FILE__, __LINE__);
             tv->ReturnPlayerLock(mctx);
         }
 
