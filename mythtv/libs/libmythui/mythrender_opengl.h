@@ -101,8 +101,9 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     static MythRenderOpenGL* Create(const QGLFormat& format,
                                     QPaintDevice* device = NULL);
 
-    MythRenderOpenGL(const QGLFormat& format, QPaintDevice* device);
-    MythRenderOpenGL(const QGLFormat& format);
+    MythRenderOpenGL(const QGLFormat& format, QPaintDevice* device,
+                     RenderType type = kRenderUnknown);
+    MythRenderOpenGL(const QGLFormat& format, RenderType type = kRenderUnknown);
     virtual ~MythRenderOpenGL();
 
     virtual void makeCurrent();

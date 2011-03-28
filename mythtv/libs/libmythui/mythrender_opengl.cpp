@@ -57,13 +57,14 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QGLFormat& format, QPaintDevice
 #endif
 }
 
-MythRenderOpenGL::MythRenderOpenGL(const QGLFormat& format, QPaintDevice* device)
-  : QGLContext(format, device)
+MythRenderOpenGL::MythRenderOpenGL(const QGLFormat& format, QPaintDevice* device,
+                                   RenderType type)
+  : QGLContext(format, device), MythRender(type)
 {
 }
 
-MythRenderOpenGL::MythRenderOpenGL(const QGLFormat& format)
-  : QGLContext(format)
+MythRenderOpenGL::MythRenderOpenGL(const QGLFormat& format, RenderType type)
+  : QGLContext(format), MythRender(type)
 {
 }
 

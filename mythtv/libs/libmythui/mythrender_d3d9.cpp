@@ -188,7 +188,8 @@ void* MythRenderD3D9::ResolveAddress(const char* lib, const char* proc)
 }
 
 MythRenderD3D9::MythRenderD3D9(void)
-  : m_d3d(NULL), m_rootD3DDevice(NULL),
+  : MythRender(kRenderDirect3D9),
+    m_d3d(NULL), m_rootD3DDevice(NULL),
     m_adaptor_fmt(D3DFMT_UNKNOWN),
     m_videosurface_fmt(D3DFMT_UNKNOWN),
     m_surface_fmt(D3DFMT_UNKNOWN), m_texture_fmt(D3DFMT_A8R8G8B8),
