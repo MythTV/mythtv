@@ -1,6 +1,9 @@
 #ifndef MYTH_MEDIA_MONITOR_UNIX_H
 #define MYTH_MEDIA_MONITOR_UNIX_H
 
+#define DEFAULT_DVD "/dev/dvd"
+#define DEFAULT_CD  "/dev/cdrom"
+
 class MediaMonitorUnix : public MediaMonitor
 {
   public:
