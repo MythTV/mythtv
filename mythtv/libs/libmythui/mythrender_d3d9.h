@@ -8,6 +8,7 @@
 
 #include "mythimage.h"
 #include "mythuiexp.h"
+#include "mythrender_base.h"
 
 #ifdef USING_DXVA2
 #include "dxva2api.h"
@@ -57,7 +58,7 @@ class MUI_PUBLIC D3D9Locker
     MythRenderD3D9 *m_render;
 };
 
-class MUI_PUBLIC MythRenderD3D9
+class MUI_PUBLIC MythRenderD3D9 : public MythRender
 {
   public:
     static void* ResolveAddress(const char* lib, const char* proc);
