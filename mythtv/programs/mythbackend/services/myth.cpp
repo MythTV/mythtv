@@ -25,6 +25,7 @@
 #include <QCryptographicHash>
 
 #include "mythcorecontext.h"
+#include "mythdbcon.h"
 #include "storagegroup.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -519,6 +520,32 @@ bool Myth::ChangePassword( const QString   &sUserName,
         gCoreContext->ClearSettingsCache();
         bResult = true;
     }
+
+    return bResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Myth::TestDBSettings( const QString &sHostName,
+                           const QString &sUserName,
+                           const QString &sPassword,
+                           const QString &sDBName,
+                           int   dbPort)
+{
+    bool bResult = false;
+
+    QString db("mythconverg");
+    int port = 3306;
+
+    if (!sDBName.isEmpty())
+        db = sDBName;
+
+    if (dbPort != 0)
+        port = dbPort;
+
+    bResult = TestDatabase(sHostName, sUserName, sPassword, db, port);
 
     return bResult;
 }

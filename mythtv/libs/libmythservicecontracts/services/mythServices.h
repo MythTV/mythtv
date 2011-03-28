@@ -55,6 +55,7 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
     Q_CLASSINFO( "AddStorageGroupDir_Method",    "POST" )
     Q_CLASSINFO( "RemoveStorageGroupDir_Method", "POST" )
     Q_CLASSINFO( "ChangePassword_Method",        "POST" )
+    Q_CLASSINFO( "TestDBSettings_Method",        "POST" )
 
     public:
 
@@ -87,17 +88,23 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
                                                            const QString   &DirName,
                                                            const QString   &HostName ) = 0;
 
-        virtual DTC::SettingList*   GetSetting          ( const QString   &HostName, 
-                                                          const QString   &Key, 
+        virtual DTC::SettingList*   GetSetting          ( const QString   &HostName,
+                                                          const QString   &Key,
                                                           const QString   &Default ) = 0;
 
-        virtual bool                PutSetting          ( const QString   &HostName, 
-                                                          const QString   &Key, 
+        virtual bool                PutSetting          ( const QString   &HostName,
+                                                          const QString   &Key,
                                                           const QString   &Value   ) = 0;
 
         virtual bool                ChangePassword      ( const QString   &UserName,
                                                           const QString   &OldPassword,
                                                           const QString   &NewPassword ) = 0;
+
+        virtual bool                TestDBSettings      ( const QString &HostName,
+                                                          const QString &UserName,
+                                                          const QString &Password,
+                                                          const QString &DBName,
+                                                          int   dbPort) = 0;
 };
 
 #endif

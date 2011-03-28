@@ -19,6 +19,45 @@
 
 static const uint kPurgeTimeout = 60 * 60;
 
+bool TestDatabase(QString dbHostName,
+                  QString dbUserName,
+                  QString dbPassword,
+                  QString dbName,
+                  int dbPort)
+{
+    bool ret = false;
+
+    if (dbHostName.isEmpty() || dbUserName.isEmpty())
+        return ret;
+
+    MSqlDatabase *db = new MSqlDatabase("dbtest");
+
+    if (!db)
+        return ret;
+
+    DatabaseParams dbparms;
+    dbparms.dbName = dbName;
+    dbparms.dbUserName = dbUserName;
+    dbparms.dbPassword = dbPassword;
+    dbparms.dbHostName = dbHostName;
+    dbparms.dbPort = dbPort;
+
+    // Just use some sane defaults for these values
+    dbparms.wolEnabled = false;
+    dbparms.wolReconnect = 1;
+    dbparms.wolRetry = 3;
+    dbparms.wolCommand = QString();
+
+    db->SetDBParams(dbparms);
+
+    ret = db->OpenDatabase(true);
+
+    delete db;
+    db = NULL;
+
+    return ret;
+}
+
 MSqlDatabase::MSqlDatabase(const QString &name)
 {
     m_name = name;
@@ -55,7 +94,7 @@ bool MSqlDatabase::isOpen()
     return false;
 }
 
-bool MSqlDatabase::OpenDatabase()
+bool MSqlDatabase::OpenDatabase(bool skipdb)
 {
     if (!m_db.isValid())
     {
@@ -68,44 +107,45 @@ bool MSqlDatabase::OpenDatabase()
 
     if (!m_db.isOpen())
     {
-        DatabaseParams dbparms = GetMythDB()->GetDatabaseParams();
-        m_db.setDatabaseName(dbparms.dbName);
-        m_db.setUserName(dbparms.dbUserName);
-        m_db.setPassword(dbparms.dbPassword);
-        m_db.setHostName(dbparms.dbHostName);
+        if (!skipdb)
+            m_dbparms = GetMythDB()->GetDatabaseParams();
+        m_db.setDatabaseName(m_dbparms.dbName);
+        m_db.setUserName(m_dbparms.dbUserName);
+        m_db.setPassword(m_dbparms.dbPassword);
+        m_db.setHostName(m_dbparms.dbHostName);
 
-        if (dbparms.dbHostName.isEmpty())  // Bootstrapping without a database?
+        if (m_dbparms.dbHostName.isEmpty())  // Bootstrapping without a database?
         {
             connected = true;              // Pretend to be connected
             return true;                   // to reduce errors
         }
 
-        if (dbparms.dbPort)
-            m_db.setPort(dbparms.dbPort);
+        if (m_dbparms.dbPort)
+            m_db.setPort(m_dbparms.dbPort);
 
-        if (dbparms.dbPort && dbparms.dbHostName == "localhost")
+        if (m_dbparms.dbPort && m_dbparms.dbHostName == "localhost")
             m_db.setHostName("127.0.0.1");
 
         connected = m_db.open();
 
-        if (!connected && dbparms.wolEnabled)
+        if (!connected && m_dbparms.wolEnabled)
         {
             int trycount = 0;
 
-            while (!connected && trycount++ < dbparms.wolRetry)
+            while (!connected && trycount++ < m_dbparms.wolRetry)
             {
                 VERBOSE(VB_GENERAL, QString(
                          "Using WOL to wakeup database server (Try %1 of %2)")
-                         .arg(trycount).arg(dbparms.wolRetry));
+                         .arg(trycount).arg(m_dbparms.wolRetry));
 
-                if (myth_system(dbparms.wolCommand) != GENERIC_EXIT_OK)
+                if (myth_system(m_dbparms.wolCommand) != GENERIC_EXIT_OK)
                 {
                     VERBOSE(VB_IMPORTANT,
                             QString("Failed to run WOL command '%1'")
-                            .arg(dbparms.wolCommand));
+                            .arg(m_dbparms.wolCommand));
                 }
 
-                sleep(dbparms.wolReconnect);
+                sleep(m_dbparms.wolReconnect);
                 connected = m_db.open();
             }
 

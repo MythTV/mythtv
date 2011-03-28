@@ -64,6 +64,12 @@ class Myth : public MythServices
         bool                ChangePassword      ( const QString   &UserName,
                                                   const QString   &OldPassword,
                                                   const QString   &NewPassword );
+
+        bool                TestDBSettings      ( const QString &HostName,
+                                                  const QString &UserName,
+                                                  const QString &Password,
+                                                  const QString &DBName,
+                                                  int   dbPort);
 };
 
 // --------------------------------------------------------------------------
@@ -136,6 +142,16 @@ class ScriptableMyth : public QObject
                          const QString   &Value   )
         {
             return m_obj.PutSetting( HostName, Key, Value );
+        }
+
+        bool TestDBSettings( const QString &HostName,
+                             const QString &UserName,
+                             const QString &Password,
+                             const QString &DBName,
+                             int   dbPort)
+        {
+            return m_obj.TestDBSettings( HostName, UserName, Password,
+                                         DBName, dbPort );
         }
 };
 
