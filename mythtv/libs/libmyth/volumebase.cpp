@@ -17,7 +17,7 @@ VolumeBase::VolumeBase() :
         (gCoreContext->GetSetting("MixerDevice", "default").toLower() == "software");
 }
 
-bool VolumeBase::SWVolume(void)
+bool VolumeBase::SWVolume(void) const
 {
     return swvol;
 }

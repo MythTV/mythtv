@@ -17,7 +17,7 @@ class MPUBLIC VolumeBase
     virtual ~VolumeBase() {};
 
     void SWVolume(bool set);
-    bool SWVolume(void);
+    bool SWVolume(void) const;
     virtual uint GetCurrentVolume(void) const;
     virtual void SetCurrentVolume(int value);
     virtual void AdjustCurrentVolume(int change);
