@@ -123,10 +123,45 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
     // find last reset or delay cancel in buffer
     for (i = 0; i < blk_size; i++)
     {
-        if (RST == cc->buf[service_num][i])
-            rst_loc = dlc_loc = i;
-        else if (DLC == cc->buf[service_num][i])
-            dlc_loc = i;
+        switch (cc->buf[service_num][i]) {
+            // Skip over parameters, since their bytes may coincide
+            // with RST or DLC
+            case CLW:
+            case DLW:
+            case DSW:
+            case HDW:
+            case TGW:
+            case DLY:
+                i += 1;
+                break;
+            case SPA:
+            case SPL:
+                i += 2;
+                break;
+            case SPC:
+                i += 3;
+                break;
+            case SWA:
+                i += 4;
+                break;
+            case DF0:
+            case DF1:
+            case DF2:
+            case DF3:
+            case DF4:
+            case DF5:
+            case DF6:
+            case DF7:
+                i += 6;
+                break;
+            // Detect RST or DLC bytes
+            case RST:
+                rst_loc = dlc_loc = i;
+                break;
+            case DLC:
+                dlc_loc = i;
+                break;
+        }
     }
 
     // reset, process only data after reset
