@@ -16,6 +16,11 @@ HttpConfig::~HttpConfig()
 {
 }
 
+QStringList HttpConfig::GetBasePaths() 
+{ 
+    return QStringList( "/Config" );
+}
+
 bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
 {
     if (!request)

@@ -25,6 +25,7 @@
 
 #include <QTextCodec>
 #include <QTextStream>
+#include <QStringList>
 
 #include "upnp.h"
 #include "eventing.h"
@@ -142,6 +143,17 @@ inline short Eventing::ReleaseEvents()
     return nVal;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QStringList Eventing::GetBasePaths()
+{
+    // -=>TODO: This isn't very efficient... Need to find out if we can make 
+    //          this something unique, other than root.
+
+    return QStringList( "/" );
+}
 
 /////////////////////////////////////////////////////////////////////////////
 //

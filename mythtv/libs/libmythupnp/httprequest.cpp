@@ -1336,21 +1336,24 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
         m_sMethod       = sSOAPAction.section( '#', 1 );
         m_sMethod.remove( m_sMethod.length()-1, 1 );
     }
-    if (sSOAPAction.contains( '/' ))
-    {
-        int nPos       = sSOAPAction.lastIndexOf( '/' );
-        m_sNameSpace   = sSOAPAction.mid( 1, nPos );
-        m_sMethod      = sSOAPAction.mid( nPos + 1, sSOAPAction.length() - nPos - 2  );
-
-        nPos           = m_sNameSpace.lastIndexOf( '/', -2);
-        sService       = m_sNameSpace.mid( nPos + 1, m_sNameSpace.length() - nPos - 2  );
-        m_sNameSpace   = m_sNameSpace.mid( 0, nPos );
-    }
     else
     {
-        m_sNameSpace = QString::null;
-        m_sMethod    = sSOAPAction;
-        m_sMethod.remove( QChar( '\"' ) );
+        if (sSOAPAction.contains( '/' ))
+        {
+            int nPos       = sSOAPAction.lastIndexOf( '/' );
+            m_sNameSpace   = sSOAPAction.mid( 1, nPos );
+            m_sMethod      = sSOAPAction.mid( nPos + 1, sSOAPAction.length() - nPos - 2  );
+
+            nPos           = m_sNameSpace.lastIndexOf( '/', -2);
+            sService       = m_sNameSpace.mid( nPos + 1, m_sNameSpace.length() - nPos - 2  );
+            m_sNameSpace   = m_sNameSpace.mid( 0, nPos );
+        }
+        else
+        {
+            m_sNameSpace = QString::null;
+            m_sMethod    = sSOAPAction;
+            m_sMethod.remove( QChar( '\"' ) );
+        }
     }
 
     QDomNodeList oNodeList = doc.elementsByTagNameNS( m_sNameSpace, m_sMethod );

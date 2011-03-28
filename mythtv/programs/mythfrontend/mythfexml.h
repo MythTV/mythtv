@@ -61,6 +61,8 @@ class MythFEXML : public Eventing
     MythFEXML( UPnpDevice *pDevice ,  const QString sSharePath);
     virtual ~MythFEXML();
 
+    virtual QStringList GetBasePaths();
+
     bool ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
 
     // Static methods shared with HttpStatus

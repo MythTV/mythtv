@@ -91,6 +91,8 @@ class UPNP_PUBLIC ServiceHost : public HttpServerExtension
                               const QString     &sSharePath );
         virtual ~ServiceHost();
 
+        virtual QStringList GetBasePaths();
+
         virtual bool       ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
 
         virtual QString    GetServiceControlURL() { return m_sBaseUrl.mid( 1 ); }

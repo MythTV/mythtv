@@ -153,6 +153,14 @@ void HttpServer::RegisterExtension( HttpServerExtension *pExtension )
     {
         m_rwlock.lockForWrite();
         m_extensions.append( pExtension );
+
+        // Add to multimap for quick lookup.
+
+        QStringList list = pExtension->GetBasePaths();
+
+        for( int nIdx = 0; nIdx < list.size(); nIdx++)
+            m_basePaths.insert( list[ nIdx ], pExtension );
+
         m_rwlock.unlock();
     }
 }
@@ -166,8 +174,16 @@ void HttpServer::UnregisterExtension( HttpServerExtension *pExtension )
     if (pExtension != NULL )
     {
         m_rwlock.lockForWrite();
-        delete pExtension;
+
+        QStringList list = pExtension->GetBasePaths();
+
+        for( int nIdx = 0; nIdx < list.size(); nIdx++)
+            m_basePaths.remove( list[ nIdx ], pExtension );
+
         m_extensions.removeAll(pExtension);
+
+        delete pExtension;
+
         m_rwlock.unlock();
     }
 }
@@ -182,6 +198,23 @@ void HttpServer::DelegateRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
 
     m_rwlock.lockForRead();
 
+    QList< HttpServerExtension* > list = m_basePaths.values( pRequest->m_sBaseUrl );
+
+    for (int nIdx=0; nIdx < list.size() && !bProcessed; nIdx++ )
+    {
+        try
+        {
+            bProcessed = list[ nIdx ]->ProcessRequest(pThread, pRequest);
+        }
+        catch(...)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("HttpServer::DelegateRequest - "
+                            "Unexpected Exception - "
+                            "pExtension->ProcessRequest()."));
+        }
+    }
+/*
     HttpServerExtensionList::iterator it = m_extensions.begin();
 
     for (; (it != m_extensions.end()) && !bProcessed; ++it)
@@ -198,7 +231,7 @@ void HttpServer::DelegateRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
                             "pExtension->ProcessRequest()."));
         }
     }
-
+*/
     m_rwlock.unlock();
 
     if (!bProcessed)

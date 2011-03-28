@@ -14,6 +14,8 @@ class HttpConfig : public HttpServerExtension
     HttpConfig();
     virtual ~HttpConfig();
 
+    virtual QStringList GetBasePaths();
+
     bool ProcessRequest(HttpWorkerThread *pThread, HTTPRequest *pRequest);
 
   private:
