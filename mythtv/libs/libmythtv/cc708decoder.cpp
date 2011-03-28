@@ -75,12 +75,12 @@ void CC708Decoder::services(uint seconds, bool seen[64]) const
 typedef enum
 {
     NUL  = 0x00,
-    EXT1 = 0x01,
     ETX  = 0x03,
     BS   = 0x08,
     FF   = 0x0C,
     CR   = 0x0D,
     HCR  = 0x0E,
+    EXT1 = 0x10,
     P16  = 0x18,
 } C0;
 
@@ -754,13 +754,13 @@ ushort CCtableG2[0x60] =
     0x160,/*S under \/*/0,                     /* 0x28-0x2b */
     0x152, /* CE */     0,
     0,                  0,                     /* 0x2c-0x2f */
-    0x2DA, /*super dot*/0x2018,/* open ' */
+    0x2588,/*block*/    0x2018,/* open ' */
     0x2019,/*close ' */ 0x201c,/* open " */    /* 0x30-0x33 */
-    0x201d,/*close " */ '*',   /* dot */
+    0x201d,/*close " */ 0xB7,/* dot */
     0,                  0,                     /* 0x34-0x37 */
-    0,                  '#',   /* super TM */
+    0,                  0x2122,/* super TM */
     0x161,/*s under \/*/0,                     /* 0x38-0x3b */
-    0x153, /* ce */     '#',   /* super SM */
+    0x153, /* ce */     0x2120,/* super SM */
     0,                  0x178,/*Y w/umlout*/   /* 0x3c-0x3f */
 
 //  0         1         2         3
