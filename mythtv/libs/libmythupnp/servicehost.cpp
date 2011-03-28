@@ -35,7 +35,7 @@
 
 MethodInfo::MethodInfo()
 {
-    m_eRequestType = (RequestType)(RequestTypeGet | RequestTypePost);
+    m_eRequestType = (RequestType)(RequestTypeGet | RequestTypePost | RequestTypeHead);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -220,7 +220,7 @@ ServiceHost::ServiceHost( const QMetaObject &metaObject, const QString &sExtensi
             oInfo.m_nMethodIndex = nIdx;
             oInfo.m_sName        = sName.section( '(', 0, 0 );
             oInfo.m_oMethod      = method;
-            oInfo.m_eRequestType = (RequestType)(RequestTypeGet | RequestTypePost);
+            oInfo.m_eRequestType = (RequestType)(RequestTypeGet | RequestTypePost | RequestTypeHead);
 
             QString sMethodClassInfo = oInfo.m_sName + "_Method";
 
@@ -233,7 +233,7 @@ ServiceHost::ServiceHost( const QMetaObject &metaObject, const QString &sExtensi
                 if (sRequestType == "POST")
                     oInfo.m_eRequestType = RequestTypePost;
                 else if (sRequestType == "GET" )
-                    oInfo.m_eRequestType = RequestTypeGet;
+                    oInfo.m_eRequestType = (RequestType)(RequestTypeGet | RequestTypeHead);
             }
 
             m_Methods.insert( oInfo.m_sName, oInfo );
@@ -323,7 +323,8 @@ bool ServiceHost::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
             else
             {
                 switch( pRequest->m_eType )
-                { 
+                {
+                    case RequestTypeHead:
                     case RequestTypeGet : sMethodName = "Get" + sMethodName; break;
                     case RequestTypePost: sMethodName = "Put" + sMethodName; break;
                 }
