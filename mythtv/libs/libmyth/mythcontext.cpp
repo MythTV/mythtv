@@ -1096,13 +1096,13 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
 #ifdef _WIN32
     // HOME environment variable might not be defined
     // some libraries will fail without it
-    char *home = getenv("HOME");
-    if (!home)
+    QString home = getenv("HOME");
+    if (home.isEmpty())
     {
         home = getenv("LOCALAPPDATA");      // Vista
-        if (!home)
+        if (home.isEmpty())
             home = getenv("APPDATA");       // XP
-        if (!home)
+        if (home.isEmpty())
             home = QString(".");  // getenv("TEMP")?
 
         _putenv(QString("HOME=%1").arg(home).toLocal8Bit().constData());
