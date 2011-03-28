@@ -26,8 +26,11 @@ VideoVisual* VideoVisual::Create(AudioPlayer *audio, MythRender *render)
     if (render)
     {
 #ifdef USING_OPENGL
-        if (dynamic_cast<MythRenderOpenGL2*>(render))
+        if (render->Type() == kRenderOpenGL2 ||
+            render->Type() == kRenderOpenGL2ES)
+        {
             return new VideoVisualCircles(audio, render);
+        }
 #endif
         return new VideoVisualSpectrum(audio, render);
     }
