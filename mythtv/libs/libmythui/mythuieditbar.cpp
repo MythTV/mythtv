@@ -188,9 +188,9 @@ void MythUIEditBar::AddBar(MythUIShape *shape, MythUIImage *image,
         MythUIShape *shape = dynamic_cast<MythUIShape*>(add);
         MythUIImage *image = dynamic_cast<MythUIImage*>(add);
         if (shape)
-            shape->SetCropRect(area.left(), 0, area.width(), area.height());
+            shape->SetCropRect(area.left(), area.top(), area.width(), area.height());
         if (image)
-            image->SetCropRect(area.left(), 0, area.width(), area.height());
+            image->SetCropRect(area.left(), area.top(), area.width(), area.height());
         add->SetPosition(area.left(), area.top());
     }
 }
