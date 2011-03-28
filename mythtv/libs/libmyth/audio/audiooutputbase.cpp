@@ -243,8 +243,8 @@ AudioOutputSettings* AudioOutputBase::GetOutputSettingsUsers(bool digital)
 bool AudioOutputBase::CanPassthrough(int samplerate, int channels,
                                      int codec, int profile) const
 {
-    bool ret = !internal_vol;
     DigitalFeature arg = FEATURE_NONE;
+    bool           ret = !(internal_vol && SWVolume());
 
     switch(codec)
     {

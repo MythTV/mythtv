@@ -123,10 +123,6 @@ class AudioReencodeBuffer : public AudioOutput
     {
         last_audiotime = timecode;
     }
-    virtual bool CanPassthrough(int, int) const
-    {
-        return false;
-    }
     virtual bool IsPaused(void) const
     {
         return false;
@@ -217,7 +213,8 @@ class AudioReencodeBuffer : public AudioOutput
     /**
      * Test if we can output digital audio
      */
-    virtual bool CanPassthrough(int, int, int) const { return m_initpassthru; }
+    virtual bool CanPassthrough(int, int, int, int) const
+        { return m_initpassthru; }
 
     int bufsize;
     int ab_count;
