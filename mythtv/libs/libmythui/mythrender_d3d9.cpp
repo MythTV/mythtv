@@ -192,7 +192,7 @@ MythRenderD3D9::MythRenderD3D9(void)
     m_d3d(NULL), m_rootD3DDevice(NULL),
     m_adaptor_fmt(D3DFMT_UNKNOWN),
     m_videosurface_fmt(D3DFMT_UNKNOWN),
-    m_surface_fmt(D3DFMT_UNKNOWN), m_texture_fmt(D3DFMT_A8R8G8B8),
+    m_surface_fmt(D3DFMT_UNKNOWN), m_texture_fmt(D3DFMT_UNKNOWN),
     m_rect_vertexbuffer(NULL), m_default_surface(NULL), m_current_surface(NULL),
     m_lock(QMutex::Recursive),
     m_blend(true), m_multi_texturing(true), m_texture_vertices(true),
@@ -230,24 +230,6 @@ MythRenderD3D9::~MythRenderD3D9(void)
         VERBOSE(VB_GENERAL, D3DLOC + "Deleting D3D9.");
         m_d3d->Release();
     }
-}
-
-bool MythRenderD3D9::FormatSupported(D3DFORMAT surface, D3DFORMAT adaptor)
-{
-    if (!m_d3d)
-        return false;
-
-    HRESULT hr = m_d3d->CheckDeviceFormat(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
-                                          adaptor, 0, D3DRTYPE_SURFACE, surface);
-    if (SUCCEEDED(hr))
-    {
-        // NB CheckDeviceFormatConversion is not fuly implemented in Wine as of 1.3.6
-        hr = m_d3d->CheckDeviceFormatConversion(D3DADAPTER_DEFAULT,
-                                                D3DDEVTYPE_HAL, surface, adaptor);
-        if (SUCCEEDED(hr))
-            return true;
-    }
-    return false;
 }
 
 static const QString toString(D3DFORMAT fmt)
@@ -318,54 +300,30 @@ bool MythRenderD3D9::Create(QSize size, HWND window)
         return false;
     }
 
-    m_adaptor_fmt = d3ddm.Format;
-    VERBOSE(VB_GENERAL, D3DLOC +
-            QString("Default Adaptor Format %1.").arg(toString(m_adaptor_fmt)));
-
-    // Find the best h/w supported video surface format
-    static const D3DFORMAT vfmt[] =
-    {
-        mD3DFMT_YV12,
-        D3DFMT_UYVY,
-        D3DFMT_YUY2,
-        mD3DFMT_IYUV,
-        mD3DFMT_I420,
-        mD3DFMT_YV16,
-        D3DFMT_A8R8G8B8,
-        D3DFMT_X8R8G8B8,
-        D3DFMT_A8B8G8R8,
-        D3DFMT_X8B8G8R8
-    };
-
-    for (unsigned i = 0; i < sizeof vfmt / sizeof vfmt[0]; ++i)
-    {
-        if (FormatSupported(vfmt[i], m_adaptor_fmt))
-        {
-            m_videosurface_fmt = vfmt[i];
-            break;
-        }
-    }
-
-    if (D3DFMT_UNKNOWN != m_videosurface_fmt)
-    {
-        VERBOSE(VB_GENERAL, D3DLOC +
-                QString("Best Video Surface Format %1.").arg(toString(m_videosurface_fmt)));
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, D3DERR + "Failed to agree video surface format");
-    }
-
-    // Find the best backing surface format
+    // Check the adaptor format is reasonable
     static const D3DFORMAT bfmt[] =
     {
         D3DFMT_A8R8G8B8,
-        D3DFMT_X8R8G8B8,
         D3DFMT_A8B8G8R8,
+        D3DFMT_X8R8G8B8,
         D3DFMT_X8B8G8R8,
         D3DFMT_R8G8B8
     };
 
+    m_adaptor_fmt = d3ddm.Format;
+    bool is_reasonable = false;
+    for (uint i = 0; i < sizeof(bfmt) / sizeof(bfmt[0]); i++)
+        if (bfmt[i] == m_adaptor_fmt)
+            is_reasonable = true;
+    VERBOSE(VB_GENERAL, D3DLOC + QString("Default adaptor format %1.")
+                                         .arg(toString(m_adaptor_fmt)));
+    if (!is_reasonable)
+    {
+        VERBOSE(VB_GENERAL, D3DLOC +
+            QString("Warning: Default adaptor format may not work."));
+    }
+
+    // Choose a surface format
     for (unsigned i = 0; i < sizeof bfmt / sizeof bfmt[0]; ++i)
     {
         if (SUCCEEDED(m_d3d->CheckDeviceType(D3DADAPTER_DEFAULT,
@@ -376,19 +334,39 @@ bool MythRenderD3D9::Create(QSize size, HWND window)
         }
     }
 
-    if (D3DFMT_UNKNOWN != m_surface_fmt)
+    if (D3DFMT_UNKNOWN == m_surface_fmt)
     {
-        VERBOSE(VB_GENERAL, D3DLOC +
-                QString("Best surface format: %1.").arg(toString(m_surface_fmt)));
+        VERBOSE(VB_IMPORTANT, D3DERR + "Failed to choose surface format - "
+                                       "using default back buffer format.");
+        m_surface_fmt = m_adaptor_fmt;
+    }
+
+    m_texture_fmt = m_surface_fmt;
+    VERBOSE(VB_GENERAL, D3DLOC + QString("Chosen surface and texture format: %1")
+            .arg(toString(m_surface_fmt)));
+
+
+    // Test whether a YV12 video surface is available
+    if (FAILED(m_d3d->CheckDeviceFormatConversion(D3DADAPTER_DEFAULT,
+               D3DDEVTYPE_HAL, D3DFMT_UNKNOWN, m_adaptor_fmt)) &&
+        SUCCEEDED(m_d3d->CheckDeviceFormatConversion(D3DADAPTER_DEFAULT,
+                  D3DDEVTYPE_HAL, mD3DFMT_YV12, m_surface_fmt)))
+    {
+        m_videosurface_fmt = mD3DFMT_YV12;
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "Failed to agree surface format");
+        m_videosurface_fmt = m_surface_fmt;
     }
+
+    VERBOSE(VB_GENERAL, D3DLOC + QString("Chosen video surface format %1.")
+        .arg(toString(m_videosurface_fmt)));
+    VERBOSE(VB_GENERAL, D3DLOC + QString("Hardware YV12 to RGB conversion %1.")
+        .arg(m_videosurface_fmt != mD3DFMT_YV12 ? "unavailable" : "available"));
 
     D3DPRESENT_PARAMETERS d3dpp;
     ZeroMemory(&d3dpp, sizeof(D3DPRESENT_PARAMETERS));
-    d3dpp.BackBufferFormat       = m_surface_fmt;
+    d3dpp.BackBufferFormat       = m_adaptor_fmt;
     d3dpp.hDeviceWindow          = window;
     d3dpp.Windowed               = TRUE;
     d3dpp.BackBufferWidth        = size.width();
@@ -408,20 +386,6 @@ bool MythRenderD3D9::Create(QSize size, HWND window)
         VERBOSE(VB_IMPORTANT, D3DERR + "Could not create the D3D device.");
         return false;
     }
-
-    VERBOSE(VB_GENERAL, D3DLOC + QString("Device backbuffer format: %1.")
-                                      .arg(toString(d3dpp.BackBufferFormat)));
-
-    if (D3DFMT_UNKNOWN == m_videosurface_fmt)
-        m_videosurface_fmt = d3dpp.BackBufferFormat;
-
-    if (D3DFMT_UNKNOWN == m_surface_fmt)
-        m_surface_fmt = d3dpp.BackBufferFormat;
-
-    VERBOSE(VB_GENERAL, D3DLOC +
-               QString("Hardware YV12 to RGB conversion %1.")
-               .arg(m_videosurface_fmt != (D3DFORMAT)MAKEFOURCC('Y','V','1','2') ?
-                 "unavailable" : "available"));
 
     static bool debugged = false;
     if (!debugged)
@@ -443,6 +407,11 @@ bool MythRenderD3D9::Create(QSize size, HWND window)
     CreateDeviceManager();
     Init2DState();
     return true;
+}
+
+bool MythRenderD3D9::HardwareYUVConversion(void)
+{
+    return m_videosurface_fmt == mD3DFMT_YV12;
 }
 
 bool MythRenderD3D9::Test(bool &reset)

@@ -78,8 +78,7 @@ class MUI_PUBLIC MythRenderD3D9 : public MythRender
     bool DrawTexturedQuad(IDirect3DVertexBuffer9 *vertexbuffer);
     void DrawRect(const QRect &rect,  const QColor &color);
     bool Present(HWND win);
-    bool HardwareYUVConversion(void)
-        { return m_videosurface_fmt == (D3DFORMAT)MAKEFOURCC('Y','V','1','2'); }
+    bool HardwareYUVConversion(void);
     QRect GetRect(IDirect3DVertexBuffer9 *vertexbuffer);
     bool SetRenderTarget(IDirect3DTexture9 *texture);
 
@@ -100,7 +99,6 @@ class MUI_PUBLIC MythRenderD3D9 : public MythRender
     void                    ReleaseBuffer(IDirect3DSurface9* surface);
 
   private:
-    bool                    FormatSupported(D3DFORMAT surface, D3DFORMAT adaptor);
     bool                    SetTexture(IDirect3DDevice9* dev,
                                        IDirect3DTexture9 *texture,
                                        int num = 0);
