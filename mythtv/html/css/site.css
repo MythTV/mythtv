@@ -90,11 +90,12 @@
     }
 
     #hostname {
+        font-size:          12px;
+        font-family:        sans-serif;
         position:           fixed;
-        bottom:             10px;
-        left:               0px;
-        width:              200px;
-        height:             20;
+        top:                90px;
+        left:               10px;
+        width:              180px;
         color:              #26c;
         text-align:         center;
     }
@@ -109,14 +110,15 @@
     }
 
     #menu-title {
-        font-size:          14px;
+        font-size:          16px;
         font-family:        sans-serif;
         font-weight:        bold;
         color:              #E4D6CD;
         position:           fixed;
-        top:                80px;
+        top:                72px;
         left:               10px;
         width:              180px;
+        text-align:         center;
     }
 
     #menu a, a:visited {
