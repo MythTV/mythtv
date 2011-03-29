@@ -1,6 +1,4 @@
 <div id='jobqueue-jobs' class='setuptab'>
-<h3>JobQueue Jobs</h3> 
-
 <%
 var myth = new Myth();
 var sList;
