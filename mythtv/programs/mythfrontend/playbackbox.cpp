@@ -3651,7 +3651,7 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "1" || action == "HELP")
+        if (action == ACTION_1 || action == "HELP")
             showIconHelp();
         else if (action == "MENU")
         {
@@ -3691,12 +3691,12 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
             m_playList.clear();
             UpdateUILists();
         }
-        else if (action == "TOGGLERECORD")
+        else if (action == ACTION_TOGGLERECORD)
         {
             m_viewMask = m_viewMaskToggle(m_viewMask, VIEW_TITLES);
             UpdateUILists();
         }
-        else if (action == "PAGERIGHT")
+        else if (action == ACTION_PAGERIGHT)
         {
             QString nextGroup;
             m_recGroupsLock.lock();
@@ -3711,7 +3711,7 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
             if (!nextGroup.isEmpty())
                 displayRecGroup(nextGroup);
         }
-        else if (action == "PAGELEFT")
+        else if (action == ACTION_PAGELEFT)
         {
             QString nextGroup;
             m_recGroupsLock.lock();
@@ -3736,7 +3736,7 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
         {
             if (action == "DELETE")
                 deleteSelected(m_recordingList->GetItemCurrent());
-            else if (action == "PLAYBACK")
+            else if (action == ACTION_PLAYBACK)
                 PlayFromBookmark();
             else if (action == "DETAILS" || action == "INFO")
                 details();
@@ -3744,7 +3744,7 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
                 customEdit();
             else if (action == "UPCOMING")
                 upcoming();
-            else if (action == "VIEWSCHEDULED")
+            else if (action == ACTION_VIEWSCHEDULED)
                 upcomingScheduled();
             else
                 handled = false;
