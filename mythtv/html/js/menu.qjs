@@ -33,16 +33,20 @@
       </ul>
     </li>
     <li><a class='menuitem' href="javascript:loadContent('/Status/GetStatusHTML')">Backend Status</a></li>
-    <li><a href='#'>WSDL Links</a>
-      <ul class="acitem">
-        <li><a href='/Myth/wsdl'>Myth Service</a></li>
-        <li><a href='/Guide/wsdl'>Guide Service</a></li>
-        <li><a href='/Dvr/wsdl'>DVR Service</a></li>
-        <li><a href='/Content/wsdl'>Content Service</a></li>
+    <li><hr></li>
+    <li><a href='#'>API</a>
+      <ul class="acitem collapsible">
+        <li><a href='#'>WSDL Links</a>
+          <ul class="acitem">
+            <li class="indent1"><a href='/Myth/wsdl'>Myth Service</a></li>
+            <li class="indent1"><a href='/Guide/wsdl'>Guide Service</a></li>
+            <li class="indent1"><a href='/Dvr/wsdl'>DVR Service</a></li>
+            <li class="indent1"><a href='/Content/wsdl'>Content Service</a></li>
+          </ul>
+        </li>
+        <li><a class='menuitem' href='/samples'>Sample Pages</a></li>
       </ul>
     </li>
-    <li><hr></li>
-    <li><a class='menuitem' href='/samples'>Sample Pages</a></li>
   </ul>
   <br>
   <center><a class='menuitem' href='http://www.mythtv.org'>www.mythtv.org</a></center>
