@@ -1,0 +1,49 @@
+<div id="menu-title" align=center>
+    MythBackend
+</div>
+<div id="menu">
+  <ul class="menu collapsible">
+    <li><a href='#'>Setup</a>
+      <ul class="acitem collapsible">
+        <li><a href="javascript:loadContent('/setup/wizard.html', '/setup/js/wizard.js')">Setup Wizard</a></li>
+        <li><a href='#'>Advanced Setup</a>
+          <ul class="acitem collapsible">
+            <li class="indent1"><a href="javascript:loadContent('/Config/Database')">Database</a></li>
+            <li class="indent1"><a href="javascript:loadContent('/Config/General')">General</a></li>
+            <!-- some possible other menu items
+            <li class="indent1"><a href="javascript:loadSetupPage('tuning')">Tuning</a></li>
+            -->
+            <li class="indent1"><a href="javascript:loadSetupPage('storagegroups')">Storage Groups</a></li>
+            <!--
+            <li class="indent1"><a href="javascript:loadSetupPage('jobqueue')">Job Queue</a></li>
+            <li class="indent1"><a href="javascript:loadSetupPage('systemevents')">System Events</a></li>
+            -->
+          </ul>
+        </li>
+<%
+    var myth = new Myth();
+    var sList = myth.GetSetting( '', 'EnableWebSetupDevMode', '');
+
+    if (sList.Settings['EnableWebSetupDevMode'] == 1)
+    {
+        os.write("<li><a href=\"javascript:loadContent('/setup/expert.html')\">Expert/Dev Setup</a></li>");
+    }
+%>
+        <li><a href="javascript:loadSetupPage('password')">Change Password</a></li>
+      </ul>
+    </li>
+    <li><a class='menuitem' href="javascript:loadContent('/Status/GetStatusHTML')">Backend Status</a></li>
+    <li><a href='#'>WSDL Links</a>
+      <ul class="acitem">
+        <li><a href='/Myth/wsdl'>Myth Service</a></li>
+        <li><a href='/Guide/wsdl'>Guide Service</a></li>
+        <li><a href='/Dvr/wsdl'>DVR Service</a></li>
+        <li><a href='/Content/wsdl'>Content Service</a></li>
+      </ul>
+    </li>
+    <li><hr></li>
+    <li><a class='menuitem' href='/samples'>Sample Pages</a></li>
+  </ul>
+  <br>
+  <center><a class='menuitem' href='http://www.mythtv.org'>www.mythtv.org</a></center>
+</div>

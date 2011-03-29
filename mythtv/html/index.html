@@ -3,17 +3,23 @@
 <title>
 MythTV mythbackend Internal Web Server
 </title>
-<link rel="stylesheet"    href="/css/site.css"       type="text/css">
-<link rel="icon"          href="/images/favicon.ico" type="image/x-icon">
-<link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
-<script language="JavaScript" type="text/javascript" src="/js/util.qjs"></script>
-<script language="JavaScript" type="text/javascript" src="/js/jquery.min.js"></script>
-
+<link rel="stylesheet"    href="/css/site.css"        type="text/css">
+<link rel="stylesheet"    href="/css/jquery-ui.css"   type="text/css">
+<link rel="stylesheet"    href="/css/menustyle.css"   type="text/css">
+<link rel="stylesheet"    href="/setup/css/setup.css" type="text/css">
+<link rel="icon"          href="/images/favicon.ico"  type="image/x-icon">
+<link rel="shortcut icon" href="/images/favicon.ico"  type="image/x-icon">
+<script language="JavaScript" type="text/javascript"  src="/js/util.qjs"></script>
+<script language="JavaScript" type="text/javascript"  src="/js/jquery.min.js"></script>
+<script language="JavaScript" type="text/javascript"  src="/js/menu.js"></script>
+<script language="JavaScript" type="text/javascript"  src="/js/jquery-ui.min.js"></script>
+<script language="JavaScript" type="text/javascript"  src="/setup/js/util.js"></script>
+<script language="JavaScript" type="text/javascript"  src="/setup/js/form_inputs.js"></script>
 
 <script language="JavaScript" type="text/javascript">
 
 $(document).ready(function() {
-    loadContent('/misc/overview.html');
+    loadScreen('/js/menu.qjs', '/misc/overview.html', '/js/menu.js')
     showHostName();
 });
 
@@ -28,26 +34,15 @@ $(document).ready(function() {
 </div>
 
 <div id="menu-bg">
-    <div id="menu-title" align=center>
-        MythBackend
-    </div>
-    <div id="menu">
-      <ul>
-        <li><a class='menuitem' href='/setup'>Setup</a></li>
-        <li><a class='menuitem' href="javascript:loadContent('/Status/GetStatusHTML')">Backend Status</a></li>
-        <li><a class='menuitem' href="javascript:loadContent('/misc/wsdl.html')">WSDL Links</a></li>
-        <li><hr></li>
-        <li><a class='menuitem' href='/samples'>Sample Pages</a></li>
-
-      </ul>
-      <br>
-      <center><a class='menuitem' href='http://www.mythtv.org'>www.mythtv.org</a></center>
-    </div>
 </div>
+
+</div>
+
 <div id="hostname">
 </div>
 
 <div id="content">
 </div>
+
 </body>
 </html>
