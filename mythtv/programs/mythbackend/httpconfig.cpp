@@ -17,8 +17,12 @@ HttpConfig::~HttpConfig()
 }
 
 QStringList HttpConfig::GetBasePaths() 
-{ 
-    return QStringList( "/Config" );
+{
+    QStringList paths;
+    paths << "/Config";
+    paths << "/Config/Database";
+    paths << "/Config/General";
+    return paths;
 }
 
 bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
@@ -38,8 +42,10 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
         if (request->m_sBaseUrl.right(7) == "config" &&
             !database_settings.empty())
         {
-            PrintHeader(request->m_response, "Config/Database");
-            check_settings(database_settings, request->m_mapParams);
+            QString checkResult;
+            PrintHeader(request->m_response, "/Config/Database");
+            check_settings(database_settings, request->m_mapParams,
+                           checkResult);
             load_settings(database_settings, "");
             PrintSettings(request->m_response, database_settings);
             PrintFooter(request->m_response);
@@ -47,17 +53,48 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
         }
         else
         {
+            bool okToSave = false;
+            QString checkResult;
+            QString fn = GetShareDir() + "backend-config/";
+
+            if (request->m_sBaseUrl == "/Config/Database")
+            {
+                if (check_settings(database_settings, request->m_mapParams,
+                                   checkResult))
+                    okToSave = true;
+            }
+            else if (request->m_sBaseUrl == "/Config/General")
+            {
+                if (check_settings(general_settings, request->m_mapParams,
+                                   checkResult))
+                    okToSave = true;
+            }
+
+#if 0
             QTextStream os(&request->m_response);
             os << "<html><body><h3>The Save function for this screen is "
                << "not hooked up yet</h3><dl>";
             QStringMap::const_iterator it = request->m_mapParams.begin();
             for (; it!=request->m_mapParams.end(); ++it)
             {
+                if (it.key() == "__group__")
+                    continue;
+
                 os << "<dt>"<<it.key()<<"</dt><dd>"
                                     <<*it<<"</dd>\r\n";
             }
             os << "</dl></body></html>";
             handled = true;
+#else
+            QTextStream os(&request->m_response);
+            os << checkResult;
+            request->m_eResponseType     = ResponseTypeOther;
+            request->m_sResponseTypeText = "application/json";
+            request->m_mapRespHeaders[ "Cache-Control" ] =
+                "no-cache=\"Ext\", max-age = 0";
+
+            return true;
+#endif
         }
     }
     else if (request->m_sMethod == "XML")
@@ -74,9 +111,11 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
     }
     else if ((request->m_sMethod == "Database") || (NULL == gContext))
     {
-        PrintHeader(request->m_response, "Config/Database");
         QString fn = GetShareDir() + "backend-config/"
             "config_backend_database.xml";
+        QString form("/Config/Database/Save");
+
+        PrintHeader(request->m_response, form);
         parse_settings(database_settings, fn);
         load_settings(database_settings, "");
         PrintSettings(request->m_response, database_settings);
@@ -85,13 +124,28 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
     }
     else if (request->m_sMethod == "General")
     {
-        PrintHeader(request->m_response, "Config/General");
         QString fn = GetShareDir() + "backend-config/"
             "config_backend_general.xml";
-        parse_settings(general_settings, fn);
+        QString group;
+        QString form("/Config/General/Save");
+
+        if (request->m_mapParams.contains("__group__"))
+            group = request->m_mapParams["__group__"];
+
+        if (group.isEmpty())
+            PrintHeader(request->m_response, form);
+        else
+            OpenForm(request->m_response, form, group);
+
+        parse_settings(general_settings, fn, group);
         load_settings(general_settings, gCoreContext->GetHostName());
         PrintSettings(request->m_response, general_settings);
-        PrintFooter(request->m_response);
+
+        if (group.isEmpty())
+            PrintFooter(request->m_response);
+        else
+            CloseForm(request->m_response, group);
+
         handled = true;
     }
 
@@ -105,7 +159,8 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
     return handled;
 }
 
-void HttpConfig::PrintHeader(QBuffer &buffer, const QString &form)
+void HttpConfig::PrintHeader(QBuffer &buffer, const QString &form,
+                             const QString &group)
 {
     QTextStream os(&buffer);
 
@@ -123,24 +178,45 @@ void HttpConfig::PrintHeader(QBuffer &buffer, const QString &form)
        << "</head>\r\n"
        << "<body>\r\n\r\n"
        << "<div class=\"config\">\r\n"
-       << "  <h1 class=\"config\">MythTV Configuration</h1>\r\n"
-       << "  <form id=\"config_form\" action=\"/" << form << "/Save\" method=\"POST\">\r\n"
+       << "  <h1 class=\"config\">MythTV Configuration</h1>\r\n";
+
+    OpenForm(buffer, form, group);
+}
+
+void HttpConfig::OpenForm(QBuffer &buffer, const QString &form,
+                          const QString &group)
+{
+    QTextStream os(&buffer);
+
+    os.setCodec("UTF-8");
+
+    os << "  <form id=\"config_form_" << group << "\">\r\n"
+       << "    <input type=\"hidden\" id=\"__config_form_action__\" value=\"" << form << "\" />\r\n"
+       << "    <input type=\"hidden\" id=\"__group__\" value=\"" << group << "\" />\r\n"
        << "    <div class=\"form_buttons_top\"\r\n"
        << "         id=\"form_buttons_top\">\r\n"
-       << "      <input type=\"submit\" value=\"Save Changes\" />\r\n"
+       << "      <input type=\"button\" value=\"Save Changes\" onClick=\"javascript:submitConfigForm('" << group << "')\" />\r\n"
        << "    </div>\r\n";
 }
 
-void HttpConfig::PrintFooter(QBuffer &buffer)
+void HttpConfig::CloseForm(QBuffer &buffer, const QString &group)
 {
     QTextStream os(&buffer);
 
     os << "    <div class=\"form_buttons_bottom\"\r\n"
        << "         id=\"form_buttons_bottom\">\r\n"
-       << "      <input type=\"submit\" value=\"Save Changes\" />\r\n"
+       << "      <input type=\"button\" value=\"Save Changes\" onClick=\"javascript:submitConfigForm('" << group << "')\" />\r\n"
        << "    </div>\r\n"
-       << "  </form>\r\n"
-       << "</div>\r\n"
+       << "  </form>\r\n";
+}
+
+void HttpConfig::PrintFooter(QBuffer &buffer, const QString &group)
+{
+    CloseForm(buffer, group);
+
+    QTextStream os(&buffer);
+
+    os << "</div>\r\n"
        << "</body>\r\n"
        << "</html>\r\n";
 }

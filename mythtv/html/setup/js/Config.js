@@ -1,27 +1,24 @@
 
-function submitForm(event) {
-    event.preventDefault();
+function submitConfigForm(form) {
+    var data = $("#config_form_" + form).serialize();
+    var url = $("#__config_form_action__").val();
 
-    var data = $("#config_form").serialize();
-    var url = $("#config_form").attr("action");
-
-    // FIXME, this should be a POST
-    var html = $.ajax({
-        type: 'GET',
-        url: url,
-        data: data,
-        async: false
-    }).responseText;
-
-    $("#content").html(html);
-
-    // FIXME, may need to modify the page again here if the result contains another form
+    /* FIXME, clear out _error divs */
+    $.ajaxSetup({ async: false });
+    $.post(url, data, function(data) {
+        $.each(data, function(key, value) {
+            $("#" + key + "_error").html(value);
+        });
+    }, "json");
+    $.ajaxSetup({ async: true });
 }
 
-function embedForm() {
-    $("#form_buttons_top").click(submitForm);
-    $("#form_buttons_bottom").click(submitForm);
+/*
+function embedConfigForm() {
+    $("#form_buttons_top").click(submitConfigForm);
+    $("#form_buttons_bottom").click(submitConfigForm);
 }
 
-embedForm();
+embedConfigForm();
+*/
 

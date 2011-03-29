@@ -1,0 +1,98 @@
+<div id='jobqueue-backend' class='setuptab'>
+<h3>JobQueue Backend Settings</h3>
+<div class="group" id="job_queue_host">
+
+            <h3 class="config">Job Queue (Backend-Specific)</h3>
+            <div class="setting" id="JobQueueMaxSimultaneousJobs_div">
+            <div class="setting_label">Maximum simultaneous jobs on this backend</div>
+            <select name="JobQueueMaxSimultaneousJobs" id="JobQueueMaxSimultaneousJobs_input">
+                <option value="0" >0</option>
+                <option value="1" selected>1</option>
+                <option value="2" >2</option>
+
+                <option value="3" >3</option>
+                <option value="4" >4</option>
+                <option value="5" >5</option>
+                <option value="6" >6</option>
+                <option value="7" >7</option>
+                <option value="8" >8</option>
+
+                <option value="9" >9</option>
+                <option value="10" >10</option>
+            </select>
+            <div style="display:none;position:absolute;left:-4000px" id="JobQueueMaxSimultaneousJobs_default">1</div>
+            </div>
+            <div class="setting" id="JobQueueCheckFrequency_div">
+            <div class="setting_label">Job Queue Check frequency (in seconds)</div>
+
+            <select name="JobQueueCheckFrequency" id="JobQueueCheckFrequency_input">
+                <option value="5" >5</option>
+                <option value="10" >10</option>
+                <option value="15" >15</option>
+                <option value="30" >30</option>
+                <option value="60" selected>60</option>
+
+                <option value="90" >90</option>
+                <option value="200" >200</option>
+                <option value="300" >300</option>
+            </select>
+            <div style="display:none;position:absolute;left:-4000px" id="JobQueueCheckFrequency_default">60</div>
+            </div>
+            <div class="setting" id="JobQueueWindowStart_div">
+
+            <div class="setting_label">Job Queue Start Time</div>
+            <input name="JobQueueWindowStart" id="JobQueueWindowStart_input" type="text" value="00:00"/>
+            <div style="display:none;position:absolute;left:-4000px" id="JobQueueWindowStart_default"></div>
+            </div>
+            <div class="setting" id="JobQueueWindowEnd_div">
+            <div class="setting_label">Job Queue End Time</div>
+            <input name="JobQueueWindowEnd" id="JobQueueWindowEnd_input" type="text" value="23:59"/>
+            <div style="display:none;position:absolute;left:-4000px" id="JobQueueWindowEnd_default"></div>
+
+            </div>
+            <div class="setting" id="JobQueueCPU_div">
+            <div class="setting_label">CPU Usage</div>
+            <select name="JobQueueCPU" id="JobQueueCPU_input">
+                <option value="0" selected>Low</option>
+                <option value="1" >Medium</option>
+                <option value="2" >High</option>
+
+            </select>
+            <div style="display:none;position:absolute;left:-4000px" id="JobQueueCPU_default"></div>
+            </div>
+            <div class="setting" id="JobAllowCommFlag_div">
+            <div class="setting_label">Allow Commercial Detection jobs</div>
+            <input name="JobAllowCommFlag" id="JobAllowCommFlag_input" type="checkbox" value="1" />
+            <div style="display:none;position:absolute;left:-4000px" id="JobAllowCommFlag_default">true</div>
+            </div>
+
+            <div class="setting" id="JobAllowTranscode_div">
+            <div class="setting_label">Allow Transcoding jobs</div>
+            <input name="JobAllowTranscode" id="JobAllowTranscode_input" type="checkbox" value="1" />
+            <div style="display:none;position:absolute;left:-4000px" id="JobAllowTranscode_default">true</div>
+            </div>
+            <div class="setting" id="JobAllowUserJob1_div">
+            <div class="setting_label">Allow User Job #1 on this backend</div>
+
+            <input name="JobAllowUserJob1" id="JobAllowUserJob1_input" type="checkbox" value="1" />
+            <div style="display:none;position:absolute;left:-4000px" id="JobAllowUserJob1_default">0</div>
+            </div>
+            <div class="setting" id="JobAllowUserJob2_div">
+            <div class="setting_label">Allow User Job #2 on this backend</div>
+            <input name="JobAllowUserJob2" id="JobAllowUserJob2_input" type="checkbox" value="1" />
+            <div style="display:none;position:absolute;left:-4000px" id="JobAllowUserJob2_default">0</div>
+
+            </div>
+            <div class="setting" id="JobAllowUserJob3_div">
+            <div class="setting_label">Allow User Job #3 on this backend</div>
+            <input name="JobAllowUserJob3" id="JobAllowUserJob3_input" type="checkbox" value="1" />
+            <div style="display:none;position:absolute;left:-4000px" id="JobAllowUserJob3_default">0</div>
+            </div>
+            <div class="setting" id="JobAllowUserJob4_div">
+            <div class="setting_label">Allow User Job #4 on this backend</div>
+
+            <input name="JobAllowUserJob4" id="JobAllowUserJob4_input" type="checkbox" value="1" />
+            <div style="display:none;position:absolute;left:-4000px" id="JobAllowUserJob4_default">0</div>
+            </div>
+        </div>
+</div>

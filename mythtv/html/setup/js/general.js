@@ -1,0 +1,3 @@
+
+$("#generaltabs").tabs({ cache: true });
+

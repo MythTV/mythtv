@@ -6,28 +6,29 @@ function testDBSettings() {
     var name = $("#dbName").val();
     var port = $("#dbPort").val();
 
+    clearEditMessages();
+
     if (name == null)
         name = "mythconverg";
 
     if (port == null)
         port = 3306;
 
-    $.ajaxSetup({ async: false });
     $.post("/Myth/TestDBSettings",
         { HostName: host, UserName: user, Password: pass, DBName: name, dbPort: port},
         function(data) {
             if (data.bool == "true") {
                 result = 1;
-                alert("Database connection succeeded!");
+                setEditStatusMessage("Database connection succeeded!");
             }
             else
-                alert("Database connection failed.");
+                setEditErrorMessage("Database connection failed!");
         }, "json").error(function(data) {
-            alert("Database connection failed.");
+            setEditErrorMessage("Database connection failed!");
         });
-    $.ajaxSetup({ async: true });
 
     return result;
 }
 
-$("#wizardtabs").tabs();
+$("#wizardtabs").tabs({ cache: true });
+showEditWindow();

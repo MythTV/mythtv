@@ -5,6 +5,7 @@ MythTV Setup
 </title>
 <link rel="stylesheet" type="text/css" href="/css/site.css">
 <link rel="stylesheet" type="text/css" href="/css/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="/setup/css/Config.css">
 <link rel="stylesheet" type="text/css" href="/setup/css/setup.css">
 
 <link rel="icon"          href="/images/favicon.ico" type="image/x-icon">
@@ -13,6 +14,7 @@ MythTV Setup
 <script language="JavaScript" type="text/javascript" src="/js/jquery.min.js"></script>
 <script language="JavaScript" type="text/javascript" src="/js/jquery-ui.min.js"></script>
 <script language="JavaScript" type="text/javascript" src="/setup/js/util.js"></script>
+<script language="JavaScript" type="text/javascript" src="/setup/js/Config.js"></script>
 <script language="JavaScript" type="text/javascript" src="/setup/js/form_inputs.js"></script>
 <script language="JavaScript" type="text/javascript">
 
@@ -31,11 +33,16 @@ $(document).ready(function() {
         <a href="/"><img src="/images/mythtv.png" class="png" width="180" height="64" border="0" alt="MythTV"></a>
     </div>
 
-    <div id='header_warning'>
-        The Setup screens are a work in progress.
-    </div>
+    <div id='header_status'></div>
+    <div id='header_error'></div>
 </div>
 
+<!-- ----------------- -->
+<!-- DELETE THIS LATER -->
+<!-- ----------------- -->
+<div id='setupWarning' style='position: fixed, left: 10px, right: 190px, top: 400px, bottom: 600px, color: red, background-color: white, text-align: center, font-size: 18px; font-family: sans-serif; font-weight: bold'>The Setup screens are a work in progress.</div>
+<!-- ----------------- -->
+<!-- ----------------- -->
 
 <div id="menu-bg">
 </div>
@@ -43,6 +50,21 @@ $(document).ready(function() {
 </div>
 
 <div id="content">
+</div>
+
+<div id='edit-bg'>
+</div>
+<div id='editborder'>
+    <div id='editStatusMessage' class='statusMessage'></div>
+    <div id='editErrorMessage' class='errorMessage'></div>
+    <div id='editcontent'>
+    </div>
+    <div id='editclosebutton'>
+        <a href='javascript:hideEditWindow()'>Close [X]</a><br>
+    </div>
+    <div id='editlogo'>
+        <img src="/images/mythtv.png" class="png" width="180" height="64" border="0" alt="MythTV">
+    </div>
 </div>
 
 </body>

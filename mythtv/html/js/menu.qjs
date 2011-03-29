@@ -5,17 +5,17 @@
   <ul class="menu collapsible">
     <li><a href='#'>Setup</a>
       <ul class="acitem collapsible">
-        <li><a href="javascript:loadContent('/setup/wizard.html', '/setup/js/wizard.js')">Setup Wizard</a></li>
+        <li><a href="javascript:loadEditWindow('/setup/wizard.html', '/setup/js/wizard.js')">Setup Wizard</a></li>
         <li><a href='#'>Advanced Setup</a>
           <ul class="acitem collapsible">
             <li class="indent1"><a href="javascript:loadContent('/Config/Database')">Database</a></li>
-            <li class="indent1"><a href="javascript:loadContent('/Config/General')">General</a></li>
+            <li class="indent1"><a href="javascript:loadContent('/setup/general.html', '/setup/js/general.js')">General</a></li>
             <!-- some possible other menu items
             <li class="indent1"><a href="javascript:loadSetupPage('tuning')">Tuning</a></li>
             -->
             <li class="indent1"><a href="javascript:loadSetupPage('storagegroups')">Storage Groups</a></li>
-            <!--
             <li class="indent1"><a href="javascript:loadSetupPage('jobqueue')">Job Queue</a></li>
+            <!--
             <li class="indent1"><a href="javascript:loadSetupPage('systemevents')">System Events</a></li>
             -->
           </ul>

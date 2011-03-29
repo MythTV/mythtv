@@ -3,17 +3,19 @@
 <title>
 MythTV mythbackend Internal Web Server
 </title>
-<link rel="stylesheet"    href="/css/site.css"        type="text/css">
-<link rel="stylesheet"    href="/css/jquery-ui.css"   type="text/css">
-<link rel="stylesheet"    href="/css/menustyle.css"   type="text/css">
-<link rel="stylesheet"    href="/setup/css/setup.css" type="text/css">
-<link rel="icon"          href="/images/favicon.ico"  type="image/x-icon">
-<link rel="shortcut icon" href="/images/favicon.ico"  type="image/x-icon">
+<link rel="stylesheet"    href="/css/site.css"         type="text/css">
+<link rel="stylesheet"    href="/css/jquery-ui.css"    type="text/css">
+<link rel="stylesheet"    href="/css/menustyle.css"    type="text/css">
+<link rel="stylesheet"    href="/setup/css/setup.css"  type="text/css">
+<link rel="stylesheet"    href="/setup/css/Config.css" type="text/css">
+<link rel="icon"          href="/images/favicon.ico"   type="image/x-icon">
+<link rel="shortcut icon" href="/images/favicon.ico"   type="image/x-icon">
 <script language="JavaScript" type="text/javascript"  src="/js/util.qjs"></script>
 <script language="JavaScript" type="text/javascript"  src="/js/jquery.min.js"></script>
 <script language="JavaScript" type="text/javascript"  src="/js/menu.js"></script>
 <script language="JavaScript" type="text/javascript"  src="/js/jquery-ui.min.js"></script>
 <script language="JavaScript" type="text/javascript"  src="/setup/js/util.js"></script>
+<script language="JavaScript" type="text/javascript"  src="/setup/js/Config.js"></script>
 <script language="JavaScript" type="text/javascript"  src="/setup/js/form_inputs.js"></script>
 
 <script language="JavaScript" type="text/javascript">
@@ -31,6 +33,9 @@ $(document).ready(function() {
     <div id="header_logo">
         <a href="/"><img src="/images/mythtv.png" class="png" width="180" height="64" border="0" alt="MythTV"></a>
     </div>
+
+    <div id='header_status'></div>
+    <div id='header_error'></div>
 </div>
 
 <div id="menu-bg">
@@ -42,6 +47,21 @@ $(document).ready(function() {
 </div>
 
 <div id="content">
+</div>
+
+<div id='edit-bg'>
+</div>
+<div id='editborder'>
+    <div id='editStatusMessage' class='statusMessage'></div>
+    <div id='editErrorMessage' class='errorMessage'></div>
+    <div id='editcontent'>
+    </div>
+    <div id='editclosebutton'>
+        <a href='javascript:hideEditWindow()'>Close [X]</a><br>
+    </div>
+    <div id='editlogo'>
+        <img src="/images/mythtv.png" class="png" width="180" height="64" border="0" alt="MythTV">
+    </div>
 </div>
 
 </body>

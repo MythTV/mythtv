@@ -1,5 +1,7 @@
 <% var myth = new Myth(); %>
 
+var statusMessageTimeout = 3000;
+var errorMessageTimeout  = 5000;
 var gHostName = "<%= myth.GetHostName() %>";
 
 function getHostName() {
@@ -17,9 +19,25 @@ function getSetting(hostname, key, defValue) {
     $.getJSON("/Myth/GetSetting",
         { HostName: hostname, Key: key, Default: defValue },
         function(data) {
-            result = data.SettingList.Settings[0].String;
+            result = data.SettingList.Settings[0].Value;
         }).error(function(data) {
             alert("Error: unable to retrieve setting");
+        });
+    $.ajaxSetup({ async: true });
+
+    return result;
+}
+
+function putSetting(hostname, key, value) {
+    var result = 0;
+
+    $.ajaxSetup({ async: false });
+    $.post("/Myth/PutSetting",
+        { HostName: hostname, Key: key, Value: value },
+        function(data) {
+            result = 1;
+        }).error(function(data) {
+            alert("Error: unable to save setting");
         });
     $.ajaxSetup({ async: true });
 
@@ -57,23 +75,33 @@ function clearMenu() {
     $("#menu-bg").html("");
 }
 
-function loadContent(contentURL, jsURL) {
-    $("#content").html("<br><br><b>Loading...</b>");
+function loadDiv(divName, contentURL, jsURL) {
+    divName = "#" + divName;
+    
+    $(divName).html("<br><br><b>Loading...</b>");
 
     var html = $.ajax({
       url: contentURL,
         async: false
      }).responseText;
 
-    $("#content").html(html);
+    $(divName).html(html);
 
     if (jsURL) {
         $.getScript(jsURL);
     }
 }
 
+function clearDiv(divName) {
+    $("#" + divName).html("");
+}
+
+function loadContent(contentURL, jsURL) {
+    loadDiv("content", contentURL, jsURL);
+}
+
 function clearContent() {
-    $("#content").html("");
+    clearDiv("content");
 }
 
 function getCurrentTab(id) {
@@ -87,5 +115,20 @@ function addTab(id, url, label) {
 
 function removeTab(id, index) {
     $(id).tabs("remove", index);
+}
+
+function setHeaderStatusMessage(message) {
+    $("#header_status").html(message);
+    setTimeout('$("#header_status").html("")', statusMessageTimeout);
+}
+
+function setHeaderErrorMessage(message) {
+    $("#header_error").html(message);
+    setTimeout('$("#header_error").html("")', errorMessageTimeout);
+}
+
+function clearHeaderMessages() {
+    setHeaderStatusMessage("");
+    setHeaderErrorMessage("");
 }
 

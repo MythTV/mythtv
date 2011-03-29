@@ -111,9 +111,10 @@ class MythSetting : public MythSettingBase
     long long range_max;
 };
 
-bool parse_settings(MythSettingList &settings, const QString &filename);
+bool parse_settings(MythSettingList &settings, const QString &filename,
+                    const QString &group = "");
 bool load_settings(MythSettingList &settings, const QString &hostname);
 bool check_settings(MythSettingList &database_settings,
-                    const QMap<QString,QString> &params);
+                    const QMap<QString,QString> &params, QString &result);
 
 #endif

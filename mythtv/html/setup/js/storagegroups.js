@@ -4,7 +4,7 @@ var sgTabCount = 0;
 
 function appendTabRow(tabID, id, group, host, dir) {
     var rowNum = $('#sgtable-' + tabID + ' tr').length;
-    var altText;
+    var altText = "";
     if ((rowNum/2) % 1 == 0)
         altText = "class='alt' ";
     var rowID = "sgtable-" + tabID + "-" + rowNum;
@@ -14,7 +14,7 @@ function appendTabRow(tabID, id, group, host, dir) {
 function initStorageGroups() {
     var selectedHost = $("#sgShowHost").val();
 
-    $("#storagegrouptabs").tabs();
+    $("#storagegrouptabs").tabs({ cache: true });
 
     while (sgTabCount > 0) {
         $("#storagegrouptabs").tabs("remove", 0);
@@ -61,6 +61,9 @@ function saveDir(tabID) {
         appendTabRow(tabID, 0, group, host, dir);
         $("#sgtabs-" + tabID + "-add").css("display", "");
         $("#sgtabs-" + tabID + "-edit").css("display", "none");
+        setHeaderStatusMessage("Storage Group Directory save Succeeded.");
+    } else {
+        setHeaderErrorMessage("Storage Group Directory save Failed!");
     }
 }
 
@@ -108,13 +111,8 @@ function removeStorageGroupDir( group, dir, host ) {
         function(data) {
             if (data.bool == "true")
                 result = 1;
-            else
-                alert("data.bool != true");
-        }, "json").error(function(data) {
-            alert("Error: unable to remove Storage Group Directory");
-        });
+        }, "json");
     $.ajaxSetup({ async: true });
-    // FIXME, better alerting
 
     return result;
 }
@@ -126,9 +124,10 @@ function removeStorageGroupTableRow( tabID, rowID ) {
     var dir = $("#" + rowID).find("td").eq(2).html();
 
     if (removeStorageGroupDir(group, dir, host)) {
+        setHeaderStatusMessage("Remove Storage Group Directory Succeeded.");
         $("#" + rowID).remove();
     } else {
-        alert("json remove call failed.");
+        setHeaderErrorMessage("Remove Storage Group Directory Failed!");
     }
 }
 

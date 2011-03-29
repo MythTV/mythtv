@@ -182,8 +182,9 @@ QString MythSetting::ToHTML(uint level) const
                 "<div class=\"setting_label\">" + label + "</div>\r\n";
             ret += indent(level) +
                 QString("<input name=\"%1\" id=\"%2_input\" type=\"text\""
-                        " value=\"%3\"/>\r\n")
-                .arg(value).arg(value).arg(data);
+                        " value=\"%3\"/><div class=\"form_error\""
+                        "id=\"%4_error\"></div>\r\n")
+                .arg(value).arg(value).arg(data).arg(value);
             ret += indent(level) +
                 QString("<div style=\"display:none;"
                         "position:absolute;left:-4000px\" "
@@ -195,8 +196,10 @@ QString MythSetting::ToHTML(uint level) const
                 "<div class=\"setting_label\">" + label + "</div>\r\n";
             ret += indent(level) +
                 QString("<input name=\"%1\" id=\"%2_input\" type=\"checkbox\""
-                        " value=\"1\" %3/>\r\n")
-                .arg(value).arg(value).arg((data.toUInt()) ? "checked" : "");
+                        " value=\"1\" %3/><div class=\"form_error\""
+                        " id=\"%4_error\"></div>\r\n")
+                .arg(value).arg(value).arg((data.toUInt()) ? "checked" : "")
+                .arg(value);
             ret += indent(level) +
                 QString("<div style=\"display:none;"
                         "position:absolute;left:-4000px\" "
@@ -222,7 +225,9 @@ QString MythSetting::ToHTML(uint level) const
                          "selected" : "")
                     .arg(display_list[i]);
             }
-            ret += indent(level) + "</select>\r\n";
+            ret += indent(level) + "</select>" +
+                   QString("<div class=\"form_error\" id=\"%1_error\"></div>\r\n")
+                           .arg(value);
             ret += indent(level) +
                 QString("<div style=\"display:none;"
                         "position:absolute;left:-4000px\" "
@@ -284,10 +289,13 @@ MythSetting::DataType parse_data_type(const QString &str)
 }
 
 bool parse_dom(MythSettingList &settings, const QDomElement &element,
-               const QString &filename)
+               const QString &filename, const QString &group,
+               bool includeAllChildren, bool &foundGroup)
 {
 #define LOC QString("parse_dom(%1@~%2), error: ") \
             .arg(filename).arg(e.lineNumber())
+
+    bool mFoundGroup = false;
 
     QDomNode n = element.firstChild();
     while (!n.isNull())
@@ -305,15 +313,32 @@ bool parse_dom(MythSettingList &settings, const QDomElement &element,
             QString unique_label = e.attribute("unique_label");
             QString ecma_script  = e.attribute("ecma_script");
 
+            bool tmpFoundGroup = false;
+            bool tmpIncludeAllChildren = false || includeAllChildren;
+            if (group.isEmpty() || unique_label == group)
+            {
+                mFoundGroup = true;
+                tmpIncludeAllChildren = true;
+            }
+
             MythSettingGroup *g = new MythSettingGroup(
                 human_label, unique_label, ecma_script);
 
-            if (e.hasChildNodes() && !parse_dom(g->settings, e, filename))
+            if ((e.hasChildNodes()) &&
+                (!parse_dom(g->settings, e, filename, group, tmpIncludeAllChildren,
+                            tmpFoundGroup)))
                 return false;
 
-            settings.push_back(g);
+            if (tmpFoundGroup || tmpIncludeAllChildren)
+            {
+                settings.push_back(g);
+                mFoundGroup = true;
+            }
+            else
+                delete g;
+
         }
-        else if (e.tagName() == "setting")
+        else if (e.tagName() == "setting" && includeAllChildren)
         {
             QMap<QString,QString> m;
             m["value"]        = e.attribute("value");
@@ -414,7 +439,7 @@ bool parse_dom(MythSettingList &settings, const QDomElement &element,
 
             settings.push_back(s);
         }
-        else
+        else if (group.isEmpty())
         {
             VERBOSE(VB_IMPORTANT, LOC +
                     QString("Unknown element: %1").arg(e.tagName()));
@@ -422,11 +447,16 @@ bool parse_dom(MythSettingList &settings, const QDomElement &element,
         }
         n = n.nextSibling();
     }
+
+    if (mFoundGroup)
+        foundGroup = true;
+
     return true;
 #undef LOC
 }
 
-bool parse_settings(MythSettingList &settings, const QString &filename)
+bool parse_settings(MythSettingList &settings, const QString &filename,
+                    const QString &group)
 {
     QDomDocument doc;
     QFile f(filename);
@@ -454,7 +484,10 @@ bool parse_settings(MythSettingList &settings, const QString &filename)
     f.close();
 
     settings.clear();
-    return parse_dom(settings, doc.documentElement(), filename);
+    bool foundGroup = false;
+    bool includeAllChildren = group.isEmpty();
+    return parse_dom(settings, doc.documentElement(), filename, group,
+                     includeAllChildren, foundGroup);
 }
 
 bool load_settings(MythSettingList &settings, const QString &hostname)
@@ -528,8 +561,27 @@ bool load_settings(MythSettingList &settings, const QString &hostname)
 }
 
 bool check_settings(MythSettingList &database_settings,
-                    const QMap<QString,QString> &params)
+                    const QMap<QString,QString> &params,
+                    QString &result)
 {
-    // TODO
-    return false;
+    QMap<QString,QString>::const_iterator it = params.begin();
+    for (; it != params.end(); ++it)
+    {
+        if (it.key().startsWith("__"))
+            continue;
+
+        if (result.isEmpty())
+            result += "{ ";
+        else
+            result += ", ";
+
+        result += QString("\"%1\": \"DEBUG: New value for '%2' would be '%3'\"")
+                          .arg(it.key()).arg(it.key()).arg(*it);
+    }
+
+    if (!result.isEmpty())
+        result += " }";
+
+    // FIXME, do some actual validation here
+    return result.isEmpty();
 }

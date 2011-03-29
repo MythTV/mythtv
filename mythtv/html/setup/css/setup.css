@@ -1,11 +1,80 @@
-    div.wizardcontent {
+    div.setupcontent {
         position:           absolute;
-        padding:            20px 10px 10px 0px;
+        top:                10px;
+        left:               10px;
+        right:              10px;
     }
 
     /* keep wizard tabs small enough to fit on a 1024x768 size browser */
-    div.wizardtab {
-        width:              700px;
-        height:             450px;
+    div.setuptab {
+        width:              100%;
+    }
+
+    #edit-bg {
+        display: none;
+        position: absolute;
+        top: 0%;
+        left: 0%;
+        width: 100%;
+        height: 100%;
+        background-color: #000000;
+        z-index:100;
+        opacity:0.5;
+        -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+        filter: alpha(opacity=50);
+    }
+
+    #editborder {
+        display: none;
+        position: absolute;
+        background-color: #FFFFFF;
+        top: 30px;
+        right: 30px;
+        bottom: 30px;
+        left: 30px;
+        z-index: 101;
+        border-width: 6px;
+        border-color: #0000FF;
+        border-style: double;
+    }
+
+    #editcontent {
+        position: absolute;
+        top: 45px;
+        width: 100%;
+    }
+
+    #editclosebutton {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+    }
+
+    #editlogo {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+    }
+
+    #setuptabs {
+        width: 100%;
+    }
+
+    #editTitle {
+        font-size:          18px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        width:              100%;
+        color:              black;
+        text-align:         center;
+    }
+
+    #jobEditTitle {
+        font-size:          14px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        width:              100%;
+        color:              black;
+        text-align:         center;
     }
 

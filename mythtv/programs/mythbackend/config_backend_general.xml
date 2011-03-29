@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config>
+<!--
   <group human_label="Host Address Backend Setup" unique_label="server">
+-->
+  <group unique_label="server">
     <group human_label="Local Backend" unique_label="local_server">
       <setting
          value="BackendServerIP" default_data="127.0.0.1"

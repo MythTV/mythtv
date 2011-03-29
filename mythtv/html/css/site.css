@@ -59,33 +59,33 @@
         height:             36px;
     }
 
-    #header_warning {
-        font-size:          24px;
+    #header_status {
+        position:           fixed;
+        font-size:          18px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        color:              blue;
+        text-align:         center;
+        top:                0px;
+        left:               0px;
+        right:              0px;
+        height:             38px;
+        z-index:            98;
+        padding:            6px 200px 0 200px;
+    }
+
+    #header_error {
+        position:           fixed;
+        font-size:          18px;
         font-family:        sans-serif;
         font-weight:        bold;
         color:              red;
-        position:           fixed;
+        text-align:         center;
         top:                0px;
         left:               0px;
         right:              0px;
         height:             38px;
         z-index:            98;
-        text-align:         center;
-        padding:            6px 200px 0 200px;
-	}
-
-    #header_title {
-        font-size:          24px;
-        font-family:        sans-serif;
-        font-weight:        bold;
-        color:              #E4D6CD;
-        position:           fixed;
-        top:                0px;
-        left:               0px;
-        right:              0px;
-        height:             38px;
-        z-index:            98;
-        text-align:         center;
         padding:            6px 200px 0 200px;
     }
 
@@ -164,12 +164,18 @@
 
     #content {
         position:           absolute;
-        margin:             0px;
-        padding:            40px 20px 20px 20px;
+        top:                40px;
+        right:              0px;
         left:               200px;
+        padding:            10px;
     }
     #content a[name] {
         padding-top: 6em;
+    }
+
+    div.tablewrapper {
+        position:           relative;
+        padding:            10px;
     }
 
     table
@@ -222,5 +228,30 @@
     table th.invisible
     {
         display:none;
+    }
+
+    div.statusMessage {
+        font-size:          18px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        width:              100%;
+        color:              blue;
+        text-align:         center;
+    }
+
+    div.errorMessage {
+        font-size:          18px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        width:              100%;
+        color:              red;
+        text-align:         center;
+    }
+
+    div.form_error {
+        font-size:          14px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        color:              red;
     }
 

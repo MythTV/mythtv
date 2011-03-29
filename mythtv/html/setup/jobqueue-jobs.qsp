@@ -1,0 +1,47 @@
+<div id='jobqueue-jobs' class='setuptab'>
+<h3>JobQueue Jobs</h3> 
+
+<%
+var myth = new Myth();
+var sList;
+var rowNum = 0;
+
+function printJobRow(title, descKey, cmdKey) {
+    var altText = "";
+
+    if ((rowNum%2) == 1)
+        altText = " class='alt'";
+
+    os.writeln("<tr" + altText + "><td>" + sList.Settings[descKey] + "</td><td><input type=button onClick='javascript:editJob(\"" + title + "\", \"" + descKey + "\", \"" + cmdKey + "\")' value='Edit'></td></tr>");
+
+    rowNum++;
+}
+
+%>
+
+<!-- Eventually after the JobQueue reorg, we'll be able to do this:
+<a href='javascript:createNewJob()'>Create New Job</a><br>
+-->
+<table border=1 cellpadding=2 cellspacing=2>
+<tr><th>Description</th><th>Actions</th></tr>
+<tr><td>Transcoding</td><td><input type=button onClick='javascript:editJob("Transcoder", "", "JobQueueTranscodeCommand")' value='Edit'></td></tr>
+<tr class='alt'><td>Commercial Flagging</td><td><input type=button onClick='javascript:editJob("Commercial Flagger", "", "JobQueueCommFlagCommand")' value='Edit'></td></tr>
+<%
+    sList = myth.GetSetting("", "UserJobDesc1", "")
+    if (sList.Settings["UserJobDesc1"] != "")
+        printJobRow("User Job #1", "UserJobDesc1", "UserJob1");
+
+    sList = myth.GetSetting("", "UserJobDesc2", "")
+    if (sList.Settings["UserJobDesc2"] != "")
+        printJobRow("User Job #2", "UserJobDesc2", "UserJob2");
+
+    sList = myth.GetSetting("", "UserJobDesc3", "")
+    if (sList.Settings["UserJobDesc3"] != "")
+        printJobRow("User Job #3", "UserJobDesc3", "UserJob3");
+
+    sList = myth.GetSetting("", "UserJobDesc4", "")
+    if (sList.Settings["UserJobDesc4"] != "")
+        printJobRow("User Job #4", "UserJobDesc4", "UserJob4");
+%>
+</table>
+</div>
