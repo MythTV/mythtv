@@ -44,14 +44,22 @@ function saveJobEditor() {
 
     editJob($("#jobEditTitle").html(), descKey, commandKey);
 
+    var errorMessage = "";
     if (!descSavedOK)
-        appendEditErrorMessage("Error updating job description");
+        errorMessage += "Error updating job description";
 
     if (!cmdSavedOK)
-        appendEditErrorMessage("Error updating job command");
+    {
+        if (errorMessage.length)
+            errorMessage += "<br>";
+        errorMessage += "Error updating job command";
+    }
+
+    if (errorMessage.length)
+        setEditErrorMessage(errorMessage);
 
     if (descSavedOK && cmdSavedOK)
-        appendEditStatusMessage("Save Successful");
+        setEditStatusMessage("Save Successful");
 }
 
 $("#setuptabs").tabs({ cache: true });

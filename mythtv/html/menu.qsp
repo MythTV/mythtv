@@ -5,18 +5,18 @@
   <ul class="menu collapsible">
     <li><a href='#'>Setup</a>
       <ul class="acitem collapsible">
-        <li><a href="javascript:loadEditWindow('/setup/wizard.html', '/setup/js/wizard.js')">Setup Wizard</a></li>
+        <li><a href='#' onClick="javascript:clearContent(); loadEditWindow('/setup/wizard.html', '/setup/js/wizard.js')">Setup Wizard</a></li>
         <li><a href='#'>Advanced Setup</a>
           <ul class="acitem collapsible">
-            <li class="indent1"><a href="javascript:loadContent('/Config/Database')">Database</a></li>
-            <li class="indent1"><a href="javascript:loadContent('/setup/general.html', '/setup/js/general.js')">General</a></li>
+            <li class="indent1"><a href='#' onClick="javascript:loadSetupContent('/Config/Database')">Database</a></li>
+            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('general')">General</a></li>
             <!-- some possible other menu items
-            <li class="indent1"><a href="javascript:loadSetupPage('tuning')">Tuning</a></li>
+            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('tuning')">Tuning</a></li>
             -->
-            <li class="indent1"><a href="javascript:loadSetupPage('storagegroups')">Storage Groups</a></li>
-            <li class="indent1"><a href="javascript:loadSetupPage('jobqueue')">Job Queue</a></li>
+            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('storagegroups')">Storage Groups</a></li>
+            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('jobqueue')">Job Queue</a></li>
             <!--
-            <li class="indent1"><a href="javascript:loadSetupPage('systemevents')">System Events</a></li>
+            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('systemevents')">System Events</a></li>
             -->
           </ul>
         </li>
@@ -26,13 +26,13 @@
 
     if (sList.Settings['EnableWebSetupDevMode'] == 1)
     {
-        os.write("<li><a href=\"javascript:loadContent('/setup/expert.html')\">Expert/Dev Setup</a></li>");
+        os.write("<li><a href='#' onClick=\"javascript:loadSetupContent('/setup/expert.html')\">Expert/Dev Setup</a></li>");
     }
 %>
-        <li><a href="javascript:loadSetupPage('password')">Change Password</a></li>
+        <li><a href='#' onClick="javascript:loadSetupPage('password')">Change Password</a></li>
       </ul>
     </li>
-    <li><a class='menuitem' href="javascript:loadContent('/Status/GetStatusHTML')">Backend Status</a></li>
+    <li><a class='menuitem' href='#' onClick="javascript:loadContent('/Status/GetStatusHTML')">Backend Status</a></li>
     <li><hr></li>
     <li><a href='#'>API</a>
       <ul class="acitem collapsible">
@@ -46,8 +46,8 @@
         </li>
         <li><a href='#'>Server Side Scripting</a>
           <ul class="acitem">
-            <li class="indent1"><a href="javascript:loadContent('/samples/serverside.qsp', '/samples/js/samples.js')">Overview</a></li>
-            <li class="indent1"><a href="javascript:loadContent('/samples/recorded.qsp', '/samples/js/samples.js')">GetRecorded() Example</a></li>
+            <li class="indent1"><a href='#' onClick="javascript:loadContent('/samples/serverside.qsp', '/samples/js/samples.js')">Overview</a></li>
+            <li class="indent1"><a href='#' onClick="javascript:loadContent('/samples/recorded.qsp', '/samples/js/samples.js')">GetRecorded() Example</a></li>
           </ul>
         </li>
       </ul>

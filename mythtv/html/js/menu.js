@@ -96,4 +96,3 @@ jQuery.fn.initMenu = function() {
 });
 };
 
-$(document).ready(function() {$('.menu').initMenu();});

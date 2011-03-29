@@ -89,3 +89,43 @@
         text-align:         center;
     }
 
+    /********************************************************/
+    /* Styles used by the /Config/* backend-generated pages */
+    div.config {
+        font:11px verdana, arial, helvetica, sans-serif;
+        margin:20px;
+    }
+
+    h1.config {
+        font-size:28px;
+        font-weight:900;
+        color:#ccc;
+        letter-spacing:0.5em;
+        margin-bottom:30px;
+        width:650px;
+        text-align:center;
+    }
+
+    h2.config {
+        font-size:18px;
+        font-weight:800;
+        color:#360;
+        border:none;
+        letter-spacing:0.3em;
+        padding:0px;
+        margin-bottom:10px;
+        margin-top:0px;
+    }
+
+    h3.config {
+        font-size:14px;
+        font-weight:800;
+        color:#360;
+        border:none;
+        letter-spacing:0.3em;
+        padding:0px;
+        margin-bottom:10px;
+        margin-top:0px;
+    }
+    /********************************************************/
+

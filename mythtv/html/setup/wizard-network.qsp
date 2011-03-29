@@ -17,5 +17,5 @@
 </table>
 <hr>
 If the setting you are looking for is not available here, you can go to the <a href="javascript:hideEditWindow(); 
-loadContent('/Config/General?__group__=local_server', '/setup/js/Config.js')">Advanced General Setup Screen</a>
+loadContent('/Config/General?__group__=local_server')">Advanced General Setup Screen</a>
 </div>

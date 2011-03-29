@@ -1,7 +1,7 @@
 <% var myth = new Myth(); %>
 
-var statusMessageTimeout = 3000;
-var errorMessageTimeout  = 5000;
+var statusMessageTimeout = 5000;
+var errorMessageTimeout  = 8000;
 var gHostName = "<%= myth.GetHostName() %>";
 
 function getHostName() {
@@ -44,37 +44,6 @@ function putSetting(hostname, key, value) {
     return result;
 }
 
-function interceptMenuClicks() {
-    $('#menu ul li a').click(function(event) {
-        if (this.href.match("/Config/") == "/Config/") {
-            event.preventDefault();
-            loadContent(this.href, "/setup/js/Config.js");
-        }
-    });
-}
-
-function loadScreen(menuURL, contentURL, jsURL) {
-    loadMenu(menuURL);
-    if (contentURL && contentURL != "")
-        loadContent(contentURL);
-    if (jsURL && jsURL != "")
-        $.getScript(jsURL);
-}
-
-function loadMenu(menuURL) {
-    var html = $.ajax({
-      url: menuURL,
-        async: false
-     }).responseText;
-
-    $("#content").html("");
-    $("#menu-bg").html(html);
-}
-
-function clearMenu() {
-    $("#menu-bg").html("");
-}
-
 function loadDiv(divName, contentURL, jsURL) {
     divName = "#" + divName;
     
@@ -100,8 +69,30 @@ function loadContent(contentURL, jsURL) {
     loadDiv("content", contentURL, jsURL);
 }
 
+function loadSetupContent(contentURL, jsURL) {
+    loadSetupJavascript();
+    loadContent(contentURL, jsURL);
+}
+
 function clearContent() {
     clearDiv("content");
+}
+
+function loadSetupJavascript() {
+    $.getScript("/setup/js/setup.js");
+}
+
+function loadSetupPage(pageName) {
+    loadSetupJavascript();
+    loadContent("/setup/" + pageName + ".html",
+                "/setup/js/" + pageName + ".js");
+}
+
+function loadEditWindow(contentURL, jsURL) {
+    loadSetupJavascript();
+    clearEditMessages();
+    loadDiv("editcontent", contentURL, jsURL);
+    showEditWindow();
 }
 
 function getCurrentTab(id) {

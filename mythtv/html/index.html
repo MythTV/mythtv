@@ -6,23 +6,21 @@ MythTV mythbackend Internal Web Server
 <link rel="stylesheet"    href="/css/site.css"         type="text/css">
 <link rel="stylesheet"    href="/css/jquery-ui.css"    type="text/css">
 <link rel="stylesheet"    href="/css/menustyle.css"    type="text/css">
-<link rel="stylesheet"    href="/setup/css/setup.css"  type="text/css">
-<link rel="stylesheet"    href="/setup/css/Config.css" type="text/css">
+<link rel="stylesheet"    href="/css/setup.css"        type="text/css">
 <link rel="icon"          href="/images/favicon.ico"   type="image/x-icon">
 <link rel="shortcut icon" href="/images/favicon.ico"   type="image/x-icon">
 <script language="JavaScript" type="text/javascript"  src="/js/util.qjs"></script>
 <script language="JavaScript" type="text/javascript"  src="/js/jquery.min.js"></script>
-<script language="JavaScript" type="text/javascript"  src="/js/menu.js"></script>
 <script language="JavaScript" type="text/javascript"  src="/js/jquery-ui.min.js"></script>
-<script language="JavaScript" type="text/javascript"  src="/setup/js/util.js"></script>
-<script language="JavaScript" type="text/javascript"  src="/setup/js/Config.js"></script>
-<script language="JavaScript" type="text/javascript"  src="/setup/js/form_inputs.js"></script>
+<script language="JavaScript" type="text/javascript"  src="/js/menu.js"></script>
 
 <script language="JavaScript" type="text/javascript">
 
 $(document).ready(function() {
-    loadScreen('/menu.qsp', '/misc/overview.html', '/js/menu.js')
+    loadDiv("menu-bg", "/menu.qsp");
+    loadContent("/misc/overview.qsp");
     showHostName();
+    $('.menu').initMenu();
 });
 
 </script>

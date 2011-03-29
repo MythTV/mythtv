@@ -192,21 +192,17 @@ void HttpConfig::OpenForm(QBuffer &buffer, const QString &form,
 
     os << "  <form id=\"config_form_" << group << "\">\r\n"
        << "    <input type=\"hidden\" id=\"__config_form_action__\" value=\"" << form << "\" />\r\n"
-       << "    <input type=\"hidden\" id=\"__group__\" value=\"" << group << "\" />\r\n"
-       << "    <div class=\"form_buttons_top\"\r\n"
-       << "         id=\"form_buttons_top\">\r\n"
-       << "      <input type=\"button\" value=\"Save Changes\" onClick=\"javascript:submitConfigForm('" << group << "')\" />\r\n"
-       << "    </div>\r\n";
+       << "    <input type=\"hidden\" id=\"__group__\" value=\"" << group << "\" />\r\n";
 }
 
 void HttpConfig::CloseForm(QBuffer &buffer, const QString &group)
 {
     QTextStream os(&buffer);
 
-    os << "    <div class=\"form_buttons_bottom\"\r\n"
-       << "         id=\"form_buttons_bottom\">\r\n"
-       << "      <input type=\"button\" value=\"Save Changes\" onClick=\"javascript:submitConfigForm('" << group << "')\" />\r\n"
-       << "    </div>\r\n"
+//    os << "    <div class=\"config_form_submit\"\r\n"
+//       << "         id=\"config_form_submit\">\r\n";
+    os << "      <input type=\"button\" value=\"Save Changes\" onClick=\"javascript:submitConfigForm('" << group << "')\" />\r\n"
+//       << "    </div>\r\n"
        << "  </form>\r\n";
 }
 
