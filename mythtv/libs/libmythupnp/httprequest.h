@@ -129,6 +129,7 @@ class UPNP_PUBLIC HTTPRequest
         int                 m_nMajor;
         int                 m_nMinor;
 
+        bool                m_bProtected;
 
         bool                m_bSOAPRequest;
         QString             m_sNameSpace;

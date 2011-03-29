@@ -919,6 +919,11 @@ QString HTTPRequest::GetAdditionalHeaders( void )
 {
     QString sHeader = m_szServerHeaders;
 
+    // Override the cache-control header on protected resources.
+
+    if (m_bProtected)
+        m_mapRespHeaders[ "Cache-control" ] = "no-cache";
+
     for ( QStringMap::iterator it  = m_mapRespHeaders.begin();
                                it != m_mapRespHeaders.end();
                              ++it )
@@ -1027,6 +1032,8 @@ bool HTTPRequest::ParseRequest()
             return false;
         }
 
+        m_bProtected = false;
+
         if (IsUrlProtected( m_sBaseUrl ))
         {
             if (!Authenticated())
@@ -1041,6 +1048,8 @@ bool HTTPRequest::ParseRequest()
 
                 return true;
             }
+
+            m_bProtected = true;
         }
 
 
@@ -1450,7 +1459,7 @@ QString HTTPRequest::Encode(const QString &sIn)
 
 bool HTTPRequest::IsUrlProtected( const QString &sBaseUrl )
 {
-    QString sProtected = UPnp::g_pConfig->GetValue( "HTTP/Protected/Urls", "/setup" );
+    QString sProtected = UPnp::g_pConfig->GetValue( "HTTP/Protected/Urls", "/setup;/Config" );
 
     QStringList oList = sProtected.split( ';' );
 
