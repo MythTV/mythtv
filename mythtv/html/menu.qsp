@@ -44,7 +44,12 @@
             <li class="indent1"><a href='/Content/wsdl'>Content Service</a></li>
           </ul>
         </li>
-        <li><a class='menuitem' href='/samples'>Sample Pages</a></li>
+        <li><a href='#'>Server Side Scripting</a>
+          <ul class="acitem">
+            <li class="indent1"><a href="javascript:loadContent('/samples/serverside.qsp', '/samples/js/samples.js')">Overview</a></li>
+            <li class="indent1"><a href="javascript:loadContent('/samples/recorded.qsp', '/samples/js/samples.js')">GetRecorded() Example</a></li>
+          </ul>
+        </li>
       </ul>
     </li>
   </ul>

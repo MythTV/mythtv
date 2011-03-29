@@ -21,6 +21,11 @@ MythTV mythbackend Internal Web Server
 <script language="JavaScript" type="text/javascript">
 
 $(document).ready(function() {
+    jQuery.ajaxSetup({ type: "GET",
+                       contentType: "application/json; charset=utf-8",
+                       data: "{}",
+                       dataType: "json" });
+
     loadScreen('/menu.qsp', '/misc/overview.html', '/js/menu.js')
     showHostName();
 });
