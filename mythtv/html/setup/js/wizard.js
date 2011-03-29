@@ -30,5 +30,6 @@ function testDBSettings() {
     return result;
 }
 
+$('#editborder').attr({ class: 'editborder-wizard' });
 $("#wizardtabs").tabs({ cache: true });
 showEditWindow();

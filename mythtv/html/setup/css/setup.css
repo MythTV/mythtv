@@ -24,7 +24,21 @@
         filter: alpha(opacity=50);
     }
 
-    #editborder {
+    #editcontent {
+        position: absolute;
+        top: 25px;
+        width: 100%;
+    }
+
+    #editclosebutton {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+    }
+
+    /************************************************************/
+    /* various classes for 'popup' edit div */
+    div.editborder-fullscreen {
         display: none;
         position: absolute;
         background-color: #FFFFFF;
@@ -38,35 +52,32 @@
         border-style: double;
     }
 
-    #editcontent {
+    div.editborder-wizard {
+        display: none;
         position: absolute;
-        top: 45px;
-        width: 100%;
+        background-color: #FFFFFF;
+        top: 30px;
+        right: 30px;
+        left: 30px;
+        height: 420px;
+        z-index: 101;
+        border-width: 6px;
+        border-color: #0000FF;
+        border-style: double;
     }
+    /************************************************************/
 
-    #editclosebutton {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-    }
-
-    #editlogo {
-        position: absolute;
-        top: 5px;
-        left: 5px;
-    }
-
-    #setuptabs {
-        width: 100%;
-    }
-
-    #Title {
+    #editTitle {
         font-size:          18px;
         font-family:        sans-serif;
         font-weight:        bold;
         width:              100%;
         color:              black;
         text-align:         center;
+    }
+
+    #setuptabs {
+        width: 100%;
     }
 
     #jobEditTitle {

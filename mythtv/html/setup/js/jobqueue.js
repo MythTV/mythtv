@@ -1,5 +1,6 @@
 
 function editJob(title, descKey, commandKey) {
+    $('#editborder').attr({ class: 'editborder-fullscreen' }); 
     loadEditWindow("/setup/jobqueue-job-editor.html");
 
     $("#jobEditTitle").html(title);
