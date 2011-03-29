@@ -55,7 +55,11 @@ DTC::ProgramList* Dvr::GetRecorded( bool bDescending,
 
     ProgramList progList;
 
-    LoadFromRecorded( progList, false, inUseMap, isJobRunning, recMap );
+    int desc = 0;
+    if (bDescending)
+        desc = -1;
+
+    LoadFromRecorded( progList, false, inUseMap, isJobRunning, recMap, desc );
 
     QMap< QString, ProgramInfo* >::iterator mit = recMap.begin();
 
