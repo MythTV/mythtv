@@ -16,6 +16,6 @@
         <td><input id='SecurityPin' type='password' size=10></td></tr>
 </table>
 <hr>
-If the setting you are looking for is not available here, you can go to
-the <a href="javascript:hideEditWindow(); loadContent('/Config/General?__group__=local_server', '/setup/js/Config.js')">Advanced General Setup Screen</a>
+If the setting you are looking for is not available here, you can go to the <a href="javascript:hideEditWindow(); 
+loadContent('/Config/General?__group__=local_server', '/setup/js/Config.js')">Advanced General Setup Screen</a>
 </div>
