@@ -110,7 +110,7 @@ bool JumpToChannel::ProcessEntry(const QStringList &actions, const QKeyEvent *e)
         return true;
     }
 
-    if (has_action("SELECT", actions))
+    if (has_action(ACTION_SELECT, actions))
     {
         if (Update())
             deleteLater();
@@ -448,28 +448,28 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
     {
         QString action = actions[i];
         handled = true;
-        if (action == "UP")
+        if (action == ACTION_UP)
         {
             if (m_verticalLayout)
                 cursorLeft();
             else
                 cursorUp();
         }
-        else if (action == "DOWN")
+        else if (action == ACTION_DOWN)
         {
             if (m_verticalLayout)
                 cursorRight();
             else
                 cursorDown();
         }
-        else if (action == "LEFT")
+        else if (action == ACTION_LEFT)
         {
             if (m_verticalLayout)
                 cursorUp();
             else
                 cursorLeft();
         }
-        else if (action == "RIGHT")
+        else if (action == ACTION_RIGHT)
         {
             if (m_verticalLayout)
                 cursorDown();
@@ -490,33 +490,33 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
             else
                 pageDown();
         }
-        else if (action == "PAGELEFT")
+        else if (action == ACTION_PAGELEFT)
         {
             if (m_verticalLayout)
                 pageUp();
             else
                 pageLeft();
         }
-        else if (action == "PAGERIGHT")
+        else if (action == ACTION_PAGERIGHT)
         {
             if (m_verticalLayout)
                 pageDown();
             else
                 pageRight();
         }
-        else if (action == "DAYLEFT")
+        else if (action == ACTION_DAYLEFT)
             dayLeft();
-        else if (action == "DAYRIGHT")
+        else if (action == ACTION_DAYRIGHT)
             dayRight();
         else if (action == "NEXTFAV")
             toggleGuideListing();
-        else if (action == "FINDER")
+        else if (action == ACTION_FINDER)
             showProgFinder();
         else if (action == "MENU")
             showMenu();
-        else if (action == "ESCAPE" || action == "GUIDE")
+        else if (action == "ESCAPE" || action == ACTION_GUIDE)
             Close();
-        else if (action == "SELECT")
+        else if (action == ACTION_SELECT)
         {
             if (m_player && (m_player->GetState(-1) == kState_WatchingLiveTV))
             {
@@ -551,9 +551,9 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
             upcoming();
         else if (action == "DETAILS" || action == "INFO")
             details();
-        else if (action == "TOGGLERECORD")
+        else if (action == ACTION_TOGGLERECORD)
             quickRecord();
-        else if (action == "TOGGLEFAV")
+        else if (action == ACTION_TOGGLEFAV)
         {
             if (m_changrpid == -1)
                 ChannelGroupMenu(0);
@@ -570,7 +570,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
             toggleMute(true);
         else if (action == "MUTE")
             toggleMute();
-        else if (action == "TOGGLEEPGORDER")
+        else if (action == ACTION_TOGGLEPGORDER)
         {
             m_sortReverse = !m_sortReverse;
             generateListings();

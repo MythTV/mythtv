@@ -429,21 +429,21 @@ void TV::SetFuncPtr(const char *string, void *lptr)
 
 void TV::InitKeys(void)
 {
-    REG_KEY("TV Frontend", "PLAYBACK", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Frontend", ACTION_PLAYBACK, QT_TRANSLATE_NOOP("MythControls",
             "Play Program"), "P");
     REG_KEY("TV Frontend", ACTION_TOGGLERECORD, QT_TRANSLATE_NOOP("MythControls",
             "Toggle recording status of current program"), "R");
-    REG_KEY("TV Frontend", "DAYLEFT", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Frontend", ACTION_DAYLEFT, QT_TRANSLATE_NOOP("MythControls",
             "Page the program guide back one day"), "Home");
-    REG_KEY("TV Frontend", "DAYRIGHT", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Frontend", ACTION_DAYRIGHT, QT_TRANSLATE_NOOP("MythControls",
             "Page the program guide forward one day"), "End");
-    REG_KEY("TV Frontend", "PAGELEFT", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Frontend", ACTION_PAGELEFT, QT_TRANSLATE_NOOP("MythControls",
             "Page the program guide left"), ",,<");
-    REG_KEY("TV Frontend", "PAGERIGHT", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Frontend", ACTION_PAGERIGHT, QT_TRANSLATE_NOOP("MythControls",
             "Page the program guide right"), ">,.");
     REG_KEY("TV Frontend", ACTION_TOGGLEFAV, QT_TRANSLATE_NOOP("MythControls",
             "Toggle the current channel as a favorite"), "?");
-    REG_KEY("TV Frontend", "TOGGLEEPGORDER", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Frontend", ACTION_TOGGLEPGORDER, QT_TRANSLATE_NOOP("MythControls",
             "Reverse the channel order in the program guide"), "");
     REG_KEY("TV Frontend", ACTION_GUIDE, QT_TRANSLATE_NOOP("MythControls",
             "Show the Program Guide"), "S");
@@ -485,9 +485,9 @@ void TV::InitKeys(void)
 
     REG_KEY("TV Playback", "BACK", QT_TRANSLATE_NOOP("MythControls",
             "Exit or return to DVD menu"), "");
-    REG_KEY("TV Playback", "CLEAROSD", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_CLEAROSD, QT_TRANSLATE_NOOP("MythControls",
             "Clear OSD"), "Backspace");
-    REG_KEY("TV Playback", "PAUSE", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_PAUSE, QT_TRANSLATE_NOOP("MythControls",
             "Pause"), "P");
     REG_KEY("TV Playback", ACTION_SEEKFFWD, QT_TRANSLATE_NOOP("MythControls",
             "Fast Forward"), "Right");
@@ -3303,8 +3303,8 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
 
         bool esc   = has_action("ESCAPE", actions) ||
                      has_action("BACK", actions);
-        bool pause = has_action("PAUSE",  actions);
-        bool play  = has_action(ACTION_PLAY, actions);
+        bool pause = has_action(ACTION_PAUSE, actions);
+        bool play  = has_action(ACTION_PLAY,  actions);
 
         if ((!esc || browsehelper->IsBrowsing()) && !pause && !play)
             return false;
@@ -3496,7 +3496,7 @@ bool TV::BrowseHandleAction(PlayerContext *ctx, const QStringList &actions)
     {
         browsehelper->BrowseEnd(ctx, true);
     }
-    else if (has_action("CLEAROSD",     actions) ||
+    else if (has_action(ACTION_CLEAROSD, actions) ||
              has_action("ESCAPE",       actions) ||
              has_action("BACK",         actions) ||
              has_action("TOGGLEBROWSE", actions))
@@ -3587,8 +3587,8 @@ bool TV::ManualZoomHandleAction(PlayerContext *actx, const QStringList &actions)
                     has_action("STRETCHDEC",     actions) ||
                     has_action("MUTE",           actions) ||
                     has_action("CYCLEAUDIOCHAN", actions) ||
-                    has_action("PAUSE",          actions) ||
-                    has_action("CLEAROSD",       actions));
+                    has_action(ACTION_PAUSE,     actions) ||
+                    has_action(ACTION_CLEAROSD,  actions));
     }
     actx->UnlockDeletePlayer(__FILE__, __LINE__);
 
@@ -3707,7 +3707,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         DoQueueTranscode(ctx, "Low Quality");
     else if (has_action(ACTION_PLAY, actions))
         DoPlay(ctx);
-    else if (has_action("PAUSE", actions))
+    else if (has_action(ACTION_PAUSE, actions))
     {
         if (ContextIsPaused(ctx, __FILE__, __LINE__))
             SendMythSystemPlayEvent("PLAY_UNPAUSED", ctx->playingInfo);
@@ -3810,7 +3810,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         if (seekloc <= 0)
             DoSeek(ctx, seekloc, tr("Jump to Beginning"));
     }
-    else if (has_action("CLEAROSD", actions))
+    else if (has_action(ACTION_CLEAROSD, actions))
     {
         ClearOSD(ctx);
     }
