@@ -26,15 +26,20 @@ function initStorageGroups() {
 
     $.getJSON("/Myth/GetStorageGroupDirs", function(data) {
         var sgTabID;
+        var sgHosts = {};
         $.each(data.StorageGroupDirList.StorageGroupDirs, function(i, value) {
+            if (sgHosts[value.HostName.toLowerCase()] == undefined) {
+                sgHosts[value.HostName.toLowerCase()] = 1;
+            }
+
             if ((selectedHost != "ALL") &&
-                (selectedHost != value.HostName)) {
+                (selectedHost.toLowerCase() != value.HostName.toLowerCase())) {
                 return true;
             }
 
             if (value.GroupName in sgTabIDs) {
                 sgTabID = sgTabIDs[value.GroupName];
-            } else{
+            } else {
                 sgTabID = sgTabCount++;
                 sgTabIDs[value.GroupName] = sgTabID;
                 sgTabNames[sgTabID] = value.GroupName;
@@ -44,6 +49,27 @@ function initStorageGroups() {
 
             appendTabRow(sgTabID, value.Id, value.GroupNme, value.HostName, value.DirName);
         });
+
+        var sortedKeys = new Array();
+        for (var i in sgHosts) {
+            sortedKeys.push(i);
+        }
+        sortedKeys.sort();
+
+        var sgHostSelect = "Host: <select id='sgShowHost' "
+            + "onChange='javascript:initStorageGroups()'><option value='ALL'>"
+            + "Display ALL Hosts</option>;";
+        for (var i in sortedKeys) {
+            sgHostSelect += "<option";
+
+            if (selectedHost.toLowerCase() == sortedKeys[i])
+                sgHostSelect += " selected";
+
+            sgHostSelect += ">" + sortedKeys[i] + "</option>";
+        }
+
+        sgHostSelect += "</select>";
+        $("#sgHostSelect").html(sgHostSelect);
     });
 }
 
