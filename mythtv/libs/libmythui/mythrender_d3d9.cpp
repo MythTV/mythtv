@@ -581,7 +581,7 @@ bool MythRenderD3D9::DrawTexturedQuad(IDirect3DVertexBuffer9 *vertexbuffer)
     return true;
 }
 
-void MythRenderD3D9::DrawRect(const QRect &rect, const QColor &color)
+void MythRenderD3D9::DrawRect(const QRect &rect, const QColor &color, int alpha)
 {
     D3D9Locker locker(this);
     IDirect3DDevice9* dev = locker.Acquire();
@@ -602,12 +602,13 @@ void MythRenderD3D9::DrawRect(const QRect &rect, const QColor &color)
         }
     }
 
-    EnableBlending(dev, false);
+    EnableBlending(dev, true);
     SetTextureVertices(dev, false);
     MultiTexturing(dev, false);
     SetTexture(dev, NULL, 0);
 
-    D3DCOLOR clr = D3DCOLOR_ARGB(color.alpha(), color.red(),
+    int alphamod = (int)(color.alpha() * (alpha / 255.0));
+    D3DCOLOR clr = D3DCOLOR_ARGB(alphamod, color.red(),
                                  color.green(), color.blue());
     VERTEX *p_vertices;
     HRESULT hr = m_rect_vertexbuffer->Lock(0, 0, (VOID **)(&p_vertices),

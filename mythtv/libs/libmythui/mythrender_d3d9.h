@@ -76,7 +76,7 @@ class MUI_PUBLIC MythRenderD3D9 : public MythRender
     bool StretchRect(IDirect3DTexture9 *texture, IDirect3DSurface9 *surface,
                      bool known_surface = true);
     bool DrawTexturedQuad(IDirect3DVertexBuffer9 *vertexbuffer);
-    void DrawRect(const QRect &rect,  const QColor &color);
+    void DrawRect(const QRect &rect,  const QColor &color, int alpha);
     bool Present(HWND win);
     bool HardwareYUVConversion(void);
     QRect GetRect(IDirect3DVertexBuffer9 *vertexbuffer);
