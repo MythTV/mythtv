@@ -118,17 +118,19 @@ function removeTab(id, index) {
 }
 
 function setHeaderStatusMessage(message) {
+    $("#header_error").html("");
     $("#header_status").html(message);
     setTimeout('$("#header_status").html("")', statusMessageTimeout);
 }
 
 function setHeaderErrorMessage(message) {
+    $("#header_status").html("");
     $("#header_error").html(message);
     setTimeout('$("#header_error").html("")', errorMessageTimeout);
 }
 
 function clearHeaderMessages() {
-    setHeaderStatusMessage("");
-    setHeaderErrorMessage("");
+    $("#header_status").html("");
+    $("#header_error").html("");
 }
 

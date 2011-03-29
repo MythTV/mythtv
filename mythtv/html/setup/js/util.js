@@ -63,11 +63,13 @@ function clearEditMessages() {
 }
 
 function setEditStatusMessage(message) {
+    $("#editErrorMessage").html("");
     $("#editStatusMessage").html(message);
     setTimeout('$("#editStatusMessage").html("")', statusMessageTimeout);
 }
 
 function setEditErrorMessage(message) {
+    $("#editStatusMessage").html("");
     $("#editErrorMessage").html(message);
     setTimeout('$("#editErrorMessage").html("")', errorMessageTimeout);
 }
