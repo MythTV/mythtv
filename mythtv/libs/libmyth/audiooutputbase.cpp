@@ -278,6 +278,9 @@ bool AudioOutputBase::CanPassthrough(int samplerate, int channels,
     ret &= output_settingsdigital->canFeature(arg);
     ret &= output_settingsdigital->IsSupportedFormat(FORMAT_S16);
     ret &= output_settingsdigital->IsSupportedRate(samplerate);
+    // if we must resample to 48kHz ; we can't passthrough
+    ret &= !((samplerate != 48000) &&
+             gCoreContext->GetNumSetting("Audio48kOverride", false));
     // Don't know any cards that support spdif clocked at < 44100
     // Some US cable transmissions have 2ch 32k AC-3 streams
     ret &= samplerate >= 44100;
