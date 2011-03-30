@@ -10,14 +10,16 @@
           <ul class="acitem collapsible">
             <li class="indent1"><a href='#' onClick="javascript:loadSetupContent('/Config/Database')">Database</a></li>
             <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('general')">General</a></li>
-            <!-- some possible other menu items
-            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('tuning')">Tuning</a></li>
-            -->
+            <li class="indent1"><a href='#'>Guide Data</a>
+              <ul class="acitem collapsible">
+                <li class="indent1"><a href='#' onClick="javascript:loadContent('/misc/placeholder.html')">Guide Data Sources (FIX)</a></li>
+                <li class="indent1"><a href='#' onClick="javascript:loadContent('/misc/placeholder.html')">Channel Editor (INDENT)</a></li>
+              </ul>
+            </li>
+            <li class="indent1"><a href='#' onClick="javascript:loadContent('/misc/placeholder.html')">Recording Devices</a></li>
             <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('storagegroups')">Storage Groups</a></li>
             <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('jobqueue')">Job Queue</a></li>
-            <!--
-            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('systemevents')">System Events</a></li>
-            -->
+            <li class="indent1"><a href='#' onClick="javascript:loadContent('/misc/placeholder.html')">System Events</a></li>
           </ul>
         </li>
 <%

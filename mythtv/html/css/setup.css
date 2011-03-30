@@ -30,12 +30,6 @@
         width: 100%;
     }
 
-    #editclosebutton {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-    }
-
     /************************************************************/
     /* various classes for 'popup' edit div */
     div.editborder-fullscreen {
@@ -129,3 +123,24 @@
     }
     /********************************************************/
 
+    #helpWindow {
+        display: none;
+        position: absolute;
+        background-color: #FFFFFF;
+        top: 10px;
+        right: 10px;
+        height: 400px;
+        width: 400px;
+        z-index: 999;
+        border-width: 6px;
+        border-color: #0000FF;
+        border-style: double;
+    }
+
+    div.helpLink {
+        font-size:          10px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        color:              blue;
+        float:              left;
+    }

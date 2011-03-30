@@ -14,7 +14,9 @@
 <input type='submit' value='Save' onClick='javascript:saveJobEditor()'>
 
 <hr>
-<b>Match Values:</b> 
+<div style='float:left'><b>Match Values:</b></div>
+<div class='helpLink'><a href='#' onClick='javascript:showHelp("Match Values", "Help might say that these matches get replaced at runtime with the appropriate values, and instead of hardcoding this text in the .html, this would come from a .js file or something")'>[?]</a></div>
+<div style='float:left'>
 <select id='appendMatchSelect'>
     <option value='CATEGORY'>Category</option>
     <option value='CHANID'>Channel ID</option>
@@ -45,6 +47,8 @@
     <option value='PROGENDISOUTC'>Program End Time in UTC in ISO format</option>
 </select>
 <input type=button onClick='javascript:appendMatch("%" + $("#appendMatchSelect").val() + "%")' value='Append Match'>
+</div>
+
 </div>
 
 </div>

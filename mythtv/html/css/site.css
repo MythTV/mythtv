@@ -257,3 +257,18 @@
         color:              red;
     }
 
+    div.Title {
+        font-size:          18px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        width:              100%;
+        color:              black;
+        text-align:         center;
+    }
+
+    div.CloseButton {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+    }
+

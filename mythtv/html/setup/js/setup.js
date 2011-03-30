@@ -15,6 +15,21 @@ function setupPageName(path) {
     return basename(path).replace( /\\/g, '/').replace( /\.[^\.]$/, '' );
 }
 
+function showHelpWindow() {
+    $("#helpWindow").show();
+    $("#helpWindow").draggable();
+}
+
+function hideHelpWindow() {
+    $("#helpWindow").hide();
+}
+
+function showHelp(title, content) {
+    $("#helpTitle").html(title);
+    $("#helpContent").html("FIXME: you can drag this window....  " + content);
+    showHelpWindow();
+}
+
 function showEditWindow() {
     $("#edit-bg").show();
     $("#editborder").show();
