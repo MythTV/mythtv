@@ -149,11 +149,11 @@ QString SOAPClient::GetNodeValue( QDomNode &node, const QString &sName, const QS
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool SOAPClient::SendSOAPRequest( const QString    &sMethod, 
-                                        QStringMap &list, 
-                                        int        &nErrCode, 
-                                        QString    &sErrDesc,
-                                        bool        bInQtThread )
+QDomDocument SOAPClient::SendSOAPRequest( const QString    &sMethod, 
+                                                QStringMap &list, 
+                                                int        &nErrCode, 
+                                                QString    &sErrDesc,
+                                                bool        bInQtThread )
 {
     QUrl url( m_url );
 
@@ -222,6 +222,7 @@ bool SOAPClient::SendSOAPRequest( const QString    &sMethod,
 
     list.clear();
 
+    QDomDocument xmlResult;
     QDomDocument doc;
 
     if ( !doc.setContent( sXml, true, &sErrDesc, &nErrCode ))
@@ -229,7 +230,7 @@ bool SOAPClient::SendSOAPRequest( const QString    &sMethod,
         VERBOSE( VB_UPNP, QString( "MythXMLClient::SendSOAPRequest( %1 ) - Invalid response from %2" )
                              .arg( sMethod   )
                              .arg( url.toString() ));
-        return false;
+        return QDomDocument();
     }
 
     // --------------------------------------------------------------
@@ -243,39 +244,27 @@ bool SOAPClient::SendSOAPRequest( const QString    &sMethod,
     {
         QDomNode oMethod = oNodeList.item(0);
 
-        if (!oMethod.isNull())
-        {
+        // Create copy of oMethod that can be used with xmlResult.
 
-            for ( QDomNode oNode = oMethod.firstChild(); !oNode.isNull(); 
-                           oNode = oNode.nextSibling() )
-            {
-                QDomElement e = oNode.toElement();
+        oMethod = xmlResult.importNode( oMethod.firstChild(), true  );
 
-                if (!e.isNull())
-                {
-                    QString sName  = e.tagName();
-                    QString sValue = "";
-    
-                    QDomText  oText = oNode.firstChild().toText();
-    
-                    if (!oText.isNull())
-                        sValue = oText.nodeValue();
+        // importNode does not attach the new nodes to the document,
+        // do it here.
 
-                    list.insert(QUrl::fromPercentEncoding(sName.toUtf8()),
-                                QUrl::fromPercentEncoding(sValue.toUtf8()));
-                }
-            }
-        }
+        xmlResult.appendChild( oMethod );
 
-        return true;
+        return xmlResult;
     }
 
     // --------------------------------------------------------------
     // Must be a fault... parse it to return reason
     // --------------------------------------------------------------
 
-    nErrCode = GetNodeValue( doc, "Envelope/Body/Fault/detail/UPnPResult/errorCode"       , 500 );
-    sErrDesc = GetNodeValue( doc, "Envelope/Body/Fault/detail/UPnPResult/errorDescription", QString( "Unknown" ));
+    QDomNode oNode  = FindNode( "Envelope/Body/Fault", doc );
 
-    return false;
+    oNode = xmlResult.importNode( oNode, true );
+    xmlResult.appendChild( oNode );
+
+    return xmlResult;
 }
+
