@@ -57,7 +57,9 @@ function loadDiv(divName, contentURL, jsURL) {
     $(divName).html(html);
 
     if (jsURL) {
+        $.ajaxSetup({ async: false });
         $.getScript(jsURL);
+        $.ajaxSetup({ async: true });
     }
 }
 
@@ -79,7 +81,9 @@ function clearContent() {
 }
 
 function loadSetupJavascript() {
+    $.ajaxSetup({ async: false });
     $.getScript("/setup/js/setup.js");
+    $.ajaxSetup({ async: true });
 }
 
 function loadSetupPage(pageName) {
