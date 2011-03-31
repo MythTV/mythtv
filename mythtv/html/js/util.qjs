@@ -88,6 +88,7 @@ function loadSetupJavascript() {
 
 function loadSetupPage(pageName) {
     loadSetupJavascript();
+    hideEditWindow();
     loadContent("/setup/" + pageName + ".html",
                 "/setup/js/" + pageName + ".js");
 }

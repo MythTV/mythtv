@@ -22,6 +22,8 @@ QStringList HttpConfig::GetBasePaths()
     paths << "/Config";
     paths << "/Config/Database";
     paths << "/Config/General";
+    paths << "/Config/GetValueList";
+    paths << "/Config/XML";
     return paths;
 }
 
@@ -97,6 +99,35 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
 #endif
         }
     }
+    else if (request->m_sMethod == "Settings")
+    {
+        QString result = "{ \"Error\": \"Unknown Settings List\" }";
+        QString fn = GetShareDir() + "backend-config/";
+
+        if (request->m_sBaseUrl == "/Config/Database")
+        {
+            fn += "config_backend_database.xml";
+            parse_settings(database_settings, fn);
+            result = StringMapToJSON(
+                GetSettingsMap(database_settings, gCoreContext->GetHostName()));
+        }
+        else if (request->m_sBaseUrl == "/Config/General")
+        {
+            fn += "config_backend_general.xml";
+            parse_settings(general_settings, fn);
+            result = StringMapToJSON(
+                GetSettingsMap(general_settings, gCoreContext->GetHostName()));
+        }
+
+        QTextStream os(&request->m_response);
+        os << result;
+        request->m_eResponseType     = ResponseTypeOther;
+        request->m_sResponseTypeText = "application/json";
+        request->m_mapRespHeaders[ "Cache-Control" ] =
+            "no-cache=\"Ext\", max-age = 0";
+
+        return true;
+    }
     else if (request->m_sMethod == "XML")
     {
         QString fn = GetShareDir() + "backend-config/";
@@ -107,6 +138,21 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
             fn += "config_backend_general.xml";
 
         request->FormatFileResponse(fn);
+        return true;
+    }
+    else if ((request->m_sMethod == "GetValueList") &&
+             (request->m_mapParams.contains("List")))
+    {
+        QString key = request->m_mapParams["List"];
+        QStringList sList = GetSettingValueList(key);
+        QTextStream os(&request->m_response);
+        os << StringListToJSON(key, sList);
+
+        request->m_eResponseType     = ResponseTypeOther;
+        request->m_sResponseTypeText = "application/json";
+        request->m_mapRespHeaders[ "Cache-Control" ] =
+            "no-cache=\"Ext\", max-age = 0";
+
         return true;
     }
     else if ((request->m_sMethod == "Database") || (NULL == gContext))
@@ -225,3 +271,4 @@ void HttpConfig::PrintSettings(QBuffer &buffer, const MythSettingList &settings)
     for (; it != settings.end(); ++it)
         os << (*it)->ToHTML(1);
 }
+

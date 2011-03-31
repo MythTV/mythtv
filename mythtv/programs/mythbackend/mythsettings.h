@@ -117,4 +117,10 @@ bool load_settings(MythSettingList &settings, const QString &hostname);
 bool check_settings(MythSettingList &database_settings,
                     const QMap<QString,QString> &params, QString &result);
 
+QStringList           GetSettingValueList(const QString &type);
+QString               StringMapToJSON(const QMap<QString,QString> &map);
+QString               StringListToJSON(const QString &key, const QStringList &sList);
+QMap<QString,QString> GetConfigFileSettingValues();
+QMap<QString,QString> GetSettingsMap(MythSettingList &settings, const QString &hostname);
+
 #endif

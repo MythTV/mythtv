@@ -266,6 +266,13 @@
         text-align:         center;
     }
 
+    div.SaveButton {
+        display: none;
+        position: absolute;
+        top: 5px;
+        left: 5px;
+    }
+
     div.CloseButton {
         position: absolute;
         top: 5px;

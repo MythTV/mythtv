@@ -1,0 +1,16 @@
+<div id='wizard-media_storage' class='setuptab'>
+<input type=button value='Prev' onClick='javascript:$("#wizardtabs").tabs("select", 3)'>
+<div class='Title'>Media Storage Directories (mockup)</div>
+NOTE: These inputs would only be usable if there was only one dir per SG,
+otherwise a link to the SG editor screen would appear if a SG had more
+than one directory defined.<br>
+<table border=1>
+<tr><td><th>Recordings:</th><td><input size=60 value='/nas/recordings'></td></tr>
+<tr><td><th>Videos:</th><td>More than one directory is configured for Videos, you may edit the list in the <a href="javascript:loadSetupPage('storagegroups')">Storage Groups Editor</a></td></tr>
+<tr><td><th>Music:</th><td><input size=60 value='/nas/music'></td></tr>
+<tr><td><th>Pictures:</th><td><input size=60 value='/nas/photos'></td></tr>
+</table>
+NOTE: These are not hooked up yet<br>
+If you would like to add more directories to spread data across multiple
+hard drives, go to the <a onClick="javascript:alert('fixme')">(FIXME link)</a>.
+</div>
