@@ -30,7 +30,7 @@ loadContent('/Config/General?__group__=local_server')">Advanced General Setup Sc
     setSettingInputValues("wizard-network");
 
     if ((settingsList["BackendServerIP"] != "") &&
-        (settingsList["MasterServerIP"] == settingsList["BackendServerIP"])) {
+        (settingsList["MasterServerIP"] != settingsList["BackendServerIP"])) {
         $("#MasterServerIP_cell").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
             + "<input type='button' "
             + " onClick='javascript:makeLocalBackendTheMaster()' "
