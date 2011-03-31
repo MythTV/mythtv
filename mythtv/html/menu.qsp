@@ -12,8 +12,8 @@
             <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('general')">General</a></li>
             <li class="indent1"><a href='#'>Guide Data</a>
               <ul class="acitem collapsible">
-                <li class="indent1"><a href='#' onClick="javascript:loadContent('/misc/placeholder.html')">Guide Data Sources (FIX)</a></li>
-                <li class="indent1"><a href='#' onClick="javascript:loadContent('/misc/placeholder.html')">Channel Editor (INDENT)</a></li>
+                <li class="indent1"><a href='#' onClick="javascript:loadContent('/misc/placeholder.html')">Guide Data Sources</a></li>
+                <li class="indent1"><a href='#' onClick="javascript:loadContent('/misc/placeholder.html')">Channel Editor</a></li>
               </ul>
             </li>
             <li class="indent1"><a href='#' onClick="javascript:loadContent('/misc/placeholder.html')">Recording Devices</a></li>
