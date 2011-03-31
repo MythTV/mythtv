@@ -26,9 +26,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-//#define ERROR(x,...)
-#define ERROR(x,...) DEBUG(DBG_BLURAY|DBG_CRIT,x,##__VA_ARGS__)
-
 
 void pg_decode_video_descriptor(BITBUFFER *bb, BD_PG_VIDEO_DESCRIPTOR *p)
 {
@@ -151,11 +148,11 @@ static int _decode_rle(BITBUFFER *bb, BD_PG_OBJECT *p)
     }
 
     if (pixels_left > 0) {
-        ERROR("pg_decode_object(): missing %d pixels\n", pixels_left);
+        BD_DEBUG(DBG_DECODE, "pg_decode_object(): missing %d pixels\n", pixels_left);
         return 0;
     }
     if (pixels_left < 0) {
-        ERROR("pg_decode_object(): too many pixels (%d)\n", -pixels_left);
+        BD_DEBUG(DBG_DECODE, "pg_decode_object(): too many pixels (%d)\n", -pixels_left);
         return 0;
     }
 
@@ -173,23 +170,23 @@ int pg_decode_object(BITBUFFER *bb, BD_PG_OBJECT *p)
 
     /* splitted segments should be already joined */
     if (!sd.first_in_seq) {
-        ERROR("pg_decode_object(): not first in sequence\n");
+        BD_DEBUG(DBG_DECODE, "pg_decode_object(): not first in sequence\n");
         return 0;
     }
     if (!sd.last_in_seq) {
-        ERROR("pg_decode_object(): not last in sequence\n");
+        BD_DEBUG(DBG_DECODE, "pg_decode_object(): not last in sequence\n");
         return 0;
     }
 
     if (!bb_is_align(bb, 0x07)) {
-      ERROR("pg_decode_object(): alignment error\n");
+      BD_DEBUG(DBG_DECODE, "pg_decode_object(): alignment error\n");
       return 0;
     }
 
     uint32_t data_len = bb_read(bb, 24);
     uint32_t buf_len  = bb->p_end - bb->p;
     if (data_len != buf_len) {
-        ERROR("pg_decode_object(): buffer size mismatch (expected %d, have %d)\n", data_len, buf_len);
+        BD_DEBUG(DBG_DECODE, "pg_decode_object(): buffer size mismatch (expected %d, have %d)\n", data_len, buf_len);
         return 0;
     }
 

@@ -297,6 +297,8 @@ class UPNP_PUBLIC  Eventing : public HttpServerExtension,
                                  const QString sSharePath );
         virtual ~Eventing      ( );
 
+        virtual QStringList GetBasePaths();
+
         virtual bool ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
 
         short    HoldEvents    ( );

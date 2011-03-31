@@ -342,8 +342,10 @@ VideoOutput::VideoOutput() :
     monitor_sz(640,480),                monitor_dim(400,300),
 
     // OSD
-    osd_painter(NULL),                  osd_image(NULL)
+    osd_painter(NULL),                  osd_image(NULL),
 
+    // Visualisation
+    m_visual(NULL)
 {
     memset(&pip_tmp_image, 0, sizeof(pip_tmp_image));
     db_display_dim = QSize(gCoreContext->GetNumSetting("DisplaySizeWidth",  0),
@@ -1292,6 +1294,13 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
             return false;
     }
 
+    if (m_visual)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "Visualiser not supported here");
+        // Clear the audio buffer
+        m_visual->Draw(QRect(), NULL, NULL);
+    }
+
     QRegion dirty   = QRegion();
     QRegion visible = osd->Draw(osd_painter, osd_image, osd_size, dirty,
                                 frame->codec == FMT_YV12 ? ALIGN_X_MMX : 0,
@@ -1338,6 +1347,34 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
         }
     }
     return show;
+}
+
+bool VideoOutput::ToggleVisualisation(AudioPlayer *audio)
+{
+    if (m_visual)
+    {
+        DestroyVisualisation();
+        return false;
+    }
+    return SetupVisualisation(audio, NULL);
+}
+
+bool VideoOutput::CanVisualise(AudioPlayer *audio, MythRender *render)
+{
+    return VideoVisual::CanVisualise(audio, render);
+}
+
+bool VideoOutput::SetupVisualisation(AudioPlayer *audio, MythRender *render)
+{
+    DestroyVisualisation();
+    m_visual = VideoVisual::Create(audio, render);
+    return m_visual;
+}
+
+void VideoOutput::DestroyVisualisation(void)
+{
+    delete m_visual;
+    m_visual = NULL;
 }
 
 /**

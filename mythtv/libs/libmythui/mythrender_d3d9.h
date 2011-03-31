@@ -8,6 +8,7 @@
 
 #include "mythimage.h"
 #include "mythuiexp.h"
+#include "mythrender_base.h"
 
 #ifdef USING_DXVA2
 #include "dxva2api.h"
@@ -57,7 +58,7 @@ class MUI_PUBLIC D3D9Locker
     MythRenderD3D9 *m_render;
 };
 
-class MUI_PUBLIC MythRenderD3D9
+class MUI_PUBLIC MythRenderD3D9 : public MythRender
 {
   public:
     static void* ResolveAddress(const char* lib, const char* proc);
@@ -75,10 +76,9 @@ class MUI_PUBLIC MythRenderD3D9
     bool StretchRect(IDirect3DTexture9 *texture, IDirect3DSurface9 *surface,
                      bool known_surface = true);
     bool DrawTexturedQuad(IDirect3DVertexBuffer9 *vertexbuffer);
-    void DrawRect(const QRect &rect,  const QColor &color);
+    void DrawRect(const QRect &rect,  const QColor &color, int alpha);
     bool Present(HWND win);
-    bool HardwareYUVConversion(void)
-        { return m_videosurface_fmt == (D3DFORMAT)MAKEFOURCC('Y','V','1','2'); }
+    bool HardwareYUVConversion(void);
     QRect GetRect(IDirect3DVertexBuffer9 *vertexbuffer);
     bool SetRenderTarget(IDirect3DTexture9 *texture);
 
@@ -99,7 +99,6 @@ class MUI_PUBLIC MythRenderD3D9
     void                    ReleaseBuffer(IDirect3DSurface9* surface);
 
   private:
-    bool                    FormatSupported(D3DFORMAT surface, D3DFORMAT adaptor);
     bool                    SetTexture(IDirect3DDevice9* dev,
                                        IDirect3DTexture9 *texture,
                                        int num = 0);

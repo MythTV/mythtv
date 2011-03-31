@@ -45,8 +45,8 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
     QDomElement  oNode;
 
     QString sClassName       = m_pServiceHost->GetServiceMetaObject().className();
-    QString sTargetNamespace = QString( "http://mythtv.org/%1/" ).arg( sClassName );
-
+    QString sTargetNamespace = "http://mythtv.org";
+    
     m_oRoot = createElementNS( "http://schemas.xmlsoap.org/wsdl/", "definitions");
 
     m_oRoot.setAttribute( "targetNamespace", sTargetNamespace );
@@ -55,6 +55,9 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
     m_oRoot.setAttribute( "xmlns:xs"  , "http://www.w3.org/2001/XMLSchema"      );
     m_oRoot.setAttribute( "xmlns:soap", "http://schemas.xmlsoap.org/wsdl/soap/" );
     m_oRoot.setAttribute( "xmlns:tns" , sTargetNamespace );
+    m_oRoot.setAttribute( "xmlns:wsaw", "http://www.w3.org/2006/05/addressing/wsdl" );
+
+    m_oRoot.setAttribute( "name", QString( "%1Services" ).arg( sClassName ) );
 
     m_oTypes    = createElement( "types"    );
     m_oLastMsg  = m_oTypes;
@@ -71,7 +74,8 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
     m_oPortType.setAttribute( "name", sClassName );
 
     oNode = createElement( "xs:schema" );
-    oNode.setAttribute( "targetNamespace", sTargetNamespace );
+    oNode.setAttribute( "targetNamespace"   , sTargetNamespace );
+    oNode.setAttribute( "elementFormDefault", "qualified"      );
 
     m_oTypes.appendChild( oNode );
     m_oTypes = oNode;
@@ -80,12 +84,11 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
     // Add Bindings...
     // ----------------------------------------------------------------------
 
-    m_oBindings.setAttribute( "name", "Soap" );
-    m_oBindings.setAttribute( "type", QString( "tns:%1" )
-                                         .arg( sClassName ));
+    m_oBindings.setAttribute( "name", QString("BasicHttpBinding_%1").arg( sClassName ));
+    m_oBindings.setAttribute( "type", QString( "tns:%1"            ).arg( sClassName ));
 
     oNode = createElement( "soap:binding" );
-    oNode.setAttribute( "style"    , "document" );
+    //oNode.setAttribute( "style"    , "document" );
     oNode.setAttribute( "transport", "http://schemas.xmlsoap.org/soap/http" );
 
     m_oBindings.appendChild( oNode );
@@ -105,8 +108,12 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
         QString sRequestTypeName  = oInfo.m_sName;
         QString sResponseTypeName = oInfo.m_sName + "Response";
 
-        QString sInputMsgName  = QString( "%1InputMessage"  ).arg( oInfo.m_sName );
-        QString sOutputMsgName = QString( "%1OutputMessage" ).arg( oInfo.m_sName );
+        QString sInputMsgName  = QString( "%1_%2_InputMessage"  )
+                                    .arg( sClassName )
+                                    .arg( oInfo.m_sName );
+        QString sOutputMsgName = QString( "%1_%2_OutputMessage" )
+                                    .arg( sClassName )
+                                    .arg( oInfo.m_sName );
 
         // ------------------------------------------------------------------
         // Create PortType Operations
@@ -121,7 +128,11 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
         // ------------------------------------------------------------------
     
         oNode = createElement( "input" );
-        oNode.setAttribute( "message", "tns:" + sInputMsgName );
+        oNode.setAttribute( "wsaw:Action", QString( "%1/%2/%3" )
+                                              .arg( sTargetNamespace )
+                                              .arg( sClassName )
+                                              .arg( oInfo.m_sName ));
+        oNode.setAttribute( "message"    , "tns:" + sInputMsgName );
     
         oOp.appendChild( oNode );
     
@@ -130,6 +141,10 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
         // ------------------------------------------------------------------
     
         oNode = createElement( "output" );
+        oNode.setAttribute( "wsaw:Action", QString( "%1/%2/%3Response" )
+                                        .arg( sTargetNamespace )
+                                        .arg( sClassName )
+                                        .arg( oInfo.m_sName ));
         oNode.setAttribute( "message", "tns:" + sOutputMsgName );
     
         oOp.appendChild( oNode );
@@ -165,7 +180,7 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
         // ------------------------------------------------------------------
 
         m_oTypes.appendChild( CreateMethodType( oInfo, sResponseTypeName, true ) );
-
+        
         // ------------------------------------------------------------------
         // Create Soap Binding Operations
         // ------------------------------------------------------------------
@@ -177,14 +192,9 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
     // Add Service Details
     // ----------------------------------------------------------------------
 
-    QString sServiceName = QString( "%1Service" ).arg( sClassName );
+    QString sServiceName = QString( "%1Services" ).arg( sClassName );
 
     m_oService.setAttribute( "name", sServiceName );
-
-    oNode = createElement( "documentation" );
-    oNode.appendChild( createTextNode( sServiceName ));
-
-    m_oService.appendChild( oNode );
 
     // ------------------------------------------------------------------
     // Add Service Port 
@@ -192,8 +202,8 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
 
     QDomElement oPort = createElement( "port" );
 
-    oPort.setAttribute( "name"   , "Soap" );
-    oPort.setAttribute( "binding", "tns:Soap" );
+    oPort.setAttribute( "name"   , QString("BasicHttpBinding_%1"    ).arg( sClassName ));
+    oPort.setAttribute( "binding", QString("tns:BasicHttpBinding_%1").arg( sClassName ));
 
     oNode = createElement( "soap:address" );
     oNode.setAttribute( "location", "http://localhost:6544/" + m_pServiceHost->GetServiceControlURL() );
@@ -314,20 +324,18 @@ QDomElement Wsdl::CreateMethodType( MethodInfo   &oInfo,
 
         QString sType = oInfo.m_oMethod.typeName();
 
-        int nPos = sType.lastIndexOf( ':' );
-
-        if (nPos >=0 )
-            sType = sType.mid( nPos +1 );
-
+//        sType.remove( "DTC::" );
         sType.remove( QChar('*') );
+
+        sTypeName.remove( "Response" );
 
         oNode.setAttribute( "minOccurs", 0       );
         oNode.setAttribute( "name"     , sTypeName + "Result" );
         oNode.setAttribute( "nillable" , true    );   //-=>TODO: This may need to be determined by sParamType
-        oNode.setAttribute( "type"     , "xs:string" );
-        oNode.setAttribute( "type"     , ConvertTypeToXSD( sType ));
 
-        CreateType( sType );
+        bool bCustomType = CreateType( NULL, sType );
+
+        oNode.setAttribute( "type"     , "tns:" + ConvertTypeToXSD( sType, bCustomType ));
 
         oSeqNode.appendChild( oNode );
     }
@@ -359,17 +367,27 @@ QDomElement Wsdl::CreateMethodType( MethodInfo   &oInfo,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void Wsdl::CreateType( QString sTypeName )
+bool Wsdl::CreateType( QObject *pParent, QString &sTypeName )
 {
     if ( m_typesCreated.contains( sTypeName ))
-        return;
+        return true;
 
-    sTypeName = "DTC::" + sTypeName;
-                        
-    int id = QMetaType::type( sTypeName.toLatin1() );
+//    sTypeName.remove( "DTC::" );
+    sTypeName.remove( QChar('*') );
+
+    int id = QMetaType::type( sTypeName.toUtf8() );
+
+    switch( id )
+    {
+        case QMetaType::QStringList:
+            return CreateArrayType( pParent, sTypeName, "Value",  "string", true );
+
+        case QMetaType::QVariantMap:
+            return CreateMapType( pParent, sTypeName, "Settings", "string", true );
+    }
 
     if ((id == -1) || (id < QMetaType::User)) 
-        return;
+        return false;
 
     // ------------------------------------------------------------------
     // Need to create an instance of the class to access it's metadata.
@@ -385,14 +403,12 @@ void Wsdl::CreateType( QString sTypeName )
         // Create xsd element structure
         // ------------------------------------------------------------------
     
-        QDomElement oElementNode = createElement( "xs:element" );
-    
-        oElementNode.setAttribute( "name", ConvertTypeToXSD( sTypeName ));
-    
         QDomElement oTypeNode = createElement( "xs:complexType" );
         QDomElement oSeqNode  = createElement( "xs:sequence"    );
-        
-        oElementNode.appendChild( oTypeNode );
+
+        oTypeNode.setAttribute( "name", ConvertTypeToXSD( sTypeName, true));
+
+//        oElementNode.appendChild( oTypeNode );
         oTypeNode   .appendChild( oSeqNode  );
     
         // ------------------------------------------------------------------
@@ -414,35 +430,186 @@ void Wsdl::CreateType( QString sTypeName )
                     continue;
 
                 QDomElement oNode = createElement( "xs:element" );
-    
+
                 QString sType = metaProperty.typeName();
+
+                // if this is a child object, sType will be QObject*
+                // which we can't use, so we need to read the
+                // properties value, and read it's metaObject data
+
+                if (sType == "QObject*")
+                {
+                    QVariant val = metaProperty.read( pClass );
+                    const QObject *pObject = val.value< QObject* >(); 
+
+                    sType = pObject->metaObject()->className();
+
+//                    sType.remove( "DTC::" );
+                }
 
                 oNode.setAttribute( "minOccurs", 0       );
                 oNode.setAttribute( "name"     , metaProperty.name() );
                 oNode.setAttribute( "nillable" , true    );   //-=>TODO: This may need to be determined by sParamType
-                oNode.setAttribute( "type"     , ConvertTypeToXSD( sType ));
     
-                CreateType( sType );
+                bool bCustomType = CreateType( pClass, sType );
+
+                oNode.setAttribute( "type"     , ((bCustomType) ? "tns:" : "") + ConvertTypeToXSD( sType, bCustomType ));
 
                 oSeqNode.appendChild( oNode );
             }
 		}
 
+        QDomElement oElementNode = createElement( "xs:element" );
+
+        oElementNode.setAttribute( "name"    , ConvertTypeToXSD( sTypeName, true));
+        oElementNode.setAttribute( "nillable", "true" );
+        oElementNode.setAttribute( "type"    , "tns:" + ConvertTypeToXSD( sTypeName, true));
+
+        m_oTypes.appendChild( oTypeNode    );
         m_oTypes.appendChild( oElementNode );
 
         QMetaType::destroy( id, pClass );
      }
 
+    m_typesCreated.insert( sTypeName, true );
+
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// <complexType name="ArrayOf<contained_typename>" >
+//   <sequence>
+//     <element name="<contained_typename>" type="<ConvertTypeToXsd(contained_typename)" minOccurs="0" maxOccurs="unbounded"/>
+//   </sequence>
+// </complexType>
+// <element name="<typename>" nillable="true" type="tns:ArrayOf<contained_typename>" />
+//
+/*
+<xs:complexType name="ArrayOfstring">
+		<xs:sequence>
+			<xs:element name="String" type="xs:string" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="StringList" type="ArrayOfstring"/>
+    */
+/////////////////////////////////////////////////////////////////////////////
+
+bool Wsdl::CreateArrayType( QObject      *pParent,
+                            QString      &sTypeName, 
+                            QString       sElementName,
+                            QString       sElementType,
+                            bool          bCustomType )
+{
+    QString sOrigTypeName( sTypeName );
+
+    sTypeName = "ArrayOf" + sElementType;
+
+    if ( m_typesCreated.contains( sTypeName ))
+        return bCustomType;
+
+    QDomElement oTypeNode = createElement( "xs:complexType" );
+    QDomElement oSeqNode  = createElement( "xs:sequence"    );
+
+    oTypeNode.setAttribute( "name", sTypeName );
+
+    oTypeNode.appendChild( oSeqNode  );
+
+    QDomElement oNode = createElement( "xs:element" );
+
+    oNode.setAttribute( "name"     , sElementName );
+    oNode.setAttribute( "type"     , ConvertTypeToXSD( sElementType, false ));
+
+    oNode.setAttribute( "nillable" , true        );   //-=>TODO: This may need to be determined by sParamType
+    oNode.setAttribute( "minOccurs", 0           );
+    oNode.setAttribute( "maxOccurs", "unbounded" );
+
+    oSeqNode.appendChild( oNode );
+
+    QDomElement oElementNode = createElement( "xs:element" );
+
+    oElementNode.setAttribute( "name"    , sTypeName );
+    oElementNode.setAttribute( "nillable", "true" );
+    oElementNode.setAttribute( "type"    , "tns:" + sTypeName );
+
+    m_oTypes.appendChild( oTypeNode    );
+    m_oTypes.appendChild( oElementNode );
 
     m_typesCreated.insert( sTypeName, true );
+
+    return bCustomType;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString Wsdl::ConvertTypeToXSD( const QString &sType )
+bool Wsdl::CreateMapType( QObject      *pParent,
+                          QString      &sTypeName, 
+                          QString       sElementName,
+                          QString       sElementType,
+                          bool          bCustomType )
 {
+/*
+    QString sOrigTypeName( sTypeName );
+
+    sTypeName = "MapOf" + sElementType;
+
+    if ( m_typesCreated.contains( sTypeName ))
+        return bCustomType;
+
+    QString sMapType = ReadClassInfo( pParent, sElementName + "_type" );
+
+    CreateType( NULL, sMapType );
+
+    QDomElement oTypeNode = createElement( "xs:complexType" );
+    QDomElement oSeqNode  = createElement( "xs:all"    );
+
+    oTypeNode.setAttribute( "name", sTypeName );
+
+    oTypeNode.appendChild( oSeqNode  );
+
+    QDomElement oNode = createElement( "xs:element" );
+
+    oNode.setAttribute( "name"     , sElementName );
+    oNode.setAttribute( "type"     , ConvertTypeToXSD( sElementType, false ));
+
+    oNode.setAttribute( "nillable" , true        );   //-=>TODO: This may need to be determined by sParamType
+    oNode.setAttribute( "minOccurs", 0           );
+    oNode.setAttribute( "maxOccurs", "unbounded" );
+
+    oSeqNode.appendChild( oNode );
+
+    QDomElement oElementNode = createElement( "xs:element" );
+
+    oElementNode.setAttribute( "name"    , sTypeName );
+    oElementNode.setAttribute( "nillable", "true" );
+    oElementNode.setAttribute( "type"    , "tns:" + sTypeName );
+
+    m_oTypes.appendChild( oTypeNode    );
+    m_oTypes.appendChild( oElementNode );
+
+    m_typesCreated.insert( sTypeName, true );
+*/
+    return bCustomType;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString Wsdl::ConvertTypeToXSD( const QString &sType, bool bCustomType )
+{
+    if (bCustomType || sType.startsWith( "DTC::"))
+    {
+        QString sTypeName( sType );
+
+        sTypeName.remove( "DTC::"    );
+        sTypeName.remove( QChar('*') );
+
+        return sTypeName;
+    }
+
     if (sType == "QDateTime")
         return "xs:dateTime";
 
@@ -453,4 +620,20 @@ QString Wsdl::ConvertTypeToXSD( const QString &sType )
         return "xs:" + sType.mid( 1 ).toLower();
 
     return "xs:" + sType.toLower();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString Wsdl::ReadClassInfo( QObject *pObject, QString sKey )
+{
+    const QMetaObject *pMeta = pObject->metaObject();
+
+    int nIdx = pMeta->indexOfClassInfo( sKey.toUtf8() );
+
+    if (nIdx >=0)
+        return pMeta->classInfo( nIdx ).value();
+
+    return QString();
 }

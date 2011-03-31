@@ -47,12 +47,16 @@ class UPNP_PUBLIC JSONSerializer : public Serializer
         QTextStream   m_Stream;
         bool          m_bCommaNeeded;
 
-        virtual void BeginSerialize();
+        virtual void BeginSerialize( QString &sName );
         virtual void EndSerialize  ();
 
         virtual void BeginObject( const QString &sName, const QObject  *pObject );
         virtual void EndObject  ( const QString &sName, const QObject  *pObject );
-        virtual void AddProperty( const QString &sName, const QVariant &vValue );
+
+        virtual void AddProperty( const QString       &sName, 
+                                  const QVariant      &vValue,
+                                  const QMetaObject   *pMetaParent,
+                                  const QMetaProperty *pMetaProp );
 
 
         void RenderValue     ( const QVariant     &vValue );

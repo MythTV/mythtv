@@ -9,12 +9,15 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mediaserver.h"
+#include "httpconfig.h"
 #include "internetContent.h"
 #include "mythdirs.h"
 
 #include "upnpcdstv.h"
 #include "upnpcdsmusic.h"
 #include "upnpcdsvideo.h"
+
+#include <QScriptEngine>
 
 #include "serviceHosts/mythServiceHost.h"
 #include "serviceHosts/guideServiceHost.h"
@@ -33,9 +36,11 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
+MediaServer::MediaServer(void) :
+    m_pUPnpCDS(NULL), m_pUPnpCMGR(NULL),
+    m_sSharePath(GetShareDir())
 {
-    VERBOSE(VB_UPNP, QString("MediaServer::Begin"));
+    VERBOSE(VB_UPNP, "MediaServer:ctor:Begin");
 
     // ----------------------------------------------------------------------
     // Initialize Configuration class (Database for Servers)
@@ -47,29 +52,34 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
     // Create mini HTTP Server
     // ----------------------------------------------------------------------
 
-    int     nPort = g_pConfig->GetValue( "BackendStatusPort", 6544 );
-    QString sIP   = g_pConfig->GetValue( "BackendServerIP"  , ""   );
+    VERBOSE(VB_UPNP, "MediaServer:ctor:End");
+}
 
-    if (sIP.isEmpty())
-    {
-        VERBOSE(VB_IMPORTANT,
-                "MediaServer:: No BackendServerIP Address defined");
-        m_pHttpServer = NULL;
-        return;
-    }
+void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = FALSE */)
+{
+    VERBOSE(VB_UPNP, "MediaServer:Init:Begin");
 
-    m_pHttpServer = new HttpServer();
+    int     nPort     = g_pConfig->GetValue( "BackendStatusPort", 6544 );
 
-    if (!m_pHttpServer->listen(QHostAddress::Any, nPort))
-    {
-        VERBOSE(VB_IMPORTANT, "MediaServer::HttpServer Create Error");
-        delete m_pHttpServer;
-        m_pHttpServer = NULL;
-        return;
-    }
+	if (!m_pHttpServer)
+	{
+		m_pHttpServer = new HttpServer();
 
-    m_sSharePath = GetShareDir();
-    m_pHttpServer->m_sSharePath = m_sSharePath;
+		m_pHttpServer->m_sSharePath = m_sSharePath;
+
+		m_pHttpServer->RegisterExtension(new HttpConfig());
+	}
+
+    if (!m_pHttpServer->isListening())
+	{
+		if (!m_pHttpServer->listen(QHostAddress::Any, nPort))
+		{
+			VERBOSE(VB_IMPORTANT, "MediaServer::HttpServer Create Error");
+			delete m_pHttpServer;
+			m_pHttpServer = NULL;
+			return;
+		}
+	}
 
     QString sFileName = g_pConfig->GetValue( "upnpDescXmlPath",
                                                 m_sSharePath );
@@ -100,6 +110,34 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
     m_pHttpServer->RegisterExtension( new GuideServiceHost  ( m_sSharePath ));
     m_pHttpServer->RegisterExtension( new ContentServiceHost( m_sSharePath ));
     m_pHttpServer->RegisterExtension( new DvrServiceHost    ( m_sSharePath ));
+
+    QString sIP = g_pConfig->GetValue( "BackendServerIP"  , ""   );
+    if (sIP.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT,
+                "MediaServer:: No BackendServerIP Address defined - "
+                "Disabling UPnP");
+        return;
+    }
+
+    // ------------------------------------------------------------------
+    // Register Service Types with Scripting Engine
+    //
+    // -=>NOTE: We need to know the actual type at compile time for this 
+    //          to work, so it needs to be done here.  I'm still looking
+    //          into ways that we may encapsulate this in the service 
+    //          classes.
+    // ------------------------------------------------------------------
+
+
+     QScriptEngine* pEngine = m_pHttpServer->ScriptEngine();
+
+     pEngine->globalObject().setProperty("Myth"   , pEngine->scriptValueFromQMetaObject< ScriptableMyth >() );
+     pEngine->globalObject().setProperty("Guide"  , pEngine->scriptValueFromQMetaObject< ScriptableGuide>() );
+     pEngine->globalObject().setProperty("Content", pEngine->scriptValueFromQMetaObject< Content        >() );
+     pEngine->globalObject().setProperty("Dvr"    , pEngine->scriptValueFromQMetaObject< ScriptableDvr  >() );
+
+    // ------------------------------------------------------------------
 
     if (sIP == "localhost" || sIP.startsWith("127."))
     {
@@ -185,7 +223,7 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
 
     }
 
-    VERBOSE(VB_UPNP, QString( "MediaServer::End" ));
+    VERBOSE(VB_UPNP, "MediaServer:Init:End");
 }
 
 //////////////////////////////////////////////////////////////////////////////

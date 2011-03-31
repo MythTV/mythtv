@@ -1,0 +1,20 @@
+<div id='wizard-database' class='setuptab'>
+<input type=button value='Next' onClick='javascript:$("#wizardtabs").tabs("select", 1)'>
+<div class='Title'>Database Setup</div>
+<table border=0 cellpadding=2 cellspacing=2>
+    <tr><th align=right>Database Host:</th>
+        <td><input id='dbHostName' size=20></td></tr>
+    <tr><th align=right>Database User:</th>
+        <td><input id='dbUserName' size=20></td></tr>
+    <tr><th align=right>Database Password:</th>
+        <td><input id='dbPassword' size=20></td></tr>
+</table>
+<input type=button value='Test Database Settings' onClick='javascript:testDBSettings()'>
+<hr>
+If the setting you are looking for is not available here, you can go to
+the <a href="javascript:hideEditWindow(); loadContent('/Config/Database')">Advanced Database Setup Screen</a>
+</div>
+
+<script language="JavaScript" type="text/javascript">
+    setSettingInputValues("wizard-database");
+</script>

@@ -251,7 +251,7 @@ bool MythRenderVDPAU::gVDPAUMPEG4Accel     = false;
 uint MythRenderVDPAU::gVDPAUBestScaling    = 0;
 
 MythRenderVDPAU::MythRenderVDPAU()
-  : m_preempted(false), m_recreating(false),
+  : MythRender(kRenderVDPAU), m_preempted(false), m_recreating(false),
     m_recreated(false), m_reset_video_surfaces(false),
     m_render_lock(QMutex::Recursive), m_decode_lock(QMutex::Recursive),
     m_display(NULL), m_window(0), m_device(0), m_surface(0),

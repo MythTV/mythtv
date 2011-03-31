@@ -22,8 +22,10 @@
 #include "myth.h"
 
 #include <QDir>
+#include <QCryptographicHash>
 
 #include "mythcorecontext.h"
+#include "mythdbcon.h"
 #include "storagegroup.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -92,7 +94,18 @@ DTC::ConnectionInfo* Myth::GetConnectionInfo( const QString  &sPin )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::StringList* Myth::GetHosts( )
+QString Myth::GetHostName( )
+{
+    if (!gCoreContext)
+        throw( QString( "No MythCoreContext in GetHostName." ));
+
+    return gCoreContext->GetHostName();
+}
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QStringList Myth::GetHosts( )
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -115,21 +128,19 @@ DTC::StringList* Myth::GetHosts( )
     // return the results of the query
     // ----------------------------------------------------------------------
 
-    DTC::StringList *pResults = new DTC::StringList();
-
-    //pResults->setObjectName( "HostList" );
+    QStringList oList;
 
     while (query.next())
-        pResults->Values().append( query.value(0).toString() );
+        oList.append( query.value(0).toString() );
 
-    return pResults;
+    return oList;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::StringList *Myth::GetKeys(  ) 
+QStringList Myth::GetKeys() 
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -149,14 +160,186 @@ DTC::StringList *Myth::GetKeys(  )
     // return the results of the query
     // ----------------------------------------------------------------------
 
-    DTC::StringList *pResults = new DTC::StringList();
-
+    QStringList oResults;
+    
     //pResults->setObjectName( "KeyList" );
 
     while (query.next())
-        pResults->Values().append( query.value(0).toString() );
+        oResults.append( query.value(0).toString() );
 
-    return pResults;
+    return oResults;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::StorageGroupDirList *Myth::GetStorageGroupDirs( const QString &sGroupName,
+                                                     const QString &sHostName ) 
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!query.isConnected())
+        throw( QString("Database not open while trying to list "
+                       "Storage Group Dirs"));
+
+    if (!sGroupName.isEmpty() && !sHostName.isEmpty())
+    {
+        query.prepare("SELECT id, groupname, hostname, dirname "
+                      "FROM storagegroup "
+                      "WHERE groupname = :GROUP AND hostname = :HOST "
+                      "ORDER BY groupname, hostname, dirname" );
+        query.bindValue(":HOST",  sHostName);
+        query.bindValue(":GROUP", sGroupName);
+    }
+    else if (!sHostName.isEmpty())
+    {
+        query.prepare("SELECT id, groupname, hostname, dirname "
+                      "FROM storagegroup "
+                      "WHERE hostname = :HOST "
+                      "ORDER BY groupname, hostname, dirname" );
+        query.bindValue(":HOST",  sHostName);
+    }
+    else if (!sGroupName.isEmpty())
+    {
+        query.prepare("SELECT id, groupname, hostname, dirname "
+                      "FROM storagegroup "
+                      "WHERE groupname = :GROUP "
+                      "ORDER BY groupname, hostname, dirname" );
+        query.bindValue(":GROUP", sGroupName);
+    }
+    else
+        query.prepare("SELECT id, groupname, hostname, dirname "
+                      "FROM storagegroup "
+                      "ORDER BY groupname, hostname, dirname" );
+
+    if (!query.exec())
+    {
+        MythDB::DBError("MythAPI::GetStorageGroupDirs()", query);
+
+        throw( QString( "Database Error executing query." ));
+    }
+
+    // ----------------------------------------------------------------------
+    // return the results of the query
+    // ----------------------------------------------------------------------
+
+    DTC::StorageGroupDirList* pList = new DTC::StorageGroupDirList();
+
+    while (query.next())
+    {
+        DTC::StorageGroupDir *pStorageGroupDir = pList->AddNewStorageGroupDir();
+            
+        pStorageGroupDir->setId            ( query.value(0).toInt()       );
+        pStorageGroupDir->setGroupName     ( query.value(1).toString()    );
+        pStorageGroupDir->setHostName      ( query.value(2).toString()    );
+        pStorageGroupDir->setDirName       ( query.value(3).toString()    );
+    }
+
+    return pList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Myth::AddStorageGroupDir( const QString &sGroupName,
+                               const QString &sDirName, 
+                               const QString &sHostName )
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!query.isConnected())
+        throw( QString("Database not open while trying to add Storage Group "
+                       "dir"));
+
+    if (sGroupName.isEmpty())
+        throw ( QString( "Storage Group Required" ));
+
+    if (sDirName.isEmpty())
+        throw ( QString( "Directory Name Required" ));
+
+    if (sHostName.isEmpty())
+        throw ( QString( "HostName Required" ));
+
+    query.prepare("SELECT COUNT(*) "
+                  "FROM storagegroup "
+                  "WHERE groupname = :GROUPNAME "
+                  "AND dirname = :DIRNAME "
+                  "AND hostname = :HOSTNAME;");
+    query.bindValue(":GROUPNAME", sGroupName );
+    query.bindValue(":DIRNAME"  , sDirName   );
+    query.bindValue(":HOSTNAME" , sHostName  );
+    if (!query.exec())
+    {
+        MythDB::DBError("MythAPI::AddStorageGroupDir()", query);
+
+        throw( QString( "Database Error executing query." ));
+    }
+
+    if (query.next())
+    {
+        if (query.value(0).toInt() > 0)
+            return false;
+    }
+
+    query.prepare("INSERT storagegroup "
+                  "( groupname, dirname, hostname ) "
+                  "VALUES "
+                  "( :GROUPNAME, :DIRNAME, :HOSTNAME );");
+    query.bindValue(":GROUPNAME", sGroupName );
+    query.bindValue(":DIRNAME"  , sDirName   );
+    query.bindValue(":HOSTNAME" , sHostName  );
+
+    if (!query.exec())
+    {
+        MythDB::DBError("MythAPI::AddStorageGroupDir()", query);
+
+        throw( QString( "Database Error executing query." ));
+    }
+
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Myth::RemoveStorageGroupDir( const QString &sGroupName,
+                                  const QString &sDirName, 
+                                  const QString &sHostName )
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!query.isConnected())
+        throw( QString("Database not open while trying to remove Storage "
+                       "Group dir"));
+
+    if (sGroupName.isEmpty())
+        throw ( QString( "Storage Group Required" ));
+
+    if (sDirName.isEmpty())
+        throw ( QString( "Directory Name Required" ));
+
+    if (sHostName.isEmpty())
+        throw ( QString( "HostName Required" ));
+
+    query.prepare("DELETE "
+                  "FROM storagegroup "
+                  "WHERE groupname = :GROUPNAME "
+                  "AND dirname = :DIRNAME "
+                  "AND hostname = :HOSTNAME;");
+    query.bindValue(":GROUPNAME", sGroupName );
+    query.bindValue(":DIRNAME"  , sDirName   );
+    query.bindValue(":HOSTNAME" , sHostName  );
+    if (!query.exec())
+    {
+        MythDB::DBError("MythAPI::AddStorageGroupDir()", query);
+
+        throw( QString( "Database Error executing query." ));
+    }
+
+    return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -271,23 +454,99 @@ DTC::SettingList *Myth::GetSetting( const QString &sHostName,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::SuccessFail *Myth::PutSetting( const QString &sHostName, 
-                                    const QString &sKey, 
-                                    const QString &sValue ) 
-
+bool Myth::PutSetting( const QString &sHostName, 
+                       const QString &sKey, 
+                       const QString &sValue ) 
 {
+    bool bResult = false;
+
     if (!sKey.isEmpty())
     {
-        DTC::SuccessFail *pResults = new DTC::SuccessFail();
-
         if ( gCoreContext->SaveSettingOnHost( sKey, sValue, sHostName ) )
-            pResults->setResult( true );
-        else
-            pResults->setResult( false );
+            bResult = true;
 
-        return pResults;
+        return bResult;
     }
 
     throw ( QString( "Key Required" ));
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Myth::ChangePassword( const QString   &sUserName,
+                           const QString   &sOldPassword,
+                           const QString   &sNewPassword )
+{
+    bool bResult = false;
+
+    if (sUserName.isEmpty())
+    {
+        throw ( QString( "UserName not supplied when trying to change "
+                         "password." ) );
+    }
+
+    if (sOldPassword.isEmpty())
+    {
+        throw ( QString( "Old Password not supplied when trying to change "
+                         "password for '%1'." ).arg(sUserName) );
+    }
+
+    if (sNewPassword.isEmpty())
+    {
+        throw ( QString( "New Password not supplied when trying to change "
+                         "password for '%1'." ).arg(sUserName) );
+    }
+
+    QCryptographicHash crypto( QCryptographicHash::Sha1 );
+
+    crypto.addData( sOldPassword.toUtf8() );
+
+    QString sPasswordHash( crypto.result().toBase64() );
+
+    if ( sPasswordHash != gCoreContext->GetSetting( "HTTP/Protected/Password", ""))
+    {
+        throw ( QString( "Incorrect Old Password supplied when trying to "
+                         "change password for '%1'." ).arg(sUserName) );
+    }
+
+    crypto.reset();
+    crypto.addData( sNewPassword.toUtf8() );
+
+    if (gCoreContext->SaveSettingOnHost( "HTTP/Protected/Password", crypto.result().toBase64(),
+                                    QString() ) )
+    {
+        gCoreContext->ClearSettingsCache();
+        bResult = true;
+    }
+
+    return bResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Myth::TestDBSettings( const QString &sHostName,
+                           const QString &sUserName,
+                           const QString &sPassword,
+                           const QString &sDBName,
+                           int   dbPort)
+{
+    bool bResult = false;
+
+    QString db("mythconverg");
+    int port = 3306;
+
+    if (!sDBName.isEmpty())
+        db = sDBName;
+
+    if (dbPort != 0)
+        port = dbPort;
+
+    bResult = TestDatabase(sHostName, sUserName, sPassword, db, port);
+
+    return bResult;
 }
 

@@ -41,6 +41,13 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
     Q_OBJECT
     Q_CLASSINFO( "version", "1.0" );
 
+    // We need to know the type that will ultimately be contained in 
+    // any QVariantList or QVariantMap.  We do his by specifying
+    // A Q_CLASSINFO entry with "<PropName>_type" as the key
+    // and the type name as the value
+
+    Q_CLASSINFO( "Programs_type", "DTC::Program");
+
     Q_PROPERTY( uint         ChanId      READ ChanId       WRITE setChanId      )
     Q_PROPERTY( QString      ChanNum     READ ChanNum      WRITE setChanNum     )
     Q_PROPERTY( QString      CallSign    READ CallSign     WRITE setCallSign    )
@@ -71,12 +78,17 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
 
     public:
 
+        static void InitializeCustomTypes();
+
+    public:
+
         ChannelInfo(QObject *parent = 0) 
-            : QObject   ( parent ),
-              m_ChanId  ( 0      ),
-              m_SourceId( 0      ),
-              m_InputId ( 0      ),
-              m_CommFree( 0      )   
+            : QObject           ( parent ),
+              m_ChanId          ( 0      ),
+              m_SourceId        ( 0      ),
+              m_InputId         ( 0      ),
+              m_CommFree        ( 0      ),
+              m_SerializeDetails( true   )
         {
         }
         
@@ -159,6 +171,20 @@ class SERVICE_PUBLIC Program : public QObject
 
     public:
 
+        static void InitializeCustomTypes()
+        {
+            qRegisterMetaType< Program  >();
+            qRegisterMetaType< Program* >();
+
+            if (QMetaType::type( "DTC::ChannelInfo" ) == 0)
+                ChannelInfo::InitializeCustomTypes();
+
+            if (QMetaType::type( "DTC::RecordingInfo" ) == 0)
+                RecordingInfo::InitializeCustomTypes();
+        }
+
+    public:
+
         Program(QObject *parent = 0) 
             : QObject               ( parent ),
               m_Repeat              ( false  ),
@@ -167,9 +193,9 @@ class SERVICE_PUBLIC Program : public QObject
               m_ProgramFlags        ( 0      ),
               m_Channel             ( NULL   ),
               m_Recording           ( NULL   ),
-              m_SerializeDetails    ( false  ),
-              m_SerializeChannel    ( false  ),
-              m_SerializeRecording  ( false  )
+              m_SerializeDetails    ( true   ),
+              m_SerializeChannel    ( true   ),
+              m_SerializeRecording  ( true   )
         {
         }
         
@@ -220,9 +246,22 @@ inline Program *ChannelInfo::AddNewProgram()
     return pObject;
 }
 
+inline void ChannelInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< ChannelInfo  >();
+    qRegisterMetaType< ChannelInfo* >();
+
+    if (QMetaType::type( "DTC::Program" ) == 0)
+        Program::InitializeCustomTypes();
+}
+
+
 } // namespace DTC
 
-Q_DECLARE_METATYPE( DTC::Program )
-Q_DECLARE_METATYPE( DTC::ChannelInfo )
+Q_DECLARE_METATYPE( DTC::Program  )
+Q_DECLARE_METATYPE( DTC::Program* )
+
+Q_DECLARE_METATYPE( DTC::ChannelInfo  )
+Q_DECLARE_METATYPE( DTC::ChannelInfo* )
 
 #endif

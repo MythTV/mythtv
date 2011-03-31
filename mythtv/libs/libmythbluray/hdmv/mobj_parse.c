@@ -41,7 +41,7 @@ static int _mobj_parse_header(BITSTREAM *bs, int *extension_data_start)
     if (sig1 != MOBJ_SIG1 ||
        (sig2 != MOBJ_SIG2A &&
         sig2 != MOBJ_SIG2B)) {
-     DEBUG(DBG_NAV, "MovieObject.bdmv failed signature match: expected MOBJ0100 got %8.8s\n", bs->buf);
+     BD_DEBUG(DBG_NAV, "MovieObject.bdmv failed signature match: expected MOBJ0100 got %8.8s\n", bs->buf);
      return 0;
     }
 
@@ -120,14 +120,14 @@ MOBJ_OBJECTS *mobj_parse(const char *file_name)
 
     fp = file_open(file_name, "rb");
     if (!fp) {
-      DEBUG(DBG_NAV | DBG_CRIT, "error opening %s\n", file_name);
+      BD_DEBUG(DBG_NAV | DBG_CRIT, "error opening %s\n", file_name);
       return NULL;
     }
 
     bs_init(&bs, fp);
 
     if (!_mobj_parse_header(&bs, &extension_data_start)) {
-        DEBUG(DBG_NAV | DBG_CRIT, "%s: invalid header\n", file_name);
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "%s: invalid header\n", file_name);
         goto error;
     }
 
@@ -142,7 +142,7 @@ MOBJ_OBJECTS *mobj_parse(const char *file_name)
 
     for (i = 0; i < objects->num_objects; i++) {
         if (!_mobj_parse_object(&bs, &objects->objects[i])) {
-            DEBUG(DBG_NAV | DBG_CRIT, "%s: error parsing object %d\n", file_name, i);
+            BD_DEBUG(DBG_NAV | DBG_CRIT, "%s: error parsing object %d\n", file_name, i);
             goto error;
         }
     }

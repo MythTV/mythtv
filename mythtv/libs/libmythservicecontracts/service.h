@@ -56,17 +56,26 @@ class SERVICE_PUBLIC Service : public QObject
 
     public:
 
+        Service( QObject *parent = 0 ) : QObject( parent ) 
+        {
+            qRegisterMetaType< QFileInfo   >();
+        }
+
+    public:
+
         /////////////////////////////////////////////////////////////////////
         // This method should be overridden to handle non-QObject based custom types
         /////////////////////////////////////////////////////////////////////
 
-        virtual QVariant ConvertToVariant  ( const QString &sTypeName, 
-                                             void *pValue );
+        virtual QVariant ConvertToVariant  ( int nType, void *pValue );
 
-        virtual void* ConvertToParameterPtr( const QString &sParamType, 
+        virtual void* ConvertToParameterPtr( int            nTypeId,
+                                             const QString &sParamType, 
+                                             void*          pParam,
                                              const QString &sValue );
 
         static bool ToBool( const QString &sVal );
+
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -74,6 +83,5 @@ class SERVICE_PUBLIC Service : public QObject
 //////////////////////////////////////////////////////////////////////////////
 
 Q_DECLARE_METATYPE( QFileInfo  )
-Q_DECLARE_METATYPE( QFileInfo* )
 
 #endif

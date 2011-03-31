@@ -671,7 +671,7 @@ int run_backend(const MythCommandLineParser &cmdline)
 
     ///////////////////////////////////////////
 
-    g_pUPnp = new MediaServer(ismaster, !cmdline.IsUPnPEnabled() );
+    g_pUPnp->Init(ismaster, !cmdline.IsUPnPEnabled());
 
     if (!ismaster)
     {

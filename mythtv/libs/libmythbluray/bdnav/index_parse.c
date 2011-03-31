@@ -102,7 +102,7 @@ static int _parse_app_info(BITSTREAM *bs, INDX_APP_INFO *app_info)
     len = bs_read(bs, 32);
 
     if (len != 34) {
-        DEBUG(DBG_NAV, "index.bdmv app_info length is %d, expected 34 !\n", len);
+        BD_DEBUG(DBG_NAV, "index.bdmv app_info length is %d, expected 34 !\n", len);
     }
 
     bs_skip(bs, 1);
@@ -134,7 +134,7 @@ static int _parse_header(BITSTREAM *bs, int *index_start, int *extension_data_st
     if (sig1 != INDX_SIG1 ||
        (sig2 != INDX_SIG2A &&
         sig2 != INDX_SIG2B)) {
-     DEBUG(DBG_NAV | DBG_CRIT, "index.bdmv failed signature match: expected INDX0100 got %8.8s\n", bs->buf);
+     BD_DEBUG(DBG_NAV | DBG_CRIT, "index.bdmv failed signature match: expected INDX0100 got %8.8s\n", bs->buf);
      return 0;
     }
 
@@ -154,7 +154,7 @@ INDX_ROOT *indx_parse(const char *file_name)
 
     fp = file_open(file_name, "rb");
     if (!fp) {
-        DEBUG(DBG_NAV | DBG_CRIT, "indx_parse(): error opening %s\n", file_name);
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "indx_parse(): error opening %s\n", file_name);
         X_FREE(index);
         return NULL;
     }
@@ -162,19 +162,19 @@ INDX_ROOT *indx_parse(const char *file_name)
     bs_init(&bs, fp);
 
     if (!_parse_header(&bs, &indexes_start, &extension_data_start)) {
-        DEBUG(DBG_NAV | DBG_CRIT, "index.bdmv: invalid header\n");
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "index.bdmv: invalid header\n");
         goto error;
     }
 
     if (!_parse_app_info(&bs, &index->app_info)) {
-        DEBUG(DBG_NAV | DBG_CRIT, "index.bdmv: error parsing app info\n");
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "index.bdmv: error parsing app info\n");
         goto error;
     }
 
     bs_seek_byte(&bs, indexes_start);
 
     if (!_parse_index(&bs, index)) {
-        DEBUG(DBG_NAV | DBG_CRIT, "index.bdmv: error parsing indexes\n");
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "index.bdmv: error parsing indexes\n");
         goto error;
     }
 

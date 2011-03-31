@@ -129,6 +129,7 @@ class UPNP_PUBLIC HTTPRequest
         int                 m_nMajor;
         int                 m_nMinor;
 
+        bool                m_bProtected;
 
         bool                m_bSOAPRequest;
         QString             m_sNameSpace;
@@ -173,6 +174,8 @@ class UPNP_PUBLIC HTTPRequest
         qint64          SendData            ( QIODevice *pDevice, qint64 llStart, qint64 llBytes );
         qint64          SendFile            ( QFile &file, qint64 llStart, qint64 llBytes );
 
+        bool            IsUrlProtected      ( const QString &sBaseUrl );
+        bool            Authenticated       ();
 
     public:
         
@@ -253,6 +256,43 @@ class BufferedSocketDeviceRequest : public HTTPRequest
         virtual int     getSocketHandle () {return( m_pSocket->socket() ); }
         virtual void    SetBlocking     ( bool bBlock );
         virtual bool    IsBlocking      ();
+
+};
+
+/////////////////////////////////////////////////////////////////////////////
+// 
+/////////////////////////////////////////////////////////////////////////////
+
+class UPNP_PUBLIC HttpException
+{
+    public:
+        int     code;
+        QString msg;
+
+        HttpException( int nCode = -1, const QString &sMsg = "") 
+               : code( nCode ), msg ( sMsg  ) 
+        {}
+
+        // Needed to force a v-table.
+        virtual ~HttpException() 
+        {}
+};
+
+class UPNP_PUBLIC HttpRedirectException : public HttpException
+{
+    public:
+
+        QString hostName;
+      //int     port;
+
+        HttpRedirectException( const QString &sHostName = "", 
+                                     int      nCode     = -1, 
+                               const QString &sMsg      = "" ) 
+               : HttpException( nCode, sMsg ), hostName( sHostName )
+        {}
+
+        virtual ~HttpRedirectException() 
+        {}
 
 };
 

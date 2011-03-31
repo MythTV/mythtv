@@ -317,7 +317,7 @@ QString RemoteFile::GetFileHash(const QString &url)
         filename = filename.right(filename.length()-1);
 
     if (filename.isEmpty() || sgroup.isEmpty())
-        return false;
+        return QString();
 
     QStringList strlist("QUERY_FILE_HASH");
     strlist << filename;

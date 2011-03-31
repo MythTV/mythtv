@@ -1,0 +1,18 @@
+<div id="setupcontent" class='setupcontent'>
+<div id='Title'>Storage Groups</div>
+<script language="JavaScript" type="text/javascript">
+$("#sgHostSelect").html("Host: <select id='sgShowHost' "
+    + "onChange='javascript:initStorageGroups()'><option value='ALL'>"
+    + "Display ALL Hosts</option>" + getHostsOptionList() + "</select>");
+</script>
+<br>
+<!--
+<a href='javascript:addTab("#storagegrouptabs", "/setup/StorageGroups/Wizard.tab_newgroup.html", "New Group")'>Create New Storage Group</a>
+-->
+
+<div id="storagegrouptabs">
+    <ul>
+    </ul>
+</div>
+<div id='sgHostSelect'></div>
+</div>

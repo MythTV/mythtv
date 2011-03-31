@@ -243,8 +243,8 @@ AudioOutputSettings* AudioOutputBase::GetOutputSettingsUsers(bool digital)
 bool AudioOutputBase::CanPassthrough(int samplerate, int channels,
                                      int codec, int profile) const
 {
-    bool ret = !internal_vol;;
     DigitalFeature arg = FEATURE_NONE;
+    bool           ret = !(internal_vol && SWVolume());
 
     switch(codec)
     {
@@ -277,6 +277,9 @@ bool AudioOutputBase::CanPassthrough(int samplerate, int channels,
     ret &= output_settingsdigital->canFeature(arg);
     ret &= output_settingsdigital->IsSupportedFormat(FORMAT_S16);
     ret &= output_settingsdigital->IsSupportedRate(samplerate);
+    // if we must resample to 48kHz ; we can't passthrough
+    ret &= !((samplerate != 48000) &&
+             gCoreContext->GetNumSetting("Audio48kOverride", false));
     // Don't know any cards that support spdif clocked at < 44100
     // Some US cable transmissions have 2ch 32k AC-3 streams
     ret &= samplerate >= 44100;
@@ -286,7 +289,7 @@ bool AudioOutputBase::CanPassthrough(int samplerate, int channels,
     // do the downmix if required
     ret &= max_channels >= 6 && channels > 2;
     // Stereo content will always be decoded so it can later be upmixed
-    // unless audio is configured for stereoo. We can passthrough otherwise
+    // unless audio is configured for stereo. We can passthrough otherwise
     ret |= max_channels == 2;
 
     return ret;
@@ -547,7 +550,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     killaudio = pauseaudio = false;
     was_paused = true;
-    internal_vol = gCoreContext->GetNumSetting("MythControlsVolume", 0);
 
     // Don't try to do anything if audio hasn't been
     // initialized yet (e.g. rubbish was provided)

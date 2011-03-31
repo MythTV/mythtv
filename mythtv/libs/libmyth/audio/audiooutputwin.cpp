@@ -304,9 +304,9 @@ void AudioOutputWin::SetVolumeChannel(int channel, int volume)
     if (MMSYSERR_NOERROR == waveOutGetVolume((HWAVEOUT)WAVE_MAPPER, &dwVolume))
     {
         if (channel == 0)
-            dwVolume = dwVolume & 0xffff0000 | volume * (0xffff / 100);
+            dwVolume = (dwVolume & 0xffff0000) | (volume * (0xffff / 100));
         else
-            dwVolume = dwVolume & 0xffff | ((volume * (0xffff / 100)) << 16);
+            dwVolume = (dwVolume & 0xffff) | ((volume * (0xffff / 100)) << 16);
     }
     else
     {

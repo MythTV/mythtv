@@ -28,9 +28,8 @@
 
 #include "service.h"
 #include "datacontracts/connectionInfo.h"
-#include "datacontracts/stringList.h"
 #include "datacontracts/settingList.h"
-#include "datacontracts/successFail.h"
+#include "datacontracts/storageGroupDirList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -52,22 +51,60 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
     Q_CLASSINFO( "version"    , "1.0" );
-    Q_CLASSINFO( "PutSetting_Method", "POST" )
+    Q_CLASSINFO( "PutSetting_Method",            "POST" )
+    Q_CLASSINFO( "AddStorageGroupDir_Method",    "POST" )
+    Q_CLASSINFO( "RemoveStorageGroupDir_Method", "POST" )
+    Q_CLASSINFO( "ChangePassword_Method",        "POST" )
+    Q_CLASSINFO( "TestDBSettings_Method",        "POST" )
+
+    public:
+
+        // Must call InitializeCustomTypes for each unique Custom Type used
+        // in public slots below.
+
+        MythServices( QObject *parent = 0 ) : Service( parent )
+        {
+            DTC::ConnectionInfo     ::InitializeCustomTypes();
+            DTC::SettingList        ::InitializeCustomTypes();
+            DTC::StorageGroupDirList::InitializeCustomTypes();
+        }
 
     public slots:
 
         virtual DTC::ConnectionInfo* GetConnectionInfo  ( const QString   &Pin ) = 0;
 
-        virtual DTC::StringList*    GetHosts            ( ) = 0;
-        virtual DTC::StringList*    GetKeys             ( ) = 0;
+        virtual QString             GetHostName         ( ) = 0;
+        virtual QStringList         GetHosts            ( ) = 0;
+        virtual QStringList         GetKeys             ( ) = 0;
 
-        virtual DTC::SettingList*   GetSetting          ( const QString   &HostName, 
-                                                          const QString   &Key, 
+        virtual DTC::StorageGroupDirList*  GetStorageGroupDirs ( const QString   &GroupName,
+                                                                 const QString   &HostName ) = 0;
+
+        virtual bool                AddStorageGroupDir  ( const QString   &GroupName,
+                                                          const QString   &DirName,
+                                                          const QString   &HostName ) = 0;
+
+        virtual bool                RemoveStorageGroupDir( const QString   &GroupName,
+                                                           const QString   &DirName,
+                                                           const QString   &HostName ) = 0;
+
+        virtual DTC::SettingList*   GetSetting          ( const QString   &HostName,
+                                                          const QString   &Key,
                                                           const QString   &Default ) = 0;
 
-        virtual DTC::SuccessFail*   PutSetting          ( const QString   &HostName, 
-                                                          const QString   &Key, 
+        virtual bool                PutSetting          ( const QString   &HostName,
+                                                          const QString   &Key,
                                                           const QString   &Value   ) = 0;
+
+        virtual bool                ChangePassword      ( const QString   &UserName,
+                                                          const QString   &OldPassword,
+                                                          const QString   &NewPassword ) = 0;
+
+        virtual bool                TestDBSettings      ( const QString &HostName,
+                                                          const QString &UserName,
+                                                          const QString &Password,
+                                                          const QString &DBName,
+                                                          int   dbPort) = 0;
 };
 
 #endif

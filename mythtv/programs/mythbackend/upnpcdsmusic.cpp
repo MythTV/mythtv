@@ -300,7 +300,7 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
     // Build Support Strings
     // ----------------------------------------------------------------------
 
-    QString sURIBase   = QString( "http://%1:%2/Myth/" )
+    QString sURIBase   = QString( "http://%1:%2/Content/" )
                             .arg( sServerIp )
                             .arg( sPort     );
 

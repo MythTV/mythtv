@@ -20,8 +20,9 @@ class MythGLShaderObject;
 class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
 {
   public:
-    MythRenderOpenGL2(const QGLFormat& format, QPaintDevice* device);
-    MythRenderOpenGL2(const QGLFormat& format);
+    MythRenderOpenGL2(const QGLFormat& format, QPaintDevice* device,
+                      RenderType type = kRenderOpenGL2);
+    MythRenderOpenGL2(const QGLFormat& format, RenderType type = kRenderOpenGL2);
     virtual ~MythRenderOpenGL2();
 
     virtual uint CreateShaderObject(const QString &vert, const QString &frag);

@@ -2,7 +2,7 @@ include ( ../../settings.pro )
 include ( ../../version.pro )
 include ( ../programs-libs.pro )
 
-QT += network xml sql
+QT += network xml sql script
 
 TEMPLATE = app
 CONFIG += thread
@@ -22,6 +22,7 @@ HEADERS += autoexpire.h encoderlink.h filetransfer.h httpstatus.h mainserver.h
 HEADERS += playbacksock.h scheduler.h server.h housekeeper.h backendutil.h
 HEADERS += upnpcdstv.h upnpcdsmusic.h upnpcdsvideo.h mediaserver.h
 HEADERS += internetContent.h main_helpers.h backendcontext.h
+HEADERS += httpconfig.h mythsettings.h
 
 HEADERS += serviceHosts/mythServiceHost.h    serviceHosts/guideServiceHost.h
 HEADERS += serviceHosts/contentServiceHost.h serviceHosts/dvrServiceHost.h
@@ -34,6 +35,7 @@ SOURCES += main.cpp mainserver.cpp playbacksock.cpp scheduler.cpp server.cpp
 SOURCES += housekeeper.cpp backendutil.cpp
 SOURCES += upnpcdstv.cpp upnpcdsmusic.cpp upnpcdsvideo.cpp mediaserver.cpp
 SOURCES += internetContent.cpp main_helpers.cpp backendcontext.cpp
+SOURCES += httpconfig.cpp mythsettings.cpp
 
 SOURCES += services/myth.cpp services/guide.cpp services/content.cpp 
 SOURCES += services/dvr.cpp
@@ -45,3 +47,7 @@ using_dvb:DEFINES += USING_DVB
 
 using_valgrind:DEFINES += USING_VALGRIND
 
+xml_conf.path = $${PREFIX}/share/mythtv/backend-config/
+xml_conf.files = config_backend_general.xml config_backend_database.xml
+
+INSTALLS += xml_conf

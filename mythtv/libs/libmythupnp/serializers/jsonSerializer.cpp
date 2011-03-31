@@ -57,7 +57,7 @@ QString JSONSerializer::GetContentType()
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void JSONSerializer::BeginSerialize()
+void JSONSerializer::BeginSerialize( QString &sName )
 {
     m_bCommaNeeded = false;
 
@@ -104,7 +104,10 @@ void JSONSerializer::EndObject  ( const QString &sName, const QObject  *pObject 
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void JSONSerializer::AddProperty( const QString &sName, const QVariant &vValue )
+void JSONSerializer::AddProperty( const QString       &sName, 
+                                  const QVariant      &vValue,
+                                  const QMetaObject   *pMetaParent,
+                                  const QMetaProperty *pMetaProp )
 {
     if (m_bCommaNeeded)
         m_Stream << ", ";

@@ -4637,6 +4637,20 @@ void MythPlayer::ToggleStudioLevels(void)
     SetOSDMessage(msg, kOSDTimeout_Med);
 }
 
+bool MythPlayer::CanVisualise(void)
+{
+    if (videoOutput)
+        return videoOutput->CanVisualise(&audio, NULL);
+    return false;
+}
+
+bool MythPlayer::ToggleVisualisation(void)
+{
+    if (videoOutput)
+        return videoOutput->ToggleVisualisation(&audio);
+    return false;
+}
+
 void MythPlayer::SetOSDMessage(const QString &msg, OSDTimeout timeout)
 {
     QMutexLocker locker(&osdLock);

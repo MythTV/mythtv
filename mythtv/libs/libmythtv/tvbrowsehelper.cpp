@@ -6,6 +6,7 @@
 #include "playercontext.h"
 #include "remoteencoder.h"
 #include "recordinginfo.h"
+#include "mythplayer.h"
 #include "tv_play.h"
 
 #define GetPlayer(X,Y) GetPlayerHaveLock(X, Y, __FILE__ , __LINE__)
@@ -65,7 +66,12 @@ bool TVBrowseHelper::BrowseStart(PlayerContext *ctx, bool skip_browse)
     if (m_ctx)
         return m_ctx == ctx;
 
-    if (ctx->paused)
+    bool paused = false;
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    if (ctx->player)
+        paused = ctx->player->IsPaused();
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+    if (paused)
         return false;
 
     m_tv->ClearOSD(ctx);

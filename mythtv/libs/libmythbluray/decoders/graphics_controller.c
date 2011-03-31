@@ -32,8 +32,8 @@
 
 #include <inttypes.h>
 
-#define ERROR(x,...) DEBUG(DBG_BLURAY | DBG_CRIT, x, ##__VA_ARGS__)
-#define TRACE(x,...) DEBUG(DBG_BLURAY,            x, ##__VA_ARGS__)
+#define GC_ERROR(...) BD_DEBUG(DBG_GC | DBG_CRIT, __VA_ARGS__)
+#define GC_TRACE(...) BD_DEBUG(DBG_GC,            __VA_ARGS__)
 
 /*
  *
@@ -189,7 +189,7 @@ static uint16_t _find_selected_button_id(GRAPHICS_CONTROLLER *gc)
 
     page = _find_page(&s->ics->interactive_composition, page_id);
     if (!page) {
-        TRACE("_find_selected_button_id(): unknown page #%d (have %d pages)\n",
+        GC_TRACE("_find_selected_button_id(): unknown page #%d (have %d pages)\n",
               page_id, s->ics->interactive_composition.num_pages);
         return 0xffff;
     }
@@ -200,7 +200,7 @@ static uint16_t _find_selected_button_id(GRAPHICS_CONTROLLER *gc)
     if (_find_button_page(page, page->default_selected_button_id_ref, NULL) &&
         _is_button_enabled(gc, page, page->default_selected_button_id_ref)) {
 
-        TRACE("_find_selected_button_id() -> default #%d\n", page->default_selected_button_id_ref);
+        GC_TRACE("_find_selected_button_id() -> default #%d\n", page->default_selected_button_id_ref);
         return page->default_selected_button_id_ref;
     }
 
@@ -210,7 +210,7 @@ static uint16_t _find_selected_button_id(GRAPHICS_CONTROLLER *gc)
 
         if (button_id == gc->enabled_button[ii]) {
             if (_find_button_bog(bog, gc->enabled_button[ii])) {
-                TRACE("_find_selected_button_id() -> PSR10 #%d\n", gc->enabled_button[ii]);
+                GC_TRACE("_find_selected_button_id() -> PSR10 #%d\n", gc->enabled_button[ii]);
                 return gc->enabled_button[ii];
             }
         }
@@ -221,12 +221,12 @@ static uint16_t _find_selected_button_id(GRAPHICS_CONTROLLER *gc)
         BD_IG_BOG *bog = &page->bog[ii];
 
         if (_find_button_bog(bog, gc->enabled_button[ii])) {
-            TRACE("_find_selected_button_id() -> first valid #%d\n", gc->enabled_button[ii]);
+            GC_TRACE("_find_selected_button_id() -> first valid #%d\n", gc->enabled_button[ii]);
             return gc->enabled_button[ii];
         }
     }
 
-    TRACE("_find_selected_button_id(): not found -> 0xffff\n");
+    GC_TRACE("_find_selected_button_id(): not found -> 0xffff\n");
     return 0xffff;
 }
 
@@ -239,7 +239,7 @@ static void _reset_enabled_button(GRAPHICS_CONTROLLER *gc)
 
     page = _find_page(&s->ics->interactive_composition, page_id);
     if (!page) {
-        ERROR("_reset_enabled_button(): unknown page #%d (have %d pages)\n",
+        GC_ERROR("_reset_enabled_button(): unknown page #%d (have %d pages)\n",
               page_id, s->ics->interactive_composition.num_pages);
         return;
     }
@@ -344,7 +344,7 @@ void gc_free(GRAPHICS_CONTROLLER **p)
 void gc_decode_ts(GRAPHICS_CONTROLLER *gc, uint16_t pid, uint8_t *block, unsigned num_blocks, int64_t stc)
 {
     if (!gc) {
-        TRACE("gc_decode_ts(): no graphics controller\n");
+        GC_TRACE("gc_decode_ts(): no graphics controller\n");
         return;
     }
 
@@ -399,7 +399,7 @@ static void _render_button(GRAPHICS_CONTROLLER *gc, BD_IG_BUTTON *button, BD_PG_
 
     object = _find_object_for_button(gc->igs, button, state);
     if (!object) {
-        TRACE("_render_button(#%d): object (state %d) not found\n", button->id, state);
+        GC_TRACE("_render_button(#%d): object (state %d) not found\n", button->id, state);
         return;
     }
 
@@ -432,7 +432,7 @@ static void _render_page(GRAPHICS_CONTROLLER *gc,
     unsigned        selected_button_id = bd_psr_read(gc->regs, PSR_SELECTED_BUTTON_ID);
 
     if (s->ics->interactive_composition.ui_model == IG_UI_MODEL_POPUP && !gc->popup_visible) {
-        TRACE("_render_page(): popup menu not visible\n");
+        GC_TRACE("_render_page(): popup menu not visible\n");
 
         _clear_osd(gc, 1);
 
@@ -441,19 +441,19 @@ static void _render_page(GRAPHICS_CONTROLLER *gc,
 
     page = _find_page(&s->ics->interactive_composition, page_id);
     if (!page) {
-        ERROR("_render_page: unknown page id %d (have %d pages)\n",
+        GC_ERROR("_render_page: unknown page id %d (have %d pages)\n",
               page_id, s->ics->interactive_composition.num_pages);
         return;
     }
 
     palette = _find_palette(s, page->palette_id_ref);
     if (!palette) {
-        ERROR("_render_page: unknown palette id %d (have %d palettes)\n",
+        GC_ERROR("_render_page: unknown palette id %d (have %d palettes)\n",
               page->palette_id_ref, s->num_palette);
         return;
     }
 
-    TRACE("rendering page #%d using palette #%d. page has %d bogs\n",
+    GC_TRACE("rendering page #%d using palette #%d. page has %d bogs\n",
           page->id, page->palette_id_ref, page->num_bogs);
 
     for (ii = 0; ii < page->num_bogs; ii++) {
@@ -464,7 +464,7 @@ static void _render_page(GRAPHICS_CONTROLLER *gc,
         button = _find_button_bog(bog, valid_id);
 
         if (!button) {
-            TRACE("_render_page(): bog %d: button %d not found\n", ii, valid_id);
+            GC_TRACE("_render_page(): bog %d: button %d not found\n", ii, valid_id);
 
         } else if (button->id == activated_button_id) {
             _render_button(gc, button, palette, BTN_ACTIVATED);
@@ -505,26 +505,26 @@ static int _user_input(GRAPHICS_CONTROLLER *gc, bd_vk_key_e key, GC_NAV_CMDS *cm
     int             activated_btn_id = -1;
 
     if (s->ics->interactive_composition.ui_model == IG_UI_MODEL_POPUP && !gc->popup_visible) {
-        TRACE("_user_input(): popup menu not visible\n");
+        GC_TRACE("_user_input(): popup menu not visible\n");
         return -1;
     }
     if (!gc->ig_drawn) {
-        ERROR("_user_input(): menu not visible\n");
+        GC_ERROR("_user_input(): menu not visible\n");
         return -1;
     }
 
-    TRACE("_user_input(%d)\n", key);
+    GC_TRACE("_user_input(%d)\n", key);
 
     page = _find_page(&s->ics->interactive_composition, page_id);
     if (!page) {
-        ERROR("_user_input(): unknown page id %d (have %d pages)\n",
+        GC_ERROR("_user_input(): unknown page id %d (have %d pages)\n",
               page_id, s->ics->interactive_composition.num_pages);
         return -1;
     }
 
     if (key == BD_VK_MOUSE_ACTIVATE) {
         if (!gc->valid_mouse_position) {
-            TRACE("_user_input(): BD_VK_MOUSE_ACTIVATE outside of valid buttons\n");
+            GC_TRACE("_user_input(): BD_VK_MOUSE_ACTIVATE outside of valid buttons\n");
             return -1;
         }
         key = BD_VK_ENTER;
@@ -600,7 +600,7 @@ static void _set_button_page(GRAPHICS_CONTROLLER *gc, uint32_t param, GC_NAV_CMD
     BD_IG_PAGE     *page   = NULL;
     BD_IG_BUTTON   *button = NULL;
 
-    TRACE("_set_button_page(0x%08x): page flag %d, id %d, effects %d   button flag %d, id %d",
+    GC_TRACE("_set_button_page(0x%08x): page flag %d, id %d, effects %d   button flag %d, id %d",
           param, !!page_flag, page_id, !!effect_flag, !!button_flag, button_id);
 
     /* 10.4.3.4 (D) */
@@ -613,7 +613,7 @@ static void _set_button_page(GRAPHICS_CONTROLLER *gc, uint32_t param, GC_NAV_CMD
 
         /* current page --> command is ignored */
         if (page_id == bd_psr_read(gc->regs, PSR_MENU_PAGE_ID)) {
-            TRACE("  page is current\n");
+            GC_TRACE("  page is current\n");
             return;
         }
 
@@ -621,7 +621,7 @@ static void _set_button_page(GRAPHICS_CONTROLLER *gc, uint32_t param, GC_NAV_CMD
 
         /* invalid page --> command is ignored */
         if (!page) {
-            TRACE("  page is invalid\n");
+            GC_TRACE("  page is invalid\n");
             return;
         }
 
@@ -635,7 +635,7 @@ static void _set_button_page(GRAPHICS_CONTROLLER *gc, uint32_t param, GC_NAV_CMD
         page    = _find_page(&s->ics->interactive_composition, page_id);
 
         if (!page) {
-            ERROR("_set_button_page(): PSR_MENU_PAGE_ID refers to unknown page %d\n", page_id);
+            GC_ERROR("_set_button_page(): PSR_MENU_PAGE_ID refers to unknown page %d\n", page_id);
             return;
         }
     }
@@ -647,12 +647,12 @@ static void _set_button_page(GRAPHICS_CONTROLLER *gc, uint32_t param, GC_NAV_CMD
         if (!page_flag) {
             if (!button) {
                 /* page not given, invalid button --> ignore command */
-                TRACE("  button is invalid\n");
+                GC_TRACE("  button is invalid\n");
                 return;
             }
             if (button_id == bd_psr_read(gc->regs, PSR_SELECTED_BUTTON_ID)) {
                 /* page not given, current button --> ignore command */
-                TRACE("  button is current\n");
+                GC_TRACE("  button is current\n");
                 return;
             }
         }
@@ -675,11 +675,11 @@ static void _enable_button(GRAPHICS_CONTROLLER *gc, uint32_t button_id, unsigned
     unsigned        cur_btn_id = bd_psr_read(gc->regs, PSR_SELECTED_BUTTON_ID);
     unsigned        bog_idx    = 0;
 
-    TRACE("_enable_button(#%d, %s)\n", button_id, enable ? "enable" : "disable");
+    GC_TRACE("_enable_button(#%d, %s)\n", button_id, enable ? "enable" : "disable");
 
     page = _find_page(&s->ics->interactive_composition, page_id);
     if (!page) {
-        TRACE("_enable_button(): unknown page #%d (have %d pages)\n",
+        GC_TRACE("_enable_button(): unknown page #%d (have %d pages)\n",
               page_id, s->ics->interactive_composition.num_pages);
         return;
     }
@@ -687,7 +687,7 @@ static void _enable_button(GRAPHICS_CONTROLLER *gc, uint32_t button_id, unsigned
     /* find correct button overlap group */
     button = _find_button_page(page, button_id, &bog_idx);
     if (!button) {
-        TRACE("_enable_button(): unknown button #%d (page #%d)\n", button_id, page_id);
+        GC_TRACE("_enable_button(): unknown button #%d (page #%d)\n", button_id, page_id);
         return;
     }
 
@@ -714,13 +714,13 @@ static void _update_selected_button(GRAPHICS_CONTROLLER *gc)
     /* executed after IG command sequence terminates */
     unsigned button_id = bd_psr_read(gc->regs, PSR_SELECTED_BUTTON_ID);
 
-    TRACE("_update_selected_button(): currently enabled button is #%d\n", button_id);
+    GC_TRACE("_update_selected_button(): currently enabled button is #%d\n", button_id);
 
     /* special case: triggered only after enable button disables selected button */
     if (button_id & 0x10000) {
         button_id &= 0xffff;
         bd_psr_write(gc->regs, PSR_SELECTED_BUTTON_ID, button_id);
-        TRACE("_update_selected_button() -> #%d [last enabled]\n", button_id);
+        GC_TRACE("_update_selected_button() -> #%d [last enabled]\n", button_id);
         return;
     }
 
@@ -742,13 +742,13 @@ static int _mouse_move(GRAPHICS_CONTROLLER *gc, unsigned x, unsigned y, GC_NAV_C
     gc->valid_mouse_position = 0;
 
     if (!gc->ig_drawn) {
-        ERROR("_mouse_move(): menu not visible\n");
+        GC_ERROR("_mouse_move(): menu not visible\n");
         return -1;
     }
 
     page = _find_page(&s->ics->interactive_composition, page_id);
     if (!page) {
-        ERROR("_mouse_move(): unknown page #%d (have %d pages)\n",
+        GC_ERROR("_mouse_move(): unknown page #%d (have %d pages)\n",
               page_id, s->ics->interactive_composition.num_pages);
         return -1;
     }
@@ -804,7 +804,7 @@ int gc_run(GRAPHICS_CONTROLLER *gc, gc_ctrl_e ctrl, uint32_t param, GC_NAV_CMDS 
     }
 
     if (!gc) {
-        TRACE("gc_run(): no graphics controller\n");
+        GC_TRACE("gc_run(): no graphics controller\n");
         return result;
     }
 
@@ -822,7 +822,7 @@ int gc_run(GRAPHICS_CONTROLLER *gc, gc_ctrl_e ctrl, uint32_t param, GC_NAV_CMDS 
 
     /* other operations require complete display set */
     if (!gc->igs || !gc->igs->ics || !gc->igs->complete) {
-        TRACE("gc_run(): no interactive composition\n");
+        GC_TRACE("gc_run(): no interactive composition\n");
         bd_mutex_unlock(&gc->mutex);
         return result;
     }

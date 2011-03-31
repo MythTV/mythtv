@@ -26,6 +26,7 @@
 
 #include <QFileInfo>
 #include <QDir>
+#include <QTextStream>
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -41,6 +42,13 @@ HtmlServerExtension::HtmlServerExtension( const QString sSharePath)
     dir.makeAbsolute();
 
     m_sAbsoluteSharePath =  dir.absolutePath();
+
+    if (getenv("MYTHHTMLDIR"))
+    {
+        QString sTempSharePath = getenv("MYTHHTMLDIR");
+        if (!sTempSharePath.isEmpty())
+            m_sAbsoluteSharePath = sTempSharePath;
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -65,7 +73,14 @@ bool HtmlServerExtension::ProcessRequest( HttpWorkerThread *, HTTPRequest *pRequ
         QFileInfo oInfo( m_sAbsoluteSharePath + pRequest->m_sResourceUrl );
 
         if (oInfo.isDir())
-            oInfo.setFile( oInfo.filePath() + "/index.html" );
+        {
+            QString sIndexFileName = oInfo.filePath() + "/index.qsp";
+
+            if (QFile::exists( sIndexFileName ))
+                oInfo.setFile( sIndexFileName );
+            else 
+                oInfo.setFile( oInfo.filePath() + "/index.html" );
+        }
 
         if (oInfo.exists() == true )
         {
@@ -82,9 +97,32 @@ bool HtmlServerExtension::ProcessRequest( HttpWorkerThread *, HTTPRequest *pRequ
                 if (oInfo.exists())
                 {
                     if (oInfo.isSymLink())
-                        pRequest->FormatFileResponse( oInfo.symLinkTarget() );
-                    else
-                        pRequest->FormatFileResponse( sResName );
+                        sResName = oInfo.symLinkTarget();
+
+                    // ------------------------------------------------------
+                    // Is this a Qt Server Page (File contains script)...
+                    // ------------------------------------------------------
+
+                    QString sSuffix = oInfo.suffix();
+
+                    if ((sSuffix.compare( "qsp", Qt::CaseInsensitive ) == 0) ||
+                        (sSuffix.compare( "qjs", Qt::CaseInsensitive ) == 0)) 
+                    {
+                        pRequest->m_eResponseType = ResponseTypeHTML;
+
+                        QTextStream stream( &pRequest->m_response );
+                        
+                        m_Scripting.EvaluatePage( &stream, sResName );
+
+                        return true;
+
+                    }
+
+                    // ------------------------------------------------------
+                    // Return the file.
+                    // ------------------------------------------------------
+
+                    pRequest->FormatFileResponse( sResName );
 
                     return true;
                 }

@@ -173,6 +173,7 @@ class MTV_PUBLIC MythPlayer
     PIPLocation GetNextPIPLocation(void) const;
 
     // Bool Gets
+    bool    IsPaused(void)                    { return allpaused;      }
     bool    GetRawAudioState(void) const;
     bool    GetLimitKeyRepeat(void) const     { return limitKeyRepeat; }
     bool    GetEof(void);
@@ -290,6 +291,10 @@ class MTV_PUBLIC MythPlayer
 
     // Public picture controls
     void ToggleStudioLevels(void);
+
+    // Visualisations
+    bool CanVisualise(void);
+    bool ToggleVisualisation(void);
 
     void SaveTotalDuration(void);
     void ResetTotalDuration(void);

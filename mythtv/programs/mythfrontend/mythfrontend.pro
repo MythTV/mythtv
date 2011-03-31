@@ -2,7 +2,7 @@ include ( ../../settings.pro )
 include ( ../../version.pro )
 include ( ../programs-libs.pro )
 
-QT += network xml sql webkit
+QT += network xml sql webkit script
 
 TEMPLATE = app
 CONFIG += thread

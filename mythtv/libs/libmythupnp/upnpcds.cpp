@@ -66,7 +66,7 @@ UPnpCDS::UPnpCDS( UPnpDevice *pDevice, const QString &sSharePath )
     m_root.m_eType      = OT_Container;
     m_root.m_sId        = "0";
     m_root.m_sParentId  = "-1";
-    m_root.m_sTitle     = "MythTv";
+    m_root.m_sTitle     = "MythTV";
     m_root.m_sClass     = "object.container";
     m_root.m_bRestricted= true;
     m_root.m_bSearchable= true;
@@ -150,6 +150,15 @@ void UPnpCDS::UnregisterExtension( UPnpCDSExtension *pExtension )
         delete pExtension;
         m_extensions.removeAll(pExtension);
     }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QStringList UPnpCDS::GetBasePaths() 
+{ 
+    return Eventing::GetBasePaths() << m_sControlUrl; 
 }
 
 /////////////////////////////////////////////////////////////////////////////

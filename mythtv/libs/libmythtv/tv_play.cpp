@@ -318,8 +318,8 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
                     mctx->player->EventLoop();
                     mctx->player->VideoLoop();
                 }
+                mctx->UnlockDeletePlayer(__FILE__, __LINE__);
             }
-            mctx->UnlockDeletePlayer(__FILE__, __LINE__);
             tv->ReturnPlayerLock(mctx);
         }
 
@@ -429,21 +429,21 @@ void TV::SetFuncPtr(const char *string, void *lptr)
 
 void TV::InitKeys(void)
 {
-    REG_KEY("TV Frontend", "PLAYBACK", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Frontend", ACTION_PLAYBACK, QT_TRANSLATE_NOOP("MythControls",
             "Play Program"), "P");
     REG_KEY("TV Frontend", ACTION_TOGGLERECORD, QT_TRANSLATE_NOOP("MythControls",
             "Toggle recording status of current program"), "R");
-    REG_KEY("TV Frontend", "DAYLEFT", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Frontend", ACTION_DAYLEFT, QT_TRANSLATE_NOOP("MythControls",
             "Page the program guide back one day"), "Home");
-    REG_KEY("TV Frontend", "DAYRIGHT", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Frontend", ACTION_DAYRIGHT, QT_TRANSLATE_NOOP("MythControls",
             "Page the program guide forward one day"), "End");
-    REG_KEY("TV Frontend", "PAGELEFT", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Frontend", ACTION_PAGELEFT, QT_TRANSLATE_NOOP("MythControls",
             "Page the program guide left"), ",,<");
-    REG_KEY("TV Frontend", "PAGERIGHT", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Frontend", ACTION_PAGERIGHT, QT_TRANSLATE_NOOP("MythControls",
             "Page the program guide right"), ">,.");
     REG_KEY("TV Frontend", ACTION_TOGGLEFAV, QT_TRANSLATE_NOOP("MythControls",
             "Toggle the current channel as a favorite"), "?");
-    REG_KEY("TV Frontend", "TOGGLEEPGORDER", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Frontend", ACTION_TOGGLEPGORDER, QT_TRANSLATE_NOOP("MythControls",
             "Reverse the channel order in the program guide"), "");
     REG_KEY("TV Frontend", ACTION_GUIDE, QT_TRANSLATE_NOOP("MythControls",
             "Show the Program Guide"), "S");
@@ -485,9 +485,9 @@ void TV::InitKeys(void)
 
     REG_KEY("TV Playback", "BACK", QT_TRANSLATE_NOOP("MythControls",
             "Exit or return to DVD menu"), "");
-    REG_KEY("TV Playback", "CLEAROSD", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_CLEAROSD, QT_TRANSLATE_NOOP("MythControls",
             "Clear OSD"), "Backspace");
-    REG_KEY("TV Playback", "PAUSE", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_PAUSE, QT_TRANSLATE_NOOP("MythControls",
             "Pause"), "P");
     REG_KEY("TV Playback", ACTION_SEEKFFWD, QT_TRANSLATE_NOOP("MythControls",
             "Fast Forward"), "Right");
@@ -751,6 +751,10 @@ void TV::InitKeys(void)
             QT_TRANSLATE_NOOP("MythControls", "Toggle Background"), "F7");
     REG_KEY("Teletext Menu", ACTION_REVEAL,      QT_TRANSLATE_NOOP("MythControls",
             "Reveal hidden Text"),    "F8");
+
+    /* Visualisations */
+    REG_KEY("TV Playback", ACTION_TOGGLEVISUALISATION,
+            QT_TRANSLATE_NOOP("MythControls", "Toggle audio visualisation"), "");
 
 /*
   keys already used:
@@ -1121,7 +1125,6 @@ bool TV::Init(bool createWindow)
     }
 
     PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-    mctx->paused = false;
     mctx->ff_rew_state = 0;
     mctx->ff_rew_index = kInitFFRWSpeed;
     mctx->ff_rew_speed = 0;
@@ -2925,18 +2928,12 @@ void TV::HandleEndOfPlaybackTimerEvent(void)
 void TV::HandleIsNearEndWhenEmbeddingTimerEvent(void)
 {
     PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
-
-    bool toggle = !actx->paused && !StateIsLiveTV(GetState(actx));
-
-    if (toggle)
+    if (!StateIsLiveTV(GetState(actx)))
     {
         actx->LockDeletePlayer(__FILE__, __LINE__);
-
-        toggle = actx->player && actx->player->IsEmbedding()
-                           && actx->player->IsNearEnd();
-
+        bool toggle = actx->player && actx->player->IsEmbedding() &&
+                      actx->player->IsNearEnd() && !actx->player->IsPaused();
         actx->UnlockDeletePlayer(__FILE__, __LINE__);
-
         if (toggle)
             DoTogglePause(actx, true);
     }
@@ -2969,7 +2966,7 @@ void TV::HandleEndOfRecordingExitPromptTimerEvent(void)
             jumped_back = false;
 
         do_prompt = mctx->player->IsNearEnd() && !jumped_back &&
-            !mctx->player->IsEmbedding() && !mctx->paused;
+            !mctx->player->IsEmbedding() && !mctx->player->IsPaused();
     }
     mctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
@@ -3306,8 +3303,8 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
 
         bool esc   = has_action("ESCAPE", actions) ||
                      has_action("BACK", actions);
-        bool pause = has_action("PAUSE",  actions);
-        bool play  = has_action(ACTION_PLAY, actions);
+        bool pause = has_action(ACTION_PAUSE, actions);
+        bool play  = has_action(ACTION_PLAY,  actions);
 
         if ((!esc || browsehelper->IsBrowsing()) && !pause && !play)
             return false;
@@ -3499,7 +3496,7 @@ bool TV::BrowseHandleAction(PlayerContext *ctx, const QStringList &actions)
     {
         browsehelper->BrowseEnd(ctx, true);
     }
-    else if (has_action("CLEAROSD",     actions) ||
+    else if (has_action(ACTION_CLEAROSD, actions) ||
              has_action("ESCAPE",       actions) ||
              has_action("BACK",         actions) ||
              has_action("TOGGLEBROWSE", actions))
@@ -3590,8 +3587,8 @@ bool TV::ManualZoomHandleAction(PlayerContext *actx, const QStringList &actions)
                     has_action("STRETCHDEC",     actions) ||
                     has_action("MUTE",           actions) ||
                     has_action("CYCLEAUDIOCHAN", actions) ||
-                    has_action("PAUSE",          actions) ||
-                    has_action("CLEAROSD",       actions));
+                    has_action(ACTION_PAUSE,     actions) ||
+                    has_action(ACTION_CLEAROSD,  actions));
     }
     actx->UnlockDeletePlayer(__FILE__, __LINE__);
 
@@ -3710,9 +3707,9 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         DoQueueTranscode(ctx, "Low Quality");
     else if (has_action(ACTION_PLAY, actions))
         DoPlay(ctx);
-    else if (has_action("PAUSE", actions))
+    else if (has_action(ACTION_PAUSE, actions))
     {
-        if (ctx->paused)
+        if (ContextIsPaused(ctx, __FILE__, __LINE__))
             SendMythSystemPlayEvent("PLAY_UNPAUSED", ctx->playingInfo);
         else
             SendMythSystemPlayEvent("PLAY_PAUSED", ctx->playingInfo);
@@ -3813,7 +3810,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         if (seekloc <= 0)
             DoSeek(ctx, seekloc, tr("Jump to Beginning"));
     }
-    else if (has_action("CLEAROSD", actions))
+    else if (has_action(ACTION_CLEAROSD, actions))
     {
         ClearOSD(ctx);
     }
@@ -4030,6 +4027,8 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
         ToggleAdjustFill(ctx);
     else if (has_action("TOGGLEAUDIOSYNC", actions))
         ChangeAudioSync(ctx, 0);   // just display
+    else if (has_action(ACTION_TOGGLEVISUALISATION, actions))
+        ToggleVisualisation(ctx);
     else if (has_action("TOGGLEPICCONTROLS", actions))
         DoTogglePictureAttribute(ctx, kAdjustingPicture_Playback);
     else if (has_action(ACTION_TOGGLESTUDIOLEVELS, actions))
@@ -4073,6 +4072,18 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
         handled = false;
 
     return handled;
+}
+
+void TV::ToggleVisualisation(const PlayerContext *ctx)
+{
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    if (ctx->player && ctx->player->CanVisualise())
+    {
+        bool on = ctx->player->ToggleVisualisation();
+        SetOSDMessage(ctx, on ? tr("Visualisation On") :
+                                tr("Visualisation Off"));
+    }
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
 bool TV::PxPHandleAction(PlayerContext *ctx, const QStringList &actions)
@@ -4277,12 +4288,13 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
     }
     else if (tokens.size() == 3 && tokens[1] == "SPEED")
     {
+        bool paused = ContextIsPaused(ctx, __FILE__, __LINE__);
+
         if (tokens[2] == "0x")
         {
             NormalSpeed(ctx);
             StopFFRew(ctx);
-
-            if (!ctx->paused)
+            if (!paused)
                 DoTogglePause(ctx, true);
         }
         else
@@ -4324,7 +4336,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
                 float searchSpeed = fabs(tmpSpeed);
                 unsigned int index;
 
-                if (ctx->paused)
+                if (paused)
                     DoTogglePause(ctx, true);
 
                 if (tmpSpeed == 0.0f)
@@ -4332,7 +4344,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
                     NormalSpeed(ctx);
                     StopFFRew(ctx);
 
-                    if (!ctx->paused)
+                    if (!paused)
                         DoTogglePause(ctx, true);
                 }
                 else if (tmpSpeed == 1.0f)
@@ -4470,8 +4482,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
         if (tokens[2] == "POSITION")
         {
             QString speedStr;
-
-            if (ctx->paused)
+            if (ContextIsPaused(ctx, __FILE__, __LINE__))
             {
                 speedStr = "pause";
             }
@@ -5317,10 +5328,9 @@ void TV::DoPlay(PlayerContext *ctx)
         ctx->player->Play(ctx->ts_normal, true);
         ctx->ff_rew_speed = 0;
     }
-    else if (ctx->paused || (ctx->ff_rew_speed != 0))
+    else if (ctx->player->IsPaused() || (ctx->ff_rew_speed != 0))
     {
         ctx->player->Play(ctx->ts_normal, true);
-        ctx->paused = false;
         ctx->ff_rew_speed = 0;
     }
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
@@ -5350,7 +5360,7 @@ float TV::DoTogglePauseStart(PlayerContext *ctx)
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
         return 0.0f;
     }
-    if (ctx->paused)
+    if (ctx->player->IsPaused())
     {
         ctx->player->Play(ctx->ts_normal, true);
     }
@@ -5361,9 +5371,6 @@ float TV::DoTogglePauseStart(PlayerContext *ctx)
         ctx->player->Pause();
     }
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-
-    ctx->paused = !ctx->paused;
-
     return time;
 }
 
@@ -5375,7 +5382,7 @@ void TV::DoTogglePauseFinish(PlayerContext *ctx, float time, bool showOSD)
     if (ctx->buffer && ctx->buffer->IsInDiscMenuOrStillFrame())
         return;
 
-    if (ctx->paused)
+    if (ContextIsPaused(ctx, __FILE__, __LINE__))
     {
         if (ctx->buffer)
             ctx->buffer->WaitForPause();
@@ -5465,7 +5472,7 @@ bool TV::SeekHandleAction(PlayerContext *actx, const QStringList &actions,
     {
         DoArbSeek(actx, static_cast<ArbSeekWhence>(flags & kWhenceMask));
     }
-    else if (actx->paused)
+    else if (ContextIsPaused(actx, __FILE__, __LINE__))
     {
         if (!isDVD)
         {
@@ -5474,7 +5481,6 @@ bool TV::SeekHandleAction(PlayerContext *actx, const QStringList &actions,
             if (actx->player)
                 rate = actx->player->GetFrameRate();
             actx->UnlockDeletePlayer(__FILE__, __LINE__);
-
             float time = (flags & kAbsolute) ?  direction :
                              direction * (1.001 / rate);
             QString message = (flags & kRewind) ? QString(tr("Rewind")) :
@@ -5573,7 +5579,7 @@ void TV::ChangeSpeed(PlayerContext *ctx, int direction)
 {
     int old_speed = ctx->ff_rew_speed;
 
-    if (ctx->paused)
+    if (ContextIsPaused(ctx, __FILE__, __LINE__))
         ctx->ff_rew_speed = -4;
 
     ctx->ff_rew_speed += direction;
@@ -5609,8 +5615,6 @@ void TV::ChangeSpeed(PlayerContext *ctx, int direction)
         return;
     }
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-
-    ctx->paused = false;
     DoPlayerSeek(ctx, time);
     UpdateOSDSeekMessage(ctx, mesg, kOSDTimeout_Med);
 
@@ -5670,7 +5674,6 @@ void TV::ChangeFFRew(PlayerContext *ctx, int direction)
     else
     {
         NormalSpeed(ctx);
-        ctx->paused = false;
         ctx->ff_rew_state = direction;
         SetFFRew(ctx, kInitFFRWSpeed);
     }
@@ -6228,12 +6231,11 @@ void TV::ToggleInputs(PlayerContext *ctx, uint inputid)
         return;
     }
 
-    // If Nuppel Video Player is paused, unpause it
-    if (ctx->paused)
+    // If MythPlayer is paused, unpause it
+    if (ContextIsPaused(ctx, __FILE__, __LINE__))
     {
         HideOSDWindow(ctx, "osd_status");
         GetMythUI()->DisableScreensaver();
-        ctx->paused = false;
     }
 
     const QString curinputname = ctx->recorder->GetInput();
@@ -6558,11 +6560,10 @@ void TV::ChangeChannel(PlayerContext *ctx, int direction)
 
     QString oldinputname = ctx->recorder->GetInput();
 
-    if (ctx->paused)
+    if (ContextIsPaused(ctx, __FILE__, __LINE__))
     {
         HideOSDWindow(ctx, "osd_status");
         GetMythUI()->DisableScreensaver();
-        ctx->paused = false;
     }
 
     // Save the current channel if this is the first time
@@ -6671,11 +6672,10 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
     if (getit || !ctx->recorder || !ctx->recorder->CheckChannel(channum))
         return;
 
-    if (ctx->paused)
+    if (ContextIsPaused(ctx, __FILE__, __LINE__))
     {
         HideOSDWindow(ctx, "osd_status");
         GetMythUI()->DisableScreensaver();
-        ctx->paused = false;
     }
 
     // Save the current channel if this is the first time
@@ -6800,12 +6800,12 @@ bool TV::ClearOSD(const PlayerContext *ctx)
 /** \fn TV::ToggleOSD(const PlayerContext*, bool includeStatus)
  *  \brief Cycle through the available Info OSDs.
  */
-void TV::ToggleOSD(const PlayerContext *ctx, bool includeStatusOSD)
+void TV::ToggleOSD(PlayerContext *ctx, bool includeStatusOSD)
 {
     OSD *osd = GetOSDLock(ctx);
     bool hideAll    = false;
     bool showStatus = false;
-    if (ctx->paused || !osd)
+    if (ContextIsPaused(ctx, __FILE__, __LINE__) || !osd)
     {
         ReturnOSDLock(ctx, osd);
         return;
@@ -7446,7 +7446,9 @@ vector<bool> TV::DoSetPauseState(PlayerContext *lctx, const vector<bool> &pause)
     vector<float> times;
     for (uint i = 0; lctx && i < player.size() && i < pause.size(); i++)
     {
-        was_paused.push_back(GetPlayer(lctx,i)->paused);
+        PlayerContext *actx = GetPlayer(lctx, i);
+        if (actx)
+            was_paused.push_back(ContextIsPaused(actx, __FILE__, __LINE__));
         float time = 0.0f;
         if (pause[i] ^ was_paused.back())
             time = DoTogglePauseStart(GetPlayer(lctx,i));
@@ -7497,14 +7499,19 @@ void TV::DoEditSchedule(int editType)
     bool isNearEnd = false;
     bool isLiveTV = StateIsLiveTV(GetState(actx));
     bool allowEmbedding = false;
+    bool paused = false;
 
     {
         actx->LockDeletePlayer(__FILE__, __LINE__);
         pause_active = !actx->player || !actx->player->getVideoOutput();
-        if (actx->player && actx->player->getVideoOutput())
-            allowEmbedding = actx->player->getVideoOutput()->AllowPreviewEPG();
-        if (!pause_active)
-            isNearEnd = actx->player->IsNearEnd();
+        if (actx->player)
+        {
+            paused = actx->player->IsPaused();
+            if (actx->player->getVideoOutput())
+                allowEmbedding = actx->player->getVideoOutput()->AllowPreviewEPG();
+            if (!pause_active)
+                isNearEnd = actx->player->IsNearEnd();
+        }
         actx->UnlockDeletePlayer(__FILE__, __LINE__);
     }
 
@@ -7513,7 +7520,7 @@ void TV::DoEditSchedule(int editType)
     pause_active |= kScheduleProgramFinder == editType;
     pause_active |=
         !isLiveTV && (!db_continue_embedded || isNearEnd);
-    pause_active |= actx->paused;
+    pause_active |= paused;
     vector<bool> do_pause;
     do_pause.insert(do_pause.begin(), true, player.size());
     do_pause[find_player_index(actx)] = pause_active;
@@ -7676,13 +7683,10 @@ void TV::ChangeTimeStretch(PlayerContext *ctx, int dir, bool allowEdit)
 
     ctx->ts_normal = new_ts_normal;
 
-    if (!ctx->paused)
-    {
-        ctx->LockDeletePlayer(__FILE__, __LINE__);
-        if (ctx->player)
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    if (ctx->player && !ctx->player->IsPaused())
             ctx->player->Play(ctx->ts_normal, true);
-        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-    }
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
     if (!browsehelper->IsBrowsing())
     {
@@ -8867,7 +8871,7 @@ void TV::ShowOSDAlreadyEditing(PlayerContext *ctx)
     if (osd)
     {
         osd->DialogQuit();
-        bool was_paused = ctx->paused;
+        bool was_paused = ContextIsPaused(ctx, __FILE__, __LINE__);
         if (!was_paused)
             DoTogglePause(ctx, true);
 
@@ -8888,13 +8892,15 @@ void TV::HandleOSDAlreadyEditing(PlayerContext *ctx, QString action,
     if (!DialogIsVisible(ctx, OSD_DLG_EDITING))
         return;
 
+    bool paused = ContextIsPaused(ctx, __FILE__, __LINE__);
+
     if (action == "STOP")
     {
         ctx->LockPlayingInfo(__FILE__, __LINE__);
         if (ctx->playingInfo)
             ctx->playingInfo->SaveEditing(false);
         ctx->UnlockPlayingInfo(__FILE__, __LINE__);
-        if (!was_paused && ctx->paused)
+        if (!was_paused && paused)
             DoTogglePause(ctx, true);
     }
     else // action == "CONTINUE"
@@ -8904,7 +8910,7 @@ void TV::HandleOSDAlreadyEditing(PlayerContext *ctx, QString action,
         {
             ctx->playingInfo->SaveEditing(false);
             editmode = ctx->player->EnableEdit();
-            if (!editmode && !was_paused && ctx->paused)
+            if (!editmode && !was_paused && paused)
                 DoTogglePause(ctx, false);
         }
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
@@ -9393,7 +9399,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
 
         StopFFRew(actx);
 
-        if (actx->paused)
+        if (ContextIsPaused(actx, __FILE__, __LINE__))
             DoTogglePause(actx, true);
 
         ChangeTimeStretch(actx, 0, !floatRead);   // just display
@@ -9411,6 +9417,8 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
     }
     else if (action.left(15) == "TOGGLEAUDIOSYNC")
         ChangeAudioSync(actx, 0);
+    else if (action == ACTION_TOGGLEVISUALISATION)
+        ToggleVisualisation(actx);
     else if (action.left(11) == ACTION_TOGGLESLEEP)
     {
         ToggleSleepTimer(actx, action.left(13));
@@ -9674,9 +9682,11 @@ void TV::FillOSDMenuAudio(const PlayerContext *ctx, OSD *osd,
     QStringList tracks;
     uint curtrack = ~0;
     bool avsync = true;
+    bool visual = false;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->player)
     {
+        visual = ctx->player->CanVisualise();
         tracks = ctx->player->GetTracks(kTrackTypeAudio);
         if (!tracks.empty())
             curtrack = (uint) ctx->player->GetTrack(kTrackTypeAudio);
@@ -9703,6 +9713,11 @@ void TV::FillOSDMenuAudio(const PlayerContext *ctx, OSD *osd,
             osd->DialogAddButton(tr("Select Audio Track"),
                                  "DIALOG_MENU_AUDIOTRACKS_0", true,
                                  selected == "AUDIOTRACKS");
+        }
+        if (visual)
+        {
+            osd->DialogAddButton(tr("Toggle Visualisation"),
+                                 ACTION_TOGGLEVISUALISATION);
         }
         if (avsync)
             osd->DialogAddButton(tr("Adjust Audio Sync"), "TOGGLEAUDIOSYNC");
@@ -11045,7 +11060,7 @@ void TV::ITVRestart(PlayerContext *ctx, bool isLive)
     uint chanid = 0;
     uint cardid = 0;
 
-    if (ctx->paused)
+    if (ContextIsPaused(ctx, __FILE__, __LINE__))
         return;
 
     ctx->LockPlayingInfo(__FILE__, __LINE__);
@@ -11248,7 +11263,7 @@ void TV::ShowOSDStopWatchingRecording(PlayerContext *ctx)
     if ((ctx != GetPlayer(ctx, 0)))
         return;
 
-    if (!ctx->paused)
+    if (!ContextIsPaused(ctx, __FILE__, __LINE__))
         DoTogglePause(ctx, false);
 
     QString message;
@@ -11372,7 +11387,7 @@ void TV::ShowOSDPromptDeleteRecording(PlayerContext *ctx, QString title,
 
     ClearOSD(ctx);
 
-    bool paused = ctx->paused;
+    bool paused = ContextIsPaused(ctx, __FILE__, __LINE__);
     if (!paused)
         DoTogglePause(ctx, false);
 
@@ -11520,6 +11535,18 @@ void TV::RestoreScreenSaver(const PlayerContext *ctx)
 {
     if (ctx == GetPlayer(ctx, 0))
         GetMythUI()->RestoreScreensaver();
+}
+
+bool TV::ContextIsPaused(PlayerContext *ctx, const char *file, int location)
+{
+    if (!ctx)
+        return false;
+    bool paused = false;
+    ctx->LockDeletePlayer(file, location);
+    if (ctx->player)
+        paused = ctx->player->IsPaused();
+    ctx->UnlockDeletePlayer(file, location);
+    return paused;
 }
 
 OSD *TV::GetOSDL(const char *file, int location)

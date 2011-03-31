@@ -22,7 +22,6 @@
 
     #header {
         background-color:       black;
-        background-image:       url("/img/shine.png");
         background-position:    left -4px;
         background-repeat:      repeat-x;
         position:           fixed;
@@ -40,99 +39,6 @@
         line-height:        2.75em;
         font-weight:        bold;
     }
-    #header_text a, #header_text a:visited {
-        color:              #cdcccc;
-    }
-    #header_text a:hover {
-        color:              #fff;
-    }
-    #header_text ul {
-        padding:            0;
-        margin:             0;
-    }
-    #header_text li {
-        list-style-type:        none;
-        float:                  left;
-        padding:                0;
-        margin:                 0;
-        height:                 38px;
-        border-right:           1px solid #445;
-        border-left:            1px solid #889;
-        white-space:            nowrap;
-        background-color:       black;
-        background-image:       url("/img/shine.png");
-        background-position:    left -2px;
-        background-repeat:      repeat-x;
-    }
-    #header_text li a {
-        padding:            .75em 1em;
-        text-decoration:    none;
-    }
-    #header_text li a:hover {
-        text-decoration:    underline;
-    }
-    #header_text li div {
-        display:            none;
-    }
-    #header_text li:hover {
-        background-color:   #3a8abc;
-    }
-    #header_text li.cur {
-        background-color:   #004570;
-    }
-    #header_text li.cur:hover {
-        background-color:   #3a8abc;
-    }
-    #header_text li.cur:hover a {
-        color:              #fff;
-    }
-    #header_text li.cur:hover li a {
-        color:              #cdcccc;
-    }
-    #header_text li.cur:hover li a:hover {
-        color:              #fff;
-    }
-    #header_text li:hover div {
-        display:        block;
-        position:       absolute;
-        width:          784px;
-        top:            30px;
-        left:           190px;
-        line-height:    2em;
-        padding:        8px 10px 20px 10px;
-    }
-    #header_text li ul {
-        list-style-type: none;
-    }
-
-    #header_text li:hover ul li {
-        background-color:   #181f2f;
-        background-image:   none;
-        margin:             0;
-        float:              left;
-        height:             2em !important;
-        padding:            0em 1em;
-        border-left:        none;
-        border-top:         2px solid #004570;
-        border-right:       1px solid #557;
-        border-bottom:      1px solid #445;
-    }
-    #header_text li:hover ul li.first {
-        border-left:        1px solid #445;
-        -moz-border-radius-bottomleft:  11px;
-        -webkit-border-radius-bottomleft:  11px;
-    }
-    #header_text li:hover ul li.last {
-        border-right:       1px solid #445;
-        -moz-border-radius-bottomright:  11px;
-        -webkit-border-radius-bottomright:  11px;
-    }
-    #header_text li:hover ul li:hover {
-        background-color:       #3786b7;
-    }
-    #header_text li:hover ul li a {
-        margin:             0em -1em;
-    }
 
     #header_logo {
         position:           absolute;
@@ -147,120 +53,229 @@
         border:             none;
     }
 
-    #header-end {
-        background-image:   url("/img/blue_fade_top.png");
+    #header_end {
         background-repeat:  repeat-x;
         margin-top:         40px;
         height:             36px;
     }
 
+    #header_status {
+        position:           fixed;
+        font-size:          18px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        color:              blue;
+        text-align:         center;
+        top:                0px;
+        left:               0px;
+        right:              0px;
+        height:             38px;
+        z-index:            98;
+        padding:            6px 200px 0 200px;
+    }
+
+    #header_error {
+        position:           fixed;
+        font-size:          18px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        color:              red;
+        text-align:         center;
+        top:                0px;
+        left:               0px;
+        right:              0px;
+        height:             38px;
+        z-index:            98;
+        padding:            6px 200px 0 200px;
+    }
+
+    #hostname {
+        font-size:          12px;
+        font-family:        sans-serif;
+        position:           fixed;
+        top:                90px;
+        left:               10px;
+        width:              180px;
+        color:              #26c;
+        text-align:         center;
+    }
+
+    #menu-bg {
+        position:           fixed;
+        top:                40px;
+        left:               0px;
+        width:              200px;
+        height:             1500;
+        background-color:   black; 
+    }
+
+    #menu-title {
+        font-size:          16px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        color:              #E4D6CD;
+        position:           fixed;
+        top:                72px;
+        left:               10px;
+        width:              180px;
+        text-align:         center;
+    }
+
+    #menu a, a:visited {
+        color:              #26c;
+    }
+
+    #menu {
+        position:           fixed;
+        top:                110px;
+        left:               10px;
+        width:              180px;
+        color:              #E4D6CD;
+    }
+
+    #menu ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    #menu li a {
+        height: 32px;
+        voice-family: "\"}\""; 
+        voice-family: inherit;
+        height: 24px;
+        text-decoration: none;
+    }
+
+    #menu li a:active, #menu li a:focus {
+        outline: none;
+    }
+
+    #menu li a:link, #menu li a:visited {
+        color: #E4D6CD;
+        display: block;
+        background:  url(/images/menu-button-bg.gif);
+        padding: 8px 0 0 10px;
+    }
+
+    #menu li a:hover {
+        color: #FFF;
+        background:  url(/images/menu-button-bg.gif) 0 -32px;
+        padding: 8px 0 0 10px;
+    }
+
     #content {
-        margin:             0px;
-        padding:            6em 2em 7em 2em;
-        width:              964px;
+        position:           absolute;
+        top:                40px;
+        right:              0px;
+        left:               200px;
+        padding:            10px;
     }
     #content a[name] {
         padding-top: 6em;
     }
 
-    #footer-start {
-        background-image:       url("/img/blue_fade_bottom.png");
-        background-repeat:      repeat-x;
-        background-position:    top;
-        margin-top:             -38px;
-        height:                 30px;
-    }
-    #footer-start hr {
-        display:            none;
-    }
-    #footer {
-        background-color:       black;
-        color:                  #ccd;
-        background-image:       url("/img/shine.png");
-        background-position:    left -6px;
-        background-repeat:      repeat-x;
-        position:               fixed;
-        bottom:                 0px;
-        left:                   0px;
-        right:                  0px;
-        padding:                .3em;
-        border-top:             4px solid #004570;
-        z-index:                49;
+    div.tablewrapper {
+        position:           relative;
+        padding:            10px;
     }
 
-    #copyright {
-        margin-left:        1em;
-        float:              left;
-        vertical-align:     middle;
-        line-height:        2.25em;
+    table
+    {
+        width:100%;
+        border-collapse:collapse;
     }
 
-    #sponsorship {
-        margin-right:       1em;
-        float:              right;
+    table td, table th
+    {
+        font-size:1.2em;
+        border:1px solid #E4D6CD;
+        padding:7px 7px 2px 7px;
     }
 
-    #sponsorship img {
-        border:             1px solid black;
-        vertical-align:     middle;
+    table th
+    {
+
+        font-size:          14px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+
+        text-align:center;
+        padding-top:5px;
+        padding-bottom:4px;
+        background-color:#004570;
+        color:#fff;
     }
 
-/* Shared formatting for the left-handed dark border */
+    table tr td
+    {
+        font-size:          14px;
+        font-family:        sans-serif;
+        color:#000;
+    }
 
-    .inset {
-        position:               relative;
-        background-color:       #e6e6f0;
-        color:                  #115;
-        background-image:       url("/img/inset_top.png");
-        background-position:    top;
-        background-repeat:      repeat-x;
-        margin:                 0;
-        margin-left:            25px;
+    table tr.alt td
+    {
+        font-size:          14px;
+        font-family:        sans-serif;
+        color:#000;
+        background-color:#EFEFFF;
     }
-    .inset .left {
-        position:               absolute;
-        top:                    0;
-        bottom:                 0;
-        margin:                 0 0 0 -25px;
-        width:                  30px;
-        float:                  left;
+
+    table td.invisible
+    {
+        display:none;
     }
-    .inset .left .middle {
-        position:               absolute;
-        top:                    12px;
-        bottom:                 12px;
-        width:                  30px;
-        background-image:       url("/img/middle_w_shadow.png");
-        background-repeat:      repeat-y;
-        background-position:    left;
+
+    table th.invisible
+    {
+        display:none;
     }
-    .inset .left .top {
-        position:               absolute;
-        top:                    0;
-        height:                 12px;
-        width:                  30px;
-        background-image:       url("/img/top_corner_w_shadow.png");
-        background-repeat:      no-repeat;
-        background-position:    top left;
+
+    div.statusMessage {
+        font-size:          18px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        width:              100%;
+        color:              blue;
+        text-align:         center;
     }
-    .inset .left .middle .title {
-        position:               absolute;
-        top:                    0;
-        bottom:                 0;
-        width:                  100%;
-        background-repeat:      no-repeat;
-        background-position:    8px .5em;
+
+    div.errorMessage {
+        font-size:          18px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        width:              100%;
+        color:              red;
+        text-align:         center;
     }
-    .inset .left .bottom {
-        position:               absolute;
-        bottom:                 0;
-        height:                 12px;
-        width:                  30px;
-        background-image:       url("/img/bottom_corner_w_shadow.png");
-        background-repeat:      no-repeat;
-        background-position:    bottom left;
+
+    div.form_error {
+        font-size:          14px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        color:              red;
     }
-    .inset .content {
-        padding:        .25em 1em;
+
+    div.Title {
+        font-size:          18px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        width:              100%;
+        color:              black;
+        text-align:         center;
+    }
+
+    div.SaveButton {
+        display: none;
+        position: absolute;
+        top: 5px;
+        left: 5px;
+    }
+
+    div.CloseButton {
+        position: absolute;
+        top: 5px;
+        right: 5px;
     }
 

@@ -1,0 +1,132 @@
+<% var myth = new Myth(); %>
+
+var statusMessageTimeout = 5000;
+var errorMessageTimeout  = 8000;
+var gHostName = "<%= myth.GetHostName() %>";
+
+function getHostName() {
+    return gHostName;
+}
+
+function showHostName() {
+    $("#hostname").html(getHostName());
+}
+
+function getSetting(hostname, key, defValue) {
+    var result = "";
+
+    $.ajaxSetup({ async: false });
+    $.getJSON("/Myth/GetSetting",
+        { HostName: hostname, Key: key, Default: defValue },
+        function(data) {
+            result = data.SettingList.Settings[0].Value;
+        }).error(function(data) {
+            alert("Error: unable to retrieve setting");
+        });
+    $.ajaxSetup({ async: true });
+
+    return result;
+}
+
+function putSetting(hostname, key, value) {
+    var result = 0;
+
+    $.ajaxSetup({ async: false });
+    $.post("/Myth/PutSetting",
+        { HostName: hostname, Key: key, Value: value },
+        function(data) {
+            result = 1;
+        }).error(function(data) {
+            alert("Error: unable to save setting");
+        });
+    $.ajaxSetup({ async: true });
+
+    return result;
+}
+
+function loadDiv(divName, contentURL, jsURL) {
+    divName = "#" + divName;
+    
+    $(divName).html("<br><br><b>Loading...</b>");
+
+    var html = $.ajax({
+      url: contentURL,
+        async: false
+     }).responseText;
+
+    $(divName).html(html);
+
+    if (jsURL) {
+        $.ajaxSetup({ async: false });
+        $.getScript(jsURL);
+        $.ajaxSetup({ async: true });
+    }
+}
+
+function clearDiv(divName) {
+    $("#" + divName).html("");
+}
+
+function loadContent(contentURL, jsURL) {
+    loadDiv("content", contentURL, jsURL);
+}
+
+function loadSetupContent(contentURL, jsURL) {
+    loadSetupJavascript();
+    loadContent(contentURL, jsURL);
+}
+
+function clearContent() {
+    clearDiv("content");
+}
+
+function loadSetupJavascript() {
+    $.ajaxSetup({ async: false });
+    $.getScript("/setup/js/setup.js");
+    $.ajaxSetup({ async: true });
+}
+
+function loadSetupPage(pageName) {
+    loadSetupJavascript();
+    hideEditWindow();
+    loadContent("/setup/" + pageName + ".html",
+                "/setup/js/" + pageName + ".js");
+}
+
+function loadEditWindow(contentURL, jsURL) {
+    loadSetupJavascript();
+    clearEditMessages();
+    loadDiv("editcontent", contentURL, jsURL);
+    showEditWindow();
+}
+
+function getCurrentTab(id) {
+    var selected = $(id).tabs('option', 'selected');
+    return selected;
+}
+
+function addTab(id, url, label) {
+    $(id).tabs("add", url, label);
+}
+
+function removeTab(id, index) {
+    $(id).tabs("remove", index);
+}
+
+function setHeaderStatusMessage(message) {
+    $("#header_error").html("");
+    $("#header_status").html(message);
+    setTimeout('$("#header_status").html("")', statusMessageTimeout);
+}
+
+function setHeaderErrorMessage(message) {
+    $("#header_status").html("");
+    $("#header_error").html(message);
+    setTimeout('$("#header_error").html("")', errorMessageTimeout);
+}
+
+function clearHeaderMessages() {
+    $("#header_status").html("");
+    $("#header_error").html("");
+}
+

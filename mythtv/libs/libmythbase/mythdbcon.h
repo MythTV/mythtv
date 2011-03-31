@@ -10,8 +10,15 @@
 #include <QList>
 
 #include "mythbaseexp.h"
+#include "mythdbparams.h"
 
 class QSemaphore;
+
+MBASE_PUBLIC bool TestDatabase(QString dbHostName,
+                               QString dbUserName,
+                               QString dbPassword,
+                               QString dbName = "mythconverg",
+                               int     dbPort = 3306);
 
 /// \brief QSqlDatabase wrapper, used by MSqlQuery. Do not use directly.
 class MBASE_PUBLIC MSqlDatabase
@@ -22,9 +29,11 @@ class MBASE_PUBLIC MSqlDatabase
     MSqlDatabase(const QString &name);
    ~MSqlDatabase(void);
 
+    bool OpenDatabase(bool skipdb = false);
+    void SetDBParams(DatabaseParams params) { m_dbparms = params; };
+
   private:
     bool isOpen(void);
-    bool OpenDatabase(void);
     bool KickDatabase(void);
     QString GetConnectionName(void) const { return m_name; }
     QSqlDatabase db(void) const { return m_db; }
@@ -34,6 +43,7 @@ class MBASE_PUBLIC MSqlDatabase
     QString m_name;
     QSqlDatabase m_db;
     QDateTime m_lastDBKick;
+    DatabaseParams m_dbparms;
 };
 
 /// \brief DB connection pool, used by MSqlQuery. Do not use directly.

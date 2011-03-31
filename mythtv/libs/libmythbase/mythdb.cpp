@@ -1,15 +1,18 @@
 #include <vector>
 using namespace std;
 
-#include <QMutex>
 #include <QReadWriteLock>
-#include <QHash>
 #include <QSqlError>
+#include <QMutex>
+#include <QFile>
+#include <QHash>
+#include <QDir>
 
 #include "mythdb.h"
 #include "mythdbcon.h"
 #include "mythverbose.h"
 #include "oldsettings.h"
+#include "mythdirs.h"
 
 static MythDB *mythdb = NULL;
 static QMutex dbLock;
@@ -843,6 +846,179 @@ void MythDB::ActivateSettingsCache(bool activate)
 
     d->useSettingsCache = activate;
     ClearSettingsCache();
+}
+
+bool MythDB::LoadDatabaseParamsFromDisk(
+    DatabaseParams &params, bool sanitize)
+{
+    Settings settings;
+    if (settings.LoadSettingsFiles(
+            "mysql.txt", GetInstallPrefix(), GetConfDir()))
+    {
+        params.dbHostName = settings.GetSetting("DBHostName");
+        params.dbHostPing = settings.GetSetting("DBHostPing") != "no";
+        params.dbPort     = settings.GetNumSetting("DBPort");
+        params.dbUserName = settings.GetSetting("DBUserName");
+        params.dbPassword = settings.GetSetting("DBPassword");
+        params.dbName     = settings.GetSetting("DBName");
+        params.dbType     = settings.GetSetting("DBType");
+
+        params.localHostName = settings.GetSetting("LocalHostName");
+        params.localEnabled  = !params.localHostName.isEmpty();
+
+        params.wolReconnect  =
+            settings.GetNumSetting("WOLsqlReconnectWaitTime");
+        params.wolEnabled = params.wolReconnect > 0;
+
+        params.wolRetry   = settings.GetNumSetting("WOLsqlConnectRetry");
+        params.wolCommand = settings.GetSetting("WOLsqlCommand");
+    }
+    else if (sanitize)
+    {
+        VERBOSE(VB_IMPORTANT, "Unable to read configuration file mysql.txt");
+
+        // Sensible connection defaults.
+        params.dbHostName    = "localhost";
+        params.dbHostPing    = true;
+        params.dbPort        = 0;
+        params.dbUserName    = "mythtv";
+        params.dbPassword    = "mythtv";
+        params.dbName        = "mythconverg";
+        params.dbType        = "QMYSQL3";
+        params.localEnabled  = false;
+        params.localHostName = "my-unique-identifier-goes-here";
+        params.wolEnabled    = false;
+        params.wolReconnect  = 0;
+        params.wolRetry      = 5;
+        params.wolCommand    = "echo 'WOLsqlServerCommand not set'";
+    }
+    else
+    {
+        return false;
+    }
+
+    // Print some warnings if things look fishy..
+
+    if (params.dbHostName.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT, "DBHostName is not set in mysql.txt");
+        VERBOSE(VB_IMPORTANT, "Assuming localhost");
+    }
+    if (params.dbUserName.isEmpty())
+        VERBOSE(VB_IMPORTANT, "DBUserName is not set in mysql.txt");
+    if (params.dbPassword.isEmpty())
+        VERBOSE(VB_IMPORTANT, "DBPassword is not set in mysql.txt");
+    if (params.dbName.isEmpty())
+        VERBOSE(VB_IMPORTANT, "DBName is not set in mysql.txt");
+
+    // If sanitize set, replace empty dbHostName with "localhost"
+    if (sanitize && params.dbHostName.isEmpty())
+        params.dbHostName = "localhost";
+
+    return true;
+}
+
+bool MythDB::SaveDatabaseParamsToDisk(
+    const DatabaseParams &params, const QString &confdir, bool overwrite)
+{
+    QString path = confdir + "/mysql.txt";
+    QFile   * f  = new QFile(path);
+
+    if (!overwrite && f->exists())
+    {
+        return false;
+    }
+
+    QString dirpath = confdir;
+    QDir createDir(dirpath);
+
+    if (!createDir.exists())
+    {
+        if (!createDir.mkdir(dirpath))
+        {
+            VERBOSE(VB_IMPORTANT, QString("Could not create %1").arg(dirpath));
+            return false;
+        }
+    }
+
+    if (!f->open(QIODevice::WriteOnly))
+    {
+        VERBOSE(VB_IMPORTANT, QString("Could not open settings file %1 "
+                                      "for writing").arg(path));
+        return false;
+    }
+
+    VERBOSE(VB_IMPORTANT, QString("Writing settings file %1").arg(path));
+    QTextStream s(f);
+    s << "DBHostName=" << params.dbHostName << endl;
+
+    s << "\n"
+      << "# By default, Myth tries to ping the DB host to see if it exists.\n"
+      << "# If your DB host or network doesn't accept pings, set this to no:\n"
+      << "#\n";
+
+    if (params.dbHostPing)
+        s << "#DBHostPing=no" << endl << endl;
+    else
+        s << "DBHostPing=no" << endl << endl;
+
+    if (params.dbPort)
+        s << "DBPort=" << params.dbPort << endl;
+
+    s << "DBUserName=" << params.dbUserName << endl
+      << "DBPassword=" << params.dbPassword << endl
+      << "DBName="     << params.dbName     << endl
+      << "DBType="     << params.dbType     << endl
+      << endl
+      << "# Set the following if you want to use something other than this\n"
+      << "# machine's real hostname for identifying settings in the database.\n"
+      << "# This is useful if your hostname changes often, as otherwise you\n"
+      << "# will need to reconfigure mythtv every time.\n"
+      << "# NO TWO HOSTS MAY USE THE SAME VALUE\n"
+      << "#\n";
+
+    if (params.localEnabled)
+        s << "LocalHostName=" << params.localHostName << endl;
+    else
+        s << "#LocalHostName=my-unique-identifier-goes-here\n";
+
+    s << endl
+      << "# If you want your frontend to be able to wake your MySQL server\n"
+      << "# using WakeOnLan, have a look at the following settings:\n"
+      << "#\n"
+      << "#\n"
+      << "# The time the frontend waits (in seconds) between reconnect tries.\n"
+      << "# This should be the rough time your MySQL server needs for startup\n"
+      << "#\n";
+
+    if (params.wolEnabled)
+        s << "WOLsqlReconnectWaitTime=" << params.wolReconnect << endl;
+    else
+        s << "#WOLsqlReconnectWaitTime=0\n";
+
+    s << "#\n"
+      << "#\n"
+      << "# This is the number of retries to wake the MySQL server\n"
+      << "# until the frontend gives up\n"
+      << "#\n";
+
+    if (params.wolEnabled)
+        s << "WOLsqlConnectRetry=" << params.wolRetry << endl;
+    else
+        s << "#WOLsqlConnectRetry=5\n";
+
+    s << "#\n"
+      << "#\n"
+      << "# This is the command executed to wake your MySQL server.\n"
+      << "#\n";
+
+    if (params.wolEnabled)
+        s << "WOLsqlCommand=" << params.wolCommand << endl;
+    else
+        s << "#WOLsqlCommand=echo 'WOLsqlServerCommand not set'\n";
+
+    f->close();
+    return true;
 }
 
 void MythDB::WriteDelayedSettings(void)

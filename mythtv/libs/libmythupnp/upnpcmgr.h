@@ -90,6 +90,8 @@ class UPNP_PUBLIC UPnpCMGR : public Eventing
         void    AddSourceProtocol( const QString &sProtocol );
         void    AddSinkProtocol  ( const QString &sProtocol );
 
+        virtual QStringList GetBasePaths();
+
         virtual bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
 };
 

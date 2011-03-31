@@ -58,6 +58,11 @@ class VideoOutputD3D : public VideoOutput
     virtual bool ApproveDeintFilter(const QString& filtername) const;
     void* GetDXVA2Decoder(void);
 
+    virtual bool CanVisualise(AudioPlayer *audio, MythRender *render)
+        { return VideoOutput::CanVisualise(audio, (MythRender*)m_render); }
+    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render)
+        { return VideoOutput::SetupVisualisation(audio, (MythRender*)m_render); }
+
   private:
     void TearDown(void);
     bool SetupContext(void);

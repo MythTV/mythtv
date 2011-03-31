@@ -239,21 +239,21 @@ DTC::Program* Guide::GetProgramDetails( int              nChanId,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QFileInfo* Guide::GetChannelIcon( int nChanId,
-                                  int nWidth  /* = 0 */,
-                                  int nHeight /* = 0 */ )
+QFileInfo Guide::GetChannelIcon( int nChanId,
+                                 int nWidth  /* = 0 */,
+                                 int nHeight /* = 0 */ )
 {
     // Get Icon file path
 
     QString sFileName = ChannelUtil::GetIcon( nChanId );
 
     if (sFileName.isEmpty())
-        return NULL;
+        return QFileInfo();
 
     if ((nWidth <= 0) && (nHeight <= 0))
     {
         // Use default pixmap
-        return new QFileInfo( sFileName );  
+        return QFileInfo( sFileName );  
     }
 
 
@@ -267,7 +267,7 @@ QFileInfo* Guide::GetChannelIcon( int nChanId,
     // ----------------------------------------------------------------------
 
     if (QFile::exists( sNewFileName ))
-        return new QFileInfo( sNewFileName );
+        return QFileInfo( sNewFileName );
 
     // ----------------------------------------------------------------------
     // We need to create it...
@@ -278,7 +278,7 @@ QFileInfo* Guide::GetChannelIcon( int nChanId,
     QImage *pImage = new QImage( sFileName );
 
     if (!pImage)
-        return NULL;
+        return QFileInfo();
 
     if (fAspect <= 0)
            fAspect = (float)(pImage->width()) / pImage->height();
@@ -286,7 +286,7 @@ QFileInfo* Guide::GetChannelIcon( int nChanId,
     if (fAspect == 0)
     {
         delete pImage;
-        return NULL;
+        return QFileInfo();
     }
 
     if ( nWidth == 0 )
@@ -302,7 +302,6 @@ QFileInfo* Guide::GetChannelIcon( int nChanId,
 
     delete pImage;
 
-    return new QFileInfo( sNewFileName );
-
+    return QFileInfo( sNewFileName );
 }
 

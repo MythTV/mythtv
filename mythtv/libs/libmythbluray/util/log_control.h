@@ -40,6 +40,8 @@ enum debug_mask_enum {
     DBG_HDMV = 4096,
     DBG_BDJ = 8192,
     DBG_STREAM = 16384,
+    DBG_GC = 32768,         // graphics controller
+    DBG_DECODE = 65536,     // PG / IG decoders, m2ts demuxer
 };
 
 typedef enum debug_mask_enum debug_mask_t;

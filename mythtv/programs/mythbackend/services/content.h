@@ -22,6 +22,8 @@
 #ifndef CONTENT_H
 #define CONTENT_H
 
+#include <QScriptEngine>
+
 #include "services/contentServices.h"
 
 class Content : public ContentServices
@@ -34,28 +36,30 @@ class Content : public ContentServices
 
     public:
 
-        QFileInfo*          GetFile             ( const QString   &StorageGroup,
+        QFileInfo           GetFile             ( const QString   &StorageGroup,
                                                   const QString   &FileName );
 
-        DTC::StringList*    GetFileList         ( const QString   &StorageGroup );
+        QStringList         GetFileList         ( const QString   &StorageGroup );
 
-        QFileInfo*          GetVideoArt         ( int Id );
+        QFileInfo           GetVideoArt         ( int Id );
 
-        QFileInfo*          GetAlbumArt         ( int Id, int Width, int Height );
+        QFileInfo           GetAlbumArt         ( int Id, int Width, int Height );
 
-        QFileInfo*          GetPreviewImage     ( int              ChanId,
-                                                  const QDateTime &tStartTime,
+        QFileInfo           GetPreviewImage     ( int              ChanId,
+                                                  const QDateTime &StartTime,
                                                   int              Width,    
                                                   int              Height,   
                                                   int              SecsIn );
 
-        QFileInfo*          GetRecording        ( int              ChanId,
+        QFileInfo           GetRecording        ( int              ChanId,
                                                   const QDateTime &StartTime );
 
-        QFileInfo*          GetMusic            ( int Id );
-        QFileInfo*          GetVideo            ( int Id );
+        QFileInfo           GetMusic            ( int Id );
+        QFileInfo           GetVideo            ( int Id );
 
 };
+
+Q_SCRIPT_DECLARE_QMETAOBJECT( Content, QObject*);
 
 #endif
 

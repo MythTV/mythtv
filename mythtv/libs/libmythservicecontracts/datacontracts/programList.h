@@ -39,6 +39,14 @@ class SERVICE_PUBLIC ProgramList : public QObject
     Q_OBJECT
     Q_CLASSINFO( "version", "1.0" );
 
+    
+    // We need to know the type that will ultimately be contained in 
+    // any QVariantList or QVariantMap.  We do his by specifying
+    // A Q_CLASSINFO entry with "<PropName>_type" as the key
+    // and the type name as the value
+
+    Q_CLASSINFO( "Programs_type", "DTC::Program");
+
     Q_PROPERTY( int          StartIndex     READ StartIndex      WRITE setStartIndex     )
     Q_PROPERTY( int          Count          READ Count           WRITE setCount          )
     Q_PROPERTY( int          TotalAvailable READ TotalAvailable  WRITE setTotalAvailable )
@@ -56,6 +64,16 @@ class SERVICE_PUBLIC ProgramList : public QObject
     PROPERTYIMP       ( QString     , ProtoVer        )
 
     PROPERTYIMP_RO_REF( QVariantList, Programs      )
+
+    public:
+
+        static void InitializeCustomTypes()
+        {
+            qRegisterMetaType< ProgramList  >();
+            qRegisterMetaType< ProgramList* >();
+
+            Program::InitializeCustomTypes();
+        }
 
     public:
 
@@ -99,6 +117,7 @@ class SERVICE_PUBLIC ProgramList : public QObject
 
 } // namespace DTC
 
-Q_DECLARE_METATYPE( DTC::ProgramList )
+Q_DECLARE_METATYPE( DTC::ProgramList  )
+Q_DECLARE_METATYPE( DTC::ProgramList* )
 
 #endif

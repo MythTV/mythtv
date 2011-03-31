@@ -57,6 +57,14 @@ class SERVICE_PUBLIC DatabaseInfo : public QObject
 
     public:
 
+        static void InitializeCustomTypes()
+        {
+            qRegisterMetaType< DatabaseInfo   >();
+            qRegisterMetaType< DatabaseInfo*  >();
+        }
+
+    public:
+
         DatabaseInfo(QObject *parent = 0) 
             : QObject       ( parent ),
               m_Ping        ( false  ),
@@ -82,14 +90,13 @@ class SERVICE_PUBLIC DatabaseInfo : public QObject
             m_LocalEnabled = src.m_LocalEnabled ;
             m_LocalHostName= src.m_LocalHostName;
         }
-                               
 };
 
 typedef DatabaseInfo * DatabaseInfoPtr;
 
 } // namespace DTC
 
-Q_DECLARE_METATYPE( DTC::DatabaseInfo )
-
+Q_DECLARE_METATYPE( DTC::DatabaseInfo  )
+Q_DECLARE_METATYPE( DTC::DatabaseInfo* )
 
 #endif

@@ -299,11 +299,11 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
         sName += " - " + sSubtitle;
     }
 
-    QString sURIBase   = QString( "http://%1:%2/Myth/" )
+    QString sURIBase   = QString( "http://%1:%2/Content/" )
                             .arg( m_mapBackendIp  [sHostName] ) 
                             .arg( m_mapBackendPort[sHostName] );
 
-    QString sURIParams = QString( "/Id%1" ).arg( nVidID );
+    QString sURIParams = QString( "?Id=%1" ).arg( nVidID );
     QString sId        = QString( "Videos/0/item%1").arg( sURIParams );
 
     QString sParentID = "Videos/0";

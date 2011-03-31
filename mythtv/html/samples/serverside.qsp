@@ -1,0 +1,67 @@
+<br>
+<h3>Sample Server Side Script Page...</h3>
+<hr>
+<p>
+This implementation of Server Side scripting is a simple adaptation of the old jsp &amp; asp model.  
+It leverages the Qt Script Engine and exposes all API Classes to the running script.
+</p>
+<p>
+Server side scripting is accomplished by wrapping script code that you wish to be executed on the server with <span style="color: yellow;">&lt;%</span> and <span style="color: yellow;">%&gt;</span>
+</p>
+<p>
+Values generated from the script can be inserted into the rendered html page using the following approaches:
+</p>
+<li>From within script code:</li>
+  <div style="margin-left:30px">
+    <p>There is an object available with a variable named '<b>os</b>' that has two methods available <b>write</b> and <b>writeln</b></p>
+    <h5>Example:</h5>
+      <pre>os.writeln( "This is text written from within server side script code" );</pre>
+  </div>
+<li>Embedded in html:</li>
+  <div style="margin-left:30px">
+    <p><span style="color: yellow;">&lt;%=</span> script variable/statement <span style="color: yellow;">%&gt;</span></p>
+  </div>
+
+<h3>Using the API classes</h3>
+<p>To use one of the API classes, it's as simple as assigning a variable to a new instances of the class you want to use.
+<pre><b>var myth = new Myth()</b></pre> 
+then calling the method:
+<pre><b>var list = myth.GetHosts();</b></pre>
+</p>
+<br>
+
+<div style="margin-left:30px">
+	Hosts: 
+	<select id="hosts">
+<%
+	var myth = new Myth();
+
+	var list = myth.GetHosts();
+
+	for (var nIdx=0; nIdx < list.length; nIdx++)
+	{
+%>
+	<option value="<%= nIdx  %>"><%=list[nIdx]%></option>
+<%  } %>
+	</select>
+</div>
+<hr>
+<div style="margin-left:30px">
+	List of Settings: 
+	<select id="Settings" onchange="GetSettingValue()">
+<%
+	var sList = myth.GetSetting( "", "", "");
+	
+	var keys = sList.Settings;
+
+	for (var sValue in sList.Settings)
+	{
+%>
+	<option value="<%= sValue %>"><%=sValue %></option>
+<%  } %>
+	</select>
+	<br>
+	Value (uses ajax to retrieve value): <input type="text" id="SettingValue" />	
+
+</div>
+<div id="debug" > </div>

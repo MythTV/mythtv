@@ -1,6 +1,3 @@
-#ifndef _MAIN_HELPERS_H_
-#define _MAIN_HELPERS_H_
-
 // C++ headers
 #include <iostream>
 #include <fstream>
@@ -16,8 +13,6 @@ void cleanup(void);
 int log_rotate(int report_error);
 void log_rotate_handler(int);
 void upnp_rebuild(int);
-void showUsage(const MythCommandLineParser &cmdlineparser,
-               const QString &version);
 void setupLogfile(void);
 bool openPidfile(ofstream &pidfs, const QString &pidfilename);
 bool setUser(const QString &username);
@@ -48,4 +43,3 @@ namespace
     };
 }
 
-#endif // _MAIN_HELPERS_H_

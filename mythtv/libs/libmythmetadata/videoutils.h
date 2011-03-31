@@ -16,13 +16,17 @@ inline void CheckedSet(T *uiItem, const QString &value)
     }
 }
 
-template <>
-META_PUBLIC void CheckedSet(class MythUIStateType *uiItem, const QString &state);
+class MythUIStateType;
+class MythUIType;
+class MythUIImage;
 
-META_PUBLIC void CheckedSet(class MythUIType *container, const QString &itemName,
+template <>
+META_PUBLIC void CheckedSet( MythUIStateType *uiItem, const QString &state);
+
+META_PUBLIC void CheckedSet( MythUIType *container, const QString &itemName,
         const QString &value);
 
-META_PUBLIC void CheckedSet(class MythUIImage *uiItem, const QString &filename);
+META_PUBLIC void CheckedSet( MythUIImage *uiItem, const QString &filename);
 
 META_PUBLIC QStringList GetVideoDirsByHost(QString host);
 META_PUBLIC QStringList GetVideoDirs();

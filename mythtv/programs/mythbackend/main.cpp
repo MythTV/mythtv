@@ -1,61 +1,49 @@
-// POSIX headers
-#include <sys/time.h>     // for setpriority
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <libgen.h>
-#include <signal.h>
-
-#include "mythconfig.h"
-#if CONFIG_DARWIN
-    #include <sys/aio.h>    // O_SYNC
-#endif
-
-// C headers
-#include <cstdlib>
-#include <cerrno>
-
-// C++ headers
-#include <iostream>
-#include <fstream>
-using namespace std;
-
 #ifndef _WIN32
 #include <QCoreApplication>
 #else
 #include <QApplication>
 #endif
 
-#include <QFile>
 #include <QFileInfo>
+#include <QRegExp>
+#include <QThread>
+#include <QFile>
 #include <QDir>
 #include <QMap>
-#include <QRegExp>
 
-#include "tv_rec.h"
+#include "mythcommandlineparser.h"
 #include "scheduledrecording.h"
-#include "autoexpire.h"
-#include "scheduler.h"
-#include "mainserver.h"
-#include "remoteutil.h"
-#include "housekeeper.h"
-
+#include "previewgenerator.h"
 #include "mythcorecontext.h"
+#include "mythsystemevent.h"
+#include "backendcontext.h"
+#include "main_helpers.h"
+#include "storagegroup.h"
+#include "housekeeper.h"
+#include "mediaserver.h"
 #include "mythverbose.h"
 #include "mythversion.h"
-#include "mythdb.h"
+#include "programinfo.h"
+#include "autoexpire.h"
+#include "mainserver.h"
+#include "remoteutil.h"
 #include "exitcodes.h"
+#include "scheduler.h"
+#include "jobqueue.h"
+#include "dbcheck.h"
 #include "compat.h"
+#include "mythdb.h"
+#include "tv_rec.h"
+
+/*
 #include "storagegroup.h"
 #include "programinfo.h"
 #include "dbcheck.h"
 #include "jobqueue.h"
 #include "mythcommandlineparser.h"
 #include "mythsystemevent.h"
-
-#include "backendcontext.h"
-#include "main_helpers.h"
+.r26134
+*/
 
 #define LOC      QString("MythBackend: ")
 #define LOC_WARN QString("MythBackend, Warning: ")
@@ -67,6 +55,21 @@ using namespace std;
 #else
     #define UNUSED_FILENO 3
 #endif
+
+class MediaServerThread : public QThread
+{
+  public:
+    void run(void)
+    {
+        g_pUPnp = new MediaServer();
+        exec();
+    }
+
+    void BlockUntilReloadNeeded(void)
+    {
+        sleep(60); // TODO
+    }
+};
 
 int main(int argc, char **argv)
 {
@@ -177,7 +180,22 @@ int main(int argc, char **argv)
 
     ///////////////////////////////////////////
 
-    return run_backend(cmdline);
+    MediaServerThread *mst = new MediaServerThread();
+    mst->start();
+    while (!mst->isRunning())
+        usleep(25000);
+    while (!g_pUPnp)
+        usleep(25000);
+
+    ///////////////////////////////////////////
+
+    while (true)
+    {
+        exitCode = run_backend(cmdline);
+        mst->BlockUntilReloadNeeded();
+    }
+
+    return exitCode;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

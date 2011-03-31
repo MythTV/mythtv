@@ -42,6 +42,7 @@ class MythDownloadInfo
         m_lastStat(QDateTime::currentDateTime()),
         m_errorCode(QNetworkReply::NoError)
     {
+        qRegisterMetaType<QNetworkReply::NetworkError>("QNetworkReply::NetworkError");
     }
 
    ~MythDownloadInfo()

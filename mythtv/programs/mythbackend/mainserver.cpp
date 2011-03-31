@@ -521,6 +521,14 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         else
             HandleRecorderQuery(listline, tokens, pbs);
     }
+    else if (command == "QUERY_RECORDING_DEVICE")
+    {
+        // TODO
+    }
+    else if (command == "QUERY_RECORDING_DEVICES")
+    {
+        // TODO
+    }
     else if (command == "SET_NEXT_LIVETV_DIR")
     {
         if (tokens.size() != 3)

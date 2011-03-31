@@ -1,0 +1,40 @@
+<div id='wizard-network' class='setuptab'>
+<input type='hidden' id='MasterServerIP'>
+<input type=button value='Prev' onClick='javascript:$("#wizardtabs").tabs("select", 0)'>&nbsp;
+<input type=button value='Next' onClick='javascript:$("#wizardtabs").tabs("select", 2)'>
+<div class='Title'>Network Setup</div>
+<table border=0 cellpadding=2 cellspacing=2>
+    <tr><th align=right>Master Backend:</th>
+        <td id='MasterServerIP_cell'></td></tr>
+    <tr><th align=right>Local Backend:</th>
+        <td id='BackendServerIP_cell'></td></tr>
+    <tr><th align=right>Security PIN:</th>
+        <td><input id='SecurityPin' type='password' size=10>
+            <div class="form_error" id="SecurityPin_error"></div>
+            </td></tr>
+</table>
+<hr>
+If the setting you are looking for is not available here, you can go to the <a href="javascript:hideEditWindow(); 
+loadContent('/Config/General?__group__=local_server')">Advanced General Setup Screen</a>
+</div>
+
+<script language="JavaScript" type="text/javascript">
+    /* FIXME, handle the current value here */
+    var options = getOptionList("/Config/GetValueList?List=LocalIPAddress",
+                                settingsList["BackendServerIP"]);
+
+    $("#MasterServerIP_cell").html("<b>" + settingsList["MasterServerIP"] + "</b>");
+    $("#BackendServerIP_cell").html("<select id='BackendServerIP'>" + options
+       + "</select>");
+
+    setSettingInputValues("wizard-network");
+
+    if ((settingsList["BackendServerIP"] != "") &&
+        (settingsList["MasterServerIP"] != settingsList["BackendServerIP"])) {
+        $("#MasterServerIP_cell").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+            + "<input type='button' "
+            + " onClick='javascript:makeLocalBackendTheMaster()' "
+            + " value='Make this server the master backend'>");
+    }
+
+</script>

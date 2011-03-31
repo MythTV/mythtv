@@ -170,8 +170,10 @@ namespace
         delete gContext;
         gContext = NULL;
 
+#ifndef _MSC_VER
         signal(SIGHUP, SIG_DFL);
         signal(SIGUSR1, SIG_DFL);
+#endif
     }
 
     class CleanupGuard
@@ -1473,11 +1475,12 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_NO_THEME;
     }
 
+#ifndef _MSC_VER
     // Setup handler for USR1 signals to reload theme
     signal(SIGUSR1, &signal_USR1_handler);
     // Setup handler for USR2 signals to restart LIRC
     signal(SIGUSR2, &signal_USR2_handler);
-
+#endif
     ThemeUpdateChecker *themeUpdateChecker = NULL;
     if (gCoreContext->GetNumSetting("ThemeUpdateNofications", 1))
         themeUpdateChecker = new ThemeUpdateChecker();
