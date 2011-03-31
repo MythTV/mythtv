@@ -54,7 +54,7 @@ static void dir_close_posix(BD_DIR_H *dir)
         closedir((DIR *)dir->internal);
 #endif
 
-        DEBUG(DBG_DIR, "Closed POSIX dir (%p)\n", dir);
+        BD_DEBUG(DBG_DIR, "Closed POSIX dir (%p)\n", dir);
 
         X_FREE(dir);
     }
@@ -96,7 +96,7 @@ static BD_DIR_H *dir_open_posix(const char* dirname)
 
     BD_DIR_H *dir = malloc(sizeof(BD_DIR_H));
 
-    DEBUG(DBG_DIR, "Opening POSIX dir %s... (%p)\n", dirname, dir);
+    BD_DEBUG(DBG_DIR, "Opening POSIX dir %s... (%p)\n", dirname, dir);
     dir->close = dir_close_posix;
     dir->read = dir_read_posix;
 
@@ -126,7 +126,7 @@ static BD_DIR_H *dir_open_posix(const char* dirname)
     }
 #endif
 
-    DEBUG(DBG_DIR, "Error opening dir! (%p)\n", dir);
+    BD_DEBUG(DBG_DIR, "Error opening dir! (%p)\n", dir);
 
     X_FREE(dir);
 

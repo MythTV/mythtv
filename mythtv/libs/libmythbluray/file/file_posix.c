@@ -37,12 +37,17 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#ifdef WIN32
+#define        ftello  _ftelli64
+#define        fseeko  _fseeki64
+#endif //      #ifdef WIN32
+
 static void file_close_linux(BD_FILE_H *file)
 {
     if (file) {
         fclose((FILE *)file->internal);
 
-        DEBUG(DBG_FILE, "Closed LINUX file (%p)\n", file);
+        BD_DEBUG(DBG_FILE, "Closed LINUX file (%p)\n", file);
 
         X_FREE(file);
     }
@@ -94,7 +99,7 @@ static BD_FILE_H *file_open_linux(const char* filename, const char *mode)
     FILE *fp = NULL;
     BD_FILE_H *file = malloc(sizeof(BD_FILE_H));
 
-    DEBUG(DBG_FILE, "Opening LINUX file %s... (%p)\n", filename, file);
+    BD_DEBUG(DBG_FILE, "Opening LINUX file %s... (%p)\n", filename, file);
     file->close = file_close_linux;
     file->seek = file_seek_linux;
     file->read = file_read_linux;
@@ -109,7 +114,7 @@ static BD_FILE_H *file_open_linux(const char* filename, const char *mode)
         return file;
     }
 
-    DEBUG(DBG_FILE, "Error opening file! (%p)\n", file);
+    BD_DEBUG(DBG_FILE, "Error opening file! (%p)\n", file);
 
     X_FREE(file);
 

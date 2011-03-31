@@ -99,7 +99,7 @@ static void _findMetaXMLfiles(META_ROOT *meta, const char *device_path)
     path = str_printf("%s" DIR_SEP "BDMV" DIR_SEP "META" DIR_SEP "DL", device_path);
     dir = dir_open(path);
     if (dir == NULL) {
-        DEBUG(DBG_DIR, "Failed to open meta dir %s\n", path);
+        BD_DEBUG(DBG_DIR, "Failed to open meta dir %s\n", path);
         X_FREE(path);
         return;
     }
@@ -139,7 +139,7 @@ META_ROOT *meta_parse(const char *device_path)
 
         BD_FILE_H *handle = file_open(path, "rb");
         if (handle == NULL) {
-            DEBUG(DBG_DIR, "Failed to open meta file (%s)\n", path);
+            BD_DEBUG(DBG_DIR, "Failed to open meta file (%s)\n", path);
             continue;
         }
 
@@ -152,7 +152,7 @@ META_ROOT *meta_parse(const char *device_path)
             int64_t size_read = file_read(handle, data, length);
             doc = xmlReadMemory((char*)data, size_read, base, NULL, 0);
             if (doc == NULL) {
-                DEBUG(DBG_DIR, "Failed to parse %s\n", path);
+                BD_DEBUG(DBG_DIR, "Failed to parse %s\n", path);
                 continue;
             }
             xmlNode *root_element = NULL;
@@ -171,7 +171,7 @@ META_ROOT *meta_parse(const char *device_path)
     xmlCleanupParser();
     return root;
 #else
-    DEBUG(DBG_DIR, "configured without libxml2 - can't parse meta info\n");
+    BD_DEBUG(DBG_DIR, "configured without libxml2 - can't parse meta info\n");
     return NULL;
 #endif
 }
@@ -181,7 +181,7 @@ META_DL *meta_get(META_ROOT *meta_root, const char *language_code)
     unsigned i;
 
     if (meta_root == NULL || meta_root->dl_count == 0) {
-        DEBUG(DBG_DIR, "meta_get not possible, no info available!\n");
+        BD_DEBUG(DBG_DIR, "meta_get not possible, no info available!\n");
         return NULL;
     }
 
@@ -191,17 +191,17 @@ META_DL *meta_get(META_ROOT *meta_root, const char *language_code)
                 return &meta_root->dl_entries[i];
             }
         }
-        DEBUG(DBG_DIR, "requested disclib language '%s' not found\n", language_code);
+        BD_DEBUG(DBG_DIR, "requested disclib language '%s' not found\n", language_code);
     }
 
     for (i = 0; i < meta_root->dl_count; i++) {
         if (strcasecmp(DEFAULT_LANGUAGE, meta_root->dl_entries[i].language_code) == 0) {
-            DEBUG(DBG_DIR, "using default disclib language '"DEFAULT_LANGUAGE"'\n");
+            BD_DEBUG(DBG_DIR, "using default disclib language '"DEFAULT_LANGUAGE"'\n");
             return &meta_root->dl_entries[i];
         }
     }
 
-    DEBUG(DBG_DIR, "requested disclib language '%s' or default '"DEFAULT_LANGUAGE"' not found, using '%s' instead\n", language_code, meta_root->dl_entries[0].language_code);
+    BD_DEBUG(DBG_DIR, "requested disclib language '%s' or default '"DEFAULT_LANGUAGE"' not found, using '%s' instead\n", language_code, meta_root->dl_entries[0].language_code);
     return &meta_root->dl_entries[0];
 }
 

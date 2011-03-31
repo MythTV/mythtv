@@ -42,7 +42,7 @@ static int _bclk_parse_header(BITSTREAM *bs, uint32_t *data_start, uint32_t *ext
     if (sig1 != BCLK_SIG1 ||
        (sig2 != BCLK_SIG2A &&
         sig2 != BCLK_SIG2B)) {
-     DEBUG(DBG_NAV, "sound.bdmv failed signature match: expected BCLK0100 got %8.8s\n", bs->buf);
+     BD_DEBUG(DBG_NAV, "sound.bdmv failed signature match: expected BCLK0100 got %8.8s\n", bs->buf);
      return 0;
     }
 
@@ -57,19 +57,19 @@ static int _sound_parse_attributes(BITSTREAM *bs, SOUND_OBJECT *obj)
     int i;
 
     switch (i = bs_read(bs, 4)) {
-        default: DEBUG(DBG_NAV, "unknown channel configuration code %d\n", i);
+        default: BD_DEBUG(DBG_NAV, "unknown channel configuration code %d\n", i);
         case 1:  obj->num_channels = 1;
                  break;
         case 3:  obj->num_channels = 2;
                  break;
     };
     switch (i = bs_read(bs, 4)) {
-        default: DEBUG(DBG_NAV, "unknown sample rate code %d\n", i);
+        default: BD_DEBUG(DBG_NAV, "unknown sample rate code %d\n", i);
         case 1:  obj->sample_rate = 48000;
                  break;
     };
     switch (i = bs_read(bs, 2)) {
-        default: DEBUG(DBG_NAV, "unknown bits per sample code %d\n", i);
+        default: BD_DEBUG(DBG_NAV, "unknown bits per sample code %d\n", i);
         case 1:  obj->bits_per_sample = 16;
                  break;
     };
@@ -131,14 +131,14 @@ SOUND_DATA *sound_parse(const char *file_name)
 
     fp = file_open(file_name, "rb");
     if (!fp) {
-      DEBUG(DBG_NAV | DBG_CRIT, "error opening %s\n", file_name);
+      BD_DEBUG(DBG_NAV | DBG_CRIT, "error opening %s\n", file_name);
       return NULL;
     }
 
     bs_init(&bs, fp);
 
     if (!_bclk_parse_header(&bs, &data_start, &extension_data_start)) {
-        DEBUG(DBG_NAV | DBG_CRIT, "%s: invalid header\n", file_name);
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "%s: invalid header\n", file_name);
         goto error;
     }
 
@@ -149,7 +149,7 @@ SOUND_DATA *sound_parse(const char *file_name)
     num_sounds = bs_read(&bs, 8);
 
     if (data_len < 1) {
-        DEBUG(DBG_NAV | DBG_CRIT, "%s: empty database\n", file_name);
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "%s: empty database\n", file_name);
         goto error;
     }
 
@@ -161,7 +161,7 @@ SOUND_DATA *sound_parse(const char *file_name)
 
     for (i = 0; i < data->num_sounds; i++) {
         if (!_sound_parse_index(&bs, data_offsets + i, &data->sounds[i])) {
-            DEBUG(DBG_NAV | DBG_CRIT, "%s: error parsing sound %d attribues\n", file_name, i);
+            BD_DEBUG(DBG_NAV | DBG_CRIT, "%s: error parsing sound %d attribues\n", file_name, i);
             goto error;
         }
     }
@@ -173,7 +173,7 @@ SOUND_DATA *sound_parse(const char *file_name)
         bs_seek_byte(&bs, data_start + data_offsets[i]);
 
         if (!_sound_read_samples(&bs, &data->sounds[i])) {
-            DEBUG(DBG_NAV | DBG_CRIT, "%s: error reading samples for sound %d\n", file_name, i);
+            BD_DEBUG(DBG_NAV | DBG_CRIT, "%s: error reading samples for sound %d\n", file_name, i);
             goto error;
         }
     }

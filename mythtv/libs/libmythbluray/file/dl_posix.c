@@ -75,7 +75,7 @@ void   *dl_dlopen  ( const char* path, const char *version )
         name = str_printf("%s%s", path, ext);
     }
 
-    DEBUG(DBG_FILE, "searching for library '%s' ...\n", name);
+    BD_DEBUG(DBG_FILE, "searching for library '%s' ...\n", name);
 
 #if defined(_WIN32)
     wchar_t wname[MAX_PATH];
@@ -84,13 +84,13 @@ void   *dl_dlopen  ( const char* path, const char *version )
 
     if (!result) {
         char buf[128];
-        DEBUG(DBG_FILE, "can't open library '%s': %s\n", name, dlerror(buf, sizeof(buf)));
+        BD_DEBUG(DBG_FILE, "can't open library '%s': %s\n", name, dlerror(buf, sizeof(buf)));
     }
 #else
     result = dlopen(name, RTLD_LAZY);
 
     if (!result) {
-        DEBUG(DBG_FILE, "can't open library '%s': %s\n", name, dlerror());
+        BD_DEBUG(DBG_FILE, "can't open library '%s': %s\n", name, dlerror());
     }
 #endif
 
@@ -106,13 +106,13 @@ void   *dl_dlsym   ( void* handle, const char* symbol )
 
     if (!result) {
         char buf[128];
-        DEBUG(DBG_FILE | DBG_CRIT, "GetProcAddress(%p, '%s') failed: %s\n", handle, symbol, dlerror(buf, sizeof(buf)));
+        BD_DEBUG(DBG_FILE | DBG_CRIT, "GetProcAddress(%p, '%s') failed: %s\n", handle, symbol, dlerror(buf, sizeof(buf)));
     }
 #else
     void *result = dlsym(handle, symbol);
 
     if (!result) {
-        DEBUG(DBG_FILE | DBG_CRIT, "dlsym(%p, '%s') failed: %s\n", handle, symbol, dlerror());
+        BD_DEBUG(DBG_FILE | DBG_CRIT, "dlsym(%p, '%s') failed: %s\n", handle, symbol, dlerror());
     }
 #endif
 

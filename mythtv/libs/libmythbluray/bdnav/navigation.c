@@ -123,12 +123,12 @@ NAV_TITLE_LIST* nav_get_title_list(const char *root, uint32_t flags)
     title_list = calloc(1, sizeof(NAV_TITLE_LIST));
     title_list->title_info = calloc(title_info_alloc, sizeof(NAV_TITLE_INFO));
 
-    DEBUG(DBG_NAV, "Root: %s:\n", root);
+    BD_DEBUG(DBG_NAV, "Root: %s:\n", root);
     path = str_printf("%s" DIR_SEP "BDMV" DIR_SEP "PLAYLIST", root);
 
     dir = dir_open(path);
     if (dir == NULL) {
-        DEBUG(DBG_NAV, "Failed to open dir: %s\n", path);
+        BD_DEBUG(DBG_NAV, "Failed to open dir: %s\n", path);
         X_FREE(path);
         X_FREE(title_list);
         return NULL;
@@ -214,7 +214,7 @@ char* nav_find_main_title(const char *root)
     int res;
     char longest[11];
 
-    DEBUG(DBG_NAV, "Root: %s:\n", root);
+    BD_DEBUG(DBG_NAV, "Root: %s:\n", root);
     path = str_printf("%s" DIR_SEP "BDMV" DIR_SEP "PLAYLIST", root);
 
     dir = dir_open(path);
@@ -454,7 +454,7 @@ NAV_TITLE* nav_title_open(const char *root, const char *playlist)
     title->angle = 0;
     title->pl = mpls_parse(path, 0);
     if (title->pl == NULL) {
-        DEBUG(DBG_NAV, "Fail: Playlist parse %s\n", path);
+        BD_DEBUG(DBG_NAV, "Fail: Playlist parse %s\n", path);
         X_FREE(title);
         X_FREE(path);
         return NULL;
