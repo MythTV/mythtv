@@ -24,6 +24,9 @@
 #include "upnp.h"
 #include "mythevent.h"
 #include "mythverbose.h"
+#include "upnptaskcache.h"
+
+SSDPCache* SSDPCache::g_pSSDPCache = NULL;
 
 int SSDPCacheEntries::g_nAllocated = 0;       // Debugging only
 
@@ -34,7 +37,6 @@ int SSDPCacheEntries::g_nAllocated = 0;       // Debugging only
 //
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
-
 
 SSDPCacheEntries::SSDPCacheEntries()
 {
@@ -190,9 +192,26 @@ int SSDPCacheEntries::RemoveStale( const TaskTime &ttNow )
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
+SSDPCache* SSDPCache::Instance()
+{
+    return g_pSSDPCache ? g_pSSDPCache : (g_pSSDPCache = new SSDPCache());
+
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 SSDPCache::SSDPCache()
 {
     VERBOSE( VB_UPNP, "SSDPCache - Constructor" );
+
+    // ----------------------------------------------------------------------
+    // Add Task to keep SSDPCache purged of stale entries.
+    // ----------------------------------------------------------------------
+
+    TaskQueue::Instance()->AddTask( new SSDPCacheTask() );
+
 }      
 
 /////////////////////////////////////////////////////////////////////////////

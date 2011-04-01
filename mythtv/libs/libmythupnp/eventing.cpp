@@ -75,7 +75,7 @@ Eventing::Eventing(const QString &sExtensionName,
     HttpServerExtension(sExtensionName, sSharePath),
     m_sEventMethodName(sEventMethodName),
     m_nSubscriptionDuration(
-        UPnp::g_pConfig->GetValue("UPnP/SubscriptionDuration", 1800)),
+        UPnp::GetConfiguration()->GetValue("UPnP/SubscriptionDuration", 1800)),
     m_nHoldCount(0),
     m_pInitializeSubscriber(NULL)
 {
@@ -418,7 +418,7 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
         UPnpEventTask    *pEventTask      = new UPnpEventTask( QHostAddress( pInfo->qURL.host() ),
                                                                              nPort, pBuffer );
 
-        UPnp::g_pTaskQueue->AddTask( 250, pEventTask );
+        TaskQueue::Instance()->AddTask( 250, pEventTask );
 
         // ------------------------------------------------------------------
         // Update the subscribers Key & last Notified fields

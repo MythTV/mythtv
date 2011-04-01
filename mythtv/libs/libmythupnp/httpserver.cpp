@@ -261,7 +261,7 @@ HttpWorkerThread::HttpWorkerThread( HttpServer *pParent, const QString &sName ) 
 {
     m_pHttpServer    = pParent;
     m_nSocket        = 0;                                                  
-    m_nSocketTimeout = UPnp::g_pConfig->GetValue( "HTTP/KeepAliveTimeoutSecs", 10 ) * 1000;
+    m_nSocketTimeout = UPnp::GetConfiguration()->GetValue( "HTTP/KeepAliveTimeoutSecs", 10 ) * 1000;
 
     m_pData          = NULL;
 }                  

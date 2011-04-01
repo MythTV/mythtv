@@ -31,7 +31,7 @@ UPnpMSRR::UPnpMSRR( UPnpDevice *pDevice,
     SetValue< unsigned short >( "ValidationRevokedUpdateID"   , 0 );
 
     QString sUPnpDescPath =
-        UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath", m_sSharePath );
+        UPnp::GetConfiguration()->GetValue( "UPnP/DescXmlPath", m_sSharePath );
 
     m_sServiceDescFileName = sUPnpDescPath + "MSRR_scpd.xml";
     m_sControlUrl          = "/MSRR_Control";

@@ -216,7 +216,6 @@ MediaRenderer::MediaRenderer()
         VERBOSE(VB_IMPORTANT, "MediaRenderer::HttpServer Create Error");
         delete m_pHttpServer;
         m_pHttpServer = NULL;
-        InitializeSSDPOnly();
         return;
     }
 

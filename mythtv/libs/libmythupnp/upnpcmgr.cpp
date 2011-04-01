@@ -43,8 +43,8 @@ UPnpCMGR::UPnpCMGR ( UPnpDevice *pDevice,
     SetValue< QString >( "SourceProtocolInfo"  , sSourceProtocols );
     SetValue< QString >( "SinkProtocolInfo"    , sSinkProtocols   );
 
-    QString sUPnpDescPath = UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath",
-                                                       m_sSharePath );
+    QString sUPnpDescPath = UPnp::GetConfiguration()->GetValue( "UPnP/DescXmlPath",
+                                                                m_sSharePath );
     m_sServiceDescFileName = sUPnpDescPath + "CMGR_scpd.xml";
     m_sControlUrl          = "/CMGR_Control";
 

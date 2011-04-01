@@ -34,7 +34,7 @@ MythFEXML::MythFEXML( UPnpDevice *pDevice , const QString sSharePath)
   : Eventing( "MythFEXML", "MYTHTV_Event", sSharePath)
 {
 
-    QString sUPnpDescPath = UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath", m_sSharePath );
+    QString sUPnpDescPath = UPnp::GetConfiguration()->GetValue( "UPnP/DescXmlPath", m_sSharePath );
 
     m_sServiceDescFileName = sUPnpDescPath + "MFEXML_scpd.xml";
     m_sControlUrl          = "/MythFE";

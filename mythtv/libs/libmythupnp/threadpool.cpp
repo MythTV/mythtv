@@ -295,9 +295,11 @@ ThreadPool::ThreadPool( const QString &sName )
 {
     m_sName = sName;
 
-    m_nInitialThreadCount = UPnp::g_pConfig->GetValue( "ThreadPool/" + m_sName + "/Initial", 1 );
-    m_nMaxThreadCount     = UPnp::g_pConfig->GetValue( "ThreadPool/" + m_sName + "/Max"    , 25 );
-    m_nIdleTimeout        = UPnp::g_pConfig->GetValue( "ThreadPool/" + m_sName + "/Timeout", 60000 );
+    Configuration *pConfig = UPnp::GetConfiguration();
+
+    m_nInitialThreadCount = pConfig->GetValue( "ThreadPool/" + m_sName + "/Initial", 1 );
+    m_nMaxThreadCount     = pConfig->GetValue( "ThreadPool/" + m_sName + "/Max"    , 25 );
+    m_nIdleTimeout        = pConfig->GetValue( "ThreadPool/" + m_sName + "/Timeout", 60000 );
 
     m_nInitialThreadCount = min( m_nInitialThreadCount, m_nMaxThreadCount );
 

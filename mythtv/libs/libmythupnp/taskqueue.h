@@ -85,11 +85,16 @@ class Task : public RefCounted
 
 
 /////////////////////////////////////////////////////////////////////////////
-//
+// TaskQueue Singleton
 /////////////////////////////////////////////////////////////////////////////
 
 class TaskQueue : public QThread
 {
+    private: 
+
+        // Singleton instance used by all.
+        static TaskQueue*        g_pTaskQueue;  
+
     protected:
 
         TaskMap     m_mapTasks;
@@ -102,9 +107,18 @@ class TaskQueue : public QThread
 
         virtual void run    ();
 
+    private:
+
+        // ------------------------------------------------------------------
+        // Private so the singleton pattern can be inforced.
+        // ------------------------------------------------------------------
+
+        TaskQueue();
+
     public:
 
-                 TaskQueue();
+        static TaskQueue* Instance();
+
         virtual ~TaskQueue();
 
         void  RequestTerminate   ( );
