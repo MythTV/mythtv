@@ -99,7 +99,7 @@ static void fill_setting(
                 if (ok)
                 {
                     uint sel = 0;
-                    for (uint i = setting->data_list.size(); i >= 0; i--)
+                    for (int i = setting->data_list.size() - 1; i >= 0; i--)
                     {
                         if (idata < setting->data_list[i].toLongLong())
                             break;
@@ -171,7 +171,7 @@ QString MythSetting::ToHTML(uint level) const
             ret += indent(level) +
                 "<div class=\"setting_label\">" + label + "</div>\r\n";
             ret += indent(level) +
-                QString("<input name=\"%1_input\" id=\"%2\" type=\"text\""
+                QString("<input name=\"%1\" id=\"%2\" type=\"text\""
                         " value=\"%3\"/><div class=\"form_error\""
                         "id=\"%4_error\"></div>\r\n")
                 .arg(value).arg(value).arg(data).arg(value);

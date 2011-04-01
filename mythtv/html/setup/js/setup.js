@@ -61,21 +61,35 @@ function setEditErrorMessage(message) {
 function submitConfigForm(form) {
     var data = $("#config_form_" + form).serialize();
     var url = $("#__config_form_action__").val();
+    var savedOK = 1;
 
-    /* FIXME, clear out _error divs */
+    /* Clear error messages */
+    $("#config_form_" + form + " :input").each(function() {
+        $("#" + $(this).attr("id") + "_error").html("");
+    });
+
     $.ajaxSetup({ async: false });
     $.post(url, data, function(data) {
         $.each(data, function(key, value) {
             $("#" + key + "_error").html(value);
+
+            if (value != "")
+                savedOK = 0;
         });
     }, "json");
     $.ajaxSetup({ async: true });
+
+    if (savedOK)
+        setHeaderStatusMessage("Changes saved successfully");
+    else
+        setHeaderErrorMessage("Error saving changes!");
 }
 
 function setSettingInputValues(divName) {
     $("#" + divName + " :input").each(function() {
-        if (($(this).attr("type") == "text") ||
-            ($(this).attr("type") == "hidden")) {
+        if (($(this).attr("type") != "button") &&
+            ($(this).attr("type") != "submit") &&
+            ($(this).attr("type") != "reset")) {
             $(this).val(settingsList[$(this).attr("id")]);
         }
     });
@@ -92,8 +106,6 @@ function makeLocalBackendTheMaster() {
 /****************************************************************************/
 var settingsList = {};
 var settingsInfo = {};
-var settingsDatabaseXML;
-var settingsGeneralXML;
 
 function storeSetting(setting) {
     settingsInfo[setting.attr("value")] = setting;
@@ -105,27 +117,16 @@ function storeGroupSettings(group) {
 }
 
 function loadConfigXML() {
-  $.ajax({
-    type: "GET",
-    url: "/Config/Database/XML",
-    dataType: "xml",
-    success: function(xml) {
-        settingsDatabaseXML = xml;
+  settingsInfo = {};
+  $.get("/Config/Database/XML", function(xml) {
         $(xml).find("group").each(function() { storeGroupSettings($(this)); });
         $(xml).find("setting").each(function() { storeSetting($(this)); });
-    }
-  }).error(function() { alert("Error downloading /Config/Database XML");});
+    }).error(function() { alert("Error downloading /Config/Database XML");});
 
-  $.ajax({
-    type: "GET",
-    url: "/Config/General/XML",
-    dataType: "xml",
-    success: function(xml) {
-        settingsGeneralXML = xml;
+  $.get("/Config/General/XML", function(xml) {
         $(xml).find("group").each(function() { storeGroupSettings($(this)); });
         $(xml).find("setting").each(function() { storeSetting($(this)); });
-    }
-  }).error(function() { alert("Error downloading /Config/General XML");});
+    }).error(function() { alert("Error downloading /Config/General XML");});
 }
 
 function getSettingsList() {
@@ -173,7 +174,7 @@ function validateSetting(key) {
 }
 
 /* load the settings list when we load setup.js */
-setTimeout(getSettingsList, 10);
+getSettingsList();  /* load now to fix a race condition */
 /* load the XML we use to validate the new setting values */
 setTimeout(loadConfigXML, 10);
 
@@ -218,5 +219,79 @@ function hostsSelect(id) {
     result += "</select>";
 
     return result;
+}
+
+/****************************************************************************/
+/* Storage Groups access methods                                            */
+/****************************************************************************/
+function addStorageGroupDir( group, dir, host ) {
+    var result = 0;
+
+    // FIXME, validate input data here or in caller
+
+    $.ajaxSetup({ async: false });
+    $.post("/Myth/AddStorageGroupDir",
+        { GroupName: group, DirName: dir, HostName: host},
+        function(data) {
+            if (data.bool == "true")
+                result = 1;
+            else
+                alert("data.bool != true");
+        }, "json").error(function(data) {
+            alert("Error: unable to add Storage Group Directory");
+        });
+    $.ajaxSetup({ async: true });
+    // FIXME, better alerting
+
+    return result;
+}
+
+function removeStorageGroupDir( group, dir, host ) {
+    var result = 0;
+
+    // FIXME, validate input data here or in caller
+
+    $.ajaxSetup({ async: false });
+    $.post("/Myth/RemoveStorageGroupDir",
+        { GroupName: group, DirName: dir, HostName: host},
+        function(data) {
+            if (data.bool == "true")
+                result = 1;
+        }, "json");
+    $.ajaxSetup({ async: true });
+
+    return result;
+}
+
+/****************************************************************************/
+/* File/Directory Browser                                                   */
+/****************************************************************************/
+var fileBrowserCallback;
+function openFileBrowser(title, dirs, callback) {
+    $('#fileBrowserTitle').html(title);
+    $('#fileBrowser-bg').show();
+    $.ajaxSetup({ async: false });
+    $.getScript("/js/jqueryFileTree/jqueryFileTree.js");
+    $.ajaxSetup({ async: true });
+    fileBrowserCallback = callback;
+    $('#fileBrowser').fileTree(
+      { root: '/',
+        script: '/Config/FileBrowser'
+      }, callback );
+}
+
+function saveFileBrowser() {
+    var selectedDir = $('#fileBrowser').find('A.selected').attr("rel");
+    if (selectedDir && fileBrowserCallback)
+    {
+        hideFileBrowser();
+        fileBrowserCallback(selectedDir);
+    }
+    else
+        alert("No directory selected.");
+}
+
+function hideFileBrowser() {
+    $('#fileBrowser-bg').hide();
 }
 

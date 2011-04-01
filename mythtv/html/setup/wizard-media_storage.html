@@ -1,16 +1,55 @@
 <div id='wizard-media_storage' class='setuptab'>
 <input type=button value='Prev' onClick='javascript:$("#wizardtabs").tabs("select", 3)'>
-<div class='Title'>Media Storage Directories (mockup)</div>
-NOTE: These inputs would only be usable if there was only one dir per SG,
-otherwise a link to the SG editor screen would appear if a SG had more
-than one directory defined.<br>
+<div class='Title'>Media Storage Directories</div>
 <table border=1>
-<tr><td><th>Recordings:</th><td><input size=60 value='/nas/recordings'></td></tr>
-<tr><td><th>Videos:</th><td>More than one directory is configured for Videos, you may edit the list in the <a href="javascript:loadSetupPage('storagegroups')">Storage Groups Editor</a></td></tr>
-<tr><td><th>Music:</th><td><input size=60 value='/nas/music'></td></tr>
-<tr><td><th>Pictures:</th><td><input size=60 value='/nas/photos'></td></tr>
+<tr><td><th>Recordings:</th><td><div id='sgDefault'></div></td><td valign=middle><input type=button onClick="wizardSelectNewDir('Default')" value='Add Directory'></td></tr>
+<tr><td><th>Videos:</th><td><div id='sgVideos'></div></td><td valign=middle><input type=button onClick="wizardSelectNewDir('Videos')" value='Add Directory'></td></tr>
+<tr><td><th>Music: (placeholder)</th><td><div id='sgMusic'></div></td><td valign=middle><input type=button onClick="wizardSelectNewDir('Music')" value='Add Directory'></td></tr>
+<tr><td><th>Pictures: (placeholder)</th><td><div id='sgPhotos'></div></td><td valign=middle><input type=button onClick="wizardSelectNewDir('Photos')" value='Add Directory'></td></tr>
 </table>
-NOTE: These are not hooked up yet<br>
-If you would like to add more directories to spread data across multiple
-hard drives, go to the <a onClick="javascript:alert('fixme')">(FIXME link)</a>.
 </div>
+
+
+<script language="JavaScript" type="text/javascript">
+    var wizardStorageGroupName;
+    function wizardNewDirSelected(dir) {
+        /* FIXME, need to do some validation here, writeability, etc. */
+        addStorageGroupDir(wizardStorageGroupName, dir, getHostName());
+        setStorageGroupDirs(wizardStorageGroupName, getHostName());
+    }
+
+    function wizardSelectNewDir(group) {
+        var dirs = new Array;
+        wizardStorageGroupName = group;
+        openFileBrowser("Storage Directory", dirs, wizardNewDirSelected);
+    }
+
+    function wizardRemoveStorageGroupDir(group, dir, host) {
+        removeStorageGroupDir(group, dir, host);
+        setStorageGroupDirs(group, host);
+    }
+
+    function setStorageGroupDirs(group, host) {
+        $.getJSON("/Myth/GetStorageGroupDirs",
+            { GroupName: group, HostName: host },
+            function(data) {
+                var result = "";
+                $.each(data.StorageGroupDirList.StorageGroupDirs,
+                    function(i, value) {
+                        if (result.length)
+                            result += "<br>";
+                        result += value.DirName +
+                            "&nbsp;&nbsp;&nbsp;&nbsp;" +
+                            "<a href=\"javascript:wizardRemoveStorageGroupDir('" +
+                            group + "', '" + value.DirName + "', '" + host +
+                            "')\">(Remove)</a>";
+                });
+                $("#sg" + group).html(result);
+        });
+    }
+
+    setStorageGroupDirs("Default", getHostName());
+    setStorageGroupDirs("Videos", getHostName());
+    setStorageGroupDirs("Music", getHostName());
+    setStorageGroupDirs("Photos", getHostName());
+</script>
