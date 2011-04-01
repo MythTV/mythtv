@@ -1044,8 +1044,6 @@ bool HTTPRequest::ParseRequest()
 
                 m_response.write( Static401Error );
 
-                SendResponse();
-
                 return true;
             }
 
