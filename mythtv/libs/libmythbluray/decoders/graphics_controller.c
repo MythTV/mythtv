@@ -600,7 +600,7 @@ static void _set_button_page(GRAPHICS_CONTROLLER *gc, uint32_t param, GC_NAV_CMD
     BD_IG_PAGE     *page   = NULL;
     BD_IG_BUTTON   *button = NULL;
 
-    GC_TRACE("_set_button_page(0x%08x): page flag %d, id %d, effects %d   button flag %d, id %d",
+    GC_TRACE("_set_button_page(0x%08x): page flag %d, id %d, effects %d   button flag %d, id %d\n",
           param, !!page_flag, page_id, !!effect_flag, !!button_flag, button_id);
 
     /* 10.4.3.4 (D) */
