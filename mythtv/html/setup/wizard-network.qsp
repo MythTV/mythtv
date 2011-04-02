@@ -5,11 +5,16 @@
 <div class='Title'>Network Setup</div>
 <table border=0 cellpadding=2 cellspacing=2>
     <tr><th align=right>Master Backend:</th>
-        <td id='MasterServerIP_cell'></td></tr>
+        <td id='MasterServerIP_cell'>&nbsp;
+            <a href="javascript:showSettingHelp('MasterServerIP')">[?]</a>
+            </td></tr>
     <tr><th align=right>Local Backend:</th>
-        <td id='BackendServerIP_cell'></td></tr>
+        <td id='BackendServerIP_cell'>&nbsp;
+            <a href="javascript:showSettingHelp('BackendServerIP')">[?]</a>
+            </td></tr>
     <tr><th align=right>Security PIN:</th>
         <td><input id='SecurityPin' type='password' size=10>
+            <a href="javascript:showSettingHelp('SecurityPin')">[?]</a>
             <div class="form_error" id="SecurityPin_error"></div>
             </td></tr>
 </table>
@@ -19,12 +24,11 @@ loadContent('/Config/General?__group__=local_server')">Advanced General Setup Sc
 </div>
 
 <script language="JavaScript" type="text/javascript">
-    /* FIXME, handle the current value here */
     var options = getOptionList("/Config/GetValueList?List=LocalIPAddress",
                                 settingsList["BackendServerIP"]);
 
-    $("#MasterServerIP_cell").html("<b>" + settingsList["MasterServerIP"] + "</b>");
-    $("#BackendServerIP_cell").html("<select id='BackendServerIP'>" + options
+    $("#MasterServerIP_cell").prepend("<b>" + settingsList["MasterServerIP"] + "</b>");
+    $("#BackendServerIP_cell").prepend("<select id='BackendServerIP'>" + options
        + "</select>");
 
     setSettingInputValues("wizard-network");
