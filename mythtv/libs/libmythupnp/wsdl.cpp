@@ -384,6 +384,15 @@ bool Wsdl::CreateType( QObject *pParent, QString &sTypeName )
 
         case QMetaType::QVariantMap:
             return CreateMapType( pParent, sTypeName, "Settings", "string", true );
+
+        default:
+            // for not, treat QFileInfo as a string.  Need to turn into MTOM later.
+            if (id == QMetaType::type( "QFileInfo" ))
+            {
+                sTypeName = "QString";
+                return false;
+            }
+            break;
     }
 
     if ((id == -1) || (id < QMetaType::User)) 
