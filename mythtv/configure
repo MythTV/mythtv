@@ -4037,7 +4037,6 @@ fi
 
 if enabled x11; then
     check_libx gl_lib GLES2/gl2.h glClear -lGLESv2 || check_libx gl_lib GL/gl.h glBegin -lGL || check_libx gl_lib GL/gl.h glBegin -lopengl32 || disable opengl
-    check_libx glu_lib GL/glu.h gluBeginSurface -lGLU || disable opengl
 fi
 
 # Quartz video is Mac only and requires Carbon which is 32bit only
@@ -4737,10 +4736,6 @@ fi
 if enabled directfb; then
   echo "CONFIG_DIRECTFB_LIBS=$CONFIG_DIRECTFB_LIBS" >> $MYTH_CONFIG_MAK
   echo "CONFIG_DIRECTFB_CXXFLAGS=$CONFIG_DIRECTFB_CXXFLAGS" >> $MYTH_CONFIG_MAK
-fi
-
-if ! enabled darwin && enabled opengl; then
-  echo "CONFIG_OPENGL_LIBS=$gl_lib $glu_lib" >> $MYTH_CONFIG_MAK
 fi
 
 if test x"$PERL_CONFIG_OPTS" != x"" ; then

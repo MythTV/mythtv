@@ -26,8 +26,14 @@ function hideHelpWindow() {
 
 function showHelp(title, content) {
     $("#helpTitle").html(title);
-    $("#helpContent").html("FIXME: you can drag this window....  " + content);
+    $("#helpContent").html(content);
     showHelpWindow();
+}
+
+function showSettingHelp(setting) {
+    var title = settingsInfo[setting].attr("label");
+    var content = settingsInfo[setting].attr("help_text");
+    showHelp(title, content);
 }
 
 function showEditWindow() {

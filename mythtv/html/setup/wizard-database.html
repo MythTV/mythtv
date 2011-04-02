@@ -3,11 +3,14 @@
 <div class='Title'>Database Setup</div>
 <table border=0 cellpadding=2 cellspacing=2>
     <tr><th align=right>Database Host:</th>
-        <td><input id='dbHostName' size=20></td></tr>
+        <td><input id='dbHostName' size=20>
+            <a href="javascript:showSettingHelp('dbHostName')">[?]</a></td></tr>
     <tr><th align=right>Database User:</th>
-        <td><input id='dbUserName' size=20></td></tr>
+        <td><input id='dbUserName' size=20>
+            <a href="javascript:showSettingHelp('dbUserName')">[?]</a></td></tr>
     <tr><th align=right>Database Password:</th>
-        <td><input id='dbPassword' size=20></td></tr>
+        <td><input id='dbPassword' size=20>
+            <a href="javascript:showSettingHelp('dbPassword')">[?]</a></td></tr>
 </table>
 <input type=button value='Test Database Settings' onClick='javascript:testDBSettings()'>
 <hr>
