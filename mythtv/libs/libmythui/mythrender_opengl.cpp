@@ -23,8 +23,7 @@ static inline int __glCheck__(const QString &loc, const char* fileName, int n)
     if (error)
     {
         VERBOSE(VB_IMPORTANT, QString("%1: %2 @ %3, %4")
-            .arg(loc).arg((const char*)gluErrorString(error))
-            .arg(fileName).arg(n));
+            .arg(loc).arg(error).arg(fileName).arg(n));
     }
     return error;
 }
