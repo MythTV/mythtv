@@ -61,7 +61,6 @@ class VideoOutputVDPAU : public VideoOutput
         { return codec_is_vdpau(video_codec_id); }
     virtual bool hasHWAcceleration(void) const
         { return codec_is_vdpau(video_codec_id); }
-    void SetNextFrameDisplayTimeOffset(int delayus) { m_frame_delay = delayus; }
     virtual MythPainter* GetOSDPainter(void) { return (MythPainter*)m_osd_painter; }
 
     virtual bool CanVisualise(AudioPlayer *audio, MythRender *render)
@@ -112,7 +111,6 @@ class VideoOutputVDPAU : public VideoOutput
     uint                 m_decoder;
     int                  m_pix_fmt;
 
-    int                  m_frame_delay;
     QMutex               m_lock;
 
     uint                 m_pip_layer;

@@ -7,6 +7,7 @@ MythTV mythbackend Internal Web Server
 <link rel="stylesheet"    href="/css/jquery-ui.css"    type="text/css">
 <link rel="stylesheet"    href="/css/menustyle.css"    type="text/css">
 <link rel="stylesheet"    href="/css/setup.css"        type="text/css">
+<link rel="stylesheet"    href="/js/jqueryFileTree/jqueryFileTree.css"        type="text/css" media="screen">
 <link rel="icon"          href="/images/favicon.ico"   type="image/x-icon">
 <link rel="shortcut icon" href="/images/favicon.ico"   type="image/x-icon">
 <script language="JavaScript" type="text/javascript"  src="/js/util.qjs"></script>
@@ -63,12 +64,31 @@ $(document).ready(function() {
 </div>
 
 <div id='helpWindow'>
+    <div id='helpHeader' class='Header'>
+        Help
+    </div>
     <div id='helpTitle' class='Title'>
     </div>
     <div id='helpContent'>
     </div>
     <div id='helpCloseButton' class='CloseButton'>
         <a href='javascript:hideHelpWindow()'>Close [X]</a>
+    </div>
+    <div id='helpFooter' class='Footer'>
+        (This window is movable if it is in the way)
+    </div>
+</div>
+
+<div id='fileBrowser-bg'>
+    <div id='fileBrowserTitle' class='Title'>
+    </div>
+    <div id='fileBrowser'>
+    </div>
+    <div id='fileBrowserSaveButton' class='SaveButton'>
+        <a href='javascript:saveFileBrowser()'>Save</a>
+    </div>
+    <div id='fileBrowserCloseButton' class='CloseButton'>
+        <a href='javascript:hideFileBrowser()'>Close [X]</a>
     </div>
 </div>
 

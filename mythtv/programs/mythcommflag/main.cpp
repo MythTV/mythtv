@@ -1300,7 +1300,7 @@ int main(int argc, char *argv[])
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(
-            false/*use gui*/, NULL/*upnp*/, false/*prompt for backend*/,
+            false/*use gui*/, false/*prompt for backend*/,
             false/*bypass auto discovery*/, !useDB/*ignoreDB*/))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");

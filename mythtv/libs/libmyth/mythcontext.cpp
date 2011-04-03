@@ -56,7 +56,7 @@ class MythContextPrivate : public QObject
     MythContextPrivate(MythContext *lparent);
    ~MythContextPrivate();
 
-    bool Init        (const bool gui,    UPnp *UPnPclient,
+    bool Init        (const bool gui,
                       const bool prompt, const bool noPrompt,
                       const bool ignoreDB);
     bool FindDatabase(const bool prompt, const bool noPrompt);
@@ -72,8 +72,6 @@ class MythContextPrivate : public QObject
     void    EnableDBerrors(void);
     void    ResetDatabase(void);
 
-    bool    InitUPnP(void);
-    void    DeleteUPnP(void);
     int     ChooseBackend(const QString &error);
     int     UPnPautoconf(const int milliSeconds = 2000);
     void    StoreConnectionInfo(void);
@@ -100,10 +98,7 @@ class MythContextPrivate : public QObject
     DatabaseParams  m_DBparams;  ///< Current database host & WOL details
     QString         m_DBhostCp;  ///< dbHostName backup
 
-    UPnp             *m_UPnP;    ///< For automatic backend discover
-    bool              m_ExternalUPnP; ///< If the UPnP was handed in via Init()
-    XmlConfiguration *m_XML;
-    HttpServer       *m_HTTP;
+    Configuration    *m_pConfig;
 
     bool disableeventpopup;
     bool disablelibrarypopup;
@@ -207,7 +202,7 @@ static void eject_cb(void)
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
     : parent(lparent),
       m_gui(false),
-      m_UPnP(NULL), m_ExternalUPnP(false), m_XML(NULL), m_HTTP(NULL),
+      m_pConfig(NULL), 
       disableeventpopup(false),
       disablelibrarypopup(false),
       pluginmanager(NULL),
@@ -221,7 +216,6 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
 
 MythContextPrivate::~MythContextPrivate()
 {
-    DeleteUPnP();
     if (m_ui)
         DestroyMythUI();
     if (m_sh)
@@ -269,21 +263,17 @@ void MythContextPrivate::EndTempWindow(void)
     EnableDBerrors();
 }
 
-bool MythContextPrivate::Init(const bool gui, UPnp *UPnPclient,
+bool MythContextPrivate::Init(const bool gui,
                               const bool promptForBackend,
                               const bool noPrompt,
                               const bool ignoreDB)
 {
     gCoreContext->GetDB()->IgnoreDatabase(ignoreDB);
     m_gui = gui;
-    if (UPnPclient)
-    {
-        m_UPnP = UPnPclient;
-        m_ExternalUPnP = true;
-#ifndef _WIN32
-        m_XML  = (XmlConfiguration *)UPnp::g_pConfig;
-#endif
-    }
+
+    // We don't have a database yet, so lets use the config.xml file.
+
+    m_pConfig = UPnp::GetConfiguration();
 
     // Creates screen saver control if we will have a GUI
     if (gui)
@@ -438,12 +428,10 @@ DBfound:
     StoreConnectionInfo();
     EnableDBerrors();
     ResetDatabase();
-    DeleteUPnP();
     return true;
 
 NoDBfound:
     //VERBOSE(VB_GENERAL, "FindDatabase() - failed");
-    DeleteUPnP();
     return false;
 }
 
@@ -687,55 +675,11 @@ void MythContextPrivate::ResetDatabase(void)
     gCoreContext->ClearSettingsCache();
 }
 
-
-bool MythContextPrivate::InitUPnP(void)
-{
-    if (m_UPnP)
-        return true;
-
-    VERBOSE(VB_UPNP, "Setting UPnP client for backend autodiscovery...");
-
-    if (!m_XML)
-        m_XML = new XmlConfiguration("");   // No file - use defaults only
-
-    m_UPnP = new UPnp();
-    m_UPnP->SetConfiguration(m_XML);
-
-    m_UPnP->InitializeSSDPOnly();
-
-    return true;
-}
-
-void MythContextPrivate::DeleteUPnP(void)
-{
-    if (m_ExternalUPnP)  // Init was passed an existing UPnP
-        return;          // so let the caller delete it cleanly
-
-    if (m_UPnP)
-    {
-        // This takes a few seconds, so inform the user:
-        VERBOSE(VB_GENERAL, "Deleting UPnP client...");
-
-        delete m_UPnP;  // This also deletes m_XML
-        m_UPnP = NULL;
-        m_XML  = NULL;
-    }
-
-    if (m_HTTP)
-    {
-        delete m_HTTP;
-        m_HTTP = NULL;
-    }
-}
-
 /**
  * Search for backends via UPnP, put up a UI for the user to choose one
  */
 int MythContextPrivate::ChooseBackend(const QString &error)
 {
-    if (!InitUPnP())
-        return -1;
-
     TempMainWindow();
 
     // Tell the user what went wrong:
@@ -744,7 +688,7 @@ int MythContextPrivate::ChooseBackend(const QString &error)
 
     VERBOSE(VB_GENERAL, "Putting up the UPnP backend chooser");
 
-    BackendSelection::prompt(&m_DBparams, m_XML);
+    BackendSelection::prompt(&m_DBparams, m_pConfig);
 
     EndTempWindow();
 
@@ -761,15 +705,15 @@ int MythContextPrivate::ChooseBackend(const QString &error)
  */
 void MythContextPrivate::StoreConnectionInfo(void)
 {
-    if (!m_XML)
+    if (!m_pConfig)
         return;
 
-    m_XML->SetValue(kDefaultBE + "DBHostName", m_DBparams.dbHostName);
-    m_XML->SetValue(kDefaultBE + "DBUserName", m_DBparams.dbUserName);
-    m_XML->SetValue(kDefaultBE + "DBPassword", m_DBparams.dbPassword);
-    m_XML->SetValue(kDefaultBE + "DBName",     m_DBparams.dbName);
-    m_XML->SetValue(kDefaultBE + "DBPort",     m_DBparams.dbPort);
-    m_XML->Save();
+    m_pConfig->SetValue(kDefaultBE + "DBHostName", m_DBparams.dbHostName);
+    m_pConfig->SetValue(kDefaultBE + "DBUserName", m_DBparams.dbUserName);
+    m_pConfig->SetValue(kDefaultBE + "DBPassword", m_DBparams.dbPassword);
+    m_pConfig->SetValue(kDefaultBE + "DBName",     m_DBparams.dbName);
+    m_pConfig->SetValue(kDefaultBE + "DBPort",     m_DBparams.dbPort);
+    m_pConfig->Save();
 }
 
 /**
@@ -780,18 +724,16 @@ void MythContextPrivate::StoreConnectionInfo(void)
  */
 int MythContextPrivate::UPnPautoconf(const int milliSeconds)
 {
-    if (!InitUPnP())
-        return 0;
-
     SSDPCacheEntries *backends = NULL;
     int               count;
     QString           loc = "UPnPautoconf() - ";
     QTime             timer;
 
-    m_UPnP->PerformSearch(gBackendURI);
+    SSDP::Instance()->PerformSearch( gBackendURI );
+
     for (timer.start(); timer.elapsed() < milliSeconds; usleep(25000))
     {
-        backends = m_UPnP->g_SSDPCache.Find(gBackendURI);
+        backends = SSDP::Instance()->Find( gBackendURI );
         if (backends)
         {
             backends->AddRef();
@@ -806,11 +748,6 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
         VERBOSE(VB_GENERAL, loc + "No UPnP backends found");
         return 0;
     }
-
-
-    // This could be tied to VB_UPNP?
-    //m_UPnP->g_SSDPCache.Dump();
-
 
     count = backends->Count();
     switch (count)
@@ -855,13 +792,13 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
  */
 bool MythContextPrivate::DefaultUPnP(QString &error)
 {
-    XmlConfiguration *XML = new XmlConfiguration("config.xml");
-    QString           loc = "MCP::DefaultUPnP() - ";
-    QString localHostName = XML->GetValue(kDefaultBE + "LocalHostName", "");
-    QString           PIN = XML->GetValue(kDefaultPIN, "");
-    QString           USN = XML->GetValue(kDefaultUSN, "");
+    Configuration *pConfig = new XmlConfiguration("config.xml");
+    QString            loc = "MCP::DefaultUPnP() - ";
+    QString  localHostName = pConfig->GetValue(kDefaultBE + "LocalHostName", "");
+    QString            PIN = pConfig->GetValue(kDefaultPIN, "");
+    QString            USN = pConfig->GetValue(kDefaultUSN, "");
 
-    delete XML;
+    delete pConfig;
 
     if (USN.isEmpty())
     {
@@ -873,19 +810,34 @@ bool MythContextPrivate::DefaultUPnP(QString &error)
             QString("PIN '%1' and host USN: %2")
             .arg(PIN).arg(USN));
 
-    if (!InitUPnP())
-    {
-        error = "UPnP is broken?";
-        return false;
-    }
+    // ----------------------------------------------------------------------
 
-    m_UPnP->PerformSearch(gBackendURI);
-    DeviceLocation *pDevLoc = m_UPnP->g_SSDPCache.Find(gBackendURI, USN);
+    SSDP::Instance()->PerformSearch( gBackendURI );
+
+    // ----------------------------------------------------------------------
+    // We need to give the server time to respond...
+    // ----------------------------------------------------------------------
+
+    DeviceLocation *pDevLoc = NULL;
+    QTime           timer;
+
+    for (timer.start(); timer.elapsed() < 5000; usleep(25000))
+    {
+        pDevLoc = SSDP::Instance()->Find( gBackendURI, USN );
+
+        if (pDevLoc)
+            break;
+
+        putchar('.');
+    }
+    putchar('\n');
+
+    // ----------------------------------------------------------------------
+
     if (!pDevLoc)
     {
         error = "Cannot find default UPnP backend";
         return false;
-
     }
 
     if (UPnPconnect(pDevLoc, PIN))
@@ -913,10 +865,10 @@ bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
     QString        error;
     QString        loc = "UPnPconnect() - ";
     QString        URL = backend->m_sLocation;
-    MythXMLClient  XML(URL);
+    MythXMLClient  client(URL);
 
     VERBOSE(VB_UPNP, loc + QString("Trying host at %1").arg(URL));
-    switch (XML.GetConnectionInfo(PIN, &m_DBparams, error))
+    switch (client.GetConnectionInfo(PIN, &m_DBparams, error))
     {
         case UPnPResult_Success:
             gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
@@ -929,7 +881,7 @@ bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
             // We could prompt for the PIN and try again, but that needs a UI.
             // Easier to fail for now, and put up the full UI selector later
             VERBOSE(VB_UPNP, loc + error + ". Wrong PIN?");
-            break;
+            return false;
 
         default:
             VERBOSE(VB_UPNP, loc + error);
@@ -1062,7 +1014,7 @@ MythContext::MythContext(const QString &binversion)
     }
 }
 
-bool MythContext::Init(const bool gui, UPnp *UPnPclient,
+bool MythContext::Init(const bool gui,
                        const bool promptForBackend,
                        const bool disableAutoDiscovery,
                        const bool ignoreDB)
@@ -1128,8 +1080,7 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
         return false;
     }
 
-    if (!d->Init(gui, UPnPclient, promptForBackend,
-                 disableAutoDiscovery, ignoreDB))
+    if (!d->Init(gui, promptForBackend, disableAutoDiscovery, ignoreDB))
     {
         return false;
     }

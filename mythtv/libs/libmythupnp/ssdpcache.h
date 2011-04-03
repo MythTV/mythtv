@@ -80,7 +80,7 @@ typedef QMap< QString, SSDPCacheEntries * > SSDPCacheEntriesMap;   // Key == Ser
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
-//
+// SSDPCache Class Definition - (Singleton)
 //
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -89,6 +89,10 @@ class UPNP_PUBLIC SSDPCache : public QObject,
                   public MythObservable
 {
     Q_OBJECT
+
+    private:
+        // Singleton instance used by all.
+        static SSDPCache*       g_pSSDPCache;  
 
     protected:
 
@@ -100,9 +104,18 @@ class UPNP_PUBLIC SSDPCache : public QObject,
                            const QString &sLocation );
         void NotifyRemove( const QString &sURI, const QString &sUSN );
 
+    private:
+
+        // ------------------------------------------------------------------
+        // Private so the singleton pattern can be inforced.
+        // ------------------------------------------------------------------
+
+        SSDPCache();
+
     public:
 
-                 SSDPCache();
+        static SSDPCache* Instance();
+
         virtual ~SSDPCache();
 
         void Lock       () { m_mutex.lock();   }

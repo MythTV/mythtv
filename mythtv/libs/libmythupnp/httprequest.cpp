@@ -1044,8 +1044,6 @@ bool HTTPRequest::ParseRequest()
 
                 m_response.write( Static401Error );
 
-                SendResponse();
-
                 return true;
             }
 
@@ -1459,7 +1457,7 @@ QString HTTPRequest::Encode(const QString &sIn)
 
 bool HTTPRequest::IsUrlProtected( const QString &sBaseUrl )
 {
-    QString sProtected = UPnp::g_pConfig->GetValue( "HTTP/Protected/Urls", "/setup;/Config" );
+    QString sProtected = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/Urls", "/setup;/Config" );
 
     QStringList oList = sProtected.split( ';' );
 
@@ -1493,13 +1491,13 @@ bool HTTPRequest::Authenticated()
     if (oList.count() < 2)
         return false;
 
-    QString sUserName = UPnp::g_pConfig->GetValue( "HTTP/Protected/UserName", "admin" );
+    QString sUserName = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/UserName", "admin" );
     
 
     if (oList[0].compare( sUserName, Qt::CaseInsensitive ) != 0)
         return false;
 
-    QString sPassword = UPnp::g_pConfig->GetValue( "HTTP/Protected/Password", 
+    QString sPassword = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/Password", 
                                  /* mythtv */ "8hDRxR1+E/n3/s3YUOhF+lUw7n4=" );
 
     QCryptographicHash crypto( QCryptographicHash::Sha1 );

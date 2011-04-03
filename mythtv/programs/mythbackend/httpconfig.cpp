@@ -1,4 +1,6 @@
 // Qt headers
+#include <QDir>
+#include <QFileInfo>
 #include <QTextStream>
 
 // MythTV headers
@@ -22,8 +24,6 @@ QStringList HttpConfig::GetBasePaths()
     paths << "/Config";
     paths << "/Config/Database";
     paths << "/Config/General";
-    paths << "/Config/GetValueList";
-    paths << "/Config/XML";
     return paths;
 }
 
@@ -32,6 +32,8 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
     if (!request)
         return false;
 
+    VERBOSE(VB_UPNP, QString("HttpConfig::ProcessRequest(): m_sBaseURL: '%1',"
+            "m_sMethod: '%2'").arg(request->m_sBaseUrl).arg(request->m_sMethod));
     if (!request->m_sBaseUrl.startsWith("/Config"))
     {
         return false;
@@ -139,6 +141,56 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
 
         request->FormatFileResponse(fn);
         return true;
+    }
+    else if ((request->m_sMethod == "FileBrowser") &&
+             (request->m_mapParams.contains("dir")))
+    {
+        QString startingDir = request->m_mapParams["dir"];
+        bool dirsOnly = true;
+        if (request->m_mapParams.contains("dirsOnly"))
+            dirsOnly = request->m_mapParams["dirsOnly"].toInt();
+
+        QDir dir(request->m_mapParams["dir"]);
+        if (dir.exists())
+        {
+            QTextStream os(&request->m_response);
+            os << "<ul class=\"jqueryFileTree\" style=\"display: none;\">\r\n";
+
+            QFileInfoList infoList = dir.entryInfoList();
+            for (QFileInfoList::iterator it  = infoList.begin();
+                                         it != infoList.end();
+                                       ++it )
+            {
+                QFileInfo &fi = *it;
+                if (!fi.isDir())
+                    continue;
+                if (fi.fileName().startsWith("."))
+                    continue;
+
+                os << "    <li class=\"directory collapsed\"><a href=\"#\" rel=\""
+                   << fi.absoluteFilePath() << "/\">" << fi.fileName() << "</a></li>\r\n";
+            }
+
+            if (!dirsOnly)
+            {
+                for (QFileInfoList::iterator it  = infoList.begin();
+                                             it != infoList.end();
+                                           ++it )
+                {
+                    QFileInfo &fi = *it;
+                    if (fi.isDir())
+                        continue;
+                    if (fi.fileName().startsWith("."))
+                        continue;
+
+                    os << "    <li class=\"file ext_" << fi.suffix() << "\"><a href=\"#\" rel=\""
+                       << fi.fileName() << "\">" << fi.fileName() << "</a></li>\r\n";
+                }
+            }
+            os << "</ul>\r\n";
+
+            handled = true;
+        }
     }
     else if ((request->m_sMethod == "GetValueList") &&
              (request->m_mapParams.contains("List")))

@@ -33,9 +33,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 UPnpDeviceDesc   UPnp::g_UPnpDeviceDesc;
-TaskQueue       *UPnp::g_pTaskQueue     = NULL;
-SSDP            *UPnp::g_pSSDP          = NULL;
-SSDPCache        UPnp::g_SSDPCache;
 QStringList      UPnp::g_IPAddrList;
 
 Configuration   *UPnp::g_pConfig        = NULL;
@@ -84,6 +81,21 @@ void UPnp::SetConfiguration( Configuration *pConfig )
 //
 //////////////////////////////////////////////////////////////////////////////
 
+Configuration *UPnp::GetConfiguration()
+{
+    // If someone is asking for a config and it's NULL, create a 
+    // new XmlConfiguration since we don't have database info yet.
+    
+    if (g_pConfig == NULL)
+        g_pConfig = new XmlConfiguration( "config.xml" );
+
+    return g_pConfig;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
 bool UPnp::Initialize( int nServicePort, HttpServer *pHttpServer )
 {
     QStringList sList;
@@ -118,50 +130,13 @@ bool UPnp::Initialize( QStringList &sIPAddrList, int nServicePort, HttpServer *p
     m_nServicePort = nServicePort;
 
     // ----------------------------------------------------------------------
-    // Initialize & Start the global Task Queue Processing Thread
-    // ----------------------------------------------------------------------
-
-    VERBOSE(VB_UPNP, "UPnp::Initialize - Starting TaskQueue");
-
-    g_pTaskQueue = new TaskQueue();
-    g_pTaskQueue->start();
-
-    // ----------------------------------------------------------------------
     // Register any HttpServerExtensions
     // ----------------------------------------------------------------------
 
     m_pHttpServer->RegisterExtension(
             new SSDPExtension( m_nServicePort, m_pHttpServer->m_sSharePath));
 
-    // ----------------------------------------------------------------------
-    // Add Task to keep SSDPCache purged of stale entries.
-    // ----------------------------------------------------------------------
-
-    UPnp::g_pTaskQueue->AddTask( new SSDPCacheTask() );
-
-    // ----------------------------------------------------------------------
-    // Create the SSDP (Upnp Discovery) Thread.
-    // ----------------------------------------------------------------------
-
-    VERBOSE(VB_UPNP, "UPnp::Initialize - Creating SSDP Thread at port "
-                     + QString::number(m_nServicePort));
-
-    g_pSSDP = new SSDP( m_nServicePort );
-
     VERBOSE(VB_UPNP, "UPnp::Initialize - End");
-
-    return true;
-}
-
-bool UPnp::InitializeSSDPOnly( void )
-{
-    VERBOSE(VB_UPNP, "UPnp::InitializeSSDPOnly - Creating SSDP Thread at port "
-                     + QString::number(m_nServicePort));
-
-    g_pSSDP = new SSDP( m_nServicePort );
-    g_pSSDP->start();
-
-    VERBOSE(VB_UPNP, "UPnp::InitializeSSDPOnly - End");
 
     return true;
 }
@@ -172,13 +147,13 @@ bool UPnp::InitializeSSDPOnly( void )
 
 void UPnp::Start()
 {
-    if (g_pSSDP != NULL)
-    {
-        VERBOSE(VB_UPNP, "UPnp::Start - Starting SSDP Thread (Multicast)");
-        g_pSSDP->start();
-        VERBOSE(VB_UPNP, "UPnp::Start - Enabling Notifications");
-        g_pSSDP->EnableNotifications();
-    }
+    VERBOSE(VB_UPNP, "UPnp::Start - Enabling SSDP Notifications");
+    // ----------------------------------------------------------------------
+    // Turn on Device Announcements 
+    // (this will also create/startup SSDP if not already done)
+    // ----------------------------------------------------------------------
+
+    SSDP::Instance()->EnableNotifications( m_nServicePort );
 
     VERBOSE(VB_UPNP, "UPnp::Start - Returning");
 }
@@ -189,26 +164,9 @@ void UPnp::Start()
 
 void UPnp::CleanUp()
 {
-    if (g_pSSDP)
-    {
-        VERBOSE(VB_UPNP, "UPnp::CleanUp() - disabling SSDP notifications");
+    VERBOSE(VB_UPNP, "UPnp::CleanUp() - disabling SSDP notifications");
 
-        delete g_pSSDP;
-        g_pSSDP = NULL;
-        VERBOSE(VB_UPNP, "UPnp::CleanUp() - deleted SSDP");
-    }
-
-    // ----------------------------------------------------------------------
-    // Clear the Task Queue & terminate Thread
-    // ----------------------------------------------------------------------
-
-    if (g_pTaskQueue)
-    {
-        g_pTaskQueue->Clear();
-
-        delete g_pTaskQueue;
-        g_pTaskQueue = NULL;
-    }
+    SSDP::Instance()->DisableNotifications();
 
     if (g_pConfig)
     {
@@ -216,23 +174,6 @@ void UPnp::CleanUp()
         g_pConfig = NULL;
     }
 
-}
-
-//////////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////////
-
-SSDPCacheEntries *UPnp::Find( const QString &sURI )
-{
-    return g_SSDPCache.Find( sURI );
-}
-
-//////////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////////
-DeviceLocation *UPnp::Find( const QString &sURI, const QString &sUSN )
-{
-    return g_SSDPCache.Find( sURI, sUSN );
 }
 
 //////////////////////////////////////////////////////////////////////////////

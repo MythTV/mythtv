@@ -1263,7 +1263,7 @@ int main(int argc, char **argv)
         }
     }
 
-    if (!gContext->Init(true, g_pUPnp, bPromptForBackend, bBypassAutoDiscovery))
+    if (!gContext->Init(true, bPromptForBackend, bBypassAutoDiscovery))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;

@@ -99,7 +99,7 @@ static void fill_setting(
                 if (ok)
                 {
                     uint sel = 0;
-                    for (uint i = setting->data_list.size(); i >= 0; i--)
+                    for (int i = setting->data_list.size() - 1; i >= 0; i--)
                     {
                         if (idata < setting->data_list[i].toLongLong())
                             break;
@@ -157,6 +157,26 @@ QString MythSetting::ToHTML(uint level) const
     QString ret = indent(level) +
         QString("<div class=\"setting\" id=\"%1_div\">\r\n").arg(value);
 
+    int size = 20;
+    switch (dtype)
+    {
+        case kFloat:
+        case kInteger:
+        case kIntegerRange:
+        case kUnsignedInteger:
+            size = 10;
+            break;
+        case kTimeOfDay:
+            size = 5;
+            break;
+        case kString:
+            size = 60;
+            break;
+        case kIPAddress:
+            size = 17;
+            break;
+    }
+
     switch (dtype)
     {
         case kInteger:
@@ -169,12 +189,14 @@ QString MythSetting::ToHTML(uint level) const
         case kTimeOfDay:
         case kOther:
             ret += indent(level) +
-                "<div class=\"setting_label\">" + label + "</div>\r\n";
+                "<div class=\"setting_label\">" + label + " "
+                "<a class=\"helpLink\" href=\"javascript:showSettingHelp('" + 
+                value + "')\">[?]</a></div>\r\n";
             ret += indent(level) +
-                QString("<input name=\"%1_input\" id=\"%2\" type=\"text\""
-                        " value=\"%3\"/><div class=\"form_error\""
-                        "id=\"%4_error\"></div>\r\n")
-                .arg(value).arg(value).arg(data).arg(value);
+                QString("<input name=\"%1\" id=\"%2\" type=\"text\""
+                        " value=\"%3\" size='%4'/><div class=\"form_error\""
+                        "id=\"%5_error\"></div>\r\n")
+                .arg(value).arg(value).arg(data).arg(size).arg(value);
             ret += indent(level) +
                 QString("<div style=\"display:none;"
                         "position:absolute;left:-4000px\" "
@@ -183,7 +205,9 @@ QString MythSetting::ToHTML(uint level) const
             break;
         case kCheckBox:
             ret += indent(level) +
-                "<div class=\"setting_label\">" + label + "</div>\r\n";
+                "<div class=\"setting_label\">" + label + " "
+                "<a class=\"helpLink\" href=\"javascript:showSettingHelp('" + 
+                value + "')\">[?]</a></div>\r\n";
             ret += indent(level) +
                 QString("<input name=\"%1_input\" id=\"%2\" type=\"checkbox\""
                         " value=\"1\" %3/><div class=\"form_error\""
@@ -201,7 +225,9 @@ QString MythSetting::ToHTML(uint level) const
         case kFrequencyTable:
         case kSelect:
             ret +=  indent(level) +
-                "<div class=\"setting_label\">" + label + "</div>\r\n";
+                "<div class=\"setting_label\">" + label + " "
+                "<a class=\"helpLink\" href=\"javascript:showSettingHelp('" + 
+                value + "')\">[?]</a></div>\r\n";
             ret +=  indent(level) +
                 QString("<select name=\"%1_input\" id=\"%2\">\r\n")
                 .arg(value).arg(value);

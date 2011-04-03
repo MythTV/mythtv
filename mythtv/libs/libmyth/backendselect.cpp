@@ -19,9 +19,9 @@
 #include <QHash>
 
 BackendSelection::BackendSelection(MythScreenStack *parent, DatabaseParams *params,
-                                   XmlConfiguration *xmlconf, bool exitOnFinish)
+                                   Configuration *conf, bool exitOnFinish)
     : MythScreenType(parent, "BackEnd Selection"),
-      m_DBparams(params), m_XML(xmlconf), m_exitOnFinish(exitOnFinish),
+      m_DBparams(params), m_pConfig(conf), m_exitOnFinish(exitOnFinish),
       m_backendList(NULL), m_manualButton(NULL), m_saveButton(NULL),
       m_cancelButton(NULL)
 {
@@ -29,7 +29,7 @@ BackendSelection::BackendSelection(MythScreenStack *parent, DatabaseParams *para
 
 BackendSelection::~BackendSelection()
 {
-    UPnp::RemoveListener(this);
+    SSDP::RemoveListener(this);
 
     ItemMap::iterator it;
     for (it = m_devices.begin(); it != m_devices.end(); ++it)
@@ -46,7 +46,7 @@ BackendSelection::~BackendSelection()
 bool BackendSelection::m_backendChanged = false;
 
 bool BackendSelection::prompt(DatabaseParams *dbParams,
-                              XmlConfiguration *xmlConfig)
+                              Configuration  *pConfig)
 {
     m_backendChanged = false;
 
@@ -56,7 +56,7 @@ bool BackendSelection::prompt(DatabaseParams *dbParams,
 
     BackendSelection *backendSettings = new BackendSelection(mainStack,
                                                              dbParams,
-                                                             xmlConfig, true);
+                                                             pConfig, true);
 
     if (backendSettings->Create())
     {
@@ -107,10 +107,13 @@ void BackendSelection::Accept(MythUIButtonListItem *item)
 
     if (ConnectBackend(dev))  // this does a Release()
     {
-        if (m_pinCode.length())
-            m_XML->SetValue(kDefaultPIN, m_pinCode);
-        m_XML->SetValue(kDefaultUSN, m_USN);
-        m_XML->Save();
+        if (m_pConfig)
+        {
+            if (m_pinCode.length())
+                m_pConfig->SetValue(kDefaultPIN, m_pinCode);
+            m_pConfig->SetValue(kDefaultUSN, m_USN);
+            m_pConfig->Save();
+        }
         Close();
     }
 }
@@ -133,9 +136,15 @@ void BackendSelection::AddItem(DeviceLocation *dev)
 
     QString USN = dev->m_sUSN;
 
+    m_mutex.lock();
+
     // The devices' USN should be unique. Don't add if it is already there:
     if (m_devices.find(USN) == m_devices.end())
     {
+        dev->AddRef();
+        m_devices.insert(USN, dev);
+
+        m_mutex.unlock();
 
         InfoMap infomap;
         dev->GetDeviceDetail(infomap, true);
@@ -164,10 +173,9 @@ void BackendSelection::AddItem(DeviceLocation *dev)
 
         bool needPin = dev->NeedSecurityPin();
         item->DisplayState(needPin ? "yes" : "no", "securitypin");
-
-        dev->AddRef();
-        m_devices.insert(USN, dev);
     }
+    else
+        m_mutex.unlock();
 
     dev->Release();
 }
@@ -181,12 +189,15 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
     QString          error;
     QString          message;
     UPnPResultCode   stat;
-    MythXMLClient   *xml;
 
-    m_USN = dev->m_sUSN;
-    xml   = new MythXMLClient(dev->m_sLocation);
-    stat  = xml->GetConnectionInfo(m_pinCode, m_DBparams, message);
+    m_USN   = dev->m_sUSN;
+
+    MythXMLClient client( dev->m_sLocation );
+
+    stat    = client.GetConnectionInfo(m_pinCode, m_DBparams, message);
+
     QString backendName = dev->GetFriendlyName(true);
+
     if (backendName == "<Unknown>")
         backendName = dev->m_sLocation;
 
@@ -200,11 +211,10 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
         case UPnPResult_HumanInterventionRequired:
             VERBOSE(VB_UPNP, error);
             ShowOkPopup(message);
+
             if (TryDBfromURL("", dev->m_sLocation))
-            {
-                delete xml;
                 return true;
-            }
+
             break;
 
         case UPnPResult_ActionNotAuthorized:
@@ -212,6 +222,7 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
                     .arg(backendName));
             PromptForPassword();
             break;
+
         default:
             VERBOSE(VB_UPNP, QString("GetConnectionInfo() failed for %1")
                     .arg(backendName));
@@ -220,7 +231,6 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
 
     // Back to the list, so the user can choose a different backend:
     SetFocusWidget(m_backendList);
-    delete xml;
     return false;
 }
 
@@ -231,8 +241,8 @@ void BackendSelection::Cancel()
 
 void BackendSelection::Load()
 {
-    UPnp::AddListener(this);
-    UPnp::PerformSearch(gBackendURI);
+    SSDP::Instance()->AddListener(this);
+    SSDP::Instance()->PerformSearch(gBackendURI);
 }
 
 void BackendSelection::Init(void)
@@ -241,7 +251,7 @@ void BackendSelection::Init(void)
     EntryMap            ourMap;
     DeviceLocation     *pDevLoc;
 
-    SSDPCacheEntries *pEntries = UPnp::g_SSDPCache.Find(gBackendURI);
+    SSDPCacheEntries *pEntries = SSDPCache::Instance()->Find( gBackendURI );
 
     if (!pEntries)
     {
@@ -282,6 +292,8 @@ void BackendSelection::Manual(void)
 
 void BackendSelection::RemoveItem(QString USN)
 {
+    m_mutex.lock();
+
     ItemMap::iterator it = m_devices.find(USN);
 
     if (it != m_devices.end())
@@ -293,12 +305,9 @@ void BackendSelection::RemoveItem(QString USN)
 
         m_devices.erase(it);
     }
-}
 
-// void BackendSelection::Search(void)
-// {
-//     UPnp::PerformSearch(gBackendURI);
-// }
+    m_mutex.unlock();
+}
 
 bool BackendSelection::TryDBfromURL(const QString &error, QString URL)
 {
@@ -331,7 +340,7 @@ void BackendSelection::customEvent(QEvent *event)
         if (message.startsWith("SSDP_ADD") &&
             URI.startsWith("urn:schemas-mythtv-org:device:MasterMediaServer:"))
         {
-            DeviceLocation *devLoc = UPnp::g_SSDPCache.Find(URI, URN);
+            DeviceLocation *devLoc = SSDP::Instance()->Find(URI, URN);
 
             if (devLoc)
             {

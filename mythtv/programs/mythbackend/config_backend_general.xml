@@ -7,7 +7,7 @@
     <group human_label="Local Backend" unique_label="local_server">
       <setting
          value="BackendServerIP" default_data="127.0.0.1"
-         setting_type="host" label="IP address"
+         setting_type="host" label="Local IP address"
          help_text="Enter the IP address of this machine.
                     Use an externally accessible address (ie, not 
                     127.0.0.1) if you are going to be running a frontend
@@ -36,7 +36,7 @@
     <group human_label="Master Backend" unique_label="master_server">
       <setting
          value="MasterServerIP" default_data="127.0.0.1"
-         setting_type="global" label="IP address"
+         setting_type="global" label="Master Backend IP address"
          help_text="The IP address of the master backend server. All
                     frontend and non-master backend machines will connect
                     to this server.  If you only have one backend,
@@ -177,7 +177,7 @@
            help_text="This setting controls how the Storage Group
                       scheduling code will balance new recordings across
                       directories. 'Balanced Free Space' is the recommended
-		      method for most users."
+                      method for most users."
            data_type="select">
           <option display="Balanced Free Space" data="BalancedFreeSpace" />
           <option display="Balanced Disk I/O" data="BalancedDiskIO" />
@@ -855,6 +855,174 @@
                           distribute load on their servers. If this setting is
                           enabled, mythfilldatabase Execution Start/End times
                           are ignored." />
+    </group>
+    <group human_label="System Events"
+           unique_label="system_events">
+      <setting
+         value="EventCmdRecPending" label="Recording pending"
+         setting_type="host" default_data=""
+         help_text="EventCmdRecPending"
+         data_type="string" />
+      <setting
+         value="EventCmdRecStarted" label="Recording started"
+         setting_type="host" default_data=""
+         help_text="EventCmdRecStarted"
+         data_type="string" />
+      <setting
+         value="EventCmdRecFinished" label="Recording finished"
+         setting_type="host" default_data=""
+         help_text="EventCmdRecFinished"
+         data_type="string" />
+      <setting
+         value="EventCmdRecDeleted" label="Recording deleted"
+         setting_type="host" default_data=""
+         help_text="EventCmdRecDeleted"
+         data_type="string" />
+      <setting
+         value="EventCmdRecExpired" label="Recording expired"
+         setting_type="host" default_data=""
+         help_text="EventCmdRecExpired"
+         data_type="string" />
+      <setting
+         value="EventCmdLivetvStarted" label="LiveTV started"
+         setting_type="host" default_data=""
+         help_text="EventCmdLivetvStarted"
+         data_type="string" />
+      <setting
+         value="EventCmdPlayStarted" label="Playback started"
+         setting_type="host" default_data=""
+         help_text="EventCmdPlayStarted"
+         data_type="string" />
+      <setting
+         value="EventCmdPlayStopped" label="Playback stopped"
+         setting_type="host" default_data=""
+         help_text="EventCmdPlayStopped"
+         data_type="string" />
+      <setting
+         value="EventCmdPlayPaused" label="Playback paused"
+         setting_type="host" default_data=""
+         help_text="EventCmdPlayPaused"
+         data_type="string" />
+      <setting
+         value="EventCmdPlayUnpaused" label="Playback unpaused"
+         setting_type="host" default_data=""
+         help_text="EventCmdPlayUnpaused"
+         data_type="string" />
+      <setting
+         value="EventCmdPlayChanged" label="Playback program changed"
+         setting_type="host" default_data=""
+         help_text="EventCmdPlayChanged"
+         data_type="string" />
+      <setting
+         value="EventCmdMasterStarted" label="Master backend started"
+         setting_type="host" default_data=""
+         help_text="EventCmdMasterStarted"
+         data_type="string" />
+      <setting
+         value="EventCmdMasterShutdown" label="Master backend shutdown"
+         setting_type="host" default_data=""
+         help_text="EventCmdMasterShutdown"
+         data_type="string" />
+      <setting
+         value="EventCmdClientConnected" label="Client connected to master backend"
+         setting_type="host" default_data=""
+         help_text="EventCmdClientConnected"
+         data_type="string" />
+      <setting
+         value="EventCmdClientDisconnected" label="Client disconnected from master backend"
+         setting_type="host" default_data=""
+         help_text="EventCmdClientDisconnected"
+         data_type="string" />
+      <setting
+         value="EventCmdSlaveConnected" label="Slave backend connected to master"
+         setting_type="host" default_data=""
+         help_text="EventCmdSlaveConnected"
+         data_type="string" />
+      <setting
+         value="EventCmdSlaveDisconnected" label="Slave backend disconnected from master"
+         setting_type="host" default_data=""
+         help_text="EventCmdSlaveDisconnected"
+         data_type="string" />
+      <setting
+         value="EventCmdNetCtrlConnected" label="Network Control client connected"
+         setting_type="host" default_data=""
+         help_text="EventCmdNetCtrlConnected"
+         data_type="string" />
+      <setting
+         value="EventCmdNetCtrlDisconnected" label="Network Control client disconnected"
+         setting_type="host" default_data=""
+         help_text="EventCmdNetCtrlDisconnected"
+         data_type="string" />
+      <setting
+         value="EventCmdMythfilldatabaseRan" label="mythfilldatabase ran"
+         setting_type="host" default_data=""
+         help_text="EventCmdMythfilldatabaseRan"
+         data_type="string" />
+      <setting
+         value="EventCmdSchedulerRan" label="Scheduler ran"
+         setting_type="host" default_data=""
+         help_text="EventCmdSchedulerRan"
+         data_type="string" />
+      <setting
+         value="EventCmdSettingsCacheCleared" label="Settings cache cleared"
+         setting_type="host" default_data=""
+         help_text="EventCmdSettingsCacheCleared"
+         data_type="string" />
+      <setting
+         value="EventCmdKey01" label="Keystroke event #1"
+         setting_type="host" default_data=""
+         help_text="EventCmdKey01"
+         data_type="string" />
+      <setting
+         value="EventCmdKey02" label="Keystroke event #2"
+         setting_type="host" default_data=""
+         help_text="EventCmdKey02"
+         data_type="string" />
+      <setting
+         value="EventCmdKey03" label="Keystroke event #3"
+         setting_type="host" default_data=""
+         help_text="EventCmdKey03"
+         data_type="string" />
+      <setting
+         value="EventCmdKey04" label="Keystroke event #4"
+         setting_type="host" default_data=""
+         help_text="EventCmdKey04"
+         data_type="string" />
+      <setting
+         value="EventCmdKey05" label="Keystroke event #5"
+         setting_type="host" default_data=""
+         help_text="EventCmdKey05"
+         data_type="string" />
+      <setting
+         value="EventCmdKey06" label="Keystroke event #6"
+         setting_type="host" default_data=""
+         help_text="EventCmdKey06"
+         data_type="string" />
+      <setting
+         value="EventCmdKey07" label="Keystroke event #7"
+         setting_type="host" default_data=""
+         help_text="EventCmdKey07"
+         data_type="string" />
+      <setting
+         value="EventCmdKey08" label="Keystroke event #8"
+         setting_type="host" default_data=""
+         help_text="EventCmdKey08"
+         data_type="string" />
+      <setting
+         value="EventCmdKey09" label="Keystroke event #9"
+         setting_type="host" default_data=""
+         help_text="EventCmdKey09"
+         data_type="string" />
+      <setting
+         value="EventCmdKey10" label="Keystroke event #10"
+         setting_type="host" default_data=""
+         help_text="EventCmdKey10"
+         data_type="string" />
+      <setting
+         value="EventCmdAll" label="Any event"
+         setting_type="host" default_data=""
+         help_text="EventCmdAll"
+         data_type="string" />
     </group>
   </group>
 </config>

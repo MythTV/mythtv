@@ -64,7 +64,7 @@ QString LookupUDN( QString sDeviceType )
     }
 
     sName = "UPnP/UDN/" + sList[ sList.size() - 2 ];
-    sUDN  = UPnp::g_pConfig->GetValue( sName, "" );
+    sUDN  = UPnp::GetConfiguration()->GetValue( sName, "" );
 
     VERBOSE(VB_UPNP, sLoc + " sName=" + sName + ", sUDN=" + sUDN);
 
@@ -74,9 +74,10 @@ QString LookupUDN( QString sDeviceType )
 
         sUDN = sUDN.mid( 1, sUDN.length() - 2);
 
-        UPnp::g_pConfig->SetValue( sName, sUDN );
+        Configuration *pConfig = UPnp::GetConfiguration();
 
-        UPnp::g_pConfig->Save();
+        pConfig->SetValue( sName, sUDN );
+        pConfig->Save();
     }
 
     return( sUDN );

@@ -68,7 +68,7 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
     bool WasPreempted(void);
     bool SetColorKey(uint color);
     void WaitForFlip(void);
-    void Flip(int delay = 0);
+    void Flip(void);
     void SyncDisplay(void);
     void DrawDisplayRect(const QRect &rect, bool use_colorkey = false);
     void MoveResizeWin(QRect &rect);

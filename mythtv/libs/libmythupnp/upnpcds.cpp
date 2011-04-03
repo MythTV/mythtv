@@ -77,7 +77,7 @@ UPnpCDS::UPnpCDS( UPnpDevice *pDevice, const QString &sSharePath )
 
     SetValue< unsigned short >( "SystemUpdateID", 1 );
 
-    QString sUPnpDescPath = UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath", sSharePath );
+    QString sUPnpDescPath = UPnp::GetConfiguration()->GetValue( "UPnP/DescXmlPath", sSharePath );
 
     m_sServiceDescFileName = sUPnpDescPath + "CDS_scpd.xml";
     m_sControlUrl          = "/CDS_Control";

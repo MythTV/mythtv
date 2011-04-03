@@ -1,16 +1,18 @@
 #ifndef __BACKENDSELECT_H__
 #define __BACKENDSELECT_H__
 
+#include <QMutex>
+
 // libmythui
 #include "mythscreentype.h"
 #include "mythuibuttonlist.h"
 
+#include "configuration.h"
 #include "upnpdevice.h"
 
 class MythUIButtonList;
 class MythUIButton;
 
-class XmlConfiguration;
 struct DatabaseParams;
 
 // TODO: The following do not belong here, but I cannot think of a better
@@ -36,13 +38,13 @@ class BackendSelection : public MythScreenType
 
   public:
     BackendSelection(MythScreenStack *parent, DatabaseParams *params,
-                     XmlConfiguration *xmlConfig, bool exitOnFinish = false);
+                     Configuration *pConfig, bool exitOnFinish = false);
     virtual ~BackendSelection();
 
     bool Create(void);
     void customEvent(QEvent *event);
 
-    static bool prompt(DatabaseParams *dbParams, XmlConfiguration *xmlConfig);
+    static bool prompt(DatabaseParams *dbParams, Configuration *pConfig);
 
   signals:
 //    void
@@ -64,7 +66,7 @@ class BackendSelection : public MythScreenType
     void PromptForPassword(void);
 
     DatabaseParams *m_DBparams;
-    XmlConfiguration *m_XML;
+    Configuration  *m_pConfig;
     bool m_exitOnFinish;
     ItemMap m_devices;
 
@@ -76,6 +78,8 @@ class BackendSelection : public MythScreenType
 
     QString m_pinCode;
     QString m_USN;
+
+    QMutex  m_mutex;
 
     static bool m_backendChanged;
 };

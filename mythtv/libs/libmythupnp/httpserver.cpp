@@ -261,7 +261,7 @@ HttpWorkerThread::HttpWorkerThread( HttpServer *pParent, const QString &sName ) 
 {
     m_pHttpServer    = pParent;
     m_nSocket        = 0;                                                  
-    m_nSocketTimeout = UPnp::g_pConfig->GetValue( "HTTP/KeepAliveTimeoutSecs", 10 ) * 1000;
+    m_nSocketTimeout = UPnp::GetConfiguration()->GetValue( "HTTP/KeepAliveTimeoutSecs", 10 ) * 1000;
 
     m_pData          = NULL;
 }                  
@@ -350,7 +350,8 @@ void  HttpWorkerThread::ProcessWork()
                         // delegate processing to HttpServerExtensions.
                         // ------------------------------------------------------
 
-                        m_pHttpServer->DelegateRequest( this, pRequest );
+                        if (pRequest->m_nResponseStatus != 401)
+                            m_pHttpServer->DelegateRequest( this, pRequest );
                     }
                     else
                     {

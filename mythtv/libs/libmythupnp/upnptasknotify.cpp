@@ -54,7 +54,7 @@ UPnpNotifyTask::UPnpNotifyTask( int nServicePort )
     m_nServicePort = nServicePort;
     m_eNTS         = NTS_alive;
 
-    m_nMaxAge      = UPnp::g_pConfig->GetValue( "UPnP/SSDP/MaxAge" , 3600 );
+    m_nMaxAge      = UPnp::GetConfiguration()->GetValue( "UPnP/SSDP/MaxAge" , 3600 );
 } 
 
 /////////////////////////////////////////////////////////////////////////////

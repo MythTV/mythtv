@@ -129,12 +129,38 @@
         background-color: #FFFFFF;
         top: 10px;
         right: 10px;
-        height: 400px;
-        width: 400px;
+        height: 200px;
+        width: 300px;
         z-index: 999;
+        padding: 5px 5px 5px 5px;
         border-width: 6px;
         border-color: #0000FF;
         border-style: double;
+    }
+
+    #helpContent {
+        height:             140;
+        overflow:           auto;
+    }
+
+    .Header {
+        font-size:          22px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        color:              blue;
+        width:              100%;
+        text-align:         center;
+    }
+
+    .Footer {
+        font-size:          12px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        color:              black;
+        width:              100%;
+        text-align:         center;
+        position:           relative;
+        bottom:             0px;
     }
 
     div.helpLink {
@@ -144,3 +170,40 @@
         color:              blue;
         float:              left;
     }
+
+    a.helpLink {
+        font-size:          10px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        color:              blue;
+    }
+
+    #fileBrowser-bg
+    {
+        position: fixed;
+        display: none;
+        left: 310px;
+        top: 50px;
+        width: 340px;
+        height: 450px;
+        border-width: 6px;
+        border-color: #0000FF;
+        border-style: double;
+        background: #DDDDDD;
+        z-index: 111;
+    }
+
+    #fileBrowser
+    {
+        position: fixed;
+        left: 330px;
+        top: 80px;
+        width: 300px;
+        height: 400px;
+        border: solid 2px #BBB;
+        background: #FFF;
+        overflow: scroll;
+        padding: 5px;
+        z-index: 110;
+    }
+

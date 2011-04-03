@@ -55,7 +55,7 @@ UPnpSearchTask::UPnpSearchTask( int          nServicePort,
     m_sST         = sST;
     m_sUDN        = sUDN;
     m_nServicePort= nServicePort;
-    m_nMaxAge     = UPnp::g_pConfig->GetValue( "UPnP/SSDP/MaxAge" , 3600 );
+    m_nMaxAge     = UPnp::GetConfiguration()->GetValue( "UPnP/SSDP/MaxAge" , 3600 );
 
 } 
 

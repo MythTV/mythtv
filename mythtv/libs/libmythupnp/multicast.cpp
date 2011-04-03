@@ -57,7 +57,7 @@ QMulticastSocket::QMulticastSocket( QString sAddress, quint16 nPort, quint8 ttl 
     m_address.setAddress( sAddress );
     m_port = nPort;
 
-    //  ttl = UPnp::g_pConfig->GetValue( "UPnP/TTL", 4 );
+    //  ttl = UPnp::GetConfiguration()_pConfig->GetValue( "UPnP/TTL", 4 );
 
     if (ttl == 0)
         ttl = 4;

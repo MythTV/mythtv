@@ -56,21 +56,6 @@
     #define UNUSED_FILENO 3
 #endif
 
-class MediaServerThread : public QThread
-{
-  public:
-    void run(void)
-    {
-        g_pUPnp = new MediaServer();
-        exec();
-    }
-
-    void BlockUntilReloadNeeded(void)
-    {
-        sleep(60); // TODO
-    }
-};
-
 int main(int argc, char **argv)
 {
     bool cmdline_err;
@@ -178,22 +163,15 @@ int main(int argc, char **argv)
         return handle_command(cmdline);
     }
 
-    ///////////////////////////////////////////
-
-    MediaServerThread *mst = new MediaServerThread();
-    mst->start();
-    while (!mst->isRunning())
-        usleep(25000);
-    while (!g_pUPnp)
-        usleep(25000);
-
-    ///////////////////////////////////////////
-
-    while (true)
-    {
+    /////////////////////////////////////////////////////////////////////////
+    // Not sure we want to keep running the backend when there is an error.
+    // Currently, it keeps repeating the same error over and over.
+    // Removing loop until reason for having it is understood.
+    //
+    //while (true)
+    //{
         exitCode = run_backend(cmdline);
-        mst->BlockUntilReloadNeeded();
-    }
+    //}
 
     return exitCode;
 }

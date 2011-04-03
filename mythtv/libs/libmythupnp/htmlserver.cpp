@@ -47,7 +47,10 @@ HtmlServerExtension::HtmlServerExtension( const QString sSharePath)
     {
         QString sTempSharePath = getenv("MYTHHTMLDIR");
         if (!sTempSharePath.isEmpty())
-            m_sAbsoluteSharePath = sTempSharePath;
+        {
+            dir.setPath( sTempSharePath );
+            m_sAbsoluteSharePath = dir.absolutePath();
+        }
     }
 }
 
@@ -74,12 +77,12 @@ bool HtmlServerExtension::ProcessRequest( HttpWorkerThread *, HTTPRequest *pRequ
 
         if (oInfo.isDir())
         {
-            QString sIndexFileName = oInfo.filePath() + "/index.qsp";
+            QString sIndexFileName = oInfo.filePath() + "index.qsp";
 
             if (QFile::exists( sIndexFileName ))
                 oInfo.setFile( sIndexFileName );
             else 
-                oInfo.setFile( oInfo.filePath() + "/index.html" );
+                oInfo.setFile( oInfo.filePath() + "index.html" );
         }
 
         if (oInfo.exists() == true )
