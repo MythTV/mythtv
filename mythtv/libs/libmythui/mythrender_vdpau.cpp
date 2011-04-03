@@ -423,7 +423,7 @@ void MythRenderVDPAU::WaitForFlip(void)
     CHECK_ST
 }
 
-void MythRenderVDPAU::Flip(int delay)
+void MythRenderVDPAU::Flip(void)
 {
     if (!m_flipReady || !m_display)
         return;
@@ -441,15 +441,7 @@ void MythRenderVDPAU::Flip(int delay)
     }
 
     INIT_ST
-    VdpTime now = 0;
-    if (delay > 0 && vdp_presentation_queue_get_time)
-    {
-        vdp_st = vdp_presentation_queue_get_time(m_flipQueue, &now);
-        CHECK_ST
-        now += delay * 1000;
-    }
-
-    vdp_st = vdp_presentation_queue_display(m_flipQueue, surface, m_rect.x1, m_rect.y1, now);
+    vdp_st = vdp_presentation_queue_display(m_flipQueue, surface, m_rect.x1, m_rect.y1, 0);
     CHECK_ST
     SyncDisplay();
 }

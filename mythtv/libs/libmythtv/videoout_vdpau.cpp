@@ -53,7 +53,7 @@ VideoOutputVDPAU::VideoOutputVDPAU()
     m_need_deintrefs(false), m_video_mixer(0), m_mixer_features(kVDPFeatNone),
     m_checked_surface_ownership(false),
     m_checked_output_surfaces(false),
-    m_decoder(0),            m_pix_fmt(-1),    m_frame_delay(0),
+    m_decoder(0),            m_pix_fmt(-1),
     m_lock(QMutex::Recursive), m_pip_layer(0), m_pip_surface(0),
     m_pip_ready(false),      m_osd_painter(NULL),
     m_skip_chroma(false),    m_denoise(0.0f),
@@ -638,10 +638,7 @@ void VideoOutputVDPAU::Show(FrameScanType scan)
         DrawUnusedRects(false);
 
     if (m_render)
-    {
-        m_render->Flip(m_frame_delay);
-        m_frame_delay = 0;
-    }
+        m_render->Flip();
     CheckFrameStates();
 }
 

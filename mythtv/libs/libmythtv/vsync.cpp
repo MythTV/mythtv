@@ -380,41 +380,6 @@ int RTCVideoSync::WaitForFrame(int sync_delay)
 }
 #endif /* __linux__ */
 
-#ifdef USING_VDPAU
-VDPAUVideoSync::VDPAUVideoSync(VideoOutput *vo,
-                              int fr, int ri, bool intl) :
-    VideoSync(vo, fr, ri, intl)
-{
-}
-
-VDPAUVideoSync::~VDPAUVideoSync()
-{
-}
-
-bool VDPAUVideoSync::TryInit(void)
-{
-    VideoOutputVDPAU *vo = dynamic_cast<VideoOutputVDPAU*>(m_video_output);
-    if (!vo)
-        return false;
-
-    return true;
-}
-
-int VDPAUVideoSync::WaitForFrame(int sync_delay)
-{
-    // Offset for externally-provided A/V sync delay
-    m_nexttrigger += sync_delay;
-    m_delay = CalcDelay();
-
-    if (m_delay < 0)
-        m_delay = 0;
-
-    VideoOutputVDPAU *vo = (VideoOutputVDPAU *)(m_video_output);
-    vo->SetNextFrameDisplayTimeOffset(m_delay);
-    return 0;
-}
-#endif
-
 BusyWaitVideoSync::BusyWaitVideoSync(VideoOutput *vo,
                                      int fr, int ri, bool intl) :
     VideoSync(vo, fr, ri, intl)
