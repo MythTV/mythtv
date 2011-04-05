@@ -159,7 +159,10 @@ class VDPAUOutputSurface : public VDPAUResource
 class VDPAUVideoSurface : public VDPAUResource
 {
   public:
-    VDPAUVideoSurface() {}
+    VDPAUVideoSurface()
+    {
+        memset(&m_render, 0, sizeof(struct vdpau_render_state));
+    }
     VDPAUVideoSurface(uint id, QSize size, VdpChromaType type)
       : VDPAUResource(id, size), m_type(type), m_needs_reset(false)
     {
