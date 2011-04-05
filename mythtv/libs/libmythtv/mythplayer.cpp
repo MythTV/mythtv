@@ -209,6 +209,9 @@ MythPlayer::MythPlayer(bool muted)
       // Debugging variables
       output_jmeter(NULL)
 {
+    memset(&tc_lastval, 0, sizeof(tc_lastval));
+    memset(&tc_wrap,    0, sizeof(tc_wrap));
+
     playerThread = QThread::currentThread();
     // Playback (output) zoom control
     detect_letter_box = new DetectLetterbox(this);
@@ -226,8 +229,6 @@ MythPlayer::MythPlayer(bool muted)
     endExitPrompt      = gCoreContext->GetNumSetting("EndOfRecordingExitPrompt");
     pip_default_loc    = (PIPLocation)gCoreContext->GetNumSetting("PIPLocation", kPIPTopLeft);
     tc_wrap[TC_AUDIO]  = gCoreContext->GetNumSetting("AudioSyncOffset", 0);
-    memset(&tc_lastval, 0, sizeof(tc_lastval));
-    memset(&tc_wrap,    0, sizeof(tc_wrap));
 
     // Get VBI page number
     QString mypage = gCoreContext->GetSetting("VBIpageNr", "888");

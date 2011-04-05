@@ -91,7 +91,6 @@ class AudioReencodeBuffer : public AudioOutput
     virtual bool AddData(void *buffer, int len, int64_t timecode, int frames)
     {
         int freebuf = bufsize - audiobuffer_len;
-        int newlen;
 
         if (len > freebuf)
         {
