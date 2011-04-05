@@ -8,6 +8,12 @@
 #include "mythcontext.h"
 #include "mythdb.h"
 
+MythSetting::SettingType parse_setting_type(const QString &str);
+MythSetting::DataType parse_data_type(const QString &str);
+bool parse_dom(MythSettingList &settings, const QDomElement &element,
+               const QString &filename, const QString &group,
+               bool includeAllChildren, bool &foundGroup);
+
 static QString indent(uint level)
 {
     QString ret;
