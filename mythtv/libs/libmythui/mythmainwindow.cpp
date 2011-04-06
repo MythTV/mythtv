@@ -1455,7 +1455,25 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
     if (e->key() == 0 && !e->text().isEmpty() &&
         e->modifiers() == Qt::NoModifier)
     {
-        actions.append(e->text());
+        QString action = e->text();
+        // check if it is a jumppoint
+        if (!d->destinationMap.contains(action))
+        {
+            actions.append(action);
+            return false;
+        }
+
+        if (allowJumps)
+        {
+            // This does not filter the jump based on the current location but
+            // is consistent with handling of other actions that do not need
+            // a keybinding. The network control code tries to match
+            // GetCurrentLocation with the jumppoint but matching is utterly
+            // inconsistent e.g. mainmenu<->Main Menu, Playback<->Live TV
+            JumpTo(action);
+            return true;
+        }
+
         return false;
     }
 
