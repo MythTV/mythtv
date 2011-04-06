@@ -53,7 +53,7 @@ function saveWizard() {
 }
 
 function preloadWizardTabs() {
-    $tabs = $("#wizardtabs").tabs({ cache: true });
+    $tabs = $("#wizardtabs").tabs({ cache: true, fx: { opacity: 'toggle', height: 'toggle' } });
     var total = $tabs.find('.ui-tabs-nav li').length;
     var currentLoadingTab = 0;
     $tabs.bind('tabsload',function(){

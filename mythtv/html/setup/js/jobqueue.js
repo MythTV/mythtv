@@ -62,5 +62,5 @@ function saveJobEditor() {
         setEditStatusMessage("Save Successful");
 }
 
-$("#setuptabs").tabs({ cache: true });
+$("#setuptabs").tabs({ cache: true, fx: { opacity: 'toggle', height: 'toggle' } });
 

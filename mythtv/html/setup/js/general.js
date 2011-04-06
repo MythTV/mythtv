@@ -1,3 +1,3 @@
 
-$("#generaltabs").tabs({ cache: true });
+$("#generaltabs").tabs({ cache: true, fx: { opacity: 'toggle', height: 'toggle' } });
 

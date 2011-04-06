@@ -14,7 +14,7 @@ function appendTabRow(tabID, id, group, host, dir) {
 function initStorageGroups(selectedGroup) {
     var selectedHost = $("#sgShowHost").val();
 
-    $("#storagegrouptabs").tabs({ cache: true });
+    $("#storagegrouptabs").tabs({ cache: true, fx: { opacity: 'toggle', height: 'toggle' } });
 
     while (sgTabCount > 0) {
         $("#storagegrouptabs").tabs("remove", 0);
