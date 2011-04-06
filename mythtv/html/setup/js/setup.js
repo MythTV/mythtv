@@ -95,7 +95,8 @@ function setSettingInputValues(divName) {
     $("#" + divName + " :input").each(function() {
         if (($(this).attr("type") != "button") &&
             ($(this).attr("type") != "submit") &&
-            ($(this).attr("type") != "reset")) {
+            ($(this).attr("type") != "reset") &&
+            (settingsList[$(this).attr("id")])) {
             $(this).val(settingsList[$(this).attr("id")]);
         }
     });
