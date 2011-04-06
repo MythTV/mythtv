@@ -14,8 +14,6 @@ function appendTabRow(tabID, id, group, host, dir) {
 function initStorageGroups(selectedGroup) {
     var selectedHost = $("#sgShowHost").val();
 
-    $("#storagegrouptabs").tabs({ cache: true, fx: { opacity: 'toggle', height: 'toggle' } });
-
     while (sgTabCount > 0) {
         $("#storagegrouptabs").tabs("remove", 0);
         sgTabCount--;
@@ -78,8 +76,8 @@ function initStorageGroups(selectedGroup) {
 
 function addNewStorageGroupTab() {
     $("#sgAddNewGroupLink").hide();
-    addTab("#storagegrouptabs", "/setup/storagegroups-add-new.html",
-        "New Group");
+    $("#storagegrouptabs").tabs("add", "/setup/storagegroups-add-new.html",
+        "New Group", sgTabCount);
     $("#storagegrouptabs").tabs("select", sgTabCount);
 }
 
@@ -159,5 +157,6 @@ function browseForNewDir( inputID ) {
 
 //////////////////////////////////////////////////////////////////////////////
 
+setupNonAnimatedTabs("storagegrouptabs", false);
 initStorageGroups();
 

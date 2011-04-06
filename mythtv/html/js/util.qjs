@@ -100,19 +100,6 @@ function loadEditWindow(contentURL, jsURL) {
     showEditWindow();
 }
 
-function getCurrentTab(id) {
-    var selected = $(id).tabs('option', 'selected');
-    return selected;
-}
-
-function addTab(id, url, label) {
-    $(id).tabs("add", url, label);
-}
-
-function removeTab(id, index) {
-    $(id).tabs("remove", index);
-}
-
 function setHeaderStatusMessage(message) {
     $("#header_error").html("");
     $("#header_status").html(message);
@@ -130,3 +117,33 @@ function clearHeaderMessages() {
     $("#header_error").html("");
 }
 
+function preloadTabs(tabs) {
+    var total = tabs.find('.ui-tabs-nav li').length;
+
+    if (total == 0)
+        return;
+
+    var currentLoadingTab = 0;
+    $tabs.bind('tabsload',function(){
+        currentLoadingTab++;
+        if (currentLoadingTab < total)
+            $tabs.tabs('load',currentLoadingTab);
+        else
+            $tabs.unbind('tabsload');
+    }).tabs('load',currentLoadingTab);
+}
+
+function setupTabs(id, preload) {
+    $tabs = $("#" + id).tabs(
+        { cache: true, fx: { opacity: 'toggle', height: 'toggle' } });
+
+    if ((preload == undefined) || (preload == true))
+        setTimeout(function(){ preloadTabs($tabs); }, 10);
+}
+
+function setupNonAnimatedTabs(id, preload) {
+    $tabs = $("#" + id).tabs({ cache: true });
+
+    if ((preload == undefined) || (preload == true))
+        setTimeout(function(){ preloadTabs($tabs); }, 10);
+}

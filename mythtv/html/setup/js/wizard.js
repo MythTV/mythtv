@@ -52,20 +52,7 @@ function saveWizard() {
     alert("Saving is not fully functional, the database has not been modified!");
 }
 
-function preloadWizardTabs() {
-    $tabs = $("#wizardtabs").tabs({ cache: true, fx: { opacity: 'toggle', height: 'toggle' } });
-    var total = $tabs.find('.ui-tabs-nav li').length;
-    var currentLoadingTab = 0;
-    $tabs.bind('tabsload',function(){
-        currentLoadingTab++;
-        if (currentLoadingTab < total)
-            $tabs.tabs('load',currentLoadingTab);
-        else
-            $tabs.unbind('tabsload');
-    }).tabs('load',currentLoadingTab);
-}
-
-preloadWizardTabs();
+setupTabs("wizardtabs");
 $("#editborder").attr({ class: 'editborder-wizard' });
 $("#editsavebutton").show();
 $("#editsavelink").attr("href", "javascript:saveWizard()");
