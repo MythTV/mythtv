@@ -33,6 +33,7 @@
 #include "previewgenerator.h"
 #include "backendutil.h"
 #include "httprequest.h"
+#include "util.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -545,3 +546,29 @@ QFileInfo Content::GetVideo( int nId )
     return QFileInfo( sFileName );
 }
 
+QString Content::GetHash( const QString &sStorageGroup, const QString &sFileName )
+{
+    if ((sFileName.isEmpty()) ||
+        (sFileName.contains("/../")) ||
+        (sFileName.startsWith("../")))
+    {
+        VERBOSE(VB_IMPORTANT, QString("ERROR checking for file, filename '%1' "
+                "fails sanity checks").arg(sFileName));
+        return QString();
+    }
+
+    QString storageGroup = "Default";
+
+    if (!sStorageGroup.isEmpty())
+        storageGroup = sStorageGroup;
+
+    StorageGroup sgroup(storageGroup, gCoreContext->GetHostName());
+
+    QString fullname = sgroup.FindRecordingFile(sFileName);
+    QString hash = FileHash(fullname);
+
+    if (hash == "NULL")
+        return QString();
+
+    return hash;
+}
