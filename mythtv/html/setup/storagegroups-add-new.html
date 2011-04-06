@@ -1,0 +1,14 @@
+<div class='Title'>New Group</div>
+<table>
+<tr><th>Storage Group Name:</th><td><input id='sgNewName' size=20 /></td></tr>
+<tr><th>Host Name:</th><td id='sgNewHostCell'></td></tr>
+<tr><th>Directory:</th><td><input id='sgNewDir' size=20 /><input type=button onClick='javascript:browseForNewDir("sgNewDir")' value='Browse'></td></tr>
+</table>
+<input type='button' onClick='javascript:addNewStorageGroup()' value='Add Group' />
+<input type='button' onClick='javascript:cancelNewStorageGroup()' value='Cancel' />
+
+<script language="JavaScript" type="text/javascript">
+    $("#sgNewHostCell").html("<select id='sgNewHost'>"
+        + getHostsOptionList() + "</select>");
+    setSettingInputValues("wizard-database");
+</script>
