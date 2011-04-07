@@ -161,8 +161,6 @@ function sendMessage() {
         }).error(function(data) {
             alert("Error: unable to send message");
         });
-
-    return result;
 }
 
 function toggleShowDiv(id) {
