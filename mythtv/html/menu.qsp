@@ -35,6 +35,7 @@
       </ul>
     </li>
     <li><a class='menuitem' href='#' onClick="javascript:loadContent('/Status/GetStatusHTML')">Backend Status</a></li>
+    <li><a class='menuitem' href='#' onClick="javascript:loadContent('/misc/message.html')">Send a Message</a></li>
     <li><hr></li>
     <li><a href='#'>API</a>
       <ul class="acitem collapsible">

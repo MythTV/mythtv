@@ -147,3 +147,31 @@ function setupNonAnimatedTabs(id, preload) {
     if ((preload == undefined) || (preload == true))
         setTimeout(function(){ preloadTabs($tabs); }, 10);
 }
+
+function sendMessage() {
+    var result  = 0;
+    var message = $("#message").val();
+    var address = $("#address").val();
+    var port    = $("#port").val();
+
+    $.ajaxSetup({ async: false });
+    $.post("/Myth/SendMessage",
+        { Message: message, Address: address, udpPort: port },
+        function(data) {
+            result = 1;
+        }).error(function(data) {
+            alert("Error: unable to send message");
+        });
+    $.ajaxSetup({ async: true });
+
+    return result;
+}
+
+function toggleShowDiv(id) {
+    var obj = document.getElementById(id);
+    if ( $("#" + id).is(':visible') ) {
+        $("#" + id).hide("slow");
+    } else {
+        $("#" + id).show("slow");
+    }
+}
