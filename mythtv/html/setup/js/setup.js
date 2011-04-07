@@ -16,7 +16,6 @@ function setupPageName(path) {
 }
 
 function showHelpWindow() {
-    $("#helpWindow").dialog();
     $("#helpWindow").show();
     $("#helpWindow").draggable();
 }
@@ -26,7 +25,9 @@ function hideHelpWindow() {
 }
 
 function showHelp(title, content) {
-    $("#helpWindow").attr('title', title);
+    $("#helpWindow").dialog({
+      'title': title
+    });
     $("#helpWindow").html(content);
     showHelpWindow();
 }
