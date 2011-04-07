@@ -902,6 +902,9 @@ ThemeUpdateChecker::~ThemeUpdateChecker()
 
 void ThemeUpdateChecker::checkForUpdate(void)
 {
+    if (GetMythUI()->GetCurrentLocation(false, true) != "mainmenu")
+        return;
+
     if (RemoteFile::Exists(m_infoPackage))
     {
         QString remoteThemeDir =
