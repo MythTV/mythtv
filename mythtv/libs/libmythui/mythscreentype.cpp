@@ -446,6 +446,10 @@ bool MythScreenType::keyPressEvent(QKeyEvent *event)
             QCoreApplication::postEvent(
                 GetMythMainWindow()->GetSystemEventHandler(), me.clone());
         }
+        else if (action == ACTION_SCREENSHOT)
+        {
+            GetMythMainWindow()->ScreenShot();
+        }
         else
             handled = false;
     }

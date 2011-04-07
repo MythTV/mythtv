@@ -612,8 +612,6 @@ class MTV_PUBLIC TV : public QObject
 
     void ITVRestart(PlayerContext*, bool isLive);
 
-    bool ScreenShot(PlayerContext*, long long frameNumber);
-
     // DVD methods
     void DVDJumpBack(PlayerContext*);
     void DVDJumpForward(PlayerContext*);

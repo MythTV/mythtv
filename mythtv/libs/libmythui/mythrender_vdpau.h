@@ -73,6 +73,7 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
     void DrawDisplayRect(const QRect &rect, bool use_colorkey = false);
     void MoveResizeWin(QRect &rect);
     void CheckOutputSurfaces(void);
+    bool GetScreenShot(int width = 0, int height = 0);
 
     uint CreateOutputSurface(const QSize &size,
                              VdpRGBAFormat fmt = VDP_RGBA_FORMAT_B8G8R8A8,
@@ -190,6 +191,8 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
     VdpOutputSurfaceCreate          *vdp_output_surface_create;
     VdpOutputSurfaceDestroy         *vdp_output_surface_destroy;
     VdpOutputSurfaceRenderBitmapSurface *vdp_output_surface_render_bitmap_surface;
+    VdpOutputSurfaceGetParameters   *vdp_output_surface_get_parameters;
+    VdpOutputSurfaceGetBitsNative   *vdp_output_surface_get_bits_native;
     VdpVideoMixerCreate             *vdp_video_mixer_create;
     VdpVideoMixerSetFeatureEnables  *vdp_video_mixer_set_feature_enables;
     VdpVideoMixerDestroy            *vdp_video_mixer_destroy;

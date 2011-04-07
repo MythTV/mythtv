@@ -188,6 +188,7 @@ class MTV_PUBLIC MythPlayer
     bool    IsMuted(void)                     { return audio.IsMuted(); }
     bool    UsingNullVideo(void) const { return using_null_videoout; }
     bool    HasTVChainNext(void) const;
+    bool    GetScreenShot(int width = 0, int height = 0);
 
     // Non-const gets
     VideoOutput *getVideoOutput(void)         { return videoOutput; }
