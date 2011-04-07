@@ -34,7 +34,6 @@ class MythPlayer;
 class OSD;
 class FilterChain;
 class FilterManager;
-class OpenGLContextGLX;
 class AudioPlayer;
 class MythRender;
 
@@ -47,8 +46,6 @@ struct SwsContext;
 
 class VideoOutput
 {
-    friend class OpenGLVideoSync;
-
   public:
     static void GetRenderOptions(render_opts &opts);
     static VideoOutput *Create(

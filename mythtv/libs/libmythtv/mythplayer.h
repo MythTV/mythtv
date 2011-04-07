@@ -100,7 +100,6 @@ class MTV_PUBLIC MythPlayer
 {
     // Do NOT add a decoder class to this list
     friend class PlayerContext;
-    friend class PlayerTimer;
     friend class CC708Reader;
     friend class CC608Reader;
     friend class DecoderThread;
