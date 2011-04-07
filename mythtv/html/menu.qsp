@@ -42,6 +42,7 @@
     <li><a href='#'>Utilities</a>
       <ul class="acitem collapsible">
         <li><a class='menuitem' href='#' onClick="javascript:loadContent('/misc/message.html')">Send a Message</a></li>
+        <li><a class='menuitem' href='#' onClick="javascript:loadContent('/misc/database.html', '/js/databaseutil.js')">Database Tools</a></li>
       </ul>
     </li>
     <li><hr></li>
