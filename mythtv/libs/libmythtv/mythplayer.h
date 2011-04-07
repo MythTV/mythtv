@@ -187,6 +187,7 @@ class MTV_PUBLIC MythPlayer
     bool    IsMuted(void)                     { return audio.IsMuted(); }
     bool    UsingNullVideo(void) const { return using_null_videoout; }
     bool    HasTVChainNext(void) const;
+    bool    CanSupportDoubleRate(void);
     bool    GetScreenShot(int width = 0, int height = 0);
 
     // Non-const gets
@@ -564,7 +565,6 @@ class MTV_PUBLIC MythPlayer
     mutable QMutex playingLock;
     bool     m_double_framerate;///< Output fps is double Video (input) rate
     bool     m_double_process;///< Output filter must processed at double rate
-    bool     m_can_double;    ///< VideoOutput capable of doubling frame rate
     bool     m_deint_possible;
     bool     livetv;
     bool     watchingrecording;
