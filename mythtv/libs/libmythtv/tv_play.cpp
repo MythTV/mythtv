@@ -9394,6 +9394,8 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         ; // exit dialog
     else if (HandleTrackAction(actx, action))
         ;
+    else if (action.startsWith("DEINTERLACER"))
+        HandleDeinterlacer(actx, action);
     else if (action == "TOGGLEMANUALZOOM")
         SetManualZoom(actx, true, tr("Zoom Mode ON"));
     else if (action == "TOGGLESTRETCH")
@@ -9813,9 +9815,8 @@ void TV::FillOSDMenuVideo(const PlayerContext *ctx, OSD *osd,
                                      selected == "ADJUSTPICTURE");
             }
         }
-        osd->DialogAddButton(tr("Video Scan"),
-                             "DIALOG_MENU_VIDEOSCAN_0", true,
-                             selected == "VIDEOSCAN");
+        osd->DialogAddButton(tr("Advanced"), "DIALOG_MENU_ADVANCEDVIDEO_0",
+                             true, selected == "ADVANCEDVIDEO");
     }
     else if (category == "VIDEOASPECT")
     {
@@ -9872,11 +9873,56 @@ void TV::FillOSDMenuVideo(const PlayerContext *ctx, OSD *osd,
             }
         }
     }
+    else if (category == "ADVANCEDVIDEO")
+    {
+        osd->DialogAddButton(tr("Video Scan"),
+                             "DIALOG_MENU_VIDEOSCAN_0", true,
+                             selected == "VIDEOSCAN");
+        /*
+        if (kScan_Progressive != scan_type)
+        {
+            osd->DialogAddButton(tr("Deinterlacer"),
+                                 "DIALOG_MENU_DEINTERLACER_0", true,
+                                 selected == "DEINTERLACER");
+        }
+        */
+        backaction = "VIDEO";
+        currenttext = tr("Advanced");
+    }
+    else if (category == "DEINTERLACER")
+    {
+        backaction = "ADVANCEDVIDEO";
+        currenttext = tr("Deinterlacer");
+
+        QStringList deinterlacers;
+        QString     currentdeinterlacer;
+        bool        doublerate = false;
+        ctx->LockDeletePlayer(__FILE__, __LINE__);
+        if (ctx->player && ctx->player->getVideoOutput())
+        {
+            ctx->player->getVideoOutput()->GetDeinterlacers(deinterlacers);
+            currentdeinterlacer = ctx->player->getVideoOutput()->GetDeinterlacer();
+            doublerate = ctx->player->CanSupportDoubleRate();
+        }
+        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+
+        foreach (QString deint, deinterlacers)
+        {
+            if ((deint.contains("doublerate") ||
+                deint.contains("doubleprocess") ||
+                deint.contains("bobdeint")) && !doublerate)
+            {
+                continue;
+            }
+            QString trans = VideoDisplayProfile::GetDeinterlacerName(deint);
+            osd->DialogAddButton(trans, "DEINTERLACER_" + deint, false,
+                                 deint == currentdeinterlacer);
+        }
+    }
     else if (category == "VIDEOSCAN")
     {
-        backaction = "VIDEO";
+        backaction = "ADVANCEDVIDEO";
         currenttext = tr("Video Scan");
-
 
         QString cur_mode = "";
         if (!scan_type_locked)
@@ -10711,6 +10757,18 @@ void TV::FillOSDMenuJumpRec(PlayerContext* ctx, const QString category,
         }
     }
     ReturnOSDLock(ctx, osd);
+}
+
+void TV::HandleDeinterlacer(PlayerContext *ctx, const QString &action)
+{
+    if (!action.startsWith("DEINTERLACER"))
+        return;
+
+    QString deint = action.mid(13);
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    if (ctx->player && ctx->player->getVideoOutput())
+        ctx->player->getVideoOutput()->SetupDeinterlace(true, deint);
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
 void TV::ToggleAutoExpire(PlayerContext *ctx)
