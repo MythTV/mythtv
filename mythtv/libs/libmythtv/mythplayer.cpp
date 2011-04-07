@@ -201,7 +201,7 @@ MythPlayer::MythPlayer(bool muted)
       avsync_predictor(0),          avsync_predictor_enabled(false),
       refreshrate(0),
       lastsync(false),              repeat_delay(0),
-      disp_timecode(0),
+      disp_timecode(0),             avsync_audiopaused(false),
       // Time Code stuff
       prevtc(0),                    prevrp(0),
       // LiveTVChain stuff
@@ -1717,12 +1717,23 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
             .arg(-diverge);
     }
 
+    if (!dropframe && avsync_audiopaused)
+    {
+        avsync_audiopaused = false;
+        audio.Pause(false);
+    }
+
     if (dropframe)
     {
         // Reset A/V Sync
         lastsync = true;
         currentaudiotime = AVSyncGetAudiotime();
         VERBOSE(VB_PLAYBACK, LOC + dbg + "dropping frame to catch up.");
+        if (!audio.IsPaused())
+        {
+            audio.Pause(true);
+            avsync_audiopaused = true;
+        }
     }
     else if (!using_null_videoout)
     {
