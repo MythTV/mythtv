@@ -70,6 +70,10 @@ class Myth : public MythServices
                                                   const QString &Password,
                                                   const QString &DBName,
                                                   int   dbPort);
+
+        bool                SendMessage         ( const QString &Message,
+                                                  const QString &Address,
+                                                  int   udpPort);
 };
 
 // --------------------------------------------------------------------------
@@ -152,6 +156,13 @@ class ScriptableMyth : public QObject
         {
             return m_obj.TestDBSettings( HostName, UserName, Password,
                                          DBName, dbPort );
+        }
+
+        bool SendMessage( const QString &Message,
+                          const QString &Address,
+                          int   udpPort)
+        {
+            return m_obj.SendMessage( Message, Address, udpPort );
         }
 };
 

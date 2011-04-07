@@ -23,6 +23,8 @@
 
 #include <QDir>
 #include <QCryptographicHash>
+#include <QHostAddress>
+#include <QUdpSocket>
 
 #include "mythcorecontext.h"
 #include "mythdbcon.h"
@@ -546,6 +548,55 @@ bool Myth::TestDBSettings( const QString &sHostName,
         port = dbPort;
 
     bResult = TestDatabase(sHostName, sUserName, sPassword, db, port);
+
+    return bResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Myth::SendMessage( const QString &sMessage,
+                        const QString &sAddress,
+                        int   udpPort)
+{
+    bool bResult = false;
+
+    if (sMessage.isEmpty())
+        return bResult;
+
+    QString xmlMessage =
+        "<mythmessage version=\"1\">\n"
+        "  <text>" + sMessage + "</text>\n"
+        "</mythmessage>";
+
+    QHostAddress address = QHostAddress::Broadcast;
+    unsigned short port = 6948;
+
+    if (!sAddress.isEmpty())
+        address.setAddress(sAddress);
+
+    if (udpPort != 0)
+        port = udpPort;
+
+    QUdpSocket *sock = new QUdpSocket();
+    QByteArray utf8 = xmlMessage.toUtf8();
+    int size = utf8.length();
+
+    if (sock->writeDatagram(utf8.constData(), size, address, port) < 0)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Failed to send UDP/XML packet (Message: %1 "
+                                      "Address: %2 Port: %3").arg(sMessage).arg(sAddress).arg(port));
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, QString("UDP/XML packet sent! (Message: %1 Address: %2 "
+                                      "Port: %3").arg(sMessage)
+                                      .arg(address.toString().toLocal8Bit().constData()).arg(port));
+        bResult = true;
+    }
+
+    sock->deleteLater();
 
     return bResult;
 }
