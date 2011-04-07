@@ -154,7 +154,6 @@ function sendMessage() {
     var address = $("#address").val();
     var port    = $("#port").val();
 
-    $.ajaxSetup({ async: false });
     $.post("/Myth/SendMessage",
         { Message: message, Address: address, udpPort: port },
         function(data) {
@@ -162,7 +161,6 @@ function sendMessage() {
         }).error(function(data) {
             alert("Error: unable to send message");
         });
-    $.ajaxSetup({ async: true });
 
     return result;
 }
