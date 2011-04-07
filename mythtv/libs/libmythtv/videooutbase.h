@@ -73,7 +73,8 @@ class VideoOutput
     virtual bool IsBobDeint(void) const;
     virtual bool IsExtraProcessingRequired(void) const;
     virtual bool ApproveDeintFilter(const QString& filtername) const;
-
+    void         GetDeinterlacers(QStringList &deinterlacers);
+    QString      GetDeinterlacer(void);
     virtual void PrepareFrame(VideoFrame *buffer, FrameScanType,
                               OSD *osd) = 0;
     virtual void Show(FrameScanType) = 0;

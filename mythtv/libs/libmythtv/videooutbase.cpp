@@ -641,7 +641,20 @@ bool VideoOutput::ApproveDeintFilter(const QString& filtername) const
             !filtername.contains("vdpau"));
 }
 
+void VideoOutput::GetDeinterlacers(QStringList &deinterlacers)
+{
+    if (!db_vdisp_profile)
+        return;
+    QString rend = db_vdisp_profile->GetActualVideoRenderer();
+    deinterlacers = db_vdisp_profile->GetDeinterlacers(rend);
+}
 
+QString VideoOutput::GetDeinterlacer(void)
+{
+    QString res = m_deintfiltername;
+    res.detach();
+    return res;
+}
 
 /**
  * \fn VideoOutput::VideoAspectRatioChanged(float aspect)
