@@ -74,6 +74,10 @@ class Myth : public MythServices
         bool                SendMessage         ( const QString &Message,
                                                   const QString &Address,
                                                   int   udpPort);
+
+        bool                BackupDatabase      ( void );
+
+        bool                CheckDatabase       ( bool Repair );
 };
 
 // --------------------------------------------------------------------------
@@ -163,6 +167,16 @@ class ScriptableMyth : public QObject
                           int   udpPort)
         {
             return m_obj.SendMessage( Message, Address, udpPort );
+        }
+
+        bool BackupDatabase( void )
+        {
+            return m_obj.BackupDatabase();
+        }
+
+        bool CheckDatabase( bool Repair )
+        {
+            return m_obj.CheckDatabase( Repair );
         }
 };
 

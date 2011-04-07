@@ -29,6 +29,7 @@
 #include "mythcorecontext.h"
 #include "mythdbcon.h"
 #include "storagegroup.h"
+#include "dbutil.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -585,18 +586,73 @@ bool Myth::SendMessage( const QString &sMessage,
 
     if (sock->writeDatagram(utf8.constData(), size, address, port) < 0)
     {
-        VERBOSE(VB_IMPORTANT, QString("Failed to send UDP/XML packet (Message: %1 "
+        VERBOSE(VB_GENERAL, QString("Failed to send UDP/XML packet (Message: %1 "
                                       "Address: %2 Port: %3").arg(sMessage).arg(sAddress).arg(port));
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("UDP/XML packet sent! (Message: %1 Address: %2 "
+        VERBOSE(VB_GENERAL, QString("UDP/XML packet sent! (Message: %1 Address: %2 "
                                       "Port: %3").arg(sMessage)
                                       .arg(address.toString().toLocal8Bit().constData()).arg(port));
         bResult = true;
     }
 
     sock->deleteLater();
+
+    return bResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Myth::BackupDatabase(void)
+{
+    bool bResult = false;
+
+    DBUtil *dbutil = new DBUtil();
+    MythDBBackupStatus status;
+    QString filename;
+
+    VERBOSE(VB_GENERAL, QString("Performing API invoked DB Backup."));
+
+    if (dbutil)
+        status = dbutil->BackupDB(filename);
+
+    if (status == kDB_Backup_Completed)
+    {
+        VERBOSE(VB_GENERAL, QString("Database backup succeeded."));
+        bResult = true;
+    }
+    else
+        VERBOSE(VB_GENERAL, QString("Database backup failed."));
+
+    delete dbutil;
+
+    return bResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Myth::CheckDatabase( bool repair )
+{
+    bool bResult = false;
+
+    DBUtil *dbutil = new DBUtil();
+
+    VERBOSE(VB_GENERAL, QString("Performing API invoked DB Check."));
+
+    if (dbutil)
+        bResult = dbutil->CheckTables(repair);
+
+    if (bResult)
+        VERBOSE(VB_GENERAL, QString("Database check complete."));
+    else
+        VERBOSE(VB_GENERAL, QString("Database check failed."));
+
+    delete dbutil;
 
     return bResult;
 }
