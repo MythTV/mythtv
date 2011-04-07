@@ -34,8 +34,16 @@
         <li><a href='#' onClick="javascript:loadSetupPage('password')">Change Password</a></li>
       </ul>
     </li>
-    <li><a class='menuitem' href='#' onClick="javascript:loadContent('/Status/GetStatusHTML')">Backend Status</a></li>
-    <li><a class='menuitem' href='#' onClick="javascript:loadContent('/misc/message.html')">Send a Message</a></li>
+    <li><a href='#'>Information</a>
+      <ul class="acitem collapsible">
+        <li><a class='menuitem' href='#' onClick="javascript:loadContent('/Status/GetStatusHTML')">Backend Status</a></li>
+      </ul>
+    </li>
+    <li><a href='#'>Utilities</a>
+      <ul class="acitem collapsible">
+        <li><a class='menuitem' href='#' onClick="javascript:loadContent('/misc/message.html')">Send a Message</a></li>
+      </ul>
+    </li>
     <li><hr></li>
     <li><a href='#'>API</a>
       <ul class="acitem collapsible">
