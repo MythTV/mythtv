@@ -8,7 +8,7 @@
         <li><a href='#' onClick="javascript:clearContent(); loadEditWindow('/setup/wizard.html', '/setup/js/wizard.js')">Setup Wizard</a></li>
         <li><a href='#'>Advanced Setup</a>
           <ul class="acitem collapsible">
-            <li class="indent1"><a href='#' onClick="javascript:loadSetupContent('/Config/Database')">Database</a></li>
+            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('database')">Database</a></li>
             <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('general')">General</a></li>
             <li class="indent1"><a href='#'>Guide Data</a>
               <ul class="acitem collapsible">
