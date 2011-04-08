@@ -71,6 +71,7 @@ function initStorageGroups(selectedGroup) {
 
         sgHostSelect += "</select>";
         $("#sgHostSelect").html(sgHostSelect);
+        setUIAttributes();
     });
 }
 
@@ -78,6 +79,7 @@ function addNewStorageGroupTab() {
     $("#sgAddNewGroupLink").hide();
     $("#storagegrouptabs").tabs("add", "/setup/storagegroups-add-new.html",
         "New Group", sgTabCount);
+    setUIAttributes();
     $("#storagegrouptabs").tabs("select", sgTabCount);
 }
 
