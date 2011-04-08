@@ -180,3 +180,27 @@ function toggleShowDiv(id) {
         $("#" + id).show("slow");
     }
 }
+
+function hideConfirm() {
+    $("#confirmWindow").hide();
+}
+
+function showConfirm(content, functionname, params) {
+    $("#confirmWindow").dialog({
+        buttons: {
+           'Yes': function() {
+               if (params == null) {
+                   functionname();
+               }
+               else {
+                   functionname(params);
+               }
+               $(this).dialog('close');
+               },
+           'No': function() { $(this).dialog('close'); }
+        }});
+    $("#confirmWindow").html(content);
+    $("#confirmWindow").show();
+    $("#confirmWindow").draggable();
+}
+
