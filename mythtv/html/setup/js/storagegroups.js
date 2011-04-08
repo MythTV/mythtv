@@ -8,7 +8,7 @@ function appendTabRow(tabID, id, group, host, dir) {
     if ((rowNum/2) % 1 == 0)
         altText = "class='alt' ";
     var rowID = "sgtable-" + tabID + "-" + rowNum;
-    $("#sgtable-" + tabID + " tr:last").after("<tr " + altText + "id='" + rowID + "'><td class='invisible'>" + id +"</td><td>" + host + "</td><td>" + dir + "</td><td><input type='button' onClick=\"javascript:removeStorageGroupTableRow(" + tabID + ", '" + rowID + "')\" value='Delete'/></tr>");
+    $("#sgtable-" + tabID + " tr:last").after("<tr " + altText + "id='" + rowID + "'><td class='invisible'>" + id +"</td><td>" + host + "</td><td>" + dir + "</td><td><input type='button' onClick=\"javascript:showConfirm('Are you sure you want to remove this group?', removeStorageGroupTableRow, ['" + tabID + "','" + rowID + "'])\" value='Delete'/></tr>");
 }
 
 function initStorageGroups(selectedGroup) {

@@ -21,7 +21,7 @@ function getSetting(hostname, key, defValue) {
         function(data) {
             result = data.SettingList.Settings[0].Value;
         }).error(function(data) {
-            alert("Error: unable to retrieve setting");
+            setErrorMessage("Error: unable to retrieve setting");
         });
     $.ajaxSetup({ async: true });
 
@@ -37,7 +37,7 @@ function putSetting(hostname, key, value) {
         function(data) {
             result = 1;
         }).error(function(data) {
-            alert("Error: unable to save setting");
+            setErrorMessage("Error: unable to save setting");
         });
     $.ajaxSetup({ async: true });
 
@@ -168,7 +168,7 @@ function sendMessage() {
         function(data) {
             result = 1;
         }).error(function(data) {
-            alert("Error: unable to send message");
+            setErrorMessage("Error: unable to send message");
         });
 }
 
@@ -191,6 +191,9 @@ function showConfirm(content, functionname, params) {
            'Yes': function() {
                if (params == null) {
                    functionname();
+               }
+               else if (params.constructor == Array) {
+                   functionname.apply(null, params);
                }
                else {
                    functionname(params);
