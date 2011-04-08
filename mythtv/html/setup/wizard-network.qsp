@@ -3,7 +3,7 @@
 <input type=button value='Prev' onClick='javascript:$("#wizardtabs").tabs("select", 0)'>&nbsp;
 <input type=button value='Next' onClick='javascript:$("#wizardtabs").tabs("select", 2)'>
 <div class='Title'>Network Setup</div>
-<table border=0 cellpadding=2 cellspacing=2>
+<table>
     <tr><th align=right>Master Backend:</th>
         <td id='MasterServerIP_cell'>&nbsp;
             <a href="javascript:showSettingHelp('MasterServerIP')">[?]</a>

@@ -3,7 +3,7 @@
     html, body {
         font-size:        14px;
         font-family:      sans-serif;
-        color:            black;
+        color:            white;
         background-color: #88a1bb;
         border:           0px;
         margin:           0px;
@@ -183,19 +183,19 @@
     table
     {
         width:100%;
+        border:1px #555555;
+        border-style: dashed;
         border-collapse:collapse;
     }
 
     table td, table th
     {
         font-size:1.2em;
-        border:1px solid #E4D6CD;
-        padding:7px 7px 2px 7px;
+        padding:7px 7px 7px 7px;
     }
 
     table th
     {
-
         font-size:          14px;
         font-family:        sans-serif;
         font-weight:        bold;
@@ -209,17 +209,22 @@
 
     table tr td
     {
+        border:1px #555555;
+        border-style: dashed none;
         font-size:          14px;
         font-family:        sans-serif;
-        color:#000;
+        color:#FFF;
+        background-color:#2D2D2D;
     }
 
     table tr.alt td
     {
+        border:1px #555555;
+        border-style: dashed none;
         font-size:          14px;
         font-family:        sans-serif;
-        color:#000;
-        background-color:#EFEFFF;
+        color:#FFF;
+        background-color:transparent;
     }
 
     table td.invisible

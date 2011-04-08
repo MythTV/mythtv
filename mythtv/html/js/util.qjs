@@ -61,6 +61,12 @@ function loadDiv(divName, contentURL, jsURL) {
         $.getScript(jsURL);
         $.ajaxSetup({ async: true });
     }
+
+    setUIAttributes();
+}
+
+function setUIAttributes() {
+    $( "input:button").button();
 }
 
 function clearDiv(divName) {
