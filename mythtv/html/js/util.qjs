@@ -132,6 +132,7 @@ function preloadTabs(tabs) {
     var currentLoadingTab = 0;
     $tabs.bind('tabsload',function(){
         currentLoadingTab++;
+        setUIAttributes();
         if (currentLoadingTab < total)
             $tabs.tabs('load',currentLoadingTab);
         else
