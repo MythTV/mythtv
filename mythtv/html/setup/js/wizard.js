@@ -58,6 +58,7 @@ $("#edit").dialog({
     width: 850,
     height: 500,
     'title': 'Setup Wizard',
+    closeOnEscape: false,
     buttons: {
        'Save': function() {},
        'Cancel': function() { $(this).dialog('close'); }

@@ -274,8 +274,19 @@ function removeStorageGroupDir( group, dir, host ) {
 /****************************************************************************/
 var fileBrowserCallback;
 function openFileBrowser(title, dirs, callback) {
-    $('#fileBrowserTitle').html(title);
-    $('#fileBrowser-bg').show();
+    $("#fileBrowserWindow").dialog({
+        modal: true,
+        width: 340,
+        height: 515,
+        'title': title,
+        closeOnEscape: false,
+        buttons: {
+           'Save': saveFileBrowser,
+           'Cancel': function() { $(this).dialog('close'); }
+        }
+    });
+
+    $('#fileBrowserWindow').dialog("open");
     $.ajaxSetup({ async: false });
     $.getScript("/js/jqueryFileTree/jqueryFileTree.js");
     $.ajaxSetup({ async: true });
@@ -290,14 +301,10 @@ function saveFileBrowser() {
     var selectedDir = $('#fileBrowser').find('A.selected').attr("rel");
     if (selectedDir && fileBrowserCallback)
     {
-        hideFileBrowser();
+        $('#fileBrowserWindow').dialog('close');
         fileBrowserCallback(selectedDir);
     }
     else
         alert("No directory selected.");
-}
-
-function hideFileBrowser() {
-    $('#fileBrowser-bg').hide();
 }
 

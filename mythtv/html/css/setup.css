@@ -103,32 +103,18 @@
     }
     /********************************************************/
 
-    #fileBrowser-bg
+    #fileBrowserWindow
     {
-        position: fixed;
         display: none;
-        left: 310px;
-        top: 50px;
-        width: 340px;
-        height: 450px;
-        border-width: 6px;
-        border-color: #0000FF;
-        border-style: double;
-        background: #DDDDDD;
-        z-index: 111;
     }
 
     #fileBrowser
     {
-        position: fixed;
-        left: 330px;
-        top: 80px;
-        width: 300px;
+        width: 310px;
         height: 400px;
-        border: solid 2px #BBB;
-        background: #FFF;
+        border:2px #555555;
+        color:#FFF;
+        background-color:#2D2D2D;
         overflow: scroll;
-        padding: 5px;
-        z-index: 110;
     }
 
