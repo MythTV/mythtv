@@ -61,14 +61,10 @@
 
     #header_status {
         position:           fixed;
-        font-size:          18px;
-        font-family:        sans-serif;
-        font-weight:        bold;
-        color:              blue;
-        text-align:         center;
-        top:                0px;
-        left:               0px;
-        right:              0px;
+        text-align:         left;
+        bottom:             30px;
+        left:               100px;
+        right:              100px;
         height:             38px;
         z-index:            98;
         padding:            6px 200px 0 200px;
@@ -76,14 +72,10 @@
 
     #header_error {
         position:           fixed;
-        font-size:          18px;
-        font-family:        sans-serif;
-        font-weight:        bold;
-        color:              red;
-        text-align:         center;
-        top:                0px;
-        left:               0px;
-        right:              0px;
+        text-align:         left;
+        bottom:             30px;
+        left:               100px;
+        right:              100px;
         height:             38px;
         z-index:            98;
         padding:            6px 200px 0 200px;

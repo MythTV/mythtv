@@ -22,6 +22,8 @@ $(document).ready(function() {
     loadContent("/misc/overview.qsp");
     showHostName();
     $('.menu').initMenu();
+    $('#header_status').hide();
+    $('#header_error').hide();
 });
 
 </script>
@@ -32,9 +34,6 @@ $(document).ready(function() {
     <div id="header_logo">
         <a href="/"><img src="/images/mythtv.png" class="png" width="180" height="64" border="0" alt="MythTV"></a>
     </div>
-
-    <div id='header_status'></div>
-    <div id='header_error'></div>
 </div>
 
 <div id="menu-bg">
@@ -44,6 +43,18 @@ $(document).ready(function() {
 </div>
 
 <div id="content">
+</div>
+
+<div id='header_status' class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;"> 
+    <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+    <div id='header_status_message'>
+    </div>
+</div>
+
+<div id='header_error' class="ui-state-error ui-corner-all" style="padding: 0 .7em;"> 
+    <p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span> 
+    <div id="header_error_message">
+    </div>
 </div>
 
 <div id='edit' title='Setup Wizard'>

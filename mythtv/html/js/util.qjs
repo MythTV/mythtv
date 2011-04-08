@@ -107,15 +107,15 @@ function loadEditWindow(contentURL, jsURL) {
 }
 
 function setHeaderStatusMessage(message) {
-    $("#header_error").html("");
-    $("#header_status").html(message);
-    setTimeout('$("#header_status").html("")', statusMessageTimeout);
+    $("#header_status_message").html(message);
+    $("#header_status").show();
+    setTimeout('$("#header_status").hide("slow")', statusMessageTimeout);
 }
 
 function setHeaderErrorMessage(message) {
-    $("#header_status").html("");
-    $("#header_error").html(message);
-    setTimeout('$("#header_error").html("")', errorMessageTimeout);
+    $("#header_error_message").html(message);
+    $("#header_error").show();
+    setTimeout('$("#header_error").hide("slow")', errorMessageTimeout);
 }
 
 function clearHeaderMessages() {
