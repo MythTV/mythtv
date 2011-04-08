@@ -227,13 +227,8 @@ function addStorageGroupDir( group, dir, host ) {
         function(data) {
             if (data.bool == "true")
                 result = 1;
-            else
-                alert("data.bool != true");
-        }, "json").error(function(data) {
-            alert("Error: unable to add Storage Group Directory");
         });
     $.ajaxSetup({ async: true });
-    // FIXME, better alerting
 
     return result;
 }
