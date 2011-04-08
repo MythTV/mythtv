@@ -67,10 +67,10 @@ function saveJobEditor() {
     }
 
     if (errorMessage.length)
-        setEditErrorMessage(errorMessage);
+        setErrorMessage(errorMessage);
 
     if (descSavedOK && cmdSavedOK)
-        setEditStatusMessage("Save Successful");
+        setStatusMessage("Save Successful");
 }
 
 setupTabs("jobqueuetabs");

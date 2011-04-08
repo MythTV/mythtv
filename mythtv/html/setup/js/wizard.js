@@ -6,7 +6,7 @@ function testDBSettings() {
     var name = $("#dbName").val();
     var port = $("#dbPort").val();
 
-    clearEditMessages();
+    clearMessages();
 
     if (name == null)
         name = "mythconverg";
@@ -19,12 +19,12 @@ function testDBSettings() {
         function(data) {
             if (data.bool == "true") {
                 result = 1;
-                setEditStatusMessage("Database connection succeeded!");
+                setStatusMessage("Database connection succeeded!");
             }
             else
-                setEditErrorMessage("Database connection failed!");
+                setErrorMessage("Database connection failed!");
         }, "json").error(function(data) {
-            setEditErrorMessage("Database connection failed!");
+            setErrorMessage("Database connection failed!");
         });
 
     return result;
@@ -46,7 +46,7 @@ function validateSettingsInDiv(divName) {
 
 function saveWizard() {
     if (!validateSettingsInDiv("wizard-network")) {
-        setEditErrorMessage("Network Setup has an error.");
+        setErrorMessage("Network Setup has an error.");
     }
 
     alert("Saving is not fully functional, the database has not been modified!");

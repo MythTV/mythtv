@@ -46,23 +46,6 @@ function hideEditWindow() {
     $("#edit").hide();
 }
 
-function clearEditMessages() {
-    setEditStatusMessage("");
-    setEditErrorMessage("");
-}
-
-function setEditStatusMessage(message) {
-    $("#editErrorMessage").html("");
-    $("#editStatusMessage").html(message);
-    setTimeout('$("#editStatusMessage").html("")', statusMessageTimeout);
-}
-
-function setEditErrorMessage(message) {
-    $("#editStatusMessage").html("");
-    $("#editErrorMessage").html(message);
-    setTimeout('$("#editErrorMessage").html("")', errorMessageTimeout);
-}
-
 function submitConfigForm(form) {
     var data = $("#config_form_" + form).serialize();
     var url = $("#__config_form_action__").val();
@@ -85,9 +68,9 @@ function submitConfigForm(form) {
     $.ajaxSetup({ async: true });
 
     if (savedOK)
-        setHeaderStatusMessage("Changes saved successfully");
+        setStatusMessage("Changes saved successfully");
     else
-        setHeaderErrorMessage("Error saving changes!");
+        setErrorMessage("Error saving changes!");
 }
 
 function setSettingInputValues(divName) {

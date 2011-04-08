@@ -101,26 +101,26 @@ function loadSetupPage(pageName) {
 
 function loadEditWindow(contentURL, jsURL) {
     loadSetupJavascript();
-    clearEditMessages();
+    clearMessages();
     loadDiv("edit", contentURL, jsURL);
     showEditWindow();
 }
 
-function setHeaderStatusMessage(message) {
+function setStatusMessage(message) {
     $("#header_status_message").html(message);
     $("#header_status").show();
     setTimeout('$("#header_status").hide("slow")', statusMessageTimeout);
 }
 
-function setHeaderErrorMessage(message) {
+function setErrorMessage(message) {
     $("#header_error_message").html(message);
     $("#header_error").show();
     setTimeout('$("#header_error").hide("slow")', errorMessageTimeout);
 }
 
-function clearHeaderMessages() {
-    $("#header_status").html("");
-    $("#header_error").html("");
+function clearMessages() {
+    $("#header_status_message").html("");
+    $("#header_error_message").html("");
 }
 
 function preloadTabs(tabs) {

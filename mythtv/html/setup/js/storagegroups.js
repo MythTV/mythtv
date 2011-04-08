@@ -91,10 +91,10 @@ function addNewStorageGroup() {
     if (addStorageGroupDir(group, dir, host)) {
         $("#storagegrouptabs").tabs("remove", sgTabCount);
         $("#sgAddNewGroupLink").show();
-        setHeaderStatusMessage("Storage Group Directory save Succeeded.");
+        setStatusMessage("Storage Group Directory save Succeeded.");
         initStorageGroups(group);
     } else {
-        setHeaderErrorMessage("Storage Group Directory save Failed!");
+        setErrorMessage("Storage Group Directory save Failed!");
     }
 }
 
@@ -117,10 +117,10 @@ function saveDir(tabID) {
         appendTabRow(tabID, 0, group, host, dir);
         $("#sgtabs-" + tabID + "-add").css("display", "");
         $("#sgtabs-" + tabID + "-edit").css("display", "none");
-        setHeaderStatusMessage("Storage Group Directory save Succeeded.");
+        setStatusMessage("Storage Group Directory save Succeeded.");
         $("#sgtabs-" + tabID + "-edit-dirname").val("");
     } else {
-        setHeaderErrorMessage("Storage Group Directory save Failed!");
+        setErrorMessage("Storage Group Directory save Failed!");
     }
 }
 
@@ -136,13 +136,13 @@ function removeStorageGroupTableRow( tabID, rowID ) {
     var dir = $("#" + rowID).find("td").eq(2).html();
 
     if (removeStorageGroupDir(group, dir, host)) {
-        setHeaderStatusMessage("Remove Storage Group Directory Succeeded.");
+        setStatusMessage("Remove Storage Group Directory Succeeded.");
         $("#" + rowID).remove();
         if ($('#sgtable-' + tabID + ' tr').length == 1) {
             initStorageGroups(); /* could optimize this and not reload */
         }
     } else {
-        setHeaderErrorMessage("Remove Storage Group Directory Failed!");
+        setErrorMessage("Remove Storage Group Directory Failed!");
     }
 }
 

@@ -5,25 +5,25 @@ function checkDatabase() {
         { Repair: repair },
         function(data) {
             if (data.bool == "true")
-                setHeaderStatusMessage("Database is healthy.");
+                setStatusMessage("Database is healthy.");
             else
-                setHeaderErrorMessage("Error while checking database, check backend logs.");
+                setErrorMessage("Error while checking database, check backend logs.");
         }, "json").error(function(data) {
-            setHeaderErrorMessage("Error while checking database, check backend logs.");
+            setErrorMessage("Error while checking database, check backend logs.");
         });
-    setHeaderStatusMessage("Checking database tables...");
+    setStatusMessage("Checking database tables...");
 }
 
 function backupDatabase() {
     $.post("/Myth/BackupDatabase", {},
         function(data) {
             if (data.bool == "true")
-                setHeaderStatusMessage("Database backup completed successfully.");
+                setStatusMessage("Database backup completed successfully.");
             else
-                setHeaderErrorMessage("Database backup failed, check backend logs.");
+                setErrorMessage("Database backup failed, check backend logs.");
         }, "json").error(function(data) {
-            setHeaderErrorMessage("Database backup failed, check backend logs.");
+            setErrorMessage("Database backup failed, check backend logs.");
         });
-    setHeaderStatusMessage("Database backup started...");
+    setStatusMessage("Database backup started...");
 }
 
