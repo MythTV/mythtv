@@ -1,6 +1,4 @@
 <div id='wizard-database' class='setuptab'>
-<input type=button value='Next' onClick='javascript:$("#wizardtabs").tabs("select", 1)'>
-<div class='Title'>Database Setup</div>
 <table>
     <tr><th align=right>Database Host:</th>
         <td><input id='dbHostName' size=20>
@@ -14,7 +12,12 @@
 </table>
 <input type='hidden' id='dbName'>
 <input type='hidden' id='dbPort'>
+<div id='test' style="text-align:center">
 <input type=button value='Test Database Settings' onClick='javascript:testDBSettings()'>
+</div>
+<div id='navigation' style="text-align:right">
+<input type=button value='Next' align=right onClick='javascript:$("#wizardtabs").tabs("select", 1)'>
+</div>
 <hr>
 If the setting you are looking for is not available here, you can go to
 the <a href="javascript:hideEditWindow(); loadContent('/Config/Database')">Advanced Database Setup Screen</a>

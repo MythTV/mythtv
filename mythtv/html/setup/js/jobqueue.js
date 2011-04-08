@@ -1,10 +1,21 @@
 
 function editJob(title, descKey, commandKey) {
-    $('#editborder').attr({ class: 'editborder-fullscreen' }); 
     loadEditWindow("/setup/jobqueue-job-editor.html");
 
-    $("#jobEditTitle").html(title);
-
+    $("#edit").dialog({
+      'title': title,
+      modal:   true,
+      width:   850,
+      height:  500,
+      buttons: {
+         'Save': function() {
+                                saveJobEditor(); 
+                                $(this).dialog('close');
+                            },
+         'Cancel': function() { $(this).dialog('close'); }
+      }
+    });
+ 
     $("#jobEditDescKey").val(descKey);
     if ((title == "Transcoder") || (title == "Commercial Flagger"))
         $("#jobEditDesc").parent().html("<b>" + title + "</b>");

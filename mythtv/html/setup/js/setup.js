@@ -39,14 +39,11 @@ function showSettingHelp(setting) {
 }
 
 function showEditWindow() {
-    $("#edit-bg").show();
-    $("#editborder").show();
+    $("#edit").show();
 }
 
 function hideEditWindow() {
-    $("#editborder").hide();
-    $("#edit-bg").hide();
-    $("#editsavebutton").hide();
+    $("#edit").hide();
 }
 
 function clearEditMessages() {

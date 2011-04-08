@@ -53,8 +53,15 @@ function saveWizard() {
 }
 
 setupTabs("wizardtabs");
-$("#editborder").attr({ class: 'editborder-wizard' });
-$("#editsavebutton").show();
-$("#editsavelink").attr("href", "javascript:saveWizard()");
+$("#edit").dialog({
+    modal: true,
+    width: 850,
+    height: 500,
+    'title': 'Setup Wizard',
+    buttons: {
+       'Save': function() {},
+       'Cancel': function() { $(this).dialog('close'); }
+    }
+});
 showEditWindow();
 
