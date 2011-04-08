@@ -111,7 +111,7 @@ function addDir(tabID) {
     'title': 'Add New Directory',
     closeOnEscape: false,
     buttons: {
-       'Save': function() { saveDir(" + sgTabID + ") },
+       'Save': function() { saveDir(tabID) },
        'Cancel': function() { $(this).dialog('close'); }
     }});
     $("#sgtabs-" + tabID + "-edit").css("display", "");
@@ -128,6 +128,8 @@ function saveDir(tabID) {
         $("#sgtabs-" + tabID + "-edit").css("display", "none");
         setStatusMessage("Storage Group Directory save Succeeded.");
         $("#sgtabs-" + tabID + "-edit-dirname").val("");
+        $("#sgtabs-" + tabID + "-edit").dialog('close');
+        setUIAttributes();
     } else {
         setErrorMessage("Storage Group Directory save Failed!");
     }
