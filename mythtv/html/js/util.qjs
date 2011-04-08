@@ -142,14 +142,16 @@ function preloadTabs(tabs) {
 
 function setupTabs(id, preload) {
     $tabs = $("#" + id).tabs(
-        { cache: true, fx: { opacity: 'toggle', height: 'toggle' } });
+        { cache: true,
+          spinner: "",
+          fx: { opacity: 'toggle', height: 'toggle' } });
 
     if ((preload == undefined) || (preload == true))
         setTimeout(function(){ preloadTabs($tabs); }, 10);
 }
 
 function setupNonAnimatedTabs(id, preload) {
-    $tabs = $("#" + id).tabs({ cache: true });
+    $tabs = $("#" + id).tabs({ cache: true, spinner: "" });
 
     if ((preload == undefined) || (preload == true))
         setTimeout(function(){ preloadTabs($tabs); }, 10);
