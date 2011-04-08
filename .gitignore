@@ -13,4 +13,5 @@ moc_*.cpp
 object_script.*
 *~
 .DS_Store
+.*.swp
 
