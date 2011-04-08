@@ -99,6 +99,11 @@ function loadSetupPage(pageName) {
                 "/setup/js/" + pageName + ".js");
 }
 
+function loadMiscPage(pageName) {
+    loadContent("/misc/" + pageName + ".html",
+                "/misc/js/" + pageName + ".js");
+}
+
 function loadEditWindow(contentURL, jsURL) {
     loadSetupJavascript();
     clearMessages();
