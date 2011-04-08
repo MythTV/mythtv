@@ -26,7 +26,10 @@ function hideHelpWindow() {
 
 function showHelp(title, content) {
     $("#helpWindow").dialog({
-      'title': title
+      'title': title,
+      'width': 300,
+      'height': 150,
+      'position': [(window.innerWidth - 330), (window.innerHeight - 180)]
     });
     $("#helpWindow").html(content);
     showHelpWindow();
