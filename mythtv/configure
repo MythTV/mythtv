@@ -140,6 +140,12 @@ Advanced options (experts only):
   --python=PATH            Force a specific python executable to use [$python_default]
   --perl-config-opts=OPTS  Additional options to pass when generating
                            Makefile.perl for building Perl bindings.
+
+mythffmpeg options (These only effect the internal ffmpeg binary, not MythTV):
+  --enable-libmp3lame      enable MP3 encoding via libmp3lame [no]
+  --enable-libx264         enable H.264 encoding via x264 [no]
+  --enable-libxvid         enable Xvid encoding via xvidcore,
+                           native MPEG-4/Xvid encoder exists [no]
 EOF
 
 #following is ffmpeg's configure help text
@@ -4446,6 +4452,12 @@ if test x"$PERL_CONFIG_OPTS" != x""; then
 fi
 echo "bindings_python           ${bindings_python-no}"
 echo "bindings_php              ${bindings_php-no}"
+echo ""
+
+echo "# mythffmpeg Options"
+echo "mp3lame                   ${libmp3lame-no}"
+echo "xvid                      ${libxvid-no}"
+echo "x264                      ${libx264-no}"
 echo ""
 
 MYTH_CONFIG_H=libs/libmythbase/mythconfig.h
