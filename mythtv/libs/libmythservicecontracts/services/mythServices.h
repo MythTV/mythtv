@@ -50,7 +50,7 @@
 class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.02" );
+    Q_CLASSINFO( "version"    , "1.03" );
     Q_CLASSINFO( "PutSetting_Method",            "POST" )
     Q_CLASSINFO( "AddStorageGroupDir_Method",    "POST" )
     Q_CLASSINFO( "RemoveStorageGroupDir_Method", "POST" )
@@ -58,6 +58,8 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
     Q_CLASSINFO( "TestDBSettings_Method",        "POST" )
     Q_CLASSINFO( "BackupDatabase_Method",        "POST" )
     Q_CLASSINFO( "CheckDatabase_Method",         "POST" )
+    Q_CLASSINFO( "ProfileSubmit_Method",         "POST" )
+    Q_CLASSINFO( "ProfileDelete_Method",         "POST" )
 
     public:
 
@@ -115,6 +117,14 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
         virtual bool                BackupDatabase      ( void ) = 0;
 
         virtual bool                CheckDatabase       ( bool Repair ) = 0;
+
+        virtual bool                ProfileSubmit       ( void ) = 0;
+
+        virtual bool                ProfileDelete       ( void ) = 0;
+
+        virtual QString             ProfileURL          ( void ) = 0;
+
+        virtual QString             ProfileUpdated      ( void ) = 0;
 };
 
 #endif

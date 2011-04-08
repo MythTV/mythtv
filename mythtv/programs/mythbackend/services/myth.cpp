@@ -30,6 +30,7 @@
 #include "mythdbcon.h"
 #include "storagegroup.h"
 #include "dbutil.h"
+#include "hardwareprofile.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -611,7 +612,7 @@ bool Myth::BackupDatabase(void)
     bool bResult = false;
 
     DBUtil *dbutil = new DBUtil();
-    MythDBBackupStatus status;
+    MythDBBackupStatus status = kDB_Backup_Unknown;
     QString filename;
 
     VERBOSE(VB_GENERAL, QString("Performing API invoked DB Backup."));
@@ -657,3 +658,88 @@ bool Myth::CheckDatabase( bool repair )
     return bResult;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Myth::ProfileSubmit()
+{
+    bool bResult = false;
+
+    HardwareProfile *profile = new HardwareProfile();
+    if (profile)
+    {
+        VERBOSE(VB_GENERAL, QString("Profile Submission..."));
+        profile->GenerateUUIDs();
+        bResult = profile->SubmitProfile();
+        if (bResult)
+            VERBOSE(VB_GENERAL, QString("Profile Submitted."));
+    }
+    delete profile;
+
+    return bResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Myth::ProfileDelete()
+{
+    bool bResult = false;
+
+    HardwareProfile *profile = new HardwareProfile();
+    if (profile)
+    {
+        VERBOSE(VB_GENERAL, QString("Profile Deletion..."));
+        profile->GenerateUUIDs();
+        bResult = profile->DeleteProfile();
+        if (bResult)
+            VERBOSE(VB_GENERAL, QString("Profile Deleted."));
+    }
+    delete profile;
+
+    return bResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString Myth::ProfileURL()
+{
+    QString sProfileURL;
+
+    HardwareProfile *profile = new HardwareProfile();
+    if (profile)
+    {
+        profile->GenerateUUIDs();
+        sProfileURL = profile->GetProfileURL();
+        VERBOSE(VB_GENERAL, QString("ProfileURL: %1").arg(sProfileURL));
+    }
+    delete profile;
+
+    return sProfileURL;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString Myth::ProfileUpdated()
+{
+    QString sProfileUpdate;
+
+    HardwareProfile *profile = new HardwareProfile();
+    if (profile)
+    {
+        profile->GenerateUUIDs();
+        QDateTime tUpdated;
+        tUpdated = profile->GetLastUpdate();
+        sProfileUpdate = tUpdated.toString(
+                             gCoreContext->GetSetting( "DateFormat", "MM.dd.yyyy"));
+    }
+    delete profile;
+
+    return sProfileUpdate;
+}
