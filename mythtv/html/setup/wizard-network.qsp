@@ -16,7 +16,7 @@
             </td></tr>
 </table>
 <div id='navigation' style="text-align:right">
-    <input type=button value='Prev' onClick='javascript:$("#wizardtabs").tabs("select", 0)'>
+    <input type=button value='Back' onClick='javascript:$("#wizardtabs").tabs("select", 0)'>
     <input type=button value='Next' onClick='javascript:$("#wizardtabs").tabs("select", 2)'>
 </div>
 <hr>
