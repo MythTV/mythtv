@@ -4217,7 +4217,7 @@ bool MythPlayer::TranscodeGetNextFrame(
         player_ctx->playingInfo->UpdateInUseMark();
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-    uint64_t lastDecodedFrameNumber =
+    int64_t lastDecodedFrameNumber =
         videoOutput->GetLastDecodedFrame()->frameNumber;
 
     if ((lastDecodedFrameNumber == 0) && honorCutList)
@@ -4237,7 +4237,7 @@ bool MythPlayer::TranscodeGetNextFrame(
 
     if (honorCutList && !deleteMap.IsEmpty())
     {
-        if (totalFrames && lastDecodedFrameNumber >= totalFrames)
+        if (totalFrames && lastDecodedFrameNumber >= (int64_t)totalFrames)
             return false;
 
         uint64_t jumpto = 0;
