@@ -1,9 +1,44 @@
-
-<script language="JavaScript" type="text/javascript"  src="/js/jquery.min.js"></script>
-
+<html>
+<head>
+<title>Sample Storage Group browser</title>
+</head>
+<body>
 <script language="JavaScript" type="text/javascript">
 
-function listFiles(group) {
+function loadScript(url, callback){
+
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+
+    if (script.readyState) {
+        script.onreadystatechange = function() {
+            if ((script.readyState == "loaded") ||
+                (script.readyState == "complete")) {
+                script.onreadystatechange = null;
+                callback();
+            }
+        };
+    } else {
+        script.onload = function(){
+            callback();
+        };
+    }
+
+    script.src = url;
+    document.getElementsByTagName("head")[0].appendChild(script);
+}
+
+function listFiles() {
+
+    if (typeof jQuery == 'undefined') {  
+        loadScript("/js/jquery.min.js", realListFiles);
+    } else {
+        realListFiles();
+    }
+}
+
+function realListFiles() {
+    var group = $("#sgName").val();
     $("#links").html("Loading...");
     $.getJSON("/Content/GetFileList", { StorageGroup: group }, function(data) {
         $("#links").html("");
@@ -38,7 +73,10 @@ function listFiles(group) {
     }
 %>
     </select>
-    <input type='button' onClick='javascript:listFiles($("#sgName").val())' value='List Files'>
+    <input type='button' onClick='javascript:listFiles()' value='List Files'>
 </div>
 <br>
 <div id="links"></div>
+
+</body>
+</html>
