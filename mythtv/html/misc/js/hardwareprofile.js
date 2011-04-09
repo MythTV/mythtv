@@ -67,8 +67,7 @@ function getHardwareProfileText() {
         function(data) {
             result = $(data).find("QString").text();
             result = result.replace(/\r?\n|\r/g, '<br>');
-            var profile = "<b>Hardware Profile:</b><br>" + result;
-            $("#profile-text").html(profile);
+            $("#profile-text").html(result);
         });
 
     return result;
