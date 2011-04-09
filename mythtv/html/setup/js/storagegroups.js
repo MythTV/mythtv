@@ -99,8 +99,8 @@ function addNewStorageGroup() {
     $("#sgHostNameCell").html(hostsSelect("sgHostName"));
     $("#edit").dialog({
         modal: true,
-        width: 600,
-        height: 300,
+        width: 670,
+        height: 250,
         'title': 'Add New Storage Group',
         closeOnEscape: false,
         buttons: {
@@ -117,8 +117,8 @@ function addNewStorageGroupDir(tabID) {
     $("#sgHostNameCell").html(hostsSelect("sgHostName"));
     $("#edit").dialog({
         modal: true,
-        width: 600,
-        height: 300,
+        width: 670,
+        height: 250,
         'title': 'Add New Directory',
         closeOnEscape: false,
         buttons: {
