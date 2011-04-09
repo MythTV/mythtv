@@ -227,7 +227,7 @@ function addStorageGroupDir( group, dir, host ) {
         function(data) {
             if (data.bool == "true")
                 result = 1;
-        });
+        }, "json");
     $.ajaxSetup({ async: true });
 
     return result;
