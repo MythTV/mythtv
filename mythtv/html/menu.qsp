@@ -25,8 +25,12 @@
 <%
     var myth = new Myth();
     var sList = myth.GetSetting( '', 'EnableWebSetupDevMode', '');
+    var devMode = 0;
 
     if (sList.Settings['EnableWebSetupDevMode'] == 1)
+        devMode = 1;
+
+    if (devMode)
     {
         os.write("<li><a href='#' onClick=\"javascript:loadSetupContent('/setup/expert.html')\">Expert/Dev Setup</a></li>");
     }
@@ -61,6 +65,12 @@
           <ul class="acitem">
             <li class="indent1"><a href='#' onClick="javascript:loadContent('/samples/serverside.qsp', '/samples/js/samples.js')">Overview</a></li>
             <li class="indent1"><a href='#' onClick="javascript:loadContent('/samples/recorded.qsp', '/samples/js/samples.js')">GetRecorded() Example</a></li>
+<%
+    if (devMode)
+    {
+        os.write("<li class='indent1'><a href='#' onClick=\"javascript:loadContent('/samples/storagegroups.qsp', '/samples/js/samples.js')\">GetStorageGroups()</a></li>");
+    }
+%>
           </ul>
         </li>
       </ul>
