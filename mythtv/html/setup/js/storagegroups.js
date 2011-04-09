@@ -129,7 +129,7 @@ function addNewStorageGroupDir(tabID) {
 }
 
 function saveNewStorageGroupDir(tabID) {
-    saveNewDir($("#sgGroupNameStatic").val());
+    saveNewDir($("#sgGroupNameStatic").val(), tabID);
 }
 
 function saveNewStorageGroup() {
@@ -139,6 +139,19 @@ function saveNewStorageGroup() {
 function saveNewDir(group, tabID) {
     var host   = $("#sgHostName").val();
     var dir    = $("#sgDirName").val();
+    var errorMsg;
+
+    if (group == "") {
+        errorMsg = "Save failed. Storage Group name was not supplied.";
+    } else if (host == "") {
+        errorMsg = "Save failed. Host Name was not supplied.";
+    } else if (dir == "") {
+        errorMsg = "Save failed. Directory Name was not supplied.";
+    }
+    if (errorMsg != undefined) {
+        setErrorMessage(errorMsg);
+        return;
+    }
 
     if (addStorageGroupDir(group, dir, host)) {
         $("#edit").dialog('close');
