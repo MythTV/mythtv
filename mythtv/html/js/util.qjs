@@ -111,16 +111,22 @@ function loadEditWindow(contentURL, jsURL) {
     showEditWindow();
 }
 
+var lastStatusTimer;
 function setStatusMessage(message) {
+    if (lastStatusTimer)
+        clearTimeout(lastStatusTimer);
     $("#header_status_message").html(message);
     $("#header_status").show();
-    setTimeout('$("#header_status").hide("slow")', statusMessageTimeout);
+    setTimeout('$("#header_status").hide("slow"); lastStatusTimer = undefined', statusMessageTimeout);
 }
 
+var lastErrorTimer;
 function setErrorMessage(message) {
+    if (lastErrorTimer)
+        clearTimeout(lastErrorTimer);
     $("#header_error_message").html(message);
     $("#header_error").show();
-    setTimeout('$("#header_error").hide("slow")', errorMessageTimeout);
+    lastErrorTimer = setTimeout('$("#header_error").hide("slow"); lastErrorTimer = undefined', errorMessageTimeout);
 }
 
 function clearMessages() {
