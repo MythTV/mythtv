@@ -1,0 +1,44 @@
+
+<script language="JavaScript" type="text/javascript"  src="/js/jquery.min.js"></script>
+
+<script language="JavaScript" type="text/javascript">
+
+function listFiles(group) {
+    $("#links").html("Loading...");
+    $.getJSON("/Content/GetFileList", { StorageGroup: group }, function(data) {
+        $("#links").html("");
+        $.each(data.QStringList, function(i, value) {
+            $("#links").append("<a href='/Content/GetFile?StorageGroup=" + group + "&FileName=" + value + "'>" + value + "</a><br>");
+        });
+    });
+}
+</script>
+
+<h3>Sample Storage Group browser</h3>
+<div>
+    Storage Group: 
+    <select id="sgName">
+<%
+    var myth = new Myth();
+
+    var hostName = myth.GetHostName();
+    var list = myth.GetStorageGroupDirs("", "");
+    var seenHosts = new Array();
+
+    for (var nIdx=0; nIdx < list.StorageGroupDirs.length; nIdx++)
+    {
+        var sgDir = list.StorageGroupDirs[nIdx];
+        if (!seenHosts[sgDir.GroupName])
+        {
+            seenHosts[sgDir.GroupName] = 1;
+%>
+    <option value="<%= sgDir.GroupName %>"><%=sgDir.GroupName%></option>
+<%
+        }
+    }
+%>
+    </select>
+    <input type='button' onClick='javascript:listFiles($("#sgName").val())' value='List Files'>
+</div>
+<br>
+<div id="links"></div>
