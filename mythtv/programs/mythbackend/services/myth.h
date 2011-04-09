@@ -86,6 +86,8 @@ class Myth : public MythServices
         QString             ProfileURL          ( void );
 
         QString             ProfileUpdated      ( void );
+
+        QString             ProfileText         ( void );
 };
 
 // --------------------------------------------------------------------------
@@ -187,26 +189,30 @@ class ScriptableMyth : public QObject
             return m_obj.CheckDatabase( Repair );
         }
 
-        bool ProfileSubmit       ( void )
+        bool ProfileSubmit( void )
         {
             return m_obj.ProfileSubmit();
         }
 
-        bool ProfileDelete       ( void )
+        bool ProfileDelete( void )
         {
             return m_obj.ProfileDelete();
         }
 
-        QString ProfileURL          ( void )
+        QString ProfileURL( void )
         {
             return m_obj.ProfileURL();
         }
 
-        QString ProfileUpdated      ( void )
+        QString ProfileUpdated( void )
         {
             return m_obj.ProfileUpdated();
         }
 
+        QString ProfileText( void )
+        {
+            return m_obj.ProfileText();
+        }
 };
 
 

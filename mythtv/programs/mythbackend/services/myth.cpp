@@ -743,3 +743,20 @@ QString Myth::ProfileUpdated()
 
     return sProfileUpdate;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString Myth::ProfileText()
+{
+    QString sProfileText;
+
+    HardwareProfile *profile = new HardwareProfile();
+    if (profile)
+        sProfileText = profile->GetHardwareProfile();
+    delete profile;
+
+    return sProfileText;
+}
+

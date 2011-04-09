@@ -43,6 +43,7 @@
       <ul class="acitem collapsible">
         <li><a class='menuitem' href='#' onClick="javascript:loadMiscPage('messagetab')">Send a Message</a></li>
         <li><a class='menuitem' href='#' onClick="javascript:loadMiscPage('databasetabs')">Database Tools</a></li>
+        <li><a class='menuitem' href='#' onClick="javascript:loadMiscPage('hardwareprofile')">Hardware Profile</a></li>
       </ul>
     </li>
     <li><hr></li>
