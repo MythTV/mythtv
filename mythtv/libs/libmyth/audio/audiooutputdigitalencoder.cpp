@@ -202,7 +202,7 @@ static int encode_frame(
 
     enc_len = std::min((uint)enc_len, block_len - 8);
 
-    swab((const char *)payload, (char *)payload, enc_len);
+    swab((char *)payload, (char *)payload, enc_len);
 
     // the following values come from libmpcodecs/ad_hwac3.c in mplayer.
     // they form a valid IEC958 AC3 header.
