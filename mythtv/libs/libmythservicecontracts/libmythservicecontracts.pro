@@ -16,6 +16,7 @@ HEADERS += serviceexp.h service.h datacontracthelper.h
 
 HEADERS += services/mythServices.h    services/guideServices.h
 HEADERS += services/contentServices.h services/dvrServices.h
+HEADERS += services/channelServices.h
 
 HEADERS += datacontracts/connectionInfo.h      datacontracts/databaseInfo.h
 HEADERS += datacontracts/programAndChannel.h   datacontracts/programGuide.h
@@ -40,7 +41,7 @@ inc.files = serviceexp.h service.h datacontracthelper.h
 incServices.path = $${PREFIX}/include/mythtv/libmythservicecontracts/services/
 incServices.files  = services/mythServices.h    services/guideServices.h
 incServices.files += services/contentServices.h services/dvrServices.h
-
+incServices.files += services/channelServices.h
 
 incDatacontracts.path = $${PREFIX}/include/mythtv/libmythservicecontracts/datacontracts/
 incDatacontracts.files  = datacontracts/connectionInfo.h      datacontracts/databaseInfo.h
