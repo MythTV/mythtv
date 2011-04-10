@@ -26,6 +26,8 @@
 
 #include "service.h"
 
+#include "datacontracts/channelInfoList.h"
+
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -45,7 +47,7 @@
 class SERVICE_PUBLIC ChannelServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "version"    , "1.01" );
 
     public:
 
@@ -54,17 +56,15 @@ class SERVICE_PUBLIC ChannelServices : public Service  //, public QScriptable ??
 
         ChannelServices( QObject *parent = 0 ) : Service( parent )
         {
+            DTC::ChannelInfoList::InitializeCustomTypes();
         }
 
     public slots:
 
-//        virtual QList<uint>  GetChannelIDs         ( int          SourceID ) = 0;
+        virtual DTC::ChannelInfoList*  GetChannelInfoList  ( int          SourceID,
+                                                             int          StartIndex,
+                                                             int          Count      ) = 0;
 
-//        virtual QList<uint>  GetCardIDs            ( uint         ChanID   ) = 0;
-        virtual QString      GetIcon               ( uint         ChanID   ) = 0;
-        virtual uint         GetMplexID            ( uint         ChanID   ) = 0;
-        virtual QString      GetDefaultAuthority   ( uint         ChanID   ) = 0;
-        virtual uint         GetSourceIDForChannel ( uint         ChanID   ) = 0;
 };
 
 #endif

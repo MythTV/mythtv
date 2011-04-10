@@ -36,13 +36,9 @@ class Channel : public ChannelServices
 
     public:
 
-//        QList<uint>  GetChannels           ( int    SourceID );
-
-//        QList<uint>  GetCardIDs            ( uint   ChanID   );
-        QString      GetIcon               ( uint   ChanID   );
-        uint         GetMplexID            ( uint   ChanID   );
-        QString      GetDefaultAuthority   ( uint   ChanID   );
-        uint         GetSourceIDForChannel ( uint   ChanID   );
+        DTC::ChannelInfoList*  GetChannelInfoList  ( int      SourceID,
+                                                     int      StartIndex,
+                                                     int      Count      );
 };
 
 #endif

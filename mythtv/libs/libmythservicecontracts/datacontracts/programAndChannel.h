@@ -39,7 +39,7 @@ class Program;
 class SERVICE_PUBLIC ChannelInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.0" );
+    Q_CLASSINFO( "version", "1.01" );
 
     // We need to know the type that will ultimately be contained in 
     // any QVariantList or QVariantMap.  We do his by specifying
@@ -53,7 +53,8 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
     Q_PROPERTY( QString      CallSign    READ CallSign     WRITE setCallSign    )
     Q_PROPERTY( QString      IconURL     READ IconURL      WRITE setIconURL     )
     Q_PROPERTY( QString      ChannelName READ ChannelName  WRITE setChannelName )
-    
+    Q_PROPERTY( uint         MplexId     READ MplexId      WRITE setMplexId     )
+
     Q_PROPERTY( QString      ChanFilters READ ChanFilters  WRITE setChanFilters DESIGNABLE SerializeDetails )
     Q_PROPERTY( int          SourceId    READ SourceId     WRITE setSourceId    DESIGNABLE SerializeDetails )
     Q_PROPERTY( int          InputId     READ InputId      WRITE setInputId     DESIGNABLE SerializeDetails )
@@ -66,6 +67,7 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
     PROPERTYIMP       ( QString     , CallSign    )
     PROPERTYIMP       ( QString     , IconURL     )
     PROPERTYIMP       ( QString     , ChannelName )
+    PROPERTYIMP       ( uint        , MplexId     )
     PROPERTYIMP       ( QString     , ChanFilters )
     PROPERTYIMP       ( int         , SourceId    )
     PROPERTYIMP       ( int         , InputId     )

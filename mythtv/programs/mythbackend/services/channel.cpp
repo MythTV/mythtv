@@ -23,87 +23,63 @@
 
 #include "channel.h"
 
+#include "compat.h"
+#include "mythversion.h"
+#include "mythcorecontext.h"
 #include "channelutil.h"
+
 #include "serviceUtil.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-//QList<uint> Channel::GetChannels( int SourceID )
-//{
-//    QList<uint> lChannels;
-//
-//    vector<uint> channelList = ChannelUtil::GetChanIDs(SourceID);
-//    QVector<uint> channelIDList = QVector<uint>::fromStdVector(channelList);
-//    lChannels = QList<uint>::fromVector(channelIDList);
-//
-//    return lChannels;
-//}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-//QList<uint> Channel::GetCardIDs( uint ChanID )
-//{
-//    QList<uint> lCardIDs;
-//
-//    vector<uint> cardList = ChannelUtil::GetCardIDs(ChanID);
-//    QVector<uint> cardIDList = QVector<uint>::fromStdVector(cardList);
-//    lCardIDs = QList<uint>::fromVector(cardIDList);
-//
-//    return lCardIDs;
-//}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-QString Channel::GetIcon( uint ChanID )
+DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
+                                                   int nStartIndex,
+                                                   int nCount )
 {
-    QString sIcon;
+    vector<uint> chanList;
 
-    sIcon = ChannelUtil::GetIcon(ChanID);
+    chanList = ChannelUtil::GetChanIDs(nSourceID);
 
-    return sIcon;
-}
+    // ----------------------------------------------------------------------
+    // Build Response
+    // ----------------------------------------------------------------------
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
+    DTC::ChannelInfoList *pChannelInfos = new DTC::ChannelInfoList();
 
-uint Channel::GetMplexID( uint ChanID )
-{
-    uint nMplex = 0;
+    nStartIndex = min( nStartIndex, (int)chanList.size() );
+    nCount      = (nCount > 0) ? min( nCount, (int)chanList.size() ) : chanList.size();
 
-    nMplex = ChannelUtil::GetMplexID(ChanID);
+    for( int n = nStartIndex; n < nCount; n++)
+    {
+        DTC::ChannelInfo *pChannelInfo = pChannelInfos->AddNewChannelInfo();
 
-    return nMplex;
-}
+        int chanid = chanList.at(n);
+        uint mplexid = ChannelUtil::GetMplexID(chanid);
+        QString channum = ChannelUtil::GetChanNum(chanid);
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
+        pChannelInfo->setChanId(chanid);
+        pChannelInfo->setChanNum(channum);
+        pChannelInfo->setCallSign(ChannelUtil::GetCallsign(chanid));
+        pChannelInfo->setIconURL(ChannelUtil::GetIcon(chanid)); //Wrong!
+        pChannelInfo->setChannelName(ChannelUtil::GetServiceName(chanid));
+        pChannelInfo->setMplexId(mplexid);
 
-QString Channel::GetDefaultAuthority( uint ChanID )
-{
-    QString sDefaultAuthority;
+        pChannelInfo->setChanFilters(ChannelUtil::GetVideoFilters(nSourceID, channum));
+        pChannelInfo->setSourceId(nSourceID);
+        // This needs to return QVector<int> instead.
+        pChannelInfo->setInputId(0);
+        // Not sure how to get this with channelutil, TODO SQL or expand channelutil
+        pChannelInfo->setCommFree(false);
+    }
 
-    sDefaultAuthority = ChannelUtil::GetDefaultAuthority(ChanID);
+    pChannelInfos->setStartIndex    ( nStartIndex     );
+    pChannelInfos->setCount         ( nCount          );
+    pChannelInfos->setTotalAvailable( chanList.size() );
+    pChannelInfos->setAsOf          ( QDateTime::currentDateTime() );
+    pChannelInfos->setVersion       ( MYTH_BINARY_VERSION );
+    pChannelInfos->setProtoVer      ( MYTH_PROTO_VERSION  );
 
-    return sDefaultAuthority;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-uint Channel::GetSourceIDForChannel( uint ChanID )
-{
-    uint nSourceID = 0;
-
-    nSourceID = ChannelUtil::GetSourceIDForChannel(ChanID);
-
-    return nSourceID;
+    return pChannelInfos;
 }
