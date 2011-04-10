@@ -48,10 +48,11 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
 
     DTC::ChannelInfoList *pChannelInfos = new DTC::ChannelInfoList();
 
-    nStartIndex = min( nStartIndex, (int)chanList.size() );
-    nCount      = (nCount > 0) ? min( nCount, (int)chanList.size() ) : chanList.size();
+    nStartIndex   = min( nStartIndex, (int)chanList.size() );
+    nCount        = (nCount > 0) ? min( nCount, (int)chanList.size() ) : chanList.size();
+    int nEndIndex = nStartIndex + nCount;
 
-    for( int n = nStartIndex; n < nCount; n++)
+    for( int n = nStartIndex; n < nEndIndex; n++)
     {
         DTC::ChannelInfo *pChannelInfo = pChannelInfos->AddNewChannelInfo();
 
