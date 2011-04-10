@@ -56,22 +56,40 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
         DTC::ChannelInfo *pChannelInfo = pChannelInfos->AddNewChannelInfo();
 
         int chanid = chanList.at(n);
-        uint mplexid = ChannelUtil::GetMplexID(chanid);
         QString channum = ChannelUtil::GetChanNum(chanid);
+        QString format, modulation, freqtable, freqid, dtv_si_std;
+        int finetune, program_number;
+        uint64_t frequency;
+        uint atscmajor, atscminor, transportid, networkid, mplexid;
+        bool commfree = false;
 
-        pChannelInfo->setChanId(chanid);
-        pChannelInfo->setChanNum(channum);
-        pChannelInfo->setCallSign(ChannelUtil::GetCallsign(chanid));
-        pChannelInfo->setIconURL(ChannelUtil::GetIcon(chanid)); //Wrong!
-        pChannelInfo->setChannelName(ChannelUtil::GetServiceName(chanid));
-        pChannelInfo->setMplexId(mplexid);
-
-        pChannelInfo->setChanFilters(ChannelUtil::GetVideoFilters(nSourceID, channum));
-        pChannelInfo->setSourceId(nSourceID);
-        // This needs to return QVector<int> instead.
-        pChannelInfo->setInputId(0);
-        // Not sure how to get this with channelutil, TODO SQL or expand channelutil
-        pChannelInfo->setCommFree(false);
+        if (ChannelUtil::GetChannelData( nSourceID, channum, format, modulation,
+                            freqtable, freqid, finetune, frequency,
+                            dtv_si_std, program_number, atscmajor,
+                            atscminor, transportid, networkid,
+                            mplexid, commfree ))
+        {
+            pChannelInfo->setChanId(chanid);
+            pChannelInfo->setChanNum(channum);
+            pChannelInfo->setCallSign(ChannelUtil::GetCallsign(chanid));
+            pChannelInfo->setIconURL(ChannelUtil::GetIcon(chanid)); //Wrong!
+            pChannelInfo->setChannelName(ChannelUtil::GetServiceName(chanid));
+            pChannelInfo->setMplexId(mplexid);
+            pChannelInfo->setServiceId(program_number);
+            pChannelInfo->setATSCMajorChan(atscmajor);
+            pChannelInfo->setATSCMinorChan(atscminor);
+            pChannelInfo->setFormat(format);
+            pChannelInfo->setModulation(modulation);
+            pChannelInfo->setFrequencyTable(freqtable);
+            pChannelInfo->setFineTune(finetune);
+            pChannelInfo->setFrequency(frequency);
+            pChannelInfo->setSIStandard(dtv_si_std);
+            pChannelInfo->setTransportId(transportid);
+            pChannelInfo->setNetworkId(networkid);
+            pChannelInfo->setChanFilters(ChannelUtil::GetVideoFilters(nSourceID, channum));
+            pChannelInfo->setSourceId(nSourceID);
+            pChannelInfo->setCommFree(commfree);
+        }
     }
 
     pChannelInfos->setStartIndex    ( nStartIndex     );
