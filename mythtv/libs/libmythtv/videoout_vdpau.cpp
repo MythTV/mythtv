@@ -946,7 +946,7 @@ void VideoOutputVDPAU::DiscardFrame(VideoFrame *frame)
         vbuffers.safeEnqueue(kVideoBuffer_displayed, frame);
     else
     {
-        vbuffers.DiscardFrame(frame);
+        vbuffers.DoneDisplayingFrame(frame);
     }
     m_lock.unlock();
 }

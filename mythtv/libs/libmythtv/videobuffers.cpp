@@ -110,6 +110,24 @@ YUVInfo::YUVInfo(uint w, uint h, uint sz, const int *p, const int *o)
  *  used by VideoOutputXv to avoid throwing away displayed frames too
  *  early. See videoout_xv.cpp for their use.
  *
+ *  released = used + finished + displayed + pause
+ *  total = available + limbo + released
+ *  released_and_in_use_by_decoder = decode
+ *
+ *  available - frames not in use by decoder or display
+ *  limbo     - frames in use by decoder but not released for display
+ *  decode    - frames in use by decoder and released for display
+ *  used      - frames released for display but not displayed or paused
+ *  displayed - frames displayed but still used as a reference frame
+ *  pause     - frames used for pause
+ *  finished  - frames that are finished displaying but still in use by decoder
+ *
+ *  NOTE: All queues are mutually exclusive except "decode" which tracks frames
+ *        that have been released but still in use by the decoder. If a frame
+ *        has finished being processed/displayed but is still in use by the
+ *        decoder (in the decode queue) then it is placed in the finished queue
+ *        until the decoder is no longer using it (not in the decode queue).
+ *
  * \see VideoOutput
  */
 
@@ -212,6 +230,8 @@ void VideoBuffers::Reset()
     available.clear();
     used.clear();
     limbo.clear();
+    finished.clear();
+    decode.clear();
     pause.clear();
     displayed.clear();
     parents.clear();
@@ -356,17 +376,16 @@ void VideoBuffers::DeLimboFrame(VideoFrame *frame)
 {
     QMutexLocker locker(&global_lock);
     if (limbo.contains(frame))
-    {
         limbo.remove(frame);
-        available.enqueue(frame);
-    }
 
-    // BEGIN HACK HACK HACK, see trac ticket #4159
-    // ffmpeg will wrongly hold on to a frame if it gets the
-    // slices for a frame for which it never got a start code.
+    // if decoder didn't release frame and the buffer is getting released by
+    // the decoder assume that the frame is lost and return to available
+    if (!decode.contains(frame))
+        safeEnqueue(kVideoBuffer_avail, frame);
+       
+    // remove from decode queue since the decoder is finished
     while (decode.contains(frame))
-      decode.remove(frame);
-    // END  HACK HACK HACK
+        decode.remove(frame);
 }
 
 /**
@@ -388,9 +407,20 @@ void VideoBuffers::DoneDisplayingFrame(VideoFrame *frame)
     QMutexLocker locker(&global_lock);
 
     if(used.contains(frame))
-    {
         remove(kVideoBuffer_used, frame);
-        enqueue(kVideoBuffer_avail, frame);
+
+    enqueue(kVideoBuffer_finished, frame);
+
+    // check if any finished frames are no longer used by decoder and return to available
+    frame_queue_t ula(finished);
+    frame_queue_t::iterator it = ula.begin();
+    for (; it != ula.end(); ++it)
+    {
+        if (!decode.contains(*it))
+        {
+            remove(kVideoBuffer_finished, *it);
+            enqueue(kVideoBuffer_avail, *it);
+        }
     }
 }
 
@@ -443,6 +473,8 @@ frame_queue_t *VideoBuffers::queue(BufferType type)
         q = &pause;
     else if (type == kVideoBuffer_decode)
         q = &decode;
+    else if (type == kVideoBuffer_finished)
+        q = &finished;
 
     return q;
 }
@@ -465,6 +497,8 @@ const frame_queue_t *VideoBuffers::queue(BufferType type) const
         q = &pause;
     else if (type == kVideoBuffer_decode)
         q = &decode;
+    else if (type == kVideoBuffer_finished)
+        q = &finished;
 
     return q;
 }
@@ -547,6 +581,8 @@ void VideoBuffers::remove(BufferType type, VideoFrame *frame)
         pause.remove(frame);
     if ((type & kVideoBuffer_decode) == kVideoBuffer_decode)
         decode.remove(frame);
+    if ((type & kVideoBuffer_finished) == kVideoBuffer_finished)
+        finished.remove(frame);
 }
 
 void VideoBuffers::requeue(BufferType dst, BufferType src, int num)
@@ -680,6 +716,7 @@ void VideoBuffers::DiscardFrames(bool next_frame_keyframe)
     frame_queue_t ula(used);
     ula.insert(ula.end(), limbo.begin(), limbo.end());
     ula.insert(ula.end(), available.begin(), available.end());
+    ula.insert(ula.end(), finished.begin(), finished.end());
     frame_queue_t::iterator it;
     for (it = ula.begin(); it != ula.end(); ++it)
         RemoveInheritence(*it);
@@ -687,6 +724,7 @@ void VideoBuffers::DiscardFrames(bool next_frame_keyframe)
     // Discard frames
     frame_queue_t discards(used);
     discards.insert(discards.end(), limbo.begin(), limbo.end());
+    discards.insert(discards.end(), finished.begin(), finished.end());
     for (it = discards.begin(); it != discards.end(); ++it)
         DiscardFrame(*it);
 
@@ -700,9 +738,9 @@ void VideoBuffers::DiscardFrames(bool next_frame_keyframe)
                 !displayed.contains(at(i)))
             {
                 VERBOSE(VB_IMPORTANT,
-                        QString("VideoBuffers::DiscardFrames(): ERROR, %1 not "
-                                "in available, pause, or displayed %2")
-                        .arg(DebugString(at(i), true))
+                        QString("VideoBuffers::DiscardFrames(): ERROR, %1 (%2) not "
+                                "in available, pause, or displayed %3")
+                        .arg(DebugString(at(i), true)).arg((long long)at(i))
                         .arg(GetStatus()));
                 DiscardFrame(at(i));
             }
@@ -1292,6 +1330,7 @@ QString VideoBuffers::GetStatus(int n) const
         unsigned long long d = to_bitmap(displayed);
         unsigned long long l = to_bitmap(limbo);
         unsigned long long p = to_bitmap(pause);
+        unsigned long long f = to_bitmap(finished);
         unsigned long long x = to_bitmap(decode);
         for (uint i=0; i<(uint)n; i++)
         {
@@ -1307,6 +1346,8 @@ QString VideoBuffers::GetStatus(int n) const
                 tmp += (x & mask) ? "l" : "L";
             if (p & mask)
                 tmp += (x & mask) ? "p" : "P";
+            if (f & mask)
+                tmp += (x & mask) ? "f" : "F";
 
             if (0 == tmp.length())
                 str += " ";
