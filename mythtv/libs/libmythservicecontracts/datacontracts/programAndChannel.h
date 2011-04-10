@@ -39,7 +39,7 @@ class Program;
 class SERVICE_PUBLIC ChannelInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.01" );
+    Q_CLASSINFO( "version", "1.02" );
 
     // We need to know the type that will ultimately be contained in 
     // any QVariantList or QVariantMap.  We do his by specifying
@@ -63,6 +63,7 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
     Q_PROPERTY( QString   Format          READ Format         WRITE setFormat         DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString   Modulation      READ Modulation     WRITE setModulation     DESIGNABLE SerializeDetails )
     Q_PROPERTY( uint64_t  Frequency       READ Frequency      WRITE setFrequency      DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString   FrequencyId     READ FrequencyId    WRITE setFrequencyId    DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString   FrequencyTable  READ FrequencyTable WRITE setFrequencyTable DESIGNABLE SerializeDetails )
     Q_PROPERTY( int       FineTune        READ FineTune       WRITE setFineTune       DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString   SIStandard      READ SIStandard     WRITE setSIStandard     DESIGNABLE SerializeDetails )
@@ -70,6 +71,10 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
     Q_PROPERTY( int       SourceId        READ SourceId       WRITE setSourceId       DESIGNABLE SerializeDetails )
     Q_PROPERTY( int       InputId         READ InputId        WRITE setInputId        DESIGNABLE SerializeDetails )
     Q_PROPERTY( int       CommFree        READ CommFree       WRITE setCommFree       DESIGNABLE SerializeDetails )
+    Q_PROPERTY( bool      UseEIT          READ UseEIT         WRITE setUseEIT         DESIGNABLE SerializeDetails )
+    Q_PROPERTY( bool      Visible         READ Visible        WRITE setVisible        DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString   XMLTVID         READ XMLTVID        WRITE setXMLTVID        DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString   DefaultAuth     READ DefaultAuth    WRITE setDefaultAuth    DESIGNABLE SerializeDetails )
 
     Q_PROPERTY( QVariantList Programs    READ Programs DESIGNABLE true )
 
@@ -87,6 +92,7 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
     PROPERTYIMP       ( QString     , Format         )
     PROPERTYIMP       ( QString     , Modulation     )
     PROPERTYIMP       ( uint64_t    , Frequency      )
+    PROPERTYIMP       ( QString     , FrequencyId    )
     PROPERTYIMP       ( QString     , FrequencyTable )
     PROPERTYIMP       ( int         , FineTune       )
     PROPERTYIMP       ( QString     , SIStandard     )
@@ -94,6 +100,10 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
     PROPERTYIMP       ( int         , SourceId       )
     PROPERTYIMP       ( int         , InputId        )
     PROPERTYIMP       ( int         , CommFree       )
+    PROPERTYIMP       ( bool        , UseEIT         )
+    PROPERTYIMP       ( bool        , Visible        )
+    PROPERTYIMP       ( QString     , XMLTVID        )
+    PROPERTYIMP       ( QString     , DefaultAuth    )
 
     PROPERTYIMP_RO_REF( QVariantList, Programs      )
 

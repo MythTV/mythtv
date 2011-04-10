@@ -57,17 +57,20 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
 
         int chanid = chanList.at(n);
         QString channum = ChannelUtil::GetChanNum(chanid);
-        QString format, modulation, freqtable, freqid, dtv_si_std;
+        QString format, modulation, freqtable, freqid, dtv_si_std,
+                xmltvid, default_authority;
         int finetune, program_number;
         uint64_t frequency;
         uint atscmajor, atscminor, transportid, networkid, mplexid;
         bool commfree = false;
+        bool eit = false;
+        bool visible = true;
 
-        if (ChannelUtil::GetChannelData( nSourceID, channum, format, modulation,
+        if (ChannelUtil::GetExtendedChannelData( nSourceID, channum, format, modulation,
                             freqtable, freqid, finetune, frequency,
                             dtv_si_std, program_number, atscmajor,
-                            atscminor, transportid, networkid,
-                            mplexid, commfree ))
+                            atscminor, transportid, networkid, mplexid,
+                            commfree, eit, visible, xmltvid, default_authority ))
         {
             pChannelInfo->setChanId(chanid);
             pChannelInfo->setChanNum(channum);
@@ -83,12 +86,17 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
             pChannelInfo->setFrequencyTable(freqtable);
             pChannelInfo->setFineTune(finetune);
             pChannelInfo->setFrequency(frequency);
+            pChannelInfo->setFrequencyId(freqid);
             pChannelInfo->setSIStandard(dtv_si_std);
             pChannelInfo->setTransportId(transportid);
             pChannelInfo->setNetworkId(networkid);
             pChannelInfo->setChanFilters(ChannelUtil::GetVideoFilters(nSourceID, channum));
             pChannelInfo->setSourceId(nSourceID);
             pChannelInfo->setCommFree(commfree);
+            pChannelInfo->setUseEIT(eit);
+            pChannelInfo->setVisible(visible);
+            pChannelInfo->setXMLTVID(xmltvid);
+            pChannelInfo->setDefaultAuth(default_authority);
         }
     }
 
