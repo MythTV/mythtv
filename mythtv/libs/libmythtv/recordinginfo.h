@@ -192,7 +192,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     void ToggleRecord(void);
 
     // these five can be moved to programinfo
-    void AddHistory(bool resched = true, bool forcedup = false);//pi
+    void AddHistory(bool resched = true, bool forcedup = false, 
+                    bool future = false);//pi
     void DeleteHistory(void);//pi
     void ForgetHistory(void);//pi
     void SetDupHistory(void);//pi
