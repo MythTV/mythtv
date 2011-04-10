@@ -33,6 +33,7 @@
 #include "previewgenerator.h"
 #include "backendutil.h"
 #include "httprequest.h"
+#include "util.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -100,42 +101,9 @@ QStringList Content::GetFileList( const QString &sStorageGroup )
         throw sMsg;
     }
 
-    QStringList      sStorageGroupDirs;
-    QString          hostname    = gCoreContext->GetHostName();
-    QStringList      oStringList;
+    StorageGroup sgroup(sStorageGroup);
 
-    if (StorageGroup::FindDirs(sStorageGroup, hostname, &sStorageGroupDirs))
-    {
-        QStringList::iterator it = sStorageGroupDirs.begin();
-
-        for ( ; it != sStorageGroupDirs.end(); ++it)
-        {
-            QDir dir(*it);
-
-            dir.setFilter(QDir::Files);
-            dir.setSorting(QDir::Name | QDir::IgnoreCase);
-
-            QFileInfoList fileList = dir.entryInfoList();
-            QFileInfoList::iterator fit = fileList.begin();
-
-            for ( ; fit != fileList.end(); ++fit )
-            {
-                /*                                
-                if (bShowLinks)
-                {
-                    stream
-                        << "<a href='/Myth/GetFile?StorageGroup="
-                        << sStorageGroup << "&FileName=" << (*fit).fileName()
-                        << "'>" << (*fit).fileName() << "</a><br>\n";
-                }
-                else
-                */
-                oStringList.append( (*fit).fileName() );
-            }
-        }
-    }
-
-    return oStringList;
+    return sgroup.GetFileList("");
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -545,3 +513,29 @@ QFileInfo Content::GetVideo( int nId )
     return QFileInfo( sFileName );
 }
 
+QString Content::GetHash( const QString &sStorageGroup, const QString &sFileName )
+{
+    if ((sFileName.isEmpty()) ||
+        (sFileName.contains("/../")) ||
+        (sFileName.startsWith("../")))
+    {
+        VERBOSE(VB_IMPORTANT, QString("ERROR checking for file, filename '%1' "
+                "fails sanity checks").arg(sFileName));
+        return QString();
+    }
+
+    QString storageGroup = "Default";
+
+    if (!sStorageGroup.isEmpty())
+        storageGroup = sStorageGroup;
+
+    StorageGroup sgroup(storageGroup, gCoreContext->GetHostName());
+
+    QString fullname = sgroup.FindRecordingFile(sFileName);
+    QString hash = FileHash(fullname);
+
+    if (hash == "NULL")
+        return QString();
+
+    return hash;
+}

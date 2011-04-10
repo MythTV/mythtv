@@ -26,6 +26,7 @@
 # undef DeleteFile
 # undef GetCurrentTime
 # undef SetJob
+# undef SendMessage
 
 #ifndef _MSC_VER
 # include <winsock2.h>

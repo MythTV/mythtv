@@ -211,13 +211,26 @@ bool HttpConfig::ProcessRequest(HttpWorkerThread*, HTTPRequest *request)
     {
         QString fn = GetShareDir() + "backend-config/"
             "config_backend_database.xml";
+        QString group;
         QString form("/Config/Database/Save");
 
-        PrintHeader(request->m_response, form);
-        parse_settings(database_settings, fn);
-        load_settings(database_settings, "");
-        PrintSettings(request->m_response, database_settings);
-        PrintFooter(request->m_response);
+        if (request->m_mapParams.contains("__group__"))
+            group = request->m_mapParams["__group__"];
+
+        if (group.isEmpty())
+            PrintHeader(request->m_response, form);
+        else
+            OpenForm(request->m_response, form, group);
+
+        parse_settings(general_settings, fn, group);
+        load_settings(general_settings, gCoreContext->GetHostName());
+        PrintSettings(request->m_response, general_settings);
+
+        if (group.isEmpty())
+            PrintFooter(request->m_response);
+        else
+            CloseForm(request->m_response, group);
+
         handled = true;
     }
     else if (request->m_sMethod == "General")

@@ -41,6 +41,7 @@ class MPUBLIC HardwareProfile : public QObject
     QString   GetPrivateUUID(void) { return m_uuid; };
     QDateTime GetLastUpdate(void) { return m_lastUpdate; };
     QString   GetProfileURL(void);
+    QString   GetHardwareProfile(void);
 
   private:
     QString   m_uuid;

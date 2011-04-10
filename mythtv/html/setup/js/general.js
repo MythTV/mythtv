@@ -1,3 +1,3 @@
 
-$("#generaltabs").tabs({ cache: true });
+setupTabs("generaltabs");
 

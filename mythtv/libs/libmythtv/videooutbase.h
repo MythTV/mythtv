@@ -34,7 +34,6 @@ class MythPlayer;
 class OSD;
 class FilterChain;
 class FilterManager;
-class OpenGLContextGLX;
 class AudioPlayer;
 class MythRender;
 
@@ -47,8 +46,6 @@ struct SwsContext;
 
 class VideoOutput
 {
-    friend class OpenGLVideoSync;
-
   public:
     static void GetRenderOptions(render_opts &opts);
     static VideoOutput *Create(
@@ -76,7 +73,8 @@ class VideoOutput
     virtual bool IsBobDeint(void) const;
     virtual bool IsExtraProcessingRequired(void) const;
     virtual bool ApproveDeintFilter(const QString& filtername) const;
-
+    void         GetDeinterlacers(QStringList &deinterlacers);
+    QString      GetDeinterlacer(void);
     virtual void PrepareFrame(VideoFrame *buffer, FrameScanType,
                               OSD *osd) = 0;
     virtual void Show(FrameScanType) = 0;
@@ -240,6 +238,7 @@ class VideoOutput
 
     virtual QString GetOSDRenderer(void) const;
     virtual MythPainter *GetOSDPainter(void) { return (MythPainter*)osd_painter; }
+    virtual bool GetScreenShot(int width = 0, int height = 0) { return false; }
 
     QString GetFilters(void) const;
     /// \brief translates caption/dvd button rectangle into 'screen' space

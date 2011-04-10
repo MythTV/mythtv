@@ -21,7 +21,7 @@ function getSetting(hostname, key, defValue) {
         function(data) {
             result = data.SettingList.Settings[0].Value;
         }).error(function(data) {
-            alert("Error: unable to retrieve setting");
+            setErrorMessage("Unable to retrieve setting!");
         });
     $.ajaxSetup({ async: true });
 
@@ -37,7 +37,7 @@ function putSetting(hostname, key, value) {
         function(data) {
             result = 1;
         }).error(function(data) {
-            alert("Error: unable to save setting");
+            setErrorMessage("Unable to save setting!");
         });
     $.ajaxSetup({ async: true });
 
@@ -61,6 +61,12 @@ function loadDiv(divName, contentURL, jsURL) {
         $.getScript(jsURL);
         $.ajaxSetup({ async: true });
     }
+
+    setUIAttributes();
+}
+
+function setUIAttributes() {
+    $( "input:button").button();
 }
 
 function clearDiv(divName) {
@@ -93,40 +99,122 @@ function loadSetupPage(pageName) {
                 "/setup/js/" + pageName + ".js");
 }
 
+function loadMiscPage(pageName) {
+    loadContent("/misc/" + pageName + ".html",
+                "/misc/js/" + pageName + ".js");
+}
+
 function loadEditWindow(contentURL, jsURL) {
     loadSetupJavascript();
-    clearEditMessages();
-    loadDiv("editcontent", contentURL, jsURL);
+    clearMessages();
+    loadDiv("edit", contentURL, jsURL);
     showEditWindow();
 }
 
-function getCurrentTab(id) {
-    var selected = $(id).tabs('option', 'selected');
-    return selected;
+var lastStatusTimer;
+function setStatusMessage(message) {
+    if (lastStatusTimer)
+        clearTimeout(lastStatusTimer);
+    $("#header_status_message").html(message);
+    $("#header_status").show();
+    setTimeout('$("#header_status").hide("slow"); lastStatusTimer = undefined', statusMessageTimeout);
 }
 
-function addTab(id, url, label) {
-    $(id).tabs("add", url, label);
+var lastErrorTimer;
+function setErrorMessage(message) {
+    if (lastErrorTimer)
+        clearTimeout(lastErrorTimer);
+    $("#header_error_message").html(message);
+    $("#header_error").show();
+    lastErrorTimer = setTimeout('$("#header_error").hide("slow"); lastErrorTimer = undefined', errorMessageTimeout);
 }
 
-function removeTab(id, index) {
-    $(id).tabs("remove", index);
+function clearMessages() {
+    $("#header_status_message").html("");
+    $("#header_error_message").html("");
 }
 
-function setHeaderStatusMessage(message) {
-    $("#header_error").html("");
-    $("#header_status").html(message);
-    setTimeout('$("#header_status").html("")', statusMessageTimeout);
+function preloadTabs(tabs) {
+    var total = tabs.find('.ui-tabs-nav li').length;
+
+    if (total == 0)
+        return;
+
+    var currentLoadingTab = 0;
+    $tabs.bind('tabsload',function(){
+        currentLoadingTab++;
+        setUIAttributes();
+        if (currentLoadingTab < total)
+            $tabs.tabs('load',currentLoadingTab);
+        else
+            $tabs.unbind('tabsload');
+    }).tabs('load',currentLoadingTab);
 }
 
-function setHeaderErrorMessage(message) {
-    $("#header_status").html("");
-    $("#header_error").html(message);
-    setTimeout('$("#header_error").html("")', errorMessageTimeout);
+function setupTabs(id, preload) {
+    $tabs = $("#" + id).tabs(
+        { cache: true,
+          spinner: "",
+          fx: { opacity: 'toggle', height: 'toggle' } });
+
+    if ((preload == undefined) || (preload == true))
+        setTimeout(function(){ preloadTabs($tabs); }, 10);
 }
 
-function clearHeaderMessages() {
-    $("#header_status").html("");
-    $("#header_error").html("");
+function setupNonAnimatedTabs(id, preload) {
+    $tabs = $("#" + id).tabs({ cache: true, spinner: "" });
+
+    if ((preload == undefined) || (preload == true))
+        setTimeout(function(){ preloadTabs($tabs); }, 10);
+}
+
+function sendMessage() {
+    var result  = 0;
+    var message = $("#message").val();
+    var address = $("#address").val();
+    var port    = $("#port").val();
+
+    $.post("/Myth/SendMessage",
+        { Message: message, Address: address, udpPort: port },
+        function(data) {
+            result = 1;
+        }).error(function(data) {
+            setErrorMessage("Unable to send message!");
+        });
+}
+
+function toggleShowDiv(id) {
+    var obj = document.getElementById(id);
+    if ( $("#" + id).is(':visible') ) {
+        $("#" + id).hide("slow");
+    } else {
+        $("#" + id).show("slow");
+    }
+}
+
+function hideConfirm() {
+    $("#confirmWindow").hide();
+}
+
+function showConfirm(content, functionname, params) {
+    $("#confirmWindow").dialog({
+        buttons: {
+           'Yes': function() {
+               if (params == null) {
+                   functionname();
+               }
+               else if (params.constructor == Array) {
+                   functionname.apply(null, params);
+               }
+               else {
+                   functionname(params);
+               }
+               $(this).dialog('close');
+               },
+           'No': function() { $(this).dialog('close'); }
+        }});
+    $("#confirmWindow").html(content);
+    $("#confirmWindow").show();
+    $("#confirmWindow").draggable();
 }
 

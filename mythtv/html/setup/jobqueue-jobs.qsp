@@ -20,7 +20,7 @@ function printJobRow(title, descKey, cmdKey) {
 <!-- Eventually after the JobQueue reorg, we'll be able to do this:
 <a href='javascript:createNewJob()'>Create New Job</a><br>
 -->
-<table border=1 cellpadding=2 cellspacing=2>
+<table>
 <tr><th>Description</th><th>Actions</th></tr>
 <tr><td>Transcoding</td><td><input type=button onClick='javascript:editJob("Transcoder", "", "JobQueueTranscodeCommand")' value='Edit'></td></tr>
 <tr class='alt'><td>Commercial Flagging</td><td><input type=button onClick='javascript:editJob("Commercial Flagger", "", "JobQueueCommFlagCommand")' value='Edit'></td></tr>

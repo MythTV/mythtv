@@ -48,7 +48,7 @@
 class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "version"    , "1.01" );
 
     public:
 
@@ -81,6 +81,11 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
 
         virtual QFileInfo           GetMusic            ( int Id ) = 0;
         virtual QFileInfo           GetVideo            ( int Id ) = 0;
+
+        virtual QString             GetHash             ( const QString   &StorageGroup,
+                                                          const QString   &FileName ) = 0;
+
+
 };
 
 #endif

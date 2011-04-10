@@ -629,6 +629,9 @@ void MythSystemUnix::Fork(time_t timeout)
     if (GetSetting("SetDirectory") && !dir.isEmpty())
         directory = strdup(dir.toUtf8().constData());
 
+    // check before fork to avoid QString use in child
+    bool setpgidsetting = GetSetting("SetPGID");
+
     /* Do this before forking in case the child miserably fails */
     m_timeout = timeout;
     if( timeout )
@@ -763,7 +766,7 @@ void MythSystemUnix::Fork(time_t timeout)
         /* Set the process group id to be the same as the pid of this child
          * process.  This ensures that any subprocesses launched by this
          * process can be killed along with the process itself. */ 
-        if (GetSetting("SetPGID") && setpgid(0,0) < 0 ) 
+        if (setpgidsetting && setpgid(0,0) < 0 ) 
         {
             cerr << locerr
                  << "setpgid() failed: "

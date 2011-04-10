@@ -3,7 +3,7 @@
     html, body {
         font-size:        14px;
         font-family:      sans-serif;
-        color:            black;
+        color:            white;
         background-color: #88a1bb;
         border:           0px;
         margin:           0px;
@@ -61,31 +61,23 @@
 
     #header_status {
         position:           fixed;
-        font-size:          18px;
-        font-family:        sans-serif;
-        font-weight:        bold;
-        color:              blue;
-        text-align:         center;
-        top:                0px;
-        left:               0px;
-        right:              0px;
+        text-align:         left;
+        bottom:             30px;
+        left:               100px;
+        right:              100px;
         height:             38px;
-        z-index:            98;
+        z-index:            2000;
         padding:            6px 200px 0 200px;
     }
 
     #header_error {
         position:           fixed;
-        font-size:          18px;
-        font-family:        sans-serif;
-        font-weight:        bold;
-        color:              red;
-        text-align:         center;
-        top:                0px;
-        left:               0px;
-        right:              0px;
+        text-align:         left;
+        bottom:             80px;
+        left:               100px;
+        right:              100px;
         height:             38px;
-        z-index:            98;
+        z-index:            2000;
         padding:            6px 200px 0 200px;
     }
 
@@ -183,19 +175,19 @@
     table
     {
         width:100%;
+        border:1px #555555;
+        border-style: dashed;
         border-collapse:collapse;
     }
 
     table td, table th
     {
         font-size:1.2em;
-        border:1px solid #E4D6CD;
-        padding:7px 7px 2px 7px;
+        padding:7px 7px 7px 7px;
     }
 
     table th
     {
-
         font-size:          14px;
         font-family:        sans-serif;
         font-weight:        bold;
@@ -209,17 +201,22 @@
 
     table tr td
     {
+        border:1px #555555;
+        border-style: dashed none;
         font-size:          14px;
         font-family:        sans-serif;
-        color:#000;
+        color:#FFF;
+        background-color:#2D2D2D;
     }
 
     table tr.alt td
     {
+        border:1px #555555;
+        border-style: dashed none;
         font-size:          14px;
         font-family:        sans-serif;
-        color:#000;
-        background-color:#EFEFFF;
+        color:#FFF;
+        background-color:transparent;
     }
 
     table td.invisible
@@ -262,7 +259,7 @@
         font-family:        sans-serif;
         font-weight:        bold;
         width:              100%;
-        color:              black;
+        color:              white;
         text-align:         center;
     }
 
@@ -276,5 +273,9 @@
         position: absolute;
         top: 5px;
         right: 5px;
+    }
+
+    .config {
+        display: none;
     }
 

@@ -923,11 +923,6 @@ static void reloadTheme_void(void)
         exit(err);
 }
 
-static void getScreenShot(void)
-{
-    (void) GetMythMainWindow()->screenShot();
-}
-
 static void setDebugShowBorders(void)
 {
     MythPainter *p = GetMythPainter();
@@ -977,9 +972,6 @@ static void InitJumpPoints(void)
          "", "", showStatus);
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Previously Recorded"),
          "", "", startPrevious);
-
-     REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "ScreenShot"),
-         "", "", getScreenShot, false);
 
      REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "Toggle Show Widget Borders"),
          "", "", setDebugShowBorders, false);

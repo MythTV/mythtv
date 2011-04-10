@@ -1,14 +1,14 @@
 <div id='wizard-media_storage' class='setuptab'>
-<input type=button value='Prev' onClick='javascript:$("#wizardtabs").tabs("select", 3)'>
-<div class='Title'>Media Storage Directories</div>
-<table border=1>
+<table>
 <tr><th>Recordings:</th><td><div id='sgDefault'></div></td><td valign=middle><input type=button onClick="wizardSelectNewDir('Default')" value='Add Directory'></td></tr>
 <tr><th>Videos:</th><td><div id='sgVideos'></div></td><td valign=middle><input type=button onClick="wizardSelectNewDir('Videos')" value='Add Directory'></td></tr>
 <tr><th>Music: (placeholder)</th><td><div id='sgMusic'></div></td><td valign=middle><input type=button onClick="wizardSelectNewDir('Music')" value='Add Directory'></td></tr>
 <tr><th>Pictures: (placeholder)</th><td><div id='sgPhotos'></div></td><td valign=middle><input type=button onClick="wizardSelectNewDir('Photos')" value='Add Directory'></td></tr>
 </table>
 </div>
-
+<div id='navigation' style="text-align:right">
+    <input type=button value='Back' onClick='javascript:$("#wizardtabs").tabs("select", 3)'>
+</div>
 
 <script language="JavaScript" type="text/javascript">
     var wizardStorageGroupName;

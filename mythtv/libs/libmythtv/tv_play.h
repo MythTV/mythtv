@@ -612,7 +612,8 @@ class MTV_PUBLIC TV : public QObject
 
     void ITVRestart(PlayerContext*, bool isLive);
 
-    bool ScreenShot(PlayerContext*, long long frameNumber);
+    // Deinterlacer handling
+    void HandleDeinterlacer(PlayerContext* ctx, const QString &action);
 
     // DVD methods
     void DVDJumpBack(PlayerContext*);

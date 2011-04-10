@@ -11,6 +11,7 @@ MythTV mythbackend Internal Web Server
 <link rel="icon"          href="/images/favicon.ico"   type="image/x-icon">
 <link rel="shortcut icon" href="/images/favicon.ico"   type="image/x-icon">
 <script language="JavaScript" type="text/javascript"  src="/js/util.qjs"></script>
+<script language="JavaScript" type="text/javascript"  src="/js/databaseutil.js"></script>
 <script language="JavaScript" type="text/javascript"  src="/js/jquery.min.js"></script>
 <script language="JavaScript" type="text/javascript"  src="/js/jquery-ui.min.js"></script>
 <script language="JavaScript" type="text/javascript"  src="/js/menu.js"></script>
@@ -22,6 +23,8 @@ $(document).ready(function() {
     loadContent("/misc/overview.qsp");
     showHostName();
     $('.menu').initMenu();
+    $('#header_status').hide();
+    $('#header_error').hide();
 });
 
 </script>
@@ -32,14 +35,9 @@ $(document).ready(function() {
     <div id="header_logo">
         <a href="/"><img src="/images/mythtv.png" class="png" width="180" height="64" border="0" alt="MythTV"></a>
     </div>
-
-    <div id='header_status'></div>
-    <div id='header_error'></div>
 </div>
 
 <div id="menu-bg">
-</div>
-
 </div>
 
 <div id="hostname">
@@ -48,47 +46,29 @@ $(document).ready(function() {
 <div id="content">
 </div>
 
-<div id='edit-bg'>
-</div>
-<div id='editborder'>
-    <div id='editStatusMessage' class='statusMessage'></div>
-    <div id='editErrorMessage' class='errorMessage'></div>
-    <div id='editcontent'>
-    </div>
-    <div id='editsavebutton' class='SaveButton'>
-        <a id='editsavelink' href=''>Save Changes</a>
-    </div>
-    <div id='editclosebutton' class='CloseButton'>
-        <a href='javascript:hideEditWindow()'>Close [X]</a>
+<div id='header_status' class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;"> 
+    <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+    <div id='header_status_message'>
     </div>
 </div>
 
-<div id='helpWindow'>
-    <div id='helpHeader' class='Header'>
-        Help
-    </div>
-    <div id='helpTitle' class='Title'>
-    </div>
-    <div id='helpContent'>
-    </div>
-    <div id='helpCloseButton' class='CloseButton'>
-        <a href='javascript:hideHelpWindow()'>Close [X]</a>
-    </div>
-    <div id='helpFooter' class='Footer'>
-        (This window is movable if it is in the way)
+<div id='header_error' class="ui-state-error ui-corner-all" style="padding: 0 .7em;"> 
+    <p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span> 
+    <div id="header_error_message">
     </div>
 </div>
 
-<div id='fileBrowser-bg'>
-    <div id='fileBrowserTitle' class='Title'>
-    </div>
+<div id='edit' title='Setup Wizard'>
+</div>
+
+<div id='helpWindow' title='Help'>
+</div>
+
+<div id='confirmWindow' title='Are You Sure?'>
+</div>
+
+<div id='fileBrowserWindow'>
     <div id='fileBrowser'>
-    </div>
-    <div id='fileBrowserSaveButton' class='SaveButton'>
-        <a href='javascript:saveFileBrowser()'>Save</a>
-    </div>
-    <div id='fileBrowserCloseButton' class='CloseButton'>
-        <a href='javascript:hideFileBrowser()'>Close [X]</a>
     </div>
 </div>
 

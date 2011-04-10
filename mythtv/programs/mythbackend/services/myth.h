@@ -70,6 +70,24 @@ class Myth : public MythServices
                                                   const QString &Password,
                                                   const QString &DBName,
                                                   int   dbPort);
+
+        bool                SendMessage         ( const QString &Message,
+                                                  const QString &Address,
+                                                  int   udpPort);
+
+        bool                BackupDatabase      ( void );
+
+        bool                CheckDatabase       ( bool Repair );
+
+        bool                ProfileSubmit       ( void );
+
+        bool                ProfileDelete       ( void );
+
+        QString             ProfileURL          ( void );
+
+        QString             ProfileUpdated      ( void );
+
+        QString             ProfileText         ( void );
 };
 
 // --------------------------------------------------------------------------
@@ -152,6 +170,48 @@ class ScriptableMyth : public QObject
         {
             return m_obj.TestDBSettings( HostName, UserName, Password,
                                          DBName, dbPort );
+        }
+
+        bool SendMessage( const QString &Message,
+                          const QString &Address,
+                          int   udpPort)
+        {
+            return m_obj.SendMessage( Message, Address, udpPort );
+        }
+
+        bool BackupDatabase( void )
+        {
+            return m_obj.BackupDatabase();
+        }
+
+        bool CheckDatabase( bool Repair )
+        {
+            return m_obj.CheckDatabase( Repair );
+        }
+
+        bool ProfileSubmit( void )
+        {
+            return m_obj.ProfileSubmit();
+        }
+
+        bool ProfileDelete( void )
+        {
+            return m_obj.ProfileDelete();
+        }
+
+        QString ProfileURL( void )
+        {
+            return m_obj.ProfileURL();
+        }
+
+        QString ProfileUpdated( void )
+        {
+            return m_obj.ProfileUpdated();
+        }
+
+        QString ProfileText( void )
+        {
+            return m_obj.ProfileText();
         }
 };
 

@@ -23,10 +23,14 @@
 
 #include <QDir>
 #include <QCryptographicHash>
+#include <QHostAddress>
+#include <QUdpSocket>
 
 #include "mythcorecontext.h"
 #include "mythdbcon.h"
 #include "storagegroup.h"
+#include "dbutil.h"
+#include "hardwareprofile.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -548,5 +552,211 @@ bool Myth::TestDBSettings( const QString &sHostName,
     bResult = TestDatabase(sHostName, sUserName, sPassword, db, port);
 
     return bResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Myth::SendMessage( const QString &sMessage,
+                        const QString &sAddress,
+                        int   udpPort)
+{
+    bool bResult = false;
+
+    if (sMessage.isEmpty())
+        return bResult;
+
+    QString xmlMessage =
+        "<mythmessage version=\"1\">\n"
+        "  <text>" + sMessage + "</text>\n"
+        "</mythmessage>";
+
+    QHostAddress address = QHostAddress::Broadcast;
+    unsigned short port = 6948;
+
+    if (!sAddress.isEmpty())
+        address.setAddress(sAddress);
+
+    if (udpPort != 0)
+        port = udpPort;
+
+    QUdpSocket *sock = new QUdpSocket();
+    QByteArray utf8 = xmlMessage.toUtf8();
+    int size = utf8.length();
+
+    if (sock->writeDatagram(utf8.constData(), size, address, port) < 0)
+    {
+        VERBOSE(VB_GENERAL, QString("Failed to send UDP/XML packet (Message: %1 "
+                                      "Address: %2 Port: %3").arg(sMessage).arg(sAddress).arg(port));
+    }
+    else
+    {
+        VERBOSE(VB_GENERAL, QString("UDP/XML packet sent! (Message: %1 Address: %2 "
+                                      "Port: %3").arg(sMessage)
+                                      .arg(address.toString().toLocal8Bit().constData()).arg(port));
+        bResult = true;
+    }
+
+    sock->deleteLater();
+
+    return bResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Myth::BackupDatabase(void)
+{
+    bool bResult = false;
+
+    DBUtil *dbutil = new DBUtil();
+    MythDBBackupStatus status = kDB_Backup_Unknown;
+    QString filename;
+
+    VERBOSE(VB_GENERAL, QString("Performing API invoked DB Backup."));
+
+    if (dbutil)
+        status = dbutil->BackupDB(filename);
+
+    if (status == kDB_Backup_Completed)
+    {
+        VERBOSE(VB_GENERAL, QString("Database backup succeeded."));
+        bResult = true;
+    }
+    else
+        VERBOSE(VB_GENERAL, QString("Database backup failed."));
+
+    delete dbutil;
+
+    return bResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Myth::CheckDatabase( bool repair )
+{
+    bool bResult = false;
+
+    DBUtil *dbutil = new DBUtil();
+
+    VERBOSE(VB_GENERAL, QString("Performing API invoked DB Check."));
+
+    if (dbutil)
+        bResult = dbutil->CheckTables(repair);
+
+    if (bResult)
+        VERBOSE(VB_GENERAL, QString("Database check complete."));
+    else
+        VERBOSE(VB_GENERAL, QString("Database check failed."));
+
+    delete dbutil;
+
+    return bResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Myth::ProfileSubmit()
+{
+    bool bResult = false;
+
+    HardwareProfile *profile = new HardwareProfile();
+    if (profile)
+    {
+        VERBOSE(VB_GENERAL, QString("Profile Submission..."));
+        profile->GenerateUUIDs();
+        bResult = profile->SubmitProfile();
+        if (bResult)
+            VERBOSE(VB_GENERAL, QString("Profile Submitted."));
+    }
+    delete profile;
+
+    return bResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Myth::ProfileDelete()
+{
+    bool bResult = false;
+
+    HardwareProfile *profile = new HardwareProfile();
+    if (profile)
+    {
+        VERBOSE(VB_GENERAL, QString("Profile Deletion..."));
+        profile->GenerateUUIDs();
+        bResult = profile->DeleteProfile();
+        if (bResult)
+            VERBOSE(VB_GENERAL, QString("Profile Deleted."));
+    }
+    delete profile;
+
+    return bResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString Myth::ProfileURL()
+{
+    QString sProfileURL;
+
+    HardwareProfile *profile = new HardwareProfile();
+    if (profile)
+    {
+        profile->GenerateUUIDs();
+        sProfileURL = profile->GetProfileURL();
+        VERBOSE(VB_GENERAL, QString("ProfileURL: %1").arg(sProfileURL));
+    }
+    delete profile;
+
+    return sProfileURL;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString Myth::ProfileUpdated()
+{
+    QString sProfileUpdate;
+
+    HardwareProfile *profile = new HardwareProfile();
+    if (profile)
+    {
+        profile->GenerateUUIDs();
+        QDateTime tUpdated;
+        tUpdated = profile->GetLastUpdate();
+        sProfileUpdate = tUpdated.toString(
+                             gCoreContext->GetSetting( "DateFormat", "MM.dd.yyyy"));
+    }
+    delete profile;
+
+    return sProfileUpdate;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString Myth::ProfileText()
+{
+    QString sProfileText;
+
+    HardwareProfile *profile = new HardwareProfile();
+    if (profile)
+        sProfileText = profile->GetHardwareProfile();
+    delete profile;
+
+    return sProfileText;
 }
 

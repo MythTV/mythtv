@@ -100,7 +100,6 @@ class MTV_PUBLIC MythPlayer
 {
     // Do NOT add a decoder class to this list
     friend class PlayerContext;
-    friend class PlayerTimer;
     friend class CC708Reader;
     friend class CC608Reader;
     friend class DecoderThread;
@@ -188,6 +187,8 @@ class MTV_PUBLIC MythPlayer
     bool    IsMuted(void)                     { return audio.IsMuted(); }
     bool    UsingNullVideo(void) const { return using_null_videoout; }
     bool    HasTVChainNext(void) const;
+    bool    CanSupportDoubleRate(void);
+    bool    GetScreenShot(int width = 0, int height = 0);
 
     // Non-const gets
     VideoOutput *getVideoOutput(void)         { return videoOutput; }
@@ -564,7 +565,6 @@ class MTV_PUBLIC MythPlayer
     mutable QMutex playingLock;
     bool     m_double_framerate;///< Output fps is double Video (input) rate
     bool     m_double_process;///< Output filter must processed at double rate
-    bool     m_can_double;    ///< VideoOutput capable of doubling frame rate
     bool     m_deint_possible;
     bool     livetv;
     bool     watchingrecording;
@@ -712,6 +712,7 @@ class MTV_PUBLIC MythPlayer
     bool       decode_extra_audio;
     int        repeat_delay;
     int64_t    disp_timecode;
+    bool       avsync_audiopaused;
 
     // Time Code stuff
     int        prevtc;        ///< 32 bit timecode if last VideoFrame shown

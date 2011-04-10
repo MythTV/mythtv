@@ -39,7 +39,7 @@ class Program;
 class SERVICE_PUBLIC ChannelInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.0" );
+    Q_CLASSINFO( "version", "1.02" );
 
     // We need to know the type that will ultimately be contained in 
     // any QVariantList or QVariantMap.  We do his by specifying
@@ -48,30 +48,64 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
 
     Q_CLASSINFO( "Programs_type", "DTC::Program");
 
-    Q_PROPERTY( uint         ChanId      READ ChanId       WRITE setChanId      )
-    Q_PROPERTY( QString      ChanNum     READ ChanNum      WRITE setChanNum     )
-    Q_PROPERTY( QString      CallSign    READ CallSign     WRITE setCallSign    )
-    Q_PROPERTY( QString      IconURL     READ IconURL      WRITE setIconURL     )
-    Q_PROPERTY( QString      ChannelName READ ChannelName  WRITE setChannelName )
-    
-    Q_PROPERTY( QString      ChanFilters READ ChanFilters  WRITE setChanFilters DESIGNABLE SerializeDetails )
-    Q_PROPERTY( int          SourceId    READ SourceId     WRITE setSourceId    DESIGNABLE SerializeDetails )
-    Q_PROPERTY( int          InputId     READ InputId      WRITE setInputId     DESIGNABLE SerializeDetails )
-    Q_PROPERTY( int          CommFree    READ CommFree     WRITE setCommFree    DESIGNABLE SerializeDetails )
+    Q_PROPERTY( uint      ChanId          READ ChanId         WRITE setChanId        )
+    Q_PROPERTY( QString   ChanNum         READ ChanNum        WRITE setChanNum       )
+    Q_PROPERTY( QString   CallSign        READ CallSign       WRITE setCallSign      )
+    Q_PROPERTY( QString   IconURL         READ IconURL        WRITE setIconURL       )
+    Q_PROPERTY( QString   ChannelName     READ ChannelName    WRITE setChannelName   )
+
+    Q_PROPERTY( uint      MplexId         READ MplexId        WRITE setMplexId        DESIGNABLE SerializeDetails )
+    Q_PROPERTY( uint      TransportId     READ TransportId    WRITE setTransportId    DESIGNABLE SerializeDetails )
+    Q_PROPERTY( uint      ServiceId       READ ServiceId      WRITE setServiceId      DESIGNABLE SerializeDetails )
+    Q_PROPERTY( uint      NetworkId       READ NetworkId      WRITE setNetworkId      DESIGNABLE SerializeDetails )
+    Q_PROPERTY( uint      ATSCMajorChan   READ ATSCMajorChan  WRITE setATSCMajorChan  DESIGNABLE SerializeDetails )
+    Q_PROPERTY( uint      ATSCMinorChan   READ ATSCMinorChan  WRITE setATSCMinorChan  DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString   Format          READ Format         WRITE setFormat         DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString   Modulation      READ Modulation     WRITE setModulation     DESIGNABLE SerializeDetails )
+    Q_PROPERTY( uint64_t  Frequency       READ Frequency      WRITE setFrequency      DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString   FrequencyId     READ FrequencyId    WRITE setFrequencyId    DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString   FrequencyTable  READ FrequencyTable WRITE setFrequencyTable DESIGNABLE SerializeDetails )
+    Q_PROPERTY( int       FineTune        READ FineTune       WRITE setFineTune       DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString   SIStandard      READ SIStandard     WRITE setSIStandard     DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString   ChanFilters     READ ChanFilters    WRITE setChanFilters    DESIGNABLE SerializeDetails )
+    Q_PROPERTY( int       SourceId        READ SourceId       WRITE setSourceId       DESIGNABLE SerializeDetails )
+    Q_PROPERTY( int       InputId         READ InputId        WRITE setInputId        DESIGNABLE SerializeDetails )
+    Q_PROPERTY( int       CommFree        READ CommFree       WRITE setCommFree       DESIGNABLE SerializeDetails )
+    Q_PROPERTY( bool      UseEIT          READ UseEIT         WRITE setUseEIT         DESIGNABLE SerializeDetails )
+    Q_PROPERTY( bool      Visible         READ Visible        WRITE setVisible        DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString   XMLTVID         READ XMLTVID        WRITE setXMLTVID        DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString   DefaultAuth     READ DefaultAuth    WRITE setDefaultAuth    DESIGNABLE SerializeDetails )
 
     Q_PROPERTY( QVariantList Programs    READ Programs DESIGNABLE true )
 
-    PROPERTYIMP       ( uint        , ChanId      )
-    PROPERTYIMP       ( QString     , ChanNum     )
-    PROPERTYIMP       ( QString     , CallSign    )
-    PROPERTYIMP       ( QString     , IconURL     )
-    PROPERTYIMP       ( QString     , ChannelName )
-    PROPERTYIMP       ( QString     , ChanFilters )
-    PROPERTYIMP       ( int         , SourceId    )
-    PROPERTYIMP       ( int         , InputId     )
-    PROPERTYIMP       ( int         , CommFree    )
+    PROPERTYIMP       ( uint        , ChanId         )
+    PROPERTYIMP       ( QString     , ChanNum        )
+    PROPERTYIMP       ( QString     , CallSign       )
+    PROPERTYIMP       ( QString     , IconURL        )
+    PROPERTYIMP       ( QString     , ChannelName    )
+    PROPERTYIMP       ( uint        , MplexId        )
+    PROPERTYIMP       ( uint        , TransportId    )
+    PROPERTYIMP       ( uint        , ServiceId      )
+    PROPERTYIMP       ( uint        , NetworkId      )
+    PROPERTYIMP       ( uint        , ATSCMajorChan  )
+    PROPERTYIMP       ( uint        , ATSCMinorChan  )
+    PROPERTYIMP       ( QString     , Format         )
+    PROPERTYIMP       ( QString     , Modulation     )
+    PROPERTYIMP       ( uint64_t    , Frequency      )
+    PROPERTYIMP       ( QString     , FrequencyId    )
+    PROPERTYIMP       ( QString     , FrequencyTable )
+    PROPERTYIMP       ( int         , FineTune       )
+    PROPERTYIMP       ( QString     , SIStandard     )
+    PROPERTYIMP       ( QString     , ChanFilters    )
+    PROPERTYIMP       ( int         , SourceId       )
+    PROPERTYIMP       ( int         , InputId        )
+    PROPERTYIMP       ( int         , CommFree       )
+    PROPERTYIMP       ( bool        , UseEIT         )
+    PROPERTYIMP       ( bool        , Visible        )
+    PROPERTYIMP       ( QString     , XMLTVID        )
+    PROPERTYIMP       ( QString     , DefaultAuth    )
 
-    PROPERTYIMP_RO_REF( QVariantList, Programs    )
+    PROPERTYIMP_RO_REF( QVariantList, Programs      )
 
     // Used only by Serializer
     PROPERTYIMP( bool, SerializeDetails )

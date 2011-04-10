@@ -688,9 +688,6 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", ACTION_EXITSHOWNOPROMPTS,
             QT_TRANSLATE_NOOP("MythControls", "Exit Show without any prompts"),
             "");
-    REG_KEY("TV Playback", ACTION_SCREENSHOT,
-            QT_TRANSLATE_NOOP("MythControls", "Save screenshot of current "
-            "video frame"), "");
 
     /* Interactive Television keys */
     REG_KEY("TV Playback", ACTION_MENURED,    QT_TRANSLATE_NOOP("MythControls",
@@ -3843,16 +3840,18 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
             sigMonMode  = !sigMonMode;
         }
     }
-    else if (has_action(ACTION_SCREENSHOT, actions) && !isDVD)
+    else if (has_action(ACTION_SCREENSHOT, actions))
     {
-        long long caploc = -1;
         ctx->LockDeletePlayer(__FILE__, __LINE__);
-        if (ctx->player)
-            caploc = ctx->player->GetFramesPlayed();
+        if (ctx->player && ctx->player->GetScreenShot())
+        {
+            // VideoOutput has saved screenshot
+        }
+        else
+        {
+            GetMythMainWindow()->ScreenShot();
+        }
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-
-        if (caploc >= 0)
-            ScreenShot(ctx, caploc);
     }
     else if (has_action(ACTION_EXITSHOWNOPROMPTS, actions))
     {
@@ -8052,7 +8051,22 @@ void TV::customEvent(QEvent *e)
     // TODO Go through these and make sure they make sense...
     QStringList tokens = message.split(" ", QString::SkipEmptyParts);
 
-    if (message.left(14) == "DONE_RECORDING")
+    if (message == ACTION_SCREENSHOT)
+    {
+        PlayerContext *mctx = GetPlayerWriteLock(0, __FILE__, __LINE__);
+        bool extra = me->ExtraDataCount() == 2;
+        int width  = extra ? me->ExtraData(0).toInt() : 0;
+        int height = extra ? me->ExtraData(1).toInt() : 0;
+        if (mctx && mctx->player && mctx->player->GetScreenShot(width, height))
+        {
+        }
+        else
+        {
+            GetMythMainWindow()->ScreenShot(width, height);
+        }
+        ReturnPlayerLock(mctx);
+    }
+    else if (message.left(14) == "DONE_RECORDING")
     {
         int seconds = 0;
         long long frames = 0;
@@ -9380,6 +9394,8 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         ; // exit dialog
     else if (HandleTrackAction(actx, action))
         ;
+    else if (action.startsWith("DEINTERLACER"))
+        HandleDeinterlacer(actx, action);
     else if (action == "TOGGLEMANUALZOOM")
         SetManualZoom(actx, true, tr("Zoom Mode ON"));
     else if (action == "TOGGLESTRETCH")
@@ -9799,9 +9815,8 @@ void TV::FillOSDMenuVideo(const PlayerContext *ctx, OSD *osd,
                                      selected == "ADJUSTPICTURE");
             }
         }
-        osd->DialogAddButton(tr("Video Scan"),
-                             "DIALOG_MENU_VIDEOSCAN_0", true,
-                             selected == "VIDEOSCAN");
+        osd->DialogAddButton(tr("Advanced"), "DIALOG_MENU_ADVANCEDVIDEO_0",
+                             true, selected == "ADVANCEDVIDEO");
     }
     else if (category == "VIDEOASPECT")
     {
@@ -9858,11 +9873,56 @@ void TV::FillOSDMenuVideo(const PlayerContext *ctx, OSD *osd,
             }
         }
     }
+    else if (category == "ADVANCEDVIDEO")
+    {
+        osd->DialogAddButton(tr("Video Scan"),
+                             "DIALOG_MENU_VIDEOSCAN_0", true,
+                             selected == "VIDEOSCAN");
+        /*
+        if (kScan_Progressive != scan_type)
+        {
+            osd->DialogAddButton(tr("Deinterlacer"),
+                                 "DIALOG_MENU_DEINTERLACER_0", true,
+                                 selected == "DEINTERLACER");
+        }
+        */
+        backaction = "VIDEO";
+        currenttext = tr("Advanced");
+    }
+    else if (category == "DEINTERLACER")
+    {
+        backaction = "ADVANCEDVIDEO";
+        currenttext = tr("Deinterlacer");
+
+        QStringList deinterlacers;
+        QString     currentdeinterlacer;
+        bool        doublerate = false;
+        ctx->LockDeletePlayer(__FILE__, __LINE__);
+        if (ctx->player && ctx->player->getVideoOutput())
+        {
+            ctx->player->getVideoOutput()->GetDeinterlacers(deinterlacers);
+            currentdeinterlacer = ctx->player->getVideoOutput()->GetDeinterlacer();
+            doublerate = ctx->player->CanSupportDoubleRate();
+        }
+        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+
+        foreach (QString deint, deinterlacers)
+        {
+            if ((deint.contains("doublerate") ||
+                deint.contains("doubleprocess") ||
+                deint.contains("bobdeint")) && !doublerate)
+            {
+                continue;
+            }
+            QString trans = VideoDisplayProfile::GetDeinterlacerName(deint);
+            osd->DialogAddButton(trans, "DEINTERLACER_" + deint, false,
+                                 deint == currentdeinterlacer);
+        }
+    }
     else if (category == "VIDEOSCAN")
     {
-        backaction = "VIDEO";
+        backaction = "ADVANCEDVIDEO";
         currenttext = tr("Video Scan");
-
 
         QString cur_mode = "";
         if (!scan_type_locked)
@@ -10699,6 +10759,18 @@ void TV::FillOSDMenuJumpRec(PlayerContext* ctx, const QString category,
     ReturnOSDLock(ctx, osd);
 }
 
+void TV::HandleDeinterlacer(PlayerContext *ctx, const QString &action)
+{
+    if (!action.startsWith("DEINTERLACER"))
+        return;
+
+    QString deint = action.mid(13);
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    if (ctx->player && ctx->player->getVideoOutput())
+        ctx->player->getVideoOutput()->SetupDeinterlace(true, deint);
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+}
+
 void TV::ToggleAutoExpire(PlayerContext *ctx)
 {
     QString desc = QString::null;
@@ -11074,51 +11146,6 @@ void TV::ITVRestart(PlayerContext *ctx, bool isLive)
     if (ctx->player)
         ctx->player->ITVRestart(chanid, cardid, isLive);
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-}
-
-/* \fn TV::ScreenShot(PlayerContext*, long long)
- * \brief Creates an image of a particular frame from the current
- *        playbackinfo recording.
- */
-bool TV::ScreenShot(PlayerContext *ctx, long long frameNumber)
-{
-    QDir d;
-    QString confdir = GetConfDir();
-    if (!d.mkpath(confdir))
-    {
-        QString msg = tr("Screen Shot") + " " + tr("Error");
-        SetOSDMessage(ctx, msg);
-        return false;
-    }
-
-    ctx->LockPlayingInfo(__FILE__, __LINE__);
-    if (!ctx->playingInfo)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "ScreenShot called with NULL playingInfo");
-        ctx->UnlockPlayingInfo(__FILE__, __LINE__);
-        return false;
-    }
-
-    QString outFile =
-        QString("%1/%2_%3_%4.png")
-        .arg(confdir).arg(ctx->playingInfo->GetChanID())
-        .arg(ctx->playingInfo->GetRecordingStartTime(MythDate))
-        .arg(frameNumber);
-
-    PreviewGenerator *previewgen = new PreviewGenerator(
-        ctx->playingInfo, QString(), PreviewGenerator::kLocalAndRemote);
-    ctx->UnlockPlayingInfo(__FILE__, __LINE__);
-
-    previewgen->SetPreviewTimeAsFrameNumber(frameNumber);
-    previewgen->SetOutputSize(QSize(-1,-1));
-    previewgen->SetOutputFilename(outFile);
-    bool ok = previewgen->Run();
-    previewgen->deleteLater();
-
-    QString msg = tr("Screen Shot") + " " + ((ok) ? tr("OK") : tr("Error"));
-    SetOSDMessage(ctx, msg);
-    return ok;
 }
 
 /*  \fn TV::DVDJumpBack(PlayerContext*)

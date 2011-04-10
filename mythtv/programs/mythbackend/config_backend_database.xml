@@ -24,7 +24,8 @@
     <setting setting_type="file" value="dbHostID" default_data=""
              label="Host Identifier" data_type="string"
              help_text="Unique identifier for this host in the database." />
-    <group human_label="Database Wake on LAN" default_data="database_wol">
+  </group>
+  <group human_label="Database Wake on LAN" unique_label="database_wol">
       <setting setting_type="file" value="dbWOLEnabled" default_data="1"
                label="Enabled" data_type="checkbox"
                help_text="If checked MythTV will attempt to wake the
@@ -43,6 +44,5 @@
                label="Command" data_type="string"
                help_text="Command to execute to wake the
                           remote database host." />
-    </group>
   </group>
 </config>

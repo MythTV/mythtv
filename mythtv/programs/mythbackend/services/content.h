@@ -57,6 +57,8 @@ class Content : public ContentServices
         QFileInfo           GetMusic            ( int Id );
         QFileInfo           GetVideo            ( int Id );
 
+        QString             GetHash             ( const QString   &storageGroup,
+                                                  const QString   &FileName );
 };
 
 Q_SCRIPT_DECLARE_QMETAOBJECT( Content, QObject*);

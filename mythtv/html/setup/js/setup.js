@@ -25,8 +25,13 @@ function hideHelpWindow() {
 }
 
 function showHelp(title, content) {
-    $("#helpTitle").html(title);
-    $("#helpContent").html(content);
+    $("#helpWindow").dialog({
+      'title': title,
+      'width': 300,
+      'height': 150,
+      'position': [(window.innerWidth - 330), (window.innerHeight - 180)]
+    });
+    $("#helpWindow").html(content);
     showHelpWindow();
 }
 
@@ -37,31 +42,11 @@ function showSettingHelp(setting) {
 }
 
 function showEditWindow() {
-    $("#edit-bg").show();
-    $("#editborder").show();
+    $("#edit").show();
 }
 
 function hideEditWindow() {
-    $("#editborder").hide();
-    $("#edit-bg").hide();
-    $("#editsavebutton").hide();
-}
-
-function clearEditMessages() {
-    setEditStatusMessage("");
-    setEditErrorMessage("");
-}
-
-function setEditStatusMessage(message) {
-    $("#editErrorMessage").html("");
-    $("#editStatusMessage").html(message);
-    setTimeout('$("#editStatusMessage").html("")', statusMessageTimeout);
-}
-
-function setEditErrorMessage(message) {
-    $("#editStatusMessage").html("");
-    $("#editErrorMessage").html(message);
-    setTimeout('$("#editErrorMessage").html("")', errorMessageTimeout);
+    $("#edit").hide();
 }
 
 function submitConfigForm(form) {
@@ -86,16 +71,17 @@ function submitConfigForm(form) {
     $.ajaxSetup({ async: true });
 
     if (savedOK)
-        setHeaderStatusMessage("Changes saved successfully");
+        setStatusMessage("Changes saved successfully");
     else
-        setHeaderErrorMessage("Error saving changes!");
+        setErrorMessage("Error saving changes!");
 }
 
 function setSettingInputValues(divName) {
     $("#" + divName + " :input").each(function() {
         if (($(this).attr("type") != "button") &&
             ($(this).attr("type") != "submit") &&
-            ($(this).attr("type") != "reset")) {
+            ($(this).attr("type") != "reset") &&
+            (settingsList[$(this).attr("id")])) {
             $(this).val(settingsList[$(this).attr("id")]);
         }
     });
@@ -241,13 +227,8 @@ function addStorageGroupDir( group, dir, host ) {
         function(data) {
             if (data.bool == "true")
                 result = 1;
-            else
-                alert("data.bool != true");
-        }, "json").error(function(data) {
-            alert("Error: unable to add Storage Group Directory");
-        });
+        }, "json");
     $.ajaxSetup({ async: true });
-    // FIXME, better alerting
 
     return result;
 }
@@ -274,8 +255,19 @@ function removeStorageGroupDir( group, dir, host ) {
 /****************************************************************************/
 var fileBrowserCallback;
 function openFileBrowser(title, dirs, callback) {
-    $('#fileBrowserTitle').html(title);
-    $('#fileBrowser-bg').show();
+    $("#fileBrowserWindow").dialog({
+        modal: true,
+        width: 340,
+        height: 515,
+        'title': title,
+        closeOnEscape: false,
+        buttons: {
+           'Save': saveFileBrowser,
+           'Cancel': function() { $(this).dialog('close'); }
+        }
+    });
+
+    $('#fileBrowserWindow').dialog("open");
     $.ajaxSetup({ async: false });
     $.getScript("/js/jqueryFileTree/jqueryFileTree.js");
     $.ajaxSetup({ async: true });
@@ -290,14 +282,10 @@ function saveFileBrowser() {
     var selectedDir = $('#fileBrowser').find('A.selected').attr("rel");
     if (selectedDir && fileBrowserCallback)
     {
-        hideFileBrowser();
+        $('#fileBrowserWindow').dialog('close');
         fileBrowserCallback(selectedDir);
     }
     else
         alert("No directory selected.");
-}
-
-function hideFileBrowser() {
-    $('#fileBrowser-bg').hide();
 }
 

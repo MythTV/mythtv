@@ -6,7 +6,7 @@ function testDBSettings() {
     var name = $("#dbName").val();
     var port = $("#dbPort").val();
 
-    clearEditMessages();
+    clearMessages();
 
     if (name == null)
         name = "mythconverg";
@@ -19,12 +19,12 @@ function testDBSettings() {
         function(data) {
             if (data.bool == "true") {
                 result = 1;
-                setEditStatusMessage("Database connection succeeded!");
+                setStatusMessage("Database connection succeeded!");
             }
             else
-                setEditErrorMessage("Database connection failed!");
+                setErrorMessage("Database connection failed!");
         }, "json").error(function(data) {
-            setEditErrorMessage("Database connection failed!");
+            setErrorMessage("Database connection failed!");
         });
 
     return result;
@@ -46,28 +46,23 @@ function validateSettingsInDiv(divName) {
 
 function saveWizard() {
     if (!validateSettingsInDiv("wizard-network")) {
-        setEditErrorMessage("Network Setup has an error.");
+        setErrorMessage("Network Setup has an error.");
     }
 
     alert("Saving is not fully functional, the database has not been modified!");
 }
 
-function preloadWizardTabs() {
-    $tabs = $("#wizardtabs").tabs({ cache: true });
-    var total = $tabs.find('.ui-tabs-nav li').length;
-    var currentLoadingTab = 0;
-    $tabs.bind('tabsload',function(){
-        currentLoadingTab++;
-        if (currentLoadingTab < total)
-            $tabs.tabs('load',currentLoadingTab);
-        else
-            $tabs.unbind('tabsload');
-    }).tabs('load',currentLoadingTab);
-}
-
-preloadWizardTabs();
-$("#editborder").attr({ class: 'editborder-wizard' });
-$("#editsavebutton").show();
-$("#editsavelink").attr("href", "javascript:saveWizard()");
+setupTabs("wizardtabs");
+$("#edit").dialog({
+    modal: true,
+    width: 850,
+    height: 500,
+    'title': 'Setup Wizard',
+    closeOnEscape: false,
+    buttons: {
+       'Save': function() {},
+       'Cancel': function() { $(this).dialog('close'); }
+    }
+});
 showEditWindow();
 

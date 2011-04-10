@@ -435,7 +435,7 @@ static int fill_buffers(void *r, int finish)
 
 MPEG2replex::MPEG2replex() :
     done(0),      otype(0),
-    ext_count(0), mplex(0)
+    ext_count(0)
 {
     memset(&vrbuf, 0, sizeof(vrbuf));
     memset(extrbuf, 0, sizeof(extrbuf));
@@ -485,12 +485,6 @@ int MPEG2replex::WaitBuffers()
     }
     mutex.unlock();
 
-    if (done)
-    {
-        finish_mpg(mplex);
-        thread.terminate();
-    }
-
     return 0;
 }
 
@@ -533,18 +527,18 @@ void MPEG2replex::Start()
     cond.wait(&mutex);
     mutex.unlock();
 
-    mplex = &mx;
-
     init_multiplex(&mx, &seq_head, extframe, exttype, exttypcnt,
                    video_delay, audio_delay, fd_out, fill_buffers,
                    &vrbuf, &index_vrbuf, extrbuf, index_extrbuf, otype);
     setup_multiplex(&mx);
 
-    while (1)
+    while (!done)
     {
         check_times( &mx, &video_ok, ext_ok, &start);
         write_out_packs( &mx, video_ok, ext_ok);
     }
+
+    finish_mpg(&mx);
 }
 
 #define INDEX_BUF (sizeof(index_unit) * 200)
@@ -964,7 +958,7 @@ void MPEG2fixup::WriteFrame(const char *filename, MPEG2frame *f)
     WriteFrame(filename, &tmpFrame->pkt);
     framePool.enqueue(tmpFrame);
 }
-   
+
 void MPEG2fixup::WriteFrame(const char *filename, AVPacket *pkt)
 {
 
