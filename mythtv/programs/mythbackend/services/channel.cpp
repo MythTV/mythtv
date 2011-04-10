@@ -166,3 +166,11 @@ bool Channel::CreateDBChannel( uint          MplexID,
     return bResult;
 }
 
+bool Channel::DeleteDBChannel( uint nChannelID )
+{
+    bool bResult = false;
+
+    bResult = ChannelUtil::DeleteChannel( nChannelID );
+
+    return bResult;
+}

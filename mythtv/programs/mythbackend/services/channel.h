@@ -73,6 +73,8 @@ class Channel : public ChannelServices
                                                      const QString &Format,
                                                      const QString &XMLTVID,
                                                      const QString &DefaultAuthority );
+
+        bool                   DeleteDBChannel     ( uint          ChannelID );
 };
 
 #endif

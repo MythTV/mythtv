@@ -47,9 +47,10 @@
 class SERVICE_PUBLIC ChannelServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.02" );
+    Q_CLASSINFO( "version"    , "1.03" );
     Q_CLASSINFO( "UpdateDBChannel_Method",         "POST" )
     Q_CLASSINFO( "CreateDBChannel_Method",         "POST" )
+    Q_CLASSINFO( "DeleteDBChannel_Method",         "POST" )
 
     public:
 
@@ -100,6 +101,8 @@ class SERVICE_PUBLIC ChannelServices : public Service  //, public QScriptable ??
                                                              const QString &Format,
                                                              const QString &XMLTVID,
                                                              const QString &DefaultAuthority ) = 0;
+
+        virtual bool                   DeleteDBChannel     ( uint          ChannelID ) = 0;
 };
 
 #endif
