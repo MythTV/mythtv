@@ -1129,12 +1129,13 @@ void RecordingInfo::ReactivateRecording(void)
 /**
  *  \brief Adds recording history, creating "record" it if necessary.
  */
-void RecordingInfo::AddHistory(bool resched, bool forcedup)
+void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
 {
     bool dup = (GetRecordingStatus() == rsRecorded || forcedup);
     RecStatusType rs = (GetRecordingStatus() == rsCurrentRecording) ?
         rsPreviousRecording : GetRecordingStatus();
-    oldrecstatus = GetRecordingStatus();
+    if (!future)
+        oldrecstatus = GetRecordingStatus();
     if (dup)
         SetReactivated(false);
     uint erecid = parentid ? parentid : recordid;
@@ -1144,10 +1145,11 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup)
     result.prepare("REPLACE INTO oldrecorded (chanid,starttime,"
                    "endtime,title,subtitle,description,category,"
                    "seriesid,programid,findid,recordid,station,"
-                   "rectype,recstatus,duplicate,reactivate) "
+                   "rectype,recstatus,duplicate,reactivate,future) "
                    "VALUES(:CHANID,:START,:END,:TITLE,:SUBTITLE,:DESC,"
                    ":CATEGORY,:SERIESID,:PROGRAMID,:FINDID,:RECORDID,"
-                   ":STATION,:RECTYPE,:RECSTATUS,:DUPLICATE,:REACTIVATE);");
+                   ":STATION,:RECTYPE,:RECSTATUS,:DUPLICATE,:REACTIVATE,"
+                   ":FUTURE);");
     result.bindValue(":CHANID", chanid);
     result.bindValue(":START", startts);
     result.bindValue(":END", endts);
@@ -1164,6 +1166,7 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup)
     result.bindValue(":RECSTATUS", rs);
     result.bindValue(":DUPLICATE", dup);
     result.bindValue(":REACTIVATE", IsReactivated());
+    result.bindValue(":FUTURE", future);
 
     if (!result.exec())
         MythDB::DBError("addHistory", result);
@@ -1291,7 +1294,7 @@ void RecordingInfo::SetDupHistory(void)
     MSqlQuery result(MSqlQuery::InitCon());
 
     result.prepare("UPDATE oldrecorded SET duplicate = 1 "
-                   "WHERE duplicate = 0 "
+                   "WHERE future = 0 AND duplicate = 0 "
                    "AND title = :TITLE AND "
                    "((programid = '' AND subtitle = :SUBTITLE"
                    "  AND description = :DESC) OR "

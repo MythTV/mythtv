@@ -1343,6 +1343,7 @@ void Scheduler::PruneRedundants(void)
         // change history, can we?
         if (p->GetRecordingStatus() != rsRecording &&
             p->GetRecordingStatus() != rsTuning &&
+            p->GetRecordingStatus() != rsMissedFuture &&
             p->GetScheduledEndTime() < schedTime &&
             p->GetRecordingEndTime() < schedTime)
         {
@@ -1361,7 +1362,12 @@ void Scheduler::PruneRedundants(void)
             p->oldrecstatus != rsNotListed &&
             !p->IsReactivated())
         {
+            RecStatusType rs = p->GetRecordingStatus();
             p->SetRecordingStatus(p->oldrecstatus);
+            // Re-mark rsMissedFuture entries so non-future history
+            // will be saved in the scheduler thread.
+            if (rs == rsMissedFuture)
+                p->oldrecstatus = rsMissedFuture;
         }
 
         if (!Recording(p))
@@ -1699,9 +1705,10 @@ void Scheduler::RunScheduler(void)
     struct timeval fillstart, fillend;
     float matchTime, placeTime;
 
-    // Mark anything that was recording as aborted.  We'll fix it up.
-    // if possible, after the slaves connect and we start scheduling.
     MSqlQuery query(dbConn);
+
+    // Mark anything that was recording as aborted.  We'll fix it, if
+    // needed, after the slaves connect and we start scheduling.
     query.prepare("UPDATE oldrecorded SET recstatus = :RSABORTED "
                   "  WHERE recstatus = :RSRECORDING OR recstatus = :RSTUNING");
     query.bindValue(":RSABORTED", rsAborted);
@@ -1709,6 +1716,24 @@ void Scheduler::RunScheduler(void)
     query.bindValue(":RSTUNING", rsTuning);
     if (!query.exec())
         MythDB::DBError("UpdateAborted", query);
+
+    // Mark anything that was going to record as missed.  We'll fix
+    // it, if needed, after we start scheduling.
+    query.prepare("UPDATE oldrecorded SET recstatus = :RSMISSED "
+                  "WHERE recstatus = :RSWILLRECORD");
+    query.bindValue(":RSMISSED", rsMissed);
+    query.bindValue(":RSWILLRECORD", rsWillRecord);
+    if (!query.exec())
+        MythDB::DBError("UpdateMissed1", query);
+
+    // Clear the "future" status of anything older than the maximum
+    // endoffset.  Anything more recent will bee handled elsewhere
+    // during normal processing.
+    query.prepare("UPDATE oldrecorded SET future = 0 "
+                  "WHERE future > 0 AND "
+                  "      endtime < (NOW() - INTERVAL 8 HOUR)");
+    if (!query.exec())
+        MythDB::DBError("UpdateMissed2", query);
 
     // wait for slaves to connect
     sleep(3);
@@ -1862,6 +1887,22 @@ void Scheduler::RunScheduler(void)
 
                 PutInactiveSlavesToSleep();
                 lastSleepCheck = QDateTime::currentDateTime();
+
+                // Delete old, future entries from oldrecorded and
+                // write new ones as well as new missed entries.
+                query.prepare("DELETE FROM oldrecorded WHERE future > 0");
+                if (!query.exec())
+                    MythDB::DBError("DeleteFuture", query);
+
+                RecIter it = reclist.begin();
+                for ( ; it != reclist.end(); ++it)
+                {
+                    RecordingInfo *p = *it;
+                    if (p->oldrecstatus == rsMissedFuture)
+                        p->AddHistory(false, false, false);
+                    else if (p->oldrecstatus == rsUnknown)
+                        p->AddHistory(false, false, true);
+                }
 
                 SendMythSystemEvent("SCHEDULER_RAN");
             }
@@ -3357,7 +3398,7 @@ void Scheduler::AddNewRecords(void)
 "      recduplicate = (recorded.endtime IS NOT NULL), "
 "      findduplicate = (oldfind.findid IS NOT NULL), "
 "      oldrecstatus = oldrecorded.recstatus "
-" WHERE program.endtime >= NOW() - INTERVAL 1 DAY "
+" WHERE program.endtime >= NOW() - INTERVAL 9 HOUR "
 );
     rmquery.replace("RECTABLE", schedTmpRecord);
 
@@ -3388,6 +3429,7 @@ void Scheduler::AddNewRecords(void)
         "    p.subtitletypes+0, p.audioprop+0,   RECTABLE.storagegroup, "//39-41
         "    capturecard.hostname, recordmatch.oldrecstatus, "
         "                                           RECTABLE.avg_delay, "//42-44
+        "    oldrecstatus.future, "                                      //45
         + pwrpri + QString(
         "FROM recordmatch "
         "INNER JOIN RECTABLE ON (recordmatch.recordid = RECTABLE.recordid) "
@@ -3488,6 +3530,15 @@ void Scheduler::AddNewRecords(void)
             result.value(38).toUInt(),//videoproperties
             result.value(40).toUInt());//audioproperties
 
+        // If this was previously a futrue recording and it's still
+        // viable, start over.
+        bool future = result.value(45).toInt();
+        if (future && p->GetRecordingEndTime() >= schedTime)
+        {
+            p->SetRecordingStatus(rsUnknown);
+            p->oldrecstatus = rsUnknown;
+        }
+
         if (!recTypeRecPriorityMap.contains(p->GetRecordingRuleType()))
         {
             recTypeRecPriorityMap[p->GetRecordingRuleType()] =
@@ -3496,7 +3547,7 @@ void Scheduler::AddNewRecords(void)
 
         p->SetRecordingPriority(
             p->GetRecordingPriority() + recTypeRecPriorityMap[p->GetRecordingRuleType()] +
-            result.value(45).toInt() +
+            result.value(46).toInt() +
             ((autopriority) ?
              autopriority - (result.value(44).toInt() * autostrata / 200) : 0));
 
@@ -3568,11 +3619,16 @@ void Scheduler::AddNewRecords(void)
         if (inactive)
             newrecstatus = rsInactive;
 
-        // Mark anything that has already passed as missed.  If it
-        // survives PruneOverlaps, it will get deleted or have its old
-        // status restored in PruneRedundants.
+        // Mark anything that has already passed as some type of
+        // missed.  If it survives PruneOverlaps, it will get deleted
+        // or have its old status restored in PruneRedundants.
         if (p->GetRecordingEndTime() < schedTime)
-            newrecstatus = rsMissed;
+        {
+            if (future)
+                newrecstatus = rsMissedFuture;
+            else
+                newrecstatus = rsMissed;
+        }
 
         p->SetRecordingStatus(newrecstatus);
 

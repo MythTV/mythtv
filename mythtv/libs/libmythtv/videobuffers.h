@@ -40,8 +40,9 @@ enum BufferType
     kVideoBuffer_used      = 0x00000004,
     kVideoBuffer_pause     = 0x00000008,
     kVideoBuffer_displayed = 0x00000010,
-    kVideoBuffer_decode    = 0x00000020,
-    kVideoBuffer_all       = 0x0000001F,
+    kVideoBuffer_finished  = 0x00000020,
+    kVideoBuffer_decode    = 0x00000040,
+    kVideoBuffer_all       = 0x0000003F,
 };
 
 class YUVInfo
@@ -133,7 +134,7 @@ class VideoBuffers
     const frame_queue_t   *queue(BufferType type) const;
     VideoFrame            *GetNextFreeFrameInternal(BufferType enqueue_to);
 
-    frame_queue_t          available, used, limbo, pause, displayed, decode;
+    frame_queue_t          available, used, limbo, pause, displayed, decode, finished;
     vbuffer_map_t          vbufferMap; // videobuffers to buffer's index
     frame_vector_t         buffers;
     uchar_vector_t         allocated_structs; // for DeleteBuffers
