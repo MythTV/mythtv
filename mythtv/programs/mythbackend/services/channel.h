@@ -39,6 +39,40 @@ class Channel : public ChannelServices
         DTC::ChannelInfoList*  GetChannelInfoList  ( int      SourceID,
                                                      int      StartIndex,
                                                      int      Count      );
+
+        bool                   UpdateDBChannel     ( uint          MplexID,
+                                                     uint          SourceID,
+                                                     uint          ChannelID,
+                                                     const QString &CallSign,
+                                                     const QString &ChannelName,
+                                                     const QString &ChannelNumber,
+                                                     uint          ServiceID,
+                                                     uint          ATSCMajorChannel,
+                                                     uint          ATSCMinorChannel,
+                                                     bool          UseEIT,
+                                                     bool          visible,
+                                                     const QString &FrequencyID,
+                                                     const QString &Icon,
+                                                     const QString &Format,
+                                                     const QString &XMLTVID,
+                                                     const QString &DefaultAuthority );
+
+        bool                   CreateDBChannel     ( uint          MplexID,
+                                                     uint          SourceID,
+                                                     uint          ChannelID,
+                                                     const QString &CallSign,
+                                                     const QString &ChannelName,
+                                                     const QString &ChannelNumber,
+                                                     uint          ServiceID,
+                                                     uint          ATSCMajorChannel,
+                                                     uint          ATSCMinorChannel,
+                                                     bool          UseEIT,
+                                                     bool          visible,
+                                                     const QString &FrequencyID,
+                                                     const QString &Icon,
+                                                     const QString &Format,
+                                                     const QString &XMLTVID,
+                                                     const QString &DefaultAuthority );
 };
 
 #endif

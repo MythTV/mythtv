@@ -47,7 +47,9 @@
 class SERVICE_PUBLIC ChannelServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.01" );
+    Q_CLASSINFO( "version"    , "1.02" );
+    Q_CLASSINFO( "UpdateDBChannel_Method",         "POST" )
+    Q_CLASSINFO( "CreateDBChannel_Method",         "POST" )
 
     public:
 
@@ -61,10 +63,43 @@ class SERVICE_PUBLIC ChannelServices : public Service  //, public QScriptable ??
 
     public slots:
 
-        virtual DTC::ChannelInfoList*  GetChannelInfoList  ( int          SourceID,
-                                                             int          StartIndex,
-                                                             int          Count      ) = 0;
+        virtual DTC::ChannelInfoList*  GetChannelInfoList  ( int           SourceID,
+                                                             int           StartIndex,
+                                                             int           Count      ) = 0;
 
+        virtual bool                   UpdateDBChannel     ( uint          MplexID,
+                                                             uint          SourceID,
+                                                             uint          ChannelID,
+                                                             const QString &CallSign,
+                                                             const QString &ChannelName,
+                                                             const QString &ChannelNumber,
+                                                             uint          ServiceID,
+                                                             uint          ATSCMajorChannel,
+                                                             uint          ATSCMinorChannel,
+                                                             bool          UseEIT,
+                                                             bool          visible,
+                                                             const QString &FrequencyID,
+                                                             const QString &Icon,
+                                                             const QString &Format,
+                                                             const QString &XMLTVID,
+                                                             const QString &DefaultAuthority ) = 0;
+
+        virtual bool                   CreateDBChannel     ( uint          MplexID,
+                                                             uint          SourceID,
+                                                             uint          ChannelID,
+                                                             const QString &CallSign,
+                                                             const QString &ChannelName,
+                                                             const QString &ChannelNumber,
+                                                             uint          ServiceID,
+                                                             uint          ATSCMajorChannel,
+                                                             uint          ATSCMinorChannel,
+                                                             bool          UseEIT,
+                                                             bool          visible,
+                                                             const QString &FrequencyID,
+                                                             const QString &Icon,
+                                                             const QString &Format,
+                                                             const QString &XMLTVID,
+                                                             const QString &DefaultAuthority ) = 0;
 };
 
 #endif

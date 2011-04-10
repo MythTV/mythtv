@@ -109,3 +109,60 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
 
     return pChannelInfos;
 }
+
+bool Channel::UpdateDBChannel( uint          MplexID,
+                               uint          SourceID,
+                               uint          ChannelID,
+                               const QString &CallSign,
+                               const QString &ChannelName,
+                               const QString &ChannelNumber,
+                               uint          ServiceID,
+                               uint          ATSCMajorChannel,
+                               uint          ATSCMinorChannel,
+                               bool          UseEIT,
+                               bool          visible,
+                               const QString &FrequencyID,
+                               const QString &Icon,
+                               const QString &Format,
+                               const QString &XMLTVID,
+                               const QString &DefaultAuthority )
+{
+    bool bResult = false;
+
+    bResult = ChannelUtil::UpdateChannel( MplexID, SourceID, ChannelID,
+                             CallSign, ChannelName, ChannelNumber,
+                             ServiceID, ATSCMajorChannel, ATSCMinorChannel,
+                             UseEIT, !visible, false, FrequencyID,
+                             Icon, Format, XMLTVID, DefaultAuthority );
+
+    return bResult;
+}
+
+bool Channel::CreateDBChannel( uint          MplexID,
+                               uint          SourceID,
+                               uint          ChannelID,
+                               const QString &CallSign,
+                               const QString &ChannelName,
+                               const QString &ChannelNumber,
+                               uint          ServiceID,
+                               uint          ATSCMajorChannel,
+                               uint          ATSCMinorChannel,
+                               bool          UseEIT,
+                               bool          visible,
+                               const QString &FrequencyID,
+                               const QString &Icon,
+                               const QString &Format,
+                               const QString &XMLTVID,
+                               const QString &DefaultAuthority )
+{
+    bool bResult = false;
+
+    bResult = ChannelUtil::CreateChannel( MplexID, SourceID, ChannelID,
+                             CallSign, ChannelName, ChannelNumber,
+                             ServiceID, ATSCMajorChannel, ATSCMinorChannel,
+                             UseEIT, !visible, false, FrequencyID,
+                             Icon, Format, XMLTVID, DefaultAuthority );
+
+    return bResult;
+}
+
