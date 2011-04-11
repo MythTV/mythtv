@@ -59,6 +59,7 @@
             <li class="indent1"><a href='/Guide/wsdl'>Guide Service</a></li>
             <li class="indent1"><a href='/Dvr/wsdl'>DVR Service</a></li>
             <li class="indent1"><a href='/Content/wsdl'>Content Service</a></li>
+            <li class="indent1"><a href='/Channel/wsdl'>Channel Service</a></li>
           </ul>
         </li>
         <li><a href='#'>Server Side Scripting</a>
