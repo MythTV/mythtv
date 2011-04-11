@@ -4,5 +4,7 @@
     <table id="channels"></table>
     <div id='pager'>
 </div>
+<div id='navigation' style="text-align:right">
 <input type='button' onClick='javascript:editSelectedChannel()' value='Edit Channel' />
-<input type='button' onClick='javascript:showConfirm("Are you sure you want to delete this channel?  This cannot be undone.", deleteSelectedChannel)' value='Delete Channel' />
+<input type='button' onClick='javascript:promptToDeleteChannel()' value='Delete Channel' />
+</div>

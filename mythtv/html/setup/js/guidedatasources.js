@@ -32,7 +32,7 @@ function initGuideDataSources() {
     /* Resize the grid if the window width changes */
 
     $(window).bind('resize', function() {
-        $("#sources").setGridWidth($(window).width() - 230);
+        $("#sources").setGridWidth($(window).width() - 223);
     }).trigger('resize');
 
     /* Sort ascending by Source ID on load */
@@ -42,15 +42,22 @@ function initGuideDataSources() {
 
 function editSelectedSource() {
     var rowNum = $('#sources').getGridParam('selrow');
-    if (rowNum != 0) {
+    if (rowNum != null) {
         $("#sources").jqGrid('editGridRow',rowNum,
                           { modal: true });
     }
 }
             
+function promptToDeleteSource() {
+    var rowNum = $('#sources').getGridParam('selrow');
+    if (rowNum != null) {
+        showConfirm("Are you sure you want to delete this guide source?  This cannot be undone.", deleteSelectedSource);
+    }
+}
+
 function deleteSelectedSource() {
     var rowNum = $('#sources').getGridParam('selrow');
-    if (rowNum != 0) {
+    if (rowNum != null) {
         if ($("#sources").jqGrid('delRowData', rowNum)) {
             $('#sources').trigger('reloadGrid');
             setStatusMessage("Deleting source " + rowNum + "...");

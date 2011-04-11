@@ -59,7 +59,7 @@ function initChannelEditor(sourceid) {
     /* Resize the grid if the window width changes */
 
     $(window).bind('resize', function() {
-        $("#channels").setGridWidth($(window).width() - 230);
+        $("#channels").setGridWidth($(window).width() - 223);
     }).trigger('resize');
 
     /* Sort ascending by Channel Number on load */
@@ -69,15 +69,22 @@ function initChannelEditor(sourceid) {
 
 function editSelectedChannel() {
     var rowNum = $('#channels').getGridParam('selrow');
-    if (rowNum != 0) {
+    if (rowNum != null) {
         $("#channels").jqGrid('editGridRow',rowNum,
                           { modal: true });
     }
 }
 
+function promptToDeleteChannel() {
+    var rowNum = $('#channels').getGridParam('selrow');
+    if (rowNum != null) {
+        showConfirm("Are you sure you want to delete this channel?  This cannot be undone.", deleteSelectedChannel);
+    }
+}
+
 function deleteSelectedChannel() {
     var rowNum = $('#channels').getGridParam('selrow');
-    if (rowNum != 0) {
+    if (rowNum != null) {
         if ($("#channels").jqGrid('delRowData', rowNum)) {
             $('#channels').trigger('reloadGrid');
             setStatusMessage("Deleting channel " + rowNum + "...");
