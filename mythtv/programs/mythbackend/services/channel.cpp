@@ -24,6 +24,7 @@
 #include "channel.h"
 
 #include "compat.h"
+#include "mythdbcon.h"
 #include "mythversion.h"
 #include "mythcorecontext.h"
 #include "channelutil.h"
@@ -175,3 +176,59 @@ bool Channel::DeleteDBChannel( uint nChannelID )
 
     return bResult;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::VideoSourceList* Channel::GetVideoSourceList()
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!query.isConnected())
+        throw( QString("Database not open while trying to list "
+                       "Video Sources."));
+
+    query.prepare("SELECT sourceid, name, xmltvgrabber, userid, "
+                  "freqtable, lineupid, password, useeit, configpath, "
+                  "dvb_nit_id FROM videosource "
+                  "ORDER BY sourceid" );
+
+    if (!query.exec())
+    {
+        MythDB::DBError("MythAPI::GetVideoSourceList()", query);
+
+        throw( QString( "Database Error executing query." ));
+    }
+
+    // ----------------------------------------------------------------------
+    // return the results of the query
+    // ----------------------------------------------------------------------
+
+    DTC::VideoSourceList* pList = new DTC::VideoSourceList();
+
+    while (query.next())
+    {
+        VERBOSE(VB_GENERAL, QString("Handling a query..."));
+
+        DTC::VideoSource *pVideoSource = pList->AddNewVideoSource();
+
+        pVideoSource->setId            ( query.value(0).toInt()       );
+        pVideoSource->setSourceName    ( query.value(1).toString()    );
+        pVideoSource->setGrabber       ( query.value(2).toString()    );
+        pVideoSource->setUserId        ( query.value(3).toString()    );
+        pVideoSource->setFreqTable     ( query.value(4).toString()    );
+        pVideoSource->setLineupId      ( query.value(5).toString()    );
+        pVideoSource->setPassword      ( query.value(6).toString()    );
+        pVideoSource->setUseEIT        ( query.value(7).toBool()      );
+        pVideoSource->setConfigPath    ( query.value(8).toString()    );
+        pVideoSource->setNITId         ( query.value(9).toInt()       );
+    }
+
+    pList->setAsOf          ( QDateTime::currentDateTime() );
+    pList->setVersion       ( MYTH_BINARY_VERSION );
+    pList->setProtoVer      ( MYTH_PROTO_VERSION  );
+
+    return pList;
+}
+

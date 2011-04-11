@@ -27,6 +27,8 @@
 #include "service.h"
 
 #include "datacontracts/channelInfoList.h"
+#include "datacontracts/videoSource.h"
+#include "datacontracts/videoSourceList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -44,7 +46,7 @@
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-class SERVICE_PUBLIC ChannelServices : public Service  //, public QScriptable ???
+class SERVICE_PUBLIC ChannelServices : public Service
 {
     Q_OBJECT
     Q_CLASSINFO( "version"    , "1.03" );
@@ -60,6 +62,8 @@ class SERVICE_PUBLIC ChannelServices : public Service  //, public QScriptable ??
         ChannelServices( QObject *parent = 0 ) : Service( parent )
         {
             DTC::ChannelInfoList::InitializeCustomTypes();
+            DTC::VideoSource::InitializeCustomTypes();
+            DTC::VideoSourceList::InitializeCustomTypes();
         }
 
     public slots:
@@ -103,6 +107,8 @@ class SERVICE_PUBLIC ChannelServices : public Service  //, public QScriptable ??
                                                              const QString &DefaultAuthority ) = 0;
 
         virtual bool                   DeleteDBChannel     ( uint          ChannelID ) = 0;
+
+        virtual DTC::VideoSourceList*  GetVideoSourceList  ( void ) = 0;
 };
 
 #endif
