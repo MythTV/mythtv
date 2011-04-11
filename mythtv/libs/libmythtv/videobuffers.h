@@ -125,6 +125,8 @@ class VideoBuffers
 
     bool CreateBuffer(int width, int height, uint num, void *data,
                       VideoFrameType fmt);
+    uint AddBuffer(int width, int height, void* data,
+                   VideoFrameType fmt);
 
     QString GetStatus(int n=-1) const; // debugging method
   private:

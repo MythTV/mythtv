@@ -765,6 +765,25 @@ bool VideoBuffers::CreateBuffer(int width, int height, uint num, void* data,
     return true;
 }
 
+uint VideoBuffers::AddBuffer(int width, int height, void* data,
+                             VideoFrameType fmt)
+{
+    QMutexLocker lock(&global_lock);
+
+    uint num = Size();
+    buffers.resize(num + 1);
+    memset(&buffers[num], 0, sizeof(VideoFrame));
+    buffers[num].interlaced_frame = -1;
+    buffers[num].top_field_first  = 1;
+    vbufferMap[at(num)] = num;
+    init(&buffers[num], fmt, (unsigned char*)data, width, height, 0);
+    buffers[num].priv[0] = ffmpeg_hack;
+    buffers[num].priv[1] = ffmpeg_hack;
+    enqueue(kVideoBuffer_avail, at(num));
+
+    return Size();
+}
+
 void VideoBuffers::DeleteBuffers()
 {
     next_dbg_str = 0;
