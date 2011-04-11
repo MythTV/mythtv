@@ -1,0 +1,38 @@
+<div id='Title'>Guide Data Sources</div><br>
+
+<div id='videoSource'>
+    <table id="sources"></table>
+    <div id='pager'>
+</div>
+
+<script language="JavaScript" type="text/javascript">
+    $("#sources").jqGrid({
+        url:'/Channel/GetVideoSourceList',
+        datatype: "xml",
+        colNames:['Source ID', 'Source Name', 'Grabber Name', 'Username', 'Password', 'Use EIT', 'Configure Path'],
+        colModel:[
+   	    {name:'sourceid', index:'sourceid', width:60, sorttype:"int", hidden:true, xmlmap:"Id"},
+   	    {name:'sourcename', index:'sourcename', width:300, sorttype:"text", xmlmap:"SourceName"},
+   	    {name:'grabber', index:'grabber', width:200, sorttype:"text", xmlmap:"Grabber"},
+            {name:'username', index:'username', width:200, align:"right", sorttype:"text", xmlmap:"UserId"},
+            {name:'password', index:'password', width:40, align:"center", sortable:true, hidden:true, xmlmap:"Password"},
+            {name:'useeit', index:'useeit', width:80, align:"right", sorttype:"bool", xmlmap:"UseEIT"},
+            {name:'configpath', index:'configpath', width:40, align:"center", sortable:true, hidden:true, xmlmap:"ConfigPath"}
+        ],
+        xmlReader: { 
+           root:"VideoSources", 
+           row:"VideoSource",
+           repeatitems:false,
+           id : "Id"
+        },
+        rowNum:20,
+        pager: '#pager',
+        sortname: 'id',
+        viewrecords: true,
+        sortorder: "desc",
+        loadonce: true,
+        autoWidth: true,
+        width: 820,
+        height: 442
+    });
+</script>
