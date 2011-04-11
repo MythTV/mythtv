@@ -21,6 +21,8 @@
 
 #include <QList>
 
+#include <math.h>
+
 #include "channel.h"
 
 #include "compat.h"
@@ -87,7 +89,7 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
             pChannelInfo->setModulation(modulation);
             pChannelInfo->setFrequencyTable(freqtable);
             pChannelInfo->setFineTune(finetune);
-            pChannelInfo->setFrequency(frequency);
+            pChannelInfo->setFrequency((long)frequency);
             pChannelInfo->setFrequencyId(freqid);
             pChannelInfo->setSIStandard(dtv_si_std);
             pChannelInfo->setTransportId(transportid);
@@ -102,8 +104,20 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
         }
     }
 
+    int curPage = 0, totalPages = 0;
+    totalPages = (int)ceil(chanList.size() / nCount);
+
+    if (totalPages == 1)
+        curPage = 1;
+    else
+    {
+        curPage = (int)ceil(nStartIndex / nCount) + 1;
+    }
+
     pChannelInfos->setStartIndex    ( nStartIndex     );
     pChannelInfos->setCount         ( nCount          );
+    pChannelInfos->setCurrentPage   ( curPage         );
+    pChannelInfos->setTotalPages    ( totalPages      );
     pChannelInfos->setTotalAvailable( chanList.size() );
     pChannelInfos->setAsOf          ( QDateTime::currentDateTime() );
     pChannelInfos->setVersion       ( MYTH_BINARY_VERSION );

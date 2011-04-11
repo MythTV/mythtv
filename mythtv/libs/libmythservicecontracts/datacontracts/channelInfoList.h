@@ -25,6 +25,8 @@ class SERVICE_PUBLIC ChannelInfoList : public QObject
 
     Q_PROPERTY( int          StartIndex     READ StartIndex      WRITE setStartIndex     )
     Q_PROPERTY( int          Count          READ Count           WRITE setCount          )
+    Q_PROPERTY( int          CurrentPage    READ CurrentPage     WRITE setCurrentPage    )
+    Q_PROPERTY( int          TotalPages     READ TotalPages      WRITE setTotalPages     )
     Q_PROPERTY( int          TotalAvailable READ TotalAvailable  WRITE setTotalAvailable )
     Q_PROPERTY( QDateTime    AsOf           READ AsOf            WRITE setAsOf           )
     Q_PROPERTY( QString      Version        READ Version         WRITE setVersion        )
@@ -34,6 +36,8 @@ class SERVICE_PUBLIC ChannelInfoList : public QObject
 
     PROPERTYIMP       ( int         , StartIndex      )
     PROPERTYIMP       ( int         , Count           )
+    PROPERTYIMP       ( int         , CurrentPage     )
+    PROPERTYIMP       ( int         , TotalPages      )
     PROPERTYIMP       ( int         , TotalAvailable  )
     PROPERTYIMP       ( QDateTime   , AsOf            )
     PROPERTYIMP       ( QString     , Version         )
