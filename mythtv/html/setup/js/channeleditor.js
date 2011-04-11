@@ -8,32 +8,32 @@ function initChannelEditor(sourceid) {
                   'Fine Tuning', 'SI Standard', 'Channel Filters', 'Source ID', 'Input ID', 'Commercial Free',
                   'Use On Air Guide', 'Default Authority'],
         colModel:[
-   	    {name:'ChanId', width:120, sorttype:"int", hidden:true, jsonmap: 'ChannelInfos.ChanId'},
-   	    {name:'ChanNum', width:120, sorttype:"int", jsonmap: 'ChanNum'},
-   	    {name:'CallSign', width:90, sorttype:"text", jsonmap: 'CallSign'},
+            {name:'ChanId', width:120, sorttype:"int", hidden:true, jsonmap: 'ChanId'},
+            {name:'ChanNum', width:120, sorttype:"int", jsonmap: 'ChanNum'},
+            {name:'CallSign', width:90, sorttype:"text", jsonmap: 'CallSign'},
             {name:'ChannelName', width:300, align:"right", sorttype:"text", jsonmap: 'ChannelName'},
             {name:'Visible', width:40, align:"center", sorttype:"bool", jsonmap: 'Visible'},
-            {name:'XMLTVID', width:0, align:"right", sortable:false, hidden:true},
-   	    {name:'IconURL', width:0, align:"right", sortable:false, hidden:true},
-            {name:'MplexId', width:0, align:"right", sortable:false, hidden:true},
-            {name:'TransportId', width:0, align:"right", sortable:false, hidden:true},
-            {name:'ServiceId', width:0, align:"right", sortable:false, hidden:true},
-            {name:'NetworkId', width:0, align:"right", sortable:false, hidden:true},
-            {name:'ATSCMajorChan', width:0, align:"right", sortable:false, hidden:true},
-            {name:'ATSCMinorChan', width:0, align:"right", sortable:false, hidden:true},
-            {name:'Format', width:0, align:"right", sortable:false, hidden:true},
-            {name:'Modulation', width:0, align:"right", sortable:false, hidden:true},
-            {name:'Frequency', width:0, align:"right", sortable:false, hidden:true},
-            {name:'FrequencyId', width:0, align:"right", sortable:false, hidden:true},
-            {name:'FrequencyTable', width:0, align:"right", sortable:false, hidden:true},
-            {name:'FineTune', width:0, align:"right", sortable:false, hidden:true},
-            {name:'SIStandard', width:0, align:"right", sortable:false, hidden:true},
-            {name:'ChanFilters', width:0, align:"right", sortable:false, hidden:true},
-            {name:'SourceId', width:0, align:"right", sortable:false, hidden:true},
-            {name:'InputId', width:0, align:"right", sortable:false, hidden:true},
-            {name:'CommFree', width:0, align:"right", sortable:false, hidden:true},
-            {name:'UseEIT', width:0, align:"right", sortable:false, hidden:true},
-            {name:'DefaultAuth', width:0, align:"right", sortable:false, hidden:true}
+            {name:'XMLTVID', width:0, align:"right", sortable:false, hidden:true, jsonmap: 'XMLTVID'},
+            {name:'IconURL', width:0, align:"right", sortable:false, hidden:true, jsonmap: 'IconURL'},
+            {name:'MplexId', width:0, align:"right", sortable:false, hidden:true, jsonmap: 'MplexId'},
+            {name:'TransportId', width:0, align:"right", sortable:false, hidden:true, jsonmap: 'TransportId'},
+            {name:'ServiceId', width:0, align:"right", sortable:false, hidden:true, jsonmap: 'ServiceID'},
+            {name:'NetworkId', width:0, align:"right", sortable:false, hidden:true, jsonmap: 'NetworkId'},
+            {name:'ATSCMajorChan', width:0, align:"right", sortable:false, hidden:true, jsonmap: 'ATSCMajorChan'},
+            {name:'ATSCMinorChan', width:0, align:"right", sortable:false, hidden:true, jsonmap: 'ATSCMinorChan'},
+            {name:'Format', width:0, align:"right", sortable:false, hidden:true, jsonmap: 'Format'},
+            {name:'Modulation', width:0, align:"right", sortable:false, hidden:true, jsonmap: 'Modulation'},
+            {name:'Frequency', width:0, align:"right", sortable:false, hidden:true, jsonmap: 'Frequency'},
+            {name:'FrequencyId', width:0, align:"right", sortable:false, hidden:true, jsonmap: 'FrequencyId'},
+            {name:'FrequencyTable', width:0, align:"right", sortable:false, hidden:true, jsonmap: 'FrequencyTable'},
+            {name:'FineTune', width:0, align:"right", sortable:false, hidden:true, jsonmap: 'FineTune'},
+            {name:'SIStandard', width:0, align:"right", sortable:false, hidden:true, jsonmap: 'SIStandard'},
+            {name:'ChanFilters', width:0, align:"right", sortable:false, hidden:true, jsonmap: 'ChanFilters'},
+            {name:'SourceId', width:0, align:"right", sortable:false, hidden:true, jsonmap: 'SourceId'},
+            {name:'InputId', width:0, align:"right", sortable:false, hidden:true, jsonmap: 'InputId'},
+            {name:'CommFree', width:0, align:"right", sortable:false, hidden:true, jsonmap: 'CommFree'},
+            {name:'UseEIT', width:0, align:"right", sortable:false, hidden:true, jsonmap: 'UseEIT'},
+            {name:'DefaultAuth', width:0, align:"right", sortable:false, hidden:true, jsonmap: 'DefaultAuth'}
         ],
         jsonReader: { 
            root:"ChannelInfoList.ChannelInfos",
@@ -47,7 +47,7 @@ function initChannelEditor(sourceid) {
         rowNum:20,
         rowList:[10,20,30,50],
         pager: '#pager',
-        sortname: 'channum',
+        sortname: 'ChanNum',
         viewrecords: true,
         sortorder: "desc",
         loadonce: true,
@@ -56,9 +56,13 @@ function initChannelEditor(sourceid) {
         height: 442
     });
 
+    /* Resize the grid if the window width changes */
+
     $(window).bind('resize', function() {
         $("#channels").setGridWidth($(window).width() - 230);
     }).trigger('resize');
+
+    $("#channels").setGridParam({sortname:'ChanNum', sortorder:'asc'}).trigger('reloadGrid');
 }
 
 var sourceid = 3;
