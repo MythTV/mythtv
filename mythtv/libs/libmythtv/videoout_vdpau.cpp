@@ -11,7 +11,12 @@
 
 #define LOC      QString("VidOutVDPAU: ")
 #define LOC_ERR  QString("VidOutVDPAU Error: ")
-#define NUM_VDPAU_BUFFERS 17
+
+#define MIN_REFERENCE_FRAMES 2
+#define MAX_REFERENCE_FRAMES 16
+#define MIN_PROCESS_BUFFER   6
+#define MAX_PROCESS_BUFFER   50
+#define DEF_PROCESS_BUFFER   12
 
 #define CHECK_ERROR(Loc) \
   if (m_render && m_render->IsErrored()) \
@@ -49,7 +54,8 @@ void VideoOutputVDPAU::GetRenderOptions(render_opts &opts)
 
 VideoOutputVDPAU::VideoOutputVDPAU()
   : m_win(0),                m_render(NULL),
-    m_buffer_size(NUM_VDPAU_BUFFERS),          m_pause_surface(0),
+    m_decoder_buffer_size(MAX_REFERENCE_FRAMES),
+    m_process_buffer_size(DEF_PROCESS_BUFFER), m_pause_surface(0),
     m_need_deintrefs(false), m_video_mixer(0), m_mixer_features(kVDPFeatNone),
     m_checked_surface_ownership(false),
     m_checked_output_surfaces(false),
@@ -175,15 +181,17 @@ bool VideoOutputVDPAU::InitBuffers(void)
     QMutexLocker locker(&m_lock);
     if (!m_render)
         return false;
+
+    uint buffer_size = m_decoder_buffer_size + m_process_buffer_size;
     const QSize video_dim = codec_is_std(video_codec_id) ?
                             window.GetVideoDim() : window.GetActualVideoDim();
 
-    vbuffers.Init(m_buffer_size, false, 2, 1, 4, 1);
+    vbuffers.Init(buffer_size, false, 2, 1, 4, 1);
 
     bool ok = false;
     if (codec_is_vdpau(video_codec_id))
     {
-        ok = CreateVideoSurfaces(m_buffer_size);
+        ok = CreateVideoSurfaces(buffer_size);
         if (ok)
         {
             for (int i = 0; i < m_video_surfaces.size(); i++)
@@ -558,19 +566,50 @@ void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
             return;
         }
 
-        uint max_refs = 2;
+        uint max_refs = MIN_REFERENCE_FRAMES;
         if (frame->pix_fmt == PIX_FMT_VDPAU_H264)
         {
             max_refs = render->info.h264.num_ref_frames;
-            if (max_refs < 1 || max_refs > 16)
+            if (max_refs < 1 || max_refs > MAX_REFERENCE_FRAMES)
             {
                 uint32_t round_width  = (frame->width + 15) & ~15;
                 uint32_t round_height = (frame->height + 15) & ~15;
                 uint32_t surf_size    = (round_width * round_height * 3) / 2;
                 max_refs = (12 * 1024 * 1024) / surf_size;
             }
-            if (max_refs > 16)
-                max_refs = 16;
+            if (max_refs > MAX_REFERENCE_FRAMES)
+                max_refs = MAX_REFERENCE_FRAMES;
+
+            // Add extra buffers as necessary
+            int needed = max_refs - m_decoder_buffer_size;
+            if (needed > 0)
+            {
+                QMutexLocker locker(&m_lock);
+                const QSize size = window.GetActualVideoDim();
+                uint created = 0;
+                for (int i = 0; i < needed; i++)
+                {
+                    uint tmp = m_render->CreateVideoSurface(size);
+                    if (tmp)
+                    {
+                        m_video_surfaces.push_back(tmp);
+                        m_render->ClearVideoSurface(tmp);
+                        if (vbuffers.AddBuffer(size.width(), size.height(),
+                                               m_render->GetRender(tmp),
+                                               FMT_VDPAU))
+                        {
+                            created++;
+                        }
+                    }
+                }
+                m_decoder_buffer_size += created;
+                VERBOSE(VB_IMPORTANT, LOC +
+                        QString("Added %1 new buffers. New buffer size %2 "
+                                "(%3 decode and %4 process)")
+                                .arg(created).arg(vbuffers.Size())
+                                .arg(m_decoder_buffer_size)
+                                .arg(m_process_buffer_size));
+            }
         }
 
         VdpDecoderProfile vdp_decoder_profile;
@@ -1130,8 +1169,12 @@ void VideoOutputVDPAU::ParseOptions(void)
     m_denoise     = 0.0f;
     m_sharpen     = 0.0f;
     m_colorspace  = VDP_COLOR_STANDARD_ITUR_BT_601;
-    m_buffer_size = NUM_VDPAU_BUFFERS;
     m_mixer_features = kVDPFeatNone;
+
+    m_decoder_buffer_size = MAX_REFERENCE_FRAMES;
+    m_process_buffer_size = DEF_PROCESS_BUFFER;
+    if (codec_is_vdpau(video_codec_id))
+        m_decoder_buffer_size = MIN_REFERENCE_FRAMES;
 
     QStringList list = GetFilters().split(",");
     if (list.empty())
@@ -1148,12 +1191,12 @@ void VideoOutputVDPAU::ParseOptions(void)
         if (name.contains("vdpaubuffersize"))
         {
             uint num = opts.toUInt();
-            if (6 <= num && num <= 50)
+            if (MIN_PROCESS_BUFFER <= num && num <= MAX_PROCESS_BUFFER)
             {
-                m_buffer_size = num;
                 VERBOSE(VB_PLAYBACK, LOC +
-                            QString("VDPAU video buffer size: %1 (default %2)")
-                            .arg(m_buffer_size).arg(NUM_VDPAU_BUFFERS));
+                            QString("VDPAU process buffer size set to %1 (was %2)")
+                            .arg(num).arg(m_process_buffer_size));
+                m_process_buffer_size = num;
             }
         }
         else if (name.contains("vdpauivtc"))
