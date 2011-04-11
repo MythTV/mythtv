@@ -23,6 +23,7 @@
 #include "clpi_parse.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #define CLPI_SIG1  ('H' << 24 | 'D' << 16 | 'M' << 8 | 'V')
 #define CLPI_SIG2A ('0' << 24 | '2' << 16 | '0' << 8 | '0')
@@ -273,7 +274,7 @@ _parse_ep_map_stream(BITSTREAM *bits, CLPI_EP_MAP_ENTRY *ee)
 
     bs_seek_byte(bits, ee->ep_map_stream_start_addr+fine_start);
 
-    fine = malloc(ee->num_ep_fine * sizeof(CLPI_EP_COARSE));
+    fine = malloc(ee->num_ep_fine * sizeof(CLPI_EP_FINE));
     ee->fine = fine;
     for (ii = 0; ii < ee->num_ep_fine; ii++) {
         fine[ii].is_angle_change_point = bs_read(bits, 1);
@@ -625,3 +626,85 @@ clpi_parse(char *path, int verbose)
     return cl;
 }
 
+CLPI_CL*
+clpi_copy(CLPI_CL* dest_cl, CLPI_CL* src_cl)
+{
+    int ii, jj;
+    if (dest_cl && src_cl) {
+      dest_cl->clip.clip_stream_type = src_cl->clip.clip_stream_type;
+      dest_cl->clip.application_type = src_cl->clip.application_type;
+      dest_cl->clip.is_atc_delta = src_cl->clip.is_atc_delta;
+      dest_cl->clip.atc_delta_count = src_cl->clip.atc_delta_count;
+      dest_cl->clip.ts_recording_rate = src_cl->clip.ts_recording_rate;
+      dest_cl->clip.num_source_packets = src_cl->clip.num_source_packets;
+      dest_cl->clip.ts_type_info.validity = src_cl->clip.ts_type_info.validity;
+      memcpy(dest_cl->clip.ts_type_info.format_id, src_cl->clip.ts_type_info.format_id, 5);
+      dest_cl->clip.atc_delta = malloc(src_cl->clip.atc_delta_count * sizeof(CLPI_ATC_DELTA));
+      for (ii = 0; ii < src_cl->clip.atc_delta_count; ii++) {
+        dest_cl->clip.atc_delta[ii].delta =  src_cl->clip.atc_delta[ii].delta;
+	memcpy(dest_cl->clip.atc_delta[ii].file_id, src_cl->clip.atc_delta[ii].file_id, 6);
+	memcpy(dest_cl->clip.atc_delta[ii].file_code, src_cl->clip.atc_delta[ii].file_code, 5);
+      }
+
+      dest_cl->sequence.num_atc_seq = src_cl->sequence.num_atc_seq;
+      dest_cl->sequence.atc_seq = malloc(src_cl->sequence.num_atc_seq * sizeof(CLPI_ATC_SEQ));
+      for (ii = 0; ii < src_cl->sequence.num_atc_seq; ii++) {
+	dest_cl->sequence.atc_seq[ii].spn_atc_start = src_cl->sequence.atc_seq[ii].spn_atc_start;
+	dest_cl->sequence.atc_seq[ii].offset_stc_id = src_cl->sequence.atc_seq[ii].offset_stc_id;
+	dest_cl->sequence.atc_seq[ii].num_stc_seq = src_cl->sequence.atc_seq[ii].num_stc_seq;
+	dest_cl->sequence.atc_seq[ii].stc_seq = malloc(src_cl->sequence.atc_seq[ii].num_stc_seq * sizeof(CLPI_STC_SEQ));
+        for (jj = 0; jj < src_cl->sequence.atc_seq[ii].num_stc_seq; jj++) {
+	    dest_cl->sequence.atc_seq[ii].stc_seq[jj].spn_stc_start = src_cl->sequence.atc_seq[ii].stc_seq[jj].spn_stc_start;
+	    dest_cl->sequence.atc_seq[ii].stc_seq[jj].pcr_pid = src_cl->sequence.atc_seq[ii].stc_seq[jj].pcr_pid;
+	    dest_cl->sequence.atc_seq[ii].stc_seq[jj].presentation_start_time = src_cl->sequence.atc_seq[ii].stc_seq[jj].presentation_start_time;
+	    dest_cl->sequence.atc_seq[ii].stc_seq[jj].presentation_end_time = src_cl->sequence.atc_seq[ii].stc_seq[jj].presentation_end_time;
+        }
+      }
+
+      dest_cl->program.num_prog = src_cl->program.num_prog;
+      dest_cl->program.progs = malloc(src_cl->program.num_prog * sizeof(CLPI_PROG));
+      for (ii = 0; ii < src_cl->program.num_prog; ii++) {
+	dest_cl->program.progs[ii].spn_program_sequence_start = src_cl->program.progs[ii].spn_program_sequence_start;
+	dest_cl->program.progs[ii].program_map_pid = src_cl->program.progs[ii].program_map_pid;
+	dest_cl->program.progs[ii].num_streams = src_cl->program.progs[ii].num_streams;
+	dest_cl->program.progs[ii].num_groups = src_cl->program.progs[ii].num_groups;
+	dest_cl->program.progs[ii].streams = malloc(src_cl->program.progs[ii].num_streams * sizeof(CLPI_PROG_STREAM));
+	for (jj = 0; jj < src_cl->program.progs[ii].num_streams; jj++) {
+	  dest_cl->program.progs[ii].streams[jj].coding_type = src_cl->program.progs[ii].streams[jj].coding_type;
+	  dest_cl->program.progs[ii].streams[jj].pid = src_cl->program.progs[ii].streams[jj].pid;
+	  dest_cl->program.progs[ii].streams[jj].format = src_cl->program.progs[ii].streams[jj].format;
+	  dest_cl->program.progs[ii].streams[jj].rate = src_cl->program.progs[ii].streams[jj].rate;
+	  dest_cl->program.progs[ii].streams[jj].aspect = src_cl->program.progs[ii].streams[jj].aspect;
+	  dest_cl->program.progs[ii].streams[jj].oc_flag = src_cl->program.progs[ii].streams[jj].oc_flag;
+	  dest_cl->program.progs[ii].streams[jj].char_code = src_cl->program.progs[ii].streams[jj].char_code;
+	  memcpy(dest_cl->program.progs[ii].streams[jj].lang,src_cl->program.progs[ii].streams[jj].lang,4);
+	}
+      }
+
+      dest_cl->cpi.num_stream_pid = src_cl->cpi.num_stream_pid;
+      dest_cl->cpi.entry = malloc(src_cl->cpi.num_stream_pid * sizeof(CLPI_EP_MAP_ENTRY));
+      for (ii = 0; ii < dest_cl->cpi.num_stream_pid; ii++) {
+	dest_cl->cpi.entry[ii].pid = src_cl->cpi.entry[ii].pid;
+	dest_cl->cpi.entry[ii].ep_stream_type = src_cl->cpi.entry[ii].ep_stream_type;
+	dest_cl->cpi.entry[ii].num_ep_coarse = src_cl->cpi.entry[ii].num_ep_coarse;
+	dest_cl->cpi.entry[ii].num_ep_fine = src_cl->cpi.entry[ii].num_ep_fine;
+	dest_cl->cpi.entry[ii].ep_map_stream_start_addr = src_cl->cpi.entry[ii].ep_map_stream_start_addr;
+	dest_cl->cpi.entry[ii].coarse = malloc(src_cl->cpi.entry[ii].num_ep_coarse * sizeof(CLPI_EP_COARSE));
+	for (jj = 0; jj < src_cl->cpi.entry[ii].num_ep_coarse; jj++) {
+	  dest_cl->cpi.entry[ii].coarse[jj].ref_ep_fine_id = src_cl->cpi.entry[ii].coarse[jj].ref_ep_fine_id;
+	  dest_cl->cpi.entry[ii].coarse[jj].pts_ep = src_cl->cpi.entry[ii].coarse[jj].pts_ep;
+	  dest_cl->cpi.entry[ii].coarse[jj].spn_ep = src_cl->cpi.entry[ii].coarse[jj].spn_ep;
+	}
+	dest_cl->cpi.entry[ii].fine = malloc(src_cl->cpi.entry[ii].num_ep_fine * sizeof(CLPI_EP_FINE));
+	for (jj = 0; jj < src_cl->cpi.entry[ii].num_ep_fine; jj++) {
+	  dest_cl->cpi.entry[ii].fine[jj].is_angle_change_point = src_cl->cpi.entry[ii].fine[jj].is_angle_change_point;
+	  dest_cl->cpi.entry[ii].fine[jj].i_end_position_offset = src_cl->cpi.entry[ii].fine[jj].i_end_position_offset;
+	  dest_cl->cpi.entry[ii].fine[jj].pts_ep = src_cl->cpi.entry[ii].fine[jj].pts_ep;
+	  dest_cl->cpi.entry[ii].fine[jj].spn_ep = src_cl->cpi.entry[ii].fine[jj].spn_ep;
+	}
+      }
+      return dest_cl;
+    }
+    clpi_free(dest_cl);
+    return NULL;
+}
