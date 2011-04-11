@@ -60,6 +60,7 @@
         bottom:             30px;
         left:               100px;
         right:              100px;
+        height:             38px;
         z-index:            2000;
         padding:            6px 200px 0 200px;
     }
