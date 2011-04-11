@@ -707,16 +707,7 @@ bool VideoBuffers::CreateBuffers(VideoFrameType type, int width, int height,
         return false;
 
     bool ok = true;
-    int  type_bpp = bitsperpixel(type);
-    uint bpp = type_bpp / 4; /* bits per pixel div common factor */
-    uint bpb =  8 / 4; /* bits per byte div common factor */
-
-    // If the buffer sizes are not a multple of 16, adjust.
-    // old versions of MythTV allowed people to set invalid
-    // dimensions for MPEG-4 capture, no need to segfault..
-    uint adj_w = (width  + 15) & ~0xF;
-    uint adj_h = (height + 15) & ~0xF;
-    uint buf_size = (adj_w * adj_h * bpp + 4/* to round up */) / bpb;
+    uint buf_size = buffersize(type, width, height);
 
     while (bufs.size() < allocSize())
     {
@@ -729,15 +720,7 @@ bool VideoBuffers::CreateBuffers(VideoFrameType type, int width, int height,
 
         bufs.push_back(data);
         yuvinfo.push_back(YUVInfo(width, height, buf_size, NULL, NULL));
-
-        if (bufs.back())
-        {
-            VERBOSE(VB_PLAYBACK+VB_EXTRA, "Created data @"
-                    <<((void*)data)<<"->"<<((void*)(data+buf_size)));
-            allocated_arrays.push_back(bufs.back());
-        }
-        else
-            ok = false;
+        allocated_arrays.push_back(data);
     }
 
     for (uint i = 0; i < allocSize(); i++)
