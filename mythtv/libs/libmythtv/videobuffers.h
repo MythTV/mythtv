@@ -104,7 +104,7 @@ class VideoBuffers
     VideoFrame *GetScratchFrame(void);
     VideoFrame *GetLastDecodedFrame(void) { return at(vpos); }
     VideoFrame *GetLastShownFrame(void) { return at(rpos); }
-    void SetLastShownFrameToScratch() { rpos = size(); }
+    void SetLastShownFrameToScratch(void);
 
     uint ValidVideoFrames(void) const { return size(kVideoBuffer_used); }
     uint FreeVideoFrames(void) const { return size(kVideoBuffer_avail); }
@@ -118,8 +118,7 @@ class VideoBuffers
     const VideoFrame *at(uint i) const { return &buffers[i]; }
     const VideoFrame *GetLastDecodedFrame(void) const { return at(vpos); }
     const VideoFrame *GetLastShownFrame(void) const { return at(rpos); }
-    uint size() const { return numbuffers; }
-    uint allocSize() const { return buffers.size(); }
+    uint  Size() const { return buffers.size(); }
 
     void Clear(uint i);
     void Clear(void);
@@ -138,7 +137,6 @@ class VideoBuffers
     frame_vector_t         buffers;
     uchar_vector_t         allocated_arrays;  // for DeleteBuffers
 
-    uint                   numbuffers;
     uint                   needfreeframes;
     uint                   needprebufferframes;
     uint                   needprebufferframes_normal;

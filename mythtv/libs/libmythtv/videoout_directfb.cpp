@@ -125,7 +125,7 @@ bool DirectfbData::CreateBuffers(VideoBuffers &vbuffers,
 
     DFBResult fberr = DFB_OK;
 
-    for (uint i = 0; i < vbuffers.allocSize(); i++)
+    for (uint i = 0; i < vbuffers.Size(); i++)
     {
         IDirectFBSurface *bufferSurface = NULL;
 
@@ -224,7 +224,7 @@ void DirectfbData::DeleteBuffers(VideoBuffers &vbuffers)
 {
     QMutexLocker locker(&bufferLock);
 
-    for (uint i = 0; i < vbuffers.allocSize(); i++)
+    for (uint i = 0; i < vbuffers.Size(); i++)
     {
         vbuffers.at(i)->buf = NULL;
 
