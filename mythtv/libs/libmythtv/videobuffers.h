@@ -102,7 +102,6 @@ class VideoBuffers
     bool contains(BufferType type, VideoFrame*) const;
 
     VideoFrame *GetScratchFrame(void);
-    const VideoFrame *GetScratchFrame() const;
     VideoFrame *GetLastDecodedFrame(void) { return at(vpos); }
     VideoFrame *GetLastShownFrame(void) { return at(rpos); }
     void SetLastShownFrameToScratch() { rpos = size(); }
@@ -145,7 +144,7 @@ class VideoBuffers
     uint                   needprebufferframes_normal;
     uint                   needprebufferframes_small;;
     uint                   keepprebufferframes;
-    bool                   need_extra_for_pause;
+    bool                   createdpauseframe;
 
     uint                   rpos;
     uint                   vpos;

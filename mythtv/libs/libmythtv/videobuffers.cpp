@@ -121,7 +121,7 @@ YUVInfo::YUVInfo(uint w, uint h, uint sz, const int *p, const int *o)
 VideoBuffers::VideoBuffers()
     : numbuffers(0), needfreeframes(0), needprebufferframes(0),
       needprebufferframes_normal(0), needprebufferframes_small(0),
-      keepprebufferframes(0), need_extra_for_pause(false), rpos(0), vpos(0),
+      keepprebufferframes(0), createdpauseframe(false), rpos(0), vpos(0),
       global_lock(QMutex::Recursive)
 {
 }
@@ -182,7 +182,10 @@ void VideoBuffers::Init(uint numdecode, bool extra_for_pause,
     needprebufferframes_normal  = needprebuffer_normal;
     needprebufferframes_small   = needprebuffer_small;
     keepprebufferframes         = keepprebuffer;
-    need_extra_for_pause        = extra_for_pause;
+    createdpauseframe           = extra_for_pause;
+
+    if (createdpauseframe)
+        enqueue(kVideoBuffer_pause, at(numcreate - 1));
 
     for (uint i = 0; i < numdecode; i++)
         enqueue(kVideoBuffer_avail, at(i));
@@ -580,26 +583,14 @@ bool VideoBuffers::contains(BufferType type, VideoFrame *frame) const
 
 VideoFrame *VideoBuffers::GetScratchFrame(void)
 {
-    if (!need_extra_for_pause)
+    if (!createdpauseframe || !head(kVideoBuffer_pause))
     {
         VERBOSE(VB_IMPORTANT,
                 "GetScratchFrame() called, but not allocated");
     }
 
     QMutexLocker locker(&global_lock);
-    return at(allocSize()-1);
-}
-
-const VideoFrame *VideoBuffers::GetScratchFrame(void) const
-{
-    if (!need_extra_for_pause)
-    {
-        VERBOSE(VB_IMPORTANT,
-                "GetScratchFrame() called, but not allocated");
-    }
-
-    QMutexLocker locker(&global_lock);
-    return at(allocSize()-1);
+    return head(kVideoBuffer_pause);
 }
 
 /**
@@ -801,8 +792,8 @@ void VideoBuffers::DeleteBuffers()
 static unsigned long long to_bitmap(const frame_queue_t& list);
 QString VideoBuffers::GetStatus(int n) const
 {
-    if (0 > n)
-        n = numbuffers;
+    if (n <= 0)
+        n = allocSize();
 
     QString str("");
     if (global_lock.tryLock())
