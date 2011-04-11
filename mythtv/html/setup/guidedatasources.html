@@ -35,4 +35,8 @@
         width: 820,
         height: 442
     });
+
+    $(window).bind('resize', function() {
+        $("#sources").setGridWidth($(window).width() - 230);
+    }).trigger('resize');
 </script>

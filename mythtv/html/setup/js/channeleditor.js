@@ -48,7 +48,7 @@ function initChannelEditor(sourceid) {
         rowNum:20,
         rowList:[10,20,30,50],
         pager: '#pager',
-        sortname: 'id',
+        sortname: 'channum',
         viewrecords: true,
         sortorder: "desc",
         loadonce: true,
@@ -56,6 +56,10 @@ function initChannelEditor(sourceid) {
         width: 820,
         height: 442
     });
+
+    $(window).bind('resize', function() {
+        $("#channels").setGridWidth($(window).width() - 230);
+    }).trigger('resize');
 }
 
 var sourceid = 3;
