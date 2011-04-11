@@ -793,10 +793,6 @@ void VideoBuffers::DeleteBuffers()
         }
     }
 
-    for (uint i = 0; i < allocated_structs.size(); i++)
-        delete allocated_structs[i];
-    allocated_structs.clear();
-
     for (uint i = 0; i < allocated_arrays.size(); i++)
         av_free(allocated_arrays[i]);
     allocated_arrays.clear();

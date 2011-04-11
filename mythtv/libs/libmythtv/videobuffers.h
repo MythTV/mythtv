@@ -137,7 +137,6 @@ class VideoBuffers
     frame_queue_t          available, used, limbo, pause, displayed, decode, finished;
     vbuffer_map_t          vbufferMap; // videobuffers to buffer's index
     frame_vector_t         buffers;
-    uchar_vector_t         allocated_structs; // for DeleteBuffers
     uchar_vector_t         allocated_arrays;  // for DeleteBuffers
 
     uint                   numbuffers;
