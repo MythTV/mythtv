@@ -108,13 +108,13 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
     if (nCount == 0)
         totalPages = 1;
     else
-        totalPages = (int)ceil(chanList.size() / nCount);
+        totalPages = (int)ceil((float)chanList.size() / nCount);
 
     if (totalPages == 1)
         curPage = 1;
     else
     {
-        curPage = (int)ceil(nStartIndex / nCount) + 1;
+        curPage = (int)ceil((float)nStartIndex / nCount) + 1;
     }
 
     pChannelInfos->setStartIndex    ( nStartIndex     );
