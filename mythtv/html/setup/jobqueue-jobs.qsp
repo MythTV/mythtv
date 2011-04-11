@@ -21,7 +21,9 @@ function printJobRow(title, descKey, cmdKey) {
 <a href='javascript:createNewJob()'>Create New Job</a><br>
 -->
 <table>
+<thead class='ui-widget-header'>
 <tr><th>Description</th><th>Actions</th></tr>
+</thead>
 <tr><td>Transcoding</td><td><input type=button onClick='javascript:editJob("Transcoder", "", "JobQueueTranscodeCommand")' value='Edit'></td></tr>
 <tr class='alt'><td>Commercial Flagging</td><td><input type=button onClick='javascript:editJob("Commercial Flagger", "", "JobQueueCommFlagCommand")' value='Edit'></td></tr>
 <%

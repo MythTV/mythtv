@@ -8,7 +8,7 @@ function appendTabRow(tabID, id, group, host, dir) {
     if ((rowNum/2) % 1 == 0)
         altText = "class='alt' ";
     var rowID = "sgtable-" + tabID + "-" + rowNum;
-    $("#sgtable-" + tabID + " tr:last").after("<tr " + altText + "id='" + rowID + "'><td class='invisible'>" + id +"</td><td>" + host + "</td><td>" + dir + "</td><td><input type='button' onClick=\"javascript:showConfirm('Are you sure you want to remove this group?', removeStorageGroupTableRow, ['" + tabID + "','" + rowID + "'])\" value='Delete'/></tr>");
+    $("#sgtable-" + tabID + " tr:last").after("<tr " + altText + "id='" + rowID + "' class='ui-widget-content'><td class='invisible'>" + id +"</td><td>" + host + "</td><td>" + dir + "</td><td><input type='button' onClick=\"javascript:showConfirm('Are you sure you want to remove this group?', removeStorageGroupTableRow, ['" + tabID + "','" + rowID + "'])\" value='Delete'/></tr>");
 }
 
 function initStorageGroups(selectedGroup) {
@@ -47,7 +47,7 @@ function initStorageGroups(selectedGroup) {
                 sgTabIDs[value.GroupName] = sgTabID;
                 sgTabNames[sgTabID] = value.GroupName;
                 $("#storagegrouptabs").tabs("add", "#sgtabs-" + sgTabID, value.GroupName, sgTabID);
-                $("#sgtabs-" + sgTabID).html("<input type=button value='Add Directory' onClick='javascript:addNewStorageGroupDir(" + sgTabID + ")'><table id='sgtable-" + sgTabID + "' width='100%'><th class='invisible'>DirID</th><th>Host Name</th><th>Directory Path</th><th>Actions</th></tr></table>");
+                $("#sgtabs-" + sgTabID).html("<input type=button value='Add Directory' onClick='javascript:addNewStorageGroupDir(" + sgTabID + ")'><table id='sgtable-" + sgTabID + "' width='100%'><thead class='ui-widget-header'><th class='invisible'>DirID</th><th>Host Name</th><th>Directory Path</th><th>Actions</th></thead></tr></table>");
             }
 
             appendTabRow(sgTabID, value.Id, value.GroupNme, value.HostName, value.DirName);
