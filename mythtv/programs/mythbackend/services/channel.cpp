@@ -105,7 +105,10 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
     }
 
     int curPage = 0, totalPages = 0;
-    totalPages = (int)ceil(chanList.size() / nCount);
+    if (nCount == 0)
+        totalPages = 1;
+    else
+        totalPages = (int)ceil(chanList.size() / nCount);
 
     if (totalPages == 1)
         curPage = 1;
