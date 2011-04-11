@@ -62,7 +62,27 @@ function initChannelEditor(sourceid) {
         $("#channels").setGridWidth($(window).width() - 230);
     }).trigger('resize');
 
+    /* Sort ascending by Channel Number on load */
+
     $("#channels").setGridParam({sortname:'ChanNum', sortorder:'asc'}).trigger('reloadGrid');
+}
+
+function editSelectedChannel() {
+    var rowNum = $('#channels').getGridParam('selrow');
+    if (rowNum != 0) {
+        $("#channels").jqGrid('editGridRow',rowNum,
+                          { modal: true });
+    }
+}
+
+function deleteSelectedChannel() {
+    var rowNum = $('#channels').getGridParam('selrow');
+    if (rowNum != 0) {
+        if ($("#channels").jqGrid('delRowData', rowNum)) {
+            $('#channels').trigger('reloadGrid');
+            setStatusMessage("Deleting channel " + rowNum + "...");
+        }
+    }
 }
 
 var sourceid = 3;
