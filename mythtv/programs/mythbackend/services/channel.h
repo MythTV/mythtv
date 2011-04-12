@@ -75,6 +75,107 @@ class Channel : public ChannelServices
                                                      const QString &DefaultAuthority );
 
         bool                   DeleteDBChannel     ( uint          ChannelID );
+
+        DTC::VideoSourceList*  GetVideoSourceList  ( void );
 };
+
+// --------------------------------------------------------------------------
+// The following class wrapper is due to a limitation in Qt Script Engine.  It
+// requires all methods that return pointers to user classes that are derived from
+// QObject actually return QObject* (not the user class *).  If the user class pointer
+// is returned, the script engine treats it as a QVariant and doesn't create a
+// javascript prototype wrapper for it.
+//
+// This class allows us to keep the rich return types in the main API class while
+// offering the script engine a class it can work with.
+//
+// Only API Classes that return custom classes needs to implement these wrappers.
+//
+// We should continue to look for a cleaning solution to this problem.
+// --------------------------------------------------------------------------
+
+class ScriptableChannel : public QObject
+{
+    Q_OBJECT
+
+    private:
+
+        Channel    m_obj;
+
+    public:
+    
+        Q_INVOKABLE ScriptableChannel( QObject *parent = 0 ) : QObject( parent ) {}
+
+    public slots:
+
+        QObject* GetChannelInfoList  ( int      SourceID,
+                                       int      StartIndex,
+                                       int      Count      )
+        {
+            return m_obj.GetChannelInfoList( SourceID, StartIndex, Count );
+        }
+
+        bool UpdateDBChannel     ( uint          MplexID,
+                                   uint          SourceID,
+                                   uint          ChannelID,
+                                   const QString &CallSign,
+                                   const QString &ChannelName,
+                                   const QString &ChannelNumber,
+                                   uint          ServiceID,
+                                   uint          ATSCMajorChannel,
+                                   uint          ATSCMinorChannel,
+                                   bool          UseEIT,
+                                   bool          visible,
+                                   const QString &FrequencyID,
+                                   const QString &Icon,
+                                   const QString &Format,
+                                   const QString &XMLTVID,
+                                   const QString &DefaultAuthority )
+        {
+            return m_obj.UpdateDBChannel(MplexID, SourceID, ChannelID,
+                                         CallSign, ChannelName, ChannelNumber,
+                                         ServiceID, ATSCMajorChannel, ATSCMinorChannel,
+                                         UseEIT, visible, FrequencyID, Icon, Format,
+                                         XMLTVID, DefaultAuthority);
+        }
+
+        bool CreateDBChannel     ( uint          MplexID,
+                                   uint          SourceID,
+                                   uint          ChannelID,
+                                   const QString &CallSign,
+                                   const QString &ChannelName,
+                                   const QString &ChannelNumber,
+                                   uint          ServiceID,
+                                   uint          ATSCMajorChannel,
+                                   uint          ATSCMinorChannel,
+                                   bool          UseEIT,
+                                   bool          visible,
+                                   const QString &FrequencyID,
+                                   const QString &Icon,
+                                   const QString &Format,
+                                   const QString &XMLTVID,
+                                   const QString &DefaultAuthority )
+        {
+            return m_obj.CreateDBChannel(MplexID, SourceID, ChannelID,
+                                         CallSign, ChannelName, ChannelNumber,
+                                         ServiceID, ATSCMajorChannel, ATSCMinorChannel,
+                                         UseEIT, visible, FrequencyID, Icon, Format,
+                                         XMLTVID, DefaultAuthority);
+        }
+
+        bool DeleteDBChannel     ( uint          ChannelID )
+        {
+            return m_obj.DeleteDBChannel(ChannelID);
+        }
+
+        QObject* GetVideoSourceList ( void )
+        {
+            return m_obj.GetVideoSourceList();
+        }
+
+};
+
+
+Q_SCRIPT_DECLARE_QMETAOBJECT( ScriptableChannel, QObject*);
 
 #endif

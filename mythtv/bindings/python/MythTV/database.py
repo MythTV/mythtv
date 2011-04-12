@@ -116,7 +116,11 @@ class DBData( DictData, MythSchema ):
             cursor.execute("""SELECT * FROM %s %s""" \
                         % (cls._table, where), args)
             for row in cursor:
-                yield cls.fromRaw(row, db)
+                try:
+                    yield cls.fromRaw(row, db)
+                except MythDBError, e:
+                    if e.ecode == MythError.DB_RESTRICT:
+                        pass
 
     @classmethod
     def fromRaw(cls, raw, db=None):

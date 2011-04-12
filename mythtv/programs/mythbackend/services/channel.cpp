@@ -21,9 +21,12 @@
 
 #include <QList>
 
+#include <math.h>
+
 #include "channel.h"
 
 #include "compat.h"
+#include "mythdbcon.h"
 #include "mythversion.h"
 #include "mythcorecontext.h"
 #include "channelutil.h"
@@ -48,10 +51,11 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
 
     DTC::ChannelInfoList *pChannelInfos = new DTC::ChannelInfoList();
 
-    nStartIndex = min( nStartIndex, (int)chanList.size() );
-    nCount      = (nCount > 0) ? min( nCount, (int)chanList.size() ) : chanList.size();
+    nStartIndex   = min( nStartIndex, (int)chanList.size() );
+    nCount        = (nCount > 0) ? min( nCount, (int)chanList.size() ) : chanList.size();
+    int nEndIndex = nStartIndex + nCount;
 
-    for( int n = nStartIndex; n < nCount; n++)
+    for( int n = nStartIndex; n < nEndIndex; n++)
     {
         DTC::ChannelInfo *pChannelInfo = pChannelInfos->AddNewChannelInfo();
 
@@ -85,7 +89,7 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
             pChannelInfo->setModulation(modulation);
             pChannelInfo->setFrequencyTable(freqtable);
             pChannelInfo->setFineTune(finetune);
-            pChannelInfo->setFrequency(frequency);
+            pChannelInfo->setFrequency((long)frequency);
             pChannelInfo->setFrequencyId(freqid);
             pChannelInfo->setSIStandard(dtv_si_std);
             pChannelInfo->setTransportId(transportid);
@@ -100,8 +104,23 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
         }
     }
 
+    int curPage = 0, totalPages = 0;
+    if (nCount == 0)
+        totalPages = 1;
+    else
+        totalPages = (int)ceil((float)chanList.size() / nCount);
+
+    if (totalPages == 1)
+        curPage = 1;
+    else
+    {
+        curPage = (int)ceil((float)nStartIndex / nCount) + 1;
+    }
+
     pChannelInfos->setStartIndex    ( nStartIndex     );
     pChannelInfos->setCount         ( nCount          );
+    pChannelInfos->setCurrentPage   ( curPage         );
+    pChannelInfos->setTotalPages    ( totalPages      );
     pChannelInfos->setTotalAvailable( chanList.size() );
     pChannelInfos->setAsOf          ( QDateTime::currentDateTime() );
     pChannelInfos->setVersion       ( MYTH_BINARY_VERSION );
@@ -174,3 +193,59 @@ bool Channel::DeleteDBChannel( uint nChannelID )
 
     return bResult;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::VideoSourceList* Channel::GetVideoSourceList()
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!query.isConnected())
+        throw( QString("Database not open while trying to list "
+                       "Video Sources."));
+
+    query.prepare("SELECT sourceid, name, xmltvgrabber, userid, "
+                  "freqtable, lineupid, password, useeit, configpath, "
+                  "dvb_nit_id FROM videosource "
+                  "ORDER BY sourceid" );
+
+    if (!query.exec())
+    {
+        MythDB::DBError("MythAPI::GetVideoSourceList()", query);
+
+        throw( QString( "Database Error executing query." ));
+    }
+
+    // ----------------------------------------------------------------------
+    // return the results of the query
+    // ----------------------------------------------------------------------
+
+    DTC::VideoSourceList* pList = new DTC::VideoSourceList();
+
+    while (query.next())
+    {
+        VERBOSE(VB_GENERAL, QString("Handling a query..."));
+
+        DTC::VideoSource *pVideoSource = pList->AddNewVideoSource();
+
+        pVideoSource->setId            ( query.value(0).toInt()       );
+        pVideoSource->setSourceName    ( query.value(1).toString()    );
+        pVideoSource->setGrabber       ( query.value(2).toString()    );
+        pVideoSource->setUserId        ( query.value(3).toString()    );
+        pVideoSource->setFreqTable     ( query.value(4).toString()    );
+        pVideoSource->setLineupId      ( query.value(5).toString()    );
+        pVideoSource->setPassword      ( query.value(6).toString()    );
+        pVideoSource->setUseEIT        ( query.value(7).toBool()      );
+        pVideoSource->setConfigPath    ( query.value(8).toString()    );
+        pVideoSource->setNITId         ( query.value(9).toInt()       );
+    }
+
+    pList->setAsOf          ( QDateTime::currentDateTime() );
+    pList->setVersion       ( MYTH_BINARY_VERSION );
+    pList->setProtoVer      ( MYTH_PROTO_VERSION  );
+
+    return pList;
+}
+

@@ -1,0 +1,27 @@
+<div id='Title'>Channel Editor</div><br>
+
+<div id='channelEdit'>
+    <table id="channels"></table>
+    <div id='pager'>
+</div>
+<div id='source' style="float: left; text-align:left;">
+<div id='sourceSelect'></div>
+</div>
+<div id='navigation' style="float: right; text-align:right;">
+<input type='button' onClick='javascript:editSelectedChannel()' value='Edit Channel' />
+<input type='button' onClick='javascript:promptToDeleteChannel()' value='Delete Channel' />
+</div>
+
+<div class="contextMenu" id="channelmenu" style="display:none">
+    <ul style="width: 300px">
+        <li id="editopt">
+            <span class="ui-icon ui-icon-pencil" style="float:left"></span>
+            <span class="body">Edit</span>
+        </li>
+        <li id="del">
+            <span class="ui-icon ui-icon-trash" style="float:left"></span>
+            <span class="body">Delete</span>
+        </li>
+    </ul>
+</div>
+

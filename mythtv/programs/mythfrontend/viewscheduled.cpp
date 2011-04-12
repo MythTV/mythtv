@@ -414,7 +414,8 @@ void ViewScheduled::FillList()
                  recstatus == rsOffLine   ||
                  recstatus == rsTunerBusy ||
                  recstatus == rsFailed    ||
-                 recstatus == rsAborted)
+                 recstatus == rsAborted   ||
+                 recstatus == rsMissed)
             state = "error";
         else if (recstatus == rsWillRecord)
         {

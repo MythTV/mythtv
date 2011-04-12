@@ -57,6 +57,8 @@ typedef enum AdjustFillMode
     kAdjustFill_Full,
     kAdjustFill_HorizontalStretch,
     kAdjustFill_VerticalStretch,
+    kAdjustFill_HorizontalFill,
+    kAdjustFill_VerticalFill,
     kAdjustFill_END,
     kAdjustFill_AutoDetect_DefaultOff,
     kAdjustFill_AutoDetect_DefaultHalf,
@@ -253,6 +255,10 @@ inline QString toString(AdjustFillMode aspectmode)
             ret = QObject::tr("H.Stretch"); break;
         case kAdjustFill_VerticalStretch:
             ret = QObject::tr("V.Stretch"); break;
+        case kAdjustFill_VerticalFill:
+            ret = QObject::tr("V.Fill"); break;
+        case kAdjustFill_HorizontalFill:
+            ret = QObject::tr("H.Fill"); break;
         case kAdjustFill_Toggle:
         case kAdjustFill_Off:
         case kAdjustFill_END: break;

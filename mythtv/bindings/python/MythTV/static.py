@@ -4,8 +4,8 @@
 Contains any static and global variables for MythTV Python Bindings
 """
 
-OWN_VERSION = (0,25,-1,1)
-SCHEMA_VERSION = 1270
+OWN_VERSION = (0,25,-1,2)
+SCHEMA_VERSION = 1271
 NVSCHEMA_VERSION = 1007
 MUSICSCHEMA_VERSION = 1018
 PROTO_VERSION = '65'
@@ -202,6 +202,7 @@ class ERRCODES( object ):
     DB_SETTING          = 53
     DB_SCHEMAMISMATCH   = 54
     DB_SCHEMAUPDATE     = 55
+    DB_RESTRICT         = 56
     PROTO_CONNECTION    = 100
     PROTO_ANNOUNCE      = 101
     PROTO_MISMATCH      = 102

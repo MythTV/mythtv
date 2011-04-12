@@ -24,7 +24,8 @@ HEADERS += datacontracts/recording.h           datacontracts/settingList.h
 HEADERS += datacontracts/wolInfo.h             datacontracts/programList.h
 HEADERS += datacontracts/encoder.h             datacontracts/encoderList.h
 HEADERS += datacontracts/storageGroupDir.h     datacontracts/storageGroupDirList.h
-HEADERS += datacontracts/channelInfoList.h
+HEADERS += datacontracts/channelInfoList.h     datacontracts/videoSource.h
+HEADERS += datacontracts/videoSourceList.h
 
 SOURCES += service.cpp
 
@@ -49,6 +50,7 @@ incDatacontracts.files  = datacontracts/connectionInfo.h      datacontracts/data
 incDatacontracts.files += datacontracts/programAndChannel.h   datacontracts/programGuide.h
 incDatacontracts.files += datacontracts/recording.h           datacontracts/settingList.h
 incDatacontracts.files += datacontracts/wolInfo.h             datacontracts/channelInfoList.h
+incDatacontracts.files += datacontracts/videoSource.h         datacontracts/videoSourceList.h
 
 INSTALLS += inc incServices incDatacontracts
 

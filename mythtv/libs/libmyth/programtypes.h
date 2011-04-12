@@ -186,6 +186,7 @@ typedef enum SubtitleTypes {
 } SubtitleType; // has 4 bits in ProgramInfo::properties
 
 typedef enum RecStatusTypes {
+    rsMissedFuture = -11,
     rsTuning = -10,
     rsFailed = -9,
     rsTunerBusy = -8,

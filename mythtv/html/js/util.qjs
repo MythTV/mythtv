@@ -67,6 +67,12 @@ function loadDiv(divName, contentURL, jsURL) {
 
 function setUIAttributes() {
     $( "input:button").button();
+    $("input, textarea").addClass("idle");
+    $("input, textarea").focus(function(){
+            $(this).addClass("activeField").removeClass("idle");
+    }).blur(function(){
+            $(this).removeClass("activeField").addClass("idle");
+    });
 }
 
 function clearDiv(divName) {

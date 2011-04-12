@@ -62,7 +62,7 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
     Q_PROPERTY( uint      ATSCMinorChan   READ ATSCMinorChan  WRITE setATSCMinorChan  DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString   Format          READ Format         WRITE setFormat         DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString   Modulation      READ Modulation     WRITE setModulation     DESIGNABLE SerializeDetails )
-    Q_PROPERTY( uint64_t  Frequency       READ Frequency      WRITE setFrequency      DESIGNABLE SerializeDetails )
+    Q_PROPERTY( long      Frequency       READ Frequency      WRITE setFrequency      DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString   FrequencyId     READ FrequencyId    WRITE setFrequencyId    DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString   FrequencyTable  READ FrequencyTable WRITE setFrequencyTable DESIGNABLE SerializeDetails )
     Q_PROPERTY( int       FineTune        READ FineTune       WRITE setFineTune       DESIGNABLE SerializeDetails )

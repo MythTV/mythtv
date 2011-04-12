@@ -520,6 +520,7 @@ void ProgDetails::loadPage(void)
     {
         query.prepare("SELECT recstatus, starttime "
                       "FROM oldrecorded WHERE duplicate > 0 AND "
+                      "future = 0 AND "
                       "((programid <> '' AND programid = :PROGRAMID) OR "
                       " (title <> '' AND title = :TITLE AND "
                       "  subtitle <> '' AND subtitle = :SUBTITLE AND "

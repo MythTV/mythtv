@@ -402,6 +402,26 @@ void VideoOutWindow::ApplyLetterboxing(void)
 
         display_video_rect.setHeight(display_video_rect.height() * 4 / 3);
     }
+    else if (adjustfill == kAdjustFill_VerticalFill &&
+             display_video_rect.height() > 0)
+    {
+        // Video fills screen vertically. May be cropped left and right
+        float factor = (float)display_visible_rect.height() /
+                       (float)display_video_rect.height();
+        display_video_rect.moveTop(display_visible_rect.top());
+        display_video_rect.setHeight(display_video_rect.height() * factor);
+        display_video_rect.setWidth(display_video_rect.width() * factor);
+    }
+    else if (adjustfill == kAdjustFill_HorizontalFill &&
+             display_video_rect.width() > 0)
+    {
+        // Video fills screen horizontally. May be cropped top and bottom
+        float factor = (float)display_visible_rect.width() /
+                       (float)display_video_rect.width();
+        display_video_rect.moveLeft(display_visible_rect.left());
+        display_video_rect.setHeight(display_video_rect.height() * factor);
+        display_video_rect.setWidth(display_video_rect.width() * factor);
+    }
 }
 
 /** \fn VideoOutWindow::ApplySnapToVideoRect(void)
