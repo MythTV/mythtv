@@ -168,7 +168,7 @@ static int encode_frame(
         size_t enc_len)
 {
     unsigned char *payload = data + 8;  // skip header, currently 52 or 54bits
-    int            flags, sample_rate, bit_rate;
+    int            sample_rate, bit_rate;
 
     // we don't do any length/crc validation of the AC3 frame here; presumably
     // the receiver will have enough sense to do that.  if someone has a
@@ -178,7 +178,7 @@ static int encode_frame(
     // ignore, and if so, may as well just assume that it will ignore
     // anything with a bad CRC...
 
-    uint nr_samples = 0, block_len = 0;
+    uint block_len = 0;
 
     if (CONFIG_AC3_DECODER)
     {
