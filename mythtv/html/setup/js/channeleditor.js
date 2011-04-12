@@ -19,7 +19,7 @@ function initChannelEditor() {
             {name:'IconURL', editable: true, width:0, align:"right", sortable:false, hidden:true, jsonmap: 'IconURL'},
             {name:'MplexId', editable: true, width:0, align:"right", sortable:false, hidden:true, jsonmap: 'MplexId'},
             {name:'TransportId', editable: true, width:0, align:"right", sortable:false, hidden:true, jsonmap: 'TransportId'},
-            {name:'ServiceId', editable: true, width:0, align:"right", sortable:false, hidden:true, jsonmap: 'ServiceID'},
+            {name:'ServiceId', editable: true, width:0, align:"right", sortable:false, hidden:true, jsonmap: 'ServiceId'},
             {name:'NetworkId', editable: true, width:0, align:"right", sortable:false, hidden:true, jsonmap: 'NetworkId'},
             {name:'ATSCMajorChan', editable: true, width:0, align:"right", sortable:false, hidden:true, jsonmap: 'ATSCMajorChan'},
             {name:'ATSCMinorChan', editable: true, width:0, align:"right", sortable:false, hidden:true, jsonmap: 'ATSCMinorChan'},
@@ -88,19 +88,60 @@ function initSourceList() {
 }
 
 function editSelectedChannel() {
-    var rowNum = $('#channels').getGridParam('selrow');
-    if (rowNum != null) {
-        $("#channels").jqGrid('editGridRow',rowNum,
-            { modal: true,
-              width: 400,
-              height: 300
-            });
+    loadEditWindow("/setup/channeleditor-channeldetail.html");
+    var row = $('#channels').getGridParam('selrow');
+    var rowdata = $("#channels").jqGrid('getRowData', row);
+
+    /* Basic */
+
+    $("#channelDetailSettingChanNum").val(rowdata.ChanNum);
+    $("#channelDetailSettingChannelName").val(rowdata.ChannelName);
+    $("#channelDetailSettingCallSign").val(rowdata.CallSign);
+    $("#channelDetailSettingXMLTVID").val(rowdata.XMLTVID);
+    $("#channelDetailSettingIconURL").val(rowdata.IconURL);
+    if (rowdata.Visible == "Yes") {
+        $("#channelDetailSettingVisible").attr('checked', true);
     }
+    if (rowdata.UseEIT == "Yes") 
+        $("#channelDetailSettingUseEIT").attr('checked', true);
+
+    /* Advanced */
+
+    $("#channelDetailSettingFrequencyId").val(rowdata.FrequencyId);
+    $("#channelDetailSettingMplexId").val(rowdata.MplexId);
+    $("#channelDetailSettingServiceId").val(rowdata.ServiceId);
+    $("#channelDetailSettingFormat").val(rowdata.Format);
+    $("#channelDetailSettingDefaultAuthority").val(rowdata.DefaultAuth);
+    $("#channelDetailSettingATSCMajorChannel").val(rowdata.ATSCMajorChan);
+    $("#channelDetailSettingATSCMinorChannel").val(rowdata.ATSCMinorChan);
+
+    /* Expert */
+
+    $("#channelDetailSettingChanId").html("<b>" + rowdata.ChanId + "</b>");
+    $("#channelDetailSettingSourceId").html("<b>" + rowdata.SourceId + "</b>");
+    $("#channelDetailSettingModulation").html("<b>" + rowdata.Modulation + "</b>")
+    $("#channelDetailSettingFrequency").html("<b>" + rowdata.Frequency + "</b>")
+    $("#channelDetailSettingSIStandard").html("<b>" + rowdata.SIStandard + "</b>")
+
+    $("#edit").dialog({
+        modal: true,
+        width: 800,
+        height: 620,
+        'title': 'Edit Channel',
+        closeOnEscape: false,
+        buttons: {
+           'Save': function() {},
+           'Cancel': function() { $(this).dialog('close'); }
+    }});
+
+    $("#channelsettings").accordion();
+
+    $("#edit").dialog("open");
 }
 
 function promptToDeleteChannel() {
     var message = "Are you sure you want to delete these channels?  This cannot be undone.";
-    var rowNum = $('#channels').getGridParam('selarrrow');
+    var rowNum = $('#channels').getGridParam('selrow');
     if (rowNum != null) {
         if (rowNum.length == 1) {
             message = "Are you sure you want to delete this channel?  This cannot be undone.";
