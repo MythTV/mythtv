@@ -185,7 +185,7 @@ class Videos(object):
         self.config[u'urls'] = {}
 
         # v2 api calls - An example that must be customized for each target site
-        self.config[u'urls'][u'video.search'] = "http://www.blip.tv/search/view/?search=%s;&page=%s;&pagelen=%s;&language_code=%s;&skin=rss"
+        self.config[u'urls'][u'video.search'] = "http://www.blip.tv/search?q=%s;&page=%s;&pagelen=%s;&language_code=%s;&skin=rss"
         self.config[u'urls'][u'categories'] = "http://www.blip.tv/?section=categories&cmd=view&skin=api"
 
         self.config[u'image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
