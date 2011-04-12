@@ -429,8 +429,8 @@ void avfDecoder::run()
                     // ptr is the input buffer
                     // len is the size of the input buffer
                     data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-                    dec_len = avcodec_decode_audio2(m_audioDec, m_samples,
-                                                    &data_size, ptr, len);
+                    dec_len = avcodec_decode_audio3(m_audioDec, m_samples,
+                                                    &data_size, &pkt);
                     if (dec_len < 0)
                         break;
 
