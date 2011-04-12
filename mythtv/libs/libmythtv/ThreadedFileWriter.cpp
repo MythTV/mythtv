@@ -29,8 +29,8 @@ static int posix_fadvise(int, off_t, off_t, int) { return 0; }
 #  endif
 #endif
 
-#define LOC QString("TFW: ")
-#define LOC_ERR QString("TFW, Error: ")
+#define LOC QString("TFW(%1): ").arg(fd)
+#define LOC_ERR QString("TFW(%1), Error: ").arg(fd)
 
 const uint ThreadedFileWriter::TFW_DEF_BUF_SIZE   = 2*1024*1024;
 const uint ThreadedFileWriter::TFW_MAX_WRITE_SIZE = TFW_DEF_BUF_SIZE / 4;
@@ -83,7 +83,7 @@ static uint safe_write(int fd, const void *data, uint sz, bool &ok)
             }
             errcnt++;
             VERBOSE(VB_IMPORTANT, LOC_ERR + "safe_write(): File I/O " +
-                    QString(" errcnt: %1").arg(errcnt) + ENO + QString(" errno: %1").arg(errno));
+                    QString(" errcnt: %1").arg(errcnt) + ENO);
 
             if (errcnt == 3)
                 break;
@@ -102,6 +102,11 @@ static uint safe_write(int fd, const void *data, uint sz, bool &ok)
     ok = (errcnt < 3);
     return tot;
 }
+
+#undef LOC
+#undef LOC_ERR
+#define LOC QString("TFW(%1:%2): ").arg(filename).arg(fd)
+#define LOC_ERR QString("TFW(%1:%2), Error: ").arg(filename).arg(fd)
 
 /** \fn TFWWriteThread::start()
  *  \brief Thunk that runs ThreadedFileWriter::DiskLoop(void)
@@ -389,11 +394,6 @@ void ThreadedFileWriter::Sync(void)
 {
     if (fd >= 0)
     {
-        /// Toss any data the kernel wrote to disk on it's own from
-        /// the cache, so we don't get penalized for preserving it
-        /// during the sync.
-        (void) posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
-
 #if defined(_POSIX_SYNCHRONIZED_IO) && _POSIX_SYNCHRONIZED_IO > 0
         // fdatasync tries to avoid updating metadata, but will in
         // practice always update metadata if any data is written
@@ -402,10 +402,6 @@ void ThreadedFileWriter::Sync(void)
 #else
         fsync(fd);
 #endif
-
-        // Toss any data we just synced from cache, so we don't
-        // get penalized for it between now and the next sync.
-        (void) posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
     }
 }
 

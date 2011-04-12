@@ -55,7 +55,7 @@ UPnpSearchTask::UPnpSearchTask( int          nServicePort,
     m_sST         = sST;
     m_sUDN        = sUDN;
     m_nServicePort= nServicePort;
-    m_nMaxAge     = UPnp::g_pConfig->GetValue( "UPnP/SSDP/MaxAge" , 3600 );
+    m_nMaxAge     = UPnp::GetConfiguration()->GetValue( "UPnP/SSDP/MaxAge" , 3600 );
 
 } 
 
@@ -87,7 +87,7 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
     QString sData = QString ( "CACHE-CONTROL: max-age=%1\r\n"
                               "DATE: %2\r\n"
                               "EXT:\r\n"
-                              "Server: %3, UPnP/1.0, MythTv %4\r\n"
+                              "Server: %3, UPnP/1.0, MythTV %4\r\n"
                               "ST: %5\r\n"
                               "USN: %6\r\n"
                               "Content-Length: 0\r\n\r\n" )

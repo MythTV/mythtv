@@ -169,12 +169,12 @@ class MTV_PUBLIC VideoDisplayProfile
     static bool DeleteDB(uint groupid, const item_list_t&);
     static bool SaveDB(uint groupid, item_list_t&);
 
+    QString GetActualVideoRenderer(void) const
+        { QString tmp = last_video_renderer; tmp.detach(); return tmp; }
+
   private:
     item_list_t::const_iterator FindMatch(const QSize &size, float framerate);
     void LoadBestPreferences(const QSize &size, float framerate);
-
-    QString GetActualVideoRenderer(void) const
-        { QString tmp = last_video_renderer; tmp.detach(); return tmp; }
 
     QString GetPreference(const QString &key) const;
     void    SetPreference(const QString &key, const QString &value);

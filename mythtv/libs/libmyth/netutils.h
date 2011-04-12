@@ -10,6 +10,7 @@
 
 // Generic Data Formatting
 MPUBLIC QString GetDisplaySeasonEpisode(int seasEp, int digits);
+MPUBLIC QString GetDownloadFilename(QString title, QString url);
 
 // Tree DB Utils
 

@@ -1,8 +1,10 @@
 #include "math.h"
 
 #include <QSize>
+#include <QThread>
 
 #include "mythverbose.h"
+#include "mythmainwindow.h"
 #include "mythrender_vdpau.h"
 
 // NB this may be API dependant
@@ -158,11 +160,14 @@ class VDPAUOutputSurface : public VDPAUResource
 class VDPAUVideoSurface : public VDPAUResource
 {
   public:
-    VDPAUVideoSurface() {}
+    VDPAUVideoSurface()
+    {
+        memset(&m_render, 0, sizeof(struct vdpau_render_state));
+    }
     VDPAUVideoSurface(uint id, QSize size, VdpChromaType type)
       : VDPAUResource(id, size), m_type(type), m_needs_reset(false)
     {
-        m_owner = pthread_self();
+        m_owner = QThread::currentThread();
         memset(&m_render, 0, sizeof(struct vdpau_render_state));
         m_render.surface = m_id;
     }
@@ -177,7 +182,7 @@ class VDPAUVideoSurface : public VDPAUResource
     VdpChromaType      m_type;
     vdpau_render_state m_render;
     bool               m_needs_reset;
-    pthread_t          m_owner;
+    QThread*           m_owner;
 };
 
 class VDPAUBitmapSurface : public VDPAUResource
@@ -250,7 +255,7 @@ bool MythRenderVDPAU::gVDPAUMPEG4Accel     = false;
 uint MythRenderVDPAU::gVDPAUBestScaling    = 0;
 
 MythRenderVDPAU::MythRenderVDPAU()
-  : m_preempted(false), m_recreating(false),
+  : MythRender(kRenderVDPAU), m_preempted(false), m_recreating(false),
     m_recreated(false), m_reset_video_surfaces(false),
     m_render_lock(QMutex::Recursive), m_decode_lock(QMutex::Recursive),
     m_display(NULL), m_window(0), m_device(0), m_surface(0),
@@ -422,7 +427,7 @@ void MythRenderVDPAU::WaitForFlip(void)
     CHECK_ST
 }
 
-void MythRenderVDPAU::Flip(int delay)
+void MythRenderVDPAU::Flip(void)
 {
     if (!m_flipReady || !m_display)
         return;
@@ -440,15 +445,7 @@ void MythRenderVDPAU::Flip(int delay)
     }
 
     INIT_ST
-    VdpTime now = 0;
-    if (delay > 0 && vdp_presentation_queue_get_time)
-    {
-        vdp_st = vdp_presentation_queue_get_time(m_flipQueue, &now);
-        CHECK_ST
-        now += delay * 1000;
-    }
-
-    vdp_st = vdp_presentation_queue_display(m_flipQueue, surface, m_rect.x1, m_rect.y1, now);
+    vdp_st = vdp_presentation_queue_display(m_flipQueue, surface, m_rect.x1, m_rect.y1, 0);
     CHECK_ST
     SyncDisplay();
 }
@@ -476,6 +473,54 @@ void MythRenderVDPAU::MoveResizeWin(QRect &rect)
     LOCK_RENDER
     if (m_display)
         m_display->MoveResizeWin(m_window, rect);
+}
+
+bool MythRenderVDPAU::GetScreenShot(int width, int height)
+{
+    LOCK_RENDER
+    CHECK_STATUS(false)
+
+    if (m_surface >= (uint)m_surfaces.size())
+        return false;
+
+    VdpRGBAFormat fmt;
+    uint32_t w, h;
+    VdpOutputSurface surface = m_outputSurfaces[m_surfaces[m_surface]].m_id;
+    INIT_ST
+    vdp_st = vdp_output_surface_get_parameters(surface, &fmt, &w, &h);
+    CHECK_ST
+
+    if (!ok || fmt != VDP_RGBA_FORMAT_B8G8R8A8 || w <= 0 || h <= 0)
+        return false;
+
+    int size = w * h * 4;
+    unsigned char* buffer = new unsigned char[size];
+    void* const data[1] = { buffer };
+    const uint32_t pitches[1] = { w * 4 };
+    vdp_st = vdp_output_surface_get_bits_native(surface, NULL, data, pitches);
+    CHECK_ST
+
+    if (!ok)
+    {
+        delete [] buffer;
+        return false;
+    }
+
+    bool success = false;
+    QImage img(buffer, w, h, QImage::Format_RGB32);
+    MythMainWindow *window = GetMythMainWindow();
+    if (window)
+    {
+        if (width <= 0)
+            width = img.width();
+        if (height <= 0)
+            height = img.height();
+
+        img = img.scaled(width, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        success = window->SaveScreenShot(img);
+    }
+    delete [] buffer;
+    return success;
 }
 
 void MythRenderVDPAU::CheckOutputSurfaces(void)
@@ -1291,11 +1336,12 @@ bool MythRenderVDPAU::DrawBitmap(uint id, uint target,
     return ok;
 }
 
-QSize MythRenderVDPAU::GetBitmapSize(uint id)
+int MythRenderVDPAU::GetBitmapSize(uint id)
 {
     if (!m_bitmapSurfaces.contains(id))
-        return QSize();
-    return m_bitmapSurfaces[id].m_size;
+        return 0;
+    QSize sz = m_bitmapSurfaces[id].m_size;
+    return sz.width() * sz.height() * 4;
 }
 
 void* MythRenderVDPAU::GetRender(uint id)
@@ -1354,7 +1400,7 @@ void MythRenderVDPAU::ChangeVideoSurfaceOwner(uint id)
     if (!m_videoSurfaces.contains(id))
         return;
 
-    m_videoSurfaces[id].m_owner = pthread_self();
+    m_videoSurfaces[id].m_owner = QThread::currentThread();
 }
 
 void MythRenderVDPAU::Decode(uint id, struct vdpau_render_state *render)
@@ -1426,6 +1472,10 @@ bool MythRenderVDPAU::GetProcs(void)
     GET_PROC(VDP_FUNC_ID_OUTPUT_SURFACE_DESTROY, vdp_output_surface_destroy);
     GET_PROC(VDP_FUNC_ID_OUTPUT_SURFACE_RENDER_BITMAP_SURFACE,
         vdp_output_surface_render_bitmap_surface);
+    GET_PROC(VDP_FUNC_ID_OUTPUT_SURFACE_GET_PARAMETERS,
+        vdp_output_surface_get_parameters);
+    GET_PROC(VDP_FUNC_ID_OUTPUT_SURFACE_GET_BITS_NATIVE,
+        vdp_output_surface_get_bits_native);
     GET_PROC(VDP_FUNC_ID_VIDEO_MIXER_CREATE, vdp_video_mixer_create);
     GET_PROC(VDP_FUNC_ID_VIDEO_MIXER_SET_FEATURE_ENABLES,
         vdp_video_mixer_set_feature_enables);
@@ -1652,6 +1702,8 @@ void MythRenderVDPAU::ResetProcs(void)
     vdp_output_surface_create = NULL;
     vdp_output_surface_destroy = NULL;
     vdp_output_surface_render_bitmap_surface = NULL;
+    vdp_output_surface_get_parameters = NULL;
+    vdp_output_surface_get_bits_native = NULL;
     vdp_video_mixer_create = NULL;
     vdp_video_mixer_set_feature_enables = NULL;
     vdp_video_mixer_destroy = NULL;
@@ -1932,7 +1984,7 @@ void MythRenderVDPAU::ResetVideoSurfaces(void)
     LOCK_ALL
 
     bool ok = true;
-    pthread_t this_thread = pthread_self();
+    QThread *this_thread = QThread::currentThread();
     QHash<uint, VDPAUVideoSurface>::iterator it;
     int surfaces_owned = 0;
 
@@ -1957,7 +2009,7 @@ void MythRenderVDPAU::ResetVideoSurfaces(void)
 
     VERBOSE(VB_IMPORTANT, LOC +
         QString("Attempting to reset %1 video surfaces owned by this thread %2")
-            .arg(surfaces_owned).arg(this_thread));
+            .arg(surfaces_owned).arg((long long)this_thread));
 
     // update old surfaces to map old vdpvideosurface to new vdpvideosurface
     QHash<uint, uint>::iterator old;

@@ -31,6 +31,7 @@ using namespace std;
 #include "mythcommflagplayer.h"
 #include "programinfo.h"
 #include "remoteutil.h"
+#include "remotefile.h"
 #include "tvremoteutil.h"
 #include "jobqueue.h"
 #include "remoteencoder.h"
@@ -751,6 +752,45 @@ static int FlagCommercials(
     }
 
     QString filename = get_filename(program_info);
+    long long size = 0;
+    bool exists = false;
+
+    if (filename.startsWith("myth://"))
+    {
+        RemoteFile remotefile(filename, false, false, 0);
+        struct stat filestat;
+
+        if (remotefile.Exists(filename, &filestat))
+        {
+            exists = true;
+            size = filestat.st_size;
+        }
+    }
+    else
+    {
+        QFile file(filename);
+        if (file.exists())
+        {
+            exists = true;
+            size = file.size();
+        }
+    }
+
+    if (!exists)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Couldn't find file %1, aborting.")
+                .arg(filename));
+        global_program_info = NULL;
+        return GENERIC_EXIT_PERMISSIONS_ERROR;
+    }
+
+    if (size == 0)
+    {
+        VERBOSE(VB_IMPORTANT, QString("File %1 is zero-byte, aborting.")
+                .arg(filename));
+        global_program_info = NULL;
+        return GENERIC_EXIT_PERMISSIONS_ERROR;
+    }
 
     RingBuffer *tmprbuf = RingBuffer::Create(filename, false);
     if (!tmprbuf)
@@ -1260,7 +1300,7 @@ int main(int argc, char *argv[])
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(
-            false/*use gui*/, NULL/*upnp*/, false/*prompt for backend*/,
+            false/*use gui*/, false/*prompt for backend*/,
             false/*bypass auto discovery*/, !useDB/*ignoreDB*/))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");

@@ -43,21 +43,39 @@
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
+// We're creating this class immediately so it will always be available.
+
+SSDP* SSDP::g_pSSDP = NULL;
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-SSDP::SSDP( int nServicePort ) :
-    m_procReqLineExp     ("[ \r\n][ \r\n]*"),
-    m_nPort              ( SSDP_PORT ),
-    m_nSearchPort        ( SSDP_SEARCHPORT ),
-    m_nServicePort       ( nServicePort ),
-    m_pNotifyTask        ( NULL ),
-    m_bTermRequested     ( false ),
-    m_lock               ( QMutex::NonRecursive )
+SSDP* SSDP::Instance()
 {
-    m_nPort       = UPnp::g_pConfig->GetValue( "UPnP/SSDP/Port", SSDP_PORT);
-    m_nSearchPort = UPnp::g_pConfig->GetValue( "UPnP/SSDP/SearchPort", SSDP_SEARCHPORT );
+    return g_pSSDP ? g_pSSDP : (g_pSSDP = new SSDP());
+}
+ 
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+SSDP::SSDP() :
+    m_procReqLineExp       ("[ \r\n][ \r\n]*"),
+    m_nPort                ( SSDP_PORT ),
+    m_nSearchPort          ( SSDP_SEARCHPORT ),
+    m_nServicePort         ( 0 ),
+    m_pNotifyTask          ( NULL ),
+    m_bAnnouncementsEnabled( false ),
+    m_bTermRequested       ( false ),
+    m_lock                 ( QMutex::NonRecursive )
+{
+    VERBOSE(VB_UPNP, "SSDP::ctor - Starting up SSDP Thread..." );
+
+    Configuration *pConfig = UPnp::GetConfiguration();
+
+    m_nPort       = pConfig->GetValue( "UPnP/SSDP/Port"      , SSDP_PORT       );
+    m_nSearchPort = pConfig->GetValue( "UPnP/SSDP/SearchPort", SSDP_SEARCHPORT );
 
     m_Sockets[ SocketIdx_Search    ] = new MSocketDevice( MSocketDevice::Datagram );
     m_Sockets[ SocketIdx_Multicast ] = new QMulticastSocket( SSDP_GROUP, m_nPort );
@@ -73,6 +91,13 @@ SSDP::SSDP( int nServicePort ) :
     m_Sockets[ SocketIdx_Search ]->bind( ip4addr          , m_nSearchPort ); 
     m_Sockets[ SocketIdx_Search ]->bind( QHostAddress::Any, m_nSearchPort );
 
+    // ----------------------------------------------------------------------
+    // Create the SSDP (Upnp Discovery) Thread.
+    // ----------------------------------------------------------------------
+
+    start();
+
+    VERBOSE(VB_UPNP, "SSDP::ctor - SSDP Thread Started." );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -81,6 +106,8 @@ SSDP::SSDP( int nServicePort ) :
 
 SSDP::~SSDP()
 {
+    VERBOSE(VB_UPNP, "SSDP::Destructor - Shutting Down SSDP Thread..." );
+
     DisableNotifications();
 
     m_bTermRequested = true;
@@ -96,16 +123,23 @@ SSDP::~SSDP()
             delete m_Sockets[ nIdx ];
         }
     }
+
+    g_pSSDP = NULL;
+
+    VERBOSE(VB_UPNP, "SSDP::Destructor - SSDP Thread Terminated." );
+
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void SSDP::EnableNotifications()
+void SSDP::EnableNotifications( int nServicePort )
 {
     if ( m_pNotifyTask == NULL )
     {
+        m_nServicePort = nServicePort;
+
         VERBOSE(VB_UPNP, "SSDP::EnableNotifications() - creating new task");
         m_pNotifyTask = new UPnpNotifyTask( m_nServicePort ); 
 
@@ -122,6 +156,8 @@ void SSDP::EnableNotifications()
         VERBOSE(VB_UPNP, "SSDP::EnableNotifications() - sending NTS_byebye");
         m_pNotifyTask->SetNTS( NTS_byebye );
         m_pNotifyTask->Execute( NULL );
+
+        m_bAnnouncementsEnabled = true;
     }
 
     // ------------------------------------------------------------------
@@ -129,8 +165,11 @@ void SSDP::EnableNotifications()
     // ------------------------------------------------------------------
 
     VERBOSE(VB_UPNP, "SSDP::EnableNotifications() - sending NTS_alive");
+
     m_pNotifyTask->SetNTS( NTS_alive );
-    UPnp::g_pTaskQueue->AddTask( m_pNotifyTask  );
+
+    TaskQueue::Instance()->AddTask( m_pNotifyTask  );
+
     VERBOSE(VB_UPNP, "SSDP::EnableNotifications() - Task added to UPnP queue");
 }
 
@@ -140,6 +179,8 @@ void SSDP::EnableNotifications()
 
 void SSDP::DisableNotifications()
 {
+    m_bAnnouncementsEnabled = false;
+
     if (m_pNotifyTask != NULL)
     {
         // Send Announcement that we are leaving.
@@ -190,6 +231,8 @@ void SSDP::run()
 {
     fd_set          read_set;
     struct timeval  timeout;
+
+    VERBOSE(VB_UPNP, "SSDP::Run - SSDP Thread Started." );
 
     // ----------------------------------------------------------------------
     // Listen for new Requests
@@ -303,12 +346,27 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
 
         switch( eType )
         {
-            case SSDP_MSearch    :
-                ProcessSearchRequest ( headers, peerAddress, peerPort ); break;
+            case SSDP_MSearch:
+            {
+                // ----------------------------------------------------------
+                // If we haven't enabled notifications yet, then we don't 
+                // want to answer search requests.
+                // ----------------------------------------------------------
+
+                if (m_pNotifyTask != NULL)
+                    ProcessSearchRequest( headers, peerAddress, peerPort ); 
+
+                break;
+            }
+
             case SSDP_MSearchResp:
-                ProcessSearchResponse( headers                        ); break;
-            case SSDP_Notify     :
-                ProcessNotify        ( headers                        ); break;
+                ProcessSearchResponse( headers); 
+                break;
+
+            case SSDP_Notify:
+                ProcessNotify( headers ); 
+                break;
+
             case SSDP_Unknown:
             default:
                 VERBOSE(VB_UPNP, "SSPD::ProcessData - Unknown request Type.");
@@ -383,7 +441,6 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
     // Validate Header Values...
     // ----------------------------------------------------------------------
 
-    if ( UPnp::g_pTaskQueue    == NULL                ) return false;
 //    if ( pRequest->m_sMethod   != "*"                 ) return false;
 //    if ( pRequest->m_sProtocol != "HTTP"              ) return false;
 //    if ( pRequest->m_nMajor    != 1                   ) return false;
@@ -415,7 +472,7 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
         // -=>TODO: To be trully uPnp compliant, this Execute should be removed.
         //pTask->Execute( NULL );
 
-        UPnp::g_pTaskQueue->AddTask( nNewMX, pTask );
+        TaskQueue::Instance()->AddTask( nNewMX, pTask );
 
         return true;
     }
@@ -439,7 +496,7 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
         // -=>TODO: To be trully uPnp compliant, this Execute should be removed.
         pTask->Execute( NULL );
 
-        UPnp::g_pTaskQueue->AddTask( nNewMX, pTask );
+        TaskQueue::Instance()->AddTask( nNewMX, pTask );
 
         return true;
     }
@@ -476,7 +533,7 @@ bool SSDP::ProcessSearchResponse( const QStringMap &headers )
 
     int nSecs = sCache.mid( nPos+1 ).toInt();
 
-    UPnp::g_SSDPCache.Add( sST, sUSN, sDescURL, nSecs );
+    SSDPCache::Instance()->Add( sST, sUSN, sDescURL, nSecs );
 
     return true;
 }
@@ -515,7 +572,7 @@ bool SSDP::ProcessNotify( const QStringMap &headers )
 
         int nSecs = sCache.mid( nPos+1 ).toInt();
 
-        UPnp::g_SSDPCache.Add( sNT, sUSN, sDescURL, nSecs );
+        SSDPCache::Instance()->Add( sNT, sUSN, sDescURL, nSecs );
 
         return true;
     }
@@ -523,7 +580,7 @@ bool SSDP::ProcessNotify( const QStringMap &headers )
 
     if ( sNTS.contains( "ssdp:byebye" ) )
     {
-        UPnp::g_SSDPCache.Remove( sNT, sUSN );
+        SSDPCache::Instance()->Remove( sNT, sUSN );
 
         return true;
     }
@@ -547,7 +604,7 @@ SSDPExtension::SSDPExtension( int nServicePort , const QString sSharePath)
   : HttpServerExtension( "SSDP" , sSharePath),
     m_nServicePort(nServicePort)
 {
-    m_sUPnpDescPath = UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath",
+    m_sUPnpDescPath = UPnp::GetConfiguration()->GetValue( "UPnP/DescXmlPath",
                                                  m_sSharePath );
 }
 
@@ -569,6 +626,18 @@ SSDPMethod SSDPExtension::GetMethod( const QString &sURI )
     if (sURI == "getDeviceList"     ) return( SSDPM_GetDeviceList    );
 
     return( SSDPM_Unknown );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QStringList SSDPExtension::GetBasePaths() 
+{
+    // -=>TODO: This is very inefficient... should look into making 
+    //          it a unique path.
+
+    return QStringList( "/" );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -653,19 +722,19 @@ void SSDPExtension::GetFile( HTTPRequest *pRequest, QString sFileName )
 
 void SSDPExtension::GetDeviceList( HTTPRequest *pRequest )
 {
-    SSDPCache    &cache  = UPnp::g_SSDPCache;
+    SSDPCache*    pCache  = SSDPCache::Instance();
     int           nCount = 0;
     NameValues    list;
 
     VERBOSE( VB_UPNP, "SSDPExtension::GetDeviceList" );
 
-    cache.Lock();
+    pCache->Lock();
 
     QString     sXML = "";
     QTextStream os( &sXML, QIODevice::WriteOnly );
 
-    for (SSDPCacheEntriesMap::Iterator it  = cache.Begin();
-                                       it != cache.End();
+    for (SSDPCacheEntriesMap::Iterator it  = pCache->Begin();
+                                       it != pCache->End();
                                      ++it )
     {
         SSDPCacheEntries *pEntries = *it;
@@ -706,18 +775,13 @@ void SSDPExtension::GetDeviceList( HTTPRequest *pRequest )
     }
     os << flush;
 
-    list.push_back(
-        NameValue("DeviceCount",           cache.Count()));
-    list.push_back(
-        NameValue("DevicesAllocated",      SSDPCacheEntries::g_nAllocated));
-    list.push_back(
-        NameValue("CacheEntriesFound",     nCount));
-    list.push_back(
-        NameValue("CacheEntriesAllocated", DeviceLocation::g_nAllocated));
-    list.push_back(
-        NameValue("DeviceList",            sXML));
+    list.push_back( NameValue("DeviceCount"          , pCache->Count()               ));
+    list.push_back( NameValue("DevicesAllocated"     , SSDPCacheEntries::g_nAllocated));
+    list.push_back( NameValue("CacheEntriesFound"    , nCount                        ));
+    list.push_back( NameValue("CacheEntriesAllocated", DeviceLocation::g_nAllocated  ));
+    list.push_back( NameValue("DeviceList"           , sXML                          ));
 
-    cache.Unlock();
+    pCache->Unlock();
 
     pRequest->FormatActionResponse( list );
 

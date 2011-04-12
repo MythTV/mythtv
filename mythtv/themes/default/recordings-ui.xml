@@ -439,7 +439,7 @@
         </textarea>
 
         <textedit name="description" from="basemultilinetextarea">
-            <position>58,290</area>
+            <position>58,290</position>
         </textedit>
 
         <button name="ok" from="basebutton">

@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+#include <QPainter>
 #include <QGLContext>
 #include <QHash>
 #include <QMutex>
@@ -100,8 +101,9 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     static MythRenderOpenGL* Create(const QGLFormat& format,
                                     QPaintDevice* device = NULL);
 
-    MythRenderOpenGL(const QGLFormat& format, QPaintDevice* device);
-    MythRenderOpenGL(const QGLFormat& format);
+    MythRenderOpenGL(const QGLFormat& format, QPaintDevice* device,
+                     RenderType type = kRenderUnknown);
+    MythRenderOpenGL(const QGLFormat& format, RenderType type = kRenderUnknown);
     virtual ~MythRenderOpenGL();
 
     virtual void makeCurrent();
@@ -130,6 +132,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
                         uint filter = GL_LINEAR, uint wrap = GL_CLAMP_TO_EDGE);
     QSize GetTextureSize(uint type, const QSize &size);
     QSize GetTextureSize(uint tex);
+    int   GetTextureDataSize(uint tex);
     void  SetTextureFilters(uint tex, uint filt, uint wrap);
     void  ActiveTexture(int active_tex);
     virtual uint CreateHelperTexture(void) { return 0; }
@@ -152,10 +155,12 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
                     int red = 255, int green = 255, int blue = 255);
     void DrawBitmap(uint *textures, uint texture_count, uint target,
                     const QRectF *src, const QRectF *dst, uint prog);
-    void DrawRect(const QRect &area, bool drawFill,
-                  const QColor &fillColor, bool drawLine,
-                  int lineWidth, const QColor &lineColor,
-                  int target = 0, int prog = 0);
+    void DrawRect(const QRect &area, const QBrush &fillBrush,
+                  const QPen &linePen, int alpha);
+    void DrawRoundRect(const QRect &area, int cornerRadius,
+                       const QBrush &fillBrush, const QPen &linePen,
+                       int alpha);
+    virtual bool RectanglesAreAccelerated(void) { return false; }
 
   protected:
     virtual void DrawBitmapPriv(uint tex, const QRect *src, const QRect *dst,
@@ -164,10 +169,11 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     virtual void DrawBitmapPriv(uint *textures, uint texture_count,
                                 const QRectF *src, const QRectF *dst,
                                 uint prog) = 0;
-    virtual void DrawRectPriv(const QRect &area, bool drawFill,
-                              const QColor &fillColor,  bool drawLine,
-                              int lineWidth, const QColor &lineColor,
-                              int prog) = 0;
+    virtual void DrawRectPriv(const QRect &area, const QBrush &fillBrush,
+                              const QPen &linePen, int alpha) = 0;
+    virtual void DrawRoundRectPriv(const QRect &area, int cornerRadius,
+                                   const QBrush &fillBrush, const QPen &linePen,
+                                   int alpha) = 0;
 
     virtual void Init2DState(void);
     virtual void InitProcs(void);

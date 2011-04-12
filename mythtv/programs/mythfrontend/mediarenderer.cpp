@@ -19,6 +19,8 @@ class MythFrontendStatus : public HttpServerExtension
     MythFrontendStatus(const QString &sSharePath)
       : HttpServerExtension("MythFrontendStatus", sSharePath) { }
 
+    virtual QStringList GetBasePaths() { return QStringList( "/" ); }
+
     virtual bool ProcessRequest(HttpWorkerThread *pThread,
                                 HTTPRequest *pRequest)
     {
@@ -214,7 +216,6 @@ MediaRenderer::MediaRenderer()
         VERBOSE(VB_IMPORTANT, "MediaRenderer::HttpServer Create Error");
         delete m_pHttpServer;
         m_pHttpServer = NULL;
-        InitializeSSDPOnly();
         return;
     }
 

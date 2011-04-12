@@ -26,8 +26,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-/*#define TRACE(x,...) DEBUG(DBG_CRIT,x,##__VA_ARGS__)*/
-#define TRACE(x,...) do {} while(0)
+/*#define M2TS_TRACE(...) BD_DEBUG(DBG_CRIT,__VA_ARGS__)*/
+#define M2TS_TRACE(...) do {} while(0)
 
 /*
  *
@@ -91,12 +91,12 @@ static int _add_ts(PES_BUFFER *p, unsigned pusi, uint8_t *buf, unsigned len)
         unsigned hdr_len    = buf[8] + 9;
 
         if (buf[0] || buf[1] || buf[2] != 1) {
-            TRACE("invalid PES header (00 00 01)");
+            BD_DEBUG(DBG_DECODE, "invalid PES header (00 00 01)");
             return -1;
         }
 
         if (len < hdr_len) {
-            TRACE("invalid BDAV TS (PES header not in single TS packet)\n");
+            BD_DEBUG(DBG_DECODE, "invalid BDAV TS (PES header not in single TS packet)\n");
             return -1;
         }
 
@@ -147,29 +147,29 @@ PES_BUFFER *m2ts_demux(M2TS_DEMUX *p, uint8_t *buf)
         int      payload_offset = (buf[4+3] & 0x20) ? buf[4+4] + 5 : 4;
 
         if (buf[4] != 0x47) {
-            DEBUG(DBG_BLURAY, "missing sync byte. scrambled data ?\n");
+            BD_DEBUG(DBG_DECODE, "missing sync byte. scrambled data ?\n");
             return NULL;
         }
         if (pid != p->pid) {
-            TRACE("skipping packet (pid %d)\n", pid);
+            M2TS_TRACE("skipping packet (pid %d)\n", pid);
             continue;
         }
         if (tp_error) {
-            DEBUG(DBG_BLURAY, "skipping packet (transport error)\n");
+            BD_DEBUG(DBG_DECODE, "skipping packet (transport error)\n");
             continue;
         }
         if (!payload_exists) {
-            TRACE("skipping packet (no payload)\n");
+            M2TS_TRACE("skipping packet (no payload)\n");
             continue;
         }
         if (payload_offset >= 188) {
-            DEBUG(DBG_BLURAY, "skipping packet (invalid payload start address)\n");
+            BD_DEBUG(DBG_DECODE, "skipping packet (invalid payload start address)\n");
             continue;
         }
 
         if (pusi) {
             if (p->buf) {
-                DEBUG(DBG_BLURAY, "PES length mismatch: have %d, expected %d\n",
+                BD_DEBUG(DBG_DECODE, "PES length mismatch: have %d, expected %d\n",
                       p->buf->len, p->pes_length);
                 pes_buffer_free(&p->buf);
             }
@@ -177,14 +177,14 @@ PES_BUFFER *m2ts_demux(M2TS_DEMUX *p, uint8_t *buf)
         }
 
         if (!p->buf) {
-            DEBUG(DBG_BLURAY, "skipping packet (no pusi seen)\n");
+            BD_DEBUG(DBG_DECODE, "skipping packet (no pusi seen)\n");
             continue;
         }
 
         int r = _add_ts(p->buf, pusi, buf + 4 + payload_offset, 188 - payload_offset);
         if (r) {
             if (r < 0) {
-                DEBUG(DBG_BLURAY, "skipping block (PES header error)\n");
+                BD_DEBUG(DBG_DECODE, "skipping block (PES header error)\n");
                 pes_buffer_free(&p->buf);
                 continue;
             }
@@ -192,7 +192,7 @@ PES_BUFFER *m2ts_demux(M2TS_DEMUX *p, uint8_t *buf)
         }
 
         if (p->buf->len == p->pes_length) {
-            TRACE("PES complete (%d bytes)\n", p->pes_length);
+            M2TS_TRACE("PES complete (%d bytes)\n", p->pes_length);
             pes_buffer_append(&result, p->buf);
             p->buf = NULL;
         }

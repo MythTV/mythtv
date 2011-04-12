@@ -236,3 +236,15 @@ QString HardwareProfile::GetProfileURL()
 
     return ret;
 }
+
+QString HardwareProfile::GetHardwareProfile()
+{
+    QString cmd = GetShareDir() + "hardwareprofile/sendProfile.py";
+    QStringList args;
+    args << "-p";
+    MythSystem system(cmd, args, kMSRunShell | kMSStdOut | kMSBuffered);
+
+    system.Run();
+    system.Wait();
+    return system.ReadAll();
+}

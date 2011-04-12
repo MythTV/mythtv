@@ -38,7 +38,7 @@
 
             var atts = { id: "mydmplayer" };
 
-            swfobject.embedSWF('http://www.dailymotion.com/swf/' + videocode + '&enableApi=1&playerapiid=dmplayer&autoPlay=1',
+            swfobject.embedSWF('http://www.dailymotion.com/swf/' + videocode + '&enableApi=1&playerapiid=dmplayer&autoPlay=1&chromeless=1',
                                "myth_player", window.innerWidth, window.innerHeight, "8", null, flashvars, params, atts);
 
             function onDailymotionPlayerReady(playerId) {

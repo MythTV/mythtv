@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+  <group human_label="Database Setup" unique_label="database">
+    <setting setting_type="file" value="dbHostName" default_data="localhost"
+             label="Host" data_type="string"
+             help_text="DNS name or IP of server containing database or
+                        'localhost' which will connect to the server using
+                        a unix pipe." />
+    <setting setting_type="file" value="dbPort" default_data="3306" label="Port"
+             help_text="Port on which the remote database server listens."
+             data_type="integer_range" range_min="0" range_max="0xffff" />
+    <setting setting_type="file" value="dbPing" default_data="1" label="Ping"
+             help_text="Ping the remote server." data_type="checkbox" />
+    <setting setting_type="file" value="dbName" default_data="mythconverg"
+             label="Database" data_type="string"
+             help_text="Database containing MythTV tables." />
+    <setting setting_type="file" value="dbUserName" default_data="mythtv"
+             label="User" data_type="string"
+             help_text="Database user name with read and write
+                        access to MythTV tables" />
+    <setting setting_type="file" value="dbPassword" default_data="mythtv"
+             label="Password" data_type="string"
+             help_text="Password for database user." />
+    <setting setting_type="file" value="dbHostID" default_data=""
+             label="Host Identifier" data_type="string"
+             help_text="Unique identifier for this host in the database." />
+  </group>
+  <group human_label="Database Wake on LAN" unique_label="database_wol">
+      <setting setting_type="file" value="dbWOLEnabled" default_data="1"
+               label="Enabled" data_type="checkbox"
+               help_text="If checked MythTV will attempt to wake the
+                          remote database host." />
+      <setting setting_type="file" value="dbWOLReconnectCount" default_data="0"
+               label="Reconnect Count"
+               data_type="integer_range" range_min="0" range_max="10"
+               help_text="How often to attempt reconnecting to the database." />
+      <setting setting_type="file" value="dbWOLRetryCount" default_data="5"
+               label="Retry Count"
+               data_type="integer_range" range_min="0" range_max="10"
+               help_text="How often to attempt to wake the remote
+                          database host." />
+      <setting setting_type="file" value="dbWOLCommand"
+               default_data="echo 'WOLsqlServerCommand not set'"
+               label="Command" data_type="string"
+               help_text="Command to execute to wake the
+                          remote database host." />
+  </group>
+</config>

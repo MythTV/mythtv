@@ -3,6 +3,9 @@
 
 #include "mythmediamonitor.h"
 
+#define DEFAULT_DVD "e:"
+#define DEFAULT_CD  "e:"
+
 class MediaMonitorWindows : public MediaMonitor
 {
   public:

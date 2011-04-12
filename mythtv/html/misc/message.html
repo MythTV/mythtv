@@ -1,0 +1,32 @@
+<div id='send-message'>
+    <table border=0 cellpadding=2 cellspacing=2>
+        <tr><th align=right>Message Text:</th>
+            <td><input id='message' size=60 maxlength=200>
+            </td>
+        </tr>
+    </table>
+
+    <input type="checkbox" name="advanced" onclick=toggleShowDiv('Advanced') value="Show Advanced" checked>Send to all frontends
+
+    <div id='Advanced'>
+        <hr>
+        <table border=0 cellpadding=2 cellspacing=2>
+            <tr><th align=right>IP Address:</th>
+                <td><input id='address' size=20 value='255.255.255.255'>
+                </td>
+            </tr>
+            <tr><th align=right>UDP Port:</th>
+                <td><input id='port' size=10 value='6948'>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <hr>
+    <input type=button value='Send This Message' onClick='javascript:sendMessage()'>
+
+</div>
+
+<script language="JavaScript" type="text/javascript">
+    $("#Advanced").hide();
+</script>
+

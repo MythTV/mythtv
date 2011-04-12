@@ -1,0 +1,58 @@
+<br>
+<h3>Sample Server Side Script Page... List of Recorded Programs<super>*</super></h3>
+<super>*</super>This would be better implemented as an ajax call.
+<hr>
+<table border="1">
+<tr><th>Title - SubTitle</th>
+  <th>StartTime</th>
+  <th>ISO StartTime</th>
+  <th>Description</th>
+  </tr>
+<%
+
+	var oDvr = new Dvr();
+
+	var list = oDvr.GetRecorded( true, 0, -1);
+
+	for (var nIdx=0; nIdx < list.Programs.length; nIdx++)
+	{
+		var program = list.Programs[ nIdx ];
+%>		
+  <tr>
+<!-- These image loads are slow when you have a lot of recordings, so comment
+     them out, but leave them in for reference for users.
+	<td><img src="/Content/GetPreviewImage?ChanId=<%= program.Channel.ChanId%>&StartTime=<%= ISODateString( program.StartTime ) %>" ></img></td>
+-->
+	
+	<td><%= program.Title %><% if (program.SubTitle.length) os.write(" - " + program.SubTitle); %></td>
+	<td><%= program.StartTime %></td>
+	<td><%= ISODateString( program.StartTime ) %></td>
+	<td><%= program.Description %></td>
+  </tr>
+<%
+    } 
+
+%>
+</table>
+<% 
+%>
+</div>
+<div id="debug" > </div>
+</div> <!-- content -->
+<%
+
+function ISODateString(d)
+{ 
+  function pad(n)
+  {
+    return n<10 ? '0'+n : n
+  } 
+  return d.getFullYear()+'-'      
+   + pad(d.getMonth()+1)+'-'      
+   + pad(d.getDate())+'T'      
+   + pad(d.getHours())+':'     
+   + pad(d.getMinutes())+':'      
+   + pad(d.getSeconds())
+}
+
+%>

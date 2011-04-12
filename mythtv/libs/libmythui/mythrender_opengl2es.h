@@ -7,12 +7,12 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
 {
   public:
     MythRenderOpenGL2ES(const QGLFormat& format, QPaintDevice* device)
-        : MythRenderOpenGL2(format, device)
+        : MythRenderOpenGL2(format, device, kRenderOpenGL2ES)
     {
     }
 
     MythRenderOpenGL2ES(const QGLFormat& format)
-        : MythRenderOpenGL2(format)
+        : MythRenderOpenGL2(format, kRenderOpenGL2ES)
     {
     }
 

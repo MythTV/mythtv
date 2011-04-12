@@ -86,6 +86,8 @@ class HttpStatus : public HttpServerExtension
         void     SetMainServer(MainServer *mainServer)
                     { m_pMainServer = mainServer; }
 
+        virtual QStringList GetBasePaths();
+        
         bool     ProcessRequest( HttpWorkerThread *pThread,
                                  HTTPRequest *pRequest );
 };

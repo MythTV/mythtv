@@ -60,6 +60,7 @@ class UPNP_PUBLIC SoapSerializer : public XmlSerializer
                 headers.insert( "EXT", "" );
         }
 
+
     protected:
 
         QString     m_sNamespace;
@@ -68,18 +69,19 @@ class UPNP_PUBLIC SoapSerializer : public XmlSerializer
         //
         // ------------------------------------------------------------------
 
-        virtual void BeginSerialize() 
+        virtual void BeginSerialize( QString &sName) 
         {
             m_pXmlWriter->writeStartDocument( "1.0" );
 
             m_pXmlWriter->writeStartElement("http://schemas.xmlsoap.org/soap/envelope/", "Envelope" );
-            m_pXmlWriter->writeAttribute( "encodingStyle", "http://schemas.xmlsoap.org/soap/encoding/" );
+           // m_pXmlWriter->writeAttribute( "encodingStyle", "http://schemas.xmlsoap.org/soap/encoding/" );
 
             m_pXmlWriter->writeStartElement( "http://schemas.xmlsoap.org/soap/envelope/", "Body" );
 
             m_pXmlWriter->writeStartElement( m_sRequestName + "Response" );
             m_pXmlWriter->writeAttribute( "xmlns", m_sNamespace );
 
+            sName = m_sRequestName + "Result";
         }
 };
 

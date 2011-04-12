@@ -25,6 +25,7 @@
 #define __HTMLSERVER_H__
 
 #include "httpserver.h"
+#include "serverSideScripting.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -38,13 +39,25 @@ class UPNP_PUBLIC HtmlServerExtension : public HttpServerExtension
 {
     private:
 
-        QString     m_sAbsoluteSharePath;
+        QString             m_sAbsoluteSharePath;
+        ServerSideScripting m_Scripting;
 
     public:
                  HtmlServerExtension( const QString sSharePath);
         virtual ~HtmlServerExtension( );
 
+        // Special case, this extension is called if no other extension
+        // processes the request.  
+
+        virtual QStringList GetBasePaths() { return QStringList(); }
+
         bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
+
+        QScriptEngine* ScriptEngine()
+        {
+            return &(m_Scripting.m_engine);
+        }
+
 };
 
 #endif

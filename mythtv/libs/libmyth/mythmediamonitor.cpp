@@ -25,8 +25,7 @@ using namespace std;
 
 #ifdef USING_DARWIN_DA
 #include "mediamonitor-darwin.h"
-#endif
-#if CONFIG_CYGWIN || defined(_WIN32)
+#elif CONFIG_CYGWIN || defined(_WIN32)
 #include "mediamonitor-windows.h"
 #else
 #include "mediamonitor-unix.h"
@@ -821,7 +820,7 @@ QString MediaMonitor::defaultDevice(QString dbSetting,
  */
 QString MediaMonitor::defaultCDdevice()
 {
-    return defaultDevice("CDDevice", tr("Select a CD drive"), "/dev/cdrom");
+    return defaultDevice("CDDevice", tr("Select a CD drive"), DEFAULT_CD);
 }
 
 /**
@@ -830,7 +829,7 @@ QString MediaMonitor::defaultCDdevice()
 QString MediaMonitor::defaultVCDdevice()
 {
     return defaultDevice("VCDDeviceLocation",
-                         tr("Select a VCD drive"), "/dev/cdrom");
+                         tr("Select a VCD drive"), DEFAULT_CD);
 }
 
 /**
@@ -839,7 +838,7 @@ QString MediaMonitor::defaultVCDdevice()
 QString MediaMonitor::defaultDVDdevice()
 {
     return defaultDevice("DVDDeviceLocation",
-                         tr("Select a DVD drive"), "/dev/dvd");
+                         tr("Select a DVD drive"), DEFAULT_DVD);
 }
 
 /**
@@ -848,7 +847,7 @@ QString MediaMonitor::defaultDVDdevice()
 QString MediaMonitor::defaultCDWriter()
 {
     return defaultDevice("CDWriterDeviceLocation",
-                         tr("Select a CD writer"), "/dev/cdrom");
+                         tr("Select a CD writer"), DEFAULT_CD);
 }
 
 /**
@@ -860,7 +859,7 @@ QString MediaMonitor::defaultCDWriter()
 QString MediaMonitor::defaultDVDWriter()
 {
     QString device = defaultDevice("MythArchiveDVDLocation",
-                                   tr("Select a DVD writer"), "/dev/dvd");
+                                   tr("Select a DVD writer"), DEFAULT_DVD);
 
     return device;
 }

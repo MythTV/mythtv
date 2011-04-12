@@ -54,6 +54,14 @@ class SERVICE_PUBLIC ProgramGuide : public QObject
     Q_OBJECT
     Q_CLASSINFO( "version", "1.0" );
 
+    // We need to know the type that will ultimately be contained in 
+    // any QVariantList or QVariantMap.  We do his by specifying
+    // A Q_CLASSINFO entry with "<PropName>_type" as the key
+    // and the type name as the value
+
+    Q_CLASSINFO( "Channels_type", "DTC::Channel");
+
+
     Q_PROPERTY( QDateTime     StartTime      READ StartTime      WRITE setStartTime      )
     Q_PROPERTY( QDateTime     EndTime        READ EndTime        WRITE setEndTime        )
     Q_PROPERTY( int           StartChanId    READ StartChanId    WRITE setStartChanId    )
@@ -81,6 +89,16 @@ class SERVICE_PUBLIC ProgramGuide : public QObject
     PROPERTYIMP       ( QString     , ProtoVer      )
 
     PROPERTYIMP_RO_REF( QVariantList, Channels      )
+
+    public:
+
+        static void InitializeCustomTypes()
+        {
+            qRegisterMetaType< ProgramGuide  >();
+            qRegisterMetaType< ProgramGuide* >();
+
+            ChannelInfo::InitializeCustomTypes();
+        }
 
     public:
 
@@ -130,6 +148,7 @@ class SERVICE_PUBLIC ProgramGuide : public QObject
 
 } // namespace DTC
 
-Q_DECLARE_METATYPE( DTC::ProgramGuide )
+Q_DECLARE_METATYPE( DTC::ProgramGuide  )
+Q_DECLARE_METATYPE( DTC::ProgramGuide* )
 
 #endif

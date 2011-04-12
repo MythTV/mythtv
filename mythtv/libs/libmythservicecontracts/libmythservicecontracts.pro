@@ -16,13 +16,16 @@ HEADERS += serviceexp.h service.h datacontracthelper.h
 
 HEADERS += services/mythServices.h    services/guideServices.h
 HEADERS += services/contentServices.h services/dvrServices.h
+HEADERS += services/channelServices.h
 
 HEADERS += datacontracts/connectionInfo.h      datacontracts/databaseInfo.h
 HEADERS += datacontracts/programAndChannel.h   datacontracts/programGuide.h
 HEADERS += datacontracts/recording.h           datacontracts/settingList.h
-HEADERS += datacontracts/stringList.h          datacontracts/successFail.h
 HEADERS += datacontracts/wolInfo.h             datacontracts/programList.h
 HEADERS += datacontracts/encoder.h             datacontracts/encoderList.h
+HEADERS += datacontracts/storageGroupDir.h     datacontracts/storageGroupDirList.h
+HEADERS += datacontracts/channelInfoList.h     datacontracts/videoSource.h
+HEADERS += datacontracts/videoSourceList.h
 
 SOURCES += service.cpp
 
@@ -40,14 +43,14 @@ inc.files = serviceexp.h service.h datacontracthelper.h
 incServices.path = $${PREFIX}/include/mythtv/libmythservicecontracts/services/
 incServices.files  = services/mythServices.h    services/guideServices.h
 incServices.files += services/contentServices.h services/dvrServices.h
-
+incServices.files += services/channelServices.h
 
 incDatacontracts.path = $${PREFIX}/include/mythtv/libmythservicecontracts/datacontracts/
 incDatacontracts.files  = datacontracts/connectionInfo.h      datacontracts/databaseInfo.h
 incDatacontracts.files += datacontracts/programAndChannel.h   datacontracts/programGuide.h
 incDatacontracts.files += datacontracts/recording.h           datacontracts/settingList.h
-incDatacontracts.files += datacontracts/stringList.h          datacontracts/successFail.h
-incDatacontracts.files += datacontracts/wolInfo.h
+incDatacontracts.files += datacontracts/wolInfo.h             datacontracts/channelInfoList.h
+incDatacontracts.files += datacontracts/videoSource.h         datacontracts/videoSourceList.h
 
 INSTALLS += inc incServices incDatacontracts
 

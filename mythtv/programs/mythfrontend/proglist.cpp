@@ -728,7 +728,8 @@ void ProgLister::DeleteOldSeries(bool ok)
         return;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE FROM oldrecorded WHERE title = :TITLE");
+    query.prepare("DELETE FROM oldrecorded "
+                  "WHERE title = :TITLE AND future = 0");
     query.bindValue(":TITLE", pi->GetTitle());
     if (!query.exec())
         MythDB::DBError("ProgLister::DeleteOldSeries -- delete", query);

@@ -18,7 +18,7 @@ static void file_close_mythiowrapper(BD_FILE_H *file)
     if (file) {
         mythfile_close((int)file->internal);
 
-        DEBUG(DBG_FILE, "Closed mythfile file (%p)\n", file);
+        BD_DEBUG(DBG_FILE, "Closed mythfile file (%p)\n", file);
 
         X_FREE(file);
     }
@@ -63,7 +63,7 @@ BD_FILE_H *file_open_mythiowrapper(const char* filename, const char *mode)
     FILE *fp = NULL;
     BD_FILE_H *file = malloc(sizeof(BD_FILE_H));
 
-    DEBUG(DBG_FILE, "Opening mythfile file %s... (%p)\n", filename, file);
+    BD_DEBUG(DBG_FILE, "Opening mythfile file %s... (%p)\n", filename, file);
     file->close = file_close_mythiowrapper;
     file->seek = file_seek_mythiowrapper;
     file->read = file_read_mythiowrapper;
@@ -83,7 +83,7 @@ BD_FILE_H *file_open_mythiowrapper(const char* filename, const char *mode)
         return file;
     }
 
-    DEBUG(DBG_FILE, "Error opening file! (%p)\n", file);
+    BD_DEBUG(DBG_FILE, "Error opening file! (%p)\n", file);
 
     X_FREE(file);
 

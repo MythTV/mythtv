@@ -38,6 +38,7 @@
 #include "compat.h"
 #include "mythdirs.h"
 #include "mythverbose.h"
+#include "htmlserver.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -83,6 +84,15 @@ HttpServer::HttpServer() : QTcpServer(), ThreadPool("HTTP")
     VERBOSE(VB_UPNP, QString( "HttpServer() - SharePath = %1")
             .arg(m_sSharePath));
 
+    // ----------------------------------------------------------------------
+    // The HtmlServer Extension is our fall back if a request isn't processed
+    // by any other extension.  (This is needed here since it listens for
+    // '/' as it's base url ).
+    // ----------------------------------------------------------------------
+
+    m_pHtmlServer = new HtmlServerExtension( m_sSharePath );
+
+
     // -=>TODO: Load Config XML
     // -=>TODO: Load & initialize - HttpServerExtensions
 }
@@ -97,6 +107,18 @@ HttpServer::~HttpServer()
     {
         delete m_extensions.takeFirst();
     }
+
+    if (m_pHtmlServer != NULL)
+        delete m_pHtmlServer;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QScriptEngine* HttpServer::ScriptEngine()
+{
+    return ((HtmlServerExtension *)m_pHtmlServer)->ScriptEngine();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -131,6 +153,14 @@ void HttpServer::RegisterExtension( HttpServerExtension *pExtension )
     {
         m_rwlock.lockForWrite();
         m_extensions.append( pExtension );
+
+        // Add to multimap for quick lookup.
+
+        QStringList list = pExtension->GetBasePaths();
+
+        for( int nIdx = 0; nIdx < list.size(); nIdx++)
+            m_basePaths.insert( list[ nIdx ], pExtension );
+
         m_rwlock.unlock();
     }
 }
@@ -144,8 +174,16 @@ void HttpServer::UnregisterExtension( HttpServerExtension *pExtension )
     if (pExtension != NULL )
     {
         m_rwlock.lockForWrite();
-        delete pExtension;
+
+        QStringList list = pExtension->GetBasePaths();
+
+        for( int nIdx = 0; nIdx < list.size(); nIdx++)
+            m_basePaths.remove( list[ nIdx ], pExtension );
+
         m_extensions.removeAll(pExtension);
+
+        delete pExtension;
+
         m_rwlock.unlock();
     }
 }
@@ -160,6 +198,23 @@ void HttpServer::DelegateRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
 
     m_rwlock.lockForRead();
 
+    QList< HttpServerExtension* > list = m_basePaths.values( pRequest->m_sBaseUrl );
+
+    for (int nIdx=0; nIdx < list.size() && !bProcessed; nIdx++ )
+    {
+        try
+        {
+            bProcessed = list[ nIdx ]->ProcessRequest(pThread, pRequest);
+        }
+        catch(...)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("HttpServer::DelegateRequest - "
+                            "Unexpected Exception - "
+                            "pExtension->ProcessRequest()."));
+        }
+    }
+/*
     HttpServerExtensionList::iterator it = m_extensions.begin();
 
     for (; (it != m_extensions.end()) && !bProcessed; ++it)
@@ -176,8 +231,11 @@ void HttpServer::DelegateRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
                             "pExtension->ProcessRequest()."));
         }
     }
-
+*/
     m_rwlock.unlock();
+
+    if (!bProcessed)
+        bProcessed = m_pHtmlServer->ProcessRequest( pThread, pRequest );
 
     if (!bProcessed)
     {
@@ -203,7 +261,7 @@ HttpWorkerThread::HttpWorkerThread( HttpServer *pParent, const QString &sName ) 
 {
     m_pHttpServer    = pParent;
     m_nSocket        = 0;                                                  
-    m_nSocketTimeout = UPnp::g_pConfig->GetValue( "HTTP/KeepAliveTimeoutSecs", 10 ) * 1000;
+    m_nSocketTimeout = UPnp::GetConfiguration()->GetValue( "HTTP/KeepAliveTimeoutSecs", 10 ) * 1000;
 
     m_pData          = NULL;
 }                  
@@ -292,7 +350,8 @@ void  HttpWorkerThread::ProcessWork()
                         // delegate processing to HttpServerExtensions.
                         // ------------------------------------------------------
 
-                        m_pHttpServer->DelegateRequest( this, pRequest );
+                        if (pRequest->m_nResponseStatus != 401)
+                            m_pHttpServer->DelegateRequest( this, pRequest );
                     }
                     else
                     {

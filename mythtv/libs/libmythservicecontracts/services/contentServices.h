@@ -25,9 +25,9 @@
 #define CONTENTSERVICES_H_
 
 #include <QFileInfo>
+#include <QStringList>
 
 #include "service.h"
-#include "datacontracts/stringList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -48,29 +48,44 @@
 class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
+    Q_CLASSINFO( "version"    , "1.01" );
+
+    public:
+
+        // Must call InitializeCustomTypes for each unique Custom Type used
+        // in public slots below.
+
+        ContentServices( QObject *parent = 0 ) : Service( parent )
+        {
+        }
 
     public slots:
 
-        virtual QFileInfo*          GetFile             ( const QString   &StorageGroup,
+        virtual QFileInfo           GetFile             ( const QString   &StorageGroup,
                                                           const QString   &FileName ) = 0;
 
-        virtual DTC::StringList*    GetFileList         ( const QString   &StorageGroup ) = 0;
+        virtual QStringList         GetFileList         ( const QString   &StorageGroup ) = 0;
 
-        virtual QFileInfo*          GetVideoArt         ( int Id ) = 0;
+        virtual QFileInfo           GetVideoArt         ( int Id ) = 0;
 
-        virtual QFileInfo*          GetAlbumArt         ( int Id, int Width, int Height ) = 0;
+        virtual QFileInfo           GetAlbumArt         ( int Id, int Width, int Height ) = 0;
 
-        virtual QFileInfo*          GetPreviewImage     ( int              ChanId,
+        virtual QFileInfo           GetPreviewImage     ( int              ChanId,
                                                           const QDateTime &StartTime,
                                                           int              Width,    
                                                           int              Height,   
                                                           int              SecsIn ) = 0;
 
-        virtual QFileInfo*          GetRecording        ( int              ChanId,
+        virtual QFileInfo           GetRecording        ( int              ChanId,
                                                           const QDateTime &StartTime ) = 0;
 
-        virtual QFileInfo*          GetMusic            ( int Id ) = 0;
-        virtual QFileInfo*          GetVideo            ( int Id ) = 0;
+        virtual QFileInfo           GetMusic            ( int Id ) = 0;
+        virtual QFileInfo           GetVideo            ( int Id ) = 0;
+
+        virtual QString             GetHash             ( const QString   &StorageGroup,
+                                                          const QString   &FileName ) = 0;
+
+
 };
 
 #endif

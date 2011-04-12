@@ -46,7 +46,7 @@ ProgramRecPriorityInfo::ProgramRecPriorityInfo(void) :
 
 ProgramRecPriorityInfo::ProgramRecPriorityInfo(
     const ProgramRecPriorityInfo &other) :
-    RecordingInfo::RecordingInfo(other),
+    RecordingInfo(other),
     recTypeRecPriority(other.recTypeRecPriority),
     recType(other.recType),
     matchCount(other.matchCount),

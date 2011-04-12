@@ -1,0 +1,212 @@
+/* Styles shared by all sections */
+
+    html, body {
+        font-size:        14px;
+        font-family:      sans-serif;
+        color:            white;
+        background-color: #88a1bb;
+        border:           0px;
+        margin:           0px;
+        padding:          0px;
+    }
+    a, a:visited {
+        color:              #026;
+        text-decoration:    underline;
+    }
+    a:hover {
+        color:              #26c;
+    }
+    .bold {
+        font-weight:        bold;
+    }
+
+    table
+    {
+        width:100%;
+    }
+
+    table td
+    {
+        font-weight: normal !important;
+        padding: .2em;
+        border: 10px #FFFFFF;
+    }
+
+    table th
+    {
+        border: 10px #FFFFFF;
+        text-align: center;
+        padding: .2em .2em;
+    }
+
+    table tr.alt td
+    {
+        border: 10px #FFFFFF;
+        background-color:#2D2D2D;
+    }
+
+    table td.invisible
+    {
+        display:none;
+    }
+
+    table th.invisible
+    {
+        display:none;
+    }
+
+    #header_status {
+        position:           fixed;
+        bottom:             30px;
+        left:               100px;
+        right:              100px;
+        height:             38px;
+        z-index:            2000;
+        padding:            6px 200px 0 200px;
+    }
+
+    #header_error {
+        position:           fixed;
+        bottom:             80px;
+        left:               100px;
+        right:              100px;
+        height:             38px;
+        z-index:            2000;
+        padding:            6px 200px 0 200px;
+    }
+
+    #header {
+        background-color:       black;
+        background-position:    left -4px;
+        background-repeat:      repeat-x;
+        position:           fixed;
+        top:                0px;
+        right:              0px;
+        left:               0px;
+        height:             38px;
+        border-bottom:      4px solid #004570;
+        z-index:            50;
+    }
+    #header_text {
+        font-weight:        bold;
+        color:              #cdcccc;
+        padding-left:       200px;
+        line-height:        2.75em;
+        font-weight:        bold;
+    }
+
+    #header_logo {
+        position:           absolute;
+        display:            inline;
+        left:               10px;
+        top:                100%;
+        height:             64px;
+        margin-top:         -29px;
+        z-index:            99;
+    }
+    #header_logo img {
+        border:             none;
+    }
+
+    #header_end {
+        background-repeat:  repeat-x;
+        margin-top:         40px;
+        height:             36px;
+    }
+
+    #content {
+        position:           absolute;
+        top:                40px;
+        right:              0px;
+        left:               200px;
+        padding:            10px;
+    }
+
+    #hostname {
+        font-size:          12px;
+        font-family:        sans-serif;
+        position:           fixed;
+        top:                90px;
+        left:               10px;
+        width:              180px;
+        color:              #26c;
+        text-align:         center;
+    }
+
+    #menu-bg {
+        position:           fixed;
+        top:                40px;
+        left:               0px;
+        width:              200px;
+        height:             1500;
+        background-color:   black; 
+    }
+
+    #menu-title {
+        font-size:          14px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        color:              #E4D6CD;
+        position:           fixed;
+        top:                72px;
+        left:               10px;
+        width:              180px;
+        text-align:         center;
+    }
+
+    #menu a, a:visited {
+        color:              #26c;
+    }
+
+    #menu {
+        position:           fixed;
+        top:                110px;
+        left:               10px;
+        width:              180px;
+        color:              #E4D6CD;
+    }
+
+    #menu ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    #menu li a {
+        height: 32px;
+        voice-family: "\"}\""; 
+        voice-family: inherit;
+        height: 24px;
+        text-decoration: none;
+    }
+
+    #menu li a:active, #menu li a:focus {
+        outline: none;
+    }
+
+    #menu li a:link, #menu li a:visited {
+        color: #E4D6CD;
+        display: block;
+        background:  url(/images/menu-button-bg.gif);
+        padding: 8px 0 0 10px;
+    }
+
+    #menu li a:hover {
+        color: #FFF;
+        background:  url(/images/menu-button-bg.gif) 0 -32px;
+        padding: 8px 0 0 10px;
+    }
+
+    div.Title {
+        font-size:          18px;
+        font-family:        sans-serif;
+        font-weight:        bold;
+        width:              100%;
+        color:              white;
+        text-align:         center;
+    }
+
+    .config {
+        display: none;
+    }
+

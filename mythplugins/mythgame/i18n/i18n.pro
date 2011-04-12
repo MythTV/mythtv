@@ -12,6 +12,7 @@ trans.files += mythgame_fr.qm mythgame_fi.qm mythgame_et.qm
 trans.files += mythgame_nb.qm mythgame_hu.qm mythgame_en_gb.qm
 trans.files += mythgame_ru.qm mythgame_el.qm mythgame_en_us.qm
 trans.files += mythgame_cs.qm mythgame_pl.qm mythgame_en_ca.qm
+trans.files += mythgame_pt_br.qm
 
 INSTALLS += trans
 

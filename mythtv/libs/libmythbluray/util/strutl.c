@@ -58,3 +58,23 @@ char * str_printf(const char *fmt, ...)
     }
 }
 
+uint32_t str_to_uint32(const char *s, int n)
+{
+    uint32_t val = 0;
+
+    if (n > 4)
+        n = 4;
+
+    if (!s || !*s) {
+        return (INT64_C(1) << (8*n)) - 1; /* default: all bits one */
+    }
+
+    while (n--) {
+        val = (val << 8) | *s;
+        if (*s) {
+            s++;
+        }
+    }
+
+    return val;
+}

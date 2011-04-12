@@ -1,0 +1,82 @@
+<html>
+<head>
+<title>Sample Storage Group browser</title>
+</head>
+<body>
+<script language="JavaScript" type="text/javascript">
+
+function loadScript(url, callback){
+
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+
+    if (script.readyState) {
+        script.onreadystatechange = function() {
+            if ((script.readyState == "loaded") ||
+                (script.readyState == "complete")) {
+                script.onreadystatechange = null;
+                callback();
+            }
+        };
+    } else {
+        script.onload = function(){
+            callback();
+        };
+    }
+
+    script.src = url;
+    document.getElementsByTagName("head")[0].appendChild(script);
+}
+
+function listFiles() {
+
+    if (typeof jQuery == 'undefined') {  
+        loadScript("/js/jquery.min.js", realListFiles);
+    } else {
+        realListFiles();
+    }
+}
+
+function realListFiles() {
+    var group = $("#sgName").val();
+    $("#links").html("Loading...");
+    $.getJSON("/Content/GetFileList", { StorageGroup: group }, function(data) {
+        $("#links").html("");
+        $.each(data.QStringList, function(i, value) {
+            $("#links").append("<a href='/Content/GetFile?StorageGroup=" + group + "&FileName=" + value + "'>" + value + "</a><br>");
+        });
+    });
+}
+</script>
+
+<h3>Sample Storage Group browser</h3>
+<div>
+    Storage Group: 
+    <select id="sgName">
+<%
+    var myth = new Myth();
+
+    var hostName = myth.GetHostName();
+    var list = myth.GetStorageGroupDirs("", "");
+    var seenHosts = new Array();
+
+    for (var nIdx=0; nIdx < list.StorageGroupDirs.length; nIdx++)
+    {
+        var sgDir = list.StorageGroupDirs[nIdx];
+        if (!seenHosts[sgDir.GroupName])
+        {
+            seenHosts[sgDir.GroupName] = 1;
+%>
+    <option value="<%= sgDir.GroupName %>"><%=sgDir.GroupName%></option>
+<%
+        }
+    }
+%>
+    </select>
+    <input type='button' onClick='javascript:listFiles()' value='List Files'>
+</div>
+<br>
+<div id="links"></div>
+
+</body>
+</html>

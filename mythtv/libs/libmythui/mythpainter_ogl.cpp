@@ -49,7 +49,7 @@ void MythOpenGLPainter::DeleteTextures(void)
     while (!m_textureDeleteList.empty())
     {
         uint tex = m_textureDeleteList.front();
-        DecreaseCacheSize(realRender->GetTextureSize(tex));
+        m_HardwareCacheSize -= realRender->GetTextureDataSize(tex);
         realRender->DeleteTexture(tex);
         m_textureDeleteList.pop_front();
     }
@@ -159,14 +159,14 @@ int MythOpenGLPainter::GetTextureFromCache(MythImage *im)
     }
 
     CheckFormatImage(im);
-    IncreaseCacheSize(realRender->GetTextureSize(tx_id));
+    m_HardwareCacheSize += realRender->GetTextureDataSize(tx_id);
     realRender->GetTextureBuffer(tx_id, false);
     realRender->UpdateTexture(tx_id, tx.bits());
 
     m_ImageIntMap[im] = tx_id;
     m_ImageExpireList.push_back(im);
 
-    while (m_CacheSize > m_MaxCacheSize)
+    while (m_HardwareCacheSize > m_MaxHardwareCacheSize)
     {
         MythImage *expiredIm = m_ImageExpireList.front();
         m_ImageExpireList.pop_front();
@@ -188,16 +188,30 @@ void MythOpenGLPainter::DrawImage(const QRect &r, MythImage *im,
 void MythOpenGLPainter::DrawRect(const QRect &area, const QBrush &fillBrush,
                                  const QPen &linePen, int alpha)
 {
-    int style = fillBrush.style();
-    if (style == Qt::SolidPattern || style == Qt::NoBrush)
+    if ((fillBrush.style() == Qt::SolidPattern ||
+         fillBrush.style() == Qt::NoBrush) && realRender)
     {
-        if (!realRender)
-            return;
-        realRender->DrawRect(area, style != Qt::NoBrush, fillBrush.color(),
-                             linePen.style() != Qt::NoPen, linePen.width(),
-                             linePen.color(), alpha);
+        realRender->DrawRect(area, fillBrush, linePen, alpha);
+        return;
     }
     MythPainter::DrawRect(area, fillBrush, linePen, alpha);
+}
+
+void MythOpenGLPainter::DrawRoundRect(const QRect &area, int cornerRadius,
+                                      const QBrush &fillBrush,
+                                      const QPen &linePen, int alpha)
+{
+    if (realRender && realRender->RectanglesAreAccelerated())
+    {
+        if (fillBrush.style() == Qt::SolidPattern ||
+            fillBrush.style() == Qt::NoBrush)
+        {
+            realRender->DrawRoundRect(area, cornerRadius, fillBrush,
+                                      linePen, alpha);
+            return;
+        }
+    }
+    MythPainter::DrawRoundRect(area, cornerRadius, fillBrush, linePen, alpha);
 }
 
 void MythOpenGLPainter::DeleteFormatImagePriv(MythImage *im)

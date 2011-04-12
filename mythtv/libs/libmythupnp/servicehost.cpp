@@ -27,13 +27,15 @@
 #include "servicehost.h"
 #include "wsdl.h"
 
+#define _MAX_PARAMS 256
+
 //////////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////////
 
 MethodInfo::MethodInfo()
 {
-    m_eRequestType = (RequestType)(RequestTypeGet | RequestTypePost);
+    m_eRequestType = (RequestType)(RequestTypeGet | RequestTypePost | RequestTypeHead);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -42,9 +44,8 @@ MethodInfo::MethodInfo()
 
 QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
 {
-    QVariant vResult;
-
-    void *pResult = NULL; 
+    HttpRedirectException exception;
+    bool                  bExceptionThrown = false;
 
     if (!pService)
         throw;
@@ -52,62 +53,129 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
     QList<QByteArray> paramNames = m_oMethod.parameterNames();
     QList<QByteArray> paramTypes = m_oMethod.parameterTypes();
 
-    // --------------------------------------------------------------
-    // Create Parameter array....
-    // --------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // Create Parameter array (Can't have more than _MAX_PARAMS parameters)....
+    // switched to static array for performance.
+    // ----------------------------------------------------------------------
 
-    void **param = new void*[ paramNames.length()+1 ];
+    void *param[ _MAX_PARAMS ];
+    int   types[ _MAX_PARAMS ];
 
-    // --------------------------------------------------------------
-    // Add a place for the Return value
-    // --------------------------------------------------------------
+    memset( param, 0, sizeof( param ));
+    memset( types, 0, sizeof( types ));
 
-    param[ 0 ] = &pResult;    
-
-    // --------------------------------------------------------------
-    // Fill in parameters from request values
-    // --------------------------------------------------------------
-
-    for( int nIdx = 0; nIdx < paramNames.length(); nIdx++ )
+    try
     {
-        QString sValue     = reqParams[ paramNames[ nIdx ] ];
-        QString sParamType = paramTypes[ nIdx ];
+        // --------------------------------------------------------------
+        // Add a place for the Return value
+        // --------------------------------------------------------------
 
-        param[nIdx+1] = pService->ConvertToParameterPtr( sParamType, sValue );
+        int nRetIdx = QMetaType::type( m_oMethod.typeName() ); 
+
+        if (nRetIdx != 0)
+        {
+            param[ 0 ] = QMetaType::construct( nRetIdx );    
+            types[ 0 ] = nRetIdx;
+        }
+        else
+        {
+            param[ 0 ] = NULL;    
+            types[ 0 ] = 0;
+        }
+
+        // --------------------------------------------------------------
+        // Fill in parameters from request values
+        // --------------------------------------------------------------
+
+        for( int nIdx = 0; nIdx < paramNames.length(); nIdx++ )
+        {
+            QString sValue     = reqParams[ paramNames[ nIdx ] ];
+            QString sParamType = paramTypes[ nIdx ];
+
+            int     nId        = QMetaType::type( paramTypes[ nIdx ] );
+            void   *pParam     = NULL;
+
+            if (nId != 0)
+            {
+                pParam = QMetaType::construct( nId );
+            }
+            else
+            {
+                VERBOSE( VB_IMPORTANT, QString( "MethodInfo::Invoke - Type unknown '%1'" )
+                                          .arg( sParamType ));
+            }
+
+            types[nIdx+1] = nId;
+            param[nIdx+1] = pService->ConvertToParameterPtr( nId, sParamType, pParam, sValue );
+        }
+
+        /* ******************************** 
+        QThread *currentThread = QThread::currentThread();
+        QThread *objectThread  = pService->thread();
+
+        if (currentThread == objectThread)
+            VERBOSE( VB_UPNP, "*** Threads are same ***" );
+        else
+            VERBOSE( VB_UPNP, "*** Threads are Different!!! ***" );
+         ******************************** */
+
+        pService->qt_metacall( QMetaObject::InvokeMetaMethod, 
+                               m_nMethodIndex, 
+                               param );
+
+        // --------------------------------------------------------------
+        // Delete param array, skip return parameter since not dynamically created.
+        // --------------------------------------------------------------
+
+        for (int nIdx=1; nIdx < paramNames.length()+1; nIdx++)
+        {
+            if ((types[ nIdx ] != 0) && (param[ nIdx ] != NULL))
+                QMetaType::destroy( types[ nIdx ], param[ nIdx ] );
+        }
     }
-
-    /* ******************************** 
-    QThread *currentThread = QThread::currentThread();
-    QThread *objectThread  = pService->thread();
-
-    if (currentThread == objectThread)
-        VERBOSE( VB_UPNP, "*** Threads are same ***" );
-    else
-        VERBOSE( VB_UPNP, "*** Threads are Different!!! ***" );
-     ******************************** */
-
-    bool bSuccess = pService->qt_metacall( QMetaObject::InvokeMetaMethod, 
-                                           m_nMethodIndex, 
-                                           param );
-
-    // --------------------------------------------------------------
-    // Delete param array, skip return parameter since not dynamically created.
-    // --------------------------------------------------------------
-
-    for (int nIdx=1; nIdx < paramNames.length()+1; nIdx++)
+    catch( QString sMsg)
     {
-        if (param[ nIdx ] != NULL)
-            delete param[ nIdx ];
-    }
+        VERBOSE( VB_IMPORTANT, QString( "MethodInfo::Invoke - An Exception Occurred: %1" )
+                                  .arg( sMsg ));
 
-    if (param)
-        delete[] param;
+        if  ((types[ 0 ] != 0) && (param[ 0 ] != NULL ))
+            QMetaType::destroy( types[ 0 ], param[ 0 ] );
+
+        throw sMsg;
+    }
+    catch( HttpRedirectException ex )
+    {
+        bExceptionThrown = true;
+        exception = ex;
+    }
+    catch( ... )
+    {
+        VERBOSE( VB_IMPORTANT, "MethodInfo::Invoke - An Exception Occurred" );
+    }
 
     // --------------------------------------------------------------
     // return the result after converting to a QVariant
     // --------------------------------------------------------------
 
-    return pService->ConvertToVariant( m_oMethod.typeName(), pResult );
+    QVariant vReturn;
+  
+    if ( param[ 0 ] != NULL)
+    {
+        vReturn = pService->ConvertToVariant( types[ 0 ], param[ 0 ] );
+
+        if  (types[ 0 ] != 0)
+            QMetaType::destroy( types[ 0 ], param[ 0 ] );
+
+    }
+
+    // --------------------------------------------------------------
+    // Re-throw exception if needed.
+    // --------------------------------------------------------------
+
+    if (bExceptionThrown)
+        throw exception;
+
+    return vReturn;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -152,7 +220,7 @@ ServiceHost::ServiceHost( const QMetaObject &metaObject, const QString &sExtensi
             oInfo.m_nMethodIndex = nIdx;
             oInfo.m_sName        = sName.section( '(', 0, 0 );
             oInfo.m_oMethod      = method;
-            oInfo.m_eRequestType = (RequestType)(RequestTypeGet | RequestTypePost);
+            oInfo.m_eRequestType = (RequestType)(RequestTypeGet | RequestTypePost | RequestTypeHead);
 
             QString sMethodClassInfo = oInfo.m_sName + "_Method";
 
@@ -165,7 +233,7 @@ ServiceHost::ServiceHost( const QMetaObject &metaObject, const QString &sExtensi
                 if (sRequestType == "POST")
                     oInfo.m_eRequestType = RequestTypePost;
                 else if (sRequestType == "GET" )
-                    oInfo.m_eRequestType = RequestTypeGet;
+                    oInfo.m_eRequestType = (RequestType)(RequestTypeGet | RequestTypeHead);
             }
 
             m_Methods.insert( oInfo.m_sName, oInfo );
@@ -179,6 +247,15 @@ ServiceHost::ServiceHost( const QMetaObject &metaObject, const QString &sExtensi
 
 ServiceHost::~ServiceHost()
 {
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+QStringList ServiceHost::GetBasePaths() 
+{ 
+    return QStringList( m_sBaseUrl );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -208,16 +285,57 @@ bool ServiceHost::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
             if (( pRequest->m_eType   == RequestTypeGet ) &&
                 ( pRequest->m_sMethod == "wsdl"         ))
             {
+                pService =  qobject_cast< Service* >( m_oMetaObject.newInstance());
+
                 Wsdl wsdl( this );
 
-                return wsdl.GetWSDL( pRequest );
+                wsdl.GetWSDL( pRequest );
+
+                delete pService;
+                return true;
+            }
+
+            if (( pRequest->m_eType   == RequestTypeGet ) &&
+                ( pRequest->m_sMethod == "version"         ))
+            {
+
+                int nClassIdx = m_oMetaObject.indexOfClassInfo( "version" );
+
+                if (nClassIdx >=0)
+                {
+                    QString sVersion = m_oMetaObject.classInfo( nClassIdx ).value();
+
+                    return FormatResponse( pRequest, QVariant( sVersion ));
+                }
             }
 
             // --------------------------------------------------------------
+            // Allow a more REST like calling convention.  If the Method 
+            // Name isn't found, search for one with the request method 
+            // appended to the name ( "Get" or "Put" for POST)
+            // --------------------------------------------------------------
 
-            if (m_Methods.contains( pRequest->m_sMethod ))
+            QString sMethodName  = pRequest->m_sMethod;
+            bool    bMethodFound = false;
+
+            if (m_Methods.contains( sMethodName ))
+                bMethodFound = true;
+            else
             {
-                MethodInfo oInfo = m_Methods.value( pRequest->m_sMethod );
+                switch( pRequest->m_eType )
+                {
+                    case RequestTypeHead:
+                    case RequestTypeGet : sMethodName = "Get" + sMethodName; break;
+                    case RequestTypePost: sMethodName = "Put" + sMethodName; break;
+                }
+
+                if (m_Methods.contains( sMethodName ))
+                    bMethodFound = true;
+            }
+
+            if (bMethodFound)
+            {
+                MethodInfo oInfo = m_Methods.value( sMethodName );
 
                 if (( pRequest->m_eType & oInfo.m_eRequestType ) != 0)
                 {
@@ -239,11 +357,27 @@ bool ServiceHost::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
                 UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidAction );
         }
     }
+    catch( HttpRedirectException ex )
+    {
+        UPnp::FormatRedirectResponse( pRequest, ex.hostName );
+        bHandled = true;
+    }
+    catch( HttpException ex )
+    {
+        VERBOSE( VB_IMPORTANT, ex.msg );
+
+        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, ex.msg );
+
+        bHandled = true;
+
+    }
     catch( QString sMsg )
     {
         VERBOSE( VB_IMPORTANT, sMsg );
 
         UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, sMsg );
+
+        bHandled = true;
     }
     catch( ... )
     {
@@ -252,6 +386,8 @@ bool ServiceHost::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
         VERBOSE( VB_IMPORTANT, sMsg );
 
         UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, sMsg );
+
+        bHandled = true;
     }
 
     if (pService != NULL)
@@ -288,16 +424,16 @@ bool ServiceHost::FormatResponse( HTTPRequest *pRequest, QObject *pResults )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool ServiceHost::FormatResponse( HTTPRequest *pRequest, QFileInfo *pInfo )
+bool ServiceHost::FormatResponse( HTTPRequest *pRequest, QFileInfo oInfo )
 {
-    if (pInfo != NULL)
-    {
-        if (pInfo->isSymLink())
-            pRequest->FormatFileResponse( pInfo->symLinkTarget() );
-        else
-            pRequest->FormatFileResponse( pInfo->absoluteFilePath() );
+    QString sName = oInfo.absoluteFilePath();
 
-        delete pInfo;
+    if (oInfo.exists())
+    {
+        if (oInfo.isSymLink())
+            pRequest->FormatFileResponse( oInfo.symLinkTarget() );
+        else
+            pRequest->FormatFileResponse( oInfo.absoluteFilePath() );
     }
     else
     {
@@ -322,11 +458,11 @@ bool ServiceHost::FormatResponse( HTTPRequest *pRequest, QVariant vValue )
         return FormatResponse( pRequest, (QObject *)pObject );
     }
 
-    if ( vValue.canConvert< QFileInfo* >()) 
+    if ( vValue.canConvert< QFileInfo >()) 
     {
-        const QFileInfo *pFileInfo = vValue.value< QFileInfo* >(); 
+        const QFileInfo oFileInfo = vValue.value< QFileInfo >(); 
 
-        return FormatResponse( pRequest, (QFileInfo*)pFileInfo );
+        return FormatResponse( pRequest, oFileInfo );
     }
 
     // ----------------------------------------------------------------------
@@ -335,7 +471,7 @@ bool ServiceHost::FormatResponse( HTTPRequest *pRequest, QVariant vValue )
     
     Serializer *pSer = pRequest->GetSerializer();
 
-    pSer->Serialize( vValue, "value" );
+    pSer->Serialize( vValue, vValue.typeName() );
 
     pRequest->FormatActionResponse( pSer );
 

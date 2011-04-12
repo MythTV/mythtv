@@ -140,6 +140,12 @@ Advanced options (experts only):
   --python=PATH            Force a specific python executable to use [$python_default]
   --perl-config-opts=OPTS  Additional options to pass when generating
                            Makefile.perl for building Perl bindings.
+
+mythffmpeg options (These only effect the internal ffmpeg binary, not MythTV):
+  --enable-libmp3lame      enable MP3 encoding via libmp3lame [no]
+  --enable-libx264         enable H.264 encoding via x264 [no]
+  --enable-libxvid         enable Xvid encoding via xvidcore,
+                           native MPEG-4/Xvid encoder exists [no]
 EOF
 
 #following is ffmpeg's configure help text
@@ -4072,7 +4078,6 @@ fi
 
 if enabled x11; then
     check_libx gl_lib GLES2/gl2.h glClear -lGLESv2 || check_libx gl_lib GL/gl.h glBegin -lGL || check_libx gl_lib GL/gl.h glBegin -lopengl32 || disable opengl
-    check_libx glu_lib GL/glu.h gluBeginSurface -lGLU || disable opengl
 fi
 
 # Quartz video is Mac only and requires Carbon which is 32bit only
@@ -4484,6 +4489,12 @@ if test x"$PERL_CONFIG_OPTS" != x""; then
 fi
 echo "bindings_python           ${bindings_python-no}"
 echo "bindings_php              ${bindings_php-no}"
+echo ""
+
+echo "# mythffmpeg Options"
+echo "mp3lame                   ${libmp3lame-no}"
+echo "xvid                      ${libxvid-no}"
+echo "x264                      ${libx264-no}"
 echo ""
 
 MYTH_CONFIG_H=libs/libmythbase/mythconfig.h

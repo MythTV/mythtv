@@ -30,9 +30,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-//#define ERROR(x,...)
-#define ERROR(x,...) DEBUG(DBG_BLURAY|DBG_CRIT,x,##__VA_ARGS__)
-
 
 static void _decode_button(BITBUFFER *bb, BD_IG_BUTTON *p)
 {
@@ -223,7 +220,7 @@ static int _decode_interactive_composition(BITBUFFER *bb, BD_IG_INTERACTIVE_COMP
     uint32_t data_len = bb_read(bb, 24);
     uint32_t buf_len  = bb->p_end - bb->p;
     if (data_len != buf_len) {
-        ERROR("ig_decode_interactive(): buffer size mismatch (expected %d, have %d)\n", data_len, buf_len);
+        BD_DEBUG(DBG_DECODE, "ig_decode_interactive(): buffer size mismatch (expected %d, have %d)\n", data_len, buf_len);
         return 0;
     }
 
@@ -273,15 +270,15 @@ int ig_decode_interactive(BITBUFFER *bb, BD_IG_INTERACTIVE *p)
     pg_decode_sequence_descriptor(bb, &sd);
 
     if (!sd.first_in_seq) {
-        ERROR("ig_decode_interactive(): not first in seq\n");
+        BD_DEBUG(DBG_DECODE, "ig_decode_interactive(): not first in seq\n");
         return 0;
     }
     if (!sd.last_in_seq) {
-        ERROR("ig_decode_interactive(): not last in seq\n");
+        BD_DEBUG(DBG_DECODE, "ig_decode_interactive(): not last in seq\n");
         return 0;
     }
     if (!bb_is_align(bb, 0x07)) {
-        ERROR("ig_decode_interactive(): alignment error\n");
+        BD_DEBUG(DBG_DECODE, "ig_decode_interactive(): alignment error\n");
         return 0;
     }
 

@@ -31,7 +31,7 @@
 extern "C" {
 #endif
 
-#define DEBUG(X,Y,...) bd_debug(__FILE__,__LINE__,X,Y,##__VA_ARGS__)
+#define BD_DEBUG(MASK,...) bd_debug(__FILE__,__LINE__,MASK,__VA_ARGS__)
 
 BD_PRIVATE char *print_hex(char *out, const uint8_t *str, int count);
 BD_PRIVATE void bd_debug(const char *file, int line, uint32_t mask, const char *format, ...) BD_ATTR_FORMAT_PRINTF(4,5);

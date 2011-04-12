@@ -56,7 +56,7 @@ void Serializer::Serialize( const QObject *pObject, const QString &_sName )
 
     // ---------------------------------------------------------------
 
-    BeginSerialize();
+    BeginSerialize( sName );
 
     SerializeObject( pObject, sName );
 
@@ -67,11 +67,12 @@ void Serializer::Serialize( const QObject *pObject, const QString &_sName )
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void Serializer::Serialize( const QVariant &vValue, const QString &sName )
+void Serializer::Serialize( const QVariant &vValue, const QString &_sName )
 {
-    BeginSerialize();
+    QString sName( _sName );
+    BeginSerialize( sName );
 
-    AddProperty( sName, vValue );
+    AddProperty( sName, vValue, NULL, NULL );
 
     EndSerialize();
 }
@@ -115,7 +116,7 @@ void Serializer::SerializeObjectProperties( const QObject *pObject )
 
                 QVariant value( pObject->property( pszPropName ) );
 
-                AddProperty( sPropName, value );
+                AddProperty( sPropName, value, pMetaObject, &metaProperty );
             }
         }
     }

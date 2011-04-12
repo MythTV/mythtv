@@ -1,0 +1,2 @@
+setupTabs("databasetabs");
+

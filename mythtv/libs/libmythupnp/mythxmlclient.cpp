@@ -32,7 +32,7 @@
 
 MythXMLClient::MythXMLClient( const QUrl &url, bool bInQtThread )
               :   SOAPClient( url,
-                              "urn:schemas-mythtv-org:service:MythTv:1",
+                              "urn:schemas-mythtv-org:service:MythTV:1",
                               "/Myth")
 {
     m_bInQtThread = bInQtThread;
@@ -63,62 +63,40 @@ UPnPResultCode MythXMLClient::GetConnectionInfo( const QString &sPin, DatabasePa
 
     list.insert( "Pin", sPin );
 
-    if (SendSOAPRequest( "GetConnectionInfo", list, nErrCode, sErrDesc, m_bInQtThread ))
+    QDomDocument xmlResults = SendSOAPRequest( "GetConnectionInfo", list, nErrCode, sErrDesc, m_bInQtThread );
+
+    // --------------------------------------------------------------
+    // Is this a valid response?
+    // --------------------------------------------------------------
+
+    QDomNode oNode = xmlResults.namedItem( "GetConnectionInfoResult" );
+
+    if (!oNode.isNull())
     {
-        QString sXml = "<Info>" + list[ "Info" ] + "</Info>";
+        QDomNode dbNode = oNode.namedItem( "Database" );
 
-        sMsg = sErrDesc;
+        pParams->dbHostName     = GetNodeValue( dbNode, "Host"     , QString( ));
+        pParams->dbPort         = GetNodeValue( dbNode, "Port"     , 0         );
+        pParams->dbUserName     = GetNodeValue( dbNode, "UserName" , QString( ));
+        pParams->dbPassword     = GetNodeValue( dbNode, "Password" , QString( ));
+        pParams->dbName         = GetNodeValue( dbNode, "Name"     , QString( ));
+        pParams->dbType         = GetNodeValue( dbNode, "Type"     , QString( ));
 
-        QDomDocument doc;
+        QDomNode wolNode = oNode.namedItem( "WOL" );
 
-        if ( !doc.setContent( sXml, false, &sErrDesc, &nErrCode ))
-        {
-            sMsg = QObject::tr("Error Requesting Connection Info");
+        pParams->wolEnabled     = GetNodeValue( wolNode, "Enabled"  , false     );
+        pParams->wolReconnect   = GetNodeValue( wolNode, "Reconnect", 0         );
+        pParams->wolRetry       = GetNodeValue( wolNode, "Retry"    , 0         );
+        pParams->wolCommand     = GetNodeValue( wolNode, "Command"  , QString( ));
 
-            VERBOSE( VB_UPNP, QString( "Error Requesting Connection Info : (%1) - %2" )
-                                 .arg( nErrCode )
-                                 .arg( sErrDesc ) );
-
-            return UPnPResult_ActionFailed;
-        }
-
-        // --------------------------------------------------------------
-        // Is this a valid response?
-        // --------------------------------------------------------------
-
-        QDomNode infoNode = doc.namedItem( "Info" );
-
-        if (!infoNode.isNull())
-        {
-            QDomNode dbNode = infoNode.namedItem( "Database" );
-
-            pParams->dbHostName     = GetNodeValue( dbNode, "Host"     , QString( ));
-            pParams->dbPort         = GetNodeValue( dbNode, "Port"     , 0         );
-            pParams->dbUserName     = GetNodeValue( dbNode, "UserName" , QString( ));
-            pParams->dbPassword     = GetNodeValue( dbNode, "Password" , QString( ));
-            pParams->dbName         = GetNodeValue( dbNode, "Name"     , QString( ));
-            pParams->dbType         = GetNodeValue( dbNode, "Type"     , QString( ));
-
-            QDomNode wolNode = infoNode.namedItem( "WOL" );
-
-            pParams->wolEnabled     = GetNodeValue( wolNode, "Enabled"  , false     );
-            pParams->wolReconnect   = GetNodeValue( wolNode, "Reconnect", 0         );
-            pParams->wolRetry       = GetNodeValue( wolNode, "Retry"    , 0         );
-            pParams->wolCommand     = GetNodeValue( wolNode, "Command"  , QString( ));
-
-            return UPnPResult_Success;
-        }
-        else
-        {
-            if (sMsg.isEmpty())
-                sMsg = QObject::tr("Unexpected Response");
-
-            VERBOSE( VB_IMPORTANT, QString( "MythXMLClient::GetConnectionInfo Failed : Unexpected Response - %1" )
-                                      .arg( sXml   ));
-        }
+        return UPnPResult_Success;
     }
     else
     {
+        
+        nErrCode = GetNodeValue( xmlResults, "Fault/detail/UPnPResult/errorCode"       , 500 );
+        sErrDesc = GetNodeValue( xmlResults, "Fault/detail/UPnPResult/errorDescription", QString( "Unknown" ));
+
         sMsg = sErrDesc;
 
         if (sMsg.isEmpty())
@@ -129,9 +107,14 @@ UPnPResultCode MythXMLClient::GetConnectionInfo( const QString &sPin, DatabasePa
                              .arg( sErrDesc ));
     }
 
-    if (UPnPResult_HumanInterventionRequired == nErrCode
-           || UPnPResult_ActionNotAuthorized == nErrCode)
-        return (UPnPResultCode)nErrCode;
+    if (( nErrCode == UPnPResult_HumanInterventionRequired ) || 
+        ( nErrCode == UPnPResult_ActionNotAuthorized       ) ||
+        ( nErrCode == 501                                  ))
+    {
+        // Service calls no longer return UPnPResult codes, 
+        // convert standard 501 to UPnPResult code for now.
+        return UPnPResult_ActionNotAuthorized;
+    }
 
     return UPnPResult_ActionFailed;
 }

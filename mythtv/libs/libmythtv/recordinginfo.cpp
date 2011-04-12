@@ -1129,24 +1129,27 @@ void RecordingInfo::ReactivateRecording(void)
 /**
  *  \brief Adds recording history, creating "record" it if necessary.
  */
-void RecordingInfo::AddHistory(bool resched, bool forcedup)
+void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
 {
     bool dup = (GetRecordingStatus() == rsRecorded || forcedup);
     RecStatusType rs = (GetRecordingStatus() == rsCurrentRecording) ?
         rsPreviousRecording : GetRecordingStatus();
-    oldrecstatus = GetRecordingStatus();
+    if (!future)
+        oldrecstatus = GetRecordingStatus();
     if (dup)
         SetReactivated(false);
+    uint erecid = parentid ? parentid : recordid;
 
     MSqlQuery result(MSqlQuery::InitCon());
 
     result.prepare("REPLACE INTO oldrecorded (chanid,starttime,"
                    "endtime,title,subtitle,description,category,"
                    "seriesid,programid,findid,recordid,station,"
-                   "rectype,recstatus,duplicate,reactivate) "
+                   "rectype,recstatus,duplicate,reactivate,future) "
                    "VALUES(:CHANID,:START,:END,:TITLE,:SUBTITLE,:DESC,"
                    ":CATEGORY,:SERIESID,:PROGRAMID,:FINDID,:RECORDID,"
-                   ":STATION,:RECTYPE,:RECSTATUS,:DUPLICATE,:REACTIVATE);");
+                   ":STATION,:RECTYPE,:RECSTATUS,:DUPLICATE,:REACTIVATE,"
+                   ":FUTURE);");
     result.bindValue(":CHANID", chanid);
     result.bindValue(":START", startts);
     result.bindValue(":END", endts);
@@ -1157,12 +1160,13 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup)
     result.bindValue(":SERIESID", seriesid);
     result.bindValue(":PROGRAMID", programid);
     result.bindValue(":FINDID", findid);
-    result.bindValue(":RECORDID", recordid);
+    result.bindValue(":RECORDID", erecid);
     result.bindValue(":STATION", chansign);
     result.bindValue(":RECTYPE", rectype);
     result.bindValue(":RECSTATUS", rs);
     result.bindValue(":DUPLICATE", dup);
     result.bindValue(":REACTIVATE", IsReactivated());
+    result.bindValue(":FUTURE", future);
 
     if (!result.exec())
         MythDB::DBError("addHistory", result);
@@ -1171,7 +1175,7 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup)
     {
         result.prepare("REPLACE INTO oldfind (recordid, findid) "
                        "VALUES(:RECORDID,:FINDID);");
-        result.bindValue(":RECORDID", recordid);
+        result.bindValue(":RECORDID", erecid);
         result.bindValue(":FINDID", findid);
 
         if (!result.exec())
@@ -1189,6 +1193,8 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup)
  */
 void RecordingInfo::DeleteHistory(void)
 {
+    uint erecid = parentid ? parentid : recordid;
+
     MSqlQuery result(MSqlQuery::InitCon());
 
     result.prepare("DELETE FROM oldrecorded WHERE title = :TITLE AND "
@@ -1204,7 +1210,7 @@ void RecordingInfo::DeleteHistory(void)
     {
         result.prepare("DELETE FROM oldfind WHERE "
                        "recordid = :RECORDID AND findid = :FINDID");
-        result.bindValue(":RECORDID", recordid);
+        result.bindValue(":RECORDID", erecid);
         result.bindValue(":FINDID", findid);
 
         if (!result.exec())
@@ -1226,6 +1232,8 @@ void RecordingInfo::DeleteHistory(void)
  */
 void RecordingInfo::ForgetHistory(void)
 {
+    uint erecid = parentid ? parentid : recordid;
+
     MSqlQuery result(MSqlQuery::InitCon());
 
     result.prepare("UPDATE recorded SET duplicate = 0 "
@@ -1266,7 +1274,7 @@ void RecordingInfo::ForgetHistory(void)
     {
         result.prepare("DELETE FROM oldfind WHERE "
                        "recordid = :RECORDID AND findid = :FINDID");
-        result.bindValue(":RECORDID", recordid);
+        result.bindValue(":RECORDID", erecid);
         result.bindValue(":FINDID", findid);
 
         if (!result.exec())
@@ -1286,7 +1294,7 @@ void RecordingInfo::SetDupHistory(void)
     MSqlQuery result(MSqlQuery::InitCon());
 
     result.prepare("UPDATE oldrecorded SET duplicate = 1 "
-                   "WHERE duplicate = 0 "
+                   "WHERE future = 0 AND duplicate = 0 "
                    "AND title = :TITLE AND "
                    "((programid = '' AND subtitle = :SUBTITLE"
                    "  AND description = :DESC) OR "

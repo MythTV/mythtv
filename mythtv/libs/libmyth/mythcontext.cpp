@@ -56,7 +56,7 @@ class MythContextPrivate : public QObject
     MythContextPrivate(MythContext *lparent);
    ~MythContextPrivate();
 
-    bool Init        (const bool gui,    UPnp *UPnPclient,
+    bool Init        (const bool gui,
                       const bool prompt, const bool noPrompt,
                       const bool ignoreDB);
     bool FindDatabase(const bool prompt, const bool noPrompt);
@@ -66,19 +66,12 @@ class MythContextPrivate : public QObject
 
     void LoadDatabaseSettings(void);
 
-    bool LoadSettingsFile(void);
-    bool WriteSettingsFile(const DatabaseParams &params,
-                           bool overwrite = false);
-    bool FindSettingsProbs(void);
-
     bool    PromptForDatabaseParams(const QString &error);
     QString TestDBconnection(void);
     void    SilenceDBerrors(void);
     void    EnableDBerrors(void);
     void    ResetDatabase(void);
 
-    bool    InitUPnP(void);
-    void    DeleteUPnP(void);
     int     ChooseBackend(const QString &error);
     int     UPnPautoconf(const int milliSeconds = 2000);
     void    StoreConnectionInfo(void);
@@ -105,10 +98,7 @@ class MythContextPrivate : public QObject
     DatabaseParams  m_DBparams;  ///< Current database host & WOL details
     QString         m_DBhostCp;  ///< dbHostName backup
 
-    UPnp             *m_UPnP;    ///< For automatic backend discover
-    bool              m_ExternalUPnP; ///< If the UPnP was handed in via Init()
-    XmlConfiguration *m_XML;
-    HttpServer       *m_HTTP;
+    Configuration    *m_pConfig;
 
     bool disableeventpopup;
     bool disablelibrarypopup;
@@ -212,7 +202,7 @@ static void eject_cb(void)
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
     : parent(lparent),
       m_gui(false),
-      m_UPnP(NULL), m_ExternalUPnP(false), m_XML(NULL), m_HTTP(NULL),
+      m_pConfig(NULL), 
       disableeventpopup(false),
       disablelibrarypopup(false),
       pluginmanager(NULL),
@@ -226,7 +216,6 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
 
 MythContextPrivate::~MythContextPrivate()
 {
-    DeleteUPnP();
     if (m_ui)
         DestroyMythUI();
     if (m_sh)
@@ -274,21 +263,17 @@ void MythContextPrivate::EndTempWindow(void)
     EnableDBerrors();
 }
 
-bool MythContextPrivate::Init(const bool gui, UPnp *UPnPclient,
+bool MythContextPrivate::Init(const bool gui,
                               const bool promptForBackend,
                               const bool noPrompt,
                               const bool ignoreDB)
 {
     gCoreContext->GetDB()->IgnoreDatabase(ignoreDB);
     m_gui = gui;
-    if (UPnPclient)
-    {
-        m_UPnP = UPnPclient;
-        m_ExternalUPnP = true;
-#ifndef _WIN32
-        m_XML  = (XmlConfiguration *)UPnp::g_pConfig;
-#endif
-    }
+
+    // We don't have a database yet, so lets use the config.xml file.
+
+    m_pConfig = UPnp::GetConfiguration();
 
     // Creates screen saver control if we will have a GUI
     if (gui)
@@ -443,12 +428,10 @@ DBfound:
     StoreConnectionInfo();
     EnableDBerrors();
     ResetDatabase();
-    DeleteUPnP();
     return true;
 
 NoDBfound:
     //VERBOSE(VB_GENERAL, "FindDatabase() - failed");
-    DeleteUPnP();
     return false;
 }
 
@@ -459,30 +442,8 @@ NoDBfound:
  */
 void MythContextPrivate::LoadDatabaseSettings(void)
 {
-    if (!LoadSettingsFile())
-    {
-        VERBOSE(VB_IMPORTANT, "Unable to read configuration file mysql.txt");
-
-        // Sensible connection defaults.
-        m_DBparams.dbHostName    = "localhost";
-        m_DBparams.dbHostPing    = true;
-        m_DBparams.dbPort        = 0;
-        m_DBparams.dbUserName    = "mythtv";
-        m_DBparams.dbPassword    = "mythtv";
-        m_DBparams.dbName        = "mythconverg";
-        m_DBparams.dbType        = "QMYSQL3";
-        m_DBparams.localEnabled  = false;
-        m_DBparams.localHostName = "my-unique-identifier-goes-here";
-        m_DBparams.wolEnabled    = false;
-        m_DBparams.wolReconnect  = 0;
-        m_DBparams.wolRetry      = 5;
-        m_DBparams.wolCommand    = "echo 'WOLsqlCommand not set'";
-        gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
-    }
-
-    // Even if we have loaded the settings file, it may be incomplete,
-    // so we check for missing values and warn user
-    FindSettingsProbs();
+    gCoreContext->GetDB()->LoadDatabaseParamsFromDisk(m_DBparams, true);
+    gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
 
     QString hostname = m_DBparams.localHostName;
     if (hostname.isEmpty() ||
@@ -502,173 +463,6 @@ void MythContextPrivate::LoadDatabaseSettings(void)
     VERBOSE(VB_GENERAL, QString("Using localhost value of %1")
             .arg(hostname));
     gCoreContext->SetLocalHostname(hostname);
-}
-
-/**
- * Load mysql.txt and parse its values into m_DBparams
- */
-bool MythContextPrivate::LoadSettingsFile(void)
-{
-    Settings *oldsettings = gCoreContext->GetDB()->GetOldSettings();
-
-    if (!oldsettings->LoadSettingsFiles("mysql.txt", GetInstallPrefix(),
-                                        GetConfDir()))
-        return false;
-
-    m_DBparams.dbHostName = oldsettings->GetSetting("DBHostName");
-    m_DBparams.dbHostPing = oldsettings->GetSetting("DBHostPing") != "no";
-    m_DBparams.dbPort     = oldsettings->GetNumSetting("DBPort");
-    m_DBparams.dbUserName = oldsettings->GetSetting("DBUserName");
-    m_DBparams.dbPassword = oldsettings->GetSetting("DBPassword");
-    m_DBparams.dbName     = oldsettings->GetSetting("DBName");
-    m_DBparams.dbType     = oldsettings->GetSetting("DBType");
-
-    m_DBparams.localHostName = oldsettings->GetSetting("LocalHostName");
-    m_DBparams.localEnabled  = m_DBparams.localHostName.length() > 0;
-
-    m_DBparams.wolReconnect
-        = oldsettings->GetNumSetting("WOLsqlReconnectWaitTime");
-    m_DBparams.wolEnabled = m_DBparams.wolReconnect > 0;
-
-    m_DBparams.wolRetry   = oldsettings->GetNumSetting("WOLsqlConnectRetry");
-    m_DBparams.wolCommand = oldsettings->GetSetting("WOLsqlCommand");
-    gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
-
-    return true;
-}
-
-bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
-                                           bool overwrite)
-{
-    QString path = GetConfDir() + "/mysql.txt";
-    QFile   * f  = new QFile(path);
-
-    if (!overwrite && f->exists())
-    {
-        delete f;
-        return false;
-    }
-
-    QString dirpath = GetConfDir();
-    QDir createDir(dirpath);
-
-    if (!createDir.exists())
-    {
-        if (!createDir.mkdir(dirpath))
-        {
-            VERBOSE(VB_IMPORTANT, QString("Could not create %1").arg(dirpath));
-            return false;
-        }
-    }
-
-    if (!f->open(QIODevice::WriteOnly))
-    {
-        VERBOSE(VB_IMPORTANT, QString("Could not open settings file %1 "
-                                      "for writing").arg(path));
-        return false;
-    }
-
-    VERBOSE(VB_IMPORTANT, QString("Writing settings file %1").arg(path));
-    QTextStream s(f);
-    s << "DBHostName=" << params.dbHostName << endl;
-
-    s << "\n"
-      << "# By default, MythTV tries to ping the DB host to see if it exists.\n"
-      << "# If your DB host or network doesn't accept pings, set this to no:\n"
-      << "#\n";
-
-    if (params.dbHostPing)
-        s << "#DBHostPing=no" << endl << endl;
-    else
-        s << "DBHostPing=no" << endl << endl;
-
-    if (params.dbPort)
-        s << "DBPort=" << params.dbPort << endl;
-
-    s << "DBUserName=" << params.dbUserName << endl
-      << "DBPassword=" << params.dbPassword << endl
-      << "DBName="     << params.dbName     << endl
-      << "DBType="     << params.dbType     << endl
-      << endl
-      << "# Set the following if you want to use something other than this\n"
-      << "# machine's real hostname for identifying settings in the database.\n"
-      << "# This is useful if your hostname changes often, as otherwise you\n"
-      << "# will need to reconfigure mythtv every time.\n"
-      << "# NO TWO HOSTS MAY USE THE SAME VALUE\n"
-      << "#\n";
-
-    if (params.localEnabled)
-        s << "LocalHostName=" << params.localHostName << endl;
-    else
-        s << "#LocalHostName=my-unique-identifier-goes-here\n";
-
-    s << endl
-      << "# If you want your frontend to be able to wake your MySQL server\n"
-      << "# using WakeOnLan, have a look at the following settings:\n"
-      << "#\n"
-      << "#\n"
-      << "# The time the frontend waits (in seconds) between reconnect tries.\n"
-      << "# This should be the rough time your MySQL server needs for startup\n"
-      << "#\n";
-
-    if (params.wolEnabled)
-        s << "WOLsqlReconnectWaitTime=" << params.wolReconnect << endl;
-    else
-        s << "#WOLsqlReconnectWaitTime=0\n";
-
-    s << "#\n"
-      << "#\n"
-      << "# This is the number of retries to wake the MySQL server\n"
-      << "# until the frontend gives up\n"
-      << "#\n";
-
-    if (params.wolEnabled)
-        s << "WOLsqlConnectRetry=" << params.wolRetry << endl;
-    else
-        s << "#WOLsqlConnectRetry=5\n";
-
-    s << "#\n"
-      << "#\n"
-      << "# This is the command executed to wake your MySQL server.\n"
-      << "#\n";
-
-    if (params.wolEnabled)
-        s << "WOLsqlCommand=" << params.wolCommand << endl;
-    else
-        s << "#WOLsqlCommand=echo 'WOLsqlCommand not set'\n";
-
-    f->close();
-    return true;
-}
-
-bool MythContextPrivate::FindSettingsProbs(void)
-{
-    bool problems = false;
-
-    if (m_DBparams.dbHostName.isEmpty())
-    {
-        problems = true;
-        VERBOSE(VB_IMPORTANT, "DBHostName is not set in mysql.txt");
-        VERBOSE(VB_IMPORTANT, "Assuming localhost");
-        m_DBparams.dbHostName = "localhost";
-    }
-    if (m_DBparams.dbUserName.isEmpty())
-    {
-        problems = true;
-        VERBOSE(VB_IMPORTANT, "DBUserName is not set in mysql.txt");
-    }
-    if (m_DBparams.dbPassword.isEmpty())
-    {
-        problems = true;
-        VERBOSE(VB_IMPORTANT, "DBPassword is not set in mysql.txt");
-    }
-    if (m_DBparams.dbName.isEmpty())
-    {
-        problems = true;
-        VERBOSE(VB_IMPORTANT, "DBName is not set in mysql.txt");
-    }
-    gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
-    return problems;
 }
 
 bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
@@ -881,55 +675,11 @@ void MythContextPrivate::ResetDatabase(void)
     gCoreContext->ClearSettingsCache();
 }
 
-
-bool MythContextPrivate::InitUPnP(void)
-{
-    if (m_UPnP)
-        return true;
-
-    VERBOSE(VB_UPNP, "Setting UPnP client for backend autodiscovery...");
-
-    if (!m_XML)
-        m_XML = new XmlConfiguration("");   // No file - use defaults only
-
-    m_UPnP = new UPnp();
-    m_UPnP->SetConfiguration(m_XML);
-
-    m_UPnP->InitializeSSDPOnly();
-
-    return true;
-}
-
-void MythContextPrivate::DeleteUPnP(void)
-{
-    if (m_ExternalUPnP)  // Init was passed an existing UPnP
-        return;          // so let the caller delete it cleanly
-
-    if (m_UPnP)
-    {
-        // This takes a few seconds, so inform the user:
-        VERBOSE(VB_GENERAL, "Deleting UPnP client...");
-
-        delete m_UPnP;  // This also deletes m_XML
-        m_UPnP = NULL;
-        m_XML  = NULL;
-    }
-
-    if (m_HTTP)
-    {
-        delete m_HTTP;
-        m_HTTP = NULL;
-    }
-}
-
 /**
  * Search for backends via UPnP, put up a UI for the user to choose one
  */
 int MythContextPrivate::ChooseBackend(const QString &error)
 {
-    if (!InitUPnP())
-        return -1;
-
     TempMainWindow();
 
     // Tell the user what went wrong:
@@ -938,7 +688,7 @@ int MythContextPrivate::ChooseBackend(const QString &error)
 
     VERBOSE(VB_GENERAL, "Putting up the UPnP backend chooser");
 
-    BackendSelection::prompt(&m_DBparams, m_XML);
+    BackendSelection::prompt(&m_DBparams, m_pConfig);
 
     EndTempWindow();
 
@@ -955,15 +705,15 @@ int MythContextPrivate::ChooseBackend(const QString &error)
  */
 void MythContextPrivate::StoreConnectionInfo(void)
 {
-    if (!m_XML)
+    if (!m_pConfig)
         return;
 
-    m_XML->SetValue(kDefaultBE + "DBHostName", m_DBparams.dbHostName);
-    m_XML->SetValue(kDefaultBE + "DBUserName", m_DBparams.dbUserName);
-    m_XML->SetValue(kDefaultBE + "DBPassword", m_DBparams.dbPassword);
-    m_XML->SetValue(kDefaultBE + "DBName",     m_DBparams.dbName);
-    m_XML->SetValue(kDefaultBE + "DBPort",     m_DBparams.dbPort);
-    m_XML->Save();
+    m_pConfig->SetValue(kDefaultBE + "DBHostName", m_DBparams.dbHostName);
+    m_pConfig->SetValue(kDefaultBE + "DBUserName", m_DBparams.dbUserName);
+    m_pConfig->SetValue(kDefaultBE + "DBPassword", m_DBparams.dbPassword);
+    m_pConfig->SetValue(kDefaultBE + "DBName",     m_DBparams.dbName);
+    m_pConfig->SetValue(kDefaultBE + "DBPort",     m_DBparams.dbPort);
+    m_pConfig->Save();
 }
 
 /**
@@ -974,18 +724,16 @@ void MythContextPrivate::StoreConnectionInfo(void)
  */
 int MythContextPrivate::UPnPautoconf(const int milliSeconds)
 {
-    if (!InitUPnP())
-        return 0;
-
     SSDPCacheEntries *backends = NULL;
     int               count;
     QString           loc = "UPnPautoconf() - ";
     QTime             timer;
 
-    m_UPnP->PerformSearch(gBackendURI);
+    SSDP::Instance()->PerformSearch( gBackendURI );
+
     for (timer.start(); timer.elapsed() < milliSeconds; usleep(25000))
     {
-        backends = m_UPnP->g_SSDPCache.Find(gBackendURI);
+        backends = SSDP::Instance()->Find( gBackendURI );
         if (backends)
         {
             backends->AddRef();
@@ -1000,11 +748,6 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
         VERBOSE(VB_GENERAL, loc + "No UPnP backends found");
         return 0;
     }
-
-
-    // This could be tied to VB_UPNP?
-    //m_UPnP->g_SSDPCache.Dump();
-
 
     count = backends->Count();
     switch (count)
@@ -1049,13 +792,13 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
  */
 bool MythContextPrivate::DefaultUPnP(QString &error)
 {
-    XmlConfiguration *XML = new XmlConfiguration("config.xml");
-    QString           loc = "MCP::DefaultUPnP() - ";
-    QString localHostName = XML->GetValue(kDefaultBE + "LocalHostName", "");
-    QString           PIN = XML->GetValue(kDefaultPIN, "");
-    QString           USN = XML->GetValue(kDefaultUSN, "");
+    Configuration *pConfig = new XmlConfiguration("config.xml");
+    QString            loc = "MCP::DefaultUPnP() - ";
+    QString  localHostName = pConfig->GetValue(kDefaultBE + "LocalHostName", "");
+    QString            PIN = pConfig->GetValue(kDefaultPIN, "");
+    QString            USN = pConfig->GetValue(kDefaultUSN, "");
 
-    delete XML;
+    delete pConfig;
 
     if (USN.isEmpty())
     {
@@ -1067,19 +810,34 @@ bool MythContextPrivate::DefaultUPnP(QString &error)
             QString("PIN '%1' and host USN: %2")
             .arg(PIN).arg(USN));
 
-    if (!InitUPnP())
-    {
-        error = "UPnP is broken?";
-        return false;
-    }
+    // ----------------------------------------------------------------------
 
-    m_UPnP->PerformSearch(gBackendURI);
-    DeviceLocation *pDevLoc = m_UPnP->g_SSDPCache.Find(gBackendURI, USN);
+    SSDP::Instance()->PerformSearch( gBackendURI );
+
+    // ----------------------------------------------------------------------
+    // We need to give the server time to respond...
+    // ----------------------------------------------------------------------
+
+    DeviceLocation *pDevLoc = NULL;
+    QTime           timer;
+
+    for (timer.start(); timer.elapsed() < 5000; usleep(25000))
+    {
+        pDevLoc = SSDP::Instance()->Find( gBackendURI, USN );
+
+        if (pDevLoc)
+            break;
+
+        putchar('.');
+    }
+    putchar('\n');
+
+    // ----------------------------------------------------------------------
+
     if (!pDevLoc)
     {
         error = "Cannot find default UPnP backend";
         return false;
-
     }
 
     if (UPnPconnect(pDevLoc, PIN))
@@ -1107,10 +865,10 @@ bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
     QString        error;
     QString        loc = "UPnPconnect() - ";
     QString        URL = backend->m_sLocation;
-    MythXMLClient  XML(URL);
+    MythXMLClient  client(URL);
 
     VERBOSE(VB_UPNP, loc + QString("Trying host at %1").arg(URL));
-    switch (XML.GetConnectionInfo(PIN, &m_DBparams, error))
+    switch (client.GetConnectionInfo(PIN, &m_DBparams, error))
     {
         case UPnPResult_Success:
             gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
@@ -1123,7 +881,7 @@ bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
             // We could prompt for the PIN and try again, but that needs a UI.
             // Easier to fail for now, and put up the full UI selector later
             VERBOSE(VB_UPNP, loc + error + ". Wrong PIN?");
-            break;
+            return false;
 
         default:
             VERBOSE(VB_UPNP, loc + error);
@@ -1256,7 +1014,7 @@ MythContext::MythContext(const QString &binversion)
     }
 }
 
-bool MythContext::Init(const bool gui, UPnp *UPnPclient,
+bool MythContext::Init(const bool gui,
                        const bool promptForBackend,
                        const bool disableAutoDiscovery,
                        const bool ignoreDB)
@@ -1276,8 +1034,7 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
 
         QString warning = QObject::tr(
             "This application is not compatible "
-            "with the installed MythTV libraries. "
-            "Please recompile after a make distclean");
+            "with the installed MythTV libraries.");
         if (gui)
         {
             d->TempMainWindow(false);
@@ -1291,14 +1048,14 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
 #ifdef _WIN32
     // HOME environment variable might not be defined
     // some libraries will fail without it
-    char *home = getenv("HOME");
-    if (!home)
+    QString home = getenv("HOME");
+    if (home.isEmpty())
     {
         home = getenv("LOCALAPPDATA");      // Vista
-        if (!home)
+        if (home.isEmpty())
             home = getenv("APPDATA");       // XP
-        if (!home)
-            home = ".";  // getenv("TEMP")?
+        if (home.isEmpty())
+            home = QString(".");  // getenv("TEMP")?
 
         _putenv(QString("HOME=%1").arg(home).toLocal8Bit().constData());
     }
@@ -1323,8 +1080,7 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
         return false;
     }
 
-    if (!d->Init(gui, UPnPclient, promptForBackend,
-                 disableAutoDiscovery, ignoreDB))
+    if (!d->Init(gui, promptForBackend, disableAutoDiscovery, ignoreDB))
     {
         return false;
     }
@@ -1358,8 +1114,7 @@ bool MythContext::TestPopupVersion(const QString &name,
 
     QString err = QObject::tr(
         "Plugin %1 is not compatible with the installed MythTV "
-        "libraries. Please recompile the plugin after a make "
-        "distclean");
+        "libraries.");
 
     VERBOSE(VB_GENERAL, QString("Plugin %1 (%2) binary version does not "
                                 "match libraries (%3)")
@@ -1418,7 +1173,7 @@ bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
           params.wolRetry      != cur_params.wolRetry     ||
           params.wolCommand    != cur_params.wolCommand)))
     {
-        ret = d->WriteSettingsFile(params, true);
+        ret = MythDB::SaveDatabaseParamsToDisk(params, GetConfDir(), true);
         if (ret)
         {
             // Save the new settings:

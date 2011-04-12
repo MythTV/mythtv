@@ -27,6 +27,7 @@
 #include <QFileInfo>
 #include <QTextCodec>
 #include <QStringList>
+#include <QCryptographicHash>
 
 #include "mythconfig.h"
 #if !( CONFIG_DARWIN || CONFIG_CYGWIN || defined(__FreeBSD__) || defined(USING_MINGW))
@@ -64,7 +65,9 @@ static MIMETypes g_MIMETypes[] =
     { "png" , "image/png"                  },
     { "htm" , "text/html"                  },
     { "html", "text/html"                  },
-    { "js"  , "text/html"                  },
+    { "qsp" , "text/html"                  },
+    { "js"  , "application/javascript"     },
+    { "qjs" , "application/javascript"     },
     { "txt" , "text/plain"                 },
     { "xml" , "text/xml"                   },
     { "pdf" , "application/pdf"            },
@@ -102,6 +105,17 @@ static MIMETypes g_MIMETypes[] =
     { "flac", "audio/x-flac"               },
     { "m4a" , "audio/x-m4a"                },
 };
+
+static const char *Static401Error = 
+    "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\""
+        "\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">"
+    "<HTML>"
+      "<HEAD>"
+        "<TITLE>Error</TITLE>"
+        "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=ISO-8859-1\">"
+      "</HEAD>"
+      "<BODY><H1>401 Unauthorized.</H1></BODY>"
+    "</HTML>";
 
 static const int g_nMIMELength = sizeof( g_MIMETypes) / sizeof( MIMETypes );
 static const int g_on          = 1;
@@ -704,8 +718,13 @@ void HTTPRequest::SetRequestProtocol( const QString &sLine )
 
 ContentType HTTPRequest::SetContentType( const QString &sType )
 {
-    if (sType == "application/x-www-form-urlencoded") return( m_eContentType = ContentType_Urlencoded );
-    if (sType == "text/xml"                         ) return( m_eContentType = ContentType_XML        );
+    if ((sType == "application/x-www-form-urlencoded"          ) ||
+        (sType.startsWith("application/x-www-form-urlencoded;")))
+        return( m_eContentType = ContentType_Urlencoded );
+
+    if ((sType == "text/xml"                                   ) ||
+        (sType.startsWith("text/xml;")                         ))
+        return( m_eContentType = ContentType_XML        );
 
     return( m_eContentType = ContentType_Unknown );
 }
@@ -860,6 +879,7 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
         {
             QString sName  = (*it).section( '=', 0, 0 );
             QString sValue = (*it).section( '=', 1 );
+            sValue.replace("+"," ");
 
             if ((sName.length() != 0) && (sValue.length() !=0))
             {
@@ -898,6 +918,11 @@ QString HTTPRequest::GetHeaderValue( const QString &sKey, QString sDefault )
 QString HTTPRequest::GetAdditionalHeaders( void )
 {
     QString sHeader = m_szServerHeaders;
+
+    // Override the cache-control header on protected resources.
+
+    if (m_bProtected)
+        m_mapRespHeaders[ "Cache-control" ] = "no-cache";
 
     for ( QStringMap::iterator it  = m_mapRespHeaders.begin();
                                it != m_mapRespHeaders.end();
@@ -1006,6 +1031,25 @@ bool HTTPRequest::ParseRequest()
             VERBOSE(VB_IMPORTANT, "HTTPRequest::ParseRequest - Timeout waiting for request header." );
             return false;
         }
+
+        m_bProtected = false;
+
+        if (IsUrlProtected( m_sBaseUrl ))
+        {
+            if (!Authenticated())
+            {
+                m_eResponseType   = ResponseTypeHTML;
+                m_nResponseStatus = 401;
+                m_mapRespHeaders[ "WWW-Authenticate" ] = "Basic realm=\"MythTV\"";
+
+                m_response.write( Static401Error );
+
+                return true;
+            }
+
+            m_bProtected = true;
+        }
+
 
         bSuccess = true;
 
@@ -1291,23 +1335,32 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
     // XML Document Loaded... now parse it
     // --------------------------------------------------------------
 
+    QString sService;
+
     if (sSOAPAction.contains( '#' ))
     {
         m_sNameSpace    = sSOAPAction.section( '#', 0, 0).remove( 0, 1);
         m_sMethod       = sSOAPAction.section( '#', 1 );
         m_sMethod.remove( m_sMethod.length()-1, 1 );
     }
-    if (sSOAPAction.contains( '/' ))
-    {
-        int nPos       = sSOAPAction.lastIndexOf( '/' );
-        m_sNameSpace   = sSOAPAction.mid( 1, nPos );
-        m_sMethod      = sSOAPAction.mid( nPos + 1, sSOAPAction.length() - nPos - 2  );
-    }
     else
     {
-        m_sNameSpace = QString::null;
-        m_sMethod    = sSOAPAction;
-        m_sMethod.remove( QChar( '\"' ) );
+        if (sSOAPAction.contains( '/' ))
+        {
+            int nPos       = sSOAPAction.lastIndexOf( '/' );
+            m_sNameSpace   = sSOAPAction.mid( 1, nPos );
+            m_sMethod      = sSOAPAction.mid( nPos + 1, sSOAPAction.length() - nPos - 2  );
+
+            nPos           = m_sNameSpace.lastIndexOf( '/', -2);
+            sService       = m_sNameSpace.mid( nPos + 1, m_sNameSpace.length() - nPos - 2  );
+            m_sNameSpace   = m_sNameSpace.mid( 0, nPos );
+        }
+        else
+        {
+            m_sNameSpace = QString::null;
+            m_sMethod    = sSOAPAction;
+            m_sMethod.remove( QChar( '\"' ) );
+        }
     }
 
     QDomNodeList oNodeList = doc.elementsByTagNameNS( m_sNameSpace, m_sMethod );
@@ -1397,6 +1450,68 @@ QString HTTPRequest::Encode(const QString &sIn)
     //VERBOSE(VB_UPNP, QString("HTTPRequest::Encode Output : %1").arg(sStr));
     return sStr;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool HTTPRequest::IsUrlProtected( const QString &sBaseUrl )
+{
+    QString sProtected = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/Urls", "/setup;/Config" );
+
+    QStringList oList = sProtected.split( ';' );
+
+    for( int nIdx = 0; nIdx < oList.count(); nIdx++)
+    {
+        if (sBaseUrl.startsWith( oList[nIdx], Qt::CaseInsensitive ))
+            return true;
+    }
+
+    return false;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool HTTPRequest::Authenticated()
+{
+    QStringList oList = m_mapHeaders[ "authorization" ].split( ' ' );
+
+    if (oList.count() < 2)
+        return false;
+
+    if (oList[0].compare( "basic", Qt::CaseInsensitive ) != 0)
+        return false;
+
+    QString sCredentials = QByteArray::fromBase64( oList[1].toUtf8() );
+    
+    oList = sCredentials.split( ':' );
+
+    if (oList.count() < 2)
+        return false;
+
+    QString sUserName = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/UserName", "admin" );
+    
+
+    if (oList[0].compare( sUserName, Qt::CaseInsensitive ) != 0)
+        return false;
+
+    QString sPassword = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/Password", 
+                                 /* mythtv */ "8hDRxR1+E/n3/s3YUOhF+lUw7n4=" );
+
+    QCryptographicHash crypto( QCryptographicHash::Sha1 );
+
+    crypto.addData( oList[1].toUtf8() );
+
+    QString sPasswordHash( crypto.result().toBase64() );
+
+    if (sPasswordHash != sPassword )
+        return false;
+    
+    return true;
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

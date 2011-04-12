@@ -363,13 +363,17 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t,
                             if (!rect.isNull())
                             {
                                 rect.adjust(-10, -10, 10, 10);
-                                m_render->DrawRect(rect, QColor(128,0,0,255));
+                                m_render->DrawRect(rect, QColor(128,0,0,255), 255);
                             }
                         }
                        (*it)->Draw();
                     }
                 }
-                if (osd && m_osd_painter)
+
+                if (m_visual)
+                    m_visual->Draw(GetTotalOSDBounds(), m_osd_painter, NULL);
+
+                if (osd && m_osd_painter && !window.IsEmbedding())
                     osd->DrawDirect(m_osd_painter, GetTotalOSDBounds().size(),
                                     true);
                 m_render->End();

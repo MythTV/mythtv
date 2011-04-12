@@ -1188,9 +1188,9 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
     if (subtype == XVideo && xv_port >= 0)
     {
         vector<unsigned char*> bufs =
-            CreateShmImages(vbuffers.allocSize(), true);
+            CreateShmImages(vbuffers.Size(), true);
 
-        ok = (bufs.size() >= vbuffers.allocSize()) &&
+        ok = (bufs.size() >= vbuffers.Size()) &&
             vbuffers.CreateBuffers(FMT_YV12,
                                    video_dim.width(), video_dim.height(),
                                    bufs, XJ_yuv_infos);
@@ -1787,11 +1787,17 @@ void VideoOutputXv::UpdatePauseFrame(void)
     }
 }
 
-void VideoOutputXv::ProcessFrameMem(VideoFrame *frame, OSD *osd,
-                                    FilterChain *filterList,
-                                    const PIPMap &pipPlayers,
-                                    FrameScanType scan)
+void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
+                                 FilterChain *filterList,
+                                 const PIPMap &pipPlayers,
+                                 FrameScanType scan)
 {
+    if (IsErrored())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "IsErrored() in ProcessFrame()");
+        return;
+    }
+
     bool deint_proc = m_deinterlacing && (m_deintFilter != NULL);
     bool pauseframe = false;
     if (!frame)
@@ -1833,21 +1839,6 @@ void VideoOutputXv::ProcessFrameMem(VideoFrame *frame, OSD *osd,
     {
         m_deintFilter->ProcessFrame(frame, scan);
     }
-}
-
-// this is documented in videooutbase.cpp
-void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
-                                 FilterChain *filterList,
-                                 const PIPMap &pipPlayers,
-                                 FrameScanType scan)
-{
-    if (IsErrored())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "IsErrored() in ProcessFrame()");
-        return;
-    }
-
-    ProcessFrameMem(frame, osd, filterList, pipPlayers, scan);
 }
 
 // this is documented in videooutbase.cpp

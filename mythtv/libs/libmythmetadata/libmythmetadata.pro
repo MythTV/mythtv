@@ -37,6 +37,7 @@ LIBS += -L../libmythsoundtouch   -lmythsoundtouch-$${LIBVERSION}
 LIBS += -L../libmythbase           -lmythbase-$${LIBVERSION}
 LIBS += -L../libmythui           -lmythui-$${LIBVERSION}
 LIBS += -L../libmythupnp         -lmythupnp-$${LIBVERSION}
+LIBS += -L../libmythservicecontracts -lmythservicecontracts-$${LIBVERSION}
 LIBS += -L../libmythfreesurround -lmythfreesurround-$${LIBVERSION}
 LIBS += -L../../external/FFmpeg/libavcodec -lmythavcodec
 LIBS += -L../../external/FFmpeg/libavutil  -lmythavutil

@@ -23,8 +23,7 @@ static inline int __glCheck__(const QString &loc, const char* fileName, int n)
     if (error)
     {
         VERBOSE(VB_IMPORTANT, QString("%1: %2 @ %3, %4")
-            .arg(loc).arg((const char*)gluErrorString(error))
-            .arg(fileName).arg(n));
+            .arg(loc).arg(error).arg(fileName).arg(n));
     }
     return error;
 }
@@ -57,13 +56,14 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QGLFormat& format, QPaintDevice
 #endif
 }
 
-MythRenderOpenGL::MythRenderOpenGL(const QGLFormat& format, QPaintDevice* device)
-  : QGLContext(format, device)
+MythRenderOpenGL::MythRenderOpenGL(const QGLFormat& format, QPaintDevice* device,
+                                   RenderType type)
+  : QGLContext(format, device), MythRender(type)
 {
 }
 
-MythRenderOpenGL::MythRenderOpenGL(const QGLFormat& format)
-  : QGLContext(format)
+MythRenderOpenGL::MythRenderOpenGL(const QGLFormat& format, RenderType type)
+  : QGLContext(format), MythRender(type)
 {
 }
 
@@ -356,6 +356,13 @@ QSize MythRenderOpenGL::GetTextureSize(uint tex)
     return m_textures[tex].m_size;
 }
 
+int MythRenderOpenGL::GetTextureDataSize(uint tex)
+{
+    if (!m_textures.contains(tex))
+        return 0;
+    return m_textures[tex].m_data_size;
+}
+
 void MythRenderOpenGL::SetTextureFilters(uint tex, uint filt, uint wrap)
 {
     if (!m_textures.contains(tex))
@@ -623,18 +630,22 @@ void MythRenderOpenGL::DrawBitmap(uint *textures, uint texture_count,
     doneCurrent();
 }
 
-void MythRenderOpenGL::DrawRect(const QRect &area, bool drawFill,
-                                const QColor &fillColor,  bool drawLine,
-                                int lineWidth, const QColor &lineColor,
-                                int target, int prog)
+void MythRenderOpenGL::DrawRect(const QRect &area, const QBrush &fillBrush,
+                                const QPen &linePen, int alpha)
 {
-    if (target && !m_framebuffers.contains(target))
-        target = 0;
-
     makeCurrent();
-    BindFramebuffer(target);
-    DrawRectPriv(area, drawFill, fillColor, drawLine,
-                 lineWidth, lineColor, prog);
+    BindFramebuffer(0);
+    DrawRectPriv(area, fillBrush, linePen, alpha);
+    doneCurrent();
+}
+
+void MythRenderOpenGL::DrawRoundRect(const QRect &area, int cornerRadius,
+                                     const QBrush &fillBrush,
+                                     const QPen &linePen, int alpha)
+{
+    makeCurrent();
+    BindFramebuffer(0);
+    DrawRoundRectPriv(area, cornerRadius, fillBrush, linePen, alpha);
     doneCurrent();
 }
 
@@ -755,8 +766,10 @@ bool MythRenderOpenGL::InitFeatures(void)
     }
 
     GLint maxtexsz = 0;
+    GLint maxunits = 0;
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxtexsz);
-    glGetIntegerv(GL_MAX_TEXTURE_UNITS, &m_max_units);
+    glGetIntegerv(GL_MAX_TEXTURE_UNITS, &maxunits);
+    m_max_units = maxunits;
     m_max_tex_size = (maxtexsz) ? maxtexsz : 512;
 
     m_extensions = (const char*) glGetString(GL_EXTENSIONS);

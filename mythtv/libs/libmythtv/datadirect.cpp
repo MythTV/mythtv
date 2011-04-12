@@ -1022,9 +1022,12 @@ bool DataDirectProcessor::DDPost(
         return false;
 
 #ifndef USING_MINGW
-    command = QString("gzip -df %1").arg(inputFile+".gz");
-    if (myth_system(command) != GENERIC_EXIT_OK)
-        return false;
+    if (QFile::exists( inputFile+".gz" ))
+    {
+        command = QString("gzip -df %1").arg(inputFile+".gz");
+        if (myth_system(command) != GENERIC_EXIT_OK)
+            return false;
+    }
 #endif
 
     return true;

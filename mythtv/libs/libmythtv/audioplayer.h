@@ -6,11 +6,19 @@
 class MythPlayer;
 class AudioOutput;
 
+namespace MythTV
+{
+    class Visual;
+}
+
 class MTV_PUBLIC AudioPlayer
 {
   public:
     AudioPlayer(MythPlayer *parent, bool muted);
    ~AudioPlayer();
+
+    void addVisual(MythTV::Visual *vis);
+    void removeVisual(MythTV::Visual *vis);
 
     void  Reset(void);
     void  DeleteOutput(void);
@@ -41,7 +49,7 @@ class MTV_PUBLIC AudioPlayer
     float GetStretchFactor(void) { return m_stretchfactor;   }
     void  SetStretchFactor(float factor);
     bool  ToggleUpmix(void);
-    bool  CanPassthrough(int samplerate, int channels, int codec = 0);
+    bool  CanPassthrough(int samplerate, int channels, int codec, int profile);
     bool  CanAC3(void);
     bool  CanDTS(void);
     bool  CanEAC3(void);
@@ -57,10 +65,15 @@ class MTV_PUBLIC AudioPlayer
     MuteState SetMuteState(MuteState);
     MuteState IncrMuteState(void);
 
-    void AddAudioData(char *buffer, int len, int64_t timecode);
+    void AddAudioData(char *buffer, int len, int64_t timecode, int frames);
+    bool NeedDecodingBeforePassthrough(void);
     int64_t LengthLastData(void);
     bool GetBufferStatus(uint &fill, uint &total);
     bool IsBufferAlmostFull(void);
+
+  private:
+    void AddVisuals(void);
+    void RemoveVisuals(void);
 
   private:
     MythPlayer  *m_parent;
@@ -79,6 +92,7 @@ class MTV_PUBLIC AudioPlayer
     QString      m_passthru_device;
     bool         m_no_audio_in;
     bool         m_no_audio_out;
+    vector<MythTV::Visual*> m_visuals;
 };
 
 #endif // AUDIOPLAYER_H

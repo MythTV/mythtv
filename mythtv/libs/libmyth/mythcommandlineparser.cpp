@@ -145,7 +145,7 @@ bool MythCommandLineParser::PreParse(
         else
         {
             cerr << "Missing argument to --setverbose option\n";
-            return GENERIC_EXIT_INVALID_CMDLINE;
+	    wantsToExit = err = true;
         }
         return true;
     }

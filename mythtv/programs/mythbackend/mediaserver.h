@@ -37,7 +37,8 @@ class MediaServer : public UPnp
         QString          m_sSharePath;
 
     public:
-        explicit MediaServer( bool bMaster, bool bDisableUPnp = false );
+        explicit MediaServer();
+        void Init(bool bMaster, bool bDisableUPnp = false);
 
         virtual ~MediaServer();
 

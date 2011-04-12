@@ -18,6 +18,55 @@ AudioPlayer::AudioPlayer(MythPlayer *parent, bool muted)
 AudioPlayer::~AudioPlayer()
 {
     DeleteOutput();
+    m_visuals.clear();
+}
+
+void AudioPlayer::addVisual(MythTV::Visual *vis)
+{
+    if (!m_audioOutput)
+        return;
+
+    QMutexLocker lock(&m_lock);
+    Visuals::iterator it = std::find(m_visuals.begin(), m_visuals.end(), vis);
+    if (it == m_visuals.end())
+    {
+        m_visuals.push_back(vis);
+        m_audioOutput->addVisual(vis);
+    }
+}
+
+void AudioPlayer::removeVisual(MythTV::Visual *vis)
+{
+    if (!m_audioOutput)
+        return;
+
+    QMutexLocker lock(&m_lock);
+    Visuals::iterator it = std::find(m_visuals.begin(), m_visuals.end(), vis);
+    if (it != m_visuals.end())
+    {
+        m_visuals.erase(it);
+        m_audioOutput->removeVisual(vis);
+    }
+}
+
+void AudioPlayer::AddVisuals(void)
+{
+    if (!m_audioOutput)
+        return;
+
+    QMutexLocker lock(&m_lock);
+    for (uint i = 0; i < m_visuals.size(); i++)
+        m_audioOutput->addVisual(m_visuals[i]);
+}
+
+void AudioPlayer::RemoveVisuals(void)
+{
+    if (!m_audioOutput)
+        return;
+
+    QMutexLocker lock(&m_lock);
+    for (uint i = 0; i < m_visuals.size(); i++)
+        m_audioOutput->removeVisual(m_visuals[i]);
 }
 
 void AudioPlayer::Reset(void)
@@ -31,6 +80,7 @@ void AudioPlayer::Reset(void)
 
 void AudioPlayer::DeleteOutput(void)
 {
+    RemoveVisuals();
     QMutexLocker locker(&m_lock);
     if (m_audioOutput)
     {
@@ -81,8 +131,9 @@ QString AudioPlayer::ReinitAudio(void)
         {
             errMsg = m_audioOutput->GetError();
         }
+        AddVisuals();
     }
-    else if (want_audio && !m_no_audio_in)
+    else if (!m_no_audio_in && m_audioOutput)
     {
         const AudioSettings settings(m_format, m_channels, m_codec,
                                      m_samplerate, m_passthru, 0,
@@ -101,7 +152,7 @@ QString AudioPlayer::ReinitAudio(void)
         }
         m_no_audio_out = true;
     }
-    else if (m_no_audio_out)
+    else if (m_no_audio_out && m_audioOutput)
     {
         VERBOSE(VB_IMPORTANT, LOC + "Enabling Audio");
         m_no_audio_out = false;
@@ -149,8 +200,11 @@ void AudioPlayer::PauseAudioUntilBuffered()
 
 void AudioPlayer::SetAudioOutput(AudioOutput *ao)
 {
+    // delete current audio class if any
+    DeleteOutput();
     m_lock.lock();
     m_audioOutput = ao;
+    AddVisuals();
     m_lock.unlock();
 }
 
@@ -344,14 +398,20 @@ int AudioPlayer::GetMaxHDRate()
     return m_audioOutput->GetOutputSettingsUsers(true)->GetMaxHDRate();
 }
 
-bool AudioPlayer::CanPassthrough(int samplerate, int channels, int codec)
+bool AudioPlayer::CanPassthrough(int samplerate, int channels,
+                                 int codec, int profile)
 {
     if (!m_audioOutput)
         return false;
-    return m_audioOutput->CanPassthrough(samplerate, channels, codec);
+    return m_audioOutput->CanPassthrough(samplerate, channels, codec, profile);
 }
 
-void AudioPlayer::AddAudioData(char *buffer, int len, int64_t timecode)
+/*
+ * if frames = -1 : let AudioOuput calculate value
+ * if frames = 0 && len > 0: will calculate according to len
+ */
+void AudioPlayer::AddAudioData(char *buffer, int len,
+                               int64_t timecode, int frames)
 {
     if (!m_audioOutput || m_no_audio_out)
         return;
@@ -363,9 +423,20 @@ void AudioPlayer::AddAudioData(char *buffer, int len, int64_t timecode)
     if (samplesize <= 0)
         return;
 
-    if (!m_audioOutput->AddData(buffer, len, timecode))
+    if (frames == 0 && len > 0)
+        frames = len / samplesize;
+
+    if (!m_audioOutput->AddData(buffer, len, timecode, frames))
         VERBOSE(VB_PLAYBACK, LOC + "AddAudioData(): "
                 "Audio buffer overflow, audio data lost!");
+}
+
+bool AudioPlayer::NeedDecodingBeforePassthrough(void)
+{
+    if (!m_audioOutput)
+        return true;
+    else
+        return m_audioOutput->NeedDecodingBeforePassthrough();
 }
 
 int64_t AudioPlayer::LengthLastData(void)

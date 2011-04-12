@@ -170,8 +170,10 @@ namespace
         delete gContext;
         gContext = NULL;
 
+#ifndef _MSC_VER
         signal(SIGHUP, SIG_DFL);
         signal(SIGUSR1, SIG_DFL);
+#endif
     }
 
     class CleanupGuard
@@ -921,11 +923,6 @@ static void reloadTheme_void(void)
         exit(err);
 }
 
-static void getScreenShot(void)
-{
-    (void) GetMythMainWindow()->screenShot();
-}
-
 static void setDebugShowBorders(void)
 {
     MythPainter *p = GetMythPainter();
@@ -975,9 +972,6 @@ static void InitJumpPoints(void)
          "", "", showStatus);
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Previously Recorded"),
          "", "", startPrevious);
-
-     REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "ScreenShot"),
-         "", "", getScreenShot, false);
 
      REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "Toggle Show Widget Borders"),
          "", "", setDebugShowBorders, false);
@@ -1105,6 +1099,7 @@ int main(int argc, char **argv)
         kCLPGetSettings          |
         kCLPQueryVersion         |
         kCLPVerbose              |
+        kCLPNoUPnP               |
 #ifdef USING_X11
         kCLPDisplay              |
 #endif // USING_X11
@@ -1235,11 +1230,15 @@ int main(int argc, char **argv)
     CleanupGuard callCleanup(cleanup);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    g_pUPnp  = new MediaRenderer();
-    if (!g_pUPnp->initialized())
+
+    if (cmdline.IsUPnPEnabled())
     {
-        delete g_pUPnp;
-        g_pUPnp = NULL;
+        g_pUPnp  = new MediaRenderer();
+        if (!g_pUPnp->initialized())
+        {
+            delete g_pUPnp;
+            g_pUPnp = NULL;
+        }
     }
 
     // Override settings as early as possible to cover bootstrapped screens
@@ -1256,7 +1255,7 @@ int main(int argc, char **argv)
         }
     }
 
-    if (!gContext->Init(true, g_pUPnp, bPromptForBackend, bBypassAutoDiscovery))
+    if (!gContext->Init(true, bPromptForBackend, bBypassAutoDiscovery))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
@@ -1392,6 +1391,15 @@ int main(int argc, char **argv)
     mainWindow->Init();
     mainWindow->setWindowTitle(QObject::tr("MythTV Frontend"));
 
+    // We must reload the translation after a language change and this
+    // also means clearing the cached/loaded theme strings, so reload the
+    // theme which also triggers a translation reload
+    if (LanguageSelection::prompt())
+    {
+        if (!reloadTheme())
+            return GENERIC_EXIT_NO_THEME;
+    }
+
     if (!UpgradeTVDatabaseSchema(upgradeAllowed))
     {
         VERBOSE(VB_IMPORTANT,
@@ -1406,12 +1414,6 @@ int main(int argc, char **argv)
     mainWindow->ResetKeys();
 
     InitJumpPoints();
-
-    // We must reload the translation after a language change and this
-    // also means clearing the cached/loaded theme strings, so reload the
-    // theme which also triggers a translation reload
-    if (LanguageSelection::prompt())
-        GetMythMainWindow()->JumpTo("Reload Theme");
 
     internal_media_init();
 
@@ -1465,11 +1467,12 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_NO_THEME;
     }
 
+#ifndef _MSC_VER
     // Setup handler for USR1 signals to reload theme
     signal(SIGUSR1, &signal_USR1_handler);
     // Setup handler for USR2 signals to restart LIRC
     signal(SIGUSR2, &signal_USR2_handler);
-
+#endif
     ThemeUpdateChecker *themeUpdateChecker = NULL;
     if (gCoreContext->GetNumSetting("ThemeUpdateNofications", 1))
         themeUpdateChecker = new ThemeUpdateChecker();

@@ -27,55 +27,67 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-QVariant Service::ConvertToVariant( const QString &sTypeName, void *pValue )
+QVariant Service::ConvertToVariant( int nType, void *pValue )
 {
-    // -=>NOTE: Only intrinsic or Qt type conversions should be here
-    //          All others should be added to overridden implementation.
+    // -=>NOTE: This assumes any UserType will be derived from QObject...
+    //          (Exception for QFileInfo )
 
+    if ( nType == QMetaType::type( "QFileInfo" ))
+        return QVariant::fromValue< QFileInfo >( *((QFileInfo *)pValue) );
 
-    if ( sTypeName.compare( "QFileInfo*", Qt::CaseInsensitive ) == 0 )
+    if (nType > QMetaType::User)
     {
-        QFileInfo *pInfo = reinterpret_cast< QFileInfo *>( pValue );
+        QObject *pObj = *((QObject **)pValue);
 
-        return QVariant::fromValue<QFileInfo*>( pInfo );
+        return QVariant::fromValue<QObject*>( pObj );
     }
 
-    // -=>NOTE: Default to being a QObject or derivative... 
-    //          Will CRASH if NOT derived from QObject!!!
-
-    QObject *pObjResult = reinterpret_cast< QObject *>( pValue );
-
-    return QVariant::fromValue<QObject*>( pObjResult );
+    return QVariant( nType, pValue );
 }
+
 
 //////////////////////////////////////////////////////////////////////////////
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-void* Service::ConvertToParameterPtr( const QString &sParamType, 
+void* Service::ConvertToParameterPtr( int            nTypeId,
+                                      const QString &sParamType, 
+                                      void*          pParam,
                                       const QString &sValue )
 {      
     // -=>NOTE: Only intrinsic or Qt type conversions should be here
     //          All others should be added to overridden implementation.
 
-    if (sParamType == "QString")
-        return new QString( sValue );
-
-    if (sParamType == "QDateTime")
+    switch( nTypeId )
     {
-        if ( sValue.isEmpty())
-            return new QDateTime();
+        case QMetaType::Bool        : *(( bool           *)pParam) = ToBool( sValue );         break;
 
-        return new QDateTime( QDateTime::fromString( sValue, Qt::ISODate ));
-    } 
+        case QMetaType::Char        : *(( char           *)pParam) = ( sValue.length() > 0) ? sValue.at( 0 ).toAscii() : 0; break;
+        case QMetaType::UChar       : *(( unsigned char  *)pParam) = ( sValue.length() > 0) ? sValue.at( 0 ).toAscii() : 0; break;
+        case QMetaType::QChar       : *(( QChar          *)pParam) = ( sValue.length() > 0) ? sValue.at( 0 )           : 0; break;
 
-    if (sParamType == "int")
-        return new int( sValue.toInt() );
+        case QMetaType::Short       : *(( short          *)pParam) = sValue.toShort     (); break;
+        case QMetaType::UShort      : *(( ushort         *)pParam) = sValue.toUShort    (); break;
 
-    if (sParamType == "bool")
-        return new bool( ToBool( sValue ));
+        case QMetaType::Int         : *(( int            *)pParam) = sValue.toInt       (); break;
+        case QMetaType::UInt        : *(( uint           *)pParam) = sValue.toUInt      (); break;
 
-    return NULL;
+        case QMetaType::Long        : *(( long           *)pParam) = sValue.toLong      (); break;
+        case QMetaType::ULong       : *(( ulong          *)pParam) = sValue.toULong     (); break;
+
+        case QMetaType::LongLong    : *(( qlonglong      *)pParam) = sValue.toLongLong  (); break;
+        case QMetaType::ULongLong   : *(( qulonglong     *)pParam) = sValue.toULongLong (); break;
+
+        case QMetaType::Double      : *(( double         *)pParam) = sValue.toDouble    (); break;
+        case QMetaType::Float       : *(( float          *)pParam) = sValue.toFloat     (); break;
+
+        case QMetaType::QString     : *(( QString        *)pParam) = sValue;                break;
+        case QMetaType::QByteArray  : *(( QByteArray     *)pParam) = sValue.toUtf8      (); break;
+
+        case QMetaType::QDateTime   : *(( QDateTime      *)pParam) = QDateTime::fromString( sValue, Qt::ISODate ); break; 
+    }
+
+    return pParam;
 }
 
 //////////////////////////////////////////////////////////////////////////////

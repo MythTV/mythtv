@@ -14,7 +14,7 @@ static void dir_close_mythiowrapper(BD_DIR_H *dir)
     if (dir) {
         mythdir_closedir((int)dir->internal);
 
-        DEBUG(DBG_DIR, "Closed mythdir dir (%p)\n", dir);
+        BD_DEBUG(DBG_DIR, "Closed mythdir dir (%p)\n", dir);
 
         X_FREE(dir);
     }
@@ -37,7 +37,7 @@ BD_DIR_H *dir_open_mythiowrapper(const char* dirname)
 {
     BD_DIR_H *dir = malloc(sizeof(BD_DIR_H));
 
-    DEBUG(DBG_DIR, "Opening mythdir dir %s... (%p)\n", dirname, dir);
+    BD_DEBUG(DBG_DIR, "Opening mythdir dir %s... (%p)\n", dirname, dir);
     dir->close = dir_close_mythiowrapper;
     dir->read = dir_read_mythiowrapper;
 
@@ -48,7 +48,7 @@ BD_DIR_H *dir_open_mythiowrapper(const char* dirname)
         return dir;
     }
 
-    DEBUG(DBG_DIR, "Error opening dir! (%p)\n", dir);
+    BD_DEBUG(DBG_DIR, "Error opening dir! (%p)\n", dir);
 
     X_FREE(dir);
 

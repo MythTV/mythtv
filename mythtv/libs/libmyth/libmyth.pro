@@ -8,7 +8,7 @@ INSTALLS = target
 DEFINES += MYTH_API
 
 
-QT += network xml sql
+QT += network xml sql script
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 

@@ -26,6 +26,7 @@
 
 #include <QMetaObject>
 #include <QMetaMethod>
+#include <QString>
 #include <QMap>
 #include <QDomDocument>
 
@@ -57,7 +58,7 @@ class UPNP_PUBLIC Wsdl : public QDomDocument
 
     protected:
 
-        QString     ConvertTypeToXSD( const QString &sType );
+        QString     ConvertTypeToXSD( const QString &sType, bool bCustomType = false );
 
         QDomElement CreateBindingOperation( MethodInfo    &oInfo,
                                             const QString &sClassName );
@@ -70,8 +71,23 @@ class UPNP_PUBLIC Wsdl : public QDomDocument
                                             QString       sTypeName,
                                             bool          bReturnType = false );
 
+        bool        CreateType            ( QObject       *pParent,
+                                            QString       &sTypeName );
 
-        void        CreateType            ( QString       sTypeName );
+        bool        CreateArrayType       ( QObject       *pParent,
+                                            QString      &sTypeName, 
+                                            QString       sElementName,
+                                            QString       sElementType,
+                                            bool          bCustomType );
+
+        bool        CreateMapType         ( QObject       *pParent,
+                                            QString      &sTypeName, 
+                                            QString       sElementName,
+                                            QString       sElementType,
+                                            bool          bCustomType );
+
+        QString     ReadClassInfo         ( QObject *pObject, 
+                                            QString  sKey );
 
     public:
 

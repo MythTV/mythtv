@@ -1,0 +1,52 @@
+<div id='jobqueue-job-editor'>
+<div id='Title'>Job Editor</div>
+<div id='jobEditTitle'></div> 
+
+<input type=hidden id='jobEditDescKey' />
+<input type=hidden id='jobEditCommandKey' />
+
+<div class='tablewrapper'>
+<table>
+    <tr><th align='right'>Description:</th><td><input id='jobEditDesc' size=60></td></tr>
+    <tr><th align='right'>Command:</th><td><input id='jobEditCommand' size=60></td></tr>
+</table>
+
+<hr>
+<div style='float:left'><b>Match Values:</b></div>
+<div class='helpLink'><a href='#' onClick='javascript:showHelp("Match Values", "Matches are keywords in the command string which are replaced at runtime with their appropriate values.  For example, the %CHANID% Channel ID match is replaced by the numeric channel ID that a recording was made from.")'>[?]</a></div>
+<div style='float:left'>
+<select id='appendMatchSelect'>
+    <option value='CATEGORY'>Category</option>
+    <option value='CHANID'>Channel ID</option>
+    <option value='DESCRIPTION'>Description</option>
+    <option value='DIR'>Recording Directory</option>
+    <option value='FILE'>Recording Filename</option>
+    <option value='HOSTNAME'>Hostname</option>
+    <option value='ORIGINALAIRDATE'>Original Air Date</option>
+    <option value='PLAYGROUP'>PlayGroup</option>
+    <option value='RECGROUP'>Recording Group</option>
+    <option value='SUBTITLE'>SubTitle</option>
+    <option value='TITLE'>Title</option>
+    <option value='STARTTIME'>Start Time</option>
+    <option value='STARTTIMEISO'>Start Time in ISO format</option>
+    <option value='STARTTIMEUTC'>Start Time in UTC</option>
+    <option value='STARTTIMEISOUTC'>Start Time in UTC in ISO format</option>
+    <option value='ENDTIME'>End Time</option>
+    <option value='ENDTIMEISO'>End Time in ISO format</option>
+    <option value='ENDTIMEUTC'>End Time in UTC</option>
+    <option value='ENDTIMEISOUTC'>End Time in UTC in ISO format</option>
+    <option value='PROGSTART'>Program Start Time</option>
+    <option value='PROGSTARTISO'>Program Start Time in ISO format</option>
+    <option value='PROGSTARTUTC'>Program Start Time in UTC</option>
+    <option value='PROGSTARTISOUTC'>Program Start Time in UTC in ISO format</option>
+    <option value='PROGEND'>Program End Time</option>
+    <option value='PROGENDISO'>Program End Time in ISO format</option>
+    <option value='PROGENDUTC'>Program End Time in UTC</option>
+    <option value='PROGENDISOUTC'>Program End Time in UTC in ISO format</option>
+</select>
+<input type=button onClick='javascript:appendMatch("%" + $("#appendMatchSelect").val() + "%")' value='Append Match'>
+</div>
+
+</div>
+
+</div>

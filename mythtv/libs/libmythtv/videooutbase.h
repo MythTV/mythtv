@@ -23,6 +23,7 @@ extern "C" {
 #include "DisplayRes.h"
 #include "videodisplayprofile.h"
 #include "videocolourspace.h"
+#include "visualisations/videovisual.h"
 
 using namespace std;
 
@@ -33,7 +34,8 @@ class MythPlayer;
 class OSD;
 class FilterChain;
 class FilterManager;
-class OpenGLContextGLX;
+class AudioPlayer;
+class MythRender;
 
 typedef QMap<MythPlayer*,PIPLocation> PIPMap;
 
@@ -44,8 +46,6 @@ struct SwsContext;
 
 class VideoOutput
 {
-    friend class OpenGLVideoSync;
-
   public:
     static void GetRenderOptions(render_opts &opts);
     static VideoOutput *Create(
@@ -73,7 +73,8 @@ class VideoOutput
     virtual bool IsBobDeint(void) const;
     virtual bool IsExtraProcessingRequired(void) const;
     virtual bool ApproveDeintFilter(const QString& filtername) const;
-
+    void         GetDeinterlacers(QStringList &deinterlacers);
+    QString      GetDeinterlacer(void);
     virtual void PrepareFrame(VideoFrame *buffer, FrameScanType,
                               OSD *osd) = 0;
     virtual void Show(FrameScanType) = 0;
@@ -237,11 +238,19 @@ class VideoOutput
 
     virtual QString GetOSDRenderer(void) const;
     virtual MythPainter *GetOSDPainter(void) { return (MythPainter*)osd_painter; }
+    virtual bool GetScreenShot(int width = 0, int height = 0) { return false; }
 
     QString GetFilters(void) const;
     /// \brief translates caption/dvd button rectangle into 'screen' space
     QRect   GetImageRect(const QRect &rect, QRect *display = NULL);
     QRect   GetSafeRect(void);
+
+    // Visualisations
+    bool ToggleVisualisation(AudioPlayer *audio);
+    virtual bool CanVisualise(AudioPlayer *audio, MythRender *render);
+    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render);
+    void DestroyVisualisation(void);
+
 
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
@@ -323,6 +332,9 @@ class VideoOutput
     // OSD painter and surface
     MythYUVAPainter *osd_painter;
     MythImage       *osd_image;
+
+    // Visualisation
+    VideoVisual     *m_visual;
 };
 
 #endif

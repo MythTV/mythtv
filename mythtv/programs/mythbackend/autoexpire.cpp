@@ -324,7 +324,7 @@ void AutoExpire::RunExpirer(void)
 void AutoExpire::Sleep(int sleepTime)
 {
     int minSleep = 5, timeExpended = 0;
-    while (expireThread.isRunning() && timeExpended < sleepTime)
+    while (expire_thread_run && timeExpended < sleepTime)
     {
         if (timeExpended > (sleepTime - minSleep))
             minSleep = sleepTime - timeExpended;

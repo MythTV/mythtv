@@ -613,6 +613,26 @@ struct meta_dl;
  */
 struct meta_dl *bd_get_meta(BLURAY *bd);
 
+
+struct clpi_cl;
+/**
+ *
+ *  Get copy of clip information for requested playitem.
+ *
+ * @param bd  BLURAY objects
+ * @param clip_ref  requested playitem number
+ * @return pointer to allocated CLPI_CL object on success, NULL on error
+ */
+struct clpi_cl *bd_get_clpi(BLURAY *bd, unsigned clip_ref);
+
+/**
+ *
+ *  Free CLPI_CL object
+ *
+ * @param cl  CLPI_CL objects
+ */
+void bd_free_clpi(struct clpi_cl *cl);
+
 #ifdef __cplusplus
 };
 #endif

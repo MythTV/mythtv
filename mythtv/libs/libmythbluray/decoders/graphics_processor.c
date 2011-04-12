@@ -32,9 +32,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
-//#define ERROR(x,...)
-#define ERROR(x,...) DEBUG(DBG_BLURAY|DBG_CRIT,x,##__VA_ARGS__)
-#define TRACE(x...)  do {} while (0)
+#define GP_TRACE(...) do {} while (0)
 
 
 /*
@@ -186,7 +184,7 @@ static int _decode_wds(PG_DISPLAY_SET *s, BITBUFFER *bb, PES_BUFFER *p)
     (void)bb;
     (void)p;
 
-    ERROR("unhandled segment type (PGS_WINDOW)\n");
+    BD_DEBUG(DBG_DECODE | DBG_CRIT, "unhandled segment type (PGS_WINDOW)\n");
     return 0;
 }
 
@@ -272,7 +270,7 @@ static int _decode_pcs(PG_DISPLAY_SET *s, BITBUFFER *bb, PES_BUFFER *p)
     (void)bb;
     (void)p;
 
-    ERROR("unhandled segment type (PGS_PG_COMPOSITION)\n");
+    BD_DEBUG(DBG_DECODE | DBG_CRIT, "unhandled segment type (PGS_PG_COMPOSITION)\n");
     return 0;
 }
 
@@ -338,7 +336,7 @@ static int _decode_segment(PG_DISPLAY_SET *s, PES_BUFFER *p)
             return 1;
 
         default:
-            ERROR("unknown segment type 0x%x\n", type);
+            BD_DEBUG(DBG_DECODE | DBG_CRIT, "unknown segment type 0x%x\n", type);
             break;
     }
 
@@ -365,19 +363,19 @@ int graphics_processor_decode_pes(PG_DISPLAY_SET **s, PES_BUFFER **p, int64_t st
 
         /* time to decode next segment ? */
         if (stc >= 0 && (*p)->dts > stc) {
-            TRACE("Segment dts > stc (%"PRId64" > %"PRId64" ; diff %"PRId64")\n",
-                  (*p)->dts, stc, (*p)->dts - stc);
+            GP_TRACE("Segment dts > stc (%"PRId64" > %"PRId64" ; diff %"PRId64")\n",
+                     (*p)->dts, stc, (*p)->dts - stc);
             return 0;
         }
 
         /* all fragments present ? */
         if (!_join_segment_fragments(*p)) {
-            TRACE("splitted segment not complete, waiting for next fragment\n");
+            GP_TRACE("splitted segment not complete, waiting for next fragment\n");
             return 0;
         }
 
-        TRACE("Decoding segment, dts %010"PRId64" pts %010"PRId64" len %d\n",
-              (*p)->dts, (*p)->pts, (*p)->len);
+        GP_TRACE("Decoding segment, dts %010"PRId64" pts %010"PRId64" len %d\n",
+                 (*p)->dts, (*p)->pts, (*p)->len);
 
         /* decode segment */
         if ((*p)->len > 2) {

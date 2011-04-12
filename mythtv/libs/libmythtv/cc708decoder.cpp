@@ -75,12 +75,12 @@ void CC708Decoder::services(uint seconds, bool seen[64]) const
 typedef enum
 {
     NUL  = 0x00,
-    EXT1 = 0x01,
     ETX  = 0x03,
     BS   = 0x08,
     FF   = 0x0C,
     CR   = 0x0D,
     HCR  = 0x0E,
+    EXT1 = 0x10,
     P16  = 0x18,
 } C0;
 
@@ -123,10 +123,45 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
     // find last reset or delay cancel in buffer
     for (i = 0; i < blk_size; i++)
     {
-        if (RST == cc->buf[service_num][i])
-            rst_loc = dlc_loc = i;
-        else if (DLC == cc->buf[service_num][i])
-            dlc_loc = i;
+        switch (cc->buf[service_num][i]) {
+            // Skip over parameters, since their bytes may coincide
+            // with RST or DLC
+            case CLW:
+            case DLW:
+            case DSW:
+            case HDW:
+            case TGW:
+            case DLY:
+                i += 1;
+                break;
+            case SPA:
+            case SPL:
+                i += 2;
+                break;
+            case SPC:
+                i += 3;
+                break;
+            case SWA:
+                i += 4;
+                break;
+            case DF0:
+            case DF1:
+            case DF2:
+            case DF3:
+            case DF4:
+            case DF5:
+            case DF6:
+            case DF7:
+                i += 6;
+                break;
+            // Detect RST or DLC bytes
+            case RST:
+                rst_loc = dlc_loc = i;
+                break;
+            case DLC:
+                dlc_loc = i;
+                break;
+        }
     }
 
     // reset, process only data after reset
@@ -719,13 +754,13 @@ ushort CCtableG2[0x60] =
     0x160,/*S under \/*/0,                     /* 0x28-0x2b */
     0x152, /* CE */     0,
     0,                  0,                     /* 0x2c-0x2f */
-    0x2DA, /*super dot*/0x2018,/* open ' */
+    0x2588,/*block*/    0x2018,/* open ' */
     0x2019,/*close ' */ 0x201c,/* open " */    /* 0x30-0x33 */
-    0x201d,/*close " */ '*',   /* dot */
+    0x201d,/*close " */ 0xB7,/* dot */
     0,                  0,                     /* 0x34-0x37 */
-    0,                  '#',   /* super TM */
+    0,                  0x2122,/* super TM */
     0x161,/*s under \/*/0,                     /* 0x38-0x3b */
-    0x153, /* ce */     '#',   /* super SM */
+    0x153, /* ce */     0x2120,/* super SM */
     0,                  0x178,/*Y w/umlout*/   /* 0x3c-0x3f */
 
 //  0         1         2         3

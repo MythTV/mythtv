@@ -103,8 +103,7 @@ class AvFormatDecoder : public DecoderBase
 
     void CloseCodecs();
     void CloseContext();
-    virtual void Reset(void);
-    void Reset(bool reset_video_data = true, bool seek_reset = true);
+    virtual void Reset(bool reset_video_data, bool seek_reset, bool reset_file);
 
     /// Perform an av_probe_input_format on the passed data to see if we
     /// can decode it with this class.
@@ -287,8 +286,10 @@ class AvFormatDecoder : public DecoderBase
     uint32_t  start_code_state;
 
     long long lastvpts;
-    long long  lastapts;
+    long long lastapts;
     long long lastccptsu;
+    long long firstvpts;
+    bool      firstvptsinuse;
 
     int64_t faulty_pts;
     int64_t faulty_dts;
@@ -336,7 +337,6 @@ class AvFormatDecoder : public DecoderBase
 
     // Audio
     short int        *audioSamples;
-    bool              internal_vol;
     bool              disable_passthru;
 
     VideoFrame       *dummy_frame;

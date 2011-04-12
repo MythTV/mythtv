@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.7.9"
+__version__=u"v0.8.0"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -309,6 +309,8 @@ __version__=u"v0.7.9"
  # 0.7.8 Replace uses of MythVideo.getVideo()
  # 0.7.9 Deal with jamu.conf entries that have unicode characters
  #       Replace 'xml' module version check with generic Python version, to correct failure in Python 2.7
+ # 0.8.0 Fixed a bug which caused jamu to crash due to an extra unicode conversion introduced in 0.7.9.
+ #       See also #9637.
 
 
 usage_txt=u'''
@@ -1280,12 +1282,12 @@ class Configuration(object):
             if section == 'regex':
                 # Change variables per user config file
                 for option in cfg.options(section):
-                    self.config['name_parse'].append(re.compile(unicode(cfg.get(section, option), 'utf8'), re.UNICODE))
+                    self.config['name_parse'].append(re.compile(cfg.get(section, option), re.UNICODE))
                 continue
             if section == 'ignore-directory':
                 # Video directories to be excluded from Jamu processing
                 for option in cfg.options(section):
-                    self.config['ignore-directory'].append(unicode(cfg.get(section, option), 'utf8'))
+                    self.config['ignore-directory'].append(cfg.get(section, option))
                 continue
             if section =='series_name_override':
                 overrides = {}

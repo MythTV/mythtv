@@ -61,8 +61,13 @@ class VideoOutputVDPAU : public VideoOutput
         { return codec_is_vdpau(video_codec_id); }
     virtual bool hasHWAcceleration(void) const
         { return codec_is_vdpau(video_codec_id); }
-    void SetNextFrameDisplayTimeOffset(int delayus) { m_frame_delay = delayus; }
     virtual MythPainter* GetOSDPainter(void) { return (MythPainter*)m_osd_painter; }
+    virtual bool GetScreenShot(int width = 0, int height = 0);
+
+    virtual bool CanVisualise(AudioPlayer *audio, MythRender *render)
+        { return VideoOutput::CanVisualise(audio, m_render);       }
+    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render)
+        { return VideoOutput::SetupVisualisation(audio, m_render); }
 
   private:
     virtual bool hasFullScreenOSD(void) const { return true; }
@@ -94,7 +99,8 @@ class VideoOutputVDPAU : public VideoOutput
     Window               m_win;
     MythRenderVDPAU     *m_render;
 
-    uint                 m_buffer_size;
+    uint                 m_decoder_buffer_size;
+    uint                 m_process_buffer_size;
     QVector<uint>        m_video_surfaces;
     QVector<uint>        m_reference_frames;
     uint                 m_pause_surface;
@@ -107,7 +113,6 @@ class VideoOutputVDPAU : public VideoOutput
     uint                 m_decoder;
     int                  m_pix_fmt;
 
-    int                  m_frame_delay;
     QMutex               m_lock;
 
     uint                 m_pip_layer;

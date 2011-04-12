@@ -69,8 +69,13 @@ void bd_debug(const char *file, int line, uint32_t mask, const char *format, ...
 
         // Send DEBUG to file?
         if ((env = getenv("BD_DEBUG_FILE"))) {
-            logfile = fopen(env, "wb");
-            setvbuf(logfile, NULL, _IOLBF, 0);
+            FILE *fp = fopen(env, "wb");
+            if (fp) {
+                logfile = fp;
+                setvbuf(logfile, NULL, _IOLBF, 0);
+            } else {
+                fprintf(logfile, "%s:%d: Error opening log file %s\n", __FILE__, __LINE__, env);
+            }
         }
     }
 

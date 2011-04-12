@@ -388,8 +388,8 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     // ----------------------------------------------------------------------
 
     if (pDevice == &m_rootDevice)
-        sFriendlyName = UPnp::g_pConfig->GetValue( "UPnP/FriendlyName",
-                                                   sFriendlyName  );
+        sFriendlyName = UPnp::GetConfiguration()->GetValue( "UPnP/FriendlyName",
+                                                            sFriendlyName  );
 
     os << "<device>\n";
     os << FormatValue( "deviceType"   , pDevice->m_sDeviceType );
@@ -702,7 +702,7 @@ QString UPnpDeviceDesc::GetHostName()
                     "UPnpDeviceDesc: Error, could not determine host name."
                     + ENO);
 
-        return UPnp::g_pConfig->GetValue( "Settings/HostName",
+        return UPnp::GetConfiguration()->GetValue( "Settings/HostName",
                                           QString( localHostName ));
     }
 

@@ -54,6 +54,8 @@ class UPNP_PUBLIC  UPnpMSRR : public Eventing
 
         virtual ~UPnpMSRR();
 
+        virtual QStringList GetBasePaths();
+
         bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
 };
 

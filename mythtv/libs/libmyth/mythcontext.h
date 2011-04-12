@@ -11,7 +11,6 @@
 
 class MythPluginManager;
 class MythContextPrivate;
-class UPnp;
 
 class MythContextSlotHandler : public QObject
 {
@@ -47,7 +46,6 @@ class MPUBLIC MythContext
     virtual ~MythContext();
 
     bool Init(const bool gui = true,
-              UPnp *UPnPclient = NULL,
               const bool promptForBackend = false,
               const bool bypassAutoDiscovery = false,
               const bool ignoreDB = false);

@@ -145,16 +145,6 @@ QString GetDisplayLength(int length)
     return QString("%1 minutes").arg(length);
 }
 
-QString GetDisplaySeasonEpisode(int seasEp, int digits)
-{
-    QString seasEpNum = QString::number(seasEp);
-
-    if (digits == 2 && seasEpNum.size() < 2)
-        seasEpNum.prepend("0");
-
-    return seasEpNum;
-}
-
 QString GetDisplayBrowse(bool browse)
 {
     return browse ? QObject::tr("Yes") : QObject::tr("No");

@@ -6,6 +6,7 @@
 #include <mythuibuttontree.h>
 #include <mythgenerictree.h>
 #include <mythuiprogressbar.h>
+#include <mythprogressdialog.h>
 #include <mythuistatetype.h>
 #include <mythscreentype.h>
 #include <mythdialogbox.h>
@@ -49,7 +50,6 @@ class NetTree : public MythScreenType
     bool keyPressEvent(QKeyEvent *);
 
     void populateResultList(ResultItem::resultList list);
-    QString getVideoDownloadFilename(ResultItem *item);
 
   public slots:
 
@@ -74,6 +74,8 @@ class NetTree : public MythScreenType
                           QList<ResultItem*> videos);
 
     void cleanCacheDir(void);
+
+    void initProgressDialog();
 
     MythGenericTree *AddDirNode(
                     MythGenericTree *where_to_add,
@@ -101,12 +103,13 @@ class NetTree : public MythScreenType
 
     MythUIBusyDialog   *m_busyPopup;
 
-    MythDialogBox      *m_menuPopup;
-    MythScreenStack    *m_popupStack;
+    MythDialogBox        *m_menuPopup;
+    MythScreenStack      *m_popupStack;
+    MythUIProgressDialog *m_progressDialog;
 
     MetadataImageDownload *m_imageDownload;
     GrabberDownloadThread *m_gdt;
-    MythDownloadManager   *m_download;
+    QString               m_downloadFile;
 
     QFile              *m_file;
 
@@ -115,8 +118,6 @@ class NetTree : public MythScreenType
 
     DialogType          m_type;
 
-    mutable QMutex      m_lock;
-
     uint                m_updateFreq;
     bool                m_rssAutoUpdate;
     bool                m_treeAutoUpdate;
@@ -124,7 +125,7 @@ class NetTree : public MythScreenType
   private slots:
     void showWebVideo(void);
     void doDownloadAndPlay(void);
-    void doPlayVideo(void);
+    void doPlayVideo(QString filename);
     void showMenu(void);
     void showViewMenu(void);
     void showManageMenu(void);
@@ -151,6 +152,7 @@ class NetTree : public MythScreenType
     void TreeRefresh();
 
     void customEvent(QEvent *levent);
+    void DownloadVideo(QString url, QString dest);
 
   protected:
     static const QString RSSNode;

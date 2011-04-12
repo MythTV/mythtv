@@ -290,6 +290,8 @@ class UPNP_PUBLIC UPnpCDS : public Eventing
         void     RegisterExtension  ( UPnpCDSExtension *pExtension );
         void     UnregisterExtension( UPnpCDSExtension *pExtension );
 
+        virtual QStringList GetBasePaths();
+        
         virtual bool ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
 };
 

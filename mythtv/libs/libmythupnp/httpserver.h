@@ -36,6 +36,8 @@
 #include <QThread>
 #include <QTcpServer>
 #include <QReadWriteLock>
+#include <QScriptEngine>
+#include <QMultiMap>
 
 // MythTV headers
 #include "upnputil.h"
@@ -65,7 +67,7 @@ class UPNP_PUBLIC HttpServerExtension : public QObject
 
         QString     m_sName;
         QString     m_sSharePath;
-
+        
     public:
 
         HttpServerExtension( const QString &sName, const  QString &sSharePath )
@@ -73,10 +75,10 @@ class UPNP_PUBLIC HttpServerExtension : public QObject
 
         virtual ~HttpServerExtension() {};
 
-//        virtual bool  Initialize    ( HttpServer  *pServer  ) = 0;
         virtual bool  ProcessRequest( HttpWorkerThread *pThread,
                                       HTTPRequest      *pRequest ) = 0;
-//        virtual bool  Uninitialize  ( ) = 0;
+
+        virtual QStringList GetBasePaths() = 0;
 };
 
 typedef QList<QPointer<HttpServerExtension> > HttpServerExtensionList;
@@ -98,6 +100,11 @@ class UPNP_PUBLIC HttpServer : public QTcpServer,
         QReadWriteLock          m_rwlock;
         HttpServerExtensionList m_extensions;
 
+        // This multimap does NOT take ownership of the HttpServerExtension*
+        QMultiMap< QString, HttpServerExtension* >  m_basePaths;
+
+        HttpServerExtension*    m_pHtmlServer;
+
         virtual WorkerThread *CreateWorkerThread( ThreadPool *,
                                                   const QString &sName );
         virtual void          incomingConnection     ( int socket );
@@ -117,6 +124,8 @@ class UPNP_PUBLIC HttpServer : public QTcpServer,
 
         void     DelegateRequest    ( HttpWorkerThread *pThread,
                                       HTTPRequest      *pRequest );
+
+        QScriptEngine* ScriptEngine();
 
 };
 

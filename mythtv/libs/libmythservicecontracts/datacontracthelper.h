@@ -80,24 +80,6 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-#define PROPERTYIMP_PTR_Old( type, name )   \
-    private: type* m_##name;            \
-    public:                             \
-    type* name()                        \
-    {                                   \
-        return m_##name;                \
-    }                                   \
-    void set##name( QObject* val)       \
-    {                                   \
-        m_##name = qobject_cast< type* >( val ); \
-    }                                   \
-    void set##name( type* val)          \
-    {                                   \
-        m_##name = val;                 \
-    }
-
-//////////////////////////////////////////////////////////////////////////////
-
 #define PROPERTYIMP_RO_REF( type, name ) \
     private: type m_##name;              \
     public:                              \

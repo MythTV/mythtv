@@ -30,6 +30,9 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
                            int alpha);
     virtual void DrawRect(const QRect &area, const QBrush &fillBrush,
                           const QPen &linePen, int alpha);
+    virtual void DrawRoundRect(const QRect &area, int cornerRadius,
+                               const QBrush &fillBrush, const QPen &linePen,
+                               int alpha);
 
   protected:
     virtual MythImage* GetFormatImagePriv(void) { return new MythImage(this); }

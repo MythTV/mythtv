@@ -1,0 +1,55 @@
+<div id='wizard-media_storage' class='setuptab'>
+<table>
+<tr><th>Recordings:</th><td><div id='sgDefault'></div></td><td valign=middle><input type=button onClick="wizardSelectNewDir('Default')" value='Add Directory'></td></tr>
+<tr><th>Videos:</th><td><div id='sgVideos'></div></td><td valign=middle><input type=button onClick="wizardSelectNewDir('Videos')" value='Add Directory'></td></tr>
+<tr><th>Music: (placeholder)</th><td><div id='sgMusic'></div></td><td valign=middle><input type=button onClick="wizardSelectNewDir('Music')" value='Add Directory'></td></tr>
+<tr><th>Pictures: (placeholder)</th><td><div id='sgPhotos'></div></td><td valign=middle><input type=button onClick="wizardSelectNewDir('Photos')" value='Add Directory'></td></tr>
+</table>
+</div>
+<div id='navigation' style="text-align:right">
+    <input type=button value='Back' onClick='javascript:$("#wizardtabs").tabs("select", 3)'>
+</div>
+
+<script language="JavaScript" type="text/javascript">
+    var wizardStorageGroupName;
+    function wizardNewDirSelected(dir) {
+        /* FIXME, need to do some validation here, writeability, etc. */
+        addStorageGroupDir(wizardStorageGroupName, dir, getHostName());
+        setStorageGroupDirs(wizardStorageGroupName, getHostName());
+    }
+
+    function wizardSelectNewDir(group) {
+        var dirs = new Array;
+        wizardStorageGroupName = group;
+        openFileBrowser("Storage Directory", dirs, wizardNewDirSelected);
+    }
+
+    function wizardRemoveStorageGroupDir(group, dir, host) {
+        removeStorageGroupDir(group, dir, host);
+        setStorageGroupDirs(group, host);
+    }
+
+    function setStorageGroupDirs(group, host) {
+        $.getJSON("/Myth/GetStorageGroupDirs",
+            { GroupName: group, HostName: host },
+            function(data) {
+                var result = "";
+                $.each(data.StorageGroupDirList.StorageGroupDirs,
+                    function(i, value) {
+                        if (result.length)
+                            result += "<br>";
+                        result += value.DirName +
+                            "&nbsp;&nbsp;&nbsp;&nbsp;" +
+                            "<a href=\"javascript:wizardRemoveStorageGroupDir('" +
+                            group + "', '" + value.DirName + "', '" + host +
+                            "')\">(Remove)</a>";
+                });
+                $("#sg" + group).html(result);
+        });
+    }
+
+    setStorageGroupDirs("Default", getHostName());
+    setStorageGroupDirs("Videos", getHostName());
+    setStorageGroupDirs("Music", getHostName());
+    setStorageGroupDirs("Photos", getHostName());
+</script>

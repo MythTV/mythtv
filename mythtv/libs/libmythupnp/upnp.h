@@ -105,28 +105,25 @@ class UPNP_PUBLIC UPnp
 
     protected:
 
+        static Configuration   *g_pConfig;
+
         HttpServer             *m_pHttpServer;
         int                     m_nServicePort;
 
     public:
 
-        static Configuration   *g_pConfig;
-
         static UPnpDeviceDesc   g_UPnpDeviceDesc;
-        static TaskQueue       *g_pTaskQueue;
-        static SSDP            *g_pSSDP;
-        static SSDPCache        g_SSDPCache;
         static QStringList      g_IPAddrList;
 
     public:
                  UPnp();
         virtual ~UPnp();
 
-        static void SetConfiguration( Configuration *pConfig );
+        static void           SetConfiguration( Configuration *pConfig );
+        static Configuration* GetConfiguration();
 
         bool Initialize( int nServicePort, HttpServer *pHttpServer );
         bool Initialize( QStringList &sIPAddrList, int nServicePort, HttpServer *pHttpServer );
-        bool InitializeSSDPOnly( void );
 
         virtual void Start();
 
@@ -134,19 +131,7 @@ class UPNP_PUBLIC UPnp
 
         UPnpDevice *RootDevice() { return &(g_UPnpDeviceDesc.m_rootDevice); }
 
-        static void PerformSearch( const QString &sST )
-        {
-            if (g_pSSDP)
-                g_pSSDP->PerformSearch( sST );
-        }
-
         HttpServer *GetHttpServer() { return m_pHttpServer; }
-
-        static void AddListener   ( QObject *listener ) { g_SSDPCache.addListener   ( listener ); }
-        static void RemoveListener( QObject *listener ) { g_SSDPCache.removeListener( listener ); }
-
-        static SSDPCacheEntries *Find( const QString &sURI );
-        static DeviceLocation   *Find( const QString &sURI, const QString &sUSN );
 
         static UPnpDeviceDesc *GetDeviceDesc( QString &sURL, bool bInQtThread = true);
 
@@ -154,6 +139,10 @@ class UPNP_PUBLIC UPnp
         static void            FormatErrorResponse( HTTPRequest   *pRequest, 
                                                     UPnPResultCode  eCode, 
                                                     const QString &sMsg = "" );
+
+        static void            FormatRedirectResponse( HTTPRequest   *pRequest,
+                                                       const QString &hostName );
+
 
 };
 

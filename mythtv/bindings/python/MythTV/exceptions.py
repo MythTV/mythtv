@@ -85,6 +85,9 @@ class MythDBError( MythError ):
             else:
                 self.sqlcode, self.sqlerr = sqlerr
                 self.args = ("Schema update failure %d: %s" % sqlerr,)
+        elif args[0] == self.DB_RESTRICT:
+            self.ename = 'DB_RESTRICT'
+            self.ecode, self.args = args
         MythError.__init__(self, *args)
 
 class MythBEError( MythError ): 

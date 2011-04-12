@@ -24,7 +24,7 @@ DEPENDPATH  += ../libmyth ../libmyth/audio
 DEPENDPATH  += ../libmythbase ../libmythhdhomerun
 DEPENDPATH  += ../libmythdvdnav/
 DEPENDPATH  += ../libmythbluray/
-DEPENDPATH  += ./dvbdev ./mpeg ./iptv ./channelscan
+DEPENDPATH  += ./dvbdev ./mpeg ./iptv ./channelscan ./visualisations
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment/include
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment
 DEPENDPATH  += ../libmythlivemedia/groupsock/include
@@ -81,7 +81,12 @@ QMAKE_LFLAGS_SHLIB += $${FREETYPE_LIBS}
 
 macx {
     # Mac OS X Frameworks
-    FWKS = AGL ApplicationServices Carbon Cocoa CoreFoundation CoreVideo OpenGL QuickTime IOKit
+    FWKS = AGL ApplicationServices Carbon Cocoa CoreFoundation OpenGL QuickTime IOKit
+    using_quartz_video {
+        FWKS += QuartzCore
+    } else {
+        FWKS += CoreVideo
+    }
 
     using_firewire:using_backend: FWKS += IOKit
 
@@ -312,12 +317,22 @@ using_frontend {
     HEADERS += videodisplayprofile.h    mythcodecid.h
     HEADERS += videoouttypes.h          util-osd.h
     HEADERS += videooutwindow.h         videocolourspace.h
+    HEADERS += videovisual.h            videovisualdefs.h
     SOURCES += videooutbase.cpp         videoout_null.cpp
     SOURCES += videobuffers.cpp         vsync.cpp
     SOURCES += jitterometer.cpp         yuv2rgb.cpp
     SOURCES += videodisplayprofile.cpp  mythcodecid.cpp
     SOURCES += videooutwindow.cpp       util-osd.cpp
     SOURCES += videocolourspace.cpp
+    SOURCES += videovisual.cpp
+
+    using_libfftw3 {
+        DEFINES += FFTW3_SUPPORT
+        HEADERS += videovisualspectrum.h
+        SOURCES += videovisualspectrum.cpp
+        using_opengl: HEADERS += videovisualcircles.h
+        using_opengl: SOURCES += videovisualcircles.cpp
+    }
 
     using_quartz_video: DEFINES += USING_QUARTZ_VIDEO
     using_quartz_video: HEADERS += videoout_quartz.h

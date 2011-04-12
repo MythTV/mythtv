@@ -263,12 +263,13 @@ bool RemoteFile::Exists(const QString &url, struct stat *fileinfo)
     if (filename.left(1) == "/")
         filename = filename.right(filename.length()-1);
 
-    if (filename.isEmpty() || sgroup.isEmpty())
+    if (filename.isEmpty())
         return false;
 
     QStringList strlist("QUERY_FILE_EXISTS");
     strlist << filename;
-    strlist << sgroup;
+    if (!sgroup.isEmpty())
+        strlist << sgroup;
 
     gCoreContext->SendReceiveStringList(strlist);
 
@@ -316,7 +317,7 @@ QString RemoteFile::GetFileHash(const QString &url)
         filename = filename.right(filename.length()-1);
 
     if (filename.isEmpty() || sgroup.isEmpty())
-        return false;
+        return QString();
 
     QStringList strlist("QUERY_FILE_HASH");
     strlist << filename;

@@ -151,9 +151,6 @@ class MPEG2replex
 
     audio_frame_t extframe[N_AUDIO];
     sequence_t seq_head;
-
-  private:
-    multiplex_t *mplex;
 };
 
 class MPEG2fixup

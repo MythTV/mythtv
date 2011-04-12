@@ -1,0 +1,82 @@
+<div id="menu-title" align=center>
+    MythBackend
+</div>
+<div id="menu">
+  <ul class="menu collapsible">
+    <li><a href='#'>Setup</a>
+      <ul class="acitem collapsible">
+        <li><a href='#' onClick="javascript:clearContent(); loadEditWindow('/setup/wizard.html', '/setup/js/wizard.js')">Setup Wizard</a></li>
+        <li><a href='#'>Advanced Setup</a>
+          <ul class="acitem collapsible">
+            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('database')">Database</a></li>
+            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('general')">General</a></li>
+            <li class="indent1"><a href='#'>Guide Data</a>
+              <ul class="acitem collapsible">
+                <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('guidedatasources')">Guide Data Sources</a></li>
+                <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('channeleditor')">Channel Editor</a></li>
+              </ul>
+            </li>
+            <li class="indent1"><a href='#' onClick="javascript:loadContent('/misc/placeholder.html')">Recording Devices</a></li>
+            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('storagegroups')">Storage Groups</a></li>
+            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('jobqueue')">Job Queue</a></li>
+            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('systemevents')">System Events</a></li>
+          </ul>
+        </li>
+<%
+    var myth = new Myth();
+    var sList = myth.GetSetting( '', 'EnableWebSetupDevMode', '');
+    var devMode = 0;
+
+    if (sList.Settings['EnableWebSetupDevMode'] == 1)
+        devMode = 1;
+
+    if (devMode)
+    {
+        os.write("<li><a href='#' onClick=\"javascript:loadSetupContent('/setup/expert.html')\">Expert/Dev Setup</a></li>");
+    }
+%>
+        <li><a href='#' onClick="javascript:loadSetupPage('password')">Change Password</a></li>
+      </ul>
+    </li>
+    <li><a href='#'>Information</a>
+      <ul class="acitem collapsible">
+        <li><a class='menuitem' href='#' onClick="javascript:loadContent('/Status/GetStatusHTML')">Backend Status</a></li>
+      </ul>
+    </li>
+    <li><a href='#'>Utilities</a>
+      <ul class="acitem collapsible">
+        <li><a class='menuitem' href='#' onClick="javascript:loadMiscPage('messagetab')">Send a Message</a></li>
+        <li><a class='menuitem' href='#' onClick="javascript:loadMiscPage('databasetabs')">Database Tools</a></li>
+        <li><a class='menuitem' href='#' onClick="javascript:loadMiscPage('hardwareprofile')">Hardware Profile</a></li>
+      </ul>
+    </li>
+    <li><hr></li>
+    <li><a href='#'>API</a>
+      <ul class="acitem collapsible">
+        <li><a href='#'>WSDL Links</a>
+          <ul class="acitem">
+            <li class="indent1"><a href='/Myth/wsdl'>Myth Service</a></li>
+            <li class="indent1"><a href='/Guide/wsdl'>Guide Service</a></li>
+            <li class="indent1"><a href='/Dvr/wsdl'>DVR Service</a></li>
+            <li class="indent1"><a href='/Content/wsdl'>Content Service</a></li>
+            <li class="indent1"><a href='/Channel/wsdl'>Channel Service</a></li>
+          </ul>
+        </li>
+        <li><a href='#'>Server Side Scripting</a>
+          <ul class="acitem">
+            <li class="indent1"><a href='#' onClick="javascript:loadContent('/samples/serverside.qsp', '/samples/js/samples.js')">Overview</a></li>
+            <li class="indent1"><a href='#' onClick="javascript:loadContent('/samples/recorded.qsp', '/samples/js/samples.js')">GetRecorded() Example</a></li>
+<%
+    if (devMode)
+    {
+        os.write("<li class='indent1'><a href='#' onClick=\"javascript:loadContent('/samples/storagegroups.qsp', '/samples/js/samples.js')\">GetStorageGroups()</a></li>");
+    }
+%>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+  <br>
+  <center><a class='menuitem' href='http://www.mythtv.org'>www.mythtv.org</a></center>
+</div>

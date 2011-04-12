@@ -63,11 +63,11 @@ class SOAPClient
         QDomNode FindNode( const QString &sName , QDomNode &baseNode );
         QDomNode FindNode( QStringList   &sParts, QDomNode &curNode  );
 
-        bool    SendSOAPRequest( const QString    &sMethod,
-                                       QStringMap &list,
-                                       int        &nErrCode,
-                                       QString    &sErrDesc,
-                                       bool        bInQtThread );
+        QDomDocument SendSOAPRequest( const QString    &sMethod,
+                                            QStringMap &list,
+                                            int        &nErrCode,
+                                            QString    &sErrDesc,
+                                            bool        bInQtThread );
 };
 
 #endif

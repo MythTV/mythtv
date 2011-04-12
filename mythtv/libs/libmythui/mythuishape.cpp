@@ -56,6 +56,9 @@ void MythUIShape::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRect)
 {
     QRect area = GetArea();
+    m_cropRect.CalculateArea(area);
+    if (!m_cropRect.isEmpty())
+        area &= m_cropRect.toQRect();
     area.translate(xoffset, yoffset);
 
     if (m_type == "box")

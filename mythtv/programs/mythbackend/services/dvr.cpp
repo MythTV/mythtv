@@ -55,7 +55,11 @@ DTC::ProgramList* Dvr::GetRecorded( bool bDescending,
 
     ProgramList progList;
 
-    LoadFromRecorded( progList, false, inUseMap, isJobRunning, recMap );
+    int desc = 0;
+    if (bDescending)
+        desc = -1;
+
+    LoadFromRecorded( progList, false, inUseMap, isJobRunning, recMap, desc );
 
     QMap< QString, ProgramInfo* >::iterator mit = recMap.begin();
 
@@ -68,10 +72,11 @@ DTC::ProgramList* Dvr::GetRecorded( bool bDescending,
 
     DTC::ProgramList *pPrograms = new DTC::ProgramList();
 
-    nStartIndex = min( nStartIndex, (int)progList.size() );
-    nCount      = (nCount > 0) ? min( nCount, (int)progList.size() ) : progList.size();
+    nStartIndex   = min( nStartIndex, (int)progList.size() );
+    nCount        = (nCount > 0) ? min( nCount, (int)progList.size() ) : progList.size();
+    int nEndIndex = nStartIndex + nCount;
 
-    for( int n = nStartIndex; n < nCount; n++)
+    for( int n = nStartIndex; n < nEndIndex; n++)
     {
         ProgramInfo *pInfo = progList[ n ];
 
@@ -110,10 +115,11 @@ DTC::ProgramList* Dvr::GetExpiring( int nStartIndex,
 
     DTC::ProgramList *pPrograms = new DTC::ProgramList();
 
-    nStartIndex = min( nStartIndex, (int)infoList.size() );
-    nCount      = (nCount > 0) ? min( nCount, (int)infoList.size() ) : infoList.size();
+    nStartIndex   = min( nStartIndex, (int)infoList.size() );
+    nCount        = (nCount > 0) ? min( nCount, (int)infoList.size() ) : infoList.size();
+    int nEndIndex = nStartIndex + nCount;
 
-    for( int n = nStartIndex; n < nCount; n++)
+    for( int n = nStartIndex; n < nEndIndex; n++)
     {
         ProgramInfo *pInfo = infoList[ n ];
 

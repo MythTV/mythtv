@@ -58,7 +58,7 @@ typedef enum
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
-// SSDPThread Class Definition
+// SSDPThread Class Definition  (Singleton)
 //
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -72,6 +72,8 @@ typedef enum
 class UPNP_PUBLIC SSDP : public QThread
 {
     private:
+        // Singleton instance used by all.
+        static SSDP*        g_pSSDP;  
 
         QRegExp             m_procReqLineExp;
         MSocketDevice      *m_Sockets[3];
@@ -81,10 +83,19 @@ class UPNP_PUBLIC SSDP : public QThread
         int                 m_nServicePort;
 
         UPnpNotifyTask     *m_pNotifyTask;
+        bool                m_bAnnouncementsEnabled;
 
         bool                m_bTermRequested;
         QMutex              m_lock;
 
+    private:
+
+        // ------------------------------------------------------------------
+        // Private so the singleton pattern can be inforced.
+        // ------------------------------------------------------------------
+
+        SSDP   ();
+        
     protected:
 
         bool    ProcessSearchRequest ( const QStringMap &sHeaders,
@@ -103,19 +114,29 @@ class UPNP_PUBLIC SSDP : public QThread
 
         SSDPRequestType ProcessRequestLine( const QString &sLine );
 
+        virtual void run    ();
+ 
     public:
 
-                     SSDP   ( int nServicePort );
-                    ~SSDP   ();
+        static SSDP* Instance();
 
-        virtual void run    ();
+            ~SSDP();
 
-                void RequestTerminate(void);
+        void RequestTerminate(void);
 
-                void EnableNotifications ();
-                void DisableNotifications();
+        void PerformSearch( const QString &sST );
 
-                void PerformSearch( const QString &sST );
+        void EnableNotifications ( int nServicePort );
+        void DisableNotifications();
+
+        // ------------------------------------------------------------------
+
+        static void AddListener   ( QObject *listener ) { SSDPCache::Instance()->addListener   ( listener ); }
+        static void RemoveListener( QObject *listener ) { SSDPCache::Instance()->removeListener( listener ); }
+
+        static SSDPCacheEntries *Find( const QString &sURI )   { return SSDPCache::Instance()->Find( sURI ); }
+        static DeviceLocation   *Find( const QString &sURI, 
+                                       const QString &sUSN )   { return SSDPCache::Instance()->Find( sURI, sUSN ); }
 
 };
 
@@ -146,6 +167,8 @@ class SSDPExtension : public HttpServerExtension
                  SSDPExtension( int nServicePort, const QString sSharePath);
         virtual ~SSDPExtension( );
 
+        virtual QStringList GetBasePaths();
+        
         bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
 };
 

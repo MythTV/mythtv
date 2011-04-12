@@ -342,8 +342,10 @@ VideoOutput::VideoOutput() :
     monitor_sz(640,480),                monitor_dim(400,300),
 
     // OSD
-    osd_painter(NULL),                  osd_image(NULL)
+    osd_painter(NULL),                  osd_image(NULL),
 
+    // Visualisation
+    m_visual(NULL)
 {
     memset(&pip_tmp_image, 0, sizeof(pip_tmp_image));
     db_display_dim = QSize(gCoreContext->GetNumSetting("DisplaySizeWidth",  0),
@@ -400,6 +402,14 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
     (void)embedid;
 
     video_codec_id = codec_id;
+    bool wasembedding = window.IsEmbedding();
+    QRect oldrect;
+    if (wasembedding)
+    {
+        oldrect = window.GetDisplayVisibleRect();
+        StopEmbedding();
+    }
+
     bool mainSuccess = window.Init(
         QSize(width, height), aspect,
         QRect(winx, winy, winw, winh),
@@ -414,6 +424,11 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
     adjustfill      = db_adjustfill >= kAdjustFill_AutoDetect_DefaultOff ?
         (AdjustFillMode) (db_adjustfill - kAdjustFill_AutoDetect_DefaultOff) : db_adjustfill;
 */
+    if (wasembedding)
+    {
+        VERBOSE(VB_PLAYBACK, LOC + "Restoring embedded playback");
+        EmbedInWidget(oldrect.x(), oldrect.y(), oldrect.width(), oldrect.height());
+    }
 
     VideoAspectRatioChanged(aspect); // apply aspect ratio and letterbox mode
 
@@ -626,7 +641,20 @@ bool VideoOutput::ApproveDeintFilter(const QString& filtername) const
             !filtername.contains("vdpau"));
 }
 
+void VideoOutput::GetDeinterlacers(QStringList &deinterlacers)
+{
+    if (!db_vdisp_profile)
+        return;
+    QString rend = db_vdisp_profile->GetActualVideoRenderer();
+    deinterlacers = db_vdisp_profile->GetDeinterlacers(rend);
+}
 
+QString VideoOutput::GetDeinterlacer(void)
+{
+    QString res = m_deintfiltername;
+    res.detach();
+    return res;
+}
 
 /**
  * \fn VideoOutput::VideoAspectRatioChanged(float aspect)
@@ -1279,6 +1307,13 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
             return false;
     }
 
+    if (m_visual)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "Visualiser not supported here");
+        // Clear the audio buffer
+        m_visual->Draw(QRect(), NULL, NULL);
+    }
+
     QRegion dirty   = QRegion();
     QRegion visible = osd->Draw(osd_painter, osd_image, osd_size, dirty,
                                 frame->codec == FMT_YV12 ? ALIGN_X_MMX : 0,
@@ -1325,6 +1360,34 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
         }
     }
     return show;
+}
+
+bool VideoOutput::ToggleVisualisation(AudioPlayer *audio)
+{
+    if (m_visual)
+    {
+        DestroyVisualisation();
+        return false;
+    }
+    return SetupVisualisation(audio, NULL);
+}
+
+bool VideoOutput::CanVisualise(AudioPlayer *audio, MythRender *render)
+{
+    return VideoVisual::CanVisualise(audio, render);
+}
+
+bool VideoOutput::SetupVisualisation(AudioPlayer *audio, MythRender *render)
+{
+    DestroyVisualisation();
+    m_visual = VideoVisual::Create(audio, render);
+    return m_visual;
+}
+
+void VideoOutput::DestroyVisualisation(void)
+{
+    delete m_visual;
+    m_visual = NULL;
 }
 
 /**

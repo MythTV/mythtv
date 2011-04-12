@@ -485,10 +485,6 @@ MythMainWindow::MythMainWindow(const bool useDB)
     d->repaintRegion = QRegion(QRect(0,0,0,0));
 
     d->m_drawEnabled = true;
-
-    connect(this, SIGNAL(signalRemoteScreenShot(QString,int,int)),
-            this, SLOT(doRemoteScreenShot(QString,int,int)),
-            Qt::BlockingQueuedConnection);
 }
 
 MythMainWindow::~MythMainWindow()
@@ -754,105 +750,49 @@ void MythMainWindow::closeEvent(QCloseEvent *e)
         QWidget::closeEvent(e);
 }
 
-bool MythMainWindow::screenShot(QString fname, int x, int y,
-                                int x2, int y2, int w, int h)
+void MythMainWindow::GrabWindow(QImage &image)
 {
-    bool ret = false;
-
-    QString extension = fname.section('.', -1, -1);
-    if (extension == "jpg")
-        extension = "JPEG";
+    WId winid;
+    QWidget *active = QApplication::activeWindow();
+    if (active)
+        winid = active->winId();
     else
-        extension = "PNG";
+        winid = QApplication::desktop()->winId();
 
-    VERBOSE(VB_GENERAL, "MythMainWindow::screenShot saving winId " +
-                        QString("%1 to %2 (%3 x %4) [ %5/%6 - %7/%8] type %9")
-                        .arg((long)QApplication::desktop()->winId())
-                        .arg(fname)
-                        .arg(w).arg(h)
-                        .arg(x).arg(y)
-                        .arg(x2).arg(y2)
-                        .arg(extension));
+    QPixmap p = QPixmap::grabWindow(winid);
+    image = p.toImage();
+}
 
-    QPixmap p;
-    p = QPixmap::grabWindow( QApplication::desktop()->winId(), x, y, x2, y2);
+bool MythMainWindow::SaveScreenShot(const QImage &image)
+{
+    QString fpath = GetMythDB()->GetSetting("ScreenShotPath", "/tmp");
+    QString fname = QString("%1/myth-screenshot-%2.png").arg(fpath)
+        .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddThh-mm-ss.zzz"));
 
-    QImage img = p.toImage();
+    VERBOSE(VB_GENERAL,QString("Saving screenshot to %1 (%2x%3)")
+                       .arg(fname).arg(image.width()).arg(image.height()));
 
-    if ( w == 0 )
-        w = img.width();
-
-    if ( h == 0 )
-        h = img.height();
-
-    VERBOSE(VB_GENERAL, QString("Scaling to %1 x %2 from %3 x %4")
-                        .arg(w)
-                        .arg(h)
-                        .arg(img.width())
-                        .arg(img.height()));
-
-    img = img.scaled(w, h, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-
-    if (img.save(fname, extension.toAscii(), 100))
+    if (image.save(fname))
     {
         VERBOSE(VB_GENERAL, "MythMainWindow::screenShot succeeded");
-        ret = true;
-    }
-    else
-    {
-        VERBOSE(VB_GENERAL, "MythMainWindow::screenShot Failed!");
-        ret = false;
+        return true;
     }
 
-    return ret;
-}
-
-bool MythMainWindow::screenShot(int x, int y, int x2, int y2)
-{
-    QString fPath = GetMythDB()->GetSetting("ScreenShotPath","/tmp/");
-    QString fName = QString("/%1/myth-screenshot-%2.png")
-                    .arg(fPath)
-                    .arg(QDateTime::currentDateTime()
-                         .toString("yyyy-MM-ddThh-mm-ss.zzz"));
-
-    return screenShot(fName, x, y, x2, y2, 0, 0);
-}
-
-bool MythMainWindow::screenShot(QString fname, int w, int h)
-{
-    QWidget *active = QApplication::activeWindow();
-    if (active)
-    {
-        QRect sLoc = active->geometry();
-        return screenShot(fname, sLoc.left(),sLoc.top(),
-                          sLoc.width(), sLoc.height(), w, h);
-    }
+    VERBOSE(VB_GENERAL, "MythMainWindow::screenShot Failed!");
     return false;
 }
 
-void MythMainWindow::remoteScreenShot(QString fname, int w, int h)
+bool MythMainWindow::ScreenShot(int w, int h)
 {
-    // This will be running from the MythFEXML handler, primarily
-    // Since QPixmap must be running in the GUI thread, we need to cross
-    // threads here.
-    emit signalRemoteScreenShot(fname, w, h);
-}
+    QImage img;
+    GrabWindow(img);
+    if (w <= 0)
+        w = img.width();
+    if (h <= 0)
+        h = img.height();
 
-void MythMainWindow::doRemoteScreenShot(QString fname, int w, int h)
-{
-    // This will be running in the GUI thread
-    screenShot(fname, w, h);
-}
-
-bool MythMainWindow::screenShot(void)
-{
-    QWidget *active = QApplication::activeWindow();
-    if (active)
-    {
-        QRect sLoc = active->geometry();
-        return screenShot(sLoc.left(),sLoc.top(), sLoc.width(), sLoc.height());
-    }
-    return false;
+    img = img.scaled(w, h, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    return SaveScreenShot(img);
 }
 
 bool MythMainWindow::event(QEvent *e)
@@ -1045,19 +985,19 @@ void MythMainWindow::Init(void)
 
 void MythMainWindow::InitKeys()
 {
-    RegisterKey("Global", "UP", QT_TRANSLATE_NOOP("MythControls",
+    RegisterKey("Global", ACTION_UP, QT_TRANSLATE_NOOP("MythControls",
         "Up Arrow"),               "Up");
-    RegisterKey("Global", "DOWN", QT_TRANSLATE_NOOP("MythControls",
+    RegisterKey("Global", ACTION_DOWN, QT_TRANSLATE_NOOP("MythControls",
         "Down Arrow"),           "Down");
-    RegisterKey("Global", "LEFT", QT_TRANSLATE_NOOP("MythControls",
+    RegisterKey("Global", ACTION_LEFT, QT_TRANSLATE_NOOP("MythControls",
         "Left Arrow"),           "Left");
-    RegisterKey("Global", "RIGHT", QT_TRANSLATE_NOOP("MythControls",
+    RegisterKey("Global", ACTION_RIGHT, QT_TRANSLATE_NOOP("MythControls",
         "Right Arrow"),         "Right");
     RegisterKey("Global", "NEXT", QT_TRANSLATE_NOOP("MythControls",
         "Move to next widget"),   "Tab");
     RegisterKey("Global", "PREVIOUS", QT_TRANSLATE_NOOP("MythControls",
         "Move to preview widget"), "Backtab");
-    RegisterKey("Global", "SELECT", QT_TRANSLATE_NOOP("MythControls",
+    RegisterKey("Global", ACTION_SELECT, QT_TRANSLATE_NOOP("MythControls",
         "Select"), "Return,Enter,Space");
     RegisterKey("Global", "BACKSPACE", QT_TRANSLATE_NOOP("MythControls",
         "Backspace"),       "Backspace");
@@ -1071,6 +1011,8 @@ void MythMainWindow::InitKeys()
         "Delete"),                  "D");
     RegisterKey("Global", "EDIT", QT_TRANSLATE_NOOP("MythControls",
         "Edit"),                    "E");
+    RegisterKey("Global", ACTION_SCREENSHOT, QT_TRANSLATE_NOOP("MythControls",
+         "Save screenshot"), "");
 
     RegisterKey("Global", "PAGEUP", QT_TRANSLATE_NOOP("MythControls",
         "Page Up"),              "PgUp");
@@ -1106,16 +1048,16 @@ void MythMainWindow::InitKeys()
     RegisterKey("Global", "SEARCH", QT_TRANSLATE_NOOP("MythControls",
         "Show incremental search dialog"), "Ctrl+S");
 
-    RegisterKey("Global", "0", QT_TRANSLATE_NOOP("MythControls","0"), "0");
-    RegisterKey("Global", "1", QT_TRANSLATE_NOOP("MythControls","1"), "1");
-    RegisterKey("Global", "2", QT_TRANSLATE_NOOP("MythControls","2"), "2");
-    RegisterKey("Global", "3", QT_TRANSLATE_NOOP("MythControls","3"), "3");
-    RegisterKey("Global", "4", QT_TRANSLATE_NOOP("MythControls","4"), "4");
-    RegisterKey("Global", "5", QT_TRANSLATE_NOOP("MythControls","5"), "5");
-    RegisterKey("Global", "6", QT_TRANSLATE_NOOP("MythControls","6"), "6");
-    RegisterKey("Global", "7", QT_TRANSLATE_NOOP("MythControls","7"), "7");
-    RegisterKey("Global", "8", QT_TRANSLATE_NOOP("MythControls","8"), "8");
-    RegisterKey("Global", "9", QT_TRANSLATE_NOOP("MythControls","9"), "9");
+    RegisterKey("Global", ACTION_0, QT_TRANSLATE_NOOP("MythControls","0"), "0");
+    RegisterKey("Global", ACTION_1, QT_TRANSLATE_NOOP("MythControls","1"), "1");
+    RegisterKey("Global", ACTION_2, QT_TRANSLATE_NOOP("MythControls","2"), "2");
+    RegisterKey("Global", ACTION_3, QT_TRANSLATE_NOOP("MythControls","3"), "3");
+    RegisterKey("Global", ACTION_4, QT_TRANSLATE_NOOP("MythControls","4"), "4");
+    RegisterKey("Global", ACTION_5, QT_TRANSLATE_NOOP("MythControls","5"), "5");
+    RegisterKey("Global", ACTION_6, QT_TRANSLATE_NOOP("MythControls","6"), "6");
+    RegisterKey("Global", ACTION_7, QT_TRANSLATE_NOOP("MythControls","7"), "7");
+    RegisterKey("Global", ACTION_8, QT_TRANSLATE_NOOP("MythControls","8"), "8");
+    RegisterKey("Global", ACTION_9, QT_TRANSLATE_NOOP("MythControls","9"), "9");
 
     RegisterKey("Global", "SYSEVENT01", QT_TRANSLATE_NOOP("MythControls",
         "Trigger System Key Event #1"), "");
@@ -1455,7 +1397,25 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
     if (e->key() == 0 && !e->text().isEmpty() &&
         e->modifiers() == Qt::NoModifier)
     {
-        actions.append(e->text());
+        QString action = e->text();
+        // check if it is a jumppoint
+        if (!d->destinationMap.contains(action))
+        {
+            actions.append(action);
+            return false;
+        }
+
+        if (allowJumps)
+        {
+            // This does not filter the jump based on the current location but
+            // is consistent with handling of other actions that do not need
+            // a keybinding. The network control code tries to match
+            // GetCurrentLocation with the jumppoint but matching is utterly
+            // inconsistent e.g. mainmenu<->Main Menu, Playback<->Live TV
+            JumpTo(action);
+            return true;
+        }
+
         return false;
     }
 
@@ -1744,9 +1704,7 @@ void MythMainWindow::RegisterJump(const QString &destination,
 
 void MythMainWindow::JumpTo(const QString& destination, bool pop)
 {
-    if (destination == "ScreenShot")
-        screenShot();
-    else if (d->destinationMap.count(destination) > 0 && d->exitmenucallback == NULL)
+    if (d->destinationMap.count(destination) > 0 && d->exitmenucallback == NULL)
     {
         d->exitingtomain = true;
         d->popwindows = pop;
@@ -2223,6 +2181,19 @@ void MythMainWindow::customEvent(QEvent *ce)
             HandleMedia(tokens[1],
                         message.mid(tokens[0].length() +
                                     tokens[1].length() + 2));
+        }
+        else if (message.startsWith(ACTION_SCREENSHOT))
+        {
+            if (me->ExtraDataCount() == 2)
+            {
+                int width  = me->ExtraData(0).toInt();
+                int height = me->ExtraData(1).toInt();
+                ScreenShot(width, height);
+            }
+            else
+            {
+                ScreenShot();
+            }
         }
     }
     else if ((MythEvent::Type)(ce->type()) == MythEvent::MythUserMessage)

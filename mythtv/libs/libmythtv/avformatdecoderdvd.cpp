@@ -15,6 +15,12 @@ AvFormatDecoderDVD::AvFormatDecoderDVD(
 {
 }
 
+void AvFormatDecoderDVD::Reset(bool reset_video_data, bool seek_reset, bool reset_file)
+{
+    AvFormatDecoder::Reset(reset_video_data, seek_reset, reset_file);
+    SyncPositionMap();
+}
+
 void AvFormatDecoderDVD::PostProcessTracks(void)
 {
     if (!ringBuffer)

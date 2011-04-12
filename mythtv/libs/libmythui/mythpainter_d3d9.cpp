@@ -52,9 +52,7 @@ void MythD3D9Painter::Teardown(void)
     DeleteBitmaps();
 
     m_ImageBitmapMap.clear();
-    m_StringToImageMap.clear();
     m_ImageExpireList.clear();
-    m_StringExpireList.clear();
     m_bitmapDeleteList.clear();
 
     if (m_render)
@@ -140,7 +138,7 @@ void MythD3D9Painter::DeleteBitmaps(void)
     {
         D3D9Image *img = m_bitmapDeleteList.front();
         m_bitmapDeleteList.pop_front();
-        DecreaseCacheSize(img->GetSize());
+        m_HardwareCacheSize -= img->GetDataSize();
         delete img;
     }
 }
@@ -166,7 +164,7 @@ void MythD3D9Painter::DrawRect(const QRect &area, const QBrush &fillBrush,
             return;
 
         if (style != Qt::NoBrush)
-            m_render->DrawRect(area, fillBrush.color());
+            m_render->DrawRect(area, fillBrush.color(), alpha);
 
         if (linePen.style() != Qt::NoPen)
         {
@@ -179,11 +177,12 @@ void MythD3D9Painter::DrawRect(const QRect &area, const QBrush &fillBrush,
                        QSize(lineWidth, area.height()));
             QRect right(QPoint(area.x() + area.width() - lineWidth, area.y()),
                         QSize(lineWidth, area.height()));
-            m_render->DrawRect(top,   linePen.color());
-            m_render->DrawRect(bot,   linePen.color());
-            m_render->DrawRect(left,  linePen.color());
-            m_render->DrawRect(right, linePen.color());
+            m_render->DrawRect(top,   linePen.color(), alpha);
+            m_render->DrawRect(bot,   linePen.color(), alpha);
+            m_render->DrawRect(left,  linePen.color(), alpha);
+            m_render->DrawRect(right, linePen.color(), alpha);
         }
+        return;
     }
 
     MythPainter::DrawRect(area, fillBrush, linePen, alpha);
@@ -224,12 +223,12 @@ D3D9Image* MythD3D9Painter::GetImageFromCache(MythImage *im)
     if (newimage && newimage->IsValid())
     {
         CheckFormatImage(im);
-        IncreaseCacheSize(newimage->GetSize());
+        m_HardwareCacheSize += newimage->GetDataSize();
         newimage->UpdateImage(im);
         m_ImageBitmapMap[im] = newimage;
         m_ImageExpireList.push_back(im);
 
-        while (m_CacheSize > m_MaxCacheSize)
+        while (m_HardwareCacheSize > m_MaxHardwareCacheSize)
         {
             MythImage *expiredIm = m_ImageExpireList.front();
             m_ImageExpireList.pop_front();

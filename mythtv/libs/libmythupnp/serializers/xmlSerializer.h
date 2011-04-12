@@ -48,13 +48,16 @@ class UPNP_PUBLIC XmlSerializer : public Serializer
         QXmlStreamWriter *m_pXmlWriter;
         QString           m_sRequestName;
 
-        virtual void BeginSerialize();
+        virtual void BeginSerialize( QString &sName );
         virtual void EndSerialize  ();
 
         virtual void BeginObject( const QString &sName, const QObject  *pObject );
         virtual void EndObject  ( const QString &sName, const QObject  *pObject );
-        virtual void AddProperty( const QString &sName, const QVariant &vValue );
 
+        virtual void AddProperty( const QString       &sName, 
+                                  const QVariant      &vValue,
+                                  const QMetaObject   *pMetaParent,
+                                  const QMetaProperty *pMetaProp );
 
         void    RenderValue     ( const QString &sName, const QVariant     &vValue );
 
@@ -64,6 +67,9 @@ class UPNP_PUBLIC XmlSerializer : public Serializer
 
         QString GetItemName     ( const QString &sName );
 
+        QString GetContentName  ( const QString        &sName, 
+                                  const QMetaObject   *pMetaObject,
+                                  const QMetaProperty *pMetaProp );
 
     public:
 

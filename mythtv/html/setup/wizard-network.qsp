@@ -1,0 +1,45 @@
+<div id='wizard-network' class='setuptab'>
+<input type='hidden' id='MasterServerIP'>
+<table>
+    <tr><th align=right>Master Backend:</th>
+        <td id='MasterServerIP_cell'>&nbsp;
+            <a href="javascript:showSettingHelp('MasterServerIP')">[?]</a>
+            </td></tr>
+    <tr><th align=right>Local Backend:</th>
+        <td id='BackendServerIP_cell'>&nbsp;
+            <a href="javascript:showSettingHelp('BackendServerIP')">[?]</a>
+            </td></tr>
+    <tr><th align=right>Security PIN:</th>
+        <td><input id='SecurityPin' type='password' size=10>
+            <a href="javascript:showSettingHelp('SecurityPin')">[?]</a>
+            <div class="form_error" id="SecurityPin_error"></div>
+            </td></tr>
+</table>
+<div id='navigation' style="text-align:right">
+    <input type=button value='Back' onClick='javascript:$("#wizardtabs").tabs("select", 0)'>
+    <input type=button value='Next' onClick='javascript:$("#wizardtabs").tabs("select", 2)'>
+</div>
+<hr>
+If the setting you are looking for is not available here, you can go to the <a href="javascript:hideEditWindow(); 
+loadContent('/Config/General?__group__=local_server')">Advanced General Setup Screen</a>
+</div>
+
+<script language="JavaScript" type="text/javascript">
+    var options = getOptionList("/Config/GetValueList?List=LocalIPAddress",
+                                settingsList["BackendServerIP"]);
+
+    $("#MasterServerIP_cell").prepend("<b>" + settingsList["MasterServerIP"] + "</b>");
+    $("#BackendServerIP_cell").prepend("<select id='BackendServerIP'>" + options
+       + "</select>");
+
+    setSettingInputValues("wizard-network");
+
+    if ((settingsList["BackendServerIP"] != "") &&
+        (settingsList["MasterServerIP"] != settingsList["BackendServerIP"])) {
+        $("#MasterServerIP_cell").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+            + "<input type='button' "
+            + " onClick='javascript:makeLocalBackendTheMaster()' "
+            + " value='Make this server the master backend'>");
+    }
+
+</script>
