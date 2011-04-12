@@ -117,11 +117,11 @@ function editSelectedChannel() {
 
     /* Expert */
 
-    $("#channelDetailSettingChanId").html("<b>" + rowdata.ChanId + "</b>");
-    $("#channelDetailSettingSourceId").html("<b>" + rowdata.SourceId + "</b>");
-    $("#channelDetailSettingModulation").html("<b>" + rowdata.Modulation + "</b>")
-    $("#channelDetailSettingFrequency").html("<b>" + rowdata.Frequency + "</b>")
-    $("#channelDetailSettingSIStandard").html("<b>" + rowdata.SIStandard + "</b>")
+    $("#channelDetailSettingChanId").html(rowdata.ChanId);
+    $("#channelDetailSettingSourceId").html(rowdata.SourceId);
+    $("#channelDetailSettingModulation").html(rowdata.Modulation)
+    $("#channelDetailSettingFrequency").html(rowdata.Frequency)
+    $("#channelDetailSettingSIStandard").html(rowdata.SIStandard )
 
     $("#edit").dialog({
         modal: true,
@@ -130,13 +130,72 @@ function editSelectedChannel() {
         'title': 'Edit Channel',
         closeOnEscape: false,
         buttons: {
-           'Save': function() {},
+           'Save': function() { saveChannelEdits(); },
            'Cancel': function() { $(this).dialog('close'); }
     }});
 
     $("#channelsettings").accordion();
 
     $("#edit").dialog("open");
+}
+
+function saveChannelEdits() {
+    var mplexid = $("#channelDetailSettingMplexId").val();
+    var sourceid = $("#channelDetailSettingSourceId").html();
+    var chanid = $("#channelDetailSettingChanId").html()
+
+    var callsign = $("#channelDetailSettingCallSign").val();
+    var channelname = $("#channelDetailSettingChannelName").val();
+    var channum =  $("#channelDetailSettingChanNum").val();
+    var serviceid =  $("#channelDetailSettingServiceId").val();
+    var atscmajorchannel =  $("#channelDetailSettingATSCMajorChannel").val();
+    var atscminorchannel =  $("#channelDetailSettingATSCMinorChannel").val();
+
+    var useeit = false;
+
+    if ($("#channelDetailSettingUseEIT").attr("checked")) {
+        useeit = true;
+    }
+
+    var visible = false;
+
+    if ($("#channelDetailSettingVisible").attr("checked")) {
+        visible = true;
+    }
+
+    var frequencyid = $("#channelDetailSettingFrequencyId").val();
+    var icon = $("#channelDetailSettingIconURL").val();
+    var format = $("#channelDetailSettingFormat").val();
+    var xmltvid = $("#channelDetailSettingXMLTVID").val();
+    var defaultauth = $("#channelDetailSettingDefaultAuthority").val();
+
+    if ($("#channels").jqGrid('setRowData', chanid,
+        { MplexID: mplexid, SourceID: sourceid, ChanID: chanid,
+        CallSign: callsign, ChannelName: channelname, ChanNum: channum,
+        ServiceID: serviceid, ATSCMajorChan: atscmajorchannel,
+        ATSCMinorChan: atscminorchannel, UseEIT: useeit, Visible: visible,
+        FrequencyID: frequencyid, IconURL: icon, Format: format, XMLTVID: xmltvid,
+        DefaultAuth: defaultauth }))
+        {
+            $.post("/Channel/UpdateDBChannel",
+                { MplexID: mplexid, SourceID: sourceid, ChannelID: chanid,
+                  CallSign: callsign, ChannelName: channelname, ChannelNumber: channum,
+                  ServiceID: serviceid, ATSCMajorChannel: atscmajorchannel,
+                  ATSCMinorChannel: atscminorchannel, UseEIT: useeit, visible: visible,
+                  FrequencyID: frequencyid, Icon: icon, Format: format, XMLTVID: xmltvid,
+                  DefaultAuthority: defaultauth},
+                  function(data) {
+                      if (data.bool == "true") {
+                          setStatusMessage("Channel updated successfully!");
+                          $("#edit").dialog('close');
+                          $('#channels').trigger('reloadGrid');
+                      }
+                      else
+                          setErrorMessage("Channel update failed!");
+                  }, "json");
+
+            setStatusMessage("Updating channel...");
+        }
 }
 
 function promptToDeleteChannel() {
