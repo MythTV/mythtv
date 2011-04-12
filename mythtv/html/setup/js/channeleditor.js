@@ -68,6 +68,26 @@ function initChannelEditor() {
     /* Sort ascending by Channel Number on load */
 
     $("#channels").setGridParam({sortname:'ChanNum', sortorder:'asc'}).trigger('reloadGrid');
+
+    /* Initialize the Popup Menu */
+
+    $("#channels").contextMenu('channelmenu', {
+            bindings: {
+                'editopt': function(t) {
+                    editSelectedChannel();
+                },
+                'del': function(t) {
+                    promptToDeleteChannel();
+                }
+            },
+            onContextMenu : function(event, menu) {
+                var rowId = $(event.target).parent("tr").attr("id")
+                var grid = $("#channels");
+                if (rowId != $('#channels').getGridParam('selrow'))
+                    grid.setSelection(rowId);
+                return true;
+            }
+    });
 }
 
 function reloadChannelGrid() {
@@ -201,8 +221,9 @@ function saveChannelEdits() {
 function promptToDeleteChannel() {
     var message = "Are you sure you want to delete these channels?  This cannot be undone.";
     var rowNum = $('#channels').getGridParam('selrow');
+    var rowArr = $('#channels').getGridParam('selarrrow');
     if (rowNum != null) {
-        if (rowNum.length == 1) {
+        if (rowArr.length == 1) {
             message = "Are you sure you want to delete this channel?  This cannot be undone.";
         }
         showConfirm(message, deleteSelectedChannel);
