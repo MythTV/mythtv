@@ -18,7 +18,7 @@ class StreamingRingBuffer : public RingBuffer
     virtual bool OpenFile(const QString &lfilename,
                           uint retry_ms = kDefaultOpenTimeout);
     virtual long long Seek(long long pos, int whence, bool has_lock);
-    virtual long long GetRealFileSize(void);
+    virtual long long GetRealFileSize(void) const;
     virtual bool IsStreamed(void) { return true; }
 
   protected:
