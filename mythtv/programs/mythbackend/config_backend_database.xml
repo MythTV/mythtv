@@ -8,7 +8,7 @@
                         a unix pipe." />
     <setting setting_type="file" value="dbPort" default_data="3306" label="Port"
              help_text="Port on which the remote database server listens."
-             data_type="integer_range" range_min="0" range_max="0xffff" />
+             data_type="integer_range" range_min="0" range_max="65535" />
     <setting setting_type="file" value="dbPing" default_data="1" label="Ping"
              help_text="Ping the remote server." data_type="checkbox" />
     <setting setting_type="file" value="dbName" default_data="mythconverg"

@@ -187,7 +187,41 @@ QString MythSetting::ToHTML(uint level) const
     {
         case kInteger:
         case kUnsignedInteger:
-        case kIntegerRange:
+            ret += indent(level) +
+                QString("<div class=\"setting_label\"><label for=\"%1\">%2: ")
+                .arg(value).arg(label);
+            ret += indent(level) +
+                QString("<input name=\"%1\" id=\"%2\" type=\"number\""
+                        " value='%3' step='1' size='%4'/></label>\r\n")
+                .arg(value).arg(value).arg(data).arg(size);
+            ret += indent(level) +
+                QString("<a class=\"helpLink\" href=\"javascript:showSettingHelp('%1')"
+                        "\">[?]</a></label></div>\r\n").arg(value);
+            ret += indent(level) +
+                QString("<div class=\"form_error\""
+                        "id=\"%1_error\"></div><div style=\"display:none;"
+                        "position:absolute;left:-4000px\" "
+                        "id=\"%2_default\">%3</div>\r\n")
+                .arg(value).arg(value).arg(default_data);
+            break;
+         case kIntegerRange:
+            ret += indent(level) +
+                QString("<div class=\"setting_label\"><label for=\"%1\">%2: ")
+                .arg(value).arg(label);
+            ret += indent(level) +
+                QString("<input name=\"%1\" id=\"%2\" type=\"number\""
+                        " value='%3' min='%4' max='%5' step='1' size='%6'/></label>\r\n")
+                .arg(value).arg(value).arg(data).arg(range_min).arg(range_max).arg(size);
+            ret += indent(level) +
+                QString("<a class=\"helpLink\" href=\"javascript:showSettingHelp('%1')"
+                        "\">[?]</a></label></div>\r\n").arg(value);
+            ret += indent(level) +
+                QString("<div class=\"form_error\""
+                        "id=\"%1_error\"></div><div style=\"display:none;"
+                        "position:absolute;left:-4000px\" "
+                        "id=\"%2_default\">%3</div>\r\n")
+                .arg(value).arg(value).arg(default_data);
+            break;
         case kFloat:
         case kComboBox:
         case kIPAddress:
