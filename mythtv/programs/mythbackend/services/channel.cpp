@@ -264,8 +264,9 @@ DTC::VideoMultiplexList* Channel::GetVideoMultiplexList( int nSourceID,
                   "msystem, modulation, bandwidth, lp_code_rate, transmission_mode, "
                   "guard_interval, visible, constellation, hierarchy, hp_code_rate, "
                   "mod_sys, rolloff, sistandard, serviceversion, updatetimestamp, "
-                  "default_authority FROM dtv_multiplex "
+                  "default_authority FROM dtv_multiplex WHERE sourceid = :SOURCEID "
                   "ORDER BY mplexid" );
+    query.bindValue(":SOURCEID", nSourceID);
 
     if (!query.exec())
     {

@@ -127,10 +127,12 @@ function editSelectedChannel() {
 
     /* Advanced */
 
+    var sourceid = rowdata.SourceId;
+
     $("#channelDetailSettingFrequencyId").val(rowdata.FrequencyId);
-    $("#channelDetailSettingMplexId").val(rowdata.MplexId);
+    $("#channelDetailSettingMplexId").html(initVideoMultiplexSelect(sourceid));
+    $("#mplexList").val(rowdata.MplexId);
     $("#channelDetailSettingServiceId").val(rowdata.ServiceId);
-    $("#channelDetailSettingFormat").val(rowdata.Format);
     $("#channelDetailSettingDefaultAuthority").val(rowdata.DefaultAuth);
     $("#channelDetailSettingATSCMajorChannel").val(rowdata.ATSCMajorChan);
     $("#channelDetailSettingATSCMinorChannel").val(rowdata.ATSCMinorChan);
@@ -138,10 +140,11 @@ function editSelectedChannel() {
     /* Expert */
 
     $("#channelDetailSettingChanId").html(rowdata.ChanId);
-    $("#channelDetailSettingSourceId").html(rowdata.SourceId);
+    $("#channelDetailSettingSourceId").html(sourceid);
     $("#channelDetailSettingModulation").html(rowdata.Modulation)
     $("#channelDetailSettingFrequency").html(rowdata.Frequency)
-    $("#channelDetailSettingSIStandard").html(rowdata.SIStandard )
+    $("#channelDetailSettingSIStandard").html(rowdata.SIStandard)
+    $("#channelDetailSettingFormat").html(rowdata.Format);
 
     $("#edit").dialog({
         modal: true,
@@ -160,7 +163,7 @@ function editSelectedChannel() {
 }
 
 function saveChannelEdits() {
-    var mplexid = $("#channelDetailSettingMplexId").val();
+    var mplexid = $("#mplexList").val();
     var sourceid = $("#channelDetailSettingSourceId").html();
     var chanid = $("#channelDetailSettingChanId").html()
 
@@ -190,11 +193,11 @@ function saveChannelEdits() {
     var defaultauth = $("#channelDetailSettingDefaultAuthority").val();
 
     if ($("#channels").jqGrid('setRowData', chanid,
-        { MplexID: mplexid, SourceID: sourceid, ChanID: chanid,
+        { MplexId: mplexid, SourceId: sourceid, ChanId: chanid,
         CallSign: callsign, ChannelName: channelname, ChanNum: channum,
-        ServiceID: serviceid, ATSCMajorChan: atscmajorchannel,
+        ServiceId: serviceid, ATSCMajorChan: atscmajorchannel,
         ATSCMinorChan: atscminorchannel, UseEIT: useeit, Visible: visible,
-        FrequencyID: frequencyid, IconURL: icon, Format: format, XMLTVID: xmltvid,
+        FrequencyId: frequencyid, IconURL: icon, Format: format, XMLTVID: xmltvid,
         DefaultAuth: defaultauth }))
         {
             $.post("/Channel/UpdateDBChannel",
@@ -257,6 +260,34 @@ function getGuideSourceList() {
         });
     });
     $.ajaxSetup({ async: true });
+
+    return result;
+}
+
+function getVideoMultiplexList(sourceid) {
+    var result = '';
+
+    $.ajaxSetup({ async: false });
+    $.post("/Channel/GetVideoMultiplexList",
+        { SourceID : sourceid },
+        function(data) {
+        $.each(data.VideoMultiplexList.VideoMultiplexes, function(i, value) {
+            var label = '';
+            if (value.TransportId > 0)
+                label = value.MplexId + " " + "(Transport: " + value.TransportId + ")";
+            else
+                label = value.MplexId + " " + "(Frequency: " + value.Frequency + ")";
+            result += "<option value='" + value.MplexId + "'>" + label + "</option>";
+        });
+    }, "json");
+    $.ajaxSetup({ async: true });
+
+    return result;
+}
+
+function initVideoMultiplexSelect(sourceid) {
+    var result = "<select id='mplexList'> "
+        + getVideoMultiplexList(sourceid) + "</select>";
 
     return result;
 }
