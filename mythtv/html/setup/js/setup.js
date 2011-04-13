@@ -16,6 +16,9 @@ function setupPageName(path) {
 }
 
 function showHelpWindow() {
+    var helpHeight = $("#helpWindow").parent().height();
+    $("#helpWindow").dialog("option", "position",
+        [(window.innerWidth - 330), (window.innerHeight - (helpHeight + 30))]);
     $("#helpWindow").show();
     $("#helpWindow").draggable();
 }
@@ -28,8 +31,9 @@ function showHelp(title, content) {
     $("#helpWindow").dialog({
       'title': title,
       'width': 300,
-      'height': 150,
-      'position': [(window.innerWidth - 330), (window.innerHeight - 180)]
+      'height': 'auto',
+      'minHeight': 20,
+      'position': [(window.innerWidth - 330), window.innerHeight]
     });
     $("#helpWindow").html(content);
     showHelpWindow();
