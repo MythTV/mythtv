@@ -8,7 +8,7 @@
                         a Unix pipe." />
     <setting setting_type="file" value="dbPort" default_data="3306" label="Port"
              help_text="Connect to the database server on this port.  MySQL
-                        uses '3306'"
+                        uses '3306'."
              data_type="integer_range" range_min="0" range_max="65535" />
     <setting setting_type="file" value="dbPing" default_data="1" label="Ping"
              help_text="Ping the remote server to confirm that it's on the
@@ -21,7 +21,7 @@
     <setting setting_type="file" value="dbUserName" default_data="mythtv"
              label="User" data_type="string"
              help_text="Database user name which has read and write
-                        privileges to MythTV tables" />
+                        privileges to MythTV tables." />
     <setting setting_type="file" value="dbPassword" default_data="mythtv"
              label="Password" data_type="string"
              help_text="Password for database user." />
