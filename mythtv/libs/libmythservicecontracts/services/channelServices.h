@@ -29,6 +29,8 @@
 #include "datacontracts/channelInfoList.h"
 #include "datacontracts/videoSource.h"
 #include "datacontracts/videoSourceList.h"
+#include "datacontracts/videoMultiplex.h"
+#include "datacontracts/videoMultiplexList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -64,9 +66,13 @@ class SERVICE_PUBLIC ChannelServices : public Service
             DTC::ChannelInfoList::InitializeCustomTypes();
             DTC::VideoSource::InitializeCustomTypes();
             DTC::VideoSourceList::InitializeCustomTypes();
+            DTC::VideoMultiplex::InitializeCustomTypes();
+            DTC::VideoMultiplexList::InitializeCustomTypes();
         }
 
     public slots:
+
+        /* Channel Methods */
 
         virtual DTC::ChannelInfoList*  GetChannelInfoList  ( int           SourceID,
                                                              int           StartIndex,
@@ -108,7 +114,15 @@ class SERVICE_PUBLIC ChannelServices : public Service
 
         virtual bool                   DeleteDBChannel     ( uint          ChannelID ) = 0;
 
+        /* Video Source Methods */
+
         virtual DTC::VideoSourceList*  GetVideoSourceList  ( void ) = 0;
+
+        /* Multiplex Methods */
+
+        virtual DTC::VideoMultiplexList*  GetVideoMultiplexList  ( int SourceID,
+                                                                   int StartIndex,
+                                                                   int Count      ) = 0;
 };
 
 #endif

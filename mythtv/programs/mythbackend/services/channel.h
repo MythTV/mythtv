@@ -36,6 +36,8 @@ class Channel : public ChannelServices
 
     public:
 
+        /* Channel Methods */
+
         DTC::ChannelInfoList*  GetChannelInfoList  ( int      SourceID,
                                                      int      StartIndex,
                                                      int      Count      );
@@ -76,7 +78,15 @@ class Channel : public ChannelServices
 
         bool                   DeleteDBChannel     ( uint          ChannelID );
 
+        /* Video Source Methods */
+
         DTC::VideoSourceList*  GetVideoSourceList  ( void );
+
+        /* Multiplex Methods */
+
+        DTC::VideoMultiplexList*  GetVideoMultiplexList  ( int SourceID,
+                                                           int StartIndex,
+                                                           int Count      );
 };
 
 // --------------------------------------------------------------------------
@@ -171,6 +181,13 @@ class ScriptableChannel : public QObject
         QObject* GetVideoSourceList ( void )
         {
             return m_obj.GetVideoSourceList();
+        }
+
+        QObject* GetVideoMultiplexList  ( int      SourceID,
+                                          int      StartIndex,
+                                          int      Count      )
+        {
+            return m_obj.GetVideoMultiplexList( SourceID, StartIndex, Count );
         }
 
 };

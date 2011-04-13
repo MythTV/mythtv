@@ -234,3 +234,8 @@
         background-repeat: repeat-x;
         background-position: top;
     }
+
+    .form_error
+    {
+        color:    red;
+    }

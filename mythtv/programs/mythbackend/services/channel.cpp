@@ -249,3 +249,99 @@ DTC::VideoSourceList* Channel::GetVideoSourceList()
     return pList;
 }
 
+DTC::VideoMultiplexList* Channel::GetVideoMultiplexList( int nSourceID,
+                                                         int nStartIndex,
+                                                         int nCount )
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!query.isConnected())
+        throw( QString("Database not open while trying to list "
+                       "Video Sources."));
+
+    query.prepare("SELECT mplexid, sourceid, transportid, networkid, "
+                  "frequency, inversion, symbolrate, fec, polarity, "
+                  "msystem, modulation, bandwidth, lp_code_rate, transmission_mode, "
+                  "guard_interval, visible, constellation, hierarchy, hp_code_rate, "
+                  "mod_sys, rolloff, sistandard, serviceversion, updatetimestamp, "
+                  "default_authority FROM dtv_multiplex "
+                  "ORDER BY mplexid" );
+
+    if (!query.exec())
+    {
+        MythDB::DBError("MythAPI::GetVideoMultiplexList()", query);
+
+        throw( QString( "Database Error executing query." ));
+    }
+
+    int muxCount = query.size();
+
+    // ----------------------------------------------------------------------
+    // Build Response
+    // ----------------------------------------------------------------------
+
+    DTC::VideoMultiplexList *pVideoMultiplexes = new DTC::VideoMultiplexList();
+
+    nStartIndex   = min( nStartIndex, muxCount );
+    nCount        = (nCount > 0) ? min( nCount, muxCount ) : muxCount;
+    int nEndIndex = nStartIndex + nCount;
+
+    for( int n = nStartIndex; n < nEndIndex; n++)
+    {
+        if (query.seek(n))
+        {
+            DTC::VideoMultiplex *pVideoMultiplex = pVideoMultiplexes->AddNewVideoMultiplex();
+
+            pVideoMultiplex->setMplexId(            query.value(0).toInt()          );
+            pVideoMultiplex->setSourceId(           query.value(1).toInt()          );
+            pVideoMultiplex->setTransportId(        query.value(2).toInt()          );
+            pVideoMultiplex->setNetworkId(          query.value(3).toInt()          );
+            pVideoMultiplex->setFrequency(          query.value(4).toLongLong()     );
+            pVideoMultiplex->setInversion(          query.value(5).toString()       );
+            pVideoMultiplex->setSymbolRate(         query.value(6).toLongLong()     );
+            pVideoMultiplex->setFEC(                query.value(7).toString()       );
+            pVideoMultiplex->setPolarity(           query.value(8).toString()       );
+            pVideoMultiplex->setMSystem(            query.value(9).toString()       );
+            pVideoMultiplex->setModulation(         query.value(10).toString()      );
+            pVideoMultiplex->setBandwidth(          query.value(11).toString()      );
+            pVideoMultiplex->setLPCodeRate(         query.value(12).toString()      );
+            pVideoMultiplex->setTransmissionMode(   query.value(13).toString()      );
+            pVideoMultiplex->setGuardInterval(      query.value(14).toString()      );
+            pVideoMultiplex->setVisible(            query.value(15).toBool()        );
+            pVideoMultiplex->setConstellation(      query.value(16).toString()      );
+            pVideoMultiplex->setHierarchy(          query.value(17).toString()      );
+            pVideoMultiplex->setHPCodeRate(         query.value(18).toString()      );
+            pVideoMultiplex->setModulationSystem(   query.value(19).toString()      );
+            pVideoMultiplex->setRollOff(            query.value(20).toString()      );
+            pVideoMultiplex->setSIStandard(         query.value(21).toString()      );
+            pVideoMultiplex->setServiceVersion(     query.value(22).toInt()         );
+            pVideoMultiplex->setUpdateTimeStamp(    query.value(23).toDateTime()    );
+            pVideoMultiplex->setDefaultAuthority(   query.value(24).toString()      );
+        }
+    }
+
+    int curPage = 0, totalPages = 0;
+    if (nCount == 0)
+        totalPages = 1;
+    else
+        totalPages = (int)ceil((float)muxCount / nCount);
+
+    if (totalPages == 1)
+        curPage = 1;
+    else
+    {
+        curPage = (int)ceil((float)nStartIndex / nCount) + 1;
+    }
+
+    pVideoMultiplexes->setStartIndex    ( nStartIndex     );
+    pVideoMultiplexes->setCount         ( nCount          );
+    pVideoMultiplexes->setCurrentPage   ( curPage         );
+    pVideoMultiplexes->setTotalPages    ( totalPages      );
+    pVideoMultiplexes->setTotalAvailable( muxCount        );
+    pVideoMultiplexes->setAsOf          ( QDateTime::currentDateTime() );
+    pVideoMultiplexes->setVersion       ( MYTH_BINARY_VERSION );
+    pVideoMultiplexes->setProtoVer      ( MYTH_PROTO_VERSION  );
+
+    return pVideoMultiplexes;
+}
+
