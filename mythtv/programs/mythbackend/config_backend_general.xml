@@ -27,8 +27,8 @@
          range_min="0" range_max="65535" />
       <setting
          value="SecurityPin" default_data=""
-         setting_type="host" label="Security Pin (Required)"
-         help_text="Pin code required for a frontend to connect
+         setting_type="host" label="Security PIN (Required)"
+         help_text="PIN code required for a frontend to connect
                     to the backend. Blank prevents all connections,
                     0000 allows any client to connect."
          data_type="string" />
