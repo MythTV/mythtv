@@ -105,7 +105,6 @@ AutoExpire::~AutoExpire()
     {
         gCoreContext->removeListener(this);
         expire_thread_run = false;
-        expireThread.quit();
         VERBOSE(VB_IMPORTANT, LOC + "Warning: Stopping auto expire thread "
                 "can take several seconds. Please be patient.");
         expireThread.wait();
@@ -318,7 +317,7 @@ void AutoExpire::RunExpirer(void)
 }
 
 /** \fn AutoExpire::Sleep(int sleepTime)
- *  \brief Sleeps for sleepTime minutes; unless the expire thread
+ *  \brief Sleeps for sleepTime seconds; unless the expire thread
  *         is told to quit, then stops sleeping within 5 seconds.
  */
 void AutoExpire::Sleep(int sleepTime)
@@ -328,7 +327,7 @@ void AutoExpire::Sleep(int sleepTime)
     {
         if (timeExpended > (sleepTime - minSleep))
             minSleep = sleepTime - timeExpended;
-        timeExpended += minSleep - (int)sleep(minSleep);
+        timeExpended += minSleep - (int)::sleep(minSleep);
     }
 }
 
@@ -1010,13 +1009,12 @@ void UpdateThread::run(void)
         return;
 
     sleep(5);
+
     m_parent->CalcParams();
     m_parent->instance_lock.lock();
     m_parent->update_pending = false;
     m_parent->instance_cond.wakeAll();
     m_parent->instance_lock.unlock();
-
-    this->deleteLater();
 }
 
 /**
@@ -1067,6 +1065,12 @@ void AutoExpire::Update(int encoder, int fsID, bool immediately)
     else
     {
         // create thread to do work
+        if( expirer->updateThread )
+        {
+            if( expirer->updateThread->isRunning() )
+                expirer->updateThread->wait();
+            delete expirer->updateThread;
+        }
         expirer->updateThread = new UpdateThread;
         expirer->updateThread->SetParent(expirer);
         expirer->updateThread->start();

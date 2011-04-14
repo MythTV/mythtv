@@ -41,10 +41,11 @@ class ExpireThread : public QThread
     Q_OBJECT
   public:
     ExpireThread() : m_parent(NULL) {}
+    ~ExpireThread() { wait(); }
     void SetParent(AutoExpire *parent) { m_parent = parent; }
     void run(void);
   private:
-    AutoExpire *m_parent;
+    QPointer<AutoExpire> m_parent;
 };
 
 class UpdateThread : public QThread
@@ -55,7 +56,7 @@ class UpdateThread : public QThread
     void SetParent(AutoExpire *parent) { m_parent = parent; }
     void run(void);
   private:
-    AutoExpire *m_parent;
+    QPointer<AutoExpire> m_parent;
 };
 
 class AutoExpire : public QObject
