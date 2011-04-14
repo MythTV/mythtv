@@ -358,5 +358,10 @@ function initVideoMultiplexSelect(sourceid) {
     return result;
 }
 
+function browseForNewChanIcon() {
+    openStorageGroupBrowser("Channel Icon", "channelDetailSettingIconURL",
+                            "ChannelIcons");
+}
+
 initSourceList();
 initChannelEditor();

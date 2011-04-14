@@ -6,7 +6,7 @@ function editJob(title, descKey, commandKey) {
       'title': title,
       modal:   true,
       width:   850,
-      height:  500,
+      height:  'auto',
       buttons: {
          'Save': function() {
                                 saveJobEditor(); 
