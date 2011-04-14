@@ -244,7 +244,17 @@ function deleteSelectedChannel() {
     if (rowArray.length > 0) {
         var len = rowArray.length;
         for (var i=0; i < len; i++) {
-            if ($("#channels").jqGrid('delRowData', rowArray[i])) {
+            var chanid = rowArray[i];
+            if ($("#channels").jqGrid('delRowData', chanid)) {
+                $.post("/Channel/DeleteDBChannel",
+                { ChannelID: chanid },
+                function(data) {
+                    if (data.bool == "true") {
+                        setStatusMessage("Channel deleted successfully!");
+                      }
+                      else
+                          setErrorMessage("Channel delete failed!");
+                  }, "json");
             }
         }
         $('#channels').trigger('reloadGrid');
