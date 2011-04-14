@@ -11,10 +11,10 @@ function initChannelEditor() {
                   'Use On Air Guide', 'Default Authority'],
         colModel:[
             {name:'ChanId', editable: true, width:120, sorttype:"int", hidden:true, jsonmap: 'ChanId'},
-            {name:'ChanNum', editable: true, width:120, sorttype:"int", jsonmap: 'ChanNum'},
-            {name:'CallSign', editable: true, width:90, sorttype:"text", jsonmap: 'CallSign'},
-            {name:'ChannelName', editable: true, width:300, align:"right", sorttype:"text", jsonmap: 'ChannelName'},
-            {name:'Visible', editable: true, width:40, align:"center", sorttype:"bool", jsonmap: 'Visible', formatter:'checkbox',edittype:"checkbox"},
+            {name:'ChanNum', search: true, editable: true, width:120, sorttype:"int", jsonmap: 'ChanNum'},
+            {name:'CallSign', search: true, editable: true, width:90, sorttype:"text", jsonmap: 'CallSign'},
+            {name:'ChannelName', search: true, editable: true, width:300, align:"right", sorttype:"text", jsonmap: 'ChannelName'},
+            {name:'Visible', search: false, editable: true, width:40, align:"center", sorttype:"bool", jsonmap: 'Visible', formatter:'checkbox',edittype:"checkbox"},
             {name:'XMLTVID', editable: true, width:0, align:"right", sortable:false, hidden:true, jsonmap: 'XMLTVID'},
             {name:'IconURL', editable: true, width:0, align:"right", sortable:false, hidden:true, jsonmap: 'IconURL'},
             {name:'MplexId', editable: true, width:0, align:"right", sortable:false, hidden:true, jsonmap: 'MplexId'},
@@ -50,6 +50,8 @@ function initChannelEditor() {
         multiselect: true,
         rowList:[10,20,30,50],
         pager: '#pager',
+        defaultSearch: 'cn',
+        ignoreCase: true,
         sortname: 'ChanNum',
         viewrecords: true,
         sortorder: "desc",
@@ -58,6 +60,10 @@ function initChannelEditor() {
         width: 820,
         height: 442
     });
+
+    /* Add a search toolbar */
+
+    jQuery("#channels").jqGrid('filterToolbar',{ searchOnEnter: false, defaultSearch: "cn" });
 
     /* Resize the grid if the window width changes */
 
