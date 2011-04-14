@@ -98,7 +98,6 @@ function initChannelEditor() {
 
 function reloadChannelGrid() {
     var sourceid = $("#sourceList").val();
-    setStatusMessage("Loading Channel Source (" + $('#sourceList').val() + ")...");
 
     $('#channels').setGridParam({
         url:'/Channel/GetChannelInfoList?SourceID=' + sourceid,
