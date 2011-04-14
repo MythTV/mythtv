@@ -152,7 +152,7 @@ QString MythCommandLineParser::GetHelpString(bool with_header) const
         {
             optstr = "-" + optstr;
             if (!m_registeredArgs.contains(optstr))
-                return QString("Could not find option matching '%s'")
+                return QString("Could not find option matching '%1'\n")
                             .arg(toString("showhelp"));
         }
 
@@ -213,8 +213,10 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
 
         opt = QString::fromLocal8Bit(argv[argpos]);
 //        cerr << "Processing: " << argv[argpos] << endl;
-        if (!opt.startsWith("-"))
+        if (!opt.startsWith("-") && opt.size() != 1)
         {
+            // arguments cannot start with '-', but can /be/ a
+            // single '-' for the purposes of using stdin/ou
             m_remainingArgs << opt;
             continue;
         }
@@ -273,8 +275,12 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
                     // new option reached without value
                     if (type == QVariant::String)
                     {
-//                        cerr << "  string set to default" << endl;
-                        m_parsed[name] = i.value().def;
+                        if (val.size() == 1)
+                            // allow a single '-' for stdin/out
+                            m_parsed[name] = '-';
+                        else
+//                          cerr << "  string set to default" << endl;
+                            m_parsed[name] = i.value().def;
                         break;
                     }
 
@@ -896,6 +902,148 @@ MythFillDatabaseCommandLineParser::MythFillDatabaseCommandLineParser(void) :
 
 void MythFillDatabaseCommandLineParser::LoadArguments(void)
 {
+    addHelp();
+    addVersion();
+    addVerbose();
+
+    add("--manual", "manual", "Run interactive configuration",
+            "Manual mode will interactively ask you questions about\n"
+            "each channel as it is processed, to configure for\n"
+            "future use.\n"
+            "mutually exclusive with --update");
+    add("--update", "update", "Run non-destructive updates",
+            "Run non-destructive updates on the database for \n"
+            "users in xmltv zones that do not provide channel\n"
+            "data. Stops the addition of new channels and the\n"
+            "changing of channel icons.\n"
+            "mutually exclusive with --manual");
+    add("--preset", "preset", "Use channel preset values instead of numbers",
+            "For use with assigning preset numbers for each\n"
+            "channel. Useful for non-US countries where people\n"
+            "are used to assigning a sequenced number for each\n"
+            "channel: 1->TVE1(S41), 2->La 2(SE18), 3->TV(21)...");
+    add("--file", "file", "Bypass grabbers and define sourceid and file",
+            "Directly define the sourceid and XMLTV file to\n"
+            "import. Must be used in combination with:\n"
+            "    --sourceid  --xmlfile");
+    add("--dd-file", "file", "Bypass grabber, and read SD data from file",
+            "Directly define the data needed to import a local\n"
+            "DataDirect download. Must be used in combination\n"
+            "with: \n"
+            "    --sourceid      --lineupid\n"
+            "    --offset        --xmlfile");
+    add("--sourceid", "sourceid", 0, "Operate on single source",
+            "Limit mythfilldatabase to only operate on the \n"
+            "specified channel source. This option is required\n"
+            "when using --file, --dd-file, or --xawchannels.");
+    add("--offset", "offset", 0, "Day offset of input xml file"
+            "Specify how many days offset from today is the \n"
+            "information in the given XML file. This option is\n"
+            "required when using --dd-file.");
+    add("--lineupid", "lineupid", 0, "DataDirect lineup of input xml file"
+            "Specify the DataDirect lineup that corresponds to\n"
+            "the information in the given XML file. This option\n"
+            "is required when using --dd-file.");
+    add("--xmlfile", "xmlfile", "", "XML file to import manually",
+            "Specify an XML guide data file to import directly\n"
+            "rather than pull data through the specified grabber.\n"
+            "This option is required when using --file or --dd-file.");
+    add("--xawchannels", "xawchannels", "Read channels from xawtvrc file",
+            "Import channels from an xawtvrc file. This option \n"
+            "requires --sourceid and --xawtvrcfile.");
+    add("--xawtvrcfile", "xawtvrcfile", "", "xawtvrc file to import channels from",
+            "Xawtvrc file containing channels to be imported.\n"
+            "This option is required when using --xawchannels.");
+    add("--do-channel-updates", "dochannelupdates", "update channels using datadirect",
+            "When using DataDirect, ask mythfilldatabase to\n"
+            "overwrite channel names, frequencies, etc. with\n"
+            "values available from the data source. This will\n"
+            "override custom channel names, which is why it \n"
+            "is disabled by default.");
+    add("--remove-new-channels", "removechannels",
+            "disable new channels on datadirect web interface",
+            "When using DataDirect, ask mythfilldatabase to\n"
+            "mark any new channels as disabled on the remote\n"
+            "lineup. Channels can be manually enabled on the\n"
+            "website at a later time, and incorporated into\n"
+            "MythTV by running mythfilldatabase without this\n"
+            "option. New digital channels cannot be directly\n"
+            "imported and thus are disabled automatically.");
+    add("--do-not-filter-new-channels", "nofilterchannels",
+            "don't filter ATSC channels for addition",
+            "Normally, MythTV tries to avoid adding ATSC\n"
+            "channels to NTSC channel lineups. This option\n"
+            "restores the behavior of adding every channel in\n"
+            "the downloaded channel lineup to MythTV's lineup,\n"
+            "in case MythTV's smarts fail you.");
+    add("--graboptions", "graboptions", "", "",
+            "Manually define options to pass to the data grabber.\n"
+            "Do NOT use this option unless you know what you are\n"
+            "doing. Mythfilldatabase will automatically use the \n"
+            "correct options for xmltv compliant grabbers.");
+    add("--cardtype", "cardtype", "", "", "No information.");           // need documentation for this one
+    add("--max-days", "maxdays", 0, "force number of days to update",
+            "Force the maximum number of days, counting today,\n"
+            "for the guide data grabber to check for future\n"
+            "listings.");
+    add("--refresh-today", "refreshtoday", "refresh today's listings",
+            "This option is only valid for selected grabbers.\n"
+            "Force a refresh for today's guide data. This can be used\n"
+            "in combination with other --refresh-<n> options.\n\n"
+            "If being used with datadirect, this option should not be\n"
+            "used, rather use --dd-grab-all to pull all listings each time.");
+    add("--dont-refresh-tomorrow", "dontrefreshtomorrow",
+            "don't refresh tomorrow's listings",
+            "This option is only valid for selected grabbers.\n"
+            "Prevent mythfilldatabase from pulling information for\n"
+            "tomorrow's listings. Data for tomorrow is always pulled\n"
+            "unless specifically specified otherwise. \n\n"
+            "If being used with datadirect, this option should not be\n"
+            "used, rather use --dd-grab-all to pull all listings each time.");
+    add("--refresh-second", "refreshsecond", "refresh listings two days from now",
+            "This option is only valid for selected grabbers.\n"
+            "Force a refresh for guide data two days from now. This can\n"
+            "be used in combination with other --refresh-<n> options.\n\n"
+            "If being used with datadirect, this option should not be\n"
+            "used, rather use --dd-grab-all to pull all listings each time.");
+    add("--refresh-all", "refreshall", "refresh listings on all days",
+            "This option is only valid for selected grabbers.\n"
+            "This option forces a refresh of all guide data, but does so \n"
+            "with fourteen downloads of one day each. \n\n"
+            "If being used with datadirect, this option should not be\n"
+            "used, rather use --dd-grab-all to pull all listings each time.");
+// TODO: I should be converted to a qstringlist and used in place of
+//       the other refresh options
+    add("--refresh-day", "refreshday", 0U, "refresh specific day's listings",
+            "This option is only valid for selected grabbers.\n"
+            "Force a refresh for guide data on a specific day. This can\n"
+            "be used in combination with other --refresh-<n> options.\n\n"
+            "If being used with datadirect, this option should not be\n"
+            "used, rather use --dd-grab-all to pull all listings each time.");
+    add("--dont-refresh-tba", "dontrefreshtba",
+            "don't refresh \"To be announced\" programs",
+            "This option is only valid for selected grabbers.\n"
+            "Prevent mythfilldatabase from automatically refreshing any \n"
+            "programs marked as \"To be announced\".\n\n"
+            "If being used with datadirect, this option should not be\n"
+            "used, rather use --dd-grab-all to pull all listings each time.");
+    add("--dd-grab-all", "ddgraball", "refresh full data using DataDirect",
+            "This option is only valid for selected grabbers (DataDirect).\n"
+            "This option is the preferred way of updating guide data from\n"
+            "DataDirect, and pulls all fourteen days of guide data at once.");
+    add("--only-update-channels", "onlychannels", "only update channel lineup",
+            "Download as little listings data as possible to update the\n"
+            "channel lineup.");
+    add("--quiet", "quiet", "do not log runtime information", "");
+    add("--no-mark-repeats", "markrepeats", true, "do not mark repeats", "");
+    add("--export-icon-map", "exporticonmap", "iconmap.xml",
+            "export icon map to file", "");
+    add("--import-icon-map", "importiconmap", "iconmap.xml",
+            "import icon map to file", "");
+    add("--update-icon-map", "updateiconmap", "updates icon map icons", "");
+    add("--reset-icon-map", "reseticonmap", "", "resets icon maps",
+            "Reset all icon maps. If given 'all' as an optiona value, reset\n"
+            "channel icons as well.");
 }
 
 MythLCDServerCommandLineParser::MythLCDServerCommandLineParser(void) :
