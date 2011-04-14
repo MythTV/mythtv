@@ -51,7 +51,7 @@
 class SERVICE_PUBLIC ChannelServices : public Service
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.03" );
+    Q_CLASSINFO( "version"    , "1.04" );
     Q_CLASSINFO( "UpdateDBChannel_Method",         "POST" )
     Q_CLASSINFO( "CreateDBChannel_Method",         "POST" )
     Q_CLASSINFO( "DeleteDBChannel_Method",         "POST" )
@@ -77,6 +77,8 @@ class SERVICE_PUBLIC ChannelServices : public Service
         virtual DTC::ChannelInfoList*  GetChannelInfoList  ( int           SourceID,
                                                              int           StartIndex,
                                                              int           Count      ) = 0;
+
+        virtual DTC::ChannelInfo*      GetChannelInfo      ( int           ChanID     ) = 0;
 
         virtual bool                   UpdateDBChannel     ( uint          MplexID,
                                                              uint          SourceID,
@@ -116,13 +118,17 @@ class SERVICE_PUBLIC ChannelServices : public Service
 
         /* Video Source Methods */
 
-        virtual DTC::VideoSourceList*  GetVideoSourceList  ( void ) = 0;
+        virtual DTC::VideoSourceList*     GetVideoSourceList     ( void ) = 0;
+
+        virtual DTC::VideoSource*         GetVideoSource         ( int SourceID ) = 0;
 
         /* Multiplex Methods */
 
         virtual DTC::VideoMultiplexList*  GetVideoMultiplexList  ( int SourceID,
                                                                    int StartIndex,
                                                                    int Count      ) = 0;
+
+        virtual DTC::VideoMultiplex*      GetVideoMultiplex      ( int MplexID    ) = 0;
 };
 
 #endif

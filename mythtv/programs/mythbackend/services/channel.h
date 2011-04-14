@@ -42,6 +42,8 @@ class Channel : public ChannelServices
                                                      int      StartIndex,
                                                      int      Count      );
 
+        DTC::ChannelInfo*      GetChannelInfo      ( int      ChanID     );
+
         bool                   UpdateDBChannel     ( uint          MplexID,
                                                      uint          SourceID,
                                                      uint          ChannelID,
@@ -80,13 +82,18 @@ class Channel : public ChannelServices
 
         /* Video Source Methods */
 
-        DTC::VideoSourceList*  GetVideoSourceList  ( void );
+        DTC::VideoSourceList*     GetVideoSourceList     ( void );
+
+        DTC::VideoSource*         GetVideoSource         ( int SourceID );
 
         /* Multiplex Methods */
 
         DTC::VideoMultiplexList*  GetVideoMultiplexList  ( int SourceID,
                                                            int StartIndex,
                                                            int Count      );
+
+        DTC::VideoMultiplex*      GetVideoMultiplex      ( int MplexID    );
+
 };
 
 // --------------------------------------------------------------------------
