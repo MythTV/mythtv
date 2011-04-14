@@ -366,6 +366,70 @@ bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString cardtype)
     return true;
 }
 
+bool SourceUtil::UpdateSource( uint sourceid, QString sourcename,
+                               QString grabber, QString userid,
+                               QString freqtable, QString lineupid,
+                               QString password, bool useeit,
+                               QString configpath, int nitid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("UPDATE videosource SET name = :NAME, xmltvgrabber = :XMLTVGRABBER, "
+                  "userid = :USERID, freqtable = :FREQTABLE, lineupid = :LINEUPID,"
+                  "password = :PASSWORD, useeit = :USEEIT, configpath = :CONFIGPATH, "
+                  "dvb_nit_id = :NITID WHERE sourceid = :SOURCEID");
+
+    query.bindValue(":NAME", sourcename);
+    query.bindValue(":XMLTVGRABBER", grabber);
+    query.bindValue(":USERID", userid);
+    query.bindValue(":FREQTABLE", freqtable);
+    query.bindValue(":LINEUPID", lineupid);
+    query.bindValue(":PASSWORD", password);
+    query.bindValue(":USEEIT", useeit);
+    query.bindValue(":CONFIGPATH", configpath);
+    query.bindValue(":NITID", nitid);
+    query.bindValue(":SOURCEID", sourceid);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("Updating Video Source", query);
+        return false;
+    }
+
+    return true;
+}
+
+bool SourceUtil::CreateSource( QString sourcename,
+                               QString grabber, QString userid,
+                               QString freqtable, QString lineupid,
+                               QString password, bool useeit,
+                               QString configpath, int nitid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("INSERT INTO videosource (name,xmltvgrabber,userid,freqtable,lineupid,"
+                  "password,useeit,configpath,dvb_nit_id) VALUES (:NAME, :XMLTVGRABBER, "
+                  ":USERID, :FREQTABLE, :LINEUPID, :PASSWORD, :USEEIT, :CONFIGPATH, :NITID)");
+
+    query.bindValue(":NAME", sourcename);
+    query.bindValue(":XMLTVGRABBER", grabber);
+    query.bindValue(":USERID", userid);
+    query.bindValue(":FREQTABLE", freqtable);
+    query.bindValue(":LINEUPID", lineupid);
+    query.bindValue(":PASSWORD", password);
+    query.bindValue(":USEEIT", useeit);
+    query.bindValue(":CONFIGPATH", configpath);
+    query.bindValue(":NITID", nitid);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("Adding Video Source", query);
+        return false;
+    }
+
+    return true;
+}
+
 bool SourceUtil::DeleteSource(uint sourceid)
 {
     MSqlQuery query(MSqlQuery::InitCon());

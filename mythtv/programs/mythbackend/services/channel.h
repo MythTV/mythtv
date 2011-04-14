@@ -84,7 +84,30 @@ class Channel : public ChannelServices
 
         DTC::VideoSourceList*     GetVideoSourceList     ( void );
 
-        DTC::VideoSource*         GetVideoSource         ( int SourceID );
+        DTC::VideoSource*         GetVideoSource         ( uint SourceID );
+
+        bool                      UpdateVideoSource      ( uint          SourceID,
+                                                           const QString &SourceName,
+                                                           const QString &Grabber,
+                                                           const QString &UserId,
+                                                           const QString &FreqTable,
+                                                           const QString &LineupId,
+                                                           const QString &Password,
+                                                           bool          UseEIT,
+                                                           const QString &ConfigPath,
+                                                           int           NITId );
+
+        bool                      CreateVideoSource      ( const QString &SourceName,
+                                                           const QString &Grabber,
+                                                           const QString &UserId,
+                                                           const QString &FreqTable,
+                                                           const QString &LineupId,
+                                                           const QString &Password,
+                                                           bool          UseEIT,
+                                                           const QString &ConfigPath,
+                                                           int           NITId );
+
+        bool                      DeleteVideoSource      ( uint SourceID );
 
         /* Multiplex Methods */
 

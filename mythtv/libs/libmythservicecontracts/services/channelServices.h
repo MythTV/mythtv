@@ -52,9 +52,12 @@ class SERVICE_PUBLIC ChannelServices : public Service
 {
     Q_OBJECT
     Q_CLASSINFO( "version"    , "1.04" );
-    Q_CLASSINFO( "UpdateDBChannel_Method",         "POST" )
-    Q_CLASSINFO( "CreateDBChannel_Method",         "POST" )
-    Q_CLASSINFO( "DeleteDBChannel_Method",         "POST" )
+    Q_CLASSINFO( "CreateDBChannel_Method",           "POST" )
+    Q_CLASSINFO( "UpdateDBChannel_Method",           "POST" )
+    Q_CLASSINFO( "DeleteDBChannel_Method",           "POST" )
+    Q_CLASSINFO( "CreateVideoSource_Method",         "POST" )
+    Q_CLASSINFO( "UpdateVideoSource_Method",         "POST" )
+    Q_CLASSINFO( "DeleteVideoSource_Method",         "POST" )
 
     public:
 
@@ -120,7 +123,30 @@ class SERVICE_PUBLIC ChannelServices : public Service
 
         virtual DTC::VideoSourceList*     GetVideoSourceList     ( void ) = 0;
 
-        virtual DTC::VideoSource*         GetVideoSource         ( int SourceID ) = 0;
+        virtual DTC::VideoSource*         GetVideoSource         ( uint SourceID ) = 0;
+
+        virtual bool                      UpdateVideoSource      ( uint          SourceID,
+                                                                   const QString &SourceName,
+                                                                   const QString &Grabber,
+                                                                   const QString &UserId,
+                                                                   const QString &FreqTable,
+                                                                   const QString &LineupId,
+                                                                   const QString &Password,
+                                                                   bool          UseEIT,
+                                                                   const QString &ConfigPath,
+                                                                   int           NITId ) = 0;
+
+        virtual bool                      CreateVideoSource      ( const QString &SourceName,
+                                                                   const QString &Grabber,
+                                                                   const QString &UserId,
+                                                                   const QString &FreqTable,
+                                                                   const QString &LineupId,
+                                                                   const QString &Password,
+                                                                   bool          UseEIT,
+                                                                   const QString &ConfigPath,
+                                                                   int           NITId ) = 0;
+
+        virtual bool                      DeleteVideoSource      ( uint          SourceID ) = 0;
 
         /* Multiplex Methods */
 

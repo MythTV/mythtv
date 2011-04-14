@@ -30,6 +30,7 @@
 #include "mythversion.h"
 #include "mythcorecontext.h"
 #include "channelutil.h"
+#include "sourceutil.h"
 
 #include "serviceUtil.h"
 
@@ -312,7 +313,7 @@ DTC::VideoSourceList* Channel::GetVideoSourceList()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::VideoSource* Channel::GetVideoSource( int nSourceID )
+DTC::VideoSource* Channel::GetVideoSource( uint nSourceID )
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -355,6 +356,70 @@ DTC::VideoSource* Channel::GetVideoSource( int nSourceID )
 
     return pVideoSource;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Channel::UpdateVideoSource( uint nSourceId,
+                                 const QString &sSourceName,
+                                 const QString &sGrabber,
+                                 const QString &sUserId,
+                                 const QString &sFreqTable,
+                                 const QString &sLineupId,
+                                 const QString &sPassword,
+                                 bool          bUseEIT,
+                                 const QString &sConfigPath,
+                                 int           nNITId )
+{
+    bool bResult = false;
+
+    bResult = SourceUtil::UpdateSource(nSourceId, sSourceName, sGrabber, sUserId, sFreqTable,
+                                       sLineupId, sPassword, bUseEIT, sConfigPath,
+                                       nNITId);
+
+    return bResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Channel::CreateVideoSource( const QString &sSourceName,
+                                 const QString &sGrabber,
+                                 const QString &sUserId,
+                                 const QString &sFreqTable,
+                                 const QString &sLineupId,
+                                 const QString &sPassword,
+                                 bool          bUseEIT,
+                                 const QString &sConfigPath,
+                                 int           nNITId )
+{
+    bool bResult = false;
+
+    bResult = SourceUtil::CreateSource(sSourceName, sGrabber, sUserId, sFreqTable,
+                                       sLineupId, sPassword, bUseEIT, sConfigPath,
+                                       nNITId);
+
+    return bResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Channel::DeleteVideoSource( uint nSourceID )
+{
+    bool bResult = false;
+
+    bResult = SourceUtil::DeleteSource( nSourceID );
+
+    return bResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
 
 DTC::VideoMultiplexList* Channel::GetVideoMultiplexList( int nSourceID,
                                                          int nStartIndex,
