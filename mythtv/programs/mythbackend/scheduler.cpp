@@ -56,7 +56,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     schedMoveHigher(false),
     schedulingEnabled(true),
     m_tvList(tvList),
-    expirer(NULL),
+    m_expirer(NULL),
     m_mainServer(NULL),
     resetIdleTime(false),
     m_isShuttingDown(false),
@@ -2173,10 +2173,10 @@ void Scheduler::RunScheduler(void)
                 nextRecording->SetReactivated(false);
 
                 nextRecording->AddHistory(false);
-                if (expirer)
+                if (m_expirer)
                 {
                     // activate auto expirer
-                    expirer->Update(nextRecording->GetCardID(), fsID, true);
+                    m_expirer->Update(nextRecording->GetCardID(), fsID, true);
                 }
             }
             else
@@ -3976,8 +3976,8 @@ void Scheduler::GetNextLiveTVDir(uint cardid)
     VERBOSE(VB_FILE, LOC + QString("FindNextLiveTVDir: next dir is '%1'")
             .arg(recording_dir));
 
-    if (expirer) // update auto expirer
-        expirer->Update(cardid, fsID, true);
+    if (m_expirer) // update auto expirer
+        m_expirer->Update(cardid, fsID, true);
 }
 
 int Scheduler::FillRecordingDir(
@@ -4278,7 +4278,7 @@ int Scheduler::FillRecordingDir(
 
     bool simulateAutoExpire =
         ((gCoreContext->GetSetting("StorageScheduler") == "BalancedFreeSpace") &&
-         (expirer) &&
+         (m_expirer) &&
          (fsInfoList.size() > 1));
 
     // Loop though looking for a directory to put the file in.  The first time
@@ -4309,7 +4309,7 @@ int Scheduler::FillRecordingDir(
 
             // get list of expirable programs
             pginfolist_t expiring;
-            expirer->GetAllExpiring(expiring);
+            m_expirer->GetAllExpiring(expiring);
 
             for(pginfolist_t::iterator it=expiring.begin();
                 it != expiring.end(); ++it)
@@ -4381,7 +4381,7 @@ int Scheduler::FillRecordingDir(
                 remainingSpaceKB[fs->fsID] += (*it)->GetFilesize() / 1024;
 
                 // check if we have enough space for new file
-                long long desiredSpaceKB = expirer->GetDesiredSpace(fs->fsID);
+                long long desiredSpaceKB = m_expirer->GetDesiredSpace(fs->fsID);
 
                 if (remainingSpaceKB[fs->fsID] > (desiredSpaceKB + maxSizeKB))
                 {
@@ -4405,7 +4405,7 @@ int Scheduler::FillRecordingDir(
                 }
             }
 
-            expirer->ClearExpireList(expiring);
+            m_expirer->ClearExpireList(expiring);
         }
         else // passes 1 & 3 (or 1 & 2 if !simulateAutoExpire)
         {
@@ -4414,8 +4414,8 @@ int Scheduler::FillRecordingDir(
             {
                 long long desiredSpaceKB = 0;
                 FileSystemInfo *fs = *fslistit;
-                if (expirer)
-                    desiredSpaceKB = expirer->GetDesiredSpace(fs->fsID);
+                if (m_expirer)
+                    desiredSpaceKB = m_expirer->GetDesiredSpace(fs->fsID);
 
                 if ((fs->hostname == hostname) &&
                     (dirlist.contains(fs->directory)) &&
