@@ -225,14 +225,20 @@ bool setupTVs(bool ismaster, bool &error)
     return true;
 }
 
-bool setup_context(const MythCommandLineParser &cmdline)
+bool setup_context(MythBackendCommandLineParser &cmdline)
 {
     if (!gContext->Init(false))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext.");
         return false;
     }
-    gCoreContext->SetBackend(!cmdline.HasBackendCommand());
+
+    if (cmdline.toBool("event")         || cmdline.toBool("systemevent") ||
+        cmdline.toBool("setverbose")    || cmdline.toBool("printsched") ||
+        cmdline.toBool("testsched")     || cmdline.toBool("resched") ||
+        cmdline.toBool("scanvideos")    || cmdline.toBool("clearcache") ||
+        cmdline.toBool("printexpire"))
+            gCoreContext->SetBackend(false);
 
     QMap<QString,QString> settingsOverride = cmdline.GetSettingsOverride();
     if (settingsOverride.size())
@@ -306,7 +312,7 @@ void log_rotate_handler(int)
     log_rotate(0);
 }
 
-void showUsage(const MythCommandLineParser &cmdlineparser, const QString &version)
+void showUsage(const MythBackendCommandLineParser &cmdlineparser, const QString &version)
 {
     QString    help  = cmdlineparser.GetHelpString(false);
     QByteArray ahelp = help.toLocal8Bit();
@@ -403,38 +409,33 @@ bool setUser(const QString &username)
 #endif // ! _WIN32
 }
 
-int handle_command(const MythCommandLineParser &cmdline)
+int handle_command(const MythBackendCommandLineParser &cmdline)
 {
-    QString eventString = cmdline.GetEventString();
+    QString eventString;
+
+    if (cmdline.toBool("event"))
+        eventString = cmdline.toString("event");
+    else if (cmdline.toBool("systemevent"))
+        eventString = "SYSTEM_EVENT " +
+                      cmdline.toString("systemevent") +
+                      QString(" SENDER %1").arg(gCoreContext->GetHostName());
+
     if (!eventString.isEmpty())
     {
         if (gCoreContext->ConnectToMasterServer())
         {
-            if (eventString.startsWith("SYSTEM_EVENT"))
-            {
-                eventString += QString(" SENDER %1")
-                    .arg(gCoreContext->GetHostName());
-            }
-
             RemoteSendMessage(eventString);
             return GENERIC_EXIT_OK;
         }
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
-    if (cmdline.WantUPnPRebuild())
-    {
-        VERBOSE(VB_GENERAL, "Rebuilding UPNP Media Map is no longer supported.  Rescan videos using MythVideo.");
-
-        return GENERIC_EXIT_OK;
-    }
-
-    if (cmdline.SetVerbose())
+    if (cmdline.toBool("setverbose"))
     {
         if (gCoreContext->ConnectToMasterServer())
         {
             QString message = "SET_VERBOSE ";
-            message += cmdline.GetNewVerbose();
+            message += cmdline.toString("setverbose");
 
             RemoteSendMessage(message);
             VERBOSE(VB_IMPORTANT, QString("Sent '%1' message").arg(message));
@@ -448,7 +449,7 @@ int handle_command(const MythCommandLineParser &cmdline)
         }
     }
 
-    if (cmdline.ClearSettingsCache())
+    if (cmdline.toBool("clearcache"))
     {
         if (gCoreContext->ConnectToMasterServer())
         {
@@ -464,11 +465,11 @@ int handle_command(const MythCommandLineParser &cmdline)
         }
     }
 
-    if (cmdline.IsPrintScheduleEnabled() ||
-        cmdline.IsTestSchedulerEnabled())
+    if (cmdline.toBool("printsched") ||
+        cmdline.toBool("testsched"))
     {
         sched = new Scheduler(false, &tvList);
-        if (!cmdline.IsTestSchedulerEnabled() &&
+        if (!cmdline.toBool("testsched") &&
             gCoreContext->ConnectToMasterServer())
         {
             cout << "Retrieving Schedule from Master backend.\n";
@@ -487,7 +488,7 @@ int handle_command(const MythCommandLineParser &cmdline)
         return GENERIC_EXIT_OK;
     }
 
-    if (cmdline.Reschedule())
+    if (cmdline.toBool("resched"))
     {
         bool ok = false;
         if (gCoreContext->ConnectToMasterServer())
@@ -502,7 +503,7 @@ int handle_command(const MythCommandLineParser &cmdline)
         return (ok) ? GENERIC_EXIT_OK : GENERIC_EXIT_CONNECT_ERROR;
     }
 
-    if (cmdline.ScanVideos())
+    if (cmdline.toBool("scanvideos"))
     {
         bool ok = false;
         if (gCoreContext->ConnectToMasterServer())
@@ -517,10 +518,10 @@ int handle_command(const MythCommandLineParser &cmdline)
         return (ok) ? GENERIC_EXIT_OK : GENERIC_EXIT_CONNECT_ERROR;
     }
 
-    if (!cmdline.GetPrintExpire().isEmpty())
+    if (!cmdline.toBool("printexpire"))
     {
         expirer = new AutoExpire();
-        expirer->PrintExpireList(cmdline.GetPrintExpire());
+        expirer->PrintExpireList(cmdline.toString("printexpire"));
         return GENERIC_EXIT_OK;
     }
 
@@ -603,22 +604,22 @@ int connect_to_master(void)
     return GENERIC_EXIT_OK;
 }
 
-int setup_basics(const MythCommandLineParser &cmdline)
+int setup_basics(const MythBackendCommandLineParser &cmdline)
 {
     ofstream pidfs;
-    if (!openPidfile(pidfs, cmdline.GetPIDFilename()))
+    if (!openPidfile(pidfs, cmdline.toString("pidfile")))
         return GENERIC_EXIT_PERMISSIONS_ERROR;
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to ignore SIGPIPE");
 
-    if (cmdline.IsDaemonizeEnabled() && (daemon(0, 1) < 0))
+    if (cmdline.toBool("daemonize") && (daemon(0, 1) < 0))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to daemonize" + ENO);
         return GENERIC_EXIT_DAEMONIZING_ERROR;
     }
 
-    QString username = cmdline.GetUsername();
+    QString username = cmdline.toString("username");
     if (!username.isEmpty() && !setUser(username))
         return GENERIC_EXIT_PERMISSIONS_ERROR;
 
@@ -631,27 +632,27 @@ int setup_basics(const MythCommandLineParser &cmdline)
     return GENERIC_EXIT_OK;
 }
 
-void print_warnings(const MythCommandLineParser &cmdline)
+void print_warnings(const MythBackendCommandLineParser &cmdline)
 {
-    if (!cmdline.IsHouseKeeperEnabled())
+    if (!cmdline.toBool("nohousekeeper"))
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN +
                 "****** The Housekeeper has been DISABLED with "
                 "the --nohousekeeper option ******");
     }
-    if (!cmdline.IsSchedulerEnabled())
+    if (!cmdline.toBool("nosched"))
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN +
                 "********** The Scheduler has been DISABLED with "
                 "the --nosched option **********");
     }
-    if (!cmdline.IsAutoExpirerEnabled())
+    if (!cmdline.toBool("noautoexpire"))
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN +
                 "********* Auto-Expire has been DISABLED with "
                 "the --noautoexpire option ********");
     }
-    if (!cmdline.IsJobQueueEnabled())
+    if (!cmdline.toBool("nojobqueue"))
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN +
                 "********* The JobQueue has been DISABLED with "
@@ -659,7 +660,7 @@ void print_warnings(const MythCommandLineParser &cmdline)
     }
 }
 
-int run_backend(const MythCommandLineParser &cmdline)
+int run_backend(MythBackendCommandLineParser &cmdline)
 {
     if (!setup_context(cmdline))
         return GENERIC_EXIT_NO_MYTHCONTEXT;
@@ -723,26 +724,26 @@ int run_backend(const MythCommandLineParser &cmdline)
             if (err)
                 return err;
 
-            if (!cmdline.IsSchedulerEnabled())
+            if (cmdline.toBool("nosched"))
                 sched->DisableScheduling();
         }
 
-        if (cmdline.IsHouseKeeperEnabled())
+        if (!cmdline.toBool("nohousekeeper"))
             housekeeping = new HouseKeeper(true, ismaster, sched);
 
-        if (cmdline.IsAutoExpirerEnabled())
+        if (!cmdline.toBool("noautoexpire"))
         {
             expirer = new AutoExpire(&tvList);
             if (sched)
                 sched->SetExpirer(expirer);
         }
     }
-    else if (cmdline.IsHouseKeeperEnabled())
+    else if (!cmdline.toBool("nohousekeeper"))
     {
         housekeeping = new HouseKeeper(true, ismaster, NULL);
     }
 
-    if (cmdline.IsJobQueueEnabled())
+    if (!cmdline.toBool("nojobqueue"))
         jobqueue = new JobQueue(ismaster);
 
     // ----------------------------------------------------------------------
@@ -753,7 +754,7 @@ int run_backend(const MythCommandLineParser &cmdline)
     {
         g_pUPnp = new MediaServer();
 
-        g_pUPnp->Init(ismaster, !cmdline.IsUPnPEnabled());
+        g_pUPnp->Init(ismaster, cmdline.toBool("noupnp"));
     }
 
     // ----------------------------------------------------------------------

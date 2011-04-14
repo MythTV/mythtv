@@ -106,26 +106,27 @@ namespace
 
 int main(int argc, char *argv[])
 {
-    bool cmdline_err;
-    MythCommandLineParser cmdline(
-        kCLPOverrideSettingsFile |
-        kCLPOverrideSettings     |
-        kCLPQueryVersion);
-
-    for (int argpos = 0; argpos < argc; ++argpos)
+    MythJobQueueCommandLineParser cmdline;
+    if (!cmdline.Parse(argc, argv))
     {
-        if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
-        {
-            if (cmdline_err)
-                return GENERIC_EXIT_INVALID_CMDLINE;
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
 
-            if (cmdline.WantsToExit())
-                return GENERIC_EXIT_OK;
-        }
+    if (cmdline.toBool("showhelp"))
+    {
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_OK;
+    }
+
+    if (cmdline.toBool("showversion"))
+    {
+        cmdline.PrintVersion();
+        return GENERIC_EXIT_OK;
     }
 
     QCoreApplication a(argc, argv);
-    QMap<QString, QString> settingsOverride;
+    QMap<QString, QString> settingsOverride = cmdline.GetSettingsOverride();
     int argpos = 1;
     bool daemonize = false;
 
@@ -133,123 +134,16 @@ int main(int argc, char *argv[])
 
     QString filename;
 
-    while (argpos < a.argc())
-    {
-        if (!strcmp(a.argv()[argpos],"-v") ||
-            !strcmp(a.argv()[argpos],"--verbose"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                if (parse_verbose_arg(a.argv()[argpos+1]) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-
-                ++argpos;
-            } else
-            {
-                cerr << "Missing argument to -v/--verbose option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-l") ||
-                 !strcmp(a.argv()[argpos],"--logfile"))
-        {
-            if (a.argc() > argpos)
-            {
-                logfile = a.argv()[argpos+1];
-                if (logfile.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to -l/--logfile option\n";
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-                else
-                {
-                    ++argpos;
-                }
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-p") ||
-                 !strcmp(a.argv()[argpos],"--pidfile"))
-        {
-            if (a.argc() > argpos)
-            {
-                pidfile = a.argv()[argpos+1];
-                if (pidfile.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to -p/--pidfile option\n";
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-                else
-                {
-                   ++argpos;
-                }
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-d") ||
-                 !strcmp(a.argv()[argpos],"--daemon"))
-        {
-            daemonize = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"-O") ||
-                 !strcmp(a.argv()[argpos],"--override-setting"))
-        {
-            if ((a.argc() - 1) > argpos)
-            {
-                QString tmpArg = a.argv()[argpos+1];
-                if (tmpArg.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to "
-                            "-O/--override-setting option\n";
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-
-                QStringList pairs = tmpArg.split(",");
-                for (int index = 0; index < pairs.size(); ++index)
-                {
-                    QStringList tokens = pairs[index].split("=");
-                    tokens[0].replace(QRegExp("^[\"']"), "");
-                    tokens[0].replace(QRegExp("[\"']$"), "");
-                    tokens[1].replace(QRegExp("^[\"']"), "");
-                    tokens[1].replace(QRegExp("[\"']$"), "");
-                    settingsOverride[tokens[0]] = tokens[1];
-                }
-            }
-            else
-            {
-                cerr << "Invalid or missing argument to -O/--override-setting "
-                        "option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            ++argpos;
-        }
-        else if (!strcmp(a.argv()[argpos],"-h") ||
-                 !strcmp(a.argv()[argpos],"--help"))
-        {
-            cerr << "Valid Options are:" << endl <<
-                    "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
-                    "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
-                    "-p or --pidfile filename       Write PID of mythjobqueue to filename " <<
-                    "-d or --daemon                 Runs mythjobqueue as a daemon" << endl <<
-                    endl;
+    if (cmdline.toBool("verbose"))
+        if (parse_verbose_arg(cmdline.toString("verbose")) ==
+                GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
-        }
-        else if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
-        {
-            if (cmdline_err)
-                return GENERIC_EXIT_INVALID_CMDLINE;
-
-            if (cmdline.WantsToExit())
-                return GENERIC_EXIT_OK;
-        }
-        else
-        {
-            printf("illegal option: '%s' (use --help)\n", a.argv()[argpos]);
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
-
-        ++argpos;
-    }
+    if (cmdline.toBool("logfile"))
+        pidfile = cmdline.toString("logfile");
+    if (cmdline.toBool("pidfile"))
+        pidfile = cmdline.toString("pidfile");
+    if (cmdline.toBool("daemon"))
+        daemonize = true;
 
     if (!logfile.isEmpty())
     {

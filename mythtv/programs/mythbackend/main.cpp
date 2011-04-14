@@ -58,47 +58,23 @@
 
 int main(int argc, char **argv)
 {
-    bool cmdline_err;
-    MythCommandLineParser cmdline(
-        kCLPDaemon               |
-        kCLPHelp                 |
-        kCLPOverrideSettingsFile |
-        kCLPOverrideSettings     |
-        kCLPQueryVersion         |
-        kCLPPrintSchedule        |
-        kCLPTestSchedule         |
-        kCLPReschedule           |
-        kCLPNoSchedule           |
-        kCLPScanVideos           |
-        kCLPNoUPnP               |
-        kCLPUPnPRebuild          |
-        kCLPNoJobqueue           |
-        kCLPNoHousekeeper        |
-        kCLPNoAutoExpire         |
-        kCLPClearCache           |
-        kCLPVerbose              |
-        kCLPSetVerbose           |
-        kCLPLogFile              |
-        kCLPPidFile              |
-        kCLPInFile               |
-        kCLPOutFile              |
-        kCLPUsername             |
-        kCLPEvent                |
-        kCLPSystemEvent          |
-        kCLPChannelId            |
-        kCLPStartTime            |
-        kCLPPrintExpire);
-
-    for (int argpos = 0; argpos < argc; ++argpos)
+    MythBackendCommandLineParser cmdline;
+    if (!cmdline.Parse(argc, argv))
     {
-        if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
-        {
-            if (cmdline_err)
-                return GENERIC_EXIT_INVALID_CMDLINE;
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
 
-            if (cmdline.WantsToExit())
-                return GENERIC_EXIT_OK;
-        }
+    if (cmdline.toBool("showversion"))
+    {
+        cmdline.PrintVersion();
+        return GENERIC_EXIT_OK;
+    }
+
+    if (cmdline.toBool("showhelp"))
+    {
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_OK;
     }
 
 #ifndef _WIN32
@@ -112,27 +88,13 @@ int main(int argc, char **argv)
 #endif
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHBACKEND);
 
-    for (int argpos = 1; argpos < a.argc(); ++argpos)
-    {
-        if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
-        {
-            if (cmdline_err)
-                return GENERIC_EXIT_INVALID_CMDLINE;
+    logfile = cmdline.toString("logfile");
+    pidfile = cmdline.toString("pidfile");
 
-            if (cmdline.WantsToExit())
-                return GENERIC_EXIT_OK;
-        }
-        else
-        {
-            cerr << "Invalid argument: " << a.argv()[argpos] << endl;
-            QByteArray help = cmdline.GetHelpString(true).toLocal8Bit();
-            cout << help.constData();
+    if (cmdline.toBool("verbose"))
+        if (parse_verbose_arg(cmdline.toString("verbose")) ==
+                    GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
-        }
-    }
-
-    logfile = cmdline.GetLogFilename();
-    pidfile = cmdline.GetPIDFilename();
 
     ///////////////////////////////////////////////////////////////////////
 
@@ -156,7 +118,11 @@ int main(int argc, char **argv)
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
-    if (cmdline.HasBackendCommand())
+    if (cmdline.toBool("event")         || cmdline.toBool("systemevent") ||
+        cmdline.toBool("setverbose")    || cmdline.toBool("printsched") ||
+        cmdline.toBool("testsched")     || cmdline.toBool("resched") ||
+        cmdline.toBool("scanvideos")    || cmdline.toBool("clearcache") ||
+        cmdline.toBool("printexpire"))
     {
         if (!setup_context(cmdline))
             return GENERIC_EXIT_NO_MYTHCONTEXT;

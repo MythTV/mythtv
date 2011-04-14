@@ -27,69 +27,48 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    bool cmdline_err;
-    MythCommandLineParser cmdline(
-        kCLPOverrideSettings     |
-        kCLPWindowed             |
-        kCLPNoWindowed           |
-#ifdef USING_X11
-        kCLPDisplay              |
-#endif // USING_X11
-        kCLPGeometry             |
-        kCLPVerbose              |
-        kCLPExtra                |
-        kCLPHelp);
-
-    print_verbose_messages |= VB_PLAYBACK | VB_LIBAV;
-
-    for (int argpos = 1; argpos < argc; ++argpos)
+    MythAVTestCommandLineParser cmdline;
+    if (!cmdline.Parse(argc, argv))
     {
-        if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
-        {
-            if (cmdline_err)
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            if (cmdline.WantsToExit())
-                return GENERIC_EXIT_OK;
-        }
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+
+    if (cmdline.toBool("showhelp"))
+    {
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_OK;
+    }
+
+    if (cmdline.toBool("showversion"))
+    {
+        cmdline.PrintVersion();
+        return GENERIC_EXIT_OK;
     }
 
     QApplication a(argc, argv);
 
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHAVTEST);
 
-    int argpos = 1;
     QString filename = "";
 
-    while (argpos < a.argc())
-    {
-        if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
-        {
-            if (cmdline_err)
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            if (cmdline.WantsToExit())
-                return GENERIC_EXIT_OK;
-        }
-        else if (a.argv()[argpos][0] != '-')
-        {
-            filename = a.argv()[argpos];
-        }
-        else
-        {
+    if (cmdline.toBool("verbose"))
+        if (parse_verbose_arg(cmdline.toString("verbose")) ==
+                        GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
-        }
 
-        ++argpos;
-    }
-
-    if (!cmdline.GetDisplay().isEmpty())
+    if (!cmdline.toString("display").isEmpty())
     {
-        MythUIHelper::SetX11Display(cmdline.GetDisplay());
+        MythUIHelper::SetX11Display(cmdline.toString("display"));
     }
 
-    if (!cmdline.GetGeometry().isEmpty())
+    if (!cmdline.toString("geometry").isEmpty())
     {
-        MythUIHelper::ParseGeometryOverride(cmdline.GetGeometry());
+        MythUIHelper::ParseGeometryOverride(cmdline.toString("geometry"));
     }
+
+    if (cmdline.GetArgs().size() >= 1)
+        filename = cmdline.GetArgs()[0];
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init())

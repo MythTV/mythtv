@@ -4,6 +4,11 @@ using namespace std;
 #include <QFile>
 #include <QFileInfo>
 #include <QSize>
+#include <QVariant>
+#include <QVariantList>
+#include <QVariantMap>
+#include <QString>
+#include <QCoreApplication>
 
 #include "mythcommandlineparser.h"
 #include "exitcodes.h"
@@ -12,923 +17,924 @@ using namespace std;
 #include "mythverbose.h"
 #include "mythversion.h"
 
-MythCommandLineParser::MythCommandLineParser(uint64_t things_to_parse) :
-    parseTypes(things_to_parse),
-    display(), geometry(),
-    logfile(),
-    pidfile(),
-    infile(),
-    outfile(),
-    newverbose(),
-    username(),
-    printexpire(),
-    eventString(),
-    previewSize(0,0),
-    starttime(),
-    chanid(0),
-    previewFrameNumber(-2),
-    previewSeconds(-2),
-    daemonize(false),
-    printsched(false),
-    testsched(false),
-    setverbose(false),
-    resched(false),
-    nosched(false),
-    scanvideos(false),
-    noupnp(false),
-    nojobqueue(false),
-    nohousekeeper(false),
-    noexpirer(false),
-    clearsettingscache(false),
-    wantupnprebuild(false),
+typedef struct helptmp {
+    QString left;
+    QString right;
+    QStringList arglist;
+    CommandLineArg arg;
+} HelpTmp;
 
-    wantsToExit(false)
+MythCommandLineParser::MythCommandLineParser(QString appname) :
+    m_appname(appname), m_allowExtras(false), m_overridesImported(false)
 {
+    LoadArguments();
 }
 
-bool MythCommandLineParser::PreParse(
-    int argc, const char * const * argv, int &argpos, bool &err)
+void MythCommandLineParser::add(QStringList arglist, QString name,
+                                QVariant::Type type, QVariant def,
+                                QString help, QString longhelp)
 {
-    err = false;
+    CommandLineArg arg;
+    arg.name     = name;
+    arg.type     = type;
+    arg.def      = def;
+    arg.help     = help;
+    arg.longhelp = longhelp;
 
-    binname = QFileInfo(argv[0]).baseName();
+    QStringList::const_iterator i;
+    for (i = arglist.begin(); i != arglist.end(); ++i)
+    {
+        if (!m_registeredArgs.contains(*i))
+        {
+//            cerr << "Adding " << (*i).toLocal8Bit().constData()
+//                 << " as taking type '" << QVariant::typeToName(type)
+//                 << "'" << endl;
+            m_registeredArgs.insert(*i, arg);
+        }
+    }
 
-    if (argpos >= argc)
-        return false;
+    if (!m_defaults.contains(arg.name))
+        m_defaults[arg.name] = arg.def;
+}
 
-    if ((parseTypes & kCLPDisplay) &&
-             (!strcmp(argv[argpos],"-display") ||
-              !strcmp(argv[argpos],"--display")))
-    {
-        if ((argc - 1) > argpos)
-        {
-            display = argv[argpos+1];
-            if (display.startsWith("-"))
-            {
-                cerr << "Invalid or missing argument to -display option\n";
-                err = true;
-                return true;
-            }
-            else
-                ++argpos;
-        }
-        else
-        {
-            cerr << "Missing argument to -display option\n";
-            err = true;
-            return true;
-        }
-
-        return true;
-    }
-    else if ((parseTypes & kCLPGeometry) &&
-             (!strcmp(argv[argpos],"-geometry") ||
-              !strcmp(argv[argpos],"--geometry")))
-    {
-        if ((argc - 1) > argpos)
-        {
-            geometry = argv[argpos+1];
-            if (geometry.startsWith("-"))
-            {
-                cerr << "Invalid or missing argument to -geometry option\n";
-                err = true;
-                return true;
-            }
-            else
-                ++argpos;
-        }
-        else
-        {
-            cerr << "Missing argument to -geometry option\n";
-            err = true;
-            return true;
-        }
-
-        return true;
-    }
-#ifdef Q_WS_MACX
-    else if (!strncmp(argv[argpos],"-psn_",5))
-    {
-        cerr << "Ignoring Process Serial Number from command line\n";
-        return true;
-    }
-#endif
-    else if ((parseTypes & kCLPVerbose) &&
-             (!strcmp(argv[argpos],"-v") ||
-              !strcmp(argv[argpos],"--verbose")))
-    {
-        if ((argc - 1) > argpos)
-        {
-            if (parse_verbose_arg(argv[argpos+1]) ==
-                GENERIC_EXIT_INVALID_CMDLINE)
-            {
-                wantsToExit = err = true;
-            }
-            ++argpos;
-        }
-        else
-        {
-            cerr << "Missing argument to -v/--verbose option";
-            wantsToExit = err = true;
-        }
-        return true;
-    }
-    else if ((parseTypes & kCLPSetVerbose) &&
-             !strcmp(argv[argpos],"--setverbose"))
-    {
-        setverbose = true;
-        if ((argc - 1) > argpos)
-        {
-            newverbose = argv[argpos+1];
-            ++argpos;
-        }
-        else
-        {
-            cerr << "Missing argument to --setverbose option\n";
-	    wantsToExit = err = true;
-        }
-        return true;
-    }
-    else if ((parseTypes & kCLPHelp) &&
-             (!strcmp(argv[argpos],"-h") ||
-              !strcmp(argv[argpos],"--help") ||
-              !strcmp(argv[argpos],"--usage")))
-    {
-        QString help = GetHelpString(true);
-        QByteArray ahelp = help.toLocal8Bit();
-        cout << ahelp.constData();
-        wantsToExit = true;
-        return true;
-    }
-    else if ((parseTypes & kCLPQueryVersion) &&
-             !strcmp(argv[argpos],"--version"))
-    {
-        cout << "Please attach all output as a file in bug reports." << endl;
-        cout << "MythTV Version   : " << MYTH_SOURCE_VERSION << endl;
-        cout << "MythTV Branch    : " << MYTH_SOURCE_PATH << endl;
-        cout << "Network Protocol : " << MYTH_PROTO_VERSION << endl;
-        cout << "Library API      : " << MYTH_BINARY_VERSION << endl;
-        cout << "QT Version       : " << QT_VERSION_STR << endl;
+void MythCommandLineParser::PrintVersion(void)
+{
+    cout << "Please attach all output as a file in bug reports." << endl;
+    cout << "MythTV Version : " << MYTH_SOURCE_VERSION << endl;
+    cout << "MythTV Branch : " << MYTH_SOURCE_PATH << endl;
+    cout << "Network Protocol : " << MYTH_PROTO_VERSION << endl;
+    cout << "Library API : " << MYTH_BINARY_VERSION << endl;
+    cout << "QT Version : " << QT_VERSION_STR << endl;
 #ifdef MYTH_BUILD_CONFIG
-        cout << "Options compiled in:" <<endl;
-        cout << MYTH_BUILD_CONFIG << endl;
+    cout << "Options compiled in:" <<endl;
+    cout << MYTH_BUILD_CONFIG << endl;
 #endif
-        wantsToExit = true;
-        return true;
-    }
-    else if ((parseTypes & kCLPExtra) &&
-             argv[argpos][0] != '-')
-        // Though it's allowed (err = false), we didn't handle the arg
-        return false;
-
-    return false;
 }
 
-bool MythCommandLineParser::Parse(
-    int argc, const char * const * argv, int &argpos, bool &err)
+void MythCommandLineParser::PrintHelp(void)
 {
-    err = false;
-
-    if (argpos >= argc)
-        return false;
-
-    if ((parseTypes & kCLPWindowed) &&
-        (!strcmp(argv[argpos],"-w") ||
-         !strcmp(argv[argpos],"--windowed")))
-    {
-        settingsOverride["RunFrontendInWindow"] = "1";
-        return true;
-    }
-    else if ((parseTypes & kCLPNoWindowed) &&
-             (!strcmp(argv[argpos],"-nw") ||
-              !strcmp(argv[argpos],"--no-windowed")))
-    {
-        settingsOverride["RunFrontendInWindow"] = "0";
-        return true;
-    }
-    else if ((parseTypes & kCLPDaemon) &&
-             (!strcmp(argv[argpos],"-d") ||
-              !strcmp(argv[argpos],"--daemon")))
-    {
-        daemonize = true;
-        return true;
-    }
-    else if ((parseTypes && kCLPPrintSchedule) &&
-             !strcmp(argv[argpos],"--printsched"))
-    {
-        printsched = true;
-        return true;
-    }
-    else if ((parseTypes && kCLPTestSchedule) &&
-             !strcmp(argv[argpos],"--testsched"))
-    {
-        testsched = true;
-        return true;
-    }
-    else if ((parseTypes && kCLPReschedule) &&
-             !strcmp(argv[argpos],"--resched"))
-    {
-        resched = true;
-        return true;
-    }
-    else if ((parseTypes && kCLPNoSchedule) &&
-             !strcmp(argv[argpos],"--nosched"))
-    {
-        nosched = true;
-        return true;
-    }
-    else if ((parseTypes && kCLPReschedule) &&
-             !strcmp(argv[argpos],"--scanvideos"))
-    {
-        scanvideos = true;
-        return true;
-    }
-    else if ((parseTypes && kCLPNoUPnP) &&
-             !strcmp(argv[argpos],"--noupnp"))
-    {
-        noupnp = true;
-        return true;
-    }
-    else if ((parseTypes && kCLPUPnPRebuild) &&
-             !strcmp(argv[argpos],"--upnprebuild"))
-    {
-        wantupnprebuild = true;
-        return true;
-    }
-    else if ((parseTypes && kCLPNoJobqueue) &&
-             !strcmp(argv[argpos],"--nojobqueue"))
-    {
-        nojobqueue = true;
-        return true;
-    }
-    else if ((parseTypes && kCLPNoHousekeeper) &&
-             !strcmp(argv[argpos],"--nohousekeeper"))
-    {
-        nohousekeeper = true;
-        return true;
-    }
-    else if ((parseTypes && kCLPNoAutoExpire) &&
-             !strcmp(argv[argpos],"--noautoexpire"))
-    {
-        noexpirer = true;
-        return true;
-    }
-    else if ((parseTypes && kCLPClearCache) &&
-             !strcmp(argv[argpos],"--clearcache"))
-    {
-        clearsettingscache = true;
-        return true;
-    }
-    else if ((parseTypes & kCLPOverrideSettingsFile) &&
-             (!strcmp(argv[argpos],"--override-settings-file")))
-    {
-        if (argc <= argpos)
-        {
-            cerr << "Missing argument to --override-settings-file option\n";
-            err = true;
-            return true;
-        }
-
-        QString filename = QString::fromLocal8Bit(argv[++argpos]);
-        QFile f(filename);
-        if (!f.open(QIODevice::ReadOnly))
-        {
-            QByteArray tmp = filename.toAscii();
-            cerr << "Failed to open the override settings file: '"
-                 << tmp.constData() << "'" << endl;
-            err = true;
-            return true;
-        }
-
-        char buf[1024];
-        int64_t len = f.readLine(buf, sizeof(buf) - 1);
-        while (len != -1)
-        {
-            if (len >= 1 && buf[len-1]=='\n')
-                buf[len-1] = 0;
-            QString line(buf);
-            QStringList tokens = line.split("=", QString::SkipEmptyParts);
-            if (tokens.size() == 1)
-                tokens.push_back("");
-            if (tokens.size() >= 2)
-            {
-                tokens[0].replace(QRegExp("^[\"']"), "");
-                tokens[0].replace(QRegExp("[\"']$"), "");
-                tokens[1].replace(QRegExp("^[\"']"), "");
-                tokens[1].replace(QRegExp("[\"']$"), "");
-                if (!tokens[0].isEmpty())
-                    settingsOverride[tokens[0]] = tokens[1];
-            }
-            len = f.readLine(buf, sizeof(buf) - 1);
-        }
-        return true;
-    }
-    else if ((parseTypes & kCLPOverrideSettings) &&
-             (!strcmp(argv[argpos],"-O") ||
-              !strcmp(argv[argpos],"--override-setting")))
-    {
-        if ((argc - 1) > argpos)
-        {
-            QString tmpArg = argv[argpos+1];
-            if (tmpArg.startsWith("-"))
-            {
-                cerr << "Invalid or missing argument to "
-                     << "-O/--override-setting option\n";
-                err = true;
-                return true;
-            }
-
-            QStringList pairs = tmpArg.split(",", QString::SkipEmptyParts);
-            for (int index = 0; index < pairs.size(); ++index)
-            {
-                QStringList tokens = pairs[index].split(
-                    "=", QString::SkipEmptyParts);
-                if (tokens.size() == 1)
-                    tokens.push_back("");
-                if (tokens.size() >= 2)
-                {
-                    tokens[0].replace(QRegExp("^[\"']"), "");
-                    tokens[0].replace(QRegExp("[\"']$"), "");
-                    tokens[1].replace(QRegExp("^[\"']"), "");
-                    tokens[1].replace(QRegExp("[\"']$"), "");
-                    if (!tokens[0].isEmpty())
-                        settingsOverride[tokens[0]] = tokens[1];
-                }
-            }
-        }
-        else
-        {
-            cerr << "Invalid or missing argument to "
-                 << "-O/--override-setting option\n";
-            err = true;
-            return true;
-        }
-
-        ++argpos;
-        return true;
-    }
-    else if ((parseTypes & kCLPGetSettings) && gContext &&
-             (!strcmp(argv[argpos],"-G") ||
-              !strcmp(argv[argpos],"--get-setting") ||
-              !strcmp(argv[argpos],"--get-settings")))
-    {
-        if ((argc - 1) > argpos)
-        {
-            QString tmpArg = argv[argpos+1];
-            if (tmpArg.startsWith("-"))
-            {
-                cerr << "Invalid argument to "
-                     << "-G/--get-setting option\n";
-                err = true;
-                return true;
-            }
-
-            settingsQuery = tmpArg.split(",", QString::SkipEmptyParts);
-        }
-        else
-        {
-            cerr << "Missing argument to "
-                 << "-G/--get-setting option\n";
-            err = true;
-            return true;
-        }
-
-        ++argpos;
-        return true;
-    }
-    else if ((parseTypes & kCLPLogFile) &&
-             (!strcmp(argv[argpos],"-l") ||
-              !strcmp(argv[argpos],"--logfile")))
-    {
-        if ((argc - 1) > argpos)
-        {
-            logfile = argv[argpos+1];
-            if (logfile.startsWith("-"))
-            {
-                cerr << "Invalid argument to -l/--logfile option\n";
-                err = true;
-                return true;
-            }
-        }
-        else
-        {
-            cerr << "Missing argument to -l/--logfile option\n";
-            err = true;
-            return true;
-        }
-
-        ++argpos;
-        return true;
-    }
-    else if ((parseTypes & kCLPPidFile) &&
-             (!strcmp(argv[argpos],"-p") ||
-              !strcmp(argv[argpos],"--pidfile")))
-    {
-        if ((argc - 1) > argpos)
-        {
-            pidfile = argv[argpos+1];
-            if (pidfile.startsWith("-"))
-            {
-                cerr << "Invalid argument to -p/--pidfile option\n";
-                err = true;
-                return true;
-            }
-        }
-        else
-        {
-            cerr << "Missing argument to -p/--pidfile option\n";
-            err = true;
-            return true;
-        }
-
-        ++argpos;
-        return true;
-    }
-    else if ((parseTypes & kCLPInFile) &&
-             !strcmp(argv[argpos],"--infile"))
-    {
-        if ((argc - 1) > argpos)
-        {
-            infile = argv[argpos+1];
-            if (infile.startsWith("-"))
-            {
-                cerr << "Invalid argument to --infile option\n";
-                err = true;
-                return true;
-            }
-        }
-        else
-        {
-            cerr << "Missing argument to --infile option\n";
-            err = true;
-            return true;
-        }
-
-        ++argpos;
-        return true;
-    }
-    else if ((parseTypes & kCLPOutFile) &&
-             !strcmp(argv[argpos],"--outfile"))
-    {
-        if ((argc - 1) > argpos)
-        {
-            outfile = argv[argpos+1];
-            if (outfile.startsWith("-"))
-            {
-                cerr << "Invalid argument to --outfile option\n";
-                err = true;
-                return true;
-            }
-        }
-        else
-        {
-            cerr << "Missing argument to --outfile option\n";
-            err = true;
-            return true;
-        }
-
-        ++argpos;
-        return true;
-    }
-    else if ((parseTypes & kCLPUsername) &&
-             !strcmp(argv[argpos],"--user"))
-    {
-        if ((argc - 1) > argpos)
-        {
-            username = argv[argpos+1];
-            if (username.startsWith("-"))
-            {
-                cerr << "Invalid argument to --user option\n";
-                err = true;
-                return true;
-            }
-        }
-        else
-        {
-            cerr << "Missing argument to --user option\n";
-            err = true;
-            return true;
-        }
-
-        ++argpos;
-        return true;
-    }
-    else if ((parseTypes & kCLPEvent) &&
-             (!strcmp(argv[argpos],"--event")))
-    {
-        if ((argc - 1) > argpos)
-        {
-            eventString = argv[argpos+1];
-            if (eventString.startsWith("-"))
-            {
-                cerr << "Invalid argument to --event option\n";
-                err = true;
-                return true;
-            }
-        }
-        else
-        {
-            cerr << "Missing argument to --event option\n";
-            err = true;
-            return true;
-        }
-
-        ++argpos;
-        return true;
-    }
-    else if ((parseTypes & kCLPSystemEvent) &&
-             (!strcmp(argv[argpos],"--systemevent")))
-    {
-        if ((argc - 1) > argpos)
-        {
-            eventString = argv[argpos+1];
-            if (eventString.startsWith("-"))
-            {
-                cerr << "Invalid argument to --systemevent option\n";
-                err = true;
-                return true;
-            }
-            eventString = QString("SYSTEM_EVENT ") + eventString;
-        }
-        else
-        {
-            cerr << "Missing argument to --systemevent option\n";
-            err = true;
-            return true;
-        }
-
-        ++argpos;
-        return true;
-    }
-    else if ((parseTypes & kCLPChannelId) &&
-             (!strcmp(argv[argpos],"-c") ||
-              !strcmp(argv[argpos],"--chanid")))
-    {
-        if ((argc - 1) > argpos)
-        {
-            chanid = QString(argv[argpos+1]).toUInt();
-            if (!chanid)
-            {
-                cerr << "Invalid argument to -c/--chanid option\n";
-                err = true;
-                return true;
-            }
-        }
-        else
-        {
-            cerr << "Missing argument to -c/--chanid option\n";
-            err = true;
-            return true;
-        }
-
-        ++argpos;
-        return true;
-    }
-    else if ((parseTypes & kCLPStartTime) &&
-             (!strcmp(argv[argpos],"-s") ||
-              !strcmp(argv[argpos],"--starttime")))
-    {
-        if ((argc - 1) > argpos)
-        {
-            QString tmp = QString(argv[argpos+1]).trimmed();
-            starttime = QDateTime::fromString(tmp, "yyyyMMddhhmmss");
-            if (!starttime.isValid() && tmp.length() == 19)
-            {
-                starttime = QDateTime::fromString(tmp, Qt::ISODate);
-            }
-            if (!starttime.isValid())
-            {
-                cerr << "Invalid argument to -s/--starttime option\n";
-                err = true;
-                return true;
-            }
-        }
-        else
-        {
-            cerr << "Missing argument to -s/--starttime option\n";
-            err = true;
-            return true;
-        }
-
-        ++argpos;
-        return true;
-    }
-    else if ((parseTypes & kCLPPrintExpire) &&
-             (!strcmp(argv[argpos],"--printexpire")))
-    {
-        printexpire = "ALL";
-        if (((argc - 1) > argpos) &&
-            QString(argv[argpos+1]).startsWith("-"))
-        {
-            printexpire = argv[argpos+1];
-            ++argpos;
-        }
-        return true;
-    }
-    else if (parseTypes & kCLPGeneratePreview &&
-             (!strcmp(argv[argpos],"--seconds")))
-    {
-        QString tmp;
-        if ((argc - 1) > argpos)
-        {
-            tmp = argv[argpos+1];
-            bool ok = true;
-            long long seconds = tmp.toInt(&ok);
-            if (ok)
-            {
-                previewSeconds = seconds;
-                ++argpos;
-            }
-            else
-                tmp.clear();
-        }
-
-        return true;
-    }
-    else if (parseTypes & kCLPGeneratePreview &&
-             (!strcmp(argv[argpos],"--frame")))
-    {
-        QString tmp;
-        if ((argc - 1) > argpos)
-        {
-            tmp = argv[argpos+1];
-            VERBOSE(VB_IMPORTANT, QString("--frame: %1").arg(tmp));
-            bool ok = true;
-            long long frame = tmp.toInt(&ok);
-            if (ok)
-            {
-                previewFrameNumber = frame;
-                ++argpos;
-            }
-            else
-                tmp.clear();
-        }
-
-        return true;
-    }
-    else if (parseTypes & kCLPGeneratePreview &&
-             (!strcmp(argv[argpos],"--size")))
-    {
-        QString tmp;
-        if ((argc - 1) > argpos)
-        {
-            tmp = argv[argpos+1];
-            int xat = tmp.indexOf("x", 0, Qt::CaseInsensitive);
-            if (xat > 0)
-            {
-                QString widthStr  = tmp.left(xat);
-                QString heightStr;
-                heightStr = tmp.mid(xat + 1);
-
-                bool ok1, ok2;
-                previewSize = QSize(widthStr.toInt(&ok1), heightStr.toInt(&ok2));
-                if (!ok1 || !ok2)
-                {
-                    VERBOSE(VB_IMPORTANT, QString(
-                                "Error: Failed to parse preview generator "
-                                "param '%1'").arg(tmp));
-                }
-            }
-            ++argpos;
-        }
-
-        return true;
-    }
-    else
-    {
-        return PreParse(argc, argv, argpos, err);
-    }
+    QString help = GetHelpString(true);
+    cerr << help.toLocal8Bit().constData();
 }
 
 QString MythCommandLineParser::GetHelpString(bool with_header) const
 {
-    QString str;
-    QTextStream msg(&str, QIODevice::WriteOnly);
+    QString helpstr;
+    QTextStream msg(&helpstr, QIODevice::WriteOnly);
 
     if (with_header)
     {
         QString versionStr = QString("%1 version: %2 [%3] www.mythtv.org")
-            .arg(binname).arg(MYTH_SOURCE_PATH).arg(MYTH_SOURCE_VERSION);
+            .arg(m_appname).arg(MYTH_SOURCE_PATH).arg(MYTH_SOURCE_VERSION);
         msg << versionStr << endl;
-        msg << "Valid options are: " << endl;
     }
 
-    if (parseTypes & kCLPHelp)
+    if (toString("showhelp").isEmpty())
     {
-        msg << "-h or --help                   "
-            << "List valid command line parameters" << endl;
-    }
+        // build generic help text
+        if (with_header)
+            msg << "Valid options are: " << endl;
 
-    if (parseTypes & kCLPLogFile)
-    {
-        msg << "-l or --logfile filename       "
-            << "Writes STDERR and STDOUT messages to filename" << endl;
-    }
+        QMap<QString, HelpTmp> argmap;
+        QString argname;
+        HelpTmp help;
 
-    if (parseTypes & kCLPPidFile)
-    {
-        msg << "-p or --pidfile filename       "
-            << "Write PID of mythbackend to filename" << endl;
-    }
+        QMap<QString, CommandLineArg>::const_iterator i;
+        for (i = m_registeredArgs.begin(); i != m_registeredArgs.end(); ++i)
+        {
+            if (i.value().help.isEmpty())
+                // ignore any arguments with no help text
+                continue;
 
-    if (parseTypes & kCLPDaemon)
-    {
-        msg << "-d or --daemon                 "
-            << "Runs program as a daemon" << endl;
-    }
+            argname = i.value().name;
+            if (argmap.contains(argname))
+                argmap[argname].arglist << i.key();
+            else
+            {
+                help.arglist = QStringList(i.key());
+                help.arg = i.value();
+                argmap[argname] = help;
+            }
+        }
 
-    if (parseTypes & kCLPDisplay)
-    {
-        msg << "-display X-server              "
-            << "Create GUI on X-server, not localhost" << endl;
-    }
+        int len, maxlen = 0;
+        QMap<QString, HelpTmp>::iterator i2;
+        for (i2 = argmap.begin(); i2 != argmap.end(); ++i2)
+        {
+            (*i2).left = (*i2).arglist.join(" OR ");
+            (*i2).right = (*i2).arg.help;
+            len = (*i2).left.length();
+            maxlen = max(len, maxlen);
+        }
 
-    if (parseTypes & kCLPGeometry)
-    {
-        msg << "-geometry or --geometry WxH    "
-            << "Override window size settings" << endl;
-        msg << "-geometry WxH+X+Y              "
-            << "Override window size and position" << endl;
-    }
+        maxlen += 4;
+        QString pad;
+        pad.fill(' ', maxlen);
+        QStringList rlist;
+        QStringList::const_iterator i3;
 
-    if (parseTypes & kCLPWindowed)
-    {
-        msg << "-w or --windowed               Run in windowed mode" << endl;
-    }
+        for (i2 = argmap.begin(); i2 != argmap.end(); ++i2)
+        {
+            msg << (*i2).left.leftJustified(maxlen, ' ');
 
-    if (parseTypes & kCLPNoWindowed)
-    {
-        msg << "-nw or --no-windowed           Run in non-windowed mode "
-            << endl;
-    }
+            rlist = (*i2).right.split('\n');
+            msg << rlist[0] << endl;
 
-    if (parseTypes & kCLPOverrideSettings)
-    {
-        msg << "-O or --override-setting KEY=VALUE " << endl
-            << "                               "
-            << "Force the setting named 'KEY' to value 'VALUE'" << endl
-            << "                               "
-            << "This option may be repeated multiple times" << endl;
+            for (i3 = rlist.begin() + 1; i3 != rlist.end(); ++i3)
+                msg << pad << *i3 << endl;
+        }
     }
-
-    if (parseTypes & kCLPOverrideSettingsFile)
+    else
     {
-        msg << "--override-settings-file <file> " << endl
-            << "                               "
-            << "File containing KEY=VALUE pairs for settings" << endl
-            << "                               Use a comma separated list to return multiple values"
-            << endl;
-    }
+        // build help for a specific argument
+        QString optstr = "-" + toString("showhelp");
+        if (!m_registeredArgs.contains(optstr))
+        {
+            optstr = "-" + optstr;
+            if (!m_registeredArgs.contains(optstr))
+                return QString("Could not find option matching '%s'")
+                            .arg(toString("showhelp"));
+        }
 
-    if (parseTypes & kCLPGetSettings)
-    {
-        msg << "-G or --get-setting KEY[,KEY2,etc] " << endl
-            << "                               "
-            << "Returns the current database setting for 'KEY'" << endl;
-    }
+        if (with_header)
+            msg << "Option:      " << optstr << endl << endl;
 
-    if (parseTypes & kCLPQueryVersion)
-    {
-        msg << "--version                      Version information" << endl;
-    }
+        // pull option information, and find aliased options
+        CommandLineArg option = m_registeredArgs[optstr];
+        QMap<QString, CommandLineArg>::const_iterator cmi;
+        QStringList aliases;
+        for (cmi = m_registeredArgs.begin(); cmi != m_registeredArgs.end(); ++cmi)
+        {
+            if (cmi.key() == optstr)
+                continue;
 
-    if (parseTypes & kCLPVerbose)
-    {
-        msg << "-v or --verbose debug-level    Use '-v help' for level info" << endl;
-    }
+            if (cmi.value().name == option.name)
+                aliases << cmi.key();
+        }
 
-    if (parseTypes & kCLPSetVerbose)
-    {
-        msg << "--setverbose debug-level       "
-            << "Change debug level of running master backend" << endl;
-    }
+        QStringList::const_iterator sli;
+        if (!aliases.isEmpty())
+        {
+            sli = aliases.begin();
+            msg <<     "Aliases:     " << *sli << endl;
+            while (++sli != aliases.end())
+                msg << "             " << *sli << endl;
+        }
 
-    if (parseTypes & kCLPUsername)
-    {
-        msg << "--user username                "
-            << "Drop permissions to username after starting"  << endl;
-    }
+        msg << "Type:        " << QVariant::typeToName(option.type) << endl;
+        if (option.def.canConvert(QVariant::String))
+            msg << "Default:     " << option.def.toString() << endl;
 
-    if (parseTypes & kCLPPrintExpire)
-    {
-        msg << "--printexpire                  "
-            << "List of auto-expire programs" << endl;
-    }
+        QStringList help;
+        if (!option.longhelp.isEmpty())
+            help = option.longhelp.split("\n");
+        else
+            help = option.help.split("\n");
 
-    if (parseTypes & kCLPPrintSchedule)
-    {
-        msg << "--printsched                   "
-            << "Upcoming scheduled programs" << endl;
-    }
-
-    if (parseTypes & kCLPTestSchedule)
-    {
-        msg << "--testsched                    "
-            << "Test run scheduler (ignore existing schedule)" << endl;
-    }
-
-    if (parseTypes & kCLPReschedule)
-    {
-        msg << "--resched                      "
-            << "Force the scheduler to update" << endl;
-    }
-
-    if (parseTypes & kCLPNoSchedule)
-    {
-        msg << "--nosched                      "
-            << "Do not perform any scheduling" << endl;
-    }
-
-    if (parseTypes & kCLPScanVideos)
-    {
-        msg << "--scanvideos                   "
-            << "Scan for new video content" << endl;
-    }
-
-    if (parseTypes & kCLPNoUPnP)
-    {
-        msg << "--noupnp                       "
-            << "Do not enable the UPNP server" << endl;
-    }
-
-    if (parseTypes & kCLPNoJobqueue)
-    {
-        msg << "--nojobqueue                   "
-            << "Do not start the JobQueue" << endl;
-    }
-
-    if (parseTypes & kCLPNoHousekeeper)
-    {
-        msg << "--nohousekeeper                "
-            << "Do not start the Housekeeper" << endl;
-    }
-
-    if (parseTypes & kCLPNoAutoExpire)
-    {
-        msg << "--noautoexpire                 "
-            << "Do not start the AutoExpire thread" << endl;
-    }
-
-    if (parseTypes & kCLPClearCache)
-    {
-        msg << "--clearcache                   "
-            << "Clear the settings cache on all MythTV servers" << endl;
-    }
-
-    if (parseTypes & kCLPGeneratePreview)
-    {
-        msg << "--seconds                      "
-            << "Number of seconds into video that preview should be taken" << endl;
-        msg << "--frame                        "
-            << "Number of frames into video that preview should be taken" << endl;
-        msg << "--size                         "
-            << "Dimensions of preview image" << endl;
-    }
-
-    if (parseTypes & kCLPUPnPRebuild)
-    {
-        msg << "--upnprebuild                  "
-            << "Force an update of UPNP media" << endl;
-    }
-
-    if (parseTypes & kCLPInFile)
-    {
-        msg << "--infile                       "
-            << "Input file for preview generation" << endl;
-    }
-
-    if (parseTypes & kCLPOutFile)
-    {
-        msg << "--outfile                      "
-            << "Optional output file for preview generation" << endl;
-    }
-
-    if (parseTypes & kCLPChannelId)
-    {
-        msg << "--chanid                       "
-            << "Channel ID for preview generation" << endl;
-    }
-
-    if (parseTypes & kCLPStartTime)
-    {
-        msg << "--starttime                    "
-            << "Recording start time for preview generation" << endl;
-    }
-
-    if (parseTypes & kCLPEvent)
-    {
-        msg << "--event EVENTTEXT              "
-            << "Send a backend event test message" << endl;
-    }
-
-    if (parseTypes & kCLPSystemEvent)
-    {
-        msg << "--systemevent EVENTTEXT        "
-            << "Send a backend SYSTEM_EVENT test message" << endl;
+        sli = help.begin();
+        msg << "Description: " << *sli << endl;
+        while (++sli != help.end())
+            msg << "             " << *sli << endl;
     }
 
     msg.flush();
+    return helpstr;
+}
 
-    return str;
+bool MythCommandLineParser::Parse(int argc, const char * const * argv)
+{
+    bool processed;
+    QString opt, val, name;
+    QVariant::Type type;
+
+    QMap<QString, CommandLineArg>::const_iterator i;
+    for (int argpos = 1; argpos < argc; ++argpos)
+    {
+
+        opt = QString::fromLocal8Bit(argv[argpos]);
+//        cerr << "Processing: " << argv[argpos] << endl;
+        if (!opt.startsWith("-"))
+        {
+            m_remainingArgs << opt;
+            continue;
+        }
+        else
+        {
+            if (!m_remainingArgs.empty())
+            {
+                cerr << "Command line arguments received out of sequence"
+                     << endl;
+                return false;
+            }
+        }
+
+        processed = false;
+
+        for (i = m_registeredArgs.begin(); i != m_registeredArgs.end(); ++i)
+        {
+            if (opt == i.key())
+            {
+                processed = true;
+                name = i.value().name;
+                type = i.value().type;
+
+                if (type == QVariant::Bool)
+                {
+//                    cerr << "  bool set to inverse of default" << endl;
+                    // if defined, a bool is set to the opposite of default
+                    m_parsed[name] = QVariant(!(i.value().def.toBool()));
+                    break;
+                }
+
+                // try to pull value
+                if (++argpos == argc)
+                {
+                    // end of list
+                    if (type == QVariant::String)
+                    {
+//                        cerr << "  string set to default" << endl;
+                        // strings can be undefined, and set to
+                        // their default value
+                        m_parsed[name] = i.value().def;
+                        break;
+                    }
+
+                    // all other types expect a value
+                    cerr << "Command line option did not receive value"
+                         << endl;
+                    return false;
+                }
+
+//                cerr << "  value found: " << argv[argpos] << endl;
+
+                val = QString::fromLocal8Bit(argv[argpos]);
+                if (val.startsWith("-"))
+                {
+                    // new option reached without value
+                    if (type == QVariant::String)
+                    {
+//                        cerr << "  string set to default" << endl;
+                        m_parsed[name] = i.value().def;
+                        break;
+                    }
+
+                    cerr << "Command line option did not receive value"
+                         << endl;
+                    return false;
+                }
+
+                if (type == QVariant::Int)
+                    m_parsed[name] = QVariant(val.toInt());
+                else if (type == QVariant::LongLong)
+                    m_parsed[name] = QVariant(val.toLongLong());
+                else if (type == QVariant::StringList)
+                {
+                    QStringList slist;
+                    if (m_parsed.contains(name))
+                        slist = m_parsed[name].toStringList();
+                    slist << val;
+                    m_parsed[name] = QVariant(slist);
+                }
+                else if (type == QVariant::Map)
+                {
+                    // check for missing key/val pair
+                    if (!val.contains("="))
+                    {
+                        cerr << "Command line option did not get expected "
+                                "key/value pair" << endl;
+                        return false;
+                    }
+
+                    QStringList slist = val.split("=");
+                    QVariantMap vmap;
+                    if (m_parsed.contains(name))
+                        vmap = m_parsed[name].toMap();
+                    vmap[slist[0]] = QVariant(slist[1]);
+                    m_parsed[name] = QVariant(vmap);
+                }
+                else if (type == QVariant::Size)
+                {
+                    if (!val.contains("x"))
+                    {
+                        cerr << "Command line option did not get expected "                                      "XxY pair" << endl;
+                        return false;
+                    }
+                    QStringList slist = val.split("x");
+                    m_parsed[name] = QSize(slist[0].toInt(), slist[1].toInt());
+                }
+                else
+                    m_parsed[name] = QVariant(val);
+                    // add more type specifics
+
+                break;
+            }
+        }
+#ifdef Q_WS_MACX
+        if (opts.startsWith("-psn_"))
+            cerr << "Ignoring Process Serial Number from command line"
+                 << endl;
+        else if (!processed && !m_allowExtras)
+#else
+        if (!processed && !m_allowExtras)
+#endif
+        {
+            cerr << "Unhandled option given on command line" << endl;
+            return false;
+        }
+    }
+
+    return true;
+}
+
+QVariant MythCommandLineParser::operator[](const QString &name)
+{
+    QVariant res("");
+    if (m_parsed.contains(name))
+        res = m_parsed[name];
+    else if (m_defaults.contains(name))
+        res = m_defaults[name];
+    return res;
+}
+
+QMap<QString,QString> MythCommandLineParser::GetSettingsOverride(void)
+{
+    QMap<QString,QString> smap;
+    if (!m_parsed.contains("overridesettings"))
+        return smap;
+
+    QVariantMap vmap = m_parsed["overridesettings"].toMap();
+
+    if (!m_overridesImported)
+    {
+        if (m_parsed.contains("overridesettingsfile"))
+        {
+            QString filename = m_parsed["overridesettingsfile"].toString();
+            if (!filename.isEmpty())
+            {
+                QFile f(filename);
+                if (f.open(QIODevice::ReadOnly))
+                {
+                    char buf[1024];
+                    int64_t len = f.readLine(buf, sizeof(buf) - 1);
+                    while (len != -1)
+                    {
+                        if (len >= 1 && buf[len-1]=='\n')
+                            buf[len-1] = 0;
+                        QString line(buf);
+                        QStringList tokens = line.split("=",
+                                QString::SkipEmptyParts);
+                        if (tokens.size() == 2)
+                        {
+                            tokens[0].replace(QRegExp("^[\"']"), "");
+                            tokens[0].replace(QRegExp("[\"']$"), "");
+                            tokens[1].replace(QRegExp("^[\"']"), "");
+                            tokens[1].replace(QRegExp("[\"']$"), "");
+                            if (!tokens[0].isEmpty())
+                                vmap[tokens[0]] = QVariant(tokens[1]);
+                        }
+                        len = f.readLine(buf, sizeof(buf) - 1);
+                    }
+                    m_parsed["overridesettings"] = QVariant(vmap);
+                }
+                else
+                {
+                    QByteArray tmp = filename.toAscii();
+                    cerr << "Failed to open the override settings file: '"
+                         << tmp.constData() << "'" << endl;
+                }
+            }
+        }
+        m_overridesImported = true;
+    }
+
+    QVariantMap::const_iterator i;
+    for (i = vmap.begin(); i != vmap.end(); ++i)
+        smap[i.key()] = i.value().toString();
+
+    // add windowed boolean
+
+    return smap;
+}
+
+bool MythCommandLineParser::toBool(QString key) const
+{
+    // If value is of type boolean, return its value
+    // If value is of other type, return whether
+    //      it was defined, of if it will return
+    //      its default value
+
+    bool val = false;
+    if (m_parsed.contains(key))
+        if (m_parsed[key].type() == QVariant::Bool)
+            val = m_parsed[key].toBool();
+        else
+            val = true;
+    return val;
+}
+
+int MythCommandLineParser::toInt(QString key) const
+{
+    // Return matching value if defined, else use default
+    // If key is not registered, return 0
+    int val = 0;
+    if (m_parsed.contains(key))
+        if (m_parsed[key].canConvert(QVariant::Int))
+            val = m_parsed[key].toInt();
+    else if (m_defaults.contains(key))
+        if (m_defaults[key].canConvert(QVariant::Int))
+            val = m_defaults[key].toInt();
+    return val;
+}
+
+uint MythCommandLineParser::toUInt(QString key) const
+{
+    // Return matching value if defined, else use default
+    // If key is not registered, return 0
+    uint val = 0;
+    if (m_parsed.contains(key))
+        if (m_parsed[key].canConvert(QVariant::UInt))
+            val = m_parsed[key].toUInt();
+    else if (m_defaults.contains(key))
+        if (m_defaults[key].canConvert(QVariant::UInt))
+            val = m_defaults[key].toUInt();
+    return val;
+}
+
+
+long long MythCommandLineParser::toLongLong(QString key) const
+{
+    // Return matching value if defined, else use default
+    // If key is not registered, return 0
+    long long val = 0;
+    if (m_parsed.contains(key))
+        if (m_parsed[key].canConvert(QVariant::LongLong))
+            val = m_parsed[key].toLongLong();
+    else if (m_defaults.contains(key))
+        if (m_defaults[key].canConvert(QVariant::LongLong))
+            val = m_defaults[key].toLongLong();
+    return val;
+}
+
+double MythCommandLineParser::toDouble(QString key) const
+{
+    // Return matching value if defined, else use default
+    // If key is not registered, return 0.0
+    double val = 0.0;
+    if (m_parsed.contains(key))
+        if (m_parsed[key].canConvert(QVariant::Double))
+            val = m_parsed[key].toDouble();
+    else if (m_defaults.contains(key))
+        if (m_defaults[key].canConvert(QVariant::Double))
+            val = m_defaults[key].toDouble();
+    return val;
+}
+
+QSize MythCommandLineParser::toSize(QString key) const
+{
+    // Return matching value if defined, else use default
+    // If key is not registered, return (0,0)
+    QSize val(0,0);
+    if (m_parsed.contains(key))
+        if (m_parsed[key].canConvert(QVariant::Size))
+            val = m_parsed[key].toSize();
+    else if (m_defaults.contains(key))
+        if (m_defaults[key].canConvert(QVariant::Size))
+            val = m_defaults[key].toSize();
+    return val;
+}
+
+QString MythCommandLineParser::toString(QString key) const
+{
+    // Return matching value if defined, else use default
+    // If key is not registered, return empty string
+    QString val("");
+    if (m_parsed.contains(key))
+        if (m_parsed[key].canConvert(QVariant::String))
+            val = m_parsed[key].toString();
+    else if (m_defaults.contains(key))
+        if (m_defaults[key].canConvert(QVariant::String))
+            val = m_defaults[key].toString();
+    return val;
+}
+
+QStringList MythCommandLineParser::toStringList(QString key) const
+{
+    // Return matching value if defined, else use default
+    // If key is not registered, return empty stringlist
+    QStringList val;
+    if (m_parsed.contains(key))
+        if (m_parsed[key].canConvert(QVariant::StringList))
+            val << m_parsed[key].toStringList();
+    else if (m_defaults.contains(key))
+        if (m_defaults[key].canConvert(QVariant::StringList))
+            val = m_defaults[key].toStringList();
+    return val;
+}
+
+QMap<QString,QString> MythCommandLineParser::toMap(QString key) const
+{
+    // Return matching value if defined, else use default
+    // If key is not registered, return empty stringmap
+    QMap<QString,QString> val;
+    if (m_parsed.contains(key))
+    {
+        if (m_parsed[key].canConvert(QVariant::Map))
+        {
+            QMap<QString,QVariant> tmp = m_parsed[key].toMap();
+            QMap<QString,QVariant>::const_iterator i;
+            for (i = tmp.begin(); i != tmp.end(); ++i)
+                val[i.key()] = i.value().toString();
+        }
+    }
+    else if (m_defaults.contains(key))
+    {
+        if (m_defaults[key].canConvert(QVariant::Map))
+        {
+            QMap<QString,QVariant> tmp = m_defaults[key].toMap();
+            QMap<QString,QVariant>::const_iterator i;
+            for (i = tmp.begin(); i != tmp.end(); ++i)
+                val[i.key()] = i.value().toString();
+        }
+    }
+    return val;
+}
+
+QDateTime MythCommandLineParser::toDateTime(QString key) const
+{
+    // Return matching value if defined, else use default
+    // If key is not registered, return empty datetime
+    QDateTime val;
+    if (m_parsed.contains(key))
+        if (m_parsed[key].canConvert(QVariant::DateTime))
+            val = m_parsed[key].toDateTime();
+    else if (m_defaults.contains(key))
+        if (m_defaults[key].canConvert(QVariant::Int))
+            val = m_defaults[key].toDateTime();
+    return val;
+}
+
+void MythCommandLineParser::addHelp(void)
+{
+    add(QStringList( QStringList() << "-h" << "--help" ), "showhelp", "",
+            "Display this help printout.",
+            "Displays a list of all commands available for use with\n"
+            "this application. If another option is provided as an\n"
+            "argument, it will provide detailed information on that\n"
+            "option.");
+}
+
+void MythCommandLineParser::addVersion(void)
+{
+    add("--version", "showversion", "Display version information.",
+            "Display informtion about build, including:\n"
+            "  version, branch, protocol, library API, Qt\n"
+            "  and compiled options.");
+}
+
+void MythCommandLineParser::addWindowed(bool def)
+{
+    if (def)
+        add(QStringList( QStringList() << "-nw" << "--no-windowed" ),
+            "notwindowed", "Prevent application from running in window.", "");
+    else
+        add(QStringList( QStringList() << "-w" << "--windowed" ), "windowed",
+            "Force application to run in a window.", "");
+}
+
+void MythCommandLineParser::addDaemon(void)
+{
+    add(QStringList( QStringList() << "-d" << "--daemon" ), "daemonize",
+            "Fork application into background after startup.",
+            "Fork application into background, detatching from\n"
+            "the local terminal. Often used with:\n"
+            "   --logfile       --pidfile\n"
+            "   --user");
+}
+
+void MythCommandLineParser::addSettingsOverride(void)
+{
+    add(QStringList( QStringList() << "-O" << "--override-setting" ),
+            "overridesettings", QVariant::Map,
+            "Override a single setting defined by a key=value pair.",
+            "Override a single setting from the database using\n"
+            "options defined as one or more key=value pairs\n"
+            "Multiple can be defined by multiple uses of the\n"
+            "-O option.");
+    add("--override-settings-file", "overridesettingsfile", "", 
+            "Define a file of key=value pairs to be\n"
+            "loaded for setting overrides.", "");
+}
+
+void MythCommandLineParser::addVerbose(void)
+{
+    add(QStringList( QStringList() << "-v" << "--verbose" ), "verbose",
+            "important,general",
+            "Specify log filtering. Use '-v help' for level info.", "");
+    add("-V", "verboseint", 0U, "",
+            "This option is intended for internal use only.\n"
+            "This option takes an unsigned value corresponding\n"
+            "to the bitwise log verbosity operator.");
+}
+
+void MythCommandLineParser::addRecording(void)
+{
+    add("--chanid", "chanid", 0U,
+            "Specify chanid of recording to operate on.", "");
+    add("--starttime", "starttime", "",
+            "Specify start time of recording to operate on.", "");
+}
+
+void MythCommandLineParser::addGeometry(void)
+{
+    add(QStringList( QStringList() << "-geometry" << "--geometry" ), "geometry",
+            "", "Specify window size and position (WxH[+X+Y])", "");
+}
+
+void MythCommandLineParser::addDisplay(void)
+{
+#ifdef USING_X11
+    add("-display", "display", "", "Specify X server to use.", "");
+#endif
+}
+
+void MythCommandLineParser::addUPnP(void)
+{
+    add("--noupnp", "noupnp", "Disable use of UPnP.", "");
+}
+
+void MythCommandLineParser::addLogFile(void)
+{
+    add(QStringList( QStringList() << "-l" << "--logfile" ), "logfile", "",
+            "Writes STDERR and STDOUT messages to filename.",
+            "Redirects messages typically sent to STDERR and STDOUT\n"
+            "to this log file. This is typically used in combination\n"
+            "with --daemon, and if used in combination with --pidfile,\n"
+            "this can be used with log rotaters, using the HUP call\n"
+            "to inform MythTV to reload the file.");
+}
+
+void MythCommandLineParser::addPIDFile(void)
+{
+    add(QStringList( QStringList() << "-p" << "--pidfile" ), "pidfile", "",
+            "Write PID of application to filename.",
+            "Write the PID of the currently running process as a single\n"
+            "line to this file. Used for init scripts to know what\n"
+            "process to terminate, and with --logfile and log rotaters\n"
+            "to send a HUP signal to process to have it re-open files.");
+}
+
+void MythCommandLineParser::addJob(void)
+{
+    add(QStringList( QStringList() << "-j" << "--jobid" ), "jobid", 0, "",
+            "Intended for internal use only, specify the JobID to match\n"
+            "up with in the database for additional information and the\n"
+            "ability to update runtime status in the database.");
+}
+
+MythBackendCommandLineParser::MythBackendCommandLineParser(void) :
+    MythCommandLineParser(MYTH_APPNAME_MYTHBACKEND)
+{ LoadArguments(); }
+
+void MythBackendCommandLineParser::LoadArguments(void)
+{
+    addHelp();
+    addVersion();
+    addDaemon();
+    addSettingsOverride();
+    addVerbose();
+    addUPnP();
+    addLogFile();
+    addPIDFile();
+
+    add("--printsched", "printsched",
+            "Print upcoming list of scheduled recordings.", "");
+    add("--testsched", "testsched", "do some scheduler testing.", "");
+    add("--resched", "resched",
+            "Trigger a run of the recording scheduler on the existing\n"
+            "master backend.",
+            "This command will connect to the master backend and trigger\n"
+            "a run of the recording scheduler. The call will return\n"
+            "immediately, however the scheduler run may take several\n"
+            "seconds to a minute or longer to complete.");
+    add("--nosched", "nosched", "",
+            "Intended for debugging use only, disable the scheduler\n"
+            "on this backend if it is the master backend, preventing\n"
+            "any recordings from occuring until the backend is\n"
+            "restarted without this option.");
+    add("--scanvideos", "scanvideos",
+            "Trigger a rescan of media content in MythVideo.",
+            "This command will connect to the master backend and trigger\n"
+            "a run of the Video scanner. The call will return\n"
+            "immediately, however the scanner may take several seconds\n"
+            "to tens of minutes, depending on how much new or moved\n"
+            "content it has to hash, and how quickly the scanner can\n"
+            "access those files to do so. If enabled, this will also\n"
+            "trigger the bulk metadata scanner upon completion.");
+    add("--nojobqueue", "nojobqueue", "",
+            "Intended for debugging use only, disable the jobqueue\n"
+            "on this backend. As each jobqueue independently selects\n"
+            "jobs, this will only have any affect on this local\n"
+            "backend.");
+    add("--nohousekeeper", "nohousekeeper", "",
+            "Intended for debugging use only, disable the housekeeper\n"
+            "on this backend if it is the master backend, preventing\n"
+            "any guide processing, recording cleanup, or any other\n"
+            "task performed by the housekeeper.");
+    add("--noautoexpire", "noautoexpire", "",
+            "Intended for debugging use only, disable the autoexpirer\n"
+            "on this backend if it is the master backend, preventing\n"
+            "recordings from being expired to clear room for new\n"
+            "recordings.");
+    add("--event", "event", "", "Send a backend event test message.", "");
+    add("--systemevent", "systemevent", "",
+            "Send a backend SYSTEM_EVENT test message.", "");
+    add("--clearcache", "clearcache",
+            "Trigger a cache clear on all connected MythTV systems.",
+            "This command will connect to the master backend and trigger\n"
+            "a cache clear event, which will subsequently be pushed to\n"
+            "all other connected programs. This event will clear the\n"
+            "local database settings cache used by each program, causing\n"
+            "options to be re-read from the database upon next use.");
+    add("--printexpire", "printexpire", "ALL",
+            "Print upcoming list of recordings to be expired.", "");
+    add("--setverbose", "setverbose", "",
+            "Change debug level of the existing master backend.", "");
+    add("--user", "username", "",
+            "Drop permissions to username after starting.", "");
+}
+
+MythFrontendCommandLineParser::MythFrontendCommandLineParser(void) :
+    MythCommandLineParser(MYTH_APPNAME_MYTHFRONTEND)
+{ LoadArguments(); }
+
+void MythFrontendCommandLineParser::LoadArguments(void)
+{
+    addHelp();
+    addVersion();
+    addWindowed(false);
+    addSettingsOverride();
+    addVerbose();
+    addGeometry();
+    addDisplay();
+    addUPnP();
+    addLogFile();
+
+    add(QStringList( QStringList() << "-r" << "--reset" ), "reset",
+        "Resets appearance, settings, and language.", "");
+    add(QStringList( QStringList() << "-p" << "--prompt" ), "prompt",
+        "Always prompt for backend selection.", "");
+    add(QStringList( QStringList() << "-d" << "--disable-autodiscovery" ),
+        "noautodiscovery", "Prevent frontend from using UPnP autodiscovery.", "");
+}
+
+MythPreviewGeneratorCommandLineParser::MythPreviewGeneratorCommandLineParser(void) :
+    MythCommandLineParser(MYTH_APPNAME_MYTHPREVIEWGEN)
+{ LoadArguments(); }
+
+void MythPreviewGeneratorCommandLineParser::LoadArguments(void)
+{
+    addHelp();
+    addVersion();
+    addVerbose();
+    addRecording();
+
+    add("--seconds", "seconds", 0LL, "Number of seconds into video to take preview image.", "");
+    add("--frame", "frame", 0LL, "Number of frames into video to take preview image.", "");
+    add("--size", "size", QSize(0,0), "Dimensions of preview image.", "");
+    add("--infile", "inputfile", "", "Input video for preview generation.", "");
+    add("--outfile" "outputfile", "", "Optional output file for preview generation.", "");
+}
+
+MythWelcomeCommandLineParser::MythWelcomeCommandLineParser(void) :
+    MythCommandLineParser(MYTH_APPNAME_MYTHWELCOME)
+{ LoadArguments(); }
+
+void MythWelcomeCommandLineParser::LoadArguments(void)
+{
+    addHelp();
+    addSettingsOverride();
+    addVersion();
+    addVerbose();
+    addLogFile();
+
+    add(QStringList( QStringList() << "-s" << "--setup" ), "setup",
+            "Run setup for mythshutdown.", "");
+}
+
+MythAVTestCommandLineParser::MythAVTestCommandLineParser(void) :
+    MythCommandLineParser(MYTH_APPNAME_MYTHAVTEST)
+{ LoadArguments(); }
+
+void MythAVTestCommandLineParser::LoadArguments(void)
+{
+    addHelp();
+    addSettingsOverride();
+    addVersion();
+    addWindowed(false);
+    addVerbose();
+    addGeometry();
+    addDisplay();
+}
+
+MythCommFlagCommandLineParser::MythCommFlagCommandLineParser(void) :
+    MythCommandLineParser(MYTH_APPNAME_MYTHCOMMFLAG)
+{ LoadArguments(); }
+
+void MythCommFlagCommandLineParser::LoadArguments(void)
+{
+    addHelp();
+    addSettingsOverride();
+    addVersion();
+    addJob();
+
+    add(QStringList( QStringList() << "-f" << "--file" ), "file", "",
+            "Specify file to operate on.");
+    add("--video", "video", "", "Rebuild the seek table for a video (non-recording) file.", "");
+    add("--method", "commmethod", "", "Commercial flagging method[s] to employ:\n"
+                                      "off, blank, scene, blankscene, logo, all\n"
+                                      "d2, d2_logo, d2_blank, d2_scene, d2_all\n", "");
+    add("--outputmethod", "outputmethod", "",
+            "Format of output written to outputfile, essentials, full.", "");
+    add("--gencutlist", "gencutlist", "Copy the commercial skip list to the cutlist.", "");
+    add("--clearcutlist", "clearcutlist", "Clear the cutlist.", "");
+    add("--clearskiplist", "clearskiplist", "Clear the commercial skip list.", "");
+    add("--getcutlist", "getcutlist", "Display the current cutlist.", "");
+    add("--getskiplist", "getskiplist", "Display the current commercial skip list.", "");
+    add("--setcutlist", "setcutlist", "", "Set a new cutlist in the form:\n"
+                                          "#-#[,#-#]... (ie, 1-100,1520-3012,4091-5094)", "");
+    add("--skipdb", "skipdb", "", "Intended for external 3rd party use.");
+    add("--quiet", "quiet", "Don't display commercial flagging progress.", "");
+    add("--very-quiet", "vquiet", "Only display output.", "");
+    add("--queue", "queue", "Insert flagging job into the JobQueue, rather than\n"
+                            "running flagging in the foreground.", "");
+    add("--nopercentage", "nopercent", "Don't print percentage done.", "");
+    add("--rebuild", "rebuild", "Do not flag commercials, just rebuild the seektable.", "");
+    add("--force", "force", "Force operation, even if program appears to be in use.", "");
+    add("--dontwritetodb", "dontwritedb", "", "Intended for external 3rd party use.");
+    add("--onlydumpdb", "dumpdb", "", "?");
+    add("--outputfile", "outputfile", "", "File to write commercial flagging output [debug].", "");
+}
+
+MythJobQueueCommandLineParser::MythJobQueueCommandLineParser(void) :
+    MythCommandLineParser(MYTH_APPNAME_MYTHJOBQUEUE)
+{ LoadArguments(); }
+
+void MythJobQueueCommandLineParser::LoadArguments(void)
+{
+    addHelp();
+    addSettingsOverride();
+    addVersion();
+    addVerbose();
+    addLogFile();
+    addPIDFile();
+    addDaemon();
+}
+
+MythFillDatabaseCommandLineParser::MythFillDatabaseCommandLineParser(void) :
+    MythCommandLineParser(MYTH_APPNAME_MYTHFILLDATABASE)
+{ LoadArguments(); }
+
+void MythFillDatabaseCommandLineParser::LoadArguments(void)
+{
+}
+
+MythLCDServerCommandLineParser::MythLCDServerCommandLineParser(void) :
+    MythCommandLineParser(MYTH_APPNAME_MYTHLCDSERVER)
+{ LoadArguments(); }
+
+void MythLCDServerCommandLineParser::LoadArguments(void)
+{
+}
+
+MythMessageCommandLineParser::MythMessageCommandLineParser(void) :
+    MythCommandLineParser(MYTH_APPNAME_MYTHMESSAGE)
+{ LoadArguments(); }
+
+void MythMessageCommandLineParser::LoadArguments(void)
+{
+}
+
+MythShutdownCommandLineParser::MythShutdownCommandLineParser(void) :
+    MythCommandLineParser(MYTH_APPNAME_MYTHSHUTDOWN)
+{ LoadArguments(); }
+
+void MythShutdownCommandLineParser::LoadArguments(void)
+{
+}
+
+MythTVSetupCommandLineParser::MythTVSetupCommandLineParser(void) :
+    MythCommandLineParser(MYTH_APPNAME_MYTHTV_SETUP)
+{ LoadArguments(); }
+
+void MythTVSetupCommandLineParser::LoadArguments(void)
+{
+}
+
+MythTranscodeCommandLineParser::MythTranscodeCommandLineParser(void) :
+    MythCommandLineParser(MYTH_APPNAME_MYTHTRANSCODE)
+{ LoadArguments(); }
+
+void MythTranscodeCommandLineParser::LoadArguments(void)
+{
 }
 

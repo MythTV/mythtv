@@ -4,148 +4,258 @@
 #include <QDateTime>
 #include <QSize>
 #include <QMap>
+#include <QString>
+#include <QVariant>
 
 #include <stdint.h>   // for uint64_t
 
 #include "mythexp.h"
 
-typedef enum {
-    kCLPOverrideSettingsFile = 0x0000000001ULL,
-    kCLPOverrideSettings     = 0x0000000002ULL,
-    kCLPWindowed             = 0x0000000004ULL,
-    kCLPNoWindowed           = 0x0000000008ULL,
-    kCLPGetSettings          = 0x0000000010ULL,
-    kCLPQueryVersion         = 0x0000000020ULL,
-    kCLPDisplay              = 0x0000000040ULL,
-    kCLPGeometry             = 0x0000000080ULL,
-    kCLPVerbose              = 0x0000000100ULL,
-    kCLPSetVerbose           = 0x0000000200ULL,
-    kCLPHelp                 = 0x0000000400ULL,
-    kCLPExtra                = 0x0000000800ULL,
-    kCLPDaemon               = 0x0000001000ULL,
-    kCLPPrintSchedule        = 0x0000002000ULL,
-    kCLPTestSchedule         = 0x0000004000ULL,
-    kCLPReschedule           = 0x0000008000ULL,
-    kCLPNoSchedule           = 0x0000010000ULL,
-    kCLPNoUPnP               = 0x0000020000ULL,
-    kCLPUPnPRebuild          = 0x0000040000ULL,
-    kCLPNoJobqueue           = 0x0000080000ULL,
-    kCLPNoHousekeeper        = 0x0000100000ULL,
-    kCLPNoAutoExpire         = 0x0000200000ULL,
-    kCLPClearCache           = 0x0000400000ULL,
-    kCLPLogFile              = 0x0000800000ULL,
-    kCLPPidFile              = 0x0001000000ULL,
-    kCLPInFile               = 0x0002000000ULL,
-    kCLPOutFile              = 0x0004000000ULL,
-    kCLPUsername             = 0x0008000000ULL,
-    kCLPEvent                = 0x0010000000ULL,
-    kCLPSystemEvent          = 0x0020000000ULL,
-    kCLPChannelId            = 0x0040000000ULL,
-    kCLPStartTime            = 0x0080000000ULL,
-    kCLPPrintExpire          = 0x0100000000ULL,
-    kCLPGeneratePreview      = 0x0200000000ULL,
-    kCLPScanVideos           = 0x0400000000ULL,
-} ParseType;
+typedef struct commandlinearg {
+    QString         name;
+    QVariant::Type  type;
+    QVariant        def;
+    QString         help;
+    QString         longhelp;
+} CommandLineArg;
 
 class MPUBLIC MythCommandLineParser
 {
   public:
-    MythCommandLineParser(uint64_t things_to_parse);
+    MythCommandLineParser(QString);
 
-    bool PreParse(int argc, const char * const * argv, int &argpos, bool &err);
-    bool Parse(int argc, const char * const * argv, int &argpos, bool &err);
+    virtual void LoadArguments(void) {};
+    void PrintVersion(void);
+    void PrintHelp(void);
     QString GetHelpString(bool with_header) const;
 
-    QMap<QString,QString> GetSettingsOverride(void) const
-        { return settingsOverride; }
-    QStringList GetSettingsQuery(void) const
-        { return settingsQuery; }
-    QString GetDisplay(void)        const { return display;     }
-    QString GetGeometry(void)       const { return geometry;    }
-    QString GetLogFilename(void)    const { return logfile;     }
-    QString GetPIDFilename(void)    const { return pidfile;     }
-    QString GetInputFilename(void)  const { return infile;      }
-    QString GetOutputFilename(void) const { return outfile;     }
-    QString GetNewVerbose(void)     const { return newverbose;  }
-    QString GetUsername(void)       const { return username;    }
-    QString GetPrintExpire(void)    const { return printexpire; }
-    QString GetEventString(void)    const { return eventString; }
+    virtual bool Parse(int argc, const char * const * argv);
 
-    QSize     GetPreviewSize(void)        const { return previewSize; }
-    QDateTime GetStartTime(void)          const { return starttime;   }
-    uint      GetChanID(void)             const { return chanid;      }
-    long long GetPreviewFrameNumber(void) const { return  previewFrameNumber; }
-    long long GetPreviewSeconds(void)     const { return previewSeconds; }
+// overloaded add constructors for single string options
+    void add(QString arg, QString name, QString help, QString longhelp) // bool
+                { add(arg, name, false, help, longhelp); }
+    void add(QString arg, QString name, bool def,                       // bool with default
+             QString help, QString longhelp)
+                { add(QStringList(arg), name, QVariant::Bool,    
+                      QVariant(def), help, longhelp); }
+    void add(QString arg, QString name, int def,                        // int
+             QString help, QString longhelp)
+                { add(QStringList(arg), name, QVariant::Int,
+                      QVariant(def), help, longhelp); }
+    void add(QString arg, QString name, uint def,                       // uint
+             QString help, QString longhelp)
+                { add(QStringList(arg), name, QVariant::UInt,
+                      QVariant(def), help, longhelp); }
+    void add(QString arg, QString name, long long def,                  // long long
+             QString help, QString longhelp)
+                { add(QStringList(arg), name, QVariant::LongLong,
+                      QVariant(def), help, longhelp); }
+    void add(QString arg, QString name, double def,                     // double
+             QString help, QString longhelp)
+                { add(QStringList(arg), name, QVariant::Double,
+                      QVariant(def), help, longhelp); }
+    void add(QString arg, QString name, const char *def,                // const char *
+             QString help, QString longhelp)
+                { add(QStringList(arg), name, QVariant::String,
+                      QVariant(def), help, longhelp); }
+    void add(QString arg, QString name, QString def,                    // QString
+             QString help, QString longhelp)
+                { add(QStringList(arg), name, QVariant::String,
+                      QVariant(def), help, longhelp); }
+    void add(QString arg, QString name, QSize def,                      // QSize
+             QString help, QString longhelp)
+                { add(QStringList(arg), name, QVariant::Size,
+                      QVariant(def), help, longhelp); }
+    void add(QString arg, QString name, QDateTime def,                  // QDateTime
+             QString help, QString longhelp)
+                { add(QStringList(arg), name, QVariant::DateTime,
+                      QVariant(def), help, longhelp); }
+    void add(QString arg, QString name, QVariant::Type type,            // anything else
+             QString help, QString longhelp)
+                { add(QStringList(arg), name, type,
+                      QVariant(type), help, longhelp); }
+    void add(QString arg, QString name, QVariant::Type type,            // anything else with default
+             QVariant def, QString help, QString longhelp)
+                { add(QStringList(arg), name, type,
+                      def, help, longhelp); }
 
-    bool IsDaemonizeEnabled(void)   const { return daemonize;   }
-    bool IsPrintScheduleEnabled(void) const { return printsched;  }
-    bool IsTestSchedulerEnabled(void) const { return testsched;   }
-    bool IsSchedulerEnabled(void)   const { return !nosched;    }
-    bool IsUPnPEnabled(void)        const { return !noupnp;     }
-    bool IsJobQueueEnabled(void)    const { return !nojobqueue; }
-    bool IsHouseKeeperEnabled(void) const { return !nohousekeeper; }
-    bool IsAutoExpirerEnabled(void) const { return !noexpirer;  }
+// overloaded add constructors for multi-string options
+    void add(QStringList arglist, QString name,                         // bool
+             QString help, QString longhelp)
+                { add(arglist, name, false, help, longhelp); }
+    void add(QStringList arglist, QString name, bool def,               // bool with default
+             QString help, QString longhelp)
+                { add(arglist, name, QVariant::Bool,
+                      QVariant(def), help, longhelp); }
+    void add(QStringList arglist, QString name, int def,                // int
+             QString help, QString longhelp)
+                { add(arglist, name, QVariant::Int,
+                      QVariant(def), help, longhelp); }
+    void add(QStringList arglist, QString name, uint def,               // uint
+             QString help, QString longhelp)
+                { add(arglist, name, QVariant::UInt,
+                      QVariant(def), help, longhelp); }
+    void add(QStringList arglist, QString name, long long def,          // long long
+             QString help, QString longhelp)
+                { add(arglist, name, QVariant::LongLong,
+                      QVariant(def), help, longhelp); }
+    void add(QStringList arglist, QString name, double def,             // float
+             QString help, QString longhelp)
+                { add(arglist, name, QVariant::Double,
+                      QVariant(def), help, longhelp); }
+    void add(QStringList arglist, QString name, const char *def,        // const char *
+             QString help, QString longhelp)
+                { add(arglist, name, QVariant::String,
+                      QVariant(def), help, longhelp); }
+    void add(QStringList arglist, QString name, QString def,            // QString
+             QString help, QString longhelp)
+                { add(arglist, name, QVariant::String,
+                      QVariant(def), help, longhelp); }
+    void add(QStringList arglist, QString name, QSize def,              // QSize
+             QString help, QString longhelp)
+                { add(arglist, name, QVariant::Size,
+                      QVariant(def), help, longhelp); }
+    void add(QStringList arglist, QString name, QDateTime def,          // QDateTime
+             QString help, QString longhelp)
+                { add(arglist, name, QVariant::DateTime,
+                      QVariant(def), help, longhelp); }
+    void add(QStringList arglist, QString name, QVariant::Type type,    // anything else
+             QString help, QString longhelp)
+                { add(arglist, name, type,
+                      QVariant(type), help, longhelp); }
+    void add(QStringList arglist, QString name, QVariant::Type type,    // anything else with default
+             QVariant def, QString help, QString longhelp);
 
-    bool SetVerbose(void)           const { return setverbose;  }
-    bool Reschedule(void)           const { return resched;     }
-    bool ScanVideos(void)           const { return scanvideos;  }
-    bool ClearSettingsCache(void)   const { return clearsettingscache; }
-    bool WantUPnPRebuild(void)      const { return wantupnprebuild; }
+    QVariant                operator[](const QString &name);
+    QStringList             GetArgs(void) const { return m_remainingArgs; }
+    QMap<QString,QString>   GetSettingsOverride(void);
 
-    bool    HasInvalidPreviewGenerationParams(void) const
-    {
-        return ((!chanid || !starttime.isValid()) && infile.isEmpty());
-    }
+    bool                    toBool(QString key) const;
+    int                     toInt(QString key) const;
+    uint                    toUInt(QString key) const;
+    long long               toLongLong(QString key) const;
+    double                  toDouble(QString key) const;
+    QSize                   toSize(QString key) const;
+    QString                 toString(QString key) const;
+    QStringList             toStringList(QString key) const;
+    QMap<QString,QString>   toMap(QString key) const;
+    QDateTime               toDateTime(QString key) const;
 
-    bool    HasBackendCommand(void) const
-    {
-        return
-            !eventString.isEmpty()    || wantupnprebuild       ||
-            setverbose                || clearsettingscache    ||
-            printsched                || testsched             ||
-            resched                   || scanvideos            ||
-            !printexpire.isEmpty();
-    }
+  protected:
+    void allowExtras(bool allow=true) { m_allowExtras = allow; }
 
-    bool    WantsToExit(void) const { return wantsToExit; }
+    void addHelp(void);
+    void addVersion(void);
+    void addWindowed(bool);
+    void addDaemon(void);
+    void addSettingsOverride(void);
+    void addVerbose(void);
+    void addRecording(void);
+    void addGeometry(void);
+    void addDisplay(void);
+    void addUPnP(void);
+    void addLogFile(void);
+    void addPIDFile(void);
+    void addJob(void);
+
+    QString m_appname;
 
   private:
-    uint64_t              parseTypes;
+    QMap<QString,QVariant>          m_parsed;
+    QMap<QString,QVariant>          m_defaults;
+    QMap<QString,CommandLineArg>    m_registeredArgs;
+    bool                            m_allowExtras;
+    QStringList                     m_remainingArgs;
+    bool                            m_overridesImported;
+};
 
-    QMap<QString,QString> settingsOverride;
-    QStringList           settingsQuery;
+class MPUBLIC MythBackendCommandLineParser : public MythCommandLineParser
+{
+  public:
+    MythBackendCommandLineParser(void); 
+    void LoadArguments(void);
+};
 
-    QString               binname;
-    QString               display;
-    QString               geometry;
-    QString               logfile;
-    QString               pidfile;
-    QString               infile;
-    QString               outfile;
-    QString               newverbose;
-    QString               username;
-    QString               printexpire;
-    QString               eventString;
+class MPUBLIC MythFrontendCommandLineParser : public MythCommandLineParser
+{
+  public:
+    MythFrontendCommandLineParser(void);
+    void LoadArguments(void);
+};
 
-    QSize                 previewSize;
-    QDateTime             starttime;
+class MPUBLIC MythPreviewGeneratorCommandLineParser : public MythCommandLineParser
+{
+  public:
+    MythPreviewGeneratorCommandLineParser(void);
+    void LoadArguments(void);
+};
 
-    uint                  chanid;
-    long long             previewFrameNumber;
-    long long             previewSeconds;
+class MPUBLIC MythWelcomeCommandLineParser : public MythCommandLineParser
+{
+  public:
+    MythWelcomeCommandLineParser(void);
+    void LoadArguments(void);
+};
 
-    bool                  daemonize;
-    bool                  printsched;
-    bool                  testsched;
-    bool                  setverbose;
-    bool                  resched;
-    bool                  nosched;
-    bool                  scanvideos;
-    bool                  noupnp;
-    bool                  nojobqueue;
-    bool                  nohousekeeper;
-    bool                  noexpirer;
-    bool                  clearsettingscache;
-    bool                  wantupnprebuild;
-    bool                  wantsToExit;
+class MPUBLIC MythAVTestCommandLineParser : public MythCommandLineParser
+{
+  public:
+    MythAVTestCommandLineParser(void);
+    void LoadArguments(void);
+};
+
+class MPUBLIC MythCommFlagCommandLineParser : public MythCommandLineParser
+{
+  public:
+    MythCommFlagCommandLineParser(void);
+    void LoadArguments(void);
+};
+
+class MPUBLIC MythJobQueueCommandLineParser : public MythCommandLineParser
+{
+  public:
+    MythJobQueueCommandLineParser(void);
+    void LoadArguments(void);
+};
+
+class MPUBLIC MythFillDatabaseCommandLineParser : public MythCommandLineParser
+{
+  public:
+    MythFillDatabaseCommandLineParser(void);
+    void LoadArguments(void);
+};
+
+class MPUBLIC MythLCDServerCommandLineParser : public MythCommandLineParser
+{
+  public:
+    MythLCDServerCommandLineParser(void);
+    void LoadArguments(void);
+};
+
+class MPUBLIC MythMessageCommandLineParser : public MythCommandLineParser
+{
+  public:
+    MythMessageCommandLineParser(void);
+    void LoadArguments(void);
+};
+
+class MPUBLIC MythShutdownCommandLineParser : public MythCommandLineParser
+{
+  public:
+    MythShutdownCommandLineParser(void);
+    void LoadArguments(void);
+};
+
+class MPUBLIC MythTVSetupCommandLineParser : public MythCommandLineParser
+{
+  public:
+    MythTVSetupCommandLineParser(void);
+    void LoadArguments(void);
+};
+
+class MPUBLIC MythTranscodeCommandLineParser : public MythCommandLineParser
+{
+  public:
+    MythTranscodeCommandLineParser(void);
+    void LoadArguments(void);
 };
