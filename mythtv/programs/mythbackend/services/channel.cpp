@@ -63,7 +63,7 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
         int chanid = chanList.at(n);
         QString channum = ChannelUtil::GetChanNum(chanid);
         QString format, modulation, freqtable, freqid, dtv_si_std,
-                xmltvid, default_authority;
+                xmltvid, default_authority, icon;
         int finetune, program_number;
         uint64_t frequency;
         uint atscmajor, atscminor, transportid, networkid, mplexid;
@@ -75,12 +75,12 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
                             freqtable, freqid, finetune, frequency,
                             dtv_si_std, program_number, atscmajor,
                             atscminor, transportid, networkid, mplexid,
-                            commfree, eit, visible, xmltvid, default_authority ))
+                            commfree, eit, visible, xmltvid, default_authority, icon ))
         {
             pChannelInfo->setChanId(chanid);
             pChannelInfo->setChanNum(channum);
             pChannelInfo->setCallSign(ChannelUtil::GetCallsign(chanid));
-            pChannelInfo->setIconURL(ChannelUtil::GetIcon(chanid)); //Wrong!
+            pChannelInfo->setIconURL(icon);
             pChannelInfo->setChannelName(ChannelUtil::GetServiceName(chanid));
             pChannelInfo->setMplexId(mplexid);
             pChannelInfo->setServiceId(program_number);
@@ -144,7 +144,7 @@ DTC::ChannelInfo* Channel::GetChannelInfo( int nChanID )
     QString channum = ChannelUtil::GetChanNum(nChanID);
     uint sourceid = ChannelUtil::GetSourceIDForChannel(nChanID);
     QString format, modulation, freqtable, freqid, dtv_si_std,
-            xmltvid, default_authority;
+            xmltvid, default_authority, icon;
     int finetune, program_number;
     uint64_t frequency;
     uint atscmajor, atscminor, transportid, networkid, mplexid;
@@ -156,12 +156,12 @@ DTC::ChannelInfo* Channel::GetChannelInfo( int nChanID )
                             freqtable, freqid, finetune, frequency,
                             dtv_si_std, program_number, atscmajor,
                             atscminor, transportid, networkid, mplexid,
-                            commfree, eit, visible, xmltvid, default_authority ))
+                            commfree, eit, visible, xmltvid, default_authority, icon ))
     {
         pChannelInfo->setChanId(nChanID);
         pChannelInfo->setChanNum(channum);
         pChannelInfo->setCallSign(ChannelUtil::GetCallsign(nChanID));
-        pChannelInfo->setIconURL(ChannelUtil::GetIcon(nChanID));
+        pChannelInfo->setIconURL(icon);
         pChannelInfo->setChannelName(ChannelUtil::GetServiceName(nChanID));
         pChannelInfo->setMplexId(mplexid);
         pChannelInfo->setServiceId(program_number);

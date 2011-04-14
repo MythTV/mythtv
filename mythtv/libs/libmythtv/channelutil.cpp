@@ -1778,11 +1778,12 @@ bool ChannelUtil::GetExtendedChannelData(
     uint    &dvb_transportid, uint          &dvb_networkid,
     uint    &mplexid,         bool          &commfree,
     bool    &use_on_air_guide,bool          &visible,
-    QString &xmltvid,         QString       &default_authority)
+    QString &xmltvid,         QString       &default_authority,
+    QString &icon)
 {
-    tvformat         = modulation = freqtable = QString::null;
-    freqid           = dtv_si_std = xmltvid = QString::null;
-    default_authority = QString::null;
+    tvformat          = modulation = freqtable = QString::null;
+    freqid            = dtv_si_std = xmltvid = QString::null;
+    default_authority = icon       = QString::null;
     finetune         = 0;
     frequency        = 0;
     mpeg_prog_num    = -1;
@@ -1797,7 +1798,7 @@ bool ChannelUtil::GetExtendedChannelData(
         "SELECT finetune, freqid, tvformat, freqtable, "
         "       commmethod, mplexid, "
         "       atsc_major_chan, atsc_minor_chan, serviceid, "
-        "       useonairguide, visible, xmltvid, default_authority "
+        "       useonairguide, visible, xmltvid, default_authority, icon "
         "FROM channel, videosource "
         "WHERE videosource.sourceid = channel.sourceid AND "
         "      channum              = :CHANNUM         AND "
@@ -1832,6 +1833,7 @@ bool ChannelUtil::GetExtendedChannelData(
     visible           = query.value(10).toBool();
     xmltvid           = query.value(11).toString();
     default_authority = query.value(12).toString();
+    icon              = query.value(13).toString();
 
     if (!mplexid || (mplexid == 32767)) /* 32767 deals with old lineups */
         return true;
