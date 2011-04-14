@@ -204,6 +204,7 @@ function hideConfirm() {
 
 function showConfirm(content, functionname, params) {
     $("#confirmWindow").dialog({
+        modal: true,
         buttons: {
            'Yes': function() {
                if (params == null) {
