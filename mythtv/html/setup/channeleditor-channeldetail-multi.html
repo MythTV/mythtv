@@ -1,0 +1,44 @@
+<div id='multichannelsettings'>
+    <h3><a href="#">Basic Settings</a></h3>
+    <div id='multichanneldetail-basicsettings'>
+        <p>
+        <div style="float:center" id='multieditheader'><center>I want to modify the 
+            <select id='multiChannelOptions'>
+                <option value='ChanNum'>Channel Number</option>
+                <option value='ChanName'>Channel Name</option>
+                <option value='CallSign'>CallSign</option>
+            </select>
+            for these channels.
+        </div>
+        <table width="100%" cellpadding="0" cellspacing="10" border="0">
+            <tr>
+                <td style="text-align:right;">Use the following format: </td><td style='text-align:left;'><input size="50" id='multiChannelRenameTemplate' /></td>
+            </tr>
+        </table>
+        <hr>
+        <div style='float:right'>
+            <select id='appendMatchSelect'>
+                <option value='ChanId'>Channel ID</option>
+                <option value='ChanNum'>Channel Number</option>
+                <option value='ChanName'>Channel Name</option>
+                <option value='CallSign'>Callsign</option>
+                <option value='MplexId'>Multiplex ID</option>
+                <option value='ServiceId'>Service ID</option>
+                <option value='ATSCMajorChan'>ATSC Major Channel</option>
+                <option value='ATSCMinorChan'>ATSC Minor Channel</option>
+                <option value='SourceId'>Guide Source ID</option>
+                <option value='XMLTVID'>XMLTV or Schedules Direct ID</option>
+            </select>
+            <input type=button onClick='javascript:appendMatch("%" + $("#appendMatchSelect").val() + "%", "multiChannelRenameTemplate")' value='Append Variable'>
+        </div>
+        </p>
+    </div>
+
+    <h3><a href="#">Expert Information</a></h3>
+    <div id='multichanneldetail-expertsettings'>
+        <p>
+        <div id='channeldetailtable'></div>
+        </p>
+    </div>
+
+</div>

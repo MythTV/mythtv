@@ -80,7 +80,7 @@ function initChannelEditor() {
     $("#channels").contextMenu('channelmenu', {
             bindings: {
                 'editopt': function(t) {
-                    editSelectedChannel();
+                    editChannel();
                 },
                 'del': function(t) {
                     promptToDeleteChannel();
@@ -110,6 +110,19 @@ function initSourceList() {
     $("#sourceSelect").html("Guide Data Source: <select id='sourceList' "
         + "onChange='javascript:reloadChannelGrid()'>"
         + getGuideSourceList() + "</select>");
+}
+
+function editChannel() {
+    var rowNum = $('#channels').getGridParam('selrow');
+    var rowArr = $('#channels').getGridParam('selarrrow');
+    if (rowNum != null) {
+        if (rowArr.length == 1) {
+            editSelectedChannel();
+        }
+        else {
+            editMultiChannel();
+        }
+    }
 }
 
 function editSelectedChannel() {
@@ -224,6 +237,44 @@ function saveChannelEdits() {
 
             setStatusMessage("Updating channel...");
         }
+}
+
+function editMultiChannel() {
+    loadEditWindow("/setup/channeleditor-channeldetail-multi.html");
+    var rows = $('#channels').getGridParam('selarrrow');
+
+    var rowinfo = getMultiRowDescription();
+
+    $("#channeldetailtable").html(rowinfo);
+
+    $("#edit").dialog({
+        modal: true,
+        width: 800,
+        height: 620,
+        'title': 'Edit Multiple Channels',
+        closeOnEscape: false,
+        buttons: {
+           'Save': function() { saveMultiChannelEdits(); },
+           'Cancel': function() { $(this).dialog('close'); }
+    }});
+
+    $("#multichannelsettings").accordion();
+}
+
+function getMultiRowDescription() {
+    var result = '';
+    var rowArr = $('#channels').getGridParam('selarrrow');
+
+    $.each(rowArr, function(i, value) {
+        var rowdata = $("#channels").jqGrid('getRowData', value);
+        result = result + "Affected ChanId:" + rowdata.ChanId + "(" + rowdata.ChannelName + ")" + "<br>";
+    });
+
+    return result;
+}
+
+function saveMultiChannelEdits() {
+    $("#edit").dialog('close');
 }
 
 function promptToDeleteChannel() {

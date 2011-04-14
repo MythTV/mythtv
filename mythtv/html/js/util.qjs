@@ -225,3 +225,8 @@ function showConfirm(content, functionname, params) {
     $("#confirmWindow").draggable();
 }
 
+function appendMatch(match, divname) {
+    var newValue = $("#" + divname).val() + match;
+    $("#" + divname).val(newValue);
+}
+

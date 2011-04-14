@@ -26,11 +26,6 @@ function editJob(title, descKey, commandKey) {
     $("#jobEditCommand").val(getSetting("", commandKey, ""));
 }
 
-function appendMatch(match) {
-    var newValue = $("#jobEditCommand").val() + match;
-    $("#jobEditCommand").val(newValue);
-}
-
 function saveJobEditor() {
     var descKey;
     var commandKey;
