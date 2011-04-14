@@ -964,7 +964,7 @@ QString VideoMetadata::VideoFileHash(const QString &file_name,
     else if (!host.isEmpty())
     {
         StorageGroup sgroup("Videos", host);
-        QString fullname = sgroup.FindRecordingFile(file_name);
+        QString fullname = sgroup.FindFile(file_name);
         return FileHash(fullname);
     }
     else

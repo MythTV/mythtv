@@ -64,6 +64,7 @@ void StorageGroup::StaticInit(void)
 
     m_staticInitDone = true;
 
+    m_builtinGroups["ChannelIcons"] = GetConfDir() + "/ChannelIcons";
     m_builtinGroups["Themes"] = GetConfDir() + "/themes";
     m_builtinGroups["Temp"] = GetConfDir() + "/tmp";
 
@@ -181,7 +182,50 @@ void StorageGroup::Init(const QString group, const QString hostname,
     }
 }
 
-QStringList StorageGroup::GetFileList(QString Path)
+QStringList StorageGroup::GetDirFileList(QString dir, QString base,
+                                         bool recursive)
+{
+    QStringList files;
+    QDir d(dir);
+
+    if (!d.exists())
+        return files;
+
+    if (base.split("/").size() > 20)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "GetDirFileList(), 20 levels "
+                "deep, possible directory loop detected.");
+        return files;
+    }
+
+    if (!base.isEmpty())
+        base += "/";
+
+    if (recursive)
+    {
+        QStringList list =
+            d.entryList(QDir::Dirs|QDir::NoDotAndDotDot|QDir::Readable);
+
+        for (QStringList::iterator p = list.begin(); p != list.end(); ++p)
+        {
+            VERBOSE(VB_FILE+VB_EXTRA, LOC +
+                    QString("GetDirFileList: Dir: %1/%2").arg(base).arg(*p));
+            files << GetDirFileList(dir + "/" + *p, base + *p, true);
+        }
+    }
+
+    QStringList list = d.entryList(QDir::Files|QDir::Readable);
+    for (QStringList::iterator p = list.begin(); p != list.end(); ++p)
+    {
+        VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("GetDirFileList: File: %1%2")
+                                                .arg(base).arg(*p));
+        files.append(base + *p);
+    }
+
+    return files;
+}
+
+QStringList StorageGroup::GetFileList(QString Path, bool recursive)
 {
     QStringList files;
     QString tmpDir;
@@ -193,15 +237,7 @@ QStringList StorageGroup::GetFileList(QString Path)
 
         d.setPath(tmpDir);
         if (d.exists())
-        {
-            VERBOSE(VB_FILE, LOC + QString("GetFileList: Reading '%1'").arg(tmpDir));
-            QStringList list = d.entryList(QDir::Files|QDir::Readable);
-            for (QStringList::iterator p = list.begin(); p != list.end(); ++p)
-            {
-                VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("GetFileList: (%1)").arg(*p));
-                files.append(*p);
-            }
-        }
+            files << GetDirFileList(tmpDir, Path, recursive);
     }
 
     return files;
@@ -210,6 +246,7 @@ QStringList StorageGroup::GetFileList(QString Path)
 QStringList StorageGroup::GetFileInfoList(QString Path)
 {
     QStringList files;
+    QString relPath;
     bool badPath = true;
 
     if (Path.isEmpty() || Path == "/")
@@ -224,6 +261,10 @@ QStringList StorageGroup::GetFileInfoList(QString Path)
     {
         if (Path.startsWith(*it))
         {
+            relPath = Path;
+            relPath.replace(*it,"");
+            if (relPath.startsWith("/"))
+                relPath.replace(0,1,"");
             badPath = false;
         }
     }
@@ -255,7 +296,8 @@ QStringList StorageGroup::GetFileInfoList(QString Path)
         if (p->isDir())
             tmp = QString("dir::%1::0").arg(p->fileName());
         else
-            tmp = QString("file::%1::%2").arg(p->fileName()).arg(p->size());
+            tmp = QString("file::%1::%2::%3%4").arg(p->fileName()).arg(p->size())
+                          .arg(relPath).arg(p->fileName());
 
         VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("GetFileInfoList: (%1)").arg(tmp));
         files.append(tmp);
@@ -307,7 +349,7 @@ QStringList StorageGroup::GetFileInfo(QString filename)
     if (!FileExists(filename))
     {
         searched = true;
-        filename = FindRecordingFile(filename);
+        filename = FindFile(filename);
     }
 
     if ((searched && !filename.isEmpty()) ||
@@ -512,31 +554,31 @@ bool StorageGroup::FindDirs(const QString group, const QString hostname,
     return found;
 }
 
-QString StorageGroup::FindRecordingFile(QString filename)
+QString StorageGroup::FindFile(QString filename)
 {
-    VERBOSE(VB_FILE, LOC + QString("FindRecordingFile: Searching for '%1'")
+    VERBOSE(VB_FILE, LOC + QString("FindFile: Searching for '%1'")
                                    .arg(filename));
 
-    QString recDir = FindRecordingDir(filename);
+    QString recDir = FindFileDir(filename);
     QString result = "";
     
     if (!recDir.isEmpty())
     {
         result = recDir + "/" + filename;
-        VERBOSE(VB_FILE, LOC + QString("FindRecordingFile: Found '%1'")
+        VERBOSE(VB_FILE, LOC + QString("FindFile: Found '%1'")
                                        .arg(result));
     }
     else
     {
         VERBOSE(VB_FILE, LOC_ERR +
-                QString("FindRecordingFile: Unable to find '%1'!")
+                QString("FindFile: Unable to find '%1'!")
                         .arg(filename));
     }
 
     return result;
 }
 
-QString StorageGroup::FindRecordingDir(QString filename)
+QString StorageGroup::FindFileDir(QString filename)
 {
     QString result = "";
     QFileInfo checkFile("");
@@ -545,7 +587,7 @@ QString StorageGroup::FindRecordingDir(QString filename)
     while (curDir < m_dirlist.size())
     {
         QString testFile = m_dirlist[curDir] + "/" + filename;
-        VERBOSE(VB_FILE, LOC + QString("FindRecordingDir: Checking '%1' for '%2'")
+        VERBOSE(VB_FILE, LOC + QString("FindFileDir: Checking '%1' for '%2'")
                 .arg(m_dirlist[curDir]).arg(testFile));
         checkFile.setFile(testFile);
         if (checkFile.exists() || checkFile.isSymLink())
@@ -571,14 +613,14 @@ QString StorageGroup::FindRecordingDir(QString filename)
     {
         // Not found in current group so try Default
         StorageGroup sgroup("Default");
-        QString tmpFile = sgroup.FindRecordingDir(filename);
+        QString tmpFile = sgroup.FindFileDir(filename);
         result = (tmpFile.isEmpty()) ? result : tmpFile;
     }
     else
     {
         // Not found in Default so try any dir
         StorageGroup sgroup;
-        QString tmpFile = sgroup.FindRecordingDir(filename);
+        QString tmpFile = sgroup.FindFileDir(filename);
         result = (tmpFile.isEmpty()) ? result : tmpFile;
     }
 

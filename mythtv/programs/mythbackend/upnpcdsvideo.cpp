@@ -350,7 +350,7 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
     if (!QFile::exists( sFullFileName ))
     {
         StorageGroup sgroup("Videos");
-        sFullFileName = sgroup.FindRecordingFile( sFullFileName );
+        sFullFileName = sgroup.FindFile( sFullFileName );
     }
     QFileInfo fInfo( sFullFileName );
 
