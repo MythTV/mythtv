@@ -1,4 +1,5 @@
 #include "mythhdd.h"
+#include "mythlogging.h"
 
 /** \fn MythHDD::Get(QObject*, const char*, bool, bool)
  *  \brief Helper function used to create a new instance
@@ -22,6 +23,7 @@ MythHDD::MythHDD(QObject *par, const char *DevicePath,
                  bool SuperMount, bool AllowEject)
     : MythMediaDevice(par, DevicePath, SuperMount, AllowEject)
 {
+    LOG(VB_MEDIA, LOG_INFO, "MythHDD::MythHDD " + m_DevicePath);
     m_Status = MEDIASTAT_UNPLUGGED;
     m_MediaType = MEDIATYPE_DATA;       // default type is data
 }
@@ -38,6 +40,8 @@ MythMediaStatus MythHDD::checkMedia(void)
         m_VolumeID = m_MountPath;
 
         // device is mounted, trigger event
+        if (MEDIASTAT_MOUNTED != m_Status)
+            m_Status = MEDIASTAT_NOTMOUNTED;
         return setStatus(MEDIASTAT_MOUNTED);
     }
 
@@ -45,8 +49,8 @@ MythMediaStatus MythHDD::checkMedia(void)
     if (m_Status == MEDIASTAT_UNPLUGGED)
     {
         // a removable device was just plugged in try to mount it.
-        mount();
-        if (isMounted())
+        LOG(VB_MEDIA, LOG_INFO, "MythHDD::checkMedia try mounting " + m_DevicePath);
+        if (mount())
         {
             m_Status = MEDIASTAT_NOTMOUNTED;
             return setStatus(MEDIASTAT_MOUNTED);
