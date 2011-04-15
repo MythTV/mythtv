@@ -254,7 +254,7 @@ function editMultiChannel() {
         'title': 'Edit Multiple Channels',
         closeOnEscape: false,
         buttons: {
-           'Save': function() { saveMultiChannelEdits(); },
+           'Save': function() { showConfirm('Editing multiple channels at once should be done with great care.  Do you want to continue?  This cannot be undone.', saveMultiChannelEdits); },
            'Cancel': function() { $(this).dialog('close'); }
     }});
 
@@ -274,7 +274,92 @@ function getMultiRowDescription() {
 }
 
 function saveMultiChannelEdits() {
+    var action = $("#multiChannelOptions").val();
+    var rowArr = $('#channels').getGridParam('selarrrow');
+    $.each(rowArr, function(i, value) {
+        var rowdata = $("#channels").jqGrid('getRowData', value);
+        var orig = '';
+        var news = '';
+        if (action == "ChanNum") {
+            orig = rowdata.ChanNum;
+            rowdata.ChanNum = multiChannelEditTextReplace(rowdata);
+            news = rowdata.ChanNum;
+        }
+        else if (action == "ChanName") {
+            orig = rowdata.ChannelName;
+            rowdata.ChannelName = multiChannelEditTextReplace(rowdata);
+            news = rowdata.ChannelName;
+        }
+        else if (action == "CallSign") {
+            orig = rowdata.CallSign;
+            rowdata.CallSign = multiChannelEditTextReplace(rowdata);
+            news = rowdata.CallSign;
+        }
+
+        if (updateChannelRow(value, rowdata)) {
+        }
+    });
     $("#edit").dialog('close');
+}
+
+function multiChannelEditTextReplace(rowdata) {
+    var template = $("#multiChannelRenameTemplate").val();
+
+    template = template.replace("%ChanId%", rowdata.ChanId);
+    template = template.replace("%ChanNum%", rowdata.ChanNum);
+    template = template.replace("%ChanName%", rowdata.ChannelName);
+    template = template.replace("%CallSign%", rowdata.CallSign);
+    template = template.replace("%MplexId%", rowdata.MplexId);
+    template = template.replace("%ServiceId%", rowdata.ServiceId);
+    template = template.replace("%ATSCMajorChan%", rowdata.ATSCMajorChan);
+    template = template.replace("%ATSCMinorChan%", rowdata.ATSCMinorChan);
+    template = template.replace("%SourceId%", rowdata.SourceId);
+    template = template.replace("%XMLTVID%", rowdata.XMLTVID);
+
+    return template;
+}
+
+function updateChannelRow(rownum, rowdata) {
+    if ($("#channels").jqGrid('setRowData', rownum, rowdata)) {
+        if (updateDBChannelRow(rowdata))
+            return true;
+        else
+            return false;
+    }
+    else {
+        return false;
+    }
+}
+
+function updateDBChannelRow(rowdata) {
+    result = false;
+    var visible = false;
+    var useeit = false;
+
+    if (rowdata.Visible == "Yes")
+        visible = true;
+    if (rowdata.UseEIT == "Yes")
+        useeit = true;
+
+    $.ajaxSetup({ async: false });
+    $.post("/Channel/UpdateDBChannel",
+        { MplexID: rowdata.MplexId, SourceID: rowdata.SourceId, ChannelID: rowdata.ChanId,
+          CallSign: rowdata.CallSign, ChannelName: rowdata.ChannelName, ChannelNumber: rowdata.ChanNum,
+          ServiceID: rowdata.ServiceId, ATSCMajorChannel: rowdata.ATSCMajorChan,
+          ATSCMinorChannel: rowdata.ATSCMinorChan, UseEIT: useeit , visible: visible,
+          FrequencyID: rowdata.FrequencyId, Icon: rowdata.IconURL, Format: rowdata.Format, XMLTVID: rowdata.XMLTVID,
+          DefaultAuthority: rowdata.DefaultAuth},
+          function(data) {
+              if (data.bool == "true") {
+                  $('#channels').trigger('reloadGrid');
+                  result = true;
+              }
+              else
+                  setErrorMessage("Channels update failed!");
+         }, "json");
+    $.ajaxSetup({ async: true });
+
+    return result;
 }
 
 function promptToDeleteChannel() {
