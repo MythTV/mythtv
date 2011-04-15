@@ -1,13 +1,27 @@
 /* Styles shared by all sections */
 
     html, body {
-        font-size:        14px;
-        font-family:      sans-serif;
+        font: normal 14px Frutiger, "Frutiger Linotype", Univers, Calibri, "Gill Sans", "Gill Sans MT", "Myriad Pro", Myriad, "DejaVu Sans Condensed", "Liberation Sans", "Nimbus Sans L", Tahoma, Geneva, "Helvetica Neue", Helvetica, Arial, sans serif;
         color:            white;
         background-color: #88a1bb;
         border:           0px;
         margin:           0px;
         padding:          0px;
+    }
+    h1 {
+        font: 4em normal Georgia, 'Times New Roman', Times, serif;
+        padding: 20px;	margin: 0;
+        text-align:center;
+    }
+    h1 small{
+        font: 0.2em normal Verdana, Arial, Helvetica, sans-serif;
+        text-transform:uppercase; letter-spacing: 0.5em; line-height: 2em;
+        display: block;
+    }
+    h2 {
+        font: normal 2em Georgia, "Times New Roman", Times, serif;
+        margin: 0;
+        padding: 0;
     }
     a, a:visited {
         color:              #026;
@@ -22,6 +36,7 @@
 
     table
     {
+        font: normal 14px Frutiger, "Frutiger Linotype", Univers, Calibri, "Gill Sans", "Gill Sans MT", "Myriad Pro", Myriad, "DejaVu Sans Condensed", "Liberation Sans", "Nimbus Sans L", Tahoma, Geneva, "Helvetica Neue", Helvetica, Arial, sans-serif;
         width:100%;
     }
 
@@ -88,7 +103,6 @@
         z-index:            50;
     }
     #header_text {
-        font-weight:        bold;
         color:              #cdcccc;
         padding-left:       200px;
         line-height:        2.75em;
@@ -143,9 +157,6 @@
     }
 
     #menu-title {
-        font-size:          14px;
-        font-family:        sans-serif;
-        font-weight:        bold;
         color:              #E4D6CD;
         position:           fixed;
         top:                72px;
@@ -201,15 +212,6 @@
         padding: 5px 5px;
     }
 
-    div.Title {
-        font-size:          18px;
-        font-family:        sans-serif;
-        font-weight:        bold;
-        width:              100%;
-        color:              white;
-        text-align:         center;
-    }
-
     .config {
         display: none;
     }
@@ -238,4 +240,17 @@
     .form_error
     {
         color:    red;
+    }
+
+    .pressed
+    {
+        color: #fff;
+        padding: 20px;
+        background: #111;
+        border: 1px solid #000;
+        border-right: 1px solid #353535;
+        border-bottom: 1px solid #353535;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
     }
