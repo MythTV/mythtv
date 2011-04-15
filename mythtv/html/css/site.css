@@ -1,7 +1,7 @@
 /* Styles shared by all sections */
 
     html, body {
-        font: normal 14px Frutiger, "Frutiger Linotype", Univers, Calibri, "Gill Sans", "Gill Sans MT", "Myriad Pro", Myriad, "DejaVu Sans Condensed", "Liberation Sans", "Nimbus Sans L", Tahoma, Geneva, "Helvetica Neue", Helvetica, Arial, sans serif;
+        font: normal 13px Verdana, Geneva, sans-serif;
         color:            white;
         background-color: #88a1bb;
         border:           0px;
@@ -36,7 +36,7 @@
 
     table
     {
-        font: normal 14px Frutiger, "Frutiger Linotype", Univers, Calibri, "Gill Sans", "Gill Sans MT", "Myriad Pro", Myriad, "DejaVu Sans Condensed", "Liberation Sans", "Nimbus Sans L", Tahoma, Geneva, "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font: normal 13px Verdana, Geneva, sans-serif;
         width:100%;
     }
 
