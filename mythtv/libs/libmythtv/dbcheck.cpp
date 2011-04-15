@@ -21,7 +21,7 @@ using namespace std;
    mythtv/bindings/perl/MythTV.pm
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1271";
+const QString currentDatabaseVersion = "1273";
 
 static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver);
 static bool performActualUpdate(
@@ -5615,6 +5615,36 @@ NULL
 NULL
 };
         if (!performActualUpdate(updates, "1271", dbver))
+            return false;
+    }
+
+    if (dbver == "1271")
+    {
+        const char *updates[] = {
+"ALTER TABLE recordmatch MODIFY recordid INT UNSIGNED NOT NULL;",
+"ALTER TABLE recordmatch MODIFY chanid INT UNSIGNED NOT NULL;",
+"ALTER TABLE recordmatch MODIFY starttime DATETIME NOT NULL;",
+"ALTER TABLE recordmatch MODIFY manualid INT UNSIGNED NOT NULL;",
+"ALTER TABLE recordmatch ADD INDEX (starttime, chanid);",
+"ALTER TABLE oldrecorded MODIFY generic TINYINT(1) NOT NULL;",
+"ALTER TABLE oldrecorded ADD INDEX (future);",
+"ALTER TABLE oldrecorded ADD INDEX (starttime, chanid);",
+NULL
+};
+        if (!performActualUpdate(updates, "1272", dbver))
+            return false;
+    }
+
+    if (dbver == "1272")
+    {
+        const char *updates[] = {
+"DROP INDEX starttime ON recordmatch;",
+"DROP INDEX starttime ON oldrecorded;",
+"ALTER TABLE recordmatch ADD INDEX (chanid, starttime, manualid);",
+"ALTER TABLE oldrecorded ADD INDEX (chanid, starttime);",
+NULL
+};
+        if (!performActualUpdate(updates, "1273", dbver))
             return false;
     }
 

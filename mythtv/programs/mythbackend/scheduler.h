@@ -171,6 +171,7 @@ class Scheduler : public QObject
     QMap<QString, RecList> titlelistmap;
     InputGroupMap igrp;
 
+    QDateTime schedTime;
     bool reclist_changed;
 
     bool specsched;
