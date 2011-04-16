@@ -87,11 +87,13 @@ class MythSetting : public MythSettingBase
     MythSetting(QString _value, QString _default_data, SettingType _stype,
                 QString _label, QString _help_text, DataType _dtype,
                 QStringList _data_list, QStringList _display_list,
-                long long _range_min, long long _range_max) :
+                long long _range_min, long long _range_max,
+                QString _placeholder) :
         value(_value), data(_default_data), default_data(_default_data),
         stype(_stype), label(_label), help_text(_help_text), dtype(_dtype),
         data_list(_data_list), display_list(_display_list),
-        range_min(_range_min), range_max(_range_max)
+        range_min(_range_min), range_max(_range_max),
+        placeholder_text(_placeholder)
     {
     }
 
@@ -109,6 +111,7 @@ class MythSetting : public MythSettingBase
     QStringList display_list;
     long long range_min;
     long long range_max;
+    QString placeholder_text;
 };
 
 bool parse_settings(MythSettingList &settings, const QString &filename,

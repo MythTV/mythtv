@@ -12,22 +12,26 @@
                     Use an externally accessible address (ie, not 
                     127.0.0.1) if you are going to be running a frontend
                     on a different machine than this one."
+         placeholder_text="Enter backend IP address"
          data_type="localipaddress" />
       <setting
          value="BackendServerPort" default_data="6543"
          setting_type="host" label="Port"
+         placeholder_text="Enter backend server port"
          help_text= "Unless you've got good reason to, don't change this."
          data_type="integer_range"
          range_min="0" range_max="65535" />
       <setting
          value="BackendStatusPort" default_data="6544"
          setting_type="host" label="Status Port"
+         placeholder_text="Enter backend status port"
          help_text="Port which the server will listen to for HTTP requests."
          data_type="integer_range"
          range_min="0" range_max="65535" />
       <setting
          value="SecurityPin" default_data=""
          setting_type="host" label="Security PIN (Required)"
+         placeholder_text="Enter security PIN code"
          help_text="PIN code required for a frontend to connect
                     to the backend. Blank prevents all connections,
                     0000 allows any client to connect."
@@ -37,6 +41,7 @@
       <setting
          value="MasterServerIP" default_data="127.0.0.1"
          setting_type="global" label="Master Backend IP address"
+         placeholder_text="Enter master server IP address"
          help_text="The IP address of the master backend server. All
                     frontend and non-master backend machines will connect
                     to this server.  If you only have one backend,
@@ -187,6 +192,7 @@
       <setting
          value="MiscStatusScript" default_data=""
          setting_type="global" label="Miscellaneous Status Application"
+         placeholder_text="Enter miscellaneous status command"
          help_text="External application or script that outputs
                     extra information for inclusion in the
                     backend status page.  See
@@ -254,6 +260,7 @@
                label="Startup command"
                default_data=""
                setting_type="global"
+               placeholder_text="Enter startup command"
                help_text="This command is executed right after starting
                           the BE. As a parameter \'$status\' is replaced by either
                           \'auto\' if the machine was started automatically or
@@ -312,6 +319,7 @@
                label="Wakeup time format"
                default_data="hh:mm yyyy-MM-dd"
                setting_type="global"
+               placeholder_text="Enter wakeup time format"
                help_text="The format of the time string passed to the
                           'setWakeuptime Command' as $time. See
                           QT::QDateTime.toString() for details. Set to 'time_t' for
@@ -320,17 +328,20 @@
                label="Command to set Wakeup Time"
                default_data=""
                setting_type="global"
+               placeholder_text="Enter wakeup time command"
                help_text="The command used to set the wakeup time (passed as
                           $time) for the Master Backend" />
       <setting data_type="string" value="ServerHaltCommand"
                label="Server halt command"
                default_data="sudo /sbin/halt -p"
                setting_type="global"
+               placeholder_text="Enter backend halt command"
                help_text="The command used to halt the backends." />
       <setting data_type="string" value="preSDWUCheckCommand"
                label="Pre Shutdown check-command"
                default_data=""
                setting_type="global"
+               placeholder_text="Enter pre-shutdown command"
                help_text="A command executed before the backend would
                           shutdown. The return value determines if
                           the backend can shutdown. 0 - yes,
@@ -380,6 +391,7 @@
                  label="Wake Command"
                  default_data=""
                  setting_type="global"
+                 placeholder_text="Enter Wake-On-LAN command"
                  help_text="The command used to wake up your master
                             backend server. For example
                             'sudo /etc/init.d/mythtv-backend restart'." />
@@ -391,6 +403,7 @@
                  label="Sleep Command"
                  default_data=""
                  setting_type="host"
+                 placeholder_text="Enter LAN sleep command"
                  help_text="The command used to put this slave to sleep.
                             If set, the master backend will use this
                             command to put this slave to sleep when it
@@ -399,6 +412,7 @@
                  label="Wake Command"
                  default_data=""
                  setting_type="host"
+                 placeholder_text="Enter LAN wake command"
                  help_text="The command used to wake up this slave from sleep.
                             This setting is not used on the master backend." />
       </group>
@@ -409,6 +423,7 @@
                label="Backend Stop Command"
                default_data="killall mythbackend"
                setting_type="global"
+               placeholder_text="Enter backend stop command"
                help_text="The command used to stop the backend
                           when running on the master backend server.
                           For example 'sudo /etc/init.d/mythtv-backend stop'." />
@@ -416,6 +431,7 @@
                label="Backend Start Command"
                default_data="mythbackend"
                setting_type="global"
+               placeholder_text="Enter backend start command"
                help_text="The command used to start the backend
                           when running on the master backend server.
                           For example, 'sudo /etc/init.d/mythtv-backend start'." />
@@ -518,7 +534,7 @@
                           to run on the backend that made the
                           original recording." />
       <setting data_type="checkbox" value="AutoCommflagWhileRecording"
-               label="Start Auto-Commercial Flagging jobs when the recording starts"
+               label="Start Auto-Commercial Detection jobs when the recording starts"
                default_data="0"
                setting_type="global"
                help_text="If set and Auto Commercial Flagging is ON for
@@ -526,9 +542,10 @@
                           as soon as the recording starts.  NOT
                           recommended on underpowered systems." />
       <setting data_type="string" value="JobQueueCommFlagCommand"
-               label="Commercial Flagger command"
+               label="Commercial Detection Command"
                default_data="mythcommflag"
                setting_type="global"
+               placeholder_text="Enter commercial detection command"
                help_text="The program used to detect commercials in a
                           recording.  The default is 'mythcommflag'
                           if this setting is empty." />
@@ -536,6 +553,7 @@
                label="Transcoder command"
                default_data="mythtranscode"
                setting_type="global"
+               placeholder_text="Enter transcode command"
                help_text="The program used to transcode recordings.
                           The default is 'mythtranscode' if this
                           setting is empty." />
@@ -561,44 +579,52 @@
                label="User Job #1 Description"
                default_data="User Job #1"
                setting_type="global"
+               placeholder_text="Enter user job description"
                help_text="The Description for this User Job."   />
       <setting data_type="string" value="UserJob1"
                label="User Job #1 Command"
                default_data=""
                setting_type="global"
+               placeholder_text="Enter user job command"
                help_text="The command to run whenever this User Job
                           number is scheduled." />
       <setting data_type="string" value="UserJobDesc2"
                label="User Job #2 Description"
                default_data="User Job #2"
                setting_type="global"
+               placeholder_text="Enter user job description"
                help_text="The Description for this User Job."   />
       <setting data_type="string" value="UserJob2"
                label="User Job #2 Command"
                default_data=""
                setting_type="global"
+               placeholder_text="Enter user job command"
                help_text="The command to run whenever this User Job
                           number is scheduled." />
       <setting data_type="string" value="UserJobDesc3"
                label="User Job #3 Description"
                default_data="User Job #3"
                setting_type="global"
+               placeholder_text="Enter user job description"
                help_text="The Description for this User Job."   />
       <setting data_type="string" value="UserJob3"
                label="User Job #3 Command"
                default_data=""
                setting_type="global"
+               placeholder_text="Enter user job command"
                help_text="The command to run whenever this User Job
                           number is scheduled." />
       <setting data_type="string" value="UserJobDesc4"
                label="User Job #4 Description"
                default_data="User Job #4"
                setting_type="global"
+               placeholder_text="Enter user job description"
                help_text="The Description for this User Job."   />
       <setting data_type="string" value="UserJob4"
                label="User Job #4 Command"
                default_data=""
                setting_type="global"
+               placeholder_text="Enter user job command"
                help_text="The command to run whenever this User Job
                           number is scheduled." />
     </group>
@@ -737,28 +763,31 @@
     <group human_label="Program Schedule Downloading Options"
            unique_label="program_schedule_downloading_options">
       <setting data_type="checkbox" value="MythFillEnabled"
-               label="Automatically run mythfilldatabase"
+               label="Automatically update program listings"
                default_data="1"
                setting_type="global"
                help_text="This enables the automatic execution of
                           mythfilldatabase." />
       <setting data_type="string" value="MythFillDatabasePath"
                setting_type="global"
-               label="mythfilldatabase Program"
+               label="Guide Data Program"
                default_data="mythfilldatabase"
+               placeholder_text="Enter guide data command"
                help_text="Use 'mythfilldatabase' or the name of a custom
                           script that will populate the program guide info
                           for all your video sources." />
       <setting data_type="string" value="MythFillDatabaseArgs"
                setting_type="global"
-               label="mythfilldatabase Arguments"
+               label="Guide Data Arguments"
                default_data=""
+               placeholder_text="Enter guide data program arguments"
                help_text="Any arguments you want passed to the
-                          mythfilldatabase program." />
+                          guide data program." />
       <setting data_type="string" value="MythFillDatabaseLog"
                setting_type="global"
-               label="mythfilldatabase Log Path"
+               label="Guide Data Program Log Path"
                default_data=""
+               placeholder_text="Enter guide data program log path"
                help_text="File or directory to use for logging
                           output from the mythfilldatabase program.
                           Leave blank to disable logging." />
@@ -861,166 +890,199 @@
       <setting
          value="EventCmdRecPending" label="Recording pending"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdRecPending"
          data_type="string" />
       <setting
          value="EventCmdRecStarted" label="Recording started"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdRecStarted"
          data_type="string" />
       <setting
          value="EventCmdRecFinished" label="Recording finished"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdRecFinished"
          data_type="string" />
       <setting
          value="EventCmdRecDeleted" label="Recording deleted"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdRecDeleted"
          data_type="string" />
       <setting
          value="EventCmdRecExpired" label="Recording expired"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdRecExpired"
          data_type="string" />
       <setting
          value="EventCmdLivetvStarted" label="LiveTV started"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdLivetvStarted"
          data_type="string" />
       <setting
          value="EventCmdPlayStarted" label="Playback started"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdPlayStarted"
          data_type="string" />
       <setting
          value="EventCmdPlayStopped" label="Playback stopped"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdPlayStopped"
          data_type="string" />
       <setting
          value="EventCmdPlayPaused" label="Playback paused"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdPlayPaused"
          data_type="string" />
       <setting
          value="EventCmdPlayUnpaused" label="Playback unpaused"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdPlayUnpaused"
          data_type="string" />
       <setting
          value="EventCmdPlayChanged" label="Playback program changed"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdPlayChanged"
          data_type="string" />
       <setting
          value="EventCmdMasterStarted" label="Master backend started"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdMasterStarted"
          data_type="string" />
       <setting
          value="EventCmdMasterShutdown" label="Master backend shutdown"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdMasterShutdown"
          data_type="string" />
       <setting
          value="EventCmdClientConnected" label="Client connected to master backend"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdClientConnected"
          data_type="string" />
       <setting
          value="EventCmdClientDisconnected" label="Client disconnected from master backend"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdClientDisconnected"
          data_type="string" />
       <setting
          value="EventCmdSlaveConnected" label="Slave backend connected to master"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdSlaveConnected"
          data_type="string" />
       <setting
          value="EventCmdSlaveDisconnected" label="Slave backend disconnected from master"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdSlaveDisconnected"
          data_type="string" />
       <setting
          value="EventCmdNetCtrlConnected" label="Network Control client connected"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdNetCtrlConnected"
          data_type="string" />
       <setting
          value="EventCmdNetCtrlDisconnected" label="Network Control client disconnected"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdNetCtrlDisconnected"
          data_type="string" />
       <setting
          value="EventCmdMythfilldatabaseRan" label="mythfilldatabase ran"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdMythfilldatabaseRan"
          data_type="string" />
       <setting
          value="EventCmdSchedulerRan" label="Scheduler ran"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdSchedulerRan"
          data_type="string" />
       <setting
          value="EventCmdSettingsCacheCleared" label="Settings cache cleared"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdSettingsCacheCleared"
          data_type="string" />
       <setting
          value="EventCmdKey01" label="Keystroke event #1"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdKey01"
          data_type="string" />
       <setting
          value="EventCmdKey02" label="Keystroke event #2"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdKey02"
          data_type="string" />
       <setting
          value="EventCmdKey03" label="Keystroke event #3"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdKey03"
          data_type="string" />
       <setting
          value="EventCmdKey04" label="Keystroke event #4"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdKey04"
          data_type="string" />
       <setting
          value="EventCmdKey05" label="Keystroke event #5"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdKey05"
          data_type="string" />
       <setting
          value="EventCmdKey06" label="Keystroke event #6"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdKey06"
          data_type="string" />
       <setting
          value="EventCmdKey07" label="Keystroke event #7"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdKey07"
          data_type="string" />
       <setting
          value="EventCmdKey08" label="Keystroke event #8"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdKey08"
          data_type="string" />
       <setting
          value="EventCmdKey09" label="Keystroke event #9"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdKey09"
          data_type="string" />
       <setting
          value="EventCmdKey10" label="Keystroke event #10"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdKey10"
          data_type="string" />
       <setting
          value="EventCmdAll" label="Any event"
          setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
          help_text="EventCmdAll"
          data_type="string" />
     </group>

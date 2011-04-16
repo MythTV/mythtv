@@ -34,6 +34,23 @@
         font-weight:        bold;
     }
 
+    p.setting_paragraph
+    {
+        padding:            0px 0px 10px 0px;
+    }
+
+    .setting_select, .setting_input
+    {
+        float: left;
+    }
+
+    .setting_label
+    {
+        width: 100%;
+        float: left;
+        clear: left;
+    }
+
     table
     {
         font: normal 13px Verdana, Geneva, sans-serif;
@@ -208,10 +225,6 @@
         padding: 8px 0 0 10px;
     }
 
-    div.setting {
-        padding: 5px 5px;
-    }
-
     .config {
         display: none;
     }
@@ -254,3 +267,9 @@
         -moz-border-radius: 5px;
         border-radius: 5px;
     }
+
+/*    label
+    {
+        width:300px;
+        float:left;
+    }*/
