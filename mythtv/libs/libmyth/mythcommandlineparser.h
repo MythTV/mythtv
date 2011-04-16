@@ -137,7 +137,7 @@ class MPUBLIC MythCommandLineParser
     double                  toDouble(QString key) const;
     QSize                   toSize(QString key) const;
     QString                 toString(QString key) const;
-    QStringList             toStringList(QString key) const;
+    QStringList             toStringList(QString key, QString sep = "") const;
     QMap<QString,QString>   toMap(QString key) const;
     QDateTime               toDateTime(QString key) const;
 
@@ -158,104 +158,107 @@ class MPUBLIC MythCommandLineParser
     void addPIDFile(void);
     void addJob(void);
 
-    QString m_appname;
-
   private:
+    int getOpt(int argc, const char * const * argv, int &argpos,
+               QString &opt, QString &val);
+
+    QString                         m_appname;
     QMap<QString,QVariant>          m_parsed;
     QMap<QString,QVariant>          m_defaults;
     QMap<QString,CommandLineArg>    m_registeredArgs;
     bool                            m_allowExtras;
     QStringList                     m_remainingArgs;
     bool                            m_overridesImported;
+    bool                            m_verbose;
 };
 
 class MPUBLIC MythBackendCommandLineParser : public MythCommandLineParser
 {
   public:
-    MythBackendCommandLineParser(void); 
+    MythBackendCommandLineParser(); 
     void LoadArguments(void);
 };
 
 class MPUBLIC MythFrontendCommandLineParser : public MythCommandLineParser
 {
   public:
-    MythFrontendCommandLineParser(void);
+    MythFrontendCommandLineParser();
     void LoadArguments(void);
 };
 
 class MPUBLIC MythPreviewGeneratorCommandLineParser : public MythCommandLineParser
 {
   public:
-    MythPreviewGeneratorCommandLineParser(void);
+    MythPreviewGeneratorCommandLineParser();
     void LoadArguments(void);
 };
 
 class MPUBLIC MythWelcomeCommandLineParser : public MythCommandLineParser
 {
   public:
-    MythWelcomeCommandLineParser(void);
+    MythWelcomeCommandLineParser();
     void LoadArguments(void);
 };
 
 class MPUBLIC MythAVTestCommandLineParser : public MythCommandLineParser
 {
   public:
-    MythAVTestCommandLineParser(void);
+    MythAVTestCommandLineParser();
     void LoadArguments(void);
 };
 
 class MPUBLIC MythCommFlagCommandLineParser : public MythCommandLineParser
 {
   public:
-    MythCommFlagCommandLineParser(void);
+    MythCommFlagCommandLineParser();
     void LoadArguments(void);
 };
 
 class MPUBLIC MythJobQueueCommandLineParser : public MythCommandLineParser
 {
   public:
-    MythJobQueueCommandLineParser(void);
+    MythJobQueueCommandLineParser();
     void LoadArguments(void);
 };
 
 class MPUBLIC MythFillDatabaseCommandLineParser : public MythCommandLineParser
 {
   public:
-    MythFillDatabaseCommandLineParser(void);
+    MythFillDatabaseCommandLineParser();
     void LoadArguments(void);
 };
 
 class MPUBLIC MythLCDServerCommandLineParser : public MythCommandLineParser
 {
   public:
-    MythLCDServerCommandLineParser(void);
+    MythLCDServerCommandLineParser();
     void LoadArguments(void);
 };
 
 class MPUBLIC MythMessageCommandLineParser : public MythCommandLineParser
 {
   public:
-    MythMessageCommandLineParser(void);
+    MythMessageCommandLineParser();
     void LoadArguments(void);
 };
 
 class MPUBLIC MythShutdownCommandLineParser : public MythCommandLineParser
 {
   public:
-    MythShutdownCommandLineParser(void);
+    MythShutdownCommandLineParser();
     void LoadArguments(void);
 };
 
 class MPUBLIC MythTVSetupCommandLineParser : public MythCommandLineParser
 {
   public:
-    MythTVSetupCommandLineParser(void);
+    MythTVSetupCommandLineParser();
     void LoadArguments(void);
 };
 
 class MPUBLIC MythTranscodeCommandLineParser : public MythCommandLineParser
 {
   public:
-    MythTranscodeCommandLineParser(void);
+    MythTranscodeCommandLineParser();
     void LoadArguments(void);
 };

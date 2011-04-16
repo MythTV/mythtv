@@ -1,4 +1,6 @@
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
 using namespace std;
 
 #include <QFile>
@@ -17,6 +19,13 @@ using namespace std;
 #include "mythverbose.h"
 #include "mythversion.h"
 
+int kEnd     = 0,
+    kEmpty   = 1,
+    kOptOnly = 2,
+    kOptVal  = 3,
+    kArg     = 4,
+    kInvalid = 5;
+
 typedef struct helptmp {
     QString left;
     QString right;
@@ -25,8 +34,16 @@ typedef struct helptmp {
 } HelpTmp;
 
 MythCommandLineParser::MythCommandLineParser(QString appname) :
-    m_appname(appname), m_allowExtras(false), m_overridesImported(false)
+    m_appname(appname), m_allowExtras(false), m_overridesImported(false),
+    m_verbose(false)
 {
+    char *verbose = getenv("VERBOSE_PARSER");
+    if (verbose != NULL)
+    {
+        cerr << "MythCommandLineParser is now operating verbosely." << endl;
+        m_verbose = true;
+    }
+
     LoadArguments();
 }
 
@@ -46,9 +63,10 @@ void MythCommandLineParser::add(QStringList arglist, QString name,
     {
         if (!m_registeredArgs.contains(*i))
         {
-//            cerr << "Adding " << (*i).toLocal8Bit().constData()
-//                 << " as taking type '" << QVariant::typeToName(type)
-//                 << "'" << endl;
+            if (m_verbose)
+                cerr << "Adding " << (*i).toLocal8Bit().constData()
+                     << " as taking type '" << QVariant::typeToName(type)
+                     << "'" << endl;
             m_registeredArgs.insert(*i, arg);
         }
     }
@@ -201,151 +219,220 @@ QString MythCommandLineParser::GetHelpString(bool with_header) const
     return helpstr;
 }
 
+int MythCommandLineParser::getOpt(int argc, const char * const * argv,
+                                    int &argpos, QString &opt, QString &val)
+{
+    opt.clear();
+    val.clear();
+
+    if (argpos >= argc)
+        // this shouldnt happen, return and exit
+        return kEnd;
+
+    QString tmp = QString::fromLocal8Bit(argv[argpos]);
+    if (tmp.isEmpty())
+        // string is empty, return and loop
+        return kEmpty;
+
+    if (tmp.startsWith("-") && tmp.size() > 1)
+    {
+        if (tmp.contains("="))
+        {
+            // option contains '=', split
+            QStringList slist = tmp.split("=");
+
+            if (slist.size() != 2)
+            {
+                // more than one '=' in option, this is not handled
+                opt = tmp;
+                return kInvalid;
+            }
+
+            opt = slist[0];
+            val = slist[1];
+            return kOptVal;
+        }
+
+        opt = tmp;
+
+        if (argpos+1 >= argc)
+            // end of input, option only
+            return kOptOnly;
+
+        tmp = QString::fromLocal8Bit(argv[++argpos]);
+        if (tmp.isEmpty())
+            // empty string, option only
+            return kOptOnly;
+
+        if (tmp.startsWith("-") && tmp.size() > 1)
+        {
+            // no value found for option, backtrack
+            argpos--;
+            return kOptOnly;
+        }
+
+        val = tmp;
+        return kOptVal;
+    }
+    else
+    {
+        // input is not an option string, return as arg
+        val = tmp;
+        return kArg;
+    }
+
+}
+
 bool MythCommandLineParser::Parse(int argc, const char * const * argv)
 {
     bool processed;
-    QString opt, val, name;
-    QVariant::Type type;
+    int res;
+    QString opt, val;
+    CommandLineArg argdef;
+
+    if (m_allowExtras)
+        m_parsed["extra"] = QVariant(QVariantMap());
 
     QMap<QString, CommandLineArg>::const_iterator i;
     for (int argpos = 1; argpos < argc; ++argpos)
     {
 
-        opt = QString::fromLocal8Bit(argv[argpos]);
-//        cerr << "Processing: " << argv[argpos] << endl;
-        if (!opt.startsWith("-") && opt.size() != 1)
+        res = getOpt(argc, argv, argpos, opt, val);
+
+        if (res == kEnd)
+            break;
+        else if (res == kEmpty)
+            continue;
+        else if (res == kInvalid)
         {
-            // arguments cannot start with '-', but can /be/ a
-            // single '-' for the purposes of using stdin/ou
+            cerr << "Invalid option received:" << endl << "    "
+                 << opt.toLocal8Bit().constData();
+            return false;
+        }
+        else if (res == kArg)
+        {
             m_remainingArgs << opt;
             continue;
         }
-        else
+
+        // this line should not be passed once arguments have started collecting
+        if (!m_remainingArgs.empty())
         {
-            if (!m_remainingArgs.empty())
-            {
-                cerr << "Command line arguments received out of sequence"
-                     << endl;
-                return false;
-            }
+            cerr << "Command line arguments received out of sequence"
+                 << endl;
+            return false;
         }
 
-        processed = false;
+#ifdef Q_WS_MACX
+        if (opts.startsWith("-psn_"))
+        {
+            cerr << "Ignoring Process Serial Number from command line"
+                 << endl;
+            continue;
+        }
+#endif
 
+        // scan for matching option handler
+        processed = false;
         for (i = m_registeredArgs.begin(); i != m_registeredArgs.end(); ++i)
         {
             if (opt == i.key())
             {
+                argdef = i.value();
                 processed = true;
-                name = i.value().name;
-                type = i.value().type;
-
-                if (type == QVariant::Bool)
-                {
-//                    cerr << "  bool set to inverse of default" << endl;
-                    // if defined, a bool is set to the opposite of default
-                    m_parsed[name] = QVariant(!(i.value().def.toBool()));
-                    break;
-                }
-
-                // try to pull value
-                if (++argpos == argc)
-                {
-                    // end of list
-                    if (type == QVariant::String)
-                    {
-//                        cerr << "  string set to default" << endl;
-                        // strings can be undefined, and set to
-                        // their default value
-                        m_parsed[name] = i.value().def;
-                        break;
-                    }
-
-                    // all other types expect a value
-                    cerr << "Command line option did not receive value"
-                         << endl;
-                    return false;
-                }
-
-//                cerr << "  value found: " << argv[argpos] << endl;
-
-                val = QString::fromLocal8Bit(argv[argpos]);
-                if (val.startsWith("-"))
-                {
-                    // new option reached without value
-                    if (type == QVariant::String)
-                    {
-                        if (val.size() == 1)
-                            // allow a single '-' for stdin/out
-                            m_parsed[name] = '-';
-                        else
-//                          cerr << "  string set to default" << endl;
-                            m_parsed[name] = i.value().def;
-                        break;
-                    }
-
-                    cerr << "Command line option did not receive value"
-                         << endl;
-                    return false;
-                }
-
-                if (type == QVariant::Int)
-                    m_parsed[name] = QVariant(val.toInt());
-                else if (type == QVariant::LongLong)
-                    m_parsed[name] = QVariant(val.toLongLong());
-                else if (type == QVariant::StringList)
-                {
-                    QStringList slist;
-                    if (m_parsed.contains(name))
-                        slist = m_parsed[name].toStringList();
-                    slist << val;
-                    m_parsed[name] = QVariant(slist);
-                }
-                else if (type == QVariant::Map)
-                {
-                    // check for missing key/val pair
-                    if (!val.contains("="))
-                    {
-                        cerr << "Command line option did not get expected "
-                                "key/value pair" << endl;
-                        return false;
-                    }
-
-                    QStringList slist = val.split("=");
-                    QVariantMap vmap;
-                    if (m_parsed.contains(name))
-                        vmap = m_parsed[name].toMap();
-                    vmap[slist[0]] = QVariant(slist[1]);
-                    m_parsed[name] = QVariant(vmap);
-                }
-                else if (type == QVariant::Size)
-                {
-                    if (!val.contains("x"))
-                    {
-                        cerr << "Command line option did not get expected "                                      "XxY pair" << endl;
-                        return false;
-                    }
-                    QStringList slist = val.split("x");
-                    m_parsed[name] = QSize(slist[0].toInt(), slist[1].toInt());
-                }
-                else
-                    m_parsed[name] = QVariant(val);
-                    // add more type specifics
-
                 break;
             }
         }
-#ifdef Q_WS_MACX
-        if (opts.startsWith("-psn_"))
-            cerr << "Ignoring Process Serial Number from command line"
-                 << endl;
-        else if (!processed && !m_allowExtras)
-#else
-        if (!processed && !m_allowExtras)
-#endif
+
+        // if unhandled, and extras are allowed, specify general collection pool
+        if (!processed)
         {
-            cerr << "Unhandled option given on command line" << endl;
-            return false;
+            if (m_allowExtras)
+            {
+                argdef.name = "extra";
+                argdef.type = QVariant::Map;
+                QString tmp = QString("%1=%2").arg(opt).arg(val);
+                val = tmp;
+                res = kOptVal;
+            }
+            else
+            {
+                // else fault
+                cerr << "Unhandled option given on command line:" << endl << "    "
+                     << opt.toLocal8Bit().constData() << endl;
+                return false;
+            }
+        }
+
+        if (res == kOptOnly)
+        {
+            if (argdef.type == QVariant::Bool)
+                m_parsed[argdef.name] = QVariant(!(i.value().def.toBool()));
+            else if (argdef.type == QVariant::String)
+                m_parsed[argdef.name] = i.value().def;
+            else
+            {
+                cerr << "Command line option did not receive value:" << endl
+                     << "    " << opt.toLocal8Bit().constData() << endl;
+                return false;
+            }
+        }
+        else if (res == kOptVal)
+        {
+            if (argdef.type == QVariant::Bool)
+            {
+                cerr << "Boolean type options do not accept values:" << endl
+                     << "    " << opt.toLocal8Bit().constData() << endl;
+                return false;
+            }
+            else if (argdef.type == QVariant::String)
+                m_parsed[argdef.name] = QVariant(val);
+            else if (argdef.type == QVariant::Int)
+                m_parsed[argdef.name] = QVariant(val.toInt());
+            else if (argdef.type == QVariant::UInt)
+                m_parsed[argdef.name] = QVariant(val.toUInt());
+            else if (argdef.type == QVariant::LongLong)
+                m_parsed[argdef.name] = QVariant(val.toLongLong());
+            else if (argdef.type == QVariant::Double)
+                m_parsed[argdef.name] = QVariant(val.toDouble());
+            else if (argdef.type == QVariant::StringList)
+            {
+                QStringList slist;
+                if (m_parsed.contains(argdef.name))
+                    slist = m_parsed[argdef.name].toStringList();
+                slist << val;
+                m_parsed[argdef.name] = QVariant(slist);
+            }
+            else if (argdef.type == QVariant::Map)
+            {
+                // check for missing key/val pair
+                if (!val.contains("="))
+                {
+                    cerr << "Command line option did not get expected "
+                            "key/value pair" << endl;
+                    return false;
+                }
+
+                QStringList slist = val.split("=");
+                QVariantMap vmap;
+                if (m_parsed.contains(argdef.name))
+                    vmap = m_parsed[argdef.name].toMap();
+                vmap[slist[0]] = QVariant(slist[1]);
+                m_parsed[argdef.name] = QVariant(vmap);
+            }
+            else if (argdef.type == QVariant::Size)
+            {
+                if (!val.contains("x"))
+                {
+                    cerr << "Command line option did not get expected "
+                            "XxY pair" << endl;
+                    return false;
+                }
+                QStringList slist = val.split("x");
+                m_parsed[argdef.name] = QSize(slist[0].toInt(), slist[1].toInt());
+            }
+            else
+                m_parsed[argdef.name] = QVariant(val);
         }
     }
 
@@ -431,10 +518,15 @@ bool MythCommandLineParser::toBool(QString key) const
 
     bool val = false;
     if (m_parsed.contains(key))
+    {
         if (m_parsed[key].type() == QVariant::Bool)
             val = m_parsed[key].toBool();
         else
             val = true;
+    }
+    else if (m_defaults.contains(key))
+        if (m_defaults[key].type() == QVariant::Bool)
+            val = m_defaults[key].toBool();
     return val;
 }
 
@@ -523,16 +615,20 @@ QString MythCommandLineParser::toString(QString key) const
     return val;
 }
 
-QStringList MythCommandLineParser::toStringList(QString key) const
+QStringList MythCommandLineParser::toStringList(QString key, QString sep) const
 {
     // Return matching value if defined, else use default
     // If key is not registered, return empty stringlist
     QStringList val;
     if (m_parsed.contains(key))
-        if (m_parsed[key].canConvert(QVariant::StringList))
+        if (m_parsed[key].type() == QVariant::String && !sep.isEmpty())
+            val << m_parsed[key].toString().split(sep);
+        else if (m_parsed[key].canConvert(QVariant::StringList))
             val << m_parsed[key].toStringList();
     else if (m_defaults.contains(key))
-        if (m_defaults[key].canConvert(QVariant::StringList))
+        if (m_defaults[key].type() == QVariant::String && !sep.isEmpty())
+            val << m_defaults[key].toString().split(sep);
+        else if (m_defaults[key].canConvert(QVariant::StringList))
             val = m_defaults[key].toStringList();
     return val;
 }
@@ -581,8 +677,8 @@ QDateTime MythCommandLineParser::toDateTime(QString key) const
 
 void MythCommandLineParser::addHelp(void)
 {
-    add(QStringList( QStringList() << "-h" << "--help" ), "showhelp", "",
-            "Display this help printout.",
+    add(QStringList( QStringList() << "-h" << "--help" << "--usage" ),
+            "showhelp", "", "Display this help printout.",
             "Displays a list of all commands available for use with\n"
             "this application. If another option is provided as an\n"
             "argument, it will provide detailed information on that\n"
@@ -697,7 +793,7 @@ void MythCommandLineParser::addJob(void)
             "ability to update runtime status in the database.");
 }
 
-MythBackendCommandLineParser::MythBackendCommandLineParser(void) :
+MythBackendCommandLineParser::MythBackendCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHBACKEND)
 { LoadArguments(); }
 
@@ -769,7 +865,7 @@ void MythBackendCommandLineParser::LoadArguments(void)
             "Drop permissions to username after starting.", "");
 }
 
-MythFrontendCommandLineParser::MythFrontendCommandLineParser(void) :
+MythFrontendCommandLineParser::MythFrontendCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHFRONTEND)
 { LoadArguments(); }
 
@@ -793,7 +889,7 @@ void MythFrontendCommandLineParser::LoadArguments(void)
         "noautodiscovery", "Prevent frontend from using UPnP autodiscovery.", "");
 }
 
-MythPreviewGeneratorCommandLineParser::MythPreviewGeneratorCommandLineParser(void) :
+MythPreviewGeneratorCommandLineParser::MythPreviewGeneratorCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHPREVIEWGEN)
 { LoadArguments(); }
 
@@ -811,7 +907,7 @@ void MythPreviewGeneratorCommandLineParser::LoadArguments(void)
     add("--outfile" "outputfile", "", "Optional output file for preview generation.", "");
 }
 
-MythWelcomeCommandLineParser::MythWelcomeCommandLineParser(void) :
+MythWelcomeCommandLineParser::MythWelcomeCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHWELCOME)
 { LoadArguments(); }
 
@@ -827,7 +923,7 @@ void MythWelcomeCommandLineParser::LoadArguments(void)
             "Run setup for mythshutdown.", "");
 }
 
-MythAVTestCommandLineParser::MythAVTestCommandLineParser(void) :
+MythAVTestCommandLineParser::MythAVTestCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHAVTEST)
 { LoadArguments(); }
 
@@ -842,7 +938,7 @@ void MythAVTestCommandLineParser::LoadArguments(void)
     addDisplay();
 }
 
-MythCommFlagCommandLineParser::MythCommFlagCommandLineParser(void) :
+MythCommFlagCommandLineParser::MythCommFlagCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHCOMMFLAG)
 { LoadArguments(); }
 
@@ -881,7 +977,7 @@ void MythCommFlagCommandLineParser::LoadArguments(void)
     add("--outputfile", "outputfile", "", "File to write commercial flagging output [debug].", "");
 }
 
-MythJobQueueCommandLineParser::MythJobQueueCommandLineParser(void) :
+MythJobQueueCommandLineParser::MythJobQueueCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHJOBQUEUE)
 { LoadArguments(); }
 
@@ -896,7 +992,7 @@ void MythJobQueueCommandLineParser::LoadArguments(void)
     addDaemon();
 }
 
-MythFillDatabaseCommandLineParser::MythFillDatabaseCommandLineParser(void) :
+MythFillDatabaseCommandLineParser::MythFillDatabaseCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHFILLDATABASE)
 { LoadArguments(); }
 
@@ -1046,43 +1142,184 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "channel icons as well.");
 }
 
-MythLCDServerCommandLineParser::MythLCDServerCommandLineParser(void) :
+MythLCDServerCommandLineParser::MythLCDServerCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHLCDSERVER)
 { LoadArguments(); }
 
 void MythLCDServerCommandLineParser::LoadArguments(void)
 {
+    addHelp();
+    addVersion();
+    addVerbose();
+    addDaemon();
+    addLogFile();
+    //addPIDFile();
+
+    add(QStringList( QStringList() << "-p" << "--port" ), "port", 6545, "listen port",
+            "This is the port MythLCDServer will listen on for events.");
+    add(QStringList( QStringList() << "-m" << "--startupmessage" ), "message", "",
+            "Message to display on startup.", "");
+    add(QStringList( QStringList() << "-t" << "--messagetime"), "messagetime", 30,
+            "Message display duration (in seconds)", "");
+    add(QStringList( QStringList() << "-x" << "--debuglevel" ), "debug", 0,
+            "debug verbosity", "Control debugging verbosity, values from 0-10");
 }
 
-MythMessageCommandLineParser::MythMessageCommandLineParser(void) :
+MythMessageCommandLineParser::MythMessageCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHMESSAGE)
 { LoadArguments(); }
 
 void MythMessageCommandLineParser::LoadArguments(void)
 {
+    addHelp();
+    addVersion();
+    addVerbose();
+    allowExtras();
+
+    add("--udpport", "port", 6948, "(optional) UDP Port to send to", "");
+    add("--bcastaddr", "addr", "127.0.0.1",
+            "(optional) IP address to send to", "");
+    add("--print-template", "printtemplate",
+            "Print the template to be sent to the frontend", "");
 }
 
-MythShutdownCommandLineParser::MythShutdownCommandLineParser(void) :
+MythShutdownCommandLineParser::MythShutdownCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHSHUTDOWN)
 { LoadArguments(); }
 
 void MythShutdownCommandLineParser::LoadArguments(void)
 {
+    addHelp();
+    addVersion();
+    addVerbose();
+
+    add(QStringList( QStringList() << "-w" << "--setwakeup" ), "setwakeup", "",
+            "Set the wakeup time (yyyy-MM-ddThh:mm:ss)", "");
+    add(QStringList( QStringList() << "-t" << "--setscheduledwakeup" ), "setschedwakeup",
+            "Set wakeup time to the next scheduled recording", "");
+    add(QStringList( QStringList() << "-q" << "--shutdown" ), "shutdown",
+            "Apply wakeup time to nvram and shutdown.", "");
+    add(QStringList( QStringList() << "-x" << "--safeshutdown" ), "safeshutdown",
+            "Check if shutdown is possible, and shutdown", "");
+    add(QStringList( QStringList() << "-p" << "--startup" ), "startup",
+            "Check startup status",
+            "Check startup status\n"
+            "   returns 0 - automatic startup\n"
+            "           1 - manual startup");
+    add(QStringList( QStringList() << "-c" << "--check" ), "check", 1,
+            "Check whether shutdown is possible",
+            "Check whether shutdown is possible depending on input\n"
+            "   input 0 - dont check recording status\n"
+            "         1 - do check recording status\n\n"
+            " returns 0 - ok to shut down\n"
+            "         1 - not ok, idle check reset");
+    add(QStringList( QStringList() << "-l" << "--lock" ), "lock",
+            "disable shutdown", "");
+    add(QStringList( QStringList() << "-u" << "--unlock" ), "unlock",
+            "enable shutdown", "");
+    add(QStringList( QStringList() << "-s" << "--status" ), "status", 1,
+            "check current status",
+            "check current status depending on input\n"
+            "   input 0 - dont check recording status\n"
+            "         1 - do check recording status\n\n"
+            " returns 0 - Idle\n"
+            "         1 - Transcoding\n"
+            "         2 - Commercial Detection\n"
+            "         4 - Grabbing EPG data\n"
+            "         8 - Recording (only valid if input=1)\n"
+            "        16 - Locked\n"
+            "        32 - Jobs running or pending\n"
+            "        64 - In daily wakeup/shutdown period\n"
+            "       128 - Less than 15 minutes to next wakeup period\n"
+            "       255 - Setup is running");
 }
 
-MythTVSetupCommandLineParser::MythTVSetupCommandLineParser(void) :
+MythTVSetupCommandLineParser::MythTVSetupCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHTV_SETUP)
 { LoadArguments(); }
 
 void MythTVSetupCommandLineParser::LoadArguments(void)
 {
+    addHelp();
+    addSettingsOverride();
+    addVersion();
+    addWindowed(false);
+    addVerbose();
+    addGeometry();
+    addDisplay();
+    addLogFile();
+
+    add("--expert", "expert", "", "Expert mode.");
+    add("--scan-list", "scanlist", "", "no help");
+    add("--scan-save-only", "savescan", "", "no help");
+    add("--scan-non-interactive", "scannoninteractive", "", "nohelp");
+
+    add("--scan", "scan", 0U, "", 
+            "Run the command line channel scanner on a specified card\n"
+            "ID. This can be used with --frequency-table and --input-name.");
+    add("--frequency-table", "freqtable", "atsc-vsb8-us", "",
+            "Specify frequency table to be used with command\n"
+            "line channel scanner.");
+    add("--input-name", "inputname", "", "",
+            "Specify which input to scan for, if specified card\n"
+            "supports multiple.");
+
+    add("--scan-import", "importscan", 0U, "",
+            "Import an existing scan from the database. Use --scan-list\n"
+            "to enumerate scans available for import.\n"
+            "This option is mutually exclusive with --scan, and can\n"
+            "be used with the options --FTAonly and --service-type.");
+    add("--FTAonly", "ftaonly", "", "Only import 'Free To Air' channels.");
+    add("--service-type", "servicetype", "all", "",
+            "To be used with channel scanning or importing, specify\n"
+            "the type of services to import. Select from the following,\n"
+            "multiple can be added with '+':\n"
+            "   all, tv, radio");
 }
 
-MythTranscodeCommandLineParser::MythTranscodeCommandLineParser(void) :
+MythTranscodeCommandLineParser::MythTranscodeCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHTRANSCODE)
 { LoadArguments(); }
 
 void MythTranscodeCommandLineParser::LoadArguments(void)
 {
+    addHelp();
+    addVersion();
+    addVerbose();
+    addJob();
+    addRecording();
+    addSettingsOverride();
+
+    add(QStringList( QStringList() << "-i" << "--infile" ), "inputfile", "",
+            "Input video for transcoding.", "");
+    add(QStringList( QStringList() << "-o" << "--outfile" ), "outputfile", "",
+            "Optional output file for transcoding.", "");
+    add(QStringList( QStringList() << "-p" << "--profile" ), "profile", "",
+            "Transcoding profile.", "");
+    add(QStringList( QStringList() << "-l" << "--honorcutlist" ), "usecutlist",
+            "", "Specifies whether to use the cutlist.",
+            "Specifies whether transcode should honor the cutlist and\n"
+            "remove the marked off commercials. Optionally takes a \n"
+            "a cutlist as an argument when used with --infile.");
+    add("--inversecut", "inversecut",
+            "Inverses the cutlist, leaving only the marked off sections.", "");
+    add(QStringList( QStringList() << "--allkeys" << "-k" ), "allkeys",
+            "Specifies the outputfile should be entirely keyframes.", "");
+    add(QStringList( QStringList() << "-f" << "--fifodir" ), "fifodir", "",
+            "Directory in which to write fifos to.", "");
+    add("--fifosync", "fifosync", "Enforce fifo sync.", "");
+    add("--passthrough", "passthru", "Pass through raw, unprocessed audio.", "");
+    add(QStringList( QStringList() << "-b" << "--buildindex" ), "reindex",
+            "Build new keyframe index.", "");
+    add("--video", "video",
+            "Specifies video is not a recording, must use --infile.", "");
+    add("--showprogress", "showprogress", "Display status info in stdout", "");
+    add(QStringList( QStringList() << "-ro" << "--recorderOptions" ), "recopt",
+            "", "Comma separated list of recordingprofile overrides.", "");
+    add("--audiotrack", "audiotrack", 0, "Select specific audio track.", "");
+    add(QStringList( QStringList() << "-m" << "--mpeg2" ), "mpeg2",
+            "Specifies that a lossless transcode should be used.", "");
+    add(QStringList( QStringList() << "-e" << "--ostream" ), "ostream", ""
+            "Output stream type: dvd, ps", "");
 }
 
