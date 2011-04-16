@@ -548,6 +548,11 @@ void Scheduler::UpdateRecStatus(RecordingInfo *pginfo)
                     reschedQueue.enqueue(0);
                     reschedWait.wakeOne();
                 }
+                else
+                {
+                    MythEvent me("SCHEDULE_CHANGE");
+                    gCoreContext->dispatch(me);
+                }
             }
             return;
         }
@@ -592,6 +597,11 @@ void Scheduler::UpdateRecStatus(uint cardid, uint chanid,
                 {
                     reschedQueue.enqueue(0);
                     reschedWait.wakeOne();
+                }
+                else
+                {
+                    MythEvent me("SCHEDULE_CHANGE");
+                    gCoreContext->dispatch(me);
                 }
             }
             return;
