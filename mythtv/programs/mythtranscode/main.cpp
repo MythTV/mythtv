@@ -24,53 +24,13 @@ using namespace std;
 #include "mpeg2fix.h"
 #include "remotefile.h"
 #include "mythtranslation.h"
+#include "mythcommandlineparser.h"
 
 static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                         frm_dir_map_t *deleteMap, int &resultCode);
 
 static int glbl_jobID = -1;
 static QString recorderOptions = "";
-
-static void usage(char *progname)
-{
-    cerr << "Usage: " << progname << " <--chanid <channelid>>\n";
-    cerr << "\t<--starttime <starttime>> <--profile <profile>>\n";
-    cerr << "\t[options]\n\n";
-    cerr << "\t--mpeg2          or -m: Perform MPEG2 to MPEG2 transcode.\n";
-    cerr << "\t--ostream <type> or -e: Output stream type.  Options: dvd, ps.\n";
-    cerr << "\t--chanid         or -c: Takes a channel id. REQUIRED\n";
-    cerr << "\t--starttime      or -s: Takes a starttime for the\n";
-    cerr << "\t                        recording. REQUIRED\n";
-    cerr << "\t--infile         or -i: Input file (Alternative to -c and -s)\n";
-    cerr << "\t--outfile        or -o: Output file\n";
-    cerr << "\t--profile        or -p: Takes a profile number or 'autodetect'\n";
-    cerr << "\t                        recording profile. REQUIRED\n";
-    cerr << "\t--honorcutlist   or -l: Specifies whether to use the cutlist.\n";
-    cerr << "                          Optionally takes a cutlist as an argument\n";
-    cerr << "\t                        when used with --infile.\n";
-    cerr << "\t--inversecut          : Specifies a list of frames to keep\n";
-    cerr << "\t                        while cutting everything else out.\n";
-    cerr << "\t                        Only works with --infile.\n";
-    cerr << "\t--allkeys        or -k: Specifies that the output file\n";
-    cerr << "\t                        should be made entirely of keyframes.\n";
-    cerr << "\t--fifodir        or -f: Directory to write fifos to\n";
-    cerr << "\t                        If --fifodir is specified, 'audout' and 'vidout'\n";
-    cerr << "\t                        will be created in the specified directory\n";
-    cerr << "\t--fifosync            : Enforce fifo sync\n";
-    cerr << "\t--passthrough         : Will pass through raw, unprocessed audio data stream\n";
-    cerr << "\t--buildindex     or -b: Build a new keyframe index\n";
-    cerr << "\t                        (use only if audio and video fifos are read independantly)\n";
-    cerr << "\t--video               : Specifies that this is not a mythtv recording\n";
-    cerr << "\t                        (must be used with --infile)\n";
-    cerr << "\t--showprogress        : Display status info to the stdout\n";
-    cerr << "\t--recorderOptions <OPTIONS>\n";
-    cerr << "\t                or -ro: Pass a comma-separated list of\n";
-    cerr << "\t                        recordingprofile options to override\n";
-    cerr << "\t                        values in the database.\n";
-    cerr << "\t--audiotrack <trackno>: Selects the audiotrack for transcoding.\n";
-    cerr << "\t--verbose level  or -v: Use '-v help' for level info\n";
-    cerr << "\t--help           or -h: Prints this help statement.\n";
-}
 
 static void UpdatePositionMap(frm_pos_map_t &posMap, QString mapfile,
                        ProgramInfo *pginfo)
@@ -167,349 +127,155 @@ int main(int argc, char *argv[])
     int isVideo = 0;
     bool passthru = false;
 
-    for (int argpos = 1; argpos < a.argc(); ++argpos)
+    MythTranscodeCommandLineParser cmdline;
+    if (!cmdline.Parse(argc, argv))
     {
-        if (!strcmp(a.argv()[argpos],"-s") ||
-            !strcmp(a.argv()[argpos],"--starttime"))
-        {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
-            {
-                starttime = a.argv()[argpos + 1];
-                found_starttime = 1;
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -s/--starttime option\n";
-                usage(a.argv()[0]);
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-c") ||
-                 !strcmp(a.argv()[argpos],"--chanid"))
-        {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
-            {
-                chanid = QString(a.argv()[argpos + 1]).toUInt();
-                found_chanid = 1;
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -c/--chanid option\n";
-                usage(a.argv()[0]);
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos], "-j"))
-        {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
-            {
-                jobID = QString(a.argv()[++argpos]).toInt();
-            }
-            else
-            {
-                cerr << "Missing argument to -j option\n";
-                usage(a.argv()[0]);
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-i") ||
-                 !strcmp(a.argv()[argpos],"--infile"))
-        {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
-            {
-                infile = a.argv()[argpos + 1];
-                found_infile = 1;
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -i/--infile option\n";
-                usage(a.argv()[0]);
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"--video"))
-        {
-            isVideo = 1;
-            //mpeg2 = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"-o") ||
-                 !strcmp(a.argv()[argpos],"--outfile"))
-        {
-            if ((a.argc()-1 > argpos) &&
-                (a.argv()[argpos+1][0] != '-' || a.argv()[argpos+1][1] == 0x0))
-            {
-                outfile = a.argv()[argpos + 1];
-                update_index = 0;
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -o/--outfile option\n";
-                usage(a.argv()[0]);
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-V"))
-        {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
-            {
-                QString temp = a.argv()[++argpos];
-                print_verbose_messages = temp.toUInt();
-            }
-            else
-            {
-                cerr << "Missing argument to -V option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-v") ||
-                 !strcmp(a.argv()[argpos],"--verbose"))
-        {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
-            {
-                if (parse_verbose_arg(a.argv()[argpos+1]) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-                    return GENERIC_EXIT_INVALID_CMDLINE;
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
 
-                ++argpos;
-            } else
-            {
-                cerr << "Missing argument to -v/--verbose option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-p") ||
-                 !strcmp(a.argv()[argpos],"--profile"))
-        {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
-            {
-                profilename = a.argv()[argpos + 1];
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -p/--profile option\n";
-                usage(a.argv()[0]);
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-l") ||
-                 !strcmp(a.argv()[argpos],"--honorcutlist"))
-        {
-            useCutlist = true;
-            if (!found_infile)
-                continue;
+    if (cmdline.toBool("showhelp"))
+    {
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_OK;
+    }
 
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
+    if (cmdline.toBool("showversion"))
+    {
+        cmdline.PrintVersion();
+        return GENERIC_EXIT_OK;
+    }
+
+    if (cmdline.toBool("verbose"))
+        if (parse_verbose_arg(cmdline.toString("verbose")) == 
+                GENERIC_EXIT_INVALID_CMDLINE)
+            return GENERIC_EXIT_INVALID_CMDLINE;
+    if (cmdline.toBool("verboseint"))
+        print_verbose_messages = cmdline.toUInt("verboseint");
+
+    if (cmdline.toBool("starttime"))
+    {
+        starttime = cmdline.toString("starttime");
+        found_starttime = 1;
+    }
+    if (cmdline.toBool("chanid"))
+    {
+        chanid = cmdline.toUInt("chanid");
+        found_chanid = 1;
+    }
+    if (cmdline.toBool("jobid"))
+        jobID = cmdline.toInt("jobid");
+    if (cmdline.toBool("inputfile"))
+    {
+        infile = cmdline.toString("inputfile");
+        found_infile = 1;
+    }
+    if (cmdline.toBool("outputfile"))
+    {
+        outfile = cmdline.toString("outputfile");
+        update_index = 0;
+    }
+    if (cmdline.toBool("video"))
+        isVideo = true;
+    if (cmdline.toBool("profile"))
+        profilename = cmdline.toString("profile");
+
+    if (cmdline.toBool("usecutlist"))    
+    {
+        useCutlist = true;
+        if (!cmdline.toString("usecutlist").isEmpty())
+        {
+            if (!cmdline.toBool("inputfile"))
             {
-                QStringList cutlist = QString(a.argv()[argpos + 1])
-                    .split(" ", QString::SkipEmptyParts);
-                ++argpos;
-                for (QStringList::Iterator it = cutlist.begin();
-                     it != cutlist.end(); ++it )
+                cerr << "External cutlists are only allowed when using" << endl
+                     << "the --infile option." << endl;
+                return GENERIC_EXIT_INVALID_CMDLINE;
+            }
+
+            QStringList cutlist = cmdline.toStringList("usecutlist", " ");
+            QStringList::iterator it;
+            for (it = cutlist.begin(); it != cutlist.end(); ++it)
+            {
+                QStringList startend = (*it).split("-", QString::SkipEmptyParts);
+                if (startend.size() == 2)
                 {
-                    QStringList startend = (*it)
-                        .split("-", QString::SkipEmptyParts);
-                    if (startend.count() == 2)
-                    {
-                        cerr << "Cutting from: "
-                             << startend.first().toULongLong()
-                             << " to: " << startend.last().toULongLong() <<"\n";
-                        deleteMap[startend.first().toULongLong()] =
-                            MARK_CUT_START;
-                        deleteMap[startend.last().toULongLong()] =
-                            MARK_CUT_END;
-                    }
+                    cerr << "Cutting from: " << startend.first().toULongLong()
+                         << " to: " << startend.last().toULongLong() << endl;
+                    deleteMap[startend.first().toULongLong()] = MARK_CUT_START;
+                    deleteMap[startend.last().toULongLong()] = MARK_CUT_END;
                 }
             }
-            else
-            {
-                cerr << "Missing argument to -l/--honorcutlist option\n";
-                usage(a.argv()[0]);
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
         }
-        else if (!strcmp(a.argv()[argpos],"--inversecut"))
-        {
-            useCutlist = true;
-            if (!found_infile)
-            {
-                cerr << "--inversecut option can only be used with --infile\n";
-                usage(a.argv()[0]);
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
+    }
 
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
-            {
-                uint64_t last = 0;
-                QStringList cutlist =  QString(a.argv()[argpos + 1])
-                    .split(" ", QString::SkipEmptyParts);
-                ++argpos;
-                deleteMap[0] = MARK_CUT_START;
-                for (QStringList::Iterator it = cutlist.begin();
-                     it != cutlist.end(); ++it )
-                {
-                    QStringList startend = (*it).split(
+    if (cmdline.toBool("inversecut"))
+    {
+        if (!cmdline.toBool("inputfile"))
+        {
+            cerr << "Inversed cutlists are only allowed when using" << endl
+                 << "the --infile option." << endl;
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+
+        deleteMap[0] = MARK_CUT_START;
+
+        uint64_t last = 0;
+        QStringList cutlist = cmdline.toStringList("inversecut", " ");
+        QStringList::iterator it;
+        for (it = cutlist.begin(); it != cutlist.end(); ++it)
+        {
+            QStringList startend = (*it).split(
                         "-", QString::SkipEmptyParts);
-                    if (startend.count() == 2)
-                    {
-                        cerr << "Cutting from: " << last
-                             << " to: "
-                             << startend.first().toULongLong() <<"\n";
-                        deleteMap[startend.first().toULongLong()] =
-                            MARK_CUT_END;
-                        deleteMap[startend.last().toULongLong()] =
-                            MARK_CUT_START;
-                        last = startend.last().toInt();
-                    }
-                }
+            if (startend.count() == 2)
+            {
                 cerr << "Cutting from: " << last
-                     << " to the end\n";
-                deleteMap[999999999] = MARK_CUT_END;
-            }
-            else
-            {
-                cerr << "Missing argument to --inversecut option\n";
-                usage(a.argv()[0]);
-                return GENERIC_EXIT_INVALID_CMDLINE;
+                     << " to: "
+                     << startend.first().toULongLong() <<"\n";
+                deleteMap[startend.first().toULongLong()] = MARK_CUT_END;
+                deleteMap[startend.last().toULongLong()] = MARK_CUT_START;
+                last = startend.last().toInt();
             }
         }
-        else if (!strcmp(a.argv()[argpos],"-k") ||
-                 !strcmp(a.argv()[argpos],"--allkeys"))
-        {
-            keyframesonly = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"-b") ||
-                 !strcmp(a.argv()[argpos],"--buildindex"))
-        {
-            build_index = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"-f") ||
-                 !strcmp(a.argv()[argpos],"--fifodir"))
-        {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
-            {
-                fifodir = a.argv()[argpos + 1];
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -f/--fifodir option\n";
-                usage(a.argv()[0]);
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-ro") ||
-                 !strcmp(a.argv()[argpos],"--recorderOptions"))
-        {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
-            {
-                recorderOptions = a.argv()[argpos + 1];
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -ro/--recorderOptions option\n";
-                usage(a.argv()[0]);
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"--fifosync"))
-        {
-            fifosync = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"--showprogress"))
-        {
-            showprogress = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"-m") ||
-                 !strcmp(a.argv()[argpos],"--mpeg2"))
-        {
-            mpeg2 = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"-e") ||
-                 !strcmp(a.argv()[argpos],"--ostream"))
-        {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
-            {
-                if(!strcmp(a.argv()[argpos + 1], "dvd"))
-                    otype = REPLEX_DVD;
-                if(!strcmp(a.argv()[argpos + 1], "ts"))
-                    otype = REPLEX_TS_SD;
+        cerr << "Cutting from: " << last
+             << " to the end\n";
+        deleteMap[999999999] = MARK_CUT_END;
+    }
 
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -e/--ostream option\n";
-                usage(a.argv()[0]);
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-O") ||
-                 !strcmp(a.argv()[argpos],"--override-setting"))
-        {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
-            {
-                QStringList pairs = QString(a.argv()[argpos+1]).split(
-                    ",", QString::SkipEmptyParts);
-                for (int index = 0; index < pairs.size(); ++index)
-                {
-                    QStringList tokens = pairs[index].split(
-                        "=", QString::SkipEmptyParts);
-                    tokens[0].replace(QRegExp("^[\"']"), "");
-                    tokens[0].replace(QRegExp("[\"']$"), "");
-                    tokens[1].replace(QRegExp("^[\"']"), "");
-                    tokens[1].replace(QRegExp("[\"']$"), "");
-                    settingsOverride[tokens[0]] = tokens[1];
-                }
-            }
-            else
-            {
-                cerr << "Invalid or missing argument to -O/--override-setting "
-                        "option\n";
-                usage(a.argv()[0]);
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
 
-            ++argpos;
-        }
-        else if (!strcmp(a.argv()[argpos],"--audiotrack"))
-        {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
-            {
-                AudioTrackNo = QString(a.argv()[argpos + 1]).toInt();
-            }
-            else
-            {
-                cerr << "Invalid or missing argument to --audiotrack "
-                        "option\n";
-                usage(a.argv()[0]);
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            ++argpos;
-        }
-        else if (!strcmp(a.argv()[argpos],"-h") ||
-                 !strcmp(a.argv()[argpos],"--help"))
-        {
-            usage(a.argv()[0]);
-            return GENERIC_EXIT_OK;
-        }
-        else if (!strcmp(a.argv()[argpos],"--passthrough"))
-        {
-            passthru = true;
-        }
+    if (cmdline.toBool("allkeys"))
+        keyframesonly = true;
+    if (cmdline.toBool("reindex"))
+        build_index = true;
+    if (cmdline.toBool("fifodir"))
+        fifodir = cmdline.toString("fifodir");
+    if (cmdline.toBool("fifosync"))
+        fifosync = true;
+    if (cmdline.toBool("recopt"))
+        recorderOptions = cmdline.toString("recopt");
+    if (cmdline.toBool("showprogress"))
+        showprogress = true;
+    if (cmdline.toBool("mpeg2"))
+        mpeg2 = true;
+    if (cmdline.toBool("ostream"))
+    {
+        if (cmdline.toString("ostream") == "dvd")
+            otype = REPLEX_DVD;
+        else if (cmdline.toString("ostream") == "ts")
+            otype = REPLEX_TS_SD;
         else
         {
-            cerr << "Unknown option: " << a.argv()[argpos] << endl;
-            usage(a.argv()[0]);
+            cerr << "Invalid 'ostream' type: "
+                 << cmdline.toString("ostream").toLocal8Bit().constData()
+                 << endl;
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
+    if (cmdline.toBool("overridesettings"))
+        settingsOverride = cmdline.GetSettingsOverride();
+    if (cmdline.toBool("audiotrack"))
+        AudioTrackNo = cmdline.toInt("audiotrack");
+    if (cmdline.toBool("passthru"))
+        passthru = true;
 
     if (outfile == "-")
         print_verbose_messages = VB_NONE;

@@ -39,6 +39,7 @@
 #include "startprompt.h"
 #include "mythsystemevent.h"
 #include "expertsettingseditor.h"
+#include "mythcommandlineparser.h"
 
 using namespace std;
 
@@ -188,27 +189,6 @@ static int reloadTheme(void)
     return 0;
 }
 
-static void print_usage()
-{
-        cerr << "Valid options are: "<<endl
-#ifdef USING_X11
-             << "-display X-server              "
-            "Create GUI on X-server, not localhost" << endl
-#endif
-             << "-geometry or --geometry WxH    "
-                "Override window size settings" << endl
-             << "-geometry WxH+X+Y              "
-                "Override window size and position" << endl
-             << "-O or " << endl
-             << "  --override-setting KEY=VALUE "
-                "Force the setting named 'KEY' to value 'VALUE'" << endl
-             << "-v or --verbose debug-level    "
-                "Use '-v help' for level info" << endl
-             << "-l or --logfile filename       "
-                "Writes STDERR and STDOUT messages to filename" << endl
-             << endl;
-}
-
 static int log_rotate(int report_error)
 {
     int new_logfd = open(logfile.toLocal8Bit().constData(),
@@ -260,29 +240,35 @@ int main(int argc, char *argv[])
     QString scanInputName = "";
     bool    use_display = true;
 
-    for(int argpos = 1; argpos < argc; ++argpos)
+    MythTVSetupCommandLineParser cmdline;
+    if (!cmdline.Parse(argc, argv))
     {
-        if (!strcmp(argv[argpos], "-h") ||
-            !strcmp(argv[argpos], "--help") ||
-            !strcmp(argv[argpos], "--usage"))
-        {
-            print_usage();
-            return GENERIC_EXIT_OK;
-        }
-#ifdef USING_X11
-    // Remember any -display or -geometry argument
-    // which QApplication init will remove.
-        else if (argpos+1 < argc && !strcmp(argv[argpos],"-geometry"))
-            geometry = argv[argpos+1];
-        else if (argpos+1 < argc && !strcmp(argv[argpos],"-display"))
-            display = argv[argpos+1];
-#endif
-        else if (QString(argv[argpos]).left(6) == "--scan")
-        {
-            use_display = false;
-            print_verbose_messages = VB_NONE;
-            verboseString = "";
-        }
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+
+    if (cmdline.toBool("showhelp"))
+    {
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_OK;
+    }
+
+    if (cmdline.toBool("showversion"))
+    {
+        cmdline.PrintVersion();
+        return GENERIC_EXIT_OK;
+    }
+
+    if (cmdline.toBool("display"))
+        display = cmdline.toString("display");
+    if (cmdline.toBool("geometry"))
+        geometry = cmdline.toString("geometry");
+
+    if (cmdline.toBool("scan"))
+    {
+        use_display = false;
+        print_verbose_messages = VB_NONE;
+        verboseString = "";
     }
 
 #ifdef Q_WS_MACX
@@ -301,204 +287,50 @@ int main(int argc, char *argv[])
                             .arg(MYTH_SOURCE_PATH)
                             .arg(MYTH_SOURCE_VERSION));
 
-
-    for(int argpos = 1; argpos < a.argc(); ++argpos)
-    {
-        if (!strcmp(a.argv()[argpos],"-display") ||
-            !strcmp(a.argv()[argpos],"--display"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                display = a.argv()[argpos+1];
-                if (display.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to -display option\n";
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-                else
-                    ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -display option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-geometry") ||
-                 !strcmp(a.argv()[argpos],"--geometry"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                geometry = a.argv()[argpos+1];
-                if (geometry.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to "
-                        "-geometry option\n";
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-                else
-                    ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -geometry option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-l") ||
-                 !strcmp(a.argv()[argpos],"--logfile"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                logfile = a.argv()[argpos+1];
-                if (logfile.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument"
-                            " to -l/--logfile option\n";
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-                else
-                {
-                    ++argpos;
-                }
-            }
-            else
-            {
-                cerr << "Missing argument to -l/--logfile option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-v") ||
-                  !strcmp(a.argv()[argpos],"--verbose"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                if (parse_verbose_arg(a.argv()[argpos+1]) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -v/--verbose option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-O") ||
-                 !strcmp(a.argv()[argpos],"--override-setting"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                QString tmpArg = a.argv()[argpos+1];
-                if (tmpArg.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to "
-                            "-O/--override-setting option\n";
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-
-                QStringList pairs = tmpArg.split(",");
-                for (int index = 0; index < pairs.size(); ++index)
-                {
-                    QStringList tokens = pairs[index].split("=");
-                    tokens[0].replace(QRegExp("^[\"']"), "");
-                    tokens[0].replace(QRegExp("[\"']$"), "");
-                    tokens[1].replace(QRegExp("^[\"']"), "");
-                    tokens[1].replace(QRegExp("[\"']$"), "");
-                    settingsOverride[tokens[0]] = tokens[1];
-                }
-            }
-            else
-            {
-                cerr << "Invalid or missing argument to "
-                        "-O/--override-setting option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            ++argpos;
-        }
-        else if (!strcmp(a.argv()[argpos],"--expert"))
-        {
-            expertMode = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"--scan-list"))
-        {
-            doScanList = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"--scan-import"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                QString tmpArg = a.argv()[argpos + 1];
-                scanImport = tmpArg.toUInt();
-                ++argpos;
-
-                if (a.argc()-1 > argpos)
-                {
-                    tmpArg = a.argv()[argpos + 1];
-                    scanFTAOnly = tmpArg.toUInt();
-                    ++argpos;
-                }
-
-                if (a.argc()-1 > argpos)
-                {
-                    tmpArg = a.argv()[argpos + 1];
-                    tmpArg = tmpArg.toLower();
-                    scanServiceRequirements = kRequireNothing;
-                    if (tmpArg.contains("radio"))
-                        scanServiceRequirements = kRequireAudio;
-                    if (tmpArg.contains("tv"))
-                        scanServiceRequirements = kRequireAV;
-                    if (tmpArg.contains("tv+radio") ||
-                        tmpArg.contains("radio+tv"))
-                        scanServiceRequirements = kRequireAudio;
-                    if (tmpArg.contains("all"))
-                        scanServiceRequirements = kRequireNothing;
-                    ++argpos;
-                }
-            }
-            else
-            {
-                cerr << "Missing scan number for import, please run "
-                     << "--scan-list to list importable scans." << endl;
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"--scan-save-only"))
-        {
-            doScanSaveOnly = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"--scan-non-interactive"))
-        {
-            scanInteractive = false;
-        }
-        else if (!strcmp(a.argv()[argpos],"--scan"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                scanTableName = a.argv()[argpos + 1];
-                ++argpos;
-            }
-            if (a.argc()-1 > argpos)
-            {
-                QString tmpArg = a.argv()[argpos + 1];
-                scanCardId = tmpArg.toUInt();
-                ++argpos;
-            }
-            if (a.argc()-1 > argpos)
-            {
-                scanInputName = a.argv()[argpos + 1];
-                ++argpos;
-            }
-            doScan = true;
-        }
-        else
-        {
-            cerr << "Invalid argument: " << a.argv()[argpos] << endl;
-            print_usage();
+    if (cmdline.toBool("logfile"))
+        logfile = cmdline.toString("logfile");
+    if (cmdline.toBool("verbose"))
+        if (parse_verbose_arg(cmdline.toString("verbose")) ==
+                    GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
-        }
+    if (cmdline.toBool("overridesettings"))
+        settingsOverride = cmdline.GetSettingsOverride();
+    if (cmdline.toBool("expert"))
+        expertMode = true;
+    if (cmdline.toBool("scanlist"))
+        doScanList = true;
+    if (cmdline.toBool("savescan"))
+        doScanSaveOnly = true;
+    if (cmdline.toBool("scannoninteractive"))
+        scanInteractive = false;
+
+    if (cmdline.toBool("importscan"))
+        scanImport = cmdline.toUInt("importscan");
+    if (cmdline.toBool("ftaonly"))
+        scanFTAOnly = true;
+    if (cmdline.toBool("servicetype"))
+    {
+        scanServiceRequirements = kRequireNothing;
+        if (cmdline.toString("servicetype").contains("radio"))
+           scanServiceRequirements = kRequireAudio;
+        if (cmdline.toString("servicetype").contains("tv"))
+           scanServiceRequirements = kRequireAV;
+        if (cmdline.toString("servicetype").contains("tv+radio") ||
+            cmdline.toString("servicetype").contains("radio+tv"))
+                scanServiceRequirements = kRequireAudio;
+        if (cmdline.toString("servicetype").contains("all"))
+           scanServiceRequirements = kRequireNothing;
     }
+
+    if (cmdline.toBool("scan"))
+    {
+        scanCardId = cmdline.toUInt("scan");
+        doScan = true;
+    }
+    if (cmdline.toBool("freqtable"))
+        scanTableName = cmdline.toString("freqtable");
+    if (cmdline.toBool("inputname"))
+        scanInputName = cmdline.toString("inputname");
 
     if (logfile.size())
     {
