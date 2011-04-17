@@ -153,16 +153,18 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
 class SERVICE_PUBLIC Program : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "version"    , "1.01" );
     Q_CLASSINFO( "defaultProp", "Description" );
 
-    Q_PROPERTY( QDateTime   StartTime    READ StartTime    WRITE setStartTime )
-    Q_PROPERTY( QDateTime   EndTime      READ EndTime      WRITE setEndTime   )
-    Q_PROPERTY( QString     Title        READ Title        WRITE setTitle     )
-    Q_PROPERTY( QString     SubTitle     READ SubTitle     WRITE setSubTitle  )
-    Q_PROPERTY( QString     Category     READ Category     WRITE setCategory  )
-    Q_PROPERTY( QString     CatType      READ CatType      WRITE setCatType   )
-    Q_PROPERTY( bool        Repeat       READ Repeat       WRITE setRepeat    )
+    Q_PROPERTY( QDateTime   StartTime    READ StartTime    WRITE setStartTime    )
+    Q_PROPERTY( QDateTime   EndTime      READ EndTime      WRITE setEndTime      )
+    Q_PROPERTY( QDateTime   RecStartTime READ RecStartTime WRITE setRecStartTime )
+    Q_PROPERTY( QDateTime   RecEndTime   READ RecEndTime   WRITE setRecEndTime   )
+    Q_PROPERTY( QString     Title        READ Title        WRITE setTitle        )
+    Q_PROPERTY( QString     SubTitle     READ SubTitle     WRITE setSubTitle     )
+    Q_PROPERTY( QString     Category     READ Category     WRITE setCategory     )
+    Q_PROPERTY( QString     CatType      READ CatType      WRITE setCatType      )
+    Q_PROPERTY( bool        Repeat       READ Repeat       WRITE setRepeat       )
 
     Q_PROPERTY( QString     SeriesId     READ SeriesId     WRITE setSeriesId     DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString     ProgramId    READ ProgramId    WRITE setProgramId    DESIGNABLE SerializeDetails )
@@ -179,6 +181,8 @@ class SERVICE_PUBLIC Program : public QObject
 
     PROPERTYIMP    ( QDateTime   , StartTime    )
     PROPERTYIMP    ( QDateTime   , EndTime      )
+    PROPERTYIMP    ( QDateTime   , RecStartTime )
+    PROPERTYIMP    ( QDateTime   , RecEndTime   )
     PROPERTYIMP    ( QString     , Title        )
     PROPERTYIMP    ( QString     , SubTitle     )
     PROPERTYIMP    ( QString     , Category     )
@@ -242,6 +246,8 @@ class SERVICE_PUBLIC Program : public QObject
         {
             m_StartTime         = src.m_StartTime;
             m_EndTime           = src.m_EndTime;
+            m_RecStartTime      = src.m_RecStartTime;
+            m_RecEndTime        = src.m_RecEndTime;
             m_Title             = src.m_Title;
             m_SubTitle          = src.m_SubTitle;
             m_Category          = src.m_Category;

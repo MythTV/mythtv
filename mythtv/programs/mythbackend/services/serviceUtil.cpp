@@ -36,13 +36,15 @@ void FillProgramInfo( DTC::Program *pProgram,
     if ((pProgram == NULL) || (pInfo == NULL))
         return;
 
-    pProgram->setStartTime(  pInfo->GetScheduledStartTime());
-    pProgram->setEndTime  (  pInfo->GetScheduledEndTime  ());
-    pProgram->setTitle    (  pInfo->GetTitle()             );
-    pProgram->setSubTitle (  pInfo->GetSubtitle()          );
-    pProgram->setCategory (  pInfo->GetCategory()          );
-    pProgram->setCatType  (  pInfo->GetCategoryType()      );
-    pProgram->setRepeat   (  pInfo->IsRepeat()             );
+    pProgram->setStartTime   (  pInfo->GetScheduledStartTime());
+    pProgram->setEndTime     (  pInfo->GetScheduledEndTime  ());
+    pProgram->setRecStartTime(  pInfo->GetRecordingStartTime());
+    pProgram->setRecEndTime  (  pInfo->GetRecordingEndTime  ());
+    pProgram->setTitle       (  pInfo->GetTitle()             );
+    pProgram->setSubTitle    (  pInfo->GetSubtitle()          );
+    pProgram->setCategory    (  pInfo->GetCategory()          );
+    pProgram->setCatType     (  pInfo->GetCategoryType()      );
+    pProgram->setRepeat      (  pInfo->IsRepeat()             );
 
     pProgram->setSerializeDetails( bDetails );
 
