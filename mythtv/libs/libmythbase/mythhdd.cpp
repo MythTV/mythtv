@@ -24,7 +24,7 @@ MythHDD::MythHDD(QObject *par, const char *DevicePath,
     : MythMediaDevice(par, DevicePath, SuperMount, AllowEject)
 {
     LOG(VB_MEDIA, LOG_INFO, "MythHDD::MythHDD " + m_DevicePath);
-    m_Status = MEDIASTAT_UNPLUGGED;
+    m_Status = MEDIASTAT_NOTMOUNTED;
     m_MediaType = MEDIATYPE_DATA;       // default type is data
 }
 
@@ -46,8 +46,9 @@ MythMediaStatus MythHDD::checkMedia(void)
     }
 
     // device is not mounted
-    if (m_Status == MEDIASTAT_UNPLUGGED)
+    switch (m_Status)
     {
+    case MEDIASTAT_NOTMOUNTED:
         // a removable device was just plugged in try to mount it.
         LOG(VB_MEDIA, LOG_INFO, "MythHDD::checkMedia try mounting " + m_DevicePath);
         if (mount())
@@ -55,17 +56,19 @@ MythMediaStatus MythHDD::checkMedia(void)
             m_Status = MEDIASTAT_NOTMOUNTED;
             return setStatus(MEDIASTAT_MOUNTED);
         }
-        else
-            return setStatus(MEDIASTAT_NOTMOUNTED);
-    }
-    else if (m_Status == MEDIASTAT_MOUNTED)
-    {
+        return m_Status;
+    case MEDIASTAT_MOUNTED:
         // device was mounted and someone unmounted it.
         return m_Status = setStatus(MEDIASTAT_NOTMOUNTED);
-    }
-    else
-    {
+    default:
         // leave device state as is
         return m_Status;
     }
+}
+
+//virtual
+MythMediaError MythHDD::eject(bool)
+{
+    setStatus(MEDIASTAT_UNPLUGGED);
+    return MEDIAERR_UNSUPPORTED;
 }
