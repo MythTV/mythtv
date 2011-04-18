@@ -1926,7 +1926,7 @@ void Scheduler::RunScheduler(void)
                 PutInactiveSlavesToSleep();
                 lastSleepCheck = QDateTime::currentDateTime();
 
-                // Write changeed entries to oldrecorded.
+                // Write changed entries to oldrecorded.
                 RecIter it = reclist.begin();
                 for ( ; it != reclist.end(); ++it)
                 {
