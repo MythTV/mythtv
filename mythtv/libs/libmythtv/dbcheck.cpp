@@ -2011,7 +2011,7 @@ NULL
 "UPDATE settings SET value = 'MythFillGrabberSuggestsTime' "
     "WHERE value = 'HonorGrabberNextSuggestedMythfilldatabaseRunTime';",
 "UPDATE settings SET value = 'MythFillSuggestedRunTime', "
-    "    data = '1970-01-01T00:00:00' "
+    "    data = '1970-01-01 00:00:00' "
     "WHERE value = 'NextSuggestedMythfilldatabaseRun';",
 NULL
 };

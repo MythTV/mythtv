@@ -518,7 +518,7 @@ void HouseKeeper::CleanupRecordedTables(void)
         while (query.next())
         {
             deleteQuery.bindValue(":CHANID", query.value(0).toString());
-            deleteQuery.bindValue(":STARTTIME", query.value(1).toString());
+            deleteQuery.bindValue(":STARTTIME", query.value(1).toDateTime());
             if (!deleteQuery.exec())
                 MythDB::DBError("HouseKeeper Cleaning Recorded Tables",
                                 deleteQuery);

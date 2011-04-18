@@ -625,7 +625,7 @@ void RecordingInfo::ApplyRecordRecTitleChange(const QString &newTitle, const QSt
     query.bindValue(":TITLE", newTitle);
     query.bindValue(":SUBTITLE", newSubtitle);
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":START", recstartts.toString("yyyyMMddhhmmss"));
+    query.bindValue(":START", recstartts);
 
     if (!query.exec())
         MythDB::DBError("RecTitle update", query);
@@ -1137,8 +1137,8 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup)
                    ":CATEGORY,:SERIESID,:PROGRAMID,:FINDID,:RECORDID,"
                    ":STATION,:RECTYPE,:RECSTATUS,:DUPLICATE,:REACTIVATE);");
     result.bindValue(":CHANID", chanid);
-    result.bindValue(":START", startts.toString(Qt::ISODate));
-    result.bindValue(":END", endts.toString(Qt::ISODate));
+    result.bindValue(":START", startts);
+    result.bindValue(":END", endts);
     result.bindValue(":TITLE", title);
     result.bindValue(":SUBTITLE", subtitle);
     result.bindValue(":DESC", description);
