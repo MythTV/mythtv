@@ -115,7 +115,6 @@ AutoExpire::~AutoExpire()
     if (expire_thread)
     {
         gCoreContext->removeListener(this);
-        expire_thread_run = false;
         expire_thread->wait();
         delete expire_thread;
         expire_thread = NULL;
