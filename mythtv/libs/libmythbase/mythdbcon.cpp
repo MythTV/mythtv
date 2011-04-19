@@ -123,8 +123,13 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
         if (m_dbparms.dbPort)
             m_db.setPort(m_dbparms.dbPort);
 
-        if (m_dbparms.dbPort && m_dbparms.dbHostName == "localhost")
-            m_db.setHostName("127.0.0.1");
+        // Prefer using the faster localhost connection if using standard
+        // ports, even if the user specified a DBHostName of 127.0.0.1.  This
+        // will cause MySQL to use a Unix socket (on *nix) or shared memory (on
+        // Windows) connection.
+        if ((m_dbparms.dbPort == 0 || m_dbparms.dbPort == 3306) &&
+            m_dbparms.dbHostName == "127.0.0.1")
+            m_db.setHostName("localhost");
 
         connected = m_db.open();
 
