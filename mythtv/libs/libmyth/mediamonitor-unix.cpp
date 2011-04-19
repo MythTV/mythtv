@@ -185,61 +185,70 @@ static QVariant DeviceProperty(const QDBusObjectPath& o, const char kszProperty[
 bool MediaMonitorUnix::CheckMountable(void)
 {
 #if CONFIG_QTDBUS
-    // Listen on DBus for UDisk add/remove device messages
-    QDBusConnection::systemBus().connect(
-        UDISKS_SVC, UDISKS_PATH, UDISKS_IFACE, UDISKS_DEVADD, UDISKS_DEVSIG,
-        this, SLOT(deviceAdded(QDBusObjectPath)) );
-    QDBusConnection::systemBus().connect(
-        UDISKS_SVC, UDISKS_PATH, UDISKS_IFACE, UDISKS_DEVRMV, UDISKS_DEVSIG,
-        this, SLOT(deviceRemoved(QDBusObjectPath)) );
-
-    // Connect to UDisks
-    QDBusInterface iface(UDISKS_SVC, UDISKS_PATH, UDISKS_IFACE,
-        QDBusConnection::systemBus() );
-    if (!iface.isValid())
+    for (int i = 0; i < 10; ++i, usleep(500000))
     {
-        LOG(VB_GENERAL, LOG_ALERT, LOC +
-            "CheckMountable: DBus interface error: " +
-                 iface.lastError().message() );
-        return false;
-    }
-
-    // Enumerate devices
-    typedef QList<QDBusObjectPath> QDBusObjectPathList;
-    QDBusReply<QDBusObjectPathList> reply = iface.call("EnumerateDevices");
-    if (!reply.isValid())
-    {
-        LOG(VB_GENERAL, LOG_ALERT, LOC +
-            "CheckMountable DBus EnumerateDevices error: " +
-                 reply.error().message() );
-        return false;
-    }
-
-    // Parse the returned device array
-    const QDBusObjectPathList& list(reply.value());
-    for (QDBusObjectPathList::const_iterator it = list.begin();
-        it != list.end(); ++it)
-    {
-        if (!DeviceProperty(*it, "DeviceIsSystemInternal").toBool() &&
-            !DeviceProperty(*it, "DeviceIsPartitionTable").toBool() )
+        // Connect to UDisks.  This can sometimes fail if mythfrontend
+        // is started during system init
+        QDBusInterface iface(UDISKS_SVC, UDISKS_PATH, UDISKS_IFACE,
+            QDBusConnection::systemBus() );
+        if (!iface.isValid())
         {
-            QString dev = DeviceProperty(*it, "DeviceFile").toString();
-
-            // ignore floppies, too slow
-            if (dev.startsWith("/dev/fd"))
-                continue;
-
-            MythMediaDevice* pDevice;
-            if (DeviceProperty(*it, "DeviceIsRemovable").toBool())
-                pDevice = MythCDROM::get(this, dev.toAscii(), false, m_AllowEject);
-            else
-                pDevice = MythHDD::Get(this, dev.toAscii(), false, false);
-
-            if (pDevice && !AddDevice(pDevice))
-                pDevice->deleteLater();
+            LOG(VB_GENERAL, LOG_ALERT, LOC +
+                "CheckMountable: DBus interface error: " +
+                     iface.lastError().message() );
+            continue;
         }
+
+        // Enumerate devices
+        typedef QList<QDBusObjectPath> QDBusObjectPathList;
+        QDBusReply<QDBusObjectPathList> reply = iface.call("EnumerateDevices");
+        if (!reply.isValid())
+        {
+            LOG(VB_GENERAL, LOG_ALERT, LOC +
+                "CheckMountable DBus EnumerateDevices error: " +
+                     reply.error().message() );
+            continue;
+        }
+
+        // Listen on DBus for UDisk add/remove device messages
+        (void)QDBusConnection::systemBus().connect(
+            UDISKS_SVC, UDISKS_PATH, UDISKS_IFACE, UDISKS_DEVADD, UDISKS_DEVSIG,
+            this, SLOT(deviceAdded(QDBusObjectPath)) );
+        (void)QDBusConnection::systemBus().connect(
+            UDISKS_SVC, UDISKS_PATH, UDISKS_IFACE, UDISKS_DEVRMV, UDISKS_DEVSIG,
+            this, SLOT(deviceRemoved(QDBusObjectPath)) );
+
+        // Parse the returned device array
+        const QDBusObjectPathList& list(reply.value());
+        for (QDBusObjectPathList::const_iterator it = list.begin();
+            it != list.end(); ++it)
+        {
+            if (!DeviceProperty(*it, "DeviceIsSystemInternal").toBool() &&
+                !DeviceProperty(*it, "DeviceIsPartitionTable").toBool() )
+            {
+                QString dev = DeviceProperty(*it, "DeviceFile").toString();
+
+                // ignore floppies, too slow
+                if (dev.startsWith("/dev/fd"))
+                    continue;
+
+                MythMediaDevice* pDevice;
+                if (DeviceProperty(*it, "DeviceIsRemovable").toBool())
+                    pDevice = MythCDROM::get(this, dev.toAscii(), false, m_AllowEject);
+                else
+                    pDevice = MythHDD::Get(this, dev.toAscii(), false, false);
+
+                if (pDevice && !AddDevice(pDevice))
+                    pDevice->deleteLater();
+            }
+        }
+
+        // Success
+        return true;
     }
-    return true;
+
+    // Timed out
+    return false;
 
 #elif defined linux
     // NB needs script in /etc/udev/rules.d
