@@ -17,6 +17,7 @@
 #endif
 
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , et c.
+#include "mythlogging.h"
 
 /// This MAP is for the various VERBOSITY flags, used to select which
 /// messages we want printed to the console.
@@ -103,10 +104,11 @@
     F(VB_NONE,      0x00000000, "none",                                       \
                              0, "NO debug output")
 
-enum VerboseMask
-{
 #define VERBOSE_ENUM(ARG_ENUM, ARG_VALUE, ARG_STRING, ARG_ADDITIVE, ARG_HELP)\
     ARG_ENUM = ARG_VALUE ,
+
+enum VerboseMask
+{
     VERBOSE_MAP(VERBOSE_ENUM)
     VB_UNUSED_END // keep at end
 };
@@ -128,89 +130,13 @@ extern MBASE_PUBLIC unsigned int print_verbose_messages;
 // If MYTHCONTEXT_H_ is not defined, we assume the first type,
 // otherwise DEBUG determines the second or third
 
-
-#ifndef MYTHCONTEXT_H_
-    #ifdef  __cplusplus
-        #define VERBOSE(mask, ...)                                                   \
-        do {                                                                         \
-            if (VERBOSE_LEVEL_CHECK(mask))                                           \
-            {                                                                        \
-                QDateTime dtmp = QDateTime::currentDateTime();                       \
-                QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz");            \
-                verbose_mutex.lock();                                                \
-                std::cout << dtime.toLocal8Bit().constData() << " "                  \
-                     << QString(__VA_ARGS__).toLocal8Bit().constData() << std::endl; \
-                verbose_mutex.unlock();                                              \
-            }                                                                        \
-        } while (0)
-    #else
-        #if HAVE_GETTIMEOFDAY
-            #define VERBOSEDATE                              \
-            {                                                \
-                struct tm      *tp;                          \
-                struct timeval  tv;                          \
-                gettimeofday(&tv, NULL);                     \
-                tp = localtime(&tv.tv_sec);                  \
-                printf("%4d-%02d-%02d %2d:%02d:%02d.%03d ",  \
-                       1900+tp->tm_year, 1+tp->tm_mon,       \
-                       tp->tm_mday, tp->tm_hour, tp->tm_min, \
-                       tp->tm_sec, (int)(tv.tv_usec/10000)); \
-            }
-        #else
-            #define VERBOSEDATE ;
-        #endif
-        #define VERBOSE(mask, ...)                           \
-        do { \
-            if (VERBOSE_LEVEL_CHECK(mask))                   \
-            {                                                \
-                VERBOSEDATE                                  \
-                printf(__VA_ARGS__);                         \
-                putchar('\n');                               \
-            } \
-        } while (0)
-    #endif
-
-#elif defined(DEBUG) // && MYTHCONTEXT_H_
-
-    // The verbose_mutex lock is a recursive lock so it is possible (while
-    // not recommended) to use a VERBOSE macro within another VERBOSE macro.
-    // But waiting for another thread to do something is not safe within a
-    // VERBOSE macro, since those threads may wish to use the VERBOSE macro
-    // and this will cause a deadlock.
-
-    #define VERBOSE(mask, ...) \
-        do { \
-            if (VERBOSE_LEVEL_CHECK(mask))                   \
-            { \
-                QDateTime dtmp = QDateTime::currentDateTime(); \
-                QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
-                verbose_mutex.lock(); \
-                std::cout << dtime.toLocal8Bit().constData() << " " \
-                     << QString(__VA_ARGS__).toLocal8Bit().constData() << std::endl; \
-                verbose_mutex.unlock(); \
-            } \
-        } while (0)
-
-#else // MYTHCONTEXT_H_ && !DEBUG
-
-    // use a slower non-deadlockable version in release builds
-
-    #define VERBOSE(mask, ...) \
-        do { \
-            if (VERBOSE_LEVEL_CHECK(mask))                   \
-            { \
-                QDateTime dtmp = QDateTime::currentDateTime(); \
-                QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
-                QTextStream ssMsg(&dtime);                  \
-                ssMsg << " " << __VA_ARGS__;              \
-                verbose_mutex.lock();                      \
-                std::cout << ssMsg.string()->toLocal8Bit().constData() << \
-                    std::endl; \
-                verbose_mutex.unlock();                    \
-            } \
-        } while (0)
-
-#endif // MYTHCONTEXT_H_, DEBUG
+#ifdef __cplusplus
+#define VERBOSE(mask, ...) \
+    LogPrintQString(mask, LOG_INFO, QString(__VA_ARGS__))
+#else
+#define VERBOSE(mask, ...) \
+    LogPrint(mask, LOG_INFO, __VA_ARGS__)
+#endif
 
 
 #ifdef  __cplusplus

@@ -16,6 +16,33 @@ unsigned int userDefaultValueInt = verboseDefaultInt;
 QString      userDefaultValueStr = QString(verboseDefaultStr);
 bool         haveUserDefaultValues = false;
 
+#define VERBOSE_ARG_HELP(ARG_ENUM, ARG_VALUE, ARG_STR, ARG_ADDITIVE, ARG_HELP) \
+                QString("  %1").arg(ARG_STR).leftJustified(15, ' ', true) << \
+                " - " << ARG_HELP << "\n" <<
+
+#define VERBOSE_ARG_CHECKS(ARG_ENUM, ARG_VALUE, ARG_STR, ARG_ADDITIVE, ARG_HELP) \
+            else if (option == ARG_STR) \
+            { \
+                if (reverseOption) \
+                { \
+                    print_verbose_messages &= ~(ARG_VALUE); \
+                    verboseString = verboseString + " no" + ARG_STR; \
+                } \
+                else \
+                { \
+                    if (ARG_ADDITIVE) \
+                    { \
+                        print_verbose_messages |= ARG_VALUE; \
+                        verboseString = verboseString + ' ' + ARG_STR; \
+                    } \
+                    else \
+                    { \
+                        print_verbose_messages = ARG_VALUE; \
+                        verboseString = ARG_STR; \
+                    } \
+                } \
+            }
+
 int parse_verbose_arg(QString arg)
 {
     QString option;
@@ -55,10 +82,6 @@ int parse_verbose_arg(QString arg)
                   "Verbose debug levels.\n" <<
                   "Accepts any combination (separated by comma) of:\n\n" <<
 
-#define VERBOSE_ARG_HELP(ARG_ENUM, ARG_VALUE, ARG_STR, ARG_ADDITIVE, ARG_HELP) \
-                QString("  %1").arg(ARG_STR).leftJustified(15, ' ', true) << \
-                " - " << ARG_HELP << "\n" <<
-
                   VERBOSE_MAP(VERBOSE_ARG_HELP)
 
                   "\n" <<
@@ -93,29 +116,7 @@ int parse_verbose_arg(QString arg)
                 }
             }
 
-#define VERBOSE_ARG_CHECKS(ARG_ENUM, ARG_VALUE, ARG_STR, ARG_ADDITIVE, ARG_HELP) \
-            else if (option == ARG_STR) \
-            { \
-                if (reverseOption) \
-                { \
-                    print_verbose_messages &= ~(ARG_VALUE); \
-                    verboseString = verboseString + " no" + ARG_STR; \
-                } \
-                else \
-                { \
-                    if (ARG_ADDITIVE) \
-                    { \
-                        print_verbose_messages |= ARG_VALUE; \
-                        verboseString = verboseString + ' ' + ARG_STR; \
-                    } \
-                    else \
-                    { \
-                        print_verbose_messages = ARG_VALUE; \
-                        verboseString = ARG_STR; \
-                    } \
-                } \
-            }
-
+            // Essentially a pile of else if {} blocks
             VERBOSE_MAP(VERBOSE_ARG_CHECKS)
 
             else
@@ -145,4 +146,8 @@ QString safe_eno_to_string(int errnum)
 {
     return QString("%1 (%2)").arg(strerror(errnum)).arg(errnum);
 }
+
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */
 
