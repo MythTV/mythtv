@@ -139,12 +139,9 @@ bool setupTVs(bool ismaster, bool &error)
 
         if (host.isEmpty())
         {
-            QString msg = cidmsg + " does not have a hostname defined.\n"
-                "Please run setup and confirm all of the capture cards.\n";
-
-            VERBOSE(VB_IMPORTANT, msg);
-            gCoreContext->LogEntry("mythbackend", LP_CRITICAL,
-                               "Problem with capture cards", msg);
+            VERBOSE(VB_IMPORTANT, cidmsg +
+                    " does not have a hostname defined.\n"
+                    "Please run setup and confirm all of the capture cards.\n");
             continue;
         }
 
@@ -176,9 +173,8 @@ bool setupTVs(bool ismaster, bool &error)
                 }
                 else
                 {
-                    gCoreContext->LogEntry("mythbackend", LP_CRITICAL,
-                                       "Problem with capture cards",
-                                       cidmsg + " failed init");
+                    VERBOSE(VB_IMPORTANT, "Problem with capture cards. " +
+                            cidmsg + " failed init");
                     delete tv;
                     // The master assumes card comes up so we need to
                     // set error and exit if a non-master card fails.
@@ -198,9 +194,8 @@ bool setupTVs(bool ismaster, bool &error)
                 }
                 else
                 {
-                    gCoreContext->LogEntry("mythbackend", LP_CRITICAL,
-                                       "Problem with capture cards",
-                                       cidmsg + "failed init");
+                    VERBOSE(VB_IMPORTANT, "Problem with capture cards",
+                            cidmsg + "failed init");
                     delete tv;
                 }
             }
@@ -216,10 +211,6 @@ bool setupTVs(bool ismaster, bool &error)
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN +
                 "No valid capture cards are defined in the database.");
-
-        gCoreContext->LogEntry("mythbackend", LP_WARNING,
-                           "No capture cards are defined",
-                           "This backend will not be used for recording.");
     }
 
     return true;
@@ -694,14 +685,10 @@ int run_backend(const MythCommandLineParser &cmdline)
     if (ismaster)
     {
         VERBOSE(VB_GENERAL, LOC + "Starting up as the master server.");
-        gCoreContext->LogEntry("mythbackend", LP_INFO,
-                           "MythBackend started as master server", "");
     }
     else
     {
         VERBOSE(VB_GENERAL, LOC + "Running as a slave backend.");
-        gCoreContext->LogEntry("mythbackend", LP_INFO,
-                           "MythBackend started as a slave backend", "");
     }
 
     print_warnings(cmdline);
@@ -806,7 +793,7 @@ int run_backend(const MythCommandLineParser &cmdline)
         qApp->processEvents();
     }
 
-    gCoreContext->LogEntry("mythbackend", LP_INFO, "MythBackend exiting", "");
+    VERBOSE(VB_GENERAL, "MythBackend exiting");
 
     delete sysEventHandler;
     delete mainServer;

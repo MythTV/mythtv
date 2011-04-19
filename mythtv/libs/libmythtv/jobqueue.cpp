@@ -1946,8 +1946,6 @@ void JobQueue::DoTranscodeThread(int jobID)
         VERBOSE(VB_GENERAL, LOC + QString("%1 for %2")
                 .arg(msg).arg(details.constData()));
 
-        gCoreContext->LogEntry("transcode", LP_NOTICE, msg, detailstr);
-
         VERBOSE(VB_JOBQUEUE, LOC + QString("Running command: '%1'")
                                            .arg(command));
 
@@ -1969,7 +1967,6 @@ void JobQueue::DoTranscodeThread(int jobID)
 
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     QString("%1 for %2").arg(msg).arg(details.constData()));
-            gCoreContext->LogEntry("transcode", LP_WARNING, msg, detailstr);
         }
         else if (result == GENERIC_EXIT_RESTART && retrylimit > 0)
         {
@@ -1978,9 +1975,6 @@ void JobQueue::DoTranscodeThread(int jobID)
             retrylimit--;
 
             program_info->SaveTranscodeStatus(TRANSCODING_NOT_TRANSCODED);
-
-            msg = QString("Transcode restarting");
-            gCoreContext->LogEntry("transcode", LP_NOTICE, msg, details);
         }
         else
         {
@@ -2045,7 +2039,6 @@ void JobQueue::DoTranscodeThread(int jobID)
             }
 
             msg = QString("Transcode %1").arg(StatusText(GetJobStatus(jobID)));
-            gCoreContext->LogEntry("transcode", LP_NOTICE, msg, details);
             VERBOSE(VB_GENERAL, LOC + msg + ": " + details);
         }
     }
@@ -2101,7 +2094,6 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
 
     QString msg = tr("Commercial Detection Starting");
     VERBOSE(VB_GENERAL, LOC + "Commercial Detection Starting for " + detailstr);
-    gCoreContext->LogEntry("commflag", LP_NOTICE, msg, detailstr);
 
     uint breaksFound = 0;
     QString path;
@@ -2183,8 +2175,6 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
         details = detailstr.toLocal8Bit();
     }
 
-    gCoreContext->LogEntry("commflag", priority, msg, detailstr);
-
     if (priority <= LP_WARNING)
         VERBOSE(VB_IMPORTANT, LOC_ERR + msg + ": " + details.constData());
 
@@ -2214,11 +2204,7 @@ void JobQueue::DoUserJobThread(int jobID)
     else
         msg = QString("Started %1 for jobID %2").arg(jobDesc).arg(jobID);
 
-    QByteArray amsg = msg.toLocal8Bit();
-
-    VERBOSE(VB_GENERAL, LOC + QString(amsg.constData()));
-    gCoreContext->LogEntry("jobqueue", LP_NOTICE,
-                       QString("Job \"%1\" Started").arg(jobDesc), msg);
+    VERBOSE(VB_GENERAL, LOC + QString(msg.toLocal8Bit().constData()));
 
     switch (jobQueueCPU)
     {
@@ -2246,9 +2232,6 @@ void JobQueue::DoUserJobThread(int jobID)
         VERBOSE(VB_IMPORTANT, LOC + QString("Current PATH: '%1'")
                                             .arg(getenv("PATH")));
 
-        gCoreContext->LogEntry("jobqueue", LP_WARNING,
-                           "User Job Errored", msg);
-
         ChangeJobStatus(jobID, JOB_ERRORED,
             "ERROR: Unable to find executable, check backend logs.");
     }
@@ -2256,8 +2239,6 @@ void JobQueue::DoUserJobThread(int jobID)
     {
         msg = QString("User Job '%1' failed.").arg(command);
         VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
-
-        gCoreContext->LogEntry("jobqueue", LP_WARNING, "User Job Errored", msg);
 
         ChangeJobStatus(jobID, JOB_ERRORED,
             "ERROR: User Job returned non-zero, check logs.");
@@ -2273,12 +2254,7 @@ void JobQueue::DoUserJobThread(int jobID)
         else
             msg = QString("Finished %1 for jobID %2").arg(jobDesc).arg(jobID);
 
-        QByteArray amsg = msg.toLocal8Bit();
-
-        VERBOSE(VB_GENERAL, LOC + QString(amsg.constData()));
-
-        gCoreContext->LogEntry("jobqueue", LP_NOTICE,
-                           QString("Job \"%1\" Finished").arg(jobDesc), msg);
+        VERBOSE(VB_GENERAL, LOC + QString(msg.toLocal8Bit().constData()));
 
         ChangeJobStatus(jobID, JOB_FINISHED, "Successfully Completed.");
 

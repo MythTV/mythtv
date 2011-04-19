@@ -563,9 +563,6 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
-    gCoreContext->LogEntry("mythfilldatabase", LP_INFO,
-                       "Listings Download Started", "");
-
     if (!grab_data)
     {
     }
@@ -677,11 +674,6 @@ int main(int argc, char *argv[])
                   VERBOSE(VB_IMPORTANT,
                           "There are no channel sources defined, did you run "
                           "the setup program?");
-                  gCoreContext->LogEntry("mythfilldatabase", LP_CRITICAL,
-                                     "No channel sources defined",
-                                     "Could not find any defined channel "
-                                     "sources - did you run the setup "
-                                     "program?");
                   return GENERIC_EXIT_SETUP_ERROR;
              }
         }
@@ -692,11 +684,7 @@ int main(int argc, char *argv[])
         }
 
         if (!fill_data.Run(sourcelist))
-        {
-             VERBOSE(VB_IMPORTANT, "Failed to fetch some program info");
-             gCoreContext->LogEntry("mythfilldatabase", LP_WARNING,
-                                "Failed to fetch some program info", "");
-        }
+            VERBOSE(VB_IMPORTANT, "Failed to fetch some program info");
         else
             VERBOSE(VB_IMPORTANT, "Data fetching complete.");
     }
@@ -744,9 +732,6 @@ int main(int argc, char *argv[])
         else
             VERBOSE(VB_GENERAL,
                     QString("    %1 replacements made").arg(update_count));
-
-        gCoreContext->LogEntry("mythfilldatabase", LP_INFO,
-                           "Listings Download Finished", "");
     }
 
     if (grab_data)

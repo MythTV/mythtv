@@ -182,25 +182,11 @@ void HouseKeeper::RunHouseKeeping(void)
 
     while (1)
     {
-        gCoreContext->LogEntry("mythbackend", LP_DEBUG,
-                           "Running housekeeping thread", "");
+        VERBOSE(VB_GENERAL, "Running housekeeping thread");
 
         // These tasks are only done from the master backend
         if (isMaster)
         {
-            // Clean out old database entries
-            if (gCoreContext->GetNumSetting("LogEnabled", 0) &&
-                gCoreContext->GetNumSetting("LogCleanEnabled", 0))
-            {
-                period = gCoreContext->GetNumSetting("LogCleanPeriod",1);
-                if (wantToRun("LogClean", period, 0, 24))
-                {
-                    VERBOSE(VB_GENERAL, "Running LogClean");
-                    flushLogs();
-                    updateLastrun("LogClean");
-                }
-            }
-
             // Run mythfilldatabase to grab the TV listings
             if (gCoreContext->GetNumSetting("MythFillEnabled", 1))
             {
@@ -262,9 +248,7 @@ void HouseKeeper::RunHouseKeeping(void)
 
                     if (runMythFill)
                     {
-                        QString msg = "Running mythfilldatabase";
-                        gCoreContext->LogEntry("mythbackend", LP_DEBUG, msg, "");
-                        VERBOSE(VB_GENERAL, msg);
+                        VERBOSE(VB_GENERAL, "Running mythfilldatabase");
                         runFillDatabase();
                         updateLastrun("MythFillDB");
                     }
@@ -303,34 +287,6 @@ void HouseKeeper::RunHouseKeeping(void)
         initialRun = false;
 
         sleep(300 + (random()%8));
-    }
-}
-
-void HouseKeeper::flushLogs()
-{
-    int numdays = gCoreContext->GetNumSetting("LogCleanDays", 14);
-    int maxdays = gCoreContext->GetNumSetting("LogCleanMax", 30);
-
-    QDateTime days = QDateTime::currentDateTime();
-    days = days.addDays(0 - numdays);
-    QDateTime max = QDateTime::currentDateTime();
-    max = max.addDays(0 - maxdays);
-
-    MSqlQuery result(MSqlQuery::InitCon());
-    if (result.isConnected())
-    {
-        result.prepare("DELETE FROM mythlog WHERE "
-                       "acknowledged=1 and logdate < :DAYS ;");
-        result.bindValue(":DAYS", days);
-        if (!result.exec())
-            MythDB::DBError("HouseKeeper::flushLogs -- delete acknowledged",
-                            result);
-
-        result.prepare("DELETE FROM mythlog WHERE logdate< :MAX ;");
-        result.bindValue(":MAX", max);
-        if (!result.exec())
-            MythDB::DBError("HouseKeeper::flushLogs -- delete old",
-                            result);
     }
 }
 

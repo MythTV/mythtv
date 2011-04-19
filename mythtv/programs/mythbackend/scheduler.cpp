@@ -1859,8 +1859,6 @@ void Scheduler::RunScheduler(void)
                             matchTime + placeTime, matchTime, placeTime);
 
                 VERBOSE(VB_GENERAL, msg);
-                gCoreContext->LogEntry("scheduler", LP_INFO,
-                                       "Scheduled items", msg);
 
                 fsInfoCacheFillTime =
                     QDateTime::currentDateTime().addSecs(-1000);
@@ -2248,7 +2246,6 @@ void Scheduler::RunScheduler(void)
                                 nextRecording->GetRecordingRuleType()));
 
             VERBOSE(VB_GENERAL, QString("%1: %2").arg(msg).arg(details));
-            gCoreContext->LogEntry("scheduler", LP_NOTICE, msg, details);
 
             if (is_rec)
                 UpdateNextRecord();

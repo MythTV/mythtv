@@ -1798,10 +1798,6 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
                               "will NOT be deleted.")
                               .arg(ds->chanid).arg(ds->recstartts.toString());
         VERBOSE(VB_GENERAL, msg);
-        gCoreContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
-                           QString("Unable to open database connection for %1. "
-                                   "Program will NOT be deleted.")
-                                   .arg(logInfo));
 
         deletelock.unlock();
         return;
@@ -1816,10 +1812,6 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
                               "Recording will NOT be deleted.")
                               .arg(ds->chanid).arg(ds->recstartts.toString());
         VERBOSE(VB_GENERAL, msg);
-        gCoreContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
-                           QString("Unable to retrieve program info for %1. "
-                                   "Program will NOT be deleted.")
-                                   .arg(logInfo));
 
         deletelock.unlock();
         return;
@@ -1837,10 +1829,6 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
                     "doesn't exist.  Database metadata"
                     "will not be removed.")
                 .arg(ds->filename));
-        gCoreContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
-                           QString("File %1 does not exist for %2 when trying "
-                                   "to delete recording.")
-                           .arg(ds->filename).arg(logInfo));
 
         pginfo.SaveDeletePendingFlag(false);
         deletelock.unlock();
@@ -1884,9 +1872,6 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
         VERBOSE(VB_IMPORTANT,
             QString("Error deleting file: %1. Keeping metadata in database.")
                     .arg(ds->filename));
-        gCoreContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
-                           QString("File %1 for %2 could not be deleted.")
-                                   .arg(ds->filename).arg(logInfo));
 
         pginfo.SaveDeletePendingFlag(false);
         deletelock.unlock();
@@ -1940,9 +1925,8 @@ void MainServer::DeleteRecordedFiles(const DeleteStruct *ds)
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("RecordedFiles deletion", query);
-        gCoreContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording Files",
-                           QString("Error querying recordedfiles for %1.")
-                                   .arg(logInfo));
+        VERBOSE(VB_IMPORTANT, QString("Error querying recordedfiles for %1.")
+                                      .arg(logInfo));
     }
 
     QString basename;
@@ -1992,11 +1976,10 @@ void MainServer::DeleteRecordedFiles(const DeleteStruct *ds)
             if (!update.exec())
             {
                 MythDB::DBError("RecordedFiles deletion", update);
-                gCoreContext->LogEntry("mythbackend", LP_ERROR,
-                       "Delete Recording Files",
-                       QString("Error querying recordedfile (%1) for %2.")
-                               .arg(query.value(1).toString())
-                               .arg(logInfo));
+                VERBOSE(VB_IMPORTANT,
+                        QString("Error querying recordedfile (%1) for %2.")
+                                .arg(query.value(1).toString())
+                                .arg(logInfo));
             }
         }
     }
@@ -2017,9 +2000,8 @@ void MainServer::DoDeleteInDB(const DeleteStruct *ds)
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("Recorded program deletion", query);
-        gCoreContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
-                           QString("Error deleting recorded table for %1.")
-                                   .arg(logInfo));
+        VERBOSE(VB_IMPORTANT, QString("Error deleting recorded entry for %1.")
+                                      .arg(logInfo));
     }
 
     sleep(1);
@@ -2040,9 +2022,8 @@ void MainServer::DoDeleteInDB(const DeleteStruct *ds)
     if (!query.exec())
     {
         MythDB::DBError("Recorded program delete recordedmarkup", query);
-        gCoreContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
-                           QString("Error deleting recordedmarkup for %1.")
-                                   .arg(logInfo));
+        VERBOSE(VB_IMPORTANT, QString("Error deleting recordedmarkup for %1.")
+                                      .arg(logInfo));
     }
 
     query.prepare("DELETE FROM recordedseek "
@@ -2053,9 +2034,8 @@ void MainServer::DoDeleteInDB(const DeleteStruct *ds)
     if (!query.exec())
     {
         MythDB::DBError("Recorded program delete recordedseek", query);
-        gCoreContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
-                           QString("Error deleting recordedseek for %1.")
-                                   .arg(logInfo));
+        VERBOSE(VB_IMPORTANT, QString("Error deleting recordedseek for %1.")
+                                      .arg(logInfo));
     }
 }
 
@@ -2544,10 +2524,6 @@ void MainServer::DoHandleDeleteRecording(
                 QString("ERROR when trying to delete file: %1. File doesn't "
                         "exist.  Database metadata will not be removed.")
                         .arg(filename));
-        gCoreContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
-                           QString("File %1 does not exist for %2 when trying "
-                                   "to delete recording.")
-                                   .arg(filename).arg(logInfo));
         resultCode = -2;
     }
 
@@ -5477,8 +5453,6 @@ void MainServer::HandlePixmapGetIfModified(
 
 void MainServer::HandleBackendRefresh(MythSocket *socket)
 {
-    gCoreContext->RefreshBackendConfig();
-
     QStringList retlist( "OK" );
     SendResponse(socket, retlist);
 }

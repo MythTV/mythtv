@@ -43,8 +43,6 @@ class MythCoreContextPrivate : public QObject
 
     bool WaitForWOL(int timeout_ms = INT_MAX);
 
-    void LoadLogSettings(void);
-
   public:
     MythCoreContext *m_parent;
     QObject         *m_GUIcontext;
@@ -58,12 +56,6 @@ class MythCoreContextPrivate : public QObject
     QMutex      m_sockLock;      ///< protects both m_serverSock and m_eventSock
     MythSocket *m_serverSock;    ///< socket for sending MythProto requests
     MythSocket *m_eventSock;     ///< socket events arrive on
-
-    int                   m_logenable;
-    int                   m_logmaxcount;
-    int                   m_logprintlevel;
-    QMap<QString,int>     m_lastLogCounts;
-    QMap<QString,QString> m_lastLogStrings;
 
     QMutex         m_WOLInProgressLock;
     QWaitCondition m_WOLInProgressWaitCondition;
@@ -89,7 +81,6 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_masterHostname(QString::null),
       m_sockLock(QMutex::NonRecursive),
       m_serverSock(NULL), m_eventSock(NULL),
-      m_logenable(-1), m_logmaxcount(-1), m_logprintlevel(-1),
       m_WOLInProgress(false),
       m_backend(false),
       m_database(GetMythDB()),
@@ -137,13 +128,6 @@ bool MythCoreContextPrivate::WaitForWOL(int timeout_in_ms)
     }
 
     return !m_WOLInProgress;
-}
-
-void MythCoreContextPrivate::LoadLogSettings(void)
-{
-    m_logenable = m_parent->GetNumSetting("LogEnabled", 0);
-    m_logmaxcount = m_parent->GetNumSetting("LogMaxCount", 0);
-    m_logprintlevel = m_parent->GetNumSetting("LogPrintLevel", LP_ERROR);
 }
 
 MythCoreContext::MythCoreContext(const QString &binversion,
@@ -631,11 +615,6 @@ QString MythCoreContext::GetFilePrefix(void)
     return GetSetting("RecordFilePrefix");
 }
 
-void MythCoreContext::RefreshBackendConfig(void)
-{
-    d->LoadLogSettings();
-}
-
 void MythCoreContext::GetResolutionSetting(const QString &type,
                                            int &width, int &height,
                                            double &forced_aspect,
@@ -953,103 +932,6 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket, uint timeout_ms,
     VERBOSE(VB_GENERAL, QString("Unexpected response to MYTH_PROTO_VERSION: %1")
                                .arg(strlist[0]));
     return false;
-}
-
-void MythCoreContext::LogEntry(const QString &module, int priority,
-                               const QString &message, const QString &details)
-{
-    unsigned int logid;
-    int howmany;
-
-    if (IsDatabaseIgnored())
-        return;
-
-    if (d->m_logenable == -1) // Haven't grabbed the settings yet
-        d->LoadLogSettings();
-    if (d->m_logenable == 1)
-    {
-        QString fullMsg = message;
-        if (!details.isEmpty())
-            fullMsg += ": " + details;
-
-        if (message.left(21) != "Last message repeated")
-        {
-            if (fullMsg == d->m_lastLogStrings[module])
-            {
-                d->m_lastLogCounts[module] += 1;
-                return;
-            }
-            else
-            {
-                if (0 < d->m_lastLogCounts[module])
-                {
-                    LogEntry(module, priority,
-                             QString("Last message repeated %1 times")
-                                    .arg(d->m_lastLogCounts[module]),
-                             d->m_lastLogStrings[module]);
-                }
-
-                d->m_lastLogCounts[module] = 0;
-                d->m_lastLogStrings[module] = fullMsg;
-            }
-        }
-
-
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("INSERT INTO mythlog (module, priority, "
-                      "logdate, host, message, details) "
-                      "values (:MODULE, :PRIORITY, now(), :HOSTNAME, "
-                      ":MESSAGE, :DETAILS );");
-
-        query.bindValue(":MODULE", module);
-        query.bindValue(":PRIORITY", priority);
-        query.bindValue(":HOSTNAME", d->m_localHostname);
-        query.bindValue(":MESSAGE", message);
-        query.bindValue(":DETAILS", details);
-
-        if (!query.exec() || !query.isActive())
-            MythDB::DBError("LogEntry", query);
-
-        if (d->m_logmaxcount > 0)
-        {
-            query.prepare("SELECT logid FROM mythlog WHERE "
-                          "module= :MODULE ORDER BY logdate ASC ;");
-            query.bindValue(":MODULE", module);
-            if (!query.exec() || !query.isActive())
-            {
-                MythDB::DBError("DelLogEntry#1", query);
-            }
-            else
-            {
-                howmany = query.size();
-                if (howmany > d->m_logmaxcount)
-                {
-                    MSqlQuery delquery(MSqlQuery::InitCon());
-                    while (howmany > d->m_logmaxcount)
-                    {
-                        query.next();
-                        logid = query.value(0).toUInt();
-                        delquery.prepare("DELETE FROM mythlog WHERE "
-                                         "logid= :LOGID ;");
-                        delquery.bindValue(":LOGID", logid);
-
-                        if (!delquery.exec() || !delquery.isActive())
-                        {
-                            MythDB::DBError("DelLogEntry#2", delquery);
-                        }
-                        howmany--;
-                    }
-                }
-            }
-        }
-
-        if (priority <= d->m_logprintlevel)
-        {
-            QByteArray tmp =
-                QString("%1: %2").arg(module).arg(fullMsg).toUtf8();
-            VERBOSE(VB_IMPORTANT, tmp.constData());
-        }
-    }
 }
 
 void MythCoreContext::dispatch(const MythEvent &event)
