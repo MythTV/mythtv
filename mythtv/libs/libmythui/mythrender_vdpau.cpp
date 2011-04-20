@@ -528,8 +528,7 @@ void MythRenderVDPAU::CheckOutputSurfaces(void)
     LOCK_RENDER
     CHECK_STATUS()
 
-    int need = (m_master == kMasterUI) ?
-                MIN_OUTPUT_SURFACES : MAX_OUTPUT_SURFACES;
+    int need = MAX_OUTPUT_SURFACES;
     int have = m_surfaces.size();
     int created = 0;
 
@@ -1546,8 +1545,7 @@ bool MythRenderVDPAU::CreatePresentationQueue(void)
 
 bool MythRenderVDPAU::CreatePresentationSurfaces(void)
 {
-    int num = (m_master == kMasterUI) ?
-               MIN_OUTPUT_SURFACES : MAX_OUTPUT_SURFACES;
+    int num = MIN_OUTPUT_SURFACES;
     bool ok = true;
 
     for (int i = 0; i < num; i++)
@@ -1668,7 +1666,6 @@ void MythRenderVDPAU::Destroy(void)
     RegisterCallback(false);
     DestroyDevice();
     ResetProcs();
-    m_master  = kMasterUI;
     m_size    = QSize();
     m_errored = false;
     memset(&m_rect, 0, sizeof(VdpRect));

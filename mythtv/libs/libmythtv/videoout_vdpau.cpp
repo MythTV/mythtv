@@ -135,7 +135,6 @@ bool VideoOutputVDPAU::InitRender(void)
 
     if (m_render && m_render->Create(size, m_win))
     {
-        m_render->SetMaster(kMasterVideo);
         m_osd_painter = new MythVDPAUPainter(m_render);
         if (m_osd_painter)
         {
@@ -410,7 +409,6 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
     if (!m_checked_output_surfaces &&
         !(!codec_is_std(video_codec_id) && !m_decoder))
     {
-        m_render->SetMaster(kMasterVideo);
         m_render->CheckOutputSurfaces();
         m_checked_output_surfaces = true;
     }
