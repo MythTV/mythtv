@@ -530,6 +530,21 @@ QWidget *MythMainWindow::GetPaintWindow(void)
     return d->paintwin;
 }
 
+void MythMainWindow::ShowPainterWindow(void)
+{
+    if (d->paintwin)
+        d->paintwin->show();
+}
+
+void MythMainWindow::HidePainterWindow(void)
+{
+    if (d->paintwin)
+    {
+        d->paintwin->clearMask();
+        d->paintwin->hide();
+    }
+}
+
 MythRender *MythMainWindow::GetRenderDevice()
 {
     return d->render;
@@ -946,7 +961,7 @@ void MythMainWindow::Init(void)
     d->paintwin->move(0, 0);
     d->paintwin->setFixedSize(size());
     d->paintwin->raise();
-    d->paintwin->show();
+    ShowPainterWindow();
     if (!GetMythDB()->GetNumSetting("HideMouseCursor", 0))
         d->paintwin->setMouseTracking(true); // Required for mouse cursor auto-hide
 
@@ -1120,7 +1135,7 @@ void MythMainWindow::ReinitDone(void)
     d->paintwin->move(0, 0);
     d->paintwin->setFixedSize(size());
     d->paintwin->raise();
-    d->paintwin->show();
+    ShowPainterWindow();
 
     d->drawTimer->start(1000 / 70);
 }
@@ -1251,11 +1266,13 @@ void MythMainWindow::SetDrawEnabled(bool enable)
             d->m_pendingUpdate = false;
         }
         d->drawTimer->start(1000 / 70);
-
+        ShowPainterWindow();
     }
     else
+    {
+        HidePainterWindow();
         d->drawTimer->stop();
-
+    }
 
     d->m_setDrawEnabledWait.wakeAll();
 }
