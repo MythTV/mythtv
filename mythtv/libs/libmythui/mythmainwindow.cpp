@@ -72,10 +72,6 @@ using namespace std;
 #include "mythuihelper.h"
 #include "mythdialogbox.h"
 
-#ifdef USING_VDPAU
-#include "mythpainter_vdpau.h"
-#endif
-
 #ifdef USING_MINGW
 #include "mythpainter_d3d9.h"
 #endif
@@ -359,22 +355,6 @@ MythPainterWindowGL::MythPainterWindowGL(MythMainWindow *win,
 }
 
 void MythPainterWindowGL::paintEvent(QPaintEvent *pe)
-{
-    d->repaintRegion = d->repaintRegion.unite(pe->region());
-    parent->drawScreen();
-}
-#endif
-
-#ifdef USING_VDPAU
-MythPainterWindowVDPAU::MythPainterWindowVDPAU(MythMainWindow *win,
-                                               MythMainWindowPrivate *priv)
-                   : QGLWidget(win),
-                     parent(win), d(priv)
-{
-    setAutoBufferSwap(false);
-}
-
-void MythPainterWindowVDPAU::paintEvent(QPaintEvent *pe)
 {
     d->repaintRegion = d->repaintRegion.unite(pe->region());
     parent->drawScreen();
@@ -944,14 +924,6 @@ void MythMainWindow::Init(void)
             else
                 gl->Init();
         }
-    }
-#endif
-#ifdef USING_VDPAU
-    if (painter == "vdpau")
-    {
-        VERBOSE(VB_GENERAL, "Using the VDPAU painter");
-        d->painter = new MythVDPAUPainter();
-        d->paintwin = new MythPainterWindowVDPAU(this, d);
     }
 #endif
 
