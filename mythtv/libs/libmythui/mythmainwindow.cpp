@@ -850,6 +850,8 @@ void MythMainWindow::Init(void)
 
     GetMythUI()->ThemeWidget(this);
     Show();
+    setAttribute(Qt::WA_NoSystemBackground);
+    setAutoFillBackground(false);
 
     if (!GetMythDB()->GetNumSetting("HideMouseCursor", 0))
         setMouseTracking(true); // Required for mouse cursor auto-hide
