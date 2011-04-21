@@ -32,63 +32,87 @@ void ProgramInfoUpdater::insert(
 
     // Start a new run() if one isn't already running..
     // The lock prevents anything from getting stuck on a queue.
-    if (!isQueued)
+    if (!isRunning)
     {
-        isQueued = true;
+        isRunning = true;
         QThreadPool::globalInstance()->start(this);
     }
+    else
+        moreWork.wakeAll();
 }
 
 void ProgramInfoUpdater::run(void)
 {
+    bool workDone;
+    QMutex mutex;
+
     threadRegister("ProgramInfoUpdater");
-    // we don't need instant updates allow a few to queue up
-    // if they come in quick succession, this allows multiple
-    // updates to be consolidated into one update...
-    usleep(50 * 1000);
 
-    QMutexLocker locker(&lock);
-    isQueued = false;
+    do {
+        workDone = false;
 
-    // send adds and deletes in the order they were queued
-    vector<PIKeyAction>::iterator ita = needsAddDelete.begin();
-    for (; ita != needsAddDelete.end(); ++ita)
-    {
-        if (kPIAdd != (*ita).action && kPIDelete != (*ita).action)
-            continue;
+        // we don't need instant updates allow a few to queue up
+        // if they come in quick succession, this allows multiple
+        // updates to be consolidated into one update...
+        usleep(50 * 1000);
 
-        QString type = (kPIAdd == (*ita).action) ? "ADD" : "DELETE";
-        QString msg = QString("RECORDING_LIST_CHANGE %1 %2 %3")
-            .arg(type).arg((*ita).chanid)
-            .arg((*ita).recstartts.toString(Qt::ISODate));
+        QMutexLocker locker(&lock);
 
-        RemoteSendMessage(msg);
-    }
-    needsAddDelete.clear();
-
-    // Send updates in any old order, we just need
-    // one per updated ProgramInfo.
-    QHash<PIKey,PIKeyData>::iterator itu = needsUpdate.begin();
-    for (; itu != needsUpdate.end(); ++itu)
-    {
-        QString msg;
-
-        if (kPIUpdateFileSize == (*itu).action)
+        // send adds and deletes in the order they were queued
+        vector<PIKeyAction>::iterator ita = needsAddDelete.begin();
+        for (; ita != needsAddDelete.end(); ++ita)
         {
-            msg = QString("UPDATE_FILE_SIZE %1 %2 %3")
-                .arg(itu.key().chanid)
-                .arg(itu.key().recstartts.toString(Qt::ISODate))
-                .arg((*itu).filesize);
-        }
-        else
-        {
-            msg = QString("MASTER_UPDATE_PROG_INFO %1 %2")
-                .arg(itu.key().chanid)
-                .arg(itu.key().recstartts.toString(Qt::ISODate));
-        }
+            if (kPIAdd != (*ita).action && kPIDelete != (*ita).action)
+                continue;
 
-        RemoteSendMessage(msg);
-    }
-    needsUpdate.clear();
+            QString type = (kPIAdd == (*ita).action) ? "ADD" : "DELETE";
+            QString msg = QString("RECORDING_LIST_CHANGE %1 %2 %3")
+                .arg(type).arg((*ita).chanid)
+                .arg((*ita).recstartts.toString(Qt::ISODate));
+
+            workDone = true;
+            RemoteSendMessage(msg);
+        }
+        needsAddDelete.clear();
+
+        // Send updates in any old order, we just need
+        // one per updated ProgramInfo.
+        QHash<PIKey,PIKeyData>::iterator itu = needsUpdate.begin();
+        for (; itu != needsUpdate.end(); ++itu)
+        {
+            QString msg;
+
+            if (kPIUpdateFileSize == (*itu).action)
+            {
+                msg = QString("UPDATE_FILE_SIZE %1 %2 %3")
+                    .arg(itu.key().chanid)
+                    .arg(itu.key().recstartts.toString(Qt::ISODate))
+                    .arg((*itu).filesize);
+            }
+            else
+            {
+                msg = QString("MASTER_UPDATE_PROG_INFO %1 %2")
+                    .arg(itu.key().chanid)
+                    .arg(itu.key().recstartts.toString(Qt::ISODate));
+            }
+
+            workDone = true;
+            RemoteSendMessage(msg);
+        }
+        needsUpdate.clear();
+
+        if ( workDone )
+        {
+            mutex.lock();
+            bool timedout = moreWork.wait(&mutex, 10000);
+            mutex.unlock();
+        }
+    } while( workDone );
+
     threadDeregister();
+    isRunning = false;
 }
+
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */
