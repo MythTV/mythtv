@@ -36,9 +36,13 @@ class Channel : public ChannelServices
 
     public:
 
+        /* Channel Methods */
+
         DTC::ChannelInfoList*  GetChannelInfoList  ( int      SourceID,
                                                      int      StartIndex,
                                                      int      Count      );
+
+        DTC::ChannelInfo*      GetChannelInfo      ( int      ChanID     );
 
         bool                   UpdateDBChannel     ( uint          MplexID,
                                                      uint          SourceID,
@@ -76,7 +80,43 @@ class Channel : public ChannelServices
 
         bool                   DeleteDBChannel     ( uint          ChannelID );
 
-        DTC::VideoSourceList*  GetVideoSourceList  ( void );
+        /* Video Source Methods */
+
+        DTC::VideoSourceList*     GetVideoSourceList     ( void );
+
+        DTC::VideoSource*         GetVideoSource         ( uint SourceID );
+
+        bool                      UpdateVideoSource      ( uint          SourceID,
+                                                           const QString &SourceName,
+                                                           const QString &Grabber,
+                                                           const QString &UserId,
+                                                           const QString &FreqTable,
+                                                           const QString &LineupId,
+                                                           const QString &Password,
+                                                           bool          UseEIT,
+                                                           const QString &ConfigPath,
+                                                           int           NITId );
+
+        bool                      CreateVideoSource      ( const QString &SourceName,
+                                                           const QString &Grabber,
+                                                           const QString &UserId,
+                                                           const QString &FreqTable,
+                                                           const QString &LineupId,
+                                                           const QString &Password,
+                                                           bool          UseEIT,
+                                                           const QString &ConfigPath,
+                                                           int           NITId );
+
+        bool                      DeleteVideoSource      ( uint SourceID );
+
+        /* Multiplex Methods */
+
+        DTC::VideoMultiplexList*  GetVideoMultiplexList  ( int SourceID,
+                                                           int StartIndex,
+                                                           int Count      );
+
+        DTC::VideoMultiplex*      GetVideoMultiplex      ( int MplexID    );
+
 };
 
 // --------------------------------------------------------------------------
@@ -171,6 +211,13 @@ class ScriptableChannel : public QObject
         QObject* GetVideoSourceList ( void )
         {
             return m_obj.GetVideoSourceList();
+        }
+
+        QObject* GetVideoMultiplexList  ( int      SourceID,
+                                          int      StartIndex,
+                                          int      Count      )
+        {
+            return m_obj.GetVideoMultiplexList( SourceID, StartIndex, Count );
         }
 
 };

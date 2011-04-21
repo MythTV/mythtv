@@ -499,6 +499,9 @@ class FileTransfer( BEEvent ):
                                     str(self), offset, whence)
         self._pos = self.joinInt(*res)
 
+    def flush(self):
+        pass
+
 class RecordFileTransfer( FileTransfer ):
     """
     A connection to mythbackend intended for file transfers.

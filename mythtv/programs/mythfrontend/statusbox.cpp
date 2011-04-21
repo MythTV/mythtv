@@ -155,11 +155,11 @@ MythUIButtonListItem* StatusBox::AddLogLine(QString line, QString detail,
 
     MythUIButtonListItem *item = new MythUIButtonListItem(m_logList, line,
                                                 qVariantFromValue(logline));
-    if (!state.isEmpty())
-    {
-        item->SetFontState(state);
-        item->DisplayState(state, "status");
-    }
+    if (state.isEmpty())
+        state = "normal";
+
+    item->SetFontState(state);
+    item->DisplayState(state, "status");
 
     return item;
 }

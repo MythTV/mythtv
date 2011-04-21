@@ -29,6 +29,8 @@
 #include "datacontracts/channelInfoList.h"
 #include "datacontracts/videoSource.h"
 #include "datacontracts/videoSourceList.h"
+#include "datacontracts/videoMultiplex.h"
+#include "datacontracts/videoMultiplexList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -49,10 +51,13 @@
 class SERVICE_PUBLIC ChannelServices : public Service
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.03" );
-    Q_CLASSINFO( "UpdateDBChannel_Method",         "POST" )
-    Q_CLASSINFO( "CreateDBChannel_Method",         "POST" )
-    Q_CLASSINFO( "DeleteDBChannel_Method",         "POST" )
+    Q_CLASSINFO( "version"    , "1.04" );
+    Q_CLASSINFO( "CreateDBChannel_Method",           "POST" )
+    Q_CLASSINFO( "UpdateDBChannel_Method",           "POST" )
+    Q_CLASSINFO( "DeleteDBChannel_Method",           "POST" )
+    Q_CLASSINFO( "CreateVideoSource_Method",         "POST" )
+    Q_CLASSINFO( "UpdateVideoSource_Method",         "POST" )
+    Q_CLASSINFO( "DeleteVideoSource_Method",         "POST" )
 
     public:
 
@@ -64,13 +69,19 @@ class SERVICE_PUBLIC ChannelServices : public Service
             DTC::ChannelInfoList::InitializeCustomTypes();
             DTC::VideoSource::InitializeCustomTypes();
             DTC::VideoSourceList::InitializeCustomTypes();
+            DTC::VideoMultiplex::InitializeCustomTypes();
+            DTC::VideoMultiplexList::InitializeCustomTypes();
         }
 
     public slots:
 
+        /* Channel Methods */
+
         virtual DTC::ChannelInfoList*  GetChannelInfoList  ( int           SourceID,
                                                              int           StartIndex,
                                                              int           Count      ) = 0;
+
+        virtual DTC::ChannelInfo*      GetChannelInfo      ( int           ChanID     ) = 0;
 
         virtual bool                   UpdateDBChannel     ( uint          MplexID,
                                                              uint          SourceID,
@@ -108,7 +119,42 @@ class SERVICE_PUBLIC ChannelServices : public Service
 
         virtual bool                   DeleteDBChannel     ( uint          ChannelID ) = 0;
 
-        virtual DTC::VideoSourceList*  GetVideoSourceList  ( void ) = 0;
+        /* Video Source Methods */
+
+        virtual DTC::VideoSourceList*     GetVideoSourceList     ( void ) = 0;
+
+        virtual DTC::VideoSource*         GetVideoSource         ( uint SourceID ) = 0;
+
+        virtual bool                      UpdateVideoSource      ( uint          SourceID,
+                                                                   const QString &SourceName,
+                                                                   const QString &Grabber,
+                                                                   const QString &UserId,
+                                                                   const QString &FreqTable,
+                                                                   const QString &LineupId,
+                                                                   const QString &Password,
+                                                                   bool          UseEIT,
+                                                                   const QString &ConfigPath,
+                                                                   int           NITId ) = 0;
+
+        virtual bool                      CreateVideoSource      ( const QString &SourceName,
+                                                                   const QString &Grabber,
+                                                                   const QString &UserId,
+                                                                   const QString &FreqTable,
+                                                                   const QString &LineupId,
+                                                                   const QString &Password,
+                                                                   bool          UseEIT,
+                                                                   const QString &ConfigPath,
+                                                                   int           NITId ) = 0;
+
+        virtual bool                      DeleteVideoSource      ( uint          SourceID ) = 0;
+
+        /* Multiplex Methods */
+
+        virtual DTC::VideoMultiplexList*  GetVideoMultiplexList  ( int SourceID,
+                                                                   int StartIndex,
+                                                                   int Count      ) = 0;
+
+        virtual DTC::VideoMultiplex*      GetVideoMultiplex      ( int MplexID    ) = 0;
 };
 
 #endif

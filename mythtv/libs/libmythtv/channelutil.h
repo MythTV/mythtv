@@ -153,7 +153,8 @@ class MTV_PUBLIC ChannelUtil
         uint    &dvb_transportid, uint          &dvb_networkid,
         uint    &mplexid,         bool          &commfree,
         bool    &use_on_air_guide,bool          &visible,
-        QString &xmltvid,         QString       &default_authority);
+        QString &xmltvid,         QString       &default_authority,
+        QString &icon);
     static int     GetProgramNumber(uint sourceid, const QString &channum)
         { return GetChannelValueInt("serviceid", sourceid, channum); }
     static QString GetVideoFilters(uint sourceid, const QString &channum)

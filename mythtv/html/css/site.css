@@ -1,13 +1,27 @@
 /* Styles shared by all sections */
 
     html, body {
-        font-size:        14px;
-        font-family:      sans-serif;
+        font: normal 13px Verdana, Geneva, sans-serif;
         color:            white;
         background-color: #88a1bb;
         border:           0px;
         margin:           0px;
         padding:          0px;
+    }
+    h1 {
+        font: 4em normal Georgia, 'Times New Roman', Times, serif;
+        padding: 20px;	margin: 0;
+        text-align:center;
+    }
+    h1 small{
+        font: 0.2em normal Verdana, Arial, Helvetica, sans-serif;
+        text-transform:uppercase; letter-spacing: 0.5em; line-height: 2em;
+        display: block;
+    }
+    h2 {
+        font: normal 2em Georgia, "Times New Roman", Times, serif;
+        margin: 0;
+        padding: 0;
     }
     a, a:visited {
         color:              #026;
@@ -20,8 +34,26 @@
         font-weight:        bold;
     }
 
+    p.setting_paragraph
+    {
+        padding:            0px 0px 10px 0px;
+    }
+
+    .setting_select, .setting_input
+    {
+        float: left;
+    }
+
+    .setting_label
+    {
+        width: 100%;
+        float: left;
+        clear: left;
+    }
+
     table
     {
+        font: normal 13px Verdana, Geneva, sans-serif;
         width:100%;
     }
 
@@ -88,7 +120,6 @@
         z-index:            50;
     }
     #header_text {
-        font-weight:        bold;
         color:              #cdcccc;
         padding-left:       200px;
         line-height:        2.75em;
@@ -143,9 +174,6 @@
     }
 
     #menu-title {
-        font-size:          14px;
-        font-family:        sans-serif;
-        font-weight:        bold;
         color:              #E4D6CD;
         position:           fixed;
         top:                72px;
@@ -197,15 +225,6 @@
         padding: 8px 0 0 10px;
     }
 
-    div.Title {
-        font-size:          18px;
-        font-family:        sans-serif;
-        font-weight:        bold;
-        width:              100%;
-        color:              white;
-        text-align:         center;
-    }
-
     .config {
         display: none;
     }
@@ -230,3 +249,63 @@
         background-repeat: repeat-x;
         background-position: top;
     }
+
+    .form_error
+    {
+        color:    red;
+    }
+
+    .pressed
+    {
+        color: #fff;
+        padding: 20px;
+        background: #111;
+        border: 1px solid #000;
+        border-right: 1px solid #353535;
+        border-bottom: 1px solid #353535;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+    }
+
+    .galleria-thumbnails
+    {
+        margin: 0 auto;
+    }
+
+    .galleria-container
+    {
+        margin-left: auto;
+        margin-right: auto
+    }
+
+    .blackbox
+    {
+        background: #000;
+    }
+
+    .indented ul
+    {
+        margin: 20px 0; padding: 0;
+        list-style: none;
+    }
+
+    .indented ul li
+    {
+        border-top: 1px solid #333;
+        border-bottom: 1px solid #111;
+    }
+
+    .indented ul li:first-child {border-top: none;}
+
+    .indented ul li:last-child {border-bottom: none;}
+
+    .indented ul li
+    {
+        padding: 10px;
+        display: block;
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .indented ul li a:hover {background: #111;}

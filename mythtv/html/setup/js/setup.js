@@ -16,6 +16,9 @@ function setupPageName(path) {
 }
 
 function showHelpWindow() {
+    var helpHeight = $("#helpWindow").parent().height();
+    $("#helpWindow").dialog("option", "position",
+        [(window.innerWidth - 330), (window.innerHeight - (helpHeight + 30))]);
     $("#helpWindow").show();
     $("#helpWindow").draggable();
 }
@@ -28,8 +31,9 @@ function showHelp(title, content) {
     $("#helpWindow").dialog({
       'title': title,
       'width': 300,
-      'height': 150,
-      'position': [(window.innerWidth - 330), (window.innerHeight - 180)]
+      'height': 'auto',
+      'minHeight': 20,
+      'position': [(window.innerWidth - 330), window.innerHeight]
     });
     $("#helpWindow").html(content);
     showHelpWindow();
@@ -254,7 +258,12 @@ function removeStorageGroupDir( group, dir, host ) {
 /* File/Directory Browser                                                   */
 /****************************************************************************/
 var fileBrowserCallback;
-function openFileBrowser(title, dirs, callback) {
+
+function fileBrowserEntryInfoCallback(file) {
+    /* do nothing here for now */
+}
+
+function openFileBrowserWindow(title, dirs, callback, onlyDirs, storageGroup) {
     $("#fileBrowserWindow").dialog({
         modal: true,
         width: 340,
@@ -269,23 +278,47 @@ function openFileBrowser(title, dirs, callback) {
 
     $('#fileBrowserWindow').dialog("open");
     $.ajaxSetup({ async: false });
-    $.getScript("/js/jqueryFileTree/jqueryFileTree.js");
+    if (typeof jQuery.fileTree == 'undefined') {
+        $.getScript("/js/jqueryFileTree/jqueryFileTree.js");
+    }
     $.ajaxSetup({ async: true });
     fileBrowserCallback = callback;
+    rootPath = "/";
+    if (storageGroup != undefined && storageGroup != "")
+        rootPath = "myth://" + storageGroup + "@" + getHostName() + ":"
+                 + location.port + "/";
+        
     $('#fileBrowser').fileTree(
-      { root: '/',
-        script: '/Config/FileBrowser'
-      }, callback );
+      { root: rootPath,
+        script: '/Config/FileBrowser',
+        dirsOnly: onlyDirs
+      }, fileBrowserEntryInfoCallback);
+}
+
+function openFileBrowser(title, dirs, callback) {
+    openFileBrowserWindow(title, dirs, callback, 0);
+}
+
+function openDirBrowser(title, dirs, callback) {
+    openFileBrowserWindow(title, dirs, callback, 1);
+}
+
+function openStorageGroupBrowser(title, callback, group) {
+    var dirs = new Array();
+    openFileBrowserWindow(title, dirs, callback, 0, group);
 }
 
 function saveFileBrowser() {
-    var selectedDir = $('#fileBrowser').find('A.selected').attr("rel");
-    if (selectedDir && fileBrowserCallback)
+    var selectedItem = $('#fileBrowser').find('A.selected').attr("rel");
+    if (selectedItem && fileBrowserCallback)
     {
         $('#fileBrowserWindow').dialog('close');
-        fileBrowserCallback(selectedDir);
+        if (typeof fileBrowserCallback == "string")
+            $("#" + fileBrowserCallback).val(selectedItem);
+        else
+            fileBrowserCallback(selectedItem);
     }
     else
-        alert("No directory selected.");
+        alert("No item selected.");
 }
 

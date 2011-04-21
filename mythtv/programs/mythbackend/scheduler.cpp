@@ -56,7 +56,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     schedMoveHigher(false),
     schedulingEnabled(true),
     m_tvList(tvList),
-    expirer(NULL),
+    m_expirer(NULL),
     m_mainServer(NULL),
     resetIdleTime(false),
     m_isShuttingDown(false),
@@ -278,8 +278,6 @@ static bool comp_recstart(RecordingInfo *a, RecordingInfo *b)
     return a->GetRecordingStatus() < b->GetRecordingStatus();
 }
 
-static QDateTime schedTime;
-
 static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
 {
     int arec = (a->GetRecordingStatus() != rsRecording &&
@@ -293,9 +291,10 @@ static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
     if (a->GetRecordingPriority() != b->GetRecordingPriority())
         return a->GetRecordingPriority() > b->GetRecordingPriority();
 
-    int apast = (a->GetRecordingStartTime() < schedTime.addSecs(-30) &&
+    QDateTime pasttime = QDateTime::currentDateTime().addSecs(-30);
+    int apast = (a->GetRecordingStartTime() < pasttime &&
                  !a->IsReactivated());
-    int bpast = (b->GetRecordingStartTime() < schedTime.addSecs(-30) &&
+    int bpast = (b->GetRecordingStartTime() < pasttime &&
                  !b->IsReactivated());
 
     if (apast != bpast)
@@ -549,6 +548,11 @@ void Scheduler::UpdateRecStatus(RecordingInfo *pginfo)
                     reschedQueue.enqueue(0);
                     reschedWait.wakeOne();
                 }
+                else
+                {
+                    MythEvent me("SCHEDULE_CHANGE");
+                    gCoreContext->dispatch(me);
+                }
             }
             return;
         }
@@ -593,6 +597,11 @@ void Scheduler::UpdateRecStatus(uint cardid, uint chanid,
                 {
                     reschedQueue.enqueue(0);
                     reschedWait.wakeOne();
+                }
+                else
+                {
+                    MythEvent me("SCHEDULE_CHANGE");
+                    gCoreContext->dispatch(me);
                 }
             }
             return;
@@ -1356,11 +1365,14 @@ void Scheduler::PruneRedundants(void)
         if (p->GetRecordingStatus() == rsUnknown)
             p->SetRecordingStatus(rsConflict);
 
-        // Restore the old status for some select cases that won't record.
-        if (p->GetRecordingStatus() != rsWillRecord &&
-            p->oldrecstatus != rsUnknown &&
-            p->oldrecstatus != rsNotListed &&
-            !p->IsReactivated())
+        // Restore the old status for some selected cases.
+        if (p->GetRecordingStatus() == rsMissedFuture ||
+            (p->GetRecordingStatus() == rsMissed && 
+             p->oldrecstatus != rsUnknown) ||
+            (p->GetRecordingStatus() == rsCurrentRecording &&
+             p->oldrecstatus == rsPreviousRecording && !p->future) ||
+            (p->GetRecordingStatus() != rsWillRecord &&
+             p->oldrecstatus == rsAborted))
         {
             RecStatusType rs = p->GetRecordingStatus();
             p->SetRecordingStatus(p->oldrecstatus);
@@ -1707,8 +1719,7 @@ void Scheduler::RunScheduler(void)
 
     MSqlQuery query(dbConn);
 
-    // Mark anything that was recording as aborted.  We'll fix it, if
-    // needed, after the slaves connect and we start scheduling.
+    // Mark anything that was recording as aborted.
     query.prepare("UPDATE oldrecorded SET recstatus = :RSABORTED "
                   "  WHERE recstatus = :RSRECORDING OR recstatus = :RSTUNING");
     query.bindValue(":RSABORTED", rsAborted);
@@ -1717,14 +1728,22 @@ void Scheduler::RunScheduler(void)
     if (!query.exec())
         MythDB::DBError("UpdateAborted", query);
 
-    // Mark anything that was going to record as missed.  We'll fix
-    // it, if needed, after we start scheduling.
+    // Mark anything that was going to record as missed.
     query.prepare("UPDATE oldrecorded SET recstatus = :RSMISSED "
                   "WHERE recstatus = :RSWILLRECORD");
     query.bindValue(":RSMISSED", rsMissed);
     query.bindValue(":RSWILLRECORD", rsWillRecord);
     if (!query.exec())
-        MythDB::DBError("UpdateMissed1", query);
+        MythDB::DBError("UpdateMissed", query);
+
+    // Mark anything that was set to rsCurrentRecording as
+    // rsPreviousRecording.
+    query.prepare("UPDATE oldrecorded SET recstatus = :RSPREVIOUS "
+                  "WHERE recstatus = :RSCURRENT");
+    query.bindValue(":RSPREVIOUS", rsPreviousRecording);
+    query.bindValue(":RSCURRENT", rsCurrentRecording);
+    if (!query.exec())
+        MythDB::DBError("UpdateCurrent", query);
 
     // Clear the "future" status of anything older than the maximum
     // endoffset.  Anything more recent will bee handled elsewhere
@@ -1733,7 +1752,7 @@ void Scheduler::RunScheduler(void)
                   "WHERE future > 0 AND "
                   "      endtime < (NOW() - INTERVAL 8 HOUR)");
     if (!query.exec())
-        MythDB::DBError("UpdateMissed2", query);
+        MythDB::DBError("UpdateFuture", query);
 
     // wait for slaves to connect
     sleep(3);
@@ -1771,6 +1790,8 @@ void Scheduler::RunScheduler(void)
                 gettimeofday(&fillstart, NULL);
                 QString msg;
 
+                bool deleteFuture = false;
+
                 while (!reschedQueue.empty())
                 {
                     int recordid = reschedQueue.dequeue();
@@ -1784,12 +1805,29 @@ void Scheduler::RunScheduler(void)
                         if (recordid == -1)
                             reschedQueue.clear();
 
+                        deleteFuture = true;
                         schedLock.unlock();
                         recordmatchLock.lock();
                         UpdateMatches(recordid);
                         recordmatchLock.unlock();
                         schedLock.lock();
                     }
+                }
+
+                // Delete future oldrecorded entries that no longer
+                // match any potential recordings.
+                if (deleteFuture)
+                {
+                    query.prepare("DELETE oldrecorded FROM oldrecorded "
+                                  "LEFT JOIN recordmatch ON "
+                                  "    recordmatch.chanid = "
+                                  "        oldrecorded.chanid AND "
+                                  "    recordmatch.starttime = "
+                                  "        oldrecorded.starttime "
+                                  "WHERE oldrecorded.future > 0 AND "
+                                  "    recordmatch.recordid IS NULL");
+                    if (!query.exec())
+                        MythDB::DBError("DeleteFuture", query);
                 }
 
                 gettimeofday(&fillend, NULL);
@@ -1888,20 +1926,28 @@ void Scheduler::RunScheduler(void)
                 PutInactiveSlavesToSleep();
                 lastSleepCheck = QDateTime::currentDateTime();
 
-                // Delete old, future entries from oldrecorded and
-                // write new ones as well as new missed entries.
-                query.prepare("DELETE FROM oldrecorded WHERE future > 0");
-                if (!query.exec())
-                    MythDB::DBError("DeleteFuture", query);
-
+                // Write changed entries to oldrecorded.
                 RecIter it = reclist.begin();
                 for ( ; it != reclist.end(); ++it)
                 {
                     RecordingInfo *p = *it;
-                    if (p->oldrecstatus == rsMissedFuture)
-                        p->AddHistory(false, false, false);
-                    else if (p->oldrecstatus == rsUnknown)
-                        p->AddHistory(false, false, true);
+                    if (p->GetRecordingStatus() != p->oldrecstatus)
+                    {
+                        if (p->GetRecordingEndTime() < schedTime)
+                            p->AddHistory(false, false, false);
+                        else if (p->GetRecordingStartTime() < schedTime &&
+                                 p->GetRecordingStatus() != rsWillRecord)
+                            p->AddHistory(false, false, false);
+                        else
+                            p->AddHistory(false, false, true);
+                    }
+                    else if (p->future)
+                    {
+                        // Force a non-future, oldrecorded entry to
+                        // get written when the time comes.
+                        p->oldrecstatus = rsUnknown;
+                    }
+                    p->future = false;
                 }
 
                 SendMythSystemEvent("SCHEDULER_RAN");
@@ -2173,10 +2219,10 @@ void Scheduler::RunScheduler(void)
                 nextRecording->SetReactivated(false);
 
                 nextRecording->AddHistory(false);
-                if (expirer)
+                if (m_expirer)
                 {
                     // activate auto expirer
-                    expirer->Update(nextRecording->GetCardID(), fsID, true);
+                    m_expirer->Update(nextRecording->GetCardID(), fsID, true);
                 }
             }
             else
@@ -3528,16 +3574,13 @@ void Scheduler::AddNewRecords(void)
             result.value(23).toInt() == COMM_DETECT_COMMFREE,//commfree
             result.value(39).toUInt(),//subtitleType
             result.value(38).toUInt(),//videoproperties
-            result.value(40).toUInt());//audioproperties
+            result.value(40).toUInt(),//audioproperties
+            result.value(45).toInt());//future
 
-        // If this was previously a futrue recording and it's still
-        // viable, start over.
-        bool future = result.value(45).toInt();
-        if (future && p->GetRecordingEndTime() >= schedTime)
-        {
-            p->SetRecordingStatus(rsUnknown);
-            p->oldrecstatus = rsUnknown;
-        }
+        if (!p->future && !p->IsReactivated() &&
+            p->oldrecstatus != rsAborted &&
+            p->oldrecstatus != rsNotListed)
+            p->SetRecordingStatus(p->oldrecstatus);
 
         if (!recTypeRecPriorityMap.contains(p->GetRecordingRuleType()))
         {
@@ -3624,7 +3667,7 @@ void Scheduler::AddNewRecords(void)
         // or have its old status restored in PruneRedundants.
         if (p->GetRecordingEndTime() < schedTime)
         {
-            if (future)
+            if (p->future)
                 newrecstatus = rsMissedFuture;
             else
                 newrecstatus = rsMissed;
@@ -3976,8 +4019,8 @@ void Scheduler::GetNextLiveTVDir(uint cardid)
     VERBOSE(VB_FILE, LOC + QString("FindNextLiveTVDir: next dir is '%1'")
             .arg(recording_dir));
 
-    if (expirer) // update auto expirer
-        expirer->Update(cardid, fsID, true);
+    if (m_expirer) // update auto expirer
+        m_expirer->Update(cardid, fsID, true);
 }
 
 int Scheduler::FillRecordingDir(
@@ -4278,7 +4321,7 @@ int Scheduler::FillRecordingDir(
 
     bool simulateAutoExpire =
         ((gCoreContext->GetSetting("StorageScheduler") == "BalancedFreeSpace") &&
-         (expirer) &&
+         (m_expirer) &&
          (fsInfoList.size() > 1));
 
     // Loop though looking for a directory to put the file in.  The first time
@@ -4309,7 +4352,7 @@ int Scheduler::FillRecordingDir(
 
             // get list of expirable programs
             pginfolist_t expiring;
-            expirer->GetAllExpiring(expiring);
+            m_expirer->GetAllExpiring(expiring);
 
             for(pginfolist_t::iterator it=expiring.begin();
                 it != expiring.end(); ++it)
@@ -4381,7 +4424,7 @@ int Scheduler::FillRecordingDir(
                 remainingSpaceKB[fs->fsID] += (*it)->GetFilesize() / 1024;
 
                 // check if we have enough space for new file
-                long long desiredSpaceKB = expirer->GetDesiredSpace(fs->fsID);
+                long long desiredSpaceKB = m_expirer->GetDesiredSpace(fs->fsID);
 
                 if (remainingSpaceKB[fs->fsID] > (desiredSpaceKB + maxSizeKB))
                 {
@@ -4405,7 +4448,7 @@ int Scheduler::FillRecordingDir(
                 }
             }
 
-            expirer->ClearExpireList(expiring);
+            m_expirer->ClearExpireList(expiring);
         }
         else // passes 1 & 3 (or 1 & 2 if !simulateAutoExpire)
         {
@@ -4414,8 +4457,8 @@ int Scheduler::FillRecordingDir(
             {
                 long long desiredSpaceKB = 0;
                 FileSystemInfo *fs = *fslistit;
-                if (expirer)
-                    desiredSpaceKB = expirer->GetDesiredSpace(fs->fsID);
+                if (m_expirer)
+                    desiredSpaceKB = m_expirer->GetDesiredSpace(fs->fsID);
 
                 if ((fs->hostname == hostname) &&
                     (dirlist.contains(fs->directory)) &&

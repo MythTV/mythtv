@@ -261,7 +261,7 @@ bool PreviewGenerator::Run(void)
             if (lpath == outname)
             {
                 StorageGroup sgroup;
-                QString tmpFile = sgroup.FindRecordingFile(lpath);
+                QString tmpFile = sgroup.FindFile(lpath);
                 outname = (tmpFile.isEmpty()) ? outname : tmpFile;
             }
 

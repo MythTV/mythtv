@@ -857,7 +857,7 @@ bool MythDB::LoadDatabaseParamsFromDisk(
     {
         params.dbHostName = settings.GetSetting("DBHostName");
         params.dbHostPing = settings.GetSetting("DBHostPing") != "no";
-        params.dbPort     = settings.GetNumSetting("DBPort");
+        params.dbPort     = settings.GetNumSetting("DBPort", 3306);
         params.dbUserName = settings.GetSetting("DBUserName");
         params.dbPassword = settings.GetSetting("DBPassword");
         params.dbName     = settings.GetSetting("DBName");
@@ -880,7 +880,7 @@ bool MythDB::LoadDatabaseParamsFromDisk(
         // Sensible connection defaults.
         params.dbHostName    = "localhost";
         params.dbHostPing    = true;
-        params.dbPort        = 0;
+        params.dbPort        = 3306;
         params.dbUserName    = "mythtv";
         params.dbPassword    = "mythtv";
         params.dbName        = "mythconverg";

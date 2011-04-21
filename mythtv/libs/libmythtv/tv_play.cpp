@@ -1213,8 +1213,6 @@ TV::~TV(void)
     }
     ReturnPlayerLock(mctx);
 
-    GetMythMainWindow()->GetPaintWindow()->show();
-
     VERBOSE(VB_PLAYBACK, "TV::~TV() -- end");
 }
 
@@ -2106,7 +2104,6 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             (db_use_fixed_size) ? player_bounds.size() :
             QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
         mainWindow->setGeometry(player_bounds);
-        GetMythMainWindow()->GetPaintWindow()->hide();
         if (!weDisabledGUI)
         {
             weDisabledGUI = true;
@@ -7590,7 +7587,6 @@ void TV::DoEditSchedule(int editType)
         GetMythMainWindow()->PopDrawDisabled();
         weDisabledGUI = false;
     }
-    GetMythMainWindow()->GetPaintWindow()->show();
 }
 
 void TV::EditSchedule(const PlayerContext *ctx, int editType)
@@ -8341,9 +8337,6 @@ void TV::customEvent(QEvent *e)
 
         DoSetPauseState(actx, saved_pause); // Restore pause states
         disableDrawUnusedRects = false;
-
-        GetMythMainWindow()->GetPaintWindow()->hide();
-        GetMythMainWindow()->GetPaintWindow()->clearMask();
 
         qApp->processEvents();
 

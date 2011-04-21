@@ -340,7 +340,6 @@ void MFDThread::run(void)
         return;
 
     m_parent->RunMFD();
-    this->deleteLater();
 }
 
 void HouseKeeper::RunMFD(void)

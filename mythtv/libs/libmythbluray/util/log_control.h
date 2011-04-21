@@ -25,23 +25,23 @@
 
 
 enum debug_mask_enum {
-    DBG_RESERVED = 1,
-    DBG_CONFIGFILE = 2,
-    DBG_FILE = 4,
-    DBG_AACS = 8,
-    DBG_MKB = 16,
-    DBG_MMC = 32,
-    DBG_BLURAY = 64,
-    DBG_DIR = 128,
-    DBG_NAV = 256,
-    DBG_BDPLUS = 512,
-    DBG_DLX = 1024,
-    DBG_CRIT = 2048,         // this is libbluray's default debug mask so use this if you want to display critical info
-    DBG_HDMV = 4096,
-    DBG_BDJ = 8192,
-    DBG_STREAM = 16384,
-    DBG_GC = 32768,         // graphics controller
-    DBG_DECODE = 65536,     // PG / IG decoders, m2ts demuxer
+    DBG_RESERVED   = 0x00001,
+    DBG_CONFIGFILE = 0x00002,
+    DBG_FILE       = 0x00004,
+    DBG_AACS       = 0x00008,
+    DBG_MKB        = 0x00010,
+    DBG_MMC        = 0x00020,
+    DBG_BLURAY     = 0x00040,
+    DBG_DIR        = 0x00080,
+    DBG_NAV        = 0x00100,
+    DBG_BDPLUS     = 0x00200,
+    DBG_DLX        = 0x00400,
+    DBG_CRIT       = 0x00800, /* this is libbluray's default debug mask so use this if you want to display critical info */
+    DBG_HDMV       = 0x01000,
+    DBG_BDJ        = 0x02000,
+    DBG_STREAM     = 0x04000,
+    DBG_GC         = 0x08000, /* graphics controller */
+    DBG_DECODE     = 0x10000, /* PG / IG decoders, m2ts demuxer */
 };
 
 typedef enum debug_mask_enum debug_mask_t;

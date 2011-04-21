@@ -63,7 +63,7 @@ QFileInfo Content::GetFile( const QString &sStorageGroup, const QString &sFileNa
     // ------------------------------------------------------------------
 
     StorageGroup storage( sGroup );
-    QString sFullFileName = storage.FindRecordingFile( sFileName );
+    QString sFullFileName = storage.FindFile( sFileName );
 
     if (sFullFileName.isEmpty())
     {
@@ -103,7 +103,7 @@ QStringList Content::GetFileList( const QString &sStorageGroup )
 
     StorageGroup sgroup(sStorageGroup);
 
-    return sgroup.GetFileList("");
+    return sgroup.GetFileList("", true);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -531,7 +531,7 @@ QString Content::GetHash( const QString &sStorageGroup, const QString &sFileName
 
     StorageGroup sgroup(storageGroup, gCoreContext->GetHostName());
 
-    QString fullname = sgroup.FindRecordingFile(sFileName);
+    QString fullname = sgroup.FindFile(sFileName);
     QString hash = FileHash(fullname);
 
     if (hash == "NULL")

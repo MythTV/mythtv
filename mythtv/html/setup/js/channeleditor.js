@@ -11,10 +11,10 @@ function initChannelEditor() {
                   'Use On Air Guide', 'Default Authority'],
         colModel:[
             {name:'ChanId', editable: true, width:120, sorttype:"int", hidden:true, jsonmap: 'ChanId'},
-            {name:'ChanNum', editable: true, width:120, sorttype:"int", jsonmap: 'ChanNum'},
-            {name:'CallSign', editable: true, width:90, sorttype:"text", jsonmap: 'CallSign'},
-            {name:'ChannelName', editable: true, width:300, align:"right", sorttype:"text", jsonmap: 'ChannelName'},
-            {name:'Visible', editable: true, width:40, align:"center", sorttype:"bool", jsonmap: 'Visible', formatter:'checkbox',edittype:"checkbox"},
+            {name:'ChanNum', search: true, editable: true, width:120, sorttype:"int", jsonmap: 'ChanNum'},
+            {name:'CallSign', search: true, editable: true, width:90, sorttype:"text", jsonmap: 'CallSign'},
+            {name:'ChannelName', search: true, editable: true, width:300, align:"right", sorttype:"text", jsonmap: 'ChannelName'},
+            {name:'Visible', search: false, editable: true, width:40, align:"center", sorttype:"bool", jsonmap: 'Visible', formatter:'checkbox',edittype:"checkbox"},
             {name:'XMLTVID', editable: true, width:0, align:"right", sortable:false, hidden:true, jsonmap: 'XMLTVID'},
             {name:'IconURL', editable: true, width:0, align:"right", sortable:false, hidden:true, jsonmap: 'IconURL'},
             {name:'MplexId', editable: true, width:0, align:"right", sortable:false, hidden:true, jsonmap: 'MplexId'},
@@ -50,6 +50,8 @@ function initChannelEditor() {
         multiselect: true,
         rowList:[10,20,30,50],
         pager: '#pager',
+        defaultSearch: 'cn',
+        ignoreCase: true,
         sortname: 'ChanNum',
         viewrecords: true,
         sortorder: "desc",
@@ -58,6 +60,10 @@ function initChannelEditor() {
         width: 820,
         height: 442
     });
+
+    /* Add a search toolbar */
+
+    jQuery("#channels").jqGrid('filterToolbar',{ searchOnEnter: false, defaultSearch: "cn" });
 
     /* Resize the grid if the window width changes */
 
@@ -74,7 +80,7 @@ function initChannelEditor() {
     $("#channels").contextMenu('channelmenu', {
             bindings: {
                 'editopt': function(t) {
-                    editSelectedChannel();
+                    editChannel();
                 },
                 'del': function(t) {
                     promptToDeleteChannel();
@@ -92,7 +98,6 @@ function initChannelEditor() {
 
 function reloadChannelGrid() {
     var sourceid = $("#sourceList").val();
-    setStatusMessage("Loading Channel Source (" + $('#sourceList').val() + ")...");
 
     $('#channels').setGridParam({
         url:'/Channel/GetChannelInfoList?SourceID=' + sourceid,
@@ -105,6 +110,19 @@ function initSourceList() {
     $("#sourceSelect").html("Guide Data Source: <select id='sourceList' "
         + "onChange='javascript:reloadChannelGrid()'>"
         + getGuideSourceList() + "</select>");
+}
+
+function editChannel() {
+    var rowNum = $('#channels').getGridParam('selrow');
+    var rowArr = $('#channels').getGridParam('selarrrow');
+    if (rowNum != null) {
+        if (rowArr.length == 1) {
+            editSelectedChannel();
+        }
+        else {
+            editMultiChannel();
+        }
+    }
 }
 
 function editSelectedChannel() {
@@ -127,10 +145,12 @@ function editSelectedChannel() {
 
     /* Advanced */
 
+    var sourceid = rowdata.SourceId;
+
     $("#channelDetailSettingFrequencyId").val(rowdata.FrequencyId);
-    $("#channelDetailSettingMplexId").val(rowdata.MplexId);
+    $("#channelDetailSettingMplexId").html(initVideoMultiplexSelect(sourceid));
+    $("#mplexList").val(rowdata.MplexId);
     $("#channelDetailSettingServiceId").val(rowdata.ServiceId);
-    $("#channelDetailSettingFormat").val(rowdata.Format);
     $("#channelDetailSettingDefaultAuthority").val(rowdata.DefaultAuth);
     $("#channelDetailSettingATSCMajorChannel").val(rowdata.ATSCMajorChan);
     $("#channelDetailSettingATSCMinorChannel").val(rowdata.ATSCMinorChan);
@@ -138,10 +158,11 @@ function editSelectedChannel() {
     /* Expert */
 
     $("#channelDetailSettingChanId").html(rowdata.ChanId);
-    $("#channelDetailSettingSourceId").html(rowdata.SourceId);
+    $("#channelDetailSettingSourceId").html(sourceid);
     $("#channelDetailSettingModulation").html(rowdata.Modulation)
     $("#channelDetailSettingFrequency").html(rowdata.Frequency)
-    $("#channelDetailSettingSIStandard").html(rowdata.SIStandard )
+    $("#channelDetailSettingSIStandard").html(rowdata.SIStandard)
+    $("#channelDetailSettingFormat").html(rowdata.Format);
 
     $("#edit").dialog({
         modal: true,
@@ -160,7 +181,7 @@ function editSelectedChannel() {
 }
 
 function saveChannelEdits() {
-    var mplexid = $("#channelDetailSettingMplexId").val();
+    var mplexid = $("#mplexList").val();
     var sourceid = $("#channelDetailSettingSourceId").html();
     var chanid = $("#channelDetailSettingChanId").html()
 
@@ -190,11 +211,11 @@ function saveChannelEdits() {
     var defaultauth = $("#channelDetailSettingDefaultAuthority").val();
 
     if ($("#channels").jqGrid('setRowData', chanid,
-        { MplexID: mplexid, SourceID: sourceid, ChanID: chanid,
+        { MplexId: mplexid, SourceId: sourceid, ChanId: chanid,
         CallSign: callsign, ChannelName: channelname, ChanNum: channum,
-        ServiceID: serviceid, ATSCMajorChan: atscmajorchannel,
+        ServiceId: serviceid, ATSCMajorChan: atscmajorchannel,
         ATSCMinorChan: atscminorchannel, UseEIT: useeit, Visible: visible,
-        FrequencyID: frequencyid, IconURL: icon, Format: format, XMLTVID: xmltvid,
+        FrequencyId: frequencyid, IconURL: icon, Format: format, XMLTVID: xmltvid,
         DefaultAuth: defaultauth }))
         {
             $.post("/Channel/UpdateDBChannel",
@@ -218,6 +239,129 @@ function saveChannelEdits() {
         }
 }
 
+function editMultiChannel() {
+    loadEditWindow("/setup/channeleditor-channeldetail-multi.html");
+    var rows = $('#channels').getGridParam('selarrrow');
+
+    var rowinfo = getMultiRowDescription();
+
+    $("#channeldetailtable").html(rowinfo);
+
+    $("#edit").dialog({
+        modal: true,
+        width: 800,
+        height: 620,
+        'title': 'Edit Multiple Channels',
+        closeOnEscape: false,
+        buttons: {
+           'Save': function() { showConfirm('Editing multiple channels at once should be done with great care.  Do you want to continue?  This cannot be undone.', saveMultiChannelEdits); },
+           'Cancel': function() { $(this).dialog('close'); }
+    }});
+
+    $("#multichannelsettings").accordion();
+}
+
+function getMultiRowDescription() {
+    var result = '';
+    var rowArr = $('#channels').getGridParam('selarrrow');
+
+    $.each(rowArr, function(i, value) {
+        var rowdata = $("#channels").jqGrid('getRowData', value);
+        result = result + "Affected ChanId:" + rowdata.ChanId + "(" + rowdata.ChannelName + ")" + "<br>";
+    });
+
+    return result;
+}
+
+function saveMultiChannelEdits() {
+    var action = $("#multiChannelOptions").val();
+    var rowArr = $('#channels').getGridParam('selarrrow');
+    $.each(rowArr, function(i, value) {
+        var rowdata = $("#channels").jqGrid('getRowData', value);
+        var orig = '';
+        var news = '';
+        if (action == "ChanNum") {
+            orig = rowdata.ChanNum;
+            rowdata.ChanNum = multiChannelEditTextReplace(rowdata);
+            news = rowdata.ChanNum;
+        }
+        else if (action == "ChanName") {
+            orig = rowdata.ChannelName;
+            rowdata.ChannelName = multiChannelEditTextReplace(rowdata);
+            news = rowdata.ChannelName;
+        }
+        else if (action == "CallSign") {
+            orig = rowdata.CallSign;
+            rowdata.CallSign = multiChannelEditTextReplace(rowdata);
+            news = rowdata.CallSign;
+        }
+
+        if (updateChannelRow(value, rowdata)) {
+        }
+    });
+    $("#edit").dialog('close');
+}
+
+function multiChannelEditTextReplace(rowdata) {
+    var template = $("#multiChannelRenameTemplate").val();
+
+    template = template.replace("%ChanId%", rowdata.ChanId);
+    template = template.replace("%ChanNum%", rowdata.ChanNum);
+    template = template.replace("%ChanName%", rowdata.ChannelName);
+    template = template.replace("%CallSign%", rowdata.CallSign);
+    template = template.replace("%MplexId%", rowdata.MplexId);
+    template = template.replace("%ServiceId%", rowdata.ServiceId);
+    template = template.replace("%ATSCMajorChan%", rowdata.ATSCMajorChan);
+    template = template.replace("%ATSCMinorChan%", rowdata.ATSCMinorChan);
+    template = template.replace("%SourceId%", rowdata.SourceId);
+    template = template.replace("%XMLTVID%", rowdata.XMLTVID);
+
+    return template;
+}
+
+function updateChannelRow(rownum, rowdata) {
+    if ($("#channels").jqGrid('setRowData', rownum, rowdata)) {
+        if (updateDBChannelRow(rowdata))
+            return true;
+        else
+            return false;
+    }
+    else {
+        return false;
+    }
+}
+
+function updateDBChannelRow(rowdata) {
+    result = false;
+    var visible = false;
+    var useeit = false;
+
+    if (rowdata.Visible == "Yes")
+        visible = true;
+    if (rowdata.UseEIT == "Yes")
+        useeit = true;
+
+    $.ajaxSetup({ async: false });
+    $.post("/Channel/UpdateDBChannel",
+        { MplexID: rowdata.MplexId, SourceID: rowdata.SourceId, ChannelID: rowdata.ChanId,
+          CallSign: rowdata.CallSign, ChannelName: rowdata.ChannelName, ChannelNumber: rowdata.ChanNum,
+          ServiceID: rowdata.ServiceId, ATSCMajorChannel: rowdata.ATSCMajorChan,
+          ATSCMinorChannel: rowdata.ATSCMinorChan, UseEIT: useeit , visible: visible,
+          FrequencyID: rowdata.FrequencyId, Icon: rowdata.IconURL, Format: rowdata.Format, XMLTVID: rowdata.XMLTVID,
+          DefaultAuthority: rowdata.DefaultAuth},
+          function(data) {
+              if (data.bool == "true") {
+                  $('#channels').trigger('reloadGrid');
+                  result = true;
+              }
+              else
+                  setErrorMessage("Channels update failed!");
+         }, "json");
+    $.ajaxSetup({ async: true });
+
+    return result;
+}
+
 function promptToDeleteChannel() {
     var message = "Are you sure you want to delete these channels?  This cannot be undone.";
     var rowNum = $('#channels').getGridParam('selrow');
@@ -235,7 +379,17 @@ function deleteSelectedChannel() {
     if (rowArray.length > 0) {
         var len = rowArray.length;
         for (var i=0; i < len; i++) {
-            if ($("#channels").jqGrid('delRowData', rowArray[i])) {
+            var chanid = rowArray[i];
+            if ($("#channels").jqGrid('delRowData', chanid)) {
+                $.post("/Channel/DeleteDBChannel",
+                { ChannelID: chanid },
+                function(data) {
+                    if (data.bool == "true") {
+                        setStatusMessage("Channel deleted successfully!");
+                      }
+                      else
+                          setErrorMessage("Channel delete failed!");
+                  }, "json");
             }
         }
         $('#channels').trigger('reloadGrid');
@@ -259,6 +413,39 @@ function getGuideSourceList() {
     $.ajaxSetup({ async: true });
 
     return result;
+}
+
+function getVideoMultiplexList(sourceid) {
+    var result = '';
+
+    $.ajaxSetup({ async: false });
+    $.post("/Channel/GetVideoMultiplexList",
+        { SourceID : sourceid },
+        function(data) {
+        $.each(data.VideoMultiplexList.VideoMultiplexes, function(i, value) {
+            var label = '';
+            if (value.TransportId > 0)
+                label = value.MplexId + " " + "(Transport: " + value.TransportId + ")";
+            else
+                label = value.MplexId + " " + "(Frequency: " + value.Frequency + ")";
+            result += "<option value='" + value.MplexId + "'>" + label + "</option>";
+        });
+    }, "json");
+    $.ajaxSetup({ async: true });
+
+    return result;
+}
+
+function initVideoMultiplexSelect(sourceid) {
+    var result = "<select id='mplexList'> "
+        + getVideoMultiplexList(sourceid) + "</select>";
+
+    return result;
+}
+
+function browseForNewChanIcon() {
+    openStorageGroupBrowser("Channel Icon", "channelDetailSettingIconURL",
+                            "ChannelIcons");
 }
 
 initSourceList();

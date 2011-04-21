@@ -92,15 +92,17 @@ RecordingInfo::RecordingInfo(
     bool _commfree,
     uint _subtitleType,
     uint _videoproperties,
-    uint _audioproperties) :
+    uint _audioproperties,
+    bool _future) :
     ProgramInfo(
         _title, _subtitle, _description, _category,
         _chanid, _chanstr, _chansign, _channame, QString(),
         _recgroup, _playgroup,
         _startts, _endts, _recstartts, _recendts,
         _seriesid, _programid),
-    oldrecstatus(rsUnknown),
+    oldrecstatus(_oldrecstatus),
     savedrecstatus(rsUnknown),
+    future(_future),
     record(NULL)
 {
     hostname = _hostname;
@@ -123,12 +125,6 @@ RecordingInfo::RecordingInfo(
     programflags |= _reactivate ? FL_REACTIVATE : 0;
     programflags &= ~FL_CHANCOMMFREE;
     programflags |= _commfree ? FL_CHANCOMMFREE : 0;
-
-    oldrecstatus = _oldrecstatus;
-
-    recstatus = (oldrecstatus == rsAborted ||
-                 oldrecstatus == rsNotListed ||
-                 _reactivate) ? rsUnknown : oldrecstatus;
 
     recordid = _recordid;
     parentid = _parentid;
@@ -196,6 +192,7 @@ RecordingInfo::RecordingInfo(
         _seriesid, _programid),
     oldrecstatus(rsUnknown),
     savedrecstatus(rsUnknown),
+    future(false),
     record(NULL)
 {
     recpriority = _recpriority;
@@ -226,6 +223,7 @@ RecordingInfo::RecordingInfo(
     bool genUnknown, uint maxHours, LoadStatus *status) :
     oldrecstatus(rsUnknown),
     savedrecstatus(rsUnknown),
+    future(false),
     record(NULL)
 {
     ProgramList schedList;
@@ -368,6 +366,7 @@ void RecordingInfo::clone(const RecordingInfo &other,
     {
         oldrecstatus   = other.oldrecstatus;
         savedrecstatus = other.savedrecstatus;
+        future         = other.future;
     }
 }
 
@@ -391,6 +390,7 @@ void RecordingInfo::clone(const ProgramInfo &other,
 
     oldrecstatus   = rsUnknown;
     savedrecstatus = rsUnknown;
+    future         = false;
 }
 
 void RecordingInfo::clear(void)
@@ -402,6 +402,7 @@ void RecordingInfo::clear(void)
 
     oldrecstatus = rsUnknown;
     savedrecstatus = rsUnknown;
+    future = false;
 }
 
 
@@ -1132,8 +1133,11 @@ void RecordingInfo::ReactivateRecording(void)
 void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
 {
     bool dup = (GetRecordingStatus() == rsRecorded || forcedup);
-    RecStatusType rs = (GetRecordingStatus() == rsCurrentRecording) ?
-        rsPreviousRecording : GetRecordingStatus();
+    RecStatusType rs = (GetRecordingStatus() == rsCurrentRecording &&
+                        !future) ? rsPreviousRecording : GetRecordingStatus();
+    VERBOSE(VB_SCHEDULE, QString("AddHistory: %1/%2, %3, %4, %5/%6")
+            .arg(int(rs)).arg(int(oldrecstatus)).arg(future).arg(dup)
+            .arg(GetScheduledStartTime().toString()).arg(GetTitle()));
     if (!future)
         oldrecstatus = GetRecordingStatus();
     if (dup)

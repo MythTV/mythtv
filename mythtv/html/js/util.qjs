@@ -204,6 +204,7 @@ function hideConfirm() {
 
 function showConfirm(content, functionname, params) {
     $("#confirmWindow").dialog({
+        modal: true,
         buttons: {
            'Yes': function() {
                if (params == null) {
@@ -222,5 +223,10 @@ function showConfirm(content, functionname, params) {
     $("#confirmWindow").html(content);
     $("#confirmWindow").show();
     $("#confirmWindow").draggable();
+}
+
+function appendMatch(match, divname) {
+    var newValue = $("#" + divname).val() + match;
+    $("#" + divname).val(newValue);
 }
 

@@ -20,7 +20,7 @@ function printJobRow(title, descKey, cmdKey) {
 <!-- Eventually after the JobQueue reorg, we'll be able to do this:
 <a href='javascript:createNewJob()'>Create New Job</a><br>
 -->
-<table>
+<table width="100%">
 <thead class='ui-widget-header'>
 <tr><th>Description</th><th>Actions</th></tr>
 </thead>

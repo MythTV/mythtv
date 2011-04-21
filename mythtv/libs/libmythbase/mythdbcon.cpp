@@ -123,8 +123,13 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
         if (m_dbparms.dbPort)
             m_db.setPort(m_dbparms.dbPort);
 
-        if (m_dbparms.dbPort && m_dbparms.dbHostName == "localhost")
-            m_db.setHostName("127.0.0.1");
+        // Prefer using the faster localhost connection if using standard
+        // ports, even if the user specified a DBHostName of 127.0.0.1.  This
+        // will cause MySQL to use a Unix socket (on *nix) or shared memory (on
+        // Windows) connection.
+        if ((m_dbparms.dbPort == 0 || m_dbparms.dbPort == 3306) &&
+            m_dbparms.dbHostName == "127.0.0.1")
+            m_db.setHostName("localhost");
 
         connected = m_db.open();
 
@@ -164,7 +169,27 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
             // both being called with true, so order is important here.
             GetMythDB()->SetHaveDBConnection(true);
             if (!GetMythDB()->HaveSchema())
-                GetMythDB()->SetHaveSchema(m_db.tables().count() > 1);
+            {
+                // We can't just check the count of QSqlDatabase::tables()
+                // because it returns all tables visible to the user in *all*
+                // databases (not just the current DB).
+                bool have_schema = false;
+                QString sql = "SELECT COUNT( "
+                              "         INFORMATION_SCHEMA.TABLES.TABLE_NAME "
+                              "       ) "
+                              "  FROM INFORMATION_SCHEMA.TABLES "
+                              " WHERE INFORMATION_SCHEMA.TABLES.TABLE_SCHEMA "
+                              "       = DATABASE() "
+                              "   AND INFORMATION_SCHEMA.TABLES.TABLE_TYPE = "
+                              "       'BASE TABLE';";
+                // We can't use MSqlQuery to determine if we have a schema,
+                // since it will open a new connection, which will try to check
+                // if we have a schema
+                QSqlQuery query = m_db.exec(sql); // don't convert to MSqlQuery
+                if (query.next())
+                    have_schema = query.value(0).toInt() > 1;
+                GetMythDB()->SetHaveSchema(have_schema);
+            }
             GetMythDB()->WriteDelayedSettings();
         }
     }

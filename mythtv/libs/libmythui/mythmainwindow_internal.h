@@ -26,22 +26,6 @@ class MythPainterWindowGL : public QGLWidget
 };
 #endif
 
-#ifdef USING_VDPAU
-
-class MythPainterWindowVDPAU : public QGLWidget
-{
-    Q_OBJECT
-
-  public:
-    MythPainterWindowVDPAU(MythMainWindow *win, MythMainWindowPrivate *priv);
-
-    void paintEvent(QPaintEvent *e);
-
-    MythMainWindow *parent;
-    MythMainWindowPrivate *d;
-};
-#endif
-
 #ifdef USING_MINGW
 // FIXME - this only really needs a QWidget but the background overpaints the
 //         main window (setAutoFillBackground(false) does not seem to help)

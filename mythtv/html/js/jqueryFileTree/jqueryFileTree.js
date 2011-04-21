@@ -67,8 +67,6 @@ if(jQuery) (function($){
 				function bindTree(t) {
 					$(t).find('LI A').bind(o.folderEvent, function() {
 						if( $(this).parent().hasClass('directory') ) {
-						    /******************************/
-							/* Chris Pinkham - 2011/03/31 */
 							if ($(this).hasClass('selected'))
 							{
     							$(this).removeClass('selected');
@@ -78,8 +76,6 @@ if(jQuery) (function($){
 								$(t).find('A.selected').removeClass('selected');
     							$(this).addClass('selected');
 							}
-						    /* end Chris Pinkham mods     */
-						    /******************************/
 
 							if( $(this).parent().hasClass('collapsed') ) {
 								// Expand
@@ -96,6 +92,16 @@ if(jQuery) (function($){
 								$(this).parent().removeClass('expanded').addClass('collapsed');
 							}
 						} else {
+							if ($(this).hasClass('selected'))
+							{
+    							$(this).removeClass('selected');
+							}
+							else
+							{
+								$(t).find('A.selected').removeClass('selected');
+    							$(this).addClass('selected');
+							}
+
 							h($(this).attr('rel'));
 						}
 						return false;
