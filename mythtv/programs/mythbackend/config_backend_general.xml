@@ -143,7 +143,7 @@
            value="MasterBackendOverride" default_data="1"
            setting_type="global" label="Master Backend Override"
            help_text="If enabled, the master backend will stream and
-                      delete files if it finds them in the video directory.
+                      delete files if it finds them in a storage directory.
                       Useful if you are using a central storage location, like
                       a NFS share, and your slave backend isn't running."
            data_type="checkbox" />
