@@ -48,7 +48,7 @@
                 {
                     case 1:
                         var recording = encoder.Recording;
-                        statestring = 'is currently watching ' + recording.Title + ' on Live TV.';
+                        statestring = 'is currently watching \"' + recording.Title + '\" on Live TV.';
                         break;
                     case 6:
                         var recording = encoder.Recording;
