@@ -268,8 +268,13 @@
         border-radius: 5px;
     }
 
-/*    label
+    .galleria-thumbnails
     {
-        width:300px;
-        float:left;
-    }*/
+        margin: 0 auto;
+    }
+
+    .galleria-container
+    {
+        margin-left: auto;
+        margin-right: auto
+    }
