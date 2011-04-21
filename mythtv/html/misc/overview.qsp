@@ -8,7 +8,7 @@
         <h2>Last Ten Recordings</h2>
     </div>
 
-    <div style="padding: margin: 0 auto;" id="lasttencontainer">
+    <div style="margin: 0 auto;" id="lasttencontainer">
         <div style="padding: 10px 0px;" id="lasttencontent">
 <%
             var oDvr = new Dvr();
@@ -29,9 +29,49 @@
         </div>
     <div>
 
-<!--    <div style="margin: 0 auto; width:660px;" class="pressed">
+    <div style="margin: 0 auto; width:660px;" class="pressed">
         <h2>Current Tuner Activity</h2>
-    </div>-->
+    </div>
+
+    <div style="padding: 10px 0px;" id="encodercontainer">
+        <div class="blackbox galleria-container indented" style="width:680px; padding: 0px 10px 0px 10px;" id="encodercontent">
+        <ul>
+<%
+            var oDvr = new Dvr();
+            var encoderlist = oDvr.Encoders();
+            for (var nIdx=0; nIdx < encoderlist.Encoders.length; nIdx++)
+            {
+                var encoder = encoderlist.Encoders[ nIdx ];
+                var statestring = '';
+                var state = encoder.State;
+                switch(state)
+                {
+                    case 1:
+                        var recording = encoder.Recording;
+                        statestring = 'is currently watching ' + recording.Title + ' on Live TV.';
+                        break;
+                    case 6:
+                        var recording = encoder.Recording;
+                        statestring = 'is currently recording \"' + recording.Title + '.\"  This program is being viewed.';
+                        break;
+                    case 7:
+                        var recording = encoder.Recording;
+                        var endtime = recording.EndTime.getHours() + ':' + recording.EndTime.getMinutes();
+                        statestring = 'is currently recording \"' + recording.Title + '.\"  This recording will end at ' + endtime + '.';
+                        break;
+                    default:
+                        statestring = 'is currently idle.';
+                        break;
+                }
+%>
+                <li>Encoder <%= encoder.Id + " " + statestring %></li>
+<%
+            }
+%>
+
+        </ul>
+        </div>
+    <div>
 
 </body>
 </html>
