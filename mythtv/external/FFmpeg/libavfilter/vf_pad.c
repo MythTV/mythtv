@@ -1,6 +1,6 @@
 /*
- * copyright (c) 2008 vmrsss
- * copyright (c) 2009 Stefano Sabatini
+ * Copyright (c) 2008 vmrsss
+ * Copyright (c) 2009 Stefano Sabatini
  *
  * This file is part of FFmpeg.
  *
@@ -25,11 +25,11 @@
  */
 
 #include "avfilter.h"
-#include "parseutils.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/colorspace.h"
-#include "libavcore/imgutils.h"
-#include "libavcore/parseutils.h"
+#include "libavutil/avassert.h"
+#include "libavutil/imgutils.h"
+#include "libavutil/parseutils.h"
 
 enum { RED = 0, GREEN, BLUE, ALPHA };
 
@@ -101,6 +101,24 @@ static void draw_rectangle(AVFilterBufferRef *outpic, uint8_t *line[4], int line
     }
 }
 
+static void copy_rectangle(AVFilterBufferRef *outpic,uint8_t *line[4], int line_step[4], int linesize[4],
+                           int hsub, int vsub, int x, int y, int y2, int w, int h)
+{
+    int i, plane;
+    uint8_t *p;
+
+    for (plane = 0; plane < 4 && outpic->data[plane]; plane++) {
+        int hsub1 = plane == 1 || plane == 2 ? hsub : 0;
+        int vsub1 = plane == 1 || plane == 2 ? vsub : 0;
+
+        p = outpic->data[plane] + (y >> vsub1) * outpic->linesize[plane];
+        for (i = 0; i < (h >> vsub1); i++) {
+            memcpy(p + (x >> hsub1) * line_step[plane], line[plane] + linesize[plane]*(i+(y2>>vsub1)), (w >> hsub1) * line_step[plane]);
+            p += outpic->linesize[plane];
+        }
+    }
+}
+
 static int query_formats(AVFilterContext *ctx)
 {
     static const enum PixelFormat pix_fmts[] = {
@@ -133,6 +151,7 @@ typedef struct {
     uint8_t *line[4];
     int      line_step[4];
     int hsub, vsub;         ///< chroma subsampling values
+    int needs_copy;
 } PadContext;
 
 static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
@@ -143,7 +162,7 @@ static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
     if (args)
         sscanf(args, "%d:%d:%d:%d:%s", &pad->w, &pad->h, &pad->x, &pad->y, color_string);
 
-    if (av_parse_color(pad->color, color_string, ctx) < 0)
+    if (av_parse_color(pad->color, color_string, -1, ctx) < 0)
         return AVERROR(EINVAL);
 
     /* sanity check params */
@@ -194,8 +213,8 @@ static int config_input(AVFilterLink *inlink)
     fill_line_with_color(pad->line, pad->line_step, pad->w, pad->color,
                          inlink->format, rgba_color, &is_packed_rgba);
 
-    av_log(ctx, AV_LOG_INFO, "w:%d h:%d x:%d y:%d color:0x%02X%02X%02X%02X[%s]\n",
-           pad->w, pad->h, pad->x, pad->y,
+    av_log(ctx, AV_LOG_INFO, "w:%d h:%d -> w:%d h:%d x:%d y:%d color:0x%02X%02X%02X%02X[%s]\n",
+           inlink->w, inlink->h, pad->w, pad->h, pad->x, pad->y,
            pad->color[0], pad->color[1], pad->color[2], pad->color[3],
            is_packed_rgba ? "rgba" : "yuva");
 
@@ -230,6 +249,9 @@ static AVFilterBufferRef *get_video_buffer(AVFilterLink *inlink, int perms, int 
                                                        h + (pad->h - pad->in_h));
     int plane;
 
+    picref->video->w = w;
+    picref->video->h = h;
+
     for (plane = 0; plane < 4 && picref->data[plane]; plane++) {
         int hsub = (plane == 1 || plane == 2) ? pad->hsub : 0;
         int vsub = (plane == 1 || plane == 2) ? pad->vsub : 0;
@@ -241,21 +263,68 @@ static AVFilterBufferRef *get_video_buffer(AVFilterLink *inlink, int perms, int 
     return picref;
 }
 
+static int does_clip(PadContext *pad, AVFilterBufferRef *outpicref, int plane, int hsub, int vsub, int x, int y)
+{
+    int64_t x_in_buf, y_in_buf;
+
+    x_in_buf =  outpicref->data[plane] - outpicref->buf->data[plane]
+             +  (x >> hsub) * pad      ->line_step[plane]
+             +  (y >> vsub) * outpicref->linesize [plane];
+
+    if(x_in_buf < 0 || x_in_buf % pad->line_step[plane])
+        return 1;
+    x_in_buf /= pad->line_step[plane];
+
+    av_assert0(outpicref->buf->linesize[plane]>0); //while reference can use negative linesize the main buffer should not
+
+    y_in_buf = x_in_buf / outpicref->buf->linesize[plane];
+    x_in_buf %= outpicref->buf->linesize[plane];
+
+    if(   y_in_buf<<vsub >= outpicref->buf->h
+       || x_in_buf<<hsub >= outpicref->buf->w)
+        return 1;
+    return 0;
+}
+
 static void start_frame(AVFilterLink *inlink, AVFilterBufferRef *inpicref)
 {
     PadContext *pad = inlink->dst->priv;
     AVFilterBufferRef *outpicref = avfilter_ref_buffer(inpicref, ~0);
     int plane;
 
-    inlink->dst->outputs[0]->out_buf = outpicref;
-
     for (plane = 0; plane < 4 && outpicref->data[plane]; plane++) {
         int hsub = (plane == 1 || plane == 2) ? pad->hsub : 0;
         int vsub = (plane == 1 || plane == 2) ? pad->vsub : 0;
 
-        outpicref->data[plane] -= (pad->x >> hsub) * pad->line_step[plane] +
-            (pad->y >> vsub) * outpicref->linesize[plane];
+        av_assert0(outpicref->buf->w>0 && outpicref->buf->h>0);
+
+        if(outpicref->format != outpicref->buf->format) //unsupported currently
+            break;
+
+        outpicref->data[plane] -=   (pad->x  >> hsub) * pad      ->line_step[plane]
+                                  + (pad->y  >> vsub) * outpicref->linesize [plane];
+
+        if(   does_clip(pad, outpicref, plane, hsub, vsub, 0, 0)
+           || does_clip(pad, outpicref, plane, hsub, vsub, 0, pad->h-1)
+           || does_clip(pad, outpicref, plane, hsub, vsub, pad->w-1, 0)
+           || does_clip(pad, outpicref, plane, hsub, vsub, pad->w-1, pad->h-1)
+          )
+            break;
     }
+    pad->needs_copy= plane < 4 && outpicref->data[plane];
+    if(pad->needs_copy){
+        av_log(inlink->dst, AV_LOG_DEBUG, "Direct padding impossible allocating new frame\n");
+        avfilter_unref_buffer(outpicref);
+        outpicref = avfilter_get_video_buffer(inlink->dst->outputs[0], AV_PERM_WRITE | AV_PERM_NEG_LINESIZES,
+                                                       FFMAX(inlink->w, pad->w),
+                                                       FFMAX(inlink->h, pad->h));
+        avfilter_copy_buffer_ref_props(outpicref, inpicref);
+    }
+
+    inlink->dst->outputs[0]->out_buf = outpicref;
+
+    outpicref->video->w = pad->w;
+    outpicref->video->h = pad->h;
 
     avfilter_start_frame(inlink->dst->outputs[0], outpicref);
 }
@@ -293,6 +362,7 @@ static void draw_slice(AVFilterLink *link, int y, int h, int slice_dir)
 {
     PadContext *pad = link->dst->priv;
     AVFilterBufferRef *outpic = link->dst->outputs[0]->out_buf;
+    AVFilterBufferRef *inpic = link->cur_buf;
 
     y += pad->y;
 
@@ -306,6 +376,13 @@ static void draw_slice(AVFilterLink *link, int y, int h, int slice_dir)
     /* left border */
     draw_rectangle(outpic, pad->line, pad->line_step, pad->hsub, pad->vsub,
                    0, y, pad->x, h);
+
+    if(pad->needs_copy){
+        copy_rectangle(outpic,
+                       inpic->data, pad->line_step, inpic->linesize, pad->hsub, pad->vsub,
+                       pad->x, y, y-pad->y, inpic->video->w, h);
+    }
+
     /* right border */
     draw_rectangle(outpic, pad->line, pad->line_step, pad->hsub, pad->vsub,
                    pad->x + pad->in_w, y, pad->w - pad->x - pad->in_w, h);
@@ -377,7 +454,7 @@ static av_cold int color_init(AVFilterContext *ctx, const char *args, void *opaq
     color->time_base.num = frame_rate_q.den;
     color->time_base.den = frame_rate_q.num;
 
-    if ((ret = av_parse_color(color->color, color_string, ctx)) < 0)
+    if ((ret = av_parse_color(color->color, color_string, -1, ctx)) < 0)
         return ret;
 
     return 0;
@@ -407,7 +484,7 @@ static int color_config_props(AVFilterLink *inlink)
 
     color->w &= ~((1 << color->hsub) - 1);
     color->h &= ~((1 << color->vsub) - 1);
-    if (av_check_image_size(color->w, color->h, 0, ctx) < 0)
+    if (av_image_check_size(color->w, color->h, 0, ctx) < 0)
         return AVERROR(EINVAL);
 
     memcpy(rgba_color, color->color, sizeof(rgba_color));
@@ -456,7 +533,7 @@ AVFilter avfilter_vsrc_color = {
     .inputs    = (AVFilterPad[]) {{ .name = NULL}},
 
     .outputs   = (AVFilterPad[]) {{ .name            = "default",
-                                    .type            = CODEC_TYPE_VIDEO,
+                                    .type            = AVMEDIA_TYPE_VIDEO,
                                     .request_frame   = color_request_frame,
                                     .config_props    = color_config_props },
                                   { .name = NULL}},

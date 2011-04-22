@@ -34,7 +34,6 @@
 #include "libavutil/intreadwrite.h"
 #include "libavcodec/bytestream.h"
 #include "network.h"
-#include "asf.h"
 
 #define LOCAL_ADDRESS 0xc0a80081    // FIXME get and use correct local ip address.
 #define LOCAL_PORT    1037          // as above.
@@ -159,7 +158,7 @@ static void mms_put_utf16(MMSContext *mms, uint8_t *src)
     init_put_byte(&bic, mms->write_out_ptr,
             sizeof(mms->out_buffer) - size, 1, NULL, NULL, NULL, NULL);
 
-    len = ff_put_str16_nolen(&bic, src);
+    len = avio_put_str16le(&bic, src);
     mms->write_out_ptr += len;
 }
 
@@ -207,11 +206,11 @@ static int send_media_file_request(MMSTContext *mmst)
 static void handle_packet_stream_changing_type(MMSTContext *mmst)
 {
     MMSContext *mms = &mmst->mms;
-    dprintf(NULL, "Stream changing!\n");
+    av_dlog(NULL, "Stream changing!\n");
 
     // 40 is the packet header size, 7 is the prefix size.
     mmst->header_packet_id= AV_RL32(mms->in_buffer + 40 + 7);
-    dprintf(NULL, "Changed header prefix to 0x%x", mmst->header_packet_id);
+    av_dlog(NULL, "Changed header prefix to 0x%x", mmst->header_packet_id);
 }
 
 static int send_keepalive_packet(MMSTContext *mmst)
@@ -271,7 +270,7 @@ static MMSSCPacketType get_tcp_server_response(MMSTContext *mmst)
             }
 
             length_remaining= AV_RL32(mms->in_buffer+8) + 4;
-            dprintf(NULL, "Length remaining is %d\n", length_remaining);
+            av_dlog(NULL, "Length remaining is %d\n", length_remaining);
             // read the rest of the packet.
             if (length_remaining < 0
                 || length_remaining > sizeof(mms->in_buffer) - 12) {
@@ -291,10 +290,9 @@ static MMSSCPacketType get_tcp_server_response(MMSTContext *mmst)
                 return read_result < 0 ? read_result : AVERROR_IO;
             }
             packet_type= AV_RL16(mms->in_buffer+36);
-            hr = AV_RL32(mms->in_buffer + 40);
-            if (hr) {
+            if (read_result >= 44 && (hr = AV_RL32(mms->in_buffer + 40))) {
                 av_log(NULL, AV_LOG_ERROR,
-                       "Server sent an error status code: 0x%08x\n", hr);
+                       "Server sent a message with packet type 0x%x and error status code 0x%08x\n", packet_type, hr);
                 return AVERROR_UNKNOWN;
             }
         } else {
@@ -351,7 +349,7 @@ static MMSSCPacketType get_tcp_server_response(MMSTContext *mmst)
             } else if(packet_id_type == mmst->packet_id) {
                 packet_type = SC_PKT_ASF_MEDIA;
             } else {
-                dprintf(NULL, "packet id type %d is old.", packet_id_type);
+                av_dlog(NULL, "packet id type %d is old.", packet_id_type);
                 continue;
             }
         }
@@ -377,7 +375,7 @@ static int mms_safe_send_recv(MMSTContext *mmst,
     if(send_fun) {
         int ret = send_fun(mmst);
         if (ret < 0) {
-            dprintf(NULL, "Send Packet error before expecting recv packet %d\n", expect_type);
+            av_dlog(NULL, "Send Packet error before expecting recv packet %d\n", expect_type);
             return ret;
         }
     }
@@ -547,11 +545,15 @@ static int mms_open(URLContext *h, const char *uri, int flags)
     err = mms_safe_send_recv(mmst, NULL, SC_PKT_ASF_HEADER);
     if (err)
         goto fail;
-    if((mmst->incoming_flags != 0X08) && (mmst->incoming_flags != 0X0C))
+    if((mmst->incoming_flags != 0X08) && (mmst->incoming_flags != 0X0C)) {
+        av_log(NULL, AV_LOG_ERROR,
+               "The server does not support MMST (try MMSH or RTSP)\n");
+        err = AVERROR_NOFMT;
         goto fail;
+    }
     err = ff_mms_asf_header_parser(mms);
     if (err) {
-        dprintf(NULL, "asf header parsed failed!\n");
+        av_dlog(NULL, "asf header parsed failed!\n");
         goto fail;
     }
     mms->header_parsed = 1;
@@ -568,11 +570,11 @@ static int mms_open(URLContext *h, const char *uri, int flags)
     if (err) {
         goto fail;
     }
-    dprintf(NULL, "Leaving open (success)\n");
+    av_dlog(NULL, "Leaving open (success)\n");
     return 0;
 fail:
     mms_close(h);
-    dprintf(NULL, "Leaving open (failure: %d)\n", err);
+    av_dlog(NULL, "Leaving open (failure: %d)\n", err);
     return err;
 }
 
@@ -605,12 +607,12 @@ static int mms_read(URLContext *h, uint8_t *buf, int size)
                     // copy the data to the packet buffer.
                     result = ff_mms_read_data(mms, buf, size);
                     if (result == 0) {
-                        dprintf(NULL, "read asf media paket size is zero!\n");
+                        av_dlog(NULL, "read asf media paket size is zero!\n");
                         break;
                     }
                 }
             } else {
-                dprintf(NULL, "read packet error!\n");
+                av_dlog(NULL, "read packet error!\n");
                 break;
             }
         }
@@ -618,7 +620,7 @@ static int mms_read(URLContext *h, uint8_t *buf, int size)
     return result;
 }
 
-URLProtocol mmst_protocol = {
+URLProtocol ff_mmst_protocol = {
     "mmst",
     mms_open,
     mms_read,

@@ -188,6 +188,31 @@
                 2*PAYLOAD_HEADER_SIZE_MULTIPLE_PAYLOADS \
                 )
 
+typedef struct {
+    uint32_t seqno;
+    int is_streamed;
+    ASFStream streams[128];              ///< it's max number and it's not that big
+    /* non streamed additonnal info */
+    uint64_t nb_packets;                 ///< how many packets are there in the file, invalid if broadcasting
+    int64_t duration;                    ///< in 100ns units
+    /* packet filling */
+    unsigned char multi_payloads_present;
+    int packet_size_left;
+    int packet_timestamp_start;
+    int packet_timestamp_end;
+    unsigned int packet_nb_payloads;
+    uint8_t packet_buf[PACKET_SIZE];
+    ByteIOContext pb;
+    /* only for reading */
+    uint64_t data_offset;                ///< beginning of the first data packet
+
+    int64_t last_indexed_pts;
+    ASFIndex* index_ptr;
+    uint32_t nb_index_count;
+    uint32_t nb_index_memory_alloc;
+    uint16_t maximum_packet;
+} ASFContext;
+
 static const AVCodecTag codec_asf_bmp_tags[] = {
     { CODEC_ID_MPEG4, MKTAG('M', 'P', '4', 'S') },
     { CODEC_ID_MPEG4, MKTAG('M', '4', 'S', '2') },
@@ -211,7 +236,7 @@ static void put_str16(ByteIOContext *s, const char *tag)
     if (url_open_dyn_buf(&dyn_buf) < 0)
         return;
 
-    ff_put_str16_nolen(dyn_buf, tag);
+    avio_put_str16le(dyn_buf, tag);
     len = url_close_dyn_buf(dyn_buf, &pb);
     put_le16(s, len);
     put_buffer(s, pb, len);
@@ -279,6 +304,8 @@ static int asf_write_header1(AVFormatContext *s, int64_t file_size, int64_t data
     int bit_rate;
     int64_t duration;
 
+    ff_metadata_conv(&s->metadata, ff_asf_metadata_conv, NULL);
+
     tags[0] = av_metadata_get(s->metadata, "title"    , NULL, 0);
     tags[1] = av_metadata_get(s->metadata, "author"   , NULL, 0);
     tags[2] = av_metadata_get(s->metadata, "copyright", NULL, 0);
@@ -344,7 +371,7 @@ static int asf_write_header1(AVFormatContext *s, int64_t file_size, int64_t data
         hpos = put_header(pb, &ff_asf_comment_header);
 
         for (n = 0; n < FF_ARRAY_ELEMS(tags); n++) {
-            len = tags[n] ? ff_put_str16_nolen(dyn_buf, tags[n]->value) : 0;
+            len = tags[n] ? avio_put_str16le(dyn_buf, tags[n]->value) : 0;
             put_le16(pb, len);
         }
         len = url_close_dyn_buf(dyn_buf, &buf);
@@ -472,7 +499,7 @@ static int asf_write_header1(AVFormatContext *s, int64_t file_size, int64_t data
         if ( url_open_dyn_buf(&dyn_buf) < 0)
             return AVERROR(ENOMEM);
 
-        ff_put_str16_nolen(dyn_buf, desc);
+        avio_put_str16le(dyn_buf, desc);
         len = url_close_dyn_buf(dyn_buf, &buf);
         put_le16(pb, len / 2); // "number of characters" = length in bytes / 2
 
@@ -853,7 +880,7 @@ static int asf_write_trailer(AVFormatContext *s)
 }
 
 #if CONFIG_ASF_MUXER
-AVOutputFormat asf_muxer = {
+AVOutputFormat ff_asf_muxer = {
     "asf",
     NULL_IF_CONFIG_SMALL("ASF format"),
     "video/x-ms-asf",
@@ -870,12 +897,11 @@ AVOutputFormat asf_muxer = {
     asf_write_trailer,
     .flags = AVFMT_GLOBALHEADER,
     .codec_tag= (const AVCodecTag* const []){codec_asf_bmp_tags, ff_codec_bmp_tags, ff_codec_wav_tags, 0},
-    .metadata_conv = ff_asf_metadata_conv,
 };
 #endif
 
 #if CONFIG_ASF_STREAM_MUXER
-AVOutputFormat asf_stream_muxer = {
+AVOutputFormat ff_asf_stream_muxer = {
     "asf_stream",
     NULL_IF_CONFIG_SMALL("ASF format"),
     "video/x-ms-asf",
@@ -892,6 +918,5 @@ AVOutputFormat asf_stream_muxer = {
     asf_write_trailer,
     .flags = AVFMT_GLOBALHEADER,
     .codec_tag= (const AVCodecTag* const []){codec_asf_bmp_tags, ff_codec_bmp_tags, ff_codec_wav_tags, 0},
-    .metadata_conv = ff_asf_metadata_conv,
 };
 #endif //CONFIG_ASF_STREAM_MUXER

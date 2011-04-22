@@ -29,6 +29,7 @@
 #include "libavutil/common.h"
 #include "libavutil/intmath.h"
 #include "libavutil/intreadwrite.h"
+#include "libavutil/audioconvert.h"
 #include "avcodec.h"
 #include "dsputil.h"
 #include "fft.h"
@@ -39,6 +40,7 @@
 #include "dca.h"
 #include "synth_filter.h"
 #include "dcadsp.h"
+#include "fmtconvert.h"
 
 //#define TRACE
 
@@ -104,26 +106,26 @@ enum DCAExtensionMask {
  * L = left, R = right, C = center, S = surround, F = front, R = rear, T = total, OV = overhead.
  * S  -> side, when both rear and back are configured move one of them to the side channel
  * OV -> center back
- * All 2 channel configurations -> CH_LAYOUT_STEREO
+ * All 2 channel configurations -> AV_CH_LAYOUT_STEREO
  */
 
 static const int64_t dca_core_channel_layout[] = {
-    CH_FRONT_CENTER,                                               ///< 1, A
-    CH_LAYOUT_STEREO,                                              ///< 2, A + B (dual mono)
-    CH_LAYOUT_STEREO,                                              ///< 2, L + R (stereo)
-    CH_LAYOUT_STEREO,                                              ///< 2, (L+R) + (L-R) (sum-difference)
-    CH_LAYOUT_STEREO,                                              ///< 2, LT +RT (left and right total)
-    CH_LAYOUT_STEREO|CH_FRONT_CENTER,                              ///< 3, C+L+R
-    CH_LAYOUT_STEREO|CH_BACK_CENTER,                               ///< 3, L+R+S
-    CH_LAYOUT_STEREO|CH_FRONT_CENTER|CH_BACK_CENTER,               ///< 4, C + L + R+ S
-    CH_LAYOUT_STEREO|CH_SIDE_LEFT|CH_SIDE_RIGHT,                   ///< 4, L + R +SL+ SR
-    CH_LAYOUT_STEREO|CH_FRONT_CENTER|CH_SIDE_LEFT|CH_SIDE_RIGHT,   ///< 5, C + L + R+ SL+SR
-    CH_LAYOUT_STEREO|CH_SIDE_LEFT|CH_SIDE_RIGHT|CH_FRONT_LEFT_OF_CENTER|CH_FRONT_RIGHT_OF_CENTER,                 ///< 6, CL + CR + L + R + SL + SR
-    CH_LAYOUT_STEREO|CH_BACK_LEFT|CH_BACK_RIGHT|CH_FRONT_CENTER|CH_BACK_CENTER,                                   ///< 6, C + L + R+ LR + RR + OV
-    CH_FRONT_CENTER|CH_FRONT_RIGHT_OF_CENTER|CH_FRONT_LEFT_OF_CENTER|CH_BACK_CENTER|CH_BACK_LEFT|CH_BACK_RIGHT,   ///< 6, CF+ CR+LF+ RF+LR + RR
-    CH_FRONT_LEFT_OF_CENTER|CH_FRONT_CENTER|CH_FRONT_RIGHT_OF_CENTER|CH_LAYOUT_STEREO|CH_SIDE_LEFT|CH_SIDE_RIGHT, ///< 7, CL + C + CR + L + R + SL + SR
-    CH_FRONT_LEFT_OF_CENTER|CH_FRONT_RIGHT_OF_CENTER|CH_LAYOUT_STEREO|CH_SIDE_LEFT|CH_SIDE_RIGHT|CH_BACK_LEFT|CH_BACK_RIGHT, ///< 8, CL + CR + L + R + SL1 + SL2+ SR1 + SR2
-    CH_FRONT_LEFT_OF_CENTER|CH_FRONT_CENTER|CH_FRONT_RIGHT_OF_CENTER|CH_LAYOUT_STEREO|CH_SIDE_LEFT|CH_BACK_CENTER|CH_SIDE_RIGHT, ///< 8, CL + C+ CR + L + R + SL + S+ SR
+    AV_CH_FRONT_CENTER,                                                      ///< 1, A
+    AV_CH_LAYOUT_STEREO,                                                     ///< 2, A + B (dual mono)
+    AV_CH_LAYOUT_STEREO,                                                     ///< 2, L + R (stereo)
+    AV_CH_LAYOUT_STEREO,                                                     ///< 2, (L+R) + (L-R) (sum-difference)
+    AV_CH_LAYOUT_STEREO,                                                     ///< 2, LT +RT (left and right total)
+    AV_CH_LAYOUT_STEREO|AV_CH_FRONT_CENTER,                                  ///< 3, C+L+R
+    AV_CH_LAYOUT_STEREO|AV_CH_BACK_CENTER,                                   ///< 3, L+R+S
+    AV_CH_LAYOUT_STEREO|AV_CH_FRONT_CENTER|AV_CH_BACK_CENTER,                ///< 4, C + L + R+ S
+    AV_CH_LAYOUT_STEREO|AV_CH_SIDE_LEFT|AV_CH_SIDE_RIGHT,                    ///< 4, L + R +SL+ SR
+    AV_CH_LAYOUT_STEREO|AV_CH_FRONT_CENTER|AV_CH_SIDE_LEFT|AV_CH_SIDE_RIGHT, ///< 5, C + L + R+ SL+SR
+    AV_CH_LAYOUT_STEREO|AV_CH_SIDE_LEFT|AV_CH_SIDE_RIGHT|AV_CH_FRONT_LEFT_OF_CENTER|AV_CH_FRONT_RIGHT_OF_CENTER,                    ///< 6, CL + CR + L + R + SL + SR
+    AV_CH_LAYOUT_STEREO|AV_CH_BACK_LEFT|AV_CH_BACK_RIGHT|AV_CH_FRONT_CENTER|AV_CH_BACK_CENTER,                                      ///< 6, C + L + R+ LR + RR + OV
+    AV_CH_FRONT_CENTER|AV_CH_FRONT_RIGHT_OF_CENTER|AV_CH_FRONT_LEFT_OF_CENTER|AV_CH_BACK_CENTER|AV_CH_BACK_LEFT|AV_CH_BACK_RIGHT,   ///< 6, CF+ CR+LF+ RF+LR + RR
+    AV_CH_FRONT_LEFT_OF_CENTER|AV_CH_FRONT_CENTER|AV_CH_FRONT_RIGHT_OF_CENTER|AV_CH_LAYOUT_STEREO|AV_CH_SIDE_LEFT|AV_CH_SIDE_RIGHT, ///< 7, CL + C + CR + L + R + SL + SR
+    AV_CH_FRONT_LEFT_OF_CENTER|AV_CH_FRONT_RIGHT_OF_CENTER|AV_CH_LAYOUT_STEREO|AV_CH_SIDE_LEFT|AV_CH_SIDE_RIGHT|AV_CH_BACK_LEFT|AV_CH_BACK_RIGHT, ///< 8, CL + CR + L + R + SL1 + SL2+ SR1 + SR2
+    AV_CH_FRONT_LEFT_OF_CENTER|AV_CH_FRONT_CENTER|AV_CH_FRONT_RIGHT_OF_CENTER|AV_CH_LAYOUT_STEREO|AV_CH_SIDE_LEFT|AV_CH_BACK_CENTER|AV_CH_SIDE_RIGHT, ///< 8, CL + C+ CR + L + R + SL + S+ SR
 };
 
 static const int8_t dca_lfe_index[] = {
@@ -272,6 +274,7 @@ typedef struct {
 
     /* Primary audio coding header */
     int subframes;              ///< number of subframes
+    int is_channels_set;        ///< check for if the channel number is already set
     int total_channels;         ///< number of channels including extensions
     int prim_channels;          ///< number of primary audio channels
     int subband_activity[DCA_PRIM_CHANNELS_MAX];    ///< subband activity count
@@ -309,7 +312,6 @@ typedef struct {
     DECLARE_ALIGNED(16, float, raXin)[32];
 
     int output;                 ///< type of output
-    float add_bias;             ///< output bias
     float scale_bias;           ///< output scale
 
     DECLARE_ALIGNED(16, float, subband_samples)[DCA_BLOCKS_MAX][DCA_PRIM_CHANNELS_MAX][DCA_SUBBANDS][8];
@@ -346,6 +348,7 @@ typedef struct {
     FFTContext imdct;
     SynthFilterContext synth;
     DCADSPContext dcadsp;
+    FmtConvertContext fmt_conv;
 } DCAContext;
 
 static const uint16_t dca_vlc_offs[] = {
@@ -866,7 +869,7 @@ static int dca_subframe_header(DCAContext * s, int base_channel, int block_index
 
 static void qmf_32_subbands(DCAContext * s, int chans,
                             float samples_in[32][8], float *samples_out,
-                            float scale, float bias)
+                            float scale)
 {
     const float *prCoeff;
     int i;
@@ -895,7 +898,7 @@ static void qmf_32_subbands(DCAContext * s, int chans,
         s->synth.synth_filter_float(&s->imdct,
                               s->subband_fir_hist[chans], &s->hist_index[chans],
                               s->subband_fir_noidea[chans], prCoeff,
-                              samples_out, s->raXin, scale, bias);
+                              samples_out, s->raXin, scale);
         samples_out+= 32;
 
     }
@@ -903,8 +906,7 @@ static void qmf_32_subbands(DCAContext * s, int chans,
 
 static void lfe_interpolation_fir(DCAContext *s, int decimation_select,
                                   int num_deci_sample, float *samples_in,
-                                  float *samples_out, float scale,
-                                  float bias)
+                                  float *samples_out, float scale)
 {
     /* samples_in: An array holding decimated samples.
      *   Samples in current subframe starts from samples_in[0],
@@ -929,7 +931,7 @@ static void lfe_interpolation_fir(DCAContext *s, int decimation_select,
     /* Interpolation */
     for (deciindex = 0; deciindex < num_deci_sample; deciindex++) {
         s->dcadsp.lfe_fir(samples_out, samples_in, prCoeff, decifactor,
-                          scale, bias);
+                          scale);
         samples_in++;
         samples_out += 2 * decifactor;
     }
@@ -937,19 +939,19 @@ static void lfe_interpolation_fir(DCAContext *s, int decimation_select,
 
 /* downmixing routines */
 #define MIX_REAR1(samples, si1, rs, coef) \
-     samples[i]     += (samples[si1] - add_bias) * coef[rs][0];  \
-     samples[i+256] += (samples[si1] - add_bias) * coef[rs][1];
+     samples[i]     += samples[si1] * coef[rs][0];  \
+     samples[i+256] += samples[si1] * coef[rs][1];
 
 #define MIX_REAR2(samples, si1, si2, rs, coef) \
-     samples[i]     += (samples[si1] - add_bias) * coef[rs][0] + (samples[si2] - add_bias) * coef[rs+1][0]; \
-     samples[i+256] += (samples[si1] - add_bias) * coef[rs][1] + (samples[si2] - add_bias) * coef[rs+1][1];
+     samples[i]     += samples[si1] * coef[rs][0] + samples[si2] * coef[rs+1][0]; \
+     samples[i+256] += samples[si1] * coef[rs][1] + samples[si2] * coef[rs+1][1];
 
 #define MIX_FRONT3(samples, coef) \
-    t = samples[i+c] - add_bias; \
-    u = samples[i+l] - add_bias; \
-    v = samples[i+r] - add_bias; \
-    samples[i]     = t * coef[0][0] + u * coef[1][0] + v * coef[2][0] + add_bias; \
-    samples[i+256] = t * coef[0][1] + u * coef[1][1] + v * coef[2][1] + add_bias;
+    t = samples[i+c]; \
+    u = samples[i+l]; \
+    v = samples[i+r]; \
+    samples[i]     = t * coef[0][0] + u * coef[1][0] + v * coef[2][0]; \
+    samples[i+256] = t * coef[0][1] + u * coef[1][1] + v * coef[2][1];
 
 #define DOWNMIX_TO_STEREO(op1, op2) \
     for (i = 0; i < 256; i++){ \
@@ -959,7 +961,7 @@ static void lfe_interpolation_fir(DCAContext *s, int decimation_select,
 
 static void dca_downmix(float *samples, int srcfmt,
                         int downmix_coef[DCA_PRIM_CHANNELS_MAX][2],
-                        const int8_t *channel_mapping, float add_bias)
+                        const int8_t *channel_mapping)
 {
     int c,l,r,sl,sr,s;
     int i;
@@ -1115,7 +1117,7 @@ static int dca_subsubframe(DCAContext * s, int base_channel, int block_index)
                         block[m] = get_bitalloc(&s->gb, &dca_smpl_bitalloc[abits], sel);
                 }
 
-                s->dsp.int32_to_float_fmul_scalar(subband_samples[k][l],
+                s->fmt_conv.int32_to_float_fmul_scalar(subband_samples[k][l],
                                                   block, rscale, 8);
             }
 
@@ -1191,13 +1193,12 @@ static int dca_filter_channels(DCAContext * s, int block_index)
 /*        static float pcm_to_double[8] =
             {32768.0, 32768.0, 524288.0, 524288.0, 0, 8388608.0, 8388608.0};*/
          qmf_32_subbands(s, k, subband_samples[k], &s->samples[256 * s->channel_order_tab[k]],
-                            M_SQRT1_2*s->scale_bias /*pcm_to_double[s->source_pcm_res] */ ,
-                            s->add_bias );
+                         M_SQRT1_2*s->scale_bias /*pcm_to_double[s->source_pcm_res] */ );
     }
 
     /* Down mixing */
     if (s->avctx->request_channels == 2 && s->prim_channels > 2) {
-        dca_downmix(s->samples, s->amode, s->downmix_coef, s->channel_order_tab, s->add_bias);
+        dca_downmix(s->samples, s->amode, s->downmix_coef, s->channel_order_tab);
     }
 
     /* Generate LFE samples for this subsubframe FIXME!!! */
@@ -1205,7 +1206,7 @@ static int dca_filter_channels(DCAContext * s, int block_index)
         lfe_interpolation_fir(s, s->lfe, 2 * s->lfe,
                               s->lfe_data + 2 * s->lfe * (block_index + 4),
                               &s->samples[256 * dca_lfe_index[s->amode]],
-                              (1.0/256.0)*s->scale_bias,  s->add_bias);
+                              (1.0/256.0)*s->scale_bias);
         /* Outputs 20bits pcm samples */
     }
 
@@ -1355,7 +1356,9 @@ static int dca_exss_mask2count(int mask)
  */
 static void dca_exss_skip_mix_coeffs(GetBitContext *gb, int channels, int out_ch)
 {
-    for (int i = 0; i < channels; i++) {
+    int i;
+
+    for (i = 0; i < channels; i++) {
         int mix_map_mask = get_bits(gb, out_ch);
         int num_coeffs = av_popcount(mix_map_mask);
         skip_bits_long(gb, num_coeffs * 6);
@@ -1733,9 +1736,9 @@ static int dca_decode_frame(AVCodecContext * avctx,
 
         if (s->xch_present && (!avctx->request_channels ||
                                avctx->request_channels > num_core_channels + !!s->lfe)) {
-            avctx->channel_layout |= CH_BACK_CENTER;
+            avctx->channel_layout |= AV_CH_BACK_CENTER;
             if (s->lfe) {
-                avctx->channel_layout |= CH_LOW_FREQUENCY;
+                avctx->channel_layout |= AV_CH_LOW_FREQUENCY;
                 s->channel_order_tab = dca_channel_reorder_lfe_xch[s->amode];
             } else {
                 s->channel_order_tab = dca_channel_reorder_nolfe_xch[s->amode];
@@ -1744,7 +1747,7 @@ static int dca_decode_frame(AVCodecContext * avctx,
             channels = num_core_channels + !!s->lfe;
             s->xch_present = 0; /* disable further xch processing */
             if (s->lfe) {
-                avctx->channel_layout |= CH_LOW_FREQUENCY;
+                avctx->channel_layout |= AV_CH_LOW_FREQUENCY;
                 s->channel_order_tab = dca_channel_reorder_lfe[s->amode];
             } else
                 s->channel_order_tab = dca_channel_reorder_nolfe[s->amode];
@@ -1757,7 +1760,7 @@ static int dca_decode_frame(AVCodecContext * avctx,
         if (avctx->request_channels == 2 && s->prim_channels > 2) {
             channels = 2;
             s->output = DCA_STEREO;
-            avctx->channel_layout = CH_LAYOUT_STEREO;
+            avctx->channel_layout = AV_CH_LAYOUT_STEREO;
         }
     } else {
         av_log(avctx, AV_LOG_ERROR, "Non standard configuration %d !\n",s->amode);
@@ -1770,7 +1773,15 @@ static int dca_decode_frame(AVCodecContext * avctx,
        unset. Ideally during the first probe for channels the crc should be checked
        and only set avctx->channels when the crc is ok. Right now the decoder could
        set the channels based on a broken first frame.*/
-    avctx->channels = channels;
+    if (s->is_channels_set == 0) {
+        s->is_channels_set = 1;
+        avctx->channels = channels;
+    }
+    if (avctx->channels != channels) {
+        av_log(avctx, AV_LOG_ERROR, "DCA decoder does not support number of "
+               "channels changing in stream. Skipping frame.\n");
+        return -1;
+    }
 
     if (*data_size < (s->sample_blocks / 8) * 256 * sizeof(int16_t) * channels)
         return -1;
@@ -1788,12 +1799,12 @@ static int dca_decode_frame(AVCodecContext * avctx,
             float* rt_chan   = s->samples + s->channel_order_tab[s->xch_base_channel - 1] * 256;
             int j;
             for(j = 0; j < 256; ++j) {
-                lt_chan[j] -= (back_chan[j] - s->add_bias) * M_SQRT1_2;
-                rt_chan[j] -= (back_chan[j] - s->add_bias) * M_SQRT1_2;
+                lt_chan[j] -= back_chan[j] * M_SQRT1_2;
+                rt_chan[j] -= back_chan[j] * M_SQRT1_2;
             }
         }
 
-        s->dsp.float_to_int16_interleave(samples, s->samples_chanptr, 256, channels);
+        s->fmt_conv.float_to_int16_interleave(samples, s->samples_chanptr, 256, channels);
         samples += 256 * channels;
     }
 
@@ -1826,25 +1837,19 @@ static av_cold int dca_decode_init(AVCodecContext * avctx)
     ff_mdct_init(&s->imdct, 6, 1, 1.0);
     ff_synth_filter_init(&s->synth);
     ff_dcadsp_init(&s->dcadsp);
+    ff_fmt_convert_init(&s->fmt_conv, avctx);
 
     for (i = 0; i < DCA_PRIM_CHANNELS_MAX+1; i++)
         s->samples_chanptr[i] = s->samples + i * 256;
-    avctx->sample_fmt = SAMPLE_FMT_S16;
+    avctx->sample_fmt = AV_SAMPLE_FMT_S16;
 
-    if (s->dsp.float_to_int16_interleave == ff_float_to_int16_interleave_c) {
-        s->add_bias = 385.0f;
-        s->scale_bias = 1.0 / 32768.0;
-    } else {
-        s->add_bias = 0.0f;
-        s->scale_bias = 1.0;
+    s->scale_bias = 1.0;
 
-        /* allow downmixing to stereo */
-        if (avctx->channels > 0 && avctx->request_channels < avctx->channels &&
-                avctx->request_channels == 2) {
-            avctx->channels = avctx->request_channels;
-        }
+    /* allow downmixing to stereo */
+    if (avctx->channels > 0 && avctx->request_channels < avctx->channels &&
+        avctx->request_channels == 2) {
+        avctx->channels = avctx->request_channels;
     }
-
 
     return 0;
 }
@@ -1865,7 +1870,7 @@ static const AVProfile profiles[] = {
     { FF_PROFILE_UNKNOWN },
 };
 
-AVCodec dca_decoder = {
+AVCodec ff_dca_decoder = {
     .name = "dca",
     .type = AVMEDIA_TYPE_AUDIO,
     .id = CODEC_ID_DTS,

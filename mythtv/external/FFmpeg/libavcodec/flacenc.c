@@ -23,7 +23,6 @@
 #include "libavutil/md5.h"
 #include "avcodec.h"
 #include "get_bits.h"
-#include "dsputil.h"
 #include "golomb.h"
 #include "lpc.h"
 #include "flac.h"
@@ -95,7 +94,7 @@ typedef struct FlacEncodeContext {
     FlacFrame frame;
     CompressionOptions options;
     AVCodecContext *avctx;
-    DSPContext dsp;
+    LPCContext lpc_ctx;
     struct AVMD5 *md5ctx;
 } FlacEncodeContext;
 
@@ -212,14 +211,12 @@ static av_cold int flac_encode_init(AVCodecContext *avctx)
     int freq = avctx->sample_rate;
     int channels = avctx->channels;
     FlacEncodeContext *s = avctx->priv_data;
-    int i, level;
+    int i, level, ret;
     uint8_t *streaminfo;
 
     s->avctx = avctx;
 
-    dsputil_init(&s->dsp, avctx);
-
-    if (avctx->sample_fmt != SAMPLE_FMT_S16)
+    if (avctx->sample_fmt != AV_SAMPLE_FMT_S16)
         return -1;
 
     if (channels < 1 || channels > FLAC_MAX_CHANNELS)
@@ -288,7 +285,7 @@ static av_cold int flac_encode_init(AVCodecContext *avctx)
     s->options.max_partition_order = ((int[]){  2,  2,  3,  3,  3,  8,  8,  8,  8,  8,  8,  8,  8})[level];
 
     /* set compression option overrides from AVCodecContext */
-#if LIBAVCODEC_VERSION_MAJOR < 53
+#if FF_API_USE_LPC
     /* for compatibility with deprecated AVCodecContext.use_lpc */
     if (avctx->use_lpc == 0) {
         s->options.lpc_type = AV_LPC_TYPE_FIXED;
@@ -439,9 +436,12 @@ static av_cold int flac_encode_init(AVCodecContext *avctx)
     if (!avctx->coded_frame)
         return AVERROR(ENOMEM);
 
+    ret = ff_lpc_init(&s->lpc_ctx, avctx->frame_size,
+                      s->options.max_prediction_order, AV_LPC_TYPE_LEVINSON);
+
     dprint_compression_options(s);
 
-    return 0;
+    return ret;
 }
 
 
@@ -902,7 +902,7 @@ static int encode_residual_ch(FlacEncodeContext *s, int ch)
 
     /* LPC */
     sub->type = FLAC_SUBFRAME_LPC;
-    opt_order = ff_lpc_calc_coefs(&s->dsp, smp, n, min_order, max_order,
+    opt_order = ff_lpc_calc_coefs(&s->lpc_ctx, smp, n, min_order, max_order,
                                   s->options.lpc_coeff_precision, coefs, shift, s->options.lpc_type,
                                   s->options.lpc_passes, omethod,
                                   MAX_LPC_SHIFT, 0);
@@ -1317,6 +1317,7 @@ static av_cold int flac_encode_close(AVCodecContext *avctx)
     if (avctx->priv_data) {
         FlacEncodeContext *s = avctx->priv_data;
         av_freep(&s->md5ctx);
+        ff_lpc_end(&s->lpc_ctx);
     }
     av_freep(&avctx->extradata);
     avctx->extradata_size = 0;
@@ -1325,7 +1326,7 @@ static av_cold int flac_encode_close(AVCodecContext *avctx)
 }
 
 
-AVCodec flac_encoder = {
+AVCodec ff_flac_encoder = {
     "flac",
     AVMEDIA_TYPE_AUDIO,
     CODEC_ID_FLAC,
@@ -1335,6 +1336,6 @@ AVCodec flac_encoder = {
     flac_encode_close,
     NULL,
     .capabilities = CODEC_CAP_SMALL_LAST_FRAME | CODEC_CAP_DELAY,
-    .sample_fmts = (const enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
+    .sample_fmts = (const enum AVSampleFormat[]){AV_SAMPLE_FMT_S16,AV_SAMPLE_FMT_NONE},
     .long_name = NULL_IF_CONFIG_SMALL("FLAC (Free Lossless Audio Codec)"),
 };

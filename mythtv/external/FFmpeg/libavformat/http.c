@@ -28,7 +28,7 @@
 #include "http.h"
 #include "os_support.h"
 #include "httpauth.h"
-#include "libavcodec/opt.h"
+#include "libavutil/opt.h"
 
 /* XXX: POST protocol is not completely implemented because ffmpeg uses
    only a subset of it. */
@@ -138,7 +138,8 @@ static int http_open_cnx(URLContext *h)
         } else
             goto fail;
     }
-    if ((s->http_code == 302 || s->http_code == 303) && location_changed == 1) {
+    if ((s->http_code == 301 || s->http_code == 302 || s->http_code == 303 || s->http_code == 307)
+        && location_changed == 1) {
         /* url moved, get next */
         url_close(hd);
         if (redirects++ >= MAX_REDIRECTS)
@@ -224,7 +225,7 @@ static int process_line(URLContext *h, char *line, int line_count,
             p++;
         s->http_code = strtol(p, &end, 10);
 
-        dprintf(NULL, "http_code=%d\n", s->http_code);
+        av_dlog(NULL, "http_code=%d\n", s->http_code);
 
         /* error codes are 4xx and 5xx, but regard 401 as a success, so we
          * don't abort until all headers have been parsed. */
@@ -355,7 +356,7 @@ static int http_connect(URLContext *h, const char *path, const char *hoststr,
         if (http_get_line(s, line, sizeof(line)) < 0)
             return AVERROR(EIO);
 
-        dprintf(NULL, "header='%s'\n", line);
+        av_dlog(NULL, "header='%s'\n", line);
 
         err = process_line(h, line, s->line_count, new_location);
         if (err < 0)
@@ -386,7 +387,7 @@ static int http_read(URLContext *h, uint8_t *buf, int size)
 
                 s->chunksize = strtoll(line, NULL, 16);
 
-                dprintf(NULL, "Chunked encoding data size: %"PRId64"'\n", s->chunksize);
+                av_dlog(NULL, "Chunked encoding data size: %"PRId64"'\n", s->chunksize);
 
                 if (!s->chunksize)
                     return 0;
@@ -502,7 +503,7 @@ http_get_file_handle(URLContext *h)
     return url_get_file_handle(s->hd);
 }
 
-URLProtocol http_protocol = {
+URLProtocol ff_http_protocol = {
     "http",
     http_open,
     http_read,

@@ -1,6 +1,7 @@
 /*
+ * Copyright (c) 2009 Stefano Sabatini
+ *
  * This file is part of FFmpeg.
- * copyright (C) 2009 Stefano Sabatini
  *
  * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -109,7 +110,7 @@ static void draw_slice(AVFilterLink *inlink, int y, int h, int slice_dir)
 
 AVFilter avfilter_vf_pixdesctest = {
     .name        = "pixdesctest",
-    .description = "Test pixel format definitions.",
+    .description = NULL_IF_CONFIG_SMALL("Test pixel format definitions."),
 
     .priv_size = sizeof(PixdescTestContext),
     .uninit    = uninit,

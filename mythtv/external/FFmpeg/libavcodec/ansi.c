@@ -24,9 +24,9 @@
  * ASCII/ANSI art decoder
  */
 
+#include "libavutil/lfg.h"
 #include "avcodec.h"
 #include "cga_data.h"
-#include <libavutil/lfg.h>
 
 #define ATTR_BOLD         0x01  /**< Bold/Bright-foreground (mode 1) */
 #define ATTR_FAINT        0x02  /**< Faint (mode 2) */
@@ -422,9 +422,9 @@ static av_cold int decode_close(AVCodecContext *avctx)
     return 0;
 }
 
-AVCodec ansi_decoder = {
+AVCodec ff_ansi_decoder = {
     .name           = "ansi",
-    .type           = CODEC_TYPE_VIDEO,
+    .type           = AVMEDIA_TYPE_VIDEO,
     .id             = CODEC_ID_ANSI,
     .priv_data_size = sizeof(AnsiContext),
     .init           = decode_init,

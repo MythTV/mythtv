@@ -25,6 +25,7 @@
 #include "dsputil.h"
 #include "get_bits.h"
 #include "bytestream.h"
+#include "libavutil/audioconvert.h"
 
 /**
  * @file
@@ -198,8 +199,8 @@ static av_cold int ape_decode_init(AVCodecContext * avctx)
     }
 
     dsputil_init(&s->dsp, avctx);
-    avctx->sample_fmt = SAMPLE_FMT_S16;
-    avctx->channel_layout = (avctx->channels==2) ? CH_LAYOUT_STEREO : CH_LAYOUT_MONO;
+    avctx->sample_fmt = AV_SAMPLE_FMT_S16;
+    avctx->channel_layout = (avctx->channels==2) ? AV_CH_LAYOUT_STEREO : AV_CH_LAYOUT_MONO;
     return 0;
 }
 
@@ -883,7 +884,7 @@ static void ape_flush(AVCodecContext *avctx)
     s->samples= 0;
 }
 
-AVCodec ape_decoder = {
+AVCodec ff_ape_decoder = {
     "ape",
     AVMEDIA_TYPE_AUDIO,
     CODEC_ID_APE,

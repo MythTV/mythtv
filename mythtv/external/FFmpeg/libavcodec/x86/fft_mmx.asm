@@ -51,6 +51,7 @@ SECTION_RODATA
 %define M_SQRT1_2 0.70710678118654752440
 ps_root2: times 4 dd M_SQRT1_2
 ps_root2mppm: dd -M_SQRT1_2, M_SQRT1_2, M_SQRT1_2, -M_SQRT1_2
+ps_p1p1m1p1: dd 0, 0, 1<<31, 0
 ps_m1p1: dd 1<<31, 0
 
 %assign i 16
@@ -95,54 +96,51 @@ section .text align=16
     SWAP     %3, %6
 %endmacro
 
-; in:  %1={r0,i0,r1,i1} %2={r2,i2,r3,i3}
+; in:  %1={r0,i0,r2,i2} %2={r1,i1,r3,i3}
 ; out: %1={r0,r1,r2,r3} %2={i0,i1,i2,i3}
 %macro T4_SSE 3
     mova     %3, %1
-    shufps   %1, %2, 0x64 ; {r0,i0,r3,i2}
-    shufps   %3, %2, 0xce ; {r1,i1,r2,i3}
+    addps    %1, %2       ; {t1,t2,t6,t5}
+    subps    %3, %2       ; {t3,t4,-t8,t7}
+    xorps    %3, [ps_p1p1m1p1]
     mova     %2, %1
-    addps    %1, %3       ; {t1,t2,t6,t5}
-    subps    %2, %3       ; {t3,t4,t8,t7}
+    shufps   %1, %3, 0x44 ; {t1,t2,t3,t4}
+    shufps   %2, %3, 0xbe ; {t6,t5,t7,t8}
     mova     %3, %1
-    shufps   %1, %2, 0x44 ; {t1,t2,t3,t4}
-    shufps   %3, %2, 0xbe ; {t6,t5,t7,t8}
+    addps    %1, %2       ; {r0,i0,r1,i1}
+    subps    %3, %2       ; {r2,i2,r3,i3}
     mova     %2, %1
-    addps    %1, %3       ; {r0,i0,r1,i1}
-    subps    %2, %3       ; {r2,i2,r3,i3}
-    mova     %3, %1
-    shufps   %1, %2, 0x88 ; {r0,r1,r2,r3}
-    shufps   %3, %2, 0xdd ; {i0,i1,i2,i3}
-    SWAP     %2, %3
+    shufps   %1, %3, 0x88 ; {r0,r1,r2,r3}
+    shufps   %2, %3, 0xdd ; {i0,i1,i2,i3}
 %endmacro
 
-%macro T8_SSE 6 ; r0,i0,r1,i1,t0,t1
-    mova     %5, %3
-    shufps   %3, %4, 0x44 ; {r4,i4,r6,i6}
-    shufps   %5, %4, 0xee ; {r5,i5,r7,i7}
+; in:  %1={r0,r1,r2,r3} %2={i0,i1,i2,i3} %3={r4,i4,r6,i6} %4={r5,i5,r7,i7}
+; out: %1={r0,r1,r2,r3} %2={i0,i1,i2,i3} %1={r4,r5,r6,r7} %2={i4,i5,i6,i7}
+%macro T8_SSE 6
     mova     %6, %3
-    subps    %3, %5       ; {r5,i5,r7,i7}
-    addps    %6, %5       ; {t1,t2,t3,t4}
-    mova     %5, %3
-    shufps   %5, %5, 0xb1 ; {i5,r5,i7,r7}
+    subps    %3, %4       ; {r5,i5,r7,i7}
+    addps    %6, %4       ; {t1,t2,t3,t4}
+    mova     %4, %3
+    shufps   %4, %4, 0xb1 ; {i5,r5,i7,r7}
     mulps    %3, [ps_root2mppm] ; {-r5,i5,r7,-i7}
-    mulps    %5, [ps_root2]
-    addps    %3, %5       ; {t8,t7,ta,t9}
-    mova     %5, %6
+    mulps    %4, [ps_root2]
+    addps    %3, %4       ; {t8,t7,ta,t9}
+    mova     %4, %6
     shufps   %6, %3, 0x36 ; {t3,t2,t9,t8}
-    shufps   %5, %3, 0x9c ; {t1,t4,t7,ta}
+    shufps   %4, %3, 0x9c ; {t1,t4,t7,ta}
     mova     %3, %6
-    addps    %6, %5       ; {t1,t2,t9,ta}
-    subps    %3, %5       ; {t6,t5,tc,tb}
-    mova     %5, %6
+    addps    %6, %4       ; {t1,t2,t9,ta}
+    subps    %3, %4       ; {t6,t5,tc,tb}
+    mova     %4, %6
     shufps   %6, %3, 0xd8 ; {t1,t9,t5,tb}
-    shufps   %5, %3, 0x8d ; {t2,ta,t6,tc}
+    shufps   %4, %3, 0x8d ; {t2,ta,t6,tc}
     mova     %3, %1
-    mova     %4, %2
+    mova     %5, %2
     addps    %1, %6       ; {r0,r1,r2,r3}
-    addps    %2, %5       ; {i0,i1,i2,i3}
+    addps    %2, %4       ; {i0,i1,i2,i3}
     subps    %3, %6       ; {r4,r5,r6,r7}
-    subps    %4, %5       ; {i4,i5,i6,i7}
+    subps    %5, %4       ; {i4,i5,i6,i7}
+    SWAP     %4, %5
 %endmacro
 
 ; scheduled for cpu-bound sizes
@@ -154,9 +152,9 @@ IF%1 mova    m5, Z(5)
     mova     m1, %3 ; wim
     mova     m3, m5
     mulps    m2, m0 ; r2*wre
-IF%1 mova    m6, Z(6)
+IF%1 mova    m6, Z2(6)
     mulps    m3, m1 ; i2*wim
-IF%1 mova    m7, Z(7)
+IF%1 mova    m7, Z2(7)
     mulps    m4, m1 ; r2*wim
     mulps    m5, m0 ; i2*wre
     addps    m2, m3 ; r2*wre + i2*wim
@@ -183,14 +181,14 @@ IF%1 mova    m7, Z(7)
     mova     m4, m6
     subps    m6, m5 ; r3
     addps    m5, m4 ; r1
-    mova   Z(6), m6
+    mova  Z2(6), m6
     mova   Z(2), m5
     mova     m2, Z(3)
     addps    m3, m0 ; t6
     subps    m2, m1 ; i3
     mova     m7, Z(1)
     addps    m1, Z(3) ; i1
-    mova   Z(7), m2
+    mova  Z2(7), m2
     mova   Z(3), m1
     mova     m4, m7
     subps    m7, m3 ; i2
@@ -208,9 +206,9 @@ IF%1 mova    m7, Z(7)
     mova     m3, m5
     mova     m1, [wq+o1q] ; wim
     mulps    m2, m0 ; r2*wre
-    mova     m6, Z(6) ; r3
+    mova     m6, Z2(6) ; r3
     mulps    m3, m1 ; i2*wim
-    mova     m7, Z(7) ; i3
+    mova     m7, Z2(7) ; i3
     mulps    m4, m1 ; r2*wim
     mulps    m5, m0 ; i2*wre
     addps    m2, m3 ; r2*wre + i2*wim
@@ -237,14 +235,14 @@ IF%1 mova    m7, Z(7)
     mova     m4, m6
     subps    m6, m5 ; r3
     addps    m5, m4 ; r1
-IF%1 mova  Z(6), m6
+IF%1 mova Z2(6), m6
 IF%1 mova  Z(2), m5
     mova     m2, Z(3)
     addps    m3, m0 ; t6
     subps    m2, m1 ; i3
     mova     m7, Z(1)
     addps    m1, Z(3) ; i1
-IF%1 mova  Z(7), m2
+IF%1 mova Z2(7), m2
 IF%1 mova  Z(3), m1
     mova     m4, m7
     subps    m7, m3 ; i2
@@ -262,8 +260,8 @@ IF%1 mova  Z(1), m3
     mova     m2, Z(4)
     mova   Z(2), m5
     mova   Z(3), m4
-    mova   Z(6), m6
-    mova   Z(7), m0
+    mova  Z2(6), m6
+    mova  Z2(7), m0
     mova     m5, m1 ; r0
     mova     m4, m2 ; r2
     unpcklps m1, m3
@@ -287,6 +285,7 @@ INIT_XMM
 %define mova movaps
 
 %define Z(x) [r0+mmsize*x]
+%define Z2(x) [r0+mmsize*x]
 
 align 16
 fft4_sse:
@@ -326,8 +325,8 @@ fft16_sse:
     mova   Z(2), m2
     mova   Z(3), m3
     T4_SSE   m4, m5, m6
-    mova     m6, Z(6)
-    mova     m7, Z(7)
+    mova     m6, Z2(6)
+    mova     m7, Z2(7)
     T4_SSE   m6, m7, m0
     PASS_SMALL 0, [cos_16], [cos_16+16]
     ret
@@ -358,8 +357,8 @@ fft8%1:
     T4_3DN   m0, m1, m2, m3, m4, m5
     mova   Z(0), m0
     mova   Z(2), m2
-    T2_3DN   m4, m5, Z(4), Z(5)
-    T2_3DN   m6, m7, Z(6), Z(7)
+    T2_3DN   m4, m5,  Z(4),  Z(5)
+    T2_3DN   m6, m7, Z2(6), Z2(7)
     pswapd   m0, m5
     pswapd   m2, m7
     pxor     m0, [ps_m1p1]
@@ -370,7 +369,7 @@ fft8%1:
     pfmul    m7, [ps_root2]
     T4_3DN   m1, m3, m5, m7, m0, m2
     mova   Z(5), m5
-    mova   Z(7), m7
+    mova  Z2(7), m7
     mova     m0, Z(0)
     mova     m2, Z(2)
     T4_3DN   m0, m2, m4, m6, m5, m7
@@ -380,12 +379,12 @@ fft8%1:
     mova   Z(1), m5
     mova   Z(2), m2
     mova   Z(3), m7
-    PUNPCK   m4, Z(5), m5
-    PUNPCK   m6, Z(7), m7
+    PUNPCK   m4,  Z(5), m5
+    PUNPCK   m6, Z2(7), m7
     mova   Z(4), m4
     mova   Z(5), m5
-    mova   Z(6), m6
-    mova   Z(7), m7
+    mova  Z2(6), m6
+    mova  Z2(7), m7
     ret
 %endmacro
 
@@ -405,7 +404,8 @@ FFT48_3DN _3dn2
 FFT48_3DN _3dn
 
 
-%define Z(x) [zq + o1q*(x&6)*((x/6)^1) + o3q*(x/6) + mmsize*(x&1)]
+%define Z(x) [zq + o1q*(x&6) + mmsize*(x&1)]
+%define Z2(x) [zq + o3q + mmsize*(x&1)]
 
 %macro DECL_PASS 2+ ; name, payload
 align 16
@@ -532,20 +532,15 @@ INIT_XMM
     unpckhps xmm0, xmm2
 %endmacro
 
-%macro PREROTATEW 3 ;addr1, addr2, xmm
-    movlps   %1,   %3
-    movhps   %2,   %3
-%endmacro
-
 %macro CMUL 6 ;j, xmm0, xmm1, 3, 4, 5
     movaps   xmm6, [%4+%1*2]
     movaps   %2,   [%4+%1*2+0x10]
     movaps   %3,   xmm6
     movaps   xmm7, %2
-    mulps    xmm6, [%5+%1*1]
-    mulps    %2,   [%6+%1*1]
-    mulps    %3,   [%6+%1*1]
-    mulps    xmm7, [%5+%1*1]
+    mulps    xmm6, [%5+%1]
+    mulps    %2,   [%6+%1]
+    mulps    %3,   [%6+%1]
+    mulps    xmm7, [%5+%1]
     subps    %2,   xmm6
     addps    %3,   xmm7
 %endmacro
@@ -576,8 +571,6 @@ cglobal imdct_half_sse, 3,7,8; FFTContext *s, FFTSample *output, const FFTSample
 %define rrevtab r10
 %define rtcos   r11
 %define rtsin   r12
-    push  r10
-    push  r11
     push  r12
     push  r13
     push  r14
@@ -620,21 +613,25 @@ cglobal imdct_half_sse, 3,7,8; FFTContext *s, FFTSample *output, const FFTSample
 
     PREROTATER r4, r3, r2, rtcos, rtsin
 %ifdef ARCH_X86_64
-    movzx  r5,  word [rrevtab+r4*1-4]
-    movzx  r6,  word [rrevtab+r4*1-2]
-    movzx  r13, word [rrevtab+r3*1]
-    movzx  r14, word [rrevtab+r3*1+2]
-    PREROTATEW [r1+r5 *8], [r1+r6 *8], xmm0
-    PREROTATEW [r1+r13*8], [r1+r14*8], xmm1
+    movzx  r5,  word [rrevtab+r4-4]
+    movzx  r6,  word [rrevtab+r4-2]
+    movzx  r13, word [rrevtab+r3]
+    movzx  r14, word [rrevtab+r3+2]
+    movlps [r1+r5 *8], xmm0
+    movhps [r1+r6 *8], xmm0
+    movlps [r1+r13*8], xmm1
+    movhps [r1+r14*8], xmm1
     add    r4, 4
 %else
     mov    r6, [esp]
-    movzx  r5, word [r6+r4*1-4]
-    movzx  r4, word [r6+r4*1-2]
-    PREROTATEW [r1+r5*8], [r1+r4*8], xmm0
-    movzx  r5, word [r6+r3*1]
-    movzx  r4, word [r6+r3*1+2]
-    PREROTATEW [r1+r5*8], [r1+r4*8], xmm1
+    movzx  r5, word [r6+r4-4]
+    movzx  r4, word [r6+r4-2]
+    movlps [r1+r5*8], xmm0
+    movhps [r1+r4*8], xmm0
+    movzx  r5, word [r6+r3]
+    movzx  r4, word [r6+r3+2]
+    movlps [r1+r5*8], xmm1
+    movhps [r1+r4*8], xmm1
 %endif
     sub    r3, 4
     jns    .pre
@@ -663,8 +660,6 @@ cglobal imdct_half_sse, 3,7,8; FFTContext *s, FFTSample *output, const FFTSample
     pop  r14
     pop  r13
     pop  r12
-    pop  r11
-    pop  r10
 %else
     add esp, 12
 %endif

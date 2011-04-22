@@ -50,7 +50,7 @@
 #include "libavcodec/dca.h"
 #include "libavcodec/dcadata.h"
 #include "libavcodec/aacadtsdec.h"
-#include "libavcodec/opt.h"
+#include "libavutil/opt.h"
 
 typedef struct IEC61937Context {
     const AVClass *av_class;
@@ -534,7 +534,7 @@ static int spdif_write_packet(struct AVFormatContext *s, AVPacket *pkt)
     return 0;
 }
 
-AVOutputFormat spdif_muxer = {
+AVOutputFormat ff_spdif_muxer = {
     "spdif",
     NULL_IF_CONFIG_SMALL("IEC 61937 (used on S/PDIF - IEC958)"),
     NULL,
