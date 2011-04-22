@@ -23,6 +23,9 @@
 #define VIDEO_H
 
 #include <QScriptEngine>
+#include <QDateTime>
+
+#include "videometadatalistmanager.h"
 
 #include "services/videoServices.h"
 
@@ -48,6 +51,10 @@ class Video : public VideoServices
 
         bool                      RemoveVideoFromDB  ( int      Id         );
 
+    private:
+
+        DTC::VideoMetadataInfo*   GetInfoFromMetadata(
+                             VideoMetadataListManager::VideoMetadataPtr metadata );
 };
 
 // --------------------------------------------------------------------------
