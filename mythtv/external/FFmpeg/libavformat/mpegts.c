@@ -1596,7 +1596,7 @@ static AVStream *new_section_av_stream(SectionContext *sect, enum CodecType type
     sect->st->priv_data = sect;
     sect->st->need_parsing = AVSTREAM_PARSE_NONE;
 
-    sect->st = av_add_stream(sect->stream, sect->st, sect->pid);
+    sect->st = av_new_stream(sect->stream, sect->pid);
 
     return sect->st;
 fail: /*for the CHECKED_ALLOCZ macro*/
