@@ -611,7 +611,7 @@ void init_yuv_conversion(void)
     /* determine best YV12 -> YUY2 converter to use */
 
 #ifdef MMX
-    if (mm_support() & FF_MM_MMXEXT)
+    if (av_get_cpu_flags() & FF_MM_MMXEXT)
     {
         yv12_to_yuy2 = yv12_to_yuy2_mmxext;
         yuy2_to_yv12 = yuy2_to_yv12_mmxext;
