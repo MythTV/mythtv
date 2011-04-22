@@ -40,7 +40,7 @@
 
 DTC::VideoMetadataInfoList* Video::GetVideos( bool bDescending,
                                               int nStartIndex,
-                                              int nCount )
+                                              int nCount       )
 {
     VideoMetadataListManager::metadata_list videolist;
     VideoMetadataListManager::loadAllFromDatabase(videolist);
@@ -55,9 +55,9 @@ DTC::VideoMetadataInfoList* Video::GetVideos( bool bDescending,
 
     nStartIndex   = min( nStartIndex, (int)videos.size() );
     nCount        = (nCount > 0) ? min( nCount, (int)videos.size() ) : videos.size();
-    int nEndIndex = nStartIndex + nCount;
+    int nEndIndex = min((nStartIndex + nCount), (int)videos.size() );
 
-    for( int n = nStartIndex; n < nEndIndex; n++)
+    for( int n = nStartIndex; n < nEndIndex; n++ )
     {
         DTC::VideoMetadataInfo *pVideoMetadataInfo = pVideoMetadataInfos->AddNewVideoMetadataInfo();
 
@@ -95,6 +95,28 @@ DTC::VideoMetadataInfoList* Video::GetVideos( bool bDescending,
             pVideoMetadataInfo->setTrailer(metadata->GetTrailer());
         }
     }
+
+    int curPage = 0, totalPages = 0;
+    if (nCount == 0)
+        totalPages = 1;
+    else
+        totalPages = (int)ceil((float)videos.size() / nCount);
+
+    if (totalPages == 1)
+        curPage = 1;
+    else
+    {
+        curPage = (int)ceil((float)nStartIndex / nCount) + 1;
+    }
+
+    pVideoMetadataInfos->setStartIndex    ( nStartIndex     );
+    pVideoMetadataInfos->setCount         ( nCount          );
+    pVideoMetadataInfos->setCurrentPage   ( curPage         );
+    pVideoMetadataInfos->setTotalPages    ( totalPages      );
+    pVideoMetadataInfos->setTotalAvailable( videos.size()   );
+    pVideoMetadataInfos->setAsOf          ( QDateTime::currentDateTime() );
+    pVideoMetadataInfos->setVersion       ( MYTH_BINARY_VERSION );
+    pVideoMetadataInfos->setProtoVer      ( MYTH_PROTO_VERSION  );
 
     return pVideoMetadataInfos;
 }
