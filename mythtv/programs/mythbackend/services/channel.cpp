@@ -54,7 +54,7 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
 
     nStartIndex   = min( nStartIndex, (int)chanList.size() );
     nCount        = (nCount > 0) ? min( nCount, (int)chanList.size() ) : chanList.size();
-    int nEndIndex = nStartIndex + nCount;
+    int nEndIndex = min((nStartIndex + nCount), (int)chanList.size() );
 
     for( int n = nStartIndex; n < nEndIndex; n++)
     {
@@ -457,7 +457,7 @@ DTC::VideoMultiplexList* Channel::GetVideoMultiplexList( int nSourceID,
 
     nStartIndex   = min( nStartIndex, muxCount );
     nCount        = (nCount > 0) ? min( nCount, muxCount ) : muxCount;
-    int nEndIndex = nStartIndex + nCount;
+    int nEndIndex = min((nStartIndex + nCount), muxCount );
 
     for( int n = nStartIndex; n < nEndIndex; n++)
     {
