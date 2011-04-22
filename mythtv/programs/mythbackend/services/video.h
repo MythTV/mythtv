@@ -38,9 +38,15 @@ class Video : public VideoServices
 
         /* Video Metadata Methods */
 
-        DTC::VideoMetadataInfoList*  GetVideos  ( bool     Descending,
-                                                  int      StartIndex,
-                                                  int      Count      );
+        DTC::VideoMetadataInfoList*  GetVideos       ( bool     Descending,
+                                                       int      StartIndex,
+                                                       int      Count      );
+
+        DTC::VideoMetadataInfo*   GetVideoById       ( int      Id         );
+
+        DTC::VideoMetadataInfo*   GetVideoByFilename ( const QString  &Filename  );
+
+        bool                      RemoveVideoFromDB  ( int      Id         );
 
 };
 
@@ -73,11 +79,26 @@ class ScriptableVideo : public QObject
 
     public slots:
 
-        QObject* GetVideos(      bool             Descending,
-                                 int              StartIndex,
-                                 int              Count      )
+        QObject* GetVideos(          bool             Descending,
+                                     int              StartIndex,
+                                     int              Count      )
         {
             return m_obj.GetVideos( Descending, StartIndex, Count );
+        }
+
+        QObject* GetVideoById(       int              Id         )
+        {
+            return m_obj.GetVideoById( Id );
+        }
+
+        QObject* GetVideoByFilename( const QString    &Filename  )
+        {
+            return m_obj.GetVideoByFilename( Filename );
+        }
+
+        bool RemoveVideoFromDB(      int              Id         )
+        {
+            return m_obj.RemoveVideoFromDB( Id );
         }
 
 };

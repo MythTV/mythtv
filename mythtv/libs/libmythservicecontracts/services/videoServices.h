@@ -50,7 +50,7 @@
 class SERVICE_PUBLIC VideoServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "version"    , "1.01" );
 
     public:
 
@@ -64,10 +64,15 @@ class SERVICE_PUBLIC VideoServices : public Service  //, public QScriptable ???
 
     public slots:
 
-        virtual DTC::VideoMetadataInfoList* GetVideos ( bool             Descending,
-                                                        int              StartIndex,
-                                                        int              Count      ) = 0;
+        virtual DTC::VideoMetadataInfoList* GetVideos          ( bool             Descending,
+                                                                 int              StartIndex,
+                                                                 int              Count      ) = 0;
 
+        virtual DTC::VideoMetadataInfo*     GetVideoById       ( int              Id         ) = 0;
+
+        virtual DTC::VideoMetadataInfo*     GetVideoByFilename ( const QString    &Filename  ) = 0;
+
+        virtual bool                        RemoveVideoFromDB  ( int              Id         ) = 0;
 };
 
 #endif

@@ -120,3 +120,131 @@ DTC::VideoMetadataInfoList* Video::GetVideos( bool bDescending,
 
     return pVideoMetadataInfos;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::VideoMetadataInfo* Video::GetVideoById( int Id )
+{
+    DTC::VideoMetadataInfo *pVideoMetadataInfo = new DTC::VideoMetadataInfo();
+
+    VideoMetadataListManager::metadata_list videolist;
+    VideoMetadataListManager::loadAllFromDatabase(videolist);
+    VideoMetadataListManager *mlm = new VideoMetadataListManager();
+    mlm->setList(videolist);
+    VideoMetadataListManager::VideoMetadataPtr metadata = mlm->byID(Id);
+
+    if ( !metadata )
+        throw( QString( "No metadata found for selected ID!." ));
+
+    if (metadata)
+    {
+        pVideoMetadataInfo->setId(metadata->GetID());
+        pVideoMetadataInfo->setTitle(metadata->GetTitle());
+        pVideoMetadataInfo->setSubTitle(metadata->GetSubtitle());
+        pVideoMetadataInfo->setTagline(metadata->GetTagline());
+        pVideoMetadataInfo->setDirector(metadata->GetDirector());
+        pVideoMetadataInfo->setStudio(metadata->GetStudio());
+        pVideoMetadataInfo->setDescription(metadata->GetPlot());
+        pVideoMetadataInfo->setCertification(metadata->GetRating());
+        pVideoMetadataInfo->setInetRef(metadata->GetInetRef());
+        pVideoMetadataInfo->setHomePage(metadata->GetHomepage());
+        pVideoMetadataInfo->setReleaseDate(QDateTime(metadata->GetReleaseDate()));
+        pVideoMetadataInfo->setAddDate(QDateTime(metadata->GetInsertdate()));
+        pVideoMetadataInfo->setUserRating(metadata->GetUserRating());
+        pVideoMetadataInfo->setLength(metadata->GetLength());
+        pVideoMetadataInfo->setSeason(metadata->GetSeason());
+        pVideoMetadataInfo->setEpisode(metadata->GetEpisode());
+        pVideoMetadataInfo->setParentalLevel(metadata->GetShowLevel());
+        pVideoMetadataInfo->setVisible(metadata->GetBrowse());
+        pVideoMetadataInfo->setWatched(metadata->GetWatched());
+        pVideoMetadataInfo->setProcessed(metadata->GetProcessed());
+        pVideoMetadataInfo->setFileName(metadata->GetFilename());
+        pVideoMetadataInfo->setHash(metadata->GetHash());
+        pVideoMetadataInfo->setHost(metadata->GetHost());
+        pVideoMetadataInfo->setCoverart(metadata->GetCoverFile());
+        pVideoMetadataInfo->setFanart(metadata->GetFanart());
+        pVideoMetadataInfo->setBanner(metadata->GetBanner());
+        pVideoMetadataInfo->setScreenshot(metadata->GetScreenshot());
+        pVideoMetadataInfo->setTrailer(metadata->GetTrailer());
+    }
+
+    delete mlm;
+
+    return pVideoMetadataInfo;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::VideoMetadataInfo* Video::GetVideoByFilename( const QString &Filename )
+{
+    DTC::VideoMetadataInfo *pVideoMetadataInfo = new DTC::VideoMetadataInfo();
+
+    VideoMetadataListManager::metadata_list videolist;
+    VideoMetadataListManager::loadAllFromDatabase(videolist);
+    VideoMetadataListManager *mlm = new VideoMetadataListManager();
+    mlm->setList(videolist);
+    VideoMetadataListManager::VideoMetadataPtr metadata = mlm->byFilename(Filename);
+
+    if ( !metadata )
+        throw( QString( "No metadata found for selected filename!." ));
+
+    if (metadata)
+    {
+        pVideoMetadataInfo->setId(metadata->GetID());
+        pVideoMetadataInfo->setTitle(metadata->GetTitle());
+        pVideoMetadataInfo->setSubTitle(metadata->GetSubtitle());
+        pVideoMetadataInfo->setTagline(metadata->GetTagline());
+        pVideoMetadataInfo->setDirector(metadata->GetDirector());
+        pVideoMetadataInfo->setStudio(metadata->GetStudio());
+        pVideoMetadataInfo->setDescription(metadata->GetPlot());
+        pVideoMetadataInfo->setCertification(metadata->GetRating());
+        pVideoMetadataInfo->setInetRef(metadata->GetInetRef());
+        pVideoMetadataInfo->setHomePage(metadata->GetHomepage());
+        pVideoMetadataInfo->setReleaseDate(QDateTime(metadata->GetReleaseDate()));
+        pVideoMetadataInfo->setAddDate(QDateTime(metadata->GetInsertdate()));
+        pVideoMetadataInfo->setUserRating(metadata->GetUserRating());
+        pVideoMetadataInfo->setLength(metadata->GetLength());
+        pVideoMetadataInfo->setSeason(metadata->GetSeason());
+        pVideoMetadataInfo->setEpisode(metadata->GetEpisode());
+        pVideoMetadataInfo->setParentalLevel(metadata->GetShowLevel());
+        pVideoMetadataInfo->setVisible(metadata->GetBrowse());
+        pVideoMetadataInfo->setWatched(metadata->GetWatched());
+        pVideoMetadataInfo->setProcessed(metadata->GetProcessed());
+        pVideoMetadataInfo->setFileName(metadata->GetFilename());
+        pVideoMetadataInfo->setHash(metadata->GetHash());
+        pVideoMetadataInfo->setHost(metadata->GetHost());
+        pVideoMetadataInfo->setCoverart(metadata->GetCoverFile());
+        pVideoMetadataInfo->setFanart(metadata->GetFanart());
+        pVideoMetadataInfo->setBanner(metadata->GetBanner());
+        pVideoMetadataInfo->setScreenshot(metadata->GetScreenshot());
+        pVideoMetadataInfo->setTrailer(metadata->GetTrailer());
+    }
+
+    delete mlm;
+
+    return pVideoMetadataInfo;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Video::RemoveVideoFromDB( int Id )
+{
+    bool bResult = false;
+
+    VideoMetadataListManager::metadata_list videolist;
+    VideoMetadataListManager::loadAllFromDatabase(videolist);
+    VideoMetadataListManager *mlm = new VideoMetadataListManager();
+    mlm->setList(videolist);
+    VideoMetadataListManager::VideoMetadataPtr metadata = mlm->byID(Id);
+
+    if (metadata)
+        bResult = metadata->DeleteFromDatabase();
+
+    return bResult;
+}
