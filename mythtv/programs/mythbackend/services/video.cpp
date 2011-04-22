@@ -26,6 +26,7 @@
 #include "video.h"
 
 #include "videometadata.h"
+#include "bluraymetadata.h"
 
 #include "compat.h"
 #include "mythversion.h"
@@ -228,4 +229,55 @@ DTC::VideoMetadataInfo* Video::GetInfoFromMetadata(
     }
 
     return pVideoMetadataInfo;
+}
+
+DTC::BlurayInfo* Video::GetBluray( const QString &sPath )
+{
+    QString path = sPath;
+
+    if (sPath.isEmpty())
+        path = gCoreContext->GetSetting( "BluRayMountpoint", "/media/cdrom");
+
+    VERBOSE(VB_GENERAL, QString("Parsing Blu-ray at path: %1 ").arg(path));
+
+    BlurayMetadata *bdmeta = new BlurayMetadata(path);
+
+    if ( !bdmeta )
+        throw( QString( "Unable to open Blu-ray Metadata Parser!" ));
+
+    if ( !bdmeta->OpenDisc() )
+        throw( QString( "Unable to open Blu-ray Disc/Path!" ));
+
+    if ( !bdmeta->ParseDisc() )
+        throw( QString( "Unable to parse metadata from Blu-ray Disc/Path!" ));
+
+    DTC::BlurayInfo *pBlurayInfo = new DTC::BlurayInfo();
+
+    pBlurayInfo->setPath(path);
+    pBlurayInfo->setTitle(bdmeta->GetTitle());
+    pBlurayInfo->setAltTitle(bdmeta->GetAlternateTitle());
+    pBlurayInfo->setDiscLang(bdmeta->GetDiscLanguage());
+    pBlurayInfo->setDiscNum(bdmeta->GetCurrentDiscNumber());
+    pBlurayInfo->setTotalDiscNum(bdmeta->GetTotalDiscNumber());
+    pBlurayInfo->setTitleCount(bdmeta->GetTitleCount());
+    pBlurayInfo->setThumbCount(bdmeta->GetThumbnailCount());
+    pBlurayInfo->setTopMenuSupported(bdmeta->GetTopMenuSupported());
+    pBlurayInfo->setFirstPlaySupported(bdmeta->GetFirstPlaySupported());
+    pBlurayInfo->setNumHDMVTitles((uint)bdmeta->GetNumHDMVTitles());
+    pBlurayInfo->setNumBDJTitles((uint)bdmeta->GetNumBDJTitles());
+    pBlurayInfo->setNumUnsupportedTitles((uint)bdmeta->GetNumUnsupportedTitles());
+    pBlurayInfo->setAACSDetected(bdmeta->GetAACSDetected());
+    pBlurayInfo->setLibAACSDetected(bdmeta->GetLibAACSDetected());
+    pBlurayInfo->setAACSHandled(bdmeta->GetAACSHandled());
+    pBlurayInfo->setBDPlusDetected(bdmeta->GetBDPlusDetected());
+    pBlurayInfo->setLibBDPlusDetected(bdmeta->GetLibBDPlusDetected());
+    pBlurayInfo->setBDPlusHandled(bdmeta->GetBDPlusHandled());
+
+    QStringList thumbs = bdmeta->GetThumbnails();
+    if (thumbs.size())
+        pBlurayInfo->setThumbPath(thumbs.at(0));
+
+    delete bdmeta;
+
+    return pBlurayInfo;
 }

@@ -5,11 +5,16 @@
 #include "mythdirs.h"
 
 BlurayMetadata::BlurayMetadata(const QString path) :
-    m_bdnav(NULL),         m_metadata(NULL),
-    m_title(QString()),    m_alttitle(QString()),
-    m_language(QString()), m_discnumber(0),
-    m_disctotal(0),        m_path(path),
-    m_images(QStringList())
+    m_bdnav(NULL),               m_metadata(NULL),
+    m_title(QString()),          m_alttitle(QString()),
+    m_language(QString()),       m_discnumber(0),
+    m_disctotal(0),              m_path(path),
+    m_images(QStringList()),     m_topMenuSupported(false),
+    m_firstPlaySupported(false), m_numHDMVTitles(0),
+    m_numBDJTitles(0),           m_numUnsupportedTitles(0),
+    m_aacsDetected(false),       m_libaacsDetected(false),
+    m_aacsHandled(false),        m_bdplusDetected(false),
+    m_libbdplusDetected(false),  m_bdplusHandled(false)
 {
 }
 
@@ -21,6 +26,9 @@ BlurayMetadata::~BlurayMetadata()
 
 bool BlurayMetadata::OpenDisc(void)
 {
+    if (IsOpen())
+        return true;
+
     QString keyfile = QString("%1/KEYDB.cfg").arg(GetConfDir());
     QByteArray keyarray = keyfile.toAscii();
     const char *keyfilepath = keyarray.data();
@@ -35,34 +43,50 @@ bool BlurayMetadata::OpenDisc(void)
 
 bool BlurayMetadata::ParseDisc(void)
 {
-    if (!m_bdnav && !OpenDisc())
+    if (!OpenDisc() && !m_bdnav)
         return false;
 
     m_metadata = bd_get_meta(m_bdnav);
 
-    if (!m_metadata)
-        return false;
-
-    m_title = QString(m_metadata->di_name);
-    m_alttitle = QString(m_metadata->di_alternative);
-    m_language = QString(m_metadata->language_code);
-    m_discnumber = m_metadata->di_set_number;
-    m_disctotal = m_metadata->di_num_sets;
-
-    for (unsigned i = 0; i < m_metadata->toc_count; i++)
+    if (m_metadata)
     {
-        uint num = m_metadata->toc_entries[i].title_number;
-        QString title = QString(m_metadata->toc_entries[i].title_name);
-        QPair<uint,QString> ret(num,title); 
-        m_titles.append(ret);
+        m_title = QString(m_metadata->di_name);
+        m_alttitle = QString(m_metadata->di_alternative);
+        m_language = QString(m_metadata->language_code);
+        m_discnumber = m_metadata->di_set_number;
+        m_disctotal = m_metadata->di_num_sets;
+
+        for (unsigned i = 0; i < m_metadata->toc_count; i++)
+        {
+            uint num = m_metadata->toc_entries[i].title_number;
+            QString title = QString(m_metadata->toc_entries[i].title_name);
+            QPair<uint,QString> ret(num,title); 
+            m_titles.append(ret);
+        }
+
+        for (unsigned i = 0; i < m_metadata->thumb_count; i++)
+        {
+            QString filepath = QString("%1/BDMV/META/DL/%2")
+                                   .arg(m_path)
+                                   .arg(m_metadata->thumbnails[i].path);
+            m_images.append(filepath);
+        }
     }
 
-    for (unsigned i = 0; i < m_metadata->thumb_count; i++)
+    const BLURAY_DISC_INFO *discinfo = bd_get_disc_info(m_bdnav);
+    if (discinfo)
     {
-        QString filepath = QString("%1/BDMV/META/DL/%2")
-                               .arg(m_path)
-                               .arg(m_metadata->thumbnails[i].path);
-        m_images.append(filepath);
+        m_topMenuSupported   = discinfo->top_menu_supported;
+        m_firstPlaySupported = discinfo->first_play_supported;
+        m_numHDMVTitles = discinfo->num_hdmv_titles;
+        m_numBDJTitles = discinfo->num_bdj_titles;
+        m_numUnsupportedTitles = discinfo->num_unsupported_titles;
+        m_aacsDetected = discinfo->aacs_detected;
+        m_libaacsDetected = discinfo->libaacs_detected;
+        m_aacsHandled = discinfo->aacs_handled;
+        m_bdplusDetected = discinfo->bdplus_detected;
+        m_libbdplusDetected = discinfo->libbdplus_detected;
+        m_bdplusHandled = discinfo->bdplus_handled;
     }
 
     return true;

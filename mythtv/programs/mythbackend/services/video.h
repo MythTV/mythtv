@@ -43,13 +43,17 @@ class Video : public VideoServices
 
         DTC::VideoMetadataInfoList*  GetVideos       ( bool     Descending,
                                                        int      StartIndex,
-                                                       int      Count      );
+                                                       int      Count            );
 
-        DTC::VideoMetadataInfo*   GetVideoById       ( int      Id         );
+        DTC::VideoMetadataInfo*   GetVideoById       ( int      Id               );
 
         DTC::VideoMetadataInfo*   GetVideoByFilename ( const QString  &Filename  );
 
-        bool                      RemoveVideoFromDB  ( int      Id         );
+        bool                      RemoveVideoFromDB  ( int      Id               );
+
+        /* Bluray Methods */
+
+        DTC::BlurayInfo*          GetBluray          ( const QString  &Path      );
 
     private:
 
