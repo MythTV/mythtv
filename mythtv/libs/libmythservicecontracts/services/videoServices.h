@@ -51,6 +51,7 @@ class SERVICE_PUBLIC VideoServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
     Q_CLASSINFO( "version"    , "1.01" );
+    Q_CLASSINFO( "RemoveVideoFromDB_Method",           "POST" )
 
     public:
 
