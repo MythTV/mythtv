@@ -91,7 +91,7 @@ QStringList DTVSignalMonitor::GetStatusList(bool kick)
             (matchingGood != (int)matchingPMT.IsGood()))
         {
             DBG_SM("GetStatusList", QString("WaitForPMT seen(%1) matching(%2)")
-		                    .arg(seenPMT.IsGood())
+                                    .arg(seenPMT.IsGood())
                                     .arg(matchingPMT.IsGood()));
             seenGood = (int)seenPMT.IsGood();
             matchingGood = (int)matchingPMT.IsGood();

@@ -741,7 +741,8 @@ void UIImageType::LoadImage()
 
     if (!GetMythUI()->FindThemeFile(file))
     {
-        VERBOSE(VB_IMPORTANT, QString("UIImageType::LoadImage() - Cannot find image: ").arg(m_filename));
+        VERBOSE(VB_IMPORTANT, "UIImageType::LoadImage() - Cannot find image: " +
+                              m_filename);
         m_show = false;
         return;
     }
