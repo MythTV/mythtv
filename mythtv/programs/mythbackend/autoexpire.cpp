@@ -1014,9 +1014,11 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
  */
 void AutoExpire::RunUpdate(void)
 {
-    Sleep(5 * 1000);
-    CalcParams();
     QMutexLocker locker(&instance_lock);
+    Sleep(5 * 1000);
+    locker.unlock();
+    CalcParams();
+    locker.relock();
     update_pending = false;
     update_thread->deleteLater();
     update_thread = NULL;
@@ -1047,7 +1049,8 @@ void AutoExpire::Update(int encoder, int fsID, bool immediately)
 
     if (encoder > 0)
     {
-        QString msg = QString("Cardid %1: is starting a recording on").arg(encoder);
+        QString msg = QString("Cardid %1: is starting a recording on")
+                      .arg(encoder);
         if (fsID == -1)
             msg.append(" an unknown fsID soon.");
         else
