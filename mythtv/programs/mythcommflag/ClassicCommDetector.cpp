@@ -198,9 +198,9 @@ void ClassicCommDetector::Init()
     else
         verboseDebugging = false;
 
-    VERBOSE(VB_COMMFLAG, "Commercial Detection initialized: width = " <<
-            width << ", height = " << height << ", fps = " <<
-            player->GetFrameRate() << ", method = " << commDetectMethod);
+    VERBOSE(VB_COMMFLAG, QString("Commercial Detection initialized: "
+            "width = %1, height = %2, fps = %3, method = %4").arg(width)
+            .arg(height).arg(player->GetFrameRate()).arg(commDetectMethod));
 
     if ((width * height) > 1000000)
     {

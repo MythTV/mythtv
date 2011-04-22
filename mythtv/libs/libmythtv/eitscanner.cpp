@@ -118,7 +118,7 @@ void EITScanner::RunEventLoop(void)
         // seen any in a while, tell scheduler to run.
         if (eitCount && (t.elapsed() > 60 * 1000))
         {
-            VERBOSE(VB_EIT, LOC_ID + "Added "<<eitCount<<" EIT Events");
+            VERBOSE(VB_EIT, LOC_ID + QString("Added %1 EIT Events").arg(eitCount));
             eitCount = 0;
             RescheduleRecordings();
         }
@@ -128,7 +128,7 @@ void EITScanner::RunEventLoop(void)
             // if there have been any new events, tell scheduler to run.
             if (eitCount)
             {
-                VERBOSE(VB_EIT, LOC_ID + "Added "<<eitCount<<" EIT Events");
+                VERBOSE(VB_EIT, LOC_ID + QString("Added %1 EIT Events").arg(eitCount));
                 eitCount = 0;
                 RescheduleRecordings();
             }

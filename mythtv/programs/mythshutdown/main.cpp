@@ -334,7 +334,7 @@ static int getStatus(bool bWantRecStatus)
         res = 255;
     }
 
-    VERBOSE(VB_GENERAL, "Mythshutdown: --status returned: " << res);
+    VERBOSE(VB_GENERAL, QString("Mythshutdown: --status returned: %1").arg(res));
 
     return res;
 }
@@ -359,7 +359,7 @@ static int checkOKShutdown(bool bWantRecStatus)
         res = 0;
     }
 
-    VERBOSE(VB_GENERAL, "Mythshutdown: --check returned: " << res);
+    VERBOSE(VB_GENERAL, QString("Mythshutdown: --check returned: %1").arg(res));
 
     return res;
 }
@@ -369,7 +369,7 @@ static int setWakeupTime(QString sWakeupTime)
     VERBOSE(VB_GENERAL, "Mythshutdown: --setwakeup");
 
     VERBOSE(VB_IMPORTANT,
-            "Mythshutdown: wakeup time given is: " << sWakeupTime);
+            QString("Mythshutdown: wakeup time given is: %1").arg(sWakeupTime));
 
     // check time given is valid
     QDateTime dtWakeupTime;
@@ -470,7 +470,7 @@ static int shutdown()
     {
         if (dtCurrent < dtPeriod1Start)
         {
-            VERBOSE(VB_IMPORTANT, "daily wakeup today at " <<
+            VERBOSE(VB_IMPORTANT, "daily wakeup today at " +
                         dtPeriod1Start.toString("hh:mm:ss"));
             dtNextDailyWakeup = dtPeriod1Start;
         }
@@ -481,7 +481,7 @@ static int shutdown()
     {
         if (dtCurrent < dtPeriod2Start)
         {
-            VERBOSE(VB_IMPORTANT, "daily wakeup today at " <<
+            VERBOSE(VB_IMPORTANT, "daily wakeup today at " +
                         dtPeriod2Start.toString("hh:mm:ss"));
             dtNextDailyWakeup = dtPeriod2Start;
         }
@@ -501,7 +501,7 @@ static int shutdown()
         {
             dtNextDailyWakeup = dtNextDailyWakeup.addDays(1);
 
-            VERBOSE(VB_IMPORTANT, "next daily wakeup is tomorrow at " <<
+            VERBOSE(VB_IMPORTANT, "next daily wakeup is tomorrow at " +
                         dtNextDailyWakeup.toString("hh:mm:ss"));
         }
     }
@@ -519,7 +519,7 @@ static int shutdown()
     if (!dtNextRecordingStart.isValid())
         VERBOSE(VB_IMPORTANT,"no recording time is set");
     else
-        VERBOSE(VB_IMPORTANT, "recording scheduled at: " <<
+        VERBOSE(VB_IMPORTANT, "recording scheduled at: " +
                     dtNextRecordingStart.toString(Qt::ISODate));
 
     // check if scheduled recording time has already passed
@@ -720,12 +720,12 @@ static int startup()
     }
 
     if (res)
-        VERBOSE(VB_IMPORTANT, "looks like we were started manually" << res);
+        VERBOSE(VB_IMPORTANT, QString("looks like we were started manually: %1").arg(res));
     else
-        VERBOSE(VB_IMPORTANT, "looks like we were started automatically" << res);
+        VERBOSE(VB_IMPORTANT, QString("looks like we were started automatically: %1").arg(res));
 
 
-    VERBOSE(VB_GENERAL, "Mythshutdown: --startup returned: " << res);
+    VERBOSE(VB_GENERAL, QString("Mythshutdown: --startup returned: %1").arg(res));
 
     return res;
 }

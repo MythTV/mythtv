@@ -604,16 +604,15 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
 
     if (video_cnt < _pmt_single_program_num_video)
     {
-        VERBOSE(VB_RECORD, "Only "<<video_cnt<<" video streams seen in PMT, "
-                "but "<<_pmt_single_program_num_video<<" are required.");
+        VERBOSE(VB_RECORD, QString("Only %1 video streams seen in PMT, "
+                "but %2 are required.").arg(video_cnt).arg(_pmt_single_program_num_video));
         return false;
     }
 
     if (audioPIDs.size() < _pmt_single_program_num_audio)
     {
-        VERBOSE(VB_RECORD, "Only "<<audioPIDs.size()
-                <<" audio streams seen in PMT, but "
-                <<_pmt_single_program_num_audio<<" are required.");
+        VERBOSE(VB_RECORD, QString("Only %1 audio streams seen in PMT, but %2"
+                " are required.").arg(audioPIDs.size()).arg(_pmt_single_program_num_audio));
         return false;
     }
 

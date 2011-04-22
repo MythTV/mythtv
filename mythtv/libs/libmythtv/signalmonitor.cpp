@@ -47,7 +47,7 @@ extern "C" {
 
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
-    "SM("<<channel->GetDevice()<<")::"<<FUNC<<": "<<MSG);
+    QString("SM(%1)::%2: %3").arg(channel->GetDevice()).arg(FUNC).arg(MSG))
 
 /** \class SignalMonitor
  *  \brief Signal monitoring base class.

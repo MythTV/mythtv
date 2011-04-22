@@ -373,8 +373,8 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
 
     if ((winw != conf.width) || (winh != conf.height))
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "Window size mismatch "
-                <<QString("%1x%2 -> %3x%4")
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Window size mismatch " +
+                QString("%1x%2 -> %3x%4")
                 .arg(winw).arg(winh).arg(conf.width).arg(conf.height));
     }
 
@@ -722,7 +722,8 @@ void VideoOutputDirectfb::PrepareFrame(VideoFrame *frame, FrameScanType,
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "Unknown Pixel Format: 0x"<<hex<<fmt<<dec);
+        VERBOSE(VB_IMPORTANT, QString("Unknown Pixel Format: 0x%1")
+                .arg(fmt,0,16));
     }
 
     if ((DSPF_YV12 == fmt) || (DSPF_I420 == fmt))

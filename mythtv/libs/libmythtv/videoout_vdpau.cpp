@@ -958,7 +958,7 @@ void VideoOutputVDPAU::DiscardFrame(VideoFrame *frame)
 void VideoOutputVDPAU::DiscardFrames(bool next_frame_keyframe)
 {
     m_lock.lock();
-    VERBOSE(VB_PLAYBACK, LOC + "DiscardFrames("<<next_frame_keyframe<<")");
+    VERBOSE(VB_PLAYBACK, LOC + QString("DiscardFrames(%1)").arg(next_frame_keyframe));
     CheckFrameStates();
     ClearReferenceFrames();
     vbuffers.DiscardFrames(next_frame_keyframe);

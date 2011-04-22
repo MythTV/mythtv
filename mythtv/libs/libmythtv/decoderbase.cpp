@@ -289,9 +289,9 @@ unsigned long DecoderBase::GetPositionMapSize(void) const
  */
 bool DecoderBase::SyncPositionMap(void)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "Resyncing position map. posmapStarted = "
-            << (int) posmapStarted << " livetv(" << livetv << ") "
-            << "watchingRec(" << watchingrecording << ")");
+    VERBOSE(VB_PLAYBACK, LOC + QString("Resyncing position map. posmapStarted = %1"
+            " livetv(%2) watchingRec(%3)")
+            .arg((int) posmapStarted).arg(livetv).arg(watchingrecording));
 
     if (dontSyncPositionMap)
         return false;

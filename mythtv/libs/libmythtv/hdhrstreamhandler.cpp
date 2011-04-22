@@ -126,17 +126,20 @@ HDHRStreamHandler::~HDHRStreamHandler()
 
 void HDHRStreamHandler::AddListener(MPEGStreamData *data)
 {
-    VERBOSE(VB_RECORD, LOC + "AddListener("<<data<<") -- begin");
+    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- begin")
+                       .arg((uint64_t)data,0,16));
     if (!data)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "AddListener("<<data<<") -- null data");
+                QString("AddListener(0x%1) -- null data")
+                .arg((uint64_t)data,0,16));
         return;
     }
 
     _listener_lock.lock();
 
-    VERBOSE(VB_RECORD, LOC + "AddListener("<<data<<") -- locked");
+    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- locked")
+                       .arg((uint64_t)data,0,16));
 
     _stream_data_list.push_back(data);
 
@@ -144,22 +147,26 @@ void HDHRStreamHandler::AddListener(MPEGStreamData *data)
 
     Start();
 
-    VERBOSE(VB_RECORD, LOC + "AddListener("<<data<<") -- end");
+    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- end")
+                       .arg((uint64_t)data,0,16));
 }
 
 void HDHRStreamHandler::RemoveListener(MPEGStreamData *data)
 {
-    VERBOSE(VB_RECORD, LOC + "RemoveListener("<<data<<") -- begin");
+    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- begin")
+                       .arg((uint64_t)data,0,16));
     if (!data)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "RemoveListener("<<data<<") -- null data");
+                QString("RemoveListener(0x%1) -- null data")
+                .arg((uint64_t)data,0,16));
         return;
     }
 
     _listener_lock.lock();
 
-    VERBOSE(VB_RECORD, LOC + "RemoveListener("<<data<<") -- locked");
+    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- locked")
+                       .arg((uint64_t)data,0,16));
 
     vector<MPEGStreamData*>::iterator it =
         find(_stream_data_list.begin(), _stream_data_list.end(), data);
@@ -177,7 +184,8 @@ void HDHRStreamHandler::RemoveListener(MPEGStreamData *data)
         _listener_lock.unlock();
     }
 
-    VERBOSE(VB_RECORD, LOC + "RemoveListener("<<data<<") -- end");
+    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- end")
+                       .arg((uint64_t)data,0,16));
 }
 
 void HDHRReadThread::run(void)

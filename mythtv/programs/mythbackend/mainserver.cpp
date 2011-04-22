@@ -3660,7 +3660,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     else if (command == "CANCEL_NEXT_RECORDING")
     {
         QString cancel = slist[2];
-        VERBOSE(VB_IMPORTANT, "Received: CANCEL_NEXT_RECORDING "<<cancel);
+        VERBOSE(VB_IMPORTANT, QString("Received: CANCEL_NEXT_RECORDING %1").arg(cancel));
         enc->CancelNextRecording(cancel == "1");
         retlist << "ok";
     }
@@ -5193,8 +5193,8 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     if (has_extra_data)
     {
-        VERBOSE(VB_PLAYBACK, "HandleGenPreviewPixmap got extra data\n\t\t\t"
-                << QString("%1%2 %3x%4 '%5'")
+        VERBOSE(VB_PLAYBACK, QString("HandleGenPreviewPixmap got extra data\n\t\t\t"
+                "%1%2 %3x%4 '%5'")
                 .arg(time).arg(time_fmt_sec?"s":"f")
                 .arg(width).arg(height).arg(outputfile));
     }
@@ -5855,15 +5855,15 @@ QString MainServer::LocalFilePath(const QUrl &url, const QString &wantgroup)
             {
                 lpath = tmpFile;
                 VERBOSE(VB_FILE,
-                        QString("LocalFilePath(%1 '%2')")
-                        .arg(url.toString()).arg(opath)
-                        <<", found file through exhaustive search "
-                        <<QString("at '%1'").arg(lpath));
+                        QString("LocalFilePath(%1 '%2')"
+                        ", found file through exhaustive search "
+                        "at '%3'")
+                        .arg(url.toString()).arg(opath).arg(lpath));
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, "ERROR: LocalFilePath "
-                        <<QString("unable to find local path for '%1'.")
+                VERBOSE(VB_IMPORTANT, QString("ERROR: LocalFilePath "
+                        "unable to find local path for '%1'.")
                         .arg(opath));
                 lpath = "";
             }

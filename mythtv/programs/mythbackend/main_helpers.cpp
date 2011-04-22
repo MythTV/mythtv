@@ -54,6 +54,7 @@
 
 #include "mediaserver.h"
 #include "httpstatus.h"
+#include "mythlogging.h"
 
 #define LOC      QString("MythBackend: ")
 #define LOC_WARN QString("MythBackend, Warning: ")
@@ -194,7 +195,7 @@ bool setupTVs(bool ismaster, bool &error)
                 }
                 else
                 {
-                    VERBOSE(VB_IMPORTANT, "Problem with capture cards",
+                    VERBOSE(VB_IMPORTANT, "Problem with capture cards" +
                             cidmsg + "failed init");
                     delete tv;
                 }

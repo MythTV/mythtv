@@ -278,10 +278,10 @@ bool PreviewGenerator::Run(void)
             else
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR + "Preview process not ok." +
-                        QString("\n\t\t\tfileinfo(%1)").arg(outname)
-                        <<" exists: "<<fi.exists()
-                        <<" readable: "<<fi.isReadable()
-                        <<" size: "<<fi.size());
+                        QString("\n\t\t\tfileinfo(%1)").arg(outname) +
+                        QString(" exists: %1").arg(fi.exists()) +
+                        QString(" readable: %1").arg(fi.isReadable()) +
+                        QString(" size: %1").arg(fi.size()));
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
                         QString("Despite command '%1' returning success")
                         .arg(command));
@@ -368,7 +368,7 @@ bool PreviewGenerator::RemotePreviewRun(void)
         else if (strlist.size() > 1)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Remote Preview failed, reason given: " <<strlist[1]);
+                    "Remote Preview failed, reason given: " + strlist[1]);
         }
 
         gCoreContext->removeListener(this);

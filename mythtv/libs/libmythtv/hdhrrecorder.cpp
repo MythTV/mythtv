@@ -179,7 +179,7 @@ void HDHRRecorder::HandlePMT(uint progNum, const ProgramMapTable *_pmt)
 
     if ((int)progNum == _stream_data->DesiredProgram())
     {
-        VERBOSE(VB_RECORD, LOC + "SetPMT("<<progNum<<")");
+        VERBOSE(VB_RECORD, LOC + QString("SetPMT(%1)").arg(progNum));
         ProgramMapTable *oldpmt = _input_pmt;
         _input_pmt = new ProgramMapTable(*_pmt);
 

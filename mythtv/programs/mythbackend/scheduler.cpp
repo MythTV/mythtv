@@ -1673,8 +1673,9 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
         rctv = (*m_tvList)[cardids[i]];
         if (!rctv)
         {
-            VERBOSE(VB_SCHEDULE, LOC_ERR + "IsBusyRecording() -> true, "
-                    "rctv("<<rctv<<"==NULL) for card "<<cardids[i]);
+            VERBOSE(VB_SCHEDULE, 
+                    QString(LOC_ERR + "IsBusyRecording() -> true, "
+                    "rctv(NULL) for card %2").arg(i));
 
             return true;
         }
@@ -2118,7 +2119,7 @@ void Scheduler::RunScheduler(void)
                       .arg(nextRecording->GetCardID())
                       .arg(nextRecording->GetSourceID());
                 QByteArray amsg = msg.toLocal8Bit();
-                VERBOSE(VB_GENERAL, msg.constData());
+                VERBOSE(VB_GENERAL, amsg.constData());
 
                 nextRecording->SetRecordingStatus(rsTunerBusy);
                 nextRecording->AddHistory(false);

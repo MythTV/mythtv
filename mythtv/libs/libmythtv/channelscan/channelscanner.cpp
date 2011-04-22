@@ -139,7 +139,8 @@ void ChannelScanner::Scan(
         (ScanTypeSetting::FullScan_Analog == scantype))
     {
         VERBOSE(VB_CHANSCAN, LOC +
-                "ScanTransports("<<freq_std<<", "<<mod<<", "<<tbl<<")");
+                QString("ScanTransports(%1, %2, %3)")
+                .arg(freq_std).arg(mod).arg(tbl));
 
         // HACK HACK HACK -- begin
         // if using QAM we may need additional time... (at least with HD-3000)
@@ -166,7 +167,8 @@ void ChannelScanner::Scan(
     }
     else if (ScanTypeSetting::FullTransportScan == scantype)
     {
-        VERBOSE(VB_CHANSCAN, LOC + "ScanExistingTransports("<<sourceid<<")");
+        VERBOSE(VB_CHANSCAN, LOC + QString("ScanExistingTransports(%1)")
+                .arg(sourceid));
 
         ok = sigmonScanner->ScanExistingTransports(sourceid, do_follow_nit);
         if (ok)
@@ -183,7 +185,7 @@ void ChannelScanner::Scan(
     {
         ok = true;
 
-        VERBOSE(VB_CHANSCAN, LOC + "ScanForChannels("<<sourceid<<")");
+        VERBOSE(VB_CHANSCAN, LOC + QString("ScanForChannels(%1)").arg(sourceid));
 
         QString card_type = CardUtil::GetRawCardType(cardid);
         QString sub_type  = card_type;
@@ -213,7 +215,7 @@ void ChannelScanner::Scan(
     }
     else if (ScanTypeSetting::TransportScan == scantype)
     {
-        VERBOSE(VB_CHANSCAN, LOC + "ScanTransport("<<mplexid<<")");
+        VERBOSE(VB_CHANSCAN, LOC + QString("ScanTransport(%1)").arg(mplexid));
 
         ok = sigmonScanner->ScanTransport(mplexid, do_follow_nit);
     }

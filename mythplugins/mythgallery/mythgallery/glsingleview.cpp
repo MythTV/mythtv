@@ -626,7 +626,7 @@ void GLSingleView::Load(void)
     ThumbItem *item = m_itemList.at(m_pos);
     if (!item)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "No item at "<<m_pos);
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("No item at %1").arg(m_pos));
         return;
     }
 
@@ -1535,7 +1535,7 @@ void KenBurnsImageLoader::run()
     ThumbItem *item = m_itemList.at(m_pos);
     if (!item)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "No item at "<<m_pos);
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("No item at %1").arg(m_pos));
         return;
     }
     QImage image(item->GetPath());

@@ -130,7 +130,7 @@ void WelcomeDialog::checkAutoStart(void)
     QString mythshutdown_exe = m_installDir + "/bin/mythshutdown --startup";
     uint state = myth_system(mythshutdown_exe);
 
-    VERBOSE(VB_GENERAL, "mythshutdown --startup returned: " << state);
+    VERBOSE(VB_GENERAL, QString("mythshutdown --startup returned: %1").arg(state));
 
     bool bAutoStartFrontend = gCoreContext->GetNumSetting("AutoStartFrontend", 1);
 

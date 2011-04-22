@@ -171,7 +171,7 @@ bool FirewireRecorder::PauseAndWait(int timeout)
 {
     if (request_pause)
     {
-        VERBOSE(VB_RECORD, LOC + "PauseAndWait("<<timeout<<") -- pause");
+        VERBOSE(VB_RECORD, LOC + QString("PauseAndWait(%1) -- pause").arg(timeout));
         if (!paused)
         {
             StopStreaming();
@@ -186,7 +186,7 @@ bool FirewireRecorder::PauseAndWait(int timeout)
     }
     if (!request_pause && paused)
     {
-        VERBOSE(VB_RECORD, LOC + "PauseAndWait("<<timeout<<") -- unpause");
+        VERBOSE(VB_RECORD, LOC + QString("PauseAndWait(%1) -- unpause").arg(timeout));
         StartStreaming();
         paused = false;
     }

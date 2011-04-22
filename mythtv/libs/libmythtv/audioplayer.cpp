@@ -274,17 +274,17 @@ bool AudioPlayer::SetMuted(bool mute)
     if (m_audioOutput && !m_no_audio_out && !is_muted && mute &&
         (kMuteAll == SetMuteState(kMuteAll)))
     {
-        VERBOSE(VB_AUDIO, "muting sound " <<IsMuted());
+        VERBOSE(VB_AUDIO, QString("muting sound %1").arg(IsMuted()));
         return true;
     }
     else if (m_audioOutput && !m_no_audio_out && is_muted && !mute &&
              (kMuteOff == SetMuteState(kMuteOff)))
     {
-        VERBOSE(VB_AUDIO, "unmuting sound "<<IsMuted());
+        VERBOSE(VB_AUDIO, QString("unmuting sound %1").arg(IsMuted()));
         return true;
     }
 
-    VERBOSE(VB_AUDIO, "not changing sound mute state "<<IsMuted());
+    VERBOSE(VB_AUDIO, QString("not changing sound mute state %1").arg(IsMuted()));
 
     return false;
 }

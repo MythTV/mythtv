@@ -353,8 +353,8 @@ void DVBCam::SendPMT(const ProgramMapTable &pmt, uint cplm)
             continue;
         }
 
-        VERBOSE(VB_DVBCAM, LOC + "Creating CA_PMT, ServiceID = "
-                << pmt.ProgramNumber());
+        VERBOSE(VB_DVBCAM, LOC + QString("Creating CA_PMT, ServiceID = %1")
+                .arg(pmt.ProgramNumber()));
 
         cCiCaPmt capmt = CreateCAPMT(pmt, casids, cplm);
 

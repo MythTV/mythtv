@@ -2763,14 +2763,14 @@ void NuppelVideoRecorder::doVbiThread(void)
             cc_close(ntsc_cc);
             return;
         }
-        VERBOSE(VB_RECORD, LOC + "vbi_format  rate: "<<vfmt.sampling_rate
-                <<"\n\t\t\tsamples_per_line: "<<vfmt.samples_per_line
-                <<"\n\t\t\t          starts: "
-                <<vfmt.start[0]<<", "<<vfmt.start[1]
-                <<"\n\t\t\t          counts: "
-                <<vfmt.count[0]<<", "<<vfmt.count[1]
-                <<"\n\t\t\t           flags: "
-                <<QString("0x%1").arg(vfmt.flags));
+        VERBOSE(VB_RECORD, LOC + 
+                QString("vbi_format  rate: %1").arg(vfmt.sampling_rate) +
+                QString("\n\t\t\tsamples_per_line: %1").arg(vfmt.samples_per_line) +
+                QString("\n\t\t\t          starts: %1, %2").arg(vfmt.start[0])
+                .arg(vfmt.start[1]) +
+                QString("\n\t\t\t          counts: %1, %2").arg(vfmt.count[0])
+                .arg(vfmt.count[1]) +
+                QString("n\t\t\t           flags: 0x%1").arg(vfmt.flags,0,16));
         uint sz = vfmt.samples_per_line * (vfmt.count[0] + vfmt.count[1]);
         ntsc_cc->samples_per_line = vfmt.samples_per_line;
         ntsc_cc->start_line       = vfmt.start[0];

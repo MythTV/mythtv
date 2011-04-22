@@ -45,7 +45,7 @@ bool IPTVRecorder::Open(void)
     _error = (!chaninfo.isValid() ||
               !_channel->GetFeeder()->Open(chaninfo.m_url));
 
-    VERBOSE(VB_RECORD, LOC + "Open() -- end err("<<_error<<")");
+    VERBOSE(VB_RECORD, LOC + QString("Open() -- end err(%1)").arg(_error));
     return !_error;
 }
 

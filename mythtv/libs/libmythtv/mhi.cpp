@@ -432,8 +432,8 @@ bool MHIContext::OfferKey(QString key)
     if (action != 0)
     {
         m_keyQueue.enqueue(action);
-        VERBOSE(VB_IMPORTANT, "Adding MHEG key "<<key<<":"<<action
-                <<":"<<m_keyQueue.size());
+        VERBOSE(VB_IMPORTANT, QString("Adding MHEG key %1:%2:%3").arg(key)
+                .arg(action).arg(m_keyQueue.size()));
         m_engine_wait.wakeAll();
         return true;
     }

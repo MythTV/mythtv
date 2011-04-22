@@ -93,9 +93,6 @@ int main(int argc, char *argv[])
 
     MythTranslation::load("mythfrontend");
 
-    gCoreContext->LogEntry("mythfillnetvision", LP_INFO,
-                       "Online Source Listing Download Started", "");
-
     if (refreshtree)
     {
         QEventLoop treeloop;

@@ -427,7 +427,8 @@ bool DTVRecorder::FindOtherKeyframes(const TSPacket *tspacket)
 // documented in recorderbase.h
 void DTVRecorder::SetNextRecording(const ProgramInfo *progInf, RingBuffer *rb)
 {
-    VERBOSE(VB_RECORD, LOC + "SetNextRecord("<<progInf<<", "<<rb<<")");
+    VERBOSE(VB_RECORD, LOC + QString("SetNextRecord(0x%1, 0x%2)")
+            .arg((uint64_t)progInf,0,16).arg((uint64_t)rb,0,16));
     // First we do some of the time consuming stuff we can do now
     SavePositionMap(true);
     if (ringBuffer)

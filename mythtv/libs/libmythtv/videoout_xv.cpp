@@ -464,7 +464,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
                 ret = XvGrabPort(disp->GetDisplay(), p, CurrentTime);
                 if (Success == ret)
                 {
-                    VERBOSE(VB_PLAYBACK,  LOC + "Grabbed xv port "<<p);
+                    VERBOSE(VB_PLAYBACK,  LOC + QString("Grabbed xv port %1").arg(p));
                     port = p;
                     xvsetdefaults = add_open_xv_port(disp, p);
                 }
@@ -784,7 +784,7 @@ bool VideoOutputXv::InitOSD(void)
 do { \
     if (test) \
     { \
-        VERBOSE(VB_IMPORTANT, LOC_ERR + msg << " Exiting playback."); \
+        VERBOSE(VB_IMPORTANT, LOC_ERR + msg + " Exiting playback."); \
         errorState = kError_Unknown; \
         return false; \
     } \
@@ -811,8 +811,8 @@ bool VideoOutputXv::InitSetupBuffers(void)
     QString     renderer  = QString::null;
 
     QString tmp = db_vdisp_profile->GetVideoRenderer();
-    VERBOSE(VB_PLAYBACK, LOC + "InitSetupBuffers() "
-            <<QString("render: %1, allowed: %2")
+    VERBOSE(VB_PLAYBACK, LOC + "InitSetupBuffers() " +
+            QString("render: %1, allowed: %2")
             .arg(tmp).arg(toCommaList(renderers)));
 
     if (renderers.contains(tmp))
@@ -888,11 +888,11 @@ bool VideoOutputXv::Init(
     VERBOSE(VB_PLAYBACK, LOC + "Creating gc");
     XV_INIT_FATAL_ERROR_TEST(!disp->CreateGC(XJ_win), "Failed to create GC.");
 
-    VERBOSE(VB_PLAYBACK, LOC + "XJ_screen_num: '"<<disp->GetScreen()<<"'");
-    VERBOSE(VB_PLAYBACK, LOC + "XJ_curwin:     '"<<XJ_curwin<<"'");
-    VERBOSE(VB_PLAYBACK, LOC + "XJ_win:        '"<<XJ_win<<"'");
-    VERBOSE(VB_PLAYBACK, LOC + "XJ_root:       '"<<disp->GetRoot()<<"'");
-    VERBOSE(VB_PLAYBACK, LOC + "XJ_gc:         '"<<disp->GetGC()<<"'");
+    VERBOSE(VB_PLAYBACK, LOC + QString("XJ_screen_num: '%1'").arg(disp->GetScreen()));
+    VERBOSE(VB_PLAYBACK, LOC + QString("XJ_curwin:     '%1'").arg(XJ_curwin));
+    VERBOSE(VB_PLAYBACK, LOC + QString("XJ_win:        '%1'").arg(XJ_win));
+    VERBOSE(VB_PLAYBACK, LOC + QString("XJ_root:       '%1'").arg(disp->GetRoot()));
+    VERBOSE(VB_PLAYBACK, LOC + QString("XJ_gc:         '0x%1'").arg((uint64_t)disp->GetGC(),0,16));
 
     // The letterbox color..
     XJ_letterbox_colour = disp->GetBlack();
@@ -1221,12 +1221,14 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
 
             if (!XJ_non_xv_image)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "XCreateImage failed: "
-                        <<"XJ_disp("<<d<<") visual("<<visual<<") "<<endl
-                        <<"                        "
-                        <<"depth("<<disp->GetDepth()<<") "
-                        <<"WxH("<<display_visible_rect.width()
-                        <<"x"<<display_visible_rect.height()<<") ");
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "XCreateImage failed: " +
+                        QString("XJ_disp(0x%1) visual(0x%2) \n")
+                        .arg((uint64_t)d,0,16).arg((uint64_t)visual,0,16) +
+                        QString("                        ") +
+                        QString("depth(%1) ").arg(disp->GetDepth()) +
+                        QString("WxH(%1""x%2) ")
+                        .arg(display_visible_rect.width())
+                        .arg(display_visible_rect.height()));
                 return false;
             }
             bytes_per_line = XJ_non_xv_image->bytes_per_line;
@@ -1358,7 +1360,7 @@ void VideoOutputXv::ClearAfterSeek(void)
 
 void VideoOutputXv::DiscardFrames(bool next_frame_keyframe)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "DiscardFrames("<<next_frame_keyframe<<")");
+    VERBOSE(VB_PLAYBACK, LOC + QString("DiscardFrames(%1)").arg(next_frame_keyframe));
     if (VideoOutputSubType() <= XVideo)
     {
         vbuffers.DiscardFrames(next_frame_keyframe);
@@ -1417,14 +1419,13 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
         if (non_xv_fps < 25)
         {
             non_xv_show_frame = 120 / non_xv_frames_shown + 1;
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "\n"
-                    "***\n"
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("\n***\n"
                     "* Your system is not capable of displaying the\n"
-                    "* full framerate at "
-                    <<display_visible_rect.width()<<"x"
-                    <<display_visible_rect.height()<<" resolution.  Frames\n"
+                    "* full framerate at %1""x%2 resolution.  Frames\n"
                     "* will be skipped in order to keep the audio and\n"
-                    "* video in sync.\n");
+                    "* video in sync.\n").arg(display_visible_rect.width())
+                    .arg(display_visible_rect.height()));
         }
     }
 

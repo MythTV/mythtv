@@ -241,7 +241,7 @@ void DVBRecorder::HandlePMT(uint progNum, const ProgramMapTable *_pmt)
 
     if ((int)progNum == _stream_data->DesiredProgram())
     {
-        VERBOSE(VB_RECORD, LOC + "SetPMT("<<progNum<<")");
+        VERBOSE(VB_RECORD, LOC + QString("SetPMT(%1)").arg(progNum));
         ProgramMapTable *oldpmt = _input_pmt;
         _input_pmt = new ProgramMapTable(*_pmt);
 
@@ -295,11 +295,11 @@ bool DVBRecorder::Open(void)
 
 void DVBRecorder::Close(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Close() fd("<<_stream_fd<<") -- begin");
+    VERBOSE(VB_RECORD, LOC + QString("Close() fd(%1) -- begin").arg(_stream_fd));
 
     DVBStreamHandler::Return(_stream_handler);
 
-    VERBOSE(VB_RECORD, LOC + "Close() fd("<<_stream_fd<<") -- end");
+    VERBOSE(VB_RECORD, LOC + QString("Close() fd(%1) -- end").arg(_stream_fd));
 }
 
 void DVBRecorder::SetStreamData(void)

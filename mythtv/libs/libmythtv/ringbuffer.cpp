@@ -393,12 +393,12 @@ bool RingBuffer::IsNearEnd(double fps, uint vvf) const
 
     bool near_end = ((vvf + readahead_frames) < 10.0) || (sz < rbs*1.5);
 
-    VERBOSE(VB_PLAYBACK, LOC + "IsReallyNearEnd()"
-            <<" br("<<(kbits_per_sec/8)<<"KB)"
-            <<" sz("<<(sz / 1000)<<"KB)"
-            <<" vfl("<<vvf<<")"
-            <<" frh("<<((uint)readahead_frames)<<")"
-            <<" ne:"<<near_end);
+    VERBOSE(VB_PLAYBACK, LOC + "IsReallyNearEnd()" +
+            QString(" br(%1KB)").arg(kbits_per_sec/8) +
+            QString(" sz(%1KB)").arg(sz / 1000) +
+            QString(" vfl(%1)").arg(vvf) +
+            QString(" frh(%1)").arg(((uint)readahead_frames)) +
+            QString(" ne:%1").arg(near_end));
 
     return near_end;
 }

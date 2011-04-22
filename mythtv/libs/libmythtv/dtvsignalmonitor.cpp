@@ -11,7 +11,7 @@
 
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
-    "DTVSM("<<channel->GetDevice()<<")::"<<FUNC<<": "<<MSG);
+    QString("DTVSM(%1)::%2: %3").arg(channel->GetDevice()).arg(FUNC).arg(MSG))
 
 #define LOC QString("DTVSM(%1): ").arg(channel->GetDevice())
 #define LOC_ERR QString("DTVSM(%1) Error: ").arg(channel->GetDevice())
@@ -90,8 +90,9 @@ QStringList DTVSignalMonitor::GetStatusList(bool kick)
         if ((seenGood != (int)seenPMT.IsGood()) ||
             (matchingGood != (int)matchingPMT.IsGood()))
         {
-            DBG_SM("GetStatusList", "WaitForPMT seen("<<seenPMT.IsGood()
-                   <<") matching("<<matchingPMT.IsGood()<<")");
+            DBG_SM("GetStatusList", QString("WaitForPMT seen(%1) matching(%2)")
+		                    .arg(seenPMT.IsGood())
+                                    .arg(matchingPMT.IsGood()));
             seenGood = (int)seenPMT.IsGood();
             matchingGood = (int)matchingPMT.IsGood();
         }
@@ -307,7 +308,7 @@ void DTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
             last_pat_crc = pat->CRC();
             QString errStr = QString("Program #%1 not found in PAT!")
                 .arg(programNumber);
-            VERBOSE(VB_IMPORTANT, errStr<<endl<<pat->toString());
+            VERBOSE(VB_IMPORTANT, errStr + "\n" + pat->toString());
         }
         if (pat->ProgramCount() == 1)
         {
@@ -370,7 +371,8 @@ void DTVSignalMonitor::HandlePMT(uint, const ProgramMapTable *pmt)
 
 void DTVSignalMonitor::HandleSTT(const SystemTimeTable*)
 {
-    VERBOSE(VB_CHANNEL, LOC + "Time Offset: "<<GetStreamData()->TimeOffset());
+    VERBOSE(VB_CHANNEL, LOC + QString("Time Offset: %1")
+            .arg(GetStreamData()->TimeOffset()));
 }
 
 void DTVSignalMonitor::HandleMGT(const MasterGuideTable* mgt)
@@ -402,9 +404,9 @@ void DTVSignalMonitor::HandleTVCT(
 
     if (idx < 0)
     {
-        VERBOSE(VB_IMPORTANT, "Could not find channel "
-                <<majorChannel<<"_"<<minorChannel<<" in TVCT");
-        VERBOSE(VB_IMPORTANT, endl<<tvct->toString());
+        VERBOSE(VB_IMPORTANT, QString("Could not find channel %1_%2 in TVCT")
+                .arg(majorChannel).arg(minorChannel));
+        VERBOSE(VB_IMPORTANT, "\n" + tvct->toString());
         GetATSCStreamData()->SetVersionTVCT(tvct->TransportStreamID(),-1);
         return;
     }
@@ -423,9 +425,9 @@ void DTVSignalMonitor::HandleCVCT(uint, const CableVirtualChannelTable* cvct)
 
     if (idx < 0)
     {
-        VERBOSE(VB_IMPORTANT, "Could not find channel "
-                <<majorChannel<<"_"<<minorChannel<<" in CVCT");
-        VERBOSE(VB_IMPORTANT, endl<<cvct->toString());
+        VERBOSE(VB_IMPORTANT, QString("Could not find channel %1_%2 in CVCT")
+                .arg(majorChannel).arg(minorChannel));
+        VERBOSE(VB_IMPORTANT, "\n" + cvct->toString());
         GetATSCStreamData()->SetVersionCVCT(cvct->TransportStreamID(),-1);
         return;
     }
@@ -439,7 +441,8 @@ void DTVSignalMonitor::HandleCVCT(uint, const CableVirtualChannelTable* cvct)
 
 void DTVSignalMonitor::HandleTDT(const TimeDateTable*)
 {
-    VERBOSE(VB_CHANNEL, LOC + "Time Offset: "<<GetStreamData()->TimeOffset());
+    VERBOSE(VB_CHANNEL, LOC + QString("Time Offset: %1")
+            .arg(GetStreamData()->TimeOffset()));
 }
 
 void DTVSignalMonitor::HandleNIT(const NetworkInformationTable *nit)
