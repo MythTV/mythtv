@@ -44,6 +44,7 @@
 
 // Myth headers
 #include "mythverbose.h"
+#include "mythlogging.h"
 
 // Mythui headers
 #include "jsmenuevent.h"
@@ -208,6 +209,7 @@ void JoystickMenuThread::run(void)
     struct js_event js;
     struct timeval timeout;
 
+    threadRegister("JoystickMenu");
     while (!m_bStop)
     {
 
@@ -291,6 +293,7 @@ void JoystickMenuThread::run(void)
 
     }
 
+    threadDeregister();
 }
 
 /**

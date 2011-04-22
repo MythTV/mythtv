@@ -16,6 +16,7 @@
 #include "util.h"
 #include "mythdb.h"
 #include "mythverbose.h"
+#include "mythlogging.h"
 
 #define LOC QString("EITScanner: ")
 #define LOC_ID QString("EITScanner (%1): ").arg(cardnum)
@@ -27,7 +28,9 @@
  */
 void EITThread::run(void)
 {
+    threadRegister("EIT");
     scanner->RunEventLoop();
+    threadDeregister();
 }
 
 /** \class EITScanner

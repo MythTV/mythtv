@@ -27,6 +27,7 @@ using namespace std;
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythverbose.h"
+#include "mythlogging.h"
 
 // windows.h - avoid a conflict with Qt::ChildJobThread::SetJob
 #undef SetJob
@@ -162,7 +163,9 @@ void QueueProcessorThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister("QueueProcessor");
     m_parent->RunQueueProcessor();
+    threadDeregister();
 }
 
 void JobQueue::ProcessQueue(void)
@@ -1824,6 +1827,8 @@ void ChildJobThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister(QString("ChildJob%1").arg(m_id));
+
     switch (m_type) {
     case JOB_TRANSCODE:
         m_parent->DoTranscodeThread(m_id);
@@ -1837,6 +1842,8 @@ void ChildJobThread::run(void)
     }
 
     this->deleteLater();
+
+    threadDeregister();
 }
 
 void JobQueue::DoTranscodeThread(int jobID)

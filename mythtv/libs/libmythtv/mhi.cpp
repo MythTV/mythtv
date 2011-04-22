@@ -13,6 +13,7 @@
 #include "mythdirs.h"
 #include "mythverbose.h"
 #include "myth_imgconvert.h"
+#include "mythlogging.h"
 
 static bool       ft_loaded = false;
 static FT_Library ft_library;
@@ -207,7 +208,9 @@ void MHEGEngineThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister("MHEGEngine");
     m_parent->RunMHEGEngine();
+    threadDeregister();
 }
 
 void MHIContext::RunMHEGEngine(void)

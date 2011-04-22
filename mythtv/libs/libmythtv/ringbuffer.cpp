@@ -26,6 +26,7 @@
 #include "remotefile.h"
 #include "compat.h"
 #include "util.h"
+#include "mythlogging.h"
 
 #ifndef HAVE_POSIX_FADVISE
 static int posix_fadvise(int, off_t, off_t, int) { return 0; }
@@ -650,6 +651,7 @@ bool RingBuffer::PauseAndWait(void)
 
 void RingBuffer::run(void)
 {
+    threadRegister("RingBuffer");
     // These variables are used to adjust the read block size
     struct timeval lastread, now;
     int readtimeavg = 300;
@@ -880,6 +882,7 @@ void RingBuffer::run(void)
     rbwlock.unlock();
     rbrlock.unlock();
     rwlock.unlock();
+    threadDeregister();
 }
 
 long long RingBuffer::SetAdjustFilesize(void)

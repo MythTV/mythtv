@@ -28,6 +28,7 @@
 #include "mythevent.h"
 #include "mythverbose.h"
 #include "exitcodes.h"
+#include "mythlogging.h"
 
 // Windows headers
 #include <windows.h>
@@ -72,6 +73,7 @@ MythSystemIOHandler::MythSystemIOHandler(bool read) :
 
 void MythSystemIOHandler::run(void)
 {
+    threadRegister("SystemIOHandler");
     VERBOSE(VB_GENERAL|VB_SYSTEM, QString("Starting IO manager (%1)")
         .arg(m_read ? "read" : "write"));
 
@@ -115,6 +117,7 @@ void MythSystemIOHandler::run(void)
             }
         }
     }
+    threadDeregister();
 }
 
 bool MythSystemIOHandler::HandleRead(HANDLE h, QBuffer *buff)
@@ -217,6 +220,7 @@ MythSystemManager::~MythSystemManager()
 
 void MythSystemManager::run(void)
 {
+    threadRegister("SystemManager");
     VERBOSE(VB_GENERAL|VB_SYSTEM, "Starting process manager");
 
     // gCoreContext is set to NULL during shutdown, and we need this thread to
@@ -323,6 +327,7 @@ void MythSystemManager::run(void)
     // kick to allow them to close themselves cleanly
     readThread->wake();
     writeThread->wake();
+    threadDeregister();
 }
 
 // NOTE: This is only to be run while m_mapLock is locked!!!
@@ -394,6 +399,7 @@ MythSystemSignalManager::MythSystemSignalManager() : QThread()
 
 void MythSystemSignalManager::run(void)
 {
+    threadRegister("SystemSignalManager");
     VERBOSE(VB_GENERAL|VB_SYSTEM, "Starting process signal handler");
     while( gCoreContext )
     {
@@ -437,6 +443,7 @@ void MythSystemSignalManager::run(void)
                 delete ms;
         }
     }
+    threadDeregister();
 }
 
 /*******************************

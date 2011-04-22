@@ -1,5 +1,6 @@
 #include <QThreadPool>
 #include "mythcommflagplayer.h"
+#include "mythlogging.h"
 
 #define LOC_ERR QString("CommFlagPlayer err: ")
 
@@ -15,12 +16,14 @@ class RebuildSaver : public QRunnable
 
     virtual void run(void)
     {
+	threadRegister("RebuildSaver");
         m_decoder->SavePositionMapDelta(m_first, m_last);
 
         QMutexLocker locker(&s_lock);
         s_cnt[m_decoder]--;
         if (!s_cnt[m_decoder])
             s_wait.wakeAll();
+	threadDeregister();
     }
 
     static uint GetCount(DecoderBase *d)

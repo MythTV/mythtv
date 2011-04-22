@@ -30,6 +30,7 @@ using namespace std;
 #include "mythcoreutil.h"
 #include "mythdownloadmanager.h"
 #include "mythversion.h"
+#include "mythlogging.h"
 
 HouseKeeper::HouseKeeper(bool runthread, bool master, Scheduler *lsched)
                         : threadrunning(runthread), filldbRunning(false),
@@ -295,7 +296,9 @@ void MFDThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister("MFD");
     m_parent->RunMFD();
+    threadDeregister();
 }
 
 void HouseKeeper::RunMFD(void)
@@ -658,7 +661,9 @@ void HKThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister("HouseKeeping");
     m_parent->RunHouseKeeping();
+    threadDeregister();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

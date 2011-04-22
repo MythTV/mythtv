@@ -35,15 +35,6 @@
 #include "mythdb.h"
 #include "tv_rec.h"
 
-/*
-#include "storagegroup.h"
-#include "programinfo.h"
-#include "dbcheck.h"
-#include "jobqueue.h"
-#include "mythcommandlineparser.h"
-#include "mythsystemevent.h"
-.r26134
-*/
 
 #define LOC      QString("MythBackend: ")
 #define LOC_WARN QString("MythBackend, Warning: ")

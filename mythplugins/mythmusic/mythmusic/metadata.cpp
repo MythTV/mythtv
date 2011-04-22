@@ -16,6 +16,7 @@
 #include "treebuilders.h"
 #include "playlist.h"
 #include "playlistcontainer.h"
+#include "mythlogging.h"
 
 
 // this is the global MusicData object shared thoughout MythMusic
@@ -949,9 +950,11 @@ MetadataLoadingThread::MetadataLoadingThread(AllMusic *parent_ptr)
 
 void MetadataLoadingThread::run()
 {
+    threadRegister("MetadataLoading");
     //if you want to simulate a big music collection load
     //sleep(3);
     parent->resync();
+    threadDeregister();
 }
 
 AllMusic::AllMusic(QString path_assignment, QString a_startdir)

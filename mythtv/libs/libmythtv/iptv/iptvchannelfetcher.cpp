@@ -16,6 +16,7 @@
 #include "channelutil.h"
 #include "iptvchannelfetcher.h"
 #include "scanmonitor.h"
+#include "mythlogging.h"
 
 #define LOC QString("IPTVChanFetch: ")
 #define LOC_ERR QString("IPTVChanFetch, Error: ")
@@ -35,7 +36,9 @@ static bool parse_extinf(const QString &data,
 */
 void IPTVChannelFetcherThread::run(void)
 {
+    threadRegister("IPTVChannelFetcher");
     iptvfetcher->RunScan();
+    threadDeregister();
 }
 
 IPTVChannelFetcher::IPTVChannelFetcher(

@@ -60,6 +60,7 @@ using namespace std;
 #include "mythpainter.h"
 #include "mythimage.h"
 #include "mythuiimage.h"
+#include "mythlogging.h"
 
 extern "C" {
 #include "vbitext/vbi.h"
@@ -94,9 +95,11 @@ void DecoderThread::run(void)
     if (!m_mp)
         return;
 
+    threadRegister("Decoder");
     VERBOSE(VB_PLAYBACK, LOC_DEC + QString("Decoder thread starting."));
     m_mp->DecoderLoop(m_start_paused);
     VERBOSE(VB_PLAYBACK, LOC_DEC + QString("Decoder thread exiting."));
+    threadDeregister();
 }
 
 static const int toCaptionType(int type)

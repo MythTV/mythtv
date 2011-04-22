@@ -24,6 +24,7 @@ using namespace std;
 #include "mythsocket.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
+#include "mythlogging.h"
 
 #include "mythversion.h"
 
@@ -87,6 +88,7 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_UIThread(QThread::currentThread()),
       m_locale(NULL)
 {
+    threadRegister("CoreContext");
 }
 
 MythCoreContextPrivate::~MythCoreContextPrivate()
@@ -109,6 +111,7 @@ MythCoreContextPrivate::~MythCoreContextPrivate()
         DestroyMythDB();
         m_database = NULL;
     }
+    threadDeregister();
 }
 
 /// If another thread has already started WOL process, wait on them...

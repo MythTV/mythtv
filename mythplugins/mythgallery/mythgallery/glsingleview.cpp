@@ -37,6 +37,7 @@ using namespace std;
 #include <mythcontext.h>
 #include <util.h>
 #include <mythuihelper.h>
+#include "mythlogging.h"
 
 // MythGallery headers
 #include "config.h"
@@ -1532,6 +1533,7 @@ void KenBurnsImageLoader::Initialize(int pos)
 
 void KenBurnsImageLoader::run() 
 {
+    threadRegister("KenBurnsImageLoader");
     ThumbItem *item = m_itemList.at(m_pos);
     if (!item)
     {
@@ -1544,5 +1546,5 @@ void KenBurnsImageLoader::run()
     
     m_singleView->LoadImage(QGLWidget::convertToGLFormat(image.scaled(m_texSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation)), image.size());   
     m_singleView->Ready();
-
+    threadDeregister();
 }

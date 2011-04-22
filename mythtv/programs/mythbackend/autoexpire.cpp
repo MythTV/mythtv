@@ -38,6 +38,7 @@ using namespace std;
 #include "backendutil.h"
 #include "mainserver.h"
 #include "compat.h"
+#include "mythlogging.h"
 
 #define LOC     QString("AutoExpire: ")
 #define LOC_ERR QString("AutoExpire Error: ")
@@ -52,13 +53,17 @@ extern AutoExpire *expirer;
 /// \brief This calls AutoExpire::RunExpirer() from within a new thread.
 void ExpireThread::run(void)
 {
+    threadRegister("Expire");
     m_parent->RunExpirer();
+    threadDeregister();
 }
 
 /// \brief This calls AutoExpire::RunUpdate() from within a new thread.
 void UpdateThread::run(void)
 {
+    threadRegister("Update");
     m_parent->RunUpdate();
+    threadDeregister();
 }
 
 /** \class AutoExpire

@@ -54,6 +54,7 @@ using namespace std;
 #include "dvbcam.h"
 #include "dvbchannel.h"
 #include "dvbrecorder.h"
+#include "mythlogging.h"
 
 #define LOC_ERR QString("DVB#%1 CA Error: ").arg(device)
 #define LOC QString("DVB#%1 CA: ").arg(device)
@@ -148,7 +149,9 @@ void CiHandlerThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister("CiHandler");
     m_parent->CiHandlerLoop();
+    threadDeregister();
 }
 
 void DVBCam::HandleUserIO(void)

@@ -41,6 +41,7 @@ using namespace std;
 #include "cardutil.h"
 #include "mythdb.h"
 #include "mythsystemevent.h"
+#include "mythlogging.h"
 
 #define LOC QString("Scheduler: ")
 #define LOC_WARN QString("Scheduler, Warning: ")
@@ -2761,7 +2762,9 @@ void ScheduleThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister("Schedule");
     m_parent->RunScheduler();
+    threadDeregister();
 }
 
 void Scheduler::UpdateManuals(int recordid)

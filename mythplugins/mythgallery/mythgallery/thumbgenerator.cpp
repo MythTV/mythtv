@@ -39,6 +39,7 @@
 #include "galleryutil.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
+#include "mythlogging.h"
 
 #ifdef EXIF_SUPPORT
 #include <libexif/exif-data.h>
@@ -94,7 +95,7 @@ void ThumbGenerator::cancel()
 
 void ThumbGenerator::run()
 {
-
+    threadRegister("ThumbGenerator");
     while (moreWork())
     {
 
@@ -179,6 +180,7 @@ void ThumbGenerator::run()
             }
         }
     }
+    threadDeregister();
 }
 
 bool ThumbGenerator::moreWork()

@@ -57,6 +57,7 @@ using namespace std;
 #include "videometadatautil.h"
 #include "mythdirs.h"
 #include "tvbrowsehelper.h"
+#include "mythlogging.h"
 
 #if ! HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
@@ -8935,10 +8936,12 @@ static void insert_map(InfoMap &infoMap, const InfoMap &newMap)
 
 void TVDDMapThread::run(void)
 {
+    threadRegister("TVDDMap");
     if (m_parent)
         m_parent->RunLoadDDMap(m_sourceid);
     else
         SourceUtil::UpdateChannelsFromListings(m_sourceid);
+    threadDeregister();
 }
 
 /** \fn TV::StartChannelEditMode(PlayerContext*)

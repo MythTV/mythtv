@@ -7,6 +7,7 @@ using namespace std;
 #include "tspacket.h"
 #include "compat.h"
 #include "mythverbose.h"
+#include "mythlogging.h"
 
 #ifndef USING_MINGW
 #include <sys/poll.h>
@@ -249,10 +250,12 @@ void DeviceReadBuffer::IncrReadPointer(uint len)
 
 void DRBThread::run(void)
 {
+    threadRegister("DeviceReadBuffer");
     if (!m_buffer)
         return;
 
     m_buffer->fill_ringbuffer();
+    threadDeregister();
 }
 
 void DeviceReadBuffer::fill_ringbuffer(void)

@@ -26,6 +26,7 @@
 #include "mythsocketthread.h"
 #include "mythsocket.h"
 #include "mythverbose.h"
+#include "mythlogging.h"
 
 #define SLOC(a) QString("MythSocketThread(sock 0x%1:%2): ")\
     .arg((quint64)a, 0, 16).arg(a->socket())
@@ -190,6 +191,7 @@ void MythSocketThread::ProcessAddRemoveQueues(void)
 
 void MythSocketThread::run(void)
 {
+    threadRegister("Socket");
     VERBOSE(VB_SOCKET, "MythSocketThread: readyread thread start");
 
     QMutexLocker locker(&m_readyread_lock);
@@ -376,6 +378,7 @@ void MythSocketThread::run(void)
     }
 
     VERBOSE(VB_SOCKET, "MythSocketThread: readyread thread exit");
+    threadDeregister();
 }
 
 #ifdef USING_MINGW

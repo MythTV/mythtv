@@ -66,6 +66,7 @@ using namespace std;
 #include "mythdownloadmanager.h"
 #include "videoscan.h"
 #include "videoutils.h"
+#include "mythlogging.h"
 
 /** Milliseconds to wait for an existing thread from
  *  process request thread pool.
@@ -143,6 +144,7 @@ class ProcessRequestThread : public QThread
 
     virtual void run(void)
     {
+        threadRegister("ProcessRequest");
         QMutexLocker locker(&lock);
         threadlives = true;
         waitCond.wakeAll(); // Signal to creating thread
@@ -162,6 +164,7 @@ class ProcessRequestThread : public QThread
             socket = NULL;
             parent->MarkUnused(this);
         }
+        threadDeregister();
     }
 
     QMutex lock;
@@ -1769,11 +1772,13 @@ void DeleteThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister("Delete");
     MainServer *ms = m_parent->ms;
     ms->DoDeleteThread(m_parent);
 
     delete m_parent;
     this->deleteLater();
+    threadDeregister();
 }
 
 void MainServer::DoDeleteThread(const DeleteStruct *ds)
@@ -4471,11 +4476,13 @@ void TruncateThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister("Truncate");
     MainServer *ms = m_parent->ms;
     ms->DoTruncateThread(m_parent);
 
     delete m_parent;
     this->deleteLater();
+    threadDeregister();
 }
 
 void MainServer::DoTruncateThread(const DeleteStruct *ds)

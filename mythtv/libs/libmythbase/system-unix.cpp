@@ -30,6 +30,7 @@
 #include "mythevent.h"
 #include "mythverbose.h"
 #include "exitcodes.h"
+#include "mythlogging.h"
 
 #define CLOSE(x) \
 if( (x) >= 0 ) { \
@@ -69,6 +70,7 @@ MythSystemIOHandler::MythSystemIOHandler(bool read) :
 
 void MythSystemIOHandler::run(void)
 {
+    threadRegister("SystemIOHandler");
     VERBOSE(VB_GENERAL|VB_SYSTEM, QString("Starting IO manager (%1)")
                 .arg(m_read ? "read" : "write"));
 
@@ -129,6 +131,7 @@ void MythSystemIOHandler::run(void)
             m_pLock.unlock();
         }
     }
+    threadDeregister();
 }
 
 void MythSystemIOHandler::HandleRead(int fd, QBuffer *buff)
@@ -237,6 +240,7 @@ MythSystemManager::MythSystemManager() : QThread()
 
 void MythSystemManager::run(void)
 {
+    threadRegister("SystemManager");
     VERBOSE(VB_GENERAL|VB_SYSTEM, "Starting process manager");
 
     // gCoreContext is set to NULL during shutdown, and we need this thread to
@@ -377,6 +381,7 @@ void MythSystemManager::run(void)
     // kick to allow them to close themselves cleanly
     readThread->wake();
     writeThread->wake();
+    threadDeregister();
 }
 
 void MythSystemManager::append(MythSystemUnix *ms)
@@ -424,6 +429,7 @@ MythSystemSignalManager::MythSystemSignalManager() : QThread()
 
 void MythSystemSignalManager::run(void)
 {
+    threadRegister("SystemSignalManager");
     VERBOSE(VB_GENERAL|VB_SYSTEM, "Starting process signal handler");
     while( gCoreContext )
     {
@@ -473,6 +479,7 @@ void MythSystemSignalManager::run(void)
                 ms->deleteLater();
         }
     }
+    threadDeregister();
 }
 
 /*******************************

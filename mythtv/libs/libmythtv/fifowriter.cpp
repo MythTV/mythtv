@@ -13,6 +13,7 @@
 #include "fifowriter.h"
 #include "compat.h"
 #include "mythverbose.h"
+#include "mythlogging.h"
 
 #include "mythconfig.h"
 #if CONFIG_DARWIN
@@ -114,7 +115,9 @@ void FIFOThread::run(void)
     if (!m_parent || m_id == -1)
         return;
 
+    threadRegister(QString("FIFOWrite%1").arg(m_id));
     m_parent->FIFOWriteThread(m_id);
+    threadDeregister();
 }
 
 void FIFOWriter::FIFOWriteThread(int id)

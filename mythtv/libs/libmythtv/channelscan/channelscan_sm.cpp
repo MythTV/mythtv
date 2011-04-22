@@ -45,6 +45,7 @@ using namespace std;
 #include "cardutil.h"
 #include "sourceutil.h"
 #include "mythdb.h"
+#include "mythlogging.h"
 
 // MythTV includes - DTV
 #include "dtvsignalmonitor.h"
@@ -1408,7 +1409,9 @@ void ScannerThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister("Scanner");
     m_parent->RunScanner();
+    threadDeregister();
 }
 
 /** \fn ChannelScanSM::StartScanner(void)

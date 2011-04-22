@@ -19,6 +19,7 @@
 #include "mythverbose.h"
 #include "mythsystemevent.h"
 #include "mythdirs.h"
+#include "mythlogging.h"
 
 // libmythui
 #include "mythmainwindow.h"
@@ -265,7 +266,9 @@ void NetworkCommandThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister("NetworkCommand");
     m_parent->RunCommandThread();
+    threadDeregister();
 }
 
 void NetworkControl::RunCommandThread(void)

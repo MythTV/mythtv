@@ -19,6 +19,7 @@
 #include "remotefile.h"
 
 #include "mythdownloadmanager.h"
+#include "mythlogging.h"
 
 using namespace std;
 
@@ -98,6 +99,7 @@ class RemoteFileDownloadThread : public QRunnable
     {
         bool ok = false;
 
+        threadRegister("RemoteFileDownload");
         RemoteFile *rf = new RemoteFile(m_dlInfo->m_url, false, false, 0);
         ok = rf->SaveAs(m_dlInfo->m_privData);
         delete rf;
@@ -106,6 +108,7 @@ class RemoteFileDownloadThread : public QRunnable
             m_dlInfo->m_errorCode = QNetworkReply::UnknownNetworkError;
 
         m_parent->downloadFinished(m_dlInfo);
+        threadDeregister();
     }
 
   private:
@@ -187,6 +190,8 @@ void MythDownloadManager::run(void)
     bool itemsInQueue = false;
     bool waitAnyway = false;
 
+    threadRegister("DownloadManager");
+
     m_queueThread = currentThread();
 
     while (!m_runThread)
@@ -255,6 +260,7 @@ void MythDownloadManager::run(void)
         m_infoLock->unlock();
     }
     m_isRunning = false;
+    threadDeregister();
 }
 
 /** \fn MythDownloadManager::queueItem(const QString &url, QNetworkRequest *req,

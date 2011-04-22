@@ -18,6 +18,7 @@
 #include "cardutil.h"
 #include "dvbtypes.h" // for pid filtering
 #include "diseqc.h" // for rotor retune
+#include "mythlogging.h"
 
 #define LOC      QString("DVBSH(%1): ").arg(_dvb_dev)
 #define LOC_WARN QString("DVBSH(%1) Warning: ").arg(_dvb_dev)
@@ -199,7 +200,9 @@ void DVBReadThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister("DVBRead");
     m_parent->Run();
+    threadDeregister();
 }
 
 void DVBStreamHandler::Start(void)

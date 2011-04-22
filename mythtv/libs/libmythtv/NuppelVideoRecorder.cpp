@@ -31,6 +31,7 @@ using namespace std;
 #include "tv_rec.h"
 #include "tv_play.h"
 #include "audioinput.h"
+#include "mythlogging.h"
 
 #if HAVE_BIGENDIAN
 extern "C" {
@@ -2330,7 +2331,9 @@ void NVRWriteThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister("NVRWrite");
     m_parent->doWriteThread();
+    threadDeregister();
 }
 
 void NVRAudioThread::run(void)
@@ -2338,7 +2341,9 @@ void NVRAudioThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister("NVRAudio");
     m_parent->doAudioThread();
+    threadDeregister();
 }
 
 void NVRVbiThread::run(void)
@@ -2346,7 +2351,9 @@ void NVRVbiThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister("NVRVbi");
     m_parent->doVbiThread();
+    threadDeregister();
 }
 
 void NuppelVideoRecorder::doAudioThread(void)

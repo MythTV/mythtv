@@ -1,6 +1,7 @@
 #include "programinfoupdater.h"
 #include "remoteutil.h"
 #include "compat.h"
+#include "mythlogging.h"
 
 uint qHash(const PIKey &k)
 {
@@ -40,6 +41,7 @@ void ProgramInfoUpdater::insert(
 
 void ProgramInfoUpdater::run(void)
 {
+    threadRegister("ProgramInfoUpdater");
     // we don't need instant updates allow a few to queue up
     // if they come in quick succession, this allows multiple
     // updates to be consolidated into one update...
@@ -88,4 +90,5 @@ void ProgramInfoUpdater::run(void)
         RemoteSendMessage(msg);
     }
     needsUpdate.clear();
+    threadDeregister();
 }

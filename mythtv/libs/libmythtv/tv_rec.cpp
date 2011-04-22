@@ -55,6 +55,7 @@ using namespace std;
 #include "iptvrecorder.h"
 #include "firewirerecorder.h"
 #include "importrecorder.h"
+#include "mythlogging.h"
 
 #include "channelgroup.h"
 
@@ -1307,7 +1308,9 @@ void TVRecEventThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister("TVRecEvent");
     m_parent->RunTV();
+    threadDeregister();
 }
 
 /** \fn TVReRecordThread::run(void)
@@ -1319,7 +1322,9 @@ void TVRecRecordThread::run(void)
     if (!m_parent || !m_parent->recorder)
         return;
 
+    threadRegister("TVRecRecord");
     m_parent->recorder->StartRecording();
+    threadDeregister();
 }
 
 static bool get_use_eit(uint cardid)

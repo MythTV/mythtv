@@ -34,6 +34,7 @@ using namespace std;
 #include "firewirerecorder.h"
 #include "mythcorecontext.h"
 #include "linuxavcinfo.h"
+#include "mythlogging.h"
 
 #define LOC      QString("LFireDev(%1): ").arg(guid_to_string(m_guid))
 #define LOC_WARN QString("LFireDev(%1), Warning: ").arg(guid_to_string(m_guid))
@@ -596,7 +597,9 @@ void LinuxControllerThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister("LinuxController");
     m_parent->RunPortHandler();
+    threadDeregister();
 }
 
 void LinuxFirewireDevice::RunPortHandler(void)

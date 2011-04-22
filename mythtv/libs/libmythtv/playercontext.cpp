@@ -16,6 +16,7 @@
 #include "storagegroup.h"
 #include "mythcorecontext.h"
 #include "videometadatautil.h"
+#include "mythlogging.h"
 
 #define LOC QString("playCtx: ")
 #define LOC_ERR QString("playCtx, Error: ")
@@ -28,10 +29,12 @@ void PlayerThread::run(void)
     if (!m_player)
         return;
 
+    threadRegister("Player");
     VERBOSE(VB_PLAYBACK, QString("PiP thread starting"));
     m_player->StartPlaying();
     exec();
     VERBOSE(VB_PLAYBACK, QString("PiP thread finishing"));
+    threadDeregister();
 }
 
 PlayerContext::PlayerContext(const QString &inUseID) :

@@ -58,6 +58,7 @@ using namespace std;
 #include "flacencoder.h"
 #include "genres.h"
 #include "editmetadata.h"
+#include "mythlogging.h"
 
 QEvent::Type RipStatusEvent::kTrackTextEvent =
     (QEvent::Type) QEvent::registerEventType();
@@ -89,7 +90,9 @@ CDScannerThread::CDScannerThread(Ripper *ripper)
 
 void CDScannerThread::run()
 {
+    threadRegister("CDScanner");
     m_parent->scanCD();
+    threadDeregister();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -101,7 +104,9 @@ CDEjectorThread::CDEjectorThread(Ripper *ripper)
 
 void CDEjectorThread::run()
 {
+    threadRegister("CDEjector");
     m_parent->ejectCD();
+    threadDeregister();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -174,6 +179,7 @@ void CDRipperThread::run(void)
     if (!m_tracks->size() > 0)
         return;
 
+    threadRegister("CDRipper");
     Metadata *track = m_tracks->at(0)->metadata;
     QString tots;
 
@@ -331,6 +337,8 @@ void CDRipperThread::run(void)
 
     QApplication::postEvent(
         m_parent, new RipStatusEvent(RipStatusEvent::kFinishedEvent, ""));
+
+    threadDeregister();
 }
 
 int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)

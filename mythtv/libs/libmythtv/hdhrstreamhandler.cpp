@@ -18,6 +18,7 @@
 #include "streamlisteners.h"
 #include "mpegstreamdata.h"
 #include "cardutil.h"
+#include "mythlogging.h"
 
 #define LOC      QString("HDHRSH(%1): ").arg(_devicename)
 #define LOC_WARN QString("HDHRSH(%1) Warning: ").arg(_devicename)
@@ -193,7 +194,9 @@ void HDHRReadThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister("HDHRRead");
     m_parent->Run();
+    threadDeregister();
 }
 
 void HDHRStreamHandler::Start(void)

@@ -12,6 +12,7 @@
 #include "atsctables.h"
 #include "firewirechannel.h"
 #include "firewiresignalmonitor.h"
+#include "mythlogging.h"
 
 #define LOC QString("FireSM(%1): ").arg(channel->GetDevice())
 #define LOC_WARN QString("FireSM(%1), Warning: ").arg(channel->GetDevice())
@@ -128,7 +129,9 @@ void FWSignalThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister("FWSignal");
     m_parent->RunTableMonitor();
+    threadDeregister();
 }
 
 void FirewireSignalMonitor::RunTableMonitor(void)

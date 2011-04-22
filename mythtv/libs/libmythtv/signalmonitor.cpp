@@ -12,6 +12,7 @@
 #include "signalmonitor.h"
 #include "compat.h"
 #include "mythverbose.h"
+#include "mythlogging.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -348,7 +349,9 @@ void SignalLoopThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister("SignalLoop");
     m_parent->MonitorLoop();
+    threadDeregister();
 }
 
 /** \fn  SignalMonitor::WaitForLock(int)

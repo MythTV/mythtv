@@ -35,6 +35,7 @@
 #include "remoteutil.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
+#include "mythlogging.h"
 
 #define LOC QString("Preview: ")
 #define LOC_ERR QString("Preview Error: ")
@@ -324,10 +325,12 @@ bool PreviewGenerator::Run(void)
 
 void PreviewGenerator::run(void)
 {
+    threadRegister("PreviewGenerator");
     setPriority(QThread::LowPriority);
     Run();
     connect(this, SIGNAL(finished()),
             this, SLOT(deleteLater()));
+    threadDeregister();
 }
 
 bool PreviewGenerator::RemotePreviewRun(void)

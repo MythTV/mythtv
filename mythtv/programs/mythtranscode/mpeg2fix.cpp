@@ -20,6 +20,8 @@
 #include <Q3PtrList>
 #include <QFileInfo>
 
+#include "mythlogging.h"
+
 #ifdef USING_MINGW
 #include <winsock2.h>
 #else
@@ -493,7 +495,9 @@ void MPEG2ReplexThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister("MPEG2Replex");
     m_parent->Start();
+    threadDeregister();
 }
 
 void MPEG2replex::Start()

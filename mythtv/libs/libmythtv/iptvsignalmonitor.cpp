@@ -7,6 +7,7 @@
 #include "iptvchannel.h"
 #include "iptvfeederwrapper.h"
 #include "iptvsignalmonitor.h"
+#include "mythlogging.h"
 
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
@@ -81,7 +82,9 @@ void IPTVMonitorThread::run(void)
     if (!m_parent)
         return;
 
+    threadRegister("IPTVMonitor");
     m_parent->RunTableMonitor();
+    threadDeregister();
 }
 
 /** \fn IPTVSignalMonitor::RunTableMonitor(void)
