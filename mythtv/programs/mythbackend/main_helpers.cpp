@@ -267,6 +267,7 @@ void cleanup(void)
 
 int log_rotate(int report_error)
 {
+#if 0
     /* http://www.gossamer-threads.com/lists/mythtv/dev/110113 */
 
     int new_logfd = open(logfile.toLocal8Bit().constData(),
@@ -290,6 +291,9 @@ int log_rotate(int report_error)
     while (dup2(new_logfd, 1) < 0 && errno == EINTR) ;
     while (dup2(new_logfd, 2) < 0 && errno == EINTR) ;
     while (close(new_logfd) < 0 && errno == EINTR) ;
+#endif
+
+    logStart(logfile);
     return 0;
 }
 

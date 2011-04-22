@@ -228,6 +228,7 @@ int main(int argc, char **argv)
 
 static bool log_rotate(bool report_error)
 {
+#if 0
     int new_logfd = open(logfile.toLocal8Bit().constData(),
                          O_WRONLY|O_CREAT|O_APPEND, 0664);
 
@@ -260,7 +261,9 @@ static bool log_rotate(bool report_error)
     while (dup2(new_logfd, 2) < 0 && errno == EINTR);
     while (close(new_logfd) < 0   && errno == EINTR);
 #endif
+#endif
 
+    logStart(logfile);
     return true;
 }
 

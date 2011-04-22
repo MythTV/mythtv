@@ -199,6 +199,7 @@ int main(int argc, char **argv)
     // set up log file
     int logfd = -1;
 
+#if 0
     if (!logfile.isEmpty())
     {
         QByteArray tmp = logfile.toAscii();
@@ -221,6 +222,8 @@ int main(int argc, char **argv)
         if (logfd != 1 && logfd != 2)
             close(logfd);
     }
+#endif
+    logStart(logfile);
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         cerr << "Unable to ignore SIGPIPE\n";

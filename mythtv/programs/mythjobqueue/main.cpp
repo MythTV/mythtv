@@ -54,6 +54,7 @@ static void cleanup(void)
 
 static int log_rotate(int report_error)
 {
+#if 0
     int new_logfd = open(logfile.toLocal8Bit().constData(),
                          O_WRONLY|O_CREAT|O_APPEND|O_SYNC, 0664);
     if (new_logfd < 0)
@@ -75,6 +76,8 @@ static int log_rotate(int report_error)
     while (dup2(new_logfd, 1) < 0 && errno == EINTR) ;
     while (dup2(new_logfd, 2) < 0 && errno == EINTR) ;
     while (close(new_logfd) < 0 && errno == EINTR) ;
+#endif
+    logStart(logfile);
     return 0;
 }
 
