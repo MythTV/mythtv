@@ -34,22 +34,26 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         ProgramInfo(other),
         oldrecstatus(other.oldrecstatus),
         savedrecstatus(other.savedrecstatus),
+        future(other.future),
         record(NULL) {}
     RecordingInfo(const ProgramInfo &other) :
         ProgramInfo(other),
         oldrecstatus(rsUnknown),
         savedrecstatus(rsUnknown),
+        future(false),
         record(NULL) {}
     RecordingInfo(uint _chanid, const QDateTime &_recstartts) :
         ProgramInfo(_chanid, _recstartts),
         oldrecstatus(rsUnknown),
         savedrecstatus(rsUnknown),
+        future(false),
         record(NULL) {}
     RecordingInfo(QStringList::const_iterator &it,
                   QStringList::const_iterator  end) :
         ProgramInfo(it, end),
         oldrecstatus(rsUnknown),
         savedrecstatus(rsUnknown),
+        future(false),
         record(NULL) {}
     /// Create RecordingInfo from 'program'+'record'+'channel' tables,
     /// used in scheduler.cpp @ ~ 3296
@@ -106,7 +110,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         bool commfree,
         uint subtitleType,
         uint videoproperties,
-        uint audioproperties);
+        uint audioproperties,
+        bool future);
 
     /// Create RecordingInfo from 'record'+'channel' tables,
     /// user in scheduler.cpp  @ ~ 3566 & ~ 3643
@@ -192,7 +197,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     void ToggleRecord(void);
 
     // these five can be moved to programinfo
-    void AddHistory(bool resched = true, bool forcedup = false);//pi
+    void AddHistory(bool resched = true, bool forcedup = false, 
+                    bool future = false);//pi
     void DeleteHistory(void);//pi
     void ForgetHistory(void);//pi
     void SetDupHistory(void);//pi
@@ -216,6 +222,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
 
     RecStatusType oldrecstatus;
     RecStatusType savedrecstatus;
+    bool future;
 
   private:
     mutable class RecordingRule *record;

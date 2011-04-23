@@ -1026,12 +1026,7 @@ static inline int mpeg4_decode_block(MpegEncContext * s, DCTELEM * block,
                     if(last) i+=192;
                 } else {
                     /* second escape */
-#if MIN_CACHE_BITS < 20
-                    LAST_SKIP_BITS(re, &s->gb, 2);
-                    UPDATE_CACHE(re, &s->gb);
-#else
                     SKIP_BITS(re, &s->gb, 2);
-#endif
                     GET_RL_VLC(level, run, re, &s->gb, rl_vlc, TEX_VLC_BITS, 2, 1);
                     i+= run + rl->max_run[run>>7][level/qmul] +1; //FIXME opt indexing
                     level = (level ^ SHOW_SBITS(re, &s->gb, 1)) - SHOW_SBITS(re, &s->gb, 1);
@@ -1039,12 +1034,7 @@ static inline int mpeg4_decode_block(MpegEncContext * s, DCTELEM * block,
                 }
             } else {
                 /* first escape */
-#if MIN_CACHE_BITS < 19
-                LAST_SKIP_BITS(re, &s->gb, 1);
-                UPDATE_CACHE(re, &s->gb);
-#else
                 SKIP_BITS(re, &s->gb, 1);
-#endif
                 GET_RL_VLC(level, run, re, &s->gb, rl_vlc, TEX_VLC_BITS, 2, 1);
                 i+= run;
                 level = level + rl->max_level[run>>7][(run-1)&63] * qmul;//FIXME opt indexing
@@ -1507,16 +1497,17 @@ end:
 
 static int mpeg4_decode_gop_header(MpegEncContext * s, GetBitContext *gb){
     int hours, minutes, seconds;
+    unsigned time_code = show_bits(gb, 18);
 
-    hours= get_bits(gb, 5);
-    minutes= get_bits(gb, 6);
-    skip_bits1(gb);
-    seconds= get_bits(gb, 6);
-
-    s->time_base= seconds + 60*(minutes + 60*hours);
-
-    skip_bits1(gb);
-    skip_bits1(gb);
+    if (time_code & 0x40) {     /* marker_bit */
+        hours   = time_code >> 13;
+        minutes = time_code >>  7 & 0x3f;
+        seconds = time_code       & 0x3f;
+        s->time_base = seconds + 60*(minutes + 60*hours);
+        skip_bits(gb, 20);      /* time_code, closed_gov, broken_link */
+    } else {
+        av_log(s->avctx, AV_LOG_WARNING, "GOP header missing marker_bit\n");
+    }
 
     return 0;
 }
@@ -1578,6 +1569,7 @@ static int decode_vol_header(MpegEncContext *s, GetBitContext *gb){
     s->avctx->time_base.den = get_bits(gb, 16);
     if(!s->avctx->time_base.den){
         av_log(s->avctx, AV_LOG_ERROR, "time_base.den==0\n");
+        s->avctx->time_base.num = 0;
         return -1;
     }
 
@@ -2085,7 +2077,7 @@ static int decode_vop_header(MpegEncContext *s, GetBitContext *gb){
      /* detect buggy encoders which don't set the low_delay flag (divx4/xvid/opendivx)*/
      // note we cannot detect divx5 without b-frames easily (although it's buggy too)
      if(s->vo_type==0 && s->vol_control_parameters==0 && s->divx_version==-1 && s->picture_number==0){
-         av_log(s->avctx, AV_LOG_ERROR, "looks like this file was encoded with (divx4/(old)xvid/opendivx) -> forcing low_delay flag\n");
+         av_log(s->avctx, AV_LOG_WARNING, "looks like this file was encoded with (divx4/(old)xvid/opendivx) -> forcing low_delay flag\n");
          s->low_delay=1;
      }
 
@@ -2124,7 +2116,7 @@ int ff_mpeg4_decode_picture_header(MpegEncContext * s, GetBitContext *gb)
     for(;;) {
         if(get_bits_count(gb) >= gb->size_in_bits){
             if(gb->size_in_bits==8 && (s->divx_version>=0 || s->xvid_build>=0)){
-                av_log(s->avctx, AV_LOG_ERROR, "frame skip %d\n", gb->size_in_bits);
+                av_log(s->avctx, AV_LOG_WARNING, "frame skip %d\n", gb->size_in_bits);
                 return FRAME_SKIPPED; //divx bug
             }else
                 return -1; //end of stream
@@ -2239,7 +2231,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
     return 0;
 }
 
-AVCodec mpeg4_decoder = {
+AVCodec ff_mpeg4_decoder = {
     "mpeg4",
     AVMEDIA_TYPE_VIDEO,
     CODEC_ID_MPEG4,
@@ -2257,7 +2249,7 @@ AVCodec mpeg4_decoder = {
 
 
 #if CONFIG_MPEG4_VDPAU_DECODER
-AVCodec mpeg4_vdpau_decoder = {
+AVCodec ff_mpeg4_vdpau_decoder = {
     "mpeg4_vdpau",
     AVMEDIA_TYPE_VIDEO,
     CODEC_ID_MPEG4,

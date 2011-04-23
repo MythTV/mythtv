@@ -623,7 +623,7 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
                 shape->SetArea(MythRect(bgrect));
             }
 
-            gTextSubFont->SetColor(clr[max(min(0, cc->color), 7)]);
+            gTextSubFont->SetColor(clr[min(max(0, cc->color), 7)]);
             MythUIText *text = new MythUIText(
                    cc->text, *gTextSubFont, rect, rect, (MythUIType*)this,
                    QString("cc608txt%1%2%3").arg(cc->x).arg(cc->y).arg(width));

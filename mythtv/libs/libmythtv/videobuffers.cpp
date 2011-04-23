@@ -97,13 +97,31 @@ YUVInfo::YUVInfo(uint w, uint h, uint sz, const int *p, const int *o)
  *  used by VideoOutputXv to avoid throwing away displayed frames too
  *  early. See videoout_xv.cpp for their use.
  *
+ *  released = used + finished + displayed + pause
+ *  total = available + limbo + released
+ *  released_and_in_use_by_decoder = decode
+ *
+ *  available - frames not in use by decoder or display
+ *  limbo     - frames in use by decoder but not released for display
+ *  decode    - frames in use by decoder and released for display
+ *  used      - frames released for display but not displayed or paused
+ *  displayed - frames displayed but still used as a reference frame
+ *  pause     - frames used for pause
+ *  finished  - frames that are finished displaying but still in use by decoder
+ *
+ *  NOTE: All queues are mutually exclusive except "decode" which tracks frames
+ *        that have been released but still in use by the decoder. If a frame
+ *        has finished being processed/displayed but is still in use by the
+ *        decoder (in the decode queue) then it is placed in the finished queue
+ *        until the decoder is no longer using it (not in the decode queue).
+ *
  * \see VideoOutput
  */
 
 VideoBuffers::VideoBuffers()
-    : numbuffers(0), needfreeframes(0), needprebufferframes(0),
+    : needfreeframes(0), needprebufferframes(0),
       needprebufferframes_normal(0), needprebufferframes_small(0),
-      keepprebufferframes(0), need_extra_for_pause(false), rpos(0), vpos(0),
+      keepprebufferframes(0), createdpauseframe(false), rpos(0), vpos(0),
       global_lock(QMutex::Recursive)
 {
 }
@@ -158,13 +176,15 @@ void VideoBuffers::Init(uint numdecode, bool extra_for_pause,
         vbufferMap[at(i)]       = i;
     }
 
-    numbuffers                  = numdecode;
     needfreeframes              = need_free;
     needprebufferframes         = needprebuffer_normal;
     needprebufferframes_normal  = needprebuffer_normal;
     needprebufferframes_small   = needprebuffer_small;
     keepprebufferframes         = keepprebuffer;
-    need_extra_for_pause        = extra_for_pause;
+    createdpauseframe           = extra_for_pause;
+
+    if (createdpauseframe)
+        enqueue(kVideoBuffer_pause, at(numcreate - 1));
 
     for (uint i = 0; i < numdecode; i++)
         enqueue(kVideoBuffer_avail, at(i));
@@ -193,6 +213,8 @@ void VideoBuffers::Reset()
     available.clear();
     used.clear();
     limbo.clear();
+    finished.clear();
+    decode.clear();
     pause.clear();
     displayed.clear();
     vbufferMap.clear();
@@ -299,17 +321,16 @@ void VideoBuffers::DeLimboFrame(VideoFrame *frame)
 {
     QMutexLocker locker(&global_lock);
     if (limbo.contains(frame))
-    {
         limbo.remove(frame);
-        available.enqueue(frame);
-    }
 
-    // BEGIN HACK HACK HACK, see trac ticket #4159
-    // ffmpeg will wrongly hold on to a frame if it gets the
-    // slices for a frame for which it never got a start code.
+    // if decoder didn't release frame and the buffer is getting released by
+    // the decoder assume that the frame is lost and return to available
+    if (!decode.contains(frame))
+        safeEnqueue(kVideoBuffer_avail, frame);
+       
+    // remove from decode queue since the decoder is finished
     while (decode.contains(frame))
-      decode.remove(frame);
-    // END  HACK HACK HACK
+        decode.remove(frame);
 }
 
 /**
@@ -331,9 +352,20 @@ void VideoBuffers::DoneDisplayingFrame(VideoFrame *frame)
     QMutexLocker locker(&global_lock);
 
     if(used.contains(frame))
-    {
         remove(kVideoBuffer_used, frame);
-        enqueue(kVideoBuffer_avail, frame);
+
+    enqueue(kVideoBuffer_finished, frame);
+
+    // check if any finished frames are no longer used by decoder and return to available
+    frame_queue_t ula(finished);
+    frame_queue_t::iterator it = ula.begin();
+    for (; it != ula.end(); ++it)
+    {
+        if (!decode.contains(*it))
+        {
+            remove(kVideoBuffer_finished, *it);
+            enqueue(kVideoBuffer_avail, *it);
+        }
     }
 }
 
@@ -366,6 +398,8 @@ frame_queue_t *VideoBuffers::queue(BufferType type)
         q = &pause;
     else if (type == kVideoBuffer_decode)
         q = &decode;
+    else if (type == kVideoBuffer_finished)
+        q = &finished;
 
     return q;
 }
@@ -388,6 +422,8 @@ const frame_queue_t *VideoBuffers::queue(BufferType type) const
         q = &pause;
     else if (type == kVideoBuffer_decode)
         q = &decode;
+    else if (type == kVideoBuffer_finished)
+        q = &finished;
 
     return q;
 }
@@ -470,6 +506,8 @@ void VideoBuffers::remove(BufferType type, VideoFrame *frame)
         pause.remove(frame);
     if ((type & kVideoBuffer_decode) == kVideoBuffer_decode)
         decode.remove(frame);
+    if ((type & kVideoBuffer_finished) == kVideoBuffer_finished)
+        finished.remove(frame);
 }
 
 void VideoBuffers::requeue(BufferType dst, BufferType src, int num)
@@ -544,26 +582,27 @@ bool VideoBuffers::contains(BufferType type, VideoFrame *frame) const
 
 VideoFrame *VideoBuffers::GetScratchFrame(void)
 {
-    if (!need_extra_for_pause)
+    if (!createdpauseframe || !head(kVideoBuffer_pause))
     {
         VERBOSE(VB_IMPORTANT,
                 "GetScratchFrame() called, but not allocated");
     }
 
     QMutexLocker locker(&global_lock);
-    return at(allocSize()-1);
+    return head(kVideoBuffer_pause);
 }
 
-const VideoFrame *VideoBuffers::GetScratchFrame(void) const
+void VideoBuffers::SetLastShownFrameToScratch(void)
 {
-    if (!need_extra_for_pause)
+    if (!createdpauseframe || !head(kVideoBuffer_pause))
     {
         VERBOSE(VB_IMPORTANT,
-                "GetScratchFrame() called, but not allocated");
+                "SetLastShownFrameToScratch() called but no pause frame");
+        return;
     }
 
-    QMutexLocker locker(&global_lock);
-    return at(allocSize()-1);
+    VideoFrame *pause = head(kVideoBuffer_pause);
+    rpos = vbufferMap[pause];
 }
 
 /**
@@ -592,27 +631,29 @@ void VideoBuffers::DiscardFrames(bool next_frame_keyframe)
     frame_queue_t ula(used);
     ula.insert(ula.end(), limbo.begin(), limbo.end());
     ula.insert(ula.end(), available.begin(), available.end());
+    ula.insert(ula.end(), finished.begin(), finished.end());
     frame_queue_t::iterator it;
 
     // Discard frames
     frame_queue_t discards(used);
     discards.insert(discards.end(), limbo.begin(), limbo.end());
+    discards.insert(discards.end(), finished.begin(), finished.end());
     for (it = discards.begin(); it != discards.end(); ++it)
         DiscardFrame(*it);
 
     // Verify that things are kosher
-    if (available.count() + pause.count() + displayed.count() != size())
+    if (available.count() + pause.count() + displayed.count() != Size())
     {
-        for (uint i=0; i < size(); i++)
+        for (uint i=0; i < Size(); i++)
         {
             if (!available.contains(at(i)) &&
                 !pause.contains(at(i)) &&
                 !displayed.contains(at(i)))
             {
                 VERBOSE(VB_IMPORTANT,
-                        QString("VideoBuffers::DiscardFrames(): ERROR, %1 not "
-                                "in available, pause, or displayed %2")
-                        .arg(DebugString(at(i), true))
+                        QString("VideoBuffers::DiscardFrames(): ERROR, %1 (%2) not "
+                                "in available, pause, or displayed %3")
+                        .arg(DebugString(at(i), true)).arg((long long)at(i))
                         .arg(GetStatus()));
                 DiscardFrame(at(i));
             }
@@ -640,7 +681,7 @@ void VideoBuffers::ClearAfterSeek(void)
     {
         QMutexLocker locker(&global_lock);
 
-        for (uint i = 0; i < size(); i++)
+        for (uint i = 0; i < Size(); i++)
             at(i)->timecode = 0;
 
         while (used.count() > 1)
@@ -678,18 +719,9 @@ bool VideoBuffers::CreateBuffers(VideoFrameType type, int width, int height,
         return false;
 
     bool ok = true;
-    int  type_bpp = bitsperpixel(type);
-    uint bpp = type_bpp / 4; /* bits per pixel div common factor */
-    uint bpb =  8 / 4; /* bits per byte div common factor */
+    uint buf_size = buffersize(type, width, height);
 
-    // If the buffer sizes are not a multple of 16, adjust.
-    // old versions of MythTV allowed people to set invalid
-    // dimensions for MPEG-4 capture, no need to segfault..
-    uint adj_w = (width  + 15) & ~0xF;
-    uint adj_h = (height + 15) & ~0xF;
-    uint buf_size = (adj_w * adj_h * bpp + 4/* to round up */) / bpb;
-
-    while (bufs.size() < allocSize())
+    while (bufs.size() < Size())
     {
         unsigned char *data = (unsigned char*)av_malloc(buf_size + 64);
         if (!data)
@@ -700,18 +732,10 @@ bool VideoBuffers::CreateBuffers(VideoFrameType type, int width, int height,
 
         bufs.push_back(data);
         yuvinfo.push_back(YUVInfo(width, height, buf_size, NULL, NULL));
-
-        if (bufs.back())
-        {
-            VERBOSE(VB_PLAYBACK+VB_EXTRA, "Created data @"
-                    <<((void*)data)<<"->"<<((void*)(data+buf_size)));
-            allocated_arrays.push_back(bufs.back());
-        }
-        else
-            ok = false;
+        allocated_arrays.push_back(data);
     }
 
-    for (uint i = 0; i < allocSize(); i++)
+    for (uint i = 0; i < Size(); i++)
     {
         init(&buffers[i],
              type, bufs[i], yuvinfo[i].width, yuvinfo[i].height,
@@ -732,7 +756,7 @@ static unsigned char *ffmpeg_hack = (unsigned char*)
 bool VideoBuffers::CreateBuffer(int width, int height, uint num, void* data,
                                 VideoFrameType fmt)
 {
-    if (num >= allocSize())
+    if (num >= Size())
         return false;
 
     init(&buffers[num], fmt, (unsigned char*)data, width, height, 0);
@@ -741,10 +765,29 @@ bool VideoBuffers::CreateBuffer(int width, int height, uint num, void* data,
     return true;
 }
 
+uint VideoBuffers::AddBuffer(int width, int height, void* data,
+                             VideoFrameType fmt)
+{
+    QMutexLocker lock(&global_lock);
+
+    uint num = Size();
+    buffers.resize(num + 1);
+    memset(&buffers[num], 0, sizeof(VideoFrame));
+    buffers[num].interlaced_frame = -1;
+    buffers[num].top_field_first  = 1;
+    vbufferMap[at(num)] = num;
+    init(&buffers[num], fmt, (unsigned char*)data, width, height, 0);
+    buffers[num].priv[0] = ffmpeg_hack;
+    buffers[num].priv[1] = ffmpeg_hack;
+    enqueue(kVideoBuffer_avail, at(num));
+
+    return Size();
+}
+
 void VideoBuffers::DeleteBuffers()
 {
     next_dbg_str = 0;
-    for (uint i = 0; i < allocSize(); i++)
+    for (uint i = 0; i < Size(); i++)
     {
         buffers[i].buf = NULL;
 
@@ -755,10 +798,6 @@ void VideoBuffers::DeleteBuffers()
         }
     }
 
-    for (uint i = 0; i < allocated_structs.size(); i++)
-        delete allocated_structs[i];
-    allocated_structs.clear();
-
     for (uint i = 0; i < allocated_arrays.size(); i++)
         av_free(allocated_arrays[i]);
     allocated_arrays.clear();
@@ -767,8 +806,8 @@ void VideoBuffers::DeleteBuffers()
 static unsigned long long to_bitmap(const frame_queue_t& list);
 QString VideoBuffers::GetStatus(int n) const
 {
-    if (0 > n)
-        n = numbuffers;
+    if (n <= 0)
+        n = Size();
 
     QString str("");
     if (global_lock.tryLock())
@@ -778,6 +817,7 @@ QString VideoBuffers::GetStatus(int n) const
         unsigned long long d = to_bitmap(displayed);
         unsigned long long l = to_bitmap(limbo);
         unsigned long long p = to_bitmap(pause);
+        unsigned long long f = to_bitmap(finished);
         unsigned long long x = to_bitmap(decode);
         for (uint i=0; i<(uint)n; i++)
         {
@@ -793,6 +833,8 @@ QString VideoBuffers::GetStatus(int n) const
                 tmp += (x & mask) ? "l" : "L";
             if (p & mask)
                 tmp += (x & mask) ? "p" : "P";
+            if (f & mask)
+                tmp += (x & mask) ? "f" : "F";
 
             if (0 == tmp.length())
                 str += " ";
@@ -818,7 +860,7 @@ void VideoBuffers::Clear(uint i)
 
 void VideoBuffers::Clear(void)
 {
-    for (uint i = 0; i < allocSize(); i++)
+    for (uint i = 0; i < Size(); i++)
         Clear(i);
 }
 

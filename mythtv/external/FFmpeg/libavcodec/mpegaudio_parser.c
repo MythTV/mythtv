@@ -141,7 +141,7 @@ static int mpegaudio_parse(AVCodecParserContext *s1,
 }
 
 
-AVCodecParser mpegaudio_parser = {
+AVCodecParser ff_mpegaudio_parser = {
     { CODEC_ID_MP1, CODEC_ID_MP2, CODEC_ID_MP3 },
     sizeof(MpegAudioParseContext),
     NULL,

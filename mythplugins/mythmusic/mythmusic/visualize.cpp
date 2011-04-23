@@ -34,10 +34,6 @@ using namespace std;
 
 
 #define FFTW_N 512
-extern "C" {
-void *av_malloc(unsigned int size);
-void av_free(void *ptr);
-}
 
 Spectrum::Spectrum()
 #if defined(FFTW3_SUPPORT) || defined(FFTW2_SUPPORT)
@@ -567,6 +563,8 @@ bool Squares::draw(QPainter *p, const QColor &back)
     int h = w;
     int center = size.height () / 2;
 
+    (void) h;
+    (void) center;
 #if defined(FFTW3_SUPPORT) || defined(FFTW2_SUPPORT)
     QRect *rectsp = rects.data();
     for (uint i = 0; i < (uint)rects.size(); i++)

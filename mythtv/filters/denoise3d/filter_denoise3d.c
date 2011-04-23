@@ -418,7 +418,7 @@ static VideoFilter *NewDenoise3DFilter(VideoFrameType inpixfmt,
     filter->filtfunc = &denoise;
 
 #ifdef MMX
-    filter->mm_flags = mm_support();
+    filter->mm_flags = av_get_cpu_flags();
     if (filter->mm_flags & FF_MM_MMX)
         filter->filtfunc = &denoiseMMX;
 #endif

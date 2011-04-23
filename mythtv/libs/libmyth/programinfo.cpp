@@ -2007,7 +2007,7 @@ QString ProgramInfo::GetPlaybackURL(
         // Check to see if the file exists locally
         StorageGroup sgroup(storagegroup);
         //VERBOSE(VB_FILE, LOC +QString("GetPlaybackURL: CHECKING SG : %1 : ").arg(tmpURL));
-        tmpURL = sgroup.FindRecordingFile(basename);
+        tmpURL = sgroup.FindFile(basename);
 
         if (!tmpURL.isEmpty())
         {
@@ -4119,6 +4119,7 @@ static bool FromProgramQuery(
         "FROM program "
         "LEFT JOIN channel ON program.chanid = channel.chanid "
         "LEFT JOIN oldrecorded AS oldrecstatus ON "
+        "    oldrecstatus.future = 0 AND "
         "    program.title = oldrecstatus.title AND "
         "    channel.callsign = oldrecstatus.station AND "
         "    program.starttime = oldrecstatus.starttime "
@@ -4224,6 +4225,7 @@ bool LoadFromOldRecorded(
         "       duplicate "
         " FROM oldrecorded "
         " LEFT JOIN channel ON oldrecorded.chanid = channel.chanid "
+        " WHERE oldrecorded.future = 0 "
         + sql;
 
     query.prepare(querystr);

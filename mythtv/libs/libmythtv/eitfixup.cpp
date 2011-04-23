@@ -186,11 +186,22 @@ void EITFixUp::Fix(DBEventEIT &event) const
     if (event.fixup)
     {
         if (!event.title.isEmpty())
+        {
+            event.title = event.title.replace(QChar('\0'), "");
             event.title = event.title.trimmed();
+        }
+
         if (!event.subtitle.isEmpty())
+        {
+            event.subtitle = event.subtitle.replace(QChar('\0'), "");
             event.subtitle = event.subtitle.trimmed();
+        }
+
         if (!event.description.isEmpty())
+        {
+            event.description = event.description.replace(QChar('\0'), "");
             event.description = event.description.trimmed();
+        }
     }
 
     if (kFixGenericDVB & event.fixup)

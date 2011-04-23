@@ -149,6 +149,11 @@ static void put_audio_specific_config(AVCodecContext *avctx)
     put_bits(&pb, 1, 0); //frame length - 1024 samples
     put_bits(&pb, 1, 0); //does not depend on core coder
     put_bits(&pb, 1, 0); //is not extension
+
+    //Explicitly Mark SBR absent
+    put_bits(&pb, 11, 0x2b7); //sync extension
+    put_bits(&pb, 5,  AOT_SBR);
+    put_bits(&pb, 1,  0);
     flush_put_bits(&pb);
 }
 
@@ -193,8 +198,8 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
 
     s->samples            = av_malloc(2 * 1024 * avctx->channels * sizeof(s->samples[0]));
     s->cpe                = av_mallocz(sizeof(ChannelElement) * aac_chan_configs[avctx->channels-1][0]);
-    avctx->extradata      = av_mallocz(2 + FF_INPUT_BUFFER_PADDING_SIZE);
-    avctx->extradata_size = 2;
+    avctx->extradata      = av_mallocz(5 + FF_INPUT_BUFFER_PADDING_SIZE);
+    avctx->extradata_size = 5;
     put_audio_specific_config(avctx);
 
     sizes[0]   = swb_size_1024[i];
@@ -251,7 +256,7 @@ static void apply_window_and_mdct(AVCodecContext *avctx, AACEncContext *s,
                 s->output[i - 448 - k] = (i < 1024)
                                          ? sce->saved[i]
                                          : audio[(i-1024)*chans];
-            s->dsp.vector_fmul        (s->output,     k ?  swindow : pwindow, 128);
+            s->dsp.vector_fmul        (s->output,     s->output, k ?  swindow : pwindow, 128);
             s->dsp.vector_fmul_reverse(s->output+128, s->output+128, swindow, 128);
             ff_mdct_calc(&s->mdct128, sce->coeffs + k, s->output);
         }
@@ -302,7 +307,7 @@ static void encode_ms_info(PutBitContext *pb, ChannelElement *cpe)
 static void adjust_frame_information(AACEncContext *apc, ChannelElement *cpe, int chans)
 {
     int i, w, w2, g, ch;
-    int start, sum, maxsfb, cmaxsfb;
+    int start, maxsfb, cmaxsfb;
 
     for (ch = 0; ch < chans; ch++) {
         IndividualChannelStream *ics = &cpe->ch[ch].ics;
@@ -311,9 +316,8 @@ static void adjust_frame_information(AACEncContext *apc, ChannelElement *cpe, in
         cpe->ch[ch].pulse.num_pulse = 0;
         for (w = 0; w < ics->num_windows*16; w += 16) {
             for (g = 0; g < ics->num_swb; g++) {
-                sum = 0;
                 //apply M/S
-                if (!ch && cpe->ms_mask[w + g]) {
+                if (cpe->common_window && !ch && cpe->ms_mask[w + g]) {
                     for (i = 0; i < ics->swb_sizes[g]; i++) {
                         cpe->ch[0].coeffs[start+i] = (cpe->ch[0].coeffs[start+i] + cpe->ch[1].coeffs[start+i]) / 2.0;
                         cpe->ch[1].coeffs[start+i] =  cpe->ch[0].coeffs[start+i] - cpe->ch[1].coeffs[start+i];
@@ -544,7 +548,6 @@ static int aac_encode_frame(AVCodecContext *avctx,
             for (k = 0; k < ics->num_windows; k++)
                 ics->group_len[k] = wi[j].grouping[k];
 
-            s->cur_channel = cur_channel;
             apply_window_and_mdct(avctx, s, &cpe->ch[j], samples2);
         }
         start_ch += chans;
@@ -561,6 +564,8 @@ static int aac_encode_frame(AVCodecContext *avctx,
             tag      = chan_map[i+1];
             chans    = tag == TYPE_CPE ? 2 : 1;
             cpe      = &s->cpe[i];
+            put_bits(&s->pb, 3, tag);
+            put_bits(&s->pb, 4, chan_el_counter[tag]++);
             for (j = 0; j < chans; j++) {
                 s->cur_channel = start_ch + j;
                 ff_psy_set_band_info(&s->psy, s->cur_channel, cpe->ch[j].coeffs, &wi[j]);
@@ -583,8 +588,6 @@ static int aac_encode_frame(AVCodecContext *avctx,
             if (cpe->common_window && s->coder->search_for_ms)
                 s->coder->search_for_ms(s, cpe, s->lambda);
             adjust_frame_information(s, cpe, chans);
-            put_bits(&s->pb, 3, tag);
-            put_bits(&s->pb, 4, chan_el_counter[tag]++);
             if (chans == 2) {
                 put_bits(&s->pb, 1, cpe->common_window);
                 if (cpe->common_window) {
@@ -638,7 +641,7 @@ static av_cold int aac_encode_end(AVCodecContext *avctx)
     return 0;
 }
 
-AVCodec aac_encoder = {
+AVCodec ff_aac_encoder = {
     "aac",
     AVMEDIA_TYPE_AUDIO,
     CODEC_ID_AAC,
@@ -647,6 +650,6 @@ AVCodec aac_encoder = {
     aac_encode_frame,
     aac_encode_end,
     .capabilities = CODEC_CAP_SMALL_LAST_FRAME | CODEC_CAP_DELAY | CODEC_CAP_EXPERIMENTAL,
-    .sample_fmts = (const enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
+    .sample_fmts = (const enum AVSampleFormat[]){AV_SAMPLE_FMT_S16,AV_SAMPLE_FMT_NONE},
     .long_name = NULL_IF_CONFIG_SMALL("Advanced Audio Coding"),
 };

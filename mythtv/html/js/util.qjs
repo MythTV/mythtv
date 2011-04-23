@@ -67,6 +67,12 @@ function loadDiv(divName, contentURL, jsURL) {
 
 function setUIAttributes() {
     $( "input:button").button();
+    $("input, textarea").addClass("idle");
+    $("input, textarea").focus(function(){
+            $(this).addClass("activeField").removeClass("idle");
+    }).blur(function(){
+            $(this).removeClass("activeField").addClass("idle");
+    });
 }
 
 function clearDiv(divName) {
@@ -198,6 +204,7 @@ function hideConfirm() {
 
 function showConfirm(content, functionname, params) {
     $("#confirmWindow").dialog({
+        modal: true,
         buttons: {
            'Yes': function() {
                if (params == null) {
@@ -216,5 +223,10 @@ function showConfirm(content, functionname, params) {
     $("#confirmWindow").html(content);
     $("#confirmWindow").show();
     $("#confirmWindow").draggable();
+}
+
+function appendMatch(match, divname) {
+    var newValue = $("#" + divname).val() + match;
+    $("#" + divname).val(newValue);
 }
 

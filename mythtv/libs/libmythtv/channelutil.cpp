@@ -1768,6 +1768,80 @@ bool ChannelUtil::GetChannelData(
                            dvb_transportid, dvb_networkid, dtv_si_std);
 }
 
+bool ChannelUtil::GetExtendedChannelData(
+    uint    sourceid,         const QString &channum,
+    QString &tvformat,        QString       &modulation,
+    QString &freqtable,       QString       &freqid,
+    int     &finetune,        uint64_t      &frequency,
+    QString &dtv_si_std,      int           &mpeg_prog_num,
+    uint    &atsc_major,      uint          &atsc_minor,
+    uint    &dvb_transportid, uint          &dvb_networkid,
+    uint    &mplexid,         bool          &commfree,
+    bool    &use_on_air_guide,bool          &visible,
+    QString &xmltvid,         QString       &default_authority,
+    QString &icon)
+{
+    tvformat          = modulation = freqtable = QString::null;
+    freqid            = dtv_si_std = xmltvid = QString::null;
+    default_authority = icon       = QString::null;
+    finetune         = 0;
+    frequency        = 0;
+    mpeg_prog_num    = -1;
+    atsc_major       = atsc_minor = mplexid = 0;
+    dvb_networkid    = dvb_transportid = 0;
+    commfree         = false;
+    use_on_air_guide = false;
+    visible          = true;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT finetune, freqid, tvformat, freqtable, "
+        "       commmethod, mplexid, "
+        "       atsc_major_chan, atsc_minor_chan, serviceid, "
+        "       useonairguide, visible, xmltvid, default_authority, icon "
+        "FROM channel, videosource "
+        "WHERE videosource.sourceid = channel.sourceid AND "
+        "      channum              = :CHANNUM         AND "
+        "      channel.sourceid     = :SOURCEID");
+    query.bindValue(":CHANNUM",  channum);
+    query.bindValue(":SOURCEID", sourceid);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("GetChannelData", query);
+        return false;
+    }
+    else if (!query.next())
+    {
+        VERBOSE(VB_IMPORTANT, QString(
+                    "GetChannelData() failed because it could not\n"
+                    "\t\t\tfind channel number '%1' in DB for source '%2'.")
+                .arg(channum).arg(sourceid));
+        return false;
+    }
+
+    finetune          = query.value(0).toInt();
+    freqid            = query.value(1).toString();
+    tvformat          = query.value(2).toString();
+    freqtable         = query.value(3).toString();
+    commfree          = (query.value(4).toInt() == -2);
+    mplexid           = query.value(5).toUInt();
+    atsc_major        = query.value(6).toUInt();
+    atsc_minor        = query.value(7).toUInt();
+    mpeg_prog_num     = query.value(8).toUInt();
+    use_on_air_guide  = query.value(9).toBool();
+    visible           = query.value(10).toBool();
+    xmltvid           = query.value(11).toString();
+    default_authority = query.value(12).toString();
+    icon              = query.value(13).toString();
+
+    if (!mplexid || (mplexid == 32767)) /* 32767 deals with old lineups */
+        return true;
+
+    return GetTuningParams(mplexid, modulation, frequency,
+                           dvb_transportid, dvb_networkid, dtv_si_std);
+}
+
 DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp, int changrpid)
 {
     DBChanList list;

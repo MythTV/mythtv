@@ -92,15 +92,17 @@ RecordingInfo::RecordingInfo(
     bool _commfree,
     uint _subtitleType,
     uint _videoproperties,
-    uint _audioproperties) :
+    uint _audioproperties,
+    bool _future) :
     ProgramInfo(
         _title, _subtitle, _description, _category,
         _chanid, _chanstr, _chansign, _channame, QString(),
         _recgroup, _playgroup,
         _startts, _endts, _recstartts, _recendts,
         _seriesid, _programid),
-    oldrecstatus(rsUnknown),
+    oldrecstatus(_oldrecstatus),
     savedrecstatus(rsUnknown),
+    future(_future),
     record(NULL)
 {
     hostname = _hostname;
@@ -123,12 +125,6 @@ RecordingInfo::RecordingInfo(
     programflags |= _reactivate ? FL_REACTIVATE : 0;
     programflags &= ~FL_CHANCOMMFREE;
     programflags |= _commfree ? FL_CHANCOMMFREE : 0;
-
-    oldrecstatus = _oldrecstatus;
-
-    recstatus = (oldrecstatus == rsAborted ||
-                 oldrecstatus == rsNotListed ||
-                 _reactivate) ? rsUnknown : oldrecstatus;
 
     recordid = _recordid;
     parentid = _parentid;
@@ -196,6 +192,7 @@ RecordingInfo::RecordingInfo(
         _seriesid, _programid),
     oldrecstatus(rsUnknown),
     savedrecstatus(rsUnknown),
+    future(false),
     record(NULL)
 {
     recpriority = _recpriority;
@@ -226,6 +223,7 @@ RecordingInfo::RecordingInfo(
     bool genUnknown, uint maxHours, LoadStatus *status) :
     oldrecstatus(rsUnknown),
     savedrecstatus(rsUnknown),
+    future(false),
     record(NULL)
 {
     ProgramList schedList;
@@ -368,6 +366,7 @@ void RecordingInfo::clone(const RecordingInfo &other,
     {
         oldrecstatus   = other.oldrecstatus;
         savedrecstatus = other.savedrecstatus;
+        future         = other.future;
     }
 }
 
@@ -391,6 +390,7 @@ void RecordingInfo::clone(const ProgramInfo &other,
 
     oldrecstatus   = rsUnknown;
     savedrecstatus = rsUnknown;
+    future         = false;
 }
 
 void RecordingInfo::clear(void)
@@ -402,6 +402,7 @@ void RecordingInfo::clear(void)
 
     oldrecstatus = rsUnknown;
     savedrecstatus = rsUnknown;
+    future = false;
 }
 
 
@@ -1129,12 +1130,16 @@ void RecordingInfo::ReactivateRecording(void)
 /**
  *  \brief Adds recording history, creating "record" it if necessary.
  */
-void RecordingInfo::AddHistory(bool resched, bool forcedup)
+void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
 {
     bool dup = (GetRecordingStatus() == rsRecorded || forcedup);
-    RecStatusType rs = (GetRecordingStatus() == rsCurrentRecording) ?
-        rsPreviousRecording : GetRecordingStatus();
-    oldrecstatus = GetRecordingStatus();
+    RecStatusType rs = (GetRecordingStatus() == rsCurrentRecording &&
+                        !future) ? rsPreviousRecording : GetRecordingStatus();
+    VERBOSE(VB_SCHEDULE, QString("AddHistory: %1/%2, %3, %4, %5/%6")
+            .arg(int(rs)).arg(int(oldrecstatus)).arg(future).arg(dup)
+            .arg(GetScheduledStartTime().toString()).arg(GetTitle()));
+    if (!future)
+        oldrecstatus = GetRecordingStatus();
     if (dup)
         SetReactivated(false);
     uint erecid = parentid ? parentid : recordid;
@@ -1144,10 +1149,11 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup)
     result.prepare("REPLACE INTO oldrecorded (chanid,starttime,"
                    "endtime,title,subtitle,description,category,"
                    "seriesid,programid,findid,recordid,station,"
-                   "rectype,recstatus,duplicate,reactivate) "
+                   "rectype,recstatus,duplicate,reactivate,future) "
                    "VALUES(:CHANID,:START,:END,:TITLE,:SUBTITLE,:DESC,"
                    ":CATEGORY,:SERIESID,:PROGRAMID,:FINDID,:RECORDID,"
-                   ":STATION,:RECTYPE,:RECSTATUS,:DUPLICATE,:REACTIVATE);");
+                   ":STATION,:RECTYPE,:RECSTATUS,:DUPLICATE,:REACTIVATE,"
+                   ":FUTURE);");
     result.bindValue(":CHANID", chanid);
     result.bindValue(":START", startts);
     result.bindValue(":END", endts);
@@ -1164,6 +1170,7 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup)
     result.bindValue(":RECSTATUS", rs);
     result.bindValue(":DUPLICATE", dup);
     result.bindValue(":REACTIVATE", IsReactivated());
+    result.bindValue(":FUTURE", future);
 
     if (!result.exec())
         MythDB::DBError("addHistory", result);
@@ -1291,7 +1298,7 @@ void RecordingInfo::SetDupHistory(void)
     MSqlQuery result(MSqlQuery::InitCon());
 
     result.prepare("UPDATE oldrecorded SET duplicate = 1 "
-                   "WHERE duplicate = 0 "
+                   "WHERE future = 0 AND duplicate = 0 "
                    "AND title = :TITLE AND "
                    "((programid = '' AND subtitle = :SUBTITLE"
                    "  AND description = :DESC) OR "

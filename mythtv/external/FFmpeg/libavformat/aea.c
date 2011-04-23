@@ -21,8 +21,9 @@
  */
 
 #include "avformat.h"
-#include "raw.h"
+#include "pcm.h"
 #include "libavutil/intreadwrite.h"
+#include "libavutil/audioconvert.h"
 
 #define AT1_SU_SIZE     212
 
@@ -76,7 +77,7 @@ static int aea_read_header(AVFormatContext *s,
         return -1;
     }
 
-    st->codec->channel_layout = (st->codec->channels == 1) ? CH_LAYOUT_MONO : CH_LAYOUT_STEREO;
+    st->codec->channel_layout = (st->codec->channels == 1) ? AV_CH_LAYOUT_MONO : AV_CH_LAYOUT_STEREO;
 
     st->codec->block_align = AT1_SU_SIZE * st->codec->channels;
     return 0;
@@ -93,7 +94,7 @@ static int aea_read_packet(AVFormatContext *s, AVPacket *pkt)
     return ret;
 }
 
-AVInputFormat aea_demuxer = {
+AVInputFormat ff_aea_demuxer = {
     "aea",
     NULL_IF_CONFIG_SMALL("MD STUDIO audio"),
     0,

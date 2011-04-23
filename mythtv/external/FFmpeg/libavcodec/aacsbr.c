@@ -1134,16 +1134,12 @@ static void sbr_dequant(SpectralBandReplication *sbr, int id_aac)
  * @param   W       array of complex-valued samples split into subbands
  */
 static void sbr_qmf_analysis(DSPContext *dsp, FFTContext *mdct, const float *in, float *x,
-                             float z[320], float W[2][32][32][2],
-                             float scale)
+                             float z[320], float W[2][32][32][2])
 {
     int i, k;
     memcpy(W[0], W[1], sizeof(W[0]));
     memcpy(x    , x+1024, (320-32)*sizeof(x[0]));
-    if (scale != 1.0f)
-        dsp->vector_fmul_scalar(x+288, in, scale, 1024);
-    else
-        memcpy(x+288, in, 1024*sizeof(*x));
+    memcpy(x+288, in,         1024*sizeof(x[0]));
     for (i = 0; i < 32; i++) { // numTimeSlots*RATE = 16*2 as 960 sample frames
                                // are not supported
         dsp->vector_fmul_reverse(z, sbr_qmf_window_ds, x, 320);
@@ -1175,12 +1171,10 @@ static void sbr_qmf_analysis(DSPContext *dsp, FFTContext *mdct, const float *in,
 static void sbr_qmf_synthesis(DSPContext *dsp, FFTContext *mdct,
                               float *out, float X[2][38][64],
                               float mdct_buf[2][64],
-                              float *v0, int *v_off, const unsigned int div,
-                              float bias, float scale)
+                              float *v0, int *v_off, const unsigned int div)
 {
     int i, n;
     const float *sbr_qmf_window = div ? sbr_qmf_window_ds : sbr_qmf_window_us;
-    int scale_and_bias = scale != 1.0f || bias != 0.0f;
     float *v;
     for (i = 0; i < 32; i++) {
         if (*v_off == 0) {
@@ -1222,9 +1216,6 @@ static void sbr_qmf_synthesis(DSPContext *dsp, FFTContext *mdct,
         dsp->vector_fmul_add(out, v + ( 960 >> div), sbr_qmf_window + (448 >> div), out   , 64 >> div);
         dsp->vector_fmul_add(out, v + (1024 >> div), sbr_qmf_window + (512 >> div), out   , 64 >> div);
         dsp->vector_fmul_add(out, v + (1216 >> div), sbr_qmf_window + (576 >> div), out   , 64 >> div);
-        if (scale_and_bias)
-            for (n = 0; n < 64 >> div; n++)
-                out[n] = out[n] * scale + bias;
         out += 64 >> div;
     }
 }
@@ -1727,7 +1718,7 @@ void ff_sbr_apply(AACContext *ac, SpectralBandReplication *sbr, int id_aac,
         /* decode channel */
         sbr_qmf_analysis(&ac->dsp, &sbr->mdct_ana, ch ? R : L, sbr->data[ch].analysis_filterbank_samples,
                          (float*)sbr->qmf_filter_scratch,
-                         sbr->data[ch].W, 1/(-1024 * ac->sf_scale));
+                         sbr->data[ch].W);
         sbr_lf_gen(ac, sbr, sbr->X_low, sbr->data[ch].W);
         if (sbr->start) {
             sbr_hf_inverse_filter(sbr->alpha0, sbr->alpha1, sbr->X_low, sbr->k[0]);
@@ -1760,12 +1751,10 @@ void ff_sbr_apply(AACContext *ac, SpectralBandReplication *sbr, int id_aac,
     sbr_qmf_synthesis(&ac->dsp, &sbr->mdct, L, sbr->X[0], sbr->qmf_filter_scratch,
                       sbr->data[0].synthesis_filterbank_samples,
                       &sbr->data[0].synthesis_filterbank_samples_offset,
-                      downsampled,
-                      ac->add_bias, -1024 * ac->sf_scale);
+                      downsampled);
     if (nch == 2)
         sbr_qmf_synthesis(&ac->dsp, &sbr->mdct, R, sbr->X[1], sbr->qmf_filter_scratch,
                           sbr->data[1].synthesis_filterbank_samples,
                           &sbr->data[1].synthesis_filterbank_samples_offset,
-                          downsampled,
-                          ac->add_bias, -1024 * ac->sf_scale);
+                          downsampled);
 }

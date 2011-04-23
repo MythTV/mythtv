@@ -103,7 +103,7 @@ bool PixmapChannel::CacheChannelIcon(void)
         return true;
 
     // Get address of master backed
-    QString url = gCoreContext->GetMasterHostPrefix();
+    QString url = gCoreContext->GetMasterHostPrefix("ChannelIcons");
     if (url.length() < 1)
     {
         icon.clear();

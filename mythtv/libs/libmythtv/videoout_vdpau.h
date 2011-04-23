@@ -99,7 +99,8 @@ class VideoOutputVDPAU : public VideoOutput
     Window               m_win;
     MythRenderVDPAU     *m_render;
 
-    uint                 m_buffer_size;
+    uint                 m_decoder_buffer_size;
+    uint                 m_process_buffer_size;
     QVector<uint>        m_video_surfaces;
     QVector<uint>        m_reference_frames;
     uint                 m_pause_surface;

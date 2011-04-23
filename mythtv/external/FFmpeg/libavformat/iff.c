@@ -30,7 +30,6 @@
  */
 
 #include "libavutil/intreadwrite.h"
-#include "libavcodec/iff.h"
 #include "avformat.h"
 
 #define ID_8SVX       MKTAG('8','S','V','X')
@@ -315,7 +314,7 @@ static int iff_read_packet(AVFormatContext *s,
     return ret;
 }
 
-AVInputFormat iff_demuxer = {
+AVInputFormat ff_iff_demuxer = {
     "IFF",
     NULL_IF_CONFIG_SMALL("IFF format"),
     sizeof(IffDemuxContext),

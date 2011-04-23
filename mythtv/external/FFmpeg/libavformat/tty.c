@@ -28,7 +28,6 @@
 #include "libavutil/avstring.h"
 #include "avformat.h"
 #include "sauce.h"
-#include <strings.h>
 
 #define LINE_RATE 6000 /* characters per second */
 
@@ -75,7 +74,7 @@ static int read_header(AVFormatContext *avctx,
     if (!st)
         return AVERROR(ENOMEM);
     st->codec->codec_tag   = 0;
-    st->codec->codec_type  = CODEC_TYPE_VIDEO;
+    st->codec->codec_type  = AVMEDIA_TYPE_VIDEO;
     st->codec->codec_id    = CODEC_ID_ANSI;
     if (ap->width)  st->codec->width  = ap->width;
     if (ap->height) st->codec->height = ap->height;
@@ -121,11 +120,11 @@ static int read_packet(AVFormatContext *avctx, AVPacket *pkt)
     pkt->size = av_get_packet(avctx->pb, pkt, n);
     if (pkt->size <= 0)
         return AVERROR(EIO);
-    pkt->flags |= PKT_FLAG_KEY;
+    pkt->flags |= AV_PKT_FLAG_KEY;
     return 0;
 }
 
-AVInputFormat tty_demuxer = {
+AVInputFormat ff_tty_demuxer = {
     .name           = "tty",
     .long_name      = NULL_IF_CONFIG_SMALL("Tele-typewriter"),
     .priv_data_size = sizeof(TtyDemuxContext),

@@ -30,9 +30,4 @@ int  ff_xvmc_field_start(MpegEncContext*s, AVCodecContext *avctx);
 void ff_xvmc_field_end(MpegEncContext *s);
 void ff_xvmc_decode_mb(MpegEncContext *s);
 
-int  XVMC_VLD_field_start(MpegEncContext* s, AVCodecContext* avctx);
-void XVMC_VLD_field_end(MpegEncContext* s);
-int  XVMC_VLD_decode_slice(MpegEncContext* s, int mb_y,
-                           uint8_t* buffer, int buf_size);
-
 #endif /* AVCODEC_INTERNAL_XVMC_H */

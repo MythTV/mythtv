@@ -56,8 +56,8 @@
 #define STREAM_TYPE_PRIVATE_DATA    0x06
 #define STREAM_TYPE_DSMCC_B         0x0b
 #define STREAM_TYPE_AUDIO_AAC       0x0f
-#define STREAM_TYPE_VIDEO_MPEG4     0x10
 #define STREAM_TYPE_AUDIO_AAC_LATM  0x11
+#define STREAM_TYPE_VIDEO_MPEG4     0x10
 #define STREAM_TYPE_VIDEO_H264      0x1b
 #define STREAM_TYPE_VIDEO_VC1       0xea
 #define STREAM_TYPE_VIDEO_DIRAC     0xd1
@@ -81,5 +81,48 @@ MpegTSContext *ff_mpegts_parse_open(AVFormatContext *s);
 int ff_mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
                            const uint8_t *buf, int len);
 void ff_mpegts_parse_close(MpegTSContext *ts);
+
+typedef struct
+{
+    char language[4];
+    int comp_page;
+    int anc_page;
+    int sub_id;
+    int txt_type;
+    int vbi_data;
+    /* DSMCC data */
+    int data_id;
+    int carousel_id;
+    int component_tag;
+    unsigned int codec_tag;
+} dvb_caption_info_t;
+
+typedef struct
+{
+    int pid;
+    int type;
+    enum CodecID       codec_id;
+    enum CodecType     codec_type;
+    dvb_caption_info_t dvbci;
+} pmt_entry_t;
+
+/**
+ * Parse an MPEG-2 descriptor
+ * @param[in] fc                    Format context (used for logging only)
+ * @param st                        Stream
+ * @param stream_type               STREAM_TYPE_xxx
+ * @param pp                        Descriptor buffer pointer
+ * @param desc_list_end             End of buffer
+ * @param mp4_dec_config_descr_len  Length of 'mp4_dec_config_descr', or zero if not present
+ * @param mp4_es_id
+ * @param pid
+ * @param mp4_dec_config_descr
+ * @return <0 to stop processing
+ */
+int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream_type,
+                              const uint8_t **pp, const uint8_t *desc_list_end,
+                              int mp4_dec_config_descr_len, int mp4_es_id, int pid,
+                              uint8_t *mp4_dec_config_descr, 
+                              dvb_caption_info_t *dvbci);
 
 #endif /* AVFORMAT_MPEGTS_H */

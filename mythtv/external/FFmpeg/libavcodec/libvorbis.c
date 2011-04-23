@@ -26,6 +26,7 @@
 
 #include <vorbis/vorbisenc.h>
 
+#include "libavutil/opt.h"
 #include "avcodec.h"
 #include "bytestream.h"
 #include "vorbis.h"
@@ -38,6 +39,7 @@
 #define BUFFER_SIZE (1024*64)
 
 typedef struct OggVorbisContext {
+    AVClass *av_class;
     vorbis_info vi ;
     vorbis_dsp_state vd ;
     vorbis_block vb ;
@@ -48,10 +50,18 @@ typedef struct OggVorbisContext {
     /* decoder */
     vorbis_comment vc ;
     ogg_packet op;
+
+    double iblock;
 } OggVorbisContext ;
 
+static const AVOption options[]={
+{"iblock", "Sets the impulse block bias", offsetof(OggVorbisContext, iblock), FF_OPT_TYPE_DOUBLE, 0, -15, 0, AV_OPT_FLAG_AUDIO_PARAM|AV_OPT_FLAG_ENCODING_PARAM},
+{NULL}
+};
+static const AVClass class = { "libvorbis", av_default_item_name, options, LIBAVUTIL_VERSION_INT };
 
 static av_cold int oggvorbis_init_encoder(vorbis_info *vi, AVCodecContext *avccontext) {
+    OggVorbisContext *context = avccontext->priv_data ;
     double cfreq;
 
     if(avccontext->flags & CODEC_FLAG_QSCALE) {
@@ -80,6 +90,10 @@ static av_cold int oggvorbis_init_encoder(vorbis_info *vi, AVCodecContext *avcco
         cfreq = avccontext->cutoff / 1000.0;
         if(vorbis_encode_ctl(vi, OV_ECTL_LOWPASS_SET, &cfreq))
             return -1;
+    }
+
+    if(context->iblock){
+        vorbis_encode_ctl(vi, OV_ECTL_IBLOCK_SET, &context->iblock);
     }
 
     return vorbis_encode_setup_init(vi);
@@ -229,7 +243,7 @@ static av_cold int oggvorbis_encode_close(AVCodecContext *avccontext) {
 }
 
 
-AVCodec libvorbis_encoder = {
+AVCodec ff_libvorbis_encoder = {
     "libvorbis",
     AVMEDIA_TYPE_AUDIO,
     CODEC_ID_VORBIS,
@@ -238,6 +252,7 @@ AVCodec libvorbis_encoder = {
     oggvorbis_encode_frame,
     oggvorbis_encode_close,
     .capabilities= CODEC_CAP_DELAY,
-    .sample_fmts = (const enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
+    .sample_fmts = (const enum AVSampleFormat[]){AV_SAMPLE_FMT_S16,AV_SAMPLE_FMT_NONE},
     .long_name= NULL_IF_CONFIG_SMALL("libvorbis Vorbis"),
+    .priv_class= &class,
 } ;

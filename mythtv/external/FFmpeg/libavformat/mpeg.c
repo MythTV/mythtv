@@ -20,6 +20,7 @@
  */
 
 #include "avformat.h"
+#include "internal.h"
 #include "mpeg.h"
 
 //#define DEBUG_SEEK
@@ -623,7 +624,7 @@ static int64_t mpegps_read_dts(AVFormatContext *s, int stream_index,
     return dts;
 }
 
-AVInputFormat mpegps_demuxer = {
+AVInputFormat ff_mpegps_demuxer = {
     "mpeg",
     NULL_IF_CONFIG_SMALL("MPEG-PS format"),
     sizeof(MpegDemuxContext),

@@ -24,7 +24,9 @@ class MBASE_PUBLIC StorageGroup
     QStringList GetDirList(void) const
         { QStringList tmp = m_dirlist; tmp.detach(); return tmp; }
 
-    QStringList GetFileList(QString Path);
+    QStringList GetDirFileList(QString dir, QString base,
+                               bool recursive = false);
+    QStringList GetFileList(QString Path, bool recursive = false);
     QStringList GetFileInfoList(QString Path);
     bool FileExists(QString filename);
     QStringList GetFileInfo(QString filename);
@@ -33,8 +35,8 @@ class MBASE_PUBLIC StorageGroup
                          const QString hostname = "",
                          QStringList *dirlist = NULL);
 
-    QString FindRecordingFile(QString filename);
-    QString FindRecordingDir(QString filename);
+    QString FindFile(QString filename);
+    QString FindFileDir(QString filename);
 
     QString FindNextDirMostFree(void);
 

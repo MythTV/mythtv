@@ -36,7 +36,7 @@
 #include "libavutil/avstring.h"
 #include "libavutil/lfg.h"
 #include "libavutil/random_seed.h"
-#include "libavcore/parseutils.h"
+#include "libavutil/parseutils.h"
 #include "libavcodec/opt.h"
 #include <stdarg.h>
 #include <unistd.h>
@@ -91,6 +91,10 @@ static const char *http_state[] = {
     "RTSP_SEND_REPLY",
     "RTSP_SEND_PACKET",
 };
+
+#if !FF_API_MAX_STREAMS
+#define MAX_STREAMS 20
+#endif
 
 #define IOBUFFER_INIT_SIZE 8192
 
@@ -380,7 +384,10 @@ static void http_vlog(const char *fmt, va_list vargs)
     }
 }
 
-static void __attribute__ ((format (printf, 1, 2))) http_log(const char *fmt, ...)
+#ifdef __GNUC__
+__attribute__ ((format (printf, 1, 2)))
+#endif
+static void http_log(const char *fmt, ...)
 {
     va_list vargs;
     va_start(vargs, fmt);
@@ -1188,19 +1195,6 @@ static int modify_current_stream(HTTPContext *c, char *rates)
     return action_required;
 }
 
-
-static void do_switch_stream(HTTPContext *c, int i)
-{
-    if (c->switch_feed_streams[i] >= 0) {
-#ifdef PHILIP
-        c->feed_streams[i] = c->switch_feed_streams[i];
-#endif
-
-        /* Now update the stream */
-    }
-    c->switch_feed_streams[i] = -1;
-}
-
 /* XXX: factorize in utils.c ? */
 /* XXX: take care with different space meaning */
 static void skip_spaces(const char **pp)
@@ -1574,7 +1568,7 @@ static int http_parse_request(HTTPContext *c)
         if (modify_current_stream(c, ratebuf)) {
             for (i = 0; i < FF_ARRAY_ELEMS(c->feed_streams); i++) {
                 if (c->switch_feed_streams[i] >= 0)
-                    do_switch_stream(c, i);
+                    c->switch_feed_streams[i] = -1;
             }
         }
     }
@@ -2141,11 +2135,10 @@ static int open_input_stream(HTTPContext *c, const char *info)
         strcpy(input_filename, c->stream->feed->feed_filename);
         buf_size = FFM_PACKET_SIZE;
         /* compute position (absolute time) */
-        if (find_info_tag(buf, sizeof(buf), "date", info)) {
-            stream_pos = parse_date(buf, 0);
-            if (stream_pos == INT64_MIN)
-                return -1;
-        } else if (find_info_tag(buf, sizeof(buf), "buffer", info)) {
+        if (av_find_info_tag(buf, sizeof(buf), "date", info)) {
+            if ((ret = av_parse_time(&stream_pos, buf, 0)) < 0)
+                return ret;
+        } else if (av_find_info_tag(buf, sizeof(buf), "buffer", info)) {
             int prebuffer = strtol(buf, 0, 10);
             stream_pos = av_gettime() - prebuffer * (int64_t)1000000;
         } else
@@ -2154,10 +2147,9 @@ static int open_input_stream(HTTPContext *c, const char *info)
         strcpy(input_filename, c->stream->feed_filename);
         buf_size = 0;
         /* compute position (relative time) */
-        if (find_info_tag(buf, sizeof(buf), "date", info)) {
-            stream_pos = parse_date(buf, 1);
-            if (stream_pos == INT64_MIN)
-                return -1;
+        if (av_find_info_tag(buf, sizeof(buf), "date", info)) {
+            if ((ret = av_parse_time(&stream_pos, buf, 1)) < 0)
+                return ret;
         } else
             stream_pos = 0;
     }
@@ -2345,7 +2337,7 @@ static int http_prepare_data(HTTPContext *c)
                         for(i=0;i<c->stream->nb_streams;i++) {
                             if (c->switch_feed_streams[i] == pkt.stream_index)
                                 if (pkt.flags & AV_PKT_FLAG_KEY)
-                                    do_switch_stream(c, i);
+                                    c->switch_feed_streams[i] = -1;
                             if (c->switch_feed_streams[i] >= 0)
                                 c->switch_pending = 1;
                         }
@@ -2891,7 +2883,7 @@ static int rtsp_parse_request(HTTPContext *c)
             len = sizeof(line) - 1;
         memcpy(line, p, len);
         line[len] = '\0';
-        ff_rtsp_parse_line(header, line, NULL);
+        ff_rtsp_parse_line(header, line, NULL, NULL);
         p = p1 + 1;
     }
 
@@ -2930,7 +2922,7 @@ static int prepare_sdp_description(FFStream *stream, uint8_t **pbuffer,
                                    struct in_addr my_ip)
 {
     AVFormatContext *avc;
-    AVStream avs[MAX_STREAMS];
+    AVStream *avs = NULL;
     int i;
 
     avc =  avformat_alloc_context();
@@ -2948,14 +2940,29 @@ static int prepare_sdp_description(FFStream *stream, uint8_t **pbuffer,
         snprintf(avc->filename, 1024, "rtp://0.0.0.0");
     }
 
+#if !FF_API_MAX_STREAMS
+    if (avc->nb_streams >= INT_MAX/sizeof(*avc->streams) ||
+        !(avc->streams = av_malloc(avc->nb_streams * sizeof(*avc->streams))))
+        goto sdp_done;
+#endif
+    if (avc->nb_streams >= INT_MAX/sizeof(*avs) ||
+        !(avs = av_malloc(avc->nb_streams * sizeof(*avs))))
+        goto sdp_done;
+
     for(i = 0; i < stream->nb_streams; i++) {
         avc->streams[i] = &avs[i];
         avc->streams[i]->codec = stream->streams[i]->codec;
     }
     *pbuffer = av_mallocz(2048);
     avf_sdp_create(&avc, 1, *pbuffer, 2048);
+
+ sdp_done:
+#if !FF_API_MAX_STREAMS
+    av_free(avc->streams);
+#endif
     av_metadata_free(&avc->metadata);
     av_free(avc);
+    av_free(avs);
 
     return strlen(*pbuffer);
 }
@@ -3192,7 +3199,7 @@ static HTTPContext *find_rtp_session_with_url(const char *url,
     char path1[1024];
     const char *path;
     char buf[1024];
-    int s;
+    int s, len;
 
     rtp_c = find_rtp_session(session_id);
     if (!rtp_c)
@@ -3212,6 +3219,10 @@ static HTTPContext *find_rtp_session_with_url(const char *url,
         return rtp_c;
       }
     }
+    len = strlen(path);
+    if (len > 0 && path[len - 1] == '/' &&
+        !strncmp(path, rtp_c->stream->filename, len - 1))
+        return rtp_c;
     return NULL;
 }
 
@@ -3478,6 +3489,7 @@ static AVStream *add_av_stream1(FFStream *stream, AVCodecContext *codec, int cop
     fst->priv_data = av_mallocz(sizeof(FeedData));
     fst->index = stream->nb_streams;
     av_set_pts_info(fst, 33, 1, 90000);
+    fst->sample_aspect_ratio = codec->sample_aspect_ratio;
     stream->streams[stream->nb_streams++] = fst;
     return fst;
 }
@@ -3953,27 +3965,11 @@ static int ffserver_opt_preset(const char *arg,
 {
     FILE *f=NULL;
     char filename[1000], tmp[1000], tmp2[1000], line[1000];
-    int i, ret = 0;
-    const char *base[3]= { getenv("FFMPEG_DATADIR"),
-                           getenv("HOME"),
-                           FFMPEG_DATADIR,
-                         };
+    int ret = 0;
+    AVCodec *codec = avcodec_find_encoder(avctx->codec_id);
 
-    for(i=0; i<3 && !f; i++){
-        if(!base[i])
-            continue;
-        snprintf(filename, sizeof(filename), "%s%s/%s.ffpreset", base[i], i != 1 ? "" : "/.ffmpeg", arg);
-        f= fopen(filename, "r");
-        if(!f){
-            AVCodec *codec = avcodec_find_encoder(avctx->codec_id);
-            if (codec) {
-                snprintf(filename, sizeof(filename), "%s%s/%s-%s.ffpreset", base[i],  i != 1 ? "" : "/.ffmpeg", codec->name, arg);
-                f= fopen(filename, "r");
-            }
-        }
-    }
-
-    if(!f){
+    if (!(f = get_preset_file(filename, sizeof(filename), arg, 0,
+                              codec ? codec->name : NULL))) {
         fprintf(stderr, "File for preset '%s' not found\n", arg);
         return 1;
     }

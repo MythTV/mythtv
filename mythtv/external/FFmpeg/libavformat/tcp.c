@@ -23,8 +23,8 @@
 #include "internal.h"
 #include "network.h"
 #include "os_support.h"
-#if HAVE_SYS_SELECT_H
-#include <sys/select.h>
+#if HAVE_POLL_H
+#include <poll.h>
 #endif
 #include <sys/time.h>
 
@@ -38,9 +38,7 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
     struct addrinfo hints, *ai, *cur_ai;
     int port, fd = -1;
     TCPContext *s = NULL;
-    fd_set wfds;
-    int fd_max, ret;
-    struct timeval tv;
+    int ret;
     socklen_t optlen;
     char hostname[1024],proto[1024],path[1024];
     char portstr[10];
@@ -73,8 +71,12 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
  redo:
     ret = connect(fd, cur_ai->ai_addr, cur_ai->ai_addrlen);
     if (ret < 0) {
-        if (ff_neterrno() == FF_NETERROR(EINTR))
+        struct pollfd p = {fd, POLLOUT, 0};
+        if (ff_neterrno() == FF_NETERROR(EINTR)) {
+            if (url_interrupt_cb())
+                goto fail1;
             goto redo;
+        }
         if (ff_neterrno() != FF_NETERROR(EINPROGRESS) &&
             ff_neterrno() != FF_NETERROR(EAGAIN))
             goto fail;
@@ -85,13 +87,8 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
                 ret = AVERROR(EINTR);
                 goto fail1;
             }
-            fd_max = fd;
-            FD_ZERO(&wfds);
-            FD_SET(fd, &wfds);
-            tv.tv_sec = 0;
-            tv.tv_usec = 100 * 1000;
-            ret = select(fd_max + 1, NULL, &wfds, NULL, &tv);
-            if (ret > 0 && FD_ISSET(fd, &wfds))
+            ret = poll(&p, 1, 100);
+            if (ret > 0)
                 break;
         }
 
@@ -132,71 +129,42 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
     return ret;
 }
 
+static int tcp_wait_fd(int fd, int write)
+{
+    int ev = write ? POLLOUT : POLLIN;
+    struct pollfd p = { .fd = fd, .events = ev, .revents = 0 };
+    int ret;
+
+    ret = poll(&p, 1, 100);
+    return ret < 0 ? ff_neterrno() : p.revents & ev ? 0 : FF_NETERROR(EAGAIN);
+}
+
 static int tcp_read(URLContext *h, uint8_t *buf, int size)
 {
     TCPContext *s = h->priv_data;
-    int len, fd_max, ret;
-    fd_set rfds;
-    struct timeval tv;
+    int ret;
 
-    for (;;) {
-        if (url_interrupt_cb())
-            return AVERROR(EINTR);
-        fd_max = s->fd;
-        FD_ZERO(&rfds);
-        FD_SET(s->fd, &rfds);
-        tv.tv_sec = 0;
-        tv.tv_usec = 100 * 1000;
-        ret = select(fd_max + 1, &rfds, NULL, NULL, &tv);
-        if (ret > 0 && FD_ISSET(s->fd, &rfds)) {
-            len = recv(s->fd, buf, size, 0);
-            if (len < 0) {
-                if (ff_neterrno() != FF_NETERROR(EINTR) &&
-                    ff_neterrno() != FF_NETERROR(EAGAIN))
-                    return AVERROR(ff_neterrno());
-            } else return len;
-        } else if (ret < 0) {
-            if (ff_neterrno() == FF_NETERROR(EINTR))
-                continue;
-            return -1;
-        }
+    if (!(h->flags & URL_FLAG_NONBLOCK)) {
+        ret = tcp_wait_fd(s->fd, 0);
+        if (ret < 0)
+            return ret;
     }
+    ret = recv(s->fd, buf, size, 0);
+    return ret < 0 ? ff_neterrno() : ret;
 }
 
 static int tcp_write(URLContext *h, const uint8_t *buf, int size)
 {
     TCPContext *s = h->priv_data;
-    int ret, size1, fd_max, len;
-    fd_set wfds;
-    struct timeval tv;
+    int ret;
 
-    size1 = size;
-    while (size > 0) {
-        if (url_interrupt_cb())
-            return AVERROR(EINTR);
-        fd_max = s->fd;
-        FD_ZERO(&wfds);
-        FD_SET(s->fd, &wfds);
-        tv.tv_sec = 0;
-        tv.tv_usec = 100 * 1000;
-        ret = select(fd_max + 1, NULL, &wfds, NULL, &tv);
-        if (ret > 0 && FD_ISSET(s->fd, &wfds)) {
-            len = send(s->fd, buf, size, 0);
-            if (len < 0) {
-                if (ff_neterrno() != FF_NETERROR(EINTR) &&
-                    ff_neterrno() != FF_NETERROR(EAGAIN))
-                    return AVERROR(ff_neterrno());
-                continue;
-            }
-            size -= len;
-            buf += len;
-        } else if (ret < 0) {
-            if (ff_neterrno() == FF_NETERROR(EINTR))
-                continue;
-            return -1;
-        }
+    if (!(h->flags & URL_FLAG_NONBLOCK)) {
+        ret = tcp_wait_fd(s->fd, 1);
+        if (ret < 0)
+            return ret;
     }
-    return size1 - size;
+    ret = send(s->fd, buf, size, 0);
+    return ret < 0 ? ff_neterrno() : ret;
 }
 
 static int tcp_close(URLContext *h)
@@ -213,7 +181,7 @@ static int tcp_get_file_handle(URLContext *h)
     return s->fd;
 }
 
-URLProtocol tcp_protocol = {
+URLProtocol ff_tcp_protocol = {
     "tcp",
     tcp_open,
     tcp_read,

@@ -54,7 +54,7 @@ QString toUIState(RecStatusType recstatus)
 
     if (recstatus == rsConflict     || recstatus == rsOffLine      ||
         recstatus == rsTunerBusy    || recstatus == rsFailed       ||
-        recstatus == rsAborted)
+        recstatus == rsAborted      || recstatus == rsMissed)
     {
         return "error";
     }
@@ -113,6 +113,9 @@ QChar toQChar(RecStatusType recstatus, uint cardid)
             break;
         case rsMissed:
             ret = QObject::tr("M", "RecStatusChar rsMissed");
+            break;
+        case rsMissedFuture:
+            ret = QObject::tr("m", "RecStatusChar rsMissedFuture");
             break;
         case rsConflict:
             ret = QObject::tr("C", "RecStatusChar rsConflict");
@@ -184,6 +187,8 @@ QString toString(RecStatusType recstatus, RecordingType rectype)
             return QObject::tr("Manual Cancel");
         case rsMissed:
             return QObject::tr("Missed");
+        case rsMissedFuture:
+            return QObject::tr("Missed Future");
         case rsConflict:
             return QObject::tr("Conflicting");
         case rsLaterShowing:
@@ -240,8 +245,13 @@ QString toDescription(RecStatusType recstatus, const QDateTime &recstartts)
                 break;
             case rsMissed:
                 message = QObject::tr(
-                    "This showing was not recorded because it "
-                    "was scheduled after it would have ended.");
+                    "This showing was not recorded because the "
+                    "master backend was hung or not running.");
+                break;
+            case rsMissedFuture:
+                message = QObject::tr(
+                    "This showing was not recorded because the "
+                    "master backend was hung or not running.");
                 break;
             case rsCancelled:
                 message = QObject::tr(

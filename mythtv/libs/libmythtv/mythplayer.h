@@ -545,6 +545,7 @@ class MTV_PUBLIC MythPlayer
     QWaitCondition decoderThreadUnpause;
     mutable QMutex decoderPauseLock;
     mutable QMutex decoderSeekLock;
+    bool           totalDecoderPause;
     bool           decoderPaused;
     bool           pauseDecoder;
     bool           unpauseDecoder;

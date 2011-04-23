@@ -89,7 +89,7 @@ static int read_header(AVFormatContext *s,
     video->codec->height = 192;
     /* 4:3 320x200 with 8 empty lines */
     video->sample_aspect_ratio = (AVRational) { 5, 6 };
-    video->time_base = (AVRational) { 2, 25 };
+    av_set_pts_info(video, 64, 2, 25);
     video->nb_frames = framecount;
     video->duration = framecount;
     video->start_time = 0;
@@ -192,7 +192,7 @@ static int read_packet(AVFormatContext *s, AVPacket *pkt)
     return ret;
 }
 
-AVInputFormat c93_demuxer = {
+AVInputFormat ff_c93_demuxer = {
     "c93",
     NULL_IF_CONFIG_SMALL("Interplay C93"),
     sizeof(C93DemuxContext),

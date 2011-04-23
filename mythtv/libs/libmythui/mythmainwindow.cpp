@@ -72,10 +72,6 @@ using namespace std;
 #include "mythuihelper.h"
 #include "mythdialogbox.h"
 
-#ifdef USING_VDPAU
-#include "mythpainter_vdpau.h"
-#endif
-
 #ifdef USING_MINGW
 #include "mythpainter_d3d9.h"
 #endif
@@ -365,22 +361,6 @@ void MythPainterWindowGL::paintEvent(QPaintEvent *pe)
 }
 #endif
 
-#ifdef USING_VDPAU
-MythPainterWindowVDPAU::MythPainterWindowVDPAU(MythMainWindow *win,
-                                               MythMainWindowPrivate *priv)
-                   : QGLWidget(win),
-                     parent(win), d(priv)
-{
-    setAutoBufferSwap(false);
-}
-
-void MythPainterWindowVDPAU::paintEvent(QPaintEvent *pe)
-{
-    d->repaintRegion = d->repaintRegion.unite(pe->region());
-    parent->drawScreen();
-}
-#endif
-
 #ifdef USING_MINGW
 MythPainterWindowD3D9::MythPainterWindowD3D9(MythMainWindow *win,
                                              MythMainWindowPrivate *priv)
@@ -548,6 +528,21 @@ MythPainter *MythMainWindow::GetCurrentPainter(void)
 QWidget *MythMainWindow::GetPaintWindow(void)
 {
     return d->paintwin;
+}
+
+void MythMainWindow::ShowPainterWindow(void)
+{
+    if (d->paintwin)
+        d->paintwin->show();
+}
+
+void MythMainWindow::HidePainterWindow(void)
+{
+    if (d->paintwin)
+    {
+        d->paintwin->clearMask();
+        d->paintwin->hide();
+    }
 }
 
 MythRender *MythMainWindow::GetRenderDevice()
@@ -870,6 +865,8 @@ void MythMainWindow::Init(void)
 
     GetMythUI()->ThemeWidget(this);
     Show();
+    setAttribute(Qt::WA_NoSystemBackground);
+    setAutoFillBackground(false);
 
     if (!GetMythDB()->GetNumSetting("HideMouseCursor", 0))
         setMouseTracking(true); // Required for mouse cursor auto-hide
@@ -946,14 +943,6 @@ void MythMainWindow::Init(void)
         }
     }
 #endif
-#ifdef USING_VDPAU
-    if (painter == "vdpau")
-    {
-        VERBOSE(VB_GENERAL, "Using the VDPAU painter");
-        d->painter = new MythVDPAUPainter();
-        d->paintwin = new MythPainterWindowVDPAU(this, d);
-    }
-#endif
 
     if (!d->painter && !d->paintwin)
     {
@@ -972,7 +961,7 @@ void MythMainWindow::Init(void)
     d->paintwin->move(0, 0);
     d->paintwin->setFixedSize(size());
     d->paintwin->raise();
-    d->paintwin->show();
+    ShowPainterWindow();
     if (!GetMythDB()->GetNumSetting("HideMouseCursor", 0))
         d->paintwin->setMouseTracking(true); // Required for mouse cursor auto-hide
 
@@ -1146,7 +1135,7 @@ void MythMainWindow::ReinitDone(void)
     d->paintwin->move(0, 0);
     d->paintwin->setFixedSize(size());
     d->paintwin->raise();
-    d->paintwin->show();
+    ShowPainterWindow();
 
     d->drawTimer->start(1000 / 70);
 }
@@ -1277,11 +1266,13 @@ void MythMainWindow::SetDrawEnabled(bool enable)
             d->m_pendingUpdate = false;
         }
         d->drawTimer->start(1000 / 70);
-
+        ShowPainterWindow();
     }
     else
+    {
+        HidePainterWindow();
         d->drawTimer->stop();
-
+    }
 
     d->m_setDrawEnabledWait.wakeAll();
 }

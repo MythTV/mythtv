@@ -21,7 +21,7 @@
     function wizardSelectNewDir(group) {
         var dirs = new Array;
         wizardStorageGroupName = group;
-        openFileBrowser("Storage Directory", dirs, wizardNewDirSelected);
+        openDirBrowser("Storage Directory", dirs, wizardNewDirSelected);
     }
 
     function wizardRemoveStorageGroupDir(group, dir, host) {

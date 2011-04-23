@@ -1,0 +1,84 @@
+<div id='channelsettings'>
+    <h3><a href="#">Basic Settings</a></h3>
+    <div id='channeldetail-basicsettings'>
+        <p>
+        <table width="100%" cellpadding="0" cellspacing="10" border="0">
+            <tr>
+                <td>Channel Number:</td><td style="text-align:right;"><input id='channelDetailSettingChanNum' /></td>
+            </tr>
+            <tr>
+                <td>Channel Name:</td><td style="text-align:right;"><input id='channelDetailSettingChannelName' /></td>
+            </tr>
+            <tr>
+                <td>Callsign:</td><td style="text-align:right;"><input id='channelDetailSettingCallSign' /></td>
+            </tr>
+            <tr>
+                <td>XMLTV ID:</td><td style="text-align:right;"><input id='channelDetailSettingXMLTVID' /></td>
+            </tr>
+            <tr>
+                <td>Icon File:</td><td style="text-align:right;"><input id='channelDetailSettingIconURL' />&nbsp;<input type=button onClick='javascript:browseForNewChanIcon()' value='Browse'></td>
+            </tr>
+            <tr>
+                <td width="100%"><input id='channelDetailSettingVisible' type='checkbox'/> Make this channel visible</td>
+            </tr>
+            <tr>
+                <td width="100%"><input id='channelDetailSettingUseEIT' type='checkbox'/> Use Over-the-air guide data for this channel</td>
+            </tr>
+        </table>
+        </p>
+    </div>
+
+    <h3><a href="#">Advanced Settings</a></h3>
+    <div id='channeldetail-advancedsettings'>
+        <p>
+        <b>Do not edit these settings!  You will almost certainly break your channel!</b>
+        <table width="100%" cellpadding="0" cellspacing="10" border="0">
+            <tr>
+                <td>Frequency ID:</td><td style="text-align:right;"><input type='number' id='channelDetailSettingFrequencyId' /></td>
+            </tr>
+            <tr>
+                <td>Multiplex ID:</td><td style="text-align:right;"><div id='channelDetailSettingMplexId'></div></td>
+            </tr>
+            <tr>
+                <td>Service ID:</td><td style="text-align:right;"><input type='number' id='channelDetailSettingServiceId' /></td>
+            </tr>
+            <tr>
+                <td>Default Authority:</td><td style="text-align:right;"><input id='channelDettailSettingDefaultAuthority' /></td>
+            </tr>
+            <tr>
+                <td>ATSC Major Channel:</td><td style="text-align:right;"><input type='number' id='channelDetailSettingATSCMajorChannel' /></td>
+            </tr>
+            <tr>
+                <td>ATSC Minor Channel:</td><td style="text-align:right;"><input type='number' id='channelDetailSettingATSCMinorChannel' /></td>
+            </tr>
+        </table>
+        </p>
+    </div>
+
+    <h3><a href="#">Expert Information</a></h3>
+    <div id='channeldetail-expertsettings'>
+        <p>
+        <table width="100%" cellpadding="0" cellspacing="10" border="0">
+            <tr>
+                <td width="50%">Channel ID:</td><td><div style="text-align:right" id='channelDetailSettingChanId'></div></td>
+            </tr>
+            <tr>
+                <td width="50%">Source ID:</td><td><div style="text-align:right" id='channelDetailSettingSourceId'></div></td>
+            </tr>
+            <tr>
+                <td width="50%">Channel Modulation:</td><td><div style="text-align:right" id='channelDetailSettingModulation'></div></td>
+            </tr>
+            <tr>
+                <td width="50%">Channel Frequency:</td><td><div style="text-align:right" id='channelDetailSettingFrequency'></div></td>
+            </tr>
+            <tr>
+                <td width="50%">SI Standard:</td><td><div style="text-align:right" id='channelDetailSettingSIStandard'></div></td>
+            </tr>
+            <tr>
+                <td width="50%">Format:</td><td><div style="text-align:right"  id='channelDetailSettingFormat'></div></td>
+            </tr>
+        </table>
+        </p>
+    </div>
+
+</div>

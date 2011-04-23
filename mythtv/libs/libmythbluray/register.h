@@ -70,44 +70,177 @@ typedef enum {
 
 #define DEFAULT_LANGUAGE  "eng"
 
-/*
- *
- */
 
 typedef struct bd_registers_s BD_REGISTERS;
 
+/**
+ *
+ *  Initialize registers
+ *
+ * @return allocated BD_REGISTERS object with default values
+ */
 BD_PRIVATE BD_REGISTERS *bd_registers_init(void);
-BD_PRIVATE void          bd_registers_free(BD_REGISTERS *);
 
-int      bd_psr_setting_write(BD_REGISTERS *, int reg, uint32_t val);
-int      bd_psr_write(BD_REGISTERS *, int reg, uint32_t val);
+/**
+ *
+ *  Free BD_REGISTERS object
+ *
+ * @param registers  BD_REGISTERS object
+ */
+BD_PRIVATE void bd_registers_free(BD_REGISTERS *);
+
+
+/*
+ * GPR (general-purprose register) access
+ */
+
+/**
+ *
+ *  Read value of general-purprose register
+ *
+ * @param registers  BD_REGISTERS object
+ * @param reg  register number
+ * @return value stored in register, -1 on error (invalid register number)
+ */
+uint32_t bd_gpr_read(BD_REGISTERS *, int reg);
+
+/**
+ *
+ *  Write to general-purprose register
+ *
+ * @param registers  BD_REGISTERS object
+ * @param reg  register number
+ * @param val  new value for register
+ * @return 0 on success, -1 on error (invalid register number)
+ */
+int bd_gpr_write(BD_REGISTERS *, int reg, uint32_t val);
+
+
+/*
+ * PSR (player status / setting register) access
+ */
+
+/**
+ *
+ *  Read value of player status/setting register
+ *
+ * @param registers  BD_REGISTERS object
+ * @param reg  register number
+ * @return value stored in register, -1 on error (invalid register number)
+ */
 uint32_t bd_psr_read(BD_REGISTERS *, int reg);
 
-void     bd_psr_save_state(BD_REGISTERS *);
-void     bd_psr_restore_state(BD_REGISTERS *);
+/**
+ *
+ *  Write to player status register.
+ *
+ *  Writing to player setting registers will fail.
+ *
+ * @param registers  BD_REGISTERS object
+ * @param reg  register number
+ * @param val  new value for register
+ * @return 0 on success, -1 on error (invalid register number)
+ */
+int bd_psr_write(BD_REGISTERS *, int reg, uint32_t val);
 
-void     bd_psr_lock(BD_REGISTERS *);
-void     bd_psr_unlock(BD_REGISTERS *);
+/**
+ *
+ *  Write to any PSR, including player setting registers.
+ *
+ *  This should be called only by the application.
+ *
+ * @param registers  BD_REGISTERS object
+ * @param reg  register number
+ * @param val  new value for register
+ * @return 0 on success, -1 on error (invalid register number)
+ */
+int bd_psr_setting_write(BD_REGISTERS *, int reg, uint32_t val);
 
-int      bd_gpr_write(BD_REGISTERS *, int reg, uint32_t val);
-uint32_t bd_gpr_read(BD_REGISTERS *, int reg);
+/**
+ *
+ *  Lock PSRs for atomic read-modify-write operation
+ *
+ * @param registers  BD_REGISTERS object
+ */
+void bd_psr_lock(BD_REGISTERS *);
+
+/**
+ *
+ *  Unlock PSRs
+ *
+ * @param registers  BD_REGISTERS object
+ */
+void bd_psr_unlock(BD_REGISTERS *);
+
+/**
+ *
+ *  Save player state
+ *
+ *  Copy values of registers 4-8 and 10-12 to backup registers 36-40 and 42-44.
+ *
+ * @param registers  BD_REGISTERS object
+ */
+void bd_psr_save_state(BD_REGISTERS *);
+
+/**
+ *
+ *  Restore player state
+ *
+ *  Restore registers 4-8 and 10-12 from backup registers 36-40 and 42-44.
+ *  Initialize backup registers to default values.
+ *
+ * @param registers  BD_REGISTERS object
+ */
+void bd_psr_restore_state(BD_REGISTERS *);
+
+/**
+ *
+ *  Reset backup registers
+ *
+ *  Initialize backup registers 36-40 and 42-44 to default values.
+ *
+ * @param registers  BD_REGISTERS object
+ */
+void bd_psr_reset_backup_registers(BD_REGISTERS *);
+
 
 /*
  * Events when PSR value is changed
  */
 
+/* event types */
 #define BD_PSR_CHANGE  1
 #define BD_PSR_RESTORE 2
 
+/* event data */
 typedef struct {
-    int      ev_type;
+    int      ev_type; /* event type */
 
-    int      psr_idx;
-    uint32_t old_val;
-    uint32_t new_val;
+    int      psr_idx; /* register index */
+    uint32_t old_val; /* old value of register */
+    uint32_t new_val; /* new value of register */
 } BD_PSR_EVENT;
 
-void bd_psr_register_cb  (BD_REGISTERS *, void (*callback)(void*,BD_PSR_EVENT*), void *cb_handle);
+/**
+ *
+ *  Register callback function
+ *
+ *  Function is called every time PSR value changes.
+ *
+ * @param registers  BD_REGISTERS object
+ * @param callback  callback function pointer
+ * @param handle  application-specific handle that is provided to callback function as first parameter
+ */
+void bd_psr_register_cb(BD_REGISTERS *, void (*callback)(void*,BD_PSR_EVENT*), void *cb_handle);
+
+/**
+ *
+ *  Unregister callback function
+ *
+ * @param registers  BD_REGISTERS object
+ * @param callback  callback function to unregister
+ * @param handle  application-specific handle that was used when callback was registered
+ */
 void bd_psr_unregister_cb(BD_REGISTERS *, void (*callback)(void*,BD_PSR_EVENT*), void *cb_handle);
 
 #ifdef __cplusplus

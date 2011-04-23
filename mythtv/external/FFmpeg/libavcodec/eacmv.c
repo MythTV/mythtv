@@ -29,7 +29,7 @@
  */
 
 #include "libavutil/intreadwrite.h"
-#include "libavcore/imgutils.h"
+#include "libavutil/imgutils.h"
 #include "avcodec.h"
 
 typedef struct CmvContext {
@@ -97,9 +97,10 @@ static void cmv_decode_inter(CmvContext * s, const uint8_t *buf, const uint8_t *
             }else if(raw<buf_end) {  /* inter using second-last frame as reference */
                 int xoffset = (*raw & 0xF) - 7;
                 int yoffset = ((*raw >> 4)) - 7;
-                cmv_motcomp(s->frame.data[0], s->frame.linesize[0],
-                            s->last2_frame.data[0], s->last2_frame.linesize[0],
-                            x*4, y*4, xoffset, yoffset, s->avctx->width, s->avctx->height);
+                if (s->last2_frame.data[0])
+                    cmv_motcomp(s->frame.data[0], s->frame.linesize[0],
+                                s->last2_frame.data[0], s->last2_frame.linesize[0],
+                                x*4, y*4, xoffset, yoffset, s->avctx->width, s->avctx->height);
                 raw++;
             }
         }else{  /* inter using last frame as reference */
@@ -157,7 +158,7 @@ static int cmv_decode_frame(AVCodecContext *avctx,
         return buf_size;
     }
 
-    if (av_check_image_size(s->width, s->height, 0, s->avctx))
+    if (av_image_check_size(s->width, s->height, 0, s->avctx))
         return -1;
 
     /* shuffle */
@@ -204,7 +205,7 @@ static av_cold int cmv_decode_end(AVCodecContext *avctx){
     return 0;
 }
 
-AVCodec eacmv_decoder = {
+AVCodec ff_eacmv_decoder = {
     "eacmv",
     AVMEDIA_TYPE_VIDEO,
     CODEC_ID_CMV,

@@ -24,6 +24,7 @@
 #include "serviceHosts/contentServiceHost.h"
 #include "serviceHosts/dvrServiceHost.h"
 #include "serviceHosts/channelServiceHost.h"
+#include "serviceHosts/videoServiceHost.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -112,6 +113,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = FALSE */)
     m_pHttpServer->RegisterExtension( new ContentServiceHost( m_sSharePath ));
     m_pHttpServer->RegisterExtension( new DvrServiceHost    ( m_sSharePath ));
     m_pHttpServer->RegisterExtension( new ChannelServiceHost( m_sSharePath ));
+    m_pHttpServer->RegisterExtension( new VideoServiceHost  ( m_sSharePath ));
 
     QString sIP = g_pConfig->GetValue( "BackendServerIP"  , ""   );
     if (sIP.isEmpty())
@@ -134,11 +136,12 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = FALSE */)
 
      QScriptEngine* pEngine = m_pHttpServer->ScriptEngine();
 
-     pEngine->globalObject().setProperty("Myth"   , pEngine->scriptValueFromQMetaObject< ScriptableMyth >() );
-     pEngine->globalObject().setProperty("Guide"  , pEngine->scriptValueFromQMetaObject< ScriptableGuide>() );
-     pEngine->globalObject().setProperty("Content", pEngine->scriptValueFromQMetaObject< Content        >() );
-     pEngine->globalObject().setProperty("Dvr"    , pEngine->scriptValueFromQMetaObject< ScriptableDvr  >() );
-     pEngine->globalObject().setProperty("Channel", pEngine->scriptValueFromQMetaObject< Channel        >() );
+     pEngine->globalObject().setProperty("Myth"   , pEngine->scriptValueFromQMetaObject< ScriptableMyth    >() );
+     pEngine->globalObject().setProperty("Guide"  , pEngine->scriptValueFromQMetaObject< ScriptableGuide   >() );
+     pEngine->globalObject().setProperty("Content", pEngine->scriptValueFromQMetaObject< Content           >() );
+     pEngine->globalObject().setProperty("Dvr"    , pEngine->scriptValueFromQMetaObject< ScriptableDvr     >() );
+     pEngine->globalObject().setProperty("Channel", pEngine->scriptValueFromQMetaObject< ScriptableChannel >() );
+     pEngine->globalObject().setProperty("Video"  , pEngine->scriptValueFromQMetaObject< ScriptableVideo   >() );
 
     // ------------------------------------------------------------------
 

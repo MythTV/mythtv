@@ -255,6 +255,17 @@ void bd_psr_save_state(BD_REGISTERS *p)
     bd_psr_unlock(p);
 }
 
+void bd_psr_reset_backup_registers(BD_REGISTERS *p)
+{
+    bd_psr_lock(p);
+
+    /* init backup registers to default */
+    memcpy(p->psr + 36, bd_psr_init + 36, sizeof(uint32_t) * 5);
+    memcpy(p->psr + 42, bd_psr_init + 42, sizeof(uint32_t) * 3);
+
+    bd_psr_unlock(p);
+}
+
 void bd_psr_restore_state(BD_REGISTERS *p)
 {
     uint32_t old_psr[BD_PSR_COUNT];

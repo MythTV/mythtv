@@ -431,7 +431,7 @@ void RecordingSelector::updateRecordingList(void)
 void RecordingSelector::getRecordingList(void)
 {
     ProgramInfo *p;
-    m_recordingList = RemoteGetRecordedList(true);
+    m_recordingList = RemoteGetRecordedList(-1);
     m_categories.clear();
 
     if (m_recordingList && m_recordingList->size() > 0)

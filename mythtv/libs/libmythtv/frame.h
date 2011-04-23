@@ -223,6 +223,20 @@ static inline int bitsperpixel(VideoFrameType type)
     return res;
 }
 
+static inline uint buffersize(VideoFrameType type, int width, int height)
+{
+    int  type_bpp = bitsperpixel(type);
+    uint bpp = type_bpp / 4; /* bits per pixel div common factor */
+    uint bpb =  8 / 4; /* bits per byte div common factor */
+
+    // If the buffer sizes are not a multple of 16, adjust.
+    // old versions of MythTV allowed people to set invalid
+    // dimensions for MPEG-4 capture, no need to segfault..
+    uint adj_w = (width  + 15) & ~0xF;
+    uint adj_h = (height + 15) & ~0xF;
+    return (adj_w * adj_h * bpp + 4/* to round up */) / bpb;
+}
+
 #endif /* __cplusplus */
 
 #endif

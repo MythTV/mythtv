@@ -1188,9 +1188,9 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
     if (subtype == XVideo && xv_port >= 0)
     {
         vector<unsigned char*> bufs =
-            CreateShmImages(vbuffers.allocSize(), true);
+            CreateShmImages(vbuffers.Size(), true);
 
-        ok = (bufs.size() >= vbuffers.allocSize()) &&
+        ok = (bufs.size() >= vbuffers.Size()) &&
             vbuffers.CreateBuffers(FMT_YV12,
                                    video_dim.width(), video_dim.height(),
                                    bufs, XJ_yuv_infos);

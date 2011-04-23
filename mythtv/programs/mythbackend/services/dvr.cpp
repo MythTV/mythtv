@@ -72,10 +72,11 @@ DTC::ProgramList* Dvr::GetRecorded( bool bDescending,
 
     DTC::ProgramList *pPrograms = new DTC::ProgramList();
 
-    nStartIndex = min( nStartIndex, (int)progList.size() );
-    nCount      = (nCount > 0) ? min( nCount, (int)progList.size() ) : progList.size();
+    nStartIndex   = min( nStartIndex, (int)progList.size() );
+    nCount        = (nCount > 0) ? min( nCount, (int)progList.size() ) : progList.size();
+    int nEndIndex = min((nStartIndex + nCount), (int)progList.size() );
 
-    for( int n = nStartIndex; n < nCount; n++)
+    for( int n = nStartIndex; n < nEndIndex; n++)
     {
         ProgramInfo *pInfo = progList[ n ];
 
@@ -114,10 +115,11 @@ DTC::ProgramList* Dvr::GetExpiring( int nStartIndex,
 
     DTC::ProgramList *pPrograms = new DTC::ProgramList();
 
-    nStartIndex = min( nStartIndex, (int)infoList.size() );
-    nCount      = (nCount > 0) ? min( nCount, (int)infoList.size() ) : infoList.size();
+    nStartIndex   = min( nStartIndex, (int)infoList.size() );
+    nCount        = (nCount > 0) ? min( nCount, (int)infoList.size() ) : infoList.size();
+    int nEndIndex = min((nStartIndex + nCount), (int)infoList.size() );
 
-    for( int n = nStartIndex; n < nCount; n++)
+    for( int n = nStartIndex; n < nEndIndex; n++)
     {
         ProgramInfo *pInfo = infoList[ n ];
 

@@ -21,9 +21,7 @@
 #ifndef AVCODEC_XVMC_H
 #define AVCODEC_XVMC_H
 
-#include <X11/Xlib.h>
 #include <X11/extensions/XvMC.h>
-#include <X11/extensions/XvMClib.h>
 
 #include "avcodec.h"
 
@@ -153,16 +151,6 @@ struct xvmc_pix_fmt {
                         of coded blocks it contains.
     */
     int             next_free_data_block_num;
-
-    int pict_type; //this is for skipping frames
-
-    // These are for the XVMC VLD slice interface
-    int      slice_code;
-    unsigned char *slice_data;
-    int      slice_datalen;
-
-    Display *disp;
-    XvMCContext *ctx;
 
 /** extensions may be placed here */
 #if LIBAVCODEC_VERSION_MAJOR < 53

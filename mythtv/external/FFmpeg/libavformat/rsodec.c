@@ -23,7 +23,7 @@
 #include "libavutil/intreadwrite.h"
 #include "avformat.h"
 #include "internal.h"
-#include "raw.h"
+#include "pcm.h"
 #include "riff.h"
 #include "rso.h"
 
@@ -88,7 +88,7 @@ static int rso_read_packet(AVFormatContext *s, AVPacket *pkt)
     return 0;
 }
 
-AVInputFormat rso_demuxer = {
+AVInputFormat ff_rso_demuxer = {
     .name           =   "rso",
     .long_name      =   NULL_IF_CONFIG_SMALL("Lego Mindstorms RSO format"),
     .extensions     =   "rso",

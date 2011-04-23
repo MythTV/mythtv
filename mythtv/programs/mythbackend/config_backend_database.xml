@@ -3,23 +3,32 @@
   <group human_label="Database Setup" unique_label="database">
     <setting setting_type="file" value="dbHostName" default_data="localhost"
              label="Host" data_type="string"
-             help_text="DNS name or IP of server containing database or
-                        'localhost' which will connect to the server using
-                        a unix pipe." />
+             placeholder_text="Enter database hostname or address"
+             help_text="DNS name or IP address of the server hosting the
+                        database. Use 'localhost' to connect to the server using
+                        a Unix pipe." />
     <setting setting_type="file" value="dbPort" default_data="3306" label="Port"
-             help_text="Port on which the remote database server listens."
-             data_type="integer_range" range_min="0" range_max="0xffff" />
+             help_text="Connect to the database server on this port.  MySQL
+                        uses '3306'."
+             placeholder_text="Enter database port (usually 3306)."
+             data_type="integer_range" range_min="0" range_max="65535" />
     <setting setting_type="file" value="dbPing" default_data="1" label="Ping"
-             help_text="Ping the remote server." data_type="checkbox" />
+             help_text="Ping the remote server to confirm that it's on the
+                        network.  You may need to disable this setting if
+                        you are blocking ICMP ping requests on the database
+                        server but are sure that it's available." data_type="checkbox" />
     <setting setting_type="file" value="dbName" default_data="mythconverg"
              label="Database" data_type="string"
+             placeholder_text="Enter MythTV database name (usually 'mythconverg')"
              help_text="Database containing MythTV tables." />
     <setting setting_type="file" value="dbUserName" default_data="mythtv"
              label="User" data_type="string"
-             help_text="Database user name with read and write
-                        access to MythTV tables" />
+             placeholder_text="Enter your database user name (usually 'mythtv')"
+             help_text="Database user name which has read and write
+                        privileges to MythTV tables." />
     <setting setting_type="file" value="dbPassword" default_data="mythtv"
              label="Password" data_type="string"
+             placeholder_text="Enter database password"
              help_text="Password for database user." />
     <setting setting_type="file" value="dbHostID" default_data=""
              label="Host Identifier" data_type="string"
@@ -27,8 +36,8 @@
   </group>
   <group human_label="Database Wake on LAN" unique_label="database_wol">
       <setting setting_type="file" value="dbWOLEnabled" default_data="1"
-               label="Enabled" data_type="checkbox"
-               help_text="If checked MythTV will attempt to wake the
+               label="Enable Wake-On-LAN" data_type="checkbox"
+               help_text="If enabled, MythTV will attempt to wake the
                           remote database host." />
       <setting setting_type="file" value="dbWOLReconnectCount" default_data="0"
                label="Reconnect Count"
@@ -42,6 +51,7 @@
       <setting setting_type="file" value="dbWOLCommand"
                default_data="echo 'WOLsqlServerCommand not set'"
                label="Command" data_type="string"
+               placeholder_text="Enter Wake-On-LAN (WOL) command"
                help_text="Command to execute to wake the
                           remote database host." />
   </group>
