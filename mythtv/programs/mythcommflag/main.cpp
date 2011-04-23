@@ -38,6 +38,7 @@ using namespace std;
 #include "ringbuffer.h"
 #include "mythcommandlineparser.h"
 #include "mythtranslation.h"
+#include "mythlogging.h"
 
 // Commercial Flagging headers
 #include "CommDetectorBase.h"
@@ -1297,6 +1298,8 @@ int main(int argc, char *argv[])
     }
 
     CleanupGuard callCleanup(cleanup);
+
+    logStart("");
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(

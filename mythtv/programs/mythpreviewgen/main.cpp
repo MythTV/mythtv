@@ -46,6 +46,7 @@ using namespace std;
 #include "previewgenerator.h"
 #include "mythcommandlineparser.h"
 #include "mythsystemevent.h"
+#include "mythlogging.h"
 
 #define LOC      QString("MythPreviewGen: ")
 #define LOC_WARN QString("MythPreviewGen, Warning: ")
@@ -217,6 +218,8 @@ int main(int argc, char **argv)
              << "\nor the --infile parameter." << endl;
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
+
+    logStart("");
 
     ///////////////////////////////////////////////////////////////////////
 

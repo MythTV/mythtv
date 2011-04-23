@@ -26,6 +26,7 @@ using namespace std;
 #include "videosource.h" // for is_grabber..
 #include "dbcheck.h"
 #include "mythsystemevent.h"
+#include "mythlogging.h"
 
 // filldata headers
 #include "filldata.h"
@@ -547,6 +548,8 @@ int main(int argc, char *argv[])
     }
 
     CleanupGuard callCleanup(cleanup);
+
+    logStart("");
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))

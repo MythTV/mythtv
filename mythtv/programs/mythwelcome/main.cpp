@@ -19,6 +19,7 @@
 #include "lcddevice.h"
 #include "mythcommandlineparser.h"
 #include "tv.h"
+#include "mythlogging.h"
 
 // libmythui
 #include "mythmainwindow.h"
@@ -152,6 +153,8 @@ int main(int argc, char **argv)
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
+
+    logStart("");
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init())

@@ -24,6 +24,7 @@ using namespace std;
 #include "mpeg2fix.h"
 #include "remotefile.h"
 #include "mythtranslation.h"
+#include "mythlogging.h"
 
 static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                         frm_dir_map_t *deleteMap, int &resultCode);
@@ -513,6 +514,8 @@ int main(int argc, char *argv[])
 
     if (outfile == "-")
         print_verbose_messages = VB_NONE;
+
+    logStart("");
 
     //  Load the context
     gContext = new MythContext(MYTH_BINARY_VERSION);

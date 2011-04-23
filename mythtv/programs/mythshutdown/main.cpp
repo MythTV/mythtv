@@ -19,6 +19,7 @@ using namespace std;
 #include "remoteutil.h"
 #include "tvremoteutil.h"
 #include "compat.h"
+#include "mythlogging.h"
 
 static void setGlobalSetting(const QString &key, const QString &value)
 {
@@ -904,6 +905,7 @@ int main(int argc, char **argv)
         }
     }
 
+    logStart("");
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))

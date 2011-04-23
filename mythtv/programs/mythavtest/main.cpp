@@ -19,6 +19,7 @@ using namespace std;
 #include "mythdbcon.h"
 #include "compat.h"
 #include "dbcheck.h"
+#include "mythlogging.h"
 
 // libmythui
 #include "mythuihelper.h"
@@ -56,6 +57,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHAVTEST);
+
+    logStart("");
 
     int argpos = 1;
     QString filename = "";

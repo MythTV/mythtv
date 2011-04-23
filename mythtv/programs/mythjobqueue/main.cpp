@@ -27,6 +27,7 @@
 #include "mythcommandlineparser.h"
 #include "compat.h"
 #include "mythsystemevent.h"
+#include "mythlogging.h"
 
 #define LOC      QString("MythJobQueue: ")
 #define LOC_WARN QString("MythJobQueue, Warning: ")
