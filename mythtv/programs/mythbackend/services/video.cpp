@@ -20,6 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <QList>
+#include <QFile>
 
 #include <math.h>
 
@@ -31,7 +32,10 @@
 #include "compat.h"
 #include "mythversion.h"
 #include "mythcorecontext.h"
-
+#include "storagegroup.h"
+#include "remotefile.h"
+#include "globals.h"
+#include "util.h"
 #include "serviceUtil.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -185,6 +189,63 @@ bool Video::RemoveVideoFromDB( int Id )
     delete mlm;
 
     return bResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Video::AddVideo( const QString &sFilename,
+                      const QString &sHost     )
+{
+    if ( sHost.isEmpty() )
+        throw( QString( "Host not provided! Local storage is deprecated and "
+                        "is not supported by the API." ));
+
+    if ( sFilename.isEmpty() ||
+        (sFilename.contains("/../")) ||
+        (sFilename.startsWith("../")) )
+    {
+        throw( QString( "Filename not provided, or fails sanity checks!" ));
+    }
+
+    StorageGroup sgroup("Videos", sHost);
+
+    QString fullname = sgroup.FindFile(sFilename);
+
+    if ( !QFile::exists(fullname) )
+        throw( QString( "Provided filename does not exist!" ));
+
+    QString hash = FileHash(fullname);
+
+    if (hash == "NULL")
+    {
+        VERBOSE(VB_GENERAL, QString("Video Hash Failed. Unless this is a DVD "
+                                    "or Blu-ray, something has probably gone "
+                                    "wrong."));
+        hash = "";
+    }
+
+    VideoMetadata newFile(sFilename, hash,
+                          VIDEO_TRAILER_DEFAULT,
+                          VIDEO_COVERFILE_DEFAULT,
+                          VIDEO_SCREENSHOT_DEFAULT,
+                          VIDEO_BANNER_DEFAULT,
+                          VIDEO_FANART_DEFAULT,
+                          VideoMetadata::FilenameToMeta(sFilename, 1),
+                          VideoMetadata::FilenameToMeta(sFilename, 4),
+                          QString(), VIDEO_YEAR_DEFAULT,
+                          QDate::fromString("0000-00-00","YYYY-MM-DD"),
+                          VIDEO_INETREF_DEFAULT, QString(),
+                          VIDEO_DIRECTOR_DEFAULT, QString(), VIDEO_PLOT_DEFAULT,
+                          0.0, VIDEO_RATING_DEFAULT, 0,
+                          VideoMetadata::FilenameToMeta(sFilename, 2).toInt(),
+                          VideoMetadata::FilenameToMeta(sFilename, 3).toInt(),
+                          QDate::currentDate(), 0, ParentalLevel::plLowest);
+    newFile.SetHost(sHost);
+    newFile.SaveToDatabase();
+
+    return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////

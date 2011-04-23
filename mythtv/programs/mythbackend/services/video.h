@@ -51,6 +51,9 @@ class Video : public VideoServices
 
         bool                      RemoveVideoFromDB  ( int      Id               );
 
+        bool                      AddVideo           ( const QString  &Filename,
+                                                       const QString  &Host      );
+
         /* Bluray Methods */
 
         DTC::BlurayInfo*          GetBluray          ( const QString  &Path      );
@@ -112,6 +115,11 @@ class ScriptableVideo : public QObject
             return m_obj.RemoveVideoFromDB( Id );
         }
 
+        bool AddVideo( const QString  &Filename,
+                       const QString  &Host      )
+        {
+            return m_obj.AddVideo( Filename, Host );
+        }
 };
 
 
