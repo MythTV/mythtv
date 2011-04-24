@@ -229,7 +229,7 @@ int main(int argc, char *argv[])
             cerr << "Valid Options are:" << endl <<
                     "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
                     "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
-                    "-p or --pidfile filename       Write PID of mythjobqueue to filename " <<
+                    "-p or --pidfile filename       Write PID of mythjobqueue to filename " << endl <<
                     "-d or --daemon                 Runs mythjobqueue as a daemon" << endl <<
                     endl;
             return GENERIC_EXIT_INVALID_CMDLINE;

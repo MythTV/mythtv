@@ -159,7 +159,7 @@ static void IMLT(ATRAC3Context *q, float *pInput, float *pOutput, int odd_band)
     ff_imdct_calc(&q->mdct_ctx,pOutput,pInput);
 
     /* Perform windowing on the output. */
-    dsp.vector_fmul(pOutput,mdct_window,512);
+    dsp.vector_fmul(pOutput, pOutput, mdct_window, 512);
 
 }
 
@@ -327,7 +327,7 @@ static int decodeSpectrum (GetBitContext *gb, float *pOut)
             readQuantSpectralCoeffs (gb, subband_vlc_index[cnt], codingMode, mantissas, subbWidth);
 
             /* Decode the scale factor for this subband. */
-            SF = sf_table[SF_idxs[cnt]] * iMaxQuant[subband_vlc_index[cnt]];
+            SF = ff_atrac_sf_table[SF_idxs[cnt]] * iMaxQuant[subband_vlc_index[cnt]];
 
             /* Inverse quantize the coefficients. */
             for (pIn=mantissas ; first<last; first++, pIn++)
@@ -400,7 +400,7 @@ static int decodeTonalComponents (GetBitContext *gb, tonal_component *pComponent
                 coded_values = coded_values_per_component + 1;
                 coded_values = FFMIN(max_coded_values,coded_values);
 
-                scalefactor = sf_table[sfIndx] * iMaxQuant[quant_step_index];
+                scalefactor = ff_atrac_sf_table[sfIndx] * iMaxQuant[quant_step_index];
 
                 readQuantSpectralCoeffs(gb, quant_step_index, coding_mode, mantissa, coded_values);
 
@@ -1014,12 +1014,12 @@ static av_cold int atrac3_decode_init(AVCodecContext *avctx)
         return AVERROR(ENOMEM);
     }
 
-    avctx->sample_fmt = SAMPLE_FMT_S16;
+    avctx->sample_fmt = AV_SAMPLE_FMT_S16;
     return 0;
 }
 
 
-AVCodec atrac3_decoder =
+AVCodec ff_atrac3_decoder =
 {
     .name = "atrac3",
     .type = AVMEDIA_TYPE_AUDIO,

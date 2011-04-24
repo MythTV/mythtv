@@ -617,7 +617,7 @@ static VideoFilter * YadifDeintFilter(VideoFrameType inpixfmt,
     AllocFilter(filter, *width, *height);
 
 #if HAVE_MMX
-    filter->mm_flags = mm_support();
+    filter->mm_flags = av_get_cpu_flags();
     TF_INIT(filter);
 #else
     filter->mm_flags = 0;

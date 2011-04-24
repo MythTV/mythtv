@@ -117,12 +117,12 @@ static int read_data_packet(MMSHContext *mmsh, const int len)
     int res;
     if (len > sizeof(mms->in_buffer)) {
         av_log(NULL, AV_LOG_ERROR,
-               "Data packet length %d exceeds the in_buffer size %d\n",
+               "Data packet length %d exceeds the in_buffer size %zu\n",
                len, sizeof(mms->in_buffer));
         return AVERROR(EIO);
     }
     res = url_read_complete(mms->mms_hd, mms->in_buffer, len);
-    dprintf(NULL, "Data packet len = %d\n", len);
+    av_dlog(NULL, "Data packet len = %d\n", len);
     if (res != len) {
         av_log(NULL, AV_LOG_ERROR, "Read data packet failed!\n");
         return AVERROR(EIO);
@@ -147,16 +147,16 @@ static int get_http_header_data(MMSHContext *mmsh)
 
     for (;;) {
         len = 0;
-        chunk_type = get_chunk_header(mmsh, &len);
-        if (chunk_type < 0) {
-            return chunk_type;
+        res = chunk_type = get_chunk_header(mmsh, &len);
+        if (res < 0) {
+            return res;
         } else if (chunk_type == CHUNK_TYPE_ASF_HEADER){
             // get asf header and stored it
             if (!mms->header_parsed) {
                 if (mms->asf_header) {
                     if (len != mms->asf_header_size) {
                         mms->asf_header_size = len;
-                        dprintf(NULL, "Header len changed from %d to %d\n",
+                        av_dlog(NULL, "Header len changed from %d to %d\n",
                                 mms->asf_header_size, len);
                         av_freep(&mms->asf_header);
                     }
@@ -192,7 +192,7 @@ static int get_http_header_data(MMSHContext *mmsh)
             if (len) {
                 if (len > sizeof(mms->in_buffer)) {
                     av_log(NULL, AV_LOG_ERROR,
-                           "Other packet len = %d exceed the in_buffer size %d\n",
+                           "Other packet len = %d exceed the in_buffer size %zu\n",
                            len, sizeof(mms->in_buffer));
                     return AVERROR(EIO);
                 }
@@ -201,7 +201,7 @@ static int get_http_header_data(MMSHContext *mmsh)
                     av_log(NULL, AV_LOG_ERROR, "Read other chunk type data failed!\n");
                     return AVERROR(EIO);
                 } else {
-                    dprintf(NULL, "Skip chunk type %d \n", chunk_type);
+                    av_dlog(NULL, "Skip chunk type %d \n", chunk_type);
                     continue;
                 }
             }
@@ -214,7 +214,7 @@ static int mmsh_open(URLContext *h, const char *uri, int flags)
 {
     int i, port, err;
     char httpname[256], path[256], host[128], location[1024];
-    char *stream_selection;
+    char *stream_selection = NULL;
     char headers[1024];
     MMSHContext *mmsh;
     MMSContext *mms;
@@ -290,7 +290,7 @@ static int mmsh_open(URLContext *h, const char *uri, int flags)
         av_log(NULL, AV_LOG_ERROR, "Build play request failed!\n");
         goto fail;
     }
-    dprintf(NULL, "out_buffer is %s", headers);
+    av_dlog(NULL, "out_buffer is %s", headers);
     ff_http_set_headers(mms->mms_hd, headers);
 
     err = url_connect(mms->mms_hd);
@@ -304,12 +304,12 @@ static int mmsh_open(URLContext *h, const char *uri, int flags)
         goto fail;
     }
 
-    dprintf(NULL, "Connection successfully open\n");
+    av_dlog(NULL, "Connection successfully open\n");
     return 0;
 fail:
     av_freep(&stream_selection);
     mmsh_close(h);
-    dprintf(NULL, "Connection failed with error %d\n", err);
+    av_dlog(NULL, "Connection failed with error %d\n", err);
     return err;
 }
 
@@ -359,7 +359,7 @@ static int mmsh_read(URLContext *h, uint8_t *buf, int size)
     return res;
 }
 
-URLProtocol mmsh_protocol = {
+URLProtocol ff_mmsh_protocol = {
     .name      = "mmsh",
     .url_open  = mmsh_open,
     .url_read  = mmsh_read,

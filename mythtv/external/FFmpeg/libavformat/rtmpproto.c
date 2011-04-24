@@ -38,10 +38,10 @@
 #include "rtmppkt.h"
 
 /* we can't use av_log() with URLContext yet... */
-#if LIBAVFORMAT_VERSION_MAJOR < 53
-#define LOG_CONTEXT NULL
-#else
+#if FF_API_URL_CLASS
 #define LOG_CONTEXT s
+#else
+#define LOG_CONTEXT NULL
 #endif
 
 //#define DEBUG
@@ -923,9 +923,9 @@ static int rtmp_read(URLContext *s, uint8_t *buf, int size)
     return orig_size;
 }
 
-static int rtmp_write(URLContext *h, const uint8_t *buf, int size)
+static int rtmp_write(URLContext *s, const uint8_t *buf, int size)
 {
-    RTMPContext *rt = h->priv_data;
+    RTMPContext *rt = s->priv_data;
     int size_temp = size;
     int pktsize, pkttype;
     uint32_t ts;
@@ -989,7 +989,7 @@ static int rtmp_write(URLContext *h, const uint8_t *buf, int size)
     return size;
 }
 
-URLProtocol rtmp_protocol = {
+URLProtocol ff_rtmp_protocol = {
     "rtmp",
     rtmp_open,
     rtmp_read,

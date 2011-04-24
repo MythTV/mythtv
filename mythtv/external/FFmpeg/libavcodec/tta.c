@@ -63,7 +63,7 @@ typedef struct TTAContext {
 
     int32_t *decode_buffer;
 
-    TTAChannel *ch_ctx;;
+    TTAChannel *ch_ctx;
 } TTAContext;
 
 #if 0
@@ -246,15 +246,15 @@ static av_cold int tta_decode_init(AVCodecContext * avctx)
 
         if (s->is_float)
         {
-            avctx->sample_fmt = SAMPLE_FMT_FLT;
+            avctx->sample_fmt = AV_SAMPLE_FMT_FLT;
             av_log(s->avctx, AV_LOG_ERROR, "Unsupported sample format. Please contact the developers.\n");
             return -1;
         }
         else switch(s->bps) {
-//            case 1: avctx->sample_fmt = SAMPLE_FMT_U8; break;
-            case 2: avctx->sample_fmt = SAMPLE_FMT_S16; break;
-//            case 3: avctx->sample_fmt = SAMPLE_FMT_S24; break;
-            case 4: avctx->sample_fmt = SAMPLE_FMT_S32; break;
+//            case 1: avctx->sample_fmt = AV_SAMPLE_FMT_U8; break;
+            case 2: avctx->sample_fmt = AV_SAMPLE_FMT_S16; break;
+//            case 3: avctx->sample_fmt = AV_SAMPLE_FMT_S24; break;
+            case 4: avctx->sample_fmt = AV_SAMPLE_FMT_S32; break;
             default:
                 av_log(s->avctx, AV_LOG_ERROR, "Invalid/unsupported sample format. Please contact the developers.\n");
                 return -1;
@@ -449,14 +449,13 @@ static int tta_decode_frame(AVCodecContext *avctx,
 static av_cold int tta_decode_close(AVCodecContext *avctx) {
     TTAContext *s = avctx->priv_data;
 
-    if (s->decode_buffer)
-        av_free(s->decode_buffer);
+    av_free(s->decode_buffer);
     av_freep(&s->ch_ctx);
 
     return 0;
 }
 
-AVCodec tta_decoder = {
+AVCodec ff_tta_decoder = {
     "tta",
     AVMEDIA_TYPE_AUDIO,
     CODEC_ID_TTA,

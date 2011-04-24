@@ -348,7 +348,7 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
 
     filter->vf.filter = &linearBlendFilter;
     filter->subfilter = &linearBlend;    /* Default, non accellerated */
-    filter->mm_flags = mm_support();
+    filter->mm_flags = av_get_cpu_flags();
     if (HAVE_MMX && filter->mm_flags & FF_MM_MMXEXT)
         filter->subfilter = &linearBlendMMX;
     else if (HAVE_AMD3DNOW && filter->mm_flags & FF_MM_3DNOW)

@@ -1,6 +1,6 @@
 /*
  * Filter layer - default implementations
- * copyright (c) 2007 Bobby Bingham
+ * Copyright (c) 2007 Bobby Bingham
  *
  * This file is part of FFmpeg.
  *
@@ -19,12 +19,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavcore/imgutils.h"
-#include "libavcodec/audioconvert.h"
+#include "libavutil/audioconvert.h"
+#include "libavutil/imgutils.h"
+#include "libavutil/samplefmt.h"
 #include "avfilter.h"
+#include "internal.h"
 
 /* TODO: buffer pool.  see comment for avfilter_default_get_video_buffer() */
-static void avfilter_default_free_buffer(AVFilterBuffer *ptr)
+void ff_avfilter_default_free_buffer(AVFilterBuffer *ptr)
 {
     av_free(ptr->data[0]);
     av_free(ptr);
@@ -35,53 +37,26 @@ static void avfilter_default_free_buffer(AVFilterBuffer *ptr)
  * alloc & free cycle currently implemented. */
 AVFilterBufferRef *avfilter_default_get_video_buffer(AVFilterLink *link, int perms, int w, int h)
 {
-    AVFilterBuffer *pic = av_mallocz(sizeof(AVFilterBuffer));
-    AVFilterBufferRef *ref = NULL;
-    int i, tempsize;
-    char *buf = NULL;
+    int linesize[4];
+    uint8_t *data[4];
+    AVFilterBufferRef *picref = NULL;
 
-    if (!pic || !(ref = av_mallocz(sizeof(AVFilterBufferRef))))
-        goto fail;
+    // +2 is needed for swscaler, +16 to be SIMD-friendly
+    if (av_image_alloc(data, linesize, w, h, link->format, 16) < 0)
+        return NULL;
 
-    ref->buf         = pic;
-    ref->video       = av_mallocz(sizeof(AVFilterBufferRefVideoProps));
-    ref->video->w    = w;
-    ref->video->h    = h;
+    picref = avfilter_get_video_buffer_ref_from_arrays(data, linesize,
+                                                       perms, w, h, link->format);
+    if (!picref) {
+        av_free(data[0]);
+        return NULL;
+    }
 
-    /* make sure the buffer gets read permission or it's useless for output */
-    ref->perms = perms | AV_PERM_READ;
-
-    pic->refcount = 1;
-    ref->format   = link->format;
-    pic->free     = avfilter_default_free_buffer;
-    av_fill_image_linesizes(pic->linesize, ref->format, ref->video->w);
-
-    for (i = 0; i < 4; i++)
-        pic->linesize[i] = FFALIGN(pic->linesize[i], 16);
-
-    tempsize = av_fill_image_pointers(pic->data, ref->format, ref->video->h, NULL, pic->linesize);
-    buf = av_malloc(tempsize + 16); // +2 is needed for swscaler, +16 to be
-                                    // SIMD-friendly
-    if (!buf)
-        goto fail;
-    av_fill_image_pointers(pic->data, ref->format, ref->video->h, buf, pic->linesize);
-
-    memcpy(ref->data,     pic->data,     sizeof(ref->data));
-    memcpy(ref->linesize, pic->linesize, sizeof(ref->linesize));
-
-    return ref;
-
-fail:
-    av_free(buf);
-    if (ref && ref->video)
-        av_free(ref->video);
-    av_free(ref);
-    av_free(pic);
-    return NULL;
+    return picref;
 }
 
 AVFilterBufferRef *avfilter_default_get_audio_buffer(AVFilterLink *link, int perms,
-                                                     enum SampleFormat sample_fmt, int size,
+                                                     enum AVSampleFormat sample_fmt, int size,
                                                      int64_t channel_layout, int planar)
 {
     AVFilterBuffer *samples = av_mallocz(sizeof(AVFilterBuffer));
@@ -107,13 +82,13 @@ AVFilterBufferRef *avfilter_default_get_audio_buffer(AVFilterLink *link, int per
     ref->perms = perms | AV_PERM_READ;
 
     samples->refcount   = 1;
-    samples->free       = avfilter_default_free_buffer;
+    samples->free       = ff_avfilter_default_free_buffer;
 
-    sample_size = av_get_bits_per_sample_format(sample_fmt) >>3;
-    chans_nb = avcodec_channel_layout_num_channels(channel_layout);
+    sample_size = av_get_bits_per_sample_fmt(sample_fmt) >>3;
+    chans_nb = av_get_channel_layout_nb_channels(channel_layout);
 
     per_channel_size = size/chans_nb;
-    ref->audio->samples_nb = per_channel_size/sample_size;
+    ref->audio->nb_samples = per_channel_size/sample_size;
 
     /* Set the number of bytes to traverse to reach next sample of a particular channel:
      * For planar, this is simply the sample size.
@@ -151,68 +126,67 @@ AVFilterBufferRef *avfilter_default_get_audio_buffer(AVFilterLink *link, int per
     return ref;
 
 fail:
-    av_free(buf);
-    if (ref && ref->audio)
+    if (ref)
         av_free(ref->audio);
     av_free(ref);
     av_free(samples);
     return NULL;
 }
 
-void avfilter_default_start_frame(AVFilterLink *link, AVFilterBufferRef *picref)
+void avfilter_default_start_frame(AVFilterLink *inlink, AVFilterBufferRef *picref)
 {
-    AVFilterLink *out = NULL;
+    AVFilterLink *outlink = NULL;
 
-    if (link->dst->output_count)
-        out = link->dst->outputs[0];
+    if (inlink->dst->output_count)
+        outlink = inlink->dst->outputs[0];
 
-    if (out) {
-        out->out_buf      = avfilter_get_video_buffer(out, AV_PERM_WRITE, out->w, out->h);
-        avfilter_copy_buffer_ref_props(out->out_buf, picref);
-        avfilter_start_frame(out, avfilter_ref_buffer(out->out_buf, ~0));
+    if (outlink) {
+        outlink->out_buf = avfilter_get_video_buffer(outlink, AV_PERM_WRITE, outlink->w, outlink->h);
+        avfilter_copy_buffer_ref_props(outlink->out_buf, picref);
+        avfilter_start_frame(outlink, avfilter_ref_buffer(outlink->out_buf, ~0));
     }
 }
 
-void avfilter_default_draw_slice(AVFilterLink *link, int y, int h, int slice_dir)
+void avfilter_default_draw_slice(AVFilterLink *inlink, int y, int h, int slice_dir)
 {
-    AVFilterLink *out = NULL;
+    AVFilterLink *outlink = NULL;
 
-    if (link->dst->output_count)
-        out = link->dst->outputs[0];
+    if (inlink->dst->output_count)
+        outlink = inlink->dst->outputs[0];
 
-    if (out)
-        avfilter_draw_slice(out, y, h, slice_dir);
+    if (outlink)
+        avfilter_draw_slice(outlink, y, h, slice_dir);
 }
 
-void avfilter_default_end_frame(AVFilterLink *link)
+void avfilter_default_end_frame(AVFilterLink *inlink)
 {
-    AVFilterLink *out = NULL;
+    AVFilterLink *outlink = NULL;
 
-    if (link->dst->output_count)
-        out = link->dst->outputs[0];
+    if (inlink->dst->output_count)
+        outlink = inlink->dst->outputs[0];
 
-    avfilter_unref_buffer(link->cur_buf);
-    link->cur_buf = NULL;
+    avfilter_unref_buffer(inlink->cur_buf);
+    inlink->cur_buf = NULL;
 
-    if (out) {
-        if (out->out_buf) {
-            avfilter_unref_buffer(out->out_buf);
-            out->out_buf = NULL;
+    if (outlink) {
+        if (outlink->out_buf) {
+            avfilter_unref_buffer(outlink->out_buf);
+            outlink->out_buf = NULL;
         }
-        avfilter_end_frame(out);
+        avfilter_end_frame(outlink);
     }
 }
 
 /* FIXME: samplesref is same as link->cur_buf. Need to consider removing the redundant parameter. */
-void avfilter_default_filter_samples(AVFilterLink *link, AVFilterBufferRef *samplesref)
+void avfilter_default_filter_samples(AVFilterLink *inlink, AVFilterBufferRef *samplesref)
 {
     AVFilterLink *outlink = NULL;
 
-    if (link->dst->output_count)
-        outlink = link->dst->outputs[0];
+    if (inlink->dst->output_count)
+        outlink = inlink->dst->outputs[0];
 
     if (outlink) {
-        outlink->out_buf = avfilter_default_get_audio_buffer(link, AV_PERM_WRITE, samplesref->format,
+        outlink->out_buf = avfilter_default_get_audio_buffer(inlink, AV_PERM_WRITE, samplesref->format,
                                                              samplesref->audio->size,
                                                              samplesref->audio->channel_layout,
                                                              samplesref->audio->planar);
@@ -223,7 +197,7 @@ void avfilter_default_filter_samples(AVFilterLink *link, AVFilterBufferRef *samp
         outlink->out_buf = NULL;
     }
     avfilter_unref_buffer(samplesref);
-    link->cur_buf = NULL;
+    inlink->cur_buf = NULL;
 }
 
 /**
@@ -235,6 +209,7 @@ int avfilter_default_config_output_link(AVFilterLink *link)
         if (link->type == AVMEDIA_TYPE_VIDEO) {
             link->w = link->src->inputs[0]->w;
             link->h = link->src->inputs[0]->h;
+            link->time_base = link->src->inputs[0]->time_base;
         } else if (link->type == AVMEDIA_TYPE_AUDIO) {
             link->channel_layout = link->src->inputs[0]->channel_layout;
             link->sample_rate    = link->src->inputs[0]->sample_rate;
@@ -282,8 +257,8 @@ void avfilter_set_common_formats(AVFilterContext *ctx, AVFilterFormats *formats)
 
 int avfilter_default_query_formats(AVFilterContext *ctx)
 {
-    enum AVMediaType type = ctx->inputs [0] ? ctx->inputs [0]->type :
-                            ctx->outputs[0] ? ctx->outputs[0]->type :
+    enum AVMediaType type = ctx->inputs  && ctx->inputs [0] ? ctx->inputs [0]->type :
+                            ctx->outputs && ctx->outputs[0] ? ctx->outputs[0]->type :
                             AVMEDIA_TYPE_VIDEO;
 
     avfilter_set_common_formats(ctx, avfilter_all_formats(type));
@@ -316,7 +291,7 @@ AVFilterBufferRef *avfilter_null_get_video_buffer(AVFilterLink *link, int perms,
 }
 
 AVFilterBufferRef *avfilter_null_get_audio_buffer(AVFilterLink *link, int perms,
-                                                  enum SampleFormat sample_fmt, int size,
+                                                  enum AVSampleFormat sample_fmt, int size,
                                                   int64_t channel_layout, int packed)
 {
     return avfilter_get_audio_buffer(link->dst->outputs[0], perms, sample_fmt,

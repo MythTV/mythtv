@@ -18,7 +18,6 @@ INSTALLS += target
 
 LIBS += -lmythavformat
 LIBS += -lmythavcodec
-LIBS += -lmythavcore
 LIBS += -lmythavutil
 LIBS += -ltag -logg -lvorbisfile -lvorbis -lvorbisenc -lFLAC -lmp3lame
 

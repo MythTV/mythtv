@@ -1,7 +1,7 @@
 include $(SUBDIR)../config.mak
 
 NAME = postproc
-FFLIBS = avcodec avcore avutil
+FFLIBS = avcodec avutil
 
 # x86_32 needs -O1 -fomit-frame-pointer to compile inline asm
 ifeq ($(ARCH_X86_32), yes)

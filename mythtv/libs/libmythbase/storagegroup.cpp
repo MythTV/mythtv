@@ -219,7 +219,10 @@ QStringList StorageGroup::GetDirFileList(QString dir, QString base,
     {
         VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("GetDirFileList: File: %1%2")
                                                 .arg(base).arg(*p));
-        files.append(*p);
+        if (recursive)
+            files.append(base + *p);
+        else
+            files.append(*p);
     }
 
     return files;

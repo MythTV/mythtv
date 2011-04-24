@@ -1,7 +1,6 @@
 /*
- * Ported to FFmpeg from MPlayer libmpcodecs/unsharp.c
- * Original copyright (C) 2002 Remi Guyomarch <rguyom@pobox.com>
- * Port copyright (C) 2010 Daniel G. Taylor <dan@programmer-art.org>
+ * Original copyright (c) 2002 Remi Guyomarch <rguyom@pobox.com>
+ * Port copyright (c) 2010 Daniel G. Taylor <dan@programmer-art.org>
  * Relicensed to the LGPL with permission from Remi Guyomarch.
  *
  * This file is part of FFmpeg.
@@ -23,7 +22,8 @@
 
 /**
  * @file
- * blur / sharpen filter
+ * blur / sharpen filter, ported to FFmpeg from MPlayer
+ * libmpcodecs/unsharp.c.
  *
  * This code is based on:
  *
@@ -132,6 +132,14 @@ static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
     if (args)
         sscanf(args, "%d:%d:%lf:%d:%d:%lf", &lmsize_x, &lmsize_y, &lamount,
                                             &cmsize_x, &cmsize_y, &camount);
+
+    if ((lamount && (lmsize_x < 2 || lmsize_y < 2)) ||
+        (camount && (cmsize_x < 2 || cmsize_y < 2))) {
+        av_log(ctx, AV_LOG_ERROR,
+               "Invalid value <2 for lmsize_x:%d or lmsize_y:%d or cmsize_x:%d or cmsize_y:%d\n",
+               lmsize_x, lmsize_y, cmsize_x, cmsize_y);
+        return AVERROR(EINVAL);
+    }
 
     set_filter_param(&unsharp->luma,   lmsize_x, lmsize_y, lamount);
     set_filter_param(&unsharp->chroma, cmsize_x, cmsize_y, camount);

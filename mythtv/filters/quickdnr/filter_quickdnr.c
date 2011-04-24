@@ -522,7 +522,7 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
     filter->vf.filter  = (double_threshold) ? &quickdnr2 : &quickdnr;
 
 #ifdef MMX
-    if (mm_support() > FF_MM_MMXEXT)
+    if (av_get_cpu_flags() > FF_MM_MMXEXT)
     {
         filter->vf.filter = (double_threshold) ? &quickdnr2MMX : &quickdnrMMX;
         for (i = 0; i < 8; i++)
@@ -561,7 +561,7 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
     fprintf(stderr, "DNR Loaded: 0x%X Params: %u %u \n"
             "Luma1:   %3d 0x%X%X  Luma2:   0x%X%X\n"
             "Chroma1: %3d %X%X    Chroma2: 0x%X%X\n",
-            mm_support(), Param1, Param2, filter->Luma_threshold1,
+            av_get_cpu_flags(), Param1, Param2, filter->Luma_threshold1,
             ((int*)&filter->Luma_threshold_mask1)[1],
             ((int*)&filter->Luma_threshold_mask1)[0],
             ((int*)&filter->Luma_threshold_mask2)[1],

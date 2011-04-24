@@ -53,6 +53,9 @@ COSTABLE_CONST FFTSample * const ff_cos_tabs[] = {
     ff_cos_2048, ff_cos_4096, ff_cos_8192, ff_cos_16384, ff_cos_32768, ff_cos_65536,
 };
 
+static void ff_fft_permute_c(FFTContext *s, FFTComplex *z);
+static void ff_fft_calc_c(FFTContext *s, FFTComplex *z);
+
 static int split_radix_permutation(int i, int n, int inverse)
 {
     int m;
@@ -94,6 +97,7 @@ av_cold int ff_fft_init(FFTContext *s, int nbits, int inverse)
     if (!s->tmp_buf)
         goto fail;
     s->inverse = inverse;
+    s->fft_permutation = FF_FFT_PERM_DEFAULT;
 
     s->fft_permute = ff_fft_permute_c;
     s->fft_calc    = ff_fft_calc_c;
@@ -110,8 +114,12 @@ av_cold int ff_fft_init(FFTContext *s, int nbits, int inverse)
     for(j=4; j<=nbits; j++) {
         ff_init_ff_cos_tabs(j);
     }
-    for(i=0; i<n; i++)
-        s->revtab[-split_radix_permutation(i, n, s->inverse) & (n-1)] = i;
+    for(i=0; i<n; i++) {
+        int j = i;
+        if (s->fft_permutation == FF_FFT_PERM_SWAP_LSBS)
+            j = (j&~3) | ((j>>1)&1) | ((j<<1)&2);
+        s->revtab[-split_radix_permutation(i, n, s->inverse) & (n-1)] = j;
+    }
 
     return 0;
  fail:
@@ -120,7 +128,7 @@ av_cold int ff_fft_init(FFTContext *s, int nbits, int inverse)
     return -1;
 }
 
-void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
+static void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 {
     int j, np;
     const uint16_t *revtab = s->revtab;
@@ -289,7 +297,7 @@ static void (* const fft_dispatch[])(FFTComplex*) = {
     fft2048, fft4096, fft8192, fft16384, fft32768, fft65536,
 };
 
-void ff_fft_calc_c(FFTContext *s, FFTComplex *z)
+static void ff_fft_calc_c(FFTContext *s, FFTComplex *z)
 {
     fft_dispatch[s->nbits-2](z);
 }

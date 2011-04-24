@@ -143,7 +143,7 @@ class ScriptableChannel : public QObject
         Channel    m_obj;
 
     public:
-    
+
         Q_INVOKABLE ScriptableChannel( QObject *parent = 0 ) : QObject( parent ) {}
 
     public slots:
@@ -153,6 +153,11 @@ class ScriptableChannel : public QObject
                                        int      Count      )
         {
             return m_obj.GetChannelInfoList( SourceID, StartIndex, Count );
+        }
+
+        QObject* GetChannelInfo      ( int      ChanID     )
+        {
+            return m_obj.GetChannelInfo( ChanID );
         }
 
         bool UpdateDBChannel     ( uint          MplexID,
@@ -213,6 +218,47 @@ class ScriptableChannel : public QObject
             return m_obj.GetVideoSourceList();
         }
 
+        QObject* GetVideoSource ( uint SourceID )
+        {
+            return m_obj.GetVideoSource( SourceID );
+        }
+
+        bool UpdateVideoSource ( uint          SourceID,
+                                 const QString &SourceName,
+                                 const QString &Grabber,
+                                 const QString &UserId,
+                                 const QString &FreqTable,
+                                 const QString &LineupId,
+                                 const QString &Password,
+                                 bool          UseEIT,
+                                 const QString &ConfigPath,
+                                 int           NITId )
+        {
+            return m_obj.UpdateVideoSource( SourceID, SourceName, Grabber,
+                                            UserId, FreqTable, LineupId, Password,
+                                            UseEIT, ConfigPath, NITId );
+        }
+
+        bool CreateVideoSource ( const QString &SourceName,
+                                 const QString &Grabber,
+                                 const QString &UserId,
+                                 const QString &FreqTable,
+                                 const QString &LineupId,
+                                 const QString &Password,
+                                 bool          UseEIT,
+                                 const QString &ConfigPath,
+                                 int           NITId )
+        {
+            return m_obj.CreateVideoSource( SourceName, Grabber, UserId,
+                                            FreqTable, LineupId, Password,
+                                            UseEIT, ConfigPath, NITId );
+        }
+
+        bool DeleteVideoSource ( uint SourceID )
+        {
+            return m_obj.DeleteVideoSource( SourceID );
+        }
+
         QObject* GetVideoMultiplexList  ( int      SourceID,
                                           int      StartIndex,
                                           int      Count      )
@@ -220,6 +266,10 @@ class ScriptableChannel : public QObject
             return m_obj.GetVideoMultiplexList( SourceID, StartIndex, Count );
         }
 
+        QObject* GetVideoMultiplex  ( int      MplexID )
+        {
+            return m_obj.GetVideoMultiplex( MplexID );
+        }
 };
 
 

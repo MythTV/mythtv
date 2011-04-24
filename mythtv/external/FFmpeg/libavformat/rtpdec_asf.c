@@ -109,9 +109,10 @@ int ff_wms_parse_sdp_a_line(AVFormatContext *s, const char *p)
             av_close_input_stream(rt->asf_ctx);
             rt->asf_ctx = NULL;
         }
-        ret = av_open_input_stream(&rt->asf_ctx, &pb, "", &asf_demuxer, NULL);
+        ret = av_open_input_stream(&rt->asf_ctx, &pb, "", &ff_asf_demuxer, NULL);
         if (ret < 0)
             return ret;
+        av_metadata_copy(&s->metadata, rt->asf_ctx->metadata, 0);
         rt->asf_pb_pos = url_ftell(&pb);
         av_free(buf);
         rt->asf_ctx->pb = NULL;
@@ -287,7 +288,7 @@ RTPDynamicProtocolHandler ff_ms_rtp_ ## n ## _handler = { \
     .open             = asfrtp_new_context, \
     .close            = asfrtp_free_context, \
     .parse_packet     = asfrtp_parse_packet,   \
-};
+}
 
 RTP_ASF_HANDLER(asf_pfv, "x-asf-pf",  AVMEDIA_TYPE_VIDEO);
 RTP_ASF_HANDLER(asf_pfa, "x-asf-pf",  AVMEDIA_TYPE_AUDIO);

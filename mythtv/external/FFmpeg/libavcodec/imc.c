@@ -40,6 +40,7 @@
 #include "get_bits.h"
 #include "dsputil.h"
 #include "fft.h"
+#include "libavutil/audioconvert.h"
 
 #include "imcdata.h"
 
@@ -156,8 +157,8 @@ static av_cold int imc_decode_init(AVCodecContext * avctx)
 
     ff_fft_init(&q->fft, 7, 1);
     dsputil_init(&q->dsp, avctx);
-    avctx->sample_fmt = SAMPLE_FMT_FLT;
-    avctx->channel_layout = (avctx->channels==2) ? CH_LAYOUT_STEREO : CH_LAYOUT_MONO;
+    avctx->sample_fmt = AV_SAMPLE_FMT_FLT;
+    avctx->channel_layout = (avctx->channels==2) ? AV_CH_LAYOUT_STEREO : AV_CH_LAYOUT_MONO;
     return 0;
 }
 
@@ -821,7 +822,7 @@ static av_cold int imc_decode_close(AVCodecContext * avctx)
 }
 
 
-AVCodec imc_decoder = {
+AVCodec ff_imc_decoder = {
     .name = "imc",
     .type = AVMEDIA_TYPE_AUDIO,
     .id = CODEC_ID_IMC,

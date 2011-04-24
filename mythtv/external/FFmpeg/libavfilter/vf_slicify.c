@@ -1,5 +1,5 @@
 /*
- * copyright (c) 2007 Bobby Bingham
+ * Copyright (c) 2007 Bobby Bingham
  *
  * This file is part of FFmpeg.
  *
@@ -97,7 +97,7 @@ static void draw_slice(AVFilterLink *link, int y, int h, int slice_dir)
 
 AVFilter avfilter_vf_slicify = {
     .name      = "slicify",
-    .description = "Pass the images of input video on to next video filter as multiple slices.",
+    .description = NULL_IF_CONFIG_SMALL("Pass the images of input video on to next video filter as multiple slices."),
 
     .init      = init,
 
