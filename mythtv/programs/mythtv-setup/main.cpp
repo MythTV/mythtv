@@ -204,8 +204,8 @@ static void print_usage()
                 "Force the setting named 'KEY' to value 'VALUE'" << endl
              << "-v or --verbose debug-level    "
                 "Use '-v help' for level info" << endl
-             << "-l or --logfile filename       "
-                "Writes STDERR and STDOUT messages to filename" << endl
+             << "-l or --logpath path           "
+                "Writes STDERR and STDOUT messages to path" << endl
              << endl;
 }
 
@@ -216,10 +216,10 @@ static int log_rotate(int report_error)
                          O_WRONLY|O_CREAT|O_APPEND, 0664);
 
     if (new_logfd < 0) {
-        /* If we can't open the new logfile, send data to /dev/null */
+        /* If we can't open the new log file, send data to /dev/null */
         if (report_error)
         {
-            VERBOSE(VB_IMPORTANT, QString("Can not open logfile '%1'")
+            VERBOSE(VB_IMPORTANT, QString("Can not open log file '%1'")
                     .arg(logfile));
             return -1;
         }
@@ -349,25 +349,33 @@ int main(int argc, char *argv[])
             }
         }
         else if (!strcmp(a.argv()[argpos],"-l") ||
+                 !strcmp(a.argv()[argpos],"--logpath") ||
                  !strcmp(a.argv()[argpos],"--logfile"))
         {
             if (a.argc()-1 > argpos)
             {
-                logfile = a.argv()[argpos+1];
-                if (logfile.startsWith("-"))
+                QString value = a.argv()[argpos+1];
+                if (value.startsWith("-"))
                 {
                     cerr << "Invalid or missing argument"
-                            " to -l/--logfile option\n";
+                            " to -l/--logpath option\n";
                     return GENERIC_EXIT_INVALID_CMDLINE;
                 }
                 else
                 {
                     ++argpos;
                 }
+                QFileInfo finfo(value);
+                if (finfo.isDir())
+                    logfile = QFileInfo(QDir(value),
+                                        QCoreApplication::applicationName() +
+                                        ".log").filePath();
+                else
+                    logfile = value;
             }
             else
             {
-                cerr << "Missing argument to -l/--logfile option\n";
+                cerr << "Missing argument to -l/--log file option\n";
                 return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
@@ -506,7 +514,7 @@ int main(int argc, char *argv[])
     if (logfile.size())
     {
         if (log_rotate(1) < 0)
-            cerr << "cannot open logfile; using stdout/stderr" << endl;
+            cerr << "cannot open log file; using stdout/stderr" << endl;
         else
         {
             VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")

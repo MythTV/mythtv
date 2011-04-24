@@ -1,6 +1,7 @@
 #include <iostream>
 using namespace std;
 
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QSize>
@@ -15,6 +16,7 @@ using namespace std;
 MythCommandLineParser::MythCommandLineParser(uint64_t things_to_parse) :
     parseTypes(things_to_parse),
     display(), geometry(),
+    logdir(),
     logfile(),
     pidfile(),
     infile(),
@@ -396,23 +398,34 @@ bool MythCommandLineParser::Parse(
         ++argpos;
         return true;
     }
-    else if ((parseTypes & kCLPLogFile) &&
+    else if ((parseTypes & kCLPLogPath) &&
              (!strcmp(argv[argpos],"-l") ||
+              !strcmp(argv[argpos],"--logpath") ||
               !strcmp(argv[argpos],"--logfile")))
     {
         if ((argc - 1) > argpos)
         {
-            logfile = argv[argpos+1];
-            if (logfile.startsWith("-"))
+            QString value = argv[argpos+1];
+            if (value.startsWith("-"))
             {
-                cerr << "Invalid argument to -l/--logfile option\n";
+                cerr << "Invalid argument to -l/--logpath option\n";
                 err = true;
                 return true;
+            }
+            QFileInfo finfo(value);
+            if (finfo.isDir())
+            {
+                logdir = finfo.filePath();
+            }
+            else
+            {
+                logdir = finfo.path();
+                logfile = finfo.fileName();
             }
         }
         else
         {
-            cerr << "Missing argument to -l/--logfile option\n";
+            cerr << "Missing argument to -l/--logpath option\n";
             err = true;
             return true;
         }
@@ -719,10 +732,10 @@ QString MythCommandLineParser::GetHelpString(bool with_header) const
             << "List valid command line parameters" << endl;
     }
 
-    if (parseTypes & kCLPLogFile)
+    if (parseTypes & kCLPLogPath)
     {
-        msg << "-l or --logfile filename       "
-            << "Writes STDERR and STDOUT messages to filename" << endl;
+        msg << "-l or --logpath path "
+            << "Writes messages to file or directory path" << endl;
     }
 
     if (parseTypes & kCLPPidFile)
@@ -932,3 +945,17 @@ QString MythCommandLineParser::GetHelpString(bool with_header) const
     return str;
 }
 
+QString MythCommandLineParser::GetLogFilePath(void) const
+{
+    QString filepath;
+    if (!logdir.isEmpty())
+    {
+        if(logfile.isEmpty())
+            filepath = QFileInfo(QDir(logdir),
+                                 QCoreApplication::applicationName() +
+                                 ".log").filePath();
+        else
+            filepath = QFileInfo(QDir(logdir), logfile).filePath();
+    }
+    return filepath;
+}

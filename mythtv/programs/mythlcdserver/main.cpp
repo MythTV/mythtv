@@ -127,24 +127,32 @@ int main(int argc, char **argv)
             }
         }
         else if (!strcmp(a.argv()[argpos],"-l") ||
+            !strcmp(a.argv()[argpos],"--logpath") ||
             !strcmp(a.argv()[argpos],"--logfile"))
         {
             if (a.argc()-1 > argpos)
             {
-                logfile = a.argv()[argpos+1];
-                if (logfile.startsWith("-"))
+                QString value = a.argv()[argpos+1];
+                if (value.startsWith("-"))
                 {
-                    cerr << "Invalid or missing argument to -l/--logfile option\n";
+                    cerr << "Invalid or missing argument to -l/--logpath option\n";
                     return GENERIC_EXIT_INVALID_CMDLINE;
                 }
                 else
                 {
                     ++argpos;
                 }
+                QFileInfo finfo(value);
+                if (finfo.isDir())
+                    logfile = QFileInfo(QDir(value),
+                                        QCoreApplication::applicationName() +
+                                        ".log").filePath();
+                else
+                    logfile = value;
             }
             else
             {
-                cerr << "Missing argument to -l/--logfile option\n";
+                cerr << "Missing argument to -l/--logpath option\n";
                 return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
@@ -184,7 +192,7 @@ int main(int argc, char **argv)
                  << endl <<
 "-t or --messagetime           How long to show startup message (default 30 seconds)"
                  << endl <<
-"-l or --logfile filename      Writes STDERR and STDOUT messages to filename"
+"-l or --logpath path          Writes STDERR and STDOUT messages to path"
                  << endl <<
 "-v or --verbose debug-level   Use '-v help' for level info"
                  << endl <<
@@ -214,7 +222,7 @@ int main(int argc, char **argv)
 
     if (logfd != -1)
     {
-        // Send stdout and stderr to the logfile
+        // Send stdout and stderr to the log file
         dup2(logfd, 1);
         dup2(logfd, 2);
 

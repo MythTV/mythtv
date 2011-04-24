@@ -69,7 +69,7 @@ int main(int argc, char **argv)
         kCLPClearCache           |
         kCLPVerbose              |
         kCLPSetVerbose           |
-        kCLPLogFile              |
+        kCLPLogPath              |
         kCLPPidFile              |
         kCLPInFile               |
         kCLPOutFile              |
@@ -122,7 +122,7 @@ int main(int argc, char **argv)
         }
     }
 
-    logfile = cmdline.GetLogFilename();
+    logfile = cmdline.GetLogFilePath();
     pidfile = cmdline.GetPIDFilename();
 
     ///////////////////////////////////////////////////////////////////////

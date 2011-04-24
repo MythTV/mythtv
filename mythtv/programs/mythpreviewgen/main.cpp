@@ -59,8 +59,6 @@ using namespace std;
     #define UNUSED_FILENO 3
 #endif
 
-static QString logfile;
-
 namespace
 {
     void cleanup()

@@ -1027,7 +1027,7 @@ static void ShowUsage(const MythCommandLineParser &cmdlineparser)
     QByteArray ahelp = help.toLocal8Bit();
 
     cerr << "Valid options are: " << endl <<
-            "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
+            "-l or --logpath path           Writes STDERR and STDOUT messages to path" << endl <<
             "-r or --reset                  Resets frontend appearance settings and language" << endl <<
             ahelp.constData() <<
             "-p or --prompt                 Always prompt for Mythbackend selection." << endl <<
@@ -1049,10 +1049,10 @@ static int log_rotate(int report_error)
                          O_WRONLY|O_CREAT|O_APPEND, 0664);
 
     if (new_logfd < 0) {
-        /* If we can't open the new logfile, send data to /dev/null */
+        /* If we can't open the new log file, send data to /dev/null */
         if (report_error)
         {
-            VERBOSE(VB_IMPORTANT, QString("Cannot open logfile '%1'")
+            VERBOSE(VB_IMPORTANT, QString("Cannot open log file '%1'")
                     .arg(logfile));
             return -1;
         }
@@ -1067,7 +1067,7 @@ static int log_rotate(int report_error)
 
 #ifdef WINDOWS_CLOSE_CONSOLE
     // pure Win32 GUI app does not have standard IO streams
-    // simply assign the file descriptors to the logfile
+    // simply assign the file descriptors to the log file
     *stdout = *(_fdopen(new_logfd, "w"));
     *stderr = *stdout;
     setvbuf(stdout, NULL, _IOLBF, 256);
@@ -1170,25 +1170,33 @@ int main(int argc, char **argv)
             bBypassAutoDiscovery = true;
         }
         else if (!strcmp(a.argv()[argpos],"-l") ||
+            !strcmp(a.argv()[argpos],"--logpath") ||
             !strcmp(a.argv()[argpos],"--logfile"))
         {
             if (a.argc()-1 > argpos)
             {
-                logfile = a.argv()[argpos+1];
-                if (logfile.startsWith('-'))
+                QString value = a.argv()[argpos+1];
+                if (value.startsWith('-'))
                 {
                     cerr << "Invalid or missing argument"
-                            " to -l/--logfile option\n";
+                            " to -l/--logpath option\n";
                     return GENERIC_EXIT_INVALID_CMDLINE;
                 }
                 else
                 {
                     ++argpos;
                 }
+                QFileInfo finfo(value);
+                if (finfo.isDir())
+                    logfile = QFileInfo(QDir(value),
+                                        QCoreApplication::applicationName() +
+                                        ".log").filePath();
+                else
+                    logfile = value;
             }
             else
             {
-                cerr << "Missing argument to -l/--logfile option\n";
+                cerr << "Missing argument to -l/--logpath option\n";
                 return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
@@ -1205,7 +1213,7 @@ int main(int argc, char **argv)
     if (logfile.size())
     {
         if (log_rotate(1) < 0)
-            cerr << "cannot open logfile; using stdout/stderr" << endl;
+            cerr << "cannot open log file; using stdout/stderr" << endl;
         else
         {
             VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
@@ -1273,9 +1281,10 @@ int main(int argc, char **argv)
     for(int argpos = 1; argpos < a.argc(); ++argpos)
     {
         if (!strcmp(a.argv()[argpos],"-l") ||
+            !strcmp(a.argv()[argpos],"--logpath") ||
             !strcmp(a.argv()[argpos],"--logfile"))
         {
-            // Arg processing for logfile already done (before MythContext)
+            // Arg processing for log file already done (before MythContext)
             ++argpos;
         } else if (!strcmp(a.argv()[argpos],"-v") ||
                    !strcmp(a.argv()[argpos],"--verbose"))

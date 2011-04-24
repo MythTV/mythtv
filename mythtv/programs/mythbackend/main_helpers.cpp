@@ -274,11 +274,11 @@ int log_rotate(int report_error)
                          O_WRONLY|O_CREAT|O_APPEND|O_SYNC, 0664);
     if (new_logfd < 0)
     {
-        // If we can't open the new logfile, send data to /dev/null
+        // If we can't open the new log file, send data to /dev/null
         if (report_error)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Cannot open logfile '%1'").arg(logfile));
+                    QString("Cannot open log file '%1'").arg(logfile));
             return -1;
         }
         new_logfd = open("/dev/null", O_WRONLY);
@@ -320,7 +320,7 @@ void setupLogfile(void)
         if (log_rotate(1) < 0)
         {
             VERBOSE(VB_IMPORTANT, LOC_WARN +
-                    "Cannot open logfile; using stdout/stderr instead");
+                    "Cannot open log file; using stdout/stderr instead");
         }
         else
             signal(SIGHUP, &log_rotate_handler);

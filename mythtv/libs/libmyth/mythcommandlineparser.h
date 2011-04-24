@@ -4,6 +4,7 @@
 #include <QDateTime>
 #include <QSize>
 #include <QMap>
+#include <QCoreApplication>
 
 #include <stdint.h>   // for uint64_t
 
@@ -33,7 +34,7 @@ typedef enum {
     kCLPNoHousekeeper        = 0x0000100000ULL,
     kCLPNoAutoExpire         = 0x0000200000ULL,
     kCLPClearCache           = 0x0000400000ULL,
-    kCLPLogFile              = 0x0000800000ULL,
+    kCLPLogPath              = 0x0000800000ULL,
     kCLPPidFile              = 0x0001000000ULL,
     kCLPInFile               = 0x0002000000ULL,
     kCLPOutFile              = 0x0004000000ULL,
@@ -62,7 +63,9 @@ class MPUBLIC MythCommandLineParser
         { return settingsQuery; }
     QString GetDisplay(void)        const { return display;     }
     QString GetGeometry(void)       const { return geometry;    }
+    QString GetLogDir(void)         const { return logdir;     }
     QString GetLogFilename(void)    const { return logfile;     }
+    QString GetLogFilePath(void)    const;
     QString GetPIDFilename(void)    const { return pidfile;     }
     QString GetInputFilename(void)  const { return infile;      }
     QString GetOutputFilename(void) const { return outfile;     }
@@ -118,6 +121,7 @@ class MPUBLIC MythCommandLineParser
     QString               binname;
     QString               display;
     QString               geometry;
+    QString               logdir;
     QString               logfile;
     QString               pidfile;
     QString               infile;
