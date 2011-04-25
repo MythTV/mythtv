@@ -33,6 +33,11 @@
 
 ServerSideScripting::ServerSideScripting()
 {
+    // ----------------------------------------------------------------------
+    // Enable Translation functions
+    // ----------------------------------------------------------------------
+
+    m_engine.installTranslatorFunctions();
 
     // ----------------------------------------------------------------------
     // Add Scriptable Objects
