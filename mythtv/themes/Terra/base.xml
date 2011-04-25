@@ -118,7 +118,7 @@
             <state name="inactive" from="active"/>
         </statetype>
         <imagetype name="cursor">
-            <filename>cursor.png</filename>
+            <filename>controls/cursor.png</filename>
         </imagetype>
         <textarea name="text">
             <area>8,10,421,35</area>

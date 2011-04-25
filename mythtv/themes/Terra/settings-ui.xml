@@ -41,7 +41,7 @@
         <textedit name="settingvalue">
             <area>428,500,830,30</area>
             <imagetype name="cursor">
-                <filename>cursor.png</filename>
+                <filename>controls/cursor.png</filename>
             </imagetype>
             <textarea name="text">
                 <area>5,0,820,30</area>
