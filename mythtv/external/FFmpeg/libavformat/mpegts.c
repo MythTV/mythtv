@@ -1303,7 +1303,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     if (ts->req_sid >= 0 && h->id != ts->req_sid)
     {
 #ifdef DEBUG
-        dprintf(NULL, "We are looking for program 0x%x, not 0x%x",
+        av_dlog(ts->stream, "We are looking for program 0x%x, not 0x%x",
                ts->req_sid, h->id);
 #endif
          return;
@@ -2058,7 +2058,7 @@ static int handle_packet(MpegTSContext *ts, const uint8_t *packet)
 
     if(pid && discard_pid(ts, pid))
     {
-        dprintf(ts->stream, "discarding pid %d\n", pid);
+        av_log(ts->stream, AV_LOG_INFO, "discarding pid %d\n", pid);
         return 0;
     }
 
