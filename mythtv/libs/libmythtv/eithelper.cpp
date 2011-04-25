@@ -907,6 +907,10 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[ 10003LL << 32 | 61441U << 16] = EITFixUp::kEFixForceISO8859_15;
     fix[ 10006LL << 32 | 61441U << 16] = EITFixUp::kEFixForceISO8859_15;
     fix[ 10009LL << 32 | 61441U << 16] = EITFixUp::kEFixForceISO8859_15;
+    fix[ 10010LL << 32 | 61441U << 16] = EITFixUp::kEFixForceISO8859_15;
+    // Mark program on the HD transponders as HDTV
+    fix[ 10012LL << 32 | 61441U << 16] = EITFixUp::kFixHDTV;
+    fix[ 10013LL << 32 | 61441U << 16] = EITFixUp::kFixHDTV;
     // On transport 10004 only DMAX needs no fixing:
     fix[    10004LL<<32 | 61441U << 16 | 50403] = // BBC World Service
         fix[10004LL<<32 | 61441U << 16 | 53101] = // BBC Prime (engl)
@@ -951,6 +955,12 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
         fix[10007LL<<32| 61441U << 16 | 53609] = // Viva
         fix[10007LL<<32| 61441U << 16 | 53628] = // COMEDY CENTRAL
         EITFixUp::kEFixForceISO8859_15;
+    // RTL Subtitle parsing
+    fix[    10007LL<<32| 61441U << 16 | 53601] = // RTL
+    fix[    10007LL<<32| 61441U << 16 | 53602] = // Super RTL
+    fix[    10007LL<<32| 61441U << 16 | 53604] = // VOX
+    fix[    10007LL<<32| 61441U << 16 | 53606] = // n-tv
+        EITFixUp::kFixRTL | EITFixUp::kFixCategory;
     // On transport 10008 only following channels need fixing:
     fix[    10008LL<<32 | 61441U << 16 | 53002] = // Tele 5
         EITFixUp::kEFixForceISO8859_15;
