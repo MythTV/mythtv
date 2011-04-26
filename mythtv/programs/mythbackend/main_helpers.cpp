@@ -232,6 +232,8 @@ bool setup_context(MythBackendCommandLineParser &cmdline)
         cmdline.toBool("scanvideos")    || cmdline.toBool("clearcache") ||
         cmdline.toBool("printexpire"))
             gCoreContext->SetBackend(false);
+    else
+        gCoreContext->SetBackend(true);
 
     QMap<QString,QString> settingsOverride = cmdline.GetSettingsOverride();
     if (settingsOverride.size())
@@ -631,25 +633,25 @@ int setup_basics(const MythBackendCommandLineParser &cmdline)
 
 void print_warnings(const MythBackendCommandLineParser &cmdline)
 {
-    if (!cmdline.toBool("nohousekeeper"))
+    if (cmdline.toBool("nohousekeeper"))
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN +
                 "****** The Housekeeper has been DISABLED with "
                 "the --nohousekeeper option ******");
     }
-    if (!cmdline.toBool("nosched"))
+    if (cmdline.toBool("nosched"))
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN +
                 "********** The Scheduler has been DISABLED with "
                 "the --nosched option **********");
     }
-    if (!cmdline.toBool("noautoexpire"))
+    if (cmdline.toBool("noautoexpire"))
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN +
                 "********* Auto-Expire has been DISABLED with "
                 "the --noautoexpire option ********");
     }
-    if (!cmdline.toBool("nojobqueue"))
+    if (cmdline.toBool("nojobqueue"))
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN +
                 "********* The JobQueue has been DISABLED with "
