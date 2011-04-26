@@ -12,7 +12,7 @@
 #define PERTEDEC 4
 
 int zoom_filter_mmx_supported () {
-	        return (mm_support()&0x1);
+	        return (av_get_cpu_flags()&0x1);
 }
 
 void zoom_filter_mmx (int prevX, int prevY,
