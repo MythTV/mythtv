@@ -78,7 +78,8 @@ class UPNP_PUBLIC ServerSideScripting
 
         bool    ProcessLine         ( QTextStream &sCode, 
                                       QString     &sLine, 
-                                      bool         bInCode );
+                                      bool         bInCode,
+                                      QString     &sTransBuffer );
 };
 
 
