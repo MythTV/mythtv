@@ -157,7 +157,7 @@ void JSONSerializer::RenderValue( const QVariant &vValue )
         case QVariant::Map:         RenderMap       ( vValue.toMap()        );  break;
         default:
         {
-            m_Stream << "\"" << vValue.toString() << "\"";
+            m_Stream << "\"" << Encode( vValue.toString() ) << "\"";
             break;
         }
     }
@@ -207,7 +207,7 @@ void JSONSerializer::RenderStringList( const QStringList &list )
         else
             m_Stream << ",";
 
-          m_Stream << "\"" << it.next() << "\"";
+          m_Stream << "\"" << Encode( it.next() ) << "\"";
     }
 
     m_Stream << "]";
@@ -235,8 +235,41 @@ void JSONSerializer::RenderMap( const QVariantMap &map )
             m_Stream << ",";
 
         m_Stream << "{ \"key\": \"" << it.key() << "\", \"Value\": \"";
-        m_Stream << it.value().toString() << "\"}";
+        m_Stream << Encode( it.value().toString() ) << "\"}";
     }
 
     m_Stream << "]";
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+QString JSONSerializer::Encode(const QString &sIn)
+{
+    if (sIn.isEmpty())
+        return sIn;
+
+    QString sStr = sIn;
+
+    // -=>TODO: Would it be better to just loop through string once and build 
+    // new string with encoded chars instead of calling replace multiple times?
+    // It might perform better.
+
+    sStr.replace( '\\', "\\\\" ); // This must be first
+    sStr.replace( '"' , "\\\"" ); 
+
+    sStr.replace( '\b', "\\b"  );
+    sStr.replace( '\f', "\\f"  );
+    sStr.replace( '\n', "\\n"  );
+    sStr.replace( "\r", "\\r"  );
+    sStr.replace( "\t", "\\t"  );
+    sStr.replace(  "/", "\\/"  );
+
+    // we don't handle hex values yet...
+    /*
+    if(ch>='\u0000' && ch<='\u001F')
+        sb.append("\\u####"); 
+    */
+    return sStr;
 }
