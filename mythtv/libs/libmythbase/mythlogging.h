@@ -65,21 +65,23 @@ extern "C" {
 #endif
 
 #define LogPrintQString(mask, level, ...) \
-    LogPrintLine(mask, (LogLevel_t)level, (char *)__FILE__, __LINE__, \
-                 (char *)__FUNCTION__, \
-                 (char *)QString(__VA_ARGS__).toLocal8Bit().constData())
+    LogPrintLineNoArg(mask, (LogLevel_t)level, (char *)__FILE__, __LINE__, \
+                      (char *)__FUNCTION__, \
+                      (char *)QString(__VA_ARGS__).toLocal8Bit().constData())
 
 #define LogPrint(mask, level, format, ...) \
     LogPrintLine(mask, (LogLevel_t)level, (char *)__FILE__, __LINE__, \
                  (char *)__FUNCTION__, (char *)format, ## __VA_ARGS__)
 
 #define LogPrintNoArg(mask, level, string) \
-    LogPrintLine(mask, (LogLevel_t)level, (char *)__FILE__, __LINE__, \
-                 (char *)__FUNCTION__, (char *)string)
+    LogPrintLineNoArg(mask, (LogLevel_t)level, (char *)__FILE__, __LINE__, \
+                      (char *)__FUNCTION__, (char *)string)
 
 /* Define the external prototype */
 MBASE_PUBLIC void LogPrintLine( uint32_t mask, LogLevel_t level, char *file, 
                                 int line, char *function, char *format, ... );
+MBASE_PUBLIC void LogPrintLineNoArg( uint32_t mask, LogLevel_t level, char *file, int line, 
+                                     char *function, char *message );
 
 #ifdef __cplusplus
 }

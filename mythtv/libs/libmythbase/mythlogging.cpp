@@ -312,10 +312,27 @@ void LogTimeStamp( time_t *epoch, uint32_t *usec )
 void LogPrintLine( uint32_t mask, LogLevel_t level, char *file, int line, 
                    char *function, char *format, ... )
 {
+    va_list         arguments;
+    char           *message;
+
+    message = (char *)malloc(LOGLINE_MAX+1);
+    if( !message )
+        return;
+
+    va_start(arguments, format);
+    vsnprintf(message, LOGLINE_MAX, format, arguments);
+    va_end(arguments);
+
+    LogPrintLineNoArg( mask, level, file, line, function, message );
+    free( message );
+}
+
+void LogPrintLineNoArg( uint32_t mask, LogLevel_t level, char *file, int line, 
+                        char *function, char *message )
+{
     LoggingItem_t  *item;
     time_t          epoch;
     uint32_t        usec;
-    va_list         arguments;
 
     if( !VERBOSE_LEVEL_CHECK(mask) )
         return;
@@ -340,16 +357,12 @@ void LogPrintLine( uint32_t mask, LogLevel_t level, char *file, int line,
     item->function = function; 
     item->threadId = (uint64_t)QThread::currentThreadId();
 
-    item->message   = (char *)malloc(LOGLINE_MAX+1);
+    item->message   = strdup(message);
     if( !item->message ) 
     {
         delete item;
         return;
     }
-
-    va_start(arguments, format);
-    vsnprintf(item->message, LOGLINE_MAX, format, arguments);
-    va_end(arguments);
 
     logQueue.enqueue(item);
 }
