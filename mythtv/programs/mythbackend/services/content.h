@@ -65,6 +65,10 @@ class Content : public ContentServices
 
         QString             GetHash             ( const QString   &storageGroup,
                                                   const QString   &FileName );
+
+        bool                DownloadFile        ( const QString   &URL,
+                                                  const QString   &StorageGroup );
+
 };
 
 Q_SCRIPT_DECLARE_QMETAOBJECT( Content, QObject*);

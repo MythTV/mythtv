@@ -34,6 +34,7 @@
 #include "backendutil.h"
 #include "httprequest.h"
 #include "util.h"
+#include "mythdownloadmanager.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -656,3 +657,36 @@ QString Content::GetHash( const QString &sStorageGroup, const QString &sFileName
 
     return hash;
 }
+
+bool Content::DownloadFile( const QString &sURL, const QString &sStorageGroup )
+{
+    QFileInfo finfo(sURL);
+    QString filename = finfo.fileName();
+    StorageGroup sgroup(sStorageGroup, gCoreContext->GetHostName(), false);
+    QString outDir = sgroup.FindNextDirMostFree();
+    QString outFile;
+
+    if (outDir.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT, QString("Unable to determine directory "
+                "to write to in %1 write command").arg(sURL));
+        return false;
+    }
+
+    if ((filename.contains("/../")) ||
+        (filename.startsWith("../")))
+    {
+        VERBOSE(VB_IMPORTANT, QString("ERROR: %1 write "
+                "filename '%2' does not pass sanity checks.")
+                .arg(sURL).arg(filename));
+        return false;
+    }
+
+    outFile = outDir + "/" + filename;
+
+    if (GetMythDownloadManager()->download(sURL, outFile))
+        return true;
+
+    return false;
+}
+
