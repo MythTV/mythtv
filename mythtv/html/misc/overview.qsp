@@ -86,7 +86,7 @@
                         break;
                     case 7:
                         var recording = encoder.Recording;
-                        var endtime = recording.EndTime.getHours() + ':' + recording.EndTime.getMinutes();
+                        var endtime = recording.EndTime.getHours() + ':' + pad(recording.EndTime.getMinutes());
                         statestring = 'is currently recording \"' + recording.Title + '.\"  This recording will end at ' + endtime + '.';
                         break;
                     default:
