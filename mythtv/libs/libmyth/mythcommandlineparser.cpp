@@ -537,11 +537,15 @@ int MythCommandLineParser::toInt(QString key) const
     // If key is not registered, return 0
     int val = 0;
     if (m_parsed.contains(key))
+    {
         if (m_parsed[key].canConvert(QVariant::Int))
             val = m_parsed[key].toInt();
+    }
     else if (m_defaults.contains(key))
+    {
         if (m_defaults[key].canConvert(QVariant::Int))
             val = m_defaults[key].toInt();
+    }
     return val;
 }
 
@@ -551,11 +555,15 @@ uint MythCommandLineParser::toUInt(QString key) const
     // If key is not registered, return 0
     uint val = 0;
     if (m_parsed.contains(key))
+    {
         if (m_parsed[key].canConvert(QVariant::UInt))
             val = m_parsed[key].toUInt();
+    }
     else if (m_defaults.contains(key))
+    {
         if (m_defaults[key].canConvert(QVariant::UInt))
             val = m_defaults[key].toUInt();
+    }
     return val;
 }
 
@@ -566,11 +574,15 @@ long long MythCommandLineParser::toLongLong(QString key) const
     // If key is not registered, return 0
     long long val = 0;
     if (m_parsed.contains(key))
+    {
         if (m_parsed[key].canConvert(QVariant::LongLong))
             val = m_parsed[key].toLongLong();
+    }
     else if (m_defaults.contains(key))
+    {
         if (m_defaults[key].canConvert(QVariant::LongLong))
             val = m_defaults[key].toLongLong();
+    }
     return val;
 }
 
@@ -580,11 +592,15 @@ double MythCommandLineParser::toDouble(QString key) const
     // If key is not registered, return 0.0
     double val = 0.0;
     if (m_parsed.contains(key))
+    {
         if (m_parsed[key].canConvert(QVariant::Double))
             val = m_parsed[key].toDouble();
+    }
     else if (m_defaults.contains(key))
+    {
         if (m_defaults[key].canConvert(QVariant::Double))
             val = m_defaults[key].toDouble();
+    }
     return val;
 }
 
@@ -594,11 +610,15 @@ QSize MythCommandLineParser::toSize(QString key) const
     // If key is not registered, return (0,0)
     QSize val(0,0);
     if (m_parsed.contains(key))
+    {
         if (m_parsed[key].canConvert(QVariant::Size))
             val = m_parsed[key].toSize();
+    }
     else if (m_defaults.contains(key))
+    {
         if (m_defaults[key].canConvert(QVariant::Size))
             val = m_defaults[key].toSize();
+    }
     return val;
 }
 
@@ -608,11 +628,15 @@ QString MythCommandLineParser::toString(QString key) const
     // If key is not registered, return empty string
     QString val("");
     if (m_parsed.contains(key))
+    {
         if (m_parsed[key].canConvert(QVariant::String))
             val = m_parsed[key].toString();
+    }
     else if (m_defaults.contains(key))
+    {
         if (m_defaults[key].canConvert(QVariant::String))
             val = m_defaults[key].toString();
+    }
     return val;
 }
 
@@ -622,15 +646,19 @@ QStringList MythCommandLineParser::toStringList(QString key, QString sep) const
     // If key is not registered, return empty stringlist
     QStringList val;
     if (m_parsed.contains(key))
+    {
         if (m_parsed[key].type() == QVariant::String && !sep.isEmpty())
             val << m_parsed[key].toString().split(sep);
         else if (m_parsed[key].canConvert(QVariant::StringList))
             val << m_parsed[key].toStringList();
+    }
     else if (m_defaults.contains(key))
+    {
         if (m_defaults[key].type() == QVariant::String && !sep.isEmpty())
             val << m_defaults[key].toString().split(sep);
         else if (m_defaults[key].canConvert(QVariant::StringList))
             val = m_defaults[key].toStringList();
+    }
     return val;
 }
 
@@ -668,11 +696,15 @@ QDateTime MythCommandLineParser::toDateTime(QString key) const
     // If key is not registered, return empty datetime
     QDateTime val;
     if (m_parsed.contains(key))
+    {
         if (m_parsed[key].canConvert(QVariant::DateTime))
             val = m_parsed[key].toDateTime();
+    }
     else if (m_defaults.contains(key))
+    {
         if (m_defaults[key].canConvert(QVariant::Int))
             val = m_defaults[key].toDateTime();
+    }
     return val;
 }
 
@@ -1324,17 +1356,3 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
             "Output stream type: dvd, ps", "");
 }
 
-QString MythCommandLineParser::GetLogFilePath(void) const
-{
-    QString filepath;
-    if (!logdir.isEmpty())
-    {
-        if(logfile.isEmpty())
-            filepath = QFileInfo(QDir(logdir),
-                                 QCoreApplication::applicationName() +
-                                 ".log").filePath();
-        else
-            filepath = QFileInfo(QDir(logdir), logfile).filePath();
-    }
-    return filepath;
-}
