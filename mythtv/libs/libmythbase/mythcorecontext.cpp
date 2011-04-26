@@ -20,6 +20,7 @@ using namespace std;
 
 #include "compat.h"
 #include "mythconfig.h"       // for CONFIG_DARWIN
+#include "mythsocketthread.h"
 #include "mythcorecontext.h"
 #include "mythsocket.h"
 #include "mythsystem.h"
@@ -100,6 +101,8 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
 
 MythCoreContextPrivate::~MythCoreContextPrivate()
 {
+    ShutdownRRT();
+
     QMutexLocker locker(&m_sockLock);
     if (m_serverSock)
     {
