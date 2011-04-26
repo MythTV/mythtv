@@ -39,11 +39,14 @@ function listFiles() {
 
 function realListFiles() {
     var group = $("#sgName").val();
+    var filter = $("#sgFilter").val().toLowerCase();
     $("#links").html("Loading...");
     $.getJSON("/Content/GetFileList", { StorageGroup: group }, function(data) {
         $("#links").html("");
         $.each(data.QStringList, function(i, value) {
-            $("#links").append("<a href='/Content/GetFile?StorageGroup=" + group + "&FileName=" + value + "'>" + value + "</a><br>");
+            if ((filter.length == 0) ||
+                (value.toLowerCase().indexOf(filter) >= 0))
+                $("#links").append("<a href='/Content/GetFile?StorageGroup=" + group + "&FileName=" + value + "'>" + value + "</a><br>");
         });
     });
 }
@@ -51,7 +54,8 @@ function realListFiles() {
 
 <h3>Sample Storage Group browser</h3>
 <div>
-    Storage Group: 
+    <table border=0 cellspacing=2 cellpadding=2>
+    Storage Group:
     <select id="sgName">
 <%
     var myth = new Myth();
@@ -72,8 +76,9 @@ function realListFiles() {
         }
     }
 %>
-    </select>
-    <input type='button' onClick='javascript:listFiles()' value='List Files'>
+    </select><br>
+    Filter: <input id='sgFilter' size=20><br>
+    <input type='button' onClick='javascript:listFiles()' value='List Files'><br>
 </div>
 <br>
 <div id="links"></div>

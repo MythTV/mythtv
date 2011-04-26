@@ -562,7 +562,7 @@ static VideoFilter *NewKernelDeintFilter(VideoFrameType inpixfmt,
     filter->line_filter = &line_filter_c;
     filter->line_filter_fast = &line_filter_c_fast;
 #if HAVE_MMX
-    filter->mm_flags = mm_support();
+    filter->mm_flags = av_get_cpu_flags();
     if (filter->mm_flags & FF_MM_MMX)
     {
         filter->line_filter = &line_filter_mmx;

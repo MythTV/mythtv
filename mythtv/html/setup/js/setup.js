@@ -263,10 +263,17 @@ function fileBrowserEntryInfoCallback(file) {
     /* do nothing here for now */
 }
 
-function openFileBrowserWindow(title, dirs, callback, onlyDirs, storageGroup) {
+function openFileBrowserWindow(title, dirs, saveCallback, onlyDirs, storageGroup) {
+    var fileBrowserWidth = 330;
+    var rootPath = "/";
+    if (storageGroup != undefined && storageGroup != "") {
+        rootPath = "myth://" + storageGroup + "@" + getHostName() + ":"
+                 + location.port + "/";
+    }
+
     $("#fileBrowserWindow").dialog({
         modal: true,
-        width: 340,
+        width: fileBrowserWidth,
         height: 515,
         'title': title,
         closeOnEscape: false,
@@ -282,11 +289,7 @@ function openFileBrowserWindow(title, dirs, callback, onlyDirs, storageGroup) {
         $.getScript("/js/jqueryFileTree/jqueryFileTree.js");
     }
     $.ajaxSetup({ async: true });
-    fileBrowserCallback = callback;
-    rootPath = "/";
-    if (storageGroup != undefined && storageGroup != "")
-        rootPath = "myth://" + storageGroup + "@" + getHostName() + ":"
-                 + location.port + "/";
+    fileBrowserCallback = saveCallback;
         
     $('#fileBrowser').fileTree(
       { root: rootPath,

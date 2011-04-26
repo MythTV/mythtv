@@ -65,13 +65,11 @@ typedef QPair<transport_scan_items_it_t, ScannedChannelInfo*> ChannelListItem;
 typedef QList<ChannelListItem> ChannelList;
 
 class ChannelScanSM;
-class AnalogSignalHandler : public QObject, public SignalMonitorListener
+class AnalogSignalHandler : public SignalMonitorListener
 {
-    Q_OBJECT
   public:
     AnalogSignalHandler(ChannelScanSM *_siscan) : siscan(_siscan) { }
 
-  public slots:
     virtual inline void AllGood(void);
     virtual void StatusSignalLock(const SignalMonitorValue&) { }
     virtual void StatusChannelTuned(const SignalMonitorValue&) { }

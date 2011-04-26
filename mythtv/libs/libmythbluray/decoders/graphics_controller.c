@@ -493,6 +493,7 @@ static void _render_page(GRAPHICS_CONTROLLER *gc,
 
 #define VK_IS_NUMERIC(vk) (/*vk >= BD_VK_0  &&*/ vk <= BD_VK_9)
 #define VK_IS_CURSOR(vk)  (vk >= BD_VK_UP && vk <= BD_VK_RIGHT)
+#define VK_TO_NUMBER(vk)  ((vk) - BD_VK_0)
 
 static int _user_input(GRAPHICS_CONTROLLER *gc, bd_vk_key_e key, GC_NAV_CMDS *cmds)
 {
@@ -533,9 +534,20 @@ static int _user_input(GRAPHICS_CONTROLLER *gc, bd_vk_key_e key, GC_NAV_CMDS *cm
     for (ii = 0; ii < page->num_bogs; ii++) {
         BD_IG_BOG *bog      = &page->bog[ii];
         unsigned   valid_id = gc->enabled_button[ii];
+        BD_IG_BUTTON *button = _find_button_bog(bog, valid_id);
+        if (!button) {
+            continue;
+        }
 
-        if (VK_IS_CURSOR(key) || key == BD_VK_ENTER) {
-            BD_IG_BUTTON *button = _find_button_bog(bog, valid_id);
+        /* numeric select */
+        if (VK_IS_NUMERIC(key)) {
+            if (button->numeric_select_value == VK_TO_NUMBER(key)) {
+                new_btn_id = button->id;
+            }
+        }
+
+        /* cursor keys */
+        else if (VK_IS_CURSOR(key) || key == BD_VK_ENTER) {
             if (button->id == cur_btn_id) {
                 switch(key) {
                     case BD_VK_UP:
@@ -559,9 +571,6 @@ static int _user_input(GRAPHICS_CONTROLLER *gc, bd_vk_key_e key, GC_NAV_CMDS *cm
                         break;
                     default:;
                 }
-            }
-            if (VK_IS_NUMERIC(key)) {
-                // TODO: numeric_select_value
             }
 
             if (new_btn_id != cur_btn_id) {

@@ -213,8 +213,8 @@ static int fillTableMMX(uint8_t *table, mmx_t *shift, mmx_t *scale, mmx_t *min,
 
     fillTable(table, in_min, in_max, out_min, out_max, gamma);
     scalec = ((out_max - out_min) << 15)/(in_max - in_min);
-    if ((mm_support() & FF_MM_MMX) == 0 || gamma < 0.9999 || gamma > 1.00001
-        || scalec > 32767 << 7)
+    if ((av_get_cpu_flags() & FF_MM_MMX) == 0 || gamma < 0.9999 || 
+        gamma > 1.00001 || scalec > 32767 << 7)
         return 0;
     shiftc = 2;
     while (scalec > 32767)

@@ -23,6 +23,9 @@
 #define VIDEO_H
 
 #include <QScriptEngine>
+#include <QDateTime>
+
+#include "videometadatalistmanager.h"
 
 #include "services/videoServices.h"
 
@@ -38,10 +41,27 @@ class Video : public VideoServices
 
         /* Video Metadata Methods */
 
-        DTC::VideoMetadataInfoList*  GetVideos  ( bool     Descending,
-                                                  int      StartIndex,
-                                                  int      Count      );
+        DTC::VideoMetadataInfoList*  GetVideos       ( bool     Descending,
+                                                       int      StartIndex,
+                                                       int      Count            );
 
+        DTC::VideoMetadataInfo*   GetVideoById       ( int      Id               );
+
+        DTC::VideoMetadataInfo*   GetVideoByFilename ( const QString  &Filename  );
+
+        bool                      RemoveVideoFromDB  ( int      Id               );
+
+        bool                      AddVideo           ( const QString  &Filename,
+                                                       const QString  &Host      );
+
+        /* Bluray Methods */
+
+        DTC::BlurayInfo*          GetBluray          ( const QString  &Path      );
+
+    private:
+
+        DTC::VideoMetadataInfo*   GetInfoFromMetadata(
+                             VideoMetadataListManager::VideoMetadataPtr metadata );
 };
 
 // --------------------------------------------------------------------------
@@ -73,13 +93,33 @@ class ScriptableVideo : public QObject
 
     public slots:
 
-        QObject* GetVideos(      bool             Descending,
-                                 int              StartIndex,
-                                 int              Count      )
+        QObject* GetVideos(          bool             Descending,
+                                     int              StartIndex,
+                                     int              Count      )
         {
             return m_obj.GetVideos( Descending, StartIndex, Count );
         }
 
+        QObject* GetVideoById(       int              Id         )
+        {
+            return m_obj.GetVideoById( Id );
+        }
+
+        QObject* GetVideoByFilename( const QString    &Filename  )
+        {
+            return m_obj.GetVideoByFilename( Filename );
+        }
+
+        bool RemoveVideoFromDB(      int              Id         )
+        {
+            return m_obj.RemoveVideoFromDB( Id );
+        }
+
+        bool AddVideo( const QString  &Filename,
+                       const QString  &Host      )
+        {
+            return m_obj.AddVideo( Filename, Host );
+        }
 };
 
 

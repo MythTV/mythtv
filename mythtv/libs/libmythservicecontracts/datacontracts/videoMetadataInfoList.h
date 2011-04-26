@@ -35,7 +35,7 @@ namespace DTC
 class SERVICE_PUBLIC VideoMetadataInfoList : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.0" );
+    Q_CLASSINFO( "version", "1.01" );
 
     // We need to know the type that will ultimately be contained in
     // any QVariantList or QVariantMap.  We do his by specifying
@@ -44,7 +44,25 @@ class SERVICE_PUBLIC VideoMetadataInfoList : public QObject
 
     Q_CLASSINFO( "VideoMetadataInfos_type", "DTC::VideoMetadataInfo");
 
+    Q_PROPERTY( int          StartIndex     READ StartIndex      WRITE setStartIndex     )
+    Q_PROPERTY( int          Count          READ Count           WRITE setCount          )
+    Q_PROPERTY( int          CurrentPage    READ CurrentPage     WRITE setCurrentPage    )
+    Q_PROPERTY( int          TotalPages     READ TotalPages      WRITE setTotalPages     )
+    Q_PROPERTY( int          TotalAvailable READ TotalAvailable  WRITE setTotalAvailable )
+    Q_PROPERTY( QDateTime    AsOf           READ AsOf            WRITE setAsOf           )
+    Q_PROPERTY( QString      Version        READ Version         WRITE setVersion        )
+    Q_PROPERTY( QString      ProtoVer       READ ProtoVer        WRITE setProtoVer       )
+
     Q_PROPERTY( QVariantList VideoMetadataInfos READ VideoMetadataInfos DESIGNABLE true )
+
+    PROPERTYIMP       ( int         , StartIndex      )
+    PROPERTYIMP       ( int         , Count           )
+    PROPERTYIMP       ( int         , CurrentPage     )
+    PROPERTYIMP       ( int         , TotalPages      )
+    PROPERTYIMP       ( int         , TotalAvailable  )
+    PROPERTYIMP       ( QDateTime   , AsOf            )
+    PROPERTYIMP       ( QString     , Version         )
+    PROPERTYIMP       ( QString     , ProtoVer        )
 
     PROPERTYIMP_RO_REF( QVariantList, VideoMetadataInfos )
 
@@ -61,7 +79,12 @@ class SERVICE_PUBLIC VideoMetadataInfoList : public QObject
     public:
 
         VideoMetadataInfoList(QObject *parent = 0)
-            : QObject( parent )
+            : QObject( parent ),
+              m_StartIndex    ( 0      ),
+              m_Count         ( 0      ),
+              m_CurrentPage   ( 0      ),
+              m_TotalPages    ( 0      ),
+              m_TotalAvailable( 0      )
         {
         }
 
@@ -72,6 +95,13 @@ class SERVICE_PUBLIC VideoMetadataInfoList : public QObject
 
         void Copy( const VideoMetadataInfoList &src )
         {
+            m_StartIndex    = src.m_StartIndex     ;
+            m_Count         = src.m_Count          ;
+            m_TotalAvailable= src.m_TotalAvailable ;
+            m_AsOf          = src.m_AsOf           ;
+            m_Version       = src.m_Version        ;
+            m_ProtoVer      = src.m_ProtoVer       ;
+
             CopyListContents< VideoMetadataInfo >( this, m_VideoMetadataInfos, src.m_VideoMetadataInfos );
         }
 

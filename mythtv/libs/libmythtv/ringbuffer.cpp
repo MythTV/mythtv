@@ -28,7 +28,7 @@
 #include "util.h"
 #include "mythlogging.h"
 
-#ifndef HAVE_POSIX_FADVISE
+#if ! HAVE_POSIX_FADVISE
 static int posix_fadvise(int, off_t, off_t, int) { return 0; }
 #define POSIX_FADV_SEQUENTIAL 0
 #define POSIX_FADV_WILLNEED 0

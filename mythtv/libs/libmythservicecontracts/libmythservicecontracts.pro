@@ -18,16 +18,16 @@ HEADERS += services/mythServices.h    services/guideServices.h
 HEADERS += services/contentServices.h services/dvrServices.h
 HEADERS += services/channelServices.h services/videoServices.h
 
-HEADERS += datacontracts/connectionInfo.h      datacontracts/databaseInfo.h
-HEADERS += datacontracts/programAndChannel.h   datacontracts/programGuide.h
-HEADERS += datacontracts/recording.h           datacontracts/settingList.h
-HEADERS += datacontracts/wolInfo.h             datacontracts/programList.h
-HEADERS += datacontracts/encoder.h             datacontracts/encoderList.h
-HEADERS += datacontracts/storageGroupDir.h     datacontracts/storageGroupDirList.h
-HEADERS += datacontracts/channelInfoList.h     datacontracts/videoSource.h
-HEADERS += datacontracts/videoSourceList.h     datacontracts/videoMultiplex.h
-HEADERS += datacontracts/videoMultiplexList.h  datacontracts/videoMetadataInfo.h
-HEADERS += datacontracts/videoMetadataInfoList.h
+HEADERS += datacontracts/connectionInfo.h        datacontracts/databaseInfo.h
+HEADERS += datacontracts/programAndChannel.h     datacontracts/programGuide.h
+HEADERS += datacontracts/recording.h             datacontracts/settingList.h
+HEADERS += datacontracts/wolInfo.h               datacontracts/programList.h
+HEADERS += datacontracts/encoder.h               datacontracts/encoderList.h
+HEADERS += datacontracts/storageGroupDir.h       datacontracts/storageGroupDirList.h
+HEADERS += datacontracts/channelInfoList.h       datacontracts/videoSource.h
+HEADERS += datacontracts/videoSourceList.h       datacontracts/videoMultiplex.h
+HEADERS += datacontracts/videoMultiplexList.h    datacontracts/videoMetadataInfo.h
+HEADERS += datacontracts/videoMetadataInfoList.h datacontracts/blurayInfo.h
 
 SOURCES += service.cpp
 
@@ -55,6 +55,7 @@ incDatacontracts.files += datacontracts/wolInfo.h             datacontracts/chan
 incDatacontracts.files += datacontracts/videoSource.h         datacontracts/videoSourceList.h
 incDatacontracts.files += datacontracts/videoMultiplex.h      datacontracts/videoMultiplexList.h
 incDatacontracts.files += datacontracts/videoMetadataInfo.h   datacontracts/videoMetadataInfoList.h
+incDatacontracts.files += datacontracts/blurayInfo.h
 
 INSTALLS += inc incServices incDatacontracts
 
