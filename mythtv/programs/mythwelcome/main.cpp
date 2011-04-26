@@ -48,121 +48,41 @@ static void initKeys(void)
         "Start Mythtv-Setup"),            "");
 }
 
-static void showUsage(const MythCommandLineParser &cmdlineparser)
-{
-    QString    help  = cmdlineparser.GetHelpString(false);
-    QByteArray ahelp = help.toLocal8Bit();
-
-    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
-                            .arg(MYTH_APPNAME_MYTHWELCOME)
-                            .arg(MYTH_SOURCE_PATH)
-                            .arg(MYTH_SOURCE_VERSION));
-
-    cerr << "Valid options are: " << endl <<
-            "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
-            "-s or --setup                  Run setup for the mythshutdown program" << endl <<
-            "-l or --logpath path           Writes STDERR and STDOUT messages to path" << endl <<
-            ahelp.constData() <<
-            endl;
-
-}
-
 int main(int argc, char **argv)
 {
     bool bShowSettings = false;
 
-    bool cmdline_err;
-
-    MythCommandLineParser cmdline(
-        kCLPOverrideSettingsFile |
-        kCLPOverrideSettings     |
-        kCLPQueryVersion);
-
-    for (int argpos = 0; argpos < argc; ++argpos)
+    MythWelcomeCommandLineParser cmdline;
+    if (!cmdline.Parse(argc, argv))
     {
-        if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
-        {
-            if (cmdline_err)
-                return GENERIC_EXIT_INVALID_CMDLINE;
-
-            if (cmdline.WantsToExit())
-                return GENERIC_EXIT_OK;
-        }
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
+    if (cmdline.toBool("showhelp"))
+    {
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_OK;
+    }
+
+    if (cmdline.toBool("showversion"))
+    {
+        cmdline.PrintVersion();
+        return GENERIC_EXIT_OK;
+    }
+    
     QApplication a(argc, argv);
 
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHWELCOME);
 
-    // Check command line arguments
-    for (int argpos = 1; argpos < a.argc(); ++argpos)
-    {
-        if (!strcmp(a.argv()[argpos],"-v") ||
-            !strcmp(a.argv()[argpos],"--verbose"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                if (parse_verbose_arg(a.argv()[argpos+1]) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-                    return GENERIC_EXIT_INVALID_CMDLINE;
+    if (parse_verbose_arg(cmdline.toString("verbose")) ==
+            GENERIC_EXIT_INVALID_CMDLINE)
+        return GENERIC_EXIT_INVALID_CMDLINE;
 
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -v/--verbose option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-s") ||
-            !strcmp(a.argv()[argpos],"--setup"))
-        {
-            bShowSettings = true;
-        }
-        else if (!strcmp(a.argv()[argpos], "-l") ||
-                 !strcmp(a.argv()[argpos], "--logpath") ||
-                 !strcmp(a.argv()[argpos], "--logfile"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                QString value = a.argv()[argpos+1];
-                if (value.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to -l/--logpath option\n";
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-                else
-                {
-                    ++argpos;
-                }
-                QFileInfo finfo(value);
-                if (finfo.isDir())
-                    logfile = QFileInfo(QDir(value),
-                                        QCoreApplication::applicationName() +
-                                        ".log").filePath();
-                else
-                    logfile = value;
-            }
-            else
-            {
-                cerr << "Missing argument to -l/--logpath option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
-        {
-            if (cmdline_err)
-                return GENERIC_EXIT_INVALID_CMDLINE;
-
-            if (cmdline.WantsToExit())
-                return GENERIC_EXIT_OK;
-        }
-        else
-        {
-            showUsage(cmdline);
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
-    }
+    if (cmdline.toBool("setup"))
+        bShowSettings = true;
+    if (!cmdline.toString("logfile").isEmpty())
+        logfile = cmdline.toString("logfile");
 
     logStart("");
 

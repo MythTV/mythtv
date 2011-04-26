@@ -934,7 +934,6 @@ static int FlagCommercials(
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    int argpos = 1;
     bool isVideo = false;
     int result = GENERIC_EXIT_OK;
 
@@ -952,349 +951,150 @@ int main(int argc, char *argv[])
     bool useDB = true;
     bool allRecorded = false;
     bool queueJobInstead = false;
-    bool copyToCutlist = false;
-    bool clearCutlist = false;
-    bool clearSkiplist = false;
-    bool getCutlist = false;
-    bool getSkipList = false;
     QString newCutList = QString::null;
-    QMap<QString, QString> settingsOverride;
 
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHCOMMFLAG);
 
     print_verbose_messages = VB_IMPORTANT;
     verboseString = "important";
 
-    bool cmdline_err;
-    MythCommandLineParser cmdline(
-        kCLPOverrideSettingsFile |
-        kCLPOverrideSettings);
-
-    while (argpos < a.argc())
+    MythCommFlagCommandLineParser cmdline;
+    if (!cmdline.Parse(argc, argv))
     {
-        if (!strcmp(a.argv()[argpos],"-c") ||
-            !strcmp(a.argv()[argpos],"--chanid"))
-        {
-            if (((argpos + 1) >= a.argc()) ||
-                !strncmp(a.argv()[argpos + 1], "--", 2))
-            {
-                VERBOSE(VB_IMPORTANT,
-                        "Missing or invalid parameters for --chanid option");
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
 
-            chanid = QString(a.argv()[++argpos]).toUInt();
-        }
-        else if (!strcmp(a.argv()[argpos],"-s") ||
-                 !strcmp(a.argv()[argpos],"--starttime"))
-        {
-            if (((argpos + 1) >= a.argc()) ||
-                !strncmp(a.argv()[argpos + 1], "--", 2))
-            {
-                VERBOSE(VB_IMPORTANT,
-                        "Missing or invalid parameters for --starttime option");
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
+    if (cmdline.toBool("showhelp"))
+    {
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_OK;
+    }
 
-            starttime += a.argv()[++argpos];
-        }
-        else if (!strcmp(a.argv()[argpos],"-f") ||
-                 !strcmp(a.argv()[argpos],"--file"))
-        {
-            if ((argpos + 1) < a.argc())
-            {
-                filename = QString::fromLocal8Bit(a.argv()[++argpos]);
-                fullfile = a.argv()[argpos];
-            }
-            else
-            {
-                cerr << "Missing argument to -f/--file option\n";
-                return -1;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"--video"))
-        {
-            if ((argpos + 1) < a.argc())
-            {
-                filename = (a.argv()[++argpos]);
-                isVideo = true;
-                rebuildSeekTable = true;
-                beNice = false;
-            }
-            else
-            {
-                cerr << "Missing argument to -v/--video option\n";
-                return -1;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"--method"))
-        {
-            if ((argpos + 1) < a.argc())
-            {
-                QString method = (a.argv()[++argpos]);
-                bool ok;
-                commDetectMethod = (SkipTypes) method.toInt(&ok);
-                if (!ok)
-                {
-                    commDetectMethod = COMM_DETECT_OFF;
-                    bool off_seen = false;
-                    QMap<QString,SkipTypes>::const_iterator sit;
-                    QStringList list =
-                        method.split(",", QString::SkipEmptyParts);
-                    QStringList::const_iterator it = list.begin();
-                    for (; it != list.end(); ++it)
-                    {
-                        QString val = (*it).toLower();
-                        QByteArray aval = val.toAscii();
-                        off_seen |= val == "off";
-                        sit = skipTypes->find(val);
-                        if (sit == skipTypes->end())
-                        {
-                            cerr << "Failed to decode --method option '"
-                                 << aval.constData() << "'" << endl;
-                            return -1;
-                        }
-                        commDetectMethod = (SkipTypes)
-                            ((int)commDetectMethod | (int)*sit);
-                    }
-                    if (COMM_DETECT_OFF == commDetectMethod)
-                        commDetectMethod = COMM_DETECT_UNINIT;
-                }
-            }
-            else
-            {
-                cerr << "Missing argument to --method option\n";
-                return -1;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"--outputmethod"))
-        {
-            if ((argpos + 1) < a.argc())
-            {
-                QString method = (a.argv()[++argpos]);
-                bool ok;
-                outputMethod = (OutputMethod) method.toInt(&ok);
-                if (!ok)
-                {
-                    outputMethod = kOutputMethodEssentials;
-                    QString val = method.toLower();
-                    QByteArray aval = val.toAscii();
-                    QMap<QString,OutputMethod>::const_iterator it =
-                        outputTypes->find(val);
-                    if (it == outputTypes->end())
-                    {
-                        cerr << "Failed to decode --outputmethod option '"
-                             << aval.constData() << "'" << endl;
-                        return -1;
-                    }
-                    outputMethod = (OutputMethod) *it;
-                }
-            }
-            else
-            {
-                cerr << "Missing argument to --method option\n";
-                return -1;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos], "--gencutlist"))
-            copyToCutlist = true;
-        else if (!strcmp(a.argv()[argpos], "--clearcutlist"))
-            clearCutlist = true;
-        else if (!strcmp(a.argv()[argpos], "--clearskiplist"))
-            clearSkiplist = true;
-        else if (!strcmp(a.argv()[argpos], "--getcutlist"))
-            getCutlist = true;
-        else if (!strcmp(a.argv()[argpos], "--getskiplist"))
-            getSkipList = true;
-        else if (!strcmp(a.argv()[argpos], "--setcutlist"))
-            newCutList = (a.argv()[++argpos]);
-        else if (!strcmp(a.argv()[argpos], "-j"))
-            jobID = QString(a.argv()[++argpos]).toInt();
-        else if (!strcmp(a.argv()[argpos], "--skipdb"))
-        {
-            useDB = false;
-            dontSubmitCommbreakListToDB = true;
-            force = true;
-        }
-        else if (!strcmp(a.argv()[argpos], "--all"))
-        {
-            allRecorded = true;
-        }
-        else if (!strcmp(a.argv()[argpos], "--allstart"))
-        {
-            if (((argpos + 1) >= a.argc()) ||
-                !strncmp(a.argv()[argpos + 1], "--", 2))
-            {
-                cerr << "Missing or invalid parameter for --allstart\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
+    if (cmdline.toBool("showversion"))
+    {
+        cmdline.PrintVersion();
+        return GENERIC_EXIT_OK;
+    }
 
-            allStart = a.argv()[++argpos];
-        }
-        else if (!strcmp(a.argv()[argpos], "--allend"))
-        {
-            if (((argpos + 1) >= a.argc()) ||
-                !strncmp(a.argv()[argpos + 1], "--", 2))
-            {
-                cerr << "Missing or invalid parameter for --allend\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            allEnd = a.argv()[++argpos];
-        }
-        else if (!strcmp(a.argv()[argpos], "--quiet"))
-        {
-            quiet = true;
-            showPercentage = false;
-        }
-        else if (!strcmp(a.argv()[argpos], "--very-quiet"))
-        {
-            quiet = true;
-            showPercentage = false;
-            print_verbose_messages = VB_NONE;
-            verboseString = "";
-        }
-        else if (!strcmp(a.argv()[argpos], "--queue"))
-        {
-            queueJobInstead = true;
-        }
-        else if (!strcmp(a.argv()[argpos], "--sleep"))
-        {
-            fullSpeed = false;
-        }
-        else if (!strcmp(a.argv()[argpos], "--nopercentage"))
-        {
-            showPercentage = false;
-        }
-        else if (!strcmp(a.argv()[argpos], "--rebuild"))
-        {
-            rebuildSeekTable = true;
-            beNice = false;
-        }
-        else if (!strcmp(a.argv()[argpos], "--force"))
-        {
-            force = true;
-        }
-        else if (!strcmp(a.argv()[argpos], "--hogcpu"))
-        {
-            beNice = false;
-        }
-        else if (!strcmp(a.argv()[argpos], "--dontwritetodb"))
-        {
-            dontSubmitCommbreakListToDB = true;
-        }
-        else if (!strcmp(a.argv()[argpos], "--onlydumpdb"))
-        {
-            onlyDumpDBCommercialBreakList = true;
-        }
-        else if (!strcmp(a.argv()[argpos], "--outputfile"))
-        {
-            if (a.argc() > argpos)
-            {
-                //clear file.
-                outputfilename = a.argv()[++argpos];
-                QByteArray tmp = outputfilename.toLocal8Bit();
-                fstream output(tmp.constData(), ios::out);
-            }
-            else
-            {
-                cerr << "Missing argument to --outputfile option\n";
-                return -1;
-            }
-        }
-
-        else if (!strcmp(a.argv()[argpos],"-V"))
-        {
-            if (a.argc() > argpos)
-            {
-                QString temp = a.argv()[++argpos];
-                print_verbose_messages = temp.toUInt();
-            }
-            else
-            {
-                VERBOSE(VB_IMPORTANT, "Missing argument to -V option");
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-v") ||
-                 !strcmp(a.argv()[argpos],"--verbose"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                if (parse_verbose_arg(a.argv()[argpos+1]) ==
+    if (cmdline.toBool("verbose"))
+        if (parse_verbose_arg(cmdline.toString("verbose")) ==
                         GENERIC_EXIT_INVALID_CMDLINE)
-                    return GENERIC_EXIT_INVALID_CMDLINE;
+            return GENERIC_EXIT_INVALID_CMDLINE;
 
-                ++argpos;
-            }
-            else
+    if (!cmdline.toString("chanid").isEmpty())
+        chanid = cmdline.toUInt("chanid");
+    if (!cmdline.toString("starttime").isEmpty())
+        starttime = cmdline.toString("starttime");
+    if (!cmdline.toString("file").isEmpty())
+    {
+        filename = cmdline.toString("file");
+        fullfile = cmdline.toString("file");
+    }
+    if (!cmdline.toString("video").isEmpty())
+    {
+        filename = cmdline.toString("video");
+        isVideo = true;
+        rebuildSeekTable = true;
+        beNice = false;
+    }
+
+    if (cmdline.toBool("commmethod"))
+    {
+        QString method = cmdline.toString("commmethod");
+        bool ok;
+        commDetectMethod = (SkipTypes) method.toInt(&ok);
+        if (!ok)
+        {
+            commDetectMethod = COMM_DETECT_OFF;
+            bool off_seen = false;
+            QMap<QString,SkipTypes>::const_iterator sit;
+            QStringList list =
+                method.split(",", QString::SkipEmptyParts);
+            QStringList::const_iterator it = list.begin();
+            for (; it != list.end(); ++it)
             {
-                VERBOSE(VB_IMPORTANT,
-                        "Missing argument to -v/--verbose option");
-                return GENERIC_EXIT_INVALID_CMDLINE;
+                QString val = (*it).toLower();
+                QByteArray aval = val.toAscii();
+                off_seen |= val == "off";
+                sit = skipTypes->find(val);
+                if (sit == skipTypes->end())
+                {
+                    cerr << "Failed to decode --method option '"
+                         << aval.constData() << "'" << endl;
+                    return -1;
+                }
+                commDetectMethod = (SkipTypes)
+                    ((int)commDetectMethod | (int)*sit);
             }
+            if (COMM_DETECT_OFF == commDetectMethod)
+                commDetectMethod = COMM_DETECT_UNINIT;
         }
-        else if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
+    }
+    if (cmdline.toBool("outputmethod"))
+    {
+        QString method = cmdline.toString("outputmethod");
+        bool ok;
+        outputMethod = (OutputMethod) method.toInt(&ok);
+        if (!ok)
         {
-            if (cmdline_err)
-                return GENERIC_EXIT_INVALID_CMDLINE;
+            outputMethod = kOutputMethodEssentials;
+            QString val = method.toLower();
+            QByteArray aval = val.toAscii();
+            QMap<QString,OutputMethod>::const_iterator it =
+                outputTypes->find(val);
+            if (it == outputTypes->end())
+            {
+                cerr << "Failed to decode --outputmethod option '"
+                     << aval.constData() << "'" << endl;
+                return -1;
+            }
+            outputMethod = (OutputMethod) *it;
         }
-        else if (!strcmp(a.argv()[argpos],"-h") ||
-                 !strcmp(a.argv()[argpos],"--help"))
-        {
-            VERBOSE(VB_IMPORTANT,
-                    "Valid Options are:\n"
-                    "-c OR --chanid <chanid>      Flag recording with given channel ID\n"
-                    "-s OR --starttime <time>     Flag recording with given recording start time\n"
-                    "-f OR --file <filename>      Flag recording with specific filename\n"
-                    "--video <filename>           Rebuild the seektable for a video (non-recording) file\n"
-                    "--sleep                      Give up some CPU time after processing each frame\n"
-                    "--nopercentage               Don't print percentage done\n"
-                    "--rebuild                    Do not flag commercials, just rebuild seektable\n"
-                    "--clearskiplist              Clear the commercial skip list\n"
-                    "--gencutlist                 Copy the commercial skip list to the cutlist\n"
-                    "--clearcutlist               Clear the cutlist\n"
-                    "--setcutlist CUTLIST         Set a new cutlist.  CUTLIST is of the form:\n"
-                    "                             #-#[,#-#]...  (ie, 1-100,1520-3012,4091-5094\n"
-                    "--getcutlist                 Display the current cutlist\n"
-                    "--getskiplist                Display the current Commercial Skip list\n"
-                    "-v or --verbose debug-level  Use '-v help' for level info\n"
-                    "--queue                      Insert flagging job into the JobQueue rather than\n"
-                    "                             running flagging in the foreground\n"
-                    "                             WARNING: This option does NOT work with --rebuild\n"
-                    "--quiet                      Don't display commercial flagging progress\n"
-                    "--very-quiet                 Only display output\n"
-                    "--all                        Re-run commercial flagging for all recorded\n"
-                    "                             programs using current detection method.\n"
-                    "--allstart YYYYMMDDHHMMSS    when using --all, only flag programs starting\n"
-                    "                             after the 'allstart' date (default = Jan 1, 1970).\n"
-                    "--allend YYYYMMDDHHMMSS      when using --all, only flag programs ending\n"
-                    "                             before the 'allend' date (default is now).\n"
-                    "--force                      Force flagging of a video even if mythcommflag\n"
-                    "                             thinks it is already in use by another instance.\n"
-                    "--method <method>            Commercial flagging method[s] to employ\n"
-                    "                             off, blank, scene, blankscene, logo, all\n"
-                    "                             d2, d2_logo, d2_blank, d2_scene, d2_all\n"
-                    "--outputfile <filename>      file to write comm flagging output to - for stdout\n"
-                    "--outputmethod <method>      format of output written to outputfile: essentials,full\n"
-                    "--hogcpu                     Do not nice the flagging process.\n"
-                    "                             WARNING: This will consume all free CPU time.\n"
-                    "--skipdb                     Avoid DB usage\n"
-                    "-h OR --help                 This text\n\n"
-                    "Note: both --chanid and --starttime must be used together\n"
-                    "      if either is used.\n\n"
-                    "If no command line arguments are specified, all\n"
-                    "unflagged videos will be flagged.\n\n");
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT, QString("Illegal option: '%1' (use --help)")
-                    .arg(a.argv()[argpos]));
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
+    }
 
-        ++argpos;
+    if (cmdline.toBool("skipdb"))
+    {
+        useDB = false;
+        dontSubmitCommbreakListToDB = true;
+        force = true;
+    }
+    if (cmdline.toBool("quiet"))
+    {
+        quiet = true;
+        showPercentage = false;
+    }
+    if (parse_verbose_arg(cmdline.toString("verbose")) ==
+                        GENERIC_EXIT_INVALID_CMDLINE)
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    if (cmdline.toBool("verboseint"))
+        print_verbose_messages = cmdline.toUInt("verboseint");
+    if (cmdline.toBool("vquiet"))
+    {
+        quiet = true;
+        showPercentage = false;
+        print_verbose_messages = VB_NONE;
+        parse_verbose_arg("");
+    }
+    if (cmdline.toBool("queue"))
+        queueJobInstead = true;
+    if (cmdline.toBool("nopercent"))
+        showPercentage = false;
+    if (cmdline.toBool("rebuild"))
+    {
+        rebuildSeekTable = true;
+        beNice = false;
+    }
+    if (cmdline.toBool("force"))
+        force = true;
+    if (cmdline.toBool("dontwritedb"))
+        dontSubmitCommbreakListToDB = true;
+    if (cmdline.toBool("dumpdb"))
+        onlyDumpDBCommercialBreakList = true;
+    if (cmdline.toBool("outputfile"))
+    {
+        outputfilename = cmdline.toString("outputfile");
+        fstream output(outputfilename.toLocal8Bit().constData(), ios::out);
     }
 
     CleanupGuard callCleanup(cleanup);
@@ -1310,8 +1110,7 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
-    MythTranslation::load("mythfrontend");
-
+    QMap<QString, QString> settingsOverride = cmdline.GetSettingsOverride();
     if (settingsOverride.size())
     {
         QMap<QString, QString>::iterator it;
@@ -1323,21 +1122,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (jobID != -1)
-    {
-        if (JobQueue::GetJobInfoFromID(
-                jobID, jobType, chanid, starttime))
-        {
-            inJobQueue = true;
-            force = true;
-        }
-        else
-        {
-            cerr << "mythcommflag: ERROR: Unable to find DB info for "
-                 << "JobQueue ID# " << jobID << endl;
-            return GENERIC_EXIT_NO_RECORDING_DATA;
-        }
-    }
+    MythTranslation::load("mythfrontend");
 
     if ((fullfile.path() != ".") && useDB)
     {
@@ -1367,26 +1152,35 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    if (clearSkiplist)
+    if (cmdline.toBool("clearskiplist"))
         return ClearSkipList(QString::number(chanid), starttime);
 
-    if (copyToCutlist)
+    if (cmdline.toBool("gencutlist"))
         return CopySkipListToCutList(QString::number(chanid), starttime);
 
-    if (clearCutlist)
+    if (cmdline.toBool("clearcutlist"))
         return SetCutList(QString::number(chanid), starttime, "");
 
-    if (!newCutList.isEmpty())
-        return SetCutList(QString::number(chanid), starttime, newCutList);
+    if (cmdline.toBool("setcutlist"))
+        return SetCutList(QString::number(chanid), starttime, cmdline.toString("setcutlist"));
 
-    if (getCutlist)
+    if (cmdline.toBool("getcutlist"))
         return GetMarkupList("cutlist", QString::number(chanid), starttime);
 
-    if (getSkipList)
+    if (cmdline.toBool("getskiplist"))
         return GetMarkupList("commflag", QString::number(chanid), starttime);
 
-    if (inJobQueue)
+    if (cmdline.toBool("jobid"))
     {
+        jobID = cmdline.toInt("jobid");
+        if (!JobQueue::GetJobInfoFromID(jobID, jobType, chanid, starttime))
+        {
+            cerr << "mythcommflag: ERROR: Unable to find DB info for "
+                 << "JobQueue ID# " << jobID << endl;
+            return GENERIC_EXIT_NO_RECORDING_DATA;
+        }
+        inJobQueue = true;
+        force = true;
         int jobQueueCPU = gCoreContext->GetNumSetting("JobQueueCPU", 0);
 
         if (jobQueueCPU < 2)
