@@ -89,7 +89,6 @@ QString AudioPlayer::ReinitAudio(void)
                                      m_codec_profile);
         m_audioOutput->Reconfigure(settings);
         errMsg = m_audioOutput->GetError();
-        SetStretchFactor(m_stretchfactor);
     }
 
     if (!errMsg.isEmpty())
@@ -106,6 +105,11 @@ QString AudioPlayer::ReinitAudio(void)
         VERBOSE(VB_IMPORTANT, LOC + "Enabling Audio");
         m_no_audio_out = false;
     }
+    if (!m_no_audio_in && !m_no_audio_out && m_audioOutput)
+    {
+        SetStretchFactor(m_stretchfactor);
+    }
+
     if (m_muted_on_creation)
     {
         SetMuteState(kMuteAll);
@@ -287,9 +291,9 @@ bool AudioPlayer::ToggleUpmix(void)
 
 void AudioPlayer::SetStretchFactor(float factor)
 {
+    m_stretchfactor = factor;
     if (!m_audioOutput)
         return;
-    m_stretchfactor = factor;
     QMutexLocker lock(&m_lock);
     m_audioOutput->SetStretchFactor(m_stretchfactor);
 }
