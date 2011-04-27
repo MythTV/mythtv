@@ -1,5 +1,6 @@
 #include "privatedecoder_crystalhd.h"
 #include "myth_imgconvert.h"
+#include "mythlogging.h"
 
 #define LOC  QString("CrystalHD: ")
 #define ERR  QString("CrystalHD Err: ")
@@ -10,9 +11,11 @@ void FetcherThread::run(void)
     if (!m_dec)
         return;
 
+    threadRegister("Fetcher");
     VERBOSE(VB_PLAYBACK, LOC + QString("Starting Fetcher thread."));
     m_dec->FetchFrames();
     VERBOSE(VB_PLAYBACK, LOC + QString("Stopping Fetcher thread."));
+    threadDeregister();
 }
 
 PixelFormat bcmpixfmt_to_pixfmt(BC_OUTPUT_FORMAT fmt);

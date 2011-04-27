@@ -8,6 +8,7 @@
 #include "recordinginfo.h"
 #include "mythplayer.h"
 #include "tv_play.h"
+#include "mythlogging.h"
 
 #define GetPlayer(X,Y) GetPlayerHaveLock(X, Y, __FILE__ , __LINE__)
 #define GetOSDLock(X) GetOSDL(X, __FILE__, __LINE__)
@@ -356,6 +357,7 @@ void TVBrowseHelper::GetNextProgramDB(
 
 void TVBrowseHelper::run()
 {
+    threadRegister("TVBrowseHelper");
     QMutexLocker locker(&m_lock);
     while (true)
     {
@@ -493,4 +495,5 @@ void TVBrowseHelper::run()
                 m_tv, new UpdateBrowseInfoEvent(infoMap));
         }
     }
+    threadDeregister();
 }

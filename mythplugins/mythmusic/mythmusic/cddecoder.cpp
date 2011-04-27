@@ -26,6 +26,7 @@ extern "C" {
 #include "cddecoder.h"
 #include "constants.h"
 #include "metadata.h"
+#include "mythlogging.h"
 
 CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
                      AudioOutput *o) :
@@ -189,6 +190,7 @@ void CdDecoder::run()
     if (!inited)
         return;
 
+    threadRegister("CdDecoder");
     stat = DecoderEvent::Decoding;
     {
         DecoderEvent e((DecoderEvent::Type) stat);
@@ -276,6 +278,7 @@ void CdDecoder::run()
     }
 
     deinit();
+    threadDeregister();
 }
 
 void CdDecoder::setCDSpeed(int speed)

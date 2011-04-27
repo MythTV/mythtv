@@ -56,6 +56,7 @@ class MTV_PUBLIC PreviewGeneratorQueue : public QThread
     PreviewGeneratorQueue(PreviewGenerator::Mode mode,
                           uint maxAttempts, uint minBlockSeconds);
     ~PreviewGeneratorQueue();
+    void run(void);
 
     QString GeneratePreviewImage(ProgramInfo &pginfo, const QSize&,
                                  const QString &outputfile,

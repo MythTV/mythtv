@@ -1827,7 +1827,7 @@ void ChildJobThread::run(void)
     if (!m_parent)
         return;
 
-    threadRegister(QString("ChildJob%1").arg(m_id));
+    threadRegister(QString("ChildJob_%1").arg(m_id));
 
     switch (m_type) {
     case JOB_TRANSCODE:

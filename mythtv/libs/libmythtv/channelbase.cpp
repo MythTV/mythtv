@@ -30,6 +30,7 @@ using namespace std;
 #include "cardutil.h"
 #include "compat.h"
 #include "mythsystem.h"
+#include "mythlogging.h"
 
 #define LOC QString("ChannelBase(%1): ").arg(GetCardID())
 #define LOC_WARN QString("ChannelBase(%1) Warning: ").arg(GetCardID())
@@ -40,10 +41,12 @@ using namespace std;
  */
 void ChannelThread::run(void)
 {
+    threadRegister("Channel");
     VERBOSE(VB_CHANNEL, "ChannelThread::run");
     bool result = tuner->SetChannelByString(channel);
     tuner->setStatus(result ?
                      ChannelBase::changeSuccess : ChannelBase::changeFailed);
+    threadDeregister();
 }
 
 ChannelBase::ChannelBase(TVRec *parent)

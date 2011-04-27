@@ -23,6 +23,7 @@
 
 #include "upnp.h"
 #include "mythverbose.h"
+#include "mythlogging.h"
 
 #include "upnptasksearch.h"
 #include "upnptaskcache.h"
@@ -232,6 +233,7 @@ void SSDP::run()
     fd_set          read_set;
     struct timeval  timeout;
 
+    threadRegister("SSDP");
     VERBOSE(VB_UPNP, "SSDP::Run - SSDP Thread Started." );
 
     // ----------------------------------------------------------------------
@@ -281,6 +283,7 @@ void SSDP::run()
             }
         }
     }
+    threadDeregister();
 }
 
 /////////////////////////////////////////////////////////////////////////////

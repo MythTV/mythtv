@@ -73,7 +73,7 @@ MythSystemIOHandler::MythSystemIOHandler(bool read) :
 
 void MythSystemIOHandler::run(void)
 {
-    threadRegister("SystemIOHandler");
+    threadRegister(QString("SystemIOHandler%1").arg(m_read ? "R" : "W"));
     VERBOSE(VB_GENERAL|VB_SYSTEM, QString("Starting IO manager (%1)")
         .arg(m_read ? "read" : "write"));
 
