@@ -156,10 +156,6 @@ QString AudioPlayer::ReinitAudio(void)
         VERBOSE(VB_IMPORTANT, LOC + "Enabling Audio");
         m_no_audio_out = false;
     }
-    if (!m_no_audio_in && !m_no_audio_out && m_audioOutput)
-    {
-        SetStretchFactor(m_stretchfactor);
-    }
 
     if (m_muted_on_creation)
     {
