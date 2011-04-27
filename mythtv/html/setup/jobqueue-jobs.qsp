@@ -10,7 +10,7 @@ function printJobRow(title, descKey, cmdKey) {
     if ((rowNum%2) == 1)
         altText = " class='alt'";
 
-    os.writeln("<tr" + altText + "><td>" + sList.Settings[descKey] + "</td><td><input type=button onClick='javascript:editJob(\"" + title + "\", \"" + descKey + "\", \"" + cmdKey + "\")' value='Edit'></td></tr>");
+    os.writeln("<tr" + altText + "><td>" + sList.Settings[descKey] + "</td><td><input type=button onClick='javascript:editJob(\"" + title + "\", \"" + descKey + "\", \"" + cmdKey + "\")' value='<i18n>Edit</i18n>'></td></tr>");
 
     rowNum++;
 }
@@ -22,26 +22,26 @@ function printJobRow(title, descKey, cmdKey) {
 -->
 <table width="100%">
 <thead class='ui-widget-header'>
-<tr><th>Description</th><th>Actions</th></tr>
+<tr><th><i18n>Description</i18n></th><th><i18n>Actions</i18n></th></tr>
 </thead>
-<tr><td>Transcoding</td><td><input type=button onClick='javascript:editJob("Transcoder", "", "JobQueueTranscodeCommand")' value='Edit'></td></tr>
-<tr class='alt'><td>Commercial Flagging</td><td><input type=button onClick='javascript:editJob("Commercial Flagger", "", "JobQueueCommFlagCommand")' value='Edit'></td></tr>
+<tr><td><i18n>Transcoding</i18n></td><td><input type=button onClick='javascript:editJob("<i18n>Transcoder</i18n>", "", "JobQueueTranscodeCommand")' value='<i18n>Edit</i18n>'></td></tr>
+<tr class='alt'><td><i18n>Commercial Flagging</i18n></td><td><input type=button onClick='javascript:editJob("<i18n>Commercial Flagger</i18n>", "", "JobQueueCommFlagCommand")' value='<i18n>Edit</i18n>'></td></tr>
 <%
     sList = myth.GetSetting("", "UserJobDesc1", "")
     if (sList.Settings["UserJobDesc1"] != "")
-        printJobRow("User Job #1", "UserJobDesc1", "UserJob1");
+        printJobRow(formatStr("<i18n>User Job #%1</i18n>", 1), "UserJobDesc1", "UserJob1");
 
     sList = myth.GetSetting("", "UserJobDesc2", "")
     if (sList.Settings["UserJobDesc2"] != "")
-        printJobRow("User Job #2", "UserJobDesc2", "UserJob2");
+        printJobRow(formatStr("<i18n>User Job #%1</i18n>", 2), "UserJobDesc2", "UserJob2");
 
     sList = myth.GetSetting("", "UserJobDesc3", "")
     if (sList.Settings["UserJobDesc3"] != "")
-        printJobRow("User Job #3", "UserJobDesc3", "UserJob3");
+        printJobRow(formatStr("<i18n>User Job #%1</i18n>", 3), "UserJobDesc3", "UserJob3");
 
     sList = myth.GetSetting("", "UserJobDesc4", "")
     if (sList.Settings["UserJobDesc4"] != "")
-        printJobRow("User Job #4", "UserJobDesc4", "UserJob4");
+        printJobRow(formatStr("<i18n>User Job #%1</i18n>", 4), "UserJobDesc4", "UserJob4");
 %>
 </table>
 </div>
