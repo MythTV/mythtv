@@ -980,10 +980,12 @@ void MythCommFlagCommandLineParser::LoadArguments(void)
     addHelp();
     addSettingsOverride();
     addVersion();
+    addVerbose();
     addJob();
+    addRecording();
 
     add(QStringList( QStringList() << "-f" << "--file" ), "file", "",
-            "Specify file to operate on.");
+            "Specify file to operate on.", "");
     add("--video", "video", "", "Rebuild the seek table for a video (non-recording) file.", "");
     add("--method", "commmethod", "", "Commercial flagging method[s] to employ:\n"
                                       "off, blank, scene, blankscene, logo, all\n"
