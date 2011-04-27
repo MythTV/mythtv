@@ -141,6 +141,7 @@ class LoggerThread : public QThread {
     Q_OBJECT
 
     public:
+        LoggerThread();
         void run(void);
         void stop(void) { aborted = true; };
     private:

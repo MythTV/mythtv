@@ -219,7 +219,17 @@ bool DatabaseLogger::logmsg(LoggingItem_t *item)
     return false;
 }
 
-
+LoggerThread::LoggerThread()
+{
+    char *debug = getenv("VERBOSE_THREADS");
+    if (debug != NULL)
+    {
+        VERBOSE(VB_IMPORTANT, "Logging thread registration/deregistration "
+                              "enabled!");
+        debugRegistration = true;
+    }
+}
+ 
 void LoggerThread::run(void)
 {
     threadRegister("Logger");
