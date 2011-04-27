@@ -173,6 +173,7 @@ class MPUBLIC MythPlayer
     PIPLocation GetNextPIPLocation(void) const;
 
     // Bool Gets
+    bool    IsPaused(void)                    { return allpaused;      }
     bool    GetRawAudioState(void) const;
     bool    GetLimitKeyRepeat(void) const     { return limitKeyRepeat; }
     bool    GetEof(void);
@@ -531,6 +532,7 @@ class MPUBLIC MythPlayer
     QWaitCondition decoderThreadUnpause;
     mutable QMutex decoderPauseLock;
     mutable QMutex decoderSeekLock;
+    bool           totalDecoderPause;
     bool           decoderPaused;
     bool           pauseDecoder;
     bool           unpauseDecoder;

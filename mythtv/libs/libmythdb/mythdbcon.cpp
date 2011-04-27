@@ -123,7 +123,27 @@ bool MSqlDatabase::OpenDatabase()
             // both being called with true, so order is important here.
             GetMythDB()->SetHaveDBConnection(true);
             if (!GetMythDB()->HaveSchema())
-                GetMythDB()->SetHaveSchema(m_db.tables().count() > 1);
+            {
+                // We can't just check the count of QSqlDatabase::tables()
+                // because it returns all tables visible to the user in *all*
+                // databases (not just the current DB).
+                bool have_schema = false;
+                QString sql = "SELECT COUNT( "
+                              "         INFORMATION_SCHEMA.TABLES.TABLE_NAME "
+                              "       ) "
+                              "  FROM INFORMATION_SCHEMA.TABLES "
+                              " WHERE INFORMATION_SCHEMA.TABLES.TABLE_SCHEMA "
+                              "       = DATABASE() "
+                              "   AND INFORMATION_SCHEMA.TABLES.TABLE_TYPE = "
+                              "       'BASE TABLE';";
+                // We can't use MSqlQuery to determine if we have a schema,
+                // since it will open a new connection, which will try to check
+                // if we have a schema
+                QSqlQuery query = m_db.exec(sql); // don't convert to MSqlQuery
+                if (query.next())
+                    have_schema = query.value(0).toInt() > 1;
+                GetMythDB()->SetHaveSchema(have_schema);
+            }
             GetMythDB()->WriteDelayedSettings();
         }
     }
