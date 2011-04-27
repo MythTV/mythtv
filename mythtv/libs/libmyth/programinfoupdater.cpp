@@ -104,7 +104,7 @@ void ProgramInfoUpdater::run(void)
         if ( workDone )
         {
             mutex.lock();
-            bool timedout = moreWork.wait(&mutex, 10000);
+            bool timedout = moreWork.wait(&mutex, 1000);
             mutex.unlock();
         }
     } while( workDone );

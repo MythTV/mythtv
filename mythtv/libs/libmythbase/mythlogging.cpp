@@ -226,7 +226,7 @@ void LoggerThread::run(void)
 
     aborted = false;
 
-    while(!aborted)
+    while(!aborted || !logQueue.empty())
     {
         if (logQueue.empty())
         {
