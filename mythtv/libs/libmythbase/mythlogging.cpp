@@ -33,6 +33,7 @@ QMutex                  logThreadMutex;
 QHash<uint64_t, char *> logThreadHash;
 
 LoggerThread            logThread;
+bool                    debugRegistration = false;
 
 #define TIMESTAMP_MAX 30
 #define MAX_STRING_LENGTH 2048
@@ -242,13 +243,16 @@ void LoggerThread::run(void)
         {
             QMutexLocker locker(&logThreadMutex);
             logThreadHash[item->threadId] = strdup(item->threadName);
-            item->message   = (char *)malloc(LOGLINE_MAX+1);
-            if( item->message )
+            if( debugRegistration )
             {
-                snprintf( item->message, LOGLINE_MAX,
-                          "Thread 0x%llX registered as \'%s\'", 
-                          (long long unsigned int)item->threadId, 
-                          logThreadHash[item->threadId] );
+                item->message   = (char *)malloc(LOGLINE_MAX+1);
+                if( item->message )
+                {
+                    snprintf( item->message, LOGLINE_MAX,
+                              "Thread 0x%llX registered as \'%s\'", 
+                              (long long unsigned int)item->threadId, 
+                              logThreadHash[item->threadId] );
+                }
             }
         }
         else if (item->deregistering)
@@ -256,13 +260,16 @@ void LoggerThread::run(void)
             QMutexLocker locker(&logThreadMutex);
             if( logThreadHash.contains(item->threadId) )
             {
-                item->message   = (char *)malloc(LOGLINE_MAX+1);
-                if( item->message )
+                if( debugRegistration )
                 {
-                    snprintf( item->message, LOGLINE_MAX,
-                              "Thread 0x%llX deregistered as \'%s\'", 
-                              (long long unsigned int)item->threadId, 
-                              logThreadHash[item->threadId] );
+                    item->message   = (char *)malloc(LOGLINE_MAX+1);
+                    if( item->message )
+                    {
+                        snprintf( item->message, LOGLINE_MAX,
+                                  "Thread 0x%llX deregistered as \'%s\'", 
+                                  (long long unsigned int)item->threadId, 
+                                  logThreadHash[item->threadId] );
+                    }
                 }
                 item->threadName = logThreadHash[item->threadId];
                 logThreadHash.remove(item->threadId);
