@@ -92,8 +92,6 @@ int main(int argc, char **argv)
     // Don't listen to console input
     close(0);
 
-    setupLogfile();
-
     CleanupGuard callCleanup(cleanup);
 
     int exitCode = setup_basics(cmdline);
@@ -108,6 +106,8 @@ int main(int argc, char **argv)
     }
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
+
+    setupLogfile();
 
     if (cmdline.toBool("event")         || cmdline.toBool("systemevent") ||
         cmdline.toBool("setverbose")    || cmdline.toBool("printsched") ||
