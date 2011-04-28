@@ -239,7 +239,6 @@ function saveChannelEdits() {
                       if (data.bool == "true") {
                           setStatusMessage("Channel updated successfully!");
                           $("#edit").dialog('close');
-                          $('#channels').trigger('reloadGrid');
                       }
                       else
                           setErrorMessage("Channel update failed!");
@@ -524,6 +523,13 @@ function addChannelIconToGrid(url) {
 }
 
 function resizeChannelIcon(id, maxWidth, maxHeight) {
+    var preview = $("#channelDetailSettingIconPreview");
+    if (preview.attr('src') != '/images/blank.gif') {
+        preview.css('display', 'inline');
+    }
+    else {
+        preview.css('display', 'none');
+    }
     var ratio = 0;
     var icon = $("#" + id);
     var width = icon.width();
