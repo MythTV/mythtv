@@ -74,6 +74,11 @@ BD_PRIVATE int      hdmv_vm_run(HDMV_VM *p, HDMV_EVENT *ev);
 BD_PRIVATE int      hdmv_vm_get_event(HDMV_VM *p, HDMV_EVENT *ev);
 
 BD_PRIVATE int      hdmv_vm_running(HDMV_VM *p);
+
+#define HDMV_MENU_CALL_MASK     0x01
+#define HDMV_TITLE_SEARCH_MASK  0x02
+BD_PRIVATE uint32_t hdmv_vm_get_uo_mask(HDMV_VM *p);
+
 BD_PRIVATE int      hdmv_vm_suspend(HDMV_VM *p);
 BD_PRIVATE int      hdmv_vm_resume(HDMV_VM *p);
 
