@@ -1021,51 +1021,6 @@ static void CleanupMyOldInUsePrograms(void)
         MythDB::DBError("CleanupMyOldInUsePrograms", query);
 }
 
-static int log_rotate(int report_error)
-{
-#if 0
-    int new_logfd = open(logfile.toLocal8Bit().constData(),
-                         O_WRONLY|O_CREAT|O_APPEND, 0664);
-
-    if (new_logfd < 0) {
-        /* If we can't open the new log file, send data to /dev/null */
-        if (report_error)
-        {
-            VERBOSE(VB_IMPORTANT, QString("Cannot open log file '%1'")
-                    .arg(logfile));
-            return -1;
-        }
-
-        new_logfd = open("/dev/null", O_WRONLY);
-
-        if (new_logfd < 0) {
-            /* There's not much we can do, so punt. */
-            return -1;
-        }
-    }
-
-#ifdef WINDOWS_CLOSE_CONSOLE
-    // pure Win32 GUI app does not have standard IO streams
-    // simply assign the file descriptors to the log file
-    *stdout = *(_fdopen(new_logfd, "w"));
-    *stderr = *stdout;
-    setvbuf(stdout, NULL, _IOLBF, 256);
-#else
-    while (dup2(new_logfd, 1) < 0 && errno == EINTR);
-    while (dup2(new_logfd, 2) < 0 && errno == EINTR);
-    while (close(new_logfd) < 0   && errno == EINTR);
-#endif
-#endif
-
-    logStart(logfile);
-    return 0;
-}
-
-static void log_rotate_handler(int)
-{
-    log_rotate(0);
-}
-
 int main(int argc, char **argv)
 {
     bool bPromptForBackend    = false;
@@ -1128,21 +1083,6 @@ int main(int argc, char **argv)
     if (!cmdline.toString("logfile").isEmpty())
         logfile = cmdline.toString("logfile");
 
-    if (logfile.size())
-    {
-        if (log_rotate(1) < 0)
-            cerr << "cannot open log file; using stdout/stderr" << endl;
-        else
-        {
-            VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
-                                    .arg(MYTH_APPNAME_MYTHFRONTEND)
-                                    .arg(MYTH_SOURCE_PATH)
-                                    .arg(MYTH_SOURCE_VERSION));
-
-            signal(SIGHUP, &log_rotate_handler);
-        }
-    }
-
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         cerr << "Unable to ignore SIGPIPE\n";
 
@@ -1159,6 +1099,8 @@ int main(int argc, char **argv)
     CleanupGuard callCleanup(cleanup);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
+
+    logStart(logfile);
 
     if (!cmdline.toBool("noupnp"))
     {
