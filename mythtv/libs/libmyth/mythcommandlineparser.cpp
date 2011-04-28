@@ -937,7 +937,7 @@ void MythPreviewGeneratorCommandLineParser::LoadArguments(void)
     add("--frame", "frame", 0LL, "Number of frames into video to take preview image.", "");
     add("--size", "size", QSize(0,0), "Dimensions of preview image.", "");
     add("--infile", "inputfile", "", "Input video for preview generation.", "");
-    add("--outfile" "outputfile", "", "Optional output file for preview generation.", "");
+    add("--outfile", "outputfile", "", "Optional output file for preview generation.", "");
 }
 
 MythWelcomeCommandLineParser::MythWelcomeCommandLineParser() :
