@@ -34,8 +34,6 @@
 
 QString logfile = "";
 
-static bool log_rotate(bool report_error);
-static void log_rotate_handler(int);
 
 
 static void initKeys(void)
@@ -84,7 +82,7 @@ int main(int argc, char **argv)
     if (!cmdline.toString("logfile").isEmpty())
         logfile = cmdline.toString("logfile");
 
-    logStart("");
+    logStart(logfile);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init())
@@ -99,14 +97,6 @@ int main(int argc, char **argv)
         VERBOSE(VB_IMPORTANT, "mythwelcome: Could not open the database. "
                         "Exiting.");
         return -1;
-    }
-
-    if (!logfile.isEmpty())
-    {
-        if (!log_rotate(true))
-            cerr << "cannot open log file; using stdout/stderr" << endl;
-        else
-            signal(SIGHUP, &log_rotate_handler);
     }
 
     LCD::SetupLCD();
@@ -156,52 +146,4 @@ int main(int argc, char **argv)
     delete gContext;
 
     return 0;
-}
-
-
-static bool log_rotate(bool report_error)
-{
-#if 0
-    int new_logfd = open(logfile.toLocal8Bit().constData(),
-                         O_WRONLY|O_CREAT|O_APPEND, 0664);
-
-    if (new_logfd < 0)
-    {
-        /* If we can't open the new log file, send data to /dev/null */
-        if (report_error)
-        {
-            cerr << "cannot open log file " << logfile.toAscii().constData() << endl;
-            return false;
-        }
-
-        new_logfd = open("/dev/null", O_WRONLY);
-
-        if (new_logfd < 0)
-        {
-            /* There's not much we can do, so punt. */
-            return false;
-        }
-    }
-
-#ifdef WINDOWS_CLOSE_CONSOLE
-    // pure Win32 GUI app does not have standard IO streams
-    // simply assign the file descriptors to the log file
-    *stdout = *(_fdopen(new_logfd, "w"));
-    *stderr = *stdout;
-    setvbuf(stdout, NULL, _IOLBF, 256);
-#else
-    while (dup2(new_logfd, 1) < 0 && errno == EINTR);
-    while (dup2(new_logfd, 2) < 0 && errno == EINTR);
-    while (close(new_logfd) < 0   && errno == EINTR);
-#endif
-#endif
-
-    logStart(logfile);
-    return true;
-}
-
-
-static void log_rotate_handler(int)
-{
-    log_rotate(false);
 }

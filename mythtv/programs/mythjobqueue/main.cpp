@@ -54,40 +54,6 @@ static void cleanup(void)
     signal(SIGHUP, SIG_DFL);
 }
 
-static int log_rotate(int report_error)
-{
-#if 0
-    int new_logfd = open(logfile.toLocal8Bit().constData(),
-                         O_WRONLY|O_CREAT|O_APPEND|O_SYNC, 0664);
-    if (new_logfd < 0)
-    {
-        // If we can't open the new log file, send data to /dev/null
-        if (report_error)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Cannot open log file '%1'").arg(logfile));
-            return -1;
-        }
-        new_logfd = open("/dev/null", O_WRONLY);
-        if (new_logfd < 0)
-        {
-            // There's not much we can do, so punt.
-            return -1;
-        }
-    }
-    while (dup2(new_logfd, 1) < 0 && errno == EINTR) ;
-    while (dup2(new_logfd, 2) < 0 && errno == EINTR) ;
-    while (close(new_logfd) < 0 && errno == EINTR) ;
-#endif
-    logStart(logfile);
-    return 0;
-}
-
-static void log_rotate_handler(int)
-{
-    log_rotate(0);
-}
-
 namespace
 {
     class CleanupGuard
@@ -150,16 +116,7 @@ int main(int argc, char *argv[])
     if (cmdline.toBool("daemon"))
         daemonize = true;
 
-    if (!logfile.isEmpty())
-    {
-        if (log_rotate(1) < 0)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_WARN +
-                    "Cannot open log file; using stdout/stderr instead");
-        }
-        else
-            signal(SIGHUP, &log_rotate_handler);
-    }
+    logStart(logfile);
 
     CleanupGuard callCleanup(cleanup);
 

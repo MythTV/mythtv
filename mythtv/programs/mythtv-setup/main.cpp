@@ -189,43 +189,6 @@ static int reloadTheme(void)
     return 0;
 }
 
-static int log_rotate(int report_error)
-{
-#if 0
-    int new_logfd = open(logfile.toLocal8Bit().constData(),
-                         O_WRONLY|O_CREAT|O_APPEND, 0664);
-
-    if (new_logfd < 0) {
-        /* If we can't open the new log file, send data to /dev/null */
-        if (report_error)
-        {
-            VERBOSE(VB_IMPORTANT, QString("Can not open log file '%1'")
-                    .arg(logfile));
-            return -1;
-        }
-
-        new_logfd = open("/dev/null", O_WRONLY);
-
-        if (new_logfd < 0) {
-            /* There's not much we can do, so punt. */
-            return -1;
-        }
-    }
-
-    while (dup2(new_logfd, 1) < 0 && errno == EINTR);
-    while (dup2(new_logfd, 2) < 0 && errno == EINTR);
-    while (close(new_logfd) < 0   && errno == EINTR);
-
-#endif
-    logStart(logfile);
-    return 0;
-}
-
-static void log_rotate_handler(int)
-{
-    log_rotate(0);
-}
-
 int main(int argc, char *argv[])
 {
     QString geometry = QString::null;
@@ -335,20 +298,7 @@ int main(int argc, char *argv[])
     if (cmdline.toBool("inputname"))
         scanInputName = cmdline.toString("inputname");
 
-    if (logfile.size())
-    {
-        if (log_rotate(1) < 0)
-            cerr << "cannot open log file; using stdout/stderr" << endl;
-        else
-        {
-            VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
-                                    .arg(MYTH_APPNAME_MYTHTV_SETUP)
-                                    .arg(MYTH_SOURCE_PATH)
-                                    .arg(MYTH_SOURCE_VERSION));
-
-            signal(SIGHUP, &log_rotate_handler);
-        }
-    }
+    logStart(logfile);
 
     if (!display.isEmpty())
     {
