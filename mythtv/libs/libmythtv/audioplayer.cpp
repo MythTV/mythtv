@@ -89,6 +89,7 @@ QString AudioPlayer::ReinitAudio(void)
                                      m_codec_profile);
         m_audioOutput->Reconfigure(settings);
         errMsg = m_audioOutput->GetError();
+        SetStretchFactor(m_stretchfactor);
     }
 
     if (!errMsg.isEmpty())

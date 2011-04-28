@@ -1246,8 +1246,22 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
         Pause(false);
     }
 
+    // Don't write new samples if we're resetting the buffer or reconfiguring
+    QMutexLocker lock(&audio_buflock);
+
     if (passthru && m_spdifenc)
     {
+        if (processing)
+        {
+            /*
+             * We shouldn't encounter this case, but it can occur when
+             * timestretch just got activated. So we will just drop the
+             * data
+             */
+            VERBOSE(VB_AUDIO, QString("Passthrough activated with audio "
+                                      "processing. Dropping audio"));
+            return false;
+        }
         // mux into an IEC958 packet
         m_spdifenc->WriteFrame((unsigned char *)in_buffer, len);
         len = m_spdifenc->GetProcessedSize();
@@ -1267,9 +1281,6 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
                       "timecode=%5 needsupmix=%6")
               .arg(frames).arg(len).arg(used).arg(afree).arg(timecode)
               .arg(needs_upmix));
-
-    // Don't write new samples if we're resetting the buffer or reconfiguring
-    QMutexLocker lock(&audio_buflock);
 
     // Mythmusic doesn't give us timestamps
     if (timecode < 0)
@@ -1323,7 +1334,6 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
     {
         buffer = (char *)in_buffer + offset;
         frames = frames_remaining;
-
         len = frames * source_bytes_per_frame;
 
         if (processing)
