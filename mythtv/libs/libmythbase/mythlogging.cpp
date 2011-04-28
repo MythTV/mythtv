@@ -208,7 +208,7 @@ DatabaseLogger::DatabaseLogger(char *table) : LoggerBase(table, 0),
     LogPrint(VB_IMPORTANT, LOG_INFO, "Added database logging to table %s",
              m_handle.string);
 
-    if (!gCoreContext->GetHostName().isEmpty())
+    if (gCoreContext && !gCoreContext->GetHostName().isEmpty())
         m_host = strdup((char *)gCoreContext->GetHostName()
                         .toLocal8Bit().constData());
 
@@ -241,7 +241,7 @@ bool DatabaseLogger::logmsg(LoggingItem_t *item)
     strftime( timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
               (const struct tm *)&item->tm );
 
-    if( !m_host )
+    if( gCoreContext && !m_host )
         m_host = strdup((char *)gCoreContext->GetHostName()
                         .toLocal8Bit().constData());
 
