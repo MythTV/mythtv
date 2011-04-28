@@ -238,6 +238,9 @@ bool DatabaseLogger::logmsg(LoggingItem_t *item)
     char        timestamp[TIMESTAMP_MAX];
     char       *threadName = getThreadName(item);;
 
+    if( !GetMythDB()->HaveValidDatabase() )
+        return false;
+
     strftime( timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
               (const struct tm *)&item->tm );
 
@@ -258,7 +261,10 @@ bool DatabaseLogger::logmsg(LoggingItem_t *item)
     if (!query.exec())
     {  
         MythDB::DBError("DBLogging", query);
+        return false;
     }
+
+    return true;
 }
 
 char *getThreadName( LoggingItem_t *item )
