@@ -10,6 +10,8 @@
 #include "mythlogging.h"
 #include "mythverbose.h"
 #include "mythconfig.h"
+#include "mythdb.h"
+#include "mythcorecontext.h"
 
 #include <stdlib.h>
 #define SYSLOG_NAMES
@@ -41,6 +43,8 @@ bool                    debugRegistration = false;
 LogLevel_t LogLevel = LOG_UNKNOWN;  /**< The log level mask to apply, messages
                                          must be at at least this priority to
                                          be output */
+
+char *getThreadName( LoggingItem_t *item );
 
 LoggerBase::LoggerBase(char *string, int number)
 {
@@ -117,14 +121,13 @@ bool FileLogger::logmsg(LoggingItem_t *item)
     char                usPart[9];
     char                timestamp[TIMESTAMP_MAX];
     int                 length;
-    static const char  *unknown = "thread_unknown";
     char               *threadName = NULL;
     pid_t               pid = getpid();
 
     if (!m_opened)
         return false;
 
-    strftime( timestamp, TIMESTAMP_MAX-8, "%Y-%b-%d %H:%M:%S",
+    strftime( timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
               (const struct tm *)&item->tm );
     snprintf( usPart, 9, ".%06d ", (int)(item->usec) );
     strcat( timestamp, usPart );
@@ -138,18 +141,7 @@ bool FileLogger::logmsg(LoggingItem_t *item)
     }
     else 
     {
-        if( !item->threadName )
-        {
-            QMutexLocker locker(&logThreadMutex);
-            if( logThreadHash.contains(item->threadId) )
-                threadName = logThreadHash[item->threadId];
-            else
-                threadName = (char *)unknown;
-        }
-        else
-        {
-            threadName = item->threadName;
-        }
+        threadName = getThreadName(item);
 
         snprintf( line, MAX_STRING_LENGTH, "%s [%d] %s %s:%d (%s) - %s\n", 
                   timestamp, pid, threadName, item->file, item->line, 
@@ -206,17 +198,91 @@ bool SyslogLogger::logmsg(LoggingItem_t *item)
 
 
 DatabaseLogger::DatabaseLogger(char *table) : LoggerBase(table, 0), 
-                                              m_opened(false)
+                                              m_host(NULL), m_opened(false)
 {
+    static const char *queryFmt =
+        "INSERT INTO %s (host, application, pid, thread, "
+        "msgtime, level, message) VALUES (:HOST, :APPLICATION, "
+        ":PID, :THREAD, :MSGTIME, :LEVEL, :MESSAGE)";
+
+    LogPrint(VB_IMPORTANT, LOG_INFO, "Added database logging to table %s",
+             m_handle.string);
+
+    if (!gCoreContext->GetHostName().isEmpty())
+        m_host = strdup((char *)gCoreContext->GetHostName()
+                        .toLocal8Bit().constData());
+
+    m_application = strdup((char *)QCoreApplication::applicationName()
+                           .toLocal8Bit().constData());
+    m_pid = getpid();
+
+    m_query = (char *)malloc(strlen(queryFmt) + strlen(m_handle.string));
+    sprintf(m_query, queryFmt, m_handle.string);
+
+    m_opened = true;
 }
 
 DatabaseLogger::~DatabaseLogger()
 {
+    LogPrintNoArg(VB_IMPORTANT, LOG_INFO, "Removing database logging");
+    if( m_query )
+        free(m_query);
+    if( m_application )
+        free(m_application);
+    if( m_host )
+        free(m_host);
 }
 
 bool DatabaseLogger::logmsg(LoggingItem_t *item)
 {
-    return false;
+    char        timestamp[TIMESTAMP_MAX];
+    char       *threadName = getThreadName(item);;
+
+    strftime( timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
+              (const struct tm *)&item->tm );
+
+    if( !m_host )
+        m_host = strdup((char *)gCoreContext->GetHostName()
+                        .toLocal8Bit().constData());
+
+    MSqlQuery   query(MSqlQuery::InitCon());
+    query.prepare( m_query );
+    query.bindValue(":HOST",        m_host);
+    query.bindValue(":APPLICATION", m_application);
+    query.bindValue(":PID",         m_pid);
+    query.bindValue(":THREAD",      threadName);
+    query.bindValue(":MSGTIME",     timestamp);
+    query.bindValue(":LEVEL",       item->level);
+    query.bindValue(":MESSAGE",     item->message);
+
+    if (!query.exec())
+    {  
+        MythDB::DBError("DBLogging", query);
+    }
+}
+
+char *getThreadName( LoggingItem_t *item )
+{
+    static const char  *unknown = "thread_unknown";
+    char *threadName;
+
+    if( !item )
+        return( (char *)unknown );
+
+    if( !item->threadName )
+    {
+        QMutexLocker locker(&logThreadMutex);
+        if( logThreadHash.contains(item->threadId) )
+            threadName = logThreadHash[item->threadId];
+        else
+            threadName = (char *)unknown;
+    }
+    else
+    {
+        threadName = item->threadName;
+    }
+
+    return( threadName );
 }
 
 LoggerThread::LoggerThread()
@@ -395,6 +461,7 @@ void logStart(QString logfile)
         if( !logfile.isEmpty() )
             logger = new FileLogger((char *)logfile.toLocal8Bit().constData());
         logger = new SyslogLogger(LOG_LOCAL7);
+        logger = new DatabaseLogger((char *)"logging");
 
         logThread.start();
     }

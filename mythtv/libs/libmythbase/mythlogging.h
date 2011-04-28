@@ -80,8 +80,9 @@ extern "C" {
 /* Define the external prototype */
 MBASE_PUBLIC void LogPrintLine( uint32_t mask, LogLevel_t level, char *file, 
                                 int line, char *function, char *format, ... );
-MBASE_PUBLIC void LogPrintLineNoArg( uint32_t mask, LogLevel_t level, char *file, int line, 
-                                     char *function, char *message );
+MBASE_PUBLIC void LogPrintLineNoArg( uint32_t mask, LogLevel_t level, 
+                                     char *file, int line, char *function, 
+                                     char *message );
 
 #ifdef __cplusplus
 }
@@ -134,6 +135,10 @@ class DatabaseLogger : public LoggerBase {
         ~DatabaseLogger();
         bool logmsg(LoggingItem_t *item);
     private:
+        char *m_host;
+        char *m_application;
+        char *m_query;
+        pid_t m_pid;
         bool m_opened;
 };
 
