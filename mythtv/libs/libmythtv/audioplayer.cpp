@@ -355,6 +355,13 @@ bool AudioPlayer::CanPassthrough(int samplerate, int channels,
     return m_audioOutput->CanPassthrough(samplerate, channels, codec, profile);
 }
 
+bool AudioPlayer::CanDownmix(void)
+{
+    if (!m_audioOutput)
+        return false;
+    return m_audioOutput->CanDownmix();
+}
+
 /*
  * if frames = -1 : let AudioOuput calculate value
  * if frames = 0 && len > 0: will calculate according to len
