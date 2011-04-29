@@ -802,8 +802,6 @@ int main(int argc, char **argv)
         bWantRecStatus = (bool)(cmdline.toInt("status") == 1);
     }
 
-    logStart("");
-
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
@@ -812,6 +810,9 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
+
+    QString logfile = cmdline.GetLogFilePath();
+    logStart(logfile);
 
     int res = 0;
 

@@ -1099,7 +1099,8 @@ int main(int argc, char *argv[])
 
     CleanupGuard callCleanup(cleanup);
 
-    logStart("");
+    QString logfile = cmdline.GetLogFilePath();
+    logStart(logfile);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(

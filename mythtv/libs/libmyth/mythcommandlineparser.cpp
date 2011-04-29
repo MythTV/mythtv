@@ -1,6 +1,9 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 using namespace std;
 
 #include <QDir>
@@ -742,7 +745,7 @@ void MythCommandLineParser::addDaemon(void)
             "Fork application into background after startup.",
             "Fork application into background, detatching from\n"
             "the local terminal. Often used with:\n"
-            "   --logfile       --pidfile\n"
+            "   --logpath       --pidfile\n"
             "   --user");
 }
 
@@ -797,15 +800,18 @@ void MythCommandLineParser::addUPnP(void)
     add("--noupnp", "noupnp", "Disable use of UPnP.", "");
 }
 
-void MythCommandLineParser::addLogFile(void)
+void MythCommandLineParser::addLogging(void)
 {
-    add(QStringList( QStringList() << "-l" << "--logfile" ), "logfile", "",
-            "Writes STDERR and STDOUT messages to filename.",
-            "Redirects messages typically sent to STDERR and STDOUT\n"
-            "to this log file. This is typically used in combination\n"
-            "with --daemon, and if used in combination with --pidfile,\n"
-            "this can be used with log rotaters, using the HUP call\n"
-            "to inform MythTV to reload the file.");
+    add(QStringList( QStringList() << "-l" << "--logfile" << "--logpath" ), 
+            "logpath", "",
+            "Writes logging messages to a file at logpath.  If a directory\n"
+            "is given, a logfile will be created in that directory with a\n"
+            "filename of applicationName.pid.log.\n"
+            "If a full filename is given, that file will be used.\n"
+            "This is typically used in combination with --daemon, and if used\n"
+            "in combination with --pidfile, this can be used with log \n"
+            "rotaters, using the HUP call to inform MythTV to reload the "
+            "file (currently disabled).\n", "");
 }
 
 void MythCommandLineParser::addPIDFile(void)
@@ -838,7 +844,7 @@ void MythBackendCommandLineParser::LoadArguments(void)
     addSettingsOverride();
     addVerbose();
     addUPnP();
-    addLogFile();
+    addLogging();
     addPIDFile();
 
     add("--printsched", "printsched",
@@ -912,7 +918,7 @@ void MythFrontendCommandLineParser::LoadArguments(void)
     addGeometry();
     addDisplay();
     addUPnP();
-    addLogFile();
+    addLogging();
 
     add(QStringList( QStringList() << "-r" << "--reset" ), "reset",
         "Resets appearance, settings, and language.", "");
@@ -950,7 +956,7 @@ void MythWelcomeCommandLineParser::LoadArguments(void)
     addSettingsOverride();
     addVersion();
     addVerbose();
-    addLogFile();
+    addLogging();
 
     add(QStringList( QStringList() << "-s" << "--setup" ), "setup",
             "Run setup for mythshutdown.", "");
@@ -1022,7 +1028,7 @@ void MythJobQueueCommandLineParser::LoadArguments(void)
     addSettingsOverride();
     addVersion();
     addVerbose();
-    addLogFile();
+    addLogging();
     addPIDFile();
     addDaemon();
 }
@@ -1187,7 +1193,7 @@ void MythLCDServerCommandLineParser::LoadArguments(void)
     addVersion();
     addVerbose();
     addDaemon();
-    addLogFile();
+    addLogging();
     //addPIDFile();
 
     add(QStringList( QStringList() << "-p" << "--port" ), "port", 6545, "listen port",
@@ -1282,7 +1288,7 @@ void MythTVSetupCommandLineParser::LoadArguments(void)
     addVerbose();
     addGeometry();
     addDisplay();
-    addLogFile();
+    addLogging();
 
     add("--expert", "expert", "", "Expert mode.");
     add("--scan-list", "scanlist", "", "no help");
@@ -1356,5 +1362,37 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
             "Specifies that a lossless transcode should be used.", "");
     add(QStringList( QStringList() << "-e" << "--ostream" ), "ostream", ""
             "Output stream type: dvd, ps", "");
+}
+
+
+QString MythCommandLineParser::GetLogFilePath(void)
+{
+    QString logfile = toString("logpath");
+    pid_t   pid = getpid();
+
+    if (logfile.isEmpty())
+        return logfile;
+
+    QString logdir;
+    QString filepath;
+
+    QFileInfo finfo(logfile);
+    if (finfo.isDir())
+    {
+        logdir  = finfo.filePath();
+        logfile = QCoreApplication::applicationName() + 
+                  QString(".%1").arg(pid) + ".log";
+    }
+    else
+    {
+        logdir  = finfo.path();
+        logfile = finfo.fileName();
+    }
+
+    m_parsed.insert("logdir", logdir);
+    m_parsed.insert("logfile", logfile);
+    m_parsed.insert("filepath", QFileInfo(QDir(logdir), logfile).filePath());
+
+    return toString("filepath");
 }
 

@@ -34,7 +34,7 @@ int main(int argc, char **argv)
     QString startup_message = "";          // default to no startup message
     int message_time = 30;                 // time to display startup message
     print_verbose_messages = VB_IMPORTANT; // only show important messages
-    QString logfile = "";
+    QString logfile;
 
     debug_level = 0;  // don't show any debug messages by default
 
@@ -46,6 +46,9 @@ int main(int argc, char **argv)
         cmdline.PrintHelp();
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
+
+    logfile = cmdline.GetLogFilePath();
+    logStart(logfile);
 
     if (cmdline.toBool("showhelp"))
     {
@@ -59,8 +62,6 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_OK;
     }
 
-    if (cmdline.toBool("logfile"))
-        logfile = cmdline.toString("logfile");
     if (cmdline.toBool("daemon"))
         daemon_mode = true;
     if (cmdline.toBool("port"))
@@ -92,35 +93,6 @@ int main(int argc, char **argv)
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
-
-    // set up log file
-    int logfd = -1;
-
-#if 0
-    if (!logfile.isEmpty())
-    {
-        QByteArray tmp = logfile.toAscii();
-        logfd = open(tmp.constData(), O_WRONLY|O_CREAT|O_APPEND, 0664);
-
-        if (logfd < 0)
-        {
-            perror("open(logfile)");
-            return GENERIC_EXIT_PERMISSIONS_ERROR;
-        }
-    }
-
-    if (logfd != -1)
-    {
-        // Send stdout and stderr to the log file
-        dup2(logfd, 1);
-        dup2(logfd, 2);
-
-        // Close the unduplicated logfd
-        if (logfd != 1 && logfd != 2)
-            close(logfd);
-    }
-#endif
-    logStart(logfile);
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         cerr << "Unable to ignore SIGPIPE\n";

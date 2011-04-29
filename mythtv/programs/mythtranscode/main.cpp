@@ -281,7 +281,8 @@ int main(int argc, char *argv[])
     if (outfile == "-")
         print_verbose_messages = VB_NONE;
 
-    logStart("");
+    QString logfile = cmdline.GetLogFilePath();
+    logStart(logfile);
 
     //  Load the context
     gContext = new MythContext(MYTH_BINARY_VERSION);

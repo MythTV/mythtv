@@ -109,16 +109,15 @@ int main(int argc, char *argv[])
         if (parse_verbose_arg(cmdline.toString("verbose")) ==
                 GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
-    if (cmdline.toBool("logfile"))
-        logfile = cmdline.toString("logfile");
     if (cmdline.toBool("pidfile"))
         pidfile = cmdline.toString("pidfile");
     if (cmdline.toBool("daemon"))
         daemonize = true;
 
-    logStart(logfile);
-
     CleanupGuard callCleanup(cleanup);
+
+    logfile = cmdline.GetLogFilePath();
+    logStart(logfile);
 
     ofstream pidfs;
     if (pidfile.size())

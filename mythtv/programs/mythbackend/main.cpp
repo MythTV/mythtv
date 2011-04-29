@@ -79,7 +79,6 @@ int main(int argc, char **argv)
 #endif
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHBACKEND);
 
-    logfile = cmdline.toString("logfile");
     pidfile = cmdline.toString("pidfile");
 
     if (cmdline.toBool("verbose"))
@@ -88,7 +87,6 @@ int main(int argc, char **argv)
             return GENERIC_EXIT_INVALID_CMDLINE;
 
     ///////////////////////////////////////////////////////////////////////
-
     // Don't listen to console input
     close(0);
 
@@ -107,6 +105,7 @@ int main(int argc, char **argv)
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
+    logfile = cmdline.GetLogFilePath();
     logStart(logfile);
 
     if (cmdline.toBool("event")         || cmdline.toBool("systemevent") ||

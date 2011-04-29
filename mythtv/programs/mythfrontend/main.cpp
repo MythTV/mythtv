@@ -1080,8 +1080,6 @@ int main(int argc, char **argv)
         bPromptForBackend = true;
     if (cmdline.toBool("noautodiscovery"))
         bBypassAutoDiscovery = true;
-    if (!cmdline.toString("logfile").isEmpty())
-        logfile = cmdline.toString("logfile");
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         cerr << "Unable to ignore SIGPIPE\n";
@@ -1100,6 +1098,7 @@ int main(int argc, char **argv)
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
+    logfile = cmdline.GetLogFilePath();
     logStart(logfile);
 
     if (!cmdline.toBool("noupnp"))

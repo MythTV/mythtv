@@ -51,7 +51,8 @@ int main(int argc, char *argv[])
 
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHAVTEST);
 
-    logStart("");
+    QString logfile = cmdline.GetLogFilePath();
+    logStart(logfile);
 
     QString filename = "";
 

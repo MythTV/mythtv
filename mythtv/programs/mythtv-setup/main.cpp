@@ -253,8 +253,6 @@ int main(int argc, char *argv[])
                             .arg(MYTH_SOURCE_PATH)
                             .arg(MYTH_SOURCE_VERSION));
 
-    if (cmdline.toBool("logfile"))
-        logfile = cmdline.toString("logfile");
     if (cmdline.toBool("verbose"))
         if (parse_verbose_arg(cmdline.toString("verbose")) ==
                     GENERIC_EXIT_INVALID_CMDLINE)
@@ -298,6 +296,7 @@ int main(int argc, char *argv[])
     if (cmdline.toBool("inputname"))
         scanInputName = cmdline.toString("inputname");
 
+    logfile = cmdline.GetLogFilePath();
     logStart(logfile);
 
     if (!display.isEmpty())

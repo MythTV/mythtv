@@ -129,6 +129,7 @@ class MPUBLIC MythCommandLineParser
     QVariant                operator[](const QString &name);
     QStringList             GetArgs(void) const { return m_remainingArgs; }
     QMap<QString,QString>   GetSettingsOverride(void);
+    QString	            GetLogFilePath(void);
 
     bool                    toBool(QString key) const;
     int                     toInt(QString key) const;
@@ -154,7 +155,7 @@ class MPUBLIC MythCommandLineParser
     void addGeometry(void);
     void addDisplay(void);
     void addUPnP(void);
-    void addLogFile(void);
+    void addLogging(void);
     void addPIDFile(void);
     void addJob(void);
 

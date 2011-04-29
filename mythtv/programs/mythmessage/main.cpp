@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 
     if (sock->writeDatagram(utf8, address, port) < 0)
     {
-        VERBOSE(VB_IMPORTANT, "Failed to send UDP/XML packet");
+        cout << "Failed to send UDP/XML packet" << endl;
     }
     else
     {

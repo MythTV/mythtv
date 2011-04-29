@@ -194,14 +194,15 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    logStart("");
-
     ///////////////////////////////////////////////////////////////////////
 
     // Don't listen to console input
     close(0);
 
     CleanupGuard callCleanup(cleanup);
+
+    QString logfile = cmdline.GetLogFilePath();
+    logStart(logfile);
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to ignore SIGPIPE");

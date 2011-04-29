@@ -32,8 +32,7 @@
 #include "welcomesettings.h"
 
 
-QString logfile = "";
-
+QString logfile;
 
 
 static void initKeys(void)
@@ -79,9 +78,8 @@ int main(int argc, char **argv)
 
     if (cmdline.toBool("setup"))
         bShowSettings = true;
-    if (!cmdline.toString("logfile").isEmpty())
-        logfile = cmdline.toString("logfile");
 
+    logfile = cmdline.GetLogFilePath();
     logStart(logfile);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
