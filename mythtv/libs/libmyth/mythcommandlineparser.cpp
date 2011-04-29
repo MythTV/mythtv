@@ -938,6 +938,7 @@ void MythPreviewGeneratorCommandLineParser::LoadArguments(void)
     addVersion();
     addVerbose();
     addRecording();
+    addLogging();
 
     add("--seconds", "seconds", 0LL, "Number of seconds into video to take preview image.", "");
     add("--frame", "frame", 0LL, "Number of frames into video to take preview image.", "");
@@ -975,6 +976,7 @@ void MythAVTestCommandLineParser::LoadArguments(void)
     addVerbose();
     addGeometry();
     addDisplay();
+    addLogging();
 }
 
 MythCommFlagCommandLineParser::MythCommFlagCommandLineParser() :
@@ -989,6 +991,7 @@ void MythCommFlagCommandLineParser::LoadArguments(void)
     addVerbose();
     addJob();
     addRecording();
+    addLogging();
 
     add(QStringList( QStringList() << "-f" << "--file" ), "file", "",
             "Specify file to operate on.", "");
@@ -1042,6 +1045,7 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
     addHelp();
     addVersion();
     addVerbose();
+    addLogging();
 
     add("--manual", "manual", "Run interactive configuration",
             "Manual mode will interactively ask you questions about\n"
@@ -1233,6 +1237,7 @@ void MythShutdownCommandLineParser::LoadArguments(void)
     addHelp();
     addVersion();
     addVerbose();
+    addLogging();
 
     add(QStringList( QStringList() << "-w" << "--setwakeup" ), "setwakeup", "",
             "Set the wakeup time (yyyy-MM-ddThh:mm:ss)", "");
@@ -1330,6 +1335,7 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
     addJob();
     addRecording();
     addSettingsOverride();
+    addLogging();
 
     add(QStringList( QStringList() << "-i" << "--infile" ), "inputfile", "",
             "Input video for transcoding.", "");
