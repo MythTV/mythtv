@@ -329,6 +329,13 @@ bool AudioPlayer::CanPassthrough(int samplerate, int channels)
     return ret;
 }
 
+bool AudioPlayer::CanDownmix(void)
+{
+    if (!m_audioOutput)
+        return false;
+    return m_audioOutput->CanDownmix();
+}
+
 void AudioPlayer::AddAudioData(char *buffer, int len, int64_t timecode)
 {
     if (!m_audioOutput)
