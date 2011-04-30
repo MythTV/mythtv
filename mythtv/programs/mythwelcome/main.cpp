@@ -91,9 +91,10 @@ int main(int argc, char **argv)
     }
 
     int facility = cmdline.GetSyslogFacility();
+    bool dblog = !cmdline.toBool("nodblog");
 
     logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet, facility);
+    logStart(logfile, quiet, facility, dblog);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init())

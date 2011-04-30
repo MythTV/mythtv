@@ -102,6 +102,7 @@ int main(int argc, char **argv)
         quiet = 1;
 
     int facility = cmdline.GetSyslogFacility();
+    bool dblog = !cmdline.toBool("nodblog");
 
     ///////////////////////////////////////////////////////////////////////
     // Don't listen to console input
@@ -123,7 +124,7 @@ int main(int argc, char **argv)
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
     logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet, facility);
+    logStart(logfile, quiet, facility, dblog);
 
     if (cmdline.toBool("event")         || cmdline.toBool("systemevent") ||
         cmdline.toBool("setverbose")    || cmdline.toBool("printsched") ||

@@ -824,6 +824,7 @@ void MythCommandLineParser::addLogging(void)
     add("--syslog", "syslog", "local7", 
             "Set the syslog logging facility.  Set to \"none\" to disable\n"
             "Defaults to local7\n", "");
+    add("--nodblog", "nodblog", "Disable database logging.", "");
 }
 
 void MythCommandLineParser::addPIDFile(void)

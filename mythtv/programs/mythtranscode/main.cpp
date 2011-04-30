@@ -293,9 +293,10 @@ int main(int argc, char *argv[])
     }
 
     int facility = cmdline.GetSyslogFacility();
+    bool dblog = !cmdline.toBool("nodblog");
 
     QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet, facility);
+    logStart(logfile, quiet, facility, dblog);
 
     //  Load the context
     gContext = new MythContext(MYTH_BINARY_VERSION);

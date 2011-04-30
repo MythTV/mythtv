@@ -1077,6 +1077,7 @@ int main(int argc, char **argv)
     }
 
     int facility = cmdline.GetSyslogFacility();
+    bool dblog = !cmdline.toBool("nodblog");
 
     VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
                             .arg(MYTH_APPNAME_MYTHFRONTEND)
@@ -1111,7 +1112,7 @@ int main(int argc, char **argv)
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
     logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet, facility);
+    logStart(logfile, quiet, facility, dblog);
 
     if (!cmdline.toBool("noupnp"))
     {

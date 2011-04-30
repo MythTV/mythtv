@@ -456,7 +456,7 @@ void LogPrintLineNoArg( uint32_t mask, LogLevel_t level, char *file, int line,
     logQueue.enqueue(item);
 }
 
-void logStart(QString logfile, int quiet, int facility)
+void logStart(QString logfile, int quiet, int facility, bool dblog)
 {
     LoggerBase *logger;
 
@@ -479,7 +479,8 @@ void logStart(QString logfile, int quiet, int facility)
             logger = new SyslogLogger(facility);
 
         /* Database */
-        logger = new DatabaseLogger((char *)"logging");
+        if( dblog )
+            logger = new DatabaseLogger((char *)"logging");
 
         logThread.start();
     }

@@ -270,6 +270,7 @@ int main(int argc, char *argv[])
     }
 
     int facility = cmdline.GetSyslogFacility();
+    bool dblog = !cmdline.toBool("nodblog");
 
     if (cmdline.toBool("overridesettings"))
         settingsOverride = cmdline.GetSettingsOverride();
@@ -311,7 +312,7 @@ int main(int argc, char *argv[])
         scanInputName = cmdline.toString("inputname");
 
     logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet, facility);
+    logStart(logfile, quiet, facility, dblog);
 
     if (!display.isEmpty())
     {

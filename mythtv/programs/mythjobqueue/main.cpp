@@ -123,6 +123,7 @@ int main(int argc, char *argv[])
     }
 
     int facility = cmdline.GetSyslogFacility();
+    bool dblog = !cmdline.toBool("nodblog");
 
     if (cmdline.toBool("pidfile"))
         pidfile = cmdline.toString("pidfile");
@@ -132,7 +133,7 @@ int main(int argc, char *argv[])
     CleanupGuard callCleanup(cleanup);
 
     logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet, facility);
+    logStart(logfile, quiet, facility, dblog);
 
     ofstream pidfs;
     if (pidfile.size())
