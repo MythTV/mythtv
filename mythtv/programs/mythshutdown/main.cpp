@@ -788,6 +788,8 @@ int main(int argc, char **argv)
         }
     }
 
+    int facility = cmdline.GetSyslogFacility();
+
     if (cmdline.toBool("lock"))
         bLockShutdown = true;
     if (cmdline.toBool("unlock"))
@@ -824,7 +826,7 @@ int main(int argc, char **argv)
 
 
     QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet);
+    logStart(logfile, quiet, facility);
 
     int res = 0;
 

@@ -29,6 +29,7 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     int quiet = 0;
+    int facility = 0;
 
     MythAVTestCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
@@ -70,8 +71,10 @@ int main(int argc, char *argv[])
         }
     }
 
+    facility = cmdline.GetSyslogFacility();
+
     QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet);
+    logStart(logfile, quiet, facility);
 
     if (!cmdline.toString("display").isEmpty())
     {

@@ -122,6 +122,8 @@ int main(int argc, char *argv[])
         }
     }
 
+    int facility = cmdline.GetSyslogFacility();
+
     if (cmdline.toBool("pidfile"))
         pidfile = cmdline.toString("pidfile");
     if (cmdline.toBool("daemon"))
@@ -130,7 +132,7 @@ int main(int argc, char *argv[])
     CleanupGuard callCleanup(cleanup);
 
     logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet);
+    logStart(logfile, quiet, facility);
 
     ofstream pidfs;
     if (pidfile.size())

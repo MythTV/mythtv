@@ -456,7 +456,7 @@ void LogPrintLineNoArg( uint32_t mask, LogLevel_t level, char *file, int line,
     logQueue.enqueue(item);
 }
 
-void logStart(QString logfile, int quiet)
+void logStart(QString logfile, int quiet, int facility)
 {
     LoggerBase *logger;
 
@@ -471,7 +471,12 @@ void logStart(QString logfile, int quiet)
             logger = new FileLogger((char *)logfile.toLocal8Bit().constData());
 
         /* Syslog */
-        logger = new SyslogLogger(LOG_LOCAL7);
+        if( facility < 0 )
+            LogPrintNoArg(VB_IMPORTANT, LOG_CRIT, 
+                          "Syslogging facility unknown, disabling syslog "
+                          "output");
+        else if( facility > 0 )
+            logger = new SyslogLogger(facility);
 
         /* Database */
         logger = new DatabaseLogger((char *)"logging");
@@ -537,6 +542,18 @@ void threadDeregister(void)
     item->function = (char *)__FUNCTION__;
     item->deregistering = true;
     logQueue.enqueue(item);
+}
+
+int syslogGetFacility(QString facility)
+{
+    CODE *name;
+    int i;
+    char *string = (char *)facility.toLocal8Bit().constData();
+    
+    for( i = 0, name = &facilitynames[0]; 
+         name->c_name && strcmp(name->c_name, string); i++, name++ );
+
+    return( name->c_val );
 }
 
 /*

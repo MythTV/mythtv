@@ -821,6 +821,9 @@ void MythCommandLineParser::addLogging(void)
             "file (currently disabled).\n", "");
     add(QStringList( QStringList() << "-q" << "--quiet"), "quiet", 0,
             "Don't log to the console (-q).  Don't log anywhere (-q -q)\n", "");
+    add("--syslog", "syslog", "local7", 
+            "Set the syslog logging facility.  Set to \"none\" to disable\n"
+            "Defaults to local7\n", "");
 }
 
 void MythCommandLineParser::addPIDFile(void)
@@ -1406,5 +1409,14 @@ QString MythCommandLineParser::GetLogFilePath(void)
     m_parsed.insert("filepath", QFileInfo(QDir(logdir), logfile).filePath());
 
     return toString("filepath");
+}
+
+int MythCommandLineParser::GetSyslogFacility(void)
+{
+    QString setting = toString("syslog").toLower();
+    if (setting == "none")
+        return 0;
+
+    return syslogGetFacility(setting);
 }
 

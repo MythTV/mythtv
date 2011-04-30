@@ -101,6 +101,8 @@ int main(int argc, char **argv)
     if (cmdline.toBool("daemon") && !quiet)
         quiet = 1;
 
+    int facility = cmdline.GetSyslogFacility();
+
     ///////////////////////////////////////////////////////////////////////
     // Don't listen to console input
     close(0);
@@ -121,7 +123,7 @@ int main(int argc, char **argv)
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
     logfile = cmdline.GetLogFilePath();
-    logStart(logfile);
+    logStart(logfile, quiet, facility);
 
     if (cmdline.toBool("event")         || cmdline.toBool("systemevent") ||
         cmdline.toBool("setverbose")    || cmdline.toBool("printsched") ||

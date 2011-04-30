@@ -87,10 +87,12 @@ MBASE_PUBLIC void LogPrintLineNoArg( uint32_t mask, LogLevel_t level,
 #ifdef __cplusplus
 }
 
-MBASE_PUBLIC void logStart(QString logfile, int quiet = 0);
+MBASE_PUBLIC void logStart(QString logfile, int quiet = 0, int facility = 0);
 MBASE_PUBLIC void logStop(void);
 MBASE_PUBLIC void threadRegister(QString name);
 MBASE_PUBLIC void threadDeregister(void);
+MBASE_PUBLIC int  syslogGetFacility(QString facility);
+
 void LogTimeStamp( time_t *epoch, uint32_t *usec );
 
 typedef union {

@@ -1076,6 +1076,8 @@ int main(int argc, char *argv[])
         }
     }
 
+    int facility = cmdline.GetSyslogFacility();
+
     if (cmdline.toBool("queue"))
         queueJobInstead = true;
     if (cmdline.toBool("nopercent"))
@@ -1100,7 +1102,7 @@ int main(int argc, char *argv[])
     CleanupGuard callCleanup(cleanup);
 
     QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet);
+    logStart(logfile, quiet, facility);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(

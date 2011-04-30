@@ -90,8 +90,10 @@ int main(int argc, char **argv)
         }
     }
 
+    int facility = cmdline.GetSyslogFacility();
+
     logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet);
+    logStart(logfile, quiet, facility);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init())

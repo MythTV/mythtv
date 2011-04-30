@@ -77,8 +77,10 @@ int main(int argc, char **argv)
             quiet = 1;
     }
 
+    int facility = cmdline.GetSyslogFacility();
+
     logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet);
+    logStart(logfile, quiet, facility);
 
 
     if (cmdline.toBool("port"))

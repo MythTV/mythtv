@@ -130,6 +130,7 @@ class MPUBLIC MythCommandLineParser
     QStringList             GetArgs(void) const { return m_remainingArgs; }
     QMap<QString,QString>   GetSettingsOverride(void);
     QString	            GetLogFilePath(void);
+    int                     GetSyslogFacility(void);
 
     bool                    toBool(QString key) const;
     int                     toInt(QString key) const;

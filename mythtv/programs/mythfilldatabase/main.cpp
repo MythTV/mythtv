@@ -259,6 +259,8 @@ int main(int argc, char *argv[])
         }
     }
 
+    int facility = cmdline.GetSyslogFacility();
+
     mark_repeats = cmdline.toBool("markrepeats");
     if (cmdline.toBool("exporticonmap"))
         export_icon_data_filename = cmdline.toString("exporticonmap");
@@ -280,7 +282,7 @@ int main(int argc, char *argv[])
     CleanupGuard callCleanup(cleanup);
 
     QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet);
+    logStart(logfile, quiet, facility);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))

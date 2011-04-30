@@ -269,6 +269,8 @@ int main(int argc, char *argv[])
         }
     }
 
+    int facility = cmdline.GetSyslogFacility();
+
     if (cmdline.toBool("overridesettings"))
         settingsOverride = cmdline.GetSettingsOverride();
     if (cmdline.toBool("expert"))
@@ -309,7 +311,7 @@ int main(int argc, char *argv[])
         scanInputName = cmdline.toString("inputname");
 
     logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet);
+    logStart(logfile, quiet, facility);
 
     if (!display.isEmpty())
     {

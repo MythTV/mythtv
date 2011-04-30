@@ -292,8 +292,10 @@ int main(int argc, char *argv[])
         }
     }
 
+    int facility = cmdline.GetSyslogFacility();
+
     QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet);
+    logStart(logfile, quiet, facility);
 
     //  Load the context
     gContext = new MythContext(MYTH_BINARY_VERSION);

@@ -206,6 +206,8 @@ int main(int argc, char **argv)
         }
     }
 
+    int facility = cmdline.GetSyslogFacility();
+
     ///////////////////////////////////////////////////////////////////////
 
     // Don't listen to console input
@@ -214,7 +216,7 @@ int main(int argc, char **argv)
     CleanupGuard callCleanup(cleanup);
 
     QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet);
+    logStart(logfile, quiet, facility);
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to ignore SIGPIPE");
