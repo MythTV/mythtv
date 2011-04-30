@@ -66,19 +66,24 @@ bool AudioOutputDigitalEncoder::Init(
     // We need to do this when called from mythmusic
     avcodec_init();
     avcodec_register_all();
-    codec = avcodec_find_encoder(CODEC_ID_AC3);
+    codec = avcodec_find_encoder_by_name("ac3_fixed");
+    //codec = avcodec_find_encoder(CODEC_ID_AC3);
     if (!codec)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not find codec");
         return false;
     }
 
-    av_context              = avcodec_alloc_context();
-    av_context->bit_rate    = bitrate;
-    av_context->sample_rate = samplerate;
-    av_context->channels    = channels;
+    av_context                 = avcodec_alloc_context();
+    avcodec_get_context_defaults3(av_context, codec);
 
-    // open it */
+    av_context->bit_rate       = bitrate;
+    av_context->sample_rate    = samplerate;
+    av_context->channels       = channels;
+    av_context->channel_layout = CH_LAYOUT_5POINT1;
+    av_context->sample_fmt     = AV_SAMPLE_FMT_S16;
+
+    // open it
     ret = avcodec_open(av_context, codec);
     if (ret < 0)
     {
