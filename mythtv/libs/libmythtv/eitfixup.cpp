@@ -114,11 +114,11 @@ EITFixUp::EITFixUp()
       m_nlOmroep ("\\s\\(([A-Z]+/?)+\\)$"),
       m_noRerun(" \\(R\\)"),
       m_noColonSubtitle("^([^:]+): (.+)"),
-      m_noNRKCategories("^(Supersommer|Superjul|Barne-tv|Fantorangen|Supermorgen|Julemorgen|Sommermorgen|"
+      m_noNRKCategories("^(Superstreker|Supersommer|Superjul|Barne-tv|Fantorangen|Kuraffen|Supermorgen|Julemorgen|Sommermorgen|"
                         "Kuraffen-TV|Sport i dag|NRKs sportsl.rdag|NRKs sportss.ndag|Dagens dokumentar|"
                         "NRK2s historiekveld|Detektimen|Nattkino|Filmklassiker|Film|Kortfilm|P.skemorgen|"
                         "Radioteatret|Opera|P2-Akademiet|Nyhetsmorgen i P2 og Alltid Nyheter:): (.+)"),
-      m_noPremiere("\\s+-\\s+(Sesongpremiere|Premiere)!?$"),
+      m_noPremiere("\\s+-\\s+(Sesongpremiere|Premiere|premiere)!?$"),
       m_Stereo("\\b\\(?[sS]tereo\\)?\\b")
 
 {
@@ -1705,7 +1705,6 @@ void EITFixUp::FixNRK_DVBT(DBEventEIT &event) const
 {
     int        position;
     QRegExp    tmpExp1;
-    tmpExp1 =  m_noNRKCategories;
     // Check for "title (R)" in the title
     position = event.title.indexOf(m_noRerun);
     if (position != -1)
@@ -1713,8 +1712,15 @@ void EITFixUp::FixNRK_DVBT(DBEventEIT &event) const
       event.previouslyshown = true;
       event.title = event.title.replace(m_noRerun, "");
     }
+    // Check for "(R)" in the description
+    position = event.description.indexOf(m_noRerun);
+    if (position != -1)
+    {
+      event.previouslyshown = true;
+    }
     // Move colon separated category from program-titles into description
     // Have seen "NRK2s historiekveld: Film: bla-bla"
+    tmpExp1 =  m_noNRKCategories;
     while (((position = tmpExp1.indexIn(event.title)) != -1) && (tmpExp1.cap(2).length() > 1)){
         event.title  = tmpExp1.cap(2);
         event.description = "(" + tmpExp1.cap(1) + ") " + event.description;

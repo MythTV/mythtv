@@ -76,7 +76,8 @@ AutoExpire::AutoExpire(QMap<int, EncoderLink *> *tvList) :
     desired_freq(15),
     expire_thread_run(true),
     main_server(NULL),
-    update_pending(false)
+    update_pending(false),
+    update_thread(NULL)
 {
     expire_thread->start();
     gCoreContext->addListener(this);
@@ -91,7 +92,8 @@ AutoExpire::AutoExpire() :
     desired_freq(15),
     expire_thread_run(false),
     main_server(NULL),
-    update_pending(false)
+    update_pending(false),
+    update_thread(NULL)
 {
 }
 

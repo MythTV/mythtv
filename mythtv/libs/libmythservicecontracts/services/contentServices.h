@@ -49,6 +49,7 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
 {
     Q_OBJECT
     Q_CLASSINFO( "version"    , "1.02" );
+    Q_CLASSINFO( "DownloadFile_Method",            "POST" ) 
 
     public:
 
@@ -91,6 +92,8 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
         virtual QString             GetHash             ( const QString   &StorageGroup,
                                                           const QString   &FileName ) = 0;
 
+        virtual bool                DownloadFile        ( const QString   &URL,
+                                                          const QString   &StorageGroup ) = 0;
 
 };
 

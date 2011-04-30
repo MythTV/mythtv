@@ -23,12 +23,12 @@ MythTV mythbackend Internal Web Server
 <script language="JavaScript" type="text/javascript">
 
 $(document).ready(function() {
-    loadDiv("menu-bg", "/menu.qsp");
-    loadContent("/misc/overview.qsp");
-    showHostName();
-    $('.menu').initMenu();
     $('#header_status').hide();
     $('#header_error').hide();
+    loadDiv("menu-bg", "/menu.qsp");
+    $('.menu').initMenu();
+    showHostName();
+    loadContent("/misc/overview.qsp");
 });
 
 </script>
@@ -63,6 +63,9 @@ $(document).ready(function() {
 </div>
 
 <div id='edit' title='Setup Wizard'>
+</div>
+
+<div id='iconBrowser' title='Channel Icon Browser'>
 </div>
 
 <div id='helpWindow' title='Help'>

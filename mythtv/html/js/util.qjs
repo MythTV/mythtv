@@ -21,7 +21,7 @@ function getSetting(hostname, key, defValue) {
         function(data) {
             result = data.SettingList.Settings[0].Value;
         }).error(function(data) {
-            setErrorMessage("Unable to retrieve setting!");
+            setErrorMessage("<i18n>Unable to retrieve setting.</i18n>");
         });
     $.ajaxSetup({ async: true });
 
@@ -37,7 +37,7 @@ function putSetting(hostname, key, value) {
         function(data) {
             result = 1;
         }).error(function(data) {
-            setErrorMessage("Unable to save setting!");
+            setErrorMessage("<i18n>Unable to save setting.</i18n>");
         });
     $.ajaxSetup({ async: true });
 
@@ -47,7 +47,7 @@ function putSetting(hostname, key, value) {
 function loadDiv(divName, contentURL, jsURL) {
     divName = "#" + divName;
     
-    $(divName).html("<br><br><b>Loading...</b>");
+    $(divName).html("<br><br><b><i18n>Loading</i18n>...</b>");
 
     var html = $.ajax({
       url: contentURL,
@@ -185,7 +185,7 @@ function sendMessage() {
         function(data) {
             result = 1;
         }).error(function(data) {
-            setErrorMessage("Unable to send message!");
+            setErrorMessage("<i18n>Unable to send message.</i18n>");
         });
 }
 
@@ -206,7 +206,7 @@ function showConfirm(content, functionname, params) {
     $("#confirmWindow").dialog({
         modal: true,
         buttons: {
-           'Yes': function() {
+           '<i18n>Yes</i18n>': function() {
                if (params == null) {
                    functionname();
                }
@@ -218,7 +218,7 @@ function showConfirm(content, functionname, params) {
                }
                $(this).dialog('close');
                },
-           'No': function() { $(this).dialog('close'); }
+           '<i18n>No</i18n>': function() { $(this).dialog('close'); }
         }});
     $("#confirmWindow").html(content);
     $("#confirmWindow").show();
@@ -229,4 +229,19 @@ function appendMatch(match, divname) {
     var newValue = $("#" + divname).val() + match;
     $("#" + divname).val(newValue);
 }
+
+function formatStr() {
+    if (arguments.length == 0)
+        return "";
+
+    if (arguments.length == 1)
+        return arguments[0];
+
+    var result = arguments[0]; 
+    for (var i = 1; i < arguments.length; i++) {
+        var regexp = '%' + i.toString();
+        result = result.replace(regexp, arguments[i]);
+    }
+    return result;
+};
 

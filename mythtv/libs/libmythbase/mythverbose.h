@@ -137,9 +137,10 @@ extern MBASE_PUBLIC unsigned int print_verbose_messages;
             {                                                                        \
                 QDateTime dtmp = QDateTime::currentDateTime();                       \
                 QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz");            \
+                QString dargs(__VA_ARGS__);                                          \
                 verbose_mutex.lock();                                                \
                 std::cout << dtime.toLocal8Bit().constData() << " "                  \
-                     << QString(__VA_ARGS__).toLocal8Bit().constData() << std::endl; \
+                     << dargs.toLocal8Bit().constData() << std::endl; \
                 verbose_mutex.unlock();                                              \
             }                                                                        \
         } while (0)

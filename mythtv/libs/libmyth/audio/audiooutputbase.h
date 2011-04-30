@@ -70,6 +70,7 @@ class AudioOutputBase : public AudioOutput, public QThread
 
     virtual bool CanPassthrough(int samplerate, int channels,
                                 int codec, int profile) const;
+    virtual bool CanDownmix(void) const { return true; };
     virtual bool ToggleUpmix(void);
 
     virtual void Reset(void);
