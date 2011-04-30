@@ -111,6 +111,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
         fflush( stdout );
     }
 
+    int prevperc = -1;
     while (!GetEof())
     {
         if (inuse_timer.elapsed() > 2534)
@@ -140,7 +141,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
             save_timer.restart();
         }
 
-        if (has_ui && (ui_timer.elapsed() > 98))
+        if (ui_timer.elapsed() > 98)
         {
             ui_timer.restart();
 
@@ -160,12 +161,23 @@ bool MythCommFlagPlayer::RebuildSeekTable(
                     printf( "%3d%%/%5dfps", percentage, flagFPS );
                     fflush( stdout );
                 }
+		if (percentage % 10 == 0 && prevperc != percentage)
+                {
+                    prevperc = percentage;
+		    VERBOSE(VB_GENERAL, QString("%1%/%2""fps")
+                                        .arg(percentage).arg(flagFPS));
+                }
             }
-            else if (showPercentage)
+            else 
             {
-                printf( "\b\b\b\b\b\b" );
-                printf( "%6lld", (long long)myFramesPlayed );
-                fflush( stdout );
+                if (showPercentage)
+                {
+                    printf( "\b\b\b\b\b\b" );
+                    printf( "%6lld", (long long)myFramesPlayed );
+                    fflush( stdout );
+                }
+                if (myFramesPlayed % 1000 == 0)
+                    VERBOSE(VB_GENERAL, QString("%1").arg(myFramesPlayed));
             }
         }
 

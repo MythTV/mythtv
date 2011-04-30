@@ -127,6 +127,7 @@ int main(int argc, char *argv[])
     int update_index = 1;
     int isVideo = 0;
     bool passthru = false;
+    int quiet = 0;
 
     MythTranscodeCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
@@ -281,8 +282,18 @@ int main(int argc, char *argv[])
     if (outfile == "-")
         print_verbose_messages = VB_NONE;
 
+    if (cmdline.toBool("quiet"))
+    {
+        quiet = cmdline.toUInt("quiet");
+        if (quiet > 1)
+        {
+            print_verbose_messages = VB_NONE;
+            parse_verbose_arg("none");
+        }
+    }
+
     QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile);
+    logStart(logfile, quiet);
 
     //  Load the context
     gContext = new MythContext(MYTH_BINARY_VERSION);

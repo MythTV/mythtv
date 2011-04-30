@@ -154,6 +154,8 @@ int preview_helper(const QString &_chanid, const QString &starttime,
 
 int main(int argc, char **argv)
 {
+    int quiet = 0;
+
     MythPreviewGeneratorCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {
@@ -194,6 +196,16 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
+    if (cmdline.toBool("quiet"))
+    {
+        quiet = cmdline.toUInt("quiet");
+        if (quiet > 1)
+        {
+            print_verbose_messages = VB_NONE;
+            parse_verbose_arg("none");
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////
 
     // Don't listen to console input
@@ -202,7 +214,7 @@ int main(int argc, char **argv)
     CleanupGuard callCleanup(cleanup);
 
     QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile);
+    logStart(logfile, quiet);
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to ignore SIGPIPE");

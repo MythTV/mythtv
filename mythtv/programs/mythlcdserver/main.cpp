@@ -35,6 +35,7 @@ int main(int argc, char **argv)
     int message_time = 30;                 // time to display startup message
     print_verbose_messages = VB_IMPORTANT; // only show important messages
     QString logfile;
+    int quiet = 0;
 
     debug_level = 0;  // don't show any debug messages by default
 
@@ -46,9 +47,6 @@ int main(int argc, char **argv)
         cmdline.PrintHelp();
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
-
-    logfile = cmdline.GetLogFilePath();
-    logStart(logfile);
 
     if (cmdline.toBool("showhelp"))
     {
@@ -62,8 +60,27 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_OK;
     }
 
+    if (cmdline.toBool("quiet"))
+    {
+        quiet = cmdline.toUInt("quiet");
+        if (quiet > 1)
+        {
+            print_verbose_messages = VB_NONE;
+            parse_verbose_arg("none");
+        }
+    }
+
     if (cmdline.toBool("daemon"))
+    {
         daemon_mode = true;
+        if (!quiet)
+            quiet = 1;
+    }
+
+    logfile = cmdline.GetLogFilePath();
+    logStart(logfile, quiet);
+
+
     if (cmdline.toBool("port"))
     {
         special_port = cmdline.toInt("port");

@@ -78,7 +78,7 @@ namespace
     };
 }
 
-bool quiet = false;
+int  quiet = 0;
 bool force = false;
 
 bool showPercentage = true;
@@ -835,7 +835,7 @@ static int FlagCommercials(
 
     if (rebuildSeekTable)
     {
-        cfp->RebuildSeekTable();
+        cfp->RebuildSeekTable(!quiet);
 
         if (!quiet)
             cerr << "Rebuilt\n";
@@ -1059,23 +1059,23 @@ int main(int argc, char *argv[])
         dontSubmitCommbreakListToDB = true;
         force = true;
     }
-    if (cmdline.toBool("quiet"))
-    {
-        quiet = true;
-        showPercentage = false;
-    }
     if (parse_verbose_arg(cmdline.toString("verbose")) ==
                         GENERIC_EXIT_INVALID_CMDLINE)
         return GENERIC_EXIT_INVALID_CMDLINE;
     if (cmdline.toBool("verboseint"))
         print_verbose_messages = cmdline.toUInt("verboseint");
-    if (cmdline.toBool("vquiet"))
+
+    if (cmdline.toBool("quiet"))
     {
-        quiet = true;
+        quiet = cmdline.toUInt("quiet");
         showPercentage = false;
-        print_verbose_messages = VB_NONE;
-        parse_verbose_arg("");
+        if (quiet > 1)
+        {
+            print_verbose_messages = VB_NONE;
+            parse_verbose_arg("none");
+        }
     }
+
     if (cmdline.toBool("queue"))
         queueJobInstead = true;
     if (cmdline.toBool("nopercent"))
@@ -1100,7 +1100,7 @@ int main(int argc, char *argv[])
     CleanupGuard callCleanup(cleanup);
 
     QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile);
+    logStart(logfile, quiet);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(

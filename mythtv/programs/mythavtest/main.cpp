@@ -28,6 +28,8 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
+    int quiet = 0;
+
     MythAVTestCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {
@@ -51,15 +53,25 @@ int main(int argc, char *argv[])
 
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHAVTEST);
 
-    QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile);
-
     QString filename = "";
 
     if (cmdline.toBool("verbose"))
         if (parse_verbose_arg(cmdline.toString("verbose")) ==
                         GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
+
+    if (cmdline.toBool("quiet"))
+    {
+        quiet = cmdline.toUInt("quiet");
+        if (quiet > 1)
+        {
+            print_verbose_messages = VB_NONE;
+            parse_verbose_arg("none");
+        }
+    }
+
+    QString logfile = cmdline.GetLogFilePath();
+    logStart(logfile, quiet);
 
     if (!cmdline.toString("display").isEmpty())
     {

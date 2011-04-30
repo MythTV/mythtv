@@ -77,6 +77,8 @@ namespace
 
 int main(int argc, char *argv[])
 {
+    int quiet = 0;
+
     MythJobQueueCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {
@@ -109,6 +111,17 @@ int main(int argc, char *argv[])
         if (parse_verbose_arg(cmdline.toString("verbose")) ==
                 GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
+
+    if (cmdline.toBool("quiet"))
+    {
+        quiet = cmdline.toUInt("quiet");
+        if (quiet > 1)
+        {
+            print_verbose_messages = VB_NONE;
+            parse_verbose_arg("none");
+        }
+    }
+
     if (cmdline.toBool("pidfile"))
         pidfile = cmdline.toString("pidfile");
     if (cmdline.toBool("daemon"))
@@ -117,7 +130,7 @@ int main(int argc, char *argv[])
     CleanupGuard callCleanup(cleanup);
 
     logfile = cmdline.GetLogFilePath();
-    logStart(logfile);
+    logStart(logfile, quiet);
 
     ofstream pidfs;
     if (pidfile.size())

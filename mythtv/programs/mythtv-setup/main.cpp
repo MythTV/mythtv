@@ -1,4 +1,3 @@
-
 #include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -205,6 +204,7 @@ int main(int argc, char *argv[])
     QString scanTableName = "atsc-vsb8-us";
     QString scanInputName = "";
     bool    use_display = true;
+    int     quiet = 0;
 
     MythTVSetupCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
@@ -232,6 +232,7 @@ int main(int argc, char *argv[])
 
     if (cmdline.toBool("scan"))
     {
+        quiet = 1;
         use_display = false;
         print_verbose_messages = VB_NONE;
         verboseString = "";
@@ -257,6 +258,17 @@ int main(int argc, char *argv[])
         if (parse_verbose_arg(cmdline.toString("verbose")) ==
                     GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
+
+    if (cmdline.toBool("quiet"))
+    {
+        quiet = cmdline.toUInt("quiet");
+        if (quiet > 1)
+        {
+            print_verbose_messages = VB_NONE;
+            parse_verbose_arg("none");
+        }
+    }
+
     if (cmdline.toBool("overridesettings"))
         settingsOverride = cmdline.GetSettingsOverride();
     if (cmdline.toBool("expert"))
@@ -297,7 +309,7 @@ int main(int argc, char *argv[])
         scanInputName = cmdline.toString("inputname");
 
     logfile = cmdline.GetLogFilePath();
-    logStart(logfile);
+    logStart(logfile, quiet);
 
     if (!display.isEmpty())
     {

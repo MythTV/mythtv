@@ -1,4 +1,3 @@
-
 #include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -1026,6 +1025,7 @@ int main(int argc, char **argv)
     bool bPromptForBackend    = false;
     bool bBypassAutoDiscovery = false;
     bool upgradeAllowed = false;
+    int quiet = 0;
 
     MythFrontendCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
@@ -1066,6 +1066,17 @@ int main(int argc, char **argv)
                         GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
 
+    if (cmdline.toBool("quiet"))
+    {
+        quiet = cmdline.toUInt("quiet");
+        if (quiet > 1)
+        {
+            print_verbose_messages = VB_NONE;
+            parse_verbose_arg("none");
+        }
+    }
+
+
     VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
                             .arg(MYTH_APPNAME_MYTHFRONTEND)
                             .arg(MYTH_SOURCE_PATH)
@@ -1099,7 +1110,7 @@ int main(int argc, char **argv)
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
     logfile = cmdline.GetLogFilePath();
-    logStart(logfile);
+    logStart(logfile, quiet);
 
     if (!cmdline.toBool("noupnp"))
     {

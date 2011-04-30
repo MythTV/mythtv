@@ -87,6 +87,7 @@ int main(int argc, char *argv[])
     bool from_dd_file = false;
     int sourceid = -1;
     QString fromddfile_lineupid;
+    int quiet = 0;
 
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFILLDATABASE);
 
@@ -247,8 +248,17 @@ int main(int argc, char *argv[])
     }
     if (cmdline.toBool("onlychannels"))
         fill_data.only_update_channels = true;
+
     if (cmdline.toBool("quiet"))
-        print_verbose_messages = VB_NONE;
+    {
+        quiet = cmdline.toUInt("quiet");
+        if (quiet > 1)
+        {
+            print_verbose_messages = VB_NONE;
+            parse_verbose_arg("none");
+        }
+    }
+
     mark_repeats = cmdline.toBool("markrepeats");
     if (cmdline.toBool("exporticonmap"))
         export_icon_data_filename = cmdline.toString("exporticonmap");
@@ -270,7 +280,7 @@ int main(int argc, char *argv[])
     CleanupGuard callCleanup(cleanup);
 
     QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile);
+    logStart(logfile, quiet);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))

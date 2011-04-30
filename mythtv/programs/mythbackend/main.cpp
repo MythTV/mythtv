@@ -49,6 +49,8 @@
 
 int main(int argc, char **argv)
 {
+    int quiet = 0;
+
     MythBackendCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {
@@ -85,6 +87,19 @@ int main(int argc, char **argv)
         if (parse_verbose_arg(cmdline.toString("verbose")) ==
                     GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
+
+    if (cmdline.toBool("quiet"))
+    {
+        quiet = cmdline.toUInt("quiet");
+        if (quiet > 1)
+        {
+            print_verbose_messages = VB_NONE;
+            parse_verbose_arg("none");
+        }
+    }
+
+    if (cmdline.toBool("daemon") && !quiet)
+        quiet = 1;
 
     ///////////////////////////////////////////////////////////////////////
     // Don't listen to console input

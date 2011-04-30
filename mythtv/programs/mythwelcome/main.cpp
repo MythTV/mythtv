@@ -48,6 +48,7 @@ static void initKeys(void)
 int main(int argc, char **argv)
 {
     bool bShowSettings = false;
+    int quiet = 0;
 
     MythWelcomeCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
@@ -79,8 +80,18 @@ int main(int argc, char **argv)
     if (cmdline.toBool("setup"))
         bShowSettings = true;
 
+    if (cmdline.toBool("quiet"))
+    {
+        quiet = cmdline.toUInt("quiet");
+        if (quiet > 1)
+        {
+            print_verbose_messages = VB_NONE;
+            parse_verbose_arg("none");
+        }
+    }
+
     logfile = cmdline.GetLogFilePath();
-    logStart(logfile);
+    logStart(logfile, quiet);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init())

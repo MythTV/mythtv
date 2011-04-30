@@ -456,17 +456,24 @@ void LogPrintLineNoArg( uint32_t mask, LogLevel_t level, char *file, int line,
     logQueue.enqueue(item);
 }
 
-void logStart(QString logfile)
+void logStart(QString logfile, int quiet)
 {
     LoggerBase *logger;
 
     if (!logThread.isRunning())
     {
         /* log to the console */
-        logger = new FileLogger((char *)"-");
+        if( !quiet )
+            logger = new FileLogger((char *)"-");
+
+        /* Debug logfile */
         if( !logfile.isEmpty() )
             logger = new FileLogger((char *)logfile.toLocal8Bit().constData());
+
+        /* Syslog */
         logger = new SyslogLogger(LOG_LOCAL7);
+
+        /* Database */
         logger = new DatabaseLogger((char *)"logging");
 
         logThread.start();

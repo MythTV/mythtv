@@ -362,8 +362,8 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
             else
             {
                 // else fault
-                cerr << "Unhandled option given on command line:" << endl << "    "
-                     << opt.toLocal8Bit().constData() << endl;
+                cerr << "Unhandled option given on command line:" << endl 
+                     << "    " << opt.toLocal8Bit().constData() << endl;
                 return false;
             }
         }
@@ -372,6 +372,13 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         {
             if (argdef.type == QVariant::Bool)
                 m_parsed[argdef.name] = QVariant(!(i.value().def.toBool()));
+            else if (argdef.type == QVariant::Int)
+            {
+                if (m_parsed.contains(argdef.name))
+                    m_parsed[argdef.name] = m_parsed[argdef.name].toInt() + 1;
+                else
+                    m_parsed[argdef.name] = QVariant((i.value().def.toInt())+1);
+            }
             else if (argdef.type == QVariant::String)
                 m_parsed[argdef.name] = i.value().def;
             else
@@ -812,6 +819,8 @@ void MythCommandLineParser::addLogging(void)
             "in combination with --pidfile, this can be used with log \n"
             "rotaters, using the HUP call to inform MythTV to reload the "
             "file (currently disabled).\n", "");
+    add(QStringList( QStringList() << "-q" << "--quiet"), "quiet", 0,
+            "Don't log to the console (-q).  Don't log anywhere (-q -q)\n", "");
 }
 
 void MythCommandLineParser::addPIDFile(void)
@@ -1009,8 +1018,6 @@ void MythCommFlagCommandLineParser::LoadArguments(void)
     add("--setcutlist", "setcutlist", "", "Set a new cutlist in the form:\n"
                                           "#-#[,#-#]... (ie, 1-100,1520-3012,4091-5094)", "");
     add("--skipdb", "skipdb", "", "Intended for external 3rd party use.");
-    add("--quiet", "quiet", "Don't display commercial flagging progress.", "");
-    add("--very-quiet", "vquiet", "Only display output.", "");
     add("--queue", "queue", "Insert flagging job into the JobQueue, rather than\n"
                             "running flagging in the foreground.", "");
     add("--nopercentage", "nopercent", "Don't print percentage done.", "");
@@ -1175,7 +1182,6 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
     add("--only-update-channels", "onlychannels", "only update channel lineup",
             "Download as little listings data as possible to update the\n"
             "channel lineup.");
-    add("--quiet", "quiet", "do not log runtime information", "");
     add("--no-mark-repeats", "markrepeats", true, "do not mark repeats", "");
     add("--export-icon-map", "exporticonmap", "iconmap.xml",
             "export icon map to file", "");

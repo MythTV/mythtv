@@ -752,6 +752,7 @@ int main(int argc, char **argv)
     bool bSetScheduledWakeupTime = false;
     bool bCheckAndShutdown = false;
     bool bWantRecStatus = true;
+    int quiet = 0;
 
     MythShutdownCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
@@ -776,6 +777,17 @@ int main(int argc, char **argv)
         if (parse_verbose_arg(cmdline.toString("verbose")) ==
                         GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
+
+    if (cmdline.toBool("quiet"))
+    {
+        quiet = cmdline.toUInt("quiet");
+        if (quiet > 1)
+        {
+            print_verbose_messages = VB_NONE;
+            parse_verbose_arg("none");
+        }
+    }
+
     if (cmdline.toBool("lock"))
         bLockShutdown = true;
     if (cmdline.toBool("unlock"))
@@ -812,7 +824,7 @@ int main(int argc, char **argv)
 
 
     QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile);
+    logStart(logfile, quiet);
 
     int res = 0;
 
