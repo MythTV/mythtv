@@ -586,6 +586,7 @@ void MythUIWebBrowser::Init(void)
         return;
 
     m_browser = new MythWebView(GetMythMainWindow()->GetPaintWindow(), this);
+    m_browser->setPalette(qApp->style()->standardPalette());
     m_browser->setGeometry(m_Area);
     m_browser->setFixedSize(m_Area.size());
     m_browser->move(m_Area.x(), m_Area.y());
