@@ -943,7 +943,7 @@ QUrl MythUIWebBrowser::GetUrl(void)
 QVariant MythUIWebBrowser::evaluateJavaScript(const QString& scriptSource)
 {
     if (m_browser)
-        return m_browser->page()->mainFrame()->evaluateJavaScript(scriptSource);
+        return m_browser->page()->currentFrame()->evaluateJavaScript(scriptSource);
     else
         return QVariant();
 }
