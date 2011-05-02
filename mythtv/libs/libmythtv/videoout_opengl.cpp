@@ -40,8 +40,7 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
 
 VideoOutputOpenGL::VideoOutputOpenGL()
     : VideoOutput(),
-    gl_context_lock(QMutex::Recursive),
-    gl_context(NULL), gl_created_context(false),
+    gl_context_lock(QMutex::Recursive), gl_context(NULL),
     gl_videochain(NULL), gl_pipchain_active(NULL),
     gl_parent_win(0), gl_embed_win(0),
     gl_painter(NULL), gl_created_painter(false)
@@ -58,8 +57,8 @@ VideoOutputOpenGL::~VideoOutputOpenGL()
     QMutexLocker locker(&gl_context_lock);
     TearDown();
 
-    if (gl_created_context)
-        delete gl_context;
+    if (gl_context)
+        gl_context->DownRef();
     gl_context = NULL;
 }
 
@@ -214,10 +213,10 @@ bool VideoOutputOpenGL::SetupContext(void)
         return false;
     }
 
-    gl_created_context = false;
     //gl_context = dynamic_cast<MythRenderOpenGL*>(win->GetRenderDevice());
     if (gl_context)
     {
+        gl_context->UpRef();
         VERBOSE(VB_PLAYBACK, LOC + "Using main UI render context");
         return true;
     }
@@ -237,12 +236,13 @@ bool VideoOutputOpenGL::SetupContext(void)
     {
         gl_context->Init();
         VERBOSE(VB_GENERAL, LOC + QString("Created MythRenderOpenGL device."));
-        gl_created_context = true;
         return true;
     }
 
     VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create MythRenderOpenGL device.");
-    delete gl_context;
+    if (gl_context)
+        gl_context->DownRef();
+    gl_context = NULL;
     return false;
 }
 
@@ -297,7 +297,7 @@ void VideoOutputOpenGL::InitOSD(void)
 
     gl_created_painter = false;
     MythMainWindow *win = MythMainWindow::getMainWindow();
-    if (gl_created_context && gl_context)
+    if (gl_context && !gl_context->IsShared())
     {
         QGLWidget *device = (QGLWidget*)QWidget::find(gl_parent_win);
         gl_painter = new MythOpenGLPainter(gl_context, device);

@@ -65,7 +65,6 @@ class VideoOutputOpenGL : public VideoOutput
 
     QMutex            gl_context_lock;
     MythRenderOpenGL *gl_context;
-    bool              gl_created_context;
     OpenGLVideo      *gl_videochain;
     QMap<MythPlayer*,OpenGLVideo*> gl_pipchains;
     QMap<MythPlayer*,bool>         gl_pip_ready;

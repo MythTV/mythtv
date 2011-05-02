@@ -104,7 +104,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     MythRenderOpenGL(const QGLFormat& format, QPaintDevice* device,
                      RenderType type = kRenderUnknown);
     MythRenderOpenGL(const QGLFormat& format, RenderType type = kRenderUnknown);
-    virtual ~MythRenderOpenGL();
 
     virtual void makeCurrent();
     virtual void doneCurrent();
@@ -163,6 +162,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     virtual bool RectanglesAreAccelerated(void) { return false; }
 
   protected:
+    virtual ~MythRenderOpenGL();
     virtual void DrawBitmapPriv(uint tex, const QRect *src, const QRect *dst,
                                 uint prog, int alpha,
                                 int red, int green, int blue) = 0;
