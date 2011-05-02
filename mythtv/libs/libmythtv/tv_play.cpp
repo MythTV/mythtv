@@ -417,7 +417,7 @@ void TV::SetFuncPtr(const char *string, void *lptr)
     QString name(string);
     if (name == "playbackbox")
         RunPlaybackBoxPtr = (EMBEDRETURNVOID)lptr;
-    else if (name == ACTION_VIEWSCHEDULED)
+    else if (name == "viewscheduled")
         RunViewScheduledPtr = (EMBEDRETURNVOID)lptr;
     else if (name == "programguide")
         RunProgramGuidePtr = (EMBEDRETURNVOIDEPG)lptr;
