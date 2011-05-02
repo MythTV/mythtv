@@ -849,6 +849,14 @@ bool MythThemedMenu::handleAction(const QString &action, const QString &password
         QString rest = action.right(action.length() - 5);
         GetMythMainWindow()->JumpTo(rest, false);
     }
+    else if (action.left(6) == "MEDIA ")
+    {
+        // the format is MEDIA HANDLER URL
+        // TODO: allow spaces in the url
+        QStringList list = action.simplified().split(' ');
+        if (list.size() >= 3)
+            GetMythMainWindow()->HandleMedia(list[1], list[2]);
+    }
     else
     {
         m_selection = action;
