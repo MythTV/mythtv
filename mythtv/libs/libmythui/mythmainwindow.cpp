@@ -877,8 +877,6 @@ void MythMainWindow::Init(void)
 
     GetMythUI()->ThemeWidget(this);
     Show();
-    setAttribute(Qt::WA_NoSystemBackground);
-    setAutoFillBackground(false);
 
     if (!GetMythDB()->GetNumSetting("HideMouseCursor", 0))
         setMouseTracking(true); // Required for mouse cursor auto-hide
@@ -968,6 +966,12 @@ void MythMainWindow::Init(void)
         VERBOSE(VB_IMPORTANT, "MythMainWindow failed to create a "
                               "painter window.");
         return;
+    }
+
+    if (d->painter->GetName() != "Qt")
+    {
+        setAttribute(Qt::WA_NoSystemBackground);
+        setAutoFillBackground(false);
     }
 
     d->paintwin->move(0, 0);
