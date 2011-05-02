@@ -541,7 +541,8 @@ void MythMainWindow::HidePainterWindow(void)
     if (d->paintwin)
     {
         d->paintwin->clearMask();
-        d->paintwin->hide();
+        if (!(d->render && d->render->IsShared()))
+            d->paintwin->hide();
     }
 }
 
