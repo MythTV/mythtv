@@ -443,7 +443,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
         }
     }
 
-    if (m_visual)
+    if (m_visual && gl_painter && !window.IsEmbedding())
         m_visual->Draw(GetTotalOSDBounds(), gl_painter, NULL);
 
     if (osd && gl_painter && !window.IsEmbedding())
