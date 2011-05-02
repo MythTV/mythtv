@@ -7360,8 +7360,14 @@ void TV::ClearTunableCache(void)
     is_tunable_cache_inputs.clear();
 }
 
-bool TV::StartEmbedding(PlayerContext *ctx, WId wid, const QRect &embedRect)
+bool TV::StartEmbedding(const QRect &embedRect)
 {
+    PlayerContext *ctx = GetPlayerReadLock(-1, __FILE__, __LINE__);
+    if (!ctx)
+        return false;
+
+    WId wid = GetMythMainWindow()->GetPaintWindow()->winId();
+
     if (!ctx->IsNullVideoDesired())
         ctx->StartEmbedding(wid, embedRect);
     else
@@ -7388,15 +7394,19 @@ bool TV::StartEmbedding(PlayerContext *ctx, WId wid, const QRect &embedRect)
         KillTimer(embedCheckTimerId);
     embedCheckTimerId = StartTimer(kEmbedCheckFrequency, __LINE__);
 
-    return ctx->IsEmbedding();
+    bool embedding = ctx->IsEmbedding();
+    ReturnPlayerLock(ctx);
+    return embedding;
 }
 
-void TV::StopEmbedding(PlayerContext *ctx)
+void TV::StopEmbedding(void)
 {
-    if (!ctx->IsEmbedding())
+    PlayerContext *ctx = GetPlayerReadLock(-1, __FILE__, __LINE__);
+    if (!ctx)
         return;
 
-    ctx->StopEmbedding();
+    if (ctx->IsEmbedding())
+        ctx->StopEmbedding();
 
     // Undo any PIP hiding
     PlayerContext *mctx = GetPlayer(ctx, 0);
@@ -7413,6 +7423,8 @@ void TV::StopEmbedding(PlayerContext *ctx)
     if (embedCheckTimerId)
         KillTimer(embedCheckTimerId);
     embedCheckTimerId = 0;
+
+    ReturnPlayerLock(ctx);
 }
 
 void TV::DrawUnusedRects(void)
@@ -8315,7 +8327,7 @@ void TV::customEvent(QEvent *e)
         PlayerContext *mctx;
         MythMainWindow *mwnd = GetMythMainWindow();
 
-        StopEmbedding(actx);                // Undo any embedding
+        StopEmbedding();
         MythPainter *painter = GetMythPainter();
         if (painter)
             painter->FreeResources();

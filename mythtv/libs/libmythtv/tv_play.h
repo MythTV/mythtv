@@ -212,8 +212,8 @@ class MTV_PUBLIC TV : public QObject
     bool StartLiveTVInGuide(void) { return db_start_in_guide; }
 
     // Embedding commands for the guidegrid to use in LiveTV
-    bool StartEmbedding(PlayerContext*, WId wid, const QRect&);
-    void StopEmbedding(PlayerContext*);
+    bool StartEmbedding(const QRect&);
+    void StopEmbedding(void);
     bool IsTunable(const PlayerContext*, uint chanid, bool use_cache = false);
     void ClearTunableCache(void);
     void ChangeChannel(const PlayerContext*, const DBChanList &options);
