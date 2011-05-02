@@ -178,6 +178,8 @@ class MTV_PUBLIC TV : public QObject
 {
     friend class PlaybackBox;
     friend class GuideGrid;
+    friend class ProgFinder;
+    friend class ViewScheduled;
     friend class TvPlayWindow;
     friend class TVBrowseHelper;
     friend class TVDDMapThread;

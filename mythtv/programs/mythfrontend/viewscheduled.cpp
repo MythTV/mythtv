@@ -102,11 +102,10 @@ bool ViewScheduled::Create()
         m_groupList->SetLCDTitles(tr("Group List"), "");
     }
 
-    if (m_player)
-        EmbedTVWindow();
-
     BuildFocusList();
     LoadInBackground();
+
+    EmbedTVWindow();
 
     return true;
 }
@@ -673,10 +672,7 @@ void ViewScheduled::viewInputs()
 void ViewScheduled::EmbedTVWindow(void)
 {
     if (m_player)
-    {
-//         m_player->EmbedOutput(this->winId(), m_tvRect.x(), m_tvRect.y(),
-//                             m_tvRect.width(), m_tvRect.height());
-    }
+        m_player->StartEmbedding(QRect());
 }
 
 void ViewScheduled::customEvent(QEvent *event)

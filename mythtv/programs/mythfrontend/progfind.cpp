@@ -90,6 +90,9 @@ bool ProgFinder::Create()
     BuildFocusList();
     LoadInBackground();
 
+    if (m_player)
+        m_player->StartEmbedding(QRect());
+
     return true;
 }
 
