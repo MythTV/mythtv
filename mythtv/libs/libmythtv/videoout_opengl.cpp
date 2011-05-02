@@ -272,8 +272,7 @@ bool VideoOutputOpenGL::SetupOpenGL(void)
                                   window.GetVideoDispDim(), dvr,
                                   window.GetDisplayVideoRect(),
                                   window.GetVideoRect(), true,
-                                  GetFilters(), !codec_is_std(video_codec_id),
-                                  db_letterbox_colour);
+                                  GetFilters(), !codec_is_std(video_codec_id));
     if (success)
     {
         bool temp_deinterlacing = m_deinterlacing;
@@ -417,6 +416,13 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     framesPlayed = buffer->frameNumber + 1;
     gl_context_lock.unlock();
 
+    gl_context->BindFramebuffer(0);
+    if (db_letterbox_colour == kLetterBoxColour_Gray25)
+        gl_context->SetBackground(127, 127, 127, 255);
+    else
+        gl_context->SetBackground(0, 0, 0, 255);
+    gl_context->ClearFramebuffer();
+
     if (gl_videochain)
     {
         gl_videochain->SetVideoRect(vsz_enabled ? vsz_desired_display_rect :
@@ -424,12 +430,6 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
                                     window.GetVideoRect());
         gl_videochain->PrepareFrame(buffer->top_field_first, t,
                                     m_deinterlacing, framesPlayed);
-    }
-    else
-    {
-        gl_context->BindFramebuffer(0);
-        gl_context->SetBackground(0, 0, 0, 0);
-        gl_context->ClearFramebuffer();
     }
 
     QMap<MythPlayer*,OpenGLVideo*>::iterator it = gl_pipchains.begin();

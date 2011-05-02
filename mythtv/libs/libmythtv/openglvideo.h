@@ -44,8 +44,7 @@ class OpenGLVideo
               QSize videoDim, QSize videoDispDim, QRect displayVisibleRect,
               QRect displayVideoRect, QRect videoRect,
               bool viewport_control,  QString options,
-              bool hwaccel,
-              LetterBoxColour letterbox_colour = kLetterBoxColour_Black);
+              bool hwaccel);
 
     uint GetInputTexture(void);
     uint GetTextureType(void);
@@ -131,6 +130,5 @@ class OpenGLVideo
     OpenGLFilterType defaultUpsize;
     uint           gl_features;
     uint           videoTextureType;
-    LetterBoxColour gl_letterbox_colour;
 };
 #endif // _OPENGL_VIDEO_H__
