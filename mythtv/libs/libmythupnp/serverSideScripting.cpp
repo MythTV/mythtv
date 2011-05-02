@@ -31,6 +31,27 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+QScriptValue formatStr(QScriptContext *context, QScriptEngine *interpreter)
+{
+    unsigned int count = context->argumentCount();
+
+    if (count == 0)
+        return QScriptValue(interpreter, QString());
+ 
+    if (count == 1)
+        return QScriptValue(interpreter, context->argument(0).toString());
+
+    QString result = context->argument(0).toString();
+    for (unsigned int i = 1; i < count; i++)
+        result.replace(QString("%%1").arg(i), context->argument(i).toString());
+
+    return QScriptValue(interpreter, result);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
 ServerSideScripting::ServerSideScripting()
 {
     // ----------------------------------------------------------------------
@@ -38,6 +59,13 @@ ServerSideScripting::ServerSideScripting()
     // ----------------------------------------------------------------------
 
     m_engine.installTranslatorFunctions();
+
+    // ----------------------------------------------------------------------
+    // Register C++ functions
+    // ----------------------------------------------------------------------
+
+    QScriptValue qsFormatStr = m_engine.newFunction(formatStr);
+    m_engine.globalObject().setProperty("formatStr", qsFormatStr);
 
     // ----------------------------------------------------------------------
     // Add Scriptable Objects

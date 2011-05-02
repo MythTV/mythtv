@@ -1020,9 +1020,7 @@ void AudioOutputBase::SetAudiotime(int frames, int64_t timecode)
 
     if (encoder)
     {
-        // the input buffered data is still in audio_bytes_per_sample format
-        processframes_stretched -=
-            encoder->Buffered() / output_bytes_per_frame;
+        processframes_stretched -= encoder->Buffered();
     }
 
     audbuf_timecode =
@@ -1246,8 +1244,22 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
         Pause(false);
     }
 
+    // Don't write new samples if we're resetting the buffer or reconfiguring
+    QMutexLocker lock(&audio_buflock);
+
     if (passthru && m_spdifenc)
     {
+        if (processing)
+        {
+            /*
+             * We shouldn't encounter this case, but it can occur when
+             * timestretch just got activated. So we will just drop the
+             * data
+             */
+            VERBOSE(VB_AUDIO, QString("Passthrough activated with audio "
+                                      "processing. Dropping audio"));
+            return false;
+        }
         // mux into an IEC958 packet
         m_spdifenc->WriteFrame((unsigned char *)in_buffer, len);
         len = m_spdifenc->GetProcessedSize();
@@ -1267,9 +1279,6 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
                       "timecode=%5 needsupmix=%6")
               .arg(frames).arg(len).arg(used).arg(afree).arg(timecode)
               .arg(needs_upmix));
-
-    // Don't write new samples if we're resetting the buffer or reconfiguring
-    QMutexLocker lock(&audio_buflock);
 
     // Mythmusic doesn't give us timestamps
     if (hasVisual())
@@ -1326,7 +1335,6 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
     {
         buffer = (char *)in_buffer + offset;
         frames = frames_remaining;
-
         len = frames * source_bytes_per_frame;
 
         if (processing)
@@ -1434,50 +1442,30 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
         if (encoder)
         {
             org_waud            = waud;
-            int org_waud2       = waud;
-            int remaining       = len;
             int to_get          = 0;
-            // The AC3 encoder can only work on 128kB of data at a time
-            int maxlength       =
-                ((ENCODER_INBUFSIZE / encoder->FrameSize() - 1) *
-                 encoder->FrameSize()) & ~0xf;
 
-            do
+            if (bdiff < len)
             {
-                len = remaining;
-                if (len > maxlength)
-                {
-                    len = maxlength;
-                }
-                remaining -= len;
-
-                bdiff = kAudioRingBufferSize - org_waud;
-                if (bdiff < len)
-                {
-                    encoder->Encode(WPOS, bdiff, processing);
-                    to_get = encoder->Encode(ABUF, len - bdiff, processing);
-                    org_waud = len - bdiff;
-                }
-                else
-                {
-                    to_get = encoder->Encode(WPOS, len, processing);
-                    org_waud += len;
-                }
-
-                bdiff = kAudioRingBufferSize - org_waud2;
-                if (bdiff <= to_get)
-                {
-                    encoder->GetFrames(audiobuffer + org_waud2, bdiff);
-                    to_get -= bdiff ;
-                    org_waud2 = 0;
-                }
-                if (to_get > 0)
-                    encoder->GetFrames(audiobuffer + org_waud2, to_get);
-
-                org_waud2 += to_get;
+                encoder->Encode(WPOS, bdiff, processing ? FORMAT_FLT : format);
+                to_get = encoder->Encode(ABUF, len - bdiff,
+                                         processing ? FORMAT_FLT : format);
             }
-            while (remaining > 0);
-            org_waud = org_waud2;
+            else
+            {
+                to_get = encoder->Encode(WPOS, len,
+                                         processing ? FORMAT_FLT : format);
+            }
+
+            if (bdiff <= to_get)
+            {
+                encoder->GetFrames(WPOS, bdiff);
+                to_get -= bdiff ;
+                org_waud = 0;
+            }
+            if (to_get > 0)
+                encoder->GetFrames(WPOS, to_get);
+
+            org_waud += to_get;
         }
 
         waud = org_waud;

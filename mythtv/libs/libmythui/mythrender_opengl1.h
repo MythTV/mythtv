@@ -9,7 +9,6 @@ class MUI_PUBLIC MythRenderOpenGL1 : public MythRenderOpenGL
   public:
     MythRenderOpenGL1(const QGLFormat& format, QPaintDevice* device);
     MythRenderOpenGL1(const QGLFormat& format);
-    virtual ~MythRenderOpenGL1();
 
     virtual void SetColor(int r, int g, int b, int a);
 
@@ -20,7 +19,8 @@ class MUI_PUBLIC MythRenderOpenGL1 : public MythRenderOpenGL
 
     virtual uint CreateHelperTexture(void);
 
-  private:
+  protected:
+    virtual ~MythRenderOpenGL1();
     virtual void DrawBitmapPriv(uint tex, const QRect *src, const QRect *dst,
                                 uint prog, int alpha,
                                 int red, int green, int blue);

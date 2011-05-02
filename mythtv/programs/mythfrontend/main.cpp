@@ -510,6 +510,7 @@ static void TVMenuCallback(void *data, QString &selection)
     {
         GetMythUI()->AddCurrentLocation("Setup");
         gCoreContext->ActivateSettingsCache(false);
+        GetMythMainWindow()->HidePainterWindow();
     }
 
     if (sel == "tv_watch_live")
@@ -706,6 +707,7 @@ static void TVMenuCallback(void *data, QString &selection)
         if (sel == "settings general" ||
             sel == "settings generalrecpriorities")
             ScheduledRecording::signalChange(0);
+        GetMythMainWindow()->ShowPainterWindow();
     }
 }
 

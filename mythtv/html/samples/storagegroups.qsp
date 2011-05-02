@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Sample Storage Group browser</title>
+<title><i18n>Sample Storage Group browser</i18n></title>
 </head>
 <body>
 <script language="JavaScript" type="text/javascript">
@@ -40,7 +40,7 @@ function listFiles() {
 function realListFiles() {
     var group = $("#sgName").val();
     var filter = $("#sgFilter").val().toLowerCase();
-    $("#links").html("Loading...");
+    $("#links").html("<i18n>Loading</i18n>...");
     $.getJSON("/Content/GetFileList", { StorageGroup: group }, function(data) {
         $("#links").html("");
         $.each(data.QStringList, function(i, value) {
@@ -52,10 +52,10 @@ function realListFiles() {
 }
 </script>
 
-<h3>Sample Storage Group browser</h3>
+<h3><i18n>Sample Storage Group browser</i18n></h3>
 <div>
     <table border=0 cellspacing=2 cellpadding=2>
-    Storage Group:
+    <i18n>Storage Group</i18n>:
     <select id="sgName">
 <%
     var myth = new Myth();
@@ -77,8 +77,8 @@ function realListFiles() {
     }
 %>
     </select><br>
-    Filter: <input id='sgFilter' size=20><br>
-    <input type='button' onClick='javascript:listFiles()' value='List Files'><br>
+    <i18n>Filter</i18n>: <input id='sgFilter' size=20><br>
+    <input type='button' onClick='javascript:listFiles()' value='<i18n>List Files</i18n>'><br>
 </div>
 <br>
 <div id="links"></div>

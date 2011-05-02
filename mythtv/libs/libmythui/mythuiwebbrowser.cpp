@@ -209,11 +209,25 @@ MythWebView::~MythWebView(void)
 /**
  *  \copydoc MythUIType::keyPressEvent()
  */
+
+const char *kgetType="\
+function activeElement()\
+{\
+    var type;\
+    type = document.activeElement.type;\
+    return type;\
+}\
+activeElement();";
+
 void MythWebView::keyPressEvent(QKeyEvent *event)
 {
+    // does an edit have focus?
+    QString type = m_parentBrowser->evaluateJavaScript(QString(kgetType)).toString().toLower();
+    bool editHasFocus = (type == "text" || type == "textarea" || type == "password");
+
     // if the QWebView widget has focus then all keypresses from a regular keyboard
     // get sent here first
-    if (m_parentBrowser && m_parentBrowser->IsInputToggled())
+    if (editHasFocus || (m_parentBrowser && m_parentBrowser->IsInputToggled()))
     {
         // input is toggled so pass all keypresses to the QWebView's handler
         QWebView::keyPressEvent(event);
@@ -586,6 +600,7 @@ void MythUIWebBrowser::Init(void)
         return;
 
     m_browser = new MythWebView(GetMythMainWindow()->GetPaintWindow(), this);
+    m_browser->setPalette(qApp->style()->standardPalette());
     m_browser->setGeometry(m_Area);
     m_browser->setFixedSize(m_Area.size());
     m_browser->move(m_Area.x(), m_Area.y());
@@ -942,7 +957,7 @@ QUrl MythUIWebBrowser::GetUrl(void)
 QVariant MythUIWebBrowser::evaluateJavaScript(const QString& scriptSource)
 {
     if (m_browser)
-        return m_browser->page()->mainFrame()->evaluateJavaScript(scriptSource);
+        return m_browser->page()->currentFrame()->evaluateJavaScript(scriptSource);
     else
         return QVariant();
 }

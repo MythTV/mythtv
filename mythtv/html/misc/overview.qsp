@@ -1,11 +1,11 @@
 <html>
 <head>
-<title>MythTV System Overview</title>
+<title><i18n>MythTV System Overview</i18n></title>
 </head>
 <body>
 
     <div style="margin: 0 auto; width:660px;" class="pressed">
-        <h2>Last Ten Recordings</h2>
+        <h2><i18n>Last Ten Recordings</i18n></h2>
     </div>
 
     <div style="margin: 0 auto;" id="lasttencontainer">
@@ -23,34 +23,39 @@
                     title = program.Title + " (" + program.SubTitle + ")";
 
                 var month_names = new Array();
-                month_names[month_names.length] = "January";
-                month_names[month_names.length] = "February";
-                month_names[month_names.length] = "March";
-                month_names[month_names.length] = "April";
-                month_names[month_names.length] = "May";
-                month_names[month_names.length] = "June";
-                month_names[month_names.length] = "July";
-                month_names[month_names.length] = "August";
-                month_names[month_names.length] = "September";
-                month_names[month_names.length] = "October";
-                month_names[month_names.length] = "November";
-                month_names[month_names.length] = "December";
+                month_names[month_names.length] = "<i18n>January</i18n>";
+                month_names[month_names.length] = "<i18n>February</i18n>";
+                month_names[month_names.length] = "<i18n>March</i18n>";
+                month_names[month_names.length] = "<i18n>April</i18n>";
+                month_names[month_names.length] = "<i18n>May</i18n>";
+                month_names[month_names.length] = "<i18n>June</i18n>";
+                month_names[month_names.length] = "<i18n>July</i18n>";
+                month_names[month_names.length] = "<i18n>August</i18n>";
+                month_names[month_names.length] = "<i18n>September</i18n>";
+                month_names[month_names.length] = "<i18n>October</i18n>";
+                month_names[month_names.length] = "<i18n>November</i18n>";
+                month_names[month_names.length] = "<i18n>December</i18n>";
 
                 var day_names = new Array();
-                day_names[day_names.length] = "Sunday";
-                day_names[day_names.length] = "Monday";
-                day_names[day_names.length] = "Tuesday";
-                day_names[day_names.length] = "Wednesday";
-                day_names[day_names.length] = "Thursday";
-                day_names[day_names.length] = "Friday";
-                day_names[day_names.length] = "Saturday";
+                day_names[day_names.length] = "<i18n>Sunday</i18n>";
+                day_names[day_names.length] = "<i18n>Monday</i18n>";
+                day_names[day_names.length] = "<i18n>Tuesday</i18n>";
+                day_names[day_names.length] = "<i18n>Wednesday</i18n>";
+                day_names[day_names.length] = "<i18n>Thursday</i18n>";
+                day_names[day_names.length] = "<i18n>Friday</i18n>";
+                day_names[day_names.length] = "<i18n>Saturday</i18n>";
 
                 function pad(n)
                 {
                     return n<10 ? '0'+n : n
                 }
 
-                var desc = program.Description + " Recorded " + day_names[program.StartTime.getDay()] + ", " + month_names[program.StartTime.getMonth()] + " " + program.StartTime.getDate() + " at " + program.StartTime.getHours() + ":" + pad(program.StartTime.getMinutes()) + ".";
+                var startTime = program.StartTime.getHours() + ":" +
+                                pad(program.StartTime.getMinutes());
+                var desc = formatStr('<i18n>%1<br>Recorded %2, %3 %4 at %5.</i18n>',
+                    program.Description, day_names[program.StartTime.getDay()],
+                    month_names[program.StartTime.getMonth()],
+                    program.StartTime.getDate(), startTime);
 %>
                 <img title="<%= title %>" alt="<%= desc %>" src="/Content/GetPreviewImage?ChanId=<%=program.Channel.ChanId %>&Height=300&StartTime=<%=ISODateString( program.Recording.StartTs ) %>"/>
 <%
@@ -60,7 +65,7 @@
     <div>
 
     <div style="margin: 0 auto; width:660px;" class="pressed">
-        <h2>Current Tuner Activity</h2>
+        <h2><i18n>Current Tuner Activity</i18n></h2>
     </div>
 
     <div style="padding: 10px 0px;" id="encodercontainer">
@@ -78,24 +83,27 @@
                 {
                     case 1:
                         var recording = encoder.Recording;
-                        statestring = 'is currently watching \"' + recording.Title + '\" on Live TV.';
+                        statestring = formatStr('<i18n>Encoder %1 is currently watching "%2" on Live TV.</i18n>',
+                            encoder.Id, recording.Title);
                         break;
                     case 6:
                         var recording = encoder.Recording;
-                        statestring = 'is currently recording \"' + recording.Title + '.\"  This program is being viewed.';
+                        statestring = formatStr('<i18n>Encoder %1 is currently recording "%2."  This program is being viewed.</i18n>',
+                            encoder.Id, recording.Title);
                         break;
                     case 7:
                         var recording = encoder.Recording;
                         var endtime = recording.EndTime.getHours() + ':' + pad(recording.EndTime.getMinutes());
-                        statestring = 'is currently recording \"' + recording.Title + '.\"  This recording will end at ' + endtime + '.';
+                        statestring = formatStr('<i18n>Encoder %1 is currently recording "%2."  This recording will end at %3.</i18n>',
+                            encoder.Id, recording.Title, endtime);
                         break;
                     default:
-                        statestring = 'is currently idle.';
+                        statestring = formatStr('<i18n>Encoder %1 is currently idle.</i18n>',
+                            encoder.Id);
                         break;
                 }
-%>
-                <li>Encoder <%= encoder.Id + " " + statestring %></li>
-<%
+
+                os.writeln("<li>" + statestring + "</li>");
             }
 %>
 

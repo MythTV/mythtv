@@ -157,6 +157,7 @@ QString AudioPlayer::ReinitAudio(void)
         VERBOSE(VB_IMPORTANT, LOC + "Enabling Audio");
         m_no_audio_out = false;
     }
+
     if (m_muted_on_creation)
     {
         SetMuteState(kMuteAll);
@@ -339,9 +340,9 @@ bool AudioPlayer::ToggleUpmix(void)
 
 void AudioPlayer::SetStretchFactor(float factor)
 {
+    m_stretchfactor = factor;
     if (!m_audioOutput)
         return;
-    m_stretchfactor = factor;
     QMutexLocker lock(&m_lock);
     m_audioOutput->SetStretchFactor(m_stretchfactor);
 }
@@ -404,6 +405,13 @@ bool AudioPlayer::CanPassthrough(int samplerate, int channels,
     if (!m_audioOutput)
         return false;
     return m_audioOutput->CanPassthrough(samplerate, channels, codec, profile);
+}
+
+bool AudioPlayer::CanDownmix(void)
+{
+    if (!m_audioOutput)
+        return false;
+    return m_audioOutput->CanDownmix();
 }
 
 /*
