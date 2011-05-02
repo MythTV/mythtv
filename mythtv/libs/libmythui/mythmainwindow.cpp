@@ -534,6 +534,8 @@ void MythMainWindow::ShowPainterWindow(void)
 {
     if (d->paintwin)
         d->paintwin->show();
+    if (d->render)
+        d->render->Release();
 }
 
 void MythMainWindow::HidePainterWindow(void)

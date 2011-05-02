@@ -107,6 +107,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
 
     virtual void makeCurrent();
     virtual void doneCurrent();
+    virtual void Release(void);
 
     void  Init(void);
 

@@ -100,6 +100,12 @@ void MythRenderOpenGL::doneCurrent()
     m_lock->unlock();
 }
 
+void MythRenderOpenGL::Release(void)
+{
+    while (m_lock_level > 0)
+        doneCurrent();
+}
+
 void MythRenderOpenGL::MoveResizeWindow(const QRect &rect)
 {
     QWidget *parent = (QWidget*)this->device();

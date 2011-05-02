@@ -51,6 +51,7 @@ class MythRender
     RenderType Type(void)       { return m_type;    }
     bool  IsErrored(void) const { return m_errored; }
     QSize GetSize(void) const   { return m_size;    }
+    virtual void Release(void)  { }
 
   protected:
     virtual  ~MythRender() { }
