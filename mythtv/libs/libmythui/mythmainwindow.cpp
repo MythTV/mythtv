@@ -641,7 +641,7 @@ void MythMainWindow::animate(void)
         }
     }
 
-    if (redraw)
+    if (redraw && !(d->render && d->render->IsShared()))
         d->paintwin->update(d->repaintRegion);
 
     for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
@@ -701,6 +701,17 @@ void MythMainWindow::drawScreen(void)
         }
     }
 
+    if (!(d->render && d->render->IsShared()))
+        draw();
+
+    d->repaintRegion = QRegion(QRect(0, 0, 0, 0));
+}
+
+void MythMainWindow::draw(void)
+{
+    if (!d->painter)
+        return;
+
     d->painter->Begin(d->paintwin);
 
     QVector<QRect> rects = d->repaintRegion.rects();
@@ -729,8 +740,6 @@ void MythMainWindow::drawScreen(void)
     }
 
     d->painter->End();
-
-    d->repaintRegion = QRegion(QRect(0, 0, 0, 0));
 }
 
 void MythMainWindow::closeEvent(QCloseEvent *e)

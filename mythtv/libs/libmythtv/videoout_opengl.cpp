@@ -423,6 +423,9 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
         gl_context->SetBackground(0, 0, 0, 255);
     gl_context->ClearFramebuffer();
 
+    if (gl_context->IsShared() && GetMythMainWindow() && window.IsEmbedding())
+        GetMythMainWindow()->draw();
+
     if (gl_videochain)
     {
         gl_videochain->SetVideoRect(vsz_enabled ? vsz_desired_display_rect :

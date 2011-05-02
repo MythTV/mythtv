@@ -121,6 +121,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     uint PushDrawDisabled(void);
     uint PopDrawDisabled(void);
     void SetEffectsEnabled(bool enable);
+    void draw(void);
 
   public slots:
     void mouseTimeout();
