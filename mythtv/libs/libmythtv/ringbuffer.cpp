@@ -772,11 +772,18 @@ void RingBuffer::run(void)
                     LOC + QString("safe_read(...@%1, %2) -- begin")
                     .arg(rbwpos).arg(totfree));
 
+            MythTimer sr_timer;
+            sr_timer.start();
+
             read_return = safe_read(readAheadBuffer + rbwpos, totfree);
 
-            VERBOSE(VB_FILE|VB_EXTRA, LOC +
-                    QString("safe_read(...@%1, %2) -> %3")
-                    .arg(rbwpos).arg(totfree).arg(read_return));
+            int sr_elapsed = sr_timer.elapsed();
+            VERBOSE((sr_elapsed > 1000) ? VB_IMPORTANT :
+                    (sr_elapsed > 500) ? VB_FILE : VB_FILE|VB_EXTRA,
+                    (sr_elapsed > 500 ? LOC_WARN : LOC) +
+                    QString("safe_read(...@%1, %2) -> %3, took %4 ms")
+                    .arg(rbwpos).arg(totfree).arg(read_return)
+                    .arg(sr_elapsed));
 
             rbwlock.unlock();
         }

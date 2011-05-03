@@ -1939,6 +1939,7 @@ void MythPlayer::SetBuffering(bool new_buffering)
         VERBOSE(VB_PLAYBACK, LOC + "Waiting for video buffers...");
         buffering = true;
         buffering_start = QTime::currentTime();
+        buffering_last_msg = QTime::currentTime();
     }
     else if (buffering && !new_buffering)
     {
@@ -1959,16 +1960,18 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
         SetBuffering(true);
         usleep(frame_interval >> 3);
         int waited_for = buffering_start.msecsTo(QTime::currentTime());
-        if ((waited_for & 100) == 100)
+        int last_msg = buffering_last_msg.msecsTo(QTime::currentTime());
+        if (last_msg > 100)
         {
             VERBOSE(VB_IMPORTANT, LOC +
-                    QString("Waited 100ms for video frames from decoder %1")
-                    .arg(videoOutput->GetFrameStatus()));
+                    QString("Waited %1ms for video buffers %2")
+                    .arg(waited_for).arg(videoOutput->GetFrameStatus()));
+            buffering_last_msg = QTime::currentTime();
             if (audio.IsBufferAlmostFull())
             {
                 // We are likely to enter this condition
                 // if the audio buffer was too full during GetFrame in AVFD
-                VERBOSE(VB_AUDIO, LOC + QString("Resetting audio buffer"));
+                VERBOSE(VB_AUDIO, LOC + "Resetting audio buffer");
                 audio.Reset();
             }
         }
