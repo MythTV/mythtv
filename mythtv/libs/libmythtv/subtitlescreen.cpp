@@ -30,11 +30,22 @@ SubtitleScreen::SubtitleScreen(MythPlayer *player, const char * name,
     m_708fontSizes[1] = 45;
     m_708fontSizes[2] = 60;
     m_removeHTML.setMinimal(true);
+
+#ifdef USING_LIBASS
+    m_assLibrary   = NULL;
+    m_assRenderer  = NULL;
+    m_assTrackNum  = -1;
+    m_assTrack     = NULL;
+    m_assFontCount = 0;
+#endif
 }
 
 SubtitleScreen::~SubtitleScreen(void)
 {
     ClearAllSubtitles();
+#ifdef USING_LIBASS
+    CleanupAssLibrary();
+#endif
 }
 
 void SubtitleScreen::EnableSubtitles(int type)
@@ -96,6 +107,10 @@ void SubtitleScreen::ClearAllSubtitles(void)
 {
     ClearNonDisplayedSubtitles();
     ClearDisplayedSubtitles();
+#ifdef USING_LIBASS
+    if (m_assTrack)
+        ass_flush_events(m_assTrack);
+#endif
 }
 
 void SubtitleScreen::ClearNonDisplayedSubtitles(void)
@@ -292,9 +307,19 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                             QString("AV Sub was %1 ms late").arg(late));
                 }
             }
+#ifdef USING_LIBASS
+            else if (displaysub && rect->type == SUBTITLE_ASS)
+            {
+                InitialiseAssTrack(m_player->GetDecoder()->GetTrack(kTrackTypeSubtitle));
+                AddAssEvent(rect->ass);
+            }
+#endif
         }
         m_subreader->FreeAVSubtitle(subtitle);
     }
+#ifdef USING_LIBASS
+    RenderAssTrack(currentFrame->timecode);
+#endif
     subs->lock.unlock();
 }
 
@@ -1028,3 +1053,261 @@ MythFontProperties* SubtitleScreen::Get708Font(CC708CharacterAttribute attr)
 
     return mythfont;
 }
+
+#ifdef USING_LIBASS
+static void myth_libass_log(int level, const char *fmt, va_list vl, void *ctx)
+{
+    static QString full_line("libass:");
+    static const int msg_len = 255;
+    static QMutex string_lock;
+    uint verbose_level = 0;
+
+    switch (level)
+    {
+        case 0: //MSGL_FATAL
+            verbose_level = VB_IMPORTANT;
+            break;
+        case 1: //MSGL_ERR
+        case 2: //MSGL_WARN
+        case 4: //MSGL_INFO
+            verbose_level = VB_GENERAL;
+            break;
+        case 6: //MSGL_V
+        case 7: //MSGL_DBG2
+        default:
+            return;
+    }
+
+    if (!VERBOSE_LEVEL_CHECK(verbose_level))
+        return;
+
+    string_lock.lock();
+
+    char str[msg_len+1];
+    int bytes = vsnprintf(str, msg_len+1, fmt, vl);
+    // check for truncated messages and fix them
+    if (bytes > msg_len)
+    {
+        VERBOSE(VB_IMPORTANT, QString("libASS log output truncated %1 of %2 bytes written")
+                .arg(msg_len).arg(bytes));
+        str[msg_len-1] = '\n';
+    }
+
+    full_line += QString(str);
+    if (full_line.endsWith("\n"))
+    {
+        full_line.truncate(full_line.length() - 1);
+        VERBOSE(verbose_level, full_line);
+        full_line.truncate(0);
+    }
+    string_lock.unlock();
+}
+
+bool SubtitleScreen::InitialiseAssLibrary(void)
+{
+    if (m_assLibrary && m_assRenderer)
+        return true;
+
+    if (!m_assLibrary)
+    {
+        m_assLibrary = ass_library_init();
+        if (!m_assLibrary)
+            return false;
+
+        ass_set_message_cb(m_assLibrary, myth_libass_log, NULL);
+        ass_set_extract_fonts(m_assLibrary, true);
+        VERBOSE(VB_PLAYBACK, LOC + QString("Initialised libass object."));
+    }
+
+    LoadAssFonts();
+
+    if (!m_assRenderer)
+    {
+        m_assRenderer = ass_renderer_init(m_assLibrary);
+        if (!m_assRenderer)
+            return false;
+
+        ass_set_fonts(m_assRenderer, NULL, "sans-serif", 1, NULL, 1);
+        ass_set_hinting(m_assRenderer, ASS_HINTING_LIGHT);
+        VERBOSE(VB_PLAYBACK, LOC + QString("Initialised libass renderer."));
+    }
+
+    return true;
+}
+
+void SubtitleScreen::LoadAssFonts(void)
+{
+    if (!m_assLibrary || !m_player)
+        return;
+
+    uint count = m_player->GetDecoder()->GetTrackCount(kTrackTypeAttachment);
+    if (m_assFontCount == count)
+        return;
+
+    ass_clear_fonts(m_assLibrary);
+    m_assFontCount = 0;
+
+    // TODO these need checking and/or reinitialising after a stream change
+    for (uint i = 0; i < count; ++i)
+    {
+        QByteArray filename;
+        QByteArray font;
+        m_player->GetDecoder()->GetAttachmentData(i, filename, font);
+        ass_add_font(m_assLibrary, filename.data(), font.data(), font.size());
+        VERBOSE(VB_PLAYBACK, LOC + QString("Retrieved font '%1'")
+            .arg(filename.constData()));
+        m_assFontCount++;
+    }
+}
+
+void SubtitleScreen::CleanupAssLibrary(void)
+{
+    CleanupAssTrack();
+
+    if (m_assRenderer)
+        ass_renderer_done(m_assRenderer);
+    m_assRenderer = NULL;
+
+    if (m_assLibrary)
+    {
+        ass_clear_fonts(m_assLibrary);
+        m_assFontCount = 0;
+        ass_library_done(m_assLibrary);
+    }
+    m_assLibrary = NULL;
+}
+
+void SubtitleScreen::InitialiseAssTrack(int tracknum)
+{
+    if (!InitialiseAssLibrary() || !m_player)
+        return;
+
+    if (tracknum == m_assTrackNum && m_assTrack)
+        return;
+
+    LoadAssFonts();
+    CleanupAssTrack();
+    m_assTrack = ass_new_track(m_assLibrary);
+    m_assTrackNum = tracknum;
+
+    QByteArray header = m_player->GetDecoder()->GetSubHeader(tracknum);
+    if (!header.isNull())
+        ass_process_codec_private(m_assTrack, header.data(), header.size());
+
+    m_safeArea = m_player->getVideoOutput()->GetMHEGBounds();
+    ResizeAssRenderer();
+}
+
+void SubtitleScreen::CleanupAssTrack(void)
+{
+    if (m_assTrack)
+        ass_free_track(m_assTrack);
+    m_assTrack = NULL;
+}
+
+void SubtitleScreen::AddAssEvent(char *event)
+{
+    if (m_assTrack && event)
+        ass_process_data(m_assTrack, event, strlen(event));
+}
+
+void SubtitleScreen::ResizeAssRenderer(void)
+{
+    // TODO this probably won't work properly for anamorphic content and XVideo
+    ass_set_frame_size(m_assRenderer, m_safeArea.width(), m_safeArea.height());
+    ass_set_margins(m_assRenderer, 0, 0, 0, 0);
+    ass_set_use_margins(m_assRenderer, true);
+    ass_set_font_scale(m_assRenderer, 1.0);
+}
+
+void SubtitleScreen::RenderAssTrack(uint64_t timecode)
+{
+    if (!m_player || !m_assRenderer || !m_assTrack)
+        return;
+
+    VideoOutput *vo = m_player->getVideoOutput();
+    if (!vo )
+        return;
+
+    QRect oldscreen = m_safeArea;
+    m_safeArea = vo->GetMHEGBounds();
+    if (oldscreen != m_safeArea)
+        ResizeAssRenderer();
+
+    int changed = 0;
+    ASS_Image *images = ass_render_frame(m_assRenderer, m_assTrack,
+                                         timecode, &changed);
+    if (!changed)
+        return;
+
+    MythPainter *osd_painter = vo->GetOSDPainter();
+    if (!osd_painter)
+        return;
+
+    int count = 0;
+    DeleteAllChildren();
+    SetRedraw();
+    while (images)
+    {
+        if (images->w == 0 || images->h == 0)
+        {
+            images = images->next;
+            continue;
+        }
+
+        uint8_t alpha = images->color & 0xFF;
+        uint8_t blue = images->color >> 8 & 0xFF;
+        uint8_t green = images->color >> 16 & 0xFF;
+        uint8_t red = images->color >> 24 & 0xFF;
+
+        if (alpha == 255)
+        {
+            images = images->next;
+            continue;
+        }
+
+        QSize img_size(images->w, images->h);
+        QRect img_rect(images->dst_x,images->dst_y,
+                       images->w, images->h);
+        QImage qImage(img_size, QImage::Format_ARGB32);
+        qImage.fill(0x00000000);
+
+        unsigned char *src = images->bitmap;
+        for (int y = 0; y < images->h; ++y)
+        {
+            for (int x = 0; x < images->w; ++x)
+            {
+                uint8_t value = src[x];
+                if (value)
+                {
+                    uint32_t pixel = (value * (255 - alpha) / 255 << 24) |
+                                     (red << 16) | (green << 8) | blue;
+                    qImage.setPixel(x, y, pixel);
+                }
+            }
+            src += images->stride;
+        }
+
+        MythImage* image = NULL;
+        MythUIImage *uiimage = NULL;
+
+        if (osd_painter)
+            image = osd_painter->GetFormatImage();
+
+        if (image)
+        {
+            image->Assign(qImage);
+            QString name = QString("asssub%1").arg(count);
+            uiimage = new MythUIImage(this, name);
+            if (uiimage)
+            {
+                m_refreshArea = true;
+                uiimage->SetImage(image);
+                uiimage->SetArea(MythRect(img_rect));
+            }
+        }
+        images = images->next;
+        count++;
+    }
+}
+#endif // USING_LIBASS
