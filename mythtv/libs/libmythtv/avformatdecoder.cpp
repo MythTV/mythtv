@@ -3365,6 +3365,19 @@ QString AvFormatDecoder::GetXDS(const QString &key) const
     return ccd608->GetXDS(key);
 }
 
+QByteArray AvFormatDecoder::GetSubHeader(uint trackNo) const
+{
+    if (trackNo >= tracks[kTrackTypeSubtitle].size())
+        return QByteArray();
+
+    int index = tracks[kTrackTypeSubtitle][trackNo].av_stream_index;
+    if (!ic->streams[index]->codec)
+        return QByteArray();
+
+    return QByteArray((char *)ic->streams[index]->codec->subtitle_header,
+                      ic->streams[index]->codec->subtitle_header_size);
+}
+
 bool AvFormatDecoder::SetAudioByComponentTag(int tag)
 {
     for (uint i = 0; i < tracks[kTrackTypeAudio].size(); i++)
