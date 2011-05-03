@@ -201,7 +201,7 @@ MythPlayer::MythPlayer(bool muted)
       avsync_adjustment(0),         avsync_avg(0),
       refreshrate(0),
       lastsync(false),              repeat_delay(0),
-      disp_timecode(0),
+      disp_timecode(0),             avsync_audiopaused(false),
       // Time Code stuff
       prevtc(0),                    prevrp(0),
       savedAudioTimecodeOffset(0),
@@ -1665,10 +1665,22 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         {
             // If we are using software decoding, skip this frame altogether.
             VERBOSE(VB_PLAYBACK, LOC + dbg + "dropping frame to catch up.");
+            // Pause the audio if necessary
+            if (!using_null_videoout && !audio.IsPaused())
+            {
+                audio.Pause(true);
+                avsync_audiopaused = true;
+            }
         }
     }
     else if (!using_null_videoout)
     {
+        if (avsync_audiopaused)
+        {
+            avsync_audiopaused = false;
+            audio.Pause(false);
+        }
+
         // if we get here, we're actually going to do video output
         osdLock.lock();
         videoOutput->PrepareFrame(buffer, ps, osd);
