@@ -31,6 +31,7 @@ typedef enum TrackTypes
     kTrackTypeTeletextCaptions,
     kTrackTypeTeletextMenu,
     kTrackTypeRawText,
+    kTrackTypeAttachment,
     kTrackTypeCount,
 
     kTrackTypeTextSubtitle,
@@ -195,6 +196,8 @@ class DecoderBase
 
     virtual QString GetXDS(const QString&) const { return QString::null; }
     virtual QByteArray GetSubHeader(uint trackNo) const { return QByteArray(); }
+    virtual void GetAttachmentData(uint trackNo, QByteArray &filename,
+                                   QByteArray &data) {}
 
     // MHEG/MHI stuff
     virtual bool SetAudioByComponentTag(int) { return false; }

@@ -1689,6 +1689,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     bitrate       = 0;
     fps           = 0;
 
+    tracks[kTrackTypeAttachment].clear();
     tracks[kTrackTypeAudio].clear();
     tracks[kTrackTypeSubtitle].clear();
     tracks[kTrackTypeTeletextCaptions].clear();
@@ -1909,6 +1910,16 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 ScanTeletextCaptions(i);
                 bitrate += enc->bit_rate;
                 VERBOSE(VB_PLAYBACK, LOC + QString("data codec (%1)")
+                        .arg(ff_codec_type_string(enc->codec_type)));
+                break;
+            }
+            case CODEC_TYPE_ATTACHMENT:
+            {
+                if (enc->codec_id == CODEC_ID_TTF)
+                   tracks[kTrackTypeAttachment].push_back(
+                       StreamInfo(i, 0, 0, ic->streams[i]->id, 0));
+                bitrate += enc->bit_rate;
+                VERBOSE(VB_PLAYBACK, LOC + QString("Attachment codec (%1)")
                         .arg(ff_codec_type_string(enc->codec_type)));
                 break;
             }
@@ -3376,6 +3387,19 @@ QByteArray AvFormatDecoder::GetSubHeader(uint trackNo) const
 
     return QByteArray((char *)ic->streams[index]->codec->subtitle_header,
                       ic->streams[index]->codec->subtitle_header_size);
+}
+
+void AvFormatDecoder::GetAttachmentData(uint trackNo, QByteArray &filename,
+                                        QByteArray &data)
+{
+    if (trackNo >= tracks[kTrackTypeAttachment].size())
+        return;
+
+    int index = tracks[kTrackTypeAttachment][trackNo].av_stream_index;
+    // TODO deprecated - use AVMetaData
+    filename  = QByteArray(ic->streams[index]->filename);
+    data      = QByteArray((char *)ic->streams[index]->codec->extradata,
+                           ic->streams[index]->codec->extradata_size);
 }
 
 bool AvFormatDecoder::SetAudioByComponentTag(int tag)
