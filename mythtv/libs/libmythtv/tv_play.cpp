@@ -505,11 +505,11 @@ void TV::InitKeys(void)
             "Switch to the next favorite channel"), "/");
     REG_KEY("TV Playback", "PREVCHAN", QT_TRANSLATE_NOOP("MythControls",
             "Switch to the previous channel"), "H");
-    REG_KEY("TV Playback", "JUMPFFWD", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_JUMPFFWD, QT_TRANSLATE_NOOP("MythControls",
             "Jump ahead"), "PgDown");
-    REG_KEY("TV Playback", "JUMPRWND", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_JUMPRWND, QT_TRANSLATE_NOOP("MythControls",
             "Jump back"), "PgUp");
-    REG_KEY("TV Playback", "JUMPBKMRK", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_JUMPBKMRK, QT_TRANSLATE_NOOP("MythControls",
             "Jump to bookmark"), "K");
     REG_KEY("TV Playback", "FFWDSTICKY", QT_TRANSLATE_NOOP("MythControls",
             "Fast Forward (Sticky) or Forward one frame while paused"), ">,.");
@@ -527,7 +527,7 @@ void TV::InitKeys(void)
             "Skip Commercial"), "Z,End");
     REG_KEY("TV Playback", "SKIPCOMMBACK", QT_TRANSLATE_NOOP("MythControls",
             "Skip Commercial (Reverse)"), "Q,Home");
-    REG_KEY("TV Playback", "JUMPSTART", QT_TRANSLATE_NOOP("MythControls",
+    REG_KEY("TV Playback", ACTION_JUMPSTART, QT_TRANSLATE_NOOP("MythControls",
             "Jump to the start of the recording."), "Ctrl+B");
     REG_KEY("TV Playback", "TOGGLEBROWSE", QT_TRANSLATE_NOOP("MythControls",
             "Toggle channel browse mode"), "O");
@@ -3572,9 +3572,9 @@ bool TV::ManualZoomHandleAction(PlayerContext *actx, const QStringList &actions)
     }
     else if (has_action(ACTION_SELECT, actions))
         SetManualZoom(actx, false, tr("Zoom Committed"));
-    else if (has_action("JUMPFFWD", actions))
+    else if (has_action(ACTION_JUMPFFWD, actions))
         actx->player->Zoom(kZoomIn);
-    else if (has_action("JUMPRWND", actions))
+    else if (has_action(ACTION_JUMPRWND, actions))
         actx->player->Zoom(kZoomOut);
     else
     {
@@ -3759,7 +3759,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
             }
         }
     }
-    else if (has_action("JUMPRWND", actions))
+    else if (has_action(ACTION_JUMPRWND, actions))
     {
         if (isDVD)
             DVDJumpBack(ctx);
@@ -3768,7 +3768,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         else
             DoSeek(ctx, -ctx->jumptime * 60, tr("Jump Back"));
     }
-    else if (has_action("JUMPFFWD", actions))
+    else if (has_action(ACTION_JUMPFFWD, actions))
     {
         if (isDVD)
             DVDJumpForward(ctx);
@@ -3777,7 +3777,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         else
             DoSeek(ctx, ctx->jumptime * 60, tr("Jump Ahead"));
     }
-    else if (has_action("JUMPBKMRK", actions))
+    else if (has_action(ACTION_JUMPBKMRK, actions))
     {
         ctx->LockDeletePlayer(__FILE__, __LINE__);
         long long bookmark = ctx->player->GetBookmark();
@@ -3789,7 +3789,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         if (bookmark > rate)
             DoSeek(ctx, seekloc, tr("Jump to Bookmark"));
     }
-    else if (has_action("JUMPSTART",actions))
+    else if (has_action(ACTION_JUMPSTART,actions))
     {
         long long seekloc = +1;
         ctx->LockDeletePlayer(__FILE__, __LINE__);
