@@ -3760,23 +3760,9 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         }
     }
     else if (has_action(ACTION_JUMPRWND, actions))
-    {
-        if (isDVD)
-            DVDJumpBack(ctx);
-        else if (GetNumChapters(ctx) > 0)
-            DoJumpChapter(ctx, -1);
-        else
-            DoSeek(ctx, -ctx->jumptime * 60, tr("Jump Back"));
-    }
+        DoJumpRWND(ctx);
     else if (has_action(ACTION_JUMPFFWD, actions))
-    {
-        if (isDVD)
-            DVDJumpForward(ctx);
-        else if (GetNumChapters(ctx) > 0)
-            DoJumpChapter(ctx, 9999);
-        else
-            DoSeek(ctx, ctx->jumptime * 60, tr("Jump Ahead"));
-    }
+        DoJumpFFWD(ctx);
     else if (has_action(ACTION_JUMPBKMRK, actions))
     {
         ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -4166,12 +4152,8 @@ bool TV::ActivePostQHandleAction(PlayerContext *ctx, const QStringList &actions)
             else
                 ChangeChannel(ctx, CHANNEL_DIRECTION_UP);
         }
-        else if (isdvd)
-            DVDJumpBack(ctx);
-        else if (GetNumChapters(ctx) > 0)
-            DoJumpChapter(ctx, -1);
         else
-            DoSeek(ctx, -ctx->jumptime * 60, tr("Jump Back"));
+            DoJumpRWND(ctx);
     }
     else if (has_action(ACTION_CHANNELDOWN, actions))
     {
@@ -4182,12 +4164,8 @@ bool TV::ActivePostQHandleAction(PlayerContext *ctx, const QStringList &actions)
             else
                 ChangeChannel(ctx, CHANNEL_DIRECTION_DOWN);
         }
-        else if (isdvd)
-            DVDJumpForward(ctx);
-        else if (GetNumChapters(ctx) > 0)
-            DoJumpChapter(ctx, 9999);
         else
-            DoSeek(ctx, ctx->jumptime * 60, tr("Jump Ahead"));
+            DoJumpFFWD(ctx);
     }
     else if (has_action("DELETE", actions) && !islivetv)
     {
@@ -9417,6 +9395,10 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         PrepareToExitPlayer(actx, __LINE__, false);
         SetExitPlayer(true, true);
     }
+    else if (action == ACTION_JUMPFFWD)
+        DoJumpFFWD(actx);
+    else if (action == ACTION_JUMPRWND)
+        DoJumpRWND(actx);
     else if (action.startsWith("DEINTERLACER"))
         HandleDeinterlacer(actx, action);
     else if (action == "TOGGLEMANUALZOOM")
@@ -10153,7 +10135,9 @@ void TV::FillOSDMenuNavigate(const PlayerContext *ctx, OSD *osd,
     }
 
     bool show = isdvd || num_chapters || num_titles || previouschan ||
-                isrecording || num_angles;
+                isrecording || num_angles ||
+                (!(num_chapters || isdvd || isbd));
+
     if (category == "MAIN")
     {
         if (show)
@@ -10166,6 +10150,11 @@ void TV::FillOSDMenuNavigate(const PlayerContext *ctx, OSD *osd,
     {
         backaction = "MAIN";
         currenttext = tr("Navigate");
+        if (!num_chapters && !isdvd && !isbd)
+        {
+            osd->DialogAddButton(tr("Jump Ahead"), ACTION_JUMPFFWD, false, false);
+            osd->DialogAddButton(tr("Jump Back"), ACTION_JUMPRWND, false, false);
+        }
         if (isrecording)
         {
             osd->DialogAddButton(tr("Commercial Auto-Skip"),
@@ -11177,6 +11166,26 @@ void TV::ITVRestart(PlayerContext *ctx, bool isLive)
     if (ctx->player)
         ctx->player->ITVRestart(chanid, cardid, isLive);
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+}
+
+void TV::DoJumpFFWD(PlayerContext *ctx)
+{
+    if (GetState(ctx) == kState_WatchingDVD)
+        DVDJumpForward(ctx);
+    else if (GetNumChapters(ctx) > 0)
+        DoJumpChapter(ctx, 9999);
+    else
+        DoSeek(ctx, ctx->jumptime * 60, tr("Jump Ahead"));
+}
+
+void TV::DoJumpRWND(PlayerContext *ctx)
+{
+    if (GetState(ctx) == kState_WatchingDVD)
+        DVDJumpBack(ctx);
+    else if (GetNumChapters(ctx) > 0)
+        DoJumpChapter(ctx, -1);
+    else
+        DoSeek(ctx, -ctx->jumptime * 60, tr("Jump Back"));
 }
 
 /*  \fn TV::DVDJumpBack(PlayerContext*)
