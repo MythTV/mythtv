@@ -297,6 +297,11 @@ using_frontend {
         LIBS += -lcrystalhd
     }
 
+    using_libass {
+        DEFINES += USING_LIBASS
+        LIBS    += -lass
+    }
+
     macx {
         HEADERS += privatedecoder_vda.h privatedecoder_vda_defs.h
         SOURCES += privatedecoder_vda.cpp

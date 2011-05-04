@@ -125,6 +125,7 @@ Advanced options (experts only):
   --disable-opengl-video   disable OpenGL based video display
   --disable-quartz-video   disable Mac OS X CoreVideo based video display
   --disable-directfb       disable DirectFB (Linux non-X11 video)
+  --disable-libass         disable libass SSA/ASS subtitle support
 
   --enable-mac-bundle      produce standalone OS X apps (e.g. mythfrontend.app)
 
@@ -1976,6 +1977,7 @@ enable hdpvr
 enable iptv
 enable ivtv
 enable lamemp3
+enable libass
 enable libxml2
 enable libudf
 enable lirc
@@ -4045,6 +4047,9 @@ fi
 enabled libfftw3 && check_lib2 fftw3.h fftw_init_threads -lfftw3_threads -lfftw3f -lfftw3 ||
     disable libfftw3
 
+# ass_flush_events was added in 0.9.10
+enabled libass && check_lib2 ass/ass.h ass_flush_events -lass || disable libass
+
 if enabled libxml2 ; then
    if pkg-config --exists libxml-2.0 ; then
         libxml2_path=`pkg-config --cflags-only-I libxml-2.0|sed -n "s/-I\([^ ]*\) *$/\1/p"`
@@ -4472,6 +4477,7 @@ fi
     echo "DXVA2 support             ${dxva2-no}"
   fi
   echo "MHEG support              ${mheg}"
+  echo "libass subtitle support   ${libass-no}"
   echo
 fi
 
@@ -4759,6 +4765,10 @@ fi
 
 if enabled mheg; then
     append CCONFIG "using_mheg"
+fi
+
+if enabled libass; then
+    append CCONFIG "using_libass"
 fi
 
 if enabled appleremote; then

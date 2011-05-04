@@ -14,6 +14,7 @@
 #include "fileringbuffer.h"
 #include "mythcontext.h"
 #include "remotefile.h"
+#include "mythconfig.h" // gives us HAVE_POSIX_FADVISE
 #include "compat.h"
 #include "util.h"
 
@@ -252,8 +253,8 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
                 {
                     if (0 == lseek(fd2, 0, SEEK_SET))
                     {
-                        posix_fadvise(fd2, 0, 0, POSIX_FADV_SEQUENTIAL);
-                        posix_fadvise(fd2, 0, 1*1024*1024, POSIX_FADV_WILLNEED);
+                        posix_fadvise(fd2, 0, 0,        POSIX_FADV_SEQUENTIAL);
+                        posix_fadvise(fd2, 0, 128*1024, POSIX_FADV_WILLNEED);
                         lasterror = 0;
                         break;
                     }
@@ -601,10 +602,8 @@ long long FileRingBuffer::Seek(long long pos, int whence, bool has_lock)
                 else
                 {
                     ret = lseek64(fd2, internalreadpos, SEEK_SET);
-                    posix_fadvise(fd2, 0,
-                                  internalreadpos, POSIX_FADV_DONTNEED);
                     posix_fadvise(fd2, internalreadpos,
-                                  1*1024*1024, POSIX_FADV_WILLNEED);
+                                  128*1024, POSIX_FADV_WILLNEED);
                 }
                 VERBOSE(VB_FILE, LOC +
                         QString("Seek to %1 from ignore pos %2 returned %3")
@@ -685,10 +684,7 @@ long long FileRingBuffer::Seek(long long pos, int whence, bool has_lock)
             if (remotefile)
                 ret = remotefile->Seek(ignorereadpos, SEEK_SET);
             else
-            {
                 ret = lseek64(fd2, ignorereadpos, SEEK_SET);
-                posix_fadvise(fd2, ignorereadpos, 250000, POSIX_FADV_WILLNEED);
-            }
 
             if (ret < 0)
             {
@@ -752,11 +748,6 @@ long long FileRingBuffer::Seek(long long pos, int whence, bool has_lock)
     else
     {
         ret = lseek64(fd2, pos, whence);
-        if (ret >= 0)
-        {
-            posix_fadvise(fd2, 0,   ret,         POSIX_FADV_DONTNEED);
-            posix_fadvise(fd2, ret, 1*1024*1024, POSIX_FADV_WILLNEED);
-        }
     }
 
     if (ret >= 0)

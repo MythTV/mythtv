@@ -58,6 +58,7 @@ typedef struct hdmv_vm_event_s {
  */
 
 struct bd_registers_s;
+struct indx_root_s;
 
 /*
  *
@@ -65,7 +66,7 @@ struct bd_registers_s;
 
 typedef struct hdmv_vm_s HDMV_VM;
 
-BD_PRIVATE HDMV_VM *hdmv_vm_init(const char *disc_root, struct bd_registers_s *regs);
+BD_PRIVATE HDMV_VM *hdmv_vm_init(const char *disc_root, struct bd_registers_s *regs, struct indx_root_s *indx);
 BD_PRIVATE void     hdmv_vm_free(HDMV_VM **p);
 
 BD_PRIVATE int      hdmv_vm_select_object(HDMV_VM *p, int object);
@@ -79,7 +80,35 @@ BD_PRIVATE int      hdmv_vm_running(HDMV_VM *p);
 #define HDMV_TITLE_SEARCH_MASK  0x02
 BD_PRIVATE uint32_t hdmv_vm_get_uo_mask(HDMV_VM *p);
 
-BD_PRIVATE int      hdmv_vm_suspend(HDMV_VM *p);
+/**
+ *
+ *  Suspend playlist playback
+ *
+ *  This function assumes playlist is currently playing and
+ *  movie object execution is suspended at PLAY_PL instruction.
+ *
+ *  If resume_intention_flag of current movie object is 1:
+ *    Copy playback position PSRs to backup registers
+ *    (suspend playlist playback at current position)
+ *  If resume_intention_flag of current movie object is 0:
+ *    Discard current movie object
+ *
+ * @param p  HDMV_VM object
+ * @return 0 on success, -1 if error
+ */
+BD_PRIVATE int      hdmv_vm_suspend_pl(HDMV_VM *p);
+
+/**
+ *
+ *  Resume HDMV execution
+ *
+ *  Continue execution of movie object after playlist playback.
+ *  Do not restore backup PSRs.
+ *  This function is called when playlist playback ends.
+ *
+ * @param p  HDMV_VM object
+ * @return 0 on success, -1 if error
+ */
 BD_PRIVATE int      hdmv_vm_resume(HDMV_VM *p);
 
 #endif // _HDMV_VM_H_

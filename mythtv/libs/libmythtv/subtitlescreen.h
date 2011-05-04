@@ -3,6 +3,12 @@
 
 #include <QFont>
 
+#ifdef USING_LIBASS
+extern "C" {
+#include <ass/ass.h>
+}
+#endif
+
 #include "mythscreentype.h"
 #include "subtitlereader.h"
 #include "mythplayer.h"
@@ -59,6 +65,23 @@ class SubtitleScreen : public MythScreenType
     bool               m_refreshArea;
     QHash<int,QList<MythUIType*> > m_708imageCache;
     int                m_fontStretch;
+
+#ifdef USING_LIBASS
+    bool InitialiseAssLibrary(void);
+    void LoadAssFonts(void);
+    void CleanupAssLibrary(void);
+    void InitialiseAssTrack(int tracknum);
+    void CleanupAssTrack(void);
+    void AddAssEvent(char *event);
+    void ResizeAssRenderer(void);
+    void RenderAssTrack(uint64_t timecode);
+
+    ASS_Library       *m_assLibrary;
+    ASS_Renderer      *m_assRenderer;
+    int                m_assTrackNum;
+    ASS_Track         *m_assTrack;
+    uint               m_assFontCount;
+#endif // USING_LIBASS
 };
 
 #endif // SUBTITLESCREEN_H

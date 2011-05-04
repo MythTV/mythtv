@@ -168,6 +168,9 @@ class AvFormatDecoder : public DecoderBase
     virtual int  GetTeletextDecoderType(void) const;
 
     virtual QString GetXDS(const QString&) const;
+    virtual QByteArray GetSubHeader(uint trackNo) const;
+    virtual void GetAttachmentData(uint trackNo, QByteArray &filename,
+                                   QByteArray &data);
 
     // MHEG stuff
     virtual bool SetAudioByComponentTag(int tag);
