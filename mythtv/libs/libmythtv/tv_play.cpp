@@ -3704,13 +3704,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
     else if (has_action(ACTION_PLAY, actions))
         DoPlay(ctx);
     else if (has_action(ACTION_PAUSE, actions))
-    {
-        if (ContextIsPaused(ctx, __FILE__, __LINE__))
-            SendMythSystemPlayEvent("PLAY_UNPAUSED", ctx->playingInfo);
-        else
-            SendMythSystemPlayEvent("PLAY_PAUSED", ctx->playingInfo);
         DoTogglePause(ctx, true);
-    }
     else if (has_action("SPEEDINC", actions) && !isDVDStill)
         ChangeSpeed(ctx, 1);
     else if (has_action("SPEEDDEC", actions) && !isDVDStill)
@@ -5413,10 +5407,20 @@ void TV::DoTogglePauseFinish(PlayerContext *ctx, float time, bool showOSD)
 void TV::DoTogglePause(PlayerContext *ctx, bool showOSD)
 {
     bool ignore = false;
+    bool paused = false;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->player)
+    {
         ignore = ctx->player->GetEditMode();
+        paused = ctx->player->IsPaused();
+    }
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+
+    if (paused)
+        SendMythSystemPlayEvent("PLAY_UNPAUSED", ctx->playingInfo);
+    else
+        SendMythSystemPlayEvent("PLAY_PAUSED", ctx->playingInfo);
+
     if (!ignore)
         DoTogglePauseFinish(ctx, DoTogglePauseStart(ctx), showOSD);
 }
@@ -9406,6 +9410,8 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         ; // exit dialog
     else if (HandleTrackAction(actx, action))
         ;
+    else if (action == ACTION_PAUSE)
+        DoTogglePause(actx, true);
     else if (action == ACTION_STOP)
     {
         PrepareToExitPlayer(actx, __LINE__, false);
@@ -10506,6 +10512,11 @@ void TV::FillOSDMenuPlayback(const PlayerContext *ctx, OSD *osd,
 {
     bool allowPIP = IsPIPSupported(ctx);
     bool allowPBP = IsPBPSupported(ctx);
+    bool ispaused = false;
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    if (ctx->player)
+        ispaused = ctx->player->IsPaused();
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
     if (category == "MAIN")
     {
@@ -10516,6 +10527,9 @@ void TV::FillOSDMenuPlayback(const PlayerContext *ctx, OSD *osd,
     {
         backaction = "MAIN";
         currenttext = tr("Playback");
+
+        osd->DialogAddButton(ispaused ? tr("Play") : tr("Pause"),
+                             ACTION_PAUSE, false, false);
         osd->DialogAddButton(tr("Adjust Time Stretch"),
                              "DIALOG_MENU_TIMESTRETCH_0", true,
                               selected == "TIMESTRETCH");
