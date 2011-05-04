@@ -431,6 +431,8 @@ void TV::InitKeys(void)
 {
     REG_KEY("TV Frontend", ACTION_PLAYBACK, QT_TRANSLATE_NOOP("MythControls",
             "Play Program"), "P");
+    REG_KEY("TV Frontend", ACTION_STOP, QT_TRANSLATE_NOOP("MythControls",
+            "Stop Program"), "");
     REG_KEY("TV Frontend", ACTION_TOGGLERECORD, QT_TRANSLATE_NOOP("MythControls",
             "Toggle recording status of current program"), "R");
     REG_KEY("TV Frontend", ACTION_DAYLEFT, QT_TRANSLATE_NOOP("MythControls",
@@ -3849,6 +3851,11 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
             GetMythMainWindow()->ScreenShot();
         }
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+    }
+    else if (has_action(ACTION_STOP, actions))
+    {
+        PrepareToExitPlayer(ctx, __LINE__, false);
+        SetExitPlayer(true, true);
     }
     else if (has_action(ACTION_EXITSHOWNOPROMPTS, actions))
     {
@@ -9399,6 +9406,11 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         ; // exit dialog
     else if (HandleTrackAction(actx, action))
         ;
+    else if (action == ACTION_STOP)
+    {
+        PrepareToExitPlayer(actx, __LINE__, false);
+        SetExitPlayer(true, true);
+    }
     else if (action.startsWith("DEINTERLACER"))
         HandleDeinterlacer(actx, action);
     else if (action == "TOGGLEMANUALZOOM")
@@ -11326,11 +11338,11 @@ void TV::ShowOSDStopWatchingRecording(PlayerContext *ctx)
             osd->DialogAddButton(tr("Save this position and go to the menu"),
                                  "DIALOG_VIDEOEXIT_SAVEPOSITIONANDEXIT_0");
             osd->DialogAddButton(tr("Do not save, just exit to the menu"),
-                                 "DIALOG_VIDEOEXIT_JUSTEXIT_0");
+                                 ACTION_STOP);
         }
         else
             osd->DialogAddButton(tr("Exit %1").arg(videotype),
-                                 "DIALOG_VIDEOEXIT_JUSTEXIT_0");
+                                 ACTION_STOP);
 
         if (IsDeleteAllowed(ctx))
             osd->DialogAddButton(tr("Delete this recording"),
@@ -11439,7 +11451,7 @@ void TV::ShowOSDPromptDeleteRecording(PlayerContext *ctx, QString title,
             osd->DialogAddButton(tr("Delete it"),
                                  "DIALOG_VIDEOEXIT_JUSTDELETE_0");
             osd->DialogAddButton(tr("Save it so I can watch it again"),
-                                 "DIALOG_VIDEOEXIT_JUSTEXIT_0", false, true);
+                                 ACTION_STOP, false, true);
         }
         else
         {
@@ -11448,7 +11460,7 @@ void TV::ShowOSDPromptDeleteRecording(PlayerContext *ctx, QString title,
             osd->DialogAddButton(tr("Yes, delete it"),
                                  "DIALOG_VIDEOEXIT_JUSTDELETE_0");
             osd->DialogAddButton(tr("No, keep it, I changed my mind"),
-                                 "DIALOG_VIDEOEXIT_JUSTEXIT_0", false, true);
+                                 ACTION_STOP, false, true);
             if (!paused)
                 osd->DialogBack("", "DIALOG_PLAY_0_0", true);
         }
@@ -11499,11 +11511,6 @@ bool TV::HandleOSDVideoExit(PlayerContext *ctx, QString action)
     else if (action == "KEEPWATCHING" && !near_end)
     {
         DoTogglePause(ctx, true);
-    }
-    else/* (action == "JUSTEXIT")*/
-    {
-        PrepareToExitPlayer(ctx, __LINE__, false);
-        SetExitPlayer(true, true);
     }
 
     return hide;
