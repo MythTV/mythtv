@@ -1856,12 +1856,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 VERBOSE(VB_PLAYBACK, LOC + QString("Using %1 CPUs for decoding")
                         .arg(HAVE_THREADS ? thread_count : 1));
 
-                if (HAVE_THREADS && thread_count > 1)
-                {
-                    if (enc->thread_count > 1)
-                        avcodec_thread_free(enc);
-                    avcodec_thread_init(enc, thread_count);
-                }
+                if (HAVE_THREADS)
+                    enc->thread_count = thread_count;
 
                 InitVideoCodec(ic->streams[i], enc,
                     selectedTrack[kTrackTypeVideo].av_stream_index == (int) i);
