@@ -24,13 +24,12 @@
 
 // MythTV
 #include "mythsocketthread.h"
-#include "mythsocket.h"
+#include "mythbaseutil.h"
 #include "mythverbose.h"
+#include "mythsocket.h"
 
 #define SLOC(a) QString("MythSocketThread(sock 0x%1:%2): ")\
     .arg((quint64)a, 0, 16).arg(a->socket())
-
-static void setup_pipe(int mypipe[2], long flags[2]);
 
 const uint MythSocketThread::kShortWait = 100;
 
@@ -377,40 +376,3 @@ void MythSocketThread::run(void)
 
     VERBOSE(VB_SOCKET, "MythSocketThread: readyread thread exit");
 }
-
-#ifdef USING_MINGW
-static void setup_pipe(int[2], long[2]) {}
-#else
-static void setup_pipe(int mypipe[2], long myflags[2])
-{
-    int pipe_ret = pipe(mypipe);
-    if (pipe_ret < 0)
-    {
-        VERBOSE(VB_IMPORTANT, "Failed to open readyread pipes" + ENO);
-        mypipe[0] = mypipe[1] = -1;
-    }
-    else
-    {
-        errno = 0;
-        long flags = fcntl(mypipe[0], F_GETFL);
-        if (0 == errno)
-        {
-            int ret = fcntl(mypipe[0], F_SETFL, flags|O_NONBLOCK);
-            if (ret < 0)
-                VERBOSE(VB_IMPORTANT, QString("Set pipe flags error")+ENO);
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT, QString("Get pipe flags error") + ENO);
-        }
-
-        for (uint i = 0; i < 2; i++)
-        {
-            errno = 0;
-            flags = fcntl(mypipe[i], F_GETFL);
-            if (0 == errno)
-                myflags[i] = flags;
-        }
-    }
-}
-#endif
