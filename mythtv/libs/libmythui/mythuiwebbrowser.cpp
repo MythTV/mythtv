@@ -567,7 +567,7 @@ bool MythWebView::isVideoFile(const QString &extension)
  */
 MythUIWebBrowser::MythUIWebBrowser(MythUIType *parent, const QString &name)
     : MythUIType(parent, name), m_browser(NULL),
-      m_image(NULL),         m_active(false),
+      m_image(NULL),         m_active(false), m_wasActive(false),
       m_initialized(false),  m_lastUpdateTime(QTime()),
       m_updateInterval(0),   m_zoom(1.0),
       m_bgColor("White"),    m_widgetUrl(QUrl()), m_userCssFile(""),
@@ -641,11 +641,6 @@ void MythUIWebBrowser::Init(void)
             this, SLOT(slotStatusBarMessage(const QString&)));
     connect(m_browser, SIGNAL(linkClicked(const QUrl&)),
             this, SLOT(slotLinkClicked(const QUrl&)));
-
-    connect(this, SIGNAL(TakingFocus()),
-            this, SLOT(slotTakingFocus(void)));
-    connect(this, SIGNAL(LosingFocus()),
-            this, SLOT(slotLosingFocus(void)));
 
     // find what screen we are on
     m_parentScreen = NULL;
@@ -804,26 +799,21 @@ void MythUIWebBrowser::SetActive(bool active)
         return;
 
     m_active = active;
+    m_wasActive = active;
 
     if (m_active)
     {
-        if (m_HasFocus)
-        {
-            m_browser->setUpdatesEnabled(false);
-            m_browser->setFocus();
-            m_browser->show();
-            m_browser->raise();
-            m_browser->setUpdatesEnabled(true);
-        }
+        m_browser->setUpdatesEnabled(false);
+        m_browser->setFocus();
+        m_browser->show();
+        m_browser->raise();
+        m_browser->setUpdatesEnabled(true);
     }
     else
     {
-        if (m_HasFocus)
-        {
-            m_browser->clearFocus();
-            m_browser->hide();
-            UpdateBuffer();
-        }
+        m_browser->clearFocus();
+        m_browser->hide();
+        UpdateBuffer();
     }
 }
 
@@ -998,28 +988,6 @@ void MythUIWebBrowser::slotIconChanged(void)
     emit iconChanged();
 }
 
-void MythUIWebBrowser::slotTakingFocus(void)
-{
-    if (m_active)
-    {
-        m_browser->setUpdatesEnabled(false);
-        m_browser->setFocus();
-        m_browser->show();
-        m_browser->raise();
-        m_browser->setUpdatesEnabled(true);
-    }
-    else
-        UpdateBuffer();
-}
-
-void MythUIWebBrowser::slotLosingFocus(void)
-{
-    m_browser->clearFocus();
-    m_browser->hide();
-
-    UpdateBuffer();
-}
-
 void MythUIWebBrowser::slotTopScreenChanged(MythScreenType* screen)
 {
     (void) screen;
@@ -1038,12 +1006,14 @@ void MythUIWebBrowser::slotTopScreenChanged(MythScreenType* screen)
 
         if (stack->GetTopScreen() == m_parentScreen)
         {
-            SetActive(true);
+            SetActive(m_wasActive);
             break;
         }
         else
         {
+            bool wasActive = m_active;
             SetActive(false);
+            m_wasActive = wasActive;
             break;
         }
     }
