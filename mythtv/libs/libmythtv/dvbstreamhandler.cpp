@@ -259,7 +259,7 @@ void DVBStreamHandler::RunTS(void)
         _device_read_buffer = new DeviceReadBuffer(this);
 
     int remainder = 0;
-    int buffer_size = TSPacket::SIZE * 15000;
+    int buffer_size = TSPacket::kSize * 15000;
     unsigned char *buffer = new unsigned char[buffer_size];
     if (!buffer)
         return;

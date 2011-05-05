@@ -729,7 +729,7 @@ bool LinuxFirewireDevice::SetAVStreamBufferSize(uint size_in_bytes)
         return false;
 
     // Set buffered packets size
-    uint   buffer_size      = max(size_in_bytes, 50 * TSPacket::SIZE);
+    uint   buffer_size      = max(size_in_bytes, 50 * TSPacket::kSize);
     size_t buffered_packets = min(buffer_size / 4, kMaxBufferedPackets);
 
     iec61883_mpeg2_set_buffers(m_priv->avstream, buffered_packets);

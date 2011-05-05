@@ -34,7 +34,7 @@ const unsigned char DEFAULT_PMT_HEADER[12] =
 
 static const uint len_for_alloc[] =
 {
-    TSPacket::PAYLOAD_SIZE
+    TSPacket::kPayloadSize
     - 1 /* for start of field pointer */
     - 3 /* for data before data last byte of pes length */,
     4000,
@@ -263,7 +263,7 @@ ProgramAssociationTable* ProgramAssociationTable::CreateBlank(bool smallPacket)
     memcpy(tspacket->data() + sizeof(TSHeader) + 1/* start of field pointer */,
            DEFAULT_PAT_HEADER, sizeof(DEFAULT_PAT_HEADER));
     PSIPTable psip = PSIPTable::View(*tspacket);
-    psip.SetLength(TSPacket::PAYLOAD_SIZE
+    psip.SetLength(TSPacket::kPayloadSize
                    - 1 /* for start of field pointer */
                    - 3 /* for data before data last byte of pes length */);
     ProgramAssociationTable *pat = new ProgramAssociationTable(psip);
@@ -774,7 +774,7 @@ const char *StreamID::toString(uint streamID)
         return "audio-mp1-layer[1,2,3]"; // EIT, PMT
     case StreamID::MPEG2AudioAmd1:
          return "audio-aac-latm"; // EIT, PMT
-    case StreamID::AACAudio:
+    case StreamID::MPEG2AACAudio:
         return "audio-aac"; // EIT, PMT
     case StreamID::DTSAudio:
         return "audio-dts"; // EIT, PMT
@@ -811,6 +811,91 @@ const char *StreamID::toString(uint streamID)
         return "component name"; //??? PMT
     }
     return "unknown";
+}
+
+QString StreamID::GetDescription(uint stream_id)
+{
+    // valid for some ATSC/DVB stuff too
+    switch (stream_id)
+    {
+        // video
+        case StreamID::MPEG1Video:
+            return "11172-2 MPEG-1 Video";
+        case StreamID::MPEG2Video:
+            return "13818-2 MPEG-2 Video";
+        case StreamID::MPEG4Video:
+            return "14492-2 MPEG-4 Video";
+        case StreamID::H264Video:
+            return "H.264 Video";
+        case StreamID::OpenCableVideo:
+            return "OpenCable Video";
+        case StreamID::VC1Video:
+            return "VC-1 Video";
+
+        // audio
+        case StreamID::MPEG1Audio:
+            return "11172-2 MPEG-1 Audio";
+        case StreamID::MPEG2Audio:
+            return "13818-3 MPEG-2 Audio";
+        case StreamID::MPEG2AACAudio:
+            return "13818-7 AAC MPEG-2 Audio";
+        case StreamID::MPEG2AudioAmd1:
+            return "13818-3 AAC LATM MPEG-2 Audio";
+        case StreamID::AC3Audio:
+            return "AC3 Audio";
+        case StreamID::DTSAudio:
+            return "DTS Audio";
+
+        // DSMCC Object Carousel
+        case StreamID::DSMCC:
+            return "13818-1 DSM-CC";
+        case StreamID::DSMCC_A:
+            return "13818-6 DSM-CC Type A";
+        case StreamID::DSMCC_B:
+            return "13818-6 DSM-CC Type B";
+        case StreamID::DSMCC_C:
+            return "13818-6 DSM-CC Type C";
+        case StreamID::DSMCC_D:
+            return "13818-6 DSM-CC Type D";
+        case StreamID::DSMCC_DL:
+            return "13818-6 Download";
+        case StreamID::MetaDataPES:
+            return "13818-6 Metadata in PES";
+        case StreamID::MetaDataSec:
+            return "13818-6 Metadata in Sections";
+        case StreamID::MetaDataDC:
+            return "13818-6 Metadata in Data Carousel";
+        case StreamID::MetaDataOC:
+            return "13818-6 Metadata in Obj Carousel";
+        case StreamID::MetaDataDL:
+            return "13818-6 Metadata in Download";
+
+        // other
+        case StreamID::PrivSec:
+            return "13818-1 Private Sections";
+        case StreamID::PrivData:
+            return "13818-3 Private Data";
+        case StreamID::MHEG:
+            return "13522 MHEG";
+        case StreamID::H222_1:
+            return "ITU H.222.1";
+        case StreamID::MPEG2Aux:
+            return "13818-1 Aux & ITU H.222.0";
+        case StreamID::FlexMuxPES:
+            return "14496-1 SL/FlexMux in PES";
+        case StreamID::FlexMuxSec:
+            return "14496-1 SL/FlexMux in Sections";
+        case StreamID::MPEG2IPMP:
+            return "13818-10 IPMP";
+        case StreamID::MPEG2IPMP2:
+            return "13818-10 IPMP2";
+
+        case AnyMask:  return QString();
+        case AnyVideo: return "video";
+        case AnyAudio: return "audio";
+    }
+
+    return QString();
 }
 
 QString ProgramMapTable::GetLanguage(uint i) const

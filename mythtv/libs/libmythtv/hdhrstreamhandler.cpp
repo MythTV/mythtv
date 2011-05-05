@@ -240,12 +240,12 @@ void HDHRStreamHandler::RunTS(void)
 
     /* Calculate buffer size */
     uint buffersize = gCoreContext->GetNumSetting(
-        "HDRingbufferSize", 50 * TSPacket::SIZE) * 1024;
+        "HDRingbufferSize", 50 * TSPacket::kSize) * 1024;
     buffersize /= VIDEO_DATA_PACKET_SIZE;
     buffersize *= VIDEO_DATA_PACKET_SIZE;
 
     // Buffer should be at least about 1MB..
-    buffersize = max(49 * TSPacket::SIZE * 128, buffersize);
+    buffersize = max(49 * TSPacket::kSize * 128, buffersize);
 
     /* Create TS socket. */
     if (!hdhomerun_device_stream_start(_hdhomerun_device))

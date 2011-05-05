@@ -469,8 +469,8 @@ void HDHRRecorder::BufferedWrite(const TSPacket &tspacket)
     if (_buffer_packets)
     {
         int idx = _payload_buffer.size();
-        _payload_buffer.resize(idx + TSPacket::SIZE);
-        memcpy(&_payload_buffer[idx], tspacket.data(), TSPacket::SIZE);
+        _payload_buffer.resize(idx + TSPacket::kSize);
+        memcpy(&_payload_buffer[idx], tspacket.data(), TSPacket::kSize);
         return;
     }
 
@@ -484,5 +484,5 @@ void HDHRRecorder::BufferedWrite(const TSPacket &tspacket)
     }
 
     if (ringBuffer)
-        ringBuffer->Write(tspacket.data(), TSPacket::SIZE);
+        ringBuffer->Write(tspacket.data(), TSPacket::kSize);
 }
