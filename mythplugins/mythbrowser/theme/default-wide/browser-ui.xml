@@ -4,7 +4,36 @@
 
     <window name="browser">
         <buttonlist name="pagelist" from="baseselector">
-            <area>20,10,1240,45</area>
+            <area>20,10,1240,44</area>
+            <buttonarea>0,0,1230,44</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,610,44</area>
+                    <imagetype name="favicon">
+                        <area>6,6,32,32</area>
+                        <filename>shared/grid_noimage.png</filename>
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <area>40,2,568,40</area>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+                <state name="selectedactive" from="active">
+                    <shape name="background" from="baseselectedwidgetshape" />
+                </state>
+                <state name="selectedinactive" from="active">
+                    <shape name="background" from="baseinactivewidgetshape" />
+                    <textarea name="buttontext">
+                        <font>basesmallpurple</font>
+                    </textarea>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>1225,2</position>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>1225,22</position>
+            </statetype>
         </buttonlist>
 
         <webbrowser name="webbrowser">
@@ -75,8 +104,9 @@
                     <shape name="background" from="baseselectedwidgetshape" />
                 </state>
                 <state name="selectedinactive" from="active">
+                    <shape name="background" from="baseinactivewidgetshape" />
                    <textarea name="buttontext">
-                        <font>basesmallgrey</font>
+                        <font>basesmallpurple</font>
                     </textarea>
                 </state>
             </statetype>

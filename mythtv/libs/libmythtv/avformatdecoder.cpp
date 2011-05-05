@@ -1052,7 +1052,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     else
         ic->build_index = 0;
 
-    dump_format(ic, 0, filename, 0);
+    av_dump_format(ic, 0, filename, 0);
 
     // print some useful information if playback debugging is on
     if (hasFullPositionMap)
@@ -1857,12 +1857,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 VERBOSE(VB_PLAYBACK, LOC + QString("Using %1 CPUs for decoding")
                         .arg(HAVE_THREADS ? thread_count : 1));
 
-                if (HAVE_THREADS && thread_count > 1)
-                {
-                    if (enc->thread_count > 1)
-                        avcodec_thread_free(enc);
-                    avcodec_thread_init(enc, thread_count);
-                }
+                if (HAVE_THREADS)
+                    enc->thread_count = thread_count;
 
                 InitVideoCodec(ic->streams[i], enc,
                     selectedTrack[kTrackTypeVideo].av_stream_index == (int) i);
@@ -3832,7 +3828,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                                         &data_size, &tmp_pkt);
             frames = data_size /
                 (ctx->channels *
-                 av_get_bits_per_sample_format(ctx->sample_fmt)>>3);
+                 av_get_bits_per_sample_fmt(ctx->sample_fmt)>>3);
             already_decoded = true;
             reselectAudioTrack |= ctx->channels;
         }
@@ -3887,7 +3883,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                                                 &tmp_pkt);
                     frames = data_size /
                         (ctx->channels *
-                         av_get_bits_per_sample_format(ctx->sample_fmt)>>3);
+                         av_get_bits_per_sample_fmt(ctx->sample_fmt)>>3);
                 }
                 else
                     frames = -1;
@@ -3915,7 +3911,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                                             &tmp_pkt);
                 frames = data_size /
                     (ctx->channels *
-                     av_get_bits_per_sample_format(ctx->sample_fmt)>>3);
+                     av_get_bits_per_sample_fmt(ctx->sample_fmt)>>3);
             }
 
             // When decoding some audio streams the number of
@@ -4450,7 +4446,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
         if (fmt == FORMAT_NONE)
         {
-            int bps = av_get_bits_per_sample_format(ctx->sample_fmt);
+            int bps = av_get_bits_per_sample_fmt(ctx->sample_fmt);
             if (ctx->sample_fmt == SAMPLE_FMT_S32 && ctx->bits_per_raw_sample)
                 bps = ctx->bits_per_raw_sample;
             VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Unsupported sample format "

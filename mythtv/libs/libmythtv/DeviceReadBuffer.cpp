@@ -68,12 +68,12 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd)
     paused        = false;
 
     size          = gCoreContext->GetNumSetting("HDRingbufferSize",
-                                            50 * TSPacket::SIZE) * 1024;
+                                            50 * TSPacket::kSize) * 1024;
     used          = 0;
-    dev_read_size = TSPacket::SIZE * (using_poll ? 256 : 48);
-    min_read      = TSPacket::SIZE * 4;
+    dev_read_size = TSPacket::kSize * (using_poll ? 256 : 48);
+    min_read      = TSPacket::kSize * 4;
 
-    buffer        = new unsigned char[size + TSPacket::SIZE];
+    buffer        = new unsigned char[size + TSPacket::kSize];
     readPtr       = buffer;
     writePtr      = buffer;
     endPtr        = buffer + size;
@@ -81,7 +81,7 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd)
     // Initialize buffer, if it exists
     if (!buffer)
         return false;
-    memset(buffer, 0xFF, size + TSPacket::SIZE);
+    memset(buffer, 0xFF, size + TSPacket::kSize);
 
     // Initialize statistics
     max_used      = 0;
@@ -292,7 +292,7 @@ void DeviceReadBuffer::fill_ringbuffer(void)
 
         // Limit read size for faster return from read
         size_t read_size =
-            min(dev_read_size, (size_t) WaitForUnused(TSPacket::SIZE));
+            min(dev_read_size, (size_t) WaitForUnused(TSPacket::kSize));
 
         // if read_size > 0 do the read...
         if (read_size)
@@ -514,7 +514,7 @@ uint DeviceReadBuffer::WaitForUnused(uint needed) const
     size_t unused = GetUnused();
     size_t contig = GetContiguousUnused();
 
-    if (contig > TSPacket::SIZE)
+    if (contig > TSPacket::kSize)
     {
         while (unused < needed)
         {

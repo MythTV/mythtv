@@ -6,6 +6,10 @@
 #include <QMutex>
 #include <QList>
 
+#include "mythbaseexp.h"
+
+MBASE_PUBLIC void ShutdownRRT(void);
+
 class MythSocket;
 class MythSocketThread : public QThread
 {

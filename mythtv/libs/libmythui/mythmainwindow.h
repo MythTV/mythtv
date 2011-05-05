@@ -92,6 +92,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     MythRender  *GetRenderDevice();
     void         ShowPainterWindow();
     void         HidePainterWindow();
+    void         ResizePainterWindow(const QSize &size);
 
     void GrabWindow(QImage &image);
     bool SaveScreenShot(const QImage &image);

@@ -60,7 +60,7 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
     _frames_seen_count(0),          _frames_written_count(0)
 {
     SetPositionMapType(MARK_GOP_BYFRAME);
-    _payload_buffer.reserve(TSPacket::SIZE * (50 + 1));
+    _payload_buffer.reserve(TSPacket::kSize * (50 + 1));
 }
 
 DTVRecorder::~DTVRecorder()
@@ -94,7 +94,8 @@ void DTVRecorder::SetOption(const QString &name, int value)
                     "Attempt made to resize packet buffer while recording.");
             return;
         }
-        int newsize = max(value - (value % TSPacket::SIZE), TSPacket::SIZE*50);
+        int newsize = max(value - (value % TSPacket::kSize),
+                          TSPacket::kSize*50);
         unsigned char* newbuf = new unsigned char[newsize];
         if (newbuf) {
             memcpy(newbuf, _buffer, min(_buffer_size, newsize));
@@ -201,8 +202,8 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
     if (_buffer_packets)
     {
         int idx = _payload_buffer.size();
-        _payload_buffer.resize(idx + TSPacket::SIZE);
-        memcpy(&_payload_buffer[idx], tspacket.data(), TSPacket::SIZE);
+        _payload_buffer.resize(idx + TSPacket::kSize);
+        memcpy(&_payload_buffer[idx], tspacket.data(), TSPacket::kSize);
         return;
     }
 
@@ -216,7 +217,7 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
     }
 
     if (ringBuffer)
-        ringBuffer->Write(tspacket.data(), TSPacket::SIZE);
+        ringBuffer->Write(tspacket.data(), TSPacket::kSize);
 }
 
 static const uint frameRateMap[16] = {
@@ -282,7 +283,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     //   00 00 01 B3: seq_start_code
     //   (there are others that we don't care about)
     const uint8_t *bufptr = tspacket->data() + tspacket->AFCOffset();
-    const uint8_t *bufend = tspacket->data() + TSPacket::SIZE;
+    const uint8_t *bufend = tspacket->data() + TSPacket::kSize;
 
     while (bufptr < bufend)
     {
@@ -330,7 +331,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     if (hasKeyFrame)
     {
         _last_keyframe_seen = _frames_seen_count;
-        HandleKeyframe(_frames_written_count, TSPacket::SIZE);
+        HandleKeyframe(_frames_written_count, TSPacket::kSize);
     }
 
     if (hasFrame)
@@ -522,13 +523,13 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
 
     // scan for PES packets and H.264 NAL units
     uint i = tspacket->AFCOffset();
-    for (; i < TSPacket::SIZE; i++)
+    for (; i < TSPacket::kSize; i++)
     {
         // special handling required when a new PES packet begins
         if (payloadStart && !_pes_synced)
         {
             // bounds check
-            if (i + 2 >= TSPacket::SIZE)
+            if (i + 2 >= TSPacket::kSize)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "PES packet start code may overflow to next TS packet, aborting keyframe search");
@@ -546,7 +547,7 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
             }
 
             // bounds check
-            if (i + 5 >= TSPacket::SIZE)
+            if (i + 5 >= TSPacket::kSize)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "PES packet headers overflow to next TS packet, aborting keyframe search");
@@ -562,7 +563,7 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
             const unsigned char pes_header_length = tspacket->data()[i + 5];
 
             // bounds check
-            if ((i + 6 + pes_header_length) >= TSPacket::SIZE)
+            if ((i + 6 + pes_header_length) >= TSPacket::kSize)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "PES packet headers overflow to next TS packet, aborting keyframe search");
@@ -585,7 +586,7 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
         // scan for a NAL unit start code
 
         uint32_t bytes_used = m_h264_parser.addBytes(
-            tspacket->data() + i, TSPacket::SIZE - i,
+            tspacket->data() + i, TSPacket::kSize - i,
             ringBuffer->GetWritePosition() + _payload_buffer.size()
             );
         i += (bytes_used - 1);
@@ -605,7 +606,7 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
                 frameRate = m_h264_parser.frameRate();
             }
         }
-    } // for (; i < TSPacket::SIZE; i++)
+    } // for (; i < TSPacket::kSize; i++)
 
     if (hasKeyFrame)
     {

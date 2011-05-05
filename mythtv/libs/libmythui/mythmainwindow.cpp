@@ -548,6 +548,14 @@ void MythMainWindow::HidePainterWindow(void)
     }
 }
 
+void MythMainWindow::ResizePainterWindow(const QSize &size)
+{
+    if (!d->paintwin)
+        return;
+    d->paintwin->setFixedSize(size);
+    d->paintwin->resize(size);
+}
+
 MythRender *MythMainWindow::GetRenderDevice()
 {
     return d->render;
@@ -975,7 +983,7 @@ void MythMainWindow::Init(void)
     }
 
     d->paintwin->move(0, 0);
-    d->paintwin->setFixedSize(size());
+    ResizePainterWindow(size());
     d->paintwin->raise();
     ShowPainterWindow();
     if (!GetMythDB()->GetNumSetting("HideMouseCursor", 0))

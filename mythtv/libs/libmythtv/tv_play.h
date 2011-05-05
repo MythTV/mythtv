@@ -428,6 +428,8 @@ class MTV_PUBLIC TV : public QObject
         ARBSEEK_END
     };
     void DoArbSeek(PlayerContext*, ArbSeekWhence whence);
+    void DoJumpFFWD(PlayerContext *ctx);
+    void DoJumpRWND(PlayerContext *ctx);
     void NormalSpeed(PlayerContext*);
     void ChangeSpeed(PlayerContext*, int direction);
     void ToggleTimeStretch(PlayerContext*);

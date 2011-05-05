@@ -1767,21 +1767,18 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
     SendResponse(pbssock, strlist);
 }
 
+
 void DeleteThread::run(void)
 {
-    if (!m_parent)
+    if (!m_ms)
         return;
 
     threadRegister("Delete");
-    MainServer *ms = m_parent->ms;
-    ms->DoDeleteThread(m_parent);
-
-    delete m_parent;
-    this->deleteLater();
+    m_ms->DoDeleteThread(this);
     threadDeregister();
 }
 
-void MainServer::DoDeleteThread(const DeleteStruct *ds)
+void MainServer::DoDeleteThread(DeleteStruct *ds)
 {
     // sleep a little to let frontends reload the recordings list
     // after deleting a recording, then we can hammer the DB and filesystem
@@ -1791,31 +1788,34 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
     deletelock.lock();
 
     QString logInfo = QString("chanid %1 at %2")
-                              .arg(ds->chanid).arg(ds->recstartts.toString());
+                              .arg(ds->m_chanid)
+                              .arg(ds->m_recstartts.toString());
 
     QString name = QString("deleteThread%1%2").arg(getpid()).arg(rand());
-    QFile checkFile(ds->filename);
+    QFile checkFile(ds->m_filename);
 
     if (!MSqlQuery::testDBConnection())
     {
         QString msg = QString("ERROR opening database connection for Delete "
                               "Thread for chanid %1 recorded at %2.  Program "
                               "will NOT be deleted.")
-                              .arg(ds->chanid).arg(ds->recstartts.toString());
+                              .arg(ds->m_chanid)
+                              .arg(ds->m_recstartts.toString());
         VERBOSE(VB_GENERAL, msg);
 
         deletelock.unlock();
         return;
     }
 
-    ProgramInfo pginfo(ds->chanid, ds->recstartts);
+    ProgramInfo pginfo(ds->m_chanid, ds->m_recstartts);
 
     if (!pginfo.GetChanID())
     {
         QString msg = QString("ERROR retrieving program info when trying to "
                               "delete program for chanid %1 recorded at %2. "
                               "Recording will NOT be deleted.")
-                              .arg(ds->chanid).arg(ds->recstartts.toString());
+                              .arg(ds->m_chanid)
+                              .arg(ds->m_recstartts.toString());
         VERBOSE(VB_GENERAL, msg);
 
         deletelock.unlock();
@@ -1827,20 +1827,20 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
     // deleting failed recordings without fuss, but blocks accidental
     // deletion of metadata for files where the filesystem has gone missing.
     if ((!checkFile.exists()) && pginfo.GetFilesize() &&
-        (!ds->forceMetadataDelete))
+        (!ds->m_forceMetadataDelete))
     {
         VERBOSE(VB_IMPORTANT, QString(
                     "ERROR when trying to delete file: %1. File "
                     "doesn't exist.  Database metadata"
                     "will not be removed.")
-                .arg(ds->filename));
+                .arg(ds->m_filename));
 
         pginfo.SaveDeletePendingFlag(false);
         deletelock.unlock();
         return;
     }
 
-    JobQueue::DeleteAllJobs(ds->chanid, ds->recstartts);
+    JobQueue::DeleteAllJobs(ds->m_chanid, ds->m_recstartts);
 
     LiveTVChain *tvchain = GetChainWithRecording(pginfo);
     if (tvchain)
@@ -1857,16 +1857,16 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
     {
         // Since stat fails after unlinking on some filesystems,
         // get the filesize first
-        const QFileInfo info(ds->filename);
+        const QFileInfo info(ds->m_filename);
         size = info.size();
-        fd = DeleteFile(ds->filename, followLinks, ds->forceMetadataDelete);
+        fd = DeleteFile(ds->m_filename, followLinks, ds->m_forceMetadataDelete);
 
         if ((fd < 0) && checkFile.exists())
             errmsg = true;
     }
     else
     {
-        delete_file_immediately(ds->filename, followLinks, false);
+        delete_file_immediately(ds->m_filename, followLinks, false);
         sleep(2);
         if (checkFile.exists())
             errmsg = true;
@@ -1876,7 +1876,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
     {
         VERBOSE(VB_IMPORTANT,
             QString("Error deleting file: %1. Keeping metadata in database.")
-                    .arg(ds->filename));
+                    .arg(ds->m_filename));
 
         pginfo.SaveDeletePendingFlag(false);
         deletelock.unlock();
@@ -1885,7 +1885,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
 
     /* Delete all preview thumbnails. */
 
-    QFileInfo fInfo( ds->filename );
+    QFileInfo fInfo( ds->m_filename );
     QString nameFilter = fInfo.fileName() + "*.png";
     // QDir's nameFilter uses spaces or semicolons to separate globs,
     // so replace them with the "match any character" wildcard
@@ -1912,20 +1912,20 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
     deletelock.unlock();
 
     if (slowDeletes && fd >= 0)
-        TruncateAndClose(&pginfo, fd, ds->filename, size);
+        TruncateAndClose(&pginfo, fd, ds->m_filename, size);
 }
 
-void MainServer::DeleteRecordedFiles(const DeleteStruct *ds)
+void MainServer::DeleteRecordedFiles(DeleteStruct *ds)
 {
     QString logInfo = QString("chanid %1 at %2")
-        .arg(ds->chanid).arg(ds->recstartts.toString());
+        .arg(ds->m_chanid).arg(ds->m_recstartts.toString());
 
     MSqlQuery update(MSqlQuery::InitCon());
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT basename, hostname, storagegroup FROM recordedfile "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
-    query.bindValue(":CHANID", ds->chanid);
-    query.bindValue(":STARTTIME", ds->recstartts);
+    query.bindValue(":CHANID", ds->m_chanid);
+    query.bindValue(":STARTTIME", ds->m_recstartts);
 
     if (!query.exec() || !query.isActive())
     {
@@ -1944,7 +1944,7 @@ void MainServer::DeleteRecordedFiles(const DeleteStruct *ds)
         storagegroup = query.value(2).toString();
         deleteInDB = false;
 
-        if (basename == ds->filename)
+        if (basename == ds->m_filename)
             deleteInDB = true;
         else
         {
@@ -1975,8 +1975,8 @@ void MainServer::DeleteRecordedFiles(const DeleteStruct *ds)
                            "WHERE chanid = :CHANID "
                                "AND starttime = :STARTTIME "
                                "AND basename = :BASENAME ;");
-            update.bindValue(":CHANID", ds->chanid);
-            update.bindValue(":STARTTIME", ds->recstartts);
+            update.bindValue(":CHANID", ds->m_chanid);
+            update.bindValue(":STARTTIME", ds->m_recstartts);
             update.bindValue(":BASENAME", basename);
             if (!update.exec())
             {
@@ -1990,17 +1990,17 @@ void MainServer::DeleteRecordedFiles(const DeleteStruct *ds)
     }
 }
 
-void MainServer::DoDeleteInDB(const DeleteStruct *ds)
+void MainServer::DoDeleteInDB(DeleteStruct *ds)
 {
     QString logInfo = QString("chanid %1 at %2")
-        .arg(ds->chanid).arg(ds->recstartts.toString());
+        .arg(ds->m_chanid).arg(ds->m_recstartts.toString());
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM recorded WHERE chanid = :CHANID AND "
                   "title = :TITLE AND starttime = :STARTTIME;");
-    query.bindValue(":CHANID", ds->chanid);
-    query.bindValue(":TITLE", ds->title);
-    query.bindValue(":STARTTIME", ds->recstartts);
+    query.bindValue(":CHANID", ds->m_chanid);
+    query.bindValue(":TITLE", ds->m_title);
+    query.bindValue(":STARTTIME", ds->m_recstartts);
 
     if (!query.exec() || !query.isActive())
     {
@@ -2013,7 +2013,7 @@ void MainServer::DoDeleteInDB(const DeleteStruct *ds)
 
     // Notify the frontend so it can requery for Free Space
     QString msg = QString("RECORDING_LIST_CHANGE DELETE %1 %2")
-        .arg(ds->chanid).arg(ds->recstartts.toString(Qt::ISODate));
+        .arg(ds->m_chanid).arg(ds->m_recstartts.toString(Qt::ISODate));
     RemoteSendEvent(MythEvent(msg));
 
     // sleep a little to let frontends reload the recordings list
@@ -2021,8 +2021,8 @@ void MainServer::DoDeleteInDB(const DeleteStruct *ds)
 
     query.prepare("DELETE FROM recordedmarkup "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
-    query.bindValue(":CHANID", ds->chanid);
-    query.bindValue(":STARTTIME", ds->recstartts);
+    query.bindValue(":CHANID", ds->m_chanid);
+    query.bindValue(":STARTTIME", ds->m_recstartts);
 
     if (!query.exec())
     {
@@ -2033,8 +2033,8 @@ void MainServer::DoDeleteInDB(const DeleteStruct *ds)
 
     query.prepare("DELETE FROM recordedseek "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
-    query.bindValue(":CHANID", ds->chanid);
-    query.bindValue(":STARTTIME", ds->recstartts);
+    query.bindValue(":CHANID", ds->m_chanid);
+    query.bindValue(":STARTTIME", ds->m_recstartts);
 
     if (!query.exec())
     {
@@ -2505,19 +2505,12 @@ void MainServer::DoHandleDeleteRecording(
     // most likely absent and deleting the file metadata is unsafe.
     if (fileExists || !recinfo.GetFilesize() || forceMetadataDelete)
     {
-        DeleteStruct *ds = new DeleteStruct;
-        ds->ms = this;
-        ds->filename = filename;
-        ds->title = recinfo.GetTitle();
-        ds->chanid = recinfo.GetChanID();
-        ds->recstartts = recinfo.GetRecordingStartTime();
-        ds->recendts = recinfo.GetRecordingEndTime();
-        ds->forceMetadataDelete = forceMetadataDelete;
-
         recinfo.SaveDeletePendingFlag(true);
 
-        DeleteThread *deleteThread = new DeleteThread;
-        deleteThread->SetParent(ds);
+        DeleteThread *deleteThread = new DeleteThread(this, filename, 
+            recinfo.GetTitle(), recinfo.GetChanID(), 
+            recinfo.GetRecordingStartTime(), recinfo.GetRecordingEndTime(), 
+            forceMetadataDelete);
         deleteThread->start();
     }
     else
@@ -4473,26 +4466,22 @@ void MainServer::GetFilesystemInfos(vector <FileSystemInfo> &fsInfos)
 
 void TruncateThread::run(void)
 {
-    if (!m_parent)
+    if (!m_ms)
         return;
 
     threadRegister("Truncate");
-    MainServer *ms = m_parent->ms;
-    ms->DoTruncateThread(m_parent);
-
-    delete m_parent;
-    this->deleteLater();
+    m_ms->DoTruncateThread(this);
     threadDeregister();
 }
 
-void MainServer::DoTruncateThread(const DeleteStruct *ds)
+void MainServer::DoTruncateThread(DeleteStruct *ds)
 {
     if (gCoreContext->GetNumSetting("TruncateDeletesSlowly", 0))
-        TruncateAndClose(NULL, ds->fd, ds->filename, ds->size);
+        TruncateAndClose(NULL, ds->m_fd, ds->m_filename, ds->m_size);
     else
     {
         QMutexLocker dl(&deletelock);
-        close(ds->fd);
+        close(ds->m_fd);
     }
 }
 
@@ -4567,15 +4556,9 @@ bool MainServer::HandleDeleteFile(QString filename, QString storagegroup,
     // DeleteFile() opened up a file for us to delete
     if (fd >= 0)
     {
-        // Thread off the actual file delete
-        DeleteStruct *ds = new DeleteStruct;
-        ds->ms = this;
-        ds->filename = fullfile;
-        ds->fd = fd;
-        ds->size = size;
-
-        TruncateThread *truncateThread = new TruncateThread;
-        truncateThread->SetParent(ds);
+        // Thread off the actual file truncate
+        TruncateThread *truncateThread = 
+            new TruncateThread(this, fullfile, fd, size);
         truncateThread->run();
     }
 

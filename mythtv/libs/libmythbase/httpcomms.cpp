@@ -514,11 +514,13 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
  *
  *   This is a synchronous function, it will block according to the vars.
  */
-QString HttpComms::postHttp(QUrl               &url         , 
-                            QHttpRequestHeader *pAddlHdr    , QIODevice *pData,
-                            int                 timeoutMS   , int        maxRetries, 
-                            int                 maxRedirects, bool       allowGzip,
-                            Credentials        *webCred     , bool       isInQtEventThread)
+QString HttpComms::postHttp(
+    QUrl               &url, 
+    QHttpRequestHeader *pAddlHdr,     QIODevice *pData,
+    int                 timeoutMS,    int        maxRetries, 
+    int                 maxRedirects, bool       allowGzip,
+    Credentials        *webCred,      bool       isInQtEventThread,
+    QString             userAgent)
 {
     int redirectCount = 0;
     int timeoutCount = 0;
@@ -526,15 +528,18 @@ QString HttpComms::postHttp(QUrl               &url         ,
     HttpComms *httpGrabber = NULL; 
     QString hostname;
 
-    QHttpRequestHeader header( "POST", url.path() + url.encodedQuery());
+    QHttpRequestHeader header("POST", url.path() + url.encodedQuery());
 
     // Add main header values
-
-    QString userAgent = "Mozilla/9.876 (X11; U; Linux 2.2.12-20 i686, en) "
-                        "Gecko/25250101 Netscape/5.432b1";
-
     header.setValue("Host", url.host());
-    header.setValue("User-Agent", userAgent);
+
+    if (userAgent.toLower() == "<default>")
+    {
+        userAgent = "Mozilla/9.876 (X11; U; Linux 2.2.12-20 i686, en) "
+            "Gecko/25250101 Netscape/5.432b1";
+    }
+    if (!userAgent.isEmpty())
+        header.setValue("User-Agent", userAgent);
 
     if (allowGzip)
         header.setValue( "Accept-Encoding", "gzip");

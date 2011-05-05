@@ -90,6 +90,8 @@ class MPEGStreamData : public EITSource
     virtual ~MPEGStreamData();
 
     void SetCaching(bool cacheTables) { _cache_tables = cacheTables; }
+    void SetListeningDisabled(bool lt) { _listening_disabled = lt; }
+
     virtual void Reset(void) { Reset(-1); }
     virtual void Reset(int desiredProgram);
 
@@ -327,10 +329,11 @@ class MPEGStreamData : public EITSource
     float                     _eit_rate;
 
     // Listening
-    pid_map_t _pids_listening;
-    pid_map_t _pids_notlistening;
-    pid_map_t _pids_writing;
-    pid_map_t _pids_audio;
+    pid_map_t                 _pids_listening;
+    pid_map_t                 _pids_notlistening;
+    pid_map_t                 _pids_writing;
+    pid_map_t                 _pids_audio;
+    bool                      _listening_disabled;
 
     // Encryption monitoring
     mutable QMutex            _encryption_lock;

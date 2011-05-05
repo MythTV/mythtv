@@ -21,6 +21,7 @@ HEADERS += mythcoreutil.h mythdownloadmanager.h mythtranslation.h
 HEADERS += unzip.h unzip_p.h zipentry_p.h iso639.h iso3166.h mythmedia.h
 HEADERS += util.h mythhdd.h mythcdrom.h autodeletedeque.h dbutil.h
 HEADERS += mythhttppool.h mythhttphandler.h mythdeque.h mythlogging.h version.h
+HEADERS += mythbaseutil.h
 
 SOURCES += mythsocket.cpp mythsocketthread.cpp msocketdevice.cpp
 SOURCES += mythdbcon.cpp mythdb.cpp oldsettings.cpp mythverbose.cpp

@@ -188,7 +188,7 @@ void IPTVRecorder::AddData(const unsigned char *data, unsigned int dataSize)
 
         // Check if the next packet in buffer is complete :
         // packet size is 188 bytes long
-        if ((dataSize - tsPos - readIndex) < TSPacket::SIZE)
+        if ((dataSize - tsPos - readIndex) < TSPacket::kSize)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "TS packet at stradles end of buffer.");
@@ -200,7 +200,7 @@ void IPTVRecorder::AddData(const unsigned char *data, unsigned int dataSize)
         ProcessTSPacket(*reinterpret_cast<const TSPacket*>(newData));
 
         // follow to next packet
-        readIndex += tsPos + TSPacket::SIZE;
+        readIndex += tsPos + TSPacket::kSize;
     }
 }
 

@@ -751,7 +751,7 @@ int MPEG2fixup::InitAV(const char *inputfile, const char *type, int64_t offset)
 
     // Dump stream information
     if (SHOW_MSG(MPF_GENERAL))
-        dump_format(inputFC, 0, inputfile, 0);
+        av_dump_format(inputFC, 0, inputfile, 0);
 
     for (unsigned int i = 0; i < inputFC->nb_streams; i++)
     {
