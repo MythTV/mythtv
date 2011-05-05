@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "compat.h"  // instead of sys/types.h, for MinGW compatibility
 
-#define SURROUND_BUFSIZE 8192
+#define SURROUND_BUFSIZE 16384
 
 class FreeSurround
 {
