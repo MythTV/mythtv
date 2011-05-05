@@ -598,7 +598,7 @@ QString MythContextPrivate::TestDBconnection(void)
 
     // 2. Check that the supplied DBport is listening:
 
-    if (port && !telnet(host, port))
+    if (host != "localhost" && port && !telnet(host, port))
     {
         SilenceDBerrors();
         err = QObject::tr("Cannot connect to port %1 on database host %2");
