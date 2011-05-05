@@ -52,7 +52,6 @@ class MythBrowser : public MythScreenType
     void slotTabSelected(MythUIButtonListItem *item);
     void slotTabLosingFocus(void);
     void slotIconChanged(void);
-    void slotExitingMenu(void);
 
   private:
     MythUIWebBrowser* activeBrowser(void);
