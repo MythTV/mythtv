@@ -241,8 +241,6 @@ void MythBrowser::slotLoadFinished(bool OK)
 
     if (m_progressBar)
         m_progressBar->SetUsed(0);
-
-    slotIconChanged();
 }
 
 void MythBrowser::slotLoadProgress(int progress)
@@ -256,35 +254,6 @@ void MythBrowser::slotTitleChanged(const QString &title)
     MythUIButtonListItem *item = m_pageList->GetItemCurrent();
     if (item)
         item->SetText(title);
-}
-
-void MythBrowser::slotIconChanged(void)
-{
-    MythUIButtonListItem *item = m_pageList->GetItemCurrent();
-    if (!item)
-        return;
-
-    QIcon icon = activeBrowser()->GetIcon();
-
-    if (icon.isNull())
-    {
-        //FIXME use a default icon here
-        item->setImage(NULL);
-    }
-    else
-    {
-        if (item)
-        {
-            QPixmap pixmap = icon.pixmap(32, 32);
-            QImage image = pixmap.toImage();
-            image = image.scaled(
-                QSize(32,32), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-            MythImage *mimage = GetMythPainter()->GetFormatImage();
-            mimage->Assign(image);
-
-            item->setImage(mimage);
-        }
-    }
 }
 
 void MythBrowser::slotStatusBarMessage(const QString &text)

@@ -51,7 +51,6 @@ class MythBrowser : public MythScreenType
     void slotStatusBarMessage(const QString &text);
     void slotTabSelected(MythUIButtonListItem *item);
     void slotTabLosingFocus(void);
-    void slotIconChanged(void);
 
   private:
     MythUIWebBrowser* activeBrowser(void);
