@@ -58,10 +58,7 @@ void MythSocketThread::ShutdownReadyReadThread(void)
 
     WakeReadyReadThread();
 
-    if (isRunning()) {
-        quit(); // make the thread exit
-        wait(); // waits for thread to exit
-    }
+    wait(); // waits for thread to exit
 
     CloseReadyReadPipe();
 }
