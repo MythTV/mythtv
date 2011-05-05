@@ -1087,6 +1087,7 @@ bool TV::Init(bool createWindow)
 
                     // resize possibly avoids a bug on some systems
                     GetMythMainWindow()->setGeometry(player_bounds);
+                    GetMythMainWindow()->ResizePainterWindow(player_bounds.size());
                 }
             }
         }
@@ -1173,6 +1174,7 @@ TV::~TV(void)
     MythMainWindow* mwnd = GetMythMainWindow();
     mwnd->setGeometry(saved_gui_bounds);
     mwnd->setFixedSize(saved_gui_bounds.size());
+    mwnd->ResizePainterWindow(saved_gui_bounds.size());
     mwnd->show();
     if (!db_use_gui_size_for_tv)
         mwnd->move(saved_gui_bounds.topLeft());
@@ -2106,6 +2108,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             (db_use_fixed_size) ? player_bounds.size() :
             QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
         mainWindow->setGeometry(player_bounds);
+        mainWindow->ResizePainterWindow(player_bounds.size());
         if (!weDisabledGUI)
         {
             weDisabledGUI = true;
