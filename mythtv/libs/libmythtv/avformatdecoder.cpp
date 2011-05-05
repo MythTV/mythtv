@@ -3823,7 +3823,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                                         &data_size, &tmp_pkt);
             frames = data_size /
                 (ctx->channels *
-                 av_get_bits_per_sample_format(ctx->sample_fmt)>>3);
+                 av_get_bits_per_sample_fmt(ctx->sample_fmt)>>3);
             already_decoded = true;
             reselectAudioTrack |= ctx->channels;
         }
@@ -3878,7 +3878,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                                                 &tmp_pkt);
                     frames = data_size /
                         (ctx->channels *
-                         av_get_bits_per_sample_format(ctx->sample_fmt)>>3);
+                         av_get_bits_per_sample_fmt(ctx->sample_fmt)>>3);
                 }
                 else
                     frames = -1;
@@ -3906,7 +3906,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                                             &tmp_pkt);
                 frames = data_size /
                     (ctx->channels *
-                     av_get_bits_per_sample_format(ctx->sample_fmt)>>3);
+                     av_get_bits_per_sample_fmt(ctx->sample_fmt)>>3);
             }
 
             // When decoding some audio streams the number of
@@ -4441,7 +4441,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
         if (fmt == FORMAT_NONE)
         {
-            int bps = av_get_bits_per_sample_format(ctx->sample_fmt);
+            int bps = av_get_bits_per_sample_fmt(ctx->sample_fmt);
             if (ctx->sample_fmt == SAMPLE_FMT_S32 && ctx->bits_per_raw_sample)
                 bps = ctx->bits_per_raw_sample;
             VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Unsupported sample format "
