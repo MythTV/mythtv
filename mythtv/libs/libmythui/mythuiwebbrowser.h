@@ -149,8 +149,6 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     void slotLoadFinished(bool Ok);
     void slotLoadProgress(int progress);
     void slotTitleChanged(const QString &title);
-    void slotTakingFocus(void);
-    void slotLosingFocus(void);
     void slotStatusBarMessage(const QString &text);
     void slotIconChanged(void);
     void slotLinkClicked(const QUrl &url);
@@ -177,6 +175,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     MythImage   *m_image;
 
     bool         m_active;
+    bool         m_wasActive;
     bool         m_initialized;
     QTime        m_lastUpdateTime;
     int          m_updateInterval;

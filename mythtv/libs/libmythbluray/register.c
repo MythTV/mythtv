@@ -291,7 +291,7 @@ void bd_psr_restore_state(BD_REGISTERS *p)
         ev.ev_type = BD_PSR_RESTORE;
 
         for (i = 4; i < 13; i++) {
-            if (i != 9 && old_psr[i] != p->psr[i]) {
+            if (i != 9) {
 
                 ev.psr_idx = i;
                 ev.old_val = old_psr[i];

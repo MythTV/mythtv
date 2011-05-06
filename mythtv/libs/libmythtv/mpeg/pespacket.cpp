@@ -35,8 +35,8 @@ bool PESPacket::AddTSPacket(const TSPacket* packet, bool &broken)
 
     const int cc = packet->ContinuityCounter();
     const int ccExp = (_ccLast + 1) & 0xf;
-    uint payloadSize  = TSPacket::PAYLOAD_SIZE;
-    uint payloadStart = TSPacket::HEADER_SIZE;
+    uint payloadSize  = TSPacket::kPayloadSize;
+    uint payloadStart = TSPacket::kHeaderSize;
 
     // If the next TS has an offset, we need to strip it out.
     // The offset will be used when a new PESPacket is created.
@@ -114,9 +114,9 @@ void PESPacket::GetAsTSPackets(vector<TSPacket> &output, uint cc) const
     }
 
     output.resize(1);
-    memcpy(output[0].data(), _fullbuffer, TSPacket::SIZE);
+    memcpy(output[0].data(), _fullbuffer, TSPacket::kSize);
     output[0].data()[3] = (output[0].data()[3] & 0xf0) | cc;
-    if (size <= TSPacket::SIZE)
+    if (size <= TSPacket::kSize)
         return;
 
     TSHeader header;
@@ -125,15 +125,15 @@ void PESPacket::GetAsTSPackets(vector<TSPacket> &output, uint cc) const
     header.data()[3] = 0x10; // adaptation field control == payload only
     header.SetPID(tsheader()->PID());
 
-    const unsigned char *data = _fullbuffer + TSPacket::SIZE;
-    size -= TSPacket::SIZE;
+    const unsigned char *data = _fullbuffer + TSPacket::kSize;
+    size -= TSPacket::kSize;
     while (size > 0)
     {
         INCR_CC(cc);
         header.SetContinuityCounter(cc);
         output.resize(output.size()+1);
         output[output.size()-1].InitHeader(header.data());
-        uint write_size = min(size, TSPacket::PAYLOAD_SIZE);
+        uint write_size = min(size, TSPacket::kPayloadSize);
         output[output.size()-1].InitPayload(data, write_size);
         data += write_size;
         size -= write_size;

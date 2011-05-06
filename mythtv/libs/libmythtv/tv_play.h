@@ -178,6 +178,8 @@ class MTV_PUBLIC TV : public QObject
 {
     friend class PlaybackBox;
     friend class GuideGrid;
+    friend class ProgFinder;
+    friend class ViewScheduled;
     friend class TvPlayWindow;
     friend class TVBrowseHelper;
     friend class TVDDMapThread;
@@ -212,8 +214,8 @@ class MTV_PUBLIC TV : public QObject
     bool StartLiveTVInGuide(void) { return db_start_in_guide; }
 
     // Embedding commands for the guidegrid to use in LiveTV
-    bool StartEmbedding(PlayerContext*, WId wid, const QRect&);
-    void StopEmbedding(PlayerContext*);
+    bool StartEmbedding(const QRect&);
+    void StopEmbedding(void);
     bool IsTunable(const PlayerContext*, uint chanid, bool use_cache = false);
     void ClearTunableCache(void);
     void ChangeChannel(const PlayerContext*, const DBChanList &options);
@@ -426,6 +428,8 @@ class MTV_PUBLIC TV : public QObject
         ARBSEEK_END
     };
     void DoArbSeek(PlayerContext*, ArbSeekWhence whence);
+    void DoJumpFFWD(PlayerContext *ctx);
+    void DoJumpRWND(PlayerContext *ctx);
     void NormalSpeed(PlayerContext*);
     void ChangeSpeed(PlayerContext*, int direction);
     void ToggleTimeStretch(PlayerContext*);

@@ -107,7 +107,7 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
 {
     videodevice = QString::null;
 
-    _buffer_size = (1024*1024 / TSPacket::SIZE) * TSPacket::SIZE;
+    _buffer_size = (1024*1024 / TSPacket::kSize) * TSPacket::kSize;
 
     _buffer = new unsigned char[_buffer_size];
     memset(_buffer, 0, _buffer_size);
@@ -546,8 +546,8 @@ void DVBRecorder::BufferedWrite(const TSPacket &tspacket)
     if (_buffer_packets)
     {
         int idx = _payload_buffer.size();
-        _payload_buffer.resize(idx + TSPacket::SIZE);
-        memcpy(&_payload_buffer[idx], tspacket.data(), TSPacket::SIZE);
+        _payload_buffer.resize(idx + TSPacket::kSize);
+        memcpy(&_payload_buffer[idx], tspacket.data(), TSPacket::kSize);
         return;
     }
 
@@ -561,5 +561,5 @@ void DVBRecorder::BufferedWrite(const TSPacket &tspacket)
     }
 
     if (ringBuffer)
-        ringBuffer->Write(tspacket.data(), TSPacket::SIZE);
+        ringBuffer->Write(tspacket.data(), TSPacket::kSize);
 }

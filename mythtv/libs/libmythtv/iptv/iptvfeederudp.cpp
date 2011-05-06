@@ -95,7 +95,7 @@ bool IPTVFeederUDP::Open(const QString &url)
         return false;
     }
 
-    _sink = IPTVMediaSink::CreateNew(*_live_env, TSPacket::SIZE * 128*1024);
+    _sink = IPTVMediaSink::CreateNew(*_live_env, TSPacket::kSize * 128*1024);
     if (!_sink)
     {
         VERBOSE(VB_IMPORTANT,

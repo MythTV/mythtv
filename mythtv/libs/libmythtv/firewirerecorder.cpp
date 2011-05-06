@@ -83,8 +83,8 @@ void FirewireRecorder::StartRecording(void)
 void FirewireRecorder::AddData(const unsigned char *data, uint len)
 {
     uint bufsz = buffer.size();
-    if ((SYNC_BYTE == data[0]) && (TSPacket::SIZE == len) &&
-        (TSPacket::SIZE > bufsz))
+    if ((SYNC_BYTE == data[0]) && (TSPacket::kSize == len) &&
+        (TSPacket::kSize > bufsz))
     {
         if (bufsz)
             buffer.clear();
@@ -106,15 +106,15 @@ void FirewireRecorder::AddData(const unsigned char *data, uint len)
     if (sync_at < 0)
         return;
 
-    if (bufsz < 30 * TSPacket::SIZE)
+    if (bufsz < 30 * TSPacket::kSize)
         return; // build up a little buffer
 
-    while (sync_at + TSPacket::SIZE < bufsz)
+    while (sync_at + TSPacket::kSize < bufsz)
     {
         ProcessTSPacket(*(reinterpret_cast<const TSPacket*>(
                               &buffer[0] + sync_at)));
 
-        sync_at += TSPacket::SIZE;
+        sync_at += TSPacket::kSize;
     }
 
     buffer.erase(buffer.begin(), buffer.begin() + sync_at);

@@ -309,7 +309,7 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
 void FirewireDevice::BroadcastToListeners(
     const unsigned char *data, uint dataSize)
 {
-    if ((dataSize >= TSPacket::SIZE) && (data[0] == SYNC_BYTE) &&
+    if ((dataSize >= TSPacket::kSize) && (data[0] == SYNC_BYTE) &&
         ((data[1] & 0x1f) == 0) && (data[2] == 0))
     {
         ProcessPATPacket(*((const TSPacket*)data));

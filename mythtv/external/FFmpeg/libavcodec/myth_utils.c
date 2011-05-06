@@ -212,6 +212,9 @@ const char *ff_codec_id_string(enum CodecID codec_id)
 
         case CODEC_ID_MPEG2TS:          return "MPEG2TS";
 
+            /* Attachment codecs */
+        case CODEC_ID_TTF:              return "TTF font";
+
         case CODEC_ID_PROBE:            return "PROBE";
     }
     return "Unknown Codec ID";
@@ -229,6 +232,7 @@ const char *ff_codec_type_string(enum CodecType codec_type)
         case CODEC_TYPE_AUDIO:         return "Audio";
         case CODEC_TYPE_DATA:          return "Data";
         case CODEC_TYPE_SUBTITLE:      return "Subtitle";
+        case CODEC_TYPE_ATTACHMENT:    return "Attachment";
     }
     return "Invalid Codec Type";
 };

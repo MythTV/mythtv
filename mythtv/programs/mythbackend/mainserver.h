@@ -6,6 +6,8 @@
 #include <QMutex>
 #include <QHash>
 #include <QMap>
+#include <QRunnable>
+#include <QThreadPool>
 
 #include <vector>
 using namespace std;
@@ -31,39 +33,52 @@ class MythServer;
 class VideoScanner;
 class QTimer;
 
-typedef struct deletestruct
+class DeleteStruct 
 {
-    MainServer *ms;
-    uint chanid;
-    QDateTime recstartts;
-    QDateTime recendts;
-    QString filename;
-    int fd;
-    off_t size;
-    QString title;
-    bool forceMetadataDelete;
-} DeleteStruct;
-
-class DeleteThread : public QThread
-{
-    Q_OBJECT
+    friend class MainServer;
   public:
-    DeleteThread() : m_parent(NULL) {}
-    void SetParent(DeleteStruct *parent) { m_parent = parent; }
-    void run(void);
-  private:
-    DeleteStruct *m_parent;
+    DeleteStruct(MainServer *ms, QString filename, QString title,
+             uint chanid, QDateTime recstartts, QDateTime recendts, 
+             bool forceMetadataDelete) : 
+                 m_ms(ms), m_filename(filename), m_title(title), 
+                 m_chanid(chanid), m_recstartts(recstartts), 
+                 m_recendts(recendts),
+                 m_forceMetadataDelete(forceMetadataDelete)  {}
+
+    DeleteStruct(MainServer *ms, QString filename, int fd, off_t size) : 
+             m_ms(ms), m_filename(filename), m_fd(fd), m_size(size)  {}
+
+  protected:
+    MainServer *m_ms;
+    QString     m_filename;
+    QString     m_title;
+    uint        m_chanid;
+    QDateTime   m_recstartts;
+    QDateTime   m_recendts;
+    bool        m_forceMetadataDelete;
+    int         m_fd;
+    off_t       m_size;
 };
 
-class TruncateThread : public QThread
+class DeleteThread : public QRunnable, public DeleteStruct
 {
-    Q_OBJECT
   public:
-    TruncateThread() : m_parent(NULL) {}
-    void SetParent(DeleteStruct *parent) { m_parent = parent; }
+    DeleteThread(MainServer *ms, QString filename, QString title, uint chanid,
+                 QDateTime recstartts, QDateTime recendts, 
+                 bool forceMetadataDelete) :
+                     DeleteStruct(ms, filename, title, chanid, recstartts,
+                                  recendts, forceMetadataDelete)  {}
+    void start(void) { QThreadPool::globalInstance()->start(this); }
     void run(void);
-  private:
-    DeleteStruct *m_parent;
+};
+
+class TruncateThread : public QRunnable, public DeleteStruct
+{
+  public:
+    TruncateThread(MainServer *ms, QString filename, int fd, off_t size) :
+                DeleteStruct(ms, filename, fd, size)  {}
+    void start(void) { QThreadPool::globalInstance()->start(this); }
+    void run(void);
 };
 
 class MainServer : public QObject, public MythSocketCBs
@@ -210,12 +225,10 @@ class MainServer : public QObject, public MythSocketCBs
 
     int GetfsID(vector<FileSystemInfo>::iterator fsInfo);
 
-    static void *SpawnTruncateThread(void *param);
-    void DoTruncateThread(const DeleteStruct *ds);
-    static void *SpawnDeleteThread(void *param);
-    void DoDeleteThread(const DeleteStruct *ds);
-    void DeleteRecordedFiles(const DeleteStruct *ds);
-    void DoDeleteInDB(const DeleteStruct *ds);
+    void DoTruncateThread(DeleteStruct *ds);
+    void DoDeleteThread(DeleteStruct *ds);
+    void DeleteRecordedFiles(DeleteStruct *ds);
+    void DoDeleteInDB(DeleteStruct *ds);
 
     LiveTVChain *GetExistingChain(const QString &id);
     LiveTVChain *GetExistingChain(const MythSocket *sock);

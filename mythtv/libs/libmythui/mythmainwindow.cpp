@@ -534,6 +534,8 @@ void MythMainWindow::ShowPainterWindow(void)
 {
     if (d->paintwin)
         d->paintwin->show();
+    if (d->render)
+        d->render->Release();
 }
 
 void MythMainWindow::HidePainterWindow(void)
@@ -541,8 +543,17 @@ void MythMainWindow::HidePainterWindow(void)
     if (d->paintwin)
     {
         d->paintwin->clearMask();
-        d->paintwin->hide();
+        if (!(d->render && d->render->IsShared()))
+            d->paintwin->hide();
     }
+}
+
+void MythMainWindow::ResizePainterWindow(const QSize &size)
+{
+    if (!d->paintwin)
+        return;
+    d->paintwin->setFixedSize(size);
+    d->paintwin->resize(size);
 }
 
 MythRender *MythMainWindow::GetRenderDevice()
@@ -640,7 +651,7 @@ void MythMainWindow::animate(void)
         }
     }
 
-    if (redraw)
+    if (redraw && !(d->render && d->render->IsShared()))
         d->paintwin->update(d->repaintRegion);
 
     for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
@@ -700,6 +711,17 @@ void MythMainWindow::drawScreen(void)
         }
     }
 
+    if (!(d->render && d->render->IsShared()))
+        draw();
+
+    d->repaintRegion = QRegion(QRect(0, 0, 0, 0));
+}
+
+void MythMainWindow::draw(void)
+{
+    if (!d->painter)
+        return;
+
     d->painter->Begin(d->paintwin);
 
     QVector<QRect> rects = d->repaintRegion.rects();
@@ -728,8 +750,6 @@ void MythMainWindow::drawScreen(void)
     }
 
     d->painter->End();
-
-    d->repaintRegion = QRegion(QRect(0, 0, 0, 0));
 }
 
 void MythMainWindow::closeEvent(QCloseEvent *e)
@@ -865,8 +885,6 @@ void MythMainWindow::Init(void)
 
     GetMythUI()->ThemeWidget(this);
     Show();
-    setAttribute(Qt::WA_NoSystemBackground);
-    setAutoFillBackground(false);
 
     if (!GetMythDB()->GetNumSetting("HideMouseCursor", 0))
         setMouseTracking(true); // Required for mouse cursor auto-hide
@@ -958,8 +976,14 @@ void MythMainWindow::Init(void)
         return;
     }
 
+    if (d->painter->GetName() != "Qt")
+    {
+        setAttribute(Qt::WA_NoSystemBackground);
+        setAutoFillBackground(false);
+    }
+
     d->paintwin->move(0, 0);
-    d->paintwin->setFixedSize(size());
+    ResizePainterWindow(size());
     d->paintwin->raise();
     ShowPainterWindow();
     if (!GetMythDB()->GetNumSetting("HideMouseCursor", 0))

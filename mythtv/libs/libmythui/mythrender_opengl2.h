@@ -23,7 +23,6 @@ class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
     MythRenderOpenGL2(const QGLFormat& format, QPaintDevice* device,
                       RenderType type = kRenderOpenGL2);
     MythRenderOpenGL2(const QGLFormat& format, RenderType type = kRenderOpenGL2);
-    virtual ~MythRenderOpenGL2();
 
     virtual uint CreateShaderObject(const QString &vert, const QString &frag);
     virtual void DeleteShaderObject(uint obj);
@@ -33,6 +32,7 @@ class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
     virtual bool RectanglesAreAccelerated(void) { return true; }
 
   protected:
+    virtual ~MythRenderOpenGL2();
     virtual void DrawBitmapPriv(uint tex, const QRect *src, const QRect *dst,
                                 uint prog, int alpha,
                                 int red, int green, int blue);

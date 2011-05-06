@@ -87,8 +87,7 @@ OpenGLVideo::OpenGLVideo() :
     inputUpdated(false),      refsNeeded(0),
     textureRects(false),      textureType(GL_TEXTURE_2D),
     helperTexture(0),         defaultUpsize(kGLFilterResize),
-    gl_features(0),           videoTextureType(GL_BGRA),
-    gl_letterbox_colour(kLetterBoxColour_Black)
+    gl_features(0),           videoTextureType(GL_BGRA)
 {
 }
 
@@ -118,8 +117,7 @@ void OpenGLVideo::Teardown(void)
  *  \fn OpenGLVideo::Init(MythRenderOpenGL *glcontext, bool colour_control,
                        QSize videoDim, QRect displayVisibleRect,
                        QRect displayVideoRect, QRect videoRect,
-                       bool viewport_control, QString options, bool osd,
-                       LetterBoxColour letterbox_colour)
+                       bool viewport_control, QString options, bool osd)
  *  \param glcontext          the MythRenderOpenGL object responsible for lower
  *   levelwindow and OpenGL context integration
  *  \param colour_control     if true, manipulation of video attributes
@@ -135,8 +133,6 @@ void OpenGLVideo::Teardown(void)
  *  \param options            a string defining OpenGL features to disable
  *  \param hw_accel           if true, a GPU decoder will copy frames directly
      to an RGBA texture
- *  \param letterbox_colour   the colour used to clear unused areas of the
-     window
  */
 
 bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspace,
@@ -144,8 +140,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
                        QRect displayVisibleRect,
                        QRect displayVideoRect, QRect videoRect,
                        bool viewport_control, QString options,
-                       bool hw_accel,
-                       LetterBoxColour letterbox_colour)
+                       bool hw_accel)
 {
     if (!glcontext)
         return false;
@@ -167,7 +162,6 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     inputTextureSize      = QSize(0,0);
     currentFrameNum       = -1;
     inputUpdated          = false;
-    gl_letterbox_colour   = letterbox_colour;
 
     // Set OpenGL feature support
     gl_features = gl_context->GetFeatures();
@@ -962,26 +956,16 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
             vrect.adjust(0, bob, 0, bob);
         }
 
-        gl_context->SetBackground(0, 0, 0, 0);
         uint target = 0;
         // bind correct frame buffer (default onscreen) and set viewport
         switch (filter->outputBuffer)
         {
             case kDefaultBuffer:
                 gl_context->BindFramebuffer(0);
-                // clear the buffer
                 if (viewportControl)
-                {
-                    if (gl_letterbox_colour == kLetterBoxColour_Gray25)
-                        gl_context->SetBackground(127, 127, 127, 127);
-                    gl_context->ClearFramebuffer();
                     gl_context->SetViewPort(QRect(QPoint(), display_visible_rect.size()));
-                }
                 else
-                {
                     gl_context->SetViewPort(QRect(QPoint(), masterViewportSize));
-                }
-
                 break;
 
             case kFrameBufferObject:

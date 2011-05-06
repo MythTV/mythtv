@@ -28,6 +28,9 @@ MythObservable::MythObservable() : m_lock(new QMutex())
 
 MythObservable::~MythObservable()
 {
+    m_lock->lock();
+    m_listeners.clear();
+    m_lock->unlock();
     delete m_lock;
     m_lock = NULL;
 }

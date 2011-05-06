@@ -2177,9 +2177,7 @@ void GuideGrid::EmbedTVWindow(void)
     MythEvent *me = new MythEvent("STOP_VIDEO_REFRESH_TIMER");
     qApp->postEvent(this, me);
 
-    PlayerContext *ctx = m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
-    m_usingNullVideo =
-            !m_player->StartEmbedding(ctx, GetMythMainWindow()->GetPaintWindow()->winId(), m_videoRect);
+    m_usingNullVideo = !m_player->StartEmbedding(m_videoRect);
     if (!m_usingNullVideo)
     {
         QRegion r1 = QRegion(m_Area);
@@ -2192,7 +2190,6 @@ void GuideGrid::EmbedTVWindow(void)
         me = new MythEvent("START_VIDEO_REFRESH_TIMER");
         qApp->postEvent(this, me);
     }
-    m_player->ReturnPlayerLock(ctx);
 }
 
 void GuideGrid::refreshVideo(void)

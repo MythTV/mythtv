@@ -78,7 +78,7 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
     if (src[0] == 0x1f)
         return freesat_huffman_to_string(src, raw_length);
 
-    if ((0x10 < src[0]) && (src[0] < 0x20))
+    if (((0x10 < src[0]) && (src[0] < 0x15)) || ((0x15 < src[0]) && (src[0] < 0x20)))
     {
         // TODO: Handle multi-byte encodings
         VERBOSE(VB_SIPARSER, "dvb_decode_text: "
@@ -140,6 +140,10 @@ static QString decode_text(const unsigned char *buf, uint length)
         else
             return QString::fromLocal8Bit((char*)(buf + 3), length - 3);
     }
+    else if (buf[0] == 0x15) // Already Unicode
+    {
+        return QString::fromUtf8((char*)(buf + 1), length - 1);
+    }
     else
     {
         // Unknown/invalid encoding - assume local8Bit
@@ -158,7 +162,7 @@ QString dvb_decode_short_name(const unsigned char *src, uint raw_length)
         return "";
     }
 
-       if ((0x10 < src[0]) && (src[0] < 0x20))
+    if (((0x10 < src[0]) && (src[0] < 0x15)) || ((0x15 < src[0]) && (src[0] < 0x20)))
     {
         // TODO: Handle multi-byte encodings
         VERBOSE(VB_SIPARSER, "dvb_decode_short_name: "

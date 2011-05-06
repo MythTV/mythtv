@@ -19,15 +19,6 @@
 #include "ThreadedFileWriter.h"
 #include "compat.h"
 #include "mythverbose.h"
-#include "mythconfig.h" // gives us HAVE_POSIX_FADVISE
-
-#if HAVE_POSIX_FADVISE < 1
-static int posix_fadvise(int, off_t, off_t, int) { return 0; }
-#define POSIX_FADV_DONTNEED 0
-#  if defined(__linux__)
-#    warning "Not using fadvise on platform that supports it."
-#  endif
-#endif
 
 #define LOC QString("TFW(%1): ").arg(fd)
 #define LOC_ERR QString("TFW(%1), Error: ").arg(fd)

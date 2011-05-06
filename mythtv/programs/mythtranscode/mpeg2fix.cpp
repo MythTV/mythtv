@@ -561,7 +561,10 @@ void MPEG2fixup::InitReplex()
             it != aFrame.end(); it++)
     {
         int i = aud_map[it.key()];
-        char *lang = inputFC->streams[it.key()]->language;
+        AVMetadataTag *metatag =
+            av_metadata_get(inputFC->streams[it.key()]->metadata,
+                            "language", NULL, 0);
+        char *lang = metatag ? metatag->value : NULL;
         ring_init(&rx.extrbuf[i], memsize / 5);
         ring_init(&rx.index_extrbuf[i], INDEX_BUF);
         rx.extframe[i].set = 1;
@@ -747,7 +750,7 @@ int MPEG2fixup::InitAV(const char *inputfile, const char *type, int64_t offset)
 
     // Dump stream information
     if (SHOW_MSG(MPF_GENERAL))
-        dump_format(inputFC, 0, inputfile, 0);
+        av_dump_format(inputFC, 0, inputfile, 0);
 
     for (unsigned int i = 0; i < inputFC->nb_streams; i++)
     {

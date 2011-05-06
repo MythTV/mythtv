@@ -624,6 +624,7 @@ class MTV_PUBLIC MythPlayer
     // Buffering
     bool     buffering;
     QTime    buffering_start;
+    QTime    buffering_last_msg;
 
     // General Caption/Teletext/Subtitle support
     uint     textDisplayMode;

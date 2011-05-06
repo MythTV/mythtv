@@ -27,13 +27,6 @@
 #include "compat.h"
 #include "util.h"
 
-#if ! HAVE_POSIX_FADVISE
-static int posix_fadvise(int, off_t, off_t, int) { return 0; }
-#define POSIX_FADV_SEQUENTIAL 0
-#define POSIX_FADV_WILLNEED 0
-#define POSIX_FADV_DONTNEED 0
-#endif
-
 // about one second at 35mbit
 const uint RingBuffer::kBufferSize = 4 * 1024 * 1024;
 const int  RingBuffer::kDefaultOpenTimeout = 2000; // ms
@@ -772,11 +765,18 @@ void RingBuffer::run(void)
                     LOC + QString("safe_read(...@%1, %2) -- begin")
                     .arg(rbwpos).arg(totfree));
 
+            MythTimer sr_timer;
+            sr_timer.start();
+
             read_return = safe_read(readAheadBuffer + rbwpos, totfree);
 
-            VERBOSE(VB_FILE|VB_EXTRA, LOC +
-                    QString("safe_read(...@%1, %2) -> %3")
-                    .arg(rbwpos).arg(totfree).arg(read_return));
+            int sr_elapsed = sr_timer.elapsed();
+            VERBOSE((sr_elapsed > 1000) ? VB_IMPORTANT :
+                    (sr_elapsed > 500) ? VB_FILE : VB_FILE|VB_EXTRA,
+                    (sr_elapsed > 500 ? LOC_WARN : LOC) +
+                    QString("safe_read(...@%1, %2) -> %3, took %4 ms")
+                    .arg(rbwpos).arg(totfree).arg(read_return)
+                    .arg(sr_elapsed));
 
             rbwlock.unlock();
         }
@@ -786,16 +786,12 @@ void RingBuffer::run(void)
             poslock.lockForWrite();
             rbwlock.lockForWrite();
             internalreadpos += read_return;
-            off_t donotneed = internalreadpos;
             rbwpos = (rbwpos + read_return) % kBufferSize;
             VERBOSE(VB_FILE|VB_EXTRA,
                     LOC + QString("rbwpos += %1K requested %2K in read")
                     .arg(read_return/1024,3).arg(totfree/1024,3));
             rbwlock.unlock();
             poslock.unlock();
-
-            if (fd2 >=0 && donotneed > 0)
-                posix_fadvise(fd2, 0, donotneed, POSIX_FADV_DONTNEED);
         }
 
         int used = kBufferSize - ReadBufFree();
@@ -1010,10 +1006,7 @@ int RingBuffer::ReadDirect(void *buf, int count, bool peek)
             if (remotefile)
                 remotefile->Seek(old_pos, SEEK_SET);
             else
-            {
                 lseek64(fd2, old_pos, SEEK_SET);
-                posix_fadvise(fd2, old_pos, 1*1024*1024, POSIX_FADV_WILLNEED);
-            }
         }
         else
         {

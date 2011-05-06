@@ -54,7 +54,7 @@ class PESPacket
     {
         InitPESPacket(const_cast<TSPacket&>(*tspacket));
         _fullbuffer = const_cast<unsigned char*>(tspacket->data());
-        _pesdataSize = TSPacket::SIZE - (_pesdata - _fullbuffer);
+        _pesdataSize = TSPacket::kSize - (_pesdata - _fullbuffer);
     }
     // does not create it's own data
     PESPacket(const unsigned char *pesdata, bool)
@@ -98,7 +98,7 @@ class PESPacket
         _allocSize  = len + _psiOffset;
         _fullbuffer = pes_alloc(_allocSize);
         _pesdata    = _fullbuffer + _psiOffset + 1;
-        memcpy(_fullbuffer, tspacket.data(), TSPacket::SIZE);
+        memcpy(_fullbuffer, tspacket.data(), TSPacket::kSize);
     }
 
     // At this point we should have the entire VCT table in buffer

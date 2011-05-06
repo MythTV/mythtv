@@ -67,15 +67,17 @@ class MBASE_PUBLIC HttpComms : public QObject
                             int maxRetries = 3, int maxRedirects = 3, 
                             bool allowGzip = false, Credentials* webCred = NULL);
     
-    static QString postHttp(QUrl               &url, 
-                            QHttpRequestHeader *pAddlHdr          = NULL, 
-                            QIODevice          *pData             = NULL,
-                            int                 timeoutMS         = 10000, 
-                            int                 maxRetries        = 3, 
-                            int                 maxRedirects      = 3, 
-                            bool                allowGzip         = false,
-                            Credentials        *webCred           = NULL, 
-                            bool                isInQtEventThread = true );
+    static QString postHttp(
+        QUrl               &url, 
+        QHttpRequestHeader *pAddlHdr          = NULL, 
+        QIODevice          *pData             = NULL,
+        int                 timeoutMS         = 10000, 
+        int                 maxRetries        = 3, 
+        int                 maxRedirects      = 3, 
+        bool                allowGzip         = false,
+        Credentials        *webCred           = NULL, 
+        bool                isInQtEventThread = true,
+        QString             userAgent         = "<default>");
 
     void request(QUrl &url, int timeoutms = -1, bool allowGzip = false);
     void request(QUrl &url, QHttpRequestHeader &header, int timeoutms = -1, QIODevice *pData = NULL );

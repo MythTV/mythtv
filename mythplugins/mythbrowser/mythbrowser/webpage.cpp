@@ -104,7 +104,7 @@ void WebPage::slotIconChanged(void)
     if (icon.isNull())
     {
         //FIXME use a default icon here?
-        m_listItem->setImage(NULL);
+        m_listItem->SetImage("", "favicon");
     }
     else
     {
@@ -117,7 +117,7 @@ void WebPage::slotIconChanged(void)
             MythImage *mimage = GetMythPainter()->GetFormatImage();
             mimage->Assign(image);
 
-            m_listItem->setImage(mimage);
+            m_listItem->setImage(mimage, "favicon");
         }
     }
 
