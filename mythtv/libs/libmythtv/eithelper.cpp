@@ -972,9 +972,6 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
         fix[ 1094LL << 32 | 1 << 16 | 17028 ] = // NT1
         fix[ 1100LL << 32 | 1 << 16 |  8710 ] = // NRJ 12
         EITFixUp::kEFixForceISO8859_15;
-
-    // DVB-T TDT, Portugal (RTP 1, RTP 2, SIC, TVI)
-    fix[ 1101LL << 32 | 8904U << 16 ] = EITFixUp::kEFixForceISO8859_15;
 }
 
 static int calc_eit_utc_offset(void)
