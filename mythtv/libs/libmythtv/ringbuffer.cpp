@@ -786,7 +786,6 @@ void RingBuffer::run(void)
             poslock.lockForWrite();
             rbwlock.lockForWrite();
             internalreadpos += read_return;
-            off_t donotneed = internalreadpos;
             rbwpos = (rbwpos + read_return) % kBufferSize;
             VERBOSE(VB_FILE|VB_EXTRA,
                     LOC + QString("rbwpos += %1K requested %2K in read")
