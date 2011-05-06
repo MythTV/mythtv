@@ -3391,8 +3391,10 @@ void AvFormatDecoder::GetAttachmentData(uint trackNo, QByteArray &filename,
         return;
 
     int index = tracks[kTrackTypeAttachment][trackNo].av_stream_index;
-    // TODO deprecated - use AVMetaData
-    filename  = QByteArray(ic->streams[index]->filename);
+    AVMetadataTag *tag = av_metadata_get(ic->streams[index]->metadata,
+                                         "filename", NULL, 0);
+    if (tag)
+        filename  = QByteArray(tag->value);
     data      = QByteArray((char *)ic->streams[index]->codec->extradata,
                            ic->streams[index]->codec->extradata_size);
 }
