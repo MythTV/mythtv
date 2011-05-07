@@ -69,7 +69,7 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
         if (args < 0)
         {
             /* no existing parameters: add it behind device name */
-            passthru_device += iecarg;
+            passthru_device += ":" + iecarg;
         }
         else
         {
