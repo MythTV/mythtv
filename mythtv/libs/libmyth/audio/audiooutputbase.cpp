@@ -1518,16 +1518,13 @@ void AudioOutputBase::OutputAudioLoop(void)
     uchar *zeros        = new uchar[fragment_size];
     uchar *fragment_buf = new uchar[fragment_size + 16];
     uchar *fragment     = (uchar *)AOALIGN(fragment_buf[0]);
-
-    // to reduce startup latency, write silence in 8ms chunks
-    int zero_fragment_size = (int)(0.008*samplerate/channels);
-    // make sure its a multiple of output_bytes_per_frame
-    zero_fragment_size *= output_bytes_per_frame;
-    if (zero_fragment_size > fragment_size)
-        zero_fragment_size = fragment_size;
-
     memset(zeros, 0, fragment_size);
 
+    // to reduce startup latency, write silence in 8ms chunks
+    int zero_fragment_size = 8 * samplerate * output_bytes_per_frame / 1000;
+    if (zero_fragment_size > fragment_size)
+        zero_fragment_size = fragment_size;
+           
     while (!killaudio)
     {
         if (pauseaudio)
@@ -1543,8 +1540,6 @@ void AudioOutputBase::OutputAudioLoop(void)
             actually_paused = true;
             audiotime = 0; // mark 'audiotime' as invalid.
 
-            // only send zeros if card doesn't already have at least one
-            // fragment of zeros -dag
             WriteAudio(zeros, zero_fragment_size);
             continue;
         }
