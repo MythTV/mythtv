@@ -1166,23 +1166,32 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
     off =  processing ? 4 : output_settings->SampleSize(format);
     off *= source_channels;
 
-    len = 0;
+    VERBOSE(VB_AUDIO, LOC + QString("CopyWithUpmix: Frames = %1").arg(frames));
+    
+    int nFrames, bdFrames;
     int i = 0;
+    len = 0;
     while (i < frames)
     {
-        int nFrames;
-
-        i += upmixer->putFrames(buffer + i * off,
-                                frames - i, source_channels);
+        i += upmixer->putFrames(buffer + i * off, frames - i, source_channels);
+        VERBOSE(VB_AUDIO, LOC + QString("CopyWithUpmix: Done %1 Frames").arg(i));
 
         nFrames = upmixer->numFrames();
-
         if (!nFrames)
+        {
+            VERBOSE(VB_AUDIO, LOC + QString("CopyWithUpmix: Got 0 in return (frames=%1 i=%2")
+                    .arg(frames).arg(i));
             continue;
+        }
 
         len += CheckFreeSpace(nFrames);
 
-        int bdFrames = (kAudioRingBufferSize - org_waud) / bpf;
+        bdFrames = (kAudioRingBufferSize - org_waud) / bpf;
+        if ((kAudioRingBufferSize - org_waud) != (bdFrames * bpf))
+        {
+            VERBOSE(VB_AUDIO, LOC + QString("CopyWithUpmix: will miss data (%1)")
+                    .arg(bdiff - (bdFrames * bpf)));
+        }
         if (bdFrames < nFrames)
         {
             upmixer->receiveFrames((float *)(WPOS), bdFrames);
@@ -1217,13 +1226,10 @@ bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
 bool AudioOutputBase::AddData(void *in_buffer, int in_len,
                               int64_t timecode, int /*in_frames*/)
 {
-    int org_waud = waud;
-    int afree    = audiofree();
     int frames   = in_len / source_bytes_per_frame;
     void *buffer = in_buffer;
     int bpf      = bytes_per_frame;
     int len      = in_len;
-    int used     = kAudioRingBufferSize - afree;
     bool music   = false;
     int bdiff;
 
@@ -1245,6 +1251,10 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
 
     // Don't write new samples if we're resetting the buffer or reconfiguring
     QMutexLocker lock(&audio_buflock);
+
+    int org_waud = waud;
+    int afree    = audiofree();
+    int used     = kAudioRingBufferSize - afree;
 
     if (passthru && m_spdifenc)
     {
@@ -1326,8 +1336,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
 
     int frames_remaining = frames;
     int frames_final = 0;
-    int maxframes = (kAudioSRCInputSize /
-                     (passthru ? channels : source_channels)) & ~0xf;
+    int maxframes = (kAudioSRCInputSize / source_channels) & ~0xf;
     int offset = 0;
 
     while(frames_remaining > 0)
@@ -1392,6 +1401,11 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
             // does not change the timecode, only the number of samples
             org_waud     = waud;
             int bdFrames = bdiff / bpf;
+            if (bdiff != (bdFrames * bpf))
+            {
+                VERBOSE(VB_AUDIO, LOC + QString("TStretch AddData: will miss data (%1)")
+                        .arg(bdiff - (bdFrames * bpf)));
+            }
 
             if (bdiff < len)
             {
