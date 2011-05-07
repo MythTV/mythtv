@@ -40,7 +40,10 @@ extern "C" {
 #endif
 
 #if HAVE_ALTIVEC
-extern "C" int has_altivec(void);    // in libavcodec/ppc/check_altivec.c
+extern "C" {
+#include "libavutil/cpu.h"
+}
+int has_altivec(void); 
 #if HAVE_ALTIVEC_H
 #include <altivec.h>
 #else
@@ -48,6 +51,17 @@ extern "C" int has_altivec(void);    // in libavcodec/ppc/check_altivec.c
 #endif
 #endif
 #include "yuv2rgb.h"
+
+#if HAVE_ALTIVEC
+int has_altivec(void)
+{
+    int cpu_flags = av_get_cpu_flags();
+    if (cpu_flags & AV_CPU_FLAG_ALTIVEC)
+        return(1);
+
+    return(0);
+}
+#endif
 
 /** \file yuv2rgb.cpp
  *  \brief Contains various YUV, VUY and RGBA colorspace conversion routines.
