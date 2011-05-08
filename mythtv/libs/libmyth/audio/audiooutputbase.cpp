@@ -1187,7 +1187,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
         len += CheckFreeSpace(nFrames);
 
         bdFrames = (kAudioRingBufferSize - org_waud) / bpf;
-        if ((kAudioRingBufferSize - org_waud) != (bdFrames * bpf))
+        if ((int)(kAudioRingBufferSize - org_waud) != (bdFrames * bpf))
         {
             VERBOSE(VB_AUDIO, LOC + QString("CopyWithUpmix: will miss data (%1)")
                     .arg(bdiff - (bdFrames * bpf)));
