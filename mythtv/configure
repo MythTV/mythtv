@@ -1229,6 +1229,7 @@ HAVE_LIST="
     attribute_may_alias
     attribute_packed
     bswap
+    byteswap_h
     closesocket
     cmov
     conio_h

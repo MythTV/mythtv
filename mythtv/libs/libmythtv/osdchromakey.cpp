@@ -228,7 +228,7 @@ void ChromaKeyOSD::BlendOrCopy(uint32_t colour, const QRect &rect)
         source += src_stride >> 1;
         dest   += dst_stride >> 1;
 #else
-        for (uint j = 0; j < width; j++)
+        for (int j = 0; j < width; j++)
             dest[j] = (source[j] & MASK) ? source[j] : colour;
         source += src_stride;
         dest   += dst_stride;
