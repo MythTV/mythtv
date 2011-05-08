@@ -368,9 +368,8 @@ static void yv12_to_yuy2_mmxext
 
     sfence();
     emms();
-
-#endif
 }
+#endif
 
 #define C_YUYV_YUV420( )                                          \
     *p_y1++ = *p_line1++; *p_y2++ = *p_line2++;                   \
@@ -518,8 +517,8 @@ static void yuy2_to_yv12_mmxext
 
     sfence();
     emms();
-#endif
 }
+#endif
 
 #if HAVE_MMX
 static void vfilter_chroma_332_packed422_scanline_mmx( uint8_t *output, int width,
