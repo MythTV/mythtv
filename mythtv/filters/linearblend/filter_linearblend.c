@@ -32,6 +32,7 @@ typedef struct LBFilter
 void linearBlend(unsigned char *src, int stride);
 void linearBlendMMX(unsigned char *src, int stride);
 void linearBlend3DNow(unsigned char *src, int stride);
+inline void linearBlendAltivec(unsigned char *src, int stride);
 int linearBlendFilterAltivec(VideoFilter *f, VideoFrame *frame, int field);
 
 #ifdef MMX

@@ -231,6 +231,7 @@ static void yv12_to_yuy2_c
 
 #endif
 
+#if HAVE_MMX
 static void yv12_to_yuy2_mmxext
 (const unsigned char *y_src, int y_src_pitch, 
  const unsigned char *u_src, int u_src_pitch, 
@@ -238,7 +239,6 @@ static void yv12_to_yuy2_mmxext
  unsigned char *yuy2_map, int yuy2_pitch,
  int width, int height, int progressive ) 
 {
-#if HAVE_MMX
     uint8_t *p_line1, *p_line2 = yuy2_map;
     const uint8_t *p_y1, *p_y2 = y_src;
     const uint8_t *p_u = u_src;
@@ -472,6 +472,7 @@ static void yuy2_to_yv12_c
 
 #endif
 
+#if HAVE_MMX
 static void yuy2_to_yv12_mmxext
 (const unsigned char *yuy2_map, int yuy2_pitch,
  unsigned char *y_dst, int y_dst_pitch, 
@@ -479,7 +480,6 @@ static void yuy2_to_yv12_mmxext
  unsigned char *v_dst, int v_dst_pitch, 
  int width, int height) 
 {
-#if HAVE_MMX
     const uint8_t *p_line1, *p_line2 = yuy2_map;
     uint8_t *p_y1, *p_y2 = y_dst;
     uint8_t *p_u = u_dst;
