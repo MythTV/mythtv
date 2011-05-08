@@ -110,6 +110,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
 
     QIcon GetIcon(void);
     QUrl  GetUrl(void);
+    QString GetTitle(void);
 
     void SetActive(bool active);
     bool IsActive(void) { return m_active; }

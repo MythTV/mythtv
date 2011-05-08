@@ -282,6 +282,8 @@ void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
 {
     if (reply->error() == QNetworkReply::NoError)
     {
+        reload();
+
         QVariant header = reply->header(QNetworkRequest::ContentTypeHeader);
 
         if (header != QVariant())
@@ -290,8 +292,6 @@ void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
 
         m_downloadRequest = reply->request();
         showDownloadMenu();
-
-        emit titleChanged(title());
 
         return;
     }
@@ -938,6 +938,18 @@ QUrl MythUIWebBrowser::GetUrl(void)
     }
     else
         return QUrl();
+}
+
+/** \fn MythUIWebBrowser::GetTitle(void)
+ *  \brief Gets the current page's title
+ *  \return return the page title
+ */
+QString MythUIWebBrowser::GetTitle(void)
+{
+    if (m_browser)
+        return m_browser->title();
+    else
+        return QString("");
 }
 
 /** \fn MythUIWebBrowser::evaluateJavaScript(const QString& scriptSource)
