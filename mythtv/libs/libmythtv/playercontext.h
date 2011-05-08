@@ -184,7 +184,6 @@ class MPUBLIC PlayerContext
     int                 ff_rew_index;
     /// Caches value of ff_rew_speeds[ff_rew_index]
     int                 ff_rew_speed;
-    bool                paused;
     TVState             playingState;
 
     bool                errored;

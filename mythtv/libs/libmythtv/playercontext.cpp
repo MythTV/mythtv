@@ -42,7 +42,7 @@ PlayerContext::PlayerContext(const QString &inUseID) :
     // Fast forward state
     ff_rew_state(0), ff_rew_index(0), ff_rew_speed(0),
     // Other state
-    paused(false), playingState(kState_None),
+    playingState(kState_None),
     errored(false),
     // pseudo states
     pseudoLiveTVRec(NULL), pseudoLiveTVState(kPseudoNormalLiveTV),

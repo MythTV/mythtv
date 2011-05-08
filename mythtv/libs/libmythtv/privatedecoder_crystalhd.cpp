@@ -861,7 +861,6 @@ QString bcmerr_to_string(BC_STATUS err)
         case BC_STS_CERT_VERIFY_ERROR: return "Certificate verify error";
         case BC_STS_DEC_EXIST_OPEN:    return "Decoder exist open (?)";
         case BC_STS_PENDING:           return "Pending";
-        case BC_STS_CLK_NOCHG:         return "Clock no change (?)";
         case BC_STS_ERROR:             return "Unknown";
     }
     return "Unknown error";

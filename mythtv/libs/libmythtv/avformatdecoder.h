@@ -222,7 +222,7 @@ class AvFormatDecoder : public DecoderBase
 
     void SeekReset(long long, uint skipFrames, bool doFlush, bool discardFrames);
 
-    static inline bool DecoderWillDownmix(const AVCodecContext *ctx);
+    inline bool DecoderWillDownmix(const AVCodecContext *ctx);
     bool DoPassThrough(const AVCodecContext *ctx);
     bool SetupAudioStream(void);
     void SetupAudioStreamSubIndexes(int streamIndex);

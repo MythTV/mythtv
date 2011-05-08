@@ -212,7 +212,10 @@ class Recorded( DBDataWrite, CMPRecord ):
                 'force' forces a delete if the file cannot be found.
                 'rerecord' sets the file as recordable in oldrecorded
         """
-        return self.getProgram().delete(force, rerecord)
+        try:
+            return self.getProgram().delete(force, rerecord)
+        except NoneType:
+            raise MythError("Program could not be found")
 
     def open(self, type='r'):
         """Recorded.open(type='r') -> file or FileTransfer object"""

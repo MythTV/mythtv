@@ -4599,10 +4599,11 @@ void AvFormatDecoder::SetDisablePassThrough(bool disable)
 
 inline bool AvFormatDecoder::DecoderWillDownmix(const AVCodecContext *ctx)
 {
-        // Until ffmpeg properly implements dialnorm
-        // use Myth internal downmixer if machines has FPU/SSE
-    if (AudioOutputUtil::has_hardware_fpu())
-        return false;
+    // Until ffmpeg properly implements dialnorm
+    // use Myth internal downmixer if machines has FPU/SSE
+    if (!m_audio->CanDownmix() || !AudioOutputUtil::has_hardware_fpu())
+        return true;
+
     switch (ctx->codec_id)
     {
         case CODEC_ID_AC3:

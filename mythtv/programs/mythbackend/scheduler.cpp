@@ -553,6 +553,11 @@ void Scheduler::UpdateRecStatus(RecordingInfo *pginfo)
                     reschedQueue.enqueue(0);
                     reschedWait.wakeOne();
                 }
+                else
+                {
+                    MythEvent me("SCHEDULE_CHANGE");
+                    gCoreContext->dispatch(me);
+                }
             }
             return;
         }
@@ -597,6 +602,11 @@ void Scheduler::UpdateRecStatus(uint cardid, uint chanid,
                 {
                     reschedQueue.enqueue(0);
                     reschedWait.wakeOne();
+                }
+                else
+                {
+                    MythEvent me("SCHEDULE_CHANGE");
+                    gCoreContext->dispatch(me);
                 }
             }
             return;
@@ -1446,9 +1456,10 @@ void Scheduler::UpdateNextRecord(void)
             if (nextRecMap[recid].isNull() || !next_record.isValid())
             {
                 subquery.prepare("UPDATE record "
-                                 "SET next_record = '0000-00-00T00:00:00' "
+                                 "SET next_record = '0000-00-00 00:00:00' "
                                  "WHERE recordid = :RECORDID;");
                 subquery.bindValue(":RECORDID", recid);
+
             }
             else
             {
