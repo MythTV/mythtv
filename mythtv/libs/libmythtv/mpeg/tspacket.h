@@ -169,8 +169,8 @@ class TSPacket : public TSHeader
     }
 
     //4.0  8 bits, iff payloadStart(), points to start of field
-    unsigned int StartOfFieldPointer() const { return data()[AFCOffset()]; }
-    void SetStartOfFieldPointer(uint sof) { data()[AFCOffset()] = sof; }
+    unsigned int StartOfFieldPointer() const { return *(data() + AFCOffset()); }
+    void SetStartOfFieldPointer(uint sof) { *(data() + AFCOffset()) = sof; }
 
     QString toString() const;
 

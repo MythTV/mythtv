@@ -267,6 +267,18 @@ qint64 MythSocket::writeBlock(const char *data, quint64 len)
     return rval;
 }
 
+static QString toSample(const QByteArray &payload)
+{
+    QString sample("");
+    for (uint i = 0; (i<60) && (i<(uint)payload.length()); i++)
+    {
+        sample += QChar(payload.data()[i]).isPrint() ?
+            QChar(payload.data()[i]) : QChar('?');
+    }
+    sample += (payload.length() > 60) ? "..." : "";
+    return sample;
+}
+
 bool MythSocket::writeStringList(QStringList &list)
 {
     if (list.size() <= 0)
@@ -325,7 +337,8 @@ bool MythSocket::writeStringList(QStringList &list)
             VERBOSE(VB_IMPORTANT, LOC +
                     "writeStringList: Error, socket went unconnected." +
                     QString("\n\t\t\tWe wrote %1 of %2 bytes with %3 errors")
-                    .arg(written).arg(written+size).arg(errorcount));
+                    .arg(written).arg(written+size).arg(errorcount) +
+                    QString("\n\t\t\tstarts with: %1").arg(toSample(payload)));
             return false;
         }
 
@@ -355,7 +368,9 @@ bool MythSocket::writeStringList(QStringList &list)
             {
                 VERBOSE(VB_GENERAL, LOC + "writeStringList: Error, " +
                         QString("No data written on writeBlock (%1 errors)")
-                        .arg(errorcount));
+                        .arg(errorcount) +
+                        QString("\n\t\t\tstarts with: %1")
+                        .arg(toSample(payload)));
                 return false;
             }
             usleep(1000);

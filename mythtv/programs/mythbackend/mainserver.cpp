@@ -4476,8 +4476,12 @@ void TruncateThread::run(void)
 
 void MainServer::DoTruncateThread(DeleteStruct *ds)
 {
-    if (gCoreContext->GetNumSetting("TruncateDeletesSlowly", 0))
+    if (gCoreContext->GetNumSetting("TruncateDeletesSlowly", 0)) 
+    {
+        QThreadPool::globalInstance()->releaseThread();
         TruncateAndClose(NULL, ds->m_fd, ds->m_filename, ds->m_size);
+        QThreadPool::globalInstance()->reserveThread();
+    }
     else
     {
         QMutexLocker dl(&deletelock);

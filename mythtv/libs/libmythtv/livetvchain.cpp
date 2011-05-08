@@ -247,9 +247,9 @@ void LiveTVChain::GetEntryAt(int at, LiveTVChainEntry &entry) const
     QMutexLocker lock(&m_lock);
 
     int size = m_chain.count();
-    int new_at = (at < 0 || at >= size) ? size - 1 : at;
+    int new_at = (size && (at < 0 || at >= size)) ? size - 1 : at;
 
-    if (new_at >= 0 && new_at <= size)
+    if (size && new_at >= 0 && new_at <= size)
         entry = m_chain[new_at];
     else
     {

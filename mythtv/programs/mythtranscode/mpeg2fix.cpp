@@ -565,7 +565,10 @@ void MPEG2fixup::InitReplex()
             it != aFrame.end(); it++)
     {
         int i = aud_map[it.key()];
-        char *lang = inputFC->streams[it.key()]->language;
+        AVMetadataTag *metatag =
+            av_metadata_get(inputFC->streams[it.key()]->metadata,
+                            "language", NULL, 0);
+        char *lang = metatag ? metatag->value : NULL;
         ring_init(&rx.extrbuf[i], memsize / 5);
         ring_init(&rx.index_extrbuf[i], INDEX_BUF);
         rx.extframe[i].set = 1;
