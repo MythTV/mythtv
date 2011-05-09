@@ -56,6 +56,8 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     bool IsOpen(void)          const { return m_dvdnav;                 }
     long long GetTotalReadPosition(void) { return m_titleLength;        }
     uint GetChapterLength(void)    const { return m_pgLength / 90000;   }
+    void GetChapterTimes(QList<long long> &times);
+    uint64_t GetChapterTimes(uint title);
     virtual long long GetReadPosition(void) const;
     void GetDescForPos(QString &desc);
     void GetPartAndTitle(int &_part, int &_title) const
@@ -108,6 +110,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
         { dvdnav_part_play(m_dvdnav, _title, _part); }
     virtual bool StartFromBeginning(void);
     void CloseDVD(void);
+    bool playTrack(int track);
     bool nextTrack(void);
     void prevTrack(void);
     virtual int safe_read(void *data, uint sz);

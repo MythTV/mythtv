@@ -11206,11 +11206,7 @@ void TV::DVDJumpBack(PlayerContext *ctx)
     }
     else if (!dvdrb->StartOfTitle())
     {
-        ctx->LockDeletePlayer(__FILE__, __LINE__);
-        if (ctx->player)
-            ctx->player->ChangeDVDTrack(0);
-        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-        UpdateOSDSeekMessage(ctx, tr("Previous Chapter"), kOSDTimeout_Med);
+        DoJumpChapter(ctx, -1);
     }
     else
     {
@@ -11250,12 +11246,7 @@ void TV::DVDJumpForward(PlayerContext *ctx)
     }
     else if (!dvdrb->EndOfTitle() && !in_still && !in_menu)
     {
-        ctx->LockDeletePlayer(__FILE__, __LINE__);
-        if (ctx->player)
-            ctx->player->ChangeDVDTrack(1);
-        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-
-        UpdateOSDSeekMessage(ctx, tr("Next Chapter"), kOSDTimeout_Med);
+        DoJumpChapter(ctx, 9999);
     }
     else if (!in_still && !in_menu)
     {

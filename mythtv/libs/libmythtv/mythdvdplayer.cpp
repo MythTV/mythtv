@@ -11,7 +11,7 @@
 
 MythDVDPlayer::MythDVDPlayer(bool muted)
   : MythPlayer(muted), m_buttonVersion(0),
-    dvd_stillframe_showing(false), need_change_dvd_track(0),
+    dvd_stillframe_showing(false),
     m_initial_title(-1), m_initial_audio_track(-1),
     m_initial_subtitle_track(-1),
     m_stillFrameLength(0)
@@ -266,16 +266,6 @@ void MythDVDPlayer::EventStart(void)
     MythPlayer::EventStart();
 }
 
-void MythDVDPlayer::EventLoop(void)
-{
-    MythPlayer::EventLoop();
-    if (need_change_dvd_track)
-    {
-        DoChangeDVDTrack();
-        need_change_dvd_track = 0;
-    }
-}
-
 void MythDVDPlayer::InitialSeek(void)
 {
     player_ctx->buffer->IgnoreWaitStates(true);
@@ -463,16 +453,63 @@ int MythDVDPlayer::SetTrack(uint type, int trackNo)
     return MythPlayer::SetTrack(type, trackNo);
 }
 
-void MythDVDPlayer::ChangeDVDTrack(bool ffw)
+int MythDVDPlayer::GetNumChapters(void)
 {
-    need_change_dvd_track = (ffw ? 1 : -1);
+    if (!player_ctx->buffer->IsDVD())
+        return 0;
+    return player_ctx->buffer->DVD()->NumPartsInTitle();
 }
 
-void MythDVDPlayer::DoChangeDVDTrack(void)
+int MythDVDPlayer::GetCurrentChapter(void)
 {
-    if (decoder)
-        decoder->ChangeDVDTrack(need_change_dvd_track > 0);
-    ClearAfterSeek(!player_ctx->buffer->IsInDiscMenuOrStillFrame());
+    if (!player_ctx->buffer->IsDVD())
+        return 0;
+    return player_ctx->buffer->DVD()->GetPart();
+}
+
+void MythDVDPlayer::GetChapterTimes(QList<long long> &times)
+{
+    if (!player_ctx->buffer->IsDVD())
+        return;
+    player_ctx->buffer->DVD()->GetChapterTimes(times);
+}
+
+bool MythDVDPlayer::DoJumpChapter(int chapter)
+{
+    if (!player_ctx->buffer->IsDVD())
+        return false;
+
+    int total   = GetNumChapters();
+    int current = GetCurrentChapter();
+
+    if (chapter < 0 || chapter > total)
+    {
+        if (chapter < 0)
+        {
+            chapter = current -1;
+            if (chapter < 0) chapter = 0;
+        }
+        else if (chapter > total)
+        {
+            chapter = current + 1;
+            if (chapter > total) chapter = total;
+        }
+    }
+
+    bool success = player_ctx->buffer->DVD()->playTrack(chapter);
+    if (success)
+    {
+        if (decoder)
+        {
+            decoder->UpdateDVDFramesPlayed();
+            if (player_ctx->buffer->DVD()->GetCellStart() == 0)
+                decoder->SeekReset(framesPlayed, 0, true, true);
+        }
+        ClearAfterSeek(!player_ctx->buffer->IsInDiscMenuOrStillFrame());
+    }
+
+    jumpchapter = 0;
+    return success;
 }
 
 void MythDVDPlayer::DisplayDVDButton(void)

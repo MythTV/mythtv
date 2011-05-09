@@ -2644,7 +2644,7 @@ void MythPlayer::EventLoop(void)
         }
     }
 
-    // Handle chapter jump (currently matroska only)
+    // Handle chapter jump
     if (jumpchapter != 0)
         DoJumpChapter(jumpchapter);
 

@@ -350,30 +350,16 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         {
             for (int i = 1; i < num_titles + 1; i++)
             {
-                uint64_t *times;
-                uint64_t duration;
-                uint32_t count = dvdnav_describe_title_chapters(m_dvdnav, i,
-                                                                &times,
-                                                                &duration);
-                if (count < 1)
-                {
-                    VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        QString("Failed to get chapters for title %1").arg(i));
+                uint64_t duration = GetChapterTimes(i);
+                if (duration < 1 || !m_chapterMap.contains(i))
                     continue;
-                }
 
-                float length = (float)duration / 90000.0f;
                 VERBOSE(VB_GENERAL, LOC +
                     QString("Title %1: chapters %2 duration %3")
-                            .arg(i).arg(count).arg(length));
+                            .arg(i).arg(m_chapterMap.value(i).size())
+                            .arg(duration));
 
-                QList<uint64_t> chapters;
-                for (uint j = 0; j < count; j++)
-                    chapters.append(times[j] / 90000);
-                delete times;
-                m_chapterMap.insert(i, chapters);
-
-                if (length > 5)
+                if (duration > 5)
                     break;
             }
         }
@@ -448,6 +434,48 @@ bool DVDRingBuffer::StartFromBeginning(void)
     dvdnav_title_play(m_dvdnav, 0);
     m_audioStreamsChanged = true;
     return true;
+}
+
+void DVDRingBuffer::GetChapterTimes(QList<long long> &times)
+{
+    if (!m_chapterMap.contains(m_title))
+        GetChapterTimes(m_title);
+
+    if (!m_chapterMap.contains(m_title))
+        return;
+
+    foreach (uint64_t chapter, m_chapterMap.value(m_title))
+        times.push_back(chapter);
+}
+
+uint64_t DVDRingBuffer::GetChapterTimes(uint title)
+{
+    if (!m_dvdnav)
+        return 0;
+
+    uint64_t duration;
+    uint64_t *chaps;
+    uint32_t num = dvdnav_describe_title_chapters(m_dvdnav, title,
+                                                  &chaps, &duration);
+
+    if (num < 1)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to retrieve chapter data");
+        return 0;
+    }
+
+    QList<uint64_t> chapters;
+    // add the start
+    chapters.append(0);
+    // don't add the last 'chapter' - which is the title end
+    if (num > 1)
+    {
+        for (uint i = 0; i < num - 1; i++)
+            chapters.append((chaps[i] + 45000) / 90000);
+    }
+    delete chaps;
+    m_chapterMap.insert(title, chapters);
+    return (duration + 45000) / 90000;
 }
 
 /** \brief returns current position in the PGC.
@@ -927,6 +955,19 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
     }
 
     return tot;
+}
+
+bool DVDRingBuffer::playTrack(int track)
+{
+    QMutexLocker lock(&m_seekLock);
+    if (track < 1)
+        Seek(0);
+    else if (track < m_titleParts)
+        dvdnav_part_play(m_dvdnav, m_title, track);
+    else
+        return false;
+    m_gotStop = false;
+    return true;
 }
 
 bool DVDRingBuffer::nextTrack(void)
