@@ -128,6 +128,7 @@ DVDRingBuffer::~DVDRingBuffer()
 {
     CloseDVD();
     ClearMenuSPUParameters();
+    ClearChapterCache();
 }
 
 void DVDRingBuffer::CloseDVD(void)
@@ -138,6 +139,13 @@ void DVDRingBuffer::CloseDVD(void)
         dvdnav_close(m_dvdnav);
         m_dvdnav = NULL;
     }
+}
+
+void DVDRingBuffer::ClearChapterCache(void)
+{
+    foreach (QList<uint64_t> chapters, m_chapterMap)
+        chapters.clear();
+    m_chapterMap.clear();
 }
 
 long long DVDRingBuffer::Seek(long long pos, int whence, bool has_lock)
@@ -313,8 +321,6 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     dvdnav_set_PGC_positioning_flag(m_dvdnav, 1);
 
     int32_t num_titles = 0;
-    int32_t num_parts  = 0;
-
     res = dvdnav_get_number_of_titles(m_dvdnav, &num_titles);
     if (num_titles == 0 || res == DVDNAV_STATUS_ERR)
     {
@@ -324,6 +330,8 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         safe_read(buf, DVD_BLOCK_SIZE * 5);
         res = dvdnav_get_number_of_titles(m_dvdnav, &num_titles);
     }
+
+    int start_title = 1;
 
     if (res == DVDNAV_STATUS_ERR)
     {
@@ -335,24 +343,61 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         VERBOSE(VB_IMPORTANT, QString("There are %1 titles on the disk")
                 .arg(num_titles));
 
-        for (int i = 1; i < num_titles + 1; i++)
+        // We do this once and chose the first title with a reasonanble length,
+        // cache the results for those we probe and probe the remainder as
+        // needed
+        if (!m_chapterMap.size())
         {
-            res = dvdnav_get_number_of_parts(m_dvdnav, i, &num_parts);
-            if (res != DVDNAV_STATUS_ERR)
+            for (int i = 1; i < num_titles + 1; i++)
             {
-                VERBOSE(VB_IMPORTANT, LOC + QString("Title %1 has %2 parts.")
-                        .arg(i).arg(num_parts));
+                uint64_t *times;
+                uint64_t duration;
+                uint32_t count = dvdnav_describe_title_chapters(m_dvdnav, i,
+                                                                &times,
+                                                                &duration);
+                if (count < 1)
+                {
+                    VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        QString("Failed to get chapters for title %1").arg(i));
+                    continue;
+                }
+
+                float length = (float)duration / 90000.0f;
+                VERBOSE(VB_GENERAL, LOC +
+                    QString("Title %1: chapters %2 duration %3")
+                            .arg(i).arg(count).arg(length));
+
+                QList<uint64_t> chapters;
+                for (uint j = 0; j < count; j++)
+                    chapters.append(times[j] / 90000);
+                delete times;
+                m_chapterMap.insert(i, chapters);
+
+                if (length > 5)
+                    break;
             }
-            else
+        }
+
+        QMapIterator<uint, QList<uint64_t> > it(m_chapterMap);
+        uint64_t longest = 0;
+        while (it.hasNext())
+        {
+            it.next();
+            if (it.value().size())
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        QString("Failed to get number of parts for title %1")
-                        .arg(i));
+                uint title = it.key();
+                uint64_t last = it.value().last();
+                if (last > longest)
+                {
+                    start_title = title;
+                    longest = last;
+                }
             }
         }
     }
 
-    dvdnav_title_play(m_dvdnav, 1);
+    VERBOSE(VB_GENERAL, LOC + QString("Starting with title %1").arg(start_title));
+    dvdnav_title_play(m_dvdnav, start_title);
     dvdnav_current_title_info(m_dvdnav, &m_title, &m_part);
     dvdnav_get_title_string(m_dvdnav, &m_dvdname);
     dvdnav_get_serial_string(m_dvdnav, &m_serialnumber);

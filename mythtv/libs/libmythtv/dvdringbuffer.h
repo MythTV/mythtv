@@ -183,6 +183,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     uint64_t       m_seektime;
     uint           m_currentTime;
     QMap<uint, uint> m_seekSpeedMap;
+    QMap<uint, QList<uint64_t> > m_chapterMap;
 
     MythDVDPlayer *m_parent;
 
@@ -211,6 +212,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     QMutex m_seekLock;
     long long Seek(long long time);
 
+    void ClearChapterCache(void);
     uint ConvertLangCode(uint16_t code);
     void SelectDefaultButton(void);
     void WaitForPlayer(void);
