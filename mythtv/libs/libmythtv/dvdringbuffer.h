@@ -27,6 +27,20 @@ extern "C" {
 
 class MythDVDPlayer;
 
+class MTV_PUBLIC DVDInfo
+{
+  public:
+    DVDInfo(const QString &filename);
+   ~DVDInfo(void);
+    bool IsValid(void) { return m_nav != NULL; }
+    bool GetNameAndSerialNum(QString &name, QString &serialnum);
+
+  protected:
+    dvdnav_t   *m_nav;
+    const char *m_name;
+    const char *m_serialnumber;
+};
+
 class MTV_PUBLIC DVDRingBuffer : public RingBuffer
 {
   public:

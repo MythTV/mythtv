@@ -33,6 +33,49 @@ static const char *dvdnav_menu_table[] =
     "Part",
 };
 
+DVDInfo::DVDInfo(const QString &filename)
+  : m_nav(NULL), m_name(NULL), m_serialnumber(NULL)
+{
+    QString name = filename;
+    if (name.left(6) == "dvd://")
+        name.remove(0,5);
+    else if (name.left(5) == "dvd:/")
+        name.remove(0,4);
+    else if (name.left(4) == "dvd:")
+        name.remove(0,4);
+
+    QByteArray fname = name.toLocal8Bit();
+    dvdnav_status_t res = dvdnav_open(&m_nav, fname.constData());
+    if (res == DVDNAV_STATUS_ERR)
+    {
+        VERBOSE(VB_IMPORTANT, QString("DVDInfo: Failed to open device at %1")
+                .arg(fname.constData()));
+        return;
+    }
+
+    res = dvdnav_get_title_string(m_nav, &m_name);
+    if (res == DVDNAV_STATUS_ERR)
+        VERBOSE(VB_IMPORTANT, QString("DVDInfo: Failed to get name."));
+    res = dvdnav_get_serial_string(m_nav, &m_serialnumber);
+    if (res == DVDNAV_STATUS_ERR)
+        VERBOSE(VB_IMPORTANT, QString("DVDInfo: Failed to get serial number."));
+}
+
+DVDInfo::~DVDInfo(void)
+{
+    if (m_nav)
+        dvdnav_close(m_nav);
+}
+
+bool DVDInfo::GetNameAndSerialNum(QString &name, QString &serial)
+{
+    name   = QString(m_name);
+    serial = QString(m_serialnumber);
+    if (name.isEmpty() && serial.isEmpty())
+        return false;
+    return true;
+}
+
 DVDRingBuffer::DVDRingBuffer(const QString &lfilename) :
     m_dvdnav(NULL),     m_dvdBlockReadBuf(NULL),
     m_dvdBlockRPos(0),  m_dvdBlockWPos(0),
