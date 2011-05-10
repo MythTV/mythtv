@@ -695,6 +695,10 @@ bool hasUtf8(const char *str)
 
 /**
  * \brief Can we ping host within timeout seconds?
+ *
+ * Some unixes don't like the -t argument. To make sure a ping failure
+ * is actually caused by a defunct server, we might have to do a ping
+ * without the -t, which will cause a long timeout.
  */
 bool ping(const QString &host, int timeout)
 {
@@ -712,12 +716,24 @@ bool ping(const QString &host, int timeout)
     if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
                          kMSProcessEvents) != GENERIC_EXIT_OK)
     {
-        // ping command may not like -t argument. Simplify:
+        // ping command may not like -t argument, or the host might not
+        // be listening. Try to narrow down with a quick ping to localhost:
 
-        cmd = QString("ping -c 1  %2  >/dev/null 2>&1").arg(host);
+        cmd = "ping -t 1 -c 1 localhost >/dev/null 2>&1";
 
         if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
                              kMSProcessEvents) != GENERIC_EXIT_OK)
+        {
+            // Assume -t is bad - do a ping that might cause a timeout:
+            cmd = QString("ping -c 1 %1 >/dev/null 2>&1").arg(host);
+
+            if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
+                                 kMSProcessEvents) != GENERIC_EXIT_OK)
+                return false;  // it failed with or without the -t
+
+            return true;
+        }
+        else  // Pinging localhost worked, so targeted host wasn't listening
             return false;
     }
 #endif
