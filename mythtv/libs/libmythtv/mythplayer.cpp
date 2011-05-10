@@ -2029,7 +2029,11 @@ void MythPlayer::VideoStart(void)
     m_can_double       = false;
     m_scan_tracker     = 2;
 
-    if (using_null_videoout)
+    if (player_ctx->IsPIP() && using_null_videoout)
+    {
+        videosync = new DummyVideoSync(videoOutput, fr_int, 0, false);
+    }
+    else if (using_null_videoout)
     {
         videosync = new USleepVideoSync(videoOutput, (int)fr_int, 0, false);
     }
