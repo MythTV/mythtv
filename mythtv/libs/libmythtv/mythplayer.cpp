@@ -2116,7 +2116,11 @@ void MythPlayer::VideoStart(void)
     m_double_framerate = false;
     m_scan_tracker     = 2;
 
-    if (using_null_videoout)
+    if (player_ctx->IsPIP() && using_null_videoout)
+    {
+        videosync = new DummyVideoSync(videoOutput, fr_int, 0, false);
+    }
+    else if (using_null_videoout)
     {
         videosync = new USleepVideoSync(videoOutput, fr_int, 0, false);
     }
