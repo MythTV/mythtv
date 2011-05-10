@@ -169,7 +169,6 @@ class DecoderBase
     void SetReadAdjust(long long adjust);
 
     // DVD public stuff
-    void ChangeDVDTrack(bool ffw);
     long long DVDFindPosition(long long desiredFrame);
     void UpdateDVDFramesPlayed(void);
 

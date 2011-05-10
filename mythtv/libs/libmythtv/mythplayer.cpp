@@ -1663,15 +1663,6 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     int vsync_delay_clock = 0;
     int64_t currentaudiotime = 0;
 
-    // attempt to reduce fps for standalone PIP
-    if (player_ctx->IsPIP() && framesPlayed % 2)
-    {
-        videosync->WaitForFrame(frameDelay + avsync_adjustment);
-        if (!using_null_videoout)
-            videoOutput->SetFramesPlayed(framesPlayed + 1);
-        return;
-    }
-
     if (videoOutput->IsErrored())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "AVSync: "
@@ -2116,7 +2107,11 @@ void MythPlayer::VideoStart(void)
     m_double_framerate = false;
     m_scan_tracker     = 2;
 
-    if (using_null_videoout)
+    if (player_ctx->IsPIP() && using_null_videoout)
+    {
+        videosync = new DummyVideoSync(videoOutput, fr_int, 0, false);
+    }
+    else if (using_null_videoout)
     {
         videosync = new USleepVideoSync(videoOutput, fr_int, 0, false);
     }
@@ -2644,7 +2639,7 @@ void MythPlayer::EventLoop(void)
         }
     }
 
-    // Handle chapter jump (currently matroska only)
+    // Handle chapter jump
     if (jumpchapter != 0)
         DoJumpChapter(jumpchapter);
 
