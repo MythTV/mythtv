@@ -1424,6 +1424,8 @@ int main(int argc, char **argv)
 
     CleanupMyOldInUsePrograms();
 
+    setHttpProxy();
+
     pmanager = new MythPluginManager();
     gContext->SetPluginManager(pmanager);
 
