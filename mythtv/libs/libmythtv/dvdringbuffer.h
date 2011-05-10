@@ -27,6 +27,20 @@ extern "C" {
 
 class MythDVDPlayer;
 
+class MTV_PUBLIC DVDInfo
+{
+  public:
+    DVDInfo(const QString &filename);
+   ~DVDInfo(void);
+    bool IsValid(void) { return m_nav != NULL; }
+    bool GetNameAndSerialNum(QString &name, QString &serialnum);
+
+  protected:
+    dvdnav_t   *m_nav;
+    const char *m_name;
+    const char *m_serialnumber;
+};
+
 class MTV_PUBLIC DVDRingBuffer : public RingBuffer
 {
   public:
@@ -42,6 +56,8 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     bool IsOpen(void)          const { return m_dvdnav;                 }
     long long GetTotalReadPosition(void) { return m_titleLength;        }
     uint GetChapterLength(void)    const { return m_pgLength / 90000;   }
+    void GetChapterTimes(QList<long long> &times);
+    uint64_t GetChapterTimes(uint title);
     virtual long long GetReadPosition(void) const;
     void GetDescForPos(QString &desc);
     void GetPartAndTitle(int &_part, int &_title) const
@@ -94,6 +110,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
         { dvdnav_part_play(m_dvdnav, _title, _part); }
     virtual bool StartFromBeginning(void);
     void CloseDVD(void);
+    bool playTrack(int track);
     bool nextTrack(void);
     void prevTrack(void);
     virtual int safe_read(void *data, uint sz);
@@ -169,6 +186,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     uint64_t       m_seektime;
     uint           m_currentTime;
     QMap<uint, uint> m_seekSpeedMap;
+    QMap<uint, QList<uint64_t> > m_chapterMap;
 
     MythDVDPlayer *m_parent;
 
@@ -197,6 +215,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     QMutex m_seekLock;
     long long Seek(long long time);
 
+    void ClearChapterCache(void);
     uint ConvertLangCode(uint16_t code);
     void SelectDefaultButton(void);
     void WaitForPlayer(void);

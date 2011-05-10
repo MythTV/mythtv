@@ -840,29 +840,6 @@ bool DecoderBase::GetWaitForChange(void) const
     return waitingForChange;
 }
 
-void DecoderBase::ChangeDVDTrack(bool ffw)
-{
-    if (!ringBuffer->IsDVD())
-        return;
-
-    bool result = true;
-
-    if (ffw)
-        result = ringBuffer->DVD()->nextTrack();
-    else
-        ringBuffer->DVD()->prevTrack();
-
-    if (result)
-    {
-        uint elapsed = ringBuffer->DVD()->GetCellStart();
-
-        UpdateDVDFramesPlayed();
-
-        if (elapsed == 0)
-            SeekReset(framesPlayed, 0, true, true);
-    }
-}
-
 long long DecoderBase::DVDFindPosition(long long desiredFrame)
 {
     if (!ringBuffer->IsDVD())

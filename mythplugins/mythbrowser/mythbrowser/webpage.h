@@ -43,10 +43,10 @@ class WebPage : public QObject
   protected:
 
   private:
-    bool                m_active;
+    bool                  m_active;
 
-    MythBrowser        *m_parent;
-    MythUIWebBrowser   *m_browser;
+    MythBrowser          *m_parent;
+    MythUIWebBrowser     *m_browser;
     MythUIButtonListItem *m_listItem;
 };
 

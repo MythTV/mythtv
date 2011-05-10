@@ -11,8 +11,17 @@
                     <area>0,0,610,44</area>
                     <imagetype name="favicon">
                         <area>6,6,32,32</area>
-                        <filename>shared/grid_noimage.png</filename>
                     </imagetype>
+                    <statetype name="loadingstate">
+                        <position>9,9</position>
+                        <state name="loading">
+                            <imagetype name="animation">
+                                <position>0,0</position>
+                                <filepattern low="1" high="8">mb_loading_%1.png</filepattern>
+                                <delay>160</delay>
+                            </imagetype>
+                        </state>
+                    </statetype>
                     <textarea name="buttontext">
                         <area>40,2,568,40</area>
                         <align>allcenter</align>

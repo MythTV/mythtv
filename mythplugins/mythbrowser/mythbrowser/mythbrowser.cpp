@@ -7,12 +7,14 @@
 // myth
 #include "mythverbose.h"
 #include "mythcontext.h"
-#include "libmythui/mythmainwindow.h"
+#include "mythmainwindow.h"
+#include "mythuihelper.h"
 
 // mythbrowser
 #include "webpage.h"
 #include "bookmarkeditor.h"
 #include "mythbrowser.h"
+
 
 using namespace std;
 
@@ -22,7 +24,8 @@ MythBrowser::MythBrowser(MythScreenStack *parent,
       m_urlList(urlList),  m_pageList(NULL),
       m_progressBar(NULL), m_titleText(NULL),
       m_statusText(NULL),  m_currentBrowser(-1),
-      m_zoom(zoom),        m_menuPopup(NULL)
+      m_zoom(zoom),        m_menuPopup(NULL),
+      m_defaultFavIcon(NULL)
 {
 }
 
@@ -56,6 +59,17 @@ bool MythBrowser::Create(void)
 
     connect(m_pageList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             this, SLOT(slotTabSelected(MythUIButtonListItem*)));
+
+    // create the default favicon
+    QString favIcon = "mb_default_favicon.png";
+    GetMythUI()->FindThemeFile(favIcon);
+    if (QFile::exists(favIcon))
+    {
+        QImage image(favIcon);
+        m_defaultFavIcon = GetMythPainter()->GetFormatImage();
+        m_defaultFavIcon->Assign(image);
+        m_defaultFavIcon->UpRef();
+    }
 
     // this is the template for all other browser tabs
     WebPage *page = new WebPage(this, browser);

@@ -803,26 +803,29 @@ static int internal_play_media(const QString &mrl, const QString &plot,
 
     if (pginfo->IsVideoDVD())
     {
-        RingBuffer *tmprbuf = RingBuffer::Create(pginfo->GetPathname(), false);
-
-        if (!tmprbuf)
+        DVDInfo *dvd = new DVDInfo(pginfo->GetPathname());
+        if (dvd && dvd->IsValid())
         {
+            QString name;
+            QString serialid;
+            if (dvd->GetNameAndSerialNum(name, serialid))
+            {
+                QStringList fields = pginfo->QueryDVDBookmark(serialid);
+                if (!fields.empty())
+                {
+                    QStringList::Iterator it = fields.begin();
+                    pos = (int64_t)((*++it).toLongLong() & 0xffffffffLL);
+                }
+            }
+        }
+        else
+        {
+            if (dvd)
+                delete dvd;
             delete pginfo;
             return res;
         }
-        QString name;
-        QString serialid;
-        if (tmprbuf->IsDVD() &&
-            tmprbuf->DVD()->GetNameAndSerialNum(name, serialid))
-        {
-            QStringList fields = pginfo->QueryDVDBookmark(serialid);
-            if (!fields.empty())
-            {
-                QStringList::Iterator it = fields.begin();
-                pos = (int64_t)((*++it).toLongLong() & 0xffffffffLL);
-            }
-        }
-        delete tmprbuf;
+        delete dvd;
     }
     else if (pginfo->IsVideo())
         pos = pginfo->QueryBookmark();

@@ -4,7 +4,45 @@
 
     <window name="browser">
         <buttonlist name="pagelist" from="baseselector">
-            <area>20,10,760,45</area>
+            <area>20,10,760,44</area>
+            <buttonarea>0,0,742,44</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,742,44</area>
+                    <imagetype name="favicon">
+                        <area>6,6,32,32</area>
+                    </imagetype>
+                    <statetype name="loadingstate">
+                        <position>9,9</position>
+                        <state name="loading">
+                            <imagetype name="animation">
+                                <position>0,0</position>
+                                <filepattern low="1" high="8">mb_loading_%1.png</filepattern>
+                                <delay>160</delay>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                    <textarea name="buttontext">
+                        <area>40,2,700,40</area>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+                <state name="selectedactive" from="active">
+                    <shape name="background" from="baseselectedwidgetshape" />
+                </state>
+                <state name="selectedinactive" from="active">
+                    <shape name="background" from="baseinactivewidgetshape" />
+                    <textarea name="buttontext">
+                        <font>basesmallpurple</font>
+                    </textarea>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>746,2</position>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>746,22</position>
+            </statetype>
         </buttonlist>
 
         <webbrowser name="webbrowser">

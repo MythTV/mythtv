@@ -38,8 +38,6 @@ WebPage::WebPage(MythBrowser *parent, QRect area, const char* name)
             this, SLOT(slotStatusBarMessage(const QString&)));
     connect(m_browser, SIGNAL(titleChanged(const QString&)),
             this, SLOT(slotTitleChanged(const QString&)));
-    connect(m_browser, SIGNAL(iconChanged(void)),
-            this, SLOT(slotIconChanged(void)));
 }
 
 WebPage::WebPage(MythBrowser *parent, MythUIWebBrowser *browser)
@@ -56,9 +54,6 @@ WebPage::WebPage(MythBrowser *parent, MythUIWebBrowser *browser)
             this, SLOT(slotLoadFinished(bool)));
     connect(m_browser, SIGNAL(titleChanged(const QString&)),
             this, SLOT(slotTitleChanged(const QString&)));
-    connect(m_browser, SIGNAL(iconChanged(void)),
-            this, SLOT(slotIconChanged(void)));
-
     connect(m_browser, SIGNAL(loadProgress(int)),
             this, SLOT(slotLoadProgress(int)));
     connect(m_browser, SIGNAL(statusBarMessage(const QString&)),
@@ -99,26 +94,23 @@ void WebPage::SetActive(bool active)
 
 void WebPage::slotIconChanged(void)
 {
+    if (!m_listItem)
+        return;
+
     QIcon icon = m_browser->GetIcon();
 
     if (icon.isNull())
-    {
-        //FIXME use a default icon here?
-        m_listItem->SetImage("", "favicon");
-    }
+        m_listItem->setImage(m_parent->getDefaultFavIcon(), "favicon");
     else
     {
-        if (m_listItem)
-        {
-            QPixmap pixmap = icon.pixmap(32, 32);
-            QImage image = pixmap.toImage();
-            image = image.scaled(
-                QSize(32,32), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-            MythImage *mimage = GetMythPainter()->GetFormatImage();
-            mimage->Assign(image);
+        QPixmap pixmap = icon.pixmap(32, 32);
+        QImage image = pixmap.toImage();
+        image = image.scaled(
+            QSize(32,32), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        MythImage *mimage = GetMythPainter()->GetFormatImage();
+        mimage->Assign(image);
 
-            m_listItem->setImage(mimage, "favicon");
-        }
+        m_listItem->setImage(mimage, "favicon");
     }
 
     m_parent->m_pageList->Refresh();
@@ -127,6 +119,10 @@ void WebPage::slotIconChanged(void)
 void WebPage::slotLoadStarted(void)
 {
     m_listItem->SetText(tr("Loading..."));
+    m_listItem->DisplayState("loading", "loadingstate");
+    m_listItem->setImage(NULL, "favicon");
+    m_listItem->SetImage("", "favicon");
+
     m_parent->m_pageList->Update();
 }
 
@@ -134,9 +130,13 @@ void WebPage::slotLoadFinished(bool OK)
 {
     (void) OK;
 
+    m_listItem->DisplayState("off", "loadingstate");
+
     slotLoadProgress(0);
 
     slotIconChanged();
+
+    m_listItem->SetText(m_browser->GetTitle());
 }
 
 void WebPage::slotLoadProgress(int progress)

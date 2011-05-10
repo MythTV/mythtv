@@ -540,7 +540,6 @@ QDateTime MythUTCToLocal(const QDateTime &utc)
 
 /** \fn getUptime(time_t&)
  *  \brief Returns uptime statistics.
- *  \todo Update Statistics are not supported (by MythTV) on NT or DOS.
  *  \return true if successful, false otherwise.
  */
 bool getUptime(time_t &uptime)
