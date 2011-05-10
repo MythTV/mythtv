@@ -50,6 +50,7 @@ class HouseKeeper
                    bool nowIfPossible = false);
     void updateLastrun(const QString &dbTag);
     QDateTime getLastRun(const QString &dbTag);
+    void flushDBLogs();
     void runFillDatabase();
     void CleanupMyOldRecordings(void);
     void CleanupAllOldInUsePrograms(void);

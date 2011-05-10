@@ -188,6 +188,14 @@ void HouseKeeper::RunHouseKeeping(void)
         // These tasks are only done from the master backend
         if (isMaster)
         {
+            // Clean out old database logging entries
+            if (wantToRun("LogClean", 1, 0, 24))
+            {
+                VERBOSE(VB_GENERAL, "Running LogClean");
+                flushDBLogs();
+                updateLastrun("LogClean");
+            }
+
             // Run mythfilldatabase to grab the TV listings
             if (gCoreContext->GetNumSetting("MythFillEnabled", 1))
             {
@@ -288,6 +296,53 @@ void HouseKeeper::RunHouseKeeping(void)
         initialRun = false;
 
         sleep(300 + (random()%8));
+    }
+}
+
+void HouseKeeper::flushDBLogs()
+{
+    int numdays = 14;
+    uint64_t maxrows = 10000 * numdays;  // likely high enough to keep numdays
+
+    QDateTime days = QDateTime::currentDateTime();
+    days = days.addDays(0 - numdays);
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (query.isConnected())
+    {
+        QString sql = "DELETE FROM logging WHERE msgtime < :DAYS ;";
+        query.prepare(sql);
+        query.bindValue(":DAYS", days);
+        VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting database log entries "
+                                     "from before %1.").arg(days.toString()));
+        if (!query.exec())
+            MythDB::DBError("Delete old log entries", query);
+
+        sql = "SELECT COUNT(0) FROM logging;";
+        query.prepare(sql);
+        if (query.exec())
+        {
+            uint64_t totalrows = 0;
+            while (query.next())
+            {
+                totalrows = query.value(0).toLongLong();
+                VERBOSE(VB_GENERAL|VB_EXTRA, QString("Database has %1 log "
+                                             "entries.").arg(totalrows));
+            }
+            if (totalrows > maxrows)
+            {
+                sql = "DELETE FROM logging ORDER BY msgtime LIMIT :ROWS;";
+                query.prepare(sql);
+                quint64 extrarows = totalrows - maxrows;
+                query.bindValue(":ROWS", extrarows);
+                VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting oldest %1 "
+                        "database log entries.").arg(extrarows));
+                if (!query.exec())
+                    MythDB::DBError("Delete excess log entries", query);
+            }
+        }
+        else
+            MythDB::DBError("Query logging table size", query);
     }
 }
 
