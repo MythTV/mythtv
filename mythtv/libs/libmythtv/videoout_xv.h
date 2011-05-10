@@ -70,9 +70,9 @@ class VideoOutputXv : public VideoOutput
     void InitPictureAttributes(void);
 
     virtual bool IsPIPSupported(void) const
-        { return false; /*XVideo == VideoOutputSubType(); */}
+        { return XVideo == VideoOutputSubType(); }
     virtual bool IsPBPSupported(void) const
-        { return false; /*return XVideo == VideoOutputSubType(); */}
+        { return XVideo == VideoOutputSubType(); }
     virtual bool NeedExtraAudioDecode(void) const { return false; }
 
     virtual QRect GetPIPRect(PIPLocation  location,

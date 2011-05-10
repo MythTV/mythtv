@@ -297,32 +297,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
 
         // Process Events
         VERBOSE(VB_GENERAL, LOC + "Entering main playback loop.");
-
-        while (true)
-        {
-            qApp->processEvents();
-
-            TVState state = tv->GetState(0);
-            if ((kState_Error == state) || (kState_None == state))
-                break;
-
-            if (kState_ChangingState == state)
-                continue;
-
-            const PlayerContext *mctx = tv->GetPlayerReadLock(0, __FILE__, __LINE__);
-            if (mctx)
-            {
-                mctx->LockDeletePlayer(__FILE__, __LINE__);
-                if (mctx->player && !mctx->player->IsErrored())
-                {
-                    mctx->player->EventLoop();
-                    mctx->player->VideoLoop();
-                }
-                mctx->UnlockDeletePlayer(__FILE__, __LINE__);
-            }
-            tv->ReturnPlayerLock(mctx);
-        }
-
+        tv->PlaybackLoop();
         VERBOSE(VB_GENERAL, LOC + "Exiting main playback loop.");
 
         if (tv->getJumpToProgram())
@@ -1218,6 +1193,41 @@ TV::~TV(void)
     ReturnPlayerLock(mctx);
 
     VERBOSE(VB_PLAYBACK, "TV::~TV() -- end");
+}
+
+/**
+ * \brief The main playback loop
+ */
+void TV::PlaybackLoop(void)
+{
+    while (true)
+    {
+        qApp->processEvents();
+
+        TVState state = GetState(0);
+        if ((kState_Error == state) || (kState_None == state))
+            return;
+
+        if (kState_ChangingState == state)
+            continue;
+
+        int count = player.size();
+        for (int i = 0; i < count; i++)
+        {
+            const PlayerContext *mctx = GetPlayerReadLock(i, __FILE__, __LINE__);
+            if (mctx)
+            {
+                mctx->LockDeletePlayer(__FILE__, __LINE__);
+                if (mctx->player && !mctx->player->IsErrored())
+                {
+                    mctx->player->EventLoop();
+                    mctx->player->VideoLoop();
+                }
+                mctx->UnlockDeletePlayer(__FILE__, __LINE__);
+            }
+            ReturnPlayerLock(mctx);
+        }
+    }
 }
 
 /**

@@ -313,6 +313,7 @@ class MTV_PUBLIC TV : public QObject
     static EMBEDRETURNVOIDSCHEDIT RunScheduleEditorPtr;
 
   private:
+    void PlaybackLoop(void);
     bool ContextIsPaused(PlayerContext *ctx, const char *file, int location);
     void SetActive(PlayerContext *lctx, int index, bool osd_msg);
 
