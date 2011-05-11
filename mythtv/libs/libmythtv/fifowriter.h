@@ -2,10 +2,10 @@
 #define FIFOWRITER
 
 // Qt headers
-#include <QString>
-#include <QMutex>
 #include <QWaitCondition>
 #include <QThread>
+#include <QString>
+#include <QMutex>
 
 // MythTV headers
 #include "mythtvexp.h"
@@ -19,9 +19,10 @@ class FIFOThread : public QThread
     Q_OBJECT
   public:
     FIFOThread() : m_parent(NULL), m_id(-1) {}
+    virtual ~FIFOThread() { wait(); m_parent = NULL; m_id = -1; }
     void SetId(int id) { m_id = id; }
     void SetParent(FIFOWriter *parent) { m_parent = parent; }
-    void run(void);
+    virtual void run(void);
   private:
     FIFOWriter *m_parent;
     int m_id;
@@ -46,11 +47,12 @@ class MTV_PUBLIC FIFOWriter
         struct fifo_buf *next;
         unsigned char *data;
         long blksize;
-     } **fifo_buf, **fb_inptr, **fb_outptr;
+    } **fifo_buf, **fb_inptr, **fb_outptr;
 
-     FIFOThread     *fifothrds;
-     QMutex         *fifo_lock;
-     QWaitCondition *full_cond, *empty_cond;
+    FIFOThread     *fifothrds;
+    QMutex         *fifo_lock;
+    QWaitCondition *full_cond;
+    QWaitCondition *empty_cond;
 
      QString *filename, *fbdesc;
 

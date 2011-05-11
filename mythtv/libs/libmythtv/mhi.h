@@ -39,9 +39,9 @@ class MHEGEngineThread : public QThread
 {
     Q_OBJECT
   public:
-    MHEGEngineThread() : m_parent(NULL) {}
-    void SetParent(MHIContext *parent) { m_parent = parent; }
-    void run(void);
+    MHEGEngineThread(MHIContext *parent) : m_parent(parent) {}
+    virtual ~MHEGEngineThread() { wait();  m_parent = NULL; }
+    virtual void run(void);
   private:
     MHIContext *m_parent;
 };
@@ -168,8 +168,9 @@ class MHIContext : public MHContext
 
     MHEG            *m_engine; // Pointer to the MHEG engine
 
-    QWaitCondition   m_engine_wait;
-    bool             m_stop;
+    mutable QMutex   m_runLock;
+    QWaitCondition   m_engine_wait; // protected by m_runLock
+    bool             m_stop;        // protected by m_runLock
     QMutex           m_display_lock;
     bool             m_updated;
     int              m_displayWidth;
@@ -182,7 +183,7 @@ class MHIContext : public MHContext
     FT_Face          m_face;
     bool             m_face_loaded;
 
-    MHEGEngineThread m_engineThread;
+    MHEGEngineThread *m_engineThread;
 
     int              m_currentChannel;
     bool             m_isLive;

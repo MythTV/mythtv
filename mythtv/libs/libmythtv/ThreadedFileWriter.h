@@ -16,22 +16,22 @@ class TFWWriteThread : public QThread
 {
     Q_OBJECT
   public:
-    TFWWriteThread(void) : m_ptr(NULL) {};
-    void SetPtr(ThreadedFileWriter *ptr) { m_ptr = ptr; };
-    void run(void);
+    TFWWriteThread(ThreadedFileWriter *p) : m_parent(p) {}
+    virtual ~TFWWriteThread() { wait(); m_parent = NULL; }
+    virtual void run(void);
   private:
-    ThreadedFileWriter *m_ptr;
+    ThreadedFileWriter *m_parent;
 };
 
 class TFWSyncThread : public QThread
 {
     Q_OBJECT
   public:
-    TFWSyncThread(void) : m_ptr(NULL) {};
-    void SetPtr(ThreadedFileWriter *ptr) { m_ptr = ptr; };
-    void run(void);
+    TFWSyncThread(ThreadedFileWriter *p) : m_parent(p) {}
+    virtual ~TFWSyncThread() { wait(); m_parent = NULL; }
+    virtual void run(void);
   private:
-    ThreadedFileWriter *m_ptr;
+    ThreadedFileWriter *m_parent;
 };
 
 class ThreadedFileWriter
@@ -73,10 +73,10 @@ class ThreadedFileWriter
     uint64_t        m_file_wpos; ///< offset written to disk
 
     // state
-    bool            no_writes;
+    volatile bool   no_writes;
     bool            flush;
     bool            write_is_blocked;
-    bool            in_dtor;
+    volatile bool   in_dtor;
     bool            ignore_writes;
     long long       tfw_min_write_size;
 
@@ -91,8 +91,8 @@ class ThreadedFileWriter
     unsigned long   tfw_buf_size;
 
     // threads
-    TFWWriteThread  writer;
-    TFWSyncThread   syncer;
+    TFWWriteThread *writeThread;
+    TFWSyncThread  *syncThread;
 
     // wait conditions
     QWaitCondition  bufferEmpty;

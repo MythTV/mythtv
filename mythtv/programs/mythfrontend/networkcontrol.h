@@ -91,9 +91,9 @@ class NetworkCommandThread : public QThread
 {
     Q_OBJECT
   public:
-    NetworkCommandThread() : m_parent(NULL) {}
-    void SetParent(NetworkControl *parent) { m_parent = parent; }
-    void run(void);
+    NetworkCommandThread(NetworkControl *parent) : m_parent(parent) {}
+    virtual ~NetworkCommandThread() { wait(); m_parent = NULL; }
+    virtual void run(void);
   private:
     NetworkControl *m_parent;
 };
@@ -150,15 +150,15 @@ class NetworkControl : public QTcpServer
     mutable QMutex  clientLock;
     QList<NetworkControlClient*> clients;
 
-    QList<NetworkCommand*> networkControlCommands;
+    QList<NetworkCommand*> networkControlCommands; // protected by ncLock
     QMutex ncLock;
-    QWaitCondition ncCond;
+    QWaitCondition ncCond; // protected by ncLock
 
     QList<NetworkCommand*> networkControlReplies;
     QMutex nrLock;
 
-    NetworkCommandThread command_thread;
-    bool stopCommandThread;
+    NetworkCommandThread *commandThread;
+    bool stopCommandThread; // protected by ncLock
 };
 
 #endif

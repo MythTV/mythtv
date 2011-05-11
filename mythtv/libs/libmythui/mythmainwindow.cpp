@@ -3,7 +3,6 @@
 
 // C headers
 #include <cmath>
-#include <pthread.h>
 
 // C++ headers
 #include <algorithm>

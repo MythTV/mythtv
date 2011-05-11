@@ -9,7 +9,6 @@
 using namespace std;
 
 // POSIX headers
-#include <pthread.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <inttypes.h>
@@ -1417,6 +1416,7 @@ void MpegRecorder::Reset(void)
 
 void MpegRecorder::Pause(bool clear)
 {
+    QMutexLocker locker(&pauseLock);
     cleartimeonpause = clear;
     paused = false;
     request_pause = true;
@@ -1424,19 +1424,15 @@ void MpegRecorder::Pause(bool clear)
 
 bool MpegRecorder::PauseAndWait(int timeout)
 {
+    QMutexLocker locker(&pauseLock);
     if (request_pause)
     {
-        QMutex waitlock;
-        waitlock.lock();
-
-        if (!paused)
+        if (!IsPaused(true))
         {
             VERBOSE(VB_RECORD, LOC + "PauseAndWait pause");
 
             if (_device_read_buffer)
             {
-                QMutex drb_lock;
-                drb_lock.lock();
                 _device_read_buffer->SetRequestPause(true);
                 _device_read_buffer->WaitForPaused(4000);
             }
@@ -1453,10 +1449,10 @@ bool MpegRecorder::PauseAndWait(int timeout)
                 tvrec->RecorderPaused();
         }
 
-        unpauseWait.wait(&waitlock, timeout);
+        unpauseWait.wait(&pauseLock, timeout);
     }
 
-    if (!request_pause && paused)
+    if (!request_pause && IsPaused(true))
     {
         VERBOSE(VB_RECORD, LOC + "PauseAndWait unpause");
 
@@ -1480,7 +1476,8 @@ bool MpegRecorder::PauseAndWait(int timeout)
 
         paused = false;
     }
-    return paused;
+
+    return IsPaused(true);
 }
 
 void MpegRecorder::RestartEncoding(void)
