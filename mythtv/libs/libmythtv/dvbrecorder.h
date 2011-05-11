@@ -1,34 +1,16 @@
 // -*- Mode: c++ -*-
-/*
- *  Copyright (C) Kenneth Aafloy 2003
- *
- *  Copyright notice is in dvbrecorder.cpp of the MythTV project.
- */
-
-#ifndef DVBRECORDER_H
-#define DVBRECORDER_H
-
-// C++ includes
-#include <vector>
-#include <deque>
-using namespace std;
+#ifndef _DVB_RECORDER_H_
+#define _DVB_RECORDER_H_
 
 // Qt includes
-#include <QMutex>
+#include <QString>
 
+// MythTV includes
 #include "dtvrecorder.h"
-#include "tspacket.h"
-#include "DeviceReadBuffer.h"
 
-class QString;
-class DVBChannel;
-class MPEGStreamData;
-class ProgramAssociationTable;
-class ProgramMapTable;
-class TSPacket;
 class DVBStreamHandler;
-
-typedef vector<uint>        uint_vec_t;
+class ProgramMapTable;
+class DVBChannel;
 
 /** \class DVBRecorder
  *  \brief This is a specialization of DTVRecorder used to
@@ -36,114 +18,27 @@ typedef vector<uint>        uint_vec_t;
  *
  *  \sa DTVRecorder
  */
-class DVBRecorder :
-    public DTVRecorder,
-    public MPEGStreamListener,
-    public MPEGSingleProgramStreamListener,
-    public DVBMainStreamListener,
-    public ATSCMainStreamListener,
-    public TSPacketListener,
-    public TSPacketListenerAV,
-    private ReaderPausedCB
+class DVBRecorder : public DTVRecorder
 {
   public:
-    DVBRecorder(TVRec *rec, DVBChannel* dvbchannel);
-   ~DVBRecorder();
-
-    void SetOptionsFromProfile(RecordingProfile *profile,
-                               const QString &videodev,
-                               const QString &audiodev,
-                               const QString &vbidev);
+    DVBRecorder(TVRec*, DVBChannel*);
 
     void StartRecording(void);
-    void ResetForNewFile(void);
-    void StopRecording(void);
 
     bool Open(void);
-    bool IsOpen(void) const { return _stream_fd >= 0; }
+    bool IsOpen(void) const;
     void Close(void);
 
-    // MPEG Stream Listener
-    void HandlePAT(const ProgramAssociationTable*);
-    void HandleCAT(const ConditionalAccessTable*) {}
-    void HandlePMT(uint pid, const ProgramMapTable*);
-    void HandleEncryptionStatus(uint /*pnum*/, bool /*encrypted*/) { }
-
-    // MPEG Single Program Stream Listener
-    void HandleSingleProgramPAT(ProgramAssociationTable *pat);
-    void HandleSingleProgramPMT(ProgramMapTable *pmt);
-
-    // ATSC Main
-    void HandleSTT(const SystemTimeTable*);
-    void HandleVCT(uint /*tsid*/, const VirtualChannelTable*) {}
-    void HandleMGT(const MasterGuideTable*) {}
-
-    // DVBMainStreamListener
-    void HandleTDT(const TimeDateTable*);
-    void HandleNIT(const NetworkInformationTable*) {}
-    void HandleSDT(uint /*tsid*/, const ServiceDescriptionTable*) {}
-
-    // TSPacketListener
-    bool ProcessTSPacket(const TSPacket &tspacket);
-
-    // TSPacketListenerAV
-    bool ProcessVideoTSPacket(const TSPacket& tspacket);
-    bool ProcessAudioTSPacket(const TSPacket& tspacket);
-
-    // Common audio/visual processing
-    bool ProcessAVTSPacket(const TSPacket &tspacket);
-
-    void SetStreamData(void);
-
-    void BufferedWrite(const TSPacket &tspacket);
-
   private:
-    void TeardownAll(void);
-
-    inline bool CheckCC(uint pid, uint cc);
-
-    void ReaderPaused(int fd);
     bool PauseAndWait(int timeout = 100);
 
+    QString GetSIStandard(void) const;
+    void SetCAMPMT(const ProgramMapTable*);
+    void UpdateCAMTimeOffset(void);
+
   private:
-    // DVB stuff
-    DVBChannel              *dvbchannel;
-    DVBStreamHandler        *_stream_handler;
-
-    // general recorder stuff
-    mutable QMutex           _pid_lock;
-    ProgramAssociationTable *_input_pat; ///< PAT on input side
-    ProgramMapTable         *_input_pmt; ///< PMT on input side
-    bool                     _has_no_av;
-
-    // TS recorder stuff
-    unsigned char _stream_id[0x1fff + 1];
-    unsigned char _pid_status[0x1fff + 1];
-    unsigned char _continuity_counter[0x1fff + 1];
-    vector<TSPacket> _scratch;
-
-    // Statistics
-    mutable uint  _continuity_error_count;
-    mutable uint  _stream_overflow_count;
-    mutable uint  _bad_packet_count;
-
-    // Constants
-    static const int TSPACKETS_BETWEEN_PSIP_SYNC;
-    static const int POLL_INTERVAL;
-    static const int POLL_WARNING_TIMEOUT;
-
-    static const unsigned char kPayloadStartSeen = 0x2;
+    DVBChannel       *_channel;
+    DVBStreamHandler *_stream_handler;
 };
 
-
-inline bool DVBRecorder::CheckCC(uint pid, uint new_cnt)
-{
-    bool ok = ((((_continuity_counter[pid] + 1) & 0xf) == new_cnt) ||
-               (_continuity_counter[pid] == 0xFF));
-
-    _continuity_counter[pid] = new_cnt & 0xf;
-
-    return ok;
-}
-
-#endif
+#endif // _DVB_RECORDER_H_

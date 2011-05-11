@@ -11,27 +11,16 @@
 #include <QString>
 #include <QThread>
 
+#include "tspacket.h"
 #include "util.h"
 
-class ReaderPausedCB
+class DeviceReaderCB
 {
   protected:
-    virtual ~ReaderPausedCB() {}
+    virtual ~DeviceReaderCB() {}
   public:
     virtual void ReaderPaused(int fd) = 0;
-};
-
-class DeviceReadBuffer;
-
-class DRBThread : public QThread
-{
-    Q_OBJECT
-  public:
-    DRBThread(void) : m_buffer(NULL) {};
-    void SetBuffer( DeviceReadBuffer *buffer ) { m_buffer = buffer; };
-    void run(void);
-  private:
-    DeviceReadBuffer *m_buffer;
+    virtual void PriorityEvent(int fd) = 0;
 };
 
 /** \class DeviceReadBuffer
@@ -41,15 +30,17 @@ class DRBThread : public QThread
  *  of long blocking conditions on writing to disk or accessing the
  *  database.
  */
-class DeviceReadBuffer
+class DeviceReadBuffer : protected QThread
 {
-    friend class DRBThread;
-
   public:
-    DeviceReadBuffer(ReaderPausedCB *callback, bool use_poll = true);
+    DeviceReadBuffer(DeviceReaderCB *callback,
+                     bool use_poll = true);
    ~DeviceReadBuffer();
 
-    bool Setup(const QString &streamName, int streamfd);
+    bool Setup(const QString &streamName,
+               int streamfd,
+               uint readQuanta       = sizeof(TSPacket),
+               uint deviceBufferSize = 0);
 
     void Start(void);
     void Reset(const QString &streamName, int streamfd);
@@ -60,14 +51,14 @@ class DeviceReadBuffer
     bool WaitForUnpause(unsigned long timeout);
     bool WaitForPaused(unsigned long timeout);
 
-    bool IsErrored(void) const { return error; }
-    bool IsEOF(void)     const { return eof;   }
+    bool IsErrored(void) const;
+    bool IsEOF(void)     const;
     bool IsRunning(void) const;
 
     uint Read(unsigned char *buf, uint count);
 
   private:
-    void fill_ringbuffer(void);
+    virtual void run(void); // QThread
 
     void SetPaused(bool);
     void IncrWritePointer(uint len);
@@ -75,26 +66,30 @@ class DeviceReadBuffer
 
     bool HandlePausing(void);
     bool Poll(void) const;
+    void WakePoll(void) const;
     uint WaitForUnused(uint bytes_needed) const;
-    uint WaitForUsed  (uint bytes_needed) const;
+    uint WaitForUsed  (uint bytes_needed, uint max_wait /*ms*/) const;
 
     bool IsPauseRequested(void) const;
     bool IsOpen(void) const { return _stream_fd >= 0; }
+    void ClosePipes(void) const;
     uint GetUnused(void) const;
     uint GetUsed(void) const;
     uint GetContiguousUnused(void) const;
 
-    bool CheckForErrors(ssize_t read_len, uint &err_cnt);
+    bool CheckForErrors(ssize_t read_len, size_t requested_len, uint &err_cnt);
     void ReportStats(void);
 
     QString          videodevice;
     int              _stream_fd;
+    mutable int      wake_pipe[2];
+    mutable long     wake_pipe_flags[2];
 
-    ReaderPausedCB  *readerPausedCB;
+    DeviceReaderCB  *readerCB;
 
     // Data for managing the device ringbuffer
     mutable QMutex   lock;
-    bool             run;
+    bool             dorun;
     bool             running;
     bool             eof;
     mutable bool     error;
@@ -105,6 +100,7 @@ class DeviceReadBuffer
 
     size_t           size;
     size_t           used;
+    size_t           read_quanta;
     size_t           dev_read_size;
     size_t           min_read;
     unsigned char   *buffer;
@@ -120,8 +116,6 @@ class DeviceReadBuffer
     size_t           avg_used;
     size_t           avg_cnt;
     MythTimer        lastReport;
-
-    DRBThread        thread;
 };
 
 #endif // _DEVICEREADBUFFER_H_

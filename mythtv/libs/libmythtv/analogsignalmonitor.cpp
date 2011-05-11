@@ -23,8 +23,13 @@ AnalogSignalMonitor::AnalogSignalMonitor(
     int videofd = channel->GetFd();
     if (videofd >= 0)
     {
-        m_usingv4l2 = CardUtil::hasV4L2(videofd);
-        CardUtil::GetV4LInfo(videofd, m_card, m_driver, m_version);
+        uint32_t caps;
+        if (!CardUtil::GetV4LInfo(videofd, m_card, m_driver, m_version, caps))
+        {
+            videofd = -1;
+            return;
+        }
+        m_usingv4l2 = !!(caps & V4L2_CAP_VIDEO_CAPTURE);
         VERBOSE(VB_RECORD, LOC + QString("card '%1' driver '%2' version '%3'")
                 .arg(m_card).arg(m_driver).arg(m_version));
     }
@@ -118,14 +123,19 @@ bool AnalogSignalMonitor::handleHDPVR(int videofd)
 
 void AnalogSignalMonitor::UpdateValues(void)
 {
-    if (!monitor_thread.isRunning() || exit)
+    SignalMonitor::UpdateValues();
+
+    {
+        QMutexLocker locker(&statusLock);
+        if (!scriptStatus.IsGood())
+            return;
+    }
+
+    if (!running || exit)
         return;
 
     int videofd = channel->GetFd();
     if (videofd < 0)
-        return;
-
-    if (!IsChannelTuned())
         return;
 
     bool isLocked = false;

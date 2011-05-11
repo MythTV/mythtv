@@ -2,7 +2,11 @@
 #ifndef TFW_H_
 #define TFW_H_
 
+#include <vector>
+using namespace std;
+
 #include <QWaitCondition>
+#include <QDateTime>
 #include <QString>
 #include <QMutex>
 #include <QThread>
@@ -47,11 +51,7 @@ class ThreadedFileWriter
     long long Seek(long long pos, int whence);
     uint Write(const void *data, uint count);
 
-    void SetWriteBufferSize(uint newSize = TFW_DEF_BUF_SIZE);
-    void SetWriteBufferMinWriteSize(uint newMinSize = TFW_MIN_WRITE_SIZE);
-
-    uint BufUsed(void) const;
-    uint BufFree(void) const;
+    void SetWriteBufferMinWriteSize(uint newMinSize = kMinWriteSize);
 
     void Sync(void);
     void Flush(void);
@@ -59,9 +59,7 @@ class ThreadedFileWriter
   protected:
     void DiskLoop(void);
     void SyncLoop(void);
-
-    uint BufUsedPriv(void) const;
-    uint BufFreePriv(void) const;
+    void TrimEmptyBuffers(void);
 
   private:
     // file info
@@ -69,26 +67,24 @@ class ThreadedFileWriter
     int             flags;
     mode_t          mode;
     int             fd;
-    uint64_t        m_file_sync;  ///< offset synced to disk
-    uint64_t        m_file_wpos; ///< offset written to disk
 
     // state
-    volatile bool   no_writes;
-    bool            flush;
-    bool            write_is_blocked;
-    volatile bool   in_dtor;
-    bool            ignore_writes;
-    long long       tfw_min_write_size;
+    bool            flush;              // protected by buflock
+    bool            in_dtor;            // protected by buflock
+    bool            ignore_writes;      // protected by buflock
+    uint            tfw_min_write_size; // protected by buflock
+    uint            totalBufferUse;     // protected by buflock
 
-    // buffer position state
-    volatile uint   rpos;    ///< points to end of data written to disk
-    volatile uint   wpos;    ///< points to end of data added to buffer
-    mutable QMutex  buflock; ///< lock needed to update rpos and wpos
-    long long       written;
-
-    // buffer
-    char           *buf;
-    unsigned long   tfw_buf_size;
+    // buffers
+    class TFWBuffer
+    {
+      public:
+        vector<char> data;
+        QDateTime    lastUsed;
+    };
+    mutable QMutex    buflock;
+    QList<TFWBuffer*> writeBuffers;     // protected by buflock
+    QList<TFWBuffer*> emptyBuffers;     // protected by buflock
 
     // threads
     TFWWriteThread *writeThread;
@@ -98,16 +94,11 @@ class ThreadedFileWriter
     QWaitCondition  bufferEmpty;
     QWaitCondition  bufferHasData;
     QWaitCondition  bufferSyncWait;
-    QWaitCondition  bufferWroteData;
 
-  private:
     // constants
-    /// Default buffer size.
-    static const uint TFW_DEF_BUF_SIZE;
-    /// Maximum to write to disk in a single write.
-    static const uint TFW_MAX_WRITE_SIZE;
+    static const uint kMaxBufferSize;
     /// Minimum to write to disk in a single write, when not flushing buffer.
-    static const uint TFW_MIN_WRITE_SIZE;
+    static const uint kMinWriteSize;
 };
 
 #endif

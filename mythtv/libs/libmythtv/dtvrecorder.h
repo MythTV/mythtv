@@ -14,6 +14,7 @@ using namespace std;
 
 #include <QString>
 
+#include "streamlisteners.h"
 #include "recorderbase.h"
 #include "H264Parser.h"
 
@@ -21,7 +22,14 @@ class MPEGStreamData;
 class TSPacket;
 class QTime;
 
-class DTVRecorder: public RecorderBase
+class DTVRecorder :
+    public RecorderBase,
+    public MPEGStreamListener,
+    public MPEGSingleProgramStreamListener,
+    public DVBMainStreamListener,
+    public ATSCMainStreamListener,
+    public TSPacketListener,
+    public TSPacketListenerAV
 {
   public:
     DTVRecorder(TVRec *rec);
@@ -29,10 +37,11 @@ class DTVRecorder: public RecorderBase
 
     virtual void SetOption(const QString &opt, const QString &value);
     virtual void SetOption(const QString &name, int value);
+    virtual void SetOptionsFromProfile(
+        RecordingProfile *profile, const QString &videodev,
+        const QString&, const QString&);
 
-    virtual void StopRecording(void) { _request_recording = false; }
-    bool IsRecording(void) { return _recording; }
-    bool IsErrored(void) { return _error; }
+    bool IsErrored(void) { return !_error.isEmpty(); }
 
     long long GetFramesWritten(void) { return _frames_written_count; }
 
@@ -41,11 +50,41 @@ class DTVRecorder: public RecorderBase
     int GetVideoFd(void) { return _stream_fd; }
 
     virtual void SetNextRecording(const ProgramInfo*, RingBuffer*);
-    virtual void SetStreamData(void) = 0;
+    virtual void SetStreamData(void);
     void SetStreamData(MPEGStreamData* sd);
     MPEGStreamData *GetStreamData(void) const { return _stream_data; }
 
     virtual void Reset();
+
+    // MPEG Stream Listener
+    void HandlePAT(const ProgramAssociationTable*);
+    void HandleCAT(const ConditionalAccessTable*) {}
+    void HandlePMT(uint pid, const ProgramMapTable*);
+    void HandleEncryptionStatus(uint /*pnum*/, bool /*encrypted*/) { }
+
+    // MPEG Single Program Stream Listener
+    void HandleSingleProgramPAT(ProgramAssociationTable *pat);
+    void HandleSingleProgramPMT(ProgramMapTable *pmt);
+
+    // ATSC Main
+    void HandleSTT(const SystemTimeTable*) { UpdateCAMTimeOffset(); }
+    void HandleVCT(uint /*tsid*/, const VirtualChannelTable*) {}
+    void HandleMGT(const MasterGuideTable*) {}
+
+    // DVBMainStreamListener
+    void HandleTDT(const TimeDateTable*) { UpdateCAMTimeOffset(); }
+    void HandleNIT(const NetworkInformationTable*) {}
+    void HandleSDT(uint /*tsid*/, const ServiceDescriptionTable*) {}
+
+    // TSPacketListener
+    bool ProcessTSPacket(const TSPacket &tspacket);
+
+    // TSPacketListenerAV
+    bool ProcessVideoTSPacket(const TSPacket& tspacket);
+    bool ProcessAudioTSPacket(const TSPacket& tspacket);
+
+    // Common audio/visual processing
+    bool ProcessAVTSPacket(const TSPacket &tspacket);
 
   protected:
     void FinishRecording(void);
@@ -71,6 +110,12 @@ class DTVRecorder: public RecorderBase
     // For handling other (non audio/video) packets
     bool FindOtherKeyframes(const TSPacket *tspacket);
 
+    inline bool CheckCC(uint pid, uint cc);
+
+    virtual QString GetSIStandard(void) const { return "mpeg"; }
+    virtual void SetCAMPMT(const ProgramMapTable*) {}
+    virtual void UpdateCAMTimeOffset(void) {}
+
     // file handle for stream
     int _stream_fd;
 
@@ -92,30 +137,36 @@ class DTVRecorder: public RecorderBase
     bool _seen_sps;
     H264Parser m_h264_parser;
 
-    /// True if API call has requested a recording be [re]started
-    bool _request_recording;
     /// Wait for the a GOP/SEQ-start before sending data
     bool _wait_for_keyframe_option;
 
     bool _has_written_other_keyframe;
 
     // state tracking variables
-    /// True iff recording is actually being performed
-    bool _recording;
-    /// True iff irrecoverable recording error detected
-    bool _error;
+    /// non-empty iff irrecoverable recording error detected
+    QString _error;
 
     MPEGStreamData          *_stream_data;
-
-    // packet buffer
-    unsigned char* _buffer;
-    int            _buffer_size;
 
     // keyframe finding buffer
     bool                  _buffer_packets;
     vector<unsigned char> _payload_buffer;
 
-    // statistics
+    // general recorder stuff
+    mutable QMutex           _pid_lock;
+    ProgramAssociationTable *_input_pat; ///< PAT on input side
+    ProgramMapTable         *_input_pmt; ///< PMT on input side
+    bool                     _has_no_av;
+
+    // TS recorder stuff
+    unsigned char _stream_id[0x1fff + 1];
+    unsigned char _pid_status[0x1fff + 1];
+    unsigned char _continuity_counter[0x1fff + 1];
+    vector<TSPacket> _scratch;
+
+    // Statistics
+    mutable unsigned long long _packet_count;
+    mutable unsigned long long _continuity_error_count;
     unsigned long long _frames_seen_count;
     unsigned long long _frames_written_count;
 
@@ -124,6 +175,18 @@ class DTVRecorder: public RecorderBase
     /// detected keyframe exceeds this value, then we begin marking
     /// random regular frames as keyframes.
     static const uint kMaxKeyFrameDistance;
+    static const unsigned char kPayloadStartSeen = 0x2;
 };
+
+inline bool DTVRecorder::CheckCC(uint pid, uint new_cnt)
+{
+    bool ok = ((((_continuity_counter[pid] + 1) & 0xf) == new_cnt) ||
+               (_continuity_counter[pid] == new_cnt) ||
+               (_continuity_counter[pid] == 0xFF));
+
+    _continuity_counter[pid] = new_cnt & 0xf;
+
+    return ok;
+}
 
 #endif // DTVRECORDER_H

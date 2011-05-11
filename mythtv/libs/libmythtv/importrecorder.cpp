@@ -83,10 +83,13 @@ void ImportRecorder::StartRecording(void)
 {
     VERBOSE(VB_RECORD, LOC + "StartRecording -- begin");
 
+    _continuity_error_count = 0;
+
     {
-        QMutexLocker locker(&_end_of_recording_lock);
-        _request_recording = true;
-        _recording = true;
+        QMutexLocker locker(&pauseLock);
+        request_recording = true;
+        recording = true;
+        recordingWait.wakeAll();
     }
 
     VERBOSE(VB_RECORD, LOC + "StartRecording -- " +
@@ -94,13 +97,18 @@ void ImportRecorder::StartRecording(void)
             .arg(curRecording->GetPathname()));
 
     // retry opening the file until StopRecording() is called.
-    while (!Open() && _request_recording && !_error)
-        usleep(20000);
+    while (!Open() && IsRecordingRequested() && !IsErrored())
+    {   // sleep 250 milliseconds unless StopRecording() or Unpause()
+        // is called, just to avoid running this loop too often.
+        QMutexLocker locker(&pauseLock);
+        if (request_recording)
+            unpauseWait.wait(&pauseLock, 250);
+    }
 
     curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
 
     // build seek table
-    if (_import_fd && _request_recording && !_error)
+    if (_import_fd && IsRecordingRequested() && !IsErrored())
     {
         MythCommFlagPlayer *cfp = new MythCommFlagPlayer();
         RingBuffer *rb = RingBuffer::Create(
@@ -124,19 +132,11 @@ void ImportRecorder::StartRecording(void)
 
     FinishRecording();
 
-    QMutexLocker locker(&_end_of_recording_lock);
-    _recording = false;
-    _end_of_recording_wait.wakeAll();
+    QMutexLocker locker(&pauseLock);
+    recording = false;
+    recordingWait.wakeAll();
 
     VERBOSE(VB_RECORD, LOC + "StartRecording -- end");
-}
-
-void ImportRecorder::StopRecording(void)
-{
-    QMutexLocker locker(&_end_of_recording_lock);
-    _request_recording = false;
-    while (_recording)
-        _end_of_recording_wait.wait(&_end_of_recording_lock);
 }
 
 bool ImportRecorder::Open(void)

@@ -7,6 +7,25 @@
 #include "mythuiactions.h"
 #include "tv_actions.h"
 
+class VBIMode
+{
+  public:
+    typedef enum
+    {
+        None    = 0,
+        PAL_TT  = 1,
+        NTSC_CC = 2,
+    } vbimode_t;
+
+    static uint Parse(QString vbiformat)
+    {
+        QString fmt = vbiformat.toLower().left(3);
+        vbimode_t mode;
+        mode = (fmt == "pal") ? PAL_TT : ((fmt == "nts") ? NTSC_CC : None);
+        return (uint) mode;
+    }
+};
+
 /** \brief ChannelChangeDirection is an enumeration of possible channel
  *         changing directions.
  */

@@ -19,51 +19,13 @@
 #include "panedvbutilsimport.h"
 #include "paneexistingscanimport.h"
 
-static QString card_types(void)
-{
-    QString cardTypes = "";
-
-#ifdef USING_DVB
-    cardTypes += "'DVB'";
-#endif // USING_DVB
-
-#ifdef USING_V4L
-    if (!cardTypes.isEmpty())
-        cardTypes += ",";
-    cardTypes += "'V4L'";
-# ifdef USING_IVTV
-    cardTypes += ",'MPEG'";
-# endif // USING_IVTV
-#endif // USING_V4L
-
-#ifdef USING_IPTV
-    if (!cardTypes.isEmpty())
-        cardTypes += ",";
-    cardTypes += "'FREEBOX'";
-#endif // USING_IPTV
-
-#ifdef USING_HDHOMERUN
-    if (!cardTypes.isEmpty())
-        cardTypes += ",";
-    cardTypes += "'HDHOMERUN'";
-#endif // USING_HDHOMERUN
-
-    if (cardTypes.isEmpty())
-        cardTypes = "'DUMMY'";
-
-    return QString("(%1)").arg(cardTypes);
-}
-
-////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////
-
 ScanWizardConfig::ScanWizardConfig(
     ScanWizard *_parent,
     uint    default_sourceid,  uint default_cardid,
     QString default_inputname) :
     VerticalConfigurationGroup(false, true, false, false),
     videoSource(new VideoSourceSelector(
-                    default_sourceid, card_types(), false)),
+                    default_sourceid, CardUtil::GetScanableCardTypes(), false)),
     input(new InputSelector(default_cardid, default_inputname)),
     scanType(new ScanTypeSetting()),
     scanConfig(new ScanOptionalConfig(scanType)),
@@ -212,6 +174,10 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
             addSelection(tr("M3U Import"),
                          QString::number(IPTVImport), true);
             return;
+        case CardUtil::ASI:
+            addSelection(tr("ASI Scan"),
+                         QString::number(CurrentTransportScan), true);
+            return;
         case CardUtil::ERROR_PROBE:
             addSelection(QObject::tr("Failed to probe the card"),
                          QString::number(Error_Probe), true);
@@ -273,6 +239,8 @@ ScanOptionalConfig::ScanOptionalConfig(ScanTypeSetting *_scan_type) :
               paneSingle);
     addTarget(QString::number(ScanTypeSetting::FullTransportScan),
               paneAll);
+    addTarget(QString::number(ScanTypeSetting::CurrentTransportScan),
+              new BlankSetting());
     addTarget(QString::number(ScanTypeSetting::IPTVImport),
               new BlankSetting());
     addTarget(QString::number(ScanTypeSetting::DVBUtilsImport),

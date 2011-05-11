@@ -1,3 +1,4 @@
+// -*- Mode: c++ -*-
 #ifndef CHANUTIL_H
 #define CHANUTIL_H
 
@@ -18,6 +19,27 @@ using namespace std;
 #include "dbchannelinfo.h"
 
 class NetworkInformationTable;
+
+class pid_cache_item_t
+{
+  public:
+    pid_cache_item_t() : pid(0), sid_tid(0) {}
+    pid_cache_item_t(uint _pid, uint _sid_tid) :
+        pid(_pid), sid_tid(_sid_tid) {}
+    uint GetPID(void) const { return pid; }
+    uint GetStreamID(void) const
+        { return (sid_tid&0x100) ? GetID() : 0; }
+    uint GetTableID(void) const
+        { return (sid_tid&0x100) ? 0 : GetID(); }
+    uint GetID(void) const { return sid_tid & 0xff; }
+    bool IsPCRPID(void) const { return sid_tid&0x200; }
+    bool IsPermanent(void) const { return sid_tid&0x10000; }
+    uint GetComposite(void) const { return sid_tid; }
+  private:
+    uint pid;
+    uint sid_tid;
+};
+typedef vector<pid_cache_item_t> pid_cache_t;
 
 /** \class ChannelUtil
  *  \brief Collection of helper utilities for channel DB use
@@ -223,6 +245,10 @@ class MTV_PUBLIC ChannelUtil
     static uint    GetSourceIDForChannel(uint chanid);
     static int     GetInputID(int sourceid, int cardid);
 
+    static QStringList GetCardTypes(uint chandid);
+
+    static bool    GetCachedPids(uint chanid, pid_cache_t &pid_cache);
+
     // Misc sets
     static bool    SetChannelValue(const QString &field_name,
                                    QString        value,
@@ -232,6 +258,10 @@ class MTV_PUBLIC ChannelUtil
     static bool    SetChannelValue(const QString &field_name,
                                    QString        value,
                                    int            chanid);
+
+    static bool    SaveCachedPids(uint chanid,
+                                  const pid_cache_t &pid_cache,
+                                  bool delete_all = false);
 
     static const QString kATSCSeparators;
 

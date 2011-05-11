@@ -28,19 +28,20 @@
  */
 
 #include <algorithm>
+using namespace std;
 
-#include "channelscanner.h"
-#include "cardutil.h"
-#include "iptvchannelfetcher.h"
-#include "channelscan_sm.h"
-#include "scanmonitor.h"
-#include "scanwizardconfig.h"
-
-#include "v4lchannel.h"
 #include "analogsignalmonitor.h"
-#include "dvbchannel.h"
+#include "iptvchannelfetcher.h"
 #include "dvbsignalmonitor.h"
+#include "scanwizardconfig.h"
+#include "channelscan_sm.h"
+#include "channelscanner.h"
 #include "hdhrchannel.h"
+#include "scanmonitor.h"
+#include "asichannel.h"
+#include "dvbchannel.h"
+#include "v4lchannel.h"
+#include "cardutil.h"
 
 #define LOC QString("ChScan: ")
 #define LOC_ERR QString("ChScan, Error: ")
@@ -217,6 +218,13 @@ void ChannelScanner::Scan(
 
         ok = sigmonScanner->ScanTransport(mplexid, do_follow_nit);
     }
+    else if (ScanTypeSetting::CurrentTransportScan == scantype)
+    {
+        QString sistandard = "mpeg";
+        VERBOSE(VB_CHANSCAN, LOC + "ScanCurrentTransport(" + sistandard + ")");
+        ok = sigmonScanner->ScanCurrentTransport(sistandard);
+    }
+
     if (!ok)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to handle tune complete.");
@@ -353,6 +361,13 @@ void ChannelScanner::PreScanCommon(
         channel = new HDHRChannel(NULL, device);
     }
 #endif // USING_HDHOMERUN
+
+#ifdef USING_ASI
+    if ("ASI" == card_type)
+    {
+        channel = new ASIChannel(NULL, device);
+    }
+#endif // USING_ASI
 
     if (!channel)
     {

@@ -28,7 +28,7 @@ class DummyChannel : public ChannelBase
 
     // Sets
     bool SetChannelByString(const QString &chan)
-           { m_curchannelname = chan; return true; }
+        { m_curchannelname = chan; return true; }
     void SetExternalChanger(void) { return; }
 
     // Gets
@@ -36,11 +36,6 @@ class DummyChannel : public ChannelBase
     QString GetDevice(void)          const { return "/dev/dummy"; }
     QString GetCurrentInput(void)    const { return curinputname; }
     uint    GetCurrentSourceID(void) const { return 0; }
-
-
-    // Commands
-    bool SelectInput(const QString &inputname, const QString &chan, bool use_sm)
-         { curinputname = inputname; m_curchannelname = chan; return true; }
 
   private:
     QString curinputname;

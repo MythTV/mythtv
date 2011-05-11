@@ -6,13 +6,11 @@
 #include <vector>
 using namespace std;
 
-#include <QMap>
+#include <QString>
 #include <QMutex>
-#include <QThread>
+#include <QMap>
 
-#include "util.h"
-#include "DeviceReadBuffer.h"
-#include "mpegstreamdata.h"
+#include "streamhandler.h"
 
 class QString;
 class DVBStreamHandler;
@@ -24,107 +22,55 @@ typedef QMap<uint,int> FilterMap;
 
 //#define RETUNE_TIMEOUT 5000
 
-class PIDInfo
+class DVBPIDInfo : public PIDInfo
 {
   public:
-    PIDInfo() :
-        _pid(0xffffffff), filter_fd(-1), streamType(0), pesType(-1) {;}
-    PIDInfo(uint pid) :
-        _pid(pid),        filter_fd(-1), streamType(0), pesType(-1) {;}
-    PIDInfo(uint pid, uint stream_type, uint pes_type) :
-        _pid(pid),                       filter_fd(-1),
-        streamType(stream_type),         pesType(pes_type) {;}
-
+    DVBPIDInfo(uint pid) : PIDInfo(pid) {}
+    DVBPIDInfo(uint pid, uint stream_type, int pes_type) :
+        PIDInfo(pid, stream_type, pes_type) {}
     bool Open(const QString &dvb_dev, bool use_section_reader);
     bool Close(const QString &dvb_dev);
-    bool IsOpen(void) const { return filter_fd >= 0; }
-
-    uint        _pid;
-    int         filter_fd;         ///< Input filter file descriptor
-    uint        streamType;        ///< StreamID
-    int         pesType;           ///< PESStreamID
-};
-typedef QMap<uint,PIDInfo*> PIDInfoMap;
-
-class DVBReadThread : public QThread
-{
-    Q_OBJECT
-  public:
-    DVBReadThread() : m_parent(NULL) {}
-    void SetParent(DVBStreamHandler *parent) { m_parent = parent; }
-    void run(void);
-  private:
-    DVBStreamHandler *m_parent;
 };
 
-class DVBStreamHandler : public ReaderPausedCB
+class DVBStreamHandler : public StreamHandler
 {
-    friend class DVBReadThread;
-
   public:
     static DVBStreamHandler *Get(const QString &dvb_device);
     static void Return(DVBStreamHandler * & ref);
 
-    void AddListener(MPEGStreamData *data,
-                     bool allow_section_reader,
-                     bool needs_buffering);
-    void RemoveListener(MPEGStreamData *data);
+    // DVB specific
 
     void RetuneMonitor(void);
 
-    bool IsRunning(void) const { return _reader_thread.isRunning(); }
     bool IsRetuneAllowed(void) const { return _allow_retune; }
 
     void SetRetuneAllowed(bool              allow,
                           DTVSignalMonitor *sigmon,
                           DVBChannel       *dvbchan);
 
-    // ReaderPausedCB
-    virtual void ReaderPaused(int fd) { (void) fd; }
-
   private:
     DVBStreamHandler(const QString &);
-    ~DVBStreamHandler();
 
-    void Start(void);
-    void Stop(void);
-
-    void Run(void);
+    virtual void run(void); // QThread
     void RunTS(void);
     void RunSR(void);
 
-    void UpdateListeningForEIT(void);
-    bool UpdateFiltersFromStreamData(void);
-    bool AddPIDFilter(PIDInfo *info);
-    bool RemovePIDFilter(uint pid);
-    bool RemoveAllPIDFilters(void);
-    void CycleFiltersByPriority(void);
+    virtual void CycleFiltersByPriority(void);
 
-    PIDPriority GetPIDPriority(uint pid) const;
     bool SupportsTSMonitoring(void);
 
-  private:
-    QString           _dvb_dev;
-    QString           _dvr_dev_path;
-    bool              _allow_section_reader;
-    bool              _needs_buffering;
-    bool              _allow_retune;
+    virtual PIDInfo *CreatePIDInfo(uint pid, uint stream_type, int pes_type)
+        { return new DVBPIDInfo(pid, stream_type, pes_type); }
 
-    mutable QMutex     _start_stop_lock;
-    DVBReadThread     _reader_thread;
-    bool              _using_section_reader;
-    DeviceReadBuffer *_device_read_buffer;
+    virtual void SetRunningDesired(bool desired); // StreamHandler
+
+  private:
+    QString           _dvr_dev_path;
+    volatile bool     _allow_retune;
+
     DTVSignalMonitor *_sigmon;
     DVBChannel       *_dvbchannel;
-
-    mutable QMutex    _pid_lock;
-    vector<uint>      _eit_pids;
-    PIDInfoMap        _pid_info;
-    uint              _open_pid_filters;
-    MythTimer         _cycle_timer;
-
-    mutable QMutex          _listener_lock;
-    vector<MPEGStreamData*> _stream_data_list;
+    DeviceReadBuffer *_drb;
 
     // for caching TS monitoring supported value.
     static QMutex             _rec_supports_ts_monitoring_lock;
@@ -134,8 +80,6 @@ class DVBStreamHandler : public ReaderPausedCB
     static QMutex                          _handlers_lock;
     static QMap<QString,DVBStreamHandler*> _handlers;
     static QMap<QString,uint>              _handlers_refcnt;
-
-    bool              _run;
 };
 
 #endif // _DVBSTREAMHANDLER_H_

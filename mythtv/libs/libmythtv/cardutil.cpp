@@ -35,9 +35,55 @@
 #include "hdhomerun.h"
 #endif
 
+#ifdef USING_ASI
+#include <dveo/asi.h>
+#include <dveo/master.h>
+#endif
+
 #define LOC      QString("CardUtil: ")
 #define LOC_WARN QString("CardUtil, Warning: ")
 #define LOC_ERR  QString("CardUtil, Error: ")
+
+QString CardUtil::GetScanableCardTypes(void)
+{
+    QString cardTypes = "";
+
+#ifdef USING_DVB
+    cardTypes += "'DVB'";
+#endif // USING_DVB
+
+#ifdef USING_V4L
+    if (!cardTypes.isEmpty())
+        cardTypes += ",";
+    cardTypes += "'V4L'";
+# ifdef USING_IVTV
+    cardTypes += ",'MPEG'";
+# endif // USING_IVTV
+#endif // USING_V4L
+
+#ifdef USING_IPTV
+    if (!cardTypes.isEmpty())
+        cardTypes += ",";
+    cardTypes += "'FREEBOX'";
+#endif // USING_IPTV
+
+#ifdef USING_HDHOMERUN
+    if (!cardTypes.isEmpty())
+        cardTypes += ",";
+    cardTypes += "'HDHOMERUN'";
+#endif // USING_HDHOMERUN
+
+#ifdef USING_ASI
+    if (!cardTypes.isEmpty())
+        cardTypes += ",";
+    cardTypes += "'ASI'";
+#endif
+
+    if (cardTypes.isEmpty())
+        cardTypes = "'DUMMY'";
+
+    return QString("(%1)").arg(cardTypes);
+}
 
 bool CardUtil::IsTunerShared(uint cardidA, uint cardidB)
 {
@@ -213,6 +259,24 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
             QFileInfoList::const_iterator subit = subil.begin();
             for (; subit != subil.end(); ++subit)
                 devs.push_back(subit->filePath());
+        }
+    }
+    else if (rawtype.toUpper() == "ASI")
+    {
+        QDir dir("/dev/", "asirx*", QDir::Name, QDir::System);
+        const QFileInfoList il = dir.entryInfoList();
+        if (il.isEmpty())
+            return devs;
+
+        QFileInfoList::const_iterator it = il.begin();
+        for (; it != il.end(); ++it)
+        {
+            if (GetASIDeviceNumber(it->filePath()) >= 0)
+            {
+                devs.push_back(it->filePath());
+                continue;
+            }
+            break;
         }
     }
 #ifdef USING_HDHOMERUN
@@ -1485,10 +1549,12 @@ bool CardUtil::hasV4L2(int videofd)
 }
 
 bool CardUtil::GetV4LInfo(
-    int videofd, QString &card, QString &driver, uint32_t &version)
+    int videofd, QString &card, QString &driver, uint32_t &version,
+    uint32_t &capabilities)
 {
     card = driver = QString::null;
     version = 0;
+    capabilities = 0;
 
     if (videofd < 0)
         return false;
@@ -1502,6 +1568,7 @@ bool CardUtil::GetV4LInfo(
         card = QString::fromAscii((const char*)capability.card);
         driver = QString::fromAscii((const char*)capability.driver);
         version = capability.version;
+        capabilities = capability.capabilities;
     }
     else // Fallback to V4L1 query
     {
@@ -1548,7 +1615,7 @@ InputNames CardUtil::ProbeV4LVideoInputs(int videofd, bool &ok)
     if (ioctl(videofd, VIDIOCGCAP, &vidcap) != 0)
     {
         QString msg = QObject::tr("Could not query inputs.");
-        VERBOSE(VB_IMPORTANT, msg + ENO);
+        VERBOSE(VB_IMPORTANT, "ProbeV4LVideoInputs(): Error, " + msg + ENO);
         list[-1] = msg;
         vidcap.channels = 0;
     }
@@ -1561,7 +1628,7 @@ InputNames CardUtil::ProbeV4LVideoInputs(int videofd, bool &ok)
 
         if (ioctl(videofd, VIDIOCGCHAN, &test) != 0)
         {
-            VERBOSE(VB_IMPORTANT,
+            VERBOSE(VB_IMPORTANT, "ProbeV4LVideoInputs(): Error, " + 
                     QString("Could determine name of input #%1"
                             "\n\t\t\tNot adding it to the list.")
                     .arg(test.channel) + ENO);
@@ -2030,5 +2097,166 @@ QString CardUtil::GetHDHRdesc(const QString &device)
 
     (void) device;
     return connectErr;
+#endif
+}
+
+#ifdef USING_ASI
+static QString sys_dev(uint device_num, QString dev)
+{
+    return QString("/sys/class/asi/asirx%1/%2").arg(device_num).arg(dev);
+}
+
+static QString read_sys(QString sys_dev)
+{
+    QFile f(sys_dev);
+    f.open(QIODevice::ReadOnly);
+    QByteArray sdba = f.readAll();
+    f.close();
+    return sdba;
+}
+
+static bool write_sys(QString sys_dev, QString str)
+{
+    QFile f(sys_dev);
+    f.open(QIODevice::WriteOnly);
+    QByteArray ba = str.toLocal8Bit();
+    qint64 offset = 0;
+    for (uint tries = 0; (offset < ba.size()) && tries < 5; tries++)
+    {
+        qint64 written = f.write(ba.data()+offset, ba.size()-offset);
+        if (written < 0)
+            return false;
+        offset += written;
+    }
+    return true;
+}
+#endif
+
+int CardUtil::GetASIDeviceNumber(const QString &device, QString *error)
+{
+#ifdef USING_ASI
+    // basic confirmation
+    struct stat statbuf;
+    memset(&statbuf, 0, sizeof(statbuf));
+    if (stat(device.toLocal8Bit().constData(), &statbuf) < 0)
+    {
+        if (error)
+            *error = QString("Unable to stat '%1'").arg(device) + ENO;
+        return -1;
+    }
+
+    if (!S_ISCHR(statbuf.st_mode))
+    {
+        if (error)
+            *error = QString("'%1' is not a character device").arg(device);
+        return -1;
+    }
+
+    if (!(statbuf.st_rdev & 0x0080))
+    {
+        if (error)
+            *error = QString("'%1' not a DVEO ASI receiver").arg(device);
+        return -1;
+    }
+
+    int device_num = statbuf.st_rdev & 0x007f;
+
+    // extra confirmation
+    QString sys_dev_contents = read_sys(sys_dev(device_num, "dev"));
+    QStringList sys_dev_clist = sys_dev_contents.split(":");
+    if (2 != sys_dev_clist.size())
+    {
+        if (error)
+        {
+            *error = QString("Unable to read '%1'")
+                .arg(sys_dev(device_num, "dev"));
+        }
+        return -1;
+    }
+    if (sys_dev_clist[0].toUInt() != (statbuf.st_rdev>>8))
+    {
+        if (error)
+            *error = QString("'%1' not a DVEO ASI device").arg(device);
+        return -1;
+    }
+
+    return device_num;
+#else
+    (void) device;
+    if (error)
+        *error = "Not compiled with ASI support.";
+    return -1;
+#endif
+}
+
+uint CardUtil::GetASIBufferSize(uint device_num, QString *error)
+{
+#ifdef USING_ASI
+    // get the buffer size
+    QString sys_bufsize_contents = read_sys(sys_dev(device_num, "bufsize"));
+    bool ok;
+    uint buf_size = sys_bufsize_contents.toUInt(&ok);
+    if (!ok)
+    {
+        if (error)
+        {
+            *error = QString("Failed to read buffer size from '%1'")
+                .arg(sys_dev(device_num, "bufsize"));
+        }
+        return 0;
+    }
+    return buf_size;
+#else
+    (void) device_num;
+    if (error)
+        *error = "Not compiled with ASI support.";
+    return 0;
+#endif
+}
+
+int CardUtil::GetASIMode(uint device_num, QString *error)
+{
+#ifdef USING_ASI
+    QString sys_bufsize_contents = read_sys(sys_dev(device_num, "mode"));
+    bool ok;
+    uint mode = sys_bufsize_contents.toUInt(&ok);
+    if (!ok)
+    {
+        if (error)
+        {
+            *error = QString("Failed to read mode from '%1'")
+                .arg(sys_dev(device_num, "mode"));
+        }
+        return -1;
+    }
+    return mode;
+#else
+    (void) device_num;
+    if (error)
+        *error = "Not compiled with ASI support.";
+    return -1;
+#endif
+}
+
+bool CardUtil::SetASIMode(uint device_num, uint mode, QString *error)
+{
+#ifdef USING_ASI
+    QString sys_bufsize_contents = read_sys(sys_dev(device_num, "mode"));
+    bool ok;
+    uint old_mode = sys_bufsize_contents.toUInt(&ok);
+    if (ok && old_mode == mode)
+        return true;
+    ok = write_sys(sys_dev(device_num, "mode"), QString("%1\n").arg(mode));
+    if (!ok && error)
+    {
+        *error = QString("Failed to set mode to %1 using '%2'")
+            .arg(mode).arg(sys_dev(device_num, "mode"));
+    }
+    return ok;
+#else
+    (void) device_num;
+    if (error)
+        *error = "Not compiled with ASI support.";
+    return false;
 #endif
 }

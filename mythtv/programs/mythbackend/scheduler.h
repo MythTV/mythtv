@@ -147,6 +147,26 @@ class Scheduler : public QThread
                          const RecList &reclist);
     void FillDirectoryInfoCache(bool force = false);
 
+    int CalcTimeToNextHandleRecordingEvent(
+        const QDateTime &curtime,
+        RecConstIter startIter, const RecList &reclist,
+        int prerollseconds, int max_sleep /*ms*/);
+    void OldRecordedFixups(void);
+    bool HandleReschedule(void);
+    bool HandleRunSchedulerStartup(
+        int prerollseconds, int idleWaitForRecordingTime);
+    void HandleWakeSlave(RecordingInfo &ri, int prerollseconds);
+    bool HandleRecording(
+        RecordingInfo &ri, bool &statuschanged, int prerollseconds);
+    void HandleTuning(
+        RecordingInfo &ri, bool &statuschanged);
+    void HandleRecordingStatusChange(
+        RecordingInfo &ri, RecStatusTypes recStatus, const QString &details);
+    void HandleIdleShutdown(
+        bool &blockShutdown, QDateTime &idleSince, int prerollseconds,
+        int idleTimeoutSecs, int idleWaitForRecordingTime);
+
+
     MythDeque<int> reschedQueue;
     QMutex schedLock;
     QMutex recordmatchLock;
