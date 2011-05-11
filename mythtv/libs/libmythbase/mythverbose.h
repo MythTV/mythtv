@@ -124,11 +124,11 @@ extern MBASE_PUBLIC unsigned int print_verbose_messages;
 #define VERBOSE_LEVEL_NONE        (print_verbose_messages == 0)
 #define VERBOSE_LEVEL_CHECK(mask) ((print_verbose_messages & (mask)) == (mask))
 
-// 1. A non-locking one, used in C or Objective C src, or standalone libraries,
-// 2. A mutex-locked one, which may deadlock, and
-// 3. A mutex-locked one, which should be deadlock safe.
-// If MYTHCONTEXT_H_ is not defined, we assume the first type,
-// otherwise DEBUG determines the second or third
+// There are two VERBOSE macros now.  One for use with Qt/C++, one for use
+// without Qt.
+//
+// Neither of them will lock the calling thread, but rather put the log message
+// onto a queue.
 
 #ifdef __cplusplus
 #define VERBOSE(mask, ...) \
@@ -147,8 +147,8 @@ extern MBASE_PUBLIC unsigned int print_verbose_messages;
 
     MBASE_PUBLIC int parse_verbose_arg(QString arg);
 
-    /// This can be appended to the VERBOSE args with either
-    /// "+" (with QStrings) or "<<" (with c strings). It uses
+    /// This can be appended to the VERBOSE args with 
+    /// "+".  Please do not use "<<".  It uses
     /// a thread safe version of strerror to produce the
     /// string representation of errno and puts it on the
     /// next line in the verbose output.
