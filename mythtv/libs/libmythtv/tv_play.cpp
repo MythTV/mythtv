@@ -4,6 +4,7 @@
 #include <cmath>
 #include <unistd.h>
 #include <stdint.h>
+#include <pthread.h>
 
 #include <algorithm>
 using namespace std;
@@ -15,7 +16,6 @@ using namespace std;
 #include <QDir>
 #include <QKeyEvent>
 #include <QEvent>
-#include <QThread>
 
 #include "mythdb.h"
 #include "tv_play.h"
@@ -1165,17 +1165,17 @@ TV::~TV(void)
         lcd->switchToTime();
     }
 
-    if (ddMapLoader && ddMapLoader->isRunning())
+    if (ddMapLoaderRunning)
     {
-        ddMapLoader->wait();
-        delete ddMapLoader;
+        pthread_join(ddMapLoader, NULL);
+        ddMapLoaderRunning = false;
 
         if (ddMapSourceId)
         {
-            ddMapLoader = new TVDDMapThread;
-            ddMapLoader->SetParent(NULL);
-            ddMapLoader->SetSourceId(ddMapSourceId);
-            ddMapLoader->start();
+            int *src = new int;
+            *src = ddMapSourceId;
+            pthread_create(&ddMapLoader, NULL, load_dd_map_post_thunk, src);
+            pthread_detach(ddMapLoader);
         }
     }
 
@@ -8948,14 +8948,32 @@ static void insert_map(InfoMap &infoMap, const InfoMap &newMap)
         infoMap.insert(it.key(), *it);
 }
 
-void TVDDMapThread::run(void)
+class load_dd_map
 {
-    threadRegister("TVDDMap");
-    if (m_parent)
-        m_parent->RunLoadDDMap(m_sourceid);
-    else
-        SourceUtil::UpdateChannelsFromListings(m_sourceid);
+  public:
+    load_dd_map(TV *t, uint s) : tv(t), sourceid(s) {}
+    TV   *tv;
+    uint  sourceid;
+};
+
+void *TV::load_dd_map_thunk(void *param)
+{
+    load_dd_map *x = (load_dd_map*) param;
+    threadRegister("LoadDDMap");
+    x->tv->RunLoadDDMap(x->sourceid);
     threadDeregister();
+    delete x;
+    return NULL;
+}
+
+void *TV::load_dd_map_post_thunk(void *param)
+{
+    uint *sourceid = (uint*) param;
+    threadRegister("LoadDDMapPost");
+    SourceUtil::UpdateChannelsFromListings(*sourceid);
+    threadDeregister();
+    delete sourceid;
+    return NULL;
 }
 
 /** \fn TV::StartChannelEditMode(PlayerContext*)
@@ -8972,10 +8990,10 @@ void TV::StartChannelEditMode(PlayerContext *ctx)
     ReturnOSDLock(ctx, osd);
 
     QMutexLocker locker(&chanEditMapLock);
-    if (ddMapLoader && ddMapLoader->isRunning())
+    if (ddMapLoaderRunning)
     {
-        ddMapLoader->wait();
-        delete ddMapLoader;
+        pthread_join(ddMapLoader, NULL);
+        ddMapLoaderRunning = false;
     }
 
     // Get the info available from the backend
@@ -9000,10 +9018,12 @@ void TV::StartChannelEditMode(PlayerContext *ctx)
 
     if (sourceid && (sourceid != ddMapSourceId))
     {
-        ddMapLoader = new TVDDMapThread;
-        ddMapLoader->SetParent(this);
-        ddMapLoader->SetSourceId(sourceid);
-        ddMapLoader->start();
+        ddMapLoaderRunning = true;
+        if (!pthread_create(&ddMapLoader, NULL, load_dd_map_thunk,
+                            new load_dd_map(this, sourceid)))
+        {
+            ddMapLoaderRunning = false;
+        }
     }
 }
 

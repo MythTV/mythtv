@@ -29,9 +29,6 @@ using namespace std;
 #include "mythverbose.h"
 #include "mythlogging.h"
 
-// windows.h - avoid a conflict with Qt::ChildJobThread::SetJob
-#undef SetJob
-
 #ifndef O_STREAMING
 #define O_STREAMING 0
 #endif
@@ -40,27 +37,32 @@ using namespace std;
 #define O_LARGEFILE 0
 #endif
 
+void QueueProcessorThread::run(void)
+{
+    threadRegister("QueueProcessor");
+    m_parent->RunQueueProcessor();
+    threadDeregister();
+}
+
 #define LOC     QString("JobQueue: ")
 #define LOC_ERR QString("JobQueue Error: ")
 
-JobQueue::JobQueue(bool master)
+JobQueue::JobQueue(bool master) :
+    m_hostname(gCoreContext->GetHostName()),
+    jobsRunning(0),
+    jobQueueCPU(0),
+    m_pginfo(NULL),
+    runningJobsLock(new QMutex(QMutex::Recursive)),
+    isMaster(master),
+    queueThread(new QueueProcessorThread(this)),
+    processQueue(false)
 {
-    isMaster = master;
-    m_hostname = gCoreContext->GetHostName();
-
-    runningJobsLock = new QMutex(QMutex::Recursive);
-
     jobQueueCPU = gCoreContext->GetNumSetting("JobQueueCPU", 0);
 
-    jobsRunning = 0;
-
 #ifndef USING_VALGRIND
-    processQueue = false;
-    queueThreadCondLock.lock();
-    queueThread.SetParent(this);
-    queueThread.start();
-    queueThreadCond.wait(&queueThreadCondLock);
-    queueThreadCondLock.unlock();
+    QMutexLocker locker(&queueThreadCondLock);
+    processQueue = true;
+    queueThread->start();
 #else
     VERBOSE(VB_IMPORTANT, LOC_ERR + "The JobQueue has been disabled because "
             "you compiled with the --enable-valgrind option.");
@@ -71,8 +73,14 @@ JobQueue::JobQueue(bool master)
 
 JobQueue::~JobQueue(void)
 {
+    queueThreadCondLock.lock();
     processQueue = false;
-    queueThread.wait();
+    queueThreadCond.wakeAll();
+    queueThreadCondLock.unlock();
+
+    queueThread->wait();
+    delete queueThread;
+    queueThread = NULL;
 
     gCoreContext->removeListener(this);
 
@@ -149,23 +157,13 @@ void JobQueue::RunQueueProcessor(void)
     queueThreadCond.wakeAll();
     queueThreadCondLock.unlock();
 
-    processQueue = true;
-
     RecoverQueue();
 
-    sleep(10);
+    queueThreadCondLock.lock();
+    queueThreadCond.wait(&queueThreadCondLock, 10 * 1000);
+    queueThreadCondLock.unlock();
 
     ProcessQueue();
-}
-
-void QueueProcessorThread::run(void)
-{
-    if (!m_parent)
-        return;
-
-    threadRegister("QueueProcessor");
-    m_parent->RunQueueProcessor();
-    threadDeregister();
 }
 
 void JobQueue::ProcessQueue(void)
@@ -189,8 +187,11 @@ void JobQueue::ProcessQueue(void)
     bool startedJobAlready = false;
     QMap<int, RunningJobInfo>::Iterator rjiter;
 
+    QMutexLocker locker(&queueThreadCondLock);
     while (processQueue)
     {
+        locker.unlock();
+
         startedJobAlready = false;
         sleepTime = gCoreContext->GetNumSetting("JobQueueCheckFrequency", 30);
         maxJobs = gCoreContext->GetNumSetting("JobQueueMaxSimultaneousJobs", 3);
@@ -469,10 +470,13 @@ void JobQueue::ProcessQueue(void)
             }
         }
 
-        if (startedJobAlready)
-            sleep(5);
-        else
-            sleep(sleepTime);
+        locker.relock();
+        if (processQueue)
+        {
+            int st = (startedJobAlready) ? (5 * 1000) : (sleepTime * 1000);
+            if (st > 0)
+                queueThreadCond.wait(locker.mutex(), st);
+        }
     }
 }
 
@@ -1668,22 +1672,23 @@ void JobQueue::ProcessJob(JobQueueEntry job)
 
     if (pginfo && pginfo->GetRecordingGroup() == "Deleted")
     {
-        ChangeJobStatus(jobID, JOB_CANCELLED, "Program has been deleted");
+        ChangeJobStatus(jobID, JOB_CANCELLED,
+                        "Program has been deleted");
         RemoveRunningJob(jobID);
     }
     else if ((job.type == JOB_TRANSCODE) ||
         (runningJobs[jobID].command == "mythtranscode"))
     {
-        StartChildJob(JOB_TRANSCODE, jobID);
+        StartChildJob(TranscodeThread, jobID);
     }
     else if ((job.type == JOB_COMMFLAG) ||
              (runningJobs[jobID].command == "mythcommflag"))
     {
-        StartChildJob(JOB_COMMFLAG, jobID);
+        StartChildJob(FlagCommercialsThread, jobID);
     }
     else if (job.type & JOB_USERJOB)
     {
-        StartChildJob(JOB_USERJOB, jobID);
+        StartChildJob(UserJobThread, jobID);
     }
     else
     {
@@ -1695,15 +1700,19 @@ void JobQueue::ProcessJob(JobQueueEntry job)
     runningJobsLock->unlock();
 }
 
-void JobQueue::StartChildJob(int type, int jobID)
+void JobQueue::StartChildJob(void *(*ChildThreadRoutine)(void *), int jobID)
 {
-    ChildJobThread *childThread = new ChildJobThread;
+    JobThreadStruct *jts = new JobThreadStruct;
+    jts->jq = this;
+    jts->jobID = jobID;
 
-    childThread->SetParent(this);
-    childThread->SetJob(type, jobID);
-    childThread->start();
+    pthread_t childThread;
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    pthread_create(&childThread, &attr, ChildThreadRoutine, jts);
+    pthread_attr_destroy(&attr);
 }
-
 
 QString JobQueue::GetJobDescription(int jobType)
 {
@@ -1822,28 +1831,18 @@ QString JobQueue::PrettyPrint(off_t bytes)
         .arg(pptab[ii].suffix);
 }
 
-void ChildJobThread::run(void)
+void *JobQueue::TranscodeThread(void *param)
 {
-    if (!m_parent)
-        return;
+    JobThreadStruct *jts = (JobThreadStruct *)param;
+    JobQueue *jq = jts->jq;
 
-    threadRegister(QString("ChildJob_%1").arg(m_id));
-
-    switch (m_type) {
-    case JOB_TRANSCODE:
-        m_parent->DoTranscodeThread(m_id);
-        break;
-    case JOB_COMMFLAG:
-        m_parent->DoFlagCommercialsThread(m_id);
-        break;
-    case JOB_USERJOB:
-        m_parent->DoUserJobThread(m_id);
-        break;
-    }
-
-    this->deleteLater();
-
+    threadRegister(QString("Transcode_%1").arg(jts->jobID));
+    jq->DoTranscodeThread(jts->jobID);
     threadDeregister();
+
+    delete jts;
+
+    return NULL;
 }
 
 void JobQueue::DoTranscodeThread(int jobID)
@@ -2060,6 +2059,20 @@ void JobQueue::DoTranscodeThread(int jobID)
     RemoveRunningJob(jobID);
 }
 
+void *JobQueue::FlagCommercialsThread(void *param)
+{
+    JobThreadStruct *jts = (JobThreadStruct *)param;
+    JobQueue *jq = jts->jq;
+
+    threadRegister(QString("Commflag_%1").arg(jts->jobID));
+    jq->DoFlagCommercialsThread(jts->jobID);
+    threadDeregister();
+
+    delete jts;
+
+    return NULL;
+}
+
 void JobQueue::DoFlagCommercialsThread(int jobID)
 {
     // We can't currently commflag non-recording files w/o a ProgramInfo
@@ -2187,6 +2200,20 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
 
     RemoveRunningJob(jobID);
     runningJobsLock->unlock();
+}
+
+void *JobQueue::UserJobThread(void *param)
+{
+    JobThreadStruct *jts = (JobThreadStruct *)param;
+    JobQueue *jq = jts->jq;
+
+    threadRegister(QString("UserJob_%1").arg(jts->jobID));
+    jq->DoUserJobThread(jts->jobID);
+    threadDeregister();
+
+    delete jts;
+
+    return NULL;
 }
 
 void JobQueue::DoUserJobThread(int jobID)

@@ -4,9 +4,10 @@
 #include <deque>
 using namespace std;
 
+#include <QWaitCondition>
 #include <QString>
-#include <QMutex>
 #include <QThread>
+#include <QMutex>
 
 #include "mpegtables.h"
 
@@ -14,31 +15,37 @@ using namespace std;
 
 class ChannelBase;
 class cCiHandler;
-typedef QMap<const ChannelBase*, ProgramMapTable*> pmt_list_t;
-
 class DVBCam;
 
-class CiHandlerThread : public QThread
+typedef QMap<const ChannelBase*, ProgramMapTable*> pmt_list_t;
+
+class DVBCamThread : public QThread
 {
     Q_OBJECT
   public:
-    CiHandlerThread() : m_parent(NULL) {}
-    void SetParent(DVBCam *parent) { m_parent = parent; }
-    void run(void);
+    DVBCamThread(DVBCam *p) : m_parent(p) {}
+    virtual ~DVBCamThread() { wait(); m_parent = NULL; }
+    virtual void run(void);
   private:
     DVBCam *m_parent;
 };
 
 class DVBCam
 {
-    friend class CiHandlerThread;
+    friend class DVBCamThread;
+
   public:
     DVBCam(const QString &device);
     ~DVBCam();
 
-    bool Start();
-    bool Stop();
-    bool IsRunning() const { return ciHandlerThread.isRunning(); }
+    bool Start(void);
+    bool Stop(void);
+    bool IsRunning(void) const
+    {
+        QMutexLocker locker(&ciHandlerLock);
+        return ciHandlerRunning;
+    }
+
     void SetPMT(const ChannelBase *chan, const ProgramMapTable *pmt);
     void SetTimeOffset(double offset_in_seconds);
 
@@ -51,15 +58,17 @@ class DVBCam
 
     QString         device;
     int             numslots;
+
+    mutable QMutex  ciHandlerLock;
+    QWaitCondition  ciHandlerWait;
+    bool            ciHandlerDoRun;
+    bool            ciHandlerRunning;
     cCiHandler     *ciHandler;
+    DVBCamThread   *ciHandlerThread;
 
-    bool            exitCiThread;
-
-    CiHandlerThread ciHandlerThread;
-
+    QMutex          pmt_lock;
     pmt_list_t      PMTList;
     pmt_list_t      PMTAddList;
-    QMutex          pmt_lock;
     bool            have_pmt;
     bool            pmt_sent;
     bool            pmt_updated;

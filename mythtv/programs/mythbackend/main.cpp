@@ -47,6 +47,12 @@
     #define UNUSED_FILENO 3
 #endif
 
+static void qt_exit(int)
+{
+    signal(SIGINT, SIG_DFL);
+    QCoreApplication::exit(0);
+}
+
 int main(int argc, char **argv)
 {
     int quiet = 0;
@@ -109,6 +115,8 @@ int main(int argc, char **argv)
     close(0);
 
     CleanupGuard callCleanup(cleanup);
+    signal(SIGINT, qt_exit);
+    signal(SIGTERM, qt_exit);
 
     int exitCode = setup_basics(cmdline);
     if (exitCode != GENERIC_EXIT_OK)
@@ -120,6 +128,8 @@ int main(int argc, char **argv)
             .arg(MYTH_SOURCE_VERSION);
         VERBOSE(VB_IMPORTANT, versionStr);
     }
+
+    setHttpProxy();
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
 

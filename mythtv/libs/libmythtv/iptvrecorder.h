@@ -30,9 +30,6 @@ class IPTVRecorder : public DTVRecorder, public TSDataListener,
     bool Open(void);
     void Close(void);
 
-    virtual void Pause(bool clear = true);
-    virtual void Unpause(void);
-
     virtual void StartRecording(void);
     virtual void StopRecording(void);
 
@@ -43,6 +40,7 @@ class IPTVRecorder : public DTVRecorder, public TSDataListener,
 
   private:
     void ProcessTSPacket(const TSPacket& tspacket);
+    virtual bool PauseAndWait(int timeout = 100);
 
     // implements TSDataListener
     void AddData(const unsigned char *data, unsigned int dataSize);
@@ -53,7 +51,6 @@ class IPTVRecorder : public DTVRecorder, public TSDataListener,
 
   private:
     IPTVChannel *_channel;
-    QWaitCondition  _cond_recording;
 
   private:
     IPTVRecorder &operator=(const IPTVRecorder&); //< avoid default impl

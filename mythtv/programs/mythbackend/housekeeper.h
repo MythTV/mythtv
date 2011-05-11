@@ -1,40 +1,44 @@
 #ifndef HOUSEKEEPER_H_
 #define HOUSEKEEPER_H_
 
+#include <QWaitCondition>
 #include <QDateTime>
 #include <QThread>
-#include <QPointer>
+#include <QMutex>
 
 class Scheduler;
 class QString;
 class HouseKeeper;
+class MythSystem;
 
-class HKThread : public QThread
+class HouseKeepingThread : public QThread
 {
     Q_OBJECT
   public:
-    HKThread() : m_parent(NULL) {}
-    void SetParent(HouseKeeper *parent) { m_parent = parent; }
-    void run(void);
+    HouseKeepingThread(HouseKeeper *p) : m_parent(p) {}
+    ~HouseKeepingThread() { wait(); }
+    virtual void run(void);
   private:
     HouseKeeper *m_parent;
 };
 
-class MFDThread : public QThread
+class MythFillDatabaseThread : public QThread
 {
     Q_OBJECT
   public:
-    MFDThread() : m_parent(NULL) {}
-    void SetParent(HouseKeeper *parent) { m_parent = parent; }
-    void run(void);
+    MythFillDatabaseThread(HouseKeeper *p) : m_parent(p) {}
+    ~MythFillDatabaseThread() { wait(); }
+    virtual void setTerminationEnabled(bool v)
+        { QThread::setTerminationEnabled(v); }
+    virtual void run(void);
   private:
     HouseKeeper *m_parent;
 };
 
 class HouseKeeper
 {
-    friend class HKThread;
-    friend class MFDThread;
+    friend class HouseKeepingThread;
+    friend class MythFillDatabaseThread;
   public:
     HouseKeeper(bool runthread, bool master, Scheduler *lsched = NULL);
    ~HouseKeeper();
@@ -42,7 +46,6 @@ class HouseKeeper
   protected:
     void RunHouseKeeping(void);
     void RunMFD(void);
-    static void *runMFDThread(void *param);
 
   private:
 
@@ -51,7 +54,8 @@ class HouseKeeper
     void updateLastrun(const QString &dbTag);
     QDateTime getLastRun(const QString &dbTag);
     void flushDBLogs();
-    void runFillDatabase();
+    void StartMFD(void);
+    void KillMFD(void);
     void CleanupMyOldRecordings(void);
     void CleanupAllOldInUsePrograms(void);
     void CleanupOrphanedLivetvChains(void);
@@ -60,13 +64,20 @@ class HouseKeeper
     void RunStartupTasks(void);
     void UpdateThemeChooserInfoCache(void);
 
-    bool threadrunning;
-    bool filldbRunning;
-    bool isMaster;
+  private:
+    bool                    isMaster;
+    Scheduler              *sched;
 
-    Scheduler *sched;
-    HKThread  HouseKeepingThread;
-    QPointer<MFDThread> FillDBThread;
+    QMutex                  houseKeepingLock;
+    QWaitCondition          houseKeepingWait;  // protected by houseKeepingLock
+    bool                    houseKeepingRun;   // protected by houseKeepingLock
+    HouseKeepingThread     *houseKeepingThread;// protected by houseKeepingLock
+
+    QMutex                  fillDBLock;
+    QWaitCondition          fillDBWait;        // protected by fillDBLock
+    MythFillDatabaseThread *fillDBThread;      // Only mod in HouseKeepingThread
+    bool                    fillDBStarted;     // protected by fillDBLock
+    MythSystem             *fillDBMythSystem;  // protected by fillDBLock
 };
 
 #endif

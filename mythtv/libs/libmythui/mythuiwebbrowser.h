@@ -68,6 +68,7 @@ class MythWebView : public QWebView
   protected slots:
     void  handleUnsupportedContent(QNetworkReply *reply);
     void  handleDownloadRequested(const QNetworkRequest &request);
+    QWebView *createWindow(QWebPage::WebWindowType type);
 
   private:
     void showDownloadMenu(void);

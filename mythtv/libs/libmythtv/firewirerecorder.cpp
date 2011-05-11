@@ -70,8 +70,13 @@ void FirewireRecorder::StartRecording(void)
 
     while (_request_recording)
     {
-        if (!PauseAndWait())
-            usleep(50 * 1000);
+        if (PauseAndWait())
+            continue;
+
+        if (!_request_recording)
+            break;
+
+        usleep(50 * 1000);
     }
 
     StopStreaming();
@@ -169,10 +174,11 @@ void FirewireRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 // documented in recorderbase.cpp
 bool FirewireRecorder::PauseAndWait(int timeout)
 {
+    QMutexLocker locker(&pauseLock);
     if (request_pause)
     {
         VERBOSE(VB_RECORD, LOC + QString("PauseAndWait(%1) -- pause").arg(timeout));
-        if (!paused)
+        if (!IsPaused(true))
         {
             StopStreaming();
             paused = true;
@@ -180,17 +186,17 @@ bool FirewireRecorder::PauseAndWait(int timeout)
             if (tvrec)
                 tvrec->RecorderPaused();
         }
-        QMutex unpause_lock;
-        unpause_lock.lock();
-        unpauseWait.wait(&unpause_lock, timeout);
+        unpauseWait.wait(&pauseLock, timeout);
     }
-    if (!request_pause && paused)
+
+    if (!request_pause && IsPaused(true))
     {
         VERBOSE(VB_RECORD, LOC + QString("PauseAndWait(%1) -- unpause").arg(timeout));
         StartStreaming();
-        paused = false;
+        unpauseWait.wakeAll();
     }
-    return paused;
+
+    return IsPaused(true);
 }
 
 void FirewireRecorder::SetStreamData(void)

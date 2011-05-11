@@ -101,32 +101,22 @@ static uint safe_write(int fd, const void *data, uint sz, bool &ok)
 #define LOC QString("TFW(%1:%2): ").arg(filename).arg(fd)
 #define LOC_ERR QString("TFW(%1:%2), Error: ").arg(filename).arg(fd)
 
-/** \fn TFWWriteThread::start()
- *  \brief Thunk that runs ThreadedFileWriter::DiskLoop(void)
- */
+/// \brief Runs ThreadedFileWriter::DiskLoop(void)
 void TFWWriteThread::run(void)
 {
-    if (!m_ptr)
-        return;
-
     threadRegister("TFWWrite");
 #ifndef USING_MINGW
     signal(SIGXFSZ, SIG_IGN);
 #endif
-    m_ptr->DiskLoop();
+    m_parent->DiskLoop();
     threadDeregister();
 }
 
-/** \fn TFWSyncThread::boot_syncer(void*)
- *  \brief Thunk that runs ThreadedFileWriter::SyncLoop(void)
- */
+/// \brief Runs ThreadedFileWriter::SyncLoop(void)
 void TFWSyncThread::run(void)
 {
-    if (!m_ptr)
-        return;
-
     threadRegister("TFWSync");
-    m_ptr->SyncLoop();
+    m_parent->SyncLoop();
     threadDeregister();
 }
 
@@ -147,7 +137,9 @@ ThreadedFileWriter::ThreadedFileWriter(const QString &fname,
     rpos(0),                             wpos(0),
     written(0),
     // buffer
-    buf(NULL),                           tfw_buf_size(0)
+    buf(NULL),                           tfw_buf_size(0),
+    // threads
+    writeThread(NULL),                   syncThread(NULL)
 {
     filename.detach();
 }
@@ -187,25 +179,10 @@ bool ThreadedFileWriter::Open(void)
         tfw_buf_size = TFW_DEF_BUF_SIZE;
         tfw_min_write_size = TFW_MIN_WRITE_SIZE;
 
-        writer.SetPtr(this);
-        writer.start();
-
-        if (!writer.isRunning())
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Starting writer thread. "));
-            return false;
-        }
-
-        syncer.SetPtr(this);
-        syncer.start();
-
-        if (!syncer.isRunning())
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Starting syncer thread. "));
-            return false;
-        }
+        writeThread = new TFWWriteThread(this);
+        writeThread->start();
+        syncThread = new TFWSyncThread(this);
+        syncThread->start();
 
         return true;
     }
@@ -221,13 +198,16 @@ ThreadedFileWriter::~ThreadedFileWriter()
     if (fd >= 0)
     {
         Flush();
-        in_dtor = true; /* tells child thread to exit */
+        in_dtor = true; /* tells child threads to exit */
 
+        buflock.lock();
         bufferSyncWait.wakeAll();
-        syncer.wait();
-
         bufferHasData.wakeAll();
-        writer.wait();
+        buflock.unlock();
+
+        syncThread->wait();
+        writeThread->wait();
+
         close(fd);
         fd = -1;
     }
@@ -236,6 +216,18 @@ ThreadedFileWriter::~ThreadedFileWriter()
     {
         delete [] buf;
         buf = NULL;
+    }
+
+    if (syncThread)
+    {
+        delete syncThread;
+        syncThread = NULL;
+    }
+
+    if (writeThread)
+    {
+        delete writeThread;
+        writeThread = NULL;
     }
 }
 
@@ -315,9 +307,8 @@ uint ThreadedFileWriter::Write(const void *data, uint count)
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Programmer Error detected! "
                     "wpos was changed from under the Write() function.");
         }
-        buflock.unlock();
-
         bufferHasData.wakeAll();
+        buflock.unlock();
 
         remaining -= bytes;
         wdata += bytes;
@@ -440,12 +431,12 @@ void ThreadedFileWriter::SyncLoop(void)
 {
     while (!in_dtor)
     {
+        Sync();
+
         buflock.lock();
         int mstimeout = (written > tfw_min_write_size) ? 1000 : 100;
         bufferSyncWait.wait(&buflock, mstimeout);
         buflock.unlock();
-
-        Sync();
     }
 }
 

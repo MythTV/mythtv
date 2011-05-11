@@ -58,6 +58,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     schedulingEnabled(true),
     m_tvList(tvList),
     m_expirer(NULL),
+    doRun(runthread),
     m_mainServer(NULL),
     resetIdleTime(false),
     m_isShuttingDown(false),
@@ -70,7 +71,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
         master_sched->getAllPending(&reclist);
 
     // Only the master scheduler should use SchedCon()
-    if (runthread)
+    if (doRun)
         dbConn = MSqlQuery::SchedCon();
     else
         dbConn = MSqlQuery::DDCon();
@@ -89,22 +90,30 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
 
     fsInfoCacheFillTime = QDateTime::currentDateTime().addSecs(-1000);
 
-    if (runthread)
+    if (doRun)
     {
-        schedThread.SetParent(this);
-        schedThread.start(QThread::LowPriority);
-
-        if (!schedThread.isRunning())
         {
-            VERBOSE(VB_IMPORTANT, QString("Failed to start scheduler thread"));
+            QMutexLocker locker(&schedLock);
+            start(QThread::LowPriority);
+            while (doRun && !isRunning())
+                reschedWait.wait(&schedLock);
         }
-
         WakeUpSlaves();
     }
 }
 
 Scheduler::~Scheduler()
 {
+    QMutexLocker locker(&schedLock);
+    if (doRun)
+    {
+        doRun = false;
+        reschedWait.wakeAll();
+        locker.unlock();
+        wait();
+        locker.relock();
+    }
+
     while (!reclist.empty())
     {
         delete reclist.back();
@@ -115,12 +124,6 @@ Scheduler::~Scheduler()
     {
         delete worklist.back();
         worklist.pop_back();
-    }
-
-    if (schedThread.isRunning())
-    {
-        schedThread.terminate();
-        schedThread.wait();
     }
 }
 
@@ -1691,8 +1694,9 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
     return false;
 }
 
-void Scheduler::RunScheduler(void)
+void Scheduler::run(void)
 {
+    threadRegister("Scheduler");
     int prerollseconds = 0;
     int wakeThreshold = gCoreContext->GetNumSetting("WakeUpThreshold", 300);
     int secsleft;
@@ -1756,6 +1760,12 @@ void Scheduler::RunScheduler(void)
     if (!query.exec())
         MythDB::DBError("UpdateFuture", query);
 
+    // Notify constructor that we're actually running
+    {
+        QMutexLocker lockit(&schedLock);
+        reschedWait.wakeAll();
+    }
+
     // wait for slaves to connect
     sleep(3);
 
@@ -1766,7 +1776,7 @@ void Scheduler::RunScheduler(void)
 
     RecIter startIter = reclist.begin();
 
-    while (1)
+    while (doRun)
     {
         curtime = QDateTime::currentDateTime();
         bool statuschanged = false;
@@ -1774,14 +1784,14 @@ void Scheduler::RunScheduler(void)
         if ((startIter != reclist.end() &&
              curtime.secsTo((*startIter)->GetRecordingStartTime()) < 30))
         {
-            schedLock.unlock();
-            sleep(1);
-            schedLock.lock();
+            reschedWait.wait(&schedLock, 1000);
         }
         else
         {
             if (reschedQueue.empty())
                 reschedWait.wait(&schedLock, 1000);
+            if (!doRun)
+                break;
 
             if (!reschedQueue.empty())
             {
@@ -2388,6 +2398,7 @@ void Scheduler::RunScheduler(void)
             }
         }
     }
+    threadDeregister();
 }
 
 //returns true, if the shutdown is not blocked
@@ -2755,16 +2766,6 @@ void Scheduler::WakeUpSlaves(void)
                         .arg(thisSlave));
         WakeUpSlave(thisSlave, false);
     }
-}
-
-void ScheduleThread::run(void)
-{
-    if (!m_parent)
-        return;
-
-    threadRegister("Schedule");
-    m_parent->RunScheduler();
-    threadDeregister();
 }
 
 void Scheduler::UpdateManuals(int recordid)
@@ -3621,8 +3622,7 @@ void Scheduler::AddNewRecords(void)
 
         RecStatusType newrecstatus = p->GetRecordingStatus();
         // Check for rsOffLine
-        if ((schedThread.isRunning() || specsched) && 
-            !cardMap.contains(p->GetCardID()))
+        if ((doRun || specsched) && !cardMap.contains(p->GetCardID()))
             newrecstatus = rsOffLine;
 
         // Check for rsTooManyRecordings

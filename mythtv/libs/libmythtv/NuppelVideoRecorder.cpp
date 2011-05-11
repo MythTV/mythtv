@@ -70,8 +70,31 @@ extern "C" {
 #define LOC QString("NVR(%1): ").arg(videodevice)
 #define LOC_ERR QString("NVR(%1) Error: ").arg(videodevice)
 
-NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel)
-    : RecorderBase(rec), audio_device(NULL)
+void NVRWriteThread::run(void)
+{
+    threadRegister("NVRWrite");
+    m_parent->doWriteThread();
+    threadDeregister();
+}
+
+void NVRAudioThread::run(void)
+{
+    threadRegister("NVRAudio");
+    m_parent->doAudioThread();
+    threadDeregister();
+}
+
+void NVRVBIThread::run(void)
+{
+    threadRegister("NVRVbi");
+    m_parent->doVbiThread();
+    threadDeregister();
+}
+
+NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
+    RecorderBase(rec), audio_device(NULL),
+    write_thread(NULL), audio_thread(NULL),
+    vbi_thread(NULL)
 {
     channelObj = channel;
 
@@ -442,6 +465,7 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 
 void NuppelVideoRecorder::Pause(bool clear)
 {
+    QMutexLocker locker(&pauseLock);
     cleartimeonpause = clear;
     writepaused = audiopaused = mainpaused = false;
     request_pause = true;
@@ -451,15 +475,14 @@ void NuppelVideoRecorder::Pause(bool clear)
     unpauseWait.wakeAll();
 }
 
-void NuppelVideoRecorder::Unpause(void)
+bool NuppelVideoRecorder::IsPaused(bool holding_lock) const
 {
-    request_pause = false;
-    unpauseWait.wakeAll();
-}
-
-bool NuppelVideoRecorder::IsPaused(void) const
-{
-    return (audiopaused && mainpaused && writepaused);
+    if (!holding_lock)
+        pauseLock.lock();
+    bool ret = audiopaused && mainpaused && writepaused;
+    if (!holding_lock)
+        pauseLock.unlock();
+    return ret;
 }
 
 void NuppelVideoRecorder::SetVideoFilters(QString &filters)
@@ -1252,26 +1275,31 @@ void NuppelVideoRecorder::DoV4L(void)
 
     int syncerrors = 0;
 
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
-
     while (encoding)
     {
-        if (request_pause)
         {
-           mainpaused = true;
-           pauseWait.wakeAll();
-           if (IsPaused() && tvrec)
-               tvrec->RecorderPaused();
-
-           unpauseWait.wait(&mutex, 100);
-           if (cleartimeonpause)
-               gettimeofday(&stm, &tzone);
-           continue;
+            QMutexLocker locker(&pauseLock);
+            if (request_pause)
+            {
+                if (!mainpaused)
+                {
+                    mainpaused = true;
+                    pauseWait.wakeAll();
+                    if (IsPaused(true) && tvrec)
+                        tvrec->RecorderPaused();
+                }
+                unpauseWait.wait(&pauseLock, 100);
+                if (cleartimeonpause)
+                    gettimeofday(&stm, &tzone);
+                continue;
+            }
+            
+            if (!request_pause && mainpaused)
+            {
+                mainpaused = false;
+                unpauseWait.wakeAll();
+            }
         }
-        mainpaused = false;
 
         frame = 0;
         mm.frame = 0;
@@ -1586,26 +1614,31 @@ void NuppelVideoRecorder::DoV4L2(void)
         avpicture_fill(&img_out, output_buffer, PIX_FMT_YUV420P, width, height);
     }
 
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
-
     while (encoding) {
 again:
-        if (request_pause)
         {
-            mainpaused = true;
-            pauseWait.wakeAll();
-            if (IsPaused() && tvrec)
-                tvrec->RecorderPaused();
-
-            unpauseWait.wait(&mutex, 100);
-            if (cleartimeonpause)
-                gettimeofday(&stm, &tzone);
-            continue;
+            QMutexLocker locker(&pauseLock);
+            if (request_pause)
+            {
+                if (!mainpaused)
+                {
+                    mainpaused = true;
+                    pauseWait.wakeAll();
+                    if (IsPaused(true) && tvrec)
+                        tvrec->RecorderPaused();
+                }
+                unpauseWait.wait(&pauseLock, 100);
+                if (cleartimeonpause)
+                    gettimeofday(&stm, &tzone);
+                continue;
+            }
+            
+            if (!request_pause && mainpaused)
+            {
+                mainpaused = false;
+                unpauseWait.wakeAll();
+            }
         }
-        mainpaused = false;
 
         if (resetcapture)
         {
@@ -1817,26 +1850,31 @@ void NuppelVideoRecorder::DoMJPEG(void)
     encoding = true;
     recording = true;
 
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
-
     while (encoding)
     {
-        if (request_pause)
         {
-           mainpaused = true;
-           pauseWait.wakeAll();
-           if (IsPaused() && tvrec)
-               tvrec->RecorderPaused();
-
-           unpauseWait.wait(&mutex, 100);
-           if (cleartimeonpause)
-               gettimeofday(&stm, &tzone);
-           continue;
+            QMutexLocker locker(&pauseLock);
+            if (request_pause)
+            {
+                if (!mainpaused)
+                {
+                    mainpaused = true;
+                    pauseWait.wakeAll();
+                    if (IsPaused(true) && tvrec)
+                        tvrec->RecorderPaused();
+                }
+                unpauseWait.wait(&pauseLock, 100);
+                if (cleartimeonpause)
+                    gettimeofday(&stm, &tzone);
+                continue;
+            }
+            
+            if (!request_pause && mainpaused)
+            {
+                mainpaused = false;
+                unpauseWait.wakeAll();
+            }
         }
-        mainpaused = false;
 
         if (ioctl(fd, MJPIOC_SYNC, &bsync) < 0)
             encoding = false;
@@ -1868,31 +1906,16 @@ bool NuppelVideoRecorder::SpawnChildren(void)
 {
     childrenLive = true;
 
-    WriteThread.SetParent(this);
-    WriteThread.start();
-    if (!WriteThread.isRunning())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't spawn writer thread, exiting");
-        return false;
-    }
+    write_thread = new NVRWriteThread(this);
+    write_thread->start();
 
-    AudioThread.SetParent(this);
-    AudioThread.start();
-    if (!AudioThread.isRunning())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't spawn audio thread, exiting");
-        return false;
-    }
+    audio_thread = new NVRAudioThread(this);
+    audio_thread->start();
 
     if (vbimode)
     {
-        VbiThread.SetParent(this);
-        VbiThread.start();
-        if (!VbiThread.isRunning())
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't spawn vbi thread, exiting");
-            return false;
-        }
+        vbi_thread = new NVRVBIThread(this);
+        vbi_thread->start();
     }
 
     return true;
@@ -1901,11 +1924,32 @@ bool NuppelVideoRecorder::SpawnChildren(void)
 void NuppelVideoRecorder::KillChildren(void)
 {
     childrenLive = false;
+    {
+        QMutexLocker locker(&pauseLock);
+        unpauseWait.wakeAll();
+    }
 
-    WriteThread.wait();
-    AudioThread.wait();
-    if (vbimode)
-        VbiThread.wait();        
+    if (write_thread)
+    {
+        write_thread->wait();
+        delete write_thread;
+        write_thread = NULL;
+    }
+
+    if (audio_thread)
+    {
+        audio_thread->wait();
+        delete audio_thread;
+        audio_thread = NULL;
+    }
+
+    if (vbi_thread)
+    {
+        vbi_thread->wait();
+        delete vbi_thread;
+        vbi_thread = NULL;
+    }
+
 #ifdef USING_FFMPEG_THREADS
     if (useavcodec && encoding_thread_count > 1)
         avcodec_thread_free(mpa_vidctx);
@@ -2326,36 +2370,6 @@ void NuppelVideoRecorder::Reset(void)
         curRecording->ClearPositionMap(MARK_KEYFRAME);
 }
 
-void NVRWriteThread::run(void)
-{
-    if (!m_parent)
-        return;
-
-    threadRegister("NVRWrite");
-    m_parent->doWriteThread();
-    threadDeregister();
-}
-
-void NVRAudioThread::run(void)
-{
-    if (!m_parent)
-        return;
-
-    threadRegister("NVRAudio");
-    m_parent->doAudioThread();
-    threadDeregister();
-}
-
-void NVRVbiThread::run(void)
-{
-    if (!m_parent)
-        return;
-
-    threadRegister("NVRVbi");
-    m_parent->doVbiThread();
-    threadDeregister();
-}
-
 void NuppelVideoRecorder::doAudioThread(void)
 {
     if (!audio_device)
@@ -2383,26 +2397,30 @@ void NuppelVideoRecorder::doAudioThread(void)
     unsigned char *buffer = new unsigned char[audio_buffer_size];
     int act = 0, lastread = 0;
     audio_bytes_per_sample = audio_channels * audio_bits / 8;
-    audiopaused = false;
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
 
     while (childrenLive)
     {
-        if (request_pause)
         {
-            audiopaused = true;
-            pauseWait.wakeAll();
-            if (IsPaused() && tvrec)
-                tvrec->RecorderPaused();
-
-            unpauseWait.wait(&mutex, 100);
-            act = act_audio_buffer;
-            continue;
+            QMutexLocker locker(&pauseLock);
+            if (request_pause)
+            {
+                if (!audiopaused)
+                {
+                    audiopaused = true;
+                    pauseWait.wakeAll();
+                    if (IsPaused(true) && tvrec)
+                        tvrec->RecorderPaused();
+                }
+                unpauseWait.wait(&pauseLock, 100);
+                continue;
+            }
+            
+            if (!request_pause && audiopaused)
+            {
+                audiopaused = false;
+                unpauseWait.wakeAll();
+            }
         }
-        audiopaused = false;
 
         lastread = audio_device->GetSamples(buffer, audio_buffer_size);
         if (audio_buffer_size != lastread)
@@ -2794,17 +2812,15 @@ void NuppelVideoRecorder::doVbiThread(void)
         }
     }
 
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
-
     while (childrenLive)
     {
-        if (request_pause)
         {
-            unpauseWait.wait(&mutex, 100);
-            continue;
+            QMutexLocker locker(&pauseLock);
+            if (request_pause)
+            {
+                unpauseWait.wait(&pauseLock, 100);
+                continue;
+            }
         }
 
         struct timeval tv;
@@ -2868,25 +2884,29 @@ void NuppelVideoRecorder::doVbiThread(void) { }
 
 void NuppelVideoRecorder::doWriteThread(void)
 {
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
-
-    writepaused = false;
     while (childrenLive && !IsErrored())
     {
-        if (request_pause)
         {
-            writepaused = true;
-            pauseWait.wakeAll();
-            if (IsPaused() && tvrec)
-                tvrec->RecorderPaused();
-
-            unpauseWait.wait(&mutex, 100);
-            continue;
+            QMutexLocker locker(&pauseLock);
+            if (request_pause)
+            {
+                if (!writepaused)
+                {
+                    writepaused = true;
+                    pauseWait.wakeAll();
+                    if (IsPaused(true) && tvrec)
+                        tvrec->RecorderPaused();
+                }
+                unpauseWait.wait(&pauseLock, 100);
+                continue;
+            }
+            
+            if (!request_pause && writepaused)
+            {
+                writepaused = false;
+                unpauseWait.wakeAll();
+            }
         }
-        writepaused = false;
 
         CheckForRingBufferSwitch();
 

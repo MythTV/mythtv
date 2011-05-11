@@ -88,6 +88,8 @@ inline int   sq(int   a) { return a*a; }
  MBASE_PUBLIC  bool MythRemoveDirectory(QDir &aDir);
  MBASE_PUBLIC  QString &ShellEscape(QString &string);
 
+ MBASE_PUBLIC  void setHttpProxy(void);
+
 // CPU Tick timing function
 #ifdef MMX
 #ifdef _WIN32

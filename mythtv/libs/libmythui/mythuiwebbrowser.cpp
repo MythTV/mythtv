@@ -524,6 +524,13 @@ bool MythWebView::isVideoFile(const QString &extension)
     return list.contains(extension, Qt::CaseInsensitive);
 }
 
+QWebView *MythWebView::createWindow(QWebPage::WebWindowType type)
+{
+    (void) type;
+    return (QWebView*) this;
+}
+
+
 /**
  * \class MythUIWebBrowser
  * \brief Provide a web browser widget.
@@ -1023,7 +1030,7 @@ void MythUIWebBrowser::slotTopScreenChanged(MythScreenType* screen)
         }
         else
         {
-            bool wasActive = m_active;
+            bool wasActive = (m_wasActive | m_active);
             SetActive(false);
             m_wasActive = wasActive;
             break;

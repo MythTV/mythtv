@@ -59,9 +59,17 @@ using namespace std;
 #define LOC_ERR QString("DVB#%1 CA Error: ").arg(device)
 #define LOC QString("DVB#%1 CA: ").arg(device)
 
+void DVBCamThread::run(void)
+{
+    threadRegister("DVBCam");
+    m_parent->CiHandlerLoop();
+    threadDeregister();
+}
+
 DVBCam::DVBCam(const QString &aDevice)
     : device(aDevice),        numslots(0),
-      ciHandler(NULL),        exitCiThread(false),
+      ciHandlerDoRun(false),  ciHandlerRunning(false),
+      ciHandler(NULL),        ciHandlerThread(NULL),
       have_pmt(false),        pmt_sent(false),
       pmt_updated(false),     pmt_added(false)
 {
@@ -82,12 +90,11 @@ DVBCam::~DVBCam()
     Stop();
 }
 
-bool DVBCam::Start()
+bool DVBCam::Start(void)
 {
     if (numslots == 0)
         return false;
 
-    exitCiThread = false;
     have_pmt     = false;
     pmt_sent     = false;
     pmt_updated  = false;
@@ -102,32 +109,38 @@ bool DVBCam::Start()
         return false;
     }
 
-    ciHandlerThread.SetParent(this);
-    ciHandlerThread.start();
+    QMutexLocker locker(&ciHandlerLock);
+    ciHandlerDoRun = true;
+    ciHandlerThread = new DVBCamThread(this);
+    ciHandlerThread->start();
+    while (ciHandlerDoRun && !ciHandlerRunning)
+        ciHandlerWait.wait(locker.mutex(), 1000);
 
-    if (!ciHandlerThread.isRunning())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create CI handler thread");
-        return false;
-    }
+    if (ciHandlerRunning)
+        VERBOSE(VB_DVBCAM, LOC + "CI handler successfully initialized!");
 
-    VERBOSE(VB_DVBCAM, LOC + "CI handler successfully initialized!");
-
-    return true;
+    return ciHandlerRunning;
 }
 
-bool DVBCam::Stop()
+bool DVBCam::Stop(void)
 {
-    if (ciHandlerThread.isRunning())
     {
-        exitCiThread = true;
-        ciHandlerThread.wait();
-    }
+        QMutexLocker locker(&ciHandlerLock);
+        if (ciHandlerRunning)
+        {
+            ciHandlerDoRun = false;
+            locker.unlock();
+            ciHandlerThread->wait();
+            locker.relock();
+            delete ciHandlerThread;
+            ciHandlerThread = NULL;
+        }
 
-    if (ciHandler)
-    {
-        delete ciHandler;
-        ciHandler = NULL;
+        if (ciHandler)
+        {
+            delete ciHandler;
+            ciHandler = NULL;
+        }
     }
 
     QMutexLocker locker(&pmt_lock);
@@ -142,16 +155,6 @@ bool DVBCam::Stop()
     PMTAddList.clear();
 
     return true;
-}
-
-void CiHandlerThread::run(void)
-{
-    if (!m_parent)
-        return;
-
-    threadRegister("CiHandler");
-    m_parent->CiHandlerLoop();
-    threadDeregister();
 }
 
 void DVBCam::HandleUserIO(void)
@@ -260,8 +263,12 @@ void DVBCam::CiHandlerLoop()
 {
     VERBOSE(VB_DVBCAM, LOC + "CI handler thread running");
 
-    while (!exitCiThread)
+    QMutexLocker locker(&ciHandlerLock);
+    ciHandlerRunning = true;
+
+    while (ciHandlerDoRun)
     {
+        locker.unlock();
         if (ciHandler->Process())
         {
             if (ciHandler->HasUserIO())
@@ -273,9 +280,11 @@ void DVBCam::CiHandlerLoop()
             if (handle_pmt)
                 HandlePMT();
         }
-        usleep(10 * 1000);
+        locker.relock();
+        ciHandlerWait.wait(locker.mutex(), 10);
     }
 
+    ciHandlerRunning = false;
     VERBOSE(VB_DVBCAM, LOC + "CiHandler thread stopped");
 }
 
@@ -314,6 +323,7 @@ void DVBCam::SetPMT(const ChannelBase *chan, const ProgramMapTable *pmt)
 
 void DVBCam::SetTimeOffset(double offset_in_seconds)
 {
+    QMutexLocker locker(&ciHandlerLock);
     if (ciHandler)
         ciHandler->SetTimeOffset(offset_in_seconds);
 }

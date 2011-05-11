@@ -27,6 +27,7 @@ using namespace std;
 
 // Qt headers
 #include <QString>
+#include <QThread>
 
 // MythTV headers
 #include "recorderbase.h"
@@ -46,16 +47,15 @@ class ChannelBase;
 class FilterManager;
 class FilterChain;
 class AudioInput;
-
 class NuppelVideoRecorder;
 
 class NVRWriteThread : public QThread
 {
     Q_OBJECT
   public:
-    NVRWriteThread() : m_parent(NULL) {}
-    void run(void);
-    void SetParent(NuppelVideoRecorder *parent) { m_parent = parent; }
+    NVRWriteThread(NuppelVideoRecorder *parent) : m_parent(parent) {}
+    virtual ~NVRWriteThread() { wait(); m_parent = NULL; }
+    virtual void run(void);
   private:
     NuppelVideoRecorder *m_parent;
 };
@@ -64,20 +64,20 @@ class NVRAudioThread : public QThread
 {
     Q_OBJECT
   public:
-    NVRAudioThread() : m_parent(NULL) {}
-    void run(void);
-    void SetParent(NuppelVideoRecorder *parent) { m_parent = parent; }
+    NVRAudioThread(NuppelVideoRecorder *parent) : m_parent(parent) {}
+    virtual ~NVRAudioThread() { wait(); m_parent = NULL; }
+    virtual void run(void);
   private:
     NuppelVideoRecorder *m_parent;
 };
 
-class NVRVbiThread : public QThread
+class NVRVBIThread : public QThread
 {
     Q_OBJECT
   public:
-    NVRVbiThread() : m_parent(NULL) {}
-    void run(void);
-    void SetParent(NuppelVideoRecorder *parent) { m_parent = parent; }
+    NVRVBIThread(NuppelVideoRecorder *parent) : m_parent(parent) {}
+    virtual ~NVRVBIThread() { wait(); m_parent = NULL; }
+    virtual void run(void);
   private:
     NuppelVideoRecorder *m_parent;
 };
@@ -86,8 +86,8 @@ class MTV_PUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Input
 {
     friend class NVRWriteThread;
     friend class NVRAudioThread;
-    friend class NVRVbiThread;
- public:
+    friend class NVRVBIThread;
+  public:
     NuppelVideoRecorder(TVRec *rec, ChannelBase *channel);
    ~NuppelVideoRecorder();
 
@@ -104,9 +104,8 @@ class MTV_PUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Input
     void StartRecording(void);
     void StopRecording(void); 
     
-    void Pause(bool clear = true);
-    void Unpause(void);
-    bool IsPaused(void) const;
+    virtual void Pause(bool clear = true);
+    virtual bool IsPaused(bool holding_lock = false) const;
  
     bool IsRecording(void);
     bool IsErrored(void);
@@ -242,11 +241,11 @@ class MTV_PUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Input
     struct timeval stm;
     struct timezone tzone;
 
-    bool childrenLive;
+    volatile bool childrenLive;
 
-    NVRWriteThread WriteThread;
-    NVRAudioThread AudioThread;
-    NVRVbiThread   VbiThread;
+    NVRWriteThread *write_thread;
+    NVRAudioThread *audio_thread;
+    NVRVBIThread   *vbi_thread;
 
     bool recording;
     bool errored;

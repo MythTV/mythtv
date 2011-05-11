@@ -37,6 +37,8 @@ using namespace std;
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>
+#include <QUrl>
+#include <QNetworkProxy>
 
 // Myth headers
 #include "mythcorecontext.h"
@@ -695,6 +697,10 @@ bool hasUtf8(const char *str)
 
 /**
  * \brief Can we ping host within timeout seconds?
+ *
+ * Some unixes don't like the -t argument. To make sure a ping failure
+ * is actually caused by a defunct server, we might have to do a ping
+ * without the -t, which will cause a long timeout.
  */
 bool ping(const QString &host, int timeout)
 {
@@ -712,12 +718,24 @@ bool ping(const QString &host, int timeout)
     if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
                          kMSProcessEvents) != GENERIC_EXIT_OK)
     {
-        // ping command may not like -t argument. Simplify:
+        // ping command may not like -t argument, or the host might not
+        // be listening. Try to narrow down with a quick ping to localhost:
 
-        cmd = QString("ping -c 1  %2  >/dev/null 2>&1").arg(host);
+        cmd = "ping -t 1 -c 1 localhost >/dev/null 2>&1";
 
         if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
                              kMSProcessEvents) != GENERIC_EXIT_OK)
+        {
+            // Assume -t is bad - do a ping that might cause a timeout:
+            cmd = QString("ping -c 1 %1 >/dev/null 2>&1").arg(host);
+
+            if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
+                                 kMSProcessEvents) != GENERIC_EXIT_OK)
+                return false;  // it failed with or without the -t
+
+            return true;
+        }
+        else  // Pinging localhost worked, so targeted host wasn't listening
             return false;
     }
 #endif
@@ -1340,6 +1358,122 @@ bool MythRemoveDirectory(QDir &aDir)
     }
 
     return string;
+}
+
+/**
+ * \brief Get network proxy settings from OS, and use for [Q]Http[Comms]
+ *
+ * The HTTP_PROXY environment var. is parsed for values like; "proxy-host",
+ * "proxy-host:8080", "http://host:8080" and "http"//user:password@host:1080",
+ * and that is used for any Qt-based Http fetches.
+ * We also test connectivity here with ping and telnet, and warn if it fails.
+ *
+ * If there is was no env. var, we use Qt to get proxy settings from the OS,
+ * and search through them for a proxy server we can connect to.
+ */
+ MBASE_PUBLIC void setHttpProxy(void)
+{
+    QString       LOC = "setHttpProxy() - ";
+    QNetworkProxy p;
+
+
+    // Set http proxy for the application if specified in environment variable
+    QString var(getenv("http_proxy"));
+    if (var.isEmpty())
+        var = getenv("HTTP_PROXY");  // Sadly, some OS envs are case sensitive
+    if (var.length())
+    {
+        if (!var.startsWith("http://"))   // i.e. just a host name
+            var.prepend("http://");
+
+        QUrl    url  = QUrl(var, QUrl::TolerantMode);
+        QString host = url.host();
+        int     port = url.port();
+
+        if (port == -1)   // Parsing error
+        {
+            port = 0;   // The default when creating a QNetworkProxy
+
+            if (telnet(host, 1080))  // Socks?
+                port = 1080;
+            if (telnet(host, 3128))  // Squid
+                port = 3128;
+            if (telnet(host, 8080))  // MS ISA
+                port = 8080;
+
+            VERBOSE(VB_NETWORK, (LOC + "assuming port %1 on host %2")
+                                .arg(port).arg(host));
+            url.setPort(port);
+        }
+        else if (!ping(host, 1))
+            VERBOSE(VB_IMPORTANT,
+                    (LOC + "cannot locate host %1").arg(host) +
+                    "\n\t\t\tPlease check HTTP_PROXY environment variable!");
+        else if (!telnet(host,port))
+            VERBOSE(VB_IMPORTANT,
+                    (LOC + "%1:%2 - cannot connect!").arg(host).arg(port) +
+                    "\n\t\t\tPlease check HTTP_PROXY environment variable!");
+
+#if 0
+        VERBOSE(VB_NETWORK, (LOC + "using http://%1:%2@%3:%4")
+                            .arg(url.userName()).arg(url.password())
+                            .arg(host).arg(port));
+#endif
+        p = QNetworkProxy(QNetworkProxy::HttpProxy,
+                          host, port, url.userName(), url.password());
+        QNetworkProxy::setApplicationProxy(p);
+        return;
+    }
+
+
+
+
+    VERBOSE(VB_NETWORK, LOC + "no HTTP_PROXY environment var.");
+
+    // Use Qt to look for user proxy settings stored by the OS or browser:
+
+    QList<QNetworkProxy> proxies;
+    QNetworkProxyQuery   query(QUrl("http://www.mythtv.org"));
+
+
+    proxies = QNetworkProxyFactory::systemProxyForQuery(query);
+
+    Q_FOREACH (p, proxies)
+    {
+        QString host = p.hostName();
+        int     port = p.port();
+
+        if (p.type() == QNetworkProxy::NoProxy)
+            continue;
+
+        if (!telnet(host, port))
+        {
+            VERBOSE(VB_NETWORK, (LOC + "failed to contact proxy host ") + host);
+            continue;
+        }
+
+        VERBOSE(VB_NETWORK, (LOC + "using proxy host %1:%2")
+                            .arg(host).arg(port));
+        QNetworkProxy::setApplicationProxy(p);
+
+        // Allow sub-commands to use this proxy
+        // via myth_system(command), by setting HTTP_PROXY
+        QString url;
+
+        if (p.user().length())
+            url = "http://%1:%2@%3:%4",
+            url = url.arg(p.user()).arg(p.password());
+        else
+            url = "http://%1:%2";
+
+        url = url.arg(p.hostName()).arg(p.port());
+        setenv("HTTP_PROXY", url.toAscii(), 1);
+        setenv("http_proxy", url.toAscii(), 0);
+
+        return;
+    }
+
+    VERBOSE(VB_NETWORK, LOC + "failed to find a network proxy");
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
