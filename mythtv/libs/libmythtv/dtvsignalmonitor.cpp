@@ -370,7 +370,7 @@ void DTVSignalMonitor::HandlePMT(uint, const ProgramMapTable *pmt)
 
 void DTVSignalMonitor::HandleSTT(const SystemTimeTable*)
 {
-    VERBOSE(VB_CHANNEL, LOC + "Time Offset: "<<GetStreamData()->TimeOffset());
+    VERBOSE(VB_CHANNEL+VB_EXTRA, LOC + "Time Offset: "<<GetStreamData()->TimeOffset());
 }
 
 void DTVSignalMonitor::HandleMGT(const MasterGuideTable* mgt)
@@ -439,7 +439,7 @@ void DTVSignalMonitor::HandleCVCT(uint, const CableVirtualChannelTable* cvct)
 
 void DTVSignalMonitor::HandleTDT(const TimeDateTable*)
 {
-    VERBOSE(VB_CHANNEL, LOC + "Time Offset: "<<GetStreamData()->TimeOffset());
+    VERBOSE(VB_CHANNEL+VB_EXTRA, LOC + "Time Offset: "<<GetStreamData()->TimeOffset());
 }
 
 void DTVSignalMonitor::HandleNIT(const NetworkInformationTable *nit)
