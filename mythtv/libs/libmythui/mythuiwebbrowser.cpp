@@ -524,6 +524,13 @@ bool MythWebView::isVideoFile(const QString &extension)
     return list.contains(extension, Qt::CaseInsensitive);
 }
 
+QWebView *MythWebView::createWindow(QWebPage::WebWindowType type)
+{
+    (void) type;
+    return (QWebView*) this;
+}
+
+
 /**
  * \class MythUIWebBrowser
  * \brief Provide a web browser widget.
