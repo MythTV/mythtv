@@ -5,15 +5,12 @@
 #include <deque>
 using namespace std;
 
-#include <pthread.h>
-
 // Qt headers
 #include <QWidget>
 #include <QString>
 #include <QMutex>
 #include <QHash>
 #include <QRect>
-#include <QThread>
 
 #include "mythdeque.h"
 #include "tv.h"
@@ -45,20 +42,6 @@ typedef enum
 typedef deque<QString>         StringDeque;
 typedef QHash<QString,QString> InfoMap;
 
-class PlayerThread : public QThread
-{
-    Q_OBJECT
-
-  public:
-    PlayerThread(MythPlayer *player) : QThread(NULL), m_player(player) { }
-
-  protected:
-    virtual void run(void);
-
-  private:
-    MythPlayer *m_player;
-};
-
 class MPUBLIC PlayerContext
 {
   public:
@@ -73,7 +56,6 @@ class MPUBLIC PlayerContext
     void TeardownPlayer(void);
     bool StartPlaying(int maxWait = -1);
     void StopPlaying(void);
-    void DeletePlayerThread(void);
     bool StartOSD(TV *tv);
     void UpdateTVChain(void);
     bool ReloadTVChain(void);
@@ -228,8 +210,6 @@ class MPUBLIC PlayerContext
     int                 pipLocation;
     /// True iff software scaled PIP should be used
     bool                useNullVideo;
-    bool                playerNeedsThread;
-    PlayerThread        *playerThread;
 
     // Embedding related
     WId   embedWinID;       ///< Window ID when embedded in another widget

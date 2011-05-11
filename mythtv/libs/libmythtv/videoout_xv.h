@@ -91,8 +91,10 @@ class VideoOutputXv : public VideoOutput
     int  SetPictureAttribute(PictureAttribute attribute, int newValue);
     void InitPictureAttributes(void);
 
-    virtual bool IsPIPSupported(void) const { return false; }
-    virtual bool IsPBPSupported(void) const { return false; }
+    virtual bool IsPIPSupported(void) const
+        { return XVideo == VideoOutputSubType(); }
+    virtual bool IsPBPSupported(void) const
+        { return XVideo == VideoOutputSubType(); }
     virtual bool NeedExtraAudioDecode(void) const
         { return XVideoMC <= VideoOutputSubType(); }
     virtual bool hasHWAcceleration(void) const

@@ -6,7 +6,8 @@ import os.path
 import sys
 
 if __name__ == '__main__':
-    banner = 'MythTV Interactive Script Downloader.'
+    print "MythTV Interactive Script Downloader."
+    print "This script parses the wiki, and may take several minutes."
     tic = time()
     scripts = getScripts()
     print 'Loading took %0.2f seconds' % (time()-tic)

@@ -11,9 +11,9 @@
         </textarea>
 
         <clock name="clock">
-            <area>1050,10,250,30</area>
+            <area>850,10,410,30</area>
             <font>basesmall_normal</font>
-            <align>vcenter,left</align>
+            <align>vcenter,right</align>
             <format>%DATE% %TIME%</format>
         </clock>
 

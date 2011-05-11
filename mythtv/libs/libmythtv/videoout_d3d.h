@@ -43,7 +43,7 @@ class VideoOutputD3D : public VideoOutput
                  MythPlayer  *pipplayer,
                  PIPLocation  loc);
     void RemovePIP(MythPlayer *pipplayer);
-    bool IsPIPSupported(void) const { return false; /*true*/}
+    bool IsPIPSupported(void) const { return true; }
     virtual MythPainter *GetOSDPainter(void) { return (MythPainter*)m_osd_painter; }
 
   private:

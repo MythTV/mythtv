@@ -63,6 +63,7 @@ class AudioOutputBase : public AudioOutput, public QThread
     virtual float GetStretchFactor(void) const;
 
     virtual bool CanPassthrough(int samplerate, int channels) const;
+    virtual bool CanDownmix(void) const { return true; };
     virtual bool ToggleUpmix(void);
 
     virtual void Reset(void);

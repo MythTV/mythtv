@@ -40,6 +40,7 @@ class MPUBLIC AudioPlayer
     void  SetStretchFactor(float factor);
     bool  ToggleUpmix(void);
     bool  CanPassthrough(int samplerate, int channels);
+    bool  CanDownmix(void);
     bool  CanAC3(void);
     bool  CanDTS(void);
     uint  GetMaxChannels(void);

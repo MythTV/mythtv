@@ -23,17 +23,6 @@
 const uint PlayerContext::kSMExitTimeout     = 2000;
 const uint PlayerContext::kMaxChannelHistory = 30;
 
-void PlayerThread::run(void)
-{
-    if (!m_player)
-        return;
-
-    VERBOSE(VB_PLAYBACK, QString("PiP thread starting"));
-    m_player->StartPlaying();
-    exec();
-    VERBOSE(VB_PLAYBACK, QString("PiP thread finishing"));
-}
-
 PlayerContext::PlayerContext(const QString &inUseID) :
     recUsage(inUseID), player(NULL), playerUnsafe(false), recorder(NULL),
     tvchain(NULL), buffer(NULL), playingInfo(NULL),
@@ -54,7 +43,7 @@ PlayerContext::PlayerContext(const QString &inUseID) :
     stateLock(QMutex::Recursive),
     // pip
     pipState(kPIPOff), pipRect(0,0,0,0), parentWidget(NULL), pipLocation(0),
-    useNullVideo(false), playerNeedsThread(false), playerThread(NULL),
+    useNullVideo(false),
     // embedding
     embedWinID(0), embedBounds(0,0,0,0)
 {
@@ -80,7 +69,6 @@ void PlayerContext::TeardownPlayer(void)
     SetRingBuffer(NULL);
     SetTVChain(NULL);
     SetPlayingInfo(NULL);
-    DeletePlayerThread();
 }
 
 /**
@@ -220,7 +208,6 @@ QRect PlayerContext::GetStandAlonePIPRect(void)
 bool PlayerContext::StartPIPPlayer(TV *tv, TVState desiredState)
 {
     bool ok = false;
-    playerNeedsThread = true;
 
     if (!useNullVideo && parentWidget)
     {
@@ -237,7 +224,6 @@ bool PlayerContext::StartPIPPlayer(TV *tv, TVState desiredState)
                           0, NULL);
     }
 
-    playerNeedsThread = false;
     return ok;
 }
 
@@ -486,17 +472,7 @@ bool PlayerContext::StartPlaying(int maxWait)
     if (!player)
         return false;
 
-    DeletePlayerThread();
-    if (playerNeedsThread)
-    {
-        playerThread = new PlayerThread(player);
-        if (playerThread)
-            playerThread->start();
-    }
-    else
-    {
-        player->StartPlaying();
-    }
+    player->StartPlaying();
 
     maxWait = (maxWait <= 0) ? 20000 : maxWait;
 #ifdef USING_VALGRIND
@@ -525,20 +501,8 @@ bool PlayerContext::StartPlaying(int maxWait)
 
 void PlayerContext::StopPlaying(void)
 {
-    DeletePlayerThread();
     if (player)
         player->StopPlaying();
-}
-
-void PlayerContext::DeletePlayerThread(void)
-{
-    if (playerThread)
-    {
-        playerThread->exit();
-        playerThread->wait();
-        delete playerThread;
-        playerThread = NULL;
-    }
 }
 
 /** \fn PlayerContext::StartOSD(TV *tv)
