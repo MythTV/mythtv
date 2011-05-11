@@ -4,7 +4,6 @@
 #include <cerrno>
 #include <cstring>
 
-#include <pthread.h>
 #include <fcntl.h>
 #include <unistd.h>
 #ifndef USING_MINGW

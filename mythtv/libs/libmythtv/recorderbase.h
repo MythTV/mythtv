@@ -6,19 +6,34 @@
 
 #include <QWaitCondition>
 #include <QString>
+#include <QThread>
 #include <QMutex>
 #include <QMap>
 
-#include <pthread.h>
-
-#include "mythtvexp.h"
-#include "mythtimer.h"
 #include "programtypes.h" // for MarkTypes, frm_pos_map_t
+#include "mythtimer.h"
+#include "mythtvexp.h"
 
-class TVRec;
-class RingBuffer;
-class ProgramInfo;
+class FireWireDBOptions;
+class GeneralDBOptions;
 class RecordingProfile;
+class DVBDBOptions;
+class RecorderBase;
+class ChannelBase;
+class ProgramInfo;
+class RingBuffer;
+class TVRec;
+
+class MTV_PUBLIC RecorderThread : public QThread
+{
+    Q_OBJECT
+  public:
+    RecorderThread(RecorderBase *p) : m_parent(p) {}
+    virtual ~RecorderThread() { wait(); m_parent = NULL; }
+    virtual inline void run(void);
+  private:
+    RecorderBase *m_parent;
+};
 
 /** \class RecorderBase
  *  \brief This is the abstract base class for supporting
@@ -184,21 +199,9 @@ class MTV_PUBLIC RecorderBase
     bool GetKeyframePositions(
         int64_t start, int64_t end, frm_pos_map_t&) const;
 
-    /** \brief Pause tells StartRecording() to pause, it should not block.
-     *
-     *   Once paused the recorder calls tvrec->RecorderPaused().
-     *
-     *  \param clear if true any generated timecodes should be reset.
-     *  \sa Unpause(), WaitForPause()
-     */
-    virtual void Pause(bool clear = true)
-        { (void) clear; request_pause = true; }
-
-    /// \brief Unpause tells StartRecording() to unpause, it should not block.
-    virtual void Unpause(void)
-        { request_pause = false; unpauseWait.wakeAll(); }
-    /// \brief Returns true iff recorder is paused.
-    virtual bool IsPaused(void) const { return paused; }
+    virtual void Pause(bool clear = true);
+    virtual void Unpause(void);
+    virtual bool IsPaused(bool holding_lock = false) const;
     virtual bool WaitForPause(int timeout = 1000);
 
     /** \brief Returns an approximation of the frame rate.
@@ -284,6 +287,7 @@ class MTV_PUBLIC RecorderBase
     ProgramInfo   *curRecording;
 
     // For handling pausing
+    mutable QMutex pauseLock;
     bool           request_pause;
     bool           paused;
     QWaitCondition pauseWait;
@@ -301,6 +305,11 @@ class MTV_PUBLIC RecorderBase
     frm_pos_map_t  positionMapDelta;
     MythTimer      positionMapTimer;
 };
+
+inline void RecorderThread::run(void)
+{
+    m_parent->StartRecording();
+}
 
 #endif
 

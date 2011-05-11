@@ -32,12 +32,11 @@
 
 // Qt includes
 #include <QString>
+#include <QThread>
 #include <QList>
 #include <QPair>
 #include <QMap>
 #include <QSet>
-#include <QObject>
-#include <QThread>
 
 // MythTV includes
 #include "frequencytables.h"
@@ -83,8 +82,8 @@ class ScannerThread : public QThread
 {
     Q_OBJECT
   public:
-    ScannerThread() : m_parent(NULL) {}
-    void SetParent(ChannelScanSM *parent) { m_parent = parent; }
+    ScannerThread(ChannelScanSM *parent) : m_parent(parent) {}
+    ~ScannerThread() { wait(); m_parent = NULL; }
     void run(void);
   private:
     ChannelScanSM *m_parent;
@@ -229,7 +228,7 @@ class ChannelScanSM : public MPEGStreamListener,
 
     // State
     bool              scanning;
-    bool              threadExit;
+    volatile bool     threadExit;
     bool              waitingForTables;
     QTime             timer;
 
@@ -253,7 +252,8 @@ class ChannelScanSM : public MPEGStreamListener,
     // Analog Info
     AnalogSignalHandler *analogSignalHandler;
 
-    ScannerThread    scannerThread;
+    /// Scanner thread, runs ChannelScanSM::StartScanner()
+    ScannerThread       *scannerThread;
 };
 
 inline void ChannelScanSM::UpdateScanPercentCompleted(void)

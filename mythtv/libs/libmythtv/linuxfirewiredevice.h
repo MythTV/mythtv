@@ -18,9 +18,9 @@ class LinuxControllerThread : public QThread
 {
     Q_OBJECT
   public:
-    LinuxControllerThread() : m_parent(NULL) {}
-    void SetParent(LinuxFirewireDevice *parent) { m_parent = parent; }
-    void run(void);
+    LinuxControllerThread(LinuxFirewireDevice *parent) : m_parent(parent) {}
+    virtual ~LinuxControllerThread() { wait(); m_parent = NULL; }
+    virtual void run(void);
   private:
     LinuxFirewireDevice *m_parent;
 };
