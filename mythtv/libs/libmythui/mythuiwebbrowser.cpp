@@ -1023,7 +1023,7 @@ void MythUIWebBrowser::slotTopScreenChanged(MythScreenType* screen)
         }
         else
         {
-            bool wasActive = m_active;
+            bool wasActive = (m_wasActive | m_active);
             SetActive(false);
             m_wasActive = wasActive;
             break;
