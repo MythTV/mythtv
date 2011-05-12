@@ -187,6 +187,11 @@ void MythFEXML::SendAction(HTTPRequest *pRequest)
             args << map->value("height");
             valid = true;
         }
+        else if (ACTION_HANDLEMEDIA == sText && 2 == pcount)
+        {
+            args << map->value("file");
+            valid = true;
+        }
 
         if (valid)
         {
