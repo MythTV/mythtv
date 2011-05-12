@@ -426,7 +426,7 @@ bool AudioOutputALSA::OpenDevice()
     }
 
     buffer_time = 500000; // buffer 0.5s worth of samples
-    period_time = 16;     // aim for an interrupt every (1/16th of buffer_time)
+    period_time = 4;      // aim for an interrupt every (1/4th of buffer_time)
 
     err = SetParameters(pcm_handle, format, channels, samplerate,
                         buffer_time, period_time);
