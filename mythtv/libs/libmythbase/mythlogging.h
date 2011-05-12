@@ -4,6 +4,7 @@
 #ifdef __cplusplus
 #include <QString>
 #include <QThread>
+#include <QQueue>
 #endif
 #include <stdint.h>
 #include <time.h>
@@ -169,11 +170,19 @@ class DBLoggerThread : public QThread {
     Q_OBJECT
 
     public:
-        DBLoggerThread(DatabaseLogger *logger) : m_logger(logger) {}
+        DBLoggerThread(DatabaseLogger *logger) : m_logger(logger), 
+            m_queue(new QQueue<LoggingItem_t *>) {}
+        ~DBLoggerThread() { delete m_queue; }
         void run(void);
-        void stop(void) { aborted = true; };
+        void stop(void) { aborted = true; }
+        bool enqueue(LoggingItem_t *item) 
+        { 
+            m_queue->enqueue(item); 
+            return true; 
+        }
     private:
         DatabaseLogger *m_logger;
+        QQueue<LoggingItem_t *> *m_queue;
         bool aborted;
 };
 #endif

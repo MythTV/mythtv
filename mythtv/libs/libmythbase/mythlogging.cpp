@@ -30,7 +30,6 @@
 QMutex                  loggerListMutex;
 QList<LoggerBase *>     loggerList;
 QQueue<LoggingItem_t *> logQueue;
-QQueue<LoggingItem_t *> dbLogQueue;
 
 QMutex                  logThreadMutex;
 QHash<uint64_t, char *> logThreadHash;
@@ -260,7 +259,8 @@ DatabaseLogger::~DatabaseLogger()
 
 bool DatabaseLogger::logmsg(LoggingItem_t *item)
 {
-    dbLogQueue.enqueue(item);
+    if( m_thread )
+        m_thread->enqueue(item);
     return true;
 }
 
@@ -310,19 +310,19 @@ void DBLoggerThread::run(void)
 
     aborted = false;
 
-    while(!aborted || !dbLogQueue.empty())
+    while(!aborted || !m_queue->isEmpty())
     {
-        if (dbLogQueue.empty())
+        if (m_queue->isEmpty())
         {
             msleep(100);
             continue;
         }
 
-        item = dbLogQueue.dequeue();
+        item = m_queue->dequeue();
         if (!item)
             continue;
 
-        if( item->message )
+        if( item->message && !aborted )
         {
             m_logger->logqmsg(item);
         }
@@ -385,9 +385,9 @@ void LoggerThread::run(void)
 
     aborted = false;
 
-    while(!aborted || !logQueue.empty())
+    while(!aborted || !logQueue.isEmpty())
     {
-        if (logQueue.empty())
+        if (logQueue.isEmpty())
         {
             msleep(100);
             continue;
