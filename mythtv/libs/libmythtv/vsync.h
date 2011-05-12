@@ -252,7 +252,7 @@ class BusyWaitVideoSync : public VideoSync
  *   inaccurate on < Linux 2.6 kernels; not very accurate there either.
  *   Not phase-maintaining. Not tried automatically.
  *
- *   This only used when NVP's 'disablevideo' is true (i.e. for 
+ *   This is only used when MythPlayer's 'disablevideo' is true (i.e. for
  *   commercial flagging and for transcoding), since it doesn't
  *   waste CPU cycles busy-waiting like BusyWaitVideoSync.
  */
@@ -267,5 +267,17 @@ class USleepVideoSync : public VideoSync
     QString getName(void) const { return QString("USleep"); }
     bool TryInit(void);
     void WaitForFrame(int sync_delay);
+};
+
+class DummyVideoSync : public VideoSync
+{
+  public:
+    DummyVideoSync(VideoOutput* vo, int fr, int ri, bool intl)
+     : VideoSync(vo, fr, ri, intl) { }
+    ~DummyVideoSync() { }
+
+    QString getName(void) const { return QString("Dummy"); }
+    bool TryInit(void) { return true; }
+    void WaitForFrame(int sync_delay) { }
 };
 #endif /* VSYNC_H_INCLUDED */
