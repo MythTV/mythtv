@@ -100,7 +100,6 @@ int main(int argc, char *argv[])
 
     QCoreApplication a(argc, argv);
     QMap<QString, QString> settingsOverride = cmdline.GetSettingsOverride();
-    int argpos = 1;
     bool daemonize = false;
 
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHJOBQUEUE);
