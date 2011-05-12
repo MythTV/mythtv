@@ -57,6 +57,8 @@ typedef struct
     char               *threadName;
     int                 registering;
     int                 deregistering;
+    int                 refcount;
+    void               *refmutex;
 } LoggingItem_t;
 
 
@@ -132,12 +134,18 @@ class SyslogLogger : public LoggerBase {
         bool m_opened;
 };
 
+class DBLoggerThread;
+
 class DatabaseLogger : public LoggerBase {
+    friend class DBLoggerThread;
     public:
         DatabaseLogger(char *table);
         ~DatabaseLogger();
         bool logmsg(LoggingItem_t *item);
+    protected:
+        bool logqmsg(LoggingItem_t *item);
     private:
+        DBLoggerThread *m_thread;
         char *m_host;
         char *m_application;
         char *m_query;
@@ -150,9 +158,22 @@ class LoggerThread : public QThread {
 
     public:
         LoggerThread();
+        ~LoggerThread();
         void run(void);
         void stop(void) { aborted = true; };
     private:
+        bool aborted;
+};
+
+class DBLoggerThread : public QThread {
+    Q_OBJECT
+
+    public:
+        DBLoggerThread(DatabaseLogger *logger) : m_logger(logger) {}
+        void run(void);
+        void stop(void) { aborted = true; };
+    private:
+        DatabaseLogger *m_logger;
         bool aborted;
 };
 #endif

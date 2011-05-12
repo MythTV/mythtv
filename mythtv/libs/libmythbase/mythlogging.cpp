@@ -30,6 +30,7 @@
 QMutex                  loggerListMutex;
 QList<LoggerBase *>     loggerList;
 QQueue<LoggingItem_t *> logQueue;
+QQueue<LoggingItem_t *> dbLogQueue;
 
 QMutex                  logThreadMutex;
 QHash<uint64_t, char *> logThreadHash;
@@ -45,6 +46,7 @@ LogLevel_t LogLevel = LOG_UNKNOWN;  /**< The log level mask to apply, messages
                                          be output */
 
 char *getThreadName( LoggingItem_t *item );
+void deleteItem( LoggingItem_t *item );
 
 LoggerBase::LoggerBase(char *string, int number)
 {
@@ -149,6 +151,12 @@ bool FileLogger::logmsg(LoggingItem_t *item)
     }
 
     int result = write( m_fd, line, strlen(line) );
+
+    {
+        QMutexLocker locker((QMutex *)item->refmutex);
+        item->refcount--;
+    }
+
     if( result == -1 )
     {  
         LogPrint( VB_IMPORTANT, LOG_UNKNOWN, 
@@ -193,6 +201,12 @@ bool SyslogLogger::logmsg(LoggingItem_t *item)
         return false;
 
     syslog( item->level, "%s", item->message );
+
+    {
+        QMutexLocker locker((QMutex *)item->refmutex);
+        item->refcount--;
+    }
+
     return true;
 }
 
@@ -219,12 +233,23 @@ DatabaseLogger::DatabaseLogger(char *table) : LoggerBase(table, 0),
     m_query = (char *)malloc(strlen(queryFmt) + strlen(m_handle.string));
     sprintf(m_query, queryFmt, m_handle.string);
 
+    m_thread = new DBLoggerThread(this);
+    m_thread->start();
+
     m_opened = true;
 }
 
 DatabaseLogger::~DatabaseLogger()
 {
     LogPrintNoArg(VB_IMPORTANT, LOG_INFO, "Removing database logging");
+
+    if( m_thread )
+    {
+        m_thread->stop();
+        m_thread->wait();
+        delete m_thread;
+    }
+
     if( m_query )
         free(m_query);
     if( m_application )
@@ -234,6 +259,12 @@ DatabaseLogger::~DatabaseLogger()
 }
 
 bool DatabaseLogger::logmsg(LoggingItem_t *item)
+{
+    dbLogQueue.enqueue(item);
+    return true;
+}
+
+bool DatabaseLogger::logqmsg(LoggingItem_t *item)
 {
     char        timestamp[TIMESTAMP_MAX];
     char       *threadName = getThreadName(item);;
@@ -258,6 +289,11 @@ bool DatabaseLogger::logmsg(LoggingItem_t *item)
     query.bindValue(":LEVEL",       item->level);
     query.bindValue(":MESSAGE",     item->message);
 
+    {
+        QMutexLocker locker((QMutex *)item->refmutex);
+        item->refcount--;
+    }
+
     if (!query.exec())
     {  
         MythDB::DBError("DBLogging", query);
@@ -265,6 +301,34 @@ bool DatabaseLogger::logmsg(LoggingItem_t *item)
     }
 
     return true;
+}
+
+void DBLoggerThread::run(void)
+{
+    threadRegister("DBLogger");
+    LoggingItem_t *item;
+
+    aborted = false;
+
+    while(!aborted || !dbLogQueue.empty())
+    {
+        if (dbLogQueue.empty())
+        {
+            msleep(100);
+            continue;
+        }
+
+        item = dbLogQueue.dequeue();
+        if (!item)
+            continue;
+
+        if( item->message )
+        {
+            m_logger->logqmsg(item);
+        }
+
+        deleteItem(item);
+    }
 }
 
 char *getThreadName( LoggingItem_t *item )
@@ -299,6 +363,18 @@ LoggerThread::LoggerThread()
         VERBOSE(VB_IMPORTANT, "Logging thread registration/deregistration "
                               "enabled!");
         debugRegistration = true;
+    }
+}
+
+LoggerThread::~LoggerThread()
+{
+    QMutexLocker locker(&loggerListMutex);
+
+    QList<LoggerBase *>::iterator it;
+
+    for(it = loggerList.begin(); it != loggerList.end(); it++)
+    {
+        delete (*it);
     }
 }
  
@@ -364,19 +440,38 @@ void LoggerThread::run(void)
 
             QList<LoggerBase *>::iterator it;
 
+            item->refcount = loggerList.size();
+            item->refmutex = new QMutex;
+
             for(it = loggerList.begin(); it != loggerList.end(); it++)
             {
                 (*it)->logmsg(item);
             }
-
-            free(item->message);
         }
+
+        deleteItem(item);
+    }
+}
+
+void deleteItem( LoggingItem_t *item )
+{
+    if( !item )
+        return;
+
+    {
+        QMutexLocker locker((QMutex *)item->refmutex);
+        if( item->refcount != 0 )
+            return;
+
+        if( item->message )
+            free(item->message);
 
         if( item->threadName )
             free( item->threadName );
-
-        delete item;
     }
+
+    delete (QMutex *)item->refmutex;
+    delete item;
 }
 
 void LogTimeStamp( time_t *epoch, uint32_t *usec )
