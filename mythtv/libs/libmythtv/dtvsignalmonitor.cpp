@@ -371,7 +371,7 @@ void DTVSignalMonitor::HandlePMT(uint, const ProgramMapTable *pmt)
 
 void DTVSignalMonitor::HandleSTT(const SystemTimeTable*)
 {
-    VERBOSE(VB_CHANNEL, LOC + QString("Time Offset: %1")
+    VERBOSE(VB_CHANNEL+VB_EXTRA, LOC + QString("Time Offset: %1")
             .arg(GetStreamData()->TimeOffset()));
 }
 
@@ -441,7 +441,7 @@ void DTVSignalMonitor::HandleCVCT(uint, const CableVirtualChannelTable* cvct)
 
 void DTVSignalMonitor::HandleTDT(const TimeDateTable*)
 {
-    VERBOSE(VB_CHANNEL, LOC + QString("Time Offset: %1")
+    VERBOSE(VB_CHANNEL+VB_EXTRA, LOC + QString("Time Offset: %1")
             .arg(GetStreamData()->TimeOffset()));
 }
 
