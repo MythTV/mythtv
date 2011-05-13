@@ -36,6 +36,7 @@ static const char *dvdnav_menu_table[] =
 DVDInfo::DVDInfo(const QString &filename)
   : m_nav(NULL), m_name(NULL), m_serialnumber(NULL)
 {
+    VERBOSE(VB_PLAYBACK, QString("DVDInfo: Starting."));
     QString name = filename;
     if (name.left(6) == "dvd://")
         name.remove(0,5);
@@ -65,6 +66,7 @@ DVDInfo::~DVDInfo(void)
 {
     if (m_nav)
         dvdnav_close(m_nav);
+    VERBOSE(VB_PLAYBACK, QString("DVDInfo: Finishing."));
 }
 
 bool DVDInfo::GetNameAndSerialNum(QString &name, QString &serial)
@@ -543,7 +545,7 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
         if (dvdStat == DVDNAV_STATUS_ERR)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Error  block from DVD: %1")
+                    QString("Failed to read block: %1")
                     .arg(dvdnav_err_to_string(m_dvdnav)));
             errno = EIO;
             return -1;
