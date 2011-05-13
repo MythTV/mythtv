@@ -105,7 +105,9 @@ typedef union {
 } LoggerHandle_t;
 
 
-class LoggerBase {
+class LoggerBase : public QObject {
+    Q_OBJECT
+
     public:
         LoggerBase(char *string, int number);
         ~LoggerBase();

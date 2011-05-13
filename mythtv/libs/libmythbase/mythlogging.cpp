@@ -389,7 +389,7 @@ LoggerThread::~LoggerThread()
 
     for(it = loggerList.begin(); it != loggerList.end(); it++)
     {
-        delete (*it);
+        (*it)->deleteLater();
     }
 }
  
