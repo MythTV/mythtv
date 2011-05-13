@@ -1167,32 +1167,19 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
     off =  processing ? 4 : output_settings->SampleSize(format);
     off *= source_channels;
 
-    VERBOSE(VB_AUDIO, LOC + QString("CopyWithUpmix: Frames = %1").arg(frames));
-    
-    int nFrames, bdFrames;
     int i = 0;
     len = 0;
+    int nFrames, bdFrames;
     while (i < frames)
     {
         i += upmixer->putFrames(buffer + i * off, frames - i, source_channels);
-        VERBOSE(VB_AUDIO, LOC + QString("CopyWithUpmix: Done %1 Frames").arg(i));
-
         nFrames = upmixer->numFrames();
         if (!nFrames)
-        {
-            VERBOSE(VB_AUDIO, LOC + QString("CopyWithUpmix: Got 0 in return (frames=%1 i=%2")
-                    .arg(frames).arg(i));
             continue;
-        }
 
         len += CheckFreeSpace(nFrames);
 
         bdFrames = (kAudioRingBufferSize - org_waud) / bpf;
-        if ((kAudioRingBufferSize - org_waud) != (bdFrames * bpf))
-        {
-            VERBOSE(VB_AUDIO, LOC + QString("CopyWithUpmix: will miss data (%1)")
-                    .arg(bdiff - (bdFrames * bpf)));
-        }
         if (bdFrames < nFrames)
         {
             upmixer->receiveFrames((float *)(WPOS), bdFrames);
@@ -1399,11 +1386,6 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
             // does not change the timecode, only the number of samples
             org_waud     = waud;
             int bdFrames = bdiff / bpf;
-            if (bdiff != (bdFrames * bpf))
-            {
-                VERBOSE(VB_AUDIO, LOC + QString("TStretch AddData: will miss data (%1)")
-                        .arg(bdiff - (bdFrames * bpf)));
-            }
 
             if (bdiff < len)
             {
