@@ -141,6 +141,8 @@ void DVDRingBuffer::CloseDVD(void)
         dvdnav_close(m_dvdnav);
         m_dvdnav = NULL;
     }
+    m_gotStop = false;
+    m_audioStreamsChanged = true;
 }
 
 void DVDRingBuffer::ClearChapterCache(void)
@@ -299,10 +301,7 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     rwlock.lockForWrite();
 
     if (m_dvdnav)
-    {
-        dvdnav_close(m_dvdnav);
-        m_dvdnav = NULL;
-    }
+        CloseDVD();
 
     filename = lfilename;
     QByteArray fname = filename.toLocal8Bit();
@@ -412,9 +411,6 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
 bool DVDRingBuffer::StartFromBeginning(void)
 {
-    if (!m_dvdnav)
-        return false;
-
     VERBOSE(VB_IMPORTANT, LOC + "Resetting DVD device.");
 
     // if a DVDNAV_STOP event has been emitted, dvdnav_reset does not
@@ -424,20 +420,19 @@ bool DVDRingBuffer::StartFromBeginning(void)
         VERBOSE(VB_IMPORTANT, LOC +
                 "DVD errored after initial scan - trying again");
         CloseDVD();
-        m_gotStop = false;
         OpenFile(filename);
         if (!m_dvdnav)
-        {
             VERBOSE(VB_IMPORTANT, LOC + "Failed to re-open DVD.");
-            return false;
-        }
     }
 
-    QMutexLocker lock(&m_seekLock);
-    dvdnav_reset(m_dvdnav);
-    dvdnav_title_play(m_dvdnav, 0);
-    m_audioStreamsChanged = true;
-    return true;
+    if (m_dvdnav)
+    {
+        QMutexLocker lock(&m_seekLock);
+        dvdnav_first_play(m_dvdnav);
+        m_audioStreamsChanged = true;
+    }
+
+    return m_dvdnav;
 }
 
 void DVDRingBuffer::GetChapterTimes(QList<long long> &times)
