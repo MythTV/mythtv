@@ -12,6 +12,7 @@
 #include "mythconfig.h"
 #include "mythdb.h"
 #include "mythcorecontext.h"
+#include "dbutil.h"
 
 #include <stdlib.h>
 #define SYSLOG_NAMES
@@ -211,7 +212,8 @@ bool SyslogLogger::logmsg(LoggingItem_t *item)
 
 
 DatabaseLogger::DatabaseLogger(char *table) : LoggerBase(table, 0), 
-                                              m_host(NULL), m_opened(false)
+                                              m_host(NULL), m_opened(false),
+                                              m_loggingTableExists(false)
 {
     static const char *queryFmt =
         "INSERT INTO %s (host, application, pid, thread, "
@@ -269,7 +271,7 @@ bool DatabaseLogger::logqmsg(LoggingItem_t *item)
     char        timestamp[TIMESTAMP_MAX];
     char       *threadName = getThreadName(item);;
 
-    if( !GetMythDB()->HaveValidDatabase() )
+    if( !isDatabaseReady() )
         return false;
 
     strftime( timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
@@ -329,6 +331,19 @@ void DBLoggerThread::run(void)
 
         deleteItem(item);
     }
+}
+
+bool DatabaseLogger::isDatabaseReady()
+{
+    bool ready = false;
+
+    if ( !m_loggingTableExists )
+        m_loggingTableExists = DBUtil::TableExists(m_handle.string);
+
+    if ( m_loggingTableExists && GetMythDB()->HaveValidDatabase() )
+        ready = true;
+
+    return ready;
 }
 
 char *getThreadName( LoggingItem_t *item )

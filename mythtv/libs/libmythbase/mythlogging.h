@@ -146,12 +146,15 @@ class DatabaseLogger : public LoggerBase {
     protected:
         bool logqmsg(LoggingItem_t *item);
     private:
+        bool isDatabaseReady();
+
         DBLoggerThread *m_thread;
         char *m_host;
         char *m_application;
         char *m_query;
         pid_t m_pid;
         bool m_opened;
+        bool m_loggingTableExists;
 };
 
 class LoggerThread : public QThread {
