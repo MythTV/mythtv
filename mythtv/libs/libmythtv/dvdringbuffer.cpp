@@ -36,6 +36,7 @@ static const char *dvdnav_menu_table[] =
 DVDInfo::DVDInfo(const QString &filename)
   : m_nav(NULL), m_name(NULL), m_serialnumber(NULL)
 {
+    VERBOSE(VB_PLAYBACK, QString("DVDInfo: Starting."));
     QString name = filename;
     if (name.left(6) == "dvd://")
         name.remove(0,5);
@@ -65,6 +66,7 @@ DVDInfo::~DVDInfo(void)
 {
     if (m_nav)
         dvdnav_close(m_nav);
+    VERBOSE(VB_PLAYBACK, QString("DVDInfo: Finishing."));
 }
 
 bool DVDInfo::GetNameAndSerialNum(QString &name, QString &serial)
@@ -139,6 +141,8 @@ void DVDRingBuffer::CloseDVD(void)
         dvdnav_close(m_dvdnav);
         m_dvdnav = NULL;
     }
+    m_gotStop = false;
+    m_audioStreamsChanged = true;
 }
 
 void DVDRingBuffer::ClearChapterCache(void)
@@ -297,10 +301,7 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     rwlock.lockForWrite();
 
     if (m_dvdnav)
-    {
-        dvdnav_close(m_dvdnav);
-        m_dvdnav = NULL;
-    }
+        CloseDVD();
 
     filename = lfilename;
     QByteArray fname = filename.toLocal8Bit();
@@ -410,9 +411,6 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
 bool DVDRingBuffer::StartFromBeginning(void)
 {
-    if (!m_dvdnav)
-        return false;
-
     VERBOSE(VB_IMPORTANT, LOC + "Resetting DVD device.");
 
     // if a DVDNAV_STOP event has been emitted, dvdnav_reset does not
@@ -422,20 +420,19 @@ bool DVDRingBuffer::StartFromBeginning(void)
         VERBOSE(VB_IMPORTANT, LOC +
                 "DVD errored after initial scan - trying again");
         CloseDVD();
-        m_gotStop = false;
         OpenFile(filename);
         if (!m_dvdnav)
-        {
             VERBOSE(VB_IMPORTANT, LOC + "Failed to re-open DVD.");
-            return false;
-        }
     }
 
-    QMutexLocker lock(&m_seekLock);
-    dvdnav_reset(m_dvdnav);
-    dvdnav_title_play(m_dvdnav, 0);
-    m_audioStreamsChanged = true;
-    return true;
+    if (m_dvdnav)
+    {
+        QMutexLocker lock(&m_seekLock);
+        dvdnav_first_play(m_dvdnav);
+        m_audioStreamsChanged = true;
+    }
+
+    return m_dvdnav;
 }
 
 void DVDRingBuffer::GetChapterTimes(QList<long long> &times)
@@ -543,7 +540,7 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
         if (dvdStat == DVDNAV_STATUS_ERR)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Error  block from DVD: %1")
+                    QString("Failed to read block: %1")
                     .arg(dvdnav_err_to_string(m_dvdnav)));
             errno = EIO;
             return -1;
