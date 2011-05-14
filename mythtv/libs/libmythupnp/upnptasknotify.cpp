@@ -69,9 +69,9 @@ UPnpNotifyTask::~UPnpNotifyTask()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
-                                    QString        sNT,
-                                    QString        sUDN )
+void UPnpNotifyTask::SendNotifyMsg( QMulticastSocket *pSocket,
+                                    QString           sNT,
+                                    QString           sUDN )
 {
     QString sUSN;
 
@@ -94,8 +94,8 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
                             .arg( m_nMaxAge    );
 
     VERBOSE(VB_UPNP, QString("UPnpNotifyTask::SendNotifyMsg : %1:%2 : %3 : %4")
-                        .arg( pSocket->address().toString() )
-                        .arg( pSocket->port() )
+                        .arg( pSocket->m_address.toString() )
+                        .arg( pSocket->m_port )
                         .arg( sNT  )
                         .arg( sUSN ));
 
@@ -122,8 +122,8 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
         QString sHeader = QString( "NOTIFY * HTTP/1.1\r\n"
                                    "HOST: %1:%2\r\n"    
                                    "LOCATION: http://%3:%4/getDeviceDesc\r\n" )
-                             .arg( SSDP_GROUP ) // pSocket->address().toString() )
-                             .arg( SSDP_PORT )  // pSocket->port() )
+                             .arg( pSocket->m_address.toString() )
+                             .arg( pSocket->m_port )
                              .arg( *it )
                              .arg( m_nServicePort);
 
@@ -134,9 +134,9 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
         // Send Packet to Socket (Send same packet twice)
         // ------------------------------------------------------------------
 
-        pSocket->writeBlock( scPacket, scPacket.length(), pSocket->address(), pSocket->port() );
+        pSocket->writeBlock( scPacket, scPacket.length(), pSocket->m_address, pSocket->m_port );
         usleep( rand() % 250000 );
-        pSocket->writeBlock( scPacket, scPacket.length(), pSocket->address(), pSocket->port() );
+        pSocket->writeBlock( scPacket, scPacket.length(), pSocket->m_address, pSocket->m_port );
     }
     }
 
@@ -149,7 +149,7 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
 void UPnpNotifyTask::Execute( TaskQueue *pQueue )
 {
 
-    MSocketDevice *pMulticast = new QMulticastSocket(SSDP_GROUP, SSDP_PORT);
+    QMulticastSocket *pMulticast = new QMulticastSocket(SSDP_GROUP, SSDP_PORT);
 //    QSocketDevice *pBroadcast = new QBroadcastSocket( "255.255.255.255", SSDP_PORT );
 
     // ----------------------------------------------------------------------
@@ -192,7 +192,7 @@ void UPnpNotifyTask::Execute( TaskQueue *pQueue )
 /////////////////////////////////////////////////////////////////////////////
 
 void UPnpNotifyTask::ProcessDevice(
-    MSocketDevice *pSocket, UPnpDevice *pDevice)
+    QMulticastSocket *pSocket, UPnpDevice *pDevice)
 {
     // ----------------------------------------------------------------------
     // Loop for each device and send the 2 required messages
