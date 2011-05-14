@@ -93,10 +93,11 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
                             .arg( sUSN         )
                             .arg( m_nMaxAge    );
 
-//    VERBOSE(VB_UPNP, QString("UPnpNotifyTask::SendNotifyMsg : %1 : %2 : %3")
-//                        .arg( pSocket->address().toString() )
-//                        .arg( sNT  )
-//                        .arg( sUSN ));
+    VERBOSE(VB_UPNP, QString("UPnpNotifyTask::SendNotifyMsg : %1:%2 : %3 : %4")
+                        .arg( pSocket->address().toString() )
+                        .arg( pSocket->port() )
+                        .arg( sNT  )
+                        .arg( sUSN ));
 
     {
     QMutexLocker qml(&m_mutex); // for addressList
