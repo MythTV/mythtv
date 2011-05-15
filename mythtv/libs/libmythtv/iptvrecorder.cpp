@@ -13,6 +13,7 @@
 #include "iptvchannel.h"
 #include "iptvfeederwrapper.h"
 #include "iptvrecorder.h"
+#include "tv_rec.h"
 
 #define LOC QString("IPTVRec: ")
 #define LOC_ERR QString("IPTVRec, Error: ")
@@ -57,28 +58,39 @@ void IPTVRecorder::Close(void)
     VERBOSE(VB_RECORD, LOC + "Close() -- end");
 }
 
-void IPTVRecorder::Pause(bool clear)
+bool IPTVRecorder::PauseAndWait(int timeout)
 {
-    VERBOSE(VB_RECORD, LOC + "Pause() -- begin");
-    DTVRecorder::Pause(clear);
-    _channel->GetFeeder()->Stop();
-    _channel->GetFeeder()->Close();
-    VERBOSE(VB_RECORD, LOC + "Pause() -- end");
-}
+    QMutexLocker locker(&pauseLock);
+    if (request_pause)
+    {
+        if (!IsPaused(true))
+        {
+            _channel->GetFeeder()->Stop();
+            _channel->GetFeeder()->Close();
 
-void IPTVRecorder::Unpause(void)
-{
-    VERBOSE(VB_RECORD, LOC + "Unpause() -- begin");
+            paused = true;
+            pauseWait.wakeAll();
+            if (tvrec)
+                tvrec->RecorderPaused();
+        }
 
-    if (_recording && !_channel->GetFeeder()->IsOpen())
-        Open();
+        unpauseWait.wait(&pauseLock, timeout);
+    }
 
-    if (_stream_data)
-        _stream_data->Reset(_stream_data->DesiredProgram());
+    if (!request_pause && IsPaused(true))
+    {
+        paused = false;
 
-    DTVRecorder::Unpause();
+        if (_recording && !_channel->GetFeeder()->IsOpen())
+            Open();
 
-    VERBOSE(VB_RECORD, LOC + "Unpause() -- end");
+        if (_stream_data)
+            _stream_data->Reset(_stream_data->DesiredProgram());
+
+        unpauseWait.wakeAll();
+    }
+
+    return IsPaused(true);
 }
 
 void IPTVRecorder::StartRecording(void)
@@ -115,7 +127,6 @@ void IPTVRecorder::StartRecording(void)
 
     VERBOSE(VB_RECORD, LOC + "StartRecording() -- end");
     _recording = false;
-    _cond_recording.wakeAll();
 }
 
 void IPTVRecorder::StopRecording(void)
@@ -124,14 +135,9 @@ void IPTVRecorder::StopRecording(void)
     Pause();
     _channel->GetFeeder()->Close();
 
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
-
     _request_recording = false;
     while (_recording)
-        _cond_recording.wait(&mutex, 500);
+        usleep(5000);
 
     VERBOSE(VB_RECORD, LOC + "StopRecording() -- end");
 }
@@ -165,7 +171,7 @@ void IPTVRecorder::AddData(const unsigned char *data, unsigned int dataSize)
     while (readIndex < dataSize)
     {
         // If recorder is paused, stop there
-        if (IsPaused())
+        if (IsPaused(false))
             return;
 
         // Find the next TS Header in data

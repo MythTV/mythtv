@@ -3,7 +3,6 @@
 
 // C headers
 #include <cmath>
-#include <pthread.h>
 
 // C++ headers
 #include <algorithm>
@@ -1026,6 +1025,8 @@ void MythMainWindow::InitKeys()
         "Edit"),                    "E");
     RegisterKey("Global", ACTION_SCREENSHOT, QT_TRANSLATE_NOOP("MythControls",
          "Save screenshot"), "");
+    RegisterKey("Global", ACTION_HANDLEMEDIA, QT_TRANSLATE_NOOP("MythControls",
+         "Play a media resource"), "");
 
     RegisterKey("Global", "PAGEUP", QT_TRANSLATE_NOOP("MythControls",
         "Page Up"),              "PgUp");
@@ -2190,12 +2191,12 @@ void MythMainWindow::customEvent(QEvent *ce)
         MythEvent *me = (MythEvent *)ce;
         QString message = me->Message();
 
-        if (message.left(12) == "HANDLE_MEDIA")
+        if (message.startsWith(ACTION_HANDLEMEDIA))
         {
-            QStringList tokens = message.split(' ', QString::SkipEmptyParts);
-            HandleMedia(tokens[1],
-                        message.mid(tokens[0].length() +
-                                    tokens[1].length() + 2));
+            if (me->ExtraDataCount() == 1)
+                HandleMedia("Internal", me->ExtraData(0));
+            else
+                VERBOSE(VB_IMPORTANT, "Failed to handle media");
         }
         else if (message.startsWith(ACTION_SCREENSHOT))
         {

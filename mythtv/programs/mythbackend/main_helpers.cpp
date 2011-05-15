@@ -252,6 +252,12 @@ bool setup_context(const MythCommandLineParser &cmdline)
 
 void cleanup(void)
 {
+    signal(SIGTERM, SIG_DFL);
+    signal(SIGHUP,  SIG_DFL);
+#ifndef _MSC_VER
+    signal(SIGUSR1, SIG_DFL);
+#endif
+
     delete sched;
     sched = NULL;
 
@@ -266,12 +272,6 @@ void cleanup(void)
         unlink(pidfile.toAscii().constData());
         pidfile.clear();
     }
-
-    signal(SIGHUP, SIG_DFL);
-
-#ifndef _MSC_VER
-    signal(SIGUSR1, SIG_DFL);
-#endif
 }
 
 int log_rotate(int report_error)

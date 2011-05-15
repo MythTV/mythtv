@@ -113,6 +113,9 @@ void SSDPCacheEntries::Insert( const QString &sUSN, DeviceLocation *pEntry )
 
     m_mapEntries.insert( sUSN, pEntry );
 
+    VERBOSE(VB_UPNP, QString("SSDP Cache adding USN: %1 Location %2")
+            .arg(pEntry->m_sUSN).arg(pEntry->m_sLocation));
+
     Unlock();
 }
 
@@ -128,7 +131,11 @@ void SSDPCacheEntries::Remove( const QString &sUSN )
     if (it != m_mapEntries.end())
     {
         if (*it)
+        {
+            VERBOSE(VB_UPNP, QString("SSDP Cache removing USN: %1 Location %2")
+                    .arg((*it)->m_sUSN).arg((*it)->m_sLocation));
             (*it)->Release();
+        }
 
         // -=>TODO: Need to somehow call SSDPCache::NotifyRemove
 

@@ -10,9 +10,9 @@ using namespace std;
 #include <QWaitCondition>
 #include <QObject>
 #include <QString>
+#include <QThread>
 #include <QMutex>
 #include <QMap>
-#include <QThread>
 
 // MythTV headers
 #include "recordinginfo.h"
@@ -33,22 +33,10 @@ typedef RecList::iterator RecIter;
 
 class Scheduler;
 
-class ScheduleThread : public QThread
-{
-    Q_OBJECT
-  public:
-    ScheduleThread() : m_parent(NULL) {}
-    void SetParent(Scheduler *parent) { m_parent = parent; }
-    void run(void);
-  private:
-    Scheduler *m_parent;
-};
-
-class Scheduler : public QObject
+class Scheduler : public QThread
 {
     Q_OBJECT
 
-    friend class ScheduleThread;
   public:
     Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
               QString recordTbl = "record", Scheduler *master_sched = NULL);
@@ -97,7 +85,7 @@ class Scheduler : public QObject
     int GetError(void) const { return error; }
 
   protected:
-    void RunScheduler(void);
+    virtual void run(void); // QThread
 
   private:
     QString recordTable;
@@ -184,7 +172,7 @@ class Scheduler : public QObject
 
     QMap<QString, bool> recPendingList;
 
-    ScheduleThread schedThread;
+    bool doRun;
 
     MainServer *m_mainServer;
 

@@ -1,9 +1,6 @@
 #ifndef FILETRANSFER_H_
 #define FILETRANSFER_H_
 
-// POSIX headers
-#include <pthread.h>
-
 // ANSI C headers
 #include <stdint.h>
 

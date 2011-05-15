@@ -22,36 +22,58 @@
 #include <iostream>
 using namespace std;
 
-FIFOWriter::FIFOWriter(int count, bool sync)
+FIFOWriter::FIFOWriter(int count, bool sync) :
+    fifo_buf(NULL),
+    fb_inptr(NULL),
+    fb_outptr(NULL),
+    fifothrds(NULL),
+    fifo_lock(NULL),
+    full_cond(NULL),
+    empty_cond(NULL),
+    filename(NULL),
+    fbdesc(NULL),
+    maxblksize(NULL),
+    killwr(NULL),
+    fbcount(NULL),
+    num_fifos(count),
+    usesync(sync)
 {
-    num_fifos = count;
-    usesync = sync;
-    maxblksize = new long[count];
-    killwr = new int[count];
-    fbcount = new int[count];
+    if (count <= 0)
+        return;
+
     fifo_buf = new struct fifo_buf *[count];
     fb_inptr = new struct fifo_buf *[count];
     fb_outptr = new struct fifo_buf *[count];
     fifothrds = new FIFOThread[count];
     fifo_lock = new QMutex[count];
-    empty_cond = new QWaitCondition[count];
     full_cond = new QWaitCondition[count];
+    empty_cond = new QWaitCondition[count];
     filename = new QString [count];
     fbdesc = new QString [count];
+    maxblksize = new long[count];
+    killwr = new int[count];
+    fbcount = new int[count];
 }
 
 FIFOWriter::~FIFOWriter()
 {
-    for (int i = 0; i <num_fifos; i++)
+    if (num_fifos <= 0)
+        return;
+
+    for (int i = 0; i < num_fifos; i++)
     {
+        QMutexLocker flock(&fifo_lock[i]);
         killwr[i] = 1;
-
-        fifo_lock[i].lock();
         empty_cond[i].wakeAll();
-        fifo_lock[i].unlock();
+    }
 
+    for (int i = 0; i < num_fifos; i++)
+    {
         fifothrds[i].wait();
     }
+
+    num_fifos = 0;
+
     delete [] maxblksize;
     delete [] fifo_buf;
     delete [] fb_inptr;
@@ -104,9 +126,10 @@ int FIFOWriter::FIFOInit(int id, QString desc, QString name, long size,
     fifothrds[id].SetId(id);
     fifothrds[id].start();
 
-    usleep(50);
+    while (0 == killwr[id] && !fifothrds[id].isRunning())
+        usleep(1000);
 
-    return (fifothrds[id].isRunning());
+    return fifothrds[id].isRunning();
 }
 
 void FIFOThread::run(void)
@@ -121,12 +144,12 @@ void FIFOWriter::FIFOWriteThread(int id)
 {
     int fd = -1;
 
-    fifo_lock[id].lock();
+    QMutexLocker flock(&fifo_lock[id]);
     while (1)
     {
-        if (fb_inptr[id] == fb_outptr[id])
-            empty_cond[id].wait(&fifo_lock[id]);
-        fifo_lock[id].unlock();
+        if ((fb_inptr[id] == fb_outptr[id]) && (0 == killwr[id]))
+            empty_cond[id].wait(flock.mutex());
+        flock.unlock();
         if (killwr[id])
             break;
         if (fd < 0)
@@ -154,7 +177,7 @@ void FIFOWriter::FIFOWriteThread(int id)
                 }
             }
         }
-        fifo_lock[id].lock();
+        flock.relock();
         fb_outptr[id] = fb_outptr[id]->next;
         full_cond[id].wakeAll();
     }
@@ -177,7 +200,7 @@ void FIFOWriter::FIFOWriteThread(int id)
 
 void FIFOWriter::FIFOWrite(int id, void *buffer, long blksize)
 {
-    fifo_lock[id].lock();
+    QMutexLocker flock(&fifo_lock[id]);
     while (fb_inptr[id]->next == fb_outptr[id])
     {
         bool blocking = false;
@@ -205,7 +228,7 @@ void FIFOWriter::FIFOWrite(int id, void *buffer, long blksize)
         }
         else
         {
-            full_cond[id].wait(&fifo_lock[id], 1000);
+            full_cond[id].wait(flock.mutex(), 1000);
         }
     }
     if (blksize > maxblksize[id])
@@ -217,7 +240,6 @@ void FIFOWriter::FIFOWrite(int id, void *buffer, long blksize)
     fb_inptr[id]->blksize = blksize;
     fb_inptr[id] = fb_inptr[id]->next;
     empty_cond[id].wakeAll();
-    fifo_lock[id].unlock();
 }
 
 void FIFOWriter::FIFODrain(void)
@@ -228,12 +250,11 @@ void FIFOWriter::FIFODrain(void)
         count = 0;
         for (int i = 0; i < num_fifos; i++)
         {
+            QMutexLocker flock(&fifo_lock[i]);
             if (fb_inptr[i] == fb_outptr[i])
             {
                 killwr[i] = 1;
-                fifo_lock[i].lock();
                 empty_cond[i].wakeAll();
-                fifo_lock[i].unlock();
                 count++;
             }
         }
