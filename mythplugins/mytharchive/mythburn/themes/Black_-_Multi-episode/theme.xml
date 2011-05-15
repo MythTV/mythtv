@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mythburntheme>
+
+  <!-- Theme for MythBurn - show intro & main menu with 10 recordings -->
+
+  <fonts>
+    <font name="title" size="22" color="yellow"
+     effect="outline" shadowcolor="black" shadowsize="1">FreeSans.ttf</font>
+    <font name="subt"  size="18" color="white"
+     effect="outline" shadowcolor="black" shadowsize="1">FreeSans.ttf</font>
+    <font name="desc"  size="14" color="white"
+     effect="outline" shadowcolor="black" shadowsize="1">FreeSans.ttf</font>
+  </fonts>
+
+  <intro filename="mythtv_intro.mpg"/>
+
+  <menu background="Black-Background.png" music="silence.ac3">
+    <item>
+      <previous filename="previous.png"
+            x="20" y="400" w="48" h="48"
+       mask="previous_mask.png" static="True"/>
+
+<!-- The text here should be Page X of Y, but mythburn can't do that yet -->
+      <text x="55" y="500" w="70" h="22"
+       value="Page %page" font="desc"
+       static="True" align="left"/>
+
+      <text x="20" y="20" w="390" h="30"
+       value="%title" font="title"
+       static="True" align="left"/>
+
+      <graphic filename="%thumbnail"
+            x="130" y="59" w="120" h="90"
+       static="False" halign="left" valign="top"/>
+      <text x="130" y="59" w="280" h="30"
+       value="%subtitle" font="subt"
+       static="False" align="left"/>
+    </item>
+
+    <item>
+      <graphic filename="%thumbnail"
+            x="130" y="160" w="120" h="90"
+       static="False" halign="left" valign="top"/>
+      <text x="130" y="160" w="280" h="30"
+       value="%subtitle" font="subt"
+       static="False" align="left"/>
+    </item>
+
+    <item>
+      <graphic filename="%thumbnail"
+            x="130" y="260" w="120" h="90"
+       static="False" halign="left" valign="top"/>
+      <text x="130" y="260" w="280" h="30"
+       value="%subtitle" font="subt"
+       static="False" align="left"/>
+    </item>
+
+    <item>
+      <graphic filename="%thumbnail"
+            x="130" y="360" w="120" h="90"
+       static="False" halign="left" valign="top"/>
+      <text x="130" y="360" w="280" h="30"
+       value="%subtitle" font="subt"
+       static="False" align="left"/>
+    </item>
+
+    <item>
+      <graphic filename="%thumbnail"
+            x="130" y="460" w="120" h="90"
+       static="False" halign="left" valign="top"/>
+      <text x="130" y="460" w="280" h="30"
+       value="%subtitle" font="subt"
+       static="False" align="left"/>
+    </item>
+
+    <item>
+      <graphic filename="%thumbnail"
+            x="430" y="60" w="120" h="90"
+       static="False" halign="left" valign="top"/>
+      <text x="430" y="60" w="280" h="30"
+       value="%subtitle" font="subt"
+       static="False" align="left"/>
+    </item>
+
+    <item>
+      <graphic filename="%thumbnail"
+            x="430" y="160" w="120" h="90"
+       static="False" halign="left" valign="top"/>
+      <text x="430" y="160" w="280" h="30"
+       value="%subtitle" font="subt"
+       static="False" align="left"/>
+    </item>
+
+    <item>
+      <graphic filename="%thumbnail"
+            x="430" y="260" w="120" h="90"
+       static="False" halign="left" valign="top"/>
+      <text x="430" y="260" w="280" h="30"
+       value="%subtitle" font="subt"
+       static="False" align="left"/>
+    </item>
+
+    <item>
+      <graphic filename="%thumbnail"
+            x="430" y="360" w="120" h="90"
+       static="False" halign="left" valign="top"/>
+      <text x="430" y="360" w="280" h="30"
+       value="%subtitle" font="subt"
+       static="False" align="left"/>
+    </item>
+
+    <item>
+      <next filename="next.png"
+            x="75" y="400" w="48" h="48"
+       mask="next_mask.png" static="False"/>
+
+      <graphic filename="%thumbnail"
+            x="430" y="460" w="120" h="90"
+       static="False" halign="left" valign="top"/>
+      <text x="430" y="460" w="280" h="30"
+       value="%subtitle" font="subt"
+       static="False" align="left"/>
+    </item>
+  </menu>
+</mythburntheme>
