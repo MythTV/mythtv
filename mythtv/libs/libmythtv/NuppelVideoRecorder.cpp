@@ -601,16 +601,9 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
     mpa_vidctx->prediction_method = FF_PRED_LEFT;
     if (videocodec.toLower() == "huffyuv" || videocodec.toLower() == "mjpeg")
         mpa_vidctx->strict_std_compliance = FF_COMPLIANCE_INOFFICIAL;
+    mpa_vidctx->thread_count = encoding_thread_count;
 
     QMutexLocker locker(avcodeclock);
-
-#ifdef USING_FFMPEG_THREADS
-    if ((encoding_thread_count > 1) &&
-        avcodec_thread_init(mpa_vidctx, encoding_thread_count))
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "FFMPEG couldn't start threading...");
-    }
-#endif
 
     if (avcodec_open(mpa_vidctx, mpa_vidcodec) < 0)
     {
@@ -1932,11 +1925,6 @@ void NuppelVideoRecorder::KillChildren(void)
         delete vbi_thread;
         vbi_thread = NULL;
     }
-
-#ifdef USING_FFMPEG_THREADS
-    if (useavcodec && encoding_thread_count > 1)
-        avcodec_thread_free(mpa_vidctx);
-#endif
 }
 
 void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len, bool forcekey)
