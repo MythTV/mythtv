@@ -53,8 +53,6 @@ extern "C" {
 #include "videodev_mjpeg.h"
 #endif
 
-#else  // USING_V4l
-#define VT_WIDTH 0
 #endif // USING_V4l
 
 #define KEYFRAMEDIST   30
@@ -2616,7 +2614,7 @@ void NuppelVideoRecorder::FormatTT(struct VBIData *vbidata)
     textbuffer[act]->freeToEncode = 1;
 }
 #else  // USING_V4L
-void NuppelVideoRecorder::FormatTeletextSubtitles(struct VBIData *vbidata) {}
+void NuppelVideoRecorder::FormatTT(struct VBIData*) {}
 #endif // USING_V4L
 
 void NuppelVideoRecorder::FormatCC(struct cc *cc)
