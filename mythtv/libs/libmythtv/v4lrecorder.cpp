@@ -1,6 +1,9 @@
 // -*- Mode: c++ -*-
 
+#ifdef USING_V4L
 #include <linux/videodev.h> // for vbi_format
+#endif // USING_V4L
+
 #include <sys/ioctl.h>      // for ioctl
 #include <sys/time.h>       // for gettimeofday
 #include <unistd.h>         // for IO_NONBLOCK
@@ -124,6 +127,7 @@ int V4LRecorder::OpenVBIDevice(void)
 
     if (VBIMode::NTSC_CC == vbimode)
     {
+#ifdef USING_V4L
         struct v4l2_format fmt;
         memset(&fmt, 0, sizeof(fmt));
         fmt.type = V4L2_BUF_TYPE_VBI_CAPTURE;
@@ -177,6 +181,7 @@ int V4LRecorder::OpenVBIDevice(void)
             close(fd);
             return -1;
         }
+#endif // USING_V4L
     }
 
     if (VBIMode::PAL_TT == vbimode)

@@ -23,7 +23,6 @@
 // stateChangeLock -> triggerEventLoopLock
 //                 -> pendingRecLock
 
-class NuppelVideoRecorder;
 class RingBuffer;
 class EITScanner;
 class RecordingProfile;
