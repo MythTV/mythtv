@@ -353,8 +353,8 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
                 QDomElement mbe = pDoc->createElement("Backend");
                 backends.appendChild(mbe);
                 mbe.setAttribute("type", "Slave");
-                mbe.setAttribute("name", url.toString(QUrl::RemovePath));
-                mbe.setAttribute("url" , i.value()->m_sLocation);
+                mbe.setAttribute("name", url.host());
+                mbe.setAttribute("url" , url.toString(QUrl::RemovePath));
             }
         }
         sbes->Unlock();
