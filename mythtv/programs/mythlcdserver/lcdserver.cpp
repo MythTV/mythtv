@@ -90,7 +90,7 @@ LCDServer::LCDServer(int port, QString message, int messageTime)
     connect(m_serverSocket, SIGNAL(newConnection()),
             this, SLOT(newConnection()));
 
-    if (!m_serverSocket->listen(QHostAddress::Any, port))
+    if (!m_serverSocket->listen(QHostAddress::AnyIPv6, port))
     {
          VERBOSE(VB_IMPORTANT, LOC_ERR +
                  QString("Can't bind to server port %1").arg(port) +

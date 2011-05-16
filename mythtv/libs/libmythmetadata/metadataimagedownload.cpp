@@ -395,9 +395,7 @@ QString getStorageGroupURL(ArtworkType type, QString host)
     else
         sgroup = "Default";
 
-    return QString("myth://%1@%2:%3/")
-        .arg(sgroup)
-        .arg(ip).arg(port);
+    return gCoreContext->GenMythURL(ip,port,"",sgroup);
 }
 
 void cleanThumbnailCacheDir()

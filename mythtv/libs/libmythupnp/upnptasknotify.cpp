@@ -121,7 +121,7 @@ void UPnpNotifyTask::SendNotifyMsg( QMulticastSocket *pSocket,
 
         QString sHeader = QString( "NOTIFY * HTTP/1.1\r\n"
                                    "HOST: %1:%2\r\n"    
-                                   "LOCATION: http://%3:%4/getDeviceDesc\r\n" )
+                                   "LOCATION: http://[%3]:%4/getDeviceDesc\r\n" )
                              .arg( pSocket->m_address.toString() )
                              .arg( pSocket->m_port )
                              .arg( *it )

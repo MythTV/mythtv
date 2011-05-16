@@ -109,7 +109,7 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
                               ++it ) 
     {
         QString sHeader = QString ( "HTTP/1.1 200 OK\r\n"
-                                    "LOCATION: http://%1:%2/getDeviceDesc\r\n" )
+                                    "LOCATION: http://[%1]:%2/getDeviceDesc\r\n" )
                             .arg( *it )
                             .arg( m_nServicePort);
 

@@ -74,7 +74,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = FALSE */)
 
     if (!m_pHttpServer->isListening())
 	{
-		if (!m_pHttpServer->listen(QHostAddress::Any, nPort))
+		if (!m_pHttpServer->listen(QHostAddress::AnyIPv6, nPort))
 		{
 			VERBOSE(VB_IMPORTANT, "MediaServer::HttpServer Create Error");
 			delete m_pHttpServer;
