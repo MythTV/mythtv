@@ -10,12 +10,14 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#ifdef USING_V4L
 // HACK. Broken kernel headers < 2.6.25 fail compile in videodev2.h when
 //       compiling with -std=c99.  We could remove this in the .pro file,
 //       but that would disable it for all .c files.
 #undef __STRICT_ANSI__
 #include <linux/videodev.h>
 #include <linux/videodev2.h>
+#endif // USING_V4L
 
 // vbitext headers
 #include "vt.h"
@@ -25,8 +27,9 @@
 #define FAC    (1<<16)         // factor for fix-point arithmetic
 
 static unsigned char *rawbuf;          // one common buffer for raw vbi data.
+#ifdef USING_V4L
 static int rawbuf_size;                // its current size
-
+#endif // USING_V4L
 
 /***** bttv api *****/
 #define BTTV_VBISIZE           _IOR('v' , BASE_VIDIOCPRIVATE+8, int)
@@ -466,8 +469,7 @@ vbi_del_handler(struct vbi *vbi, void *handler, void *data)
     return;
 }
 
-
-
+#ifdef USING_V4L
 static int
 set_decode_parms(struct vbi *vbi, struct v4l2_vbi_format *p)
 {
@@ -527,11 +529,12 @@ set_decode_parms(struct vbi *vbi, struct v4l2_vbi_format *p)
 
     return 0;
 }
-
+#endif // USING_V4L
 
 static int
 setup_dev(struct vbi *vbi)
 {
+#ifdef USING_V4L
     struct v4l2_format v4l2_format;
     struct v4l2_vbi_format *vbifmt = &v4l2_format.fmt.vbi;
 
@@ -585,6 +588,9 @@ setup_dev(struct vbi *vbi)
     }
 
     return 0;
+#else
+    return -1;
+#endif // USING_V4L
 }
 
 
