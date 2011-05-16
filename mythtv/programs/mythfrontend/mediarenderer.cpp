@@ -35,6 +35,11 @@ class MythFrontendStatus : public HttpServerExtension
         pRequest->m_eResponseType = ResponseTypeHTML;
         pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
 
+        SSDPCacheEntries* cache = NULL;
+        QString ipaddress = QString();
+        if (!UPnp::g_IPAddrList.isEmpty())
+            ipaddress = UPnp::g_IPAddrList.at(0);
+
         QString shortdateformat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
         QString timeformat      = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
         QString hostname   = gCoreContext->GetHostName();
@@ -64,6 +69,7 @@ class MythFrontendStatus : public HttpServerExtension
            << "<body>\r\n\r\n"
            << "  <h1 class=\"status\">MythFrontend Status</h1>\r\n";
 
+        // This frontend
         stream
            << "  <div class=\"content\">\r\n"
            << "    <h2 class=\"status\">This Frontend</h2>\r\n"
@@ -71,12 +77,65 @@ class MythFrontendStatus : public HttpServerExtension
            << "Version : " << MYTH_BINARY_VERSION << "\r\n"
            << "  </div>\r\n";
 
+        // Other frontends
+
+        // This will not work with multiple frontends on the same machine (upnp
+        // setup will fail on a second frontend anyway) and the ip address
+        // filtering of the current frontend may not work in all situations
+
+        cache = SSDP::Find("urn:schemas-mythtv-org:service:MythFrontend:1");
+        if (cache)
+        {
+            stream
+               << "  <div class=\"content\">\r\n"
+               << "    <h2 class=\"status\">Other Frontends</h2>\r\n";
+            cache->AddRef();
+            cache->Lock();
+            EntryMap* map = cache->GetEntryMap();
+            QMapIterator< QString, DeviceLocation * > i(*map);
+            while (i.hasNext())
+            {
+                i.next();
+                QUrl url(i.value()->m_sLocation);
+                if (url.host() != ipaddress)
+                {
+                    stream << "<br />" << url.host() << "&nbsp(<a href=\""
+                           << url.toString(QUrl::RemovePath) << "\">Status page</a>)\r\n";
+                }
+            }
+            cache->Unlock();
+            cache->Release();
+            stream << "  </div>\r\n";
+        }
+
+        // Master backend
         stream
            << "  <div class=\"content\">\r\n"
-           << "    <h2 class=\"status\">Master Backend</h2>\r\n"
-           << masterhost << "&nbsp(<a href=\"http://"
+           << "    <h2 class=\"status\">MythTV Backends</h2>\r\n"
+           << "Master: " << masterhost << "&nbsp(<a href=\"http://"
            << masterip << ":" << masterport
-           << "\">Status page</a>)\r\n"
+           << "\">Status page</a>)\r\n";
+
+        // Slave backends
+        cache = SSDP::Find("urn:schemas-mythtv-org:device:SlaveMediaServer:1");
+        if (cache)
+        {
+            cache->AddRef();
+            cache->Lock();
+            EntryMap* map = cache->GetEntryMap();
+            QMapIterator< QString, DeviceLocation * > i(*map);
+            while (i.hasNext())
+            {
+                i.next();
+                QUrl url(i.value()->m_sLocation);
+                stream << "<br />" << "Slave: " << url.host() << "&nbsp(<a href=\""
+                       << url.toString(QUrl::RemovePath) << "\">Status page</a>)\r\n";
+            }
+            cache->Unlock();
+            cache->Release();
+        }
+
+        stream
            << "  </div>\r\n";
 
         stream
@@ -212,13 +271,14 @@ MediaRenderer::MediaRenderer()
 
         Start();
 
+        // ensure the frontend is aware of all backends (slave and master) and
+        // other frontends
+        SSDP::Instance()->PerformSearch("ssdp:all");
     }
     else
     {
         VERBOSE(VB_IMPORTANT, "MediaRenderer::Unable to Initialize UPnp Stack");
     }
-
-
 
     VERBOSE(VB_UPNP, QString( "MediaRenderer::End" ));
 }
