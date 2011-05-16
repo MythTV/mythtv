@@ -490,7 +490,7 @@ bool DeviceReadBuffer::Poll(void) const
         {
             char dummy[128];
             int cnt = (wake_pipe_flags[0] & O_NONBLOCK) ? 128 : 1;
-            (void) ::read(wake_pipe[0], dummy, cnt);
+            cnt = ::read(wake_pipe[0], dummy, cnt);
         }
 
         if ((uint)timer.elapsed() >= max_poll_wait)

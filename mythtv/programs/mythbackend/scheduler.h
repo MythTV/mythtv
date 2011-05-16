@@ -93,7 +93,7 @@ class Scheduler : public QThread
 
     bool VerifyCards(void);
 
-    bool FillRecordList(bool doLock);
+    bool FillRecordList(void);
     void UpdateMatches(int recordid);
     void UpdateManuals(int recordid);
     void BuildWorkList(void);

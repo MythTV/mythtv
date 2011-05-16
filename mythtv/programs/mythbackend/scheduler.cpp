@@ -334,15 +334,16 @@ static bool comp_timechannel(RecordingInfo *a, RecordingInfo *b)
     return a->GetChanNum() < b->GetChanNum();
 }
 
-bool Scheduler::FillRecordList(bool doLock)
+bool Scheduler::FillRecordList(void)
 {
     schedMoveHigher = (bool)gCoreContext->GetNumSetting("SchedMoveHigher");
     schedTime = QDateTime::currentDateTime();
 
     VERBOSE(VB_SCHEDULE, "BuildWorkList...");
     BuildWorkList();
-    if (doLock)
-        schedLock.unlock();
+
+    schedLock.unlock();
+
     VERBOSE(VB_SCHEDULE, "AddNewRecords...");
     AddNewRecords();
     VERBOSE(VB_SCHEDULE, "AddNotListed...");
@@ -363,8 +364,8 @@ bool Scheduler::FillRecordList(bool doLock)
     SchedPreserveLiveTV();
     VERBOSE(VB_SCHEDULE, "ClearListMaps...");
     ClearListMaps();
-    if (doLock)
-        schedLock.lock();
+
+    schedLock.lock();
 
     VERBOSE(VB_SCHEDULE, "Sort by time...");
     SORT_RECLIST(worklist, comp_redundant);
@@ -417,6 +418,8 @@ void Scheduler::FillRecordListFromDB(int recordid)
         return;
     }
 
+    QMutexLocker locker(&schedLock);
+
     gettimeofday(&fillstart, NULL);
     UpdateMatches(recordid);
     gettimeofday(&fillend, NULL);
@@ -424,7 +427,7 @@ void Scheduler::FillRecordListFromDB(int recordid)
                  (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
 
     gettimeofday(&fillstart, NULL);
-    FillRecordList(false);
+    FillRecordList();
     gettimeofday(&fillend, NULL);
     placeTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
                  (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
@@ -2018,7 +2021,7 @@ bool Scheduler::HandleReschedule(void)
                        (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
 
     gettimeofday(&fillstart, NULL);
-    bool worklistused = FillRecordList(true);
+    bool worklistused = FillRecordList();
     gettimeofday(&fillend, NULL);
     if (worklistused)
     {
