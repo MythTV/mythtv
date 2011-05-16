@@ -132,17 +132,38 @@ class MTV_PUBLIC ChannelOptionsCommon: public VerticalConfigurationGroup
     XmltvID    *xmltvID;
 };
 
-class MTV_PUBLIC ChannelOptionsFilters: public VerticalConfigurationGroup {
+class MTV_PUBLIC ChannelOptionsFilters: public VerticalConfigurationGroup
+{
   public:
     ChannelOptionsFilters(const ChannelID& id);
 };
 
-class MTV_PUBLIC ChannelOptionsV4L: public VerticalConfigurationGroup {
+class MTV_PUBLIC ChannelOptionsV4L: public VerticalConfigurationGroup
+{
   public:
     ChannelOptionsV4L(const ChannelID& id);
 };
 
-class MTV_PUBLIC ChannelTVFormat : public ComboBoxSetting, public ChannelDBStorage
+class MTV_PUBLIC ChannelOptionsRawTS: public VerticalConfigurationGroup
+{
+  public:
+    ChannelOptionsRawTS(const ChannelID &id);
+
+    virtual void Load(void);
+    virtual void Save(void);
+
+  private:
+    const ChannelID &cid;
+
+    vector<TransLineEditSetting*> pids;
+    vector<TransComboBoxSetting*> sids;
+    vector<TransCheckBoxSetting*> pcrs;
+
+    static const uint kMaxPIDs = 10;
+};
+
+class MTV_PUBLIC ChannelTVFormat :
+    public ComboBoxSetting, public ChannelDBStorage
 {
   public:
     ChannelTVFormat(const ChannelID &id);

@@ -38,11 +38,12 @@ QString DTVParamHelper::toString(const char *strings[], int index,
     return strings[index];
 }
 
-const int DTVTunerType::kTunerTypeDVBS1   = 0x00;
-const int DTVTunerType::kTunerTypeDVBS2   = 0x20;
-const int DTVTunerType::kTunerTypeDVBC    = 0x01;
-const int DTVTunerType::kTunerTypeDVBT    = 0x02;
-const int DTVTunerType::kTunerTypeATSC    = 0x03;
+const int DTVTunerType::kTunerTypeDVBS1   = 0x0000;
+const int DTVTunerType::kTunerTypeDVBS2   = 0x0020;
+const int DTVTunerType::kTunerTypeDVBC    = 0x0001;
+const int DTVTunerType::kTunerTypeDVBT    = 0x0002;
+const int DTVTunerType::kTunerTypeATSC    = 0x0003;
+const int DTVTunerType::kTunerTypeASI     = 0x1000;
 const int DTVTunerType::kTunerTypeUnknown = 0x80000000;
 
 static QMutex dtv_tt_canonical_str_lock;
@@ -55,6 +56,7 @@ void DTVTunerType::initStr(void)
     dtv_tt_canonical_str[kTunerTypeDVBC]    = "QAM";
     dtv_tt_canonical_str[kTunerTypeDVBS1]   = "QPSK";
     dtv_tt_canonical_str[kTunerTypeDVBS2]   = "DVB_S2";
+    dtv_tt_canonical_str[kTunerTypeASI]     = "ASI";
     dtv_tt_canonical_str[kTunerTypeUnknown] = "UNKNOWN";
 }
 
@@ -74,6 +76,7 @@ const DTVParamHelperStruct DTVTunerType::parseTable[] =
     { "OFDM",    kTunerTypeDVBT    },
     { "ATSC",    kTunerTypeATSC    },
     { "DVB_S2",  kTunerTypeDVBS2   },
+    { "ASI",     kTunerTypeASI     },
     { "UNKNOWN", kTunerTypeUnknown },
     { NULL,      kTunerTypeUnknown },
 };

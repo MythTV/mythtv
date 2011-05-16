@@ -29,9 +29,9 @@ using namespace std;
 
 #define DEBUG_ATTRIB 1
 
-#define LOC QString("Channel(%1): ").arg(device)
-#define LOC_WARN QString("Channel(%1) Warning: ").arg(device)
-#define LOC_ERR QString("Channel(%1) Error: ").arg(device)
+#define LOC      QString("V4LChannel(%1): ").arg(device)
+#define LOC_WARN QString("V4LChannel(%1) Warning: ").arg(device)
+#define LOC_ERR  QString("V4LChannel(%1) Error: ").arg(device)
 
 static int format_to_mode(const QString& fmt, int v4l_version);
 static QString mode_to_format(int mode, int v4l_version);
@@ -39,10 +39,15 @@ static QString mode_to_format(int mode, int v4l_version);
 V4LChannel::V4LChannel(TVRec *parent, const QString &videodevice)
     : DTVChannel(parent),
       device(videodevice),          videofd(-1),
-      device_name(QString::null),   driver_name(QString::null),
+      device_name(),                driver_name(),
       curList(NULL),                totalChannels(0),
-      currentFormat(""),            is_dtv(false),
-      usingv4l2(false),             defaultFreqTable(1)
+      currentFormat(),
+      usingv4l2(false),
+      has_stream_io(false),         has_std_io(false),
+      has_async_io(false),
+      has_tuner(false),             has_sliced_vbi(false),
+
+      defaultFreqTable(1)
 {
 }
 
@@ -73,16 +78,37 @@ bool V4LChannel::Open(void)
     videofd = open(ascii_device.constData(), O_RDWR);
     if (videofd < 0)
     {
-         VERBOSE(VB_IMPORTANT,
-                 QString("Channel(%1)::Open(): Can't open video device, "
-                         "error \"%2\"").arg(device).arg(strerror(errno)));
+         VERBOSE(VB_IMPORTANT, LOC_ERR + "Can't open video device." + ENO);
          return false;
     }
 
-    usingv4l2 = CardUtil::hasV4L2(videofd);
-    CardUtil::GetV4LInfo(videofd, device_name, driver_name);
+    uint32_t version, capabilities;
+    if (!CardUtil::GetV4LInfo(videofd, device_name, driver_name,
+                              version, capabilities))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Failed to query capabilities." + ENO);
+        Close();
+        return false;
+    }
+
+    usingv4l2      = !!(capabilities & V4L2_CAP_VIDEO_CAPTURE);
+    has_stream_io  = !!(capabilities & V4L2_CAP_STREAMING);
+    has_std_io     = !!(capabilities & V4L2_CAP_READWRITE);
+    has_async_io   = !!(capabilities & V4L2_CAP_ASYNCIO);
+    has_tuner      = !!(capabilities & V4L2_CAP_TUNER);
+    has_sliced_vbi = !!(capabilities & V4L2_CAP_SLICED_VBI_CAPTURE);
+
     VERBOSE(VB_CHANNEL, LOC + QString("Device name '%1' driver '%2'.")
             .arg(device_name).arg(driver_name));
+
+    VERBOSE(VB_CHANNEL, LOC + QString(
+                "v4l2: %1 stream io: %2 std io: %3 async io: %4 "
+                "tuner %5 sliced vbi %6")
+            .arg(usingv4l2)
+            .arg(has_stream_io).arg(has_std_io).arg(has_async_io)
+            .arg(has_tuner).arg(has_sliced_vbi));
+
 
     if (!InitializeInputs())
     {
@@ -344,7 +370,6 @@ void V4LChannel::SetFormat(const QString &format)
     if ((fmt == currentFormat) || SetInputAndFormat(inputNum, fmt))
     {
         currentFormat = fmt;
-        is_dtv        = (fmt == "ATSC");
     }
 }
 
@@ -360,8 +385,12 @@ void V4LChannel::SetFreqTable(const int index)
     totalChannels = chanlists[index].count;
 }
 
-int V4LChannel::SetFreqTable(const QString &name)
+int V4LChannel::SetFreqTable(const QString &tablename)
 {
+    QString name = tablename;
+    if (name.toLower() == "default" || name.isEmpty())
+        name = defaultFreqTable;
+
     int i = 0;
     char *listname = (char *)chanlists[i].name;
 
@@ -399,203 +428,50 @@ int V4LChannel::GetCurrentChannelNum(const QString &channame)
     return -1;
 }
 
-void V4LChannel::SaveCachedPids(const pid_cache_t &pid_cache) const
+bool V4LChannel::Tune(const QString &freqid, int finetune)
 {
-    int chanid = GetChanID();
-    if (chanid > 0)
-        DTVChannel::SaveCachedPids(chanid, pid_cache);
-}
-
-void V4LChannel::GetCachedPids(pid_cache_t &pid_cache) const
-{
-    int chanid = GetChanID();
-    if (chanid > 0)
-        DTVChannel::GetCachedPids(chanid, pid_cache);
-}
-
-bool V4LChannel::SetChannelByString(const QString &channum)
-{
-    QString loc = LOC + QString("SetChannelByString(%1)").arg(channum);
-    QString loc_err = loc + ", Error: ";
-    VERBOSE(VB_CHANNEL, loc);
-
-    if (!Open())
-    {
-        VERBOSE(VB_IMPORTANT, loc_err + "Channel object "
-                "will not open, cannot change channels.");
-
-        return false;
-    }
-
-    QString inputName;
-    if (!CheckChannel(channum, inputName))
-    {
-        VERBOSE(VB_IMPORTANT, loc_err +
-                "CheckChannel failed.\n\t\t\tPlease verify the channel "
-                "in the 'mythtv-setup' Channel Editor.");
-
-        return false;
-    }
-
-    // If CheckChannel filled in the inputName then we need to
-    // change inputs and return, since the act of changing
-    // inputs will change the channel as well.
-    if (!inputName.isEmpty())
-        return ChannelBase::SelectInput(inputName, channum, false);
-
-    ClearDTVInfo();
-
-    InputMap::const_iterator it = m_inputs.find(m_currentInputID);
-    if (it == m_inputs.end())
-        return false;
-
-    uint mplexid_restriction;
-    if (!IsInputAvailable(m_currentInputID, mplexid_restriction))
-        return false;
-
-    // Fetch tuning data from the database.
-    QString tvformat, modulation, freqtable, freqid, dtv_si_std;
-    int finetune;
-    uint64_t frequency;
-    int mpeg_prog_num;
-    uint atsc_major, atsc_minor, mplexid, tsid, netid;
-
-    if (!ChannelUtil::GetChannelData(
-        (*it)->sourceid, channum,
-        tvformat, modulation, freqtable, freqid,
-        finetune, frequency,
-        dtv_si_std, mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
-        mplexid, m_commfree))
-    {
-        return false;
-    }
-
-    if (mplexid_restriction && (mplexid != mplexid_restriction))
-        return false;
-
-    // If the frequency is zeroed out, don't use it directly.
-    bool ok = (frequency > 0);
-
-    if (!ok)
-    {
-        frequency = (freqid.toInt(&ok) + finetune) * 1000;
-        mplexid = 0;
-    }
-    bool isFrequency = ok && (frequency > 10000000);
-
-    // If we are tuning to a freqid, rather than an actual frequency,
-    // we need to set the frequency table to use.
-    if (!isFrequency)
-    {
-        if (freqtable == "default" || freqtable.isEmpty())
-            SetFreqTable(defaultFreqTable);
-        else
-            SetFreqTable(freqtable);
-    }
-
-    // Set NTSC, PAL, ATSC, etc.
-    SetFormat(tvformat);
-
-    // If a tuneToChannel is set make sure we're still on it
-    if (!(*it)->tuneToChannel.isEmpty() && (*it)->tuneToChannel != "Undefined")
-        TuneTo((*it)->tuneToChannel, 0);
-
-    // Tune to proper frequency
-    if ((*it)->externalChanger.isEmpty())
-    {
-        if ((*it)->name.contains("composite", Qt::CaseInsensitive) ||
-            (*it)->name.contains("s-video", Qt::CaseInsensitive))
-        {
-            VERBOSE(VB_GENERAL, LOC_WARN + "You have not set "
-                    "an external channel changing"
-                    "\n\t\t\tscript for a composite or s-video "
-                    "input. Channel changing will do nothing.");
-        }
-        else if (isFrequency)
-        {
-            if (!Tune(frequency, "", (is_dtv) ? "8vsb" : "analog", dtv_si_std))
-            {
-                return false;
-            }
-        }
-        else
-        {
-            if (!TuneTo(freqid, finetune))
-                return false;
-        }
-    }
-    else if (!ChangeExternalChannel(freqid))
-        return false;
-
-    // Set the current channum to the new channel's channum
-    QString tmp = channum; tmp.detach();
-    m_curchannelname = tmp;
-
-    // Setup filters & recording picture attributes for framegrabing recorders
-    // now that the new curchannelname has been established.
-    if (m_pParent)
-        m_pParent->SetVideoFiltersForChannel(GetCurrentSourceID(), channum);
-    InitPictureAttributes();
-
-    // Set the major and minor channel for any additional multiplex tuning
-    SetDTVInfo(atsc_major, atsc_minor, netid, tsid, mpeg_prog_num);
-
-    // Set this as the future start channel for this source
-    QString tmpX = m_curchannelname; tmpX.detach();
-    m_inputs[m_currentInputID]->startChanNum = tmpX;
-
-    return true;
-}
-
-bool V4LChannel::TuneTo(const QString &channum, int finetune)
-{
-    int i = GetCurrentChannelNum(channum);
-    VERBOSE(VB_CHANNEL, QString("Channel(%1)::TuneTo(%2): "
+    int i = GetCurrentChannelNum(freqid);
+    VERBOSE(VB_CHANNEL, QString("Channel(%1)::Tune(%2): "
                                 "curList[%3].freq(%4)")
-            .arg(device).arg(channum).arg(i)
+            .arg(device).arg(freqid).arg(i)
             .arg((i != -1) ? curList[i].freq : -1));
 
     if (i == -1)
     {
-        VERBOSE(VB_IMPORTANT, QString("Channel(%1)::TuneTo(%2): Error, "
+        VERBOSE(VB_IMPORTANT, QString("Channel(%1)::Tune(%2): Error, "
                                       "failed to find channel.")
-                .arg(device).arg(channum));
+                .arg(device).arg(freqid));
         return false;
     }
 
     int frequency = (curList[i].freq + finetune) * 1000;
 
-    return Tune(frequency, "", "analog", "analog");
+    return Tune(frequency, "");
 }
 
 bool V4LChannel::Tune(const DTVMultiplex &tuning, QString inputname)
 {
     return Tune(tuning.frequency - 1750000, // to visual carrier
-                inputname, tuning.modulation.toString(), tuning.sistandard);
+                inputname);
 }
 
-/** \fn V4LChannel::Tune(uint,QString,QString,QString)
- *  \brief Tunes to a specific frequency (Hz) on a particular input, using
- *         the specified modulation.
+/** \brief Tunes to a specific frequency (Hz) on a particular input
  *
- *  Note: This function always uses modulator zero.
+ *  \note This function always uses modulator zero.
+ *  \note Unlike digital tuning functions this accepts the visual carrier
+ *        frequency and not the center frequency.
  *
  *  \param frequency Frequency in Hz, this is divided by 62.5 kHz or 62.5 Hz
  *                   depending on the modulator and sent to the hardware.
  *  \param inputname Name of the input (Television, Antenna 1, etc.)
  *  \param modulation "radio", "analog", or "digital"
  */
-bool V4LChannel::Tune(uint frequency, QString inputname,
-                   QString modulation, QString si_std)
+bool V4LChannel::Tune(uint64_t frequency, QString inputname)
 {
-    VERBOSE(VB_CHANNEL, LOC + QString("Tune(%1, %2, %3, %4)")
-            .arg(frequency).arg(inputname).arg(modulation).arg(si_std));
+    VERBOSE(VB_CHANNEL, LOC + QString("Tune(%1, %2)")
+            .arg(frequency).arg(inputname));
 
     int ioctlval = 0;
-
-    if (modulation == "8vsb")
-        SetFormat("ATSC");
-    modulation = (is_dtv) ? "digital" : modulation;
 
     int inputnum = GetInputByName(inputname);
 
@@ -607,20 +483,6 @@ bool V4LChannel::Tune(uint frequency, QString inputname,
 
     if (!ok)
         return false;
-
-    // If the frequency is a center frequency and not
-    // a visual carrier frequency, convert it.
-    int offset = frequency % 1000000;
-    offset = (offset > 500000) ? 1000000 - offset : offset;
-    bool is_visual_carrier = (offset > 150000) && (offset < 350000);
-    if (!is_visual_carrier && currentFormat == "ATSC")
-    {
-        VERBOSE(VB_CHANNEL,  QString("Channel(%1): ").arg(device) +
-                QString("Converting frequency from center frequency "
-                        "(%1 Hz) to visual carrier frequency (%2 Hz).")
-                .arg(frequency).arg(frequency - 1750000));
-        frequency -= 1750000; // convert to visual carrier
-    }
 
     // Video4Linux version 2 tuning
     if (usingv4l2)
@@ -643,15 +505,6 @@ bool V4LChannel::Tune(uint frequency, QString inputname,
         vf.tuner = 0; // use first tuner
         vf.frequency = (isTunerCapLow) ?
             ((int)(frequency / 62.5)) : (frequency / 62500);
-
-        if (modulation.toLower() == "digital")
-        {
-            VERBOSE(VB_CHANNEL, "using digital modulation");
-            vf.type = V4L2_TUNER_DIGITAL_TV;
-            if (ioctl(videofd, VIDIOC_S_FREQUENCY, &vf)>=0)
-                return true;
-            VERBOSE(VB_CHANNEL, "digital modulation failed");
-        }
 
         vf.type = V4L2_TUNER_ANALOG_TV;
 
@@ -687,8 +540,6 @@ bool V4LChannel::Tune(uint frequency, QString inputname,
                 .arg(device).arg(ioctlval).arg(strerror(errno)));
         return false;
     }
-
-    SetSIStandard(si_std);
 
     return true;
 }
@@ -730,34 +581,6 @@ bool V4LChannel::Retune(void)
     return false;
 }
 
-// documented in dtvchannel.h
-bool V4LChannel::TuneMultiplex(uint mplexid, QString inputname)
-{
-    VERBOSE(VB_CHANNEL, LOC + QString("TuneMultiplex(%1)").arg(mplexid));
-
-    QString  modulation;
-    QString  si_std;
-    uint64_t frequency;
-    uint     transportid;
-    uint     dvb_networkid;
-
-    if (!ChannelUtil::GetTuningParams(
-            mplexid, modulation, frequency,
-            transportid, dvb_networkid, si_std))
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "TuneMultiplex(): " +
-                QString("Could not find tuning parameters for multiplex %1.")
-                .arg(mplexid));
-
-        return false;
-    }
-
-    if (!Tune(frequency, inputname, modulation, si_std))
-        return false;
-
-    return true;
-}
-
 QString V4LChannel::GetFormatForChannel(QString channum, QString inputname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -795,54 +618,64 @@ bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
 
     if (usingv4l2)
     {
-        VERBOSE(VB_CHANNEL, LOC + msg + "(v4l v2)");
+        struct v4l2_input input;
+        int ioctlval = ioctl(videofd, VIDIOC_G_INPUT, &input);
+        bool input_switch = (0 != ioctlval || (uint)inputNumV4L != input.index);
 
-        int ioctlval = ioctl(videofd, VIDIOC_S_INPUT, &inputNumV4L);
+        const v4l2_std_id new_vid_mode = format_to_mode(newFmt, 2);
+        v4l2_std_id cur_vid_mode;
+        ioctlval = ioctl(videofd, VIDIOC_G_STD, &cur_vid_mode);
+        bool mode_switch = (0 != ioctlval || new_vid_mode != cur_vid_mode);
+        bool needs_switch = input_switch || mode_switch;
+
+        VERBOSE(VB_IMPORTANT, LOC + msg + "(v4l v2) " +
+                QString("input_switch: %1 mode_switch: %2")
+                .arg(input_switch).arg(mode_switch));
 
         // ConvertX (wis-go7007) requires streaming to be disabled
-        // before an input switch, do this if initial switch failed.
+        // before an input switch, do this if CAP_STREAMING is set.
         bool streamingDisabled = false;
         int  streamType = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        if ((ioctlval < 0) && (errno == EBUSY))
+        if (needs_switch && has_stream_io)
         {
             ioctlval = ioctl(videofd, VIDIOC_STREAMOFF, &streamType);
             if (ioctlval < 0)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR + msg +
                         "\n\t\t\twhile disabling streaming (v4l v2)" + ENO);
-
                 ok = false;
-                ioctlval = 0;
             }
             else
             {
                 streamingDisabled = true;
-
-                // Resend the input switch ioctl.
-                ioctlval = ioctl(videofd, VIDIOC_S_INPUT, &inputNumV4L);
             }
         }
 
-        if (ioctlval < 0)
+        if (input_switch)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + msg +
-                    "\n\t\t\twhile setting input (v4l v2)" + ENO);
+            // Send the input switch ioctl.
+            ioctlval = ioctl(videofd, VIDIOC_S_INPUT, &inputNumV4L);
+            if (ioctlval < 0)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + msg +
+                        "\n\t\t\twhile setting input (v4l v2)" + ENO);
 
-            ok = false;
+                ok = false;
+            }
         }
 
-        v4l2_std_id vid_mode = format_to_mode(newFmt, 2);
-        ioctlval = ioctl(videofd, VIDIOC_S_STD, &vid_mode);
-        if (ioctlval < 0)
+        if (mode_switch)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + msg +
-                    "\n\t\t\twhile setting format (v4l v2)" + ENO);
+            ioctlval = ioctl(videofd, VIDIOC_S_STD, &new_vid_mode);
+            if (ioctlval < 0)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + msg +
+                        "\n\t\t\twhile setting format (v4l v2)" + ENO);
 
-            ok = false;
+                ok = false;
+            }
         }
 
-        // ConvertX (wis-go7007) requires streaming to be disabled
-        // before an input switch, here we try to re-enable streaming.
         if (streamingDisabled)
         {
             ioctlval = ioctl(videofd, VIDIOC_STREAMON, &streamType);
@@ -916,10 +749,6 @@ bool V4LChannel::SwitchToInput(int inputnum, bool setstarting)
 
     bool ok = SetInputAndFormat(inputnum, newFmt);
 
-    // Try to set ATSC mode if NTSC fails
-    if (!ok && newFmt == "NTSC")
-        ok = SetInputAndFormat(inputnum, "ATSC");
-
     if (!ok)
     {
         VERBOSE(VB_IMPORTANT, LOC + "SetInputAndFormat() failed");
@@ -927,12 +756,11 @@ bool V4LChannel::SwitchToInput(int inputnum, bool setstarting)
     }
 
     currentFormat     = newFmt;
-    is_dtv            = newFmt == "ATSC";
     m_currentInputID = inputnum;
     m_curchannelname    = ""; // this will be set by SetChannelByString
 
     if (!tuneFreqId.isEmpty() && tuneFreqId != "Undefined")
-        ok = TuneTo(tuneFreqId, 0);
+        ok = Tune(tuneFreqId, 0);
 
     if (!ok)
         return false;
@@ -986,7 +814,7 @@ static int get_v4l2_attribute(const QString &db_col_name)
 
 bool V4LChannel::InitPictureAttribute(const QString db_col_name)
 {
-    if (!m_pParent || is_dtv)
+    if (!m_pParent)
         return false;
 
     int v4l2_attrib = get_v4l2_attribute(db_col_name);
@@ -1251,7 +1079,7 @@ static int set_attribute_value(bool usingv4l2, int videofd,
 int V4LChannel::ChangePictureAttribute(
     PictureAdjustType type, PictureAttribute attr, bool up)
 {
-    if (!m_pParent || is_dtv)
+    if (!m_pParent)
         return -1;
 
     QString db_col_name = toDBString(attr);

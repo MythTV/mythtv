@@ -550,9 +550,8 @@ static int transUnlink(QString filename, ProgramInfo *pginfo)
         QString port = gCoreContext->GetSettingOnHost("BackendServerPort",
                                                   pginfo->GetHostname());
         QString basename = filename.section('/', -1);
-        QString uri = QString("myth://%1@%2:%3/%4")
-            .arg(pginfo->GetStorageGroup())
-            .arg(ip).arg(port).arg(basename);
+        QString uri = gCoreContext->GenMythURL(ip,port,basename,pginfo->GetStorageGroup());
+
         VERBOSE(VB_IMPORTANT, QString("Requesting delete for file '%1'.")
                                       .arg(uri));
         bool ok = RemoteFile::DeleteFile(uri);

@@ -38,86 +38,6 @@ FirewireChannel::FirewireChannel(TVRec *parent, const QString &_videodevice,
 #endif // USING_OSX_FIREWIRE
 }
 
-bool FirewireChannel::SetChannelByString(const QString &channum)
-{
-    QString loc = LOC + QString("SetChannelByString(%1)").arg(channum);
-    VERBOSE(VB_CHANNEL, loc);
-
-    InputMap::const_iterator it = m_inputs.find(m_currentInputID);
-    if (it == m_inputs.end())
-        return false;
-
-    uint mplexid_restriction;
-    if (!IsInputAvailable(m_currentInputID, mplexid_restriction))
-    {
-        VERBOSE(VB_IMPORTANT, loc + " " + QString(
-                    "Requested channel '%1' is on input '%2' "
-                    "which is in a busy input group")
-                .arg(channum).arg(m_currentInputID));
-
-        return false;
-    }
-
-    // Fetch tuning data from the database.
-    QString tvformat, modulation, freqtable, freqid, dtv_si_std;
-    int finetune;
-    uint64_t frequency;
-    int mpeg_prog_num;
-    uint atsc_major, atsc_minor, mplexid, tsid, netid;
-
-    if (!ChannelUtil::GetChannelData(
-        (*it)->sourceid, channum,
-        tvformat, modulation, freqtable, freqid,
-        finetune, frequency,
-        dtv_si_std, mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
-        mplexid, m_commfree))
-    {
-        VERBOSE(VB_IMPORTANT, loc + " " + QString(
-                    "Requested channel '%1' is on input '%2' "
-                    "which is in a busy input group")
-                .arg(channum).arg(m_currentInputID));
-
-        return false;
-    }
-
-    if (mplexid_restriction && (mplexid != mplexid_restriction))
-    {
-        VERBOSE(VB_IMPORTANT, loc + " " + QString(
-                    "Requested channel '%1' is not available because "
-                    "the tuner is currently in use on another transport.")
-                .arg(channum));
-
-        return false;
-    }
-
-    bool ok = false;
-    if (!(*it)->externalChanger.isEmpty())
-    {
-        ok = ChangeExternalChannel(freqid);
-        SetSIStandard("mpeg");
-        SetDTVInfo(0,0,0,0,1);
-    }
-    else
-    {
-        uint ichan = freqid.toUInt(&ok);
-        ok = ok && isopen && SetChannelByNumber(ichan);
-    }
-
-    if (ok)
-    {
-        // Set the current channum to the new channel's channum
-        QString tmp = channum;
-        tmp.detach();
-        m_curchannelname = tmp;
-        tmp.detach();
-        (*it)->startChanNum = tmp;
-    }
-
-    VERBOSE(VB_CHANNEL, loc + " " + ((ok) ? "success" : "failure"));
-
-    return ok;
-}
-
 bool FirewireChannel::Open(void)
 {
     VERBOSE(VB_CHANNEL, LOC + "Open()");
@@ -206,23 +126,27 @@ bool FirewireChannel::Retune(void)
     }
 
     if (current_channel)
-        return SetChannelByNumber(current_channel);
+    {
+        QString freqid = QString::number(current_channel);
+        return Tune(freqid, 0);
+    }
 
     return false;
 }
 
-bool FirewireChannel::SetChannelByNumber(int channel)
+bool FirewireChannel::Tune(const QString &freqid, int /*finetune*/)
 {
-    VERBOSE(VB_CHANNEL, QString("SetChannelByNumber(%1)").arg(channel));
-    current_channel = channel;
+    VERBOSE(VB_CHANNEL, QString("Tune(%1)").arg(freqid));
+
+    bool ok;
+    uint channel = freqid.toUInt(&ok);
+    if (!ok)
+        return false;
 
     if (FirewireDevice::kAVCPowerOff == GetPowerState())
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN +
                 "STB is turned off, must be on to set channel.");
-
-        SetSIStandard("mpeg");
-        SetDTVInfo(0,0,0,0,1);
 
         return true; // signal monitor will call retune later...
     }
@@ -230,8 +154,7 @@ bool FirewireChannel::SetChannelByNumber(int channel)
     if (!device->SetChannel(fw_opts.model, 0, channel))
         return false;
 
-    SetSIStandard("mpeg");
-    SetDTVInfo(0,0,0,0,1);
+    current_channel = channel;
 
     return true;
 }

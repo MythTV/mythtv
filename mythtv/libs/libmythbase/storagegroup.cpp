@@ -806,9 +806,10 @@ QStringList StorageGroup::getGroupDirs(QString groupname, QString host)
              * value using QString::fromUtf8() to prevent corruption. */
             dirname = QString::fromUtf8(query.value(0)
                                         .toByteArray().constData());
-            groups += QString("myth://%1@%2%3").arg(groupname)
-                                       .arg(query.value(1).toString())
-                                       .arg(dirname);
+            groups += gCoreContext->GenMythURL(query.value(1).toString(),
+                                               0,
+                                               dirname,
+                                               groupname);
         }
     }
 

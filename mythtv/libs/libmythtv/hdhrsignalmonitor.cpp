@@ -89,7 +89,7 @@ HDHRChannel *HDHRSignalMonitor::GetHDHRChannel(void)
  */
 void HDHRSignalMonitor::UpdateValues(void)
 {
-    if (!monitor_thread.isRunning() || exit)
+    if (!running || exit)
         return;
 
     if (streamHandlerStarted)
@@ -103,9 +103,6 @@ void HDHRSignalMonitor::UpdateValues(void)
         update_done = true;
         return;
     }
-
-    if (!IsChannelTuned())
-        return;
 
     struct hdhomerun_tuner_status_t status;
     streamHandler->GetTunerStatus(&status);

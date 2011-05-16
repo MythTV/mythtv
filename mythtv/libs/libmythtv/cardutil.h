@@ -60,6 +60,7 @@ class MTV_PUBLIC CardUtil
         DVBS2     = 13,
         IMPORT    = 14,
         DEMO      = 15,
+        ASI       = 16,
     };
 
     static enum CARD_TYPES toCardType(const QString &name)
@@ -96,6 +97,8 @@ class MTV_PUBLIC CardUtil
             return IMPORT;
         if ("DEMO" == name)
             return DEMO;
+        if ("ASI" == name)
+            return ASI;
         return ERROR_UNKNOWN;
     }
 
@@ -104,7 +107,15 @@ class MTV_PUBLIC CardUtil
         return
             (rawtype != "DVB")       && (rawtype != "FIREWIRE") &&
             (rawtype != "HDHOMERUN") && (rawtype != "FREEBOX")  &&
-            (rawtype != "IMPORT")    && (rawtype != "DEMO");
+            (rawtype != "IMPORT")    && (rawtype != "DEMO")     &&
+            (rawtype != "ASI");
+    }
+
+    static bool         IsV4L(const QString &rawtype)
+    {
+        return (rawtype == "V4L"   || rawtype == "MPEG"      ||
+                rawtype == "HDPVR" || rawtype == "GO7007"    ||
+                rawtype == "MJPEG");
     }
 
     static bool         IsChannelChangeDiscontinuous(const QString &rawtype)
@@ -116,8 +127,10 @@ class MTV_PUBLIC CardUtil
     {
         return
             (rawtype == "FIREWIRE")  || (rawtype == "HDPVR") ||
-            (rawtype == "IMPORT")    || (rawtype == "DEMO");
+            (rawtype == "IMPORT")    || (rawtype == "DEMO")  ||
+            (rawtype == "GO7007")    || (rawtype == "MJPEG");
     }
+    static QString      GetScanableCardTypes(void);
 
     static bool         IsEITCapable(const QString &rawtype)
     {
@@ -127,7 +140,9 @@ class MTV_PUBLIC CardUtil
 
     static bool         IsTunerSharingCapable(const QString &rawtype)
     {
-        return (rawtype == "DVB")   || (rawtype == "HDHOMERUN");
+        return
+            (rawtype == "DVB")       || (rawtype == "HDHOMERUN") ||
+            (rawtype == "ASI");
     }
 
     static bool         IsTunerShared(uint cardidA, uint cardidB);
@@ -135,21 +150,27 @@ class MTV_PUBLIC CardUtil
     static bool         IsTuningDigital(const QString &rawtype)
     {
         return
-            (rawtype == "DVB")       || (rawtype == "HDHOMERUN");
+            (rawtype == "DVB")       || (rawtype == "HDHOMERUN") ||
+            (rawtype == "ASI");
     }
 
     static bool         IsTuningAnalog(const QString &rawtype)
     {
         return
-            (rawtype == "V4L")    || (rawtype == "MPEG") ||
-            (rawtype == "HDPVR");
+            (rawtype == "V4L")       || (rawtype == "MPEG");
+    }
+
+    static bool         IsTuningVirtual(const QString &rawtype)
+    {
+        return
+            (rawtype == "FIREWIRE")  || (rawtype == "HDPVR");
     }
 
     static bool         IsSingleInputCard(const QString &rawtype)
     {
         return
             (rawtype == "FIREWIRE")  || (rawtype == "HDHOMERUN") ||
-            (rawtype == "FREEBOX")   ||
+            (rawtype == "FREEBOX")   || (rawtype == "ASI")       ||
             (rawtype == "IMPORT")    || (rawtype == "DEMO");
     }
 
@@ -282,15 +303,26 @@ class MTV_PUBLIC CardUtil
     // V4L info
     static bool         hasV4L2(int videofd);
     static bool         GetV4LInfo(int videofd, QString &card, QString &driver,
-                                   uint32_t &version);
+                                   uint32_t &version, uint32_t &capabilities);
     static bool         GetV4LInfo(int videofd, QString &card, QString &driver)
-        { uint32_t dummy; return GetV4LInfo(videofd, card, driver, dummy); }
+        { uint32_t d1,d2; return GetV4LInfo(videofd, card, driver, d1, d2); }
     static InputNames   ProbeV4LVideoInputs(int videofd, bool &ok);
     static InputNames   ProbeV4LAudioInputs(int videofd, bool &ok);
 
     // HDHomeRun info
     static bool         HDHRdoesDVB(const QString &device);
     static QString      GetHDHRdesc(const QString &device);
+
+    // ASI info
+    static int          GetASIDeviceNumber(const QString &device,
+                                           QString *error = NULL);
+
+    static uint         GetASIBufferSize(uint device_num,
+                                         QString *error = NULL);
+    static int          GetASIMode(uint device_num,
+                                   QString *error = NULL);
+    static bool         SetASIMode(uint device_num, uint mode,
+                                   QString *error = NULL);
 
   private:
     static QStringList  ProbeV4LVideoInputs(QString device);

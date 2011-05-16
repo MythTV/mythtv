@@ -32,11 +32,20 @@ class MythFrontendStatus : public HttpServerExtension
         if (pRequest->m_sBaseUrl != "/")
             return false;
 
+        if (pRequest->m_sMethod == "getDeviceDesc")
+            return false;
+
         pRequest->m_eResponseType = ResponseTypeHTML;
         pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
 
+        SSDPCacheEntries* cache = NULL;
+        QString ipaddress = QString();
+        if (!UPnp::g_IPAddrList.isEmpty())
+            ipaddress = UPnp::g_IPAddrList.at(0);
+
         QString shortdateformat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
         QString timeformat      = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
+        QString hostname   = gCoreContext->GetHostName();
         QDateTime qdtNow   = QDateTime::currentDateTime();
         QString masterhost = gCoreContext->GetMasterHostName();
         QString masterip   = gCoreContext->GetSetting("MasterServerIP");
@@ -53,104 +62,88 @@ class MythFrontendStatus : public HttpServerExtension
            << "<head>\r\n"
            << "  <meta http-equiv=\"Content-Type\""
            << "content=\"text/html; charset=UTF-8\" />\r\n"
-           << "  <style type=\"text/css\" title=\"Default\" media=\"all\">\r\n"
-           << "  <!--\r\n"
-           << "  body {\r\n"
-           << "    background-color:#fff;\r\n"
-           << "    font:11px verdana, arial, helvetica, sans-serif;\r\n"
-           << "    margin:20px;\r\n"
-           << "  }\r\n"
-           << "  h1 {\r\n"
-           << "    font-size:28px;\r\n"
-           << "    font-weight:900;\r\n"
-           << "    color:#ccc;\r\n"
-           << "    letter-spacing:0.5em;\r\n"
-           << "    margin-bottom:30px;\r\n"
-           << "    width:650px;\r\n"
-           << "    text-align:center;\r\n"
-           << "  }\r\n"
-           << "  h2 {\r\n"
-           << "    font-size:18px;\r\n"
-           << "    font-weight:800;\r\n"
-           << "    color:#360;\r\n"
-           << "    border:none;\r\n"
-           << "    letter-spacing:0.3em;\r\n"
-           << "    padding:0px;\r\n"
-           << "    margin-bottom:10px;\r\n"
-           << "    margin-top:0px;\r\n"
-           << "  }\r\n"
-           << "  hr {\r\n"
-           << "    display:none;\r\n"
-           << "  }\r\n"
-           << "  div.content {\r\n"
-           << "    width:650px;\r\n"
-           << "    border-top:1px solid #000;\r\n"
-           << "    border-right:1px solid #000;\r\n"
-           << "    border-bottom:1px solid #000;\r\n"
-           << "    border-left:10px solid #000;\r\n"
-           << "    padding:10px;\r\n"
-           << "    margin-bottom:30px;\r\n"
-           << "    -moz-border-radius:8px 0px 0px 8px;\r\n"
-           << "  }\r\n"
-           << "  div.schedule a {\r\n"
-           << "    display:block;\r\n"
-           << "    color:#000;\r\n"
-           << "    text-decoration:none;\r\n"
-           << "    padding:.2em .8em;\r\n"
-           << "    border:thin solid #fff;\r\n"
-           << "    width:350px;\r\n"
-           << "  }\r\n"
-           << "  div.schedule a span {\r\n"
-           << "    display:none;\r\n"
-           << "  }\r\n"
-           << "  div.schedule a:hover {\r\n"
-           << "    background-color:#F4F4F4;\r\n"
-           << "    border-top:thin solid #000;\r\n"
-           << "    border-bottom:thin solid #000;\r\n"
-           << "    border-left:thin solid #000;\r\n"
-           << "    cursor:default;\r\n"
-           << "  }\r\n"
-           << "  div.schedule a:hover span {\r\n"
-           << "    display:block;\r\n"
-           << "    position:absolute;\r\n"
-           << "    background-color:#F4F4F4;\r\n"
-           << "    color:#000;\r\n"
-           << "    left:400px;\r\n"
-           << "    margin-top:-20px;\r\n"
-           << "    width:280px;\r\n"
-           << "    padding:5px;\r\n"
-           << "    border:thin dashed #000;\r\n"
-           << "  }\r\n"
-           << "  div.loadstatus {\r\n"
-           << "    width:325px;\r\n"
-           << "    height:7em;\r\n"
-           << "  }\r\n"
-           << "  .jobfinished { color: #0000ff; }\r\n"
-           << "  .jobaborted { color: #7f0000; }\r\n"
-           << "  .joberrored { color: #ff0000; }\r\n"
-           << "  .jobrunning { color: #005f00; }\r\n"
-           << "  .jobqueued  {  }\r\n"
-           << "  -->\r\n"
-           << "  </style>\r\n"
            << "  <title>MythFrontend Status - "
            << qdtNow.toString(shortdateformat) << " "
            << qdtNow.toString(timeformat) << " - "
            << MYTH_BINARY_VERSION << "</title>\r\n"
+           << "  <link rel=\"stylesheet\" href=\"/css/site.css\"   type=\"text/css\">\r\n"
+           << "  <link rel=\"stylesheet\" href=\"/css/Status.css\" type=\"text/css\">\r\n"
            << "</head>\r\n"
            << "<body>\r\n\r\n"
-           << "  <h1>MythFrontend Status</h1>\r\n";
+           << "  <h1 class=\"status\">MythFrontend Status</h1>\r\n";
 
+        // This frontend
         stream
            << "  <div class=\"content\">\r\n"
-           << "    <h2>Master Backend</h2>\r\n"
-           << masterhost << "&nbsp(<a href=\"http://"
+           << "    <h2 class=\"status\">This Frontend</h2>\r\n"
+           << "Name : " << hostname << "<br />\r\n"
+           << "Version : " << MYTH_BINARY_VERSION << "\r\n"
+           << "  </div>\r\n";
+
+        // Other frontends
+
+        // This will not work with multiple frontends on the same machine (upnp
+        // setup will fail on a second frontend anyway) and the ip address
+        // filtering of the current frontend may not work in all situations
+
+        cache = SSDP::Find("urn:schemas-mythtv-org:service:MythFrontend:1");
+        if (cache)
+        {
+            stream
+               << "  <div class=\"content\">\r\n"
+               << "    <h2 class=\"status\">Other Frontends</h2>\r\n";
+            cache->AddRef();
+            cache->Lock();
+            EntryMap* map = cache->GetEntryMap();
+            QMapIterator< QString, DeviceLocation * > i(*map);
+            while (i.hasNext())
+            {
+                i.next();
+                QUrl url(i.value()->m_sLocation);
+                if (url.host() != ipaddress)
+                {
+                    stream << "<br />" << url.host() << "&nbsp(<a href=\""
+                           << url.toString(QUrl::RemovePath) << "\">Status page</a>)\r\n";
+                }
+            }
+            cache->Unlock();
+            cache->Release();
+            stream << "  </div>\r\n";
+        }
+
+        // Master backend
+        stream
+           << "  <div class=\"content\">\r\n"
+           << "    <h2 class=\"status\">MythTV Backends</h2>\r\n"
+           << "Master: " << masterhost << "&nbsp(<a href=\"http://"
            << masterip << ":" << masterport
-           << "\">Status page</a>)\r\n"
+           << "\">Status page</a>)\r\n";
+
+        // Slave backends
+        cache = SSDP::Find("urn:schemas-mythtv-org:device:SlaveMediaServer:1");
+        if (cache)
+        {
+            cache->AddRef();
+            cache->Lock();
+            EntryMap* map = cache->GetEntryMap();
+            QMapIterator< QString, DeviceLocation * > i(*map);
+            while (i.hasNext())
+            {
+                i.next();
+                QUrl url(i.value()->m_sLocation);
+                stream << "<br />" << "Slave: " << url.host() << "&nbsp(<a href=\""
+                       << url.toString(QUrl::RemovePath) << "\">Status page</a>)\r\n";
+            }
+            cache->Unlock();
+            cache->Release();
+        }
+
+        stream
            << "  </div>\r\n";
 
         stream
            << "  <div class=\"content\">\r\n"
-           << "    <h2>Services</h2>\r\n"
+           << "    <h2 class=\"status\">Services</h2>\r\n"
            << "    <a href=\"MythFE/GetRemote\">Remote Control</a>\r\n"
            << "  </div>\r\n";
 
@@ -159,7 +152,7 @@ class MythFrontendStatus : public HttpServerExtension
         {
             stream
                << "  <div class=\"content\">\r\n"
-               << "    <h2>Machine Information</h2>\r\n"
+               << "    <h2 class=\"status\">Machine Information</h2>\r\n"
                << "    <div class=\"loadstatus\">\r\n"
                << "      This machine's load average:"
                << "\r\n      <ul>\r\n        <li>"
@@ -211,7 +204,7 @@ MediaRenderer::MediaRenderer()
     if (!m_pHttpServer)
         return;
 
-    if (!m_pHttpServer->listen(QHostAddress::Any, nPort))
+    if (!m_pHttpServer->listen(QHostAddress::AnyIPv6, nPort))
     {
         VERBOSE(VB_IMPORTANT, "MediaRenderer::HttpServer Create Error");
         delete m_pHttpServer;
@@ -281,13 +274,14 @@ MediaRenderer::MediaRenderer()
 
         Start();
 
+        // ensure the frontend is aware of all backends (slave and master) and
+        // other frontends
+        SSDP::Instance()->PerformSearch("ssdp:all");
     }
     else
     {
         VERBOSE(VB_IMPORTANT, "MediaRenderer::Unable to Initialize UPnp Stack");
     }
-
-
 
     VERBOSE(VB_UPNP, QString( "MediaRenderer::End" ));
 }

@@ -1192,30 +1192,6 @@ int RingBuffer::Read(void *buf, int count)
     return ret;
 }
 
-/** \fn RingBuffer::IsIOBound(void) const
- *  \brief Returns true if a RingBuffer::Write(void*,int) is likely to block.
- */
-bool RingBuffer::IsIOBound(void) const
-{
-    bool ret = false;
-    int used, free;
-    rwlock.lockForRead();
-
-    if (!tfw)
-    {
-        rwlock.unlock();
-        return ret;
-    }
-
-    used = tfw->BufUsed();
-    free = tfw->BufFree();
-
-    ret = (used * 5 > free);
-
-    rwlock.unlock();
-    return ret;
-}
-
 /** \fn RingBuffer::Write(const void*, uint)
  *  \brief Writes buffer to ThreadedFileWriter::Write(const void*,uint)
  *  \return Bytes written, or -1 on error.
@@ -1303,17 +1279,6 @@ void RingBuffer::WriterFlush(void)
         tfw->Flush();
         tfw->Sync();
     }
-    rwlock.unlock();
-}
-
-/** \fn RingBuffer::SetWriteBufferSize(int)
- *  \brief Calls ThreadedFileWriter::SetWriteBufferSize(int)
- */
-void RingBuffer::SetWriteBufferSize(int newSize)
-{
-    rwlock.lockForRead();
-    if (tfw)
-        tfw->SetWriteBufferSize(newSize);
     rwlock.unlock();
 }
 

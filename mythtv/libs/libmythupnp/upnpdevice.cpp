@@ -33,6 +33,7 @@
 
 #include <QFile>
 #include <QTextStream>
+#include <QHostAddress>
 
 int DeviceLocation::g_nAllocated   = 0;       // Debugging only
 
@@ -353,6 +354,18 @@ void UPnpDeviceDesc::GetValidXML(
 {
 //    os.setEncoding( QTextStream::UnicodeUTF8 );
 
+    QString BaseAddr;
+    QHostAddress addr(sBaseAddress);
+
+#if !defined(QT_NO_IPV6)
+    // Basically if it appears to be an IPv6 IP surround the IP with [] otherwise don't bother
+    if (( addr.protocol() == QAbstractSocket::IPv6Protocol ) || (sBaseAddress.contains(":")))
+        BaseAddr = "[" + sBaseAddress + "]";
+    else
+#endif
+    if ( addr.protocol() == QAbstractSocket::IPv4Protocol )
+        BaseAddr = sBaseAddress;
+
     os << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
           "<root xmlns=\"urn:schemas-upnp-org:device-1-0\"  xmlns:mythtv=\"mythtv.org\">\n"
             "<specVersion>\n"
@@ -360,7 +373,7 @@ void UPnpDeviceDesc::GetValidXML(
               "<minor>0</minor>\n"
             "</specVersion>\n"
             "<URLBase>http://"
-       << sBaseAddress << ":" << nPort << "/</URLBase>\n";
+       << BaseAddr << ":" << nPort << "/</URLBase>\n";
 
     OutputDevice( os, &m_rootDevice, sUserAgent );
 

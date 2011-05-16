@@ -25,10 +25,10 @@ class DVBSignalMonitor: public DTVSignalMonitor
 
     virtual void SetRotorTarget(float target);
     virtual void GetRotorStatus(bool &was_moving, bool &is_moving);
-    virtual void SetRotorValue(int)
+    virtual void SetRotorValue(int val)
     {
         QMutexLocker locker(&statusLock);
-        rotorPosition.SetValue(100);
+        rotorPosition.SetValue(val);
     }
 
     virtual void EmitStatus(void);

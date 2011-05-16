@@ -7,12 +7,13 @@
 #include <unistd.h>
 
 // MythTV headers
-#include "mythcontext.h"
-#include "tv_rec.h"
+#include "scriptsignalmonitor.h"
 #include "signalmonitor.h"
+#include "mythcontext.h"
 #include "compat.h"
 #include "mythverbose.h"
 #include "mythlogging.h"
+#include "tv_rec.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -44,7 +45,10 @@ extern "C" {
 #   include "firewirechannel.h"
 #endif
 
-#include "channelchangemonitor.h"
+#ifdef USING_ASI
+#   include "asisignalmonitor.h"
+#   include "asichannel.h"
+#endif
 
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
@@ -132,11 +136,18 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
     }
 #endif
 
-    if (!signalMonitor)
+#ifdef USING_ASI
+    if (cardtype.toUpper() == "ASI")
     {
-        // For anything else
-        if (channel)
-            signalMonitor = new ChannelChangeMonitor(db_cardnum, channel);
+        ASIChannel *fc = dynamic_cast<ASIChannel*>(channel);
+        if (fc)
+            signalMonitor = new ASISignalMonitor(db_cardnum, fc);
+    }
+#endif
+
+    if (!signalMonitor && channel)
+    {
+        signalMonitor = new ScriptSignalMonitor(db_cardnum, channel);
     }
 
     if (!signalMonitor)
@@ -167,17 +178,21 @@ SignalMonitor::SignalMonitor(int _capturecardnum, ChannelBase *_channel,
     : channel(_channel),
       capturecardnum(_capturecardnum), flags(wait_for_mask),
       update_rate(25),                 minimum_update_rate(5),
-      exit(false),
+      running(false),                  exit(false),
       update_done(false),              notify_frontend(true),
-      is_tuned(false),                 tablemon(false),
-      eit_scan(false),                 error(""),
+      eit_scan(false),
       signalLock    (QObject::tr("Signal Lock"),  "slock",
                      1, true, 0,   1, 0),
       signalStrength(QObject::tr("Signal Power"), "signal",
                      0, true, 0, 100, 0),
-      channelTuned("Channel Tuned", "tuned", 3, true, 0, 3, 0),
+      scriptStatus  (QObject::tr("Script Status"), "script",
+                     3, true, 0, 3, 0),
       statusLock(QMutex::Recursive)
 {
+    if (!channel->IsExternalChannelChangeSupported())
+    {
+        scriptStatus.SetValue(3);
+    }
 }
 
 /** \fn SignalMonitor::~SignalMonitor()
@@ -213,34 +228,16 @@ bool SignalMonitor::HasAnyFlag(uint64_t _flags) const
 /** \fn SignalMonitor::Start()
  *  \brief Start signal monitoring thread.
  */
-void SignalMonitor::Start(bool waitfor_tune)
+void SignalMonitor::Start()
 {
     DBG_SM("Start", "begin");
     {
         QMutexLocker locker(&startStopLock);
 
-        // When used for scanning, don't wait for the tuning thread
-        is_tuned = !waitfor_tune;
-        if (waitfor_tune)
-        {
-            m_channelTimeout = 40000; // 40 seconds (in milliseconds)
-            m_channelTimer.start();
-        }
+        start();
 
-        if (!monitor_thread.isRunning())
-        {
-            monitor_thread.SetParent(this);
-            monitor_thread.start();
-
-            if (!monitor_thread.isRunning())
-            {
-                VERBOSE(VB_IMPORTANT, "Failed to create signal monitor thread");
-                return;
-            }
-        }
-
-        while (!monitor_thread.isRunning())
-            usleep(50);
+        while (!running)
+            usleep(5000);
     }
     DBG_SM("Start", "end");
 }
@@ -253,10 +250,10 @@ void SignalMonitor::Stop()
     DBG_SM("Stop", "begin");
     {
         QMutexLocker locker(&startStopLock);
-        if (monitor_thread.isRunning())
+        if (running)
         {
             exit = true;
-            monitor_thread.wait();
+            wait();
         }
     }
     DBG_SM("Stop", "end");
@@ -292,14 +289,14 @@ void SignalMonitor::Kick()
  */
 QStringList SignalMonitor::GetStatusList(bool kick)
 {
-    if (kick && monitor_thread.isRunning())
+    if (kick && running)
         Kick();
-    else if (!monitor_thread.isRunning())
+    else if (!running)
         UpdateValues();
 
     QStringList list;
     statusLock.lock();
-    list<<channelTuned.GetName()<<channelTuned.GetStatus();
+    list<<scriptStatus.GetName()<<scriptStatus.GetStatus();
     list<<signalLock.GetName()<<signalLock.GetStatus();
     if (HasFlags(kSigMon_WaitForSig))
         list<<signalStrength.GetName()<<signalStrength.GetStatus();
@@ -313,6 +310,7 @@ QStringList SignalMonitor::GetStatusList(bool kick)
  */
 void SignalMonitor::MonitorLoop()
 {
+    running = true;
     exit = false;
 
     while (!exit)
@@ -339,19 +337,7 @@ void SignalMonitor::MonitorLoop()
         MythEvent me(QString("SIGNAL %1").arg(capturecardnum), slist);
         gCoreContext->dispatch(me);
     }
-}
-
-/** \fn  SignalLoopThread::run(void)
- *  \brief Runs MonitorLoop() within the monitor_thread pthread.
- */
-void SignalLoopThread::run(void)
-{
-    if (!m_parent)
-        return;
-
-    threadRegister("SignalLoop");
-    m_parent->MonitorLoop();
-    threadDeregister();
+    running = false;
 }
 
 /** \fn  SignalMonitor::WaitForLock(int)
@@ -374,36 +360,32 @@ bool SignalMonitor::WaitForLock(int timeout)
 
     MythTimer t;
     t.start();
-    if (monitor_thread.isRunning())
+    if (running)
     {
-        while (t.elapsed()<timeout && monitor_thread.isRunning())
+        while (t.elapsed()<timeout && running)
         {
             Kick();
-            statusLock.lock();
-            bool ok = signalLock.IsGood();
-            statusLock.unlock();
-            if (ok)
+
+            if (HasSignalLock())
                 return true;
 
             usleep(50);
         }
-        if (!monitor_thread.isRunning())
+        if (!running)
             return WaitForLock(timeout-t.elapsed());
     }
     else
     {
-        while (t.elapsed()<timeout && !monitor_thread.isRunning())
+        while (t.elapsed()<timeout && !running)
         {
             UpdateValues();
-            statusLock.lock();
-            bool ok = signalLock.IsGood();
-            statusLock.unlock();
-            if (ok)
+
+            if (HasSignalLock())
                 return true;
 
             usleep(50);
         }
-        if (monitor_thread.isRunning())
+        if (running)
             return WaitForLock(timeout-t.elapsed());
     }
     return false;
@@ -482,54 +464,14 @@ void SignalMonitor::SendMessage(
     }
 }
 
-bool SignalMonitor::IsChannelTuned(void)
+void SignalMonitor::UpdateValues(void)
 {
-    if (is_tuned)
-        return true;
-
-    ChannelBase::Status status = channel->GetStatus();
     QMutexLocker locker(&statusLock);
-
-    switch (status) {
-      case ChannelBase::changePending:
-        if (HasFlags(SignalMonitor::kDVBSigMon_WaitForPos))
-        {
-            // Still waiting on rotor
-            m_channelTimer.start();
-            channelTuned.SetValue(1);
-        }
-        else if (m_channelTimer.elapsed() > m_channelTimeout)
-        {
-            // channel change is taking too long
-            VERBOSE(VB_IMPORTANT, "SignalMonitor: channel change timed-out");
-            error = QObject::tr("Error: channel change failed");
-            channelTuned.SetValue(2);
-        }
-        else
-            channelTuned.SetValue(1);
-        break;
-      case ChannelBase::changeFailed:
-        VERBOSE(VB_IMPORTANT, "SignalMonitor: channel change failed");
-        channelTuned.SetValue(2);
-        error = QObject::tr("Error: channel change failed");
-        break;
-      case ChannelBase::changeSuccess:
-        channelTuned.SetValue(3);
-        break;
-    }
-
-    EmitStatus();
-
-    if (status == ChannelBase::changeSuccess)
+    if (channel->IsExternalChannelChangeSupported() &&
+        (scriptStatus.GetValue() < 2))
     {
-        if (tablemon)
-            pParent->SetupDTVSignalMonitor(eit_scan);
-
-        is_tuned = true;
-        return true;
+        scriptStatus.SetValue(channel->GetScriptStatus());
     }
-
-    return false;
 }
 
 void SignalMonitor::SendMessageAllGood(void)
@@ -541,7 +483,7 @@ void SignalMonitor::SendMessageAllGood(void)
 
 void SignalMonitor::EmitStatus(void)
 {
-    SendMessage(kStatusChannelTuned, channelTuned);
+    SendMessage(kStatusChannelTuned, scriptStatus);
     SendMessage(kStatusSignalLock, signalLock);
     if (HasFlags(kSigMon_WaitForSig))
         SendMessage(kStatusSignalStrength,    signalStrength);

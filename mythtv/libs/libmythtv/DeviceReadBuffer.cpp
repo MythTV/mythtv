@@ -4,9 +4,10 @@ using namespace std;
 #include <QThread>
 #include "DeviceReadBuffer.h"
 #include "mythcorecontext.h"
+#include "mythbaseutil.h"
+#include "mythverbose.h"
 #include "tspacket.h"
 #include "compat.h"
-#include "mythverbose.h"
 #include "mythlogging.h"
 
 #ifndef USING_MINGW
@@ -19,17 +20,18 @@ using namespace std;
 #define LOC QString("DevRdB(%1): ").arg(videodevice)
 #define LOC_ERR QString("DevRdB(%1) Error: ").arg(videodevice)
 
-DeviceReadBuffer::DeviceReadBuffer(ReaderPausedCB *cb, bool use_poll)
+DeviceReadBuffer::DeviceReadBuffer(DeviceReaderCB *cb, bool use_poll)
     : videodevice(QString::null),   _stream_fd(-1),
-      readerPausedCB(cb),
+      readerCB(cb),
 
       // Data for managing the device ringbuffer
-      run(false),                   running(false),
+      dorun(false),                 running(false),
       eof(false),                   error(false),
       request_pause(false),         paused(false),
       using_poll(use_poll),         max_poll_wait(2500 /*ms*/),
 
       size(0),                      used(0),
+      read_quanta(0),
       dev_read_size(0),             min_read(0),
 
       buffer(NULL),                 readPtr(NULL),
@@ -39,6 +41,21 @@ DeviceReadBuffer::DeviceReadBuffer(ReaderPausedCB *cb, bool use_poll)
       max_used(0),                  avg_used(0),
       avg_cnt(0)
 {
+    for (int i = 0; i < 2; i++)
+    {
+        wake_pipe[i] = -1;
+        wake_pipe_flags[i] = 0;
+    }
+
+#ifdef USING_MINGW
+#warning mingw DeviceReadBuffer::Poll
+    if (using_poll)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "mingw DeviceReadBuffer::Poll is not implemented");
+        using_poll = false;
+    }
+#endif
 }
 
 DeviceReadBuffer::~DeviceReadBuffer()
@@ -47,7 +64,8 @@ DeviceReadBuffer::~DeviceReadBuffer()
         delete[] buffer;
 }
 
-bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd)
+bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
+                             uint readQuanta, uint deviceBufferSize)
 {
     QMutexLocker locker(&lock);
 
@@ -57,7 +75,7 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd)
     videodevice   = streamName;
     _stream_fd    = streamfd;
 
-    // BEGIN HACK -- see #6897
+    // BEGIN HACK -- see #6897, remove after August 2009
     max_poll_wait = (videodevice.contains("dvb")) ? 25000 : 2500;
     // END HACK
 
@@ -67,21 +85,29 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd)
     request_pause = false;
     paused        = false;
 
-    size          = gCoreContext->GetNumSetting("HDRingbufferSize",
-                                            50 * TSPacket::kSize) * 1024;
+    read_quanta   = (readQuanta) ? readQuanta : read_quanta;
+    size          = gCoreContext->GetNumSetting(
+        "HDRingbufferSize", 50 * read_quanta) * 1024;
     used          = 0;
-    dev_read_size = TSPacket::kSize * (using_poll ? 256 : 48);
-    min_read      = TSPacket::kSize * 4;
+    dev_read_size = read_quanta * (using_poll ? 256 : 48);
+    dev_read_size = (deviceBufferSize) ?
+        min(dev_read_size, (size_t)deviceBufferSize) : dev_read_size;
+    min_read      = read_quanta * 4;
 
-    buffer        = new unsigned char[size + TSPacket::kSize];
+    buffer        = new unsigned char[size + dev_read_size];
     readPtr       = buffer;
     writePtr      = buffer;
     endPtr        = buffer + size;
 
     // Initialize buffer, if it exists
     if (!buffer)
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+                QString("Failed to allocate buffer of size %1 = %2 + %3")
+                .arg(size+dev_read_size).arg(size).arg(dev_read_size));
         return false;
-    memset(buffer, 0xFF, size + TSPacket::kSize);
+    }
+    memset(buffer, 0xFF, size + read_quanta);
 
     // Initialize statistics
     max_used      = 0;
@@ -96,32 +122,31 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd)
 
 void DeviceReadBuffer::Start(void)
 {
-    bool was_running;
+    VERBOSE(VB_RECORD, LOC + "Start() -- begin");
+
+    if (isRunning())
+    {
+        {
+            QMutexLocker locker(&lock);
+            dorun = false;
+        }
+        wait();
+    }
 
     {
         QMutexLocker locker(&lock);
-        was_running = running;
         error = false;
+        eof   = false;
     }
 
-    if (was_running)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Start(): Already running.");
-        SetRequestPause(false);
-        return;
-    }
+    start();
 
-    thread.SetBuffer(this);
-    thread.start();
+    VERBOSE(VB_RECORD, LOC + "Start() -- middle");
 
-    if (!thread.isRunning())
-    {
-        VERBOSE(VB_IMPORTANT,
-                LOC_ERR + QString("Start(): thread.run() failed.") + ENO);
+    while (!IsRunning())
+        usleep(5000);
 
-        QMutexLocker locker(&lock);
-        error = true;
-    }
+    VERBOSE(VB_RECORD, LOC + "Start() -- end");
 }
 
 void DeviceReadBuffer::Reset(const QString &streamName, int streamfd)
@@ -140,26 +165,24 @@ void DeviceReadBuffer::Reset(const QString &streamName, int streamfd)
 
 void DeviceReadBuffer::Stop(void)
 {
-    bool was_running = IsRunning();
-
-    if (!was_running)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Stop(): Not running.");
-        return;
-    }
-
+    VERBOSE(VB_RECORD, LOC + "Stop() -- begin");
     {
         QMutexLocker locker(&lock);
-        run = false;
+        dorun = false;
     }
 
-    thread.wait();
+    WakePoll();
+    VERBOSE(VB_RECORD, LOC + "Stop() -- middle");
+
+    wait();
+    VERBOSE(VB_RECORD, LOC + "Stop() -- end");
 }
 
 void DeviceReadBuffer::SetRequestPause(bool req)
 {
     QMutexLocker locker(&lock);
     request_pause = req;
+    WakePoll();
 }
 
 void DeviceReadBuffer::SetPaused(bool val)
@@ -170,6 +193,37 @@ void DeviceReadBuffer::SetPaused(bool val)
         pauseWait.wakeAll();
     else
         unpauseWait.wakeAll();
+}
+
+// The WakePoll code is copied from MythSocketThread::WakeReadyReadThread()
+void DeviceReadBuffer::WakePoll(void) const
+{
+    char buf[1];
+    buf[0] = '0';
+    ssize_t wret = 0;
+    while (running && (wret <= 0) && (wake_pipe[1] >= 0))
+    {
+        wret = ::write(wake_pipe[1], &buf, 1);
+        if ((wret < 0) && (EAGAIN != errno) && (EINTR != errno))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "WakePoll failed.");
+            ClosePipes();
+            break;
+        }
+    }
+}
+
+void DeviceReadBuffer::ClosePipes(void) const
+{
+    for (uint i = 0; i < 2; i++)
+    {
+        if (wake_pipe[i] >= 0)
+        {
+            ::close(wake_pipe[i]);
+            wake_pipe[i] = -1;
+            wake_pipe_flags[i] = 0;
+        }
+    }
 }
 
 bool DeviceReadBuffer::IsPaused(void) const
@@ -204,6 +258,18 @@ bool DeviceReadBuffer::IsPauseRequested(void) const
     return request_pause;
 }
 
+bool DeviceReadBuffer::IsErrored(void) const
+{
+    QMutexLocker locker(&lock);
+    return error;
+}
+
+bool DeviceReadBuffer::IsEOF(void) const
+{
+    QMutexLocker locker(&lock);
+    return eof;
+}
+
 bool DeviceReadBuffer::IsRunning(void) const
 {
     QMutexLocker locker(&lock);
@@ -233,7 +299,7 @@ void DeviceReadBuffer::IncrWritePointer(uint len)
     QMutexLocker locker(&lock);
     used     += len;
     writePtr += len;
-    writePtr  = (writePtr == endPtr) ? buffer : writePtr;
+    writePtr  = (writePtr >= endPtr) ? buffer + (writePtr - endPtr) : writePtr;
 #if REPORT_RING_STATS
     max_used = max(used, max_used);
     avg_used = ((avg_used * avg_cnt) + used) / ++avg_cnt;
@@ -248,26 +314,20 @@ void DeviceReadBuffer::IncrReadPointer(uint len)
     readPtr  = (readPtr == endPtr) ? buffer : readPtr;
 }
 
-void DRBThread::run(void)
-{
-    threadRegister("DeviceReadBuffer");
-    if (!m_buffer)
-        return;
-
-    m_buffer->fill_ringbuffer();
-    threadDeregister();
-}
-
-void DeviceReadBuffer::fill_ringbuffer(void)
+void DeviceReadBuffer::run(void)
 {
     uint      errcnt = 0;
 
+    threadRegister("DeviceReadBuffer");
     lock.lock();
-    run     = true;
+    dorun   = true;
     running = true;
     lock.unlock();
 
-    while (run)
+    if (using_poll)
+        setup_pipe(wake_pipe, wake_pipe_flags);
+
+    while (dorun)
     {
         if (!HandlePausing())
             continue;
@@ -291,14 +351,14 @@ void DeviceReadBuffer::fill_ringbuffer(void)
         }
 
         // Limit read size for faster return from read
-        size_t read_size =
-            min(dev_read_size, (size_t) WaitForUnused(TSPacket::kSize));
+        size_t unused = (size_t) WaitForUnused(read_quanta);
+        size_t read_size = min(dev_read_size, unused);
 
         // if read_size > 0 do the read...
         if (read_size)
         {
             ssize_t len = read(_stream_fd, writePtr, read_size);
-            if (!CheckForErrors(len, errcnt))
+            if (!CheckForErrors(len, read_size, errcnt))
             {
                 if (errcnt > 5)
                     break;
@@ -306,13 +366,21 @@ void DeviceReadBuffer::fill_ringbuffer(void)
                     continue;
             }
             errcnt = 0;
+            // if we wrote past the official end of the buffer, copy to start
+            if (writePtr + len > endPtr)
+                memcpy(buffer, endPtr, writePtr + len - endPtr);
             IncrWritePointer(len);
         }
     }
 
+    ClosePipes();
+
     lock.lock();
     running = false;
+    eof     = true;
     lock.unlock();
+
+    threadDeregister();
 }
 
 bool DeviceReadBuffer::HandlePausing(void)
@@ -321,8 +389,8 @@ bool DeviceReadBuffer::HandlePausing(void)
     {
         SetPaused(true);
 
-        if (readerPausedCB)
-            readerPausedCB->ReaderPaused(_stream_fd);
+        if (readerCB)
+            readerCB->ReaderPaused(_stream_fd);
 
         usleep(5000);
         return false;
@@ -351,57 +419,112 @@ bool DeviceReadBuffer::Poll(void) const
     MythTimer timer;
     timer.start();
 
+    int poll_cnt = 1;
+    struct pollfd polls[2];
+    memset(polls, 0, sizeof(polls));
+
+    polls[0].fd      = _stream_fd;
+    polls[0].events  = POLLIN | POLLPRI;
+    polls[0].revents = 0;
+
+    if (wake_pipe[0] >= 0)
+    {
+        poll_cnt = 2;
+        polls[1].fd      = wake_pipe[0];
+        polls[1].events  = POLLIN;
+        polls[1].revents = 0;
+    }
+
     while (true)
     {
-        struct pollfd polls;
-        polls.fd      = _stream_fd;
-        polls.events  = POLLIN;
-        polls.revents = 0;
+        polls[0].revents = 0;
+        polls[1].revents = 0;
+        poll_cnt = (wake_pipe[0] >= 0) ? poll_cnt : 1;
 
-        int ret = poll(&polls, 1 /*number of polls*/, 10 /*msec*/);
+        int timeout = max((int)max_poll_wait - timer.elapsed(), 10);
+        timeout = (1 == poll_cnt) ? 10 : timeout;
+        int ret = poll(polls, poll_cnt, timeout);
 
-        if (polls.revents & (POLLHUP | POLLNVAL))
+        if (polls[0].revents & (POLLHUP | POLLNVAL))
         {
             VERBOSE(VB_IMPORTANT, LOC + "poll error");
             error = true;
             return true;
         }
 
-        if (!run || !IsOpen() || IsPauseRequested())
+        if (!dorun || !IsOpen() || IsPauseRequested())
         {
             retval = false;
             break; // are we supposed to pause, stop, etc.
         }
 
-        if (ret > 0)
-            break; // we have data to read :)
-        else if (ret < 0)
+        if (polls[0].revents & POLLPRI)
         {
-            if ((EOVERFLOW == errno))
-                break; // we have an error to handle
-
-            if ((EAGAIN == errno) || (EINTR  == errno))
-                continue; // errors that tell you to try again
-
-            usleep(2500 /*2.5 ms*/);
+            readerCB->PriorityEvent(polls[0].fd);
         }
-        else //  ret == 0
+
+        if (polls[0].revents & POLLIN)
         {
-            if ((uint)timer.elapsed() > max_poll_wait)
+            if (ret > 0)
+                break; // we have data to read :)
+            else if (ret < 0)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Poll giving up");
-                QMutexLocker locker(&lock);
-                error = true;
-                return true;
+                if ((EOVERFLOW == errno))
+                    break; // we have an error to handle
+
+                if ((EAGAIN == errno) || (EINTR  == errno))
+                    continue; // errors that tell you to try again
+
+                usleep(2500 /*2.5 ms*/);
             }
+            else //  ret == 0
+            {
+                if ((uint)timer.elapsed() >= max_poll_wait)
+                {
+                    VERBOSE(VB_IMPORTANT, LOC_ERR + "Poll giving up 1");
+                    QMutexLocker locker(&lock);
+                    error = true;
+                    return true;
+                }
+            }
+        }
+
+        // Clear out any pending pipe reads
+        if ((poll_cnt > 1) && (polls[1].revents & POLLIN))
+        {
+            char dummy[128];
+            int cnt = (wake_pipe_flags[0] & O_NONBLOCK) ? 128 : 1;
+            cnt = ::read(wake_pipe[0], dummy, cnt);
+        }
+
+        if ((uint)timer.elapsed() >= max_poll_wait)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Poll giving up 2");
+            QMutexLocker locker(&lock);
+            error = true;
+            return true;
         }
     }
     return retval;
 #endif //!USING_MINGW
 }
 
-bool DeviceReadBuffer::CheckForErrors(ssize_t len, uint &errcnt)
+bool DeviceReadBuffer::CheckForErrors(
+    ssize_t len, size_t requested_len, uint &errcnt)
 {
+    if (len > (ssize_t)requested_len)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Driver is retruning bogus values on read");
+        if (++errcnt > 5)
+        {
+            VERBOSE(VB_RECORD, LOC + "Too many errors.");
+            QMutexLocker locker(&lock);
+            error = true;
+        }
+        return false;
+    }
+
 #ifdef USING_MINGW
 # ifdef _MSC_VER
 #  pragma message( "mingw DeviceReadBuffer::CheckForErrors" )
@@ -469,7 +592,7 @@ bool DeviceReadBuffer::CheckForErrors(ssize_t len, uint &errcnt)
  */
 uint DeviceReadBuffer::Read(unsigned char *buf, const uint count)
 {
-    uint avail = WaitForUsed(min(count, (uint)min_read));
+    uint avail = WaitForUsed(min(count, (uint)min_read), 500);
     size_t cnt = min(count, avail);
 
     if (!cnt)
@@ -512,41 +635,44 @@ uint DeviceReadBuffer::Read(unsigned char *buf, const uint count)
 uint DeviceReadBuffer::WaitForUnused(uint needed) const
 {
     size_t unused = GetUnused();
-    size_t contig = GetContiguousUnused();
 
-    if (contig > TSPacket::kSize)
+    if (unused > read_quanta)
     {
         while (unused < needed)
         {
             unused = GetUnused();
-            if (IsPauseRequested() || !IsOpen() || !run)
+            if (IsPauseRequested() || !IsOpen() || !dorun)
                 return 0;
             usleep(5000);
         }
-        if (IsPauseRequested() || !IsOpen() || !run)
+        if (IsPauseRequested() || !IsOpen() || !dorun)
             return 0;
-        contig = GetContiguousUnused();
+        unused = GetUnused();
     }
 
-    return min(contig, unused);
+    return unused;
 }
 
-/** \fn DeviceReadBuffer::WaitForUsed(uint) const
+/** \fn DeviceReadBuffer::WaitForUsed(uint,uint) const
  *  \param needed Number of bytes we want to read
+ *  \param max_wait Number of milliseconds to wait for the needed data
  *  \return bytes available for reading
  */
-uint DeviceReadBuffer::WaitForUsed(uint needed) const
+uint DeviceReadBuffer::WaitForUsed(uint needed, uint max_wait) const
 {
-    size_t avail = GetUsed();
-    while ((needed > avail) && running)
+    QWaitCondition dataWait;
+
+    MythTimer timer;
+    timer.start();
+
+    QMutexLocker locker(&lock);
+    size_t avail = used;
+    while ((needed > avail) && running &&
+           !request_pause && !error && !eof &&
+           (timer.elapsed() < (int)max_wait))
     {
-        {
-            QMutexLocker locker(&lock);
-            avail = used;
-            if (request_pause || error || eof)
-                return 0;
-        }
-        usleep(5000);
+        dataWait.wait(locker.mutex(), 10);
+        avail = used;
     }
     return avail;
 }

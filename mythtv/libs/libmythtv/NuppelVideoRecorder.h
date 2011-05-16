@@ -30,7 +30,7 @@ using namespace std;
 #include <QThread>
 
 // MythTV headers
-#include "recorderbase.h"
+#include "v4lrecorder.h"
 #include "format.h"
 #include "cc608decoder.h"
 #include "filter.h"
@@ -39,8 +39,6 @@ using namespace std;
 #include "mythtvexp.h"
 
 struct video_audio;
-struct VBIData;
-struct cc;
 class RTjpeg;
 class RingBuffer;
 class ChannelBase;
@@ -71,22 +69,10 @@ class NVRAudioThread : public QThread
     NuppelVideoRecorder *m_parent;
 };
 
-class NVRVBIThread : public QThread
-{
-    Q_OBJECT
-  public:
-    NVRVBIThread(NuppelVideoRecorder *parent) : m_parent(parent) {}
-    virtual ~NVRVBIThread() { wait(); m_parent = NULL; }
-    virtual void run(void);
-  private:
-    NuppelVideoRecorder *m_parent;
-};
-
-class MTV_PUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Input
+class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
 {
     friend class NVRWriteThread;
     friend class NVRAudioThread;
-    friend class NVRVBIThread;
   public:
     NuppelVideoRecorder(TVRec *rec, ChannelBase *channel);
    ~NuppelVideoRecorder();
@@ -146,7 +132,6 @@ class MTV_PUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Input
  protected:
     void doWriteThread(void);
     void doAudioThread(void);
-    void doVbiThread(void);
 
  private:
     inline void WriteFrameheader(rtframeheader *fh);
@@ -172,10 +157,10 @@ class MTV_PUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Input
     void DoV4L2(void);
     void DoMJPEG(void);
 
-    void FormatTeletextSubtitles(struct VBIData *vbidata);
-    void FormatCC(struct cc *cc);
-    void AddTextData(unsigned char *buf, int len,
-                     int64_t timecode, char type);
+    virtual void FormatTT(struct VBIData*); // RecorderBase
+    virtual void FormatCC(struct cc*); // RecorderBase
+    virtual void AddTextData(unsigned char*,int,int64_t,char); // CC608Decoder
+
     void UpdateResolutions(void);
     
     bool encoding;
@@ -245,7 +230,6 @@ class MTV_PUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Input
 
     NVRWriteThread *write_thread;
     NVRAudioThread *audio_thread;
-    NVRVBIThread   *vbi_thread;
 
     bool recording;
     bool errored;

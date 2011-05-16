@@ -83,7 +83,7 @@ class MTV_PUBLIC RecorderBase
 
     /** \brief Set an specific option.
      *
-     *   Base options include: codec, audiodevice, videodevice, vbidevice,
+     *   Base options include: codec, videodevice,
      *   tvformat&nbsp;(ntsc,ntsc-jp,pal-m),
      *   vbiformat&nbsp;("none","pal teletext","ntsc").
      */
@@ -137,22 +137,12 @@ class MTV_PUBLIC RecorderBase
      */
     virtual void StartRecording(void) = 0;
 
-    /** \brief StopRecording() signals to the StartRecording() function that
-     *         it should stop recording and exit cleanly.
-     *
-     *   This function should block until StartRecording() has finished up.
-     */
-    virtual void StopRecording(void) = 0;
-
     /** \brief Reset the recorder to the startup state.
      *
      *   This is used after Pause(bool), WaitForPause() and
      *   after the RingBuffer's StopReads() method has been called.
      */
     virtual void Reset(void) = 0;
-
-    /// \brief Tells whether the StartRecorder() loop is running.
-    virtual bool IsRecording(void) = 0;
 
     /// \brief Tells us whether an unrecoverable error has been encountered.
     virtual bool IsErrored(void) = 0;
@@ -163,13 +153,6 @@ class MTV_PUBLIC RecorderBase
      *   because frames may not be written in display order.
      */
     virtual long long GetFramesWritten(void) = 0;
-
-    /** \brief Open devices needed by recorder.
-     *
-     *   This is usually called by StartRecording().
-     *  \return true if device was successfully opened.
-     */
-    virtual bool Open(void) = 0;
 
     /** \brief Returns file descriptor of recorder device.
      *
@@ -199,6 +182,11 @@ class MTV_PUBLIC RecorderBase
     bool GetKeyframePositions(
         int64_t start, int64_t end, frm_pos_map_t&) const;
 
+    virtual void StopRecording(void);
+    virtual bool IsRecording(void);
+    virtual bool IsRecordingRequested(void);
+
+    // pausing interface
     virtual void Pause(bool clear = true);
     virtual void Unpause(void);
     virtual bool IsPaused(bool holding_lock = false) const;
@@ -228,6 +216,13 @@ class MTV_PUBLIC RecorderBase
         ASPECT_2_21_1        = 0x04,
         ASPECT_CUSTOM        = 0x05,
     };
+
+    static RecorderBase *CreateRecorder(
+        TVRec                  *tvrec,
+        ChannelBase            *channel,
+        const RecordingProfile &profile,
+        const GeneralDBOptions &genOpt,
+        const DVBDBOptions     &dvbOpt);
 
   protected:
     /** \brief Convenience function used to set integer options from a profile.
@@ -269,11 +264,8 @@ class MTV_PUBLIC RecorderBase
     bool           weMadeBuffer;
 
     QString        videocodec;
-    QString        audiodevice;
     QString        videodevice;
-    QString        vbidevice;
 
-    int            vbimode;
     bool           ntsc;
     bool           ntsc_framerate;
     double         video_frame_rate;
@@ -286,12 +278,18 @@ class MTV_PUBLIC RecorderBase
 
     ProgramInfo   *curRecording;
 
-    // For handling pausing
-    mutable QMutex pauseLock;
+    // For handling pausing + stop recording
+    mutable QMutex pauseLock; // also used for request_recording and recording
     bool           request_pause;
     bool           paused;
     QWaitCondition pauseWait;
     QWaitCondition unpauseWait;
+    /// True if API call has requested a recording be [re]started
+    bool           request_recording;
+    /// True while recording is actually being performed
+    bool           recording;
+    QWaitCondition recordingWait;
+    
 
     // For RingBuffer switching
     QMutex         nextRingBufferLock;

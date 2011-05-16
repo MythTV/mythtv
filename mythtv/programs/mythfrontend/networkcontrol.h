@@ -106,7 +106,7 @@ class NetworkControl : public QTcpServer
   public:
     NetworkControl();
     ~NetworkControl();
-    bool listen(const QHostAddress &address = QHostAddress::Any,
+    bool listen(const QHostAddress &address = QHostAddress::AnyIPv6,
                 quint16 port = 0);
 
   private slots:

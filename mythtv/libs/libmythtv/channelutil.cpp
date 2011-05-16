@@ -843,6 +843,129 @@ int ChannelUtil::GetInputID(int source_id, int card_id)
     return input_id;
 }
 
+QStringList ChannelUtil::GetCardTypes(uint chanid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT cardtype "
+                  "FROM capturecard, cardinput, channel "
+                  "WHERE channel.chanid   = :CHANID            AND "
+                  "      channel.sourceid = cardinput.sourceid AND "
+                  "      cardinput.cardid = capturecard.cardid "
+                  "GROUP BY cardtype");
+    query.bindValue(":CHANID", chanid);
+
+    QStringList list;
+    if (!query.exec())
+    {
+        MythDB::DBError("ChannelUtil::GetCardTypes", query);
+        return list;
+    }
+    while (query.next())
+        list.push_back(query.value(0).toString());
+    return list;
+}
+
+static bool lt_pidcache(
+    const pid_cache_item_t &a, const pid_cache_item_t &b)
+{
+    return a.GetPID() < b.GetPID();
+}
+
+/** \brief Returns cached MPEG PIDs when given a Channel ID.
+ *
+ *  \param chanid   Channel ID to fetch cached pids for.
+ *  \param pid_cache List of PIDs with their TableID
+ *                   types is returned in pid_cache.
+ */
+bool ChannelUtil::GetCachedPids(uint chanid,
+                                pid_cache_t &pid_cache)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString thequery = QString("SELECT pid, tableid FROM pidcache "
+                               "WHERE chanid='%1'").arg(chanid);
+    query.prepare(thequery);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("GetCachedPids: fetching pids", query);
+        return false;
+    }
+
+    while (query.next())
+    {
+        int pid = query.value(0).toInt(), tid = query.value(1).toInt();
+        if ((pid >= 0) && (tid >= 0))
+            pid_cache.push_back(pid_cache_item_t(pid, tid));
+    }
+    stable_sort(pid_cache.begin(), pid_cache.end(), lt_pidcache);
+
+    return true;
+}
+
+/** \brief Saves PIDs for PSIP tables to database.
+ *
+ *  \param chanid     Channel ID to fetch cached pids for.
+ *  \param pid_cache  List of PIDs with their TableID types to be saved.
+ *  \param delete_all If true delete both permanent and transient pids first.
+ */
+bool ChannelUtil::SaveCachedPids(uint chanid,
+                                 const pid_cache_t &_pid_cache,
+                                 bool delete_all)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    /// delete
+    if (delete_all)
+        query.prepare("DELETE FROM pidcache WHERE chanid = :CHANID");
+    else
+        query.prepare(
+            "DELETE FROM pidcache "
+            "WHERE chanid = :CHANID AND tableid < 65536");
+
+    query.bindValue(":CHANID", chanid);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("GetCachedPids -- delete", query);
+        return false;
+    }
+
+    pid_cache_t old_cache;
+    GetCachedPids(chanid, old_cache);
+    pid_cache_t pid_cache = _pid_cache;
+    stable_sort(pid_cache.begin(), pid_cache.end(), lt_pidcache);
+
+    /// insert
+    query.prepare(
+        "INSERT INTO pidcache "
+        "SET chanid = :CHANID, pid = :PID, tableid = :TABLEID");
+    query.bindValue(":CHANID", chanid);
+
+    bool ok = true;
+    pid_cache_t::const_iterator ito = old_cache.begin();
+    pid_cache_t::const_iterator itn = pid_cache.begin();
+    for (; itn != pid_cache.end(); ++itn)
+    {
+        // if old pid smaller than current new pid, skip this old pid
+        for (; ito != old_cache.end() && ito->GetPID() < itn->GetPID(); ito++);
+
+        // if already in DB, skip DB insert
+        if (ito != old_cache.end() && ito->GetPID() == itn->GetPID())
+            continue;
+
+        query.bindValue(":PID",     itn->GetPID());
+        query.bindValue(":TABLEID", itn->GetComposite());
+
+        if (!query.exec())
+        {
+            MythDB::DBError("GetCachedPids -- insert", query);
+            ok = false;
+        }
+    }
+
+    return ok;
+}
+
 QString ChannelUtil::GetChannelValueStr(const QString &channel_field,
                                         uint           cardid,
                                         const QString &input,
@@ -1759,7 +1882,7 @@ bool ChannelUtil::GetChannelData(
     mplexid       = query.value(5).toUInt();
     atsc_major    = query.value(6).toUInt();
     atsc_minor    = query.value(7).toUInt();
-    mpeg_prog_num = query.value(8).toUInt();
+    mpeg_prog_num = (query.value(8).isNull()) ? -1 : query.value(8).toInt();
 
     if (!mplexid || (mplexid == 32767)) /* 32767 deals with old lineups */
         return true;

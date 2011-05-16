@@ -1,6 +1,10 @@
 #ifndef VBI_H
 #define VBI_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "vt.h"
 #include "dllist.h"
 #include "lang.h"
@@ -55,6 +59,10 @@ struct vt_page *vbi_query_page(struct vbi *vbi, int pgno, int subno);
 void vbi_pll_reset(struct vbi *vbi, int fine_tune);
 
 void vbi_handler(struct vbi *vbi, int fd);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

@@ -17,31 +17,35 @@ class IPTVFeederWrapper;
 
 class IPTVChannel : public DTVChannel
 {
+    friend class IPTVSignalMonitor;
+    friend class IPTVRecorder;
+
   public:
     IPTVChannel(TVRec *parent, const QString &videodev);
     ~IPTVChannel();
 
+    // Commands
     bool Open(void);
     void Close(void);
+    bool SetChannelByString(const QString &channum);
 
+    // Gets
     bool IsOpen(void) const;
 
-    bool SetChannelByString(const QString &channum);
-    bool TuneMultiplex(uint /*mplexid*/, QString /*sourceid*/)
-        { return false; } // TODO
-    bool Tune(const DTVMultiplex &/*tuning*/, QString /*inputname*/)
-        { return false; } // TODO
+    // Channel scanning stuff
+    bool Tune(const DTVMultiplex&, QString) { return true; }
 
+  private:
     IPTVChannelInfo GetCurrentChanInfo(void) const
         { return GetChanInfo(m_curchannelname); }
 
     IPTVFeederWrapper       *GetFeeder(void)       { return m_feeder; }
     const IPTVFeederWrapper *GetFeeder(void) const { return m_feeder; }
 
-  private:
     IPTVChannelInfo GetChanInfo(
         const QString &channum, uint sourceid = 0) const;
 
+  private:
     QString               m_videodev;
     fbox_chan_map_t       m_freeboxchannels;
     IPTVFeederWrapper    *m_feeder;

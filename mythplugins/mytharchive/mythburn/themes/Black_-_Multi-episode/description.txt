@@ -1,0 +1,2 @@
+Has an intro and contains a summary main menu with 10 recordings per page.
+Does not have a chapter selection submenu, recording titles, dates or category.

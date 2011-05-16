@@ -2032,19 +2032,19 @@ QString ProgramInfo::GetPlaybackURL(
         (gCoreContext->GetNumSetting("MasterBackendOverride", 0)) &&
         (RemoteCheckFile(this, false)))
     {
-        tmpURL = QString("myth://") +
-        gCoreContext->GetSetting("MasterServerIP") + ':' +
-        gCoreContext->GetSetting("MasterServerPort") + '/' + basename;
+        tmpURL = gCoreContext->GenMythURL(gCoreContext->GetSetting("MasterServerIP"),
+                                          gCoreContext->GetSetting("MasterServerPort").toInt(),
+                                          basename);
+
         VERBOSE(VB_FILE, LOC +
                 QString("GetPlaybackURL: Found @ '%1'").arg(tmpURL));
         return tmpURL;
         }
 
     // Fallback to streaming from the backend the recording was created on
-    tmpURL = QString("myth://") +
-        gCoreContext->GetSettingOnHost("BackendServerIP", hostname) + ':' +
-        gCoreContext->GetSettingOnHost("BackendServerPort", hostname) + '/' +
-        basename;
+    tmpURL = gCoreContext->GenMythURL(gCoreContext->GetSettingOnHost("BackendServerIP", hostname),
+                                      gCoreContext->GetSettingOnHost("BackendServerPort", hostname).toInt(),
+                                      basename);
 
     VERBOSE(VB_FILE, LOC + QString("GetPlaybackURL: Using default of: '%1'")
             .arg(tmpURL));

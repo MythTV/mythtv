@@ -115,6 +115,7 @@ Advanced options (experts only):
   --dvb-path=HDRLOC        location of directory containing
                            'linux/dvb/frontend.h', not the
                            directory with frontend.h [$dvb_path_default]
+  --disable-asi            disable support for ASI recorder
   --disable-x11            disable X11 support
   --x11-path=X11LOC        location of X11 include files [$x11_path_default]
   --disable-xrandr         disable X11 resolution switching
@@ -1344,6 +1345,7 @@ MYTHTV_CONFIG_LIST='
     hdpvr
     iptv
     ivtv
+    asi
     joystick_menu
     libfftw3
     libmpeg2external
@@ -1773,6 +1775,7 @@ v4l_deps="backend linux_videodev_h linux_videodev2_h"
 vdpau_deps="opengl vdpau_vdpau_h vdpau_vdpau_x11_h"
 xrandr_deps="x11"
 xv_deps="x11"
+asi_deps="backend"
 
 <<BLOCKQUOTE
 # tests
@@ -1977,6 +1980,7 @@ enable hdhomerun
 enable hdpvr
 enable iptv
 enable ivtv
+enable asi
 enable lamemp3
 enable libass
 enable libxml2
@@ -3997,6 +4001,12 @@ int main(void) {
 }
 EOF
 
+enabled asi && check_cc <<EOF || disable asi
+#include <dveo/asi.h>
+#include <dveo/master.h>
+int main(void) { return 1; }
+EOF
+
 # Check that all MythTV build "requirements" are met:
 enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
     die "ERROR! You must have the Lame MP3 encoding library installed to compile MythTV."
@@ -4444,6 +4454,7 @@ if enabled backend; then
   echo "DVB-S2 support            ${fe_can_2g_modulation-no}"
   echo "HDHomeRun support         ${hdhomerun-no}"
   echo "IPTV support              ${iptv-no}"
+  echo "ASI support               ${asi-no}"
 fi
 
 if enabled frontend; then

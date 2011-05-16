@@ -1660,7 +1660,7 @@ void ChannelScanSM::ScanTransport(const transport_scan_items_it_t transport)
     }
 
     // Start signal monitor for this channel
-    signalMonitor->Start(false);
+    signalMonitor->Start();
 
     timer.start();
     waitingForTables = (item.tuning.sistandard != "analog");
@@ -1963,6 +1963,25 @@ bool ChannelScanSM::ScanTransport(uint mplexid, bool follow_nit)
     }
 
     return false;
+}
+
+bool ChannelScanSM::ScanCurrentTransport(const QString &sistandard)
+{
+    scanTransports.clear();
+    nextIt = scanTransports.end();
+
+    signalTimeout = 30000;
+    QString name;
+    TransportScanItem item(sourceID, sistandard, name, 0, signalTimeout);
+    scanTransports.push_back(item);
+
+    timer.start();
+    waitingForTables = false;
+    extend_scan_list = false;
+    transportsScanned = 0;
+    nextIt   = scanTransports.begin();
+    scanning = true;
+    return true;
 }
 
 /** \fn ChannelScanSM::CheckImportedList(const DTVChannelInfoList&,uint,QString&,QString&,QString&)

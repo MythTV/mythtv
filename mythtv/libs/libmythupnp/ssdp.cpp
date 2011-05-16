@@ -206,6 +206,11 @@ void SSDP::PerformSearch( const QString &sST )
     QByteArray sRequest = rRequest.toUtf8();
 
     MSocketDevice *pSocket = m_Sockets[ SocketIdx_Search ];
+    if ( !pSocket->isValid() )
+    {
+        pSocket->setProtocol(MSocketDevice::IPv4);
+        pSocket->setSocket(pSocket->createNewSocket(), MSocketDevice::Datagram);
+    }
 
     QHostAddress address;
     address.setAddress( SSDP_GROUP );

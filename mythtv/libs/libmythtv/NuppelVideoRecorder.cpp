@@ -24,7 +24,6 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythverbose.h"
 #include "NuppelVideoRecorder.h"
-#include "vbitext/cc.h"
 #include "channelbase.h"
 #include "filtermanager.h"
 #include "recordingprofile.h"
@@ -32,10 +31,12 @@ using namespace std;
 #include "tv_play.h"
 #include "audioinput.h"
 #include "mythlogging.h"
+#include "vbitext/cc.h"
+#include "vbitext/vbi.h"
 
 #if HAVE_BIGENDIAN
 extern "C" {
-#include "bswap.h"
+#include "byteswap.h"
 }
 #endif
 
@@ -53,11 +54,6 @@ extern "C" {
 #include "videodev_mjpeg.h"
 #endif
 
-extern "C" {
-#include "vbitext/vbi.h"
-}
-#else  // USING_V4l
-#define VT_WIDTH 0
 #endif // USING_V4l
 
 #define KEYFRAMEDIST   30
@@ -84,17 +80,9 @@ void NVRAudioThread::run(void)
     threadDeregister();
 }
 
-void NVRVBIThread::run(void)
-{
-    threadRegister("NVRVbi");
-    m_parent->doVbiThread();
-    threadDeregister();
-}
-
 NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
-    RecorderBase(rec), audio_device(NULL),
-    write_thread(NULL), audio_thread(NULL),
-    vbi_thread(NULL)
+    V4LRecorder(rec), audio_device(NULL),
+    write_thread(NULL), audio_thread(NULL)
 {
     channelObj = channel;
 
@@ -360,7 +348,7 @@ void NuppelVideoRecorder::SetOption(const QString &opt, int value)
     else if (opt == "volume")
         volume = value;
     else
-        RecorderBase::SetOption(opt, value);
+        V4LRecorder::SetOption(opt, value);
 }
 
 void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
@@ -616,16 +604,9 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
     mpa_vidctx->prediction_method = FF_PRED_LEFT;
     if (videocodec.toLower() == "huffyuv" || videocodec.toLower() == "mjpeg")
         mpa_vidctx->strict_std_compliance = FF_COMPLIANCE_INOFFICIAL;
+    mpa_vidctx->thread_count = encoding_thread_count;
 
     QMutexLocker locker(avcodeclock);
-
-#ifdef USING_FFMPEG_THREADS
-    if ((encoding_thread_count > 1) &&
-        avcodec_thread_init(mpa_vidctx, encoding_thread_count))
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "FFMPEG couldn't start threading...");
-    }
-#endif
 
     if (avcodec_open(mpa_vidctx, mpa_vidcodec) < 0)
     {
@@ -1007,6 +988,7 @@ void NuppelVideoRecorder::ResizeVideoBuffers(void)
 void NuppelVideoRecorder::StopRecording(void)
 {
     encoding = false;
+    V4LRecorder::StopRecording();
 }
 
 void NuppelVideoRecorder::StreamAllocate(void)
@@ -1912,11 +1894,8 @@ bool NuppelVideoRecorder::SpawnChildren(void)
     audio_thread = new NVRAudioThread(this);
     audio_thread->start();
 
-    if (vbimode)
-    {
-        vbi_thread = new NVRVBIThread(this);
-        vbi_thread->start();
-    }
+    if ((vbimode != VBIMode::None) && (OpenVBIDevice() >= 0))
+        vbi_thread = new VBIThread(this);
 
     return true;
 }
@@ -1949,11 +1928,6 @@ void NuppelVideoRecorder::KillChildren(void)
         delete vbi_thread;
         vbi_thread = NULL;
     }
-
-#ifdef USING_FFMPEG_THREADS
-    if (useavcodec && encoding_thread_count > 1)
-        avcodec_thread_free(mpa_vidctx);
-#endif
 }
 
 void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len, bool forcekey)
@@ -2478,14 +2452,7 @@ void NuppelVideoRecorder::doAudioThread(void)
 }
 
 #ifdef USING_V4L
-struct VBIData
-{
-    NuppelVideoRecorder *nvr;
-    vt_page teletextpage;
-    bool foundteletextpage;
-};
-
-void NuppelVideoRecorder::FormatTeletextSubtitles(struct VBIData *vbidata)
+void NuppelVideoRecorder::FormatTT(struct VBIData *vbidata)
 {
     struct timeval tnow;
     gettimeofday(&tnow, &tzone);
@@ -2652,7 +2619,7 @@ void NuppelVideoRecorder::FormatTeletextSubtitles(struct VBIData *vbidata)
     textbuffer[act]->freeToEncode = 1;
 }
 #else  // USING_V4L
-void NuppelVideoRecorder::FormatTeletextSubtitles(struct VBIData *vbidata) {}
+void NuppelVideoRecorder::FormatTT(struct VBIData*) {}
 #endif // USING_V4L
 
 void NuppelVideoRecorder::FormatCC(struct cc *cc)
@@ -2689,198 +2656,6 @@ void NuppelVideoRecorder::AddTextData(unsigned char *buf, int len,
         act_text_buffer = 0;
     textbuffer[act]->freeToEncode = 1;
 }
-
-#ifdef USING_V4L
-static void vbi_event(struct VBIData *data, struct vt_event *ev)
-{
-    switch (ev->type)
-    {
-       case EV_PAGE:
-       {
-            struct vt_page *vtp = (struct vt_page *) ev->p1;
-            if (vtp->flags & PG_SUBTITLE)
-            {
-                //printf("subtitle page %x.%x\n", vtp->pgno, vtp->subno);
-                data->foundteletextpage = true;
-                memcpy(&(data->teletextpage), vtp, sizeof(vt_page));
-            }
-       }
-
-       case EV_HEADER:
-       case EV_XPACKET:
-           break;
-    }
-}
-
-/*
-These are the default values for various VBI drivers
-// bttv
-vbi_format  rate: 28636363
-samples_per_line: 2048
-          starts: 10, 273
-          counts: 16, 16
-           flags: 0x0
-// cx88
-vbi_format  rate: 28636363
-samples_per_line: 2048
-          starts: 9, 272
-          counts: 17, 17
-           flags: 0x0
-*/
-
-void NuppelVideoRecorder::doVbiThread(void)
-{
-    //VERBOSE(VB_IMPORTANT, LOC + "vbi begin");
-    struct VBIData vbicallbackdata;
-    struct vbi *pal_tt = NULL;
-    struct cc *ntsc_cc = NULL;
-    int vbifd = -1;
-    char *ptr = NULL;
-    char *ptr_end = NULL;
-
-    QByteArray vbidev = vbidevice.toAscii();
-    if (VBIMode::PAL_TT == vbimode)
-    {
-        pal_tt = vbi_open(vbidev.constData(), NULL, 99, -1);
-        if (pal_tt)
-        {
-            vbifd = pal_tt->fd;
-            vbicallbackdata.nvr = this;
-            vbi_add_handler(pal_tt, (void*) vbi_event, &vbicallbackdata);
-        }
-    }
-    else if (VBIMode::NTSC_CC == vbimode)
-    {
-        ntsc_cc = new struct cc;
-        memset(ntsc_cc, 0, sizeof(struct cc));
-        ntsc_cc->fd = open(vbidev.constData(), O_RDONLY|O_NONBLOCK);
-        ntsc_cc->code1 = -1;
-        ntsc_cc->code2 = -1;
-
-        vbifd   = ntsc_cc->fd;
-        ptr     = ntsc_cc->buffer;
-
-        if (vbifd < 0)
-            delete ntsc_cc;
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid CC/Teletext mode");
-        return;
-    }
-
-    if (vbifd < 0)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Can't open vbi device: '%1'").arg(vbidevice));
-        return;
-    }
-
-    if (VBIMode::NTSC_CC == vbimode)
-    {
-        // V4L v1 VBI ioctls
-        struct vbi_format vfmt;
-        memset(&vfmt, 0, sizeof(vbi_format));
-        if (ioctl(vbifd, VIDIOCGVBIFMT, &vfmt) < 0)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Failed to query vbi capabilities (v4l1)");
-            cc_close(ntsc_cc);
-            return;
-        }
-        VERBOSE(VB_RECORD, LOC + 
-                QString("vbi_format  rate: %1").arg(vfmt.sampling_rate) +
-                QString("\n\t\t\tsamples_per_line: %1").arg(vfmt.samples_per_line) +
-                QString("\n\t\t\t          starts: %1, %2").arg(vfmt.start[0])
-                .arg(vfmt.start[1]) +
-                QString("\n\t\t\t          counts: %1, %2").arg(vfmt.count[0])
-                .arg(vfmt.count[1]) +
-                QString("n\t\t\t           flags: 0x%1").arg(vfmt.flags,0,16));
-        uint sz = vfmt.samples_per_line * (vfmt.count[0] + vfmt.count[1]);
-        ntsc_cc->samples_per_line = vfmt.samples_per_line;
-        ntsc_cc->start_line       = vfmt.start[0];
-        ntsc_cc->line_count       = vfmt.count[0];
-        ntsc_cc->scale0           = (vfmt.sampling_rate + 503488 / 2) / 503488;
-        ntsc_cc->scale1           = (ntsc_cc->scale0 * 2 + 3) / 5; /* 40% */
-        ptr_end = ntsc_cc->buffer + sz;
-        if (sz > CC_VBIBUFSIZE)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "VBI format has too many samples per frame");
-            cc_close(ntsc_cc);
-            return;
-        }
-    }
-
-    while (childrenLive)
-    {
-        {
-            QMutexLocker locker(&pauseLock);
-            if (request_pause)
-            {
-                unpauseWait.wait(&pauseLock, 100);
-                continue;
-            }
-        }
-
-        struct timeval tv;
-        fd_set rdset;
-
-        tv.tv_sec = 0;
-        tv.tv_usec = 5000;
-        FD_ZERO(&rdset);
-        FD_SET(vbifd, &rdset);
-
-        int nr = select(vbifd + 1, &rdset, 0, 0, &tv);
-        if (nr < 0)
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "vbi select failed" + ENO);
-
-        if (nr <= 0)
-            continue; // either failed or timed out..
-
-        if (VBIMode::PAL_TT == vbimode)
-        {
-            vbicallbackdata.foundteletextpage = false;
-            vbi_handler(pal_tt, pal_tt->fd);
-            if (vbicallbackdata.foundteletextpage)
-            {
-                // decode VBI as teletext subtitles
-                FormatTeletextSubtitles(&vbicallbackdata);
-            }
-        }
-        else if (VBIMode::NTSC_CC == vbimode)
-        {
-            int ret = read(vbifd, ptr, ptr_end - ptr);
-            ptr = (ret > 0) ? ptr + ret : ptr;
-            if ((ptr_end - ptr) == 0)
-            {
-                cc_decode(ntsc_cc);
-                FormatCC(ntsc_cc);
-                ptr = ntsc_cc->buffer;
-            }
-            else if (ret < 0)
-            {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Reading VBI data" + ENO);
-            }
-        }
-    }
-    //VERBOSE(VB_RECORD, LOC + "vbi shutdown");
-
-    if (pal_tt)
-    {
-        vbi_del_handler(pal_tt, (void*) vbi_event, &vbicallbackdata);
-        vbi_close(pal_tt);
-    }
-
-    if (ntsc_cc)
-        cc_close(ntsc_cc);
-
-    //VERBOSE(VB_RECORD, LOC + "vbi end");
-}
-
-#else  // USING_V4L
-void NuppelVideoRecorder::doVbiThread(void) { }
-#endif // USING_V4L
 
 void NuppelVideoRecorder::doWriteThread(void)
 {
@@ -3178,16 +2953,6 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         if (freecount < 5)
             raw = 1; // speed up the encode process
 
-        if (raw == 1 || compressthis == 0)
-        {
-            if (ringBuffer->IsIOBound())
-            {
-                /* need to compress, the disk can't handle any more bandwidth*/
-                raw=0;
-                compressthis=1;
-            }
-        }
-
         if (transcoding)
         {
             raw = 0;
@@ -3434,18 +3199,25 @@ void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, int timecode,
     frameheader.frametype = 'T'; // text frame
     frameheader.timecode = timecode;
 
-    if (vbimode == 1)
+    if (VBIMode::PAL_TT == vbimode)
     {
         frameheader.comptype = 'T'; // european teletext
-        frameheader.packetlength = sizeof(int) + len;
-
+        frameheader.packetlength = len + 4;
         WriteFrameheader(&frameheader);
-        ringBuffer->Write(&pagenr, sizeof(int));
+        union page_t {
+            int32_t val32;
+            struct { int8_t a,b,c,d; } val8;
+        } v;
+        v.val32 = pagenr;
+        ringBuffer->Write(&v.val8.d, sizeof(int8_t));
+        ringBuffer->Write(&v.val8.c, sizeof(int8_t));
+        ringBuffer->Write(&v.val8.b, sizeof(int8_t));
+        ringBuffer->Write(&v.val8.a, sizeof(int8_t));
         ringBuffer->Write(buf, len);
     }
-    else if (vbimode == 2)
+    else if (VBIMode::NTSC_CC == vbimode)
     {
-        frameheader.comptype = 'C';      // NTSC CC
+        frameheader.comptype = 'C'; // NTSC CC
         frameheader.packetlength = len;
 
         WriteFrameheader(&frameheader);

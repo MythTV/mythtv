@@ -923,7 +923,6 @@ bool RecordingInfo::InsertProgram(const RecordingInfo *pg,
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    //query.prepare("LOCK TABLES recorded WRITE");
     if (!query.exec("LOCK TABLES recorded WRITE"))
     {
         MythDB::DBError("InsertProgram -- lock", query);
@@ -938,13 +937,24 @@ bool RecordingInfo::InsertProgram(const RecordingInfo *pg,
     query.bindValue(":CHANID", pg->chanid);
     query.bindValue(":STARTS", pg->recstartts);
 
-    if (!query.exec() || query.size())
+    bool err = true;
+    if (!query.exec())
     {
-        if (!query.isActive())
-            MythDB::DBError("InsertProgram -- select", query);
-        else
-            VERBOSE(VB_IMPORTANT, "recording already exists...");
+        MythDB::DBError("InsertProgram -- select", query);
+    }
+    else if (query.next())
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("RecordingInfo::InsertProgram(%1): ")
+                .arg(pg->toString()) + "recording already exists...");
+    }
+    else
+    {
+        err = false;
+    }
 
+    if (err)
+    {
         if (!query.exec("UNLOCK TABLES"))
             MythDB::DBError("InsertProgram -- unlock tables", query);
         return false;

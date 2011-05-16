@@ -1008,6 +1008,27 @@ class RecordingType : public ComboBoxSetting, public CodecParamStorage
     };
 };
 
+class RecordFullTSStream : public ComboBoxSetting, public CodecParamStorage
+{
+  public:
+    RecordFullTSStream(const RecordingProfile &parent) :
+        ComboBoxSetting(this), CodecParamStorage(this, parent, "recordmpts")
+    {
+        setLabel(QObject::tr("Recording Full TS"));
+
+        QString msg = QObject::tr(
+            "When set an extra files will be created for each recording "
+            "with the name of that recording plus .ts and a number. "
+            "These will represent that full contents of the transport "
+            "stream used to generate the recording.");
+        setHelpText(msg);
+
+        addSelection(QObject::tr("Yes"), "1");
+        addSelection(QObject::tr("No"),  "0");
+        setValue(1);
+    };
+};
+
 class TranscodeFilters : public LineEditSetting, public CodecParamStorage
 {
   public:
@@ -1394,6 +1415,10 @@ void RecordingProfile::CompleteLoad(int profileId, const QString &type,
     else if (type.toUpper() == "DVB")
     {
         addChild(new RecordingType(*this));
+    }
+    else if (type.toUpper() == "ASI")
+    {
+        addChild(new RecordFullTSStream(*this));
     }
 
     id->setValue(profileId);

@@ -36,7 +36,6 @@ DEPENDPATH  += ../libmythlivemedia/UsageEnvironment
 DEPENDPATH  += ../libmythbase ../libmythui
 DEPENDPATH  += ../libmythupnp
 
-
 INCLUDEPATH += .. ../.. # for avlib headers
 INCLUDEPATH += ../../external/FFmpeg
 INCLUDEPATH += $$DEPENDPATH
@@ -113,11 +112,11 @@ cygwin:DEFINES += _WIN32
 using_valgrind:DEFINES += USING_VALGRIND
 
 # old libvbitext (Caption decoder)
-using_v4l {
+#using_v4l {
     HEADERS += vbitext/cc.h vbitext/dllist.h vbitext/hamm.h vbitext/lang.h
     HEADERS += vbitext/vbi.h vbitext/vt.h
     SOURCES += vbitext/cc.cpp vbitext/vbi.c vbitext/hamm.c vbitext/lang.c
-}
+#}
 
 # mmx macros from avlib
 contains( HAVE_MMX, yes ) {
@@ -149,6 +148,7 @@ HEADERS += filtermanager.h          recordingprofile.h
 HEADERS += remoteencoder.h          videosource.h
 HEADERS += cardutil.h               sourceutil.h
 HEADERS += videometadatautil.h
+HEADERS += vbi608extractor.h
 HEADERS += cc608decoder.h           cc608reader.h
 HEADERS += cc708decoder.h           cc708reader.h
 HEADERS += cc708window.h            subtitlereader.h
@@ -176,6 +176,7 @@ SOURCES += filtermanager.cpp        recordingprofile.cpp
 SOURCES += remoteencoder.cpp        videosource.cpp
 SOURCES += cardutil.cpp             sourceutil.cpp
 SOURCES += videometadatautil.cpp
+SOURCES += vbi608extractor.cpp
 SOURCES += cc608decoder.cpp         cc608reader.cpp
 SOURCES += cc708decoder.cpp         cc708reader.cpp
 SOURCES += cc708window.cpp          subtitlereader.cpp
@@ -402,6 +403,7 @@ using_backend {
     # Channel stuff
     HEADERS += channelbase.h               dtvchannel.h
     HEADERS += signalmonitor.h             dtvsignalmonitor.h
+    HEADERS += scriptsignalmonitor.h
     HEADERS += inputinfo.h                 inputgroupmap.h
     SOURCES += channelbase.cpp             dtvchannel.cpp
     SOURCES += signalmonitor.cpp           dtvsignalmonitor.cpp
@@ -483,10 +485,9 @@ using_backend {
         DEFINES += USING_OSS
     }
 
-    HEADERS += channelchangemonitor.h
-    SOURCES += channelchangemonitor.cpp
-
     # Support for Video4Linux devices
+    HEADERS += v4lrecorder.h
+    SOURCES += v4lrecorder.cpp
     using_v4l {
         HEADERS += v4lchannel.h                analogsignalmonitor.h
         SOURCES += v4lchannel.cpp              analogsignalmonitor.cpp
@@ -550,6 +551,9 @@ using_backend {
         SOURCES += hdhrsignalmonitor.cpp hdhrchannel.cpp
         SOURCES += hdhrrecorder.cpp      hdhrstreamhandler.cpp
 
+        HEADERS *= streamhandler.h
+        SOURCES *= streamhandler.cpp
+
         DEFINES += USING_HDHOMERUN
     }
 
@@ -579,11 +583,29 @@ using_backend {
         HEADERS += dvbrecorder.h          dvbstreamhandler.h
         SOURCES += dvbrecorder.cpp        dvbstreamhandler.cpp
 
+        HEADERS *= streamhandler.h
+        SOURCES *= streamhandler.cpp
+
         # Misc
         HEADERS += dvbdev/dvbci.h
         SOURCES += dvbdev/dvbci.cpp
 
         DEFINES += USING_DVB
+    }
+
+    using_asi {
+        # Channel stuff
+        HEADERS += asichannel.h           asisignalmonitor.h
+        SOURCES += asichannel.cpp         asisignalmonitor.cpp
+
+        # ASI Recorder
+        HEADERS += asirecorder.h          asistreamhandler.h
+        SOURCES += asirecorder.cpp        asistreamhandler.cpp
+
+        HEADERS *= streamhandler.h
+        SOURCES *= streamhandler.cpp
+
+        DEFINES += USING_ASI
     }
 
     DEFINES += USING_BACKEND
