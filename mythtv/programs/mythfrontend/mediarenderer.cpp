@@ -32,6 +32,9 @@ class MythFrontendStatus : public HttpServerExtension
         if (pRequest->m_sBaseUrl != "/")
             return false;
 
+        if (pRequest->m_sMethod == "getDeviceDesc")
+            return false;
+
         pRequest->m_eResponseType = ResponseTypeHTML;
         pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
 
