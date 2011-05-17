@@ -8,7 +8,7 @@
 
 #ifdef USING_V4L1
 #include <linux/videodev.h>
-#endif USING_V4L1
+#endif // USING_V4L1
 
 #include "mythverbose.h"
 #include "analogsignalmonitor.h"
@@ -177,7 +177,7 @@ void AnalogSignalMonitor::UpdateValues(void)
             isLocked = tuner.signal;
         }
     }
-#endif USING_V4L1
+#endif // USING_V4L1
 
     {
         QMutexLocker locker(&statusLock);
