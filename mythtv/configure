@@ -108,8 +108,8 @@ Advanced options (experts only):
   --disable-firewire       disable support for FireWire cable boxes
   --disable-iptv           disable support for recording RTSP/UDP/RTP streams
   --disable-hdhomerun      disable support for HDHomeRun boxes
-  --disable-v4l            disable Video4Linux support
-  --disable-ivtv           disable ivtv support (PVR-x50) req. v4l support
+  --disable-v4l2           disable Video4Linux support
+  --disable-ivtv           disable ivtv support (PVR-x50) req. v4l2 support
   --disable-hdpvr          disable HD-PVR support
   --disable-dvb            disable DVB support
   --dvb-path=HDRLOC        location of directory containing
@@ -1357,7 +1357,8 @@ MYTHTV_CONFIG_LIST='
     qtdbus
     qtwebkit
     quartz_video
-    v4l
+    v4l2
+    v4l1
     valgrind
     x11
     xrandr
@@ -1763,15 +1764,16 @@ audio_oss_deps_any="soundcard_h sys_soundcard_h"
 dvb_deps="backend"
 firewire_deps="backend"
 iptv_deps="backend"
-ivtv_deps="backend v4l"
-hdpvr_deps="backend v4l"
+ivtv_deps="backend v4l2"
+hdpvr_deps="backend v4l2"
 hdhomerun_deps="backend"
 mpegtsraw_demuxer_deps="merge_libavformat_mpegts_c"
 mythtranscode_deps="backend frontend"
 opengl_deps_any="agl_h GL_gl_h GLES2_gl2_h darwin windows x11"
 opengles_deps="GLES2_gl2_h"
 opengl_video_deps="opengl"
-v4l_deps="backend linux_videodev_h linux_videodev2_h"
+v4l2_deps="backend linux_videodev2_h"
+v4l1_deps="backend v4l2 linux_videodev_h"
 vdpau_deps="opengl vdpau_vdpau_h vdpau_vdpau_x11_h"
 xrandr_deps="x11"
 xv_deps="x11"
@@ -1993,10 +1995,12 @@ enable opengles
 enable opengl_video
 enable quartz_video
 enable symbol_visibility
-enable v4l
+enable v4l1
+enable v4l2
 enable x11
 enable xrandr
 enable xv
+disable indevs
 
 # mythtv paths
 dvb_path_default="${sysroot}/usr/include"
@@ -3120,7 +3124,8 @@ EOF
             disable mmx
             enable disable_mmx_for_debugging   # prevent later call to die
         fi
-        disable v4l
+        disable v4l1
+        disable v4l2
         disable x11
         # Workaround compile errors from missing gmtime_r/localtime_r/uint def
         CFLAGS=`echo $CFLAGS | sed 's/-D_POSIX_C_SOURCE=200112//'`
@@ -3165,7 +3170,8 @@ EOF
             disable protocols
         fi
         disable symver
-        disable v4l
+        disable v4l1
+        disable v4l2
         enable  windows
         disable x11
         ###### Standard ffmpeg configure stuff follows:
@@ -4446,7 +4452,7 @@ enabled stripping || strip="echo skipping strip"
 config_files="$TMPH $TMPMAK"
 
 if enabled backend; then
-  echo "Video4Linux sup.          ${v4l-no}"
+  echo "Video4Linux sup.          ${v4l2-no} (v1 ${v4l1-no})"
   echo "ivtv support              ${ivtv-no}"
   echo "HD-PVR support            ${hdpvr-no}"
   echo "FireWire support          ${firewire-no}"

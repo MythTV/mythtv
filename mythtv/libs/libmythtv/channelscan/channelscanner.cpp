@@ -350,7 +350,7 @@ void ChannelScanner::PreScanCommon(
         channel = new DVBChannel(device);
 #endif
 
-#ifdef USING_V4L
+#ifdef USING_V4L2
     if (("V4L" == card_type) || ("MPEG" == card_type))
         channel = new V4LChannel(NULL, device);
 #endif

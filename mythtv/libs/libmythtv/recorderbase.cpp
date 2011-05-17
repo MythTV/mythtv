@@ -537,11 +537,11 @@ RecorderBase *RecorderBase::CreateRecorder(
     }
     else if (CardUtil::IsV4L(genOpt.cardtype))
     {
-#ifdef USING_V4L
+#ifdef USING_V4L2
         // V4L/MJPEG/GO7007 from here on
         recorder = new NuppelVideoRecorder(tvrec, channel);
         recorder->SetOption("skipbtaudio", genOpt.skip_btaudio);
-#endif // USING_V4L
+#endif // USING_V4L2
     }
 
     if (recorder)

@@ -1174,7 +1174,7 @@ ChannelBase *ChannelBase::CreateChannel(
     }
     else if (CardUtil::IsV4L(genOpt.cardtype))
     {
-#ifdef USING_V4L
+#ifdef USING_V4L2
         channel = new V4LChannel(tvrec, genOpt.videodev);
 #endif
         if ((genOpt.cardtype != "MPEG") && (genOpt.cardtype != "HDPVR"))

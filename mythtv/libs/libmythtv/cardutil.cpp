@@ -4,7 +4,7 @@
 
 #include <algorithm>
 
-#if defined(USING_V4L) || defined(USING_DVB)
+#if defined(USING_V4L2) || defined(USING_DVB)
 #include <sys/ioctl.h>
 #endif
 
@@ -26,8 +26,11 @@
 #include "dvbtypes.h"
 #endif
 
-#ifdef USING_V4L
+#ifdef USING_V4L1
 #include <linux/videodev.h>
+#endif
+
+#ifdef USING_V4L2
 #include <linux/videodev2.h>
 #endif
 
@@ -52,14 +55,14 @@ QString CardUtil::GetScanableCardTypes(void)
     cardTypes += "'DVB'";
 #endif // USING_DVB
 
-#ifdef USING_V4L
+#ifdef USING_V4L2
     if (!cardTypes.isEmpty())
         cardTypes += ",";
     cardTypes += "'V4L'";
 # ifdef USING_IVTV
     cardTypes += ",'MPEG'";
 # endif // USING_IVTV
-#endif // USING_V4L
+#endif // USING_V4L2
 
 #ifdef USING_IPTV
     if (!cardTypes.isEmpty())
@@ -1537,15 +1540,15 @@ uint CardUtil::GetQuickTuning(uint cardid, const QString &input_name)
 bool CardUtil::hasV4L2(int videofd)
 {
     (void) videofd;
-#ifdef USING_V4L
+#ifdef USING_V4L2
     struct v4l2_capability vcap;
     memset(&vcap, 0, sizeof(vcap));
 
     return ((ioctl(videofd, VIDIOC_QUERYCAP, &vcap) >= 0) &&
             (vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE));
-#else // if !USING_V4L
+#else // if !USING_V4L2
     return false;
-#endif // !USING_V4L
+#endif // !USING_V4L2
 }
 
 bool CardUtil::GetV4LInfo(
@@ -1559,7 +1562,7 @@ bool CardUtil::GetV4LInfo(
     if (videofd < 0)
         return false;
 
-#ifdef USING_V4L
+#ifdef USING_V4L2
     // First try V4L2 query
     struct v4l2_capability capability;
     memset(&capability, 0, sizeof(struct v4l2_capability));
@@ -1570,13 +1573,15 @@ bool CardUtil::GetV4LInfo(
         version = capability.version;
         capabilities = capability.capabilities;
     }
+#ifdef USING_V4L1
     else // Fallback to V4L1 query
     {
         struct video_capability capability;
         if (ioctl(videofd, VIDIOCGCAP, &capability) >= 0)
             card = QString::fromAscii((const char*)capability.name);
     }
-#endif // !USING_V4L
+#endif // USING_V4L1
+#endif // USING_V4L2
 
     if (!driver.isEmpty())
         driver.remove( QRegExp("\\[[0-9]\\]$") );
@@ -1591,7 +1596,7 @@ InputNames CardUtil::ProbeV4LVideoInputs(int videofd, bool &ok)
     InputNames list;
     ok = false;
 
-#ifdef USING_V4L
+#ifdef USING_V4L2
     bool usingv4l2 = hasV4L2(videofd);
 
     // V4L v2 query
@@ -1609,6 +1614,7 @@ InputNames CardUtil::ProbeV4LVideoInputs(int videofd, bool &ok)
         return list;
     }
 
+#ifdef USING_V4L1
     // V4L v1 query
     struct video_capability vidcap;
     memset(&vidcap, 0, sizeof(vidcap));
@@ -1637,15 +1643,16 @@ InputNames CardUtil::ProbeV4LVideoInputs(int videofd, bool &ok)
 
         list[i] = test.name;
     }
+#endif // USING_V4L1
 
     // Create an input on single input cards that don't advertise input
     if (!list.size())
         list[0] = "Television";
 
     ok = true;
-#else // if !USING_V4L
+#else // if !USING_V4L2
     list[-1] += QObject::tr("ERROR, Compile with V4L support to query inputs");
-#endif // !USING_V4L
+#endif // !USING_V4L2
     return list;
 }
 
@@ -1656,7 +1663,7 @@ InputNames CardUtil::ProbeV4LAudioInputs(int videofd, bool &ok)
     InputNames list;
     ok = false;
 
-#ifdef USING_V4L
+#ifdef USING_V4L2
     bool usingv4l2 = hasV4L2(videofd);
 
     // V4L v2 query
@@ -1675,10 +1682,10 @@ InputNames CardUtil::ProbeV4LAudioInputs(int videofd, bool &ok)
     }
 
     ok = true;
-#else // if !USING_V4L
+#else // if !USING_V4L2
     list[-1] += QObject::tr(
         "ERROR, Compile with V4L support to query audio inputs");
-#endif // !USING_V4L
+#endif // !USING_V4L2
     return list;
 }
 
