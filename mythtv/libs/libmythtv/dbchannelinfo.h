@@ -25,7 +25,8 @@ class MTV_PUBLIC DBChannel
     DBChannel(const QString &_channum, const QString &_callsign,
               uint _chanid, uint _major_chan, uint _minor_chan,
               uint _mplexid, bool _visible,
-              const QString &_name, const QString &_icon);
+              const QString &_name, const QString &_icon,
+              uint _sourceid, uint _cardid, uint _grpid);
     DBChannel& operator=(const DBChannel&);
 
     bool operator == (uint _chanid) const
@@ -34,13 +35,16 @@ class MTV_PUBLIC DBChannel
   public:
     QString channum;
     QString callsign;
+    QString name;
+    QString icon;
     uint    chanid;
     uint    major_chan;
     uint    minor_chan;
     uint    mplexid;
+    uint    sourceid;
+    uint    cardid;
+    uint    grpid;
     bool    visible;
-    QString name;
-    QString icon;
 };
 typedef vector<DBChannel> DBChanList;
 

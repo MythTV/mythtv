@@ -927,8 +927,7 @@ bool ChannelBase::InitializeInputs(void)
         m_allchannels.insert(m_allchannels.end(),
                            channels.begin(), channels.end());
     }
-    ChannelUtil::SortChannels(m_allchannels, order);
-    ChannelUtil::EliminateDuplicateChanNum(m_allchannels);
+    ChannelUtil::SortChannels(m_allchannels, order, true);
 
     m_currentInputID = GetDefaultInput(cardid);
 

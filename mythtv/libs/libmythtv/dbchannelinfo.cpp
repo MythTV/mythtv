@@ -24,32 +24,33 @@ DBChannel::DBChannel(
     const QString &_channum, const QString &_callsign,
     uint _chanid, uint _major_chan, uint _minor_chan,
     uint _mplexid, bool _visible,
-    const QString &_name, const QString &_icon) :
+    const QString &_name, const QString &_icon,
+    uint _sourceid, uint _cardid, uint _grpid) :
     channum(_channum),
-    callsign(_callsign), chanid(_chanid),
+    callsign(_callsign),
+    name(_name), icon((_icon == "none") ? QString() : _icon),
+    chanid(_chanid),
     major_chan(_major_chan), minor_chan(_minor_chan),
-    mplexid(_mplexid), visible(_visible),
-    name(_name), icon(_icon)
+    mplexid((_mplexid == 32767) ? 0 : _mplexid),
+    sourceid(_sourceid), cardid(_cardid), grpid(_grpid),
+    visible(_visible)
 {
-    channum.detach();
-    callsign.detach();
-    name.detach();
-    icon.detach();
-    mplexid = (mplexid == 32767) ? 0 : mplexid;
-    icon = (icon == "none") ? QString::null : icon;
 }
 
 DBChannel &DBChannel::operator=(const DBChannel &other)
 {
-    channum    = other.channum;  channum.detach();
-    callsign   = other.callsign; callsign.detach();
+    channum    = other.channum;
+    callsign   = other.callsign;
+    name       = other.name;
+    icon       = other.icon;
     chanid     = other.chanid;
     major_chan = other.major_chan;
     minor_chan = other.minor_chan;
     mplexid    = (other.mplexid == 32767) ? 0 : other.mplexid;
+    sourceid   = other.sourceid;
+    cardid     = other.cardid;
+    grpid      = other.grpid;
     visible    = other.visible;
-    name       = other.name; name.detach();
-    icon       = other.icon; icon.detach();
 
     return *this;
 }
