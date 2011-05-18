@@ -182,18 +182,20 @@ class MTV_PUBLIC ChannelUtil
     static QString GetVideoFilters(uint sourceid, const QString &channum)
         { return GetChannelValueStr("videofilters", sourceid, channum); }
 
-    static DBChanList GetChannels(uint srcid, bool vis_only, 
-                                  QString grp = "", int changrpid = -1);
+    static DBChanList GetChannels(
+        uint sourceid, bool visible_only, 
+        QString group_by = "", uint channel_groupid = 0);
     static vector<uint> GetChanIDs(int sourceid = -1);
     static uint    GetChannelCount(int sourceid = -1);
     static void    SortChannels(DBChanList &list, const QString &order,
                                 bool eliminate_duplicates = false);
-    static void    EliminateDuplicateChanNum(DBChanList &list);
 
-    static uint    GetNextChannel(const DBChanList  &sorted,
-                                  uint               old_chanid,
-                                  uint               mplexid_restriction,
-                                  int                direction);
+    static uint    GetNextChannel(const DBChanList &sorted,
+                                  uint old_chanid,
+                                  uint mplexid_restriction,
+                                  int  direction,
+                                  bool skip_non_visible = true,
+                                  bool skip_same_channum_and_callsign = false);
 
     static QString GetChannelValueStr(const QString &channel_field,
                                       uint           sourceid,

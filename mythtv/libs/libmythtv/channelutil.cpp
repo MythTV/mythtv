@@ -1965,7 +1965,8 @@ bool ChannelUtil::GetExtendedChannelData(
                            dvb_transportid, dvb_networkid, dtv_si_std);
 }
 
-DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp, int changrpid)
+DBChanList ChannelUtil::GetChannels(
+    uint sourceid, bool vis_only, QString grp, uint changrpid)
 {
     DBChanList list;
 
@@ -1974,36 +1975,42 @@ DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp, i
     QString qstr =
         "SELECT channum, callsign, channel.chanid, "
         "       atsc_major_chan, atsc_minor_chan, "
-        "       name, icon, mplexid, visible "
-        "FROM channel ";
+        "       name, icon, mplexid, visible, "
+        "       channel.sourceid, cardinput.cardid, channelgroup.grpid "
+        "FROM channel "
+        "LEFT JOIN channelgroup ON channel.chanid     = channelgroup.chanid "
+        "JOIN cardinput         ON cardinput.sourceid = channel.sourceid "
+        "JOIN capturecard       ON cardinput.cardid   = capturecard.cardid ";
 
-    // Select only channels from the specified channel group
-    if (changrpid > -1)
-        qstr += QString(",channelgroup ");
+    QString cond = " WHERE ";
 
     if (sourceid)
-        qstr += QString("WHERE sourceid='%1' ").arg(sourceid);
-    else
-        qstr += ",cardinput,capturecard "
-            "WHERE cardinput.sourceid = channel.sourceid   AND "
-            "      cardinput.cardid   = capturecard.cardid     ";
-
-    if (changrpid > -1)
     {
-        qstr += QString("AND channel.chanid = channelgroup.chanid "
-                        "AND channelgroup.grpid ='%1' ").arg(changrpid);
+        qstr += QString("WHERE channel.sourceid='%1' ").arg(sourceid);
+        cond = " AND ";
+    }
+
+    // Select only channels from the specified channel group
+    if (changrpid > 0)
+    {
+        qstr += QString("%1 channelgroup.grpid = '%2' ")
+            .arg(cond).arg(changrpid);
+        cond = " AND ";
     }
 
     if (vis_only)
-        qstr += "AND visible=1 ";
+    {
+        qstr += QString("%1 visible=1 ").arg(cond);
+        cond = " AND ";
+    }
 
     if (!grp.isEmpty())
-        qstr += QString("GROUP BY %1 ").arg(grp);
+        qstr += QString(" GROUP BY %1 ").arg(grp);
 
     query.prepare(qstr);
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
     {
-        MythDB::DBError("get channels -- sourceid", query);
+        MythDB::DBError("ChannelUtil::GetChannels()", query);
         return list;
     }
 
@@ -2021,7 +2028,10 @@ DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp, i
             query.value(7).toUInt(),                      /* mplexid    */
             query.value(8).toBool(),                      /* visible    */
             query.value(5).toString(),                    /* name       */
-            query.value(6).toString());                   /* icon       */
+            query.value(6).toString(),                    /* icon       */
+            query.value(9).toUInt(),                      /* sourceid   */
+            query.value(11).toUInt(),                     /* cardid     */
+            query.value(10).toUInt());                    /* grpid      */
 
         list.push_back(chan);
     }
@@ -2189,29 +2199,13 @@ void ChannelUtil::SortChannels(DBChanList &list, const QString &order,
     }
 }
 
-void ChannelUtil::EliminateDuplicateChanNum(DBChanList &list)
-{
-    typedef std::set<QString> seen_set;
-    seen_set seen;
-
-    DBChanList::iterator it = list.begin();
-
-    while (it != list.end())
-    {
-        QString tmp = it->channum; tmp.detach();
-        std::pair<seen_set::iterator, bool> insret = seen.insert(tmp);
-        if (insret.second)
-            ++it;
-        else
-            it = list.erase(it);
-    }
-}
-
 uint ChannelUtil::GetNextChannel(
     const DBChanList &sorted,
     uint              old_chanid,
     uint              mplexid_restriction,
-    int               direction)
+    int               direction,
+    bool              skip_non_visible,
+    bool              skip_same_channum_and_callsign)
 {
     DBChanList::const_iterator it =
         find(sorted.begin(), sorted.end(), old_chanid);
@@ -2223,7 +2217,6 @@ uint ChannelUtil::GetNextChannel(
         return 0; // no channels..
 
     DBChanList::const_iterator start = it;
-    bool skip_non_visible = true; // TODO make DB selectable
 
     if (CHANNEL_DIRECTION_DOWN == direction)
     {
@@ -2237,10 +2230,14 @@ uint ChannelUtil::GetNextChannel(
         }
         while ((it != start) &&
                ((skip_non_visible && !it->visible) ||
+                (skip_same_channum_and_callsign &&
+                 it->channum  == start->channum &&
+                 it->callsign == start->callsign) ||
                 (mplexid_restriction &&
                  (mplexid_restriction != it->mplexid))));
     }
-    else if ((CHANNEL_DIRECTION_UP == direction) || (CHANNEL_DIRECTION_FAVORITE == direction))
+    else if ((CHANNEL_DIRECTION_UP == direction) ||
+             (CHANNEL_DIRECTION_FAVORITE == direction))
     {
         do
         {
@@ -2250,6 +2247,9 @@ uint ChannelUtil::GetNextChannel(
         }
         while ((it != start) &&
                ((skip_non_visible && !it->visible) ||
+                (skip_same_channum_and_callsign &&
+                 it->channum  == start->channum &&
+                 it->callsign == start->callsign) ||
                 (mplexid_restriction &&
                  (mplexid_restriction != it->mplexid))));
     }
