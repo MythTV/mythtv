@@ -119,7 +119,7 @@ cygwin:DEFINES += _WIN32
 using_valgrind:DEFINES += USING_VALGRIND
 
 # old libvbitext (Caption decoder)
-using_v4l {
+using_v4l || using_v4l2 {
     HEADERS += vbitext/cc.h vbitext/dllist.h vbitext/hamm.h vbitext/lang.h
     HEADERS += vbitext/vbi.h vbitext/vt.h
     SOURCES += vbitext/cc.cpp vbitext/vbi.c vbitext/hamm.c vbitext/lang.c
@@ -471,11 +471,17 @@ using_backend {
     SOURCES += channelchangemonitor.cpp
 
     # Support for Video4Linux devices
-    using_v4l {
+    using_v4l || using_v4l2 {
         HEADERS += v4lchannel.h                analogsignalmonitor.h
         SOURCES += v4lchannel.cpp              analogsignalmonitor.cpp
 
-        DEFINES += USING_V4L
+        using_v4l {
+            DEFINES += USING_V4L
+        }
+
+        using_v4l2 {
+            DEFINES += USING_V4L2
+        }
     }
 
     # Support for cable boxes that provide Firewire out

@@ -6,7 +6,9 @@
 #include <sys/ioctl.h>
 #include <poll.h>
 
+#ifdef USING_V4L
 #include <linux/videodev.h>
+#endif
 
 #include "mythverbose.h"
 #include "analogsignalmonitor.h"
@@ -151,6 +153,7 @@ void AnalogSignalMonitor::UpdateValues(void)
     }
     else
     {
+#ifdef USING_V4L
         struct video_tuner tuner;
         bzero(&tuner, sizeof(tuner));
 
@@ -163,6 +166,7 @@ void AnalogSignalMonitor::UpdateValues(void)
         {
             isLocked = tuner.signal;
         }
+#endif
     }
 
     {
