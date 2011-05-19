@@ -3,7 +3,10 @@
 #ifdef USING_V4L1
 #include <linux/videodev.h> // for vbi_format
 #endif // USING_V4L1
+
+#ifdef USING_V4L2
 #include <linux/videodev2.h>
+#endif // USING_V4L2
 
 #include <sys/ioctl.h>      // for ioctl
 #include <sys/time.h>       // for gettimeofday
@@ -156,8 +159,8 @@ int V4LRecorder::OpenVBIDevice(void)
             fmt.fmt.vbi.flags            = old_fmt.flags;
 #else // if !USING_V4L1
             VERBOSE(VB_RECORD, "V4L2 VBI setup failed");
-	    close(fd);
-	    return -1;
+            close(fd);
+            return -1;
 #endif // !USING_V4L1
         }
         VERBOSE(VB_RECORD, LOC + "vbi_format  rate: "<<fmt.fmt.vbi.sampling_rate
