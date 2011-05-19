@@ -34,7 +34,7 @@
 #define LCD_VERSION_5 2
 
 #define LCD_RECSTATUS_TIME  10000
-#define LCD_TIME_TIME       5000
+#define LCD_TIME_TIME       3000
 #define LCD_SCROLLLIST_TIME 2000
 
 int lcdStartCol = LCD_START_COL;
@@ -431,6 +431,10 @@ void LCDProcClient::init()
     if (gCoreContext->GetSetting("LCDBigClock", "1") == "1")
     {
         // Big Clock - spans multiple lines
+        sendToServer("widget_add Time rec1 string");
+        sendToServer("widget_add Time rec2 string");
+        sendToServer("widget_add Time rec3 string");
+        sendToServer("widget_add Time recCnt string");
         sendToServer("widget_add Time d0 num");
         sendToServer("widget_add Time d1 num");
         sendToServer("widget_add Time sep num");
@@ -498,6 +502,7 @@ void LCDProcClient::init()
     sendToServer("widget_add RecStatus textWidget1 string");
     sendToServer("widget_add RecStatus textWidget2 string");
     sendToServer("widget_add RecStatus textWidget3 string");
+    sendToServer("widget_add RecStatus textWidget4 string");
     sendToServer("widget_add RecStatus progressBar hbar");
 
     lcd_ready = true;
@@ -1828,9 +1833,26 @@ void LCDProcClient::dobigclock (bool init)
     }
     outputRightText("Time", aString, "ampm", lcdHeight - 1);
 
+    if (isRecording)
+    {
+         outputLeftText("Time","R","rec1",1);
+         outputLeftText("Time","E","rec2",2);
+         outputLeftText("Time","C","rec3",3);
+         aString = QString::number((int) tunerList.size());
+         outputLeftText("Time",aString,"recCnt",4);
+
+    }
+    else
+    {
+         outputLeftText("Time"," ","rec1",1);
+         outputLeftText("Time"," ","rec2",2);
+         outputLeftText("Time"," ","rec3",3);
+         outputLeftText("Time"," ","recCnt",4);
+    }
+
     // Add Hour 10's Digit
     aString = "widget_set Time d0 ";
-    aString += QString::number(lcdWidth/2 - 6 - xoffset) + " ";
+    aString += QString::number(lcdWidth/2 - 5 - xoffset) + " ";
     if (toffset == 0)
         aString += "11";
     else
@@ -1839,25 +1861,25 @@ void LCDProcClient::dobigclock (bool init)
 
     // Add Hour 1's Digit
     aString = "widget_set Time d1 ";
-    aString += QString::number(lcdWidth/2 - 3 - xoffset) + " ";
+    aString += QString::number(lcdWidth/2 - 2 - xoffset) + " ";
     aString += time.at(0 + toffset);
     sendToServer(aString);
 
     // Add the Colon
     aString = "widget_set Time sep ";
-    aString += QString::number(lcdWidth/2 - xoffset);
+    aString += QString::number(lcdWidth/2 + 1 - xoffset);
     aString += " 10";   // 10 means: colon
     sendToServer(aString);
 
     // Add Minute 10's Digit
     aString = "widget_set Time d2 ";
-    aString += QString::number(lcdWidth/2 + 1 - xoffset) + " ";
+    aString += QString::number(lcdWidth/2 + 2 - xoffset) + " ";
     aString += time.at(2 + toffset);
     sendToServer(aString);
 
     // Add Minute 1's Digit
     aString = "widget_set Time d3 ";
-    aString += QString::number(lcdWidth/2 + 4 - xoffset) + " ";
+    aString += QString::number(lcdWidth/2 + 5 - xoffset) + " ";
     aString += time.at(3 + toffset);
     sendToServer(aString);
 
@@ -1944,8 +1966,10 @@ void LCDProcClient::outputRecStatus(void)
         isTimeVisible = false;
         activeScreen = "RecStatus";
     }
-    else
+    else if (lcdTunerNo > (int) tunerList.size() - 1)
     {
+        lcdTunerNo = 0;
+
         // switch to the time screen
         setPriority("Time", MEDIUM);
         setPriority("RecStatus", LOW);
@@ -1960,7 +1984,7 @@ void LCDProcClient::outputRecStatus(void)
         isTimeVisible = true;
 
         return;
-    }
+    }  
 
     QString aString, status;
     QStringList list;
@@ -1970,27 +1994,38 @@ void LCDProcClient::outputRecStatus(void)
     scrollListItems.clear();
     if (lcdHeight >= 4)
     {
-        outputCenteredText("RecStatus", tr("RECORDING"), "textWidget1", 1);
+        //  LINE 1 - "R" + Channel
+        status = tr("R ");
+        status += tuner.channame;
+        outputLeftText("RecStatus", status, "textWidget1", 1);
 
-        status = tuner.title;
-        if (!tuner.subtitle.isEmpty())
-            status += " (" + tuner.subtitle + ")";
+        //  LINE 2 - "E" + Program Title
+        status = tr("E ");
+        status += tuner.title;
+        outputLeftText("RecStatus", status, "textWidget2", 2);
+        //list = formatScrollerText(status);
+        //assignScrollingList(list, "RecStatus", "textWidget2", 2);
 
-        list = formatScrollerText(status);
-        assignScrollingList(list, "RecStatus", "textWidget2", 2);
+        //  LINE 3 - "C" + Program Subtitle
+        status = tr("C ");
+        status += tuner.subtitle;
+        outputLeftText("RecStatus", status, "textWidget3", 3);
+        //list = formatScrollerText(status);
+        //assignScrollingList(list, "RecStatus", "textWidget3", 3);
 
-        status = tuner.startTime.toString("hh:mm") + " to " +
-                tuner.endTime.toString("hh:mm");
-        outputCenteredText("RecStatus", status, "textWidget3", 3);
+        //  LINE 4 - hh:mm-hh:mm + Progress Bar
+        status = tuner.startTime.toString("hh:mm") + "-" +
+                 tuner.endTime.toString("hh:mm");
+        outputLeftText("RecStatus", status, "textWidget4", 4);
 
         int length = tuner.startTime.secsTo(tuner.endTime);
         int delta = tuner.startTime.secsTo(QDateTime::currentDateTime());
         double rec_progress = (double) delta / length;
 
-        aString = "widget_set RecStatus progressBar 1 ";
+        aString = "widget_set RecStatus progressBar 13 ";
         aString += QString::number(lcdHeight);
         aString += " ";
-        aString += QString::number((int)rint(rec_progress * lcdWidth *
+        aString += QString::number((int)rint(rec_progress * (lcdWidth - 13) *
                                 cellWidth));
         sendToServer(aString);
 
@@ -2004,7 +2039,7 @@ void LCDProcClient::outputRecStatus(void)
             status += "|(" + tuner.subtitle + ")";
 
         status += "|" + tuner.startTime.toString("hh:mm") + " to " +
-                tuner.endTime.toString("hh:mm");
+                  tuner.endTime.toString("hh:mm");
 
         list = formatScrollerText(status);
         assignScrollingList(list, "RecStatus", "textWidget1", 1);
@@ -2032,11 +2067,7 @@ void LCDProcClient::outputRecStatus(void)
         listTime = LCD_TIME_TIME;
 
     recStatusTimer->start(listTime);
-
-    if (lcdTunerNo < (int) tunerList.size() - 1)
-        lcdTunerNo++;
-    else
-        lcdTunerNo = 0;
+    lcdTunerNo++;
 }
 
 void LCDProcClient::outputScrollerText(QString theScreen, QString theText,
@@ -2348,6 +2379,10 @@ void LCDProcClient::removeWidgets()
 
     if (lcd_bigclock)
     {
+        sendToServer("widget_del Time rec1");
+        sendToServer("widget_del Time rec2");
+        sendToServer("widget_del Time rec3");
+        sendToServer("widget_del Time recCnt");
         sendToServer("widget_del Time d0");
         sendToServer("widget_del Time d1");
         sendToServer("widget_del Time sep");
@@ -2367,6 +2402,7 @@ void LCDProcClient::removeWidgets()
     sendToServer("widget_del RecStatus textWidget1");
     sendToServer("widget_del RecStatus textWidget2");
     sendToServer("widget_del RecStatus textWidget3");
+    sendToServer("widget_del RecStatus textWidget4");
     sendToServer("widget_del RecStatus progressBar");
 }
 
