@@ -87,12 +87,12 @@ static inline void bs_init( BITSTREAM *bs, BD_FILE_H *fp )
     bb_init(&bs->bb, bs->buf, bs->size);
 }
 
-static inline int bb_pos( const BITBUFFER *bb )
+static inline off_t bb_pos( const BITBUFFER *bb )
 {
     return 8 * ( bb->p - bb->p_start ) + 8 - bb->i_left;
 }
 
-static inline int bs_pos( const BITSTREAM *bs )
+static inline off_t bs_pos( const BITSTREAM *bs )
 {
     return bs->pos * 8 + bb_pos(&bs->bb);
 }

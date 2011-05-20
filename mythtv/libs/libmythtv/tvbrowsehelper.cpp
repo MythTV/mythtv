@@ -1,3 +1,6 @@
+#include <algorithm>
+using namespace std;
+
 #include "mythcorecontext.h"
 
 #include <QCoreApplication>
@@ -7,8 +10,13 @@
 #include "remoteencoder.h"
 #include "recordinginfo.h"
 #include "mythplayer.h"
+#include "cardutil.h"
 #include "tv_play.h"
 #include "mythlogging.h"
+
+#define LOC      QString("BH: ")
+#define LOC_WARN QString("BH Warning: ")
+#define LOC_ERR  QString("BH Error: ")
 
 #define GetPlayer(X,Y) GetPlayerHaveLock(X, Y, __FILE__ , __LINE__)
 #define GetOSDLock(X) GetOSDL(X, __FILE__, __LINE__)
@@ -41,13 +49,23 @@ TVBrowseHelper::TVBrowseHelper(
     m_chanid(0),
     m_run(true)
 {
-    if (db_browse_all_tuners)
+    db_all_channels = ChannelUtil::GetChannels(
+        0, true, "channum, callsign");
+    ChannelUtil::SortChannels(
+        db_all_channels, db_channel_ordering, false);
+
+    DBChanList::const_iterator it = db_all_channels.begin();
+    for (; it != db_all_channels.end(); ++it)
     {
-        db_browse_all_channels = ChannelUtil::GetChannels(
-            0, true, "channum, callsign");
-        ChannelUtil::SortChannels(
-            db_browse_all_channels, db_channel_ordering, true);
+        db_chanid_to_channum[(*it).chanid] = (*it).channum;
+        db_chanid_to_sourceid[(*it).chanid] = (*it).sourceid;
+        db_channum_to_chanids.insert((*it).channum,(*it).chanid);
     }
+
+    db_all_visible_channels = ChannelUtil::GetChannels(
+        0, true, "channum, callsign");
+    ChannelUtil::SortChannels(
+        db_all_visible_channels, db_channel_ordering, false);
 
     start();
 }
@@ -57,8 +75,6 @@ TVBrowseHelper::TVBrowseHelper(
 /// \note This may only be called from the UI thread.
 bool TVBrowseHelper::BrowseStart(PlayerContext *ctx, bool skip_browse)
 {
-    VERBOSE(VB_IMPORTANT, "BrowseStart()");
-
     if (!gCoreContext->IsUIThread())
         return false;
 
@@ -80,15 +96,15 @@ bool TVBrowseHelper::BrowseStart(PlayerContext *ctx, bool skip_browse)
     ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (ctx->playingInfo)
     {
-        m_ctx = ctx;
-        BrowseInfo bi(BROWSE_SAME,
-                      ctx->playingInfo->GetChanNum(),
-                      ctx->playingInfo->GetChanID(),
-                      ctx->playingInfo->GetScheduledStartTime(ISODate));
+        m_ctx       = ctx;
+        m_channum   = ctx->playingInfo->GetChanNum();
+        m_chanid    = ctx->playingInfo->GetChanID();
+        m_starttime = ctx->playingInfo->GetScheduledStartTime(ISODate);
         ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
         if (!skip_browse)
         {
+            BrowseInfo bi(BROWSE_SAME, m_channum, m_chanid, m_starttime);
             locker.unlock();
             BrowseDispInfo(ctx, bi);
         }
@@ -109,8 +125,6 @@ bool TVBrowseHelper::BrowseStart(PlayerContext *ctx, bool skip_browse)
  */
 void TVBrowseHelper::BrowseEnd(PlayerContext *ctx, bool change_channel)
 {
-    VERBOSE(VB_IMPORTANT, "BrowseEnd()");
-
     if (!gCoreContext->IsUIThread())
         return;
 
@@ -147,8 +161,6 @@ void TVBrowseHelper::BrowseEnd(PlayerContext *ctx, bool change_channel)
 
 void TVBrowseHelper::BrowseDispInfo(PlayerContext *ctx, BrowseInfo &bi)
 {
-    VERBOSE(VB_IMPORTANT, "BrowseDispInfo()");
-
     if (!gCoreContext->IsUIThread())
         return;
 
@@ -170,6 +182,31 @@ void TVBrowseHelper::BrowseDispInfo(PlayerContext *ctx, BrowseInfo &bi)
         m_list.clear();
     m_list.push_back(bi);
     m_wait.wakeAll();
+}
+
+void TVBrowseHelper::BrowseChannel(PlayerContext *ctx, const QString &channum)
+{
+    if (!gCoreContext->IsUIThread())
+        return;
+
+    if (db_browse_all_tuners)
+    {
+        BrowseInfo bi(channum, 0);
+        BrowseDispInfo(ctx, bi);
+        return;
+    }
+
+    if (!ctx->recorder || !ctx->last_cardid)
+        return;
+
+    QString inputname = ctx->recorder->GetInput();
+    uint    inputid   = CardUtil::GetInputID(ctx->last_cardid, inputname);
+    uint    sourceid  = CardUtil::GetSourceID(inputid);
+    if (sourceid)
+    {
+        BrowseInfo bi(channum, sourceid);
+        BrowseDispInfo(ctx, bi);
+    }
 }
 
 BrowseInfo TVBrowseHelper::GetBrowsedInfo(void) const
@@ -196,15 +233,46 @@ bool TVBrowseHelper::IsBrowsing(void) const
     return m_ctx != NULL;
 }
 
-/// Returns chanid of random channel with with matching channum
-uint TVBrowseHelper::BrowseAllGetChanId(const QString &channum) const
+/** \brief Returns a chanid for the channum, or 0 if none is available.
+ *
+ *  This will prefer a given sourceid first, and then a given card id,
+ *  but if one or the other can not be satisfied but db_browse_all_tuners
+ *  is set then it will look to see if the chanid is available on any
+ *  tuner.
+ */
+uint TVBrowseHelper::GetChanId(
+    const QString &channum, uint pref_cardid, uint pref_sourceid) const
 {
-    DBChanList::const_iterator it = db_browse_all_channels.begin();
-    for (; it != db_browse_all_channels.end(); ++it)
+    if (pref_sourceid)
     {
-        if ((*it).channum == channum)
-            return (*it).chanid;
+        DBChanList::const_iterator it = db_all_channels.begin();
+        for (; it != db_all_channels.end(); ++it)
+        {
+            if ((*it).sourceid == pref_sourceid && (*it).channum == channum)
+                return (*it).chanid;
+        }
     }
+
+    if (pref_cardid)
+    {
+        DBChanList::const_iterator it = db_all_channels.begin();
+        for (; it != db_all_channels.end(); ++it)
+        {
+            if ((*it).cardid == pref_cardid && (*it).channum == channum)
+                return (*it).chanid;
+        }
+    }
+
+    if (db_browse_all_tuners)
+    {
+        DBChanList::const_iterator it = db_all_channels.begin();
+        for (; it != db_all_channels.end(); ++it)
+        {
+            if ((*it).channum == channum)
+                return (*it).chanid;
+        }
+    }
+
     return 0;
 }
 
@@ -280,7 +348,11 @@ void TVBrowseHelper::GetNextProgramDB(
 {
     uint chanid = infoMap["chanid"].toUInt();
     if (!chanid)
-        chanid = BrowseAllGetChanId(infoMap["channum"]);
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "GetNextProgramDB() requires a chanid");
+        return;
+    }
 
     int chandir = -1;
     switch (direction)
@@ -289,25 +361,15 @@ void TVBrowseHelper::GetNextProgramDB(
         case BROWSE_DOWN:     chandir = CHANNEL_DIRECTION_DOWN;     break;
         case BROWSE_FAVORITE: chandir = CHANNEL_DIRECTION_FAVORITE; break;
     }
-    if (direction != BROWSE_INVALID)
+    if (chandir != -1)
     {
         chanid = ChannelUtil::GetNextChannel(
-            db_browse_all_channels, chanid, 0, chandir);
+            db_all_visible_channels, chanid, 0 /*mplexid_restriction*/,
+            chandir, true /*skip non visible*/, true /*skip same callsign*/);
     }
 
-    infoMap["chanid"] = QString::number(chanid);
-
-    DBChanList::const_iterator it = db_browse_all_channels.begin();
-    for (; it != db_browse_all_channels.end(); ++it)
-    {
-        if ((*it).chanid == chanid)
-        {
-            QString tmp = (*it).channum;
-            tmp.detach();
-            infoMap["channum"] = tmp;
-            break;
-        }
-    }
+    infoMap["chanid"]  = QString::number(chanid);
+    infoMap["channum"] = db_chanid_to_channum[chanid];
 
     QDateTime nowtime = QDateTime::currentDateTime();
     QDateTime latesttime = nowtime.addSecs(6*60*60);
@@ -355,6 +417,15 @@ void TVBrowseHelper::GetNextProgramDB(
     infoMap["dbstarttime"] = prog->GetScheduledStartTime(ISODate);
 }
 
+inline static QString toString(const InfoMap &infoMap, const QString sep="\n")
+{
+    QString str("");
+    InfoMap::const_iterator it = infoMap.begin();
+    for (; it != infoMap.end() ; ++it)
+        str += QString("[%1]:%2%3").arg(it.key()).arg(*it).arg(sep);
+    return str;
+}
+
 void TVBrowseHelper::run()
 {
     threadRegister("TVBrowseHelper");
@@ -372,10 +443,29 @@ void TVBrowseHelper::run()
 
         PlayerContext *ctx = m_ctx;
 
+        vector<uint> chanids;
         if (BROWSE_SAME == bi.m_dir)
         {
+            if (!bi.m_chanid)
+            {
+                vector<uint> chanids_extra;
+                uint sourceid = db_chanid_to_sourceid[m_chanid];
+                QMultiMap<QString,uint>::iterator it;
+                it = db_channum_to_chanids.lowerBound(bi.m_channum);
+                for ( ; (it != db_channum_to_chanids.end()) &&
+                          (it.key() == bi.m_channum); it++)
+                {
+                    if (db_chanid_to_sourceid[*it] == sourceid)
+                        chanids.push_back(*it);
+                    else
+                        chanids_extra.push_back(*it);
+                }
+                chanids.insert(chanids.end(),
+                               chanids_extra.begin(),
+                               chanids_extra.end());
+            }
             m_channum   = bi.m_channum;
-            m_chanid    = bi.m_chanid;
+            m_chanid    = (chanids.empty()) ? bi.m_chanid : chanids[0];
             m_starttime = bi.m_starttime;
         }
 
@@ -437,7 +527,7 @@ void TVBrowseHelper::run()
         m_tv->GetPlayerReadLock(0,__FILE__,__LINE__);
         bool still_there = false;
         for (uint i = 0; i < m_tv->player.size() && !still_there; i++)
-            still_there |= (ctx == m_tv->player[0]);
+            still_there |= (ctx == m_tv->player[i]);
         if (still_there)
         {
             if (!db_browse_all_tuners)
@@ -446,11 +536,27 @@ void TVBrowseHelper::run()
             }
             else
             {
-                GetNextProgramDB(direction, infoMap);
-                while (!m_tv->IsTunable(ctx, infoMap["chanid"].toUInt()) &&
-                       (infoMap["channum"] != m_channum))
+                if (!chanids.empty())
                 {
+                    for (uint i = 0; i < chanids.size(); i++)
+                    {
+                        if (m_tv->IsTunable(ctx, chanids[i]))
+                        {
+                            infoMap["chanid"] = QString::number(chanids[i]);
+                            GetNextProgramDB(direction, infoMap);
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    uint orig_chanid = infoMap["chanid"].toUInt();
                     GetNextProgramDB(direction, infoMap);
+                    while (!m_tv->IsTunable(ctx, infoMap["chanid"].toUInt()) &&
+                           (infoMap["chanid"].toUInt() != orig_chanid))
+                    {
+                        GetNextProgramDB(direction, infoMap);
+                    }
                 }
             }
         }
@@ -459,9 +565,6 @@ void TVBrowseHelper::run()
         m_lock.lock();
         if (!m_ctx && !still_there)
             continue;
-
-        VERBOSE(VB_IMPORTANT, QString("browsechanid: %1 -> %2")
-                .arg(m_chanid).arg(infoMap["chanid"].toUInt()));
 
         m_channum = infoMap["channum"];
         m_chanid  = infoMap["chanid"].toUInt();

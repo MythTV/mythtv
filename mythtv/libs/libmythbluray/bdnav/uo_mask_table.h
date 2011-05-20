@@ -67,7 +67,7 @@ static inline BD_UO_MASK bd_uo_mask_combine(BD_UO_MASK a, BD_UO_MASK b)
     unsigned   i;
 
     for (i = 0; i < sizeof(BD_UO_MASK); i++) {
-        po[i] = pa[i] & pb[i];
+        po[i] = pa[i] | pb[i];
     }
 
     return o;

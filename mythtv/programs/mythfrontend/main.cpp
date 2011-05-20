@@ -1273,7 +1273,7 @@ int main(int argc, char **argv)
     {
         int networkPort = gCoreContext->GetNumSetting("NetworkControlPort", 6545);
         networkControl = new NetworkControl();
-        if (!networkControl->listen(QHostAddress::AnyIPv6,networkPort))
+        if (!networkControl->listen(QHostAddress(gCoreContext->MythHostAddressAny()),networkPort))
             VERBOSE(VB_IMPORTANT,
                     QString("NetworkControl failed to bind to port %1.")
                     .arg(networkPort));

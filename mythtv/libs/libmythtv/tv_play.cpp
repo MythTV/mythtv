@@ -6495,16 +6495,20 @@ bool TV::CommitQueuedInput(PlayerContext *ctx)
         QString chaninput = GetQueuedInput();
         if (browsehelper->IsBrowsing())
         {
+            uint sourceid = 0;
+            ctx->LockPlayingInfo(__FILE__, __LINE__);
+            if (ctx->playingInfo)
+                sourceid = ctx->playingInfo->GetSourceID();
+            ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+
             commited = true;
             if (channum.isEmpty())
                 channum = browsehelper->GetBrowsedInfo().m_channum;
-
-            if ((ctx->recorder && ctx->recorder->CheckChannel(channum)) ||
-                (db_browse_all_tuners &&
-                 browsehelper->BrowseAllGetChanId(channum)))
-            {
+            uint chanid = browsehelper->GetChanId(
+                channum, ctx->GetCardID(), sourceid);
+            if (chanid)
                 browsehelper->BrowseChannel(ctx, channum);
-            }
+
             HideOSDWindow(ctx, "osd_input");
         }
         else if (GetQueuedChanID() || !channum.isEmpty())
@@ -6536,8 +6540,7 @@ void TV::ChangeChannel(PlayerContext *ctx, int direction)
                 return;
             }
             // Collect channel info
-            const ProgramInfo pginfo(*ctx->playingInfo);
-            old_chanid = pginfo.GetChanID();
+            old_chanid = ctx->playingInfo->GetChanID();
             ctx->UnlockPlayingInfo(__FILE__, __LINE__);
         }
 

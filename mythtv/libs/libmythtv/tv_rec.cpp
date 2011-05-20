@@ -1091,11 +1091,11 @@ DTVChannel *TVRec::GetDTVChannel(void)
 
 V4LChannel *TVRec::GetV4LChannel(void)
 {
-#ifdef USING_V4L
+#ifdef USING_V4L2
     return dynamic_cast<V4LChannel*>(channel);
 #else
     return NULL;
-#endif // USING_V4L
+#endif // USING_V4L2
 }
 
 /** \fn TVRecEventThread::run(void)
@@ -4000,7 +4000,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
                                   channel->GetCurrentName());
     }
 
-#ifdef USING_V4L
+#ifdef USING_V4L2
     if (GetV4LChannel())
     {
         channel->InitPictureAttributes();

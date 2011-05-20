@@ -1,8 +1,12 @@
 // -*- Mode: c++ -*-
 
-#ifdef USING_V4L
+#ifdef USING_V4L1
 #include <linux/videodev.h> // for vbi_format
-#endif // USING_V4L
+#endif // USING_V4L1
+
+#ifdef USING_V4L2
+#include <linux/videodev2.h>
+#endif // USING_V4L2
 
 #include <sys/ioctl.h>      // for ioctl
 #include <sys/time.h>       // for gettimeofday
@@ -127,12 +131,13 @@ int V4LRecorder::OpenVBIDevice(void)
 
     if (VBIMode::NTSC_CC == vbimode)
     {
-#ifdef USING_V4L
+#ifdef USING_V4L2
         struct v4l2_format fmt;
         memset(&fmt, 0, sizeof(fmt));
         fmt.type = V4L2_BUF_TYPE_VBI_CAPTURE;
         if (0 != ioctl(fd, VIDIOC_G_FMT, &fmt))
         {
+#ifdef USING_V4L1
             VERBOSE(VB_RECORD, "V4L2 VBI setup failed, trying v1 ioctl");
             // Try V4L v1 VBI ioctls, iff V4L v2 fails
             struct vbi_format old_fmt;
@@ -152,6 +157,11 @@ int V4LRecorder::OpenVBIDevice(void)
             fmt.fmt.vbi.count[0]         = old_fmt.count[0];
             fmt.fmt.vbi.count[1]         = old_fmt.count[1];
             fmt.fmt.vbi.flags            = old_fmt.flags;
+#else // if !USING_V4L1
+            VERBOSE(VB_RECORD, "V4L2 VBI setup failed");
+            close(fd);
+            return -1;
+#endif // !USING_V4L1
         }
         VERBOSE(VB_RECORD, LOC + QString("vbi_format  rate: %1"
                   "\n\t\t\t          offset: %2"
@@ -187,7 +197,7 @@ int V4LRecorder::OpenVBIDevice(void)
             close(fd);
             return -1;
         }
-#endif // USING_V4L
+#endif // USING_V4L2
     }
 
     if (VBIMode::PAL_TT == vbimode)

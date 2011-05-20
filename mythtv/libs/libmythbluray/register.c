@@ -268,16 +268,22 @@ void bd_psr_reset_backup_registers(BD_REGISTERS *p)
 
 void bd_psr_restore_state(BD_REGISTERS *p)
 {
-    uint32_t old_psr[BD_PSR_COUNT];
+    uint32_t old_psr[13];
+    uint32_t new_psr[13];
 
     bd_psr_lock(p);
 
-    if (p->num_cb)
-        memcpy(old_psr, p->psr, sizeof(old_psr));
+    if (p->num_cb) {
+        memcpy(old_psr, p->psr, sizeof(old_psr[0]) * 13);
+    }
 
     /* restore backup registers */
     memcpy(p->psr + 4,  p->psr + 36, sizeof(uint32_t) * 5);
     memcpy(p->psr + 10, p->psr + 42, sizeof(uint32_t) * 3);
+
+    if (p->num_cb) {
+        memcpy(new_psr, p->psr, sizeof(new_psr[0]) * 13);
+    }
 
     /* init backup registers to default */
     memcpy(p->psr + 36, bd_psr_init + 36, sizeof(uint32_t) * 5);
@@ -291,11 +297,11 @@ void bd_psr_restore_state(BD_REGISTERS *p)
         ev.ev_type = BD_PSR_RESTORE;
 
         for (i = 4; i < 13; i++) {
-            if (i != 9) {
+            if (i != PSR_NAV_TIMER) {
 
                 ev.psr_idx = i;
                 ev.old_val = old_psr[i];
-                ev.new_val = p->psr[i];
+                ev.new_val = new_psr[i];
 
                 for (j = 0; j < p->num_cb; j++) {
                     p->cb[j].cb(p->cb[j].handle, &ev);

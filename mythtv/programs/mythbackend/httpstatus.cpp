@@ -305,7 +305,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             frontends.appendChild(fe);
             QUrl url(i.value()->m_sLocation);
             fe.setAttribute("name", url.host());
-            fe.setAttribute("url",  i.value()->m_sLocation);
+            fe.setAttribute("url",  url.toString(QUrl::RemovePath));
         }
         fes->Unlock();
         fes->Release();

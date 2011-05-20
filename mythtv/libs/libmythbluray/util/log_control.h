@@ -21,6 +21,10 @@
 #ifndef BD_LOG_CONTROL_H_
 #define BD_LOG_CONTROL_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 
@@ -57,5 +61,8 @@ void bd_set_debug_handler(BD_LOG_FUNC);
 void bd_set_debug_mask(uint32_t mask);
 uint32_t bd_get_debug_mask(void);
 
+#ifdef __cplusplus
+};
+#endif
 
 #endif /* BD_LOG_CONTROL_H_ */

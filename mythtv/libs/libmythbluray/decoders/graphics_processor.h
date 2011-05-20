@@ -52,7 +52,7 @@ typedef struct {
 
     /* only one of the following segments can be present */
     BD_IG_INTERACTIVE   *ics;
-    /*BD_PG_PRESENTATON_COMPOSITION_SEGMENT  *pcs;*/
+    BD_PG_COMPOSITION   *pcs;
 
 } PG_DISPLAY_SET;
 

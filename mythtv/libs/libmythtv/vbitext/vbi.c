@@ -10,12 +10,16 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#ifdef USING_V4L2
 // HACK. Broken kernel headers < 2.6.25 fail compile in videodev2.h when
 //       compiling with -std=c99.  We could remove this in the .pro file,
 //       but that would disable it for all .c files.
 #undef __STRICT_ANSI__
+#ifdef USING_V4L1
 #include <linux/videodev.h>
+#endif // USING_V4L1
 #include <linux/videodev2.h>
+#endif // USING_V4L2
 
 // vbitext headers
 #include "vt.h"
@@ -25,8 +29,9 @@
 #define FAC    (1<<16)         // factor for fix-point arithmetic
 
 static unsigned char *rawbuf;          // one common buffer for raw vbi data.
+#ifdef USING_V4L2
 static int rawbuf_size;                // its current size
-
+#endif // USING_V4L2
 
 /***** bttv api *****/
 #define BTTV_VBISIZE           _IOR('v' , BASE_VIDIOCPRIVATE+8, int)
@@ -466,8 +471,7 @@ vbi_del_handler(struct vbi *vbi, void *handler, void *data)
     return;
 }
 
-
-
+#ifdef USING_V4L2
 static int
 set_decode_parms(struct vbi *vbi, struct v4l2_vbi_format *p)
 {
@@ -527,11 +531,12 @@ set_decode_parms(struct vbi *vbi, struct v4l2_vbi_format *p)
 
     return 0;
 }
-
+#endif // USING_V4L2
 
 static int
 setup_dev(struct vbi *vbi)
 {
+#ifdef USING_V4L2
     struct v4l2_format v4l2_format;
     struct v4l2_vbi_format *vbifmt = &v4l2_format.fmt.vbi;
 
@@ -539,6 +544,7 @@ setup_dev(struct vbi *vbi)
     v4l2_format.type = V4L2_BUF_TYPE_VBI_CAPTURE;
     if (ioctl(vbi->fd, VIDIOC_G_FMT, &v4l2_format) == -1)
     {
+#ifdef USING_V4L1
        // not a v4l2 device.  assume bttv and create a standard fmt-struct.
        int size;
        perror("ioctl VIDIOC_G_FMT");
@@ -564,6 +570,10 @@ setup_dev(struct vbi *vbi)
            vbifmt->count[0] = size/2;
            vbifmt->count[1] = size - size/2;
        }
+#else
+       error("Video 4 Linux version 1 support is not enabled.");
+       return -1;
+#endif
     }
 
     if (set_decode_parms(vbi, vbifmt) == -1)
@@ -585,6 +595,9 @@ setup_dev(struct vbi *vbi)
     }
 
     return 0;
+#else
+    return -1;
+#endif // USING_V4L2
 }
 
 

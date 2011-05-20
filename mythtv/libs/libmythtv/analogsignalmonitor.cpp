@@ -6,7 +6,9 @@
 #include <sys/ioctl.h>
 #include <poll.h>
 
+#ifdef USING_V4L1
 #include <linux/videodev.h>
+#endif // USING_V4L1
 
 #include "mythverbose.h"
 #include "analogsignalmonitor.h"
@@ -159,6 +161,7 @@ void AnalogSignalMonitor::UpdateValues(void)
             }
         }
     }
+#ifdef USING_V4L1
     else
     {
         struct video_tuner tuner;
@@ -174,6 +177,7 @@ void AnalogSignalMonitor::UpdateValues(void)
             isLocked = tuner.signal;
         }
     }
+#endif // USING_V4L1
 
     {
         QMutexLocker locker(&statusLock);

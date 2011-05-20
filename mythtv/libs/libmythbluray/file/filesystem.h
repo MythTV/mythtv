@@ -21,12 +21,12 @@
 #ifndef BD_FILESYSTEM_H_
 #define BD_FILESYSTEM_H_
 
-#include <stdint.h>
-#include <sys/types.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <stdint.h>
+#include <sys/types.h>
 
 /*
  * file access

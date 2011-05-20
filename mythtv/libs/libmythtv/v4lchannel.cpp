@@ -16,7 +16,10 @@
 #include <iostream>
 using namespace std;
 
+#ifdef USING_V4L1
 #include <linux/videodev.h>
+#endif // USING_V4L1
+
 #include <linux/videodev2.h>
 
 // MythTV headers
@@ -172,6 +175,7 @@ static int format_to_mode(const QString &fmt, int v4l_version)
             return V4L2_STD_PAL;
         return V4L2_STD_NTSC;
     }
+#ifdef USING_V4L1
     else if (1 == v4l_version)
     {
         if (fmt == "NTSC-JP")
@@ -193,6 +197,7 @@ static int format_to_mode(const QString &fmt, int v4l_version)
             return VIDEO_MODE_NTSC; // We've dropped V4L ATSC support...
         return VIDEO_MODE_NTSC;
     }
+#endif
 
     VERBOSE(VB_IMPORTANT,
             "format_to_mode() does not recognize V4L" + v4l_version);
@@ -261,6 +266,7 @@ static QString mode_to_format(int mode, int v4l_version)
             return "ATSC";
         }
     }
+#ifdef USING_V4L1
     else if (1 == v4l_version)
     {
         if (mode == VIDEO_MODE_NTSC)
@@ -276,6 +282,7 @@ static QString mode_to_format(int mode, int v4l_version)
         else if (mode == 6)
             return "NTSC-JP";
     }
+#endif
     else
     {
         VERBOSE(VB_IMPORTANT,
@@ -529,6 +536,7 @@ bool V4LChannel::Tune(uint64_t frequency, QString inputname)
         return true;
     }
 
+#ifdef USING_V4L1
     // Video4Linux version 1 tuning
     uint freq = frequency / 62500;
     ioctlval = ioctl(videofd, VIDIOCSFREQ, &freq);
@@ -540,8 +548,10 @@ bool V4LChannel::Tune(uint64_t frequency, QString inputname)
                 .arg(device).arg(ioctlval).arg(strerror(errno)));
         return false;
     }
-
     return true;
+#else
+    return false;
+#endif
 }
 
 /** \fn V4LChannel::Retune(void)
@@ -689,6 +699,8 @@ bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
         }
     }
 
+    (void) usingv4l1;
+#ifdef USING_V4L1
     if (usingv4l1)
     {
         VERBOSE(VB_CHANNEL, LOC + msg + "(v4l v1)");
@@ -715,6 +727,8 @@ bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
                     "\n\t\t\tSetting video mode with v4l version 1 worked");
         }
     }
+#endif // USING_V4L1
+
     return ok;
 }
 
@@ -779,6 +793,7 @@ bool V4LChannel::SwitchToInput(int inputnum, bool setstarting)
     return ok;
 }
 
+#ifdef USING_V4L1
 static unsigned short *get_v4l1_field(
     int v4l2_attrib, struct video_picture &vid_pic)
 {
@@ -798,6 +813,7 @@ static unsigned short *get_v4l1_field(
     }
     return NULL;
 }
+#endif
 
 static int get_v4l2_attribute(const QString &db_col_name)
 {
@@ -894,6 +910,7 @@ bool V4LChannel::InitPictureAttribute(const QString db_col_name)
         return true;
     }
 
+#ifdef USING_V4L1
     // V4L1
     unsigned short *setfield;
     struct video_picture vid_pic;
@@ -917,6 +934,9 @@ bool V4LChannel::InitPictureAttribute(const QString db_col_name)
     }
 
     return true;
+#else
+    return false;
+#endif
 }
 
 bool V4LChannel::InitPictureAttributes(void)
@@ -982,6 +1002,9 @@ static int get_v4l2_attribute_value(int videofd, int v4l2_attrib)
 
 static int get_v4l1_attribute_value(int videofd, int v4l2_attrib)
 {
+  (void) videofd;
+  (void) v4l2_attrib;
+#ifdef USING_V4L1
     struct video_picture vid_pic;
     memset(&vid_pic, 0, sizeof(vid_pic));
 
@@ -995,7 +1018,7 @@ static int get_v4l1_attribute_value(int videofd, int v4l2_attrib)
     unsigned short *setfield = get_v4l1_field(v4l2_attrib, vid_pic);
     if (setfield)
         return *setfield;
-
+#endif
     return -1;
 }
 
@@ -1038,6 +1061,7 @@ static int set_v4l2_attribute_value(int videofd, int v4l2_attrib, int newvalue)
 
 static int set_v4l1_attribute_value(int videofd, int v4l2_attrib, int newvalue)
 {
+#ifdef USING_V4L1
     unsigned short *setfield;
     struct video_picture vid_pic;
     memset(&vid_pic, 0, sizeof(vid_pic));
@@ -1066,6 +1090,9 @@ static int set_v4l1_attribute_value(int videofd, int v4l2_attrib, int newvalue)
     }
 
     return 0;
+#else
+    return -1;
+#endif
 }
 
 static int set_attribute_value(bool usingv4l2, int videofd,

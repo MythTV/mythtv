@@ -6,6 +6,7 @@
 #include <QMutex>
 #include <QThread>
 #include <QWaitCondition>
+#include <QNetworkInterface>
 
 #include <cmath>
 
@@ -166,6 +167,19 @@ bool MythCoreContext::Init(void)
 
         return false;
     }
+
+    has_ipv6 = false;
+
+    // If any of the IPs on any interfaces look like IPv6 addresses, assume IPv6
+    // is available
+    QNetworkInterface interface;
+    QList<QHostAddress> IpList = interface.allAddresses();
+    for (int i = 0; i < IpList.size(); i++)
+    {
+        if (IpList.at(i).toString().contains(":"))
+            has_ipv6 = true;
+    };
+
 
     return true;
 }
@@ -540,6 +554,16 @@ bool MythCoreContext::IsFrontendOnly(void)
         backendOnLocalhost = true;
 
     return !backendOnLocalhost;
+}
+
+QString MythCoreContext::MythHostAddressAny(void)
+{
+
+    if (has_ipv6)
+        return QString("::");
+    else
+        return QString("0.0.0.0");
+
 }
 
 QString MythCoreContext::GenMythURL(QString host, QString port, QString path, QString storageGroup)
