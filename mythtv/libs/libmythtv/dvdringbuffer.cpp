@@ -36,7 +36,7 @@ static const char *dvdnav_menu_table[] =
 DVDInfo::DVDInfo(const QString &filename)
   : m_nav(NULL), m_name(NULL), m_serialnumber(NULL)
 {
-    VERBOSE(VB_PLAYBACK, QString("DVDInfo: Starting."));
+    VERBOSE(VB_PLAYBACK, QString("DVDInfo: Trying %1").arg(filename));
     QString name = filename;
     if (name.left(6) == "dvd://")
         name.remove(0,5);
