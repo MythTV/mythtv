@@ -344,10 +344,6 @@ using_frontend {
     using_quartz_video: HEADERS += videoout_quartz.h
     using_quartz_video: SOURCES += videoout_quartz.cpp
 
-    using_directfb:HEADERS +=     videoout_directfb.h
-    using_directfb:SOURCES +=     videoout_directfb.cpp
-    using_directfb:DEFINES +=     USING_DIRECTFB
-
     using_x11:DEFINES += USING_X11
 
     using_xv:HEADERS += videoout_xv.h   util-xv.h   osdchromakey.h

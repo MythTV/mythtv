@@ -125,7 +125,6 @@ Advanced options (experts only):
   --enable-dxva2           enable hardware accelerated decoding on windows
   --disable-opengl-video   disable OpenGL based video display
   --disable-quartz-video   disable Mac OS X CoreVideo based video display
-  --disable-directfb       disable DirectFB (Linux non-X11 video)
   --disable-libass         disable libass SSA/ASS subtitle support
 
   --enable-mac-bundle      produce standalone OS X apps (e.g. mythfrontend.app)
@@ -1336,7 +1335,6 @@ MYTHTV_CONFIG_LIST='
     crystalhd
     cygwin
     darwin
-    directfb
     disable_mmx_for_debugging
     dvb
     firewire
@@ -1973,7 +1971,6 @@ enable audio_oss
 enable bindings_perl
 enable bindings_python
 enable bindings_php
-enable directfb
 enable dvb
 enable ffmpeg_pthreads
 enable firewire
@@ -4130,13 +4127,6 @@ if test -d ${sysroot}/usr/share/nvidia/include/GL; then
     append CONFIG_INCLUDEPATH "${sysroot}/usr/share/nvidia/include"
 fi
 
-! disabled directfb && check_foo_config directfb directfb directfb.h DirectFBInit
-
-if enabled directfb; then
-    CONFIG_DIRECTFB_LIBS=`directfb-config --libs`
-    CONFIG_DIRECTFB_CXXFLAGS=`directfb-config --cflags`
-fi
-
 if test $target_os = darwin; then
     # So far, only OS X 10.4 has this as a non-private framework
     if test -d /System/Library/Frameworks/DiskArbitration.framework/Headers ; then
@@ -4489,7 +4479,6 @@ fi
   if test x"$target_os" = x"darwin" ; then
     echo "Quartz video              ${quartz_video-no}"
   fi
-  echo "DirectFB                  ${directfb-no}"
   if test x"$target_os" = x"mingw32" ; then
     echo "Windows (Direct3D)        yes"
     echo "DXVA2 support             ${dxva2-no}"
@@ -4812,11 +4801,6 @@ if enabled x11; then
   if [ -d $x11_path ] ; then
     append CONFIG_INCLUDEPATH "$x11_path"
   fi
-fi
-
-if enabled directfb; then
-  echo "CONFIG_DIRECTFB_LIBS=$CONFIG_DIRECTFB_LIBS" >> $TMPMAK
-  echo "CONFIG_DIRECTFB_CXXFLAGS=$CONFIG_DIRECTFB_CXXFLAGS" >> $TMPMAK
 fi
 
 if ! enabled darwin && enabled opengl; then
