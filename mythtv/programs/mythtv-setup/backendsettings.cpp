@@ -821,16 +821,6 @@ static GlobalCheckBox *MythFillEnabled()
     return bc;
 }
 
-static GlobalSpinBox *MythFillPeriod()
-{
-    GlobalSpinBox *bs = new GlobalSpinBox("MythFillPeriod", 1, 30, 1);
-    bs->setLabel(QObject::tr("mythfilldatabase run frequency (days)"));
-    bs->setValue(1);
-    bs->setHelpText(QObject::tr("The number of days between mythfilldatabase "
-                    "runs."));
-    return bs;
-}
-
 static GlobalSpinBox *MythFillMinHour()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("MythFillMinHour", 0, 23, 1);
@@ -946,7 +936,6 @@ class MythFillSettings : public TriggeredConfigurationGroup
          settings->addChild(MythFillDatabasePath());
          settings->addChild(MythFillDatabaseArgs());
          settings->addChild(MythFillDatabaseLog());
-         settings->addChild(MythFillPeriod());
          settings->addChild(MythFillMinHour());
          settings->addChild(MythFillMaxHour());
          settings->addChild(MythFillGrabberSuggestsTime());
