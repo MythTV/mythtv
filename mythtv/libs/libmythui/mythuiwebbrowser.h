@@ -131,6 +131,9 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     void SetDefaultSaveDirectory(const QString &saveDir);
     QString GetDefaultSaveDirectory(void) { return m_defaultSaveDir; }
 
+    void SetDefaultSaveFilename(const QString &filename);
+    QString GetDefaultSaveFilename(void) { return m_defaultSaveFilename; }
+
   public slots:
     void Back(void);
     void Forward(void);
@@ -187,6 +190,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     QUrl         m_widgetUrl;
     QString      m_userCssFile;
     QString      m_defaultSaveDir;
+    QString      m_defaultSaveFilename;
 
     bool         m_inputToggled;
     QString      m_lastMouseAction;

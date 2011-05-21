@@ -19,7 +19,8 @@
 
 using namespace std;
 
-static int handleMedia(const QString &url, const QString &plot, const QString &, const QString &, const QString &, int, int, int, const QString &)
+static int handleMedia(const QString &url, const QString &directory, const QString &filename,
+                       const QString &, const QString &, int, int, int, const QString &)
 {
     if (url.isEmpty())
     {
@@ -44,9 +45,11 @@ static int handleMedia(const QString &url, const QString &plot, const QString &,
     {
         MythBrowser *mythbrowser = new MythBrowser(mainStack, urls, zoom);
 
-        // plot is used to set a default save directory
-        if (!plot.isEmpty())
-            mythbrowser->setDefaultSaveDirectory(plot);
+        if (!directory.isEmpty())
+            mythbrowser->setDefaultSaveDirectory(directory);
+
+        if (!filename.isEmpty())
+            mythbrowser->setDefaultSaveFilename(filename);
 
         if (mythbrowser->Create())
             mainStack->AddScreen(mythbrowser);

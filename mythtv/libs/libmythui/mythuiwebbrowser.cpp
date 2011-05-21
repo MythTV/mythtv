@@ -579,9 +579,10 @@ MythUIWebBrowser::MythUIWebBrowser(MythUIType *parent, const QString &name)
       m_updateInterval(0),   m_zoom(1.0),
       m_bgColor("White"),    m_widgetUrl(QUrl()), m_userCssFile(""),
       m_inputToggled(false), m_lastMouseAction(""),
-      m_mouseKeyCount(0),    m_lastMouseActionTime()
+      m_mouseKeyCount(0),    m_lastMouseActionTime(),
+      m_defaultSaveDir(GetConfDir() + "/MythBrowser/"),
+      m_defaultSaveFilename("")
 {
-    m_defaultSaveDir = QDir::homePath() + "/";
     SetCanTakeFocus(true);
 }
 
@@ -611,7 +612,7 @@ void MythUIWebBrowser::Init(void)
     m_browser->setGeometry(m_Area);
     m_browser->setFixedSize(m_Area.size());
     m_browser->move(m_Area.x(), m_Area.y());
-    m_browser->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+    m_browser->page()->setLinkDelegationPolicy(QWebPage::DontDelegateLinks);
 
     // if we have a valid css URL use that ...
     if (!m_userCssFile.isEmpty())
@@ -859,7 +860,15 @@ void MythUIWebBrowser::SetDefaultSaveDirectory(const QString &saveDir)
     if (!saveDir.isEmpty())
         m_defaultSaveDir = saveDir;
     else
-        m_defaultSaveDir = QDir::homePath() + "/";
+        m_defaultSaveDir = GetConfDir() + "/MythBrowser/";
+}
+
+void MythUIWebBrowser::SetDefaultSaveFilename(const QString &filename)
+{
+    if (!filename.isEmpty())
+        m_defaultSaveFilename = filename;
+    else
+        m_defaultSaveFilename = "";
 }
 
 /** \fn MythUIWebBrowser::GetZoom()
@@ -1334,6 +1343,7 @@ void MythUIWebBrowser::CopyFrom(MythUIType *base)
     m_userCssFile = browser->m_userCssFile;
     m_updateInterval = browser->m_updateInterval;
     m_defaultSaveDir = browser->m_defaultSaveDir;
+    m_defaultSaveFilename = browser->m_defaultSaveFilename;
 
     Init();
 }
