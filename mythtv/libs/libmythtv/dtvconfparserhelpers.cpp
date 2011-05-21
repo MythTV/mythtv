@@ -44,6 +44,7 @@ const int DTVTunerType::kTunerTypeDVBC    = 0x0001;
 const int DTVTunerType::kTunerTypeDVBT    = 0x0002;
 const int DTVTunerType::kTunerTypeATSC    = 0x0003;
 const int DTVTunerType::kTunerTypeASI     = 0x1000;
+const int DTVTunerType::kTunerTypeOCUR    = 0x2000;
 const int DTVTunerType::kTunerTypeUnknown = 0x80000000;
 
 static QMutex dtv_tt_canonical_str_lock;
@@ -57,6 +58,7 @@ void DTVTunerType::initStr(void)
     dtv_tt_canonical_str[kTunerTypeDVBS1]   = "QPSK";
     dtv_tt_canonical_str[kTunerTypeDVBS2]   = "DVB_S2";
     dtv_tt_canonical_str[kTunerTypeASI]     = "ASI";
+    dtv_tt_canonical_str[kTunerTypeOCUR]    = "OCUR";
     dtv_tt_canonical_str[kTunerTypeUnknown] = "UNKNOWN";
 }
 
@@ -77,6 +79,7 @@ const DTVParamHelperStruct DTVTunerType::parseTable[] =
     { "ATSC",    kTunerTypeATSC    },
     { "DVB_S2",  kTunerTypeDVBS2   },
     { "ASI",     kTunerTypeASI     },
+    { "OCUR",    kTunerTypeOCUR    },
     { "UNKNOWN", kTunerTypeUnknown },
     { NULL,      kTunerTypeUnknown },
 };

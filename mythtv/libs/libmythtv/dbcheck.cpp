@@ -21,7 +21,7 @@ using namespace std;
    mythtv/bindings/perl/MythTV.pm
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1274";
+const QString currentDatabaseVersion = "1275";
 
 static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver);
 static bool performActualUpdate(
@@ -5655,7 +5655,41 @@ NULL
 "  DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00';",
 NULL
 };
-        if (!performActualUpdate(updates, "1274", dbver))
+
+        if (!performActualUpdate(updates, "1273", dbver))
+            return false;
+    }
+
+    if (dbver == "1274")
+    {
+        const char *updates[] = {
+"UPDATE cardinput SET tunechan=NULL"
+"  WHERE inputname='DVBInput' OR inputname='MPEG2TS';"
+"UPDATE dtv_multiplex SET symbolrate = NULL"
+"  WHERE modulation LIKE 't%' OR modulation LIKE '%t';",
+"UPDATE dtv_multiplex"
+"  SET bandwidth=SUBSTR(modulation,2,1)"
+"  WHERE SUBSTR(modulation,3,3)='qam' OR"
+"        SUBSTR(modulation,3,4)='qpsk';",
+"UPDATE dtv_multiplex"
+"  SET bandwidth=SUBSTR(modulation,5,1)"
+"  WHERE SUBSTR(modulation,1,4)='auto' AND"
+"        LENGTH(modulation)=6;",
+"UPDATE dtv_multiplex SET modulation='auto'"
+"  WHERE modulation LIKE 'auto%';",
+"UPDATE dtv_multiplex SET modulation='qam_16'"
+"  WHERE modulation LIKE '%qam16%';",
+"UPDATE dtv_multiplex SET modulation='qam_32'"
+"  WHERE modulation LIKE '%qam32%';",
+"UPDATE dtv_multiplex SET modulation='qam_64'"
+"  WHERE modulation LIKE '%qam64%';",
+"UPDATE dtv_multiplex SET modulation='qam_128'"
+"  WHERE modulation LIKE '%qam128%';",
+"UPDATE dtv_multiplex SET modulation='qam_256'"
+"  WHERE modulation LIKE '%qam256%';",
+NULL
+};
+        if (!performActualUpdate(updates, "1275", dbver))
             return false;
     }
 
