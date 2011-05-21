@@ -32,6 +32,7 @@ trans.files += mythfrontend_ru.qm
 trans.files += mythfrontend_sl.qm
 trans.files += mythfrontend_sv.qm
 trans.files += mythfrontend_tr.qm
+trans.files += mythfrontend_zh_cn.qm
 
 INSTALLS += trans
 
