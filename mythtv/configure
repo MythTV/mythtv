@@ -3312,15 +3312,15 @@ enabled version3 && { enabled gpl && enable gplv3 || enable lgplv3; }
 check_deps $ARCH_EXT_LIST
 
 is_qmake4(){
-    $1 --version 2>&1 | egrep -q -e "Qt version 4\.[5-9]\.[0-9]"
+    $1 --version 2>&1 | egrep -q -e "Qt version 4\.[6-9]\.[0-9]"
 }
 
 if ! is_qmake4 $qmake; then
-    is_qmake4 qmake-qt4 && qmake=qmake-qt4 || die "qmake for Qt4.5 or newer not found.\nPlease specify the correct qmake with --qmake="
+    is_qmake4 qmake-qt4 && qmake=qmake-qt4 || die "qmake for Qt4.6 or newer not found.\nPlease specify the correct qmake with --qmake="
 fi
 
-if ! expr $($qmake -query QT_VERSION) : "4\.[5-9]\.[0-9]" >/dev/null; then
-    die "Qt4.5 or newer is required to build MythTV."
+if ! expr $($qmake -query QT_VERSION) : "4\.[6-9]\.[0-9]" >/dev/null; then
+    die "Qt4.6 or newer is required to build MythTV."
 fi
 
 enable_pic() {
@@ -4018,12 +4018,12 @@ enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
 qt_inc="-I${sysroot}/$(${qmake} -query QT_INSTALL_HEADERS)"
 qt_libs="-L${sysroot}/$(${qmake} -query QT_INSTALL_LIBS)"
 
-if $(pkg-config --atleast-version 4.5.0 QtWebKit) ; then
+if $(pkg-config --atleast-version 4.6.0 QtWebKit) ; then
     enable qtwebkit
 else
     check_cxx ${qt_inc} ${qt_inc}/QtCore <<EOF && enable qtwebkit
 #include <QtWebKit/QtWebKit>
-#if QT_VERSION < 0x040500
+#if QT_VERSION < 0x040600
 die
 #endif
 EOF
