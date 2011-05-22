@@ -1,9 +1,9 @@
 /**
  * \file mythuiwebbrowser.cpp
- * \author Paul Harrison <mythtv@dsl.pipex.com>
+ * \author Paul Harrison <pharrison@mythtv.org>
  * \brief Provide a web browser widget.
  *
- * This requires qt4.5.0 or later to function properly.
+ * This requires qt4.6.0 or later to function properly.
  *
  */
 
@@ -19,6 +19,7 @@
 #include <QStyle>
 #include <QKeyEvent>
 #include <QDomDocument>
+#include <QNetworkCookieJar>
 
 // myth
 #include "mythpainter.h"
@@ -34,8 +35,68 @@
 #include "mythdialogbox.h"
 #include "mythprogressdialog.h"
 
-#define MUSIC_EXTENSIONS "mp3,mp2,ogg,oga,flac,wma,wav,ac3,oma,omg,atp,ra,dts,aac,m4a,aa3,tta,mka,aiff,swa,wv"
-#define VIDEO_EXTENSIONS "mpeg,mpg,wmv,avi"
+struct MimeType
+{
+    QString mimeType;
+    QString extension;
+    bool    isVideo;
+};
+
+static MimeType SupportedMimeTypes[] =
+{
+    { "audio/mpeg3",                "mp3",   false },
+    { "audio/x-mpeg-3",             "mp3",   false },
+    { "audio/mpeg",                 "mp2",   false },
+    { "audio/x-mpeg",               "mp2",   false },
+    { "audio/ogg",                  "ogg",   false },
+    { "audio/ogg",                  "oga",   false },
+    { "audio/flac",                 "flac",  false },
+    { "audio/x-ms-wma",             "wma",   false },
+    { "audio/wav",                  "wav",   false },
+    { "audio/x-wav",                "wav",   false },
+    { "audio/ac3",                  "ac3",   false },
+    { "audio/x-ac3",                "ac3",   false },
+    { "audio/x-oma",                "oma",   false },
+    { "audio/x-realaudio",          "ra",    false },
+    { "audio/dts",                  "dts",   false },
+    { "audio/x-dts",                "dts",   false },
+    { "audio/aac",                  "aac",   false },
+    { "audio/x-aac",                "aac",   false },
+    { "audio/m4a",                  "m4a",   false },
+    { "audio/x-m4a",                "m4a",   false },
+    { "video/mpeg",                 "mpg",   true },
+    { "video/mpeg",                 "mpeg",  true },
+    { "video/x-ms-wmv",             "wmv",   true },
+    { "video/x-ms-wmv",             "avi",   true },
+    { "application/x-troff-msvideo","avi",   true },
+    { "video/avi",                  "avi",   true },
+    { "video/msvideo",              "avi",   true },
+    { "video/x-msvideo",            "avi",   true }
+};
+
+static int SupportedMimeTypesCount = sizeof(SupportedMimeTypes) / sizeof(SupportedMimeTypes[0]);
+
+static QNetworkAccessManager *networkManager = NULL;
+
+static void DestroyNetworkAccessManager(void)
+{
+    if (networkManager)
+        delete networkManager;
+}
+
+static QNetworkAccessManager *GetNetworkAccessManager(void)
+{
+    if (networkManager)
+        return networkManager;
+
+    networkManager = new QNetworkAccessManager();
+    networkManager->setCookieJar(GetMythDownloadManager()->getCookieJar());
+    networkManager->cookieJar()->setParent(NULL);
+
+    atexit(DestroyNetworkAccessManager);
+
+    return networkManager;
+}
 
 /**
  * @class BrowserApi
@@ -178,14 +239,74 @@ void BrowserApi::customEvent(QEvent *e)
     }
 }
 
+MythWebPage::MythWebPage(QObject *parent)
+    : QWebPage(parent)
+{
+    setNetworkAccessManager(GetNetworkAccessManager());
+}
+
+bool MythWebPage::supportsExtension(Extension extension) const
+{
+    if (extension == QWebPage::ErrorPageExtension)
+        return true;
+
+    return false;
+}
+
+bool MythWebPage::extension(Extension extension, const ExtensionOption *option, ExtensionReturn *output)
+{
+    if (extension == QWebPage::ErrorPageExtension)
+    {
+        ErrorPageExtensionOption *erroroption = (ErrorPageExtensionOption*) option;
+        ErrorPageExtensionReturn *erroroutput = (ErrorPageExtensionReturn*) output;
+
+        if (!option || !output)
+            return false;
+
+        QString filename = "htmls/notfound.html";
+        if (!GetMythUI()->FindThemeFile(filename))
+            return false;
+
+        QFile file(QLatin1String(qPrintable(filename)));
+        bool isOpened = file.open(QIODevice::ReadOnly);
+        if (!isOpened)
+            return false;
+
+        QString title = tr("Error loading page: %1").arg(erroroption->url.toString());
+        QString html = QString(QLatin1String(file.readAll()))
+                            .arg(title)
+                            .arg(erroroption->errorString)
+                            .arg(erroroption->url.toString());
+
+        QBuffer imageBuffer;
+        imageBuffer.open(QBuffer::ReadWrite);
+        QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxWarning, 0, 0);
+        QPixmap pixmap = icon.pixmap(QSize(32,32));
+        if (pixmap.save(&imageBuffer, "PNG"))
+        {
+            html.replace(QLatin1String("IMAGE_BINARY_DATA_HERE"),
+                            QString(QLatin1String(imageBuffer.buffer().toBase64())));
+        }
+
+        erroroutput->content = html.toUtf8();
+
+        return true;
+    }
+
+    return false;
+}
+
 /**
  * @class MythWebView
  * @brief Subclass of QWebView
  * \note allows us to intercept keypresses
  */
 MythWebView::MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser)
-           : QWebView(parent)
+           : QWebView(parent),
+           m_webpage(new MythWebPage(this))
 {
+    setPage(m_webpage);
+
     m_parentBrowser = parentBrowser;
     m_busyPopup = NULL;
 
@@ -199,6 +320,9 @@ MythWebView::MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser)
 
     m_api = new BrowserApi(this);
     m_api->setWebView(this);
+
+    m_downloadAndPlay = false;
+    m_downloadReply = NULL;
 }
 
 MythWebView::~MythWebView(void)
@@ -282,7 +406,7 @@ void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
 {
     if (reply->error() == QNetworkReply::NoError)
     {
-        reload();
+        stop();
 
         QVariant header = reply->header(QNetworkRequest::ContentTypeHeader);
 
@@ -290,83 +414,83 @@ void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
             VERBOSE(VB_IMPORTANT, QString("MythWebView::handleUnsupportedContent - %1")
                                           .arg(header.toString()));
 
+        m_downloadReply = reply;
         m_downloadRequest = reply->request();
+        m_downloadAndPlay = false;
         showDownloadMenu();
 
         return;
     }
-
-    QString filename = "htmls/notfound.html";
-    if (!GetMythUI()->FindThemeFile(filename))
-        return;
-
-    QFile file(QLatin1String(qPrintable(filename)));
-    bool isOpened = file.open(QIODevice::ReadOnly);
-    if (!isOpened)
-        return;
-
-    QString title = tr("Error loading page: %1").arg(reply->url().toString());
-    QString html = QString(QLatin1String(file.readAll()))
-                        .arg(title)
-                        .arg(reply->errorString())
-                        .arg(reply->url().toString());
-
-    QBuffer imageBuffer;
-    imageBuffer.open(QBuffer::ReadWrite);
-    QIcon icon = style()->standardIcon(QStyle::SP_MessageBoxWarning, 0, this);
-    QPixmap pixmap = icon.pixmap(QSize(32,32));
-    if (pixmap.save(&imageBuffer, "PNG"))
-    {
-        html.replace(QLatin1String("IMAGE_BINARY_DATA_HERE"),
-                     QString(QLatin1String(imageBuffer.buffer().toBase64())));
-    }
-
-    QList<QWebFrame*> frames;
-    frames.append(page()->mainFrame());
-    while (!frames.isEmpty())
-    {
-        QWebFrame *frame = frames.takeFirst();
-        if (frame->url() == reply->url())
-        {
-            frame->setHtml(html, reply->url());
-            return;
-        }
-        QList<QWebFrame *> children = frame->childFrames();
-        foreach(QWebFrame *frame, children)
-            frames.append(frame);
-    }
-
-    page()->mainFrame()->setHtml(html, reply->url());
-
-    emit statusBarMessage(title);
 }
 
 void  MythWebView::handleDownloadRequested(const QNetworkRequest &request)
 {
-    QFileInfo fi(request.url().path());
-    QString basename(fi.baseName());
-    QString extension = fi.suffix();
+    m_downloadReply = NULL;
+    doDownloadRequested(request);
+}
 
+void  MythWebView::doDownloadRequested(const QNetworkRequest &request)
+{
     m_downloadRequest = request;
 
-    QFileInfo savefi(m_parentBrowser->GetDefaultSaveDirectory());
-    QString saveBaseName(savefi.baseName());
-    if (saveBaseName.isEmpty())
-        saveBaseName = basename;
-    QString saveFilename = savefi.absolutePath() + '/' + saveBaseName + '.' + extension;
+    // get the filename from the url if available
+    QFileInfo fi(request.url().path());
+    QString basename(fi.completeBaseName());
+    QString extension = fi.suffix();
+    QString mimetype = getReplyMimetype();
 
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-
-    QString msg = tr("Enter filename to save file");
-    MythTextInputDialog *input = new MythTextInputDialog(popupStack, msg, FilterNone, false, saveFilename);
-
-    if (input->Create())
+    // if we have a default filename use that
+    QString saveBaseName = basename;
+    if (!m_parentBrowser->GetDefaultSaveFilename().isEmpty())
     {
-        input->SetReturnEvent(this, "filenamedialog");
-        popupStack->AddScreen(input);
+        QFileInfo savefi(m_parentBrowser->GetDefaultSaveFilename());
+        saveBaseName = savefi.baseName();
+    }
+
+    // if the filename is still empty use a default name
+    if (saveBaseName.isEmpty())
+        saveBaseName = "unnamed_download";
+
+    // if we don't have an extension from the filename get one from the mime type
+    if (extension.isEmpty())
+        extension = getExtensionForMimetype(mimetype);
+
+    if (!extension.isEmpty())
+        extension = '.' + extension;
+
+    QString saveFilename = m_parentBrowser->GetDefaultSaveDirectory() + saveBaseName + extension;
+
+    // dont overwrite an existing file
+    if (QFile::exists(saveFilename))
+    {
+        int i = 1;
+        do
+        {
+            saveFilename = m_parentBrowser->GetDefaultSaveDirectory() + saveBaseName
+                    + '-' + QString::number(i++) + extension;
+        } while (QFile::exists(saveFilename));
+    }
+
+    // if we are downloading and then playing the file don't ask for the file name
+    if (m_downloadAndPlay)
+    {
+        doDownload(saveFilename);
     }
     else
-        delete input;
+    {
+        MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+        QString msg = tr("Enter filename to save file");
+        MythTextInputDialog *input = new MythTextInputDialog(popupStack, msg, FilterNone, false, saveFilename);
+
+        if (input->Create())
+        {
+            input->SetReturnEvent(this, "filenamedialog");
+            popupStack->AddScreen(input);
+        }
+        else
+            delete input;
+    }
 }
 
 void MythWebView::doDownload(const QString &saveFilename)
@@ -376,6 +500,7 @@ void MythWebView::doDownload(const QString &saveFilename)
 
     openBusyPopup(QObject::tr("Downloading file. Please wait..."));
 
+    // No need to make sure the path to saveFilename exists because MythDownloadManage takes care of that
     GetMythDownloadManager()->queueDownload(m_downloadRequest.url().toString(), saveFilename, this);
 }
 
@@ -424,25 +549,28 @@ void MythWebView::customEvent(QEvent *event)
                 QFileInfo fi(m_downloadRequest.url().path());
                 QString basename(fi.baseName());
                 QString extension = fi.suffix();
+                QString mimeType = getReplyMimetype();
 
-                if (isMusicFile(extension))
+                if (isMusicFile(extension, mimeType))
                 {
                     MythEvent me(QString("MUSIC_COMMAND %1 PLAY_URL %2")
                         .arg(gCoreContext->GetHostName()).arg(m_downloadRequest.url().toString()));
                     gCoreContext->dispatch(me);
                 }
-                else if (isVideoFile(extension))
-                {
-                    //NOTE: before this will work internal_play_media() needs updating to support http: urls
+                else if (isVideoFile(extension, mimeType))
                     GetMythMainWindow()->HandleMedia("Internal", m_downloadRequest.url().toString());
-                }
                 else
                     VERBOSE(VB_IMPORTANT, QString("MythWebView: Asked to play a file with extension '%1' but don't know how")
                                                   .arg(extension));
             }
             else if (resulttext == tr("Download the file"))
             {
-                handleDownloadRequested(m_downloadRequest);
+                doDownloadRequested(m_downloadRequest);
+            }
+            else if (resulttext == tr("Download and play the file"))
+            {
+                m_downloadAndPlay = true;
+                doDownloadRequested(m_downloadRequest);
             }
         }
     }
@@ -465,11 +593,14 @@ void MythWebView::customEvent(QEvent *event)
             {
                 int fileSize  = args[2].toInt();
                 int errorCode = args[4].toInt();
+                QString filename = args[1];
 
                 closeBusyPopup();
 
                 if ((errorCode != 0) || (fileSize == 0))
                     ShowOkPopup(tr("ERROR downloading file."));
+                else if (m_downloadAndPlay)
+                   GetMythMainWindow()->HandleMedia("Internal", filename);
 
                 MythEvent me(QString("BROWSER_DOWNLOAD_FINISHED"), args);
                 gCoreContext->dispatch(me);
@@ -483,8 +614,7 @@ void MythWebView::showDownloadMenu(void)
     QFileInfo fi(m_downloadRequest.url().path());
     QString basename(fi.baseName());
     QString extension = fi.suffix();
-
-    bool isPlayable = isMusicFile(extension) | isVideoFile(extension);
+    QString mimeType = getReplyMimetype();
 
     QString label = tr("What do you want to do with this file?");
 
@@ -500,28 +630,74 @@ void MythWebView::showDownloadMenu(void)
 
     menu->SetReturnEvent(this, "downloadmenu");
 
-    if (isPlayable)
+    if (isMusicFile(extension, mimeType))
         menu->AddButton(tr("Play the file"));
+
+    if (isVideoFile(extension, mimeType))
+        menu->AddButton(tr("Download and play the file"));
+
     menu->AddButton(tr("Download the file"));
     menu->AddButton(tr("Cancel"));
 
     popupStack->AddScreen(menu);
 }
 
-bool MythWebView::isMusicFile(const QString &extension)
+QString MythWebView::getExtensionForMimetype(const QString &mimetype)
 {
-    QStringList list = QString(MUSIC_EXTENSIONS).split(",");
-    return list.contains(extension, Qt::CaseInsensitive);
+    for (int x = 0; x < SupportedMimeTypesCount; x++)
+    {
+        if (!mimetype.isEmpty() && mimetype == SupportedMimeTypes[x].mimeType)
+            return SupportedMimeTypes[x].extension;
+    }
+
+    return QString("");
 }
 
-bool MythWebView::isVideoFile(const QString &extension)
+bool MythWebView::isMusicFile(const QString &extension, const QString &mimetype)
 {
-    //the internal player is currently broken for all file formats
-    //so for the moment ignore all video files
-    return false;
+    for (int x = 0; x < SupportedMimeTypesCount; x++)
+    {
+        if (!SupportedMimeTypes[x].isVideo)
+        {
+            if (!mimetype.isEmpty() && mimetype == SupportedMimeTypes[x].mimeType)
+                return true;
 
-    QStringList list = QString(VIDEO_EXTENSIONS).split(",");
-    return list.contains(extension, Qt::CaseInsensitive);
+            if (!extension.isEmpty() && extension.toLower() == SupportedMimeTypes[x].extension)
+                return true;
+        }
+    }
+
+    return false;
+}
+
+bool MythWebView::isVideoFile(const QString &extension, const QString &mimetype)
+{
+    for (int x = 0; x < SupportedMimeTypesCount; x++)
+    {
+        if (SupportedMimeTypes[x].isVideo)
+        {
+            if (!mimetype.isEmpty() && mimetype == SupportedMimeTypes[x].mimeType)
+                return true;
+
+            if (!extension.isEmpty() && extension.toLower() == SupportedMimeTypes[x].extension)
+                return true;
+        }
+    }
+
+    return false;
+}
+
+QString MythWebView::getReplyMimetype(void)
+{
+    if (!m_downloadReply)
+        return QString();
+
+    QString mimeType;
+    QVariant header = m_downloadReply->header(QNetworkRequest::ContentTypeHeader);
+    if (header != QVariant())
+        mimeType = header.toString();
+
+    return mimeType;
 }
 
 QWebView *MythWebView::createWindow(QWebPage::WebWindowType type)
@@ -578,10 +754,10 @@ MythUIWebBrowser::MythUIWebBrowser(MythUIType *parent, const QString &name)
       m_initialized(false),  m_lastUpdateTime(QTime()),
       m_updateInterval(0),   m_zoom(1.0),
       m_bgColor("White"),    m_widgetUrl(QUrl()), m_userCssFile(""),
-      m_inputToggled(false), m_lastMouseAction(""),
-      m_mouseKeyCount(0),    m_lastMouseActionTime(),
       m_defaultSaveDir(GetConfDir() + "/MythBrowser/"),
-      m_defaultSaveFilename("")
+      m_defaultSaveFilename(""),
+      m_inputToggled(false), m_lastMouseAction(""),
+      m_mouseKeyCount(0),    m_lastMouseActionTime()
 {
     SetCanTakeFocus(true);
 }
@@ -740,7 +916,7 @@ void MythUIWebBrowser::LoadPage(QUrl url)
     if (!m_browser)
         return;
 
-    m_browser->load(url);
+    m_browser->setUrl(url);
 }
 
 /** \fn MythUIWebBrowser::SetHtml(const QString&, const QUrl&)
