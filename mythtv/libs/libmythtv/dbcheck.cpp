@@ -21,7 +21,7 @@ using namespace std;
    mythtv/bindings/perl/MythTV.pm
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1273";
+const QString currentDatabaseVersion = "1274";
 
 static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver);
 static bool performActualUpdate(
@@ -5219,8 +5219,7 @@ NULL
 "  description TEXT NOT NULL,"
 "  commandline TEXT NOT NULL,"
 "  version DOUBLE NOT NULL,"
-"  updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP "
-"                             ON UPDATE CURRENT_TIMESTAMP,"
+"  updated DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',"
 "  search BOOL NOT NULL,"
 "  tree BOOL NOT NULL,"
 "  podcast BOOL NOT NULL,"
@@ -5240,8 +5239,7 @@ NULL
 "  thumbnail TEXT NOT NULL,"
 "  mediaURL TEXT NOT NULL,"
 "  author VARCHAR(255) NOT NULL,"
-"  date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP "
-"                          ON UPDATE CURRENT_TIMESTAMP,"
+"  date DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',"
 "  time INT NOT NULL,"
 "  rating VARCHAR(255) NOT NULL,"
 "  filesize BIGINT NOT NULL,"
@@ -5645,6 +5643,19 @@ NULL
 NULL
 };
         if (!performActualUpdate(updates, "1273", dbver))
+            return false;
+    }
+
+    if (dbver == "1273")
+    {
+        const char *updates[] = {
+"ALTER TABLE internetcontent MODIFY COLUMN updated "
+"  DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00';",
+"ALTER TABLE internetcontentarticles MODIFY COLUMN `date` "
+"  DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00';",
+NULL
+};
+        if (!performActualUpdate(updates, "1274", dbver))
             return false;
     }
 
