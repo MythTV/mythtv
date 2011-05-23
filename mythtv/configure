@@ -4634,7 +4634,7 @@ fi
 
 if test $target_os = darwin; then
   # Qt, by default builds .app bundles everywhere. Prevent this.
-  enabled mac_bundle || echo "CONFIG -= app_bundle" >> $TMPMAK
+  enabled mac_bundle || echo "CONFIG-=app_bundle" >> $TMPMAK
 fi
 
 cat > $TMPH <<EOF
