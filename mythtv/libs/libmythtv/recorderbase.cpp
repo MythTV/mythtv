@@ -1,20 +1,32 @@
 #include <stdint.h>
 
 #include <algorithm> // for min
-#include <iostream>
 using namespace std;
 
-#include "recorderbase.h"
-#include "tv_rec.h"
-#include "mythverbose.h"
-#include "ringbuffer.h"
+#include "NuppelVideoRecorder.h"
+#include "firewirerecorder.h"
 #include "recordingprofile.h"
+#include "firewirechannel.h"
+#include "importrecorder.h"
+#include "dummychannel.h"
+#include "hdhrrecorder.h"
+#include "iptvrecorder.h"
+#include "mpegrecorder.h"
+#include "recorderbase.h"
+#include "asirecorder.h"
+#include "dvbrecorder.h"
+#include "hdhrchannel.h"
+#include "iptvchannel.h"
+#include "mythverbose.h"
 #include "programinfo.h"
+#include "asichannel.h"
+#include "dtvchannel.h"
+#include "dvbchannel.h"
+#include "v4lchannel.h"
+#include "ringbuffer.h"
+#include "cardutil.h"
+#include "tv_rec.h"
 #include "util.h"
-
-#ifndef LONG_LONG_MAX
-#define LONG_LONG_MAX ((~((long long)0))>>1)
-#endif
 
 #define TVREC_CARDNUM \
         ((tvrec != NULL) ? QString::number(tvrec->GetCaptureCardNum()) : "NULL")
@@ -29,14 +41,13 @@ using namespace std;
 RecorderBase::RecorderBase(TVRec *rec)
     : tvrec(rec),               ringBuffer(NULL),
       weMadeBuffer(true),       videocodec("rtjpeg"),
-      audiodevice("/dev/dsp"),  videodevice("/dev/video"),
-      vbidevice("/dev/vbi"),    vbimode(0),
       ntsc(true),               ntsc_framerate(true),
       video_frame_rate(29.97),
       m_videoAspect(0),         m_videoHeight(0),
-      m_videoWidth(0),          m_frameRate(0),
+      m_videoWidth(0),          m_frameRate(0.0),
       curRecording(NULL),
       request_pause(false),     paused(false),
+      request_recording(false), recording(false),
       nextRingBuffer(NULL),     nextRecording(NULL),
       positionMapType(MARK_GOP_BYFRAME)
 {
@@ -89,12 +100,8 @@ void RecorderBase::SetOption(const QString &name, const QString &value)
 {
     if (name == "videocodec")
         videocodec = value;
-    else if (name == "audiodevice")
-        audiodevice = value;
     else if (name == "videodevice")
         videodevice = value;
-    else if (name == "vbidevice")
-        vbidevice = value;
     else if (name == "tvformat")
     {
         ntsc = false;
@@ -120,14 +127,11 @@ void RecorderBase::SetOption(const QString &name, const QString &value)
         else
             SetFrameRate(25.00);
     }
-    else if (name == "vbiformat")
+    else
     {
-        if (value.toLower() == "pal teletext")
-            vbimode = 1;
-        else if (value.toLower().left(4) == "ntsc")
-            vbimode = 2;
-        else
-            vbimode = 0;
+        VERBOSE(VB_GENERAL, LOC_WARN +
+                QString("SetOption(%1,%2): Option not recognized")
+                .arg(name).arg(value));
     }
 }
 
@@ -156,6 +160,42 @@ void RecorderBase::SetStrOption(RecordingProfile *profile, const QString &name)
     else
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
                     "SetStrOption(...%1): Option not in profile.").arg(name));
+}
+
+/** \brief StopRecording() signals to the StartRecording() function that
+ *         it should stop recording and exit cleanly.
+ *
+ *   This function should block until StartRecording() has finished up.
+ */
+void RecorderBase::StopRecording(void)
+{
+    QMutexLocker locker(&pauseLock);
+    request_recording = false;
+    unpauseWait.wakeAll();
+    while (recording)
+    {
+        recordingWait.wait(&pauseLock, 100);
+        if (request_recording)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Programmer Error: StartRecording called while we were in StopRecording");
+            request_recording = false;
+        }
+    }
+}
+
+/// \brief Tells whether the StartRecorder() loop is running.
+bool RecorderBase::IsRecording(void)
+{
+    QMutexLocker locker(&pauseLock);
+    return recording;
+}
+
+/// \brief Tells us if StopRecording() has been called.
+bool RecorderBase::IsRecordingRequested(void)
+{
+    QMutexLocker locker(&pauseLock);
+    return request_recording;
 }
 
 /** \brief Pause tells StartRecording() to pause, it should not block.
@@ -265,7 +305,7 @@ void RecorderBase::CheckForRingBufferSwitch(void)
         ResetForNewFile();
 
         m_videoAspect = m_videoWidth = m_videoHeight = 0;
-        m_frameRate = 0;
+        m_frameRate = 0.0;
 
         SetRingBuffer(nextRingBuffer);
         SetRecording(nextRecording);
@@ -419,5 +459,109 @@ void RecorderBase::SetDuration(uint64_t duration)
 }
 
 
+
+RecorderBase *RecorderBase::CreateRecorder(
+    TVRec                  *tvrec,
+    ChannelBase            *channel,
+    const RecordingProfile &profile,
+    const GeneralDBOptions &genOpt,
+    const DVBDBOptions     &dvbOpt)
+{
+    if (!channel)
+        return NULL;
+
+    RecorderBase *recorder = NULL;
+    if (genOpt.cardtype == "MPEG")
+    {
+#ifdef USING_IVTV
+        recorder = new MpegRecorder(tvrec);
+#endif // USING_IVTV
+    }
+    else if (genOpt.cardtype == "HDPVR")
+    {
+#ifdef USING_HDPVR
+        recorder = new MpegRecorder(tvrec);
+#endif // USING_HDPVR
+    }
+    else if (genOpt.cardtype == "FIREWIRE")
+    {
+#ifdef USING_FIREWIRE
+        recorder = new FirewireRecorder(
+            tvrec, dynamic_cast<FirewireChannel*>(channel));
+#endif // USING_FIREWIRE
+    }
+    else if (genOpt.cardtype == "HDHOMERUN")
+    {
+#ifdef USING_HDHOMERUN
+        recorder = new HDHRRecorder(
+            tvrec, dynamic_cast<HDHRChannel*>(channel));
+        recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+#endif // USING_HDHOMERUN
+    }
+    else if (genOpt.cardtype == "DVB")
+    {
+#ifdef USING_DVB
+        recorder = new DVBRecorder(
+            tvrec, dynamic_cast<DVBChannel*>(channel));
+        recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+        recorder->SetOption("dvb_on_demand",     dvbOpt.dvb_on_demand);
+#endif // USING_DVB
+    }
+    else if (genOpt.cardtype == "FREEBOX")
+    {
+#ifdef USING_IPTV
+        recorder = new IPTVRecorder(
+            tvrec, dynamic_cast<IPTVChannel*>(channel));
+        recorder->SetOption("mrl", genOpt.videodev);
+#endif // USING_IPTV
+    }
+    else if (genOpt.cardtype == "ASI")
+    {
+#ifdef USING_ASI
+        recorder = new ASIRecorder(
+            tvrec, dynamic_cast<ASIChannel*>(channel));
+        recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+#endif // USING_ASI
+    }
+    else if (genOpt.cardtype == "IMPORT")
+    {
+        recorder = new ImportRecorder(tvrec);
+    }
+    else if (genOpt.cardtype == "DEMO")
+    {
+#ifdef USING_IVTV
+        recorder = new MpegRecorder(tvrec);
+#else
+        recorder = new ImportRecorder(tvrec);
+#endif
+    }
+    else if (CardUtil::IsV4L(genOpt.cardtype))
+    {
+#ifdef USING_V4L2
+        // V4L/MJPEG/GO7007 from here on
+        recorder = new NuppelVideoRecorder(tvrec, channel);
+        recorder->SetOption("skipbtaudio", genOpt.skip_btaudio);
+#endif // USING_V4L2
+    }
+
+    if (recorder)
+    {
+        recorder->SetOptionsFromProfile(
+            const_cast<RecordingProfile*>(&profile),
+            genOpt.videodev, genOpt.audiodev, genOpt.vbidev);
+        // Override the samplerate defined in the profile if this card
+        // was configured with a fixed rate.
+        if (genOpt.audiosamplerate)
+            recorder->SetOption("samplerate", genOpt.audiosamplerate);
+    }
+    else
+    {
+        QString msg = "Need %1 recorder, but compiled without %2 support!";
+        msg = msg.arg(genOpt.cardtype).arg(genOpt.cardtype);
+        VERBOSE(VB_IMPORTANT, "RecorderBase::CreateRecorder() Error, " + msg);
+    }
+
+    return recorder;
+}
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -48,6 +48,10 @@ class QBroadcastSocket : public MSocketDevice
             m_address.setAddress( sAddress );
             m_port = nPort;
 
+            QByteArray addr = sAddress.toLatin1();
+            setProtocol(IPv4);
+            setSocket(createNewSocket(), MSocketDevice::Datagram);
+
             int one = 1;
 
             if ( setsockopt( socket(), SOL_SOCKET, SO_BROADCAST, &one, sizeof( one )) < 0) 

@@ -99,50 +99,41 @@ RingBuffer *RingBuffer::Create(
     QString lfilename = xfilename;
 
     if (write)
-    {
-        return new FileRingBuffer(
-            lfilename, write, usereadahead, timeout_ms);
-    }
+        return new FileRingBuffer(lfilename, write, usereadahead, timeout_ms);
 
-    bool is_dvd = false;
-    bool is_bd  = false;
+    bool dvddir  = false;
+    bool bddir   = false;
+    bool httpurl = lfilename.startsWith("http://");
+    bool mythurl = lfilename.startsWith("myth://");
+    bool bdurl   = lfilename.startsWith("bd:");
+    bool dvdurl  = lfilename.startsWith("dvd:");
+    bool dvdext  = lfilename.endsWith(".img") || lfilename.endsWith(".iso");
 
-    if (lfilename.startsWith("http://"))
-    {
+    if (httpurl)
         return new StreamingRingBuffer(lfilename);
-    }
 
-    if (!stream_only && lfilename.startsWith("myth://"))
+    if (!stream_only && mythurl)
     {
         struct stat fileInfo;
         if ((RemoteFile::Exists(lfilename, &fileInfo)) &&
             (S_ISDIR(fileInfo.st_mode)))
         {
-            QString tmpFile = lfilename + "/VIDEO_TS";
-            if (RemoteFile::Exists(tmpFile))
-            {
-                is_dvd = true;
-            }
-            else
-            {
-                tmpFile = lfilename + "/BDMV";
-                if (RemoteFile::Exists(tmpFile))
-                    is_bd = true;
-            }
+            if (RemoteFile::Exists(lfilename + "/VIDEO_TS"))
+                dvddir = true;
+            else if (RemoteFile::Exists(lfilename + "/BDMV"))
+                bddir = true;
         }
     }
-
-    if ((lfilename.left(1) == "/") || (QFile::exists(lfilename)))
+    else if (!stream_only && !mythurl)
     {
+        if (QFile::exists(lfilename + "/VIDEO_TS"))
+            dvddir = true;
+        else if (QFile::exists(lfilename + "/BDMV"))
+            bddir  = true;
     }
-    else if ((!stream_only) &&
-             ((lfilename.startsWith("dvd:")) || is_dvd ||
-              ((lfilename.startsWith("myth://")) &&
-               ((lfilename.endsWith(".img")) ||
-                (lfilename.endsWith(".iso"))))))
-    {
-        is_dvd = true;
 
+    if (!stream_only && (dvdurl || dvddir || dvdext))
+    {
         if (lfilename.left(6) == "dvd://")     // 'Play DVD' sends "dvd:/" + dev
             lfilename.remove(0,5);             // e.g. "dvd://dev/sda"
         else if (lfilename.left(5) == "dvd:/") // Less correct URI "dvd:" + path
@@ -150,34 +141,24 @@ RingBuffer *RingBuffer::Create(
         else if (lfilename.left(4) == "dvd:")   // Win32 URI "dvd:" + abs path
             lfilename.remove(0,4);              //             e.g. "dvd:D:\"
 
-        if (QFile::exists(lfilename) || lfilename.startsWith("myth://"))
-        {
+        if (mythurl || QFile::exists(lfilename))
             VERBOSE(VB_PLAYBACK, "Trying DVD at " + lfilename);
-        }
         else
-        {
             lfilename = "/dev/dvd";
-        }
 
         return new DVDRingBuffer(lfilename);
     }
-    else if ((!stream_only) && (lfilename.left(3) == "bd:" || is_bd))
+    else if (!stream_only && (bdurl || bddir))
     {
-        is_bd = true;
-
         if (lfilename.left(5) == "bd://")      // 'Play DVD' sends "bd:/" + dev
             lfilename.remove(0,4);             // e.g. "bd://dev/sda"
         else if (lfilename.left(4) == "bd:/")  // Less correct URI "bd:" + path
             lfilename.remove(0,3);             // e.g. "bd:/videos/ET"
 
-        if (QFile::exists(lfilename) || lfilename.startsWith("myth://"))
-        {
+        if (mythurl || QFile::exists(lfilename))
             VERBOSE(VB_PLAYBACK, "Trying BD at " + lfilename);
-        }
         else
-        {
             lfilename = "/dev/dvd";
-        }
 
         return new BDRingBuffer(lfilename);
     }
@@ -1189,30 +1170,6 @@ int RingBuffer::Read(void *buf, int count)
     return ret;
 }
 
-/** \fn RingBuffer::IsIOBound(void) const
- *  \brief Returns true if a RingBuffer::Write(void*,int) is likely to block.
- */
-bool RingBuffer::IsIOBound(void) const
-{
-    bool ret = false;
-    int used, free;
-    rwlock.lockForRead();
-
-    if (!tfw)
-    {
-        rwlock.unlock();
-        return ret;
-    }
-
-    used = tfw->BufUsed();
-    free = tfw->BufFree();
-
-    ret = (used * 5 > free);
-
-    rwlock.unlock();
-    return ret;
-}
-
 /** \fn RingBuffer::Write(const void*, uint)
  *  \brief Writes buffer to ThreadedFileWriter::Write(const void*,uint)
  *  \return Bytes written, or -1 on error.
@@ -1300,17 +1257,6 @@ void RingBuffer::WriterFlush(void)
         tfw->Flush();
         tfw->Sync();
     }
-    rwlock.unlock();
-}
-
-/** \fn RingBuffer::SetWriteBufferSize(int)
- *  \brief Calls ThreadedFileWriter::SetWriteBufferSize(int)
- */
-void RingBuffer::SetWriteBufferSize(int newSize)
-{
-    rwlock.lockForRead();
-    if (tfw)
-        tfw->SetWriteBufferSize(newSize);
     rwlock.unlock();
 }
 

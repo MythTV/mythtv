@@ -4,8 +4,10 @@
 #define _TV_BROWSE_HELPER_H_
 
 #include <QWaitCondition>
+#include <QMultiMap>
 #include <QThread>
 #include <QString>
+#include <QHash>
 
 #include "dbchannelinfo.h" // for DBChanList
 #include "programtypes.h"  // for InfoMap
@@ -19,22 +21,43 @@ class BrowseInfo
 {
   public:
     BrowseInfo(BrowseDirection dir) :
-        m_dir(dir), m_chanid(0)
+        m_dir(dir), m_chanid(0), m_sourceid(0)
     {
     }
     BrowseInfo(BrowseDirection dir,
                const QString &channum,
                uint           chanid,
                const QString &starttime) :
-        m_dir(dir),  m_channum(channum),
-        m_chanid(0), m_starttime(starttime)
+        m_dir(dir),         m_channum(channum),
+        m_chanid(chanid),   m_starttime(starttime),
+        m_sourceid(0)
     {
+    }
+    BrowseInfo(const QString &channum,
+               uint           sourceid) :
+        m_dir(BROWSE_SAME), m_channum(channum),
+        m_chanid(0),        m_sourceid(sourceid)
+    {
+    }
+
+    QString toString() const
+    {
+        return QString("%1;%2;%3;%4;%5")
+            .arg(BROWSE_SAME==m_dir?"SAME":
+                 BROWSE_UP  ==m_dir?"UP":
+                 BROWSE_DOWN==m_dir?"DOWN":
+                 QString::number(m_dir))
+            .arg(m_channum)
+            .arg(m_chanid)
+            .arg(m_starttime)
+            .arg(m_sourceid);
     }
 
     BrowseDirection m_dir;
     QString         m_channum;
     uint            m_chanid;
     QString         m_starttime;
+    uint            m_sourceid;
 };
 
 
@@ -82,15 +105,12 @@ class TVBrowseHelper : public QThread
             BrowseDispInfo(ctx, bi);
     }
 
-    void BrowseChannel(PlayerContext *ctx, const QString &channum)
-    {
-        BrowseInfo bi(BROWSE_SAME, channum, 0, "");
-        BrowseDispInfo(ctx, bi);
-    }
+    void BrowseChannel(PlayerContext *ctx, const QString &channum);
 
     BrowseInfo GetBrowsedInfo(void) const;
     bool IsBrowsing(void) const;
-    uint BrowseAllGetChanId(const QString &channum) const;
+    uint GetChanId(const QString &channum,
+                   uint pref_cardid, uint pref_sourceid) const;
 
   protected:
     void GetNextProgram(BrowseDirection direction, InfoMap &infoMap) const;
@@ -99,12 +119,16 @@ class TVBrowseHelper : public QThread
     virtual void run();
 
     TV               *m_tv;
-    DBChanList        db_browse_all_channels;
+    DBChanList        db_all_channels;
+    DBChanList        db_all_visible_channels;
     QString           db_time_format;
     QString           db_short_date_format;
     uint              db_browse_max_forward;
     bool              db_browse_all_tuners;
     bool              db_use_channel_groups;
+    QHash<uint,QString>     db_chanid_to_channum;
+    QHash<uint,uint>        db_chanid_to_sourceid;
+    QMultiMap<QString,uint> db_channum_to_chanids;
 
     mutable QMutex    m_lock; // protects variables below
     PlayerContext    *m_ctx;

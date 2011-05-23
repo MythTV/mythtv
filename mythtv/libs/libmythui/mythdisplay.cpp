@@ -6,12 +6,6 @@
 #import "util-osx.h"
 #elif USING_X11
 #include "mythxdisplay.h"
-#elif USING_DIRECTFB
-#include <linux/fb.h>
-extern "C" {
-#include <directfb.h>
-#include <directfb_version.h>
-}
 #endif
 
 #if !USING_X11
@@ -113,50 +107,6 @@ DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
     ret.res  = disp->GetDisplaySize();
     ret.size = disp->GetDisplayDimensions();
     delete disp;
-#elif USING_DIRECTFB
-    int fh, v;
-    struct fb_var_screeninfo si;
-    double drate;
-    double hrate;
-    double vrate;
-    long htotal;
-    long vtotal;
-    const char *fb_dev_name = NULL;
-    if (!(fb_dev_name = getenv("FRAMEBUFFER")))
-        fb_dev_name = "/dev/fb0";
-
-    fh = open(fb_dev_name, O_RDONLY);
-    if (-1 == fh)
-        return ret;
-
-    if (ioctl(fh, FBIOGET_VSCREENINFO, &si))
-    {
-        close(fh);
-        return ret;
-    }
-
-    htotal = si.left_margin + si.xres + si.right_margin + si.hsync_len;
-    vtotal = si.upper_margin + si.yres + si.lower_margin + si.vsync_len;
-
-    switch (si.vmode & FB_VMODE_MASK)
-    {
-        case FB_VMODE_INTERLACED:
-            break;
-        case FB_VMODE_DOUBLE:
-            vtotal <<= 2;
-            break;
-        default:
-            vtotal <<= 1;
-    }
-
-    drate = 1E12 / si.pixclock;
-    hrate = drate / htotal;
-    vrate = hrate / vtotal * 2;
-
-    v = (int)(1E3 / vrate + 0.5);
-    /* h = hrate / 1E3; */
-    ret.rate = v;
-    close(fh);
 #endif
     return ret;
 }

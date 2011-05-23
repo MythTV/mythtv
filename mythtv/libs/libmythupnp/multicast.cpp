@@ -62,6 +62,10 @@ QMulticastSocket::QMulticastSocket( QString sAddress, quint16 nPort, quint8 ttl 
     if (ttl == 0)
         ttl = 4;
 
+    // Force to IPv4 until a proper upnp spec is complete for ipv6 as well.
+    setProtocol(IPv4);
+    setSocket(createNewSocket(), MSocketDevice::Datagram);
+
     // ----------------------------------------------------------------------
     // Set the numer of subnets to traverse (TTL)
     // ----------------------------------------------------------------------

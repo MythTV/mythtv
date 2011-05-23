@@ -78,25 +78,14 @@ class DVBChannel : public DTVChannel
     double GetUncorrectedBlockCount(bool *ok = NULL) const;
 
     // Commands
-#if 0
     bool SwitchToInput(const QString &inputname, const QString &chan);
-#else
-    bool SelectInput(const QString &inputname, const QString &chan,
-                     bool use_sm);
-#endif
     bool SwitchToInput(int newcapchannel, bool setstarting);
-    bool SetChannelByString(const QString &chan);
     bool Tune(const DTVMultiplex &tuning, QString inputname);
     bool Tune(const DTVMultiplex &tuning, uint inputid,
               bool force_reset = false, bool same_input = false);
-    bool TuneMultiplex(uint mplexid, QString inputname);
     bool Retune(void);
 
     bool ProbeTuningParams(DTVMultiplex &tuning) const;
-
-    // PID caching
-    void SaveCachedPids(const pid_cache_t&) const;
-    void GetCachedPids(pid_cache_t&) const;
 
   private:
     bool Open(DVBChannel*);
@@ -146,7 +135,6 @@ class DVBChannel : public DTVChannel
     int               fd_frontend; ///< File descriptor for tuning hardware
     QString           device;      ///< DVB Device
     bool              has_crc_bug; ///< true iff our driver munges PMT
-    int               nextInputID; ///< Signal an input change
 };
 
 #endif

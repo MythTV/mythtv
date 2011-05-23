@@ -2994,7 +2994,7 @@ bool UIManagedTreeListType::incSearchStart(void)
     modeCombo->insertItem(tr("Contains text"));
     popup->addWidget(modeCombo);
 
-    MythLineEdit *searchEdit = new MythLineEdit(false, popup, "mode_combo");
+    MythLineEdit *searchEdit = new MythLineEdit(popup, "mode_edit");
     searchEdit->setText(incSearch);
     popup->addWidget(searchEdit);
     searchEdit->setFocus();

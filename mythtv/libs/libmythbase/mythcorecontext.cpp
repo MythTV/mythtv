@@ -6,6 +6,7 @@
 #include <QMutex>
 #include <QThread>
 #include <QWaitCondition>
+#include <QNetworkInterface>
 
 #include <cmath>
 
@@ -179,6 +180,19 @@ bool MythCoreContext::Init(void)
 
         return false;
     }
+
+    has_ipv6 = false;
+
+    // If any of the IPs on any interfaces look like IPv6 addresses, assume IPv6
+    // is available
+    QNetworkInterface interface;
+    QList<QHostAddress> IpList = interface.allAddresses();
+    for (int i = 0; i < IpList.size(); i++)
+    {
+        if (IpList.at(i).toString().contains(":"))
+            has_ipv6 = true;
+    };
+
 
     return true;
 }
@@ -555,19 +569,69 @@ bool MythCoreContext::IsFrontendOnly(void)
     return !backendOnLocalhost;
 }
 
+QString MythCoreContext::MythHostAddressAny(void)
+{
+
+    if (has_ipv6)
+        return QString("::");
+    else
+        return QString("0.0.0.0");
+
+}
+
+QString MythCoreContext::GenMythURL(QString host, QString port, QString path, QString storageGroup)
+{
+    return GenMythURL(host,port.toInt(),path,storageGroup);
+}
+
+QString MythCoreContext::GenMythURL(QString host, int port, QString path, QString storageGroup) 
+{
+    QString ret;
+
+    QString m_storageGroup;
+    QString m_host;
+    QString m_port;
+
+    QHostAddress addr(host);
+
+    if (!storageGroup.isEmpty()) 
+        m_storageGroup = storageGroup + "@";
+
+    m_host = host;
+
+#if !defined(QT_NO_IPV6)
+    // Basically if it appears to be an IPv6 IP surround the IP with [] otherwise don't bother
+    if (( addr.protocol() == QAbstractSocket::IPv6Protocol ) || (host.contains(":"))) 
+        m_host = "[" + host + "]";
+#endif
+
+    if (port > 0) 
+        m_port = QString(":%1").arg(port);
+    else
+        m_port = "";
+
+    QString seperator = "/";
+    if (path.startsWith("/"))
+        seperator = "";
+
+    ret = QString("myth://%1%2%3%4%5").arg(m_storageGroup).arg(m_host).arg(m_port).arg(seperator).arg(path);
+
+    //VERBOSE(VB_GENERAL, LOC + QString("GenMythURL returning %1").arg(ret));
+
+    return ret;
+}
+
+
 QString MythCoreContext::GetMasterHostPrefix(QString storageGroup)
 {
     QString ret;
 
     if (IsMasterHost())
     {
-        if (storageGroup.isEmpty())
-            return QString("myth://%1:%2/").arg(GetSetting("MasterServerIP"))
-                           .arg(GetNumSetting("MasterServerPort", 6543));
-        else
-            return QString("myth://%1@%2:%3/").arg(storageGroup)
-                           .arg(GetSetting("MasterServerIP"))
-                           .arg(GetNumSetting("MasterServerPort", 6543));
+        return GenMythURL(GetSetting("MasterServerIP"),
+                          GetNumSetting("MasterServerPort", 6543),
+                          "",
+                          storageGroup);
     }
 
     QMutexLocker locker(&d->m_sockLock);
@@ -579,15 +643,11 @@ QString MythCoreContext::GetMasterHostPrefix(QString storageGroup)
 
     if (d->m_serverSock)
     {
-        if (storageGroup.isEmpty())
-            ret = QString("myth://%1:%2/")
-                         .arg(d->m_serverSock->peerAddress().toString())
-                         .arg(d->m_serverSock->peerPort());
-        else
-            ret = QString("myth://%1@%2:%3/")
-                         .arg(storageGroup)
-                         .arg(d->m_serverSock->peerAddress().toString())
-                         .arg(d->m_serverSock->peerPort());
+
+         ret = GenMythURL(d->m_serverSock->peerAddress().toString(),
+                          d->m_serverSock->peerPort(),
+                          "",
+                          storageGroup);
     }
 
     return ret;

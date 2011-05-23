@@ -13,30 +13,31 @@
 
 class FirewireChannel : public DTVChannel
 {
+    friend class FirewireSignalMonitor;
+    friend class FirewireRecorder;
+
   public:
     FirewireChannel(TVRec *parent, const QString &videodevice,
                     const FireWireDBOptions &firewire_opts);
-    ~FirewireChannel() { Close(); }
 
     // Commands
     virtual bool Open(void);
     virtual void Close(void);
 
-    virtual bool TuneMultiplex(uint /*mplexid*/, QString /*inputname*/)
-        { return false; }
-    virtual bool Tune(const DTVMultiplex &/*tuning*/, QString /*inputname*/)
-        { return false; }
+    virtual bool Tune(const DTVMultiplex&, QString) { return false; }
+    virtual bool Tune(const QString &freqid, int finetune);
     virtual bool Retune(void);
 
     // Sets
-    virtual bool SetChannelByString(const QString &chan);
-    virtual bool SetChannelByNumber(int channel);
     virtual bool SetPowerState(bool on);
 
     // Gets
     virtual bool IsOpen(void) const { return isopen; }
-    virtual FirewireDevice::PowerState GetPowerState(void) const;
     virtual QString GetDevice(void) const;
+    virtual bool IsExternalChannelChangeSupported(void) { return true; }
+
+  private:
+    virtual FirewireDevice::PowerState GetPowerState(void) const;
     virtual FirewireDevice *GetFirewireDevice(void) { return device; }
 
   protected:

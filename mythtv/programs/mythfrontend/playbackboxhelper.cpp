@@ -407,14 +407,12 @@ bool PBHEventHandler::event(QEvent *e)
                 {
                     if (!re.exactMatch(*it))
                         continue;
+                    foundFile = gCoreContext->GenMythURL(
+                                           gCoreContext->GetSettingOnHost("BackendServerIP", host),
+                                           gCoreContext->GetSettingOnHost("BackendServerPort", host).toInt(),
+                                           *it,
+                                           StorageGroup::GetGroupToUse(host, sgroup));
 
-                    foundFile = QString("myth://%1@%2:%3/%4")
-                        .arg(StorageGroup::GetGroupToUse(host, sgroup))
-                        .arg(gCoreContext->GetSettingOnHost(
-                                 "BackendServerIP", host))
-                        .arg(gCoreContext->GetSettingOnHost(
-                                 "BackendServerPort", host))
-                        .arg(*it);
                     break;
                 }
             }

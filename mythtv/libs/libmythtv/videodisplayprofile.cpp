@@ -1138,12 +1138,6 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
             "XVideo hardware assist for scaling, color conversion. If the "
             "hardware offers picture controls the renderer supports them.");
 
-    if (renderer == "directfb")
-        msg = QObject::tr(
-            "This video renderer uses DirectFB for scaling and color "
-            "conversion. It is not as feature rich as the standard video "
-            "renderer, but can run on Linux hardware without an X11 server.");
-
     if (renderer == "direct3d")
         msg = QObject::tr(
             "Windows video renderer based on Direct3D. Requires "

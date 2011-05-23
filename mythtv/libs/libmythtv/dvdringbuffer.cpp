@@ -36,7 +36,7 @@ static const char *dvdnav_menu_table[] =
 DVDInfo::DVDInfo(const QString &filename)
   : m_nav(NULL), m_name(NULL), m_serialnumber(NULL)
 {
-    VERBOSE(VB_PLAYBACK, QString("DVDInfo: Starting."));
+    VERBOSE(VB_PLAYBACK, QString("DVDInfo: Trying %1").arg(filename));
     QString name = filename;
     if (name.left(6) == "dvd://")
         name.remove(0,5);
@@ -502,7 +502,12 @@ void DVDRingBuffer::WaitForPlayer(void)
         m_playerWait = true;
         int count = 0;
         while (m_playerWait && count++ < 200)
+        {
+            rwlock.unlock();
             usleep(10000);
+            rwlock.lockForWrite();
+        }
+
         if (m_playerWait)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -529,6 +534,9 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
         errno = EBADF;
         return -1;
     }
+
+    if (readaheadrunning)
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "read ahead thread running.");
 
     while (needed)
     {
@@ -886,7 +894,9 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
 
                 // pause a little as the dvdnav VM will continue to return
                 // this event until it has been skipped
+                rwlock.unlock();
                 usleep(10000);
+                rwlock.lockForWrite();
 
                 // when scanning the file or exiting playback, skip immediately
                 // otherwise update the timeout in the player
@@ -919,7 +929,9 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                 else
                 {
                     m_dvdWaiting = true;
+                    rwlock.unlock();
                     usleep(10000);
+                    rwlock.lockForWrite();
                 }
 
                 // release buffer

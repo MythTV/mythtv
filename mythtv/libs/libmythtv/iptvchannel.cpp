@@ -59,9 +59,8 @@ bool IPTVChannel::Open(void)
             .arg(m_videodev));
     }
 
-    bool open = IsOpen();
     VERBOSE(VB_CHANNEL, LOC + "Open() -- end");
-    return open;
+    return !m_freeboxchannels.empty();
 }
 
 void IPTVChannel::Close(void)
@@ -78,9 +77,8 @@ bool IPTVChannel::IsOpen(void) const
     VERBOSE(VB_CHANNEL, LOC + "IsOpen() -- begin");
     QMutexLocker locker(&m_lock);
     VERBOSE(VB_CHANNEL, LOC + "IsOpen() -- locked");
-    bool open = m_freeboxchannels.size() > 0;
     VERBOSE(VB_CHANNEL, LOC + "IsOpen() -- end");
-    return open;
+    return !m_freeboxchannels.empty();
 }
 
 bool IPTVChannel::SetChannelByString(const QString &channum)
@@ -106,9 +104,6 @@ bool IPTVChannel::SetChannelByString(const QString &channum)
         return false;
     }
 
-    if (!(*it)->externalChanger.isEmpty() && !ChangeExternalChannel(channum))
-        return false;
-
     // Set the current channum to the new channel's channum
     QString tmp = channum; tmp.detach();
     m_curchannelname = tmp;
@@ -117,6 +112,8 @@ bool IPTVChannel::SetChannelByString(const QString &channum)
     SetDTVInfo(/*atsc_major*/ 0, /*atsc_minor*/ 0,
                /*netid*/ 0,
                /*tsid*/ 0, /*mpeg_prog_num*/ 1);
+
+    HandleScript(channum /* HACK treat channum as freqid */);
 
     VERBOSE(VB_CHANNEL, LOC + "SetChannelByString() -- end");
     return true;

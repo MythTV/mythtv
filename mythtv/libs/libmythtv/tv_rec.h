@@ -21,8 +21,8 @@
 
 // locking order
 // stateChangeLock -> triggerEventLoopLock
+//                 -> pendingRecLock
 
-class NuppelVideoRecorder;
 class RingBuffer;
 class EITScanner;
 class RecordingProfile;
@@ -33,6 +33,7 @@ class RecorderBase;
 class DTVRecorder;
 class DVBRecorder;
 class HDHRRecorder;
+class ASIRecorder;
 
 class SignalMonitor;
 class DTVSignalMonitor;
@@ -134,7 +135,6 @@ class PendingInfo
 typedef QMap<uint,PendingInfo> PendingMap;
 
 class TVRec;
-
 class TVRecEventThread : public QThread
 {
     Q_OBJECT
@@ -149,7 +149,6 @@ class TVRecEventThread : public QThread
 class MTV_PUBLIC TVRec : public SignalMonitorListener
 {
     friend class TuningRequest;
-    friend class SignalMonitor;
     friend class TVRecEventThread;
     friend class TVRecRecordThread;
 
@@ -254,7 +253,6 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener
   protected:
     void RunTV(void);
     bool WaitForEventThreadSleep(bool wake = true, ulong time = ULONG_MAX);
-    bool SetupDTVSignalMonitor(bool EITscan);
 
   private:
     void SetRingBuffer(RingBuffer *);
@@ -269,23 +267,18 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener
 
     static QString GetStartChannel(uint cardid, const QString &defaultinput);
 
-    bool SetupRecorder(RecordingProfile& profile);
     void TeardownRecorder(bool killFile = false);
     DTVRecorder  *GetDTVRecorder(void);
-    HDHRRecorder *GetHDHRRecorder(void);
-    DVBRecorder  *GetDVBRecorder(void);
-    
-    bool CreateChannel(const QString &startChanNum);
-    void InitChannel(const QString &inputname, const QString &startchannel);
-    void CloseChannel(void);
-    DTVChannel   *GetDTVChannel(void);
-    HDHRChannel  *GetHDHRChannel(void);
-    DVBChannel   *GetDVBChannel(void);
-    FirewireChannel *GetFirewireChannel(void);
-    V4LChannel   *GetV4LChannel(void);
 
-    bool SetupSignalMonitor(bool enable_table_monitoring,
-                            bool EITscan, bool notify);
+    bool CreateChannel(const QString &startChanNum,
+                       bool enter_power_save_mode);
+    void CloseChannel(void);
+    DTVChannel *GetDTVChannel(void);
+    V4LChannel *GetV4LChannel(void);
+
+    bool SetupSignalMonitor(
+        bool enable_table_monitoring, bool EITscan, bool notify);
+    bool SetupDTVSignalMonitor(bool EITscan);
     void TeardownSignalMonitor(void);
     DTVSignalMonitor *GetDTVSignalMonitor(void);
 
@@ -318,10 +311,12 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener
 
     bool WaitForNextLiveTVDir(void);
     bool GetProgramRingBufferForLiveTV(RecordingInfo **pginfo, RingBuffer **rb,
-				       const QString & channum, int inputID);
+                                       const QString &channum, int inputID);
     bool CreateLiveTVRingBuffer(const QString & channum);
     bool SwitchLiveTVRingBuffer(const QString & channum,
-				bool discont, bool set_rec);
+                                bool discont, bool set_rec);
+
+    RecordingInfo *SwitchRecordingRingBuffer(const RecordingInfo &rcinfo);
 
     void StartedRecording(RecordingInfo*);
     void FinishedRecording(RecordingInfo*);
@@ -379,7 +374,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener
     mutable QMutex triggerEventSleepLock;
     QWaitCondition triggerEventSleepWait;
     bool           triggerEventSleepSignal;
-    bool           m_switchingBuffer;
+    volatile bool  switchingBuffer;
     RecStatusType  m_recStatus;
 
     // Current recording info

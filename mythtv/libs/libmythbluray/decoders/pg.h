@@ -89,6 +89,20 @@ typedef struct {
 
 } BD_PG_OBJECT;
 
+typedef struct {
+    int64_t       pts;
+
+    BD_PG_VIDEO_DESCRIPTOR        video_descriptor;
+    BD_PG_COMPOSITION_DESCRIPTOR  composition_descriptor;
+
+    uint8_t       palette_update_flag;
+    uint8_t       palette_id_ref;
+
+    unsigned                  num_composition_objects;
+    BD_PG_COMPOSITION_OBJECT *composition_object;
+
+} BD_PG_COMPOSITION;
+
 #ifdef __cplusplus
 };
 #endif

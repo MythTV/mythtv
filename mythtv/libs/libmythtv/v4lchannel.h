@@ -4,11 +4,11 @@
 #define CHANNEL_H
 
 #include "dtvchannel.h"
-#ifdef USING_V4L
+#ifdef USING_V4L2
 #include <linux/videodev2.h> // needed for v4l2_std_id type
 #else
 typedef uint64_t v4l2_std_id;
-#endif //USING_V4L
+#endif //USING_V4L2
 
 using namespace std;
 
@@ -37,43 +37,31 @@ class V4LChannel : public DTVChannel
 
     bool Init(QString &inputname, QString &startchannel, bool setchan);
 
+    // Commands
+    bool SwitchToInput(int newcapchannel, bool setstarting);
     bool Open(void);
     void Close(void);
+    bool Tune(const DTVMultiplex &tuning, QString inputname);
+    bool Tune(uint64_t frequency, QString inputname);
+    bool Tune(const QString &freqid, int finetune);
+    bool Retune(void);
 
     // Sets
     void SetFd(int fd);
     void SetFormat(const QString &format);
     int  SetDefaultFreqTable(const QString &name);
-    bool SetChannelByString(const QString &chan);
 
     // Gets
     bool IsOpen(void)       const { return GetFd() >= 0; }
     int  GetFd(void)        const { return videofd; }
     QString GetDevice(void) const { return device; }
     QString GetSIStandard(void) const { return "atsc"; }
-
-    // Commands
-    bool Retune(void);
+    virtual bool IsExternalChannelChangeSupported(void) { return true; }
 
     // Picture attributes.
     bool InitPictureAttributes(void);
     int  GetPictureAttribute(PictureAttribute) const;
     int  ChangePictureAttribute(PictureAdjustType, PictureAttribute, bool up);
-
-    // PID caching
-    void SaveCachedPids(const pid_cache_t&) const;
-    void GetCachedPids(pid_cache_t&) const;
-
-    // Digital scanning stuff
-    bool TuneMultiplex(uint mplexid, QString inputname);
-    bool Tune(const DTVMultiplex &tuning, QString inputname);
-
-    // Analog scanning stuff
-    bool Tune(uint frequency, QString inputname,
-              QString modulation, QString si_std);
-
-  protected:
-    bool SwitchToInput(int newcapchannel, bool setstarting);
 
   private:
     // Helper Sets
@@ -88,7 +76,6 @@ class V4LChannel : public DTVChannel
 
     // Helper Commands
     bool InitPictureAttribute(const QString db_col_name);
-    bool TuneTo(const QString &chan, int finetune);
     bool InitializeInputs(void);
 
   private:
@@ -103,8 +90,13 @@ class V4LChannel : public DTVChannel
     int         totalChannels;
 
     QString     currentFormat;
-    bool        is_dtv;         ///< Set if 'currentFormat' is a DTV format
     bool        usingv4l2;      ///< Set to true if tuner accepts v4l2 commands
+    bool        has_stream_io;
+    bool        has_std_io;
+    bool        has_async_io;
+    bool        has_tuner;
+    bool        has_sliced_vbi;
+
     VidModV4L1  videomode_v4l1; ///< Current video mode if 'usingv4l2' is false
     VidModV4L2  videomode_v4l2; ///< Current video mode if 'usingv4l2' is true
 

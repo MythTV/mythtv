@@ -11,22 +11,22 @@
 class IPTVChannel;
 class IPTVSignalMonitor;
 
-class IPTVMonitorThread : public QThread
+class IPTVTableMonitorThread : public QThread
 {
     Q_OBJECT
   public:
-    IPTVMonitorThread() : m_parent(NULL) {}
-    void SetParent(IPTVSignalMonitor *parent) { m_parent = parent; }
-    void run(void);
+    IPTVTableMonitorThread(IPTVSignalMonitor *p) : m_parent(p) { start(); }
+    virtual ~IPTVTableMonitorThread() { wait(); }
+    virtual void run(void);
   private:
     IPTVSignalMonitor *m_parent;
 };
 
-class IPTVSignalMonitor : public QObject, public DTVSignalMonitor, public TSDataListener
+class IPTVSignalMonitor : public DTVSignalMonitor, public TSDataListener
 {
     Q_OBJECT
 
-    friend class IPTVMonitorThread;
+    friend class IPTVTableMonitorThread;
   public:
     IPTVSignalMonitor(int db_cardnum, IPTVChannel *_channel,
                       uint64_t _flags = 0);
@@ -48,7 +48,8 @@ class IPTVSignalMonitor : public QObject, public DTVSignalMonitor, public TSData
     IPTVChannel *GetChannel(void);
 
   protected:
-    IPTVMonitorThread  table_monitor_thread;
+    volatile bool dtvMonitorRunning;
+    IPTVTableMonitorThread *tableMonitorThread;
 };
 
 #endif // _IPTVSIGNALMONITOR_H_

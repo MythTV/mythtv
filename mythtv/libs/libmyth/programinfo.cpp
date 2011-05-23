@@ -1994,15 +1994,47 @@ QString ProgramInfo::QueryBasename(void) const
 QString ProgramInfo::GetPlaybackURL(
     bool checkMaster, bool forceCheckLocal) const
 {
-    QString tmpURL;
     QString basename = QueryBasename();
-
     if (basename.isEmpty())
         return "";
 
-    bool alwaysStream = gCoreContext->GetNumSetting("AlwaysStreamFiles", 0);
+    bool checklocal = !gCoreContext->GetNumSetting("AlwaysStreamFiles", 0) ||
+                      forceCheckLocal;
 
-    if ((!alwaysStream) || (forceCheckLocal))
+    if (IsVideo())
+    {
+        QString fullpath = GetPathname();
+        if (!fullpath.startsWith("myth://", Qt::CaseInsensitive) || !checklocal)
+            return fullpath;
+
+        QUrl    url  = QUrl(fullpath);
+        QString path = url.path();
+        QString host = url.toString(QUrl::RemovePath).mid(7);
+        QStringList list = host.split(":", QString::SkipEmptyParts);
+        if (list.size())
+        {
+            host = list[0];
+            list = host.split("@", QString::SkipEmptyParts);
+            QString group;
+            if (list.size() > 0 && list.size() < 3)
+            {
+                host  = list.size() == 1 ? list[0]   : list[1];
+                group = list.size() == 1 ? QString() : list[0];
+                StorageGroup *sg = new StorageGroup(group, host);
+                if (sg)
+                {
+                    QString local = sg->FindFile(path);
+                    if (!local.isEmpty())
+                        if (sg->FileExists(local))
+                            return local;
+                }
+            }
+        }
+        return fullpath;
+    }
+
+    QString tmpURL;
+    if (checklocal)
     {
         // Check to see if the file exists locally
         StorageGroup sgroup(storagegroup);
@@ -2032,19 +2064,19 @@ QString ProgramInfo::GetPlaybackURL(
         (gCoreContext->GetNumSetting("MasterBackendOverride", 0)) &&
         (RemoteCheckFile(this, false)))
     {
-        tmpURL = QString("myth://") +
-        gCoreContext->GetSetting("MasterServerIP") + ':' +
-        gCoreContext->GetSetting("MasterServerPort") + '/' + basename;
+        tmpURL = gCoreContext->GenMythURL(gCoreContext->GetSetting("MasterServerIP"),
+                                          gCoreContext->GetSetting("MasterServerPort").toInt(),
+                                          basename);
+
         VERBOSE(VB_FILE, LOC +
                 QString("GetPlaybackURL: Found @ '%1'").arg(tmpURL));
         return tmpURL;
         }
 
     // Fallback to streaming from the backend the recording was created on
-    tmpURL = QString("myth://") +
-        gCoreContext->GetSettingOnHost("BackendServerIP", hostname) + ':' +
-        gCoreContext->GetSettingOnHost("BackendServerPort", hostname) + '/' +
-        basename;
+    tmpURL = gCoreContext->GenMythURL(gCoreContext->GetSettingOnHost("BackendServerIP", hostname),
+                                      gCoreContext->GetSettingOnHost("BackendServerPort", hostname).toInt(),
+                                      basename);
 
     VERBOSE(VB_FILE, LOC + QString("GetPlaybackURL: Using default of: '%1'")
             .arg(tmpURL));

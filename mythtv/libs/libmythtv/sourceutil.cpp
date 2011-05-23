@@ -221,27 +221,25 @@ bool SourceUtil::IsProperlyConnected(uint sourceid, bool strict)
             counts["ANALOG_TUNING"]++;
         else if (CardUtil::IsTuningDigital(*it))
             counts["DIGITAL_TUNING"]++;
-        else
-            counts["OTHER_TUNING"]++;
+        else if (CardUtil::IsTuningVirtual(*it))
+            counts["VIRTUAL_TUNING"]++;
     }
 
-    bool tune_mismatch = counts["ANALOG_TUNING"]   && counts["DIGITAL_TUNING"];
-    bool enc_mismatch  = counts["ENCODER"]         && counts["NOT_ENCODER"];
-    bool scan_mismatch = counts["SCAN"]            && counts["NO_SCAN"];
-    bool fw_mismatch   = (counts["FIREWIRE"] &&
-                          ((int)counts["FIREWIRE"] < types.size()));
+    bool tune_mismatch =
+        (counts["ANALOG_TUNING"]  && counts["DIGITAL_TUNING"]) ||
+        (counts["VIRTUAL_TUNING"] && counts["DIGITAL_TUNING"]);
+    bool enc_mismatch  = counts["ENCODER"] && counts["NOT_ENCODER"];
+    bool scan_mismatch = counts["SCAN"]    && counts["NO_SCAN"];
 
     if (tune_mismatch)
     {
         uint a = counts["ANALOG_TUNERS"];
         uint d = counts["DIGITAL_TUNERS"];
+        uint v = counts["VIRTUAL_TUNERS"];
         VERBOSE(VB_GENERAL, QString("SourceUtil::IsProperlyConnected(): ") +
-                QString("Source ID %1 ").arg(sourceid) +
-                QString("appears to be connected\n\t\t\tto %1 analog tuner%2,")
-                .arg(a).arg((1 == a) ? "":"s") +
-                QString("and %1 digital tuner%2.\n\t\t\t")
-                .arg(d).arg((1 == d) ? "":"s") +
-                QString("Can't mix analog and digital tuning information."));
+                QString("Connected to %1 analog, %2 digital and %3 virtual "
+                        "tuners\n\t\t\t").arg(a).arg(d).arg(v) +
+                QString("Can not mix digital with other tuning information."));
     }
 
     if (enc_mismatch)
@@ -271,19 +269,10 @@ bool SourceUtil::IsProperlyConnected(uint sourceid, bool strict)
                 QString("This may be a problem."));
     }
 
-    if (fw_mismatch)
-    {
-        VERBOSE(VB_GENERAL, QString("SourceUtil::IsProperlyConnected(): ") +
-                QString(
-                    "Source ID %1 appears to be connected\n\t\t\t"
-                    "to both firewire and non-firewire inputs. "
-                    "This is probably a bad idea.").arg(sourceid));
-    }
-
     if (!strict)
         return !tune_mismatch;
 
-    return !tune_mismatch && !enc_mismatch && !scan_mismatch && !fw_mismatch;
+    return !tune_mismatch && !enc_mismatch && !scan_mismatch;
 }
 
 bool SourceUtil::IsEncoder(uint sourceid, bool strict)

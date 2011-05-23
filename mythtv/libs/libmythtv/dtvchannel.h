@@ -19,12 +19,12 @@ using namespace std;
 #include <QString>
 
 // MythTV headers
-#include "channelbase.h"
 #include "dtvconfparserhelpers.h" // for DTVTunerType
+#include "channelbase.h"
+#include "channelutil.h" // for pid_cache_t
 
-typedef pair<uint,uint> pid_cache_item_t;
-typedef vector<pid_cache_item_t> pid_cache_t;
-
+class ProgramAssociationTable;
+class ProgramMapTable;
 class TVRec;
 
 /** \class DTVChannel
@@ -37,13 +37,39 @@ class DTVChannel : public ChannelBase
     virtual ~DTVChannel();
 
     // Commands
+    virtual bool SetChannelByString(const QString &chan);
 
     /// \brief To be used by the channel scanner and possibly the EIT scanner.
-    virtual bool TuneMultiplex(uint mplexid, QString inputname) = 0;
-    /// \brief To be used by the channel scanner and possibly the EIT scanner.
+    virtual bool TuneMultiplex(uint mplexid, QString inputname);
+    /// \brief This performs the actual frequency tuning and in some cases
+    ///        input switching.
+    ///
+    /// In rare cases such as ASI this does nothing since all the channels
+    /// are in the same MPTS stream on the same input. But generally you
+    /// will need to implement this when adding support for new hardware.
     virtual bool Tune(const DTVMultiplex &tuning, QString inputname) = 0;
     /// \brief Enters power saving mode if the card supports it
-    virtual bool EnterPowerSavingMode(void) { return true; }
+    virtual bool EnterPowerSavingMode(void)
+    {
+        return true;
+    }
+    /// \brief This tunes on the frequency Identification parameter for
+    ///        hardware that supports it.
+    ///
+    /// This is only called when there is no frequency set. This is used
+    /// to implement "Channel Numbers" in analog tuning scenarios and to
+    /// implement "Virtual Channels" in the OCUR and Firewire tuners.
+    virtual bool Tune(const QString &freqid, int finetune)
+    {
+        (void) freqid; (void) finetune;
+        return false;
+    }
+
+    virtual bool Tune(uint64_t frequency, QString inputname)
+    {
+        (void) frequency; (void) inputname;
+        return false;
+    }
 
     // Gets
 
@@ -79,26 +105,27 @@ class DTVChannel : public ChannelBase
     /// \brief Returns a vector of supported tuning types.
     virtual vector<DTVTunerType> GetTunerTypes(void) const;
 
-    /** \brief Returns cached MPEG PIDs for last tuned channel.
-     *  \param pid_cache List of PIDs with their TableID
-     *                   types is returned in pid_cache.
-     */
-    virtual void GetCachedPids(pid_cache_t &pid_cache) const
-        { (void) pid_cache; }
+    void GetCachedPids(pid_cache_t &pid_cache) const;
 
     DTVChannel *GetMaster(const QString &videodevice);
     const DTVChannel *GetMaster(const QString &videodevice) const;
+
+    /// \brief Returns true if this is the first of a number of multi-rec devs
+    virtual bool IsMaster(void) const { return false; }
+
+    virtual bool IsPIDTuningSupported(void) const { return false; }
+
+    bool HasGeneratedPAT(void) const { return genPAT != NULL; }
+    bool HasGeneratedPMT(void) const { return genPMT != NULL; }
+    const ProgramAssociationTable *GetGeneratedPAT(void) const {return genPAT;}
+    const ProgramMapTable         *GetGeneratedPMT(void) const {return genPMT;}
 
     // Sets
 
     /// \brief Sets tuning mode: "mpeg", "dvb", "atsc", etc.
     void SetTuningMode(const QString &tuningmode);
 
-    /** \brief Saves MPEG PIDs to cache to database
-     * \param pid_cache List of PIDs with their TableID types to be saved.
-     */
-    virtual void SaveCachedPids(const pid_cache_t &pid_cache) const
-        { (void) pid_cache; }
+    void SaveCachedPids(const pid_cache_t &pid_cache) const;
 
   protected:
     /// \brief Sets PSIP table standard: MPEG, DVB, ATSC, or OpenCable
@@ -107,9 +134,9 @@ class DTVChannel : public ChannelBase
                     uint dvb_orig_netid,
                     uint mpeg_tsid, int mpeg_pnum);
     void ClearDTVInfo(void) { SetDTVInfo(0, 0, 0, 0, -1); }
-
-    static void GetCachedPids(int chanid, pid_cache_t&);
-    static void SaveCachedPids(int chanid, const pid_cache_t&);
+    /// \brief Checks tuning for problems, and tries to fix them.
+    virtual void CheckOptions(DTVMultiplex &tuning) const {}
+    virtual void HandleScriptEnd(bool ok);
 
   protected:
     mutable QMutex dtvinfo_lock;
@@ -122,6 +149,11 @@ class DTVChannel : public ChannelBase
     uint    currentATSCMinorChannel;
     uint    currentTransportID;
     uint    currentOriginalNetworkID;
+
+    /// This is a generated PAT for RAW pid tuning
+    ProgramAssociationTable *genPAT;
+    /// This is a generated PMT for RAW pid tuning
+    ProgramMapTable         *genPMT;
 
     static QMutex                    master_map_lock;
     static QMap<QString,DTVChannel*> master_map;

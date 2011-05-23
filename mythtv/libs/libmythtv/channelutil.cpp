@@ -843,6 +843,129 @@ int ChannelUtil::GetInputID(int source_id, int card_id)
     return input_id;
 }
 
+QStringList ChannelUtil::GetCardTypes(uint chanid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT cardtype "
+                  "FROM capturecard, cardinput, channel "
+                  "WHERE channel.chanid   = :CHANID            AND "
+                  "      channel.sourceid = cardinput.sourceid AND "
+                  "      cardinput.cardid = capturecard.cardid "
+                  "GROUP BY cardtype");
+    query.bindValue(":CHANID", chanid);
+
+    QStringList list;
+    if (!query.exec())
+    {
+        MythDB::DBError("ChannelUtil::GetCardTypes", query);
+        return list;
+    }
+    while (query.next())
+        list.push_back(query.value(0).toString());
+    return list;
+}
+
+static bool lt_pidcache(
+    const pid_cache_item_t &a, const pid_cache_item_t &b)
+{
+    return a.GetPID() < b.GetPID();
+}
+
+/** \brief Returns cached MPEG PIDs when given a Channel ID.
+ *
+ *  \param chanid   Channel ID to fetch cached pids for.
+ *  \param pid_cache List of PIDs with their TableID
+ *                   types is returned in pid_cache.
+ */
+bool ChannelUtil::GetCachedPids(uint chanid,
+                                pid_cache_t &pid_cache)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString thequery = QString("SELECT pid, tableid FROM pidcache "
+                               "WHERE chanid='%1'").arg(chanid);
+    query.prepare(thequery);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("GetCachedPids: fetching pids", query);
+        return false;
+    }
+
+    while (query.next())
+    {
+        int pid = query.value(0).toInt(), tid = query.value(1).toInt();
+        if ((pid >= 0) && (tid >= 0))
+            pid_cache.push_back(pid_cache_item_t(pid, tid));
+    }
+    stable_sort(pid_cache.begin(), pid_cache.end(), lt_pidcache);
+
+    return true;
+}
+
+/** \brief Saves PIDs for PSIP tables to database.
+ *
+ *  \param chanid     Channel ID to fetch cached pids for.
+ *  \param pid_cache  List of PIDs with their TableID types to be saved.
+ *  \param delete_all If true delete both permanent and transient pids first.
+ */
+bool ChannelUtil::SaveCachedPids(uint chanid,
+                                 const pid_cache_t &_pid_cache,
+                                 bool delete_all)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    /// delete
+    if (delete_all)
+        query.prepare("DELETE FROM pidcache WHERE chanid = :CHANID");
+    else
+        query.prepare(
+            "DELETE FROM pidcache "
+            "WHERE chanid = :CHANID AND tableid < 65536");
+
+    query.bindValue(":CHANID", chanid);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("GetCachedPids -- delete", query);
+        return false;
+    }
+
+    pid_cache_t old_cache;
+    GetCachedPids(chanid, old_cache);
+    pid_cache_t pid_cache = _pid_cache;
+    stable_sort(pid_cache.begin(), pid_cache.end(), lt_pidcache);
+
+    /// insert
+    query.prepare(
+        "INSERT INTO pidcache "
+        "SET chanid = :CHANID, pid = :PID, tableid = :TABLEID");
+    query.bindValue(":CHANID", chanid);
+
+    bool ok = true;
+    pid_cache_t::const_iterator ito = old_cache.begin();
+    pid_cache_t::const_iterator itn = pid_cache.begin();
+    for (; itn != pid_cache.end(); ++itn)
+    {
+        // if old pid smaller than current new pid, skip this old pid
+        for (; ito != old_cache.end() && ito->GetPID() < itn->GetPID(); ito++);
+
+        // if already in DB, skip DB insert
+        if (ito != old_cache.end() && ito->GetPID() == itn->GetPID())
+            continue;
+
+        query.bindValue(":PID",     itn->GetPID());
+        query.bindValue(":TABLEID", itn->GetComposite());
+
+        if (!query.exec())
+        {
+            MythDB::DBError("GetCachedPids -- insert", query);
+            ok = false;
+        }
+    }
+
+    return ok;
+}
+
 QString ChannelUtil::GetChannelValueStr(const QString &channel_field,
                                         uint           cardid,
                                         const QString &input,
@@ -1759,7 +1882,7 @@ bool ChannelUtil::GetChannelData(
     mplexid       = query.value(5).toUInt();
     atsc_major    = query.value(6).toUInt();
     atsc_minor    = query.value(7).toUInt();
-    mpeg_prog_num = query.value(8).toUInt();
+    mpeg_prog_num = (query.value(8).isNull()) ? -1 : query.value(8).toInt();
 
     if (!mplexid || (mplexid == 32767)) /* 32767 deals with old lineups */
         return true;
@@ -1842,7 +1965,8 @@ bool ChannelUtil::GetExtendedChannelData(
                            dvb_transportid, dvb_networkid, dtv_si_std);
 }
 
-DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp, int changrpid)
+DBChanList ChannelUtil::GetChannels(
+    uint sourceid, bool vis_only, QString grp, uint changrpid)
 {
     DBChanList list;
 
@@ -1851,36 +1975,42 @@ DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp, i
     QString qstr =
         "SELECT channum, callsign, channel.chanid, "
         "       atsc_major_chan, atsc_minor_chan, "
-        "       name, icon, mplexid, visible "
-        "FROM channel ";
+        "       name, icon, mplexid, visible, "
+        "       channel.sourceid, cardinput.cardid, channelgroup.grpid "
+        "FROM channel "
+        "LEFT JOIN channelgroup ON channel.chanid     = channelgroup.chanid "
+        "JOIN cardinput         ON cardinput.sourceid = channel.sourceid "
+        "JOIN capturecard       ON cardinput.cardid   = capturecard.cardid ";
 
-    // Select only channels from the specified channel group
-    if (changrpid > -1)
-        qstr += QString(",channelgroup ");
+    QString cond = " WHERE ";
 
     if (sourceid)
-        qstr += QString("WHERE sourceid='%1' ").arg(sourceid);
-    else
-        qstr += ",cardinput,capturecard "
-            "WHERE cardinput.sourceid = channel.sourceid   AND "
-            "      cardinput.cardid   = capturecard.cardid     ";
-
-    if (changrpid > -1)
     {
-        qstr += QString("AND channel.chanid = channelgroup.chanid "
-                        "AND channelgroup.grpid ='%1' ").arg(changrpid);
+        qstr += QString("WHERE channel.sourceid='%1' ").arg(sourceid);
+        cond = " AND ";
+    }
+
+    // Select only channels from the specified channel group
+    if (changrpid > 0)
+    {
+        qstr += QString("%1 channelgroup.grpid = '%2' ")
+            .arg(cond).arg(changrpid);
+        cond = " AND ";
     }
 
     if (vis_only)
-        qstr += "AND visible=1 ";
+    {
+        qstr += QString("%1 visible=1 ").arg(cond);
+        cond = " AND ";
+    }
 
     if (!grp.isEmpty())
-        qstr += QString("GROUP BY %1 ").arg(grp);
+        qstr += QString(" GROUP BY %1 ").arg(grp);
 
     query.prepare(qstr);
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
     {
-        MythDB::DBError("get channels -- sourceid", query);
+        MythDB::DBError("ChannelUtil::GetChannels()", query);
         return list;
     }
 
@@ -1898,7 +2028,10 @@ DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp, i
             query.value(7).toUInt(),                      /* mplexid    */
             query.value(8).toBool(),                      /* visible    */
             query.value(5).toString(),                    /* name       */
-            query.value(6).toString());                   /* icon       */
+            query.value(6).toString(),                    /* icon       */
+            query.value(9).toUInt(),                      /* sourceid   */
+            query.value(11).toUInt(),                     /* cardid     */
+            query.value(10).toUInt());                    /* grpid      */
 
         list.push_back(chan);
     }
@@ -2066,29 +2199,13 @@ void ChannelUtil::SortChannels(DBChanList &list, const QString &order,
     }
 }
 
-void ChannelUtil::EliminateDuplicateChanNum(DBChanList &list)
-{
-    typedef std::set<QString> seen_set;
-    seen_set seen;
-
-    DBChanList::iterator it = list.begin();
-
-    while (it != list.end())
-    {
-        QString tmp = it->channum; tmp.detach();
-        std::pair<seen_set::iterator, bool> insret = seen.insert(tmp);
-        if (insret.second)
-            ++it;
-        else
-            it = list.erase(it);
-    }
-}
-
 uint ChannelUtil::GetNextChannel(
     const DBChanList &sorted,
     uint              old_chanid,
     uint              mplexid_restriction,
-    int               direction)
+    int               direction,
+    bool              skip_non_visible,
+    bool              skip_same_channum_and_callsign)
 {
     DBChanList::const_iterator it =
         find(sorted.begin(), sorted.end(), old_chanid);
@@ -2100,7 +2217,6 @@ uint ChannelUtil::GetNextChannel(
         return 0; // no channels..
 
     DBChanList::const_iterator start = it;
-    bool skip_non_visible = true; // TODO make DB selectable
 
     if (CHANNEL_DIRECTION_DOWN == direction)
     {
@@ -2114,10 +2230,14 @@ uint ChannelUtil::GetNextChannel(
         }
         while ((it != start) &&
                ((skip_non_visible && !it->visible) ||
+                (skip_same_channum_and_callsign &&
+                 it->channum  == start->channum &&
+                 it->callsign == start->callsign) ||
                 (mplexid_restriction &&
                  (mplexid_restriction != it->mplexid))));
     }
-    else if ((CHANNEL_DIRECTION_UP == direction) || (CHANNEL_DIRECTION_FAVORITE == direction))
+    else if ((CHANNEL_DIRECTION_UP == direction) ||
+             (CHANNEL_DIRECTION_FAVORITE == direction))
     {
         do
         {
@@ -2127,6 +2247,9 @@ uint ChannelUtil::GetNextChannel(
         }
         while ((it != start) &&
                ((skip_non_visible && !it->visible) ||
+                (skip_same_channum_and_callsign &&
+                 it->channum  == start->channum &&
+                 it->callsign == start->callsign) ||
                 (mplexid_restriction &&
                  (mplexid_restriction != it->mplexid))));
     }

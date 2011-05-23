@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 char * str_printf(const char *fmt, ...)
 {
@@ -77,4 +78,12 @@ uint32_t str_to_uint32(const char *s, int n)
     }
 
     return val;
+}
+
+void str_tolower(char *s)
+{
+    while (*s) {
+        *s = tolower(*s);
+        s++;
+    }
 }

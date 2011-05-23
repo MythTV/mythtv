@@ -1,6 +1,10 @@
 #ifndef DLLIST_H
 #define DLLIST_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct dl_node
 {
     struct dl_node *next;
@@ -49,6 +53,10 @@ dl_insert_after(struct dl_node *p, struct dl_node *n)
                                        dl_insert_after((h)->last, _n); })
 #define dl_remove_first(h)      dl_remove((h)->first) // mustn't be empty!
 #define dl_remove_last(h)       dl_remove((h)->last) // mustn't be empty!
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* DLLIST_H */
 

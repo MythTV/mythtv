@@ -66,9 +66,6 @@ class ChannelWizard : public QObject, public ConfigurationWizard
     Q_OBJECT
   public:
     ChannelWizard(int id, int default_sourceid);
-    QString getCardtype();
-    bool cardTypesInclude(const QString& cardtype);
-    int countCardtypes();
 
   private:
     ChannelID *cid;

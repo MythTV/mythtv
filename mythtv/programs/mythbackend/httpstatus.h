@@ -63,6 +63,8 @@ class HttpStatus : public HttpServerExtension
         void    PrintStatus       ( QTextStream &os, QDomDocument *pDoc );
         int     PrintEncoderStatus( QTextStream &os, QDomElement encoders );
         int     PrintScheduled    ( QTextStream &os, QDomElement scheduled );
+        int     PrintFrontends    ( QTextStream &os, QDomElement frontends );
+        int     PrintBackends     ( QTextStream &os, QDomElement backends );
         int     PrintJobQueue     ( QTextStream &os, QDomElement jobs );
         int     PrintMachineInfo  ( QTextStream &os, QDomElement info );
         int     PrintMiscellaneousInfo ( QTextStream &os, QDomElement info );

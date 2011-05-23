@@ -2,23 +2,39 @@
  *  DTVRecorder -- base class for Digital Televison recorders
  *  Copyright 2003-2004 by Brandon Beattie, Doug Larrick,
  *    Jason Hoos, and Daniel Thor Kristjansson
- *  Distributed as part of MythTV under GPL v2 and later.
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 2 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "ringbuffer.h"
-#include "programinfo.h"
-#include "mpegtables.h"
+#include "atscstreamdata.h"
 #include "mpegstreamdata.h"
+#include "dvbstreamdata.h"
 #include "dtvrecorder.h"
-#include "tv_rec.h"
+#include "programinfo.h"
 #include "mythverbose.h"
+#include "mpegtables.h"
+#include "ringbuffer.h"
+#include "tv_rec.h"
 
 extern "C" {
 extern const uint8_t *ff_find_start_code(const uint8_t *p, const uint8_t *end, uint32_t *state);
 }
 
-#define LOC QString("DTVRec(%1): ").arg(tvrec->GetCaptureCardNum())
-#define LOC_ERR QString("DTVRec(%1) Error: ").arg(tvrec->GetCaptureCardNum())
+#define LOC      QString("DTVRec(%1): ").arg(tvrec->GetCaptureCardNum())
+#define LOC_WARN QString("DTVRec(%1) Warning: ").arg(tvrec->GetCaptureCardNum())
+#define LOC_ERR  QString("DTVRec(%1) Error: ").arg(tvrec->GetCaptureCardNum())
 
 const uint DTVRecorder::kMaxKeyFrameDistance = 80;
 
@@ -45,27 +61,48 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
     _pes_synced(false),
     _seen_sps(false),
     // settings
-    _request_recording(false),
     _wait_for_keyframe_option(true),
     _has_written_other_keyframe(false),
     // state
-    _recording(false),
-    _error(false),
+    _error(),
     _stream_data(NULL),
     // TS packet buffer
-    _buffer(0),                     _buffer_size(0),
     // keyframe TS buffer
     _buffer_packets(false),
+    // general recorder stuff
+    _pid_lock(QMutex::Recursive),
+    _input_pat(NULL),
+    _input_pmt(NULL),
+    _has_no_av(false),
     // statistics
+    _packet_count(0),
+    _continuity_error_count(0),
     _frames_seen_count(0),          _frames_written_count(0)
 {
     SetPositionMapType(MARK_GOP_BYFRAME);
     _payload_buffer.reserve(TSPacket::kSize * (50 + 1));
+    memset(_stream_id, 0, sizeof(_stream_id));
+    memset(_pid_status, 0, sizeof(_pid_status));
+    memset(_continuity_counter, 0, sizeof(_continuity_counter));
 }
 
 DTVRecorder::~DTVRecorder()
 {
+    StopRecording();
+
     SetStreamData(NULL);
+
+    if (_input_pat)
+    {
+        delete _input_pat;
+        _input_pat = NULL;
+    }
+
+    if (_input_pmt)
+    {
+        delete _input_pmt;
+        _input_pmt = NULL;
+    }
 }
 
 void DTVRecorder::SetOption(const QString &name, const QString &value)
@@ -80,33 +117,23 @@ void DTVRecorder::SetOption(const QString &name, const QString &value)
 }
 
 /** \fn DTVRecorder::SetOption(const QString&,int)
- *  \brief handles the "wait_for_seqstart" and "pkt_buf_size" options.
+ *  \brief handles the "wait_for_seqstart" option.
  */
 void DTVRecorder::SetOption(const QString &name, int value)
 {
     if (name == "wait_for_seqstart")
         _wait_for_keyframe_option = (value == 1);
-    else if (name == "pkt_buf_size")
-    {
-        if (_request_recording)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Attempt made to resize packet buffer while recording.");
-            return;
-        }
-        int newsize = max(value - (value % TSPacket::kSize),
-                          TSPacket::kSize*50);
-        unsigned char* newbuf = new unsigned char[newsize];
-        if (newbuf) {
-            memcpy(newbuf, _buffer, min(_buffer_size, newsize));
-            memset(newbuf+_buffer_size, 0xFF, max(newsize-_buffer_size, 0));
-            _buffer = newbuf;
-            _buffer_size = newsize;
-        }
-        else
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Could not allocate new packet buffer.");
-    }
+    else
+        RecorderBase::SetOption(name, value);
+}
+
+void DTVRecorder::SetOptionsFromProfile(RecordingProfile *profile,
+                                        const QString &videodev,
+                                        const QString&, const QString&)
+{
+    SetOption("videodevice", videodev);
+    DTVRecorder::SetOption("tvformat", gCoreContext->GetSetting("TVFormat"));
+    SetStrOption(profile, "recordingtype");
 }
 
 /** \fn DTVRecorder::FinishRecording(void)
@@ -142,8 +169,16 @@ void DTVRecorder::ResetForNewFile(void)
     VERBOSE(VB_RECORD, LOC + "ResetForNewFile(void)");
     QMutexLocker locker(&positionMapLock);
 
+    // _first_keyframe, _seen_psp and m_h264_parser should
+    // not be reset here. This will only be called just as
+    // we're seeing the first packet of a new keyframe for
+    // writing to the new file and anything that makes the
+    // recorder think we're waiting on another keyframe will
+    // send significant amounts of good data to /dev/null.
+    // -- Daniel Kristjansson 2011-02-26
+
     _start_code                 = 0xffffffff;
-    _first_keyframe             =-1;
+    //_first_keyframe
     _has_written_other_keyframe = false;
     _last_keyframe_seen         = 0;
     _last_gop_seen              = 0;
@@ -152,14 +187,18 @@ void DTVRecorder::ResetForNewFile(void)
     _video_bytes_remaining      = 0;
     _other_bytes_remaining      = 0;
     //_recording
-    _error                      = false;
-    //_buffer
-    //_buffer_size
+    _error                      = QString();
+
+    memset(_stream_id,  0, sizeof(_stream_id));
+    memset(_pid_status, 0, sizeof(_pid_status));
+    memset(_continuity_counter, 0xff, sizeof(_continuity_counter));
+
+    _packet_count               = 0;
+    _continuity_error_count     = 0;
     _frames_seen_count          = 0;
     _frames_written_count       = 0;
     _pes_synced                 = false;
-    _seen_sps                   = false;
-    m_h264_parser.Reset();
+    //_seen_sps
     positionMap.clear();
     positionMapDelta.clear();
     _payload_buffer.clear();
@@ -191,6 +230,23 @@ void DTVRecorder::SetStreamData(MPEGStreamData *data)
         SetStreamData();
 }
 
+void DTVRecorder::SetStreamData(void)
+{
+    _stream_data->AddMPEGSPListener(this);
+    _stream_data->AddMPEGListener(this);
+
+    DVBStreamData *dvb = dynamic_cast<DVBStreamData*>(_stream_data);
+    if (dvb)
+        dvb->AddDVBMainListener(this);
+
+    ATSCStreamData *atsc = dynamic_cast<ATSCStreamData*>(_stream_data);
+
+    if (atsc && atsc->DesiredMinorChannel())
+        atsc->SetDesiredChannel(atsc->DesiredMajorChannel(),
+                                atsc->DesiredMinorChannel());
+    else if (_stream_data->DesiredProgram() >= 0)
+        _stream_data->SetDesiredProgram(_stream_data->DesiredProgram());
+}
 
 void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
 {
@@ -853,6 +909,223 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
 #if 0
 VERBOSE(VB_GENERAL, QString("idx: %1, rem: %2").arg(idx).arg(rem) );
 #endif
+}
+
+void DTVRecorder::HandlePAT(const ProgramAssociationTable *_pat)
+{
+    if (!_pat)
+    {
+        VERBOSE(VB_RECORD, LOC + "SetPAT(NULL)");
+        return;
+    }
+
+    QMutexLocker change_lock(&_pid_lock);
+
+    int progNum = _stream_data->DesiredProgram();
+    uint pmtpid = _pat->FindPID(progNum);
+
+    if (!pmtpid)
+    {
+        VERBOSE(VB_RECORD, LOC + "SetPAT(): "
+                "Ignoring PAT not containing our desired program...");
+        return;
+    }
+
+    VERBOSE(VB_RECORD, LOC + QString("SetPAT(%1 on 0x%2)")
+            .arg(progNum).arg(pmtpid,0,16));
+
+    ProgramAssociationTable *oldpat = _input_pat;
+    _input_pat = new ProgramAssociationTable(*_pat);
+    delete oldpat;
+
+    // Listen for the other PMTs for faster channel switching
+    for (uint i = 0; _input_pat && (i < _input_pat->ProgramCount()); i++)
+    {
+        uint pmt_pid = _input_pat->ProgramPID(i);
+        if (!_stream_data->IsListeningPID(pmt_pid))
+            _stream_data->AddListeningPID(pmt_pid, kPIDPriorityLow);
+    }
+}
+
+void DTVRecorder::HandlePMT(uint progNum, const ProgramMapTable *_pmt)
+{
+    QMutexLocker change_lock(&_pid_lock);
+
+    if ((int)progNum == _stream_data->DesiredProgram())
+    {
+        VERBOSE(VB_RECORD, LOC + "SetPMT("<<progNum<<")");
+        ProgramMapTable *oldpmt = _input_pmt;
+        _input_pmt = new ProgramMapTable(*_pmt);
+
+        QString sistandard = GetSIStandard();
+
+        bool has_no_av = true;
+        for (uint i = 0; i < _input_pmt->StreamCount() && has_no_av; i++)
+        {
+            has_no_av &= !_input_pmt->IsVideo(i, sistandard);
+            has_no_av &= !_input_pmt->IsAudio(i, sistandard);
+        }
+        _has_no_av = has_no_av;
+
+        SetCAMPMT(_input_pmt);
+        delete oldpmt;
+    }
+}
+
+void DTVRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
+{
+    if (!pat)
+    {
+        VERBOSE(VB_RECORD, LOC + "HandleSingleProgramPAT(NULL)");
+        return;
+    }
+
+    if (!ringBuffer)
+        return;
+
+    uint next_cc = (pat->tsheader()->ContinuityCounter()+1)&0xf;
+    pat->tsheader()->SetContinuityCounter(next_cc);
+    pat->GetAsTSPackets(_scratch, next_cc);
+
+    for (uint i = 0; i < _scratch.size(); i++)
+        DTVRecorder::BufferedWrite(_scratch[i]);
+}
+
+void DTVRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
+{
+    if (!pmt)
+    {
+        VERBOSE(VB_RECORD, LOC + "HandleSingleProgramPMT(NULL)");
+        return;
+    }
+
+    // collect stream types for H.264 (MPEG-4 AVC) keyframe detection
+    for (uint i = 0; i < pmt->StreamCount(); i++)
+        _stream_id[pmt->StreamPID(i)] = pmt->StreamType(i);
+
+    if (!ringBuffer)
+        return;
+
+    uint next_cc = (pmt->tsheader()->ContinuityCounter()+1)&0xf;
+    pmt->tsheader()->SetContinuityCounter(next_cc);
+    pmt->GetAsTSPackets(_scratch, next_cc);
+
+    for (uint i = 0; i < _scratch.size(); i++)
+        DTVRecorder::BufferedWrite(_scratch[i]);
+}
+
+bool DTVRecorder::ProcessTSPacket(const TSPacket &tspacket)
+{
+    const uint pid = tspacket.PID();
+
+    if (pid != 0x1fff)
+        _packet_count++;
+
+    // Check continuity counter
+    uint old_cnt = _continuity_counter[pid];
+    if ((pid != 0x1fff) && !CheckCC(pid, tspacket.ContinuityCounter()))
+    {
+        _continuity_error_count++;
+        double erate = _continuity_error_count * 100.0 / _packet_count;
+        VERBOSE(VB_RECORD, LOC_WARN +
+                QString("PID 0x%1 discontinuity detected ((%2+1)%16!=%3) %4\%")
+                .arg(pid,0,16).arg(old_cnt,2)
+                .arg(tspacket.ContinuityCounter(),2)
+                .arg(erate));
+    }
+
+    // Only create fake keyframe[s] if there are no audio/video streams
+    if (_input_pmt && _has_no_av)
+    {
+        _buffer_packets = !FindOtherKeyframes(&tspacket);
+    }
+    else
+    {
+        // There are audio/video streams. Only write the packet
+        // if audio/video key-frames have been found
+        if (_wait_for_keyframe_option && _first_keyframe < 0)
+            return true;
+
+        _buffer_packets = true;
+    }
+
+    BufferedWrite(tspacket);
+
+    return true;
+}
+
+bool DTVRecorder::ProcessVideoTSPacket(const TSPacket &tspacket)
+{
+    if (!ringBuffer)
+        return true;
+
+    uint streamType = _stream_id[tspacket.PID()];
+
+    // Check for keyframes and count frames
+    if (streamType == StreamID::H264Video)
+    {
+        _buffer_packets = !FindH264Keyframes(&tspacket);
+        if (_wait_for_keyframe_option && !_seen_sps)
+            return true;
+    }
+    else
+    {
+        _buffer_packets = !FindMPEG2Keyframes(&tspacket);
+    }
+
+    return ProcessAVTSPacket(tspacket);
+}
+
+bool DTVRecorder::ProcessAudioTSPacket(const TSPacket &tspacket)
+{
+    if (!ringBuffer)
+        return true;
+
+    _buffer_packets = !FindAudioKeyframes(&tspacket);
+    return ProcessAVTSPacket(tspacket);
+}
+
+/// Common code for processing either audio or video packets
+bool DTVRecorder::ProcessAVTSPacket(const TSPacket &tspacket)
+{
+    const uint pid = tspacket.PID();
+
+    if (pid != 0x1fff)
+        _packet_count++;
+
+    // Check continuity counter
+    uint old_cnt = _continuity_counter[pid];
+    if ((pid != 0x1fff) && !CheckCC(pid, tspacket.ContinuityCounter()))
+    {
+        _continuity_error_count++;
+        double erate = _continuity_error_count * 100.0 / _packet_count;
+        VERBOSE(VB_RECORD, LOC_WARN +
+                QString("A/V PID 0x%1 discontinuity detected "
+                        "((%2+1)%16!=%3) %4\%")
+                .arg(pid,0,16).arg(old_cnt).arg(tspacket.ContinuityCounter())
+                .arg(erate,5,'f',2));
+    }
+
+    // Sync recording start to first keyframe
+    if (_wait_for_keyframe_option && _first_keyframe < 0)
+        return true;
+
+    // Sync streams to the first Payload Unit Start Indicator
+    // _after_ first keyframe iff _wait_for_keyframe_option is true
+    if (!(_pid_status[pid] & kPayloadStartSeen) && tspacket.HasPayload())
+    {
+        if (!tspacket.PayloadStart())
+            return true; // not payload start - drop packet
+
+        VERBOSE(VB_RECORD,
+                QString("PID 0x%1 Found Payload Start").arg(pid,0,16));
+
+        _pid_status[pid] |= kPayloadStartSeen;
+    }
+
+    BufferedWrite(tspacket);
+
+    return true;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

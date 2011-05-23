@@ -47,7 +47,7 @@ using namespace std;
 #include "dvbtypes.h"
 #endif
 
-#ifdef USING_V4L
+#ifdef USING_V4L2
 #include <linux/videodev2.h>
 #endif
 
@@ -831,17 +831,19 @@ class VBIDevice : public PathSetting, public CaptureCardDBStorage
         if (!fillSelectionsFromDir(dev, card, driver))
         {
             dev.setPath("/dev");
-            fillSelectionsFromDir(dev, card, driver);
+            if (!fillSelectionsFromDir(dev, card, driver) &&
+                !getValue().isEmpty())
+            {
+                addSelection(getValue(),getValue(),true);
+            }
         }
     }
 
     uint fillSelectionsFromDir(const QDir &dir, const QString &card,
                                const QString &driver)
     {
-        uint cnt = 0;
-
+        QStringList devices;
         QFileInfoList il = dir.entryInfoList();
-
         for( QFileInfoList::iterator it  = il.begin();
                                      it != il.end();
                                    ++it )
@@ -859,14 +861,17 @@ class VBIDevice : public PathSetting, public CaptureCardDBStorage
                 (driver.isEmpty() || (dn == driver)) &&
                 (card.isEmpty()   || (cn == card)))
             {
-                addSelection(device);
-                cnt++;
+                devices.push_back(device);
             }
 
             close(vbifd);
         }
 
-        return cnt;
+        QString sel = getValue();
+        for (uint i = 0; i < (uint) devices.size(); i++)
+            addSelection(devices[i], devices[i], devices[i] == sel);
+
+        return (uint) devices.size();
     }
 };
 
@@ -993,7 +998,7 @@ class DVBCardNum : public ComboBoxSetting, public CaptureCardDBStorage
         ComboBoxSetting(this),
         CaptureCardDBStorage(this, parent, "videodevice")
     {
-        setLabel(QObject::tr("DVB device number"));
+        setLabel(QObject::tr("DVB device"));
         setHelpText(
             QObject::tr("When you change this setting, the text below "
                         "should change to the name and type of your card. "
@@ -1260,6 +1265,8 @@ class FirewireConfigurationGroup : public VerticalConfigurationGroup
         model(new FirewireModel(parent, dev))
     {
         addChild(dev);
+        addChild(new EmptyAudioDevice(parent));
+        addChild(new EmptyVBIDevice(parent));
         addChild(desc);
         addChild(model);
 
@@ -1551,11 +1558,148 @@ class IPTVConfigurationGroup : public VerticalConfigurationGroup
         addChild(new IPTVHost(parent));
         addChild(new ChannelTimeout(parent, 3000, 1750));
         addChild(new SingleCardInput(parent));
+        addChild(new EmptyAudioDevice(parent));
+        addChild(new EmptyVBIDevice(parent));
     };
 
   private:
     CaptureCard &parent;
 };
+
+class ASIDevice : public ComboBoxSetting, public CaptureCardDBStorage
+{
+  public:
+    ASIDevice(const CaptureCard &parent) :
+        ComboBoxSetting(this, true),
+        CaptureCardDBStorage(this, parent, "videodevice")
+    {
+        setLabel(QObject::tr("ASI device"));
+        fillSelections(QString::null);
+    };
+
+    /// \brief Adds all available cards to list
+    /// If current is >= 0 it will be considered available even
+    /// if no device exists for it in /dev/dvb/adapter*
+    void fillSelections(const QString &current)
+    {
+        clearSelections();
+
+        // Get devices from filesystem
+        QStringList sdevs = CardUtil::ProbeVideoDevices("ASI");
+
+        // Add current if needed
+        if (!current.isEmpty() &&
+            (find(sdevs.begin(), sdevs.end(), current) == sdevs.end()))
+        {
+            stable_sort(sdevs.begin(), sdevs.end());
+        }
+
+        // Get devices from DB
+        QStringList db = CardUtil::GetVideoDevices("ASI");
+
+        // Figure out which physical devices are already in use
+        // by another card defined in the DB, and select a device
+        // for new configs (preferring non-conflicing devices).
+        QMap<QString,bool> in_use;
+        QString sel = current;
+        for (uint i = 0; i < (uint)sdevs.size(); i++)
+        {
+            const QString dev = sdevs[i];
+            in_use[sdevs[i]] = find(db.begin(), db.end(), dev) != db.end();
+            if (sel.isEmpty() && !in_use[sdevs[i]])
+                sel = dev;
+        }
+
+        // Unfortunately all devices are conflicted, select first device.
+        if (sel.isEmpty() && sdevs.size())
+            sel = sdevs[0];
+
+        QString usestr = QString(" -- ");
+        usestr += QObject::tr("Warning: already in use");
+
+        // Add the devices to the UI
+        bool found = false;
+        for (uint i = 0; i < (uint)sdevs.size(); i++)
+        {
+            const QString dev = sdevs[i];
+            QString desc = dev + (in_use[sdevs[i]] ? usestr : "");
+            desc = (current == sdevs[i]) ? dev : desc;
+            addSelection(desc, dev, dev == sel);
+            found |= (dev == sel);
+        }
+
+        // If a configured device isn't on the list, add it with warning
+        if (!found && !current.isEmpty())
+        {
+            QString desc = current + " -- " +
+                QObject::tr("Warning: unable to open");
+            addSelection(desc, current, true);
+        }
+    }
+
+    virtual void Load(void)
+    {
+        clearSelections();
+        addSelection(QString::null);
+        CaptureCardDBStorage::Load();
+        fillSelections(getValue());
+    }
+};
+
+ASIConfigurationGroup::ASIConfigurationGroup(CaptureCard& a_parent):
+    VerticalConfigurationGroup(false, true, false, false),
+    parent(a_parent),
+    device(new ASIDevice(parent)),
+    cardinfo(new TransLabelSetting()),
+    input(new TunerCardInput(parent, device->getValue(), "ASI")),
+    instances(new InstanceCount(parent))
+{
+    addChild(device);
+    addChild(new EmptyAudioDevice(parent));
+    addChild(new EmptyVBIDevice(parent));
+    addChild(cardinfo);
+    addChild(input);
+    addChild(instances);
+    input->setVisible(false);
+
+    connect(device, SIGNAL(valueChanged(const QString&)),
+            this,   SLOT(  probeCard(   const QString&)));
+    connect(instances, SIGNAL(valueChanged(int)),
+            &parent,   SLOT(  SetInstanceCount(int)));
+
+    probeCard(device->getValue());
+};
+
+void ASIConfigurationGroup::probeCard(const QString &device)
+{
+#ifdef USING_ASI
+    if (device.isEmpty())
+    {
+        cardinfo->setValue("");
+        return;
+    }
+
+    if (parent.getCardID() && parent.GetRawCardType() != "ASI")
+    {
+        cardinfo->setValue("");
+        return;
+    }
+
+    QString error;
+    int device_num = CardUtil::GetASIDeviceNumber(device, &error);
+    if (device_num < 0)
+    {
+        cardinfo->setValue(tr("Not a valid DVEO ASI card"));
+        VERBOSE(VB_IMPORTANT,
+                "ASIConfigurationGroup::probeCard(), Warning: " + error);
+        return;
+    }
+    cardinfo->setValue(tr("Valid DVEO ASI card"));
+    input->fillSelections(device);
+#else
+    cardinfo->setValue(QString("Not compiled with ASI support"));
+#endif
+}
 
 ImportConfigurationGroup::ImportConfigurationGroup(CaptureCard& a_parent):
     VerticalConfigurationGroup(false, true, false, false),
@@ -1567,6 +1711,9 @@ ImportConfigurationGroup::ImportConfigurationGroup(CaptureCard& a_parent):
                            " Leave empty to use MythEvents to trigger an"
                            " external program to import recording files."));
     addChild(device);
+
+    addChild(new EmptyAudioDevice(parent));
+    addChild(new EmptyVBIDevice(parent));
 
     info->setLabel(tr("File info"));
     addChild(info);
@@ -1654,6 +1801,8 @@ HDHomeRunConfigurationGroup::HDHomeRunConfigurationGroup
         deviceid, desc, cardip, cardtuner, &devicelist);
 
     addChild(deviceidlist);
+    addChild(new EmptyAudioDevice(parent));
+    addChild(new EmptyVBIDevice(parent));
     addChild(deviceid);
     addChild(desc);
     addChild(cardip);
@@ -1815,7 +1964,8 @@ V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& a_parent) :
     cardinfo(new TransLabelSetting()),  vbidev(new VBIDevice(parent)),
     input(new TunerCardInput(parent))
 {
-    VideoDevice *device = new VideoDevice(parent);
+    QString drv = "(?!ivtv|hdpvr|(saa7164(.*)))";
+    VideoDevice *device = new VideoDevice(parent, 0, 15, QString::null, drv);
     HorizontalConfigurationGroup *audgrp =
         new HorizontalConfigurationGroup(false, false, true, true);
 
@@ -1859,15 +2009,20 @@ void V4LConfigurationGroup::probeCard(const QString &device)
 
 MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &a_parent) :
     VerticalConfigurationGroup(false, true, false, false),
-    parent(a_parent), cardinfo(new TransLabelSetting()),
+    parent(a_parent),
+    device(NULL), vbidevice(NULL),
+    cardinfo(new TransLabelSetting()),
     input(new TunerCardInput(parent))
 {
-    VideoDevice *device =
-        new VideoDevice(parent, 0, 15, QString::null, "(ivtv|saa7164)");
+    QString drv = "ivtv|(saa7164(.*))";
+    device    = new VideoDevice(parent, 0, 15, QString::null, drv);
+    vbidevice = new VBIDevice(parent);
+    vbidevice->setVisible(false);
 
     cardinfo->setLabel(tr("Probed info"));
 
     addChild(device);
+    addChild(vbidevice);
     addChild(cardinfo);
     addChild(input);
     addChild(new ChannelTimeout(parent, 12000, 2000));
@@ -1894,6 +2049,8 @@ void MPEGConfigurationGroup::probeCard(const QString &device)
     }
 
     cardinfo->setValue(ci);
+    vbidevice->setVisible(dn!="ivtv");
+    vbidevice->setFilter(cn, dn);
     input->fillSelections(device);
 }
 
@@ -1907,6 +2064,9 @@ DemoConfigurationGroup::DemoConfigurationGroup(CaptureCard &a_parent) :
                            " Must be entered as file:/path/movie.mpg"));
     device->addSelection("file:/");
     addChild(device);
+
+    addChild(new EmptyAudioDevice(parent));
+    addChild(new EmptyVBIDevice(parent));
 
     info->setLabel(tr("File info"));
     addChild(info);
@@ -1963,6 +2123,8 @@ HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent) :
     cardinfo->setLabel(tr("Probed info"));
 
     addChild(device);
+    addChild(new EmptyAudioDevice(parent));
+    addChild(new EmptyVBIDevice(parent));
     addChild(cardinfo);
     addChild(videoinput);
     addChild(audioinput);
@@ -2004,7 +2166,7 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
     setTrigger(cardtype);
     setSaveAll(false);
 
-#ifdef USING_V4L
+#ifdef USING_V4L2
     addTarget("V4L",       new V4LConfigurationGroup(parent));
 # ifdef USING_IVTV
     addTarget("MPEG",      new MPEGConfigurationGroup(parent));
@@ -2012,7 +2174,7 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
 # ifdef USING_HDPVR
     addTarget("HDPVR",     new HDPVRConfigurationGroup(parent));
 # endif // USING_HDPVR
-#endif // USING_V4L
+#endif // USING_V4L2
 
 #ifdef USING_DVB
     addTarget("DVB",       new DVBConfigurationGroup(parent));
@@ -2029,6 +2191,10 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
 #ifdef USING_IPTV
     addTarget("FREEBOX",   new IPTVConfigurationGroup(parent));
 #endif // USING_IPTV
+
+#ifdef USING_ASI
+    addTarget("ASI",       new ASIConfigurationGroup(parent));
+#endif // USING_ASI
 
     // for testing without any actual tuner hardware:
     addTarget("IMPORT",    new ImportConfigurationGroup(parent));
@@ -2193,20 +2359,20 @@ CardType::CardType(const CaptureCard &parent) :
 
 void CardType::fillSelections(SelectSetting* setting)
 {
-#ifdef USING_V4L
+#ifdef USING_V4L2
     setting->addSelection(
         QObject::tr("Analog V4L capture card"), "V4L");
     setting->addSelection(
         QObject::tr("MJPEG capture card (Matrox G200, DC10)"), "MJPEG");
 # ifdef USING_IVTV
     setting->addSelection(
-        QObject::tr("IVTV MPEG-2 encoder card"), "MPEG");
+        QObject::tr("MPEG-2 encoder card"), "MPEG");
 # endif // USING_IVTV
 # ifdef USING_HDPVR
     setting->addSelection(
         QObject::tr("H.264 encoder card (HD-PVR)"), "HDPVR");
 # endif // USING_HDPVR
-#endif // USING_V4L
+#endif // USING_V4L2
 
 #ifdef USING_DVB
     setting->addSelection(
@@ -2218,11 +2384,11 @@ void CardType::fillSelections(SelectSetting* setting)
         QObject::tr("FireWire cable box"), "FIREWIRE");
 #endif // USING_FIREWIRE
 
-#ifdef USING_V4L
+#ifdef USING_V4L2
     setting->addSelection(
         QObject::tr("USB MPEG-4 encoder box (Plextor ConvertX, etc)"),
         "GO7007");
-#endif // USING_V4L
+#endif // USING_V4L2
 
 #ifdef USING_HDHOMERUN
     setting->addSelection(
@@ -2232,6 +2398,10 @@ void CardType::fillSelections(SelectSetting* setting)
 #ifdef USING_IPTV
     setting->addSelection(QObject::tr("Network recorder"), "FREEBOX");
 #endif // USING_IPTV
+
+#ifdef USING_ASI
+    setting->addSelection(QObject::tr("DVEO ASI recorder"), "ASI");
+#endif
 
     setting->addSelection(QObject::tr("Import test recorder"), "IMPORT");
     setting->addSelection(QObject::tr("Demo test recorder"),   "DEMO");
@@ -3497,8 +3667,8 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
     addChild(signal_timeout);
     addChild(channel_timeout);
 
-    addChild(new DVBAudioDevice(parent));
-    addChild(new DVBVbiDevice(parent));
+    addChild(new EmptyAudioDevice(parent));
+    addChild(new EmptyVBIDevice(parent));
 
     TransButtonSetting *buttonRecOpt = new TransButtonSetting();
     buttonRecOpt->setLabel(tr("Recording Options"));

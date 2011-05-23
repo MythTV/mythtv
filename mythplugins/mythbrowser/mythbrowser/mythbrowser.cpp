@@ -77,6 +77,7 @@ bool MythBrowser::Create(void)
     m_browserList.append(page);
     page->getBrowser()->SetZoom(m_zoom);
     page->getBrowser()->SetDefaultSaveDirectory(m_defaultSaveDir);
+    page->getBrowser()->SetDefaultSaveFilename(m_defaultSaveFilename);
 
     page->SetActive(true);
 

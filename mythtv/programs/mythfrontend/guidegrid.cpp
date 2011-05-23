@@ -172,7 +172,8 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
         changrpid = gCoreContext->GetNumSetting("ChannelGroupDefault", -1);
 
     // check there are some channels setup
-    DBChanList channels = ChannelUtil::GetChannels(0, true, "", changrpid);
+    DBChanList channels = ChannelUtil::GetChannels(
+        0, true, "", (changrpid<0) ? 0 : changrpid);
     if (!channels.size())
     {
         QString message;
@@ -832,7 +833,8 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
     m_channelInfoIdx.clear();
     m_currentStartChannel = 0;
 
-    DBChanList channels = ChannelUtil::GetChannels(0, true, "", m_changrpid);
+    DBChanList channels = ChannelUtil::GetChannels(
+        0, true, "", (m_changrpid < 0) ? 0 : m_changrpid);
     ChannelUtil::SortChannels(channels, m_channelOrdering, false);
 
     typedef vector<uint> uint_list_t;

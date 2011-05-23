@@ -111,7 +111,6 @@ class DTVSignalMonitor : public SignalMonitor,
   protected:
     MPEGStreamData    *stream_data;
     vector<uint>       eit_pids;
-    SignalMonitorValue channelTuned;
     SignalMonitorValue seenPAT;
     SignalMonitorValue seenPMT;
     SignalMonitorValue seenMGT;
