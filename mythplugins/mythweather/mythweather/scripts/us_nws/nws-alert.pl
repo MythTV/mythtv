@@ -28,11 +28,11 @@ sub StartDocument {
 
 sub StartTag {
     my ($expat, $name, %atts) = @_;
-    if ($name eq "cap:alert"){
+    if ($name eq "feed"){
         $currAlert = {};
     }
 
-    if ($name eq "cap:info") {
+    if ($name eq "entry") {
         $currInfo = {};
     }
 
@@ -42,22 +42,31 @@ sub StartTag {
 sub EndTag {
     my ($expat, $name, %atts) = @_;
 
-    if ($name eq "cap:alert") {
+    if ($name eq "feed") {
         push @$alerts, $currAlert;
     }
-    if ($name eq "cap:info") {
-        push (@{$currAlert->{'cap:info'}}, $currInfo);
+    if ($name eq "entry") {
+        push (@{$currAlert->{'entry'}}, $currInfo);
     }
 }
 
 sub Text {
     my ($expat, $text) = @_;
 
-    if ($expat->within_element('cap:info')) {
+    if ($expat->within_element('cap:geocode') && $expat->within_element('value')) {
+        if($expat->{Text}) {
+            my %geocodes;
+	    foreach my $geocode ($expat->{Text} =~ m/(\d+)/g) {
+	        $geocodes{int $geocode} = 1;
+            }
+	    $currInfo->{'cap:geocode'} = \%geocodes;
+        }
+
+    } elsif ($expat->within_element('entry')) {
         $currInfo->{$expat->current_element} = $expat->{Text} if ($expat->{Text}
                 =~ /\w+/);
 
-    } elsif ($expat->within_element('cap:alert')) {
+    } elsif ($expat->within_element('feed')) {
         $currAlert->{$expat->current_element} = $expat->{Text} if ($expat->{Text} =~
                 /\w+/);
     }
@@ -70,7 +79,7 @@ sub getWarnings {
     my $state = shift;
     $state =~ tr/[A-Z]/[a-z]/;
     my $parser = new XML::Parser(Style => 'Stream');
-    my $capfile = get "http://www.weather.gov/alerts/$state.cap" or
+    my $capfile = get "http://www.weather.gov/alerts/$state.php?x=0" or
         die "cannot retrieve alert data";
     $parser->parse($capfile);
     return $alerts;
@@ -94,12 +103,12 @@ sub getEffectiveWarnings {
 
     my @dates;
     while ($alert = shift @$alerts) {
-        push @dates, $alert->{'cap:sent'};
-        while ($info = shift @{$alert->{'cap:info'}}) {
+        push @dates, $alert->{'updated'};
+        while ($info = shift @{$alert->{'entry'}}) {
             if ($info->{'cap:effective'} && 
-                Date_Cmp($date, "$info->{'cap:effective'}") >= 0 &&
-                Date_Cmp($date, "$info->{'cap:expires'}") < 0 &&
-                (!$geo || $info->{'cap:geocode'} == $geo)) {
+                Date_Cmp($date, $info->{'cap:effective'}) >= 0 &&
+                Date_Cmp($date, $info->{'cap:expires'}) < 0 &&
+                (!$geo || $info->{'cap:geocode'}{int $geo})) {
                 push @results, $info;
             }
         }
@@ -182,7 +191,7 @@ if (!$state || !$locstr) {
 my ($updatetime, @warnings) = getEffectiveWarnings("now", $state, $loc);
 
 foreach my $warning (@warnings) {
-    my $txt = $warning->{'cap:description'};
+    my $txt = $warning->{'summary'};
     for my $line (split /\n/, $txt) {
         print "alerts::$line\n" if ($line =~ m/\w+/);
     }
