@@ -796,24 +796,6 @@
                help_text="File or directory to use for logging
                           output from the mythfilldatabase program.
                           Leave blank to disable logging." />
-      <setting data_type="select" value="MythFillPeriod"
-               label="mythfilldatabase Run Frequency (Days)"
-               default_data="1"
-               setting_type="global"
-               help_text="The number of days between mythfilldatabase runs.">
-        <option display="1" data="1" />
-        <option display="2" data="2" />
-        <option display="3" data="3" />
-        <option display="4" data="4" />
-        <option display="5" data="5" />
-        <option display="6" data="6" />
-        <option display="7" data="7" />
-        <option display="8" data="8" />
-        <option display="9" data="9" />
-        <option display="10" data="10" />
-        <option display="20" data="20" />
-        <option display="30" data="30" />
-      </setting>
 
       <setting data_type="select" value="MythFillMinHour"
                label="mythfilldatabase Execution Start"
