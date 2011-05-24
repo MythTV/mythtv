@@ -1153,29 +1153,9 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     }
 
     if (GotNextSuggestedTime)
-    {
-        int daysToSuggested =
-            QDateTime::currentDateTime().daysTo(NextSuggestedTime);
-        int desiredPeriod = gCoreContext->GetNumSetting("MythFillPeriod", 1);
-
-
-        if (daysToSuggested > desiredPeriod)
-        {
-            QDateTime newTime =
-                NextSuggestedTime.addDays(desiredPeriod - daysToSuggested);
-            VERBOSE(VB_IMPORTANT, LOC + QString(
-                        "Provider suggested running again at %1, "
-                        "but MythFillPeriod is %2.  Next run time "
-                        "will be adjusted to be %3.")
-                    .arg(NextSuggestedTime.toString(Qt::ISODate))
-                    .arg(desiredPeriod)
-                    .arg(newTime.toString(Qt::ISODate)));
-            NextSuggestedTime = newTime;
-        }
-
-	gCoreContext->SaveSettingOnHost("MythFillSuggestedRunTime",
+        gCoreContext->SaveSettingOnHost("MythFillSuggestedRunTime",
             NextSuggestedTime.toString(Qt::ISODate), NULL);
-    }
+
     return GotNextSuggestedTime;
 }
 

@@ -223,10 +223,15 @@ void CdDecoder::run()
                 {
                     cdbuffer = paranoia_read(paranoia, paranoia_cb);
 
-                    memcpy((char *)(output_buf + output_at), (char *)cdbuffer,
-                           CD_FRAMESIZE_RAW);
+                    if (cdbuffer)
+                    {
+                        memcpy((char *)(output_buf + output_at), (char *)cdbuffer,
+                                CD_FRAMESIZE_RAW);
 
-                    output_at += CD_FRAMESIZE_RAW;
+                        output_at += CD_FRAMESIZE_RAW;
+                    }
+                    else
+                        finish = true;
                 }
                 else
                     finish = TRUE;

@@ -405,7 +405,7 @@ bool MSocketDevice::connect( const QHostAddress &addr, quint16 port )
         }
 
         VERBOSE(VB_SOCKET, "MSocketDevice::connect: attempting to create new socket");
-        setSocket( createNewSocket(), t);
+        MSocketDevice::setSocket( createNewSocket(), t);
     
        // If still not valid, give up.
        if ( !isValid() )

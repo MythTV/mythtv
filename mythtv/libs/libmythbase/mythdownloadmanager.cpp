@@ -204,6 +204,8 @@ void MythDownloadManager::run(void)
                                    gCoreContext->GetHostName());
     m_manager->setCache(m_diskCache);
 
+    // make sure the cookieJar is created in the same thread as the manager
+    m_manager->cookieJar();
 
     QObject::connect(m_manager, SIGNAL(finished(QNetworkReply*)), this,
                        SLOT(downloadFinished(QNetworkReply*)));

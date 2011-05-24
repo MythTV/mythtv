@@ -803,7 +803,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
 
     if (pginfo->IsVideoDVD())
     {
-        DVDInfo *dvd = new DVDInfo(pginfo->GetPathname());
+        DVDInfo *dvd = new DVDInfo(pginfo->GetPlaybackURL());
         if (dvd && dvd->IsValid())
         {
             QString name;

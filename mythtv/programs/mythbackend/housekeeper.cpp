@@ -244,7 +244,7 @@ void HouseKeeper::RunHouseKeeping(void)
                 }
                 else
                 {
-                    period = gCoreContext->GetNumSetting("MythFillPeriod", 1);
+                    period = 1;
                     minhr = gCoreContext->GetNumSetting("MythFillMinHour", -1);
                     if (minhr == -1)
                     {
@@ -789,7 +789,7 @@ void HouseKeeper::UpdateThemeChooserInfoCache(void)
                 "remote themes info package.").arg(url));
         return;
     }
-    
+
     if (!extractZIP(remoteThemesFile, remoteThemesDir))
     {
         VERBOSE(VB_IMPORTANT, QString("HouseKeeper: Error extracting %1"

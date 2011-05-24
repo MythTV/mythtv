@@ -52,6 +52,9 @@ class MBASE_PUBLIC MythDownloadManager : public QThread
     void removeListener(QObject *caller);
     QDateTime GetLastModified(const QString &url);
 
+    QNetworkCookieJar *getCookieJar(void) { return m_manager->cookieJar(); }
+    void setCookieJar(QNetworkCookieJar *cookieJar) { m_manager->setCookieJar(cookieJar); }
+
   private slots:
     // QNetworkAccessManager signals
     void downloadFinished(QNetworkReply* reply);

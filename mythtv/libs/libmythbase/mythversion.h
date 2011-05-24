@@ -5,14 +5,14 @@
 #include "mythbaseexp.h"
 #include "version.h"
 
-#if ( QT_VERSION < 0x040500 )
-#error You need Qt version >= 4.5.0 to compile MythTV.
+#if ( QT_VERSION < 0x040600 )
+#error You need Qt version >= 4.6.0 to compile MythTV.
 #endif
 
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythbase, libmyth, libmythtv, libmythav* and
 /// libmythui class methods used by plug-ins.
-#define MYTH_BINARY_VERSION "0.25.20110502-1"
+#define MYTH_BINARY_VERSION "0.25.20110522-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *

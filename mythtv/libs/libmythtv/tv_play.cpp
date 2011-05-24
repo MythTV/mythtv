@@ -812,7 +812,7 @@ TV::TV(void)
       // Channel Editing
       chanEditMapLock(QMutex::Recursive),
       ddMapSourceId(0), ddMapLoaderRunning(false),
-      ddMapLoader(NULL),
+      ddMapLoader(0),
       // Sleep Timer
       sleep_index(0), sleepTimerId(0), sleepDialogTimerId(0),
       // Idle Timer
@@ -1942,16 +1942,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
              TRANSITION(kState_None, kState_WatchingRecording))
     {
         ctx->LockPlayingInfo(__FILE__, __LINE__);
-        QString playbackURL;
-        if (ctx->playingInfo->IsRecording())
-        {
-            playbackURL = ctx->playingInfo->GetPlaybackURL(true);
-        }
-        else
-        {
-            playbackURL = ctx->playingInfo->GetPathname();
-            playbackURL.detach();
-        }
+        QString playbackURL = ctx->playingInfo->GetPlaybackURL(true);
         ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
         ctx->SetRingBuffer(RingBuffer::Create(playbackURL, false));
