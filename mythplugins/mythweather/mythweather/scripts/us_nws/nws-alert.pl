@@ -77,10 +77,28 @@ sub Text {
 sub getWarnings {
     
     my $state = shift;
+    my $cache_dir = shift;
     $state =~ tr/[A-Z]/[a-z]/;
     my $parser = new XML::Parser(Style => 'Stream');
-    my $capfile = get "http://www.weather.gov/alerts/$state.php?x=0" or
-        die "cannot retrieve alert data";
+    my $capfile = '';
+    my $url = "http://alerts.weather.gov/cap/$state.php?x=0";
+    if($cache_dir && -d $cache_dir)
+    {
+        my $cache_file = "$cache_dir/$state.cap";
+        my $rc = mirror($url, $cache_file);
+        if(is_error($rc)) {
+            die "cannot retrieve alert data";
+        }
+        open(CAP, $cache_file);
+        undef($/);
+        $capfile = <CAP>;
+        close(CAP);
+    }
+    else
+    {
+        $capfile = get $url
+            or die "cannot retrieve alert data";
+    }
     $parser->parse($capfile);
     return $alerts;
 }
@@ -89,17 +107,16 @@ sub getEffectiveWarnings {
     my $date = shift;
     my $state = shift;
     my $geo = shift;
+    my $cache_dir = shift;
     my @results;
     if (!$alerts) {
-        getWarnings($state);
+        getWarnings($state, $cache_dir);
     }
     my $alert;
     my $info;
 
     $date = ParseDate($date);
     my $tz = new Date::Manip::TZ;
-    $date = Date_ConvTZ($date, $tz->curr_zone(), "UTC");
-    $date = UnixDate($date, "%O");
 
     my @dates;
     while ($alert = shift @$alerts) {
@@ -188,7 +205,7 @@ if (!$state || !$locstr) {
     } else { die "cannot find location"; }
 }
 
-my ($updatetime, @warnings) = getEffectiveWarnings("now", $state, $loc);
+my ($updatetime, @warnings) = getEffectiveWarnings("now", $state, $loc, $dir);
 
 foreach my $warning (@warnings) {
     my $txt = $warning->{'summary'};
