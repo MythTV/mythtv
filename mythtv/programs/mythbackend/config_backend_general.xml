@@ -80,8 +80,8 @@
       <setting value="TimeOffset" default_data=""
                setting_type="global" label="Your local time zone (for XMLTV)"
                help_text="Used if the XMLTV data comes from a different
-                          time zone than your own. This adjust the times in
-                          the XMLTV EPG data to compensate. 'Auto' converts
+                          time zone than your own and modifies the date and
+                          time before insertion into the database. 'Auto' converts
                           the XMLTV time to local time using your computer's
                           time zone. 'None' ignores the XMLTV timezone,
                           interpreting times as local."

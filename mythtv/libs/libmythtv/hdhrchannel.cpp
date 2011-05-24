@@ -92,15 +92,75 @@ bool HDHRChannel::IsOpen(void) const
       return _stream_handler;
 }
 
+/// This is used when the tuner type is kTunerTypeOCUR
 bool HDHRChannel::Tune(const QString &freqid, int /*finetune*/)
 {
     return _stream_handler->TuneVChannel(freqid);
 }
 
+static QString format_modulation(const DTVMultiplex &tuning)
+{
+    if (DTVModulation::kModulationQAM256 == tuning.modulation)
+        return "qam256";
+    else if (DTVModulation::kModulationQAM128 == tuning.modulation)
+        return "qam128";
+    else if (DTVModulation::kModulationQAM64 == tuning.modulation)
+        return "qam64";
+    else if (DTVModulation::kModulationQAM16 == tuning.modulation)
+        return "qam16";
+    else if (DTVModulation::kModulationDQPSK == tuning.modulation)
+        return "qpsk";
+    else if (DTVModulation::kModulation8VSB == tuning.modulation)
+        return "8vsb";
+
+    return "auto";
+}
+
+static QString format_dvbt(const DTVMultiplex &tuning, const QString &mod)
+{
+    const QChar b = tuning.bandwidth.toChar();
+
+    if ((QChar('a') == b) || (mod == "auto"))
+        return "auto"; // uses bandwidth from channel map
+    else if (QChar('a') != b)
+        return QString("t%1%2").arg(b).arg(mod);
+
+    return QString("auto%1t").arg(b);
+}
+
+static QString format_dvbc(const DTVMultiplex &tuning, const QString &mod)
+{
+    const QChar b = tuning.bandwidth.toChar();
+
+    if ((QChar('a') == b) || (mod == "auto"))
+        return "auto"; // uses bandwidth from channel map
+    else if ((QChar('a') != b) && (tuning.symbolrate > 0))
+        return QString("a%1%2-%3")
+            .arg(b).arg(mod).arg(tuning.symbolrate/1000);
+
+    return QString("auto%1c").arg(b);
+}
+
+static QString get_tune_spec(
+    const DTVTunerType tunerType, const DTVMultiplex &tuning)
+{
+    const QString mod = format_modulation(tuning);
+
+    if (DTVTunerType::kTunerTypeATSC == tunerType)
+        // old atsc firmware does no recognize "auto"
+        return (mod == "auto") ? "qam" : mod;
+    else if (DTVTunerType::kTunerTypeDVBC == tunerType)
+        return format_dvbc(tuning, mod);
+    else if (DTVTunerType::kTunerTypeDVBT == tunerType)
+        return format_dvbt(tuning, mod);
+
+    return "auto";
+}
+
 bool HDHRChannel::Tune(const DTVMultiplex &tuning, QString /*inputname*/)
 {
-    QString chan = tuning.modulation.toString() + ':' +
-        QString::number(tuning.frequency);
+    QString spec = get_tune_spec(tunerType, tuning);
+    QString chan = QString("%1:%2").arg(spec).arg(tuning.frequency);
 
     VERBOSE(VB_CHANNEL, LOC + "Tuning to " + chan);
 
@@ -111,4 +171,37 @@ bool HDHRChannel::Tune(const DTVMultiplex &tuning, QString /*inputname*/)
     }
 
     return false;
+}
+
+bool HDHRChannel::SetChannelByString(const QString &channum)
+{
+    bool ok = DTVChannel::SetChannelByString(channum);
+
+    // HACK HACK HACK -- BEGIN
+    // if the DTVTunerType were specified in tuning we wouldn't
+    // need to try alternative tuning...
+    if (!ok && DTVTunerType::kTunerTypeDVBT == tunerType)
+    {
+        bool has_dvbc = false, has_dvbt = false;
+        vector<DTVTunerType>::const_iterator it = _tuner_types.begin();
+        for (; it != _tuner_types.end(); ++it)
+        {
+            has_dvbt |= (DTVTunerType::kTunerTypeDVBT == *it);
+            has_dvbc |= (DTVTunerType::kTunerTypeDVBC == *it);
+        }
+
+        if (has_dvbt && has_dvbc)
+        {
+            tunerType = DTVTunerType::kTunerTypeDVBC;
+            ok = DTVChannel::SetChannelByString(channum);
+            if (!ok)
+            {
+                tunerType = DTVTunerType::kTunerTypeDVBT;
+                return false;
+            }
+        }
+    }
+    // HACK HACK HACK -- END
+
+    return ok;
 }

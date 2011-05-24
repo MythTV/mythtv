@@ -265,7 +265,11 @@ bool HDHRStreamHandler::Open(void)
     {
         const char *model = hdhomerun_device_get_model_str(_hdhomerun_device);
         _tuner_types.clear();
-        if (QString(model).toLower().contains("dvb"))
+        if (QString(model).toLower().contains("cablecard"))
+        {
+            _tuner_types.push_back(DTVTunerType::kTunerTypeOCUR);
+        }
+        else if (QString(model).toLower().contains("dvb"))
         {
             _tuner_types.push_back(DTVTunerType::kTunerTypeDVBT);
             _tuner_types.push_back(DTVTunerType::kTunerTypeDVBC);
@@ -389,18 +393,6 @@ QString HDHRStreamHandler::TunerSet(
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Set request failed" + ENO);
 
         return QString::null;
-    }
-
-    // Database modulation strings and HDHR use different syntax.
-    // HACK!! Caller should be doing this. (e.g. auto in HDHRChannel::Tune())
-    //
-    if (error && name == QString("channel") && val.contains("qam_"))
-    {
-        QString newval = val;
-        newval.replace("qam_256", "qam");
-        newval.replace("qam_64", "qam");
-        VERBOSE(VB_CHANNEL, "HDHRSH::TunerSet() Failed. Trying " + newval);
-        return TunerSet(name, newval, report_error_return, print_error);
     }
 
     if (report_error_return && error)
