@@ -1337,8 +1337,11 @@ bool MpegRecorder::StartEncoding(int fd)
     // put a warning in the logs.  This should keep any driver without this
     // support (such as saa7164) recording without affecting those that do
     // use it.
+    if (errno == EINVAL)
+        return true;
+
     VERBOSE(VB_IMPORTANT, LOC_WARN + "StartEncoding failed" + ENO);
-    return (errno == EINVAL);
+    return false;
 }
 
 bool MpegRecorder::StopEncoding(int fd)
@@ -1358,7 +1361,16 @@ bool MpegRecorder::StopEncoding(int fd)
         return true;
     }
 
-    VERBOSE(VB_IMPORTANT, LOC_ERR + "StopEncoding failed" + ENO);
+    // Some drivers do not support this ioctl at all.  It is marked as 
+    // "experimental" in the V4L2 API spec.  If we fail with EINVAL (which
+    // happens if the ioctl isn't supported), treat it as a success, but
+    // put a warning in the logs.  This should keep any driver without this
+    // support (such as saa7164) recording without affecting those that do
+    // use it.
+    if (errno == EINVAL)
+        return true;
+
+    VERBOSE(VB_IMPORTANT, LOC_WARN + "StopEncoding failed" + ENO);
     return false;
 }
 
