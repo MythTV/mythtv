@@ -683,3 +683,11 @@ def CopyData2(dfrom, dto, keys):
     for key,key2 in keys:
         if key in dfrom:
             dto[key2] = dfrom[key]
+
+def check_ipv6(n):
+    try:
+        socket.inet_pton(socket.AF_INET6, n)
+        return True
+    except socket.error:
+        return False
+
