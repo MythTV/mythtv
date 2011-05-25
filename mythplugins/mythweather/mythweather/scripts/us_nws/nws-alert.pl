@@ -28,11 +28,11 @@ sub StartDocument {
 
 sub StartTag {
     my ($expat, $name, %atts) = @_;
-    if ($name eq "cap:alert"){
+    if ($name eq "feed"){
         $currAlert = {};
     }
 
-    if ($name eq "cap:info") {
+    if ($name eq "entry") {
         $currInfo = {};
     }
 
@@ -42,22 +42,31 @@ sub StartTag {
 sub EndTag {
     my ($expat, $name, %atts) = @_;
 
-    if ($name eq "cap:alert") {
+    if ($name eq "feed") {
         push @$alerts, $currAlert;
     }
-    if ($name eq "cap:info") {
-        push (@{$currAlert->{'cap:info'}}, $currInfo);
+    if ($name eq "entry") {
+        push (@{$currAlert->{'entry'}}, $currInfo);
     }
 }
 
 sub Text {
     my ($expat, $text) = @_;
 
-    if ($expat->within_element('cap:info')) {
+    if ($expat->within_element('cap:geocode') && $expat->within_element('value')) {
+        if($expat->{Text}) {
+            my %geocodes;
+	    foreach my $geocode ($expat->{Text} =~ m/(\d+)/g) {
+	        $geocodes{int $geocode} = 1;
+            }
+	    $currInfo->{'cap:geocode'} = \%geocodes;
+        }
+
+    } elsif ($expat->within_element('entry')) {
         $currInfo->{$expat->current_element} = $expat->{Text} if ($expat->{Text}
                 =~ /\w+/);
 
-    } elsif ($expat->within_element('cap:alert')) {
+    } elsif ($expat->within_element('feed')) {
         $currAlert->{$expat->current_element} = $expat->{Text} if ($expat->{Text} =~
                 /\w+/);
     }
@@ -68,10 +77,28 @@ sub Text {
 sub getWarnings {
     
     my $state = shift;
+    my $cache_dir = shift;
     $state =~ tr/[A-Z]/[a-z]/;
     my $parser = new XML::Parser(Style => 'Stream');
-    my $capfile = get "http://www.weather.gov/alerts/$state.cap" or
-        die "cannot retrieve alert data";
+    my $capfile = '';
+    my $url = "http://alerts.weather.gov/cap/$state.php?x=0";
+    if($cache_dir && -d $cache_dir)
+    {
+        my $cache_file = "$cache_dir/$state.cap";
+        my $rc = mirror($url, $cache_file);
+        if(is_error($rc)) {
+            die "cannot retrieve alert data";
+        }
+        open(CAP, $cache_file);
+        undef($/);
+        $capfile = <CAP>;
+        close(CAP);
+    }
+    else
+    {
+        $capfile = get $url
+            or die "cannot retrieve alert data";
+    }
     $parser->parse($capfile);
     return $alerts;
 }
@@ -80,26 +107,25 @@ sub getEffectiveWarnings {
     my $date = shift;
     my $state = shift;
     my $geo = shift;
+    my $cache_dir = shift;
     my @results;
     if (!$alerts) {
-        getWarnings($state);
+        getWarnings($state, $cache_dir);
     }
     my $alert;
     my $info;
 
     $date = ParseDate($date);
     my $tz = new Date::Manip::TZ;
-    $date = Date_ConvTZ($date, $tz->curr_zone(), "UTC");
-    $date = UnixDate($date, "%O");
 
     my @dates;
     while ($alert = shift @$alerts) {
-        push @dates, $alert->{'cap:sent'};
-        while ($info = shift @{$alert->{'cap:info'}}) {
+        push @dates, $alert->{'updated'};
+        while ($info = shift @{$alert->{'entry'}}) {
             if ($info->{'cap:effective'} && 
-                Date_Cmp($date, "$info->{'cap:effective'}") >= 0 &&
-                Date_Cmp($date, "$info->{'cap:expires'}") < 0 &&
-                (!$geo || $info->{'cap:geocode'} == $geo)) {
+                Date_Cmp($date, $info->{'cap:effective'}) >= 0 &&
+                Date_Cmp($date, $info->{'cap:expires'}) < 0 &&
+                (!$geo || $info->{'cap:geocode'}{int $geo})) {
                 push @results, $info;
             }
         }
@@ -179,10 +205,10 @@ if (!$state || !$locstr) {
     } else { die "cannot find location"; }
 }
 
-my ($updatetime, @warnings) = getEffectiveWarnings("now", $state, $loc);
+my ($updatetime, @warnings) = getEffectiveWarnings("now", $state, $loc, $dir);
 
 foreach my $warning (@warnings) {
-    my $txt = $warning->{'cap:description'};
+    my $txt = $warning->{'summary'};
     for my $line (split /\n/, $txt) {
         print "alerts::$line\n" if ($line =~ m/\w+/);
     }
