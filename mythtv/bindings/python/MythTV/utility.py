@@ -288,18 +288,6 @@ class databaseSearch( object ):
 
         return sql
 
-class SplitInt( object ):
-    """Utility class for handling split integers sent over myth protocol."""
-    @staticmethod
-    def joinInt(high,low):
-        """obj.joinInt(high, low) -> 64-bit int, from two signed ints"""
-        return (int(high) + (int(low)<0))*2**32 + int(low)
-
-    @staticmethod
-    def splitInt(dint):
-        """obj.joinInt(64-bit int) -> (high, low)"""
-        return dint/(2**32),dint%2**32 - (dint%2**32 > 2**31)*2**32
-
 class CMPVideo( object ):
     """
     Utility class providing comparison operators between data objects

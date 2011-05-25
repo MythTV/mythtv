@@ -256,8 +256,7 @@ class MythBE( FileOps ):
         """
         res = [int(r) for r in self.backendCommand('QUERY_FREE_SPACE_SUMMARY')\
                                    .split(BACKEND_SEP)]
-        return (self.joinInt(res[0],res[1]),
-                self.joinInt(res[2],res[3]))
+        return (res[0], res[1])
 
     def getLoad(self):
         """

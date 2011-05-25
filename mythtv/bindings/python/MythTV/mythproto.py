@@ -11,7 +11,7 @@ from logging import MythLog
 from altdict import DictData
 from connections import BEConnection, BEEventConnection
 from database import DBCache
-from utility import SplitInt, CMPRecord, datetime, \
+from utility import CMPRecord, datetime, \
                     ParseEnum, CopyData, CopyData2, check_ipv6
 
 from datetime import date
@@ -24,7 +24,7 @@ import weakref
 import re
 import os
 
-class BECache( SplitInt ):
+class BECache( object ):
     """
     BECache(backend=None, noshutdown=False, db=None)
                                             -> MythBackend connection object
@@ -40,10 +40,6 @@ class BECache( SplitInt ):
                 automatic shutdown while the connection is alive.
 
     Available methods:
-        joinInt()           - convert two signed ints to one 64-bit
-                              signed int
-        splitInt()          - convert one 64-bit signed int to two
-                              signed ints
         backendCommand()    - Sends a formatted command to the backend
                               and returns the response.
     """
@@ -337,7 +333,7 @@ class FileTransfer( BEEvent ):
             else:
                 sp = res.split(BACKEND_SEP)
                 self._sockno = int(sp[1])
-                self._size = [int(i) for i in sp[2:]]
+                self._size = int(sp[2])
 
         def __del__(self):
             self.socket.shutdown(1)
@@ -370,7 +366,7 @@ class FileTransfer( BEEvent ):
         self.open = True
 
         self._sockno = self.ftsock._sockno
-        self._size = self.joinInt(*self.ftsock._size)
+        self._size = self.ftsock._size
         self._pos = 0
         self._tsize = 2**15
         self._tmax = 2**17
@@ -508,20 +504,17 @@ class FileTransfer( BEEvent ):
             whence = 0
             offset = self._size+offset
 
-        curhigh,curlow = self.splitInt(self._pos)
-        offhigh,offlow = self.splitInt(offset)
-
         res = self.backendCommand('QUERY_FILETRANSFER '\
                 +BACKEND_SEP.join(
                         [str(self._sockno),'SEEK',
-                         str(offhigh),str(offlow),
+                         str(offset),
                          str(whence),
-                         str(curhigh),str(curlow)])\
+                         str(self._pos)])\
                  ).split(BACKEND_SEP)
         if res[0] == '-1':
             raise MythFileError(MythError.FILE_FAILED_SEEK, \
                                     str(self), offset, whence)
-        self._pos = self.joinInt(*res)
+        self._pos = res[0]
 
     def flush(self):
         pass
@@ -742,12 +735,11 @@ class FileOps( BECache ):
         return sorted(self._getPrograms(query, recstatus, recordid, header),\
                       key=lambda p: p.starttime)
 
-class FreeSpace( DictData, SplitInt ):
+class FreeSpace( DictData ):
     """Represents a FreeSpace entry."""
     _field_order = [ 'host',         'path',     'islocal',
                     'disknumber',   'sgroupid', 'blocksize',
-                    'ts_high',      'ts_low',   'us_high',
-                    'us_low']
+                    'totalspace', 'usedspace']
     _field_type = [3, 3, 2, 0, 0, 0, 0, 0, 0, 0]
     def __str__(self):
         return "<FreeSpace '%s@%s' at %s>"\
@@ -758,8 +750,6 @@ class FreeSpace( DictData, SplitInt ):
 
     def __init__(self, raw):
         DictData.__init__(self, raw)
-        self.totalspace = self.joinInt(self.ts_high, self.ts_low)
-        self.usedspace = self.joinInt(self.us_high, self.us_low)
         self.freespace = self.totalspace - self.usedspace
 
 class Program( DictData, RECSTATUS, AUDIO_PROPS, VIDEO_PROPS, \
