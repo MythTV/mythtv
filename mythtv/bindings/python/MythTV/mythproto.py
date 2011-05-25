@@ -79,7 +79,7 @@ class BECache( SplitInt ):
             if self._reip.match(backend):
                 # given backend is IP address
                 self.host = backend
-            else if check_ipv6(backend):
+            elif check_ipv6(backend):
                 # given backend is IPv6 address
                 self.host = backend
             else:
