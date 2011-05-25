@@ -5656,7 +5656,7 @@ NULL
 NULL
 };
 
-        if (!performActualUpdate(updates, "1273", dbver))
+        if (!performActualUpdate(updates, "1274", dbver))
             return false;
     }
 
