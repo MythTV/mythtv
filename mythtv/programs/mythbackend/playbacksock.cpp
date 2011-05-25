@@ -10,7 +10,6 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "util.h"
 #include "inputinfo.h"
-#include "decodeencode.h"
 
 #define LOC QString("PlaybackSock: ")
 #define LOC_ERR QString("PlaybackSock, Error: ")
@@ -286,7 +285,7 @@ QStringList PlaybackSock::GenPreviewPixmap(const QString &token,
     strlist += token;
     pginfo->ToStringList(strlist);
     strlist.push_back(time_fmt_sec ? "s" : "f");
-    encodeLongLong(strlist, time);
+    strlist.push_back(QString::number(time));
     strlist.push_back((outputFile.isEmpty()) ? "<EMPTY>" : outputFile);
     strlist.push_back(QString::number(outputSize.width()));
     strlist.push_back(QString::number(outputSize.height()));
@@ -392,9 +391,9 @@ long long PlaybackSock::GetMaxBitrate(int capturecardnum)
     strlist << "GET_MAX_BITRATE";
 
     if (SendReceiveStringList(strlist, 2))
-        return decodeLongLong(strlist, 0);
+        return strlist[0].toLongLong();
 
-    return 20200000LL; // Peek bit rate for HD-PVR
+    return 20200000LL; // Peak bit rate for HD-PVR
 }
 
 /** \brief Returns the ProgramInfo being used by any current recording.

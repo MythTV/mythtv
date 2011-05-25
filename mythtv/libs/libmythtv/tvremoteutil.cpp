@@ -7,7 +7,6 @@
 #include "inputinfo.h"
 #include "programinfo.h"
 #include "mythcorecontext.h"
-#include "decodeencode.h"
 #include "remoteencoder.h"
 #include "tv_rec.h"
 

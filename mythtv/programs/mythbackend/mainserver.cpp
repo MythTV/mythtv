@@ -43,7 +43,6 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythverbose.h"
 #include "mythversion.h"
-#include "decodeencode.h"
 #include "mythdb.h"
 #include "mainserver.h"
 #include "server.h"
@@ -1486,7 +1485,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         retlist << QString::number(socket->socket());
         ft->UpRef();
-        encodeLongLong(retlist, ft->GetFileSize());
+        retlist << QString::number(ft->GetFileSize());
         ft->DownRef();
 
         if (checkfiles.size())
@@ -3599,18 +3598,15 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     else if (command == "GET_FRAMES_WRITTEN")
     {
-        long long value = enc->GetFramesWritten();
-        encodeLongLong(retlist, value);
+        retlist << QString::number(enc->GetFramesWritten());
     }
     else if (command == "GET_FILE_POSITION")
     {
-        long long value = enc->GetFilePosition();
-        encodeLongLong(retlist, value);
+        retlist << QString::number(enc->GetFilePosition());
     }
     else if (command == "GET_MAX_BITRATE")
     {
-        long long value = enc->GetMaxBitrate();
-        encodeLongLong(retlist, value);
+        retlist << QString::number(enc->GetMaxBitrate());
     }
     else if (command == "GET_CURRENT_RECORDING")
     {
@@ -3628,10 +3624,8 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     else if (command == "GET_KEYFRAME_POS")
     {
-        long long desired = decodeLongLong(slist, 2);
-
-        long long value = enc->GetKeyframePosition(desired);
-        encodeLongLong(retlist, value);
+        long long desired = slist[2].toLongLong();
+        retlist << QString::number(enc->GetKeyframePosition(desired));
     }
     else if (command == "FILL_POSITION_MAP")
     {
@@ -4063,8 +4057,7 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     }
     else if (command == "GET_MAX_BITRATE")
     {
-        long long value = enc->GetMaxBitrate();
-        encodeLongLong(retlist, value);
+        retlist << QString::number(enc->GetMaxBitrate());
     }
     else if (command == "GET_CURRENT_RECORDING")
     {
@@ -4246,8 +4239,8 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                     strlist << "-1"; // Ignore fsID
                     strlist << dirID;
                     strlist << QString::number(bSize);
-                    encodeLongLong(strlist, totalKB);
-                    encodeLongLong(strlist, usedKB);
+                    strlist << QString::number(totalKB);
+                    strlist << QString::number(usedKB);
 
                     foundDirs[currentDir] = true;
                 }
@@ -4307,8 +4300,8 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
         fsInfo.fsID = (*(it++)).toInt();
         fsInfo.dirID = (*(it++)).toInt();
         fsInfo.blocksize = (*(it++)).toInt();
-        fsInfo.totalSpaceKB = decodeLongLong(strlist, it);
-        fsInfo.usedSpaceKB = decodeLongLong(strlist, it);
+        fsInfo.totalSpaceKB = (*(it++)).toLongLong();
+        fsInfo.usedSpaceKB = (*(it++)).toLongLong();
         fsInfo.freeSpaceKB = fsInfo.totalSpaceKB - fsInfo.usedSpaceKB;
         fsInfos.push_back(fsInfo);
     }
@@ -4333,10 +4326,15 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
             // our fuzzy comparison uses the maximum of the two block sizes
             // or 32, whichever is greater
             bSize = max(32, max(it1->blocksize, it2->blocksize) / 1024);
-            if (it2->fsID == -1 &&
-                (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= bSize) &&
-                ((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB)
-                 <= maxWriteFiveSec))
+            long long diffSize = it1->totalSpaceKB - it2->totalSpaceKB;
+            long long diffUsed = it1->usedSpaceKB - it2->usedSpaceKB;
+            if (diffSize < 0)
+                diffSize = 0 - diffSize;
+            if (diffUsed < 0)
+                diffUsed = 0 - diffUsed;
+
+            if (it2->fsID == -1 && (diffSize <= bSize) && 
+                ((size_t)diffUsed <= maxWriteFiveSec))
             {
                 if (!it1->hostname.contains(it2->hostname))
                     it1->hostname = it1->hostname + "," + it2->hostname;
@@ -4359,8 +4357,8 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
         strlist << QString::number(it1->fsID);
         strlist << QString::number(it1->dirID);
         strlist << QString::number(it1->blocksize);
-        encodeLongLong(strlist, it1->totalSpaceKB);
-        encodeLongLong(strlist, it1->usedSpaceKB);
+        strlist << QString::number(it1->totalSpaceKB);
+        strlist << QString::number(it1->usedSpaceKB);
 
         totalKB += it1->totalSpaceKB;
         usedKB  += it1->usedSpaceKB;
@@ -4374,8 +4372,8 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
         strlist << "-2";
         strlist << "-2";
         strlist << "0";
-        encodeLongLong(strlist, totalKB);
-        encodeLongLong(strlist, usedKB);
+        strlist << QString::number(totalKB);
+        strlist << QString::number(usedKB);
     }
 }
 
@@ -4398,8 +4396,8 @@ void MainServer::GetFilesystemInfos(vector <FileSystemInfo> &fsInfos)
         it++;
         fsInfo.dirID = (*(it++)).toInt();
         fsInfo.blocksize = (*(it++)).toInt();
-        fsInfo.totalSpaceKB = decodeLongLong(strlist, it);
-        fsInfo.usedSpaceKB = decodeLongLong(strlist, it);
+        fsInfo.totalSpaceKB = (*(it++)).toLongLong();
+        fsInfo.usedSpaceKB = (*(it++)).toLongLong();
         fsInfo.freeSpaceKB = fsInfo.totalSpaceKB - fsInfo.usedSpaceKB;
         fsInfo.weight = 0;
         fsInfos.push_back(fsInfo);
@@ -4429,23 +4427,26 @@ void MainServer::GetFilesystemInfos(vector <FileSystemInfo> &fsInfos)
             // our fuzzy comparison uses the maximum of the two block sizes
             // or 32, whichever is greater
             bSize = max(32, max(it1->blocksize, it2->blocksize) / 1024);
+            long long diffSize = it1->totalSpaceKB - it2->totalSpaceKB;
+            long long diffUsed = it1->usedSpaceKB - it2->usedSpaceKB;
+            if (diffSize < 0)
+                diffSize = 0 - diffSize;
+            if (diffUsed < 0)
+                diffUsed = 0 - diffUsed;
+
             VERBOSE(VB_SCHEDULE+VB_FILE+VB_EXTRA,
                 QString("    Checking %1:%2 (dirID %3) using %4 of %5 KB")
                         .arg(it2->hostname).arg(it2->directory).arg(it2->dirID)
                         .arg(it2->usedSpaceKB).arg(it2->totalSpaceKB));
             VERBOSE(VB_SCHEDULE+VB_FILE+VB_EXTRA,
                 QString("        Total KB Diff: %1 (want <= %2)")
-                .arg((long)absLongLong(it1->totalSpaceKB - it2->totalSpaceKB))
-                .arg(bSize));
+                .arg((long)diffSize).arg(bSize));
             VERBOSE(VB_SCHEDULE+VB_FILE+VB_EXTRA,
                 QString("        Used  KB Diff: %1 (want <= %2)")
-                .arg((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB))
-                .arg(maxWriteFiveSec));
+                .arg((long)diffUsed).arg(maxWriteFiveSec));
 
-            if (it2->fsID == -1 &&
-                (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= bSize) &&
-                ((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB)
-                 <= maxWriteFiveSec))
+            if (it2->fsID == -1 && (diffSize <= bSize) &&
+                ((size_t)diffUsed <= maxWriteFiveSec))
             {
                 it2->fsID = it1->fsID;
 
@@ -4616,7 +4617,7 @@ void MainServer::HandleCutMapQuery(const QString &chanid,
             rowcnt++;
             QString intstr = QString("%1").arg(*it);
             retlist << intstr;
-            encodeLongLong(retlist,it.key());
+            retlist << QString::number(it.key());
         }
     }
 
@@ -4683,7 +4684,7 @@ void MainServer::HandleBookmarkQuery(const QString &chanid,
         chanid.toUInt(), recstartts);
 
     QStringList retlist;
-    encodeLongLong(retlist,bookmark);
+    retlist << QString::number(bookmark);
 
     if (pbssock)
         SendResponse(pbssock, retlist);
@@ -4708,14 +4709,11 @@ void MainServer::HandleSetBookmark(QStringList &tokens,
 
     QString chanid = tokens[1];
     QString starttime = tokens[2];
-    QStringList bookmarklist;
-    bookmarklist << tokens[3];
-    bookmarklist << tokens[4];
+    long long bookmark = tokens[3].toLongLong();
 
     QDateTime recstartts;
     recstartts.setTime_t(starttime.toULongLong());
     QStringList retlist;
-    long long bookmark = decodeLongLong(bookmarklist, 0);
 
     ProgramInfo pginfo(chanid.toUInt(), recstartts);
 
@@ -4936,12 +4934,12 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
     }
     else if (command == "SEEK")
     {
-        long long pos = decodeLongLong(slist, 2);
-        int whence = slist[4].toInt();
-        long long curpos = decodeLongLong(slist, 5);
+        long long pos = slist[2].toLongLong();
+        int whence = slist[3].toInt();
+        long long curpos = slist[4].toLongLong();
 
         long long ret = ft->Seek(curpos, pos, whence);
-        encodeLongLong(retlist, ret);
+        retlist << QString::number(ret);
     }
     else if (command == "SET_TIMEOUT")
     {
@@ -5185,7 +5183,7 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     if (it != slist.end())
         (time_fmt_sec = ((*it).toLower() == "s")), it++;
     if (it != slist.end())
-        time = decodeLongLong(slist, it);
+        (time = (*it).toLongLong()), it++;
     if (it != slist.end())
         (outputfile = *it), it++;
     outputfile = (outputfile == "<EMPTY>") ? QString::null : outputfile;

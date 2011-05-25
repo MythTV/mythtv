@@ -707,8 +707,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                     (!episodeParts.contains(episodeKey)) &&
                     (found > *maxIter))
                 {
-                    long long spaceFreed =
-                        query.value(5).toLongLong() >> 20;
+                    long long spaceFreed = query.value(5).toLongLong() >> 20;
                     QString msg =
                         QString("Expiring %1 MBytes for %2 at %3 => %4.  Too "
                                 "many episodes, we only want to keep %5.")

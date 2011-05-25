@@ -4,7 +4,6 @@
 
 // MythTV headers
 #include "mythcorecontext.h"    /* gContext */
-#include "decodeencode.h"           /* for absLongLong */
 #include "mythplayer.h"
 
 // Commercial Flagging headers
@@ -255,8 +254,12 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
                 long long testlen = (long long)roundf((end - start) / fps);
                 if (testlen > breaktype[ii].len + breaktype[ii].delta)
                     break;      /* Too far ahead; break to next break length. */
-                if (absLongLong(testlen - breaktype[ii].len)
-                        > breaktype[ii].delta)
+
+                long long delta = testlen - breaktype[ii].len;
+                if (delta < 0)
+                    delta = 0 - delta;
+
+                if (delta > breaktype[ii].delta)
                     continue;   /* Outside delta range; try next end-blank. */
 
                 /* Mark this commercial break. */
