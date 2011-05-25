@@ -91,7 +91,6 @@ static QNetworkAccessManager *GetNetworkAccessManager(void)
 
     networkManager = new QNetworkAccessManager();
     networkManager->setCookieJar(GetMythDownloadManager()->getCookieJar());
-    networkManager->cookieJar()->setParent(NULL);
 
     atexit(DestroyNetworkAccessManager);
 
