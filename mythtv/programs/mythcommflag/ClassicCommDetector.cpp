@@ -753,6 +753,8 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
     {
         VERBOSE(VB_COMMFLAG, "CommDetect: Invalid video frame or codec, "
                 "unable to process frame.");
+        delete[] rowMax;
+        delete[] colMax;
         return;
     }
 
@@ -760,6 +762,8 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
     {
         VERBOSE(VB_COMMFLAG, "CommDetect: Width or Height is 0, "
                 "unable to process frame.");
+        delete[] rowMax;
+        delete[] colMax;
         return;
     }
 
@@ -863,6 +867,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
                 bottomDarkRow = y;
 
         delete[] rowMax;
+        rowMax = 0;
 
         for(int x = commDetectBorder; x < (width - commDetectBorder);
                 x += horizSpacing)
@@ -879,6 +884,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
                 rightDarkCol = x;
 
         delete[] colMax;
+        colMax = 0;
 
         if ((topDarkRow > commDetectBorder) &&
             (topDarkRow < (height * .20)) &&
@@ -976,6 +982,8 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
 #endif
 
     framesProcessed++;
+    delete[] rowMax;
+    delete[] colMax;
 }
 
 void ClassicCommDetector::ClearAllMaps(void)
