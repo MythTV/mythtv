@@ -53,7 +53,7 @@ class MythBackend {
 
         // If the IP contains a ':' It's likely an IPv6 address so enclose it in '[]'
         if (strpos($this->ip,":") > 0) {
-            $this->ip = "[" + $this->ip + "]";
+            $this->ip = "[" . $this->ip . "]";
         }
 
         $this->port         = _or($port, _or(setting('BackendServerPort', $this->host), 6543));
