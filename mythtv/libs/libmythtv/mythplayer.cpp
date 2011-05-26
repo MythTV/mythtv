@@ -1663,15 +1663,6 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     int vsync_delay_clock = 0;
     int64_t currentaudiotime = 0;
 
-    // attempt to reduce fps for standalone PIP
-    if (player_ctx->IsPIP() && framesPlayed % 2)
-    {
-        videosync->WaitForFrame(frameDelay + avsync_adjustment);
-        if (!using_null_videoout)
-            videoOutput->SetFramesPlayed(framesPlayed + 1);
-        return;
-    }
-
     if (videoOutput->IsErrored())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "AVSync: "
@@ -1939,6 +1930,7 @@ void MythPlayer::SetBuffering(bool new_buffering)
         VERBOSE(VB_PLAYBACK, LOC + "Waiting for video buffers...");
         buffering = true;
         buffering_start = QTime::currentTime();
+        buffering_last_msg = QTime::currentTime();
     }
     else if (buffering && !new_buffering)
     {
@@ -1959,16 +1951,18 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
         SetBuffering(true);
         usleep(frame_interval >> 3);
         int waited_for = buffering_start.msecsTo(QTime::currentTime());
-        if ((waited_for & 100) == 100)
+        int last_msg = buffering_last_msg.msecsTo(QTime::currentTime());
+        if (last_msg > 100)
         {
             VERBOSE(VB_IMPORTANT, LOC +
-                    QString("Waited 100ms for video frames from decoder %1")
-                    .arg(videoOutput->GetFrameStatus()));
+                    QString("Waited %1ms for video buffers %2")
+                    .arg(waited_for).arg(videoOutput->GetFrameStatus()));
+            buffering_last_msg = QTime::currentTime();
             if (audio.IsBufferAlmostFull())
             {
                 // We are likely to enter this condition
                 // if the audio buffer was too full during GetFrame in AVFD
-                VERBOSE(VB_AUDIO, LOC + QString("Resetting audio buffer"));
+                VERBOSE(VB_AUDIO, LOC + "Resetting audio buffer");
                 audio.Reset();
             }
         }
@@ -2113,7 +2107,11 @@ void MythPlayer::VideoStart(void)
     m_double_framerate = false;
     m_scan_tracker     = 2;
 
-    if (using_null_videoout)
+    if (player_ctx->IsPIP() && using_null_videoout)
+    {
+        videosync = new DummyVideoSync(videoOutput, fr_int, 0, false);
+    }
+    else if (using_null_videoout)
     {
         videosync = new USleepVideoSync(videoOutput, fr_int, 0, false);
     }
@@ -2641,7 +2639,7 @@ void MythPlayer::EventLoop(void)
         }
     }
 
-    // Handle chapter jump (currently matroska only)
+    // Handle chapter jump
     if (jumpchapter != 0)
         DoJumpChapter(jumpchapter);
 

@@ -1019,9 +1019,7 @@ void AudioOutputBase::SetAudiotime(int frames, int64_t timecode)
 
     if (encoder)
     {
-        // the input buffered data is still in audio_bytes_per_sample format
-        processframes_stretched -=
-            encoder->Buffered() / output_bytes_per_frame;
+        processframes_stretched -= encoder->Buffered();
     }
 
     audbuf_timecode =
@@ -1168,23 +1166,19 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
     off =  processing ? 4 : output_settings->SampleSize(format);
     off *= source_channels;
 
-    len = 0;
     int i = 0;
+    len = 0;
+    int nFrames, bdFrames;
     while (i < frames)
     {
-        int nFrames;
-
-        i += upmixer->putFrames(buffer + i * off,
-                                frames - i, source_channels);
-
+        i += upmixer->putFrames(buffer + i * off, frames - i, source_channels);
         nFrames = upmixer->numFrames();
-
         if (!nFrames)
             continue;
 
         len += CheckFreeSpace(nFrames);
 
-        int bdFrames = (kAudioRingBufferSize - org_waud) / bpf;
+        bdFrames = (kAudioRingBufferSize - org_waud) / bpf;
         if (bdFrames < nFrames)
         {
             upmixer->receiveFrames((float *)(WPOS), bdFrames);
@@ -1219,13 +1213,10 @@ bool AudioOutputBase::AddFrames(void *in_buffer, int in_frames,
 bool AudioOutputBase::AddData(void *in_buffer, int in_len,
                               int64_t timecode, int /*in_frames*/)
 {
-    int org_waud = waud;
-    int afree    = audiofree();
     int frames   = in_len / source_bytes_per_frame;
     void *buffer = in_buffer;
     int bpf      = bytes_per_frame;
     int len      = in_len;
-    int used     = kAudioRingBufferSize - afree;
     bool music   = false;
     int bdiff;
 
@@ -1245,8 +1236,26 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
         Pause(false);
     }
 
+    // Don't write new samples if we're resetting the buffer or reconfiguring
+    QMutexLocker lock(&audio_buflock);
+
+    int org_waud = waud;
+    int afree    = audiofree();
+    int used     = kAudioRingBufferSize - afree;
+
     if (passthru && m_spdifenc)
     {
+        if (processing)
+        {
+            /*
+             * We shouldn't encounter this case, but it can occur when
+             * timestretch just got activated. So we will just drop the
+             * data
+             */
+            VERBOSE(VB_AUDIO, QString("Passthrough activated with audio "
+                                      "processing. Dropping audio"));
+            return false;
+        }
         // mux into an IEC958 packet
         m_spdifenc->WriteFrame((unsigned char *)in_buffer, len);
         len = m_spdifenc->GetProcessedSize();
@@ -1266,9 +1275,6 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
                       "timecode=%5 needsupmix=%6")
               .arg(frames).arg(len).arg(used).arg(afree).arg(timecode)
               .arg(needs_upmix));
-
-    // Don't write new samples if we're resetting the buffer or reconfiguring
-    QMutexLocker lock(&audio_buflock);
 
     // Mythmusic doesn't give us timestamps
     if (hasVisual())
@@ -1317,15 +1323,13 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
 
     int frames_remaining = frames;
     int frames_final = 0;
-    int maxframes = (kAudioSRCInputSize /
-                     (passthru ? channels : source_channels)) & ~0xf;
+    int maxframes = (kAudioSRCInputSize / source_channels) & ~0xf;
     int offset = 0;
 
     while(frames_remaining > 0)
     {
         buffer = (char *)in_buffer + offset;
         frames = frames_remaining;
-
         len = frames * source_bytes_per_frame;
 
         if (processing)
@@ -1433,50 +1437,30 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
         if (encoder)
         {
             org_waud            = waud;
-            int org_waud2       = waud;
-            int remaining       = len;
             int to_get          = 0;
-            // The AC3 encoder can only work on 128kB of data at a time
-            int maxlength       =
-                ((ENCODER_INBUFSIZE / encoder->FrameSize() - 1) *
-                 encoder->FrameSize()) & ~0xf;
 
-            do
+            if (bdiff < len)
             {
-                len = remaining;
-                if (len > maxlength)
-                {
-                    len = maxlength;
-                }
-                remaining -= len;
-
-                bdiff = kAudioRingBufferSize - org_waud;
-                if (bdiff < len)
-                {
-                    encoder->Encode(WPOS, bdiff, processing);
-                    to_get = encoder->Encode(ABUF, len - bdiff, processing);
-                    org_waud = len - bdiff;
-                }
-                else
-                {
-                    to_get = encoder->Encode(WPOS, len, processing);
-                    org_waud += len;
-                }
-
-                bdiff = kAudioRingBufferSize - org_waud2;
-                if (bdiff <= to_get)
-                {
-                    encoder->GetFrames(audiobuffer + org_waud2, bdiff);
-                    to_get -= bdiff ;
-                    org_waud2 = 0;
-                }
-                if (to_get > 0)
-                    encoder->GetFrames(audiobuffer + org_waud2, to_get);
-
-                org_waud2 += to_get;
+                encoder->Encode(WPOS, bdiff, processing ? FORMAT_FLT : format);
+                to_get = encoder->Encode(ABUF, len - bdiff,
+                                         processing ? FORMAT_FLT : format);
             }
-            while (remaining > 0);
-            org_waud = org_waud2;
+            else
+            {
+                to_get = encoder->Encode(WPOS, len,
+                                         processing ? FORMAT_FLT : format);
+            }
+
+            if (bdiff <= to_get)
+            {
+                encoder->GetFrames(WPOS, bdiff);
+                to_get -= bdiff ;
+                org_waud = 0;
+            }
+            if (to_get > 0)
+                encoder->GetFrames(WPOS, to_get);
+
+            org_waud += to_get;
         }
 
         waud = org_waud;
@@ -1530,16 +1514,13 @@ void AudioOutputBase::OutputAudioLoop(void)
     uchar *zeros        = new uchar[fragment_size];
     uchar *fragment_buf = new uchar[fragment_size + 16];
     uchar *fragment     = (uchar *)AOALIGN(fragment_buf[0]);
-
-    // to reduce startup latency, write silence in 8ms chunks
-    int zero_fragment_size = (int)(0.008*samplerate/channels);
-    // make sure its a multiple of output_bytes_per_frame
-    zero_fragment_size *= output_bytes_per_frame;
-    if (zero_fragment_size > fragment_size)
-        zero_fragment_size = fragment_size;
-
     memset(zeros, 0, fragment_size);
 
+    // to reduce startup latency, write silence in 8ms chunks
+    int zero_fragment_size = 8 * samplerate * output_bytes_per_frame / 1000;
+    if (zero_fragment_size > fragment_size)
+        zero_fragment_size = fragment_size;
+           
     while (!killaudio)
     {
         if (pauseaudio)
@@ -1555,8 +1536,6 @@ void AudioOutputBase::OutputAudioLoop(void)
             actually_paused = true;
             audiotime = 0; // mark 'audiotime' as invalid.
 
-            // only send zeros if card doesn't already have at least one
-            // fragment of zeros -dag
             WriteAudio(zeros, zero_fragment_size);
             continue;
         }

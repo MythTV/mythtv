@@ -50,6 +50,12 @@ class MythBackend {
     function __construct($host, $port = null) {
         $this->host         = $host;
         $this->ip           = _or(setting('BackendServerIP', $this->host), $host);
+
+        // If the IP contains a ':' It's likely an IPv6 address so enclose it in '[]'
+        if (strpos($this->ip,":") > 0) {
+            $this->ip = "[" + $this->ip + "]";
+        }
+
         $this->port         = _or($port, _or(setting('BackendServerPort', $this->host), 6543));
         $this->port_http    = _or(setting('BackendStatusPort', $this->host), _or(setting('BackendStatusPort'), 6544));
     }

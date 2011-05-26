@@ -21,9 +21,9 @@ class FirewireChannel;
  *
  *  \sa DTVRecorder
  */
-class FirewireRecorder : public DTVRecorder,
-                         public MPEGSingleProgramStreamListener,
-                         public TSDataListener
+class FirewireRecorder :
+    public DTVRecorder,
+    public TSDataListener
 {
     friend class MPEGStreamData;
     friend class TSPacketProcessor;
@@ -42,8 +42,10 @@ class FirewireRecorder : public DTVRecorder,
     void StartRecording(void);
     bool PauseAndWait(int timeout = 100);
 
+    // Implements TSDataListener
     void AddData(const unsigned char *data, uint dataSize);
-    void ProcessTSPacket(const TSPacket &tspacket);
+
+    bool ProcessTSPacket(const TSPacket &tspacket);
 
     // Sets
     void SetOptionsFromProfile(RecordingProfile *profile,
@@ -51,10 +53,6 @@ class FirewireRecorder : public DTVRecorder,
                                const QString &audiodev,
                                const QString &vbidev);
     void SetStreamData(void);
-
-    // MPEG Single Program
-    void HandleSingleProgramPAT(ProgramAssociationTable*);
-    void HandleSingleProgramPMT(ProgramMapTable*);
 
   protected:
     FirewireRecorder(TVRec *rec);

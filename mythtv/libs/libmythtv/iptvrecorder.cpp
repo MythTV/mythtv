@@ -13,6 +13,7 @@
 #include "iptvchannel.h"
 #include "iptvfeederwrapper.h"
 #include "iptvrecorder.h"
+#include "tv_rec.h"
 
 #define LOC QString("IPTVRec: ")
 #define LOC_ERR QString("IPTVRec, Error: ")
@@ -46,7 +47,7 @@ bool IPTVRecorder::Open(void)
               !_channel->GetFeeder()->Open(chaninfo.m_url));
 
     VERBOSE(VB_RECORD, LOC + "Open() -- end err("<<_error<<")");
-    return !_error;
+    return !IsErrored();
 }
 
 void IPTVRecorder::Close(void)
@@ -57,28 +58,39 @@ void IPTVRecorder::Close(void)
     VERBOSE(VB_RECORD, LOC + "Close() -- end");
 }
 
-void IPTVRecorder::Pause(bool clear)
+bool IPTVRecorder::PauseAndWait(int timeout)
 {
-    VERBOSE(VB_RECORD, LOC + "Pause() -- begin");
-    DTVRecorder::Pause(clear);
-    _channel->GetFeeder()->Stop();
-    _channel->GetFeeder()->Close();
-    VERBOSE(VB_RECORD, LOC + "Pause() -- end");
-}
+    QMutexLocker locker(&pauseLock);
+    if (request_pause)
+    {
+        if (!IsPaused(true))
+        {
+            _channel->GetFeeder()->Stop();
+            _channel->GetFeeder()->Close();
 
-void IPTVRecorder::Unpause(void)
-{
-    VERBOSE(VB_RECORD, LOC + "Unpause() -- begin");
+            paused = true;
+            pauseWait.wakeAll();
+            if (tvrec)
+                tvrec->RecorderPaused();
+        }
 
-    if (_recording && !_channel->GetFeeder()->IsOpen())
-        Open();
+        unpauseWait.wait(&pauseLock, timeout);
+    }
 
-    if (_stream_data)
-        _stream_data->Reset(_stream_data->DesiredProgram());
+    if (!request_pause && IsPaused(true))
+    {
+        paused = false;
 
-    DTVRecorder::Unpause();
+        if (recording && !_channel->GetFeeder()->IsOpen())
+            Open();
 
-    VERBOSE(VB_RECORD, LOC + "Unpause() -- end");
+        if (_stream_data)
+            _stream_data->Reset(_stream_data->DesiredProgram());
+
+        unpauseWait.wakeAll();
+    }
+
+    return IsPaused(true);
 }
 
 void IPTVRecorder::StartRecording(void)
@@ -91,13 +103,20 @@ void IPTVRecorder::StartRecording(void)
     }
 
     // Start up...
-    _recording = true;
-    _request_recording = true;
+    {
+        QMutexLocker locker(&pauseLock);
+        request_recording = true;
+        recording = true;
+        recordingWait.wakeAll();
+    }
 
-    while (_request_recording)
+    while (IsRecordingRequested() && !IsErrored())
     {
         if (PauseAndWait())
             continue;
+
+        if (!IsRecordingRequested())
+            break;
 
         if (!_channel->GetFeeder()->IsOpen())
         {
@@ -113,27 +132,11 @@ void IPTVRecorder::StartRecording(void)
     FinishRecording();
     Close();
 
+    QMutexLocker locker(&pauseLock);
+    recording = false;
+    recordingWait.wakeAll();
+
     VERBOSE(VB_RECORD, LOC + "StartRecording() -- end");
-    _recording = false;
-    _cond_recording.wakeAll();
-}
-
-void IPTVRecorder::StopRecording(void)
-{
-    VERBOSE(VB_RECORD, LOC + "StopRecording() -- begin");
-    Pause();
-    _channel->GetFeeder()->Close();
-
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
-
-    _request_recording = false;
-    while (_recording)
-        _cond_recording.wait(&mutex, 500);
-
-    VERBOSE(VB_RECORD, LOC + "StopRecording() -- end");
 }
 
 // ===================================================
@@ -165,7 +168,7 @@ void IPTVRecorder::AddData(const unsigned char *data, unsigned int dataSize)
     while (readIndex < dataSize)
     {
         // If recorder is paused, stop there
-        if (IsPaused())
+        if (IsPaused(false))
             return;
 
         // Find the next TS Header in data
@@ -188,7 +191,7 @@ void IPTVRecorder::AddData(const unsigned char *data, unsigned int dataSize)
 
         // Check if the next packet in buffer is complete :
         // packet size is 188 bytes long
-        if ((dataSize - tsPos - readIndex) < TSPacket::SIZE)
+        if ((dataSize - tsPos - readIndex) < TSPacket::kSize)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "TS packet at stradles end of buffer.");
@@ -200,17 +203,17 @@ void IPTVRecorder::AddData(const unsigned char *data, unsigned int dataSize)
         ProcessTSPacket(*reinterpret_cast<const TSPacket*>(newData));
 
         // follow to next packet
-        readIndex += tsPos + TSPacket::SIZE;
+        readIndex += tsPos + TSPacket::kSize;
     }
 }
 
-void IPTVRecorder::ProcessTSPacket(const TSPacket& tspacket)
+bool IPTVRecorder::ProcessTSPacket(const TSPacket& tspacket)
 {
     if (!_stream_data)
-        return;
+        return true;
 
     if (tspacket.TransportError() || tspacket.Scrambled())
-        return;
+        return true;
 
     if (tspacket.HasAdaptationField())
         _stream_data->HandleAdaptationFieldControl(&tspacket);
@@ -243,31 +246,13 @@ void IPTVRecorder::ProcessTSPacket(const TSPacket& tspacket)
         else if (_stream_data->IsWritingPID(lpid))
             BufferedWrite(tspacket);
     }
+
+    return true;
 }
 
 void IPTVRecorder::SetStreamData(void)
 {
     _stream_data->AddMPEGSPListener(this);
-}
-
-void IPTVRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
-{
-    if (!pat)
-        return;
-
-    int next = (pat->tsheader()->ContinuityCounter()+1)&0xf;
-    pat->tsheader()->SetContinuityCounter(next);
-    BufferedWrite(*(reinterpret_cast<const TSPacket*>(pat->tsheader())));
-}
-
-void IPTVRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
-{
-    if (!pmt)
-        return;
-
-    int next = (pmt->tsheader()->ContinuityCounter()+1)&0xf;
-    pmt->tsheader()->SetContinuityCounter(next);
-    BufferedWrite(*(reinterpret_cast<const TSPacket*>(pmt->tsheader())));
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

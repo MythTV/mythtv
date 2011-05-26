@@ -30,32 +30,28 @@ class HDHRChannel : public DTVChannel
     void Close(void);
     bool EnterPowerSavingMode(void);
 
-    bool Init(QString &inputname, QString &startchannel, bool setchan);
-
-    // Sets
-    bool SetChannelByString(const QString &chan);
-
     // Gets
     bool IsOpen(void) const;
     QString GetDevice(void) const { return _device_id; }
-    virtual vector<DTVTunerType> GetTunerTypes(void) const { return _tuner_types; }
+    virtual vector<DTVTunerType> GetTunerTypes(void) const
+        { return _tuner_types; }
+    virtual bool IsMaster(void) const
+        { return _master == NULL; }
+
+    // Sets
+    virtual bool SetChannelByString(const QString &channum);
 
     // ATSC/DVB scanning/tuning stuff
-    bool TuneMultiplex(uint mplexid, QString inputname);
     bool Tune(const DTVMultiplex &tuning, QString inputname);
 
-  private:
-    bool Tune(uint frequency, QString inputname,
-              QString modulation, QString si_std);
+    // Virtual tuning
+    bool Tune(const QString &freqid, int /*finetune*/);
 
   private:
     QString               _device_id;
+    HDHRChannel          *_master;
     HDHRStreamHandler    *_stream_handler;
     vector<DTVTunerType>  _tuner_types;
-
-    mutable QMutex  _lock;
-    mutable QMutex  tune_lock;
-    mutable QMutex  hw_lock;
 };
 
 #endif

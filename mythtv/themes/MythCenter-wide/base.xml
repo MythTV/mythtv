@@ -163,6 +163,10 @@
         <fill color="#43b038" alpha="200" />
     </shape>
 
+    <shape name="baseinactivewidgetshape" from="basewidgetshape">
+        <fill color="#43b038" alpha="120" />
+    </shape>
+
     <buttonlist name="basebuttonlist">
         <area>0,0,300,250</area>
         <layout>vertical</layout>

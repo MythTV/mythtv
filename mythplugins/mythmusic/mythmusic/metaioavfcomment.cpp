@@ -54,20 +54,35 @@ Metadata* MetaIOAVFComment::read(QString filename)
     if (av_find_stream_info(p_context) < 0)
         return NULL;
 
-
-    title += (char *)p_context->title;
-    if (title.isEmpty())
+    AVMetadataTag *tag = av_metadata_get(p_context->metadata, "title", NULL, 0);
+    if (!tag)
     {
         readFromFilename(filename, artist, album, title, genre, tracknum);
     }
     else
     {
-        artist += (char *)p_context->author;
+	title = (char *)tag->value;
+
+	tag = av_metadata_get(p_context->metadata, "author", NULL, 0);
+        if (tag)
+	    artist += (char *)tag->value;
+
         // compilation_artist???
-        album += (char *)p_context->album;
-        genre += (char *)p_context->genre;
-        year = p_context->year;
-        tracknum = p_context->track;
+	tag = av_metadata_get(p_context->metadata, "album", NULL, 0);
+        if (tag)
+            album += (char *)tag->value;
+
+	tag = av_metadata_get(p_context->metadata, "genre", NULL, 0);
+        if (tag)
+            genre += (char *)tag->value;
+
+	tag = av_metadata_get(p_context->metadata, "year", NULL, 0);
+        if (tag)
+            year = atoi(tag->value);
+
+	tag = av_metadata_get(p_context->metadata, "tracknum", NULL, 0);
+        if (tag)
+            tracknum = atoi(tag->value);
     }
 
     length = getTrackLength(p_context);

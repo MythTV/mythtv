@@ -25,7 +25,6 @@ DTVSignalMonitor::DTVSignalMonitor(int db_cardnum,
                                    uint64_t wait_for_mask)
     : SignalMonitor(db_cardnum, _channel, wait_for_mask),
       stream_data(NULL),
-      channelTuned(QObject::tr("Channel Tuned"), "tuned", 3, true, 0, 3, 0),
       seenPAT(QObject::tr("Seen")+" PAT", "seen_pat", 1, true, 0, 1, 0),
       seenPMT(QObject::tr("Seen")+" PMT", "seen_pmt", 1, true, 0, 1, 0),
       seenMGT(QObject::tr("Seen")+" MGT", "seen_mgt", 1, true, 0, 1, 0),
@@ -65,12 +64,6 @@ QStringList DTVSignalMonitor::GetStatusList(bool kick)
     QStringList list = SignalMonitor::GetStatusList(kick);
     QMutexLocker locker(&statusLock);
 
-    // tuned?
-    if (flags & kSigMon_Tuned)
-    {
-        list<<channelTuned.GetName()<<channelTuned.GetStatus();
-    }
-
     // mpeg tables
     if (flags & kDTVSigMon_WaitForPAT)
     {
@@ -79,7 +72,7 @@ QStringList DTVSignalMonitor::GetStatusList(bool kick)
     }
     if (flags & kDTVSigMon_WaitForPMT)
     {
-#define DEBUG_PMT 1
+#define DEBUG_PMT 0
 #if DEBUG_PMT
         static int seenGood = -1;
         static int matchingGood = -1;
@@ -146,7 +139,6 @@ void DTVSignalMonitor::RemoveFlags(uint64_t _flags)
 void DTVSignalMonitor::UpdateMonitorValues(void)
 {
     QMutexLocker locker(&statusLock);
-    channelTuned.SetValue((flags & kSigMon_Tuned)      ? 3 : 1);
     seenPAT.SetValue(    (flags & kDTVSigMon_PATSeen)  ? 1 : 0);
     seenPMT.SetValue(    (flags & kDTVSigMon_PMTSeen)  ? 1 : 0);
     seenMGT.SetValue(    (flags & kDTVSigMon_MGTSeen)  ? 1 : 0);
@@ -370,7 +362,7 @@ void DTVSignalMonitor::HandlePMT(uint, const ProgramMapTable *pmt)
 
 void DTVSignalMonitor::HandleSTT(const SystemTimeTable*)
 {
-    VERBOSE(VB_CHANNEL, LOC + "Time Offset: "<<GetStreamData()->TimeOffset());
+    VERBOSE(VB_CHANNEL+VB_EXTRA, LOC + "Time Offset: "<<GetStreamData()->TimeOffset());
 }
 
 void DTVSignalMonitor::HandleMGT(const MasterGuideTable* mgt)
@@ -439,7 +431,7 @@ void DTVSignalMonitor::HandleCVCT(uint, const CableVirtualChannelTable* cvct)
 
 void DTVSignalMonitor::HandleTDT(const TimeDateTable*)
 {
-    VERBOSE(VB_CHANNEL, LOC + "Time Offset: "<<GetStreamData()->TimeOffset());
+    VERBOSE(VB_CHANNEL+VB_EXTRA, LOC + "Time Offset: "<<GetStreamData()->TimeOffset());
 }
 
 void DTVSignalMonitor::HandleNIT(const NetworkInformationTable *nit)
@@ -550,7 +542,7 @@ bool DTVSignalMonitor::WaitForLock(int timeout)
 
     MythTimer t;
     t.start();
-    while (t.elapsed()<timeout && monitor_thread.isRunning())
+    while (t.elapsed()<timeout && running)
     {
         SignalMonitorList slist =
             SignalMonitorValue::Parse(GetStatusList());

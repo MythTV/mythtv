@@ -1482,7 +1482,7 @@ bool UIListBtnType::incSearchStart(void)
     modeCombo->insertItem(tr("Contains text"));
     popup->addWidget(modeCombo);
 
-    MythLineEdit *searchEdit = new MythLineEdit(false, popup, "mode_combo");
+    MythLineEdit *searchEdit = new MythLineEdit(popup, "mode_combo");
     searchEdit->setText(m_incSearch);
     popup->addWidget(searchEdit);
     searchEdit->setFocus();

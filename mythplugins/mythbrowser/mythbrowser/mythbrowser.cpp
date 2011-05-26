@@ -7,12 +7,14 @@
 // myth
 #include "mythverbose.h"
 #include "mythcontext.h"
-#include "libmythui/mythmainwindow.h"
+#include "mythmainwindow.h"
+#include "mythuihelper.h"
 
 // mythbrowser
 #include "webpage.h"
 #include "bookmarkeditor.h"
 #include "mythbrowser.h"
+
 
 using namespace std;
 
@@ -22,7 +24,8 @@ MythBrowser::MythBrowser(MythScreenStack *parent,
       m_urlList(urlList),  m_pageList(NULL),
       m_progressBar(NULL), m_titleText(NULL),
       m_statusText(NULL),  m_currentBrowser(-1),
-      m_zoom(zoom),        m_menuPopup(NULL)
+      m_zoom(zoom),        m_menuPopup(NULL),
+      m_defaultFavIcon(NULL)
 {
 }
 
@@ -57,12 +60,24 @@ bool MythBrowser::Create(void)
     connect(m_pageList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             this, SLOT(slotTabSelected(MythUIButtonListItem*)));
 
+    // create the default favicon
+    QString favIcon = "mb_default_favicon.png";
+    GetMythUI()->FindThemeFile(favIcon);
+    if (QFile::exists(favIcon))
+    {
+        QImage image(favIcon);
+        m_defaultFavIcon = GetMythPainter()->GetFormatImage();
+        m_defaultFavIcon->Assign(image);
+        m_defaultFavIcon->UpRef();
+    }
+
     // this is the template for all other browser tabs
     WebPage *page = new WebPage(this, browser);
 
     m_browserList.append(page);
     page->getBrowser()->SetZoom(m_zoom);
     page->getBrowser()->SetDefaultSaveDirectory(m_defaultSaveDir);
+    page->getBrowser()->SetDefaultSaveFilename(m_defaultSaveFilename);
 
     page->SetActive(true);
 
@@ -98,8 +113,6 @@ MythUIWebBrowser* MythBrowser::activeBrowser(void)
 
 void MythBrowser::slotEnterURL(void)
 {
-    activeBrowser()->SetActive(false);
-
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
     QString message = tr("Enter URL");
@@ -112,26 +125,26 @@ void MythBrowser::slotEnterURL(void)
 
      connect(dialog, SIGNAL(haveResult(QString)),
             SLOT(slotOpenURL(QString)), Qt::QueuedConnection);
-
-     connect(dialog, SIGNAL(Exiting()), SLOT(slotExitingMenu()));
 }
 
 void MythBrowser::slotAddTab(const QString &url, bool doSwitch)
 {
     QString name = QString("browser%1").arg(m_browserList.size() + 1);
-    WebPage *page = new WebPage(
-        this, m_browserList[0]->getBrowser()->GetArea(),
-        name.toAscii().constData());
+    WebPage *page = new WebPage(this, m_browserList[0]->getBrowser()->GetArea(),
+                                name.toAscii().constData());
     page->getBrowser()->SetZoom(m_zoom);
 
-    if (url != "")
-    {
-        QString newUrl = url;
-        if (!url.startsWith("http://") && !url.startsWith("https://") &&
-                !url.startsWith("file:/") )
-            newUrl.prepend("http://");
-        page->getBrowser()->LoadPage(QUrl::fromEncoded(newUrl.toLocal8Bit()));
-    }
+    m_browserList.append(page);
+
+    QString newUrl = url;
+
+    if (newUrl.isEmpty())
+        newUrl = "http://www.google.com"; // TODO: add a user definable home page
+
+    if (!newUrl.startsWith("http://") && !newUrl.startsWith("https://") &&
+            !newUrl.startsWith("file:/") )
+        newUrl.prepend("http://");
+    page->getBrowser()->LoadPage(QUrl::fromEncoded(newUrl.toLocal8Bit()));
 
     page->SetActive(false);
 
@@ -139,8 +152,6 @@ void MythBrowser::slotAddTab(const QString &url, bool doSwitch)
             this, SLOT(slotLoadProgress(int)));
     connect(page, SIGNAL(statusBarMessage(const QString&)),
             this, SLOT(slotStatusBarMessage(const QString&)));
-
-    m_browserList.append(page);
 
     if (doSwitch)
         m_pageList->SetItemCurrent(m_browserList.size() -1);
@@ -175,6 +186,8 @@ void MythBrowser::switchTab(int newTab)
 
     if (m_currentBrowser >= 0 && m_currentBrowser < m_browserList.size())
         m_browserList[m_currentBrowser]->SetActive(false);
+
+    BuildFocusList();
 
     m_browserList[newTab]->SetActive(true);
 
@@ -216,8 +229,6 @@ void MythBrowser::slotForward()
 
 void MythBrowser::slotAddBookmark()
 {
-    activeBrowser()->SetActive(false);
-
     m_editBookmark.category = "";
     m_editBookmark.name = m_pageList->GetValue();
     m_editBookmark.url = activeBrowser()->GetUrl().toString();
@@ -230,8 +241,6 @@ void MythBrowser::slotAddBookmark()
 
     if (editor->Create())
         mainStack->AddScreen(editor);
-
-    connect(editor, SIGNAL(Exiting()), SLOT(slotExitingMenu()));
 }
 
 void MythBrowser::slotLoadStarted(void)
@@ -247,8 +256,6 @@ void MythBrowser::slotLoadFinished(bool OK)
 
     if (m_progressBar)
         m_progressBar->SetUsed(0);
-
-    slotIconChanged();
 }
 
 void MythBrowser::slotLoadProgress(int progress)
@@ -262,35 +269,6 @@ void MythBrowser::slotTitleChanged(const QString &title)
     MythUIButtonListItem *item = m_pageList->GetItemCurrent();
     if (item)
         item->SetText(title);
-}
-
-void MythBrowser::slotIconChanged(void)
-{
-    MythUIButtonListItem *item = m_pageList->GetItemCurrent();
-    if (!item)
-        return;
-
-    QIcon icon = activeBrowser()->GetIcon();
-
-    if (icon.isNull())
-    {
-        //FIXME use a default icon here
-        item->setImage(NULL);
-    }
-    else
-    {
-        if (item)
-        {
-            QPixmap pixmap = icon.pixmap(32, 32);
-            QImage image = pixmap.toImage();
-            image = image.scaled(
-                QSize(32,32), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-            MythImage *mimage = GetMythPainter()->GetFormatImage();
-            mimage->Assign(image);
-
-            item->setImage(mimage);
-        }
-    }
 }
 
 void MythBrowser::slotStatusBarMessage(const QString &text)
@@ -331,7 +309,6 @@ bool MythBrowser::keyPressEvent(QKeyEvent *event)
 
         if (action == "MENU")
         {
-            activeBrowser()->SetActive(false);
             slotStatusBarMessage("");
 
             QString label = tr("Actions");
@@ -344,8 +321,6 @@ bool MythBrowser::keyPressEvent(QKeyEvent *event)
                 popupStack->AddScreen(m_menuPopup);
 
             m_menuPopup->SetReturnEvent(this, "action");
-
-            connect(m_menuPopup, SIGNAL(Exiting()), SLOT(slotExitingMenu()));
 
             m_menuPopup->AddButton(tr("Enter URL"), SLOT(slotEnterURL()));
 
@@ -403,9 +378,4 @@ bool MythBrowser::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void MythBrowser::slotExitingMenu(void)
-{
-    if (GetFocusWidget() == activeBrowser())
-        activeBrowser()->SetActive(true);
-}
 

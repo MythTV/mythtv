@@ -68,6 +68,7 @@ ScanCountry::ScanCountry() : ComboBoxSetting(this)
     addSelection(QObject::tr("France"),         "fr", country == "fr");
     addSelection(QObject::tr("Germany"),        "de", country == "de");
     addSelection(QObject::tr("Greece"),         "gr", country == "gr");
+    addSelection(QObject::tr("Italy"),          "it", country == "it");
     addSelection(QObject::tr("New Zealand"),    "nz", country == "nz");
     addSelection(QObject::tr("Spain"),          "es", country == "es");
     addSelection(QObject::tr("Sweden"),         "se", country == "se");

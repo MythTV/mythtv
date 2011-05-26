@@ -236,12 +236,14 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
     av_register_all();
     av_log_set_callback(my_av_print);
 
+    pthread_mutex_init(&rx.mutex, NULL);
+    pthread_cond_init(&rx.cond, NULL);
+
     //await multiplexer initialization (prevent a deadlock race)
-    rx.mutex.lock();
-    rx.thread.SetParent(&rx);
-    rx.thread.start();
-    rx.cond.wait(&rx.mutex);
-    rx.mutex.unlock();
+    pthread_mutex_lock(&rx.mutex);
+    pthread_create(&thread, NULL, ReplexStart, this);
+    pthread_cond_wait(&rx.cond, &rx.mutex);
+    pthread_mutex_unlock(&rx.mutex);
 
     //initialize progress stats
     showprogress = showprog;
@@ -435,7 +437,7 @@ static int fill_buffers(void *r, int finish)
 
 MPEG2replex::MPEG2replex() :
     done(0),      otype(0),
-    ext_count(0)
+    ext_count(0), mplex(0)
 {
     memset(&vrbuf, 0, sizeof(vrbuf));
     memset(extrbuf, 0, sizeof(extrbuf));
@@ -465,7 +467,7 @@ MPEG2replex::~MPEG2replex()
 
 int MPEG2replex::WaitBuffers()
 {
-    mutex.lock();
+    pthread_mutex_lock( &mutex );
     while (1)
     {
         int i, ok = 1;
@@ -480,20 +482,25 @@ int MPEG2replex::WaitBuffers()
         if (ok || done)
             break;
 
-        cond.wakeAll();
-        cond.wait(&mutex);
+        pthread_cond_signal(&cond);
+        pthread_cond_wait(&cond, &mutex);
     }
-    mutex.unlock();
+    pthread_mutex_unlock(&mutex);
+
+    if (done)
+    {
+        finish_mpg(mplex);
+        pthread_exit(NULL);
+    }
 
     return 0;
 }
 
-void MPEG2ReplexThread::run(void)
+void *MPEG2fixup::ReplexStart(void *data)
 {
-    if (!m_parent)
-        return;
-
-    m_parent->Start();
+    MPEG2fixup *m2f = (MPEG2fixup *) data;
+    m2f->rx.Start();
+    return NULL;
 }
 
 void MPEG2replex::Start()
@@ -522,23 +529,23 @@ void MPEG2replex::Start()
     fd_out = open(outfile, O_WRONLY | O_CREAT | O_TRUNC | O_LARGEFILE, 0644);
 
     //await buffer fill
-    mutex.lock();
-    cond.wakeAll();
-    cond.wait(&mutex);
-    mutex.unlock();
+    pthread_mutex_lock(&mutex);
+    pthread_cond_signal(&cond);
+    pthread_cond_wait(&cond, &mutex);
+    pthread_mutex_unlock(&mutex);
+
+    mplex = &mx;
 
     init_multiplex(&mx, &seq_head, extframe, exttype, exttypcnt,
                    video_delay, audio_delay, fd_out, fill_buffers,
                    &vrbuf, &index_vrbuf, extrbuf, index_extrbuf, otype);
     setup_multiplex(&mx);
 
-    while (!done)
+    while (1)
     {
         check_times( &mx, &video_ok, ext_ok, &start);
         write_out_packs( &mx, video_ok, ext_ok);
     }
-
-    finish_mpg(&mx);
 }
 
 #define INDEX_BUF (sizeof(index_unit) * 200)
@@ -561,7 +568,10 @@ void MPEG2fixup::InitReplex()
             it != aFrame.end(); it++)
     {
         int i = aud_map[it.key()];
-        char *lang = inputFC->streams[it.key()]->language;
+        AVMetadataTag *metatag =
+            av_metadata_get(inputFC->streams[it.key()]->metadata,
+                            "language", NULL, 0);
+        char *lang = metatag ? metatag->value : NULL;
         ring_init(&rx.extrbuf[i], memsize / 5);
         ring_init(&rx.index_extrbuf[i], INDEX_BUF);
         rx.extframe[i].set = 1;
@@ -645,7 +655,7 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
     iu.active = 1;
     iu.length = f->pkt.size;
     iu.pts = f->pkt.pts * 300;
-    rx.mutex.lock();
+    pthread_mutex_lock( &rx.mutex );
 
     FrameInfo(f);
     while (ring_free(rb) < (unsigned int)f->pkt.size ||
@@ -674,7 +684,7 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
         }
         if (! ok)
         {
-            rx.mutex.unlock();
+            pthread_mutex_unlock( &rx.mutex );
             //deadlock
             VERBOSE(MPF_IMPORTANT,
                     "Deadlock detected.  One buffer is full when\n"
@@ -682,25 +692,25 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
             return 1;
         }
 
-        rx.cond.wakeAll();
-        rx.cond.wait(&rx.mutex);
+        pthread_cond_signal(&rx.cond);
+        pthread_cond_wait(&rx.cond, &rx.mutex);
 
         FrameInfo(f);
     }
 
     if (ring_write(rb, f->pkt.data, f->pkt.size)<0){
-        rx.mutex.unlock();
+        pthread_mutex_unlock( &rx.mutex );
         VERBOSE(MPF_IMPORTANT,
                 QString("Ring buffer overflow %1\n").arg(rb->size));
         return 1;
     }
     if (ring_write(rbi, (uint8_t *)&iu, sizeof(index_unit))<0){
-        rx.mutex.unlock();
+        pthread_mutex_unlock( &rx.mutex );
         VERBOSE(MPF_IMPORTANT,
                 QString("Ring buffer overflow %1\n").arg(rbi->size));
         return 1;
     }
-    rx.mutex.unlock();
+    pthread_mutex_unlock(&rx.mutex);
     last_written_pos = f->pkt.pos;
     return 0;
 }
@@ -747,7 +757,7 @@ int MPEG2fixup::InitAV(const char *inputfile, const char *type, int64_t offset)
 
     // Dump stream information
     if (SHOW_MSG(MPF_GENERAL))
-        dump_format(inputFC, 0, inputfile, 0);
+        av_dump_format(inputFC, 0, inputfile, 0);
 
     for (unsigned int i = 0; i < inputFC->nb_streams; i++)
     {
@@ -958,7 +968,7 @@ void MPEG2fixup::WriteFrame(const char *filename, MPEG2frame *f)
     WriteFrame(filename, &tmpFrame->pkt);
     framePool.enqueue(tmpFrame);
 }
-
+   
 void MPEG2fixup::WriteFrame(const char *filename, AVPacket *pkt)
 {
 
@@ -2420,10 +2430,10 @@ int MPEG2fixup::Start()
     }
 
     rx.done = 1;
-    rx.mutex.lock();
-    rx.cond.wakeAll();
-    rx.mutex.unlock();
-    rx.thread.wait();
+    pthread_mutex_lock( &rx.mutex );
+    pthread_cond_signal(&rx.cond);
+    pthread_mutex_unlock( &rx.mutex );
+    pthread_join(thread, NULL);
 
     av_close_input_file(inputFC);
     inputFC = NULL;

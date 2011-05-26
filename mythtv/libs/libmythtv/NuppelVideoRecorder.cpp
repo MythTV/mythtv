@@ -24,17 +24,18 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythverbose.h"
 #include "NuppelVideoRecorder.h"
-#include "vbitext/cc.h"
 #include "channelbase.h"
 #include "filtermanager.h"
 #include "recordingprofile.h"
 #include "tv_rec.h"
 #include "tv_play.h"
 #include "audioinput.h"
+#include "vbitext/cc.h"
+#include "vbitext/vbi.h"
 
 #if HAVE_BIGENDIAN
 extern "C" {
-#include "bswap.h"
+#include "byteswap.h"
 }
 #endif
 
@@ -42,22 +43,20 @@ extern "C" {
 #include "libswscale/swscale.h"
 }
 
-#ifdef USING_V4L
-#include <linux/videodev.h>
+#ifdef USING_V4L2
 #include <linux/videodev2.h>
 
 #include "go7007_myth.h"
+
+#ifdef USING_V4L1
+#include <linux/videodev.h>
+#endif // USING_V4L1
 
 #ifndef MJPIOC_S_PARAMS
 #include "videodev_mjpeg.h"
 #endif
 
-extern "C" {
-#include "vbitext/vbi.h"
-}
-#else  // USING_V4l
-#define VT_WIDTH 0
-#endif // USING_V4l
+#endif // USING_V4L2
 
 #define KEYFRAMEDIST   30
 
@@ -69,8 +68,19 @@ extern "C" {
 #define LOC QString("NVR(%1): ").arg(videodevice)
 #define LOC_ERR QString("NVR(%1) Error: ").arg(videodevice)
 
-NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel)
-    : RecorderBase(rec), audio_device(NULL)
+void NVRWriteThread::run(void)
+{
+    m_parent->doWriteThread();
+}
+
+void NVRAudioThread::run(void)
+{
+    m_parent->doAudioThread();
+}
+
+NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
+    V4LRecorder(rec), audio_device(NULL),
+    write_thread(NULL), audio_thread(NULL)
 {
     channelObj = channel;
 
@@ -336,7 +346,7 @@ void NuppelVideoRecorder::SetOption(const QString &opt, int value)
     else if (opt == "volume")
         volume = value;
     else
-        RecorderBase::SetOption(opt, value);
+        V4LRecorder::SetOption(opt, value);
 }
 
 void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
@@ -441,6 +451,7 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 
 void NuppelVideoRecorder::Pause(bool clear)
 {
+    QMutexLocker locker(&pauseLock);
     cleartimeonpause = clear;
     writepaused = audiopaused = mainpaused = false;
     request_pause = true;
@@ -450,15 +461,14 @@ void NuppelVideoRecorder::Pause(bool clear)
     unpauseWait.wakeAll();
 }
 
-void NuppelVideoRecorder::Unpause(void)
+bool NuppelVideoRecorder::IsPaused(bool holding_lock) const
 {
-    request_pause = false;
-    unpauseWait.wakeAll();
-}
-
-bool NuppelVideoRecorder::IsPaused(void) const
-{
-    return (audiopaused && mainpaused && writepaused);
+    if (!holding_lock)
+        pauseLock.lock();
+    bool ret = audiopaused && mainpaused && writepaused;
+    if (!holding_lock)
+        pauseLock.unlock();
+    return ret;
 }
 
 void NuppelVideoRecorder::SetVideoFilters(QString &filters)
@@ -592,16 +602,9 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
     mpa_vidctx->prediction_method = FF_PRED_LEFT;
     if (videocodec.toLower() == "huffyuv" || videocodec.toLower() == "mjpeg")
         mpa_vidctx->strict_std_compliance = FF_COMPLIANCE_INOFFICIAL;
+    mpa_vidctx->thread_count = encoding_thread_count;
 
     QMutexLocker locker(avcodeclock);
-
-#ifdef USING_FFMPEG_THREADS
-    if ((encoding_thread_count > 1) &&
-        avcodec_thread_init(mpa_vidctx, encoding_thread_count))
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "FFMPEG couldn't start threading...");
-    }
-#endif
 
     if (avcodec_open(mpa_vidctx, mpa_vidcodec) < 0)
     {
@@ -829,7 +832,7 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
  */
 bool NuppelVideoRecorder::MJPEGInit(void)
 {
-#ifdef USING_V4L
+#ifdef USING_V4L1
     bool we_opened_fd = false;
     int init_fd = fd;
     if (init_fd < 0)
@@ -871,7 +874,7 @@ bool NuppelVideoRecorder::MJPEGInit(void)
             hmjpg_maxw = 640;
         return true;
     }
-#endif // USING_V4L
+#endif // USING_V4L1
 
     VERBOSE(VB_IMPORTANT, LOC_ERR + "MJPEG not supported by device");
     return false;
@@ -983,6 +986,7 @@ void NuppelVideoRecorder::ResizeVideoBuffers(void)
 void NuppelVideoRecorder::StopRecording(void)
 {
     encoding = false;
+    V4LRecorder::StopRecording();
 }
 
 void NuppelVideoRecorder::StreamAllocate(void)
@@ -1019,7 +1023,7 @@ bool NuppelVideoRecorder::Open(void)
 
 void NuppelVideoRecorder::ProbeV4L2(void)
 {
-#ifdef USING_V4L
+#ifdef USING_V4L2
     usingv4l2 = true;
 
     struct v4l2_capability vcap;
@@ -1049,7 +1053,7 @@ void NuppelVideoRecorder::ProbeV4L2(void)
     QString driver = (char *)vcap.driver;
     if (driver == "go7007")
         go7007 = true;
-#endif // USING_V4L
+#endif // USING_V4L2
 }
 
 void NuppelVideoRecorder::StartRecording(void)
@@ -1131,11 +1135,11 @@ void NuppelVideoRecorder::StartRecording(void)
         return;
     }
     else
-        DoV4L();
+        DoV4L1();
 }
 
-#ifdef USING_V4L
-void NuppelVideoRecorder::DoV4L(void)
+#ifdef USING_V4L1
+void NuppelVideoRecorder::DoV4L1(void)
 {
     struct video_capability vc;
     struct video_mmap mm;
@@ -1251,26 +1255,31 @@ void NuppelVideoRecorder::DoV4L(void)
 
     int syncerrors = 0;
 
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
-
     while (encoding)
     {
-        if (request_pause)
         {
-           mainpaused = true;
-           pauseWait.wakeAll();
-           if (IsPaused() && tvrec)
-               tvrec->RecorderPaused();
-
-           unpauseWait.wait(&mutex, 100);
-           if (cleartimeonpause)
-               gettimeofday(&stm, &tzone);
-           continue;
+            QMutexLocker locker(&pauseLock);
+            if (request_pause)
+            {
+                if (!mainpaused)
+                {
+                    mainpaused = true;
+                    pauseWait.wakeAll();
+                    if (IsPaused(true) && tvrec)
+                        tvrec->RecorderPaused();
+                }
+                unpauseWait.wait(&pauseLock, 100);
+                if (cleartimeonpause)
+                    gettimeofday(&stm, &tzone);
+                continue;
+            }
+            
+            if (!request_pause && mainpaused)
+            {
+                mainpaused = false;
+                unpauseWait.wakeAll();
+            }
         }
-        mainpaused = false;
 
         frame = 0;
         mm.frame = 0;
@@ -1320,7 +1329,11 @@ void NuppelVideoRecorder::DoV4L(void)
     recording = false;
     close(fd);
 }
+#else // if !USING_V4L1
+void NuppelVideoRecorder::DoV4L1(void) {}
+#endif // !USING_V4L1
 
+#ifdef USING_V4L2
 bool NuppelVideoRecorder::SetFormatV4L2(void)
 {
     struct v4l2_format     vfmt;
@@ -1397,7 +1410,11 @@ bool NuppelVideoRecorder::SetFormatV4L2(void)
 
     return true;
 }
+#else // if !USING_V4L2
+bool NuppelVideoRecorder::SetFormatV4L2(void) { return false; }
+#endif // !USING_V4L2
 
+#ifdef USING_V4L2
 #define MAX_VIDEO_BUFFERS 5
 void NuppelVideoRecorder::DoV4L2(void)
 {
@@ -1585,26 +1602,31 @@ void NuppelVideoRecorder::DoV4L2(void)
         avpicture_fill(&img_out, output_buffer, PIX_FMT_YUV420P, width, height);
     }
 
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
-
     while (encoding) {
 again:
-        if (request_pause)
         {
-            mainpaused = true;
-            pauseWait.wakeAll();
-            if (IsPaused() && tvrec)
-                tvrec->RecorderPaused();
-
-            unpauseWait.wait(&mutex, 100);
-            if (cleartimeonpause)
-                gettimeofday(&stm, &tzone);
-            continue;
+            QMutexLocker locker(&pauseLock);
+            if (request_pause)
+            {
+                if (!mainpaused)
+                {
+                    mainpaused = true;
+                    pauseWait.wakeAll();
+                    if (IsPaused(true) && tvrec)
+                        tvrec->RecorderPaused();
+                }
+                unpauseWait.wait(&pauseLock, 100);
+                if (cleartimeonpause)
+                    gettimeofday(&stm, &tzone);
+                continue;
+            }
+            
+            if (!request_pause && mainpaused)
+            {
+                mainpaused = false;
+                unpauseWait.wakeAll();
+            }
         }
-        mainpaused = false;
 
         if (resetcapture)
         {
@@ -1719,7 +1741,11 @@ again:
     close(fd);
     close(channelfd);
 }
+#else // if !USING_V4L2
+void NuppelVideoRecorder::DoV4L2(void) {}
+#endif // !USING_V4L2
 
+#ifdef USING_V4L1
 void NuppelVideoRecorder::DoMJPEG(void)
 {
     struct mjpeg_params bparm;
@@ -1816,26 +1842,31 @@ void NuppelVideoRecorder::DoMJPEG(void)
     encoding = true;
     recording = true;
 
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
-
     while (encoding)
     {
-        if (request_pause)
         {
-           mainpaused = true;
-           pauseWait.wakeAll();
-           if (IsPaused() && tvrec)
-               tvrec->RecorderPaused();
-
-           unpauseWait.wait(&mutex, 100);
-           if (cleartimeonpause)
-               gettimeofday(&stm, &tzone);
-           continue;
+            QMutexLocker locker(&pauseLock);
+            if (request_pause)
+            {
+                if (!mainpaused)
+                {
+                    mainpaused = true;
+                    pauseWait.wakeAll();
+                    if (IsPaused(true) && tvrec)
+                        tvrec->RecorderPaused();
+                }
+                unpauseWait.wait(&pauseLock, 100);
+                if (cleartimeonpause)
+                    gettimeofday(&stm, &tzone);
+                continue;
+            }
+            
+            if (!request_pause && mainpaused)
+            {
+                mainpaused = false;
+                unpauseWait.wakeAll();
+            }
         }
-        mainpaused = false;
 
         if (ioctl(fd, MJPIOC_SYNC, &bsync) < 0)
             encoding = false;
@@ -1855,44 +1886,22 @@ void NuppelVideoRecorder::DoMJPEG(void)
     recording = false;
     close(fd);
 }
-
-#else  // USING_V4L
-void NuppelVideoRecorder::DoV4L(void)         {}
-bool NuppelVideoRecorder::SetFormatV4L2(void) { return false; }
-void NuppelVideoRecorder::DoV4L2(void)        {}
-void NuppelVideoRecorder::DoMJPEG(void)       {}
-#endif // USING_V4L
+#else // if !USING_V4L1
+void NuppelVideoRecorder::DoMJPEG(void) {}
+#endif // !USING_V4L1
 
 bool NuppelVideoRecorder::SpawnChildren(void)
 {
     childrenLive = true;
 
-    WriteThread.SetParent(this);
-    WriteThread.start();
-    if (!WriteThread.isRunning())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't spawn writer thread, exiting");
-        return false;
-    }
+    write_thread = new NVRWriteThread(this);
+    write_thread->start();
 
-    AudioThread.SetParent(this);
-    AudioThread.start();
-    if (!AudioThread.isRunning())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't spawn audio thread, exiting");
-        return false;
-    }
+    audio_thread = new NVRAudioThread(this);
+    audio_thread->start();
 
-    if (vbimode)
-    {
-        VbiThread.SetParent(this);
-        VbiThread.start();
-        if (!VbiThread.isRunning())
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't spawn vbi thread, exiting");
-            return false;
-        }
-    }
+    if ((vbimode != VBIMode::None) && (OpenVBIDevice() >= 0))
+        vbi_thread = new VBIThread(this);
 
     return true;
 }
@@ -1900,15 +1909,31 @@ bool NuppelVideoRecorder::SpawnChildren(void)
 void NuppelVideoRecorder::KillChildren(void)
 {
     childrenLive = false;
+    {
+        QMutexLocker locker(&pauseLock);
+        unpauseWait.wakeAll();
+    }
 
-    WriteThread.wait();
-    AudioThread.wait();
-    if (vbimode)
-        VbiThread.wait();        
-#ifdef USING_FFMPEG_THREADS
-    if (useavcodec && encoding_thread_count > 1)
-        avcodec_thread_free(mpa_vidctx);
-#endif
+    if (write_thread)
+    {
+        write_thread->wait();
+        delete write_thread;
+        write_thread = NULL;
+    }
+
+    if (audio_thread)
+    {
+        audio_thread->wait();
+        delete audio_thread;
+        audio_thread = NULL;
+    }
+
+    if (vbi_thread)
+    {
+        vbi_thread->wait();
+        delete vbi_thread;
+        vbi_thread = NULL;
+    }
 }
 
 void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len, bool forcekey)
@@ -2325,30 +2350,6 @@ void NuppelVideoRecorder::Reset(void)
         curRecording->ClearPositionMap(MARK_KEYFRAME);
 }
 
-void NVRWriteThread::run(void)
-{
-    if (!m_parent)
-        return;
-
-    m_parent->doWriteThread();
-}
-
-void NVRAudioThread::run(void)
-{
-    if (!m_parent)
-        return;
-
-    m_parent->doAudioThread();
-}
-
-void NVRVbiThread::run(void)
-{
-    if (!m_parent)
-        return;
-
-    m_parent->doVbiThread();
-}
-
 void NuppelVideoRecorder::doAudioThread(void)
 {
     if (!audio_device)
@@ -2376,26 +2377,30 @@ void NuppelVideoRecorder::doAudioThread(void)
     unsigned char *buffer = new unsigned char[audio_buffer_size];
     int act = 0, lastread = 0;
     audio_bytes_per_sample = audio_channels * audio_bits / 8;
-    audiopaused = false;
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
 
     while (childrenLive)
     {
-        if (request_pause)
         {
-            audiopaused = true;
-            pauseWait.wakeAll();
-            if (IsPaused() && tvrec)
-                tvrec->RecorderPaused();
-
-            unpauseWait.wait(&mutex, 100);
-            act = act_audio_buffer;
-            continue;
+            QMutexLocker locker(&pauseLock);
+            if (request_pause)
+            {
+                if (!audiopaused)
+                {
+                    audiopaused = true;
+                    pauseWait.wakeAll();
+                    if (IsPaused(true) && tvrec)
+                        tvrec->RecorderPaused();
+                }
+                unpauseWait.wait(&pauseLock, 100);
+                continue;
+            }
+            
+            if (!request_pause && audiopaused)
+            {
+                audiopaused = false;
+                unpauseWait.wakeAll();
+            }
         }
-        audiopaused = false;
 
         lastread = audio_device->GetSamples(buffer, audio_buffer_size);
         if (audio_buffer_size != lastread)
@@ -2452,15 +2457,8 @@ void NuppelVideoRecorder::doAudioThread(void)
         audio_device->Close();
 }
 
-#ifdef USING_V4L
-struct VBIData
-{
-    NuppelVideoRecorder *nvr;
-    vt_page teletextpage;
-    bool foundteletextpage;
-};
-
-void NuppelVideoRecorder::FormatTeletextSubtitles(struct VBIData *vbidata)
+#ifdef USING_V4L2
+void NuppelVideoRecorder::FormatTT(struct VBIData *vbidata)
 {
     struct timeval tnow;
     gettimeofday(&tnow, &tzone);
@@ -2626,9 +2624,9 @@ void NuppelVideoRecorder::FormatTeletextSubtitles(struct VBIData *vbidata)
         act_text_buffer = 0;
     textbuffer[act]->freeToEncode = 1;
 }
-#else  // USING_V4L
-void NuppelVideoRecorder::FormatTeletextSubtitles(struct VBIData *vbidata) {}
-#endif // USING_V4L
+#else  // USING_V4L2
+void NuppelVideoRecorder::FormatTT(struct VBIData*) {}
+#endif // USING_V4L2
 
 void NuppelVideoRecorder::FormatCC(struct cc *cc)
 {
@@ -2665,221 +2663,31 @@ void NuppelVideoRecorder::AddTextData(unsigned char *buf, int len,
     textbuffer[act]->freeToEncode = 1;
 }
 
-#ifdef USING_V4L
-static void vbi_event(struct VBIData *data, struct vt_event *ev)
-{
-    switch (ev->type)
-    {
-       case EV_PAGE:
-       {
-            struct vt_page *vtp = (struct vt_page *) ev->p1;
-            if (vtp->flags & PG_SUBTITLE)
-            {
-                //printf("subtitle page %x.%x\n", vtp->pgno, vtp->subno);
-                data->foundteletextpage = true;
-                memcpy(&(data->teletextpage), vtp, sizeof(vt_page));
-            }
-       }
-
-       case EV_HEADER:
-       case EV_XPACKET:
-           break;
-    }
-}
-
-/*
-These are the default values for various VBI drivers
-// bttv
-vbi_format  rate: 28636363
-samples_per_line: 2048
-          starts: 10, 273
-          counts: 16, 16
-           flags: 0x0
-// cx88
-vbi_format  rate: 28636363
-samples_per_line: 2048
-          starts: 9, 272
-          counts: 17, 17
-           flags: 0x0
-*/
-
-void NuppelVideoRecorder::doVbiThread(void)
-{
-    //VERBOSE(VB_IMPORTANT, LOC + "vbi begin");
-    struct VBIData vbicallbackdata;
-    struct vbi *pal_tt = NULL;
-    struct cc *ntsc_cc = NULL;
-    int vbifd = -1;
-    char *ptr = NULL;
-    char *ptr_end = NULL;
-
-    QByteArray vbidev = vbidevice.toAscii();
-    if (VBIMode::PAL_TT == vbimode)
-    {
-        pal_tt = vbi_open(vbidev.constData(), NULL, 99, -1);
-        if (pal_tt)
-        {
-            vbifd = pal_tt->fd;
-            vbicallbackdata.nvr = this;
-            vbi_add_handler(pal_tt, (void*) vbi_event, &vbicallbackdata);
-        }
-    }
-    else if (VBIMode::NTSC_CC == vbimode)
-    {
-        ntsc_cc = new struct cc;
-        memset(ntsc_cc, 0, sizeof(struct cc));
-        ntsc_cc->fd = open(vbidev.constData(), O_RDONLY|O_NONBLOCK);
-        ntsc_cc->code1 = -1;
-        ntsc_cc->code2 = -1;
-
-        vbifd   = ntsc_cc->fd;
-        ptr     = ntsc_cc->buffer;
-
-        if (vbifd < 0)
-            delete ntsc_cc;
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid CC/Teletext mode");
-        return;
-    }
-
-    if (vbifd < 0)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Can't open vbi device: '%1'").arg(vbidevice));
-        return;
-    }
-
-    if (VBIMode::NTSC_CC == vbimode)
-    {
-        // V4L v1 VBI ioctls
-        struct vbi_format vfmt;
-        memset(&vfmt, 0, sizeof(vbi_format));
-        if (ioctl(vbifd, VIDIOCGVBIFMT, &vfmt) < 0)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Failed to query vbi capabilities (v4l1)");
-            cc_close(ntsc_cc);
-            return;
-        }
-        VERBOSE(VB_RECORD, LOC + "vbi_format  rate: "<<vfmt.sampling_rate
-                <<"\n\t\t\tsamples_per_line: "<<vfmt.samples_per_line
-                <<"\n\t\t\t          starts: "
-                <<vfmt.start[0]<<", "<<vfmt.start[1]
-                <<"\n\t\t\t          counts: "
-                <<vfmt.count[0]<<", "<<vfmt.count[1]
-                <<"\n\t\t\t           flags: "
-                <<QString("0x%1").arg(vfmt.flags));
-        uint sz = vfmt.samples_per_line * (vfmt.count[0] + vfmt.count[1]);
-        ntsc_cc->samples_per_line = vfmt.samples_per_line;
-        ntsc_cc->start_line       = vfmt.start[0];
-        ntsc_cc->line_count       = vfmt.count[0];
-        ntsc_cc->scale0           = (vfmt.sampling_rate + 503488 / 2) / 503488;
-        ntsc_cc->scale1           = (ntsc_cc->scale0 * 2 + 3) / 5; /* 40% */
-        ptr_end = ntsc_cc->buffer + sz;
-        if (sz > CC_VBIBUFSIZE)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "VBI format has too many samples per frame");
-            cc_close(ntsc_cc);
-            return;
-        }
-    }
-
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
-
-    while (childrenLive)
-    {
-        if (request_pause)
-        {
-            unpauseWait.wait(&mutex, 100);
-            continue;
-        }
-
-        struct timeval tv;
-        fd_set rdset;
-
-        tv.tv_sec = 0;
-        tv.tv_usec = 5000;
-        FD_ZERO(&rdset);
-        FD_SET(vbifd, &rdset);
-
-        int nr = select(vbifd + 1, &rdset, 0, 0, &tv);
-        if (nr < 0)
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "vbi select failed" + ENO);
-
-        if (nr <= 0)
-            continue; // either failed or timed out..
-
-        if (VBIMode::PAL_TT == vbimode)
-        {
-            vbicallbackdata.foundteletextpage = false;
-            vbi_handler(pal_tt, pal_tt->fd);
-            if (vbicallbackdata.foundteletextpage)
-            {
-                // decode VBI as teletext subtitles
-                FormatTeletextSubtitles(&vbicallbackdata);
-            }
-        }
-        else if (VBIMode::NTSC_CC == vbimode)
-        {
-            int ret = read(vbifd, ptr, ptr_end - ptr);
-            ptr = (ret > 0) ? ptr + ret : ptr;
-            if ((ptr_end - ptr) == 0)
-            {
-                cc_decode(ntsc_cc);
-                FormatCC(ntsc_cc);
-                ptr = ntsc_cc->buffer;
-            }
-            else if (ret < 0)
-            {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Reading VBI data" + ENO);
-            }
-        }
-    }
-    //VERBOSE(VB_RECORD, LOC + "vbi shutdown");
-
-    if (pal_tt)
-    {
-        vbi_del_handler(pal_tt, (void*) vbi_event, &vbicallbackdata);
-        vbi_close(pal_tt);
-    }
-
-    if (ntsc_cc)
-        cc_close(ntsc_cc);
-
-    //VERBOSE(VB_RECORD, LOC + "vbi end");
-}
-
-#else  // USING_V4L
-void NuppelVideoRecorder::doVbiThread(void) { }
-#endif // USING_V4L
-
 void NuppelVideoRecorder::doWriteThread(void)
 {
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
-
-    writepaused = false;
     while (childrenLive && !IsErrored())
     {
-        if (request_pause)
         {
-            writepaused = true;
-            pauseWait.wakeAll();
-            if (IsPaused() && tvrec)
-                tvrec->RecorderPaused();
-
-            unpauseWait.wait(&mutex, 100);
-            continue;
+            QMutexLocker locker(&pauseLock);
+            if (request_pause)
+            {
+                if (!writepaused)
+                {
+                    writepaused = true;
+                    pauseWait.wakeAll();
+                    if (IsPaused(true) && tvrec)
+                        tvrec->RecorderPaused();
+                }
+                unpauseWait.wait(&pauseLock, 100);
+                continue;
+            }
+            
+            if (!request_pause && writepaused)
+            {
+                writepaused = false;
+                unpauseWait.wakeAll();
+            }
         }
-        writepaused = false;
 
         CheckForRingBufferSwitch();
 
@@ -3151,16 +2959,6 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         if (freecount < 5)
             raw = 1; // speed up the encode process
 
-        if (raw == 1 || compressthis == 0)
-        {
-            if (ringBuffer->IsIOBound())
-            {
-                /* need to compress, the disk can't handle any more bandwidth*/
-                raw=0;
-                compressthis=1;
-            }
-        }
-
         if (transcoding)
         {
             raw = 0;
@@ -3407,18 +3205,25 @@ void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, int timecode,
     frameheader.frametype = 'T'; // text frame
     frameheader.timecode = timecode;
 
-    if (vbimode == 1)
+    if (VBIMode::PAL_TT == vbimode)
     {
         frameheader.comptype = 'T'; // european teletext
-        frameheader.packetlength = sizeof(int) + len;
-
+        frameheader.packetlength = len + 4;
         WriteFrameheader(&frameheader);
-        ringBuffer->Write(&pagenr, sizeof(int));
+        union page_t {
+            int32_t val32;
+            struct { int8_t a,b,c,d; } val8;
+        } v;
+        v.val32 = pagenr;
+        ringBuffer->Write(&v.val8.d, sizeof(int8_t));
+        ringBuffer->Write(&v.val8.c, sizeof(int8_t));
+        ringBuffer->Write(&v.val8.b, sizeof(int8_t));
+        ringBuffer->Write(&v.val8.a, sizeof(int8_t));
         ringBuffer->Write(buf, len);
     }
-    else if (vbimode == 2)
+    else if (VBIMode::NTSC_CC == vbimode)
     {
-        frameheader.comptype = 'C';      // NTSC CC
+        frameheader.comptype = 'C'; // NTSC CC
         frameheader.packetlength = len;
 
         WriteFrameheader(&frameheader);

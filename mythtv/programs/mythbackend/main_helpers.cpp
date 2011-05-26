@@ -51,6 +51,7 @@
 #include "mythsystemevent.h"
 #include "main_helpers.h"
 #include "backendcontext.h"
+#include "mythtranslation.h"
 
 #include "mediaserver.h"
 #include "httpstatus.h"
@@ -251,6 +252,12 @@ bool setup_context(const MythCommandLineParser &cmdline)
 
 void cleanup(void)
 {
+    signal(SIGTERM, SIG_DFL);
+    signal(SIGHUP,  SIG_DFL);
+#ifndef _MSC_VER
+    signal(SIGUSR1, SIG_DFL);
+#endif
+
     delete sched;
     sched = NULL;
 
@@ -265,12 +272,6 @@ void cleanup(void)
         unlink(pidfile.toAscii().constData());
         pidfile.clear();
     }
-
-    signal(SIGHUP, SIG_DFL);
-
-#ifndef _MSC_VER
-    signal(SIGUSR1, SIG_DFL);
-#endif
 }
 
 int log_rotate(int report_error)
@@ -671,6 +672,8 @@ int run_backend(const MythCommandLineParser &cmdline)
         VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema");
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
+
+    MythTranslation::load("mythfrontend");
 
     if (!ismaster)
     {

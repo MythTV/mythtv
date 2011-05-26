@@ -1,6 +1,10 @@
 #ifndef CC_H
 #define CC_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define CC_VBIBUFSIZE 65536*2
 
 //cc is 32 columns per row, this allows for extra characters
@@ -19,12 +23,14 @@ struct cc
     int scale0, scale1;
 };
 
-int cc_decode(unsigned char *vbiline);
 void cc_decode(struct cc *cc);
 
 struct cc *cc_open(const char *vbi_name);
 void cc_close(struct cc *cc);
 void cc_handler(struct cc *cc);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif

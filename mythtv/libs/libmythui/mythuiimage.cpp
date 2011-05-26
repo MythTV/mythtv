@@ -342,9 +342,11 @@ void MythUIImage::SetDelays(QVector<int> delays)
  */
 void MythUIImage::SetImage(MythImage *img)
 {
-    QWriteLocker updateLocker(&d->m_UpdateLock);
+    d->m_UpdateLock.lockForWrite();
+
     if (!img)
     {
+        d->m_UpdateLock.unlock();
         Reset();
         return;
     }
@@ -379,6 +381,8 @@ void MythUIImage::SetImage(MythImage *img)
 
     m_CurPos = 0;
     SetRedraw();
+
+    d->m_UpdateLock.unlock();
 }
 
 /**

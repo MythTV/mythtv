@@ -219,7 +219,10 @@ QStringList StorageGroup::GetDirFileList(QString dir, QString base,
     {
         VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("GetDirFileList: File: %1%2")
                                                 .arg(base).arg(*p));
-        files.append(*p);
+        if (recursive)
+            files.append(base + *p);
+        else
+            files.append(*p);
     }
 
     return files;
@@ -803,9 +806,10 @@ QStringList StorageGroup::getGroupDirs(QString groupname, QString host)
              * value using QString::fromUtf8() to prevent corruption. */
             dirname = QString::fromUtf8(query.value(0)
                                         .toByteArray().constData());
-            groups += QString("myth://%1@%2%3").arg(groupname)
-                                       .arg(query.value(1).toString())
-                                       .arg(dirname);
+            groups += gCoreContext->GenMythURL(query.value(1).toString(),
+                                               0,
+                                               dirname,
+                                               groupname);
         }
     }
 

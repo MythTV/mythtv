@@ -65,6 +65,8 @@ class UPNP_PUBLIC JSONSerializer : public Serializer
         void RenderList      ( const QVariantList &list );
         void RenderMap       ( const QVariantMap  &map  );
 
+        QString Encode       ( const QString &sIn );
+
     public:
 
                  JSONSerializer( QIODevice *pDevice, const QString &sRequestName );

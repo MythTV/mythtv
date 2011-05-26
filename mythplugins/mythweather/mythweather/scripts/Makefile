@@ -18,5 +18,5 @@ install:	${install_SUBDIRS}
 uninstall:	${uninstall_SUBDIRS}
 
 ${install_SUBDIRS} ${uninstall_SUBDIRS}:	
-	make -C ${@F} ${@D} INSTDIR=${INSTDIR}/${@F}
+	${MAKE} -C ${@F} ${@D} INSTDIR=${INSTDIR}/${@F}
 

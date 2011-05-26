@@ -110,11 +110,35 @@
 
     #fileBrowser
     {
+        position: absolute;
+        top: 10px;
+        left: 10px;
         width: 310px;
         height: 400px;
         border:2px #555555;
         color:#FFF;
         background-color:#2D2D2D;
         overflow: scroll;
+        float: left;
+    }
+
+    #iconBrowser
+    {
+        overflow: auto;
+    }
+
+    td.iconGridCell
+    {
+        height: 200px;
+        width: 200px;
+        text-align:         center;
+        vertical-align:     middle;
+    }
+
+    img.iconGridIcon
+    {
+        background: url(/images/checkerboard_100x100.png);
+        background-repeat: repeat; 
+        border: 0;
     }
 

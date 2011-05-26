@@ -511,6 +511,7 @@ static void TVMenuCallback(void *data, QString &selection)
     {
         GetMythUI()->AddCurrentLocation("Setup");
         gCoreContext->ActivateSettingsCache(false);
+        GetMythMainWindow()->HidePainterWindow();
     }
 
     if (sel == "tv_watch_live")
@@ -707,6 +708,7 @@ static void TVMenuCallback(void *data, QString &selection)
         if (sel == "settings general" ||
             sel == "settings generalrecpriorities")
             ScheduledRecording::signalChange(0);
+        GetMythMainWindow()->ShowPainterWindow();
     }
 }
 
@@ -802,26 +804,29 @@ static int internal_play_media(const QString &mrl, const QString &plot,
 
     if (pginfo->IsVideoDVD())
     {
-        RingBuffer *tmprbuf = RingBuffer::Create(pginfo->GetPathname(), false);
-
-        if (!tmprbuf)
+        DVDInfo *dvd = new DVDInfo(pginfo->GetPlaybackURL());
+        if (dvd && dvd->IsValid())
         {
+            QString name;
+            QString serialid;
+            if (dvd->GetNameAndSerialNum(name, serialid))
+            {
+                QStringList fields = pginfo->QueryDVDBookmark(serialid);
+                if (!fields.empty())
+                {
+                    QStringList::Iterator it = fields.begin();
+                    pos = (int64_t)((*++it).toLongLong() & 0xffffffffLL);
+                }
+            }
+        }
+        else
+        {
+            if (dvd)
+                delete dvd;
             delete pginfo;
             return res;
         }
-        QString name;
-        QString serialid;
-        if (tmprbuf->IsDVD() &&
-            tmprbuf->DVD()->GetNameAndSerialNum(name, serialid))
-        {
-            QStringList fields = pginfo->QueryDVDBookmark(serialid);
-            if (!fields.empty())
-            {
-                QStringList::Iterator it = fields.begin();
-                pos = (int64_t)((*++it).toLongLong() & 0xffffffffLL);
-            }
-        }
-        delete tmprbuf;
+        delete dvd;
     }
     else if (pginfo->IsVideo())
         pos = pginfo->QueryBookmark();
@@ -1419,6 +1424,8 @@ int main(int argc, char **argv)
 
     CleanupMyOldInUsePrograms();
 
+    setHttpProxy();
+
     pmanager = new MythPluginManager();
     gContext->SetPluginManager(pmanager);
 
@@ -1447,7 +1454,7 @@ int main(int argc, char **argv)
     {
         int networkPort = gCoreContext->GetNumSetting("NetworkControlPort", 6545);
         networkControl = new NetworkControl();
-        if (!networkControl->listen(QHostAddress::Any,networkPort))
+        if (!networkControl->listen(QHostAddress(gCoreContext->MythHostAddressAny()),networkPort))
             VERBOSE(VB_IMPORTANT,
                     QString("NetworkControl failed to bind to port %1.")
                     .arg(networkPort));

@@ -55,7 +55,7 @@ class VideoOutputVDPAU : public VideoOutput
     static MythCodecID GetBestSupportedCodec(uint width, uint height,
                                              uint stream_type,
                                              bool no_acceleration);
-    virtual bool IsPIPSupported(void) const { return false;/*true; */}
+    virtual bool IsPIPSupported(void) const { return true;  }
     virtual bool IsPBPSupported(void) const { return false; }
     virtual bool NeedExtraAudioDecode(void) const
         { return codec_is_vdpau(video_codec_id); }

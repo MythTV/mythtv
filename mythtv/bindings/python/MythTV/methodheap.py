@@ -7,11 +7,11 @@ Provides base classes for accessing MythTV
 from static import *
 from exceptions import *
 from logging import MythLog
-from connections import FEConnection, XMLConnection
+from connections import FEConnection, XMLConnection, BEEventConnection
 from utility import databaseSearch, datetime
 from database import DBCache, DBData
 from system import SystemEvent
-from mythproto import BEEvent, FileOps, Program, FreeSpace
+from mythproto import BECache, FileOps, Program, FreeSpace
 from dataheap import *
 
 from datetime import timedelta
@@ -378,16 +378,25 @@ class MythBE( FileOps ):
         self.backendCommand('MESSAGE%sCLEAR_SETTINGS_CACHE' % BACKEND_SEP)
         self.db.settings.clear()
 
-class BEEventMonitor( BEEvent ):
+class BEEventMonitor( BECache ):
+    def __init__(self, backend=None, blockshutdown=False,
+                       systemevents=False, db=None):
+        self.systemevents = systemevents
+        super(BEEventMonitor, self).__init__(backend, blockshutdown, True, db)
+
     def _listhandlers(self):
         return [self.eventMonitor]
+
+    def _neweventconn(self):
+        return BEEventConnection(self.host, self.port, self.db.gethostname(),
+                    level = (2,1)[self.systemevents])
 
     def eventMonitor(self, event=None):
         if event is None:
             return re.compile('BACKEND_MESSAGE')
         self.log(MythLog.ALL-MythLog.EXTRA, event)
 
-class MythSystemEvent( BEEvent ):
+class MythSystemEvent( BECache ):
     class systemeventhandler( object ):
         # decorator class for system events
         bs = BACKEND_SEP.replace('[','\[').replace(']','\]')
@@ -452,16 +461,16 @@ class MythSystemEvent( BEEvent ):
     def _listhandlers(self):
         return []
 
-    def __init__(self, backend=None, noshutdown=False, generalevents=False, \
-                       db=None, opts=None, enablehandler=True):
-        if opts is None:
-            opts = BEConnection.BEConnOpts(noshutdown,\
-                             True, generalevents)
-        BEEvent.__init__(self, backend, db=db, opts=opts)
+    def __init__(self, backend=None, blockshutdown=False, db=None,
+                       enablehandler=True):
+        super(MythSystemEvent, self).__init__(backend, blockshutdown, True, db)
 
         if enablehandler:
             self._events.append(self._generic_handler)
             self.registerevent(self._generic_handler)
+
+    def _neweventconn(self):
+        return BEEventConnection(self.host, self.port, self.db.gethostname(), 3)
 
     @systemeventhandler
     def _generic_handler(self, event):

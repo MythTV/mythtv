@@ -70,6 +70,7 @@ class AudioOutputBase : public AudioOutput, public QThread
 
     virtual bool CanPassthrough(int samplerate, int channels,
                                 int codec, int profile) const;
+    virtual bool CanDownmix(void) const { return true; };
     virtual bool ToggleUpmix(void);
 
     virtual void Reset(void);
@@ -105,7 +106,7 @@ class AudioOutputBase : public AudioOutput, public QThread
     virtual void bufferOutputData(bool y){ buffer_output_data_for_use = y; }
     virtual int readOutputData(unsigned char *read_buffer, int max_length);
 
-    static const uint kAudioSRCInputSize = 32768;
+    static const uint kAudioSRCInputSize = 16384;
 
     /// Audio Buffer Size -- should be divisible by 32,24,16,12,10,8,6,4,2..
     static const uint kAudioRingBufferSize   = 3072000;

@@ -168,6 +168,9 @@ class AvFormatDecoder : public DecoderBase
     virtual int  GetTeletextDecoderType(void) const;
 
     virtual QString GetXDS(const QString&) const;
+    virtual QByteArray GetSubHeader(uint trackNo) const;
+    virtual void GetAttachmentData(uint trackNo, QByteArray &filename,
+                                   QByteArray &data);
 
     // MHEG stuff
     virtual bool SetAudioByComponentTag(int tag);
@@ -227,7 +230,7 @@ class AvFormatDecoder : public DecoderBase
 
     void SeekReset(long long, uint skipFrames, bool doFlush, bool discardFrames);
 
-    static inline bool DecoderWillDownmix(const AVCodecContext *ctx);
+    inline bool DecoderWillDownmix(const AVCodecContext *ctx);
     bool DoPassThrough(const AVCodecContext *ctx);
     bool SetupAudioStream(void);
     void SetupAudioStreamSubIndexes(int streamIndex);

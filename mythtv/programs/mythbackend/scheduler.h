@@ -10,9 +10,9 @@ using namespace std;
 #include <QWaitCondition>
 #include <QObject>
 #include <QString>
+#include <QThread>
 #include <QMutex>
 #include <QMap>
-#include <QThread>
 
 // MythTV headers
 #include "recordinginfo.h"
@@ -33,22 +33,10 @@ typedef RecList::iterator RecIter;
 
 class Scheduler;
 
-class ScheduleThread : public QThread
-{
-    Q_OBJECT
-  public:
-    ScheduleThread() : m_parent(NULL) {}
-    void SetParent(Scheduler *parent) { m_parent = parent; }
-    void run(void);
-  private:
-    Scheduler *m_parent;
-};
-
-class Scheduler : public QObject
+class Scheduler : public QThread
 {
     Q_OBJECT
 
-    friend class ScheduleThread;
   public:
     Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
               QString recordTbl = "record", Scheduler *master_sched = NULL);
@@ -97,7 +85,7 @@ class Scheduler : public QObject
     int GetError(void) const { return error; }
 
   protected:
-    void RunScheduler(void);
+    virtual void run(void); // QThread
 
   private:
     QString recordTable;
@@ -105,7 +93,7 @@ class Scheduler : public QObject
 
     bool VerifyCards(void);
 
-    bool FillRecordList(bool doLock);
+    bool FillRecordList(void);
     void UpdateMatches(int recordid);
     void UpdateManuals(int recordid);
     void BuildWorkList(void);
@@ -159,6 +147,26 @@ class Scheduler : public QObject
                          const RecList &reclist);
     void FillDirectoryInfoCache(bool force = false);
 
+    int CalcTimeToNextHandleRecordingEvent(
+        const QDateTime &curtime,
+        RecConstIter startIter, const RecList &reclist,
+        int prerollseconds, int max_sleep /*ms*/);
+    void OldRecordedFixups(void);
+    bool HandleReschedule(void);
+    bool HandleRunSchedulerStartup(
+        int prerollseconds, int idleWaitForRecordingTime);
+    void HandleWakeSlave(RecordingInfo &ri, int prerollseconds);
+    bool HandleRecording(
+        RecordingInfo &ri, bool &statuschanged, int prerollseconds);
+    void HandleTuning(
+        RecordingInfo &ri, bool &statuschanged);
+    void HandleRecordingStatusChange(
+        RecordingInfo &ri, RecStatusTypes recStatus, const QString &details);
+    void HandleIdleShutdown(
+        bool &blockShutdown, QDateTime &idleSince, int prerollseconds,
+        int idleTimeoutSecs, int idleWaitForRecordingTime);
+
+
     MythDeque<int> reschedQueue;
     QMutex schedLock;
     QMutex recordmatchLock;
@@ -184,7 +192,7 @@ class Scheduler : public QObject
 
     QMap<QString, bool> recPendingList;
 
-    ScheduleThread schedThread;
+    bool doRun;
 
     MainServer *m_mainServer;
 

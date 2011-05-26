@@ -31,6 +31,7 @@
 #include "storagegroup.h"
 #include "dbutil.h"
 #include "hardwareprofile.h"
+#include "util.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -344,6 +345,21 @@ bool Myth::RemoveStorageGroupDir( const QString &sGroupName,
     }
 
     return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::TimeZoneInfo *Myth::GetTimeZone(  )
+{
+    DTC::TimeZoneInfo *pResults = new DTC::TimeZoneInfo();
+
+    pResults->setTimeZoneID( getTimeZoneID() );
+    pResults->setUTCOffset( calc_utc_offset() );
+    pResults->setCurrentDateTime( mythCurrentDateTime() );
+
+    return pResults;
 }
 
 /////////////////////////////////////////////////////////////////////////////

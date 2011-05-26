@@ -18,8 +18,7 @@ class IPTVChannel;
 
 /** \brief Processes data from a IPTVFeeder and writes it to disk.
  */
-class IPTVRecorder : public DTVRecorder, public TSDataListener,
-                     public MPEGSingleProgramStreamListener
+class IPTVRecorder : public DTVRecorder, public TSDataListener
 {
     friend class IPTVMediaSink;
 
@@ -30,30 +29,24 @@ class IPTVRecorder : public DTVRecorder, public TSDataListener,
     bool Open(void);
     void Close(void);
 
-    virtual void Pause(bool clear = true);
-    virtual void Unpause(void);
-
     virtual void StartRecording(void);
-    virtual void StopRecording(void);
 
     virtual void SetOptionsFromProfile(RecordingProfile*, const QString&,
                                        const QString&, const QString&) {}
 
     virtual void SetStreamData(void);
 
+    virtual bool IsExternalChannelChangeSupported(void) { return true; }
+
   private:
-    void ProcessTSPacket(const TSPacket& tspacket);
+    bool ProcessTSPacket(const TSPacket &tspacket);
+    virtual bool PauseAndWait(int timeout = 100);
 
     // implements TSDataListener
     void AddData(const unsigned char *data, unsigned int dataSize);
 
-    // implements MPEGSingleProgramStreamListener
-    void HandleSingleProgramPAT(ProgramAssociationTable *pat);
-    void HandleSingleProgramPMT(ProgramMapTable *pmt);
-
   private:
     IPTVChannel *_channel;
-    QWaitCondition  _cond_recording;
 
   private:
     IPTVRecorder &operator=(const IPTVRecorder&); //< avoid default impl

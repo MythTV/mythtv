@@ -20,10 +20,6 @@
 #include "videoout_xv.h"
 #endif
 
-#ifdef USING_DIRECTFB
-#include "videoout_directfb.h"
-#endif
-
 #ifdef USING_MINGW
 #include "videoout_d3d.h"
 #endif
@@ -73,10 +69,6 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
 
     VideoOutputNull::GetRenderOptions(opts, cpudeints);
 
-#ifdef USING_DIRECTFB
-    VideoOutputDirectfb::GetRenderOptions(opts, cpudeints);
-#endif // USING_DIRECTFB
-
 #ifdef USING_MINGW
     VideoOutputD3D::GetRenderOptions(opts, cpudeints);
 #endif
@@ -114,10 +106,6 @@ VideoOutput *VideoOutput::Create(
     (void) codec_priv;
 
     QStringList renderers;
-
-#ifdef USING_DIRECTFB
-    renderers += VideoOutputDirectfb::GetAllowedRenderers(codec_id, video_dim);
-#endif // USING_DIRECTFB
 
 #ifdef USING_MINGW
     renderers += VideoOutputD3D::GetAllowedRenderers(codec_id, video_dim);
@@ -179,11 +167,6 @@ VideoOutput *VideoOutput::Create(
             break;
 
         VideoOutput *vo = NULL;
-
-#ifdef USING_DIRECTFB
-        if (renderer == "directfb")
-            vo = new VideoOutputDirectfb();
-#endif // USING_DIRECTFB
 
 #ifdef USING_MINGW
         if (renderer == "direct3d")

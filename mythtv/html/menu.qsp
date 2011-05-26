@@ -3,23 +3,23 @@
 </div>
 <div id="menu">
   <ul class="menu collapsible">
-    <li><a href='#'>Setup</a>
+    <li><a href='#'><i18n>Setup</i18n></a>
       <ul class="acitem collapsible">
-        <li><a href='#' onClick="javascript:clearContent(); loadEditWindow('/setup/wizard.html', '/setup/js/wizard.js')">Setup Wizard</a></li>
-        <li><a href='#'>Advanced Setup</a>
+        <li><a href='#' onClick="javascript:clearContent(); loadEditWindow('/setup/wizard.html', '/setup/js/wizard.js')"><i18n>Setup Wizard</i18n></a></li>
+        <li><a href='#'><i18n>Advanced Setup</i18n></a>
           <ul class="acitem collapsible">
-            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('database')">Database</a></li>
-            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('general')">General</a></li>
-            <li class="indent1"><a href='#'>Guide Data</a>
+            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('database')"><i18n>Database</i18n></a></li>
+            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('general')"><i18n>General</i18n></a></li>
+            <li class="indent1"><a href='#'><i18n>Guide Data</i18n></a>
               <ul class="acitem collapsible">
-                <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('guidedatasources')">Guide Data Sources</a></li>
-                <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('channeleditor')">Channel Editor</a></li>
+                <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('guidedatasources')"><i18n>Guide Data Sources</i18n></a></li>
+                <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('channeleditor')"><i18n>Channel Editor</i18n></a></li>
               </ul>
             </li>
-            <li class="indent1"><a href='#' onClick="javascript:loadContent('/misc/placeholder.html')">Recording Devices</a></li>
-            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('storagegroups')">Storage Groups</a></li>
-            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('jobqueue')">Job Queue</a></li>
-            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('systemevents')">System Events</a></li>
+            <li class="indent1"><a href='#' onClick="javascript:loadContent('/misc/placeholder.html')"><i18n>Recording Devices</i18n></a></li>
+            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('storagegroups')"><i18n>Storage Groups</i18n></a></li>
+            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('jobqueue')"><i18n>Job Queue</i18n></a></li>
+            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('systemevents')"><i18n>System Events</i18n></a></li>
           </ul>
         </li>
 <%
@@ -32,44 +32,44 @@
 
     if (devMode)
     {
-        os.write("<li><a href='#' onClick=\"javascript:loadSetupContent('/setup/expert.html')\">Expert/Dev Setup</a></li>");
+        os.write("<li><a href='#' onClick=\"javascript:loadSetupContent('/setup/expert.html')\"><i18n>Expert/Dev Setup</i18n></a></li>");
     }
 %>
-        <li><a href='#' onClick="javascript:loadSetupPage('password')">Change Password</a></li>
+        <li><a href='#' onClick="javascript:loadSetupPage('password')"><i18n>Change Password</i18n></a></li>
       </ul>
     </li>
-    <li><a href='#'>Information</a>
+    <li><a href='#'><i18n>Information</i18n></a>
       <ul class="acitem collapsible">
-        <li><a class='menuitem' href='#' onClick="javascript:loadContent('/Status/GetStatusHTML')">Backend Status</a></li>
+        <li><a class='menuitem' href='#' onClick="javascript:loadContent('/Status/GetStatusHTML')"><i18n>Backend Status</i18n></a></li>
       </ul>
     </li>
-    <li><a href='#'>Utilities</a>
+    <li><a href='#'><i18n>Utilities</i18n></a>
       <ul class="acitem collapsible">
-        <li><a class='menuitem' href='#' onClick="javascript:loadMiscPage('messagetab')">Send a Message</a></li>
-        <li><a class='menuitem' href='#' onClick="javascript:loadMiscPage('databasetabs')">Database Tools</a></li>
-        <li><a class='menuitem' href='#' onClick="javascript:loadMiscPage('hardwareprofile')">Hardware Profile</a></li>
+        <li><a class='menuitem' href='#' onClick="javascript:loadMiscPage('messagetab')"><i18n>Send a Message</i18n></a></li>
+        <li><a class='menuitem' href='#' onClick="javascript:loadMiscPage('databasetabs')"><i18n>Database Tools</i18n></a></li>
+        <li><a class='menuitem' href='#' onClick="javascript:loadMiscPage('hardwareprofile')"><i18n>Hardware Profile</i18n></a></li>
       </ul>
     </li>
     <li><hr></li>
-    <li><a href='#'>API</a>
+    <li><a href='#'><i18n>API</i18n></a>
       <ul class="acitem collapsible">
-        <li><a href='#'>WSDL Links</a>
+        <li><a href='#'><i18n>WSDL Links</i18n></a>
           <ul class="acitem">
-            <li class="indent1"><a href='/Myth/wsdl'>Myth Service</a></li>
-            <li class="indent1"><a href='/Guide/wsdl'>Guide Service</a></li>
-            <li class="indent1"><a href='/Dvr/wsdl'>DVR Service</a></li>
-            <li class="indent1"><a href='/Content/wsdl'>Content Service</a></li>
-            <li class="indent1"><a href='/Channel/wsdl'>Channel Service</a></li>
+            <li class="indent1"><a href='/Myth/wsdl'><i18n>Myth Service</i18n></a></li>
+            <li class="indent1"><a href='/Guide/wsdl'><i18n>Guide Service</i18n></a></li>
+            <li class="indent1"><a href='/Dvr/wsdl'><i18n>DVR Service</i18n></a></li>
+            <li class="indent1"><a href='/Content/wsdl'><i18n>Content Service</i18n></a></li>
+            <li class="indent1"><a href='/Channel/wsdl'><i18n>Channel Service</i18n></a></li>
           </ul>
         </li>
-        <li><a href='#'>Server Side Scripting</a>
+        <li><a href='#'><i18n>Server Side Scripting</i18n></a>
           <ul class="acitem">
-            <li class="indent1"><a href='#' onClick="javascript:loadContent('/samples/serverside.qsp', '/samples/js/samples.js')">Overview</a></li>
-            <li class="indent1"><a href='#' onClick="javascript:loadContent('/samples/recorded.qsp', '/samples/js/samples.js')">GetRecorded() Example</a></li>
+            <li class="indent1"><a href='#' onClick="javascript:loadContent('/samples/serverside.qsp', '/samples/js/samples.js')"><i18n>Overview</i18n></a></li>
+            <li class="indent1"><a href='#' onClick="javascript:loadContent('/samples/recorded.qsp', '/samples/js/samples.js')"><i18n>GetRecorded() Example</i18n></a></li>
 <%
     if (devMode)
     {
-        os.write("<li class='indent1'><a href='#' onClick=\"javascript:loadContent('/samples/storagegroups.qsp', '/samples/js/samples.js')\">GetStorageGroups()</a></li>");
+        os.write("<li class='indent1'><a href='#' onClick=\"javascript:loadContent('/samples/storagegroups.qsp', '/samples/js/samples.js')\"><i18n>GetStorageGroups()</i18n></a></li>");
     }
 %>
           </ul>

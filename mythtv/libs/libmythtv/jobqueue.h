@@ -1,15 +1,16 @@
 #ifndef JOBQUEUE_H_
 #define JOBQUEUE_H_
 
+#include <pthread.h>
 #include <sys/types.h>
 
 #include <QWaitCondition>
 #include <QDateTime>
 #include <QObject>
+#include <QThread>
 #include <QEvent>
 #include <QMutex>
 #include <QMap>
-#include <QThread>
 
 #include "mythtvexp.h"
 
@@ -114,25 +115,11 @@ class QueueProcessorThread : public QThread
 {
     Q_OBJECT
   public:
-    QueueProcessorThread() : m_parent(NULL) {}
-    void SetParent(JobQueue *parent) { m_parent = parent; }
-    void run(void);
+    QueueProcessorThread(JobQueue *parent) : m_parent(parent) {}
+    ~QueueProcessorThread() { wait(); m_parent = NULL; }
+    virtual void run(void);
   private:
     JobQueue *m_parent;
-};
-
-class ChildJobThread : public QThread
-{
-    Q_OBJECT
-  public:
-    ChildJobThread() : m_parent(NULL), m_type(JOB_NONE), m_id(-1) {};
-    void SetParent(JobQueue *parent) { m_parent = parent; }
-    void SetJob(int type, int id) { m_type = type; m_id = id; }
-    void run(void);
-  private:
-    JobQueue *m_parent;
-    int m_type;
-    int m_id;
 };
 
 class MTV_PUBLIC JobQueue : public QObject
@@ -140,7 +127,6 @@ class MTV_PUBLIC JobQueue : public QObject
     Q_OBJECT
 
     friend class QueueProcessorThread;
-    friend class ChildJobThread;
   public:
     JobQueue(bool master);
     ~JobQueue(void);
@@ -221,6 +207,12 @@ class MTV_PUBLIC JobQueue : public QObject
     static void CleanupOldJobsInQueue();
 
   private:
+    typedef struct jobthreadstruct
+    {
+        JobQueue *jq;
+        int jobID;
+    } JobThreadStruct;
+
     void RunQueueProcessor(void);
     void ProcessQueue(void);
 
@@ -230,7 +222,7 @@ class MTV_PUBLIC JobQueue : public QObject
 
     static bool InJobRunWindow(int orStartingWithinMins = 0);
 
-    void StartChildJob(int type, int jobID);
+    void StartChildJob(void *(*start_routine)(void *), int jobID);
 
     QString GetJobDescription(int jobType);
     QString GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo);
@@ -238,8 +230,13 @@ class MTV_PUBLIC JobQueue : public QObject
 
     static QString PrettyPrint(off_t bytes);
 
+    static void *TranscodeThread(void *param);
     void DoTranscodeThread(int jobID);
+
+    static void *FlagCommercialsThread(void *param);
     void DoFlagCommercialsThread(int jobID);
+
+    static void *UserJobThread(void *param);
     void DoUserJobThread(int jobID);
 
     QString m_hostname;
@@ -257,7 +254,7 @@ class MTV_PUBLIC JobQueue : public QObject
 
     bool isMaster;
 
-    QueueProcessorThread queueThread;
+    QueueProcessorThread *queueThread;
     QWaitCondition queueThreadCond;
     QMutex queueThreadCondLock;
     bool processQueue;

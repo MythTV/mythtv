@@ -23,6 +23,7 @@
 #include "hdmv_insn.h"
 #include "../register.h"
 
+#include "../bdnav/index_parse.h"
 #include "util/macro.h"
 #include "util/strutl.h"
 #include "util/logging.h"
@@ -58,6 +59,9 @@ struct hdmv_vm_s {
     /* suspended object */
     MOBJ_OBJECT *suspended_object;
     int          suspended_pc;
+
+    /* disc index (used to verify CALL_TITLE/JUMP_TITLE) */
+    INDX_ROOT   *indx;
 };
 
 /*
@@ -231,7 +235,7 @@ static int _queue_event(HDMV_VM *p, uint32_t event, uint32_t param)
  * vm init
  */
 
-HDMV_VM *hdmv_vm_init(const char *disc_root, BD_REGISTERS *regs)
+HDMV_VM *hdmv_vm_init(const char *disc_root, BD_REGISTERS *regs, INDX_ROOT *indx)
 {
     HDMV_VM *p = calloc(1, sizeof(HDMV_VM));
     char *file;
@@ -246,6 +250,7 @@ HDMV_VM *hdmv_vm_init(const char *disc_root, BD_REGISTERS *regs)
     }
 
     p->regs         = regs;
+    p->indx         = indx;
 
     bd_mutex_init(&p->mutex);
 
@@ -278,7 +283,23 @@ void hdmv_vm_free(HDMV_VM **p)
  * suspend/resume ("function call")
  */
 
-static void _suspend_object(HDMV_VM *p)
+static int _suspended_at_play_pl(HDMV_VM *p)
+{
+    int play_pl = 0;
+    if (p && p->suspended_object) {
+        MOBJ_CMD  *cmd  = &p->suspended_object->cmds[p->suspended_pc];
+        HDMV_INSN *insn = &cmd->insn;
+        play_pl = (insn->grp     == INSN_GROUP_BRANCH &&
+                   insn->sub_grp == BRANCH_PLAY  &&
+                   (  insn->branch_opt == INSN_PLAY_PL ||
+                      insn->branch_opt == INSN_PLAY_PL_PI ||
+                      insn->branch_opt == INSN_PLAY_PL_PM));
+    }
+
+    return play_pl;
+}
+
+static void _suspend_object(HDMV_VM *p, int psr_backup)
 {
     BD_DEBUG(DBG_HDMV, "_suspend_object()\n");
 
@@ -287,7 +308,9 @@ static void _suspend_object(HDMV_VM *p)
         // [execute the call, discard old suspended object (10.2.4.2.2)].
     }
 
-    bd_psr_save_state(p->regs);
+    if (psr_backup) {
+        bd_psr_save_state(p->regs);
+    }
 
     p->suspended_object = p->object;
     p->suspended_pc     = p->pc;
@@ -295,17 +318,21 @@ static void _suspend_object(HDMV_VM *p)
     p->object = NULL;
 }
 
-static int _resume_object(HDMV_VM *p)
+static int _resume_object(HDMV_VM *p, int psr_restore)
 {
     if (!p->suspended_object) {
         BD_DEBUG(DBG_HDMV|DBG_CRIT, "_resume_object: no suspended object!\n");
         return -1;
     }
 
+    _free_ig_object(p);
+
     p->object = p->suspended_object;
     p->pc     = p->suspended_pc + 1;
 
-    bd_psr_restore_state(p->regs);
+    if (psr_restore) {
+        bd_psr_restore_state(p->regs);
+    }
 
     BD_DEBUG(DBG_HDMV, "resuming object %p at %d\n", p->object, p->pc + 1);
 
@@ -318,6 +345,21 @@ static int _resume_object(HDMV_VM *p)
 /*
  * branching
  */
+
+static int _is_valid_title(HDMV_VM *p, int title)
+{
+    if (title == 0 || title == 0xffff) {
+        INDX_PLAY_ITEM *pi = (!title) ? &p->indx->top_menu : &p->indx->first_play;
+
+        if (pi->object_type == indx_object_type_hdmv &&  pi->hdmv.id_ref == 0xffff) {
+            /* no top menu or first play title (5.2.3.3) */
+            return 0;
+        }
+        return 1;
+    }
+
+    return title > 0 && title <= p->indx->num_titles;
+}
 
 static int _jump_object(HDMV_VM *p, int object)
 {
@@ -333,12 +375,14 @@ static int _jump_object(HDMV_VM *p, int object)
     p->pc     = 0;
     p->object = &p->movie_objects->objects[object];
 
+    /* suspended object is not discarded */
+
     return 0;
 }
 
 static int _jump_title(HDMV_VM *p, int title)
 {
-    if (title >= 0 && title <= 0xffff) {
+    if (_is_valid_title(p, title)) {
         BD_DEBUG(DBG_HDMV, "_jump_title(%d)\n", title);
 
         /* discard suspended object */
@@ -358,17 +402,17 @@ static int _call_object(HDMV_VM *p, int object)
 {
     BD_DEBUG(DBG_HDMV, "_call_object(%d)\n", object);
 
-    _suspend_object(p);
+    _suspend_object(p, 1);
 
     return _jump_object(p, object);
 }
 
 static int _call_title(HDMV_VM *p, int title)
 {
-    if (title >= 0 && title <= 0xffff) {
+    if (_is_valid_title(p, title)) {
         BD_DEBUG(DBG_HDMV, "_call_title(%d)\n", title);
 
-        _suspend_object(p);
+        _suspend_object(p, 1);
 
         _queue_event(p, HDMV_EVENT_TITLE, title);
         return 0;
@@ -404,7 +448,7 @@ static int _play_at(HDMV_VM *p, int playlist, int playitem, int playmark)
 
     if (playlist >= 0) {
         _queue_event(p, HDMV_EVENT_PLAY_PL, playlist);
-        _suspend_object(p);
+        _suspend_object(p, 0);
     }
 
     if (playitem >= 0) {
@@ -759,7 +803,7 @@ static int _hdmv_step(HDMV_VM *p)
                     switch (insn->branch_opt) {
                         case INSN_JUMP_TITLE:  _jump_title(p, dst); break;
                         case INSN_CALL_TITLE:  _call_title(p, dst); break;
-                        case INSN_RESUME:      _resume_object(p);   break;
+                        case INSN_RESUME:      _resume_object(p, 1);   break;
                         case INSN_JUMP_OBJECT: if (!_jump_object(p, dst)) { inc_pc = 0; } break;
                         case INSN_CALL_OBJECT: if (!_call_object(p, dst)) { inc_pc = 0; } break;
                         default:
@@ -941,24 +985,55 @@ int hdmv_vm_running(HDMV_VM *p)
     return result;
 }
 
+uint32_t hdmv_vm_get_uo_mask(HDMV_VM *p)
+{
+    uint32_t     mask = 0;
+    MOBJ_OBJECT *o    = NULL;
+
+    bd_mutex_lock(&p->mutex);
+
+    if ((o = p->object ? p->object : p->suspended_object)) {
+        mask |= o->menu_call_mask;
+        mask |= o->title_search_mask << 1;
+    }
+
+    bd_mutex_unlock(&p->mutex);
+    return mask;
+}
+
 int hdmv_vm_resume(HDMV_VM *p)
 {
     int result;
     bd_mutex_lock(&p->mutex);
 
-    result = _resume_object(p);
+    result = _resume_object(p, 0);
 
     bd_mutex_unlock(&p->mutex);
     return result;
 }
 
-int hdmv_vm_suspend(HDMV_VM *p)
+int hdmv_vm_suspend_pl(HDMV_VM *p)
 {
     int result = -1;
     bd_mutex_lock(&p->mutex);
 
-    if (p->object && !p->ig_object) {
-        _suspend_object(p);
+    if (p->object || p->ig_object) {
+        BD_DEBUG(DBG_HDMV, "hdmv_vm_suspend_pl(): HDMV VM is still running\n");
+
+    } else if (!p->suspended_object) {
+        BD_DEBUG(DBG_HDMV, "hdmv_vm_suspend_pl(): No suspended object\n");
+
+    } else if (!_suspended_at_play_pl(p)) {
+        BD_DEBUG(DBG_HDMV, "hdmv_vm_suspend_pl(): Object is not playing playlist\n");
+
+    } else if (!p->suspended_object->resume_intention_flag) {
+        BD_DEBUG(DBG_HDMV, "hdmv_vm_suspend_pl(): no resume intention flag\n");
+
+        p->suspended_object = NULL;
+        result = 0;
+
+    } else {
+        bd_psr_save_state(p->regs);
         result = 0;
     }
 

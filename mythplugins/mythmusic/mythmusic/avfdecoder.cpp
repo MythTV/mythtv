@@ -284,7 +284,7 @@ bool avfDecoder::initialize()
     if (m_sampleFmt == FORMAT_NONE)
     {
         int bps =
-            av_get_bits_per_sample_format(m_audioDec->sample_fmt);
+            av_get_bits_per_sample_fmt(m_audioDec->sample_fmt);
         if (m_audioDec->sample_fmt == SAMPLE_FMT_S32 &&
             m_audioDec->bits_per_raw_sample)
         {
@@ -371,11 +371,9 @@ void avfDecoder::run()
     if (!inited)
         return;
 
-    AVPacket pkt;
+    AVPacket pkt, tmp_pkt;
     char *s;
     int data_size, dec_len;
-    long len;
-    const uint8_t *ptr;
     uint fill, total;
     // account for possible frame expansion in aobase (upmix, float conv)
     uint thresh = bks * 12 / AudioOutputSettings::SampleSize(m_sampleFmt);
@@ -418,19 +416,19 @@ void avfDecoder::run()
                     break;
                 }
 
-                ptr = pkt.data;
-                len = pkt.size;
+		tmp_pkt.data = pkt.data;
+		tmp_pkt.size = pkt.size;
 
-                while (len > 0 && !finish && !user_stop && seekTime <= 0.0)
+                while (tmp_pkt.size > 0 && !finish &&
+		       !user_stop && seekTime <= 0.0)
                 {
                     // Decode the stream to the output codec
                     // m_samples is the output buffer
                     // data_size is the size in bytes of the frame
-                    // ptr is the input buffer
-                    // len is the size of the input buffer
+                    // tmp_pkt is the input buffer
                     data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
                     dec_len = avcodec_decode_audio3(m_audioDec, m_samples,
-                                                    &data_size, &pkt);
+                                                    &data_size, &tmp_pkt);
                     if (dec_len < 0)
                         break;
 
@@ -440,8 +438,8 @@ void avfDecoder::run()
 
                     // Increment the output pointer and count
                     output_at += data_size;
-                    len -= dec_len;
-                    ptr += dec_len;
+                    tmp_pkt.size -= dec_len;
+                    tmp_pkt.data += dec_len;
                 }
 
                 av_free_packet(&pkt);

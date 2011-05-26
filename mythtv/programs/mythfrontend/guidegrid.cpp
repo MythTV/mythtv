@@ -172,7 +172,8 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
         changrpid = gCoreContext->GetNumSetting("ChannelGroupDefault", -1);
 
     // check there are some channels setup
-    DBChanList channels = ChannelUtil::GetChannels(0, true, "", changrpid);
+    DBChanList channels = ChannelUtil::GetChannels(
+        0, true, "", (changrpid<0) ? 0 : changrpid);
     if (!channels.size())
     {
         QString message;
@@ -832,7 +833,8 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
     m_channelInfoIdx.clear();
     m_currentStartChannel = 0;
 
-    DBChanList channels = ChannelUtil::GetChannels(0, true, "", m_changrpid);
+    DBChanList channels = ChannelUtil::GetChannels(
+        0, true, "", (m_changrpid < 0) ? 0 : m_changrpid);
     ChannelUtil::SortChannels(channels, m_channelOrdering, false);
 
     typedef vector<uint> uint_list_t;
@@ -2177,9 +2179,7 @@ void GuideGrid::EmbedTVWindow(void)
     MythEvent *me = new MythEvent("STOP_VIDEO_REFRESH_TIMER");
     qApp->postEvent(this, me);
 
-    PlayerContext *ctx = m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
-    m_usingNullVideo =
-            !m_player->StartEmbedding(ctx, GetMythMainWindow()->GetPaintWindow()->winId(), m_videoRect);
+    m_usingNullVideo = !m_player->StartEmbedding(m_videoRect);
     if (!m_usingNullVideo)
     {
         QRegion r1 = QRegion(m_Area);
@@ -2192,7 +2192,6 @@ void GuideGrid::EmbedTVWindow(void)
         me = new MythEvent("START_VIDEO_REFRESH_TIMER");
         qApp->postEvent(this, me);
     }
-    m_player->ReturnPlayerLock(ctx);
 }
 
 void GuideGrid::refreshVideo(void)

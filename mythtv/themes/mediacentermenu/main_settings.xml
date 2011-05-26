@@ -11,7 +11,7 @@
     <button>
         <type>SETTINGS_APPEARANCE</type>
         <text>Appearance</text>
-        <description>pick the theme, font, size, and locale</description>
+        <description>Pick the menu layout, font, size, and locale</description>
         <action>SETTINGS APPEARANCE</action>
     </button>
 

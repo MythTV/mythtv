@@ -27,12 +27,47 @@
 #include "serverSideScripting.h"
 #include "mythverbose.h"
 
+QScriptValue formatStr(QScriptContext *context, QScriptEngine *interpreter);
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+QScriptValue formatStr(QScriptContext *context, QScriptEngine *interpreter)
+{
+    unsigned int count = context->argumentCount();
+
+    if (count == 0)
+        return QScriptValue(interpreter, QString());
+ 
+    if (count == 1)
+        return QScriptValue(interpreter, context->argument(0).toString());
+
+    QString result = context->argument(0).toString();
+    for (unsigned int i = 1; i < count; i++)
+        result.replace(QString("%%1").arg(i), context->argument(i).toString());
+
+    return QScriptValue(interpreter, result);
+}
+
 //////////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////////
 
 ServerSideScripting::ServerSideScripting()
 {
+    // ----------------------------------------------------------------------
+    // Enable Translation functions
+    // ----------------------------------------------------------------------
+
+    m_engine.installTranslatorFunctions();
+
+    // ----------------------------------------------------------------------
+    // Register C++ functions
+    // ----------------------------------------------------------------------
+
+    QScriptValue qsFormatStr = m_engine.newFunction(formatStr);
+    m_engine.globalObject().setProperty("formatStr", qsFormatStr);
 
     // ----------------------------------------------------------------------
     // Add Scriptable Objects
@@ -185,6 +220,7 @@ QString ServerSideScripting::CreateMethodFromFile( const QString &sFileName )
     try
     {
         QTextStream stream( &scriptFile );
+        QString sTransBuffer;
 
         sCode << "(function( os ) {\n";
 
@@ -192,7 +228,7 @@ QString ServerSideScripting::CreateMethodFromFile( const QString &sFileName )
         {
             QString sLine = stream.readLine();
 
-            bInCode = ProcessLine( sCode, sLine, bInCode );
+            bInCode = ProcessLine( sCode, sLine, bInCode, sTransBuffer );
         }
     
         sCode << "})";
@@ -216,14 +252,64 @@ QString ServerSideScripting::CreateMethodFromFile( const QString &sFileName )
 
 bool ServerSideScripting::ProcessLine( QTextStream &sCode, 
                                        QString     &sLine, 
-                                       bool         bInCode )
+                                       bool         bInCode,
+                                       QString     &sTransBuffer )
 {
+    sLine = sLine.trimmed();
+
+    QString sLowerLine = sLine.toLower();
+
+    if (!sTransBuffer.isEmpty())
+    {
+        int nEndTransPos = sLowerLine.indexOf("</i18n>");
+
+        if (nEndTransPos == -1)
+        {
+            sTransBuffer.append(" ");
+            sTransBuffer.append(sLine);
+            return bInCode;
+        }
+
+        if (nEndTransPos > 0)
+            sTransBuffer.append(" ");
+
+        sTransBuffer.append(sLine.left(nEndTransPos).trimmed());
+        QString trStr =
+            QObject::tr(sTransBuffer.trimmed().toLocal8Bit().data());
+        trStr.replace( '"', "\\\"" );
+        sCode << "os.write( \"" << trStr << "\" );\n";
+        sTransBuffer = "";
+
+        if (nEndTransPos == (sLine.length() - 7))
+            return bInCode;
+
+        sLine = sLine.right(sLine.length() - (nEndTransPos + 7));
+    }
+
+    int nStartTransPos = sLowerLine.indexOf("<i18n>");
+    if (nStartTransPos != -1)
+    {
+        int nEndTransPos = sLowerLine.indexOf("</i18n>");
+        if (nEndTransPos != -1)
+        {
+            QString patStr = sLine.mid(nStartTransPos,
+                                       (nEndTransPos + 7 - nStartTransPos));
+            QString repStr = patStr.mid(6, patStr.length() - 13).trimmed();
+            sLine.replace(patStr, QObject::tr(repStr.toLocal8Bit().data()));
+            return ProcessLine(sCode, sLine, bInCode, sTransBuffer);
+        }
+        else
+        {
+            sTransBuffer = " ";
+            sTransBuffer.append(sLine.mid(nStartTransPos + 6).trimmed());
+            sLine = sLine.left(nStartTransPos);
+        }
+    }
+
     int  nStartPos       = 0;
     int  nEndPos         = 0;
     int  nMatchPos       = 0;
     bool bMatchFound     = false;
-
-    sLine = sLine.trimmed();
 
     QString sExpecting = bInCode ? "%>" : "<%";
     bool    bNewLine   = !(sLine.startsWith( sExpecting ));

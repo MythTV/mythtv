@@ -59,32 +59,52 @@ void FirewireRecorder::StartRecording(void)
 
     if (!Open())
     {
-        _error = true;
+        _error = "Failed to open firewire device";
+        VERBOSE(VB_IMPORTANT, LOC_ERR + _error);
         return;
     }
 
-    _request_recording = true;
-    _recording = true;
+    _continuity_error_count = 0;
+
+    {
+        QMutexLocker locker(&pauseLock);
+        request_recording = true;
+        recording = true;
+        recordingWait.wakeAll();
+    }
 
     StartStreaming();
 
-    while (_request_recording)
+    while (IsRecordingRequested() && !IsErrored())
     {
-        if (!PauseAndWait())
-            usleep(50 * 1000);
+        if (PauseAndWait())
+            continue;
+
+        if (!IsRecordingRequested())
+            break;
+
+        {   // sleep 1 seconds unless StopRecording() or Unpause() is called,
+            // just to avoid running this too often.
+            QMutexLocker locker(&pauseLock);
+            if (!request_recording || request_pause)
+                continue;
+            unpauseWait.wait(&pauseLock, 1000);
+        }
     }
 
     StopStreaming();
     FinishRecording();
 
-    _recording = false;
+    QMutexLocker locker(&pauseLock);
+    recording = false;
+    recordingWait.wakeAll();
 }
 
 void FirewireRecorder::AddData(const unsigned char *data, uint len)
 {
     uint bufsz = buffer.size();
-    if ((SYNC_BYTE == data[0]) && (TSPacket::SIZE == len) &&
-        (TSPacket::SIZE > bufsz))
+    if ((SYNC_BYTE == data[0]) && (TSPacket::kSize == len) &&
+        (TSPacket::kSize > bufsz))
     {
         if (bufsz)
             buffer.clear();
@@ -106,15 +126,15 @@ void FirewireRecorder::AddData(const unsigned char *data, uint len)
     if (sync_at < 0)
         return;
 
-    if (bufsz < 30 * TSPacket::SIZE)
+    if (bufsz < 30 * TSPacket::kSize)
         return; // build up a little buffer
 
-    while (sync_at + TSPacket::SIZE < bufsz)
+    while (sync_at + TSPacket::kSize < bufsz)
     {
         ProcessTSPacket(*(reinterpret_cast<const TSPacket*>(
                               &buffer[0] + sync_at)));
 
-        sync_at += TSPacket::SIZE;
+        sync_at += TSPacket::kSize;
     }
 
     buffer.erase(buffer.begin(), buffer.begin() + sync_at);
@@ -122,13 +142,13 @@ void FirewireRecorder::AddData(const unsigned char *data, uint len)
     return;
 }
 
-void FirewireRecorder::ProcessTSPacket(const TSPacket &tspacket)
+bool FirewireRecorder::ProcessTSPacket(const TSPacket &tspacket)
 {
     if (tspacket.TransportError())
-        return;
+        return true;
 
     if (tspacket.Scrambled())
-        return;
+        return true;
 
     if (tspacket.HasAdaptationField())
         GetStreamData()->HandleAdaptationFieldControl(&tspacket);
@@ -153,6 +173,8 @@ void FirewireRecorder::ProcessTSPacket(const TSPacket &tspacket)
         else if (GetStreamData()->IsWritingPID(lpid))
             BufferedWrite(tspacket);
     }
+
+    return true;
 }
 
 void FirewireRecorder::SetOptionsFromProfile(RecordingProfile *profile,
@@ -169,10 +191,11 @@ void FirewireRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 // documented in recorderbase.cpp
 bool FirewireRecorder::PauseAndWait(int timeout)
 {
+    QMutexLocker locker(&pauseLock);
     if (request_pause)
     {
         VERBOSE(VB_RECORD, LOC + "PauseAndWait("<<timeout<<") -- pause");
-        if (!paused)
+        if (!IsPaused(true))
         {
             StopStreaming();
             paused = true;
@@ -180,17 +203,18 @@ bool FirewireRecorder::PauseAndWait(int timeout)
             if (tvrec)
                 tvrec->RecorderPaused();
         }
-        QMutex unpause_lock;
-        unpause_lock.lock();
-        unpauseWait.wait(&unpause_lock, timeout);
+        unpauseWait.wait(&pauseLock, timeout);
     }
-    if (!request_pause && paused)
+
+    if (!request_pause && IsPaused(true))
     {
+        paused = false;
         VERBOSE(VB_RECORD, LOC + "PauseAndWait("<<timeout<<") -- unpause");
         StartStreaming();
-        paused = false;
+        unpauseWait.wakeAll();
     }
-    return paused;
+
+    return IsPaused(true);
 }
 
 void FirewireRecorder::SetStreamData(void)
@@ -199,24 +223,4 @@ void FirewireRecorder::SetStreamData(void)
 
     if (_stream_data->DesiredProgram() >= 0)
         _stream_data->SetDesiredProgram(_stream_data->DesiredProgram());
-}
-
-void FirewireRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
-{
-    if (!pat)
-        return;
-
-    int next = (pat->tsheader()->ContinuityCounter()+1)&0xf;
-    pat->tsheader()->SetContinuityCounter(next);
-    BufferedWrite(*(reinterpret_cast<const TSPacket*>(pat->tsheader())));
-}
-
-void FirewireRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
-{
-    if (!pmt)
-        return;
-
-    int next = (pmt->tsheader()->ContinuityCounter()+1)&0xf;
-    pmt->tsheader()->SetContinuityCounter(next);
-    BufferedWrite(*(reinterpret_cast<const TSPacket*>(pmt->tsheader())));
 }

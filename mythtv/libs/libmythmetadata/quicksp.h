@@ -21,7 +21,7 @@ struct ThreadLock
 
 // TODO: Get a real reference counted smart pointer in libmyth
 template <typename T, class Locker = NoLock>
-class META_PUBLIC simple_ref_ptr
+class simple_ref_ptr
 {
   public:
     simple_ref_ptr() : m_ref(0)

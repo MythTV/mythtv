@@ -213,7 +213,7 @@ bool IPTVFeederRTSP::Open(const QString &url)
             continue; // was not initiated
 
         IPTVMediaSink *iptvMediaSink = IPTVMediaSink::CreateNew(
-            *_live_env, TSPacket::SIZE * 128*1024);
+            *_live_env, TSPacket::kSize * 128*1024);
 
         subsession->sink = iptvMediaSink;
         if (!subsession->sink)

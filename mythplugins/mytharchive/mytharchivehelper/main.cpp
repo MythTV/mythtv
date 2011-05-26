@@ -2182,7 +2182,7 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
     av_estimate_timings(inputFC, 0);
 
     // Dump stream information
-    dump_format(inputFC, 0, inFileBA.constData(), 0);
+    av_dump_format(inputFC, 0, inFileBA.constData(), 0);
 
     QDomDocument doc("FILEINFO");
 
@@ -2330,8 +2330,11 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
                     stream.setAttribute("codec", codec.trimmed());
 
                 stream.setAttribute("channels", st->codec->channels);
-                if (strlen(st->language) > 0)
-                    stream.setAttribute("language", st->language);
+
+                AVMetadataTag *metatag = 
+                    av_metadata_get(st->metadata, "language", NULL, 0);
+                if (metatag)
+                    stream.setAttribute("language", metatag->value);
                 else
                     stream.setAttribute("language", "N/A");
 
@@ -2365,8 +2368,11 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
                 stream.setAttribute("streamindex", i);
                 stream.setAttribute("ffmpegindex", ffmpegIndex++);
                 stream.setAttribute("codec", codec.trimmed());
-                if (strlen(st->language) > 0)
-                    stream.setAttribute("language", st->language);
+
+                AVMetadataTag *metatag = 
+                    av_metadata_get(st->metadata, "language", NULL, 0);
+                if (metatag)
+                    stream.setAttribute("language", metatag->value);
                 else
                     stream.setAttribute("language", "N/A");
 

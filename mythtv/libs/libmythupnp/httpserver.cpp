@@ -64,7 +64,7 @@ HttpServer::HttpServer() : QTcpServer(), ThreadPool("HTTP")
     // ----------------------------------------------------------------------
 
 #ifdef USING_MINGW
-    g_sPlatform = QString( "Windows %1.%1" )
+    g_sPlatform = QString( "Windows %1.%2" )
         .arg(LOBYTE(LOWORD(GetVersion())))
         .arg(HIBYTE(LOWORD(GetVersion())));
 #else

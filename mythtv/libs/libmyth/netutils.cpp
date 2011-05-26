@@ -258,10 +258,10 @@ bool insertGrabberInDB(const QString &name, const QString &thumbnail,
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("INSERT INTO internetcontent (name,thumbnail,type,author,"
-                  "description,commandline,version,updated,search,tree,podcast,"
+                  "description,commandline,version,search,tree,podcast,"
                   "host) "
             "VALUES( :NAME, :THUMBNAIL, :TYPE, :AUTHOR, :DESCRIPTION, :COMMAND, "
-            ":VERSION, :UPDATED, :SEARCH, :TREE, :PODCAST, :HOST);");
+            ":VERSION, :SEARCH, :TREE, :PODCAST, :HOST);");
     query.bindValue(":NAME", name);
     query.bindValue(":THUMBNAIL", thumbbase);
     query.bindValue(":TYPE", type);
@@ -270,7 +270,6 @@ bool insertGrabberInDB(const QString &name, const QString &thumbnail,
     QFileInfo cmd(commandline);
     query.bindValue(":COMMAND", cmd.fileName());
     query.bindValue(":VERSION", version);
-    query.bindValue(":UPDATED", QDateTime());
     query.bindValue(":SEARCH", search);
     query.bindValue(":TREE", tree);
     query.bindValue(":PODCAST", podcast);

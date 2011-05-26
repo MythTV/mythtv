@@ -31,8 +31,11 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h>
 #include <errno.h>
+
+#ifdef HAVE_STRINGS_H
+#include <strings.h>
+#endif
 
 #ifdef HAVE_LIBXML2
 #include <libxml/parser.h>
@@ -114,6 +117,7 @@ static void _findMetaXMLfiles(META_ROOT *meta, const char *device_path)
             meta->dl_entries[i].filename = str_printf("%s", ent.d_name);
             strncpy(meta->dl_entries[i].language_code, ent.d_name+5,3);
             meta->dl_entries[i].language_code[3] = '\0';
+            str_tolower(meta->dl_entries[i].language_code);
         }
     }
     dir_close(dir);
@@ -187,7 +191,7 @@ META_DL *meta_get(META_ROOT *meta_root, const char *language_code)
 
     if (language_code) {
         for (i = 0; i < meta_root->dl_count; i++) {
-            if (strcasecmp(language_code, meta_root->dl_entries[i].language_code) == 0) {
+            if (strcmp(language_code, meta_root->dl_entries[i].language_code) == 0) {
                 return &meta_root->dl_entries[i];
             }
         }
@@ -195,7 +199,7 @@ META_DL *meta_get(META_ROOT *meta_root, const char *language_code)
     }
 
     for (i = 0; i < meta_root->dl_count; i++) {
-        if (strcasecmp(DEFAULT_LANGUAGE, meta_root->dl_entries[i].language_code) == 0) {
+        if (strcmp(DEFAULT_LANGUAGE, meta_root->dl_entries[i].language_code) == 0) {
             BD_DEBUG(DBG_DIR, "using default disclib language '"DEFAULT_LANGUAGE"'\n");
             return &meta_root->dl_entries[i];
         }

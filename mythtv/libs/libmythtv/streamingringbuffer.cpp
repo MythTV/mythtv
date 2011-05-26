@@ -31,6 +31,7 @@ bool StreamingRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     av_register_all();
 
     filename = lfilename;
+    VERBOSE(VB_GENERAL, LOC + QString("Trying %1").arg(filename));
 
     int res = url_open(&m_context, filename.toAscii(), URL_RDONLY);
 

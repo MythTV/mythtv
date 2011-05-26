@@ -3,9 +3,6 @@
  * engine and the rest of Myth.
  */
 
-// POSIX header
-#include <pthread.h>
-
 // Qt headers
 #include <QString>
 #include <QImage>

@@ -137,6 +137,16 @@ function editSelectedChannel() {
     $("#channelDetailSettingCallSign").val(rowdata.CallSign);
     $("#channelDetailSettingXMLTVID").val(rowdata.XMLTVID);
     $("#channelDetailSettingIconURL").val(rowdata.IconURL);
+    var preview = $("#channelDetailSettingIconPreview");
+    if ((rowdata.IconURL.length > 0) &&
+        (rowdata.IconURL.substring(0,1) != "/")) {
+        preview.attr('src',
+            '/Content/GetFile?StorageGroup=ChannelIcons&FileName=' +
+            rowdata.IconURL);
+    }
+    else
+        preview.attr('src', '/images/blank.gif');
+
     if (rowdata.Visible == "Yes") {
         $("#channelDetailSettingVisible").attr('checked', true);
     }
@@ -229,7 +239,6 @@ function saveChannelEdits() {
                       if (data.bool == "true") {
                           setStatusMessage("Channel updated successfully!");
                           $("#edit").dialog('close');
-                          $('#channels').trigger('reloadGrid');
                       }
                       else
                           setErrorMessage("Channel update failed!");
@@ -443,9 +452,146 @@ function initVideoMultiplexSelect(sourceid) {
     return result;
 }
 
+function choseNewChanIcon(url) {
+    $("#channelDetailSettingIconURL").val(url);
+    $("#channelDetailSettingIconPreview").attr('src',
+        '/Content/GetFile?StorageGroup=ChannelIcons&FileName=' +
+        basename(url));
+}
+
 function browseForNewChanIcon() {
-    openStorageGroupBrowser("Channel Icon", "channelDetailSettingIconURL",
+    openStorageGroupBrowser("Channel Icon", choseNewChanIcon,
                             "ChannelIcons");
+}
+
+function downloadChannelIcon(url) {
+    $.post("/Content/DownloadFile",
+        { URL: url, StorageGroup: "ChannelIcons" },
+        function(data) {
+            $("#channelDetailSettingIconPreview").attr('src',
+                '/Content/GetFile?StorageGroup=ChannelIcons&FileName=' +
+                basename(url));
+            setStatusMessage("Channel Icon download succeeded!");
+        }, "json").error(function() {
+            setErrorMessage("Channel Icon download failed!");
+        });
+}
+
+function selectChannelIcon(url) {
+    $("#channelDetailSettingIconPreview").attr('src', '/images/blank.gif');
+    downloadChannelIcon(url);
+    $("#channelDetailSettingIconURL").val(basename(url));
+    $("#iconBrowser").dialog("close");
+}
+
+var iconCount = 0;
+var iconRow = "";
+function channelIconLink(url) {
+    return "<td class='iconGridCell'><a href='#' " +
+        "onClick='javascript:selectChannelIcon(\"" + url + "\")'><img src='" +
+        url + "' id='channelIcon_" + iconCount + "' class='iconGridIcon'" +
+        " onLoad='resizeChannelIcon(\"channelIcon_" + iconCount + "\")'></a>" +
+        "<br><div id='channelIcon_" + iconCount + "_size'></div></td>";
+}
+
+function addChannelIconToGrid(url) {
+    var result = "";
+    if (url.substring(0,5).toLowerCase() == "error")
+        return;
+
+    iconRow = "row_" + parseInt(iconCount / 3);
+
+    if (iconCount == 0) {
+        $("#iconBrowser").html(
+            "<table id='iconGallery' border=0 cellpadding=0 cellspacing=1>" +
+            "<tr><td class='xinvisible'>" +
+                     "<img src='/images/blank.gif' width=200 height=0></td>" +
+                "<td class='xinvisible'>" +
+                     "<img src='/images/blank.gif' width=200 height=0></td>" +
+                "<td class='xinvisible'>" +
+                     "<img src='/images/blank.gif' width=200 height=0></td></tr>" +
+            "<tr id='" + iconRow + "'>" + channelIconLink(url) +
+            "</tr></table>");
+    } else if (((iconCount % 3) == 0)) {
+        $("#iconGallery").append("<tr id='" + iconRow + "'>" +
+            channelIconLink(url) + "</tr>");
+    } else {
+        $("#" + iconRow).append(channelIconLink(url));
+    }
+
+    iconCount++;
+}
+
+function resizeChannelIcon(id, maxWidth, maxHeight) {
+    var preview = $("#channelDetailSettingIconPreview");
+    if (preview.attr('src') != '/images/blank.gif') {
+        preview.css('display', 'inline');
+    }
+    else {
+        preview.css('display', 'none');
+    }
+    var ratio = 0;
+    var icon = $("#" + id);
+    var width = icon.width();
+    var height = icon.height();
+
+    if (maxWidth == undefined)
+        maxWidth = 200;
+    if (maxHeight == undefined)
+        maxHeight = 200;
+
+    $("#" + id + "_size").html("Size: " + width + "x" + height);
+
+    if (width > maxWidth) {
+        ratio = maxWidth / width;
+        icon.attr("width", maxWidth);
+        icon.attr("height", height * ratio);
+        height = height * ratio;
+        width = width * ratio;
+    }
+
+    if (height > maxHeight) {
+        ratio = maxHeight / height;
+        icon.attr("height", maxHeight);
+        icon.attr("width", width * ratio);
+        width = width * ratio;
+    }
+}
+
+function searchChannelIcon() {
+    var iconsSeen = [];
+    iconCount = 0;
+
+    var iconBrowser = $("#iconBrowser");
+    iconBrowser.dialog({
+        modal: true,
+        width: 680,
+        height: 340,
+        'title': 'Channel Icon Download',
+        closeOnEscape: false,
+        autoOpen: false,
+        buttons: {
+           'Cancel': function() { $(this).dialog('close'); }
+    }});
+
+    iconBrowser.html("");
+    $.getJSON("http://services.mythtv.org/channel-icon/lookup?jsoncallback=?",
+        { callsign: $("#channelDetailSettingCallSign").val() },
+        function(data) {
+            $.each(data.urls, function(i, url) {
+                addChannelIconToGrid(url);
+            });
+        });
+
+    $.getJSON("http://services.mythtv.org/channel-icon/lookup?jsoncallback=?",
+        { xmltvid: $("#channelDetailSettingXMLTVID").val() },
+        function(data) {
+            $.each(data.urls, function(i, url) {
+                addChannelIconToGrid(url);
+            });
+        });
+
+    iconBrowser.dialog("open");
 }
 
 initSourceList();

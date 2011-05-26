@@ -1,31 +1,26 @@
-
-#include "channeleditor.h"
-
-#include <QSqlDatabase>
+// Qt
 #include <QCoreApplication>
 
-#include "mythwizard.h"
-
-
-// MythUI
-#include "mythdb.h"
-#include "mythverbose.h"
-#include "mythuitext.h"
-#include "mythuibutton.h"
-#include "mythuibuttonlist.h"
-#include "mythuitextedit.h"
-#include "mythuicheckbox.h"
-#include "mythdialogbox.h"
+// MythTV
 #include "mythprogressdialog.h"
-
-#include "settings.h"
+#include "mythuibuttonlist.h"
 #include "channelsettings.h"
 #include "transporteditor.h"
-#include "sourceutil.h"
+#include "mythuicheckbox.h"
+#include "mythuitextedit.h"
+#include "channeleditor.h"
+#include "mythdialogbox.h"
+#include "mythuibutton.h"
 #include "channelutil.h"
-
-#include "scanwizard.h"
 #include "importicons.h"
+#include "mythverbose.h"
+#include "mythuitext.h"
+#include "mythwizard.h"
+#include "scanwizard.h"
+#include "sourceutil.h"
+#include "cardutil.h"
+#include "settings.h"
+#include "mythdb.h"
 
 ChannelWizard::ChannelWizard(int id, int default_sourceid)
     : ConfigurationWizard()
@@ -44,77 +39,19 @@ ChannelWizard::ChannelWizard(int id, int default_sourceid)
         new ChannelOptionsFilters(*cid);
     addChild(filters);
 
-    int cardtypes = countCardtypes();
-    bool hasDVB = cardTypesInclude("DVB");
-
-    // add v4l options if no dvb or if dvb and some other card type
-    // present
-    QString cardtype = getCardtype();
-    if (!hasDVB || cardtypes > 1 || id == 0)
+    QStringList cardtypes = ChannelUtil::GetCardTypes(cid->getValue().toUInt());
+    bool all_v4l = !cardtypes.empty();
+    bool all_asi = !cardtypes.empty();
+    for (uint i = 0; i < (uint) cardtypes.size(); i++)
     {
-        ChannelOptionsV4L* v4l = new ChannelOptionsV4L(*cid);
-        addChild(v4l);
-    }
-}
-
-QString ChannelWizard::getCardtype()
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardtype"
-                  " FROM capturecard, cardinput, channel"
-                  " WHERE channel.chanid = :CHID "
-                  " AND channel.sourceid = cardinput.sourceid"
-                  " AND cardinput.cardid = capturecard.cardid");
-    query.bindValue(":CHID", cid->getValue());
-
-    if (query.exec() && query.next())
-    {
-        return query.value(0).toString();
+        all_v4l &= CardUtil::IsV4L(cardtypes[i]);
+        all_asi &= cardtypes[i] == "ASI";
     }
 
-    return "";
-}
-
-bool ChannelWizard::cardTypesInclude(const QString& thecardtype)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT count(cardtype)"
-        " FROM capturecard, cardinput, channel"
-        " WHERE channel.chanid= :CHID "
-        " AND channel.sourceid = cardinput.sourceid"
-        " AND cardinput.cardid = capturecard.cardid"
-        " AND capturecard.cardtype= :CARDTYPE ");
-    query.bindValue(":CHID", cid->getValue());
-    query.bindValue(":CARDTYPE", thecardtype);
-
-    if (query.exec() && query.next())
-    {
-        int count = query.value(0).toInt();
-
-        if (count > 0)
-            return true;
-        else
-            return false;
-    } else
-        return false;
-}
-
-int ChannelWizard::countCardtypes()
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT count(DISTINCT cardtype)"
-        " FROM capturecard, cardinput, channel"
-        " WHERE channel.chanid = :CHID "
-        " AND channel.sourceid = cardinput.sourceid"
-        " AND cardinput.cardid = capturecard.cardid");
-    query.bindValue(":CHID", cid->getValue());
-
-    if (query.exec() && query.next())
-    {
-        return query.value(0).toInt();
-    }
-    else
-        return 0;
+    if (all_v4l)
+        addChild(new ChannelOptionsV4L(*cid));
+    else if (all_asi)
+        addChild(new ChannelOptionsRawTS(*cid));
 }
 
 /////////////////////////////////////////////////////////

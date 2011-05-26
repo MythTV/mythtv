@@ -61,6 +61,15 @@ using namespace std;
 #include "hdhrchannel.h"
 #include "v4lchannel.h"
 
+/** \fn ScannerThread::run(void)
+ *  \brief Thunk that allows scannerThread thread to
+ *         call ChannelScanSM::RunScanner().
+ */
+void ScannerThread::run(void)
+{
+    m_parent->RunScanner();
+}
+
 /// SDT's should be sent every 2 seconds and NIT's every
 /// 10 seconds, so lets wait at least 30 seconds, in
 /// case of bad transmitter or lost packets.
@@ -163,7 +172,8 @@ ChannelScanSM::ChannelScanSM(
       // Misc
       channelsFound(999),
       currentInfo(NULL),
-      analogSignalHandler(new AnalogSignalHandler(this))
+      analogSignalHandler(new AnalogSignalHandler(this)),
+      scannerThread(NULL)
 {
     inputname.detach();
 
@@ -1392,23 +1402,11 @@ const DVBChannel *ChannelScanSM::GetDVBChannel(void) const
 
 V4LChannel *ChannelScanSM::GetV4LChannel(void)
 {
-#ifdef USING_V4L
+#ifdef USING_V4L2
     return dynamic_cast<V4LChannel*>(channel);
 #else
     return NULL;
 #endif
-}
-
-/** \fn ScannerThread::run(void)
- *  \brief Thunk that allows scannerThread thread to
- *         call ChannelScanSM::RunScanner().
- */
-void ScannerThread::run(void)
-{
-    if (!m_parent)
-        return;
-
-    m_parent->RunScanner();
 }
 
 /** \fn ChannelScanSM::StartScanner(void)
@@ -1416,8 +1414,18 @@ void ScannerThread::run(void)
  */
 void ChannelScanSM::StartScanner(void)
 {
-    scannerThread.SetParent(this);
-    scannerThread.start();
+    while (scannerThread)
+    {
+        threadExit = true;
+        if (scannerThread->wait(1000))
+        {
+            delete scannerThread;
+            scannerThread = NULL;
+        }
+    }
+    threadExit = false;
+    scannerThread = new ScannerThread(this);
+    scannerThread->start();
 }
 
 /** \fn ChannelScanSM::RunScanner(void)
@@ -1427,14 +1435,12 @@ void ChannelScanSM::RunScanner(void)
 {
     VERBOSE(VB_CHANSCAN, LOC + "ChannelScanSM::RunScanner -- begin");
 
-    threadExit = false;
-
     while (!threadExit)
     {
         if (scanning)
             HandleActiveScan();
 
-        usleep(250);
+        usleep(10 * 1000);
     }
 
     VERBOSE(VB_CHANSCAN, LOC + "ChannelScanSM::RunScanner -- end");
@@ -1651,7 +1657,7 @@ void ChannelScanSM::ScanTransport(const transport_scan_items_it_t transport)
     }
 
     // Start signal monitor for this channel
-    signalMonitor->Start(false);
+    signalMonitor->Start();
 
     timer.start();
     waitingForTables = (item.tuning.sistandard != "analog");
@@ -1665,10 +1671,15 @@ void ChannelScanSM::StopScanner(void)
 {
     VERBOSE(VB_CHANSCAN, LOC + "ChannelScanSM::StopScanner");
 
-    threadExit = true;
-
-    if (scannerThread.isRunning())
-        scannerThread.wait();
+    while (scannerThread)
+    {
+        threadExit = true;
+        if (scannerThread->wait(1000))
+        {
+            delete scannerThread;
+            scannerThread = NULL;
+        }
+    }
 
     if (signalMonitor)
         signalMonitor->Stop();
@@ -1949,6 +1960,25 @@ bool ChannelScanSM::ScanTransport(uint mplexid, bool follow_nit)
     }
 
     return false;
+}
+
+bool ChannelScanSM::ScanCurrentTransport(const QString &sistandard)
+{
+    scanTransports.clear();
+    nextIt = scanTransports.end();
+
+    signalTimeout = 30000;
+    QString name;
+    TransportScanItem item(sourceID, sistandard, name, 0, signalTimeout);
+    scanTransports.push_back(item);
+
+    timer.start();
+    waitingForTables = false;
+    extend_scan_list = false;
+    transportsScanned = 0;
+    nextIt   = scanTransports.begin();
+    scanning = true;
+    return true;
 }
 
 /** \fn ChannelScanSM::CheckImportedList(const DTVChannelInfoList&,uint,QString&,QString&,QString&)

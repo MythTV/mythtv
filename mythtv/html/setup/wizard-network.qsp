@@ -1,15 +1,15 @@
 <div id='wizard-network' class='setuptab'>
 <input type='hidden' id='MasterServerIP'>
 <table>
-    <tr><th align=right>Master Backend:</th>
+    <tr><th align=right><i18n>Master Backend</i18n>:</th>
         <td id='MasterServerIP_cell'>&nbsp;
             <a href="javascript:showSettingHelp('MasterServerIP')">[?]</a>
             </td></tr>
-    <tr><th align=right>Local Backend:</th>
+    <tr><th align=right><i18n>Local Backend</i18n>:</th>
         <td id='BackendServerIP_cell'>&nbsp;
             <a href="javascript:showSettingHelp('BackendServerIP')">[?]</a>
             </td></tr>
-    <tr><th align=right>Security PIN:</th>
+    <tr><th align=right><i18n>Security PIN</i18n>:</th>
         <td><input id='SecurityPin' type='password' size=10>
             <a href="javascript:showSettingHelp('SecurityPin')">[?]</a>
             <div class="form_error" id="SecurityPin_error"></div>
@@ -39,7 +39,7 @@ loadContent('/Config/General?__group__=local_server')">Advanced General Setup Sc
         $("#MasterServerIP_cell").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
             + "<input type='button' "
             + " onClick='javascript:makeLocalBackendTheMaster()' "
-            + " value='Make this server the master backend'>");
+            + " value='<i18n>Make this server the master backend</i18n>'>");
     }
 
 </script>

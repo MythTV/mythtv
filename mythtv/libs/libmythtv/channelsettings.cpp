@@ -1,9 +1,12 @@
 #include <QWidget>
+#include <QFile>
 
 #include "channelsettings.h"
-#include "cardutil.h"
 #include "channelutil.h"
 #include "programinfo.h" // for COMM_DETECT*, GetPreferredSkipTypeCombinations()
+#include "mpegtables.h"
+#include "mythdirs.h"
+#include "cardutil.h"
 
 QString ChannelDBStorage::GetWhereClause(MSqlBindings &bindings) const
 {
@@ -229,12 +232,12 @@ class OutputFilters : public LineEditSetting, public ChannelDBStorage
     }
 };
 
-
-class XmltvID : public LineEditSetting, public ChannelDBStorage
+class XmltvID : public ComboBoxSetting, public ChannelDBStorage
 {
   public:
-    XmltvID(const ChannelID &id) :
-        LineEditSetting(this), ChannelDBStorage(this, id, "xmltvid")
+    XmltvID(const ChannelID &id, const QString &_sourceName) :
+        ComboBoxSetting(this, true), ChannelDBStorage(this, id, "xmltvid"),
+        sourceName(_sourceName)
     {
         setLabel(QObject::tr("XMLTV ID"));
         setHelpText(QObject::tr(
@@ -243,6 +246,47 @@ class XmltvID : public LineEditSetting, public ChannelDBStorage
                         "and a channel in their database. Normally this is "
                         "set automatically when 'mythfilldatabase' is run."));
     }
+
+    void Load(void)
+    {
+        fillSelections();
+        ChannelDBStorage::Load();
+    }
+
+    void fillSelections(void)
+    {
+        clearSelections();
+
+        QString xmltvFile = GetConfDir() + '/' + sourceName + ".xmltv";
+
+        if (QFile::exists(xmltvFile))
+        {
+            QFile file(xmltvFile);
+            if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+                return;
+
+            QStringList idList;
+
+            while (!file.atEnd())
+            {
+                QByteArray line = file.readLine();
+
+                if (line.startsWith("channel="))
+                {
+                    QString id = line.mid(8, -1).trimmed();
+                    idList.append(id);
+                }
+            }
+
+            idList.sort();
+
+            for (int x = 0; x < idList.size(); x++)
+                addSelection(idList.at(x), idList.at(x));
+        }
+    }
+
+  private:
+    QString sourceName;
 };
 
 class CommMethod : public ComboBoxSetting, public ChannelDBStorage
@@ -375,11 +419,12 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
     addChild(new Name(id));
 
     Source *source = new Source(id, default_sourceid);
+    source->Load();
 
     HorizontalConfigurationGroup *group1 =
         new HorizontalConfigurationGroup(false,false,true,true);
-    HorizontalConfigurationGroup *bottomhoz =
-        new HorizontalConfigurationGroup(false, true);
+    VerticalConfigurationGroup *bottomhoz =
+        new VerticalConfigurationGroup(false, true);
     VerticalConfigurationGroup *left =
         new VerticalConfigurationGroup(false, true);
     VerticalConfigurationGroup *right =
@@ -398,7 +443,7 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
     group1->addChild(right);
 
     bottomhoz->addChild(onairguide = new OnAirGuide(id));
-    bottomhoz->addChild(xmltvID = new XmltvID(id));
+    bottomhoz->addChild(xmltvID = new XmltvID(id, source->getSelectionLabel()));
     bottomhoz->addChild(new TimeOffset(id));
 
     addChild(group1);
@@ -465,6 +510,7 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
 
     onairguide->setEnabled(supports_eit);
     xmltvID->setEnabled(!uses_eit_only);
+    xmltvID->Load();
 }
 
 ChannelOptionsFilters::ChannelOptionsFilters(const ChannelID& id) :
@@ -490,5 +536,118 @@ ChannelOptionsV4L::ChannelOptionsV4L(const ChannelID& id) :
     addChild(new Colour(id));
     addChild(new Hue(id));
 };
+
+/*****************************************************************************
+        Channel Options - Video 4 Linux
+ *****************************************************************************/
+
+ChannelOptionsRawTS::ChannelOptionsRawTS(const ChannelID &id) :
+    VerticalConfigurationGroup(false, true, false, false), cid(id)
+{
+    setLabel(QObject::tr("Channel Options - Raw Transport Stream"));
+    setUseLabel(false);
+
+    const uint mx = kMaxPIDs;
+    pids.resize(mx);
+    sids.resize(mx);
+    pcrs.resize(mx);
+
+    for (uint i = 0; i < mx; i++)
+    {
+        HorizontalConfigurationGroup *row =
+            new HorizontalConfigurationGroup(false, false, true, true);
+        TransLabelSetting *label0 = new TransLabelSetting();
+        label0->setLabel("    PID");
+        TransLabelSetting *label1 = new TransLabelSetting();
+        label1->setLabel("    StreamID");
+        TransLabelSetting *label2 = new TransLabelSetting();
+        label2->setLabel("    Is PCR");
+        row->addChild(label0);
+        row->addChild((pids[i] = new TransLineEditSetting()));
+        row->addChild(label1);
+        row->addChild((sids[i] = new TransComboBoxSetting()));
+        for (uint j = 0x101; j <= 0x1ff; j++)
+        {
+            QString desc = StreamID::GetDescription(j&0xff);
+            if (!desc.isEmpty())
+                sids[i]->addSelection(
+                    QString("%1 (0x%2)")
+                    .arg(desc).arg(j&0xff,2,16,QLatin1Char('0')),
+                    QString::number(j), false);
+        }
+        for (uint j = 0x101; j <= 0x1ff; j++)
+        {
+            QString desc = StreamID::GetDescription(j&0xff);
+            if (desc.isEmpty())
+                sids[i]->addSelection(
+                    QString("0x%1").arg(j&0xff,2,16,QLatin1Char('0')),
+                    QString::number(j), false);
+        }
+/* we don't allow tables right now, PAT & PMT generated on the fly
+        for (uint j = 0; j <= 0xff; j++)
+        {
+            QString desc = TableID::GetDescription(j);
+            if (!desc.isEmpty())
+            {
+                sids[i]->addSelection(
+                    QString("%1 (0x%2)").arg(j,0,16,QLatin1Char('0')),
+                    QString::number(j),
+                    false);
+            }
+        }
+*/
+        row->addChild(label2);
+        row->addChild((pcrs[i] = new TransCheckBoxSetting()));
+        addChild(row);
+    }
+};
+
+void ChannelOptionsRawTS::Load(void)
+{
+    uint chanid = cid.getValue().toUInt();
+
+    pid_cache_t pid_cache;
+    if (!ChannelUtil::GetCachedPids(chanid, pid_cache))
+        return;
+
+    pid_cache_t::const_iterator it = pid_cache.begin();
+    for (uint i = 0; i < kMaxPIDs && it != pid_cache.end(); )
+    {
+        if (!(it->IsPermanent()))
+        {
+            ++it;
+            continue;
+        }
+
+        pids[i]->setValue(QString("0x%1")
+                          .arg(it->GetPID(),2,16,QLatin1Char('0')));
+        sids[i]->setValue(QString::number(it->GetComposite()&0x1ff));
+        pcrs[i]->setValue(it->IsPCRPID());
+        
+        ++it;
+        ++i;
+    }
+}
+
+void ChannelOptionsRawTS::Save(void)
+{
+    uint chanid = cid.getValue().toUInt();
+
+    pid_cache_t pid_cache;
+    for (uint i = 0; i < kMaxPIDs; i++)
+    {
+        bool ok;
+        uint pid = pids[i]->getValue().toUInt(&ok, 0);
+        if (!ok || !sids[i]->getValue().toUInt())
+            continue;
+
+        pid_cache.push_back(
+            pid_cache_item_t(
+                pid, sids[i]->getValue().toUInt() | 0x10000 |
+                (pcrs[i]->getValue().toUInt() ? 0x200 : 0x0)));
+    }
+
+    ChannelUtil::SaveCachedPids(chanid, pid_cache, true /* delete_all */);
+}
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

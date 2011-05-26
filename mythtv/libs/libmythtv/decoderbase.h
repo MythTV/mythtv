@@ -31,6 +31,7 @@ typedef enum TrackTypes
     kTrackTypeTeletextCaptions,
     kTrackTypeTeletextMenu,
     kTrackTypeRawText,
+    kTrackTypeAttachment,
     kTrackTypeCount,
 
     kTrackTypeTextSubtitle,
@@ -168,7 +169,6 @@ class DecoderBase
     void SetReadAdjust(long long adjust);
 
     // DVD public stuff
-    void ChangeDVDTrack(bool ffw);
     long long DVDFindPosition(long long desiredFrame);
     void UpdateDVDFramesPlayed(void);
 
@@ -194,6 +194,9 @@ class DecoderBase
     virtual int  GetTeletextDecoderType(void) const { return -1; }
 
     virtual QString GetXDS(const QString&) const { return QString::null; }
+    virtual QByteArray GetSubHeader(uint trackNo) const { return QByteArray(); }
+    virtual void GetAttachmentData(uint trackNo, QByteArray &filename,
+                                   QByteArray &data) {}
 
     // MHEG/MHI stuff
     virtual bool SetAudioByComponentTag(int) { return false; }

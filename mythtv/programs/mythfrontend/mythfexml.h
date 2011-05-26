@@ -55,6 +55,7 @@ class MythFEXML : public Eventing
     void GetActionList    ( HTTPRequest *pRequest );
     void GetActionListTest( HTTPRequest *pRequest );
     void GetRemote        ( HTTPRequest *pRequest );
+    bool IsValidAction    ( const QString &action );
     void InitActions      ( void );
 
   public:

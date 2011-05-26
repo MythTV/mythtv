@@ -28,6 +28,7 @@ HEADERS += datacontracts/channelInfoList.h       datacontracts/videoSource.h
 HEADERS += datacontracts/videoSourceList.h       datacontracts/videoMultiplex.h
 HEADERS += datacontracts/videoMultiplexList.h    datacontracts/videoMetadataInfo.h
 HEADERS += datacontracts/videoMetadataInfoList.h datacontracts/blurayInfo.h
+HEADERS += datacontracts/timeZoneInfo.h
 
 SOURCES += service.cpp
 
@@ -56,6 +57,7 @@ incDatacontracts.files += datacontracts/videoSource.h         datacontracts/vide
 incDatacontracts.files += datacontracts/videoMultiplex.h      datacontracts/videoMultiplexList.h
 incDatacontracts.files += datacontracts/videoMetadataInfo.h   datacontracts/videoMetadataInfoList.h
 incDatacontracts.files += datacontracts/blurayInfo.h
+incDatacontracts.files += datacontracts/timeZoneInfo.h
 
 INSTALLS += inc incServices incDatacontracts
 

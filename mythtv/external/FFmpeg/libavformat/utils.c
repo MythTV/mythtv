@@ -2339,7 +2339,8 @@ int av_find_stream_info(AVFormatContext *ic)
     }
 
     for (i=0; i<ic->nb_streams; i++) {
-        ic->streams[i]->info->last_dts = AV_NOPTS_VALUE;
+        if (ic->streams[i]->info )
+            ic->streams[i]->info->last_dts = AV_NOPTS_VALUE;
     }
 
     count = 0;

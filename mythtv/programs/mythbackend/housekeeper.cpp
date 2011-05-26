@@ -31,32 +31,44 @@ using namespace std;
 #include "mythdownloadmanager.h"
 #include "mythversion.h"
 
-HouseKeeper::HouseKeeper(bool runthread, bool master, Scheduler *lsched)
-                        : threadrunning(runthread), filldbRunning(false),
-                          isMaster(master),         sched(lsched)
+HouseKeeper::HouseKeeper(bool runthread, bool master, Scheduler *lsched) :
+    isMaster(master),           sched(lsched),
+    houseKeepingRun(runthread), houseKeepingThread(NULL),
+    fillDBThread(NULL),         fillDBStarted(false),
+    fillDBMythSystem(NULL)
 {
     CleanupMyOldRecordings();
 
     if (runthread)
     {
-        HouseKeepingThread.SetParent(this);
-        HouseKeepingThread.start();
+        houseKeepingThread = new HouseKeepingThread(this);
+        houseKeepingThread->start();
+
+        QMutexLocker locker(&houseKeepingLock);
+        while (houseKeepingRun && !houseKeepingThread->isRunning())
+            houseKeepingWait.wait(locker.mutex());
     }
 }
 
 HouseKeeper::~HouseKeeper()
 {
-    if (HouseKeepingThread.isRunning())
+    if (houseKeepingThread)
     {
-        HouseKeepingThread.terminate();
-        HouseKeepingThread.wait();
+        {
+            QMutexLocker locker(&houseKeepingLock);
+            houseKeepingRun = false;
+            houseKeepingWait.wakeAll();
+        }
+        houseKeepingThread->wait();
+        delete houseKeepingThread;
+        houseKeepingThread = NULL;
     }
 
-    if (FillDBThread && FillDBThread->isRunning())
+    if (fillDBThread)
     {
-        FillDBThread->terminate();
-        FillDBThread->wait();
-        delete FillDBThread;
+        KillMFD();
+        delete fillDBThread;
+        fillDBThread = NULL;
     }
 }
 
@@ -171,17 +183,29 @@ QDateTime HouseKeeper::getLastRun(const QString &dbTag)
 
 void HouseKeeper::RunHouseKeeping(void)
 {
+    // tell constructor that we've started..
+    {
+        QMutexLocker locker(&houseKeepingLock);
+        houseKeepingWait.wakeAll();
+    }
+
     int period, maxhr, minhr;
     QString dbTag;
     bool initialRun = true;
 
     // wait a little for main server to come up and things to settle down
-    sleep(10);
+    {
+        QMutexLocker locker(&houseKeepingLock);
+        houseKeepingWait.wait(locker.mutex(), 10 * 1000);
+    }
 
     RunStartupTasks();
 
-    while (1)
+    QMutexLocker locker(&houseKeepingLock);
+    while (houseKeepingRun)
     {
+        locker.unlock();
+
         gCoreContext->LogEntry("mythbackend", LP_DEBUG,
                            "Running housekeeping thread", "");
 
@@ -204,14 +228,14 @@ void HouseKeeper::RunHouseKeeping(void)
             // Run mythfilldatabase to grab the TV listings
             if (gCoreContext->GetNumSetting("MythFillEnabled", 1))
             {
-                if (FillDBThread && FillDBThread->isRunning())
+                if (fillDBThread && fillDBThread->isRunning())
                 {
                     VERBOSE(VB_GENERAL, "mythfilldatabase still running, "
                                         "skipping checks.");
                 }
                 else
                 {
-                    period = gCoreContext->GetNumSetting("MythFillPeriod", 1);
+                    period = 1;
                     minhr = gCoreContext->GetNumSetting("MythFillMinHour", -1);
                     if (minhr == -1)
                     {
@@ -265,7 +289,7 @@ void HouseKeeper::RunHouseKeeping(void)
                         QString msg = "Running mythfilldatabase";
                         gCoreContext->LogEntry("mythbackend", LP_DEBUG, msg, "");
                         VERBOSE(VB_GENERAL, msg);
-                        runFillDatabase();
+                        StartMFD();
                         updateLastrun("MythFillDB");
                     }
                 }
@@ -302,7 +326,9 @@ void HouseKeeper::RunHouseKeeping(void)
 
         initialRun = false;
 
-        sleep(300 + (random()%8));
+        locker.relock();
+        if (houseKeepingRun)
+            houseKeepingWait.wait(locker.mutex(), (300 + (random()%8)) * 1000);
     }
 }
 
@@ -334,16 +360,16 @@ void HouseKeeper::flushLogs()
     }
 }
 
-void MFDThread::run(void)
-{
-    if (!m_parent)
-        return;
-
-    m_parent->RunMFD();
-}
-
 void HouseKeeper::RunMFD(void)
 {
+    fillDBThread->setTerminationEnabled(false);
+
+    {
+        QMutexLocker locker(&fillDBLock);
+        fillDBStarted = true;
+        fillDBWait.wakeAll();
+    }
+
     QString mfpath = gCoreContext->GetSetting("MythFillDatabasePath",
                                           "mythfilldatabase");
     QString mfarg = gCoreContext->GetSetting("MythFillDatabaseArgs", "");
@@ -384,24 +410,81 @@ void HouseKeeper::RunMFD(void)
         }
     }
 
-    if (myth_system(command, kMSDontBlockInputDevs))
+    {
+        QMutexLocker locker(&fillDBLock);
+        fillDBMythSystem = new MythSystem(
+            command, kMSRunShell | kMSAutoCleanup);
+        fillDBMythSystem->Run(0);
+        fillDBWait.wakeAll();
+    }
+
+    fillDBThread->setTerminationEnabled(true);
+
+    uint result = fillDBMythSystem->Wait(0);
+
+    fillDBThread->setTerminationEnabled(false);
+
+    {
+        QMutexLocker locker(&fillDBLock);
+        fillDBMythSystem->deleteLater();
+        fillDBMythSystem = NULL;
+        fillDBWait.wakeAll();
+    }
+
+    if (result)
     {
         VERBOSE(VB_IMPORTANT, QString("MythFillDatabase command '%1' failed")
-                                        .arg(command));
+                .arg(command));
     }
 }
 
-void HouseKeeper::runFillDatabase()
+void HouseKeeper::StartMFD(void)
 {
-    if (FillDBThread && FillDBThread->isRunning())
+    if (fillDBThread)
+    {
+        KillMFD();
+        delete fillDBThread;
+        fillDBThread = NULL;
+        fillDBStarted = false;
+    }
+
+    fillDBThread = new MythFillDatabaseThread(this);
+    fillDBThread->start();
+
+    QMutexLocker locker(&fillDBLock);
+    while (!fillDBStarted)
+        fillDBWait.wait(locker.mutex());
+}
+
+void HouseKeeper::KillMFD(void)
+{
+    if (!fillDBThread->isRunning())
         return;
 
-    if (FillDBThread)
-        delete FillDBThread;
+    QMutexLocker locker(&fillDBLock);
+    if (fillDBMythSystem && fillDBThread->isRunning())
+    {
+        fillDBMythSystem->Term(false);
+        fillDBWait.wait(locker.mutex(), 50);
+    }
 
-    FillDBThread = new MFDThread;
-    FillDBThread->SetParent(this);
-    FillDBThread->start();
+    if (fillDBMythSystem && fillDBThread->isRunning())
+    {
+        fillDBMythSystem->Term(true);
+        fillDBWait.wait(locker.mutex(), 50);
+    }
+
+    if (fillDBThread->isRunning())
+    {
+        fillDBThread->terminate();
+        usleep(5000);
+    }
+
+    if (fillDBThread->isRunning())
+    {
+        locker.unlock();
+        fillDBThread->wait();
+    }
 }
 
 void HouseKeeper::CleanupMyOldRecordings(void)
@@ -680,7 +763,7 @@ void HouseKeeper::UpdateThemeChooserInfoCache(void)
                 "remote themes info package.").arg(url));
         return;
     }
-    
+
     if (!extractZIP(remoteThemesFile, remoteThemesDir))
     {
         VERBOSE(VB_IMPORTANT, QString("HouseKeeper: Error extracting %1"
@@ -694,15 +777,6 @@ void HouseKeeper::RunStartupTasks(void)
 {
     if (isMaster)
         EITCache::ClearChannelLocks();
-}
-
-
-void HKThread::run(void)
-{
-    if (!m_parent)
-        return;
-
-    m_parent->RunHouseKeeping();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

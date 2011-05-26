@@ -1,5 +1,5 @@
 // -*- Mode: c++ -*-
-// Copyright (c) 2003-2004, Daniel Thor Kristjansson
+// Copyright (c) 2003-2004,2010 Daniel Thor Kristjansson
 #ifndef _TS_PACKET_H_
 #define _TS_PACKET_H_
 
@@ -112,8 +112,8 @@ class TSHeader {
     const unsigned char* data() const { return _tsdata; }
     unsigned char* data() { return _tsdata; }
 
-    static const unsigned int HEADER_SIZE;
-    static const unsigned char PAYLOAD_ONLY_HEADER[4];
+    static const unsigned int kHeaderSize;
+    static const unsigned char kPayloadOnlyHeader[4];
   private:
     unsigned char _tsdata[4];
 };
@@ -133,22 +133,22 @@ class TSPacket : public TSHeader
     static TSPacket* CreatePayloadOnlyPacket()
     {
         TSPacket *pkt = new TSPacket();
-        pkt->InitHeader(PAYLOAD_ONLY_HEADER);
-        memset(pkt->_tspayload, 0xFF, PAYLOAD_SIZE);
+        pkt->InitHeader(kPayloadOnlyHeader);
+        memset(pkt->_tspayload, 0xFF, kPayloadSize);
         pkt->SetStartOfFieldPointer(0);
         return pkt;
     }
 
     inline TSPacket* CreateClone() const {
         TSPacket *pkt = new TSPacket();
-        memcpy(pkt, this, SIZE);
+        memcpy(pkt, this, kSize);
         return pkt;
     }
 
     void InitPayload(const unsigned char *payload)
     {
         if (payload)
-            memcpy(_tspayload, payload, PAYLOAD_SIZE);
+            memcpy(_tspayload, payload, kPayloadSize);
     }
 
     void InitPayload(const unsigned char *payload, uint size)
@@ -158,8 +158,8 @@ class TSPacket : public TSHeader
         else
             size = 0;
 
-        if (size < TSPacket::PAYLOAD_SIZE)
-            memset(_tspayload + size, 0xff, TSPacket::PAYLOAD_SIZE - size);
+        if (size < TSPacket::kPayloadSize)
+            memset(_tspayload + size, 0xff, TSPacket::kPayloadSize - size);
     }
 
     // This points outside the TSHeader data, but is declared here because
@@ -169,16 +169,48 @@ class TSPacket : public TSHeader
     }
 
     //4.0  8 bits, iff payloadStart(), points to start of field
-    unsigned int StartOfFieldPointer() const { return data()[AFCOffset()]; }
-    void SetStartOfFieldPointer(uint sof) { data()[AFCOffset()] = sof; }
+    unsigned int StartOfFieldPointer() const 
+        { return _tspayload[AFCOffset()-4]; }
+    void SetStartOfFieldPointer(uint sof) 
+        { _tspayload[AFCOffset()-4] = sof; }
 
     QString toString() const;
 
-    static const unsigned int SIZE;
-    static const unsigned int PAYLOAD_SIZE;
-    static const TSPacket    *NULL_PACKET;
+    static const unsigned int kSize;
+    static const unsigned int kPayloadSize;
+    static const unsigned int kDVBEmissionSize;
+    static const unsigned int kISDBEmissionSize;
+    static const unsigned int k8VSBEmissionSize;
+    static const TSPacket    *kNullPacket;
   private:
     unsigned char _tspayload[184];
 };
 
-#endif
+/** \class TSDVBEmissionPacket
+ *  \brief Adds DVB forward error correction data to size of packet.
+ */
+class TSDVBEmissionPacket : public TSPacket
+{
+  private:
+    unsigned char _tsfec[16];
+};
+
+/** \class TSISDBEmissionPacket
+ *  \brief Adds ISDB forward error correction data to size of packet.
+ */
+class TSISDBEmissionPacket : public TSPacket
+{
+  private:
+    unsigned char _tsfec[16];
+};
+
+/** \class TS8VSBEmissionPacket
+ *  \brief Adds 8-VSB forward error correction data to size of packet.
+ */
+class TS8VSBEmissionPacket : public TSPacket
+{
+  private:
+    unsigned char _tsfec[20];
+};
+
+#endif // _TS_PACKET_H_

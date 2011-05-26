@@ -108,13 +108,14 @@ Advanced options (experts only):
   --disable-firewire       disable support for FireWire cable boxes
   --disable-iptv           disable support for recording RTSP/UDP/RTP streams
   --disable-hdhomerun      disable support for HDHomeRun boxes
-  --disable-v4l            disable Video4Linux support
-  --disable-ivtv           disable ivtv support (PVR-x50) req. v4l support
+  --disable-v4l2           disable Video4Linux support
+  --disable-ivtv           disable ivtv support (PVR-x50) req. v4l2 support
   --disable-hdpvr          disable HD-PVR support
   --disable-dvb            disable DVB support
   --dvb-path=HDRLOC        location of directory containing
                            'linux/dvb/frontend.h', not the
                            directory with frontend.h [$dvb_path_default]
+  --disable-asi            disable support for ASI recorder
   --disable-x11            disable X11 support
   --x11-path=X11LOC        location of X11 include files [$x11_path_default]
   --disable-xrandr         disable X11 resolution switching
@@ -124,7 +125,7 @@ Advanced options (experts only):
   --enable-dxva2           enable hardware accelerated decoding on windows
   --disable-opengl-video   disable OpenGL based video display
   --disable-quartz-video   disable Mac OS X CoreVideo based video display
-  --disable-directfb       disable DirectFB (Linux non-X11 video)
+  --disable-libass         disable libass SSA/ASS subtitle support
 
   --enable-mac-bundle      produce standalone OS X apps (e.g. mythfrontend.app)
 
@@ -1228,6 +1229,7 @@ HAVE_LIST="
     attribute_may_alias
     attribute_packed
     bswap
+    byteswap_h
     closesocket
     cmov
     conio_h
@@ -1333,7 +1335,6 @@ MYTHTV_CONFIG_LIST='
     crystalhd
     cygwin
     darwin
-    directfb
     disable_mmx_for_debugging
     dvb
     firewire
@@ -1342,6 +1343,7 @@ MYTHTV_CONFIG_LIST='
     hdpvr
     iptv
     ivtv
+    asi
     joystick_menu
     libfftw3
     libmpeg2external
@@ -1353,7 +1355,8 @@ MYTHTV_CONFIG_LIST='
     qtdbus
     qtwebkit
     quartz_video
-    v4l
+    v4l2
+    v4l1
     valgrind
     x11
     xrandr
@@ -1759,18 +1762,20 @@ audio_oss_deps_any="soundcard_h sys_soundcard_h"
 dvb_deps="backend"
 firewire_deps="backend"
 iptv_deps="backend"
-ivtv_deps="backend v4l"
-hdpvr_deps="backend v4l"
+ivtv_deps="backend v4l2"
+hdpvr_deps="backend v4l2"
 hdhomerun_deps="backend"
 mpegtsraw_demuxer_deps="merge_libavformat_mpegts_c"
 mythtranscode_deps="backend frontend"
 opengl_deps_any="agl_h GL_gl_h GLES2_gl2_h darwin windows x11"
 opengles_deps="GLES2_gl2_h"
 opengl_video_deps="opengl"
-v4l_deps="backend linux_videodev_h linux_videodev2_h"
+v4l2_deps="backend linux_videodev2_h"
+v4l1_deps="backend v4l2 linux_videodev_h"
 vdpau_deps="opengl vdpau_vdpau_h vdpau_vdpau_x11_h"
 xrandr_deps="x11"
 xv_deps="x11"
+asi_deps="backend"
 
 <<BLOCKQUOTE
 # tests
@@ -1966,7 +1971,6 @@ enable audio_oss
 enable bindings_perl
 enable bindings_python
 enable bindings_php
-enable directfb
 enable dvb
 enable ffmpeg_pthreads
 enable firewire
@@ -1975,7 +1979,9 @@ enable hdhomerun
 enable hdpvr
 enable iptv
 enable ivtv
+enable asi
 enable lamemp3
+enable libass
 enable libxml2
 enable libudf
 enable lirc
@@ -1986,10 +1992,12 @@ enable opengles
 enable opengl_video
 enable quartz_video
 enable symbol_visibility
-enable v4l
+enable v4l1
+enable v4l2
 enable x11
 enable xrandr
 enable xv
+disable indevs
 
 # mythtv paths
 dvb_path_default="${sysroot}/usr/include"
@@ -3113,7 +3121,8 @@ EOF
             disable mmx
             enable disable_mmx_for_debugging   # prevent later call to die
         fi
-        disable v4l
+        disable v4l1
+        disable v4l2
         disable x11
         # Workaround compile errors from missing gmtime_r/localtime_r/uint def
         CFLAGS=`echo $CFLAGS | sed 's/-D_POSIX_C_SOURCE=200112//'`
@@ -3158,7 +3167,8 @@ EOF
             disable protocols
         fi
         disable symver
-        disable v4l
+        disable v4l1
+        disable v4l2
         enable  windows
         disable x11
         ###### Standard ffmpeg configure stuff follows:
@@ -3302,15 +3312,15 @@ enabled version3 && { enabled gpl && enable gplv3 || enable lgplv3; }
 check_deps $ARCH_EXT_LIST
 
 is_qmake4(){
-    $1 --version 2>&1 | egrep -q -e "Qt version 4\.[5-9]\.[0-9]"
+    $1 --version 2>&1 | egrep -q -e "Qt version 4\.[6-9]\.[0-9]"
 }
 
 if ! is_qmake4 $qmake; then
-    is_qmake4 qmake-qt4 && qmake=qmake-qt4 || die "qmake for Qt4.5 or newer not found.\nPlease specify the correct qmake with --qmake="
+    is_qmake4 qmake-qt4 && qmake=qmake-qt4 || die "qmake for Qt4.6 or newer not found.\nPlease specify the correct qmake with --qmake="
 fi
 
-if ! expr $($qmake -query QT_VERSION) : "4\.[5-9]\.[0-9]" >/dev/null; then
-    die "Qt4.5 or newer is required to build MythTV."
+if ! expr $($qmake -query QT_VERSION) : "4\.[6-9]\.[0-9]" >/dev/null; then
+    die "Qt4.6 or newer is required to build MythTV."
 fi
 
 enable_pic() {
@@ -3994,6 +4004,12 @@ int main(void) {
 }
 EOF
 
+enabled asi && check_cc <<EOF || disable asi
+#include <dveo/asi.h>
+#include <dveo/master.h>
+int main(void) { return 1; }
+EOF
+
 # Check that all MythTV build "requirements" are met:
 enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
     die "ERROR! You must have the Lame MP3 encoding library installed to compile MythTV."
@@ -4002,12 +4018,12 @@ enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
 qt_inc="-I${sysroot}/$(${qmake} -query QT_INSTALL_HEADERS)"
 qt_libs="-L${sysroot}/$(${qmake} -query QT_INSTALL_LIBS)"
 
-if $(pkg-config --atleast-version 4.5.0 QtWebKit) ; then
+if $(pkg-config --atleast-version 4.6.0 QtWebKit) ; then
     enable qtwebkit
 else
     check_cxx ${qt_inc} ${qt_inc}/QtCore <<EOF && enable qtwebkit
 #include <QtWebKit/QtWebKit>
-#if QT_VERSION < 0x040500
+#if QT_VERSION < 0x040600
 die
 #endif
 EOF
@@ -4044,6 +4060,9 @@ fi
 
 enabled libfftw3 && check_lib2 fftw3.h fftw_init_threads -lfftw3_threads -lfftw3f -lfftw3 ||
     disable libfftw3
+
+# ass_flush_events was added in 0.9.10
+enabled libass && check_lib2 ass/ass.h ass_flush_events -lass || disable libass
 
 if enabled libxml2 ; then
    if pkg-config --exists libxml-2.0 ; then
@@ -4106,13 +4125,6 @@ fi
 # Same for Debian Sid.
 if test -d ${sysroot}/usr/share/nvidia/include/GL; then
     append CONFIG_INCLUDEPATH "${sysroot}/usr/share/nvidia/include"
-fi
-
-! disabled directfb && check_foo_config directfb directfb directfb.h DirectFBInit
-
-if enabled directfb; then
-    CONFIG_DIRECTFB_LIBS=`directfb-config --libs`
-    CONFIG_DIRECTFB_CXXFLAGS=`directfb-config --cflags`
 fi
 
 if test $target_os = darwin; then
@@ -4430,7 +4442,7 @@ enabled stripping || strip="echo skipping strip"
 config_files="$TMPH $TMPMAK"
 
 if enabled backend; then
-  echo "Video4Linux sup.          ${v4l-no}"
+  echo "Video4Linux sup.          ${v4l2-no} (v1 ${v4l1-no})"
   echo "ivtv support              ${ivtv-no}"
   echo "HD-PVR support            ${hdpvr-no}"
   echo "FireWire support          ${firewire-no}"
@@ -4438,6 +4450,7 @@ if enabled backend; then
   echo "DVB-S2 support            ${fe_can_2g_modulation-no}"
   echo "HDHomeRun support         ${hdhomerun-no}"
   echo "IPTV support              ${iptv-no}"
+  echo "ASI support               ${asi-no}"
 fi
 
 if enabled frontend; then
@@ -4466,12 +4479,12 @@ fi
   if test x"$target_os" = x"darwin" ; then
     echo "Quartz video              ${quartz_video-no}"
   fi
-  echo "DirectFB                  ${directfb-no}"
   if test x"$target_os" = x"mingw32" ; then
     echo "Windows (Direct3D)        yes"
     echo "DXVA2 support             ${dxva2-no}"
   fi
   echo "MHEG support              ${mheg}"
+  echo "libass subtitle support   ${libass-no}"
   echo
 fi
 
@@ -4627,7 +4640,7 @@ fi
 
 if test $target_os = darwin; then
   # Qt, by default builds .app bundles everywhere. Prevent this.
-  enabled mac_bundle || echo "CONFIG -= app_bundle" >> $TMPMAK
+  enabled mac_bundle || echo "CONFIG-=app_bundle" >> $TMPMAK
 fi
 
 cat > $TMPH <<EOF
@@ -4761,6 +4774,10 @@ if enabled mheg; then
     append CCONFIG "using_mheg"
 fi
 
+if enabled libass; then
+    append CCONFIG "using_libass"
+fi
+
 if enabled appleremote; then
   append CONFIG_DEFINES "USING_APPLEREMOTE"
 fi
@@ -4784,11 +4801,6 @@ if enabled x11; then
   if [ -d $x11_path ] ; then
     append CONFIG_INCLUDEPATH "$x11_path"
   fi
-fi
-
-if enabled directfb; then
-  echo "CONFIG_DIRECTFB_LIBS=$CONFIG_DIRECTFB_LIBS" >> $TMPMAK
-  echo "CONFIG_DIRECTFB_CXXFLAGS=$CONFIG_DIRECTFB_CXXFLAGS" >> $TMPMAK
 fi
 
 if ! enabled darwin && enabled opengl; then

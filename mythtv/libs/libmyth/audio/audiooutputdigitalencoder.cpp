@@ -8,27 +8,7 @@
 // libav headers
 extern "C" {
 #include "libavutil/mem.h" // for av_free
-
-// copied from libavutil/internal.h
-#include "libavutil/common.h" // for AV_GCC_VERSION_AT_LEAST()
-#ifndef av_alias
-#if HAVE_ATTRIBUTE_MAY_ALIAS && (!defined(__ICC) || __ICC > 1110) && AV_GCC_VERSION_AT_LEAST(3,3)
-#   define av_alias __attribute__((may_alias))
-#else
-#   define av_alias
-#endif
-#endif
-
 #include "libavcodec/avcodec.h"
-#if CONFIG_AC3_DECODER
-#include "libavcodec/ac3.h"
-#ifndef INT_BIT
-#define INT_BIT (CHAR_BIT * sizeof(int))
-#endif
-#include "libavcodec/ac3_parser.h"
-#else
-#include <a52dec/a52.h>
-#endif
 }
 
 // MythTV headers
@@ -40,16 +20,24 @@ extern "C" {
 #define LOC QString("DEnc: ")
 #define LOC_ERR QString("DEnc, Error: ")
 
-#define MAX_AC3_FRAME_SIZE 6144
-
 AudioOutputDigitalEncoder::AudioOutputDigitalEncoder(void) :
-    bytes_per_sample(0),
     av_context(NULL),
-    outlen(0),
-    inlen(0),
-    one_frame_bytes(0)
+    out(NULL), out_size(0),
+    in(NULL), in_size(0),
+    outlen(0), inlen(0),
+    samples_per_frame(0),
+    m_spdifenc(NULL)
 {
-    in = (char *)(((long)&inbuf + 15) & ~15);
+    out = (outbuf_t *)av_malloc(OUTBUFSIZE);
+    if (out)
+    {
+        out_size = OUTBUFSIZE;
+    }
+    in = (inbuf_t *)av_malloc(INBUFSIZE);
+    if (in)
+    {
+        in_size = INBUFSIZE;
+    }
 }
 
 AudioOutputDigitalEncoder::~AudioOutputDigitalEncoder()
@@ -62,12 +50,43 @@ void AudioOutputDigitalEncoder::Dispose()
     if (av_context)
     {
         avcodec_close(av_context);
-        av_free(av_context);
-        av_context = NULL;
+        av_freep(&av_context);
+    }
+    if (out)
+    {
+        av_freep(&out);
+        out_size = 0;
+    }
+    if (in)
+    {
+        av_freep(&in);
+        in_size = 0;
+    }
+    if (m_spdifenc)
+    {
+        delete m_spdifenc;
+        m_spdifenc = NULL;
     }
 }
 
-//CODEC_ID_AC3
+void *AudioOutputDigitalEncoder::realloc(void *ptr,
+                                         size_t old_size, size_t new_size)
+{
+    if (!ptr)
+        return ptr;
+
+    // av_realloc doesn't maintain 16 bytes alignment
+    void *new_ptr = av_malloc(new_size);
+    if (!new_ptr)
+    {
+        av_free(ptr);
+        return new_ptr;
+    }
+    memcpy(new_ptr, ptr, old_size);
+    av_free(ptr);
+    return new_ptr;
+}
+
 bool AudioOutputDigitalEncoder::Init(
     CodecID codec_id, int bitrate, int samplerate, int channels)
 {
@@ -83,20 +102,32 @@ bool AudioOutputDigitalEncoder::Init(
     // We need to do this when called from mythmusic
     avcodec_init();
     avcodec_register_all();
-    // always AC3 as there is no DTS encoder at the moment 2005/1/9
+#if LIBAVCODEC_VERSION_INT > AV_VERSION_INT( 52, 113, 0 )
+    codec = avcodec_find_encoder_by_name("ac3_fixed");
+#else
     codec = avcodec_find_encoder(CODEC_ID_AC3);
+#endif
     if (!codec)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not find codec");
         return false;
     }
 
-    av_context              = avcodec_alloc_context();
-    av_context->bit_rate    = bitrate;
-    av_context->sample_rate = samplerate;
-    av_context->channels    = channels;
+    av_context                 = avcodec_alloc_context();
+    avcodec_get_context_defaults3(av_context, codec);
 
-    // open it */
+    av_context->bit_rate       = bitrate;
+    av_context->sample_rate    = samplerate;
+    av_context->channels       = channels;
+#if LIBAVCODEC_VERSION_INT > AV_VERSION_INT( 52, 113, 0 )
+    av_context->channel_layout = AV_CH_LAYOUT_5POINT1;
+    av_context->sample_fmt     = AV_SAMPLE_FMT_S16;
+#else
+    av_context->channel_layout = CH_LAYOUT_5POINT1;
+    av_context->sample_fmt     = SAMPLE_FMT_S16;
+#endif
+
+// open it
     ret = avcodec_open(av_context, codec);
     if (ret < 0)
     {
@@ -107,165 +138,121 @@ bool AudioOutputDigitalEncoder::Init(
         return false;
     }
 
-    bytes_per_sample = av_context->channels * sizeof(short);
-    one_frame_bytes  = bytes_per_sample * av_context->frame_size;
+    if (m_spdifenc)
+    {
+        delete m_spdifenc;
+    }
 
-    VERBOSE(VB_AUDIO, QString("DigitalEncoder::Init fs=%1, bpf=%2 ofb=%3")
+    m_spdifenc = new SPDIFEncoder("spdif", CODEC_ID_AC3);
+    if (!m_spdifenc->Succeeded())
+    {
+        Dispose();
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Could not create spdif muxer");
+        return false;
+    }
+
+    samples_per_frame  = av_context->frame_size * av_context->channels;
+
+    VERBOSE(VB_AUDIO, QString("DigitalEncoder::Init fs=%1, spf=%2")
             .arg(av_context->frame_size)
-            .arg(bytes_per_sample)
-            .arg(one_frame_bytes));
+            .arg(samples_per_frame));
 
     return true;
 }
 
-// from http://www.ebu.ch/CMSimages/en/tec_AES-EBU_eg_tcm6-11890.pdf
-// http://en.wikipedia.org/wiki/S/PDIF
-typedef struct {
-    // byte 0
-    unsigned professional_consumer:1;
-    unsigned non_data:1;
-    // 4 - no emphasis
-    // 6 - 50/15us
-    // 7 - CCITT J17
-    unsigned audio_signal_emphasis:3;
-    unsigned SSFL:1;
-    // 0
-    // 1 - 48k
-    // 2 - 44.1k
-    // 3 - 32k
-    unsigned sample_frequency:2;
-    // byte 1
-    // 0
-    // 1 - 2 ch
-    // 2 - mono
-    // 3 - prim/sec
-    // 4 - stereo
-    unsigned channel_mode:4;
-    // 0
-    // 1 - 192 bit block
-    // 2 - AES18
-    // 3 - user def
-    unsigned user_bit_management:4;
-    // byte 2
-    // 1 - audio data
-    // 2 - co-ordn
-    unsigned auxiliary_bits:3;
-    // 4 - 16 bits
-    // 5-7 - redither to 16 bits
-    unsigned source_word_length:3;
-    unsigned reserved:2;
-    // byte 3
-    unsigned multi_channel_function_description:8;
-    // byte 4
-    unsigned digital_audio_reference_signal:2;
-    unsigned reserved2:6;
-
-} AESHeader;
-
-static int encode_frame(
-        bool dts,
-        unsigned char *data,
-        size_t enc_len)
-{
-    unsigned char *payload = data + 8;  // skip header, currently 52 or 54bits
-    int            sample_rate, bit_rate;
-
-    // we don't do any length/crc validation of the AC3 frame here; presumably
-    // the receiver will have enough sense to do that.  if someone has a
-    // receiver that doesn't, here would be a good place to put in a call
-    // to a52_crc16_block(samples+2, data_size-2) - but what do we do if the
-    // packet is bad?  we'd need to send something that the receiver would
-    // ignore, and if so, may as well just assume that it will ignore
-    // anything with a bad CRC...
-
-    uint block_len = 0;
-
-    if (CONFIG_AC3_DECODER)
-    {
-        int err;
-        AC3HeaderInfo hdr;
-        GetBitContext gbc;
-
-        init_get_bits(&gbc, payload, 54);
-        err = ff_ac3_parse_header(&gbc, &hdr);
-
-        if(err < 0)
-            enc_len = 0;
-        else
-        {
-            sample_rate = hdr.sample_rate;
-            bit_rate    = hdr.bit_rate;
-            enc_len     = hdr.frame_size;
-            block_len   = AC3_FRAME_SIZE * 4;
-        }
-    }
-
-    enc_len = std::min((uint)enc_len, block_len - 8);
-
-    swab((char *)payload, (char *)payload, enc_len);
-
-    // the following values come from libmpcodecs/ad_hwac3.c in mplayer.
-    // they form a valid IEC958 AC3 header.
-    data[0] = 0x72;
-    data[1] = 0xF8;
-    data[2] = 0x1F;
-    data[3] = 0x4E;
-    data[4] = 0x01;
-    data[5] = 0x00;
-    data[6] = (enc_len << 3) & 0xFF;
-    data[7] = (enc_len >> 5) & 0xFF;
-    memset(payload + enc_len, 0, block_len - 8 - enc_len);
-
-    return enc_len;
-}
-
-size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, bool isFloat)
+size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
 {
     size_t outsize = 0;
+    int data_size;
 
-    if (isFloat)
-        inlen += AudioOutputUtil::fromFloat(FORMAT_S16, in + inlen, buf, len);
+    // Check if there is enough space in incoming buffer
+    int required_len = inlen + len / AudioOutputSettings::SampleSize(format) *
+        AudioOutputSettings::SampleSize(FORMAT_S16);
+    if (required_len > (int)in_size)
+    {
+        required_len = ((required_len / INBUFSIZE) + 1) * INBUFSIZE;
+        VERBOSE(VB_AUDIO, LOC +
+                QString("low mem, reallocating in buffer from %1 to %2")
+                .arg(in_size)
+                .arg(required_len));
+        if (!(in = (inbuf_t *)realloc(in, in_size, required_len)))
+        {
+            in_size = 0;
+            VERBOSE(VB_AUDIO, LOC_ERR +
+                    "AC-3 encode error, insufficient memory");
+            return outlen;
+        }
+        in_size = required_len;
+    }
+    if (format != FORMAT_S16)
+    {
+        inlen += AudioOutputUtil::fromFloat(FORMAT_S16, (char *)in + inlen,
+                                            buf, len);
+    }
     else
     {
-        memcpy(in + inlen, buf, len);
+        memcpy((char *)in + inlen, buf, len);
         inlen += len;
     }
 
-    int frames = inlen / one_frame_bytes;
+    int frames = inlen / sizeof(inbuf_t) / samples_per_frame;
     int i = 0;
 
     while (i < frames)
     {
-        // put data in the correct spot for encode frame
         outsize = avcodec_encode_audio(av_context,
-                                       ((uchar*)out) + outlen + 8,
-                                       OUTBUFSIZE - outlen - 8,
-                                       (short *)(in + i * one_frame_bytes));
+                                       (uint8_t *)m_encodebuffer,
+                                       sizeof(m_encodebuffer),
+                                       (short *)(in + i * samples_per_frame));
         if (outsize < 0)
         {
             VERBOSE(VB_AUDIO, LOC_ERR + "AC-3 encode error");
             return outlen;
         }
 
-        encode_frame(
-            /*av_context->codec_id==CODEC_ID_DTS*/ false,
-            (uchar*)out + outlen, outsize
-        );
-
-
-        outlen += MAX_AC3_FRAME_SIZE;
-        inlen -= one_frame_bytes;
+        if (!m_spdifenc)
+        {
+            m_spdifenc = new SPDIFEncoder("spdif", CODEC_ID_AC3);
+        }
+        m_spdifenc->WriteFrame((uint8_t *)m_encodebuffer, outsize);
+        // Check if output buffer is big enough
+        required_len = outlen + m_spdifenc->GetProcessedSize();
+        if (required_len > (int)out_size)
+        {
+            required_len = ((required_len / OUTBUFSIZE) + 1) * OUTBUFSIZE;
+            VERBOSE(VB_AUDIO, LOC +
+                    QString("low mem, reallocating out buffer from %1 to %2")
+                    .arg(out_size)
+                    .arg(required_len));
+            if (!(out = (outbuf_t *)realloc(out, out_size, required_len)))
+            {
+                out_size = 0;
+                VERBOSE(VB_AUDIO, LOC_ERR +
+                        "AC-3 encode error, insufficient memory");
+                return outlen;
+            }
+            out_size = required_len;
+        }
+        m_spdifenc->GetData((uint8_t *)out + outlen, data_size);
+        outlen += data_size;
+        inlen  -= samples_per_frame * sizeof(inbuf_t);
         i++;
     }
 
-    memmove(in, in + i * one_frame_bytes, inlen);
+    memmove(in, in + i * samples_per_frame, inlen);
     return outlen;
 }
 
-void AudioOutputDigitalEncoder::GetFrames(void *ptr, int maxlen)
+size_t AudioOutputDigitalEncoder::GetFrames(void *ptr, int maxlen)
 {
     int len = std::min(maxlen, outlen);
+    if (len != maxlen)
+    {
+        VERBOSE(VB_AUDIO, LOC + QString("GetFrames: getting less than requested"));
+    }
     memcpy(ptr, out, len);
     outlen -= len;
-    memmove(out, out + len, outlen);
+    memmove(out, (char *)out + len, outlen);
+    return len;
 }

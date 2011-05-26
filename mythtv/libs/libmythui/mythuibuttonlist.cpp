@@ -2837,10 +2837,18 @@ void MythUIButtonListItem::setImage(MythImage *image, const QString &name)
     if (!name.isEmpty())
     {
         if (m_images.contains(name))
-            m_images.value(name)->DownRef();
-        m_images.insert(name, image);
+        {
+            if (m_images.value(name))
+                m_images.value(name)->DownRef();
+        }
+
         if (image)
+        {
+            m_images.insert(name, image);
             image->UpRef();
+        }
+        else
+            m_images.remove(name);
     }
     else
     {

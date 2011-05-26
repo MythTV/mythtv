@@ -39,6 +39,7 @@
 #include "mythsystem.h"
 #include "exitcodes.h"
 #include "jobqueue.h"
+#include "upnp.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -283,6 +284,84 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     }
 
     scheduled.setAttribute("count", iNumRecordings);
+
+    // Add known frontends
+
+    QDomElement frontends = pDoc->createElement("Frontends");
+    root.appendChild(frontends);
+
+    SSDPCacheEntries* fes = SSDP::Find("urn:schemas-mythtv-org:service:MythFrontend:1");
+    if (fes)
+    {
+        fes->AddRef();
+        fes->Lock();
+        EntryMap* map = fes->GetEntryMap();
+        frontends.setAttribute( "count", map->size() );
+        QMapIterator< QString, DeviceLocation * > i(*map);
+        while (i.hasNext())
+        {
+            i.next();
+            QDomElement fe = pDoc->createElement("Frontend");
+            frontends.appendChild(fe);
+            QUrl url(i.value()->m_sLocation);
+            fe.setAttribute("name", url.host());
+            fe.setAttribute("url",  url.toString(QUrl::RemovePath));
+        }
+        fes->Unlock();
+        fes->Release();
+    }
+
+    // Other backends
+
+    QDomElement backends = pDoc->createElement("Backends");
+    root.appendChild(backends);
+
+    int numbes = 0;
+    if (!gCoreContext->IsMasterBackend())
+    {
+        numbes++;
+        QString masterhost = gCoreContext->GetMasterHostName();
+        QString masterip   = gCoreContext->GetSetting("MasterServerIP");
+        QString masterport = gCoreContext->GetSettingOnHost("BackendStatusPort", masterhost, "6544");
+
+        QDomElement mbe = pDoc->createElement("Backend");
+        backends.appendChild(mbe);
+        mbe.setAttribute("type", "Master");
+        mbe.setAttribute("name", masterhost);
+        mbe.setAttribute("url" , masterip + ":" + masterport);
+    }
+
+    SSDPCacheEntries* sbes = SSDP::Find("urn:schemas-mythtv-org:device:SlaveMediaServer:1");
+    if (sbes)
+    {
+
+        QString ipaddress = QString();
+        if (!UPnp::g_IPAddrList.isEmpty())
+            ipaddress = UPnp::g_IPAddrList.at(0);
+
+        sbes->AddRef();
+        sbes->Lock();
+        EntryMap* map = sbes->GetEntryMap();
+        QMapIterator< QString, DeviceLocation * > i(*map);
+        while (i.hasNext())
+        {
+            i.next();
+            QUrl url(i.value()->m_sLocation);
+            if (url.host() != ipaddress)
+            {
+                numbes++;
+                QDomElement mbe = pDoc->createElement("Backend");
+                backends.appendChild(mbe);
+                mbe.setAttribute("type", "Slave");
+                mbe.setAttribute("name", url.host());
+                mbe.setAttribute("url" , url.toString(QUrl::RemovePath));
+            }
+        }
+        sbes->Unlock();
+        sbes->Release();
+    }
+
+    backends.setAttribute("count", numbes);
 
     // Add Job Queue Entries
 
@@ -579,13 +658,26 @@ void HttpStatus::PrintStatus( QTextStream &os, QDomDocument *pDoc )
     if (!node.isNull())
         PrintScheduled( os, node.toElement());
 
+    // Frontends
+
+    node = docElem.namedItem( "Frontends" );
+
+    if (!node.isNull())
+        PrintFrontends (os, node.toElement());
+
+    // Backends
+
+    node = docElem.namedItem( "Backends" );
+
+    if (!node.isNull())
+        PrintBackends (os, node.toElement());
+
     // Job Queue Entries -----------------------
 
     node = docElem.namedItem( "JobQueue" );
 
     if (!node.isNull())
         PrintJobQueue( os, node.toElement());
-
 
     // Machine information ---------------------
 
@@ -875,6 +967,83 @@ int HttpStatus::PrintScheduled( QTextStream &os, QDomElement scheduled )
     os << "  </div>\r\n\r\n";
 
     return( nNumRecordings );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+int HttpStatus::PrintFrontends( QTextStream &os, QDomElement frontends )
+{
+    if (frontends.isNull())
+        return( 0 );
+
+    int nNumFES= frontends.attribute( "count", "0" ).toInt();
+
+    if (nNumFES < 1)
+        return( 0 );
+
+
+    os << "  <div class=\"content\">\r\n"
+       << "    <h2 class=\"status\">Frontends</h2>\r\n";
+
+    QDomNode node = frontends.firstChild();
+    while (!node.isNull())
+    {
+        QDomElement e = node.toElement();
+
+        if (!e.isNull())
+        {
+            QString name = e.attribute( "name" , "" );
+            QString url  = e.attribute( "url" ,  "" );
+            os << name << "&nbsp(<a href=\"" << url << "\">Status page</a>)<br />";
+        }
+
+        node = node.nextSibling();
+    }
+
+    os << "  </div>\r\n\r\n";
+
+    return nNumFES;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+int HttpStatus::PrintBackends( QTextStream &os, QDomElement backends )
+{
+    if (backends.isNull())
+        return( 0 );
+
+    int nNumBES= backends.attribute( "count", "0" ).toInt();
+
+    if (nNumBES < 1)
+        return( 0 );
+
+
+    os << "  <div class=\"content\">\r\n"
+       << "    <h2 class=\"status\">Other Backends</h2>\r\n";
+
+    QDomNode node = backends.firstChild();
+    while (!node.isNull())
+    {
+        QDomElement e = node.toElement();
+
+        if (!e.isNull())
+        {
+            QString type = e.attribute( "type",  "" );
+            QString name = e.attribute( "name" , "" );
+            QString url  = e.attribute( "url" ,  "" );
+            os << type << ": " << name << "&nbsp(<a href=\"" << url << "\">Status page</a>)<br />";
+        }
+
+        node = node.nextSibling();
+    }
+
+    os << "  </div>\r\n\r\n";
+
+    return nNumBES;
 }
 
 /////////////////////////////////////////////////////////////////////////////
