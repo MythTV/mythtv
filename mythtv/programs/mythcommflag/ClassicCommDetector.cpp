@@ -249,9 +249,9 @@ void ClassicCommDetector::Init()
     sceneChangeDetector = new ClassicSceneChangeDetector(width, height,
         commDetectBorder, horizSpacing, vertSpacing);
     connect(
-         sceneChangeDetector, 
-         SIGNAL(haveNewInformation(unsigned int,bool,float)), 
-         this, 
+         sceneChangeDetector,
+         SIGNAL(haveNewInformation(unsigned int,bool,float)),
+         this,
          SLOT(sceneChangeDetectorHasNewInformation(unsigned int,bool,float))
     );
 
@@ -369,7 +369,7 @@ bool ClassicCommDetector::go()
 
     QTime flagTime;
     flagTime.start();
-    
+
     long long myTotalFrames;
     if (recordingStopsAt < QDateTime::currentDateTime() )
         myTotalFrames = player->GetTotalFrameCount();
@@ -386,7 +386,7 @@ bool ClassicCommDetector::go()
         cerr.flush();
     }
 
- 
+
     float flagFPS;
     long long  currentFrameNumber;
     float aspect = player->GetVideoAspect();
@@ -562,7 +562,7 @@ bool ClassicCommDetector::go()
             }
             else if (secondsBehind < requiredBuffer)
                 usecSleep = (long)(usecPerFrame * 1.5);
-            
+
             if (usecSleep > 0)
                 usleep(usecSleep);
         }
@@ -829,7 +829,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
                  {
                      blankPixelsChecked++;
                      totBrightness += pixel;
-  
+
                      if (pixel < min)
                           min = pixel;
 
