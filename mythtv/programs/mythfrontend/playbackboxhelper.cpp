@@ -518,6 +518,8 @@ void PlaybackBoxHelper::UndeleteRecording(
 void PlaybackBoxHelper::run(void)
 {
     m_eventHandler = new PBHEventHandler(*this);
+    // Prime the pump so the disk free display starts updating
+    ForceFreeSpaceUpdate();
     exec();
 }
 
