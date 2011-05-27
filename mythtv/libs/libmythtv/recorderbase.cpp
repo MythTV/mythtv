@@ -419,10 +419,13 @@ void RecorderBase::AspectChange(uint aspect, long long frame)
 {
     MarkTypes mark = MARK_ASPECT_4_3;
     uint customAspect = 0;
-    if (aspect == ASPECT_1_1 && m_videoHeight)
+    if ((aspect == ASPECT_1_1 && m_videoHeight) || (aspect >= ASPECT_CUSTOM))
     {
         mark = MARK_ASPECT_CUSTOM;
-        customAspect = m_videoWidth * 1000000 / m_videoHeight;
+        if (aspect > 0x0F)
+            customAspect = aspect;
+        else
+            customAspect = m_videoWidth * 1000000 / m_videoHeight;
     }
     if (aspect == ASPECT_4_3)
         mark = MARK_ASPECT_4_3;
@@ -430,11 +433,6 @@ void RecorderBase::AspectChange(uint aspect, long long frame)
         mark = MARK_ASPECT_16_9;
     if (aspect == ASPECT_2_21_1)
         mark = MARK_ASPECT_2_21_1;
-    if (aspect > ASPECT_CUSTOM)
-    {
-        mark = MARK_ASPECT_CUSTOM;
-        customAspect = aspect;
-    }
 
     if (curRecording)
         curRecording->SaveAspect(frame, mark, customAspect);
