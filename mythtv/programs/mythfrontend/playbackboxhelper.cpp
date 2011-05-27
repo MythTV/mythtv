@@ -536,6 +536,8 @@ void PlaybackBoxHelper::UpdateFreeSpace(void)
             m_freeSpaceUsedMB  = (uint64_t) (fsInfos[i].usedSpaceKB  >> 10);
         }
     }
+    MythEvent *e = new MythEvent("UPDATE_USAGE_UI");
+    QCoreApplication::postEvent(m_listener, e);
 }
 
 uint64_t PlaybackBoxHelper::GetFreeSpaceTotalMB(void) const
