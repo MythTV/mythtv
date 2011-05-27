@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QDir>
 #include <QThreadPool>
+#include <QNetworkCookieJar>
 
 #include "stdlib.h"
 
@@ -205,7 +206,8 @@ void MythDownloadManager::run(void)
     m_manager->setCache(m_diskCache);
 
     // make sure the cookieJar is created in the same thread as the manager
-    m_manager->cookieJar();
+    // and set its parent to NULL so it can be shared between managers
+    m_manager->cookieJar()->setParent(NULL);
 
     QObject::connect(m_manager, SIGNAL(finished(QNetworkReply*)), this,
                        SLOT(downloadFinished(QNetworkReply*)));

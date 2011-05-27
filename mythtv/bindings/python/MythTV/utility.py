@@ -288,18 +288,6 @@ class databaseSearch( object ):
 
         return sql
 
-class SplitInt( object ):
-    """Utility class for handling split integers sent over myth protocol."""
-    @staticmethod
-    def joinInt(high,low):
-        """obj.joinInt(high, low) -> 64-bit int, from two signed ints"""
-        return (int(high) + (int(low)<0))*2**32 + int(low)
-
-    @staticmethod
-    def splitInt(dint):
-        """obj.joinInt(64-bit int) -> (high, low)"""
-        return dint/(2**32),dint%2**32 - (dint%2**32 > 2**31)*2**32
-
 class CMPVideo( object ):
     """
     Utility class providing comparison operators between data objects
@@ -683,3 +671,11 @@ def CopyData2(dfrom, dto, keys):
     for key,key2 in keys:
         if key in dfrom:
             dto[key2] = dfrom[key]
+
+def check_ipv6(n):
+    try:
+        socket.inet_pton(socket.AF_INET6, n)
+        return True
+    except socket.error:
+        return False
+

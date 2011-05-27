@@ -28,7 +28,6 @@
 #include "remotefile.h"
 #include "storagegroup.h"
 #include "util.h"
-#include "decodeencode.h"
 #include "playercontext.h"
 #include "mythdirs.h"
 #include "mythverbose.h"
@@ -344,7 +343,7 @@ bool PreviewGenerator::RemotePreviewRun(void)
     strlist.push_back(token);
     programInfo.ToStringList(strlist);
     strlist.push_back(timeInSeconds ? "s" : "f");
-    encodeLongLong(strlist, captureTime);
+    strlist.push_back(QString::number(captureTime));
     if (outFileName.isEmpty())
     {
         strlist.push_back("<EMPTY>");

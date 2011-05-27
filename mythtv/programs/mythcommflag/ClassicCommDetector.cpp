@@ -249,9 +249,9 @@ void ClassicCommDetector::Init()
     sceneChangeDetector = new ClassicSceneChangeDetector(width, height,
         commDetectBorder, horizSpacing, vertSpacing);
     connect(
-         sceneChangeDetector, 
-         SIGNAL(haveNewInformation(unsigned int,bool,float)), 
-         this, 
+         sceneChangeDetector,
+         SIGNAL(haveNewInformation(unsigned int,bool,float)),
+         this,
          SLOT(sceneChangeDetectorHasNewInformation(unsigned int,bool,float))
     );
 
@@ -369,7 +369,7 @@ bool ClassicCommDetector::go()
 
     QTime flagTime;
     flagTime.start();
-    
+
     long long myTotalFrames;
     if (recordingStopsAt < QDateTime::currentDateTime() )
         myTotalFrames = player->GetTotalFrameCount();
@@ -386,7 +386,7 @@ bool ClassicCommDetector::go()
         cerr.flush();
     }
 
- 
+
     float flagFPS;
     long long  currentFrameNumber;
     float aspect = player->GetVideoAspect();
@@ -562,7 +562,7 @@ bool ClassicCommDetector::go()
             }
             else if (secondsBehind < requiredBuffer)
                 usecSleep = (long)(usecPerFrame * 1.5);
-            
+
             if (usecSleep > 0)
                 usleep(usecSleep);
         }
@@ -753,6 +753,8 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
     {
         VERBOSE(VB_COMMFLAG, "CommDetect: Invalid video frame or codec, "
                 "unable to process frame.");
+        delete[] rowMax;
+        delete[] colMax;
         return;
     }
 
@@ -760,6 +762,8 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
     {
         VERBOSE(VB_COMMFLAG, "CommDetect: Width or Height is 0, "
                 "unable to process frame.");
+        delete[] rowMax;
+        delete[] colMax;
         return;
     }
 
@@ -829,7 +833,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
                  {
                      blankPixelsChecked++;
                      totBrightness += pixel;
-  
+
                      if (pixel < min)
                           min = pixel;
 
@@ -863,6 +867,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
                 bottomDarkRow = y;
 
         delete[] rowMax;
+        rowMax = 0;
 
         for(int x = commDetectBorder; x < (width - commDetectBorder);
                 x += horizSpacing)
@@ -879,6 +884,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
                 rightDarkCol = x;
 
         delete[] colMax;
+        colMax = 0;
 
         if ((topDarkRow > commDetectBorder) &&
             (topDarkRow < (height * .20)) &&
@@ -976,6 +982,8 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
 #endif
 
     framesProcessed++;
+    delete[] rowMax;
+    delete[] colMax;
 }
 
 void ClassicCommDetector::ClearAllMaps(void)

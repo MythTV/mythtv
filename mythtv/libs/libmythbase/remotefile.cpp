@@ -6,7 +6,6 @@ using namespace std;
 #include "mythconfig.h"
 #include "mythdb.h"
 #include "remotefile.h"
-#include "decodeencode.h"
 #include "mythcorecontext.h"
 #include "mythsocket.h"
 #include "compat.h"
@@ -128,15 +127,15 @@ MythSocket *RemoteFile::openSocket(bool control)
             strlist.push_back("invalid response");
         }
 
-        if (strlist.size() >= 4)
+        if (strlist.size() >= 3)
         {
             it = strlist.begin(); ++it;
             recordernum = (*it).toInt(); ++it;
-            filesize = decodeLongLong(strlist, it);
+            filesize = (*(it)).toLongLong(); ++it;
             for (; it != strlist.end(); ++it)
                 auxfiles << *it;
         }
-        else if (0 < strlist.size() && strlist.size() < 4 &&
+        else if (0 < strlist.size() && strlist.size() < 3 &&
                  strlist[0] != "ERROR")
         {
             VERBOSE(VB_IMPORTANT, loc_err +
@@ -373,18 +372,18 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
 
     QStringList strlist( QString(query).arg(recordernum) );
     strlist << "SEEK";
-    encodeLongLong(strlist, pos);
+    strlist << QString::number(pos);
     strlist << QString::number(whence);
     if (curpos > 0)
-        encodeLongLong(strlist, curpos);
+        strlist << QString::number(curpos);
     else
-        encodeLongLong(strlist, readposition);
+        strlist << QString::number(readposition);
 
     controlSock->writeStringList(strlist);
     controlSock->readStringList(strlist);
     lock.unlock();
 
-    long long retval = decodeLongLong(strlist, 0);
+    long long retval = strlist[0].toLongLong();
     readposition = retval;
 
     Reset();

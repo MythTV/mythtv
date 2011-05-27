@@ -26,7 +26,6 @@
 
 #include "mythcorecontext.h"
 #include "mythversion.h"
-#include "decodeencode.h"
 #include "mythdbcon.h"
 #include "compat.h"
 #include "mythconfig.h"
@@ -454,8 +453,8 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         fsID       = *(sit++);
         sit++; // ignore dirID
         sit++; // ignore blocksize
-        iTotal     = decodeLongLong(strlist, sit);
-        iUsed      = decodeLongLong(strlist, sit);
+        iTotal     = (*(sit++)).toLongLong();
+        iUsed      = (*(sit++)).toLongLong();;
         iAvail     = iTotal - iUsed;
 
         if (fsID == "-2")

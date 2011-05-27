@@ -1,4 +1,4 @@
-INSTALL = /usr/bin/install
+include ../../../../mythconfig.mak
 
 ifeq (.${INSTDIR}.,..)
 
