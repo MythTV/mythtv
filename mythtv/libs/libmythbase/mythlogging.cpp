@@ -336,11 +336,12 @@ void DBLoggerThread::run(void)
 bool DatabaseLogger::isDatabaseReady()
 {
     bool ready = false;
+    MythDB *db;
 
     if ( !m_loggingTableExists )
         m_loggingTableExists = DBUtil::TableExists(m_handle.string);
 
-    if ( m_loggingTableExists && GetMythDB()->HaveValidDatabase() )
+    if ( m_loggingTableExists && (db = GetMythDB()) && db->HaveValidDatabase() )
         ready = true;
 
     return ready;
@@ -600,6 +601,17 @@ void logStop(void)
 {
     logThread.stop();
     logThread.wait();
+
+    QMutexLocker locker(&loggerListMutex);
+    QList<LoggerBase *>::iterator it;
+
+    for(it = loggerList.begin(); it != loggerList.end(); )
+    {
+        locker.unlock();
+        delete *it;
+        locker.relock();
+        it = loggerList.begin();
+    }
 }
 
 void threadRegister(QString name)
