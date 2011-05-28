@@ -84,7 +84,7 @@ class ImageLoadThread : public QRunnable
 
     void run()
     {
-        QString tmpFilename;
+        QString tmpFilename = m_filename;
         if ((m_filename.startsWith("/")) ||
             (m_filename.startsWith("http://")) ||
             (m_filename.startsWith("https://")) ||
