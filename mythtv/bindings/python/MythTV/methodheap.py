@@ -336,12 +336,12 @@ class MythBE( FileOps ):
                 type,name = entry.split('::')
                 dirs.append(name)
             else:
-                type,name,size = entry.split('::')
-                if type == 'file':
-                    files.append(name)
-                    sizes.append(size)
-                if type == 'dir':
-                    dirs.append(name)
+                se = entry.split('::')
+                if se[0] == 'file':
+                    files.append(se[1])
+                    sizes.append(se[2])
+                elif se[0] == 'dir':
+                    dirs.append(se[1])
         if filenamesonly:
             return files
         elif path == '':
