@@ -551,6 +551,12 @@ bool MSqlQuery::exec()
 {
     // Database connection down.  Try to restart it, give up if it's still
     // down
+    if (!m_db)
+    {
+        // Database structure's been deleted
+        return false;
+    }
+
     if (!m_db->isOpen() && !m_db->Reconnect())
     {
         VERBOSE(VB_IMPORTANT, "MySQL server disconnected");
@@ -660,6 +666,12 @@ bool MSqlQuery::prepare(const QString& query)
 
     // Database connection down.  Try to restart it, give up if it's still
     // down
+    if (!m_db)
+    {
+        // Database structure has been deleted...
+        return false;
+    }
+
     if (!m_db->isOpen() && !m_db->Reconnect())
     {
         VERBOSE(VB_IMPORTANT, "MySQL server disconnected");
