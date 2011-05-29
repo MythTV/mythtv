@@ -534,7 +534,7 @@ template_alloc(const unsigned int *scores, int width, int height,
                 ptmplrow, ptmplcol, ptmplwidth, ptmplheight))
         goto free_thresh;
 
-    if (*ptmplwidth * *ptmplheight > USHRT_MAX)
+    if ((uint)(*ptmplwidth * *ptmplheight) > USHRT_MAX)
     {
         /* Max value of data type of TemplateMatcher::edgematch */
         VERBOSE(VB_COMMFLAG, QString(
