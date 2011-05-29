@@ -314,11 +314,15 @@ void DBLoggerThread::run(void)
 
     aborted = false;
 
+    QMutexLocker qLock(&m_queueMutex);
+
     while(!aborted || !m_queue->isEmpty())
     {
         if (m_queue->isEmpty())
         {
+            qLock.unlock();
             msleep(100);
+            qLock.relock();
             continue;
         }
 
@@ -326,12 +330,16 @@ void DBLoggerThread::run(void)
         if (!item)
             continue;
 
+        qLock.unlock();
+
         if( item->message && !aborted )
         {
             m_logger->logqmsg(item);
         }
 
         deleteItem(item);
+
+        qLock.relock();
     }
 }
 

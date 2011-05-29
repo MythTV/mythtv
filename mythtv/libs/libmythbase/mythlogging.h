@@ -5,6 +5,8 @@
 #include <QString>
 #include <QThread>
 #include <QQueue>
+#include <QMutex>
+#include <QMutexLocker>
 #endif
 #include <stdint.h>
 #include <time.h>
@@ -175,11 +177,13 @@ class DBLoggerThread : public QThread {
         void stop(void) { aborted = true; }
         bool enqueue(LoggingItem_t *item) 
         { 
+            QMutexLocker qLock(&m_queueMutex); 
             m_queue->enqueue(item); 
             return true; 
         }
     private:
         DatabaseLogger *m_logger;
+        QMutex m_queueMutex;
         QQueue<LoggingItem_t *> *m_queue;
         bool aborted;
 };
