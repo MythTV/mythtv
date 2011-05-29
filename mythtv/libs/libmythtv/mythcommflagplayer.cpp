@@ -92,7 +92,6 @@ bool MythCommFlagPlayer::RebuildSeekTable(
 
     ClearAfterSeek();
 
-    bool has_ui = showPercentage || cb;
     int save_timeout = 1001;
     MythTimer flagTime, ui_timer, inuse_timer, save_timer;
     flagTime.start();

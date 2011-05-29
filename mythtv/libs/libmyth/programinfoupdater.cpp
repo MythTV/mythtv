@@ -103,9 +103,8 @@ void ProgramInfoUpdater::run(void)
 
         if ( workDone )
         {
-            mutex.lock();
-            bool timedout = moreWork.wait(&mutex, 1000);
-            mutex.unlock();
+            QMutexLocker mlock(&mutex);
+            moreWork.wait(&mutex, 1000);
         }
     } while( workDone );
 

@@ -98,7 +98,6 @@ int main(int argc, char *argv[])
 
     QUdpSocket *sock = new QUdpSocket();
     QByteArray utf8 = message.toUtf8();
-    int size = utf8.length();
 
     if (sock->writeDatagram(utf8, address, port) < 0)
     {
