@@ -272,7 +272,7 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
     int  max_width, max_height;
     int  left_width, right_width;
     int  begin, end;
-    bool underflow = false;	// keep from being uninitialized
+    bool underflow = false;     // keep from being uninitialized
     bool added;
     bool hsplit, vsplit;
     int  selectedIdx;
@@ -345,8 +345,7 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
         ((vsplit ? split_height : total_height) +
          m_itemVertSpacing + row_height > max_height))
     {
-        VERBOSE(VB_GENERAL|VB_EXTRA,
-                QString("%1 Height exceeded %2 + (%3) + %4 = %5 "
+        VERBOSE(VB_GUI, QString("%1 Height exceeded %2 + (%3) + %4 = %5 "
                         "which is > %6")
                 .arg(vsplit ? "Centering" : "Total")
                 .arg(split_height).arg(m_itemVertSpacing).arg(row_height)
@@ -357,8 +356,7 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
         return false;
     }
 
-    VERBOSE(VB_GENERAL|VB_EXTRA, QString("Added button item %1 "
-                                         "width %2 height %3")
+    VERBOSE(VB_GUI, QString("Added button item %1 width %2 height %3")
             .arg(grow_right ? last_item : first_item)
             .arg(width).arg(row_height));
 
@@ -421,7 +419,7 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
                     m_itemHorizSpacing + width > max_width)
                 {
                     int total = hsplit ? right_width : left_width + right_width;
-                    VERBOSE(VB_GENERAL|VB_EXTRA,
+                    VERBOSE(VB_GUI,
                             QString("button on right would exceed width: "
                                     "%1+(%2)+%3 == %4 which is > %5")
                             .arg(total).arg(m_itemHorizSpacing).arg(width)
@@ -439,7 +437,7 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
                     height = minButtonHeight(buttonstate->GetArea());
                     if (row_height < height)
                         row_height = height;
-                    VERBOSE(VB_GENERAL|VB_EXTRA,
+                    VERBOSE(VB_GUI,
                             QString("Added button item %1 "
                                     "r.width %2 height %3 total width %4+%5")
                             .arg(last_item).arg(width).arg(height)
@@ -487,7 +485,7 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
                     m_itemHorizSpacing + width > max_width)
                 {
                     int total = hsplit ? left_width : left_width + right_width;
-                    VERBOSE(VB_GENERAL|VB_EXTRA,
+                    VERBOSE(VB_GUI,
                             QString("button on left would exceed width: "
                                     "%1+(%2)+%3 == %4 which is > %5")
                             .arg(total).arg(m_itemHorizSpacing).arg(width)
@@ -506,7 +504,7 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
                     height = minButtonHeight(buttonstate->GetArea());
                     if (row_height < height)
                         row_height = height;
-                    VERBOSE(VB_GENERAL|VB_EXTRA,
+                    VERBOSE(VB_GUI,
                             QString("Added button item %1 "
                                     "l.width %2 height %3 total width %4+%5")
                             .arg(first_item).arg(width).arg(height)
@@ -527,7 +525,7 @@ bool MythUIButtonList::DistributeRow(int & first_button, int & last_button,
         ((vsplit ? split_height : total_height) +
          m_itemVertSpacing + row_height > max_height))
     {
-        VERBOSE(VB_GENERAL|VB_EXTRA,
+        VERBOSE(VB_GUI,
                 QString("%1 Height exceeded %2 + (%3) + %4 = %5 "
                         "which is > %6")
                 .arg(vsplit ? "Centering" : "Total")
@@ -735,8 +733,8 @@ bool MythUIButtonList::DistributeButtons(void)
     col_widths = 0;
     first_button = last_button = start_button = 0;
 
-    VERBOSE(VB_GENERAL|VB_EXTRA, QString("DistributeButtons: "
-                                         "selected item %1 total items %2")
+    VERBOSE(VB_GUI, QString("DistributeButtons: "
+                            "selected item %1 total items %2")
             .arg(start_item).arg(m_itemCount));
 
     /*
@@ -850,7 +848,7 @@ bool MythUIButtonList::DistributeButtons(void)
 
     m_rows = row_heights.size();
 
-    VERBOSE(VB_GENERAL|VB_EXTRA,
+    VERBOSE(VB_GUI,
             QString("%1 rows, %2 columns fit inside parent area %3x%4")
             .arg(m_rows).arg(m_columns).arg(m_contentsRect.width())
             .arg(m_contentsRect.height()));
@@ -975,7 +973,7 @@ bool MythUIButtonList::DistributeButtons(void)
                   .arg(top_spacing).arg(bottom_spacing)
                   .arg(m_itemVertSpacing).arg(y);
 
-    VERBOSE(VB_GENERAL|VB_EXTRA, status_msg);
+    VERBOSE(VB_GUI, status_msg);
 
     /*
      * Calculate width of buttons on each side of selected button
@@ -1091,7 +1089,7 @@ bool MythUIButtonList::DistributeButtons(void)
     status_msg += QString(" spacing left %1 right %2 fixed %3 offset %4")
                   .arg(left_spacing).arg(right_spacing)
                   .arg(m_itemHorizSpacing).arg(x_init);
-    VERBOSE(VB_GENERAL|VB_EXTRA, status_msg);
+    VERBOSE(VB_GUI, status_msg);
 
     top_spacing    += m_itemVertSpacing;
     bottom_spacing += m_itemVertSpacing;
@@ -3028,7 +3026,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
     if (!buttonstate)
     {
         VERBOSE(VB_IMPORTANT, QString("Failed to query buttonlist state: %1")
-                                                                    .arg(state));
+                .arg(state));
         return;
     }
 
