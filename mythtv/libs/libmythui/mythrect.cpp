@@ -263,6 +263,7 @@ MythPoint::MythPoint(const QString &sX, const QString &sY)
     Init();
     setX(sX);
     setY(sY);
+    valid = true;
 }
 
 MythPoint::MythPoint(QPoint point)
@@ -275,6 +276,7 @@ void MythPoint::Init()
 {
     m_needsUpdate = true;
     m_percentX = m_percentY = 0.0;
+    valid = false;
 }
 
 void MythPoint::CalculatePoint(MythRect parentArea)
@@ -297,6 +299,7 @@ void MythPoint::CalculatePoint(MythRect parentArea)
     QPoint::setY(Y);
 
     m_needsUpdate = false;
+    valid = true;
 }
 
 void MythPoint::NormPoint(void)
@@ -319,6 +322,7 @@ void MythPoint::setX(const QString &sX)
     }
     else
         QPoint::setX(X.toInt());
+    valid = true;
 }
 
 void MythPoint::setY(const QString &sY)
@@ -332,6 +336,7 @@ void MythPoint::setY(const QString &sY)
     }
     else
         QPoint::setY(Y.toInt());
+    valid = true;
 }
 
 QString MythPoint::getX(void) const

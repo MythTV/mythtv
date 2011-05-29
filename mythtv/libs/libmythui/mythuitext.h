@@ -84,7 +84,8 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void MoveDrawRect(const int x, const int y);
 
     bool MakeNarrow(QRect &min_rect);
-    void FillCutMessage(void);
+    bool MakeShort(QRect &min_rect);
+    void FillCutMessage(bool reset_size = false);
     QString cutDown(const QString &data, MythFontProperties *font,
                     bool multiline = false);
 
@@ -98,6 +99,8 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     QString m_DefaultMessage;
     QString m_TemplateText;
 
+    bool m_usingAltArea;
+    bool m_ShrinkNarrow;
     bool m_Cutdown;
     bool m_MultiLine;
 
