@@ -617,7 +617,7 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
             VERBOSE(VB_GUI|VB_FILE|VB_EXTRA, LOC + QString(
                         "Load(), loading '%1' in foreground").arg(filename));
             QString tmpFilename;
-            if (!(m_filename.startsWith("myth://")))
+            if (!(filename.startsWith("myth://")))
                 tmpFilename = filename;
 
             MythImageReader imageReader(tmpFilename);
