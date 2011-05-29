@@ -51,7 +51,7 @@ readData(QString filename, float *mean, unsigned char *median, float *stddev,
             goto error;
         }
         if (monochromaticval < 0 || monochromaticval > 1 ||
-                medianval < 0 || medianval > UCHAR_MAX ||
+                medianval < 0 || (uint)medianval > UCHAR_MAX ||
                 widthval < 0 || heightval < 0 || colval < 0 || rowval < 0)
         {
             VERBOSE(VB_COMMFLAG, QString(
@@ -67,7 +67,7 @@ readData(QString filename, float *mean, unsigned char *median, float *stddev,
                         .arg(filename).arg(frameno));
                 goto error;
             }
-            if (counter[ii] < 0 || counter[ii] > UCHAR_MAX)
+            if (counter[ii] < 0 || (uint)(counter[ii]) > UCHAR_MAX)
             {
                 VERBOSE(VB_COMMFLAG, QString(
                             "Data out of range in %1: frame %2")
