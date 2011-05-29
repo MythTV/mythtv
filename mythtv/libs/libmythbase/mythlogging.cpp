@@ -30,6 +30,8 @@
 
 QMutex                  loggerListMutex;
 QList<LoggerBase *>     loggerList;
+
+QMutex                  logQueueMutex;
 QQueue<LoggingItem_t *> logQueue;
 
 QMutex                  logThreadMutex;
@@ -401,17 +403,23 @@ void LoggerThread::run(void)
 
     aborted = false;
 
+    QMutexLocker qLock(&logQueueMutex);
+
     while(!aborted || !logQueue.isEmpty())
     {
         if (logQueue.isEmpty())
         {
+            qLock.unlock();
             msleep(100);
+            qLock.relock();
             continue;
         }
 
         item = logQueue.dequeue();
         if (!item)
             continue;
+
+        qLock.unlock();
 
         if (item->registering)
         {
@@ -466,6 +474,8 @@ void LoggerThread::run(void)
         }
 
         deleteItem(item);
+
+        qLock.relock();
     }
 }
 
@@ -564,6 +574,7 @@ void LogPrintLineNoArg( uint32_t mask, LogLevel_t level, char *file, int line,
         return;
     }
 
+    QMutexLocker qLock(&logQueueMutex);
     logQueue.enqueue(item);
 }
 
@@ -638,6 +649,8 @@ void threadRegister(QString name)
     item->function = (char *)__FUNCTION__;
     item->threadName = strdup((char *)name.toLocal8Bit().constData());
     item->registering = true;
+
+    QMutexLocker qLock(&logQueueMutex);
     logQueue.enqueue(item);
 }
 
@@ -664,6 +677,8 @@ void threadDeregister(void)
     item->file = (char *)__FILE__;
     item->function = (char *)__FUNCTION__;
     item->deregistering = true;
+
+    QMutexLocker qLock(&logQueueMutex);
     logQueue.enqueue(item);
 }
 
