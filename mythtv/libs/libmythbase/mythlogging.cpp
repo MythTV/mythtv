@@ -93,7 +93,7 @@ FileLogger::FileLogger(char *filename) : LoggerBase(filename, 0),
     {
         m_opened = true;
         m_fd = 1;
-        LogPrintNoArg( VB_IMPORTANT, LOG_INFO, "Added logging to the console" );
+        LogPrint( VB_IMPORTANT, LOG_INFO, "Added logging to the console" );
     }
     else
     {
@@ -114,8 +114,8 @@ FileLogger::~FileLogger()
             close( m_fd );
         }
         else
-            LogPrintNoArg( VB_IMPORTANT, LOG_INFO,
-                           "Removed logging to the console" );
+            LogPrint( VB_IMPORTANT, LOG_INFO,
+                      "Removed logging to the console" );
     }
 }
 
@@ -192,7 +192,7 @@ SyslogLogger::SyslogLogger(int facility) : LoggerBase(NULL, facility),
 
 SyslogLogger::~SyslogLogger()
 {
-    LogPrintNoArg(VB_IMPORTANT, LOG_INFO, "Removing syslogging");
+    LogPrint(VB_IMPORTANT, LOG_INFO, "Removing syslogging");
     free(m_application);
     closelog();
 }
@@ -244,7 +244,7 @@ DatabaseLogger::DatabaseLogger(char *table) : LoggerBase(table, 0),
 
 DatabaseLogger::~DatabaseLogger()
 {
-    LogPrintNoArg(VB_IMPORTANT, LOG_INFO, "Removing database logging");
+    LogPrint(VB_IMPORTANT, LOG_INFO, "Removing database logging");
 
     if( m_thread )
     {
@@ -519,27 +519,11 @@ void LogTimeStamp( time_t *epoch, uint32_t *usec )
 #endif
 }
 
-void LogPrintLine( uint32_t mask, LogLevel_t level, char *file, int line, 
-                   char *function, char *format, ... )
+void LogPrintLine( uint32_t mask, LogLevel_t level, const char *file, int line, 
+                   const char *function, const char *format, ... )
 {
     va_list         arguments;
     char           *message;
-
-    message = (char *)malloc(LOGLINE_MAX+1);
-    if( !message )
-        return;
-
-    va_start(arguments, format);
-    vsnprintf(message, LOGLINE_MAX, format, arguments);
-    va_end(arguments);
-
-    LogPrintLineNoArg( mask, level, file, line, function, message );
-    free( message );
-}
-
-void LogPrintLineNoArg( uint32_t mask, LogLevel_t level, char *file, int line, 
-                        char *function, char *message )
-{
     LoggingItem_t  *item;
     time_t          epoch;
     uint32_t        usec;
@@ -556,23 +540,25 @@ void LogPrintLineNoArg( uint32_t mask, LogLevel_t level, char *file, int line,
 
     memset( item, 0, sizeof(LoggingItem_t) );
 
+    message = (char *)malloc(LOGLINE_MAX+1);
+    if( !message )
+        return;
+
+    va_start(arguments, format);
+    vsnprintf(message, LOGLINE_MAX, format, arguments);
+    va_end(arguments);
+
     LogTimeStamp( &epoch, &usec );
 
     localtime_r(&epoch, &item->tm);
-    item->usec = usec;
+    item->usec     = usec;
 
     item->level    = level;
     item->file     = file;
     item->line     = line;
     item->function = function; 
     item->threadId = (uint64_t)QThread::currentThreadId();
-
-    item->message   = strdup(message);
-    if( !item->message ) 
-    {
-        delete item;
-        return;
-    }
+    item->message  = message;
 
     QMutexLocker qLock(&logQueueMutex);
     logQueue.enqueue(item);
@@ -594,9 +580,8 @@ void logStart(QString logfile, int quiet, int facility, bool dblog)
 
         /* Syslog */
         if( facility < 0 )
-            LogPrintNoArg(VB_IMPORTANT, LOG_CRIT, 
-                          "Syslogging facility unknown, disabling syslog "
-                          "output");
+            LogPrint(VB_IMPORTANT, LOG_CRIT, 
+                     "Syslogging facility unknown, disabling syslog output");
         else if( facility > 0 )
             logger = new SyslogLogger(facility);
 

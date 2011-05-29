@@ -49,9 +49,9 @@ typedef struct
 {
     LogLevel_t          level;
     uint64_t            threadId;
-    char               *file;
+    const char         *file;
     int                 line;
-    char               *function;
+    const char         *function;
     struct tm           tm;
     uint32_t            usec;
     char               *message;
@@ -67,25 +67,18 @@ typedef struct
 extern "C" {
 #endif
 
-#define LogPrintQString(mask, level, ...) \
-    LogPrintLineNoArg(mask, (LogLevel_t)level, (char *)__FILE__, __LINE__, \
-                      (char *)__FUNCTION__, \
-                      (char *)QString(__VA_ARGS__).toLocal8Bit().constData())
+#define LogPrintQString(mask, level, string) \
+    LogPrintLine(mask, (LogLevel_t)level, __FILE__, __LINE__, __FUNCTION__, \
+                 QString(string).toLocal8Bit().constData())
 
 #define LogPrint(mask, level, format, ...) \
-    LogPrintLine(mask, (LogLevel_t)level, (char *)__FILE__, __LINE__, \
-                 (char *)__FUNCTION__, (char *)format, ## __VA_ARGS__)
-
-#define LogPrintNoArg(mask, level, string) \
-    LogPrintLineNoArg(mask, (LogLevel_t)level, (char *)__FILE__, __LINE__, \
-                      (char *)__FUNCTION__, (char *)string)
+    LogPrintLine(mask, (LogLevel_t)level, __FILE__, __LINE__, __FUNCTION__, \
+                 (const char *)format, ##__VA_ARGS__)
 
 /* Define the external prototype */
-MBASE_PUBLIC void LogPrintLine( uint32_t mask, LogLevel_t level, char *file, 
-                                int line, char *function, char *format, ... );
-MBASE_PUBLIC void LogPrintLineNoArg( uint32_t mask, LogLevel_t level, 
-                                     char *file, int line, char *function, 
-                                     char *message );
+MBASE_PUBLIC void LogPrintLine( uint32_t mask, LogLevel_t level, 
+                                const char *file, int line, 
+                                const char *function, const char *format, ... );
 
 #ifdef __cplusplus
 }
