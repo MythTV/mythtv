@@ -2678,9 +2678,7 @@ void MainServer::HandleQueryFreeSpaceSummary(PlaybackSock *pbs)
     BackendQueryDiskSpace(fullStrList, true, true);
 
     // The TotalKB and UsedKB are the last two numbers encoded in the list
-    unsigned int index = fullStrList.size() - 4;
-    strList << fullStrList[index++];
-    strList << fullStrList[index++];
+    unsigned int index = fullStrList.size() - 2;
     strList << fullStrList[index++];
     strList << fullStrList[index++];
 

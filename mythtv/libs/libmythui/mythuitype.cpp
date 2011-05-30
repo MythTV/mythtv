@@ -674,7 +674,7 @@ void MythUIType::SetMinAreaParent(MythRect actual_area, MythRect allowed_area,
 void MythUIType::SetMinArea(const QSize &size)
 {
     // If a minsize is not set, don't use MinArea
-    if (!m_MinSize.isValid())
+    if (!m_Initiator || !m_MinSize.isValid())
         return;
 
     m_MinArea.setWidth(0);
@@ -921,6 +921,7 @@ void MythUIType::CopyFrom(MythUIType *base)
     SetArea(base->m_Area);
     m_MinArea = base->m_MinArea;
     m_MinSize = base->m_MinSize;
+    m_Initiator = base->m_Initiator;
     m_NormalSize = base->m_NormalSize;
     m_Alpha = base->m_Alpha;
     m_AlphaChangeMode = base->m_AlphaChangeMode;
@@ -972,11 +973,9 @@ bool MythUIType::ParseElement(
     else if (element.tagName() == "minsize")
     {
         // Use parsePoint so percentages can be used
+        if (element.hasAttribute("initiator"))
+            m_Initiator = parseBool(element.attribute("initiator"));
         SetMinSize(parsePoint(element));
-    }
-    else if (element.tagName() == "initiator")
-    {
-        m_Initiator = parseBool(element);
     }
     else if (element.tagName() == "alpha")
     {
