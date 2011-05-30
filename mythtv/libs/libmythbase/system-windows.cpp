@@ -666,7 +666,7 @@ void MythSystemWindows::Fork(time_t timeout)
         m_child = pi.hProcess;
         SetStatus( GENERIC_EXIT_RUNNING );
 
-        VERBOSE(VB_SYSTEM|VB_EXTRA,
+        VERBOSE(VB_SYSTEM,
                 QString("Managed child (Handle: %1) has started! "
                         "%2%3 command=%4, timeout=%5")
                     .arg((long long)m_child) 
