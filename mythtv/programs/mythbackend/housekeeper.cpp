@@ -344,13 +344,28 @@ void HouseKeeper::flushDBLogs()
     int numdays = 14;
     uint64_t maxrows = 10000 * numdays;  // likely high enough to keep numdays
 
-    QDateTime days = QDateTime::currentDateTime();
-    days = days.addDays(0 - numdays);
-
     MSqlQuery query(MSqlQuery::InitCon());
     if (query.isConnected())
     {
-        QString sql = "DELETE FROM logging WHERE msgtime < :DAYS ;";
+        // Remove less-important logging after 1/2 * numdays days
+        QDateTime days = QDateTime::currentDateTime();
+        days = days.addDays(0 - (numdays / 2));
+        QString sql = "DELETE FROM logging "
+                      " WHERE application NOT IN (:MYTHBACKEND, :MYTHFRONTEND) "
+                      "   AND msgtime < :DAYS ;";
+        query.prepare(sql);
+        query.bindValue(":MYTHBACKEND", MYTH_APPNAME_MYTHBACKEND);
+        query.bindValue(":MYTHFRONTEND", MYTH_APPNAME_MYTHFRONTEND);
+        query.bindValue(":DAYS", days);
+        VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting helper application "
+                "database log entries from before %1.").arg(days.toString()));
+        if (!query.exec())
+            MythDB::DBError("Delete helper application log entries", query);
+
+        // Remove backend/frontend logging after numdays days
+        days = QDateTime::currentDateTime();
+        days = days.addDays(0 - numdays);
+        sql = "DELETE FROM logging WHERE msgtime < :DAYS ;";
         query.prepare(sql);
         query.bindValue(":DAYS", days);
         VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting database log entries "
