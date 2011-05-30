@@ -373,7 +373,7 @@ void HouseKeeper::flushDBLogs()
         if (!query.exec())
             MythDB::DBError("Delete old log entries", query);
 
-        sql = "SELECT COUNT(0) FROM logging;";
+        sql = "SELECT COUNT(id) FROM logging;";
         query.prepare(sql);
         if (query.exec())
         {
