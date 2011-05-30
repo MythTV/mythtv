@@ -43,7 +43,7 @@ extern "C" {
 }
 
 #ifdef USING_V4L
-#include <linux/videodev.h>
+#include "videodev_myth.h"
 #include <linux/videodev2.h>
 
 #include "go7007_myth.h"

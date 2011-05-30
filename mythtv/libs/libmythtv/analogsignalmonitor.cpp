@@ -6,7 +6,7 @@
 #include <sys/ioctl.h>
 #include <poll.h>
 
-#include <linux/videodev.h>
+#include "videodev_myth.h"
 
 #include "mythverbose.h"
 #include "analogsignalmonitor.h"
