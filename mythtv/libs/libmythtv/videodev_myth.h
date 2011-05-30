@@ -6,12 +6,14 @@
 #if defined(__FreeBSD__) || CONFIG_DARWIN || defined(USING_MINGW)
 #include <sys/types.h>
 #include <stdint.h>
+#if CONFIG_DARWIN || defined(USING_MINGW) // Already in FBSDs linux/videodev2.h
 typedef uint32_t __u32;
 typedef uint16_t __u16;
 typedef int32_t  __s32;
 typedef uint8_t  __u8;
 typedef uint32_t __u64;
 typedef int32_t  __s64;  // HACK. Non 64bit FreeBSD kernels require this for ioctls
+#endif /* CONFIG_DARWIN || defined(USING_MINGW) */
 #else
 #undef __STRICT_ANSI__   // HACK. Broken kernel headers < 2.6.25 fail compile in videodev2_myth.h
 #include <linux/types.h>
