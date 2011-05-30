@@ -220,7 +220,7 @@
         <translation>Searching for scripts</translation>
     </message>
     <message>
-        <location filename="../mythweather/sourceManager.cpp" line="301"/>
+        <location filename="../mythweather/sourceManager.cpp" line="302"/>
         <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
         <translation>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</translation>
     </message>

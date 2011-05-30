@@ -665,8 +665,10 @@ Place a blank DVD in the drive and select an option below.</translation>
     </message>
     <message>
         <location filename="../mytharchive/recordingselector.cpp" line="119"/>
-        <source>Retrieving Recording List. Please Wait...</source>
-        <translation>Retrieving Recording List. Please Wait...</translation>
+        <source>Retrieving Recording List.
+Please Wait...</source>
+        <translation>Retrieving Recording List.
+Please Wait...</translation>
     </message>
     <message>
         <location filename="../mytharchive/recordingselector.cpp" line="143"/>
