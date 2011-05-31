@@ -515,7 +515,8 @@ int main(int argc, char *argv[])
         print_verbose_messages = VB_NONE;
 
     //  Load the context
-    gContext = new MythContext(MYTH_BINARY_VERSION);
+    MythContext context(MYTH_BINARY_VERSION);
+    gContext = &context;
     if (!gContext->Init(false))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
@@ -625,8 +626,14 @@ int main(int argc, char *argv[])
                     QString("Couldn't find a recording for filename '%1'")
                     .arg(infile));
             delete pginfo;
-            pginfo = NULL;
+            return GENERIC_EXIT_NO_RECORDING_DATA;
         }
+    }
+
+    if (!pginfo)
+    {
+        VERBOSE(VB_IMPORTANT, "No program info found!");
+        return GENERIC_EXIT_NO_RECORDING_DATA;
     }
 
     if (infile.left(7) == "myth://" && (outfile.isNull() || outfile != "-"))
@@ -752,7 +759,6 @@ int main(int argc, char *argv[])
 
     transcode->deleteLater();
 
-    delete gContext;
     return exitcode;
 }
 
