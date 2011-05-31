@@ -4,10 +4,10 @@
 // QT
 #include <QString>
 
-#define MYTH_MUSICBRAINZ_ALBUMARTIST_UUID "89ad4ac3-39f7-470e-963a-56509c546377"
+// MythMusic
+#include "metadata.h"
 
-// No need to include all the Metadata stuff just for the abstract pointer....
-class Metadata;
+#define MYTH_MUSICBRAINZ_ALBUMARTIST_UUID "89ad4ac3-39f7-470e-963a-56509c546377"
 
 class MetaIO
 {
@@ -43,6 +43,41 @@ class MetaIO
     * \returns Metadata pointer or NULL on error
     */
     virtual Metadata* read(QString filename) = 0;
+
+    /*!
+    * \brief Does the tag support embedded cover art.
+    *
+    * \returns true if reading/writing embedded images are supported
+    */
+    virtual bool supportsEmbeddedImages(void)
+    {
+        return false;
+    }
+
+    /*!
+    * \brief Reads the list of embedded images in the tag
+    *
+    * \returns the list of embedded images
+    */
+    virtual AlbumArtList getAlbumArtList(const QString &filename)
+    {
+        (void)filename;
+        return AlbumArtList();
+    }
+
+    virtual bool writeAlbumArt(const QString &filename, const AlbumArtImage *albumart)
+    {
+        (void)filename;
+        (void)albumart;
+        return false;
+    }
+
+    virtual bool removeAlbumArt(const QString &filename, const AlbumArtImage *albumart)
+    {
+        (void)filename;
+        (void)albumart;
+        return false;
+    }
 
     void readFromFilename(QString filename, QString &artist, QString &album,
                           QString &title, QString &genre, int &tracknum);
