@@ -119,8 +119,7 @@ void UPNPSubscription::Unsubscribe(const QString &usn)
 
 int UPNPSubscription::Renew(const QString &usn)
 {
-    VERBOSE(VB_UPNP, LOC + QString("Renew: %1")
-        .arg(usn).arg(gCoreContext->IsUIThread()));
+    VERBOSE(VB_UPNP, LOC + QString("Renew: %1").arg(usn));
 
     QUrl    url;
     QString path;
