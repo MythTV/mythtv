@@ -1185,7 +1185,10 @@ int bd_read(BLURAY *bd, unsigned char *buf, int len)
                         return 0;
                     }
                     if (pi->still_mode == BLURAY_STILL_TIME) {
-                        _queue_event(bd, (BD_EVENT){BD_EVENT_STILL_TIME, pi->still_time});
+                        if (bd->event_queue) {
+                            _queue_event(bd, (BD_EVENT){BD_EVENT_STILL_TIME, pi->still_time});
+                            return 0;
+                        }
                     }
 
                     // find next clip
@@ -1197,14 +1200,6 @@ int bd_read(BLURAY *bd, unsigned char *buf, int len)
                     }
                     if (!_open_m2ts(bd, st)) {
                         return -1;
-                    }
-
-                    // timed still mode: allow application to process BD_EVENT_STILL_TIME.
-                    // next bd_read() will return new data.
-                    if (bd->event_queue) {
-                        if (pi->still_mode == BLURAY_STILL_TIME) {
-                            return 0;
-                        }
                     }
                 }
 
@@ -1241,6 +1236,24 @@ int bd_read(BLURAY *bd, unsigned char *buf, int len)
     BD_DEBUG(DBG_STREAM | DBG_CRIT, "bd_read(): no valid title selected! (%p)\n", bd);
 
     return -1;
+}
+
+int bd_read_skip_still(BLURAY *bd)
+{
+    BD_STREAM *st = &bd->st0;
+
+    if (st->clip) {
+        MPLS_PI *pi = &st->clip->title->pl->play_item[st->clip->ref];
+
+        if (pi->still_mode == BLURAY_STILL_TIME) {
+            st->clip = nav_next_clip(bd->title, st->clip);
+            if (st->clip) {
+                return _open_m2ts(bd, st);
+            }
+        }
+    }
+
+    return 0;
 }
 
 /*

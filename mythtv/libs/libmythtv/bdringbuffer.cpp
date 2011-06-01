@@ -671,6 +671,7 @@ bool BDRingBuffer::UpdateTitleInfo(void)
     {
         VERBOSE(VB_PLAYBACK, LOC +
             QString("Entering still frame (%1 seconds) UNSUPPORTED").arg(time));
+        bd_read_skip_still(bdnav);
     }
     else if (still == BLURAY_STILL_INFINITE)
     {
