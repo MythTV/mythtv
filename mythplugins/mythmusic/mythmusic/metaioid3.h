@@ -24,8 +24,6 @@ using TagLib::ID3v2::PopularimeterFrame;
 using TagLib::ID3v2::AttachedPictureFrame;
 using TagLib::MPEG::Properties;
 
-typedef QList<struct AlbumArtImage> AlbumArtList;
-
 /*!
 * \class MetaIOID3
 *
@@ -44,23 +42,27 @@ class MetaIOID3 : public MetaIOTagLib
     bool write(Metadata* mdata);
     bool writeVolatileMetadata(const Metadata* mdata);
 
-    bool writePlayCount(TagLib::ID3v2::Tag *tag, int playcount);
-    bool writeRating(TagLib::ID3v2::Tag *tag, int rating);
-    bool writeAlbumArt(TagLib::ID3v2::Tag *tag, QByteArray *image,
-                       const AttachedPictureFrame::Type &type,
-                       const QString &mimetype);
+    bool writeAlbumArt(const QString &filename, const AlbumArtImage *albumart);
+    bool removeAlbumArt(const QString &filename, const AlbumArtImage *albumart);
 
     Metadata* read(QString filename);
+    AlbumArtList getAlbumArtList(const QString &filename);
     static QImage getAlbumArt(QString filename, ImageType type);
+
+    bool supportsEmbeddedImages(void) { return true; }
 
   private:
     TagLib::MPEG::File *OpenFile(const QString &filename);
+
+    bool writePlayCount(TagLib::ID3v2::Tag *tag, int playcount);
+    bool writeRating(TagLib::ID3v2::Tag *tag, int rating);
 
     AlbumArtList readAlbumArt(TagLib::ID3v2::Tag *tag);
     UserTextIdentificationFrame* find(TagLib::ID3v2::Tag *tag, const String &description);
     PopularimeterFrame* findPOPM(TagLib::ID3v2::Tag *tag, const String &email);
     AttachedPictureFrame* findAPIC(TagLib::ID3v2::Tag *tag, const AttachedPictureFrame::Type &type,
                                    const String &description = String::null);
+    QString getExtFromMimeType(const QString &mimeType);
 };
 
 #endif

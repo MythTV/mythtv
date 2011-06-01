@@ -130,6 +130,7 @@ NAV_TITLE_LIST* nav_get_title_list(const char *root, uint32_t flags)
     if (dir == NULL) {
         BD_DEBUG(DBG_NAV, "Failed to open dir: %s\n", path);
         X_FREE(path);
+        X_FREE(title_list->title_info);
         X_FREE(title_list);
         return NULL;
     }

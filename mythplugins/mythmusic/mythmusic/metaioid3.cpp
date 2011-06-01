@@ -218,14 +218,6 @@ Metadata *MetaIOID3::read(QString filename)
     // e.g. Lame under certain circumstances will always write a length of
     // 27 hours
 
-    // Album Art
-    if (!tag->frameListMap()["APIC"].isEmpty())
-    {
-        QList<struct AlbumArtImage> albumart;
-        albumart = readAlbumArt(tag);
-        metadata->setEmbeddedAlbumArt(albumart);
-    }
-
     metadata->setCompilation(compilation);
 
     TagLib::FileRef *fileref = new TagLib::FileRef(mpegfile);
@@ -304,6 +296,36 @@ QImage MetaIOID3::getAlbumArt(QString filename, ImageType type)
     return picture;
 }
 
+
+/*!
+ * \brief Read the albumart images from the file
+ *
+ * \param filename The filename for which we want to find the images.
+ */
+AlbumArtList MetaIOID3::getAlbumArtList(const QString &filename)
+{
+    AlbumArtList imageList;
+    QByteArray fname = filename.toLocal8Bit();
+    TagLib::MPEG::File *mpegfile = new TagLib::MPEG::File(fname.constData());
+
+    if (mpegfile)
+    {
+        TagLib::ID3v2::Tag *tag = mpegfile->ID3v2Tag();
+
+        if (!tag)
+        {
+            delete mpegfile;
+            return imageList;
+        }
+
+        imageList = readAlbumArt(tag);
+
+        delete mpegfile;
+    }
+
+    return imageList;
+}
+
 /*!
  * \brief Read the albumart image from the file
  *
@@ -313,7 +335,7 @@ QImage MetaIOID3::getAlbumArt(QString filename, ImageType type)
  */
 AlbumArtList MetaIOID3::readAlbumArt(TagLib::ID3v2::Tag *tag)
 {
-    QList<struct AlbumArtImage> artlist;
+    AlbumArtList artlist;
 
     if (!tag->frameListMap()["APIC"].isEmpty())
     {
@@ -335,34 +357,38 @@ AlbumArtList MetaIOID3::readAlbumArt(TagLib::ID3v2::Tag *tag)
                 continue;
             }
 
-            AlbumArtImage art;
+            AlbumArtImage *art = new AlbumArtImage();
 
             if (frame->description().isEmpty())
-            {
-                art.description.clear();
-            }
-            else {
-                art.description = TStringToQString(frame->description());
-            }
+                art->description.clear();
+            else
+                art->description = TStringToQString(frame->description());
 
-            art.embedded = true;
+            art->embedded = true;
+
+            QString ext = getExtFromMimeType(TStringToQString(frame->mimeType()).toLower());
 
             switch (frame->type())
             {
                 case AttachedPictureFrame::FrontCover :
-                    art.imageType = IT_FRONTCOVER;
+                    art->imageType = IT_FRONTCOVER;
+                    art->filename = QString("front") + ext;
                     break;
                 case AttachedPictureFrame::BackCover :
-                    art.imageType = IT_BACKCOVER;
+                    art->imageType = IT_BACKCOVER;
+                    art->filename = QString("back") + ext;
                     break;
                 case AttachedPictureFrame::Media :
-                    art.imageType = IT_CD;
+                    art->imageType = IT_CD;
+                    art->filename = QString("cd") + ext;
                     break;
                 case AttachedPictureFrame::LeafletPage :
-                    art.imageType = IT_INLAY;
+                    art->imageType = IT_INLAY;
+                    art->filename = QString("inlay") + ext;
                     break;
                 case AttachedPictureFrame::Other :
-                    art.imageType = IT_UNKNOWN;
+                    art->imageType = IT_UNKNOWN;
+                    art->filename = QString("unknown") + ext;
                     break;
                 default:
                     VERBOSE(VB_GENERAL, "Music Scanner - APIC tag found "
@@ -375,6 +401,22 @@ AlbumArtList MetaIOID3::readAlbumArt(TagLib::ID3v2::Tag *tag)
     }
 
     return artlist;
+}
+
+QString MetaIOID3::getExtFromMimeType(const QString &mimeType)
+{
+    if (mimeType == "image/png")
+        return QString(".png");
+    else if (mimeType == "image/jpeg" || mimeType == "image/jpg")
+        return QString(".jpg");
+    else if (mimeType == "image/gif")
+        return QString(".gif");
+    else if (mimeType == "image/bmp")
+        return QString(".bmp");
+
+    VERBOSE(VB_GENERAL, QString("Music Scanner - Unknow image mimetype found - %1").arg(mimeType));
+
+    return QString();
 }
 
 /*!
@@ -403,17 +445,58 @@ AttachedPictureFrame* MetaIOID3::findAPIC(TagLib::ID3v2::Tag *tag,
 /*!
  * \brief Write the albumart image to the file
  *
- * \param tag The ID3v2 tag object in which to look for Album Art
+ * \param filename The music file to add the albumart
+ * \param albumart The Album Art image to write
  * \returns True if successful
+ *
+ * \Note We always save the image in JPEG format
  */
-bool MetaIOID3::writeAlbumArt(TagLib::ID3v2::Tag *tag, QByteArray *image,
-                              const AttachedPictureFrame::Type &type,
-                              const QString &mimetype)
+bool MetaIOID3::writeAlbumArt(const QString &filename, const AlbumArtImage *albumart)
 {
-    if (!tag || !image)
+    if (filename.isEmpty() || !albumart)
         return false;
 
-    AttachedPictureFrame *apic = findAPIC(tag, type);
+    // load the image into a QByteArray
+    QImage image(albumart->filename);
+    QByteArray imageData;
+    QBuffer buffer(&imageData);
+    buffer.open(QIODevice::WriteOnly);
+    image.save(&buffer, "JPEG");
+
+    AttachedPictureFrame::Type type = AttachedPictureFrame::Other;
+    switch (albumart->imageType)
+    {
+        case IT_FRONTCOVER:
+            type = AttachedPictureFrame::FrontCover;
+            break;
+        case IT_BACKCOVER:
+            type = AttachedPictureFrame::BackCover;
+            break;
+        case IT_CD:
+            type = AttachedPictureFrame::Media;
+            break;
+        case IT_INLAY:
+            type = AttachedPictureFrame::LeafletPage;
+            break;
+        default:
+            type = AttachedPictureFrame::Other;
+            break;
+    }
+
+    TagLib::MPEG::File *mpegfile = OpenFile(filename);
+
+    if (!mpegfile)
+        return false;
+
+    TagLib::ID3v2::Tag *tag = mpegfile->ID3v2Tag();
+
+    if (!tag)
+    {
+        delete mpegfile;
+        return false;
+    }
+
+    AttachedPictureFrame *apic = findAPIC(tag, type, QStringToTString(albumart->description));
 
     if (!apic)
     {
@@ -422,12 +505,77 @@ bool MetaIOID3::writeAlbumArt(TagLib::ID3v2::Tag *tag, QByteArray *image,
         apic->setType(type);
     }
 
+    QString mimetype = "image/jpeg";
+
     TagLib::ByteVector bytevector;
-    bytevector.setData(image->data(), image->size());
-    delete image;
+    bytevector.setData(imageData.data(), imageData.size());
 
     apic->setMimeType(QStringToTString(mimetype));
     apic->setPicture(bytevector);
+    apic->setDescription(QStringToTString(albumart->description));
+
+    mpegfile->save();
+    delete mpegfile;
+
+    return true;
+}
+
+/*!
+ * \brief Remove the albumart image from the file
+ *
+ * \param filename The music file to remove the albumart
+ * \param albumart The Album Art image to remove
+ * \returns True if successful
+ */
+bool MetaIOID3::removeAlbumArt(const QString &filename, const AlbumArtImage *albumart)
+{
+    if (filename.isEmpty() || !albumart)
+        return false;
+
+    AttachedPictureFrame::Type type = AttachedPictureFrame::Other;
+    switch (albumart->imageType)
+    {
+        case IT_FRONTCOVER:
+            type = AttachedPictureFrame::FrontCover;
+            break;
+        case IT_BACKCOVER:
+            type = AttachedPictureFrame::BackCover;
+            break;
+        case IT_CD:
+            type = AttachedPictureFrame::Media;
+            break;
+        case IT_INLAY:
+            type = AttachedPictureFrame::LeafletPage;
+            break;
+        default:
+            type = AttachedPictureFrame::Other;
+            break;
+    }
+
+    TagLib::MPEG::File *mpegfile = OpenFile(filename);
+
+    if (!mpegfile)
+        return false;
+
+    TagLib::ID3v2::Tag *tag = mpegfile->ID3v2Tag();
+
+    if (!tag)
+    {
+        delete mpegfile;
+        return false;
+    }
+
+    AttachedPictureFrame *apic = findAPIC(tag, type, QStringToTString(albumart->description));
+    if (!apic)
+    {
+        delete mpegfile;
+        return false;
+    }
+
+    tag->removeFrame(apic);
+
+    mpegfile->save();
+    delete mpegfile;
 
     return true;
 }

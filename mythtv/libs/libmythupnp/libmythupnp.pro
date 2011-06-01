@@ -17,7 +17,7 @@ QMAKE_CLEAN += version.cpp
 
 # Input
 
-HEADERS += httprequest.h upnp.h ssdp.h taskqueue.h
+HEADERS += httprequest.h upnp.h ssdp.h taskqueue.h upnpsubscription.h
 HEADERS += upnpdevice.h upnptasknotify.h upnptasksearch.h threadpool.h upnputil.h
 HEADERS += httpserver.h upnpcds.h upnpcdsobjects.h bufferedsocketdevice.h upnpmsrr.h
 HEADERS += eventing.h upnpcmgr.h upnptaskevent.h upnptaskcache.h ssdpcache.h
@@ -34,7 +34,7 @@ SOURCES += httpserver.cpp upnpcds.cpp upnpcdsobjects.cpp bufferedsocketdevice.cp
 SOURCES += eventing.cpp upnpcmgr.cpp upnpmsrr.cpp upnptaskevent.cpp ssdpcache.cpp
 SOURCES += configuration.cpp soapclient.cpp mythxmlclient.cpp mmembuf.cpp
 SOURCES += multicast.cpp htmlserver.cpp serverSideScripting.cpp
-SOURCES += servicehost.cpp wsdl.cpp
+SOURCES += servicehost.cpp wsdl.cpp upnpsubscription.cpp
 
 SOURCES += serializers/serializer.cpp     serializers/xmlSerializer.cpp
 SOURCES += serializers/jsonSerializer.cpp 
@@ -60,7 +60,7 @@ inc.files += upnpdevice.h upnptasknotify.h upnptasksearch.h threadpool.h upnputi
 inc.files += httpserver.h httpstatus.h upnpcds.h upnpcdsobjects.h
 inc.files += eventing.h upnpcmgr.h upnptaskevent.h upnptaskcache.h ssdpcache.h
 inc.files += upnpimpl.h multicast.h broadcast.h configuration.h
-inc.files += soapclient.h mythxmlclient.h mmembuf.h 
+inc.files += soapclient.h mythxmlclient.h mmembuf.h upnpsubscription.h
 inc.files += servicehost.h wsdl.h htmlserver.h serverSideScripting.h
 
 inc.files += serializers/serializer.h     serializers/xmlSerializer.h 

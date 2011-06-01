@@ -254,6 +254,15 @@ int bd_read(BLURAY *bd, unsigned char *buf, int len);
 
 /**
  *
+ *  Continue reading after still mode clip
+ *
+ * @param bd  BLURAY object
+ * @return 0 on error
+ */
+int bd_read_skip_still(BLURAY *bd);
+
+/**
+ *
  *  Seek to a chapter. First chapter is 0
  *
  * @param bd  BLURAY object
