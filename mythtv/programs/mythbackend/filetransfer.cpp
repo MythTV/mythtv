@@ -17,6 +17,7 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
 {
     pginfo = new ProgramInfo(filename);
     pginfo->MarkAsInUse(true, kFileTransferInUseID);
+    rbuffer->Start();
 }
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote, bool write) :
@@ -30,6 +31,7 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote, bool write) :
 
     if (write)
         remote->useReadyReadCallback(false);
+    rbuffer->Start();
 }
 
 FileTransfer::~FileTransfer()
