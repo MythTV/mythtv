@@ -21,7 +21,7 @@ using namespace std;
    mythtv/bindings/perl/MythTV.pm
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1275";
+const QString currentDatabaseVersion = "1276";
 
 static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver);
 static bool performActualUpdate(
@@ -5690,6 +5690,30 @@ NULL
 NULL
 };
         if (!performActualUpdate(updates, "1275", dbver))
+            return false;
+    }
+
+    if (dbver == "1275")
+    {
+        const char *updates[] = {
+"DROP TABLE IF EXISTS `logging`;",
+"CREATE TABLE `logging` ( "
+"  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT, "
+"  `host` varchar(64) NOT NULL, "
+"  `application` varchar(64) NOT NULL, "
+"  `pid` int(11) NOT NULL, "
+"  `thread` varchar(64) NOT NULL, "
+"  `msgtime` datetime NOT NULL, "
+"  `level` int(11) NOT NULL, "
+"  `message` varchar(2048) NOT NULL, "
+"  PRIMARY KEY (`id`), "
+"  KEY `host` (`host`,`application`,`pid`,`msgtime`), "
+"  KEY `msgtime` (`msgtime`), "
+"  KEY `level` (`level`) "
+") ENGINE=MyISAM DEFAULT CHARSET=utf8; ",
+NULL
+};
+        if (!performActualUpdate(updates, "1276", dbver))
             return false;
     }
 
