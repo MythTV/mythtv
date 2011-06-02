@@ -752,15 +752,13 @@ void RingBuffer::run(void)
             read_return = safe_read(readAheadBuffer + rbwpos, totfree);
 
             int sr_elapsed = sr_timer.elapsed();
-            if (sr_elapsed)
-            {
-                VERBOSE(VB_FILE, LOC +
-                        QString("safe_read(...@%1, %2) -> %3, took %4 ms (%5Mbps)")
-                        .arg(rbwpos).arg(totfree).arg(read_return)
-                        .arg(sr_elapsed)
-                        .arg(((float)read_return *
-                             (1000.0 * 8.0 / (float)sr_elapsed)) / (1048576)));
-            }
+            VERBOSE(VB_FILE, LOC +
+                    QString("safe_read(...@%1, %2) -> %3, took %4 ms %5")
+                    .arg(rbwpos).arg(totfree).arg(read_return)
+                    .arg(sr_elapsed)
+                    .arg(!sr_elapsed ? "" :
+                         QString("(%1Mbps)").arg(((float)read_return *
+                         (8000.0 / (float)sr_elapsed)) / 1048576)));
 
             rbwlock.unlock();
         }
