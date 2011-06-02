@@ -440,7 +440,7 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
 
     VERBOSE( VB_UPNP+VB_EXTRA,
              QString( "SSDP::ProcessSearchrequest : [%1] MX=%2" )
-             .arg( sST ).arg( nMX ));
+             .arg( sST ).arg( sMX ));
 
     // ----------------------------------------------------------------------
     // Validate Header Values...
