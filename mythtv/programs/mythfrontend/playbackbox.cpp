@@ -3855,6 +3855,10 @@ void PlaybackBox::customEvent(QEvent *event)
             UpdateUILists();
             m_helper.ForceFreeSpaceUpdate();
         }
+        else if (message == "UPDATE_USAGE_UI")
+        {
+            UpdateUsageUI();
+        }
         else if (message == "RECONNECT_SUCCESS")
         {
             m_programInfoCache.ScheduleLoad();

@@ -14,7 +14,7 @@
 //       compiling with -std=c99.  We could remove this in the .pro file,
 //       but that would disable it for all .c files.
 #undef __STRICT_ANSI__
-#include <linux/videodev.h>
+#include "videodev_myth.h"
 #include <linux/videodev2.h>
 
 // vbitext headers

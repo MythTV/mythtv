@@ -16,7 +16,7 @@
 #include <iostream>
 using namespace std;
 
-#include <linux/videodev.h>
+#include "videodev_myth.h"
 #include <linux/videodev2.h>
 
 // MythTV headers

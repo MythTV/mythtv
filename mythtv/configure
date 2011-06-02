@@ -1714,7 +1714,7 @@ mythtranscode_deps="backend frontend"
 opengl_deps_any="agl_h GL_gl_h darwin windows x11"
 opengl_video_deps="opengl"
 opengl_vsync_deps="opengl"
-v4l_deps="backend linux_videodev_h linux_videodev2_h"
+v4l_deps="backend linux_videodev2_h"
 vdpau_deps="opengl vdpau_vdpau_h vdpau_vdpau_x11_h"
 xrandr_deps="x11"
 xv_deps="x11"
@@ -3773,7 +3773,6 @@ if enabled network; then
     fi
 fi
 
-check_header linux/videodev.h
 check_header linux/videodev2.h
 check_header sys/videoio.h
 

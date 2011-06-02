@@ -368,7 +368,7 @@
 <context>
     <name>ZMLivePlayer</name>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="127"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="123"/>
         <source>Can&apos;t show live view.
 You don&apos;t have any monitors defined!</source>
         <translation>Can&apos;t show live view.
