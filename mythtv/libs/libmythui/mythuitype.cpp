@@ -687,11 +687,15 @@ void MythUIType::SetMinArea(const QSize &size)
      * The MinArea will have the same origin as the normal Area,
      * but can have a smaller size.
      */
-    QSize minsize = QSize(m_MinSize.x(), m_MinSize.y());
+    QSize minsize = QSize(m_MinSize.x() + 1, m_MinSize.y() + 1);
 
     QSize bounded(size);
 
-    bounded = bounded.expandedTo(minsize);
+    if (bounded.isNull())
+        bounded = minsize;
+    else
+        bounded = bounded.expandedTo(minsize);
+
     bounded = bounded.boundedTo(m_Area.size());
 
     if (bounded == m_MinArea.size())

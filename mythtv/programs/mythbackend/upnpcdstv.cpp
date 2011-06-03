@@ -92,8 +92,7 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
             "%1 "
             "GROUP BY name "
             "ORDER BY channel.chanid",
-        "WHERE channel.chanid=:KEY", "channel.callsign" },
-
+        "WHERE channel.chanid=:KEY", ""},
 
     {   "By Group",
         "recgroup",

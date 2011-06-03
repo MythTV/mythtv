@@ -1423,6 +1423,9 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             }
 
             QString basename = qurl.path();
+            if (qurl.hasFragment())
+                basename += "#" + qurl.fragment();
+
             if (basename.isEmpty())
             {
                 VERBOSE(VB_IMPORTANT, QString("ERROR: FileTransfer write "
@@ -5775,6 +5778,9 @@ void MainServer::SetExitCode(int exitCode, bool closeApplication)
 QString MainServer::LocalFilePath(const QUrl &url, const QString &wantgroup)
 {
     QString lpath = url.path();
+
+    if (url.hasFragment())
+        lpath += "#" + url.fragment();
 
     if (lpath.section('/', -2, -2) == "channels")
     {

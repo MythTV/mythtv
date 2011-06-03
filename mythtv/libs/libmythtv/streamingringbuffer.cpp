@@ -7,6 +7,7 @@
 StreamingRingBuffer::StreamingRingBuffer(const QString &lfilename)
   : m_context(NULL)
 {
+    startreadahead = true;
     OpenFile(lfilename);
 }
 

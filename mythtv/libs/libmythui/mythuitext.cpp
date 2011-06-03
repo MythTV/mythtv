@@ -688,11 +688,6 @@ bool MythUIText::ParseElement(
     {
         m_TemplateText = parseText(element);
     }
-    else if (element.tagName() == "shrink")
-    {
-        // When minsize is used, select if are should be made narrow or short
-        m_ShrinkNarrow = (parseText(element).toLower() != "short");
-    }
     else if (element.tagName() == "cutdown")
     {
         SetCutDown(parseBool(element));
@@ -768,6 +763,11 @@ bool MythUIText::ParseElement(
     }
     else
     {
+        if (element.tagName() == "minsize" && element.hasAttribute("shrink"))
+        {
+            m_ShrinkNarrow = (element.attribute("shrink")
+                              .toLower() != "short");
+        }
         return MythUIType::ParseElement(filename, element, showWarnings);
     }
 

@@ -77,7 +77,7 @@ This is currently broken... need to handle list of items with single parent (lik
             "%1 "
             "GROUP BY a.album_id "
             "ORDER BY a.album_name",
-        "WHERE song.album_id=:KEY", "song.album_name" },
+        "WHERE song.album_id=:KEY", "album.album_name" },
 /*
 
     {   "By Artist",

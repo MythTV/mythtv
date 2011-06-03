@@ -90,7 +90,7 @@ void UPnpCDSVideo::BuildItemQuery( MSqlQuery &query, const QStringMap &mapParams
 {
     int nVideoID = mapParams[ "Id" ].toInt();
 
-    QString sSQL = QString( "WHERE %1 AND intid=:VIDEOID ORDER BY title DESC" )
+    QString sSQL = QString( "%1 WHERE intid=:VIDEOID ORDER BY title DESC" )
                     .arg( GetItemListSQL( ) );
 
     query.prepare( sSQL );
