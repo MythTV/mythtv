@@ -440,6 +440,8 @@ class MTV_PUBLIC TV : public QObject
 
     bool ClearOSD(const PlayerContext*);
     void ToggleOSD(PlayerContext*, bool includeStatusOSD);
+    void ToggleOSDDebug(PlayerContext*);
+    void UpdateOSDDebug(const PlayerContext *ctx);
     void UpdateOSDProgInfo(const PlayerContext*, const char *whichInfo);
     void UpdateOSDStatus(const PlayerContext *ctx, QString title, QString desc,
                          QString value, int type, QString units,
@@ -808,6 +810,7 @@ class MTV_PUBLIC TV : public QObject
     volatile int         queueInputTimerId;
     volatile int         browseTimerId;
     volatile int         updateOSDPosTimerId;
+    volatile int         updateOSDDebugTimerId;
     volatile int         endOfPlaybackTimerId;
     volatile int         embedCheckTimerId;
     volatile int         endOfRecPromptTimerId;
