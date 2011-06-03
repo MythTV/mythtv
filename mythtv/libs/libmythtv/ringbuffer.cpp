@@ -185,7 +185,8 @@ RingBuffer::RingBuffer(void) :
     readblocksize(CHUNK),     wanttoread(0),
     numfailures(0),           commserror(false),
     oldfile(false),           livetvchain(NULL),
-    ignoreliveeof(false),     readAdjust(0)
+    ignoreliveeof(false),     readAdjust(0),
+    bitrateMonitorEnabled(false)
 {
     {
         QMutexLocker locker(&subExtLock);
@@ -752,14 +753,14 @@ void RingBuffer::run(void)
             read_return = safe_read(readAheadBuffer + rbwpos, totfree);
 
             int sr_elapsed = sr_timer.elapsed();
+            uint64_t bps = !sr_elapsed ? 1000000001 :
+                           (uint64_t)(((double)read_return * 8000.0) / (double)sr_elapsed);
             VERBOSE(VB_FILE, LOC +
                     QString("safe_read(...@%1, %2) -> %3, took %4 ms %5")
                     .arg(rbwpos).arg(totfree).arg(read_return)
                     .arg(sr_elapsed)
-                    .arg(!sr_elapsed ? "" :
-                         QString("(%1Mbps)").arg(((float)read_return *
-                         (8000.0 / (float)sr_elapsed)) / 1048576)));
-
+                    .arg(QString("(%1Mbps)").arg((double)bps / 1000000.0)));
+            UpdateStorageRate(bps);
             rbwlock.unlock();
         }
 
@@ -977,7 +978,13 @@ int RingBuffer::ReadDirect(void *buf, int count, bool peek)
         poslock.unlock();
     }
 
+    MythTimer timer;
+    timer.start();
     int ret = safe_read(buf, count);
+    int elapsed = timer.elapsed();
+    uint64_t bps = !elapsed ? 1000000001 :
+                   (uint64_t)(((float)ret * 8000.0) / (float)elapsed);
+    UpdateStorageRate(bps);
 
     poslock.lockForWrite();
     if (ignorereadpos >= 0 && ret > 0)
@@ -1168,7 +1175,125 @@ int RingBuffer::Read(void *buf, int count)
         readpos += ret;
         poslock.unlock();
     }
+
+    UpdateDecoderRate(ret);
     return ret;
+}
+
+QString RingBuffer::BitrateToString(uint64_t rate)
+{
+    QString msg;
+    float bitrate;
+    int range = 0;
+    if (rate < 1)
+    {
+        return "-";
+    }
+    else if (rate > 1000000000)
+    {
+        return QObject::tr(">1Gbps");
+    }
+    else if (rate >= 1000000)
+    {
+        msg = QObject::tr("%1Mbps");
+        bitrate  = (float)rate / (1000000.0);
+        range = 1;
+    }
+    else if (rate >= 1000)
+    {
+        msg = QObject::tr("%1Kbps");
+        bitrate = (float)rate / 1000.0;
+    }
+    else
+    {
+        msg = QObject::tr("%1bps");
+        bitrate = (float)rate;
+    }
+    return msg.arg(bitrate, 0, 'f', range);
+}
+
+QString RingBuffer::GetDecoderRate(void)
+{
+    return BitrateToString(UpdateDecoderRate());
+}
+
+QString RingBuffer::GetStorageRate(void)
+{
+    return BitrateToString(UpdateStorageRate());
+}
+
+QString RingBuffer::GetAvailableBuffer(void)
+{
+    int avail = (rbwpos >= rbrpos) ? rbwpos - rbrpos : kBufferSize - rbrpos + rbwpos;
+    return QString("%1%").arg((int)(((float)avail / (float)kBufferSize) * 100.0));
+}
+
+uint64_t RingBuffer::UpdateDecoderRate(uint64_t latest)
+{
+    if (!bitrateMonitorEnabled)
+        return 0;
+
+    static QDateTime epoch = QDateTime(QDate(1971, 1, 1));
+    QDateTime now = QDateTime::currentDateTime();
+    qint64    age = epoch.msecsTo(now);
+    qint64 oldest = age - 1000;
+
+    decoderReadLock.lock();
+    uint64_t total = 0;
+    QMutableMapIterator<qint64,uint64_t> it(decoderReads);
+    while (it.hasNext())
+    {
+        it.next();
+        if (it.key() < oldest)
+            it.remove();
+        else
+            total += it.value();
+    }
+
+    if (latest)
+        decoderReads.insert(age, latest);
+
+    uint64_t average = (uint64_t)((double)total * 8.0);
+    decoderReadLock.unlock();
+
+    VERBOSE(VB_FILE, LOC + QString("Decoder read speed: %1 %2")
+            .arg(average).arg(decoderReads.size()));
+    return average;
+}
+
+uint64_t RingBuffer::UpdateStorageRate(uint64_t latest)
+{
+    if (!bitrateMonitorEnabled)
+        return 0;
+
+    static QDateTime epoch = QDateTime(QDate(1971, 1, 1));
+    QDateTime now = QDateTime::currentDateTime();
+    qint64    age = epoch.msecsTo(now);
+    qint64 oldest = age - 1000;
+
+    storageReadLock.lock();
+    uint64_t total = 0;
+    QMutableMapIterator<qint64,uint64_t> it(storageReads);
+    while (it.hasNext())
+    {
+        it.next();
+        if (it.key() < oldest)
+            it.remove();
+        else
+            total += it.value();
+    }
+
+    if (latest)
+        storageReads.insert(age, latest);
+
+    int size = storageReads.size();
+    storageReadLock.unlock();
+
+    uint64_t average = size ? (uint64_t)(((double)total) / (double)size) : 0;
+
+    VERBOSE(VB_FILE, LOC + QString("Average storage read speed: %1 %2")
+            .arg(average).arg(storageReads.size()));
+    return average;
 }
 
 /** \fn RingBuffer::Write(const void*, uint)
