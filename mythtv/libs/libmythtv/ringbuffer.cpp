@@ -319,7 +319,7 @@ void RingBuffer::CalcReadAheadThresh(void)
     readblocksize  = max(readblocksize, CHUNK);
 
     // loop without sleeping if the buffered data is less than this
-    fill_threshold = kBufferSize / 8;
+    fill_threshold = 3 * kBufferSize / 4;
 
     const uint KB32  =  32*1024;
     const uint KB64  =  64*1024;
