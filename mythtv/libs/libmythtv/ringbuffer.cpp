@@ -1233,9 +1233,10 @@ uint64_t RingBuffer::UpdateDecoderRate(uint64_t latest)
     if (!bitrateMonitorEnabled)
         return 0;
 
-    static QDateTime epoch = QDateTime(QDate(1971, 1, 1));
-    QDateTime now = QDateTime::currentDateTime();
-    qint64    age = epoch.msecsTo(now);
+    // TODO use QDateTime once we've moved to Qt 4.7
+    static QTime midnight = QTime(0, 0, 0);
+    QTime now = QTime::currentTime();
+    qint64 age = midnight.msecsTo(now);
     qint64 oldest = age - 1000;
 
     decoderReadLock.lock();
@@ -1244,7 +1245,7 @@ uint64_t RingBuffer::UpdateDecoderRate(uint64_t latest)
     while (it.hasNext())
     {
         it.next();
-        if (it.key() < oldest)
+        if (it.key() < oldest || it.key() > age)
             it.remove();
         else
             total += it.value();
@@ -1266,9 +1267,10 @@ uint64_t RingBuffer::UpdateStorageRate(uint64_t latest)
     if (!bitrateMonitorEnabled)
         return 0;
 
-    static QDateTime epoch = QDateTime(QDate(1971, 1, 1));
-    QDateTime now = QDateTime::currentDateTime();
-    qint64    age = epoch.msecsTo(now);
+    // TODO use QDateTime once we've moved to Qt 4.7
+    static QTime midnight = QTime(0, 0, 0);
+    QTime now = QTime::currentTime();
+    qint64 age = midnight.msecsTo(now);
     qint64 oldest = age - 1000;
 
     storageReadLock.lock();
@@ -1277,7 +1279,7 @@ uint64_t RingBuffer::UpdateStorageRate(uint64_t latest)
     while (it.hasNext())
     {
         it.next();
-        if (it.key() < oldest)
+        if (it.key() < oldest || it.key() > age)
             it.remove();
         else
             total += it.value();
