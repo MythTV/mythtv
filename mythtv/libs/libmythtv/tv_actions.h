@@ -75,4 +75,7 @@
 /* Visualisations */
 #define ACTION_TOGGLEVISUALISATION "TOGGLEVISUALISATION"
 
+/* OSD playback information screen */
+#define ACTION_TOGGLEOSDDEBUG "DEBUGOSD"
+
 #endif // TV_ACTIONS_H

@@ -731,6 +731,10 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", ACTION_TOGGLEVISUALISATION,
             QT_TRANSLATE_NOOP("MythControls", "Toggle audio visualisation"), "");
 
+    /* OSD playback information screen */
+    REG_KEY("TV Playback", ACTION_TOGGLEOSDDEBUG,
+            QT_TRANSLATE_NOOP("MythControls", "Toggle OSD playback information"), "");
+
 /*
   keys already used:
 
@@ -850,6 +854,7 @@ TV::TV(void)
       switchToInputTimerId(0),      ccInputTimerId(0),
       asInputTimerId(0),            queueInputTimerId(0),
       browseTimerId(0),             updateOSDPosTimerId(0),
+      updateOSDDebugTimerId(0),
       endOfPlaybackTimerId(0),      embedCheckTimerId(0),
       endOfRecPromptTimerId(0),     videoExitDialogTimerId(0),
       pseudoChangeChanTimerId(0),   speedChangeTimerId(0),
@@ -2605,6 +2610,30 @@ void TV::timerEvent(QTimerEvent *te)
     if (handled)
         return;
 
+    if (timer_id == updateOSDDebugTimerId)
+    {
+        bool update = false;
+        PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
+        OSD *osd = GetOSDLock(actx);
+        if (osd && osd->IsWindowVisible("osd_debug") &&
+            (StateIsLiveTV(actx->GetState()) ||
+             StateIsPlaying(actx->GetState())))
+        {
+            update = true;
+        }
+        else
+        {
+            QMutexLocker locker(&timerIdLock);
+            KillTimer(updateOSDDebugTimerId);
+            updateOSDDebugTimerId = 0;
+            actx->buffer->EnableBitrateMonitor(false);
+        }
+        ReturnOSDLock(actx, osd);
+        if (update)
+            UpdateOSDDebug(actx);
+        ReturnPlayerLock(actx);
+        handled = true;
+    }
     if (timer_id == updateOSDPosTimerId)
     {
         PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
@@ -2620,6 +2649,8 @@ void TV::timerEvent(QTimerEvent *te)
                 osd->SetValues("osd_status", info.values, kOSDTimeout_Ignore);
             }
         }
+        else
+            SetUpdateOSDPosition(false);
         ReturnOSDLock(actx, osd);
         ReturnPlayerLock(actx);
         handled = true;
@@ -3952,6 +3983,8 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         else
             ToggleOSD(ctx, true);
     }
+    else if (has_action(ACTION_TOGGLEOSDDEBUG, actions))
+        ToggleOSDDebug(ctx);
     else if (!isDVDStill && SeekHandleAction(ctx, actions, isDVD))
     {
     }
@@ -6863,6 +6896,42 @@ void TV::ToggleOSD(PlayerContext *ctx, bool includeStatusOSD)
     {
         SetUpdateOSDPosition(false);
     }
+}
+
+void TV::ToggleOSDDebug(PlayerContext *ctx)
+{
+    bool show = false;
+    OSD *osd = GetOSDLock(ctx);
+    if (osd && osd->IsWindowVisible("osd_debug"))
+    {
+        ctx->buffer->EnableBitrateMonitor(false);
+        osd->HideWindow("osd_debug");
+    }
+    else if (osd)
+    {
+        ctx->buffer->EnableBitrateMonitor(true);
+        InfoMap infoMap;
+        infoMap.insert("filename", ctx->buffer->GetFilename());
+        osd->ResetWindow("osd_debug");
+        osd->SetText("osd_debug", infoMap, kOSDTimeout_None);
+
+        QMutexLocker locker(&timerIdLock);
+        if (!updateOSDDebugTimerId)
+            updateOSDDebugTimerId = StartTimer(250, __LINE__);
+    }
+    ReturnOSDLock(ctx, osd);
+}
+
+void TV::UpdateOSDDebug(const PlayerContext *ctx)
+{
+    InfoMap infoMap;
+    infoMap.insert("decoderrate", ctx->buffer->GetDecoderRate());
+    infoMap.insert("storagerate", ctx->buffer->GetStorageRate());
+    infoMap.insert("bufferavail", ctx->buffer->GetAvailableBuffer());
+    OSD *osd = GetOSDLock(ctx);
+    if (osd)
+        osd->SetText("osd_debug", infoMap, kOSDTimeout_None);
+    ReturnOSDLock(ctx, osd);
 }
 
 /** \fn TV::UpdateOSDProgInfo(const PlayerContext*, const char *whichInfo)
