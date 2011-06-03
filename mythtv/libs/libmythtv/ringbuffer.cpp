@@ -923,6 +923,14 @@ bool RingBuffer::WaitForAvail(int count)
         return false;
     }
 
+    // Make sure that if the read ahead thread is sleeping and
+    // it should be reading that we start reading right away.
+    if ((avail < count) && !stopreads &&
+        !request_pause && !commserror && readaheadrunning)
+    {
+        generalWait.wakeAll();
+    }
+
     MythTimer t;
     t.start();
     while ((avail < count) && !stopreads &&
