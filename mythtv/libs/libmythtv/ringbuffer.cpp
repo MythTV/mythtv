@@ -821,7 +821,7 @@ void RingBuffer::run(void)
 
         VERBOSE(VB_FILE|VB_EXTRA, LOC + "@ end of read ahead loop");
 
-        if (readsallowed || commserror || ateof || setswitchtonext ||
+        if (!readsallowed || commserror || ateof || setswitchtonext ||
             (wanttoread <= used && wanttoread > 0))
         {
             // To give other threads a good chance to handle these
@@ -839,6 +839,14 @@ void RingBuffer::run(void)
                 (used >= fill_threshold || ateof || setswitchtonext))
             {
                 generalWait.wait(&rwlock, 1000);
+            }
+            else if (readsallowed)
+            { // if reads are allowed release the lock and yield so the
+              // reader gets a chance to read before the buffer is full.
+                generalWait.wakeAll();
+                rwlock.unlock();
+                usleep(5 * 1000);
+                rwlock.lockForRead();            
             }
         }
     }
