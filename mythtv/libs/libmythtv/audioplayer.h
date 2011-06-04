@@ -44,6 +44,7 @@ class MTV_PUBLIC AudioPlayer
     int   GetCodec(void)        { return m_codec;         }
     int   GetNumChannels(void)  { return m_channels;      }
     int   GetOrigChannels(void) { return m_orig_channels; }
+    int   GetSampleRate(void)   { return m_samplerate;    }
     uint  GetVolume(void);
     uint  AdjustVolume(int change);
     float GetStretchFactor(void) { return m_stretchfactor;   }
