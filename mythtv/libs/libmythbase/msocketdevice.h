@@ -66,6 +66,8 @@ public:
     Type	 type() const;
     Protocol	 protocol() const;
 
+    void setProtocol( Protocol protocol );
+
     int		 socket() const;
     virtual void setSocket( int socket, Type type );
 
@@ -133,6 +135,7 @@ public:
     Error	 error() const;
 
     inline bool isSequential() const { return true; }
+    int      createNewSocket();
 
 protected:
     void setError( Error err );
@@ -160,7 +163,6 @@ private:
 #endif
 
     static void  init();
-    int		 createNewSocket();
     Protocol	 getProtocol() const;
 
 private:	// Disabled copy constructor and operator=

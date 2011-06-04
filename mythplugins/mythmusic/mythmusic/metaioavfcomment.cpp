@@ -61,26 +61,26 @@ Metadata* MetaIOAVFComment::read(QString filename)
     }
     else
     {
-	title = (char *)tag->value;
+        title = (char *)tag->value;
 
-	tag = av_metadata_get(p_context->metadata, "author", NULL, 0);
+        tag = av_metadata_get(p_context->metadata, "author", NULL, 0);
         if (tag)
-	    artist += (char *)tag->value;
+            artist += (char *)tag->value;
 
         // compilation_artist???
-	tag = av_metadata_get(p_context->metadata, "album", NULL, 0);
+        tag = av_metadata_get(p_context->metadata, "album", NULL, 0);
         if (tag)
             album += (char *)tag->value;
 
-	tag = av_metadata_get(p_context->metadata, "genre", NULL, 0);
+        tag = av_metadata_get(p_context->metadata, "genre", NULL, 0);
         if (tag)
             genre += (char *)tag->value;
 
-	tag = av_metadata_get(p_context->metadata, "year", NULL, 0);
+        tag = av_metadata_get(p_context->metadata, "year", NULL, 0);
         if (tag)
             year = atoi(tag->value);
 
-	tag = av_metadata_get(p_context->metadata, "tracknum", NULL, 0);
+        tag = av_metadata_get(p_context->metadata, "tracknum", NULL, 0);
         if (tag)
             tracknum = atoi(tag->value);
     }

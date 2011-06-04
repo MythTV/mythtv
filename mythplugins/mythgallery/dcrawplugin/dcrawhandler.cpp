@@ -52,6 +52,7 @@ bool DcrawHandler::read(QImage *image)
         // MythGallery anyway. So for simplicity we give up.
         return false;
 
+    path = "'" + path + "'";
     QStringList arguments;
     arguments << "-c" << "-w" << "-W";
 #ifdef ICC_PROFILE

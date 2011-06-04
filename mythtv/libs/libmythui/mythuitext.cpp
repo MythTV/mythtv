@@ -31,6 +31,9 @@ MythUIText::MythUIText(MythUIType *parent, const QString &name)
             curR(0.0),              curG(0.0),             curB(0.0),
             incR(0.0),              incG(0.0),             incB(0.0)
 {
+    m_Initiator = true;
+    m_usingAltArea = false;
+    m_ShrinkNarrow = true;
     m_MultiLine = false;
     m_scrolling = false;
     m_scrollDirection = ScrollLeft;
@@ -55,6 +58,9 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
              curR(0.0),      curG(0.0),      curB(0.0),
              incR(0.0),      incG(0.0),      incB(0.0)
 {
+    m_Initiator = true;
+    m_usingAltArea = false;
+    m_ShrinkNarrow = true;
     m_MultiLine = false;
     m_scrolling = false;
     m_scrollDirection = ScrollLeft;
@@ -96,7 +102,7 @@ void MythUIText::SetText(const QString &text)
 
     m_Message = newtext;
     m_CutMessage.clear();
-    FillCutMessage();
+    FillCutMessage(true);
 
     if (m_scrolling)
     {
@@ -163,7 +169,7 @@ void MythUIText::SetFontProperties(const MythFontProperties &fontProps)
 {
     m_FontStates.insert("default", fontProps);
     *m_Font = m_FontStates["default"];
-    FillCutMessage();
+    FillCutMessage(false);
     SetRedraw();
 }
 
@@ -174,17 +180,24 @@ void MythUIText::SetFontState(const QString &state)
     else
         *m_Font = m_FontStates["default"];
 
-    FillCutMessage();
+    FillCutMessage(false);
     SetRedraw();
 }
 
 void MythUIText::UseAlternateArea(bool useAlt)
 {
     if (useAlt && m_AltDisplayRect.width() > 1)
+    {
         MythUIType::SetArea(m_AltDisplayRect);
+        m_usingAltArea = true;
+    }
     else
+    {
         MythUIType::SetArea(m_OrigDisplayRect);
-    FillCutMessage();
+        m_usingAltArea = false;
+    }
+
+    FillCutMessage(false);
 }
 
 void MythUIText::SetJustification(int just)
@@ -194,7 +207,7 @@ void MythUIText::SetJustification(int just)
         // preserve the wordbreak attribute, drop everything else
         m_Justification = m_Justification & Qt::TextWordWrap;
         m_Justification |= just;
-        FillCutMessage();
+        FillCutMessage(false);
         SetRedraw();
     }
 }
@@ -207,7 +220,7 @@ int MythUIText::GetJustification(void)
 void MythUIText::SetCutDown(bool cut)
 {
     m_Cutdown = cut;
-    FillCutMessage();
+    FillCutMessage(false);
     SetRedraw();
 }
 
@@ -218,7 +231,7 @@ void MythUIText::SetMultiLine(bool multiline)
         m_Justification |= Qt::TextWordWrap;
     else
         m_Justification &= ~Qt::TextWordWrap;
-    FillCutMessage();
+    FillCutMessage(false);
     SetRedraw();
 }
 
@@ -234,7 +247,7 @@ void MythUIText::SetArea(const MythRect &rect)
         QSize stringSize = fm.size(Qt::TextSingleLine, m_Message);
         SetDrawRectSize(stringSize.width(), m_Area.height());
     }
-    FillCutMessage();
+    FillCutMessage(false);
 }
 
 void MythUIText::SetPosition(const MythPoint &pos)
@@ -363,7 +376,7 @@ bool MythUIText::MakeNarrow(QRect &min_rect)
 
     if (min_width == INT_MAX)
     {
-        // won't fit, even when the ara is the maxium size
+        // won't fit, even when the area is the maxium size
         min_rect = fm.boundingRect(m_Area, m_Justification, m_CutMessage);
         return false;
     }
@@ -380,7 +393,21 @@ bool MythUIText::MakeNarrow(QRect &min_rect)
     }
 }
 
-void MythUIText::FillCutMessage()
+/*
+ * If minsize and multiline are defined, minimize the height by using
+ * as many columns as possible.
+ */
+bool MythUIText::MakeShort(QRect &min_rect)
+{
+    QFontMetrics fm(GetFontProperties()->face());
+
+    min_rect = fm.boundingRect(m_Area, m_Justification, m_CutMessage);
+    min_rect.setWidth(m_Area.width());
+
+    return true;
+}
+
+void MythUIText::FillCutMessage(bool reset_size)
 {
     m_CutMessage.clear();
 
@@ -405,47 +432,60 @@ void MythUIText::FillCutMessage()
 
     if (m_CutMessage.isEmpty())
         m_CutMessage = m_Message;
-    if (m_CutMessage.isEmpty())
+
+    if (!reset_size && m_CutMessage.isEmpty())
         return;
 
-    QStringList templist;
-    QStringList::iterator it;
-    switch (m_textCase)
+    if (!m_CutMessage.isEmpty())
     {
-      case CaseUpper :
-        m_CutMessage = m_CutMessage.toUpper();
-        break;
-      case CaseLower :
-        m_CutMessage = m_CutMessage.toLower();
-        break;
-      case CaseCapitaliseFirst :
-        //m_CutMessage = m_CutMessage.toLower();
-        templist = m_CutMessage.split(". ");
-        for (it = templist.begin(); it != templist.end(); ++it)
-            (*it).replace(0,1,(*it).left(1).toUpper());
-        m_CutMessage = templist.join(". ");
-        break;
-      case CaseCapitaliseAll :
-        //m_CutMessage = m_CutMessage.toLower();
-        templist = m_CutMessage.split(" ");
-        for (it = templist.begin(); it != templist.end(); ++it)
-            (*it).replace(0,1,(*it).left(1).toUpper());
-        m_CutMessage = templist.join(" ");
-        break;
+
+        QStringList templist;
+        QStringList::iterator it;
+        switch (m_textCase)
+        {
+          case CaseUpper :
+            m_CutMessage = m_CutMessage.toUpper();
+            break;
+          case CaseLower :
+            m_CutMessage = m_CutMessage.toLower();
+            break;
+          case CaseCapitaliseFirst :
+            //m_CutMessage = m_CutMessage.toLower();
+            templist = m_CutMessage.split(". ");
+            for (it = templist.begin(); it != templist.end(); ++it)
+                (*it).replace(0,1,(*it).left(1).toUpper());
+            m_CutMessage = templist.join(". ");
+            break;
+          case CaseCapitaliseAll :
+            //m_CutMessage = m_CutMessage.toLower();
+            templist = m_CutMessage.split(" ");
+            for (it = templist.begin(); it != templist.end(); ++it)
+                (*it).replace(0,1,(*it).left(1).toUpper());
+            m_CutMessage = templist.join(" ");
+            break;
+        }
     }
 
-    if (m_MinSize.x() > 0)
+    if (m_MinSize.isValid())
     {
         QRect rect;
-        MakeNarrow(rect);
+
+        if (!m_CutMessage.isEmpty())
+        {
+            if (m_ShrinkNarrow)
+                MakeNarrow(rect);
+            else
+                MakeShort(rect);
+        }
 
         // Record the minimal area needed for the message.
         SetMinArea(rect.size());
-        if (m_MinArea.width() > 0)
+
+        if (m_MinArea.isValid())
             SetDrawRectSize(m_MinArea.width(), m_MinArea.height());
     }
 
-    if (m_Cutdown)
+    if (m_Cutdown && !m_CutMessage.isEmpty())
         m_CutMessage = cutDown(m_CutMessage, m_Font, m_MultiLine);
 }
 
@@ -719,10 +759,15 @@ bool MythUIText::ParseElement(
             m_textCase = CaseCapitaliseAll;
         else
             m_textCase = CaseNormal;
-        FillCutMessage();
+        FillCutMessage(true);
     }
     else
     {
+        if (element.tagName() == "minsize" && element.hasAttribute("shrink"))
+        {
+            m_ShrinkNarrow = (element.attribute("shrink")
+                              .toLower() != "short");
+        }
         return MythUIType::ParseElement(filename, element, showWarnings);
     }
 
@@ -748,6 +793,7 @@ void MythUIText::CopyFrom(MythUIType *base)
     m_CutMessage = text->m_CutMessage;
     m_TemplateText = text->m_TemplateText;
 
+    m_ShrinkNarrow = text->m_ShrinkNarrow;
     m_Cutdown = text->m_Cutdown;
     m_MultiLine = text->m_MultiLine;
 
@@ -788,6 +834,6 @@ void MythUIText::CreateCopy(MythUIType *parent)
 
 void MythUIText::Finalize(void)
 {
-    FillCutMessage();
+    FillCutMessage(true);
 }
 

@@ -786,7 +786,8 @@ static int internal_play_media(const QString &mrl, const QString &plot,
     QFile checkFile(mrl);
     if ((!checkFile.exists() && !mrl.startsWith("dvd:")
          && !mrl.startsWith("bd:")
-         && !mrl.startsWith("myth:")))
+         && !mrl.startsWith("myth:")
+         && !mrl.startsWith("http://")))
     {
         QString errorText = QObject::tr("Failed to open \n '%1' in %2 \n"
                                         "Check if the video exists")
@@ -804,7 +805,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
 
     if (pginfo->IsVideoDVD())
     {
-        DVDInfo *dvd = new DVDInfo(pginfo->GetPathname());
+        DVDInfo *dvd = new DVDInfo(pginfo->GetPlaybackURL());
         if (dvd && dvd->IsValid())
         {
             QString name;
@@ -1454,7 +1455,7 @@ int main(int argc, char **argv)
     {
         int networkPort = gCoreContext->GetNumSetting("NetworkControlPort", 6545);
         networkControl = new NetworkControl();
-        if (!networkControl->listen(QHostAddress::Any,networkPort))
+        if (!networkControl->listen(QHostAddress(gCoreContext->MythHostAddressAny()),networkPort))
             VERBOSE(VB_IMPORTANT,
                     QString("NetworkControl failed to bind to port %1.")
                     .arg(networkPort));

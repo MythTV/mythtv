@@ -5,7 +5,6 @@
 #include "remoteencoder.h"
 #include "programinfo.h"
 #include "util.h"
-#include "decodeencode.h"
 #include "mythcorecontext.h"
 #include "signalmonitor.h"
 #include "videooutbase.h"
@@ -206,21 +205,13 @@ long long RemoteEncoder::GetFramesWritten(void)
     QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum));
     strlist << "GET_FRAMES_WRITTEN";
 
-    if (!SendReceiveStringList(strlist, 2))
+    if (!SendReceiveStringList(strlist, 1))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "GetFramesWritten() -- network error");
         return -1;
     }
 
-    if (1 == strlist.size())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("GetFramesWritten() -- server ret: %1")
-                .arg(strlist[0]));
-        return -1;
-    }
-
-    cachedFramesWritten = decodeLongLong(strlist, 0);
+    cachedFramesWritten = strlist[0].toLongLong();
     return cachedFramesWritten;
 }
 
@@ -235,8 +226,8 @@ long long RemoteEncoder::GetFilePosition(void)
     QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum));
     strlist << "GET_FILE_POSITION";
 
-    if (SendReceiveStringList(strlist, 2))
-        return decodeLongLong(strlist, 0);
+    if (SendReceiveStringList(strlist, 1))
+        return strlist[0].toLongLong();
 
     return -1;
 }
@@ -250,8 +241,8 @@ long long RemoteEncoder::GetMaxBitrate(void)
     QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum));
     strlist << "GET_MAX_BITRATE";
 
-    if (SendReceiveStringList(strlist, 2))
-        return decodeLongLong(strlist, 0);
+    if (SendReceiveStringList(strlist, 1))
+        return strlist[0].toLongLong();
 
     return 20200000LL; // Peek bit rate for HD-PVR
 }
@@ -267,10 +258,10 @@ int64_t RemoteEncoder::GetKeyframePosition(uint64_t desired)
 {
     QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "GET_KEYFRAME_POS";
-    encodeLongLong(strlist, desired);
+    strlist << QString::number(desired);
 
-    if (SendReceiveStringList(strlist, 2))
-        return decodeLongLong(strlist, 0);
+    if (SendReceiveStringList(strlist, 1))
+        return strlist[0].toLongLong();
 
     return -1;
 }

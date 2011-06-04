@@ -97,25 +97,6 @@ typedef void (*EMBEDRETURNVOIDSCHEDIT) (const ProgramInfo *, void *);
 // desirable and should be avoided when possible.)
 //
 
-class VBIMode
-{
-  public:
-    typedef enum
-    {
-        None    = 0,
-        PAL_TT  = 1,
-        NTSC_CC = 2,
-    } vbimode_t;
-
-    static uint Parse(QString vbiformat)
-    {
-        QString fmt = vbiformat.toLower().left(3);
-        vbimode_t mode;
-        mode = (fmt == "pal") ? PAL_TT : ((fmt == "nts") ? NTSC_CC : None);
-        return (uint) mode;
-    }
-};
-
 enum scheduleEditTypes {
     kScheduleProgramGuide = 0,
     kScheduleProgramFinder,
@@ -459,6 +440,8 @@ class MTV_PUBLIC TV : public QObject
 
     bool ClearOSD(const PlayerContext*);
     void ToggleOSD(PlayerContext*, bool includeStatusOSD);
+    void ToggleOSDDebug(PlayerContext*);
+    void UpdateOSDDebug(const PlayerContext *ctx);
     void UpdateOSDProgInfo(const PlayerContext*, const char *whichInfo);
     void UpdateOSDStatus(const PlayerContext *ctx, QString title, QString desc,
                          QString value, int type, QString units,
@@ -827,6 +810,7 @@ class MTV_PUBLIC TV : public QObject
     volatile int         queueInputTimerId;
     volatile int         browseTimerId;
     volatile int         updateOSDPosTimerId;
+    volatile int         updateOSDDebugTimerId;
     volatile int         endOfPlaybackTimerId;
     volatile int         embedCheckTimerId;
     volatile int         endOfRecPromptTimerId;

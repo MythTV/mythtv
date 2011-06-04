@@ -30,6 +30,7 @@
 #include "datacontracts/connectionInfo.h"
 #include "datacontracts/settingList.h"
 #include "datacontracts/storageGroupDirList.h"
+#include "datacontracts/timeZoneInfo.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -71,6 +72,7 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
             DTC::ConnectionInfo     ::InitializeCustomTypes();
             DTC::SettingList        ::InitializeCustomTypes();
             DTC::StorageGroupDirList::InitializeCustomTypes();
+            DTC::TimeZoneInfo       ::InitializeCustomTypes();
         }
 
     public slots:
@@ -91,6 +93,8 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
         virtual bool                RemoveStorageGroupDir( const QString   &GroupName,
                                                            const QString   &DirName,
                                                            const QString   &HostName ) = 0;
+
+        virtual DTC::TimeZoneInfo*  GetTimeZone         ( ) = 0;
 
         virtual DTC::SettingList*   GetSetting          ( const QString   &HostName,
                                                           const QString   &Key,

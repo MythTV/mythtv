@@ -44,7 +44,6 @@ using namespace std;
 #include "fifowriter.h"
 #include "filtermanager.h"
 #include "util.h"
-#include "decodeencode.h"
 #include "livetvchain.h"
 #include "decoderbase.h"
 #include "nuppeldecoder.h"

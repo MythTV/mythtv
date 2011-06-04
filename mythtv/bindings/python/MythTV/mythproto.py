@@ -9,10 +9,10 @@ from static import PROTO_VERSION, BACKEND_SEP, RECSTATUS, AUDIO_PROPS, \
 from exceptions import MythError, MythDBError, MythBEError, MythFileError
 from logging import MythLog
 from altdict import DictData
-from connections import BEConnection
+from connections import BEConnection, BEEventConnection
 from database import DBCache
-from utility import SplitInt, CMPRecord, datetime, \
-                    ParseEnum, CopyData, CopyData2
+from utility import CMPRecord, datetime, \
+                    ParseEnum, CopyData, CopyData2, check_ipv6
 
 from datetime import date
 from time import sleep
@@ -24,7 +24,7 @@ import weakref
 import re
 import os
 
-class BECache( SplitInt ):
+class BECache( object ):
     """
     BECache(backend=None, noshutdown=False, db=None)
                                             -> MythBackend connection object
@@ -40,13 +40,14 @@ class BECache( SplitInt ):
                 automatic shutdown while the connection is alive.
 
     Available methods:
-        joinInt()           - convert two signed ints to one 64-bit
-                              signed int
-        splitInt()          - convert one 64-bit signed int to two
-                              signed ints
         backendCommand()    - Sends a formatted command to the backend
                               and returns the response.
     """
+
+    class _ConnHolder( object ):
+        command = None
+        event = None
+
     logmodule = 'Python Backend Connection'
     _shared = weakref.WeakValueDictionary()
     _reip = re.compile('(?:\d{1,3}\.){3}\d{1,3}')
@@ -56,23 +57,26 @@ class BECache( SplitInt ):
                 (str(self.__class__).split("'")[1].split(".")[-1],
                  self.hostname, self.port, hex(id(self)))
 
-    def __init__(self, backend=None, noshutdown=False, db=None, opts=None):
+    def __init__(self, backend=None, blockshutdown=False, events=False, db=None):
         self.db = DBCache(db)
         self.log = MythLog(self.logmodule, db=self.db)
         self.hostname = None
 
-        if opts is None:
-            self.opts = BEConnection.BEConnOpts(noshutdown)
-        else:
-            self.opts = opts
+        self.sendcommands = True
+        self.blockshutdown = blockshutdown
+        self.receiveevents = events
 
         if backend is None:
             # no backend given, use master
             self.host = self.db.settings.NULL.MasterServerIP
 
         else:
+            backend = backend.strip('[]')
             if self._reip.match(backend):
                 # given backend is IP address
+                self.host = backend
+            elif check_ipv6(backend):
+                # given backend is IPv6 address
                 self.host = backend
             else:
                 # given backend is hostname, pull address from database
@@ -104,15 +108,35 @@ class BECache( SplitInt ):
         if self._ident in self._shared:
             # existing connection found
             # register and reconnect if necessary
-            self.be = self._shared[self._ident]
-            self.be.registeruser(self._uuid, self.opts)
-            self.be.reconnect()
+            self._conn = self._shared[self._ident]
+            if self.sendcommands:
+                if self._conn.command is None:
+                    self._conn.command = self._newcmdconn()
+            if self.receiveevents:
+                if self._conn.event is None:
+                    self._conn.event = self._neweventconn()
+            # trigger reconnect for blocking shutdown?
         else:
             # no existing connection, create new
-            self.be = BEConnection(self.host, self.port, \
-                                    self.db.gethostname(), self.opts)
-            self.be.registeruser(self._uuid, self.opts)
-            self._shared[self._ident] = self.be
+            self._conn = self._ConnHolder()
+
+            if self.sendcommands:
+                self._conn.command = self._newcmdconn()
+            if self.receiveevents:
+                self._conn.event = self._neweventconn()
+
+            self._shared[self._ident] = self._conn
+
+        self._events = self._listhandlers()
+        for func in self._events:
+            self.registerevent(func)
+
+    def _newcmdconn(self):
+        return BEConnection(self.host, self.port, self.db.gethostname(),
+                            self.blockshutdown)
+
+    def _neweventconn(self):
+        return BEEventConnection(self.host, self.port, self.db.gethostname())
 
     def backendCommand(self, data):
         """
@@ -120,32 +144,26 @@ class BECache( SplitInt ):
 
         Sends a formatted command via a socket to the mythbackend.
         """
-        return self.be.backendCommand(data)
+        if self._conn.command is None:
+            return ""
+        return self._conn.command.backendCommand(data)
 
-class BEEvent( BECache ):
-    __doc__ = BECache.__doc__
     def _listhandlers(self):
         return []
 
-    def __init__(self, backend=None, noshutdown=False, systemevents=False,\
-                       generalevents=True, db=None, opts=None):
-        if opts is None:
-            opts = BEConnection.BEConnOpts(noshutdown,\
-                             systemevents, generalevents)
-        BECache.__init__(self, backend, db=db, opts=opts)
-
-        # must be done to retain hard reference
-        self._events = self._listhandlers()
-        for func in self._events:
-            self.registerevent(func)
-
     def registerevent(self, func, regex=None):
+        if self._conn.event is None:
+            return
         if regex is None:
             regex = func()
-        self.be.registerevent(regex, func)
+        self._conn.event.registerevent(regex, func)
 
     def clearevents(self):
         self._events = []
+
+class BEEvent( BECache ):
+    #this class will be removed at a later date
+    pass
 
 def findfile(filename, sgroup, db=None):
     """
@@ -185,7 +203,7 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
     db = DBCache(db)
     log = MythLog('Python File Transfer', db=db)
     reuri = re.compile(\
-        'myth://((?P<group>.*)@)?(?P<host>[a-zA-Z0-9_\-\.]*)(:[0-9]*)?/(?P<file>.*)')
+        'myth://((?P<group>.*)@)?(?P<host>[\[\]a-zA-Z0-9_\-\.]*)(:[0-9]*)?/(?P<file>.*)')
     reip = re.compile('(?:\d{1,3}\.){3}\d{1,3}')
 
     if mode not in ('r','w'):
@@ -214,7 +232,8 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
         sgroup = 'Default'
 
     # get full system name
-    if reip.match(host):
+    host = host.strip('[]')
+    if reip.match(host) or check_ipv6(host):
         with db.cursor(log) as cursor:
             if cursor.execute("""SELECT hostname FROM settings
                                  WHERE value='BackendServerIP'
@@ -314,7 +333,7 @@ class FileTransfer( BEEvent ):
             else:
                 sp = res.split(BACKEND_SEP)
                 self._sockno = int(sp[1])
-                self._size = [int(i) for i in sp[2:]]
+                self._size = int(sp[2])
 
         def __del__(self):
             self.socket.shutdown(1)
@@ -341,12 +360,13 @@ class FileTransfer( BEEvent ):
         # open control socket
         BEEvent.__init__(self, host, True, db=db)
         # open transfer socket
-        self.ftsock = self.BETransConn(self.host, self.port, \
-                    self.be.localname, self.filename, self.sgroup, self.mode)
+        self.ftsock = self.BETransConn(self.host, self.port,
+                    self._conn.command.localname, self.filename,
+                    self.sgroup, self.mode)
         self.open = True
 
         self._sockno = self.ftsock._sockno
-        self._size = self.joinInt(*self.ftsock._size)
+        self._size = self.ftsock._size
         self._pos = 0
         self._tsize = 2**15
         self._tmax = 2**17
@@ -484,20 +504,17 @@ class FileTransfer( BEEvent ):
             whence = 0
             offset = self._size+offset
 
-        curhigh,curlow = self.splitInt(self._pos)
-        offhigh,offlow = self.splitInt(offset)
-
         res = self.backendCommand('QUERY_FILETRANSFER '\
                 +BACKEND_SEP.join(
                         [str(self._sockno),'SEEK',
-                         str(offhigh),str(offlow),
+                         str(offset),
                          str(whence),
-                         str(curhigh),str(curlow)])\
+                         str(self._pos)])\
                  ).split(BACKEND_SEP)
         if res[0] == '-1':
             raise MythFileError(MythError.FILE_FAILED_SEEK, \
                                     str(self), offset, whence)
-        self._pos = self.joinInt(*res)
+        self._pos = res[0]
 
     def flush(self):
         pass
@@ -583,8 +600,8 @@ class DownloadFileTransfer( FileTransfer ):
             FileOps(self.host, db=self.db).\
                         deleteFile(self.filename, self.sgroup)
 
-class FileOps( BEEvent ):
-    __doc__ = BEEvent.__doc__+"""
+class FileOps( BECache ):
+    __doc__ = BECache.__doc__+"""
         getRecording()      - return a Program object for a recording
         deleteRecording()   - notify the backend to delete a recording
         forgetRecording()   - allow a recording to re-record
@@ -718,12 +735,11 @@ class FileOps( BEEvent ):
         return sorted(self._getPrograms(query, recstatus, recordid, header),\
                       key=lambda p: p.starttime)
 
-class FreeSpace( DictData, SplitInt ):
+class FreeSpace( DictData ):
     """Represents a FreeSpace entry."""
     _field_order = [ 'host',         'path',     'islocal',
                     'disknumber',   'sgroupid', 'blocksize',
-                    'ts_high',      'ts_low',   'us_high',
-                    'us_low']
+                    'totalspace', 'usedspace']
     _field_type = [3, 3, 2, 0, 0, 0, 0, 0, 0, 0]
     def __str__(self):
         return "<FreeSpace '%s@%s' at %s>"\
@@ -734,8 +750,6 @@ class FreeSpace( DictData, SplitInt ):
 
     def __init__(self, raw):
         DictData.__init__(self, raw)
-        self.totalspace = self.joinInt(self.ts_high, self.ts_low)
-        self.usedspace = self.joinInt(self.us_high, self.us_low)
         self.freespace = self.totalspace - self.usedspace
 
 class Program( DictData, RECSTATUS, AUDIO_PROPS, VIDEO_PROPS, \

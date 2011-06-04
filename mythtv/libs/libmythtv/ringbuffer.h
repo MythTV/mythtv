@@ -8,6 +8,7 @@
 #include <QString>
 #include <QThread>
 #include <QMutex>
+#include <QMap>
 
 #include "mythconfig.h"
 
@@ -45,6 +46,7 @@ class MTV_PUBLIC RingBuffer : protected QThread
     void SetOldFile(bool is_old);
     void UpdateRawBitrate(uint rawbitrate);
     void UpdatePlaySpeed(float playspeed);
+    void EnableBitrateMonitor(bool enable) { bitrateMonitorEnabled = enable; }
 
     // Gets
     QString   GetFilename(void)      const;
@@ -55,6 +57,9 @@ class MTV_PUBLIC RingBuffer : protected QThread
     bool      isPaused(void)         const;
     /// \brief Returns how far into the file we have read.
     virtual long long GetReadPosition(void)  const = 0;
+    QString GetDecoderRate(void);
+    QString GetStorageRate(void);
+    QString GetAvailableBuffer(void);
     long long GetWritePosition(void) const;
     /// \brief Returns the size of the file we are reading/writing,
     ///        or -1 if the query fails.
@@ -149,6 +154,10 @@ class MTV_PUBLIC RingBuffer : protected QThread
     void ResetReadAhead(long long newinternal);
     void KillReadAheadThread(void);
 
+    static QString BitrateToString(uint64_t rate);
+    uint64_t UpdateDecoderRate(uint64_t latest = 0);
+    uint64_t UpdateStorageRate(uint64_t latest = 0);
+
   protected:
     mutable QReadWriteLock poslock;
     long long readpos;            // protected by poslock
@@ -201,6 +210,13 @@ class MTV_PUBLIC RingBuffer : protected QThread
     bool ignoreliveeof;           // protected by rwlock
 
     long long readAdjust;         // protected by rwlock
+
+    // bitrate monitors
+    bool              bitrateMonitorEnabled;
+    QMutex            decoderReadLock;
+    QMap<qint64, uint64_t> decoderReads;
+    QMutex            storageReadLock;
+    QMap<qint64, uint64_t> storageReads;
 
     // note 1: numfailures is modified with only a read lock in the
     // read ahead thread, but this is safe since all other places

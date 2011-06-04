@@ -588,9 +588,10 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
 
         if (GetMythUI()->GetCurrentLocation().toLower() == "mainmenu")
         {
-            QString msg = QString("HANDLE_MEDIA Internal %1").arg(nc->getFrom(2));
-            MythEvent me(msg);
-            QCoreApplication::postEvent(GetMythMainWindow(), me.clone());
+            QStringList args;
+            args << nc->getFrom(2);
+            MythEvent *me = new MythEvent(ACTION_HANDLEMEDIA, args);
+            qApp->postEvent(GetMythMainWindow(), me);
         }
         else
             return QString("Unable to change to main menu to start playback!");

@@ -278,8 +278,8 @@ static GlobalComboBox *TimeOffset()
     init_time_offsets(gc);
     QString helptext = QObject::tr(
         "Used if the XMLTV data comes from a different time zone than your "
-        "own. This adjusts the times in the XMLTV EPG data to compensate. "
-        "'Auto' converts the XMLTV time to local time using your "
+        "own and modifies the date and time before insertion into the "
+        "database. 'Auto' converts the XMLTV time to local time using your "
         "computer's time zone. "
         "'None' ignores the XMLTV time zone, interpreting times as local.");
     gc->setHelpText(helptext);
@@ -322,7 +322,7 @@ static GlobalCheckBox *MasterBackendOverride()
     gc->setLabel(QObject::tr("Master backend override"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("If enabled, the master backend will stream and"
-                    " delete files if it finds them in the video directory. "
+                    " delete files if it finds them in a storage directory. "
                     "Useful if you are using a central storage location, like "
                     "a NFS share, and your slave backend isn't running."));
     return gc;
@@ -821,16 +821,6 @@ static GlobalCheckBox *MythFillEnabled()
     return bc;
 }
 
-static GlobalSpinBox *MythFillPeriod()
-{
-    GlobalSpinBox *bs = new GlobalSpinBox("MythFillPeriod", 1, 30, 1);
-    bs->setLabel(QObject::tr("mythfilldatabase run frequency (days)"));
-    bs->setValue(1);
-    bs->setHelpText(QObject::tr("The number of days between mythfilldatabase "
-                    "runs."));
-    return bs;
-}
-
 static GlobalSpinBox *MythFillMinHour()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("MythFillMinHour", 0, 23, 1);
@@ -946,7 +936,6 @@ class MythFillSettings : public TriggeredConfigurationGroup
          settings->addChild(MythFillDatabasePath());
          settings->addChild(MythFillDatabaseArgs());
          settings->addChild(MythFillDatabaseLog());
-         settings->addChild(MythFillPeriod());
          settings->addChild(MythFillMinHour());
          settings->addChild(MythFillMaxHour());
          settings->addChild(MythFillGrabberSuggestsTime());

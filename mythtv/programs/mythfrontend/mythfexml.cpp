@@ -166,20 +166,45 @@ void MythFEXML::SendMessage(HTTPRequest *pRequest)
 
 void MythFEXML::SendAction(HTTPRequest *pRequest)
 {
+    QStringMap* map = &pRequest->m_mapParams;
     pRequest->m_eResponseType = ResponseTypeHTML;
-    QString sText = pRequest->m_mapParams["action"];
-    VERBOSE(VB_UPNP, QString("UPNP Action: ") + sText);
+    QString sText = map->value("action");
+    uint pcount   = map->size();
 
-    InitActions();
-    if (!m_actionList.contains(sText))
-    {
-        VERBOSE(VB_GENERAL, QString("UPNP Action: %1 is invalid").arg(sText));
+    VERBOSE(VB_UPNP, QString("UPNP Action: %1 (total %2 params)")
+        .arg(sText).arg(pcount));
+
+    if (!IsValidAction(sText))
         return;
+
+    if (pcount > 1)
+    {
+        bool valid = false;
+        QStringList args;
+        if (ACTION_SCREENSHOT == sText && 3 == pcount)
+        {
+            args << map->value("width");
+            args << map->value("height");
+            valid = true;
+        }
+        else if (ACTION_HANDLEMEDIA == sText && 2 == pcount)
+        {
+            args << map->value("file");
+            valid = true;
+        }
+
+        if (valid)
+        {
+            MythEvent* me = new MythEvent(sText, args);
+            qApp->postEvent(GetMythMainWindow(), me);
+            return;
+        }
+
+        VERBOSE(VB_UPNP, QString("Failed to validate extra paramaters - ignoring"));
     }
 
-    MythMainWindow *window = GetMythMainWindow();
     QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, 0, Qt::NoModifier, sText);
-    qApp->postEvent(window, (QEvent*)ke);
+    qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
 }
 
 static const QString PROCESS_ACTION =
@@ -329,6 +354,15 @@ void MythFEXML::GetRemote(HTTPRequest *pRequest)
     stream <<
         "  </body>\n"
         "</html>\n";
+}
+
+bool MythFEXML::IsValidAction(const QString &action)
+{
+    InitActions();
+    if (m_actionList.contains(action))
+        return true;
+    VERBOSE(VB_GENERAL, QString("UPNP Action: %1 is invalid").arg(action));
+    return false;
 }
 
 void MythFEXML::InitActions(void)

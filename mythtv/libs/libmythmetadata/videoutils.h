@@ -67,9 +67,9 @@ inline QString generate_file_url(
     uint port = gCoreContext->GetSettingOnHost("BackendServerPort",
                                                host).toUInt();
 
-    return QString("myth://%1@%2:%3/%4")
-        .arg(StorageGroup::GetGroupToUse(host, storage_group))
-        .arg(ip).arg(port).arg(path);
+    return gCoreContext->GenMythURL(ip,port,path,
+                                    StorageGroup::GetGroupToUse(host, storage_group));
+
 }
 
 #endif // VIDEOUTILS_H_

@@ -26,6 +26,7 @@ class MythBrowser : public MythScreenType
     bool keyPressEvent(QKeyEvent *);
 
     void setDefaultSaveDirectory(const QString saveDir) { m_defaultSaveDir = saveDir; }
+    void setDefaultSaveFilename(const QString saveFile) { m_defaultSaveFilename = saveFile; }
     MythImage* getDefaultFavIcon(void) { return m_defaultFavIcon; }
 
   public slots:
@@ -70,6 +71,7 @@ class MythBrowser : public MythScreenType
     QUrl      m_url;
     float     m_zoom;
     QString   m_defaultSaveDir;
+    QString   m_defaultSaveFilename;
 
     Bookmark  m_editBookmark;
 

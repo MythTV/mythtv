@@ -49,7 +49,7 @@ MHIContext::MHIContext(InteractiveTV *parent)
       m_engine(NULL),       m_stop(false),
       m_updated(false),
       m_displayWidth(StdDisplayWidth), m_displayHeight(StdDisplayHeight),
-      m_face_loaded(false), m_currentChannel(-1),
+      m_face_loaded(false), m_engineThread(NULL), m_currentChannel(-1),
       m_isLive(false),      m_currentCard(0),
       m_audioTag(-1),       m_videoTag(-1),
       m_tuningTo(-1),       m_lastNbiVersion(NBI_VERSION_UNSET),

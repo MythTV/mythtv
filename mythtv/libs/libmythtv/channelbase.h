@@ -4,10 +4,10 @@
 #define CHANNELBASE_H
 
 // Qt headers
+#include <QWaitCondition>
 #include <QStringList>
-#include <qwaitcondition.h>
-#include <qmutex.h>
-#include <qthread.h>
+#include <QThread>
+#include <QMutex>
 
 // MythTV headers
 #include "channelutil.h"
@@ -15,20 +15,13 @@
 #include "mythsystem.h"
 #include "tv.h"
 
-class TVRec;
+class FireWireDBOptions;
+class GeneralDBOptions;
+class ProcessThread;
+class DVBDBOptions;
 class ChannelBase;
-
-/*
- * Thread to run tunning process in
- */
-class ChannelThread : public QThread
-{
-  public:
-    virtual void run(void);
-
-    QString      channel;
-    ChannelBase *tuner;
-};
+class QProcess;
+class TVRec;
 
 /** \class ChannelBase
  *  \brief Abstract class providing a generic interface to tuning hardware.
@@ -40,22 +33,14 @@ class ChannelThread : public QThread
 
 class ChannelBase
 {
-    friend class ChannelThread;
+    friend class SignalMonitor;
 
   public:
-    enum Status { changeUnknown = 'U', changePending = 'P',
-                  changeFailed = 'F', changeSuccess = 'S' };
-
     ChannelBase(TVRec *parent);
     virtual ~ChannelBase(void);
 
     virtual bool Init(QString &inputname, QString &startchannel, bool setchan);
     virtual bool IsTunable(const QString &input, const QString &channum) const;
-
-    virtual void SelectChannel(const QString & chan, bool use_sm);
-
-    Status GetStatus(void);
-    Status Wait(void);
 
     // Methods that must be implemented.
     /// \brief Opens the channel changing hardware for use.
@@ -64,12 +49,17 @@ class ChannelBase
     virtual void Close(void) = 0;
     /// \brief Reports whether channel is already open
     virtual bool IsOpen(void) const = 0;
+    virtual bool SetChannelByString(const QString &chan) = 0;
 
     // Methods that one might want to specialize
+    virtual void SetFormat(const QString &/*format*/) {}
+    virtual int SetFreqTable(const QString &/*tablename*/) { return 0; }
     /// \brief Sets file descriptor.
     virtual void SetFd(int fd) { (void)fd; };
     /// \brief Returns file descriptor, -1 if it does not exist.
     virtual int GetFd(void) const { return -1; };
+    virtual bool Tune(const QString &freqid, int finetune) { return true; }
+    virtual bool IsExternalChannelChangeSupported(void) { return false; }
 
     // Gets
     virtual uint GetNextChannel(uint chanid, int direction) const;
@@ -110,9 +100,8 @@ class ChannelBase
                           const QString &newChanNum);
 
     // Input toggling convenience methods
-//    virtual bool SwitchToInput(const QString &input); // not used?
-    virtual bool SelectInput(const QString &input, const QString &chan,
-                             bool use_sm);
+    virtual bool SwitchToInput(const QString &input);
+    virtual bool SwitchToInput(const QString &input, const QString &chan);
 
     virtual bool InitializeInputs(void);
 
@@ -134,28 +123,39 @@ class ChannelBase
 
     // \brief Set cardid for scanning
     void SetCardID(uint _cardid) { m_cardid = _cardid; }
-    // \brief Set chan name for ringbuffer
-    void SetChanNum(const QString & chan) { m_curchannelname= chan; }
 
     virtual int GetCardID(void) const;
-  protected:
-    virtual bool SetChannelByString(const QString &chan) = 0;
 
+    static ChannelBase *CreateChannel(
+        TVRec                    *tv_rec,
+        const GeneralDBOptions   &genOpt,
+        const DVBDBOptions       &dvbOpt,
+        const FireWireDBOptions  &fwOpt,
+        const QString            &startchannel,
+        bool                      enter_power_save_mode,
+        QString                  &rbFileExt);
+
+  protected:
     /// \brief Switches to another input on hardware,
     ///        and sets the channel is setstarting is true.
     virtual bool SwitchToInput(int inputNum, bool setstarting);
     virtual bool IsInputAvailable(
         int inputNum, uint &mplexid_restriction) const;
 
-    virtual bool ChangeExternalChannel(const QString &newchan);
-    static void StoreInputChannels(const InputMap&);
-    static void StoreDefaultInput(uint cardid, const QString &input);
     int GetDefaultInput(uint cardid);
     void ClearInputMap(void);
 
-    bool Aborted();
-    void setStatus(Status status);
-    void TeardownAll(void);
+    static void StoreInputChannels(const InputMap&);
+    static void StoreDefaultInput(uint cardid, const QString &input);
+
+  protected:
+    bool KillScript(uint timeout_ms);
+    void HandleScript(const QString &freqid);
+    virtual void HandleScriptEnd(bool ok);
+    uint GetScriptStatus(bool holding_lock = false);
+
+    bool ChangeExternalChannel(
+        const QString &changer, const QString &newchan);
 
     TVRec   *m_pParent;
     QString  m_curchannelname;
@@ -165,15 +165,30 @@ class ChannelBase
     InputMap m_inputs;
     DBChanList m_allchannels; ///< channels across all inputs
 
-    QWaitCondition  m_tuneCond;
+    QMutex         m_process_lock;
+    ProcessThread *m_process_thread;
+    QProcess      *m_process;
+    /// 0 == unknown, 1 == pending, 2 == failed, 4 == success
+    uint           m_process_status;
+};
 
-  private:
-    mutable     ChannelThread   m_tuneThread;
-    Status      m_tuneStatus;
-    QMutex      m_thread_lock;
-    bool        m_abort_change;
-    MythSystem *m_changer;
+/** \brief ChannelBase helper class
+ *  This is only needed because ChangeExternalChannel is called
+ *  outside of a QThread event thread. If TVRec were converted to
+ *  use QThread w/event thread this could be replaced by
+ *    m_process = new QProcess();
+ *    m_process->start(command);
+ */
+class ProcessThread : public QThread
+{
+  public:
+    ProcessThread() { QObject::moveToThread(this); }
+    virtual void run(void) { exec(); }
+    virtual bool event(QEvent*);
+    QProcess *CreateProcess(const QString&);
+    QMutex          m_lock;
+    QWaitCondition  m_wait;
+    QProcess       *m_proc;
 };
 
 #endif
-

@@ -40,15 +40,21 @@ typedef struct graphics_controller_s GRAPHICS_CONTROLLER;
 typedef void (*gc_overlay_proc_f)(void *, const struct bd_overlay_s * const);
 
 typedef enum {
-    GC_CTRL_NOP,
+    /* */
+    GC_CTRL_NOP,             /* No input. Render page / run timers / run animations */
+    GC_CTRL_RESET,           /* reset graphics controller */
+
+    /* user input */
     GC_CTRL_VK_KEY,          /* param: bd_vk_key_e */
+    GC_CTRL_MOUSE_MOVE,      /* move selected button to (x,y), param: (x<<16 | y) */
+
+    /* HDMV VM control messages */
     GC_CTRL_ENABLE_BUTTON,   /* param: button_id */
     GC_CTRL_DISABLE_BUTTON,  /* param: button_id */
     GC_CTRL_SET_BUTTON_PAGE,
     GC_CTRL_POPUP,           /* param: on/off */
     GC_CTRL_IG_END,          /* execution of IG object is complete */
-    GC_CTRL_RESET,           /* reset graphics controller */
-    GC_CTRL_MOUSE_MOVE,      /* move selected button to (x,y), param: (x<<16 | y) */
+
 } gc_ctrl_e;
 
 typedef struct {

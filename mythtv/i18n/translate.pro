@@ -53,3 +53,4 @@ TRANSLATIONS += mythfrontend_ru.ts
 TRANSLATIONS += mythfrontend_sl.ts
 TRANSLATIONS += mythfrontend_sv.ts
 TRANSLATIONS += mythfrontend_tr.ts
+TRANSLATIONS += mythfrontend_zh_cn.ts

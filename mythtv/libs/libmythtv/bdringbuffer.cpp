@@ -671,6 +671,7 @@ bool BDRingBuffer::UpdateTitleInfo(void)
     {
         VERBOSE(VB_PLAYBACK, LOC +
             QString("Entering still frame (%1 seconds) UNSUPPORTED").arg(time));
+        bd_read_skip_still(bdnav);
     }
     else if (still == BLURAY_STILL_INFINITE)
     {
@@ -1003,7 +1004,7 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
 
 bool BDRingBuffer::IsInStillFrame(void) const
 {
-    return m_stillTime >= 0 && m_stillMode != BLURAY_STILL_NONE;
+    return m_stillTime > 0 && m_stillMode != BLURAY_STILL_NONE;
 }
 
 void BDRingBuffer::WaitForPlayer(void)
@@ -1069,10 +1070,8 @@ void BDRingBuffer::SubmitOverlay(const bd_overlay_s * const overlay)
     if (!overlay)
         return;
 
-    if ((overlay->w <= 0) || (overlay->w > 1920) ||
-        (overlay->x <  0) || (overlay->x > 1920) ||
-        (overlay->h <= 0) || (overlay->h > 1080) ||
-        (overlay->y <  0) || (overlay->y > 1080))
+    if ((overlay->w < 1) || (overlay->w > 1920) || (overlay->x > 1920) ||
+        (overlay->h < 1) || (overlay->h > 1080) || (overlay->y > 1080))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
             QString("Invalid overlay size: %1x%2+%3+%4")

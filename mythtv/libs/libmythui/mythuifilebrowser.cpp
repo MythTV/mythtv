@@ -176,8 +176,11 @@ void MythUIFileBrowser::Init(const QString &startPath)
         if (!qurl.path().isEmpty())
         {
             // Force browing of remote SG's to start at their root
-            m_baseDirectory = QString("myth://%1@%2").arg(qurl.userName())
-                                                      .arg(qurl.host());
+            m_baseDirectory = gCoreContext->GenMythURL(qurl.host(),
+                                                       0,
+                                                       "",
+                                                       qurl.userName());
+
         }
         else
         {

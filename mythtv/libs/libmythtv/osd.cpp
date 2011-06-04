@@ -292,11 +292,11 @@ void OSD::HideAll(bool keepsubs, MythScreenType* except)
 
 void OSD::LoadWindows(void)
 {
-    static const char* default_windows[6] = {
+    static const char* default_windows[7] = {
         "osd_message", "osd_input", "program_info", "browse_info", "osd_status",
-        "osd_program_editor"};
+        "osd_program_editor", "osd_debug"};
 
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 7; i++)
     {
         const char* window = default_windows[i];
         MythOSDWindow *win = new MythOSDWindow(NULL, window, true);

@@ -53,6 +53,8 @@ class Myth : public MythServices
                                                    const QString   &DirName,
                                                    const QString   &HostName );
 
+        DTC::TimeZoneInfo*  GetTimeZone         ( );
+
         DTC::SettingList*   GetSetting          ( const QString   &HostName, 
                                                   const QString   &Key, 
                                                   const QString   &Default );
@@ -147,6 +149,8 @@ class ScriptableMyth : public QObject
         {
             return m_obj.RemoveStorageGroupDir( GroupName, DirName, HostName );
         }
+
+        QObject* GetTimeZone() { return m_obj.GetTimeZone( ); }
 
         QObject* GetSetting ( const QString   &HostName, 
                               const QString   &Key, 

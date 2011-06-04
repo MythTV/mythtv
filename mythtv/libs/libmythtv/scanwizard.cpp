@@ -121,6 +121,7 @@ void ScanWizard::SetPage(const QString &pageTitle)
     else if ((scantype == ScanTypeSetting::FullScan_ATSC)     ||
              (scantype == ScanTypeSetting::FullTransportScan) ||
              (scantype == ScanTypeSetting::TransportScan)     ||
+             (scantype == ScanTypeSetting::CurrentTransportScan) ||
              (scantype == ScanTypeSetting::FullScan_DVBC)     ||
              (scantype == ScanTypeSetting::FullScan_DVBT)     ||
              (scantype == ScanTypeSetting::FullScan_Analog))

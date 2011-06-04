@@ -54,6 +54,22 @@ class BrowserApi : public QObject
     QString    m_answer;
 };
 
+class MythWebPage : public QWebPage
+{
+  Q_OBJECT
+
+  public:
+    MythWebPage(QObject *parent = 0);
+
+    virtual bool extension (Extension extension, const ExtensionOption *option = 0, ExtensionReturn *output = 0);
+    virtual bool supportsExtension (Extension extension) const;
+
+  protected:
+
+  private:
+    friend class MythWebView;
+};
+
 class MythWebView : public QWebView
 {
   Q_OBJECT
@@ -72,17 +88,24 @@ class MythWebView : public QWebView
 
   private:
     void showDownloadMenu(void);
+    void doDownloadRequested(const QNetworkRequest &request);
     void doDownload(const QString &saveFilename);
     void openBusyPopup(const QString &message);
     void closeBusyPopup(void);
 
-    bool isMusicFile(const QString &extension);
-    bool isVideoFile(const QString &extension);
+    bool isMusicFile(const QString &extension, const QString &mimetype);
+    bool isVideoFile(const QString &extension, const QString &mimetype);
 
+    QString getReplyMimetype(void);
+    QString getExtensionForMimetype(const QString &mimetype);
+
+    MythWebPage      *m_webpage;
     MythUIWebBrowser *m_parentBrowser;
     BrowserApi       *m_api;
     QNetworkRequest   m_downloadRequest;
+    QNetworkReply    *m_downloadReply;
     MythUIBusyDialog *m_busyPopup;
+    bool              m_downloadAndPlay;
 };
 
 /**
@@ -130,6 +153,9 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
 
     void SetDefaultSaveDirectory(const QString &saveDir);
     QString GetDefaultSaveDirectory(void) { return m_defaultSaveDir; }
+
+    void SetDefaultSaveFilename(const QString &filename);
+    QString GetDefaultSaveFilename(void) { return m_defaultSaveFilename; }
 
   public slots:
     void Back(void);
@@ -187,6 +213,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     QUrl         m_widgetUrl;
     QString      m_userCssFile;
     QString      m_defaultSaveDir;
+    QString      m_defaultSaveFilename;
 
     bool         m_inputToggled;
     QString      m_lastMouseAction;

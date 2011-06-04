@@ -32,7 +32,6 @@ class ImportRecorder : public DTVRecorder
                                const QString &vbidev);
 
     void StartRecording(void);
-    void StopRecording(void);
 
     bool Open(void);
     void Close(void);
@@ -41,9 +40,6 @@ class ImportRecorder : public DTVRecorder
 
   private:
     int             _import_fd;
-
-    QMutex          _end_of_recording_lock;
-    QWaitCondition  _end_of_recording_wait;
 };
 
 #endif // _IMPORT_RECORDER_H_

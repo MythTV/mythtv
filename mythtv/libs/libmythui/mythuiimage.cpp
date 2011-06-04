@@ -86,10 +86,7 @@ class ImageLoadThread : public QRunnable
     void run()
     {
         QString tmpFilename;
-        if ((m_filename.startsWith("/")) ||
-            (m_filename.startsWith("http://")) ||
-            (m_filename.startsWith("https://")) ||
-            (m_filename.startsWith("ftp://")))
+        if (!(m_filename.startsWith("myth://")))
             tmpFilename = m_filename;
 
         MythImageReader imageReader(tmpFilename);
@@ -620,10 +617,7 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
             VERBOSE(VB_GUI|VB_FILE|VB_EXTRA, LOC + QString(
                         "Load(), loading '%1' in foreground").arg(filename));
             QString tmpFilename;
-            if ((filename.startsWith("/")) ||
-                (filename.startsWith("http://")) ||
-                (filename.startsWith("https://")) ||
-                (filename.startsWith("ftp://")))
+            if (!(filename.startsWith("myth://")))
                 tmpFilename = filename;
 
             MythImageReader imageReader(tmpFilename);

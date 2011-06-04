@@ -1,6 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
 <mythuitheme>
+    <window name="osd_debug">
+        <fontdef name="medium" face="DejaVu Sans">
+            <pixelsize>16</pixelsize>
+            <color>#FFFFFF</color>
+        </fontdef>
+        <area>50,50,800,105</area>
+        <shape name="background">
+            <area>0,0,100%,100%</area>
+            <fill color="#000000" alpha="200" />
+        </shape>
+        <textarea name="file">
+            <font>medium</font>
+            <area>5,5,180,25</area>
+            <align>right,vcenter</align>
+            <value>Filename :</value>
+        </textarea>
+        <textarea name="filename">
+            <font>medium</font>
+            <area>190,5,605,25</area>
+            <align>left,vcenter</align>
+        </textarea>
+        <textarea name="storage">
+            <font>medium</font>
+            <area>5,30,180,25</area>
+            <align>right,vcenter</align>
+            <value>Storage to Buffer :</value>
+        </textarea>
+        <textarea name="storagerate">
+            <font>medium</font>
+            <area>190,30,605,25</area>
+            <align>left,vcenter</align>
+        </textarea>
+        <textarea name="decoder">
+            <font>medium</font>
+            <area>5,55,180,25</area>
+            <align>right,vcenter</align>
+            <value>Buffer to Decoder :</value>
+        </textarea>
+        <textarea name="decoderrate">
+            <font>medium</font>
+            <area>190,55,605,25</area>
+            <align>left,vcenter</align>
+        </textarea>
+        <textarea name="buffer">
+            <font>medium</font>
+            <area>5,80,180,25</area>
+            <align>right,vcenter</align>
+            <value>Available Buffer :</value>
+        </textarea>
+        <textarea name="bufferavail">
+            <font>medium</font>
+            <area>190,80,605,25</area>
+            <align>left,vcenter</align>
+        </textarea>
+    </window>
+
     <window name="osd_message">
         <fontdef name="medium" face="DejaVu Sans">
             <pixelsize>26</pixelsize>

@@ -82,6 +82,7 @@ class MUI_PUBLIC MythPoint : public QPoint
     MythPoint(QPoint point);
 
     void Init(void);
+    bool isValid(void) const { return valid; }
     void CalculatePoint(MythRect parentArea);
 
     void NormPoint(void);
@@ -103,6 +104,8 @@ class MUI_PUBLIC MythPoint : public QPoint
     bool m_needsUpdate;
 
     QRect m_parentArea;
+
+    bool valid;
 };
 
 #endif

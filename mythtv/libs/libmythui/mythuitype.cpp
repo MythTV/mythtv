@@ -33,6 +33,7 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
 
     m_Visible = true;
     m_Enabled = true;
+    m_Initiator = false;
     m_CanHaveFocus = m_HasFocus = false;
     m_Area = MythRect(0, 0, 0, 0);
     m_MinArea = MythRect(0, 0, 0, 0);
@@ -106,6 +107,7 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
     for (int i = 0; i < children.size(); ++i)
     {
         QObject *obj = children.at(i);
+
         if (onlyWidgets)
         {
             if (obj->isWidgetType() && (!objName || obj->objectName() == oName))
@@ -521,19 +523,17 @@ void MythUIType::SetMinSize(const MythPoint &minsize)
     MythPoint point(minsize);
 
     if (m_Parent)
-    {
         point.CalculatePoint(m_Parent->GetArea());
-        m_Parent->m_MinSize = point;
-    }
+
     m_MinSize = point;
 }
 
 QSize MythUIType::GetMinSize(void) const
 {
-    if (m_MinSize.x() > 0)
-        return QSize(m_MinSize.x(), m_MinSize.y());
+    if (!m_MinSize.isValid())
+        return m_Area.size();
 
-    return m_Area.size();
+    return QSize(m_MinSize.x(), m_MinSize.y());
 }
 
 void MythUIType::SetArea(const MythRect &rect)
@@ -544,6 +544,12 @@ void MythUIType::SetArea(const MythRect &rect)
     m_DirtyRegion = QRegion(m_Area.toQRect());
 
     m_Area = rect;
+
+    if (m_Area.width() > m_NormalSize.width())
+        m_NormalSize.setWidth(m_Area.width());
+    if (m_Area.height() > m_NormalSize.height())
+        m_NormalSize.setHeight(m_Area.height());
+
     RecalculateArea();
 
     if (m_Parent)
@@ -558,8 +564,13 @@ void MythUIType::SetArea(const MythRect &rect)
 void MythUIType::AdjustMinArea(int delta_x, int delta_y)
 {
     // If a minsize is not set, don't use MinArea
-    if (m_MinSize.x() < 1)
+    if (!m_MinSize.isValid())
         return;
+
+    if (m_Area.width() < m_NormalSize.width())
+        m_Area.setWidth(m_NormalSize.width());
+    if (m_Area.height() < m_NormalSize.height())
+        m_Area.setHeight(m_NormalSize.height());
 
     QSize size(m_Area.size());
 
@@ -568,27 +579,93 @@ void MythUIType::AdjustMinArea(int delta_x, int delta_y)
     m_MinArea.setSize(size);
     m_MinArea.setX(m_Area.x());
     m_MinArea.setY(m_Area.y());
+
+    QSize minsize = QSize(m_MinSize.x(), m_MinSize.y());
+    QSize bound(m_MinArea.width(), m_MinArea.height());
+    bound = bound.expandedTo(minsize);
+
+    m_MinArea.setWidth(bound.width());
+    m_MinArea.setHeight(bound.height());
 }
 
 /**
  * Adjust the size of sibling objects within the button.
  */
-void MythUIType::SetMinAreaSiblings(const QSize &size,
-                                    int delta_x, int delta_y)
+void MythUIType::SetMinAreaParent(MythRect actual_area, MythRect allowed_area,
+                                  const MythUIType *calling_child)
 {
+    int delta_x, delta_y;
+    MythRect area;
+
     // If a minsize is not set, don't use MinArea
-    if (m_MinSize.x() > 0)
-    {
-        m_MinArea.setSize(size);
-        m_MinArea.setX(m_Area.x());
-        m_MinArea.setY(m_Area.y());
-    }
+    if (!m_MinSize.isValid())
+        return;
+
+    m_MinArea.setWidth(0);
+
+    if (m_Area.width() < m_NormalSize.width())
+        m_Area.setWidth(m_NormalSize.width());
+    if (m_Area.height() < m_NormalSize.height())
+        m_Area.setHeight(m_NormalSize.height());
+
+    actual_area.translate(m_Area.topLeft());
+    allowed_area.translate(m_Area.topLeft());
 
     QList<MythUIType*>::iterator it;
+
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
     {
-        (*it)->AdjustMinArea(delta_x, delta_y);
+        if (*it == calling_child || !(*it)->m_Initiator)
+            continue;
+
+        // Find union of area(s)
+        area = (*it)->GetArea();
+        area.translate(m_Area.topLeft());
+        actual_area = actual_area.united(area);
+        area = (*it)->m_Area;
+        area.translate(m_Area.topLeft());
+        allowed_area = allowed_area.united(area);
     }
+
+    // Make sure it is not larger than the area allowed
+    actual_area = actual_area.intersected(m_Area);
+    allowed_area = allowed_area.intersected(m_Area);
+
+    if (!actual_area.isValid() || actual_area == m_MinArea)
+        return;
+
+    delta_x = (actual_area.x() + actual_area.width()) -
+              (allowed_area.x() + allowed_area.width());
+    delta_y = (actual_area.y() + actual_area.height()) -
+              (allowed_area.y() + allowed_area.height());
+
+    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+    {
+        if (*it == calling_child)
+            continue;
+
+        if (!(*it)->m_Initiator)
+        {
+            (*it)->AdjustMinArea(delta_x, delta_y);
+        }
+
+        area = (*it)->GetArea();
+        area.translate(m_Area.topLeft());
+        actual_area = actual_area.united(area);
+        area = (*it)->m_Area;
+        area.translate(m_Area.topLeft());
+        allowed_area = allowed_area.united(area);
+    }
+
+    QSize minsize = QSize(m_MinSize.x(), m_MinSize.y());
+    QSize bound(actual_area.width(), actual_area.height());
+    bound = bound.expandedTo(minsize);
+
+    m_MinArea.setWidth(bound.width());
+    m_MinArea.setHeight(bound.height());
+
+    if (m_Parent)
+        m_Parent->SetMinAreaParent(actual_area, allowed_area, this);
 }
 
 /**
@@ -597,30 +674,40 @@ void MythUIType::SetMinAreaSiblings(const QSize &size,
 void MythUIType::SetMinArea(const QSize &size)
 {
     // If a minsize is not set, don't use MinArea
-    if (m_MinSize.x() < 1)
+    if (!m_Initiator || !m_MinSize.isValid())
         return;
+
+    m_MinArea.setWidth(0);
+    if (m_Area.width() < m_NormalSize.width())
+        m_Area.setWidth(m_NormalSize.width());
+    if (m_Area.height() < m_NormalSize.height())
+        m_Area.setHeight(m_NormalSize.height());
 
     /**
      * The MinArea will have the same origin as the normal Area,
      * but can have a smaller size.
      */
-    QSize minsize = QSize(m_MinSize.x(), m_MinSize.y());
+    QSize minsize = QSize(m_MinSize.x() + 1, m_MinSize.y() + 1);
+
     QSize bounded(size);
 
-    bounded = bounded.expandedTo(minsize);
+    if (bounded.isNull())
+        bounded = minsize;
+    else
+        bounded = bounded.expandedTo(minsize);
+
     bounded = bounded.boundedTo(m_Area.size());
 
     if (bounded == m_MinArea.size())
         return;
 
-    m_MinArea.setSize(bounded);
     m_MinArea.setX(m_Area.x());
     m_MinArea.setY(m_Area.y());
+    m_MinArea.setWidth(bounded.width());
+    m_MinArea.setHeight(bounded.height());
 
     if (m_Parent)
-        m_Parent->SetMinAreaSiblings(bounded,
-                                     bounded.width()  - m_Area.width(),
-                                     bounded.height() - m_Area.height());
+        m_Parent->SetMinAreaParent(m_MinArea, m_Area, this);
 }
 
 void MythUIType::ExpandArea(const MythRect &rect)
@@ -641,7 +728,7 @@ void MythUIType::ExpandArea(const MythRect &rect)
  */
 MythRect MythUIType::GetArea(void) const
 {
-    if (m_MinArea.width() > 0)
+    if (m_MinArea.isValid())
         return m_MinArea;
     return m_Area;
 }
@@ -838,6 +925,8 @@ void MythUIType::CopyFrom(MythUIType *base)
     SetArea(base->m_Area);
     m_MinArea = base->m_MinArea;
     m_MinSize = base->m_MinSize;
+    m_Initiator = base->m_Initiator;
+    m_NormalSize = base->m_NormalSize;
     m_Alpha = base->m_Alpha;
     m_AlphaChangeMode = base->m_AlphaChangeMode;
     m_AlphaChange = base->m_AlphaChange;
@@ -882,10 +971,14 @@ bool MythUIType::ParseElement(
     if (element.tagName() == "position")
         SetPosition(parsePoint(element));
     else if (element.tagName() == "area")
+    {
         SetArea(parseRect(element));
+    }
     else if (element.tagName() == "minsize")
     {
         // Use parsePoint so percentages can be used
+        if (element.hasAttribute("initiator"))
+            m_Initiator = parseBool(element.attribute("initiator"));
         SetMinSize(parsePoint(element));
     }
     else if (element.tagName() == "alpha")
@@ -954,6 +1047,11 @@ void MythUIType::RecalculateArea(bool recurse)
         m_Area.CalculateArea(m_Parent->GetArea());
     else
         m_Area.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
+
+    if (m_Area.width() > m_NormalSize.width())
+        m_NormalSize.setWidth(m_Area.width());
+    if (m_Area.height() > m_NormalSize.height())
+        m_NormalSize.setHeight(m_Area.height());
 
     if (recurse)
     {

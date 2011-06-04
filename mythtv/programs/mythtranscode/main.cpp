@@ -515,7 +515,8 @@ int main(int argc, char *argv[])
         print_verbose_messages = VB_NONE;
 
     //  Load the context
-    gContext = new MythContext(MYTH_BINARY_VERSION);
+    MythContext context(MYTH_BINARY_VERSION);
+    gContext = &context;
     if (!gContext->Init(false))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
@@ -625,8 +626,14 @@ int main(int argc, char *argv[])
                     QString("Couldn't find a recording for filename '%1'")
                     .arg(infile));
             delete pginfo;
-            pginfo = NULL;
+            return GENERIC_EXIT_NO_RECORDING_DATA;
         }
+    }
+
+    if (!pginfo)
+    {
+        VERBOSE(VB_IMPORTANT, "No program info found!");
+        return GENERIC_EXIT_NO_RECORDING_DATA;
     }
 
     if (infile.left(7) == "myth://" && (outfile.isNull() || outfile != "-"))
@@ -752,7 +759,6 @@ int main(int argc, char *argv[])
 
     transcode->deleteLater();
 
-    delete gContext;
     return exitcode;
 }
 
@@ -766,9 +772,8 @@ static int transUnlink(QString filename, ProgramInfo *pginfo)
         QString port = gCoreContext->GetSettingOnHost("BackendServerPort",
                                                   pginfo->GetHostname());
         QString basename = filename.section('/', -1);
-        QString uri = QString("myth://%1@%2:%3/%4")
-            .arg(pginfo->GetStorageGroup())
-            .arg(ip).arg(port).arg(basename);
+        QString uri = gCoreContext->GenMythURL(ip,port,basename,pginfo->GetStorageGroup());
+
         VERBOSE(VB_IMPORTANT, QString("Requesting delete for file '%1'.")
                                       .arg(uri));
         bool ok = RemoteFile::DeleteFile(uri);

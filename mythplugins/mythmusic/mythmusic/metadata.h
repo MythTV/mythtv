@@ -41,6 +41,8 @@ typedef struct AlbumArtImage
     bool      embedded;
 } AlbumArtImage;
 
+typedef QList<AlbumArtImage*> AlbumArtList;
+
 typedef QHash<QString,QString> MetadataMap;
 
 class Metadata

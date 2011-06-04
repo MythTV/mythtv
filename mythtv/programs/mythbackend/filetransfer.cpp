@@ -11,12 +11,13 @@
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
                            bool usereadahead, int timeout_ms) :
     readthreadlive(true), readsLocked(false),
-    rbuffer(RingBuffer::Create(filename, false, usereadahead, timeout_ms)),
+    rbuffer(RingBuffer::Create(filename, false, usereadahead, timeout_ms, true)),
     sock(remote), ateof(false), lock(QMutex::NonRecursive),
     refLock(QMutex::NonRecursive), refCount(0), writemode(false)
 {
     pginfo = new ProgramInfo(filename);
     pginfo->MarkAsInUse(true, kFileTransferInUseID);
+    rbuffer->Start();
 }
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote, bool write) :
@@ -30,6 +31,7 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote, bool write) :
 
     if (write)
         remote->useReadyReadCallback(false);
+    rbuffer->Start();
 }
 
 FileTransfer::~FileTransfer()

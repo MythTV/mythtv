@@ -205,6 +205,11 @@ void SSDP::PerformSearch( const QString &sST )
     QByteArray sRequest = rRequest.toUtf8();
 
     MSocketDevice *pSocket = m_Sockets[ SocketIdx_Search ];
+    if ( !pSocket->isValid() )
+    {
+        pSocket->setProtocol(MSocketDevice::IPv4);
+        pSocket->setSocket(pSocket->createNewSocket(), MSocketDevice::Datagram);
+    }
 
     QHostAddress address;
     address.setAddress( SSDP_GROUP );
@@ -435,7 +440,7 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
 
     VERBOSE( VB_UPNP+VB_EXTRA,
              QString( "SSDP::ProcessSearchrequest : [%1] MX=%2" )
-             .arg( sST ).arg( nMX ));
+             .arg( sST ).arg( sMX ));
 
     // ----------------------------------------------------------------------
     // Validate Header Values...

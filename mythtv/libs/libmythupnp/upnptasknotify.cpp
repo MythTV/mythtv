@@ -69,9 +69,9 @@ UPnpNotifyTask::~UPnpNotifyTask()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
-                                    QString        sNT,
-                                    QString        sUDN )
+void UPnpNotifyTask::SendNotifyMsg( QMulticastSocket *pSocket,
+                                    QString           sNT,
+                                    QString           sUDN )
 {
     QString sUSN;
 
@@ -93,10 +93,11 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
                             .arg( sUSN         )
                             .arg( m_nMaxAge    );
 
-//    VERBOSE(VB_UPNP, QString("UPnpNotifyTask::SendNotifyMsg : %1 : %2 : %3")
-//                        .arg( pSocket->address().toString() )
-//                        .arg( sNT  )
-//                        .arg( sUSN ));
+    VERBOSE(VB_UPNP, QString("UPnpNotifyTask::SendNotifyMsg : %1:%2 : %3 : %4")
+                        .arg( pSocket->m_address.toString() )
+                        .arg( pSocket->m_port )
+                        .arg( sNT  )
+                        .arg( sUSN ));
 
     {
     QMutexLocker qml(&m_mutex); // for addressList
@@ -118,12 +119,18 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
             continue;
         }
 
+        QString ipaddress = *it;
+
+        // If this looks like an IPv6 address, then enclose it in []'s
+        if (ipaddress.contains(":"))
+            ipaddress = "[" + ipaddress + "]";
+
         QString sHeader = QString( "NOTIFY * HTTP/1.1\r\n"
                                    "HOST: %1:%2\r\n"    
                                    "LOCATION: http://%3:%4/getDeviceDesc\r\n" )
-                             .arg( SSDP_GROUP ) // pSocket->address().toString() )
-                             .arg( SSDP_PORT )  // pSocket->port() )
-                             .arg( *it )
+                             .arg( pSocket->m_address.toString() )
+                             .arg( pSocket->m_port )
+                             .arg( ipaddress )
                              .arg( m_nServicePort);
 
         QString  sPacket  = sHeader + sData;
@@ -133,9 +140,9 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
         // Send Packet to Socket (Send same packet twice)
         // ------------------------------------------------------------------
 
-        pSocket->writeBlock( scPacket, scPacket.length(), pSocket->address(), pSocket->port() );
+        pSocket->writeBlock( scPacket, scPacket.length(), pSocket->m_address, pSocket->m_port );
         usleep( rand() % 250000 );
-        pSocket->writeBlock( scPacket, scPacket.length(), pSocket->address(), pSocket->port() );
+        pSocket->writeBlock( scPacket, scPacket.length(), pSocket->m_address, pSocket->m_port );
     }
     }
 
@@ -148,7 +155,7 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
 void UPnpNotifyTask::Execute( TaskQueue *pQueue )
 {
 
-    MSocketDevice *pMulticast = new QMulticastSocket(SSDP_GROUP, SSDP_PORT);
+    QMulticastSocket *pMulticast = new QMulticastSocket(SSDP_GROUP, SSDP_PORT);
 //    QSocketDevice *pBroadcast = new QBroadcastSocket( "255.255.255.255", SSDP_PORT );
 
     // ----------------------------------------------------------------------
@@ -191,7 +198,7 @@ void UPnpNotifyTask::Execute( TaskQueue *pQueue )
 /////////////////////////////////////////////////////////////////////////////
 
 void UPnpNotifyTask::ProcessDevice(
-    MSocketDevice *pSocket, UPnpDevice *pDevice)
+    QMulticastSocket *pSocket, UPnpDevice *pDevice)
 {
     // ----------------------------------------------------------------------
     // Loop for each device and send the 2 required messages

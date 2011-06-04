@@ -407,14 +407,12 @@ bool PBHEventHandler::event(QEvent *e)
                 {
                     if (!re.exactMatch(*it))
                         continue;
+                    foundFile = gCoreContext->GenMythURL(
+                                           gCoreContext->GetSettingOnHost("BackendServerIP", host),
+                                           gCoreContext->GetSettingOnHost("BackendServerPort", host).toInt(),
+                                           *it,
+                                           StorageGroup::GetGroupToUse(host, sgroup));
 
-                    foundFile = QString("myth://%1@%2:%3/%4")
-                        .arg(StorageGroup::GetGroupToUse(host, sgroup))
-                        .arg(gCoreContext->GetSettingOnHost(
-                                 "BackendServerIP", host))
-                        .arg(gCoreContext->GetSettingOnHost(
-                                 "BackendServerPort", host))
-                        .arg(*it);
                     break;
                 }
             }
@@ -520,6 +518,8 @@ void PlaybackBoxHelper::UndeleteRecording(
 void PlaybackBoxHelper::run(void)
 {
     m_eventHandler = new PBHEventHandler(*this);
+    // Prime the pump so the disk free display starts updating
+    ForceFreeSpaceUpdate();
     exec();
 }
 
@@ -536,6 +536,8 @@ void PlaybackBoxHelper::UpdateFreeSpace(void)
             m_freeSpaceUsedMB  = (uint64_t) (fsInfos[i].usedSpaceKB  >> 10);
         }
     }
+    MythEvent *e = new MythEvent("UPDATE_USAGE_UI");
+    QCoreApplication::postEvent(m_listener, e);
 }
 
 uint64_t PlaybackBoxHelper::GetFreeSpaceTotalMB(void) const
