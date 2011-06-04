@@ -97,7 +97,7 @@ FileLogger::FileLogger(char *filename) : LoggerBase(filename, 0),
     }
     else
     {
-        m_fd = open(filename, O_WRONLY|O_CREAT|O_APPEND|O_SYNC, 0664);
+        m_fd = open(filename, O_WRONLY|O_CREAT|O_APPEND, 0664);
         m_opened = (m_fd != -1);
         LogPrint( VB_IMPORTANT, LOG_INFO, "Added logging to %s", filename );
     }
