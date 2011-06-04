@@ -172,7 +172,7 @@ RingBuffer::RingBuffer(void) :
     readpos(0),               writepos(0),
     internalreadpos(0),       ignorereadpos(-1),
     rbrpos(0),                rbwpos(0),
-    stopreads(false),
+    stopreads(false),         safefilename(QString()),
     filename(),               subtitlefilename(),
     tfw(NULL),                fd2(-1),
     writemode(false),         remotefile(NULL),

@@ -303,6 +303,7 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     if (m_dvdnav)
         CloseDVD();
 
+    safefilename = lfilename;
     filename = lfilename;
     QByteArray fname = filename.toLocal8Bit();
 

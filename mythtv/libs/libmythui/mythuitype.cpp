@@ -580,9 +580,8 @@ void MythUIType::AdjustMinArea(int delta_x, int delta_y)
     m_MinArea.setX(m_Area.x());
     m_MinArea.setY(m_Area.y());
 
-    QSize minsize = QSize(m_MinSize.x(), m_MinSize.y());
     QSize bound(m_MinArea.width(), m_MinArea.height());
-    bound = bound.expandedTo(minsize);
+    bound = bound.expandedTo(GetMinSize());
 
     m_MinArea.setWidth(bound.width());
     m_MinArea.setHeight(bound.height());
@@ -657,9 +656,8 @@ void MythUIType::SetMinAreaParent(MythRect actual_area, MythRect allowed_area,
         allowed_area = allowed_area.united(area);
     }
 
-    QSize minsize = QSize(m_MinSize.x(), m_MinSize.y());
     QSize bound(actual_area.width(), actual_area.height());
-    bound = bound.expandedTo(minsize);
+    bound = bound.expandedTo(GetMinSize());
 
     m_MinArea.setWidth(bound.width());
     m_MinArea.setHeight(bound.height());
@@ -687,15 +685,9 @@ void MythUIType::SetMinArea(const QSize &size)
      * The MinArea will have the same origin as the normal Area,
      * but can have a smaller size.
      */
-    QSize minsize = QSize(m_MinSize.x() + 1, m_MinSize.y() + 1);
-
     QSize bounded(size);
 
-    if (bounded.isNull())
-        bounded = minsize;
-    else
-        bounded = bounded.expandedTo(minsize);
-
+    bounded = bounded.expandedTo(GetMinSize());
     bounded = bounded.boundedTo(m_Area.size());
 
     if (bounded == m_MinArea.size())

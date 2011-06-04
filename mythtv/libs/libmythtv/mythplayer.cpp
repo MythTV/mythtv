@@ -4317,6 +4317,27 @@ int MythPlayer::GetStatusbarPos(void) const
     return((int)spos);
 }
 
+void MythPlayer::GetPlaybackData(InfoMap &infoMap)
+{
+    QString samplerate = RingBuffer::BitrateToString(audio.GetSampleRate());
+    infoMap.insert("samplerate",  samplerate);
+    infoMap.insert("filename",    player_ctx->buffer->GetSafeFilename());
+    infoMap.insert("decoderrate", player_ctx->buffer->GetDecoderRate());
+    infoMap.insert("storagerate", player_ctx->buffer->GetStorageRate());
+    infoMap.insert("bufferavail", player_ctx->buffer->GetAvailableBuffer());
+    infoMap.insert("avsync",
+            QString::number((float)avsync_avg / (float)frame_interval, 'f', 2));
+    if (videoOutput)
+    {
+        QString frames = QString("%1/%2").arg(videoOutput->ValidVideoFrames())
+                                         .arg(videoOutput->FreeVideoFrames());
+        infoMap.insert("videoframes", frames);
+    }
+    if (decoder)
+        infoMap["videodecoder"] = decoder->GetCodecDecoderName();
+    GetCodecDescription(infoMap);
+}
+
 int MythPlayer::GetSecondsBehind(void) const
 {
     if (!player_ctx->recorder)

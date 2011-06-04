@@ -273,6 +273,7 @@ void BDRingBuffer::ProgressUpdate(void)
 
 bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 {
+    safefilename = lfilename;
     filename = lfilename;
 
     VERBOSE(VB_IMPORTANT, LOC + QString("Opened BDRingBuffer device at %1")

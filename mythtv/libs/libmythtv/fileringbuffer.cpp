@@ -45,6 +45,7 @@ FileRingBuffer::FileRingBuffer(const QString &lfilename,
                                bool write, bool readahead, int timeout_ms)
 {
     startreadahead = readahead;
+    safefilename = lfilename;
     filename = lfilename;
 
     if (write)

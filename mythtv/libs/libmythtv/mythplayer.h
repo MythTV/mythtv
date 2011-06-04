@@ -144,7 +144,7 @@ class MTV_PUBLIC MythPlayer
     QSize   GetVideoSize(void) const          { return video_disp_dim; }
     float   GetVideoAspect(void) const        { return video_aspect; }
     float   GetFrameRate(void) const          { return video_frame_rate; }
-
+    void    GetPlaybackData(InfoMap &infoMap);
     bool    IsAudioNeeded(void) { return !using_null_videoout && player_ctx->IsAudioNeeded(); }
     uint    GetVolume(void) { return audio.GetVolume(); }
     int     GetSecondsBehind(void) const;
