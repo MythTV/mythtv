@@ -6900,7 +6900,6 @@ void TV::ToggleOSD(PlayerContext *ctx, bool includeStatusOSD)
 
 void TV::ToggleOSDDebug(PlayerContext *ctx)
 {
-    bool show = false;
     OSD *osd = GetOSDLock(ctx);
     if (osd && osd->IsWindowVisible("osd_debug"))
     {
@@ -9501,6 +9500,8 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         DoJumpRWND(actx);
     else if (action.startsWith("DEINTERLACER"))
         HandleDeinterlacer(actx, action);
+    else if (action == ACTION_TOGGLEOSDDEBUG)
+        ToggleOSDDebug(actx);
     else if (action == "TOGGLEMANUALZOOM")
         SetManualZoom(actx, true, tr("Zoom Mode ON"));
     else if (action == "TOGGLESTRETCH")
@@ -10639,6 +10640,8 @@ void TV::FillOSDMenuPlayback(const PlayerContext *ctx, OSD *osd,
         }
         if (!db_browse_always)
             osd->DialogAddButton(tr("Toggle Browse Mode"), "TOGGLEBROWSE");
+        osd->DialogAddButton(tr("Playback data"),
+                             ACTION_TOGGLEOSDDEBUG, false, false);
     }
     else if (category == "TIMESTRETCH")
     {

@@ -1259,6 +1259,9 @@ uint64_t RingBuffer::UpdateDecoderRate(uint64_t latest)
     qint64 oldest = age - 1000;
 
     decoderReadLock.lock();
+    if (latest)
+        decoderReads.insert(age, latest);
+
     uint64_t total = 0;
     QMutableMapIterator<qint64,uint64_t> it(decoderReads);
     while (it.hasNext())
@@ -1269,9 +1272,6 @@ uint64_t RingBuffer::UpdateDecoderRate(uint64_t latest)
         else
             total += it.value();
     }
-
-    if (latest)
-        decoderReads.insert(age, latest);
 
     uint64_t average = (uint64_t)((double)total * 8.0);
     decoderReadLock.unlock();
@@ -1293,6 +1293,9 @@ uint64_t RingBuffer::UpdateStorageRate(uint64_t latest)
     qint64 oldest = age - 1000;
 
     storageReadLock.lock();
+    if (latest)
+        storageReads.insert(age, latest);
+
     uint64_t total = 0;
     QMutableMapIterator<qint64,uint64_t> it(storageReads);
     while (it.hasNext())
@@ -1303,9 +1306,6 @@ uint64_t RingBuffer::UpdateStorageRate(uint64_t latest)
         else
             total += it.value();
     }
-
-    if (latest)
-        storageReads.insert(age, latest);
 
     int size = storageReads.size();
     storageReadLock.unlock();
