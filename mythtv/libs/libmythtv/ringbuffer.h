@@ -49,6 +49,7 @@ class MTV_PUBLIC RingBuffer : protected QThread
     void EnableBitrateMonitor(bool enable) { bitrateMonitorEnabled = enable; }
 
     // Gets
+    QString   GetSafeFilename(void) { return safefilename; }
     QString   GetFilename(void)      const;
     QString   GetSubtitleFilename(void) const;
     /// Returns value of stopreads
@@ -69,6 +70,7 @@ class MTV_PUBLIC RingBuffer : protected QThread
     virtual bool IsOpen(void) const = 0;
     virtual bool IsStreamed(void)     { return LiveMode(); }
     virtual int  BestBufferSize(void) { return 32768; }
+    static QString BitrateToString(uint64_t rate);
 
     // DVD and bluray methods
     bool IsDisc(void) const { return IsDVD() || IsBD(); }
@@ -154,7 +156,6 @@ class MTV_PUBLIC RingBuffer : protected QThread
     void ResetReadAhead(long long newinternal);
     void KillReadAheadThread(void);
 
-    static QString BitrateToString(uint64_t rate);
     uint64_t UpdateDecoderRate(uint64_t latest = 0);
     uint64_t UpdateStorageRate(uint64_t latest = 0);
 
@@ -175,6 +176,7 @@ class MTV_PUBLIC RingBuffer : protected QThread
 
     mutable QReadWriteLock rwlock;
 
+    QString safefilename;         // unprotected (for debugging)
     QString filename;             // protected by rwlock
     QString subtitlefilename;     // protected by rwlock
 
