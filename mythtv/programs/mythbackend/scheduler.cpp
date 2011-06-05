@@ -3224,6 +3224,21 @@ void Scheduler::UpdateMatches(int recordid) {
         return;
     }
 
+    QString filterClause;
+    query.prepare("SELECT filterid, clause FROM recordfilter "
+                  "WHERE filterid >= 0 AND filterid < 12 AND "
+                  "      TRIM(clause) <> ''");
+    if (!query.exec())
+    {
+        MythDB::DBError("UpdateMatches", query);
+        return;
+    }
+    while (query.next())
+    {
+        filterClause += QString(" AND (((RECTABLE.filter & %1) = 0) OR (%2))")
+            .arg(1 << query.value(0).toInt()).arg(query.value(1).toString());
+    }
+
     // Make sure all FindOne rules have a valid findid before scheduling.
     query.prepare("SELECT NULL from record "
                   "WHERE type = :FINDONE AND findid <= 0;");
@@ -3275,7 +3290,9 @@ void Scheduler::UpdateMatches(int recordid) {
             " AND (NOT ((RECTABLE.dupin & %3) AND (program.previouslyshown "
             "                                      OR program.first = 0))) ")
             .arg(kDupsExRepeats).arg(kDupsExGeneric).arg(kDupsFirstNew) +
-    QString(" AND channel.visible = 1 AND "
+    QString(" AND channel.visible = 1 ") +
+    filterClause + QString(" AND "
+
 "((RECTABLE.type = %1 " // allrecord
 "OR RECTABLE.type = %2 " // findonerecord
 "OR RECTABLE.type = %3 " // finddailyrecord
