@@ -398,7 +398,11 @@ bool AlbumArt::draw(QPainter *p, const QColor &back)
     // If the directory has changed (new album) or the size, reload
     if (needsUpdate())
     {
-        QImage art(gPlayer->getCurrentMetadata()->getAlbumArt(m_currImageType));
+        QImage art;
+        QString imageFilename = gPlayer->getCurrentMetadata()->getAlbumArtFile(m_currImageType);
+        if (!imageFilename.isEmpty())
+            art.load(imageFilename);
+
         if (art.isNull())
         {
             m_cursize = m_size;

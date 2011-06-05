@@ -234,11 +234,11 @@ Metadata *MetaIOID3::read(QString filename)
  *
  * \param filename The filename for which we want to find the length.
  * \param type The type of image we want - front/back etc
- * \returns A QByteArray that can contains the image data.
+ * \returns A pointer to a QImage owned by the caller or NULL if not found.
  */
-QImage MetaIOID3::getAlbumArt(QString filename, ImageType type)
+QImage* MetaIOID3::getAlbumArt(QString filename, ImageType type)
 {
-    QImage picture;
+    QImage *picture = new QImage();
 
     AttachedPictureFrame::Type apicType
         = AttachedPictureFrame::FrontCover;
@@ -282,9 +282,8 @@ QImage MetaIOID3::getAlbumArt(QString filename, ImageType type)
                                     static_cast<AttachedPictureFrame *>(*it);
                 if (frame && frame->type() == apicType)
                 {
-                    QImage picture;
-                    picture.loadFromData((const uchar *)frame->picture().data(),
-                                         frame->picture().size());
+                    picture->loadFromData((const uchar *)frame->picture().data(),
+                                          frame->picture().size());
                     return picture;
                 }
             }
@@ -293,7 +292,9 @@ QImage MetaIOID3::getAlbumArt(QString filename, ImageType type)
         delete mpegfile;
     }
 
-    return picture;
+    delete picture;
+
+    return NULL;
 }
 
 

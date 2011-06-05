@@ -125,7 +125,7 @@ void EditMetadataDialog::gridItemChanged(ImageGridItem *item)
             coverart_image->SetImage(image->filename);
             coverart_image->LoadImage();
             if (imagetype_text)
-                imagetype_text->SetText(image->typeName);
+                imagetype_text->SetText(AlbumArtImages::getTypeName(image->imageType));
             if (imagefilename_text)
             {
                 QFileInfo fi(image->filename);
@@ -137,7 +137,7 @@ void EditMetadataDialog::gridItemChanged(ImageGridItem *item)
 
 void EditMetadataDialog::updateImageGrid()
 {
-    vector<AlbumArtImage*> *albumArtList = albumArt->getImageList();
+    AlbumArtList *albumArtList = albumArt->getImageList();
 
     QSize size = coverart_grid->getImageItemSize();
 
@@ -150,7 +150,7 @@ void EditMetadataDialog::updateImageGrid()
                                              size.width(), size.height(),
                                              Qt::KeepAspectRatio);
 
-        ImageGridItem *item = new ImageGridItem(albumArtList->at(x)->typeName,
+        ImageGridItem *item = new ImageGridItem(AlbumArtImages::getTypeName(albumArtList->at(x)->imageType),
                 pixmap, false, (void*) albumArtList->at(x));
         coverart_grid->appendItem(item);
     }
@@ -643,7 +643,7 @@ void EditMetadataDialog::saveToMetadata()
 {
     cancelPopup();
 
-    *m_sourceMetadata = m_metadata;
+    *m_sourceMetadata = *m_metadata;
     accept();
 }
 
@@ -652,7 +652,7 @@ void EditMetadataDialog::saveToDatabase()
     cancelPopup();
 
     m_metadata->dumpToDatabase();
-    *m_sourceMetadata = m_metadata;
+    *m_sourceMetadata = *m_metadata;
 
     accept();
 }
@@ -704,7 +704,6 @@ void EditMetadataDialog::showMenu()
             if (image)
             {
                 image->imageType = (ImageType) res;
-                image->typeName = item->text;
 
                 // save the image type to the DB
                 albumArt->saveImageType(image->id, image->imageType);
