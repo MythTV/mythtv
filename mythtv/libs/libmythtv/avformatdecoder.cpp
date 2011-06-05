@@ -1693,6 +1693,7 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
 
 int AvFormatDecoder::ScanStreams(bool novideo)
 {
+    bool unknownbitrate = false;
     int scanerror = 0;
     bitrate       = 0;
     fps           = 0;
@@ -1744,6 +1745,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 }
 
                 codec_is_mpeg = CODEC_IS_FFMPEG_MPEG(enc->codec_id);
+
+                if (enc->bit_rate == 0)
+                    unknownbitrate = true;
 
                 // HACK -- begin
                 // ffmpeg is unable to compute H.264 bitrates in mpegts?
@@ -2080,6 +2084,13 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         bitrate = (bitrate + 999) / 1000;
         if (ringBuffer)
             ringBuffer->UpdateRawBitrate(bitrate);
+    }
+
+    // update RingBuffer buffer size
+    if (ringBuffer)
+    {
+        ringBuffer->SetBufferSizeFactors(unknownbitrate,
+                            QString(ic->iformat->name).contains("matroska"));
     }
 
     PostProcessTracks();
