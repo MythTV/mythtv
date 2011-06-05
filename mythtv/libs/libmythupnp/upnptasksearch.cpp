@@ -108,9 +108,15 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
                                 it != m_addressList.end(); 
                               ++it ) 
     {
+        QString ipaddress = *it;
+
+        // If this looks like an IPv6 address, then enclose it in []'s
+        if (ipaddress.contains(":"))
+            ipaddress = "[" + ipaddress + "]";
+
         QString sHeader = QString ( "HTTP/1.1 200 OK\r\n"
-                                    "LOCATION: http://[%1]:%2/getDeviceDesc\r\n" )
-                            .arg( *it )
+                                    "LOCATION: http://%1:%2/getDeviceDesc\r\n" )
+                            .arg( ipaddress )
                             .arg( m_nServicePort);
 
 
