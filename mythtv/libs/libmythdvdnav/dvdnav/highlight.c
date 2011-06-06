@@ -368,7 +368,7 @@ dvdnav_status_t dvdnav_button_activate(dvdnav_t *this, pci_t *pci) {
 
   button_ptr = get_current_button(this, pci);
   /* Finally, make the VM execute the appropriate code and probably
-   * scedule a jump */
+   * schedule a jump */
 #ifdef BUTTON_TESTING
   fprintf(MSG_OUT, "libdvdnav: Evaluating Button Activation commands.\n");
 #endif
@@ -425,7 +425,7 @@ dvdnav_status_t dvdnav_button_select(dvdnav_t *this, pci_t *pci, int32_t button)
   }
 
   this->vm->state.HL_BTNN_REG = (button << 10);
-  this->position_current.button = -1; /* Force Highligh change */
+  this->position_current.button = -1; /* Force Highlight change */
 
   return DVDNAV_STATUS_OK;
 }
