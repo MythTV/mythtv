@@ -40,6 +40,9 @@ static int _filter_dup(MPLS_PL *pl_list[], unsigned count, MPLS_PL *pl)
         if (pl->list_count != pl_list[ii]->list_count) {
             continue;
         }
+        if (pl->mark_count != pl_list[ii]->mark_count) {
+            continue;
+        }
         for (jj = 0; jj < pl->list_count; jj++) {
             MPLS_PI *pi1, *pi2;
 
