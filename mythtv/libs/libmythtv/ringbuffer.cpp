@@ -767,7 +767,7 @@ void RingBuffer::run(void)
                     (now.tv_usec - lastread.tv_usec) / 1000;
                 readtimeavg = (readtimeavg * 9 + readinterval) / 10;
 
-                if (readtimeavg < 150 && (uint)readblocksize < (bufferSize>>2))
+                if (readtimeavg < 150 && (uint)readblocksize < (BUFFER_SIZE_MINIMUM >>2))
                 {
                     int old_block_size = readblocksize;
                     readblocksize = 3 * readblocksize / 2;
