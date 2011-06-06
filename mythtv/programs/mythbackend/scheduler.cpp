@@ -2277,7 +2277,7 @@ bool Scheduler::HandleRecording(
             .arg(ri.GetCardID())
             .arg(ri.GetSourceID());
         QByteArray amsg = msg.toLocal8Bit();
-        VERBOSE(VB_GENERAL, msg.constData());
+        VERBOSE(VB_GENERAL, msg);
 
         ri.SetRecordingStatus(rsTunerBusy);
         ri.AddHistory(true);
