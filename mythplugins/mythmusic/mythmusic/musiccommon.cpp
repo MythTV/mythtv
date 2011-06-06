@@ -1234,16 +1234,14 @@ void MusicCommon::updateTrackInfo(Metadata *mdata)
     m_maxTime = mdata->Length() / 1000;
     if (m_coverartImage)
     {
-        //FIXME: change this to use the filename
-        QImage image = gPlayer->getCurrentMetadata()->getAlbumArt();
-        if (!image.isNull())
+        QString filename = mdata->getAlbumArtFile();
+        if (!filename.isEmpty())
         {
-            MythImage *mimage = GetMythPainter()->GetFormatImage();
-            mimage->Assign(image);
-            m_coverartImage->SetImage(mimage);
+            m_coverartImage->SetFilename(filename);
+            m_coverartImage->Load();
         }
         else
-            m_coverartImage->Reset();
+             m_coverartImage->Reset();
     }
 
     if (m_ratingState)
@@ -1275,15 +1273,11 @@ void MusicCommon::updateAlbumArtImage(Metadata *mdata)
     if (!m_coverartImage || !mdata)
        return;
 
-    QSize img_size = m_coverartImage->GetArea().size();
-
-    QImage albumArt = mdata->getAlbumArt();
-
-    if (!albumArt.isNull())
+    QString filename = mdata->getAlbumArtFile();
+    if (!filename.isEmpty())
     {
-        MythImage *mimage = GetMythPainter()->GetFormatImage();
-        mimage->Assign(albumArt);
-        m_coverartImage->SetImage(mimage);
+        m_coverartImage->SetFilename(filename);
+        m_coverartImage->Load();
     }
     else
         m_coverartImage->Reset();

@@ -26,8 +26,7 @@ class MetaIO
     /*!
     * \brief Writes rating and playcount back to a file
     *
-    * \param rating Integer between 0 and 10 representing the rating given to
-    *               this file by the user
+    * \param mdata A pointer to a Metadata object
     * \returns Boolean to indicate success/failure.
     */
     virtual bool writeVolatileMetadata(const Metadata* mdata)
@@ -57,6 +56,7 @@ class MetaIO
     /*!
     * \brief Reads the list of embedded images in the tag
     *
+    * \param filename The filename to read images from.
     * \returns the list of embedded images
     */
     virtual AlbumArtList getAlbumArtList(const QString &filename)
@@ -76,6 +76,13 @@ class MetaIO
     {
         (void)filename;
         (void)albumart;
+        return false;
+    }
+
+    virtual QImage *getAlbumArt(QString filename, ImageType type)
+    {
+        (void)filename;
+        (void)type;
         return false;
     }
 

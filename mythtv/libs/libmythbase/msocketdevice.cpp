@@ -189,7 +189,11 @@ MSocketDevice::MSocketDevice( Type type )
 	    this, type );
 #endif
     init();
-    //setSocket( createNewSocket(), type );
+
+    // For the time being, if it's of type Datagram create the socket now
+    // rather than later during connect (since there wont be one with udp)
+    if (type == Datagram)
+        setSocket( createNewSocket(), type );
 }
 
 /*!
@@ -549,7 +553,19 @@ quint16 MSocketDevice::port() const
 */
 QHostAddress MSocketDevice::address() const
 {
-    return a;
+
+    QString ipaddress;
+    if (a.toString().startsWith("0:0:0:0:0:FFFF:"))
+    {
+        Q_IPV6ADDR addr = a.toIPv6Address();
+         // addr contains 16 unsigned characters
+
+        ipaddress = QString("%1.%2.%3.%4").arg(addr[12]).arg(addr[13]).arg(addr[14]).arg(addr[15]);
+    }
+    else
+        ipaddress = a.toString();
+
+    return QHostAddress(ipaddress);
 }
 
 

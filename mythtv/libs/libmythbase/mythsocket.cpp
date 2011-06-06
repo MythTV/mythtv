@@ -14,17 +14,22 @@
 #include <QByteArray>
 #include <QHostInfo>
 #include <QMap>
+#include <QCoreApplication>
 
 // MythTV
 #include "mythsocketthread.h"
 #include "mythsocket.h"
 #include "mythtimer.h"
 #include "mythsocket.h"
+#include "mythevent.h"
+#include "mythversion.h"
 #include "mythverbose.h"
+#include "mythcorecontext.h"
 
 #define SLOC(a) QString("MythSocket(%1:%2): ")\
                     .arg((quint64)a, 0, 16).arg(a->socket())
 #define LOC SLOC(this)
+#define LOC_ERR SLOC(this)
 
 const uint MythSocket::kSocketBufferSize = 128000;
 const uint MythSocket::kShortTimeout = kMythSocketShortTimeout;
@@ -36,7 +41,8 @@ MythSocket::MythSocket(int socket, MythSocketCBs *cb)
     : MSocketDevice(MSocketDevice::Stream),            m_cb(cb),
       m_useReadyReadCallback(true),
       m_state(Idle),         m_addr(),                 m_port(0),
-      m_ref_count(0),        m_notifyread(false)
+      m_ref_count(0),        m_notifyread(false),      m_expectingreply(false),
+      m_isValidated(false),  m_isAnnounced(false)
 {
     VERBOSE(VB_SOCKET, LOC + "new socket");
     if (socket > -1)
@@ -88,7 +94,7 @@ bool MythSocket::DownRef(void)
     int ref = --m_ref_count;
     m_ref_lock.unlock();
 
-    VERBOSE(VB_SOCKET, LOC + QString("DownRef: %1").arg(m_ref_count));
+    VERBOSE(VB_SOCKET, LOC + QString("DownRef: %1").arg(ref));
 
     if (m_cb && ref == 0)
     {
@@ -663,6 +669,55 @@ bool MythSocket::readStringList(QStringList &list, uint timeoutMS)
     return true;
 }
 
+bool MythSocket::SendReceiveStringList(
+            QStringList &strlist, uint min_reply_length)
+{
+    bool ok = false;
+
+    Lock();
+    m_expectingreply = true;
+
+    writeStringList(strlist);
+    ok = readStringList(strlist);
+
+    while (ok && strlist[0] == "BACKEND_MESSAGE")
+    {
+        // not for us
+        // TODO: sockets should be one directional
+        // a socket that would use this call should never 
+        // receive events
+        if (strlist.size() >= 2)
+        {
+            QString message = strlist[1];
+            strlist.pop_front();
+            strlist.pop_front();
+            MythEvent me(message, strlist);
+            gCoreContext->dispatch(me);
+        }
+
+        ok = readStringList(strlist);
+    }
+
+    m_expectingreply = false;
+    Unlock();
+
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT,
+            "MythSocket::SendReceiveStringList(): No response.");
+        return false;
+    }
+
+    if (min_reply_length && ((uint)strlist.size() < min_reply_length))
+    {
+        VERBOSE(VB_IMPORTANT,
+            "MythSocket::SendReceiveStringList(): Response too short.");
+        return false;
+    }
+
+    return true;
+}
+
 void MythSocket::Lock(void) const
 {
     m_lock.lock();
@@ -755,4 +810,92 @@ bool MythSocket::connect(const QHostAddress &addr, quint16 port)
     }
 
     return true;
+}
+
+bool MythSocket::Validate(uint timeout_ms, bool error_dialog_desired)
+{
+    if (m_isValidated)
+        return true;
+
+    QStringList strlist(QString("MYTH_PROTO_VERSION %1 %2")
+                            .arg(MYTH_PROTO_VERSION).arg(MYTH_PROTO_TOKEN));
+    writeStringList(strlist);
+
+    if (!readStringList(strlist, timeout_ms) || strlist.empty())
+    {
+        VERBOSE(VB_IMPORTANT, "Protocol version check failure.\n\t\t\t"
+                "The response to MYTH_PROTO_VERSION was empty.\n\t\t\t"
+                "This happens when the backend is too busy to respond,\n\t\t\t"
+                "or has deadlocked in due to bugs or hardware failure.");
+        return false;
+    }
+    else if (strlist[0] == "REJECT" && strlist.size() >= 2)
+    {
+        VERBOSE(VB_GENERAL, QString("Protocol version or token mismatch "
+                                    "(frontend=%1/%2,"
+                                    "backend=%3/\?\?)\n")
+                                    .arg(MYTH_PROTO_VERSION)
+                                    .arg(MYTH_PROTO_TOKEN)
+                                    .arg(strlist[1]));
+
+        QObject *GUIcontext = gCoreContext->GetGUIObject();
+        if (error_dialog_desired && GUIcontext)
+        {
+            QStringList list(strlist[1]);
+            QCoreApplication::postEvent(
+                GUIcontext, new MythEvent("VERSION_MISMATCH", list));
+        }
+
+        return false;
+    }
+    else if (strlist[0] == "ACCEPT")
+    {
+        VERBOSE(VB_IMPORTANT, QString("Using protocol version %1")
+                               .arg(MYTH_PROTO_VERSION));
+        setValidated();
+        return true;
+    }
+
+    VERBOSE(VB_GENERAL, QString("Unexpected response to MYTH_PROTO_VERSION: %1")
+                               .arg(strlist[0]));
+    return false;
+}
+
+bool MythSocket::Announce(QStringList &strlist)
+{
+    if (!m_isValidated)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "refusing to announce "
+                            "unvalidated socket");
+    }
+
+    if (m_isAnnounced)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "refusing to re-announce socket");
+        return false;
+    }
+
+    m_announce << strlist;
+
+    writeStringList(strlist);
+    strlist.clear();
+
+    if (!readStringList(strlist, true))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("\n\t\t\tCould not read string list from server "
+                            "%1:%2").arg(m_addr.toString()).arg(m_port));
+        m_announce.clear();
+        return false;
+    }
+
+    m_isAnnounced = true;
+    return true;
+}
+
+void MythSocket::setAnnounce(QStringList &strlist)
+{
+    m_announce.clear();
+    m_announce << strlist;
+    m_isAnnounced = true;
 }

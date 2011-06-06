@@ -357,14 +357,13 @@ void UPnpDeviceDesc::GetValidXML(
     QString BaseAddr;
     QHostAddress addr(sBaseAddress);
 
+    BaseAddr = sBaseAddress;
+
 #if !defined(QT_NO_IPV6)
     // Basically if it appears to be an IPv6 IP surround the IP with [] otherwise don't bother
-    if (( addr.protocol() == QAbstractSocket::IPv6Protocol ) || (sBaseAddress.contains(":")))
+    if (sBaseAddress.contains(":"))
         BaseAddr = "[" + sBaseAddress + "]";
-    else
 #endif
-    if ( addr.protocol() == QAbstractSocket::IPv4Protocol )
-        BaseAddr = sBaseAddress;
 
     os << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
           "<root xmlns=\"urn:schemas-upnp-org:device-1-0\"  xmlns:mythtv=\"mythtv.org\">\n"

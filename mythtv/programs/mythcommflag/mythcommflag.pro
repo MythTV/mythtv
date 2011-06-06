@@ -50,5 +50,5 @@ SOURCES += PrePostRollFlagger.cpp
 SOURCES += main.cpp
 
 #The following line was inserted by qt3to4
-QT += xml sql
+QT += xml sql network
 

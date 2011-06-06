@@ -168,16 +168,6 @@ static void loadMusic()
     if (gMusicData->initialized)
         return;
 
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    QString message = QObject::tr("Loading Music. Please wait ...");
-
-    MythUIBusyDialog *busy = new MythUIBusyDialog(message, popupStack,
-                                                  "musicscanbusydialog");
-    if (busy->Create())
-        popupStack->AddScreen(busy, false);
-    else
-        busy = NULL;
-
     srand(time(NULL));
 
     CheckFreeDBServerFile();
@@ -213,6 +203,16 @@ static void loadMusic()
         fscan->SearchDir(startdir);
         delete fscan;
     }
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    QString message = QObject::tr("Loading Music. Please wait ...");
+
+    MythUIBusyDialog *busy = new MythUIBusyDialog(message, popupStack,
+                                                  "musicscanbusydialog");
+    if (busy->Create())
+        popupStack->AddScreen(busy, false);
+    else
+        busy = NULL;
 
     QString paths = gCoreContext->GetSetting("TreeLevels");
 

@@ -533,10 +533,10 @@ void PlaybackBoxHelper::UpdateFreeSpace(void)
     QMutexLocker locker(&m_lock);
     for (uint i = 0; i < fsInfos.size(); i++)
     {
-        if (fsInfos[i].directory == "TotalDiskSpace")
+        if (fsInfos[i].getPath() == "TotalDiskSpace")
         {
-            m_freeSpaceTotalMB = (uint64_t) (fsInfos[i].totalSpaceKB >> 10);
-            m_freeSpaceUsedMB  = (uint64_t) (fsInfos[i].usedSpaceKB  >> 10);
+            m_freeSpaceTotalMB = (uint64_t) (fsInfos[i].getTotalSpace() >> 10);
+            m_freeSpaceUsedMB  = (uint64_t) (fsInfos[i].getUsedSpace()  >> 10);
         }
     }
     MythEvent *e = new MythEvent("UPDATE_USAGE_UI");

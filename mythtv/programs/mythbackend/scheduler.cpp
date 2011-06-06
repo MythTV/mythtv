@@ -20,6 +20,7 @@ using namespace std;
 
 #include <QStringList>
 #include <QDateTime>
+#include <QString>
 #include <QRegExp>
 #include <QMutex>
 #include <QFile>
@@ -1680,9 +1681,9 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
         rctv = (*m_tvList)[cardids[i]];
         if (!rctv)
         {
-            VERBOSE(VB_SCHEDULE, 
-                    QString(LOC_ERR + "IsBusyRecording() -> true, "
-                    "rctv(NULL) for card %2").arg(i));
+            // VERBOSE(VB_SCHEDULE, 
+            //         QString(LOC_ERR + "IsBusyRecording() -> true, "
+            //         "rctv(NULL) for card %2").arg(cardids[i]));
 
             return true;
         }
@@ -2277,8 +2278,7 @@ bool Scheduler::HandleRecording(
             .arg(ri.GetChanID())
             .arg(ri.GetCardID())
             .arg(ri.GetSourceID());
-        QByteArray amsg = msg.toLocal8Bit();
-        VERBOSE(VB_GENERAL, amsg.constData());
+        VERBOSE(VB_GENERAL, msg);
 
         ri.SetRecordingStatus(rsTunerBusy);
         ri.AddHistory(true);
@@ -3225,6 +3225,21 @@ void Scheduler::UpdateMatches(int recordid) {
         return;
     }
 
+    QString filterClause;
+    query.prepare("SELECT filterid, clause FROM recordfilter "
+                  "WHERE filterid >= 0 AND filterid < 12 AND "
+                  "      TRIM(clause) <> ''");
+    if (!query.exec())
+    {
+        MythDB::DBError("UpdateMatches", query);
+        return;
+    }
+    while (query.next())
+    {
+        filterClause += QString(" AND (((RECTABLE.filter & %1) = 0) OR (%2))")
+            .arg(1 << query.value(0).toInt()).arg(query.value(1).toString());
+    }
+
     // Make sure all FindOne rules have a valid findid before scheduling.
     query.prepare("SELECT NULL from record "
                   "WHERE type = :FINDONE AND findid <= 0;");
@@ -3276,7 +3291,9 @@ void Scheduler::UpdateMatches(int recordid) {
             " AND (NOT ((RECTABLE.dupin & %3) AND (program.previouslyshown "
             "                                      OR program.first = 0))) ")
             .arg(kDupsExRepeats).arg(kDupsExGeneric).arg(kDupsFirstNew) +
-    QString(" AND channel.visible = 1 AND "
+    QString(" AND channel.visible = 1 ") +
+    filterClause + QString(" AND "
+
 "((RECTABLE.type = %1 " // allrecord
 "OR RECTABLE.type = %2 " // findonerecord
 "OR RECTABLE.type = %3 " // finddailyrecord
@@ -4129,31 +4146,31 @@ void Scheduler::findAllScheduledPrograms(RecList &proglist)
 static bool comp_storage_combination(FileSystemInfo *a, FileSystemInfo *b)
 {
     // local over remote
-    if (a->isLocal && !b->isLocal)
+    if (a->isLocal() && !b->isLocal())
     {
-        if (a->weight <= b->weight)
+        if (a->getWeight() <= b->getWeight())
         {
             return true;
         }
     }
-    else if (a->isLocal == b->isLocal)
+    else if (a->isLocal() == b->isLocal())
     {
-        if (a->weight < b->weight)
+        if (a->getWeight() < b->getWeight())
         {
             return true;
         }
-        else if (a->weight > b->weight)
+        else if (a->getWeight() > b->getWeight())
         {
             return false;
         }
-        else if (a->freeSpaceKB > b->freeSpaceKB)
+        else if (a->getFreeSpace() > b->getFreeSpace())
         {
             return true;
         }
     }
-    else if (!a->isLocal && b->isLocal)
+    else if (!a->isLocal() && b->isLocal())
     {
-        if (a->weight < b->weight)
+        if (a->getWeight() < b->getWeight())
         {
             return true;
         }
@@ -4165,14 +4182,14 @@ static bool comp_storage_combination(FileSystemInfo *a, FileSystemInfo *b)
 // prefer dirs with more percentage free space over dirs with less
 static bool comp_storage_perc_free_space(FileSystemInfo *a, FileSystemInfo *b)
 {
-    if (a->totalSpaceKB == 0)
+    if (a->getTotalSpace() == 0)
         return false;
 
-    if (b->totalSpaceKB == 0)
+    if (b->getTotalSpace() == 0)
         return true;
 
-    if ((a->freeSpaceKB * 100.0) / a->totalSpaceKB > 
-        (b->freeSpaceKB * 100.0) / b->totalSpaceKB)
+    if ((a->getFreeSpace() * 100.0) / a->getTotalSpace() > 
+        (b->getFreeSpace() * 100.0) / b->getTotalSpace())
         return true;
 
     return false;
@@ -4181,7 +4198,7 @@ static bool comp_storage_perc_free_space(FileSystemInfo *a, FileSystemInfo *b)
 // prefer dirs with more absolute free space over dirs with less
 static bool comp_storage_free_space(FileSystemInfo *a, FileSystemInfo *b)
 {
-    if (a->freeSpaceKB > b->freeSpaceKB)
+    if (a->getFreeSpace() > b->getFreeSpace())
         return true;
 
     return false;
@@ -4190,7 +4207,7 @@ static bool comp_storage_free_space(FileSystemInfo *a, FileSystemInfo *b)
 // prefer dirs with less weight (disk I/O) over dirs with more weight
 static bool comp_storage_disk_io(FileSystemInfo *a, FileSystemInfo *b)
 {
-    if (a->weight < b->weight)
+    if (a->getWeight() < b->getWeight())
         return true;
 
     return false;
@@ -4293,9 +4310,9 @@ int Scheduler::FillRecordingDir(
         FileSystemInfo *fs = &(*fsit);
         int tmpWeight = 0;
 
-        QString msg = QString("  %1:%2").arg(fs->hostname)
-                              .arg(fs->directory);
-        if (fs->isLocal)
+        QString msg = QString("  %1:%2").arg(fs->getHostname())
+                              .arg(fs->getPath());
+        if (fs->isLocal())
         {
             tmpWeight = localStartingWeight;
             msg += " is local (" + QString::number(tmpWeight) + ")";
@@ -4306,17 +4323,17 @@ int Scheduler::FillRecordingDir(
             msg += " is remote (+" + QString::number(tmpWeight) + ")";
         }
 
-        fs->weight = tmpWeight;
+        fs->setWeight(tmpWeight);
 
         tmpWeight = gCoreContext->GetNumSetting(QString("SGweightPerDir:%1:%2")
-                                .arg(fs->hostname).arg(fs->directory), 0);
-        fs->weight += tmpWeight;
+                                .arg(fs->getHostname()).arg(fs->getPath()), 0);
+        fs->setWeight(fs->getWeight() + tmpWeight);
 
         if (tmpWeight)
             msg += ", has SGweightPerDir offset of "
                    + QString::number(tmpWeight) + ")";
 
-        msg += ". initial dir weight = " + QString::number(fs->weight);
+        msg += ". initial dir weight = " + QString::number(fs->getWeight());
         VERBOSE(VB_FILE|VB_SCHEDULE, msg);
 
         fsInfoList.push_back(fs);
@@ -4372,8 +4389,8 @@ int Scheduler::FillRecordingDir(
                  fslistit != fsInfoList.end(); ++fslistit)
             {
                 FileSystemInfo *fs = *fslistit;
-                if ((recHost == fs->hostname) &&
-                    (recDir == fs->directory))
+                if ((recHost == fs->getHostname()) &&
+                    (recDir == fs->getPath()))
                 {
                     int weightOffset = 0;
 
@@ -4401,22 +4418,22 @@ int Scheduler::FillRecordingDir(
                                 .arg(recChanid)
                                 .arg(recStart.toString(Qt::ISODate))
                                 .arg(recUsage).arg(recHost).arg(recDir)
-                                .arg(fs->fsID).arg(weightOffset));
+                                .arg(fs->getFSysID()).arg(weightOffset));
 
                         // need to offset all directories on this filesystem
                         for (fsit2 = fsInfoCache.begin();
                              fsit2 != fsInfoCache.end(); ++fsit2)
                         {
                             FileSystemInfo *fs2 = &(*fsit2);
-                            if (fs2->fsID == fs->fsID)
+                            if (fs2->getFSysID() == fs->getFSysID())
                             {
                                 VERBOSE(VB_FILE|VB_SCHEDULE, QString("    "
                                         "%1:%2 => old weight %3 plus %4 = %5")
-                                        .arg(fs2->hostname).arg(fs2->directory)
-                                        .arg(fs2->weight).arg(weightOffset)
-                                        .arg(fs2->weight + weightOffset));
+                                        .arg(fs2->getHostname()).arg(fs2->getPath())
+                                        .arg(fs2->getWeight()).arg(weightOffset)
+                                        .arg(fs2->getWeight() + weightOffset));
 
-                                fs2->weight += weightOffset;
+                                fs2->setWeight(fs2->getWeight() + weightOffset);
                             }
                         }
                     }
@@ -4447,30 +4464,30 @@ int Scheduler::FillRecordingDir(
              fslistit != fsInfoList.end(); ++fslistit)
         {
             FileSystemInfo *fs = *fslistit;
-            if ((fs->hostname == thispg->GetHostname()) &&
-                (fs->directory == thispg->GetPathname()))
+            if ((fs->getHostname() == thispg->GetHostname()) &&
+                (fs->getPath() == thispg->GetPathname()))
             {
                 VERBOSE(VB_FILE|VB_SCHEDULE, QString(
                         "%1 @ %2 will record on %3:%4, FSID #%5, "
                         "weightPerRecording +%6.")
                         .arg(thispg->GetChanID())
                         .arg(thispg->GetRecordingStartTime(ISODate))
-                        .arg(fs->hostname).arg(fs->directory)
-                        .arg(fs->fsID).arg(weightPerRecording));
+                        .arg(fs->getHostname()).arg(fs->getPath())
+                        .arg(fs->getFSysID()).arg(weightPerRecording));
 
                 for (fsit2 = fsInfoCache.begin();
                      fsit2 != fsInfoCache.end(); ++fsit2)
                 {
                     FileSystemInfo *fs2 = &(*fsit2);
-                    if (fs2->fsID == fs->fsID)
+                    if (fs2->getFSysID() == fs->getFSysID())
                     {
                         VERBOSE(VB_FILE|VB_SCHEDULE, QString("    "
                                 "%1:%2 => old weight %3 plus %4 = %5")
-                                .arg(fs2->hostname).arg(fs2->directory)
-                                .arg(fs2->weight).arg(weightPerRecording)
-                                .arg(fs2->weight + weightPerRecording));
+                                .arg(fs2->getHostname()).arg(fs2->getPath())
+                                .arg(fs2->getWeight()).arg(weightPerRecording)
+                                .arg(fs2->getWeight() + weightPerRecording));
 
-                        fs2->weight += weightPerRecording;
+                        fs2->setWeight(fs2->getWeight() + weightPerRecording);
                     }
                 }
                 break;
@@ -4502,10 +4519,10 @@ int Scheduler::FillRecordingDir(
                 "    Location    : %3\n"
                 "    weight      : %4\n"
                 "    free space  : %5")
-                .arg(fs->hostname).arg(fs->directory)
-                .arg((fs->isLocal) ? "local" : "remote")
-                .arg(fs->weight)
-                .arg(fs->freeSpaceKB);
+                .arg(fs->getHostname()).arg(fs->getPath())
+                .arg((fs->isLocal()) ? "local" : "remote")
+                .arg(fs->getWeight())
+                .arg(fs->getFreeSpace());
             cout << msg.toLocal8Bit().constData() << endl;
         }
         cout << "--- FillRecordingDir Sorted fsInfoList end ---\n";
@@ -4548,7 +4565,7 @@ int Scheduler::FillRecordingDir(
             for (fslistit = fsInfoList.begin();
                 fslistit != fsInfoList.end(); ++fslistit)
             {
-                remainingSpaceKB[(*fslistit)->fsID] = (*fslistit)->freeSpaceKB;
+                remainingSpaceKB[(*fslistit)->getFSysID()] = (*fslistit)->getFreeSpace();
             }
 
             // get list of expirable programs
@@ -4564,15 +4581,15 @@ int Scheduler::FillRecordingDir(
                     fslistit != fsInfoList.end(); ++fslistit)
                 {
                     // recording is not on this filesystem's host
-                    if ((*it)->GetHostname() != (*fslistit)->hostname)
+                    if ((*it)->GetHostname() != (*fslistit)->getHostname())
                         continue;
 
                     // directory is not in the Storage Group dir list
-                    if (!dirlist.contains((*fslistit)->directory))
+                    if (!dirlist.contains((*fslistit)->getPath()))
                         continue;
 
                     QString filename =
-                        (*fslistit)->directory + "/" + (*it)->GetPathname();
+                        (*fslistit)->getPath() + "/" + (*it)->GetPathname();
 
                     // recording is local
                     if ((*it)->GetHostname() == gCoreContext->GetHostName())
@@ -4622,15 +4639,15 @@ int Scheduler::FillRecordingDir(
                 }
 
                 // add this files size to the remaining free space
-                remainingSpaceKB[fs->fsID] += (*it)->GetFilesize() / 1024;
+                remainingSpaceKB[fs->getFSysID()] += (*it)->GetFilesize() / 1024;
 
                 // check if we have enough space for new file
-                long long desiredSpaceKB = m_expirer->GetDesiredSpace(fs->fsID);
+                long long desiredSpaceKB = m_expirer->GetDesiredSpace(fs->getFSysID());
 
-                if (remainingSpaceKB[fs->fsID] > (desiredSpaceKB + maxSizeKB))
+                if (remainingSpaceKB[fs->getFSysID()] > (desiredSpaceKB + maxSizeKB))
                 {
-                    recording_dir = fs->directory;
-                    fsID = fs->fsID;
+                    recording_dir = fs->getPath();
+                    fsID = fs->getFSysID();
 
                     VERBOSE(VB_FILE, QString(
                                 "pass 2: '%1' will record in '%2' "
@@ -4641,7 +4658,7 @@ int Scheduler::FillRecordingDir(
                                 "there are enough that the Expirer should "
                                 "be able to free up space for this recording.")
                             .arg(title).arg(recording_dir)
-                            .arg(fs->freeSpaceKB / 1024)
+                            .arg(fs->getFreeSpace() / 1024)
                             .arg(desiredSpaceKB / 1024));
 
                     foundDir = true;
@@ -4659,15 +4676,15 @@ int Scheduler::FillRecordingDir(
                 long long desiredSpaceKB = 0;
                 FileSystemInfo *fs = *fslistit;
                 if (m_expirer)
-                    desiredSpaceKB = m_expirer->GetDesiredSpace(fs->fsID);
+                    desiredSpaceKB = m_expirer->GetDesiredSpace(fs->getFSysID());
 
-                if ((fs->hostname == hostname) &&
-                    (dirlist.contains(fs->directory)) &&
+                if ((fs->getHostname() == hostname) &&
+                    (dirlist.contains(fs->getPath())) &&
                     ((pass > 1) ||
-                     (fs->freeSpaceKB > (desiredSpaceKB + maxSizeKB))))
+                     (fs->getFreeSpace() > (desiredSpaceKB + maxSizeKB))))
                 {
-                    recording_dir = fs->directory;
-                    fsID = fs->fsID;
+                    recording_dir = fs->getPath();
+                    fsID = fs->getFSysID();
 
                     if (pass == 1)
                         VERBOSE(VB_FILE, QString("pass 1: '%1' will record in "
@@ -4676,7 +4693,7 @@ int Scheduler::FillRecordingDir(
                                 "wants to keep %5 MB free.")
                                 .arg(title)
                                 .arg(recording_dir)
-                                .arg(fs->freeSpaceKB / 1024)
+                                .arg(fs->getFreeSpace() / 1024)
                                 .arg(maxSizeKB / 1024)
                                 .arg(desiredSpaceKB / 1024));
                     else
@@ -4688,7 +4705,7 @@ int Scheduler::FillRecordingDir(
                                 "successfully.")
                                 .arg(pass).arg(title)
                                 .arg(recording_dir)
-                                .arg(fs->freeSpaceKB / 1024)
+                                .arg(fs->getFreeSpace() / 1024)
                                 .arg(desiredSpaceKB / 1024));
 
                     foundDir = true;
@@ -4711,7 +4728,7 @@ void Scheduler::FillDirectoryInfoCache(bool force)
         (fsInfoCacheFillTime > QDateTime::currentDateTime().addSecs(-180)))
         return;
 
-    vector<FileSystemInfo> fsInfos;
+    QList<FileSystemInfo> fsInfos;
 
     fsInfoCache.clear();
 
@@ -4719,11 +4736,11 @@ void Scheduler::FillDirectoryInfoCache(bool force)
         m_mainServer->GetFilesystemInfos(fsInfos);
 
     QMap <int, bool> fsMap;
-    vector<FileSystemInfo>::iterator it1;
+    QList<FileSystemInfo>::iterator it1;
     for (it1 = fsInfos.begin(); it1 != fsInfos.end(); ++it1)
     {
-        fsMap[it1->fsID] = true;
-        fsInfoCache[it1->hostname + ":" + it1->directory] = *it1;
+        fsMap[it1->getFSysID()] = true;
+        fsInfoCache[it1->getHostname() + ":" + it1->getPath()] = *it1;
     }
 
     VERBOSE(VB_FILE, LOC + QString("FillDirectoryInfoCache: found %1 unique "

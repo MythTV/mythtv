@@ -16,6 +16,7 @@
 #include "decoder.h"
 #include "filescanner.h"
 #include "metadata.h"
+#include "metaio.h"
 
 FileScanner::FileScanner ()
 {
@@ -268,7 +269,8 @@ void FileScanner::AddFileToDB(const QString &filename)
     {
         VERBOSE(VB_FILE, QString("Reading metadata from %1").arg(filename));
         Metadata *data = decoder->readMetadata();
-        if (data) {
+        if (data) 
+        {
 
             QString album_cache_string;
 
@@ -307,6 +309,16 @@ void FileScanner::AddFileToDB(const QString &filename)
             album_cache_string = data->getArtistId() + "#"
                 + data->Album().toLower();
             m_albumid[album_cache_string] = data->getAlbumId();
+
+            // read any embedded images from the tag
+            MetaIO *tagger = data->getTagger();
+            if (tagger && tagger->supportsEmbeddedImages())
+            {
+                AlbumArtList artList = tagger->getAlbumArtList(data->Filename());
+                data->setEmbeddedAlbumArt(artList);
+                data->getAlbumArtImages()->dumpToDatabase();
+            }
+
             delete data;
         }
 
@@ -610,7 +622,10 @@ void FileScanner::SearchDir(QString &directory)
             UpdateFileInDB(iter.key());
 
         if (file_checking)
+        {
             file_checking->SetProgress(++counter);
+            qApp->processEvents();
+        }
     }
     if (file_checking)
         file_checking->Close();
@@ -671,7 +686,11 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
                 {
                     if (music_files[name] == kDatabase)
                     {
-                        file_checking->SetProgress(++counter);
+                        if (file_checking)
+                        {
+                            file_checking->SetProgress(++counter);
+                            qApp->processEvents();
+                        }
                         continue;
                     }
                     else if (HasFileChanged(name, query.value(1).toString()))
@@ -684,11 +703,17 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
                     music_files[name] = kDatabase;
                 }
             }
-            file_checking->SetProgress(++counter);
+
+            if (file_checking)
+            {
+                file_checking->SetProgress(++counter);
+                qApp->processEvents();
+            }
         }
     }
 
-    file_checking->Close();
+    if (file_checking)
+        file_checking->Close();
 }
 
 /*!
@@ -744,7 +769,10 @@ void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
                     if (music_files[name] == kDatabase)
                     {
                         if (file_checking)
+                        {
                             file_checking->SetProgress(++counter);
+                            qApp->processEvents();
+                        }
                         continue;
                     }
                     else
@@ -756,7 +784,10 @@ void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
                 }
             }
             if (file_checking)
+            {
                 file_checking->SetProgress(++counter);
+                qApp->processEvents();
+            }
         }
     }
 

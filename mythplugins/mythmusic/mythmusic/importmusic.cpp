@@ -16,6 +16,7 @@
 #include "cdrip.h"
 #include "editmetadata.h"
 #include "musicplayer.h"
+#include "metaio.h"
 
 #include <mythdialogbox.h>
 #include <mythuitext.h>
@@ -370,6 +371,16 @@ void ImportMusicDialog::addPressed()
 
         // update the database
         meta->dumpToDatabase();
+
+        // read any embedded images from the tag
+        MetaIO *tagger = meta->getTagger();
+        if (tagger && tagger->supportsEmbeddedImages())
+        {
+            AlbumArtList artList = tagger->getAlbumArtList(meta->Filename());
+            meta->setEmbeddedAlbumArt(artList);
+            meta->getAlbumArtImages()->dumpToDatabase();
+        }
+
         m_somethingWasImported = true;
 
         m_tracks->at(m_currentTrack)->isNewTune = Ripper::isNewTune(

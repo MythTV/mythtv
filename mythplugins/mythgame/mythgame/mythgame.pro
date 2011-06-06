@@ -35,6 +35,6 @@ use_hidesyms {
 LIBS += -lz
 
 #The following line was inserted by qt3to4
-QT += xml sql opengl 
+QT += xml sql opengl network
 
 include ( ../../libs-targetfix.pro )

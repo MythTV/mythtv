@@ -47,7 +47,7 @@ class MetaIOID3 : public MetaIOTagLib
 
     Metadata* read(QString filename);
     AlbumArtList getAlbumArtList(const QString &filename);
-    static QImage getAlbumArt(QString filename, ImageType type);
+    QImage *getAlbumArt(QString filename, ImageType type);
 
     bool supportsEmbeddedImages(void) { return true; }
 

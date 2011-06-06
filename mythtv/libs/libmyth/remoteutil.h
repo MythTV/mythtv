@@ -8,27 +8,10 @@
 using namespace std;
 
 #include "mythexp.h"
+#include "filesysteminfo.h"
 
 class ProgramInfo;
 class MythEvent;
-
-/** \class FileSystemInfo
- *  \brief Holds hostname, total space, and used space in kilobytes.
- */
-class MPUBLIC FileSystemInfo
-{
-  public:
-    QString hostname;
-    QString directory;
-    bool isLocal;
-    int fsID;
-    int dirID;
-    int blocksize;
-    long long totalSpaceKB;
-    long long usedSpaceKB;
-    long long freeSpaceKB;
-    int weight;
-};
 
 MPUBLIC vector<ProgramInfo *> *RemoteGetRecordedList(int sort);
 MPUBLIC vector<FileSystemInfo> RemoteGetFreeSpace(void);

@@ -590,7 +590,7 @@ const QString &CdDecoderFactory::extension() const
 
 const QString &CdDecoderFactory::description() const
 {
-    static QString desc(QObject::tr("Ogg Vorbis Audio"));
+    static QString desc(QObject::tr("CD Audio decoder"));
     return desc;
 }
 
