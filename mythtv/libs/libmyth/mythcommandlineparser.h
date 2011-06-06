@@ -264,3 +264,11 @@ class MPUBLIC MythTranscodeCommandLineParser : public MythCommandLineParser
     MythTranscodeCommandLineParser();
     void LoadArguments(void);
 };
+
+class MPUBLIC MythMediaServerCommandLineParser : public MythCommandLineParser
+{
+  public:
+    MythMediaServerCommandLineParser(); 
+    void LoadArguments(void);
+};
+

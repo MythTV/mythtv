@@ -1380,6 +1380,24 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
             "Output stream type: dvd, ps", "");
 }
 
+MythMediaServerCommandLineParser::MythMediaServerCommandLineParser() :
+    MythCommandLineParser(MYTH_APPNAME_MYTHMEDIASERVER)
+{ LoadArguments(); }
+
+void MythMediaServerCommandLineParser::LoadArguments(void)
+{
+    addHelp();
+    addVersion();
+    addVerbose();
+    addSettingsOverride();
+    addLogging();
+
+    add(QStringList( QStringList() << "-p" << "--pidfile" ), "pidfile", "",
+            "Write PID of mythmediaserver to filename", "");
+    add(QStringList( QStringList() << "-d" << "--daemon" ), "daemonize",
+            "Runs mythmediaserver as a daemon", "");
+}
+
 
 QString MythCommandLineParser::GetLogFilePath(void)
 {
