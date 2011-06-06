@@ -4281,6 +4281,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
         fsInfo.setPath(*(it++));
         fsInfo.setLocal((*(it++)).toInt() > 0);
         fsInfo.setFSysID(-1);
+        it++;   // Without this, the strlist gets out of whack
         fsInfo.setGroupID((*(it++)).toInt());
         fsInfo.setBlockSize((*(it++)).toInt());
         fsInfo.setTotalSpace((*(it++)).toLongLong());
