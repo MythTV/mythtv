@@ -20,6 +20,7 @@ using namespace std;
 #include "mythconfig.h"
 #include "mythverbose.h"
 #include "mythversion.h"
+#include "mythlogging.h"
 
 #define LOC      QString("MythSocketManager: ")
 #define LOC_WARN QString("MythSocketManager, Warning: ")
@@ -53,6 +54,7 @@ class ProcessRequestThread : public QThread
 
     virtual void run(void)
     {
+	threadRegister("ProcessRequest");
         QMutexLocker locker(&m_lock);
         m_threadlives = true;
         m_waitCond.wakeAll(); // Signal to creating thread
@@ -76,6 +78,7 @@ class ProcessRequestThread : public QThread
             m_socket = NULL;
             m_parent->MarkUnused(this);
         }
+	threadDeregister();
     }
 
     QMutex m_lock;
