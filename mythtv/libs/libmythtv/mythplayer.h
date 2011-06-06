@@ -138,6 +138,7 @@ class MTV_PUBLIC MythPlayer
     void SetDuration(int duration);
     void SetForcedAspectRatio(int mpeg2_aspect_value, int letterbox_permission);
     void SetVideoResize(const QRect &videoRect);
+    void EnableFrameRateMonitor(bool enable = false);
 
     // Gets
     QSize   GetVideoBufferSize(void) const    { return video_dim; }

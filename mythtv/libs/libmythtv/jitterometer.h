@@ -33,9 +33,11 @@
 class Jitterometer
 {
   public:
-    Jitterometer(const char *name, int num_cycles);
+    Jitterometer(QString nname, int num_cycles = 0);
    ~Jitterometer();
 
+    float GetLastFPS(void) { return last_fps; }
+    void SetNumCycles(int cycles);
     bool RecordCycleTime();
     void RecordStartTime();
     bool RecordEndTime();
@@ -46,7 +48,8 @@ class Jitterometer
     struct timeval starttime;
     int starttime_valid;
     unsigned *times; // array of cycle lengths, in uS
-    char *name;
+    float last_fps;
+    QString name;
 };
 
 #endif // JITTEROMETER_H

@@ -2626,6 +2626,8 @@ void TV::timerEvent(QTimerEvent *te)
             KillTimer(updateOSDDebugTimerId);
             updateOSDDebugTimerId = 0;
             actx->buffer->EnableBitrateMonitor(false);
+            if (actx->player)
+                actx->player->EnableFrameRateMonitor(false);
         }
         ReturnOSDLock(actx, osd);
         if (update)
@@ -6903,11 +6905,15 @@ void TV::ToggleOSDDebug(PlayerContext *ctx)
     if (osd && osd->IsWindowVisible("osd_debug"))
     {
         ctx->buffer->EnableBitrateMonitor(false);
+        if (ctx->player)
+            ctx->player->EnableFrameRateMonitor(false);
         osd->HideWindow("osd_debug");
     }
     else if (osd)
     {
         ctx->buffer->EnableBitrateMonitor(true);
+        if (ctx->player)
+            ctx->player->EnableFrameRateMonitor(true);
         show = true;
         QMutexLocker locker(&timerIdLock);
         if (!updateOSDDebugTimerId)
