@@ -22,6 +22,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythverbose.h"
 #include "mythversion.h"
+#include "util.h"
 
 int kEnd     = 0,
     kEmpty   = 1,
@@ -160,6 +161,7 @@ QString MythCommandLineParser::GetHelpString(bool with_header) const
             msg << (*i2).left.leftJustified(maxlen, ' ');
 
             rlist = (*i2).right.split('\n');
+            wrapList(rlist, 79-maxlen);
             msg << rlist[0] << endl;
 
             for (i3 = rlist.begin() + 1; i3 != rlist.end(); ++i3)
@@ -722,9 +724,9 @@ void MythCommandLineParser::addHelp(void)
 {
     add(QStringList( QStringList() << "-h" << "--help" << "--usage" ),
             "showhelp", "", "Display this help printout.",
-            "Displays a list of all commands available for use with\n"
-            "this application. If another option is provided as an\n"
-            "argument, it will provide detailed information on that\n"
+            "Displays a list of all commands available for use with "
+            "this application. If another option is provided as an "
+            "argument, it will provide detailed information on that "
             "option.");
 }
 
@@ -732,8 +734,8 @@ void MythCommandLineParser::addVersion(void)
 {
     add("--version", "showversion", "Display version information.",
             "Display informtion about build, including:\n"
-            "  version, branch, protocol, library API, Qt\n"
-            "  and compiled options.");
+            " version, branch, protocol, library API, Qt "
+            "and compiled options.");
 }
 
 void MythCommandLineParser::addWindowed(bool def)
@@ -750,10 +752,9 @@ void MythCommandLineParser::addDaemon(void)
 {
     add(QStringList( QStringList() << "-d" << "--daemon" ), "daemonize",
             "Fork application into background after startup.",
-            "Fork application into background, detatching from\n"
-            "the local terminal. Often used with:\n"
-            "   --logpath       --pidfile\n"
-            "   --user");
+            "Fork application into background, detatching from "
+            "the local terminal.\nOften used with: "
+            " --logpath --pidfile --user");
 }
 
 void MythCommandLineParser::addSettingsOverride(void)
@@ -761,12 +762,12 @@ void MythCommandLineParser::addSettingsOverride(void)
     add(QStringList( QStringList() << "-O" << "--override-setting" ),
             "overridesettings", QVariant::Map,
             "Override a single setting defined by a key=value pair.",
-            "Override a single setting from the database using\n"
+            "Override a single setting from the database using "
             "options defined as one or more key=value pairs\n"
-            "Multiple can be defined by multiple uses of the\n"
+            "Multiple can be defined by multiple uses of the "
             "-O option.");
     add("--override-settings-file", "overridesettingsfile", "", 
-            "Define a file of key=value pairs to be\n"
+            "Define a file of key=value pairs to be "
             "loaded for setting overrides.", "");
 }
 
@@ -777,7 +778,7 @@ void MythCommandLineParser::addVerbose(void)
             "Specify log filtering. Use '-v help' for level info.", "");
     add("-V", "verboseint", 0U, "",
             "This option is intended for internal use only.\n"
-            "This option takes an unsigned value corresponding\n"
+            "This option takes an unsigned value corresponding "
             "to the bitwise log verbosity operator.");
 }
 
@@ -811,19 +812,19 @@ void MythCommandLineParser::addLogging(void)
 {
     add(QStringList( QStringList() << "-l" << "--logfile" << "--logpath" ), 
             "logpath", "",
-            "Writes logging messages to a file at logpath.  If a directory\n"
-            "is given, a logfile will be created in that directory with a\n"
-            "filename of applicationName.pid.log.\n"
+            "Writes logging messages to a file at logpath.\n"
+            "If a directory is given, a logfile will be created in that "
+            "directory with a filename of applicationName.pid.log.\n"
             "If a full filename is given, that file will be used.\n"
-            "This is typically used in combination with --daemon, and if used\n"
-            "in combination with --pidfile, this can be used with log \n"
+            "This is typically used in combination with --daemon, and if used "
+            "in combination with --pidfile, this can be used with log "
             "rotaters, using the HUP call to inform MythTV to reload the "
-            "file (currently disabled).\n", "");
+            "file (currently disabled).", "");
     add(QStringList( QStringList() << "-q" << "--quiet"), "quiet", 0,
-            "Don't log to the console (-q).  Don't log anywhere (-q -q)\n", "");
+            "Don't log to the console (-q).  Don't log anywhere (-q -q)", "");
     add("--syslog", "syslog", "local7", 
-            "Set the syslog logging facility.  Set to \"none\" to disable\n"
-            "Defaults to local7\n", "");
+            "Set the syslog logging facility.\nSet to \"none\" to disable, "
+            "defaults to local7", "");
     add("--nodblog", "nodblog", "Disable database logging.", "");
 }
 
@@ -831,17 +832,17 @@ void MythCommandLineParser::addPIDFile(void)
 {
     add(QStringList( QStringList() << "-p" << "--pidfile" ), "pidfile", "",
             "Write PID of application to filename.",
-            "Write the PID of the currently running process as a single\n"
-            "line to this file. Used for init scripts to know what\n"
-            "process to terminate, and with --logfile and log rotaters\n"
+            "Write the PID of the currently running process as a single "
+            "line to this file. Used for init scripts to know what "
+            "process to terminate, and with --logfile and log rotaters "
             "to send a HUP signal to process to have it re-open files.");
 }
 
 void MythCommandLineParser::addJob(void)
 {
     add(QStringList( QStringList() << "-j" << "--jobid" ), "jobid", 0, "",
-            "Intended for internal use only, specify the JobID to match\n"
-            "up with in the database for additional information and the\n"
+            "Intended for internal use only, specify the JobID to match "
+            "up with in the database for additional information and the "
             "ability to update runtime status in the database.");
 }
 
@@ -864,50 +865,50 @@ void MythBackendCommandLineParser::LoadArguments(void)
             "Print upcoming list of scheduled recordings.", "");
     add("--testsched", "testsched", "do some scheduler testing.", "");
     add("--resched", "resched",
-            "Trigger a run of the recording scheduler on the existing\n"
+            "Trigger a run of the recording scheduler on the existing "
             "master backend.",
-            "This command will connect to the master backend and trigger\n"
-            "a run of the recording scheduler. The call will return\n"
-            "immediately, however the scheduler run may take several\n"
+            "This command will connect to the master backend and trigger "
+            "a run of the recording scheduler. The call will return "
+            "immediately, however the scheduler run may take several "
             "seconds to a minute or longer to complete.");
     add("--nosched", "nosched", "",
-            "Intended for debugging use only, disable the scheduler\n"
-            "on this backend if it is the master backend, preventing\n"
-            "any recordings from occuring until the backend is\n"
+            "Intended for debugging use only, disable the scheduler "
+            "on this backend if it is the master backend, preventing "
+            "any recordings from occuring until the backend is "
             "restarted without this option.");
     add("--scanvideos", "scanvideos",
             "Trigger a rescan of media content in MythVideo.",
-            "This command will connect to the master backend and trigger\n"
-            "a run of the Video scanner. The call will return\n"
-            "immediately, however the scanner may take several seconds\n"
-            "to tens of minutes, depending on how much new or moved\n"
-            "content it has to hash, and how quickly the scanner can\n"
-            "access those files to do so. If enabled, this will also\n"
+            "This command will connect to the master backend and trigger "
+            "a run of the Video scanner. The call will return "
+            "immediately, however the scanner may take several seconds "
+            "to tens of minutes, depending on how much new or moved "
+            "content it has to hash, and how quickly the scanner can "
+            "access those files to do so. If enabled, this will also "
             "trigger the bulk metadata scanner upon completion.");
     add("--nojobqueue", "nojobqueue", "",
-            "Intended for debugging use only, disable the jobqueue\n"
-            "on this backend. As each jobqueue independently selects\n"
-            "jobs, this will only have any affect on this local\n"
+            "Intended for debugging use only, disable the jobqueue "
+            "on this backend. As each jobqueue independently selects "
+            "jobs, this will only have any affect on this local "
             "backend.");
     add("--nohousekeeper", "nohousekeeper", "",
-            "Intended for debugging use only, disable the housekeeper\n"
-            "on this backend if it is the master backend, preventing\n"
-            "any guide processing, recording cleanup, or any other\n"
+            "Intended for debugging use only, disable the housekeeper "
+            "on this backend if it is the master backend, preventing "
+            "any guide processing, recording cleanup, or any other "
             "task performed by the housekeeper.");
     add("--noautoexpire", "noautoexpire", "",
-            "Intended for debugging use only, disable the autoexpirer\n"
-            "on this backend if it is the master backend, preventing\n"
-            "recordings from being expired to clear room for new\n"
+            "Intended for debugging use only, disable the autoexpirer "
+            "on this backend if it is the master backend, preventing "
+            "recordings from being expired to clear room for new "
             "recordings.");
     add("--event", "event", "", "Send a backend event test message.", "");
     add("--systemevent", "systemevent", "",
             "Send a backend SYSTEM_EVENT test message.", "");
     add("--clearcache", "clearcache",
             "Trigger a cache clear on all connected MythTV systems.",
-            "This command will connect to the master backend and trigger\n"
-            "a cache clear event, which will subsequently be pushed to\n"
-            "all other connected programs. This event will clear the\n"
-            "local database settings cache used by each program, causing\n"
+            "This command will connect to the master backend and trigger "
+            "a cache clear event, which will subsequently be pushed to "
+            "all other connected programs. This event will clear the "
+            "local database settings cache used by each program, causing "
             "options to be re-read from the database upon next use.");
     add("--printexpire", "printexpire", "ALL",
             "Print upcoming list of recordings to be expired.", "");
@@ -1010,8 +1011,8 @@ void MythCommFlagCommandLineParser::LoadArguments(void)
             "Specify file to operate on.", "");
     add("--video", "video", "", "Rebuild the seek table for a video (non-recording) file.", "");
     add("--method", "commmethod", "", "Commercial flagging method[s] to employ:\n"
-                                      "off, blank, scene, blankscene, logo, all\n"
-                                      "d2, d2_logo, d2_blank, d2_scene, d2_all\n", "");
+                                      "off, blank, scene, blankscene, logo, all, "
+                                      "d2, d2_logo, d2_blank, d2_scene, d2_all", "");
     add("--outputmethod", "outputmethod", "",
             "Format of output written to outputfile, essentials, full.", "");
     add("--gencutlist", "gencutlist", "Copy the commercial skip list to the cutlist.", "");
@@ -1022,7 +1023,7 @@ void MythCommFlagCommandLineParser::LoadArguments(void)
     add("--setcutlist", "setcutlist", "", "Set a new cutlist in the form:\n"
                                           "#-#[,#-#]... (ie, 1-100,1520-3012,4091-5094)", "");
     add("--skipdb", "skipdb", "", "Intended for external 3rd party use.");
-    add("--queue", "queue", "Insert flagging job into the JobQueue, rather than\n"
+    add("--queue", "queue", "Insert flagging job into the JobQueue, rather than "
                             "running flagging in the foreground.", "");
     add("--nopercentage", "nopercent", "Don't print percentage done.", "");
     add("--rebuild", "rebuild", "Do not flag commercials, just rebuild the seektable.", "");
@@ -1059,132 +1060,131 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
     addLogging();
 
     add("--manual", "manual", "Run interactive configuration",
-            "Manual mode will interactively ask you questions about\n"
-            "each channel as it is processed, to configure for\n"
-            "future use.\n"
+            "Manual mode will interactively ask you questions about "
+            "each channel as it is processed, to configure for "
+            "future use."
             "mutually exclusive with --update");
     add("--update", "update", "Run non-destructive updates",
-            "Run non-destructive updates on the database for \n"
-            "users in xmltv zones that do not provide channel\n"
-            "data. Stops the addition of new channels and the\n"
-            "changing of channel icons.\n"
+            "Run non-destructive updates on the database for "
+            "users in xmltv zones that do not provide channel "
+            "data. Stops the addition of new channels and the "
+            "changing of channel icons."
             "mutually exclusive with --manual");
     add("--preset", "preset", "Use channel preset values instead of numbers",
-            "For use with assigning preset numbers for each\n"
-            "channel. Useful for non-US countries where people\n"
-            "are used to assigning a sequenced number for each\n"
-            "channel: 1->TVE1(S41), 2->La 2(SE18), 3->TV(21)...");
+            "For use with assigning preset numbers for each "
+            "channel. Useful for non-US countries where people "
+            "are used to assigning a sequenced number for each "
+            "channel:\n1->TVE1(S41), 2->La 2(SE18), 3->TV(21)...");
     add("--file", "file", "Bypass grabbers and define sourceid and file",
-            "Directly define the sourceid and XMLTV file to\n"
-            "import. Must be used in combination with:\n"
-            "    --sourceid  --xmlfile");
+            "Directly define the sourceid and XMLTV file to "
+            "import. Must be used in combination with:"
+            " --sourceid  --xmlfile");
     add("--dd-file", "file", "Bypass grabber, and read SD data from file",
-            "Directly define the data needed to import a local\n"
-            "DataDirect download. Must be used in combination\n"
+            "Directly define the data needed to import a local "
+            "DataDirect download. Must be used in combination "
             "with: \n"
-            "    --sourceid      --lineupid\n"
-            "    --offset        --xmlfile");
+            " --sourceid  --lineupid  --offset  --xmlfile");
     add("--sourceid", "sourceid", 0, "Operate on single source",
-            "Limit mythfilldatabase to only operate on the \n"
-            "specified channel source. This option is required\n"
+            "Limit mythfilldatabase to only operate on the "
+            "specified channel source. This option is required "
             "when using --file, --dd-file, or --xawchannels.");
     add("--offset", "offset", 0, "Day offset of input xml file"
-            "Specify how many days offset from today is the \n"
-            "information in the given XML file. This option is\n"
+            "Specify how many days offset from today is the "
+            "information in the given XML file. This option is "
             "required when using --dd-file.");
     add("--lineupid", "lineupid", 0, "DataDirect lineup of input xml file"
-            "Specify the DataDirect lineup that corresponds to\n"
-            "the information in the given XML file. This option\n"
+            "Specify the DataDirect lineup that corresponds to "
+            "the information in the given XML file. This option "
             "is required when using --dd-file.");
     add("--xmlfile", "xmlfile", "", "XML file to import manually",
-            "Specify an XML guide data file to import directly\n"
+            "Specify an XML guide data file to import directly "
             "rather than pull data through the specified grabber.\n"
             "This option is required when using --file or --dd-file.");
     add("--xawchannels", "xawchannels", "Read channels from xawtvrc file",
-            "Import channels from an xawtvrc file. This option \n"
+            "Import channels from an xawtvrc file.\nThis option "
             "requires --sourceid and --xawtvrcfile.");
     add("--xawtvrcfile", "xawtvrcfile", "", "xawtvrc file to import channels from",
             "Xawtvrc file containing channels to be imported.\n"
             "This option is required when using --xawchannels.");
     add("--do-channel-updates", "dochannelupdates", "update channels using datadirect",
-            "When using DataDirect, ask mythfilldatabase to\n"
-            "overwrite channel names, frequencies, etc. with\n"
-            "values available from the data source. This will\n"
-            "override custom channel names, which is why it \n"
+            "When using DataDirect, ask mythfilldatabase to "
+            "overwrite channel names, frequencies, etc. with "
+            "values available from the data source. This will "
+            "override custom channel names, which is why it "
             "is disabled by default.");
     add("--remove-new-channels", "removechannels",
             "disable new channels on datadirect web interface",
-            "When using DataDirect, ask mythfilldatabase to\n"
-            "mark any new channels as disabled on the remote\n"
-            "lineup. Channels can be manually enabled on the\n"
-            "website at a later time, and incorporated into\n"
-            "MythTV by running mythfilldatabase without this\n"
-            "option. New digital channels cannot be directly\n"
+            "When using DataDirect, ask mythfilldatabase to "
+            "mark any new channels as disabled on the remote "
+            "lineup. Channels can be manually enabled on the "
+            "website at a later time, and incorporated into "
+            "MythTV by running mythfilldatabase without this "
+            "option. New digital channels cannot be directly "
             "imported and thus are disabled automatically.");
     add("--do-not-filter-new-channels", "nofilterchannels",
             "don't filter ATSC channels for addition",
-            "Normally, MythTV tries to avoid adding ATSC\n"
-            "channels to NTSC channel lineups. This option\n"
-            "restores the behavior of adding every channel in\n"
-            "the downloaded channel lineup to MythTV's lineup,\n"
+            "Normally, MythTV tries to avoid adding ATSC "
+            "channels to NTSC channel lineups. This option "
+            "restores the behavior of adding every channel in "
+            "the downloaded channel lineup to MythTV's lineup, "
             "in case MythTV's smarts fail you.");
     add("--graboptions", "graboptions", "", "",
-            "Manually define options to pass to the data grabber.\n"
-            "Do NOT use this option unless you know what you are\n"
-            "doing. Mythfilldatabase will automatically use the \n"
+            "Manually define options to pass to the data grabber. "
+            "Do NOT use this option unless you know what you are "
+            "doing. Mythfilldatabase will automatically use the "
             "correct options for xmltv compliant grabbers.");
     add("--cardtype", "cardtype", "", "", "No information.");           // need documentation for this one
     add("--max-days", "maxdays", 0, "force number of days to update",
-            "Force the maximum number of days, counting today,\n"
-            "for the guide data grabber to check for future\n"
+            "Force the maximum number of days, counting today, "
+            "for the guide data grabber to check for future "
             "listings.");
     add("--refresh-today", "refreshtoday", "refresh today's listings",
             "This option is only valid for selected grabbers.\n"
-            "Force a refresh for today's guide data. This can be used\n"
-            "in combination with other --refresh-<n> options.\n\n"
-            "If being used with datadirect, this option should not be\n"
+            "Force a refresh for today's guide data.\nThis can be used "
+            "in combination with other --refresh-<n> options.\n"
+            "If being used with datadirect, this option should not be "
             "used, rather use --dd-grab-all to pull all listings each time.");
     add("--dont-refresh-tomorrow", "dontrefreshtomorrow",
             "don't refresh tomorrow's listings",
             "This option is only valid for selected grabbers.\n"
-            "Prevent mythfilldatabase from pulling information for\n"
-            "tomorrow's listings. Data for tomorrow is always pulled\n"
-            "unless specifically specified otherwise. \n\n"
-            "If being used with datadirect, this option should not be\n"
+            "Prevent mythfilldatabase from pulling information for "
+            "tomorrow's listings. Data for tomorrow is always pulled "
+            "unless specifically specified otherwise.\n"
+            "If being used with datadirect, this option should not be "
             "used, rather use --dd-grab-all to pull all listings each time.");
     add("--refresh-second", "refreshsecond", "refresh listings two days from now",
             "This option is only valid for selected grabbers.\n"
-            "Force a refresh for guide data two days from now. This can\n"
-            "be used in combination with other --refresh-<n> options.\n\n"
-            "If being used with datadirect, this option should not be\n"
+            "Force a refresh for guide data two days from now. This can "
+            "be used in combination with other --refresh-<n> options.\n"
+            "If being used with datadirect, this option should not be "
             "used, rather use --dd-grab-all to pull all listings each time.");
     add("--refresh-all", "refreshall", "refresh listings on all days",
             "This option is only valid for selected grabbers.\n"
-            "This option forces a refresh of all guide data, but does so \n"
-            "with fourteen downloads of one day each. \n\n"
-            "If being used with datadirect, this option should not be\n"
+            "This option forces a refresh of all guide data, but does so "
+            "with fourteen downloads of one day each.\n"
+            "If being used with datadirect, this option should not be "
             "used, rather use --dd-grab-all to pull all listings each time.");
 // TODO: I should be converted to a qstringlist and used in place of
 //       the other refresh options
     add("--refresh-day", "refreshday", 0U, "refresh specific day's listings",
             "This option is only valid for selected grabbers.\n"
-            "Force a refresh for guide data on a specific day. This can\n"
-            "be used in combination with other --refresh-<n> options.\n\n"
-            "If being used with datadirect, this option should not be\n"
+            "Force a refresh for guide data on a specific day. This can "
+            "be used in combination with other --refresh-<n> options.\n"
+            "If being used with datadirect, this option should not be "
             "used, rather use --dd-grab-all to pull all listings each time.");
     add("--dont-refresh-tba", "dontrefreshtba",
             "don't refresh \"To be announced\" programs",
             "This option is only valid for selected grabbers.\n"
-            "Prevent mythfilldatabase from automatically refreshing any \n"
-            "programs marked as \"To be announced\".\n\n"
-            "If being used with datadirect, this option should not be\n"
+            "Prevent mythfilldatabase from automatically refreshing any "
+            "programs marked as \"To be announced\".\n"
+            "If being used with datadirect, this option should not be "
             "used, rather use --dd-grab-all to pull all listings each time.");
     add("--dd-grab-all", "ddgraball", "refresh full data using DataDirect",
             "This option is only valid for selected grabbers (DataDirect).\n"
-            "This option is the preferred way of updating guide data from\n"
+            "This option is the preferred way of updating guide data from "
             "DataDirect, and pulls all fourteen days of guide data at once.");
     add("--only-update-channels", "onlychannels", "only update channel lineup",
-            "Download as little listings data as possible to update the\n"
+            "Download as little listings data as possible to update the "
             "channel lineup.");
     add("--no-mark-repeats", "markrepeats", true, "do not mark repeats", "");
     add("--export-icon-map", "exporticonmap", "iconmap.xml",
@@ -1193,7 +1193,7 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "import icon map to file", "");
     add("--update-icon-map", "updateiconmap", "updates icon map icons", "");
     add("--reset-icon-map", "reseticonmap", "", "resets icon maps",
-            "Reset all icon maps. If given 'all' as an optiona value, reset\n"
+            "Reset all icon maps. If given 'all' as an optional value, reset "
             "channel icons as well.");
 }
 
@@ -1311,24 +1311,24 @@ void MythTVSetupCommandLineParser::LoadArguments(void)
     add("--scan-non-interactive", "scannoninteractive", "", "nohelp");
 
     add("--scan", "scan", 0U, "", 
-            "Run the command line channel scanner on a specified card\n"
+            "Run the command line channel scanner on a specified card "
             "ID. This can be used with --frequency-table and --input-name.");
     add("--frequency-table", "freqtable", "atsc-vsb8-us", "",
-            "Specify frequency table to be used with command\n"
+            "Specify frequency table to be used with command "
             "line channel scanner.");
     add("--input-name", "inputname", "", "",
-            "Specify which input to scan for, if specified card\n"
+            "Specify which input to scan for, if specified card "
             "supports multiple.");
 
     add("--scan-import", "importscan", 0U, "",
-            "Import an existing scan from the database. Use --scan-list\n"
+            "Import an existing scan from the database. Use --scan-list "
             "to enumerate scans available for import.\n"
-            "This option is mutually exclusive with --scan, and can\n"
+            "This option is mutually exclusive with --scan, and can "
             "be used with the options --FTAonly and --service-type.");
     add("--FTAonly", "ftaonly", "", "Only import 'Free To Air' channels.");
     add("--service-type", "servicetype", "all", "",
-            "To be used with channel scanning or importing, specify\n"
-            "the type of services to import. Select from the following,\n"
+            "To be used with channel scanning or importing, specify "
+            "the type of services to import. Select from the following, "
             "multiple can be added with '+':\n"
             "   all, tv, radio");
 }
@@ -1355,8 +1355,8 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
             "Transcoding profile.", "");
     add(QStringList( QStringList() << "-l" << "--honorcutlist" ), "usecutlist",
             "", "Specifies whether to use the cutlist.",
-            "Specifies whether transcode should honor the cutlist and\n"
-            "remove the marked off commercials. Optionally takes a \n"
+            "Specifies whether transcode should honor the cutlist and "
+            "remove the marked off commercials. Optionally takes a "
             "a cutlist as an argument when used with --infile.");
     add("--inversecut", "inversecut",
             "Inverses the cutlist, leaving only the marked off sections.", "");
@@ -1390,12 +1390,9 @@ void MythMediaServerCommandLineParser::LoadArguments(void)
     addVersion();
     addVerbose();
     addSettingsOverride();
+    addPIDFile();
+    addDaemon();
     addLogging();
-
-    add(QStringList( QStringList() << "-p" << "--pidfile" ), "pidfile", "",
-            "Write PID of mythmediaserver to filename", "");
-    add(QStringList( QStringList() << "-d" << "--daemon" ), "daemonize",
-            "Runs mythmediaserver as a daemon", "");
 }
 
 
