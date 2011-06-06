@@ -339,7 +339,7 @@ void RingBuffer::CalcReadAheadThresh(void)
     readblocksize  = max(readblocksize, CHUNK);
 
     // loop without sleeping if the buffered data is less than this
-    fill_threshold = 3 * bufferSize / 8;
+    fill_threshold = 7 * bufferSize / 8;
 
     const uint KB32  =  32*1024;
     const uint KB64  =  64*1024;
@@ -906,7 +906,7 @@ void RingBuffer::run(void)
             if (!request_pause &&
                 (used >= fill_threshold || ateof || setswitchtonext))
             {
-                generalWait.wait(&rwlock, 1000);
+                generalWait.wait(&rwlock, 50);
             }
             else if (readsallowed)
             { // if reads are allowed release the lock and yield so the
