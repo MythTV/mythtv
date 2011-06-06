@@ -7,7 +7,7 @@ using_frontend {
     SUBDIRS += mythavtest mythfrontend mythcommflag
     SUBDIRS += mythmessage mythjobqueue mythlcdserver
     SUBDIRS += mythwelcome mythshutdown
-    SUBDIRS += mythpreviewgen
+    SUBDIRS += mythpreviewgen mythmediaserver
     !mingw: SUBDIRS += mythtranscode/replex
 }
 

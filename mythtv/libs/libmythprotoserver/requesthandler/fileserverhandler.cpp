@@ -231,8 +231,6 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
     QUrl qurl           = *(++it);
     QString wantgroup   = *(++it);
 
-    VERBOSE(VB_FILE, "FIleServerHandler::HandleAnnounce: building checkfile list.");
-
     QStringList checkfiles;
     while (++it != slist.end())
         checkfiles += *(it);
