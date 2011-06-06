@@ -675,7 +675,8 @@ void RingBuffer::CreateReadAheadBuffer(void)
         memcpy(newbuffer + (oldsize - rbwpos), readAheadBuffer, rbwpos);
         delete [] readAheadBuffer;
         readAheadBuffer = newbuffer;
-        rbrpos = rbrpos + oldsize - rbwpos;
+        rbrpos = (rbrpos > rbwpos) ? (rbrpos - rbwpos) :
+                                     (rbrpos + oldsize - rbwpos);
         rbwpos = oldsize;
     }
     else
