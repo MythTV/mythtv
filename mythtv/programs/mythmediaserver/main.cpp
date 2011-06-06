@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
     int argpos = 1;
     bool daemonize = false;
 
-    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHJOBQUEUE);
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHMEDIASERVER);
 
     QString filename;
 
@@ -288,7 +288,7 @@ int main(int argc, char *argv[])
     }
 
     VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
-                            .arg(MYTH_APPNAME_MYTHJOBQUEUE)
+                            .arg(MYTH_APPNAME_MYTHMEDIASERVER)
                             .arg(MYTH_SOURCE_PATH)
                             .arg(MYTH_SOURCE_VERSION));
 
