@@ -1,6 +1,9 @@
 #ifndef FILETRANSFER_H_
 #define FILETRANSFER_H_
 
+// ANSI C headers
+#include <stdint.h>
+
 using namespace std;
 
 #include <QMutex>

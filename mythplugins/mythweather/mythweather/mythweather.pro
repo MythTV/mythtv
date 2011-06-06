@@ -2,7 +2,7 @@ include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 
-QT += sql xml
+QT += sql xml network
 
 TEMPLATE = lib
 CONFIG += plugin thread 
