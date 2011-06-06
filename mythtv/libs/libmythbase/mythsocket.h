@@ -42,6 +42,18 @@ class MBASE_PUBLIC MythSocket : public MSocketDevice
     QString errorToString(void) const { return errorToString(error()); }
     QString errorToString(const Error error) const;
 
+    bool    Validate(uint timeout_ms = kMythSocketLongTimeout,
+                     bool error_dialog_desired = false);
+    void setValidated(bool isValidated=true)    { m_isValidated = isValidated; }
+    bool  isValidated(void)                     { return m_isValidated; }
+
+    bool           Announce(QStringList &strlist);
+    QStringList getAnnounce(void)               { return m_announce; }
+    void        setAnnounce(QStringList &strlist);
+    bool         isAnnounced(void)              { return m_isAnnounced; }
+
+    bool isExpectingReply(void)                 { return m_expectingreply; }
+
     void setSocket(int socket, Type type = MSocketDevice::Stream);
     void setCallbacks(MythSocketCBs *cb);
     void useReadyReadCallback(bool useReadyReadCallback = true)
@@ -57,6 +69,7 @@ class MBASE_PUBLIC MythSocket : public MSocketDevice
             list, quickTimeout ? kShortTimeout : kLongTimeout);
     }
     bool writeStringList(QStringList &list);
+    bool SendReceiveStringList(QStringList &list, uint min_reply_length = 0);
     bool readData(char *data, quint64 len);
     bool writeData(const char *data, quint64 len);
 
@@ -85,6 +98,11 @@ class MBASE_PUBLIC MythSocket : public MSocketDevice
     bool            m_notifyread;
     QMutex          m_ref_lock;
     mutable QMutex  m_lock; // externally accessible lock
+
+    bool            m_expectingreply;
+    bool            m_isValidated;
+    bool            m_isAnnounced;
+    QStringList     m_announce;
 
     static const uint kSocketBufferSize;
     static MythSocketThread *s_readyread_thread;

@@ -32,3 +32,7 @@ SUBDIRS += libmythtv
 # libmythmetadata
 SUBDIRS += libmythmetadata
 libmythmetadata.depends = $$LIBMYTHTVDEPS libmythtv
+
+#libmythmediaserver
+SUBDIRS += libmythprotoserver
+libmythprotoserver.depends = $$LIBMYTHTVDEPS libmythtv

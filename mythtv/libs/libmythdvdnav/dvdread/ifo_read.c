@@ -1325,6 +1325,9 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
     ifofile->ptl_mait = 0;
     return 0;
   }
+  for(i = 0; i < ptl_mait->nr_of_countries; i++) {
+    ptl_mait->countries[i].pf_ptl_mai = NULL;
+  }
 
   for(i = 0; i < ptl_mait->nr_of_countries; i++) {
     if(!(DVDReadBytes(ifofile->file, &ptl_mait->countries[i], PTL_MAIT_COUNTRY_SIZE))) {
@@ -1345,7 +1348,7 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
     CHECK_ZERO(ptl_mait->countries[i].zero_1);
     CHECK_ZERO(ptl_mait->countries[i].zero_2);
     CHECK_VALUE(ptl_mait->countries[i].pf_ptl_mai_start_byte
-                + 8*2 * (ptl_mait->nr_of_vtss + 1) <= ptl_mait->last_byte + 1);
+                + sizeof(pf_level_t) * (ptl_mait->nr_of_vtss + 1) <= ptl_mait->last_byte + 1);
   }
 
   for(i = 0; i < ptl_mait->nr_of_countries; i++) {
@@ -1354,21 +1357,24 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
     if(!DVDFileSeek_(ifofile->file,
                      ifofile->vmgi_mat->ptl_mait * DVD_BLOCK_LEN
                      + ptl_mait->countries[i].pf_ptl_mai_start_byte)) {
-      fprintf(stderr, "libdvdread: Unable to seek PTL_MAIT table.\n");
+      fprintf(stderr, "libdvdread: Unable to seek PTL_MAIT table at index %d.\n",i);
       free(ptl_mait->countries);
       free(ptl_mait);
+      ifofile->ptl_mait = NULL;
       return 0;
     }
     info_length = (ptl_mait->nr_of_vtss + 1) * sizeof(pf_level_t);
     pf_temp = (uint16_t *)malloc(info_length);
     if(!pf_temp) {
       free_ptl_mait(ptl_mait, i);
+      ifofile->ptl_mait = NULL;
       return 0;
     }
     if(!(DVDReadBytes(ifofile->file, pf_temp, info_length))) {
-      fprintf(stderr, "libdvdread: Unable to read PTL_MAIT table.\n");
+      fprintf(stderr, "libdvdread: Unable to read PTL_MAIT table at index %d.\n",i);
       free(pf_temp);
       free_ptl_mait(ptl_mait, i);
+      ifofile->ptl_mait = NULL;
       return 0;
     }
     for (j = 0; j < ((ptl_mait->nr_of_vtss + 1) * 8); j++) {
@@ -1378,11 +1384,12 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
     if(!ptl_mait->countries[i].pf_ptl_mai) {
       free(pf_temp);
       free_ptl_mait(ptl_mait, i);
+      ifofile->ptl_mait = NULL;
       return 0;
     }
     { /* Transpose the array so we can use C indexing. */
       int level, vts;
-      for(level = 0; level < 8; level++) {
+      for(level = 0; level < PTL_MAIT_NUM_LEVEL; level++) {
         for(vts = 0; vts <= ptl_mait->nr_of_vtss; vts++) {
           ptl_mait->countries[i].pf_ptl_mai[vts][level] =
             pf_temp[(7-level)*(ptl_mait->nr_of_vtss+1) + vts];

@@ -2626,6 +2626,8 @@ void TV::timerEvent(QTimerEvent *te)
             KillTimer(updateOSDDebugTimerId);
             updateOSDDebugTimerId = 0;
             actx->buffer->EnableBitrateMonitor(false);
+            if (actx->player)
+                actx->player->EnableFrameRateMonitor(false);
         }
         ReturnOSDLock(actx, osd);
         if (update)
@@ -6898,36 +6900,40 @@ void TV::ToggleOSD(PlayerContext *ctx, bool includeStatusOSD)
 
 void TV::ToggleOSDDebug(PlayerContext *ctx)
 {
+    bool show = false;
     OSD *osd = GetOSDLock(ctx);
     if (osd && osd->IsWindowVisible("osd_debug"))
     {
         ctx->buffer->EnableBitrateMonitor(false);
+        if (ctx->player)
+            ctx->player->EnableFrameRateMonitor(false);
         osd->HideWindow("osd_debug");
     }
     else if (osd)
     {
         ctx->buffer->EnableBitrateMonitor(true);
-        InfoMap infoMap;
-        infoMap.insert("filename", ctx->buffer->GetFilename());
-        osd->ResetWindow("osd_debug");
-        osd->SetText("osd_debug", infoMap, kOSDTimeout_None);
-
+        if (ctx->player)
+            ctx->player->EnableFrameRateMonitor(true);
+        show = true;
         QMutexLocker locker(&timerIdLock);
         if (!updateOSDDebugTimerId)
             updateOSDDebugTimerId = StartTimer(250, __LINE__);
     }
     ReturnOSDLock(ctx, osd);
+    if (show)
+        UpdateOSDDebug(ctx);
 }
 
 void TV::UpdateOSDDebug(const PlayerContext *ctx)
 {
-    InfoMap infoMap;
-    infoMap.insert("decoderrate", ctx->buffer->GetDecoderRate());
-    infoMap.insert("storagerate", ctx->buffer->GetStorageRate());
-    infoMap.insert("bufferavail", ctx->buffer->GetAvailableBuffer());
     OSD *osd = GetOSDLock(ctx);
-    if (osd)
+    if (osd && ctx->player)
+    {
+        InfoMap infoMap;
+        ctx->player->GetPlaybackData(infoMap);
+        osd->ResetWindow("osd_debug");
         osd->SetText("osd_debug", infoMap, kOSDTimeout_None);
+    }
     ReturnOSDLock(ctx, osd);
 }
 

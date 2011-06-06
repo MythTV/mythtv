@@ -36,6 +36,7 @@ HEADERS += programinfo.h          programinfoupdater.h
 HEADERS += programtypes.h         recordingtypes.h
 HEADERS += mythrssmanager.h       netgrabbermanager.h
 HEADERS += rssparse.h             netutils.h
+HEADERS += filesysteminfo.h
 
 # remove when everything is switched to mythui
 HEADERS += virtualkeyboard_qt.h
@@ -65,6 +66,7 @@ SOURCES += programinfo.cpp        programinfoupdater.cpp
 SOURCES += programtypes.cpp       recordingtypes.cpp
 SOURCES += mythrssmanager.cpp     netgrabbermanager.cpp
 SOURCES += rssparse.cpp           netutils.cpp
+SOURCES += filesysteminfo.cpp
 
 # remove when everything is switched to mythui
 SOURCES += virtualkeyboard_qt.cpp
@@ -109,7 +111,7 @@ inc.files += visual.h volumebase.h output.h langsettings.h
 inc.files += mythexp.h mythpluginapi.h storagegroupeditor.h
 inc.files += mythconfigdialogs.h mythconfiggroups.h
 inc.files += mythterminal.h
-inc.files += remoteutil.h
+inc.files += remoteutil.h         filesysteminfo.h
 inc.files += programinfo.h        hardwareprofile.h
 inc.files += programtypes.h       recordingtypes.h
 inc.files += mythrssmanager.h     netgrabbermanager.h

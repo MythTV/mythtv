@@ -47,8 +47,10 @@ class MTV_PUBLIC RingBuffer : protected QThread
     void UpdateRawBitrate(uint rawbitrate);
     void UpdatePlaySpeed(float playspeed);
     void EnableBitrateMonitor(bool enable) { bitrateMonitorEnabled = enable; }
+    void SetBufferSizeFactors(bool estbitrate, bool matroska);
 
     // Gets
+    QString   GetSafeFilename(void) { return safefilename; }
     QString   GetFilename(void)      const;
     QString   GetSubtitleFilename(void) const;
     /// Returns value of stopreads
@@ -69,6 +71,7 @@ class MTV_PUBLIC RingBuffer : protected QThread
     virtual bool IsOpen(void) const = 0;
     virtual bool IsStreamed(void)     { return LiveMode(); }
     virtual int  BestBufferSize(void) { return 32768; }
+    static QString BitrateToString(uint64_t rate);
 
     // DVD and bluray methods
     bool IsDisc(void) const { return IsDVD() || IsBD(); }
@@ -139,6 +142,7 @@ class MTV_PUBLIC RingBuffer : protected QThread
     RingBuffer();
 
     void run(void); // QThread
+    void CreateReadAheadBuffer(void);
     void CalcReadAheadThresh(void);
     bool PauseAndWait(void);
     virtual int safe_read(void *data, uint sz) = 0;
@@ -154,7 +158,6 @@ class MTV_PUBLIC RingBuffer : protected QThread
     void ResetReadAhead(long long newinternal);
     void KillReadAheadThread(void);
 
-    static QString BitrateToString(uint64_t rate);
     uint64_t UpdateDecoderRate(uint64_t latest = 0);
     uint64_t UpdateStorageRate(uint64_t latest = 0);
 
@@ -175,6 +178,7 @@ class MTV_PUBLIC RingBuffer : protected QThread
 
     mutable QReadWriteLock rwlock;
 
+    QString safefilename;         // unprotected (for debugging)
     QString filename;             // protected by rwlock
     QString subtitlefilename;     // protected by rwlock
 
@@ -185,6 +189,9 @@ class MTV_PUBLIC RingBuffer : protected QThread
 
     RemoteFile *remotefile;       // protected by rwlock
 
+    uint      bufferSize;         // protected by rwlock
+    bool      fileismatroska;     // protected by rwlock
+    bool      unknownbitrate;     // protected by rwlock
     bool      startreadahead;     // protected by rwlock
     char     *readAheadBuffer;    // protected by rwlock
     bool      readaheadrunning;   // protected by rwlock
@@ -231,10 +238,6 @@ class MTV_PUBLIC RingBuffer : protected QThread
     static QMutex subExtLock;
     static QStringList subExt;
     static QStringList subExtNoCheck;
-
-    // constants
-  public:
-    static const uint kBufferSize;
 };
 
 #endif // _RINGBUFFER_H_

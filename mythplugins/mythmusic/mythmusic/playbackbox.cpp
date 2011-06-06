@@ -2110,7 +2110,10 @@ void PlaybackBoxMusic::showAlbumArtImage(Metadata *mdata)
 
     QSize img_size = albumart_image->GetSize(true);
 
-    QImage albumArt = mdata->getAlbumArt();
+    QImage albumArt;
+    QString imageFilename = mdata->getAlbumArtFile();
+    if (!imageFilename.isEmpty())
+        albumArt.load(imageFilename);
 
     if (!albumArt.isNull())
     {

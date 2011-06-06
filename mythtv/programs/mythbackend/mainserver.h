@@ -32,6 +32,7 @@ class QUrl;
 class MythServer;
 class VideoScanner;
 class QTimer;
+class FileSystemInfo;
 
 class DeleteStruct 
 {
@@ -112,7 +113,7 @@ class MainServer : public QObject, public MythSocketCBs
     size_t GetCurrentMaxBitrate(void);
     void BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                                bool allHosts);
-    void GetFilesystemInfos(vector <FileSystemInfo> &fsInfos);
+    void GetFilesystemInfos(QList<FileSystemInfo> &fsInfos);
 
     int GetExitCode() const { return m_exitCode; }
 
@@ -223,7 +224,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     QString LocalFilePath(const QUrl &url, const QString &wantgroup);
 
-    int GetfsID(vector<FileSystemInfo>::iterator fsInfo);
+    int GetfsID(QList<FileSystemInfo>::iterator fsInfo);
 
     void DoTruncateThread(DeleteStruct *ds);
     void DoDeleteThread(DeleteStruct *ds);

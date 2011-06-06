@@ -354,7 +354,11 @@ void InfoWidget::showMetadata(Metadata *mdata, bool fullScreen, int visMode)
         return;
 
     QString  text = "\"" + mdata->Title() + "\"\n" +  mdata->Artist() + "\n" + mdata->Album();
-    QImage albumArt = mdata->getAlbumArt();
+
+    QImage albumArt;
+    QString imageFilename = mdata->getAlbumArtFile();
+    if (!imageFilename.isEmpty())
+        albumArt.load(imageFilename);
 
     if (text == info)
         return;

@@ -21,7 +21,7 @@ using namespace std;
    mythtv/bindings/perl/MythTV.pm
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1276";
+const QString currentDatabaseVersion = "1277";
 
 static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver);
 static bool performActualUpdate(
@@ -5714,6 +5714,34 @@ NULL
 NULL
 };
         if (!performActualUpdate(updates, "1276", dbver))
+            return false;
+    }
+
+    if (dbver == "1276")
+    {
+        const char *updates[] = {
+"ALTER TABLE record ADD COLUMN filter INT UNSIGNED NOT NULL DEFAULT 0;",
+"CREATE TABLE IF NOT EXISTS recordfilter ("
+"    filterid INT UNSIGNED NOT NULL PRIMARY KEY,"
+"    description VARCHAR(64) DEFAULT NULL,"
+"    clause VARCHAR(256) DEFAULT NULL,"
+"    newruledefault TINYINT(1) DEFAULT 0);",
+"INSERT INTO recordfilter (filterid, description, clause, newruledefault) "
+"    VALUES (0, 'New episode', 'program.previouslyshown = 0', 0);",
+"INSERT INTO recordfilter (filterid, description, clause, newruledefault) "
+"    VALUES (1, 'Identifiable episode', 'program.generic = 0', 0);",
+"INSERT INTO recordfilter (filterid, description, clause, newruledefault) "
+"    VALUES (2, 'First showing', 'program.first > 0', 0);",
+"INSERT INTO recordfilter (filterid, description, clause, newruledefault) "
+"    VALUES (3, 'Primetime', 'HOUR(program.starttime) >= 19 AND HOUR(program.starttime) < 23', 0);",
+"INSERT INTO recordfilter (filterid, description, clause, newruledefault) "
+"    VALUES (4, 'Commercial free', 'channel.commmethod = -2', 0);",
+"INSERT INTO recordfilter (filterid, description, clause, newruledefault) "
+"    VALUES (5, 'High definition', 'program.hdtv > 0', 0);",
+NULL
+};
+
+        if (!performActualUpdate(updates, "1277", dbver))
             return false;
     }
 

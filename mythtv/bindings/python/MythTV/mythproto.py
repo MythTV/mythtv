@@ -469,7 +469,9 @@ class FileTransfer( BEEvent ):
                 buff = data
                 data = ''
             # push data to server
-            self.pos += int(self.ftsock.send(buff))
+            self._pos += int(self.ftsock.send(buff))
+            if self._pos > self._size:
+                self._size = self._pos
             # inform server of new data
             self.backendCommand('QUERY_FILETRANSFER '\
                     +BACKEND_SEP.join(\
@@ -514,7 +516,7 @@ class FileTransfer( BEEvent ):
         if res[0] == '-1':
             raise MythFileError(MythError.FILE_FAILED_SEEK, \
                                     str(self), offset, whence)
-        self._pos = res[0]
+        self._pos = int(res[0])
 
     def flush(self):
         pass

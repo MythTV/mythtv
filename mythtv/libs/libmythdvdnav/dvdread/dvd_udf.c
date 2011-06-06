@@ -37,13 +37,9 @@
 #include <unistd.h>
 #include <inttypes.h>
 
+#include "dvdread_internal.h"
 #include "dvdread/dvd_reader.h"
 #include "dvdread/dvd_udf.h"
-
-/* Private but located in/shared with dvd_reader.c */
-extern int UDFReadBlocksRaw( dvd_reader_t *device, uint32_t lb_number,
-                             size_t block_count, unsigned char *data,
-                             int encrypted );
 
 /* It's required to either fail or deliver all the blocks asked for. */
 static int DVDReadLBUDF( dvd_reader_t *device, uint32_t lb_number,

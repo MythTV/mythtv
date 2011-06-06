@@ -18,8 +18,9 @@ using namespace std;
 
 
 class AllMusic;
-class CoverArt;
+class AlbumArtImages;
 class PlaylistContainer;
+class MetaIO;
 
 enum ImageType
 {
@@ -31,28 +32,54 @@ enum ImageType
     IT_LAST
 };
 
-typedef struct AlbumArtImage
+class AlbumArtImage
 {
-    int       id;
-    QString   filename;
-    ImageType imageType;
-    QString   typeName;
-    QString   description;
-    bool      embedded;
-} AlbumArtImage;
+  public:
+    AlbumArtImage(void) :
+            id(0), filename(""), imageType(IT_UNKNOWN),
+            description(""), embedded(false) {}
+    AlbumArtImage(AlbumArtImage *image) :
+            id(image->id), filename(image->filename), imageType(image->imageType),
+            description(image->description), embedded(image->embedded) {}
+     int       id;
+     QString   filename;
+     ImageType imageType;
+     QString   description;
+     bool      embedded;
+};
+typedef QList<AlbumArtImage*> AlbumArtList;
 
 typedef QList<AlbumArtImage*> AlbumArtList;
 
 typedef QHash<QString,QString> MetadataMap;
 
+
+enum RepoType
+{
+    RT_Database = 0,
+    RT_CD       = 1,
+    RT_Radio    = 2
+};
+
+#define METADATA_BITS_FOR_REPO 8
+#define METADATA_REPO_SHIFT 24
+#define METADATA_REPO_MASK 0xff000000
+#define METADATA_ID_MASK 0x00ffffff
+
+#define ID_TO_ID(x) x & METADATA_ID_MASK;
+#define ID_TO_REPO(x)  x >> METADATA_REPO_SHIFT
+
 class Metadata
 {
   public:
+
+    typedef uint32_t IdType;
+
     Metadata(QString lfilename = "", QString lartist = "", QString lcompilation_artist = "",
              QString lalbum = "", QString ltitle = "", QString lgenre = "",
              int lyear = 0, int ltracknum = 0, int llength = 0, int lid = 0,
              int lrating = 0, int lplaycount = 0, QDateTime llastplay = QDateTime(),
-             bool lcompilation = false, QString lformat = "")
+             QDateTime ldateadded = QDateTime(), bool lcompilation = false, QString lformat = "")
                 : m_artist(lartist),
                    m_compilation_artist(lcompilation_artist),
                    m_album(lalbum),
@@ -71,9 +98,10 @@ class Metadata
                    m_albumid(-1),
                    m_genreid(-1),
                    m_lastplay(llastplay),
+                   m_dateadded(ldateadded),
                    m_playcount(lplaycount),
                    m_compilation(lcompilation),
-                   m_albumart(),
+                   m_albumArt(NULL),
                    m_id(lid),
                    m_filename(lfilename),
                    m_changed(false),
@@ -82,13 +110,15 @@ class Metadata
         checkEmptyFields();
     }
 
+    ~Metadata();
+
     Metadata(const Metadata &other)
     {
         *this = other;
          m_changed = false;
     }
 
-    Metadata& operator=(Metadata *rhs);
+    Metadata& operator=(const Metadata &other);
 
     QString Artist() const { return m_artist; }
     void setArtist(const QString &lartist)
@@ -142,8 +172,11 @@ class Metadata
     int Playcount() const { return m_playcount; }
     void setPlaycount(int lplaycount) { m_playcount = lplaycount; }
 
-    unsigned int ID() const { return m_id; }
-    void setID(int lid) { m_id = lid; }
+    IdType ID() const { return m_id; }
+    void setID(IdType lid) { m_id = lid; }
+    void setRepo(RepoType repo) { m_id = (m_id & METADATA_ID_MASK) | (repo << METADATA_REPO_SHIFT); }
+
+    bool isCDTrack(void) { return ID_TO_REPO(m_id) == RT_CD; }
 
     QString Filename() const { return m_filename; }
     void setFilename(const QString &lfilename) { m_filename = lfilename; }
@@ -175,7 +208,7 @@ class Metadata
     }
     bool determineIfCompilation(bool cd = false);
 
-    void setEmbeddedAlbumArt(const QList<struct AlbumArtImage> &art);
+    void setEmbeddedAlbumArt(AlbumArtList &albumart);
 
     bool isInDatabase(void);
     void dumpToDatabase(void);
@@ -193,17 +226,16 @@ class Metadata
     static QString GetStartdir() { return m_startdir; }
 
     static QStringList fillFieldList(QString field);
-    static Metadata *getMetadataFromID(int id);
-
-    // this looks for any image available - preferring a front cover if available
-    QImage getAlbumArt(void);
-    // this looks only for the given image type
-    QImage getAlbumArt(ImageType type);
 
     // this looks for any image available - preferring a front cover if available
     QString getAlbumArtFile(void);
     // this looks only for the given image type
     QString getAlbumArtFile(ImageType type);
+
+    AlbumArtImages *getAlbumArtImages(void);
+    void reloadAlbumArtImages(void);
+
+    MetaIO *getTagger(void);
 
   private:
     void setCompilationFormatting(bool cd = false);
@@ -228,15 +260,17 @@ class Metadata
     int m_albumid;
     int m_genreid;
     QDateTime m_lastplay;
+    QDateTime m_dateadded;
     int  m_playcount;
     bool m_compilation;
-    QList<struct AlbumArtImage> m_albumart;
 
-    unsigned int m_id;
-    QString m_filename;
-    bool    m_changed;
+    AlbumArtImages *m_albumArt;
 
-    bool    m_show;
+    IdType   m_id;
+    QString  m_filename;
+    bool     m_changed;
+
+    bool     m_show;
 
     static QString m_startdir;
 
@@ -366,6 +400,8 @@ class AllMusic
     void        resetListings(){m_last_listed = -1;}
     void        setAllVisible(bool visible);
 
+    MetadataPtrList *getAllMetadata(void) { return &m_all_music; }
+
   private:
 
     MetadataPtrList     m_all_music;
@@ -428,30 +464,33 @@ extern MPUBLIC MusicData *gMusicData;
 
 //----------------------------------------------------------------------------
 
+
 class AlbumArtImages
 {
   public:
     AlbumArtImages(Metadata *metadata);
     ~AlbumArtImages();
 
-    typedef vector<AlbumArtImage*> ImageList;
-
-    uint                     getImageCount() { return m_imageList.size(); }
-    AlbumArtImage           *getImage(ImageType type);
-    QString                  getTypeName(ImageType type);
-    QStringList              getImageFilenames(void) const;
-    ImageList               *getImageList(void) { return &m_imageList; }
-    AlbumArtImage           *getImageAt(uint index);
+    void           addImage(const AlbumArtImage &newImage);
+    uint           getImageCount() { return m_imageList.size(); }
+    AlbumArtImage *getImage(ImageType type);
+    QStringList    getImageFilenames(void) const;
+    AlbumArtList  *getImageList(void) { return &m_imageList; }
+    AlbumArtImage *getImageAt(uint index);
 
     bool saveImageType(const int id, ImageType type);
 
+    void dumpToDatabase(void);
+
     static ImageType guessImageType(const QString &filename);
+    static QString   getTypeName(ImageType type);
+    static QString   getTypeFilename(ImageType type);
 
   private:
     void findImages(void);
 
-    Metadata  *m_parent;
-    ImageList  m_imageList;
+    Metadata     *m_parent;
+    AlbumArtList  m_imageList;
 };
 
 Q_DECLARE_METATYPE(AlbumArtImage*);

@@ -138,13 +138,14 @@ class MTV_PUBLIC MythPlayer
     void SetDuration(int duration);
     void SetForcedAspectRatio(int mpeg2_aspect_value, int letterbox_permission);
     void SetVideoResize(const QRect &videoRect);
+    void EnableFrameRateMonitor(bool enable = false);
 
     // Gets
     QSize   GetVideoBufferSize(void) const    { return video_dim; }
     QSize   GetVideoSize(void) const          { return video_disp_dim; }
     float   GetVideoAspect(void) const        { return video_aspect; }
     float   GetFrameRate(void) const          { return video_frame_rate; }
-
+    void    GetPlaybackData(InfoMap &infoMap);
     bool    IsAudioNeeded(void) { return !using_null_videoout && player_ctx->IsAudioNeeded(); }
     uint    GetVolume(void) { return audio.GetVolume(); }
     int     GetSecondsBehind(void) const;

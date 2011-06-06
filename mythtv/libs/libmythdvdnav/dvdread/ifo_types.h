@@ -475,7 +475,8 @@ typedef struct {
  * Parental Management Information Unit Table.
  * Level 1 (US: G), ..., 7 (US: NC-17), 8
  */
-typedef uint16_t pf_level_t[8];
+#define PTL_MAIT_NUM_LEVEL 8
+typedef uint16_t pf_level_t[PTL_MAIT_NUM_LEVEL];
 
 /**
  * Parental Management Information Unit Table.
