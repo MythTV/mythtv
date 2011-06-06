@@ -1208,11 +1208,11 @@ void StatusBox::doMachineStatus()
     {
         // For a single-directory installation just display the totals
         if ((fsInfos.size() == 2) && (i == 0) &&
-            (fsInfos[i].directory != "TotalDiskSpace") &&
-            (fsInfos[i+1].directory == "TotalDiskSpace"))
+            (fsInfos[i].getPath() != "TotalDiskSpace") &&
+            (fsInfos[i+1].getPath() == "TotalDiskSpace"))
             i++;
 
-        hostnames = QString("\"%1\"").arg(fsInfos[i].hostname);
+        hostnames = QString("\"%1\"").arg(fsInfos[i].getHostname());
         hostnames.replace(' ', "");
         hostnames.replace(',', "\",\"");
 
@@ -1220,21 +1220,21 @@ void StatusBox::doMachineStatus()
 
         QStringList list;
         disk_usage_with_rec_time_kb(list,
-            fsInfos[i].totalSpaceKB, fsInfos[i].usedSpaceKB,
-            fsInfos[i].totalSpaceKB - fsInfos[i].usedSpaceKB,
+            fsInfos[i].getTotalSpace(), fsInfos[i].getUsedSpace(),
+            fsInfos[i].getTotalSpace() - fsInfos[i].getUsedSpace(),
             recordingProfilesBPS);
 
-        if (fsInfos[i].directory == "TotalDiskSpace")
+        if (fsInfos[i].getPath() == "TotalDiskSpace")
         {
             line = tr("Total Disk Space:");
             AddLogLine(line, QString("%1\n").arg(line));
         }
         else
         {
-            line = tr("MythTV Drive #%1:").arg(fsInfos[i].fsID);
+            line = tr("MythTV Drive #%1:").arg(fsInfos[i].getFSysID());
             AddLogLine(line, QString("%1\n").arg(line));
 
-            QStringList tokens = fsInfos[i].directory.split(',');
+            QStringList tokens = fsInfos[i].getPath().split(',');
 
             if (tokens.size() > 1)
             {
@@ -1247,7 +1247,7 @@ void StatusBox::doMachineStatus()
             else
             {
                 AddLogLine(QString("   " ) + tr("Directory:") + ' ' +
-                            fsInfos[i].directory);
+                            fsInfos[i].getPath());
             }
         }
 
