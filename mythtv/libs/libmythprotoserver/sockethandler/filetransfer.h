@@ -1,0 +1,64 @@
+#ifndef FILETRANSFER_H_
+#define FILETRANSFER_H_
+
+using namespace std;
+
+#include <QMutex>
+#include <QString>
+#include <QWaitCondition>
+
+#include <vector>
+
+#include "mythsocket.h"
+#include "sockethandler.h"
+
+class ProgramInfo;
+class RingBuffer;
+
+class FileTransfer : public SocketHandler
+{
+    Q_OBJECT
+
+    friend class QObject; // quiet OSX gcc warning
+
+  public:
+    FileTransfer(QString &filename, MythSocket *remote,
+                 MythSocketManager *parent,
+                 bool usereadahead, int timeout_ms);
+    FileTransfer(QString &filename, MythSocket *remote,
+                 MythSocketManager *parent, bool write);
+
+    bool isOpen(void);
+
+    void Stop(void);
+
+    void Pause(void);
+    void Unpause(void);
+    int RequestBlock(int size);
+    int WriteBlock(int size);
+
+    long long Seek(long long curpos, long long pos, int whence);
+
+    uint64_t GetFileSize(void);
+
+    void SetTimeout(bool fast);
+
+  private:
+   ~FileTransfer();
+
+    volatile bool  readthreadlive;
+    bool           readsLocked;
+    QWaitCondition readsUnlockedCond;
+
+    ProgramInfo *pginfo;
+    RingBuffer *rbuffer;
+    bool ateof;
+
+    vector<char> requestBuffer;
+
+    QMutex lock;
+
+    bool writemode;
+};
+
+#endif
