@@ -2493,86 +2493,91 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
     addLogging();
 
     add(QStringList( QStringList() << "-t" << "--createthumbnail" ),
-            "createthumbnail", "Create one or more thumbnails",
+            "createthumbnail", 
+	    "Create one or more thumbnails\n"
             "Requires: --infile, --thumblist, --outfile\n"
-            "Optional: --framecount");
+            "Optional: --framecount", "");
     add("--infile", "infile", ""
-            "Input file name",
+            "Input file name\n"
             "Used with: --createthumbnail, --getfileinfo, --isremote, "
-            "--sup2dast, --importarchive");
+            "--sup2dast, --importarchive", "");
     add("--outfile", "outfile", ""
-            "Output file name",
+            "Output file name\n"
             "Used with: --createthumbnail, --getfileinfo, --getdbparameters, "
             "--nativearchive\n"
             "When used with --createthumbnail: eg 'thumb%1-%2.jpg'\n"
             "  %1 will be replaced with the no. of the thumb\n"
-            "  %2 will be replaced with the frame no.");
+            "  %2 will be replaced with the frame no.", "");
     add("--thumblist", "thumblist", "", 
-            "Comma-separated list of required thumbs (in seconds)", 
-            "Used with: --createthumbnail");
+            "Comma-separated list of required thumbs (in seconds)\n" 
+            "Used with: --createthumbnail","");
     add("--framecount", "framecount", 1,
-            "Number of frames to grab (default 1)",
-            "Used with: --createthumbnail");
+            "Number of frames to grab (default 1)\n"
+            "Used with: --createthumbnail", "");
 
     add(QStringList( QStringList() << "-i" << "--getfileinfo" ),
-            "getfileinfo", "Write file info about infile to outfile",
-            "Requires: --infile, --outfile, --method");
+            "getfileinfo", "Write file info about infile to outfile\n"
+            "Requires: --infile, --outfile, --method", "");
     add("--method", "method", 0, 
-            "Method of file duration calculation", 
+            "Method of file duration calculation\n" 
             "Used with: --getfileinfo\n"
-            "  0 - use av_estimate_timings() (quick but not very accurate - "
+            "  0 = use av_estimate_timings() (quick but not very accurate - "
             "default)\n"
-            "  1 - read all frames (most accurate but slow)\n"
-            "  2 - use position map in DB (quick, only works for MythTV "
-            "recordings)");
+            "  1 = read all frames (most accurate but slow)\n"
+            "  2 = use position map in DB (quick, only works for MythTV "
+            "recordings)", "");
 
     add(QStringList( QStringList() << "-p" << "--getdbparameters" ),
-            "getdbparameters", "Write the mysql database parameters to outfile",
-            "Requires: --outfile");
+            "getdbparameters", 
+            "Write the mysql database parameters to outfile\n"
+            "Requires: --outfile", "");
 
     add(QStringList( QStringList() << "-n" << "--nativearchive" ),
-            "nativearchive", "Archive files to a native archive format",
-            "Requires: --outfile");
+            "nativearchive", 
+            "Archive files to a native archive format\n"
+            "Requires: --outfile", "");
 
     add(QStringList( QStringList() << "-f" << "--importarchive" ),
-            "importarchive", "Import an archived file",
-            "Requires: --infile, --chanid");
+            "importarchive", 
+            "Import an archived file\n"
+            "Requires: --infile, --chanid", "");
     add("--chanid", "chanid", -1, 
-            "Channel ID to use when inserting records in DB", 
-            "Used with: --importarchive");
+            "Channel ID to use when inserting records in DB\n" 
+            "Used with: --importarchive", "");
 
     add(QStringList( QStringList() << "-r" << "--isremote" ),
-            "isremote", "Check if infile is on a remote filesystem",
+            "isremote", "Check if infile is on a remote filesystem\n"
             "Requires: --infile\n"
             "Returns:   0 on error or file not found\n"
             "         - 1 file is on a local filesystem\n"
-            "         - 2 file is on a remote filesystem");
+            "         - 2 file is on a remote filesystem", "");
 
     add(QStringList( QStringList() << "-b" << "--burndvd" ),
-            "burndvd", "Burn a created DVD to a blank disc",
-            "Optional: --mediatype, --erasedvdrw, --nativeformat");
+            "burndvd", "Burn a created DVD to a blank disc\n"
+            "Optional: --mediatype, --erasedvdrw, --nativeformat", "");
     add("--mediatype", "mediatype", 0, 
-            "Type of media to burn", 
+            "Type of media to burn\n" 
             "Used with: --burndvd\n"
-            " 0 = single layer DVD (default)\n"
-            " 1 = dual layer DVD\n"
-            " 2 = rewritable DVD" );
+            "  0 = single layer DVD (default)\n"
+            "  1 = dual layer DVD\n"
+            "  2 = rewritable DVD", "");
     add("--erasedvdrw", "erasedvdrw",  
-            "Force an erase of DVD-R/W Media", 
-            "Used with: --burndvd (optional)");
+            "Force an erase of DVD-R/W Media\n" 
+            "Used with: --burndvd (optional)", "");
     add("--nativeformat", "nativeformat", 
-            "Archive is a native archive format", 
-            "Used with: --burndvd (optional)");
+            "Archive is a native archive format\n" 
+            "Used with: --burndvd (optional)", "");
 
     add(QStringList( QStringList() << "-s" << "--sup2dast" ),
-            "sup2dast", "Convert projectX subtitles to DVD subtitles",
-            "Requires: --infile, --ifofile, --delay");
+            "sup2dast", 
+            "Convert projectX subtitles to DVD subtitles\n"
+            "Requires: --infile, --ifofile, --delay", "");
     add("--ifofile", "ifofile", ""
-            "Filename of ifo file",
-            "Used with: --sup2dast");
+            "Filename of ifo file\n"
+            "Used with: --sup2dast", "");
     add("--delay", "delay", 0, 
-            "Delay to add to subtitles (default 0ms)", 
-            "Used with: --sup2dast");
+            "Delay in ms to add to subtitles (default 0)\n" 
+            "Used with: --sup2dast", "");
 }
 
 
@@ -2633,16 +2638,16 @@ int main(int argc, char **argv)
             .arg("mytharchivehelper").arg(MYTH_SOURCE_PATH)
             .arg(MYTH_SOURCE_VERSION));
 
+    QString logfile = cmdline.GetLogFilePath();
+    logStart(logfile, quiet, facility, dblog);
+
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
-        cout << "mytharchivehelper: Could not initialize MythContext. "
-                "Exiting." << endl;
+        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        delete gContext;
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
-
-    QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet, facility, dblog);
 
     int res = 0;
     bool bGrabThumbnail   = cmdline.toBool("createthumbnail");
