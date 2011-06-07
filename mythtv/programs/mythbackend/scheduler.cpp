@@ -38,6 +38,7 @@ using namespace std;
 #include "compat.h"
 #include "storagegroup.h"
 #include "recordinginfo.h"
+#include "recordingrule.h"
 #include "scheduledrecording.h"
 #include "cardutil.h"
 #include "mythdb.h"
@@ -3227,8 +3228,9 @@ void Scheduler::UpdateMatches(int recordid) {
 
     QString filterClause;
     query.prepare("SELECT filterid, clause FROM recordfilter "
-                  "WHERE filterid >= 0 AND filterid < 12 AND "
+                  "WHERE filterid >= 0 AND filterid < :NUMFILTERS AND "
                   "      TRIM(clause) <> ''");
+    query.bindValue(":NUMFILTERS", RecordingRule::kNumFilters);
     if (!query.exec())
     {
         MythDB::DBError("UpdateMatches", query);
