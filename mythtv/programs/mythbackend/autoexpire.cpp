@@ -11,7 +11,6 @@
 
 // POSIX headers
 #include <unistd.h>
-#include <signal.h>
 
 // C headers
 #include <cstdlib>

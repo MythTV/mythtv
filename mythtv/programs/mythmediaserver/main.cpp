@@ -44,8 +44,6 @@ static void cleanup(void)
         unlink(pidfile.toAscii().constData());
         pidfile.clear();
     }
-
-    signal(SIGHUP, SIG_DFL);
 }
 
 namespace

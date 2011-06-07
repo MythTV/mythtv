@@ -170,7 +170,6 @@ namespace
         gContext = NULL;
 
 #ifndef _MSC_VER
-        signal(SIGHUP, SIG_DFL);
         signal(SIGUSR1, SIG_DFL);
 #endif
     }

@@ -253,7 +253,6 @@ bool setup_context(MythBackendCommandLineParser &cmdline)
 void cleanup(void)
 {
     signal(SIGTERM, SIG_DFL);
-    signal(SIGHUP,  SIG_DFL);
 #ifndef _MSC_VER
     signal(SIGUSR1, SIG_DFL);
 #endif
