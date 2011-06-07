@@ -42,6 +42,7 @@
 
 typedef struct {
     uint16_t enabled_button;  /* enabled button id */
+    uint16_t x, y, w, h;      /* button rect on overlay plane (if drawn) */
 } BOG_DATA;
 
 struct graphics_controller_s {
@@ -261,28 +262,44 @@ static void _reset_page_state(GRAPHICS_CONTROLLER *gc)
     }
 }
 
-static void _clear_osd(GRAPHICS_CONTROLLER *gc, int plane)
+static void _clear_osd_area(GRAPHICS_CONTROLLER *gc, int plane,
+                            uint16_t x, uint16_t y, uint16_t w, uint16_t h)
 {
     if (gc->overlay_proc) {
         /* clear plane */
         const BD_OVERLAY ov = {
             .pts     = -1,
             .plane   = plane,
-            .x       = 0,
-            .y       = 0,
-            .w       = 1920,
-            .h       = 1080,
+            .x       = x,
+            .y       = y,
+            .w       = w,
+            .h       = h,
             .palette = NULL,
             .img     = NULL,
         };
 
         gc->overlay_proc(gc->overlay_proc_handle, &ov);
     }
+}
+
+static void _clear_osd(GRAPHICS_CONTROLLER *gc, int plane)
+{
+    _clear_osd_area(gc, plane, 0, 0, 1920, 1080);
 
     if (plane) {
         gc->ig_drawn      = 0;
     } else {
         gc->pg_drawn      = 0;
+    }
+}
+
+static void _clear_bog_area(GRAPHICS_CONTROLLER *gc, BOG_DATA *bog_data)
+{
+    if (gc->ig_drawn && bog_data->w && bog_data->h) {
+
+        _clear_osd_area(gc, 1, bog_data->x, bog_data->y, bog_data->w, bog_data->h);
+
+        bog_data->x = bog_data->y = bog_data->w = bog_data->h = 0;
     }
 }
 
@@ -401,7 +418,7 @@ void gc_decode_ts(GRAPHICS_CONTROLLER *gc, uint16_t pid, uint8_t *block, unsigne
  */
 
 static void _render_button(GRAPHICS_CONTROLLER *gc, BD_IG_BUTTON *button, BD_PG_PALETTE *palette,
-                           int state)
+                           int state, BOG_DATA *bog_data)
 {
     BD_PG_OBJECT *object    = NULL;
     BD_OVERLAY    ov;
@@ -409,16 +426,19 @@ static void _render_button(GRAPHICS_CONTROLLER *gc, BD_IG_BUTTON *button, BD_PG_
     object = _find_object_for_button(gc->igs, button, state);
     if (!object) {
         GC_TRACE("_render_button(#%d): object (state %d) not found\n", button->id, state);
+
+        _clear_bog_area(gc, bog_data);
+
         return;
     }
 
     ov.pts   = -1;
     ov.plane = 1; /* IG */
 
-    ov.x = button->x_pos;
-    ov.y = button->y_pos;
-    ov.w = object->width;
-    ov.h = object->height;
+    ov.x = bog_data->x = button->x_pos;
+    ov.y = bog_data->y = button->y_pos;
+    ov.w = bog_data->w = object->width;
+    ov.h = bog_data->h = object->height;
 
     ov.img     = object->img;
     ov.palette = palette->entry;
@@ -476,11 +496,11 @@ static void _render_page(GRAPHICS_CONTROLLER *gc,
             GC_TRACE("_render_page(): bog %d: button %d not found\n", ii, valid_id);
 
         } else if (button->id == activated_button_id) {
-            _render_button(gc, button, palette, BTN_ACTIVATED);
+            _render_button(gc, button, palette, BTN_ACTIVATED, &gc->bog_data[ii]);
 
         } else if (button->id == selected_button_id) {
 
-            _render_button(gc, button, palette, BTN_SELECTED);
+            _render_button(gc, button, palette, BTN_SELECTED, &gc->bog_data[ii]);
 
             bd_psr_write(gc->regs, PSR_SELECTED_BUTTON_ID, selected_button_id);
 
@@ -490,7 +510,7 @@ static void _render_page(GRAPHICS_CONTROLLER *gc,
             }
 
         } else {
-            _render_button(gc, button, palette, BTN_NORMAL);
+            _render_button(gc, button, palette, BTN_NORMAL, &gc->bog_data[ii]);
 
         }
     }
