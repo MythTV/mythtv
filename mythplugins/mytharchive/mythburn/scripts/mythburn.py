@@ -326,7 +326,7 @@ def getMysqlDBParameters():
 
     f = tempfile.NamedTemporaryFile();
     result = os.spawnlp(os.P_WAIT, 'mytharchivehelper','mytharchivehelper',
-                        '-p', f.name)
+                        '--getdbparameters', '--outfile', f.name)
     if result <> 0:
         write("Failed to run mytharchivehelper to get mysql database parameters! "
               "Exit code: %d" % result)
@@ -1929,7 +1929,7 @@ def multiplexMPEGStream(video, audio1, audio2, destination, syncOffset):
 def getStreamInformation(filename, xmlFilename, lenMethod):
     """create a stream.xml file for filename"""
     filename = quoteFilename(filename)
-    command = "mytharchivehelper -i %s %s %d" % (filename, xmlFilename, lenMethod)
+    command = "mytharchivehelper --getfileinfo --infile %s --outfile %s --method %d" % (filename, xmlFilename, lenMethod)
 
     result = runCommand(command)
 
@@ -2081,7 +2081,7 @@ def runProjectX(chanid, starttime, folder, usecutlist, file):
             os.path.exists(os.path.join(folder, "stream.sup.IFO"))):
             write("Found DVB subtitles converting to DVD subtitles")
             command = "mytharchivehelper --sup2dast "
-            command += " %s %s 0" % (os.path.join(folder, "stream.sup"), os.path.join(folder, "stream.sup.IFO"))
+            command += " --infile %s --ifofile %s --delay 0" % (os.path.join(folder, "stream.sup"), os.path.join(folder, "stream.sup.IFO"))
 
             result = runCommand(command)
 
@@ -2289,7 +2289,7 @@ def extractVideoFrame(source, destination, seconds):
 
         source = quoteFilename(source)
 
-        command = "mytharchivehelper -t  %s '%s' %s" % (source, seconds, destination)
+        command = "mytharchivehelper --createthumbnail --infile %s --thumblist '%s' --outfile %s" % (source, seconds, destination)
         result = runCommand(command)
         if result <> 0:
             fatalError("Failed while running mytharchivehelper to get thumbnails.\n"
@@ -2314,7 +2314,7 @@ def extractVideoFrames(source, destination, thumbList):
 
     source = quoteFilename(source)
 
-    command = "mytharchivehelper -v important -t %s '%s' %s" % (source, thumbList, destination)
+    command = "mytharchivehelper -v important --createthumbnail --infile %s --thumblist '%s' --outfile %s" % (source, thumbList, destination)
     result = runCommand(command)
     if result <> 0:
         fatalError("Failed while running mytharchivehelper to get thumbnails")
@@ -3501,7 +3501,7 @@ def generateVideoPreview(videoitem, itemonthispage, menuitem, starttime, menulen
                 height = getScaledAttribute(node, "h")
                 frames = int(secondsToFrames(menulength))
 
-                command = "mytharchivehelper -t  %s '%s' '%s' %d" % (inputfile, starttime, outputfile, frames)
+                command = "mytharchivehelper --createthumbnail --infile  %s --thumblist '%s' --outfile '%s' --framecount %d" % (inputfile, starttime, outputfile, frames)
                 result = runCommand(command)
                 if (result != 0):
                     write( "mytharchivehelper failed with code %d. Command = %s" % (result, command) )
@@ -5091,7 +5091,7 @@ def copyRemote(files, tmpPath):
         tmpfile = node.attributes["filename"].value
         filename = os.path.basename(tmpfile)
 
-        res = runCommand("mytharchivehelper -r " + quoteFilename(tmpfile))
+        res = runCommand("mytharchivehelper --isremote --infile " + quoteFilename(tmpfile))
         if res == 2:
             # file is on a remote filesystem so copy it to a local file
             write("Copying file from " + tmpfile)
