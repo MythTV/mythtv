@@ -4408,7 +4408,7 @@ void MainServer::GetFilesystemInfos(QList<FileSystemInfo> &fsInfos)
     size_t maxWriteFiveSec = GetCurrentMaxBitrate()/12  /*5 seconds*/;
     maxWriteFiveSec = max((size_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
 
-    FileSystemInfo::Consolidate(fsInfos, true, maxWriteFiveSec);
+    FileSystemInfo::Consolidate(fsInfos, false, maxWriteFiveSec);
 
     QList<FileSystemInfo>::iterator it1;
     if (VERBOSE_LEVEL_CHECK(VB_FILE|VB_SCHEDULE))
