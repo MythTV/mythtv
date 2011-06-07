@@ -27,6 +27,7 @@
 #if HAVE_GETTIMEOFDAY
 #include <sys/time.h>
 #endif
+#include <signal.h>
 
 QMutex                  loggerListMutex;
 QList<LoggerBase *>     loggerList;
@@ -49,6 +50,7 @@ LogLevel_t LogLevel = LOG_UNKNOWN;  /**< The log level mask to apply, messages
 
 char *getThreadName( LoggingItem_t *item );
 void deleteItem( LoggingItem_t *item );
+void logSighup( int signum, siginfo_t *info, void *secret );
 
 LoggerBase::LoggerBase(char *string, int number)
 {
@@ -117,6 +119,21 @@ FileLogger::~FileLogger()
             LogPrint( VB_IMPORTANT, LOG_INFO,
                       "Removed logging to the console" );
     }
+}
+
+void FileLogger::reopen(void)
+{
+    char *filename = m_handle.string;
+
+    // Skip console
+    if( !strcmp(filename, "-") )
+        return;
+
+    close(m_fd);
+
+    m_fd = open(filename, O_WRONLY|O_CREAT|O_APPEND, 0664);
+    m_opened = (m_fd != -1);
+    LogPrint( VB_IMPORTANT, LOG_INFO, "Rolled logging on %s", filename );
 }
 
 bool FileLogger::logmsg(LoggingItem_t *item)
@@ -572,39 +589,70 @@ void LogPrintLine( uint32_t mask, LogLevel_t level, const char *file, int line,
     logQueue.enqueue(item);
 }
 
+void logSighup( int signum, siginfo_t *info, void *secret )
+{
+    VERBOSE(VB_GENERAL, "SIGHUP received, rolling log files.");
+
+    /* SIGHUP was sent.  Close and reopen debug logfiles */
+    QMutexLocker locker(&loggerListMutex);
+
+    QList<LoggerBase *>::iterator it;
+    for(it = loggerList.begin(); it != loggerList.end(); it++)
+    {
+        (*it)->reopen();
+    }
+}
+
+
 void logStart(QString logfile, int quiet, int facility, bool dblog)
 {
     LoggerBase *logger;
+    struct sigaction sa;
 
-    if (!logThread.isRunning())
-    {
-        /* log to the console */
-        if( !quiet )
-            logger = new FileLogger((char *)"-");
+    if (logThread.isRunning())
+        return;
 
-        /* Debug logfile */
-        if( !logfile.isEmpty() )
-            logger = new FileLogger((char *)logfile.toLocal8Bit().constData());
+    /* log to the console */
+    if( !quiet )
+        logger = new FileLogger((char *)"-");
 
-        /* Syslog */
-        if( facility < 0 )
-            LogPrint(VB_IMPORTANT, LOG_CRIT, 
-                     "Syslogging facility unknown, disabling syslog output");
-        else if( facility > 0 )
-            logger = new SyslogLogger(facility);
+    /* Debug logfile */
+    if( !logfile.isEmpty() ) 
+        logger = new FileLogger((char *)logfile.toLocal8Bit().constData());
 
-        /* Database */
-        if( dblog )
-            logger = new DatabaseLogger((char *)"logging");
+    /* Syslog */
+    if( facility < 0 )
+        LogPrint(VB_IMPORTANT, LOG_CRIT, 
+                 "Syslogging facility unknown, disabling syslog output");
+    else if( facility > 0 )
+        logger = new SyslogLogger(facility);
 
-        logThread.start();
-    }
+    /* Database */
+    if( dblog )
+        logger = new DatabaseLogger((char *)"logging");
+
+    /* Setup SIGHUP */
+    LogPrint(VB_IMPORTANT, LOG_CRIT, "Setting up SIGHUP handler");
+    sa.sa_sigaction = logSighup;
+    sigemptyset( &sa.sa_mask );
+    sa.sa_flags = SA_RESTART | SA_SIGINFO;
+    sigaction( SIGHUP, &sa, NULL );
+
+    logThread.start();
 }
 
 void logStop(void)
 {
+    struct sigaction sa;
+
     logThread.stop();
     logThread.wait();
+
+    /* Tear down SIGHUP */
+    sa.sa_handler = SIG_DFL;
+    sigemptyset( &sa.sa_mask );
+    sa.sa_flags = SA_RESTART;
+    sigaction( SIGHUP, &sa, NULL );
 
     QMutexLocker locker(&loggerListMutex);
     QList<LoggerBase *>::iterator it;

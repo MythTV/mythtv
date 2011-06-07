@@ -107,6 +107,7 @@ class LoggerBase : public QObject {
         LoggerBase(char *string, int number);
         ~LoggerBase();
         virtual bool logmsg(LoggingItem_t *item) = 0;
+        virtual void reopen(void) = 0;
     protected:
         LoggerHandle_t m_handle;
         bool m_string;
@@ -117,6 +118,7 @@ class FileLogger : public LoggerBase {
         FileLogger(char *filename);
         ~FileLogger();
         bool logmsg(LoggingItem_t *item);
+        void reopen(void);
     private:
         bool m_opened;
         int  m_fd;
@@ -127,6 +129,7 @@ class SyslogLogger : public LoggerBase {
         SyslogLogger(int facility);
         ~SyslogLogger();
         bool logmsg(LoggingItem_t *item);
+        void reopen(void) { };
     private:
         char *m_application;
         bool m_opened;
@@ -140,6 +143,7 @@ class DatabaseLogger : public LoggerBase {
         DatabaseLogger(char *table);
         ~DatabaseLogger();
         bool logmsg(LoggingItem_t *item);
+        void reopen(void) { };
     protected:
         bool logqmsg(LoggingItem_t *item);
     private:
