@@ -21,67 +21,94 @@ using namespace std;
 #include <mythconfig.h>
 #include <netgrabbermanager.h>
 #include <mythrssmanager.h>
+#include <mythcommandlineparser.h>
+#include <mythlogging.h>
 
 GrabberDownloadThread *gdt = 0;
 RSSManager *rssMan = 0;
 
+class MPUBLIC MythFillNVCommandLineParser : public MythCommandLineParser
+{
+  public:
+    MythFillNVCommandLineParser(); 
+    void LoadArguments(void);
+};
+
+MythFillNVCommandLineParser::MythFillNVCommandLineParser() :
+    MythCommandLineParser("mythfillnetvision")
+{ LoadArguments(); }
+
+void MythFillNVCommandLineParser::LoadArguments(void)
+{
+    addHelp();
+    addVersion();
+    addVerbose();
+    addLogging();
+
+    add("--refresh-all", "refresh-all", false,
+            "Refresh ALL configured and installed tree grabbers", "");
+    add("--refresh-rss", "refresh-rss", false,
+            "Refresh RSS feeds only", "");
+    add("--refresh-tree", "refresh-tree", false,
+            "Refresh trees only", "");
+}
+
+
+
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
-    int argpos = 1;
-    bool refreshall = false;
-    bool refreshrss = true;
-    bool refreshtree = true;
-
-    myth_nice(19);
-
-    while (argpos < a.argc())
+    MythFillNVCommandLineParser cmdline;
+    if (!cmdline.Parse(argc, argv))
     {
-        // The manual and update flags should be mutually exclusive.
-        if (!strcmp(a.argv()[argpos], "--refresh-all"))
-        {
-            cout << "###\n";
-            cout << "### Refreshing ALL configured and installed tree grabbers.\n";
-            cout << "###\n";
-            refreshall = true;
-        }
-        else if (!strcmp(a.argv()[argpos], "--refresh-rss"))
-        {
-            cout << "###\n";
-            cout << "### Refreshing RSS Only.\n";
-            cout << "###\n";
-            refreshtree = false;
-        }
-        else if (!strcmp(a.argv()[argpos], "--refresh-tree"))
-        {
-            cout << "###\n";
-            cout << "### Refreshing Trees Only.\n";
-            cout << "###\n";
-            refreshrss = false;
-        }
-        else if (!strcmp(a.argv()[argpos], "-h") ||
-                 !strcmp(a.argv()[argpos], "--help"))
-        {
-            cout << "usage:\n";
-            cout << "--refresh-all\n";
-            cout << "   Refresh all tree views and RSS feeds, regardless of whether they need it.\n";
-            cout << "--refresh-rss\n";
-            cout << "   Refresh RSS feeds only.\n";
-            cout << "--refresh-tree\n";
-            cout << "   Refresh Tree views only.\n";
-            cout << "\n";
-            cout << "Run with no options to only update trees which need update.\n";
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
-        else
-        {
-            fprintf(stderr, "illegal option: '%s' (use --help)\n",
-                    a.argv()[argpos]);
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
-
-        ++argpos;
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_INVALID_CMDLINE;
     }
+
+    if (cmdline.toBool("showversion"))
+    {
+        cmdline.PrintVersion();
+        return GENERIC_EXIT_OK;
+    }
+
+    if (cmdline.toBool("showhelp"))
+    {
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_OK;
+    }
+
+    QCoreApplication a(argc, argv);
+
+    QCoreApplication::setApplicationName("mythfillnetvision");
+
+    if (cmdline.toBool("verbose"))
+        if (parse_verbose_arg(cmdline.toString("verbose")) ==
+                    GENERIC_EXIT_INVALID_CMDLINE)
+            return GENERIC_EXIT_INVALID_CMDLINE;
+
+    int quiet;
+    if (cmdline.toBool("quiet"))
+    {
+        quiet = cmdline.toUInt("quiet");
+        if (quiet > 1)
+        {
+            print_verbose_messages = VB_NONE;
+            parse_verbose_arg("none");
+        }
+    }
+
+    int facility = cmdline.GetSyslogFacility();
+    bool dblog = !cmdline.toBool("nodblog");
+
+    ///////////////////////////////////////////////////////////////////////
+    // Don't listen to console input
+    close(0);
+
+    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
+            .arg("mythfillnetvision").arg(MYTH_SOURCE_PATH)
+            .arg(MYTH_SOURCE_VERSION));
+
+    QString logfile = cmdline.GetLogFilePath();
+    logStart(logfile, quiet, facility, dblog);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
@@ -90,6 +117,33 @@ int main(int argc, char *argv[])
         delete gContext;
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
+
+    bool refreshall  = cmdline.toBool("refresh-all");
+    bool refreshrss  = cmdline.toBool("refresh-rss");
+    bool refreshtree = cmdline.toBool("refresh-tree");
+
+    if (refreshall && (refreshrss || refreshtree))
+    {
+        VERBOSE(VB_IMPORTANT, "--refresh-all must not be accompanied by "
+                              "--refresh-rss or --refresh-tree");
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+
+    if (refreshrss && refreshtree)
+    {
+        VERBOSE(VB_IMPORTANT, "--refresh-rss and --refresh-tree are mutually "
+                              "exclusive options");
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+
+    if (!refreshall && !refreshrss && !refreshtree)
+    {
+        // Default is to do rss & tree, but not all
+        refreshtree = true;
+        refreshrss  = true;
+    }
+
+    myth_nice(19);
 
     MythTranslation::load("mythfrontend");
 
