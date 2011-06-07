@@ -31,6 +31,8 @@ INCLUDEPATH += ../../external/FFmpeg ../.. ../ ./
 DEPENDPATH += ../ ../libmythbase ../libmythtv ../libmyth ../libmythui
 
 LIBS += -L../libmythbase -L../libmyth -L../libmythtv -L../libmythui
+LIBS += -lmythbase-$$LIBVERSION -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION
+LIBS += -lmythtv-$$LIBVERSION
 LIBS += $$EXTRA_LIBS $$LATE_LIBS $$QMAKE_LIBS_DYNLOAD
 
 inc.path = $${PREFIX}/include/mythtv/protoserver
