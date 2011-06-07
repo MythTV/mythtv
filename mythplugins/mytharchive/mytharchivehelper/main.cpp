@@ -51,6 +51,7 @@ using namespace std;
 #include <QMutexLocker>
 
 // MythTV headers
+#include <mythcommandlineparser.h>
 #include <mythcontext.h>
 #include <mythcoreutil.h>
 #include <mythversion.h>
@@ -61,6 +62,8 @@ using namespace std;
 #include <mythconfig.h>
 #include <mythsystem.h>
 #include <util.h>
+#include <mythverbose.h>
+#include <mythlogging.h>
 
 extern "C" {
 #include <avcodec.h>
@@ -2471,66 +2474,164 @@ static int isRemote(QString filename)
     return 1;
 }
 
-static void showUsage()
+class MPUBLIC MythArchiveHelperCommandLineParser : public MythCommandLineParser
 {
-    cout << "Usage of mytharchivehelper\n";
-    cout << "-t/--createthumbnail infile thumblist outfile framecount\n";
-    cout << "       (create one or more thumbnails)\n";
-    cout << "       infile     - filename of recording to grab thumbs from\n";
-    cout << "       thumblist  - comma separated list of required thumbs in seconds\n";
-    cout << "       outfile    - name of file to save thumbs to eg 'thumb%1-%2.jpg'\n";
-    cout << "                    %1 will be replaced with the no. of the thumb\n";
-    cout << "                    %2 will be replaced with the frame no.\n";
-    cout << "       framecount - no of frames to grab\n\n";
-    cout << "-i/--getfileinfo infile outfile method\n";
-    cout << "       (write some file information to outfile for infile)\n";
-    cout << "       method is the method to used to calc the file duration\n";
-    cout << "       0 - use av_estimate_timings() (quick but not very accurate)\n";
-    cout << "       1 - read all frames (most accurate but slow)\n";
-    cout << "       2 - use position map in DB (quick, only works for MythTV recordings)\n\n";
-    cout << "-p/--getdbparameters outfile\n";
-    cout << "       (write the mysql database parameters to outfile)\n\n";
-    cout << "-n/--nativearchive jobfile \n";
-    cout << "       (archive files to a native archive format)\n";
-    cout << "       jobfile    - filename of archive job file\n\n";
-    cout << "-f/--importarchive xmlfile chanID\n";
-    cout << "       (import an archived file)\n";
-    cout << "       xmlfile    - filename of the archive xml file\n";
-    cout << "       chanID     - chanID to use when inserting records in DB\n\n";
-    cout << "-r/--isremote file\n";
-    cout << "       (check if file is on a remote filesystem)\n";
-    cout << "       file       - filename to check\n";
-    cout << "       returns    - 0 on error or file not found\n";
-    cout << "                  - 1 file is on a local filesystem\n";
-    cout << "                  - 2 file is on a remote filesystem\n\n";
-    cout << "-b/--burndvd mediatype erasedvdrw format\n";
-    cout << "       (burn a created dvd to a blank disk)\n";
-    cout << "       mediatype  - 0 = single layer DVD\n";
-    cout << "                    1 = dual layer DVD\n";
-    cout << "                    2 = rewritable DVD\n";
-    cout << "       erasedvdrw - 0 = don't erase\n";
-    cout << "                    1 = force erase\n";
-    cout << "       native     - 0 = not a native archive\n";
-    cout << "                    1 = is a native archive\n\n";
-    cout << "-s/--sup2dast supfile ifofile delay\n";
-    cout << "       (convert projectX subtitles to dvd subtitles)\n";
-    cout << "       supfile    - input sup file\n";
-    cout << "       ifofile    - input sup file\n";
-    cout << "       delay      - delay to add to subtitles (default is 0ms)\n\n";
-    cout << "-l/--log logfile\n";
-    cout << "       (name of log file to send messages)\n\n";
-    cout << "-v/--verbose debug-level\n";
-    cout << "       (Use '-v help' for level info)\n\n";
-    cout << "-h/--help\n";
-    cout << "       (shows this usage)\n";
+  public:
+    MythArchiveHelperCommandLineParser(); 
+    void LoadArguments(void);
+};
+
+MythArchiveHelperCommandLineParser::MythArchiveHelperCommandLineParser() :
+    MythCommandLineParser("mytharchivehelper")
+{ LoadArguments(); }
+
+void MythArchiveHelperCommandLineParser::LoadArguments(void)
+{
+    addHelp();
+    addVersion();
+    addVerbose();
+    addLogging();
+
+    add(QStringList( QStringList() << "-t" << "--createthumbnail" ),
+            "createthumbnail", "Create one or more thumbnails",
+            "Requires: --infile, --thumblist, --outfile\n"
+            "Optional: --framecount");
+    add("--infile", "infile", ""
+            "Input file name",
+            "Used with: --createthumbnail, --getfileinfo, --isremote, "
+            "--sup2dast, --importarchive");
+    add("--outfile", "outfile", ""
+            "Output file name",
+            "Used with: --createthumbnail, --getfileinfo, --getdbparameters, "
+            "--nativearchive\n"
+            "When used with --createthumbnail: eg 'thumb%1-%2.jpg'\n"
+            "  %1 will be replaced with the no. of the thumb\n"
+            "  %2 will be replaced with the frame no.");
+    add("--thumblist", "thumblist", "", 
+            "Comma-separated list of required thumbs (in seconds)", 
+            "Used with: --createthumbnail");
+    add("--framecount", "framecount", 1,
+            "Number of frames to grab (default 1)",
+            "Used with: --createthumbnail");
+
+    add(QStringList( QStringList() << "-i" << "--getfileinfo" ),
+            "getfileinfo", "Write file info about infile to outfile",
+            "Requires: --infile, --outfile, --method");
+    add("--method", "method", 0, 
+            "Method of file duration calculation", 
+            "Used with: --getfileinfo\n"
+            "  0 - use av_estimate_timings() (quick but not very accurate - "
+            "default)\n"
+            "  1 - read all frames (most accurate but slow)\n"
+            "  2 - use position map in DB (quick, only works for MythTV "
+            "recordings)");
+
+    add(QStringList( QStringList() << "-p" << "--getdbparameters" ),
+            "getdbparameters", "Write the mysql database parameters to outfile",
+            "Requires: --outfile");
+
+    add(QStringList( QStringList() << "-n" << "--nativearchive" ),
+            "nativearchive", "Archive files to a native archive format",
+            "Requires: --outfile");
+
+    add(QStringList( QStringList() << "-f" << "--importarchive" ),
+            "importarchive", "Import an archived file",
+            "Requires: --infile, --chanid");
+    add("--chanid", "chanid", -1, 
+            "Channel ID to use when inserting records in DB", 
+            "Used with: --importarchive");
+
+    add(QStringList( QStringList() << "-r" << "--isremote" ),
+            "isremote", "Check if infile is on a remote filesystem",
+            "Requires: --infile\n"
+            "Returns:   0 on error or file not found\n"
+            "         - 1 file is on a local filesystem\n"
+            "         - 2 file is on a remote filesystem");
+
+    add(QStringList( QStringList() << "-b" << "--burndvd" ),
+            "burndvd", "Burn a created DVD to a blank disc",
+            "Optional: --mediatype, --erasedvdrw, --nativeformat");
+    add("--mediatype", "mediatype", 0, 
+            "Type of media to burn", 
+            "Used with: --burndvd\n"
+            " 0 = single layer DVD (default)\n"
+            " 1 = dual layer DVD\n"
+            " 2 = rewritable DVD" );
+    add("--erasedvdrw", "erasedvdrw",  
+            "Force an erase of DVD-R/W Media", 
+            "Used with: --burndvd (optional)");
+    add("--nativeformat", "nativeformat", 
+            "Archive is a native archive format", 
+            "Used with: --burndvd (optional)");
+
+    add(QStringList( QStringList() << "-s" << "--sup2dast" ),
+            "sup2dast", "Convert projectX subtitles to DVD subtitles",
+            "Requires: --infile, --ifofile, --delay");
+    add("--ifofile", "ifofile", ""
+            "Filename of ifo file",
+            "Used with: --sup2dast");
+    add("--delay", "delay", 0, 
+            "Delay to add to subtitles (default 0ms)", 
+            "Used with: --sup2dast");
 }
+
+
 
 int main(int argc, char **argv)
 {
+    int quiet = 0;
+
     // by default we only output our messages
     print_verbose_messages = VB_JOBQUEUE;
 
-    QApplication a(argc, argv, false);
+    MythArchiveHelperCommandLineParser cmdline;
+    if (!cmdline.Parse(argc, argv))
+    {
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+
+    if (cmdline.toBool("showversion"))
+    {
+        cmdline.PrintVersion();
+        return GENERIC_EXIT_OK;
+    }
+
+    if (cmdline.toBool("showhelp"))
+    {
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_OK;
+    }
+
+    QCoreApplication a(argc, argv);
+
+    QCoreApplication::setApplicationName("mytharchivehelper");
+
+    if (cmdline.toBool("verbose"))
+        if (parse_verbose_arg(cmdline.toString("verbose")) ==
+                    GENERIC_EXIT_INVALID_CMDLINE)
+            return GENERIC_EXIT_INVALID_CMDLINE;
+
+    if (cmdline.toBool("quiet"))
+    {
+        quiet = cmdline.toUInt("quiet");
+        if (quiet > 1)
+        {
+            print_verbose_messages = VB_NONE;
+            parse_verbose_arg("none");
+        }
+    }
+
+    int facility = cmdline.GetSyslogFacility();
+    bool dblog = !cmdline.toBool("nodblog");
+
+    ///////////////////////////////////////////////////////////////////////
+    // Don't listen to console input
+    close(0);
+
+    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
+            .arg("mytharchivehelper").arg(MYTH_SOURCE_PATH)
+            .arg(MYTH_SOURCE_VERSION));
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
@@ -2540,331 +2641,139 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
+    QString logfile = cmdline.GetLogFilePath();
+    logStart(logfile, quiet, facility, dblog);
+
     int res = 0;
-    bool bShowUsage = false;
-    bool bGrabThumbnail = false;
-    bool bGetDBParameters = false;
-    bool bNativeArchive = false;
-    bool bImportArchive = false;
-    bool bGetFileInfo = false;
-    bool bIsRemote = false;
-    bool bDoBurn = false;
-    int  mediaType = AD_DVD_SL;
-    bool bEraseDVDRW = false;
-    bool bNativeFormat = false;
-    bool bSup2Dast = false;
-    QString thumbList;
-    QString inFile;
-    QString outFile;
-    QString logFile;
-    QString ifoFile;
-    int lenMethod = 0;
-    int chanID = -1;
-    int frameCount = 1;
-    int delay = 0;
+    bool bGrabThumbnail   = cmdline.toBool("createthumbnail");
+    bool bGetDBParameters = cmdline.toBool("grabdbparameters");
+    bool bNativeArchive   = cmdline.toBool("nativearchive");
+    bool bImportArchive   = cmdline.toBool("importarchive");
+    bool bGetFileInfo     = cmdline.toBool("getfileinfo");
+    bool bIsRemote        = cmdline.toBool("isremote");
+    bool bDoBurn          = cmdline.toBool("burndvd");
+    bool bEraseDVDRW      = cmdline.toBool("erasedvdrw");
+    bool bNativeFormat    = cmdline.toBool("nativeformat");;
+    bool bSup2Dast        = cmdline.toBool("sup2dast");
+
+    QString thumbList     = cmdline.toString("thumblist");
+    QString inFile        = cmdline.toString("infile");
+    QString outFile       = cmdline.toString("outfile");
+    QString ifoFile       = cmdline.toString("ifofile");
+
+    int mediaType         = cmdline.toUInt("mediatype");
+    int lenMethod         = cmdline.toUInt("method");
+    int chanID            = cmdline.toInt("chanid");
+    int frameCount        = cmdline.toUInt("framecount");
+    int delay             = cmdline.toUInt("delay");
 
     //  Check command line arguments
-    for (int argpos = 1; argpos < a.argc(); ++argpos)
+    if (bGrabThumbnail)
     {
-        if (!strcmp(a.argv()[argpos],"-v") ||
-             !strcmp(a.argv()[argpos],"--verbose"))
+        if (inFile.isEmpty())
         {
-            if (a.argc()-1 > argpos)
-            {
-                if (parse_verbose_arg(a.argv()[argpos+1]) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -v/--verbose option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
+            VERBOSE(VB_IMPORTANT, "Missing --infile in -t/--grabthumbnail "
+                                  "option");
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
-        else if (!strcmp(a.argv()[argpos],"-t") ||
-                  !strcmp(a.argv()[argpos],"--grabthumbnail"))
+
+        if (thumbList.isEmpty())
         {
-            bGrabThumbnail = true;
-
-            if (a.argc()-1 > argpos)
-            {
-                inFile = a.argv()[argpos+1];
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing infile in -t/--grabthumbnail option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            if (a.argc()-1 > argpos)
-            {
-                thumbList = a.argv()[argpos+1];
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing thumblist in -t/--grabthumbnail option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            if (a.argc()-1 > argpos)
-            {
-                outFile = a.argv()[argpos+1];
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing outfile in -t/--grabthumbnail option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            if (a.argc()-1 > argpos)
-            {
-                QString arg(a.argv()[argpos+1]);
-                frameCount = arg.toInt();
-                ++argpos;
-            }
+            VERBOSE(VB_IMPORTANT, "Missing --thumblist in -t/--grabthumbnail "
+                                  "option");
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
-        else if (!strcmp(a.argv()[argpos],"-p") ||
-             !strcmp(a.argv()[argpos],"--getdbparameters"))
-        {
-            bGetDBParameters = true;
-            if (a.argc()-1 > argpos)
-            {
-                outFile = a.argv()[argpos+1];
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -p/--getdbparameters option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-r") ||
-                  !strcmp(a.argv()[argpos],"--isremote"))
-        {
-            bIsRemote = true;
-            if (a.argc()-1 > argpos)
-            {
-                inFile = a.argv()[argpos+1];
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -r/--isremote option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-b") ||
-                  !strcmp(a.argv()[argpos],"--burndvd"))
-        {
-            bDoBurn = true;
-            if (a.argc()-1 > argpos)
-            {
-                QString arg(a.argv()[argpos+1]);
-                mediaType = arg.toInt();
-                if (mediaType < 0 || mediaType > 2)
-                {
-                    cerr << "Invalid mediatype given: " << mediaType << "\n";
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -b/--burndvd option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
 
-            if (a.argc()-1 > argpos)
-            {
-                QString arg(a.argv()[argpos+1]);
-                int value = arg.toInt();
-                if (value < 0 || value > 1)
-                {
-                    cerr << "Invalid erasedvd parameter given: " << value << "\n";
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-                bEraseDVDRW = (value == 1);
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -b/--burndvd option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            if (a.argc()-1 > argpos)
-            {
-                QString arg(a.argv()[argpos+1]);
-                int value = arg.toInt();
-                if (value < 0 || value > 1)
-                {
-                    cerr << "Invalid native format parameter given: " << value << "\n";
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-                bNativeFormat = (value == 1);
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -b/--burndvd option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-n") ||
-                  !strcmp(a.argv()[argpos],"--nativearchive"))
+        if (outFile.isEmpty())
         {
-            bNativeArchive = true;
-            if (a.argc()-1 > argpos)
-            {
-                outFile = a.argv()[argpos+1];
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -r/--nawarchive option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-f") ||
-                  !strcmp(a.argv()[argpos],"--importarchive"))
-        {
-            bImportArchive = true;
-            if (a.argc()-1 > argpos)
-            {
-                inFile = a.argv()[argpos+1];
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing filename argument to -f/--importarchive option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            if (a.argc()-1 > argpos)
-            {
-                QString arg(a.argv()[argpos+1]);
-                chanID = arg.toInt();
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing chanID argument to -f/--importarchive option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-l") ||
-                  !strcmp(a.argv()[argpos],"--log"))
-        {
-            //FIXME
-            if (a.argc()-1 > argpos)
-            {
-                logFile = a.argv()[argpos+1];
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -l/--log option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-h") ||
-                  !strcmp(a.argv()[argpos],"--help"))
-        {
-            bShowUsage = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"-i") ||
-                  !strcmp(a.argv()[argpos],"--getfileinfo"))
-        {
-            bGetFileInfo = true;
-
-            if (a.argc()-1 > argpos)
-            {
-                inFile = a.argv()[argpos+1];
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing infile in -i/--getfileinfo option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            if (a.argc()-1 > argpos)
-            {
-                outFile = a.argv()[argpos+1];
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing outfile in -i/--getfileinfo option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            if (a.argc()-1 > argpos)
-            {
-                QString arg(a.argv()[argpos+1]);
-                lenMethod = arg.toInt();
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing method in -i/--getfileinfo option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-s") ||
-                  !strcmp(a.argv()[argpos],"--sup2dast"))
-        {
-            bSup2Dast = true;
-
-            if (a.argc()-1 > argpos)
-            {
-                inFile = a.argv()[argpos+1];
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing supfile in -s/--sup2dast option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            if (a.argc()-1 > argpos)
-            {
-                ifoFile = a.argv()[argpos+1];
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing ifofile in -s/--sup2dast option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            if (a.argc()-1 > argpos)
-            {
-                QString arg(a.argv()[argpos+1]);
-                delay = arg.toInt();
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing delay in -s/--sup2dast option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else
-        {
-            cout << "Invalid argument: " << a.argv()[argpos] << endl;
-            showUsage();
+            VERBOSE(VB_IMPORTANT, "Missing --outfile in -t/--grabthumbnail "
+                                  "option");
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
 
-    if (bShowUsage)
-        showUsage();
-    else if (bGrabThumbnail)
+    if (bGetDBParameters)
+    {
+        if (outFile.isEmpty())
+        {
+            VERBOSE(VB_IMPORTANT, "Missing argument to -p/--getdbparameters "
+                                  "option");
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+    }
+
+    if (bIsRemote)
+    {
+        if (inFile.isEmpty())
+        {
+            VERBOSE(VB_IMPORTANT, "Missing argument to -r/--isremote option");
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+    }
+
+    if (bDoBurn)
+    {
+        if (mediaType < 0 || mediaType > 2)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Invalid mediatype given: %1")
+                    .arg(mediaType));
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+    }
+
+    if (bNativeArchive)
+    {
+        if (outFile.isEmpty())
+        {
+            VERBOSE(VB_IMPORTANT, "Missing argument to -n/--nativearchive "
+                                  "option");
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+    }
+
+    if (bImportArchive)
+    {
+        if (inFile.isEmpty())
+        {
+            VERBOSE(VB_IMPORTANT, "Missing --infile argument to "
+                                  "-f/--importarchive option");
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+    }
+
+    if (bGetFileInfo)
+    {
+        if (inFile.isEmpty())
+        {
+            VERBOSE(VB_IMPORTANT, "Missing --infile in -i/--getfileinfo "
+                                  "option");
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+
+        if (outFile.isEmpty())
+        {
+            VERBOSE(VB_IMPORTANT, "Missing --outfile in -i/--getfileinfo "
+                                  "option");
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+    }
+
+    if (bSup2Dast)
+    {
+        if (inFile.isEmpty())
+        {
+            VERBOSE(VB_IMPORTANT, "Missing --infile in -s/--sup2dast option");
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+
+        if (ifoFile.isEmpty())
+        {
+            VERBOSE(VB_IMPORTANT, "Missing --ifofile in -s/--sup2dast option");
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+    }
+
+    if (bGrabThumbnail)
         res = grabThumbnail(inFile, thumbList, outFile, frameCount);
     else if (bGetDBParameters)
         res = getDBParamters(outFile);
@@ -2885,7 +2794,7 @@ int main(int argc, char **argv)
         res = sup2dast(inFileBA.constData(), ifoFileBA.constData(), delay);
     }
     else
-        showUsage();
+        cmdline.PrintHelp();
 
     exit(res);
 }
