@@ -16,6 +16,7 @@ extern "C" {
 }
 
 #include "dvdnav/dvdnav.h"
+#include "RingBuffer.h"
 
 /** \class DVDRingBufferPriv
  *  \brief RingBuffer class for DVD's
@@ -28,7 +29,7 @@ class MythDVDPlayer;
 class MPUBLIC DVDRingBufferPriv
 {
   public:
-    DVDRingBufferPriv();
+    DVDRingBufferPriv(RingBuffer* ringbuffer);
     virtual ~DVDRingBufferPriv();
 
     // gets
@@ -167,6 +168,7 @@ class MPUBLIC DVDRingBufferPriv
     QMap<uint, uint> m_seekSpeedMap;
 
     MythDVDPlayer *m_parent;
+    RingBuffer    *m_ringBuffer;
 
     // Private menu/button stuff
     bool DVDButtonUpdate(bool b_mode);

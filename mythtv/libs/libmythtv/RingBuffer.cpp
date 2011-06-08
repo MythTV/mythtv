@@ -344,7 +344,7 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
                 (filename.endsWith(".iso"))))))
     {
         is_dvd = true;
-        dvdPriv = new DVDRingBufferPriv();
+        dvdPriv = new DVDRingBufferPriv(this);
         startreadahead = false;
 
         if (filename.left(6) == "dvd://")      // 'Play DVD' sends "dvd:/" + dev
