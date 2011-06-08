@@ -245,6 +245,33 @@ void AutoExpire::CalcParams()
             maxKBperMin = thisKBperMin;
         }
     }
+
+    // Determine frequency to run autoexpire so it doesn't have to free
+    // too much space
+    uint expireFreq = 15;
+    if (maxKBperMin > 0)
+    {
+        expireFreq = SPACE_TOO_BIG_KB / (maxKBperMin + maxKBperMin/3);
+        expireFreq = max(3U, min(expireFreq, 15U));
+    }
+
+    double expireMinGB = ((maxKBperMin + maxKBperMin/3)
+                          * expireFreq + extraKB) >> 20;
+    VERBOSE(VB_IMPORTANT, LOC +
+            QString("CalcParams(): Max required Free Space: %1 GB w/freq: "
+                    "%2 min").arg(expireMinGB, 0, 'f', 1).arg(expireFreq));
+
+    // lock class and save these parameters.
+    instance_lock.lock();
+    desired_freq = expireFreq;
+    // write per file system needed space back, use safety of 33%
+    QMap<int, uint64_t>::iterator it = fsMap.begin();
+    while (it != fsMap.end())
+    {
+        desired_space[it.key()] = (*it + *it/3) * expireFreq + extraKB;
+        ++it;
+    }
+    instance_lock.unlock();
 }
 
 /** \brief This contains the main loop for the auto expire process.
