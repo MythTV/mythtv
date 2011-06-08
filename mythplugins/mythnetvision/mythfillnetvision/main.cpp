@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
                     GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
 
-    int quiet;
+    int quiet = 0;
     if (cmdline.toBool("quiet"))
     {
         quiet = cmdline.toUInt("quiet");
