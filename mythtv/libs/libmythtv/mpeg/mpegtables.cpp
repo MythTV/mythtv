@@ -390,7 +390,7 @@ ProgramMapTable* ProgramMapTable::Create(
     }
     pmt->Finalize();
 
-    VERBOSE(VB_SIPARSER, "Created PMT \n"<<pmt->toString());
+    VERBOSE(VB_SIPARSER, "Created PMT \n" + pmt->toString());
 
     return pmt;
 }

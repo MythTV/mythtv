@@ -27,6 +27,7 @@
 #include "dvbrecorder.h"
 #include "dvbchannel.h"
 #include "tv_rec.h"
+#include "mythverbose.h"
 
 #define LOC      QString("DVBRec(%1:%2): ") \
                  .arg(tvrec->GetCaptureCardNum()).arg(videodevice)

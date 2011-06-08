@@ -16,6 +16,7 @@
 #include "storagegroup.h"
 #include "mythcorecontext.h"
 #include "videometadatautil.h"
+#include "mythlogging.h"
 
 #define LOC QString("playCtx: ")
 #define LOC_ERR QString("playCtx, Error: ")
@@ -479,8 +480,8 @@ bool PlayerContext::StartPlaying(int maxWait)
 
     if (player->IsPlaying())
     {
-        VERBOSE(VB_PLAYBACK, LOC + "StartPlaying(): took "<<t.elapsed()
-                <<" ms to start player.");
+        VERBOSE(VB_PLAYBACK, LOC + QString("StartPlaying(): took %1"
+                " ms to start player.").arg(t.elapsed()));
         return true;
     }
     else

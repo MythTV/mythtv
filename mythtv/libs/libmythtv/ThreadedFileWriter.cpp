@@ -18,23 +18,29 @@
 // MythTV headers
 #include "ThreadedFileWriter.h"
 #include "mythverbose.h"
+#include "mythlogging.h"
+
 #include "mythtimer.h"
 #include "compat.h"
 
 /// \brief Runs ThreadedFileWriter::DiskLoop(void)
 void TFWWriteThread::run(void)
 {
+    threadRegister("TFWWrite");
 #ifndef USING_MINGW
     // don't exit program if file gets larger than quota limit..
     signal(SIGXFSZ, SIG_IGN);
 #endif
     m_parent->DiskLoop();
+    threadDeregister();
 }
 
 /// \brief Runs ThreadedFileWriter::SyncLoop(void)
 void TFWSyncThread::run(void)
 {
+    threadRegister("TFWSync");
     m_parent->SyncLoop();
+    threadDeregister();
 }
 
 const uint ThreadedFileWriter::kMaxBufferSize = 128 * 1024 * 1024;

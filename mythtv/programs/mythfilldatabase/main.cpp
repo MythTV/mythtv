@@ -21,11 +21,13 @@ using namespace std;
 #include "mythconfig.h"
 
 // libmythtv headers
+#include "mythcommandlineparser.h"
 #include "scheduledrecording.h"
 #include "remoteutil.h"
 #include "videosource.h" // for is_grabber..
 #include "dbcheck.h"
 #include "mythsystemevent.h"
+#include "mythlogging.h"
 
 // filldata headers
 #include "filldata.h"
@@ -61,7 +63,6 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
     FillData fill_data;
-    int argpos = 1;
     int fromfile_id = 1;
     int fromfile_offset = 0;
     QString fromfile_name;
@@ -86,467 +87,203 @@ int main(int argc, char *argv[])
     bool from_dd_file = false;
     int sourceid = -1;
     QString fromddfile_lineupid;
+    int quiet = 0;
 
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFILLDATABASE);
 
     myth_nice(19);
 
-    while (argpos < a.argc())
+    MythFillDatabaseCommandLineParser cmdline;
+    if (!cmdline.Parse(argc, argv))
     {
-        // The manual and update flags should be mutually exclusive.
-        if (!strcmp(a.argv()[argpos], "--manual"))
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+
+    if (cmdline.toBool("showhelp"))
+    {
+        cerr << "displaying help" << endl;
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_OK;
+    }
+
+    if (cmdline.toBool("showversion"))
+    {
+        cmdline.PrintVersion();
+        return GENERIC_EXIT_OK;
+    }
+
+    if (cmdline.toBool("manual"))
+    {
+        cout << "###\n";
+        cout << "### Running in manual channel configuration mode.\n";
+        cout << "### This will ask you questions about every channel.\n";
+        cout << "###\n";
+        fill_data.chan_data.interactive = true;
+    }
+
+    if (cmdline.toBool("update"))
+    {
+        if (cmdline.toBool("manual"))
         {
-            cout << "###\n";
-            cout << "### Running in manual channel configuration mode.\n";
-            cout << "### This will ask you questions about every channel.\n";
-            cout << "###\n";
-            fill_data.chan_data.interactive = true;
+            cerr << "--update and --manual cannot be used simultaneously"
+                 << endl;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
-        else if (!strcmp(a.argv()[argpos], "--preset"))
+        fill_data.chan_data.non_us_updating = true;
+    }
+
+    if (cmdline.toBool("preset"))
+    {
+        cout << "###\n";
+        cout << "### Running in preset channel configuration mode.\n";
+        cout << "### This will assign channel ";
+        cout << "preset numbers to every channel.\n";
+        cout << "###\n";
+        fill_data.chan_data.channel_preset = true;
+    }
+
+    if (cmdline.toBool("file"))
+    {
+        // manual file mode
+        if (!cmdline.toBool("sourceid") ||
+            !cmdline.toBool("xmlfile"))
         {
-            // For using channel preset values instead of channel numbers.
-            cout << "###\n";
-            cout << "### Running in preset channel configuration mode.\n";
-            cout << "### This will assign channel ";
-            cout << "preset numbers to every channel.\n";
-            cout << "###\n";
-            fill_data.chan_data.channel_preset = true;
+            cerr << "The --file option must be used in combination" << endl
+                 << "with both --sourceid and --xmlfile." << endl;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
-        else if (!strcmp(a.argv()[argpos], "--update"))
+
+        fromfile_id = cmdline.toInt("sourceid");
+        fromfile_name = cmdline.toString("xmlfile");
+
+        VERBOSE(VB_GENERAL, "Bypassing grabbers, reading directly from file");
+        from_file = true;
+    }
+
+    if (cmdline.toBool("ddfile"))
+    {
+        // datadirect file mode
+        if (!cmdline.toBool("sourceid") || 
+            !cmdline.toBool("offset") ||
+            !cmdline.toBool("lineupid") ||
+            !cmdline.toBool("xmlfile"))
         {
-            // For running non-destructive updates on the database for
-            // users in xmltv zones that do not provide channel data.
-            fill_data.chan_data.non_us_updating = true;
+            cerr << "The --dd-file option must be used in combination" << endl
+                 << "with each of --sourceid, --offset, --lineupid," << endl
+                 << "and --xmlfile." << endl;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
-        else if (!strcmp(a.argv()[argpos], "--file"))
+
+        fromfile_id         = cmdline.toInt("sourceid");
+        fromfile_offset     = cmdline.toInt("offset");
+        fromddfile_lineupid = cmdline.toInt("lineupid");
+        fromfile_name       = cmdline.toString("xmlfile");
+
+        VERBOSE(VB_GENERAL, "Bypassing grabbers, reading directly from file");
+        from_dd_file = true;
+    }
+
+    if (cmdline.toBool("xawchannels"))
+    {
+        // xaw channel import mode
+        if (!cmdline.toBool("sourceid") ||
+            !cmdline.toBool("xawtvrcfile"))
         {
-            if (((argpos + 2) >= a.argc()) ||
-                !strncmp(a.argv()[argpos + 1], "--", 2) ||
-                !strncmp(a.argv()[argpos + 2], "--", 2))
-            {
-                printf("missing or invalid parameters for --file option\n");
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            if (!fromfile_name.isEmpty())
-            {
-                printf("only one --file option allowed\n");
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            fromfile_id = atoi(a.argv()[++argpos]);
-            fromfile_name = a.argv()[++argpos];
-
-            VERBOSE(VB_GENERAL, "Bypassing grabbers, reading directly from file");
-            from_file = true;
+            cerr << "The --xawchannels option must be used in combination" << endl
+                 << "with both --sourceid and --xawtvrcfile" << endl;
         }
-        else if (!strcmp(a.argv()[argpos], "--dd-file"))
+
+        fromxawfile_id = cmdline.toInt("sourceid");
+        fromxawfile_name = cmdline.toString("xawtvrcfile");
+
+        VERBOSE(VB_GENERAL, "Reading channels from xawtv configfile");
+        from_xawfile = true;
+    }
+
+    if (cmdline.toBool("dochannelupdates"))
+        fill_data.chan_data.channel_updates = true;
+    if (cmdline.toBool("removechannels"))
+        fill_data.chan_data.remove_new_channels = true;
+    if (cmdline.toBool("nofilterchannels"))
+        fill_data.chan_data.filter_new_channels = false;
+    if (cmdline.toBool("graboptions"))
+        fill_data.graboptions = " " + cmdline.toString("graboptions");
+    if (cmdline.toBool("sourceid"))
+        sourceid = cmdline.toInt("sourceid");
+    if (cmdline.toBool("cardtype"))
+    {
+        if (!cmdline.toBool("sourceid"))
         {
-            if (((argpos + 4) >= a.argc()) ||
-                !strncmp(a.argv()[argpos + 1], "--", 2) ||
-                !strncmp(a.argv()[argpos + 2], "--", 2) ||
-                !strncmp(a.argv()[argpos + 3], "--", 2) ||
-                !strncmp(a.argv()[argpos + 4], "--", 2))
-            {
-                printf("missing or invalid parameters for --dd-file option\n");
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            if (!fromfile_name.isEmpty())
-            {
-                printf("only one --dd-file option allowed\n");
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            fromfile_id = atoi(a.argv()[++argpos]);
-            fromfile_offset = atoi(a.argv()[++argpos]);
-            fromddfile_lineupid = a.argv()[++argpos];
-            fromfile_name = a.argv()[++argpos];
-
-            VERBOSE(VB_GENERAL, "Bypassing grabbers, reading directly from file");
-            from_dd_file = true;
+            cerr << "The --cardtype option must be used in combination" << endl
+                 << "with a --sourceid option." << endl;
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
-        else if (!strcmp(a.argv()[argpos], "--xawchannels"))
-        {
-            if (((argpos + 2) >= a.argc()) ||
-                !strncmp(a.argv()[argpos + 1], "--", 2) ||
-                !strncmp(a.argv()[argpos + 2], "--", 2))
-            {
-                printf("missing or invalid parameters for --xawchannels option\n");
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
 
-            if (!fromxawfile_name.isEmpty())
-            {
-                printf("only one --xawchannels option allowed\n");
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            fromxawfile_id = atoi(a.argv()[++argpos]);
-            fromxawfile_name = a.argv()[++argpos];
-
-            VERBOSE(VB_GENERAL, "Reading channels from xawtv configfile");
-            from_xawfile = true;
-        }
-        else if (!strcmp(a.argv()[argpos], "--do-channel-updates"))
-        {
-            fill_data.chan_data.channel_updates = true;
-        }
-        else if (!strcmp(a.argv()[argpos], "--remove-new-channels"))
-        {
-            fill_data.chan_data.remove_new_channels = true;
-        }
-        else if (!strcmp(a.argv()[argpos], "--do-not-filter-new-channels"))
-        {
-            fill_data.chan_data.filter_new_channels = false;
-        }
-        else if (!strcmp(a.argv()[argpos], "--graboptions"))
-        {
-            if (((argpos + 1) >= a.argc()))
-            {
-                printf("missing parameter for --graboptions option\n");
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            fill_data.graboptions = QString(" ") + QString(a.argv()[++argpos]);
-        }
-        else if (!strcmp(a.argv()[argpos], "--sourceid"))
-        {
-            if (((argpos + 1) >= a.argc()))
-            {
-                printf("missing parameter for --sourceid option\n");
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            sourceid = QString(a.argv()[++argpos]).toInt();
-        }
-        else if (!strcmp(a.argv()[argpos], "--cardtype"))
-        {
-            if (!sourceid)
-            {
-                printf("--cardtype option must follow a --sourceid option\n");
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            if (((argpos + 1) >= a.argc()))
-            {
-                printf("missing parameter for --cardtype option\n");
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            fill_data.chan_data.cardtype =
-                QString(a.argv()[++argpos]).trimmed().toUpper();
-        }
-        else if (!strcmp(a.argv()[argpos], "--max-days"))
-        {
-            if (((argpos + 1) >= a.argc()))
-            {
-                printf("missing parameter for --max-days option\n");
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            fill_data.maxDays = QString(a.argv()[++argpos]).toUInt();
-
-            if (fill_data.maxDays < 1)
-            {
-                printf("ignoring invalid parameter for --max-days\n");
-                fill_data.maxDays = 0;
-            }
-            else if (fill_data.maxDays == 1)
-            {
-                fill_data.SetRefresh(0, true);
-            }
-        }
-        else if (!strcmp(a.argv()[argpos], "--refresh-today"))
-        {
+        fill_data.chan_data.cardtype = cmdline.toString("cardtype")
+                                                .trimmed().toUpper();
+    }
+    if (cmdline.toBool("maxdays") && cmdline.toInt("maxdays") > 0)
+    {
+        fill_data.maxDays = cmdline.toInt("maxdays");
+        if (fill_data.maxDays == 1)
             fill_data.SetRefresh(0, true);
-        }
-        else if (!strcmp(a.argv()[argpos], "--dont-refresh-tomorrow"))
-        {
-            fill_data.SetRefresh(1, false);
-        }
-        else if (!strcmp(a.argv()[argpos], "--refresh-second"))
-        {
-            fill_data.SetRefresh(2, true);
-        }
-        else if (!strcmp(a.argv()[argpos], "--refresh-all"))
-        {
-            fill_data.SetRefresh(FillData::kRefreshAll, true);
-        }
-        else if (!strcmp(a.argv()[argpos], "--refresh-day"))
-        {
-            if (((argpos + 1) >= a.argc()))
-            {
-                printf("missing parameter for --refresh-day option\n");
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
+    }
+    if (cmdline.toBool("refreshtoday"))
+        fill_data.SetRefresh(0, true);
+    if (cmdline.toBool("dontrefreshtomorrow"))
+        fill_data.SetRefresh(1, false);
+    if (cmdline.toBool("refreshsecond"))
+        fill_data.SetRefresh(2, true);
+    if (cmdline.toBool("refreshall"))
+        fill_data.SetRefresh(FillData::kRefreshAll, true);
+    if (cmdline.toBool("refreshday"))
+        fill_data.SetRefresh(cmdline.toUInt("refreshday"), true);
+    if (cmdline.toBool("dontrefreshtba"))
+        fill_data.refresh_tba = false;
+    if (cmdline.toBool("ddgraball"))
+    {
+        fill_data.SetRefresh(FillData::kRefreshClear, false);
+        fill_data.dd_grab_all = true;
+    }
+    if (cmdline.toBool("onlychannels"))
+        fill_data.only_update_channels = true;
 
-            bool ok = true;
-            uint day = QString(a.argv()[++argpos]).toUInt(&ok);
-
-            if (!ok)
-            {
-                printf("ignoring invalid parameter for --refresh-day\n");
-            }
-            else
-            {
-                fill_data.SetRefresh(day, true);
-            }
-        }
-        else if (!strcmp(a.argv()[argpos], "--dont-refresh-tba"))
-        {
-            fill_data.refresh_tba = false;
-        }
-        else if (!strcmp(a.argv()[argpos], "--only-update-channels"))
-        {
-            fill_data.only_update_channels = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"-v") ||
-                 !strcmp(a.argv()[argpos],"--verbose"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                if (parse_verbose_arg(a.argv()[argpos+1]) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -v/--verbose option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos], "--dd-grab-all"))
-        {
-            fill_data.SetRefresh(FillData::kRefreshClear, false);
-            fill_data.dd_grab_all = true;
-        }
-        else if (!strcmp(a.argv()[argpos], "--quiet"))
+    if (cmdline.toBool("quiet"))
+    {
+        quiet = cmdline.toUInt("quiet");
+        if (quiet > 1)
         {
             print_verbose_messages = VB_NONE;
+            parse_verbose_arg("none");
         }
-        else if (!strcmp(a.argv()[argpos], "--mark-repeats"))
-        {
-             mark_repeats = true;
-        }
-        else if (!strcmp(a.argv()[argpos], "--nomark-repeats"))
-        {
-            mark_repeats = false;
-        }
-        else if (!strcmp(a.argv()[argpos], "--export-icon-map"))
-        {
-            export_iconmap = true;
-            grab_data = false;
+    }
 
-            if ((argpos + 1) >= a.argc() ||
-                    !strncmp(a.argv()[argpos + 1], "--", 2))
-            {
-                if (!isatty(fileno(stdout)))
-                {
-                    export_icon_data_filename = '-';
-                }
-            }
-            else
-            {
-                export_icon_data_filename = a.argv()[++argpos];
-            }
-        }
-        else if (!strcmp(a.argv()[argpos], "--import-icon-map"))
-        {
-            import_iconmap = true;
-            grab_data = false;
+    int facility = cmdline.GetSyslogFacility();
+    bool dblog = !cmdline.toBool("nodblog");
 
-            if ((argpos + 1) >= a.argc() ||
-                    !strncmp(a.argv()[argpos + 1], "--", 2))
-            {
-                if (!isatty(fileno(stdin)))
-                {
-                    import_icon_data_filename = '-';
-                }
-            }
-            else
-            {
-                import_icon_data_filename = a.argv()[++argpos];
-            }
-        }
-        else if (!strcmp(a.argv()[argpos], "--update-icon-map"))
-        {
-            update_icon_data = true;
-            grab_data = false;
-        }
-        else if (!strcmp(a.argv()[argpos], "--reset-icon-map"))
-        {
-            reset_iconmap = true;
-            grab_data = false;
-
-            if ((argpos + 1) < a.argc() &&
-                    strncmp(a.argv()[argpos + 1], "--", 2))
-            {
-                ++argpos;
-                if (QString(a.argv()[argpos]) == "all")
-                {
-                    reset_iconmap_icons = true;
-                }
-                else
-                {
-                    cerr << "Unknown icon group '" << a.argv()[argpos]
-                            << "' for --reset-icon-map option" << endl;
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-            }
-        }
-        else if (!strcmp(a.argv()[argpos], "-h") ||
-                 !strcmp(a.argv()[argpos], "--help"))
-        {
-            cout << "usage:\n";
-            cout << "--manual\n";
-            cout << "   Run in manual channel configuration mode\n";
-            cout << "   This will ask you questions about every channel\n";
-            cout << "\n";
-            cout << "--update\n";
-            cout << "   For running non-destructive updates on the database for\n";
-            cout << "   users in xmltv zones that do not provide channel data\n";
-            cout << "   Stops the addition of new channels and the changing of channel icons.\n";
-            cout << "\n";
-            cout << "--preset\n";
-            cout << "   Use it in case that you want to assign a preset number for\n";
-            cout << "   each channel, useful for non US countries where people\n";
-            cout << "   are used to assigning a sequenced number for each channel, i.e.:\n";
-            cout << "   1->TVE1(S41), 2->La 2(SE18), 3->TV3(21), 4->Canal 33(60)...\n";
-            cout << "\n";
-            cout << "--file <sourceid> <xmlfile>\n";
-            cout << "   Bypass the grabbers and read data directly from a file\n";
-            cout << "   <sourceid> = number of the video source to use with this file\n";
-            cout << "   <xmlfile>  = file to read\n";
-            cout << "\n";
-            cout << "--dd-file <sourceid> <offset> <lineupid> <xmlfile>\n";
-            cout << "   <sourceid> = number of the video source to use with this file\n";
-            cout << "   <offset>   = days from today that xmlfile defines\n";
-            cout << "                (-1 means to replace all data, up to 10 days)\n";
-            cout << "   <lineupid> = the lineup id\n";
-            cout << "   <xmlfile>  = file to read\n";
-            cout << "\n";
-            cout << "--xawchannels <sourceid> <xawtvrcfile>\n";
-            cout << "   (--manual flag works in combination with this)\n";
-            cout << "   Read channels as defined in xawtvrc file given\n";
-            cout << "   <sourceid>    = cardinput\n";
-            cout << "   <xawtvrcfile> = file to read\n";
-            cout << "\n";
-            cout << "--do-channel-updates\n";
-            cout << "   When using DataDirect, ask mythfilldatabase to\n";
-            cout << "   overwrite channel names, frequencies, etc. with the\n";
-            cout << "   values available from the data source. This will \n";
-            cout << "   override custom channel names, which is why it is\n";
-            cout << "   off by default.\n";
-            cout << "\n";
-            cout << "--remove-new-channels\n";
-            cout << "   When using DataDirect, ask mythfilldatabase to\n";
-            cout << "   remove new channels (those not in the database)\n";
-            cout << "   from the DataDirect lineup.  These channels are\n";
-            cout << "   removed from the lineup as if you had done so\n";
-            cout << "   via the DataDirect website's Lineup Wizard, but\n";
-            cout << "   may be re-added manually and incorporated into\n";
-            cout << "   MythTV by running mythfilldatabase without this\n";
-            cout << "   option.  New channels are automatically removed\n";
-            cout << "   for DVB and HDTV sources that use DataDirect.\n";
-            cout << "\n";
-            cout << "--do-not-filter-new-channels\n";
-            cout << "   Normally MythTV tries to avoid adding ATSC channels\n";
-            cout << "   to NTSC channel lineups. This option restores the\n";
-            cout << "   behaviour of adding every channel in the downloaded\n";
-            cout << "   channel lineup to MythTV's lineup, in case MythTV's\n";
-            cout << "   smarts fail you.\n";
-            cout << "\n";
-            cout << "--graboptions <\"options\">\n";
-            cout << "   Pass options to grabber. Do NOT use unless you know\n";
-            cout << "   what you are doing. Mythfilldatabase will\n";
-            cout << "   automatically use the correct options for xmltv\n";
-            cout << "   compliant grabbers.\n";
-            cout << "\n";
-            cout << "--sourceid <number>\n";
-            cout << "   Only refresh data for sourceid given\n";
-            cout << "\n";
-            cout << "--max-days <number>\n";
-            cout << "   Force the maximum number of days, counting today,\n";
-            cout << "   for the grabber to check for future listings\n";
-            cout << "--only-update-channels\n";
-            cout << "   Get as little listings data as possible to update channels\n";
-            cout << "--refresh-today\n";
-            cout << "--refresh-second\n";
-            cout << "--refresh-all\n";
-            cout << "--refresh-day <number>";
-            cout << "   (Only valid for selected grabbers: e.g. DataDirect)\n";
-            cout << "   Force a refresh today, two days, every day, or a specific day from now,\n";
-            cout << "   to catch the latest changes.  --refresh-all will update every day except\n";
-            cout << "   the current day. To refresh today and all following days, XMLTV users\n";
-            cout << "   should combine --refresh-today and --refresh-all.  Schedules Direct/\n";
-            cout << "   DataDirect users should use --dd-grab-all.\n";
-            cout << "--dont-refresh-tomorrow\n";
-            cout << "   Tomorrow will always be refreshed unless this argument is used\n";
-            cout << "--dont-refresh-tba\n";
-            cout << "   \"To be announced\" programs will always be refreshed \n";
-            cout << "   unless this argument is used\n";
-            cout << "\n";
-            cout << "--dd-grab-all\n";
-            cout << "   The DataDirect grabber will grab all available data\n";
-            cout << "   in a single pull. This will ensure you always have\n";
-            cout << "   the most up-to-date data, but requires significantly\n";
-            cout << "   more CPU and RAM. It is not expected to work on all\n";
-            cout << "   backend systems and with all lineups, and may\n";
-            cout << "   interfere with recording due to resource starvation.\n";
-            cout << "\n";
-            cout << "--export-icon-map [<filename>]\n";
-            cout << "   Exports your current icon map to <filename> (default: "
-                 << export_icon_data_filename.toLocal8Bit().constData()
-                 << ")\n";
-            cout << "--import-icon-map [<filename>]\n";
-            cout << "   Imports an icon map from <filename> (default: "
-                 << import_icon_data_filename.toLocal8Bit().constData()
-                 << ")\n";
-            cout << "--update-icon-map\n";
-            cout << "   Updates icon map icons only\n";
-            cout << "--reset-icon-map [all]\n";
-            cout << "   Resets your icon map (pass all to reset channel icons as well)\n";
-            cout << "\n";
-            cout << "--mark-repeats\n";
-            cout << "   Marks any programs with a OriginalAirDate earlier\n";
-            cout << "   than their start date as a repeat\n";
-            cout << "\n";
-            cout << "-v or --verbose debug-level\n";
-            cout << "   Use '-v help' for level info\n";
-            cout << "\n";
-
-            cout << "--help\n";
-            cout << "   This text\n";
-            cout << "\n";
-            cout << "\n";
-            cout << "  --manual and --update cannot be used together.\n";
-            cout << "\n";
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
-        else if (!strcmp(a.argv()[argpos], "--no-delete"))
-        {
-            cerr << "Deprecated option '" << a.argv()[argpos] << "'" << endl;
-        }
-#ifdef Q_WS_MACX
-        else if (!strncmp(argv[argpos],"-psn_",5))
-        {
-            cerr << "Ignoring Process Serial Number from command line\n";
-        }
-#endif
-        else
-        {
-            fprintf(stderr, "illegal option: '%s' (use --help)\n",
-                    a.argv()[argpos]);
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
-
-        ++argpos;
+    mark_repeats = cmdline.toBool("markrepeats");
+    if (cmdline.toBool("exporticonmap"))
+        export_icon_data_filename = cmdline.toString("exporticonmap");
+    if (cmdline.toBool("importiconmap"))
+        import_icon_data_filename = cmdline.toString("importiconmap");
+    if (cmdline.toBool("updateiconmap"))
+    {
+        update_icon_data = true;
+        grab_data = false;
+    }
+    if (cmdline.toBool("reseticonmap"))
+    {
+        reset_iconmap = true;
+        grab_data = false;
+        if (cmdline.toString("reseticonmap") == "all")
+            reset_iconmap_icons = true;
     }
 
     CleanupGuard callCleanup(cleanup);
+
+    QString logfile = cmdline.GetLogFilePath();
+    logStart(logfile, quiet, facility, dblog);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
@@ -562,9 +299,6 @@ int main(int argc, char *argv[])
         VERBOSE(VB_IMPORTANT, "Incorrect database schema");
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
-
-    gCoreContext->LogEntry("mythfilldatabase", LP_INFO,
-                       "Listings Download Started", "");
 
     if (!grab_data)
     {
@@ -677,11 +411,6 @@ int main(int argc, char *argv[])
                   VERBOSE(VB_IMPORTANT,
                           "There are no channel sources defined, did you run "
                           "the setup program?");
-                  gCoreContext->LogEntry("mythfilldatabase", LP_CRITICAL,
-                                     "No channel sources defined",
-                                     "Could not find any defined channel "
-                                     "sources - did you run the setup "
-                                     "program?");
                   return GENERIC_EXIT_SETUP_ERROR;
              }
         }
@@ -692,11 +421,7 @@ int main(int argc, char *argv[])
         }
 
         if (!fill_data.Run(sourcelist))
-        {
-             VERBOSE(VB_IMPORTANT, "Failed to fetch some program info");
-             gCoreContext->LogEntry("mythfilldatabase", LP_WARNING,
-                                "Failed to fetch some program info", "");
-        }
+            VERBOSE(VB_IMPORTANT, "Failed to fetch some program info");
         else
             VERBOSE(VB_IMPORTANT, "Data fetching complete.");
     }
@@ -744,9 +469,6 @@ int main(int argc, char *argv[])
         else
             VERBOSE(VB_GENERAL,
                     QString("    %1 replacements made").arg(update_count));
-
-        gCoreContext->LogEntry("mythfilldatabase", LP_INFO,
-                           "Listings Download Finished", "");
     }
 
     if (grab_data)

@@ -22,6 +22,7 @@ using namespace std;
 #include "mythdialogbox.h"
 #include "mythverbose.h"
 #include "util.h"
+#include "mythlogging.h"
 
 #ifdef USING_DARWIN_DA
 #include "mediamonitor-darwin.h"
@@ -45,11 +46,13 @@ MonitorThread::MonitorThread(MediaMonitor* pMon, unsigned long interval)
 // loop and check it's devices.
 void MonitorThread::run(void)
 {
+    threadRegister("Monitor");
     while (m_Monitor && m_Monitor->IsActive())
     {
         m_Monitor->CheckDevices();
         msleep(m_Interval);
     }
+    threadDeregister();
 }
 
 ////////////////////////////////////////////////////////////////////////

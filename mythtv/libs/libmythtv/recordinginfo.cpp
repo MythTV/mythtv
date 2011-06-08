@@ -1089,7 +1089,6 @@ void RecordingInfo::FinishedRecording(bool prematurestop)
                                         .arg(chanid);
 
         VERBOSE(VB_GENERAL, QString("%1 %2").arg(msg).arg(details));
-        gCoreContext->LogEntry("scheduler", LP_NOTICE, msg, details);
     }
 
     SendUpdateEvent();

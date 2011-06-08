@@ -425,7 +425,8 @@ void ImportNative::finishedPressed()
     if (QFile::exists(logDir + "/progress.log"))
         QFile::remove(logDir + "/progress.log");
 
-    commandline = "mytharchivehelper -f \"" + m_xmlFile + "\" " + chanID;
+    commandline = "mytharchivehelper --importnative --infile \"" + m_xmlFile + 
+                  "\" --chanid " + chanID + " --quiet";
     commandline += " > "  + logDir + "/progress.log 2>&1 &";
 
     uint flags = kMSRunBackground | kMSDontBlockInputDevs | 

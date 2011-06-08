@@ -683,8 +683,8 @@ int DataDirectProcessor::UpdateChannelsSafe(
     if (!SourceUtil::GetConnectionCount(sourceid))
     {
         VERBOSE(VB_IMPORTANT, LOC +
-                "Not inserting channels into disconnected source "
-                <<sourceid<<".");
+                QString("Not inserting channels into disconnected source %1.")
+                .arg(sourceid));
         return -1;
     }
 
@@ -1015,7 +1015,7 @@ bool DataDirectProcessor::DDPost(
 #endif
 
     if (SHOW_WGET_OUTPUT)
-        VERBOSE(VB_GENERAL, "command: "<<command<<endl);
+        VERBOSE(VB_GENERAL, "command: " + command);
 
     err_txt = "Returned failure";
     if (myth_system(command, kMSAnonLog) != GENERIC_EXIT_OK)
@@ -1099,7 +1099,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     }
 
     if (SHOW_WGET_OUTPUT)
-        VERBOSE(VB_GENERAL, "command: "<<command<<endl);
+        VERBOSE(VB_GENERAL, "command: " + command);
 #ifndef USING_MINGW
     else
         command += " 2> /dev/null ";
@@ -1163,7 +1163,7 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
                                    const QDateTime pendDate)
 {
     QString msg = (pstartDate.addSecs(1) == pendDate) ? "channel" : "listing";
-    VERBOSE(VB_GENERAL, "Grabbing " << msg << " data");
+    VERBOSE(VB_GENERAL, "Grabbing " + msg + " data");
 
     QString err = "";
     QString ddurl = providers[listings_provider].webServiceURL;
@@ -1450,22 +1450,22 @@ QDateTime DataDirectProcessor::GetLineupCacheAge(const QString &lineupid) const
     QFile lfile(get_cache_filename(lineupid));
     if (!lfile.exists())
     {
-        VERBOSE(VB_GENERAL, "GrabLineupCacheAge("<<lineupid<<") failed -- "
-                <<QString("file '%1' doesn't exist")
+        VERBOSE(VB_GENERAL, "GrabLineupCacheAge("+lineupid+") failed -- " +
+                QString("file '%1' doesn't exist")
                 .arg(get_cache_filename(lineupid)));
         return cache_dt;
     }
     if (lfile.size() < 8)
     {
-        VERBOSE(VB_IMPORTANT, "GrabLineupCacheAge("<<lineupid<<") failed -- "
-                <<QString("file '%1' size %2 too small")
+        VERBOSE(VB_IMPORTANT, "GrabLineupCacheAge("+lineupid+") failed -- " +
+                QString("file '%1' size %2 too small")
                 .arg(get_cache_filename(lineupid)).arg(lfile.size()));
         return cache_dt;
     }
     if (!lfile.open(QIODevice::ReadOnly))
     {
-        VERBOSE(VB_IMPORTANT, "GrabLineupCacheAge("<<lineupid<<") failed -- "
-                <<QString("cannot open file '%1'")
+        VERBOSE(VB_IMPORTANT, "GrabLineupCacheAge("+lineupid+") failed -- " +
+                QString("cannot open file '%1'")
                 .arg(get_cache_filename(lineupid)));
         return cache_dt;
     }
@@ -1475,8 +1475,8 @@ QDateTime DataDirectProcessor::GetLineupCacheAge(const QString &lineupid) const
     io >> tmp;
     cache_dt = QDateTime::fromString(tmp, Qt::ISODate);
 
-    VERBOSE(VB_GENERAL, "GrabLineupCacheAge("<<lineupid<<") -> "
-            <<cache_dt.toString(Qt::ISODate));
+    VERBOSE(VB_GENERAL, "GrabLineupCacheAge("+lineupid+") -> " +
+            cache_dt.toString(Qt::ISODate));
 
     return cache_dt;
 }
@@ -1486,7 +1486,7 @@ bool DataDirectProcessor::GrabLineupsFromCache(const QString &lineupid)
     QFile lfile(get_cache_filename(lineupid));
     if (!lfile.exists() || (lfile.size() < 8) || !lfile.open(QIODevice::ReadOnly))
     {
-        VERBOSE(VB_IMPORTANT, "GrabLineupFromCache("<<lineupid<<") -- failed");
+        VERBOSE(VB_IMPORTANT, "GrabLineupFromCache("+lineupid+") -- failed");
         return false;
     }
 
@@ -1535,7 +1535,7 @@ bool DataDirectProcessor::GrabLineupsFromCache(const QString &lineupid)
         stations[station.stationid] = station;
     }
 
-    VERBOSE(VB_GENERAL, "GrabLineupFromCache("<<lineupid<<") -- success");
+    VERBOSE(VB_GENERAL, "GrabLineupFromCache("+lineupid+") -- success");
 
     return true;
 }
@@ -1547,7 +1547,7 @@ bool DataDirectProcessor::SaveLineupToCache(const QString &lineupid) const
     QFile lfile(fna.constData());
     if (!lfile.open(QIODevice::WriteOnly))
     {
-        VERBOSE(VB_IMPORTANT, "SaveLineupToCache("<<lineupid<<") -- failed");
+        VERBOSE(VB_IMPORTANT, "SaveLineupToCache("+lineupid+") -- failed");
         return false;
     }
 
@@ -1590,7 +1590,7 @@ bool DataDirectProcessor::SaveLineupToCache(const QString &lineupid) const
     }
     io << flush;
 
-    VERBOSE(VB_GENERAL, "SaveLineupToCache("<<lineupid<<") -- success");
+    VERBOSE(VB_GENERAL, "SaveLineupToCache("+lineupid+") -- success");
 
     makeFileAccessible(fna.constData()); // Let anybody update it
 
@@ -1919,7 +1919,7 @@ bool DataDirectProcessor::Post(QString url, const PostList &list,
 #endif
 
     if (SHOW_WGET_OUTPUT)
-        VERBOSE(VB_GENERAL, "command: "<<command<<endl);
+        VERBOSE(VB_GENERAL, "command: " + command);
     else
     {
         command += (documentFile.isEmpty()) ? "&> " : "2> ";
@@ -2354,7 +2354,7 @@ static void set_lineup_type(const QString &lineupid, const QString &type)
         tmptype.detach();
         srcid_to_type[srcid] = tmptype;
 
-        VERBOSE(VB_GENERAL, "sourceid "<<srcid<<" has lineup type: "<<type);
+        VERBOSE(VB_GENERAL, QString("sourceid %1 has lineup type: %2").arg(srcid).arg(type));
     }
 }
 

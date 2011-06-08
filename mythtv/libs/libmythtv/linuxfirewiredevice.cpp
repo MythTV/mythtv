@@ -34,6 +34,7 @@ using namespace std;
 #include "firewirerecorder.h"
 #include "mythcorecontext.h"
 #include "linuxavcinfo.h"
+#include "mythlogging.h"
 
 #define LOC      QString("LFireDev(%1): ").arg(guid_to_string(m_guid))
 #define LOC_WARN QString("LFireDev(%1), Warning: ").arg(guid_to_string(m_guid))
@@ -46,7 +47,9 @@ typedef QMap<raw1394handle_t,LinuxFirewireDevice*> handle_to_lfd_t;
 
 void LinuxControllerThread::run(void)
 {
+    threadRegister("LinuxController");
     m_parent->RunPortHandler();
+    threadDeregister();
 }
 
 class LFDPriv
@@ -216,8 +219,8 @@ void LinuxFirewireDevice::HandleBusReset(void)
         m_priv->channel = fwchan;
 
         VERBOSE(VB_IMPORTANT,
-                loc + ": Reconnected fwchan: "<<fwchan<<"\n\t\t\t"
-                <<hex<<"output: 0x"<<output<<" input: 0x"<<input<<dec);
+                loc + QString(": Reconnected fwchan: %1\n\t\t\toutput: 0x%2 "
+                "input: 0x%3").arg(fwchan).arg(output,0,16).arg(input,0,16));
     }
 
     if (m_priv->is_bcast_node_open)
@@ -881,8 +884,8 @@ bool LinuxFirewireDevice::UpdateDeviceList(void)
     {
         if (raw1394_set_port(item.handle, port) < 0)
         {
-            VERBOSE(VB_IMPORTANT, QString("LinuxFirewireDevice: ") +
-                    "Couldn't set port to " << port);
+            VERBOSE(VB_IMPORTANT, QString("LinuxFirewireDevice: "
+                    "Couldn't set port to %1").arg(port));
             continue;
         }
 
@@ -903,8 +906,8 @@ bool LinuxFirewireDevice::UpdateDeviceList(void)
         if (!item.handle)
         {
             VERBOSE(VB_IMPORTANT, QString("LinuxFirewireDevice: ") +
-                    "Couldn't get handle "
-                    "(after setting port "<<port<<")" + ENO);
+                    "Couldn't get handle " +
+                    QString("(after setting port %1").arg(port) + ENO);
             item.handle = NULL;
             break;
         }
@@ -938,7 +941,7 @@ void LinuxFirewireDevice::UpdateDeviceListItem(uint64_t guid, void *pitem)
     {
         LinuxAVCInfo *ptr = new LinuxAVCInfo();
 
-        VERBOSE(VB_RECORD, LOC + "Adding   0x"<<hex<<guid<<dec);
+        VERBOSE(VB_RECORD, LOC + QString("Adding   0x%1").arg(guid,0,16));
 
         m_priv->devices[guid] = ptr;
         it = m_priv->devices.find(guid);
@@ -947,8 +950,8 @@ void LinuxFirewireDevice::UpdateDeviceListItem(uint64_t guid, void *pitem)
     if (it != m_priv->devices.end())
     {
         dev_item &item = *((dev_item*) pitem);
-        VERBOSE(VB_RECORD, LOC + "Updating 0x"<<hex<<guid<<dec
-                <<" port: "<<item.port<<" node: "<<item.node);
+        VERBOSE(VB_RECORD, LOC + QString("Updating 0x%1 port: %2 node: %3")
+                .arg(guid,0,16).arg(item.port).arg(item.node));
 
         (*it)->Update(guid, item.handle, item.port, item.node);
     }

@@ -57,6 +57,7 @@ using namespace std;
 #include "videometadatautil.h"
 #include "mythdirs.h"
 #include "tvbrowsehelper.h"
+#include "mythlogging.h"
 
 #if ! HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
@@ -2174,8 +2175,8 @@ bool TV::StartRecorder(PlayerContext *ctx, int maxWait)
         return false;
     }
 
-    VERBOSE(VB_PLAYBACK, LOC + "StartRecorder(): took "<<t.elapsed()
-            <<" ms to start recorder.");
+    VERBOSE(VB_PLAYBACK, LOC + QString("StartRecorder(): took %1"
+            " ms to start recorder.").arg(t.elapsed()));
 
     return true;
 }
@@ -3061,7 +3062,7 @@ void TV::HandlePseudoLiveTVTimerEvent(void)
             continue;
         }
 
-        VERBOSE(VB_PLAYBACK, "REC_PROGRAM -- channel change "<<i);
+        VERBOSE(VB_PLAYBACK, QString("REC_PROGRAM -- channel change %1").arg(i));
 
         uint        chanid  = ctx->pseudoLiveTVRec->GetChanID();
         QString     channum = ctx->pseudoLiveTVRec->GetChanNum();
@@ -4679,7 +4680,7 @@ bool TV::CreatePBP(PlayerContext *ctx, const ProgramInfo *info)
         ForceNextStateNone(mctx);
     }
 
-    VERBOSE(VB_PLAYBACK, LOC + "CreatePBP() -- end : "<<ok);
+    VERBOSE(VB_PLAYBACK, LOC + QString("CreatePBP() -- end : %1").arg(ok));
     return ok;
 }
 
@@ -5059,7 +5060,8 @@ bool TV::ResizePIPWindow(PlayerContext *ctx)
         if (mctx->player && ctx->player)
         {
             PIPLocation loc = mctx->player->GetNextPIPLocation();
-            VERBOSE(VB_PLAYBACK, LOC + "ResizePIPWindow -- loc "<<loc);
+            VERBOSE(VB_PLAYBACK, LOC + QString("ResizePIPWindow -- loc %1")
+                    .arg(loc));
             if (loc != kPIP_END)
             {
                 rect = mctx->player->getVideoOutput()->GetPIPRect(
@@ -7082,7 +7084,7 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
         if ("message" == it->GetShortName())
         {
             msg = it->GetName();
-            VERBOSE(VB_IMPORTANT, "msg: "<<msg);
+            VERBOSE(VB_IMPORTANT, "msg: " + msg);
             continue;
         }
 
@@ -8203,8 +8205,8 @@ void TV::customEvent(QEvent *e)
             hasrec    = tokens[3].toInt();
             haslater  = tokens[4].toInt();
         }
-        VERBOSE(VB_GENERAL, LOC + message << " hasrec: "<<hasrec
-                << " haslater: " << haslater);
+        VERBOSE(VB_GENERAL, LOC + message + QString(" hasrec: %1 haslater: %2")
+                .arg(hasrec).arg(haslater));
 
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
         if (mctx->recorder && cardnum == mctx->GetCardID())
@@ -9025,7 +9027,9 @@ class load_dd_map
 void *TV::load_dd_map_thunk(void *param)
 {
     load_dd_map *x = (load_dd_map*) param;
+    threadRegister("LoadDDMap");
     x->tv->RunLoadDDMap(x->sourceid);
+    threadDeregister();
     delete x;
     return NULL;
 }
@@ -9033,7 +9037,9 @@ void *TV::load_dd_map_thunk(void *param)
 void *TV::load_dd_map_post_thunk(void *param)
 {
     uint *sourceid = (uint*) param;
+    threadRegister("LoadDDMapPost");
     SourceUtil::UpdateChannelsFromListings(*sourceid);
+    threadDeregister();
     delete sourceid;
     return NULL;
 }
@@ -11109,12 +11115,12 @@ void TV::ToggleSleepTimer(const PlayerContext *ctx, const QString &time)
             else
             {
                 mins = 0;
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid time "<<time);
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid time " + time);
             }
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid time string "<<time);
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid time string " + time);
         }
 
         if (mins)

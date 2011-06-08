@@ -18,6 +18,7 @@
 #include "cardutil.h"
 #include "dvbtypes.h" // for pid filtering
 #include "diseqc.h" // for rotor retune
+#include "mythlogging.h"
 
 #define LOC      QString("DVBSH(%1): ").arg(_device)
 #define LOC_WARN QString("DVBSH(%1) Warning: ").arg(_device)
@@ -104,6 +105,7 @@ void DVBStreamHandler::SetRunningDesired(bool desired)
 
 void DVBStreamHandler::run(void)
 {
+    threadRegister("DVBRead");
     VERBOSE(VB_RECORD, LOC + "run(): begin");
 
     if (!SupportsTSMonitoring() && _allow_section_reader)
@@ -112,6 +114,7 @@ void DVBStreamHandler::run(void)
         RunTS();
 
     VERBOSE(VB_RECORD, LOC + "run(): end");
+    threadDeregister();
 }
 
 /** \fn DVBStreamHandler::RunTS(void)

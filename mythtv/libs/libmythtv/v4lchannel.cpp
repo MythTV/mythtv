@@ -200,7 +200,7 @@ static int format_to_mode(const QString &fmt, int v4l_version)
 #endif
 
     VERBOSE(VB_IMPORTANT,
-            "format_to_mode() does not recognize V4L" << v4l_version);
+            "format_to_mode() does not recognize V4L" + v4l_version);
 
     return V4L2_STD_NTSC; // assume V4L version 2
 }
@@ -286,7 +286,7 @@ static QString mode_to_format(int mode, int v4l_version)
     else
     {
         VERBOSE(VB_IMPORTANT,
-                "mode_to_format() does not recognize V4L" << v4l_version);
+                "mode_to_format() does not recognize V4L" + v4l_version);
     }
 
     return "Unknown";
@@ -502,8 +502,8 @@ bool V4LChannel::Tune(uint64_t frequency, QString inputname)
         if (ioctlval >= 0)
         {
             isTunerCapLow = (mod.capability & V4L2_TUNER_CAP_LOW);
-            VERBOSE(VB_CHANNEL, "  name: "<<mod.name);
-            VERBOSE(VB_CHANNEL, "CapLow: "<<isTunerCapLow);
+            VERBOSE(VB_CHANNEL, QString("  name: %1").arg((char *)mod.name));
+            VERBOSE(VB_CHANNEL, QString("CapLow: %1").arg(isTunerCapLow));
         }
 
         struct v4l2_frequency vf;
@@ -808,8 +808,8 @@ static unsigned short *get_v4l1_field(
         case V4L2_CID_HUE:
             return &vid_pic.hue;
         default:
-            VERBOSE(VB_IMPORTANT, "get_v4l1_field: "
-                    "invalid attribute argument "<<v4l2_attrib);
+            VERBOSE(VB_IMPORTANT, QString("get_v4l1_field: "
+                    "invalid attribute argument %1").arg(v4l2_attrib));
     }
     return NULL;
 }

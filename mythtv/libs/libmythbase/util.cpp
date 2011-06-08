@@ -1476,4 +1476,48 @@ bool MythRemoveDirectory(QDir &aDir)
     VERBOSE(VB_NETWORK, LOC + "failed to find a network proxy");
 }
 
+MBASE_PUBLIC void wrapList(QStringList &list, int width)
+{
+    int i;
+
+    for(i = 0; i < list.size(); i++)
+    {
+        QString string = list.at(i);
+
+        if( string.size() <= width )
+            continue;
+
+        QString left   = string.left(width);
+        bool inserted  = false;
+
+        while( !inserted && left.right(1) != " " )
+        {
+            if( string.mid(left.size(), 1) == " " )
+            {
+                list.replace(i, left);
+                list.insert(i+1, string.mid(left.size()).trimmed());
+                inserted = true;
+            }
+            else
+            { 
+                left.chop(1);
+                if( !left.contains(" ") )
+                {
+                    // Line is too long, just hyphenate it
+                    list.replace(i, left + "-");
+                    list.insert(i+1, string.mid(left.size()));
+                    inserted = true;
+                }
+            }
+        }
+
+        if( !inserted )
+        {
+            left.chop(1);
+            list.replace(i, left);
+            list.insert(i+1, string.mid(left.size()).trimmed());
+        }
+    }
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

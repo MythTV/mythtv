@@ -30,6 +30,7 @@ using namespace std;
 #include "tv_rec.h"
 #include "tv_play.h"
 #include "audioinput.h"
+#include "mythlogging.h"
 #include "vbitext/cc.h"
 #include "vbitext/vbi.h"
 
@@ -70,12 +71,16 @@ extern "C" {
 
 void NVRWriteThread::run(void)
 {
+    threadRegister("NVRWrite");
     m_parent->doWriteThread();
+    threadDeregister();
 }
 
 void NVRAudioThread::run(void)
 {
+    threadRegister("NVRAudio");
     m_parent->doAudioThread();
+    threadDeregister();
 }
 
 NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :

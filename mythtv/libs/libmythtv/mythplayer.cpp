@@ -59,6 +59,7 @@ using namespace std;
 #include "mythpainter.h"
 #include "mythimage.h"
 #include "mythuiimage.h"
+#include "mythlogging.h"
 
 extern "C" {
 #include "vbitext/vbi.h"
@@ -93,9 +94,11 @@ void DecoderThread::run(void)
     if (!m_mp)
         return;
 
+    threadRegister("Decoder");
     VERBOSE(VB_PLAYBACK, LOC_DEC + QString("Decoder thread starting."));
     m_mp->DecoderLoop(m_start_paused);
     VERBOSE(VB_PLAYBACK, LOC_DEC + QString("Decoder thread exiting."));
+    threadDeregister();
 }
 
 static const int toCaptionType(int type)
@@ -705,8 +708,8 @@ void MythPlayer::AutoDeint(VideoFrame *frame, bool allow_lock)
     {
         if (m_scan_tracker < 0)
         {
-            VERBOSE(VB_PLAYBACK, LOC + "interlaced frame seen after "
-                    << abs(m_scan_tracker) << " progressive frames");
+            VERBOSE(VB_PLAYBACK, LOC + QString("interlaced frame seen after %1"
+                    " progressive frames").arg(abs(m_scan_tracker)));
             m_scan_tracker = 2;
             if (allow_lock)
             {
@@ -721,8 +724,8 @@ void MythPlayer::AutoDeint(VideoFrame *frame, bool allow_lock)
     {
         if (m_scan_tracker > 0)
         {
-            VERBOSE(VB_PLAYBACK, LOC + "progressive frame seen after "
-                    << m_scan_tracker << " interlaced  frames");
+            VERBOSE(VB_PLAYBACK, LOC + QString("progressive frame seen after %1"
+                    " interlaced  frames").arg(m_scan_tracker));
             m_scan_tracker = 0;
         }
         m_scan_tracker--;
@@ -1070,8 +1073,8 @@ void MythPlayer::InitFilters(void)
 
     videofiltersLock.unlock();
 
-    VERBOSE(VB_PLAYBACK, LOC + QString("LoadFilters('%1'..) -> ")
-            .arg(filters)<<videoFilters);
+    VERBOSE(VB_PLAYBACK, LOC + QString("LoadFilters('%1'..) -> 0x%2")
+            .arg(filters).arg((uint64_t)videoFilters,0,16));
 }
 
 /** \fn MythPlayer::GetNextVideoFrame(bool)
@@ -3503,7 +3506,7 @@ void MythPlayer::WaitForSeek(uint64_t frame, bool override_seeks,
  */
 void MythPlayer::ClearAfterSeek(bool clearvideobuffers)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "ClearAfterSeek("<<clearvideobuffers<<")");
+    VERBOSE(VB_PLAYBACK, LOC + QString("ClearAfterSeek(%1)").arg(clearvideobuffers));
 
     if (clearvideobuffers && videoOutput)
         videoOutput->ClearAfterSeek();

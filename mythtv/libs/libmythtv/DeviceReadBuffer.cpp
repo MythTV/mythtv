@@ -8,6 +8,7 @@ using namespace std;
 #include "mythverbose.h"
 #include "tspacket.h"
 #include "compat.h"
+#include "mythlogging.h"
 
 #ifndef USING_MINGW
 #include <sys/poll.h>
@@ -317,6 +318,7 @@ void DeviceReadBuffer::run(void)
 {
     uint      errcnt = 0;
 
+    threadRegister("DeviceReadBuffer");
     lock.lock();
     dorun   = true;
     running = true;
@@ -377,6 +379,8 @@ void DeviceReadBuffer::run(void)
     running = false;
     eof     = true;
     lock.unlock();
+
+    threadDeregister();
 }
 
 bool DeviceReadBuffer::HandlePausing(void)

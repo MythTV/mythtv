@@ -17,7 +17,7 @@ class HouseKeepingThread : public QThread
   public:
     HouseKeepingThread(HouseKeeper *p) : m_parent(p) {}
     ~HouseKeepingThread() { wait(); }
-    inline virtual void run(void);
+    virtual void run(void);
   private:
     HouseKeeper *m_parent;
 };
@@ -30,7 +30,7 @@ class MythFillDatabaseThread : public QThread
     ~MythFillDatabaseThread() { wait(); }
     virtual void setTerminationEnabled(bool v)
         { QThread::setTerminationEnabled(v); }
-    inline virtual void run(void);
+    virtual void run(void);
   private:
     HouseKeeper *m_parent;
 };
@@ -53,7 +53,7 @@ class HouseKeeper
                    bool nowIfPossible = false);
     void updateLastrun(const QString &dbTag);
     QDateTime getLastRun(const QString &dbTag);
-    void flushLogs();
+    void flushDBLogs();
     void StartMFD(void);
     void KillMFD(void);
     void CleanupMyOldRecordings(void);
@@ -79,15 +79,5 @@ class HouseKeeper
     bool                    fillDBStarted;     // protected by fillDBLock
     MythSystem             *fillDBMythSystem;  // protected by fillDBLock
 };
-
-inline void HouseKeepingThread::run(void)
-{
-    m_parent->RunHouseKeeping();
-}
-
-inline void MythFillDatabaseThread::run(void)
-{
-    m_parent->RunMFD();
-}
 
 #endif

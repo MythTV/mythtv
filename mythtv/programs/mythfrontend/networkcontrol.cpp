@@ -19,6 +19,7 @@
 #include "mythverbose.h"
 #include "mythsystemevent.h"
 #include "mythdirs.h"
+#include "mythlogging.h"
 
 // libmythui
 #include "mythmainwindow.h"
@@ -50,7 +51,9 @@ static bool is_abbrev(QString const& command,
 
 void NetworkCommandThread::run(void)
 {
+    threadRegister("NetworkCommand");
     m_parent->RunCommandThread();
+    threadDeregister();
 }
 
 NetworkControl::NetworkControl() :

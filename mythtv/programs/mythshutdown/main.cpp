@@ -19,6 +19,8 @@ using namespace std;
 #include "remoteutil.h"
 #include "tvremoteutil.h"
 #include "compat.h"
+#include "mythlogging.h"
+#include "mythcommandlineparser.h"
 
 static void setGlobalSetting(const QString &key, const QString &value)
 {
@@ -334,7 +336,7 @@ static int getStatus(bool bWantRecStatus)
         res = 255;
     }
 
-    VERBOSE(VB_GENERAL, "Mythshutdown: --status returned: " << res);
+    VERBOSE(VB_GENERAL, QString("Mythshutdown: --status returned: %1").arg(res));
 
     return res;
 }
@@ -359,7 +361,7 @@ static int checkOKShutdown(bool bWantRecStatus)
         res = 0;
     }
 
-    VERBOSE(VB_GENERAL, "Mythshutdown: --check returned: " << res);
+    VERBOSE(VB_GENERAL, QString("Mythshutdown: --check returned: %1").arg(res));
 
     return res;
 }
@@ -369,7 +371,7 @@ static int setWakeupTime(QString sWakeupTime)
     VERBOSE(VB_GENERAL, "Mythshutdown: --setwakeup");
 
     VERBOSE(VB_IMPORTANT,
-            "Mythshutdown: wakeup time given is: " << sWakeupTime);
+            QString("Mythshutdown: wakeup time given is: %1").arg(sWakeupTime));
 
     // check time given is valid
     QDateTime dtWakeupTime;
@@ -470,7 +472,7 @@ static int shutdown()
     {
         if (dtCurrent < dtPeriod1Start)
         {
-            VERBOSE(VB_IMPORTANT, "daily wakeup today at " <<
+            VERBOSE(VB_IMPORTANT, "daily wakeup today at " +
                         dtPeriod1Start.toString("hh:mm:ss"));
             dtNextDailyWakeup = dtPeriod1Start;
         }
@@ -481,7 +483,7 @@ static int shutdown()
     {
         if (dtCurrent < dtPeriod2Start)
         {
-            VERBOSE(VB_IMPORTANT, "daily wakeup today at " <<
+            VERBOSE(VB_IMPORTANT, "daily wakeup today at " +
                         dtPeriod2Start.toString("hh:mm:ss"));
             dtNextDailyWakeup = dtPeriod2Start;
         }
@@ -501,7 +503,7 @@ static int shutdown()
         {
             dtNextDailyWakeup = dtNextDailyWakeup.addDays(1);
 
-            VERBOSE(VB_IMPORTANT, "next daily wakeup is tomorrow at " <<
+            VERBOSE(VB_IMPORTANT, "next daily wakeup is tomorrow at " +
                         dtNextDailyWakeup.toString("hh:mm:ss"));
         }
     }
@@ -519,7 +521,7 @@ static int shutdown()
     if (!dtNextRecordingStart.isValid())
         VERBOSE(VB_IMPORTANT,"no recording time is set");
     else
-        VERBOSE(VB_IMPORTANT, "recording scheduled at: " <<
+        VERBOSE(VB_IMPORTANT, "recording scheduled at: " +
                     dtNextRecordingStart.toString(Qt::ISODate));
 
     // check if scheduled recording time has already passed
@@ -720,55 +722,14 @@ static int startup()
     }
 
     if (res)
-        VERBOSE(VB_IMPORTANT, "looks like we were started manually" << res);
+        VERBOSE(VB_IMPORTANT, QString("looks like we were started manually: %1").arg(res));
     else
-        VERBOSE(VB_IMPORTANT, "looks like we were started automatically" << res);
+        VERBOSE(VB_IMPORTANT, QString("looks like we were started automatically: %1").arg(res));
 
 
-    VERBOSE(VB_GENERAL, "Mythshutdown: --startup returned: " << res);
+    VERBOSE(VB_GENERAL, QString("Mythshutdown: --startup returned: %1").arg(res));
 
     return res;
-}
-
-static void showUsage()
-{
-    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
-                            .arg(MYTH_APPNAME_MYTHSHUTDOWN)
-                            .arg(MYTH_SOURCE_PATH)
-                            .arg(MYTH_SOURCE_VERSION));
-
-    cout << "Usage of mythshutdown\n";
-    cout << "-w/--setwakeup time      (sets the wakeup time. time=yyyy-MM-ddThh:mm:ss\n";
-    cout << "                          doesn't write it into nvram)\n";
-    cout << "-t/--setscheduledwakeup  (sets the wakeup time to the next scheduled recording)\n";
-    cout << "-q/--shutdown            (set nvram-wakeup time and shutdown)\n";
-    cout << "-x/--safeshutdown        (equal to -c -t -q.  check shutdown possible, set\n";
-    cout <<"                           scheduled wakeup and shutdown)\n";
-    cout << "-p/--startup             (check startup. check will return 0 if automatic\n";
-    cout << "                                                           1 for manually)\n";
-    cout << "-c/--check flag          (check shutdown possible\n";
-    cout << "                          flag is 0 - don't check recording status\n";
-    cout << "                                  1 - do check recording status (default)\n";
-    cout << "                          returns 0 ok to shutdown\n";
-    cout << "                                  1 reset idle check)\n";
-    cout << "-l/--lock                (disable shutdown. check will return 1.)\n";
-    cout << "-u/--unlock              (enable shutdown. check will return 0)\n";
-    cout << "-s/--status flag         (returns a code indicating the current status)\n";
-    cout << "                          flag is 0 - don't check recording status\n";
-    cout << "                                  1 - do check recording status (default)\n";
-    cout << "                          0 - Idle\n";
-    cout << "                          1 - Transcoding\n";
-    cout << "                          2 - Commercial Detection\n";
-    cout << "                          4 - Grabbing EPG data\n";
-    cout << "                          8 - Recording - only valid if flag is 1\n";
-    cout << "                         16 - Locked\n";
-    cout << "                         32 - Jobs running or pending\n";
-    cout << "                         64 - In a daily wakeup/shutdown period\n";
-    cout << "                        128 - Less than 15 minutes to next wakeup period\n";
-    cout << "                        255 - Setup is running\n";
-    cout << "-v/--verbose debug-level (Use '-v help' for level info\n";
-    cout << "-h/--help                (shows this usage)\n";
-    cout << "\n";
 }
 
 int main(int argc, char **argv)
@@ -791,119 +752,70 @@ int main(int argc, char **argv)
     bool bSetScheduledWakeupTime = false;
     bool bCheckAndShutdown = false;
     bool bWantRecStatus = true;
+    int quiet = 0;
 
-    //  Check command line arguments
-    for (int argpos = 1; argpos < a.argc(); ++argpos)
+    MythShutdownCommandLineParser cmdline;
+    if (!cmdline.Parse(argc, argv))
     {
-        if (!strcmp(a.argv()[argpos],"-v") ||
-            !strcmp(a.argv()[argpos],"--verbose"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                if (parse_verbose_arg(a.argv()[argpos+1]) ==
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+
+    if (cmdline.toBool("showhelp"))
+    {
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_OK;
+    }
+
+    if (cmdline.toBool("showversion"))
+    {
+        cmdline.PrintVersion();
+        return GENERIC_EXIT_OK;
+    }
+
+    if (cmdline.toBool("verbose"))
+        if (parse_verbose_arg(cmdline.toString("verbose")) ==
                         GENERIC_EXIT_INVALID_CMDLINE)
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -v/--verbose option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-
-        else if (!strcmp(a.argv()[argpos],"-l") ||
-            !strcmp(a.argv()[argpos],"--lock"))
-        {
-            bLockShutdown = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"-u") ||
-            !strcmp(a.argv()[argpos],"--unlock"))
-        {
-            bUnlockShutdown = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"-c") ||
-            !strcmp(a.argv()[argpos],"--check"))
-        {
-            bCheckOKShutdown = true;
-            if (a.argc() - 1 > argpos)
-            {
-                QString s = a.argv()[argpos+1];
-                if (!s.startsWith("-"))
-                {
-                    if (s == "0")
-                        bWantRecStatus = false;
-                    ++argpos;
-                }
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-s") ||
-            !strcmp(a.argv()[argpos],"--status"))
-        {
-            bGetStatus = true;
-            if (a.argc() - 1 > argpos)
-            {
-                QString s = a.argv()[argpos+1];
-                if (!s.startsWith("-"))
-                {
-                    if (s == "0")
-                        bWantRecStatus = false;
-                    ++argpos;
-                }
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-w") ||
-            !strcmp(a.argv()[argpos],"--setwakeup"))
-        {
-            if (a.argc() - 1 > argpos)
-            {
-                sWakeupTime = a.argv()[argpos+1];
-                ++argpos;
-            }
-            else
-            {
-                cout << "mythshutdown: Missing argument to "
-                                "-w/--setwakeup option" << endl;
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            bSetWakeupTime = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"-q") ||
-            !strcmp(a.argv()[argpos],"--shutdown"))
-        {
-            bShutdown = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"-p") ||
-            !strcmp(a.argv()[argpos],"--startup"))
-        {
-            bStartup = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"-h") ||
-            !strcmp(a.argv()[argpos],"--help"))
-        {
-            showUsage();
-            return GENERIC_EXIT_OK;
-        }
-        else if (!strcmp(a.argv()[argpos],"-t") ||
-            !strcmp(a.argv()[argpos],"--setscheduledwakeup"))
-        {
-            bSetScheduledWakeupTime = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"-x") ||
-            !strcmp(a.argv()[argpos],"--safeshutdown"))
-        {
-            bCheckAndShutdown = true;
-        }
-
-        else
-        {
-            cout << "Invalid argument: " << a.argv()[argpos] << endl;
-            showUsage();
             return GENERIC_EXIT_INVALID_CMDLINE;
+
+    if (cmdline.toBool("quiet"))
+    {
+        quiet = cmdline.toUInt("quiet");
+        if (quiet > 1)
+        {
+            print_verbose_messages = VB_NONE;
+            parse_verbose_arg("none");
         }
     }
 
+    int facility = cmdline.GetSyslogFacility();
+    bool dblog = !cmdline.toBool("nodblog");
+
+    if (cmdline.toBool("lock"))
+        bLockShutdown = true;
+    if (cmdline.toBool("unlock"))
+        bUnlockShutdown = true;
+    if (cmdline.toBool("shutdown"))
+        bShutdown = true;
+    if (cmdline.toBool("startup"))
+        bStartup = true;
+    if (cmdline.toBool("setschedwakeup"))
+        bSetScheduledWakeupTime = true;
+    if (cmdline.toBool("safeshutdown"))
+        bCheckAndShutdown = true;
+    if (cmdline.toBool("setwakeup"))
+        sWakeupTime = cmdline.toString("setwakeup");
+
+    if (cmdline.toBool("check"))
+    {
+        bCheckOKShutdown = true;
+        bWantRecStatus = (bool)(cmdline.toInt("check") == 1);
+    }
+    if (cmdline.toBool("status"))
+    {
+        bGetStatus = true;
+        bWantRecStatus = (bool)(cmdline.toInt("status") == 1);
+    }
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
@@ -913,6 +825,9 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
+
+    QString logfile = cmdline.GetLogFilePath();
+    logStart(logfile, quiet, facility, dblog);
 
     int res = 0;
 
@@ -942,7 +857,7 @@ int main(int argc, char **argv)
         }
     }
     else
-        showUsage();
+        cmdline.PrintHelp();
 
     delete gContext;
 

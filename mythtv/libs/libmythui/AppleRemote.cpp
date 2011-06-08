@@ -18,6 +18,7 @@
 #include <sstream>
 
 #include "mythverbose.h"
+#include "mythlogging.h"
 
 AppleRemote*      AppleRemote::_instance = 0;
 const int         AppleRemote::REMOTE_SWITCH_COOKIE = 19;
@@ -98,9 +99,11 @@ void AppleRemote::stopListening()
 
 void AppleRemote::run()
 {
+    threadRegister("AppleRemote");
     CFRunLoopRun();
     exec();  // prevent QThread exiting, by entering its run loop
     CFRunLoopStop(CFRunLoopGetCurrent());
+    threadDeregister();
 }
 
 // protected

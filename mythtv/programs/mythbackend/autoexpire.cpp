@@ -11,7 +11,6 @@
 
 // POSIX headers
 #include <unistd.h>
-#include <signal.h>
 
 // C headers
 #include <cstdlib>
@@ -39,6 +38,7 @@ using namespace std;
 #include "backendutil.h"
 #include "mainserver.h"
 #include "compat.h"
+#include "mythlogging.h"
 
 #define LOC     QString("AutoExpire: ")
 #define LOC_ERR QString("AutoExpire Error: ")
@@ -53,13 +53,17 @@ extern AutoExpire *expirer;
 /// \brief This calls AutoExpire::RunExpirer() from within a new thread.
 void ExpireThread::run(void)
 {
+    threadRegister("Expire");
     m_parent->RunExpirer();
+    threadDeregister();
 }
 
 /// \brief This calls AutoExpire::RunUpdate() from within a new thread.
 void UpdateThread::run(void)
 {
+    threadRegister("Update");
     m_parent->RunUpdate();
+    threadDeregister();
 }
 
 /** \class AutoExpire
@@ -153,11 +157,8 @@ void AutoExpire::CalcParams()
 
     if (fsInfos.empty())
     {
-        QString msg = "ERROR: Filesystem Info cache is empty, unable to "
-                      "calculate necessary parameters.";
-        VERBOSE(VB_IMPORTANT, LOC + msg);
-        gCoreContext->LogEntry("mythbackend", LP_WARNING,
-                           "Autoexpire CalcParams", msg);
+        VERBOSE(VB_IMPORTANT, LOC + "ERROR: Filesystem Info cache is empty, "
+                "unable to calculate necessary parameters.");
 
         return;
     }
@@ -372,11 +373,8 @@ void AutoExpire::ExpireRecordings(void)
 
     if (fsInfos.empty())
     {
-        QString msg = "ERROR: Filesystem Info cache is empty, unable to "
-                      "determine what Recordings to expire";
-        VERBOSE(VB_IMPORTANT, LOC + msg);
-        gCoreContext->LogEntry("mythbackend", LP_WARNING,
-                           "Autoexpire Recording", msg);
+        VERBOSE(VB_IMPORTANT, LOC + "ERROR: Filesystem Info cache is empty, "
+                "unable to determine what Recordings to expire");
 
         return;
     }
@@ -592,9 +590,6 @@ void AutoExpire::SendDeleteMessages(pginfolist_t &deleteList)
         else
             VERBOSE(VB_FILE, QString("    ") +  msg);
 
-        gCoreContext->LogEntry("autoexpire", LP_NOTICE,
-                           "Expiring Program", msg);
-
         // send auto expire message to backend's event thread.
         MythEvent me(QString("AUTO_EXPIRE %1 %2").arg((*it)->GetChanID())
                      .arg((*it)->GetRecordingStartTime(ISODate)));
@@ -694,9 +689,6 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                         VERBOSE(VB_IMPORTANT, msg);
                     else
                         VERBOSE(VB_FILE, QString("    ") +  msg);
-
-                    gCoreContext->LogEntry("autoexpire", LP_NOTICE,
-                                       "Expired program", msg);
 
                     msg = QString("AUTO_EXPIRE %1 %2")
                                   .arg(chanid)

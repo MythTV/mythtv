@@ -72,7 +72,8 @@ void RecorderBase::SetRingBuffer(RingBuffer *rbuf)
         QString msg("");
         if (rbuf)
             msg = " '" + rbuf->GetFilename() + "'";
-        VERBOSE(VB_RECORD,  LOC + "SetRingBuffer("<<rbuf<<")"<<msg);
+        VERBOSE(VB_RECORD,  LOC + QString("SetRingBuffer(0x%1)")
+                .arg((uint64_t)rbuf,0,16) + msg);
     }
     ringBuffer = rbuf;
     weMadeBuffer = false;
@@ -82,7 +83,7 @@ void RecorderBase::SetRecording(const ProgramInfo *pginfo)
 {
     if (pginfo)
         VERBOSE(VB_RECORD, LOC + QString("SetRecording(0x%1) title(%2)")
-                .arg((uintptr_t)pginfo,0,16).arg(pginfo->GetTitle()));
+                .arg((uint64_t)pginfo,0,16).arg(pginfo->GetTitle()));
     else
         VERBOSE(VB_RECORD, LOC + "SetRecording(0x0)");
 

@@ -463,7 +463,8 @@ void ExportNative::runScript()
         QFile::remove(logDir + "/mythburncancel.lck");
 
     createConfigFile(configDir + "/mydata.xml");
-    commandline = "mytharchivehelper -n " + configDir + "/mydata.xml";  // job file
+    commandline = "mytharchivehelper --nativearchive --outfile " + configDir + 
+                  "/mydata.xml --quiet";  // job file
     commandline += " > "  + logDir + "/progress.log 2>&1 &";            // Logs
 
     uint flags = kMSRunBackground | kMSDontBlockInputDevs | 

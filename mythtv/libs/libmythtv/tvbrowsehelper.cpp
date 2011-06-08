@@ -12,6 +12,7 @@ using namespace std;
 #include "mythplayer.h"
 #include "cardutil.h"
 #include "tv_play.h"
+#include "mythlogging.h"
 
 #define LOC      QString("BH: ")
 #define LOC_WARN QString("BH Warning: ")
@@ -427,6 +428,7 @@ inline static QString toString(const InfoMap &infoMap, const QString sep="\n")
 
 void TVBrowseHelper::run()
 {
+    threadRegister("TVBrowseHelper");
     QMutexLocker locker(&m_lock);
     while (true)
     {
@@ -596,4 +598,5 @@ void TVBrowseHelper::run()
                 m_tv, new UpdateBrowseInfoEvent(infoMap));
         }
     }
+    threadDeregister();
 }

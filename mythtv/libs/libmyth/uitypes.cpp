@@ -741,14 +741,14 @@ void UIImageType::LoadImage()
 
     if (!GetMythUI()->FindThemeFile(file))
     {
-        VERBOSE(VB_IMPORTANT, "UIImageType::LoadImage() - Cannot find image: "
-                << m_filename);
+        VERBOSE(VB_IMPORTANT, "UIImageType::LoadImage() - Cannot find image: " +
+                              m_filename);
         m_show = false;
         return;
     }
 
     if (m_debug == true)
-        VERBOSE(VB_GENERAL, "     -Filename: " << file);
+        VERBOSE(VB_GENERAL, QString("     -Filename: %1").arg(file));
 
     if (m_hmult == 1 && m_wmult == 1 && m_force_x == -1 && m_force_y == -1)
     {
@@ -767,13 +767,13 @@ void UIImageType::LoadImage()
             {
                 doX = m_force_x;
                 if (m_debug == true)
-                    VERBOSE(VB_GENERAL, "         +Force X: " << doX);
+                    VERBOSE(VB_GENERAL, QString("         +Force X: %1").arg(doX));
             }
             if (m_force_y != -1)
             {
                 doY = m_force_y;
                 if (m_debug == true)
-                    VERBOSE(VB_GENERAL, "         +Force Y: " << doY);
+                    VERBOSE(VB_GENERAL, QString("         +Force Y: %1").arg(doY));
             }
 
             scalerImg = sourceImg->scaled((int)(doX * m_wmult),
@@ -783,13 +783,13 @@ void UIImageType::LoadImage()
             m_show = true;
             img = QPixmap::fromImage(scalerImg);
             if (m_debug == true)
-                VERBOSE(VB_GENERAL, "     -Image: " << file << " loaded.");
+                VERBOSE(VB_GENERAL, QString("     -Image: %1 loaded.").arg(file));
         }
         else
         {
             m_show = false;
             if (m_debug == true)
-                VERBOSE(VB_GENERAL, "     -Image: " << file << " failed to load.");
+                VERBOSE(VB_GENERAL, QString("     -Image: %1 failed to load.").arg(file));
         }
         delete sourceImg;
     }

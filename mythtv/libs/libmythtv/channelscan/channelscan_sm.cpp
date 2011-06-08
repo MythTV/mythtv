@@ -45,6 +45,7 @@ using namespace std;
 #include "cardutil.h"
 #include "sourceutil.h"
 #include "mythdb.h"
+#include "mythlogging.h"
 
 // MythTV includes - DTV
 #include "dtvsignalmonitor.h"
@@ -67,7 +68,9 @@ using namespace std;
  */
 void ScannerThread::run(void)
 {
+    threadRegister("Scanner");
     m_parent->RunScanner();
+    threadDeregister();
 }
 
 /// SDT's should be sent every 2 seconds and NIT's every

@@ -74,19 +74,22 @@ void IPTVMediaSink::afterGettingFrame1(unsigned int   frameSize,
 
 void IPTVMediaSink::AddListener(TSDataListener *item)
 {
-    VERBOSE(VB_RECORD, LOC + "AddListener("<<item<<") -- begin");
+    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- begin")
+                       .arg((uint64_t)item,0,16));
     if (item)
     {
         RemoveListener(item);
         QMutexLocker locker(&_lock);
         _listeners.push_back(item);
     }
-    VERBOSE(VB_RECORD, LOC + "AddListener("<<item<<") -- end");
+    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- end")
+                       .arg((uint64_t)item,0,16));
 }
 
 void IPTVMediaSink::RemoveListener(TSDataListener *item)
 {
-    VERBOSE(VB_RECORD, LOC + "RemoveListener("<<item<<") -- begin 1");
+    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- begin 1")
+                       .arg((uint64_t)item,0,16));
     QMutexLocker locker(&_lock);
     vector<TSDataListener*>::iterator it =
         find(_listeners.begin(), _listeners.end(), item);
@@ -95,7 +98,8 @@ void IPTVMediaSink::RemoveListener(TSDataListener *item)
         *it = *_listeners.rbegin();
         _listeners.resize(_listeners.size() - 1);
     }
-    VERBOSE(VB_RECORD, LOC + "RemoveListener("<<item<<") -- end 6");
+    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- end 6")
+                       .arg((uint64_t)item,0,16));
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

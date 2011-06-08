@@ -3,6 +3,7 @@
 #include <compat.h>
 
 #include "playlistcontainer.h"
+#include "mythlogging.h"
 
 PlaylistLoadingThread::PlaylistLoadingThread(PlaylistContainer *parent_ptr,
                                              AllMusic *all_music_ptr)
@@ -13,11 +14,13 @@ PlaylistLoadingThread::PlaylistLoadingThread(PlaylistContainer *parent_ptr,
 
 void PlaylistLoadingThread::run()
 {
+    threadRegister("PlaylistLoading");
     while(!all_music->doneLoading())
     {
         sleep(1);
     }
     parent->load();
+    threadDeregister();
 }
 
 #define LOC      QString("PlaylistContainer: ")

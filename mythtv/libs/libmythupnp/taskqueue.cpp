@@ -23,6 +23,7 @@
 
 #include "taskqueue.h"
 #include "mythverbose.h"
+#include "mythlogging.h"
 
 #include <QDateTime>
 
@@ -115,6 +116,7 @@ void TaskQueue::run( )
 {
     Task *pTask;
 
+    threadRegister("TaskQueue");
     VERBOSE(VB_UPNP, "TaskQueue::run - TaskQueue Thread Running.");
 
     while ( !m_bTermRequested )
@@ -143,7 +145,7 @@ void TaskQueue::run( )
 
         msleep( 100 );
     }
-
+    threadDeregister();
 }
 
 /////////////////////////////////////////////////////////////////////////////

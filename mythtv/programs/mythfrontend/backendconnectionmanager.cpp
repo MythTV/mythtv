@@ -12,6 +12,7 @@
 #include "exitcodes.h"
 #include "util.h" // for checkTimeZone()
 #include "backendconnectionmanager.h"
+#include "mythlogging.h"
 
 class Reconnect : public QRunnable
 {
@@ -23,10 +24,12 @@ class Reconnect : public QRunnable
 
     virtual void run(void)
     {
+        threadRegister("Reconnect");
         if (gCoreContext->GetMasterHostPrefix().isEmpty())
             gCoreContext->dispatch(MythEvent(QString("RECONNECT_FAILURE")));
         else
             gCoreContext->dispatch(MythEvent(QString("RECONNECT_SUCCESS")));
+        threadDeregister();
     }
 };
 

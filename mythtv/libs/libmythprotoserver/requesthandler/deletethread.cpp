@@ -15,6 +15,7 @@ using namespace std;
 #include "mythverbose.h"
 #include "requesthandler/deletethread.h"
 #include "mythcorecontext.h"
+#include "mythlogging.h"
 
 /*
  Rather than attempt to calculate a delete speed from tuner card information
@@ -35,6 +36,7 @@ DeleteThread::DeleteThread(void) :
 
 void DeleteThread::run(void)
 {
+    threadRegister("Delete");
     while (gCoreContext && m_run)
     {
         // loop through any stored files every half second 
@@ -54,6 +56,7 @@ void DeleteThread::run(void)
             delete (*i);
         }
     }
+    threadDeregister();
 }
 
 bool DeleteThread::AddFile(QString path)

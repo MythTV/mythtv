@@ -28,6 +28,7 @@
 #include "mythconfig.h"
 #include "remoteutil.h"
 #include "ringbuffer.h"
+#include "mythlogging.h"
 #include "v4lchannel.h"
 #include "dialogbox.h"
 #include "jobqueue.h"
@@ -355,13 +356,13 @@ QDateTime TVRec::GetRecordEndTime(const ProgramInfo *pi) const
 void TVRec::CancelNextRecording(bool cancel)
 {
     QMutexLocker pendlock(&pendingRecLock);
-    VERBOSE(VB_RECORD, LOC + "CancelNextRecording("<<cancel<<") -- begin");
+    VERBOSE(VB_RECORD, LOC + QString("CancelNextRecording(%1) -- begin").arg(cancel));
 
     PendingMap::iterator it = pendingRecordings.find(cardid);
     if (it == pendingRecordings.end())
     {
-        VERBOSE(VB_RECORD, LOC + "CancelNextRecording("<<cancel<<") -- "
-                "error, unknown recording");
+        VERBOSE(VB_RECORD, LOC + QString("CancelNextRecording(%1) -- "
+                "error, unknown recording").arg(cancel));
         return;
     }
 
@@ -371,14 +372,16 @@ void TVRec::CancelNextRecording(bool cancel)
         for (uint i = 0; i < cardids.size(); i++)
         {
             VERBOSE(VB_RECORD, LOC +
-                    "CancelNextRecording -- cardid "<<cardids[i]);
+                    QString("CancelNextRecording -- cardid 0x%1")
+                    .arg((uint64_t)cardids[i],0,16));
 
             pendlock.unlock();
             RemoteRecordPending(cardids[i], (*it).info, -1, false);
             pendlock.relock();
         }
 
-        VERBOSE(VB_RECORD, LOC + "CancelNextRecording -- cardid "<<cardid);
+        VERBOSE(VB_RECORD, LOC + QString("CancelNextRecording -- cardid %1")
+                           .arg(cardid));
 
         RecordPending((*it).info, -1, false);
     }
@@ -387,7 +390,7 @@ void TVRec::CancelNextRecording(bool cancel)
         (*it).canceled = false;
     }
 
-    VERBOSE(VB_RECORD, LOC + "CancelNextRecording("<<cancel<<") -- end");
+    VERBOSE(VB_RECORD, LOC + QString("CancelNextRecording(%1) -- end").arg(cancel));
 }
 
 /** \fn TVRec::StartRecording(const ProgramInfo*)
@@ -765,8 +768,8 @@ void TVRec::StartedRecording(RecordingInfo *curRec)
         return;
 
     curRec->StartedRecording(rbFileExt);
-    VERBOSE(VB_RECORD, LOC + "StartedRecording("<<curRec<<") fn("
-            <<curRec->GetPathname()<<")");
+    VERBOSE(VB_RECORD, LOC + QString("StartedRecording(0x%1) fn(%2)")
+            .arg((uint64_t)curRec,0,16).arg(curRec->GetPathname()));
 
     if (curRec->IsCommercialFree())
         curRec->SaveCommFlagged(COMM_FLAG_COMMFREE);
@@ -1095,12 +1098,14 @@ V4LChannel *TVRec::GetV4LChannel(void)
 #endif // USING_V4L2
 }
 
-/** \fn TVReEventThread::run(void)
+/** \fn TVRecEventThread::run(void)
  *  \brief Thunk that allows event thread to call RunTV().
  */
 void TVRecEventThread::run(void)
 {
+    threadRegister("TVRecEvent");
     m_parent->RunTV();
+    threadDeregister();
 }
 
 static bool get_use_eit(uint cardid)
@@ -1293,12 +1298,13 @@ void TVRec::RunTV(void)
                     if (curRecording)
                         starttime = curRecording->GetRecordingStartTime();
 
-                    VERBOSE(VB_RECORD, LOC
-                            <<"!has_rec("<<!has_rec<<") "
-                            <<"!rec_soon("<<!rec_soon<<") "
-                            <<"curRec("<<curRecording<<") "
-                            <<"starttm("
-                            <<starttime.toString(Qt::ISODate)<<")");
+                    VERBOSE(VB_RECORD, LOC +
+                            QString("!has_rec(%1) ").arg(!has_rec) +
+                            QString("!rec_soon(%1) ").arg(!rec_soon) +
+                            QString("curRec(0x%1) ")
+                            .arg((uint64_t)curRecording,0,16) +
+                            QString("starttm(%1)")
+                            .arg(starttime.toString(Qt::ISODate)));
                 }
                 else
                 {
@@ -1899,8 +1905,8 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
  */
 bool TVRec::SetupSignalMonitor(bool tablemon, bool EITscan, bool notify)
 {
-    VERBOSE(VB_RECORD, LOC + "SetupSignalMonitor("
-            <<tablemon<<", "<<notify<<")");
+    VERBOSE(VB_RECORD, LOC + QString("SetupSignalMonitor(%1, %2)")
+            .arg(tablemon).arg(notify));
 
     // if it already exists, there no need to initialize it
     if (signalMonitor)
@@ -2667,7 +2673,7 @@ void TVRec::NotifySchedulerOfRecording(RecordingInfo *rec)
  */
 void TVRec::SetLiveRecording(int recording)
 {
-    VERBOSE(VB_IMPORTANT, LOC + "SetLiveRecording("<<recording<<")");
+    VERBOSE(VB_IMPORTANT, LOC + QString("SetLiveRecording(%1)").arg(recording));
     QMutexLocker locker(&stateChangeLock);
 
     (void) recording;
@@ -2719,8 +2725,10 @@ void TVRec::SetLiveRecording(int recording)
 void TVRec::StopLiveTV(void)
 {
     QMutexLocker lock(&stateChangeLock);
-    VERBOSE(VB_RECORD, LOC + "StopLiveTV(void) curRec: "<<curRecording
-            <<" pseudoRec: "<<pseudoLiveTVRecording);
+    VERBOSE(VB_RECORD, LOC + QString("StopLiveTV(void) curRec: 0x%1 "
+            "pseudoRec: 0x%2")
+            .arg((uint64_t)curRecording,0,16)
+            .arg((uint64_t)pseudoLiveTVRecording,0,16));
 
     if (internalState != kState_WatchingLiveTV)
         return;
@@ -2903,7 +2911,7 @@ QString TVRec::SetInput(QString input, uint requestType)
 {
     QMutexLocker lock(&stateChangeLock);
     QString origIn = input;
-    VERBOSE(VB_RECORD, LOC + "SetInput("<<input<<") -- begin");
+    VERBOSE(VB_RECORD, LOC + "SetInput(" + input + ") -- begin");
 
     if (!channel)
     {
@@ -2915,8 +2923,8 @@ QString TVRec::SetInput(QString input, uint requestType)
 
     if (input == channel->GetCurrentInput())
     {
-        VERBOSE(VB_RECORD, LOC + "SetInput("<<origIn<<":"<<input
-                <<") -- end  nothing to do");
+        VERBOSE(VB_RECORD, LOC + "SetInput(" + origIn + ":" + input +
+                ") -- end  nothing to do");
         return input;
     }
 
@@ -2943,7 +2951,7 @@ QString TVRec::SetInput(QString input, uint requestType)
         while (!HasFlags(kFlagRingBufferReady))
             WaitForEventThreadSleep();
     }
-    VERBOSE(VB_RECORD, LOC + "SetInput("<<origIn<<":"<<input<<") -- end");
+    VERBOSE(VB_RECORD, LOC + "SetInput(" + origIn + ":" + input + ") -- end");
 
     return GetInput();
 }
@@ -3321,7 +3329,7 @@ void TVRec::HandleTuning(void)
     if (tuningRequests.size())
     {
         TuningRequest request = tuningRequests.front();
-        VERBOSE(VB_RECORD, LOC + "HandleTuning Request: "<<request.toString());
+        VERBOSE(VB_RECORD, LOC + "HandleTuning Request: " + request.toString());
 
         QString input;
         request.channel = TuningGetChanNum(request, input);
@@ -3408,7 +3416,8 @@ uint TVRec::TuningCheckForHWChange(const TuningRequest &request,
         int new_input     = channel->GetInputByName(inputname);
         curCardID = channel->GetInputCardID(current_input);
         newCardID = channel->GetInputCardID(new_input);
-        VERBOSE(VB_IMPORTANT, LOC<<"HW Tuner: "<<curCardID<<"->"<<newCardID);
+        VERBOSE(VB_IMPORTANT, LOC + QString("HW Tuner: %1->%2")
+                .arg(curCardID).arg(newCardID));
     }
 
     if (curCardID != newCardID)
@@ -4365,8 +4374,8 @@ bool TVRec::CreateLiveTVRingBuffer(const QString & channum)
 bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
                                    bool discont, bool set_rec)
 {
-    VERBOSE(VB_RECORD, LOC + "SwitchLiveTVRingBuffer(discont "
-            <<discont<<", set_rec "<<set_rec<<")");
+    VERBOSE(VB_RECORD, LOC + QString("SwitchLiveTVRingBuffer(discont %1, "
+            "set_rec %2").arg(discont).arg(set_rec));
 
     RecordingInfo *pginfo = NULL;
     RingBuffer    *rb = NULL;

@@ -445,9 +445,9 @@ void StackedConfigurationGroup::raise(Configurable* child)
         }
     }
 
-    VERBOSE(VB_IMPORTANT, "BUG: StackedConfigurationGroup::raise(): "
-            "unrecognized child " << child << " "
-            <<QString("on setting %1/%2").arg(getName()).arg(getLabel()));
+    VERBOSE(VB_IMPORTANT, QString("BUG: StackedConfigurationGroup::raise(): "
+            "unrecognized child 0x%1 on setting %2/%3")
+            .arg((uint64_t)child,0,16).arg(getName()).arg(getLabel()));
 }
 
 void StackedConfigurationGroup::Save(void)

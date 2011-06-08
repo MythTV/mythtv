@@ -1,4 +1,3 @@
-
 #include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -171,7 +170,6 @@ namespace
         gContext = NULL;
 
 #ifndef _MSC_VER
-        signal(SIGHUP, SIG_DFL);
         signal(SIGUSR1, SIG_DFL);
 #endif
     }
@@ -1027,112 +1025,30 @@ static void CleanupMyOldInUsePrograms(void)
         MythDB::DBError("CleanupMyOldInUsePrograms", query);
 }
 
-static void ShowUsage(const MythCommandLineParser &cmdlineparser)
-{
-    QString    help  = cmdlineparser.GetHelpString(false);
-    QByteArray ahelp = help.toLocal8Bit();
-
-    cerr << "Valid options are: " << endl <<
-            "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
-            "-r or --reset                  Resets frontend appearance settings and language" << endl <<
-            ahelp.constData() <<
-            "-p or --prompt                 Always prompt for Mythbackend selection." << endl <<
-            "-d or --disable-autodiscovery  Never prompt for Mythbackend selection." << endl <<
-
-            "-u or --upgrade-schema         Allow mythfrontend to upgrade the database schema" << endl <<
-            "<plugin>                       Initialize and run this plugin" << endl <<
-            endl <<
-            "Environment Variables:" << endl <<
-            "$MYTHTVDIR                     Set the installation prefix" << endl <<
-            "$MYTHCONFDIR                   Set the config dir (instead of ~/.mythtv)" << endl;
-
-}
-
-static int log_rotate(int report_error)
-{
-    int new_logfd = open(logfile.toLocal8Bit().constData(),
-                         O_WRONLY|O_CREAT|O_APPEND, 0664);
-
-    if (new_logfd < 0) {
-        /* If we can't open the new logfile, send data to /dev/null */
-        if (report_error)
-        {
-            VERBOSE(VB_IMPORTANT, QString("Cannot open logfile '%1'")
-                    .arg(logfile));
-            return -1;
-        }
-
-        new_logfd = open("/dev/null", O_WRONLY);
-
-        if (new_logfd < 0) {
-            /* There's not much we can do, so punt. */
-            return -1;
-        }
-    }
-
-#ifdef WINDOWS_CLOSE_CONSOLE
-    // pure Win32 GUI app does not have standard IO streams
-    // simply assign the file descriptors to the logfile
-    *stdout = *(_fdopen(new_logfd, "w"));
-    *stderr = *stdout;
-    setvbuf(stdout, NULL, _IOLBF, 256);
-#else
-    while (dup2(new_logfd, 1) < 0 && errno == EINTR);
-    while (dup2(new_logfd, 2) < 0 && errno == EINTR);
-    while (close(new_logfd) < 0   && errno == EINTR);
-#endif
-
-    return 0;
-}
-
-static void log_rotate_handler(int)
-{
-    log_rotate(0);
-}
-
 int main(int argc, char **argv)
 {
     bool bPromptForBackend    = false;
     bool bBypassAutoDiscovery = false;
     bool upgradeAllowed = false;
+    int quiet = 0;
 
-    bool cmdline_err;
-    MythCommandLineParser cmdline(
-        kCLPOverrideSettingsFile |
-        kCLPOverrideSettings     |
-        kCLPWindowed             |
-        kCLPNoWindowed           |
-        kCLPGetSettings          |
-        kCLPQueryVersion         |
-        kCLPVerbose              |
-        kCLPNoUPnP               |
-#ifdef USING_X11
-        kCLPDisplay              |
-#endif // USING_X11
-        kCLPExtra                |
-        kCLPGeometry);
-
-    // Handle --help before QApplication is created, so that
-    // we can print help even if X11 is absent.
-    for (int argpos = 1; argpos < argc; ++argpos)
+    MythFrontendCommandLineParser cmdline;
+    if (!cmdline.Parse(argc, argv))
     {
-        QString arg(argv[argpos]);
-        if (arg == "-h" || arg == "--help" || arg == "--usage")
-        {
-            ShowUsage(cmdline);
-            return GENERIC_EXIT_OK;
-        }
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    for (int argpos = 1; argpos < argc; ++argpos)
+    if (cmdline.toBool("showhelp"))
     {
-        if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
-        {
-            if (cmdline_err)
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            if (cmdline.WantsToExit())
-                return GENERIC_EXIT_OK;
-        }
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_OK;
+    }
+
+    if (cmdline.toBool("showversion"))
+    {
+        cmdline.PrintVersion();
+        return GENERIC_EXIT_OK;
     }
 
 #ifdef Q_WS_MACX
@@ -1150,6 +1066,24 @@ int main(int argc, char **argv)
 
     QString binname = finfo.baseName();
 
+    if (cmdline.toBool("verbose"))
+        if (parse_verbose_arg(cmdline.toString("verbose")) ==
+                        GENERIC_EXIT_INVALID_CMDLINE)
+            return GENERIC_EXIT_INVALID_CMDLINE;
+
+    if (cmdline.toBool("quiet"))
+    {
+        quiet = cmdline.toUInt("quiet");
+        if (quiet > 1)
+        {
+            print_verbose_messages = VB_NONE;
+            parse_verbose_arg("none");
+        }
+    }
+
+    int facility = cmdline.GetSyslogFacility();
+    bool dblog = !cmdline.toBool("nodblog");
+
     VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
                             .arg(MYTH_APPNAME_MYTHFRONTEND)
                             .arg(MYTH_SOURCE_PATH)
@@ -1160,84 +1094,32 @@ int main(int argc, char **argv)
     if (binname.toLower() != "mythfrontend")
         pluginname = binname;
 
-    for (int argpos = 1; argpos < a.argc(); ++argpos)
-    {
-        if (!strcmp(a.argv()[argpos],"--prompt") ||
-            !strcmp(a.argv()[argpos],"-p" ))
-        {
-            bPromptForBackend = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"--disable-autodiscovery") ||
-                 !strcmp(a.argv()[argpos],"-d" ))
-        {
-            bBypassAutoDiscovery = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"-l") ||
-            !strcmp(a.argv()[argpos],"--logfile"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                logfile = a.argv()[argpos+1];
-                if (logfile.startsWith('-'))
-                {
-                    cerr << "Invalid or missing argument"
-                            " to -l/--logfile option\n";
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-                else
-                {
-                    ++argpos;
-                }
-            }
-            else
-            {
-                cerr << "Missing argument to -l/--logfile option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
-        {
-            if (cmdline_err)
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            if (cmdline.WantsToExit())
-                return GENERIC_EXIT_OK;
-        }
-    }
-    QMap<QString,QString> settingsOverride = cmdline.GetSettingsOverride();
-
-    if (logfile.size())
-    {
-        if (log_rotate(1) < 0)
-            cerr << "cannot open logfile; using stdout/stderr" << endl;
-        else
-        {
-            VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
-                                    .arg(MYTH_APPNAME_MYTHFRONTEND)
-                                    .arg(MYTH_SOURCE_PATH)
-                                    .arg(MYTH_SOURCE_VERSION));
-
-            signal(SIGHUP, &log_rotate_handler);
-        }
-    }
+    if (cmdline.toBool("prompt"))
+        bPromptForBackend = true;
+    if (cmdline.toBool("noautodiscovery"))
+        bBypassAutoDiscovery = true;
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         cerr << "Unable to ignore SIGPIPE\n";
 
-    if (!cmdline.GetDisplay().isEmpty())
+    if (!cmdline.toString("display").isEmpty())
     {
-        MythUIHelper::SetX11Display(cmdline.GetDisplay());
+        MythUIHelper::SetX11Display(cmdline.toString("display"));
     }
 
-    if (!cmdline.GetGeometry().isEmpty())
+    if (!cmdline.toString("geometry").isEmpty())
     {
-        MythUIHelper::ParseGeometryOverride(cmdline.GetGeometry());
+        MythUIHelper::ParseGeometryOverride(cmdline.toString("geometry"));
     }
 
     CleanupGuard callCleanup(cleanup);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
-    if (cmdline.IsUPnPEnabled())
+    logfile = cmdline.GetLogFilePath();
+    logStart(logfile, quiet, facility, dblog);
+
+    if (!cmdline.toBool("noupnp"))
     {
         g_pUPnp  = new MediaRenderer();
         if (!g_pUPnp->initialized())
@@ -1249,7 +1131,7 @@ int main(int argc, char **argv)
 
     // Override settings as early as possible to cover bootstrapped screens
     // such as the language prompt
-    settingsOverride = cmdline.GetSettingsOverride();
+    QMap<QString,QString> settingsOverride = cmdline.GetSettingsOverride();
     if (settingsOverride.size())
     {
         QMap<QString, QString>::iterator it;
@@ -1273,75 +1155,11 @@ int main(int argc, char **argv)
             return GENERIC_EXIT_DB_ERROR;
     }
 
-    for(int argpos = 1; argpos < a.argc(); ++argpos)
-    {
-        if (!strcmp(a.argv()[argpos],"-l") ||
-            !strcmp(a.argv()[argpos],"--logfile"))
-        {
-            // Arg processing for logfile already done (before MythContext)
-            ++argpos;
-        } else if (!strcmp(a.argv()[argpos],"-v") ||
-                   !strcmp(a.argv()[argpos],"--verbose"))
-        {
-            // Arg processing for verbose already done (before MythContext)
-            ++argpos;
-        }
-        else if (!strcmp(a.argv()[argpos],"-r") ||
-                 !strcmp(a.argv()[argpos],"--reset"))
-        {
-            ResetSettings = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"--prompt") ||
-                 !strcmp(a.argv()[argpos],"-p" ))
-        {
-        }
-        else if (!strcmp(a.argv()[argpos],"--disable-autodiscovery") ||
-                 !strcmp(a.argv()[argpos],"-d" ))
-        {
-        }
-        else if (!strcmp(a.argv()[argpos],"--upgrade-schema") ||
-                 !strcmp(a.argv()[argpos],"-u" ))
-        {
-            upgradeAllowed = true;
-        }
-        else if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
-        {
-            if (cmdline_err)
-            {
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
+    if (cmdline.toBool("reset"))
+        ResetSettings = true;
 
-            if (cmdline.WantsToExit())
-            {
-                return GENERIC_EXIT_OK;
-            }
-        }
-        else if ((argpos + 1 == a.argc()) &&
-                 (!QString(a.argv()[argpos]).startsWith('-')))
-        {
-            pluginname = a.argv()[argpos];
-        }
-        else
-        {
-            cerr << "Invalid argument: " << a.argv()[argpos] << endl;
-            ShowUsage(cmdline);
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
-    }
-
-    QStringList settingsQuery = cmdline.GetSettingsQuery();
-    if (!settingsQuery.empty())
-    {
-        QStringList::const_iterator it = settingsQuery.begin();
-        for (; it != settingsQuery.end(); ++it)
-        {
-            QString value = gCoreContext->GetSetting(*it);
-            QString out = QString("\tSettings Value : %1 = %2")
-                .arg(*it).arg(value);
-            cout << out.toLocal8Bit().constData() << endl;
-        }
-        return GENERIC_EXIT_OK;
-    }
+    if (cmdline.GetArgs().size() >= 1)
+        pluginname = cmdline.GetArgs()[0];
 
     QString fileprefix = GetConfDir();
 

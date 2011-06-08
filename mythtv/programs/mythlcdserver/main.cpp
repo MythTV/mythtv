@@ -22,6 +22,7 @@ using namespace std;
 #include "tv_play.h"
 #include "compat.h"
 #include "mythtranslation.h"
+#include "mythcommandlineparser.h"
 
 #include "lcdserver.h"
 
@@ -33,193 +34,84 @@ int main(int argc, char **argv)
     QString startup_message = "";          // default to no startup message
     int message_time = 30;                 // time to display startup message
     print_verbose_messages = VB_IMPORTANT; // only show important messages
-    QString logfile = "";
+    QString logfile;
+    int quiet = 0;
 
     debug_level = 0;  // don't show any debug messages by default
 
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHLCDSERVER);
 
-    //  Check command line arguments
-    for (int argpos = 1; argpos < a.argc(); ++argpos)
+    MythLCDServerCommandLineParser cmdline;
+    if (!cmdline.Parse(argc, argv))
     {
-        if (!strcmp(a.argv()[argpos],"-d") ||
-            !strcmp(a.argv()[argpos],"--daemon"))
-        {
-            daemon_mode = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"-n") ||
-            !strcmp(a.argv()[argpos],"--nodaemon"))
-        {
-            daemon_mode = false;
-        }
-        else if (!strcmp(a.argv()[argpos],"-p") ||
-            !strcmp(a.argv()[argpos],"--port"))
-        {
-            if (a.argc() > argpos)
-            {
-                QString port_number = a.argv()[argpos+1];
-                ++argpos;
-                special_port = port_number.toInt();
-                if (special_port < 1 || special_port > 65534)
-                {
-                    VERBOSE(VB_IMPORTANT, "lcdserver: Bad port number");
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-            }
-            else
-            {
-                VERBOSE(VB_IMPORTANT, "lcdserver: Missing argument to "
-                                "-p/--port option");
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-m") ||
-            !strcmp(a.argv()[argpos],"--startupmessage"))
-        {
-            if (a.argc() > argpos)
-            {
-                startup_message = a.argv()[argpos+1];
-                ++argpos;
-            }
-            else
-            {
-                VERBOSE(VB_IMPORTANT, "lcdserver: Missing argument to "
-                                "-m/--startupmessage");
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-t") ||
-            !strcmp(a.argv()[argpos],"--messagetime"))
-        {
-            if (a.argc() > argpos)
-            {
-                QString sTime = a.argv()[argpos+1];
-                ++argpos;
-                message_time = sTime.toInt();
-                if (message_time < 1 || message_time > 1000)
-                {
-                    VERBOSE(VB_IMPORTANT, "lcdserver: Bad show message time");
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-            }
-            else
-            {
-                VERBOSE(VB_IMPORTANT, "lcdserver: Missing argument to "
-                                "-t/--messagetime");
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-v") ||
-            !strcmp(a.argv()[argpos],"--verbose"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                if (parse_verbose_arg(a.argv()[argpos+1]) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-                    return GENERIC_EXIT_INVALID_CMDLINE;
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
 
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -v/--verbose option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-l") ||
-            !strcmp(a.argv()[argpos],"--logfile"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                logfile = a.argv()[argpos+1];
-                if (logfile.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to -l/--logfile option\n";
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-                else
-                {
-                    ++argpos;
-                }
-            }
-            else
-            {
-                cerr << "Missing argument to -l/--logfile option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-x") ||
-            !strcmp(a.argv()[argpos],"--debuglevel"))
-        {
-            if (a.argc() > argpos)
-            {
-                QString sTemp = a.argv()[argpos+1];
+    if (cmdline.toBool("showhelp"))
+    {
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_OK;
+    }
 
-                ++argpos;
-                debug_level = sTemp.toInt();
-                if (debug_level < 0 || debug_level > 10)
-                {
-                    VERBOSE(VB_IMPORTANT, "lcdserver: Bad debug level");
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-            }
-            else
-            {
-                VERBOSE(VB_IMPORTANT, "lcdserver: Missing argument to "
-                                "-x/--debuglevel");
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else
+    if (cmdline.toBool("showversion"))
+    {
+        cmdline.PrintVersion();
+        return GENERIC_EXIT_OK;
+    }
+
+    if (cmdline.toBool("quiet"))
+    {
+        quiet = cmdline.toUInt("quiet");
+        if (quiet > 1)
         {
-            cerr << "Invalid argument: " << a.argv()[argpos] << endl
-                 << "Valid options are: " << endl <<
-"-p or --port number           A port number to listen on (default is 6545) "
-                 << endl <<
-"-d or --daemon                Runs lcd server as a daemon "
-                 << endl <<
-"-n or --nodaemon              Does not run lcd server as a daemon (default)"
-                 << endl <<
-"-m or --startupmessage        Message to show at startup"
-                 << endl <<
-"-t or --messagetime           How long to show startup message (default 30 seconds)"
-                 << endl <<
-"-l or --logfile filename      Writes STDERR and STDOUT messages to filename"
-                 << endl <<
-"-v or --verbose debug-level   Use '-v help' for level info"
-                 << endl <<
-"-x or --debuglevel level      Control how much debug messages to show"
-                 << endl <<
-"                              [number between 0 and 10] (default 0)"
-                 << endl;
+            print_verbose_messages = VB_NONE;
+            parse_verbose_arg("none");
+        }
+    }
+
+    if (cmdline.toBool("daemon"))
+    {
+        daemon_mode = true;
+        if (!quiet)
+            quiet = 1;
+    }
+
+    int facility = cmdline.GetSyslogFacility();
+    bool dblog = !cmdline.toBool("nodblog");
+
+    logfile = cmdline.GetLogFilePath();
+    logStart(logfile, quiet, facility, dblog);
+
+
+    if (cmdline.toBool("port"))
+    {
+        special_port = cmdline.toInt("port");
+        if (special_port < 1 || special_port > 65534)
+        {
+            VERBOSE(VB_IMPORTANT, "lcdserver: Bad port number");
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
-
-    // set up log file
-    int logfd = -1;
-
-    if (!logfile.isEmpty())
+    if (cmdline.toBool("message"))
+        startup_message = cmdline.toString("message");
+    if (cmdline.toBool("messagetime"))
     {
-        QByteArray tmp = logfile.toAscii();
-        logfd = open(tmp.constData(), O_WRONLY|O_CREAT|O_APPEND, 0664);
-
-        if (logfd < 0)
+        message_time = cmdline.toInt("messagetime");
+        if (message_time < 1 || message_time > 1000)
         {
-            perror("open(logfile)");
-            return GENERIC_EXIT_PERMISSIONS_ERROR;
+            VERBOSE(VB_IMPORTANT, "lcdserver: Bad message duration");
+            return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
-
-    if (logfd != -1)
+    if (cmdline.toBool("debug"))
     {
-        // Send stdout and stderr to the logfile
-        dup2(logfd, 1);
-        dup2(logfd, 2);
-
-        // Close the unduplicated logfd
-        if (logfd != 1 && logfd != 2)
-            close(logfd);
+        debug_level = cmdline.toInt("debug");
+        if (debug_level < 0 || debug_level > 10)
+        {
+            VERBOSE(VB_IMPORTANT, "lcdserver: Bad debug level");
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
     }
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)

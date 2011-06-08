@@ -15,6 +15,8 @@
 #include "streamlisteners.h"
 #include "mpegstreamdata.h"
 #include "cardutil.h"
+#include "mythverbose.h"
+#include "mythlogging.h"
 
 #define LOC      QString("HDHRSH(%1): ").arg(_device)
 #define LOC_WARN QString("HDHRSH(%1) Warning: ").arg(_device)
@@ -107,12 +109,14 @@ HDHRStreamHandler::HDHRStreamHandler(const QString &device) :
  */
 void HDHRStreamHandler::run(void)
 {
+    threadRegister("HDHRStreamHandler");
     /* Create TS socket. */
     if (!hdhomerun_device_stream_start(_hdhomerun_device))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Starting recording (set target failed). Aborting.");
         _error = true;
+	threadDeregister();
         return;
     }
     hdhomerun_device_stream_flush(_hdhomerun_device);
@@ -178,6 +182,7 @@ void HDHRStreamHandler::run(void)
     VERBOSE(VB_RECORD, LOC + "RunTS(): " + "end");
 
     SetRunning(false, false, false);
+    threadDeregister();
 }
 
 static QString filt_str(uint pid)

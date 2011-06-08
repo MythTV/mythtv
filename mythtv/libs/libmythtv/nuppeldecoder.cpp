@@ -909,7 +909,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
             if (ret < 0)
             {
                 VERBOSE(VB_PLAYBACK, LOC_ERR +
-                        "avcodec_decode_video returned: "<<ret);
+                        QString("avcodec_decode_video returned: %1").arg(ret));
                 return false;
             }
             else if (!gotpicture)

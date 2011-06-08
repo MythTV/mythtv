@@ -747,9 +747,9 @@ void MythRemoteLineEdit::updateCycle(QString current_choice, QString set)
     if (index < 0 || index > length)
     {
         VERBOSE(VB_IMPORTANT,
-                "MythRemoteLineEdit passed a choice of \""
-                << current_choice << "\" which is not in set \""
-                << set << "\"");
+                QString("MythRemoteLineEdit passed a choice of \"%1"
+                        "\" which is not in set \"%2"
+                        "\"").arg(current_choice).arg(set));
         setText("????");
         return;
     }

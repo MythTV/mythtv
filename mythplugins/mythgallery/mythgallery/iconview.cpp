@@ -42,6 +42,7 @@ using namespace std;
 #include <mythmainwindow.h>
 #include <mythprogressdialog.h>
 #include <mythmediamonitor.h>
+#include "mythlogging.h"
 
 // MythGallery headers
 #include "galleryutil.h"
@@ -83,6 +84,7 @@ void FileCopyThread::run()
     QFileInfo fi;
     QFileInfo dest;
 
+    threadRegister("FileCopy");
     m_progress = 0;
 
     for (it = m_parent->m_itemMarked.begin(); it != m_parent->m_itemMarked.end(); it++)
@@ -95,6 +97,7 @@ void FileCopyThread::run()
 
         m_progress++;
     }
+    threadDeregister();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1481,6 +1484,7 @@ void ChildCountThread::cancel()
 
 void ChildCountThread::run()
 {
+    threadRegister("ChildCount");
     while (moreWork())
     {
         QString file;
@@ -1502,6 +1506,7 @@ void ChildCountThread::run()
         // inform parent we have got a count ready for it
         QApplication::postEvent(m_parent, new ChildCountEvent(ccd));
     }
+    threadDeregister();
 }
 
 bool ChildCountThread::moreWork()

@@ -1,5 +1,4 @@
 #include <cstdlib>
-#include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -7,6 +6,8 @@
 
 // Qt
 #include <QApplication>
+#include <QFileInfo>
+#include <QDir>
 
 // MythTV
 #include "mythcontext.h"
@@ -19,6 +20,7 @@
 #include "lcddevice.h"
 #include "mythcommandlineparser.h"
 #include "tv.h"
+#include "mythlogging.h"
 
 // libmythui
 #include "mythmainwindow.h"
@@ -29,10 +31,7 @@
 #include "welcomesettings.h"
 
 
-QString logfile = "";
-
-static bool log_rotate(bool report_error);
-static void log_rotate_handler(int);
+QString logfile;
 
 
 static void initKeys(void)
@@ -45,113 +44,56 @@ static void initKeys(void)
         "Start Mythtv-Setup"),            "");
 }
 
-static void showUsage(const MythCommandLineParser &cmdlineparser)
-{
-    QString    help  = cmdlineparser.GetHelpString(false);
-    QByteArray ahelp = help.toLocal8Bit();
-
-    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
-                            .arg(MYTH_APPNAME_MYTHWELCOME)
-                            .arg(MYTH_SOURCE_PATH)
-                            .arg(MYTH_SOURCE_VERSION));
-
-    cerr << "Valid options are: " << endl <<
-            "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
-            "-s or --setup                  Run setup for the mythshutdown program" << endl <<
-            "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
-            ahelp.constData() <<
-            endl;
-
-}
-
 int main(int argc, char **argv)
 {
     bool bShowSettings = false;
+    int quiet = 0;
 
-    bool cmdline_err;
-
-    MythCommandLineParser cmdline(
-        kCLPOverrideSettingsFile |
-        kCLPOverrideSettings     |
-        kCLPQueryVersion);
-
-    for (int argpos = 0; argpos < argc; ++argpos)
+    MythWelcomeCommandLineParser cmdline;
+    if (!cmdline.Parse(argc, argv))
     {
-        if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
-        {
-            if (cmdline_err)
-                return GENERIC_EXIT_INVALID_CMDLINE;
-
-            if (cmdline.WantsToExit())
-                return GENERIC_EXIT_OK;
-        }
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
+    if (cmdline.toBool("showhelp"))
+    {
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_OK;
+    }
+
+    if (cmdline.toBool("showversion"))
+    {
+        cmdline.PrintVersion();
+        return GENERIC_EXIT_OK;
+    }
+    
     QApplication a(argc, argv);
 
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHWELCOME);
 
-    // Check command line arguments
-    for (int argpos = 1; argpos < a.argc(); ++argpos)
+    if (parse_verbose_arg(cmdline.toString("verbose")) ==
+            GENERIC_EXIT_INVALID_CMDLINE)
+        return GENERIC_EXIT_INVALID_CMDLINE;
+
+    if (cmdline.toBool("setup"))
+        bShowSettings = true;
+
+    if (cmdline.toBool("quiet"))
     {
-        if (!strcmp(a.argv()[argpos],"-v") ||
-            !strcmp(a.argv()[argpos],"--verbose"))
+        quiet = cmdline.toUInt("quiet");
+        if (quiet > 1)
         {
-            if (a.argc()-1 > argpos)
-            {
-                if (parse_verbose_arg(a.argv()[argpos+1]) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-
-                ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -v/--verbose option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-s") ||
-            !strcmp(a.argv()[argpos],"--setup"))
-        {
-            bShowSettings = true;
-        }
-        else if (!strcmp(a.argv()[argpos], "-l") ||
-            !strcmp(a.argv()[argpos], "--logfile"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                logfile = a.argv()[argpos+1];
-                if (logfile.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to -l/--logfile option\n";
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-                else
-                {
-                    ++argpos;
-                }
-            }
-            else
-            {
-                cerr << "Missing argument to -l/--logfile option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
-        {
-            if (cmdline_err)
-                return GENERIC_EXIT_INVALID_CMDLINE;
-
-            if (cmdline.WantsToExit())
-                return GENERIC_EXIT_OK;
-        }
-        else
-        {
-            showUsage(cmdline);
-            return GENERIC_EXIT_INVALID_CMDLINE;
+            print_verbose_messages = VB_NONE;
+            parse_verbose_arg("none");
         }
     }
+
+    int facility = cmdline.GetSyslogFacility();
+    bool dblog = !cmdline.toBool("nodblog");
+
+    logfile = cmdline.GetLogFilePath();
+    logStart(logfile, quiet, facility, dblog);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init())
@@ -166,14 +108,6 @@ int main(int argc, char **argv)
         VERBOSE(VB_IMPORTANT, "mythwelcome: Could not open the database. "
                         "Exiting.");
         return -1;
-    }
-
-    if (!logfile.isEmpty())
-    {
-        if (!log_rotate(true))
-            cerr << "cannot open logfile; using stdout/stderr" << endl;
-        else
-            signal(SIGHUP, &log_rotate_handler);
     }
 
     LCD::SetupLCD();
@@ -223,49 +157,4 @@ int main(int argc, char **argv)
     delete gContext;
 
     return 0;
-}
-
-
-static bool log_rotate(bool report_error)
-{
-    int new_logfd = open(logfile.toLocal8Bit().constData(),
-                         O_WRONLY|O_CREAT|O_APPEND, 0664);
-
-    if (new_logfd < 0)
-    {
-        /* If we can't open the new logfile, send data to /dev/null */
-        if (report_error)
-        {
-            cerr << "cannot open logfile " << logfile.toAscii().constData() << endl;
-            return false;
-        }
-
-        new_logfd = open("/dev/null", O_WRONLY);
-
-        if (new_logfd < 0)
-        {
-            /* There's not much we can do, so punt. */
-            return false;
-        }
-    }
-
-#ifdef WINDOWS_CLOSE_CONSOLE
-    // pure Win32 GUI app does not have standard IO streams
-    // simply assign the file descriptors to the logfile
-    *stdout = *(_fdopen(new_logfd, "w"));
-    *stderr = *stdout;
-    setvbuf(stdout, NULL, _IOLBF, 256);
-#else
-    while (dup2(new_logfd, 1) < 0 && errno == EINTR);
-    while (dup2(new_logfd, 2) < 0 && errno == EINTR);
-    while (close(new_logfd) < 0   && errno == EINTR);
-#endif
-
-    return true;
-}
-
-
-static void log_rotate_handler(int)
-{
-    log_rotate(false);
 }

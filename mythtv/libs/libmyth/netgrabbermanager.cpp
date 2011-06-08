@@ -10,6 +10,7 @@
 #include "mythsystem.h"
 #include "exitcodes.h"
 #include "util.h"
+#include "mythlogging.h"
 
 #include "netgrabbermanager.h"
 #include "netutils.h"
@@ -46,6 +47,7 @@ GrabberScript::~GrabberScript()
 
 void GrabberScript::run()
 {
+    threadRegister("GrabberScript");
     QMutexLocker locker(&m_lock);
 
     QString commandline = m_commandline;
@@ -85,6 +87,7 @@ void GrabberScript::run()
                            "%1 crashed while grabbing tree.").arg(m_title));
 
     emit finished();
+    threadDeregister();
 }
 
 void GrabberScript::parseDBTree(const QString &feedtitle, const QString &path,
@@ -212,6 +215,7 @@ void GrabberDownloadThread::refreshAll()
 
 void GrabberDownloadThread::run()
 {
+    threadRegister("GrabberDownload");
     m_scripts = findAllDBTreeGrabbers();
     uint updateFreq = gCoreContext->GetNumSetting(
                "netsite.updateFreq", 24);
@@ -230,6 +234,8 @@ void GrabberDownloadThread::run()
     emit finished();
     if (m_parent)
         QCoreApplication::postEvent(m_parent, new GrabberUpdateEvent());
+
+    threadDeregister();
 }
 
 Search::Search()

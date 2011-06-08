@@ -20,6 +20,7 @@
 
 // libmythbase
 #include "mythverbose.h"
+#include "mythlogging.h"
 
 // Mythui
 #include "mythpainter.h"
@@ -85,6 +86,7 @@ class ImageLoadThread : public QRunnable
 
     void run()
     {
+        threadRegister("ImageLoad");
         QString tmpFilename;
         if (!(m_filename.startsWith("myth://")))
             tmpFilename = m_filename;
@@ -104,6 +106,7 @@ class ImageLoadThread : public QRunnable
                                                     m_filename, m_number);
             QCoreApplication::postEvent(m_parent, le);
         }
+        threadDeregister();
     }
 
   private:

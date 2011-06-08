@@ -54,13 +54,16 @@ using namespace std;
 #include "dvbcam.h"
 #include "dvbchannel.h"
 #include "dvbrecorder.h"
+#include "mythlogging.h"
 
 #define LOC_ERR QString("DVB#%1 CA Error: ").arg(device)
 #define LOC QString("DVB#%1 CA: ").arg(device)
 
 void DVBCamThread::run(void)
 {
+    threadRegister("DVBCam");
     m_parent->CiHandlerLoop();
+    threadDeregister();
 }
 
 DVBCam::DVBCam(const QString &aDevice)
@@ -363,8 +366,8 @@ void DVBCam::SendPMT(const ProgramMapTable &pmt, uint cplm)
             continue;
         }
 
-        VERBOSE(VB_DVBCAM, LOC + "Creating CA_PMT, ServiceID = "
-                << pmt.ProgramNumber());
+        VERBOSE(VB_DVBCAM, LOC + QString("Creating CA_PMT, ServiceID = %1")
+                .arg(pmt.ProgramNumber()));
 
         cCiCaPmt capmt = CreateCAPMT(pmt, casids, cplm);
 

@@ -115,7 +115,7 @@ inc.files += remoteutil.h         filesysteminfo.h
 inc.files += programinfo.h        hardwareprofile.h
 inc.files += programtypes.h       recordingtypes.h
 inc.files += mythrssmanager.h     netgrabbermanager.h
-inc.files += rssparse.h           netutils.h
+inc.files += rssparse.h           netutils.h mythcommandlineparser.h
 
 # remove when everything is switched to mythui
 inc.files += virtualkeyboard_qt.h

@@ -43,6 +43,7 @@ using namespace std;
 #include "cardutil.h"
 #include "mythdb.h"
 #include "mythsystemevent.h"
+#include "mythlogging.h"
 
 #define LOC QString("Scheduler: ")
 #define LOC_WARN QString("Scheduler, Warning: ")
@@ -1681,8 +1682,9 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
         rctv = (*m_tvList)[cardids[i]];
         if (!rctv)
         {
-//            VERBOSE(VB_SCHEDULE, LOC_ERR + "IsBusyRecording() -> true, "
-//                    "rctv("<<rctv<<"==NULL) for card "<<cardids[i]);
+            // VERBOSE(VB_SCHEDULE, 
+            //         QString(LOC_ERR + "IsBusyRecording() -> true, "
+            //         "rctv(NULL) for card %2").arg(cardids[i]));
 
             return true;
         }
@@ -1739,6 +1741,7 @@ void Scheduler::OldRecordedFixups(void)
 
 void Scheduler::run(void)
 {
+    threadRegister("Scheduler");
     // Notify constructor that we're actually running
     {
         QMutexLocker lockit(&schedLock);
@@ -1900,6 +1903,7 @@ void Scheduler::run(void)
                                idleTimeoutSecs, idleWaitForRecordingTime);
         }
     }
+    threadDeregister();
 }
 
 int Scheduler::CalcTimeToNextHandleRecordingEvent(
@@ -2046,8 +2050,6 @@ bool Scheduler::HandleReschedule(void)
                 matchTime + placeTime, matchTime, placeTime);
 
     VERBOSE(VB_GENERAL, msg);
-    gCoreContext->LogEntry("scheduler", LP_INFO,
-                           "Scheduled items", msg);
 
     fsInfoCacheFillTime =
         QDateTime::currentDateTime().addSecs(-1000);
@@ -2277,7 +2279,6 @@ bool Scheduler::HandleRecording(
             .arg(ri.GetChanID())
             .arg(ri.GetCardID())
             .arg(ri.GetSourceID());
-        QByteArray amsg = msg.toLocal8Bit();
         VERBOSE(VB_GENERAL, msg);
 
         ri.SetRecordingStatus(rsTunerBusy);
@@ -2417,7 +2418,6 @@ void Scheduler::HandleRecordingStatusChange(
          .arg(toString(ri.GetRecordingStatus(), ri.GetRecordingRuleType())));
 
     VERBOSE(VB_GENERAL, QString("%1: %2").arg(msg).arg(details));
-    gCoreContext->LogEntry("scheduler", LP_NOTICE, msg, details);
 
     if ((rsRecording == recStatus) || (rsTuning == recStatus))
     {

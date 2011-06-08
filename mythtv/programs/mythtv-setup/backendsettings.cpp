@@ -725,92 +725,6 @@ static GlobalComboBox *UPNPWmpSource()
     return gc;
 };
 
-
-static GlobalCheckBox *LogEnabled()
-{
-    GlobalCheckBox *bc = new GlobalCheckBox("LogEnabled");
-    bc->setLabel(QObject::tr("Log MythTV events to database"));
-    bc->setValue(false);
-    bc->setHelpText(QObject::tr("If enabled, MythTV modules will send event "
-                    "details to the database, where they can be viewed with "
-                    "MythLog or periodically emailed to the administrator."));
-    return bc;
-}
-
-static HostSpinBox *LogMaxCount()
-{
-    HostSpinBox *gs = new HostSpinBox("LogMaxCount", 0, 500, 10);
-    gs->setLabel(QObject::tr("Maximum number of entries per module"));
-    gs->setValue(100);
-    gs->setHelpText(QObject::tr("If there are more than this number of entries "
-                    "for a module, the oldest log entries will be deleted to "
-                    "reduce the count to this number. Set to 0 to disable."));
-    return gs;
-}
-
-static HostCheckBox *LogCleanEnabled()
-{
-    HostCheckBox *gc = new HostCheckBox("LogCleanEnabled");
-    gc->setLabel(QObject::tr("Automatic log cleaning enabled"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If enabled, a periodic cleanup of the "
-                    "events stored in the MythTV database occurs (see \"Log "
-                    "MythTV events to database\")."));
-    return gc;
-}
-
-static HostSpinBox *LogCleanPeriod()
-{
-    HostSpinBox *gs = new HostSpinBox("LogCleanPeriod", 0, 60, 1);
-    gs->setLabel(QObject::tr("Log cleanup frequency (days)"));
-    gs->setValue(14);
-    gs->setHelpText(QObject::tr("The number of days between log cleanup runs."));
-    return gs;
-}
-
-static HostSpinBox *LogCleanDays()
-{
-    HostSpinBox *gs = new HostSpinBox("LogCleanDays", 0, 60, 1);
-    gs->setLabel(QObject::tr("Number of days to keep acknowledged log "
-                 "entries"));
-    gs->setValue(14);
-    gs->setHelpText(QObject::tr("The number of days before a log entry that "
-                    "has been acknowledged will be deleted by the log cleanup "
-                    "process."));
-    return gs;
-}
-
-static HostSpinBox *LogCleanMax()
-{
-    HostSpinBox *gs = new HostSpinBox("LogCleanMax", 0, 60, 1);
-    gs->setLabel(QObject::tr("Number of days to keep unacknowledged log "
-                 "entries"));
-    gs->setValue(30);
-    gs->setHelpText(QObject::tr("The number of days before a log entry that "
-                    "has NOT been acknowledged will be deleted by the log "
-                    "cleanup process."));
-    return gs;
-}
-
-static HostComboBox *LogPrintLevel()
-{
-    HostComboBox *gc = new HostComboBox("LogPrintLevel");
-    gc->setLabel(QObject::tr("Log print threshold"));
-    gc->addSelection(QObject::tr("All messages"), "8");
-    gc->addSelection(QObject::tr("Debug and higher"), "7");
-    gc->addSelection(QObject::tr("Info and higher"), "6");
-    gc->addSelection(QObject::tr("Notice and higher"), "5");
-    gc->addSelection(QObject::tr("Warning and higher"), "4");
-    gc->addSelection(QObject::tr("Error and higher"), "3");
-    gc->addSelection(QObject::tr("Critical and higher"), "2");
-    gc->addSelection(QObject::tr("Alert and higher"), "1");
-    gc->addSelection(QObject::tr("Emergency only"), "0");
-    gc->addSelection(QObject::tr("Disable printed output"), "-1");
-    gc->setHelpText(QObject::tr("This controls what messages will be printed "
-                    "out as well as being logged to the database."));
-    return gc;
-}
-
 static GlobalCheckBox *MythFillEnabled()
 {
     GlobalCheckBox *bc = new GlobalCheckBox("MythFillEnabled");
@@ -892,32 +806,6 @@ static GlobalLineEdit *MythFillDatabaseLog()
                     "to disable logging."));
     return be;
 }
-
-class MythLogSettings : public TriggeredConfigurationGroup
-{
-  public:
-    MythLogSettings() : TriggeredConfigurationGroup(false, true, false, false)
-    {
-         setLabel(QObject::tr("MythTV Database Logging"));
-//         setUseLabel(false);
-
-         Setting* logEnabled = LogEnabled();
-         addChild(logEnabled);
-         setTrigger(logEnabled);
-         addChild(LogMaxCount());
-
-         ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
-         settings->addChild(LogPrintLevel());
-         settings->addChild(LogCleanEnabled());
-         settings->addChild(LogCleanPeriod());
-         settings->addChild(LogCleanDays());
-         settings->addChild(LogCleanMax());
-         addTarget("1", settings);
-
-         // show nothing if logEnabled is off
-         addTarget("0", new VerticalConfigurationGroup(true));
-     };
-};
 
 class MythFillSettings : public TriggeredConfigurationGroup
 {
@@ -1099,9 +987,6 @@ BackendSettings::BackendSettings() {
     group8->addChild(UPNPWmpSource());
     group8->addChild(UPNPRebuildDelay());
     addChild(group8);
-
-    MythLogSettings *mythlog = new MythLogSettings();
-    addChild(mythlog);
 
     MythFillSettings *mythfill = new MythFillSettings();
     addChild(mythfill);

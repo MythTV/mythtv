@@ -8,6 +8,7 @@
 #include "mythcontext.h"
 #include "remoteutil.h"
 #include "mythdirs.h"
+#include "mythlogging.h"
 
 #define LOC QString("PreviewQueue: ")
 #define LOC_ERR QString("PreviewQueue Error: ")
@@ -56,6 +57,13 @@ PreviewGeneratorQueue::~PreviewGeneratorQueue()
         if ((*it).gen)
             (*it).gen->deleteLater();
     }
+}
+
+void PreviewGeneratorQueue::run(void)
+{
+    threadRegister("PreviewGeneratorQueue");
+    exec();
+    threadDeregister();
 }
 
 void PreviewGeneratorQueue::GetPreviewImage(

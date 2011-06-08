@@ -194,7 +194,7 @@ bool FirewireRecorder::PauseAndWait(int timeout)
     QMutexLocker locker(&pauseLock);
     if (request_pause)
     {
-        VERBOSE(VB_RECORD, LOC + "PauseAndWait("<<timeout<<") -- pause");
+        VERBOSE(VB_RECORD, LOC + QString("PauseAndWait(%1) -- pause").arg(timeout));
         if (!IsPaused(true))
         {
             StopStreaming();
@@ -208,8 +208,7 @@ bool FirewireRecorder::PauseAndWait(int timeout)
 
     if (!request_pause && IsPaused(true))
     {
-        paused = false;
-        VERBOSE(VB_RECORD, LOC + "PauseAndWait("<<timeout<<") -- unpause");
+        VERBOSE(VB_RECORD, LOC + QString("PauseAndWait(%1) -- unpause").arg(timeout));
         StartStreaming();
         unpauseWait.wakeAll();
     }

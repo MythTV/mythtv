@@ -18,6 +18,7 @@
 #include "metadataimagedownload.h"
 #include "remotefile.h"
 #include "mythdownloadmanager.h"
+#include "mythlogging.h"
 
 QEvent::Type ImageDLEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
@@ -73,6 +74,7 @@ void MetadataImageDownload::run()
 {
     // Always handle thumbnails first, they're higher priority.
     ThumbnailData *thumb;
+    threadRegister("MetadataImageDownload");
     while ((thumb = moreThumbs()) != NULL)
     {
         QString sFilename = getDownloadFilename(thumb->title, thumb->url);
@@ -241,6 +243,7 @@ void MetadataImageDownload::run()
         lookup->SetDownloads(downloaded);
         QCoreApplication::postEvent(m_parent, new ImageDLEvent(lookup));
     }
+    threadDeregister();
 }
 
 ThumbnailData* MetadataImageDownload::moreThumbs()

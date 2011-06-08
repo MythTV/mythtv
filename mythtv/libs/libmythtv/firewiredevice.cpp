@@ -45,7 +45,7 @@ void FirewireDevice::AddListener(TSDataListener *listener)
             m_listeners.push_back(listener);
     }
 
-    VERBOSE(VB_RECORD, LOC + "AddListener() "<<m_listeners.size());
+    VERBOSE(VB_RECORD, LOC + QString("AddListener() %1").arg(m_listeners.size()));
 }
 
 void FirewireDevice::RemoveListener(TSDataListener *listener)
@@ -63,7 +63,7 @@ void FirewireDevice::RemoveListener(TSDataListener *listener)
     }
     while (it != m_listeners.end());
 
-    VERBOSE(VB_RECORD, LOC + "RemoveListener() "<<m_listeners.size());
+    VERBOSE(VB_RECORD, LOC + QString("RemoveListener() %1").arg(m_listeners.size()));
 }
 
 bool FirewireDevice::SetPowerState(bool on)

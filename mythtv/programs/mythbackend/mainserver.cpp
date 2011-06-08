@@ -66,6 +66,7 @@ using namespace std;
 #include "mythdownloadmanager.h"
 #include "videoscan.h"
 #include "videoutils.h"
+#include "mythlogging.h"
 #include "filesysteminfo.h"
 
 /** Milliseconds to wait for an existing thread from
@@ -144,6 +145,7 @@ class ProcessRequestThread : public QThread
 
     virtual void run(void)
     {
+        threadRegister("ProcessRequest");
         QMutexLocker locker(&lock);
         threadlives = true;
         waitCond.wakeAll(); // Signal to creating thread
@@ -163,6 +165,7 @@ class ProcessRequestThread : public QThread
             socket = NULL;
             parent->MarkUnused(this);
         }
+        threadDeregister();
     }
 
     QMutex lock;
@@ -1771,7 +1774,9 @@ void DeleteThread::run(void)
     if (!m_ms)
         return;
 
+    threadRegister("Delete");
     m_ms->DoDeleteThread(this);
+    threadDeregister();
 }
 
 void MainServer::DoDeleteThread(DeleteStruct *ds)
@@ -1798,10 +1803,6 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
                               .arg(ds->m_chanid)
                               .arg(ds->m_recstartts.toString());
         VERBOSE(VB_GENERAL, msg);
-        gCoreContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
-                           QString("Unable to open database connection for %1. "
-                                   "Program will NOT be deleted.")
-                                   .arg(logInfo));
 
         deletelock.unlock();
         return;
@@ -1817,10 +1818,6 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
                               .arg(ds->m_chanid)
                               .arg(ds->m_recstartts.toString());
         VERBOSE(VB_GENERAL, msg);
-        gCoreContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
-                           QString("Unable to retrieve program info for %1. "
-                                   "Program will NOT be deleted.")
-                                   .arg(logInfo));
 
         deletelock.unlock();
         return;
@@ -1838,10 +1835,6 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
                     "doesn't exist.  Database metadata"
                     "will not be removed.")
                 .arg(ds->m_filename));
-        gCoreContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
-                           QString("File %1 does not exist for %2 when trying "
-                                   "to delete recording.")
-                           .arg(ds->m_filename).arg(logInfo));
 
         pginfo.SaveDeletePendingFlag(false);
         deletelock.unlock();
@@ -1885,9 +1878,6 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
         VERBOSE(VB_IMPORTANT,
             QString("Error deleting file: %1. Keeping metadata in database.")
                     .arg(ds->m_filename));
-        gCoreContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
-                           QString("File %1 for %2 could not be deleted.")
-                                   .arg(ds->m_filename).arg(logInfo));
 
         pginfo.SaveDeletePendingFlag(false);
         deletelock.unlock();
@@ -1941,9 +1931,8 @@ void MainServer::DeleteRecordedFiles(DeleteStruct *ds)
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("RecordedFiles deletion", query);
-        gCoreContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording Files",
-                           QString("Error querying recordedfiles for %1.")
-                                   .arg(logInfo));
+        VERBOSE(VB_IMPORTANT, QString("Error querying recordedfiles for %1.")
+                                      .arg(logInfo));
     }
 
     QString basename;
@@ -1995,11 +1984,10 @@ void MainServer::DeleteRecordedFiles(DeleteStruct *ds)
             if (!update.exec())
             {
                 MythDB::DBError("RecordedFiles deletion", update);
-                gCoreContext->LogEntry("mythbackend", LP_ERROR,
-                       "Delete Recording Files",
-                       QString("Error querying recordedfile (%1) for %2.")
-                               .arg(query.value(1).toString())
-                               .arg(logInfo));
+                VERBOSE(VB_IMPORTANT,
+                        QString("Error querying recordedfile (%1) for %2.")
+                                .arg(query.value(1).toString())
+                                .arg(logInfo));
             }
         }
     }
@@ -2020,9 +2008,8 @@ void MainServer::DoDeleteInDB(DeleteStruct *ds)
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("Recorded program deletion", query);
-        gCoreContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
-                           QString("Error deleting recorded table for %1.")
-                                   .arg(logInfo));
+        VERBOSE(VB_IMPORTANT, QString("Error deleting recorded entry for %1.")
+                                      .arg(logInfo));
     }
 
     sleep(1);
@@ -2043,9 +2030,8 @@ void MainServer::DoDeleteInDB(DeleteStruct *ds)
     if (!query.exec())
     {
         MythDB::DBError("Recorded program delete recordedmarkup", query);
-        gCoreContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
-                           QString("Error deleting recordedmarkup for %1.")
-                                   .arg(logInfo));
+        VERBOSE(VB_IMPORTANT, QString("Error deleting recordedmarkup for %1.")
+                                      .arg(logInfo));
     }
 
     query.prepare("DELETE FROM recordedseek "
@@ -2056,9 +2042,8 @@ void MainServer::DoDeleteInDB(DeleteStruct *ds)
     if (!query.exec())
     {
         MythDB::DBError("Recorded program delete recordedseek", query);
-        gCoreContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
-                           QString("Error deleting recordedseek for %1.")
-                                   .arg(logInfo));
+        VERBOSE(VB_IMPORTANT, QString("Error deleting recordedseek for %1.")
+                                      .arg(logInfo));
     }
 }
 
@@ -2540,10 +2525,6 @@ void MainServer::DoHandleDeleteRecording(
                 QString("ERROR when trying to delete file: %1. File doesn't "
                         "exist.  Database metadata will not be removed.")
                         .arg(filename));
-        gCoreContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
-                           QString("File %1 does not exist for %2 when trying "
-                                   "to delete recording.")
-                                   .arg(filename).arg(logInfo));
         resultCode = -2;
     }
 
@@ -3673,7 +3654,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     else if (command == "CANCEL_NEXT_RECORDING")
     {
         QString cancel = slist[2];
-        VERBOSE(VB_IMPORTANT, "Received: CANCEL_NEXT_RECORDING "<<cancel);
+        VERBOSE(VB_IMPORTANT, QString("Received: CANCEL_NEXT_RECORDING %1").arg(cancel));
         enc->CancelNextRecording(cancel == "1");
         retlist << "ok";
     }
@@ -4442,7 +4423,9 @@ void TruncateThread::run(void)
     if (!m_ms)
         return;
 
+    threadRegister("Truncate");
     m_ms->DoTruncateThread(this);
+    threadDeregister();
 }
 
 void MainServer::DoTruncateThread(DeleteStruct *ds)
@@ -5155,8 +5138,8 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     if (has_extra_data)
     {
-        VERBOSE(VB_PLAYBACK, "HandleGenPreviewPixmap got extra data\n\t\t\t"
-                << QString("%1%2 %3x%4 '%5'")
+        VERBOSE(VB_PLAYBACK, QString("HandleGenPreviewPixmap got extra data\n\t\t\t"
+                "%1%2 %3x%4 '%5'")
                 .arg(time).arg(time_fmt_sec?"s":"f")
                 .arg(width).arg(height).arg(outputfile));
     }
@@ -5415,8 +5398,6 @@ void MainServer::HandlePixmapGetIfModified(
 
 void MainServer::HandleBackendRefresh(MythSocket *socket)
 {
-    gCoreContext->RefreshBackendConfig();
-
     QStringList retlist( "OK" );
     SendResponse(socket, retlist);
 }
@@ -5822,15 +5803,15 @@ QString MainServer::LocalFilePath(const QUrl &url, const QString &wantgroup)
             {
                 lpath = tmpFile;
                 VERBOSE(VB_FILE,
-                        QString("LocalFilePath(%1 '%2')")
-                        .arg(url.toString()).arg(opath)
-                        <<", found file through exhaustive search "
-                        <<QString("at '%1'").arg(lpath));
+                        QString("LocalFilePath(%1 '%2')"
+                        ", found file through exhaustive search "
+                        "at '%3'")
+                        .arg(url.toString()).arg(opath).arg(lpath));
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, "ERROR: LocalFilePath "
-                        <<QString("unable to find local path for '%1'.")
+                VERBOSE(VB_IMPORTANT, QString("ERROR: LocalFilePath "
+                        "unable to find local path for '%1'.")
                         .arg(opath));
                 lpath = "";
             }
