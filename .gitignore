@@ -1,6 +1,7 @@
 *.a
 *.o
 moc_*.cpp
+*.moc
 *.so
 *.so.*
 *.orig
