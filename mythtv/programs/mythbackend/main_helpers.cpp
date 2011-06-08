@@ -560,7 +560,7 @@ int setup_basics(const MythBackendCommandLineParser &cmdline)
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to ignore SIGPIPE");
 
-    if (cmdline.toBool("daemonize") && (daemon(0, 1) < 0))
+    if (cmdline.toBool("daemon") && (daemon(0, 1) < 0))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to daemonize" + ENO);
         return GENERIC_EXIT_DAEMONIZING_ERROR;
