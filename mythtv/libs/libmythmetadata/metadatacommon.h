@@ -18,7 +18,7 @@ enum LookupStep {
     GETDATA = 1
 };
 
-enum ArtworkType {
+enum VideoArtworkType {
     COVERART = 0,
     FANART = 1,
     BANNER = 2,
@@ -28,7 +28,7 @@ enum ArtworkType {
     INSIDECOVER = 6,
     CDIMAGE = 7
 };
-Q_DECLARE_METATYPE(ArtworkType)
+Q_DECLARE_METATYPE(VideoArtworkType)
 
 struct PersonInfo
 {
@@ -71,9 +71,9 @@ enum PeopleType {
 
 typedef QList< ArtworkInfo > ArtworkList;
 
-typedef QMultiMap< ArtworkType, ArtworkInfo > ArtworkMap;
+typedef QMultiMap< VideoArtworkType, ArtworkInfo > ArtworkMap;
 
-typedef QMap< ArtworkType, ArtworkInfo > DownloadMap;
+typedef QMap< VideoArtworkType, ArtworkInfo > DownloadMap;
 
 typedef QMultiMap< PeopleType, PersonInfo > PeopleMap;
 
@@ -223,7 +223,7 @@ class META_PUBLIC MetadataLookup : public QObject
     QString GetTrailerURL() const { return m_trailerURL; };
 
     // Artwork
-    ArtworkList GetArtwork(ArtworkType type) const;
+    ArtworkList GetArtwork(VideoArtworkType type) const;
     DownloadMap GetDownloads() const { return m_downloads; };
 
   private:

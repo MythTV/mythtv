@@ -65,8 +65,7 @@
         <type>SETTINGS_VIDEO</type>
         <text>Videos Settings</text>
         <description>Configure playback and metadata</description>
-        <action>CONFIGPLUGIN mythvideo</action>
-        <depends>mythvideo</depends>
+        <action>MENU video_settings.xml</action>
     </button>
 
     <!-- Keep this in synch with mythtv/themes/defaultmenu/util_menu.xml -->

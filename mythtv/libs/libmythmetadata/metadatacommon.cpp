@@ -142,7 +142,7 @@ QList<PersonInfo> MetadataLookup::GetPeople(PeopleType type) const
     return ret;
 }
 
-ArtworkList MetadataLookup::GetArtwork(ArtworkType type) const
+ArtworkList MetadataLookup::GetArtwork(VideoArtworkType type) const
 {
     ArtworkList ret;
     ret = m_artwork.values(type);
@@ -439,7 +439,7 @@ ArtworkMap ParseArtwork(QDomElement artwork)
             if (image.hasAttribute("type"))
             {
                 QString typestring = image.attribute("type");
-                ArtworkType type;
+                VideoArtworkType type;
                 if (typestring.toLower() == "coverart")
                     type = COVERART;
                 else if (typestring.toLower() == "fanart")

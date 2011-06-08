@@ -48,7 +48,6 @@
         <text>Media Settings</text>
         <description>Settings for all non-TV media</description>
         <action>MENU media_settings.xml</action>
-        <depends>mythvideo mythmusic mythgallery mythfm mythgame mythburn mytharchive</depends>
     </button>
 
     <button>

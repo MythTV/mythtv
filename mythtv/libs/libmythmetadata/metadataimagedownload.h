@@ -67,11 +67,11 @@ class META_PUBLIC MetadataImageDownload : public QThread
 };
 
 META_PUBLIC QString getDownloadFilename(QString title, QString url);
-META_PUBLIC QString getDownloadFilename(ArtworkType type, MetadataLookup *lookup,
+META_PUBLIC QString getDownloadFilename(VideoArtworkType type, MetadataLookup *lookup,
                                     QString url);
 
-META_PUBLIC QString getLocalWritePath(MetadataType metadatatype, ArtworkType type);
-META_PUBLIC QString getStorageGroupURL(ArtworkType type, QString host);
+META_PUBLIC QString getLocalWritePath(MetadataType metadatatype, VideoArtworkType type);
+META_PUBLIC QString getStorageGroupURL(VideoArtworkType type, QString host);
 
 META_PUBLIC void cleanThumbnailCacheDir(void);
 

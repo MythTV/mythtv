@@ -33,7 +33,12 @@ HEADERS += proglist.h                   proglist_helpers.h
 HEADERS += playbackboxhelper.h          viewschedulediff.h
 HEADERS += themechooser.h               setupwizard_general.h
 HEADERS += setupwizard_audio.h          setupwizard_video.h
-HEADERS += grabbersettings.h
+HEADERS += grabbersettings.h            editvideometadata.h
+HEADERS += videofileassoc.h             videometadatasettings.h
+HEADERS += videoplayercommand.h         videopopups.h
+HEADERS += videofilter.h                videolist.h
+HEADERS += videoplayersettings.h        videodlg.h
+HEADERS += videoglobalsettings.h
 
 SOURCES += main.cpp playbackbox.cpp viewscheduled.cpp audiogeneralsettings.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp
@@ -48,7 +53,12 @@ SOURCES += proglist.cpp                 proglist_helpers.cpp
 SOURCES += playbackboxhelper.cpp        viewschedulediff.cpp
 SOURCES += themechooser.cpp             setupwizard_general.cpp
 SOURCES += setupwizard_audio.cpp        setupwizard_video.cpp
-SOURCES += grabbersettings.cpp
+SOURCES += grabbersettings.cpp          editvideometadata.cpp
+SOURCES += videofileassoc.cpp           videometadatasettings.cpp
+SOURCES += videoplayercommand.cpp       videopopups.cpp
+SOURCES += videofilter.cpp              videolist.cpp
+SOURCES += videoplayersettings.cpp      videodlg.cpp
+SOURCES += videoglobalsettings.cpp
 
 macx {
     mac_bundle {
