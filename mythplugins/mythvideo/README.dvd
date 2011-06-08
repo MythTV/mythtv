@@ -1,1 +1,0 @@
-In MythTV 0.20.x and earlier, mythdvd was a stand-alone application. As of MythTV 0.21, mythdvd's functionality was merged into mythvideo. See the main README in this same directory for further details.

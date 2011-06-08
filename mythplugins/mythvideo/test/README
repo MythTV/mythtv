@@ -1,6 +1,0 @@
-mythvideo_search.py
-  This is a test search script for MythVideo. It knows a limited
-  number of video titles and IDs.
-
-mythvideo_http.py
-  A basic "web" server, for testing poster download timeouts.
