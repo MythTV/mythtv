@@ -141,7 +141,7 @@ void EditMetadataDialog::updateImageGrid()
 
     QSize size = coverart_grid->getImageItemSize();
 
-    for (uint x = 0; x < albumArtList->size(); x++)
+    for (int x = 0; x < albumArtList->size(); x++)
     {
         if (albumArtList->at(x)->embedded)
             continue;
