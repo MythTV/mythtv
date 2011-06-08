@@ -34,6 +34,8 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
     m_Visible = true;
     m_Enabled = true;
     m_Initiator = false;
+    m_Vanish = false;
+    m_Vanished = false;
     m_CanHaveFocus = m_HasFocus = false;
     m_Area = MythRect(0, 0, 0, 0);
     m_MinArea = MythRect(0, 0, 0, 0);
@@ -414,7 +416,7 @@ void MythUIType::HandleAlphaPulse(void)
  */
 void MythUIType::Pulse(void)
 {
-    if (!m_Visible)
+    if (!m_Visible || m_Vanished)
         return;
 
     HandleMovementPulse();
@@ -439,7 +441,7 @@ void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
 {
     m_DirtyRegion = QRegion(QRect(0,0,0,0));
 
-    if (!m_Visible)
+    if (!m_Visible || m_Vanished)
         return;
 
     QRect realArea = m_Area.toQRect();
@@ -577,14 +579,27 @@ void MythUIType::AdjustMinArea(int delta_x, int delta_y)
     size.setWidth( size.width()  + delta_x);
     size.setHeight(size.height() + delta_y);
     m_MinArea.setSize(size);
-    m_MinArea.setX(m_Area.x());
-    m_MinArea.setY(m_Area.y());
+    m_MinArea.moveLeft(m_Area.x());
+    m_MinArea.moveTop(m_Area.y());
 
     QSize bound(m_MinArea.width(), m_MinArea.height());
     bound = bound.expandedTo(GetMinSize());
 
     m_MinArea.setWidth(bound.width());
     m_MinArea.setHeight(bound.height());
+    m_Vanished = false;
+}
+
+void MythUIType::VanishSibling(void)
+{
+    if (!m_MinSize.isValid() || !m_Vanish)
+        return;
+
+    m_MinArea.moveLeft(0);
+    m_MinArea.moveTop(0);
+    m_MinArea.setWidth(0);
+    m_MinArea.setHeight(0);
+    m_Vanished = true;
 }
 
 /**
@@ -607,6 +622,14 @@ void MythUIType::SetMinAreaParent(MythRect actual_area, MythRect allowed_area,
     if (m_Area.height() < m_NormalSize.height())
         m_Area.setHeight(m_NormalSize.height());
 
+    if (calling_child->m_Vanished)
+    {
+        actual_area.moveLeft(0);
+        actual_area.moveTop(0);
+        allowed_area.moveLeft(0);
+        allowed_area.moveTop(0);
+    }
+
     actual_area.translate(m_Area.topLeft());
     allowed_area.translate(m_Area.topLeft());
 
@@ -621,6 +644,7 @@ void MythUIType::SetMinAreaParent(MythRect actual_area, MythRect allowed_area,
         area = (*it)->GetArea();
         area.translate(m_Area.topLeft());
         actual_area = actual_area.united(area);
+
         area = (*it)->m_Area;
         area.translate(m_Area.topLeft());
         allowed_area = allowed_area.united(area);
@@ -630,13 +654,28 @@ void MythUIType::SetMinAreaParent(MythRect actual_area, MythRect allowed_area,
     actual_area = actual_area.intersected(m_Area);
     allowed_area = allowed_area.intersected(m_Area);
 
-    if (!actual_area.isValid() || actual_area == m_MinArea)
-        return;
-
-    delta_x = (actual_area.x() + actual_area.width()) -
-              (allowed_area.x() + allowed_area.width());
-    delta_y = (actual_area.y() + actual_area.height()) -
-              (allowed_area.y() + allowed_area.height());
+    if (m_Vanish && actual_area.size().isNull())
+    {
+        m_Vanished = true;
+    }
+    else
+    {
+        if (calling_child->m_Vanished)
+        {
+            delta_x = (actual_area.x() + actual_area.width()) -
+                      (m_Area.x() + m_Area.width());
+            delta_y = (actual_area.y() + actual_area.height()) -
+                      (m_Area.y() + m_Area.height());
+        }
+        else
+        {
+            delta_x = (actual_area.x() + actual_area.width()) -
+                      (allowed_area.x() + allowed_area.width());
+            delta_y = (actual_area.y() + actual_area.height()) -
+                      (allowed_area.y() + allowed_area.height());
+        }
+        m_Vanished = false;
+    }
 
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
     {
@@ -645,25 +684,31 @@ void MythUIType::SetMinAreaParent(MythRect actual_area, MythRect allowed_area,
 
         if (!(*it)->m_Initiator)
         {
-            (*it)->AdjustMinArea(delta_x, delta_y);
+            if (m_Vanished)
+                (*it)->VanishSibling();
+            else
+                (*it)->AdjustMinArea(delta_x, delta_y);
         }
 
         area = (*it)->GetArea();
         area.translate(m_Area.topLeft());
         actual_area = actual_area.united(area);
-        area = (*it)->m_Area;
-        area.translate(m_Area.topLeft());
-        allowed_area = allowed_area.united(area);
     }
 
     QSize bound(actual_area.width(), actual_area.height());
-    bound = bound.expandedTo(GetMinSize());
+    if (m_Vanished)
+    {
+        m_MinArea.moveLeft(0);
+        m_MinArea.moveTop(0);
+    }
+    else
+        bound = bound.expandedTo(GetMinSize());
 
     m_MinArea.setWidth(bound.width());
     m_MinArea.setHeight(bound.height());
 
     if (m_Parent)
-        m_Parent->SetMinAreaParent(actual_area, allowed_area, this);
+        m_Parent->SetMinAreaParent(actual_area, m_Area, this);
 }
 
 /**
@@ -687,16 +732,33 @@ void MythUIType::SetMinArea(const QSize &size)
      */
     QSize bounded(size);
 
-    bounded = bounded.expandedTo(GetMinSize());
-    bounded = bounded.boundedTo(m_Area.size());
+    if (!bounded.isNull() || !m_Vanish)
+    {
+        if (bounded.isNull())
+            bounded = GetMinSize();
+        else
+            bounded = bounded.expandedTo(GetMinSize());
 
-    if (bounded == m_MinArea.size())
+        bounded = bounded.boundedTo(m_Area.size());
+    }
+
+    if (m_Vanish == m_Vanished && bounded == m_MinArea.size())
         return;
 
-    m_MinArea.setX(m_Area.x());
-    m_MinArea.setY(m_Area.y());
     m_MinArea.setWidth(bounded.width());
     m_MinArea.setHeight(bounded.height());
+    m_Vanished = (m_Vanish && m_MinArea.size().isNull());
+
+    if (m_Vanished)
+    {
+        m_MinArea.moveLeft(0);
+        m_MinArea.moveTop(0);
+    }
+    else
+    {
+        m_MinArea.moveLeft(m_Area.x());
+        m_MinArea.moveTop(m_Area.y());
+    }
 
     if (m_Parent)
         m_Parent->SetMinAreaParent(m_MinArea, m_Area, this);
@@ -720,7 +782,7 @@ void MythUIType::ExpandArea(const MythRect &rect)
  */
 MythRect MythUIType::GetArea(void) const
 {
-    if (m_MinArea.isValid())
+    if (m_Vanished || m_MinArea.isValid())
         return m_MinArea;
     return m_Area;
 }
@@ -918,6 +980,8 @@ void MythUIType::CopyFrom(MythUIType *base)
     m_MinArea = base->m_MinArea;
     m_MinSize = base->m_MinSize;
     m_Initiator = base->m_Initiator;
+    m_Vanish = base->m_Vanish;
+    m_Vanished = base->m_Vanished;
     m_NormalSize = base->m_NormalSize;
     m_Alpha = base->m_Alpha;
     m_AlphaChangeMode = base->m_AlphaChangeMode;
@@ -971,6 +1035,8 @@ bool MythUIType::ParseElement(
         // Use parsePoint so percentages can be used
         if (element.hasAttribute("initiator"))
             m_Initiator = parseBool(element.attribute("initiator"));
+        if (element.hasAttribute("vanish"))
+            m_Vanish = parseBool(element.attribute("vanish"));
         SetMinSize(parsePoint(element));
     }
     else if (element.tagName() == "alpha")
