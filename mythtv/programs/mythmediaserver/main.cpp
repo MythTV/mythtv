@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 
     if (cmdline.toBool("pidfile"))
         pidfile = cmdline.toUInt("pidfile");
-    daemonize = cmdline.toBool("daemonize");
+    daemonize = cmdline.toBool("daemon");
 
     if (parse_verbose_arg(cmdline.toString("verbose")) ==
                         GENERIC_EXIT_INVALID_CMDLINE)

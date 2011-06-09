@@ -750,7 +750,7 @@ void MythCommandLineParser::addWindowed(bool def)
 
 void MythCommandLineParser::addDaemon(void)
 {
-    add(QStringList( QStringList() << "-d" << "--daemon" ), "daemonize",
+    add(QStringList( QStringList() << "-d" << "--daemon" ), "daemon",
             "Fork application into background after startup.",
             "Fork application into background, detatching from "
             "the local terminal.\nOften used with: "
