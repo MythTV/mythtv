@@ -597,7 +597,7 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
         return false;
 
     QString devicePath( mep->fs_spec );
-    //cout << "AddDevice - " << devicePath << endl;
+    //VERBOSE(VB_GENERAL, "AddDevice - " + devicePath);
 
     MythMediaDevice* pDevice = NULL;
     struct stat sbuf;
@@ -632,7 +632,7 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
         strstr(mep->fs_vfstype, MNTTYPE_AUTO))
     {
         is_cdrom = true;
-        //cout << "Device is a CDROM" << endl;
+        //VERBOSE(VB_GENERAL, "Device is a CDROM");
     }
 
     if (!is_supermount)

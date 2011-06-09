@@ -7370,10 +7370,12 @@ bool TV::IsTunable(const PlayerContext *ctx, uint chanid, bool use_cache)
     }
 
 #if 0
-    cout << "cardids[" << sourceid << "]: ";
-    for (uint i = 0; i < cardids.size(); i++)
-        cout << cardids[i] << ", ";
-    cout << endl;
+    {
+        QString msg = QString("cardids[%1]: ").arg(sourceid);
+        for (uint i = 0; i < cardids.size(); i++)
+            msg += QString("%1, ").arg(cardids[i]);
+        VERBOSE(VB_GENERAL, msg);
+    }
 #endif
 
     for (uint i = 0; i < cardids.size(); i++)
@@ -7399,10 +7401,12 @@ bool TV::IsTunable(const PlayerContext *ctx, uint chanid, bool use_cache)
         }
 
 #if 0
-        cout << "inputs[" << cardids[i] << "]: ";
+    {
+        QString msg = QString("inputs[%1]: ").arg(cardids[i]);
         for (uint j = 0; j < inputs.size(); j++)
-            cout << inputs[j].inputid << ", ";
-        cout << endl;
+            msg += QString("%1, ").arg(inputs[j].inputid);
+        VERBOSE(VB_GENERAL, msg);
+    }
 #endif
 
         for (uint j = 0; j < inputs.size(); j++)

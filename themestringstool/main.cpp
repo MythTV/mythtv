@@ -76,7 +76,7 @@ void parseElement(QDomElement &element)
                         laststring = lines.join(" ");
 
                         laststring.replace(QString("<newline>"), QString("\\n"));
-                        
+
                         if (!strings.contains(laststring))
                             strings << laststring;
                         ++stringCount;
@@ -100,10 +100,10 @@ void parseDirectory(QString dir)
     QDir themeDir(dir);
 
     cout << "Searching directory: " << qPrintable(themeDir.path()) << endl;
-    
+
     themeDir.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     themeDir.setSorting(QDir::DirsFirst);
-    
+
     QDomDocument doc;
     QFileInfoList themeFiles = themeDir.entryInfoList();
     QFileInfoList::const_iterator it;
@@ -119,7 +119,7 @@ void parseDirectory(QString dir)
             continue;
 
         cout << "  Found: " << qPrintable((*it).filePath()) << endl;
-        
+
         QFile fin((*it).absoluteFilePath());
 
         if (!fin.open(QIODevice::ReadOnly))
@@ -145,7 +145,7 @@ void parseDirectory(QString dir)
         fin.close();
 
         stringCount = 0;
-        
+
         QDomElement docElem = doc.documentElement();
         QDomNode n = docElem.firstChild();
         while (!n.isNull())
@@ -157,7 +157,7 @@ void parseDirectory(QString dir)
             }
             n = n.nextSibling();
         }
-        
+
         cout << "    Contains " << stringCount << " total strings" << endl;
     }
 
@@ -220,51 +220,55 @@ int main(int argc, char *argv[])
             fdataout << QString("    ThemeUI::tr(\"%1\");\n")
                                 .arg((*strit).toUtf8().data());
 
-//         if (translatedStrings.contains(*strit))
-//         {
-//             QStringList prevSeenLanguages;
-//             QList<QString> values = translatedStrings.values(*strit);
-//             for (int i = 0; i < values.size(); ++i)
-//             {
-//                 QString language = values.at(i).section("{}", 0, 0);
-//                 if (prevSeenLanguages.contains(language))
-//                     continue;
-//                 prevSeenLanguages << language;
-//                 
-//                 QString translation = values.at(i).section("{}", 1, 1);
-//                 if (!transFiles.contains(language))
-//                 {
-//                     QFile *tmp = new QFile(outfile + '_' + language + ".ts");
-//                     if (!tmp->open(QIODevice::WriteOnly))
-//                     {
-//                         cerr << "couldn't open language file\n";
-//                         exit(-1);
-//                     }
-// 
-//                     transFiles[language] = tmp;
-//                 }
-// 
-//                 QTextStream dstream(transFiles[language]);
-//                 dstream.setCodec("UTF-8");
-// 
-//                 dstream << "    <message>\n"
-//                         << "        <location filename=\"" << qPrintable(outfile) << "\" line=\"" << lineCount << "\"/>\n"
-//                         << "        <source>" << Qt::escape(*strit).replace("\"", "&quot;") << "<source>\n"
-//                         << "        <translation>" << Qt::escape(translation).replace("\"", "&quot;") << "<translation>\n"
-//                         << "    <message>\n";
-//             }
-//         }
+#if 0
+        if (translatedStrings.contains(*strit))
+        {
+            QStringList prevSeenLanguages;
+            QList<QString> values = translatedStrings.values(*strit);
+            for (int i = 0; i < values.size(); ++i)
+            {
+                QString language = values.at(i).section("{}", 0, 0);
+                if (prevSeenLanguages.contains(language))
+                    continue;
+                prevSeenLanguages << language;
+
+                QString translation = values.at(i).section("{}", 1, 1);
+                if (!transFiles.contains(language))
+                {
+                    QFile *tmp = new QFile(outfile + '_' + language + ".ts");
+                    if (!tmp->open(QIODevice::WriteOnly))
+                    {
+                        cerr << "couldn't open language file\n";
+                        exit(-1);
+                    }
+
+                    transFiles[language] = tmp;
+                }
+
+                QTextStream dstream(transFiles[language]);
+                dstream.setCodec("UTF-8");
+
+                dstream << "    <message>\n"
+                        << "        <location filename=\"" << qPrintable(outfile) << "\" line=\"" << lineCount << "\"/>\n"
+                        << "        <source>" << Qt::escape(*strit).replace("\"", "&quot;") << "<source>\n"
+                        << "        <translation>" << Qt::escape(translation).replace("\"", "&quot;") << "<translation>\n"
+                        << "    <message>\n";
+            }
+        }
+#endif
         ++lineCount;
     }
-    
+
     fdataout << QString("}\n");
     fstringout.close();
 
-//     QMap<QString, QFile *>::Iterator it;
-//     for (it = transFiles.begin(); it != transFiles.end(); ++it)
-//     {
-//         it.value()->close();
-//     }
+#if 0
+    QMap<QString, QFile *>::Iterator it;
+    for (it = transFiles.begin(); it != transFiles.end(); ++it)
+    {
+        it.value()->close();
+    }
+#endif
 
     cout << endl;
     cout << "---------------------------------------" << endl;

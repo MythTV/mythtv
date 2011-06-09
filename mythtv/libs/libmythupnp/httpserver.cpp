@@ -361,7 +361,7 @@ void  HttpWorkerThread::ProcessWork()
                         bKeepAlive = false;
                     }
 
-                    /*
+#if 0
                     // Dump Request Header 
                     if (!bKeepAlive )
                     {
@@ -369,14 +369,15 @@ void  HttpWorkerThread::ProcessWork()
                                                    it != pRequest->m_mapHeaders.end(); 
                                                  ++it ) 
                         {  
-                            cout << it.key() << ": " << it.data() << endl;
+                            VERBOSE(VB_IMPORTANT, QString("%1: %2") 
+                                .arg(it.key()) .arg(it.data()));
                         }
                     }
-                    */
+#endif
 
-                    // ----------------------------------------------------------
+                    // -------------------------------------------------------
                     // Always MUST send a response.
-                    // ----------------------------------------------------------
+                    // -------------------------------------------------------
 
                     if (pRequest->SendResponse() < 0)
                     {

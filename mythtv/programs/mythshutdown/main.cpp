@@ -817,17 +817,16 @@ int main(int argc, char **argv)
         bWantRecStatus = (bool)(cmdline.toInt("status") == 1);
     }
 
+    QString logfile = cmdline.GetLogFilePath();
+    logStart(logfile, quiet, facility, dblog);
+
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
-        cout << "mythshutdown: Could not initialize MythContext. "
-                "Exiting." << endl;
+        VERBOSE(VB_IMPORTANT, "mythshutdown: Could not initialize MythContext. "
+                              "Exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
-
-
-    QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet, facility, dblog);
 
     int res = 0;
 

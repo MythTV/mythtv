@@ -4385,36 +4385,40 @@ void MainServer::GetFilesystemInfos(QList<FileSystemInfo> &fsInfos)
         fsInfos.push_back(fsInfo);
     }
 
-    VERBOSE(VB_SCHEDULE+VB_FILE+VB_EXTRA, "Determining unique filesystems");
+    VERBOSE(VB_SCHEDULE|VB_FILE|VB_EXTRA, "Determining unique filesystems");
     size_t maxWriteFiveSec = GetCurrentMaxBitrate()/12  /*5 seconds*/;
-    maxWriteFiveSec = max((size_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
+    // safety for NFS mounted dirs
+    maxWriteFiveSec = max((size_t)2048, maxWriteFiveSec); 
 
     FileSystemInfo::Consolidate(fsInfos, false, maxWriteFiveSec);
 
     QList<FileSystemInfo>::iterator it1;
     if (VERBOSE_LEVEL_CHECK(VB_FILE|VB_SCHEDULE))
     {
-        cout << "--- GetFilesystemInfos directory list start ---" << endl;
+        VERBOSE(VB_FILE|VB_SCHEDULE, "--- GetFilesystemInfos directory list "
+                                     "start ---");
         for (it1 = fsInfos.begin(); it1 != fsInfos.end(); ++it1)
         {
             QString msg = QString("Dir: %1:%2")
                 .arg(it1->getHostname()).arg(it1->getPath());
-            cout << msg.toLocal8Bit().constData() << endl;
-            cout << "     Location: ";
-            if (it1->isLocal())
-                cout << "Local";
-            else
-                cout << "Remote";
-            cout << endl;
-            cout << "     fsID    : " << it1->getFSysID() << endl;
-            cout << "     dirID   : " << it1->getGroupID() << endl;
-            cout << "     BlkSize : " << it1->getBlockSize() << endl;
-            cout << "     TotalKB : " << it1->getTotalSpace() << endl;
-            cout << "     UsedKB  : " << it1->getUsedSpace() << endl;
-            cout << "     FreeKB  : " << it1->getFreeSpace() << endl;
-            cout << endl;
+            VERBOSE(VB_FILE|VB_SCHEDULE, msg) ;
+            VERBOSE(VB_FILE|VB_SCHEDULE, QString("     Location: %1")
+                .arg(it1->isLocal() ? "Local" : "Remote"));
+            VERBOSE(VB_FILE|VB_SCHEDULE, QString("     fsID    : %1")
+                .arg(it1->getFSysID()));
+            VERBOSE(VB_FILE|VB_SCHEDULE, QString("     dirID   : %1")
+                .arg(it1->getGroupID()));
+            VERBOSE(VB_FILE|VB_SCHEDULE, QString("     BlkSize : %1")
+                .arg(it1->getBlockSize()));
+            VERBOSE(VB_FILE|VB_SCHEDULE, QString("     TotalKB : %1")
+                .arg(it1->getTotalSpace()));
+            VERBOSE(VB_FILE|VB_SCHEDULE, QString("     UsedKB  : %1")
+                .arg(it1->getUsedSpace()));
+            VERBOSE(VB_FILE|VB_SCHEDULE, QString("     FreeKB  : %1")
+                .arg(it1->getFreeSpace()));
         }
-        cout << "--- GetFilesystemInfos directory list end ---" << endl;
+        VERBOSE(VB_FILE|VB_SCHEDULE, "--- GetFilesystemInfos directory list "
+                                     "end ---");
     }
 }
 

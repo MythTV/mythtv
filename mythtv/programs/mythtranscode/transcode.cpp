@@ -885,11 +885,14 @@ int Transcode::TranscodeFile(
                 wait_recover = 0;
             }
 
-            // int buflen = (int)(arb->audiobuffer_len / rateTimeConv);
-            // cout << curFrameNum << ": video time: " << frame.timecode
-            //      << " audio time: " << arb->last_audiotime << " buf: "
-            //      << buflen << " exp: "
-            //      << audbufTime << " delta: " << delta << endl;
+#if 0
+            int buflen = (int)(arb->audiobuffer_len / rateTimeConv);
+            VERBOSE(VB_GENERAL, QString("%1: video time: %2 audio time: %3 " 
+                                        "buf: %4 exp: %5 delta: %6")
+                .arg(curFrameNum) .arg(frame.timecode) 
+                .arg(arb->last_audiotime) .arg(buflen) .arg(audbufTime)
+                .arg(delta));
+#endif
             if (arb->audiobuffer_len)
                 fifow->FIFOWrite(1, arb->audiobuffer, arb->audiobuffer_len);
             if (dropvideo < 0)

@@ -350,7 +350,7 @@ Playlist::~Playlist()
     }
 }
 
-/*
+#if 0
 Playlist& Playlist::operator=(const Playlist& rhs)
 {
     if (this == &rhs)
@@ -371,17 +371,17 @@ Playlist& Playlist::operator=(const Playlist& rhs)
 
     return *this;
 }
-*/
+#endif
 
 void Playlist::describeYourself(void) const
 {
     //  This is for debugging
-/*
-    cout << "Playlist with name of \"" << name << "\"" << endl;
-    cout << "        playlistid is " << playlistid << endl;
-    cout << "     songlist(raw) is \"" << raw_songlist << "\"" << endl;
-    cout << "     songlist list is ";
-*/
+#if 0
+    VERBOSE(VB_GENERAL, QString("Playlist with name of \"%1\"").arg(name));
+    VERBOSE(VB_GENERAL, QString("        playlistid is %1").arg(laylistid));
+    VERBOSE(VB_GENERAL, QString("     songlist(raw) is \"%1\"").arg(raw_songlist));
+    VERBOSE(VB_GENERAL, "     songlist list is ");
+#endif
     QString msg;
     SongList::const_iterator it = songs.begin();
     for (; it != songs.end(); ++it)

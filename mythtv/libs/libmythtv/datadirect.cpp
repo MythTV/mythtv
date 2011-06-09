@@ -589,7 +589,6 @@ DataDirectProcessor::~DataDirectProcessor()
 
     for (uint i = 0; i < d.count(); i++)
     {
-        //cout<<"deleting '"<<tmpDir<<"/"<<d[i]<<"'"<<endl;
         QString    tmps = QString(tmpDir + "/" + d[i]);
         QByteArray tmpa = tmps.toAscii();
         unlink(tmpa.constData());

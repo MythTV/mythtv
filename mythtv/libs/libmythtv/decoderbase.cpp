@@ -489,7 +489,6 @@ uint64_t DecoderBase::SavePositionMapDelta(uint64_t first, uint64_t last)
     m_playbackinfo->SavePositionMapDelta(posMap, type);
 
 #if 0
-    cout<<'\n';
     VERBOSE(VB_IMPORTANT, LOC +
             QString("Saving position map [%1,%2] w/%3 keyframes, "
                     "took (%4,%5,%6) ms\n")

@@ -1538,8 +1538,7 @@ QPixmap *UIImageGridType::createScaledPixmap(QString filename,
         QImage *img = GetMythUI()->LoadScaleImage(filename);
         if (!img)
         {
-            cout << "Failed to load image"
-                 << filename.toAscii().constData() << endl;
+            VERBOSE(VB_IMPORTANT, "Failed to load image" + filename);
             return NULL;
         }
         else
@@ -4182,8 +4181,8 @@ QString UIKeyType::decodeChar(QString c)
                 res += QString(uc);
             }
             else
-                cout <<  "UIKeyType::decodeChar - bad char code "
-                     <<  "(" << sCode.toAscii().constData() << ")" << endl;
+                VERBOSE(VB_IMPORTANT, QString("UIKeyType::decodeChar - bad "
+                                              "char code (%1)").arg(sCode));
         }
         else
         {

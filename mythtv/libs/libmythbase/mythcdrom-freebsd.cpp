@@ -44,17 +44,13 @@ MythMediaError MythCDROMFreeBSD::eject(bool open_close)
 // Helper function, perform a sanity check on the device
 MythMediaError MythCDROMFreeBSD::testMedia()
 {
-    //cout << "MythCDROMLinux::testMedia - ";
     bool OpenedHere = false;
     if (!isDeviceOpen()) 
     {
-        //cout << "Device is not open - ";
         if (!openDevice()) 
         {
-            //cout << "failed to open device - ";
             if (errno == EBUSY)
             {
-                //cout << "errno == EBUSY" << endl;
                 return isMounted() ? MEDIAERR_OK : MEDIAERR_FAILED;
             } 
             else 
@@ -62,7 +58,6 @@ MythMediaError MythCDROMFreeBSD::testMedia()
                 return MEDIAERR_FAILED; 
             }
         }
-        //cout << "Opened it - ";
         OpenedHere = true;
     }
 
@@ -86,7 +81,7 @@ MythMediaError MythCDROMFreeBSD::unlock()
 {
     if (isDeviceOpen() || openDevice()) 
     { 
-        //cout <<  "Unlocking CDROM door" << endl;
+        //VERBOSE(VB_GENERAL, "Unlocking CDROM door");
         ioctl(m_DeviceHandle, CDIOCALLOW);
     }
     else

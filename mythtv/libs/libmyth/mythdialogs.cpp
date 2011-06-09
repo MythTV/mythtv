@@ -386,7 +386,7 @@ bool MythPopupBox::focusNextPrevChild(bool next)
 
     return false;
 
-/*
+#if 0
     QFocusData *focusList = focusData();
     QObjectList *objList = queryList(NULL,NULL,false,true);
 
@@ -415,7 +415,7 @@ bool MythPopupBox::focusNextPrevChild(bool next)
 
     candidate->setFocus();
     return true;
-*/
+#endif
 }
 
 void MythPopupBox::addWidget(QWidget *widget, bool setAppearance)
@@ -1366,18 +1366,15 @@ void MythThemedDialog::UpdateForegroundRect(const QRect &inv_rect)
             //
             //  Debugging
             //
-            /*
-            cout << "A container called \"" << looper->GetName()
-                 << "\" said its area is "
-                 << container_area.left()
-                 << ","
-                 << container_area.top()
-                 << " to "
-                 << container_area.left() + container_area.width()
-                 << ","
-                 << container_area.top() + container_area.height()
-                 << endl;
-            */
+#if 0
+            VERBOSE(VB_GENERAL, QString("A container called \"%1\" said its "
+                                        "area is %2,%3 to %4,%5")
+                .arg(looper->GetName())
+                .arg(container_area.left())
+                .arg(container_area.top())
+                .arg(container_area.left() + container_area.width())
+                .arg(container_area.top() + container_area.height()));
+#endif
 
             //
             //  Loop over the draworder layers
