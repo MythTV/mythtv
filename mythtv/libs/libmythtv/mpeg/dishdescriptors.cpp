@@ -3,6 +3,7 @@
 #include "dishdescriptors.h"
 #include "atsc_huffman.h"
 #include "programinfo.h" // for subtitle types and audio and video properties
+#include "dvbtables.h"
 
 QString DishEventNameDescriptor::Name(uint compression_type) const
 {
@@ -81,29 +82,82 @@ void DishEventPropertiesDescriptor::decompress_properties(uint compression_type)
 
 QString DishEventTagsDescriptor::programid(void) const
 {
-    QString id;
+    QString prefix = QString("");
 
     if (DescriptorLength() != 8)
         return QString::null;
 
-    id.sprintf("%02x%02x%02x%02x%02x%02x%02x", _data[3], _data[4], _data[5],
-                                               _data[6], _data[7], _data[8],
-                                               _data[9]);
+    QString series = seriesid();
+    series.remove(0, 2);
+
+    uint episode = ((_data[6] & 0x3f) << 0x08) | _data[7];
+
+    if (_data[2] == 0x7c)
+        prefix = "MV";
+    else if (_data[2] == 0x7d)
+        prefix = "SP";
+    else if (_data[2] == 0x7e)
+    {
+        if (episode > 0)
+            prefix = "EP";
+        else
+            prefix = "SH";
+    } else
+        return prefix;
+
+    QString id = QString("%1%2%3").arg(prefix).arg(series).arg(episode, 4, 0);
+
+    return id;      
+}
+
+QString DishEventTagsDescriptor::seriesid(void) const
+{
+    QString prefix = QString("");
+
+    if (DescriptorLength() != 8)
+        return QString::null;
+
+    if (_data[2] == 0x7c)
+        prefix = "MV";
+    else if (_data[2] == 0x7d)
+        prefix = "SP";
+    else if (_data[2] == 0x7e)
+        prefix = "EP";
+    else
+        return prefix;
+
+    uint series  = (_data[3] << 0x12) | (_data[4] << 0x0a) | (_data[5] << 0x02) |
+                    ((_data[6] & 0xc0) >> 0x06);
+
+    QString id = QString("%1%2").arg(prefix).arg(series, 8, 0);
 
     return id;
 }
 
-QString DishEventTagsDescriptor::seriesid(void) const            
+QDate DishEventTagsDescriptor::originalairdate(void) const
 {
-    QString id;
+    unsigned char mjd[5];
 
     if (DescriptorLength() != 8)
-        return QString::null;
+        return QDate::QDate();
 
-    id.sprintf("%02x%02x%02x%01x", _data[3], _data[4], _data[5],
-                                   ((_data[6] & 0xf0) >> 0x04));
+    mjd[0] = _data[8];
+    mjd[1] = _data[9];
+    mjd[2] = 0;
+    mjd[3] = 0;
+    mjd[4] = 0;
 
-    return id;
+    QDateTime t = dvbdate2qt(mjd);
+
+    if (!t.isValid())
+        return QDate::QDate();
+
+    QDate originalairdate = t.date();
+
+    if (originalairdate.year() < 1940)
+        return QDate::QDate();
+
+    return originalairdate;
 }
 
 QMutex            DishEventMPAADescriptor::mpaaRatingsLock;

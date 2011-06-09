@@ -8,6 +8,7 @@
 
 #include <qmutex.h>
 #include <QString>
+#include <QDate>
 
 #include "atscdescriptors.h"
 
@@ -47,7 +48,7 @@ class DishEventVCHIPDescriptor : public MPEGDescriptor
 {
   public:
     DishEventVCHIPDescriptor(const unsigned char* data)
-        : MPEGDescriptor(data)               
+        : MPEGDescriptor(data)
     {
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x95
@@ -144,12 +145,10 @@ class DishEventTagsDescriptor : public MPEGDescriptor
         assert(DescriptorID::dish_event_tags == DescriptorTag());
     // descriptor_length        8   1.0
     }
-    // unknown                  8   2.0
-    // seriesid                 28  3.0
+    // seriesid                 64  2.0
     QString seriesid(void) const;
-
-    // programid                42  3.0
     QString programid(void) const;
+    QDate originalairdate(void) const;
 };
 
 typedef enum
