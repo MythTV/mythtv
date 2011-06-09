@@ -797,7 +797,7 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 "CREATE TEMPORARY TABLE arttype_tmp ( type INT, name VARCHAR(30) );"
 "INSERT INTO arttype_tmp VALUES (0,'unknown'),(1,'front'),(2,'back'),(3,'cd'),(4,'inlay');"
 "UPDATE music_albumart LEFT JOIN arttype_tmp ON type = imagetype "
-"SET filename = CONCAT(song_id, '-', name, '.jpg') WHERE embedded=1;
+"SET filename = CONCAT(song_id, '-', name, '.jpg') WHERE embedded=1;"
 ""
 };
 
