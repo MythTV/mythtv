@@ -605,7 +605,7 @@ class ProgramMapTable : public PSIPTable
     // helper methods
     bool IsVideo(uint i, QString sistandard) const;
     bool IsAudio(uint i, QString sistandard) const;
-    bool IsEncrypted(void) const;
+    bool IsEncrypted(QString sistandard) const;
     bool IsProgramEncrypted(void) const;
     bool IsStreamEncrypted(uint pid) const;
     /// Returns true iff PMT contains a still-picture video stream
