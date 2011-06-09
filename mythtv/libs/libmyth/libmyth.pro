@@ -144,6 +144,7 @@ using_pulse {
 unix:!cygwin {
     SOURCES += mediamonitor-unix.cpp
     HEADERS += mediamonitor-unix.h
+    using_qtdbus: CONFIG += qdbus
 }
 
 linux:DEFINES += linux
