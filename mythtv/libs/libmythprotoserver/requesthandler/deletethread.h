@@ -14,6 +14,7 @@ using namespace std;
 #include <QMutex>
 #include <QTimer>
 #include <QThread>
+#include <QDateTime>
 #include <QStringList>
 #include <QWaitCondition>
 
@@ -22,6 +23,7 @@ typedef struct deletestruct
     QString path;
     int fd;
     off_t size;
+    QDateTime wait;
 } DeleteStruct;
 
 class DeleteThread : public QThread
@@ -45,6 +47,7 @@ class DeleteThread : public QThread
 
     size_t               m_increment;
     bool                 m_slow;
+    bool                 m_link;
     bool                 m_run;
     QTimer               m_timer;
     int                  m_timeout;
