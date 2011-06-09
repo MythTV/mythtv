@@ -11,7 +11,7 @@ using namespace std;
 #include "mythtv/mythdb.h"
 #include "mythtv/schemawizard.h"
 
-const QString currentDatabaseVersion = "1018";
+const QString currentDatabaseVersion = "1019";
 
 static bool doUpgradeMusicDatabaseSchema(QString &dbver);
 
@@ -788,6 +788,20 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 };
 
         if (!performActualUpdate(updates, "1018", dbver))
+            return false;
+    }
+
+    if (dbver == "1018")
+    {
+        const QString updates[] = {
+"CREATE TEMPORARY TABLE arttype_tmp ( type INT, name VARCHAR(30) );"
+"INSERT INTO arttype_tmp VALUES (0,'unknown'),(1,'front'),(2,'back'),(3,'cd'),(4,'inlay');"
+"UPDATE music_albumart LEFT JOIN arttype_tmp ON type = imagetype "
+"SET filename = CONCAT(song_id, '-', name, '.jpg') WHERE embedded=1;
+""
+};
+
+        if (!performActualUpdate(updates, "1019", dbver))
             return false;
     }
 
