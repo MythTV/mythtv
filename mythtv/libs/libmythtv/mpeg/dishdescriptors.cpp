@@ -139,7 +139,7 @@ QDate DishEventTagsDescriptor::originalairdate(void) const
     unsigned char mjd[5];
 
     if (DescriptorLength() != 8)
-        return QDate::QDate();
+        return QDate();
 
     mjd[0] = _data[8];
     mjd[1] = _data[9];
@@ -150,12 +150,12 @@ QDate DishEventTagsDescriptor::originalairdate(void) const
     QDateTime t = dvbdate2qt(mjd);
 
     if (!t.isValid())
-        return QDate::QDate();
+        return QDate();
 
     QDate originalairdate = t.date();
 
     if (originalairdate.year() < 1940)
-        return QDate::QDate();
+        return QDate();
 
     return originalairdate;
 }
