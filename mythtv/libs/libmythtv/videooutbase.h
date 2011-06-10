@@ -3,8 +3,8 @@
 #ifndef VIDEOOUTBASE_H_
 #define VIDEOOUTBASE_H_
 
-extern "C" {
 #include "frame.h"
+extern "C" {
 #include "filter.h"
 }
 
