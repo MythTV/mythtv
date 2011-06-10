@@ -396,8 +396,8 @@ QString MPEGDescriptor::DescriptorTagString() const
         /// ATSC
         case DescriptorID::atsc_stuffing:
             return QString("ATSC Stuffing");
-        case DescriptorID::audio_stream:
-            return QString("Audio");
+        case DescriptorID::ac3_audio_stream:
+            return QString("AC-3 Audio");
         case DescriptorID::caption_service:
             return QString("Caption Service");
         case DescriptorID::content_advisory:
@@ -414,12 +414,24 @@ QString MPEGDescriptor::DescriptorTagString() const
             return QString("ATSC Time-shifted Service");
         case DescriptorID::component_name:
             return QString("Component Name");
+        case DescriptorID::atsc_data_service:
+            return QString("ATSC Data Service");
+        case DescriptorID::atsc_pid_count:
+            return QString("ATSC PID Count");
+        case DescriptorID::atsc_download:
+            return QString("ATSC Download");
+        case DescriptorID::multiprotocol_encapsulation:
+            return QString("ATSC Multiprotocol Encapsulation");
         case DescriptorID::DCC_departing_request:
             return QString("DCC Departing Request");
         case DescriptorID::DCC_arriving_request:
             return QString("DCC Arriving Request");
         case DescriptorID::DRM_control:
             return QString("Consumer Restrictions Control");
+        case DescriptorID::atsc_genre:
+            return QString("ATSC Genre");
+        case DescriptorID::atsc_private_information:
+            return QString("ATSC Private Information");
         case DescriptorID::atsc_content_identifier:
             return QString("Content Identifier");
 
@@ -438,7 +450,7 @@ QString MPEGDescriptor::toString() const
         str = ISO639LanguageDescriptor(_data).toString();
     else if (DescriptorID::avc_video == DescriptorTag())
         str = AVCVideoDescriptor(_data).toString();
-    else if (DescriptorID::audio_stream == DescriptorTag())
+    else if (DescriptorID::ac3_audio_stream == DescriptorTag())
         str = AudioStreamDescriptor(_data).toString();
     else if (DescriptorID::caption_service == DescriptorTag())
         str = CaptionServiceDescriptor(_data).toString();

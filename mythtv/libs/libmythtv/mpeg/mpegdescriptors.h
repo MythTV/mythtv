@@ -137,7 +137,7 @@ class DescriptorID
 
         // ATSC
         atsc_stuffing               = 0x80,
-        audio_stream                = 0x81,
+        ac3_audio_stream            = 0x81,
         caption_service             = 0x86,
         content_advisory            = 0x87,
 
@@ -155,9 +155,15 @@ class DescriptorID
         service_location            = 0xA1,
         atsc_time_shifted_service   = 0xA2,
         component_name              = 0xA3,
+        atsc_data_service           = 0xA4,
+        atsc_pid_count              = 0xA5,
+        atsc_download               = 0xA6,
+        multiprotocol_encapsulation = 0xA7,
         DCC_departing_request       = 0xA8,
         DCC_arriving_request        = 0xA9,
         DRM_control                 = 0xAA,
+        atsc_genre                  = 0xAB,
+        atsc_private_information    = 0xAD,
         atsc_content_identifier     = 0xB6,
 
         // private premiere.de
