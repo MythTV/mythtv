@@ -42,6 +42,14 @@ class DescriptorID
         smoothing_buffer            = 0x10,
         STD                         = 0x11,
         IBP                         = 0x12,
+        carousel_identifier         = 0x13,
+        association_tag             = 0x14,
+        deferred_association_tag    = 0x15,
+        /*  RESERVED                = 0x16, */
+        npt_reference               = 0x17,
+        npt_endpoint                = 0x18,
+        stream_mode                 = 0x19,
+        stream_event                = 0x1A,
         mpeg4_video                 = 0x1B,
         mpeg4_audio                 = 0x1C,
         IOD                         = 0x1D,
@@ -57,7 +65,9 @@ class DescriptorID
         metadata_std                = 0x27,
         avc_video                   = 0x28,
         ipmp                        = 0x29,
-        avc_timing__hrd             = 0x30,
+        avc_timing__hrd             = 0x2A,
+        MPEG2_AAC_audio             = 0x2B,
+        FlexMuxTiming               = 0x2C,
 
         // DVB
         network_name                = 0x40,

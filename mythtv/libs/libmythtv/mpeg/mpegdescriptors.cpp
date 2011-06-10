@@ -214,6 +214,20 @@ QString MPEGDescriptor::DescriptorTagString() const
             return QString("STD");
         case DescriptorID::IBP:
             return QString("IBP");
+        case DescriptorID::carousel_identifier:
+            return QString("DSM-CC Carousel Identifier");
+        case DescriptorID::association_tag:
+            return QString("DSM-CC Association Tag");
+        case DescriptorID::deferred_association_tag:
+            return QString("DSM-CC Deferred Association Tag");
+        case DescriptorID::npt_reference:
+            return QString("DSM-CC NPT Reference");
+        case DescriptorID::npt_endpoint:
+            return QString("DSM-CC NPT Endpoint");
+        case DescriptorID::stream_mode:
+            return QString("DSM-CC Stream Mode");
+        case DescriptorID::stream_event:
+            return QString("DSM-CC Stream Event");
         case DescriptorID::mpeg4_video:
             return QString("MPEG-4 Video");
         case DescriptorID::mpeg4_audio:
@@ -246,6 +260,10 @@ QString MPEGDescriptor::DescriptorTagString() const
             return QString("IPMP Digital Restrictions Management");
         case DescriptorID::avc_timing__hrd:
             return QString("AVC Timing & HRD");
+        case DescriptorID::MPEG2_AAC_audio:
+            return QString("AAC Audio");
+        case DescriptorID::FlexMuxTiming:
+            return QString("Flex Mux Timing");
 
         // DVB
         case DescriptorID::network_name:
