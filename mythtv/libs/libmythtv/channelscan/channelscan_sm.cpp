@@ -370,7 +370,7 @@ void ChannelScanSM::HandlePMT(uint, const ProgramMapTable *pmt)
             QString("Got a Program Map Table for %1")
             .arg((*current).FriendlyName) + "\n" + pmt->toString());
 
-    if (!currentTestingDecryption && pmt->IsEncrypted())
+    if (!currentTestingDecryption && pmt->IsEncrypted(GetDTVChannel()->GetSIStandard()))
         currentEncryptionStatus[pmt->ProgramNumber()] = kEncUnknown;
 }
 
@@ -1184,7 +1184,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                 info.is_opencable = true;
         }
 
-        info.is_encrypted |= pmt->IsEncrypted();
+        info.is_encrypted |= pmt->IsEncrypted(GetDTVChannel()->GetSIStandard());
         info.in_pmt = true;
     }
 

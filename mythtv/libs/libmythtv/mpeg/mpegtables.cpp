@@ -467,15 +467,18 @@ bool ProgramMapTable::IsAudio(uint i, QString sistandard) const
     return StreamID::IsAudio(stream_id);
 }
 
-/** \fn ProgramMapTable::IsEncrypted(void) const
- *  \brief Returns true iff PMT contains CA descriptor.
+/** \fn ProgramMapTable::IsEncrypted(QString sistandard) const
+ *  \brief Returns true iff PMT contains CA descriptor for a vid/aud stream.
  */
-bool ProgramMapTable::IsEncrypted(void) const
+bool ProgramMapTable::IsEncrypted(QString sistandard) const
 {
     bool encrypted = IsProgramEncrypted();
 
-    for (uint i = 0; !encrypted && i < StreamCount(); i++)
-        encrypted |= IsStreamEncrypted(i);
+    for (uint i = 0; !encrypted && i < StreamCount(); i++) {
+    /* Only check audio/video streams */
+        if (IsAudio(i,sistandard) || IsVideo(i,sistandard))
+            encrypted |= IsStreamEncrypted(i);
+    }
 
     return encrypted;
 }

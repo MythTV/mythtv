@@ -22,7 +22,7 @@ HostComboBox *VideoDefaultParentalLevel()
                      QString::number(ParentalLevel::plLowest));
     gc->addSelection(QString::number(ParentalLevel::plLow));
     gc->addSelection(QString::number(ParentalLevel::plMedium));
-    gc->setHelpText(QObject::tr("This is the 'level' that MythVideo starts at. "
+    gc->setHelpText(QObject::tr("This is the 'level' that Video starts at. "
                     "Any videos with a level at or below this will be shown in "
                     "the list or while browsing by default. The Parental PIN "
                     "should be set to limit changing of the default level."));
@@ -83,7 +83,7 @@ HostLineEdit *VideoStartupDirectory()
     gc->setValue(DEFAULT_VIDEOSTARTUP_DIR);
     gc->setHelpText(QObject::tr("Multiple directories can be separated by ':'. "
                     "Each directory must exist and be readable by the user "
-                    "running MythVideo."));
+                    "running the frontend."));
     return gc;
 }
 
@@ -91,9 +91,9 @@ HostLineEdit *VideoArtworkDirectory()
 {
     HostLineEdit *gc = new HostLineEdit("VideoArtworkDir");
     gc->setLabel(QObject::tr("Directory that holds movie posters"));
-    gc->setValue(GetConfDir() + "/MythVideo/Artwork");
+    gc->setValue(GetConfDir() + "/Video/Artwork");
     gc->setHelpText(QObject::tr("This directory must exist, and the user "
-                    "running MythVideo needs to have read/write permission "
+                    "running the frontend needs to have read/write permission "
                     "to the directory."));
     return gc;
 }
@@ -102,9 +102,9 @@ HostLineEdit *VideoScreenshotDirectory()
 {
     HostLineEdit *gc = new HostLineEdit("mythvideo.screenshotDir");
     gc->setLabel(QObject::tr("Directory that holds movie screenshots"));
-    gc->setValue(GetConfDir() + "/MythVideo/Screenshots");
+    gc->setValue(GetConfDir() + "/Video/Screenshots");
     gc->setHelpText(QObject::tr("This directory must exist, and the user "
-                    "running MythVideo needs to have read/write permission "
+                    "running the frontend needs to have read/write permission "
                     "to the directory."));
     return gc;
 }
@@ -113,9 +113,9 @@ HostLineEdit *VideoBannerDirectory()
 {
     HostLineEdit *gc = new HostLineEdit("mythvideo.bannerDir");
     gc->setLabel(QObject::tr("Directory that holds movie/TV Banners"));
-    gc->setValue(GetConfDir() + "/MythVideo/Banners");
+    gc->setValue(GetConfDir() + "/Video/Banners");
     gc->setHelpText(QObject::tr("This directory must exist, and the user "
-                    "running MythVideo needs to have read/write permission "
+                    "running the frontend needs to have read/write permission "
                     "to the directory."));
     return gc;
 }
@@ -124,9 +124,9 @@ HostLineEdit *VideoFanartDirectory()
 {
     HostLineEdit *gc = new HostLineEdit("mythvideo.fanartDir");
     gc->setLabel(QObject::tr("Directory that holds movie fanart"));
-    gc->setValue(GetConfDir() + "/MythVideo/Fanart");
+    gc->setValue(GetConfDir() + "/Video/Fanart");
     gc->setHelpText(QObject::tr("This directory must exist, and the user "
-                    "running MythVideo needs to have read/write permission "
+                    "running the frontend needs to have read/write permission "
                     "to the directory."));
     return gc;
 }
@@ -135,9 +135,9 @@ HostLineEdit *TrailerDirectory()
 {
     HostLineEdit *gc = new HostLineEdit("mythvideo.TrailersDir");
     gc->setLabel(QObject::tr("Directory that holds movie trailers"));
-    gc->setValue(GetConfDir() + "/MythVideo/Trailers");
+    gc->setValue(GetConfDir() + "/Video/Trailers");
     gc->setHelpText(QObject::tr("This directory must exist, and the user "
-                    "running MythVideo needs to have read/write permission "
+                    "running the frontend needs to have read/write permission "
                     "to the directory."));
     return gc;
 }
