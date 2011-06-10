@@ -138,8 +138,14 @@ class DescriptorID
         // ATSC
         atsc_stuffing               = 0x80,
         ac3_audio_stream            = 0x81,
+        scte_frame_rate             = 0x82,
+        scte_component_name         = 0x84,
+        atsc_program_identifier     = 0x85,
         caption_service             = 0x86,
         content_advisory            = 0x87,
+        atsc_ca_descriptor          = 0x88,
+        atsc_descriptor_tag         = 0x89,
+        scte_cue_identifier         = 0x90,
 
         // Dish Network
         dish_event_rights           = 0x87,

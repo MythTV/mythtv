@@ -194,6 +194,8 @@ QString MPEGDescriptor::DescriptorTagString() const
             return QString("Hierarchy");
         case DescriptorID::registration:
             return QString("Registration");
+        case DescriptorID::data_stream_alignment:
+            return QString("Data Stream Alignment");
         case DescriptorID::conditional_access:
             return QString("Conditional Access");
         case DescriptorID::ISO_639_language:
@@ -398,10 +400,22 @@ QString MPEGDescriptor::DescriptorTagString() const
             return QString("ATSC Stuffing");
         case DescriptorID::ac3_audio_stream:
             return QString("AC-3 Audio");
+        case DescriptorID::scte_frame_rate:
+            return QString("SCTE Frame Rate");
+        case DescriptorID::scte_component_name:
+            return QString("SCTE Component Name");
+        case DescriptorID::atsc_program_identifier:
+            return QString("ATSC Program Identifier");
         case DescriptorID::caption_service:
             return QString("Caption Service");
         case DescriptorID::content_advisory:
             return QString("Content Advisory");
+        case DescriptorID::atsc_ca_descriptor:
+            return QString("ATSC CA Descriptor");
+        case DescriptorID::atsc_descriptor_tag:
+            return QString("ATSC Descriptor Tag");
+        case DescriptorID::scte_cue_identifier:
+            return QString("SCTE CUE Identifier");
         case DescriptorID::dish_event_name:
             return QString("Dishnet EIT Name");
         case DescriptorID::dish_event_description:
