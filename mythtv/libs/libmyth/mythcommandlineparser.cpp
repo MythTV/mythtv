@@ -24,12 +24,30 @@ using namespace std;
 #include "mythversion.h"
 #include "util.h"
 
-int kEnd     = 0,
-    kEmpty   = 1,
-    kOptOnly = 2,
-    kOptVal  = 3,
-    kArg     = 4,
-    kInvalid = 5;
+const int kEnd     = 0,
+          kEmpty   = 1,
+          kOptOnly = 2,
+          kOptVal  = 3,
+          kArg     = 4,
+          kInvalid = 5;
+
+const char* NamedOptType(int type)
+{
+    if (type == kEnd)
+        return "kEnd";
+    else if (type == kEmpty)
+        return "kEmpty";
+    else if (type == kOptOnly)
+        return "kOptOnly";
+    else if (type == kOptVal)
+        return "kOptVal";
+    else if (type == kArg)
+        return "kArg";
+    else if (type == kInvalid)
+        return "kInvalid";
+
+    return "";
+}
 
 typedef struct helptmp {
     QString left;
@@ -305,6 +323,11 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
 
         res = getOpt(argc, argv, argpos, opt, val);
 
+        if (m_verbose)
+            cerr << "res: " << NamedOptType(res) << endl
+                 << "opt: " << opt.toLocal8Bit().constData() << endl
+                 << "val: " << val.toLocal8Bit().constData() << endl << endl;
+
         if (res == kEnd)
             break;
         else if (res == kEmpty)
@@ -447,6 +470,71 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
             else
                 m_parsed[argdef.name] = QVariant(val);
         }
+    }
+
+    if (m_verbose)
+    {
+        cerr << "Processed option list:" << endl;
+        QMap<QString, QVariant>::const_iterator it = m_parsed.begin();
+        for (; it != m_parsed.end(); it++)
+        {
+            cerr << "  " << it.key().leftJustified(30)
+                              .toLocal8Bit().constData();
+            if ((*it).type() == QVariant::Bool)
+                cerr << ((*it).toBool() ? "True" : "False");
+            else if ((*it).type() == QVariant::Int)
+                cerr << (*it).toInt();
+            else if ((*it).type() == QVariant::UInt)
+                cerr << (*it).toUInt();
+            else if ((*it).type() == QVariant::LongLong)
+                cerr << (*it).toLongLong();
+            else if ((*it).type() == QVariant::Double)
+                cerr << (*it).toDouble();
+            else if ((*it).type() == QVariant::Size)
+            {
+                QSize tmpsize = (*it).toSize();
+                cerr <<  "x=" << tmpsize.width()
+                     << " y=" << tmpsize.height();
+            }
+            else if ((*it).type() == QVariant::String)
+                cerr << '"' << (*it).toString().toLocal8Bit()
+                                    .constData()
+                     << '"';
+            else if ((*it).type() == QVariant::StringList)
+                cerr << '"' << (*it).toStringList().join("\", \"")
+                                    .toLocal8Bit().constData()
+                     << '"';
+            else if ((*it).type() == QVariant::Map)
+            {
+                QMap<QString, QVariant> tmpmap = (*it).toMap();
+                bool first = true;
+                QMap<QString, QVariant>::const_iterator it2 = tmpmap.begin();
+                for (; it2 != tmpmap.end(); it2++)
+                {
+                    if (first)
+                        first = false;
+                    else
+                        cerr << QString("").leftJustified(32)
+                                           .toLocal8Bit().constData();
+                    cerr << it2.key().toLocal8Bit().constData()
+                         << '='
+                         << (*it2).toString().toLocal8Bit().constData()
+                         << endl;
+                }
+                continue;
+            }
+            else if ((*it).type() == QVariant::DateTime)
+                cerr << (*it).toDateTime().toString(Qt::ISODate)
+                             .toLocal8Bit().constData();
+            cerr << endl;
+        }
+
+        cerr << endl << "Extra argument list:" << endl;
+        QStringList::const_iterator it3 = m_remainingArgs.begin();
+        for (; it3 != m_remainingArgs.end(); it3++)
+            cerr << "  " << (*it3).toLocal8Bit().constData() << endl;
+
+        cerr << endl;
     }
 
     return true;
