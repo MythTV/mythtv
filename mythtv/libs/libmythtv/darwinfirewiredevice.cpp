@@ -870,7 +870,7 @@ void DarwinFirewireDevice::HandleDeviceChange(uint messageType)
         VERBOSE(VB_RECORD, loc + "kIOMessageSystemWillRestart");
     else
     {
-        VERBOSE(VB_RECORD, (loc + "unknown message 0x%1%2%3")
+        VERBOSE(VB_RECORD, (loc + "unknown message 0x%1")
                            .arg(messageType, 0, 16));
     }
 }
