@@ -12,6 +12,8 @@
 #include "mediarenderer.h"
 #include "mythfexml.h"
 #include "compat.h"
+#include "upnpsubscription.h"
+#include "upnpscanner.h"
 
 class MythFrontendStatus : public HttpServerExtension
 {
@@ -272,7 +274,15 @@ MediaRenderer::MediaRenderer()
         // VERBOSE(VB_UPNP, QString( "MediaRenderer::Registering RenderingControl Service." ));
         // m_pHttpServer->RegisterExtension( m_pUPnpRCTL= new UPnpRCTL( RootDevice() ));
 
+        //VERBOSE(VB_UPNP, QString("MediaRenderer: Registering subscription service."));
+        //UPNPSubscription *subscription =
+        //    new UPNPSubscription(m_pHttpServer->m_sSharePath, nPort);
+        //m_pHttpServer->RegisterExtension(subscription);
+
         Start();
+
+        // Start scanning for UPnP media servers
+        //UPNPScanner::Enable(true, subscription);
 
         // ensure the frontend is aware of all backends (slave and master) and
         // other frontends

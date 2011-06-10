@@ -38,7 +38,7 @@ HEADERS += videofileassoc.h             videometadatasettings.h
 HEADERS += videoplayercommand.h         videopopups.h
 HEADERS += videofilter.h                videolist.h
 HEADERS += videoplayersettings.h        videodlg.h
-HEADERS += videoglobalsettings.h
+HEADERS += videoglobalsettings.h        upnpscanner.h
 
 SOURCES += main.cpp playbackbox.cpp viewscheduled.cpp audiogeneralsettings.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp
@@ -58,7 +58,7 @@ SOURCES += videofileassoc.cpp           videometadatasettings.cpp
 SOURCES += videoplayercommand.cpp       videopopups.cpp
 SOURCES += videofilter.cpp              videolist.cpp
 SOURCES += videoplayersettings.cpp      videodlg.cpp
-SOURCES += videoglobalsettings.cpp
+SOURCES += videoglobalsettings.cpp      upnpscanner.cpp
 
 macx {
     mac_bundle {
