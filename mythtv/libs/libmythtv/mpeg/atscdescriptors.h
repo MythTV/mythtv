@@ -207,7 +207,7 @@ class AudioStreamDescriptor : public MPEGDescriptor {
     AudioStreamDescriptor(const unsigned char* data) :
         MPEGDescriptor(data) {
 // descriptor_tag   The value for the AC-3 descriptor tag is 0x81.
-        assert(DescriptorID::audio_stream == DescriptorTag());
+        assert(DescriptorID::atsc_audio_stream == DescriptorTag());
     }
     // sample_rate_code                      3   2.0
     uint SampleRateCode() const { return (_data[2]>>5)&7; }
