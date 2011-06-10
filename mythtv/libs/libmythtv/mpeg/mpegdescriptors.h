@@ -117,6 +117,10 @@ class DescriptorID
         dvb_content_identifier      = 0x76,
         time_slice_fec_identifier   = 0x77,
         ECM_repetition_rate         = 0x78,
+        S2_delivery_system          = 0x79,
+        EAC3                        = 0x7A,
+        DTS                         = 0x7B,
+        AAC                         = 0x7C,
 
         // private
         dvb_uk_channel_list         = 0x83,

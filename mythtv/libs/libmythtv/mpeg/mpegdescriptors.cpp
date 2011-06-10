@@ -362,6 +362,14 @@ QString MPEGDescriptor::DescriptorTagString() const
             return QString("Time Slice FEC Identifier");
         case DescriptorID::ECM_repetition_rate:
             return QString("ECM Repetition Rate");
+        case DescriptorID::S2_delivery_system:
+            return QString("DVB-S2 Delivery Identifier");
+        case DescriptorID::EAC3:
+            return QString("E-AC-3");
+        case DescriptorID::DTS:
+            return QString("DTS");
+        case DescriptorID::AAC:
+            return QString("AAC");
 
         // private
         case DescriptorID::dvb_uk_channel_list:
