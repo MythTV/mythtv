@@ -367,11 +367,11 @@ void gc_free(GRAPHICS_CONTROLLER **p)
  * graphics stream input
  */
 
-void gc_decode_ts(GRAPHICS_CONTROLLER *gc, uint16_t pid, uint8_t *block, unsigned num_blocks, int64_t stc)
+int gc_decode_ts(GRAPHICS_CONTROLLER *gc, uint16_t pid, uint8_t *block, unsigned num_blocks, int64_t stc)
 {
     if (!gc) {
         GC_TRACE("gc_decode_ts(): no graphics controller\n");
-        return;
+        return -1;
     }
 
     if (pid >= 0x1400 && pid < 0x1500) {
@@ -388,7 +388,7 @@ void gc_decode_ts(GRAPHICS_CONTROLLER *gc, uint16_t pid, uint8_t *block, unsigne
                                      stc);
         if (!gc->igs || !gc->igs->complete) {
             bd_mutex_unlock(&gc->mutex);
-            return;
+            return 0;
         }
 
         gc->popup_visible = 0;
@@ -396,6 +396,8 @@ void gc_decode_ts(GRAPHICS_CONTROLLER *gc, uint16_t pid, uint8_t *block, unsigne
         _select_page(gc, 0);
 
         bd_mutex_unlock(&gc->mutex);
+
+        return 1;
     }
 
     else if (pid >= 0x1200 && pid < 0x1300) {
@@ -408,9 +410,13 @@ void gc_decode_ts(GRAPHICS_CONTROLLER *gc, uint16_t pid, uint8_t *block, unsigne
                                      stc);
 
         if (!gc->pgs || !gc->pgs->complete) {
-            return;
+            return 0;
         }
+
+        return 1;
     }
+
+    return -1;
 }
 
 /*

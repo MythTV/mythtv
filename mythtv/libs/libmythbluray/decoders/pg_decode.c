@@ -218,6 +218,20 @@ int pg_decode_composition(BITBUFFER *bb, BD_PG_COMPOSITION *p)
     return 1;
 }
 
+int pg_decode_windows(BITBUFFER *bb, BD_PG_WINDOWS *p)
+{
+    unsigned ii;
+
+    p->num_windows = bb_read(bb, 8);
+    p->window = calloc(p->num_windows, sizeof(BD_PG_WINDOW));
+
+    for (ii = 0; ii < p->num_windows; ii++) {
+        pg_decode_window(bb, &p->window[ii]);
+    }
+
+    return 1;
+}
+
 /*
  * cleanup
  */
@@ -236,10 +250,10 @@ void pg_clean_composition(BD_PG_COMPOSITION *p)
     }
 }
 
-void pg_free_window(BD_PG_WINDOW **p)
+void pg_clean_windows(BD_PG_WINDOWS *p)
 {
-    if (p && *p) {
-        X_FREE(*p);
+    if (p) {
+        X_FREE(p->window);
     }
 }
 
@@ -262,6 +276,14 @@ void pg_free_composition(BD_PG_COMPOSITION **p)
 {
     if (p && *p) {
         pg_clean_composition(*p);
+        X_FREE(*p);
+    }
+}
+
+void pg_free_windows(BD_PG_WINDOWS **p)
+{
+    if (p && *p) {
+        pg_clean_windows(*p);
         X_FREE(*p);
     }
 }

@@ -1835,6 +1835,8 @@ static int _play_bdj(BLURAY *bd, const char *name)
 
 static int _play_hdmv(BLURAY *bd, unsigned id_ref)
 {
+    int result = 1;
+
     bd->title_type = title_hdmv;
 
 #ifdef USING_BDJAVA
@@ -1846,12 +1848,12 @@ static int _play_hdmv(BLURAY *bd, unsigned id_ref)
     }
 
     if (hdmv_vm_select_object(bd->hdmv_vm, id_ref)) {
-        return 0;
+        result = 0;
     }
 
     bd->hdmv_suspended = !hdmv_vm_running(bd->hdmv_vm);
 
-    return 1;
+    return result;
 }
 
 static int _play_title(BLURAY *bd, unsigned title)
@@ -1934,8 +1936,10 @@ int bd_play(BLURAY *bd)
 
     _init_event_queue(bd);
 
+    bd_psr_lock(bd->regs);
     bd_psr_register_cb(bd->regs, _process_psr_event, bd);
     _queue_initial_psr_events(bd);
+    bd_psr_unlock(bd->regs);
 
     return _play_title(bd, BLURAY_TITLE_FIRST_PLAY);
 }

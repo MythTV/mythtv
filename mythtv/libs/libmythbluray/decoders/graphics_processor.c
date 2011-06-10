@@ -358,8 +358,6 @@ int graphics_processor_decode_pes(PG_DISPLAY_SET **s, PES_BUFFER **p, int64_t st
         *s = calloc(1, sizeof(PG_DISPLAY_SET));
     }
 
-    (*s)->complete = 0;
-
     while (*p && !(*s)->complete) {
 
         /* time to decode next segment ? */
@@ -380,6 +378,9 @@ int graphics_processor_decode_pes(PG_DISPLAY_SET **s, PES_BUFFER **p, int64_t st
 
         /* decode segment */
         if ((*p)->len > 2) {
+
+            (*s)->complete = 0;
+
             _decode_segment(*s, *p);
         }
 
@@ -437,5 +438,9 @@ int graphics_processor_decode_ts(GRAPHICS_PROCESSOR *p,
         unit += 6144;
     }
 
-    return graphics_processor_decode_pes(s, &p->queue, stc);
+    if (p->queue) {
+        return graphics_processor_decode_pes(s, &p->queue, stc);
+    }
+
+    return *s && (*s)->complete;
 }
