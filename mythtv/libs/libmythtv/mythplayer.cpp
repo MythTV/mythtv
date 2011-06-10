@@ -2054,7 +2054,7 @@ void MythPlayer::EnableFrameRateMonitor(bool enable)
 {
     if (!output_jmeter)
         return;
-    int rate = enable ? (video_frame_rate / 4) :
+    int rate = enable ? video_frame_rate :
                  VERBOSE_LEVEL_CHECK(VB_PLAYBACK) ? (video_frame_rate * 4) : 0;
     output_jmeter->SetNumCycles(rate);
 }
