@@ -317,7 +317,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         }
         else if (res == kArg)
         {
-            m_remainingArgs << opt;
+            m_remainingArgs << val;
             continue;
         }
 
