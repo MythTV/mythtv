@@ -194,7 +194,7 @@ bool SignalMonitorValue::AllGood(const SignalMonitorList& slist)
         for (; it != slist.end(); ++it)
             if (!it->IsGood())
             {
-                cerr<<it->noSpaceName<<"("<<it->GetValue()
+                cerr<<it->noSpaceName.toLocal8Bit().data()<<"("<<it->GetValue()
                     <<((it->high_threshold) ? "<" : ">")
                     <<it->GetThreshold()<<") ";
             }
