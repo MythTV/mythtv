@@ -132,25 +132,33 @@ bool MythFEXML::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest
 
 void MythFEXML::GetScreenShot(HTTPRequest *pRequest)
 {
-    pRequest->m_eResponseType = ResponseTypeHTML;
+    pRequest->m_eResponseType = ResponseTypeFile;
 
     // Optional Parameters
     int     nWidth    = pRequest->m_mapParams[ "width"     ].toInt();
     int     nHeight   = pRequest->m_mapParams[ "height"    ].toInt();
+    QString sFormat   = pRequest->m_mapParams[ "format"    ];
+
+    if (sFormat.isEmpty())
+        sFormat = "png";
+
+    if (sFormat != "jpg" && sFormat != "png")
+    {
+        VERBOSE(VB_GENERAL, "Invalid screen shot format: " + sFormat);
+        return;
+    }
    
-    VERBOSE(VB_GENERAL, QString("Screen shot requested (%1x%2)")
-        .arg(nWidth).arg(nHeight));
+    VERBOSE(VB_GENERAL, QString("Screen shot requested (%1x%2), format %3")
+        .arg(nWidth).arg(nHeight).arg(sFormat));
+
+    QString sFileName = QString("/%1/myth-screenshot-XML.%2")
+        .arg(gCoreContext->GetSetting("ScreenShotPath","/tmp"))
+        .arg(sFormat);
 
     MythMainWindow *window = GetMythMainWindow();
-    QStringList args;
-    if (nWidth && nHeight)
-    {
-        args << QString::number(nWidth);
-        args << QString::number(nHeight);
-    }
-    MythEvent* me = new MythEvent(MythEvent::MythEventMessage,
-                                  ACTION_SCREENSHOT, args);
-    qApp->postEvent(window, me);
+    window->RemoteScreenShot(sFileName, nWidth, nHeight);
+
+    pRequest->m_sFileName = sFileName;
 }
 
 void MythFEXML::SendMessage(HTTPRequest *pRequest)

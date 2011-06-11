@@ -464,6 +464,10 @@ MythMainWindow::MythMainWindow(const bool useDB)
     d->repaintRegion = QRegion(QRect(0,0,0,0));
 
     d->m_drawEnabled = true;
+
+    connect(this, SIGNAL(signalRemoteScreenShot(QString,int,int)),
+            this, SLOT(doRemoteScreenShot(QString,int,int)),
+            Qt::BlockingQueuedConnection);
 }
 
 MythMainWindow::~MythMainWindow()
@@ -777,16 +781,48 @@ void MythMainWindow::GrabWindow(QImage &image)
     image = p.toImage();
 }
 
-bool MythMainWindow::SaveScreenShot(const QImage &image)
+/* This is required to allow a screenshot to be requested by another thread
+ * other than the UI thread, and to wait for the screenshot before returning.
+ * It is used by mythweb for the remote access screenshots
+ */
+void MythMainWindow::doRemoteScreenShot(QString filename, int x, int y)
 {
-    QString fpath = GetMythDB()->GetSetting("ScreenShotPath", "/tmp");
-    QString fname = QString("%1/myth-screenshot-%2.png").arg(fpath)
-        .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddThh-mm-ss.zzz"));
+    // This will be running in the UI thread, as is required by QPixmap
+    QStringList args;
+    args << QString::number(x);
+    args << QString::number(y);
+    args << filename;
+
+    MythEvent me(MythEvent::MythEventMessage, ACTION_SCREENSHOT, args);
+    qApp->sendEvent(this, &me);
+}
+
+void MythMainWindow::RemoteScreenShot(QString filename, int x, int y)
+{
+    // This will be running in a non-UI thread and is used to trigger a
+    // function in the UI thread, and waits for completion of that handler
+    emit signalRemoteScreenShot(filename, x, y);
+}
+
+bool MythMainWindow::SaveScreenShot(const QImage &image, QString filename)
+{
+    if (filename.isEmpty())
+    {
+        QString fpath = GetMythDB()->GetSetting("ScreenShotPath", "/tmp");
+        filename = QString("%1/myth-screenshot-%2.png").arg(fpath)
+         .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddThh-mm-ss.zzz"));
+    }
+
+    QString extension = filename.section('.', -1, -1);
+    if (extension == "jpg")
+        extension = "JPEG";
+    else
+        extension = "PNG";
 
     VERBOSE(VB_GENERAL,QString("Saving screenshot to %1 (%2x%3)")
-                       .arg(fname).arg(image.width()).arg(image.height()));
+                       .arg(filename).arg(image.width()).arg(image.height()));
 
-    if (image.save(fname))
+    if (image.save(filename, extension.toAscii(), 100))
     {
         VERBOSE(VB_GENERAL, "MythMainWindow::screenShot succeeded");
         return true;
@@ -796,7 +832,7 @@ bool MythMainWindow::SaveScreenShot(const QImage &image)
     return false;
 }
 
-bool MythMainWindow::ScreenShot(int w, int h)
+bool MythMainWindow::ScreenShot(int w, int h, QString filename)
 {
     QImage img;
     GrabWindow(img);
@@ -806,7 +842,7 @@ bool MythMainWindow::ScreenShot(int w, int h)
         h = img.height();
 
     img = img.scaled(w, h, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    return SaveScreenShot(img);
+    return SaveScreenShot(img, filename);
 }
 
 bool MythMainWindow::event(QEvent *e)
@@ -2200,11 +2236,18 @@ void MythMainWindow::customEvent(QEvent *ce)
         }
         else if (message.startsWith(ACTION_SCREENSHOT))
         {
-            if (me->ExtraDataCount() == 2)
+            if (me->ExtraDataCount() >= 2)
             {
                 int width  = me->ExtraData(0).toInt();
                 int height = me->ExtraData(1).toInt();
-                ScreenShot(width, height);
+
+                if (me->ExtraDataCount() == 3)
+                {
+                    QString filename = me->ExtraData(2);
+                    ScreenShot(width, height, filename);
+                }
+                else
+                    ScreenShot(width, height);
             }
             else
             {
