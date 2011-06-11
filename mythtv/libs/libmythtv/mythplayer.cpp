@@ -3875,10 +3875,10 @@ bool MythPlayer::IsEmbedding(void)
     return false;
 }
 
-bool MythPlayer::GetScreenShot(int width, int height)
+bool MythPlayer::GetScreenShot(int width, int height, QString filename)
 {
     if (videoOutput)
-        return videoOutput->GetScreenShot(width, height);
+        return videoOutput->GetScreenShot(width, height, filename);
     return false;
 }
 

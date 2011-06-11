@@ -189,7 +189,7 @@ class MTV_PUBLIC MythPlayer
     bool    UsingNullVideo(void) const { return using_null_videoout; }
     bool    HasTVChainNext(void) const;
     bool    CanSupportDoubleRate(void);
-    bool    GetScreenShot(int width = 0, int height = 0);
+    bool    GetScreenShot(int width = 0, int height = 0, QString filename = "");
 
     // Non-const gets
     VideoOutput *getVideoOutput(void)         { return videoOutput; }

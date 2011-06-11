@@ -2236,23 +2236,19 @@ void MythMainWindow::customEvent(QEvent *ce)
         }
         else if (message.startsWith(ACTION_SCREENSHOT))
         {
+            int width = 0;
+            int height = 0;
+            QString filename;
+
             if (me->ExtraDataCount() >= 2)
             {
-                int width  = me->ExtraData(0).toInt();
-                int height = me->ExtraData(1).toInt();
+                width  = me->ExtraData(0).toInt();
+                height = me->ExtraData(1).toInt();
 
                 if (me->ExtraDataCount() == 3)
-                {
-                    QString filename = me->ExtraData(2);
-                    ScreenShot(width, height, filename);
-                }
-                else
-                    ScreenShot(width, height);
+                    filename = me->ExtraData(2);
             }
-            else
-            {
-                ScreenShot();
-            }
+	    ScreenShot(width, height, filename);
         }
     }
     else if ((MythEvent::Type)(ce->type()) == MythEvent::MythUserMessage)

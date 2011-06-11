@@ -1258,9 +1258,9 @@ void VideoOutputVDPAU::ParseOptions(void)
     }
 }
 
-bool VideoOutputVDPAU::GetScreenShot(int width, int height)
+bool VideoOutputVDPAU::GetScreenShot(int width, int height, QString filename)
 {
     if (m_render)
-        return m_render->GetScreenShot(width, height);
+        return m_render->GetScreenShot(width, height, filename);
     return false;
 }

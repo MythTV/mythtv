@@ -8138,15 +8138,25 @@ void TV::customEvent(QEvent *e)
     if (message == ACTION_SCREENSHOT)
     {
         PlayerContext *mctx = GetPlayerWriteLock(0, __FILE__, __LINE__);
-        bool extra = me->ExtraDataCount() == 2;
-        int width  = extra ? me->ExtraData(0).toInt() : 0;
-        int height = extra ? me->ExtraData(1).toInt() : 0;
-        if (mctx && mctx->player && mctx->player->GetScreenShot(width, height))
+        int width = 0;
+        int height = 0;
+        QString filename;
+
+        if (me->ExtraDataCount() >= 2)
+        {
+            width  = me->ExtraData(0).toInt();
+            height = me->ExtraData(1).toInt();
+
+            if (me->ExtraDataCount() == 3)
+                filename = me->ExtraData(2);
+        }
+        if (mctx && mctx->player && 
+            mctx->player->GetScreenShot(width, height, filename))
         {
         }
         else
         {
-            GetMythMainWindow()->ScreenShot(width, height);
+            GetMythMainWindow()->ScreenShot(width, height, filename);
         }
         ReturnPlayerLock(mctx);
     }
