@@ -863,10 +863,8 @@ bool VideoOutputXv::InitSetupBuffers(void)
  *
  * \return success or failure.
  */
-bool VideoOutputXv::Init(
-    int width, int height, float aspect,
-    WId winid, int winx, int winy, int winw, int winh,
-    MythCodecID codec_id)
+bool VideoOutputXv::Init(int width, int height, float aspect,
+                         WId winid, const QRect &win_rect, MythCodecID codec_id)
 {
     window.SetNeedRepaint(true);
 
@@ -907,9 +905,7 @@ bool VideoOutputXv::Init(
     XJ_started = true;
 
     // Basic setup
-    VideoOutput::Init(width, height, aspect,
-                      winid, winx, winy, winw, winh,
-                      codec_id);
+    VideoOutput::Init(width, height, aspect,winid, win_rect,codec_id);
 
     // Set resolution/measurements (check XRandR, Xinerama, config settings)
     InitDisplayMeasurements(width, height, true);

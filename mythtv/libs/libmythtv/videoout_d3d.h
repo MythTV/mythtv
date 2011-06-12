@@ -19,9 +19,8 @@ class VideoOutputD3D : public VideoOutput
     VideoOutputD3D();
    ~VideoOutputD3D();
 
-    bool Init(int width, int height, float aspect, WId winid,
-              int winx, int winy, int winw, int winh,
-              MythCodecID codec_id);
+    bool Init(int width, int height, float aspect,
+              WId winid, const QRect &win_rect, MythCodecID codec_id);
     void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd);
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,

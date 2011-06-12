@@ -86,8 +86,8 @@ void VideoOutputVDPAU::TearDown(void)
     DeleteRender();
 }
 
-bool VideoOutputVDPAU::Init(int width, int height, float aspect, WId winid,
-                            int winx, int winy, int winw, int winh,
+bool VideoOutputVDPAU::Init(int width, int height, float aspect,
+                            WId winid, const QRect &win_rect,
                             MythCodecID codec_id)
 {
     // Attempt to free up as much video memory as possible
@@ -99,8 +99,7 @@ bool VideoOutputVDPAU::Init(int width, int height, float aspect, WId winid,
     m_win = winid;
     QMutexLocker locker(&m_lock);
     window.SetNeedRepaint(true);
-    bool ok = VideoOutput::Init(width, height, aspect,
-                                winid, winx, winy, winw, winh,codec_id);
+    bool ok = VideoOutput::Init(width, height, aspect, winid, win_rect,codec_id);
     if (db_vdisp_profile)
         db_vdisp_profile->SetVideoRenderer("vdpau");
 
@@ -714,8 +713,7 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
     TearDown();
     QRect disp = window.GetDisplayVisibleRect();
     if (Init(input_size.width(), input_size.height(),
-             aspect, m_win, disp.left(), disp.top(),
-             disp.width(), disp.height(), av_codec_id))
+             aspect, m_win, disp, av_codec_id))
     {
         BestDeint();
         return true;

@@ -49,19 +49,15 @@ class VideoOutput
   public:
     static void GetRenderOptions(render_opts &opts);
     static VideoOutput *Create(
-        const QString &decoder,   MythCodecID  codec_id,
-        void          *codec_priv,
-        PIPState       pipState,
-        const QSize   &video_dim, float        video_aspect,
-        WId            win_id,    const QRect &display_rect,
-        float video_prate);
+        const QString &decoder, MythCodecID  codec_id,     void *codec_priv,
+        PIPState pipState,      const QSize &video_dim,    float video_aspect,
+        WId win_id,             const QRect &display_rect, float video_prate);
 
     VideoOutput();
     virtual ~VideoOutput();
 
     virtual bool Init(int width, int height, float aspect,
-                      WId winid, int winx, int winy, int winw,
-                      int winh, MythCodecID codec_id);
+                      WId winid, const QRect &win_rect, MythCodecID codec_id);
     virtual void InitOSD(OSD *osd);
     virtual void SetVideoFrameRate(float);
     virtual bool IsPreferredRenderer(QSize video_size);

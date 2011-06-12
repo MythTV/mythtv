@@ -22,9 +22,8 @@ class VideoOutputVDPAU : public VideoOutput
     static void GetRenderOptions(render_opts &opts);
     VideoOutputVDPAU();
     ~VideoOutputVDPAU();
-    bool Init(int width, int height, float aspect, WId winid,
-              int winx, int winy, int winw, int winh,
-              MythCodecID codec_id);
+    bool Init(int width, int height, float aspect,
+              WId winid, const QRect &win_rect, MythCodecID codec_id);
     bool SetDeinterlacingEnabled(bool interlaced);
     bool SetupDeinterlace(bool interlaced, const QString& ovrf="");
     bool ApproveDeintFilter(const QString& filtername) const;

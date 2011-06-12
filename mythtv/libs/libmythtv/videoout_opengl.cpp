@@ -108,9 +108,8 @@ void VideoOutputOpenGL::TearDown(void)
         gl_context->doneCurrent();
 }
 
-bool VideoOutputOpenGL::Init(int width, int height, float aspect,
-                        WId winid, int winx, int winy, int winw, int winh,
-                        MythCodecID codec_id)
+bool VideoOutputOpenGL::Init(int width, int height, float aspect, WId winid,
+                             const QRect &win_rect, MythCodecID codec_id)
 {
     QMutexLocker locker(&gl_context_lock);
 
@@ -119,9 +118,7 @@ bool VideoOutputOpenGL::Init(int width, int height, float aspect,
     window.SetAllowPreviewEPG(true);
     gl_parent_win = winid;
 
-    VideoOutput::Init(width, height, aspect,
-                      winid, winx, winy, winw, winh,
-                      codec_id);
+    VideoOutput::Init(width, height, aspect, winid, win_rect, codec_id);
 
     SetProfile();
 
@@ -180,8 +177,7 @@ bool VideoOutputOpenGL::InputChanged(const QSize &input_size,
     TearDown();
     QRect disp = window.GetDisplayVisibleRect();
     if (Init(input_size.width(), input_size.height(),
-             aspect, gl_parent_win, disp.left(),  disp.top(),
-             disp.width(), disp.height(), av_codec_id))
+             aspect, gl_parent_win, disp, av_codec_id))
     {
         BestDeint();
         return true;

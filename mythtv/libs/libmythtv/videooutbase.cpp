@@ -96,12 +96,9 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
  * \return instance of VideoOutput if successful, NULL otherwise.
  */
 VideoOutput *VideoOutput::Create(
-        const QString &decoder,   MythCodecID  codec_id,
-        void          *codec_priv,
-        PIPState pipState,
-        const QSize   &video_dim, float        video_aspect,
-        WId            win_id,    const QRect &display_rect,
-        float          video_prate)
+    const QString &decoder, MythCodecID  codec_id,     void *codec_priv,
+    PIPState pipState,      const QSize &video_dim,    float video_aspect,
+    WId win_id,             const QRect &display_rect, float video_prate)
 {
     (void) codec_priv;
 
@@ -199,8 +196,7 @@ VideoOutput *VideoOutput::Create(
             vo->SetVideoFrameRate(video_prate);
             if (vo->Init(
                     video_dim.width(), video_dim.height(), video_aspect,
-                    win_id, display_rect.x(), display_rect.y(),
-                    display_rect.width(), display_rect.height(), codec_id))
+                    win_id, display_rect, codec_id))
             {
                 return vo;
             }
@@ -377,8 +373,7 @@ VideoOutput::~VideoOutput()
  * \return true if successful, false otherwise.
  */
 bool VideoOutput::Init(int width, int height, float aspect, WId winid,
-                       int winx, int winy, int winw, int winh,
-                       MythCodecID codec_id)
+                       const QRect &win_rect, MythCodecID codec_id)
 {
     (void)winid;
 
@@ -391,10 +386,8 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
         StopEmbedding();
     }
 
-    bool mainSuccess = window.Init(
-        QSize(width, height), aspect,
-        QRect(winx, winy, winw, winh),
-        db_aspectoverride, db_adjustfill);
+    bool mainSuccess = window.Init(QSize(width, height), aspect, win_rect,
+                                   db_aspectoverride, db_adjustfill);
 
     if (db_vdisp_profile)
         db_vdisp_profile->SetInput(window.GetVideoDim());

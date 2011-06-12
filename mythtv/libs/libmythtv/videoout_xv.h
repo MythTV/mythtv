@@ -33,9 +33,8 @@ class VideoOutputXv : public VideoOutput
     VideoOutputXv();
    ~VideoOutputXv();
 
-    bool Init(int width, int height, float aspect, WId winid,
-              int winx, int winy, int winw, int winh,
-              MythCodecID codec_id);
+    bool Init(int width, int height, float aspect,
+              WId winid, const QRect &win_rect, MythCodecID codec_id);
 
     bool SetDeinterlacingEnabled(bool);
     bool SetupDeinterlace(bool interlaced, const QString& ovrf="");

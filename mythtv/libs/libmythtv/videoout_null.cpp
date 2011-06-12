@@ -131,17 +131,15 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
     return ok;
 }
 
-bool VideoOutputNull::Init(int width, int height, float aspect,
-                           WId winid, int winx, int winy, int winw,
-                           int winh, MythCodecID codec_id)
+bool VideoOutputNull::Init(int width, int height, float aspect, WId winid,
+                           const QRect &win_rect, MythCodecID codec_id)
 {
     if ((width <= 0) || (height <= 0))
         return false;
 
     QMutexLocker locker(&global_lock);
 
-    VideoOutput::Init(width, height, aspect, winid,
-                      winx, winy, winw, winh, codec_id);
+    VideoOutput::Init(width, height, aspect, winid, win_rect, codec_id);
 
     vbuffers.Init(kNumBuffers, true, kNeedFreeFrames,
                   kPrebufferFramesNormal, kPrebufferFramesSmall,

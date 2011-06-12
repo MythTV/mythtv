@@ -13,9 +13,8 @@ class VideoOutputOpenGL : public VideoOutput
     VideoOutputOpenGL();
     virtual ~VideoOutputOpenGL();
 
-    virtual bool Init(int width, int height, float aspect, WId winid,
-                      int winx, int winy, int winw, int winh,
-                      MythCodecID codec_id);
+    virtual bool Init(int width, int height, float aspect,
+                      WId winid, const QRect &win_rect, MythCodecID codec_id);
     virtual void SetProfile(void);
     virtual void TearDown(void);
 

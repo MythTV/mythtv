@@ -459,7 +459,7 @@ bool MythPlayer::InitVideo(void)
         MythCodecID codec = decoder->GetVideoCodecID();
         videoOutput = new VideoOutputNull();
         if (!videoOutput->Init(video_disp_dim.width(), video_disp_dim.height(),
-                               video_aspect, 0, 0, 0, 0, 0, codec))
+                               video_aspect, 0, QRect(), codec))
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "Unable to create null video out");
