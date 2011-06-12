@@ -16,10 +16,14 @@
 #define OSD_DLG_CUTPOINT  "OSD_CUTPOINT"
 #define OSD_DLG_DELETE    "OSD_DELETE"
 #define OSD_DLG_CONFIRM   "mythconfirmpopup"
-#define OSD_WIN_TELETEXT  "OSD_TELETEXT"
-#define OSD_WIN_SUBTITLE  "OSD_SUBTITLES"
-#define OSD_WIN_INTERACT  "OSD_INTERACTIVE"
-#define OSD_WIN_BDOVERLAY "OSD_BDOVERLAY"
+// Force subtitle/interactive screens to be drawn first (i.e. at the back) by
+// prepending their identifiers with a low numeric (may not always work as
+// QMap/QString ordering is based on unicode values)
+#define OSD_WIN_TELETEXT  "00_OSD_TELETEXT"
+#define OSD_WIN_SUBTITLE  "00_OSD_SUBTITLES"
+// MHEG and blu-ray overlay should cover subtitles
+#define OSD_WIN_INTERACT  "01_OSD_INTERACTIVE"
+#define OSD_WIN_BDOVERLAY "01_OSD_BDOVERLAY"
 
 #define kOSDFadeTime 1000
 
@@ -208,7 +212,7 @@ class OSD
     enum OSDFunctionalType m_FunctionalType;
     QString                m_FunctionalWindow;
 
-    QHash<QString, MythScreenType*>   m_Children;
+    QMap<QString, MythScreenType*>    m_Children;
     QHash<MythScreenType*, QDateTime> m_ExpireTimes;
 };
 
