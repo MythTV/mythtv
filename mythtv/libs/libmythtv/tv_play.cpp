@@ -10267,9 +10267,10 @@ void TV::FillOSDMenuNavigate(const PlayerContext *ctx, OSD *osd,
             previouschan = true;
     }
 
+    bool jump = !num_chapters && !isdvd && !isbd &&
+                ctx->buffer->IsSeekingAllowed();
     bool show = isdvd || num_chapters || num_titles || previouschan ||
-                isrecording || num_angles ||
-                (!(num_chapters || isdvd || isbd));
+                isrecording || num_angles || jump;
 
     if (category == "MAIN")
     {
@@ -10283,7 +10284,7 @@ void TV::FillOSDMenuNavigate(const PlayerContext *ctx, OSD *osd,
     {
         backaction = "MAIN";
         currenttext = tr("Navigate");
-        if (!num_chapters && !isdvd && !isbd)
+        if (jump)
         {
             osd->DialogAddButton(tr("Jump Ahead"), ACTION_JUMPFFWD, false, false);
             osd->DialogAddButton(tr("Jump Back"), ACTION_JUMPRWND, false, false);
