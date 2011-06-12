@@ -695,6 +695,18 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
             .arg(toString(video_codec_id)).arg(toString(av_codec_id)));
 
     QMutexLocker locker(&m_lock);
+
+    // Ensure we don't lose embedding through program changes. This duplicates
+    // code in VideoOutput::Init but we need start here otherwise the embedding
+    // is lost during window re-initialistion.
+    bool wasembedding = window.IsEmbedding();
+    QRect oldrect;
+    if (wasembedding)
+    {
+        oldrect = window.GetEmbeddingRect();
+        StopEmbedding();
+    }
+
     bool cid_changed = (video_codec_id != av_codec_id);
     bool res_changed = input_size  != window.GetActualVideoDim();
     bool asp_changed = aspect      != window.GetVideoAspect();
@@ -706,6 +718,8 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
         {
             VideoAspectRatioChanged(aspect);
             MoveResize();
+            if (wasembedding)
+                EmbedInWidget(oldrect);
         }
         return true;
     }
@@ -715,6 +729,8 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
     if (Init(input_size.width(), input_size.height(),
              aspect, m_win, disp, av_codec_id))
     {
+        if (wasembedding)
+            EmbedInWidget(oldrect);
         BestDeint();
         return true;
     }

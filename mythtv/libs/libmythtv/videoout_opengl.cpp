@@ -155,6 +155,18 @@ bool VideoOutputOpenGL::InputChanged(const QSize &input_size,
             .arg(toString(video_codec_id)).arg(toString(av_codec_id)));
 
     QMutexLocker locker(&gl_context_lock);
+
+    // Ensure we don't lose embedding through program changes. This duplicates
+    // code in VideoOutput::Init but we need start here otherwise the embedding
+    // is lost during window re-initialistion.
+    bool wasembedding = window.IsEmbedding();
+    QRect oldrect;
+    if (wasembedding)
+    {
+        oldrect = window.GetEmbeddingRect();
+        StopEmbedding();
+    }
+
     if (!codec_is_std(av_codec_id))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -170,6 +182,8 @@ bool VideoOutputOpenGL::InputChanged(const QSize &input_size,
         {
             VideoAspectRatioChanged(aspect);
             MoveResize();
+            if (wasembedding)
+                EmbedInWidget(oldrect);
         }
         return true;
     }
@@ -179,6 +193,8 @@ bool VideoOutputOpenGL::InputChanged(const QSize &input_size,
     if (Init(input_size.width(), input_size.height(),
              aspect, gl_parent_win, disp, av_codec_id))
     {
+        if (wasembedding)
+            EmbedInWidget(oldrect);
         BestDeint();
         return true;
     }
