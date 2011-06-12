@@ -129,8 +129,7 @@ MythPlayer::MythPlayer(bool muted)
       decoderThread(NULL),          playerThread(NULL),
       no_hardware_decoders(false),
       // Window stuff
-      parentWidget(NULL), embedid(0),
-      embx(-1), emby(-1), embw(-1), embh(-1),
+      parentWidget(NULL), embedding(false), embedRect(QRect()),
       // State
       totalDecoderPause(false), decoderPaused(false),
       pauseDecoder(false), unpauseDecoder(false),
@@ -460,7 +459,7 @@ bool MythPlayer::InitVideo(void)
         MythCodecID codec = decoder->GetVideoCodecID();
         videoOutput = new VideoOutputNull();
         if (!videoOutput->Init(video_disp_dim.width(), video_disp_dim.height(),
-                               video_aspect, 0, 0, 0, 0, 0, codec, 0))
+                               video_aspect, 0, 0, 0, 0, 0, codec))
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "Unable to create null video out");
@@ -495,7 +494,7 @@ bool MythPlayer::InitVideo(void)
 
         QRect display_rect;
         if (pipState == kPIPStandAlone)
-            display_rect = QRect(embx, emby, embw, embh);
+            display_rect = embedRect;
         else
             display_rect = QRect(0, 0, widget->width(), widget->height());
 
@@ -507,8 +506,7 @@ bool MythPlayer::InitVideo(void)
                 decoder->GetVideoCodecPrivate(),
                 pipState,
                 video_disp_dim, video_aspect,
-                widget->winId(), display_rect, video_frame_rate,
-                0 /*embedid*/);
+                widget->winId(), display_rect, video_frame_rate);
         }
 
         if (videoOutput)
@@ -526,10 +524,8 @@ bool MythPlayer::InitVideo(void)
         return false;
     }
 
-    if (embedid > 0 && pipState == kPIPOff)
-    {
-        videoOutput->EmbedInWidget(embx, emby, embw, embh);
-    }
+    if (embedding && pipState == kPIPOff)
+        videoOutput->EmbedInWidget(embedRect);
 
     InitFilters();
 
@@ -1171,17 +1167,14 @@ void MythPlayer::ReleaseCurrentFrame(VideoFrame *frame)
         vidExitLock.unlock();
 }
 
-void MythPlayer::EmbedInWidget(int x, int y, int w, int h, WId id)
+void MythPlayer::EmbedInWidget(QRect rect)
 {
     if (videoOutput)
-        videoOutput->EmbedInWidget(x, y, w, h);
+        videoOutput->EmbedInWidget(rect);
     else
     {
-        embx = x;
-        emby = y;
-        embw = w;
-        embh = h;
-        embedid = id;
+        embedRect = rect;
+        embedding = true;
     }
 }
 
@@ -1191,6 +1184,11 @@ void MythPlayer::StopEmbedding(void)
     {
         videoOutput->StopEmbedding();
         ReinitOSD();
+    }
+    else
+    {
+        embedRect = QRect();
+        embedding = false;
     }
 }
 

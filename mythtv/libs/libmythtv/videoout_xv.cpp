@@ -866,7 +866,7 @@ bool VideoOutputXv::InitSetupBuffers(void)
 bool VideoOutputXv::Init(
     int width, int height, float aspect,
     WId winid, int winx, int winy, int winw, int winh,
-    MythCodecID codec_id, WId embedid)
+    MythCodecID codec_id)
 {
     window.SetNeedRepaint(true);
 
@@ -909,14 +909,10 @@ bool VideoOutputXv::Init(
     // Basic setup
     VideoOutput::Init(width, height, aspect,
                       winid, winx, winy, winw, winh,
-                      codec_id, embedid);
+                      codec_id);
 
     // Set resolution/measurements (check XRandR, Xinerama, config settings)
     InitDisplayMeasurements(width, height, true);
-
-    // Set embedding window id
-    if (embedid > 0)
-        XJ_curwin = XJ_win = embedid;
 
     if (!InitSetupBuffers())
         return false;
@@ -1317,12 +1313,12 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
     XJ_non_xv_image = NULL;
 }
 
-void VideoOutputXv::EmbedInWidget(int x, int y, int w, int h)
+void VideoOutputXv::EmbedInWidget(const QRect &rect)
 {
     QMutexLocker locker(&global_lock);
 
     if (!window.IsEmbedding())
-        VideoOutput::EmbedInWidget(x, y, w, h);
+        VideoOutput::EmbedInWidget(rect);
     MoveResize();
 }
 

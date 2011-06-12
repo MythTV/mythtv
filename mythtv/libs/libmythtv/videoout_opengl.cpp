@@ -42,8 +42,7 @@ VideoOutputOpenGL::VideoOutputOpenGL()
     : VideoOutput(),
     gl_context_lock(QMutex::Recursive), gl_context(NULL),
     gl_videochain(NULL), gl_pipchain_active(NULL),
-    gl_parent_win(0), gl_embed_win(0),
-    gl_painter(NULL), gl_created_painter(false)
+    gl_parent_win(0),    gl_painter(NULL), gl_created_painter(false)
 {
     memset(&av_pause_frame, 0, sizeof(av_pause_frame));
     av_pause_frame.buf = NULL;
@@ -111,7 +110,7 @@ void VideoOutputOpenGL::TearDown(void)
 
 bool VideoOutputOpenGL::Init(int width, int height, float aspect,
                         WId winid, int winx, int winy, int winw, int winh,
-                        MythCodecID codec_id, WId embedid)
+                        MythCodecID codec_id)
 {
     QMutexLocker locker(&gl_context_lock);
 
@@ -119,11 +118,10 @@ bool VideoOutputOpenGL::Init(int width, int height, float aspect,
     // FIXME Mac OS X overlay does not work with preview
     window.SetAllowPreviewEPG(true);
     gl_parent_win = winid;
-    gl_embed_win  = embedid;
 
     VideoOutput::Init(width, height, aspect,
                       winid, winx, winy, winw, winh,
-                      codec_id, embedid);
+                      codec_id);
 
     SetProfile();
 
@@ -183,7 +181,7 @@ bool VideoOutputOpenGL::InputChanged(const QSize &input_size,
     QRect disp = window.GetDisplayVisibleRect();
     if (Init(input_size.width(), input_size.height(),
              aspect, gl_parent_win, disp.left(),  disp.top(),
-             disp.width(), disp.height(), av_codec_id, gl_embed_win))
+             disp.width(), disp.height(), av_codec_id))
     {
         BestDeint();
         return true;
@@ -739,10 +737,10 @@ void VideoOutputOpenGL::MoveResizeWindow(QRect new_rect)
         gl_context->MoveResizeWindow(new_rect);
 }
 
-void VideoOutputOpenGL::EmbedInWidget(int x, int y, int w, int h)
+void VideoOutputOpenGL::EmbedInWidget(const QRect &rect)
 {
     if (!window.IsEmbedding())
-        VideoOutput::EmbedInWidget(x,y,w,h);
+        VideoOutput::EmbedInWidget(rect);
 
     MoveResize();
 }

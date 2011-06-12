@@ -15,7 +15,7 @@ class VideoOutputOpenGL : public VideoOutput
 
     virtual bool Init(int width, int height, float aspect, WId winid,
                       int winx, int winy, int winw, int winh,
-                      MythCodecID codec_id, WId embedid = 0);
+                      MythCodecID codec_id);
     virtual void SetProfile(void);
     virtual void TearDown(void);
 
@@ -36,7 +36,7 @@ class VideoOutputOpenGL : public VideoOutput
     void InitPictureAttributes(void);
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
-    void EmbedInWidget(int x, int y, int w, int h);
+    void EmbedInWidget(const QRect &rect);
     void StopEmbedding(void);
     virtual bool SetDeinterlacingEnabled(bool);
     virtual bool SetupDeinterlace(bool i, const QString& ovrf="");
@@ -70,7 +70,6 @@ class VideoOutputOpenGL : public VideoOutput
     QMap<MythPlayer*,bool>         gl_pip_ready;
     OpenGLVideo      *gl_pipchain_active;
     WId               gl_parent_win;
-    WId               gl_embed_win;
     VideoFrame        av_pause_frame;
 
     MythOpenGLPainter *gl_painter;

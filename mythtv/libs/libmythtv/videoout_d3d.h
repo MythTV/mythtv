@@ -21,7 +21,7 @@ class VideoOutputD3D : public VideoOutput
 
     bool Init(int width, int height, float aspect, WId winid,
               int winx, int winy, int winw, int winh,
-              MythCodecID codec_id, WId embedid = 0);
+              MythCodecID codec_id);
     void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd);
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,
@@ -38,7 +38,7 @@ class VideoOutputD3D : public VideoOutput
     void UpdatePauseFrame(void);
     void DrawUnusedRects(bool) {;}
     void Zoom(ZoomDirection direction);
-    void EmbedInWidget(int x, int y, int w, int h);
+    void EmbedInWidget(const QRect &rect);
     void StopEmbedding(void);
     bool hasFullScreenOSD(void) const { return true; }
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,

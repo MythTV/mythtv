@@ -101,7 +101,7 @@ VideoOutput *VideoOutput::Create(
         PIPState pipState,
         const QSize   &video_dim, float        video_aspect,
         WId            win_id,    const QRect &display_rect,
-        float          video_prate,     WId    embed_id)
+        float          video_prate)
 {
     (void) codec_priv;
 
@@ -200,8 +200,7 @@ VideoOutput *VideoOutput::Create(
             if (vo->Init(
                     video_dim.width(), video_dim.height(), video_aspect,
                     win_id, display_rect.x(), display_rect.y(),
-                    display_rect.width(), display_rect.height(),
-                    codec_id, embed_id))
+                    display_rect.width(), display_rect.height(), codec_id))
             {
                 return vo;
             }
@@ -379,10 +378,9 @@ VideoOutput::~VideoOutput()
  */
 bool VideoOutput::Init(int width, int height, float aspect, WId winid,
                        int winx, int winy, int winw, int winh,
-                       MythCodecID codec_id, WId embedid)
+                       MythCodecID codec_id)
 {
     (void)winid;
-    (void)embedid;
 
     video_codec_id = codec_id;
     bool wasembedding = window.IsEmbedding();
@@ -410,7 +408,7 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
     if (wasembedding)
     {
         VERBOSE(VB_PLAYBACK, LOC + "Restoring embedded playback");
-        EmbedInWidget(oldrect.x(), oldrect.y(), oldrect.width(), oldrect.height());
+        EmbedInWidget(oldrect);
     }
 
     VideoAspectRatioChanged(aspect); // apply aspect ratio and letterbox mode
@@ -682,21 +680,17 @@ void VideoOutput::ResizeDisplayWindow(const QRect &rect, bool save_visible_rect)
 
 /**
  * \brief Tells video output to embed video in an existing window.
- * \param x   X location where to locate video
- * \param y   Y location where to locate video
- * \param w   width of video
- * \param h   height of video
  * \sa StopEmbedding()
  */
-void VideoOutput::EmbedInWidget(int x, int y, int w, int h)
+void VideoOutput::EmbedInWidget(const QRect &rect)
 {
-    window.EmbedInWidget(QRect(x, y, w, h));
+    window.EmbedInWidget(rect);
 }
 
 /**
  * \fn VideoOutput::StopEmbedding(void)
  * \brief Tells video output to stop embedding video in an existing window.
- * \sa EmbedInWidget(WId, int, int, int, int)
+ * \sa EmbedInWidget(const QRect&)
  */
 void VideoOutput::StopEmbedding(void)
 {

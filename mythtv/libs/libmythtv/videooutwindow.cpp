@@ -81,6 +81,7 @@ VideoOutWindow::VideoOutWindow() :
     display_video_rect(0, 0, 0, 0),
     display_visible_rect(0, 0, 0, 0),
     tmp_display_visible_rect(0, 0, 0, 0),
+    embedding_rect(QRect()),
 
     // Various state variables
     embedding(false), needrepaint(false),
@@ -675,6 +676,7 @@ void VideoOutWindow::EmbedInWidget(const QRect &new_video_rect)
     if (!allowpreviewepg && pip_state == kPIPOff)
         return;
 
+    embedding_rect = new_video_rect;
     bool save_visible_rect = !embedding;
 
     embedding = true;
@@ -690,6 +692,7 @@ void VideoOutWindow::EmbedInWidget(const QRect &new_video_rect)
  */
 void VideoOutWindow::StopEmbedding(void)
 {
+    embedding_rect = QRect();
     display_visible_rect = tmp_display_visible_rect;
 
     MoveResize();

@@ -14,7 +14,7 @@ class VideoOutputNull : public VideoOutput
 
     bool Init(int width, int height, float aspect, WId winid,
               int winx, int winy, int winw, int winh,
-              MythCodecID codec_id, WId embedid = 0);
+              MythCodecID codec_id);
     bool SetupDeinterlace(bool, const QString &ovrf = "")
         { (void)ovrf; return false; } // we don't deinterlace in null output..
     void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd);
@@ -26,7 +26,7 @@ class VideoOutputNull : public VideoOutput
                       void        *codec_private,
                       bool        &aspect_only);
     void Zoom(ZoomDirection direction);
-    void EmbedInWidget(int x, int y, int w, int h);
+    void EmbedInWidget(const QRect &rect);
     void StopEmbedding(void);
     void DrawUnusedRects(bool sync = true);
     void UpdatePauseFrame(void);

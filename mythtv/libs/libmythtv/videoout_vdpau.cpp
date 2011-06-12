@@ -88,7 +88,7 @@ void VideoOutputVDPAU::TearDown(void)
 
 bool VideoOutputVDPAU::Init(int width, int height, float aspect, WId winid,
                             int winx, int winy, int winw, int winh,
-                            MythCodecID codec_id, WId embedid)
+                            MythCodecID codec_id)
 {
     // Attempt to free up as much video memory as possible
     // only works when using the VDPAU painter for the UI
@@ -96,13 +96,11 @@ bool VideoOutputVDPAU::Init(int width, int height, float aspect, WId winid,
     if (painter)
         painter->FreeResources();
 
-    (void) embedid;
     m_win = winid;
     QMutexLocker locker(&m_lock);
     window.SetNeedRepaint(true);
     bool ok = VideoOutput::Init(width, height, aspect,
-                                winid, winx, winy, winw, winh,
-                                codec_id, embedid);
+                                winid, winx, winy, winw, winh,codec_id);
     if (db_vdisp_profile)
         db_vdisp_profile->SetVideoRenderer("vdpau");
 
@@ -717,7 +715,7 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
     QRect disp = window.GetDisplayVisibleRect();
     if (Init(input_size.width(), input_size.height(),
              aspect, m_win, disp.left(), disp.top(),
-             disp.width(), disp.height(), av_codec_id, 0))
+             disp.width(), disp.height(), av_codec_id))
     {
         BestDeint();
         return true;
@@ -743,12 +741,12 @@ void VideoOutputVDPAU::VideoAspectRatioChanged(float aspect)
     VideoOutput::VideoAspectRatioChanged(aspect);
 }
 
-void VideoOutputVDPAU::EmbedInWidget(int x, int y,int w, int h)
+void VideoOutputVDPAU::EmbedInWidget(const QRect &rect)
 {
     QMutexLocker locker(&m_lock);
     if (!window.IsEmbedding())
     {
-        VideoOutput::EmbedInWidget(x, y, w, h);
+        VideoOutput::EmbedInWidget(rect);
         MoveResize();
         window.SetDisplayVisibleRect(window.GetTmpDisplayVisibleRect());
     }
