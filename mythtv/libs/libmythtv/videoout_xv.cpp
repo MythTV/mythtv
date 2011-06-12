@@ -456,8 +456,6 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
             else if (req[j].feature_flags & XvAttributes::kFeatureChromakey)
                 VERBOSE(VB_PLAYBACK, LOC + "Has XV_COLORKEY...");
 
-            VERBOSE(VB_PLAYBACK, LOC + "Here...");
-
             for (p = firstPort; (p <= lastPort) && (port == -1); ++p)
             {
                 disp->Lock();
@@ -873,24 +871,12 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
     disp = OpenMythXDisplay();
     XV_INIT_FATAL_ERROR_TEST(!disp, "Failed to open display.");
 
-    // HACK -- begin
-    //usleep(50 * 1000);
-    // HACK -- end
-
     // Initialize X stuff
     MythXLocker lock(disp);
 
     XJ_curwin     = winid;
     XJ_win        = winid;
-
-    VERBOSE(VB_PLAYBACK, LOC + "Creating gc");
     XV_INIT_FATAL_ERROR_TEST(!disp->CreateGC(XJ_win), "Failed to create GC.");
-
-    VERBOSE(VB_PLAYBACK, LOC + QString("XJ_screen_num: '%1'").arg(disp->GetScreen()));
-    VERBOSE(VB_PLAYBACK, LOC + QString("XJ_curwin:     '%1'").arg(XJ_curwin));
-    VERBOSE(VB_PLAYBACK, LOC + QString("XJ_win:        '%1'").arg(XJ_win));
-    VERBOSE(VB_PLAYBACK, LOC + QString("XJ_root:       '%1'").arg(disp->GetRoot()));
-    VERBOSE(VB_PLAYBACK, LOC + QString("XJ_gc:         '0x%1'").arg((uint64_t)disp->GetGC(),0,16));
 
     // The letterbox color..
     XJ_letterbox_colour = disp->GetBlack();
