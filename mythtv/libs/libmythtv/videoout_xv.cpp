@@ -1550,15 +1550,14 @@ static void calc_bob(FrameScanType scan, int imgh, int disphoff,
 
     if (last_dest_y != dest_y)
     {
-        cerr<<"####### Field "<<field<<" #######"<<endl;
-        cerr<<"         src_y: "<<src_y<<endl;
-        cerr<<"        dest_y: "<<dest_y<<endl;
-        cerr<<" xv_src_y_incr: "<<xv_src_y_incr<<endl;
-        cerr<<"xv_dest_y_incr: "<<xv_dest_y_incr<<endl;
-        cerr<<"      disphoff: "<<disphoff<<endl;
-        cerr<<"          imgh: "<<imgh<<endl;
-        cerr<<"           mod: "<<mod<<endl;
-        cerr<<endl;
+        VERBOSE(VB_GENERAL, QString("####### Field %1 #######").arg(field));
+        VERBOSE(VB_GENERAL, QString("         src_y: %1").arg(src_y));
+        VERBOSE(VB_GENERAL, QString("        dest_y: %1").arg(dest_y));
+        VERBOSE(VB_GENERAL, QString(" xv_src_y_incr: %1").arg(xv_src_y_incr));
+        VERBOSE(VB_GENERAL, QString("xv_dest_y_incr: %1").arg(xv_dest_y_incr));
+        VERBOSE(VB_GENERAL, QString("      disphoff: %1").arg(disphoff));
+        VERBOSE(VB_GENERAL, QString("          imgh: %1").arg(imgh));
+        VERBOSE(VB_GENERAL, QString("           mod: %1").arg(mod));
     }
     last_dest_y_field[field] = dest_y;
 #endif

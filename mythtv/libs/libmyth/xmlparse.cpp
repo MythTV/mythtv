@@ -73,7 +73,10 @@ bool XMLParse::doLoadTheme(QDomElement &ele, QString winName, QString themeFile)
 
     if (!f.open(QIODevice::ReadOnly))
     {
-        //cerr << "XMLParse::LoadTheme(): Can't open: " << themeFile << endl;
+#if 0
+        VERBOSE(VB_IMPORTANT, "XMLParse::LoadTheme(): Can't open: " + 
+                              themeFile);
+#endif
         return false;
     }
 

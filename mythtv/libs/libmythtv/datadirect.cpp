@@ -423,7 +423,7 @@ bool DDStructureParser::endDocument()
 
 bool DDStructureParser::characters(const QString& pchars)
 {
-    // cerr << "Characters : " << pchars << "\n";
+    // VERBOSE(VB_GENERAL, "Characters : " + pchars);
     if (pchars.trimmed().isEmpty())
         return true;
 
@@ -833,7 +833,7 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
 {
     MSqlQuery query(MSqlQuery::DDCon());
 
-    //cerr << "Adding rows to main program table from view table..\n";
+    //VERBOSE(VB_GENERAL, "Adding rows to main program table from view table");
     query.prepare(
         "INSERT IGNORE INTO program "
         "  ( chanid,        starttime,   endtime,         title,           "
@@ -870,8 +870,8 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
     if (!query.exec())
         MythDB::DBError("Inserting into program table", query);
 
-    //cerr << "Finished adding rows to main program table...\n";
-    //cerr << "Adding program ratings...\n";
+    //VERBOSE(VB_GENERAL, "Finished adding rows to main program table");
+    //VERBOSE(VB_GENERAL, "Adding program ratings");
 
     if (!query.exec("INSERT IGNORE INTO programrating (chanid, starttime, "
                     "system, rating) SELECT dd_v_program.chanid, "
@@ -890,8 +890,8 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
                     " AND dd_v_program.chanid = channel.chanid"))
         MythDB::DBError("Inserting into programrating table", query);
 
-    //cerr << "Finished adding program ratings...\n";
-    //cerr << "Populating people table from production crew list...\n";
+    //VERBOSE(VB_GENERAL, "Finished adding program ratings");
+    //VERBOSE(VB_GENERAL, "Populating people table from production crew list");
 
     if (!query.exec("INSERT IGNORE INTO people (name) "
                     "SELECT fullname "
@@ -901,8 +901,8 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
                     "WHERE people.name IS NULL;"))
         MythDB::DBError("Inserting into people table", query);
 
-    //cerr << "Finished adding people...\n";
-    //cerr << "Adding credits entries from production crew list...\n";
+    //VERBOSE(VB_GENERAL, "Finished adding people");
+    //VERBOSE(VB_GENERAL, "Adding credits entries from production crew list");
 
     if (!query.exec("INSERT IGNORE INTO credits (chanid, starttime, person, role)"
                     "SELECT dd_v_program.chanid, "
@@ -924,8 +924,8 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
                     "WHERE credits.role IS NULL;"))
         MythDB::DBError("Inserting into credits table", query);
 
-    //cerr << "Finished inserting credits...\n";
-    //cerr << "Adding genres...\n";
+    //VERBOSE(VB_GENERAL, "Finished inserting credits");
+    //VERBOSE(VB_GENERAL, "Adding genres");
 
     if (!query.exec("INSERT IGNORE INTO programgenres (chanid, starttime, "
                     "relevance, genre) SELECT dd_v_program.chanid, "
@@ -935,7 +935,7 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
                     "AND dd_v_program.chanid = channel.chanid"))
         MythDB::DBError("Inserting into programgenres table",query);
 
-    //cerr << "Done...\n";
+    //VERBOSE(VB_GENERAL, "Done");
 }
 
 bool DataDirectProcessor::DDPost(
@@ -1961,7 +1961,7 @@ bool DataDirectProcessor::ParseLineups(const QString &documentFile)
             in_form = true;
             get_action = get_setting(line.mid(frm + 5), "action");
             name_value.clear();
-            //cerr<<QString("action: %1").arg(action)<<endl;
+            //VERBOSE(VB_GENERAL, QString("action: %1").arg(action));
         }
 
         if (!in_form)
@@ -1971,11 +1971,11 @@ bool DataDirectProcessor::ParseLineups(const QString &documentFile)
         if (inp >= 0)
         {
             QString input_line = line.mid(inp + 6);
-            //cerr<<QString("input: %1").arg(input_line)<<endl;
+            //VERBOSE(VB_GENERAL, QString("input: %1").arg(input_line));
             QString name  = get_setting(input_line, "name");
             QString value = get_setting(input_line, "value");
-            //cerr<<QString("name: %1").arg(name)<<endl;
-            //cerr<<QString("value: %1").arg(value)<<endl;
+            //VERBOSE(VB_GENERAL, QString("name: %1").arg(name));
+            //VERBOSE(VB_GENERAL, QString("value: %1").arg(value));
             if (!name.isEmpty() && !value.isEmpty())
                 name_value[name] = value;
         }
@@ -2034,7 +2034,7 @@ bool DataDirectProcessor::ParseLineup(const QString &lineupid,
         {
             in_form = true;
             lineup.set_action = get_setting(line.mid(frm + 5), "action");
-            //cerr<<"set_action: "<<lineup.set_action<<endl;
+            //VERBOSE(VB_GENERAL "set_action: " + lineup.set_action);
         }
 
         if (!in_form)

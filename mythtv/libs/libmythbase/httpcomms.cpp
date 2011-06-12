@@ -781,14 +781,14 @@ bool HttpComms::createDigestAuth ( bool isForProxy, const QString& authStr, QHtt
 
     info.digestURI.append (m_url.path() + m_url.encodedQuery());
 
-
-//     cerr << " RESULT OF PARSING:" << endl;
-//     cerr << "   algorithm: " << info.algorithm << endl;
-//     cerr << "   realm:     " << info.realm << endl;
-//     cerr << "   nonce:     " << info.nonce << endl;
-//     cerr << "   opaque:    " << opaque << endl;
-//     cerr << "   qop:       " << info.qop << endl;
-
+#if 0
+    VERBOSE(VB_GENERAL, " RESULT OF PARSING:");
+    VERBOSE(VB_GENERAL, QString("   algorithm: ") .arg(info.algorithm));
+    VERBOSE(VB_GENERAL, QString("   realm:     ") .arg(info.realm));
+    VERBOSE(VB_GENERAL, QString("   nonce:     ") .arg(info.nonce));
+    VERBOSE(VB_GENERAL, QString("   opaque:    ") .arg(opaque));
+    VERBOSE(VB_GENERAL, QString("   qop:       ") .arg(info.qop));
+#endif
 
     // Calculate the response...
     calculateDigestResponse( info, Response );
@@ -869,7 +869,7 @@ void HttpComms::calculateDigestResponse( DigestAuthInfo& info, QByteArray& Respo
 
     HA1 = md.hexDigest();
 
-    //cerr << " calculateResponse(): A1 => " << HA1 << endl;
+    //VERBOSE(VB_GENERAL, QString(" calculateResponse(): A1 => %1") .arg(HA1));
 
     QString sEncodedPathAndQuery = m_url.path() + m_url.encodedQuery();
 
@@ -888,7 +888,7 @@ void HttpComms::calculateDigestResponse( DigestAuthInfo& info, QByteArray& Respo
     md.update( authStr );
     HA2 = md.hexDigest();
 
-    //cerr << " calculateResponse(): A2 => " << HA2 << endl;
+    //VERBOSE(VB_GENERAL, QString(" calculateResponse(): A2 => %1") .arg(HA2));
 
     // Calculate the response.
     authStr = HA1;
@@ -910,7 +910,7 @@ void HttpComms::calculateDigestResponse( DigestAuthInfo& info, QByteArray& Respo
     md.update( authStr );
     Response = md.hexDigest();
 
-    //cerr << " calculateResponse(): Response => " << Response << endl;
+    //VERBOSE(VB_GENERAL, QString(" calculateResponse(): Response => %1") .arg(Response));
 }
 
 

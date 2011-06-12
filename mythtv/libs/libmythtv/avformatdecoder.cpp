@@ -2575,8 +2575,11 @@ void AvFormatDecoder::HandleGopStart(
                 last_frame = m_positionMap.back().index;
         }
 
-        //cerr << "framesRead: " << framesRead << " last_frame: " << last_frame
-        //    << " keyframedist: " << keyframedist << endl;
+#if 0
+        VERBOSE(VB_PLAYBACK, QString("framesRead: %1 last_frame: %2 "
+                                     "keyframedist: %3")
+            .arg(framesRead) .arg(last_frame) .arg(keyframedist));
+#endif
 
         // if we don't have an entry, fill it in with what we've just parsed
         if (framesRead > last_frame && keyframedist > 0)

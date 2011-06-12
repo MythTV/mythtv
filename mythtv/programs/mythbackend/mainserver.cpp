@@ -328,7 +328,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     line = line.simplified();
     QStringList tokens = line.split(' ', QString::SkipEmptyParts);
     QString command = tokens[0];
-    //cerr << "command='" << command << "'\n";
+    //VERBOSE(VB_GENERAL, "command='" + command + "'");
     if (command == "MYTH_PROTO_VERSION")
     {
         if (tokens.size() < 2)

@@ -73,7 +73,7 @@ extern "C" {
 
 static void ALRMhandler(int /*sig*/)
 {
-     cerr<<"SignalMonitor: Got SIGALRM"<<endl;
+     VERBOSE(VB_GENERAL, "SignalMonitor: Got SIGALRM");
      signal(SIGINT, ALRMhandler);
 }
 
@@ -322,7 +322,7 @@ void SignalMonitor::MonitorLoop()
             QStringList slist = GetStatusList(false);
             MythEvent me(QString("SIGNAL %1").arg(capturecardnum), slist);
             gCoreContext->dispatch(me);
-            //cerr<<"sent SIGNAL"<<endl;
+            //VERBOSE(VB_GENERAL("sent SIGNAL");
         }
 
         usleep(update_rate * 1000);

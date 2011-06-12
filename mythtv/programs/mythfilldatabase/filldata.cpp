@@ -277,9 +277,9 @@ bool FillData::GrabDDData(Source source, int poffset,
         channel_update_run = true;
     }
 
-    //cerr << "Creating program view table...\n";
+    //VERBOSE(VB_GENERAL, "Creating program view table...");
     DataDirectProcessor::UpdateProgramViewTable(source.id);
-    //cerr <<  "Finished creating program view table...\n";
+    //VERBOSE(VB_GENERAL, "Finished creating program view table...");
 
     query.prepare("SELECT count(*) from dd_v_program;");
     if (query.exec() && query.size() > 0)

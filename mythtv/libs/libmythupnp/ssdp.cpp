@@ -219,13 +219,15 @@ void SSDP::PerformSearch( const QString &sST )
 
     if ( pSocket->writeBlock( sRequest.data(),
                               sRequest.size(), address, SSDP_PORT ) != nSize)
-        cerr << "SSDP::PerformSearch - did not write entire buffer." << endl;
+        VERBOSE(VB_GENERAL, "SSDP::PerformSearch - did not write entire "
+                            "buffer.");
 
     usleep( rand() % 250000 );
 
     if ( pSocket->writeBlock( sRequest.data(),
                               sRequest.size(), address, SSDP_PORT ) != nSize)
-        cerr << "SSDP::PerformSearch - did not write entire buffer." << endl;
+        VERBOSE(VB_GENERAL, "SSDP::PerformSearch - did not write entire "
+                            "buffer.");
 
 }
 

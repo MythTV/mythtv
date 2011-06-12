@@ -49,9 +49,11 @@ SignalMonitorValue::SignalMonitorValue(const QString& _name,
 
     Init();
 #if DEBUG_SIGNAL_MONITOR_VALUE
-    cerr<<"SignalMonitorValue("<<name<<", "<<noSpaceName<<", "<<value<<", "
-        <<threshold<<", "<<minval<<", "<<maxval<<", "<<timeout<<", "
-        <<high_threshold<<", "<< ((set) ? "true" : "false") <<")"<<endl;
+    VERBOSE(VB_GENERAL, QString("SignalMonitorValue(%1, %2, %3, %4, %5, %6, %7,"
+                                " %8, %9)")
+        .arg(name) .arg(noSpaceName) .arg(value) .arg(threshold) .arg(minval)
+        .arg(maxval) .arg(timeout) .arg(high_threshold)
+        .arg((set ? "true" : "false")));
 #endif
 }
 
@@ -73,9 +75,11 @@ SignalMonitorValue::SignalMonitorValue(const QString& _name,
 
     Init();
 #if DEBUG_SIGNAL_MONITOR_VALUE
-    cerr<<"SignalMonitorValue("<<name<<", "<<noSpaceName<<", "<<value<<", "
-        <<threshold<<", "<<minval<<", "<<maxval<<", "<<timeout<<", "
-        <<high_threshold<<", "<< ((set) ? "true" : "false") <<")"<<endl;
+    VERBOSE(VB_GENERAL, QString("SignalMonitorValue(%1, %2, %3, %4, %5, %6, %7,"
+                                " %8, %9)")
+        .arg(name) .arg(noSpaceName) .arg(value) .arg(threshold) .arg(minval)
+        .arg(maxval) .arg(timeout) .arg(high_threshold)
+        .arg((set ? "true" : "false")));
 #endif
 }
 
@@ -161,7 +165,7 @@ SignalMonitorList SignalMonitorValue::Parse(const QStringList& slist)
     for (int i=0; i+1<slist.size(); i+=2)
     {
 #if DEBUG_SIGNAL_MONITOR_VALUE
-        cerr<<"Parse("<<slist[i]<<", ("<<slist[i+1]<<"))"<<endl;
+        VERBOSE(VB_GENERAL, "Parse(" + slist[i] + ", (" + slist[i+1] + "))");
 #endif
         if (smv.Set(slist[i], slist[i+1]))
             monitor_list.push_back(smv);
@@ -189,17 +193,18 @@ bool SignalMonitorValue::AllGood(const SignalMonitorList& slist)
 #if DEBUG_SIGNAL_MONITOR_VALUE
     if (!good)
     {
-        cerr<<"AllGood failed on ";
+        QString msg("AllGood failed on ");
         SignalMonitorList::const_iterator it = slist.begin();
         for (; it != slist.end(); ++it)
             if (!it->IsGood())
             {
-                QByteArray ba = it->noSpaceName.toLocal8Bit();
-                cerr<<ba.data()<<"("<<it->GetValue()
-                    <<((it->high_threshold) ? "<" : ">")
-                    <<it->GetThreshold()<<") ";
+                msg += it->noSpaceName;
+                msg += QString("(%1%2%3) ")
+                           .arg(it->GetValue())
+                           .arg(it->high_threshold ? "<" : ">")
+                           .arg(it->GetThreshold());
             }
-        cerr<<endl;
+        VERBOSE(VB_GENERAL, msg);
     }
 #endif
     return good;

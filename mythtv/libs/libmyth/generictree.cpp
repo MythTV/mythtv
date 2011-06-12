@@ -83,10 +83,9 @@ static int compareItems(
     }
     else
     {
-        cerr << "generictree.o: SortableGenericTreeList was asked to "
-             << "compare items (probably inside a sort()), but the "
-             << "sort_type is not set to anything recognizable"
-             << endl;
+        VERBOSE(VB_IMPORTANT, "SortableGenericTreeList was asked to "
+                "compare items (probably inside a sort()), but the "
+                "sort_type is not set to anything recognizable");
         return 0;
     }
 }
@@ -335,7 +334,10 @@ GenericTree* GenericTree::getChildAt(uint reference, int ordering_index)
 {
     if (reference >= (uint)m_ordered_subnodes->size())
     {
-        // cerr << "GenericTree: out of bounds request to getChildAt()\n";
+#if 0
+        VERBOSE(VB_IMPORTANT, "GenericTree: out of bounds request to "
+                              "getChildAt()");
+#endif
         return NULL;
     }
 
@@ -363,7 +365,7 @@ void GenericTree::becomeSelectedChild()
     if (m_parent)
         m_parent->setSelectedChild(this);
     else
-        cerr << "Top level can't become selected child\n";
+        VERBOSE(VB_IMPORTANT, "Top level can't become selected child");
 }
 
 GenericTree* GenericTree::prevSibling(int number_up, int ordering_index)
@@ -453,7 +455,8 @@ int GenericTree::getAttribute(uint which_one) const
 {
     if (m_attributes->size() < (int)(which_one + 1))
     {
-        cerr << "asked a GenericTree node for a nonexistent attribute\n";
+        VERBOSE(VB_IMPORTANT, "asked a GenericTree node for a nonexistent "
+                              "attribute");
         return 0;
     }
 
@@ -639,9 +642,8 @@ void GenericTree::reOrderAsSorted()
 
     if (m_subnodes->size() != m_ordered_subnodes->size())
     {
-        cerr << "generictree.o: Can't reOrderAsSorted(), because the number "
-             << "of subnodes is different than the number of ordered subnodes"
-             << endl;
+        VERBOSE(VB_IMPORTANT, "Can't reOrderAsSorted(), because the number "
+                "of subnodes is different than the number of ordered subnodes");
         return;
     }
 

@@ -123,7 +123,8 @@ bool HttpStatus::ProcessRequest( HttpWorkerThread * /* pThread */,
     }
     catch( ... )
     {
-        cerr << "HttpStatus::ProcessRequest() - Unexpected Exception" << endl;
+        VERBOSE(VB_GENERAL, "HttpStatus::ProcessRequest() - Unexpected "
+                            "Exception");
     }
 
     return( false );

@@ -7,6 +7,7 @@
 using namespace std;
 
 // MythTH headers
+#include "mythverbose.h"
 #include "mythxdisplay.h"
 #include "util-xv.h"
 
@@ -21,12 +22,13 @@ QMap<int,port_info> open_xv_ports;
 
 void close_all_xv_ports_signal_handler(int sig)
 {
-    cerr<<"Signal: "<<sys_siglist[sig]<<endl;
+    VERBOSE(VB_GENERAL, QString("Signal: %1").arg(sys_siglist[sig]));
     QMap<int,port_info>::iterator it;
     for (it = open_xv_ports.begin(); it != open_xv_ports.end(); ++it)
     {
         restore_port_attributes((*it).port);
-        cerr<<"Ungrabbing XVideo port: "<<(*it).port<<endl;
+        VERBOSE(VB_GENERAL, QString("Ungrabbing XVideo port: %1")
+            .arg((*it).port));
         XvUngrabPort((*it).disp->GetDisplay(), (*it).port, CurrentTime);
     }
     exit(GENERIC_EXIT_NOT_OK);

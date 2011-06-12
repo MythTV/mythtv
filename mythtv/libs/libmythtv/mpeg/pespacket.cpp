@@ -259,7 +259,7 @@ static void return_188_block(unsigned char* ptr)
             free(*it);
         mem188.clear();
         free188.clear();
-        //cerr<<"freeing all 188 blocks"<<endl;
+        //VERBOSE(VB_GENERAL, "freeing all 188 blocks");
     }
 }
 
@@ -293,19 +293,20 @@ static void return_4096_block(unsigned char* ptr)
     free4096.push_back(ptr);
 
 #if 0 // enable this to debug memory leaks
-        cerr<<alloc4096.size()<<" 4096 blocks remain"<<endl;
+        VERBOSE(VB_GENERAL, QString("%1 4096 blocks remain")
+            .arg(alloc4096.size()));
         map<unsigned char*, bool>::iterator it;
         for (it = alloc4096.begin(); it != alloc4096.end(); ++it)
         {
             TSPacket *ts = (TSPacket*) it->first;
-            cerr<<QString("PES Packet: pid(0x%1)").arg(ts->PID(),0,16);
+            VERBOSE(VB_GENERAL, QString("PES Packet: pid(0x%1)")
+                .arg(ts->PID(),0,16));
             if (ts->PID() == 0x1ffb)
             {
-                cerr<<QString(" tid(0x%1) ext(0x%2)")
+                VERBOSE(VB_GENERAL, QString(" tid(0x%1) ext(0x%2)")
                     .arg(PSIPTable::View(*ts).TableID(),0,16)
-                    .arg(PSIPTable::View(*ts).TableIDExtension(),0,16);
+                    .arg(PSIPTable::View(*ts).TableIDExtension(),0,16));
             }
-            cerr<<endl;
         }
 #endif
 
@@ -317,7 +318,7 @@ static void return_4096_block(unsigned char* ptr)
             free(*it);
         mem4096.clear();
         free4096.clear();
-        //cerr<<"freeing all 4096 blocks"<<endl;
+        //VERBOSE(VB_GENERAL, "freeing all 4096 blocks");
     }
 }
 

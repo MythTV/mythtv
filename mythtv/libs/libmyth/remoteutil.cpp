@@ -489,8 +489,8 @@ int RemoteGetFreeRecorderCount(void)
 
     if (strlist[0] == "UNKNOWN_COMMAND")
     {
-        cerr << "Unknown command GET_FREE_RECORDER_COUNT, upgrade "
-                "your backend version." << endl;
+        VERBOSE(VB_IMPORTANT, "Unknown command GET_FREE_RECORDER_COUNT, "
+                              "upgrade your backend version.");
         return 0;
     }
 

@@ -176,7 +176,8 @@ TVState EncoderLink::GetState(void)
     else if (sock)
         retval = (TVState)sock->GetEncoderState(m_capturecardnum);
     else
-        cerr << "Broken for card: " << m_capturecardnum << endl;
+        VERBOSE(VB_GENERAL, QString("Broken for card: %1")
+            .arg(m_capturecardnum));
 
     return retval;
 }

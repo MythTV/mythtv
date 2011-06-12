@@ -1,6 +1,7 @@
 // MythTV headers
 #include "H264Parser.h"
 #include <iostream>
+#include "mythverbose.h"
 
 extern "C" {
 // from libavcodec
@@ -338,8 +339,8 @@ bool H264Parser::fillRBSP(const uint8_t *byteP, uint32_t byte_count,
         if (new_buffer == NULL)
         {
             /* Allocation failed. Discard the new bytes */
-            std::cerr << "H264Parser::fillRBSP: "
-                      << "FAILED to allocate RBSP buffer!\n";
+            VERBOSE(VB_GENERAL, "H264Parser::fillRBSP: "
+                                "FAILED to allocate RBSP buffer!");
             return false;
         }
 
@@ -382,9 +383,10 @@ bool H264Parser::fillRBSP(const uint8_t *byteP, uint32_t byte_count,
         else
         {
             /* This should never happen. */
-            std::cerr << "H264Parser::fillRBSP: "
-                      << "Found start code, rbsp_index is "
-                      << rbsp_index << " but it should be >4\n";
+            VERBOSE(VB_GENERAL, QString("H264Parser::fillRBSP: "
+                                        "Found start code, rbsp_index is %1 "
+                                        "but it should be >4")
+                .arg(rbsp_index));
         }
     }
 
@@ -437,8 +439,8 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
                  * parsing the previous NAL. Either there's a
                  * problem with the stream or with this parser.
                  */
-                std::cerr << "H264Parser::addBytes: Found new start code, "
-                          << "but previous NAL is incomplete!\n";
+                VERBOSE(VB_GENERAL, "H264Parser::addBytes: Found new start "
+                                    "code, but previous NAL is incomplete!");
             }
 
             /* Prepare for accepting the new NAL */

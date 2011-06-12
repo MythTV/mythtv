@@ -12,9 +12,6 @@
 
 #include <X11/extensions/Xrandr.h> // this has to be after util-x11.h (Qt bug)
 
-using std::cerr;
-using std::endl;
-
 static XRRScreenConfiguration *GetScreenConfig(MythXDisplay*& display);
 
 DisplayResX::DisplayResX(void)
@@ -82,10 +79,10 @@ bool DisplayResX::SwitchToVideoMode(int width, int height, double desired_rate)
         delete display;
 
         if (RRSetConfigSuccess != status)
-            cerr<<"DisplaResX: XRRSetScreenConfigAndRate() call failed."<<endl;
+            VERBOSE(VB_GENERAL, "XRRSetScreenConfigAndRate() call failed.");
         return RRSetConfigSuccess == status;
     }
-    cerr<<"DisplaResX: Desired Resolution and FrameRate not found."<<endl;
+    VERBOSE(VB_GENERAL, "Desired Resolution and FrameRate not found.");
     return false;
 }
 

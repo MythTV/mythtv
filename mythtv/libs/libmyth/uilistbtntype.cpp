@@ -244,7 +244,7 @@ void UIListTreeType::SetTree(UIListGenericTree *toplevel)
         //  Not really an error, as UIListTreeType is perfectly capable of drawing an empty list.
         //
 
-        // cerr << "No top-level children?\n";
+        // VERBOSE(VB_IMPORTANT, "No top-level children?");
         return;
     }
 
@@ -256,7 +256,8 @@ void UIListTreeType::SetTree(UIListGenericTree *toplevel)
 
     if (!currentlevel)
     {
-        cerr << "Something is seriously wrong (currentlevel = NULL)\n";
+        VERBOSE(VB_IMPORTANT, "Something is seriously wrong (currentlevel = "
+                              "NULL)");
         return;
     }
 
@@ -736,9 +737,8 @@ bool UIListTreeType::tryToSetCurrent(QStringList route)
             currentpos = (UIListGenericTree *)next_child;
             if (!currentlevel->MoveToNamedPosition(currentpos->getString()))
             {
-                cerr << "uilistbtntype.o: had problem finding "
-                     << "something it knows is there"
-                     << endl;
+                VERBOSE(VB_IMPORTANT, "had problem finding "
+                                      "something it knows is there");
                 keep_going = false;
             }
         }

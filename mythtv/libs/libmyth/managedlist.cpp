@@ -434,8 +434,10 @@ ManagedListItem* SelectManagedListItem::addSelection(const QString& label,
                 this,    SLOT(itemSelected(ManagedListItem*)));
     }
 
-    //cerr << "adding '" << label << "' value == "
-    //     << value << " curval == " << valueText << endl;
+#if 0
+    VERBOSE(VB_IMPORTANT, QString("adding '%1' value == %2 curval == %3")
+	.arg(label) .arg(value) .arg(valueText));
+#endif
 
     // If we're adding an item with the same value as what we have selected
     // go trhough the selection process so the list gets updated.
@@ -443,7 +445,10 @@ ManagedListItem* SelectManagedListItem::addSelection(const QString& label,
     {
 
         int index = getValueIndex(value);
-        //cerr << "new item matches cur value and is at: " << index << endl;
+#if 0
+        VERBOSE(VB_IMPORTANT, 
+                QString("new item matches cur value and is at: %1").arg(index));
+#endif
         if (index > 0)
         {
             curItem = index;

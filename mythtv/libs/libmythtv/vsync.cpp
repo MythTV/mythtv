@@ -187,7 +187,7 @@ int VideoSync::CalcDelay()
  */
 void VideoSync::KeepPhase()
 {
-    // cerr << m_delay << endl;
+    // VERBOSE(VB_GENERAL, QString("%1").arg(m_delay));
     if (m_delay < -(m_refresh_interval/2))
         m_nexttrigger += 200;
     else if (m_delay > -500)
@@ -287,7 +287,7 @@ int DRMVideoSync::WaitForFrame(int sync_delay)
     m_nexttrigger += sync_delay;
 
     m_delay = CalcDelay();
-    //cerr << "WaitForFrame at : " << m_delay;
+    //VERBOSE(VB_GENERAL, QString("WaitForFrame at : %1").arg(m_delay));
 
     // Always sync to the next retrace execpt when we are very late.
     if (m_delay > -(m_refresh_interval/2))
@@ -297,9 +297,8 @@ int DRMVideoSync::WaitForFrame(int sync_delay)
         blank.request.sequence = 1;
         drmWaitVBlank(m_dri_fd, &blank);
         m_delay = CalcDelay();
-        // cerr << "\tDelay at sync: " << m_delay;
+        //VERBOSE(VB_GENERAL, QString("Delay at sync: %1").arg(m_delay));
     }
-    //cerr  << endl;
 
     if (m_delay > 0)
     {
@@ -311,8 +310,10 @@ int DRMVideoSync::WaitForFrame(int sync_delay)
         blank.request.sequence = n;
         drmWaitVBlank(m_dri_fd, &blank);
         m_delay = CalcDelay();
-        //cerr << "Wait " << n << " intervals. Count " << blank.request.sequence;
-        //cerr  << " Delay " << m_delay << endl;
+#if 0
+        VERBOSE(VB_GENERAL, QString("Wait %1 intervals. Count %2 Delay %3")
+            .arg(n) .arg(blank.request.sequence) .arg(m_delay));
+#endif
     }
 
     return m_delay;
