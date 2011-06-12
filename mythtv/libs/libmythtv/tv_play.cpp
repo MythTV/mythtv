@@ -5456,6 +5456,12 @@ bool TV::DoPlayerSeek(PlayerContext *ctx, float time)
         return false;
     }
 
+    if (!ctx->buffer->IsSeekingAllowed())
+    {
+        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+        return false;
+    }
+
     if (ctx == GetPlayer(ctx, 0))
         PauseAudioUntilBuffered(ctx);
 
