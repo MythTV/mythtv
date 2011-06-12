@@ -1551,7 +1551,7 @@
         </textarea>
 
         <spinbox name="priority" from="basewidespinbox">
-            <position>40,160</position>
+            <position>40,100</position>
             <helptext></helptext>
             <template type="negative">Reduce priority by %n</template>
             <template type="zero">Normal recording priority</template>
@@ -1559,12 +1559,12 @@
         </spinbox>
 
         <buttonlist name="input" from="basewideselector">
-            <position>40,220</position>
+            <position>40,160</position>
             <helptext></helptext>
         </buttonlist>
 
         <spinbox name="startoffset" from="basewidespinbox">
-            <position>40,280</position>
+            <position>40,220</position>
             <helptext></helptext>
             <template type="negative">Start recording %n minute(s) late</template>
             <template type="zero">Start recording on time</template>
@@ -1572,7 +1572,7 @@
         </spinbox>
 
         <spinbox name="endoffset" from="basewidespinbox">
-            <position>40,340</position>
+            <position>40,280</position>
             <helptext></helptext>
             <template type="negative">End recording %n minute(s) early</template>
             <template type="zero">End recording on time</template>
@@ -1580,14 +1580,20 @@
         </spinbox>
 
         <buttonlist name="dupmethod" from="basewideselector">
-            <position>40,400</position>
+            <position>40,340</position>
             <helptext></helptext>
         </buttonlist>
 
         <buttonlist name="dupscope" from="basewideselector">
-            <position>40,460</position>
+            <position>40,400</position>
             <helptext></helptext>
         </buttonlist>
+
+        <button name="filters" from="basewidebutton">
+            <position>154,460</position>
+            <value>Schedule filters</value>
+            <helptext></helptext>
+        </button>
 
         <checkbox name="ruleactive" from="basecheckbox">
             <position>154,520</position>
@@ -1597,6 +1603,145 @@
             <area>196,527,600,30</area>
             <value>Recording Rule Active</value>
         </textarea>
+
+        <button name="back" from="basebutton">
+            <position>60,595</position>
+            <value>Back</value>
+        </button>
+    </window>
+
+    <window name="schedulefiltereditor">
+
+        <imagetype name="backdrop" from="basebackdrop" />
+
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="heading" from="baseheading">
+            <value>Storage Options</value>
+        </textarea>
+
+        <shape name="overviewbackground" from="basetextbackground">
+            <area>680,70,567,214</area>
+            <shape name="hline">
+                <area>15,41,537,6</area>
+            </shape>
+            <shape name="hline2">
+                <area>0,0,0,0</area>
+            </shape>
+        </shape>
+
+        <textarea name="overviewlabel" from="basetextarea">
+            <area>700,77,490,40</area>
+            <font>baselarge</font>
+            <value>Rule Overview</value>
+        </textarea>
+
+        <shape name="descriptionbackground" from="basetextbackground">
+            <area>680,307,567,365</area>
+            <shape name="hline">
+                <area>15,41,537,6</area>
+            </shape>
+            <shape name="hline2" from="hline">
+                <position>15,329</position>
+            </shape>
+        </shape>
+
+        <textarea name="title" from="basetextarea">
+            <area>700,312,490,40</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <statetype name="ratingstate" from="baserating">
+            <position>1195,309</position>
+        </statetype>
+
+        <textarea name="channel" from="basetextarea">
+            <area>1030,370,195,30</area>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="timedate" from="basetextarea">
+            <area>700,370,420,30</area>
+        </textarea>
+
+        <textarea name="description" from="basetextarea">
+            <area>700,405,535,230</area>
+            <multiline>yes</multiline>
+            <align>vcenter</align>
+            <template>%"|SUBTITLE|" %%DESCRIPTION%</template>
+        </textarea>
+
+        <textarea name="rectypestatus" from="basetextarea">
+            <area>700,646,420,30</area>
+        </textarea>
+
+	<buttonlist name="filters" from="baseselector">
+	    <area>40,160,540,328</area>
+	    <layout>vertical</layout>
+	    <spacing>0</spacing>
+	    <scrollstyle>free</scrollstyle>
+	    <wrapstyle>items</wrapstyle>
+	    <buttonarea>5,5,500,320</buttonarea>
+	    <statetype name="buttonitem">
+		<state name="active">
+		    <area>0,0,500,40</area>
+		    <textarea name="buttontext">
+			<area>50,5,-5,30</area>
+		    </textarea>
+		    <statetype name="buttoncheck">
+			<position>5,10</position>
+			<state type="off">
+			    <imagetype name="checkoff">
+				<filename>lb-check-empty.png</filename>
+			    </imagetype>
+			</state>
+			<state type="half">
+			    <imagetype name="checkhalf">
+				<filename>lb-check-half.png</filename>
+			    </imagetype>
+			</state>
+			<state type="full">
+			    <imagetype name="checkfull">
+				<filename>lb-check-full.png</filename>
+			    </imagetype>
+			</state>
+		    </statetype>
+		</state>
+		<state name="selectedactive" from="active">
+		  <shape name="buttonbackground">
+                    <fill color="#8a916f" />
+		  </shape>
+		</state>
+		<state name="selectedinactive" from="active" />
+	    </statetype>
+
+	    <statetype name="upscrollarrow">
+	      <position>510,5</position>
+	      <state type="off">
+                <imagetype name="upon">
+		  <filename>lb-uparrow-reg.png</filename>
+                </imagetype>
+	      </state>
+	      <state type="full">
+                <imagetype name="upoff">
+		  <filename>lb-uparrow-sel.png</filename>
+                </imagetype>
+	      </state>
+	    </statetype>
+	    <statetype name="downscrollarrow">
+	      <position>510,305</position>
+	      <state type="off">
+                <imagetype name="dnon">
+		  <filename>lb-dnarrow-reg.png</filename>
+                </imagetype>
+	      </state>
+	      <state type="full">
+                <imagetype name="dnoff">
+		  <filename>lb-dnarrow-sel.png</filename>
+                </imagetype>
+	      </state>
+	    </statetype>
+	</buttonlist>
 
         <button name="back" from="basebutton">
             <position>60,595</position>

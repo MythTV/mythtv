@@ -14,6 +14,10 @@
 #include "recordingrule.h"
 #include "recordinginfo.h"
 
+#ifndef ALLOW_MISSING_FILTERS
+#define ALLOW_MISSING_FILTERS 1
+#endif
+
 class ProgramInfo;
 class MythUIText;
 class MythUIButton;
@@ -91,6 +95,7 @@ class SchedOptEditor : public MythScreenType
 
   protected slots:
     void dupMatchChanged(MythUIButtonListItem *item);
+    void ShowFilters(void);
     void Close(void);
 
   private:
@@ -108,8 +113,38 @@ class SchedOptEditor : public MythScreenType
     MythUISpinBox *m_endoffsetSpin;
     MythUIButtonList *m_dupmethodList;
     MythUIButtonList *m_dupscopeList;
+    MythUIButton  *m_filtersButton;
 
     MythUICheckBox *m_ruleactiveCheck;
+
+#if (ALLOW_MISSING_FILTERS)
+    bool m_missing_filters;
+#endif
+};
+
+class SchedFilterEditor : public MythScreenType
+{
+  Q_OBJECT
+  public:
+    SchedFilterEditor(MythScreenStack *parent, RecordingInfo *recinfo,
+		      RecordingRule *rule);
+   ~SchedFilterEditor();
+
+    bool Create(void);
+
+  protected slots:
+    void Close(void);
+    void ToggleSelected(MythUIButtonListItem *item);
+
+  private:
+    void Load(void);
+    void Save(void);
+
+    RecordingInfo *m_recInfo;
+    RecordingRule *m_recordingRule;
+
+    MythUIButton    *m_backButton;
+    MythUIButtonList *m_filtersList;
 };
 
 class StoreOptEditor : public MythScreenType
