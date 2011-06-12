@@ -5721,18 +5721,26 @@ void TV::SetFFRew(PlayerContext *ctx, int index)
         return;
     }
 
-    ctx->ff_rew_index = index;
     int speed;
-
     QString mesg;
     if (ctx->ff_rew_state > 0)
     {
+        speed = ff_rew_speeds[index];
+        // Don't allow ffwd if seeking is needed but not available
+        if (!ctx->buffer->IsSeekingAllowed() && speed > 3)
+            return;
+
+        ctx->ff_rew_index = index;
         mesg = tr("Forward %1X").arg(ff_rew_speeds[ctx->ff_rew_index]);
-        speed = ff_rew_speeds[ctx->ff_rew_index];
         ctx->ff_rew_speed = speed;
     }
     else
     {
+        // Don't rewind if we cannot seek
+        if (!ctx->buffer->IsSeekingAllowed())
+            return;
+
+        ctx->ff_rew_index = index;
         mesg = tr("Rewind %1X").arg(ff_rew_speeds[ctx->ff_rew_index]);
         speed = -ff_rew_speeds[ctx->ff_rew_index];
         ctx->ff_rew_speed = speed;
