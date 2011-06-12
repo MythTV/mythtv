@@ -318,7 +318,7 @@ class MTV_PUBLIC MythPlayer
     void Zoom(ZoomDirection direction);
 
     // Windowing stuff
-    void EmbedInWidget(int x, int y, int w, int h, WId id);
+    void EmbedInWidget(QRect rect);
     void StopEmbedding(void);
     void ExposeEvent(void);
     bool IsEmbedding(void);
@@ -536,8 +536,8 @@ class MTV_PUBLIC MythPlayer
 
     // Window stuff
     QWidget *parentWidget;
-    WId embedid;
-    int embx, emby, embw, embh;
+    bool     embedding;
+    QRect    embedRect;
     float defaultDisplayAspect;
 
     // State

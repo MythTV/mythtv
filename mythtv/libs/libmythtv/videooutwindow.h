@@ -76,10 +76,11 @@ class VideoOutWindow
     PIPState    GetPIPState(void)        const { return pip_state;       }
     float  GetOverridenVideoAspect(void) const { return overriden_video_aspect;}
     QRect  GetDisplayVisibleRect(void)   const { return display_visible_rect; }
-    QRect  GetScreenGeometry(void)       const { return screen_geom; }
+    QRect  GetScreenGeometry(void)       const { return screen_geom;     }
     QRect  GetVideoRect(void)            const { return video_rect;      }
     QRect  GetDisplayVideoRect(void)     const { return display_video_rect; }
-    bool   UsingXinerama(void)           const { return using_xinerama; }
+    QRect  GetEmbeddingRect(void)        const { return embedding_rect;  }
+    bool   UsingXinerama(void)           const { return using_xinerama;  }
     bool   UsingGuiSize(void)            const { return db_use_gui_size; }
 
     /// \brief Returns current aspect override mode
@@ -157,6 +158,8 @@ class VideoOutWindow
     /// Used to save the display_visible_rect for
     /// restoration after video embedding ends.
     QRect   tmp_display_visible_rect;
+    /// Embedded video rectangle
+    QRect    embedding_rect;
 
     /// State variables
     bool     embedding;

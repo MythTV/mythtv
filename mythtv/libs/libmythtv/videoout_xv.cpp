@@ -456,8 +456,6 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
             else if (req[j].feature_flags & XvAttributes::kFeatureChromakey)
                 VERBOSE(VB_PLAYBACK, LOC + "Has XV_COLORKEY...");
 
-            VERBOSE(VB_PLAYBACK, LOC + "Here...");
-
             for (p = firstPort; (p <= lastPort) && (port == -1); ++p)
             {
                 disp->Lock();
@@ -863,10 +861,8 @@ bool VideoOutputXv::InitSetupBuffers(void)
  *
  * \return success or failure.
  */
-bool VideoOutputXv::Init(
-    int width, int height, float aspect,
-    WId winid, int winx, int winy, int winw, int winh,
-    MythCodecID codec_id, WId embedid)
+bool VideoOutputXv::Init(int width, int height, float aspect,
+                         WId winid, const QRect &win_rect, MythCodecID codec_id)
 {
     window.SetNeedRepaint(true);
 
@@ -875,24 +871,12 @@ bool VideoOutputXv::Init(
     disp = OpenMythXDisplay();
     XV_INIT_FATAL_ERROR_TEST(!disp, "Failed to open display.");
 
-    // HACK -- begin
-    //usleep(50 * 1000);
-    // HACK -- end
-
     // Initialize X stuff
     MythXLocker lock(disp);
 
     XJ_curwin     = winid;
     XJ_win        = winid;
-
-    VERBOSE(VB_PLAYBACK, LOC + "Creating gc");
     XV_INIT_FATAL_ERROR_TEST(!disp->CreateGC(XJ_win), "Failed to create GC.");
-
-    VERBOSE(VB_PLAYBACK, LOC + QString("XJ_screen_num: '%1'").arg(disp->GetScreen()));
-    VERBOSE(VB_PLAYBACK, LOC + QString("XJ_curwin:     '%1'").arg(XJ_curwin));
-    VERBOSE(VB_PLAYBACK, LOC + QString("XJ_win:        '%1'").arg(XJ_win));
-    VERBOSE(VB_PLAYBACK, LOC + QString("XJ_root:       '%1'").arg(disp->GetRoot()));
-    VERBOSE(VB_PLAYBACK, LOC + QString("XJ_gc:         '0x%1'").arg((uint64_t)disp->GetGC(),0,16));
 
     // The letterbox color..
     XJ_letterbox_colour = disp->GetBlack();
@@ -907,16 +891,10 @@ bool VideoOutputXv::Init(
     XJ_started = true;
 
     // Basic setup
-    VideoOutput::Init(width, height, aspect,
-                      winid, winx, winy, winw, winh,
-                      codec_id, embedid);
+    VideoOutput::Init(width, height, aspect,winid, win_rect,codec_id);
 
     // Set resolution/measurements (check XRandR, Xinerama, config settings)
     InitDisplayMeasurements(width, height, true);
-
-    // Set embedding window id
-    if (embedid > 0)
-        XJ_curwin = XJ_win = embedid;
 
     if (!InitSetupBuffers())
         return false;
@@ -1317,12 +1295,12 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
     XJ_non_xv_image = NULL;
 }
 
-void VideoOutputXv::EmbedInWidget(int x, int y, int w, int h)
+void VideoOutputXv::EmbedInWidget(const QRect &rect)
 {
     QMutexLocker locker(&global_lock);
 
     if (!window.IsEmbedding())
-        VideoOutput::EmbedInWidget(x, y, w, h);
+        VideoOutput::EmbedInWidget(rect);
     MoveResize();
 }
 

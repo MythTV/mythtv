@@ -49,19 +49,15 @@ class VideoOutput
   public:
     static void GetRenderOptions(render_opts &opts);
     static VideoOutput *Create(
-        const QString &decoder,   MythCodecID  codec_id,
-        void          *codec_priv,
-        PIPState       pipState,
-        const QSize   &video_dim, float        video_aspect,
-        WId            win_id,    const QRect &display_rect,
-        float video_prate,        WId          embed_id);
+        const QString &decoder, MythCodecID  codec_id,     void *codec_priv,
+        PIPState pipState,      const QSize &video_dim,    float video_aspect,
+        WId win_id,             const QRect &display_rect, float video_prate);
 
     VideoOutput();
     virtual ~VideoOutput();
 
     virtual bool Init(int width, int height, float aspect,
-                      WId winid, int winx, int winy, int winw,
-                      int winh, MythCodecID codec_id, WId embedid = 0);
+                      WId winid, const QRect &win_rect, MythCodecID codec_id);
     virtual void InitOSD(OSD *osd);
     virtual void SetVideoFrameRate(float);
     virtual bool IsPreferredRenderer(QSize video_size);
@@ -89,7 +85,7 @@ class VideoOutput
     virtual void VideoAspectRatioChanged(float aspect);
 
     virtual void ResizeDisplayWindow(const QRect&, bool);
-    virtual void EmbedInWidget(int x, int y, int w, int h);
+    virtual void EmbedInWidget(const QRect &rect);
     virtual void StopEmbedding(void);
     virtual void ResizeForGui(void);
     virtual void ResizeForVideo(uint width = 0, uint height = 0);

@@ -4659,7 +4659,7 @@ bool TV::CreatePBP(PlayerContext *ctx, const ProgramInfo *info)
         mctx->buffer->Unpause();
 
     bool ok = mctx->CreatePlayer(
-        this, GetMythMainWindow(), mctx->GetState(), 0, &mctx->embedBounds);
+        this, GetMythMainWindow(), mctx->GetState(), false);
 
     if (ok)
     {
@@ -4776,15 +4776,14 @@ bool TV::StartPlayer(PlayerContext *mctx, PlayerContext *ctx,
     bool ok = false;
     if (ctx->IsNullVideoDesired())
     {
-        ok = ctx->CreatePlayer(this, NULL, desiredState, 0, NULL);
+        ok = ctx->CreatePlayer(this, NULL, desiredState, false);
         ScheduleStateChange(ctx);
         if (ok)
             ok = PIPAddPlayer(mctx, ctx);
     }
     else
     {
-        ok = ctx->CreatePlayer(this, GetMythMainWindow(), desiredState,
-                            mctx->embedWinID, &mctx->embedBounds);
+        ok = ctx->CreatePlayer(this, GetMythMainWindow(), desiredState, false);
         ScheduleStateChange(ctx);
     }
 
@@ -5160,8 +5159,7 @@ void TV::PBPRestartMainPlayer(PlayerContext *mctx)
     mctx->SetPIPState(kPIPOff);
     mctx->buffer->Seek(0, SEEK_SET);
 
-    if (mctx->CreatePlayer(this, GetMythMainWindow(), mctx->GetState(),
-                        mctx->embedWinID, &mctx->embedBounds))
+    if (mctx->CreatePlayer(this, GetMythMainWindow(), mctx->GetState(), false))
     {
         ScheduleStateChange(mctx);
         mctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -6206,10 +6204,10 @@ void TV::SwitchCards(PlayerContext *ctx,
         if (ctx->playingInfo && StartRecorder(ctx,-1))
         {
             PlayerContext *mctx = GetPlayer(ctx, 0);
-
+            QRect dummy = QRect();
             if (ctx->CreatePlayer(
                     this, GetMythMainWindow(), ctx->GetState(),
-                    mctx->embedWinID, &mctx->embedBounds, muted))
+                    false, dummy, muted))
             {
                 ScheduleStateChange(ctx);
                 ok = true;
@@ -11178,11 +11176,7 @@ void TV::ShowNoRecorderDialog(const PlayerContext *ctx, NoRecorderMsg msgType)
     }
 
     OSD *osd = GetOSDLock(ctx);
-    if (ctx->embedWinID)
-    {
-        VERBOSE(VB_IMPORTANT, errorText);
-    }
-    else if (osd)
+    if (osd)
     {
         osd->DialogShow(OSD_DLG_INFO, errorText);
         osd->DialogAddButton(tr("OK"), "DIALOG_INFO_X_X");
