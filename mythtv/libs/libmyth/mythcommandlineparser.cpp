@@ -128,6 +128,10 @@ QString MythCommandLineParser::GetHelpString(bool with_header) const
         QString versionStr = QString("%1 version: %2 [%3] www.mythtv.org")
             .arg(m_appname).arg(MYTH_SOURCE_PATH).arg(MYTH_SOURCE_VERSION);
         msg << versionStr << endl;
+
+        QString descr = GetHelpHeader();
+        if (descr.size() > 0)
+            msg << endl << descr << endl << endl;
     }
 
     if (toString("showhelp").isEmpty())
@@ -1006,6 +1010,15 @@ void MythBackendCommandLineParser::LoadArguments(void)
             "Drop permissions to username after starting.", "");
 }
 
+QString MythBackendCommandLineParser::GetHelpHeader(void) const
+{
+    return "MythBackend is the primary server application for MythTV. It is \n"
+           "used for recording and remote streaming access of media. Only one \n"
+           "instance of this application is allowed to run on one host at a \n"
+           "time, and one must be configured to operate as a master, performing \n"
+           "additional scheduler and housekeeper tasks.";
+}
+
 MythFrontendCommandLineParser::MythFrontendCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHFRONTEND)
 { LoadArguments(); }
@@ -1028,6 +1041,13 @@ void MythFrontendCommandLineParser::LoadArguments(void)
         "Always prompt for backend selection.", "");
     add(QStringList( QStringList() << "-d" << "--disable-autodiscovery" ),
         "noautodiscovery", "Prevent frontend from using UPnP autodiscovery.", "");
+}
+
+QString MythFrontendCommandLineParser::GetHelpHeader(void) const
+{
+    return "MythFrontend is the primary playback application for MythTV. It \n"
+           "is used for playback of scheduled and live recordings, and management \n"
+           "of recording rules.";
 }
 
 MythPreviewGeneratorCommandLineParser::MythPreviewGeneratorCommandLineParser() :
@@ -1053,6 +1073,12 @@ MythWelcomeCommandLineParser::MythWelcomeCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHWELCOME)
 { LoadArguments(); }
 
+QString MythWelcomeCommandLineParser::GetHelpHeader(void) const
+{
+    return "MythWelcome is a graphical launcher application to allow MythFrontend \n"
+           "to disconnect from the backend, and allow automatic shutdown to occur.";
+}
+
 void MythWelcomeCommandLineParser::LoadArguments(void)
 {
     addHelp();
@@ -1068,6 +1094,12 @@ void MythWelcomeCommandLineParser::LoadArguments(void)
 MythAVTestCommandLineParser::MythAVTestCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHAVTEST)
 { LoadArguments(); }
+
+QString MythAVTestCommandLineParser::GetHelpHeader(void) const
+{
+    return "MythAVTest is a testing application that allows direct access \n"
+           "to the MythTV internal video player.";
+}
 
 void MythAVTestCommandLineParser::LoadArguments(void)
 {
@@ -1124,6 +1156,12 @@ void MythCommFlagCommandLineParser::LoadArguments(void)
 MythJobQueueCommandLineParser::MythJobQueueCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHJOBQUEUE)
 { LoadArguments(); }
+
+QString MythJobQueueCommandLineParser::GetHelpHeader(void) const
+{
+    return "MythJobqueue is daemon implementing the job queue. It is intended \n"
+           "for use as additional processing power without requiring a full backend.";
+}
 
 void MythJobQueueCommandLineParser::LoadArguments(void)
 {
@@ -1382,6 +1420,14 @@ MythTVSetupCommandLineParser::MythTVSetupCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHTV_SETUP)
 { LoadArguments(); }
 
+QString MythTVSetupCommandLineParser::GetHelpHeader(void) const
+{
+    return "Mythtv-setup is the setup application for the backend server. It is \n"
+           "used to configure the backend, and manage tuner cards and storage. \n"
+           "Most settings will require a restart of the backend before they take \n"
+           "effect.";
+}
+
 void MythTVSetupCommandLineParser::LoadArguments(void)
 {
     addHelp();
@@ -1471,6 +1517,13 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
 MythMediaServerCommandLineParser::MythMediaServerCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHMEDIASERVER)
 { LoadArguments(); }
+
+QString MythMediaServerCommandLineParser::GetHelpHeader(void) const
+{
+    return "MythMediaServer is daemon implementing the backend file server. \n"
+           "It is intended to allow access to remote file storage on machines \n"
+           "that do not have tuners, and as such cannot run a backend.";
+}
 
 void MythMediaServerCommandLineParser::LoadArguments(void)
 {
