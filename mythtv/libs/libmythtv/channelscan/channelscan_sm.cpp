@@ -259,8 +259,8 @@ void ChannelScanSM::HandleAllGood(void)
     {
         int chanid = ChannelUtil::CreateChanID(sourceID, freqid);
 
-        QString callsign = QString("%1%2")
-            .arg(ChannelUtil::GetUnknownCallsign()).arg(freqid);
+        QString callsign = QString("%1-%2")
+            .arg(ChannelUtil::GetUnknownCallsign()).arg(chanid);
 
         ok = ChannelUtil::CreateChannel(
             0      /* mplexid */,
@@ -1021,7 +1021,9 @@ static void update_info(ChannelInsertInfo &info,
     {
         callsign = desc->ServiceShortName();
         if (callsign.trimmed().isEmpty())
-            callsign = QString::null;
+            callsign = QString("%1-%2-%3")
+                .arg(ChannelUtil::GetUnknownCallsign()).arg(sdt->TSID())
+                .arg(sdt->ServiceID(i));
 
         service_name = desc->ServiceName();
         if (service_name.trimmed().isEmpty())
