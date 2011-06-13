@@ -676,19 +676,9 @@ int main(int argc, char *argv[])
         if (query.exec() && query.next())
         {
             if (query.value(0).toInt() != 0)
-            {
-                query.prepare("UPDATE settings SET data = '1' "
-                              "WHERE value = 'HaveRepeats';");
-                if (!query.exec())
-                    MythDB::DBError("Setting HaveRepeats", query);
-            }
+                gCoreContext->SaveSettingOnHost("HaveRepeats", "1", NULL);
             else
-            {
-                query.prepare("UPDATE settings SET data = '0' "
-                              "WHERE value = 'HaveRepeats';");
-                if (!query.exec())
-                    MythDB::DBError("Clearing HaveRepeats", query);
-            }
+                gCoreContext->SaveSettingOnHost("HaveRepeats", "0", NULL);
         }
     }
 
