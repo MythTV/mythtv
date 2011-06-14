@@ -121,15 +121,13 @@ bool VideoOutputOpenGL::Init(int width, int height, float aspect, WId winid,
     VideoOutput::Init(width, height, aspect, winid, win_rect, codec_id);
 
     SetProfile();
-
+    InitPictureAttributes();
     success &= SetupContext();
     InitDisplayMeasurements(width, height, false);
     success &= CreateBuffers();
     success &= CreatePauseFrame();
     success &= SetupOpenGL();
-
     InitOSD();
-    InitPictureAttributes();
     MoveResize();
 
     if (!success)
@@ -521,7 +519,7 @@ void VideoOutputOpenGL::UpdatePauseFrame(void)
 
 void VideoOutputOpenGL::InitPictureAttributes(void)
 {
-    if (!gl_context || video_codec_id == kCodec_NONE)
+    if (video_codec_id == kCodec_NONE)
         return;
 
     videoColourSpace.SetSupportedAttributes((PictureAttributeSupported)
