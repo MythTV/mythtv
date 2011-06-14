@@ -154,7 +154,7 @@ BD_PRIVATE NAV_CLIP* nav_mark_search(NAV_TITLE *title, unsigned mark, uint32_t *
 BD_PRIVATE uint32_t nav_angle_change_search(NAV_CLIP *clip, uint32_t pkt, uint32_t *time);
 BD_PRIVATE NAV_CLIP* nav_set_angle(NAV_TITLE *title, NAV_CLIP *clip, unsigned angle);
 
-BD_PRIVATE NAV_TITLE_LIST* nav_get_title_list(const char *root, uint32_t flags);
+BD_PRIVATE NAV_TITLE_LIST* nav_get_title_list(const char *root, uint32_t flags, uint32_t min_title_length);
 BD_PRIVATE void nav_free_title_list(NAV_TITLE_LIST *title_list);
 
 #ifdef __cplusplus

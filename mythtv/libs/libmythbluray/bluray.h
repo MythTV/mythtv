@@ -174,9 +174,10 @@ typedef struct bd_title_info {
  *
  * @param bd  BLURAY object
  * @param flags  title flags
+ * @param min_title_length  filter out titles shorter than min_title_length seconds
  * @return number of titles found
  */
-uint32_t bd_get_titles(BLURAY *bd, uint8_t flags);
+uint32_t bd_get_titles(BLURAY *bd, uint8_t flags, uint32_t min_title_length);
 
 /**
  *
@@ -184,9 +185,10 @@ uint32_t bd_get_titles(BLURAY *bd, uint8_t flags);
  *
  * @param bd  BLURAY object
  * @param title_idx title index number
+ * @param angle angle number (chapter offsets and clip size depend on selected angle)
  * @return allocated BLURAY_TITLE_INFO object, NULL on error
  */
-BLURAY_TITLE_INFO* bd_get_title_info(BLURAY *bd, uint32_t title_idx);
+BLURAY_TITLE_INFO* bd_get_title_info(BLURAY *bd, uint32_t title_idx, unsigned angle);
 
 /**
  *
@@ -194,9 +196,10 @@ BLURAY_TITLE_INFO* bd_get_title_info(BLURAY *bd, uint32_t title_idx);
  *
  * @param bd  BLURAY object
  * @param playlist playlist number
+ * @param angle angle number (chapter offsets and clip size depend on selected angle)
  * @return allocated BLURAY_TITLE_INFO object, NULL on error
  */
-BLURAY_TITLE_INFO* bd_get_playlist_info(BLURAY *bd, uint32_t playlist);
+BLURAY_TITLE_INFO* bd_get_playlist_info(BLURAY *bd, uint32_t playlist, unsigned angle);
 
 /**
  *
