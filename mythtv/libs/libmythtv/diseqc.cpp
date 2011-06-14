@@ -2010,8 +2010,9 @@ bool DiSEqCDevRotor::ExecuteUSALS(const DiSEqCDevSettings&, const DTVMultiplex&,
 
 double DiSEqCDevRotor::CalculateAzimuth(double angle) const
 {
-    // Equation lifted from VDR rotor plugin by
-    // Thomas Bergwinkl <Thomas.Bergwinkl@t-online.de>
+    // Azimuth Calculation references:
+    // http://engr.nmsu.edu/~etti/3_2/3_2e.html
+    // http://www.angelfire.com/trek/ismail/theory.html
 
     // Earth Station Latitude and Longitude in radians
     double P  = gCoreContext->GetSetting("Latitude",  "").toFloat() * TO_RADS;
@@ -2020,14 +2021,7 @@ double DiSEqCDevRotor::CalculateAzimuth(double angle) const
     // Satellite Longitude in radians
     double Us = angle * TO_RADS;
 
-    double az      = M_PI + atan( tan(Us - Ue) / sin(P) );
-    double x       = acos( cos(Us - Ue)  *cos(P) );
-    double el      = atan( (cos(x) - 0.1513) / sin(x) );
-    double tmp_a   = -cos(el)  *sin(az);
-    double tmp_b   = (sin(el)  *cos(P)) - (cos(el)  *sin(P)  *cos(az));
-    double azimuth = atan(tmp_a / tmp_b)  *TO_DEC;
-
-    return azimuth;
+    return TO_DEC * atan( tan(Us - Ue) / sin(P) );
 }
 
 double DiSEqCDevRotor::GetApproxAzimuth(void) const
