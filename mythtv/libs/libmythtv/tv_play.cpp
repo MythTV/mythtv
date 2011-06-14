@@ -5846,6 +5846,7 @@ void TV::DoJumpChapter(PlayerContext *ctx, int chapter)
     info.text["description"] = tr("Jump Chapter");
     info.text["title"] = tr("Searching");
     UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default, kOSDTimeout_Med);
+    SetUpdateOSDPosition(true);
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->player)
@@ -5936,6 +5937,7 @@ void TV::DoSwitchTitle(PlayerContext *ctx, int title)
     info.text["description"] = tr("Jump Title");
     info.text["title"] = tr("Searching");
     UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default, kOSDTimeout_Med);
+    SetUpdateOSDPosition(true);
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->player)
@@ -5957,6 +5959,7 @@ void TV::DoSwitchAngle(PlayerContext *ctx, int angle)
     info.text["description"] = tr("Switch Angle");
     info.text["title"]       = tr("Switching");
     UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default, kOSDTimeout_Med);
+    SetUpdateOSDPosition(true);
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->player)
