@@ -328,7 +328,7 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
                 "Unsupported inversion option 'auto', "
                 "falling back to 'off'");
 
-        tuning.inversion = DTVInversion::kInversionAuto;
+        tuning.inversion = DTVInversion::kInversionOff;
     }
 
     // DVB-S needs a fully initialized diseqc tree and is checked later in Tune
