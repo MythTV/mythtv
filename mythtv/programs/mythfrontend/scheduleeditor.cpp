@@ -34,6 +34,14 @@
 
 #define ENUM_TO_QVARIANT(a) qVariantFromValue(static_cast<int>(a))
 
+// Define the strings inserted into the recordfilter table in the
+// database.  This should make them available to the translators.
+static QString fs0(QObject::tr("New episode"));
+static QString fs1(QObject::tr("Identifiable episode"));
+static QString fs2(QObject::tr("First showing"));
+static QString fs3(QObject::tr("Primetime"));
+static QString fs4(QObject::tr("Commercial free"));
+static QString fs5(QObject::tr("High definition"));
 
 void *ScheduleEditor::RunScheduleEditor(ProgramInfo *proginfo, void *player)
 {
@@ -502,7 +510,6 @@ bool SchedOptEditor::Create()
     }
 
     if ((m_recordingRule->m_type == kSingleRecord) ||
-        (m_recordingRule->m_type == kFindOneRecord) ||
         (m_recordingRule->m_type ==kOverrideRecord))
     {
         m_dupmethodList->SetEnabled(false);
@@ -753,13 +760,13 @@ void SchedFilterEditor::Load()
         while (query.next())
         {
             uint32_t filterid       = query.value(0).toInt();
-            QString  description    = query.value(1).toString();
+            QString  description    = tr(query.value(1).toString()
+                                         .toUtf8().constData());
             bool     filter_default = query.value(2).toInt();
 
             // Fill in list of possible filters
-            button = new MythUIButtonListItem(m_filtersList,
-//                                              tr(description),
-                                              description, filterid);
+            button = new MythUIButtonListItem(m_filtersList, description,
+                                              filterid);
             button->setCheckable(true);
             if (m_recordingRule->IsLoaded())
                 button->setChecked(m_recordingRule->m_filter & (1 << filterid) ?
