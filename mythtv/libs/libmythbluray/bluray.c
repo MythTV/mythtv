@@ -1467,7 +1467,7 @@ void bd_seamless_angle_change(BLURAY *bd, unsigned angle)
  * title lists
  */
 
-uint32_t bd_get_titles(BLURAY *bd, uint8_t flags)
+uint32_t bd_get_titles(BLURAY *bd, uint8_t flags, uint32_t min_title_length)
 {
     if (!bd) {
         BD_DEBUG(DBG_BLURAY | DBG_CRIT, "bd_get_titles(NULL) failed (%p)\n", bd);
@@ -1477,7 +1477,7 @@ uint32_t bd_get_titles(BLURAY *bd, uint8_t flags)
     if (bd->title_list != NULL) {
         nav_free_title_list(bd->title_list);
     }
-    bd->title_list = nav_get_title_list(bd->device_path, flags);
+    bd->title_list = nav_get_title_list(bd->device_path, flags, min_title_length);
 
     if (!bd->title_list) {
         BD_DEBUG(DBG_BLURAY | DBG_CRIT, "nav_get_title_list(%s) failed (%p)\n", bd->device_path, bd);
@@ -1553,12 +1553,13 @@ static BLURAY_TITLE_INFO* _fill_title_info(NAV_TITLE* title, uint32_t title_idx,
     return title_info;
 }
 
-static BLURAY_TITLE_INFO *_get_title_info(BLURAY *bd, uint32_t title_idx, uint32_t playlist, const char *mpls_name)
+static BLURAY_TITLE_INFO *_get_title_info(BLURAY *bd, uint32_t title_idx, uint32_t playlist, const char *mpls_name,
+                                          unsigned angle)
 {
     NAV_TITLE *title;
     BLURAY_TITLE_INFO *title_info;
 
-    title = nav_title_open(bd->device_path, mpls_name, 0);
+    title = nav_title_open(bd->device_path, mpls_name, angle);
     if (title == NULL) {
         BD_DEBUG(DBG_BLURAY | DBG_CRIT, "Unable to open title %s! (%p)\n",
               mpls_name, bd);
@@ -1571,7 +1572,7 @@ static BLURAY_TITLE_INFO *_get_title_info(BLURAY *bd, uint32_t title_idx, uint32
     return title_info;
 }
 
-BLURAY_TITLE_INFO* bd_get_title_info(BLURAY *bd, uint32_t title_idx)
+BLURAY_TITLE_INFO* bd_get_title_info(BLURAY *bd, uint32_t title_idx, unsigned angle)
 {
     if (bd->title_list == NULL) {
         BD_DEBUG(DBG_BLURAY, "Title list not yet read! (%p)\n", bd);
@@ -1584,15 +1585,16 @@ BLURAY_TITLE_INFO* bd_get_title_info(BLURAY *bd, uint32_t title_idx)
 
     return _get_title_info(bd,
                            title_idx, bd->title_list->title_info[title_idx].mpls_id,
-                           bd->title_list->title_info[title_idx].name);
+                           bd->title_list->title_info[title_idx].name,
+                           angle);
 }
 
-BLURAY_TITLE_INFO* bd_get_playlist_info(BLURAY *bd, uint32_t playlist)
+BLURAY_TITLE_INFO* bd_get_playlist_info(BLURAY *bd, uint32_t playlist, unsigned angle)
 {
     char *f_name = str_printf("%05d.mpls", playlist);
     BLURAY_TITLE_INFO *title_info;
 
-    title_info = _get_title_info(bd, 0, playlist, f_name);
+    title_info = _get_title_info(bd, 0, playlist, f_name, angle);
 
     X_FREE(f_name);
 

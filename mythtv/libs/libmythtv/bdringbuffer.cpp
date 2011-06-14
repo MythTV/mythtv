@@ -389,7 +389,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
     // Return an index of relevant titles (excludes dupe clips + titles)
     VERBOSE(VB_GENERAL, LOC + QString("Retrieving title list (please wait)."));
-    m_numTitles = bd_get_titles(bdnav, TITLES_RELEVANT);
+    m_numTitles = bd_get_titles(bdnav, TITLES_RELEVANT, 30);
     VERBOSE(VB_GENERAL, LOC + QString("Found %1 titles.").arg(m_numTitles));
     m_mainTitle = 0;
     m_currentTitleLength = 0;
@@ -434,13 +434,12 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
         // Loop through the relevant titles and find the longest
         uint64_t titleLength = 0;
-        uint64_t margin      = 90000 << 4; // approx 30s
         BLURAY_TITLE_INFO *titleInfo = NULL;
         for( unsigned i = 0; i < m_numTitles; ++i)
         {
             titleInfo = GetTitleInfo(i);
             if (titleLength == 0 ||
-                (titleInfo->duration > (titleLength + margin)))
+                (titleInfo->duration > titleLength))
             {
                 m_mainTitle = titleInfo->idx;
                 titleLength = titleInfo->duration;
@@ -569,7 +568,7 @@ BLURAY_TITLE_INFO* BDRingBuffer::GetTitleInfo(uint32_t index)
     if (index > m_numTitles)
         return NULL;
 
-    BLURAY_TITLE_INFO* result = bd_get_title_info(bdnav, index);
+    BLURAY_TITLE_INFO* result = bd_get_title_info(bdnav, index, 0);
     if (result)
     {
         VERBOSE(VB_PLAYBACK, LOC + QString("Found title %1 info").arg(index));
@@ -588,7 +587,7 @@ BLURAY_TITLE_INFO* BDRingBuffer::GetPlaylistInfo(uint32_t index)
     if (m_cachedPlaylistInfo.contains(index))
         return m_cachedPlaylistInfo.value(index);
 
-    BLURAY_TITLE_INFO* result = bd_get_playlist_info(bdnav, index);
+    BLURAY_TITLE_INFO* result = bd_get_playlist_info(bdnav, index, 0);
     if (result)
     {
         VERBOSE(VB_PLAYBACK, LOC + QString("Found playlist %1 info").arg(index));

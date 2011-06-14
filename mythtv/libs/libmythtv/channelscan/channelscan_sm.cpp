@@ -1454,8 +1454,12 @@ void ChannelScanSM::RunScanner(void)
 // See if we have timed out
 bool ChannelScanSM::HasTimedOut(void)
 {
-    if (currentTestingDecryption)
-        return (timer.elapsed() > (int)kDecryptionTimeout);
+    if (currentTestingDecryption &&
+        (timer.elapsed() > (int)kDecryptionTimeout))
+    {
+        currentTestingDecryption = false;
+        return true;
+    }
 
     if (!waitingForTables)
         return true;
