@@ -3261,6 +3261,9 @@ void MythPlayer::ChangeSpeed(void)
 bool MythPlayer::DoRewind(uint64_t frames, bool override_seeks,
                           bool seeks_wanted)
 {
+    if (player_ctx->buffer && !player_ctx->buffer->IsSeekingAllowed())
+        return false;
+
     uint64_t number = frames + 1;
     uint64_t desiredFrame = (framesPlayed > number) ? framesPlayed - number : 0;
 
@@ -3413,6 +3416,9 @@ bool MythPlayer::IsNearEnd(void)
 bool MythPlayer::DoFastForward(uint64_t frames, bool override_seeks,
                                bool seeks_wanted)
 {
+    if (player_ctx->buffer && !player_ctx->buffer->IsSeekingAllowed())
+        return false;
+
     uint64_t number = frames - 1;
     uint64_t desiredFrame = framesPlayed + number;
 
