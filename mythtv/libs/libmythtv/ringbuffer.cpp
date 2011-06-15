@@ -102,17 +102,18 @@ RingBuffer *RingBuffer::Create(
     bool usereadahead, int timeout_ms, bool stream_only)
 {
     QString lfilename = xfilename;
+    QString lower = lfilename.toLower();
 
     if (write)
         return new FileRingBuffer(lfilename, write, usereadahead, timeout_ms);
 
     bool dvddir  = false;
     bool bddir   = false;
-    bool httpurl = lfilename.startsWith("http://");
-    bool mythurl = lfilename.startsWith("myth://");
-    bool bdurl   = lfilename.startsWith("bd:");
-    bool dvdurl  = lfilename.startsWith("dvd:");
-    bool dvdext  = lfilename.endsWith(".img") || lfilename.endsWith(".iso");
+    bool httpurl = lower.startsWith("http://");
+    bool mythurl = lower.startsWith("myth://");
+    bool bdurl   = lower.startsWith("bd:");
+    bool dvdurl  = lower.startsWith("dvd:");
+    bool dvdext  = lower.endsWith(".img") || lower.endsWith(".iso");
 
     if (httpurl)
         return new StreamingRingBuffer(lfilename);
