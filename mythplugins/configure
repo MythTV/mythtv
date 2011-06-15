@@ -105,7 +105,6 @@ game
 music
 netvision
 news
-video
 weather
 zoneminder
 "
@@ -180,9 +179,6 @@ MythNetvision related options:
 
 MythNews related options:
   --enable-mythnews        build the mythnews plugin [$news]
-
-MythVideo related options:
-  --enable-mythvideo       build the mythvideo plugin [$video]
 
 MythWeather related options:
   --enable-mythweather     build the mythweather plugin [$weather]
@@ -657,13 +653,6 @@ if test "$news" = "yes" ; then
   echo "SUBDIRS += mythnews" >> ./config.pro
 else
   echo "        MythNews       plugin will not be built"
-fi
-
-if test "$video" = "yes" ; then
-  echo "        MythVideo      plugin will be built"
-  echo "SUBDIRS += mythvideo" >> ./config.pro
-else
-  echo "        MythVideo      plugin will not be built"
 fi
 
 if test "$weather" = "yes" ; then

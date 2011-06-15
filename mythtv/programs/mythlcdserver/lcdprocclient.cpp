@@ -211,7 +211,7 @@ void LCDProcClient::sendToServer(const QString &someText)
     if (connected)
     {
         if (debug_level > 9)
-            VERBOSE(VB_NETWORK, "LCDProcClient: Sending to Server: " << someText);
+            VERBOSE(VB_NETWORK, "LCDProcClient: Sending to Server: " + someText);
 
         // Just stream the text out the socket
 
@@ -343,8 +343,8 @@ void LCDProcClient::serverSendingData()
         if (debug_level > 0)
         // Make debugging be less noisy
             if (lineFromServer != "success")
-                VERBOSE(VB_NETWORK, "LCDProcClient: Received from server: "
-                    << lineFromServer);
+                VERBOSE(VB_NETWORK, "LCDProcClient: Received from server: " +
+                       lineFromServer);
 
         aList = lineFromServer.split(" ");
         if (aList.first() == "connect")
@@ -401,7 +401,7 @@ void LCDProcClient::serverSendingData()
         {
             VERBOSE(VB_IMPORTANT, "LCDProcClient: WARNING: Something is getting"
                                   "passed to LCDd that it doesn't understand");
-            VERBOSE(VB_IMPORTANT, "last command: " << last_command);
+            VERBOSE(VB_IMPORTANT, "last command: " + last_command);
         }
         else if (aList.first() == "key")
         {

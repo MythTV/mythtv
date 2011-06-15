@@ -51,7 +51,7 @@ class MTV_PUBLIC PlayerContext
     // Actions
     bool CreatePlayer(TV *tv, QWidget *widget,
                    TVState desiredState,
-                   WId embedwinid, const QRect *embedBounds,
+                   bool embed, const QRect &embedBounds = QRect(),
                    bool muted = false);
     void TeardownPlayer(void);
     bool StartPlaying(int maxWait = -1);
@@ -207,10 +207,6 @@ class MTV_PUBLIC PlayerContext
     int                 pipLocation;
     /// True iff software scaled PIP should be used
     bool                useNullVideo;
-
-    // Embedding related
-    WId   embedWinID;       ///< Window ID when embedded in another widget
-    QRect embedBounds;      ///< Bounds when embedded in another widget
 
     /// Timeout after last Signal Monitor message for ignoring OSD when exiting.
     static const uint kSMExitTimeout;

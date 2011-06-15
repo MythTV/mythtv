@@ -1205,7 +1205,7 @@ void GameUI::handleDownloadedImages(MetadataLookup *lookup)
     for (DownloadMap::iterator i = downloads.begin();
             i != downloads.end(); ++i)
     {
-        ArtworkType type = i.key();
+        VideoArtworkType type = i.key();
         ArtworkInfo info = i.value();
         QString filename = info.url;
 

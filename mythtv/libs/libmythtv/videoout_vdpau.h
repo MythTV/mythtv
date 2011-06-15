@@ -22,9 +22,8 @@ class VideoOutputVDPAU : public VideoOutput
     static void GetRenderOptions(render_opts &opts);
     VideoOutputVDPAU();
     ~VideoOutputVDPAU();
-    bool Init(int width, int height, float aspect, WId winid,
-              int winx, int winy, int winw, int winh,
-              MythCodecID codec_id, WId embedid = 0);
+    bool Init(int width, int height, float aspect,
+              WId winid, const QRect &win_rect, MythCodecID codec_id);
     bool SetDeinterlacingEnabled(bool interlaced);
     bool SetupDeinterlace(bool interlaced, const QString& ovrf="");
     bool ApproveDeintFilter(const QString& filtername) const;
@@ -43,7 +42,7 @@ class VideoOutputVDPAU : public VideoOutput
                       bool        &aspect_only);
     void Zoom(ZoomDirection direction);
     void VideoAspectRatioChanged(float aspect);
-    void EmbedInWidget(int x, int y, int w, int h);
+    void EmbedInWidget(const QRect &rect);
     void StopEmbedding(void);
     void MoveResizeWindow(QRect new_rect);
     void DrawUnusedRects(bool sync = true);
@@ -62,7 +61,8 @@ class VideoOutputVDPAU : public VideoOutput
     virtual bool hasHWAcceleration(void) const
         { return codec_is_vdpau(video_codec_id); }
     virtual MythPainter* GetOSDPainter(void) { return (MythPainter*)m_osd_painter; }
-    virtual bool GetScreenShot(int width = 0, int height = 0);
+    virtual bool GetScreenShot(int width = 0, int height = 0,
+                               QString filename = "");
 
     virtual bool CanVisualise(AudioPlayer *audio, MythRender *render)
         { return VideoOutput::CanVisualise(audio, m_render);       }

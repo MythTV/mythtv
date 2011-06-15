@@ -86,9 +86,9 @@ void VideoOutputVDPAU::TearDown(void)
     DeleteRender();
 }
 
-bool VideoOutputVDPAU::Init(int width, int height, float aspect, WId winid,
-                            int winx, int winy, int winw, int winh,
-                            MythCodecID codec_id, WId embedid)
+bool VideoOutputVDPAU::Init(int width, int height, float aspect,
+                            WId winid, const QRect &win_rect,
+                            MythCodecID codec_id)
 {
     // Attempt to free up as much video memory as possible
     // only works when using the VDPAU painter for the UI
@@ -96,13 +96,10 @@ bool VideoOutputVDPAU::Init(int width, int height, float aspect, WId winid,
     if (painter)
         painter->FreeResources();
 
-    (void) embedid;
     m_win = winid;
     QMutexLocker locker(&m_lock);
     window.SetNeedRepaint(true);
-    bool ok = VideoOutput::Init(width, height, aspect,
-                                winid, winx, winy, winw, winh,
-                                codec_id, embedid);
+    bool ok = VideoOutput::Init(width, height, aspect, winid, win_rect,codec_id);
     if (db_vdisp_profile)
         db_vdisp_profile->SetVideoRenderer("vdpau");
 
@@ -698,6 +695,18 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
             .arg(toString(video_codec_id)).arg(toString(av_codec_id)));
 
     QMutexLocker locker(&m_lock);
+
+    // Ensure we don't lose embedding through program changes. This duplicates
+    // code in VideoOutput::Init but we need start here otherwise the embedding
+    // is lost during window re-initialistion.
+    bool wasembedding = window.IsEmbedding();
+    QRect oldrect;
+    if (wasembedding)
+    {
+        oldrect = window.GetEmbeddingRect();
+        StopEmbedding();
+    }
+
     bool cid_changed = (video_codec_id != av_codec_id);
     bool res_changed = input_size  != window.GetActualVideoDim();
     bool asp_changed = aspect      != window.GetVideoAspect();
@@ -709,6 +718,8 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
         {
             VideoAspectRatioChanged(aspect);
             MoveResize();
+            if (wasembedding)
+                EmbedInWidget(oldrect);
         }
         return true;
     }
@@ -716,9 +727,10 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
     TearDown();
     QRect disp = window.GetDisplayVisibleRect();
     if (Init(input_size.width(), input_size.height(),
-             aspect, m_win, disp.left(), disp.top(),
-             disp.width(), disp.height(), av_codec_id, 0))
+             aspect, m_win, disp, av_codec_id))
     {
+        if (wasembedding)
+            EmbedInWidget(oldrect);
         BestDeint();
         return true;
     }
@@ -743,12 +755,12 @@ void VideoOutputVDPAU::VideoAspectRatioChanged(float aspect)
     VideoOutput::VideoAspectRatioChanged(aspect);
 }
 
-void VideoOutputVDPAU::EmbedInWidget(int x, int y,int w, int h)
+void VideoOutputVDPAU::EmbedInWidget(const QRect &rect)
 {
     QMutexLocker locker(&m_lock);
     if (!window.IsEmbedding())
     {
-        VideoOutput::EmbedInWidget(x, y, w, h);
+        VideoOutput::EmbedInWidget(rect);
         MoveResize();
         window.SetDisplayVisibleRect(window.GetTmpDisplayVisibleRect());
     }
@@ -958,7 +970,7 @@ void VideoOutputVDPAU::DiscardFrame(VideoFrame *frame)
 void VideoOutputVDPAU::DiscardFrames(bool next_frame_keyframe)
 {
     m_lock.lock();
-    VERBOSE(VB_PLAYBACK, LOC + "DiscardFrames("<<next_frame_keyframe<<")");
+    VERBOSE(VB_PLAYBACK, LOC + QString("DiscardFrames(%1)").arg(next_frame_keyframe));
     CheckFrameStates();
     ClearReferenceFrames();
     vbuffers.DiscardFrames(next_frame_keyframe);
@@ -1258,9 +1270,9 @@ void VideoOutputVDPAU::ParseOptions(void)
     }
 }
 
-bool VideoOutputVDPAU::GetScreenShot(int width, int height)
+bool VideoOutputVDPAU::GetScreenShot(int width, int height, QString filename)
 {
     if (m_render)
-        return m_render->GetScreenShot(width, height);
+        return m_render->GetScreenShot(width, height, filename);
     return false;
 }

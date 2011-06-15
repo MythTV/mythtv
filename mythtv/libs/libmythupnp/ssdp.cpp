@@ -23,6 +23,7 @@
 
 #include "upnp.h"
 #include "mythverbose.h"
+#include "mythlogging.h"
 
 #include "upnptasksearch.h"
 #include "upnptaskcache.h"
@@ -237,6 +238,7 @@ void SSDP::run()
     fd_set          read_set;
     struct timeval  timeout;
 
+    threadRegister("SSDP");
     VERBOSE(VB_UPNP, "SSDP::Run - SSDP Thread Started." );
 
     // ----------------------------------------------------------------------
@@ -259,7 +261,8 @@ void SSDP::run()
 #if 0
                 if (m_Sockets[ nIdx ]->bytesAvailable() > 0)
                 {
-	            cout << "Found Extra data before select: " << nIdx << endl;
+	            VERBOSE(VB_IMPORTANT, QString("Found Extra data before "
+                            "select: %1").arg(nIdx));
                     ProcessData( m_Sockets[ nIdx ] );
                 }
 #endif
@@ -278,7 +281,10 @@ void SSDP::run()
                 {
                     if (FD_ISSET( m_Sockets[ nIdx ]->socket(), &read_set ))
                     {
-                        // cout << "FD_ISSET( " << nIdx << " ) " << endl;
+#if 0
+                        VERBOSE(VB_IMPORTANT, QString("FD_ISSET( %1 )")
+                            .arg(nIdx));
+#endif
 
                         ProcessData( m_Sockets[ nIdx ] );
                     }
@@ -286,6 +292,7 @@ void SSDP::run()
             }
         }
     }
+    threadDeregister();
 }
 
 /////////////////////////////////////////////////////////////////////////////

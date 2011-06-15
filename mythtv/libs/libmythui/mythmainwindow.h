@@ -95,8 +95,9 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void         ResizePainterWindow(const QSize &size);
 
     void GrabWindow(QImage &image);
-    bool SaveScreenShot(const QImage &image);
-    bool ScreenShot(int w = 0, int h = 0);
+    bool SaveScreenShot(const QImage &image, QString filename = "");
+    bool ScreenShot(int w = 0, int h = 0, QString filename = "");
+    void RemoteScreenShot(QString filename, int x, int y);
 
     void AllowInput(bool allow);
 
@@ -130,6 +131,10 @@ class MUI_PUBLIC MythMainWindow : public QWidget
 
   protected slots:
     void animate();
+    void doRemoteScreenShot(QString filename, int x, int y);
+
+  signals:
+    void signalRemoteScreenShot(QString filename, int x, int y);
 
   protected:
     MythMainWindow(const bool useDB = true);

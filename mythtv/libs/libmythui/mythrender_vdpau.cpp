@@ -475,7 +475,7 @@ void MythRenderVDPAU::MoveResizeWin(QRect &rect)
         m_display->MoveResizeWin(m_window, rect);
 }
 
-bool MythRenderVDPAU::GetScreenShot(int width, int height)
+bool MythRenderVDPAU::GetScreenShot(int width, int height, QString filename)
 {
     LOCK_RENDER
     CHECK_STATUS(false)
@@ -516,8 +516,9 @@ bool MythRenderVDPAU::GetScreenShot(int width, int height)
         if (height <= 0)
             height = img.height();
 
-        img = img.scaled(width, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        success = window->SaveScreenShot(img);
+        img = img.scaled(width, height, Qt::KeepAspectRatio, 
+                         Qt::SmoothTransformation);
+        success = window->SaveScreenShot(img, filename);
     }
     delete [] buffer;
     return success;

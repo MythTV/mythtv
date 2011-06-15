@@ -296,10 +296,12 @@ void IPTVFeederRTSP::Close(void)
 
 void IPTVFeederRTSP::AddListener(TSDataListener *item)
 {
-    VERBOSE(VB_RECORD, LOC + "AddListener("<<item<<") -- begin");
+    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- begin")
+                       .arg((uint64_t)item,0,16));
     if (!item)
     {
-        VERBOSE(VB_RECORD, LOC + "AddListener("<<item<<") -- end 0");
+        VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- end 0")
+                           .arg((uint64_t)item,0,16));
         return;
     }
 
@@ -313,7 +315,8 @@ void IPTVFeederRTSP::AddListener(TSDataListener *item)
     // if there is a session, add to each subsession->sink
     if (!_session)
     {
-        VERBOSE(VB_RECORD, LOC + "AddListener("<<item<<") -- end 1");
+        VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- end 1")
+                           .arg((uint64_t)item,0,16));
         return;
     }
 
@@ -325,19 +328,22 @@ void IPTVFeederRTSP::AddListener(TSDataListener *item)
         if ((sink = dynamic_cast<IPTVMediaSink*>(subsession->sink)))
             sink->AddListener(item);
     }
-    VERBOSE(VB_RECORD, LOC + "AddListener("<<item<<") -- end 2");
+    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- end 2")
+                       .arg((uint64_t)item,0,16));
 }
 
 void IPTVFeederRTSP::RemoveListener(TSDataListener *item)
 {
-    VERBOSE(VB_RECORD, LOC + "RemoveListener("<<item<<") -- begin");
+    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- begin")
+                       .arg((uint64_t)item,0,16));;
     QMutexLocker locker(&_lock);
     vector<TSDataListener*>::iterator it =
         find(_listeners.begin(), _listeners.end(), item);
 
     if (it == _listeners.end())
     {
-        VERBOSE(VB_RECORD, LOC + "RemoveListener("<<item<<") -- end 1");
+        VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- end 1")
+                           .arg((uint64_t)item,0,16));
         return;
     }
 
@@ -348,7 +354,8 @@ void IPTVFeederRTSP::RemoveListener(TSDataListener *item)
     // if there is a session, remove from each subsession->sink
     if (!_session)
     {
-        VERBOSE(VB_RECORD, LOC + "RemoveListener("<<item<<") -- end 2");
+        VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- end 2")
+                           .arg((uint64_t)item,0,16));
         return;
     }
 
@@ -360,5 +367,6 @@ void IPTVFeederRTSP::RemoveListener(TSDataListener *item)
         if ((sink = dynamic_cast<IPTVMediaSink*>(subsession->sink)))
             sink->RemoveListener(item);
     }
-    VERBOSE(VB_RECORD, LOC + "RemoveListener("<<item<<") -- end 3");
+    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- end 3")
+                       .arg((uint64_t)item,0,16));
 }

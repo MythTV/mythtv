@@ -13,7 +13,6 @@
         <text>Optical Disks</text>
         <description>Play or import Blu-ray, DVD, and CDs</description>
         <action>MENU optical_menu.xml</action>
-        <depends>mythmusic mythvideo mytharchive mythburn</depends>
     </button>
 
     <button>

@@ -12,6 +12,7 @@
 #include "atsctables.h"
 #include "firewirechannel.h"
 #include "firewiresignalmonitor.h"
+#include "mythlogging.h"
 
 #define LOC QString("FireSM(%1): ").arg(channel->GetDevice())
 #define LOC_WARN QString("FireSM(%1), Warning: ").arg(channel->GetDevice())
@@ -19,7 +20,9 @@
 
 void FirewireTableMonitorThread::run(void)
 {
+    threadRegister("FirewireTableMonitor");
     m_parent->RunTableMonitor();
+    threadDeregister();
 }
 
 const uint FirewireSignalMonitor::kPowerTimeout  = 3000; /* ms */

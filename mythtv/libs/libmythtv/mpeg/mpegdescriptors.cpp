@@ -194,6 +194,8 @@ QString MPEGDescriptor::DescriptorTagString() const
             return QString("Hierarchy");
         case DescriptorID::registration:
             return QString("Registration");
+        case DescriptorID::data_stream_alignment:
+            return QString("Data Stream Alignment");
         case DescriptorID::conditional_access:
             return QString("Conditional Access");
         case DescriptorID::ISO_639_language:
@@ -214,6 +216,20 @@ QString MPEGDescriptor::DescriptorTagString() const
             return QString("STD");
         case DescriptorID::IBP:
             return QString("IBP");
+        case DescriptorID::carousel_identifier:
+            return QString("DSM-CC Carousel Identifier");
+        case DescriptorID::association_tag:
+            return QString("DSM-CC Association Tag");
+        case DescriptorID::deferred_association_tag:
+            return QString("DSM-CC Deferred Association Tag");
+        case DescriptorID::npt_reference:
+            return QString("DSM-CC NPT Reference");
+        case DescriptorID::npt_endpoint:
+            return QString("DSM-CC NPT Endpoint");
+        case DescriptorID::stream_mode:
+            return QString("DSM-CC Stream Mode");
+        case DescriptorID::stream_event:
+            return QString("DSM-CC Stream Event");
         case DescriptorID::mpeg4_video:
             return QString("MPEG-4 Video");
         case DescriptorID::mpeg4_audio:
@@ -246,6 +262,10 @@ QString MPEGDescriptor::DescriptorTagString() const
             return QString("IPMP Digital Restrictions Management");
         case DescriptorID::avc_timing__hrd:
             return QString("AVC Timing & HRD");
+        case DescriptorID::MPEG2_AAC_audio:
+            return QString("AAC Audio");
+        case DescriptorID::FlexMuxTiming:
+            return QString("Flex Mux Timing");
 
         // DVB
         case DescriptorID::network_name:
@@ -362,6 +382,14 @@ QString MPEGDescriptor::DescriptorTagString() const
             return QString("Time Slice FEC Identifier");
         case DescriptorID::ECM_repetition_rate:
             return QString("ECM Repetition Rate");
+        case DescriptorID::S2_delivery_system:
+            return QString("DVB-S2 Delivery Identifier");
+        case DescriptorID::EAC3:
+            return QString("E-AC-3");
+        case DescriptorID::DTS:
+            return QString("DTS");
+        case DescriptorID::AAC:
+            return QString("AAC");
 
         // private
         case DescriptorID::dvb_uk_channel_list:
@@ -370,12 +398,24 @@ QString MPEGDescriptor::DescriptorTagString() const
         /// ATSC
         case DescriptorID::atsc_stuffing:
             return QString("ATSC Stuffing");
-        case DescriptorID::audio_stream:
-            return QString("Audio");
+        case DescriptorID::ac3_audio_stream:
+            return QString("AC-3 Audio");
+        case DescriptorID::scte_frame_rate:
+            return QString("SCTE Frame Rate");
+        case DescriptorID::scte_component_name:
+            return QString("SCTE Component Name");
+        case DescriptorID::atsc_program_identifier:
+            return QString("ATSC Program Identifier");
         case DescriptorID::caption_service:
             return QString("Caption Service");
         case DescriptorID::content_advisory:
             return QString("Content Advisory");
+        case DescriptorID::atsc_ca_descriptor:
+            return QString("ATSC CA Descriptor");
+        case DescriptorID::atsc_descriptor_tag:
+            return QString("ATSC Descriptor Tag");
+        case DescriptorID::scte_cue_identifier:
+            return QString("SCTE CUE Identifier");
         case DescriptorID::dish_event_name:
             return QString("Dishnet EIT Name");
         case DescriptorID::dish_event_description:
@@ -388,12 +428,24 @@ QString MPEGDescriptor::DescriptorTagString() const
             return QString("ATSC Time-shifted Service");
         case DescriptorID::component_name:
             return QString("Component Name");
+        case DescriptorID::atsc_data_service:
+            return QString("ATSC Data Service");
+        case DescriptorID::atsc_pid_count:
+            return QString("ATSC PID Count");
+        case DescriptorID::atsc_download:
+            return QString("ATSC Download");
+        case DescriptorID::multiprotocol_encapsulation:
+            return QString("ATSC Multiprotocol Encapsulation");
         case DescriptorID::DCC_departing_request:
             return QString("DCC Departing Request");
         case DescriptorID::DCC_arriving_request:
             return QString("DCC Arriving Request");
         case DescriptorID::DRM_control:
             return QString("Consumer Restrictions Control");
+        case DescriptorID::atsc_genre:
+            return QString("ATSC Genre");
+        case DescriptorID::atsc_private_information:
+            return QString("ATSC Private Information");
         case DescriptorID::atsc_content_identifier:
             return QString("Content Identifier");
 
@@ -412,7 +464,7 @@ QString MPEGDescriptor::toString() const
         str = ISO639LanguageDescriptor(_data).toString();
     else if (DescriptorID::avc_video == DescriptorTag())
         str = AVCVideoDescriptor(_data).toString();
-    else if (DescriptorID::audio_stream == DescriptorTag())
+    else if (DescriptorID::ac3_audio_stream == DescriptorTag())
         str = AudioStreamDescriptor(_data).toString();
     else if (DescriptorID::caption_service == DescriptorTag())
         str = CaptionServiceDescriptor(_data).toString();

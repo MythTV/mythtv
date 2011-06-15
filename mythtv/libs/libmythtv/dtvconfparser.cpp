@@ -304,8 +304,8 @@ void DTVConfParser::AddChannel(const DTVMultiplex &mux, DTVChannelInfo &chan)
         {
             channels[i].channels.push_back(chan);
 
-            VERBOSE(VB_IMPORTANT, "Imported channel: "<<chan.toString()
-                    <<" on "<<mux.toString());
+            VERBOSE(VB_IMPORTANT, "Imported channel: " + chan.toString() +
+                    " on " + mux.toString());
             return;
         }
     }
@@ -313,6 +313,6 @@ void DTVConfParser::AddChannel(const DTVMultiplex &mux, DTVChannelInfo &chan)
     channels.push_back(mux);
     channels.back().channels.push_back(chan);
 
-    VERBOSE(VB_IMPORTANT, "Imported channel: "<<chan.toString()
-            <<" on "<<mux.toString());
+    VERBOSE(VB_IMPORTANT, "Imported channel: " + chan.toString() +
+            " on " + mux.toString());
 }

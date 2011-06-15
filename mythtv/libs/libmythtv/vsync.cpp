@@ -147,12 +147,12 @@ void VideoSync::Start(void)
 int VideoSync::CalcDelay()
 {
     int64_t now = GetTime();
-    //cout << "CalcDelay: next: " << timeval_str(m_nexttrigger) << " now "
-    // << timeval_str(now) << endl;
+    //VERBOSE(VB_IMPORTANT, QString("CalcDelay: next: %1 now %2")
+    //    .arg(timeval_str(m_nexttrigger)) .arg(timeval_str(now)));
 
     int ret_val = m_nexttrigger - now;
 
-    //cout << "delay " << ret_val << endl;
+    //VERBOSE(VB_IMPORTANT, QString("delay %1").arg(ret_val);
 
     if (ret_val > m_frame_interval * 4)
     {

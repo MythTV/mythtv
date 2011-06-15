@@ -6,7 +6,6 @@
         <text>Play Optical Disc</text>
         <description>Play a film on Blu-ray or DVD</description>
         <action>JUMP Play Disc</action>
-        <depends>mythvideo</depends>
     </button>
 
     <button>

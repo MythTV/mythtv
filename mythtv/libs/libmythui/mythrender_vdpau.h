@@ -73,7 +73,7 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
     void DrawDisplayRect(const QRect &rect, bool use_colorkey = false);
     void MoveResizeWin(QRect &rect);
     void CheckOutputSurfaces(void);
-    bool GetScreenShot(int width = 0, int height = 0);
+    bool GetScreenShot(int width = 0, int height = 0, QString filename = "");
 
     uint CreateOutputSurface(const QSize &size,
                              VdpRGBAFormat fmt = VDP_RGBA_FORMAT_B8G8R8A8,

@@ -65,23 +65,40 @@ BD_PRIVATE void pg_display_set_free(PG_DISPLAY_SET **s);
 BD_PRIVATE GRAPHICS_PROCESSOR *graphics_processor_init(void);
 BD_PRIVATE void                graphics_processor_free(GRAPHICS_PROCESSOR **p);
 
-/*
- *  stc:      current STC
+/**
  *
- *  return:   0 : wait for more data
- *            1 : display set complete
+ *  Decode data from MPEG-PES input stream
  *
  *  Only segments where DTS <= STC are decoded.
  *  If STC < 0, all segments are immediately decoded to display set.
  *
  *  All decoded PES packets are removed from buffer.
+ *
+ * @param s  display set
+ * @param buf  data to decode
+ * @param stc  current playback time
+ * @return 1 if display set was completed, 0 otherwise
  */
-
 BD_PRIVATE int
 graphics_processor_decode_pes(PG_DISPLAY_SET **s,
                               struct pes_buffer_s **buf,
                               int64_t stc);
 
+/**
+ *
+ *  Decode data from MPEG-TS input stream
+ *
+ *  Segments are queued and decoded when DTS <= STC.
+ *  If STC < 0, all segments are immediately decoded to display set.
+ *
+ * @param p  GRAPHICS_PROCESSOR object
+ * @param s  display set
+ * @param pid  mpeg-ts PID to decode (HDMV IG/PG stream)
+ * @param unit  mpeg-ts data
+ * @param num_units  number of aligned units in data
+ * @param stc  current playback time
+ * @return 1 if display set was completed, 0 otherwise
+ */
 BD_PRIVATE int
 graphics_processor_decode_ts(GRAPHICS_PROCESSOR *p,
                              PG_DISPLAY_SET **s,

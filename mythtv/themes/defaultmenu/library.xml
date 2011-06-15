@@ -12,8 +12,7 @@
         <type>VIDEO_BROWSER</type>
         <text>Watch Videos</text>
         <description>Browse your video library</description>
-        <action>JUMP MythVideo</action>
-        <depends>mythvideo</depends>
+        <action>JUMP Video Default</action>
     </button>
 
     <button>

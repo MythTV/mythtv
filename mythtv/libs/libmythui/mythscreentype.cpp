@@ -14,6 +14,7 @@
 #include "mythuihelper.h"
 #include "mythprogressdialog.h"
 #include "mythuigroup.h"
+#include "mythlogging.h"
 
 QEvent::Type ScreenLoadCompletionEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
@@ -27,7 +28,11 @@ class ScreenLoadTask : public QRunnable
     void run()
     {
         if (m_parent)
+        {
+            threadRegister("ScreenLoad");
             m_parent->LoadInForeground();
+            threadDeregister();
+        }
     }
 
     MythScreenType *m_parent;

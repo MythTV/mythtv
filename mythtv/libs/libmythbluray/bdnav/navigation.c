@@ -40,6 +40,9 @@ static int _filter_dup(MPLS_PL *pl_list[], unsigned count, MPLS_PL *pl)
         if (pl->list_count != pl_list[ii]->list_count) {
             continue;
         }
+        if (pl->mark_count != pl_list[ii]->mark_count) {
+            continue;
+        }
         for (jj = 0; jj < pl->list_count; jj++) {
             MPLS_PI *pi1, *pi2;
 
@@ -108,7 +111,7 @@ _pl_duration(MPLS_PL *pl)
     return duration;
 }
 
-NAV_TITLE_LIST* nav_get_title_list(const char *root, uint32_t flags)
+NAV_TITLE_LIST* nav_get_title_list(const char *root, uint32_t flags, uint32_t min_title_length)
 {
     BD_DIR_H *dir;
     BD_DIRENT ent;
@@ -165,6 +168,11 @@ NAV_TITLE_LIST* nav_get_title_list(const char *root, uint32_t flags)
                 continue;
             }
             if ((flags & TITLES_FILTER_DUP_CLIP) && !_filter_repeats(pl, 2)) {
+                mpls_free(pl);
+                continue;
+            }
+            if (min_title_length > 0 &&
+                _pl_duration(pl) < min_title_length*45000) {
                 mpls_free(pl);
                 continue;
             }
@@ -426,8 +434,12 @@ static void _fill_clip(NAV_TITLE *title,
             clip->connection = CONNECT_SEAMLESS;
             break;
         default:
-            clip->start_pkt = clpi_lookup_spn(clip->cl, in_time, 1,
+            if (ref) {
+                clip->start_pkt = clpi_lookup_spn(clip->cl, in_time, 1,
                                               mpls_clip[clip->angle].stc_id);
+            } else {
+                clip->start_pkt = 0;
+            }
             clip->connection = CONNECT_NON_SEAMLESS;
             break;
     }

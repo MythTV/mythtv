@@ -27,6 +27,7 @@
 #include <mythuibuttonlist.h>
 #include <mythprogressdialog.h>
 #include <mythuifilebrowser.h>
+#include "mythlogging.h"
 
 static bool copyFile(const QString &src, const QString &dst)
 {
@@ -68,7 +69,9 @@ FileScannerThread::FileScannerThread(ImportMusicDialog *parent)
 
 void FileScannerThread::run()
 {
+    threadRegister("FileScanner");
     m_parent->doScan();
+    threadDeregister();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

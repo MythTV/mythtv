@@ -1110,7 +1110,8 @@ QList<ThemeInfo> MythUIHelper::GetThemes(ThemeType type)
         QFileInfo  &theme = *it;
 
         if (theme.baseName() == "default" ||
-            theme.baseName() == "default-wide")
+            theme.baseName() == "default-wide" ||
+            theme.baseName() == "Slave")
             continue;
 
         ThemeInfo themeInfo(theme.absoluteFilePath());

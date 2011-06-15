@@ -42,8 +42,7 @@ class MythDVDPlayer : public MythPlayer
 
   protected:
     // Non-public sets
-    virtual void SetBookmark(void);
-    virtual void ClearBookmark(bool message = true);
+    virtual void SetBookmark(bool clear = false);
 
     // Start/Reset/Stop playing
     virtual void ResetPlaying(bool resetframes = true);

@@ -374,6 +374,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         QString rating_system = QString("");
         QString advisory = QString("");
         float stars = 0.0;
+        QDate originalairdate;
 
         if (EITFixUp::kFixDish & fix)
         {
@@ -420,6 +421,10 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                 DishEventTagsDescriptor tags(tags_data);
                 seriesId  = tags.seriesid();
                 programId = tags.programid();
+                originalairdate = tags.originalairdate(); // future use
+
+                if (programId.startsWith("MV") || programId.startsWith("SP"))
+                    seriesId = "";
             }
 
             const unsigned char *properties_data =

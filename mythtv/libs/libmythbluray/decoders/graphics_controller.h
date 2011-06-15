@@ -75,11 +75,18 @@ BD_PRIVATE GRAPHICS_CONTROLLER *gc_init(struct bd_registers_s *regs,
 
 BD_PRIVATE void                 gc_free(GRAPHICS_CONTROLLER **p);
 
-/*
- * input stream (MPEG-TS IG stream)
+/**
+ *
+ *  Decode data from MPEG-TS input stream
+ *
+ * @param p  GRAPHICS_CONTROLLER object
+ * @param pid  mpeg-ts PID to decode (HDMV IG/PG stream)
+ * @param block  mpeg-ts data
+ * @param num_blocks  number of aligned units in data
+ * @param stc  current playback time
+ * @return <0 on error, 0 when not complete, >0 when complete
  */
-
-BD_PRIVATE void                 gc_decode_ts(GRAPHICS_CONTROLLER *p,
+BD_PRIVATE int                  gc_decode_ts(GRAPHICS_CONTROLLER *p,
                                              uint16_t pid,
                                              uint8_t *block, unsigned num_blocks,
                                              int64_t stc);

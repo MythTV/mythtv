@@ -18,6 +18,7 @@
  */
 
 #include "mythsignalingtimer.h"
+#include "mythlogging.h"
 
 MythSignalingTimer::MythSignalingTimer(
     QObject *parent, const char *slot) :
@@ -67,6 +68,8 @@ void MythSignalingTimer::stop(void)
 
 void MythSignalingTimer::run(void)
 {
+    threadRegister("SignalingTimer");
+
     running = true;
     while (dorun)
     {
@@ -75,4 +78,5 @@ void MythSignalingTimer::run(void)
             emit timeout();
     }
     running = false;
+    threadDeregister();
 }

@@ -175,8 +175,8 @@ bool FilterManager::LoadFilterLib(const QString &path)
         QByteArray libname = path.toAscii();
         newFilter->libname = strdup(libname.constData());
         filters[newFilter->name] = newFilter;
-        VERBOSE(VB_PLAYBACK+VB_EXTRA, LOC + QString("filters[%1] = ")
-                .arg(newFilter->name) << newFilter);
+        VERBOSE(VB_PLAYBACK+VB_EXTRA, LOC + QString("filters[%1] = 0x%2")
+                .arg(newFilter->name).arg((uint64_t)newFilter,0,16));
     }
     return true;
 }
@@ -189,7 +189,7 @@ const FilterInfo *FilterManager::GetFilterInfo(const QString &name) const
         finfo = it->second;
 
     VERBOSE(VB_PLAYBACK, LOC + QString("GetFilterInfo(%1)").arg(name) +
-            " returning: "<<finfo);
+            QString(" returning: 0x%1").arg((uint64_t)finfo,0,16));
 
     return finfo;
 }

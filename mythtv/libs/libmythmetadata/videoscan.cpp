@@ -19,6 +19,7 @@
 #include "videoscan.h"
 #include "videoutils.h"
 #include "remoteutil.h"
+#include "mythlogging.h"
 
 namespace
 {
@@ -92,6 +93,7 @@ class VideoScannerThread : public QThread
 
     void run()
     {
+        threadRegister("VideoScanner");
         QList<QByteArray> image_types = QImageReader::supportedImageFormats();
         QStringList imageExtensions;
         for (QList<QByteArray>::const_iterator p = image_types.begin();
@@ -134,6 +136,7 @@ class VideoScannerThread : public QThread
         m_DBDataChanged = updateDB(fs_files, db_remove);
         if (m_DBDataChanged)
             RemoteSendMessage("VIDEO_LIST_CHANGE");
+        threadDeregister();
     }
 
     void SetDirs(const QStringList &dirs)

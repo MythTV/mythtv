@@ -41,7 +41,6 @@
         <text>Media Settings</text>
         <description>Configure music, video, and other media plugins</description>
         <action>MENU media_settings.xml</action>
-        <depends>mythvideo mythmusic mythgallery mythfm mythgame mythburn mytharchive</depends>
     </button>
 
     <button>

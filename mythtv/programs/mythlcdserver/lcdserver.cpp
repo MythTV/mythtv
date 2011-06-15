@@ -272,8 +272,8 @@ void LCDServer::parseTokens(const QStringList &tokens, QTcpSocket *socket)
         QString did_not_parse = tokens.join(" ");
 
         if (debug_level > 0)
-            VERBOSE(VB_IMPORTANT, "LCDServer::failed to parse this: "
-                << did_not_parse);
+            VERBOSE(VB_IMPORTANT, "LCDServer::failed to parse this: " +
+                did_not_parse);
 
         sendMessage(socket, "HUH?");
     }
@@ -300,7 +300,7 @@ void LCDServer::sendMessage(QTcpSocket *where, const QString &what)
 void LCDServer::sendKeyPress(QString key_pressed)
 {
     if (debug_level > 0)
-        VERBOSE(VB_GENERAL, "LCDServer:: send key press: " << key_pressed);
+        VERBOSE(VB_GENERAL, "LCDServer:: send key press: " + key_pressed);
 
     // send key press to last client that sent us a message
     if (m_lastSocket)
@@ -344,7 +344,7 @@ void LCDServer::switchToMusic(const QStringList &tokens, QTcpSocket *socket)
 
     if (tokens.count() != 4)
     {
-        VERBOSE(VB_IMPORTANT, "LCDServer: bad SWITCH_TO_MUSIC command: " << flat);
+        VERBOSE(VB_IMPORTANT, "LCDServer: bad SWITCH_TO_MUSIC command: " + flat);
         sendMessage(socket, "HUH?");
         return;
     }
@@ -365,7 +365,7 @@ void LCDServer::switchToGeneric(const QStringList &tokens, QTcpSocket *socket)
     if ((tokens.count() - 1) % 5 != 0)
     {
         VERBOSE(VB_IMPORTANT, "LCDServer: bad no. of args SWITCH_TO_GENERIC "
-                        "command: " <<  flat);
+                        "command: " + flat);
         sendMessage(socket, "HUH?");
         return;
     }
@@ -379,7 +379,7 @@ void LCDServer::switchToGeneric(const QStringList &tokens, QTcpSocket *socket)
         if (!bOK)
         {
             VERBOSE(VB_IMPORTANT, "LCDServer: bad row no. in SWITCH_TO_GENERIC "
-                    "command: " << tokens[x]);
+                    "command: " + tokens[x]);
             sendMessage(socket, "HUH?");
             return;
         }
@@ -394,7 +394,7 @@ void LCDServer::switchToGeneric(const QStringList &tokens, QTcpSocket *socket)
         else
         {
             VERBOSE(VB_IMPORTANT, "LCDServer: bad align in SWITCH_TO_GENERIC "
-                    "command: " << tokens[x + 1]);
+                    "command: " + tokens[x + 1]);
             sendMessage(socket, "HUH?");
             return;
         }
@@ -409,7 +409,7 @@ void LCDServer::switchToGeneric(const QStringList &tokens, QTcpSocket *socket)
         else
         {
             VERBOSE(VB_IMPORTANT, "LCDServer: bad scrollable bool in "
-                "SWITCH_TO_GENERIC command: " << tokens[x + 4]);
+                "SWITCH_TO_GENERIC command: " + tokens[x + 4]);
             sendMessage(socket, "HUH?");
             return;
         }
@@ -432,8 +432,8 @@ void LCDServer::switchToChannel(const QStringList &tokens, QTcpSocket *socket)
 
     if (tokens.count() != 4)
     {
-        VERBOSE(VB_IMPORTANT, "LCDServer: bad SWITCH_TO_CHANNEL command: "
-                << flat);
+        VERBOSE(VB_IMPORTANT, "LCDServer: bad SWITCH_TO_CHANNEL command: " +
+                flat);
         sendMessage(socket, "HUH?");
         return;
     }
@@ -453,8 +453,8 @@ void LCDServer::switchToVolume(const QStringList &tokens, QTcpSocket *socket)
 
     if (tokens.count() != 2)
     {
-        VERBOSE(VB_IMPORTANT, "LCDServer: bad SWITCH_TO_VOLUME command: "
-                << flat);
+        VERBOSE(VB_IMPORTANT, "LCDServer: bad SWITCH_TO_VOLUME command: " +
+                flat);
         sendMessage(socket, "HUH?");
         return;
     }
@@ -479,14 +479,14 @@ void LCDServer::switchToNothing(QTcpSocket *socket)
 void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
 {
     if (debug_level > 0)
-        VERBOSE(VB_GENERAL, "LCDServer: SWITCH_TO_MENU: " << tokens.count());
+        VERBOSE(VB_GENERAL, QString("LCDServer: SWITCH_TO_MENU: %1").arg(tokens.count()));
 
     QString flat = tokens.join(" ");
 
     if ((tokens.count() - 3) % 5 != 0)
     {
-        VERBOSE(VB_IMPORTANT, "LCDServer: bad no. of args SWITCH_TO_MENU command: "
-                << flat);
+        VERBOSE(VB_IMPORTANT, "LCDServer: bad no. of args SWITCH_TO_MENU command: " +
+                flat);
         sendMessage(socket, "HUH?");
         return;
     }
@@ -501,7 +501,7 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
     else
     {
         VERBOSE(VB_IMPORTANT, "LCDServer: bad popup bool in SWITCH_TO_MENU "
-                        "command: " << tokens[2]);
+                        "command: " + tokens[2]);
         sendMessage(socket, "HUH?");
         return;
     }
@@ -522,7 +522,7 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
         else
         {
             VERBOSE(VB_IMPORTANT, "LCDServer: bad checked state in "
-                    "SWITCH_TO_MENU command: " << tokens[x + 1]);
+                    "SWITCH_TO_MENU command: " + tokens[x + 1]);
             sendMessage(socket, "HUH?");
             return;
         }
@@ -535,7 +535,7 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
         else
         {
             VERBOSE(VB_IMPORTANT, "LCDServer: bad selected state in "
-                    "SWITCH_TO_MENU command: " << tokens[x + 2]);
+                    "SWITCH_TO_MENU command: " + tokens[x + 2]);
             sendMessage(socket, "HUH?");
             return;
         }
@@ -548,7 +548,7 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
         else
         {
             VERBOSE(VB_IMPORTANT, "LCDServer: bad scrollable bool in "
-                    "SWITCH_TO_MENU command: " << tokens[x + 3]);
+                    "SWITCH_TO_MENU command: " + tokens[x + 3]);
             sendMessage(socket, "HUH?");
             return;
         }
@@ -558,7 +558,7 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
         if (!bOK)
         {
             VERBOSE(VB_IMPORTANT, "LCDServer: bad indent in SWITCH_TO_MENU "
-                            "command: " << tokens[x + 4]);
+                            "command: " + tokens[x + 4]);
             sendMessage(socket, "HUH?");
             return;
         }
@@ -581,8 +581,8 @@ void LCDServer::setChannelProgress(const QStringList &tokens, QTcpSocket *socket
 
     if (tokens.count() != 3)
     {
-        VERBOSE(VB_IMPORTANT, "LCDServer: bad SET_CHANNEL_PROGRESS command: "
-                << flat);
+        VERBOSE(VB_IMPORTANT, "LCDServer: bad SET_CHANNEL_PROGRESS command: " +
+                flat);
         sendMessage(socket, "HUH?");
         return;
     }
@@ -591,8 +591,8 @@ void LCDServer::setChannelProgress(const QStringList &tokens, QTcpSocket *socket
     float progress = tokens[2].toFloat(&bOK);
     if (!bOK)
     {
-        VERBOSE(VB_IMPORTANT, "LCDServer: bad float value in "
-                "SET_CHANNEL_PROGRESS command: %1" << tokens[1]);
+        VERBOSE(VB_IMPORTANT, QString("LCDServer: bad float value in "
+                "SET_CHANNEL_PROGRESS command: %1").arg(tokens[2]));
         sendMessage(socket, "HUH?");
         return;
     }
@@ -612,8 +612,8 @@ void LCDServer::setGenericProgress(const QStringList &tokens, QTcpSocket *socket
 
     if (tokens.count() != 3)
     {
-        VERBOSE(VB_IMPORTANT, "LCDServer: bad SET_GENERIC_PROGRESS command: "
-                << flat);
+        VERBOSE(VB_IMPORTANT, "LCDServer: bad SET_GENERIC_PROGRESS command: " +
+                flat);
         sendMessage(socket, "HUH?");
         return;
     }
@@ -622,16 +622,16 @@ void LCDServer::setGenericProgress(const QStringList &tokens, QTcpSocket *socket
     bool busy = tokens[1].toInt(&bOK);
     if (!bOK)
     {
-        VERBOSE(VB_IMPORTANT, "LCDServer: bad bool value in "
-                "SET_GENERIC_PROGRESS command: %1 %2" << tokens[1] << tokens[2]);
+        VERBOSE(VB_IMPORTANT, QString("LCDServer: bad bool value in "
+                "SET_GENERIC_PROGRESS command: %1 %2").arg(tokens[1]).arg(tokens[2]));
         sendMessage(socket, "HUH?");
         return;
     }
     float progress = tokens[2].toFloat(&bOK);
     if (!bOK)
     {
-        VERBOSE(VB_IMPORTANT, "LCDServer: bad float value in "
-                "SET_GENERIC_PROGRESS command: %1" << tokens[1]);
+        VERBOSE(VB_IMPORTANT, QString("LCDServer: bad float value in "
+                "SET_GENERIC_PROGRESS command: %1").arg(tokens[2]));
         sendMessage(socket, "HUH?");
         return;
     }
@@ -651,8 +651,8 @@ void LCDServer::setMusicProgress(const QStringList &tokens, QTcpSocket *socket)
 
     if (tokens.count() != 3)
     {
-        VERBOSE(VB_IMPORTANT, "LCDServer: bad SET_MUSIC_PROGRESS command: "
-                << flat);
+        VERBOSE(VB_IMPORTANT, "LCDServer: bad SET_MUSIC_PROGRESS command: " +
+                flat);
         sendMessage(socket, "HUH?");
         return;
     }
@@ -662,7 +662,7 @@ void LCDServer::setMusicProgress(const QStringList &tokens, QTcpSocket *socket)
     if (!bOK)
     {
         VERBOSE(VB_IMPORTANT, "LCDServer: bad float value in "
-                "SET_MUSIC_PROGRESS command: " << tokens[2]);
+                "SET_MUSIC_PROGRESS command: " + tokens[2]);
         sendMessage(socket, "HUH?");
         return;
     }
@@ -682,8 +682,8 @@ void LCDServer::setMusicProp(const QStringList &tokens, QTcpSocket *socket)
 
     if (tokens.count() < 3)
     {
-        VERBOSE(VB_IMPORTANT, "LCDServer: bad SET_MUSIC_PROP command: "
-                << flat);
+        VERBOSE(VB_IMPORTANT, "LCDServer: bad SET_MUSIC_PROP command: " +
+                flat);
         sendMessage(socket, "HUH?");
         return;
     }
@@ -693,7 +693,7 @@ void LCDServer::setMusicProp(const QStringList &tokens, QTcpSocket *socket)
         if (tokens.count () != 3)
         {
             VERBOSE(VB_IMPORTANT, "LCDServer: missing argument for "
-                    "SET_MUSIC_PROP SHUFFLE command: " << flat);
+                    "SET_MUSIC_PROP SHUFFLE command: " + flat);
             sendMessage(socket, "HUH?");
             return;
         }
@@ -702,7 +702,7 @@ void LCDServer::setMusicProp(const QStringList &tokens, QTcpSocket *socket)
         if (!bOk)
         {
             VERBOSE(VB_IMPORTANT, "LCDServer: bad argument for "
-                    "SET_MUSIC_PROP SHUFFLE command: " << tokens[2]);
+                    "SET_MUSIC_PROP SHUFFLE command: " + tokens[2]);
             sendMessage(socket, "HUH?");
             return;
         }
@@ -714,7 +714,7 @@ void LCDServer::setMusicProp(const QStringList &tokens, QTcpSocket *socket)
         if (tokens.count () != 3)
         {
             VERBOSE(VB_IMPORTANT, "LCDServer: missing argument for "
-                    "SET_MUSIC_PROP REPEAT command: " << flat);
+                    "SET_MUSIC_PROP REPEAT command: " + flat);
             sendMessage(socket, "HUH?");
             return;
         }
@@ -723,7 +723,7 @@ void LCDServer::setMusicProp(const QStringList &tokens, QTcpSocket *socket)
         if (!bOk)
         {
             VERBOSE(VB_IMPORTANT, "LCDServer: bad argument for "
-                    "SET_MUSIC_PROP REPEAT command: " << tokens[2]);
+                    "SET_MUSIC_PROP REPEAT command: " + tokens[2]);
             sendMessage(socket, "HUH?");
             return;
         }
@@ -733,7 +733,7 @@ void LCDServer::setMusicProp(const QStringList &tokens, QTcpSocket *socket)
     else
     {
         VERBOSE(VB_IMPORTANT, "LCDServer: bad argument for "
-                "SET_MUSIC_PROP command: " << tokens[1]);
+                "SET_MUSIC_PROP command: " + tokens[1]);
         sendMessage(socket, "HUH?");
         return;
     }
@@ -750,8 +750,8 @@ void LCDServer::setVolumeLevel(const QStringList &tokens, QTcpSocket *socket)
 
     if (tokens.count() != 2)
     {
-        VERBOSE(VB_IMPORTANT, "LCDServer: bad SET_VOLUME_LEVEL command: "
-                << flat);
+        VERBOSE(VB_IMPORTANT, "LCDServer: bad SET_VOLUME_LEVEL command: " +
+                flat);
         sendMessage(socket, "HUH?");
         return;
     }
@@ -761,7 +761,7 @@ void LCDServer::setVolumeLevel(const QStringList &tokens, QTcpSocket *socket)
     if (!bOK)
     {
         VERBOSE(VB_IMPORTANT, "LCDServer: bad float value in "
-                "SET_VOLUME_LEVEL command: " << tokens[1]);
+                "SET_VOLUME_LEVEL command: " + tokens[1]);
         sendMessage(socket, "HUH?");
         return;
     }
@@ -781,7 +781,7 @@ void LCDServer::updateLEDs(const QStringList &tokens, QTcpSocket *socket)
 
     if (tokens.count() != 2)
     {
-        VERBOSE(VB_IMPORTANT, "LCDServer: bad UPDATE_LEDs command: " << flat);
+        VERBOSE(VB_IMPORTANT, "LCDServer: bad UPDATE_LEDs command: " + flat);
         sendMessage(socket, "HUH?");
         return;
     }
@@ -791,7 +791,7 @@ void LCDServer::updateLEDs(const QStringList &tokens, QTcpSocket *socket)
     if (!bOK)
     {
         VERBOSE(VB_IMPORTANT, "LCDServer: bad mask in UPDATE_LEDS "
-                              "command: " << tokens[1]);
+                              "command: " + tokens[1]);
         sendMessage(socket, "HUH?");
         return;
     }

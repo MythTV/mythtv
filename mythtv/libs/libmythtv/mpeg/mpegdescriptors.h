@@ -42,6 +42,14 @@ class DescriptorID
         smoothing_buffer            = 0x10,
         STD                         = 0x11,
         IBP                         = 0x12,
+        carousel_identifier         = 0x13,
+        association_tag             = 0x14,
+        deferred_association_tag    = 0x15,
+        /*  RESERVED                = 0x16, */
+        npt_reference               = 0x17,
+        npt_endpoint                = 0x18,
+        stream_mode                 = 0x19,
+        stream_event                = 0x1A,
         mpeg4_video                 = 0x1B,
         mpeg4_audio                 = 0x1C,
         IOD                         = 0x1D,
@@ -57,7 +65,9 @@ class DescriptorID
         metadata_std                = 0x27,
         avc_video                   = 0x28,
         ipmp                        = 0x29,
-        avc_timing__hrd             = 0x30,
+        avc_timing__hrd             = 0x2A,
+        MPEG2_AAC_audio             = 0x2B,
+        FlexMuxTiming               = 0x2C,
 
         // DVB
         network_name                = 0x40,
@@ -117,15 +127,25 @@ class DescriptorID
         dvb_content_identifier      = 0x76,
         time_slice_fec_identifier   = 0x77,
         ECM_repetition_rate         = 0x78,
+        S2_delivery_system          = 0x79,
+        EAC3                        = 0x7A,
+        DTS                         = 0x7B,
+        AAC                         = 0x7C,
 
         // private
         dvb_uk_channel_list         = 0x83,
 
         // ATSC
         atsc_stuffing               = 0x80,
-        audio_stream                = 0x81,
+        ac3_audio_stream            = 0x81,
+        scte_frame_rate             = 0x82,
+        scte_component_name         = 0x84,
+        atsc_program_identifier     = 0x85,
         caption_service             = 0x86,
         content_advisory            = 0x87,
+        atsc_ca_descriptor          = 0x88,
+        atsc_descriptor_tag         = 0x89,
+        scte_cue_identifier         = 0x90,
 
         // Dish Network
         dish_event_rights           = 0x87,
@@ -141,9 +161,15 @@ class DescriptorID
         service_location            = 0xA1,
         atsc_time_shifted_service   = 0xA2,
         component_name              = 0xA3,
+        atsc_data_service           = 0xA4,
+        atsc_pid_count              = 0xA5,
+        atsc_download               = 0xA6,
+        multiprotocol_encapsulation = 0xA7,
         DCC_departing_request       = 0xA8,
         DCC_arriving_request        = 0xA9,
         DRM_control                 = 0xAA,
+        atsc_genre                  = 0xAB,
+        atsc_private_information    = 0xAD,
         atsc_content_identifier     = 0xB6,
 
         // private premiere.de

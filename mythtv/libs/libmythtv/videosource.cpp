@@ -2568,9 +2568,12 @@ void InputGroup::Load(void)
 #if 0
     VERBOSE(VB_IMPORTANT, QString("Group num: %1 id: %2")
             .arg(groupnum).arg(groupid));
-    for (uint i = 0; i < selected_groupids.size(); i++)
-        cout<<selected_groupids[i]<<" ";
-    cout<<endl;
+    {
+        QString msg;
+        for (uint i = 0; i < selected_groupids.size(); i++)
+            msg += QString("%1 ").arg(selected_groupids[i]);
+        VERBOSE(VB_IMPORTANT, msg);
+    }
 #endif
 
     // add selections to combobox

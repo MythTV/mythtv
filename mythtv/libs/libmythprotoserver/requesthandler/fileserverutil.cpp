@@ -15,11 +15,11 @@
 #include "requesthandler/fileserverutil.h"
 #include "programinfo.h"
 
-QMutex recordingPathLock;
 QMap <QString, QString> recordingPathCache;
 
 QString GetPlaybackURL(ProgramInfo *pginfo, bool storePath)
 {
+    static QMutex recordingPathLock;
     QString result = "";
     QMutexLocker locker(&recordingPathLock);
     QString cacheKey = QString("%1:%2").arg(pginfo->GetChanID())

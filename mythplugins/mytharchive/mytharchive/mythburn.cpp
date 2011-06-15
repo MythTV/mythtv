@@ -1190,12 +1190,13 @@ void BurnMenu::doBurn(int mode)
         QFile::remove(logDir + "/mythburncancel.lck");
 
     QString sArchiveFormat = QString::number(mode);
-    QString sEraseDVDRW = (mode == 2) ? "1" : "0";
-    QString sNativeFormat = (gCoreContext->GetSetting("MythArchiveLastRunType")
-                             .startsWith("Native") ? "1" : "0");
+    bool bEraseDVDRW = (mode == 2);
+    bool bNativeFormat = gCoreContext->GetSetting("MythArchiveLastRunType")
+                             .startsWith("Native");
 
-    commandline = "mytharchivehelper -b " + sArchiveFormat +
-                  " " + sEraseDVDRW  + " " + sNativeFormat;
+    commandline = "mytharchivehelper --burndvd --mediatype " + sArchiveFormat +
+                  (bEraseDVDRW ? " --erasedvdrw" : "") + 
+                  (bNativeFormat ? " --nativeformat" : "") + " --quiet";
     commandline += " > "  + logDir + "/progress.log 2>&1 &";
 
     uint flags = kMSRunBackground | kMSDontBlockInputDevs | 

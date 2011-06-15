@@ -28,6 +28,7 @@
 #include <mythcontext.h>
 #include <audiooutput.h>
 #include <mythverbose.h>
+#include "mythlogging.h"
 
 using namespace std;
 
@@ -371,6 +372,7 @@ void avfDecoder::run()
     if (!inited)
         return;
 
+    threadRegister("avfDecoder");
     AVPacket pkt, tmp_pkt;
     char *s;
     int data_size, dec_len;
@@ -491,6 +493,7 @@ void avfDecoder::run()
     }
 
     deinit();
+    threadDeregister();
 }
 
 MetaIO* avfDecoder::doCreateTagger(void)

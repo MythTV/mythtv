@@ -11,6 +11,7 @@
 #include "programinfo.h"
 #include "remoteutil.h"
 #include "mythevent.h"
+#include "mythlogging.h"
 
 typedef vector<ProgramInfo*> *VPI_ptr;
 static void free_vec(VPI_ptr &v)
@@ -31,7 +32,12 @@ class ProgramInfoLoader : public QRunnable
     ProgramInfoLoader(ProgramInfoCache &c, const bool updateUI)
       : m_cache(c), m_updateUI(updateUI) {}
 
-    void run(void) { m_cache.Load(m_updateUI); }
+    void run(void) 
+    { 
+        threadRegister("ProgramInfoLoader");
+        m_cache.Load(m_updateUI); 
+        threadDeregister();
+    }
 
     ProgramInfoCache &m_cache;
     bool              m_updateUI;

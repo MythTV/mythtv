@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mythmenu name="MAIN">
+    <button>
+        <type>TV</type>
+        <text>MythTV</text>
+        <description></description>
+        <action></action>
+    </button>
+</mythmenu>

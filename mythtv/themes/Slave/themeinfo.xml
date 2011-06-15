@@ -1,0 +1,15 @@
+<themeinfo>
+    <name>Slave</name>
+    <types>
+        <type>Menu</type>
+    </types>
+    <version>
+        <major>1</major>
+        <minor>1</minor>
+    </version>
+    <detail>
+        <thumbnail name="preview">classic-preview.png</thumbnail>
+        <description></description>
+        <errata>N/A</errata>
+    </detail>
+</themeinfo>

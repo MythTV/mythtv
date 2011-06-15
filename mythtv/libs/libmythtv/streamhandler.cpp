@@ -42,17 +42,20 @@ void StreamHandler::AddListener(MPEGStreamData *data,
                                 bool needs_buffering,
                                 QString output_file)
 {
-    VERBOSE(VB_RECORD, LOC + "AddListener("<<data<<") -- begin");
+    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- begin")
+		.arg((uint64_t)data,0,16));
     if (!data)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "AddListener("<<data<<") -- null data");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + 
+		QString("AddListener(0x%1) -- null data")
+		.arg((uint64_t)data,0,16));
         return;
     }
 
     _listener_lock.lock();
 
-    VERBOSE(VB_RECORD, LOC + "AddListener("<<data<<") -- locked");
+    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- locked")
+		.arg((uint64_t)data,0,16));
 
     if (_stream_data_list.empty())
     {
@@ -85,22 +88,26 @@ void StreamHandler::AddListener(MPEGStreamData *data,
 
     Start();
 
-    VERBOSE(VB_RECORD, LOC + "AddListener("<<data<<") -- end");
+    VERBOSE(VB_RECORD, LOC + QString("AddListener(0x%1) -- end")
+		.arg((uint64_t)data,0,16));
 }
 
 void StreamHandler::RemoveListener(MPEGStreamData *data)
 {
-    VERBOSE(VB_RECORD, LOC + "RemoveListener("<<data<<") -- begin");
+    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- begin")
+		.arg((uint64_t)data,0,16));
     if (!data)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "RemoveListener("<<data<<") -- null data");
+                QString("RemoveListener(0x%1) -- null data")
+		.arg((uint64_t)data,0,16));
         return;
     }
 
     _listener_lock.lock();
 
-    VERBOSE(VB_RECORD, LOC + "RemoveListener("<<data<<") -- locked");
+    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- locked")
+		.arg((uint64_t)data,0,16));
 
     StreamDataList::iterator it = _stream_data_list.find(data);
 
@@ -121,7 +128,8 @@ void StreamHandler::RemoveListener(MPEGStreamData *data)
         _listener_lock.unlock();
     }
 
-    VERBOSE(VB_RECORD, LOC + "RemoveListener("<<data<<") -- end");
+    VERBOSE(VB_RECORD, LOC + QString("RemoveListener(0x%1) -- end")
+		.arg((uint64_t)data,0,16));
 }
 
 void StreamHandler::Start(void)

@@ -38,7 +38,7 @@ bool LinuxAVCInfo::Update(uint64_t _guid, raw1394handle_t handle,
 
 bool LinuxAVCInfo::OpenPort(void)
 {
-    VERBOSE(VB_RECORD, LOC + "Getting raw1394 handle for port "<<port);
+    VERBOSE(VB_RECORD, LOC + QString("Getting raw1394 handle for port %1").arg(port));
     fw_handle = raw1394_new_handle_on_port(port);
 
     if (!fw_handle)

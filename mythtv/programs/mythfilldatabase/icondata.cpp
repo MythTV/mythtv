@@ -7,7 +7,6 @@ using namespace std;
 
 // POSIX headers
 #include <unistd.h>
-#include <signal.h>
 
 // Qt headers
 #include <QCoreApplication>

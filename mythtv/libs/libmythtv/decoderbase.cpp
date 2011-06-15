@@ -289,9 +289,9 @@ unsigned long DecoderBase::GetPositionMapSize(void) const
  */
 bool DecoderBase::SyncPositionMap(void)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "Resyncing position map. posmapStarted = "
-            << (int) posmapStarted << " livetv(" << livetv << ") "
-            << "watchingRec(" << watchingrecording << ")");
+    VERBOSE(VB_PLAYBACK, LOC + QString("Resyncing position map. posmapStarted = %1"
+            " livetv(%2) watchingRec(%3)")
+            .arg((int) posmapStarted).arg(livetv).arg(watchingrecording));
 
     if (dontSyncPositionMap)
         return false;
@@ -489,7 +489,6 @@ uint64_t DecoderBase::SavePositionMapDelta(uint64_t first, uint64_t last)
     m_playbackinfo->SavePositionMapDelta(posMap, type);
 
 #if 0
-    cout<<'\n';
     VERBOSE(VB_IMPORTANT, LOC +
             QString("Saving position map [%1,%2] w/%3 keyframes, "
                     "took (%4,%5,%6) ms\n")

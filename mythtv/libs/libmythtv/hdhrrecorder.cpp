@@ -11,6 +11,7 @@
 #include "hdhrrecorder.h"
 #include "hdhrchannel.h"
 #include "tv_rec.h"
+#include "mythverbose.h"
 
 #define LOC QString("HDHRRec(%1): ").arg(tvrec->GetCaptureCardNum())
 #define LOC_WARN QString("HDHRRec(%1), Warning: ") \

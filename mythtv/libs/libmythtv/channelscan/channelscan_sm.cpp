@@ -45,6 +45,7 @@ using namespace std;
 #include "cardutil.h"
 #include "sourceutil.h"
 #include "mythdb.h"
+#include "mythlogging.h"
 
 // MythTV includes - DTV
 #include "dtvsignalmonitor.h"
@@ -67,7 +68,9 @@ using namespace std;
  */
 void ScannerThread::run(void)
 {
+    threadRegister("Scanner");
     m_parent->RunScanner();
+    threadDeregister();
 }
 
 /// SDT's should be sent every 2 seconds and NIT's every
@@ -256,8 +259,8 @@ void ChannelScanSM::HandleAllGood(void)
     {
         int chanid = ChannelUtil::CreateChanID(sourceID, freqid);
 
-        QString callsign = QString("%1%2")
-            .arg(ChannelUtil::GetUnknownCallsign()).arg(freqid);
+        QString callsign = QString("%1-%2")
+            .arg(ChannelUtil::GetUnknownCallsign()).arg(chanid);
 
         ok = ChannelUtil::CreateChannel(
             0      /* mplexid */,
@@ -367,7 +370,7 @@ void ChannelScanSM::HandlePMT(uint, const ProgramMapTable *pmt)
             QString("Got a Program Map Table for %1")
             .arg((*current).FriendlyName) + "\n" + pmt->toString());
 
-    if (!currentTestingDecryption && pmt->IsEncrypted())
+    if (!currentTestingDecryption && pmt->IsEncrypted(GetDTVChannel()->GetSIStandard()))
         currentEncryptionStatus[pmt->ProgramNumber()] = kEncUnknown;
 }
 
@@ -1018,7 +1021,9 @@ static void update_info(ChannelInsertInfo &info,
     {
         callsign = desc->ServiceShortName();
         if (callsign.trimmed().isEmpty())
-            callsign = QString::null;
+            callsign = QString("%1-%2-%3")
+                .arg(ChannelUtil::GetUnknownCallsign()).arg(sdt->TSID())
+                .arg(sdt->ServiceID(i));
 
         service_name = desc->ServiceName();
         if (service_name.trimmed().isEmpty())
@@ -1181,7 +1186,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                 info.is_opencable = true;
         }
 
-        info.is_encrypted |= pmt->IsEncrypted();
+        info.is_encrypted |= pmt->IsEncrypted(GetDTVChannel()->GetSIStandard());
         info.in_pmt = true;
     }
 
@@ -1449,8 +1454,12 @@ void ChannelScanSM::RunScanner(void)
 // See if we have timed out
 bool ChannelScanSM::HasTimedOut(void)
 {
-    if (currentTestingDecryption)
-        return (timer.elapsed() > (int)kDecryptionTimeout);
+    if (currentTestingDecryption &&
+        (timer.elapsed() > (int)kDecryptionTimeout))
+    {
+        currentTestingDecryption = false;
+        return true;
+    }
 
     if (!waitingForTables)
         return true;

@@ -271,14 +271,6 @@ long HTTPRequest::SendResponse( void )
 
     if (( m_eType != RequestTypeHead ) && ( buffer.length() > 0 ))
     {
-#if 0
-        VERBOSE(VB_UPNP, QString("HTTPRequest::SendResponse : DATA : %1 : ")
-                .arg( m_aBuffer.size() ));
-        for (uint i = 0; i < (uint)m_aBuffer.size(); i++)
-            cout << m_aBuffer.data()[i];
-
-        cout << endl;
-#endif
         nBytes += SendData( &m_response, 0, m_response.size() );
     }
 
@@ -309,16 +301,15 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     m_eResponseType     = ResponseTypeOther;
     m_sResponseTypeText = "text/plain";
 
-    /*
-        Dump request header
+#if 0
+    // Dump request header
     for ( QStringMap::iterator it  = m_mapHeaders.begin();
                                it != m_mapHeaders.end();
                              ++it )
     {
-        cout << it.key().toLatin1().constData() << ": "
-             << (*it).toLatin1().constData() << endl;
+        VERBOSE(VB_IMPORTANT, it.key() + ": " + *it);
     }
-    */
+#endif
 
     // ----------------------------------------------------------------------
     // Make it so the header is sent with the data
@@ -1272,7 +1263,10 @@ bool HTTPRequest::ParseRange( QString sRange,
             return false;
     }
 
-    //cout << getSocketHandle() << "Range Requested " << *pllStart << " - " << *pllEnd << endl;
+#if 0
+    VERBOSE(VB_IMPORTANT, QString("%1 Range Requested %2 - %3")
+        .arg(getSocketHandle()) .arg(*pllStart) .arg(*pllEnd));
+#endif
 
     return true;
 }

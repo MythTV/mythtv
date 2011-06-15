@@ -293,8 +293,8 @@ void DVBSignalMonitor::UpdateValues(void)
     // Debug output
     if (wasLocked != isLocked)
     {
-        VERBOSE(VB_CHANNEL, LOC + "UpdateValues -- Signal "
-                <<(isLocked ? "Locked" : "Lost"));
+        VERBOSE(VB_CHANNEL, LOC + "UpdateValues -- Signal " +
+                (isLocked ? "Locked" : "Lost"));
     }
 
     EmitStatus();

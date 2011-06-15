@@ -11,6 +11,7 @@
 #include "mythsystem.h"
 #include "metadatadownload.h"
 #include "util.h"
+#include "mythlogging.h"
 
 QEvent::Type MetadataLookupEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
@@ -61,6 +62,7 @@ void MetadataDownload::cancel()
 void MetadataDownload::run()
 {
     MetadataLookup* lookup;
+    threadRegister("MetadataDownload");
     while ((lookup = moreWork()) != NULL)
     {
         MetadataLookupList list;
@@ -116,6 +118,7 @@ void MetadataDownload::run()
                 new MetadataLookupFailure(list));
         }
     }
+    threadDeregister();
 }
 
 MetadataLookup* MetadataDownload::moreWork()

@@ -11,6 +11,7 @@
 #include "programinfo.h"
 #include "remoteutil.h"
 #include "exitcodes.h"
+#include "mythlogging.h"
 
 #define LOC      QString("MythSystemEventHandler: ")
 #define LOC_ERR  QString("MythSystemEventHandler ERROR: ")
@@ -44,6 +45,7 @@ class SystemEventThread : public QRunnable
      */
     void run()
     {
+        threadRegister("SystemEvent");
         uint flags = kMSDontBlockInputDevs;
 
         m_event.detach();
@@ -59,12 +61,16 @@ class SystemEventThread : public QRunnable
             VERBOSE(VB_IMPORTANT, LOC_WARN + QString("Command '%1' returned %2")
                     .arg(m_command).arg(result));
 
-        if (m_event.isEmpty())
+       if (m_event.isEmpty()) 
+       {
+            threadDeregister();
             return;
+       }
 
         RemoteSendMessage(QString("SYSTEM_EVENT_RESULT %1 SENDER %2 RESULT %3")
                                   .arg(m_event).arg(gCoreContext->GetHostName())
                                   .arg(result));
+        threadDeregister();
     }
 
   private:

@@ -16,6 +16,7 @@
 #include <QCoreApplication>
 #include <QString>
 #include <QRegExp>
+#include <QFileInfo>
 #include <QDir>
 
 #include "exitcodes.h"
@@ -27,6 +28,7 @@
 #include "mythcommandlineparser.h"
 #include "compat.h"
 #include "mythsystemevent.h"
+#include "mythlogging.h"
 
 #define LOC      QString("MythJobQueue: ")
 #define LOC_WARN QString("MythJobQueue, Warning: ")
@@ -36,7 +38,7 @@ using namespace std;
 
 JobQueue *jobqueue = NULL;
 QString   pidfile;
-QString   logfile  = QString::null;
+QString   logfile;
 
 static void cleanup(void)
 {
@@ -48,39 +50,6 @@ static void cleanup(void)
         unlink(pidfile.toAscii().constData());
         pidfile.clear();
     }
-
-    signal(SIGHUP, SIG_DFL);
-}
-
-static int log_rotate(int report_error)
-{
-    int new_logfd = open(logfile.toLocal8Bit().constData(),
-                         O_WRONLY|O_CREAT|O_APPEND|O_SYNC, 0664);
-    if (new_logfd < 0)
-    {
-        // If we can't open the new logfile, send data to /dev/null
-        if (report_error)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Cannot open logfile '%1'").arg(logfile));
-            return -1;
-        }
-        new_logfd = open("/dev/null", O_WRONLY);
-        if (new_logfd < 0)
-        {
-            // There's not much we can do, so punt.
-            return -1;
-        }
-    }
-    while (dup2(new_logfd, 1) < 0 && errno == EINTR) ;
-    while (dup2(new_logfd, 2) < 0 && errno == EINTR) ;
-    while (close(new_logfd) < 0 && errno == EINTR) ;
-    return 0;
-}
-
-static void log_rotate_handler(int)
-{
-    log_rotate(0);
 }
 
 namespace
@@ -106,163 +75,62 @@ namespace
 
 int main(int argc, char *argv[])
 {
-    bool cmdline_err;
-    MythCommandLineParser cmdline(
-        kCLPOverrideSettingsFile |
-        kCLPOverrideSettings     |
-        kCLPQueryVersion);
+    int quiet = 0;
 
-    for (int argpos = 0; argpos < argc; ++argpos)
+    MythJobQueueCommandLineParser cmdline;
+    if (!cmdline.Parse(argc, argv))
     {
-        if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
-        {
-            if (cmdline_err)
-                return GENERIC_EXIT_INVALID_CMDLINE;
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
 
-            if (cmdline.WantsToExit())
-                return GENERIC_EXIT_OK;
-        }
+    if (cmdline.toBool("showhelp"))
+    {
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_OK;
+    }
+
+    if (cmdline.toBool("showversion"))
+    {
+        cmdline.PrintVersion();
+        return GENERIC_EXIT_OK;
     }
 
     QCoreApplication a(argc, argv);
-    QMap<QString, QString> settingsOverride;
-    int argpos = 1;
+    QMap<QString, QString> settingsOverride = cmdline.GetSettingsOverride();
     bool daemonize = false;
 
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHJOBQUEUE);
 
     QString filename;
 
-    while (argpos < a.argc())
+    if (cmdline.toBool("verbose"))
+        if (parse_verbose_arg(cmdline.toString("verbose")) ==
+                GENERIC_EXIT_INVALID_CMDLINE)
+            return GENERIC_EXIT_INVALID_CMDLINE;
+
+    if (cmdline.toBool("quiet"))
     {
-        if (!strcmp(a.argv()[argpos],"-v") ||
-            !strcmp(a.argv()[argpos],"--verbose"))
+        quiet = cmdline.toUInt("quiet");
+        if (quiet > 1)
         {
-            if (a.argc()-1 > argpos)
-            {
-                if (parse_verbose_arg(a.argv()[argpos+1]) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-
-                ++argpos;
-            } else
-            {
-                cerr << "Missing argument to -v/--verbose option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
+            print_verbose_messages = VB_NONE;
+            parse_verbose_arg("none");
         }
-        else if (!strcmp(a.argv()[argpos],"-l") ||
-                 !strcmp(a.argv()[argpos],"--logfile"))
-        {
-            if (a.argc() > argpos)
-            {
-                logfile = a.argv()[argpos+1];
-                if (logfile.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to -l/--logfile option\n";
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-                else
-                {
-                    ++argpos;
-                }
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-p") ||
-                 !strcmp(a.argv()[argpos],"--pidfile"))
-        {
-            if (a.argc() > argpos)
-            {
-                pidfile = a.argv()[argpos+1];
-                if (pidfile.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to -p/--pidfile option\n";
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-                else
-                {
-                   ++argpos;
-                }
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-d") ||
-                 !strcmp(a.argv()[argpos],"--daemon"))
-        {
-            daemonize = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"-O") ||
-                 !strcmp(a.argv()[argpos],"--override-setting"))
-        {
-            if ((a.argc() - 1) > argpos)
-            {
-                QString tmpArg = a.argv()[argpos+1];
-                if (tmpArg.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to "
-                            "-O/--override-setting option\n";
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-
-                QStringList pairs = tmpArg.split(",");
-                for (int index = 0; index < pairs.size(); ++index)
-                {
-                    QStringList tokens = pairs[index].split("=");
-                    tokens[0].replace(QRegExp("^[\"']"), "");
-                    tokens[0].replace(QRegExp("[\"']$"), "");
-                    tokens[1].replace(QRegExp("^[\"']"), "");
-                    tokens[1].replace(QRegExp("[\"']$"), "");
-                    settingsOverride[tokens[0]] = tokens[1];
-                }
-            }
-            else
-            {
-                cerr << "Invalid or missing argument to -O/--override-setting "
-                        "option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            ++argpos;
-        }
-        else if (!strcmp(a.argv()[argpos],"-h") ||
-                 !strcmp(a.argv()[argpos],"--help"))
-        {
-            cerr << "Valid Options are:" << endl <<
-                    "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
-                    "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
-                    "-p or --pidfile filename       Write PID of mythjobqueue to filename " << endl <<
-                    "-d or --daemon                 Runs mythjobqueue as a daemon" << endl <<
-                    endl;
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
-        else if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
-        {
-            if (cmdline_err)
-                return GENERIC_EXIT_INVALID_CMDLINE;
-
-            if (cmdline.WantsToExit())
-                return GENERIC_EXIT_OK;
-        }
-        else
-        {
-            printf("illegal option: '%s' (use --help)\n", a.argv()[argpos]);
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
-
-        ++argpos;
     }
 
-    if (!logfile.isEmpty())
-    {
-        if (log_rotate(1) < 0)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_WARN +
-                    "Cannot open logfile; using stdout/stderr instead");
-        }
-        else
-            signal(SIGHUP, &log_rotate_handler);
-    }
+    int facility = cmdline.GetSyslogFacility();
+    bool dblog = !cmdline.toBool("nodblog");
+
+    if (cmdline.toBool("pidfile"))
+        pidfile = cmdline.toString("pidfile");
+    if (cmdline.toBool("daemon"))
+        daemonize = true;
 
     CleanupGuard callCleanup(cleanup);
+
+    logfile = cmdline.GetLogFilePath();
+    logStart(logfile, quiet, facility, dblog);
 
     ofstream pidfs;
     if (pidfile.size())

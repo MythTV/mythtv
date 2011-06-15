@@ -281,6 +281,11 @@ long long DVDRingBuffer::Seek(long long time)
     return m_currentpos;
 }
 
+bool DVDRingBuffer::IsBookmarkAllowed(void)
+{
+    return GetTotalTimeOfTitle() >= 120;
+}
+
 void DVDRingBuffer::GetDescForPos(QString &desc)
 {
     if (m_inMenu)
@@ -362,7 +367,7 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
                             .arg(i).arg(m_chapterMap.value(i).size())
                             .arg(duration));
 
-                if (duration > 5)
+                if (duration > 60)
                     break;
             }
         }
@@ -387,6 +392,16 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
     VERBOSE(VB_GENERAL, LOC + QString("Starting with title %1").arg(start_title));
     dvdnav_title_play(m_dvdnav, start_title);
+
+    // Check we aren't starting in a still frame (which will probably fail as
+    // ffmpeg will be unable to create a decoder)
+    if (dvdnav_get_next_still_flag(m_dvdnav))
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "The selected title is a still frame. "
+            "Playback is likely to fail - please raise a bug report at "
+            "http://code.mythtv.org/trac");
+    }
+
     dvdnav_current_title_info(m_dvdnav, &m_title, &m_part);
     dvdnav_get_title_string(m_dvdnav, &m_dvdname);
     dvdnav_get_serial_string(m_dvdnav, &m_serialnumber);

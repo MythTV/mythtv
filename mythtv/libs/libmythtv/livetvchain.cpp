@@ -459,7 +459,7 @@ void LiveTVChain::SwitchTo(int num)
 {
     QMutexLocker lock(&m_lock);
 
-    VERBOSE(VB_PLAYBACK, LOC + "SwitchTo("<<num<<")");
+    VERBOSE(VB_PLAYBACK, LOC + QString("SwitchTo(%1)").arg(num));
 
     int size = m_chain.count();
     if ((num < 0) || (num >= size))
@@ -479,7 +479,7 @@ void LiveTVChain::SwitchTo(int num)
         GetEntryAt(num, e);
         QString msg = QString("%1_%2")
             .arg(e.chanid).arg(e.starttime.toString("yyyyMMddhhmmss"));
-        VERBOSE(VB_PLAYBACK, LOC + "Entry@"<<num<<": '"<<msg<<"'");
+        VERBOSE(VB_PLAYBACK, LOC + QString("Entry@%1: '%2')").arg(num).arg(msg));
     }
 }
 

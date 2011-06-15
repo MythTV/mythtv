@@ -32,6 +32,7 @@ RecordingRule::RecordingRule()
     m_dupMethod(static_cast<RecordingDupMethodType>(
                 gCoreContext->GetNumSetting("prefDupMethod", kDupCheckSubDesc))),
     m_dupIn(kDupsInAll),
+    m_filter(GetDefaultFilter()),
     m_recProfile(QObject::tr("Default")),
     m_recGroup("Default"),
     m_storageGroup("Default"),
@@ -73,7 +74,7 @@ bool RecordingRule::Load()
     "parentid, title, subtitle, description, category, "
     "starttime, startdate, endtime, enddate, seriesid, programid, "
     "chanid, station, findday, findtime, findid, "
-    "next_record, last_record, last_delete, avg_delay "
+    "next_record, last_record, last_delete, avg_delay, filter "
     "FROM record WHERE recordid = :RECORDID ;");
 
     query.bindValue(":RECORDID", m_recordID);
@@ -96,6 +97,7 @@ bool RecordingRule::Load()
         m_dupMethod = static_cast<RecordingDupMethodType>
                                                 (query.value(6).toInt());
         m_dupIn = static_cast<RecordingDupInType>(query.value(7).toInt());
+        m_filter = query.value(43).toUInt();
         m_isInactive = query.value(8).toBool();
         // Storage
         m_recProfile = query.value(9).toString();
@@ -289,6 +291,7 @@ bool RecordingRule::Save(bool sendSig)
                     "recpriority = :RECPRIORITY, prefinput = :INPUT, "
                     "startoffset = :STARTOFFSET, endoffset = :ENDOFFSET, "
                     "dupmethod = :DUPMETHOD, dupin = :DUPIN, "
+                    "filter = :FILTER, "
                     "inactive = :INACTIVE, profile = :RECPROFILE, "
                     "recgroup = :RECGROUP, storagegroup = :STORAGEGROUP, "
                     "playgroup = :PLAYGROUP, autoexpire = :AUTOEXPIRE, "
@@ -327,6 +330,7 @@ bool RecordingRule::Save(bool sendSig)
     query.bindValue(":ENDOFFSET", m_endOffset);
     query.bindValue(":DUPMETHOD", m_dupMethod);
     query.bindValue(":DUPIN", m_dupIn);
+    query.bindValue(":FILTER", m_filter);
     query.bindValue(":INACTIVE", m_isInactive);
     query.bindValue(":RECPROFILE", m_recProfile);
     query.bindValue(":RECGROUP", m_recGroup);
@@ -587,3 +591,20 @@ void RecordingRule::AssignProgramInfo()
     }
     m_category = m_progInfo->GetCategory();
 }
+
+unsigned RecordingRule::GetDefaultFilter(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT SUM(1 << filterid) FROM recordfilter "
+                  "WHERE filterid >= 0 AND filterid < :NUMFILTERS AND "
+                  "      TRIM(clause) <> '' AND newruledefault <> 0");
+    query.bindValue(":NUMFILTERS", RecordingRule::kNumFilters);
+    if (!query.exec())
+    {
+        MythDB::DBError("GetDefaultFilter", query);
+        return 0;
+    }
+    query.next();
+    return query.value(0).toUInt();
+}
+

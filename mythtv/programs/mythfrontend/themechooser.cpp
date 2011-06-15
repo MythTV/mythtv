@@ -17,6 +17,7 @@
 #include "mythsystemevent.h"
 #include "util.h"
 #include "mythversion.h"
+#include "mythlogging.h"
 
 // LibMythUI headers
 #include "mythmainwindow.h"
@@ -49,11 +50,13 @@ class ThemeExtractThread : public QRunnable
 
     void run()
     {
+        threadRegister("ThemeExtract");
         extractZIP(m_srcFile, m_destDir);
 
         MythEvent *me =
              new MythEvent("THEME_INSTALLED", QStringList(m_srcFile));
         QCoreApplication::postEvent(m_parent, me);
+        threadDeregister();
     }
 
   private:

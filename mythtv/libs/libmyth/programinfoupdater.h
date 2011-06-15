@@ -13,6 +13,7 @@ using namespace std;
 #include <QDateTime>
 #include <QMutex>
 #include <QHash>
+#include <QWaitCondition>
 
 typedef enum PIAction {
     kPIAdd,
@@ -57,7 +58,7 @@ class PIKeyData
 class ProgramInfoUpdater : public QRunnable
 {
   public:
-    ProgramInfoUpdater() : isQueued(false) { setAutoDelete(false); }
+    ProgramInfoUpdater() : isRunning(false) { setAutoDelete(false); }
 
     void insert(uint     chanid, const QDateTime &recstartts,
                 PIAction action, uint64_t         filesize = 0ULL);
@@ -65,7 +66,8 @@ class ProgramInfoUpdater : public QRunnable
 
   private:
     QMutex        lock;
-    bool          isQueued;
+    QWaitCondition moreWork; 
+    bool          isRunning;
     vector<PIKeyAction>    needsAddDelete;
     QHash<PIKey,PIKeyData> needsUpdate;
 };

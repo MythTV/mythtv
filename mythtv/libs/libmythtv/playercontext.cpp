@@ -16,6 +16,7 @@
 #include "storagegroup.h"
 #include "mythcorecontext.h"
 #include "videometadatautil.h"
+#include "mythlogging.h"
 
 #define LOC QString("playCtx: ")
 #define LOC_ERR QString("playCtx, Error: ")
@@ -43,9 +44,7 @@ PlayerContext::PlayerContext(const QString &inUseID) :
     stateLock(QMutex::Recursive),
     // pip
     pipState(kPIPOff), pipRect(0,0,0,0), parentWidget(NULL), pipLocation(0),
-    useNullVideo(false),
-    // embedding
-    embedWinID(0), embedBounds(0,0,0,0)
+    useNullVideo(false)
 {
     lastSignalMsgTime.start();
     lastSignalMsgTime.addMSecs(-2 * kSMExitTimeout);
@@ -206,7 +205,7 @@ bool PlayerContext::StartPIPPlayer(TV *tv, TVState desiredState)
     {
         const QRect rect = QRect(pipRect);
         ok = CreatePlayer(tv, parentWidget, desiredState,
-                          parentWidget->winId(), &rect);
+                          true, rect);
     }
 
     if (useNullVideo || !ok)
@@ -214,7 +213,7 @@ bool PlayerContext::StartPIPPlayer(TV *tv, TVState desiredState)
         SetPlayer(NULL);
         useNullVideo = true;
         ok = CreatePlayer(tv, NULL, desiredState,
-                          0, NULL);
+                          false);
     }
 
     return ok;
@@ -269,21 +268,15 @@ void PlayerContext::ResizePIPWindow(const QRect &rect)
 
 bool PlayerContext::StartEmbedding(WId wid, const QRect &embedRect)
 {
-    embedWinID = 0;
-
+    bool ret = false;
     LockDeletePlayer(__FILE__, __LINE__);
     if (player)
     {
-        embedWinID = wid;
-        embedBounds = embedRect;
-        player->EmbedInWidget(
-            embedRect.topLeft().x(), embedRect.topLeft().y(),
-            embedRect.width(),       embedRect.height(),
-            embedWinID);
+        ret = true;
+        player->EmbedInWidget(embedRect);
     }
     UnlockDeletePlayer(__FILE__, __LINE__);
-
-    return embedWinID;
+    return ret;
 }
 
 bool PlayerContext::IsEmbedding(void) const
@@ -298,8 +291,6 @@ bool PlayerContext::IsEmbedding(void) const
 
 void PlayerContext::StopEmbedding(void)
 {
-    embedWinID = 0;
-
     LockDeletePlayer(__FILE__, __LINE__);
     if (player)
         player->StopEmbedding();
@@ -381,7 +372,7 @@ bool PlayerContext::IsRecorderErrored(void) const
 
 bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
                                  TVState desiredState,
-                                 WId embedwinid, const QRect *embedbounds,
+                                 bool embed, const QRect &embedbounds,
                                  bool muted)
 {
     int exact_seeking = gCoreContext->GetNumSetting("ExactSeeking", 0);
@@ -430,12 +421,8 @@ bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
             player->GetSubReader()->LoadExternalSubtitles(subfn);
     }
 
-    if ((embedwinid > 0) && embedbounds)
-    {
-        player->EmbedInWidget(
-            embedbounds->x(), embedbounds->y(),
-            embedbounds->width(), embedbounds->height(), embedwinid);
-    }
+    if (embed && !embedbounds.isNull())
+        player->EmbedInWidget(embedbounds);
 
     bool isWatchingRecording = (desiredState == kState_WatchingRecording);
     player->SetWatchingRecording(isWatchingRecording);
@@ -479,8 +466,8 @@ bool PlayerContext::StartPlaying(int maxWait)
 
     if (player->IsPlaying())
     {
-        VERBOSE(VB_PLAYBACK, LOC + "StartPlaying(): took "<<t.elapsed()
-                <<" ms to start player.");
+        VERBOSE(VB_PLAYBACK, LOC + QString("StartPlaying(): took %1"
+                " ms to start player.").arg(t.elapsed()));
         return true;
     }
     else

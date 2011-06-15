@@ -325,11 +325,9 @@ bool MythCDROMLinux::checkOK()
 // Helper function, perform a sanity check on the device
 MythMediaError MythCDROMLinux::testMedia()
 {
-    //cout << "MythCDROMLinux::testMedia - ";
     bool OpenedHere = false;
     if (!isDeviceOpen())
     {
-        //cout << "Device is not open - ";
         if (!openDevice())
         {
             VERBOSE(VB_MEDIA+VB_EXTRA, LOC + ":testMedia - failed to open '"

@@ -199,8 +199,8 @@ void SelectSetting::setValue(int which)
 {
     if ((which >= ((int) values.size())) || (which < 0))
     {
-        VERBOSE(VB_IMPORTANT, "SelectSetting::setValue(): "
-                "invalid index: " << which << " size: "<<values.size());
+        VERBOSE(VB_IMPORTANT, QString("SelectSetting::setValue(): "
+                "invalid index: %1 size: ").arg(which).arg(values.size()));
     }
     else
     {

@@ -16,6 +16,7 @@ using namespace std;
 #include "remoteutil.h"
 #include "mythevent.h"
 #include "mythdirs.h"
+#include "mythlogging.h"
 
 #define LOC      QString("PlaybackBoxHelper: ")
 #define LOC_WARN QString("PlaybackBoxHelper Warning: ")
@@ -517,10 +518,12 @@ void PlaybackBoxHelper::UndeleteRecording(
 
 void PlaybackBoxHelper::run(void)
 {
+    threadRegister("PlaybackBoxHelper");
     m_eventHandler = new PBHEventHandler(*this);
     // Prime the pump so the disk free display starts updating
     ForceFreeSpaceUpdate();
     exec();
+    threadDeregister();
 }
 
 void PlaybackBoxHelper::UpdateFreeSpace(void)

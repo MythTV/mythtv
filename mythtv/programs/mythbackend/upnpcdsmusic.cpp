@@ -55,8 +55,9 @@ UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] =
             "ORDER BY name",
         "", "name" },
 
-/*
-This is currently broken... need to handle list of items with single parent (like 'All Music')
+#if 0
+// This is currently broken... need to handle list of items with single parent
+// (like 'All Music')
 
     {   "Recently Added",
         "*",
@@ -67,7 +68,8 @@ This is currently broken... need to handle list of items with single parent (lik
             "%1 "
             "ORDER BY name",
         "WHERE (DATEDIFF( CURDATE(), date_modified ) <= 30 ) ", "" },
-*/
+#endif
+
     {   "By Album",
         "song.album_id",
         "SELECT a.album_id as id, "
@@ -78,8 +80,8 @@ This is currently broken... need to handle list of items with single parent (lik
             "GROUP BY a.album_id "
             "ORDER BY a.album_name",
         "WHERE song.album_id=:KEY", "album.album_name" },
-/*
 
+#if 0
     {   "By Artist",
         "artist_id",
         "SELECT a.artist_id as id, "
@@ -90,8 +92,7 @@ This is currently broken... need to handle list of items with single parent (lik
             "GROUP BY a.artist_id "
             "ORDER BY a.artist_name",
         "WHERE song.artist_id=:KEY", "" },
-*/
-/*
+
 {   "By Genre",
         "genre_id",
         "SELECT g.genre_id as id, "
@@ -102,8 +103,8 @@ This is currently broken... need to handle list of items with single parent (lik
             "GROUP BY g.genre_id "
             "ORDER BY g.genre",
         "WHERE song.genre_id=:KEY", "" },
+#endif
 
-*/
 };
 
 int UPnpCDSMusic::g_nRootCount = sizeof( g_RootNodes ) / sizeof( UPnpCDSRootInfo );
@@ -268,7 +269,7 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
     QString        sFileName    = query.value( 8).toString();
     uint           nLength      = query.value( 9).toInt();
 
-/*
+#if 0
     if ((nNodeIdx == 0) || (nNodeIdx == 1))
     {
         sName = QString( "%1-%2:%3" )
@@ -277,21 +278,21 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
                    .arg( sTitle );
     }
     else
-*/
+#endif
         sName = sTitle;
-
-//cout << nId << " " << sName << endl;
 
 
     // ----------------------------------------------------------------------
     // Cache Host ip Address & Port
     // ----------------------------------------------------------------------
 
-//    if (!m_mapBackendIp.contains( sHostName ))
-//        m_mapBackendIp[ sHostName ] = gCoreContext->GetSettingOnHost( "BackendServerIp", sHostName);
-//
-//    if (!m_mapBackendPort.contains( sHostName ))
-//        m_mapBackendPort[ sHostName ] = gCoreContext->GetSettingOnHost("BackendStatusPort", sHostName);
+#if 0
+    if (!m_mapBackendIp.contains( sHostName ))
+        m_mapBackendIp[ sHostName ] = gCoreContext->GetSettingOnHost( "BackendServerIp", sHostName);
+
+    if (!m_mapBackendPort.contains( sHostName ))
+        m_mapBackendPort[ sHostName ] = gCoreContext->GetSettingOnHost("BackendStatusPort", sHostName);
+#endif
 
     QString sServerIp = gCoreContext->GetSetting( "BackendServerIp"   );
     QString sPort     = gCoreContext->GetSetting( "BackendStatusPort" );
@@ -333,10 +334,9 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
 
     pItem->SetPropValue( "artist"               ,  sArtist    );
     pItem->SetPropValue( "album"                ,  sAlbum     );
-    pItem->SetPropValue( "originalTrackNumber"  ,  QString::number( nTrackNum  ));
+    pItem->SetPropValue( "originalTrackNumber"  ,  QString::number(nTrackNum));
 
-/*
-
+#if 0
     pObject->AddProperty( new Property( "publisher"       , "dc"   ));
     pObject->AddProperty( new Property( "language"        , "dc"   ));
     pObject->AddProperty( new Property( "relation"        , "dc"   ));
@@ -347,9 +347,7 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
     pObject->AddProperty( new Property( "storageMedium"       , "upnp" ));
     pObject->AddProperty( new Property( "contributor"         , "dc"   ));
     pObject->AddProperty( new Property( "date"                , "dc"   ));
-
-*/
-
+#endif
 
     pResults->Add( pItem );
 

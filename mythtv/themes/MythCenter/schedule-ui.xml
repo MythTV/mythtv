@@ -1784,12 +1784,18 @@
             <helptext></helptext>
         </buttonlist>
 
+        <button name="filters" from="basewidebutton">
+            <position>135,480</position>
+            <value>Schedule filters</value>
+            <helptext></helptext>
+        </button>
+
         <checkbox name="ruleactive" from="basecheckbox">
-            <position>215,480</position>
+            <position>455,486</position>
         </checkbox>
 
         <textarea name="ruleactivelabel" from="basetextarea">
-            <area>260,487,300,30</area>
+            <area>490,490,300,30</area>
             <value>Recording Rule Active</value>
         </textarea>
 
@@ -1797,6 +1803,84 @@
             <position>40,525</position>
             <value>Back</value>
         </button>
+    </window>
+
+    <window name="schedulefiltereditor">
+
+        <shape name="details_background" from="basebackground">
+            <area>25,25,750,175</area>
+        </shape>
+
+        <textarea name="title" from="basetextarea">
+            <area>50,35,700,45</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="timedate" from="basetextarea">
+            <area>50,170,440,27</area>
+        </textarea>
+
+        <textarea name="channel" from="basetextarea">
+            <area>550,170,200,35</area>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="description" from="basetextarea">
+            <area>50,70,700,100</area>
+            <multiline>yes</multiline>
+            <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
+        </textarea>
+
+	<buttonlist name="filters" from="basebuttonlist">
+	    <area>200,210,400,290</area>
+	    <layout>vertical</layout>
+	    <spacing>0</spacing>
+	    <scrollstyle>free</scrollstyle>
+	    <wrapstyle>items</wrapstyle>
+	    <buttonarea>5,5,390,280</buttonarea>
+	    <statetype name="buttonitem">
+		<state name="active">
+		    <area>0,0,370,40</area>
+		    <textarea name="buttontext">
+			<area>50,5,-5,30</area>
+		    </textarea>
+		    <statetype name="buttoncheck">
+			<position>5,10</position>
+			<state type="off">
+			    <imagetype name="checkoff">
+				<filename>lb-check-empty.png</filename>
+			    </imagetype>
+			</state>
+			<state type="half">
+			    <imagetype name="checkhalf">
+				<filename>lb-check-half.png</filename>
+			    </imagetype>
+			</state>
+			<state type="full">
+			    <imagetype name="checkfull">
+				<filename>lb-check-full.png</filename>
+			    </imagetype>
+			</state>
+		    </statetype>
+		</state>
+		<state name="selectedactive" from="active">
+		    <shape name="background" from="baseselectedwidgetshape" />
+		</state>
+		<state name="selectedinactive" from="active" />
+	    </statetype>
+            <statetype name="upscrollarrow">
+                <position>380,5</position>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>380,267</position>
+            </statetype>
+	</buttonlist>
+
+        <button name="back" from="basebutton">
+            <position>40,525</position>
+            <value>Back</value>
+        </button>
+
     </window>
 
     <window name="storageoptionseditor">

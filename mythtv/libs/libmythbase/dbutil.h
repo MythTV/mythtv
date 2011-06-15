@@ -44,6 +44,7 @@ class MBASE_PUBLIC DBUtil
     static bool IsNewDatabase(void);
     static bool IsBackupInProgress(void);
     static int  CountClients(void);
+    static bool TableExists(const QString &table);
 
     static bool lockSchema(MSqlQuery &);
     static void unlockSchema(MSqlQuery &);

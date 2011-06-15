@@ -33,7 +33,7 @@ COMMAND LINE PARAMETERS
 -t or --messagetime time      Maximum length of time to show the startup message 
                               (default 30 seconds) 
 
--l or --logfile filename      Writes STDERR and STDOUT messages to filename
+-l or --logpath path          Writes STDERR and STDOUT messages to path
 
 -v or --verbose debug-level   Prints more information
                               Accepts any combination (separated by comma) 

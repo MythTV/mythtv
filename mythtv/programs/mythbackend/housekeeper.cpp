@@ -30,6 +30,21 @@ using namespace std;
 #include "mythcoreutil.h"
 #include "mythdownloadmanager.h"
 #include "mythversion.h"
+#include "mythlogging.h"
+
+void HouseKeepingThread::run(void)
+{
+    threadRegister("HouseKeeping");
+    m_parent->RunHouseKeeping();
+    threadDeregister();
+}
+
+void MythFillDatabaseThread::run(void)
+{
+    threadRegister("MythFillDB");
+    m_parent->RunMFD();
+    threadDeregister();
+}
 
 HouseKeeper::HouseKeeper(bool runthread, bool master, Scheduler *lsched) :
     isMaster(master),           sched(lsched),
@@ -206,23 +221,17 @@ void HouseKeeper::RunHouseKeeping(void)
     {
         locker.unlock();
 
-        gCoreContext->LogEntry("mythbackend", LP_DEBUG,
-                           "Running housekeeping thread", "");
+        VERBOSE(VB_GENERAL, "Running housekeeping thread");
 
         // These tasks are only done from the master backend
         if (isMaster)
         {
-            // Clean out old database entries
-            if (gCoreContext->GetNumSetting("LogEnabled", 0) &&
-                gCoreContext->GetNumSetting("LogCleanEnabled", 0))
+            // Clean out old database logging entries
+            if (wantToRun("LogClean", 1, 0, 24))
             {
-                period = gCoreContext->GetNumSetting("LogCleanPeriod",1);
-                if (wantToRun("LogClean", period, 0, 24))
-                {
-                    VERBOSE(VB_GENERAL, "Running LogClean");
-                    flushLogs();
-                    updateLastrun("LogClean");
-                }
+                VERBOSE(VB_GENERAL, "Running LogClean");
+                flushDBLogs();
+                updateLastrun("LogClean");
             }
 
             // Run mythfilldatabase to grab the TV listings
@@ -286,9 +295,7 @@ void HouseKeeper::RunHouseKeeping(void)
 
                     if (runMythFill)
                     {
-                        QString msg = "Running mythfilldatabase";
-                        gCoreContext->LogEntry("mythbackend", LP_DEBUG, msg, "");
-                        VERBOSE(VB_GENERAL, msg);
+                        VERBOSE(VB_GENERAL, "Running mythfilldatabase");
                         StartMFD();
                         updateLastrun("MythFillDB");
                     }
@@ -332,31 +339,65 @@ void HouseKeeper::RunHouseKeeping(void)
     }
 }
 
-void HouseKeeper::flushLogs()
+void HouseKeeper::flushDBLogs()
 {
-    int numdays = gCoreContext->GetNumSetting("LogCleanDays", 14);
-    int maxdays = gCoreContext->GetNumSetting("LogCleanMax", 30);
+    int numdays = 14;
+    uint64_t maxrows = 10000 * numdays;  // likely high enough to keep numdays
 
-    QDateTime days = QDateTime::currentDateTime();
-    days = days.addDays(0 - numdays);
-    QDateTime max = QDateTime::currentDateTime();
-    max = max.addDays(0 - maxdays);
-
-    MSqlQuery result(MSqlQuery::InitCon());
-    if (result.isConnected())
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (query.isConnected())
     {
-        result.prepare("DELETE FROM mythlog WHERE "
-                       "acknowledged=1 and logdate < :DAYS ;");
-        result.bindValue(":DAYS", days);
-        if (!result.exec())
-            MythDB::DBError("HouseKeeper::flushLogs -- delete acknowledged",
-                            result);
+        // Remove less-important logging after 1/2 * numdays days
+        QDateTime days = QDateTime::currentDateTime();
+        days = days.addDays(0 - (numdays / 2));
+        QString sql = "DELETE FROM logging "
+                      " WHERE application NOT IN (:MYTHBACKEND, :MYTHFRONTEND) "
+                      "   AND msgtime < :DAYS ;";
+        query.prepare(sql);
+        query.bindValue(":MYTHBACKEND", MYTH_APPNAME_MYTHBACKEND);
+        query.bindValue(":MYTHFRONTEND", MYTH_APPNAME_MYTHFRONTEND);
+        query.bindValue(":DAYS", days);
+        VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting helper application "
+                "database log entries from before %1.").arg(days.toString()));
+        if (!query.exec())
+            MythDB::DBError("Delete helper application log entries", query);
 
-        result.prepare("DELETE FROM mythlog WHERE logdate< :MAX ;");
-        result.bindValue(":MAX", max);
-        if (!result.exec())
-            MythDB::DBError("HouseKeeper::flushLogs -- delete old",
-                            result);
+        // Remove backend/frontend logging after numdays days
+        days = QDateTime::currentDateTime();
+        days = days.addDays(0 - numdays);
+        sql = "DELETE FROM logging WHERE msgtime < :DAYS ;";
+        query.prepare(sql);
+        query.bindValue(":DAYS", days);
+        VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting database log entries "
+                                     "from before %1.").arg(days.toString()));
+        if (!query.exec())
+            MythDB::DBError("Delete old log entries", query);
+
+        sql = "SELECT COUNT(id) FROM logging;";
+        query.prepare(sql);
+        if (query.exec())
+        {
+            uint64_t totalrows = 0;
+            while (query.next())
+            {
+                totalrows = query.value(0).toLongLong();
+                VERBOSE(VB_GENERAL|VB_EXTRA, QString("Database has %1 log "
+                                             "entries.").arg(totalrows));
+            }
+            if (totalrows > maxrows)
+            {
+                sql = "DELETE FROM logging ORDER BY msgtime LIMIT :ROWS;";
+                query.prepare(sql);
+                quint64 extrarows = totalrows - maxrows;
+                query.bindValue(":ROWS", extrarows);
+                VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting oldest %1 "
+                        "database log entries.").arg(extrarows));
+                if (!query.exec())
+                    MythDB::DBError("Delete excess log entries", query);
+            }
+        }
+        else
+            MythDB::DBError("Query logging table size", query);
     }
 }
 

@@ -37,6 +37,7 @@ using namespace std;
 #include <mythcontext.h>
 #include <util.h>
 #include <mythuihelper.h>
+#include "mythlogging.h"
 
 // MythGallery headers
 #include "config.h"
@@ -626,7 +627,7 @@ void GLSingleView::Load(void)
     ThumbItem *item = m_itemList.at(m_pos);
     if (!item)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "No item at "<<m_pos);
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("No item at %1").arg(m_pos));
         return;
     }
 
@@ -1532,10 +1533,11 @@ void KenBurnsImageLoader::Initialize(int pos)
 
 void KenBurnsImageLoader::run() 
 {
+    threadRegister("KenBurnsImageLoader");
     ThumbItem *item = m_itemList.at(m_pos);
     if (!item)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "No item at "<<m_pos);
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("No item at %1").arg(m_pos));
         return;
     }
     QImage image(item->GetPath());
@@ -1544,5 +1546,5 @@ void KenBurnsImageLoader::run()
     
     m_singleView->LoadImage(QGLWidget::convertToGLFormat(image.scaled(m_texSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation)), image.size());   
     m_singleView->Ready();
-
+    threadDeregister();
 }

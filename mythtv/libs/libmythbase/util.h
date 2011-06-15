@@ -52,6 +52,9 @@ class QFile;
  MBASE_PUBLIC  void sendPlaybackStart();
  MBASE_PUBLIC  void sendPlaybackEnd();
 
+ MBASE_PUBLIC  void wrapList(QStringList &list, int width);
+
+
 inline float clamp(float val, float minimum, float maximum)
 {
     return min(max(val, minimum), maximum);

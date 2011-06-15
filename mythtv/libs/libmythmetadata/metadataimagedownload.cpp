@@ -18,6 +18,7 @@
 #include "metadataimagedownload.h"
 #include "remotefile.h"
 #include "mythdownloadmanager.h"
+#include "mythlogging.h"
 
 QEvent::Type ImageDLEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
@@ -73,6 +74,7 @@ void MetadataImageDownload::run()
 {
     // Always handle thumbnails first, they're higher priority.
     ThumbnailData *thumb;
+    threadRegister("MetadataImageDownload");
     while ((thumb = moreThumbs()) != NULL)
     {
         QString sFilename = getDownloadFilename(thumb->title, thumb->url);
@@ -104,7 +106,7 @@ void MetadataImageDownload::run()
         for (DownloadMap::iterator i = downloads.begin();
                 i != downloads.end(); ++i)
         {
-            ArtworkType type = i.key();
+            VideoArtworkType type = i.key();
             ArtworkInfo info = i.value();
             QString filename = getDownloadFilename( type, lookup,
                                    info.url );
@@ -241,6 +243,7 @@ void MetadataImageDownload::run()
         lookup->SetDownloads(downloaded);
         QCoreApplication::postEvent(m_parent, new ImageDLEvent(lookup));
     }
+    threadDeregister();
 }
 
 ThumbnailData* MetadataImageDownload::moreThumbs()
@@ -292,7 +295,7 @@ QString getDownloadFilename(QString title, QString url)
     return outputfile;
 }
 
-QString getDownloadFilename(ArtworkType type, MetadataLookup *lookup,
+QString getDownloadFilename(VideoArtworkType type, MetadataLookup *lookup,
                             QString url)
 {
     QString basefilename;
@@ -346,7 +349,7 @@ QString getDownloadFilename(ArtworkType type, MetadataLookup *lookup,
     return basefilename;
 }
 
-QString getLocalWritePath(MetadataType metadatatype, ArtworkType type)
+QString getLocalWritePath(MetadataType metadatatype, VideoArtworkType type)
 {
     QString ret;
 
@@ -377,7 +380,7 @@ QString getLocalWritePath(MetadataType metadatatype, ArtworkType type)
     return ret;
 }
 
-QString getStorageGroupURL(ArtworkType type, QString host)
+QString getStorageGroupURL(VideoArtworkType type, QString host)
 {
     QString sgroup;
     QString ip = gCoreContext->GetSettingOnHost("BackendServerIP", host);

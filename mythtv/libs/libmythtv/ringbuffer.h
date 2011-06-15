@@ -69,8 +69,10 @@ class MTV_PUBLIC RingBuffer : protected QThread
     bool      IsNearEnd(double fps, uint vvf) const;
     /// \brief Returns true if open for either reading or writing.
     virtual bool IsOpen(void) const = 0;
-    virtual bool IsStreamed(void)     { return LiveMode(); }
-    virtual int  BestBufferSize(void) { return 32768; }
+    virtual bool IsStreamed(void)       { return LiveMode(); }
+    virtual bool IsSeekingAllowed(void) { return true;  }
+    virtual bool IsBookmarkAllowed(void) { return true; }
+    virtual int  BestBufferSize(void)   { return 32768; }
     static QString BitrateToString(uint64_t rate);
 
     // DVD and bluray methods

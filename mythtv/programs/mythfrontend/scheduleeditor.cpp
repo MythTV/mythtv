@@ -34,6 +34,14 @@
 
 #define ENUM_TO_QVARIANT(a) qVariantFromValue(static_cast<int>(a))
 
+// Define the strings inserted into the recordfilter table in the
+// database.  This should make them available to the translators.
+static QString fs0(QObject::tr("New episode"));
+static QString fs1(QObject::tr("Identifiable episode"));
+static QString fs2(QObject::tr("First showing"));
+static QString fs3(QObject::tr("Primetime"));
+static QString fs4(QObject::tr("Commercial free"));
+static QString fs5(QObject::tr("High definition"));
 
 void *ScheduleEditor::RunScheduleEditor(ProgramInfo *proginfo, void *player)
 {
@@ -453,15 +461,18 @@ void ScheduleEditor::ShowPreview(void)
 SchedOptEditor::SchedOptEditor(MythScreenStack *parent,
                                RecordingInfo *recInfo,
                                RecordingRule *rule)
-          : MythScreenType(parent, "ScheduleOptionsEditor"),
-            m_recInfo(NULL), m_recordingRule(rule),
-            m_backButton(NULL),
-            m_prioritySpin(NULL), m_inputList(NULL), m_startoffsetSpin(NULL),
-            m_endoffsetSpin(NULL), m_dupmethodList(NULL), m_dupscopeList(NULL),
-            m_ruleactiveCheck(NULL)
+    : MythScreenType(parent, "ScheduleOptionsEditor"),
+      m_recInfo(NULL), m_recordingRule(rule),
+      m_backButton(NULL),
+      m_prioritySpin(NULL), m_inputList(NULL), m_startoffsetSpin(NULL),
+      m_endoffsetSpin(NULL), m_dupmethodList(NULL), m_dupscopeList(NULL),
+      m_filtersButton(NULL), m_ruleactiveCheck(NULL)
 {
     if (recInfo)
         m_recInfo = new RecordingInfo(*recInfo);
+#if (ALLOW_MISSING_FILTERS)
+    m_missing_filters = false;
+#endif
 }
 
 SchedOptEditor::~SchedOptEditor(void)
@@ -482,8 +493,13 @@ bool SchedOptEditor::Create()
     UIUtilE::Assign(this, m_dupmethodList, "dupmethod", &err);
     UIUtilE::Assign(this, m_dupscopeList, "dupscope", &err);
 
-    UIUtilE::Assign(this, m_ruleactiveCheck, "ruleactive", &err);
+#if (ALLOW_MISSING_FILTERS)
+    UIUtilE::Assign(this, m_filtersButton, "filters", &m_missing_filters);
+#else
+    UIUtilE::Assign(this, m_filtersButton, "filters", &err);
+#endif
 
+    UIUtilE::Assign(this, m_ruleactiveCheck, "ruleactive", &err);
     UIUtilE::Assign(this, m_backButton, "back", &err);
 
     if (err)
@@ -494,15 +510,20 @@ bool SchedOptEditor::Create()
     }
 
     if ((m_recordingRule->m_type == kSingleRecord) ||
-        (m_recordingRule->m_type == kFindOneRecord) ||
         (m_recordingRule->m_type ==kOverrideRecord))
     {
         m_dupmethodList->SetEnabled(false);
         m_dupscopeList->SetEnabled(false);
+        m_filtersButton->SetEnabled(false);
     }
 
     connect(m_dupmethodList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-                         SLOT(dupMatchChanged(MythUIButtonListItem *)));
+            SLOT(dupMatchChanged(MythUIButtonListItem *)));
+
+#if (ALLOW_MISSING_FILTERS)
+    if (!m_missing_filters)
+#endif
+    connect(m_filtersButton, SIGNAL(Clicked()), SLOT(ShowFilters()));
 
     connect(m_backButton, SIGNAL(Clicked()), SLOT(Close()));
 
@@ -584,6 +605,10 @@ void SchedOptEditor::Load()
                              tr("Look for duplicates in previous recordings "
                                 "only"),
                              ENUM_TO_QVARIANT(kDupsInOldRecorded));
+#if (ALLOW_MISSING_FILTERS)
+    if (m_missing_filters)
+    {
+#endif
     new MythUIButtonListItem(m_dupscopeList,
                              tr("Exclude unidentified episodes"),
                              ENUM_TO_QVARIANT(kDupsExGeneric | kDupsInAll));
@@ -599,6 +624,10 @@ void SchedOptEditor::Load()
                                  tr("Record new episode first showings"),
                                  ENUM_TO_QVARIANT(kDupsFirstNew | kDupsInAll));
     }
+#if (ALLOW_MISSING_FILTERS)
+    }
+#endif
+
     m_dupscopeList->SetValueByData(ENUM_TO_QVARIANT(m_recordingRule->m_dupIn));
 
     // Active/Disabled
@@ -652,6 +681,137 @@ void SchedOptEditor::Save()
 }
 
 void SchedOptEditor::Close()
+{
+    Save();
+    MythScreenType::Close();
+}
+
+void SchedOptEditor::ShowFilters(void)
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    SchedFilterEditor *schedfilteredit = new SchedFilterEditor(mainStack,
+                                                               m_recInfo,
+                                                               m_recordingRule);
+    if (schedfilteredit->Create())
+        mainStack->AddScreen(schedfilteredit);
+    else
+        delete schedfilteredit;
+}
+
+////////////////////////////////////////////////////////
+
+/** \class SchedFilterEditor
+ *  \brief Select schedule filters
+ *
+ */
+
+SchedFilterEditor::SchedFilterEditor(MythScreenStack *parent,
+                                     RecordingInfo *recInfo,
+                                     RecordingRule *rule)
+    : MythScreenType(parent, "ScheduleFilterEditor"),
+      m_recInfo(NULL), m_recordingRule(rule),
+      m_backButton(NULL), m_filtersList(NULL)
+{
+    if (recInfo)
+        m_recInfo = new RecordingInfo(*recInfo);
+}
+
+SchedFilterEditor::~SchedFilterEditor(void)
+{
+}
+
+bool SchedFilterEditor::Create()
+{
+    if (!LoadWindowFromXML("schedule-ui.xml", "schedulefiltereditor", this))
+        return false;
+
+    bool err = false;
+
+    UIUtilE::Assign(this, m_filtersList, "filters", &err);
+    UIUtilE::Assign(this, m_backButton, "back", &err);
+
+    if (err)
+    {
+        VERBOSE(VB_IMPORTANT, "SchedFilterEditor, theme is missing "
+                "required elements");
+        return false;
+    }
+
+    connect(m_backButton, SIGNAL(Clicked()), SLOT(Close()));
+
+    connect(m_filtersList, SIGNAL(itemClicked(MythUIButtonListItem *)),
+            SLOT(ToggleSelected(MythUIButtonListItem *)));
+    BuildFocusList();
+
+    return true;
+}
+
+void SchedFilterEditor::Load()
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT filterid, description, newruledefault "
+                  "FROM recordfilter ORDER BY filterid");
+
+    if (query.exec())
+    {
+        MythUIButtonListItem *button;
+
+        while (query.next())
+        {
+            uint32_t filterid       = query.value(0).toInt();
+            QString  description    = tr(query.value(1).toString()
+                                         .toUtf8().constData());
+            bool     filter_default = query.value(2).toInt();
+
+            // Fill in list of possible filters
+            button = new MythUIButtonListItem(m_filtersList, description,
+                                              filterid);
+            button->setCheckable(true);
+            if (m_recordingRule->IsLoaded())
+                button->setChecked(m_recordingRule->m_filter & (1 << filterid) ?
+                                   MythUIButtonListItem::FullChecked :
+                                   MythUIButtonListItem::NotChecked);
+            else
+                button->setChecked(filter_default ?
+                                   MythUIButtonListItem::FullChecked :
+                                   MythUIButtonListItem::NotChecked);
+        }
+    }
+
+    InfoMap progMap;
+    if (m_recInfo)
+        m_recInfo->ToMap(progMap);
+    else
+        m_recordingRule->ToMap(progMap);
+    SetTextFromMap(progMap);
+}
+
+void SchedFilterEditor::ToggleSelected(MythUIButtonListItem *item)
+{
+    item->setChecked(item->state() == MythUIButtonListItem::FullChecked ?
+                     MythUIButtonListItem::NotChecked :
+                     MythUIButtonListItem::FullChecked);
+}
+
+void SchedFilterEditor::Save()
+{
+    // Iterate through button list, and build the mask
+    MythUIButtonListItem *button;
+    uint32_t filter_mask = 0;
+    int idx, end;
+
+    end = m_filtersList->GetCount();
+    for (idx = 0; idx < end; ++idx)
+    {
+        if ((button = m_filtersList->GetItemAt(idx)) &&
+            button->state() == MythUIButtonListItem::FullChecked)
+            filter_mask |= (1 << qVariantValue<uint32_t>(button->GetData()));
+    }
+    m_recordingRule->m_filter = filter_mask;
+}
+
+void SchedFilterEditor::Close()
 {
     Save();
     MythScreenType::Close();

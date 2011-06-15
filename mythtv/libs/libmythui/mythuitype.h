@@ -112,6 +112,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     virtual QSize GetMinSize(void) const;
     virtual void SetArea(const MythRect &rect);
     virtual void AdjustMinArea(int delta_x, int delta_y);
+    virtual void VanishSibling(void);
     virtual void SetMinAreaParent(MythRect actual_area, MythRect full_area,
                                   const MythUIType *child);
     virtual void SetMinArea(const QSize &size);
@@ -200,6 +201,8 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     bool m_CanHaveFocus;
     bool m_Enabled;
     bool m_Initiator;
+    bool m_Vanish;
+    bool m_Vanished;
 
     int m_focusOrder;
 

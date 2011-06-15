@@ -24,8 +24,7 @@
     <button>
         <type>VIDEO</type>
         <text>Videos</text>
-        <action>PLUGIN mythvideo</action>
-        <depends>mythvideo</depends>
+        <action>MENU videomenu.xml</action>
     </button>
 
     <button>

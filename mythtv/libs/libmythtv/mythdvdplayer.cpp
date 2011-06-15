@@ -317,25 +317,12 @@ bool MythDVDPlayer::PrepareAudioSample(int64_t &timecode)
     return false;
 }
 
-void MythDVDPlayer::SetBookmark(void)
+void MythDVDPlayer::SetBookmark(bool clear)
 {
-    if (player_ctx->buffer->IsInDiscMenuOrStillFrame())
-    {
+    if (player_ctx->buffer->IsInDiscMenuOrStillFrame() || clear)
         SetDVDBookmark(0);
-    }
     else
-    {
         SetDVDBookmark(framesPlayed);
-        SetOSDStatus(QObject::tr("Position"), kOSDTimeout_Med);
-        SetOSDMessage(QObject::tr("Bookmark Saved"), kOSDTimeout_Med);
-    }
-}
-
-void MythDVDPlayer::ClearBookmark(bool message)
-{
-    SetDVDBookmark(0);
-    if (message)
-        SetOSDMessage(QObject::tr("Bookmark Cleared"), kOSDTimeout_Med);
 }
 
 uint64_t MythDVDPlayer::GetBookmark(void)

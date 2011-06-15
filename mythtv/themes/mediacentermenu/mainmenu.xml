@@ -12,8 +12,7 @@
         <type>VIDEO_BROWSER</type>
         <text>Watch Videos</text>
         <description>Play videos</description>
-        <action>JUMP MythVideo</action>
-        <depends>mythvideo</depends>
+        <action>JUMP Video Default</action>
     </button>
 
     <button>
@@ -21,7 +20,6 @@
         <text>Watch A Disc</text>
         <description>Play the video on a Blu-ray or DVD</description>
         <action>JUMP Play Disc</action>
-        <depends>mythvideo</depends>
     </button>
 
     <button>

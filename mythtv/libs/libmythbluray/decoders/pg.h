@@ -107,4 +107,11 @@ typedef struct {
 };
 #endif
 
+typedef struct {
+    int64_t       pts;
+
+    unsigned      num_windows;
+    BD_PG_WINDOW *window;
+} BD_PG_WINDOWS;
+
 #endif // _BD_PG_H_

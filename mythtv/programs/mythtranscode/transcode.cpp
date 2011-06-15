@@ -78,6 +78,7 @@ class AudioReencodeBuffer : public AudioOutput
     virtual void Reset(void)
     {
         audiobuffer_len = 0;
+        audiobuffer_frames = 0;
         ab_count = 0;
     }
 
@@ -106,7 +107,8 @@ class AudioReencodeBuffer : public AudioOutput
 
         memcpy(audiobuffer + audiobuffer_len, buffer,
                len);
-        audiobuffer_len += len;
+        audiobuffer_len    += len;
+        audiobuffer_frames += frames;
 
         // last_audiotime is at the end of the frame
         last_audiotime = timecode + frames * 1000 /
@@ -221,7 +223,8 @@ class AudioReencodeBuffer : public AudioOutput
     int ab_offset[128];
     long long ab_time[128];
     unsigned char *audiobuffer;
-    int audiobuffer_len, channels, bits, bytes_per_frame, eff_audiorate;
+    int audiobuffer_len, audiobuffer_frames;
+    int channels, bits, bytes_per_frame, eff_audiorate;
     long long last_audiotime;
 private:
     bool                m_passthru, m_initpassthru;
@@ -798,8 +801,8 @@ int Transcode::TranscodeFile(
     long long lasttimecode = 0;
     long long timecodeOffset = 0;
 
-    float rateTimeConv = arb->eff_audiorate * arb->bytes_per_frame / 1000.0;
-    float vidFrameTime = 1000.0 / video_frame_rate;
+    float rateTimeConv = arb->eff_audiorate / 1000.0f;
+    float vidFrameTime = 1000.0f / video_frame_rate;
     int wait_recover = 0;
     VideoOutput *videoOutput = player->getVideoOutput();
     bool is_key = 0;
@@ -837,7 +840,7 @@ int Transcode::TranscodeFile(
         if (fifow)
         {
             frame.buf = lastDecode->buf;
-            totalAudio += arb->audiobuffer_len;
+            totalAudio += arb->audiobuffer_frames;
             int audbufTime = (int)(totalAudio / rateTimeConv);
             int auddelta = arb->last_audiotime - audbufTime;
             int vidTime = (int)(curFrameNum * vidFrameTime + 0.5);
@@ -845,10 +848,13 @@ int Transcode::TranscodeFile(
             int delta = viddelta - auddelta;
             if (abs(delta) < 500 && abs(delta) >= vidFrameTime)
             {
-               QString msg = QString("Audio is %1ms %2 video at # %3")
-                          .arg(abs(delta))
-                          .arg(((delta > 0) ? "ahead of" : "behind"))
-                          .arg((int)curFrameNum);
+               QString msg = QString("Audio is %1ms %2 video at # %3: "
+                                     "auddelta=%4, viddelta=%5")
+                   .arg(abs(delta))
+                   .arg(((delta > 0) ? "ahead of" : "behind"))
+                   .arg((int)curFrameNum)
+                   .arg(auddelta)
+                   .arg(viddelta);
                 VERBOSE(VB_GENERAL, msg);
                 dropvideo = (delta > 0) ? 1 : -1;
                 wait_recover = 0;
@@ -885,11 +891,14 @@ int Transcode::TranscodeFile(
                 wait_recover = 0;
             }
 
-            // int buflen = (int)(arb->audiobuffer_len / rateTimeConv);
-            // cout << curFrameNum << ": video time: " << frame.timecode
-            //      << " audio time: " << arb->last_audiotime << " buf: "
-            //      << buflen << " exp: "
-            //      << audbufTime << " delta: " << delta << endl;
+#if 0
+            int buflen = (int)(arb->audiobuffer_len / rateTimeConv);
+            VERBOSE(VB_GENERAL, QString("%1: video time: %2 audio time: %3 " 
+                                        "buf: %4 exp: %5 delta: %6")
+                .arg(curFrameNum) .arg(frame.timecode) 
+                .arg(arb->last_audiotime) .arg(buflen) .arg(audbufTime)
+                .arg(delta));
+#endif
             if (arb->audiobuffer_len)
                 fifow->FIFOWrite(1, arb->audiobuffer, arb->audiobuffer_len);
             if (dropvideo < 0)

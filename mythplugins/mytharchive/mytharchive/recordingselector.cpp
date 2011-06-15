@@ -24,6 +24,7 @@
 #include <mythmainwindow.h>
 #include <mythprogressdialog.h>
 #include <mythdialogbox.h>
+#include "mythlogging.h"
 
 // mytharchive
 #include "recordingselector.h"
@@ -40,7 +41,9 @@ class GetRecordingListThread : public QThread
 
     virtual void run(void)
     {
+        threadRegister("GetRecordingList");
         m_parent->getRecordingList();
+        threadDeregister();
     }
 
     RecordingSelector *m_parent;

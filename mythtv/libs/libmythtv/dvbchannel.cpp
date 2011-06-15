@@ -325,10 +325,9 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
         !(capabilities & FE_CAN_INVERSION_AUTO))
     {
         VERBOSE(VB_GENERAL, LOC_WARN +
-                "Unsupported inversion option 'auto', "
-                "falling back to 'off'");
-
-        tuning.inversion = DTVInversion::kInversionAuto;
+                "'Auto' inversion parameter unsupported by this driver, "
+                "falling back to 'off'.");
+        tuning.inversion = DTVInversion::kInversionOff;
     }
 
     // DVB-S needs a fully initialized diseqc tree and is checked later in Tune
@@ -350,12 +349,14 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
 
     if (tunerType.IsFECVariable() && !CheckCodeRate(tuning.fec))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN + "Unsupported fec_inner parameter.");
+        VERBOSE(VB_GENERAL, LOC_WARN + "Selected fec_inner parameter "
+                                       "unsupported by this driver.");
     }
 
     if (tunerType.IsModulationVariable() && !CheckModulation(tuning.modulation))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN + "Unsupported modulation parameter.");
+        VERBOSE(VB_GENERAL, LOC_WARN + "Selected modulation parameter unsupported "
+                                       "by this driver.");
     }
 
     if (DTVTunerType::kTunerTypeDVBT != tunerType)
@@ -368,43 +369,50 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
 
     if (!CheckCodeRate(tuning.hp_code_rate))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN + "Unsupported code_rate_hp parameter.");
+        VERBOSE(VB_GENERAL, LOC_WARN + "Selected code_rate_hp parameter "
+                                       "unsupported by this driver.");
     }
 
     if (!CheckCodeRate(tuning.lp_code_rate))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN + "Unsupported code_rate_lp parameter.");
+        VERBOSE(VB_GENERAL, LOC_WARN + "Selected code_rate_lp parameter "
+                                       "unsupported by this driver.");
     }
 
     if ((tuning.bandwidth == DTVBandwidth::kBandwidthAuto) &&
         !(capabilities & FE_CAN_BANDWIDTH_AUTO))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN + "Unsupported bandwidth parameter.");
+        VERBOSE(VB_GENERAL, LOC_WARN + "'Auto' bandwidth parameter unsupported "
+                                       "by this driver.");
     }
 
     if ((tuning.trans_mode == DTVTransmitMode::kTransmissionModeAuto) &&
         !(capabilities & FE_CAN_TRANSMISSION_MODE_AUTO))
     {
         VERBOSE(VB_GENERAL, LOC_WARN +
-                "Unsupported transmission_mode parameter.");
+                "'Auto' transmission_mode parameter unsupported "
+                "by this driver.");
     }
 
     if ((tuning.guard_interval == DTVGuardInterval::kGuardIntervalAuto) &&
         !(capabilities & FE_CAN_GUARD_INTERVAL_AUTO))
     {
         VERBOSE(VB_GENERAL, LOC_WARN +
-                "Unsupported guard_interval parameter.");
+                "'Auto' guard_interval parameter unsupported "
+                "by this driver.");
     }
 
     if ((tuning.hierarchy == DTVHierarchy::kHierarchyAuto) &&
         !(capabilities & FE_CAN_HIERARCHY_AUTO))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN + "Unsupported hierarchy parameter.");
+        VERBOSE(VB_GENERAL, LOC_WARN +
+                "'Auto' hierarchy parameter unsupported by this driver. ");
     }
 
     if (!CheckModulation(tuning.modulation))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN + "Unsupported constellation parameter.");
+        VERBOSE(VB_GENERAL, LOC_WARN + "Selected modulation parameter unsupported "
+                                       "by this driver.");
     }
 
     VERBOSE(VB_CHANNEL, LOC + tuning.toString());

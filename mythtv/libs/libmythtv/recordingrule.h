@@ -30,6 +30,8 @@ class MTV_PUBLIC RecordingRule
 {
 
   public:
+    static const int kNumFilters = 12;
+
     RecordingRule();
    ~RecordingRule() {};
 
@@ -47,6 +49,7 @@ class MTV_PUBLIC RecordingRule
 
     bool IsLoaded() const { return m_loaded; }
     void UseTempTable(bool usetemp, QString table = "record_tmp");
+    static unsigned GetDefaultFilter(void);
 
     void ToMap(InfoMap &infoMap) const;
 
@@ -88,6 +91,7 @@ class MTV_PUBLIC RecordingRule
     int m_endOffset;
     RecordingDupMethodType m_dupMethod;
     RecordingDupInType m_dupIn;
+    unsigned m_filter;
 
     // Storage Options
     // TODO: These should all be converted to integer IDs instead

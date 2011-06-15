@@ -1,5 +1,6 @@
 #include <QLocale>
 
+#include "rssparse.h"
 #include "mythcorecontext.h"
 #include "metadatacommon.h"
 #include "mythverbose.h"
@@ -142,7 +143,7 @@ QList<PersonInfo> MetadataLookup::GetPeople(PeopleType type) const
     return ret;
 }
 
-ArtworkList MetadataLookup::GetArtwork(ArtworkType type) const
+ArtworkList MetadataLookup::GetArtwork(VideoArtworkType type) const
 {
     ArtworkList ret;
     ret = m_artwork.values(type);
@@ -208,11 +209,11 @@ MetadataLookup* ParseMetadataItem(const QDomElement& item,
     ArtworkMap artwork;
 
     // Get the easy parses
-    title = item.firstChildElement("title").text();
-    subtitle = item.firstChildElement("subtitle").text();
-    tagline = item.firstChildElement("tagline").text();
-    description = item.firstChildElement("description").text();
-    album = item.firstChildElement("albumname").text();
+    title = Parse::UnescapeHTML(item.firstChildElement("title").text());
+    subtitle = Parse::UnescapeHTML(item.firstChildElement("subtitle").text());
+    tagline = Parse::UnescapeHTML(item.firstChildElement("tagline").text());
+    description = Parse::UnescapeHTML(item.firstChildElement("description").text());
+    album = Parse::UnescapeHTML(item.firstChildElement("albumname").text());
     inetref = item.firstChildElement("inetref").text();
     tmsref = item.firstChildElement("tmsref").text();
     imdb = item.firstChildElement("imdb").text();
@@ -439,7 +440,7 @@ ArtworkMap ParseArtwork(QDomElement artwork)
             if (image.hasAttribute("type"))
             {
                 QString typestring = image.attribute("type");
-                ArtworkType type;
+                VideoArtworkType type;
                 if (typestring.toLower() == "coverart")
                     type = COVERART;
                 else if (typestring.toLower() == "fanart")

@@ -358,9 +358,7 @@ int graphics_processor_decode_pes(PG_DISPLAY_SET **s, PES_BUFFER **p, int64_t st
         *s = calloc(1, sizeof(PG_DISPLAY_SET));
     }
 
-    (*s)->complete = 0;
-
-    while (*p && !(*s)->complete) {
+    while (*p) {
 
         /* time to decode next segment ? */
         if (stc >= 0 && (*p)->dts > stc) {
@@ -375,18 +373,30 @@ int graphics_processor_decode_pes(PG_DISPLAY_SET **s, PES_BUFFER **p, int64_t st
             return 0;
         }
 
+        if ((*p)->len <= 2) {
+            BD_DEBUG(DBG_DECODE, "segment too short, skipping (%d bytes)\n", (*p)->len);
+            pes_buffer_remove(p, *p);
+            continue;
+        }
+
+        /* decode segment */
+
         GP_TRACE("Decoding segment, dts %010"PRId64" pts %010"PRId64" len %d\n",
                  (*p)->dts, (*p)->pts, (*p)->len);
 
-        /* decode segment */
-        if ((*p)->len > 2) {
-            _decode_segment(*s, *p);
-        }
+        (*s)->complete = 0;
+
+        _decode_segment(*s, *p);
 
         pes_buffer_remove(p, *p);
+
+        if ((*s)->complete) {
+            return 1;
+        }
+
     }
 
-    return (*s)->complete;
+    return 0;
 }
 
 /*
@@ -437,5 +447,9 @@ int graphics_processor_decode_ts(GRAPHICS_PROCESSOR *p,
         unit += 6144;
     }
 
-    return graphics_processor_decode_pes(s, &p->queue, stc);
+    if (p->queue) {
+        return graphics_processor_decode_pes(s, &p->queue, stc);
+    }
+
+    return 0;
 }

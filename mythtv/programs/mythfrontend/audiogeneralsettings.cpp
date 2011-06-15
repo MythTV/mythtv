@@ -20,6 +20,7 @@
 #include "audiooutpututil.h"
 #include "audiogeneralsettings.h"
 #include "mythdialogbox.h"
+#include "mythlogging.h"
 
 extern "C" {
 #include "libavformat/avformat.h"
@@ -577,6 +578,7 @@ void AudioTestThread::setChannel(int channel)
 
 void AudioTestThread::run()
 {
+    threadRegister("AudioTest");
     m_interrupted = false;
     int smptelayout[7][8] = { 
         { 0, 1 },                       //stereo
@@ -679,6 +681,7 @@ void AudioTestThread::run()
 
         delete[] frames_in;
     }
+    threadDeregister();
 }
 
 AudioTest::AudioTest(QString main, QString passthrough,

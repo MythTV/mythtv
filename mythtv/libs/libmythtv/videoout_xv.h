@@ -33,9 +33,8 @@ class VideoOutputXv : public VideoOutput
     VideoOutputXv();
    ~VideoOutputXv();
 
-    bool Init(int width, int height, float aspect, WId winid,
-              int winx, int winy, int winw, int winh,
-              MythCodecID codec_id, WId embedid = 0);
+    bool Init(int width, int height, float aspect,
+              WId winid, const QRect &win_rect, MythCodecID codec_id);
 
     bool SetDeinterlacingEnabled(bool);
     bool SetupDeinterlace(bool interlaced, const QString& ovrf="");
@@ -61,7 +60,7 @@ class VideoOutputXv : public VideoOutput
                       bool        &aspect_only);
     void Zoom(ZoomDirection direction);
     void VideoAspectRatioChanged(float aspect);
-    void EmbedInWidget(int x, int y, int w, int h);
+    void EmbedInWidget(const QRect &rect);
     void StopEmbedding(void);
     void MoveResizeWindow(QRect new_rect);
     void DrawUnusedRects(bool sync = true);

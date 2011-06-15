@@ -163,15 +163,21 @@ int V4LRecorder::OpenVBIDevice(void)
             return -1;
 #endif // !USING_V4L1
         }
-        VERBOSE(VB_RECORD, LOC + "vbi_format  rate: "<<fmt.fmt.vbi.sampling_rate
-                <<"\n\t\t\t          offset: "<<fmt.fmt.vbi.offset
-                <<"\n\t\t\tsamples_per_line: "<<fmt.fmt.vbi.samples_per_line
-                <<"\n\t\t\t          starts: "
-                <<fmt.fmt.vbi.start[0]<<", "<<fmt.fmt.vbi.start[1]
-                <<"\n\t\t\t          counts: "
-                <<fmt.fmt.vbi.count[0]<<", "<<fmt.fmt.vbi.count[1]
-                <<"\n\t\t\t           flags: "
-                <<QString("0x%1").arg(fmt.fmt.vbi.flags,0,16));
+        VERBOSE(VB_RECORD, LOC + QString("vbi_format  rate: %1"
+                  "\n\t\t\t          offset: %2"
+                  "\n\t\t\tsamples_per_line: %3"
+                  "\n\t\t\t          starts: %4, %5"
+                  "\n\t\t\t          counts: %6, %7"
+                  "\n\t\t\t           flags: 0x%8")
+                .arg(fmt.fmt.vbi.sampling_rate)
+                .arg(fmt.fmt.vbi.offset)
+                .arg(fmt.fmt.vbi.samples_per_line)
+                .arg(fmt.fmt.vbi.start[0])
+                .arg(fmt.fmt.vbi.start[1])
+                .arg(fmt.fmt.vbi.count[0])
+                .arg(fmt.fmt.vbi.count[1])
+                .arg(fmt.fmt.vbi.flags,0,16));
+
         width      = fmt.fmt.vbi.samples_per_line;
         start_line = fmt.fmt.vbi.start[0];
         line_count = fmt.fmt.vbi.count[0];

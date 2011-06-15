@@ -35,6 +35,7 @@ using namespace std;
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/wait.h>
+#include "mythlogging.h"
 
 #define LOC      QString("LIRC: ")
 #define LOC_WARN QString("LIRC, Warning: ")
@@ -400,6 +401,7 @@ void LIRC::Process(const QByteArray &data)
 
 void LIRC::run(void)
 {
+    threadRegister("LIRC");
     //VERBOSE(VB_GENERAL, LOC + "run -- start");
     /* Process all events read */
     while (IsDoRunSet())
@@ -458,6 +460,7 @@ void LIRC::run(void)
             Process(codes[i]);
     }
     //VERBOSE(VB_GENERAL, LOC + "run -- end");
+    threadDeregister();
 }
   
 QList<QByteArray> LIRC::GetCodes(void)

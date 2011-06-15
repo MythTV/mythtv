@@ -1,4 +1,3 @@
-
 #include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -74,6 +73,17 @@ using namespace std;
 #include "backendconnectionmanager.h"
 #include "themechooser.h"
 
+// Video
+#include "cleanup.h"
+#include "globals.h"
+#include "videodlg.h"
+#include "videoglobalsettings.h"
+#include "videofileassoc.h"
+#include "videoplayersettings.h"
+#include "videometadatasettings.h"
+#include "videolist.h"
+
+
 static ExitPrompter   *exitPopup = NULL;
 static MythThemedMenu *menu;
 
@@ -85,6 +95,61 @@ static void handleExit(void);
 
 namespace
 {
+    class RunSettingsCompletion : public QObject
+    {
+        Q_OBJECT
+
+      public:
+        static void Create(bool check)
+        {
+            new RunSettingsCompletion(check);
+        }
+
+      private:
+        RunSettingsCompletion(bool check)
+        {
+            if (check)
+            {
+                connect(&m_plcc,
+                        SIGNAL(SigResultReady(bool, ParentalLevel::Level)),
+                        SLOT(OnPasswordResultReady(bool,
+                                        ParentalLevel::Level)));
+                m_plcc.Check(ParentalLevel::plMedium, ParentalLevel::plHigh);
+            }
+            else
+            {
+                OnPasswordResultReady(true, ParentalLevel::plHigh);
+            }
+        }
+
+        ~RunSettingsCompletion() {}
+
+      private slots:
+        void OnPasswordResultReady(bool passwordValid,
+                ParentalLevel::Level newLevel)
+        {
+            (void) newLevel;
+
+            if (passwordValid)
+            {
+                VideoGeneralSettings settings;
+                settings.exec();
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT,
+                        QObject::tr("Aggressive Parental Controls Warning: "
+                                "invalid password. An attempt to enter a "
+                                "MythVideo settings screen was prevented."));
+            }
+
+            deleteLater();
+        }
+
+      public:
+        ParentalLevelChangeChecker m_plcc;
+    };
+
     class BookmarkDialog : MythScreenType
     {
       public:
@@ -171,7 +236,6 @@ namespace
         gContext = NULL;
 
 #ifndef _MSC_VER
-        signal(SIGHUP, SIG_DFL);
         signal(SIGUSR1, SIG_DFL);
 #endif
     }
@@ -502,6 +566,200 @@ static void showStatus(void)
         delete statusbox;
 }
 
+static void RunVideoScreen(VideoDialog::DialogType type, bool fromJump = false)
+{
+    QString message = QObject::tr("Loading videos ...");
+
+    MythScreenStack *popupStack =
+            GetMythMainWindow()->GetStack("popup stack");
+
+    MythUIBusyDialog *busyPopup = new MythUIBusyDialog(message,
+            popupStack, "mythvideobusydialog");
+
+    if (busyPopup->Create())
+        popupStack->AddScreen(busyPopup, false);
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    VideoDialog::VideoListPtr video_list;
+    if (fromJump)
+    {
+        VideoDialog::VideoListDeathDelayPtr &saved =
+                VideoDialog::GetSavedVideoList();
+        if (!saved.isNull())
+        {
+            video_list = saved->GetSaved();
+        }
+    }
+
+    VideoDialog::BrowseType browse = static_cast<VideoDialog::BrowseType>(
+                         gCoreContext->GetNumSetting("mythvideo.db_group_type",
+                                                 VideoDialog::BRS_FOLDER));
+
+    if (!video_list)
+        video_list = new VideoList;
+
+    VideoDialog *mythvideo =
+            new VideoDialog(mainStack, "mythvideo", video_list, type, browse);
+
+    if (mythvideo->Create())
+    {
+        busyPopup->Close();
+        mainStack->AddScreen(mythvideo);
+    }
+    else
+        busyPopup->Close();
+}
+
+static void jumpScreenVideoManager() { RunVideoScreen(VideoDialog::DLG_MANAGER, true); }
+static void jumpScreenVideoBrowser() { RunVideoScreen(VideoDialog::DLG_BROWSER, true); }
+static void jumpScreenVideoTree()    { RunVideoScreen(VideoDialog::DLG_TREE, true);    }
+static void jumpScreenVideoGallery() { RunVideoScreen(VideoDialog::DLG_GALLERY, true); }
+static void jumpScreenVideoDefault() { RunVideoScreen(VideoDialog::DLG_DEFAULT, true); }
+
+QString gDVDdevice;
+
+static void playDisc()
+{
+    //
+    //  Get the command string to play a DVD
+    //
+
+    bool isBD = false;
+
+    QString command_string =
+            gCoreContext->GetSetting("mythdvd.DVDPlayerCommand");
+    QString bluray_mountpoint =
+            gCoreContext->GetSetting("BluRayMountpoint", "/media/cdrom");
+    QDir bdtest(bluray_mountpoint + "/BDMV");
+
+    if (bdtest.exists())
+        isBD = true;
+
+    if (isBD)
+    {
+        GetMythUI()->AddCurrentLocation("playdisc");
+
+        QString filename = QString("bd:/%1/").arg(bluray_mountpoint);
+
+        GetMythMainWindow()->HandleMedia("Internal", filename);
+
+        GetMythUI()->RemoveCurrentLocation();
+    }
+    else
+    {
+        QString dvd_device = gDVDdevice;
+
+        if (dvd_device.isEmpty())
+            dvd_device = MediaMonitor::defaultDVDdevice();
+
+        if (dvd_device.isEmpty())
+            return;  // User cancelled in the Popup
+
+        GetMythUI()->AddCurrentLocation("playdisc");
+
+        if ((command_string.indexOf("internal", 0, Qt::CaseInsensitive) > -1) ||
+            (command_string.length() < 1))
+        {
+#ifdef Q_OS_MAC
+            // Convert a BSD 'leaf' name into a raw device path
+            QString filename = "dvd://dev/r";   // e.g. 'dvd://dev/rdisk2'
+#elif USING_MINGW
+            QString filename = "dvd:";          // e.g. 'dvd:E\\'
+#else
+            QString filename = "dvd:/";         // e.g. 'dvd://dev/sda'
+#endif
+            filename += dvd_device;
+
+            command_string = "Internal";
+            GetMythMainWindow()->HandleMedia(command_string, filename);
+            GetMythUI()->RemoveCurrentLocation();
+
+            return;
+        }
+        else
+        {
+            if (command_string.contains("%d"))
+            {
+                //
+                //  Need to do device substitution
+                //
+                command_string =
+                        command_string.replace(QRegExp("%d"), dvd_device);
+            }
+            sendPlaybackStart();
+            myth_system(command_string);
+            sendPlaybackEnd();
+            if (GetMythMainWindow())
+            {
+                GetMythMainWindow()->raise();
+                GetMythMainWindow()->activateWindow();
+                if (GetMythMainWindow()->currentWidget())
+                    GetMythMainWindow()->currentWidget()->setFocus();
+            }
+        }
+        GetMythUI()->RemoveCurrentLocation();
+    }
+}
+
+/////////////////////////////////////////////////
+//// Media handlers
+/////////////////////////////////////////////////
+static void handleDVDMedia(MythMediaDevice *dvd)
+{
+    if (!dvd)
+        return;
+
+    QString newDevice = dvd->getDevicePath();
+
+    // Device insertion. Store it for later use
+    if (dvd->isUsable())
+        if (gDVDdevice.length() && gDVDdevice != newDevice)
+        {
+            // Multiple DVD devices. Clear the old one so the user has to
+            // select a disk to play (in MediaMonitor::defaultDVDdevice())
+
+            VERBOSE(VB_MEDIA, "MythVideo: Multiple DVD drives? Forgetting "
+                                + gDVDdevice);
+            gDVDdevice.clear();
+        }
+        else
+        {
+            gDVDdevice = newDevice;
+            VERBOSE(VB_MEDIA,
+                    "MythVideo: Storing DVD device " + gDVDdevice);
+        }
+    else
+    {
+        // Ejected/unmounted/error.
+
+        if (gDVDdevice.length() && gDVDdevice == newDevice)
+        {
+            VERBOSE(VB_MEDIA,
+                    "MythVideo: Forgetting existing DVD " + gDVDdevice);
+            gDVDdevice.clear();
+        }
+
+        return;
+    }
+
+    switch (gCoreContext->GetNumSetting("DVDOnInsertDVD", 1))
+    {
+        case 0 : // Do nothing
+            break;
+        case 1 : // Display menu (mythdvd)*/
+            GetMythMainWindow()->JumpTo("Main Menu");
+            break;
+        case 2 : // play DVD or Blu-ray
+            GetMythMainWindow()->JumpTo("Main Menu");
+            playDisc();
+            break;
+        default:
+            VERBOSE(VB_IMPORTANT, "mythdvd main.o: handleMedia() does not "
+                    "know what to do");
+    }
+}
+
 static void TVMenuCallback(void *data, QString &selection)
 {
     (void)data;
@@ -691,6 +949,50 @@ static void TVMenuCallback(void *data, QString &selection)
         else
             delete msee;
     }
+    else if (sel == "video_settings_general")
+    {
+        RunSettingsCompletion::Create(gCoreContext->
+                GetNumSetting("VideoAggressivePC", 0));
+    }
+    else if (sel == "video_settings_player")
+    {
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+        PlayerSettings *ps = new PlayerSettings(mainStack, "player settings");
+
+        if (ps->Create())
+            mainStack->AddScreen(ps);
+    }
+    else if (sel == "video_settings_metadata")
+    {
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+        MetadataSettings *ms = new MetadataSettings(mainStack, "metadata settings");
+
+        if (ms->Create())
+            mainStack->AddScreen(ms);
+    }
+    else if (sel == "video_settings_associations")
+    {
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+        FileAssocDialog *fa = new FileAssocDialog(mainStack, "fa dialog");
+
+        if (fa->Create())
+            mainStack->AddScreen(fa);
+    }
+    if (sel == "manager")
+        RunVideoScreen(VideoDialog::DLG_MANAGER);
+    else if (sel == "browser")
+        RunVideoScreen(VideoDialog::DLG_BROWSER);
+    else if (sel == "listing")
+        RunVideoScreen(VideoDialog::DLG_TREE);
+    else if (sel == "gallery")
+        RunVideoScreen(VideoDialog::DLG_GALLERY);
+    else if (sel == "disc_play")
+    {
+        playDisc();
+    }
     else if (sel == "tv_status")
         showStatus();
     else if (sel == "exiting_app")
@@ -774,6 +1076,9 @@ static void WriteDefaults()
     GeneralRecPrioritiesSettings grs;
     grs.Load();
     grs.Save();
+    VideoGeneralSettings vgs;
+    vgs.Load();
+    vgs.Save();
 }
 
 static int internal_play_media(const QString &mrl, const QString &plot,
@@ -979,6 +1284,45 @@ static void InitJumpPoints(void)
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Previously Recorded"),
          "", "", startPrevious);
 
+     // Video
+
+     REG_JUMP(JUMP_VIDEO_DEFAULT, QT_TRANSLATE_NOOP("MythControls",
+         "The Video default view"), "", jumpScreenVideoDefault);
+     REG_JUMP(JUMP_VIDEO_MANAGER, QT_TRANSLATE_NOOP("MythControls",
+         "The Video video manager"), "", jumpScreenVideoManager);
+     REG_JUMP(JUMP_VIDEO_BROWSER, QT_TRANSLATE_NOOP("MythControls",
+         "The Video video browser"), "", jumpScreenVideoBrowser);
+     REG_JUMP(JUMP_VIDEO_TREE, QT_TRANSLATE_NOOP("MythControls",
+         "The Video video listings"), "", jumpScreenVideoTree);
+     REG_JUMP(JUMP_VIDEO_GALLERY, QT_TRANSLATE_NOOP("MythControls",
+         "The Video video gallery"), "", jumpScreenVideoGallery);
+     REG_JUMP("Play Disc", QT_TRANSLATE_NOOP("MythControls",
+         "Play an Optical Disc"), "", playDisc);
+
+     REG_KEY("Video","PLAYALT", QT_TRANSLATE_NOOP("MythControls",
+         "Play selected item in alternate player"), "ALT+P");
+     REG_KEY("Video","FILTER", QT_TRANSLATE_NOOP("MythControls",
+         "Open video filter dialog"), "F");
+     REG_KEY("Video","BROWSE", QT_TRANSLATE_NOOP("MythControls",
+         "Change browsable in video manager"), "B");
+     REG_KEY("Video","INCPARENT", QT_TRANSLATE_NOOP("MythControls",
+         "Increase Parental Level"), "],},F11");
+     REG_KEY("Video","DECPARENT", QT_TRANSLATE_NOOP("MythControls",
+         "Decrease Parental Level"), "[,{,F10");
+     REG_KEY("Video","INCSEARCH", QT_TRANSLATE_NOOP("MythControls",
+         "Show Incremental Search Dialog"), "Ctrl+S");
+     REG_KEY("Video","DOWNLOADDATA", QT_TRANSLATE_NOOP("MythControls",
+         "Download metadata for current item"), "W");
+     REG_KEY("Video","ITEMDETAIL", QT_TRANSLATE_NOOP("MythControls",
+         "Display Item Detail Popup"), "");
+     REG_KEY("Video","HOME", QT_TRANSLATE_NOOP("MythControls",
+         "Go to the first video"), "Home");
+     REG_KEY("Video","END", QT_TRANSLATE_NOOP("MythControls",
+         "Go to the last video"), "End");
+     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
+         "MythDVD DVD Media Handler"), "", "", handleDVDMedia,
+         MEDIATYPE_DVD, QString::null);
+
      REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "Toggle Show Widget Borders"),
          "", "", setDebugShowBorders, false);
      REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "Toggle Show Widget Names"),
@@ -1027,112 +1371,30 @@ static void CleanupMyOldInUsePrograms(void)
         MythDB::DBError("CleanupMyOldInUsePrograms", query);
 }
 
-static void ShowUsage(const MythCommandLineParser &cmdlineparser)
-{
-    QString    help  = cmdlineparser.GetHelpString(false);
-    QByteArray ahelp = help.toLocal8Bit();
-
-    cerr << "Valid options are: " << endl <<
-            "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
-            "-r or --reset                  Resets frontend appearance settings and language" << endl <<
-            ahelp.constData() <<
-            "-p or --prompt                 Always prompt for Mythbackend selection." << endl <<
-            "-d or --disable-autodiscovery  Never prompt for Mythbackend selection." << endl <<
-
-            "-u or --upgrade-schema         Allow mythfrontend to upgrade the database schema" << endl <<
-            "<plugin>                       Initialize and run this plugin" << endl <<
-            endl <<
-            "Environment Variables:" << endl <<
-            "$MYTHTVDIR                     Set the installation prefix" << endl <<
-            "$MYTHCONFDIR                   Set the config dir (instead of ~/.mythtv)" << endl;
-
-}
-
-static int log_rotate(int report_error)
-{
-    int new_logfd = open(logfile.toLocal8Bit().constData(),
-                         O_WRONLY|O_CREAT|O_APPEND, 0664);
-
-    if (new_logfd < 0) {
-        /* If we can't open the new logfile, send data to /dev/null */
-        if (report_error)
-        {
-            VERBOSE(VB_IMPORTANT, QString("Cannot open logfile '%1'")
-                    .arg(logfile));
-            return -1;
-        }
-
-        new_logfd = open("/dev/null", O_WRONLY);
-
-        if (new_logfd < 0) {
-            /* There's not much we can do, so punt. */
-            return -1;
-        }
-    }
-
-#ifdef WINDOWS_CLOSE_CONSOLE
-    // pure Win32 GUI app does not have standard IO streams
-    // simply assign the file descriptors to the logfile
-    *stdout = *(_fdopen(new_logfd, "w"));
-    *stderr = *stdout;
-    setvbuf(stdout, NULL, _IOLBF, 256);
-#else
-    while (dup2(new_logfd, 1) < 0 && errno == EINTR);
-    while (dup2(new_logfd, 2) < 0 && errno == EINTR);
-    while (close(new_logfd) < 0   && errno == EINTR);
-#endif
-
-    return 0;
-}
-
-static void log_rotate_handler(int)
-{
-    log_rotate(0);
-}
-
 int main(int argc, char **argv)
 {
     bool bPromptForBackend    = false;
     bool bBypassAutoDiscovery = false;
     bool upgradeAllowed = false;
+    int quiet = 0;
 
-    bool cmdline_err;
-    MythCommandLineParser cmdline(
-        kCLPOverrideSettingsFile |
-        kCLPOverrideSettings     |
-        kCLPWindowed             |
-        kCLPNoWindowed           |
-        kCLPGetSettings          |
-        kCLPQueryVersion         |
-        kCLPVerbose              |
-        kCLPNoUPnP               |
-#ifdef USING_X11
-        kCLPDisplay              |
-#endif // USING_X11
-        kCLPExtra                |
-        kCLPGeometry);
-
-    // Handle --help before QApplication is created, so that
-    // we can print help even if X11 is absent.
-    for (int argpos = 1; argpos < argc; ++argpos)
+    MythFrontendCommandLineParser cmdline;
+    if (!cmdline.Parse(argc, argv))
     {
-        QString arg(argv[argpos]);
-        if (arg == "-h" || arg == "--help" || arg == "--usage")
-        {
-            ShowUsage(cmdline);
-            return GENERIC_EXIT_OK;
-        }
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    for (int argpos = 1; argpos < argc; ++argpos)
+    if (cmdline.toBool("showhelp"))
     {
-        if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
-        {
-            if (cmdline_err)
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            if (cmdline.WantsToExit())
-                return GENERIC_EXIT_OK;
-        }
+        cmdline.PrintHelp();
+        return GENERIC_EXIT_OK;
+    }
+
+    if (cmdline.toBool("showversion"))
+    {
+        cmdline.PrintVersion();
+        return GENERIC_EXIT_OK;
     }
 
 #ifdef Q_WS_MACX
@@ -1150,6 +1412,24 @@ int main(int argc, char **argv)
 
     QString binname = finfo.baseName();
 
+    if (cmdline.toBool("verbose"))
+        if (parse_verbose_arg(cmdline.toString("verbose")) ==
+                        GENERIC_EXIT_INVALID_CMDLINE)
+            return GENERIC_EXIT_INVALID_CMDLINE;
+
+    if (cmdline.toBool("quiet"))
+    {
+        quiet = cmdline.toUInt("quiet");
+        if (quiet > 1)
+        {
+            print_verbose_messages = VB_NONE;
+            parse_verbose_arg("none");
+        }
+    }
+
+    int facility = cmdline.GetSyslogFacility();
+    bool dblog = !cmdline.toBool("nodblog");
+
     VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
                             .arg(MYTH_APPNAME_MYTHFRONTEND)
                             .arg(MYTH_SOURCE_PATH)
@@ -1160,84 +1440,32 @@ int main(int argc, char **argv)
     if (binname.toLower() != "mythfrontend")
         pluginname = binname;
 
-    for (int argpos = 1; argpos < a.argc(); ++argpos)
-    {
-        if (!strcmp(a.argv()[argpos],"--prompt") ||
-            !strcmp(a.argv()[argpos],"-p" ))
-        {
-            bPromptForBackend = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"--disable-autodiscovery") ||
-                 !strcmp(a.argv()[argpos],"-d" ))
-        {
-            bBypassAutoDiscovery = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"-l") ||
-            !strcmp(a.argv()[argpos],"--logfile"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                logfile = a.argv()[argpos+1];
-                if (logfile.startsWith('-'))
-                {
-                    cerr << "Invalid or missing argument"
-                            " to -l/--logfile option\n";
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-                }
-                else
-                {
-                    ++argpos;
-                }
-            }
-            else
-            {
-                cerr << "Missing argument to -l/--logfile option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
-        {
-            if (cmdline_err)
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            if (cmdline.WantsToExit())
-                return GENERIC_EXIT_OK;
-        }
-    }
-    QMap<QString,QString> settingsOverride = cmdline.GetSettingsOverride();
-
-    if (logfile.size())
-    {
-        if (log_rotate(1) < 0)
-            cerr << "cannot open logfile; using stdout/stderr" << endl;
-        else
-        {
-            VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
-                                    .arg(MYTH_APPNAME_MYTHFRONTEND)
-                                    .arg(MYTH_SOURCE_PATH)
-                                    .arg(MYTH_SOURCE_VERSION));
-
-            signal(SIGHUP, &log_rotate_handler);
-        }
-    }
+    if (cmdline.toBool("prompt"))
+        bPromptForBackend = true;
+    if (cmdline.toBool("noautodiscovery"))
+        bBypassAutoDiscovery = true;
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         cerr << "Unable to ignore SIGPIPE\n";
 
-    if (!cmdline.GetDisplay().isEmpty())
+    if (!cmdline.toString("display").isEmpty())
     {
-        MythUIHelper::SetX11Display(cmdline.GetDisplay());
+        MythUIHelper::SetX11Display(cmdline.toString("display"));
     }
 
-    if (!cmdline.GetGeometry().isEmpty())
+    if (!cmdline.toString("geometry").isEmpty())
     {
-        MythUIHelper::ParseGeometryOverride(cmdline.GetGeometry());
+        MythUIHelper::ParseGeometryOverride(cmdline.toString("geometry"));
     }
 
     CleanupGuard callCleanup(cleanup);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
-    if (cmdline.IsUPnPEnabled())
+    logfile = cmdline.GetLogFilePath();
+    logStart(logfile, quiet, facility, dblog);
+
+    if (!cmdline.toBool("noupnp"))
     {
         g_pUPnp  = new MediaRenderer();
         if (!g_pUPnp->initialized())
@@ -1249,7 +1477,7 @@ int main(int argc, char **argv)
 
     // Override settings as early as possible to cover bootstrapped screens
     // such as the language prompt
-    settingsOverride = cmdline.GetSettingsOverride();
+    QMap<QString,QString> settingsOverride = cmdline.GetSettingsOverride();
     if (settingsOverride.size())
     {
         QMap<QString, QString>::iterator it;
@@ -1273,75 +1501,11 @@ int main(int argc, char **argv)
             return GENERIC_EXIT_DB_ERROR;
     }
 
-    for(int argpos = 1; argpos < a.argc(); ++argpos)
-    {
-        if (!strcmp(a.argv()[argpos],"-l") ||
-            !strcmp(a.argv()[argpos],"--logfile"))
-        {
-            // Arg processing for logfile already done (before MythContext)
-            ++argpos;
-        } else if (!strcmp(a.argv()[argpos],"-v") ||
-                   !strcmp(a.argv()[argpos],"--verbose"))
-        {
-            // Arg processing for verbose already done (before MythContext)
-            ++argpos;
-        }
-        else if (!strcmp(a.argv()[argpos],"-r") ||
-                 !strcmp(a.argv()[argpos],"--reset"))
-        {
-            ResetSettings = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"--prompt") ||
-                 !strcmp(a.argv()[argpos],"-p" ))
-        {
-        }
-        else if (!strcmp(a.argv()[argpos],"--disable-autodiscovery") ||
-                 !strcmp(a.argv()[argpos],"-d" ))
-        {
-        }
-        else if (!strcmp(a.argv()[argpos],"--upgrade-schema") ||
-                 !strcmp(a.argv()[argpos],"-u" ))
-        {
-            upgradeAllowed = true;
-        }
-        else if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
-        {
-            if (cmdline_err)
-            {
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
+    if (cmdline.toBool("reset"))
+        ResetSettings = true;
 
-            if (cmdline.WantsToExit())
-            {
-                return GENERIC_EXIT_OK;
-            }
-        }
-        else if ((argpos + 1 == a.argc()) &&
-                 (!QString(a.argv()[argpos]).startsWith('-')))
-        {
-            pluginname = a.argv()[argpos];
-        }
-        else
-        {
-            cerr << "Invalid argument: " << a.argv()[argpos] << endl;
-            ShowUsage(cmdline);
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
-    }
-
-    QStringList settingsQuery = cmdline.GetSettingsQuery();
-    if (!settingsQuery.empty())
-    {
-        QStringList::const_iterator it = settingsQuery.begin();
-        for (; it != settingsQuery.end(); ++it)
-        {
-            QString value = gCoreContext->GetSetting(*it);
-            QString out = QString("\tSettings Value : %1 = %2")
-                .arg(*it).arg(value);
-            cout << out.toLocal8Bit().constData() << endl;
-        }
-        return GENERIC_EXIT_OK;
-    }
+    if (cmdline.GetArgs().size() >= 1)
+        pluginname = cmdline.GetArgs()[0];
 
     QString fileprefix = GetConfDir();
 
@@ -1514,4 +1678,6 @@ int main(int argc, char **argv)
     return ret;
 
 }
+
+#include "main.moc"
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
