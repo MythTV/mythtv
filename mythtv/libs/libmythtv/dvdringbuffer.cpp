@@ -281,6 +281,11 @@ long long DVDRingBuffer::Seek(long long time)
     return m_currentpos;
 }
 
+bool DVDRingBuffer::IsBookmarkAllowed(void)
+{
+    return GetTotalTimeOfTitle() >= 120;
+}
+
 void DVDRingBuffer::GetDescForPos(QString &desc)
 {
     if (m_inMenu)

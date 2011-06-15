@@ -3156,7 +3156,8 @@ uint64_t MythPlayer::GetBookmark(void)
 {
     uint64_t bookmark = 0;
 
-    if (gCoreContext->IsDatabaseIgnored())
+    if (gCoreContext->IsDatabaseIgnored() ||
+       (player_ctx->buffer && !player_ctx->buffer->IsBookmarkAllowed()))
         bookmark = 0;
     else
     {

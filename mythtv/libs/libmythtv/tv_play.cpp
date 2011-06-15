@@ -4159,7 +4159,7 @@ bool TV::ActivePostQHandleAction(PlayerContext *ctx, const QStringList &actions)
         if (!islivetv || !CommitQueuedInput(ctx))
         {
             ctx->LockDeletePlayer(__FILE__, __LINE__);
-            if (ctx->player)
+            if (ctx->player && IsBookmarkAllowed(ctx))
             {
                 if (db_toggle_bookmark && ctx->player->GetBookmark())
                     ctx->player->ClearBookmark();
@@ -11408,8 +11408,6 @@ void TV::DVDJumpForward(PlayerContext *ctx)
  */
 bool TV::IsBookmarkAllowed(const PlayerContext *ctx) const
 {
-    bool isDVD = ctx->buffer && ctx->buffer->IsDVD();
-
     ctx->LockPlayingInfo(__FILE__, __LINE__);
 
     // Allow bookmark of "Record current LiveTV program"
@@ -11428,7 +11426,7 @@ bool TV::IsBookmarkAllowed(const PlayerContext *ctx) const
 
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-    return (!isDVD || (ctx->buffer->DVD()->GetTotalTimeOfTitle() >= 120));
+    return ctx->buffer && ctx->buffer->IsBookmarkAllowed();
 }
 
 /* \fn TV::IsDeleteAllowed(const PlayerContext*) const

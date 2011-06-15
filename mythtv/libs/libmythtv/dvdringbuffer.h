@@ -63,6 +63,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     void GetPartAndTitle(int &_part, int &_title) const
         { _part  = m_part; _title = m_title; }
     uint GetTotalTimeOfTitle(void);
+    virtual bool IsBookmarkAllowed(void);
     virtual bool IsStreamed(void)     { return true; }
     virtual int  BestBufferSize(void) { return 2048; }
 

@@ -71,6 +71,7 @@ class MTV_PUBLIC RingBuffer : protected QThread
     virtual bool IsOpen(void) const = 0;
     virtual bool IsStreamed(void)       { return LiveMode(); }
     virtual bool IsSeekingAllowed(void) { return true;  }
+    virtual bool IsBookmarkAllowed(void) { return true; }
     virtual int  BestBufferSize(void)   { return 32768; }
     static QString BitrateToString(uint64_t rate);
 

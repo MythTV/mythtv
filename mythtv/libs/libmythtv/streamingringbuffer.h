@@ -21,6 +21,7 @@ class StreamingRingBuffer : public RingBuffer
     virtual long long GetRealFileSize(void) const;
     virtual bool IsStreamed(void)       { return true;  }
     virtual bool IsSeekingAllowed(void) { return false; }
+    virtual bool IsBookmarkAllowed(void) { return false; }
 
   protected:
     virtual int safe_read(void *data, uint sz);
