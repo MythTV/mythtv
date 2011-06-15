@@ -112,12 +112,12 @@ EITFixUp::EITFixUp()
       m_nlDirector("(?=\\svan\\s)(([A-Z]{1}[a-z]+\\s)|([A-Z]{1}\\.\\s))"),
       m_nlCat("^(Amusement|Muziek|Informatief|Nieuws/actualiteiten|Jeugd|Animatie|Sport|Serie/soap|Kunst/Cultuur|Documentaire|Film|Natuur|Erotiek|Comedy|Misdaad|Religieus)\\.\\s"),
       m_nlOmroep ("\\s\\(([A-Z]+/?)+\\)$"),
-      m_noRerun(" \\(R\\)"),
+      m_noRerun("\\(R\\)"),
       m_noColonSubtitle("^([^:]+): (.+)"),
-      m_noNRKCategories("^(Superstreker|Supersommer|Superjul|Barne-tv|Fantorangen|Kuraffen|Supermorgen|Julemorgen|Sommermorgen|"
+      m_noNRKCategories("^(Superstrek[ea]r|Supersomm[ea]r|Superjul|Barne-tv|Fantorangen|Kuraffen|Supermorg[eo]n|Julemorg[eo]n|Sommermorg[eo]n|"
                         "Kuraffen-TV|Sport i dag|NRKs sportsl.rdag|NRKs sportss.ndag|Dagens dokumentar|"
-                        "NRK2s historiekveld|Detektimen|Nattkino|Filmklassiker|Film|Kortfilm|P.skemorgen|"
-                        "Radioteatret|Opera|P2-Akademiet|Nyhetsmorgen i P2 og Alltid Nyheter:): (.+)"),
+                        "NRK2s historiekveld|Detektimen|Nattkino|Filmklassiker|Film|Kortfilm|P.skemorg[eo]n|"
+                        "Radioteatret|Opera|P2-Akademiet|Nyhetsmorg[eo]n i P2 og Alltid Nyheter:): (.+)"),
       m_noPremiere("\\s+-\\s+(Sesongpremiere|Premiere|premiere)!?$"),
       m_Stereo("\\b\\(?[sS]tereo\\)?\\b")
 
