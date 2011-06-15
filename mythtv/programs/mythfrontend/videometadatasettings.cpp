@@ -55,10 +55,10 @@ bool MetadataSettings::Create()
     int unknownSetting = gCoreContext->GetNumSetting("VideoListUnknownFiletypes", 0);
     if (unknownSetting == 1)
         m_unknownFileCheck->SetCheckState(MythUIStateType::Full);
-    int autoMetaSetting = gCoreContext->GetNumSetting("mythvideo.AutoMetaDataScan", 0);
+    int autoMetaSetting = gCoreContext->GetNumSetting("mythvideo.AutoMetaDataScan", 1);
     if (autoMetaSetting == 1)
         m_autoMetaUpdateCheck->SetCheckState(MythUIStateType::Full);
-    int loadMetaSetting = gCoreContext->GetNumSetting("VideoTreeLoadMetaData", 0);
+    int loadMetaSetting = gCoreContext->GetNumSetting("VideoTreeLoadMetaData", 1);
     if (loadMetaSetting == 1)
         m_treeLoadsMetaCheck->SetCheckState(MythUIStateType::Full);
     int trailerSetting = gCoreContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0);
