@@ -2479,7 +2479,7 @@ void MythPlayer::InitialSeek(void)
     {
         DoFastForward(bookmarkseek, true, false);
         if (clearSavedPosition && !player_ctx->IsPIP())
-            ClearBookmark(false);
+            SetBookmark(true);
     }
 }
 
@@ -3128,27 +3128,11 @@ void MythPlayer::SetWatched(bool forceWatched)
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 }
 
-void MythPlayer::SetBookmark(void)
+void MythPlayer::SetBookmark(bool clear)
 {
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (player_ctx->playingInfo)
-    {
-        player_ctx->playingInfo->SaveBookmark(framesPlayed);
-        SetOSDStatus(QObject::tr("Position"), kOSDTimeout_Med);
-        SetOSDMessage(QObject::tr("Bookmark Saved"), kOSDTimeout_Med);
-    }
-    player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
-}
-
-void MythPlayer::ClearBookmark(bool message)
-{
-    player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-    if (player_ctx->playingInfo)
-    {
-        player_ctx->playingInfo->SaveBookmark(0);
-        if (message)
-            SetOSDMessage(QObject::tr("Bookmark Cleared"), kOSDTimeout_Med);
-    }
+        player_ctx->playingInfo->SaveBookmark(clear ? 0 : framesPlayed);
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 }
 

@@ -305,8 +305,7 @@ class MTV_PUBLIC MythPlayer
     void OpenDummy(void);
 
     // Non-public sets
-    virtual void SetBookmark(void);
-    virtual void ClearBookmark(bool message = true);
+    virtual void SetBookmark(bool clear = false);
     bool AddPIPPlayer(MythPlayer *pip, PIPLocation loc, uint timeout);
     bool RemovePIPPlayer(MythPlayer *pip, uint timeout);
     void DisableHardwareDecoders(void)        { no_hardware_decoders = true; }

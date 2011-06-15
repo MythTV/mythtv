@@ -2869,7 +2869,7 @@ void TV::PrepToSwitchToRecordedProgram(PlayerContext *ctx,
     SetExitPlayer(true, true);
 }
 
-void TV::PrepareToExitPlayer(PlayerContext *ctx, int line, bool bookmark) const
+void TV::PrepareToExitPlayer(PlayerContext *ctx, int line, bool bookmark)
 {
     bool bookmark_it = bookmark && IsBookmarkAllowed(ctx);
     ctx->LockDeletePlayer(__FILE__, line);
@@ -2877,7 +2877,7 @@ void TV::PrepareToExitPlayer(PlayerContext *ctx, int line, bool bookmark) const
     {
         if (bookmark_it && (!(ctx->player->IsNearEnd()) ||
                             StateIsRecording(GetState(ctx))))
-            ctx->player->SetBookmark();
+            SetBookmark(ctx);
         if (db_auto_set_watched)
             ctx->player->SetWatched();
     }
@@ -4146,6 +4146,30 @@ bool TV::PxPHandleAction(PlayerContext *ctx, const QStringList &actions)
     return handled;
 }
 
+void TV::SetBookmark(PlayerContext *ctx, bool clear)
+{
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    if (ctx->player)
+    {
+        if (clear)
+        {
+            ctx->player->SetBookmark(true);
+            SetOSDMessage(ctx, QObject::tr("Bookmark Cleared"));
+        }
+        else if (IsBookmarkAllowed(ctx))
+        {
+            ctx->player->SetBookmark();
+            osdInfo info;
+            ctx->CalcPlayerSliderPosition(info);
+            info.text["title"] = QObject::tr("Position");
+            UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default,
+                            kOSDTimeout_Med);
+            SetOSDMessage(ctx, QObject::tr("Bookmark Saved"));
+        }
+    }
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+}
+
 bool TV::ActivePostQHandleAction(PlayerContext *ctx, const QStringList &actions)
 {
     bool handled = true;
@@ -4159,13 +4183,7 @@ bool TV::ActivePostQHandleAction(PlayerContext *ctx, const QStringList &actions)
         if (!islivetv || !CommitQueuedInput(ctx))
         {
             ctx->LockDeletePlayer(__FILE__, __LINE__);
-            if (ctx->player && IsBookmarkAllowed(ctx))
-            {
-                if (db_toggle_bookmark && ctx->player->GetBookmark())
-                    ctx->player->ClearBookmark();
-                else
-                    ctx->player->SetBookmark();
-            }
+            SetBookmark(ctx, db_toggle_bookmark && ctx->player->GetBookmark());
             ctx->UnlockDeletePlayer(__FILE__, __LINE__);
         }
     }
@@ -4211,10 +4229,7 @@ bool TV::ActivePostQHandleAction(PlayerContext *ctx, const QStringList &actions)
     {
         NormalSpeed(ctx);
         StopFFRew(ctx);
-        ctx->LockDeletePlayer(__FILE__, __LINE__);
-        if (ctx->player)
-            ctx->player->SetBookmark();
-        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+        SetBookmark(ctx);
         ShowOSDPromptDeleteRecording(ctx, tr("Delete this recording?"));
     }
     else if (has_action(ACTION_JUMPTODVDROOTMENU, actions) && isdisc)
@@ -4416,9 +4431,8 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
     }
     else if (tokens.size() == 2 && tokens[1] == "STOP")
     {
+        SetBookmark(ctx);
         ctx->LockDeletePlayer(__FILE__, __LINE__);
-        if (ctx->player)
-            ctx->player->SetBookmark();
         if (ctx->player && db_auto_set_watched)
             ctx->player->SetWatched();
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
