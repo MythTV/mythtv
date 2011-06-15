@@ -1826,6 +1826,12 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
                      SignalMonitor::kDVBSigMon_WaitForPos);
         sm->SetRotorTarget(1.0f);
 
+        if (EITscan)
+        {
+            sm->GetStreamData()->SetVideoStreamsRequired(0);
+            sm->IgnoreEncrypted(true);
+        }
+
         VERBOSE(VB_RECORD, LOC + "Successfully set up DVB table monitoring.");
         return true;
     }
