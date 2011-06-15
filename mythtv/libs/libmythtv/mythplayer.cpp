@@ -1682,6 +1682,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
         ps = kScan_Progressive;
 
+    bool max_video_behind = diverge < -MAXDIVERGE; 
     bool dropframe = false;
     QString dbg;
 
@@ -1700,7 +1701,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         }
     }
 
-    if (diverge < -MAXDIVERGE)
+    if (max_video_behind)
     {
         dropframe = true;
         // If video is way behind of audio, adjust for it...
@@ -1720,7 +1721,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         lastsync = true;
         currentaudiotime = AVSyncGetAudiotime();
         VERBOSE(VB_PLAYBACK, LOC + dbg + "dropping frame to catch up.");
-        if (!audio.IsPaused())
+        if (!audio.IsPaused() && max_video_behind)
         {
             audio.Pause(true);
             avsync_audiopaused = true;
