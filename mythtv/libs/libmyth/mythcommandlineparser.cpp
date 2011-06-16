@@ -31,6 +31,8 @@ const int kEnd     = 0,
           kArg     = 4,
           kInvalid = 5;
 
+const char* NamedOptType(int type);
+
 const char* NamedOptType(int type)
 {
     if (type == kEnd)
