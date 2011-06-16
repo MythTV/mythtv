@@ -178,7 +178,7 @@ macx {
     }
 
     # Mac OS X Frameworks
-    FWKS = ApplicationServices AudioUnit Carbon CoreAudio IOKit
+    FWKS = ApplicationServices AudioUnit AudioToolbox Carbon CoreAudio IOKit
 
     darwin_da : FWKS += DiskArbitration
 

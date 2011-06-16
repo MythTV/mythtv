@@ -524,7 +524,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         lsource_channels == source_channels &&
         lneeds_downmix == needs_downmix;
 
-    if (general_deps)
+    if (general_deps && m_configure_succeeded)
     {
         VBAUDIO("Reconfigure(): No change -> exiting");
         return;
