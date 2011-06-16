@@ -56,6 +56,10 @@ class VideoOutputOpenGL : public VideoOutput
         { return VideoOutput::SetupVisualisation(audio, gl_context); }
 
   protected:
+    bool CreateCPUResources(void);
+    bool CreateGPUResources(void);
+    void DestroyCPUResources(void);
+    void DestroyGPUResources(void);
     virtual bool CreateBuffers(void);
     bool CreatePauseFrame(void);
     bool SetupContext(void);

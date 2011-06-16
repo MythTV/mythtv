@@ -53,18 +53,44 @@ VideoOutputOpenGL::VideoOutputOpenGL()
 
 VideoOutputOpenGL::~VideoOutputOpenGL()
 {
-    QMutexLocker locker(&gl_context_lock);
+    gl_context_lock.lock();
     TearDown();
 
     if (gl_context)
         gl_context->DownRef();
     gl_context = NULL;
+    gl_context_lock.unlock();
 }
 
 void VideoOutputOpenGL::TearDown(void)
 {
-    QMutexLocker locker(&gl_context_lock);
+    gl_context_lock.lock();
+    DestroyCPUResources();
+    DestroyGPUResources();
+    gl_context_lock.unlock();
+}
 
+bool VideoOutputOpenGL::CreateCPUResources(void)
+{
+    bool result = CreateBuffers();
+    result &= CreatePauseFrame();
+    return result;
+}
+
+bool VideoOutputOpenGL::CreateGPUResources(void)
+{
+    bool result = SetupContext();
+    QSize size = window.GetActualVideoDim();
+    InitDisplayMeasurements(size.width(), size.height(), false);
+    result &= SetupOpenGL();
+    InitOSD();
+    MoveResize();
+    return result;
+}
+
+void VideoOutputOpenGL::DestroyCPUResources(void)
+{
+    gl_context_lock.lock();
     DiscardFrames(true);
     vbuffers.DeleteBuffers();
     vbuffers.Reset();
@@ -79,7 +105,12 @@ void VideoOutputOpenGL::TearDown(void)
         delete [] av_pause_frame.qscale_table;
         av_pause_frame.qscale_table = NULL;
     }
+    gl_context_lock.unlock();
+}
 
+void VideoOutputOpenGL::DestroyGPUResources(void)
+{
+    gl_context_lock.lock();
     if (gl_context)
         gl_context->makeCurrent();
 
@@ -106,33 +137,26 @@ void VideoOutputOpenGL::TearDown(void)
 
     if (gl_context)
         gl_context->doneCurrent();
+    gl_context_lock.unlock();
 }
 
 bool VideoOutputOpenGL::Init(int width, int height, float aspect, WId winid,
                              const QRect &win_rect, MythCodecID codec_id)
 {
     QMutexLocker locker(&gl_context_lock);
-
     bool success = true;
-    // FIXME Mac OS X overlay does not work with preview
     window.SetAllowPreviewEPG(true);
     gl_parent_win = winid;
-
-    VideoOutput::Init(width, height, aspect, winid, win_rect, codec_id);
-
+    success &= VideoOutput::Init(width, height, aspect, winid,
+                                 win_rect, codec_id);
     SetProfile();
     InitPictureAttributes();
-    success &= SetupContext();
-    InitDisplayMeasurements(width, height, false);
-    success &= CreateBuffers();
-    success &= CreatePauseFrame();
-    success &= SetupOpenGL();
-    InitOSD();
-    MoveResize();
+
+    success &= CreateCPUResources();
+    success &= CreateGPUResources();
 
     if (!success)
         TearDown();
-
     return success;
 }
 
