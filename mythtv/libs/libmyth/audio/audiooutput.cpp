@@ -115,7 +115,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
 
             device_name.remove(0, 5);
             QMap<QString, QString> *alsadevs =
-                AudioOutputALSA::GetALSADevices("pcm");
+                AudioOutputALSA::GetDevices("pcm");
             if (!alsadevs->empty() && alsadevs->contains(device_name))
             {
                 if (alsadevs->value(device_name).contains("pulse",
@@ -329,7 +329,7 @@ static void fillSelectionsFromDir(const QDir &dir,
         QString name = fi.absoluteFilePath();
         QString desc = QString("OSS device");
         AudioOutput::AudioDeviceConfig *adc =
-        AudioOutput::GetAudioDeviceConfig(name, desc);
+            AudioOutput::GetAudioDeviceConfig(name, desc);
         if (!adc)
             continue;
         list->append(*adc);
