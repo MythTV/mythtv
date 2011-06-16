@@ -123,7 +123,7 @@ bool PlayerContext::IsPIPSupported(void) const
     QMutexLocker locker(&deletePlayerLock);
     if (player)
     {
-        const VideoOutput *vid = player->getVideoOutput();
+        const VideoOutput *vid = player->GetVideoOutput();
         if (vid)
             supported = vid->IsPIPSupported();
     }
@@ -141,7 +141,7 @@ bool PlayerContext::IsPBPSupported(void) const
     QMutexLocker locker(&deletePlayerLock);
     if (player)
     {
-        const VideoOutput *vid = player->getVideoOutput();
+        const VideoOutput *vid = player->GetVideoOutput();
         if (vid)
             supported = vid->IsPBPSupported();
     }
@@ -259,8 +259,8 @@ void PlayerContext::ResizePIPWindow(const QRect &rect)
         tmpRect = QRect(rect);
 
     LockDeletePlayer(__FILE__, __LINE__);
-    if (player && player->getVideoOutput())
-        player->getVideoOutput()->ResizeDisplayWindow(tmpRect, false);
+    if (player && player->GetVideoOutput())
+        player->GetVideoOutput()->ResizeDisplayWindow(tmpRect, false);
     UnlockDeletePlayer(__FILE__, __LINE__);
 
     pipRect = QRect(rect);

@@ -51,7 +51,7 @@ void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
                                     "before initialisation.");
     }
 
-    VideoOutput *vo = m_player->getVideoOutput();
+    VideoOutput *vo = m_player->GetVideoOutput();
     if (!vo)
         return;
 

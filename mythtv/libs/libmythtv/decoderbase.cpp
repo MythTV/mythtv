@@ -520,11 +520,7 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool discardFrames)
     SeekReset(lastKey, normalframes, true, discardFrames);
 
     if (ringBuffer->IsDisc() || discardFrames)
-    {
-        // We need to tell the NVP and VideoOutput what frame we're on.
         m_parent->SetFramesPlayed(framesPlayed+1);
-        m_parent->getVideoOutput()->SetFramesPlayed(framesPlayed+1);
-    }
 
     return true;
 }
@@ -735,11 +731,7 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
     SeekReset(lastKey, normalframes, needflush, discardFrames);
 
     if (discardFrames)
-    {
-        // We need to tell the NVP and VideoOutput what frame we're on.
         m_parent->SetFramesPlayed(framesPlayed+1);
-        m_parent->getVideoOutput()->SetFramesPlayed(framesPlayed+1);
-    }
 
     // Re-enable rawframe state if it was enabled before FF
     getrawframes = oldrawstate;
@@ -907,7 +899,6 @@ void DecoderBase::UpdateDVDFramesPlayed(void)
         return;
     long long currentpos = (long long)(ringBuffer->DVD()->GetCurrentTime() * fps);
     framesPlayed = framesRead = currentpos ;
-    m_parent->getVideoOutput()->SetFramesPlayed(currentpos + 1);
     m_parent->SetFramesPlayed(currentpos + 1);
 }
 
@@ -917,7 +908,6 @@ void DecoderBase::UpdateBDFramesPlayed(void)
         return;
     long long currentpos = (long long)(ringBuffer->BD()->GetCurrentTime() * fps);
     framesPlayed = framesRead = currentpos ;
-    m_parent->getVideoOutput()->SetFramesPlayed(currentpos + 1);
     m_parent->SetFramesPlayed(currentpos + 1);
 }
 

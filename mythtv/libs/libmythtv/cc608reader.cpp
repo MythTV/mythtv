@@ -42,8 +42,8 @@ CC608Buffer* CC608Reader::GetOutputText(bool &changed)
         return NULL;
 
     VideoFrame *last = NULL;
-    if (m_parent->getVideoOutput())
-        last = m_parent->getVideoOutput()->GetLastShownFrame();
+    if (m_parent->GetVideoOutput())
+        last = m_parent->GetVideoOutput()->GetLastShownFrame();
 
     if (NumInputBuffers() && m_inputBuffers[m_writePosition].timecode &&
        (last && m_inputBuffers[m_writePosition].timecode <= last->timecode))

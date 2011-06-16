@@ -560,8 +560,6 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     {
         SeekReset(framesPlayed, seekDelta, false, true);
         m_parent->SetFramesPlayed(framesPlayed + 1);
-        m_parent->getVideoOutput()->SetFramesPlayed(framesPlayed + 1);
-
         return true;
     }
 
@@ -635,10 +633,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     SeekReset(lastKey, normalframes, true, discardFrames);
 
     if (discardFrames)
-    {
         m_parent->SetFramesPlayed(framesPlayed + 1);
-        m_parent->getVideoOutput()->SetFramesPlayed(framesPlayed + 1);
-    }
 
     dorewind = false;
 
@@ -2288,8 +2283,8 @@ void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
     }
 
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
-    if (nd && nd->GetPlayer() && nd->GetPlayer()->getVideoOutput())
-        nd->GetPlayer()->getVideoOutput()->DeLimboFrame((VideoFrame*)pic->opaque);
+    if (nd && nd->GetPlayer())
+        nd->GetPlayer()->DeLimboFrame((VideoFrame*)pic->opaque);
 
     assert(pic->type == FF_BUFFER_TYPE_USER);
 
@@ -2337,8 +2332,8 @@ void release_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
 #endif
 
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
-    if (nd && nd->GetPlayer() && nd->GetPlayer()->getVideoOutput())
-        nd->GetPlayer()->getVideoOutput()->DeLimboFrame((VideoFrame*)pic->opaque);
+    if (nd && nd->GetPlayer())
+        nd->GetPlayer()->DeLimboFrame((VideoFrame*)pic->opaque);
 
     for (uint i = 0; i < 4; i++)
         pic->data[i] = NULL;
@@ -2385,12 +2380,9 @@ int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic)
     frame->pix_fmt   = c->pix_fmt;
 
 #ifdef USING_DXVA2
-    if (nd->GetPlayer()->getVideoOutput())
+    if (nd->GetPlayer())
     {
-        VideoOutputD3D *vo =
-            dynamic_cast<VideoOutputD3D*>(nd->GetPlayer()->getVideoOutput());
-        if (vo)
-            c->hwaccel_context = (dxva_context*)vo->GetDXVA2Decoder();
+        c->hwaccel_context = (dxva_context*)nd->GetPlayer()->GetDecoderContext();
         pic->data[0] = (uint8_t*)frame->buf;
         pic->data[3] = (uint8_t*)frame->buf;
     }
@@ -4304,9 +4296,6 @@ bool AvFormatDecoder::HasVideo(const AVFormatContext *ic)
 
 bool AvFormatDecoder::GenerateDummyVideoFrame(void)
 {
-    if (!m_parent->getVideoOutput())
-        return false;
-
     VideoFrame *frame = m_parent->GetNextVideoFrame();
     if (!frame)
         return false;
@@ -4340,7 +4329,7 @@ bool AvFormatDecoder::GenerateDummyVideoFrame(void)
     frame->frameNumber = framesPlayed;
 
     m_parent->ReleaseNextVideoFrame(frame, lastvpts);
-    m_parent->getVideoOutput()->DeLimboFrame(frame);
+    m_parent->DeLimboFrame(frame);
 
     decoded_video_frame = frame;
     framesPlayed++;

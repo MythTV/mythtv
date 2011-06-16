@@ -92,7 +92,7 @@ QImage* TeletextScreen::GetRowImage(int row, QRect &rect)
 
 void TeletextScreen::OptimiseDisplayedArea(void)
 {
-    VideoOutput *vo = m_player->getVideoOutput();
+    VideoOutput *vo = m_player->GetVideoOutput();
     if (!vo)
         return;
     MythPainter *osd_painter = vo->GetOSDPainter();
@@ -150,11 +150,11 @@ void TeletextScreen::Pulse(void)
     if (!InitialiseFont() || !m_displaying)
         return;
 
-    if (m_player && m_player->getVideoOutput())
+    if (m_player && m_player->GetVideoOutput())
     {
         static const float kTextPadding = 0.96f;
         QRect oldsafe = m_safeArea;
-        m_safeArea = m_player->getVideoOutput()->GetSafeRect();
+        m_safeArea = m_player->GetVideoOutput()->GetSafeRect();
         m_colWidth = (int)((float)m_safeArea.width() / (float)kTeletextColumns);
         m_rowHeight = (int)((float)m_safeArea.height() / (float)kTeletextRows);
 

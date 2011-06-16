@@ -804,7 +804,7 @@ int Transcode::TranscodeFile(
     float rateTimeConv = arb->eff_audiorate / 1000.0f;
     float vidFrameTime = 1000.0f / video_frame_rate;
     int wait_recover = 0;
-    VideoOutput *videoOutput = player->getVideoOutput();
+    VideoOutput *videoOutput = player->GetVideoOutput();
     bool is_key = 0;
     bool first_loop = true;
     unsigned char *newFrame = new unsigned char[frame.size];

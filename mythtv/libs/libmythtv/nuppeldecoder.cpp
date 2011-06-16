@@ -638,8 +638,8 @@ void release_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic)
     assert(pic->type == FF_BUFFER_TYPE_USER);
 
     NuppelDecoder *nd = (NuppelDecoder *)(c->opaque);
-    if (nd && nd->GetPlayer() && nd->GetPlayer()->getVideoOutput())
-        nd->GetPlayer()->getVideoOutput()->DeLimboFrame((VideoFrame*)pic->opaque);
+    if (nd && nd->GetPlayer())
+        nd->GetPlayer()->DeLimboFrame((VideoFrame*)pic->opaque);
 
     int i;
     for (i = 0; i < 4; i++)
@@ -1191,7 +1191,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
             // We need to make the frame available ourselves
             // if we are not using ffmpeg/avlib.
             if (directframe)
-                GetPlayer()->getVideoOutput()->DeLimboFrame(buf);
+                GetPlayer()->DeLimboFrame(buf);
 
             decoded_video_frame = buf;
             gotvideo = 1;

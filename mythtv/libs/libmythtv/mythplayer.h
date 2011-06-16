@@ -103,9 +103,14 @@ class MTV_PUBLIC MythPlayer
     friend class CC708Reader;
     friend class CC608Reader;
     friend class DecoderThread;
-    friend class TV;
     friend class DetectLetterbox;
-    friend class PlayerThread;
+    friend class TeletextScreen;
+    friend class SubtitleScreen;
+    friend class InteractiveScreen;
+    friend class BDOverlayScreen;
+    // TODO remove these
+    friend class TV;
+    friend class Transcode;
 
   public:
     MythPlayer(bool muted = false);
@@ -121,7 +126,7 @@ class MTV_PUBLIC MythPlayer
     void SetNullVideo(void)                   { using_null_videoout = true; }
     void SetExactSeeks(bool exact)            { exactseeks = exact; }
     void SetLength(int len)                   { totalLength = len; }
-    void SetFramesPlayed(uint64_t played)     { framesPlayed = played; }
+    void SetFramesPlayed(uint64_t played);
     void SetVideoFilters(const QString &override);
     void SetEof(bool eof);
     void SetPIPActive(bool is_active)         { pip_active = is_active; }
@@ -192,7 +197,6 @@ class MTV_PUBLIC MythPlayer
     bool    GetScreenShot(int width = 0, int height = 0, QString filename = "");
 
     // Non-const gets
-    VideoOutput *getVideoOutput(void)         { return videoOutput; }
     virtual char *GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
                                        int &buflen, int &vw, int &vh, float &ar);
     virtual char *GetScreenGrab(int secondsin, int &buflen,
@@ -222,6 +226,7 @@ class MTV_PUBLIC MythPlayer
     VideoFrame *GetNextVideoFrame(void);
     VideoFrame *GetRawVideoFrame(long long frameNumber = -1);
     VideoFrame *GetCurrentFrame(int &w, int &h);
+    void DeLimboFrame(VideoFrame *frame);
     virtual void ReleaseNextVideoFrame(VideoFrame *buffer, int64_t timecode,
                                        bool wrap = true);
     void ReleaseNextVideoFrame(void)
@@ -232,6 +237,7 @@ class MTV_PUBLIC MythPlayer
     void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
     /// Returns the stream decoder currently in use.
     DecoderBase *GetDecoder(void) { return decoder; }
+    void *GetDecoderContext(void);
 
     // Preview Image stuff
     void SaveScreenshot(void);
@@ -330,7 +336,8 @@ class MTV_PUBLIC MythPlayer
     MuteState IncrMuteState(void)           { return audio.IncrMuteState();      }
 
     // Non-const gets
-    OSD         *GetOSD(void) { return osd; }
+    VideoOutput *GetVideoOutput(void)       { return videoOutput; }
+    OSD         *GetOSD(void)               { return osd;         }
     virtual void SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
                                    bool absolute);
 

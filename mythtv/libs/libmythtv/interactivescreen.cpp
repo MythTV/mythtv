@@ -14,8 +14,8 @@ InteractiveScreen::~InteractiveScreen(void)
 
 void InteractiveScreen::Close(void)
 {
-    if (m_player && m_player->getVideoOutput())
-        m_player->getVideoOutput()->SetVideoResize(QRect());
+    if (m_player && m_player->GetVideoOutput())
+        m_player->GetVideoOutput()->SetVideoResize(QRect());
 }
 
 void InteractiveScreen::UpdateArea(void)
@@ -24,11 +24,11 @@ void InteractiveScreen::UpdateArea(void)
     {
         m_safeArea = QRect();
     }
-    else if (m_player && m_player->getVideoOutput())
+    else if (m_player && m_player->GetVideoOutput())
     {
         float tmp = 0.0;
         QRect dummy;
-        m_player->getVideoOutput()->GetOSDBounds(dummy, m_safeArea, tmp, tmp, tmp);
+        m_player->GetVideoOutput()->GetOSDBounds(dummy, m_safeArea, tmp, tmp, tmp);
     }
     SetArea(MythRect(m_safeArea));
 }

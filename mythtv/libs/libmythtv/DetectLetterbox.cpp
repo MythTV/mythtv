@@ -58,7 +58,7 @@ void DetectLetterbox::Detect(VideoFrame *frame)
     if (!GetDetectLetterbox())
         return;
 
-    if (!m_player->getVideoOutput())
+    if (!m_player->GetVideoOutput())
         return;
 
     switch (frame->codec) {
@@ -300,7 +300,7 @@ void DetectLetterbox::SwitchTo(VideoFrame *frame)
                 VERBOSE(VB_PLAYBACK, QString("Detect Letterbox: Switched to %1 "
                         "on frame %2 (%3)").arg(detectLetterboxDetectedMode)
                         .arg(frame->frameNumber).arg(detectLetterboxSwitchFrame));
-                m_player->getVideoOutput()->ToggleAdjustFill(detectLetterboxDetectedMode);
+                m_player->GetVideoOutput()->ToggleAdjustFill(detectLetterboxDetectedMode);
                 m_player->ReinitOSD();
             }
             detectLetterboxSwitchFrame = -1;

@@ -3706,7 +3706,7 @@ bool TV::AudioSyncHandleAction(PlayerContext *ctx,
 bool TV::DiscMenuHandleAction(PlayerContext *ctx, const QStringList &actions)
 {
     int64_t pts = 0;
-    VideoOutput *output = ctx->player->getVideoOutput();
+    VideoOutput *output = ctx->player->GetVideoOutput();
     if (output)
     {
         VideoFrame *frame = output->GetLastShownFrame();
@@ -5077,7 +5077,7 @@ bool TV::ResizePIPWindow(PlayerContext *ctx)
                     .arg(loc));
             if (loc != kPIP_END)
             {
-                rect = mctx->player->getVideoOutput()->GetPIPRect(
+                rect = mctx->player->GetVideoOutput()->GetPIPRect(
                     loc, ctx->player, false);
             }
         }
@@ -7616,12 +7616,12 @@ void TV::DoEditSchedule(int editType)
 
     {
         actx->LockDeletePlayer(__FILE__, __LINE__);
-        pause_active = !actx->player || !actx->player->getVideoOutput();
+        pause_active = !actx->player || !actx->player->GetVideoOutput();
         if (actx->player)
         {
             paused = actx->player->IsPaused();
-            if (actx->player->getVideoOutput())
-                allowEmbedding = actx->player->getVideoOutput()->AllowPreviewEPG();
+            if (actx->player->GetVideoOutput())
+                allowEmbedding = actx->player->GetVideoOutput()->AllowPreviewEPG();
             if (!pause_active)
                 isNearEnd = actx->player->IsNearEnd();
         }
@@ -7644,8 +7644,8 @@ void TV::DoEditSchedule(int editType)
     // Resize window to the MythTV GUI size
     PlayerContext *mctx = GetPlayer(actx,0);
     mctx->LockDeletePlayer(__FILE__, __LINE__);
-    if (mctx->player && mctx->player->getVideoOutput())
-        mctx->player->getVideoOutput()->ResizeForGui();
+    if (mctx->player && mctx->player->GetVideoOutput())
+        mctx->player->GetVideoOutput()->ResizeForGui();
     mctx->UnlockDeletePlayer(__FILE__, __LINE__);
     ReturnPlayerLock(actx);
     MythMainWindow *mwnd = GetMythMainWindow();
@@ -8449,8 +8449,8 @@ void TV::customEvent(QEvent *e)
 
         mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
         mctx->LockDeletePlayer(__FILE__, __LINE__);
-        if (mctx->player && mctx->player->getVideoOutput())
-            mctx->player->getVideoOutput()->ResizeForVideo();
+        if (mctx->player && mctx->player->GetVideoOutput())
+            mctx->player->GetVideoOutput()->ResizeForVideo();
         mctx->UnlockDeletePlayer(__FILE__, __LINE__);
         ReturnPlayerLock(mctx);
 
@@ -8660,16 +8660,16 @@ void TV::HandleOSDClosed(int osdType)
     }
 }
 
-static PictureAttribute next(
+PictureAttribute TV::NextPictureAdjustType(
     PictureAdjustType type, MythPlayer *mp, PictureAttribute attr)
 {
     if (!mp)
         return kPictureAttribute_None;
 
     uint sup = kPictureAttributeSupported_None;
-    if ((kAdjustingPicture_Playback == type) && mp && mp->getVideoOutput())
+    if ((kAdjustingPicture_Playback == type) && mp && mp->GetVideoOutput())
     {
-        sup = mp->getVideoOutput()->GetSupportedPictureAttributes();
+        sup = mp->GetVideoOutput()->GetSupportedPictureAttributes();
         if (mp->HasAudioOut())
             sup |= kPictureAttributeSupported_Volume;
     }
@@ -8702,7 +8702,8 @@ void TV::DoTogglePictureAttribute(const PlayerContext *ctx,
                                   PictureAdjustType type)
 {
     ctx->LockDeletePlayer(__FILE__, __LINE__);
-    PictureAttribute attr = next(type, ctx->player, adjustingPictureAttribute);
+    PictureAttribute attr = NextPictureAdjustType(type, ctx->player,
+                                                  adjustingPictureAttribute);
     if (kPictureAttribute_None == attr)
     {
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
@@ -8724,7 +8725,7 @@ void TV::DoTogglePictureAttribute(const PlayerContext *ctx,
         }
         if (kPictureAttribute_Volume != adjustingPictureAttribute)
         {
-            value = ctx->player->getVideoOutput()->GetPictureAttribute(attr);
+            value = ctx->player->GetVideoOutput()->GetPictureAttribute(attr);
         }
         else if (ctx->player->HasAudioOut())
         {
@@ -8767,7 +8768,7 @@ void TV::DoChangePictureAttribute(
             ctx->UnlockDeletePlayer(__FILE__, __LINE__);
             return;
         }
-        value = ctx->player->getVideoOutput()->ChangePictureAttribute(attr, up);
+        value = ctx->player->GetVideoOutput()->ChangePictureAttribute(attr, up);
     }
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
@@ -9931,7 +9932,7 @@ void TV::FillOSDMenuVideo(const PlayerContext *ctx, OSD *osd,
         scan_type_locked = ctx->player->IsScanTypeLocked();
         if (!tracks.empty())
             curtrack = (uint) ctx->player->GetTrack(kTrackTypeVideo);
-        VideoOutput *vo = ctx->player->getVideoOutput();
+        VideoOutput *vo = ctx->player->GetVideoOutput();
         if (vo)
         {
             sup = vo->GetSupportedPictureAttributes();
@@ -10053,10 +10054,10 @@ void TV::FillOSDMenuVideo(const PlayerContext *ctx, OSD *osd,
         QString     currentdeinterlacer;
         bool        doublerate = false;
         ctx->LockDeletePlayer(__FILE__, __LINE__);
-        if (ctx->player && ctx->player->getVideoOutput())
+        if (ctx->player && ctx->player->GetVideoOutput())
         {
-            ctx->player->getVideoOutput()->GetDeinterlacers(deinterlacers);
-            currentdeinterlacer = ctx->player->getVideoOutput()->GetDeinterlacer();
+            ctx->player->GetVideoOutput()->GetDeinterlacers(deinterlacers);
+            currentdeinterlacer = ctx->player->GetVideoOutput()->GetDeinterlacer();
             doublerate = ctx->player->CanSupportDoubleRate();
         }
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
@@ -10939,8 +10940,8 @@ void TV::HandleDeinterlacer(PlayerContext *ctx, const QString &action)
 
     QString deint = action.mid(13);
     ctx->LockDeletePlayer(__FILE__, __LINE__);
-    if (ctx->player && ctx->player->getVideoOutput())
-        ctx->player->getVideoOutput()->SetupDeinterlace(true, deint);
+    if (ctx->player && ctx->player->GetVideoOutput())
+        ctx->player->GetVideoOutput()->SetupDeinterlace(true, deint);
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 }
 

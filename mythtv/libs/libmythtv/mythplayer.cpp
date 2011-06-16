@@ -1008,6 +1008,13 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
     return IsErrored() ? -1 : 0;
 }
 
+void MythPlayer::SetFramesPlayed(uint64_t played)
+{
+    framesPlayed = played;
+    if (videoOutput)
+        videoOutput->SetFramesPlayed(played);
+}
+
 void MythPlayer::SetVideoFilters(const QString &override)
 {
     videoFiltersOverride = override;
@@ -1088,7 +1095,9 @@ void MythPlayer::InitFilters(void)
  */
 VideoFrame *MythPlayer::GetNextVideoFrame(void)
 {
-    return videoOutput->GetNextFreeFrame();
+    if (videoOutput)
+        return videoOutput->GetNextFreeFrame();
+    return NULL;
 }
 
 /** \fn MythPlayer::ReleaseNextVideoFrame(VideoFrame*, int64_t)
@@ -1102,7 +1111,8 @@ void MythPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
         WrapTimecode(timecode, TC_VIDEO);
     buffer->timecode = timecode;
 
-    videoOutput->ReleaseFrame(buffer);
+    if (videoOutput)
+        videoOutput->ReleaseFrame(buffer);
 
     detect_letter_box->Detect(buffer);
 }
@@ -1135,7 +1145,15 @@ void MythPlayer::DiscardVideoFrames(bool next_frame_keyframe)
 
 void MythPlayer::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 {
-    videoOutput->DrawSlice(frame, x, y, w, h);
+    if (videoOutput)
+        videoOutput->DrawSlice(frame, x, y, w, h);
+}
+
+void* MythPlayer::GetDecoderContext(void)
+{
+    if (videoOutput)
+        return videoOutput->GetDecoderContext();
+    return NULL;
 }
 
 VideoFrame *MythPlayer::GetCurrentFrame(int &w, int &h)
@@ -1159,6 +1177,12 @@ VideoFrame *MythPlayer::GetCurrentFrame(int &w, int &h)
         vidExitLock.unlock();
 
     return retval;
+}
+
+void MythPlayer::DeLimboFrame(VideoFrame *frame)
+{
+    if (videoOutput)
+        videoOutput->DeLimboFrame(frame);
 }
 
 void MythPlayer::ReleaseCurrentFrame(VideoFrame *frame)
