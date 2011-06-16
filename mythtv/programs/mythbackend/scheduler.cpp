@@ -1103,7 +1103,7 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
             continue;
 
         if (samePriority &&
-            (q->GetRecordingPriority() != p->GetRecordingPriority()))
+            (q->GetRecordingPriority() < p->GetRecordingPriority()))
         {
             continue;
         }
@@ -1294,8 +1294,7 @@ void Scheduler::MoveHigherRecords(bool move_this)
         RecConstIter k = cardlist.begin();
         for ( ; FindNextConflict(cardlist, p, k ); ++k)
         {
-            if (p->GetRecordingPriority() != (*k)->GetRecordingPriority() ||
-                !TryAnotherShowing(*k, true))
+            if (!TryAnotherShowing(*k, true))
             {
                 RestoreRecStatus();
                 break;
