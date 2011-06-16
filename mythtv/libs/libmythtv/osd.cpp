@@ -200,7 +200,7 @@ void OSD::SetPainter(MythPainter *painter)
         return;
 
     m_CurrentPainter = painter;
-    QHashIterator<QString, MythScreenType*> it(m_Children);
+    QMapIterator<QString, MythScreenType*> it(m_Children);
     while (it.hasNext())
     {
         it.next();
@@ -275,7 +275,7 @@ bool OSD::IsVisible(void)
 
 void OSD::HideAll(bool keepsubs, MythScreenType* except)
 {
-    QMutableHashIterator<QString, MythScreenType*> it(m_Children);
+    QMutableMapIterator<QString, MythScreenType*> it(m_Children);
     while (it.hasNext())
     {
         it.next();
@@ -538,7 +538,7 @@ bool OSD::DrawDirect(MythPainter* painter, QSize size, bool repaint)
     QTime now = QTime::currentTime();
 
     CheckExpiry();
-    QHash<QString,MythScreenType*>::iterator it;
+    QMap<QString,MythScreenType*>::const_iterator it;
     for (it = m_Children.begin(); it != m_Children.end(); ++it)
     {
         if (it.value()->IsVisible())
@@ -594,7 +594,7 @@ QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
     CheckExpiry();
 
     // first update for alpha pulse and fade
-    QHash<QString,MythScreenType*>::iterator it;
+    QMap<QString,MythScreenType*>::const_iterator it;
     for (it = m_Children.begin(); it != m_Children.end(); ++it)
     {
         if (it.value()->IsVisible())
@@ -990,6 +990,8 @@ TeletextScreen* OSD::InitTeletext(void)
             if (tt->Create())
             {
                 m_Children.insert(OSD_WIN_TELETEXT, tt);
+                VERBOSE(VB_PLAYBACK, LOC + QString("Created window %1")
+                    .arg(OSD_WIN_TELETEXT));
             }
             else
             {
@@ -1096,6 +1098,8 @@ SubtitleScreen* OSD::InitSubtitles(void)
             if (sub->Create())
             {
                 m_Children.insert(OSD_WIN_SUBTITLE, sub);
+                VERBOSE(VB_PLAYBACK, LOC + QString("Created window %1")
+                    .arg(OSD_WIN_SUBTITLE));
             }
             else
             {

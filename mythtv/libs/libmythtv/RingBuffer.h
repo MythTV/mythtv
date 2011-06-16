@@ -91,6 +91,10 @@ class MPUBLIC RingBuffer : protected QThread
     bool IsDVD(void) const;
     bool InDVDMenuOrStillFrame(void);
 
+    // Temporary DVD locking mechanisms (fixed in 0.25)
+    void DVDUnlockRW(void)       { rwlock.unlock();       }
+    void DVDLockRWForWrite(void) { rwlock.lockForWrite(); }
+
     // BDRingBuffer proxies
     bool IsBD(void) const;
 

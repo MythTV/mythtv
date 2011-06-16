@@ -33,7 +33,7 @@ static const char *dvdnav_menu_table[] =
     "Part",
 };
 
-DVDRingBufferPriv::DVDRingBufferPriv()
+DVDRingBufferPriv::DVDRingBufferPriv(RingBuffer* ringbuffer)
     : m_dvdnav(NULL),     m_dvdBlockReadBuf(NULL),
       m_dvdFilename(QString::null),
       m_dvdBlockRPos(0),  m_dvdBlockWPos(0),
@@ -62,7 +62,7 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       m_dvdname(NULL), m_serialnumber(NULL),
       m_seeking(false), m_seektime(0),
       m_currentTime(0),
-      m_parent(NULL),
+      m_parent(NULL), m_ringBuffer(ringbuffer),
 
       // Menu/buttons
       m_inMenu(false), m_buttonVersion(1), m_buttonStreamID(0),
@@ -289,7 +289,11 @@ void DVDRingBufferPriv::WaitForPlayer(void)
         m_playerWait = true;
         int count = 0;
         while (m_playerWait && count++ < 200)
+        {
+            m_ringBuffer->DVDUnlockRW();
             usleep(10000);
+            m_ringBuffer->DVDLockRWForWrite();
+        }
         if (m_playerWait)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -666,7 +670,9 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
 
                 // pause a little as the dvdnav VM will continue to return
                 // this event until it has been skipped
+                m_ringBuffer->DVDUnlockRW();
                 usleep(10000);
+                m_ringBuffer->DVDLockRWForWrite();
 
                 // when scanning the file or exiting playback, skip immediately
                 // otherwise update the timeout in the player
@@ -699,7 +705,9 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 else
                 {
                     m_dvdWaiting = true;
+                    m_ringBuffer->DVDUnlockRW();
                     usleep(10000);
+                    m_ringBuffer->DVDLockRWForWrite();
                 }
 
                 // release buffer

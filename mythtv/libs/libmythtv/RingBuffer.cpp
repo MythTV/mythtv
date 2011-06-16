@@ -294,6 +294,7 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     rwlock.lockForWrite();
 
     filename = lfilename;
+    QString lower = filename.toLower();
 
     if (remotefile)
     {
@@ -312,7 +313,7 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     bool is_bd = false;
     (void) is_bd;
 
-    if (!streamOnly && filename.startsWith("myth://"))
+    if (!streamOnly && lower.startsWith("myth://"))
     {
         struct stat fileInfo;
         if ((RemoteFile::Exists(filename, &fileInfo)) &&
@@ -338,39 +339,39 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
 #ifdef USING_FRONTEND
     else if ((!streamOnly) &&
-             ((filename.startsWith("dvd:")) || is_dvd ||
-              ((filename.startsWith("myth://")) &&
-               ((filename.endsWith(".img")) ||
-                (filename.endsWith(".iso"))))))
+             ((lower.startsWith("dvd:")) || is_dvd ||
+              ((lower.startsWith("myth://")) &&
+               ((lower.endsWith(".img")) ||
+                (lower.endsWith(".iso"))))))
     {
         is_dvd = true;
-        dvdPriv = new DVDRingBufferPriv();
+        dvdPriv = new DVDRingBufferPriv(this);
         startreadahead = false;
 
-        if (filename.left(6) == "dvd://")      // 'Play DVD' sends "dvd:/" + dev
-            filename.remove(0,5);              //             e.g. "dvd://dev/sda"
-        else if (filename.left(5) == "dvd:/")  // Less correct URI "dvd:" + path
-            filename.remove(0,4);              //             e.g. "dvd:/videos/ET"
+        if (lower.left(6) == "dvd://")      // 'Play DVD' sends "dvd:/" + dev
+            filename.remove(0,5);           //             e.g. "dvd://dev/sda"
+        else if (lower.left(5) == "dvd:/")  // Less correct URI "dvd:" + path
+            filename.remove(0,4);           //             e.g. "dvd:/videos/ET"
 
-        if (QFile::exists(filename) || filename.startsWith("myth://"))
+        if (QFile::exists(filename) || lower.startsWith("myth://"))
             VERBOSE(VB_PLAYBACK, "OpenFile() trying DVD at " + filename);
         else
         {
             filename = "/dev/dvd";
         }
     }
-    else if ((!streamOnly) && (filename.left(3) == "bd:" || is_bd))
+    else if ((!streamOnly) && (lower.left(3) == "bd:" || is_bd))
     {
         is_bd = true;
         bdPriv = new BDRingBufferPriv();
         startreadahead = false;
 
-        if (filename.left(5) == "bd://")      // 'Play DVD' sends "bd:/" + dev
-            filename.remove(0,4);             //             e.g. "bd://dev/sda"
-        else if (filename.left(4) == "bd:/")  // Less correct URI "bd:" + path
-            filename.remove(0,3);             //             e.g. "bd:/videos/ET"
+        if (lower.left(5) == "bd://")      // 'Play DVD' sends "bd:/" + dev
+            filename.remove(0,4);          //             e.g. "bd://dev/sda"
+        else if (lower.left(4) == "bd:/")  // Less correct URI "bd:" + path
+            filename.remove(0,3);          //             e.g. "bd:/videos/ET"
 
-        if (QFile::exists(filename) || filename.startsWith("myth://"))
+        if (QFile::exists(filename) || lower.startsWith("myth://"))
             VERBOSE(VB_PLAYBACK, "OpenFile() trying BD at " + filename);
         else
         {
