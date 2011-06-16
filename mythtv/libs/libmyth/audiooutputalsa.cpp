@@ -913,7 +913,7 @@ bool AudioOutputALSA::OpenMixer(void)
     return true;
 }
 
-QMap<QString, QString> *AudioOutputALSA::GetALSADevices(const char *type)
+QMap<QString, QString> *AudioOutputALSA::GetDevices(const char *type)
 {
     QMap<QString, QString> *alsadevs = new QMap<QString, QString>();
     void **hints, **n;
