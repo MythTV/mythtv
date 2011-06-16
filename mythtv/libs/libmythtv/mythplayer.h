@@ -616,6 +616,8 @@ class MTV_PUBLIC MythPlayer
     double   video_frame_rate;///< Video (input) Frame Rate (often inaccurate)
     float    video_aspect;    ///< Video (input) Apect Ratio
     float    forced_video_aspect;
+    /// Tell the player thread to set the scan type (and hence deinterlacers)
+    FrameScanType resetScan;
     /// Video (input) Scan Type (interlaced, progressive, detect, ignore...)
     FrameScanType m_scan;
     /// Set when the user selects a scan type, overriding the detected one
