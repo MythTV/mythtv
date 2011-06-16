@@ -132,6 +132,7 @@ class MPUBLIC MythCommandLineParser
     QMap<QString,QString>   GetSettingsOverride(void);
     QString	                GetLogFilePath(void);
     int                     GetSyslogFacility(void);
+    QString                 GetPassthrough(void) const { return m_passthrough.join(" "); }
 
     bool                    toBool(QString key) const;
     int                     toInt(QString key) const;
@@ -146,6 +147,7 @@ class MPUBLIC MythCommandLineParser
 
   protected:
     void allowExtras(bool allow=true) { m_allowExtras = allow; }
+    void allowPassthrough(bool allow=true) { m_allowPassthrough = allow; }
 
     void addHelp(void);
     void addVersion(void);
@@ -171,6 +173,9 @@ class MPUBLIC MythCommandLineParser
     QMap<QString,CommandLineArg>    m_registeredArgs;
     bool                            m_allowExtras;
     QStringList                     m_remainingArgs;
+    bool                            m_allowPassthrough;
+    bool                            m_passthroughActive;
+    QStringList                     m_passthrough;
     bool                            m_overridesImported;
     bool                            m_verbose;
 };

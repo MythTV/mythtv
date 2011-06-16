@@ -24,12 +24,13 @@ using namespace std;
 #include "mythversion.h"
 #include "util.h"
 
-const int kEnd     = 0,
-          kEmpty   = 1,
-          kOptOnly = 2,
-          kOptVal  = 3,
-          kArg     = 4,
-          kInvalid = 5;
+const int kEnd          = 0,
+          kEmpty        = 1,
+          kOptOnly      = 2,
+          kOptVal       = 3,
+          kArg          = 4,
+          kPassthrough  = 5,
+          kInvalid      = 6;
 
 const char* NamedOptType(int type);
 
@@ -45,10 +46,12 @@ const char* NamedOptType(int type)
         return "kOptVal";
     else if (type == kArg)
         return "kArg";
+    else if (type == kPassthrough)
+        return "kPassthrough";
     else if (type == kInvalid)
         return "kInvalid";
 
-    return "";
+    return "kUnknown";
 }
 
 typedef struct helptmp {
@@ -59,8 +62,8 @@ typedef struct helptmp {
 } HelpTmp;
 
 MythCommandLineParser::MythCommandLineParser(QString appname) :
-    m_appname(appname), m_allowExtras(false), m_overridesImported(false),
-    m_verbose(false)
+    m_appname(appname), m_allowExtras(false), m_allowPassthrough(false), 
+    m_passthroughActive(false), m_overridesImported(false), m_verbose(false)
 {
     char *verbose = getenv("VERBOSE_PARSER");
     if (verbose != NULL)
@@ -264,8 +267,22 @@ int MythCommandLineParser::getOpt(int argc, const char * const * argv,
         // string is empty, return and loop
         return kEmpty;
 
+    if (m_passthroughActive)
+    {
+        // pass through has been activated
+        val = tmp;
+        return kArg;
+    }
+
     if (tmp.startsWith("-") && tmp.size() > 1)
     {
+        if (tmp == "--")
+        {
+            // all options beyond this will be passed as a single string
+            m_passthroughActive = true;
+            return kPassthrough;
+        }
+
         if (tmp.contains("="))
         {
             // option contains '=', split
@@ -334,6 +351,12 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
                  << "opt: " << opt.toLocal8Bit().constData() << endl
                  << "val: " << val.toLocal8Bit().constData() << endl << endl;
 
+        if (res == kPassthrough && !m_allowPassthrough)
+        {
+            cerr << "Received '--' but passthrough has not been enabled" << endl;
+            return false;
+        }
+
         if (res == kEnd)
             break;
         else if (res == kEmpty)
@@ -343,6 +366,11 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
             cerr << "Invalid option received:" << endl << "    "
                  << opt.toLocal8Bit().constData();
             return false;
+        }
+        else if (m_passthroughActive)
+        {
+            m_passthrough << val;
+            continue;
         }
         else if (res == kArg)
         {
@@ -539,6 +567,12 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         QStringList::const_iterator it3 = m_remainingArgs.begin();
         for (; it3 != m_remainingArgs.end(); it3++)
             cerr << "  " << (*it3).toLocal8Bit().constData() << endl;
+
+        if (m_allowPassthrough)
+        {
+            cerr << endl << "Passthrough string:" << endl;
+            cerr << "  " << GetPassthrough().toLocal8Bit().constData() << endl;
+        }
 
         cerr << endl;
     }
