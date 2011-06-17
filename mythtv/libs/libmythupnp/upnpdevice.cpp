@@ -286,10 +286,8 @@ void UPnpDeviceDesc::ProcessDeviceList( QDomNode    oListNode,
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/// \brief Sets sValue param to n.firstChild().toText().nodeValue(), iff
+///        neither n.isNull() nor n.firstChild().toText().isNull() is true.
 void UPnpDeviceDesc::SetStrValue( const QDomNode &n, QString &sValue )
 {
     if (!n.isNull())
@@ -301,10 +299,8 @@ void UPnpDeviceDesc::SetStrValue( const QDomNode &n, QString &sValue )
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/// \brief Sets nValue param to n.firstChild().toText().nodeValue(), iff
+///        neither n.isNull() nor n.firstChild().toText().isNull() is true.
 void UPnpDeviceDesc::SetNumValue( const QDomNode &n, int &nValue )
 {
     if (!n.isNull())
@@ -366,7 +362,8 @@ void UPnpDeviceDesc::GetValidXML(
 #endif
 
     os << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-          "<root xmlns=\"urn:schemas-upnp-org:device-1-0\"  xmlns:mythtv=\"mythtv.org\">\n"
+          "<root xmlns=\"urn:schemas-upnp-org:device-1-0\" "
+          " xmlns:mythtv=\"mythtv.org\">\n"
             "<specVersion>\n"
               "<major>1</major>\n"
               "<minor>0</minor>\n"
@@ -719,4 +716,128 @@ QString UPnpDeviceDesc::GetHostName()
     }
 
     return m_sHostName;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+//
+//
+//
+//
+/////////////////////////////////////////////////////////////////////////////
+
+UPnpService UPnpDevice::GetService(const QString &urn, bool *found) const
+{
+    UPnpService srv;
+
+    bool done = false;
+
+    UPnpServiceList::const_iterator it = m_listServices.begin();
+    for (; it != m_listServices.end(); ++it)
+    {
+        if ((*it)->m_sServiceType == urn)
+        {
+            srv = **it;
+            done = true;
+            break;
+        }
+    }
+
+    if (!done)
+    {
+        UPnpDeviceList::const_iterator dit = m_listDevices.begin();
+        for (; dit != m_listDevices.end() && !done; ++dit)
+            srv = (*dit)->GetService(urn, &done);
+    }
+
+    if (found)
+        *found = done;
+
+    return srv;
+}
+
+QString UPnpDevice::toString(uint padding) const
+{
+    QString ret =
+        QString("UPnP Device\n"
+                "===========\n"
+                "deviceType:       %1\n"
+                "friendlyName:     %2\n"
+                "manufacturer:     %3\n"
+                "manufacturerURL:  %4\n"
+                "modelDescription: %5\n"
+                "modelName:        %6\n"
+                "modelNumber:      %7\n"
+                "modelURL:         %8\n")
+        .arg(m_sDeviceType      )
+        .arg(m_sFriendlyName    )
+        .arg(m_sManufacturer    )
+        .arg(m_sManufacturerURL )
+        .arg(m_sModelDescription)
+        .arg(m_sModelName       )
+        .arg(m_sModelNumber     )
+        .arg(m_sModelURL        ) +
+        QString("serialNumber:     %1\n"
+                "UPC:              %2\n"
+                "presentationURL:  %3\n"
+                "UDN:              %4\n")
+        .arg(m_sSerialNumber    )
+        .arg(m_sUPC             )
+        .arg(m_sPresentationURL )
+        .arg(m_sUDN             );
+
+    if (!m_lstExtra.empty())
+    {
+        NameValues::const_iterator it = m_lstExtra.begin();
+        ret += "Extra key value pairs\n";
+        for (; it != m_lstExtra.end(); ++it)
+        {
+            ret += (*it).sName;
+            ret += ":";
+            int int_padding = 18 - ((*it).sName.length() + 1);
+            for (int i = 0; i < int_padding; i++)
+                ret += " ";
+            ret += QString("%1\n").arg((*it).sValue);
+        }
+    }
+
+    if (!m_listIcons.empty())
+    {
+        ret += "Icon List:\n";
+        UPnpIconList::const_iterator it = m_listIcons.begin();
+        for (; it != m_listIcons.end(); ++it)
+            ret += (*it)->toString(padding+2) + "\n";
+    }
+
+    if (!m_listServices.empty())
+    {
+        ret += "Service List:\n";
+        UPnpServiceList::const_iterator it = m_listServices.begin();
+        for (; it != m_listServices.end(); ++it)
+            ret += (*it)->toString(padding+2) + "\n";
+    }
+
+    if (!m_listDevices.empty())
+    {
+        ret += "Device List:\n";
+        UPnpDeviceList::const_iterator it = m_listDevices.begin();
+        for (; it != m_listDevices.end(); ++it)
+            ret += (*it)->toString(padding+2) + "\n";
+        ret += "\n";
+    }
+
+    // remove trailing newline
+    if (ret.right(1)=="\n")
+        ret = ret.left(ret.length()-1);
+
+    // add any padding as necessary
+    if (padding)
+    {
+        QString pad;
+        for (uint i = 0; i < padding; i++)
+            pad += " ";
+        ret = pad + ret.replace("\n", QString("\n%1").arg(pad));
+    }
+
+    return ret;
 }

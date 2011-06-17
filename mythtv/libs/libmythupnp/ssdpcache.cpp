@@ -40,29 +40,19 @@ int SSDPCacheEntries::g_nAllocated = 0;       // Debugging only
 
 SSDPCacheEntries::SSDPCacheEntries()
 {
-    // Should be atomic increment
-    g_nAllocated++;
+    g_nAllocated++;    // Should be atomic increment
 }
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
 
 SSDPCacheEntries::~SSDPCacheEntries()
 {
     Clear();
-
-    // Should be atomic decrement
-    g_nAllocated--;
+    g_nAllocated--;    // Should be atomic decrement
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void SSDPCacheEntries::Clear()
+/// Clears the cache of all entries.
+void SSDPCacheEntries::Clear(void)
 {
-    Lock();
+    QMutexLocker locker(&m_mutex);
 
     EntryMap::iterator it = m_mapEntries.begin();
     for (; it != m_mapEntries.end(); ++it)
@@ -72,33 +62,52 @@ void SSDPCacheEntries::Clear()
     }
 
     m_mapEntries.clear();
-
-    Unlock();
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//  Caller must call AddRef on returned pointer.
-/////////////////////////////////////////////////////////////////////////////
-
-DeviceLocation *SSDPCacheEntries::Find( const QString &sUSN )
+/// Finds the Device in the cache, returns NULL when absent
+/// \note Caller must call Release on non-NULL DeviceLocation when done with it.
+DeviceLocation *SSDPCacheEntries::Find(const QString &sUSN)
 {
-    Lock();
+    QMutexLocker locker(&m_mutex);
 
-    EntryMap::iterator it = m_mapEntries.find(sUSN);
+    EntryMap::iterator it = m_mapEntries.find(GetNormalizedUSN(sUSN));
     DeviceLocation *pEntry = (it != m_mapEntries.end()) ? *it : NULL;
-
-    Unlock();
+    if (pEntry)
+        pEntry->AddRef();
 
     return pEntry;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//  
-/////////////////////////////////////////////////////////////////////////////
-
-void SSDPCacheEntries::Insert( const QString &sUSN, DeviceLocation *pEntry )
+/// Returns random entry in cache, returns NULL when list is empty
+/// \note Caller must call Release on non-NULL DeviceLocation when done with it.
+DeviceLocation *SSDPCacheEntries::GetFirst(void)
 {
-    Lock();
+    QMutexLocker locker(&m_mutex);
+    if (m_mapEntries.empty())
+        return NULL;
+    DeviceLocation *loc = *m_mapEntries.begin();
+    loc->AddRef();
+    return loc;
+}
+
+/// Returns a copy of the EntryMap
+/// \note Caller must call Release() on each entry in the map.
+void SSDPCacheEntries::GetEntryMap(EntryMap &map)
+{
+    QMutexLocker locker(&m_mutex);
+
+    EntryMap::const_iterator it = m_mapEntries.begin();
+    for (; it != m_mapEntries.end(); ++it)
+    {
+        (*it)->AddRef();
+        map.insert(it.key(), *it);
+    }
+}
+
+/// Inserts a device location into the cache
+void SSDPCacheEntries::Insert(const QString &sUSN, DeviceLocation *pEntry)
+{
+    QMutexLocker locker(&m_mutex);
 
     pEntry->AddRef();
 
@@ -106,28 +115,25 @@ void SSDPCacheEntries::Insert( const QString &sUSN, DeviceLocation *pEntry )
     // we need to see if the key already exists and release
     // it's reference if it does.
 
-    EntryMap::Iterator it = m_mapEntries.find( sUSN );
+    QString usn = GetNormalizedUSN(sUSN);
 
-    if (it != m_mapEntries.end() && *it)
+    EntryMap::iterator it = m_mapEntries.find(usn);
+    if ((it != m_mapEntries.end()) && (*it != NULL))
         (*it)->Release();
 
-    m_mapEntries.insert( sUSN, pEntry );
+    m_mapEntries[usn] = pEntry;
 
     VERBOSE(VB_UPNP, QString("SSDP Cache adding USN: %1 Location %2")
             .arg(pEntry->m_sUSN).arg(pEntry->m_sLocation));
-
-    Unlock();
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/// Removes a specific entry from the cache
 void SSDPCacheEntries::Remove( const QString &sUSN )
 {
-    Lock();
+    QMutexLocker locker(&m_mutex);
 
-    EntryMap::iterator it = m_mapEntries.find(sUSN);
+    QString usn = GetNormalizedUSN(sUSN);
+    EntryMap::iterator it = m_mapEntries.find(usn);
     if (it != m_mapEntries.end())
     {
         if (*it)
@@ -141,54 +147,96 @@ void SSDPCacheEntries::Remove( const QString &sUSN )
 
         m_mapEntries.erase(it);
     }
-
-    Unlock();
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-int SSDPCacheEntries::RemoveStale( const TaskTime &ttNow )
+/// Removes expired cache entries, returning the number removed.
+uint SSDPCacheEntries::RemoveStale(const TaskTime &ttNow)
 {
-    int          nCount = 0;
-    QStringList  lstKeys;
+    QMutexLocker locker(&m_mutex);
+    uint nCount = 0;
 
-    Lock();
-
-    // ----------------------------------------------------------------------
-    // Iterate through all USN's and build list of stale entries keys
-    // ----------------------------------------------------------------------
-
-    EntryMap::iterator it  = m_mapEntries.begin();
-    for (; it != m_mapEntries.end(); ++it)
+    EntryMap::iterator it = m_mapEntries.begin();
+    while (it != m_mapEntries.end())
     {
-        if (*it)
-            continue;
+        if (*it == NULL)
+        {
+            it = m_mapEntries.erase(it);
+        }
+        else if ((*it)->m_ttExpires < ttNow)
+        {
+            // Note: locking is not required above since we hold
+            // one reference to each entry and are holding m_mutex.
+            (*it)->Release();
 
-        (*it)->AddRef();
-        
-        if ((*it)->m_ttExpires < ttNow)
-            lstKeys.push_back(it.key());
+            // -=>TODO: Need to somehow call SSDPCache::NotifyRemove
 
-        (*it)->Release();
+            it = m_mapEntries.erase(it);
+            nCount++;
+        }
+        else
+        {
+            ++it;
+        }
     }
 
-    nCount = lstKeys.count();
-
-    // ----------------------------------------------------------------------
-    // Iterate through list of keys and remove them.
-    // (This avoids issues when removing from a QMap while iterating it)
-    // ----------------------------------------------------------------------
-
-    for ( QStringList::Iterator it = lstKeys.begin();
-                                it != lstKeys.end();
-                              ++it ) 
-        Remove( *it );
-
-    Unlock();
-
     return nCount;
+}
+
+/// Outputs the XML for this service
+QTextStream &SSDPCacheEntries::OutputXML(
+    QTextStream &os, uint *pnEntryCount) const
+{
+    QMutexLocker locker(&m_mutex);
+
+    EntryMap::const_iterator it  = m_mapEntries.begin();
+    for (; it != m_mapEntries.end(); ++it)
+    {
+        if (*it == NULL)
+            continue;
+
+        // Note: AddRef,Release not required since SSDPCacheEntries
+        // holds one reference to each entry and we are holding m_mutex.
+        os << "<Service usn='" << (*it)->m_sUSN 
+           << "' expiresInSecs='" << (*it)->ExpiresInSecs()
+           << "' url='" << (*it)->m_sLocation << "' />" << endl;
+
+        if (pnEntryCount != NULL)
+            *pnEntryCount++;
+    }
+
+    return os;
+}
+
+/// Prints this service to the console in human readable form
+void SSDPCacheEntries::Dump(uint &nEntryCount) const
+{
+    QMutexLocker locker(&m_mutex);
+
+    EntryMap::const_iterator it  = m_mapEntries.begin();
+    for (; it != m_mapEntries.end(); ++it)
+    {
+        if (*it == NULL)
+            continue;
+
+        // Note: AddRef,Release not required since SSDPCacheEntries
+        // holds one reference to each entry and we are holding m_mutex.
+        VERBOSE(VB_UPNP, QString(" * \t\t%1\t | %2\t | %3 ")
+                .arg((*it)->m_sUSN)
+                .arg((*it)->ExpiresInSecs())
+                .arg((*it)->m_sLocation));
+
+        nEntryCount++;
+    }
+}
+
+/// Returns a normalized USN, so that capitalization 
+/// of the uuid is not an issue.
+QString SSDPCacheEntries::GetNormalizedUSN(const QString &sUSN)
+{
+    int uuid_end_loc = sUSN.indexOf(":",5);
+    if (uuid_end_loc > 0)
+        return sUSN.left(uuid_end_loc).toLower() + sUSN.mid(uuid_end_loc);
+    return sUSN;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -237,9 +285,9 @@ SSDPCache::~SSDPCache()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void SSDPCache::Clear()
+void SSDPCache::Clear(void)
 {
-    Lock();
+    QMutexLocker locker(&m_mutex);
 
     SSDPCacheEntriesMap::iterator it  = m_cache.begin();
     for (; it != m_cache.end(); ++it)
@@ -249,42 +297,31 @@ void SSDPCache::Clear()
     }
 
     m_cache.clear();
-
-    Unlock();
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//  Caller must call AddRef on returned pointer.
-/////////////////////////////////////////////////////////////////////////////
-
-SSDPCacheEntries *SSDPCache::Find( const QString &sURI )
+/// Finds the SSDPCacheEntries in the cache, returns NULL when absent
+/// \note Caller must call Release on non-NULL when done with it.
+SSDPCacheEntries *SSDPCache::Find(const QString &sURI)
 {
-    SSDPCacheEntries *pEntries = NULL;
-
-    Lock();
+    QMutexLocker locker(&m_mutex);
 
     SSDPCacheEntriesMap::iterator it = m_cache.find(sURI);
-    if ( it != m_cache.end() )
-        pEntries = *it;
+    if (it != m_cache.end() && (*it != NULL))
+        (*it)->AddRef();
 
-    Unlock();
-
-    return pEntries;
+    return (it != m_cache.end()) ? *it : NULL;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//  Caller must call AddRef on returned pointer.
-/////////////////////////////////////////////////////////////////////////////
-
-DeviceLocation *SSDPCache::Find( const QString &sURI, const QString &sUSN )
+/// Finds the Device in the cache, returns NULL when absent
+/// \note Caller must call Release on non-NULL when done with it.
+DeviceLocation *SSDPCache::Find(const QString &sURI, const QString &sUSN)
 {
     DeviceLocation   *pEntry   = NULL;
-    SSDPCacheEntries *pEntries = Find( sURI );
+    SSDPCacheEntries *pEntries = Find(sURI);
 
     if (pEntries != NULL)
     {
-        pEntries->AddRef();
-        pEntry = pEntries->Find( sUSN );
+        pEntry = pEntries->Find(sUSN);
         pEntries->Release();
     }
 
@@ -312,36 +349,33 @@ void SSDPCache::Add( const QString &sURI,
     // Get a Pointer to a Entries QDict... (Create if not found)
     // --------------------------------------------------------------
 
-    SSDPCacheEntries *pEntries = Find( sURI );
-
-    if (pEntries == NULL)
+    SSDPCacheEntries *pEntries = NULL;
     {
-        pEntries = new SSDPCacheEntries();
+        QMutexLocker locker(&m_mutex);
+        SSDPCacheEntriesMap::iterator it = m_cache.find(sURI);
+        if (it == m_cache.end() || (*it == NULL))
+        {
+            pEntries = new SSDPCacheEntries();
+            pEntries->AddRef();
+            it = m_cache.insert(sURI, pEntries);
+        }
+        pEntries = *it;
         pEntries->AddRef();
-        m_cache.insert( sURI, pEntries );
     }
-
-    pEntries->AddRef();
 
     // --------------------------------------------------------------
     // See if the Entries Collection contains our USN... (Create if not found)
     // --------------------------------------------------------------
 
-    DeviceLocation *pEntry = pEntries->Find( sUSN );
-
+    DeviceLocation *pEntry = pEntries->Find(sUSN);
     if (pEntry == NULL)
     {
-        pEntry = new DeviceLocation( sURI, sUSN, sLocation, ttExpires );
-
-        Lock();
-        pEntries->Insert( sUSN, pEntry );
-        Unlock();
-
-        NotifyAdd( sURI, sUSN, sLocation );
+        pEntry = new DeviceLocation(sURI, sUSN, sLocation, ttExpires);
+        pEntries->Insert(sUSN, pEntry);
+        NotifyAdd(sURI, sUSN, sLocation);
     }
     else
     {
-        pEntry->AddRef();
         pEntry->m_sLocation = sLocation;
         pEntry->m_ttExpires = ttExpires;
         pEntry->Release();
@@ -491,78 +525,82 @@ void SSDPCache::NotifyRemove( const QString &sURI, const QString &sUSN )
     dispatch( me );
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void SSDPCache::Dump()
+/// Outputs the XML for this device
+QTextStream &SSDPCache::OutputXML(
+    QTextStream &os, uint *pnDevCount, uint *pnEntryCount) const
 {
-    int nCount = 0;
+    QMutexLocker locker(&m_mutex);
 
-    if (VERBOSE_LEVEL_CHECK(VB_UPNP))
+    if (pnDevCount != NULL)
+        *pnDevCount   = 0;
+    if (pnEntryCount != NULL)
+        *pnEntryCount = 0;
+
+    SSDPCacheEntriesMap::const_iterator it = m_cache.begin();
+    for (; it != m_cache.end(); ++it)
     {
-
-        Lock();
-
-        // ----------------------------------------------------------------------
-        // Build List of items to be removed
-        // ----------------------------------------------------------------------
-
-        VERBOSE( VB_UPNP, "===============================================================================" );
-        VERBOSE( VB_UPNP, QString(  " URI (type) - Found: %1 Entries - %2 have been Allocated. " )
-                             .arg( m_cache.count() )
-                             .arg( SSDPCacheEntries::g_nAllocated ));
-        VERBOSE( VB_UPNP, "   \t\tUSN (unique id)\t\t | Expires\t | Location" );
-        VERBOSE( VB_UPNP, "-------------------------------------------------------------------------------" );
-
-        for (SSDPCacheEntriesMap::Iterator it  = m_cache.begin();
-                                           it != m_cache.end();
-                                         ++it )
+        if (*it != NULL)
         {
-            SSDPCacheEntries *pEntries = *it;
+            os << "<Device uri='" << it.key() << "'>" << endl;
 
-            if (pEntries != NULL)
-            {
-                VERBOSE( VB_UPNP, it.key() );
+            uint tmp = 0;
 
-                pEntries->Lock();
+            (*it)->OutputXML(os, &tmp);
 
-                EntryMap *pMap = pEntries->GetEntryMap();
+            if (pnEntryCount != NULL)
+                *pnEntryCount += tmp;
 
-                for (EntryMap::Iterator itEntry  = pMap->begin();
-                                        itEntry != pMap->end();
-                                      ++itEntry )
-                {
+            os << "</Device>" << endl;
 
-                    DeviceLocation *pEntry = *itEntry;
-
-                    if (pEntry != NULL)
-                    {
-                        nCount++;
-
-                        pEntry->AddRef();
-
-                        VERBOSE( VB_UPNP, QString( " * \t\t%1\t | %2\t | %3 " ) 
-                                             .arg( pEntry->m_sUSN )
-                                             .arg( pEntry->ExpiresInSecs() )
-                                             .arg( pEntry->m_sLocation ));
-
-                        pEntry->Release();
-                    }
-                }
-
-                VERBOSE( VB_UPNP, " "); 
-
-                pEntries->Unlock();
-            }
+            if (pnDevCount != NULL)
+                *pnDevCount++;
         }
-
-        VERBOSE( VB_UPNP, "-------------------------------------------------------------------------------" );
-        VERBOSE( VB_UPNP, QString(  " Found: %1 Entries - %2 have been Allocated. " )
-                             .arg( nCount )
-                             .arg( DeviceLocation::g_nAllocated ));
-        VERBOSE( VB_UPNP, "===============================================================================" );
-
-        Unlock();
     }
+    os << flush;
+
+    return os;
+}
+
+/// Prints this device to the console in a human readable form
+void SSDPCache::Dump(void)
+{
+    if (!VERBOSE_LEVEL_CHECK(VB_UPNP))
+        return;
+
+    QMutexLocker locker(&m_mutex);
+
+    VERBOSE(VB_UPNP,
+            "========================================"
+            "=======================================" );
+    VERBOSE(VB_UPNP,
+            QString(" URI (type) - Found: %1 Entries - "
+                    "%2 have been Allocated. ")
+            .arg(m_cache.count()).arg(SSDPCacheEntries::g_nAllocated));
+    VERBOSE(VB_UPNP, "   \t\tUSN (unique id)\t\t | Expires\t | Location");
+    VERBOSE(VB_UPNP,
+            "----------------------------------------"
+            "---------------------------------------");
+
+    uint nCount = 0;
+    SSDPCacheEntriesMap::const_iterator it  = m_cache.begin();
+    for (; it != m_cache.end(); ++it)
+    {
+        if (*it != NULL)
+        {
+            VERBOSE(VB_UPNP, it.key());
+            (*it)->Dump(nCount);
+            VERBOSE(VB_UPNP, " ");
+        }
+    }
+
+    VERBOSE(VB_UPNP,
+            "----------------------------------------"
+            "---------------------------------------");
+    VERBOSE(VB_UPNP,
+            QString(" Found: %1 Entries - %2 have been Allocated. ")
+            .arg(nCount)
+            .arg(DeviceLocation::g_nAllocated));
+    VERBOSE(VB_UPNP,
+            "========================================"
+            "=======================================" );
 }

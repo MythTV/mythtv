@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Program Name: UPnpImpl.h
+// Program Name: upnpserviceimpl.h
 // Created     : Jan 15, 2007
 //
 // Purpose     : UPnp Device Description parser/generator
@@ -21,41 +21,35 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __UPNPIMPL_H__
-#define __UPNPIMPL_H__
+#ifndef _UPNPIMPL_H_
+#define _UPNPIMPL_H_
 
-#include "upnpdevice.h"
+#include "upnpexp.h"
 
-class UPnpServiceImpl
+#include <QString>
+
+class UPnpDevice;
+
+/// Base class for services we offer to other UPnP devices.
+class UPNP_PUBLIC UPnpServiceImpl
 {
-    protected:
+  public:
+    UPnpServiceImpl() {}
+    virtual ~UPnpServiceImpl() {}
 
-        virtual QString     GetServiceType      () = 0;
-        virtual QString     GetServiceId        () = 0;
-        virtual QString     GetServiceControlURL() = 0;
-        virtual QString     GetServiceDescURL   () = 0;
-        virtual QString     GetServiceEventURL  () { return ""; }
+    void RegisterService(UPnpDevice *device);
 
-    public:
-
-        UPnpServiceImpl() {}
-        virtual ~UPnpServiceImpl() {}
-
-        void RegisterService( UPnpDevice  *pDevice )
-        {
-            if (pDevice != NULL)
-            {
-                UPnpService *pService = new UPnpService();
-            
-                pService->m_sServiceType = GetServiceType();
-                pService->m_sServiceId   = GetServiceId();
-                pService->m_sSCPDURL     = GetServiceDescURL();
-                pService->m_sControlURL  = GetServiceControlURL();
-                pService->m_sEventSubURL = GetServiceEventURL();
-
-                pDevice->m_listServices.append( pService );
-            }
-        }
+  protected:
+    /// Provices the schema urn
+    virtual QString GetServiceType(void)       = 0;
+    /// Provides the device specific urn
+    virtual QString GetServiceId(void)         = 0;
+    /// Provices the base URL for control commands
+    virtual QString GetServiceControlURL(void) = 0;
+    /// Provices the URL of the service description XML
+    virtual QString GetServiceDescURL(void)    = 0;
+    /// Provides the URL of the event portion of the service
+    virtual QString GetServiceEventURL(void) { return QString(); }
 };
 
-#endif
+#endif /// _UPNPIMPL_H_

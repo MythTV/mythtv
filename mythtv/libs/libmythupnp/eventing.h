@@ -28,7 +28,7 @@
 #include <QUuid>
 #include <QMap>
 
-#include "upnpimpl.h"
+#include "upnpserviceimpl.h"
 #include "upnputil.h"
 #include "httpserver.h"
 

@@ -32,50 +32,50 @@
 
 #include "upnpdevice.h"
 
-typedef QMap< QString, DeviceLocation * > EntryMap;     // Key == Unique Service Name (USN)
+/// Key == Unique Service Name (USN)
+typedef QMap< QString, DeviceLocation * > EntryMap;
 
 /////////////////////////////////////////////////////////////////////////////
 // QDict Implementation that uses RefCounted pointers
 /////////////////////////////////////////////////////////////////////////////
 
-class SSDPCacheEntries : public RefCounted
+class UPNP_PUBLIC SSDPCacheEntries : public RefCounted
 {
-    public:
+  protected:
+    /// Destructor protected to enforce Release method usage
+    virtual ~SSDPCacheEntries();
 
-        static int      g_nAllocated;       // Debugging only
+  public:
+    SSDPCacheEntries();
 
-    protected:
+    void Clear(void);
+    uint Count(void) const
+        { QMutexLocker locker(&m_mutex); return m_mapEntries.size(); }
+    void Insert(const QString &sUSN, DeviceLocation *pEntry);
+    void Remove(const QString &sUSN);
+    uint RemoveStale(const TaskTime &ttNow);
 
-        QMutex      m_mutex;
-        EntryMap    m_mapEntries;
+    DeviceLocation *Find(const QString &sUSN);
 
-    protected:
+    DeviceLocation *GetFirst(void);
 
-        // Destructor protected to force use of Release Method
+    void GetEntryMap(EntryMap&);
 
-        virtual ~SSDPCacheEntries();
+    QTextStream &OutputXML(QTextStream &os, uint *pnEntryCount = NULL) const;
+    void Dump(uint &nEntryCount) const;
 
-    public:
+    static QString GetNormalizedUSN(const QString &sUSN);
 
-                 SSDPCacheEntries();
+  public:
+    static int      g_nAllocated;       // Debugging only
 
-        void Lock       () { m_mutex.lock();   }
-        void Unlock     () { m_mutex.unlock(); }
-
-        void            Clear      ( );
-
-        int             Count      ( ) { return m_mapEntries.size(); }
-
-        DeviceLocation *Find       ( const QString &sUSN );
-        void            Insert     ( const QString &sUSN, DeviceLocation *pEntry );
-        void            Remove     ( const QString &sUSN );
-        int             RemoveStale( const TaskTime &ttNow );
-
-        // Must Lock/Unlock when using.
-        EntryMap       *GetEntryMap() { return &m_mapEntries;  }
+  protected:
+    mutable QMutex  m_mutex;
+    EntryMap        m_mapEntries;
 };
 
-typedef QMap< QString, SSDPCacheEntries * > SSDPCacheEntriesMap;   // Key == Service Type URI
+/// Key == Service Type URI
+typedef QMap< QString, SSDPCacheEntries * > SSDPCacheEntriesMap;
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ class UPNP_PUBLIC SSDPCache : public QObject,
 
     protected:
 
-        QMutex                  m_mutex;
+        mutable QMutex          m_mutex;
         SSDPCacheEntriesMap     m_cache;
 
         void NotifyAdd   ( const QString &sURI,
@@ -134,7 +134,11 @@ class UPNP_PUBLIC SSDPCache : public QObject,
         void Remove     ( const QString &sURI, const QString &sUSN );
         int  RemoveStale( );
 
-        void Dump       ( );
+        void Dump       (void);
+
+        QTextStream &OutputXML(QTextStream &os,
+                               uint        *pnDevCount   = NULL,
+                               uint        *pnEntryCount = NULL) const;
 
         SSDPCacheEntries *Find( const QString &sURI );
         DeviceLocation   *Find( const QString &sURI, const QString &sUSN );

@@ -94,10 +94,13 @@ class MythFrontendStatus : public HttpServerExtension
             stream
                << "  <div class=\"content\">\r\n"
                << "    <h2 class=\"status\">Other Frontends</h2>\r\n";
-            cache->AddRef();
-            cache->Lock();
-            EntryMap* map = cache->GetEntryMap();
-            QMapIterator< QString, DeviceLocation * > i(*map);
+
+            EntryMap map;
+            cache->GetEntryMap(map);
+            cache->Release();
+            cache = NULL;
+
+            QMapIterator< QString, DeviceLocation * > i(map);
             while (i.hasNext())
             {
                 i.next();
@@ -105,11 +108,11 @@ class MythFrontendStatus : public HttpServerExtension
                 if (url.host() != ipaddress)
                 {
                     stream << "<br />" << url.host() << "&nbsp(<a href=\""
-                           << url.toString(QUrl::RemovePath) << "\">Status page</a>)\r\n";
+                           << url.toString(QUrl::RemovePath)
+                           << "\">Status page</a>)\r\n";
                 }
+                i.value()->Release();
             }
-            cache->Unlock();
-            cache->Release();
             stream << "  </div>\r\n";
         }
 
@@ -125,19 +128,22 @@ class MythFrontendStatus : public HttpServerExtension
         cache = SSDP::Find("urn:schemas-mythtv-org:device:SlaveMediaServer:1");
         if (cache)
         {
-            cache->AddRef();
-            cache->Lock();
-            EntryMap* map = cache->GetEntryMap();
-            QMapIterator< QString, DeviceLocation * > i(*map);
+            EntryMap map;
+            cache->GetEntryMap(map);
+            cache->Release();
+            cache = NULL;
+
+            QMapIterator< QString, DeviceLocation * > i(map);
             while (i.hasNext())
             {
                 i.next();
                 QUrl url(i.value()->m_sLocation);
-                stream << "<br />" << "Slave: " << url.host() << "&nbsp(<a href=\""
-                       << url.toString(QUrl::RemovePath) << "\">Status page</a>)\r\n";
+                stream << "<br />" << "Slave: " << url.host()
+                       << "&nbsp(<a href=\""
+                       << url.toString(QUrl::RemovePath)
+                       << "\">Status page</a>)\r\n";
+                i.value()->Release();
             }
-            cache->Unlock();
-            cache->Release();
         }
 
         stream

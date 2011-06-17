@@ -33,10 +33,8 @@
 #endif
 
 // Qt headers
-#include <QThread>
-#include <QTcpServer>
 #include <QReadWriteLock>
-#include <QScriptEngine>
+#include <QTcpServer>
 #include <QMultiMap>
 
 // MythTV headers
@@ -49,6 +47,7 @@
 typedef struct timeval  TaskTime;
 
 class HttpWorkerThread;
+class QScriptEngine;
 class HttpServer;
 
 /////////////////////////////////////////////////////////////////////////////

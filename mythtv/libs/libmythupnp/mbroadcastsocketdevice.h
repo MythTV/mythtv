@@ -21,55 +21,58 @@
 //
 //////////////////////////////////////////////////////////////////////////////
                                                                        
-#ifndef __BROADCAST_H__
-#define __BROADCAST_H__
+#ifndef _MBROADCAST_SOCKET_DEVICE_H_
+#define _MBROADCAST_SOCKET_DEVICE_H_
 
 #include <QString>
 
 #include "msocketdevice.h"
+#include "mythverbose.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // Broadcast Socket is used for XBox (original) since Multicast is not supported
 /////////////////////////////////////////////////////////////////////////////
 
-class QBroadcastSocket : public MSocketDevice
+class MBroadcastSocketDevice : public MSocketDevice
 {
-    public:
+  public:
+    MBroadcastSocketDevice(QString sAddress, quint16 nPort) :
+        MSocketDevice(MSocketDevice::Datagram),
+        m_address(sAddress), m_port(nPort)
+    {
+        m_address.setAddress( sAddress );
+        m_port = nPort;
 
-        QHostAddress    m_address;
-        quint16         m_port;
-        struct ip_mreq  m_imr;
+        QByteArray addr = sAddress.toLatin1();
+        setProtocol(IPv4);
+        setSocket(createNewSocket(), MSocketDevice::Datagram);
 
-    public:
-
-        QBroadcastSocket( QString sAddress, quint16 nPort ) 
-         : MSocketDevice( MSocketDevice::Datagram )
+        int one = 1;
+        if (setsockopt(socket(), SOL_SOCKET, SO_BROADCAST,
+                       &one, sizeof(one)) < 0) 
         {
-            m_address.setAddress( sAddress );
-            m_port = nPort;
-
-            QByteArray addr = sAddress.toLatin1();
-            setProtocol(IPv4);
-            setSocket(createNewSocket(), MSocketDevice::Datagram);
-
-            int one = 1;
-
-            if ( setsockopt( socket(), SOL_SOCKET, SO_BROADCAST, &one, sizeof( one )) < 0) 
-            {
-                VERBOSE(VB_IMPORTANT, QString( "QBroadcastSocket: setsockopt - SO_BROADCAST Error" ));
-            }
-
-            setAddressReusable( true );
-
-            bind( m_address, m_port ); 
+            VERBOSE(VB_IMPORTANT, "MBroadcastSocketDevice: setsockopt - "
+                    "SO_BROADCAST Error" + ENO);
         }
 
-        virtual ~QBroadcastSocket()
-        {
-            int zero = 0;
+        setAddressReusable(true);
 
-            setsockopt( socket(), SOL_SOCKET, SO_BROADCAST, &zero, sizeof( zero ));
-        }
+        bind(m_address, m_port);
+    }
+
+    virtual ~MBroadcastSocketDevice()
+    {
+        int zero = 0;
+        setsockopt(socket(), SOL_SOCKET, SO_BROADCAST, &zero, sizeof(zero));
+    }
+
+    virtual QHostAddress address() const { return m_address; }
+    virtual quint16	 port() const { return m_port; }
+
+  private:
+    QHostAddress    m_address;
+    quint16         m_port;
+    struct ip_mreq  m_imr;
 };
 
-#endif
+#endif // _MBROADCAST_SOCKET_DEVICE_H_

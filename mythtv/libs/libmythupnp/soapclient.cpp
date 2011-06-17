@@ -28,44 +28,77 @@
 #include "mythverbose.h"
 #include "httprequest.h"
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
+#define LOC      QString("SOAPClient: ")
+#define LOC_WARN QString("SOAPClient, Warning: ")
+#define LOC_ERR  QString("SOAPClient, Error: ")
 
-SOAPClient::SOAPClient( const QUrl    &url,
-                        const QString &sNamespace,
-                        const QString &sControlPath )
-{
-    m_url          = url;
-    m_sNamespace   = sNamespace;
-    m_sControlPath = sControlPath;
-}
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-SOAPClient::~SOAPClient() 
+/** \brief Full SOAPClient constructor. After constructing the client
+ *         with this constructor it is ready for SendSOAPRequest().
+ *  \param url          The host and port portion of the command URL
+ *  \param sNamespace   The part of the action before the # character
+ *  \param sControlPath The path portion of the command URL
+ */
+SOAPClient::SOAPClient(const QUrl    &url,
+                       const QString &sNamespace,
+                       const QString &sControlPath) :
+    m_url(url), m_sNamespace(sNamespace), m_sControlPath(sControlPath)
 {
 }
 
-//////////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////////
 
-QDomNode SOAPClient::FindNode( const QString &sName, QDomNode &baseNode )
+/** \brief SOAPClient Initializer. After constructing the client
+ *         with the empty constructor call this before calling
+ *         SendSOAPRequest() the first time.
+ */
+bool SOAPClient::Init(const QUrl    &url,
+                      const QString &sNamespace,
+                      const QString &sControlPath)
+{
+    bool ok = true;
+    if (sNamespace.isEmpty())
+    {
+        ok = false;
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Init() given blank namespace");
+    }
+
+    QUrl test(url);
+    test.setPath(sControlPath);
+    if (!test.isValid())
+    {
+        ok = false;
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Init() given invalid control URL %1")
+                .arg(test.toString()));
+    }
+
+    if (ok)
+    {
+        m_url          = url;
+        m_sNamespace   = sNamespace;
+        m_sControlPath = sControlPath;
+    }
+    else
+    {
+        m_url = QUrl();
+        m_sNamespace.clear();
+        m_sControlPath.clear();
+    }
+
+    return ok;
+}
+
+/// Used by GeNodeValue() methods to find the named node.
+QDomNode SOAPClient::FindNode(
+    const QString &sName, const QDomNode &baseNode) const
 {
     QStringList parts = sName.split('/', QString::SkipEmptyParts);
-
-    return FindNode( parts, baseNode );
-
+    return FindNodeInternal(parts, baseNode);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////////
-
-QDomNode SOAPClient::FindNode( QStringList &sParts, QDomNode &curNode )
+/// This is an internal function used to implement FindNode
+QDomNode SOAPClient::FindNodeInternal(
+    QStringList &sParts, const QDomNode &curNode) const
 {
     if (sParts.empty())
         return curNode;
@@ -73,68 +106,61 @@ QDomNode SOAPClient::FindNode( QStringList &sParts, QDomNode &curNode )
     QString sName = sParts.front();
     sParts.pop_front();
 
-    QDomNode child = curNode.namedItem( sName );
+    QDomNode child = curNode.namedItem(sName);
 
     if (child.isNull() )
         sParts.clear();
 
-    return FindNode( sParts, child );
+    return FindNodeInternal(sParts, child);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-int SOAPClient::GetNodeValue( QDomNode &node, const QString &sName, int nDefault )
+/// Gets the named value using QDomNode as the baseNode in the search,
+/// returns default if it is not found.
+int SOAPClient::GetNodeValue(
+    const QDomNode &node, const QString &sName, int nDefault) const
 {
-    QString  sValue = GetNodeValue( node, sName, QString::number( nDefault ) );
-    
+    QString sValue = GetNodeValue(node, sName, QString::number(nDefault));
     return sValue.toInt();
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-bool SOAPClient::GetNodeValue( QDomNode &node, const QString &sName, bool bDefault )
+/// Gets the named value using QDomNode as the baseNode in the search,
+/// returns default if it is not found.
+bool SOAPClient::GetNodeValue(
+    const QDomNode &node, const QString &sName, bool bDefault) const
 {
     QString sDefault = (bDefault) ? "true" : "false";
-    QString sValue   = GetNodeValue( node, sName, sDefault );
+    QString sValue   = GetNodeValue(node, sName, sDefault);
+    if (sValue.isEmpty())
+        return bDefault;
 
-    if (sValue.startsWith( 'T' , Qt::CaseInsensitive ) || 
-        sValue.startsWith( 'Y' , Qt::CaseInsensitive ) ||
-        sValue.startsWith( '1' , Qt::CaseInsensitive ) )
+    char ret = sValue[0].toAscii();
+    switch (ret)
     {
-        return true;
+        case 't': case 'T': case 'y': case 'Y': case '1':
+            return true;
+        case 'f': case 'F': case 'n': case 'N': case '0':
+            return false;
+        default:
+            return bDefault;
     }
-
-    if (sValue.startsWith( 'F' , Qt::CaseInsensitive ) || 
-        sValue.startsWith( 'N' , Qt::CaseInsensitive ) ||
-        sValue.startsWith( '0' , Qt::CaseInsensitive ) )
-    {
-        return false;
-    }
-
-    return bDefault;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-QString SOAPClient::GetNodeValue( QDomNode &node, const QString &sName, const QString &sDefault )
+/// Gets the named value using QDomNode as the baseNode in the search,
+/// returns default if it is not found.
+QString SOAPClient::GetNodeValue(
+    const QDomNode &node, const QString &sName, const QString &sDefault) const
 {
     if (node.isNull())
         return sDefault;
 
     QString  sValue  = "";
-    QDomNode valNode = FindNode( sName, node );
+    QDomNode valNode = FindNode(sName, node);
 
     if (!valNode.isNull())
     {
         // -=>TODO: Assumes first child is Text Node.
 
-        QDomText  oText = valNode.firstChild().toText();
+        QDomText oText = valNode.firstChild().toText();
 
         if (!oText.isNull())
             sValue = oText.nodeValue();
@@ -145,29 +171,40 @@ QString SOAPClient::GetNodeValue( QDomNode &node, const QString &sName, const QS
     return sDefault;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-QDomDocument SOAPClient::SendSOAPRequest( const QString    &sMethod, 
-                                                QStringMap &list, 
-                                                int        &nErrCode, 
-                                                QString    &sErrDesc,
-                                                bool        bInQtThread )
+/** Actually sends the sMethod action to the command URL specified
+ * in the constructor (url+[/]+sControlPath). list is parsed as
+ * a series of key value pairs for the input params and then
+ * cleared and used for the output params.
+ *
+ * \param bInQtThread May be set to true if this is run from within
+ *                    a QThread with a running an event loop.
+ */
+QDomDocument SOAPClient::SendSOAPRequest(const QString &sMethod,
+                                         QStringMap    &list,
+                                         int           &nErrCode,
+                                         QString       &sErrDesc,
+                                         bool           bInQtThread)
 {
-    QUrl url( m_url );
+    QUrl url(m_url);
 
-    url.setPath( m_sControlPath );
+    url.setPath(m_sControlPath);
+
+    if (m_sNamespace.isEmpty())
+    {
+        nErrCode = 0;
+        sErrDesc = "No namespace given";
+        return QDomDocument();
+    }
 
     // --------------------------------------------------------------
     // Add appropriate headers
     // --------------------------------------------------------------
 
-    QHttpRequestHeader header;
+    QHttpRequestHeader header("POST", sMethod, 1, 0);
 
     header.setValue("CONTENT-TYPE", "text/xml; charset=\"utf-8\"" );
-    header.setValue("SOAPACTION"  , QString( "\"%1#GetConnectionInfo\"" )
-                                       .arg( m_sNamespace ));
+    header.setValue("SOAPACTION",
+                    QString("\"%1#%2\"").arg(m_sNamespace).arg(sMethod));
 
     // --------------------------------------------------------------
     // Build request payload
@@ -176,8 +213,12 @@ QDomDocument SOAPClient::SendSOAPRequest( const QString    &sMethod,
     QByteArray  aBuffer;
     QTextStream os( &aBuffer );
 
+    os.setCodec("UTF-8");
+
     os << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n"; 
-    os << "<s:Envelope s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">\r\n";
+    os << "<s:Envelope "
+        " s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\""
+        " xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">\r\n";
     os << " <s:Body>\r\n";
     os << "  <u:" << sMethod << " xmlns:u=\"" << m_sNamespace << "\">\r\n";
 
@@ -185,9 +226,7 @@ QDomDocument SOAPClient::SendSOAPRequest( const QString    &sMethod,
     // Add parameters from list
     // --------------------------------------------------------------
 
-    for ( QStringMap::iterator it  = list.begin(); 
-                               it != list.end(); 
-                             ++it ) 
+    for (QStringMap::iterator it = list.begin(); it != list.end(); ++it)
     {                                                               
         os << "   <" << it.key() << ">";
         os << HTTPRequest::Encode( *it );
@@ -204,32 +243,48 @@ QDomDocument SOAPClient::SendSOAPRequest( const QString    &sMethod,
     // Perform Request
     // --------------------------------------------------------------
 
-    QBuffer     buff( &aBuffer );
+    QBuffer buff(&aBuffer);
 
-    QString sXml = HttpComms::postHttp( url, 
-                                        &header,
-                                        (QIODevice *)&buff,
-                                        10000, // ms
-                                        3,     // retries
-                                        0,     // redirects
-                                        false, // allow gzip
-                                        NULL,  // login
-                                        bInQtThread );
+    VERBOSE(VB_UPNP|VB_EXTRA,
+            QString("SOAPClient(%1) sending:\n").arg(url.toString()) +
+            header.toString() +
+            QString("\n%1\n").arg(aBuffer.constData()));
+
+    QString sXml = HttpComms::postHttp(
+        url,
+        &header,
+        &buff, // QIODevice*
+        10000, // ms -- Technically we should allow 30,000 ms per spec
+        3,     // retries
+        0,     // redirects
+        false, // allow gzip
+        NULL,  // login
+        bInQtThread,
+        QString() // userAgent, UPnP/1.0 very strict on format if set
+        );
 
     // --------------------------------------------------------------
     // Parse response
     // --------------------------------------------------------------
+
+    VERBOSE(VB_UPNP|VB_EXTRA, "SOAPClient response:\n" +QString("%1\n")
+            .arg(sXml));
+
+    // TODO handle timeout without response correctly.
 
     list.clear();
 
     QDomDocument xmlResult;
     QDomDocument doc;
 
-    if ( !doc.setContent( sXml, true, &sErrDesc, &nErrCode ))
+    if (!doc.setContent(sXml, true, &sErrDesc, &nErrCode))
     {
-        VERBOSE( VB_UPNP, QString( "MythXMLClient::SendSOAPRequest( %1 ) - Invalid response from %2" )
-                             .arg( sMethod   )
-                             .arg( url.toString() ));
+        VERBOSE(VB_UPNP,
+                QString("MythXMLClient::SendSOAPRequest( %1 ) - "
+                        "Invalid response from %2")
+                .arg(sMethod).arg(url.toString()) + 
+                QString("%1: %2").arg(nErrCode).arg(sErrDesc));
+
         return QDomDocument();
     }
 
@@ -238,7 +293,8 @@ QDomDocument SOAPClient::SendSOAPRequest( const QString    &sMethod,
     // --------------------------------------------------------------
 
     QString      sResponseName = sMethod + "Response";
-    QDomNodeList oNodeList     = doc.elementsByTagNameNS( m_sNamespace, sResponseName );
+    QDomNodeList oNodeList     =
+        doc.elementsByTagNameNS(m_sNamespace, sResponseName);
 
     if (oNodeList.count() > 0)
     {

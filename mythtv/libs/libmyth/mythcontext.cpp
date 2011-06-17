@@ -736,10 +736,7 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
     {
         backends = SSDP::Instance()->Find( gBackendURI );
         if (backends)
-        {
-            backends->AddRef();
             break;
-        }
         putchar('.');
     }
     putchar('\n');
@@ -771,19 +768,17 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
         return count;
     }
 
-
     // Get this backend's location:
-    backends->Lock();
-    DeviceLocation *BE = *(backends->GetEntryMap()->begin());
-    backends->Unlock();
+    DeviceLocation *BE = backends->GetFirst();
     backends->Release();
 
     // We don't actually know the backend's access PIN, so this will
     // only work for ones that have PIN access disabled (i.e. 0000)
-    if (UPnPconnect(BE, QString::null))
-        return 1;
+    int ret = (UPnPconnect(BE, QString::null)) ? 1 : -1;
 
-    return -1;   // Try to force chooser & PIN
+    BE->Release();
+
+    return ret;
 }
 
 /**
@@ -850,8 +845,12 @@ bool MythContextPrivate::DefaultUPnP(QString &error)
             gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
         }
 
+        pDevLoc->Release();
+
         return true;
     }
+
+    pDevLoc->Release();
 
     error = "Cannot connect to default backend via UPnP. Wrong saved PIN?";
     return false;

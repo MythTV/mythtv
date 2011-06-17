@@ -31,6 +31,9 @@
 #include <sys/utsname.h> 
 #endif
 
+// Qt headers
+#include <QScriptEngine>
+
 // MythTV headers
 #include "httpserver.h"
 #include "upnputil.h"

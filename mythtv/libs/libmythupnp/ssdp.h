@@ -124,20 +124,23 @@ class UPNP_PUBLIC SSDP : public QThread
 
         void RequestTerminate(void);
 
-        void PerformSearch( const QString &sST );
+        void PerformSearch(const QString &sST, uint timeout_secs = 2);
 
         void EnableNotifications ( int nServicePort );
         void DisableNotifications();
 
         // ------------------------------------------------------------------
 
-        static void AddListener   ( QObject *listener ) { SSDPCache::Instance()->addListener   ( listener ); }
-        static void RemoveListener( QObject *listener ) { SSDPCache::Instance()->removeListener( listener ); }
+        static void AddListener(QObject *listener)
+            { SSDPCache::Instance()->addListener(listener); }
+        static void RemoveListener(QObject *listener)
+            { SSDPCache::Instance()->removeListener(listener); }
 
-        static SSDPCacheEntries *Find( const QString &sURI )   { return SSDPCache::Instance()->Find( sURI ); }
-        static DeviceLocation   *Find( const QString &sURI, 
-                                       const QString &sUSN )   { return SSDPCache::Instance()->Find( sURI, sUSN ); }
-
+        static SSDPCacheEntries *Find(const QString &sURI)
+            { return SSDPCache::Instance()->Find(sURI); }
+        static DeviceLocation   *Find(const QString &sURI, 
+                                      const QString &sUSN)
+            { return SSDPCache::Instance()->Find( sURI, sUSN ); }
 };
 
 /////////////////////////////////////////////////////////////////////////////

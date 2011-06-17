@@ -247,41 +247,16 @@ void BackendSelection::Load()
 
 void BackendSelection::Init(void)
 {
-    EntryMap::Iterator  it;
-    EntryMap            ourMap;
-    DeviceLocation     *pDevLoc;
-
-    SSDPCacheEntries *pEntries = SSDPCache::Instance()->Find( gBackendURI );
-
-    if (!pEntries)
+    SSDPCacheEntries *pEntries = SSDPCache::Instance()->Find(gBackendURI);
+    if (pEntries)
     {
-        VERBOSE(VB_GENERAL, "Found zero backends, bailing");
-        return;
-    }
+        EntryMap ourMap;
+        pEntries->GetEntryMap(ourMap);
+        pEntries->Release();
 
-    pEntries->AddRef();
-    pEntries->Lock();
-
-    EntryMap *pMap = pEntries->GetEntryMap();
-
-    for (it = pMap->begin(); it != pMap->end(); ++it)
-    {
-        pDevLoc = (DeviceLocation *)*it;
-
-        if (!pDevLoc)
-            continue;
-
-        pDevLoc->AddRef();
-        ourMap.insert(pDevLoc->m_sUSN, pDevLoc);
-    }
-
-    pEntries->Unlock();
-    pEntries->Release();
-
-    for (it = ourMap.begin(); it != ourMap.end(); ++it)
-    {
-        pDevLoc = (DeviceLocation *)*it;
-        AddItem(pDevLoc);   // this does a Release()
+        EntryMap::const_iterator it;
+        for (it = ourMap.begin(); it != ourMap.end(); ++it)
+            AddItem(*it);   // this does an (*it)->Release()
     }
 }
 
@@ -341,12 +316,8 @@ void BackendSelection::customEvent(QEvent *event)
             URI.startsWith("urn:schemas-mythtv-org:device:MasterMediaServer:"))
         {
             DeviceLocation *devLoc = SSDP::Instance()->Find(URI, URN);
-
             if (devLoc)
-            {
-                devLoc->AddRef();
                 AddItem(devLoc);   // this does a Release()
-            }
         }
         else if (message.startsWith("SSDP_REMOVE"))
         {
