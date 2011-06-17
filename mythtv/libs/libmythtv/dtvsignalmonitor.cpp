@@ -59,9 +59,9 @@ DTVChannel *DTVSignalMonitor::GetDTVChannel(void)
     return dynamic_cast<DTVChannel*>(channel);
 }
 
-QStringList DTVSignalMonitor::GetStatusList(bool kick)
+QStringList DTVSignalMonitor::GetStatusList(void) const
 {
-    QStringList list = SignalMonitor::GetStatusList(kick);
+    QStringList list = SignalMonitor::GetStatusList();
     QMutexLocker locker(&statusLock);
 
     // mpeg tables
@@ -525,36 +525,4 @@ bool DTVSignalMonitor::IsAllGood(void) const
             return false;
 
     return true;
-}
-
-/** \fn  SignalMonitor::WaitForLock(int)
- *  \brief Wait for a StatusSignaLock(int) of true.
- *
- *   This can be called only after the signal
- *   monitoring thread has been started.
- *
- *  \param timeout maximum time to wait in milliseconds.
- *  \return true if signal was acquired.
- */
-bool DTVSignalMonitor::WaitForLock(int timeout)
-{
-    statusLock.lock();
-    if (-1 == timeout)
-        timeout = signalLock.GetTimeout();
-    statusLock.unlock();
-    if (timeout < 0)
-        return false;
-
-    MythTimer t;
-    t.start();
-    while (t.elapsed()<timeout && running)
-    {
-        SignalMonitorList slist =
-            SignalMonitorValue::Parse(GetStatusList());
-        if (SignalMonitorValue::AllGood(slist))
-            return true;
-        usleep(250);
-    }
-
-    return false;
 }

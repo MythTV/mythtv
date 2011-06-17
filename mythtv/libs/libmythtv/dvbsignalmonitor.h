@@ -20,7 +20,7 @@ class DVBSignalMonitor: public DTVSignalMonitor
                      kDVBSigMon_WaitForBER | kDVBSigMon_WaitForUB);
     virtual ~DVBSignalMonitor();
 
-    virtual QStringList GetStatusList(bool kick);
+    virtual QStringList GetStatusList(void) const;
     void Stop(void);
 
     virtual void SetRotorTarget(float target);

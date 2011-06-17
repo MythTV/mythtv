@@ -178,7 +178,6 @@ SignalMonitor::SignalMonitor(int _capturecardnum, ChannelBase *_channel,
     : channel(_channel),
       capturecardnum(_capturecardnum), flags(wait_for_mask),
       update_rate(25),                 minimum_update_rate(5),
-      running(false),                  exit(false),
       update_done(false),              notify_frontend(true),
       eit_scan(false),
       signalLock    (QObject::tr("Signal Lock"),  "slock",
@@ -187,6 +186,7 @@ SignalMonitor::SignalMonitor(int _capturecardnum, ChannelBase *_channel,
                      0, true, 0, 100, 0),
       scriptStatus  (QObject::tr("Script Status"), "script",
                      3, true, 0, 3, 0),
+      running(false),                  exit(false),
       statusLock(QMutex::Recursive)
 {
     if (!channel->IsExternalChannelChangeSupported())
@@ -233,11 +233,10 @@ void SignalMonitor::Start()
     DBG_SM("Start", "begin");
     {
         QMutexLocker locker(&startStopLock);
-
+        exit = false;
         start();
-
         while (!running)
-            usleep(5000);
+            startStopWait.wait(locker.mutex());
     }
     DBG_SM("Start", "end");
 }
@@ -248,33 +247,19 @@ void SignalMonitor::Start()
 void SignalMonitor::Stop()
 {
     DBG_SM("Stop", "begin");
+
+    QMutexLocker locker(&startStopLock);
+    exit = true;
+    if (running)
     {
-        QMutexLocker locker(&startStopLock);
-        if (running)
-        {
-            exit = true;
-            wait();
-        }
+        locker.unlock();
+        wait();
     }
+
     DBG_SM("Stop", "end");
 }
 
-/** \fn SignalMonitor::Kick()
- *  \brief Wake up monitor thread, and wait for
- *         UpdateValue() to execute once.
- */
-void SignalMonitor::Kick()
-{
-    update_done = false;
-
-    //pthread_kill(monitor_thread, SIGALRM);
-
-    while (!update_done)
-        usleep(50);
-}
-
-/** \fn SignalMonitor::GetStatusList(bool)
- *  \brief Returns QStringList containing all signals and their current
+/** \brief Returns QStringList containing all signals and their current
  *         values.
  *
  *   This serializes the signal monitoring values so that they can
@@ -282,18 +267,9 @@ void SignalMonitor::Kick()
  *
  *   SignalMonitorValue::Parse(const QStringList&) will convert this
  *   to a vector of SignalMonitorValue instances.
- *
- *  \param kick if true Kick() will be employed so that this
- *         call will not have to wait for the next signal
- *         monitoring event.
  */
-QStringList SignalMonitor::GetStatusList(bool kick)
+QStringList SignalMonitor::GetStatusList(void) const
 {
-    if (kick && running)
-        Kick();
-    else if (!running)
-        UpdateValues();
-
     QStringList list;
     statusLock.lock();
     list<<scriptStatus.GetName()<<scriptStatus.GetStatus();
@@ -305,90 +281,48 @@ QStringList SignalMonitor::GetStatusList(bool kick)
     return list;
 }
 
-/** \fn SignalMonitor::MonitorLoop()
- *  \brief Basic signal monitoring loop
- */
-void SignalMonitor::MonitorLoop()
+/// \brief Basic signal monitoring loop
+void SignalMonitor::MonitorLoop(void)
 {
+    threadRegister("SignalMonitor");
+
+    QMutexLocker locker(&startStopLock);
     running = true;
-    exit = false;
+    startStopWait.wakeAll();
 
     while (!exit)
     {
+        locker.unlock();
+
         UpdateValues();
 
         if (notify_frontend && capturecardnum>=0)
         {
-            QStringList slist = GetStatusList(false);
+            QStringList slist = GetStatusList();
             MythEvent me(QString("SIGNAL %1").arg(capturecardnum), slist);
             gCoreContext->dispatch(me);
-            //VERBOSE(VB_GENERAL("sent SIGNAL");
         }
 
-        usleep(update_rate * 1000);
+        locker.relock();
+        startStopWait.wait(locker.mutex(), update_rate);
     }
 
     // We need to send a last informational message because a
     // signal update may have come in while we were sleeping
     // if we are using the multithreaded dtvsignalmonitor.
+    locker.unlock();
     if (notify_frontend && capturecardnum>=0)
     {
-        QStringList slist = GetStatusList(false);
+        QStringList slist = GetStatusList();
         MythEvent me(QString("SIGNAL %1").arg(capturecardnum), slist);
         gCoreContext->dispatch(me);
     }
+    locker.relock();
+
     running = false;
-}
+    startStopWait.wakeAll();
 
-/** \fn  SignalMonitor::WaitForLock(int)
- *  \brief Wait for a StatusSignaLock(int) of true.
- *
- *   This can be called whether or not the signal
- *   monitoring thread has been started.
- *
- *  \param timeout maximum time to wait in milliseconds.
- *  \return true if signal was acquired.
- */
-bool SignalMonitor::WaitForLock(int timeout)
-{
-    statusLock.lock();
-    if (-1 == timeout)
-        timeout = signalLock.GetTimeout();
-    statusLock.unlock();
-    if (timeout<0)
-        return false;
-
-    MythTimer t;
-    t.start();
-    if (running)
-    {
-        while (t.elapsed()<timeout && running)
-        {
-            Kick();
-
-            if (HasSignalLock())
-                return true;
-
-            usleep(50);
-        }
-        if (!running)
-            return WaitForLock(timeout-t.elapsed());
-    }
-    else
-    {
-        while (t.elapsed()<timeout && !running)
-        {
-            UpdateValues();
-
-            if (HasSignalLock())
-                return true;
-
-            usleep(50);
-        }
-        if (running)
-            return WaitForLock(timeout-t.elapsed());
-    }
-    return false;
+    threadDeregister();
 }
 
 void SignalMonitor::AddListener(SignalMonitorListener *listener)
