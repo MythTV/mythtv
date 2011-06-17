@@ -28,6 +28,9 @@
 #include <sys/time.h>
 #endif
 #include <signal.h>
+#ifdef linux
+#include <sys/syscall.h>
+#endif
 
 QMutex                  loggerListMutex;
 QList<LoggerBase *>     loggerList;
@@ -37,6 +40,9 @@ QQueue<LoggingItem_t *> logQueue;
 
 QMutex                  logThreadMutex;
 QHash<uint64_t, char *> logThreadHash;
+
+QMutex                  logThreadTidMutex;
+QHash<uint64_t, pid_t>  logThreadTidHash;
 
 LoggerThread            logThread;
 bool                    debugRegistration = false;
@@ -49,6 +55,7 @@ LogLevel_t LogLevel = LOG_UNKNOWN;  /**< The log level mask to apply, messages
                                          be output */
 
 char *getThreadName( LoggingItem_t *item );
+pid_t getThreadTid( LoggingItem_t *item );
 void deleteItem( LoggingItem_t *item );
 void logSighup( int signum, siginfo_t *info, void *secret );
 
@@ -88,7 +95,7 @@ LoggerBase::~LoggerBase()
 }
 
 
-FileLogger::FileLogger(char *filename) : LoggerBase(filename, 0), 
+FileLogger::FileLogger(char *filename) : LoggerBase(filename, 0),
                                          m_opened(false), m_fd(-1)
 {
     if( !strcmp(filename, "-") )
@@ -107,11 +114,11 @@ FileLogger::FileLogger(char *filename) : LoggerBase(filename, 0),
 
 FileLogger::~FileLogger()
 {
-    if( m_opened ) 
+    if( m_opened )
     {
         if( m_fd != 1 )
         {
-            LogPrint( VB_IMPORTANT, LOG_INFO, "Removed logging to %s", 
+            LogPrint( VB_IMPORTANT, LOG_INFO, "Removed logging to %s",
                       m_handle.string );
             close( m_fd );
         }
@@ -144,6 +151,7 @@ bool FileLogger::logmsg(LoggingItem_t *item)
     int                 length;
     char               *threadName = NULL;
     pid_t               pid = getpid();
+    pid_t               tid = 0;
 
     if (!m_opened)
         return false;
@@ -154,19 +162,28 @@ bool FileLogger::logmsg(LoggingItem_t *item)
     strcat( timestamp, usPart );
     length = strlen( timestamp );
 
-    if (m_fd == 1) 
+    if (m_fd == 1)
     {
         // Stdout
-        snprintf( line, MAX_STRING_LENGTH, "%s %c  %s\n", timestamp, 
+        snprintf( line, MAX_STRING_LENGTH, "%s %c  %s\n", timestamp,
                   LogLevelShortNames[item->level], item->message );
     }
-    else 
+    else
     {
         threadName = getThreadName(item);
+        tid = getThreadTid(item);
 
-        snprintf( line, MAX_STRING_LENGTH, "%s %c [%d] %s %s:%d (%s) - %s\n", 
-                  timestamp, LogLevelShortNames[item->level], pid, threadName,
-                  item->file, item->line, item->function, item->message );
+#ifdef linux
+        snprintf( line, MAX_STRING_LENGTH, "%s %c [%d/%d] %s %s:%d (%s) - %s\n",
+                  timestamp, LogLevelShortNames[item->level], pid, tid,
+                  threadName, item->file, item->line, item->function,
+                  item->message );
+#else
+        snprintf( line, MAX_STRING_LENGTH, "%s %c [%d] %s %s:%d (%s) - %s\n",
+                  timestamp, LogLevelShortNames[item->level], pid,
+                  threadName, item->file, item->line, item->function,
+                  item->message );
+#endif
     }
 
     int result = write( m_fd, line, strlen(line) );
@@ -177,8 +194,8 @@ bool FileLogger::logmsg(LoggingItem_t *item)
     }
 
     if( result == -1 )
-    {  
-        LogPrint( VB_IMPORTANT, LOG_UNKNOWN, 
+    {
+        LogPrint( VB_IMPORTANT, LOG_UNKNOWN,
                   "Closed Log output on fd %d due to errors", m_fd );
         m_opened = false;
         if( m_fd != 1 )
@@ -189,7 +206,7 @@ bool FileLogger::logmsg(LoggingItem_t *item)
 }
 
 
-SyslogLogger::SyslogLogger(int facility) : LoggerBase(NULL, facility), 
+SyslogLogger::SyslogLogger(int facility) : LoggerBase(NULL, facility),
                                            m_opened(false)
 {
     CODE *name;
@@ -200,7 +217,7 @@ SyslogLogger::SyslogLogger(int facility) : LoggerBase(NULL, facility),
     openlog( m_application, LOG_NDELAY | LOG_PID, facility );
     m_opened = true;
 
-    for( name = &facilitynames[0]; 
+    for( name = &facilitynames[0];
          name->c_name && name->c_val != facility; name++ );
 
     LogPrint(VB_IMPORTANT, LOG_INFO, "Added syslogging to facility %s",
@@ -230,7 +247,7 @@ bool SyslogLogger::logmsg(LoggingItem_t *item)
 }
 
 
-DatabaseLogger::DatabaseLogger(char *table) : LoggerBase(table, 0), 
+DatabaseLogger::DatabaseLogger(char *table) : LoggerBase(table, 0),
                                               m_host(NULL), m_opened(false),
                                               m_loggingTableExists(false)
 {
@@ -316,7 +333,7 @@ bool DatabaseLogger::logqmsg(LoggingItem_t *item)
     }
 
     if (!query.exec())
-    {  
+    {
         MythDB::DBError("DBLogging", query);
         return false;
     }
@@ -398,6 +415,21 @@ char *getThreadName( LoggingItem_t *item )
     return( threadName );
 }
 
+pid_t getThreadTid( LoggingItem_t *item )
+{
+    pid_t tid = 0;
+
+    if( !item )
+        return( 0 );
+
+    QMutexLocker locker(&logThreadTidMutex);
+    if( logThreadTidHash.contains(item->threadId) )
+        tid = logThreadTidHash[item->threadId];
+
+    return( tid );
+}
+
+
 LoggerThread::LoggerThread()
 {
     char *debug = getenv("VERBOSE_THREADS");
@@ -420,7 +452,7 @@ LoggerThread::~LoggerThread()
         (*it)->deleteLater();
     }
 }
- 
+
 void LoggerThread::run(void)
 {
     threadRegister("Logger");
@@ -448,22 +480,36 @@ void LoggerThread::run(void)
 
         if (item->registering)
         {
+            pid_t tid = getThreadTid(item);
+
             QMutexLocker locker(&logThreadMutex);
             logThreadHash[item->threadId] = strdup(item->threadName);
+
             if( debugRegistration )
             {
                 item->message   = (char *)malloc(LOGLINE_MAX+1);
                 if( item->message )
                 {
                     snprintf( item->message, LOGLINE_MAX,
-                              "Thread 0x%llX registered as \'%s\'", 
-                              (long long unsigned int)item->threadId, 
-                              logThreadHash[item->threadId] );
+                              "Thread 0x%llX (%d) registered as \'%s\'",
+                              (long long unsigned int)item->threadId,
+                              tid, logThreadHash[item->threadId] );
                 }
             }
         }
         else if (item->deregistering)
         {
+            pid_t tid = 0;
+
+            {
+                QMutexLocker locker(&logThreadTidMutex);
+                if( logThreadTidHash.contains(item->threadId) )
+                {
+                    tid = logThreadTidHash[item->threadId];
+                    logThreadTidHash.remove(item->threadId);
+                }
+            }
+
             QMutexLocker locker(&logThreadMutex);
             if( logThreadHash.contains(item->threadId) )
             {
@@ -473,9 +519,9 @@ void LoggerThread::run(void)
                     if( item->message )
                     {
                         snprintf( item->message, LOGLINE_MAX,
-                                  "Thread 0x%llX deregistered as \'%s\'", 
-                                  (long long unsigned int)item->threadId, 
-                                  logThreadHash[item->threadId] );
+                                  "Thread 0x%llX (%d) deregistered as \'%s\'",
+                                  (long long unsigned int)item->threadId,
+                                  tid, logThreadHash[item->threadId] );
                     }
                 }
                 item->threadName = logThreadHash[item->threadId];
@@ -533,7 +579,7 @@ void LogTimeStamp( time_t *epoch, uint32_t *usec )
 #if HAVE_GETTIMEOFDAY
     struct timeval  tv;
     gettimeofday(&tv, NULL);
-    *epoch = tv.tv_sec; 
+    *epoch = tv.tv_sec;
     *usec  = tv.tv_usec;
 #else
     /* Stupid system has no gettimeofday, use less precise QDateTime */
@@ -544,7 +590,7 @@ void LogTimeStamp( time_t *epoch, uint32_t *usec )
 #endif
 }
 
-void LogPrintLine( uint32_t mask, LogLevel_t level, const char *file, int line, 
+void LogPrintLine( uint32_t mask, LogLevel_t level, const char *file, int line,
                    const char *function, const char *format, ... )
 {
     va_list         arguments;
@@ -581,8 +627,21 @@ void LogPrintLine( uint32_t mask, LogLevel_t level, const char *file, int line,
     item->level    = level;
     item->file     = file;
     item->line     = line;
-    item->function = function; 
+    item->function = function;
     item->threadId = (uint64_t)QThread::currentThreadId();
+
+#ifdef linux
+    {
+        QMutexLocker locker(&logThreadTidMutex);
+
+        if( ! logThreadTidHash.contains(item->threadId) )
+        {
+            pid_t tid = syscall(SYS_gettid);
+            logThreadTidHash[item->threadId] = tid;
+        }
+    }
+#endif
+
     item->message  = message;
 
     QMutexLocker qLock(&logQueueMutex);
@@ -617,12 +676,12 @@ void logStart(QString logfile, int quiet, int facility, bool dblog)
         logger = new FileLogger((char *)"-");
 
     /* Debug logfile */
-    if( !logfile.isEmpty() ) 
+    if( !logfile.isEmpty() )
         logger = new FileLogger((char *)logfile.toLocal8Bit().constData());
 
     /* Syslog */
     if( facility < 0 )
-        LogPrint(VB_IMPORTANT, LOG_CRIT, 
+        LogPrint(VB_IMPORTANT, LOG_CRIT,
                  "Syslogging facility unknown, disabling syslog output");
     else if( facility > 0 )
         logger = new SyslogLogger(facility);
@@ -691,6 +750,18 @@ void threadRegister(QString name)
     item->threadName = strdup((char *)name.toLocal8Bit().constData());
     item->registering = true;
 
+#ifdef linux
+    {
+        QMutexLocker locker(&logThreadTidMutex);
+
+        if( ! logThreadTidHash.contains(item->threadId) )
+        {
+            pid_t tid = syscall(SYS_gettid);
+            logThreadTidHash[item->threadId] = tid;
+        }
+    }
+#endif
+
     QMutexLocker qLock(&logQueueMutex);
     logQueue.enqueue(item);
 }
@@ -728,8 +799,8 @@ int syslogGetFacility(QString facility)
     CODE *name;
     int i;
     char *string = (char *)facility.toLocal8Bit().constData();
-    
-    for( i = 0, name = &facilitynames[0]; 
+
+    for( i = 0, name = &facilitynames[0];
          name->c_name && strcmp(name->c_name, string); i++, name++ );
 
     return( name->c_val );
