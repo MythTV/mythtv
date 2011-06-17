@@ -950,9 +950,9 @@ void MythCommandLineParser::addLogging(void)
             "file (currently disabled).", "");
     add(QStringList( QStringList() << "-q" << "--quiet"), "quiet", 0,
             "Don't log to the console (-q).  Don't log anywhere (-q -q)", "");
-    add("--syslog", "syslog", "local7", 
+    add("--syslog", "syslog", "none", 
             "Set the syslog logging facility.\nSet to \"none\" to disable, "
-            "defaults to local7", "");
+            "defaults to none", "");
     add("--nodblog", "nodblog", "Disable database logging.", "");
 }
 
