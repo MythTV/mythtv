@@ -40,7 +40,7 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
 
 VideoOutputOpenGL::VideoOutputOpenGL()
     : VideoOutput(),
-    gl_context_lock(QMutex::Recursive), gl_context(NULL),
+    gl_context_lock(QMutex::Recursive), gl_context(NULL), gl_valid(true),
     gl_videochain(NULL), gl_pipchain_active(NULL),
     gl_parent_win(0),    gl_painter(NULL), gl_created_painter(false)
 {
@@ -66,6 +66,7 @@ void VideoOutputOpenGL::TearDown(void)
 {
     gl_context_lock.lock();
     DestroyCPUResources();
+    DestroyVideoResources();
     DestroyGPUResources();
     gl_context_lock.unlock();
 }
@@ -82,8 +83,13 @@ bool VideoOutputOpenGL::CreateGPUResources(void)
     bool result = SetupContext();
     QSize size = window.GetActualVideoDim();
     InitDisplayMeasurements(size.width(), size.height(), false);
-    result &= SetupOpenGL();
     InitOSD();
+    return result;
+}
+
+bool VideoOutputOpenGL::CreateVideoResources(void)
+{
+    bool result = SetupOpenGL();
     MoveResize();
     return result;
 }
@@ -114,19 +120,30 @@ void VideoOutputOpenGL::DestroyGPUResources(void)
     if (gl_context)
         gl_context->makeCurrent();
 
+    if (gl_created_painter)
+        delete gl_painter;
+    else if (gl_painter)
+        gl_painter->SetSwapControl(true);
+
+    gl_painter = NULL;
+    gl_created_painter = false;
+
+    if (gl_context)
+        gl_context->doneCurrent();
+    gl_context_lock.unlock();
+}
+
+void VideoOutputOpenGL::DestroyVideoResources(void)
+{
+    gl_context_lock.lock();
+    if (gl_context)
+        gl_context->makeCurrent();
+
     if (gl_videochain)
     {
         delete gl_videochain;
         gl_videochain = NULL;
     }
-
-    if (gl_created_painter)
-        delete gl_painter;
-    else
-        gl_painter->SetSwapControl(true);
-
-    gl_painter = NULL;
-    gl_created_painter = false;
 
     while (!gl_pipchains.empty())
     {
@@ -153,7 +170,17 @@ bool VideoOutputOpenGL::Init(int width, int height, float aspect, WId winid,
     InitPictureAttributes();
 
     success &= CreateCPUResources();
-    success &= CreateGPUResources();
+
+    if (!gCoreContext->IsUIThread())
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "Deferring creation of OpenGL resources");
+        gl_valid = false;
+    }
+    else
+    {
+        success &= CreateGPUResources();
+        success &= CreateVideoResources();
+    }
 
     if (!success)
         TearDown();
@@ -210,14 +237,19 @@ bool VideoOutputOpenGL::InputChanged(const QSize &input_size,
         return true;
     }
 
-    TearDown();
+    if (gCoreContext->IsUIThread())
+        TearDown();
+    else
+        DestroyCPUResources();
+
     QRect disp = window.GetDisplayVisibleRect();
     if (Init(input_size.width(), input_size.height(),
              aspect, gl_parent_win, disp, av_codec_id))
     {
         if (wasembedding)
             EmbedInWidget(oldrect);
-        BestDeint();
+        if (gCoreContext->IsUIThread())
+            BestDeint();
         return true;
     }
 
@@ -384,8 +416,24 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD *osd,
                                      FrameScanType scan)
 {
     QMutexLocker locker(&gl_context_lock);
+
     if (!gl_context)
         return;
+
+    if (!gl_valid)
+    {
+        if (!gCoreContext->IsUIThread())
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "ProcessFrame called from wrong thread");
+        }
+        QSize size = window.GetActualVideoDim();
+        InitDisplayMeasurements(size.width(), size.height(), false);
+        DestroyVideoResources();
+        CreateVideoResources();
+        BestDeint();
+        gl_valid = true;
+    }
 
     bool sw_frame = codec_is_std(video_codec_id) && video_codec_id != kCodec_NONE;
     bool deint_proc = m_deinterlacing && (m_deintFilter != NULL);

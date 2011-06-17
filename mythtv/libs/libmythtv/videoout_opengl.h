@@ -58,7 +58,9 @@ class VideoOutputOpenGL : public VideoOutput
   protected:
     bool CreateCPUResources(void);
     bool CreateGPUResources(void);
+    bool CreateVideoResources(void);
     void DestroyCPUResources(void);
+    void DestroyVideoResources(void);
     void DestroyGPUResources(void);
     virtual bool CreateBuffers(void);
     bool CreatePauseFrame(void);
@@ -68,6 +70,7 @@ class VideoOutputOpenGL : public VideoOutput
 
     QMutex            gl_context_lock;
     MythRenderOpenGL *gl_context;
+    bool              gl_valid;
     OpenGLVideo      *gl_videochain;
     QMap<MythPlayer*,OpenGLVideo*> gl_pipchains;
     QMap<MythPlayer*,bool>         gl_pip_ready;
