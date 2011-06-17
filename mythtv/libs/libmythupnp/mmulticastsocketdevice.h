@@ -25,6 +25,7 @@
 #define _MULTICAST_SOCKET_DEVICE_H_
 
 #include <sys/socket.h>
+#include <netinet/in.h>
 #include <netinet/ip.h>
 
 // Qt headers
