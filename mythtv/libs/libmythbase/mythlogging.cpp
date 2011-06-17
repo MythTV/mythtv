@@ -150,23 +150,23 @@ bool FileLogger::logmsg(LoggingItem_t *item)
 
     strftime( timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
               (const struct tm *)&item->tm );
-    snprintf( usPart, 9, ".%06d ", (int)(item->usec) );
+    snprintf( usPart, 9, ".%06d", (int)(item->usec) );
     strcat( timestamp, usPart );
     length = strlen( timestamp );
 
     if (m_fd == 1) 
     {
         // Stdout
-        snprintf( line, MAX_STRING_LENGTH, "%s %s\n", timestamp, 
-                  item->message );
+        snprintf( line, MAX_STRING_LENGTH, "%s %c  %s\n", timestamp, 
+                  LogLevelShortNames[item->level], item->message );
     }
     else 
     {
         threadName = getThreadName(item);
 
-        snprintf( line, MAX_STRING_LENGTH, "%s [%d] %s %s:%d (%s) - %s\n", 
-                  timestamp, pid, threadName, item->file, item->line, 
-                  item->function, item->message );
+        snprintf( line, MAX_STRING_LENGTH, "%s %c [%d] %s %s:%d (%s) - %s\n", 
+                  timestamp, LogLevelShortNames[item->level], pid, threadName,
+                  item->file, item->line, item->function, item->message );
     }
 
     int result = write( m_fd, line, strlen(line) );

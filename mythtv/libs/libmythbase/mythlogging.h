@@ -40,10 +40,27 @@ const char *LogLevelNames[] =
     "LOG_DEBUG",
     "LOG_UNKNOWN"
 };
-int LogLevelNameCount = sizeof(LogLevelNames)/sizeof(LogLevelNames[0]);
+int LogLevelNameCount = sizeof(LogLevelNames) / sizeof(LogLevelNames[0]);
+
+const char LogLevelShortNames[] =
+{
+    '!',
+    'A',
+    'C',
+    'E',
+    'W',
+    'N',
+    'I',
+    'D',
+    '-'
+};
+int LogLevelShortNameCount = sizeof(LogLevelShortNames) / 
+                             sizeof(LogLevelShortNames[0]);
 #else
 extern MBASE_PUBLIC char *LogLevelNames[];
 extern MBASE_PUBLIC int LogLevelNameCount;
+extern MBASE_PUBLIC char *LogLevelShortNames[];
+extern MBASE_PUBLIC int LogLevelShortNameCount;
 #endif
 extern MBASE_PUBLIC LogLevel_t LogLevel;
 
