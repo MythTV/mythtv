@@ -28,8 +28,15 @@
 #include <sys/time.h>
 #endif
 #include <signal.h>
-#ifdef linux
+
+// Various ways to get to thread's tid
+#if defined(linux)
 #include <sys/syscall.h>
+#elif defined(__FreeBSD__)
+#include <sys/ucontext.h>
+#include <sys/thr.h>
+#elif CONFIG_DARWIN
+#include <mach/mach.h>
 #endif
 
 QMutex                  loggerListMutex;
@@ -41,8 +48,8 @@ QQueue<LoggingItem_t *> logQueue;
 QMutex                  logThreadMutex;
 QHash<uint64_t, char *> logThreadHash;
 
-QMutex                  logThreadTidMutex;
-QHash<uint64_t, pid_t>  logThreadTidHash;
+QMutex                   logThreadTidMutex;
+QHash<uint64_t, int64_t> logThreadTidHash;
 
 LoggerThread            logThread;
 bool                    debugRegistration = false;
@@ -55,7 +62,8 @@ LogLevel_t LogLevel = LOG_UNKNOWN;  /**< The log level mask to apply, messages
                                          be output */
 
 char *getThreadName( LoggingItem_t *item );
-pid_t getThreadTid( LoggingItem_t *item );
+int64_t getThreadTid( LoggingItem_t *item );
+void setThreadTid( LoggingItem_t *item );
 void deleteItem( LoggingItem_t *item );
 void logSighup( int signum, siginfo_t *info, void *secret );
 
@@ -173,17 +181,18 @@ bool FileLogger::logmsg(LoggingItem_t *item)
         threadName = getThreadName(item);
         tid = getThreadTid(item);
 
-#ifdef linux
-        snprintf( line, MAX_STRING_LENGTH, "%s %c [%d/%d] %s %s:%d (%s) - %s\n",
-                  timestamp, LogLevelShortNames[item->level], pid, tid,
-                  threadName, item->file, item->line, item->function,
-                  item->message );
-#else
-        snprintf( line, MAX_STRING_LENGTH, "%s %c [%d] %s %s:%d (%s) - %s\n",
-                  timestamp, LogLevelShortNames[item->level], pid,
-                  threadName, item->file, item->line, item->function,
-                  item->message );
-#endif
+        if( tid )
+            snprintf( line, MAX_STRING_LENGTH, 
+                      "%s %c [%d/%d] %s %s:%d (%s) - %s\n",
+                      timestamp, LogLevelShortNames[item->level], pid, tid,
+                      threadName, item->file, item->line, item->function,
+                      item->message );
+        else
+            snprintf( line, MAX_STRING_LENGTH,
+                      "%s %c [%d] %s %s:%d (%s) - %s\n",
+                      timestamp, LogLevelShortNames[item->level], pid,
+                      threadName, item->file, item->line, item->function,
+                      item->message );
     }
 
     int result = write( m_fd, line, strlen(line) );
@@ -415,7 +424,7 @@ char *getThreadName( LoggingItem_t *item )
     return( threadName );
 }
 
-pid_t getThreadTid( LoggingItem_t *item )
+int64_t getThreadTid( LoggingItem_t *item )
 {
     pid_t tid = 0;
 
@@ -427,6 +436,27 @@ pid_t getThreadTid( LoggingItem_t *item )
         tid = logThreadTidHash[item->threadId];
 
     return( tid );
+}
+
+void setThreadTid( LoggingItem_t *item )
+{
+    int64_t tid = 0;
+
+    QMutexLocker locker(&logThreadTidMutex);
+
+    if( ! logThreadTidHash.contains(item->threadId) )
+    {
+#if defined(linux)
+        tid = (int64_t)syscall(SYS_gettid);
+#elif defined(__FreeBSD__)
+        long lwpid;
+        thr_self( &lwpid );
+        tid = (int64_t)lwpid;
+#elif CONFIG_DARWIN
+        tid = (int64_t)mach_thread_self();
+#endif
+        logThreadTidHash[item->threadId] = tid;
+    }
 }
 
 
@@ -480,7 +510,7 @@ void LoggerThread::run(void)
 
         if (item->registering)
         {
-            pid_t tid = getThreadTid(item);
+            int64_t tid = getThreadTid(item);
 
             QMutexLocker locker(&logThreadMutex);
             logThreadHash[item->threadId] = strdup(item->threadName);
@@ -491,7 +521,7 @@ void LoggerThread::run(void)
                 if( item->message )
                 {
                     snprintf( item->message, LOGLINE_MAX,
-                              "Thread 0x%llX (%d) registered as \'%s\'",
+                              "Thread 0x%llX (%lld) registered as \'%s\'",
                               (long long unsigned int)item->threadId,
                               tid, logThreadHash[item->threadId] );
                 }
@@ -499,7 +529,7 @@ void LoggerThread::run(void)
         }
         else if (item->deregistering)
         {
-            pid_t tid = 0;
+            int64_t tid = 0;
 
             {
                 QMutexLocker locker(&logThreadTidMutex);
@@ -519,7 +549,7 @@ void LoggerThread::run(void)
                     if( item->message )
                     {
                         snprintf( item->message, LOGLINE_MAX,
-                                  "Thread 0x%llX (%d) deregistered as \'%s\'",
+                                  "Thread 0x%llX (%lld) deregistered as \'%s\'",
                                   (long long unsigned int)item->threadId,
                                   tid, logThreadHash[item->threadId] );
                     }
@@ -629,20 +659,8 @@ void LogPrintLine( uint32_t mask, LogLevel_t level, const char *file, int line,
     item->line     = line;
     item->function = function;
     item->threadId = (uint64_t)QThread::currentThreadId();
-
-#ifdef linux
-    {
-        QMutexLocker locker(&logThreadTidMutex);
-
-        if( ! logThreadTidHash.contains(item->threadId) )
-        {
-            pid_t tid = syscall(SYS_gettid);
-            logThreadTidHash[item->threadId] = tid;
-        }
-    }
-#endif
-
     item->message  = message;
+    setThreadTid(item);
 
     QMutexLocker qLock(&logQueueMutex);
     logQueue.enqueue(item);
@@ -749,18 +767,7 @@ void threadRegister(QString name)
     item->function = (char *)__FUNCTION__;
     item->threadName = strdup((char *)name.toLocal8Bit().constData());
     item->registering = true;
-
-#ifdef linux
-    {
-        QMutexLocker locker(&logThreadTidMutex);
-
-        if( ! logThreadTidHash.contains(item->threadId) )
-        {
-            pid_t tid = syscall(SYS_gettid);
-            logThreadTidHash[item->threadId] = tid;
-        }
-    }
-#endif
+    setThreadTid(item);
 
     QMutexLocker qLock(&logQueueMutex);
     logQueue.enqueue(item);
