@@ -2138,7 +2138,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
     VERBOSE(VB_JOBQUEUE, LOC + QString("Running command: '%1'").arg(command));
 
     breaksFound = myth_system(command);
-    int priority = LP_NOTICE;
+    int priority = LOG_NOTICE;
     QString comment;
 
     runningJobsLock->lock();
@@ -2148,25 +2148,25 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
     {
         comment = tr("Unable to find mythcommflag");
         ChangeJobStatus(jobID, JOB_ERRORED, comment);
-        priority = LP_WARNING;
+        priority = LOG_WARNING;
     }
     else if (runningJobs[jobID].flag == JOB_STOP)
     {
         comment = tr("Aborted by user");
         ChangeJobStatus(jobID, JOB_ABORTED, comment);
-        priority = LP_WARNING;
+        priority = LOG_WARNING;
     }
     else if (breaksFound == GENERIC_EXIT_NO_RECORDING_DATA)
     {
         comment = tr("Unable to open file or init decoder");
         ChangeJobStatus(jobID, JOB_ERRORED, comment);
-        priority = LP_WARNING;
+        priority = LOG_WARNING;
     }
     else if (breaksFound >= GENERIC_EXIT_NOT_OK) // 256 or above - error
     {
         comment = tr("Failed with exit status %1").arg(breaksFound);
         ChangeJobStatus(jobID, JOB_ERRORED, comment);
-        priority = LP_WARNING;
+        priority = LOG_WARNING;
     }
     else
     {
@@ -2195,7 +2195,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
         details = detailstr.toLocal8Bit();
     }
 
-    if (priority <= LP_WARNING)
+    if (priority <= LOG_WARNING)
         VERBOSE(VB_IMPORTANT, LOC_ERR + msg + ": " + details.constData());
 
     RemoveRunningJob(jobID);
