@@ -241,15 +241,17 @@ bool PreviewGenerator::Run(void)
         if (!outFileName.isEmpty())
             command += QString("--outfile \"%1\" ").arg(outFileName);
 
-        command += " > /dev/null";
+        command += " --quiet";
 
+        // Timeout in 5s
         uint ret = myth_system(command, kMSDontBlockInputDevs |
                                         kMSDontDisableDrawing |
-                                        kMSProcessEvents);
+                                        kMSProcessEvents, 5000);
         if (ret != GENERIC_EXIT_OK)
         {
-            msg = QString("Encountered problems running '%1'").arg(command);
-            VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
+            VERBOSE(VB_IMPORTANT, LOC_ERR + 
+                              QString("Encountered problems running '%1' (%2)")
+                .arg(command) .arg(ret));
         }
         else
         {
