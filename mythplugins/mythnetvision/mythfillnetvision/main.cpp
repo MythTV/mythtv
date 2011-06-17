@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
 
     MythTranslation::load("mythfrontend");
 
-    if (refreshtree)
+    if (refreshall || refreshtree)
     {
         QEventLoop treeloop;
 
@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
         treeloop.exec();
     }
 
-    if (refreshrss)
+    if (refreshall || refreshrss)
     {
         QEventLoop rssloop;
 
