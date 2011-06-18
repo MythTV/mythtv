@@ -450,7 +450,7 @@ void setThreadTid( LoggingItem_t *item )
         tid = (int64_t)syscall(SYS_gettid);
 #elif defined(__FreeBSD__)
         long lwpid;
-        thr_self( &lwpid );
+        int dummy = thr_self( &lwpid );
         tid = (int64_t)lwpid;
 #elif CONFIG_DARWIN
         tid = (int64_t)mach_thread_self();
