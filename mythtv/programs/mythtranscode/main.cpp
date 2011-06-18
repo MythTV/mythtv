@@ -107,7 +107,8 @@ int main(int argc, char *argv[])
     int jobType = JOB_NONE;
     int otype = REPLEX_MPEG2;
     bool useCutlist = false, keyframesonly = false;
-    bool build_index = false, fifosync = false, showprogress = false, mpeg2 = false;
+    bool build_index = false, fifosync = false, showprogress = false;
+    bool mpeg2 = false;
     QMap<QString, QString> settingsOverride;
     frm_dir_map_t deleteMap;
     frm_pos_map_t posMap;
@@ -254,8 +255,6 @@ int main(int argc, char *argv[])
         fifosync = true;
     if (cmdline.toBool("recopt"))
         recorderOptions = cmdline.toString("recopt");
-    if (cmdline.toBool("showprogress"))
-        showprogress = true;
     if (cmdline.toBool("mpeg2"))
         mpeg2 = true;
     if (cmdline.toBool("ostream"))
@@ -291,6 +290,10 @@ int main(int argc, char *argv[])
             parse_verbose_arg("none");
         }
     }
+
+    showprogress = cmdline.toBool("showprogress");
+    if (showprogress)
+        quiet++;
 
     int facility = cmdline.GetSyslogFacility();
     bool dblog = !cmdline.toBool("nodblog");
