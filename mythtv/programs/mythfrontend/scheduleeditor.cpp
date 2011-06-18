@@ -498,9 +498,7 @@ bool SchedOptEditor::Create()
 #else
     UIUtilE::Assign(this, m_filtersButton, "filters", &err);
 #endif
-
     UIUtilE::Assign(this, m_ruleactiveCheck, "ruleactive", &err);
-    UIUtilE::Assign(this, m_backButton, "back", &err);
 
     if (err)
     {
@@ -508,6 +506,9 @@ bool SchedOptEditor::Create()
                               "required elements");
         return false;
     }
+
+    if (!UIUtilW::Assign(this, m_backButton, "back"))
+        connect(m_backButton, SIGNAL(Clicked()), SLOT(Close()));
 
     if ((m_recordingRule->m_type == kSingleRecord) ||
         (m_recordingRule->m_type ==kOverrideRecord))
@@ -524,8 +525,6 @@ bool SchedOptEditor::Create()
     if (!m_missing_filters)
 #endif
     connect(m_filtersButton, SIGNAL(Clicked()), SLOT(ShowFilters()));
-
-    connect(m_backButton, SIGNAL(Clicked()), SLOT(Close()));
 
     BuildFocusList();
 
@@ -728,7 +727,6 @@ bool SchedFilterEditor::Create()
     bool err = false;
 
     UIUtilE::Assign(this, m_filtersList, "filters", &err);
-    UIUtilE::Assign(this, m_backButton, "back", &err);
 
     if (err)
     {
@@ -737,7 +735,8 @@ bool SchedFilterEditor::Create()
         return false;
     }
 
-    connect(m_backButton, SIGNAL(Clicked()), SLOT(Close()));
+    if (!UIUtilW::Assign(this, m_backButton, "back"))
+        connect(m_backButton, SIGNAL(Clicked()), SLOT(Close()));
 
     connect(m_filtersList, SIGNAL(itemClicked(MythUIButtonListItem *)),
             SLOT(ToggleSelected(MythUIButtonListItem *)));
@@ -858,8 +857,6 @@ bool StoreOptEditor::Create()
 
     UIUtilE::Assign(this, m_autoexpireCheck, "autoexpire", &err);
 
-    UIUtilE::Assign(this, m_backButton, "back", &err);
-
     if (err)
     {
         VERBOSE(VB_IMPORTANT, "StoreOptEditor, theme is missing "
@@ -867,13 +864,14 @@ bool StoreOptEditor::Create()
         return false;
     }
 
+    if (!UIUtilW::Assign(this, m_backButton, "back"))
+        connect(m_backButton, SIGNAL(Clicked()), SLOT(Close()));
+
     connect(m_maxepSpin, SIGNAL(itemSelected(MythUIButtonListItem *)),
                          SLOT(maxEpChanged(MythUIButtonListItem *)));
 
     connect(m_recgroupList, SIGNAL(LosingFocus()),
                             SLOT(PromptForRecgroup()));
-
-    connect(m_backButton, SIGNAL(Clicked()), SLOT(Close()));
 
     BuildFocusList();
 
@@ -1162,8 +1160,6 @@ bool PostProcEditor::Create()
     UIUtilE::Assign(this, m_userjob3Check, "userjob3", &err);
     UIUtilE::Assign(this, m_userjob4Check, "userjob4", &err);
 
-    UIUtilE::Assign(this, m_backButton, "back", &err);
-
     if (err)
     {
         VERBOSE(VB_IMPORTANT, "PostProcEditor, theme is missing "
@@ -1171,10 +1167,11 @@ bool PostProcEditor::Create()
         return false;
     }
 
+    if (!UIUtilW::Assign(this, m_backButton, "back"))
+        connect(m_backButton, SIGNAL(Clicked()), SLOT(Close()));
+
     connect(m_transcodeCheck, SIGNAL(toggled(bool)),
             SLOT(transcodeEnable(bool)));
-
-    connect(m_backButton, SIGNAL(Clicked()), SLOT(Close()));
 
     BuildFocusList();
 
