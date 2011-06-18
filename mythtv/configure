@@ -122,7 +122,7 @@ Advanced options (experts only):
   --disable-xv             disable XVideo   (X11 video output accel.)
   --enable-vdpau           enable NVidia VDPAU hardware acceleration.
   --enable-crystalhd       enable Broadcom CrystalHD hardware decoder support
-  --enablevaapi            enable VAAPI hardware accelerated video decoding
+  --enable-vaapi           enable VAAPI hardware accelerated video decoding
   --enable-dxva2           enable hardware accelerated decoding on windows
   --disable-opengl-video   disable OpenGL based video display
   --disable-quartz-video   disable Mac OS X CoreVideo based video display
