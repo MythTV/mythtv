@@ -448,7 +448,7 @@ void setThreadTid( LoggingItem_t *item )
     {
 #if defined(linux)
         tid = (int64_t)syscall(SYS_gettid);
-#elif defined(__FreeBSD__)
+#elif defined(__FreeBSD__) && 0
         long lwpid;
         int dummy = thr_self( &lwpid );
         tid = (int64_t)lwpid;
