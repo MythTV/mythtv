@@ -355,11 +355,11 @@ class Videos(object):
             urlType = u'fullscreen'
 
         # Translate the search results into MNV RSS item format
-        audioFilter = etree.XPath('./@class="audio"')
-        linkFilter = etree.XPath(u".//div[@class='episode-info']//a")
-        titleFilter = etree.XPath(u".//div[@class='episode-info']//a")
-        descFilter = etree.XPath(u".//div[@class='episode-info']//p[@class='episode-synopsis']")
-        thumbnailFilter = etree.XPath(u".//div[@class='episode-image']//img")
+        audioFilter = etree.XPath('contains(./@class,"audio") or contains(./../../@class,"audio")')
+        linkFilter = etree.XPath(u".//div[@class='episode-info ']//a")
+        titleFilter = etree.XPath(u".//div[@class='episode-info ']//a")
+        descFilter = etree.XPath(u".//div[@class='episode-info ']//p[@class='episode-synopsis']")
+        thumbnailFilter = etree.XPath(u".//span[@class='episode-image cta-play']//img")
         itemDict = {}
         for result in searchResults:
             tmpLink = linkFilter(result)
