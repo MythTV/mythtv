@@ -639,6 +639,7 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
         dec_name["ffmpeg"]   = QObject::tr("Standard");
         dec_name["macaccel"] = QObject::tr("Mac hardware acceleration");
         dec_name["vdpau"]    = QObject::tr("NVidia VDPAU acceleration");
+        dec_name["vaapi"]    = QObject::tr("VAAPI acceleration");
         dec_name["dxva2"]    = QObject::tr("Windows hardware acceleration");
     }
 
@@ -680,6 +681,10 @@ QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
             "accelerate video decoding and playback "
             "(requires Windows Vista or later).");
 
+    if (decoder == "vaapi")
+        msg += QObject::tr(
+            "VAAPI will attempt to use the graphics hardware to "
+            "accelerate video decoding.");
     return msg;
 }
 
@@ -737,6 +742,10 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString short_name)
         return QObject::tr("Advanced (1x, HW)");
     else if ("vdpauadvanceddoublerate" == short_name)
         return QObject::tr("Advanced (2x, HW)");
+    else if ("vaapionefield" == short_name)
+        return QObject::tr("One Field (1x, HW)");
+    else if ("vaapibobdeint" == short_name)
+        return QObject::tr("Bob (2x, HW)");
 
     return "";
 }
@@ -1167,6 +1176,13 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
             "This is the only video renderer for NVidia VDPAU decoding.");
     }
 
+    if (renderer == "openglvaapi")
+    {
+        msg = QObject::tr(
+             "This video renderer uses VAAPI for video decoding and "
+             "OpenGL for scaling and color conversion.");
+    }
+
     return msg;
 }
 
@@ -1300,6 +1316,10 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
         msg = kBasicMsg + " " +  kDoubleRateMsg + " " + kUsingGPU;
     else if (deint == "vdpauadvanceddoublerate")
         msg = kAdvMsg + " " +  kDoubleRateMsg + " " + kUsingGPU;
+    else if (deint == "vaapionefield")
+        msg = kOneFieldMsg + " " + kUsingGPU;
+    else if (deint == "vaapibobdeint")
+        msg = kBobMsg + " " + kUsingGPU;
     else
         msg = QObject::tr("'%1' has not been documented yet.").arg(deint);
 

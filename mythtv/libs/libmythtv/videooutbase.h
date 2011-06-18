@@ -144,7 +144,7 @@ class VideoOutput
 
     /// \brief Return true if HW Acceleration is running
     virtual bool hasHWAcceleration(void) const { return false; }
-    virtual void* GetDecoderContext(void) { return NULL; }
+    virtual void* GetDecoderContext(unsigned char* buf, uint8_t*& id) { return NULL; }
 
     /// \brief Sets the number of frames played
     virtual void SetFramesPlayed(long long fp) { framesPlayed = fp; };

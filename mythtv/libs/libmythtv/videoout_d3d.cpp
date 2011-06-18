@@ -700,8 +700,10 @@ MythCodecID VideoOutputD3D::GetBestSupportedCodec(
 }
 
 
-void* VideoOutputD3D::GetDecoderContext(void)
+void* VideoOutputD3D::GetDecoderContext(unsigned char* buf, uint8_t*& id)
 {
+    (void)buf;
+    (void)id;
 #ifdef USING_DXVA2
     if (m_decoder)
         return (void*)&m_decoder->m_context;

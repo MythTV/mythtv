@@ -370,6 +370,11 @@ using_frontend {
     using_opengl_video:HEADERS += openglvideo.h   videoout_opengl.h
     using_opengl_video:SOURCES += openglvideo.cpp videoout_opengl.cpp
 
+    using_vaapi: DEFINES += USING_VAAPI
+    using_vaapi: DEFINES += vaapicontext.h   videoout_openglvaapi.h
+    using_vaapi: SOURCES += vaapicontext.cpp videoout_openglvaapi.cpp
+    using_vaapi: LIBS    += -lva -lva-x11 -lva-glx
+
     # Misc. frontend
     HEADERS += DetectLetterbox.h
     SOURCES += DetectLetterbox.cpp

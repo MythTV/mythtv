@@ -237,7 +237,7 @@ class MTV_PUBLIC MythPlayer
     void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
     /// Returns the stream decoder currently in use.
     DecoderBase *GetDecoder(void) { return decoder; }
-    void *GetDecoderContext(void);
+    void *GetDecoderContext(unsigned char* buf, uint8_t*& id);
 
     // Preview Image stuff
     void SaveScreenshot(void);

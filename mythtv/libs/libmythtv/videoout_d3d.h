@@ -55,7 +55,7 @@ class VideoOutputD3D : public VideoOutput
     virtual MythPainter *GetOSDPainter(void) { return (MythPainter*)m_osd_painter; }
     bool hasHWAcceleration(void) const { return !codec_is_std(video_codec_id); }
     virtual bool ApproveDeintFilter(const QString& filtername) const;
-    virtual void* GetDecoderContext(void);
+    virtual void* GetDecoderContext(unsigned char* buf, uint8_t*& id);
 
     virtual bool CanVisualise(AudioPlayer *audio, MythRender *render)
         { return VideoOutput::CanVisualise(audio, (MythRender*)m_render); }

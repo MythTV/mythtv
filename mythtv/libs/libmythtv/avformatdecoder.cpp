@@ -53,6 +53,11 @@ extern "C" {
 #include "videoout_d3d.h"
 #endif
 
+#ifdef USING_VAAPI
+#include "videoout_openglvaapi.h"
+#include "vaapicontext.h"
+#endif // USING_VAAPI
+
 extern "C" {
 #include "libavutil/avutil.h"
 #include "libavcodec/ac3_parser.h"
@@ -125,6 +130,7 @@ void release_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic);
 void render_slice_vdpau(struct AVCodecContext *s, const AVFrame *src,
                         int offset[4], int y, int type, int height);
 int  get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic);
+int  get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic);
 
 static AVCodec *find_vdpau_decoder(AVCodec *c, enum CodecID id)
 {
@@ -236,6 +242,11 @@ void AvFormatDecoder::GetDecoders(render_opts &opts)
 #ifdef USING_DXVA2
     opts.decoders->append("dxva2");
     (*opts.equiv_decoders)["dxva2"].append("dummy");
+#endif
+
+#ifdef USING_VAAPI
+    opts.decoders->append("vaapi");
+    (*opts.equiv_decoders)["vaapi"].append("dummy");
 #endif
 
     PrivateDecoder::GetDecoders(opts);
@@ -1270,6 +1281,13 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         enc->get_format      = get_format_dxva2;
         enc->release_buffer  = release_avf_buffer;
     }
+    else if (CODEC_IS_VAAPI(codec, enc))
+    {
+        enc->get_buffer      = get_avf_buffer_vaapi;
+        enc->get_format      = get_format_vaapi;
+        enc->release_buffer  = release_avf_buffer;
+        enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
+    }
     else if (codec && codec->capabilities & CODEC_CAP_DR1)
     {
         enc->flags          |= CODEC_FLAG_EMU_EDGE;
@@ -1805,6 +1823,25 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         handled = true;
                     }
 #endif // USING_VDPAU
+#ifdef USING_VAAPI
+                    MythCodecID vaapi_mcid;
+                    PixelFormat pix_fmt = PIX_FMT_YUV420P;
+                    vaapi_mcid = VideoOutputOpenGLVAAPI::GetBestSupportedCodec(
+                            width, height, mpeg_version(enc->codec_id),
+                            no_hardware_decoders, pix_fmt);
+
+                    if (vaapi_mcid >= video_codec_id)
+                    {
+                        enc->codec_id = (CodecID)myth2av_codecid(vaapi_mcid);
+                        video_codec_id = vaapi_mcid;
+                        handled = true;
+                        if (!no_hardware_decoders &&
+                            codec_is_vaapi(video_codec_id))
+                        {
+                            enc->pix_fmt = pix_fmt;
+                        }
+                    }
+#endif // USING_VAAPI
 #ifdef USING_DXVA2
                     MythCodecID dxva2_mcid;
                     PixelFormat pix_fmt = PIX_FMT_YUV420P;
@@ -2386,6 +2423,32 @@ int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic)
         pic->data[0] = (uint8_t*)frame->buf;
         pic->data[3] = (uint8_t*)frame->buf;
     }
+#endif
+
+    return 0;
+}
+
+int get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic)
+{
+    AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
+    VideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame();
+
+    pic->data[0]     = frame->buf;
+    pic->data[1]     = NULL;
+    pic->data[2]     = NULL;
+    pic->data[3]     = NULL;
+    pic->linesize[0] = 0;
+    pic->linesize[1] = 0;
+    pic->linesize[2] = 0;
+    pic->linesize[3] = 0;
+    pic->opaque      = frame;
+    pic->type        = FF_BUFFER_TYPE_USER;
+    pic->age         = 256 * 256 * 256 * 64;
+    frame->pix_fmt   = c->pix_fmt;
+
+#ifdef USING_VAAPI
+    if (nd->GetPlayer())
+        c->hwaccel_context = (vaapi_context*)nd->GetPlayer()->GetDecoderContext(frame->buf, pic->data[3]);
 #endif
 
     return 0;

@@ -1157,10 +1157,10 @@ void MythPlayer::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
         videoOutput->DrawSlice(frame, x, y, w, h);
 }
 
-void* MythPlayer::GetDecoderContext(void)
+void* MythPlayer::GetDecoderContext(unsigned char* buf, uint8_t*& id)
 {
     if (videoOutput)
-        return videoOutput->GetDecoderContext();
+        return videoOutput->GetDecoderContext(buf, id);
     return NULL;
 }
 

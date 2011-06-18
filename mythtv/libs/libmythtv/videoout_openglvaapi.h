@@ -1,0 +1,48 @@
+#ifndef VIDEOOUTPUTOPENGLVAAPI_H
+#define VIDEOOUTPUTOPENGLVAAPI_H
+
+#include "videoout_opengl.h"
+
+class VAAPIContext;
+
+class VideoOutputOpenGLVAAPI : public VideoOutputOpenGL
+{
+  public:
+    static void GetRenderOptions(render_opts &opts);
+
+    VideoOutputOpenGLVAAPI();
+   ~VideoOutputOpenGLVAAPI();
+
+    bool  Init(int width, int height, float aspect, WId winid,
+               const QRect &win_rect, MythCodecID codec_id);
+    bool  CreateVAAPIContext(QSize size);
+    void  DeleteVAAPIContext(void);
+    bool  CreateBuffers(void);
+    virtual void* GetDecoderContext(unsigned char* buf, uint8_t*& id);
+    uint8_t* GetSurfaceIDPointer(void* buf);
+    void  SetProfile(void);
+    void  TearDown(void);
+    bool  InputChanged(const QSize &input_size, float aspect,
+                       MythCodecID  av_codec_id, void *codec_private,
+                       bool &aspect_only);
+    void  ProcessFrame(VideoFrame *frame, OSD *osd,
+                       FilterChain *filterList,
+                       const PIPMap &pipPlayers,
+                       FrameScanType scan);
+    bool  ApproveDeintFilter(const QString& filtername) const;
+    bool  SetDeinterlacingEnabled(bool enable);
+    bool  SetupDeinterlace(bool i, const QString& ovrf="");
+    void  InitPictureAttributes(void) { }
+
+    static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
+                                           const QSize &video_dim);
+    static MythCodecID GetBestSupportedCodec(uint width, uint height,
+                                             uint stream_type,
+                                             bool no_acceleration,
+                                             PixelFormat &pix_fmt);
+
+  private:
+    VAAPIContext *m_ctx;
+};
+#endif // VIDEOOUTPUTOPENGLVAAPI_H
+
