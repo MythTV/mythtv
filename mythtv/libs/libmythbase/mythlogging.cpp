@@ -523,7 +523,8 @@ void LoggerThread::run(void)
                     snprintf( item->message, LOGLINE_MAX,
                               "Thread 0x%llX (%lld) registered as \'%s\'",
                               (long long unsigned int)item->threadId,
-                              tid, logThreadHash[item->threadId] );
+                              (long long int)tid, 
+                              logThreadHash[item->threadId] );
                 }
             }
         }
@@ -551,7 +552,8 @@ void LoggerThread::run(void)
                         snprintf( item->message, LOGLINE_MAX,
                                   "Thread 0x%llX (%lld) deregistered as \'%s\'",
                                   (long long unsigned int)item->threadId,
-                                  tid, logThreadHash[item->threadId] );
+                                  (long long int)tid, 
+                                  logThreadHash[item->threadId] );
                     }
                 }
                 item->threadName = logThreadHash[item->threadId];
