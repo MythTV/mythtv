@@ -1830,8 +1830,6 @@ void Scheduler::run(void)
                 schedRunTime = (firstRun) ? 0 : schedRunTime;
                 schedRunTime =
                     max((int)(((e + 999) / 1000) * 1.5f), schedRunTime);
-                VERBOSE(VB_IMPORTANT, QString("schedRunTime: %1 seconds (e %2)")
-                        .arg(schedRunTime).arg(e));
             }
 
             if (firstRun)
