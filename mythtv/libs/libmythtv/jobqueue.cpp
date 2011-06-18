@@ -2123,7 +2123,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
     if (runningJobs[jobID].command == "mythcommflag")
     {
         path = GetInstallPrefix() + "/bin/mythcommflag";
-        command = QString("%1 -j %2 -V %3")
+        command = QString("%1 -j %2 -V %3 --noprogress")
                           .arg(path).arg(jobID).arg(print_verbose_messages);
     }
     else

@@ -1181,7 +1181,7 @@ void MythCommFlagCommandLineParser::LoadArguments(void)
     add("--skipdb", "skipdb", "", "Intended for external 3rd party use.");
     add("--queue", "queue", "Insert flagging job into the JobQueue, rather than "
                             "running flagging in the foreground.", "");
-    add("--nopercentage", "nopercent", "Don't print percentage done.", "");
+    add("--noprogress", "noprogress", "Don't print progress on stdout.", "");
     add("--rebuild", "rebuild", "Do not flag commercials, just rebuild the seektable.", "");
     add("--force", "force", "Force operation, even if program appears to be in use.", "");
     add("--dontwritetodb", "dontwritedb", "", "Intended for external 3rd party use.");
