@@ -32,7 +32,8 @@ class VideoOutputOpenGLVAAPI : public VideoOutputOpenGL
     bool  ApproveDeintFilter(const QString& filtername) const;
     bool  SetDeinterlacingEnabled(bool enable);
     bool  SetupDeinterlace(bool i, const QString& ovrf="");
-    void  InitPictureAttributes(void) { }
+    virtual void InitPictureAttributes(void);
+    virtual int  SetPictureAttribute(PictureAttribute attribute, int newValue);
 
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);

@@ -31,8 +31,8 @@ class VideoOutputOpenGL : public VideoOutput
     void DrawUnusedRects(bool) { }
     void Zoom(ZoomDirection direction);
     void MoveResize(void);
-    int  SetPictureAttribute(PictureAttribute attribute, int newValue);
-    void InitPictureAttributes(void);
+    virtual int  SetPictureAttribute(PictureAttribute attribute, int newValue);
+    virtual void InitPictureAttributes(void);
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
     void EmbedInWidget(const QRect &rect);

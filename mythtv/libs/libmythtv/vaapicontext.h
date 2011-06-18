@@ -5,6 +5,7 @@ extern "C" {
 #include "libavcodec/vaapi.h"
 }
 #include "va/va_glx.h"
+#include "videocolourspace.h"
 
 struct vaapi_surface
 {
@@ -39,6 +40,8 @@ class VAAPIContext
     bool InitProfiles(void);
     bool InitBuffers(void);
     bool InitContext(void);
+    void InitPictureAttributes(VideoColourSpace &colourspace);
+    int  SetPictureAttribute(PictureAttribute attribute, int newValue);
 
     vaapi_context  m_ctx;
     MythCodecID    m_codec;
@@ -51,6 +54,8 @@ class VAAPIContext
     VASurfaceID   *m_surfaces;
     vaapi_surface *m_surfaceData;
     QHash<uint, void*> m_glxSurfaces;
+    VADisplayAttribute* m_pictureAttributes;
+    int            m_pictureAttributeCount;
 };
 
 #endif // VAAPICONTEXT_H

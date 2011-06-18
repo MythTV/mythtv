@@ -214,13 +214,16 @@ VAAPIContext::VAAPIContext(MythCodecID codec)
     m_vaProfile(VAProfileMPEG2Main)/* ?? */,
     m_vaEntrypoint(VAEntrypointEncSlice),
     m_pix_fmt(PIX_FMT_YUV420P), m_numSurfaces(NUM_VAAPI_BUFFERS),
-    m_surfaces(NULL), m_surfaceData(NULL)
+    m_surfaces(NULL), m_surfaceData(NULL), m_pictureAttributes(NULL),
+    m_pictureAttributeCount(0)
 {
     memset(&m_ctx, 0, sizeof(vaapi_context));
 }
 
 VAAPIContext::~VAAPIContext()
 {
+    delete [] m_pictureAttributes;
+
     ClearGLXSurfaces();
 
     if (m_display)
@@ -273,6 +276,123 @@ bool VAAPIContext::CreateDisplay(QSize size)
             .arg(size.width()).arg(size.height())
             .arg(m_size.width()).arg(m_size.height()));
     return ok;
+}
+
+void VAAPIContext::InitPictureAttributes(VideoColourSpace &colourspace)
+{
+    if (!m_display)
+        return;
+    if (!m_display->m_va_disp)
+        return;
+
+    delete [] m_pictureAttributes;
+    m_pictureAttributeCount = 0;
+    int supported_controls = kPictureAttributeSupported_None;
+    QList<VADisplayAttribute> supported;
+    int num = vaMaxNumDisplayAttributes(m_display->m_va_disp);
+    VADisplayAttribute* attribs = new VADisplayAttribute[num];
+
+    int actual = 0;
+    INIT_ST
+    va_status = vaQueryDisplayAttributes(m_display->m_va_disp, attribs, &actual);
+    CHECK_ST
+
+    for (int i = 0; i < actual; i++)
+    {
+        int type = attribs[i].type;
+        if ((attribs[i].flags & VA_DISPLAY_ATTRIB_SETTABLE) &&
+            (type == VADisplayAttribBrightness ||
+             type == VADisplayAttribContrast ||
+             type == VADisplayAttribHue ||
+             type == VADisplayAttribSaturation))
+        {
+            supported.push_back(attribs[i]);
+            if (type == VADisplayAttribBrightness)
+                supported_controls += kPictureAttributeSupported_Brightness;
+            if (type == VADisplayAttribHue)
+                supported_controls += kPictureAttributeSupported_Hue;
+            if (type == VADisplayAttribContrast)
+                supported_controls += kPictureAttributeSupported_Contrast;
+            if (type == VADisplayAttribSaturation)
+                supported_controls += kPictureAttributeSupported_Colour;
+        }
+    }
+
+    colourspace.SetSupportedAttributes((PictureAttributeSupported)supported_controls);
+    delete [] attribs;
+
+    if (!supported.size())
+        return;
+
+    m_pictureAttributeCount = supported.size();
+    m_pictureAttributes = new VADisplayAttribute[m_pictureAttributeCount];
+    for (int i = 0; i < m_pictureAttributeCount; i++)
+        m_pictureAttributes[i] = supported.at(i);
+
+    if (supported_controls & kPictureAttributeSupported_Brightness)
+        SetPictureAttribute(kPictureAttribute_Brightness,
+            colourspace.GetPictureAttribute(kPictureAttribute_Brightness));
+    if (supported_controls & kPictureAttributeSupported_Hue)
+        SetPictureAttribute(kPictureAttribute_Hue,
+            colourspace.GetPictureAttribute(kPictureAttribute_Hue));
+    if (supported_controls & kPictureAttributeSupported_Contrast)
+        SetPictureAttribute(kPictureAttribute_Contrast,
+            colourspace.GetPictureAttribute(kPictureAttribute_Contrast));
+    if (supported_controls & kPictureAttributeSupported_Colour)
+        SetPictureAttribute(kPictureAttribute_Colour,
+            colourspace.GetPictureAttribute(kPictureAttribute_Colour));
+}
+
+int VAAPIContext::SetPictureAttribute(PictureAttribute attribute, int newValue)
+{
+    if (!m_display)
+        return newValue;
+    if (!m_display->m_va_disp)
+        return newValue;
+
+    VADisplayAttribType attrib = VADisplayAttribBrightness;
+    switch (attribute)
+    {
+        case kPictureAttribute_Brightness:
+            attrib = VADisplayAttribBrightness;
+            break;
+        case kPictureAttribute_Contrast:
+            attrib = VADisplayAttribContrast;
+            break;
+        case kPictureAttribute_Hue:
+            attrib = VADisplayAttribHue;
+            break;
+        case kPictureAttribute_Colour:
+            attrib = VADisplayAttribSaturation;
+            break;
+        default:
+            return -1;
+    }
+
+    bool found = false;
+    for (int i = 0; i < m_pictureAttributeCount; i++)
+    {
+        if (m_pictureAttributes[i].type == attrib)
+        {
+            int min = m_pictureAttributes[i].min_value;
+            int max = m_pictureAttributes[i].max_value;
+            int val = min + (int)(((float)newValue / 100.0) * (max - min));
+            m_pictureAttributes[i].value = val;
+            found = true;
+            break;
+        }
+    }
+
+    if (found)
+    {
+        INIT_ST
+        va_status = vaSetDisplayAttributes(m_display->m_va_disp,
+                                           m_pictureAttributes,
+                                           m_pictureAttributeCount);
+        CHECK_ST
+        return newValue;
+    }
+    return -1;
 }
 
 bool VAAPIContext::CreateBuffers(void)

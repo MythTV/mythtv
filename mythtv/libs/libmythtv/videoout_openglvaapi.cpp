@@ -139,6 +139,7 @@ bool VideoOutputOpenGLVAAPI::CreateVAAPIContext(QSize size)
                                         m_ctx->GetVideoSurface(i),
                                         FMT_VAAPI);
         }
+        InitPictureAttributes();
         return ok;
     }
 
@@ -206,6 +207,26 @@ bool VideoOutputOpenGLVAAPI::SetupDeinterlace(bool i, const QString& ovrf)
     //                     db_vdisp_profile->GetFilteredDeint(ovrf);
     m_deinterlacing = i;
     return m_deinterlacing;
+}
+
+void VideoOutputOpenGLVAAPI::InitPictureAttributes(void)
+{
+    if (codec_is_vaapi(video_codec_id))
+    {
+        if (m_ctx)
+            m_ctx->InitPictureAttributes(videoColourSpace);
+        return;
+    }
+    VideoOutputOpenGL::InitPictureAttributes();
+}
+
+int VideoOutputOpenGLVAAPI::SetPictureAttribute(PictureAttribute attribute,
+                                                int newValue)
+{
+    int val = newValue;
+    if (codec_is_vaapi(video_codec_id) && m_ctx)
+        val = m_ctx->SetPictureAttribute(attribute, newValue);
+    return VideoOutput::SetPictureAttribute(attribute, val);
 }
 
 void VideoOutputOpenGLVAAPI::ProcessFrame(VideoFrame *frame, OSD *osd,

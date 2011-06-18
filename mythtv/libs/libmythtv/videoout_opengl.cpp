@@ -608,7 +608,7 @@ int VideoOutputOpenGL::SetPictureAttribute(PictureAttribute attribute,
     if (!gl_context)
         return -1;
 
-    return videoColourSpace.SetPictureAttribute(attribute, newValue);
+    return VideoOutput::SetPictureAttribute(attribute, newValue);
 }
 
 bool VideoOutputOpenGL::SetupDeinterlace(
