@@ -4481,7 +4481,6 @@ if enabled frontend; then
     echo "Windows (DirectX)         yes"
   fi
   echo "libfftw3 support          ${libfftw3-no}"
-  echo "libxml2 support           ${libxml2-no} [$libxml2_path]"
   echo
   echo "# Video Output Support"
   echo "x11 support               ${x11-no}"
@@ -4507,6 +4506,9 @@ fi
 
 echo "# Misc Features"
 echo "multi threaded libavcodec ${threads-no}"
+if enabled frontend; then
+  echo "libxml2 support           ${libxml2-no} [$libxml2_path]"
+fi
 echo "Frontend                  ${frontend-no}"
 echo "Backend                   ${backend-no}"
 echo "OpenGL ES 2.0             ${opengles-no}"
