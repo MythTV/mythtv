@@ -1204,7 +1204,7 @@ void StatusBox::doMachineStatus()
     QString hostnames;
 
     QVector<FileSystemInfo> fsInfos = RemoteGetFreeSpace();
-    for (uint i=0; i<fsInfos.size(); ++i)
+    for (int i = 0; i < fsInfos.size(); ++i)
     {
         // For a single-directory installation just display the totals
         if ((fsInfos.size() == 2) && (i == 0) &&
