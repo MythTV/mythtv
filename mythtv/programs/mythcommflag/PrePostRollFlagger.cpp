@@ -339,7 +339,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
             if (percentage % 10 == 0 && prevpercent != percentage)
             {
                 prevpercent = percentage;
-                VERBOSE(VB_GENERAL|VB_EXTRA, QString("%1% Completed @ %2 fps.")
+                VERBOSE(VB_GENERAL|VB_EXTRA, QString("%1%% Completed @ %2 fps.")
                     .arg(percentage) .arg(flagFPS));
             }
         }
