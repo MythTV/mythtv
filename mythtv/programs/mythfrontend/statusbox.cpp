@@ -1203,7 +1203,7 @@ void StatusBox::doMachineStatus()
     // get free disk space
     QString hostnames;
 
-    vector<FileSystemInfo> fsInfos = RemoteGetFreeSpace();
+    QVector<FileSystemInfo> fsInfos = RemoteGetFreeSpace();
     for (uint i=0; i<fsInfos.size(); ++i)
     {
         // For a single-directory installation just display the totals

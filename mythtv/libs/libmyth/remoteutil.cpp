@@ -39,10 +39,10 @@ vector<ProgramInfo *> *RemoteGetRecordedList(int sort)
 /** \fn RemoteGetFreeSpace(void)
  *  \brief Returns total and used space in kilobytes for each backend.
  */
-vector<FileSystemInfo> RemoteGetFreeSpace(void)
+QVector<FileSystemInfo> RemoteGetFreeSpace(void)
 {
     QList<FileSystemInfo> fsInfos = FileSystemInfo::RemoteGetInfo();
-    return fsInfos.toVector().toStdVector();
+    return fsInfos.toVector();
 }
 
 bool RemoteGetLoad(float load[3])

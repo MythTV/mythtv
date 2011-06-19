@@ -528,7 +528,7 @@ void PlaybackBoxHelper::run(void)
 
 void PlaybackBoxHelper::UpdateFreeSpace(void)
 {
-    vector<FileSystemInfo> fsInfos = RemoteGetFreeSpace();
+    QVector<FileSystemInfo> fsInfos = RemoteGetFreeSpace();
 
     QMutexLocker locker(&m_lock);
     for (uint i = 0; i < fsInfos.size(); i++)
