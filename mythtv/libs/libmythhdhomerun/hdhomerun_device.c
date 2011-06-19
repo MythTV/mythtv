@@ -212,17 +212,8 @@ static struct hdhomerun_device_t *hdhomerun_device_create_from_str_device_id(con
 	return NULL;
 }
 
-static struct hdhomerun_device_t *hdhomerun_device_create_from_str_ip(const char *device_str, struct hdhomerun_debug_t *dbg)
+static struct hdhomerun_device_t *hdhomerun_device_create_from_str_ip_result(unsigned long a[4], unsigned int port, unsigned int tuner, struct hdhomerun_debug_t *dbg)
 {
-	unsigned long a[4];
-	unsigned int port = 0;
-        unsigned int tuner = 0;
-	if (sscanf(device_str, "%lu.%lu.%lu.%lu:%u", &a[0], &a[1], &a[2], &a[3], &port) != 5) {
-		if (sscanf(device_str, "%lu.%lu.%lu.%lu-%u", &a[0], &a[1], &a[2], &a[3], &tuner) != 5) {
-			return NULL;
-		}
-	}
-
 	unsigned long device_ip = (a[0] << 24) | (a[1] << 16) | (a[2] << 8) | (a[3] << 0);
 	struct hdhomerun_device_t *hd = hdhomerun_device_create(HDHOMERUN_DEVICE_ID_WILDCARD, (uint32_t)device_ip, tuner, dbg);
 	if (!hd) {
@@ -230,10 +221,29 @@ static struct hdhomerun_device_t *hdhomerun_device_create_from_str_ip(const char
 	}
 
 	if (hd->multicast_ip != 0) {
-		hd->multicast_port = port;
+		hd->multicast_port = (uint16_t)port;
 	}
 
 	return hd;
+}
+
+static struct hdhomerun_device_t *hdhomerun_device_create_from_str_ip(const char *device_str, struct hdhomerun_debug_t *dbg)
+{
+	unsigned long a[4];
+	unsigned int port = 0;
+	unsigned int tuner = 0;
+
+	if (sscanf(device_str, "%lu.%lu.%lu.%lu:%u", &a[0], &a[1], &a[2], &a[3], &port) == 5) {
+		return hdhomerun_device_create_from_str_ip_result(a, port, tuner, dbg);
+	}
+	if (sscanf(device_str, "%lu.%lu.%lu.%lu-%u", &a[0], &a[1], &a[2], &a[3], &tuner) == 5) {
+		return hdhomerun_device_create_from_str_ip_result(a, port, tuner, dbg);
+	}
+	if (sscanf(device_str, "%lu.%lu.%lu.%lu", &a[0], &a[1], &a[2], &a[3]) == 4) {
+		return hdhomerun_device_create_from_str_ip_result(a, port, tuner, dbg);
+	}
+
+	return NULL;
 }
 
 static struct hdhomerun_device_t *hdhomerun_device_create_from_str_dns(const char *device_str, struct hdhomerun_debug_t *dbg)
