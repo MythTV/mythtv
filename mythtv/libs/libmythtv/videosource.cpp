@@ -1337,8 +1337,6 @@ HDHomeRunTunerIndex::HDHomeRunTunerIndex()
 {
     setLabel(QObject::tr("Tuner"));
     setEnabled(false);
-    addSelection("0");
-    addSelection("1");
     connect(this, SIGNAL(valueChanged( const QString&)),
             this, SLOT(  UpdateDevices(const QString&)));
     _oldValue = "";
@@ -1346,7 +1344,7 @@ HDHomeRunTunerIndex::HDHomeRunTunerIndex()
 
 void HDHomeRunTunerIndex::setEnabled(bool e)
 {
-    TransComboBoxSetting::setEnabled(e);
+    TransLineEditSetting::setEnabled(e);
     if (e) {
         if (!_oldValue.isEmpty())
             setValue(_oldValue);
