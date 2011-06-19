@@ -1337,8 +1337,6 @@ HDHomeRunTunerIndex::HDHomeRunTunerIndex()
 {
     setLabel(QObject::tr("Tuner"));
     setEnabled(false);
-    addSelection("0");
-    addSelection("1");
     connect(this, SIGNAL(valueChanged( const QString&)),
             this, SLOT(  UpdateDevices(const QString&)));
     _oldValue = "";
@@ -1346,7 +1344,7 @@ HDHomeRunTunerIndex::HDHomeRunTunerIndex()
 
 void HDHomeRunTunerIndex::setEnabled(bool e)
 {
-    TransComboBoxSetting::setEnabled(e);
+    TransLineEditSetting::setEnabled(e);
     if (e) {
         if (!_oldValue.isEmpty())
             setValue(_oldValue);
@@ -1696,8 +1694,9 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
     {
         QString dev = *it;
         QStringList devinfo = dev.split(" ");
-        QString devid = devinfo.first();
-        QString devip = devinfo.last();
+        QString devid = devinfo.at(0);
+        QString devip = devinfo.at(1);
+        QString devtuner = devinfo.at(2);
 
         HDHomeRunDevice tmpdevice;
         tmpdevice.deviceid   = devid;
@@ -1705,13 +1704,7 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
         tmpdevice.cardip     = devip;
         tmpdevice.inuse      = false;
         tmpdevice.discovered = true;
-
-        tmpdevice.cardtuner = "0";
-        tmpdevice.mythdeviceid =
-            tmpdevice.deviceid + "-" + tmpdevice.cardtuner;
-        devicelist[tmpdevice.mythdeviceid] = tmpdevice;
-
-        tmpdevice.cardtuner = "1";
+        tmpdevice.cardtuner = devtuner;
         tmpdevice.mythdeviceid =
             tmpdevice.deviceid + "-" + tmpdevice.cardtuner;
         devicelist[tmpdevice.mythdeviceid] = tmpdevice;
