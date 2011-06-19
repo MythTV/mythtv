@@ -234,7 +234,7 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
             return devs;
         }
 
-        if (result >= max_count)
+        if (result == 50)
         {
             VERBOSE(VB_IMPORTANT, "CardUtil::ProbeVideoDevices: "
                     "Warning: may be > 50 HDHomerun devices");
@@ -250,11 +250,9 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
                                  .arg((result_list[i].ip_addr>> 8) & 0xFF)
                                  .arg((result_list[i].ip_addr>> 0) & 0xFF);
 
-            for (int tuner = 0; tuner < result_list[i].tuner_count; tuner++)
-            {
-                QString hdhrdev = id.toUpper() + " " + ip + " " + QString("%1").arg(tuner);
-                devs.push_back(hdhrdev);
-            }
+            QString hdhrdev = id.toUpper() + " " + ip;
+
+            devs.push_back(hdhrdev);
         }
     }
 #endif // USING_HDHOMERUN

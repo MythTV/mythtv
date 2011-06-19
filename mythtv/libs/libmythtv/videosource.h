@@ -823,7 +823,7 @@ class HDHomeRunIP : public TransLineEditSetting
     QString _oldValue;
 };
 
-class HDHomeRunTunerIndex : public TransLineEditSetting
+class HDHomeRunTunerIndex : public TransComboBoxSetting
 {
     Q_OBJECT
 
