@@ -216,14 +216,15 @@ static struct hdhomerun_device_t *hdhomerun_device_create_from_str_ip(const char
 {
 	unsigned long a[4];
 	unsigned int port = 0;
+        unsigned int tuner = 0;
 	if (sscanf(device_str, "%lu.%lu.%lu.%lu:%u", &a[0], &a[1], &a[2], &a[3], &port) != 5) {
-		if (sscanf(device_str, "%lu.%lu.%lu.%lu", &a[0], &a[1], &a[2], &a[3]) != 4) {
+		if (sscanf(device_str, "%lu.%lu.%lu.%lu-%u", &a[0], &a[1], &a[2], &a[3], &tuner) != 5) {
 			return NULL;
 		}
 	}
 
 	unsigned long device_ip = (a[0] << 24) | (a[1] << 16) | (a[2] << 8) | (a[3] << 0);
-	struct hdhomerun_device_t *hd = hdhomerun_device_create(HDHOMERUN_DEVICE_ID_WILDCARD, (uint32_t)device_ip, 0, dbg);
+	struct hdhomerun_device_t *hd = hdhomerun_device_create(HDHOMERUN_DEVICE_ID_WILDCARD, (uint32_t)device_ip, tuner, dbg);
 	if (!hd) {
 		return NULL;
 	}
