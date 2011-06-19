@@ -33,6 +33,13 @@
 extern "C" {
 #endif
 
+struct hdhomerun_local_ip_info_t {
+	uint32_t ip_addr;
+	uint32_t subnet_mask;
+};
+
+extern LIBTYPE int hdhomerun_local_ip_info(struct hdhomerun_local_ip_info_t ip_info_list[], int max_count);
+
 #define HDHOMERUN_SOCK_INVALID -1
 
 typedef int hdhomerun_sock_t;
@@ -55,7 +62,6 @@ extern LIBTYPE bool_t hdhomerun_sock_sendto(hdhomerun_sock_t sock, uint32_t remo
 
 extern LIBTYPE bool_t hdhomerun_sock_recv(hdhomerun_sock_t sock, void *data, size_t *length, uint64_t timeout);
 extern LIBTYPE bool_t hdhomerun_sock_recvfrom(hdhomerun_sock_t sock, uint32_t *remote_addr, uint16_t *remote_port, void *data, size_t *length, uint64_t timeout);
-
 
 #ifdef __cplusplus
 }

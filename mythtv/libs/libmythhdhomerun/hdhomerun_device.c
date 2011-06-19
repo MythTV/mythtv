@@ -942,7 +942,7 @@ int hdhomerun_device_tuner_lockkey_request(struct hdhomerun_device_t *hd, char *
 		return -1;
 	}
 
-	uint32_t new_lockkey = (uint32_t)getcurrenttime();
+	uint32_t new_lockkey = random_get32();
 
 	char name[32];
 	sprintf(name, "/tuner%u/lockkey", hd->tuner);
@@ -1126,7 +1126,7 @@ int hdhomerun_device_channelscan_advance(struct hdhomerun_device_t *hd, struct h
 	}
 
 	int ret = channelscan_advance(hd->scan, result);
-	if (ret <= 0) {
+	if (ret <= 0) { /* Free scan if normal finish or fatal error */
 		channelscan_destroy(hd->scan);
 		hd->scan = NULL;
 	}
@@ -1142,7 +1142,7 @@ int hdhomerun_device_channelscan_detect(struct hdhomerun_device_t *hd, struct hd
 	}
 
 	int ret = channelscan_detect(hd->scan, result);
-	if (ret <= 0) {
+	if (ret < 0) { /* Free scan if fatal error */
 		channelscan_destroy(hd->scan);
 		hd->scan = NULL;
 	}

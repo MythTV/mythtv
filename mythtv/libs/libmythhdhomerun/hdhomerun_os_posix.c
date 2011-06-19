@@ -32,6 +32,22 @@
 
 #include "hdhomerun_os.h"
 
+uint32_t random_get32(void)
+{
+	FILE *fp = fopen("/dev/urandom", "rb");
+	if (!fp) {
+		return (uint32_t)rand();
+	}
+
+	uint32_t Result;
+	if (fread(&Result, 4, 1, fp) != 1) {
+		Result = (uint32_t)rand();
+	}
+
+	fclose(fp);
+	return Result;
+}
+
 uint64_t getcurrenttime(void)
 {
 	static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;

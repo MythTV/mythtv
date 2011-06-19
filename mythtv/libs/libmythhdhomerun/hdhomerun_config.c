@@ -308,8 +308,11 @@ static int cmd_scan(const char *tuner_str, const char *filename)
 		);
 
 		ret = hdhomerun_device_channelscan_detect(hd, &result);
-		if (ret <= 0) {
+		if (ret < 0) {
 			break;
+		}
+		if (ret == 0) {
+			continue;
 		}
 
 		cmd_scan_printf(fp, "LOCK: %s (ss=%u snq=%u seq=%u)\n",
@@ -477,6 +480,8 @@ static int cmd_upgrade(const char *filename)
 		fclose(fp);
 		return -1;
 	}
+
+	fclose(fp);
 	msleep_minimum(2000);
 
 	printf("upgrading firmware...\n");
@@ -493,7 +498,6 @@ static int cmd_upgrade(const char *filename)
 		count++;
 		if (count > 30) {
 			fprintf(stderr, "error finding device after firmware upgrade\n");
-			fclose(fp);
 			return -1;
 		}
 
@@ -501,7 +505,6 @@ static int cmd_upgrade(const char *filename)
 	}
 
 	printf("upgrade complete - now running firmware %s\n", version_str);
-	fclose(fp);
 	return 0;
 }
 

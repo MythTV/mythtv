@@ -46,6 +46,62 @@
  */
 
 #include "hdhomerun.h"
+#include <windows.h>
+#include <iphlpapi.h>
+
+int hdhomerun_local_ip_info(struct hdhomerun_local_ip_info_t ip_info_list[], int max_count)
+{
+	PIP_ADAPTER_INFO pAdapterInfo = (IP_ADAPTER_INFO *)malloc(sizeof(IP_ADAPTER_INFO));
+	ULONG ulOutBufLen = sizeof(IP_ADAPTER_INFO);
+
+	DWORD Ret = GetAdaptersInfo(pAdapterInfo, &ulOutBufLen);
+	if (Ret != NO_ERROR) {
+		free(pAdapterInfo);
+		if (Ret != ERROR_BUFFER_OVERFLOW) {
+			return -1;
+		}
+		pAdapterInfo = (IP_ADAPTER_INFO *)malloc(ulOutBufLen); 
+		Ret = GetAdaptersInfo(pAdapterInfo, &ulOutBufLen);
+		if (Ret != NO_ERROR) {
+			free(pAdapterInfo);
+			return -1;
+		}
+	}
+
+	int count = 0;
+	PIP_ADAPTER_INFO pAdapter = pAdapterInfo;
+	while (pAdapter) {
+		IP_ADDR_STRING *pIPAddr = &pAdapter->IpAddressList;
+		while (pIPAddr) {
+			uint32_t ip_addr = ntohl(inet_addr(pIPAddr->IpAddress.String));
+			uint32_t subnet_mask = ntohl(inet_addr(pIPAddr->IpMask.String));
+
+			if (ip_addr == 0) {
+				pIPAddr = pIPAddr->Next;
+				continue;
+			}
+
+			struct hdhomerun_local_ip_info_t *ip_info = &ip_info_list[count++];
+			ip_info->ip_addr = ip_addr;
+			ip_info->subnet_mask = subnet_mask;
+
+			if (count >= max_count) {
+				break;
+			}
+
+			pIPAddr = pIPAddr->Next;
+		}
+
+		if (count >= max_count) {
+			break;
+		}
+
+		pAdapter = pAdapter->Next;
+	}
+
+	free(pAdapterInfo);
+	return count;
+}
 
 hdhomerun_sock_t hdhomerun_sock_create_udp(void)
 {

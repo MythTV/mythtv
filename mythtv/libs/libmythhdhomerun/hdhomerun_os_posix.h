@@ -61,6 +61,7 @@ typedef void (*sig_t)(int);
 extern "C" {
 #endif
 
+extern LIBTYPE uint32_t random_get32(void);
 extern LIBTYPE uint64_t getcurrenttime(void);
 extern LIBTYPE void msleep_approx(uint64_t ms);
 extern LIBTYPE void msleep_minimum(uint64_t ms);

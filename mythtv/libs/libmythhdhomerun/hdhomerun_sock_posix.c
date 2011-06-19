@@ -48,6 +48,72 @@
 
 #include "hdhomerun.h"
 
+#include <net/if.h>
+#include <sys/ioctl.h>
+#ifndef SIOCGIFCONF
+#include <sys/sockio.h>
+#endif
+#ifndef _SIZEOF_ADDR_IFREQ
+#define _SIZEOF_ADDR_IFREQ(x) sizeof(x)
+#endif
+
+int hdhomerun_local_ip_info(struct hdhomerun_local_ip_info_t ip_info_list[], int max_count)
+{
+	int sock = socket(AF_INET, SOCK_DGRAM, 0);
+	if (sock == HDHOMERUN_SOCK_INVALID) {
+		return -1;
+	}
+
+	struct ifconf ifc;
+	uint8_t buf[8192];
+	ifc.ifc_len = sizeof(buf);
+	ifc.ifc_buf = (char *)buf;
+
+	memset(buf, 0, sizeof(buf));
+
+	if (ioctl(sock, SIOCGIFCONF, &ifc) != 0) {
+		close(sock);
+		return -1;
+	}
+
+	uint8_t *ptr = (uint8_t *)ifc.ifc_req;
+	uint8_t	*end = (uint8_t *)&ifc.ifc_buf[ifc.ifc_len];
+
+	int count = 0;
+	while (ptr <= end) {
+		struct ifreq *ifr = (struct ifreq *)ptr;
+		ptr += _SIZEOF_ADDR_IFREQ(*ifr);
+
+		if (ioctl(sock, SIOCGIFADDR, ifr) != 0) {
+			continue;
+		}
+
+		struct sockaddr_in *ip_addr_in = (struct sockaddr_in *)&(ifr->ifr_addr);
+		uint32_t ip_addr = ntohl(ip_addr_in->sin_addr.s_addr);
+		if (ip_addr == 0) {
+			continue;
+		}
+
+		if (ioctl(sock, SIOCGIFNETMASK, ifr) != 0) {
+			continue;
+		}
+
+		struct sockaddr_in *subnet_mask_in = (struct sockaddr_in *)&(ifr->ifr_addr);
+		uint32_t subnet_mask = ntohl(subnet_mask_in->sin_addr.s_addr);
+
+		struct hdhomerun_local_ip_info_t *ip_info = &ip_info_list[count++];
+		ip_info->ip_addr = ip_addr;
+		ip_info->subnet_mask = subnet_mask;
+
+		if (count >= max_count) {
+			break;
+		}
+	}
+
+	close(sock);
+	return count;
+}
+
 hdhomerun_sock_t hdhomerun_sock_create_udp(void)
 {
 	/* Create socket. */
