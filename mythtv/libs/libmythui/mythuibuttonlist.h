@@ -32,9 +32,10 @@ class MUI_PUBLIC MythUIButtonListItem
 
     MythUIButtonListItem(MythUIButtonList *lbtype, const QString& text,
                          const QString& image = "", bool checkable = false,
-                         CheckState state = CantCheck, bool showArrow = false);
+                         CheckState state = CantCheck, bool showArrow = false,
+                         int listPosition = -1);
     MythUIButtonListItem(MythUIButtonList *lbtype, const QString& text,
-                         QVariant data);
+                         QVariant data, int listPosition = -1);
     virtual ~MythUIButtonListItem();
 
     MythUIButtonList *parent() const;
@@ -197,7 +198,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     void Const();
     virtual void Init();
 
-    void InsertItem(MythUIButtonListItem *item);
+    void InsertItem(MythUIButtonListItem *item, int listPosition = -1);
 
     int minButtonWidth(const MythRect & area);
     int minButtonHeight(const MythRect & area);

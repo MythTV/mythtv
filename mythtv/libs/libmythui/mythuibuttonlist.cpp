@@ -1344,10 +1344,21 @@ void MythUIButtonList::ItemVisible(MythUIButtonListItem* item)
         emit itemVisible(item);
 }
 
-void MythUIButtonList::InsertItem(MythUIButtonListItem *item)
+void MythUIButtonList::InsertItem(MythUIButtonListItem *item, int listPosition)
 {
     bool wasEmpty = m_itemList.isEmpty();
-    m_itemList.append(item);
+    if (listPosition >= 0 && listPosition <= m_itemList.count())
+    {
+        m_itemList.insert(listPosition, item);
+        
+        if (listPosition <= m_selPosition)
+            m_selPosition++;
+        
+        if (listPosition <= m_topPosition)
+            m_topPosition++;
+    }
+    else
+        m_itemList.append(item);
 
     m_itemCount++;
 
@@ -2643,7 +2654,7 @@ bool MythUIButtonList::DoFind(bool doMove, bool searchForward)
 MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
                                       const QString& text, const QString& image,
                                       bool checkable, CheckState state,
-                                      bool showArrow)
+                                      bool showArrow, int listPosition)
 {
     if (!lbtype)
         VERBOSE(VB_IMPORTANT, "Cannot add a button to a non-existent list!");
@@ -2661,12 +2672,12 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
         m_checkable = true;
 
     if (m_parent)
-        m_parent->InsertItem(this);
+        m_parent->InsertItem(this, listPosition);
 }
 
 MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
                                        const QString& text,
-                                       QVariant data)
+                                       QVariant data, int listPosition)
 {
     if (!lbtype)
         VERBOSE(VB_IMPORTANT, "Cannot add a button to a non-existent list!");
@@ -2682,7 +2693,7 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
     m_showArrow = false;
 
     if (m_parent)
-        m_parent->InsertItem(this);
+        m_parent->InsertItem(this, listPosition);
 }
 
 MythUIButtonListItem::~MythUIButtonListItem()
