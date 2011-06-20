@@ -506,8 +506,13 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
         gl_context->SetBackground(0, 0, 0, 255);
     gl_context->ClearFramebuffer();
 
-    if (gl_context->IsShared() && GetMythMainWindow() && window.IsEmbedding())
-        GetMythMainWindow()->draw();
+    MythMainWindow *mwnd = GetMythMainWindow();
+    if (gl_context->IsShared() && mwnd && window.IsEmbedding())
+    {
+        if (mwnd->GetPaintWindow())
+            mwnd->GetPaintWindow()->setMask(QRegion());
+        mwnd->draw();
+    }
 
     if (gl_videochain)
     {
