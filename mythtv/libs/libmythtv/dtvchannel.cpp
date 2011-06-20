@@ -253,6 +253,11 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     }
 
     // If the frequency is zeroed out, don't use it directly.
+    if (frequency == 0)
+    {
+        frequency = (freqid.toUInt() + finetune) * 1000;
+        mplexid = 0;
+    }
     bool isFrequency = (frequency > 10000000);
     bool hasTuneToChan =
         !(*it)->tuneToChannel.isEmpty() && (*it)->tuneToChannel != "Undefined";
