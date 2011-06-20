@@ -529,8 +529,14 @@ MythSystemUnix::~MythSystemUnix(void)
 
 void MythSystemUnix::Term(bool force)
 {
-    if( (GetStatus() != GENERIC_EXIT_RUNNING) || (m_pid <= 0) )
+    int status = GetStatus();
+    if( (status != GENERIC_EXIT_RUNNING && status != GENERIC_EXIT_TIMEOUT) || 
+        (m_pid <= 0) )
+    {
+        VERBOSE(VB_GENERAL | VB_EXTRA, QString("Terminate skipped. Status: %1")
+            .arg(status));
         return;
+    }
 
     Signal(SIGTERM);
     if( force )
@@ -543,8 +549,15 @@ void MythSystemUnix::Term(bool force)
 
 void MythSystemUnix::Signal( int sig )
 {
-    if( (GetStatus() != GENERIC_EXIT_RUNNING) || (m_pid <= 0) )
+    int status = GetStatus();
+    if( (status != GENERIC_EXIT_RUNNING && status != GENERIC_EXIT_TIMEOUT) || 
+        (m_pid <= 0) )
+    {
+        VERBOSE(VB_GENERAL | VB_EXTRA, QString("Signal skipped. Status: %1")
+            .arg(status));
         return;
+    }
+
     VERBOSE(VB_GENERAL, QString("Child PID %1 killed with %2")
                     .arg(m_pid).arg(strsignal(sig)));
     kill((GetSetting("SetPGID") ? -m_pid : m_pid), sig);
