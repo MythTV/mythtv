@@ -18,7 +18,6 @@ from datetime import date
 from time import sleep
 from thread import allocate_lock
 from random import randint
-from uuid import uuid4
 import socket
 import weakref
 import re
@@ -45,6 +44,7 @@ class BECache( object ):
     """
 
     class _ConnHolder( object ):
+        blockshutdown = 0
         command = None
         event = None
 
@@ -103,25 +103,30 @@ class BECache( object ):
             raise MythDBError(MythError.DB_SETTING, 'BackendServerPort',
                                             self.port)
 
-        self._uuid = uuid4()
         self._ident = '%s:%d' % (self.host, self.port)
         if self._ident in self._shared:
             # existing connection found
-            # register and reconnect if necessary
             self._conn = self._shared[self._ident]
             if self.sendcommands:
                 if self._conn.command is None:
                     self._conn.command = self._newcmdconn()
+                elif self.blockshutdown:
+                    # upref block of shutdown
+                    # issue command to backend if needed
+                    self._conn.blockshutdown += 1
+                    if self._conn.blockshutdown == 1:
+                        self._conn.command.blockShutdown()
             if self.receiveevents:
                 if self._conn.event is None:
                     self._conn.event = self._neweventconn()
-            # trigger reconnect for blocking shutdown?
         else:
             # no existing connection, create new
             self._conn = self._ConnHolder()
 
             if self.sendcommands:
                 self._conn.command = self._newcmdconn()
+                if self.blockshutdown:
+                    self._conn.blockshutdown = 1
             if self.receiveevents:
                 self._conn.event = self._neweventconn()
 
@@ -130,6 +135,15 @@ class BECache( object ):
         self._events = self._listhandlers()
         for func in self._events:
             self.registerevent(func)
+
+    def __del__(self):
+        # downref block of shutdown
+        # issue command to backend if needed
+        print 'destructing BECache'
+        if self.blockshutdown:
+            self._conn.blockshutdown -= 1
+            if not self._conn.blockshutdown:
+                self._conn.command.unblockShutdown()
 
     def _newcmdconn(self):
         return BEConnection(self.host, self.port, self.db.gethostname(),
