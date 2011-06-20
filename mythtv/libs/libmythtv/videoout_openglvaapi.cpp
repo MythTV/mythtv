@@ -272,14 +272,14 @@ MythCodecID VideoOutputOpenGLVAAPI::GetBestSupportedCodec(
     vdp.SetInput(size);
     QString dec = vdp.GetDecoder();
 
-   PixelFormat fmt = PIX_FMT_YUV420P;
+    PixelFormat fmt = PIX_FMT_YUV420P;
     MythCodecID test_cid = (MythCodecID)(kCodec_MPEG1_VAAPI + (stream_type - 1));
-    if (codec_is_vaapi(test_cid))
+    if (codec_is_vaapi(test_cid) && dec == "vaapi" && !getenv("NO_VAAPI"))
         use_cpu |= !VAAPIContext::IsFormatAccelerated(size, test_cid, fmt);
     else
         use_cpu = true;
 
-    if ((dec != "vaapi") || getenv("NO_VAAPI") || use_cpu)
+    if (use_cpu)
         return (MythCodecID)(kCodec_MPEG1 + (stream_type - 1));
 
     pix_fmt = fmt;
