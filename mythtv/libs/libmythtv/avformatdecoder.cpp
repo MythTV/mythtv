@@ -2155,12 +2155,12 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             tvformat == "pal-m" || tvformat == "atsc")
         {
             fps = 29.97;
-            m_parent->SetVideoParams(-1, -1, 29.97, 1);
+            m_parent->SetVideoParams(-1, -1, 29.97, 1, current_aspect);
         }
         else
         {
             fps = 25.0;
-            m_parent->SetVideoParams(-1, -1, 25.0, 1);
+            m_parent->SetVideoParams(-1, -1, 25.0, 1, current_aspect);
         }
     }
 
