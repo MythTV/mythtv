@@ -3223,19 +3223,19 @@ bool SearchButtonListDialog::Create(void)
 bool SearchButtonListDialog::keyPressEvent(QKeyEvent *event)
 {
     QStringList actions;
-    bool handled = GetMythMainWindow()->TranslateKeyPress("Music", event, actions, false);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions, false);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
 
-        if (action == "0")
-        {
-            m_startsWith = !m_startsWith;
-            searchChanged();
-        }
-        else
+//         if (action == "0")
+//         {
+//             m_startsWith = !m_startsWith;
+//             searchChanged();
+//         }
+//         else
             handled = false;
     }
 
