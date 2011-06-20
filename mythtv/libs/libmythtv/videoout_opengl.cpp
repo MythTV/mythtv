@@ -224,16 +224,20 @@ bool VideoOutputOpenGL::InputChanged(const QSize &input_size,
         return false;
     }
 
-    if (input_size == window.GetActualVideoDim())
+    bool cid_changed = (video_codec_id != av_codec_id);
+    bool res_changed = input_size  != window.GetActualVideoDim();
+    bool asp_changed = aspect      != window.GetVideoAspect();
+
+    if (!res_changed && !cid_changed)
     {
-        aspect_only = video_codec_id == av_codec_id;
-        if (window.GetVideoAspect() != aspect)
+        if (asp_changed)
         {
+            aspect_only = true;
             VideoAspectRatioChanged(aspect);
             MoveResize();
-            if (wasembedding)
-                EmbedInWidget(oldrect);
         }
+        if (wasembedding)
+            EmbedInWidget(oldrect);
         return true;
     }
 
@@ -479,7 +483,6 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD *osd,
 void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
                                      OSD *osd)
 {
-    (void)osd;
     if (!gl_context)
         return;
 
