@@ -395,8 +395,7 @@ void V4LChannel::SetFreqTable(const int index)
 int V4LChannel::SetFreqTable(const QString &tablename)
 {
     QString name = tablename;
-    if (name.toLower() == "default" || name.isEmpty())
-        name = defaultFreqTable;
+    bool use_default = (name.toLower() == "default" || name.isEmpty());
 
     int i = 0;
     char *listname = (char *)chanlists[i].name;
@@ -404,7 +403,15 @@ int V4LChannel::SetFreqTable(const QString &tablename)
     curList = NULL;
     while (listname != NULL)
     {
-        if (name == listname)
+        if (use_default)
+        {
+            if (i == defaultFreqTable)
+            {
+                SetFreqTable(i);
+                return i;
+            }
+        }
+        else if (name == listname)
         {
             SetFreqTable(i);
             return i;
