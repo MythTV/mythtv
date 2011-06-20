@@ -243,10 +243,10 @@ bool PreviewGenerator::Run(void)
 
         command += " --quiet";
 
-        // Timeout in 5s
+        // Timeout in 30s
         uint ret = myth_system(command, kMSDontBlockInputDevs |
                                         kMSDontDisableDrawing |
-                                        kMSProcessEvents, 5000);
+                                        kMSProcessEvents, 30);
         if (ret != GENERIC_EXIT_OK)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + 
