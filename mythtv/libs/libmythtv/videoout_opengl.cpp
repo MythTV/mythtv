@@ -400,11 +400,12 @@ bool VideoOutputOpenGL::CreateBuffers(void)
 
 bool VideoOutputOpenGL::CreatePauseFrame(void)
 {
-    av_pause_frame.height = vbuffers.GetScratchFrame()->height;
-    av_pause_frame.width  = vbuffers.GetScratchFrame()->width;
-    av_pause_frame.bpp    = vbuffers.GetScratchFrame()->bpp;
-    av_pause_frame.size   = vbuffers.GetScratchFrame()->size;
-    av_pause_frame.buf    = new unsigned char[av_pause_frame.size + 128];
+    init(&av_pause_frame, FMT_YV12,
+         new unsigned char[vbuffers.GetScratchFrame()->size + 128],
+         vbuffers.GetScratchFrame()->width,
+         vbuffers.GetScratchFrame()->height,
+         vbuffers.GetScratchFrame()->size);
+
     av_pause_frame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
 
     if (!av_pause_frame.buf)

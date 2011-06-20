@@ -303,11 +303,12 @@ bool VideoOutputD3D::CreatePauseFrame(void)
     if (codec_is_dxva2(video_codec_id))
         return true;
 
-    m_pauseFrame.height = vbuffers.GetScratchFrame()->height;
-    m_pauseFrame.width  = vbuffers.GetScratchFrame()->width;
-    m_pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
-    m_pauseFrame.size   = vbuffers.GetScratchFrame()->size;
-    m_pauseFrame.buf    = new unsigned char[m_pauseFrame.size + 128];
+    init(&av_pause_frame, FMT_YV12,
+         new unsigned char[vbuffers.GetScratchFrame()->size + 128],
+         vbuffers.GetScratchFrame()->width,
+         vbuffers.GetScratchFrame()->height,
+         vbuffers.GetScratchFrame()->size);
+
     m_pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
     return true;
 }

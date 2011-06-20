@@ -4376,7 +4376,8 @@ bool AvFormatDecoder::GenerateDummyVideoFrame(void)
         init(dummy_frame,
              frame->codec, new unsigned char[frame->size],
              frame->width, frame->height, frame->size,
-             frame->pitches, frame->offsets);
+             frame->pitches, frame->offsets,
+             frame->aspect, frame->frame_rate);
 
         clear(dummy_frame);
         // Note: instead of clearing the frame to black, one
