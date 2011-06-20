@@ -518,14 +518,17 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
                                     m_deinterlacing, framesPlayed);
     }
 
-    QMap<MythPlayer*,OpenGLVideo*>::iterator it = gl_pipchains.begin();
-    for (; it != gl_pipchains.end(); ++it)
+    if (gl_pipchains.size())
     {
-        if (gl_pip_ready[it.key()])
+        QMap<MythPlayer*,OpenGLVideo*>::iterator it = gl_pipchains.begin();
+        for (; it != gl_pipchains.end(); ++it)
         {
-            bool active = gl_pipchain_active == *it;
-            (*it)->PrepareFrame(buffer->top_field_first, t,
-                                m_deinterlacing, framesPlayed, active);
+            if (gl_pip_ready[it.key()])
+            {
+                bool active = gl_pipchain_active == *it;
+                (*it)->PrepareFrame(buffer->top_field_first, t,
+                                    m_deinterlacing, framesPlayed, active);
+            }
         }
     }
 
