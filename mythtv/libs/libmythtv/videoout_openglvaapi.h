@@ -25,6 +25,7 @@ class VideoOutputOpenGLVAAPI : public VideoOutputOpenGL
     bool  InputChanged(const QSize &input_size, float aspect,
                        MythCodecID  av_codec_id, void *codec_private,
                        bool &aspect_only);
+    virtual void UpdatePauseFrame(void);
     void  ProcessFrame(VideoFrame *frame, OSD *osd,
                        FilterChain *filterList,
                        const PIPMap &pipPlayers,
@@ -44,6 +45,7 @@ class VideoOutputOpenGLVAAPI : public VideoOutputOpenGL
 
   private:
     VAAPIContext *m_ctx;
+    void         *m_pauseBuffer;
 };
 #endif // VIDEOOUTPUTOPENGLVAAPI_H
 
