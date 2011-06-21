@@ -602,10 +602,10 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
         ImageCacheMode cacheMode2 = (!forceStat) ? kCacheNormal :
             (ImageCacheMode) ((int)kCacheNormal | (int)kCacheForceStat);
 
-
         if ((allowLoadInBackground) &&
-            (!GetMythUI()->LoadCacheImage(filename, imagelabel,
-                                          GetPainter(), cacheMode)) &&
+            ((!filename.startsWith("/")) ||
+             (!GetMythUI()->LoadCacheImage(filename, imagelabel,
+                                           GetPainter(), cacheMode))) &&
             (!getenv("DISABLETHREADEDMYTHUIIMAGE")))
         {
             VERBOSE(VB_GUI|VB_FILE|VB_EXTRA, LOC + QString(
