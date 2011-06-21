@@ -52,6 +52,7 @@ QMutex                   logThreadTidMutex;
 QHash<uint64_t, int64_t> logThreadTidHash;
 
 LoggerThread            logThread;
+bool                    logThreadFinished = false;
 bool                    debugRegistration = false;
 
 #define TIMESTAMP_MAX 30
@@ -314,7 +315,7 @@ bool DatabaseLogger::logmsg(LoggingItem_t *item)
 bool DatabaseLogger::logqmsg(LoggingItem_t *item)
 {
     char        timestamp[TIMESTAMP_MAX];
-    char       *threadName = getThreadName(item);;
+    char       *threadName = getThreadName(item);
 
     if( !isDatabaseReady() )
         return false;
@@ -326,7 +327,7 @@ bool DatabaseLogger::logqmsg(LoggingItem_t *item)
         m_host = strdup((char *)gCoreContext->GetHostName()
                         .toLocal8Bit().constData());
 
-    MSqlQuery   query(MSqlQuery::InitCon());
+    MSqlQuery   query(MSqlQuery::LogCon());
     query.prepare( m_query );
     query.bindValue(":HOST",        m_host);
     query.bindValue(":APPLICATION", m_application);
@@ -384,6 +385,8 @@ void DBLoggerThread::run(void)
 
         qLock.relock();
     }
+    MSqlQuery::CloseLogCon();
+    threadDeregister();
 }
 
 bool DatabaseLogger::isDatabaseReady()
@@ -392,13 +395,43 @@ bool DatabaseLogger::isDatabaseReady()
     MythDB *db;
 
     if ( !m_loggingTableExists )
-        m_loggingTableExists = DBUtil::TableExists(m_handle.string);
+        m_loggingTableExists = tableExists(m_handle.string);
 
     if ( m_loggingTableExists && (db = GetMythDB()) && db->HaveValidDatabase() )
         ready = true;
 
     return ready;
 }
+
+/**
+ *  \brief Checks whether table exists
+ *
+ *  \param  table  The name of the table to check (without schema name)
+ *  \return true if table exists in schema or false if not
+ */
+bool DatabaseLogger::tableExists(const QString &table)
+{
+    bool result = false;
+    MSqlQuery query(MSqlQuery::LogCon());
+    if (query.isConnected())
+    {
+        QString sql = "SELECT INFORMATION_SCHEMA.TABLES.TABLE_NAME "
+                      "  FROM INFORMATION_SCHEMA.TABLES "
+                      " WHERE INFORMATION_SCHEMA.TABLES.TABLE_SCHEMA = "
+                      "       DATABASE() "
+                      "   AND INFORMATION_SCHEMA.TABLES.TABLE_NAME = "
+                      "       :TABLENAME ;";
+        if (query.prepare(sql))
+        {
+            query.bindValue(":TABLENAME", table);
+            if (query.exec() && query.next())
+                result = true;
+        }
+    }
+    return result;
+}
+
+
 
 char *getThreadName( LoggingItem_t *item )
 {
@@ -488,6 +521,7 @@ void LoggerThread::run(void)
     threadRegister("Logger");
     LoggingItem_t *item;
 
+    logThreadFinished = false;
     aborted = false;
 
     QMutexLocker qLock(&logQueueMutex);
@@ -580,6 +614,8 @@ void LoggerThread::run(void)
 
         qLock.relock();
     }
+
+    logThreadFinished = true;
 }
 
 void deleteItem( LoggingItem_t *item )
@@ -756,6 +792,9 @@ void threadRegister(QString name)
     if (!item)
         return;
 
+    if (logThreadFinished)
+        return;
+
     memset( item, 0, sizeof(LoggingItem_t) );
     LogTimeStamp( &epoch, &usec );
 
@@ -784,6 +823,9 @@ void threadDeregister(void)
 
     item = new LoggingItem_t;
     if (!item)
+        return;
+
+    if (logThreadFinished)
         return;
 
     memset( item, 0, sizeof(LoggingItem_t) );

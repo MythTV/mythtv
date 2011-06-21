@@ -165,6 +165,7 @@ class DatabaseLogger : public LoggerBase {
         bool logqmsg(LoggingItem_t *item);
     private:
         bool isDatabaseReady();
+        bool tableExists(const QString &table);
 
         DBLoggerThread *m_thread;
         char *m_host;

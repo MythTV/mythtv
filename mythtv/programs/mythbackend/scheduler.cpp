@@ -120,6 +120,8 @@ Scheduler::~Scheduler()
         wait();
         locker.relock();
     }
+    else
+        MSqlQuery::CloseDDCon();
 
     while (!reclist.empty())
     {
@@ -1901,6 +1903,8 @@ void Scheduler::run(void)
                                idleTimeoutSecs, idleWaitForRecordingTime);
         }
     }
+
+    MSqlQuery::CloseSchedCon();
     threadDeregister();
 }
 

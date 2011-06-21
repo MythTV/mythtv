@@ -61,7 +61,9 @@ bool TestDatabase(QString dbHostName,
 MSqlDatabase::MSqlDatabase(const QString &name)
 {
     m_name = name;
+    m_name.detach();
     m_db = QSqlDatabase::addDatabase("QMYSQL", m_name);
+    VERBOSE(VB_IMPORTANT, "Database connection created: " + m_name);
 
     if (!m_db.isValid())
     {
@@ -81,6 +83,7 @@ MSqlDatabase::~MSqlDatabase()
                                 // removeDatabase() so that connections
                                 // and queries are cleaned up correctly
         QSqlDatabase::removeDatabase(m_name);
+        VERBOSE(VB_IMPORTANT, "Database connection deleted: " + m_name);
     }
 }
 
@@ -276,6 +279,7 @@ MDBManager::MDBManager()
 
     m_schedCon = NULL;
     m_DDCon = NULL;
+    m_LogCon = NULL;
 }
 
 MDBManager::~MDBManager()
@@ -284,8 +288,9 @@ MDBManager::~MDBManager()
         delete m_pool.takeFirst();
     delete m_sem;
 
-    delete m_schedCon;
-    delete m_DDCon;
+    closeStaticCon(&m_schedCon);
+    closeStaticCon(&m_DDCon);
+    closeStaticCon(&m_LogCon);
 }
 
 MSqlDatabase *MDBManager::popConnection()
@@ -392,30 +397,59 @@ void MDBManager::PurgeIdleConnections(void)
     }
 }
 
-MSqlDatabase *MDBManager::getSchedCon()
+MSqlDatabase *MDBManager::getStaticCon(MSqlDatabase **dbcon, QString name)
 {
-    if (!m_schedCon)
+    if (!dbcon)
+        return NULL;
+
+    if (!*dbcon)
     {
-        m_schedCon = new MSqlDatabase("SchedCon");
-        VERBOSE(VB_IMPORTANT, "New DB scheduler connection");
+        *dbcon = new MSqlDatabase(name);
+        VERBOSE(VB_IMPORTANT, "New static DB connection" + name);
     }
 
-    m_schedCon->OpenDatabase();
+    (*dbcon)->OpenDatabase();
 
-    return m_schedCon;
+    return *dbcon;
+}
+
+MSqlDatabase *MDBManager::getSchedCon()
+{
+    return getStaticCon(&m_schedCon, "SchedCon");
 }
 
 MSqlDatabase *MDBManager::getDDCon()
 {
-    if (!m_DDCon)
+    return getStaticCon(&m_DDCon, "DataDirectCon");
+}
+
+MSqlDatabase *MDBManager::getLogCon()
+{
+    return getStaticCon(&m_LogCon, "LogCon");
+}
+
+void MDBManager::closeStaticCon(MSqlDatabase **dbcon)
+{
+    if (dbcon && *dbcon)
     {
-        m_DDCon = new MSqlDatabase("DataDirectCon");
-        VERBOSE(VB_IMPORTANT, "New DB DataDirect connection");
+        delete *dbcon;
+        *dbcon = NULL;
     }
+}
 
-    m_DDCon->OpenDatabase();
+void MDBManager::closeSchedCon()
+{
+    closeStaticCon(&m_schedCon);
+}
 
-    return m_DDCon;
+void MDBManager::closeDDCon()
+{
+    closeStaticCon(&m_DDCon);
+}
+
+void MDBManager::closeLogCon()
+{
+    closeStaticCon(&m_LogCon);
 }
 
 // Dangerous. Should only be used when the database connection has errored?
@@ -546,6 +580,41 @@ MSqlQueryInfo MSqlQuery::DDCon()
 
     return qi;
 }
+
+MSqlQueryInfo MSqlQuery::LogCon()
+{
+    MSqlDatabase *db = GetMythDB()->GetDBManager()->getLogCon();
+    MSqlQueryInfo qi;
+
+    InitMSqlQueryInfo(qi);
+    qi.returnConnection = false;
+
+    if (db)
+    {
+        qi.db = db;
+        qi.qsqldb = db->db();
+
+        db->KickDatabase();
+    }
+
+    return qi;
+}
+
+void MSqlQuery::CloseSchedCon()
+{
+    GetMythDB()->GetDBManager()->closeSchedCon();
+}
+
+void MSqlQuery::CloseDDCon()
+{
+    GetMythDB()->GetDBManager()->closeDDCon();
+}
+
+void MSqlQuery::CloseLogCon()
+{
+    GetMythDB()->GetDBManager()->closeLogCon();
+}
+
 
 bool MSqlQuery::exec()
 {
