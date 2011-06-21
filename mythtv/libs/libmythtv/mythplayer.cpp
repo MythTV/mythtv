@@ -812,28 +812,16 @@ void MythPlayer::SetScanType(FrameScanType scan)
 }
 
 void MythPlayer::SetVideoParams(int width, int height, double fps,
-                                int keyframedistance, float aspect,
-                                FrameScanType scan, bool video_codec_changed)
+                                FrameScanType scan)
 {
-    if (width == 0 || height == 0 || isnan(aspect) || isnan(fps))
+    if (width < 1 || height < 1 || isnan(fps))
         return;
 
-    if ((video_disp_dim == QSize(width, height)) &&
-        (video_aspect == aspect) && (video_frame_rate == fps   ) &&
-        ((keyframedistance <= 0) ||
-         ((uint64_t)keyframedistance == keyframedist)) &&
-        !video_codec_changed)
-    {
+    if ((video_disp_dim == QSize(width, height)) && (video_frame_rate == fps))
         return;
-    }
 
-    if ((width > 0) && (height > 0))
-    {
-        video_dim      = QSize((width + 15) & ~0xf, (height + 15) & ~0xf);
-        video_disp_dim = QSize(width, height);
-    }
-    video_aspect = (aspect > 0.0f) ? aspect : video_aspect;
-    keyframedist = (keyframedistance > 0) ? keyframedistance : keyframedist;
+    video_dim      = QSize((width + 15) & ~0xf, (height + 15) & ~0xf);
+    video_disp_dim = QSize(width, height);
 
     if (fps > 0.0f && fps < 121.0f)
     {
@@ -872,7 +860,8 @@ void MythPlayer::OpenDummy(void)
 
     if (!videoOutput)
     {
-        SetVideoParams(720, 576, 25.00, 15, defaultDisplayAspect);
+        SetKeyframeDistance(15);
+        SetVideoParams(720, 576, 25.00);
     }
 
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
@@ -2028,8 +2017,25 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     // clear the buffering state
     SetBuffering(false);
 
+    // retrieve the next frame
     videoOutput->StartDisplayingFrame();
     VideoFrame *frame = videoOutput->GetLastShownFrame();
+
+    // Check aspect ratio
+    if (frame)
+    {
+        if (!qFuzzyCompare(frame->aspect, video_aspect) && frame->aspect > 0.0f)
+        {
+            VERBOSE(VB_PLAYBACK, LOC +
+                QString("Video Aspect ratio changed from %1 to %2")
+                .arg(video_aspect).arg(frame->aspect));
+            video_aspect = frame->aspect;
+            if (videoOutput)
+                videoOutput->VideoAspectRatioChanged(video_aspect);
+        }
+    }
+
+    // Player specific processing (dvd, bd, mheg etc)
     PreProcessNormalFrame();
 
     // handle scan type changes

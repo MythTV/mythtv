@@ -1355,9 +1355,8 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
             aspect = 4.0f / 3.0f;
         }
 
-        m_parent->SetVideoParams(width, height, fps,
-                                 keyframedist, aspect, kScan_Detect,
-                                 false);
+        m_parent->SetKeyframeDistance(keyframedist);
+        m_parent->SetVideoParams(width, height, fps, kScan_Detect);
         if (LCD *lcd = LCD::Get())
         {
             LCDVideoFormatSet video_format;
@@ -2155,12 +2154,12 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             tvformat == "pal-m" || tvformat == "atsc")
         {
             fps = 29.97;
-            m_parent->SetVideoParams(-1, -1, 29.97, 1, current_aspect);
+            m_parent->SetVideoParams(-1, -1, 29.97);
         }
         else
         {
             fps = 25.0;
-            m_parent->SetVideoParams(-1, -1, 25.0, 1, current_aspect);
+            m_parent->SetVideoParams(-1, -1, 25.0);
         }
     }
 
@@ -2701,25 +2700,21 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
             uint  width  = seq->width()  >> context->lowres;
             uint  height = seq->height() >> context->lowres;
-            float aspect = seq->aspect(context->sub_id == 1);
+            current_aspect = seq->aspect(context->sub_id == 1);
             if (aspect_override > 0.0f)
-                aspect = aspect_override;
+                current_aspect = aspect_override;
             float seqFPS = seq->fps();
 
             bool changed = (seqFPS > fps+0.01f) || (seqFPS < fps-0.01f);
             changed |= (width  != (uint)current_width );
             changed |= (height != (uint)current_height);
-            changed |= fabs(aspect - current_aspect) > eps;
 
             if (changed)
             {
-                m_parent->SetVideoParams(width, height, seqFPS,
-                                         keyframedist, aspect,
-                                         kScan_Detect);
+                m_parent->SetVideoParams(width, height, seqFPS, kScan_Detect);
 
                 current_width  = width;
                 current_height = height;
-                current_aspect = aspect;
                 fps            = seqFPS;
 
                 if (private_dec)
@@ -2811,7 +2806,7 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             continue;
         }
 
-        float aspect_ratio = get_aspect(*context);
+        current_aspect = get_aspect(*context);
         QSize dim    = get_video_dim(*context);
         uint  width  = dim.width();
         uint  height = dim.height();
@@ -2820,17 +2815,13 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
         bool changed = (seqFPS > fps+0.01f) || (seqFPS < fps-0.01f);
         changed |= (width  != (uint)current_width );
         changed |= (height != (uint)current_height);
-        changed |= fabs(aspect_ratio - current_aspect) > eps;
 
         if (changed)
         {
-            m_parent->SetVideoParams(width, height, seqFPS,
-                                     keyframedist, aspect_ratio,
-                                     kScan_Detect);
+            m_parent->SetVideoParams(width, height, seqFPS, kScan_Detect);
 
             current_width  = width;
             current_height = height;
-            current_aspect = aspect_ratio;
             fps            = seqFPS;
 
             gopset = false;
@@ -3060,6 +3051,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
             xf->interlaced_frame = mpa_pic->interlaced_frame;
             xf->top_field_first = mpa_pic->top_field_first;
             xf->frameNumber = framesPlayed;
+            xf->aspect = current_aspect;
             m_parent->DiscardVideoFrame(xf);
         }
     }
@@ -3097,6 +3089,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
     picframe->repeat_pict      = mpa_pic->repeat_pict;
     picframe->disp_timecode    = NormalizeVideoTimecode(stream, temppts);
     picframe->frameNumber      = framesPlayed;
+    picframe->aspect           = current_aspect;
 
     m_parent->ReleaseNextVideoFrame(picframe, temppts);
     if (private_dec)
