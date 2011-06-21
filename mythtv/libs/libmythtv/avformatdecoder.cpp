@@ -2682,8 +2682,13 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
     {
         bufptr = ff_find_start_code(bufptr, bufend, &start_code_state);
 
-        if (ringBuffer->IsDVD() && (start_code_state == SEQ_END_CODE))
-            ringBuffer->DVD()->NewSequence(true);
+        float aspect_override = -1.0f;
+        if (ringBuffer->IsDVD())
+        {
+            if (start_code_state == SEQ_END_CODE)
+                ringBuffer->DVD()->NewSequence(true);
+            aspect_override = ringBuffer->DVD()->GetAspectOverride();
+        }
 
         if (start_code_state >= SLICE_MIN && start_code_state <= SLICE_MAX)
             continue;
@@ -2697,6 +2702,8 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
             uint  width  = seq->width()  >> context->lowres;
             uint  height = seq->height() >> context->lowres;
             float aspect = seq->aspect(context->sub_id == 1);
+            if (aspect_override > 0.0f)
+                aspect = aspect_override;
             float seqFPS = seq->fps();
 
             bool changed = (seqFPS > fps+0.01f) || (seqFPS < fps-0.01f);

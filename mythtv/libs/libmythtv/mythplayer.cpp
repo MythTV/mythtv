@@ -3840,26 +3840,6 @@ AdjustFillMode MythPlayer::GetAdjustFill(void) const
     return kAdjustFill_Off;
 }
 
-void MythPlayer::SetForcedAspectRatio(int mpeg2_aspect_value, int letterbox_permission)
-{
-    (void)letterbox_permission;
-
-    float forced_aspect_old = forced_video_aspect;
-
-    if (mpeg2_aspect_value == 2) // 4:3
-        forced_video_aspect = 4.0f / 3.0f;
-    else if (mpeg2_aspect_value == 3) // 16:9
-        forced_video_aspect = 16.0f / 9.0f;
-    else
-        forced_video_aspect = -1;
-
-    if (videoOutput && forced_video_aspect != forced_aspect_old)
-    {
-        float aspect = (forced_video_aspect > 0) ? forced_video_aspect : video_aspect;
-        videoOutput->VideoAspectRatioChanged(aspect);
-    }
-}
-
 void MythPlayer::ToggleAspectOverride(AspectOverrideMode aspectMode)
 {
     if (videoOutput)

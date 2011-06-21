@@ -107,6 +107,7 @@ DVDRingBuffer::DVDRingBuffer(const QString &lfilename) :
     m_seeking(false), m_seektime(0),
     m_currentTime(0),
     m_parent(NULL),
+    m_forcedAspect(-1.0f),
 
     // Menu/buttons
     m_inMenu(false), m_buttonVersion(1), m_buttonStreamID(0),
@@ -843,9 +844,13 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
 
                 // update player
                 int aspect = dvdnav_get_video_aspect(m_dvdnav);
+                if (aspect == 2) // 4:3
+                    m_forcedAspect = 4.0f / 3.0f;
+                else if (aspect == 3) // 16:9
+                    m_forcedAspect = 16.0f / 9.0f;
+                else
+                    m_forcedAspect = -1;
                 int permission = dvdnav_get_video_scale_permission(m_dvdnav);
-                if (m_parent)
-                    m_parent->SetForcedAspectRatio(aspect, permission);
 
                 // debug
                 VERBOSE(VB_PLAYBACK, LOC +

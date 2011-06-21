@@ -141,7 +141,6 @@ class MTV_PUBLIC MythPlayer
                         bool video_codec_changed = false);
     void SetFileLength(int total, int frames);
     void SetDuration(int duration);
-    void SetForcedAspectRatio(int mpeg2_aspect_value, int letterbox_permission);
     void SetVideoResize(const QRect &videoRect);
     void EnableFrameRateMonitor(bool enable = false);
 
