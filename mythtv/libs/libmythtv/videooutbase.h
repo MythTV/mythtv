@@ -275,8 +275,6 @@ class VideoOutput
     void DoVideoResize(const QSize &inDim, const QSize &outDim);
     virtual void ShutdownVideoResize(void);
 
-    void SetVideoAspectRatio(float aspect);
-
     VideoOutWindow     window;
     QSize              db_display_dim;   ///< Screen dimensions in millimeters from DB
     VideoColourSpace   videoColourSpace;
