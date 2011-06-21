@@ -884,7 +884,7 @@ bool MythDB::LoadDatabaseParamsFromDisk(
         params.dbUserName    = "mythtv";
         params.dbPassword    = "mythtv";
         params.dbName        = "mythconverg";
-        params.dbType        = "QMYSQL3";
+        params.dbType        = "QMYSQL";
         params.localEnabled  = false;
         params.localHostName = "my-unique-identifier-goes-here";
         params.wolEnabled    = false;

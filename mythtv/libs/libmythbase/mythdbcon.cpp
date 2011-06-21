@@ -61,7 +61,7 @@ bool TestDatabase(QString dbHostName,
 MSqlDatabase::MSqlDatabase(const QString &name)
 {
     m_name = name;
-    m_db = QSqlDatabase::addDatabase("QMYSQL3", name);
+    m_db = QSqlDatabase::addDatabase("QMYSQL", m_name);
 
     if (!m_db.isValid())
     {
