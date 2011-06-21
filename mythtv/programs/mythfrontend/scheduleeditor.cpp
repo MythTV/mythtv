@@ -510,12 +510,13 @@ bool SchedOptEditor::Create()
     if (!UIUtilW::Assign(this, m_backButton, "back"))
         connect(m_backButton, SIGNAL(Clicked()), SLOT(Close()));
 
-    if ((m_recordingRule->m_type == kSingleRecord) ||
-        (m_recordingRule->m_type ==kOverrideRecord))
+    if (m_recordingRule->m_type == kOverrideRecord)
+        m_filtersButton->SetEnabled(false);
+    if (m_recordingRule->m_type == kSingleRecord ||
+        m_recordingRule->m_type == kOverrideRecord)
     {
         m_dupmethodList->SetEnabled(false);
         m_dupscopeList->SetEnabled(false);
-        m_filtersButton->SetEnabled(false);
     }
 
     connect(m_dupmethodList, SIGNAL(itemSelected(MythUIButtonListItem *)),
