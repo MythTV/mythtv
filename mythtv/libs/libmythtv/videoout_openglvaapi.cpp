@@ -26,7 +26,7 @@ void VideoOutputOpenGLVAAPI::GetRenderOptions(render_opts &opts)
 }
 
 VideoOutputOpenGLVAAPI::VideoOutputOpenGLVAAPI()
-  : VideoOutputOpenGL(), m_ctx(NULL)
+  : VideoOutputOpenGL(), m_ctx(NULL), m_pauseBuffer(NULL)
 {
 }
 
@@ -229,6 +229,27 @@ int VideoOutputOpenGLVAAPI::SetPictureAttribute(PictureAttribute attribute,
     return VideoOutput::SetPictureAttribute(attribute, val);
 }
 
+void VideoOutputOpenGLVAAPI::UpdatePauseFrame(void)
+{
+    if (codec_is_std(video_codec_id))
+    {
+        VideoOutputOpenGLVAAPI::UpdatePauseFrame();
+        return;
+    }
+
+    vbuffers.begin_lock(kVideoBuffer_used);
+    if (vbuffers.size(kVideoBuffer_used))
+    {
+        VideoFrame *frame = vbuffers.head(kVideoBuffer_used);
+        m_pauseBuffer = frame->buf;
+    }
+    else
+        VERBOSE(VB_PLAYBACK, LOC +
+            QString("WARNING: Could not update pause frame - no used frames."));
+
+    vbuffers.end_lock();
+}
+
 void VideoOutputOpenGLVAAPI::ProcessFrame(VideoFrame *frame, OSD *osd,
                                           FilterChain *filterList,
                                           const PIPMap &pipPlayers,
@@ -237,10 +258,10 @@ void VideoOutputOpenGLVAAPI::ProcessFrame(VideoFrame *frame, OSD *osd,
     QMutexLocker locker(&gl_context_lock);
     VideoOutputOpenGL::ProcessFrame(frame, osd, filterList, pipPlayers, scan);
 
-    if (codec_is_vaapi(video_codec_id) && m_ctx && gl_videochain && frame)
+    if (codec_is_vaapi(video_codec_id) && m_ctx && gl_videochain)
     {
         gl_context->makeCurrent();
-        m_ctx->CopySurfaceToTexture(frame->buf,
+        m_ctx->CopySurfaceToTexture(frame ? frame->buf : m_pauseBuffer,
                                     gl_videochain->GetInputTexture(),
                                     gl_videochain->GetTextureType(), scan);
         gl_videochain->SetInputUpdated();
