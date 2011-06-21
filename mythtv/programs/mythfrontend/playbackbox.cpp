@@ -2333,6 +2333,15 @@ bool PlaybackBox::Play(
         return false;
     }
 
+    for (uint i = 0; i < sizeof(m_artImage) / sizeof(MythUIImage*); i++)
+    {
+        if (!m_artImage[i])
+            continue;
+
+        m_artTimer[i]->stop();
+        m_artImage[i]->Reset();
+    }
+
     ProgramInfo tvrec(rec);
 
     m_playingSomething = true;
