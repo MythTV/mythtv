@@ -46,6 +46,7 @@
 #include <QDateTime>
 
 #include <QCoreApplication>
+#include "mythverbose.h"
 
 #include <string.h>
 
