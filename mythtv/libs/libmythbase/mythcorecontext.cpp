@@ -172,8 +172,8 @@ bool MythCoreContext::Init(void)
 
     // If any of the IPs on any interfaces look like IPv6 addresses, assume IPv6
     // is available
-    QNetworkInterface interface;
-    QList<QHostAddress> IpList = interface.allAddresses();
+    QNetworkInterface qtinterface;
+    QList<QHostAddress> IpList = qtinterface.allAddresses();
     for (int i = 0; i < IpList.size(); i++)
     {
         if (IpList.at(i).toString().contains(":"))
