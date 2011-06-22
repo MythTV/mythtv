@@ -438,6 +438,7 @@ namespace
 
        ~FanartLoader()
         {
+            m_fanartTimer.stop();
             m_fanartTimer.disconnect(this);
         }
 
