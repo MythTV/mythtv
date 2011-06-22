@@ -615,7 +615,7 @@ void ThemeChooser::saveAndReload(MythUIButtonListItem *item)
     else
     {
         gCoreContext->SaveSetting("Theme", info->GetDirectoryName());
-        GetMythMainWindow()->JumpTo("Reload Theme");
+        GetMythMainWindow()->JumpTo("Reload Theme", false);
     }
 }
 
@@ -734,6 +734,7 @@ void ThemeChooser::customEvent(QEvent *e)
                         if (file.exists())
                         {
                             remoteFileIsLocal = true;
+                            m_downloadFile = localFile;
                         }
                         else
                         {
@@ -741,8 +742,9 @@ void ThemeChooser::customEvent(QEvent *e)
                                 m_downloadFile, localFile, this);
                             OpenBusyPopup(tr("Copying %1 Theme Package")
                                           .arg(m_downloadTheme->GetName()));
+                            m_downloadFile = localFile;
+                            return;
                         }
-                        m_downloadFile = localFile;
                     }
                     else
                     {
@@ -793,7 +795,7 @@ void ThemeChooser::customEvent(QEvent *e)
             SendMythSystemEvent(event);
 
             gCoreContext->SaveSetting("Theme", m_downloadTheme->GetDirectoryName());
-            GetMythMainWindow()->JumpTo("Reload Theme");
+            GetMythMainWindow()->JumpTo("Reload Theme", false);
         }
     }
 }
