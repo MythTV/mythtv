@@ -2418,7 +2418,9 @@ int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic)
 #ifdef USING_DXVA2
     if (nd->GetPlayer())
     {
-        c->hwaccel_context = (dxva_context*)nd->GetPlayer()->GetDecoderContext();
+        static uint8_t *dummy[1] = { 0 };
+        c->hwaccel_context =
+            (dxva_context*)nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
         pic->data[0] = (uint8_t*)frame->buf;
         pic->data[3] = (uint8_t*)frame->buf;
     }
