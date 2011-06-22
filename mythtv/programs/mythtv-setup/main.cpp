@@ -311,7 +311,8 @@ int main(int argc, char *argv[])
         scanInputName = cmdline.toString("inputname");
 
     logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet, facility, dblog);
+    bool propagate = cmdline.toBool("islogpath");
+    logStart(logfile, quiet, facility, dblog, propagate);
 
     if (!display.isEmpty())
     {

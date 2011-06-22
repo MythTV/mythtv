@@ -450,7 +450,7 @@ XMLTV_generic_config::XMLTV_generic_config(const VideoSource& _parent,
 void XMLTV_generic_config::Save()
 {
     VerticalConfigurationGroup::Save();
-/*
+#if 0
     QString err_msg = QObject::tr(
         "You MUST run 'mythfilldatabase --manual the first time,\n "
         "instead of just 'mythfilldatabase'.\nYour grabber does not provide "
@@ -462,7 +462,7 @@ void XMLTV_generic_config::Save()
         MythPopupBox::showOkPopup(
             GetMythMainWindow(), QObject::tr("Warning."), err_msg);
     }
-*/
+#endif
 }
 
 void XMLTV_generic_config::RunConfig(void)

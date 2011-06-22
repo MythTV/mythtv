@@ -422,6 +422,9 @@ void HouseKeeper::RunMFD(void)
 
     QString command = QString("%1 %2").arg(mfpath).arg(mfarg);
 
+    if (logPropagate())
+        command += QString(" --logpath %1").arg(logPropPath());
+
     if (mflog.length())
     {
         bool dir_writable = false;

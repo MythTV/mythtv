@@ -134,7 +134,8 @@ int main(int argc, char **argv)
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
     logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet, facility, dblog);
+    bool propagate = cmdline.toBool("islogpath");
+    logStart(logfile, quiet, facility, dblog, propagate);
 
     if (cmdline.toBool("event")         || cmdline.toBool("systemevent") ||
         cmdline.toBool("setverbose")    || cmdline.toBool("printsched") ||

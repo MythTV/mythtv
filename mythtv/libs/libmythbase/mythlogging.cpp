@@ -5,6 +5,7 @@
 #include <QThread>
 #include <QHash>
 #include <QCoreApplication>
+#include <QFileInfo>
 
 #define _LogLevelNames_
 #include "mythlogging.h"
@@ -54,6 +55,9 @@ QHash<uint64_t, int64_t> logThreadTidHash;
 LoggerThread            logThread;
 bool                    logThreadFinished = false;
 bool                    debugRegistration = false;
+
+bool                    logPropagateFlag  = false;
+QString                 logPropagatePath;
 
 #define TIMESTAMP_MAX 30
 #define MAX_STRING_LENGTH 2048
@@ -718,14 +722,32 @@ void logSighup( int signum, siginfo_t *info, void *secret )
     }
 }
 
+bool logPropagate(void)
+{
+    return logPropagateFlag;
+}
 
-void logStart(QString logfile, int quiet, int facility, bool dblog)
+QString &logPropPath(void)
+{
+    return logPropagatePath;
+}
+
+void logStart(QString logfile, int quiet, int facility, bool dblog, 
+              bool propagate)
 {
     LoggerBase *logger;
     struct sigaction sa;
 
     if (logThread.isRunning())
         return;
+
+    logPropagateFlag = propagate;
+    if (propagate)
+    {
+        QFileInfo finfo(logfile);
+        logPropagatePath = finfo.path();
+        logPropagatePath.detach();
+    }
 
     /* log to the console */
     if( !quiet )

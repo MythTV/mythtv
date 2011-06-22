@@ -1587,12 +1587,14 @@ QString MythCommandLineParser::GetLogFilePath(void)
     QFileInfo finfo(logfile);
     if (finfo.isDir())
     {
+        m_parsed.insert("islogpath", true);
         logdir  = finfo.filePath();
         logfile = QCoreApplication::applicationName() + 
                   QString(".%1").arg(pid) + ".log";
     }
     else
     {
+        m_parsed.insert("islogpath", false);
         logdir  = finfo.path();
         logfile = finfo.fileName();
     }

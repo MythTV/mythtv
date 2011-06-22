@@ -81,7 +81,8 @@ int main(int argc, char **argv)
     bool dblog = !cmdline.toBool("nodblog");
 
     logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet, facility, dblog);
+    bool propagate = cmdline.toBool("islogpath");
+    logStart(logfile, quiet, facility, dblog, propagate);
 
 
     if (cmdline.toBool("port"))

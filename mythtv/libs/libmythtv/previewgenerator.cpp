@@ -233,15 +233,17 @@ bool PreviewGenerator::Run(void)
             else
                 command += QString(" --frame %1").arg(captureTime);
         }
-        command += " ";
-        command += QString("--chanid %1 ").arg(programInfo.GetChanID());
-        command += QString("--starttime %1 ")
+        command += QString(" --chanid %1").arg(programInfo.GetChanID());
+        command += QString(" --starttime %1")
             .arg(programInfo.GetRecordingStartTime(MythDate));
 
         if (!outFileName.isEmpty())
-            command += QString("--outfile \"%1\" ").arg(outFileName);
+            command += QString(" --outfile \"%1\"").arg(outFileName);
 
         command += " --quiet";
+
+        if (logPropagate())
+            command += QString(" --logpath %1").arg(logPropPath());
 
         // Timeout in 30s
         uint ret = myth_system(command, kMSDontBlockInputDevs |

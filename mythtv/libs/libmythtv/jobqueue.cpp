@@ -1886,7 +1886,9 @@ void JobQueue::DoTranscodeThread(int jobID)
         QByteArray parg = profilearg.toAscii();
         command = QString("%1 -j %2 -V %3 -p %4 %5")
           .arg(path).arg(jobID).arg(print_verbose_messages)
-          .arg(parg.constData()).arg(useCutlist ? "-l" : "");
+          .arg(parg.constData()).arg(useCutlist ? "--honorcutlist" : "");
+        if (logPropagate())
+            command += QString(" --logpath %1").arg(logPropPath());
     }
     else
     {
@@ -2125,6 +2127,8 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
         path = GetInstallPrefix() + "/bin/mythcommflag";
         command = QString("%1 -j %2 -V %3 --noprogress")
                           .arg(path).arg(jobID).arg(print_verbose_messages);
+        if (logPropagate())
+            command += QString(" --logpath %1").arg(logPropPath());
     }
     else
     {

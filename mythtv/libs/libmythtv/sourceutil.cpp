@@ -344,11 +344,13 @@ bool SourceUtil::IsAnySourceScanable(void)
 
 bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString cardtype)
 {
-    QString cmd = "mythfilldatabase --only-update-channels ";
+    QString cmd = "mythfilldatabase --only-update-channels";
     if (sourceid)
-        cmd += QString("--sourceid %1 ").arg(sourceid);
+        cmd += QString(" --sourceid %1").arg(sourceid);
     if (!cardtype.isEmpty())
-        cmd += QString("--cardtype %1 ").arg(cardtype);
+        cmd += QString(" --cardtype %1").arg(cardtype);
+    if (logPropagate())
+	cmd += QString(" --logpath %1").arg(logPropPath());
 
     myth_system(cmd);
 

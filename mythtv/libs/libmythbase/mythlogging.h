@@ -103,8 +103,10 @@ MBASE_PUBLIC void LogPrintLine( uint32_t mask, LogLevel_t level,
 }
 
 MBASE_PUBLIC void logStart(QString logfile, int quiet = 0, int facility = 0,
-                           bool dblog = true);
+                           bool dblog = true, bool propagate = false);
 MBASE_PUBLIC void logStop(void);
+MBASE_PUBLIC bool logPropagate(void);
+MBASE_PUBLIC QString &logPropPath(void);
 MBASE_PUBLIC void threadRegister(QString name);
 MBASE_PUBLIC void threadDeregister(void);
 MBASE_PUBLIC int  syslogGetFacility(QString facility);
