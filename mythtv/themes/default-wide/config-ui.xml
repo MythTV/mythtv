@@ -2,6 +2,107 @@
 <!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
 <mythuitheme>
 
+    <window name="iconimport">
+        <textarea name="name" from="basetextarea">
+            <area>30,15,1220,30</area>
+            <font>basemedium</font>
+            <align>hcenter</align>
+        </textarea>
+
+        <buttonlist name="icons">
+            <area>30,60,1240,555</area>
+            <buttonarea>0,0,1240,520</buttonarea>
+            <layout>grid</layout>
+            <spacing>5</spacing>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,300,60</area>
+                    <shape name="background">
+                        <area>0,0,300,60</area>
+                        <type>roundbox</type>
+                        <cornerradius>4</cornerradius>
+                        <fill style="gradient">
+                            <gradient start="#505050" end="#000000" alpha="200" direction="vertical" />
+                        </fill>
+                    </shape>
+                    <imagetype name="icon">
+                        <area>0,5,80,50</area>
+                        <preserveaspect>true</preserveaspect>
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <area>90,5,200,50</area>
+                        <align>allcenter</align>
+                        <multiline>yes</multiline>
+                    </textarea>
+                </state>
+                <state name="selectedactive" from="active">
+                    <shape name="background">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="255" />
+                        </fill>
+                    </shape>
+                </state>
+                <state name="selectedinactive" from="selectedactive">
+                    <shape name="background">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="175" />
+                        </fill>
+                    </shape>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>1140,530</position>
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename>lb-uparrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename>lb-uparrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>1180,530</position>
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename>lb-dnarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename>lb-dnarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <textarea name="status" from="basetextarea">
+            <area>30,550,600,25</area>
+        </textarea>
+
+        <textarea name="manuallabel" from="basetextarea">
+            <area>30,605,300,25</area>
+            <value>Search terms:</value>
+        </textarea>
+
+        <textedit name="manualsearch" from="basetextedit">
+            <position>30,635</position>
+        </textedit>
+
+        <button name="search" from="basebutton">
+            <position>440,638</position>
+            <value>Search</value>
+        </button>
+
+        <button name="skip" from="basebutton">
+            <position>620,638</position>
+            <value>Skip</value>
+        </button>
+
+    </window>
+
     <window name="channeloverview">
 
         <textarea name="pagetitle">
