@@ -201,6 +201,9 @@ long GalleryUtil::GetNaturalRotation(const QString &filePathString)
                 .arg(filePathString));
     }
 
+#else
+    // Shut the compiler up about the unused argument
+    (void)filePathString;
 #endif // EXIF_SUPPORT
     return rotateAngle;
 }
