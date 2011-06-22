@@ -11,90 +11,96 @@
         </textarea>
 
         <shape name="list_background" from="basebackground">
-            <area>14,40,1190,360</area>
+            <area>14,50,1190,380</area>
         </shape>
 
         <shape name="channum_column">
-            <area>51,42,80,356</area>
+            <area>51,54,80,372</area>
             <fill color="#333333" alpha="180" />
         </shape>
 
         <shape name="sourcename_background" from="channum_column">
-            <area>854,42,290,356</area>
+            <area>854,54,290,372</area>
         </shape>
 
         <buttonlist name="channels" from="basebuttonlist2">
-            <position>18,50</position>
+            <position>18,60</position>
             <buttonarea>0,0,1200,364</buttonarea>
             <statetype name="buttonitem">
                 <area>0,0,1200,26</area>
                 <state name="active">
                     <imagetype name="icon">
-                        <area>1124,0,60,24</area>
+                        <area>1124,3,60,24</area>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
                     <textarea name="channum" from="buttontext">
-                        <area>32,2,80,22</area>
-                        <align>center</align>
+                        <area>32,2,80,26</area>
+                        <align>center,vcenter</align>
                     </textarea>
                     <textarea name="name" from="buttontext">
-                        <area>120,0,740,26</area>
+                        <area>120,2,740,26</area>
                         <align>left,vcenter</align>
                     </textarea>
                     <textarea name="sourcename" from="name">
-                        <area>860,0,276,26</area>
+                        <area>860,2,276,26</area>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active" />
                 <state name="selectedinactive" from="active" />
             </statetype>
+            <statetype name="upscrollarrow">
+                <position>1190,40</position>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>1190,300</position>
+            </statetype>
         </buttonlist>
 
         <textarea name="sortlabel" from="basetextarea">
-            <area>30,420,220,30</area>
+            <area>30,460,220,30</area>
             <value>Sort Mode:</value>
             <font>basemedium</font>
         </textarea>
 
         <buttonlist name="sorting" from="basewideselector">
-            <position>260,414</position>
+            <position>260,454</position>
         </buttonlist>
 
         <textarea name="sourcelabel" from="sortlabel">
-            <position>30,480</position>
+            <position>30,520</position>
             <value>Video Source:</value>
         </textarea>
 
         <buttonlist name="source" from="basewideselector">
-            <position>260,474</position>
+            <position>260,514</position>
         </buttonlist>
 
         <button name="delete" from="basebutton">
-            <position>1000,474</position>
+            <position>1000,514</position>
             <value>Delete</value>
         </button>
 
         <textarea name="nochannumlabel" from="basetextarea">
-            <area>70,536,500,60</area>
+            <area>70,576,500,60</area>
             <value>Hide Channels without channel number.</value>
         </textarea>
 
         <checkbox name="nochannum" from="basecheckbox">
-            <position>30,534</position>
+            <position>30,574</position>
         </checkbox>
 
         <button name="scan" from="basewidebutton">
-            <position>90,604</position>
+            <position>90,644</position>
             <value>Channel Scan</value>
         </button>
 
         <button name="importicons" from="basewidebutton">
-            <position>490,604</position>
+            <position>490,644</position>
             <value>Icon Download</value>
         </button>
 
         <button name="edittransport" from="basewidebutton">
-            <position>890,604</position>
+            <position>890,644</position>
             <value>Edit Transports</value>
         </button>
 
