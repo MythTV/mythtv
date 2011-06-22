@@ -108,6 +108,9 @@ class RemoteFileDownloadThread : public QRunnable
         if (!ok)
             m_dlInfo->m_errorCode = QNetworkReply::UnknownNetworkError;
 
+        m_dlInfo->m_bytesReceived = m_dlInfo->m_privData.size();
+        m_dlInfo->m_bytesTotal = m_dlInfo->m_bytesReceived;
+
         m_parent->downloadFinished(m_dlInfo);
         threadDeregister();
     }
