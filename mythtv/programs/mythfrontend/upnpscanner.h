@@ -15,7 +15,7 @@
 class MediaServer;
 class UPNPSubscription;
 
-class UPNP_PUBLIC UPNPScanner : public QObject
+class UPNPScanner : public QObject
 {
    Q_OBJECT
 
