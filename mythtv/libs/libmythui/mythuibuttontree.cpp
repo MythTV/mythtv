@@ -96,10 +96,10 @@ void MythUIButtonTree::SetTreeState(bool refreshAll)
     QList<MythGenericTree*> route = m_currentNode->getRoute();
 
     // Sanity Checks
-    if (m_depthOffset > route.size())
+    if (m_depthOffset >= route.size())
         m_depthOffset = 0;
 
-    if (((int)m_currentDepth + m_depthOffset) > route.size())
+    if (((int)m_currentDepth + m_depthOffset) >= route.size())
         m_currentDepth = 0;
 
     MythGenericTree *node = route.at(m_currentDepth + m_depthOffset);
