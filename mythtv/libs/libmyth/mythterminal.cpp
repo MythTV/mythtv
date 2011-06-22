@@ -99,6 +99,7 @@ void MythTerminal::AddText(const QString &_str)
     {
         lbwidget->setEnabled(true);
         lbwidget->setFocus();
+        lbwidget->setCurrentRow(lbwidget->count() - 1);
     }
 }
 
@@ -169,7 +170,9 @@ bool MythTerminalKeyFilter::eventFilter(QObject *obj, QEvent *event)
                                                               false);
         if (!handled && !actions.isEmpty())
         {
-            if (actions.contains("LEFT") || actions.contains("RIGHT"))
+            if (actions.contains("LEFT") || actions.contains("RIGHT") ||
+                actions.contains("UP") || actions.contains("DOWN") ||
+                actions.contains("ESCAPE"))
             {
                 return QObject::eventFilter(obj, event);
             }
