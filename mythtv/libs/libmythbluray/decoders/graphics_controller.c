@@ -61,6 +61,7 @@ struct graphics_controller_s {
     unsigned        popup_visible;
     unsigned        valid_mouse_position;
     BOG_DATA       *bog_data;
+    BOG_DATA       *saved_bog_data;
 
     /* data */
     PG_DISPLAY_SET *pgs;
@@ -238,6 +239,52 @@ static uint16_t _find_selected_button_id(GRAPHICS_CONTROLLER *gc)
     return 0xffff;
 }
 
+static int _save_page_state(GRAPHICS_CONTROLLER *gc)
+{
+    if (!gc->bog_data) {
+        GC_ERROR("_save_page_state(): no bog data !\n");
+        return -1;
+    }
+
+    PG_DISPLAY_SET *s       = gc->igs;
+    BD_IG_PAGE     *page    = NULL;
+    unsigned        page_id = bd_psr_read(gc->regs, PSR_MENU_PAGE_ID);
+    unsigned        ii;
+
+    page = _find_page(&s->ics->interactive_composition, page_id);
+    if (!page) {
+        GC_ERROR("_save_page_state(): unknown page #%d (have %d pages)\n",
+              page_id, s->ics->interactive_composition.num_pages);
+        return -1;
+    }
+
+    /* copy enabled button state, clear draw state */
+
+    X_FREE(gc->saved_bog_data);
+    gc->saved_bog_data = calloc(page->num_bogs, sizeof(*gc->saved_bog_data));
+
+    for (ii = 0; ii < page->num_bogs; ii++) {
+        gc->saved_bog_data[ii].enabled_button = gc->bog_data[ii].enabled_button;
+    }
+
+    return 1;
+}
+
+static int _restore_page_state(GRAPHICS_CONTROLLER *gc)
+{
+    if (gc->saved_bog_data) {
+        if (gc->bog_data) {
+            GC_ERROR("_restore_page_state(): bog data already exists !\n");
+            X_FREE(gc->bog_data);
+        }
+        gc->bog_data       = gc->saved_bog_data;
+        gc->saved_bog_data = NULL;
+
+        return 1;
+    }
+    return -1;
+}
+
 static void _reset_page_state(GRAPHICS_CONTROLLER *gc)
 {
     PG_DISPLAY_SET *s       = gc->igs;
@@ -330,6 +377,44 @@ static void _gc_reset(GRAPHICS_CONTROLLER *gc)
 }
 
 /*
+ * register hook
+ */
+static void _process_psr_event(void *handle, BD_PSR_EVENT *ev)
+{
+    GRAPHICS_CONTROLLER *gc = (GRAPHICS_CONTROLLER *)handle;
+
+    if (ev->ev_type == BD_PSR_SAVE) {
+        BD_DEBUG(DBG_GC, "PSR SAVE event\n");
+
+        /* save menu page state */
+        bd_mutex_lock(&gc->mutex);
+        _save_page_state(gc);
+        bd_mutex_unlock(&gc->mutex);
+
+        return;
+    }
+
+    if (ev->ev_type == BD_PSR_RESTORE) {
+        switch (ev->psr_idx) {
+
+            case PSR_SELECTED_BUTTON_ID:
+              return;
+
+            case PSR_MENU_PAGE_ID:
+                /* restore menus */
+                bd_mutex_lock(&gc->mutex);
+                _restore_page_state(gc);
+                bd_mutex_unlock(&gc->mutex);
+                return;
+
+            default:
+                /* others: ignore */
+                return;
+        }
+    }
+}
+
+/*
  * init / free
  */
 
@@ -344,6 +429,8 @@ GRAPHICS_CONTROLLER *gc_init(BD_REGISTERS *regs, void *handle, gc_overlay_proc_f
 
     bd_mutex_init(&p->mutex);
 
+    bd_psr_register_cb(regs, _process_psr_event, p);
+
     return p;
 }
 
@@ -351,13 +438,17 @@ void gc_free(GRAPHICS_CONTROLLER **p)
 {
     if (p && *p) {
 
-        _gc_reset(*p);
+        GRAPHICS_CONTROLLER *gc = *p;
 
-        if ((*p)->overlay_proc) {
-            (*p)->overlay_proc((*p)->overlay_proc_handle, NULL);
+        bd_psr_unregister_cb(gc->regs, _process_psr_event, gc);
+
+        _gc_reset(gc);
+
+        if (gc->overlay_proc) {
+            gc->overlay_proc(gc->overlay_proc_handle, NULL);
         }
 
-        bd_mutex_destroy(&(*p)->mutex);
+        bd_mutex_destroy(&gc->mutex);
 
         X_FREE(*p);
     }
@@ -786,7 +877,7 @@ static int _mouse_move(GRAPHICS_CONTROLLER *gc, unsigned x, unsigned y, GC_NAV_C
     gc->valid_mouse_position = 0;
 
     if (!gc->ig_drawn) {
-        GC_ERROR("_mouse_move(): menu not visible\n");
+        GC_TRACE("_mouse_move(): menu not visible\n");
         return -1;
     }
 
@@ -821,7 +912,7 @@ static int _mouse_move(GRAPHICS_CONTROLLER *gc, unsigned x, unsigned y, GC_NAV_C
 
         /* is button already selected? */
         if (button->id == cur_btn_id) {
-            return 0;
+            return 1;
         }
 
         new_btn_id = button->id;
@@ -861,6 +952,7 @@ int gc_run(GRAPHICS_CONTROLLER *gc, gc_ctrl_e ctrl, uint32_t param, GC_NAV_CMDS 
 
             bd_mutex_unlock(&gc->mutex);
             return 0;
+
         default:;
     }
 
@@ -919,6 +1011,7 @@ int gc_run(GRAPHICS_CONTROLLER *gc, gc_ctrl_e ctrl, uint32_t param, GC_NAV_CMDS 
         case GC_CTRL_MOUSE_MOVE:
             result = _mouse_move(gc, param >> 16, param & 0xffff, cmds);
             break;
+
         case GC_CTRL_RESET:
             /* already handled */
             break;

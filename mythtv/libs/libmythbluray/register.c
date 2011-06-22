@@ -252,6 +252,22 @@ void bd_psr_save_state(BD_REGISTERS *p)
     memcpy(p->psr + 36, p->psr + 4,  sizeof(uint32_t) * 5);
     memcpy(p->psr + 42, p->psr + 10, sizeof(uint32_t) * 3);
 
+    /* generate save event */
+
+    if (p->num_cb) {
+        BD_PSR_EVENT ev = {
+            .ev_type = BD_PSR_SAVE,
+            .psr_idx = -1,
+            .old_val = 0,
+            .new_val = 0,
+        };
+
+        unsigned j;
+        for (j = 0; j < p->num_cb; j++) {
+            p->cb[j].cb(p->cb[j].handle, &ev);
+        }
+    }
+
     bd_psr_unlock(p);
 }
 
