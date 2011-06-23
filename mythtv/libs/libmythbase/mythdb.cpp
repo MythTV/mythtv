@@ -8,6 +8,7 @@ using namespace std;
 #include <QHash>
 #include <QDir>
 #include <QThread>
+#include <QTextStream>
 
 #include "mythdb.h"
 #include "mythdbcon.h"

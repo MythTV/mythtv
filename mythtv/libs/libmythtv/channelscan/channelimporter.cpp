@@ -6,6 +6,11 @@
  *
  */
 
+#include <QTextStream>
+#include <iostream>
+
+using namespace std;
+
 // MythTV headers
 #include "channelimporter.h"
 #include "mythdialogs.h"

@@ -2,6 +2,7 @@
 // qt
 #include <QKeyEvent>
 #include <QFile>
+#include <QTextStream>
 
 // myth
 #include "mythcorecontext.h"

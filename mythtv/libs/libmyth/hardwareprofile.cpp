@@ -3,6 +3,7 @@
 // qt
 #include <QStringList>
 #include <QDir>
+#include <QTextStream>
 
 // libmythbase
 #include "mythcorecontext.h"

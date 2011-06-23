@@ -5,6 +5,7 @@
 #include <QMutex>
 
 #include <cmath>
+#include <iostream>
 
 #include <queue>
 #include <algorithm>

@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <stdio.h>
 
 #include "mythverbose.h"
 #include "cc708reader.h"

@@ -13,6 +13,7 @@ using namespace std;
 #include <QDomElement>
 #include <QFileInfo>
 #include <QFile>
+#include <QTextStream>
 
 // MythTV headers
 #include "mythcorecontext.h"

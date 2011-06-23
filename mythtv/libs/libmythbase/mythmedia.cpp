@@ -9,6 +9,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QFileInfoList>
+#include <QTextStream>
 
 // MythTV headers
 #include "mythmedia.h"

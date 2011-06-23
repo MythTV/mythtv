@@ -16,6 +16,7 @@
 #include <string.h>
 #include <sys/select.h>
 #include <sys/wait.h>
+#include <iostream>
 
 // QT headers
 #include <QCoreApplication>

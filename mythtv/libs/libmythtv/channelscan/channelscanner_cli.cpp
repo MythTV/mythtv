@@ -25,6 +25,9 @@
 
 // Qt headers
 #include <QCoreApplication>
+#include <iostream>
+
+using namespace std;
 
 // MythTv headers
 #include "channelscanner_cli.h"

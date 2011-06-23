@@ -15,6 +15,7 @@ using namespace std;
 #include <QVariantMap>
 #include <QString>
 #include <QCoreApplication>
+#include <QTextStream>
 
 #include "mythcommandlineparser.h"
 #include "exitcodes.h"

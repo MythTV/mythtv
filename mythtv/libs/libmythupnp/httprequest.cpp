@@ -28,6 +28,7 @@
 #include <QTextCodec>
 #include <QStringList>
 #include <QCryptographicHash>
+#include <QDateTime>
 
 #include "mythconfig.h"
 #if !( CONFIG_DARWIN || CONFIG_CYGWIN || defined(__FreeBSD__) || defined(USING_MINGW))

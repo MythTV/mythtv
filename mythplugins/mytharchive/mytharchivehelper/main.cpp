@@ -49,6 +49,7 @@ using namespace std;
 #include <QImage>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QTextStream>
 
 // MythTV headers
 #include <mythcommandlineparser.h>
