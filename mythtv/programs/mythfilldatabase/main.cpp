@@ -113,6 +113,11 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_OK;
     }
 
+    if (cmdline.toBool("verbose"))
+        if (parse_verbose_arg(cmdline.toString("verbose")) ==
+                        GENERIC_EXIT_INVALID_CMDLINE)
+            return GENERIC_EXIT_INVALID_CMDLINE;
+
     if (cmdline.toBool("manual"))
     {
         cout << "###\n";
