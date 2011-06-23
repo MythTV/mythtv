@@ -747,7 +747,6 @@ int main(int argc, char **argv)
     bool bStartup = false;
     bool bShutdown = false;
     bool bGetStatus = false;
-    bool bSetWakeupTime = false;
     QString sWakeupTime = "";
     bool bSetScheduledWakeupTime = false;
     bool bCheckAndShutdown = false;
@@ -845,7 +844,7 @@ int main(int argc, char **argv)
         res = shutdown();
     else if (bGetStatus)
         res = getStatus(bWantRecStatus);
-    else if (bSetWakeupTime)
+    else if (!sWakeupTime.isEmpty())
         res = setWakeupTime(sWakeupTime);
     else if (bCheckAndShutdown)
     {
