@@ -1388,7 +1388,7 @@ bool DVDRingBuffer::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
             w = x2 - x1 + 1;
             if (w < 0)
                 w = 0;
-            h = y2 - y1 + 2;
+            h = y2 - y1 + 1;
             if (h < 0)
                 h = 0;
             if (w > 0 && h > 0)
