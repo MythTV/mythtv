@@ -12,7 +12,7 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 # Input
 HEADERS += mythsocket.h mythsocket_cb.h mythsocketthread.h msocketdevice.h
 HEADERS += mythbaseexp.h mythdbcon.h mythdb.h mythdbparams.h oldsettings.h
-HEADERS += mythverbose.h mythversion.h compat.h mythconfig.h
+HEADERS += mythverbose.h verbosedefs.h mythversion.h compat.h mythconfig.h
 HEADERS += mythobservable.h mythevent.h httpcomms.h mcodecs.h
 HEADERS += mythtimer.h mythsignalingtimer.h mythdirs.h exitcodes.h
 HEADERS += lcddevice.h mythstorage.h remotefile.h
@@ -51,7 +51,7 @@ mingw {
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = mythverbose.h mythdbcon.h mythdbparams.h mythbaseexp.h mythdb.h
 inc.files += compat.h mythversion.h mythconfig.h mythconfig.mak version.h
-inc.files += mythobservable.h mythevent.h httpcomms.h mcodecs.h
+inc.files += mythobservable.h mythevent.h httpcomms.h mcodecs.h verbosedefs.h
 inc.files += mythtimer.h lcddevice.h exitcodes.h mythdirs.h mythstorage.h
 inc.files += mythsocket.h mythsocket_cb.h msocketdevice.h mythlogging.h
 inc.files += mythcorecontext.h mythsystem.h storagegroup.h

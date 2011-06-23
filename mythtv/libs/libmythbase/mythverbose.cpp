@@ -1,129 +1,189 @@
 #include <QMutex>
 #include <QStringList>
-#include <QtDebug>
+#include <QMap>
+#include <QMutexLocker>
+#include <iostream>
+
+using namespace std;
 
 #include "mythverbose.h"
 #include "exitcodes.h"
 
-const unsigned int verboseDefaultInt = VB_IMPORTANT | VB_GENERAL;
-const char        *verboseDefaultStr = " important general";
+typedef struct {
+    uint64_t    mask;
+    QString     name;
+    bool        additive;
+    QString     helpText;
+} VerboseDef;
 
-QMutex verbose_mutex;
-unsigned int print_verbose_messages = verboseDefaultInt;
+typedef QMap<QString, VerboseDef *> VerboseMap;
+
+bool verboseInitialized = false;
+VerboseMap verboseMap;
+QMutex verboseMapMutex;
+
+const uint64_t verboseDefaultInt = VB_IMPORTANT | VB_GENERAL;
+const char    *verboseDefaultStr = " important general";
+
+uint64_t print_verbose_messages = verboseDefaultInt;
 QString verboseString = QString(verboseDefaultStr);
 
 unsigned int userDefaultValueInt = verboseDefaultInt;
 QString      userDefaultValueStr = QString(verboseDefaultStr);
 bool         haveUserDefaultValues = false;
 
-#define VERBOSE_ARG_HELP(ARG_ENUM, ARG_VALUE, ARG_STR, ARG_ADDITIVE, ARG_HELP) \
-                QString("  %1").arg(ARG_STR).leftJustified(15, ' ', true) << \
-                " - " << ARG_HELP << "\n" <<
+void verboseAdd(uint64_t mask, QString name, bool additive, QString helptext);
+void verboseInit(void);
+void verboseHelp();
 
-#define VERBOSE_ARG_CHECKS(ARG_ENUM, ARG_VALUE, ARG_STR, ARG_ADDITIVE, ARG_HELP) \
-            else if (option == ARG_STR) \
-            { \
-                if (reverseOption) \
-                { \
-                    print_verbose_messages &= ~(ARG_VALUE); \
-                    verboseString = verboseString + " no" + ARG_STR; \
-                } \
-                else \
-                { \
-                    if (ARG_ADDITIVE) \
-                    { \
-                        print_verbose_messages |= ARG_VALUE; \
-                        verboseString = verboseString + ' ' + ARG_STR; \
-                    } \
-                    else \
-                    { \
-                        print_verbose_messages = ARG_VALUE; \
-                        verboseString = ARG_STR; \
-                    } \
-                } \
-            }
+
+void verboseAdd(uint64_t mask, QString name, bool additive, QString helptext)
+{
+    VerboseDef *item = new VerboseDef;
+
+    item->mask = mask;
+    name.detach();
+    // VB_GENERAL -> general
+    name.remove(0, 3);
+    name = name.toLower();
+    item->name = name;
+    item->additive = additive;
+    helptext.detach();
+    item->helpText = helptext;
+
+    verboseMap.insert(name, item);
+}
+
+void verboseInit(void)
+{
+    QMutexLocker locker(&verboseMapMutex);
+    verboseMap.clear();
+
+    // This looks funky, so I'll put some explanation here.  The verbosedefs.h
+    // file gets included as part of the mythverbose.h include, and at that
+    // time, the normal (without _IMPLEMENT_VERBOSE defined) code case will
+    // define the VerboseMask enum.  At this point, we force it to allow us
+    // to include the file again, but with _IMPLEMENT_VERBOSE set so that the
+    // single definition of the VB_* values can be shared to define also the
+    // contents of verboseMap, via repeated calls to verboseAdd()
+
+#undef VERBOSEDEFS_H_
+#define _IMPLEMENT_VERBOSE
+#include "verbosedefs.h"
+    
+    verboseInitialized = true;
+}
+
+void verboseHelp()
+{
+    QString m_verbose = verboseString.trimmed();
+    m_verbose.replace(QRegExp(" "), ",");
+    m_verbose.remove(QRegExp("^,"));
+
+    cerr << "Verbose debug levels.\n"
+            "Accepts any combination (separated by comma) of:\n\n";
+
+    for (VerboseMap::Iterator vit = verboseMap.begin();
+         vit != verboseMap.end(); ++vit )
+    {
+        VerboseDef *item = vit.value();
+        QString name = QString("  %1").arg(item->name, -15, ' ');
+        cerr << name.toLocal8Bit().constData() << " - " << 
+                item->helpText.toLocal8Bit().constData() << endl;
+    }
+
+    cerr << endl <<
+      "The default for this program appears to be: '-v " <<
+      m_verbose.toLocal8Bit().constData() << "'\n\n"
+      "Most options are additive except for none, all, and important.\n"
+      "These three are semi-exclusive and take precedence over any\n"
+      "prior options given.  You can however use something like\n"
+      "'-v none,jobqueue' to get only JobQueue related messages\n"
+      "and override the default verbosity level.\n\n"
+      "The additive options may also be subtracted from 'all' by \n"
+      "prefixing them with 'no', so you may use '-v all,nodatabase'\n"
+      "to view all but database debug messages.\n\n"
+      "Some debug levels may not apply to this program.\n\n";
+}
 
 int parse_verbose_arg(QString arg)
 {
     QString option;
 
-    verbose_mutex.lock();
+    if (!verboseInitialized)
+        verboseInit();
+
+    QMutexLocker locker(&verboseMapMutex);
 
     print_verbose_messages = verboseDefaultInt;
     verboseString = QString(verboseDefaultStr);
 
     if (arg.startsWith('-'))
     {
-        qDebug() << "Invalid or missing argument to -v/--verbose option\n";
-        verbose_mutex.unlock();
+        cerr << "Invalid or missing argument to -v/--verbose option\n";
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
-    else
+
+    QStringList verboseOpts = arg.split(',');
+    for (QStringList::Iterator it = verboseOpts.begin();
+         it != verboseOpts.end(); ++it )
     {
-        QStringList verboseOpts = arg.split(',');
-        for (QStringList::Iterator it = verboseOpts.begin();
-             it != verboseOpts.end(); ++it )
+        option = (*it).toLower();
+        bool reverseOption = false;
+
+        if (option != "none" && option.left(2) == "no")
         {
-            option = *it;
-            bool reverseOption = false;
+            reverseOption = true;
+            option = option.right(option.length() - 2);
+        }
 
-            if (option != "none" && option.left(2) == "no")
+        if (option == "help")
+        {
+            verboseHelp();
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+        else if (option == "default")
+        {
+            if (haveUserDefaultValues)
             {
-                reverseOption = true;
-                option = option.right(option.length() - 2);
+                print_verbose_messages = userDefaultValueInt;
+                verboseString = userDefaultValueStr;
             }
-
-            if (option == "help")
+            else
             {
-                QString m_verbose = verboseString;
-                m_verbose.replace(QRegExp(" "), ",");
-                m_verbose.remove(QRegExp("^,"));
-                qDebug() <<
-                  "Verbose debug levels.\n" <<
-                  "Accepts any combination (separated by comma) of:\n\n" <<
-
-                  VERBOSE_MAP(VERBOSE_ARG_HELP)
-
-                  "\n" <<
-                  "The default for this program appears to be: '-v " <<
-                  m_verbose << "'\n\n" <<
-                  "Most options are additive except for none, all, and important.\n" <<
-                  "These three are semi-exclusive and take precedence over any\n" <<
-                  "prior options given.  You can however use something like\n" <<
-                  "'-v none,jobqueue' to get only JobQueue related messages\n" <<
-                  "and override the default verbosity level.\n" <<
-                  "\n" <<
-                  "The additive options may also be subtracted from 'all' by \n" <<
-                  "prefixing them with 'no', so you may use '-v all,nodatabase'\n" <<
-                  "to view all but database debug messages.\n" <<
-                  "\n" <<
-                  "Some debug levels may not apply to this program.\n" <<
-                  endl;
-                verbose_mutex.unlock();
-                return GENERIC_EXIT_INVALID_CMDLINE;
+                print_verbose_messages = verboseDefaultInt;
+                verboseString = QString(verboseDefaultStr);
             }
-            else if (option == "default")
+        }
+        else 
+        {
+            VerboseDef *item = verboseMap.value(option);
+
+            if (item)
             {
-                if (haveUserDefaultValues)
+                if (reverseOption)
                 {
-                    print_verbose_messages = userDefaultValueInt;
-                    verboseString = userDefaultValueStr;
+                    print_verbose_messages &= ~(item->mask);
+                    verboseString += " no" + item->name;
                 }
                 else
                 {
-                    print_verbose_messages = verboseDefaultInt;
-                    verboseString = QString(verboseDefaultStr);
+                    if (item->additive)
+                    {
+                        print_verbose_messages |= item->mask;
+                        verboseString += ' ' + item->name;
+                    }
+                    else
+                    {
+                        print_verbose_messages = item->mask;
+                        verboseString = item->name;
+                    }
                 }
             }
-
-            // Essentially a pile of else if {} blocks
-            VERBOSE_MAP(VERBOSE_ARG_CHECKS)
-
             else
             {
-                qDebug() << "Unknown argument for -v/--verbose: "
-                         << option << endl;;
-                verbose_mutex.unlock();
+                cerr << "Unknown argument for -v/--verbose: " << 
+                        option.toLocal8Bit().constData() << endl;;
                 return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
@@ -135,8 +195,6 @@ int parse_verbose_arg(QString arg)
         userDefaultValueInt = print_verbose_messages;
         userDefaultValueStr = verboseString;
     }
-
-    verbose_mutex.unlock();
 
     return GENERIC_EXIT_OK;
 }
@@ -150,4 +208,3 @@ QString safe_eno_to_string(int errnum)
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4
  */
-
