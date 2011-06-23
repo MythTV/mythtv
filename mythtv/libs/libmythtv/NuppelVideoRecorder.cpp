@@ -2485,7 +2485,7 @@ void NuppelVideoRecorder::FormatTT(struct VBIData *vbidata)
     unsigned char *inpos = vbidata->teletextpage.data[0];
     unsigned char *outpos = textbuffer[act]->buffer;
     *outpos = 0;
-    struct teletextsubtitle st;
+    struct teletextsubtitle st = { 0 };
     unsigned char linebuf[VT_WIDTH + 1];
     unsigned char *linebufpos = linebuf;
 
