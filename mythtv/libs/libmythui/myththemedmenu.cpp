@@ -7,6 +7,7 @@
 #include <QKeyEvent>
 #include <QDomDocument>
 #include <QFile>
+#include <QTextStream>
 
 // libmythui headers
 #include "mythmainwindow.h"
