@@ -533,7 +533,7 @@ void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
     uint h = hl_button->h;
     uint w = hl_button->w;
     QRect rect = QRect(hl_button->x, hl_button->y, w, h);
-    QImage bg_image(hl_button->pict.data[0], w, h, QImage::Format_Indexed8);
+    QImage bg_image(hl_button->pict.data[0], w, h, w, QImage::Format_Indexed8);
     uint32_t *bgpalette = (uint32_t *)(hl_button->pict.data[1]);
 
     bool blank = true;
