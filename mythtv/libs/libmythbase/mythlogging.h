@@ -10,6 +10,7 @@
 #endif
 #include <stdint.h>
 #include <time.h>
+#include <unistd.h>
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
 
 #define LOGLINE_MAX 2048

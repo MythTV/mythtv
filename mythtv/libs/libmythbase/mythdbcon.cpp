@@ -16,6 +16,7 @@
 #include "mythverbose.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
+#include <unistd.h>
 
 static const uint kPurgeTimeout = 60 * 60;
 

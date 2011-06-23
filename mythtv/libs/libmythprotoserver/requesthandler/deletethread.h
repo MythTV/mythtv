@@ -6,6 +6,7 @@
 
 // ANSI C headers
 #include <stdint.h>
+#include <unistd.h>
 
 // C++ headers
 using namespace std;
