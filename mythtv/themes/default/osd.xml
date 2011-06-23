@@ -57,40 +57,41 @@
             <font>medium</font>
             <area>118,66,378,20</area>
             <align>left,vcenter</align>
+            <template>%BUFFERAVAIL% of %BUFFERSIZE%Mb</template>
         </textarea>
 
         <textarea name="video">
             <font>medium</font>
-            <area>156,25,93,20</area>
+            <area>176,25,93,20</area>
             <align>right,vcenter</align>
             <value>Video :</value>
         </textarea>
         <textarea name="videowidth">
             <font>medium</font>
-            <area>253,25,156,20</area>
+            <area>273,25,156,20</area>
             <align>left,vcenter</align>
             <template>%VIDEOWIDTH%x%VIDEOHEIGHT%@%VIDEOFRAMERATE%fps</template>
         </textarea>
         <textarea name="vidcodec">
             <font>medium</font>
-            <area>156,45,93,20</area>
+            <area>176,45,93,20</area>
             <align>right,vcenter</align>
             <value>Codec :</value>
         </textarea>
         <textarea name="videocodec">
             <font>medium</font>
-            <area>253,45,93,20</area>
+            <area>273,45,93,20</area>
             <align>left,vcenter</align>
         </textarea>
         <textarea name="viddec">
             <font>medium</font>
-            <area>156,66,93,20</area>
+            <area>176,66,93,20</area>
             <align>right,vcenter</align>
             <value>Decoder :</value>
         </textarea>
         <textarea name="videodecoder">
             <font>medium</font>
-            <area>253,66,93,20</area>
+            <area>273,66,93,20</area>
             <align>left,vcenter</align>
         </textarea>
 
@@ -118,7 +119,7 @@
         </textarea>
         <textarea name="frames">
             <font>medium</font>
-            <area>375,66,125,20</area>
+            <area>365,66,135,20</area>
             <align>right,vcenter</align>
             <value>Frames decoded/free :</value>
         </textarea>

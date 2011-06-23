@@ -62,6 +62,7 @@ class MTV_PUBLIC RingBuffer : protected QThread
     QString GetDecoderRate(void);
     QString GetStorageRate(void);
     QString GetAvailableBuffer(void);
+    uint    GetBufferSize(void) { return bufferSize; }
     long long GetWritePosition(void) const;
     /// \brief Returns the size of the file we are reading/writing,
     ///        or -1 if the query fails.

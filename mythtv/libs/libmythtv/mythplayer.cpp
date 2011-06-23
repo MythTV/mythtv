@@ -4339,6 +4339,8 @@ void MythPlayer::GetPlaybackData(InfoMap &infoMap)
     infoMap.insert("decoderrate", player_ctx->buffer->GetDecoderRate());
     infoMap.insert("storagerate", player_ctx->buffer->GetStorageRate());
     infoMap.insert("bufferavail", player_ctx->buffer->GetAvailableBuffer());
+    infoMap.insert("buffersize",
+        QString::number(player_ctx->buffer->GetBufferSize() >> 20));
     infoMap.insert("avsync",
             QString::number((float)avsync_avg / (float)frame_interval, 'f', 2));
     if (videoOutput)
