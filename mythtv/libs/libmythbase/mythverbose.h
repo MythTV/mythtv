@@ -26,7 +26,7 @@ extern MBASE_PUBLIC uint64_t print_verbose_messages;
 
 #ifdef __cplusplus
 #define VERBOSE(mask, ...) \
-    LogPrintQString((uint64_t)(mask), LOG_INFO, QString(__VA_ARGS__))
+    LogPrint((uint64_t)(mask), LOG_INFO, QString(__VA_ARGS__))
 #else
 #define VERBOSE(mask, ...) \
     LogPrint((uint64_t)(mask), LOG_INFO, __VA_ARGS__)

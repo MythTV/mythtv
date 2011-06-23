@@ -87,13 +87,15 @@ typedef struct
 extern "C" {
 #endif
 
-#define LogPrintQString(mask, level, string) \
+#ifdef __cplusplus
+#define LogPrint(mask, level, string) \
     LogPrintLine(mask, (LogLevel_t)level, __FILE__, __LINE__, __FUNCTION__, \
                  QString(string).toLocal8Bit().constData())
-
+#else
 #define LogPrint(mask, level, format, ...) \
     LogPrintLine(mask, (LogLevel_t)level, __FILE__, __LINE__, __FUNCTION__, \
                  (const char *)format, ##__VA_ARGS__)
+#endif
 
 /* Define the external prototype */
 MBASE_PUBLIC void LogPrintLine( uint32_t mask, LogLevel_t level, 

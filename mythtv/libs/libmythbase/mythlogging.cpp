@@ -115,13 +115,14 @@ FileLogger::FileLogger(char *filename) : LoggerBase(filename, 0),
     {
         m_opened = true;
         m_fd = 1;
-        LogPrint( VB_IMPORTANT, LOG_INFO, "Added logging to the console" );
+        LogPrint(VB_IMPORTANT, LOG_INFO, "Added logging to the console");
     }
     else
     {
         m_fd = open(filename, O_WRONLY|O_CREAT|O_APPEND, 0664);
         m_opened = (m_fd != -1);
-        LogPrint( VB_IMPORTANT, LOG_INFO, "Added logging to %s", filename );
+        LogPrint(VB_IMPORTANT, LOG_INFO, QString("Added logging to %1")
+                 .arg(filename));
     }
 }
 
@@ -131,13 +132,12 @@ FileLogger::~FileLogger()
     {
         if( m_fd != 1 )
         {
-            LogPrint( VB_IMPORTANT, LOG_INFO, "Removed logging to %s",
-                      m_handle.string );
+            LogPrint(VB_IMPORTANT, LOG_INFO, QString("Removed logging to %1")
+                     .arg(m_handle.string));
             close( m_fd );
         }
         else
-            LogPrint( VB_IMPORTANT, LOG_INFO,
-                      "Removed logging to the console" );
+            LogPrint(VB_IMPORTANT, LOG_INFO, "Removed logging to the console");
     }
 }
 
@@ -153,7 +153,8 @@ void FileLogger::reopen(void)
 
     m_fd = open(filename, O_WRONLY|O_CREAT|O_APPEND, 0664);
     m_opened = (m_fd != -1);
-    LogPrint( VB_IMPORTANT, LOG_INFO, "Rolled logging on %s", filename );
+    LogPrint(VB_IMPORTANT, LOG_INFO, QString("Rolled logging on %1")
+             .arg(filename));
 }
 
 bool FileLogger::logmsg(LoggingItem_t *item)
@@ -209,8 +210,8 @@ bool FileLogger::logmsg(LoggingItem_t *item)
 
     if( result == -1 )
     {
-        LogPrint( VB_IMPORTANT, LOG_UNKNOWN,
-                  "Closed Log output on fd %d due to errors", m_fd );
+        LogPrint(VB_IMPORTANT, LOG_UNKNOWN,
+                 QString("Closed Log output on fd %1 due to errors").arg(m_fd));
         m_opened = false;
         if( m_fd != 1 )
             close( m_fd );
@@ -234,8 +235,8 @@ SyslogLogger::SyslogLogger(int facility) : LoggerBase(NULL, facility),
     for( name = &facilitynames[0];
          name->c_name && name->c_val != facility; name++ );
 
-    LogPrint(VB_IMPORTANT, LOG_INFO, "Added syslogging to facility %s",
-             name->c_name);
+    LogPrint(VB_IMPORTANT, LOG_INFO, QString("Added syslogging to facility %1")
+             .arg(name->c_name));
 }
 
 SyslogLogger::~SyslogLogger()
@@ -270,8 +271,9 @@ DatabaseLogger::DatabaseLogger(char *table) : LoggerBase(table, 0),
         "msgtime, level, message) VALUES (:HOST, :APPLICATION, "
         ":PID, :THREAD, :MSGTIME, :LEVEL, :MESSAGE)";
 
-    LogPrint(VB_IMPORTANT, LOG_INFO, "Added database logging to table %s",
-             m_handle.string);
+    LogPrint(VB_IMPORTANT, LOG_INFO, 
+             QString("Added database logging to table %1")
+             .arg(m_handle.string));
 
     if (gCoreContext && !gCoreContext->GetHostName().isEmpty())
         m_host = strdup((char *)gCoreContext->GetHostName()
