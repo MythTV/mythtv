@@ -208,6 +208,9 @@ int main(int argc, char **argv)
 
     int facility = cmdline.GetSyslogFacility();
     bool dblog = !cmdline.toBool("nodblog");
+    LogLevel_t level = cmdline.GetLogLevel();
+    if (level == LOG_UNKNOWN)
+        return GENERIC_EXIT_INVALID_CMDLINE;
 
     ///////////////////////////////////////////////////////////////////////
 
@@ -218,7 +221,7 @@ int main(int argc, char **argv)
 
     QString logfile = cmdline.GetLogFilePath();
     bool propagate = cmdline.toBool("islogpath");
-    logStart(logfile, quiet, facility, dblog, propagate);
+    logStart(logfile, quiet, facility, level, dblog, propagate);
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to ignore SIGPIPE");

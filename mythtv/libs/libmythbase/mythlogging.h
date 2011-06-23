@@ -106,13 +106,15 @@ MBASE_PUBLIC void LogPrintLine( uint32_t mask, LogLevel_t level,
 }
 
 MBASE_PUBLIC void logStart(QString logfile, int quiet = 0, int facility = 0,
-                           bool dblog = true, bool propagate = false);
+                           LogLevel_t level = LOG_INFO, bool dblog = true, 
+                           bool propagate = false);
 MBASE_PUBLIC void logStop(void);
 MBASE_PUBLIC bool logPropagate(void);
 MBASE_PUBLIC QString &logPropPath(void);
 MBASE_PUBLIC void threadRegister(QString name);
 MBASE_PUBLIC void threadDeregister(void);
 MBASE_PUBLIC int  syslogGetFacility(QString facility);
+MBASE_PUBLIC LogLevel_t logLevelGet(QString level);
 
 void LogTimeStamp( time_t *epoch, uint32_t *usec );
 

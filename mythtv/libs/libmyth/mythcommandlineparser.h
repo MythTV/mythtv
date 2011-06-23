@@ -10,6 +10,7 @@
 #include <stdint.h>   // for uint64_t
 
 #include "mythexp.h"
+#include "mythlogging.h"
 
 typedef struct commandlinearg {
     QString         name;
@@ -130,8 +131,9 @@ class MPUBLIC MythCommandLineParser
     QVariant                operator[](const QString &name);
     QStringList             GetArgs(void) const { return m_remainingArgs; }
     QMap<QString,QString>   GetSettingsOverride(void);
-    QString	                GetLogFilePath(void);
+    QString	            GetLogFilePath(void);
     int                     GetSyslogFacility(void);
+    LogLevel_t              GetLogLevel(void);
     QString                 GetPassthrough(void) const { return m_passthrough.join(" "); }
 
     bool                    toBool(QString key) const;

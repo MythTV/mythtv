@@ -121,6 +121,9 @@ int main(int argc, char *argv[])
 
     int facility = cmdline.GetSyslogFacility();
     bool dblog = !cmdline.toBool("nodblog");
+    LogLevel_t level = cmdline.GetLogLevel();
+    if (level == LOG_UNKNOWN)
+        return GENERIC_EXIT_INVALID_CMDLINE;
 
     if (cmdline.toBool("pidfile"))
         pidfile = cmdline.toString("pidfile");
@@ -131,7 +134,7 @@ int main(int argc, char *argv[])
 
     logfile = cmdline.GetLogFilePath();
     bool propagate = cmdline.toBool("islogpath");
-    logStart(logfile, quiet, facility, dblog, propagate);
+    logStart(logfile, quiet, facility, level, dblog, propagate);
 
     ofstream pidfs;
     if (pidfile.size())

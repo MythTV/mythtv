@@ -62,9 +62,7 @@ QString                 logPropagatePath;
 #define TIMESTAMP_MAX 30
 #define MAX_STRING_LENGTH 2048
 
-LogLevel_t LogLevel = LOG_UNKNOWN;  /**< The log level mask to apply, messages
-                                         must be at at least this priority to
-                                         be output */
+LogLevel_t logLevel = (LogLevel_t)LOG_INFO;
 
 char *getThreadName( LoggingItem_t *item );
 int64_t getThreadTid( LoggingItem_t *item );
@@ -676,7 +674,7 @@ void LogPrintLine( uint32_t mask, LogLevel_t level, const char *file, int line,
     if( !VERBOSE_LEVEL_CHECK(mask) )
         return;
 
-    if( level > LogLevel )
+    if( level > logLevel )
         return;
 
     item = new LoggingItem_t;
@@ -734,14 +732,18 @@ QString &logPropPath(void)
     return logPropagatePath;
 }
 
-void logStart(QString logfile, int quiet, int facility, bool dblog, 
-              bool propagate)
+void logStart(QString logfile, int quiet, int facility, LogLevel_t level,
+              bool dblog, bool propagate)
 {
     LoggerBase *logger;
     struct sigaction sa;
 
     if (logThread.isRunning())
         return;
+ 
+    logLevel = level;
+    LogPrint(VB_IMPORTANT, LOG_CRIT, QString("Setting Log Level to %1")
+             .arg(LogLevelNames[logLevel]));
 
     logPropagateFlag = propagate;
     if (propagate)
@@ -879,6 +881,20 @@ int syslogGetFacility(QString facility)
          name->c_name && strcmp(name->c_name, string); i++, name++ );
 
     return( name->c_val );
+}
+
+LogLevel_t logLevelGet(QString level)
+{
+    int i;
+
+    level = "LOG_" + level.toUpper();
+    for( i = LOG_EMERG; i < LOG_UNKNOWN; i++ )
+    {
+        if( level == LogLevelNames[i] )
+            return (LogLevel_t)i;
+    }
+
+    return LOG_UNKNOWN;
 }
 
 /*
