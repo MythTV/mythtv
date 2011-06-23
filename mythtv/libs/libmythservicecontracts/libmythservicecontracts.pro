@@ -62,7 +62,6 @@ incDatacontracts.files += datacontracts/timeZoneInfo.h
 INSTALLS += inc incServices incDatacontracts
 
 macx {
-
     QMAKE_LFLAGS_SHLIB += -flat_namespace
 }
 

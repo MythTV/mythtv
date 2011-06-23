@@ -50,6 +50,7 @@ LIBS += -L../libmythui -L../libmythupnp
 LIBS += -L../libmythdvdnav
 LIBS += -L../libmythbluray
 LIBS += -L../libmythbase
+LIBS += -L../libmythservicecontracts
 LIBS += -lmyth-$$LIBVERSION
 LIBS += -lmythswscale
 LIBS += -lmythavformat
@@ -58,6 +59,7 @@ LIBS += -lmythavutil
 LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
 LIBS += -lmythdvdnav-$$LIBVERSION
 LIBS += -lmythbluray-$$LIBVERSION    -lmythbase-$$LIBVERSION
+LIBS += -lmythservicecontracts-$$LIBVERSION
 using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_live: LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_hdhomerun: LIBS += -L../libmythhdhomerun -lmythhdhomerun-$$LIBVERSION
@@ -98,10 +100,6 @@ macx {
 
     using_firewire:using_backend {
         QMAKE_CXXFLAGS += -F$${CONFIG_MAC_AVC}
-        LIBS += -F$${CONFIG_MAC_AVC} -framework AVCVideoServices
-        # Recent versions of this framework use /usr/lib/libstdc++.6.dylib
-        # which may clash with symbols in /usr/lib/gcc/darwin/3.3/libstdc++.a
-        # In that case, rebuild the framework with your (old) Xcode version
     }
 }
 

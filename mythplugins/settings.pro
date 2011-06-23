@@ -72,3 +72,5 @@ EXTRA_LIBS += $$CONFIG_XVMC_LIBS
 EXTRA_LIBS += $$CONFIG_OPENGL_VSYNC_LIBS
 
 LIRC_LIBS = $$CONFIG_LIRC_LIBS
+
+macx:using_firewire:using_backend:EXTRA_LIBS += -F$${CONFIG_MAC_AVC} -framework AVCVideoServices

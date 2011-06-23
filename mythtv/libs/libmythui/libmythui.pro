@@ -84,7 +84,6 @@ using_x11 {
     DEFINES += USING_X11
     HEADERS += screensaver-x11.h
     SOURCES += screensaver-x11.cpp
-    LIBS += $$EXTRA_LIBS
 }
 
 macx {
@@ -153,7 +152,6 @@ using_opengl {
     inc.files += mythpainter_ogl.h
     QT += opengl
 
-    using_x11:LIBS += $$EXTRA_LIBS
     mingw:LIBS += -lopengl32
 }
 
@@ -167,4 +165,4 @@ use_hidesyms {
 
 include ( ../libs-targetfix.pro )
 
-LIBS += $$LATE_LIBS
+LIBS += $$EXTRA_LIBS $$LATE_LIBS

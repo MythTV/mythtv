@@ -29,12 +29,18 @@ INCLUDEPATH += ../libmythbase ../libmyth ../libmythtv ../libmythui
 INCLUDEPATH += ../../external/FFmpeg ../.. ../ ./
 
 DEPENDPATH += ../ ../libmythbase ../libmythtv ../libmyth ../libmythui
+DEPENDPATH += ../libmythupnp ../libmythservicecontracts
 
 LIBS += -L../libmythbase -L../libmyth -L../libmythtv -L../libmythui
-LIBS += -L../../external/FFmpeg/libavutil
+LIBS += -L../libmythupnp -L../libmythservicecontracts -L../libmythfreemheg
+LIBS += -L../libmythlivemedia -L../libmythhdhomerun
+LIBS += -L../../external/FFmpeg/libavutil -L../../external/FFmpeg/libavcodec
+LIBS += -L../../external/FFmpeg/libavformat -L../../external/FFmpeg/libswscale
 LIBS += -lmythbase-$$LIBVERSION -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION
-LIBS += -lmythtv-$$LIBVERSION
-LIBS += -lmythavutil
+LIBS += -lmythtv-$$LIBVERSION -lmythupnp-$$LIBVERSION
+LIBS += -lmythservicecontracts-$$LIBVERSION -lmythfreemheg-$$LIBVERSION
+LIBS += -lmythlivemedia-$$LIBVERSION -lmythhdhomerun-$$LIBVERSION
+LIBS += -lmythavutil -lmythavcodec -lmythavformat -lmythswscale
 LIBS += $$EXTRA_LIBS $$LATE_LIBS $$QMAKE_LIBS_DYNLOAD
 
 inc.path = $${PREFIX}/include/mythtv/protoserver
