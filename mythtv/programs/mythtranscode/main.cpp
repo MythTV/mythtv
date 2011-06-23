@@ -412,7 +412,7 @@ int main(int argc, char *argv[])
         return QueueTranscodeJob(pginfo, profilename, hostname, useCutlist);
     }
 
-    if (infile.left(7) == "myth://" && (outfile.isNull() || outfile != "-"))
+    if (infile.left(7) == "myth://" && (outfile.isNull() || outfile != "-") && fifodir.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, QString("Attempted to transcode %1. "
                "Mythtranscode is currently unable to transcode remote "
@@ -421,7 +421,7 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_REMOTE_FILE;
     }
 
-    if (outfile.isNull() && !build_index)
+    if (outfile.isNull() && !build_index && fifodir.isEmpty())
         outfile = infile + ".tmp";
 
     if (jobID >= 0)
