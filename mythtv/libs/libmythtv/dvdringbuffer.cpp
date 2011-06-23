@@ -1245,9 +1245,7 @@ AVSubtitle *DVDRingBuffer::GetMenuSubtitle(uint &version)
     // this is unlocked by ReleaseMenuButton
     m_menuBtnLock.lock();
 
-    if ((m_menuBuflength > 4) && m_buttonExists && (NumMenuButtons() > 0) &&
-        (m_dvdMenuButton.rects[0]->h >= m_hl_button.height()) &&
-        (m_dvdMenuButton.rects[0]->w >= m_hl_button.width()))
+    if ((m_menuBuflength > 4) && m_buttonExists && (NumMenuButtons() > 0))
     {
         version = m_buttonVersion;
         return &(m_dvdMenuButton);
@@ -1270,15 +1268,8 @@ QRect DVDRingBuffer::GetButtonCoords(void)
     if (!m_buttonExists)
         return rect;
 
-    int x1, y1;
-    int x = 0; int y = 0;
-    x1 = m_dvdMenuButton.rects[0]->x;
-    y1 = m_dvdMenuButton.rects[0]->y;
-    if (m_hl_button.x() > x1)
-        x = m_hl_button.x() - x1;
-    if (m_hl_button.y() > y1)
-        y  = m_hl_button.y() - y1;
-    rect.setRect(x, y, m_hl_button.width(), m_hl_button.height());
+    rect.setRect(m_hl_button.x(), m_hl_button.y(), m_hl_button.width(),
+                 m_hl_button.height());
 
     return rect;
 }

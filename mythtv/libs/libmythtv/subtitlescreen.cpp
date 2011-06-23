@@ -560,7 +560,9 @@ void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
         VERBOSE(VB_PLAYBACK, LOC + "Added DVD button background");
     }
 
-    QImage fg_image = bg_image.copy(buttonPos);
+    // copy button region of background image
+    QRect fg_rect(buttonPos.translated(-hl_button->x, -hl_button->y));
+    QImage fg_image = bg_image.copy(fg_rect);
     QVector<unsigned int> fg_palette;
     uint32_t *fgpalette = (uint32_t *)(dvdButton->rects[1]->pict.data[1]);
     if (fgpalette)
@@ -571,9 +573,8 @@ void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
     }
 
     // scale highlight image to match OSD size, if required
-    QRect button = buttonPos.adjusted(0, 2, 0, 0);
     fg_image = fg_image.convertToFormat(QImage::Format_ARGB32);
-    AddScaledImage(fg_image, button);
+    AddScaledImage(fg_image, buttonPos);
 }
 
 void SubtitleScreen::DisplayCC608Subtitles(void)
