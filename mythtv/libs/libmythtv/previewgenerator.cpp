@@ -244,6 +244,9 @@ bool PreviewGenerator::Run(void)
         if (logPropagate())
             command += QString(" --logpath %1").arg(logPropPath());
 
+        command += QString(" --verbose %1").arg(logPropMask());
+        command += QString(" --loglevel %1").arg(logPropLevel());
+
         // Timeout in 30s
         uint ret = myth_system(command, kMSDontBlockInputDevs |
                                         kMSDontDisableDrawing |

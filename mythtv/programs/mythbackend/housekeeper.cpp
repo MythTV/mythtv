@@ -424,6 +424,8 @@ void HouseKeeper::RunMFD(void)
 
     if (logPropagate())
         command += QString(" --logpath %1").arg(logPropPath());
+    command += QString(" --verbose %1").arg(logPropMask());
+    command += QString(" --loglevel %1").arg(logPropLevel());
 
     if (mflog.length())
     {

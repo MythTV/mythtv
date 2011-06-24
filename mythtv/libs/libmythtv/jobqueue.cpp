@@ -1882,12 +1882,14 @@ void JobQueue::DoTranscodeThread(int jobID)
     if (runningJobs[jobID].command == "mythtranscode")
     {
         path = GetInstallPrefix() + "/bin/mythtranscode";
-        QByteArray parg = profilearg.toAscii();
-        command = QString("%1 -j %2 -V %3 -p %4 %5")
-          .arg(path).arg(jobID).arg(verboseMask)
-          .arg(parg.constData()).arg(useCutlist ? "--honorcutlist" : "");
+        command = QString("%1 -j %2 --profile %3")
+                  .arg(path).arg(jobID).arg(profilearg);
+        if (useCutlist)
+            command += " --honorcutlist";
         if (logPropagate())
             command += QString(" --logpath %1").arg(logPropPath());
+        command += QString(" --verbose %1").arg(logPropMask());
+        command += QString(" --loglevel %1").arg(logPropLevel());
     }
     else
     {
@@ -2124,10 +2126,12 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
     if (runningJobs[jobID].command == "mythcommflag")
     {
         path = GetInstallPrefix() + "/bin/mythcommflag";
-        command = QString("%1 -j %2 -V %3 --noprogress")
-                          .arg(path).arg(jobID).arg(verboseMask);
+        command = QString("%1 -j %2 --noprogress")
+                          .arg(path).arg(jobID);
         if (logPropagate())
             command += QString(" --logpath %1").arg(logPropPath());
+        command += QString(" --verbose %1").arg(logPropMask());
+        command += QString(" --loglevel %1").arg(logPropLevel());
     }
     else
     {

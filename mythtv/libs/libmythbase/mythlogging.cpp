@@ -760,9 +760,26 @@ bool logPropagate(void)
     return logPropagateFlag;
 }
 
-QString &logPropPath(void)
+QString logPropPath(void)
 {
     return logPropagatePath;
+}
+
+QString logPropMask(void)
+{
+    QString mask = verboseString.trimmed();
+    mask.replace(QRegExp(" "), ",");
+    mask.remove(QRegExp("^,"));
+
+    return mask;
+}
+
+QString logPropLevel(void)
+{
+    QString name = QString(LogLevelNames[logLevel]).toLower();
+    name.remove(0, 4);
+
+    return name;
 }
 
 void logStart(QString logfile, int quiet, int facility, LogLevel_t level,
