@@ -9,6 +9,7 @@
 // c
 //#include <assert.h>
 //#include "iostream"
+#include <string>
 
 // qt
 #include <QPair>
