@@ -536,9 +536,9 @@ void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
     QImage bg_image(hl_button->pict.data[0], w, h, w, QImage::Format_Indexed8);
     uint32_t *bgpalette = (uint32_t *)(hl_button->pict.data[1]);
 
-    QVector<unsigned int> bg_palette;
-    for (int i = 0; i < AVPALETTE_COUNT; i++)
-        bg_palette.push_back(bgpalette[i]);
+    QVector<unsigned int> bg_palette(16);
+    for (int i = 0; i < 16; i++)
+        bg_palette.append(bgpalette[i]);
     bg_image.setColorTable(bg_palette);
 
     // copy button region of background image
