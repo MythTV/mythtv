@@ -853,6 +853,8 @@ void RingBuffer::run(void)
 
         int used = bufferSize - ReadBufFree();
 
+        bool reads_were_allowed = readsallowed;
+
         if ((0 == read_return) || (numfailures > 5) ||
             (readsallowed != (used >= fill_min || ateof ||
                               setswitchtonext || commserror)))
@@ -909,7 +911,7 @@ void RingBuffer::run(void)
         else
         {
             // yield if we have nothing to do...
-            if (!request_pause &&
+            if (!request_pause && reads_were_allowed &&
                 (used >= fill_threshold || ateof || setswitchtonext))
             {
                 generalWait.wait(&rwlock, 50);
