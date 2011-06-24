@@ -21,7 +21,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "htmlserver.h"
 
 #include <QFileInfo>

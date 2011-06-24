@@ -17,7 +17,6 @@
 
 #include <sstream>
 
-#include "mythverbose.h"
 #include "mythlogging.h"
 
 AppleRemote*      AppleRemote::_instance = 0;

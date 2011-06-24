@@ -6,7 +6,7 @@
 #include "storagegroup.h"
 #include "mythcorecontext.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythcoreutil.h"
 #include "mythdirs.h"
 

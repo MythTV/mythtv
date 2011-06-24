@@ -22,7 +22,7 @@ using namespace std;
 #include "mythuihelper.h"
 #include "x11colors.h"
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #ifdef USING_MINGW
 #undef LoadImage

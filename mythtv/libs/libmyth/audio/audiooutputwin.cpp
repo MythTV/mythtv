@@ -2,7 +2,7 @@
 
 using namespace std;
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "audiooutputwin.h"
 
 #include <windows.h>

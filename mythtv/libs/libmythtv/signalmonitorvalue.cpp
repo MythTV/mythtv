@@ -2,7 +2,7 @@
 using namespace std;
 
 #include "signalmonitorvalue.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 bool SignalMonitorValue::run_static_init = true;
 QStringList SignalMonitorValue::ERROR_NO_CHANNEL;

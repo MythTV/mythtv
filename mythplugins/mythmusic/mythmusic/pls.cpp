@@ -17,7 +17,7 @@
 #include <QMap>
 
 // mythtv
-#include <mythverbose.h>
+#include <mythlogging.h>
 
 // mythmusic
 #include "pls.h"

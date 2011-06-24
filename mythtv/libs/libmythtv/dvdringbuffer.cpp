@@ -10,7 +10,7 @@
 
 #include "mythdvdplayer.h"
 #include "compat.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythuihelper.h"
 
 #define LOC      QString("DVDRB: ")

@@ -4,7 +4,7 @@
 
 #include <cmath>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythdb.h"
 #include "mythdisplay.h"
 #include "mythxdisplay.h"

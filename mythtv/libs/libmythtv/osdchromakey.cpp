@@ -11,7 +11,7 @@
 #include "osd.h"
 #include "osdchromakey.h"
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "videoout_xv.h"
 #include "mythxdisplay.h"
 

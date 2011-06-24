@@ -39,7 +39,7 @@
 
 // MythTV headers
 #include "mmulticastsocketdevice.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #define LOC      (QString("MMulticastSocketDevice(%1:%2): ") \
                   .arg(m_address.toString()).arg(socket()))

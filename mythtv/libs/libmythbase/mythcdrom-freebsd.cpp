@@ -4,7 +4,7 @@
 
 #include "mythcdrom.h"
 #include "mythcdrom-freebsd.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 
 #define ASSUME_WANT_AUDIO 1

@@ -3,7 +3,7 @@
  */
 
 // MythTV includes
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mpegtables.h"
 #include "asichannel.h"
 

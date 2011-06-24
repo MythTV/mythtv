@@ -10,7 +10,7 @@
 #include <QDomDocument>
 
 // libmythbase headers
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythdb.h"
 
 // MythUI headers

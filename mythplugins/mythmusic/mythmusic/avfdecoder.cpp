@@ -27,8 +27,7 @@
 #include <mythconfig.h>
 #include <mythcontext.h>
 #include <audiooutput.h>
-#include <mythverbose.h>
-#include "mythlogging.h"
+#include <mythlogging.h>
 
 using namespace std;
 

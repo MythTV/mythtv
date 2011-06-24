@@ -7,7 +7,7 @@
 #include <QString>
 #include "mpegtables.h"
 #include "atscdescriptors.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 // Some sample code is in pcHDTV's dtvscan.c,
 // accum_sect/dequeue_buf/atsc_tables.  We should stuff

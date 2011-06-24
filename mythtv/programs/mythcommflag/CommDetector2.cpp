@@ -16,7 +16,7 @@ using namespace std;
 // MythTV headers
 #include "compat.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythplayer.h"
 #include "programinfo.h"
 #include "channelutil.h"

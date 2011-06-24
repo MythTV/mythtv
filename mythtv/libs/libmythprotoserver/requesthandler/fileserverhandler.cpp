@@ -9,7 +9,7 @@ using namespace std;
 #include "mythdb.h"
 #include "ringbuffer.h"
 #include "mythsocket.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "programinfo.h"
 #include "storagegroup.h"
 #include "mythcorecontext.h"

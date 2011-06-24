@@ -24,7 +24,6 @@
 #include <algorithm>
 
 #include "upnp.h"
-#include "mythverbose.h"
 #include "mythlogging.h"
 
 #include "upnptasksearch.h"

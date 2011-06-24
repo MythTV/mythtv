@@ -22,7 +22,7 @@ using namespace std;
 #include <QDir>
 
 #include "oldsettings.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 Settings::Settings(QString strSettingsFile)
 {

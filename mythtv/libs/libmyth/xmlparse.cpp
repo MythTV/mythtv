@@ -17,7 +17,7 @@ using namespace std;
 #include "mythfontproperties.h"
 #include "mythuihelper.h"
 #include "x11colors.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythcorecontext.h"
 
 #ifdef USING_MINGW

@@ -63,7 +63,7 @@ using namespace std;
 
 #include "osd.h"
 #include "mythconfig.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "videodisplayprofile.h"
 
 #define LOC     QString("VideoOutputQuartz::")

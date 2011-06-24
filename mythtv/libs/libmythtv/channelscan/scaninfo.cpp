@@ -8,7 +8,7 @@
 #include "mythdb.h"
 #include "scaninfo.h"
 #include "mythdbcon.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 ScanInfo::ScanInfo() : scanid(0), cardid(0), sourceid(0), processed(false) { }
 

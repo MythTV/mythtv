@@ -34,7 +34,7 @@
 #include "upnp.h"
 #include "compat.h"
 #include "mythconfig.h" // for HAVE_GETIFADDRS
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 // POSIX headers 2, needs to be after compat.h for OS X
 #ifndef USING_MINGW

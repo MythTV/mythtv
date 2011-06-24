@@ -6,7 +6,7 @@
 using namespace std;
 
 #include "managedlist.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "xmlparse.h"
 #include "mythfontproperties.h"
 

@@ -36,7 +36,7 @@
 
 // MythTV headers
 #include "msocketdevice.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "compat.h"
 
 /////////////////////////////////////////////////////////////////////////////

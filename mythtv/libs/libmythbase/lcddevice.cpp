@@ -22,7 +22,7 @@
 
 // MythTV headers
 #include "lcddevice.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "compat.h"
 #include "mythdb.h"
 #include "mythdirs.h"

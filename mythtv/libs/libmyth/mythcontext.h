@@ -7,7 +7,7 @@
 #include "mythcorecontext.h"
 #include "mythevent.h"
 #include "mythexp.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 class MythPluginManager;
 class MythContextPrivate;

@@ -29,7 +29,7 @@ using namespace std;
 #include "mythwidgets.h"
 #include "mythcontext.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "DisplayRes.h"
 #include "mythuihelper.h"
 

@@ -25,7 +25,6 @@
 // MythTV
 #include "mythsocketthread.h"
 #include "mythbaseutil.h"
-#include "mythverbose.h"
 #include "mythlogging.h"
 #include "mythsocket.h"
 

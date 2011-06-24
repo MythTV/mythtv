@@ -53,7 +53,6 @@ using namespace std;
 #include "NuppelVideoRecorder.h"
 #include "tv_play.h"
 #include "interactivetv.h"
-#include "mythverbose.h"
 #include "myth_imgconvert.h"
 #include "mythsystemevent.h"
 #include "mythpainter.h"

@@ -1,6 +1,6 @@
 #include <QFontMetrics>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythfontproperties.h"
 #include "mythuitext.h"
 #include "mythuishape.h"

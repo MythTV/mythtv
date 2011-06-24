@@ -6,7 +6,7 @@ using namespace std;
 #include <QTimer>
 #include <QFile>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "compat.h"
 #include "mcodecs.h"
 #include "httpcomms.h"

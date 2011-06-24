@@ -20,7 +20,6 @@ using namespace std;
 #include "mythdialogs.h"
 #include "mythconfig.h"
 #include "mythdialogbox.h"
-#include "mythverbose.h"
 #include "util.h"
 #include "mythlogging.h"
 

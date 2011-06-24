@@ -1,4 +1,4 @@
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythuieditbar.h"
 
 MythUIEditBar::MythUIEditBar(MythUIType *parent, const QString &name)

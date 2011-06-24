@@ -1,4 +1,4 @@
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "CommDetector2.h"
 #include "FrameAnalyzer.h"
 

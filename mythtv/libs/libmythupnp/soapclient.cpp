@@ -25,7 +25,7 @@
 
 #include "soapclient.h"
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "httprequest.h"
 
 #define LOC      QString("SOAPClient: ")

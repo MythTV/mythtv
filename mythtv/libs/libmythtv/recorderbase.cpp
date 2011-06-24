@@ -17,7 +17,7 @@ using namespace std;
 #include "dvbrecorder.h"
 #include "hdhrchannel.h"
 #include "iptvchannel.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "programinfo.h"
 #include "asichannel.h"
 #include "dtvchannel.h"

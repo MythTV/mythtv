@@ -16,7 +16,7 @@
 #include "filter.h"
 #include "frame.h"
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #include "../mm_arch.h"
 

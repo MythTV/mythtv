@@ -18,7 +18,6 @@ using namespace std;
 #include "referencecounter.h"
 #include "mythcorecontext.h"
 #include "mythconfig.h"
-#include "mythverbose.h"
 #include "mythversion.h"
 #include "mythlogging.h"
 

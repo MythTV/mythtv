@@ -1,7 +1,7 @@
 #include <QTextCodec>
 
 #include "mythcorecontext.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "ssdp.h"
 #include "upnpscanner.h"
 

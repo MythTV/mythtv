@@ -8,7 +8,7 @@ using std::min;
 #include <QMap>
 #include <QMutex>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythrender_d3d9.h"
 
 #define DXVA2_E_NEW_VIDEO_DEVICE MAKE_HRESULT(1, 4, 4097)

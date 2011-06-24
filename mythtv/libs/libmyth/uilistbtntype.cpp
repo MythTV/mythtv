@@ -27,7 +27,7 @@ using namespace std;
 #include <QPixmap>
 #include <QPainter>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "lcddevice.h"
 
 #include "uilistbtntype.h"

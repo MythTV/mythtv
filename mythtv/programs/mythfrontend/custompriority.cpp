@@ -6,7 +6,7 @@
 
 // libmythbase
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 // libmyth
 #include "mythcorecontext.h"

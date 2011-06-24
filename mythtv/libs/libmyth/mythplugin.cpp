@@ -15,7 +15,7 @@
 
 #include "mythdirs.h"
 #include "mythversion.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 using namespace std;
 

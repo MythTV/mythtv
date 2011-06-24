@@ -5,7 +5,7 @@
 
 #include "mythdirs.h"
 #include "mythcontext.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #include "mythrssmanager.h"
 #include "netutils.h"

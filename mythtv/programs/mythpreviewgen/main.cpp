@@ -35,7 +35,6 @@ using namespace std;
 
 #include "mythcontext.h"
 #include "mythcorecontext.h"
-#include "mythverbose.h"
 #include "mythversion.h"
 #include "mythdb.h"
 #include "exitcodes.h"
@@ -201,8 +200,8 @@ int main(int argc, char **argv)
         quiet = cmdline.toUInt("quiet");
         if (quiet > 1)
         {
-            print_verbose_messages = VB_NONE;
-            parse_verbose_arg("none");
+            verboseMask = VB_NONE;
+            verboseArgParse("none");
         }
     }
 

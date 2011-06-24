@@ -8,7 +8,7 @@
 #include <QX11Info>
 
 // Mythdb headers
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythdb.h"
 
 // Mythui headers

@@ -6,7 +6,7 @@
 
 #include "streaminput.h"
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #include <QApplication>
 

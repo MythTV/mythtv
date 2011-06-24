@@ -6,7 +6,7 @@
 #include <algorithm>
 
 #include "mythcontext.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "iptvmediasink.h"
 #include "streamlisteners.h"
 

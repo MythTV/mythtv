@@ -21,7 +21,7 @@ using namespace std;
 #include "exitcodes.h"
 #include "mythconfig.h"
 #include "mythcontext.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythversion.h"
 #include "util.h"
 

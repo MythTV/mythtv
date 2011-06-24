@@ -22,7 +22,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "taskqueue.h"
-#include "mythverbose.h"
 #include "mythlogging.h"
 
 #include <QDateTime>

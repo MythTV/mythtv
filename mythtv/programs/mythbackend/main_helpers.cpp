@@ -37,7 +37,6 @@
 #include "housekeeper.h"
 
 #include "mythcontext.h"
-#include "mythverbose.h"
 #include "mythversion.h"
 #include "mythdb.h"
 #include "exitcodes.h"
@@ -430,7 +429,7 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
             sched->FillRecordListFromDB();
         }
 
-        print_verbose_messages |= VB_SCHEDULE;
+        verboseMask |= VB_SCHEDULE;
         sched->PrintList(true);
         return GENERIC_EXIT_OK;
     }

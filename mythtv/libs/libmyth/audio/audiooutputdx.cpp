@@ -3,7 +3,7 @@
 
 using namespace std;
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "audiooutputdx.h"
 
 #include <windows.h>

@@ -3,7 +3,7 @@
 #include <QSize>
 #include <QThread>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythmainwindow.h"
 #include "mythrender_vdpau.h"
 

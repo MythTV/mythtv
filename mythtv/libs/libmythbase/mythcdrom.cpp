@@ -10,7 +10,7 @@
 #elif CONFIG_DARWIN
 #include "mythcdrom-darwin.h"
 #endif
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 
 // If your DVD has directories in lowercase, then it is wrongly mounted!

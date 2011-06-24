@@ -7,7 +7,6 @@
 #include "mythcorecontext.h"
 #include "mythsystem.h"
 #include "mythsystemevent.h"
-#include "mythverbose.h"
 #include "programinfo.h"
 #include "remoteutil.h"
 #include "exitcodes.h"
@@ -216,7 +215,7 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
     }
 
     command.replace(QString("%VERBOSELEVEL%"),
-                    QString("%1").arg(print_verbose_messages));
+                    QString("%1").arg(verboseMask));
 
     VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("SubstituteMatches: AFTER : %1")
                                             .arg(command));

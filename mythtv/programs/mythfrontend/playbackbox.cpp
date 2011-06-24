@@ -22,7 +22,7 @@
 #include "mythuihelper.h"
 #include "storagegroup.h"
 #include "mythuibutton.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythuiimage.h"
 #include "programinfo.h"
 #include "mythplayer.h"

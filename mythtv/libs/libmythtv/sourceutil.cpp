@@ -7,7 +7,7 @@
 #include "sourceutil.h"
 #include "cardutil.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "util.h"
 
 bool SourceUtil::HasDigitalChannel(uint sourceid)

@@ -30,7 +30,7 @@ using namespace std;
 #include "mythdbcon.h"
 #include "mythfontproperties.h"
 #include "mythuihelper.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythcorecontext.h"
 
 #ifdef USING_MINGW

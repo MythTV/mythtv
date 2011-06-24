@@ -23,7 +23,7 @@
 #include "mythconfig.h"
 #include "mythcorecontext.h"
 #include "mythdbcon.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "dbsettings.h"
 #include "mythtranslation.h"
 #include "iso639.h"

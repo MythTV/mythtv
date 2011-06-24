@@ -19,7 +19,7 @@ using namespace std;
 
 // libmyth headers
 #include "exitcodes.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythdbcon.h"
 #include "compat.h"
 #include "util.h"

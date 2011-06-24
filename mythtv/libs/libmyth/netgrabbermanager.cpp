@@ -6,7 +6,6 @@
 
 #include "mythdirs.h"
 #include "mythcontext.h"
-#include "mythverbose.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
 #include "util.h"

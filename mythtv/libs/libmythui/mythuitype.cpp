@@ -8,7 +8,7 @@
 #include <QDomDocument>
 
 // Mythdb headers
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 // MythUI headers
 #include "mythgesture.h"

@@ -12,7 +12,7 @@ using namespace std;
 
 #include "mythdb.h"
 #include "mythdbcon.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "oldsettings.h"
 #include "mythdirs.h"
 #include "mythcorecontext.h"

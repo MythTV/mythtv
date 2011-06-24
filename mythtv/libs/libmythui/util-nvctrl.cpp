@@ -1,7 +1,7 @@
 
 #include "util-nvctrl.h"
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythdb.h"
 
 #include <stdio.h>

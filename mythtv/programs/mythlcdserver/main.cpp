@@ -17,7 +17,7 @@ using namespace std;
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythversion.h"
 #include "tv_play.h"
 #include "compat.h"
@@ -33,7 +33,7 @@ int main(int argc, char **argv)
     int  special_port = -1;
     QString startup_message = "";          // default to no startup message
     int message_time = 30;                 // time to display startup message
-    print_verbose_messages = VB_IMPORTANT; // only show important messages
+    verboseMask = VB_IMPORTANT;            // only show important messages
     QString logfile;
     int quiet = 0;
 
@@ -65,8 +65,8 @@ int main(int argc, char **argv)
         quiet = cmdline.toUInt("quiet");
         if (quiet > 1)
         {
-            print_verbose_messages = VB_NONE;
-            parse_verbose_arg("none");
+            verboseMask = VB_NONE;
+            verboseArgParse("none");
         }
     }
 

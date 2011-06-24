@@ -7,7 +7,7 @@
 #include "dirscan.h"
 #include "remoteutil.h"
 #include "mythcontext.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "videoutils.h"
 #include "storagegroup.h"
 

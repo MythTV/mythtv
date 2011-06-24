@@ -18,7 +18,7 @@
 #include "mythconfig.h"
 #include "compat.h"
 #include "mythcorecontext.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "remotefile.h"
 #include "ringbuffer.h"
 

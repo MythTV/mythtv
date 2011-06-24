@@ -2,7 +2,7 @@
 #include "bumpscope.h"
 
 #include <compat.h>
-#include <mythverbose.h>
+#include <mythlogging.h>
 
 // This was:
 // Bump Scope - Visualization Plugin for XMMS

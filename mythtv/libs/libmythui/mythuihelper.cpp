@@ -18,7 +18,7 @@
 #include <QFile>
 
 #include "mythdirs.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythdownloadmanager.h"
 #include "oldsettings.h"
 #include "screensaver.h"

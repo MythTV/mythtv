@@ -38,7 +38,7 @@ using namespace std;
 #include "compat.h"
 #include "mythdb.h"
 #include "mythdirs.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "libmythupnp/httprequest.h"    // for TestMimeType()
 #include "mythsystem.h"
 #include "exitcodes.h"

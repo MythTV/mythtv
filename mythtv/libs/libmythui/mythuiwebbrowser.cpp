@@ -26,7 +26,7 @@
 #include "mythimage.h"
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythuihelper.h"

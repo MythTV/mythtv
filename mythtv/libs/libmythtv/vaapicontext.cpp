@@ -1,5 +1,5 @@
 #include "openglvideo.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythxdisplay.h"
 #include "mythcodecid.h"
 #include "frame.h"

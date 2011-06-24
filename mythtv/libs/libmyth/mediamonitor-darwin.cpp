@@ -12,7 +12,7 @@
 #include "mythcdrom.h"
 #include "mythhdd.h"
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #include <IOKit/IOKitLib.h>
 #include <IOKit/storage/IOMedia.h>

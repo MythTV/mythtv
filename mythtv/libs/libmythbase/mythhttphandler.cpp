@@ -8,7 +8,7 @@
 // Myth headers
 #include "mythhttphandler.h"
 #include "mythhttppool.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #define LOC      QString("MythHttpHandler: ")
 #define LOC_WARN QString("MythHttpHandler, Warning: ")

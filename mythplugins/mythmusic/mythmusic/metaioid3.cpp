@@ -3,7 +3,7 @@
 #include "metadata.h"
 
 // Libmyth
-#include <mythverbose.h>
+#include <mythlogging.h>
 #include <set>
 
 const String email = "music@mythtv.org";  // TODO username/ip/hostname?

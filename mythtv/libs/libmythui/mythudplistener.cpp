@@ -3,7 +3,7 @@
 #include <QDomDocument>
 
 #include "mythcorecontext.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythmainwindow.h"
 #include "mythudplistener.h"
 

@@ -4,7 +4,7 @@
 #include "mythuibuttonlist.h"
 
 // Myth headers
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 class SortableMythGenericTreeList : public QList<MythGenericTree*>
 {

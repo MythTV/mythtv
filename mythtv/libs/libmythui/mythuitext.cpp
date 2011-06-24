@@ -8,7 +8,7 @@
 #include <QString>
 #include <QHash>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #include "mythuihelper.h"
 #include "mythpainter.h"

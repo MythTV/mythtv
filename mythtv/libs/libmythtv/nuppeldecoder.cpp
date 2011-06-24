@@ -19,7 +19,7 @@ using namespace std;
 #include "nuppeldecoder.h"
 #include "mythplayer.h"
 #include "remoteencoder.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "myth_imgconvert.h"
 #include "programinfo.h"
 

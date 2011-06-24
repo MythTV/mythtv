@@ -63,7 +63,6 @@ using namespace std;
 #include <mythconfig.h>
 #include <mythsystem.h>
 #include <util.h>
-#include <mythverbose.h>
 #include <mythlogging.h>
 
 extern "C" {
@@ -979,9 +978,10 @@ int NativeArchive::exportVideo(QDomElement   &itemNode,
 
     if (!query.exec())
     {
-        print_verbose_messages = VB_JOBQUEUE + VB_IMPORTANT;
+        // TODO: why are we doing this?
+        verboseMask = VB_JOBQUEUE + VB_IMPORTANT;
         MythDB::DBError("select countries", query);
-        print_verbose_messages = VB_JOBQUEUE;
+        verboseMask = VB_JOBQUEUE;
     }
 
     if (query.isActive() && query.size())
@@ -1008,9 +1008,9 @@ int NativeArchive::exportVideo(QDomElement   &itemNode,
 
     if (!query.exec())
     {
-        print_verbose_messages = VB_JOBQUEUE + VB_IMPORTANT;
+        verboseMask = VB_JOBQUEUE + VB_IMPORTANT;
         MythDB::DBError("select genres", query);
-        print_verbose_messages = VB_JOBQUEUE;
+        verboseMask = VB_JOBQUEUE;
     }
 
     if (query.isActive() && query.size())
@@ -1264,9 +1264,9 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
         VERBOSE(VB_JOBQUEUE, "Inserted recorded details into database");
     else
     {
-        print_verbose_messages = VB_JOBQUEUE + VB_IMPORTANT;
+        verboseMask = VB_JOBQUEUE + VB_IMPORTANT;
         MythDB::DBError("recorded insert", query);
-        print_verbose_messages = VB_JOBQUEUE;
+        verboseMask = VB_JOBQUEUE;
     }
 
     // copy recordedmarkup to db
@@ -1302,7 +1302,7 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
 
                 if (!query.exec())
                 {
-                    print_verbose_messages = VB_JOBQUEUE + VB_IMPORTANT;
+                    verboseMask = VB_JOBQUEUE + VB_IMPORTANT;
                     MythDB::DBError("recordedmark insert", query);
                     return 1;
                 }
@@ -1345,7 +1345,7 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
 
                 if (!query.exec())
                 {
-                    print_verbose_messages = VB_JOBQUEUE + VB_IMPORTANT;
+                    verboseMask = VB_JOBQUEUE + VB_IMPORTANT;
                     MythDB::DBError("recordedseek insert", query);
                     return 1;
                 }
@@ -1458,9 +1458,9 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
         VERBOSE(VB_JOBQUEUE, "Inserted videometadata details into database");
     else
     {
-        print_verbose_messages = VB_JOBQUEUE + VB_IMPORTANT;
+        verboseMask = VB_JOBQUEUE + VB_IMPORTANT;
         MythDB::DBError("videometadata insert", query);
-        print_verbose_messages = VB_JOBQUEUE;
+        verboseMask = VB_JOBQUEUE;
         return 1;
     }
 
@@ -1474,9 +1474,9 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
     }
     else
     {
-        print_verbose_messages = VB_JOBQUEUE + VB_IMPORTANT;
+        verboseMask = VB_JOBQUEUE + VB_IMPORTANT;
         MythDB::DBError("Failed to get intid", query);
-        print_verbose_messages = VB_JOBQUEUE;
+        verboseMask = VB_JOBQUEUE;
         return 1;
     }
 
@@ -1748,9 +1748,9 @@ static void clearArchiveTable(void)
 
     if (!query.exec())
     {
-        print_verbose_messages = VB_JOBQUEUE + VB_IMPORTANT;
+        verboseMask = VB_JOBQUEUE + VB_IMPORTANT;
         MythDB::DBError("delete archiveitems", query);
-        print_verbose_messages = VB_JOBQUEUE;
+        verboseMask = VB_JOBQUEUE;
     }
 }
 
@@ -2588,7 +2588,7 @@ int main(int argc, char **argv)
     int quiet = 0;
 
     // by default we only output our messages
-    print_verbose_messages = VB_JOBQUEUE;
+    verboseMask = VB_JOBQUEUE;
 
     MythArchiveHelperCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
@@ -2614,7 +2614,7 @@ int main(int argc, char **argv)
     QCoreApplication::setApplicationName("mytharchivehelper");
 
     if (cmdline.toBool("verbose"))
-        if (parse_verbose_arg(cmdline.toString("verbose")) ==
+        if (verboseArgParse(cmdline.toString("verbose")) ==
                     GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
 
@@ -2623,8 +2623,8 @@ int main(int argc, char **argv)
         quiet = cmdline.toUInt("quiet");
         if (quiet > 1)
         {
-            print_verbose_messages = VB_NONE;
-            parse_verbose_arg("none");
+            verboseMask = VB_NONE;
+            verboseArgParse("none");
         }
     }
 

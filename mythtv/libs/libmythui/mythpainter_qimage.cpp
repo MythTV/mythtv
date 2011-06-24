@@ -8,7 +8,7 @@
 
 // MythDB headers
 #include "compat.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 MythQImagePainter::MythQImagePainter() :
     MythPainter(), painter(NULL), copy(false)

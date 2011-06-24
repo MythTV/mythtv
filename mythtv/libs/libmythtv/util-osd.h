@@ -1,7 +1,7 @@
 #ifndef UTIL_OSD_H
 #define UTIL_OSD_H
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythimage.h"
 #include "frame.h"
 

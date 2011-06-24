@@ -9,7 +9,7 @@
 
 // MythTV headers
 #include "mythdbcon.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "diseqcsettings.h"
 
 /* Lat/Long items relocated from videosource.cpp */

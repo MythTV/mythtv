@@ -19,7 +19,7 @@
  * 02110-1301, USA.
  */
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "audioinputalsa.h"
 
 #define LOC     QString("AudioInALSA: ")

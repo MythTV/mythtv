@@ -1,7 +1,7 @@
 // Based upon CDVDVideoCodecVDA from the xbmc project, originally written by
 // Scott Davilla (davilla@xbmc.org) and released under the GPLv2
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #define LOC QString("VDADec: ")
 #define ERR QString("VDADec error: ")
 

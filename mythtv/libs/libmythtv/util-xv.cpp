@@ -7,7 +7,7 @@
 using namespace std;
 
 // MythTH headers
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythxdisplay.h"
 #include "util-xv.h"
 

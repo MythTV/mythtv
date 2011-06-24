@@ -33,7 +33,7 @@ using namespace std;
 #include "teletextdecoder.h"
 #include "teletextreader.h"
 #include "vbilut.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 /** \fn TeletextDecoder::Decode(const unsigned char*, int)
  *  \brief Decodes teletext data

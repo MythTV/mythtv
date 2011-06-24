@@ -12,7 +12,7 @@ extern "C" {
 }
 #include "fourcc.h"
 #include "compat.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #define TRY_LOCK_SPINS                 100
 #define TRY_LOCK_SPINS_BEFORE_WARNING   10

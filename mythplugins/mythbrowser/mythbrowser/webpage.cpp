@@ -6,7 +6,7 @@
 #include <QIcon>
 
 // myth
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "libmythui/mythmainwindow.h"
 
 // mythbrowser

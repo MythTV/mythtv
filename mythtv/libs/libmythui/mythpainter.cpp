@@ -5,7 +5,7 @@
 #include <QPainter>
 
 // libmythbase headers
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 // libmythui headers
 #include "mythfontproperties.h"

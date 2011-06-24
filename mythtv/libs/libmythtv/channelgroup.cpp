@@ -2,7 +2,7 @@
 #include <algorithm>
 
 // mythtv
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythdb.h"
 #include "channelgroup.h"
 

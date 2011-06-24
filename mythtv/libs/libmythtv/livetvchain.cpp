@@ -1,7 +1,7 @@
 #include "livetvchain.h"
 #include "mythcontext.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "programinfo.h"
 #include "mythsocket.h"
 #include "cardutil.h"

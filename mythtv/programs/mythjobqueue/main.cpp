@@ -23,7 +23,6 @@
 #include "mythcontext.h"
 #include "jobqueue.h"
 #include "mythdbcon.h"
-#include "mythverbose.h"
 #include "mythversion.h"
 #include "mythcommandlineparser.h"
 #include "compat.h"
@@ -105,7 +104,7 @@ int main(int argc, char *argv[])
     QString filename;
 
     if (cmdline.toBool("verbose"))
-        if (parse_verbose_arg(cmdline.toString("verbose")) ==
+        if (verboseArgParse(cmdline.toString("verbose")) ==
                 GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
 
@@ -114,8 +113,8 @@ int main(int argc, char *argv[])
         quiet = cmdline.toUInt("quiet");
         if (quiet > 1)
         {
-            print_verbose_messages = VB_NONE;
-            parse_verbose_arg("none");
+            verboseMask = VB_NONE;
+            verboseArgParse("none");
         }
     }
 

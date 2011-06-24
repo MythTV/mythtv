@@ -18,7 +18,7 @@
  * 02110-1301, USA.
  */
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythconfig.h"
 #include "audioinput.h"
 #include "audioinputoss.h"

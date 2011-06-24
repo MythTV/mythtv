@@ -24,7 +24,7 @@ using namespace std;
 
 // MythTV
 #include <compat.h>
-#include <mythverbose.h>
+#include <mythlogging.h>
 
 // MythMusic
 #include "mainvisual.h"

@@ -1,7 +1,7 @@
 #include <algorithm>
 using namespace std;
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythrender_opengl.h"
 #include "mythxdisplay.h"
 

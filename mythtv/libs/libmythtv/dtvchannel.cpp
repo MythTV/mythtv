@@ -8,7 +8,7 @@ using namespace std;
 #include "cardutil.h"
 #include "dtvchannel.h"
 #include "mpegtables.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #define LOC QString("DTVChan(%1): ").arg(GetDevice())
 #define LOC_WARN QString("DTVChan(%1) Warning: ").arg(GetDevice())

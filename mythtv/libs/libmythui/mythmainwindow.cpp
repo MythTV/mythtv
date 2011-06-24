@@ -37,7 +37,7 @@ using namespace std;
 
 // libmythbase headers
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythevent.h"
 #include "mythdirs.h"
 #include "compat.h"

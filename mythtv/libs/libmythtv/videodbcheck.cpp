@@ -9,7 +9,7 @@
 #include "videodbcheck.h"
 #include "mythdb.h"
 #include "mythcorecontext.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "remotefile.h"
 #include "util.h"
 #include "libmythmetadata/videoutils.h"

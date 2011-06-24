@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "config.h" // for CONFIG_DARWIN
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythuihelper.h"
 
 #ifdef USING_X11

@@ -7,7 +7,7 @@
 #include <QGLWidget>
 
 // libmythbase headers
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 // Mythui headers
 #include "mythrender_opengl.h"

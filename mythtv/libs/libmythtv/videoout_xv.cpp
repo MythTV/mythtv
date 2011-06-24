@@ -37,7 +37,7 @@ using namespace std;
 
 // MythTV General headers
 #include "mythcorecontext.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "filtermanager.h"
 #include "videodisplayprofile.h"
 #define IGNORE_TV_PLAY_REC

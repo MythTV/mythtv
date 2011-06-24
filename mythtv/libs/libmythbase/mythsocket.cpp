@@ -23,7 +23,7 @@
 #include "mythsocket.h"
 #include "mythevent.h"
 #include "mythversion.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythcorecontext.h"
 
 #define SLOC(a) QString("MythSocket(%1:%2): ")\

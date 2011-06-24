@@ -24,7 +24,7 @@
 #include "upnp.h"
 #include "upnpdevice.h"
 #include "httpcomms.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 // MythDB
 #include "mythdb.h"

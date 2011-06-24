@@ -26,7 +26,6 @@
 // libmythbase headers
 #include "mythcorecontext.h"
 #include "mythevent.h"
-#include "mythverbose.h"
 #include "exitcodes.h"
 #include "mythlogging.h"
 

@@ -8,7 +8,7 @@
 #include "util.h"
 
 #include "mythtimer.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
 #include "mythdb.h"

@@ -1,6 +1,6 @@
 
 #include "mythcorecontext.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythuibutton.h"
 #include "mythuibuttonlist.h"
 #include "mythuitext.h"

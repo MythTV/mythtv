@@ -6,13 +6,12 @@
 #include <QFontInfo>
 #include <QRect>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythdb.h"
 
 #include "mythuihelper.h"
 #include "mythmainwindow.h"
 #include "xmlparsebase.h"
-#include "mythverbose.h"
 
 #define LOC      QString("MythFontProperties: ")
 #define LOC_WARN QString("MythFontProperties, Warning: ")

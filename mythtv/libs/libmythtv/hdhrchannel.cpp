@@ -22,7 +22,7 @@ using namespace std;
 
 // MythTV includes
 #include "mythdbcon.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "hdhrchannel.h"
 #include "videosource.h"
 #include "channelutil.h"

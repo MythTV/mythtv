@@ -13,7 +13,7 @@
 #include "mythwidgets.h"
 #include "mythwizard.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 class QWidget;
 

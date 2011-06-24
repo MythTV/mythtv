@@ -42,7 +42,7 @@
 ****************************************************************************/
 
 #include "qplatformdefs.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 // Almost always the same. If not, specify in qplatformdefs.h.
 #if !defined(QT_SOCKOPTLEN_T)

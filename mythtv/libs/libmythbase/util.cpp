@@ -43,7 +43,7 @@ using namespace std;
 // Myth headers
 #include "mythcorecontext.h"
 #include "exitcodes.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "msocketdevice.h"
 #include "mythsocket.h"
 #include "mythcoreutil.h"

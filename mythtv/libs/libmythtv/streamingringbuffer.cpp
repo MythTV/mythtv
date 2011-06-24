@@ -1,4 +1,4 @@
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #include "streamingringbuffer.h"
 

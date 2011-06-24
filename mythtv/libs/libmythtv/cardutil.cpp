@@ -20,7 +20,7 @@
 #include "diseqcsettings.h"
 #include "sourceutil.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"

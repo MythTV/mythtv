@@ -1,7 +1,7 @@
 
 #include "DisplayRes.h"
 #include "config.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythdb.h"
 
 #ifdef USING_XRANDR

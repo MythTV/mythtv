@@ -26,7 +26,7 @@
 
 #include <QString>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "upnp.h"
 
 /////////////////////////////////////////////////////////////////////////////

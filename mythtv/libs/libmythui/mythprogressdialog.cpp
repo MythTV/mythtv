@@ -1,6 +1,6 @@
 // MythTV headers
 #include "mythprogressdialog.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 QEvent::Type ProgressUpdateEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();

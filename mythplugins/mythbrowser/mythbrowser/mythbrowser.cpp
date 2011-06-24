@@ -5,7 +5,7 @@
 #include <QEvent>
 
 // myth
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythcontext.h"
 #include "mythmainwindow.h"
 #include "mythuihelper.h"

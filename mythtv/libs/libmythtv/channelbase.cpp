@@ -28,7 +28,7 @@ using namespace std;
 #include "frequencies.h"
 #include "hdhrchannel.h"
 #include "iptvchannel.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "asichannel.h"
 #include "dtvchannel.h"
 #include "dvbchannel.h"

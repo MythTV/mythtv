@@ -6,7 +6,7 @@
 #include "virtualkeyboard_qt.h"
 #include "mythdialogs.h"
 #include "uitypes.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythcorecontext.h"
 
 #include "mythfontproperties.h"

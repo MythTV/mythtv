@@ -43,7 +43,6 @@
 #include <linux/joystick.h>
 
 // Myth headers
-#include "mythverbose.h"
 #include "mythlogging.h"
 
 // Mythui headers

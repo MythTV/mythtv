@@ -4,10 +4,10 @@
 #include <stdint.h>
 
 /// This file gets included in two different ways:
-/// 1) from mythverbose.h from nearly every file.  This will define the 
+/// 1) from mythlogging.h from nearly every file.  This will define the 
 ///    VerboseMask enum
 /// 2) specifically (and a second include with _IMPLEMENT_VERBOSE defined) from
-///    mythverbose.cpp.  This is done in verboseInit (in the middle of the
+///    mythlogging.cpp.  This is done in verboseInit (in the middle of the
 ///    function) as it will expand out to a series of calls to verboseAdd()
 ///    to fill the verboseMap.
 ///
@@ -19,7 +19,7 @@
 ///
 /// To create a new VB_* flag, this is the only piece of code you need to
 /// modify, then you can start using the new flag and it will automatically be
-/// processed by the parse_verbose_arg() function and help info printed when
+/// processed by the verboseArgParse() function and help info printed when
 /// "-v help" is used.
 
 #undef VERBOSE_PREAMBLE
@@ -28,7 +28,7 @@
 
 #ifdef _IMPLEMENT_VERBOSE
 
-// This is used to actually implement the mask in mythverbose.cpp
+// This is used to actually implement the mask in mythlogging.cpp
 #define VERBOSE_PREAMBLE
 #define VERBOSE_POSTAMBLE
 #define VERBOSE_MAP(name,mask,additive,help) \

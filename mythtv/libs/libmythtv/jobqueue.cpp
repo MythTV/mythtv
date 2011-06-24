@@ -26,7 +26,6 @@ using namespace std;
 
 #include "mythdb.h"
 #include "mythdirs.h"
-#include "mythverbose.h"
 #include "mythlogging.h"
 
 #ifndef O_STREAMING
@@ -1768,7 +1767,7 @@ QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
         tmpInfo->SubstituteMatches(command);
 
         command.replace("%VERBOSELEVEL%",
-                        QString("%1").arg(print_verbose_messages));
+                        QString("%1").arg(verboseMask));
 
         uint transcoder = tmpInfo->QueryTranscoderID();
         command.replace("%TRANSPROFILE%",
@@ -1885,7 +1884,7 @@ void JobQueue::DoTranscodeThread(int jobID)
         path = GetInstallPrefix() + "/bin/mythtranscode";
         QByteArray parg = profilearg.toAscii();
         command = QString("%1 -j %2 -V %3 -p %4 %5")
-          .arg(path).arg(jobID).arg(print_verbose_messages)
+          .arg(path).arg(jobID).arg(verboseMask)
           .arg(parg.constData()).arg(useCutlist ? "--honorcutlist" : "");
         if (logPropagate())
             command += QString(" --logpath %1").arg(logPropPath());
@@ -2126,7 +2125,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
     {
         path = GetInstallPrefix() + "/bin/mythcommflag";
         command = QString("%1 -j %2 -V %3 --noprogress")
-                          .arg(path).arg(jobID).arg(print_verbose_messages);
+                          .arg(path).arg(jobID).arg(verboseMask);
         if (logPropagate())
             command += QString(" --logpath %1").arg(logPropPath());
     }

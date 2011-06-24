@@ -40,7 +40,7 @@
 #include "upnp.h" // only needed for Config... remove once config is moved.
 #include "compat.h"
 #include "mythdirs.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "htmlserver.h"
 
 /////////////////////////////////////////////////////////////////////////////

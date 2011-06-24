@@ -9,7 +9,7 @@
 #include "decoderbase.h"
 
 #include "mythcorecontext.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
 #include "mythxdisplay.h"

@@ -22,7 +22,7 @@
 #include "mythcorecontext.h"
 
 // libmythbase headers
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythmedia.h"

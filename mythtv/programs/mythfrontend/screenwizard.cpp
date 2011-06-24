@@ -10,7 +10,7 @@
 #include "mythcorecontext.h"
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 using namespace std;
 

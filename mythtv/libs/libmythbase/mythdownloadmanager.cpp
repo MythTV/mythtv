@@ -15,7 +15,6 @@
 #include "mythcoreutil.h"
 #include "mythdirs.h"
 #include "mythevent.h"
-#include "mythverbose.h"
 #include "mythversion.h"
 #include "remotefile.h"
 

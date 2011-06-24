@@ -6,7 +6,7 @@
 #include <QDomDocument>
 
 // libmythbase
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 // Mythui
 #include "mythpainter.h"

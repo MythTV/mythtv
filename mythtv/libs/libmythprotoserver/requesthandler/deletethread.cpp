@@ -14,7 +14,6 @@ using namespace std;
 
 #include "util.h"
 #include "mythdb.h"
-#include "mythverbose.h"
 #include "requesthandler/deletethread.h"
 #include "mythcorecontext.h"
 #include "mythlogging.h"

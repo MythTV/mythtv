@@ -6,7 +6,7 @@
 #include <QDomDocument>
 
 // Mythdb headers
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 // Mythui Headers
 #include "mythmainwindow.h"

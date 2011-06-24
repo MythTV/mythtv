@@ -5,7 +5,7 @@
 #include <QMutexLocker>
 
 #include "mythfontmanager.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 static MythFontManager *gFontManager = NULL;
 

@@ -6,7 +6,7 @@
 #include <QTimer>
 #include <QUrl>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #include "mythdialogbox.h"
 #include "mythmainwindow.h"

@@ -3,7 +3,7 @@
 #include <QUrl>
 
 #include "videometadatautil.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythdb.h"
 
 #define LOC      QString("VideoMetaDataUtil: ")

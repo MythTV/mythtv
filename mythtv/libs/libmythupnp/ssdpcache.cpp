@@ -23,7 +23,7 @@
 
 #include "upnp.h"
 #include "mythevent.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "upnptaskcache.h"
 
 SSDPCache* SSDPCache::g_pSSDPCache = NULL;

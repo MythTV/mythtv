@@ -11,7 +11,7 @@
 #include "mythcorecontext.h"
 #include "mythstorage.h"
 #include "mythdirs.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythlocale.h"
 #include "mythtranslation.h"
 

@@ -7,7 +7,7 @@
 #include <QList>
 #include <QDateTime>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "visual.h"
 #include "mythpainter.h"
 #include "videovisualdefs.h"

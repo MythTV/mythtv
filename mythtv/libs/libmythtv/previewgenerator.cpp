@@ -30,7 +30,6 @@
 #include "util.h"
 #include "playercontext.h"
 #include "mythdirs.h"
-#include "mythverbose.h"
 #include "remoteutil.h"
 #include "mythsystem.h"
 #include "exitcodes.h"

@@ -3,7 +3,7 @@
 using namespace std;
 
 #include "generictree.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #define LOC      QString("*TreeList: ")
 #define LOC_WARN QString("*TreeList, Warning: ")

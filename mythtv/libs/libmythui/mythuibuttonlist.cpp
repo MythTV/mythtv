@@ -7,7 +7,7 @@
 #include <QDomDocument>
 
 // libmyth headers
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 // mythui headers
 #include "mythmainwindow.h"

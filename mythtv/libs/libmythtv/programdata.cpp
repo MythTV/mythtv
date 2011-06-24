@@ -9,7 +9,7 @@ using namespace std;
 // MythTV headers
 #include "channelutil.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "programinfo.h"
 #include "programdata.h"
 #include "dvbdescriptors.h"

@@ -7,7 +7,7 @@
 #include <QCoreApplication>
 
 // Myth headers
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 // MythUI headers
 #include "mythmainwindow.h"

@@ -10,7 +10,7 @@ using namespace std;
 #include "format.h"
 #include "cc608decoder.h"
 #include "mythcontext.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "vbilut.h"
 
 #define DEBUG_XDS 0

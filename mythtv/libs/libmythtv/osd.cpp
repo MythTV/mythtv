@@ -2,7 +2,7 @@
 #include <QCoreApplication>
 
 // libmyth
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 // libmythui
 #include "mythmainwindow.h"

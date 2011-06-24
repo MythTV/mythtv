@@ -11,7 +11,7 @@
 #include "httpcomms.h"
 
 // libmyth headers
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythdb.h"
 #include "util.h"
 

@@ -11,7 +11,6 @@
 
 // MythTV
 #include "mythcontext.h"
-#include "mythverbose.h"
 #include "mythversion.h"
 #include "mythtranslation.h"
 #include "mythdbcon.h"
@@ -72,7 +71,7 @@ int main(int argc, char **argv)
 
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHWELCOME);
 
-    if (parse_verbose_arg(cmdline.toString("verbose")) ==
+    if (verboseArgParse(cmdline.toString("verbose")) ==
             GENERIC_EXIT_INVALID_CMDLINE)
         return GENERIC_EXIT_INVALID_CMDLINE;
 
@@ -84,8 +83,8 @@ int main(int argc, char **argv)
         quiet = cmdline.toUInt("quiet");
         if (quiet > 1)
         {
-            print_verbose_messages = VB_NONE;
-            parse_verbose_arg("none");
+            verboseMask = VB_NONE;
+            verboseArgParse("none");
         }
     }
 

@@ -7,7 +7,7 @@
 #include <QStringList>
 #include <QTimer>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"

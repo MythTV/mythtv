@@ -10,7 +10,7 @@
 
 // MythDB headers
 #include "compat.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 class MythQtImage : public MythImage
 {

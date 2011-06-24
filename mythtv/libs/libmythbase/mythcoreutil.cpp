@@ -28,7 +28,7 @@
 
 // libmythbase headers
 #include "mythcorecontext.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "unzip.h"
 
 /** \fn getDiskSpace(const QString&,long long&,long long&)

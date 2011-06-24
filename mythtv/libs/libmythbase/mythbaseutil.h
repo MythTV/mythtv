@@ -10,7 +10,7 @@
 #include <QString>
 
 // MythTV
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #ifdef USING_MINGW
 static inline void setup_pipe(int[2], long[2]) {}

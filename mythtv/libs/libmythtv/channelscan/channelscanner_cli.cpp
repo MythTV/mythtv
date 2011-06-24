@@ -93,7 +93,7 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
     else if (scanEvent->type() == ScannerEvent::SetStatusSignalStrength)
         ;
 
-    //cout<<"HERE<"<<print_verbose_messages<<">"<<endl;
+    //cout<<"HERE<"<<verboseMask<<">"<<endl;
     QString msg;
     if (VERBOSE_LEVEL_NONE || VERBOSE_LEVEL_CHECK(VB_CHANSCAN))
     {

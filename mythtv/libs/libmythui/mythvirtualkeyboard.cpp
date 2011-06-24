@@ -12,7 +12,7 @@
 
 // myth
 #include "mythmainwindow.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythfontproperties.h"
 #include "mythuihelper.h"
 #include "mythuibutton.h"

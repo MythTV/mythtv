@@ -5,7 +5,7 @@
 #include <QSize>
 
 // MythTV headers
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythplayer.h"
 #include "frame.h"          /* VideoFrame */
 

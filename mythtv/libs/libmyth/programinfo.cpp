@@ -27,7 +27,7 @@ using namespace std;
 #include "dialogbox.h"
 #include "remoteutil.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "storagegroup.h"
 #include "programinfoupdater.h"
 

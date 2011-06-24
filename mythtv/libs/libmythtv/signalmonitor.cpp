@@ -11,7 +11,6 @@
 #include "signalmonitor.h"
 #include "mythcontext.h"
 #include "compat.h"
-#include "mythverbose.h"
 #include "mythlogging.h"
 #include "tv_rec.h"
 

@@ -12,7 +12,7 @@
 using namespace std;
 
 #include "tspacket.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 unsigned char *pes_alloc(uint size);
 void pes_free(unsigned char *ptr);

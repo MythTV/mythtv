@@ -27,7 +27,7 @@
 using namespace std;
 
 #include "vbi608extractor.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #define LOC      QString("VBI608Extractor: ")
 #define LOC_WARN QString("VBI608Extractor, Warning: ")

@@ -40,7 +40,7 @@
 
 #include <QString>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #ifndef MALLOC
 #define MALLOC(type, size)  (type *)malloc(sizeof(type) * (size))

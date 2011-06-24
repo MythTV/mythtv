@@ -8,7 +8,7 @@
 #include "mythbaseexp.h"
 #include "mythobservable.h"
 #include "mythsocket_cb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythlocale.h"
 
 #define MYTH_APPNAME_MYTHBACKEND "mythbackend"

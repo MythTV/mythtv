@@ -13,7 +13,7 @@
 #include "mythconfig.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythversion.h"
 #include "langsettings.h"
 #include "mythtranslation.h"
@@ -233,7 +233,7 @@ int main(int argc, char *argv[])
     {
         quiet = 1;
         use_display = false;
-        print_verbose_messages = VB_NONE;
+        verboseMask = VB_NONE;
         verboseString = "";
     }
 
@@ -254,7 +254,7 @@ int main(int argc, char *argv[])
                             .arg(MYTH_SOURCE_VERSION));
 
     if (cmdline.toBool("verbose"))
-        if (parse_verbose_arg(cmdline.toString("verbose")) ==
+        if (verboseArgParse(cmdline.toString("verbose")) ==
                     GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
 
@@ -263,8 +263,8 @@ int main(int argc, char *argv[])
         quiet = cmdline.toUInt("quiet");
         if (quiet > 1)
         {
-            print_verbose_messages = VB_NONE;
-            parse_verbose_arg("none");
+            verboseMask = VB_NONE;
+            verboseArgParse("none");
         }
     }
 

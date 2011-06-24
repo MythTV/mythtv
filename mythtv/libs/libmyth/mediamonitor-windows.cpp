@@ -10,7 +10,7 @@
 #include "mediamonitor-windows.h"
 #include "mythcdrom.h"
 #include "mythhdd.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 
 /**

@@ -15,7 +15,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "util.h"
 #include "mythdialogs.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythmainwindow.h"
 
 typedef VirtualKeyboardQt* QWidgetP;

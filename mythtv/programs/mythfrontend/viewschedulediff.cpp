@@ -1,6 +1,6 @@
 // myth
 #include "mythcorecontext.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "remoteutil.h"
 #include "recordinginfo.h"
 

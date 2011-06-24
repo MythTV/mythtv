@@ -1,6 +1,6 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "pespacket.h"
 #include "mpegtables.h"
 

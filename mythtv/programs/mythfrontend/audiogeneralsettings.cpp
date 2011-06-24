@@ -16,7 +16,6 @@
 #include "mythconfig.h"
 #include "mythcorecontext.h"
 #include "mythdbcon.h"
-#include "mythverbose.h"
 #include "audiooutpututil.h"
 #include "audiogeneralsettings.h"
 #include "mythdialogbox.h"

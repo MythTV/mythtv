@@ -1,7 +1,7 @@
 #include <cmath>
 #include <stdint.h>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythcontext.h"
 #include "osd.h"
 #include "deletemap.h"

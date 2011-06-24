@@ -6,7 +6,6 @@
 // myth
 #include "mythcorecontext.h"
 #include "mythdirs.h"
-#include "mythverbose.h"
 #include "mythuihelper.h"
 #include "mythsystem.h"
 #include "metadatadownload.h"

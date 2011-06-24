@@ -25,7 +25,7 @@
 // libmythbase headers
 #include "mythcorecontext.h"
 #include "mythevent.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "exitcodes.h"
 
 #if CONFIG_CYGWIN || defined(_WIN32)

@@ -3,7 +3,7 @@
 #include <QString>
 #include <QMutexLocker>
 #include "referencecounter.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 ReferenceCounter::ReferenceCounter(void) :
     m_refCount(1)

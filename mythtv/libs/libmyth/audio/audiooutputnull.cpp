@@ -17,7 +17,7 @@
 
 using namespace std;
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "audiooutputnull.h"
 
 #define CHANNELS_MIN 1

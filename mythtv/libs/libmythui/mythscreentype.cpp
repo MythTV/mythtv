@@ -6,7 +6,6 @@
 #include <QRunnable>
 #include <QThreadPool>
 
-#include "mythverbose.h"
 #include "mythobservable.h"
 
 #include "mythscreenstack.h"

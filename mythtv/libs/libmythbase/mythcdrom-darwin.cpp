@@ -6,7 +6,7 @@
 
 #include "mythcdrom.h"
 #include "mythcdrom-darwin.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #define LOC     QString("MythCDROMDarwin:")
 #define LOC_ERR QString("mythcdrom-darwin, Error: ")

@@ -48,7 +48,7 @@
 #include "upnp.h"
 
 #include "compat.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #include "serializers/xmlSerializer.h"
 #include "serializers/soapSerializer.h"

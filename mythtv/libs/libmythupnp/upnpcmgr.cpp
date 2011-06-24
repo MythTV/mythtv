@@ -23,7 +23,7 @@
 
 #include "upnp.h"
 #include "upnpcmgr.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -5,7 +5,7 @@ using namespace std;
 #include "videodisplayprofile.h"
 #include "mythcorecontext.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "videooutbase.h"
 #include "avformatdecoder.h"
 

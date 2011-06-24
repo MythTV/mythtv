@@ -1,7 +1,7 @@
 // MythTV headers
 #include "H264Parser.h"
 #include <iostream>
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 extern "C" {
 // from libavcodec

@@ -13,7 +13,7 @@
 #include "compat.h"
 #include "mythdbcon.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
 #include <unistd.h>

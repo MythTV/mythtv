@@ -11,7 +11,6 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdb.h"
 #include "mythsystem.h"
-#include "mythverbose.h"
 #include "mythversion.h"
 #include "programdetail.h"
 #include "jobqueue.h"
@@ -735,7 +734,7 @@ static int startup()
 int main(int argc, char **argv)
 {
     // by default we don't output any messages
-    print_verbose_messages = VB_NONE;
+    verboseMask = VB_NONE;
 
     QCoreApplication a(argc, argv);
 
@@ -773,7 +772,7 @@ int main(int argc, char **argv)
     }
 
     if (cmdline.toBool("verbose"))
-        if (parse_verbose_arg(cmdline.toString("verbose")) ==
+        if (verboseArgParse(cmdline.toString("verbose")) ==
                         GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
 
@@ -782,8 +781,8 @@ int main(int argc, char **argv)
         quiet = cmdline.toUInt("quiet");
         if (quiet > 1)
         {
-            print_verbose_messages = VB_NONE;
-            parse_verbose_arg("none");
+            verboseMask = VB_NONE;
+            verboseArgParse("none");
         }
     }
 

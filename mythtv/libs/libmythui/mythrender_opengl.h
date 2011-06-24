@@ -18,7 +18,7 @@
 #endif
 
 #include "mythuiexp.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythrender_base.h"
 #include "mythrender_opengl_defs.h"
 

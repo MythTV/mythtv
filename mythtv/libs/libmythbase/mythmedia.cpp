@@ -14,7 +14,7 @@
 // MythTV headers
 #include "mythmedia.h"
 #include "mythconfig.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "util.h"
 #include "mythsystem.h"
 #include "exitcodes.h"

@@ -18,7 +18,7 @@
 #include "util.h"
 #include "mythdb.h"
 #include "mythdirs.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
 

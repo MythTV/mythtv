@@ -8,7 +8,7 @@
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythdb.h"
 
 MythUIClock::MythUIClock(MythUIType *parent, const QString &name)

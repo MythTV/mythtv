@@ -36,7 +36,7 @@
 // MythTV headers
 #include "mythcontext.h"
 #include "mythdbcon.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "dtvconfparser.h"
 #include "channelutil.h"
 

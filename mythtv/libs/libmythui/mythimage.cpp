@@ -14,7 +14,7 @@
 
 // Mythdb headers
 #include "mythdownloadmanager.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 // Myth headers
 #include "remotefile.h"

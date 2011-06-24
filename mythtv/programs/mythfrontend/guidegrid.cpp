@@ -16,7 +16,7 @@ using namespace std;
 // myth
 #include "mythcorecontext.h"
 #include "mythdbcon.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "dbchannelinfo.h"
 #include "programinfo.h"
 #include "recordingrule.h"

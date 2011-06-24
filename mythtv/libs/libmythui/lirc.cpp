@@ -19,7 +19,6 @@ using namespace std;
 #include <QStringList>
 
 // MythTV headers
-#include "mythverbose.h"
 #include "mythdb.h"
 #include "mythsystem.h"
 #include "lircevent.h"

@@ -6,7 +6,7 @@
 #include <QEvent>
 
 // myth
-#include <mythverbose.h>
+#include <mythlogging.h>
 #include <mythcontext.h>
 #include <libmythui/mythmainwindow.h>
 #include <mythuiwebbrowser.h>

@@ -26,7 +26,7 @@
 #include "mythtimer.h"
 #include "bufferedsocketdevice.h"
 #include "upnputil.h"
-#include "mythverbose.h"  // for VERBOSE
+#include "mythlogging.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //

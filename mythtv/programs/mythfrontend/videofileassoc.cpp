@@ -3,7 +3,7 @@
 #include <iterator>
 #include <map>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythmainwindow.h"
 #include "mythdialogbox.h"
 #include "mythuibuttonlist.h"

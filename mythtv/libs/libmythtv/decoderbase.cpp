@@ -9,7 +9,7 @@ using namespace std;
 #include "mythplayer.h"
 #include "remoteencoder.h"
 #include "mythdbcon.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "decoderbase.h"
 #include "programinfo.h"
 #include "livetvchain.h"

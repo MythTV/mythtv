@@ -12,7 +12,7 @@
 #include "mythevent.h"
 #include "iso639.h"
 #include "bdringbuffer.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythcorecontext.h"
 #include "mythlocale.h"
 #include "mythdirs.h"

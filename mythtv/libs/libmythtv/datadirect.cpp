@@ -13,7 +13,7 @@
 #include "listingsources.h"
 #include "mythcontext.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythversion.h"
 #include "util.h"
 #include "dbutil.h"

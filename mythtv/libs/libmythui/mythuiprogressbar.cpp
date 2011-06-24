@@ -7,7 +7,7 @@
 #include <QDomDocument>
 
 // MythDB
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 // MythUI
 

@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <cmath>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "jitterometer.h"
 
 Jitterometer::Jitterometer(QString nname, int ncycles)

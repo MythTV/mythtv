@@ -39,7 +39,7 @@ using namespace std;
 #include "mythconfig.h"
 #include "mythcdrom.h"
 #include "mythhdd.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
 

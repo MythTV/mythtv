@@ -13,7 +13,7 @@ using namespace std;
 #include <QColor>
 
 // myth
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythpainter.h"
 #include "mythimage.h"
 #include "mythmainwindow.h"

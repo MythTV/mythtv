@@ -6,7 +6,7 @@
 
 #include "mythconfig.h"  // for CONFIG_DARWIN
 #include "mythdirs.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 static QString installprefix = QString::null;
 static QString sharedir = QString::null;

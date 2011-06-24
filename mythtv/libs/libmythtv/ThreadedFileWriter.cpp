@@ -17,7 +17,6 @@
 
 // MythTV headers
 #include "ThreadedFileWriter.h"
-#include "mythverbose.h"
 #include "mythlogging.h"
 
 #include "mythtimer.h"

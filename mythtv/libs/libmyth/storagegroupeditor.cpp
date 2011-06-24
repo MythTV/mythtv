@@ -7,7 +7,7 @@
 #include "storagegroupeditor.h"
 #include "mythcorecontext.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "util.h"
 
 #define LOC QString("SGE(%1): ").arg(m_groupname)

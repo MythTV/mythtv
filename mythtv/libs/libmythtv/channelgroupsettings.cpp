@@ -2,7 +2,7 @@
 #include <iostream>
 
 // myth
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythdb.h"
 #include "channelutil.h"
 #include "channelgroup.h"

@@ -9,7 +9,7 @@ using namespace std;
 #include "mythcorecontext.h"
 
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythversion.h"
 #include "util.h"
 

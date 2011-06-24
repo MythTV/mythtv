@@ -1,7 +1,7 @@
 #include "playbackboxlistitem.h"
 #include "programinfo.h"
 #include "playbackbox.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 PlaybackBoxListItem::PlaybackBoxListItem(
     PlaybackBox *parent, MythUIButtonList *lbtype, ProgramInfo *pi) :

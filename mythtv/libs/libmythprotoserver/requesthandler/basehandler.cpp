@@ -10,7 +10,7 @@ using namespace std;
 #include "socketrequesthandler.h"
 #include "sockethandler.h"
 #include "util.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythcorecontext.h"
 
 #include "requesthandler/basehandler.h"

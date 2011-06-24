@@ -10,7 +10,7 @@
 #include <linux/videodev.h>
 #endif // USING_V4L1
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "analogsignalmonitor.h"
 #include "v4lchannel.h"
 

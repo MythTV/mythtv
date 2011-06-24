@@ -4,7 +4,7 @@
  */
 #include <stdint.h>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #include "dsmccreceiver.h"
 #include "dsmccbiop.h"

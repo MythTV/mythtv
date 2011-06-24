@@ -22,7 +22,6 @@ using namespace std;
 
 #include "util.h"
 #include "mythcontext.h"
-#include "mythverbose.h"
 #include "NuppelVideoRecorder.h"
 #include "channelbase.h"
 #include "filtermanager.h"

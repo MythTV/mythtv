@@ -6,7 +6,7 @@
 
 #include "mythdb.h"
 #include "mythdirs.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "httpcomms.h"
 #include "importicons.h"
 #include "util.h"

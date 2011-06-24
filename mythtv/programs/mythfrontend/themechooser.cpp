@@ -8,7 +8,6 @@
 #include <QRegExp>
 
 // MythTV headers
-#include "mythverbose.h"
 #include "mythcorecontext.h"
 #include "mythcoreutil.h"
 #include "remotefile.h"

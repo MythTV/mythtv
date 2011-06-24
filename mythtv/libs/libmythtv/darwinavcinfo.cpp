@@ -11,7 +11,7 @@ using namespace std;
 // MythTV headers
 #include "darwinfirewiredevice.h"
 #include "darwinavcinfo.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #ifndef kIOFireWireAVCLibUnitInterfaceID2
 #define kIOFireWireAVCLibUnitInterfaceID2 \

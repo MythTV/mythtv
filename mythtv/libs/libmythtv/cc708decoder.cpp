@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <stdio.h>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "cc708reader.h"
 #include "cc708decoder.h"
 

@@ -4,7 +4,7 @@ using namespace std;
 #include <QStringList>
 
 #include "sockethandler.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 SocketHandler::SocketHandler(MythSocket *sock, MythSocketManager *parent,
                   QString hostname) :
