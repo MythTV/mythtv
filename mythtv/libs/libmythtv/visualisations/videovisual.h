@@ -1,9 +1,11 @@
 #ifndef VIDEOVISUAL_H
 #define VIDEOVISUAL_H
 
+#include "stdint.h"
+
 #include <QRect>
 #include <QList>
-#include "stdint.h"
+#include <QDateTime>
 
 #include "mythverbose.h"
 #include "visual.h"
