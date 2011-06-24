@@ -127,8 +127,12 @@ void WelcomeDialog::checkAutoStart(void)
 {
     // mythshutdown --startup returns 0 for automatic startup
     //                                1 for manual startup
-    QString mythshutdown_exe = m_installDir + "/bin/mythshutdown --startup";
-    uint state = myth_system(mythshutdown_exe);
+    QString command = m_installDir + "/bin/mythshutdown --startup";
+    if (logPropagate())
+        command += QString(" --logpath %1").arg(logPropPath());
+    command += QString(" --verbose %1").arg(logPropMask());
+    command += QString(" --loglevel %1").arg(logPropLevel());
+    uint state = myth_system(command);
 
     VERBOSE(VB_GENERAL, QString("mythshutdown --startup returned: %1").arg(state));
 
@@ -263,15 +267,21 @@ bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
             QString mythshutdown_lock =
                 m_installDir + "/bin/mythshutdown --lock";
 
-            uint statusCode = myth_system(mythshutdown_status);
+            QString args;
+            if (logPropagate())
+                args += QString(" --logpath %1").arg(logPropPath());
+            args += QString(" --verbose %1").arg(logPropMask());
+            args += QString(" --loglevel %1").arg(logPropLevel());
+
+            uint statusCode = myth_system(mythshutdown_status + args);
             // is shutdown locked by a user
             if (!(statusCode & 0xFF00) && statusCode & 16)
             {
-                myth_system(mythshutdown_unlock);
+                myth_system(mythshutdown_unlock + args);
             }
             else
             {
-                myth_system(mythshutdown_lock);
+                myth_system(mythshutdown_lock + args);
             }
 
             updateStatusMessage();
@@ -286,7 +296,13 @@ bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
         else if (action == "STARTSETUP")
         {
             QString mythtv_setup = m_installDir + "/bin/mythtv-setup";
-            myth_system(mythtv_setup);
+            QString args;
+            if (logPropagate())
+                args += QString(" --logpath %1").arg(logPropPath());
+            args += QString(" --verbose %1").arg(logPropMask());
+            args += QString(" --loglevel %1").arg(logPropLevel());
+
+            myth_system(mythtv_setup + args);
         }
         else
             handled = false;
@@ -439,7 +455,13 @@ void WelcomeDialog::runMythFillDatabase()
                                          "/var/log/mythfilldatabase.log");
 
     if (mflog.isEmpty())
+    {
         command = QString("%1 %2").arg(mfpath).arg(mfarg);
+        if (logPropagate())
+            command += QString(" --logpath %1").arg(logPropPath());
+        command += QString(" --verbose %1").arg(logPropMask());
+        command += QString(" --loglevel %1").arg(logPropLevel());
+    }
     else
         command = QString("%1 %2 >>%3 2>&1").arg(mfpath).arg(mfarg).arg(mflog);
 
@@ -524,7 +546,13 @@ void WelcomeDialog::updateStatusMessage(void)
     }
 
     QString mythshutdown_status = m_installDir + "/bin/mythshutdown --status 0";
-    uint statusCode = myth_system(mythshutdown_status);
+    QString args;
+    if (logPropagate())
+        args += QString(" --logpath %1").arg(logPropPath());
+    args += QString(" --verbose %1").arg(logPropMask());
+    args += QString(" --loglevel %1").arg(logPropLevel());
+
+    uint statusCode = myth_system(mythshutdown_status + args);
 
     if (!(statusCode & 0xFF00))
     {
@@ -595,7 +623,13 @@ void WelcomeDialog::showMenu(void)
     m_menuPopup->SetReturnEvent(this, "action");
 
     QString mythshutdown_status = m_installDir + "/bin/mythshutdown --status 0";
-    uint statusCode = myth_system(mythshutdown_status);
+    QString args;
+    if (logPropagate())
+        args += QString(" --logpath %1").arg(logPropPath());
+    args += QString(" --verbose %1").arg(logPropMask());
+    args += QString(" --loglevel %1").arg(logPropLevel());
+
+    uint statusCode = myth_system(mythshutdown_status + args);
 
     if (!(statusCode & 0xFF00) && statusCode & 16)
         m_menuPopup->AddButton(tr("Unlock Shutdown"), SLOT(unlockShutdown()));
@@ -610,16 +644,26 @@ void WelcomeDialog::showMenu(void)
 
 void WelcomeDialog::lockShutdown(void)
 {
-    QString mythshutdown_exe = m_installDir + "/bin/mythshutdown --lock";
-    myth_system(mythshutdown_exe);
+    QString command = m_installDir + "/bin/mythshutdown --lock";
+    if (logPropagate())
+        command += QString(" --logpath %1").arg(logPropPath());
+    command += QString(" --verbose %1").arg(logPropMask());
+    command += QString(" --loglevel %1").arg(logPropLevel());
+
+    myth_system(command);
     updateStatusMessage();
     updateScreen();
 }
 
 void WelcomeDialog::unlockShutdown(void)
 {
-    QString mythshutdown_exe = m_installDir + "/bin/mythshutdown --unlock";
-    myth_system(mythshutdown_exe);
+    QString command = m_installDir + "/bin/mythshutdown --unlock";
+    if (logPropagate())
+        command += QString(" --logpath %1").arg(logPropPath());
+    command += QString(" --verbose %1").arg(logPropMask());
+    command += QString(" --loglevel %1").arg(logPropLevel());
+
+    myth_system(command);
     updateStatusMessage();
     updateScreen();
 }
@@ -663,9 +707,13 @@ void WelcomeDialog::shutdownNow(void)
     }
 
     // don't shutdown if we are about to start a wakeup/shutdown period
-    QString mythshutdown_exe_status =
-        m_installDir + "/bin/mythshutdown --status 0";
-    uint statusCode = myth_system(mythshutdown_exe_status);
+    QString command = m_installDir + "/bin/mythshutdown --status 0";
+    if (logPropagate())
+        command += QString(" --logpath %1").arg(logPropPath());
+    command += QString(" --verbose %1").arg(logPropMask());
+    command += QString(" --loglevel %1").arg(logPropLevel());
+
+    uint statusCode = myth_system(command);
     if (!(statusCode & 0xFF00) && statusCode & 128)
     {
         ShowOkPopup(tr("Cannot shutdown because MythTV is about to start "
@@ -706,8 +754,12 @@ void WelcomeDialog::shutdownNow(void)
     }
 
     // run command to set wakeuptime in bios and shutdown the system
-    QString mythshutdown_exe =
-        "sudo " + m_installDir + "/bin/mythshutdown --shutdown";
-    myth_system(mythshutdown_exe);
+    command = "sudo " + m_installDir + "/bin/mythshutdown --shutdown";
+    if (logPropagate())
+        command += QString(" --logpath %1").arg(logPropPath());
+    command += QString(" --verbose %1").arg(logPropMask());
+    command += QString(" --loglevel %1").arg(logPropLevel());
+
+    myth_system(command);
 }
 

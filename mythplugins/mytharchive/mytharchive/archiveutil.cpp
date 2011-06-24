@@ -239,8 +239,12 @@ bool getFileDetails(ArchiveItem *a)
 
     // call mytharchivehelper to get files stream info etc.
     QString command = QString("mytharchivehelper --getfileinfo --infile \"%1\" "
-                              "--outfile \"%2\" --method %3 > /dev/null 2>&1")
+                              "--outfile \"%2\" --method %3 --quiet")
             .arg(inFile).arg(outFile).arg(lenMethod);
+    if (logPropagate())
+        command += QString(" --logpath %1").arg(logPropPath());
+    command += QString(" --verbose %1").arg(logPropMask());
+    command += QString(" --loglevel %1").arg(logPropLevel());
 
     uint flags = kMSDontBlockInputDevs | kMSDontDisableDrawing;
     if (myth_system(command, flags) != GENERIC_EXIT_OK)

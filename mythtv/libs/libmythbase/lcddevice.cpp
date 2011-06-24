@@ -758,7 +758,11 @@ QString LCD::quotedString(const QString &s)
 
 bool LCD::startLCDServer(void)
 {
-    QString command = GetInstallPrefix() + "/bin/mythlcdserver -v none &";
+    QString command = GetInstallPrefix() + "/bin/mythlcdserver";
+    if (logPropagate())
+        command += QString(" --logpath %1").arg(logPropPath());
+    command += QString(" --verbose %1").arg(logPropMask());
+    command += QString(" --loglevel %1").arg(logPropLevel());
     uint flags = kMSDontBlockInputDevs | kMSDontDisableDrawing | 
                  kMSRunBackground;
 
