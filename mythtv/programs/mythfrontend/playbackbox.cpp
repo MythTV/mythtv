@@ -917,14 +917,14 @@ void PlaybackBox::HandlePreviewEvent(const QStringList &list)
         QString tokens("\n\t\t\ttokens: ");
         for (uint i = 4; i < (uint) list.size(); i++)
             tokens += list[i] + ", ";
-        VERBOSE(VB_GENERAL, LOC +
+        VERBOSE(VB_GENERAL|VB_EXTRA, LOC +
                 "Ignoring PREVIEW_SUCCESS, no matcing token" + tokens);
         return;
     }
 
     if (previewFile.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
+        VERBOSE(VB_IMPORTANT|VB_EXTRA, LOC_ERR +
                 "Ignoring PREVIEW_SUCCESS, no preview file.");
         return;
     }
@@ -937,7 +937,7 @@ void PlaybackBox::HandlePreviewEvent(const QStringList &list)
 
     if (!item)
     {
-        VERBOSE(VB_GENERAL, LOC +
+        VERBOSE(VB_GENERAL|VB_EXTRA, LOC +
                 "Ignoring PREVIEW_SUCCESS, item no longer on screen.");
     }
 
@@ -1671,7 +1671,7 @@ bool PlaybackBox::UpdateUILists(void)
 
     if (sortedList.empty())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "SortedList is Empty");
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "SortedList is Empty");
         m_progLists[""];
         m_titleList << "";
         m_playList.clear();
