@@ -536,20 +536,20 @@ void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
     QImage bg_image(hl_button->pict.data[0], w, h, w, QImage::Format_Indexed8);
     uint32_t *bgpalette = (uint32_t *)(hl_button->pict.data[1]);
 
-    QVector<unsigned int> bg_palette(16);
-    for (int i = 0; i < 16; i++)
-        bg_palette.append(bgpalette[i]);
+    QVector<uint32_t> bg_palette(4);
+    for (int i = 0; i < 4; i++)
+        bg_palette[i] = bgpalette[i];
     bg_image.setColorTable(bg_palette);
 
     // copy button region of background image
     const QRect fg_rect(buttonPos.translated(-hl_button->x, -hl_button->y));
     QImage fg_image = bg_image.copy(fg_rect);
-    QVector<unsigned int> fg_palette;
+    QVector<uint32_t> fg_palette(4);
     uint32_t *fgpalette = (uint32_t *)(dvdButton->rects[1]->pict.data[1]);
     if (fgpalette)
     {
-        for (int i = 0; i < AVPALETTE_COUNT; i++)
-            fg_palette.push_back(fgpalette[i]);
+        for (int i = 0; i < 4; i++)
+            fg_palette[i] = fgpalette[i];
         fg_image.setColorTable(fg_palette);
     }
 
