@@ -816,9 +816,6 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
     if (width < 1 || height < 1 || isnan(fps))
         return;
 
-    if ((video_disp_dim == QSize(width, height)) && (video_frame_rate == fps))
-        return;
-
     video_dim      = QSize((width + 15) & ~0xf, (height + 15) & ~0xf);
     video_disp_dim = QSize(width, height);
 
