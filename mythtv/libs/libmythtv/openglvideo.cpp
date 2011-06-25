@@ -940,8 +940,16 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         // invert if first filter
         if (it == filters.begin())
         {
-            vrect.setTop((visible.height()) - display.top());
-            vrect.setBottom(vrect.top() - (display.height()));
+            if (filters.size() > 1)
+            {
+                vrect.setTop((visible.height()) - display.top());
+                vrect.setBottom(vrect.top() - (display.height()));
+            }
+            else
+            {
+                vrect.setBottom(display.top());
+                vrect.setTop(display.top() + (display.height()));
+            }
         }
 
         // hardware bobdeint
