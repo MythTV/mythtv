@@ -946,7 +946,7 @@ void TVRec::HandleStateChange(void)
 
     // Make sure EIT scan is stopped before any tuning,
     // to avoid race condition with it's tuning requests.
-    if (HasFlags(kFlagEITScannerRunning))
+    if (scanner && HasFlags(kFlagEITScannerRunning))
     {
         scanner->StopActiveScan();
         ClearFlags(kFlagEITScannerRunning);
@@ -991,8 +991,7 @@ void TVRec::HandleStateChange(void)
     changeState = false;
 
     eitScanStartTime = QDateTime::currentDateTime();
-    if ((internalState == kState_None) &&
-        scanner)
+    if (scanner && (internalState == kState_None))
         eitScanStartTime = eitScanStartTime.addSecs(eitCrawlIdleStart);
     else
         eitScanStartTime = eitScanStartTime.addYears(1);
@@ -1186,7 +1185,8 @@ void TVRec::RunTV(void)
     eitScanStartTime = QDateTime::currentDateTime();
     // check whether we should use the EITScanner in this TVRec instance
     if (CardUtil::IsEITCapable(genOpt.cardtype) &&
-        (!GetDTVChannel() || GetDTVChannel()->IsMaster()))
+        (!GetDTVChannel() || GetDTVChannel()->IsMaster()) && 
+        (dvbOpt.dvb_eitscan && get_use_eit(cardid)))
     {
         scanner = new EITScanner(cardid);
         uint timeout = eitCrawlIdleStart;
@@ -1334,7 +1334,7 @@ void TVRec::RunTV(void)
             ClearFlags(kFlagExitPlayer);
         }
 
-        if (channel && scanner &&
+        if (scanner && channel &&
             QDateTime::currentDateTime() > eitScanStartTime)
         {
             if (!dvbOpt.dvb_eitscan)
@@ -3445,7 +3445,8 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
     QString channum, inputname;
     uint newCardID = TuningCheckForHWChange(request, channum, inputname);
 
-    if (!(request.flags & kFlagEITScan) && HasFlags(kFlagEITScannerRunning))
+    if (scanner && !(request.flags & kFlagEITScan) &&
+        HasFlags(kFlagEITScannerRunning))
     {
         scanner->StopActiveScan();
         ClearFlags(kFlagEITScannerRunning);
@@ -3755,7 +3756,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
 
         newRecStatus = rsFailed;
 
-        if (HasFlags(kFlagEITScannerRunning))
+        if (scanner && HasFlags(kFlagEITScannerRunning))
         {
             scanner->StopActiveScan();
             ClearFlags(kFlagEITScannerRunning);
