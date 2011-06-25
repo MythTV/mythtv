@@ -496,10 +496,11 @@
                         <area>180,1,155,24</area>
                     </textarea>
                     <textarea name="title" from="shortstarttimedate">
-                        <area>345,1,370,24</area>
+                        <area>345,1,365,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
-                        <area>730,1,30,24</area>
+                        <area>720,1,30,24</area>
+                        <align>right,vcenter</align>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">
@@ -511,10 +512,11 @@
                         <area>180,1,155,24</area>
                     </textarea>
                     <textarea name="title" from="shortstarttimedate">
-                        <area>345,1,370,24</area>
+                        <area>345,1,365,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
-                        <area>730,1,30,24</area>
+                        <area>720,1,30,24</area>
+                        <align>right,vcenter</align>
                     </textarea>
                     <shape name="selectbar">
                         <area>5,-3,751,30</area>
@@ -1255,12 +1257,13 @@
                         <font>basesmallwhite</font>
                     </textarea>
                     <textarea name="titlesubtitle" from="shortstarttimedate">
-                        <area>340,1,380,24</area>
+                        <area>340,1,370,24</area>
                         <font>basesmallboldblue</font>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
-                        <area>730,1,30,24</area>
+                        <area>720,1,30,24</area>
                         <font>basesmallboldblue</font>
+                        <align>right,vcenter</align>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">

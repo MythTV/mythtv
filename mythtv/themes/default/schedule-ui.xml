@@ -494,10 +494,11 @@
                         <area>190,1,140,24</area>
                     </textarea>
                     <textarea name="title" from="shortstarttimedate">
-                        <area>340,1,380,24</area>
+                        <area>340,1,370,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
-                        <area>730,1,30,24</area>
+                        <area>720,1,30,24</area>
+                        <align>right,vcenter</align>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active" />
@@ -1218,10 +1219,11 @@
                         <area>190,1,140,24</area>
                     </textarea>
                     <textarea name="titlesubtitle" from="shortstarttimedate">
-                        <area>340,1,380,24</area>
+                        <area>340,1,370,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
-                        <area>730,1,30,24</area>
+                        <area>720,1,30,24</area>
+                        <align>right,vcenter</align>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active" />
@@ -2018,13 +2020,15 @@
                         <area>190,1,140,24</area>
                     </textarea>
                     <textarea name="titlesubtitle" from="shortstarttimedate">
-                        <area>340,1,350,24</area>
+                        <area>340,1,330,24</area>
                     </textarea>
                     <textarea name="statusbefore" from="shortstarttimedate">
-                        <area>700,1,30,24</area>
+                        <area>680,1,30,24</area>
+                        <align>right,vcenter</align>
                     </textarea>
                     <textarea name="statusafter" from="shortstarttimedate">
-                        <area>730,1,30,24</area>
+                        <area>720,1,30,24</area>
+                        <align>right,vcenter</align>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active" />

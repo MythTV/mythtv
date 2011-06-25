@@ -1428,7 +1428,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     }
     progMap["rectypestatus"] = tmp_rec;
 
-    progMap["card"] = toQChar(GetRecordingStatus(), cardid);
+    progMap["card"] = ::toString(GetRecordingStatus(), cardid);
 
     progMap["recpriority"] = recpriority;
     progMap["recpriority2"] = recpriority2;

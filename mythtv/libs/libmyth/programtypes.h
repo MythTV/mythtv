@@ -213,7 +213,7 @@ typedef enum RecStatusTypes {
     rsOtherShowing = 13
 } RecStatusType; // note stored in int8_t in ProgramInfo
 MPUBLIC QString toUIState(RecStatusType);
-MPUBLIC QChar   toQChar(RecStatusType, uint cardid);
+MPUBLIC QString toString(RecStatusType, uint cardid);
 MPUBLIC QString toString(RecStatusType, RecordingType);
 MPUBLIC QString toDescription(RecStatusType, const QDateTime &recstartts);
 

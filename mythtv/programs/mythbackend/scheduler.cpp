@@ -523,7 +523,7 @@ void Scheduler::PrintRec(const RecordingInfo *p, const char *prefix)
         .arg(p->GetInputID());
     outstr += QString("%1 %2 %3")
         .arg(toQChar(p->GetRecordingRuleType()))
-        .arg(toQChar(p->GetRecordingStatus(), p->GetCardID()))
+        .arg(toString(p->GetRecordingStatus(), p->GetCardID()))
         .arg(p->GetRecordingPriority());
     if (p->GetRecordingPriority2())
         outstr += QString("/%1").arg(p->GetRecordingPriority2());
