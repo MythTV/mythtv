@@ -89,7 +89,10 @@ QChar toQChar(RecStatusType recstatus, uint cardid)
             ret = QObject::tr("t", "RecStatusChar rsTuning");
             break;
         case rsWillRecord:
-            ret = QString::number(cardid);
+            if (0 < cardid && cardid < 10)
+                ret = QString::number(cardid);
+            else
+                ret = "#";
             break;
         case rsDontRecord:
             ret = QObject::tr("X", "RecStatusChar rsDontRecord");
