@@ -128,10 +128,7 @@ void WelcomeDialog::checkAutoStart(void)
     // mythshutdown --startup returns 0 for automatic startup
     //                                1 for manual startup
     QString command = m_installDir + "/bin/mythshutdown --startup";
-    if (logPropagate())
-        command += QString(" --logpath %1").arg(logPropPath());
-    command += QString(" --verbose %1").arg(logPropMask());
-    command += QString(" --loglevel %1").arg(logPropLevel());
+    command += logPropagateArgs;
     uint state = myth_system(command);
 
     VERBOSE(VB_GENERAL, QString("mythshutdown --startup returned: %1").arg(state));
@@ -267,21 +264,17 @@ bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
             QString mythshutdown_lock =
                 m_installDir + "/bin/mythshutdown --lock";
 
-            QString args;
-            if (logPropagate())
-                args += QString(" --logpath %1").arg(logPropPath());
-            args += QString(" --verbose %1").arg(logPropMask());
-            args += QString(" --loglevel %1").arg(logPropLevel());
+            uint statusCode;
+            statusCode = myth_system(mythshutdown_status + logPropagateArgs);
 
-            uint statusCode = myth_system(mythshutdown_status + args);
             // is shutdown locked by a user
             if (!(statusCode & 0xFF00) && statusCode & 16)
             {
-                myth_system(mythshutdown_unlock + args);
+                myth_system(mythshutdown_unlock + logPropagateArgs);
             }
             else
             {
-                myth_system(mythshutdown_lock + args);
+                myth_system(mythshutdown_lock + logPropagateArgs);
             }
 
             updateStatusMessage();
@@ -296,13 +289,7 @@ bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
         else if (action == "STARTSETUP")
         {
             QString mythtv_setup = m_installDir + "/bin/mythtv-setup";
-            QString args;
-            if (logPropagate())
-                args += QString(" --logpath %1").arg(logPropPath());
-            args += QString(" --verbose %1").arg(logPropMask());
-            args += QString(" --loglevel %1").arg(logPropLevel());
-
-            myth_system(mythtv_setup + args);
+            myth_system(mythtv_setup + logPropagateArgs);
         }
         else
             handled = false;
@@ -457,10 +444,7 @@ void WelcomeDialog::runMythFillDatabase()
     if (mflog.isEmpty())
     {
         command = QString("%1 %2").arg(mfpath).arg(mfarg);
-        if (logPropagate())
-            command += QString(" --logpath %1").arg(logPropPath());
-        command += QString(" --verbose %1").arg(logPropMask());
-        command += QString(" --loglevel %1").arg(logPropLevel());
+        command += logPropagateArgs;
     }
     else
         command = QString("%1 %2 >>%3 2>&1").arg(mfpath).arg(mfarg).arg(mflog);
@@ -546,13 +530,7 @@ void WelcomeDialog::updateStatusMessage(void)
     }
 
     QString mythshutdown_status = m_installDir + "/bin/mythshutdown --status 0";
-    QString args;
-    if (logPropagate())
-        args += QString(" --logpath %1").arg(logPropPath());
-    args += QString(" --verbose %1").arg(logPropMask());
-    args += QString(" --loglevel %1").arg(logPropLevel());
-
-    uint statusCode = myth_system(mythshutdown_status + args);
+    uint statusCode = myth_system(mythshutdown_status + logPropagateArgs);
 
     if (!(statusCode & 0xFF00))
     {
@@ -623,13 +601,7 @@ void WelcomeDialog::showMenu(void)
     m_menuPopup->SetReturnEvent(this, "action");
 
     QString mythshutdown_status = m_installDir + "/bin/mythshutdown --status 0";
-    QString args;
-    if (logPropagate())
-        args += QString(" --logpath %1").arg(logPropPath());
-    args += QString(" --verbose %1").arg(logPropMask());
-    args += QString(" --loglevel %1").arg(logPropLevel());
-
-    uint statusCode = myth_system(mythshutdown_status + args);
+    uint statusCode = myth_system(mythshutdown_status + logPropagateArgs);
 
     if (!(statusCode & 0xFF00) && statusCode & 16)
         m_menuPopup->AddButton(tr("Unlock Shutdown"), SLOT(unlockShutdown()));
@@ -645,11 +617,7 @@ void WelcomeDialog::showMenu(void)
 void WelcomeDialog::lockShutdown(void)
 {
     QString command = m_installDir + "/bin/mythshutdown --lock";
-    if (logPropagate())
-        command += QString(" --logpath %1").arg(logPropPath());
-    command += QString(" --verbose %1").arg(logPropMask());
-    command += QString(" --loglevel %1").arg(logPropLevel());
-
+    command += logPropagateArgs;
     myth_system(command);
     updateStatusMessage();
     updateScreen();
@@ -658,11 +626,7 @@ void WelcomeDialog::lockShutdown(void)
 void WelcomeDialog::unlockShutdown(void)
 {
     QString command = m_installDir + "/bin/mythshutdown --unlock";
-    if (logPropagate())
-        command += QString(" --logpath %1").arg(logPropPath());
-    command += QString(" --verbose %1").arg(logPropMask());
-    command += QString(" --loglevel %1").arg(logPropLevel());
-
+    command += logPropagateArgs;
     myth_system(command);
     updateStatusMessage();
     updateScreen();
@@ -708,10 +672,7 @@ void WelcomeDialog::shutdownNow(void)
 
     // don't shutdown if we are about to start a wakeup/shutdown period
     QString command = m_installDir + "/bin/mythshutdown --status 0";
-    if (logPropagate())
-        command += QString(" --logpath %1").arg(logPropPath());
-    command += QString(" --verbose %1").arg(logPropMask());
-    command += QString(" --loglevel %1").arg(logPropLevel());
+    command += logPropagateArgs;
 
     uint statusCode = myth_system(command);
     if (!(statusCode & 0xFF00) && statusCode & 128)
@@ -755,10 +716,7 @@ void WelcomeDialog::shutdownNow(void)
 
     // run command to set wakeuptime in bios and shutdown the system
     command = "sudo " + m_installDir + "/bin/mythshutdown --shutdown";
-    if (logPropagate())
-        command += QString(" --logpath %1").arg(logPropPath());
-    command += QString(" --verbose %1").arg(logPropMask());
-    command += QString(" --loglevel %1").arg(logPropLevel());
+    command += logPropagateArgs;
 
     myth_system(command);
 }

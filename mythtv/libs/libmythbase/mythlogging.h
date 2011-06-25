@@ -108,15 +108,14 @@ MBASE_PUBLIC void LogPrintLine( uint32_t mask, LogLevel_t level,
 #ifdef __cplusplus
 }
 
+extern MBASE_PUBLIC QString logPropagateArgs;
+
 MBASE_PUBLIC void logStart(QString logfile, int quiet = 0, int facility = 0,
                            LogLevel_t level = LOG_INFO, bool dblog = true, 
                            bool propagate = false);
 MBASE_PUBLIC void logStop(void);
-
-MBASE_PUBLIC bool logPropagate(void);
-MBASE_PUBLIC QString logPropPath(void);
-MBASE_PUBLIC QString logPropMask(void);
-MBASE_PUBLIC QString logPropLevel(void);
+MBASE_PUBLIC void logPropagateCalc(void);
+MBASE_PUBLIC bool logPropagateQuiet(void);
 
 MBASE_PUBLIC void threadRegister(QString name);
 MBASE_PUBLIC void threadDeregister(void);

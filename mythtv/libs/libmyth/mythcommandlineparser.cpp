@@ -1616,7 +1616,7 @@ int MythCommandLineParser::GetSyslogFacility(void)
 {
     QString setting = toString("syslog").toLower();
     if (setting == "none")
-        return 0;
+        return -2;
 
     return syslogGetFacility(setting);
 }

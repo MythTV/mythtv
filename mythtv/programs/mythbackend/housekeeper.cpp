@@ -421,11 +421,7 @@ void HouseKeeper::RunMFD(void)
         mfpath = GetInstallPrefix() + "/bin/mythfilldatabase";
 
     QString command = QString("%1 %2").arg(mfpath).arg(mfarg);
-
-    if (logPropagate())
-        command += QString(" --logpath %1").arg(logPropPath());
-    command += QString(" --verbose %1").arg(logPropMask());
-    command += QString(" --loglevel %1").arg(logPropLevel());
+    command += logPropagateArgs;
 
     if (mflog.length())
     {

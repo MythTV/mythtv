@@ -5020,10 +5020,11 @@ void MainServer::HandleSetVerbose(QStringList &slist, PlaybackSock *pbs)
     QStringList retlist;
 
     QString newverbose = slist[1];
-    int len=newverbose.length();
+    int len = newverbose.length();
     if (len > 12)
     {
         verboseArgParse(newverbose.right(len-12));
+        logPropagateCalc();
 
         VERBOSE(VB_IMPORTANT, QString("Verbose mask changed, new mask is: %1")
                                       .arg(verboseString));

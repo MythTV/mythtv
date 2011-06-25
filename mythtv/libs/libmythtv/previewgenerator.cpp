@@ -239,13 +239,9 @@ bool PreviewGenerator::Run(void)
         if (!outFileName.isEmpty())
             command += QString(" --outfile \"%1\"").arg(outFileName);
 
-        command += " --quiet";
-
-        if (logPropagate())
-            command += QString(" --logpath %1").arg(logPropPath());
-
-        command += QString(" --verbose %1").arg(logPropMask());
-        command += QString(" --loglevel %1").arg(logPropLevel());
+        command += logPropagateArgs;
+        if (!logPropagateQuiet())
+            command += " --quiet";
 
         // Timeout in 30s
         uint ret = myth_system(command, kMSDontBlockInputDevs |

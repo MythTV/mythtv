@@ -61,8 +61,16 @@ LoggerThread            logThread;
 bool                    logThreadFinished = false;
 bool                    debugRegistration = false;
 
-bool                    logPropagateFlag  = false;
-QString                 logPropagatePath;
+typedef struct {
+    bool    propagate;
+    int     quiet;
+    int     facility;
+    bool    dblog;
+    QString path;
+} LogPropagateOpts;
+
+LogPropagateOpts        logPropagateOpts;
+QString                 logPropagateArgs;
 
 #define TIMESTAMP_MAX 30
 #define MAX_STRING_LENGTH 2048
@@ -755,31 +763,41 @@ void logSighup( int signum, siginfo_t *info, void *secret )
     }
 }
 
-bool logPropagate(void)
-{
-    return logPropagateFlag;
-}
-
-QString logPropPath(void)
-{
-    return logPropagatePath;
-}
-
-QString logPropMask(void)
+void logPropagateCalc(void)
 {
     QString mask = verboseString.trimmed();
     mask.replace(QRegExp(" "), ",");
     mask.remove(QRegExp("^,"));
+    logPropagateArgs = " --verbose " + mask;
 
-    return mask;
-}
+    if (logPropagateOpts.propagate)
+        logPropagateArgs += " --logpath " + logPropagateOpts.path;
 
-QString logPropLevel(void)
-{
     QString name = QString(LogLevelNames[logLevel]).toLower();
     name.remove(0, 4);
+    logPropagateArgs += " --loglevel " + name;
 
-    return name;
+    if (logPropagateOpts.quiet)
+        logPropagateArgs += " --quiet";
+
+    if (!logPropagateOpts.dblog)
+        logPropagateArgs += " --nodblog";
+
+    if (logPropagateOpts.facility >= 0)
+    {
+        CODE *syslogname;
+
+        for( syslogname = &facilitynames[0];
+             (syslogname->c_name &&
+              syslogname->c_val != logPropagateOpts.facility); syslogname++ );
+
+        logPropagateArgs += QString(" --syslog %1").arg(syslogname->c_name);
+    }
+}
+
+bool logPropagateQuiet(void)
+{
+    return logPropagateOpts.quiet;
 }
 
 void logStart(QString logfile, int quiet, int facility, LogLevel_t level,
@@ -795,13 +813,19 @@ void logStart(QString logfile, int quiet, int facility, LogLevel_t level,
     LogPrint(VB_IMPORTANT, LOG_CRIT, QString("Setting Log Level to %1")
              .arg(LogLevelNames[logLevel]));
 
-    logPropagateFlag = propagate;
+    logPropagateOpts.propagate = propagate;
+    logPropagateOpts.quiet = quiet;
+    logPropagateOpts.facility = facility;
+    logPropagateOpts.dblog = dblog;
+
     if (propagate)
     {
         QFileInfo finfo(logfile);
-        logPropagatePath = finfo.path();
-        logPropagatePath.detach();
+        QString path = finfo.path();
+        logPropagateOpts.path = path;
     }
+
+    logPropagateCalc();
 
     /* log to the console */
     if( !quiet )
@@ -812,10 +836,10 @@ void logStart(QString logfile, int quiet, int facility, LogLevel_t level,
         logger = new FileLogger((char *)logfile.toLocal8Bit().constData());
 
     /* Syslog */
-    if( facility < 0 )
+    if( facility == -1 )
         LogPrint(VB_IMPORTANT, LOG_CRIT,
                  "Syslogging facility unknown, disabling syslog output");
-    else if( facility > 0 )
+    else if( facility >= 0 )
         logger = new SyslogLogger(facility);
 
     /* Database */

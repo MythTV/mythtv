@@ -349,10 +349,7 @@ bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString cardtype)
         cmd += QString(" --sourceid %1").arg(sourceid);
     if (!cardtype.isEmpty())
         cmd += QString(" --cardtype %1").arg(cardtype);
-    if (logPropagate())
-	cmd += QString(" --logpath %1").arg(logPropPath());
-    cmd += QString(" --verbose %1").arg(logPropMask());
-    cmd += QString(" --loglevel %1").arg(logPropLevel());
+    cmd += logPropagateArgs;
 
     myth_system(cmd);
 

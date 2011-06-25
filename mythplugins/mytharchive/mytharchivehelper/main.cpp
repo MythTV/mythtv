@@ -977,12 +977,7 @@ int NativeArchive::exportVideo(QDomElement   &itemNode,
     query.bindValue(":INTID", intID);
 
     if (!query.exec())
-    {
-        // TODO: why are we doing this?
-        verboseMask = VB_JOBQUEUE + VB_IMPORTANT;
         MythDB::DBError("select countries", query);
-        verboseMask = VB_JOBQUEUE;
-    }
 
     if (query.isActive() && query.size())
     {
@@ -1007,11 +1002,7 @@ int NativeArchive::exportVideo(QDomElement   &itemNode,
     query.bindValue(":INTID", intID);
 
     if (!query.exec())
-    {
-        verboseMask = VB_JOBQUEUE + VB_IMPORTANT;
         MythDB::DBError("select genres", query);
-        verboseMask = VB_JOBQUEUE;
-    }
 
     if (query.isActive() && query.size())
     {
@@ -1263,11 +1254,7 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
     if (query.exec())
         VERBOSE(VB_JOBQUEUE, "Inserted recorded details into database");
     else
-    {
-        verboseMask = VB_JOBQUEUE + VB_IMPORTANT;
         MythDB::DBError("recorded insert", query);
-        verboseMask = VB_JOBQUEUE;
-    }
 
     // copy recordedmarkup to db
     nodeList = itemNode.elementsByTagName("recordedmarkup");
@@ -1302,7 +1289,6 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
 
                 if (!query.exec())
                 {
-                    verboseMask = VB_JOBQUEUE + VB_IMPORTANT;
                     MythDB::DBError("recordedmark insert", query);
                     return 1;
                 }
@@ -1345,7 +1331,6 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
 
                 if (!query.exec())
                 {
-                    verboseMask = VB_JOBQUEUE + VB_IMPORTANT;
                     MythDB::DBError("recordedseek insert", query);
                     return 1;
                 }
@@ -1458,9 +1443,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
         VERBOSE(VB_JOBQUEUE, "Inserted videometadata details into database");
     else
     {
-        verboseMask = VB_JOBQUEUE + VB_IMPORTANT;
         MythDB::DBError("videometadata insert", query);
-        verboseMask = VB_JOBQUEUE;
         return 1;
     }
 
@@ -1474,9 +1457,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
     }
     else
     {
-        verboseMask = VB_JOBQUEUE + VB_IMPORTANT;
         MythDB::DBError("Failed to get intid", query);
-        verboseMask = VB_JOBQUEUE;
         return 1;
     }
 
@@ -1747,11 +1728,7 @@ static void clearArchiveTable(void)
     query.prepare("DELETE FROM archiveitems;");
 
     if (!query.exec())
-    {
-        verboseMask = VB_JOBQUEUE + VB_IMPORTANT;
         MythDB::DBError("delete archiveitems", query);
-        verboseMask = VB_JOBQUEUE;
-    }
 }
 
 static int doNativeArchive(const QString &jobFile)
@@ -2588,7 +2565,7 @@ int main(int argc, char **argv)
     int quiet = 0;
 
     // by default we only output our messages
-    verboseMask = VB_JOBQUEUE;
+    verboseMask = VB_JOBQUEUE | VB_IMPORTANT;
 
     MythArchiveHelperCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))

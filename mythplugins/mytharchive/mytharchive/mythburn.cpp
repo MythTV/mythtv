@@ -1196,11 +1196,10 @@ void BurnMenu::doBurn(int mode)
 
     commandline = "mytharchivehelper --burndvd --mediatype " + sArchiveFormat +
                   (bEraseDVDRW ? " --erasedvdrw" : "") + 
-                  (bNativeFormat ? " --nativeformat" : "") + " --quiet";
-    if (logPropagate())
-        commandline += QString(" --logpath %1").arg(logPropPath());
-    commandline += QString(" --verbose %1").arg(logPropMask());
-    commandline += QString(" --loglevel %1").arg(logPropLevel());
+                  (bNativeFormat ? " --nativeformat" : "");
+    commandline += logPropagateArgs;
+    if (!logPropagateQuiet())
+        commandline += " --quiet";
     commandline += " > "  + logDir + "/progress.log 2>&1 &";
 
     uint flags = kMSRunBackground | kMSDontBlockInputDevs | 
