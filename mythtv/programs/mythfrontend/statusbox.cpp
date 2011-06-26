@@ -29,6 +29,8 @@ using namespace std;
 struct LogLine {
     QString line;
     QString detail;
+    QString help;
+    QString helpdetail;
     QString data;
     QString state;
 };
@@ -56,6 +58,7 @@ StatusBox::StatusBox(MythScreenStack *parent)
     m_iconState = NULL;
     m_categoryList = m_logList = NULL;
     m_helpText = NULL;
+    m_justHelpText = NULL;
 
     QStringList strlist;
     strlist << "QUERY_IS_ACTIVE_BACKEND";
@@ -88,8 +91,9 @@ bool StatusBox::Create()
 
     m_iconState = dynamic_cast<MythUIStateType *>(GetChild("icon"));
     m_helpText = dynamic_cast<MythUIText *>(GetChild("helptext"));
+    m_justHelpText = dynamic_cast<MythUIText *>(GetChild("justhelptext"));
 
-    if (!m_categoryList || !m_logList || !m_helpText)
+    if (!m_categoryList || !m_logList || (!m_helpText && !m_justHelpText))
     {
         VERBOSE(VB_IMPORTANT, "StatusBox, theme is missing "
                               "required elements");
@@ -97,11 +101,11 @@ bool StatusBox::Create()
     }
 
     connect(m_categoryList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-                SLOT(updateLogList(MythUIButtonListItem *)));
+            SLOT(updateLogList(MythUIButtonListItem *)));
     connect(m_logList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-                SLOT(setHelpText(MythUIButtonListItem *)));
+            SLOT(setHelpText(MythUIButtonListItem *)));
     connect(m_logList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-                SLOT(clicked(MythUIButtonListItem *)));
+            SLOT(clicked(MythUIButtonListItem *)));
 
     BuildFocusList();
     return true;
@@ -143,23 +147,42 @@ void StatusBox::Init()
     m_categoryList->SetItemCurrent(itemCurrent);
 }
 
-MythUIButtonListItem* StatusBox::AddLogLine(QString line, QString detail,
-                                            QString state, QString data)
+MythUIButtonListItem* StatusBox::AddLogLine(const QString & line,
+                                            const QString & help,
+                                            const QString & detail,
+                                            const QString & helpdetail,
+                                            const QString & state,
+                                            const QString & data)
 {
-
     LogLine logline;
     logline.line = line;
-    logline.detail = detail;
+
+    if (detail.isEmpty())
+        logline.detail = line;
+    else
+        logline.detail = detail;
+
+    if (help.isEmpty())
+        logline.help = logline.detail;
+    else
+        logline.help = help;
+
+    if (helpdetail.isEmpty())
+        logline.helpdetail = logline.detail;
+    else
+        logline.helpdetail = helpdetail;
+
     logline.state = state;
     logline.data = data;
 
     MythUIButtonListItem *item = new MythUIButtonListItem(m_logList, line,
                                                 qVariantFromValue(logline));
-    if (state.isEmpty())
-        state = "normal";
+    if (logline.state.isEmpty())
+        logline.state = "normal";
 
-    item->SetFontState(state);
-    item->DisplayState(state, "status");
+    item->SetFontState(logline.state);
+    item->DisplayState(logline.state, "status");
+    item->SetText(logline.detail, "detail");
 
     return item;
 }
@@ -207,8 +230,12 @@ bool StatusBox::keyPressEvent(QKeyEvent *event)
                  (logNumberKeys.indexIn(action) == 0))
         {
             m_minLevel = action.toInt();
-            m_helpText->SetText(tr("Setting priority level to %1")
-                                          .arg(m_minLevel));
+            if (m_helpText)
+                m_helpText->SetText(tr("Setting priority level to %1")
+                                    .arg(m_minLevel));
+            if (m_justHelpText)
+                m_justHelpText->SetText(tr("Setting priority level to %1")
+                                        .arg(m_minLevel));
             doLogEntries();
         }
         else
@@ -227,7 +254,10 @@ void StatusBox::setHelpText(MythUIButtonListItem *item)
         return;
 
     LogLine logline = qVariantValue<LogLine>(item->GetData());
-    m_helpText->SetText(logline.detail);
+    if (m_helpText)
+        m_helpText->SetText(logline.helpdetail);
+    if (m_justHelpText)
+        m_justHelpText->SetText(logline.help);
 }
 
 void StatusBox::updateLogList(MythUIButtonListItem *item)
@@ -477,9 +507,14 @@ void StatusBox::doListingsStatus()
     if (m_iconState)
         m_iconState->DisplayState("listings");
     m_logList->Reset();
-    m_helpText->SetText(tr("Listings Status shows the latest "
-                                    "status information from "
-                                    "mythfilldatabase"));
+
+    QString helpmsg(tr("Listings Status shows the latest "
+                       "status information from "
+                       "mythfilldatabase"));
+    if (m_helpText)
+        m_helpText->SetText(helpmsg);
+    if (m_justHelpText)
+        m_justHelpText->SetText(helpmsg);
 
     QString mfdLastRunStart, mfdLastRunEnd, mfdLastRunStatus, mfdNextRunStart;
     QString querytext, DataDirectMessage;
@@ -504,42 +539,46 @@ void StatusBox::doListingsStatus()
     mfdNextRunStart.replace('T', ' ');
 
     AddLogLine(tr("Mythfrontend version: %1 (%2)").arg(MYTH_SOURCE_PATH)
-                                                  .arg(MYTH_SOURCE_VERSION));
-    AddLogLine(tr("Last mythfilldatabase guide update:"));
-    AddLogLine(tr("Started:   %1").arg(mfdLastRunStart));
+               .arg(MYTH_SOURCE_VERSION), helpmsg);
+    AddLogLine(tr("Last mythfilldatabase guide update:"), helpmsg);
+    AddLogLine(tr("Started:   %1").arg(mfdLastRunStart), helpmsg);
 
     if (mfdLastRunEnd >= mfdLastRunStart)
-        AddLogLine(tr("Finished: %1").arg(mfdLastRunEnd));
+        AddLogLine(tr("Finished: %1").arg(mfdLastRunEnd), helpmsg);
 
-    AddLogLine(tr("Result: %1").arg(mfdLastRunStatus));
+    AddLogLine(tr("Result: %1").arg(mfdLastRunStatus), helpmsg);
 
 
     if (mfdNextRunStart >= mfdLastRunStart)
-        AddLogLine(tr("Suggested Next: %1").arg(mfdNextRunStart));
+        AddLogLine(tr("Suggested Next: %1").arg(mfdNextRunStart), helpmsg);
 
     DaysOfData = qdtNow.daysTo(GuideDataThrough);
 
     if (GuideDataThrough.isNull())
     {
-        AddLogLine(tr("There's no guide data available!"), "", "warning");
-        AddLogLine(tr("Have you run mythfilldatabase?"), "", "warning");
+        AddLogLine(tr("There's no guide data available!"), helpmsg,
+                   "", "warning");
+        AddLogLine(tr("Have you run mythfilldatabase?"), helpmsg,
+                   "", "warning");
     }
     else
     {
         AddLogLine(tr("There is guide data until %1")
-                        .arg(QDateTime(GuideDataThrough)
-                            .toString("yyyy-MM-dd hh:mm")));
+                   .arg(QDateTime(GuideDataThrough)
+                        .toString("yyyy-MM-dd hh:mm")), helpmsg);
 
-        AddLogLine(QString("(%1).").arg(tr("%n day(s)", "", DaysOfData)));
+        AddLogLine(QString("(%1).").arg(tr("%n day(s)", "", DaysOfData)),
+                   helpmsg);
     }
 
     if (DaysOfData <= 3)
-        AddLogLine(tr("WARNING: is mythfilldatabase running?"), "", "warning");
+        AddLogLine(tr("WARNING: is mythfilldatabase running?"), helpmsg,
+                   "", "", "warning");
 
     if (!DataDirectMessage.isEmpty())
     {
-        AddLogLine(tr("DataDirect Status: "));
-        AddLogLine(DataDirectMessage);
+        AddLogLine(tr("DataDirect Status: "), helpmsg);
+        AddLogLine(DataDirectMessage, helpmsg);
     }
 
 }
@@ -549,8 +588,13 @@ void StatusBox::doScheduleStatus()
     if (m_iconState)
         m_iconState->DisplayState("schedule");
     m_logList->Reset();
-    m_helpText->SetText(tr("Schedule Status shows current statistics from the "
-                           "scheduler."));
+
+    QString helpmsg(tr("Schedule Status shows current statistics "
+                       "from the scheduler."));
+    if (m_helpText)
+        m_helpText->SetText(helpmsg);
+    if (m_justHelpText)
+        m_justHelpText->SetText(helpmsg);
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -559,7 +603,7 @@ void StatusBox::doScheduleStatus()
     {
         QString rules = tr("%n standard rule(s) (is) defined", "",
                             query.value(0).toInt());
-        AddLogLine(rules, rules);
+        AddLogLine(rules, helpmsg);
     }
     else
     {
@@ -572,7 +616,7 @@ void StatusBox::doScheduleStatus()
     {
         QString rules = tr("%n search rule(s) are defined", "",
                             query.value(0).toInt());
-        AddLogLine(rules, rules);
+        AddLogLine(rules, helpmsg);
     }
     else
     {
@@ -632,7 +676,7 @@ void StatusBox::doScheduleStatus()
     LoadFromScheduler(schedList);
 
     tmpstr = tr("%n matching showing(s)", "", schedList.size());
-    AddLogLine(tmpstr, tmpstr);
+    AddLogLine(tmpstr, helpmsg);
 
     ProgramList::const_iterator it = schedList.begin();
     for (; it != schedList.end(); ++it)
@@ -665,7 +709,7 @@ void StatusBox::doScheduleStatus()
         {                                                       \
             tmpstr = QString("%1 %2").arg(statusMatch[rtype])   \
                                      .arg(statusText[rtype]);   \
-            AddLogLine(tmpstr, tmpstr, fstate);                 \
+            AddLogLine(tmpstr, helpmsg, tmpstr, tmpstr, fstate);\
         }                                                       \
     } while (0)
     ADD_STATUS_LOG_LINE(rsRecording, "");
@@ -682,13 +726,13 @@ void StatusBox::doScheduleStatus()
     {
         tmpstr = QString("%1 %2 %3").arg(lowerpriority).arg(willrec)
                                     .arg(tr("with lower priority"));
-        AddLogLine(tmpstr, tmpstr, "warning");
+        AddLogLine(tmpstr, helpmsg, tmpstr, tmpstr, "warning");
     }
     if (hdflag > 0)
     {
         tmpstr = QString("%1 %2 %3").arg(hdflag).arg(willrec)
                                     .arg(tr("marked as HDTV"));
-        AddLogLine(tmpstr, tmpstr);
+        AddLogLine(tmpstr, helpmsg);
     }
     int i;
     for (i = 1; i <= maxSource; ++i)
@@ -698,7 +742,7 @@ void StatusBox::doScheduleStatus()
             tmpstr = QString("%1 %2 %3 %4 \"%5\"")
                              .arg(sourceMatch[i]).arg(willrec)
                              .arg(tr("from source")).arg(i).arg(sourceText[i]);
-            AddLogLine(tmpstr, tmpstr);
+            AddLogLine(tmpstr, helpmsg);
         }
     }
     for (i = 1; i <= maxInput; ++i)
@@ -708,7 +752,7 @@ void StatusBox::doScheduleStatus()
             tmpstr = QString("%1 %2 %3 %4 \"%5\"")
                              .arg(inputMatch[i]).arg(willrec)
                              .arg(tr("on input")).arg(i).arg(inputText[i]);
-            AddLogLine(tmpstr, tmpstr);
+            AddLogLine(tmpstr, helpmsg);
         }
     }
 }
@@ -718,8 +762,13 @@ void StatusBox::doTunerStatus()
     if (m_iconState)
         m_iconState->DisplayState("tuner");
     m_logList->Reset();
-    m_helpText->SetText(tr("Tuner Status shows the current information about "
-                           "the state of backend tuner cards"));
+
+    QString helpmsg(tr("Tuner Status shows the current information "
+                       "about the state of backend tuner cards"));
+    if (m_helpText)
+        m_helpText->SetText(helpmsg);
+    if (m_justHelpText)
+        m_justHelpText->SetText(helpmsg);
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -794,7 +843,7 @@ void StatusBox::doTunerStatus()
             }
         }
 
-        AddLogLine(shorttuner, longtuner, fontstate);
+        AddLogLine(shorttuner, helpmsg, longtuner, longtuner, fontstate);
     }
 }
 
@@ -803,8 +852,13 @@ void StatusBox::doLogEntries(void)
     if (m_iconState)
         m_iconState->DisplayState("log");
     m_logList->Reset();
-    m_helpText->SetText(tr("Log Entries shows any unread log entries from the "
-                           "system if you have logging enabled"));
+
+    QString helpmsg(tr("Log Entries shows any unread log entries "
+                       "from the system if you have logging enabled"));
+    if (m_helpText)
+        m_helpText->SetText(helpmsg);
+    if (m_justHelpText)
+        m_justHelpText->SetText(helpmsg);
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT logid, module, priority, logdate, host, "
@@ -840,14 +894,15 @@ void StatusBox::doLogEntries(void)
                                .arg(query.value(4).toString())
                                .arg(query.value(1).toString())
                                .arg(query.value(5).toString());
-            AddLogLine(line, detail, "", query.value(0).toString());
+            AddLogLine(line, helpmsg, detail, detail,
+                       "", query.value(0).toString());
         }
 
         if (query.size() == 0)
         {
             AddLogLine(tr("No items found at priority level %1 or lower.")
-                                                            .arg(m_minLevel));
-            AddLogLine(tr("Use 1-8 to change priority level."));
+                       .arg(m_minLevel), helpmsg);
+            AddLogLine(tr("Use 1-8 to change priority level."), helpmsg);
         }
     }
 }
@@ -857,8 +912,14 @@ void StatusBox::doJobQueueStatus()
     if (m_iconState)
         m_iconState->DisplayState("jobqueue");
     m_logList->Reset();
-    m_helpText->SetText(tr("Job Queue shows any jobs currently in MythTV's Job "
-                           "Queue such as a commercial detection job."));
+
+    QString helpmsg(tr("Job Queue shows any jobs currently in "
+                       "MythTV's Job Queue such as a commercial "
+                       "detection job."));
+    if (m_helpText)
+        m_helpText->SetText(helpmsg);
+    if (m_justHelpText)
+        m_justHelpText->SetText(helpmsg);
 
     QMap<int, JobQueueEntry> jobs;
     QMap<int, JobQueueEntry>::Iterator it;
@@ -909,11 +970,12 @@ void StatusBox::doJobQueueStatus()
             else if ((*it).status == JOB_ABORTED)
                 font = "warning";
 
-            AddLogLine(line, detail, font, QString("%1").arg((*it).id));
+            AddLogLine(line, helpmsg, detail, detail, font,
+                       QString("%1").arg((*it).id));
         }
     }
     else
-        AddLogLine(tr("Job Queue is currently empty."));
+        AddLogLine(tr("Job Queue is currently empty."), helpmsg);
 
 }
 
@@ -1098,7 +1160,10 @@ void StatusBox::doMachineStatus()
     if (!m_isBackendActive)
         machineStr.append(" " + tr("and the MythTV server"));
 
-    m_helpText->SetText(machineStr);
+    if (m_helpText)
+        m_helpText->SetText(machineStr);
+    if (m_justHelpText)
+        m_justHelpText->SetText(machineStr);
 
     int           totalM, usedM, freeM;    // Physical memory
     int           totalS, usedS, freeS;    // Virtual  memory (swap)
@@ -1109,7 +1174,7 @@ void StatusBox::doMachineStatus()
         line = tr("System:");
     else
         line = tr("This machine:");
-    AddLogLine(line, QString("%1\n").arg(line));
+    AddLogLine(line, machineStr);
 
     // uptime
     if (!getUptime(uptime))
@@ -1134,7 +1199,7 @@ void StatusBox::doMachineStatus()
     }
 #endif // _WIN32
 
-    AddLogLine(line, QString("%1\n").arg(line));
+    AddLogLine(line, machineStr);
 
     // memory usage
     if (getMemStats(totalM, freeM, totalS, freeS))
@@ -1143,21 +1208,21 @@ void StatusBox::doMachineStatus()
         if (totalM > 0)
         {
             line = "   " + tr("RAM") + ": " + usage_str_mb(totalM, usedM, freeM);
-            AddLogLine(line, QString("%1\n").arg(line));
+            AddLogLine(line, machineStr);
         }
         usedS = totalS - freeS;
         if (totalS > 0)
         {
             line = "   " + tr("Swap") +
                                   ": "  + usage_str_mb(totalS, usedS, freeS);
-            AddLogLine(line, QString("%1\n").arg(line));
+            AddLogLine(line, machineStr);
         }
     }
 
     if (!m_isBackendActive)
     {
         line = tr("MythTV server") + ':';
-        AddLogLine(line, QString("%1\n").arg(line));
+        AddLogLine(line, machineStr);
 
         // uptime
         if (!RemoteGetUptime(uptime))
@@ -1177,7 +1242,7 @@ void StatusBox::doMachineStatus()
         else
             line.append(tr("unknown"));
 
-        AddLogLine(line, QString("%1\n").arg(line));
+        AddLogLine(line, machineStr);
 
         // memory usage
         if (RemoteGetMemStats(totalM, freeM, totalS, freeS))
@@ -1187,7 +1252,7 @@ void StatusBox::doMachineStatus()
             {
                 line = "   " + tr("RAM") +
                                      ": "  + usage_str_mb(totalM, usedM, freeM);
-                AddLogLine(line, QString("%1\n").arg(line));
+                AddLogLine(line, machineStr);
             }
 
             usedS = totalS - freeS;
@@ -1195,7 +1260,7 @@ void StatusBox::doMachineStatus()
             {
                 line = "   " + tr("Swap") +
                                      ": "  + usage_str_mb(totalS, usedS, freeS);
-                AddLogLine(line, QString("%1\n").arg(line));
+                AddLogLine(line, machineStr);
             }
         }
     }
@@ -1227,27 +1292,28 @@ void StatusBox::doMachineStatus()
         if (fsInfos[i].getPath() == "TotalDiskSpace")
         {
             line = tr("Total Disk Space:");
-            AddLogLine(line, QString("%1\n").arg(line));
+            AddLogLine(line, machineStr);
         }
         else
         {
             line = tr("MythTV Drive #%1:").arg(fsInfos[i].getFSysID());
-            AddLogLine(line, QString("%1\n").arg(line));
+            AddLogLine(line, machineStr);
 
             QStringList tokens = fsInfos[i].getPath().split(',');
 
             if (tokens.size() > 1)
             {
-                AddLogLine(QString("   ") + tr("Directories:"));
+                AddLogLine(QString("   ") + tr("Directories:"), machineStr);
 
                 int curToken = 0;
                 while (curToken < tokens.size())
-                    AddLogLine(QString("      ") + tokens[curToken++]);
+                    AddLogLine(QString("      ") +
+                               tokens[curToken++], machineStr);
             }
             else
             {
                 AddLogLine(QString("   " ) + tr("Directory:") + ' ' +
-                            fsInfos[i].getPath());
+                           fsInfos[i].getPath(), machineStr);
             }
         }
 
@@ -1255,7 +1321,7 @@ void StatusBox::doMachineStatus()
         for (;it != list.end(); ++it)
         {
             line = QString("   ") + (*it);
-            AddLogLine(line, QString("%1\n").arg(line));
+            AddLogLine(line, machineStr);
         }
     }
 
@@ -1269,10 +1335,15 @@ void StatusBox::doAutoExpireList()
     if (m_iconState)
         m_iconState->DisplayState("autoexpire");
     m_logList->Reset();
-    m_helpText->SetText(tr("The AutoExpire List shows all recordings which "
-                           "may be expired and the order of their expiration. "
-                           "Recordings at the top of the list will be expired "
-                           "first."));
+
+    QString helpmsg(tr("The AutoExpire List shows all recordings "
+                       "which may be expired and the order of "
+                       "their expiration. Recordings at the top "
+                       "of the list will be expired first."));
+    if (m_helpText)
+        m_helpText->SetText(helpmsg);
+    if (m_justHelpText)
+        m_justHelpText->SetText(helpmsg);
 
     ProgramInfo*          pginfo;
     QString               contentLine;
@@ -1331,8 +1402,7 @@ void StatusBox::doAutoExpireList()
         contentLine += pginfo->GetTitle() +
             " (" + sm_str(pginfo->GetFilesize() / 1024) + ")";
 
-        detailInfo = staticInfo;
-        detailInfo +=
+        detailInfo =
             pginfo->GetRecordingStartTime().toString(m_timeDateFormat) + " - " +
             pginfo->GetRecordingEndTime().toString(m_timeDateFormat);
 
@@ -1342,7 +1412,8 @@ void StatusBox::doAutoExpireList()
 
         detailInfo += "\n" + pginfo->toString(ProgramInfo::kTitleSubtitle, " - ");
 
-        AddLogLine(contentLine, detailInfo);
+        AddLogLine(contentLine, staticInfo, detailInfo,
+                   staticInfo + detailInfo);
     }
 
 }
