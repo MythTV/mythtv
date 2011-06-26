@@ -115,7 +115,7 @@
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="233"/>
         <source>Add desired screen to the Active Screens list by pressing SELECT.</source>
-        <translation type="unfinished">Для добавления экрана к списку активных нажмите ВЫБОР.</translation>
+        <translation>Для добавления экрана к списку активных нажмите ВЫБОР.</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="236"/>
@@ -163,12 +163,12 @@
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="269"/>
         <source>change location; </source>
-        <translation type="unfinished">изменения местоположения; </translation>
+        <translation>изменение местоположения; </translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="271"/>
         <source>change units; </source>
-        <translation type="unfinished">изменения системы измерений; </translation>
+        <translation>изменение системы измерений; </translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="272"/>
@@ -215,14 +215,13 @@
 <context>
     <name>SourceManager</name>
     <message>
-        <location filename="../mythweather/sourceManager.cpp" line="91"/>
+        <location filename="../mythweather/sourceManager.cpp" line="92"/>
         <source>Searching for scripts</source>
         <translation>Поиск скриптов</translation>
     </message>
     <message>
-        <location filename="../mythweather/sourceManager.cpp" line="301"/>
         <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
-        <translation>Скрипт %1 запущен и пытается обновить данные. Убедитесь что он работает и интервал обновления правильный ... Не запускайте еще раз</translation>
+        <translation type="obsolete">Скрипт %1 запущен и пытается обновить данные. Убедитесь что он работает и интервал обновления правильный ... Не запускайте еще раз</translation>
     </message>
 </context>
 <context>
@@ -301,7 +300,7 @@
     <message>
         <location filename="strings.h" line="36"/>
         <source>Partly Cloudy</source>
-        <translation type="unfinished">Переменная облачность</translation>
+        <translation>Переменная облачность</translation>
     </message>
     <message>
         <location filename="strings.h" line="37"/>
@@ -322,7 +321,7 @@
     <message>
         <location filename="strings.h" line="40"/>
         <source>AM Showers</source>
-        <translation>Утром ливень</translation>
+        <translation>ДП ливень</translation>
     </message>
     <message>
         <location filename="strings.h" line="41"/>
@@ -352,7 +351,7 @@
     <message>
         <location filename="strings.h" line="46"/>
         <source>AM Clouds/PM Sun</source>
-        <translation>утром облачно/вечером солнце</translation>
+        <translation>ДП облачно/вечером солнце</translation>
     </message>
     <message>
         <location filename="strings.h" line="47"/>
@@ -367,12 +366,12 @@
     <message>
         <location filename="strings.h" line="49"/>
         <source>PM Showers</source>
-        <translation>Вечером ливень</translation>
+        <translation>ПП ливень</translation>
     </message>
     <message>
         <location filename="strings.h" line="50"/>
         <source>PM Showers/Wind</source>
-        <translation>Вечером ливень/ветер</translation>
+        <translation>ПП ливень/ветер</translation>
     </message>
     <message>
         <location filename="strings.h" line="51"/>
@@ -413,7 +412,7 @@
     <message>
         <location filename="strings.h" line="58"/>
         <source>AM Rain/Snow Showers</source>
-        <translation type="unfinished">ДП дождь/сильный снегопад</translation>
+        <translation>ПП дождь/сильный снегопад</translation>
     </message>
     <message>
         <location filename="strings.h" line="59"/>
@@ -453,7 +452,7 @@
     <message>
         <location filename="strings.h" line="66"/>
         <source>PM T-Storms</source>
-        <translation type="unfinished">вечером грозы</translation>
+        <translation>ПП грозы</translation>
     </message>
     <message>
         <location filename="strings.h" line="67"/>
@@ -463,17 +462,17 @@
     <message>
         <location filename="strings.h" line="68"/>
         <source>Sunny/Windy</source>
-        <translation type="unfinished">Ясно/ветрено</translation>
+        <translation>Ясно/ветрено</translation>
     </message>
     <message>
         <location filename="strings.h" line="69"/>
         <source>AM Thunderstorms</source>
-        <translation type="unfinished">утром грозы</translation>
+        <translation>ДП грозы</translation>
     </message>
     <message>
         <location filename="strings.h" line="70"/>
         <source>AM Rain</source>
-        <translation type="unfinished">утром дождь</translation>
+        <translation>ДП дождь</translation>
     </message>
     <message>
         <location filename="strings.h" line="71"/>
@@ -488,17 +487,17 @@
     <message>
         <location filename="strings.h" line="73"/>
         <source>Sct T-Storms/Wind</source>
-        <translation type="unfinished">Порывами грозы/ветер</translation>
+        <translation>Порывами грозы/ветер</translation>
     </message>
     <message>
         <location filename="strings.h" line="74"/>
         <source>AM Showers/Wind</source>
-        <translation type="unfinished">ДП ливень/ветер</translation>
+        <translation>ДП ливень/ветер</translation>
     </message>
     <message>
         <location filename="strings.h" line="75"/>
         <source>Sct Snow Showers</source>
-        <translation type="unfinished">Порывами снегопад</translation>
+        <translation>Порывами снегопад</translation>
     </message>
     <message>
         <location filename="strings.h" line="76"/>
@@ -513,17 +512,17 @@
     <message>
         <location filename="strings.h" line="78"/>
         <source>AM Light Rain</source>
-        <translation type="unfinished">ДП небольшой дождь</translation>
+        <translation>ДП небольшой дождь</translation>
     </message>
     <message>
         <location filename="strings.h" line="79"/>
         <source>PM Light Rain</source>
-        <translation type="unfinished">ПП небольшой дождь</translation>
+        <translation>ПП небольшой дождь</translation>
     </message>
     <message>
         <location filename="strings.h" line="80"/>
         <source>PM Rain</source>
-        <translation type="unfinished">ПП дождь</translation>
+        <translation>ПП дождь</translation>
     </message>
     <message>
         <location filename="strings.h" line="81"/>
@@ -538,7 +537,7 @@
     <message>
         <location filename="strings.h" line="83"/>
         <source>PM Rain/Snow</source>
-        <translation type="unfinished">ПП дождь/снег</translation>
+        <translation>ПП дождь/снег</translation>
     </message>
     <message>
         <location filename="strings.h" line="84"/>
@@ -553,18 +552,18 @@
     <message>
         <location filename="strings.h" line="86"/>
         <source>PM Rain/Snow Showers</source>
-        <translation type="unfinished">ПП дождь/снегопад</translation>
+        <translation>ПП дождь/снегопад</translation>
     </message>
     <message>
         <location filename="strings.h" line="87"/>
         <location filename="strings.h" line="98"/>
         <source>PM Rain/Snow/Wind</source>
-        <translation type="unfinished">ПП дождь/снег/ветер</translation>
+        <translation>ПП дождь/снег/ветер</translation>
     </message>
     <message>
         <location filename="strings.h" line="88"/>
         <source>Rain/Snow Showers/Wind</source>
-        <translation type="unfinished">Дождь/снегопад/ветер</translation>
+        <translation>Дождь/снегопад/ветер</translation>
     </message>
     <message>
         <location filename="strings.h" line="89"/>
@@ -579,7 +578,7 @@
     <message>
         <location filename="strings.h" line="91"/>
         <source>PM Snow</source>
-        <translation type="unfinished">ПП снег</translation>
+        <translation>ПП снег</translation>
     </message>
     <message>
         <location filename="strings.h" line="92"/>
@@ -599,23 +598,23 @@
     <message>
         <location filename="strings.h" line="95"/>
         <source>AM Wintry Mix</source>
-        <translation type="unfinished">ДП зимняя смесь</translation>
+        <translation>ДП зимняя смесь</translation>
     </message>
     <message>
         <location filename="strings.h" line="96"/>
         <location filename="strings.h" line="132"/>
         <source>Hvy Rain/Freezing Rain</source>
-        <translation type="unfinished">Сильный дождь/леденящий дождь</translation>
+        <translation>Сильный дождь/леденящий дождь</translation>
     </message>
     <message>
         <location filename="strings.h" line="97"/>
         <source>AM Light Snow</source>
-        <translation type="unfinished">ДП небольшой снег</translation>
+        <translation>ДП небольшой снег</translation>
     </message>
     <message>
         <location filename="strings.h" line="99"/>
         <source>Rain/Freezing Rain</source>
-        <translation type="unfinished">Дождь/леденящий дождь</translation>
+        <translation>Дождь/Дождь с образованием гололеда</translation>
     </message>
     <message>
         <location filename="strings.h" line="100"/>
@@ -630,7 +629,7 @@
     <message>
         <location filename="strings.h" line="102"/>
         <source>AM Snow Showers</source>
-        <translation>ПП снегопад</translation>
+        <translation>ДП снегопад</translation>
     </message>
     <message>
         <location filename="strings.h" line="103"/>
@@ -670,32 +669,32 @@
     <message>
         <location filename="strings.h" line="110"/>
         <source>AM Rain/Ice</source>
-        <translation type="unfinished">ДП дождь/град</translation>
+        <translation>ДП дождь/град</translation>
     </message>
     <message>
         <location filename="strings.h" line="111"/>
         <source>AM Snow Showers/Wind</source>
-        <translation type="unfinished">ПП снегопад/ветер</translation>
+        <translation>ДП снегопад/ветер</translation>
     </message>
     <message>
         <location filename="strings.h" line="112"/>
         <source>AM Light Snow/Wind</source>
-        <translation type="unfinished">ДП небольшой снег/ветер</translation>
+        <translation>ДП небольшой снег/ветер</translation>
     </message>
     <message>
         <location filename="strings.h" line="113"/>
         <source>PM Light Rain/Wind</source>
-        <translation type="unfinished">ПП небольшой дождь/ветер</translation>
+        <translation>ПП небольшой дождь/ветер</translation>
     </message>
     <message>
         <location filename="strings.h" line="114"/>
         <source>AM Light Wintry Mix</source>
-        <translation type="unfinished">ДП легкая зимняя смесь</translation>
+        <translation>ДП легкая зимняя смесь</translation>
     </message>
     <message>
         <location filename="strings.h" line="115"/>
         <source>PM Light Snow/Wind</source>
-        <translation type="unfinished">ПП небольшой снег/ветер</translation>
+        <translation>ПП небольшой снег/ветер</translation>
     </message>
     <message>
         <location filename="strings.h" line="116"/>
@@ -705,7 +704,7 @@
     <message>
         <location filename="strings.h" line="117"/>
         <source>PM Snow Shower</source>
-        <translation type="unfinished">ПП снегопад</translation>
+        <translation>ПП снегопад</translation>
     </message>
     <message>
         <location filename="strings.h" line="118"/>
@@ -715,12 +714,12 @@
     <message>
         <location filename="strings.h" line="119"/>
         <source>PM Light Rain/Ice</source>
-        <translation type="unfinished">ПП небольшой дождь/град</translation>
+        <translation>ПП небольшой дождь/град</translation>
     </message>
     <message>
         <location filename="strings.h" line="120"/>
         <source>AM Snow</source>
-        <translation type="unfinished">ДП снег</translation>
+        <translation>ДП снег</translation>
     </message>
     <message>
         <location filename="strings.h" line="121"/>
@@ -735,12 +734,12 @@
     <message>
         <location filename="strings.h" line="123"/>
         <source>PM Light Snow</source>
-        <translation type="unfinished">ДП легкий снег</translation>
+        <translation>ДП небольшой снег</translation>
     </message>
     <message>
         <location filename="strings.h" line="124"/>
         <source>AM Drizzle</source>
-        <translation type="unfinished">ДП изморось</translation>
+        <translation>ДП изморось</translation>
     </message>
     <message>
         <location filename="strings.h" line="125"/>
@@ -750,7 +749,7 @@
     <message>
         <location filename="strings.h" line="126"/>
         <source>PM Drizzle</source>
-        <translation type="unfinished">ПП изморось</translation>
+        <translation>ПП изморось</translation>
     </message>
     <message>
         <location filename="strings.h" line="127"/>
@@ -760,12 +759,12 @@
     <message>
         <location filename="strings.h" line="128"/>
         <source>AM Light Rain/Wind</source>
-        <translation type="unfinished">ДП легкий дождь/ветер</translation>
+        <translation>ДП небольшой дождь/ветер</translation>
     </message>
     <message>
         <location filename="strings.h" line="129"/>
         <source>AM Rain/Wind</source>
-        <translation type="unfinished">ДП дождь/ветер</translation>
+        <translation>ДП дождь/ветер</translation>
     </message>
     <message>
         <location filename="strings.h" line="130"/>
@@ -986,7 +985,7 @@
     <message>
         <location filename="themestrings.h" line="2"/>
         <source>%DATE%, %TIME%</source>
-        <translation type="unfinished"></translation>
+        <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
@@ -1022,7 +1021,10 @@
         <location filename="themestrings.h" line="15"/>
         <source>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
 
-When you are done configuring the Weather Plugin, click &quot;Finish&quot; to continue.</source>
+When you are done configuring the weather plugin, click &quot;Finish&quot; to continue.</source>
+        <oldsource>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
+
+When you are done configuring the Weather Plugin, click &quot;Finish&quot; to continue.</oldsource>
         <translation>Этот экран регулирует поведение экранов погоды. Вы можете включить фоновое обновление прогноза погоды, которое будет работать независимо от того отображается или нет экран погоды, а также настроить сколько секунд будет отображаться каждый экран.
 
 Когда вы закончите настройку плагина погоды, нажмите кнопку &quot;Закончить&quot;.</translation>
@@ -1094,7 +1096,7 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
     <message>
         <location filename="themestrings.h" line="32"/>
         <source>Temp</source>
-        <translation>Темп. </translation>
+        <translation>Темп.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="33"/>
@@ -1173,7 +1175,8 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
     </message>
     <message>
         <location filename="themestrings.h" line="53"/>
-        <source>General weather plugin options</source>
+        <source>General weather options</source>
+        <oldsource>General weather plugin options</oldsource>
         <translation>Общие параметры плагина погоды</translation>
     </message>
     <message>
