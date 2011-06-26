@@ -547,6 +547,16 @@ EOF
     # $seek is optional, and is the amount to seek from the start of the file
     # (for resuming downloads, etc.)
         my $seek = (shift or 0);
+    # Check to see if we were passed a URL using the myth protocol - if so,
+    # override the values set above accordingly
+        if (substr($basename, 0,7) eq "myth://") {
+            $basename = substr($basename, 7);
+            my $index = index($basename, ":");
+            $host = substr($basename, 0, $index);
+            my $endindex = index($basename, "/", $index);
+            $port = substr($basename, $index+1, $endindex-$index-1);
+            $basename = substr($basename, $endindex);
+        }
     # We need to figure out if we were passed a file handle or a filename.  If
     # it was a pathname, we should open the file for writing.
         if ($target_path) {
