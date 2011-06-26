@@ -1000,7 +1000,7 @@ static void TVMenuCallback(void *data, QString &selection)
     else
         VERBOSE(VB_IMPORTANT, "Unknown menu action: " + selection);
 
-    if (sel.left(9) == "settings ")
+    if (sel.left(9) == "settings " || sel == "video_settings_general")
     {
         GetMythUI()->RemoveCurrentLocation();
 
