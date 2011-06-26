@@ -236,4 +236,26 @@ bool CheckSetup(QStringList &problems)
         || checkImageStoragePaths(problems);
 }
 
+bool needsMFDBReminder()
+{
+    bool needsReminder = false;
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT sourceid "
+                  "FROM videosource "
+                  "WHERE xmltvgrabber = 'schedulesdirect1' "
+                  "OR xmltvgrabber = 'datadirect' "
+                  "OR xmltvgrabber LIKE 'tv_grab_%';");
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("needsMFDBReminder", query);
+    }
+    else if (query.size() >= 1)
+    {
+        needsReminder = true;
+    }
+
+    return needsReminder;
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

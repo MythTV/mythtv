@@ -34,7 +34,7 @@ ExitPrompter::~ExitPrompter()
 
 void ExitPrompter::masterPromptExit()
 {
-    if (gCoreContext->IsMasterHost())
+    if (gCoreContext->IsMasterHost() && needsMFDBReminder())
     {
         QString label = tr("If you've added or altered channels,"
                            " please run 'mythfilldatabase' on the"
