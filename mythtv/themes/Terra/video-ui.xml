@@ -865,7 +865,7 @@
         </textarea>
 
         <buttontree name="videos">
-            <area>40,80,720,260</area>
+            <area>40,80,905,260</area>
             <numlists>3</numlists>
             <spacing>10</spacing>
             <buttonlist name="listtemplate" from="basebuttonlist" />
@@ -898,14 +898,14 @@
         </textarea>
 
         <textarea name="cast" from="basetextarea">
-            <area>60,510,505,70</area>
+            <area>40,510,530,70</area>
             <align>left,top</align>
             <multiline>yes</multiline>
-            <cutdown>no</cutdown>
+            <cutdown>yes</cutdown>
         </textarea>
 
         <textarea name="position" from="basetextarea">
-            <area>266,585,266,40</area>
+            <area>40,585,530,40</area>
             <font>basemedium</font>
             <align>hcenter,vcenter</align>
         </textarea>
