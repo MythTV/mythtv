@@ -25,6 +25,7 @@ using namespace std;
 #include "mythtranslation.h"
 #include "mythlogging.h"
 #include "mythcommandlineparser.h"
+#include "recordinginfo.h"
 
 static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                         frm_dir_map_t *deleteMap, int &resultCode);
@@ -93,6 +94,31 @@ static int CheckJobQueue()
         return 1;
     }
     return 0;
+}
+
+static int QueueTranscodeJob(ProgramInfo *pginfo, QString profile,
+                            QString hostname, bool usecutlist)
+{
+    RecordingInfo recinfo(*pginfo);
+    if (!profile.isEmpty())
+        recinfo.ApplyTranscoderProfileChange(profile);
+
+    if (JobQueue::QueueJob(JOB_TRANSCODE,
+            pginfo->GetChanID(),
+            pginfo->GetRecordingStartTime(),
+            hostname, "", "", 
+            usecutlist ? JOB_USE_CUTLIST : 0))
+    {
+        VERBOSE(VB_IMPORTANT, QString("Queued transcode job for chanid %1 @ %2")
+                    .arg(pginfo->GetChanID())
+                    .arg(pginfo->GetRecordingStartTime().toString("yyyyMMddhhmmss")));
+        return GENERIC_EXIT_OK;
+    }
+
+    VERBOSE(VB_IMPORTANT, QString("Error queuing job for chanid %1 @ %2")
+                .arg(pginfo->GetChanID())
+                .arg(pginfo->GetRecordingStartTime().toString("yyyyMMddhhmmss")));
+    return GENERIC_EXIT_DB_ERROR;
 }
 
 int main(int argc, char *argv[])
@@ -424,6 +450,12 @@ int main(int argc, char *argv[])
     {
         VERBOSE(VB_IMPORTANT, "No program info found!");
         return GENERIC_EXIT_NO_RECORDING_DATA;
+    }
+
+    if (cmdline.toBool("queue"))
+    {
+        QString hostname = cmdline.toString("queue");
+        return QueueTranscodeJob(pginfo, profilename, hostname, useCutlist);
     }
 
     if (infile.left(7) == "myth://" && (outfile.isNull() || outfile != "-"))

@@ -1554,6 +1554,10 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
             "Specifies that a lossless transcode should be used.", "");
     add(QStringList( QStringList() << "-e" << "--ostream" ), "ostream", ""
             "Output stream type: dvd, ps", "");
+    add("--queue", "queue", "",
+            "Add a new transcoding job of the specified recording and "
+            "profile to the jobqueue. Accepts an optional string to define "
+            "the hostname.", "");
 }
 
 MythMediaServerCommandLineParser::MythMediaServerCommandLineParser() :
@@ -1562,7 +1566,7 @@ MythMediaServerCommandLineParser::MythMediaServerCommandLineParser() :
 
 QString MythMediaServerCommandLineParser::GetHelpHeader(void) const
 {
-    return "MythMediaServer is daemon implementing the backend file server. \n"
+    return "MythMediaServer is a daemon implementing the backend file server. \n"
            "It is intended to allow access to remote file storage on machines \n"
            "that do not have tuners, and as such cannot run a backend.";
 }
