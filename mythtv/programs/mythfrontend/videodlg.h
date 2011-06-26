@@ -172,6 +172,8 @@ class VideoDialog : public MythScreenType
                             QStringList fanart = QStringList(), QStringList banner = QStringList(),
                             QStringList screenshot = QStringList());
 
+    void SavePosition(void);
+
   private slots:
 
     void OnVideoImageSetDone(VideoMetadata *metadata);
