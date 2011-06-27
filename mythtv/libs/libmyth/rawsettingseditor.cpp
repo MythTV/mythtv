@@ -51,7 +51,8 @@ bool RawSettingsEditor::Create(void)
 
     if (!m_settingsList || !m_textLabel || !m_saveButton || !m_cancelButton)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        LogPrint(VB_GENERAL, LOG_EMERG,
+                 "Theme is missing critical theme elements.");
         return false;
     }
 

@@ -204,12 +204,13 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
     switch (stat)
     {
         case UPnPResult_Success:
-            VERBOSE(VB_UPNP, QString("ConnectBackend() - success. New hostname: %1")
+            LogPrint(VB_UPNP, LOG_INFO, 
+                     QString("ConnectBackend() - success. New hostname: %1")
                     .arg(m_DBparams->dbHostName));
             return true;
 
         case UPnPResult_HumanInterventionRequired:
-            VERBOSE(VB_UPNP, error);
+            LogPrint(VB_UPNP, LOG_ERR, error);
             ShowOkPopup(message);
 
             if (TryDBfromURL("", dev->m_sLocation))
@@ -218,13 +219,15 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
             break;
 
         case UPnPResult_ActionNotAuthorized:
-            VERBOSE(VB_UPNP, QString("Access denied for %1. Wrong PIN?")
+            LogPrint(VB_UPNP, LOG_ERR, 
+                     QString("Access denied for %1. Wrong PIN?")
                     .arg(backendName));
             PromptForPassword();
             break;
 
         default:
-            VERBOSE(VB_UPNP, QString("GetConnectionInfo() failed for %1")
+            LogPrint(VB_UPNP, LOG_ERR, 
+                     QString("GetConnectionInfo() failed for %1")
                     .arg(backendName));
             ShowOkPopup(message);
     }
@@ -309,7 +312,8 @@ void BackendSelection::customEvent(QEvent *event)
         QString    URL     = me->ExtraData(2);
 
 
-        VERBOSE(VB_UPNP, QString("BackendSelection::customEvent(%1, %2, %3, %4)")
+        LogPrint(VB_UPNP, LOG_DEBUG, 
+                 QString("BackendSelection::customEvent(%1, %2, %3, %4)")
                 .arg(message).arg(URI).arg(URN).arg(URL));
 
         if (message.startsWith("SSDP_ADD") &&

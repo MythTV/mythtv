@@ -87,8 +87,8 @@ MythDBBackupStatus SchemaUpgradeWizard::BackupDB(void)
 {
     if (emptyDB)
     {
-        VERBOSE(VB_GENERAL,
-                "The database seems to be empty - not attempting a backup");
+        LogPrint(VB_GENERAL, LOG_INFO,
+                 "The database seems to be empty - not attempting a backup");
         return kDB_Backup_Empty_DB;
     }
 
@@ -104,18 +104,18 @@ int SchemaUpgradeWizard::Compare(void)
     // No current schema? Investigate further:
     if (DBver.isEmpty() || DBver == "0")
     {
-        VERBOSE(VB_GENERAL, "No current database version?");
+        LogPrint(VB_GENERAL, LOG_INFO, "No current database version?");
 
         if (DBUtil::IsNewDatabase())
         {
-            VERBOSE(VB_GENERAL, "Database appears to be empty/new!");
+            LogPrint(VB_GENERAL, LOG_INFO, "Database appears to be empty/new!");
             emptyDB = true;
         }
     }
     else
-        VERBOSE(VB_GENERAL, QString("Current %1 Schema Version (%2): %3")
-                                    .arg(m_schemaName).arg(m_schemaSetting)
-                                    .arg(DBver));
+        LogPrint(VB_GENERAL, LOG_INFO,
+                 QString("Current %1 Schema Version (%2): %3")
+                     .arg(m_schemaName).arg(m_schemaSetting).arg(DBver));
 
 #if TESTING
     //DBver = "9" + DBver + "-testing";
@@ -133,7 +133,7 @@ int SchemaUpgradeWizard::CompareAndWait(const int seconds)
         QString message = tr("%1 database schema is old. Waiting to see if DB "
                              "is being upgraded.").arg(m_schemaName);
 
-        VERBOSE(VB_IMPORTANT, message);
+        LogPrint(VB_GENERAL, LOG_CRIT, message);
 
         MSqlQuery query(MSqlQuery::InitCon());
         bool      backupRunning  = false;
@@ -147,8 +147,8 @@ int SchemaUpgradeWizard::CompareAndWait(const int seconds)
 
             if (IsBackupInProgress())
             {
-                VERBOSE(VB_IMPORTANT,
-                        "Waiting for Database Backup to complete.");
+                LogPrint(VB_GENERAL, LOG_CRIT,
+                         "Waiting for Database Backup to complete.");
                 if (!backupRunning)
                 {
                     elapsedTimer.restart();
@@ -159,8 +159,8 @@ int SchemaUpgradeWizard::CompareAndWait(const int seconds)
 
             if (!lockSchema(query))
             {
-                VERBOSE(VB_IMPORTANT,
-                        "Waiting for Database Upgrade to complete.");
+                LogPrint(VB_GENERAL, LOG_CRIT,
+                         "Waiting for Database Upgrade to complete.");
                 if (!upgradeRunning)
                 {
                     elapsedTimer.restart();
@@ -177,10 +177,10 @@ int SchemaUpgradeWizard::CompareAndWait(const int seconds)
         }
 
         if (versionsBehind)
-            VERBOSE(VB_IMPORTANT, "Timed out waiting.");
+            LogPrint(VB_GENERAL, LOG_CRIT, "Timed out waiting.");
         else
-            VERBOSE(VB_IMPORTANT,
-                    "Schema version was upgraded while we were waiting.");
+            LogPrint(VB_GENERAL, LOG_CRIT,
+                     "Schema version was upgraded while we were waiting.");
     }
     // else DB is same version, or newer. Either way, we won't upgrade it
 
@@ -313,31 +313,33 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
 
     if (!gui && (!isatty(fileno(stdin)) || !isatty(fileno(stdout))))
     {
-        VERBOSE(VB_GENERAL, "Console is non-interactive, can't prompt user...");
+        LogPrint(VB_GENERAL, LOG_INFO,
+                 "Console is non-interactive, can't prompt user...");
 
         if (m_expertMode)
         {
-            VERBOSE(VB_IMPORTANT, "Using existing schema.");
+            LogPrint(VB_GENERAL, LOG_CRIT, "Using existing schema.");
             return MYTH_SCHEMA_USE_EXISTING;
         }
 
         if (!validDBMS)
         {
-            VERBOSE(VB_IMPORTANT, warnOldDBMS);
+            LogPrint(VB_GENERAL, LOG_CRIT, warnOldDBMS);
             return MYTH_SCHEMA_EXIT;
         }
 
         if (versionsBehind < 0)
         {
-            VERBOSE(VB_IMPORTANT, QString("Error: MythTV database has newer "
-                    "%1 schema (%2) than expected (%3).")
-                    .arg(name).arg(DBver).arg(m_newSchemaVer));
+            LogPrint(VB_GENERAL, LOG_CRIT,
+                     QString("Error: MythTV database has newer %1 schema (%2) "
+                             "than expected (%3).")
+                         .arg(name).arg(DBver).arg(m_newSchemaVer));
             return MYTH_SCHEMA_ERROR;
         }
 
         if (upgradeIfNoUI && validDBMS)
         {
-            VERBOSE(VB_IMPORTANT, "Upgrading.");
+            LogPrint(VB_GENERAL, LOG_CRIT, "Upgrading.");
             return MYTH_SCHEMA_UPGRADE;
         }
 

@@ -83,8 +83,8 @@ void LayerSet::Draw(QPainter *dr, int drawlayer, int context)
     vector<UIType *>::iterator i = allTypes->begin();
     for (; i != allTypes->end(); i++)
     {
-        if (m_debug == true)
-            VERBOSE(VB_GENERAL, "-LayerSet::Draw");
+        if (m_debug)
+            LogPrint(VB_GENERAL, LOG_DEBUG, "-LayerSet::Draw");
         UIType *type = (*i);
         type->Draw(dr, drawlayer, context);
     }
@@ -98,8 +98,8 @@ void LayerSet::DrawRegion(QPainter *dr, QRect &area, int drawlayer, int context)
     vector<UIType *>::iterator i = allTypes->begin();
     for (; i != allTypes->end(); i++)
     {
-        if (m_debug == true)
-            VERBOSE(VB_GENERAL, "-LayerSet::DrawRegion");
+        if (m_debug)
+            LogPrint(VB_GENERAL, LOG_DEBUG, "-LayerSet::DrawRegion");
         UIType *type = (*i);
         type->DrawRegion(dr, area, drawlayer, context);
     }
@@ -391,7 +391,7 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
   {
     if (drawlayer == m_order)
     {
-        if (m_fill_type == 1 && m_active == true)
+        if (m_fill_type == 1 && m_active)
             dr->fillRect(m_fill_area, QBrush(m_fill_color, Qt::Dense4Pattern));
 
         QString tempWrite;
@@ -401,12 +401,13 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
         QPoint fontdrop = QPoint(0, 0);
         int tempArrows = 0;
 
-        if (m_debug == true)
-            VERBOSE(VB_GENERAL, "   +UIListType::Draw() <- within Layer");
+        if (m_debug)
+            LogPrint(VB_GENERAL, LOG_DEBUG,
+                     "   +UIListType::Draw() <- within Layer");
 
         for (int i = 0; i < m_count; i++)
         {
-            if (m_active == true)
+            if (m_active)
                 tmpfont = &m_fontfcns[m_fonts["active"]];
             else
                 tmpfont = &m_fontfcns[m_fonts["inactive"]];
@@ -428,14 +429,15 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
                 if (caw == 0)
                     caw = m_area.width();
 
-                if (j > 1 && lastShown == true)
+                if (j > 1 && lastShown)
                     left = left + columnWidth[j - 1] + m_pad;
 
-                if (m_debug == true)
+                if (m_debug)
                 {
-                    VERBOSE(VB_GENERAL, QString("      -Column #%1, Column "
-                                                "Context: %2, Draw Context: %3")
-                        .arg(j) .arg(columnContext[j]) .arg(context));
+                    LogPrint(VB_GENERAL, LOG_DEBUG,
+                             QString("      -Column #%1, Column Context: %2, "
+                                     "Draw Context: %3")
+                                 .arg(j) .arg(columnContext[j]) .arg(context));
                 }
 
                 if (columnContext[j] != context && columnContext[j] != -1)
@@ -503,17 +505,17 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
                                  caw - offsetRight, m_selheight,
                                  m_justification, tempWrite);
                     dr->setFont(tmpfont->face);
-                    if (m_debug == true)
-                        VERBOSE(VB_GENERAL, "   +UIListType::Draw() Data: " +
-                                            tempWrite);
+                    if (m_debug)
+                        LogPrint(VB_GENERAL, LOG_DEBUG,
+                                 "   +UIListType::Draw() Data: " + tempWrite);
                     lastShown = true;
                  }
               }
           }
 
-          if (m_uarrow == true)
+          if (m_uarrow)
               dr->drawPixmap(m_uparrow_loc, m_uparrow);
-          if (m_darrow == true)
+          if (m_darrow)
               dr->drawPixmap(m_downarrow_loc, m_downarrow);
     }
     else if (drawlayer == 8 && m_current >= 0)
@@ -524,7 +526,7 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
         fontProp *tmpfont = NULL;
         int tempArrows;
 
-        if (m_active == true)
+        if (m_active)
             tmpfont = &m_fontfcns[m_fonts["selected"]];
         else
             tmpfont = &m_fontfcns[m_fonts["inactive"]];
@@ -537,7 +539,7 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
 
         dr->setFont(tmpfont->face);
 
-        if (m_active == true || m_showSelAlways)
+        if (m_active || m_showSelAlways)
             dr->drawPixmap(m_area.left() + m_selection_loc.x(),
                            m_area.top() + m_selection_loc.y() +
                            (int)(m_current * m_selheight),
@@ -553,14 +555,15 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
             if (caw == 0)
                 caw = m_area.width();
 
-            if (j > 1 && lastShown == true)
+            if (j > 1 && lastShown)
                 left = left + columnWidth[j - 1] + m_pad;
 
-            if (m_debug == true)
+            if (m_debug)
             {
-                VERBOSE(VB_GENERAL, QString("      -Column #%1, Column "
-                                            "Context: %2, Draw Context: %3")
-                    .arg(j) .arg(columnContext[j]) .arg(context));
+                LogPrint(VB_GENERAL, LOG_DEBUG,
+                         QString("      -Column #%1, Column Context: %2, "
+                                 "Draw Context: %3")
+                             .arg(j) .arg(columnContext[j]) .arg(context));
             }
             if (columnContext[j] != context && columnContext[j] != -1)
             {
@@ -627,10 +630,11 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
     }
     else
     {
-        if (m_debug == true)
-            VERBOSE(VB_GENERAL, QString("   +UIListType::Draw() <- outside "
-                                        "(layer = %1, widget layer = %2)")
-                .arg(drawlayer) .arg(m_order));
+        if (m_debug)
+            LogPrint(VB_GENERAL, LOG_DEBUG,
+                     QString("   +UIListType::Draw() <- outside "
+                             "(layer = %1, widget layer = %2)")
+                         .arg(drawlayer) .arg(m_order));
     }
   }
 }
@@ -732,7 +736,7 @@ void UIImageType::LoadImage()
     }
 
     QString file;
-    if (m_flex == true)
+    if (m_flex)
     {
         QString flexprefix = "trans-";
         int pathStart = m_filename.lastIndexOf('/');
@@ -763,14 +767,15 @@ void UIImageType::LoadImage()
 
     if (!GetMythUI()->FindThemeFile(file))
     {
-        VERBOSE(VB_IMPORTANT, "UIImageType::LoadImage() - Cannot find image: " +
-                              m_filename);
+        LogPrint(VB_GENERAL, LOG_CRIT,
+                 "UIImageType::LoadImage() - Cannot find image: " + m_filename);
         m_show = false;
         return;
     }
 
-    if (m_debug == true)
-        VERBOSE(VB_GENERAL, QString("     -Filename: %1").arg(file));
+    if (m_debug)
+        LogPrint(VB_GENERAL, LOG_DEBUG, 
+                 QString("     -Filename: %1").arg(file));
 
     if (m_hmult == 1 && m_wmult == 1 && m_force_x == -1 && m_force_y == -1)
     {
@@ -788,16 +793,16 @@ void UIImageType::LoadImage()
             if (m_force_x != -1)
             {
                 doX = m_force_x;
-                if (m_debug == true)
-                    VERBOSE(VB_GENERAL, QString("         +Force X: %1")
-                        .arg(doX));
+                if (m_debug)
+                    LogPrint(VB_GENERAL, LOG_DEBUG,
+                             QString("         +Force X: %1") .arg(doX));
             }
             if (m_force_y != -1)
             {
                 doY = m_force_y;
-                if (m_debug == true)
-                    VERBOSE(VB_GENERAL, QString("         +Force Y: %1")
-                        .arg(doY));
+                if (m_debug)
+                    LogPrint(VB_GENERAL, LOG_DEBUG,
+                             QString("         +Force Y: %1") .arg(doY));
             }
 
             scalerImg = sourceImg->scaled((int)(doX * m_wmult),
@@ -806,16 +811,16 @@ void UIImageType::LoadImage()
                                             Qt::SmoothTransformation);
             m_show = true;
             img = QPixmap::fromImage(scalerImg);
-            if (m_debug == true)
-                VERBOSE(VB_GENERAL, QString("     -Image: %1 loaded.")
-                    .arg(file));
+            if (m_debug)
+                LogPrint(VB_GENERAL, LOG_DEBUG,
+                         QString("     -Image: %1 loaded.") .arg(file));
         }
         else
         {
             m_show = false;
-            if (m_debug == true)
-                VERBOSE(VB_GENERAL, QString("     -Image: %1 failed to load.")
-                    .arg(file));
+            if (m_debug)
+                LogPrint(VB_GENERAL, LOG_DEBUG,
+                         QString("     -Image: %1 failed to load.") .arg(file));
         }
         delete sourceImg;
     }
@@ -838,32 +843,35 @@ void UIImageType::Draw(QPainter *dr, int drawlayer, int context)
     {
         if (drawlayer == m_order)
         {
-            if (!img.isNull() && m_show == true)
+            if (!img.isNull() && m_show)
             {
-                if (m_debug == true)
+                if (m_debug)
                 {
-                    VERBOSE(VB_GENERAL, "   +UIImageType::Draw() <- "
-                                        "inside Layer");
-                    VERBOSE(VB_GENERAL, QString("       -Drawing @ (%1, %2)")
-                        .arg(m_displaypos.x()) .arg(m_displaypos.y()));
-                    VERBOSE(VB_GENERAL,
-                            QString("       -Skip Section: (%1, %2)")
-                        .arg(m_drop_x) .arg(m_drop_y));
+                    LogPrint(VB_GENERAL, LOG_DEBUG,
+                             "   +UIImageType::Draw() <- inside Layer");
+                    LogPrint(VB_GENERAL, LOG_DEBUG,
+                             QString("       -Drawing @ (%1, %2)")
+                                 .arg(m_displaypos.x()) .arg(m_displaypos.y()));
+                    LogPrint(VB_GENERAL, LOG_DEBUG,
+                             QString("       -Skip Section: (%1, %2)")
+                                 .arg(m_drop_x) .arg(m_drop_y));
                 }
                 dr->drawPixmap(m_displaypos.x(), m_displaypos.y(), img,
                                m_drop_x, m_drop_y, -1, -1);
             }
-            else if (m_debug == true)
+            else if (m_debug)
             {
-                VERBOSE(VB_GENERAL, "   +UIImageType::Draw() <= Image is null");
+                LogPrint(VB_GENERAL, LOG_DEBUG,
+                         "   +UIImageType::Draw() <= Image is null");
             }
         }
     }
-    else if (m_debug == true)
+    else if (m_debug)
     {
-            VERBOSE(VB_GENERAL, QString("   +UIImageType::Draw() <- outside "
-                                        "(layer = %1, widget layer = %2)")
-                .arg(drawlayer) .arg(m_order));
+            LogPrint(VB_GENERAL, LOG_DEBUG,
+                     QString("   +UIImageType::Draw() <- outside "
+                             "(layer = %1, widget layer = %2)")
+                         .arg(drawlayer) .arg(m_order));
     }
 }
 
@@ -922,17 +930,18 @@ void UIRepeatedImageType::Draw(QPainter *p, int drawlayer, int context)
     {
         if (drawlayer == m_order)
         {
-            if (!img.isNull() && m_show == true)
+            if (!img.isNull() && m_show)
             {
-                if (m_debug == true)
+                if (m_debug)
                 {
-                    VERBOSE(VB_GENERAL, "   +UIRepeatedImageType::Draw() <- "
-                                        "inside Layer");
-                    VERBOSE(VB_GENERAL, QString("       -Drawing @ (%1, %2)")
-                       .arg(m_displaypos.x()) .arg(m_displaypos.y()));
-                    VERBOSE(VB_GENERAL,
-                            QString("       -Skip Section: (%1, %2)")
-                       .arg(m_drop_x) .arg(m_drop_y));
+                    LogPrint(VB_GENERAL, LOG_DEBUG,
+                             "   +UIRepeatedImageType::Draw() <- inside Layer");
+                    LogPrint(VB_GENERAL, LOG_DEBUG,
+                             QString("       -Drawing @ (%1, %2)")
+                                 .arg(m_displaypos.x()) .arg(m_displaypos.y()));
+                    LogPrint(VB_GENERAL, LOG_DEBUG,
+                             QString("       -Skip Section: (%1, %2)")
+                                 .arg(m_drop_x) .arg(m_drop_y));
                 }
                 if (m_orientation == 0)
                 {
@@ -971,21 +980,22 @@ void UIRepeatedImageType::Draw(QPainter *p, int drawlayer, int context)
                     }
                 }
             }
-            else if (m_debug == true)
+            else if (m_debug)
             {
-                VERBOSE(VB_GENERAL, "   +UIImageType::Draw() <= Image is "
-                                    "null");
+                LogPrint(VB_GENERAL, LOG_DEBUG,
+                         "   +UIImageType::Draw() <= Image is null");
             }
         }
 
     }
     else
     {
-        if (m_debug == true)
+        if (m_debug)
         {
-            VERBOSE(VB_GENERAL, QString("   +UIImageType::Draw() <- outside "
-                                        "(layer = %1, widget layer = %2)")
-                .arg(drawlayer) .arg(m_order));
+            LogPrint(VB_GENERAL, LOG_DEBUG,
+                     QString("   +UIImageType::Draw() <- outside "
+                             "(layer = %1, widget layer = %2)")
+                         .arg(drawlayer) .arg(m_order));
         }
     }
 }
@@ -1007,9 +1017,9 @@ void UIRepeatedImageType::setOrientation(int x)
 {
     if (x < 0 || x > 3)
     {
-        VERBOSE(VB_GENERAL, QString("UIRepeatedImageType received an invalid "
-                                    "request to set orientation to %1")
-            .arg(x));
+        LogPrint(VB_GENERAL, LOG_CRIT,
+                 QString("UIRepeatedImageType received an invalid "
+                         "request to set orientation to %1") .arg(x));
         return;
     }
     m_orientation = x ;
@@ -1377,7 +1387,7 @@ void UIImageGridType::Draw(QPainter *p, int drawlayer, int context)
     // redraw the complete view rectangle
     QRect pr = displayRect;
 
-    if (m_debug == true)
+    if (m_debug)
     {
         p->setPen(Qt::red);
         p->drawRect(QRect(displayRect.x(), displayRect.y(),
@@ -1432,14 +1442,14 @@ void UIImageGridType::drawCell(QPainter *p, int curPos, int xpos, int ypos)
     if (curPos == currentItem)
     {
         // highlighted
-        if (m_debug == true)
+        if (m_debug)
             p->setPen(Qt::yellow);
         if (highlightedPixmap)
             p->drawPixmap(xpos, ypos, *highlightedPixmap);
     }
     else
     {
-        if (m_debug == true)
+        if (m_debug)
             p->setPen(Qt::green);
         if (normalPixmap)
             p->drawPixmap(xpos, ypos, *normalPixmap);
@@ -1468,7 +1478,7 @@ void UIImageGridType::drawCell(QPainter *p, int curPos, int xpos, int ypos)
                       ( (imageRect.height() - pixmap->height()) / 2 ),
                       *pixmap, 0, 0, -1, -1);
 
-    if (m_debug == true)
+    if (m_debug)
     {
         p->setBrush(Qt::NoBrush);
         p->drawRect(r);
@@ -1484,7 +1494,7 @@ void UIImageGridType::drawText(QPainter *p, int curPos, int xpos, int ypos)
     if (textPos == UIImageGridType::textPosBottom)
         textRect.moveTop(ypos + cellHeight - textHeight);
 
-    if (m_debug == true)
+    if (m_debug)
     {
         p->setBrush(Qt::NoBrush);
         p->setPen(Qt::blue);
@@ -1514,7 +1524,7 @@ void UIImageGridType::drawText(QPainter *p, int curPos, int xpos, int ypos)
         }
     }
 
-    if (m_debug == true)
+    if (m_debug)
     {
         p->setBrush(Qt::NoBrush);
         p->setPen(Qt::blue);
@@ -1593,13 +1603,12 @@ QPixmap *UIImageGridType::createScaledPixmap(QString filename,
         QImage *img = GetMythUI()->LoadScaleImage(filename);
         if (!img)
         {
-            VERBOSE(VB_IMPORTANT, "Failed to load image" + filename);
+            LogPrint(VB_GENERAL, LOG_CRIT, "Failed to load image" + filename);
             return NULL;
         }
         else
         {
-            img->scaled(width, height, mode,
-                        Qt::SmoothTransformation);
+            img->scaled(width, height, mode, Qt::SmoothTransformation);
             pixmap = new QPixmap(QPixmap::fromImage(*img));
             delete img;
         }
@@ -1720,14 +1729,16 @@ void UITextType::Draw(QPainter *dr, int drawlayer, int context)
                               m_displaysize.width(), m_displaysize.height());
             }
             if (m_cutdown && m_debug)
-                VERBOSE(VB_GENERAL, "    +UITextType::CutDown Called.");
+                LogPrint(VB_GENERAL, LOG_DEBUG,
+                         "    +UITextType::CutDown Called.");
 
             if (drawFontShadow && (fontdrop.x() != 0 || fontdrop.y() != 0))
             {
                 if (m_debug)
                 {
-                    VERBOSE(VB_GENERAL, QString("    +UITextType::Drawing "
-                                                "shadow @ (%1, %2)")
+                    LogPrint(VB_GENERAL, LOG_DEBUG,
+                             QString("    +UITextType::Drawing "
+                                     "shadow @ (%1, %2)")
                         .arg((int)(m_displaysize.left() + fontdrop.x()))
                         .arg((int)(m_displaysize.top() + fontdrop.y())));
                 }
@@ -1745,10 +1756,10 @@ void UITextType::Draw(QPainter *dr, int drawlayer, int context)
 
             if (m_debug)
             {
-                VERBOSE(VB_GENERAL,
-                        QString("    +UITextType::Drawing @ (%1, %2)")
-                    .arg((int)(m_displaysize.left()))
-                    .arg((int)(m_displaysize.top())));
+                LogPrint(VB_GENERAL, LOG_DEBUG,
+                         QString("    +UITextType::Drawing @ (%1, %2)")
+                             .arg((int)(m_displaysize.left()))
+                             .arg((int)(m_displaysize.top())));
             }
 
             dr->drawText(m_displaysize.left(), m_displaysize.top(),
@@ -1757,16 +1768,19 @@ void UITextType::Draw(QPainter *dr, int drawlayer, int context)
 
             if (m_debug)
             {
-                VERBOSE(VB_GENERAL, "   +UITextType::Draw() <- inside Layer");
-                VERBOSE(VB_GENERAL, QString("       -Message: %1 (cut: %2)")
-                    .arg(m_message) .arg(msg));
+                LogPrint(VB_GENERAL, LOG_DEBUG,
+                         "   +UITextType::Draw() <- inside Layer");
+                LogPrint(VB_GENERAL, LOG_DEBUG,
+                         QString("       -Message: %1 (cut: %2)")
+                             .arg(m_message) .arg(msg));
             }
         }
         else if (m_debug)
         {
-            VERBOSE(VB_GENERAL, QString("   +UITextType::Draw() <- outside "
-                                        "(layer = %1, widget layer = %2)")
-                .arg(drawlayer) .arg(m_order));
+            LogPrint(VB_GENERAL, LOG_DEBUG,
+                     QString("   +UITextType::Draw() <- outside "
+                             "(layer = %1, widget layer = %2)")
+                         .arg(drawlayer) .arg(m_order));
         }
     }
 }
@@ -1970,10 +1984,10 @@ void UIStatusBarType::Draw(QPainter *dr, int drawlayer, int context)
     {
         if (drawlayer == m_order)
         {
-            if (m_debug == true)
+            if (m_debug)
             {
-                VERBOSE(VB_GENERAL, "   +UIStatusBarType::Draw() <- within "
-                                    "Layer");
+                LogPrint(VB_GENERAL, LOG_DEBUG,
+                         "   +UIStatusBarType::Draw() <- within Layer");
             }
 
             // Width or height of 0 will draw the full image, not what we want
@@ -1989,11 +2003,12 @@ void UIStatusBarType::Draw(QPainter *dr, int drawlayer, int context)
                                (double)(2*m_fillerSpace)) *
                                (double)((double)m_used / (double)m_total));
 
-            if (m_debug == true)
+            if (m_debug)
             {
-                VERBOSE(VB_GENERAL, QString("       -Width  = %1") .arg(width));
-                VERBOSE(VB_GENERAL, QString("       -Height = %1")
-                    .arg(height));
+                LogPrint(VB_GENERAL, LOG_DEBUG,
+                         QString("       -Width  = %1") .arg(width));
+                LogPrint(VB_GENERAL, LOG_DEBUG,
+                         QString("       -Height = %1") .arg(height));
             }
 
             if (m_orientation == 0)
@@ -2042,12 +2057,12 @@ void UIStatusBarType::setOrientation(int x)
 {
     if (x < 0 || x > 3)
     {
-        VERBOSE(VB_GENERAL, QString("UIStatusBarType received an invalid "
-                                    "request to set orientation to %1")
-            .arg(x));
+        LogPrint(VB_GENERAL, LOG_ERR,
+                 QString("UIStatusBarType received an invalid "
+                         "request to set orientation to %1") .arg(x));
         return;
     }
-    m_orientation = x ;
+    m_orientation = x;
 }
 
 // *********************************************************************
@@ -2181,8 +2196,8 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
         GenericTree *parent = current_node->getParent();
         if (parent == NULL)
         {
-            VERBOSE(VB_IMPORTANT, "UIManagedTreeListType: LCD sees no "
-                                  "parent to current_node" );
+            LogPrint(VB_IMPORTANT, LOG_CRIT,
+                     "LCD sees no parent to current_node" );
         }
         else
         {
@@ -2763,8 +2778,9 @@ void UIManagedTreeListType::assignTreeData(GenericTree *a_tree)
     }
     else
     {
-        VERBOSE(VB_GENERAL, "somebody just assigned me to assign tree data, "
-                            "but they gave me no data");
+        LogPrint(VB_GENERAL, LOG_ERR, 
+                 "somebody just assigned me to assign tree data, "
+                 "but they gave me no data");
     }
 
 }
@@ -4305,8 +4321,9 @@ QString UIKeyType::decodeChar(QString c)
                 res += QString(uc);
             }
             else
-                VERBOSE(VB_IMPORTANT, QString("UIKeyType::decodeChar - bad "
-                                              "char code (%1)").arg(sCode));
+                LogPrint(VB_GENERAL, LOG_CRIT,
+                         QString("UIKeyType::decodeChar - bad char code (%1)")
+                             .arg(sCode));
         }
         else
         {

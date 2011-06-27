@@ -43,7 +43,6 @@ MythMediaType FindMediaType(io_service_t service)
     kern_return_t  kernResult;
     io_iterator_t  iter;
     MythMediaType  mediaType = MEDIATYPE_UNKNOWN;
-    QString        msg = QString("FindMediaType() - ");
     bool           isWholeMedia = false;
 
     // Create an iterator across all parents of the service object passed in.
@@ -54,11 +53,12 @@ MythMediaType FindMediaType(io_service_t service)
                                                &iter);
 
     if (KERN_SUCCESS != kernResult)
-        VERBOSE(VB_IMPORTANT, (msg + "IORegistryEntryCreateIterator"
-                                   + " returned %1").arg(kernResult));
+        LogPrint(VB_GENERAL, LOG_CRIT,
+                 QString("IORegistryEntryCreateIterator returned %1")
+                         .arg(kernResult));
     else if (!iter)
-        VERBOSE(VB_IMPORTANT, msg + "IORegistryEntryCreateIterator"
-                                  + " returned a NULL iterator");
+        LogPrint(VB_GENERAL, LOG_CRIT,
+                 "IORegistryEntryCreateIterator returned NULL iterator");
     else
     {
         // A reference on the initial service object is released in
@@ -76,9 +76,9 @@ MythMediaType FindMediaType(io_service_t service)
                              (service, CFSTR(kIOMediaWholeKey), 
                               kCFAllocatorDefault, 0);
 
-                if (NULL == wholeMedia)
-                    VERBOSE(VB_IMPORTANT,
-                            msg + "Could not retrieve Whole property");
+                if (!wholeMedia)
+                    LogPrint(VB_GENERAL, LOG_ALERT,
+                            "Could not retrieve Whole property");
                 else
                 {
                     isWholeMedia = CFBooleanGetValue((CFBooleanRef)wholeMedia);
@@ -120,15 +120,15 @@ MythMediaType MediaTypeForBSDName(const char *bsdName)
 
     if (!bsdName || !*bsdName)
     {
-        VERBOSE(VB_IMPORTANT, msg + " - Error. No name supplied?");
+        LogPrint(VB_GENERAL, LOG_ALERT, msg + " - No name supplied?");
         return MEDIATYPE_UNKNOWN;
     }
 
     matchingDict = IOBSDNameMatching(sMasterPort, 0, bsdName);
-    if (NULL == matchingDict)
+    if (!matchingDict)
     {
-        VERBOSE(VB_IMPORTANT, msg + " - Error. IOBSDNameMatching()"
-                                  + " returned a NULL dictionary.");
+        LogPrint(VB_GENERAL, LOG_ALERT, 
+                 msg + " - IOBSDNameMatching() returned a NULL dictionary.");
         return MEDIATYPE_UNKNOWN;
     }
 
@@ -138,14 +138,16 @@ MythMediaType MediaTypeForBSDName(const char *bsdName)
 
     if (KERN_SUCCESS != kernResult)
     {
-        VERBOSE(VB_IMPORTANT, (msg + " - Error. IOServiceGetMatchingServices()"
-                                   + " returned %2").arg(kernResult));
+        LogPrint(VB_GENERAL, LOG_ALERT,
+                 QString(msg + " - IOServiceGetMatchingServices() returned %2")
+                         .arg(kernResult));
         return MEDIATYPE_UNKNOWN;
     }
     if (!iter)
     {
-        VERBOSE(VB_IMPORTANT, msg + " - Error. IOServiceGetMatchingServices()"
-                                  + " returned a NULL iterator");
+        LogPrint(VB_GENERAL, LOG_ALERT,
+                 msg + " - IOServiceGetMatchingServices() returned a NULL "
+                       "iterator");
         return MEDIATYPE_UNKNOWN;
     }
 
@@ -157,8 +159,8 @@ MythMediaType MediaTypeForBSDName(const char *bsdName)
 
     if (!service)
     {
-        VERBOSE(VB_IMPORTANT, msg + " - Error. IOIteratorNext()"
-                                  + " returned a NULL iterator");
+        LogPrint(VB_GENERAL, LOG_ALERT, 
+                 msg + " - IOIteratorNext() returned a NULL iterator");
         return MEDIATYPE_UNKNOWN;
     }
     mediaType = FindMediaType(service);
@@ -186,8 +188,8 @@ static char * getVolName(CFDictionaryRef diskDetails)
     volName = (char *) malloc(size);
     if (!volName)
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("getVolName() - Error. Can't malloc(%1)?").arg(size));
+        LogPrint(VB_GENERAL, LOG_ALERT, 
+                QString("getVolName() - Can't malloc(%1)?").arg(size));
         return NULL;
     }
 
@@ -257,19 +259,18 @@ void diskAppearedCallback(DADiskRef disk, void *context)
     MythMediaType        mediaType;
     QString              model;
     MonitorThreadDarwin *mtd;
-    QString              msg = "diskAppearedCallback() - ";
     char                *volName;
 
 
     if (!BSDname)
     {
-        VERBOSE(VB_MEDIA, msg + "Skipping non-local device");
+        LogPrint(VB_MEDIA, LOG_INFO, "Skipping non-local device");
         return;
     }
 
     if (!context)
     {
-        VERBOSE(VB_IMPORTANT, msg + "Error. Invoked with a NULL context.");
+        LogPrint(VB_GENERAL, LOG_ALERT, "Error. Invoked with a NULL context.");
         return;
     }
 
@@ -286,7 +287,7 @@ void diskAppearedCallback(DADiskRef disk, void *context)
     if (kCFBooleanFalse ==
         CFDictionaryGetValue(details, kDADiskDescriptionMediaRemovableKey))
     {
-        VERBOSE(VB_MEDIA, msg + "Skipping non-removable " + BSDname);
+        LogPrint(VB_MEDIA, LOG_INFO, "Skipping non-removable " + BSDname);
         CFRelease(details);
         return;
     }
@@ -295,7 +296,7 @@ void diskAppearedCallback(DADiskRef disk, void *context)
     volName = getVolName(details);
     if (!volName)
     {
-        VERBOSE(VB_MEDIA, msg + "No volume name for dev " + BSDname);
+        LogPrint(VB_MEDIA, LOG_INFO, "No volume name for dev " + BSDname);
         CFRelease(details);
         return;
     }
@@ -308,7 +309,7 @@ void diskAppearedCallback(DADiskRef disk, void *context)
     // We know it is removable, and have guessed the type.
     // Call a helper function to create appropriate objects and insert 
 
-    VERBOSE(VB_MEDIA, QString("Found disk %1 - volume name '%2'.")
+    LogPrint(VB_MEDIA, LOG_INFO, QString("Found disk %1 - volume name '%2'.")
                       .arg(BSDname).arg(volName));
 
     mtd->diskInsert(BSDname, volName, model, isCDorDVD);
@@ -334,7 +335,7 @@ void diskChangedCallback(DADiskRef disk, CFArrayRef keys, void *context)
         CFDictionaryRef details = DADiskCopyDescription(disk);
         char           *volName = getVolName(details);
 
-        VERBOSE(VB_MEDIA, QString("Disk %1 - changed name to '%2'.")
+        LogPrint(VB_MEDIA, LOG_INFO, QString("Disk %1 - changed name to '%2'.")
                           .arg(BSDname).arg(volName));
 
         reinterpret_cast<MonitorThreadDarwin *>(context)
@@ -394,9 +395,8 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
                                      QString model, bool isCDorDVD)
 {
     MythMediaDevice  *media;
-    QString           msg = "MonitorThreadDarwin::diskInsert";
 
-    VERBOSE(VB_MEDIA, (msg + "(%1,%2,'%3',%4)")
+    LogPrint(VB_MEDIA, LOG_DEBUG, QString("(%1,%2,'%3',%4)")
                       .arg(devName).arg(volName).arg(model).arg(isCDorDVD));
 
     if (isCDorDVD)
@@ -406,8 +406,7 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
 
     if (!media)
     {
-        VERBOSE(VB_IMPORTANT,
-                msg + " - Error. Couldn't create MythMediaDevice.");
+        LogPrint(VB_GENERAL, LOG_ALERT, "Couldn't create MythMediaDevice.");
         return;
     }
 
@@ -434,7 +433,7 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
 
 void MonitorThreadDarwin::diskRemove(QString devName)
 {
-    VERBOSE(VB_MEDIA,
+    LogPrint(VB_MEDIA, LOG_DEBUG,
             QString("MonitorThreadDarwin::diskRemove(%1)").arg(devName));
 
     if (m_Monitor->m_SendEvent)
@@ -444,7 +443,8 @@ void MonitorThreadDarwin::diskRemove(QString devName)
         if (pDevice)  // Probably should ValidateAndLock() here?
             pDevice->setStatus(MEDIASTAT_NODISK);
         else
-            VERBOSE(VB_MEDIA, "Couldn't find MythMediaDevice: " + devName);
+            LogPrint(VB_MEDIA, LOG_INFO,
+                     "Couldn't find MythMediaDevice: " + devName);
     }
 
     m_Monitor->RemoveDevice(devName);
@@ -458,7 +458,8 @@ void MonitorThreadDarwin::diskRemove(QString devName)
  */
 void MonitorThreadDarwin::diskRename(const char *devName, const char *volName)
 {
-    VERBOSE(VB_MEDIA, QString("MonitorThreadDarwin::diskRename(%1,%2)")
+    LogPrint(VB_MEDIA, LOG_DEBUG,
+             QString("MonitorThreadDarwin::diskRename(%1,%2)")
                       .arg(devName).arg(volName));
 
     MythMediaDevice *pDevice = m_Monitor->GetMedia(devName);
@@ -479,7 +480,8 @@ void MonitorThreadDarwin::diskRename(const char *devName, const char *volName)
         m_Monitor->Unlock(pDevice);
     }
     else
-        VERBOSE(VB_MEDIA, QString("Couldn't find MythMediaDevice: ") + devName);
+        LogPrint(VB_MEDIA, LOG_INFO,
+                 "Couldn't find MythMediaDevice: " + devName);
 }
 
 /**
@@ -509,7 +511,7 @@ void MediaMonitorDarwin::StartMonitoring(void)
 
     qRegisterMetaType<MythMediaStatus>("MythMediaStatus");
 
-    VERBOSE(VB_MEDIA, "Starting MediaMonitor");
+    LogPrint(VB_MEDIA, LOG_NOTICE, "Starting MediaMonitor");
     m_Active = true;
     m_Thread->start();
 }
@@ -521,9 +523,9 @@ void MediaMonitorDarwin::StartMonitoring(void)
  */
 bool MediaMonitorDarwin::AddDevice(MythMediaDevice* pDevice)
 {
-    if ( ! pDevice )
+    if ( !pDevice )
     {
-        VERBOSE(VB_IMPORTANT, "Error - MediaMonitor::AddDevice(null)");
+        LogPrint(VB_GENERAL, LOG_ALERT, "MediaMonitor::AddDevice(null)");
         return false;
     }
 
@@ -611,7 +613,7 @@ QStringList MediaMonitorDarwin::GetCDROMBlockDevices()
     devices = IOServiceMatching(kIOBlockStorageDeviceClass);
     if (!devices)
     {
-        VERBOSE(VB_IMPORTANT, msg + "No Storage Devices? Unlikely!");
+        LogPrint(VB_GENERAL, LOG_ALERT, msg + "No Storage Devices? Unlikely!");
         return list;
     }
 
@@ -620,14 +622,15 @@ QStringList MediaMonitorDarwin::GetCDROMBlockDevices()
 
     if (KERN_SUCCESS != kernResult)
     {
-        VERBOSE(VB_IMPORTANT, (msg + "IORegistryEntryCreateIterator"
-                                   + " returned %1").arg(kernResult));
+        LogPrint(VB_GENERAL, LOG_ALERT, 
+                 QString("IORegistryEntryCreateIterator returned %1")
+                     .arg(kernResult));
         return list;
     }
     if (!iter)
     {
-        VERBOSE(VB_IMPORTANT, msg + "IORegistryEntryCreateIterator"
-                                  + " returned a NULL iterator");
+        LogPrint(VB_GENERAL, LOG_ALERT, 
+                 "IORegistryEntryCreateIterator returned a NULL iterator");
         return list;
     }
 
@@ -647,12 +650,13 @@ QStringList MediaMonitorDarwin::GetCDROMBlockDevices()
                 QString  desc = getModel(drive);
 
                 list.append(desc);
-                VERBOSE(VB_MEDIA, desc.prepend("Found CD/DVD: "));
+                LogPrint(VB_MEDIA, LOG_INFO, desc.prepend("Found CD/DVD: "));
                 CFRelease(p);
             }
         }
         else
-            VERBOSE(VB_IMPORTANT, msg + "Could not retrieve drive properties");
+            LogPrint(VB_GENERAL, LOG_ALERT, 
+                     msg + "Could not retrieve drive properties");
 
         IOObjectRelease(drive);
     }

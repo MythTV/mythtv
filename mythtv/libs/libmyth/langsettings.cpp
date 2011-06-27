@@ -45,14 +45,18 @@ bool LanguageSelection::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'languageselection'");
+        LogPrint(VB_GENERAL, LOG_ALERT, 
+                 "Cannot load screen 'languageselection'");
         return false;
     }
 
-//     connect(m_countryList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-//             SLOT(LocaleClicked(MythUIButtonListItem*)));
-//     connect(m_languageList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-//             SLOT(LanguageClicked(MythUIButtonListItem*)));
+#if 0
+    connect(m_countryList, SIGNAL(itemClicked(MythUIButtonListItem*)),
+            SLOT(LocaleClicked(MythUIButtonListItem*)));
+    connect(m_languageList, SIGNAL(itemClicked(MythUIButtonListItem*)),
+            SLOT(LanguageClicked(MythUIButtonListItem*)));
+#endif
+
     connect(m_saveButton, SIGNAL(Clicked()), SLOT(Save()));
     connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
 
@@ -95,9 +99,9 @@ void LanguageSelection::Load(void)
     QString localeCode = locale->GetLocaleCode();
     QString countryCode = locale->GetCountryCode();
 
-    VERBOSE(VB_GENERAL, QString("System Locale (%1), Country (%2), Language "
-                                "(%3)").arg(localeCode).arg(countryCode)
-                                .arg(langCode));
+    LogPrint(VB_GENERAL, LOG_INFO, 
+             QString("System Locale (%1), Country (%2), Language (%3)")
+                     .arg(localeCode).arg(countryCode).arg(langCode));
 
     CodeToNameMap langMap = MythTranslation::getLanguages();
     QStringList langs = langMap.values();
