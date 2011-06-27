@@ -981,7 +981,7 @@ static void TVMenuCallback(void *data, QString &selection)
         if (fa->Create())
             mainStack->AddScreen(fa);
     }
-    if (sel == "manager")
+    else if (sel == "manager")
         RunVideoScreen(VideoDialog::DLG_MANAGER);
     else if (sel == "browser")
         RunVideoScreen(VideoDialog::DLG_BROWSER);
