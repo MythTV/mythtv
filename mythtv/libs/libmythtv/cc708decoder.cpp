@@ -194,7 +194,7 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
   cc->delayed, blk_start, blk_size);
 */
 
-    for (int i = (cc->delayed[service_num]) ? blk_size : blk_start;
+    for (i = (cc->delayed[service_num]) ? blk_size : blk_start;
          i < blk_size; )
     {
         const int old_i = i;
