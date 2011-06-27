@@ -835,11 +835,7 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
 
 void OpenGLVideo::SetDeinterlacing(bool deinterlacing)
 {
-    if (deinterlacing == hardwareDeinterlacing)
-        return;
-
     hardwareDeinterlacing = deinterlacing;
-
     OpenGLLocker ctx_lock(gl_context);
     CheckResize(hardwareDeinterlacing);
 }

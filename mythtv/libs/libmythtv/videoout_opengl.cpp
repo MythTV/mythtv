@@ -589,6 +589,12 @@ void VideoOutputOpenGL::MoveResize(void)
 {
     QMutexLocker locker(&gl_context_lock);
     VideoOutput::MoveResize();
+    if (gl_videochain)
+    {
+        gl_videochain->SetVideoRect(vsz_enabled ? vsz_desired_display_rect :
+                                                  window.GetDisplayVideoRect(),
+                                    window.GetVideoRect());
+    }
 }
 
 void VideoOutputOpenGL::UpdatePauseFrame(void)
@@ -657,6 +663,7 @@ bool VideoOutputOpenGL::SetupDeinterlace(
         m_deintFilter = NULL;
     }
 
+    MoveResize();
     m_deinterlacing = interlaced;
 
     if (m_deinterlacing && !m_deintfiltername.isEmpty())
@@ -713,8 +720,8 @@ bool VideoOutputOpenGL::SetDeinterlacingEnabled(bool enable)
         }
     }
 
-    if (gl_videochain)
-        gl_videochain->SetDeinterlacing(enable);
+    MoveResize();
+    gl_videochain->SetDeinterlacing(enable);
 
     m_deinterlacing = enable;
 
