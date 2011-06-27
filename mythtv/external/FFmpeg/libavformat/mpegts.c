@@ -1589,14 +1589,14 @@ static AVStream *new_section_av_stream(SectionContext *sect, enum CodecType type
     FF_ALLOCZ_OR_GOTO(NULL, sect->st, sizeof(AVStream), fail);
 
     sect->st->codec = avcodec_alloc_context();
-    sect->st->codec->codec_type = type;
-    sect->st->codec->codec_id   = id;
+    sect->st = av_new_stream(sect->stream, sect->pid);
+
     av_set_pts_info(sect->st, 33, 1, 90000);
 
+    sect->st->codec->codec_type = type;
+    sect->st->codec->codec_id   = id;
     sect->st->priv_data = sect;
     sect->st->need_parsing = AVSTREAM_PARSE_NONE;
-
-    sect->st = av_new_stream(sect->stream, sect->pid);
 
     return sect->st;
 fail: /*for the CHECKED_ALLOCZ macro*/
