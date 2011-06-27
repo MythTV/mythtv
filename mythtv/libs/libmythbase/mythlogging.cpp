@@ -61,6 +61,10 @@ LoggerThread            logThread;
 bool                    logThreadFinished = false;
 bool                    debugRegistration = false;
 
+#ifdef _WIN32
+QMutex                  localtimeMutex;
+#endif
+
 typedef struct {
     bool    propagate;
     int     quiet;
@@ -104,11 +108,14 @@ void verboseAdd(uint64_t mask, QString name, bool additive, QString helptext);
 void verboseInit(void);
 void verboseHelp();
 
+void LogTimeStamp( time_t *epoch, uint32_t *usec, struct tm *tm );
 char *getThreadName( LoggingItem_t *item );
 int64_t getThreadTid( LoggingItem_t *item );
 void setThreadTid( LoggingItem_t *item );
 void deleteItem( LoggingItem_t *item );
+#ifndef _WIN32
 void logSighup( int signum, siginfo_t *info, void *secret );
+#endif
 
 
 LoggerBase::LoggerBase(char *string, int number)
@@ -260,6 +267,7 @@ bool FileLogger::logmsg(LoggingItem_t *item)
 }
 
 
+#ifndef _WIN32
 SyslogLogger::SyslogLogger(int facility) : LoggerBase(NULL, facility),
                                            m_opened(false)
 {
@@ -299,6 +307,7 @@ bool SyslogLogger::logmsg(LoggingItem_t *item)
 
     return true;
 }
+#endif
 
 
 DatabaseLogger::DatabaseLogger(char *table) : LoggerBase(table, 0),
@@ -684,9 +693,9 @@ void deleteItem( LoggingItem_t *item )
     delete item;
 }
 
-void LogTimeStamp( time_t *epoch, uint32_t *usec )
+void LogTimeStamp( time_t *epoch, uint32_t *usec, struct tm *tm )
 {
-    if( !epoch || !usec )
+    if( !epoch || !usec || !tm )
         return;
 
 #if HAVE_GETTIMEOFDAY
@@ -700,6 +709,16 @@ void LogTimeStamp( time_t *epoch, uint32_t *usec )
     QTime     time = date.time();
     *epoch = date.toTime_t();
     *usec = time.msec() * 1000;
+#endif
+
+#ifndef _WIN32
+    localtime_r(epoch, tm);
+#else
+    {
+        QMutexLocker timeLock(&localtimeMutex);
+        struct tm *tmp = localtime(epoch);
+        memcpy(tm, tmp, sizeof(struct tm));
+    }
 #endif
 }
 
@@ -732,9 +751,7 @@ void LogPrintLine( uint32_t mask, LogLevel_t level, const char *file, int line,
     vsnprintf(message, LOGLINE_MAX, format, arguments);
     va_end(arguments);
 
-    LogTimeStamp( &epoch, &usec );
-
-    localtime_r(&epoch, &item->tm);
+    LogTimeStamp( &epoch, &usec, &item->tm );
     item->usec     = usec;
 
     item->level    = level;
@@ -749,6 +766,7 @@ void LogPrintLine( uint32_t mask, LogLevel_t level, const char *file, int line,
     logQueue.enqueue(item);
 }
 
+#ifndef _WIN32
 void logSighup( int signum, siginfo_t *info, void *secret )
 {
     VERBOSE(VB_GENERAL, "SIGHUP received, rolling log files.");
@@ -762,6 +780,7 @@ void logSighup( int signum, siginfo_t *info, void *secret )
         (*it)->reopen();
     }
 }
+#endif
 
 void logPropagateCalc(void)
 {
@@ -804,7 +823,6 @@ void logStart(QString logfile, int quiet, int facility, LogLevel_t level,
               bool dblog, bool propagate)
 {
     LoggerBase *logger;
-    struct sigaction sa;
 
     if (logThread.isRunning())
         return;
@@ -835,23 +853,28 @@ void logStart(QString logfile, int quiet, int facility, LogLevel_t level,
     if( !logfile.isEmpty() )
         logger = new FileLogger((char *)logfile.toLocal8Bit().constData());
 
+#ifndef _WIN32
     /* Syslog */
     if( facility == -1 )
         LogPrint(VB_IMPORTANT, LOG_CRIT,
                  "Syslogging facility unknown, disabling syslog output");
     else if( facility >= 0 )
         logger = new SyslogLogger(facility);
+#endif
 
     /* Database */
     if( dblog )
         logger = new DatabaseLogger((char *)"logging");
 
+#ifndef _WIN32
     /* Setup SIGHUP */
     LogPrint(VB_IMPORTANT, LOG_CRIT, "Setting up SIGHUP handler");
+    struct sigaction sa;
     sa.sa_sigaction = logSighup;
     sigemptyset( &sa.sa_mask );
     sa.sa_flags = SA_RESTART | SA_SIGINFO;
     sigaction( SIGHUP, &sa, NULL );
+#endif
 
     logThread.start();
 }
@@ -896,9 +919,7 @@ void threadRegister(QString name)
         return;
 
     memset( item, 0, sizeof(LoggingItem_t) );
-    LogTimeStamp( &epoch, &usec );
-
-    localtime_r(&epoch, &item->tm);
+    LogTimeStamp( &epoch, &usec, &item->tm );
     item->usec = usec;
 
     item->level = (LogLevel_t)LOG_DEBUG;
@@ -929,9 +950,7 @@ void threadDeregister(void)
         return;
 
     memset( item, 0, sizeof(LoggingItem_t) );
-    LogTimeStamp( &epoch, &usec );
-
-    localtime_r(&epoch, &item->tm);
+    LogTimeStamp( &epoch, &usec, &item->tm );
     item->usec = usec;
 
     item->level = (LogLevel_t)LOG_DEBUG;
@@ -947,6 +966,11 @@ void threadDeregister(void)
 
 int syslogGetFacility(QString facility)
 {
+#ifdef _WIN32
+    LogPrint(VB_GENERAL, LOG_CRIT, "Windows does not support syslog,"
+                                   " disabling" );
+    return( -2 );
+#else
     CODE *name;
     int i;
     char *string = (char *)facility.toLocal8Bit().constData();
@@ -955,6 +979,7 @@ int syslogGetFacility(QString facility)
          name->c_name && strcmp(name->c_name, string); i++, name++ );
 
     return( name->c_val );
+#endif
 }
 
 LogLevel_t logLevelGet(QString level)

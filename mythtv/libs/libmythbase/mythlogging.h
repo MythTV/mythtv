@@ -122,8 +122,6 @@ MBASE_PUBLIC void threadDeregister(void);
 MBASE_PUBLIC int  syslogGetFacility(QString facility);
 MBASE_PUBLIC LogLevel_t logLevelGet(QString level);
 
-void LogTimeStamp( time_t *epoch, uint32_t *usec );
-
 typedef union {
     char   *string;
     int     number;
@@ -154,6 +152,7 @@ class FileLogger : public LoggerBase {
         int  m_fd;
 };
 
+#ifndef _WIN32
 class SyslogLogger : public LoggerBase {
     public:
         SyslogLogger(int facility);
@@ -164,6 +163,7 @@ class SyslogLogger : public LoggerBase {
         char *m_application;
         bool m_opened;
 };
+#endif
 
 class DBLoggerThread;
 
