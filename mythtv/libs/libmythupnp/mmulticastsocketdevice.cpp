@@ -115,9 +115,7 @@ qint64 MMulticastSocketDevice::writeBlock(
             if (addr == "127.0.0.1")
                 continue; // skip localhost address
 
-            struct in_addr interface_addr;
-            inet_pton(AF_INET, addr.toAscii().constData(),
-                      (char*)&interface_addr);
+            uint32_t interface_addr = (*it).toIPv4Address();
             setsockopt(socket(), IPPROTO_IP, IP_MULTICAST_IF,
                        &interface_addr, sizeof(interface_addr));
             retx = MSocketDevice::writeBlock(data, len, host, port);

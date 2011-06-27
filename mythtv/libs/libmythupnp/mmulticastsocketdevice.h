@@ -24,9 +24,13 @@
 #ifndef _MULTICAST_SOCKET_DEVICE_H_
 #define _MULTICAST_SOCKET_DEVICE_H_
 
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/ip.h>
+#ifdef _WIN32
+# include <ws2tcpip.h>
+#else
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <netinet/ip.h>
+#endif
 
 // Qt headers
 #include <QNetworkInterface>
