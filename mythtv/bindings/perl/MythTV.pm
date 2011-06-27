@@ -23,7 +23,6 @@ package MythTV;
     use DBI;
     use HTTP::Request;
     use LWP::UserAgent;
-    use Math::BigInt;
 
 # Load the UPNP libraries if we have them, but die nicely if we don't.
     BEGIN {
@@ -617,7 +616,7 @@ EOF
         }
     # Transfer the data.
         # File size is longlong but is sent as 2 signed ints
-        my $total = $self->decodeLongLong($recs[2], $recs[3]);
+        my $total = $recs[2];
         while ($sock && $total > 0) {
         # Attempt to read in 2M chunks, or the remaining total, whichever is
         # smaller.
@@ -653,27 +652,6 @@ EOF
         }
     # Return
         return 2;
-    }
- # Analogous to decodeLongLong in decodeencode.cpp
-    sub decodeLongLong {
-        my $self = shift;
-        my $first = shift;
-        my $longlong = Math::BigInt->bzero();
-        if($first) { # 1st unsigned int is most significant
-           my $maxInt = Math::BigInt->new('4294967296');
-           my $shifted = $self->signedToUnsignedInt($first) * $maxInt;
-           $longlong += $shifted;
-        }
-        # add the 2nd unsigned int
-        $longlong += $self->signedToUnsignedInt(shift);
-        return $longlong;
-    }
-                                                                    
-    sub signedToUnsignedInt {
-        my $self = shift;
-        $b = pack( "l", shift);
-        my @array = unpack( "L", $b );
-        return Math::BigInt->new(@array);
     }
 
 # Check the MythProto version between the backend and this script
