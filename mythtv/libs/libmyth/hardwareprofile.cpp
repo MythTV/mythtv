@@ -49,7 +49,7 @@ void HardwareProfile::GenerateUUIDs(void)
 
     if (fileUUID.isEmpty() && m_uuid.isEmpty())
     {
-        LogPrint(VB_GENERAL, LOG_INFO, 
+        LOG(VB_GENERAL, LOG_INFO, 
                  "No UUID in DB or File, generating new UUID...");
 
         QString cmd = GetShareDir() + "hardwareprofile/sendProfile.py";
@@ -64,14 +64,14 @@ void HardwareProfile::GenerateUUIDs(void)
     }
     else if (fileUUID.isEmpty())
     {
-        LogPrint(VB_GENERAL, LOG_INFO, 
+        LOG(VB_GENERAL, LOG_INFO, 
                  QString("Writing Database UUID to local file: %1")
                          .arg(m_uuid));
         WritePrivateUUIDToFile(m_uuid);
     }
     else if (m_uuid.isEmpty())
     {
-        LogPrint(VB_GENERAL, LOG_INFO,
+        LOG(VB_GENERAL, LOG_INFO,
                  QString("Profile UUID found in local file: %1")
                          .arg(fileUUID));
         m_uuid = fileUUID;
@@ -164,7 +164,7 @@ bool HardwareProfile::NeedsUpdate(void)
         (m_lastUpdate.addMonths(1) < QDateTime::currentDateTime()) &&
         !m_uuid.isEmpty())
     {
-        LogPrint(VB_GENERAL, LOG_INFO,
+        LOG(VB_GENERAL, LOG_INFO,
                  "Last hardware profile update was > 30 days ago, update "
                  "required...");
         return true;
@@ -179,7 +179,7 @@ bool HardwareProfile::SubmitProfile(void)
         return false;
 
     if (!m_hardwareProfile.isEmpty())
-        LogPrint(VB_GENERAL, LOG_INFO, 
+        LOG(VB_GENERAL, LOG_INFO, 
                  QString("Submitting the following hardware profile:  %1")
                          .arg(m_hardwareProfile));
 
@@ -210,7 +210,7 @@ bool HardwareProfile::DeleteProfile(void)
     if (m_uuid.isEmpty())
         return false;
 
-    LogPrint(VB_GENERAL, LOG_INFO,
+    LOG(VB_GENERAL, LOG_INFO,
              QString("Deleting the following hardware profile: %1")
                      .arg(m_uuid));
 

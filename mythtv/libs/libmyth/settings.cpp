@@ -49,7 +49,7 @@ QWidget* Configurable::configWidget(ConfigurationGroup *cg, QWidget* parent,
     (void)cg;
     (void)parent;
     (void)widgetName;
-    LogPrint(VB_GENERAL, LOG_ALERT, 
+    LOG(VB_GENERAL, LOG_ALERT, 
              "BUG: Configurable is visible, but has no configWidget");
     return NULL;
 }
@@ -199,7 +199,7 @@ void SelectSetting::setValue(int which)
 {
     if ((which >= ((int) values.size())) || (which < 0))
     {
-        LogPrint(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR,
                  QString("SelectSetting::setValue(): invalid index: %1 size: ")
                      .arg(which).arg(values.size()));
     }
@@ -992,7 +992,7 @@ void AutoIncrementDBSetting::Save(QString table)
                 setValue(lii);
             }
             else
-                LogPrint(VB_GENERAL, LOG_EMERG,
+                LOG(VB_GENERAL, LOG_EMERG,
                          "Can't determine the Id of the last insert "
                          "QSqlQuery.lastInsertId() failed, the workaround "
                          "failed too!");

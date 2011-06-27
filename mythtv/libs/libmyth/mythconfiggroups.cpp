@@ -445,7 +445,7 @@ void StackedConfigurationGroup::raise(Configurable* child)
         }
     }
 
-    LogPrint(VB_GENERAL, LOG_ALERT,
+    LOG(VB_GENERAL, LOG_ALERT,
              QString("BUG: StackedConfigurationGroup::raise(): "
                      "unrecognized child 0x%1 on setting %2/%3")
                  .arg((uint64_t)child,0,16).arg(getName()).arg(getLabel()));
@@ -566,7 +566,7 @@ void TriggeredConfigurationGroup::triggerChanged(const QString &value)
 
     if (it == triggerMap.end())
     {
-        LogPrint(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT, 
                 "TriggeredConfigurationGroup::" +
                 QString("triggerChanged(%1) Error:").arg(value) +
                 "Failed to locate value in triggerMap");
@@ -587,7 +587,7 @@ void TriggeredConfigurationGroup::SetVertical(bool vert)
 {
     if (configLayout)
     {
-        LogPrint(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT, 
                  "TriggeredConfigurationGroup::setVertical(): "
                  "Sorry, this must be called before any children are added "
                  "to the group.");
@@ -602,7 +602,7 @@ void TriggeredConfigurationGroup::removeTarget(QString triggerValue)
     ComboBoxSetting *combobox = dynamic_cast<ComboBoxSetting*>(trigger);
     if (!combobox)
     {
-        LogPrint(VB_GENERAL, LOG_ALERT,
+        LOG(VB_GENERAL, LOG_ALERT,
                  "TriggeredConfigurationGroup::removeTarget(): "
                  "Failed to cast trigger to ComboBoxSetting -- aborting");
         return;
@@ -611,7 +611,7 @@ void TriggeredConfigurationGroup::removeTarget(QString triggerValue)
     QMap<QString,Configurable*>::iterator cit = triggerMap.find(triggerValue);
     if (cit == triggerMap.end())
     {
-        LogPrint(VB_GENERAL, LOG_ALERT,
+        LOG(VB_GENERAL, LOG_ALERT,
                  QString("TriggeredConfigurationGroup::removeTarget(): "
                         "Failed to find desired value(%1) -- aborting")
                      .arg(triggerValue));
@@ -632,7 +632,7 @@ void TriggeredConfigurationGroup::removeTarget(QString triggerValue)
 
     if (!ok)
     {
-        LogPrint(VB_GENERAL, LOG_ALERT,
+        LOG(VB_GENERAL, LOG_ALERT,
                  QString("TriggeredConfigurationGroup::removeTarget(): "
                          "Failed to remove '%1' from combobox -- aborting")
                      .arg(triggerValue));

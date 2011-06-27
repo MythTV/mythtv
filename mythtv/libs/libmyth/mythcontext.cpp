@@ -173,7 +173,7 @@ static void exec_program_tv_cb(const QString &cmd)
                                 "in-progress recordings from the delete menu");
         }
 
-        LogPrint(VB_GENERAL, LOG_ALERT, QString("exec_program_tv: ") + label);
+        LOG(VB_GENERAL, LOG_ALERT, QString("exec_program_tv: ") + label);
 
         ShowOkPopup(label);
     }
@@ -353,7 +353,7 @@ bool MythContextPrivate::FindDatabase(const bool prompt, const bool noPrompt)
             autoSelect = manualSelect = false;   // so disable any further UPnP
         else
             if (failure.length())
-                LogPrint(VB_GENERAL, LOG_ALERT, failure);
+                LOG(VB_GENERAL, LOG_ALERT, failure);
 
         failure = TestDBconnection();
         if (failure.isEmpty())
@@ -413,13 +413,13 @@ bool MythContextPrivate::FindDatabase(const bool prompt, const bool noPrompt)
     // line or the GUI depending on the application.
     while (!failure.isEmpty())
     {
-        LogPrint(VB_GENERAL, LOG_ALERT, failure);
+        LOG(VB_GENERAL, LOG_ALERT, failure);
         if (( manualSelect && ChooseBackend(failure)) ||
             (!manualSelect && PromptForDatabaseParams(failure)))
         {
             failure = TestDBconnection();
             if (failure.length())
-                LogPrint(VB_GENERAL, LOG_ALERT, failure);
+                LOG(VB_GENERAL, LOG_ALERT, failure);
         }
         else
             goto NoDBfound;
@@ -427,7 +427,7 @@ bool MythContextPrivate::FindDatabase(const bool prompt, const bool noPrompt)
 
 DBfound:
 #if 0
-    LogPrint(VB_GENERAL, LOG_DEBUG, "FindDatabase() - Success!");
+    LOG(VB_GENERAL, LOG_DEBUG, "FindDatabase() - Success!");
 #endif
     StoreConnectionInfo();
     EnableDBerrors();
@@ -436,7 +436,7 @@ DBfound:
 
 NoDBfound:
 #if 0
-    LogPrint(VB_GENERAL, LOG_DEBUG, "FindDatabase() - failed");
+    LOG(VB_GENERAL, LOG_DEBUG, "FindDatabase() - failed");
 #endif
     return false;
 }
@@ -458,15 +458,15 @@ void MythContextPrivate::LoadDatabaseSettings(void)
         char localhostname[1024];
         if (gethostname(localhostname, 1024))
         {
-            LogPrint(VB_GENERAL, LOG_ALERT,
+            LOG(VB_GENERAL, LOG_ALERT,
                     "MCP: Error, could not determine host name." + ENO);
             localhostname[0] = '\0';
         }
         hostname = localhostname;
-        LogPrint(VB_GENERAL, LOG_ALERT, "Empty LocalHostName.");
+        LOG(VB_GENERAL, LOG_ALERT, "Empty LocalHostName.");
     }
 
-    LogPrint(VB_GENERAL, LOG_INFO, QString("Using localhost value of %1")
+    LOG(VB_GENERAL, LOG_INFO, QString("Using localhost value of %1")
             .arg(hostname));
     gCoreContext->SetLocalHostname(hostname);
 }
@@ -486,7 +486,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
         DatabaseSettings settings(m_DBhostCp);
         accepted = (settings.exec() == QDialog::Accepted);
         if (!accepted)
-            LogPrint(VB_GENERAL, LOG_ALERT,
+            LOG(VB_GENERAL, LOG_ALERT,
                      "User cancelled database configuration");
 
         EndTempWindow();
@@ -580,19 +580,19 @@ QString MythContextPrivate::TestDBconnection(void)
                 break;
             }
 
-            LogPrint(VB_GENERAL, LOG_INFO,
+            LOG(VB_GENERAL, LOG_INFO,
                      QString("Trying to wake up host %1, attempt %2")
                           .arg(host).arg(attempt));
             myth_system(m_DBparams.wolCommand);
 
-            LogPrint(VB_GENERAL, LOG_INFO,
+            LOG(VB_GENERAL, LOG_INFO,
                      QString("Waiting for %1 seconds").arg(wakeupTime));
             sleep(m_DBparams.wolReconnect);
         }
 
     if (doPing)
     {
-        LogPrint(VB_GENERAL, LOG_INFO,
+        LOG(VB_GENERAL, LOG_INFO,
                  QString("Testing network connectivity to '%1'").arg(host));
     }
 
@@ -694,7 +694,7 @@ int MythContextPrivate::ChooseBackend(const QString &error)
     if (error.length())
         ShowOkPopup(error);
 
-    LogPrint(VB_GENERAL, LOG_INFO, "Putting up the UPnP backend chooser");
+    LOG(VB_GENERAL, LOG_INFO, "Putting up the UPnP backend chooser");
 
     BackendSelection::prompt(&m_DBparams, m_pConfig);
 
@@ -749,7 +749,7 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
 
     if (!backends)
     {
-        LogPrint(VB_GENERAL, LOG_INFO, "No UPnP backends found");
+        LOG(VB_GENERAL, LOG_INFO, "No UPnP backends found");
         return 0;
     }
 
@@ -757,14 +757,14 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
     switch (count)
     {
         case 0:
-            LogPrint(VB_GENERAL, LOG_ALERT,
+            LOG(VB_GENERAL, LOG_ALERT,
                      "No UPnP backends found, but SSDP::Find() not NULL!");
             break;
         case 1:
-            LogPrint(VB_GENERAL, LOG_INFO, "Found one UPnP backend");
+            LOG(VB_GENERAL, LOG_INFO, "Found one UPnP backend");
             break;
         default:
-            LogPrint(VB_GENERAL, LOG_INFO,
+            LOG(VB_GENERAL, LOG_INFO,
                      QString("More than one UPnP backend found (%1)")
                          .arg(count));
     }
@@ -805,11 +805,11 @@ bool MythContextPrivate::DefaultUPnP(QString &error)
 
     if (USN.isEmpty())
     {
-        LogPrint(VB_UPNP, LOG_INFO, "No default UPnP backend");
+        LOG(VB_UPNP, LOG_INFO, "No default UPnP backend");
         return false;
     }
 
-    LogPrint(VB_UPNP, LOG_INFO, "config.xml has default " +
+    LOG(VB_UPNP, LOG_INFO, "config.xml has default " +
              QString("PIN '%1' and host USN: %2") .arg(PIN).arg(USN));
 
     // ----------------------------------------------------------------------
@@ -873,12 +873,12 @@ bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
     QString        URL = backend->m_sLocation;
     MythXMLClient  client(URL);
 
-    LogPrint(VB_UPNP, LOG_INFO, QString("Trying host at %1").arg(URL));
+    LOG(VB_UPNP, LOG_INFO, QString("Trying host at %1").arg(URL));
     switch (client.GetConnectionInfo(PIN, &m_DBparams, error))
     {
         case UPnPResult_Success:
             gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
-            LogPrint(VB_UPNP, LOG_INFO,
+            LOG(VB_UPNP, LOG_INFO,
                      "Got database hostname: " + m_DBparams.dbHostName);
             return true;
 
@@ -886,11 +886,11 @@ bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
             // The stored PIN is probably not correct.
             // We could prompt for the PIN and try again, but that needs a UI.
             // Easier to fail for now, and put up the full UI selector later
-            LogPrint(VB_UPNP, LOG_ERR, "Wrong PIN?");
+            LOG(VB_UPNP, LOG_ERR, "Wrong PIN?");
             return false;
 
         default:
-            LogPrint(VB_UPNP, LOG_ERR, error);
+            LOG(VB_UPNP, LOG_ERR, error);
             break;
     }
 
@@ -902,7 +902,7 @@ bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
     if (URL.isEmpty())
         return false;
 
-    LogPrint(VB_UPNP, LOG_INFO, "Trying default DB credentials at " + URL);
+    LOG(VB_UPNP, LOG_INFO, "Trying default DB credentials at " + URL);
     m_DBparams.dbHostName = URL;
 
     return true;
@@ -981,7 +981,7 @@ void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
     }
     else
     {
-        LogPrint(VB_GENERAL, LOG_ERR, message);
+        LOG(VB_GENERAL, LOG_ERR, message);
         qApp->exit(GENERIC_EXIT_SOCKET_ERROR);
     }
 }
@@ -1005,7 +1005,7 @@ MythContext::MythContext(const QString &binversion)
     if (!WSAStarted) {
         WSADATA wsadata;
         int res = WSAStartup(MAKEWORD(2, 0), &wsadata);
-        LogPrint(VB_SOCKET, LOG_INFO, 
+        LOG(VB_SOCKET, LOG_INFO, 
                  QString("WSAStartup returned %1").arg(res));
     }
 #endif
@@ -1016,7 +1016,7 @@ MythContext::MythContext(const QString &binversion)
 
     if (!gCoreContext || !gCoreContext->Init())
     {
-        LogPrint(VB_GENERAL, LOG_EMERG, "Unable to allocate MythCoreContext");
+        LOG(VB_GENERAL, LOG_EMERG, "Unable to allocate MythCoreContext");
         qApp->exit(GENERIC_EXIT_NO_MYTHCONTEXT);
     }
 }
@@ -1028,13 +1028,13 @@ bool MythContext::Init(const bool gui,
 {
     if (!d)
     {
-        LogPrint(VB_GENERAL, LOG_EMERG, "Init() Out-of-memory");
+        LOG(VB_GENERAL, LOG_EMERG, "Init() Out-of-memory");
         return false;
     }
 
     if (app_binary_version != MYTH_BINARY_VERSION)
     {
-        LogPrint(VB_GENERAL, LOG_EMERG, 
+        LOG(VB_GENERAL, LOG_EMERG, 
                  QString("Application binary version (%1) does not "
                          "match libraries (%2)")
                      .arg(app_binary_version) .arg(MYTH_BINARY_VERSION));
@@ -1047,7 +1047,7 @@ bool MythContext::Init(const bool gui,
             d->TempMainWindow(false);
             ShowOkPopup(warning);
         }
-        LogPrint(VB_GENERAL, LOG_WARNING, warning);
+        LOG(VB_GENERAL, LOG_WARNING, warning);
 
         return false;
     }
@@ -1082,7 +1082,7 @@ bool MythContext::Init(const bool gui,
             d->TempMainWindow(false);
             ShowOkPopup(warning);
         }
-        LogPrint(VB_GENERAL, LOG_WARNING, warning);
+        LOG(VB_GENERAL, LOG_WARNING, warning);
 
         return false;
     }
@@ -1100,7 +1100,7 @@ bool MythContext::Init(const bool gui,
 MythContext::~MythContext()
 {
     if (QThreadPool::globalInstance()->activeThreadCount())
-        LogPrint(VB_GENERAL, LOG_INFO, "Waiting for threads to exit.");
+        LOG(VB_GENERAL, LOG_INFO, "Waiting for threads to exit.");
 
     QThreadPool::globalInstance()->waitForDone();
     logStop();
@@ -1122,7 +1122,7 @@ bool MythContext::TestPopupVersion(const QString &name,
         "Plugin %1 is not compatible with the installed MythTV "
         "libraries.");
 
-    LogPrint(VB_GENERAL, LOG_EMERG, 
+    LOG(VB_GENERAL, LOG_EMERG, 
              QString("Plugin %1 (%2) binary version does not "
                      "match libraries (%3)")
                  .arg(name).arg(pluginversion).arg(libversion));

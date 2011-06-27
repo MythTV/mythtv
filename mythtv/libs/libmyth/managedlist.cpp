@@ -435,7 +435,7 @@ ManagedListItem* SelectManagedListItem::addSelection(const QString& label,
     }
 
 #if 0
-    LogPrint(VB_GENERAL, LOG_DEBUG, 
+    LOG(VB_GENERAL, LOG_DEBUG, 
              QString("adding '%1' value == %2 curval == %3")
 	             .arg(label) .arg(value) .arg(valueText));
 #endif
@@ -447,7 +447,7 @@ ManagedListItem* SelectManagedListItem::addSelection(const QString& label,
 
         int index = getValueIndex(value);
 #if 0
-        LogPrint(VB_IMPORTANT, LOG_DEBUG,
+        LOG(VB_IMPORTANT, LOG_DEBUG,
                 QString("new item matches cur value and is at: %1").arg(index));
 #endif
         if (index > 0)
@@ -806,7 +806,7 @@ bool ManagedList::init(XMLParse       *themeIn,
 
     if (!themeIn || containerNameIn.isEmpty() || listNameIn.isEmpty())
     {
-        LogPrint(VB_GENERAL, LOG_ALERT, "sanity check failed");
+        LOG(VB_GENERAL, LOG_ALERT, "sanity check failed");
         return false;
     }
 
@@ -816,7 +816,7 @@ bool ManagedList::init(XMLParse       *themeIn,
     container = theme->GetSet(containerName);
     if (!container)
     {
-        LogPrint(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT, 
                  QString("Failed to get container %1") .arg(containerName));
         return false;
     }
@@ -826,7 +826,7 @@ bool ManagedList::init(XMLParse       *themeIn,
     ltype = (UIListType *)container->GetType(listName);
     if (!ltype)
     {
-        LogPrint(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT, 
 		 QString("Failed to get list %1") .arg(listName));
         return false;
     }

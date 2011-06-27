@@ -91,14 +91,14 @@ static const QString LOC = QString("MMUnix:");
 // TODO: are these used?
 static void fstabError(const QString &methodName)
 {
-    LogPrint(VB_GENERAL, LOG_ALERT, 
+    LOG(VB_GENERAL, LOG_ALERT, 
              LOC + methodName + " Error: failed to open " + _PATH_FSTAB +
              " for reading, " + ENO);
 }
 
 static void statError(const QString &methodName, const QString devPath)
 {
-    LogPrint(VB_GENERAL, LOG_ALERT, 
+    LOG(VB_GENERAL, LOG_ALERT, 
              LOC + methodName + " Error: failed to stat " + devPath + 
              ", " + ENO);
 }
@@ -114,7 +114,7 @@ MediaMonitorUnix::MediaMonitorUnix(QObject* par,
     CheckFileSystemTable();
     CheckMountable();
 
-    LogPrint(VB_MEDIA, LOG_INFO, "Initial device list...\n" + listDevices());
+    LOG(VB_MEDIA, LOG_INFO, "Initial device list...\n" + listDevices());
 }
 
 
@@ -198,7 +198,7 @@ bool MediaMonitorUnix::CheckMountable(void)
         QDBusConnection::systemBus() );
     if (!iface.isValid())
     {
-        LogPrint(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT, 
                  "CheckMountable: DBus interface error: " +
                  iface.lastError().message() );
         return false;
@@ -209,7 +209,7 @@ bool MediaMonitorUnix::CheckMountable(void)
     QDBusReply<QDBusObjectPathList> reply = iface.call("EnumerateDevices");
     if (!reply.isValid())
     {
-        LogPrint(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT, 
                  "CheckMountable DBus EnumerateDevices error: " +
                  reply.error().message() );
         return false;
@@ -290,13 +290,13 @@ bool MediaMonitorUnix::CheckRemovable(const QString &dev)
 
             if (ok)
             {
-                LogPrint(VB_MEDIA, LOG_DEBUG, msg + c);
+                LOG(VB_MEDIA, LOG_DEBUG, msg + c);
                 if (c == '1')
                     return true;
             }
             else
             {
-                LogPrint(VB_GENERAL, LOG_ALERT, msg + "failed");
+                LOG(VB_GENERAL, LOG_ALERT, msg + "failed");
             }
         }
         return false;
@@ -339,14 +339,14 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
                 // device with partitions.  FindPartition locates a partition
                 // in sysfs but udev hasn't created the devnode for it yet.
                 // Udev will send another AddDevice for the partition later.
-                LogPrint(VB_MEDIA, LOG_DEBUG, msg + " devnode not (yet) known");
+                LOG(VB_MEDIA, LOG_DEBUG, msg + " devnode not (yet) known");
             }
 
             udev_device_unref(device);
         }
         else
         {
-            LogPrint(VB_GENERAL, LOG_ALERT, 
+            LOG(VB_GENERAL, LOG_ALERT, 
                      msg + " udev_device_new_from_syspath returned NULL");
             ret = "";
         }
@@ -354,7 +354,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
         udev_unref(udev);
     }
     else
-        LogPrint(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT, 
                  "MediaMonitorUnix::GetDeviceFile udev_new failed");
   #else   // HAVE_LIBUDEV
     // Use udevadm info to determine the name
@@ -380,7 +380,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
     {
         QTextStream estream(udevinfo->ReadAllErr());
         while( !estream.atEnd() )
-            LogPrint(VB_MEDIA, LOG_DEBUG,
+            LOG(VB_MEDIA, LOG_DEBUG,
                     msg + " - udevadm info error...\n" + estream.readLine());
     }
 
@@ -393,7 +393,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
   #endif // HAVE_LIBUDEV
 #endif // linux
 
-    LogPrint(VB_MEDIA, LOG_INFO, msg + "->'" + ret + "'");
+    LOG(VB_MEDIA, LOG_INFO, msg + "->'" + ret + "'");
     return ret;
 }
 #endif // !CONFIG_QTDBUS
@@ -453,7 +453,7 @@ QStringList MediaMonitorUnix::GetCDROMBlockDevices(void)
     }
 #endif // linux
 
-    LogPrint(VB_MEDIA, LOG_DEBUG,
+    LOG(VB_MEDIA, LOG_DEBUG,
              LOC + ":GetCDROMBlockDevices()->'" + l.join(", ") + "'");
     return l;
 }
@@ -526,7 +526,7 @@ static void LookupModel(MythMediaDevice* device)
     }
 #endif
 
-    LogPrint(VB_MEDIA, LOG_DEBUG, QString("LookupModel '%1' -> '%2'")
+    LOG(VB_MEDIA, LOG_DEBUG, QString("LookupModel '%1' -> '%2'")
              .arg(device->getRealDevice()).arg(desc) );
     device->setDeviceModel(desc.toAscii().constData());
 }
@@ -538,7 +538,7 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
 {
     if ( ! pDevice )
     {
-        LogPrint(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT, 
                  "Error - MediaMonitorUnix::AddDevice(null)");
         return false;
     }
@@ -550,7 +550,7 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
     QString path = pDevice->getDevicePath();
     if (!path.length())
     {
-        LogPrint(VB_GENERAL, LOG_ALERT,
+        LOG(VB_GENERAL, LOG_ALERT,
                 "MediaMonitorUnix::AddDevice() - empty device path.");
         return false;
     }
@@ -579,7 +579,7 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
 
         if (sb.st_rdev == new_rdev)
         {
-            LogPrint(VB_MEDIA, LOG_INFO,
+            LOG(VB_MEDIA, LOG_INFO,
                      LOC + ":AddDevice() - not adding " + path + 
                      "\n                        "
                      "because it appears to be a duplicate of " +
@@ -596,7 +596,7 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
             this, SLOT(mediaStatusChanged(MythMediaStatus, MythMediaDevice*)));
     m_Devices.push_back( pDevice );
     m_UseCount[pDevice] = 0;
-    LogPrint(VB_MEDIA, LOG_INFO, LOC + ":AddDevice() - Added " + path);
+    LOG(VB_MEDIA, LOG_INFO, LOC + ":AddDevice() - Added " + path);
 
     return true;
 }
@@ -609,7 +609,7 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
 
     QString devicePath( mep->fs_spec );
 #if 0
-    LogPrint(VB_GENERAL, LOG_DEBUG, "AddDevice - " + devicePath);
+    LOG(VB_GENERAL, LOG_DEBUG, "AddDevice - " + devicePath);
 #endif
 
     MythMediaDevice* pDevice = NULL;
@@ -646,7 +646,7 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
     {
         is_cdrom = true;
 #if 0
-        LogPrint(VB_GENERAL, LOG_DEBUG, "Device is a CDROM");
+        LOG(VB_GENERAL, LOG_DEBUG, "Device is a CDROM");
 #endif
     }
 
@@ -701,7 +701,7 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
  */
 void MediaMonitorUnix::deviceAdded( QDBusObjectPath o)
 {
-    LogPrint(VB_MEDIA, LOG_INFO, LOC + ":deviceAdded " + o.path());
+    LOG(VB_MEDIA, LOG_INFO, LOC + ":deviceAdded " + o.path());
 
     // Don't add devices with partition tables, just the partitions
     if (!DeviceProperty(o, "DeviceIsPartitionTable").toBool())
@@ -724,7 +724,7 @@ void MediaMonitorUnix::deviceAdded( QDBusObjectPath o)
  */
 void MediaMonitorUnix::deviceRemoved( QDBusObjectPath o)
 {
-    LogPrint(VB_MEDIA, LOG_INFO, LOC + "deviceRemoved " + o.path());
+    LOG(VB_MEDIA, LOG_INFO, LOC + "deviceRemoved " + o.path());
 #if 0 // This fails because the DeviceFile has just been deleted
     QString dev = DeviceProperty(o, "DeviceFile");
     if (!dev.isEmpty())
@@ -756,7 +756,7 @@ void MediaMonitorUnix::deviceRemoved( QDBusObjectPath o)
  */
 bool MediaMonitorUnix::FindPartitions(const QString &dev, bool checkPartitions)
 {
-    LogPrint(VB_MEDIA, LOG_DEBUG, 
+    LOG(VB_MEDIA, LOG_DEBUG, 
              LOC + ":FindPartitions(" + dev + 
              QString(",%1").arg(checkPartitions ? " true" : " false" ) + ")");
     MythMediaDevice* pDevice = NULL;
@@ -850,7 +850,7 @@ void MediaMonitorUnix::CheckDeviceNotifications(void)
         if ((*it).startsWith("add"))
         {
             QString dev = (*it).section(' ', 1, 1);
-            LogPrint(VB_MEDIA, LOG_INFO, "Udev add " + dev);
+            LOG(VB_MEDIA, LOG_INFO, "Udev add " + dev);
 
             if (CheckRemovable(dev))
                 FindPartitions(dev, true);
@@ -858,7 +858,7 @@ void MediaMonitorUnix::CheckDeviceNotifications(void)
         else if ((*it).startsWith("remove"))
         {
             QString dev = (*it).section(' ', 2, 2);
-            LogPrint(VB_MEDIA, LOG_INFO, "Udev remove " + dev);
+            LOG(VB_MEDIA, LOG_INFO, "Udev remove " + dev);
             RemoveDevice(dev);
         }
     }

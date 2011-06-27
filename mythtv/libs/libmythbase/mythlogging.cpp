@@ -161,13 +161,13 @@ FileLogger::FileLogger(char *filename) : LoggerBase(filename, 0),
     {
         m_opened = true;
         m_fd = 1;
-        LogPrint(VB_IMPORTANT, LOG_INFO, "Added logging to the console");
+        LOG(VB_IMPORTANT, LOG_INFO, "Added logging to the console");
     }
     else
     {
         m_fd = open(filename, O_WRONLY|O_CREAT|O_APPEND, 0664);
         m_opened = (m_fd != -1);
-        LogPrint(VB_IMPORTANT, LOG_INFO, QString("Added logging to %1")
+        LOG(VB_IMPORTANT, LOG_INFO, QString("Added logging to %1")
                  .arg(filename));
     }
 }
@@ -178,12 +178,12 @@ FileLogger::~FileLogger()
     {
         if( m_fd != 1 )
         {
-            LogPrint(VB_IMPORTANT, LOG_INFO, QString("Removed logging to %1")
+            LOG(VB_IMPORTANT, LOG_INFO, QString("Removed logging to %1")
                      .arg(m_handle.string));
             close( m_fd );
         }
         else
-            LogPrint(VB_IMPORTANT, LOG_INFO, "Removed logging to the console");
+            LOG(VB_IMPORTANT, LOG_INFO, "Removed logging to the console");
     }
 }
 
@@ -199,7 +199,7 @@ void FileLogger::reopen(void)
 
     m_fd = open(filename, O_WRONLY|O_CREAT|O_APPEND, 0664);
     m_opened = (m_fd != -1);
-    LogPrint(VB_IMPORTANT, LOG_INFO, QString("Rolled logging on %1")
+    LOG(VB_IMPORTANT, LOG_INFO, QString("Rolled logging on %1")
              .arg(filename));
 }
 
@@ -256,7 +256,7 @@ bool FileLogger::logmsg(LoggingItem_t *item)
 
     if( result == -1 )
     {
-        LogPrint(VB_IMPORTANT, LOG_UNKNOWN,
+        LOG(VB_IMPORTANT, LOG_UNKNOWN,
                  QString("Closed Log output on fd %1 due to errors").arg(m_fd));
         m_opened = false;
         if( m_fd != 1 )
@@ -282,13 +282,13 @@ SyslogLogger::SyslogLogger(int facility) : LoggerBase(NULL, facility),
     for( name = &facilitynames[0];
          name->c_name && name->c_val != facility; name++ );
 
-    LogPrint(VB_IMPORTANT, LOG_INFO, QString("Added syslogging to facility %1")
+    LOG(VB_IMPORTANT, LOG_INFO, QString("Added syslogging to facility %1")
              .arg(name->c_name));
 }
 
 SyslogLogger::~SyslogLogger()
 {
-    LogPrint(VB_IMPORTANT, LOG_INFO, "Removing syslogging");
+    LOG(VB_IMPORTANT, LOG_INFO, "Removing syslogging");
     free(m_application);
     closelog();
 }
@@ -319,7 +319,7 @@ DatabaseLogger::DatabaseLogger(char *table) : LoggerBase(table, 0),
         "msgtime, level, message) VALUES (:HOST, :APPLICATION, "
         ":PID, :THREAD, :MSGTIME, :LEVEL, :MESSAGE)";
 
-    LogPrint(VB_IMPORTANT, LOG_INFO, 
+    LOG(VB_IMPORTANT, LOG_INFO, 
              QString("Added database logging to table %1")
              .arg(m_handle.string));
 
@@ -342,7 +342,7 @@ DatabaseLogger::DatabaseLogger(char *table) : LoggerBase(table, 0),
 
 DatabaseLogger::~DatabaseLogger()
 {
-    LogPrint(VB_IMPORTANT, LOG_INFO, "Removing database logging");
+    LOG(VB_IMPORTANT, LOG_INFO, "Removing database logging");
 
     if( m_thread )
     {
@@ -828,7 +828,7 @@ void logStart(QString logfile, int quiet, int facility, LogLevel_t level,
         return;
  
     logLevel = level;
-    LogPrint(VB_IMPORTANT, LOG_CRIT, QString("Setting Log Level to %1")
+    LOG(VB_IMPORTANT, LOG_CRIT, QString("Setting Log Level to %1")
              .arg(LogLevelNames[logLevel]));
 
     logPropagateOpts.propagate = propagate;
@@ -856,7 +856,7 @@ void logStart(QString logfile, int quiet, int facility, LogLevel_t level,
 #ifndef _WIN32
     /* Syslog */
     if( facility == -1 )
-        LogPrint(VB_IMPORTANT, LOG_CRIT,
+        LOG(VB_IMPORTANT, LOG_CRIT,
                  "Syslogging facility unknown, disabling syslog output");
     else if( facility >= 0 )
         logger = new SyslogLogger(facility);
@@ -868,7 +868,7 @@ void logStart(QString logfile, int quiet, int facility, LogLevel_t level,
 
 #ifndef _WIN32
     /* Setup SIGHUP */
-    LogPrint(VB_IMPORTANT, LOG_CRIT, "Setting up SIGHUP handler");
+    LOG(VB_IMPORTANT, LOG_CRIT, "Setting up SIGHUP handler");
     struct sigaction sa;
     sa.sa_sigaction = logSighup;
     sigemptyset( &sa.sa_mask );
@@ -968,7 +968,7 @@ void threadDeregister(void)
 int syslogGetFacility(QString facility)
 {
 #ifdef _WIN32
-    LogPrint(VB_GENERAL, LOG_CRIT, "Windows does not support syslog,"
+    LOG(VB_GENERAL, LOG_CRIT, "Windows does not support syslog,"
                                    " disabling" );
     return( -2 );
 #else

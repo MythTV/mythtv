@@ -245,7 +245,7 @@ void UIListTreeType::SetTree(UIListGenericTree *toplevel)
         //
 
 #if 0
-        LogPrint(VB_GENERAL, LOG_DEBUG, "No top-level children?");
+        LOG(VB_GENERAL, LOG_DEBUG, "No top-level children?");
 #endif
         return;
     }
@@ -258,7 +258,7 @@ void UIListTreeType::SetTree(UIListGenericTree *toplevel)
 
     if (!currentlevel)
     {
-        LogPrint(VB_GENERAL, LOG_ALERT,
+        LOG(VB_GENERAL, LOG_ALERT,
                  "Something is seriously wrong (currentlevel = NULL)");
         return;
     }
@@ -462,7 +462,7 @@ UIListBtnType *UIListTreeType::GetLevel(int levelnum)
 {
     if ((uint)levelnum > (uint)listLevels.size())
     {
-        LogPrint(VB_GENERAL, LOG_ERR, "OOB GetLevel call");
+        LOG(VB_GENERAL, LOG_ERR, "OOB GetLevel call");
         return NULL;
     }
 
@@ -739,7 +739,7 @@ bool UIListTreeType::tryToSetCurrent(QStringList route)
             currentpos = (UIListGenericTree *)next_child;
             if (!currentlevel->MoveToNamedPosition(currentpos->getString()))
             {
-                LogPrint(VB_GENERAL, LOG_CRIT,
+                LOG(VB_GENERAL, LOG_CRIT,
                          "had problem finding something it knows is there");
                 keep_going = false;
             }
@@ -1420,7 +1420,7 @@ bool UIListBtnType::MoveItemUpDown(UIListBtnTypeItem *item, bool flag)
 
     if (item != m_selItem)
     {
-        LogPrint(VB_GENERAL, LOG_ERR, "Can't move non-selected item");
+        LOG(VB_GENERAL, LOG_ERR, "Can't move non-selected item");
         return false;
     }
 

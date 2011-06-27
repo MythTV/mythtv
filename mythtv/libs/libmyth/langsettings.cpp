@@ -45,7 +45,7 @@ bool LanguageSelection::Create(void)
 
     if (err)
     {
-        LogPrint(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT, 
                  "Cannot load screen 'languageselection'");
         return false;
     }
@@ -99,7 +99,7 @@ void LanguageSelection::Load(void)
     QString localeCode = locale->GetLocaleCode();
     QString countryCode = locale->GetCountryCode();
 
-    LogPrint(VB_GENERAL, LOG_INFO, 
+    LOG(VB_GENERAL, LOG_INFO, 
              QString("System Locale (%1), Country (%2), Language (%3)")
                      .arg(localeCode).arg(countryCode).arg(langCode));
 

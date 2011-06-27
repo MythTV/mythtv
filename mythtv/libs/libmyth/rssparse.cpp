@@ -711,7 +711,7 @@ ResultItem::resultList Parse::parseRSS(QDomDocument domDoc)
     ResultItem::resultList vList;
 
     QString document = domDoc.toString();
-    LogPrint(VB_GENERAL, LOG_DEBUG, "Will Be Parsing: " + document);
+    LOG(VB_GENERAL, LOG_DEBUG, "Will Be Parsing: " + document);
 
     QDomElement root = domDoc.documentElement();
     QDomElement channel = root.firstChildElement("channel");

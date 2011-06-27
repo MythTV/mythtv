@@ -136,7 +136,7 @@ bool RemoteDeleteRecording(
 
     if (!result)
     {
-        LogPrint(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT, 
                  QString("Failed to delete recording %1:%2")
                      .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
     }
@@ -190,7 +190,7 @@ uint RemoteGetRecordingList(
 
     if (numrecordings * NUMPROGRAMLINES + 1 > (int)strList.size())
     {
-        LogPrint(VB_GENERAL, LOG_ERR, 
+        LOG(VB_GENERAL, LOG_ERR, 
                  "RemoteGetRecordingList() list size appears to be incorrect.");
         return 0;
     }
@@ -301,7 +301,7 @@ QDateTime RemoteGetPreviewIfModified(
     if (!gCoreContext->SendReceiveStringList(strlist) ||
         strlist.empty() || strlist[0] == "ERROR")
     {
-        LogPrint(VB_GENERAL, LOG_ERR, "Remote error" +
+        LOG(VB_GENERAL, LOG_ERR, "Remote error" +
                  ((strlist.size() >= 2) ? (":\n\t\t\t" + strlist[1]) : ""));
 
         return QDateTime();
@@ -309,7 +309,7 @@ QDateTime RemoteGetPreviewIfModified(
 
     if (strlist[0] == "WARNING")
     {
-        LogPrint(VB_NETWORK, LOG_WARNING, "Remote warning" +
+        LOG(VB_NETWORK, LOG_WARNING, "Remote warning" +
                  ((strlist.size() >= 2) ? (":\n\t\t\t" + strlist[1]) : ""));
 
         return QDateTime();
@@ -330,7 +330,7 @@ QDateTime RemoteGetPreviewIfModified(
     QByteArray data = QByteArray::fromBase64(strlist[3].toAscii());
     if ((size_t) data.size() < length)
     { // (note data.size() may be up to 3 bytes longer after decoding
-        LogPrint(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR,
                  QString("Preview size check failed %1 < %2")
                      .arg(data.size()).arg(length));
         return QDateTime();
@@ -339,7 +339,7 @@ QDateTime RemoteGetPreviewIfModified(
 
     if (checksum16 != qChecksum(data.constData(), data.size()))
     {
-        LogPrint(VB_GENERAL, LOG_ERR, "Preview checksum failed");
+        LOG(VB_GENERAL, LOG_ERR, "Preview checksum failed");
         return QDateTime();
     }
 
@@ -347,7 +347,7 @@ QDateTime RemoteGetPreviewIfModified(
     QDir cfd(pdir);
     if (!cfd.exists() && !cfd.mkdir(pdir))
     {
-        LogPrint(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR,
                  QString("Unable to create remote cache directory '%1'")
                      .arg(pdir));
 
@@ -357,7 +357,7 @@ QDateTime RemoteGetPreviewIfModified(
     QFile file(cachefile);
     if (!file.open(QIODevice::WriteOnly|QIODevice::Truncate))
     {
-        LogPrint(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR,
                  QString("Unable to open cached preview file for writing '%1'")
                      .arg(cachefile));
 
@@ -384,7 +384,7 @@ QDateTime RemoteGetPreviewIfModified(
 
     if (remaining)
     {
-        LogPrint(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR,
                  QString("Failed to write cached preview file '%1'")
                      .arg(cachefile));
 
@@ -483,7 +483,7 @@ int RemoteGetFreeRecorderCount(void)
 
     if (strlist[0] == "UNKNOWN_COMMAND")
     {
-        LogPrint(VB_GENERAL, LOG_EMERG,
+        LOG(VB_GENERAL, LOG_EMERG,
                  "Unknown command GET_FREE_RECORDER_COUNT, upgrade your "
                  "backend version.");
         return 0;

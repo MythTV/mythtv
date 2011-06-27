@@ -49,7 +49,7 @@ int MythPlugin::init(const char *libversion)
         error_msg = dlerror();
     }
 
-    LogPrint(VB_GENERAL, LOG_EMERG, QString("MythPlugin::init() dlerror: %1")
+    LOG(VB_GENERAL, LOG_EMERG, QString("MythPlugin::init() dlerror: %1")
             .arg(error_msg));
 
     return -1;
@@ -144,7 +144,7 @@ MythPluginManager::MythPluginManager()
 
         QStringList libraries = filterDir.entryList();
         if (libraries.isEmpty())
-            LogPrint(VB_GENERAL, LOG_WARNING,
+            LOG(VB_GENERAL, LOG_WARNING,
                     "No libraries in plugins directory " + filterDir.path());
 
         for (QStringList::iterator i = libraries.begin(); i != libraries.end();
@@ -160,7 +160,7 @@ MythPluginManager::MythPluginManager()
         }
     }
     else
-        LogPrint(VB_GENERAL, LOG_WARNING,
+        LOG(VB_GENERAL, LOG_WARNING,
                  "No plugins directory " + filterDir.path());
 
     gContext->SetDisableLibraryPopup(false);
@@ -187,7 +187,7 @@ bool MythPluginManager::init_plugin(const QString &plugname)
     {
         delete m_dict[newname];
         m_dict.remove(newname);
-        LogPrint(VB_GENERAL, LOG_ERR, 
+        LOG(VB_GENERAL, LOG_ERR, 
                  QString("Unable to initialize plugin '%1'.") .arg(plugname));
         return false;
     }
@@ -215,7 +215,7 @@ bool MythPluginManager::run_plugin(const QString &plugname)
 
     if (!m_dict[newname] && !init_plugin(plugname))
     {
-        LogPrint(VB_GENERAL, LOG_ALERT,
+        LOG(VB_GENERAL, LOG_ALERT,
                  QString("Unable to run plugin '%1': not initialized")
                      .arg(plugname));
         return true;
@@ -233,7 +233,7 @@ bool MythPluginManager::config_plugin(const QString &plugname)
 
     if (!m_dict[newname] && !init_plugin(plugname))
     {
-        LogPrint(VB_GENERAL, LOG_ALERT,
+        LOG(VB_GENERAL, LOG_ALERT,
                  QString("Unable to configure plugin '%1': not initialized")
                      .arg(plugname));
         return true;
@@ -250,7 +250,7 @@ bool MythPluginManager::destroy_plugin(const QString &plugname)
 
     if (!m_dict[newname] && !init_plugin(plugname))
     {
-        LogPrint(VB_GENERAL, LOG_ALERT,
+        LOG(VB_GENERAL, LOG_ALERT,
                  QString("Unable to destroy plugin '%1': not initialized")
                      .arg(plugname));
         return false;

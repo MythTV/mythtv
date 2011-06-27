@@ -91,11 +91,11 @@ extern "C" {
 #endif
 
 #ifdef __cplusplus
-#define LogPrint(mask, level, string) \
+#define LOG(mask, level, string) \
     LogPrintLine(mask, (LogLevel_t)level, __FILE__, __LINE__, __FUNCTION__, \
                  QString(string).toLocal8Bit().constData())
 #else
-#define LogPrint(mask, level, format, ...) \
+#define LOG(mask, level, format, ...) \
     LogPrintLine(mask, (LogLevel_t)level, __FILE__, __LINE__, __FUNCTION__, \
                  (const char *)format, ##__VA_ARGS__)
 #endif
@@ -240,10 +240,10 @@ extern MBASE_PUBLIC uint64_t verboseMask;
 
 #ifdef __cplusplus
 #define VERBOSE(mask, ...) \
-    LogPrint((uint64_t)(mask), LOG_INFO, QString(__VA_ARGS__))
+    LOG((uint64_t)(mask), LOG_INFO, QString(__VA_ARGS__))
 #else
 #define VERBOSE(mask, ...) \
-    LogPrint((uint64_t)(mask), LOG_INFO, __VA_ARGS__)
+    LOG((uint64_t)(mask), LOG_INFO, __VA_ARGS__)
 #endif
 
 

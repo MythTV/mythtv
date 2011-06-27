@@ -44,7 +44,7 @@ MediaMonitorWindows::MediaMonitorWindows(QObject* par,
 
         if (!media)
         {
-            LogPrint(VB_GENERAL, LOG_ALERT,
+            LOG(VB_GENERAL, LOG_ALERT,
                     "Error. Couldn't create MythMediaDevice.");
             return;
         }
@@ -61,14 +61,14 @@ MediaMonitorWindows::MediaMonitorWindows(QObject* par,
         AddDevice(media);
     }
 
-    LogPrint(VB_MEDIA, LOG_INFO, "Initial device list: " + listDevices());
+    LOG(VB_MEDIA, LOG_INFO, "Initial device list: " + listDevices());
 }
 
 bool MediaMonitorWindows::AddDevice(MythMediaDevice *pDevice)
 {
     if (!pDevice)
     {
-        LogPrint(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT, 
                  "Error - MediaMonitorWindows::AddDevice(null)");
         return false;
     }
@@ -83,7 +83,7 @@ bool MediaMonitorWindows::AddDevice(MythMediaDevice *pDevice)
     {
         if ((*itr)->getDevicePath() == path)
         {
-            LogPrint(VB_MEDIA, LOG_INFO, 
+            LOG(VB_MEDIA, LOG_INFO, 
                      "MediamonitorWindows::AddDevice() -- " +
                      QString("Not adding '%1', it appears to be a duplicate.")
                          .arg(path));

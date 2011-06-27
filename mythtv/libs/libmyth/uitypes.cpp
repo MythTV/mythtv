@@ -84,7 +84,7 @@ void LayerSet::Draw(QPainter *dr, int drawlayer, int context)
     for (; i != allTypes->end(); i++)
     {
         if (m_debug)
-            LogPrint(VB_GENERAL, LOG_DEBUG, "-LayerSet::Draw");
+            LOG(VB_GENERAL, LOG_DEBUG, "-LayerSet::Draw");
         UIType *type = (*i);
         type->Draw(dr, drawlayer, context);
     }
@@ -99,7 +99,7 @@ void LayerSet::DrawRegion(QPainter *dr, QRect &area, int drawlayer, int context)
     for (; i != allTypes->end(); i++)
     {
         if (m_debug)
-            LogPrint(VB_GENERAL, LOG_DEBUG, "-LayerSet::DrawRegion");
+            LOG(VB_GENERAL, LOG_DEBUG, "-LayerSet::DrawRegion");
         UIType *type = (*i);
         type->DrawRegion(dr, area, drawlayer, context);
     }
@@ -402,7 +402,7 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
         int tempArrows = 0;
 
         if (m_debug)
-            LogPrint(VB_GENERAL, LOG_DEBUG,
+            LOG(VB_GENERAL, LOG_DEBUG,
                      "   +UIListType::Draw() <- within Layer");
 
         for (int i = 0; i < m_count; i++)
@@ -434,7 +434,7 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
 
                 if (m_debug)
                 {
-                    LogPrint(VB_GENERAL, LOG_DEBUG,
+                    LOG(VB_GENERAL, LOG_DEBUG,
                              QString("      -Column #%1, Column Context: %2, "
                                      "Draw Context: %3")
                                  .arg(j) .arg(columnContext[j]) .arg(context));
@@ -506,7 +506,7 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
                                  m_justification, tempWrite);
                     dr->setFont(tmpfont->face);
                     if (m_debug)
-                        LogPrint(VB_GENERAL, LOG_DEBUG,
+                        LOG(VB_GENERAL, LOG_DEBUG,
                                  "   +UIListType::Draw() Data: " + tempWrite);
                     lastShown = true;
                  }
@@ -560,7 +560,7 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
 
             if (m_debug)
             {
-                LogPrint(VB_GENERAL, LOG_DEBUG,
+                LOG(VB_GENERAL, LOG_DEBUG,
                          QString("      -Column #%1, Column Context: %2, "
                                  "Draw Context: %3")
                              .arg(j) .arg(columnContext[j]) .arg(context));
@@ -631,7 +631,7 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
     else
     {
         if (m_debug)
-            LogPrint(VB_GENERAL, LOG_DEBUG,
+            LOG(VB_GENERAL, LOG_DEBUG,
                      QString("   +UIListType::Draw() <- outside "
                              "(layer = %1, widget layer = %2)")
                          .arg(drawlayer) .arg(m_order));
@@ -767,14 +767,14 @@ void UIImageType::LoadImage()
 
     if (!GetMythUI()->FindThemeFile(file))
     {
-        LogPrint(VB_GENERAL, LOG_CRIT,
+        LOG(VB_GENERAL, LOG_CRIT,
                  "UIImageType::LoadImage() - Cannot find image: " + m_filename);
         m_show = false;
         return;
     }
 
     if (m_debug)
-        LogPrint(VB_GENERAL, LOG_DEBUG, 
+        LOG(VB_GENERAL, LOG_DEBUG, 
                  QString("     -Filename: %1").arg(file));
 
     if (m_hmult == 1 && m_wmult == 1 && m_force_x == -1 && m_force_y == -1)
@@ -794,14 +794,14 @@ void UIImageType::LoadImage()
             {
                 doX = m_force_x;
                 if (m_debug)
-                    LogPrint(VB_GENERAL, LOG_DEBUG,
+                    LOG(VB_GENERAL, LOG_DEBUG,
                              QString("         +Force X: %1") .arg(doX));
             }
             if (m_force_y != -1)
             {
                 doY = m_force_y;
                 if (m_debug)
-                    LogPrint(VB_GENERAL, LOG_DEBUG,
+                    LOG(VB_GENERAL, LOG_DEBUG,
                              QString("         +Force Y: %1") .arg(doY));
             }
 
@@ -812,14 +812,14 @@ void UIImageType::LoadImage()
             m_show = true;
             img = QPixmap::fromImage(scalerImg);
             if (m_debug)
-                LogPrint(VB_GENERAL, LOG_DEBUG,
+                LOG(VB_GENERAL, LOG_DEBUG,
                          QString("     -Image: %1 loaded.") .arg(file));
         }
         else
         {
             m_show = false;
             if (m_debug)
-                LogPrint(VB_GENERAL, LOG_DEBUG,
+                LOG(VB_GENERAL, LOG_DEBUG,
                          QString("     -Image: %1 failed to load.") .arg(file));
         }
         delete sourceImg;
@@ -847,12 +847,12 @@ void UIImageType::Draw(QPainter *dr, int drawlayer, int context)
             {
                 if (m_debug)
                 {
-                    LogPrint(VB_GENERAL, LOG_DEBUG,
+                    LOG(VB_GENERAL, LOG_DEBUG,
                              "   +UIImageType::Draw() <- inside Layer");
-                    LogPrint(VB_GENERAL, LOG_DEBUG,
+                    LOG(VB_GENERAL, LOG_DEBUG,
                              QString("       -Drawing @ (%1, %2)")
                                  .arg(m_displaypos.x()) .arg(m_displaypos.y()));
-                    LogPrint(VB_GENERAL, LOG_DEBUG,
+                    LOG(VB_GENERAL, LOG_DEBUG,
                              QString("       -Skip Section: (%1, %2)")
                                  .arg(m_drop_x) .arg(m_drop_y));
                 }
@@ -861,14 +861,14 @@ void UIImageType::Draw(QPainter *dr, int drawlayer, int context)
             }
             else if (m_debug)
             {
-                LogPrint(VB_GENERAL, LOG_DEBUG,
+                LOG(VB_GENERAL, LOG_DEBUG,
                          "   +UIImageType::Draw() <= Image is null");
             }
         }
     }
     else if (m_debug)
     {
-            LogPrint(VB_GENERAL, LOG_DEBUG,
+            LOG(VB_GENERAL, LOG_DEBUG,
                      QString("   +UIImageType::Draw() <- outside "
                              "(layer = %1, widget layer = %2)")
                          .arg(drawlayer) .arg(m_order));
@@ -934,12 +934,12 @@ void UIRepeatedImageType::Draw(QPainter *p, int drawlayer, int context)
             {
                 if (m_debug)
                 {
-                    LogPrint(VB_GENERAL, LOG_DEBUG,
+                    LOG(VB_GENERAL, LOG_DEBUG,
                              "   +UIRepeatedImageType::Draw() <- inside Layer");
-                    LogPrint(VB_GENERAL, LOG_DEBUG,
+                    LOG(VB_GENERAL, LOG_DEBUG,
                              QString("       -Drawing @ (%1, %2)")
                                  .arg(m_displaypos.x()) .arg(m_displaypos.y()));
-                    LogPrint(VB_GENERAL, LOG_DEBUG,
+                    LOG(VB_GENERAL, LOG_DEBUG,
                              QString("       -Skip Section: (%1, %2)")
                                  .arg(m_drop_x) .arg(m_drop_y));
                 }
@@ -982,7 +982,7 @@ void UIRepeatedImageType::Draw(QPainter *p, int drawlayer, int context)
             }
             else if (m_debug)
             {
-                LogPrint(VB_GENERAL, LOG_DEBUG,
+                LOG(VB_GENERAL, LOG_DEBUG,
                          "   +UIImageType::Draw() <= Image is null");
             }
         }
@@ -992,7 +992,7 @@ void UIRepeatedImageType::Draw(QPainter *p, int drawlayer, int context)
     {
         if (m_debug)
         {
-            LogPrint(VB_GENERAL, LOG_DEBUG,
+            LOG(VB_GENERAL, LOG_DEBUG,
                      QString("   +UIImageType::Draw() <- outside "
                              "(layer = %1, widget layer = %2)")
                          .arg(drawlayer) .arg(m_order));
@@ -1017,7 +1017,7 @@ void UIRepeatedImageType::setOrientation(int x)
 {
     if (x < 0 || x > 3)
     {
-        LogPrint(VB_GENERAL, LOG_CRIT,
+        LOG(VB_GENERAL, LOG_CRIT,
                  QString("UIRepeatedImageType received an invalid "
                          "request to set orientation to %1") .arg(x));
         return;
@@ -1603,7 +1603,7 @@ QPixmap *UIImageGridType::createScaledPixmap(QString filename,
         QImage *img = GetMythUI()->LoadScaleImage(filename);
         if (!img)
         {
-            LogPrint(VB_GENERAL, LOG_CRIT, "Failed to load image" + filename);
+            LOG(VB_GENERAL, LOG_CRIT, "Failed to load image" + filename);
             return NULL;
         }
         else
@@ -1729,14 +1729,14 @@ void UITextType::Draw(QPainter *dr, int drawlayer, int context)
                               m_displaysize.width(), m_displaysize.height());
             }
             if (m_cutdown && m_debug)
-                LogPrint(VB_GENERAL, LOG_DEBUG,
+                LOG(VB_GENERAL, LOG_DEBUG,
                          "    +UITextType::CutDown Called.");
 
             if (drawFontShadow && (fontdrop.x() != 0 || fontdrop.y() != 0))
             {
                 if (m_debug)
                 {
-                    LogPrint(VB_GENERAL, LOG_DEBUG,
+                    LOG(VB_GENERAL, LOG_DEBUG,
                              QString("    +UITextType::Drawing "
                                      "shadow @ (%1, %2)")
                         .arg((int)(m_displaysize.left() + fontdrop.x()))
@@ -1756,7 +1756,7 @@ void UITextType::Draw(QPainter *dr, int drawlayer, int context)
 
             if (m_debug)
             {
-                LogPrint(VB_GENERAL, LOG_DEBUG,
+                LOG(VB_GENERAL, LOG_DEBUG,
                          QString("    +UITextType::Drawing @ (%1, %2)")
                              .arg((int)(m_displaysize.left()))
                              .arg((int)(m_displaysize.top())));
@@ -1768,16 +1768,16 @@ void UITextType::Draw(QPainter *dr, int drawlayer, int context)
 
             if (m_debug)
             {
-                LogPrint(VB_GENERAL, LOG_DEBUG,
+                LOG(VB_GENERAL, LOG_DEBUG,
                          "   +UITextType::Draw() <- inside Layer");
-                LogPrint(VB_GENERAL, LOG_DEBUG,
+                LOG(VB_GENERAL, LOG_DEBUG,
                          QString("       -Message: %1 (cut: %2)")
                              .arg(m_message) .arg(msg));
             }
         }
         else if (m_debug)
         {
-            LogPrint(VB_GENERAL, LOG_DEBUG,
+            LOG(VB_GENERAL, LOG_DEBUG,
                      QString("   +UITextType::Draw() <- outside "
                              "(layer = %1, widget layer = %2)")
                          .arg(drawlayer) .arg(m_order));
@@ -1986,7 +1986,7 @@ void UIStatusBarType::Draw(QPainter *dr, int drawlayer, int context)
         {
             if (m_debug)
             {
-                LogPrint(VB_GENERAL, LOG_DEBUG,
+                LOG(VB_GENERAL, LOG_DEBUG,
                          "   +UIStatusBarType::Draw() <- within Layer");
             }
 
@@ -2005,9 +2005,9 @@ void UIStatusBarType::Draw(QPainter *dr, int drawlayer, int context)
 
             if (m_debug)
             {
-                LogPrint(VB_GENERAL, LOG_DEBUG,
+                LOG(VB_GENERAL, LOG_DEBUG,
                          QString("       -Width  = %1") .arg(width));
-                LogPrint(VB_GENERAL, LOG_DEBUG,
+                LOG(VB_GENERAL, LOG_DEBUG,
                          QString("       -Height = %1") .arg(height));
             }
 
@@ -2057,7 +2057,7 @@ void UIStatusBarType::setOrientation(int x)
 {
     if (x < 0 || x > 3)
     {
-        LogPrint(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR,
                  QString("UIStatusBarType received an invalid "
                          "request to set orientation to %1") .arg(x));
         return;
@@ -2196,7 +2196,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
         GenericTree *parent = current_node->getParent();
         if (parent == NULL)
         {
-            LogPrint(VB_IMPORTANT, LOG_CRIT,
+            LOG(VB_IMPORTANT, LOG_CRIT,
                      "LCD sees no parent to current_node" );
         }
         else
@@ -2778,7 +2778,7 @@ void UIManagedTreeListType::assignTreeData(GenericTree *a_tree)
     }
     else
     {
-        LogPrint(VB_GENERAL, LOG_ERR, 
+        LOG(VB_GENERAL, LOG_ERR, 
                  "somebody just assigned me to assign tree data, "
                  "but they gave me no data");
     }
@@ -4321,7 +4321,7 @@ QString UIKeyType::decodeChar(QString c)
                 res += QString(uc);
             }
             else
-                LogPrint(VB_GENERAL, LOG_CRIT,
+                LOG(VB_GENERAL, LOG_CRIT,
                          QString("UIKeyType::decodeChar - bad char code (%1)")
                              .arg(sCode));
         }

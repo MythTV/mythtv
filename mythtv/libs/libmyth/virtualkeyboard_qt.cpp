@@ -33,7 +33,7 @@ void VirtualKeyboardQt::SwitchLayout(const QString &lang)
 {
     if (!m_parentEdit)
     {
-        LogPrint(VB_GENERAL, LOG_ERR, "No edit receiving output");
+        LOG(VB_GENERAL, LOG_ERR, "No edit receiving output");
         reject();
         return;
     }
@@ -44,13 +44,13 @@ void VirtualKeyboardQt::SwitchLayout(const QString &lang)
 
     if (!loadThemedWindow("keyboard", theme_file))
     {
-        LogPrint(VB_GENERAL, LOG_WARNING,
+        LOG(VB_GENERAL, LOG_WARNING,
                  QString("Cannot find layout for '%1'").arg(language));
 
         // cannot find layout so fallback to US English layout
         if (!loadThemedWindow("keyboard", "keyboard/en_us_"))
         {
-            LogPrint(VB_GENERAL, LOG_ERR, "Cannot find layout for US English");
+            LOG(VB_GENERAL, LOG_ERR, "Cannot find layout for US English");
 
             reject();
             return;
@@ -62,7 +62,7 @@ void VirtualKeyboardQt::SwitchLayout(const QString &lang)
 
     if (!container)
     {
-        LogPrint(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR,
                  "Cannot find the 'keyboard_container' in your theme");
 
         reject();
@@ -163,7 +163,7 @@ void VirtualKeyboardQt::SwitchLayout(const QString &lang)
     m_keyboard = getUIKeyboardType("keyboard");
     if (!m_keyboard)
     {
-        LogPrint(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR,
                  "Cannot find the UIKeyboardType in your theme");
 
         reject();

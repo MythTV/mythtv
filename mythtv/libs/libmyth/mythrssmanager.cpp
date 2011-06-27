@@ -52,7 +52,7 @@ void RSSManager::doUpdate()
     for (RSSSite::rssList::iterator i = m_sites.begin();
             i != m_sites.end(); ++i)
     {
-        LogPrint(VB_GENERAL, LOG_INFO,
+        LOG(VB_GENERAL, LOG_INFO,
                  QString("Updating RSS Feed %1") .arg((*i)->GetTitle()));
 
         connect(*i, SIGNAL(finished(RSSSite*)),
@@ -220,7 +220,7 @@ void RSSSite::process(void)
 
     if (!domDoc.setContent(m_data, true))
     {
-        LogPrint(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR,
                  "Failed to set content from downloaded XML");
         return;
     }
@@ -257,7 +257,7 @@ void RSSSite::process(void)
     }
     else
     {
-        LogPrint(VB_GENERAL, LOG_ERR, "Data is not valid RSS-feed");
+        LOG(VB_GENERAL, LOG_ERR, "Data is not valid RSS-feed");
         emit finished(this);
     }
 }

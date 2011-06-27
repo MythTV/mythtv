@@ -33,7 +33,7 @@ using namespace std;
 // for deserialization
 #define NEXT_STR()        do { if (it == listend)                    \
                                {                                     \
-                                   LogPrint(VB_GENERAL, LOG_ALERT, listerror); \
+                                   LOG(VB_GENERAL, LOG_ALERT, listerror); \
                                    clear();                          \
                                    return false;                     \
                                }                                     \

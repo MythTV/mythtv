@@ -97,7 +97,7 @@ void MediaMonitor::SetCDSpeed(const char *device, int speed)
         delete cd;
     }
 
-    LogPrint(VB_MEDIA, LOG_INFO, 
+    LOG(VB_MEDIA, LOG_INFO, 
              QString("MediaMonitor::setSpeed(%1) - Cannot find/create CDROM?")
                   .arg(device));
 }
@@ -160,7 +160,7 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString label,
 
     if (drives.count() == 0)
     {
-        LogPrint(VB_MEDIA, LOG_INFO,
+        LOG(VB_MEDIA, LOG_INFO,
                  "MediaMonitor::selectDrivePopup(" + label +
                  ") - No suitable devices");
         return NULL;
@@ -168,7 +168,7 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString label,
 
     if (drives.count() == 1)
     {
-        LogPrint(VB_MEDIA, LOG_INFO, 
+        LOG(VB_MEDIA, LOG_INFO, 
                  "MediaMonitor::selectDrivePopup(" + label +
                  ") - One suitable device");
         return drives.front();
@@ -233,7 +233,7 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
 
     if (device->getStatus() == MEDIASTAT_OPEN)
     {
-        LogPrint(VB_MEDIA, LOG_INFO,
+        LOG(VB_MEDIA, LOG_INFO,
                  QString("Disk %1's tray is OPEN. Closing tray").arg(dev));
 
         if (device->eject(false) != MEDIAERR_OK)
@@ -249,7 +249,7 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
 
     if (device->isMounted())
     {
-        LogPrint(VB_MEDIA, LOG_INFO,
+        LOG(VB_MEDIA, LOG_INFO,
                  QString("Disk %1 is mounted? Unmounting").arg(dev));
         device->unmount();
 
@@ -260,7 +260,7 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
         }
     }
 
-    LogPrint(VB_MEDIA, LOG_INFO,
+    LOG(VB_MEDIA, LOG_INFO,
              QString("Unlocking disk %1, then ejecting").arg(dev));
     device->unlock();
 
@@ -302,16 +302,16 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
         m_IgnoreList = QStringList();  // Force empty list
 
     if (m_StartThread)
-        LogPrint(VB_MEDIA, LOG_NOTICE, "Creating MediaMonitor");
+        LOG(VB_MEDIA, LOG_NOTICE, "Creating MediaMonitor");
     else
 #ifdef USING_DARWIN_DA
-        LogPrint(VB_MEDIA, LOG_INFO,
+        LOG(VB_MEDIA, LOG_INFO,
                  "MediaMonitor is disabled. Eject will not work");
 #else
-        LogPrint(VB_MEDIA, LOG_INFO,
+        LOG(VB_MEDIA, LOG_INFO,
                  "Creating inactive MediaMonitor and static device list");
 #endif
-    LogPrint(VB_MEDIA, LOG_INFO, "IgnoreDevices=" + ignore);
+    LOG(VB_MEDIA, LOG_INFO, "IgnoreDevices=" + ignore);
 
     // If any of IgnoreDevices are symlinks, also add the real device
     QStringList::Iterator dev;
@@ -325,7 +325,7 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
 
             if (m_IgnoreList.filter(target).isEmpty())
             {
-                LogPrint(VB_MEDIA, LOG_INFO,
+                LOG(VB_MEDIA, LOG_INFO,
                          "Also ignoring " + target + " (symlinked from " + 
                          *dev + ").");
                 m_IgnoreList += target;
@@ -420,7 +420,7 @@ void MediaMonitor::StartMonitoring(void)
 
     qRegisterMetaType<MythMediaStatus>("MythMediaStatus");
 
-    LogPrint(VB_MEDIA, LOG_NOTICE, "Starting MediaMonitor");
+    LOG(VB_MEDIA, LOG_NOTICE, "Starting MediaMonitor");
     m_Active = true;
     m_Thread->start();
 }
@@ -434,7 +434,7 @@ void MediaMonitor::StopMonitoring(void)
     if (!m_Active)
         return;
 
-    LogPrint(VB_MEDIA, LOG_NOTICE, "Stopping MediaMonitor");
+    LOG(VB_MEDIA, LOG_NOTICE, "Stopping MediaMonitor");
     m_Active = false;
     m_Thread->wait();
 }
@@ -534,7 +534,7 @@ QString MediaMonitor::GetMountPath(const QString& devPath)
             if (pMedia && pMedia->findMountPath())
                 mountPath = pMedia->getMountPath();
             else
-                LogPrint(VB_MEDIA, LOG_INFO,
+                LOG(VB_MEDIA, LOG_INFO,
                          "MediaMonitor::GetMountPath() - failed");
             // need some way to delete the media device.
         }
@@ -588,7 +588,7 @@ QList<MythMediaDevice*> MediaMonitor::GetMedias(MythMediaType mediatype)
 void MediaMonitor::MonitorRegisterExtensions(uint mediatype,
                                              const QString &extensions)
 {
-    LogPrint(VB_GENERAL, LOG_DEBUG, 
+    LOG(VB_GENERAL, LOG_DEBUG, 
              QString("MonitorRegisterExtensions(0x%1, %2)")
                  .arg(mediatype, 0, 16).arg(extensions));
 
@@ -616,7 +616,7 @@ void MediaMonitor::RegisterMediaHandler(const QString  &destination,
         if (extensions.length())
             msg += QString(", ext(%1)").arg(extensions);
 
-        LogPrint(VB_MEDIA, LOG_INFO, 
+        LOG(VB_MEDIA, LOG_INFO, 
                  "Registering '" + destination + "' as a media handler for " +
                  msg);
 
@@ -627,7 +627,7 @@ void MediaMonitor::RegisterMediaHandler(const QString  &destination,
     }
     else
     {
-       LogPrint(VB_GENERAL, LOG_INFO,
+       LOG(VB_GENERAL, LOG_INFO,
                 destination + " is already registered as a media handler.");
     }
 }
@@ -648,7 +648,7 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
     {
         if (((*itr).MythMediaType & (int)pMedia->getMediaType()))
         {
-            LogPrint(VB_GENERAL, LOG_NOTICE,
+            LOG(VB_GENERAL, LOG_NOTICE,
                      "Found a handler - '" + itr.key() + "'");
             handlers.append(*itr);
         }
@@ -657,7 +657,7 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
 
     if (handlers.empty())
     {
-        LogPrint(VB_MEDIA, LOG_INFO, "No media handler found for event type");
+        LOG(VB_MEDIA, LOG_INFO, "No media handler found for event type");
         return;
     }
 
@@ -694,7 +694,7 @@ void MediaMonitor::mediaStatusChanged(MythMediaStatus oldStatus,
         // Should we ValidateAndLock() first?
         QEvent *e = new MythMediaEvent(stat, pMedia);
 
-        LogPrint(VB_MEDIA, LOG_INFO, "Posting MediaEvent" + msg);
+        LOG(VB_MEDIA, LOG_INFO, "Posting MediaEvent" + msg);
 
         // sendEvent() is needed here - it waits for the event to be used.
         // postEvent() would result in pDevice's media type changing
@@ -704,7 +704,7 @@ void MediaMonitor::mediaStatusChanged(MythMediaStatus oldStatus,
         delete e;
     }
     else
-        LogPrint(VB_MEDIA, LOG_INFO,
+        LOG(VB_MEDIA, LOG_INFO,
                  "Media status changed, but not sending event" + msg);
 
 
@@ -724,17 +724,17 @@ bool MediaMonitor::shouldIgnore(const MythMediaDevice* device)
         m_IgnoreList.contains(device->getRealDevice())||
         m_IgnoreList.contains(device->getDevicePath()) )
     {
-        LogPrint(VB_MEDIA, LOG_INFO,
+        LOG(VB_MEDIA, LOG_INFO,
                  "Ignoring device: " + device->getDevicePath());
         return true;
     }
 #if 0
     else
     {
-        LogPrint(VB_MEDIA, LOG_DEBUG,
+        LOG(VB_MEDIA, LOG_DEBUG,
                  "Not ignoring: " + device->getDevicePath() + " / " +
                  device->getMountPath());
-        LogPrint(VB_MEDIA, LOG_DEBUG, 
+        LOG(VB_MEDIA, LOG_DEBUG, 
                  "Paths not in: " + m_IgnoreList.join(", "));
     }
 #endif
@@ -754,7 +754,7 @@ bool MediaMonitor::eventFilter(QObject *obj, QEvent *event)
 
         if (!pDev)
         {
-            LogPrint(VB_GENERAL, LOG_ALERT,
+            LOG(VB_GENERAL, LOG_ALERT,
                      "MediaMonitor::eventFilter() got a bad media event?");
             return true;
         }
@@ -800,7 +800,7 @@ QString MediaMonitor::defaultDevice(QString dbSetting,
 {
     QString device = gCoreContext->GetSetting(dbSetting);
 
-    LogPrint(VB_MEDIA, LOG_DEBUG,
+    LOG(VB_MEDIA, LOG_DEBUG,
              QString("MediaMonitor::defaultDevice(%1,..,%2) dbSetting='%3'")
                  .arg(dbSetting).arg(hardCodedDefault).arg(device));
 
@@ -827,7 +827,7 @@ QString MediaMonitor::defaultDevice(QString dbSetting,
         }
     }
 
-    LogPrint(VB_MEDIA, LOG_DEBUG,
+    LOG(VB_MEDIA, LOG_DEBUG,
              "MediaMonitor::defaultDevice() returning " + device);
     return device;
 }
@@ -924,12 +924,12 @@ void MediaMonitor::ejectOpticalDisc()
         mon->ChooseAndEjectMedia();
     else
     {
-        LogPrint(VB_MEDIA, LOG_INFO, "CD/DVD Monitor isn't enabled.");
+        LOG(VB_MEDIA, LOG_INFO, "CD/DVD Monitor isn't enabled.");
 #ifdef __linux__
-        LogPrint(VB_MEDIA, LOG_INFO, "Trying Linux 'eject -T' command");
+        LOG(VB_MEDIA, LOG_INFO, "Trying Linux 'eject -T' command");
         myth_system("eject -T");
 #elif CONFIG_DARWIN
-        LogPrint(VB_MEDIA, LOG_INFO, "Trying 'disktool -e disk1");
+        LOG(VB_MEDIA, LOG_INFO, "Trying 'disktool -e disk1");
         myth_system("disktool -e disk1");
 #endif
     }

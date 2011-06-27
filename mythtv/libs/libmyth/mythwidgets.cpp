@@ -676,7 +676,7 @@ void MythRemoteLineEdit::startCycle(QString current_choice, QString set)
 {
     if (active_cycle)
     {
-        LogPrint(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT, 
                  "startCycle() called, but edit is already in a cycle.");
         return;
     }
@@ -746,7 +746,7 @@ void MythRemoteLineEdit::updateCycle(QString current_choice, QString set)
     int length = set.length();
     if (index < 0 || index > length)
     {
-        LogPrint(VB_GENERAL, LOG_ALERT,
+        LOG(VB_GENERAL, LOG_ALERT,
                  QString("MythRemoteLineEdit passed a choice of \"%1"
                          "\" which is not in set \"%2\"")
                      .arg(current_choice).arg(set));
@@ -1008,7 +1008,7 @@ void MythRemoteLineEdit::setCycleTime(float desired_interval)
 {
     if (desired_interval < 0.5 || desired_interval > 10.0)
     {
-        LogPrint(VB_GENERAL, LOG_ALERT, 
+        LOG(VB_GENERAL, LOG_ALERT, 
                  QString("cycle interval of %1 milliseconds ")
                      .arg((int) (desired_interval * 1000)) +
                  "\n\t\t\tis outside of the allowed range of "
