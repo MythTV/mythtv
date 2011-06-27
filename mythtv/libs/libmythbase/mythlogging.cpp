@@ -881,16 +881,17 @@ void logStart(QString logfile, int quiet, int facility, LogLevel_t level,
 
 void logStop(void)
 {
-    struct sigaction sa;
-
     logThread.stop();
     logThread.wait();
 
+#ifndef _WIN32
     /* Tear down SIGHUP */
+    struct sigaction sa;
     sa.sa_handler = SIG_DFL;
     sigemptyset( &sa.sa_mask );
     sa.sa_flags = SA_RESTART;
     sigaction( SIGHUP, &sa, NULL );
+#endif
 
     QMutexLocker locker(&loggerListMutex);
     QList<LoggerBase *>::iterator it;
