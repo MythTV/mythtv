@@ -18,7 +18,7 @@ using namespace std;
 // MythTV headers
 #include "exitcodes.h"
 #include "compat.h"
-#include "mythcommandlineparser.h"
+#include "commandlineparser.h"
 
 #ifndef VERBOSE
 #define VB_IMPORTANT 0

@@ -29,6 +29,7 @@ HEADERS += PrePostRollFlagger.h
 
 HEADERS += LogoDetectorBase.h SceneChangeDetectorBase.h
 HEADERS += SlotRelayer.h CustomEventRelayer.h
+HEADERS += commandlineparser.h
 
 SOURCES += CommDetectorFactory.cpp CommDetectorBase.cpp
 SOURCES += ClassicLogoDetector.cpp
@@ -47,7 +48,7 @@ SOURCES += BlankFrameDetector.cpp
 SOURCES += SceneChangeDetector.cpp
 SOURCES += PrePostRollFlagger.cpp
 
-SOURCES += main.cpp
+SOURCES += main.cpp commandlineparser.cpp
 
 #The following line was inserted by qt3to4
 QT += xml sql network

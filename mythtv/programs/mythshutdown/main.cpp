@@ -19,7 +19,7 @@ using namespace std;
 #include "tvremoteutil.h"
 #include "compat.h"
 #include "mythlogging.h"
-#include "mythcommandlineparser.h"
+#include "commandlineparser.h"
 
 static void setGlobalSetting(const QString &key, const QString &value)
 {

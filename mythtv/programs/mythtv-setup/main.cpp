@@ -37,7 +37,7 @@
 #include "startprompt.h"
 #include "mythsystemevent.h"
 #include "expertsettingseditor.h"
-#include "mythcommandlineparser.h"
+#include "commandlineparser.h"
 
 using namespace std;
 

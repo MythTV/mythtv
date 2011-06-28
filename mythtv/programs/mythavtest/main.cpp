@@ -10,7 +10,7 @@ using namespace std;
 
 #include "tv_play.h"
 #include "programinfo.h"
-#include "mythcommandlineparser.h"
+#include "commandlineparser.h"
 
 #include "exitcodes.h"
 #include "mythcontext.h"

@@ -59,7 +59,7 @@ using namespace std;
 #include "lcddevice.h"
 #include "langsettings.h"
 #include "mythtranslation.h"
-#include "mythcommandlineparser.h"
+#include "commandlineparser.h"
 #include "channelgroupsettings.h"
 
 #include "myththemedmenu.h"

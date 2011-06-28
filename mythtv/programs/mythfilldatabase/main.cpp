@@ -20,7 +20,7 @@ using namespace std;
 #include "mythconfig.h"
 
 // libmythtv headers
-#include "mythcommandlineparser.h"
+#include "commandlineparser.h"
 #include "scheduledrecording.h"
 #include "remoteutil.h"
 #include "videosource.h" // for is_grabber..

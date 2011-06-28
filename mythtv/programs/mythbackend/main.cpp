@@ -11,7 +11,7 @@
 #include <QDir>
 #include <QMap>
 
-#include "mythcommandlineparser.h"
+#include "commandlineparser.h"
 #include "scheduledrecording.h"
 #include "previewgenerator.h"
 #include "mythcorecontext.h"

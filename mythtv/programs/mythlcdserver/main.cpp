@@ -22,7 +22,7 @@ using namespace std;
 #include "tv_play.h"
 #include "compat.h"
 #include "mythtranslation.h"
-#include "mythcommandlineparser.h"
+#include "commandlineparser.h"
 
 #include "lcdserver.h"
 

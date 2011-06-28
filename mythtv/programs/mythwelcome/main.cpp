@@ -17,7 +17,7 @@
 #include "exitcodes.h"
 #include "compat.h"
 #include "lcddevice.h"
-#include "mythcommandlineparser.h"
+#include "commandlineparser.h"
 #include "tv.h"
 #include "mythlogging.h"
 

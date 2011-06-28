@@ -35,7 +35,7 @@ using namespace std;
 #include "jobqueue.h"
 #include "remoteencoder.h"
 #include "ringbuffer.h"
-#include "mythcommandlineparser.h"
+#include "commandlineparser.h"
 #include "mythtranslation.h"
 #include "mythlogging.h"
 

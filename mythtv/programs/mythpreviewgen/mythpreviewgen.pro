@@ -12,7 +12,9 @@ INSTALLS = target
 
 QMAKE_CLEAN += $(TARGET)
 
-SOURCES += main.cpp
+HEADERS += commandlineparser.h
+
+SOURCES += main.cpp commandlineparser.cpp
 
 using_oss:DEFINES += USING_OSS
 

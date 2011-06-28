@@ -20,7 +20,7 @@
 #include "mythlogging.h"
 #include "mythversion.h"
 #include "mythsystemevent.h"
-#include "mythcommandlineparser.h"
+#include "commandlineparser.h"
 
 #include "requesthandler/basehandler.h"
 #include "requesthandler/fileserverhandler.h"

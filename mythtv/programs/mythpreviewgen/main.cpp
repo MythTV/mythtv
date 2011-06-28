@@ -43,7 +43,7 @@ using namespace std;
 #include "programinfo.h"
 #include "dbcheck.h"
 #include "previewgenerator.h"
-#include "mythcommandlineparser.h"
+#include "commandlineparser.h"
 #include "mythsystemevent.h"
 #include "mythlogging.h"
 

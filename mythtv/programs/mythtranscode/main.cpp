@@ -24,7 +24,7 @@ using namespace std;
 #include "remotefile.h"
 #include "mythtranslation.h"
 #include "mythlogging.h"
-#include "mythcommandlineparser.h"
+#include "commandlineparser.h"
 #include "recordinginfo.h"
 
 static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
