@@ -287,7 +287,8 @@ void diskAppearedCallback(DADiskRef disk, void *context)
     if (kCFBooleanFalse ==
         CFDictionaryGetValue(details, kDADiskDescriptionMediaRemovableKey))
     {
-        LOG(VB_MEDIA, LOG_INFO, "Skipping non-removable " + BSDname);
+        LOG(VB_MEDIA, LOG_INFO, QString("Skipping non-removable %1")
+            .arg(BSDname));
         CFRelease(details);
         return;
     }
@@ -296,7 +297,8 @@ void diskAppearedCallback(DADiskRef disk, void *context)
     volName = getVolName(details);
     if (!volName)
     {
-        LOG(VB_MEDIA, LOG_INFO, "No volume name for dev " + BSDname);
+        LOG(VB_MEDIA, LOG_INFO, QString("No volume name for dev %1")
+            .arg(BSDname));
         CFRelease(details);
         return;
     }
@@ -481,7 +483,7 @@ void MonitorThreadDarwin::diskRename(const char *devName, const char *volName)
     }
     else
         LOG(VB_MEDIA, LOG_INFO,
-                 "Couldn't find MythMediaDevice: " + devName);
+                 QString("Couldn't find MythMediaDevice: %1").arg(devName));
 }
 
 /**
