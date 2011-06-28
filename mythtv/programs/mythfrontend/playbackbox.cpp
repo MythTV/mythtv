@@ -1221,7 +1221,8 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
 
     updateGroupInfo(groupname, grouplabel);
 
-    if ((m_currentGroup == groupname) && !m_needUpdate)
+    if (((m_currentGroup == groupname) && !m_needUpdate) ||
+        m_playingSomething)
         return;
 
     m_needUpdate = false;
@@ -2369,6 +2370,9 @@ bool PlaybackBox::Play(
         if (pginfo)
             UpdateUIListItem(pginfo, true);
     }
+
+    if (m_needUpdate)
+        ScheduleUpdateUIList();
 
     return playCompleted;
 }
@@ -3872,8 +3876,13 @@ void PlaybackBox::customEvent(QEvent *event)
         }
         else if (message == "UPDATE_UI_LIST")
         {
-            UpdateUILists();
-            m_helper.ForceFreeSpaceUpdate();
+            if (m_playingSomething)
+                m_needUpdate = true;
+            else
+            {
+                UpdateUILists();
+                m_helper.ForceFreeSpaceUpdate();
+            }
         }
         else if (message == "UPDATE_USAGE_UI")
         {
