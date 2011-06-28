@@ -1929,8 +1929,6 @@ static ProgramInfoType discover_program_info_type(
 
 void ProgramInfo::SetPathname(const QString &pn) const
 {
-    VERBOSE(VB_IMPORTANT, QString("SetPathname(%1)").arg(pn));
-
     pathname = pn;
     pathname.detach();
 
