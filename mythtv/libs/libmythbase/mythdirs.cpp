@@ -40,26 +40,27 @@ void InitializeMythDirs(void)
         // executable directory. This can be fragile on Unix, so
         // use relative PREFIX values with care.
 
-        VERBOSE(VB_IMPORTANT+VB_EXTRA,
-                "Relative PREFIX! (" + installprefix +
-                ")\n\t\tappDir=" + prefixDir.canonicalPath());
+        LOG(VB_GENERAL, LOG_DEBUG, 
+            "Relative PREFIX! (" + installprefix + ")\n\t\tappDir=" +
+            prefixDir.canonicalPath());
+
         prefixDir.cd(installprefix);
         installprefix = prefixDir.canonicalPath();
     }
 
-    VERBOSE(VB_IMPORTANT, "Using runtime prefix = " + installprefix);
+    LOG(VB_GENERAL, LOG_CRIT, "Using runtime prefix = " + installprefix);
 
     char *tmp_confdir = std::getenv("MYTHCONFDIR");
     if (tmp_confdir)
     {
         confdir = QString(tmp_confdir);
-        VERBOSE(VB_IMPORTANT, QString("Read conf dir = %1").arg(confdir));
+        LOG(VB_GENERAL, LOG_CRIT, QString("Read conf dir = %1").arg(confdir));
         confdir.replace("$HOME", QDir::homePath());
     }
     else
         confdir = QDir::homePath() + "/.mythtv";
 
-    VERBOSE(VB_IMPORTANT, QString("Using configuration directory = %1")
+    LOG(VB_GENERAL, LOG_CRIT, QString("Using configuration directory = %1")
                                  .arg(confdir));
 
     sharedir = installprefix + "/share/mythtv/";

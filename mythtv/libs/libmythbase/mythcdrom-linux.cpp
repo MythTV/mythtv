@@ -168,7 +168,7 @@ int MythCDROMLinux::driveStatus()
 
     if (drive_status == -1)   // Very unlikely, but we should check
     {
-        VERBOSE(VB_MEDIA, LOC + ":driveStatus() - ioctl() failed: " + ENO);
+        LOG(VB_MEDIA, LOG_INFO, "driveStatus() - ioctl() failed: " + ENO);
         return CDS_NO_INFO;
     }
 
@@ -200,9 +200,8 @@ bool MythCDROMLinux::hasWritableMedia()
 
     if (ioctl(m_DeviceHandle, CDROM_SEND_PACKET, &cgc) < 0)
     {
-        VERBOSE(VB_MEDIA,
-                LOC + ":hasWritableMedia() - failed to send packet to "
-                    + m_DevicePath);
+        LOG(VB_MEDIA, LOG_ERR,
+            "hasWritableMedia() - failed to send packet to " + m_DevicePath);
         return false;
     }
 
@@ -260,29 +259,25 @@ int MythCDROMLinux::SCSIstatus()
         || es->nea                           // drive does not support request
         || (es->notification_class != 0x4))  // notification class mismatch
     {
-        VERBOSE(VB_MEDIA,
-                LOC + ":SCSIstatus() - failed to send SCSI packet to "
-                    + m_DevicePath);
+        LOG(VB_MEDIA, LOG_ERR,
+            "SCSIstatus() - failed to send SCSI packet to " + m_DevicePath);
         return CDS_TRAY_OPEN;
     }
 
     if (es->media_present)
     {
-        VERBOSE(VB_MEDIA+VB_EXTRA,
-                LOC + ":SCSIstatus() - ioctl() said tray was open,"
-                      "but drive is actually closed with a disc");
+        LOG(VB_MEDIA, LOG_DEBUG, "SCSIstatus() - ioctl() said tray was open, "
+                                 "but drive is actually closed with a disc");
         return CDS_DISC_OK;
     }
     else if (es->door_open)
     {
-        VERBOSE(VB_MEDIA+VB_EXTRA,
-                LOC + ":SCSIstatus() - tray is definitely open");
+        LOG(VB_MEDIA, LOG_DEBUG, "SCSIstatus() - tray is definitely open");
         return CDS_TRAY_OPEN;
     }
 
-    VERBOSE(VB_MEDIA+VB_EXTRA,
-            LOC + ":SCSIstatus() - ioctl() said tray was open,"
-                  " but drive is actually closed with no disc");
+    LOG(VB_MEDIA, LOG_DEBUG, "SCSIstatus() - ioctl() said tray was open, "
+                             "but drive is actually closed with no disc");
     return CDS_NO_DISC;
 }
 
@@ -332,14 +327,14 @@ MythMediaError MythCDROMLinux::testMedia()
     {
         if (!openDevice())
         {
-            VERBOSE(VB_MEDIA+VB_EXTRA, LOC + ":testMedia - failed to open '"
-                                           + m_DevicePath +  "' : " +ENO);
+            LOG(VB_MEDIA, LOG_DEBUG, "testMedia - failed to open '" +
+                                     m_DevicePath +  "' : " +ENO);
             if (errno == EBUSY)
                 return isMounted() ? MEDIAERR_OK : MEDIAERR_FAILED;
             else
                 return MEDIAERR_FAILED;
         }
-        VERBOSE(VB_MEDIA+VB_EXTRA, LOC + ":testMedia - Opened device");
+        LOG(VB_MEDIA, LOG_DEBUG, "testMedia - Opened device");
         OpenedHere = true;
     }
 
@@ -353,9 +348,8 @@ MythMediaError MythCDROMLinux::testMedia()
 
     if (Stat == -1)
     {
-        VERBOSE(VB_MEDIA+VB_EXTRA,
-                LOC + ":testMedia - Failed to get drive status of '"
-                    + m_DevicePath + "' : " + ENO);
+        LOG(VB_MEDIA, LOG_DEBUG, "testMedia - Failed to get drive status of '" +
+                      m_DevicePath + "' : " + ENO);
         return MEDIAERR_FAILED;
     }
 
@@ -374,9 +368,9 @@ MythMediaStatus MythCDROMLinux::checkMedia()
 
         if (!OpenedHere)
         {
-            VERBOSE(VB_MEDIA, LOC + ":checkMedia() - cannot open device '"
-                                  + m_DevicePath + "' : "
-                                  + ENO + "- returning UNKNOWN");
+            LOG(VB_MEDIA, LOG_ERR, "checkMedia() - cannot open device '" +
+                                   m_DevicePath + "' : " +
+                                   ENO + "- returning UNKNOWN");
             m_MediaType = MEDIATYPE_UNKNOWN;
             return setStatus(MEDIASTAT_UNKNOWN, false);
         }
@@ -385,12 +379,12 @@ MythMediaStatus MythCDROMLinux::checkMedia()
     switch (driveStatus())
     {
         case CDS_DISC_OK:
-            VERBOSE(VB_MEDIA|VB_EXTRA, m_DevicePath + " Disk OK, type = "
-                              + MediaTypeString(m_MediaType) );
+            LOG(VB_MEDIA, LOG_DEBUG, m_DevicePath + " Disk OK, type = " +
+                                     MediaTypeString(m_MediaType) );
             // further checking is required
             break;
         case CDS_TRAY_OPEN:
-            VERBOSE(VB_MEDIA|VB_EXTRA, m_DevicePath + " Tray open or no disc");
+            LOG(VB_MEDIA, LOG_DEBUG, m_DevicePath + " Tray open or no disc");
             // First, send a message to the
             // plugins to forget the current media type
             setStatus(MEDIASTAT_OPEN, OpenedHere);
@@ -399,25 +393,26 @@ MythMediaStatus MythCDROMLinux::checkMedia()
             return MEDIASTAT_OPEN;
             break;
         case CDS_NO_DISC:
-            VERBOSE(VB_MEDIA|VB_EXTRA, m_DevicePath + " No disc");
+            LOG(VB_MEDIA, LOG_DEBUG, m_DevicePath + " No disc");
             m_MediaType = MEDIATYPE_UNKNOWN;
             return setStatus(MEDIASTAT_NODISK, OpenedHere);
             break;
         case CDS_NO_INFO:
         case CDS_DRIVE_NOT_READY:
-            VERBOSE(VB_MEDIA|VB_EXTRA, m_DevicePath + " No info or drive not ready");
+            LOG(VB_MEDIA, LOG_DEBUG, m_DevicePath + 
+                                     " No info or drive not ready");
             m_MediaType = MEDIATYPE_UNKNOWN;
             return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
         default:
-            VERBOSE(VB_IMPORTANT, "Failed to get drive status of "
-                                  + m_DevicePath + " : " + ENO);
+            LOG(VB_GENERAL, LOG_CRIT, "Failed to get drive status of " +
+                                      m_DevicePath + " : " + ENO);
             m_MediaType = MEDIATYPE_UNKNOWN;
             return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
     }
 
     if (mediaChanged())
     {
-        VERBOSE(VB_MEDIA, m_DevicePath + " Media changed");
+        LOG(VB_MEDIA, LOG_INFO, m_DevicePath + " Media changed");
         // Regardless of the actual status lie here and say
         // it's open for now, so we can cover the case of a missed open.
         return setStatus(MEDIASTAT_OPEN, OpenedHere);
@@ -426,7 +421,7 @@ MythMediaStatus MythCDROMLinux::checkMedia()
 
     if (isUsable())
     {
-        VERBOSE(VB_MEDIA+VB_EXTRA, "Disc useable, media unchanged. All good!");
+        LOG(VB_MEDIA, LOG_DEBUG, "Disc useable, media unchanged. All good!");
         if (OpenedHere)
             closeDevice();
         return MEDIASTAT_USEABLE;
@@ -435,7 +430,7 @@ MythMediaStatus MythCDROMLinux::checkMedia()
     // If we have tried to mount and failed, don't keep trying
     if (m_Status == MEDIASTAT_ERROR)
     {
-        VERBOSE(VB_MEDIA+VB_EXTRA, "Disc is unmountable?");
+        LOG(VB_MEDIA, LOG_DEBUG, "Disc is unmountable?");
         if (OpenedHere)
             closeDevice();
         return m_Status;
@@ -444,7 +439,7 @@ MythMediaStatus MythCDROMLinux::checkMedia()
     if ((m_Status == MEDIASTAT_OPEN) ||
         (m_Status == MEDIASTAT_UNKNOWN))
     {
-        VERBOSE(VB_MEDIA, m_DevicePath + " Current status " +
+        LOG(VB_MEDIA, LOG_INFO, m_DevicePath + " Current status " +
                 MythMediaDevice::MediaStatusStrings[m_Status]);
         int type = ioctl(m_DeviceHandle, CDROM_DISC_STATUS, CDSL_CURRENT);
         switch (type)
@@ -453,7 +448,7 @@ MythMediaStatus MythCDROMLinux::checkMedia()
             case CDS_DATA_2:
             {
                 m_MediaType = MEDIATYPE_DATA;
-                VERBOSE(VB_MEDIA, "Found a data disk");
+                LOG(VB_MEDIA, LOG_INFO, "Found a data disk");
 
                 //grab information from iso9660 (& udf)
                 off_t sr = lseek(m_DeviceHandle,
@@ -486,7 +481,8 @@ MythMediaStatus MythCDROMLinux::checkMedia()
                         QDateTime::currentDateTime().toString(Qt::ISODate);
                 }
 
-                VERBOSE(VB_MEDIA, QString("Volume ID: %1").arg(m_VolumeID));
+                LOG(VB_MEDIA, LOG_INFO,
+                    QString("Volume ID: %1").arg(m_VolumeID));
 #ifdef USING_LIBUDF
                 // Check for a DVD/BD disk by reading the UDF root dir.
                 // This allows DVD's to play immediately upon insertion without
@@ -538,13 +534,13 @@ MythMediaStatus MythCDROMLinux::checkMedia()
                 break;
             }
             case CDS_AUDIO:
-                VERBOSE(VB_MEDIA, "found an audio disk");
+                LOG(VB_MEDIA, LOG_DEBUG, "found an audio disk");
                 m_MediaType = MEDIATYPE_AUDIO;
                 return setStatus(MEDIASTAT_USEABLE, OpenedHere);
                 break;
             case CDS_MIXED:
                 m_MediaType = MEDIATYPE_MIXED;
-                VERBOSE(VB_MEDIA, "found a mixed CD");
+                LOG(VB_MEDIA, LOG_DEBUG, "found a mixed CD");
                 // Note: Mixed mode CDs require an explixit mount call
                 //       since we'll usually want the audio portion.
                 // undefine ASSUME_WANT_AUDIO to change this behavior.
@@ -569,17 +565,17 @@ MythMediaStatus MythCDROMLinux::checkMedia()
             case CDS_NO_DISC:
                 if (hasWritableMedia())
                 {
-                    VERBOSE(VB_MEDIA, "found a blank or writable disk");
+                    LOG(VB_MEDIA, LOG_DEBUG, "found a blank or writable disk");
                     return setStatus(MEDIASTAT_UNFORMATTED, OpenedHere);
                 }
 
-                VERBOSE(VB_MEDIA, "found no disk");
+                LOG(VB_MEDIA, LOG_DEBUG, "found no disk");
                 m_MediaType = MEDIATYPE_UNKNOWN;
                 return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
                 break;
             default:
-                VERBOSE(VB_MEDIA, "found unknown disk type: "
-                                  + QString().setNum(type));
+                LOG(VB_MEDIA, LOG_DEBUG, "found unknown disk type: " +
+                                         QString::number(type));
                 m_MediaType = MEDIATYPE_UNKNOWN;
                 return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
         }
@@ -593,9 +589,8 @@ MythMediaStatus MythCDROMLinux::checkMedia()
     if (OpenedHere)
         closeDevice();
 
-    VERBOSE(VB_MEDIA+VB_EXTRA,
-            QString("Returning ")
-            + MythMediaDevice::MediaStatusStrings[m_Status]);
+    LOG(VB_MEDIA, LOG_DEBUG, QString("Returning %1")
+                           .arg(MythMediaDevice::MediaStatusStrings[m_Status]));
     return m_Status;
 }
 
@@ -612,13 +607,13 @@ MythMediaError MythCDROMLinux::unlock()
 {
     if (isDeviceOpen() || openDevice())
     {
-        VERBOSE(VB_MEDIA+VB_EXTRA, LOC + ":unlock - Unlocking CDROM door");
+        LOG(VB_MEDIA, LOG_DEBUG, "unlock - Unlocking CDROM door");
         ioctl(m_DeviceHandle, CDROM_LOCKDOOR, 0);
     }
     else
     {
-        VERBOSE(VB_GENERAL, "Failed to open device, CDROM try will remain "
-                            "locked.");
+        LOG(VB_GENERAL, LOG_INFO, "Failed to open device, CDROM try will "
+                                  "remain locked.");
     }
 
     return MythMediaDevice::unlock();
@@ -631,9 +626,9 @@ bool MythCDROMLinux::isSameDevice(const QString &path)
 
     if (stat(path.toLocal8Bit().constData(), &sb) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC + ":isSameDevice() -- " +
-                QString("Failed to stat '%1'")
-                .arg(path) + ENO);
+        LOG(VB_GENERAL, LOG_CRIT,  
+            "isSameDevice() -- " + QString("Failed to stat '%1'").arg(path) +
+            ENO);
         return false;
     }
     new_rdev = sb.st_rdev;
@@ -641,9 +636,9 @@ bool MythCDROMLinux::isSameDevice(const QString &path)
     // Check against m_DevicePath...
     if (stat(m_DevicePath.toLocal8Bit().constData(), &sb) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC + ":isSameDevice() -- " +
-                QString("Failed to stat '%1'")
-                .arg(m_DevicePath) + ENO);
+        LOG(VB_GENERAL, LOG_CRIT, "isSameDevice() -- " +
+                                  QString("Failed to stat '%1'")
+                                      .arg(m_DevicePath) + ENO);
         return false;
     }
     return (sb.st_rdev == new_rdev);
@@ -676,23 +671,22 @@ void MythCDROMLinux::setSpeed(const char *device, int speed)
 
     if ((fd = open(device, O_RDWR | O_NONBLOCK)) == -1)
     {
-        VERBOSE(VB_MEDIA, LOC_ERR + "Changing CD/DVD speed needs write access");
+        LOG(VB_MEDIA, LOG_ERR, "Changing CD/DVD speed needs write access");
         return;
     }
 
     if (fstat(fd, &st) == -1)
     {
         close(fd);
-        VERBOSE(VB_MEDIA, LOC_ERR +
-                QString("setSpeed() Failed. device %1 not found")
-                .arg(device));
+        LOG(VB_MEDIA, LOG_ERR,
+            QString("setSpeed() Failed. device %1 not found") .arg(device));
         return;
     }
 
     if (!S_ISBLK(st.st_mode))
     {
         close(fd);
-        VERBOSE(VB_MEDIA, LOC_ERR + "setSpeed() Failed. Not a block device");
+        LOG(VB_MEDIA, LOG_ERR, "setSpeed() Failed. Not a block device");
         return;
     }
 
@@ -708,7 +702,7 @@ void MythCDROMLinux::setSpeed(const char *device, int speed)
         {
             rate = 0;
             buffer[0] = 4;
-            VERBOSE(VB_MEDIA, LOC + ":setSpeed() - Restored CD/DVD Speed");
+            LOG(VB_MEDIA, LOG_INFO, "setSpeed() - Restored CD/DVD Speed");
             break;
         }
         default:
@@ -718,9 +712,9 @@ void MythCDROMLinux::setSpeed(const char *device, int speed)
 
             rate = (speed > 0 && speed < 100) ? speed * 177 : speed;
 
-            VERBOSE(VB_MEDIA,
-                    (LOC + ":setSpeed() - Limiting CD/DVD Speed to %1KB/s")
-                    .arg(rate));
+            LOG(VB_MEDIA, LOG_INFO,
+                    QString("setSpeed() - Limiting CD/DVD Speed to %1KB/s")
+                        .arg(rate));
             break;
         }
     }
@@ -754,18 +748,17 @@ void MythCDROMLinux::setSpeed(const char *device, int speed)
 
     if (ioctl(fd, SG_IO, &sghdr) < 0)
     {
-        VERBOSE(VB_MEDIA, LOC_ERR + "Limit CD/DVD Speed Failed");
+        LOG(VB_MEDIA, LOG_ERR, "Limit CD/DVD Speed Failed");
     }
     else
     {
-        // On my system (2.6.18 + ide-cd),  SG_IO succeeds without doing anything,
+        // On my system (2.6.18+ide-cd), SG_IO succeeds without doing anything,
         // while CDROM_SELECT_SPEED works...
         if (ioctl(fd, CDROM_SELECT_SPEED, speed) < 0)
         {
-            VERBOSE(VB_MEDIA, LOC_ERR +
-                    "Limit CD/DVD CDROM_SELECT_SPEED Failed");
+            LOG(VB_MEDIA, LOG_ERR, "Limit CD/DVD CDROM_SELECT_SPEED Failed");
         }
-        VERBOSE(VB_MEDIA, LOC + ":setSpeed() - CD/DVD Speed Set Successful");
+        LOG(VB_MEDIA, LOG_INFO, "setSpeed() - CD/DVD Speed Set Successful");
     }
 
     close(fd);

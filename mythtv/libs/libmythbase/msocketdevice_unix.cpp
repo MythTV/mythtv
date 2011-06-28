@@ -202,7 +202,7 @@ void MSocketDevice::close()
 	return;
     setOpenMode(NotOpen);
     ::close( fd );
-    VERBOSE(VB_SOCKET|VB_EXTRA,
+    LOG(VB_SOCKET, LOG_DEBUG,
             QString("MSocketDevice::close: Closed socket %1").arg(fd));
     fd = -1;
     fetchConnectionParameters();
@@ -246,9 +246,8 @@ bool MSocketDevice::blocking() const
 */
 void MSocketDevice::setBlocking( bool enable )
 {
-    VERBOSE(VB_SOCKET|VB_EXTRA,
-            QString("MSocketDevice::setBlocking(%1)")
-            .arg((enable) ? "true":"false"));
+    LOG(VB_SOCKET, LOG_DEBUG, QString("MSocketDevice::setBlocking(%1)")
+                                  .arg((enable) ? "true":"false"));
 
     if ( !isValid() )
 	return;
@@ -395,16 +394,19 @@ bool MSocketDevice::connect( const QHostAddress &addr, quint16 port )
 #if !defined(QT_NO_IPV6)
         if ( addr.protocol() == QAbstractSocket::IPv6Protocol ) {
             setProtocol(IPv6);
-            VERBOSE(VB_SOCKET, "MSocketDevice::connect: setting Protocol to IPv6");
+            LOG(VB_SOCKET, LOG_INFO,
+                "MSocketDevice::connect: setting Protocol to IPv6");
         }
         else   
 #endif
         if ( addr.protocol() == QAbstractSocket::IPv4Protocol ) {
             setProtocol(IPv4);
-            VERBOSE(VB_SOCKET, "MSocketDevice::connect: setting Protocol to IPv4");
+            LOG(VB_SOCKET, LOG_INFO, 
+                "MSocketDevice::connect: setting Protocol to IPv4");
         }
 
-        VERBOSE(VB_SOCKET, "MSocketDevice::connect: attempting to create new socket");
+        LOG(VB_SOCKET, LOG_INFO,
+            "MSocketDevice::connect: attempting to create new socket");
         MSocketDevice::setSocket( createNewSocket(), t);
     
        // If still not valid, give up.
@@ -763,22 +765,22 @@ qint64 MSocketDevice::readData( char *data, qint64 maxlen )
         return 0;
 
     if ( data == 0 ) {
-        VERBOSE(VB_SOCKET|VB_EXTRA,
+        LOG(VB_SOCKET, LOG_DEBUG,
                 "MSocketDevice::readBlock: Null pointer error");
         return -1;
     }
     if ( !isValid() ) {
-        VERBOSE(VB_SOCKET|VB_EXTRA,
+        LOG(VB_SOCKET, LOG_DEBUG,
                 "MSocketDevice::readBlock: Invalid socket");
         return -1;
     }
     if ( !isOpen() ) {
-        VERBOSE(VB_SOCKET|VB_EXTRA,
+        LOG(VB_SOCKET, LOG_DEBUG,
                 "MSocketDevice::readBlock: Device is not open");
         return -1;
     }
     if ( !isReadable() ) {
-        VERBOSE(VB_SOCKET|VB_EXTRA,
+        LOG(VB_SOCKET, LOG_DEBUG,
                 "MSocketDevice::readBlock: Read operation not permitted");
         return -1;
     }
@@ -859,22 +861,22 @@ qint64 MSocketDevice::writeData( const char *data, qint64 len )
         return 0;
 
     if ( data == 0 ) {
-        VERBOSE(VB_SOCKET|VB_EXTRA,
+        LOG(VB_SOCKET, LOG_DEBUG,
                 "MSocketDevice::writeBlock: Null pointer error");
         return -1;
     }
     if ( !isValid() ) {
-        VERBOSE(VB_SOCKET|VB_EXTRA,
+        LOG(VB_SOCKET, LOG_DEBUG,
                 "MSocketDevice::writeBlock: Invalid socket");
         return -1;
     }
     if ( !isOpen() ) {
-        VERBOSE(VB_SOCKET|VB_EXTRA,
+        LOG(VB_SOCKET, LOG_DEBUG,
                 "MSocketDevice::writeBlock: Device is not open");
         return -1;
     }
     if ( !isWritable() ) {
-        VERBOSE(VB_SOCKET|VB_EXTRA,
+        LOG(VB_SOCKET, LOG_DEBUG,
                 "MSocketDevice::writeBlock: Write operation not permitted");
         return -1;
     }
@@ -946,28 +948,28 @@ qint64 MSocketDevice::writeBlock( const char * data, quint64 len,
         return 0;
 
     if ( t != Datagram ) {
-        VERBOSE(VB_SOCKET|VB_EXTRA,
+        LOG(VB_SOCKET, LOG_DEBUG,
                 "MSocketDevice::sendBlock: Not datagram");
         return -1; // for now - later we can do t/tcp
     }
 
     if ( data == 0 ) {
-        VERBOSE(VB_SOCKET|VB_EXTRA,
+        LOG(VB_SOCKET, LOG_DEBUG,
                 "MSocketDevice::sendBlock: Null pointer error");
         return -1;
     }
     if ( !isValid() ) {
-        VERBOSE(VB_SOCKET|VB_EXTRA,
+        LOG(VB_SOCKET, LOG_DEBUG,
                 "MSocketDevice::sendBlock: Invalid socket");
         return -1;
     }
     if ( !isOpen() ) {
-        VERBOSE(VB_SOCKET|VB_EXTRA,
+        LOG(VB_SOCKET, LOG_DEBUG,
                 "MSocketDevice::sendBlock: Device is not open");
         return -1;
     }
     if ( !isWritable() ) {
-        VERBOSE(VB_SOCKET|VB_EXTRA,
+        LOG(VB_SOCKET, LOG_DEBUG,
                 "MSocketDevice::sendBlock: Write operation not permitted");
         return -1;
     }

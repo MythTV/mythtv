@@ -66,7 +66,7 @@ extern MBASE_PUBLIC int LogLevelNameCount;
 extern MBASE_PUBLIC char *LogLevelShortNames[];
 extern MBASE_PUBLIC int LogLevelShortNameCount;
 #endif
-extern MBASE_PUBLIC LogLevel_t LogLevel;
+extern MBASE_PUBLIC LogLevel_t logLevel;
 
 typedef struct
 {
@@ -255,7 +255,7 @@ extern MBASE_PUBLIC QString verboseString;
 
 MBASE_PUBLIC int verboseArgParse(QString arg);
 
-/// This can be appended to the VERBOSE args with 
+/// This can be appended to the LOG args with 
 /// "+".  Please do not use "<<".  It uses
 /// a thread safe version of strerror to produce the
 /// string representation of errno and puts it on the

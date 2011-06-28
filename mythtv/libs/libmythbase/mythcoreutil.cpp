@@ -75,7 +75,7 @@ bool extractZIP(const QString &zipFile, const QString &outDir)
 
     if (ec != UnZip::Ok)
     {
-        VERBOSE(VB_IMPORTANT,
+        LOG(VB_GENERAL, LOG_CRIT,
                 QString("extractZIP(): Unable to open ZIP file %1")
                         .arg(zipFile));
         return false;
@@ -85,7 +85,7 @@ bool extractZIP(const QString &zipFile, const QString &outDir)
 
     if (ec != UnZip::Ok)
     {
-        VERBOSE(VB_IMPORTANT,
+        LOG(VB_GENERAL, LOG_CRIT,
                 QString("extractZIP(): Error extracting ZIP file %1")
                         .arg(zipFile));
         return false;
@@ -109,8 +109,8 @@ static QString downloadRemoteFile(const QString &cmd, const QString &url,
 
     if (!ok || strlist.size() < 2 || strlist[0] != "OK")
     {
-        VERBOSE(VB_IMPORTANT, QString("downloadRemoteFile(): ") + cmd +
-                " returned ERROR!");
+        LOG(VB_GENERAL, LOG_CRIT, "downloadRemoteFile(): " + cmd +
+                                  " returned ERROR!");
         return QString();
     }
 

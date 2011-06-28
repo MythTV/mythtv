@@ -410,16 +410,19 @@ bool MSocketDevice::connect( const QHostAddress &addr, quint16 port )
 #if !defined(QT_NO_IPV6)
         if ( addr.protocol() == QAbstractSocket::IPv6Protocol ) {
             setProtocol(IPv6);
-            VERBOSE(VB_SOCKET, "MSocketDevice::connect: setting Protocol to IPv6");
+            LOG(VB_SOCKET, LOG_INFO,
+                "MSocketDevice::connect: setting Protocol to IPv6");
         }
         else
 #endif  
         if ( addr.protocol() == QAbstractSocket::IPv4Protocol ) {
             setProtocol(IPv4);
-            VERBOSE(VB_SOCKET, "MSocketDevice::connect: setting Protocol to IPv4");
+            LOG(VB_SOCKET, LOG_INFO,
+                "MSocketDevice::connect: setting Protocol to IPv4");
         }
 
-        VERBOSE(VB_SOCKET, "MSocketDevice::connect: attempting to create new socket");
+        LOG(VB_SOCKET, LOG_INFO,
+            "MSocketDevice::connect: attempting to create new socket");
         MSocketDevice::setSocket( createNewSocket(), t);
 
        // If still not valid, give up.

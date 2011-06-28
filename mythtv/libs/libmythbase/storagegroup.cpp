@@ -76,8 +76,9 @@ void StorageGroup::StaticInit(void)
             qdir.mkpath(it.value());
 
         if (!qdir.exists())
-            VERBOSE(VB_IMPORTANT, QString("SG() Error: Could not create builtin"
-                    "Storage Group directory '%1' for '%2'").arg(it.value())
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("SG() Error: Could not create builtin"
+                        "Storage Group directory '%1' for '%2'").arg(it.value())
                     .arg(it.key()));
     }
 }
@@ -123,7 +124,7 @@ void StorageGroup::Init(const QString group, const QString hostname,
     if ((!found) && m_allowFallback && (m_groupname != "LiveTV") &&
         (!hostname.isEmpty()))
     {
-        VERBOSE(VB_FILE, LOC +
+        LOG(VB_FILE, LOG_NOTICE,
                 QString("Unable to find any directories for the local "
                         "storage group '%1' on '%2', trying directories on "
                         "all hosts!").arg(group).arg(hostname));
@@ -136,7 +137,7 @@ void StorageGroup::Init(const QString group, const QString hostname,
     }
     if ((!found) && m_allowFallback && (group != "Default"))
     {
-        VERBOSE(VB_FILE, LOC +
+        LOG(VB_FILE, LOG_NOTICE,
                 QString("Unable to find storage group '%1', trying "
                         "'Default' group!").arg(group));
         found = FindDirs("Default", m_hostname, &m_dirlist);
@@ -147,7 +148,7 @@ void StorageGroup::Init(const QString group, const QString hostname,
         }
         else if (!hostname.isEmpty())
         {
-            VERBOSE(VB_FILE, LOC +
+            LOG(VB_FILE, LOG_NOTICE,
                     QString("Unable to find any directories for the local "
                             "Default storage group on '%1', trying directories "
                             "in all Default groups!").arg(hostname));
@@ -177,7 +178,7 @@ void StorageGroup::Init(const QString group, const QString hostname,
             msg += QString("Using hardcoded default value of '%1'")
                            .arg(kDefaultStorageDir);
         }
-        VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
+        LOG(VB_GENERAL, LOG_ERR, msg);
         m_dirlist << tmpDir;
     }
 }
@@ -193,8 +194,8 @@ QStringList StorageGroup::GetDirFileList(QString dir, QString base,
 
     if (base.split("/").size() > 20)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "GetDirFileList(), 20 levels "
-                "deep, possible directory loop detected.");
+        LOG(VB_GENERAL, LOG_ERR, "GetDirFileList(), 20 levels "
+                                 "deep, possible directory loop detected.");
         return files;
     }
 
@@ -208,7 +209,7 @@ QStringList StorageGroup::GetDirFileList(QString dir, QString base,
 
         for (QStringList::iterator p = list.begin(); p != list.end(); ++p)
         {
-            VERBOSE(VB_FILE+VB_EXTRA, LOC +
+            LOG(VB_FILE, LOG_DEBUG,
                     QString("GetDirFileList: Dir: %1/%2").arg(base).arg(*p));
             files << GetDirFileList(dir + "/" + *p, base + *p, true);
         }
@@ -217,7 +218,7 @@ QStringList StorageGroup::GetDirFileList(QString dir, QString base,
     QStringList list = d.entryList(QDir::Files|QDir::Readable);
     for (QStringList::iterator p = list.begin(); p != list.end(); ++p)
     {
-        VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("GetDirFileList: File: %1%2")
+        LOG(VB_FILE, LOG_DEBUG, QString("GetDirFileList: File: %1%2")
                                                 .arg(base).arg(*p));
         if (recursive)
             files.append(base + *p);
@@ -272,7 +273,7 @@ QStringList StorageGroup::GetFileInfoList(QString Path)
         }
     }
 
-    VERBOSE(VB_FILE, LOC + QString("GetFileInfoList: Reading '%1'").arg(Path));
+    LOG(VB_FILE, LOG_INFO, QString("GetFileInfoList: Reading '%1'").arg(Path));
 
     if (badPath)
         return files;
@@ -302,7 +303,7 @@ QStringList StorageGroup::GetFileInfoList(QString Path)
             tmp = QString("file::%1::%2::%3%4").arg(p->fileName()).arg(p->size())
                           .arg(relPath).arg(p->fileName());
 
-        VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("GetFileInfoList: (%1)").arg(tmp));
+        LOG(VB_FILE, LOG_DEBUG, QString("GetFileInfoList: (%1)").arg(tmp));
         files.append(tmp);
     }
 
@@ -311,7 +312,7 @@ QStringList StorageGroup::GetFileInfoList(QString Path)
 
 bool StorageGroup::FileExists(QString filename)
 {
-    VERBOSE(VB_FILE, LOC + QString("FileExist: Testing for '%1'")
+    LOG(VB_FILE, LOG_DEBUG, QString("FileExist: Testing for '%1'")
                                                .arg(filename));
     bool badPath = true;
 
@@ -343,8 +344,7 @@ bool StorageGroup::FileExists(QString filename)
 // in the order EXISTS, DATE, SIZE
 QStringList StorageGroup::GetFileInfo(QString filename)
 {
-    VERBOSE(VB_FILE, LOC + QString("GetFileInfo: For '%1'")
-                                               .arg(filename));
+    LOG(VB_FILE, LOG_DEBUG, QString("GetFileInfo: For '%1'") .arg(filename));
 
     QStringList details;
     bool searched = false;
@@ -381,7 +381,7 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
     QString result = filename;
     MSqlQuery query(MSqlQuery::InitCon());
 
-    VERBOSE(VB_FILE+VB_EXTRA,
+    LOG(VB_FILE, LOG_DEBUG,
             QString("StorageGroup::GetRelativePathname(%1)").arg(filename));
 
     StaticInit();
@@ -420,7 +420,7 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
                 if (result.startsWith("/"))
                     result.replace(0, 1, "");
 
-                VERBOSE(VB_FILE+VB_EXTRA,
+                LOG(VB_FILE, LOG_DEBUG,
                         QString("StorageGroup::GetRelativePathname(%1) = '%2'")
                                 .arg(filename).arg(result));
                 return result;
@@ -428,7 +428,8 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
         }
     }
 
-    query.prepare("SELECT DISTINCT data FROM settings WHERE value = 'VideoStartupDir';");
+    query.prepare("SELECT DISTINCT data FROM settings WHERE "
+                  "value = 'VideoStartupDir';");
     if (query.exec())
     {
         while (query.next())
@@ -448,7 +449,7 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
                     if (result.startsWith("/"))
                         result.replace(0, 1, "");
 
-                    VERBOSE(VB_FILE+VB_EXTRA,
+                    LOG(VB_FILE, LOG_DEBUG,
                             QString("StorageGroup::GetRelativePathname(%1) "
                                     "= '%2'").arg(filename).arg(result));
                     return result;
@@ -472,9 +473,9 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
             if (result.startsWith("/"))
                 result.replace(0, 1, "");
 
-            VERBOSE(VB_FILE+VB_EXTRA,
-                    QString("StorageGroup::GetRelativePathname(%1) "
-                            "= '%2'").arg(filename).arg(result));
+            LOG(VB_FILE, LOG_DEBUG,
+                    QString("StorageGroup::GetRelativePathname(%1) = '%2'")
+                        .arg(filename).arg(result));
             return result;
         }
     }
@@ -559,7 +560,7 @@ bool StorageGroup::FindDirs(const QString group, const QString hostname,
 
 QString StorageGroup::FindFile(QString filename)
 {
-    VERBOSE(VB_FILE, LOC + QString("FindFile: Searching for '%1'")
+    LOG(VB_FILE, LOG_DEBUG, QString("FindFile: Searching for '%1'")
                                    .arg(filename));
 
     QString recDir = FindFileDir(filename);
@@ -568,14 +569,12 @@ QString StorageGroup::FindFile(QString filename)
     if (!recDir.isEmpty())
     {
         result = recDir + "/" + filename;
-        VERBOSE(VB_FILE, LOC + QString("FindFile: Found '%1'")
-                                       .arg(result));
+        LOG(VB_FILE, LOG_DEBUG, QString("FindFile: Found '%1'") .arg(result));
     }
     else
     {
-        VERBOSE(VB_FILE, LOC_ERR +
-                QString("FindFile: Unable to find '%1'!")
-                        .arg(filename));
+        LOG(VB_FILE, LOG_ERR,
+                QString("FindFile: Unable to find '%1'!") .arg(filename));
     }
 
     return result;
@@ -590,7 +589,7 @@ QString StorageGroup::FindFileDir(QString filename)
     while (curDir < m_dirlist.size())
     {
         QString testFile = m_dirlist[curDir] + "/" + filename;
-        VERBOSE(VB_FILE, LOC + QString("FindFileDir: Checking '%1' for '%2'")
+        LOG(VB_FILE, LOG_DEBUG, QString("FindFileDir: Checking '%1' for '%2'")
                 .arg(m_dirlist[curDir]).arg(testFile));
         checkFile.setFile(testFile);
         if (checkFile.exists() || checkFile.isSymLink())
@@ -639,7 +638,7 @@ QString StorageGroup::FindNextDirMostFree(void)
     long long thisDirUsed;
     long long thisDirFree;
 
-    VERBOSE(VB_FILE, LOC + QString("FindNextDirMostFree: Starting"));
+    LOG(VB_FILE, LOG_DEBUG, QString("FindNextDirMostFree: Starting"));
 
     if (m_allowFallback)
         nextDir = kDefaultStorageDir;
@@ -654,7 +653,7 @@ QString StorageGroup::FindNextDirMostFree(void)
         checkDir.setPath(m_dirlist[curDir]);
         if (!checkDir.exists())
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
+            LOG(VB_GENERAL, LOG_ERR,
                     QString("FindNextDirMostFree: '%1' does not exist!")
                             .arg(m_dirlist[curDir]));
             curDir++;
@@ -663,10 +662,10 @@ QString StorageGroup::FindNextDirMostFree(void)
 
         thisDirFree = getDiskSpace(m_dirlist[curDir], thisDirTotal,
                                    thisDirUsed);
-        VERBOSE(VB_FILE, LOC +
+        LOG(VB_FILE, LOG_DEBUG,
                 QString("FindNextDirMostFree: '%1' has %2 KiB free")
                         .arg(m_dirlist[curDir])
-                .arg(QString::number(thisDirFree)));
+                        .arg(QString::number(thisDirFree)));
 
         if (thisDirFree > nextDirFree)
         {
@@ -677,10 +676,10 @@ QString StorageGroup::FindNextDirMostFree(void)
     }
 
     if (nextDir.isEmpty())
-        VERBOSE(VB_FILE, LOC + QString("FindNextDirMostFree: Unable to find "
-                                       "any directories to use."));
+        LOG(VB_FILE, LOG_ERR, QString("FindNextDirMostFree: Unable to find "
+                                      "any directories to use."));
     else
-        VERBOSE(VB_FILE, LOC + QString("FindNextDirMostFree: Using '%1'")
+        LOG(VB_FILE, LOG_DEBUG, QString("FindNextDirMostFree: Using '%1'")
                                        .arg(nextDir));
 
     nextDir.detach();
@@ -703,8 +702,8 @@ void StorageGroup::CheckAllStorageGroupDirs(void)
         return;
     }
 
-    VERBOSE(VB_FILE, LOC + "CheckAllStorageGroupDirs(): Checking All Storage "
-            "Group directories");
+    LOG(VB_FILE, LOG_DEBUG, "CheckAllStorageGroupDirs(): Checking All Storage "
+                            "Group directories");
 
     QFile testFile("");
     QDir testDir("");
@@ -720,14 +719,14 @@ void StorageGroup::CheckAllStorageGroupDirs(void)
         dirname.replace(QRegExp("^\\s*"), "");
         dirname.replace(QRegExp("\\s*$"), "");
 
-        VERBOSE(VB_FILE, LOC +
+        LOG(VB_FILE, LOG_DEBUG,
                 QString("Checking directory '%1' in group '%2'.")
                         .arg(dirname).arg(m_groupname));
 
         testDir.setPath(dirname);
         if (!testDir.exists())
         {
-            VERBOSE(VB_FILE, LOC_WARN + 
+            LOG(VB_FILE, LOG_WARNING,
                     QString("Group '%1' references directory '%2' but this "
                             "directory does not exist.  This directory "
                             "will not be used on this server.")
@@ -739,8 +738,7 @@ void StorageGroup::CheckAllStorageGroupDirs(void)
             if (testFile.open(QIODevice::WriteOnly))
                 testFile.remove();
             else
-                VERBOSE(VB_IMPORTANT,
-                        LOC_ERR +
+                LOG(VB_GENERAL, LOG_ERR,
                         QString("Group '%1' wants to use directory '%2', but "
                                 "this directory is not writeable.")
                                 .arg(m_groupname).arg(dirname));
@@ -845,7 +843,7 @@ QString StorageGroup::GetGroupToUse(
         }
         else
         {
-            VERBOSE(VB_FILE+VB_EXTRA,
+            LOG(VB_FILE, LOG_DEBUG,
                     QString("GetGroupToUse(): "
                             "falling back to Videos Storage Group for host %1 "
                             "since it does not have a %2 Storage Group.")

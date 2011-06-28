@@ -52,8 +52,8 @@ void MythCDROM::onDeviceMounted()
 {
     if (!QDir(m_MountPath).exists())
     {
-        VERBOSE(VB_IMPORTANT, QString("Mountpoint '%1' doesn't exist")
-                              .arg(m_MountPath));
+        LOG(VB_GENERAL, LOG_ERR, QString("Mountpoint '%1' doesn't exist")
+                                     .arg(m_MountPath));
         m_MediaType = MEDIATYPE_UNKNOWN;
         m_Status    = MEDIASTAT_ERROR;
         return;
@@ -74,39 +74,39 @@ void MythCDROM::onDeviceMounted()
 
     if (dvd.exists())
     {
-        VERBOSE(VB_MEDIA, "Probable DVD detected.");
+        LOG(VB_MEDIA, LOG_INFO, "Probable DVD detected.");
         m_MediaType = MEDIATYPE_DVD;
         m_Status = MEDIASTAT_USEABLE; 
     }
     if (bd.exists())
     {
-        VERBOSE(VB_MEDIA, "Probable Blu-ray detected.");
+        LOG(VB_MEDIA, LOG_INFO, "Probable Blu-ray detected.");
         m_MediaType = MEDIATYPE_BD;
         m_Status = MEDIASTAT_USEABLE;
     }
     else if (audio.exists())
     {
-        VERBOSE(VB_MEDIA, "Probable Audio CD detected.");
+        LOG(VB_MEDIA, LOG_INFO, "Probable Audio CD detected.");
         m_MediaType = MEDIATYPE_AUDIO;
         m_Status = MEDIASTAT_USEABLE; 
     }
     else if (vcd.exists() || svcd.exists())
     {
-        VERBOSE(VB_MEDIA, "Probable VCD/SVCD detected.");
+        LOG(VB_MEDIA, LOG_INFO, "Probable VCD/SVCD detected.");
         m_MediaType = MEDIATYPE_VCD;
         m_Status = MEDIASTAT_USEABLE; 
     }
     else if (bad_dvd.exists())
-        VERBOSE(VB_IMPORTANT,
-                "DVD incorrectly mounted? (ISO9660 instead of UDF)");
+        LOG(VB_GENERAL, LOG_ERR, 
+            "DVD incorrectly mounted? (ISO9660 instead of UDF)");
     else
     {
-        VERBOSE(VB_GENERAL,
+        LOG(VB_GENERAL, LOG_ERR,
                 QString("CD/DVD '%1' contained none of\n").arg(m_MountPath) +
                 QString("\t\t\t%1, %2, %3 or %4").arg(PATHTO_DVD_DETECT)
                 .arg(PATHTO_AUDIO_DETECT).arg(PATHTO_VCD_DETECT)
                 .arg(PATHTO_SVCD_DETECT));
-        VERBOSE(VB_GENERAL, "Searching CD statistically - file by file!");
+        LOG(VB_GENERAL, LOG_INFO, "Searching CD statistically - file by file!");
     }
 
     // If not DVD/AudioCD/VCD/SVCD, use parent's more generic version
@@ -126,6 +126,7 @@ void MythCDROM::onDeviceMounted()
 
 void MythCDROM::setSpeed(const char *devicePath, int speed)
 {
-    VERBOSE(VB_MEDIA, QString("SetSpeed(%1,%2) - not implemented on this OS.")
+    LOG(VB_MEDIA, LOG_INFO, 
+        QString("SetSpeed(%1,%2) - not implemented on this OS.")
                       .arg(devicePath).arg(speed));
 }

@@ -111,8 +111,8 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
 {
     if (DoMount && isMounted())
     {
-        VERBOSE(VB_MEDIA, "MythMediaDevice::performMountCmd(true)"
-                          " - Logic Error? Device already mounted.");
+        LOG(VB_MEDIA, LOG_ERR, "MythMediaDevice::performMountCmd(true)"
+                               " - Logic Error? Device already mounted.");
         return true;
     }
 
@@ -134,7 +134,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
                 .arg((DoMount) ? PATHTO_MOUNT : PATHTO_UNMOUNT)
                 .arg(m_DevicePath);
 
-        VERBOSE(VB_MEDIA, QString("Executing '%1'").arg(MountCommand));
+        LOG(VB_MEDIA, LOG_INFO, QString("Executing '%1'").arg(MountCommand));
         if (myth_system(MountCommand, kMSDontBlockInputDevs) == GENERIC_EXIT_OK)
         {
             if (DoMount)
@@ -143,13 +143,13 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
                 // so verify the mount status of the device
                 if (!findMountPath())
                 {
-                    VERBOSE(VB_MEDIA, "performMountCmd() attempted to"
-                                      " find mounted media, but failed?");
+                    LOG(VB_MEDIA, LOG_ERR, "performMountCmd() attempted to"
+                                           " find mounted media, but failed?");
                     return false;
                 }
                 m_Status = MEDIASTAT_MOUNTED;
                 onDeviceMounted();
-                VERBOSE(VB_GENERAL,
+                LOG(VB_GENERAL, LOG_INFO,
                         QString("Detected MediaType ") + MediaTypeString());
             }
             else
@@ -158,19 +158,19 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
             return true;
         }
         else
-            VERBOSE(VB_GENERAL, QString("Failed to mount %1.")
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to mount %1.")
                                        .arg(m_DevicePath));
     }
     else
     {
-        VERBOSE(VB_MEDIA, "Disk inserted on a supermount device");
+        LOG(VB_MEDIA, LOG_INFO, "Disk inserted on a supermount device");
         // If it's a super mount then the OS will handle mounting /  unmounting.
         // We just need to give derived classes a chance to perform their
         // mount / unmount logic.
         if (DoMount)
         {
             onDeviceMounted();
-            VERBOSE(VB_GENERAL,
+            LOG(VB_GENERAL, LOG_INFO,
                     QString("Detected MediaType ") + MediaTypeString());
         }
         else
@@ -191,7 +191,8 @@ MythMediaType MythMediaDevice::DetectMediaType(void)
 
     if (!ScanMediaType(m_MountPath, ext_cnt))
     {
-        VERBOSE(VB_MEDIA, QString("No files with extensions found in '%1'")
+        LOG(VB_MEDIA, LOG_NOTICE,
+            QString("No files with extensions found in '%1'")
                 .arg(m_MountPath));
         return mediatype;
     }
@@ -314,7 +315,7 @@ bool MythMediaDevice::isSameDevice(const QString &path)
 
 void MythMediaDevice::setSpeed(int speed)
 {
-    VERBOSE(VB_MEDIA,
+    LOG(VB_MEDIA, LOG_ERR,
             QString("Cannot setSpeed(%1) for device %2 - not implemented.")
             .arg(speed).arg(m_DevicePath));
 }
@@ -353,8 +354,7 @@ bool MythMediaDevice::findMountPath()
 {
     if (m_DevicePath.isEmpty())
     {
-        VERBOSE(VB_MEDIA,
-                LOC + ":findMountPath() - logic error, no device path");
+        LOG(VB_MEDIA, LOG_ERR, "findMountPath() - logic error, no device path");
         return false;
     }
 
@@ -441,13 +441,14 @@ bool MythMediaDevice::findMountPath()
                 + "                 -----------------+-------------------\n"
                 + debug
                 + "                 =================+===================";
-        VERBOSE(VB_MEDIA, debug);
+        LOG(VB_MEDIA, LOG_DEBUG, debug);
     }
 
     return false;
 }
 
-MythMediaStatus MythMediaDevice::setStatus( MythMediaStatus NewStatus, bool CloseIt )
+MythMediaStatus MythMediaDevice::setStatus( MythMediaStatus NewStatus,
+                                            bool CloseIt )
 {
     MythMediaStatus OldStatus = m_Status;
 

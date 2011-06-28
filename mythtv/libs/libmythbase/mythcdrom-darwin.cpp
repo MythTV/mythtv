@@ -43,18 +43,18 @@ void MythCDROMDarwin::setSpeed(const char *device, int speed)
     fd = open(raw.toLocal8Bit().constData(), O_RDONLY | O_NONBLOCK);
     if (fd == -1)
     {
-        VERBOSE(VB_MEDIA, LOC_ERR + "setSpeed() can't open drive " + raw);
+        LOG(VB_MEDIA, LOG_ERR, "setSpeed() can't open drive " + raw);
         return;
     }
 
     if (ioctl(fd, DKIOCCDSETSPEED, &spd) == -1 &&
         ioctl(fd, DKIOCDVDSETSPEED, &spd) == -1)
     {
-        VERBOSE(VB_MEDIA, (LOC_ERR + "setSpeed() failed: ") + strerror(errno));
+        LOG(VB_MEDIA, LOG_ERR, "setSpeed() failed: " + ENO);
         close(fd);
         return;
     }
-    VERBOSE(VB_MEDIA, LOC + ":setSpeed() - CD/DVD Speed Set to "
-                          + QString::number(spd));
+    LOG(VB_MEDIA, LOG_INFO, ":setSpeed() - CD/DVD Speed Set to " +
+                            QString::number(spd));
     close(fd);
 }

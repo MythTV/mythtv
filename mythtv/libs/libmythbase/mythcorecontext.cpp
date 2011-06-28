@@ -126,7 +126,7 @@ bool MythCoreContextPrivate::WaitForWOL(int timeout_in_ms)
     int timeout_remaining = timeout_in_ms;
     while (m_WOLInProgress && (timeout_remaining > 0))
     {
-        VERBOSE(VB_GENERAL, LOC + "Wake-On-LAN in progress, waiting...");
+        LOG(VB_GENERAL, LOG_INFO, "Wake-On-LAN in progress, waiting...");
 
         int max_wait = min(1000, timeout_remaining);
         m_WOLInProgressWaitCondition.wait(
@@ -148,22 +148,22 @@ bool MythCoreContext::Init(void)
 {
     if (!d)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Init() Out-of-memory");
+        LOG(VB_GENERAL, LOG_EMERG, "Init() Out-of-memory");
         return false;
     }
 
     if (d->m_appBinaryVersion != MYTH_BINARY_VERSION)
     {
-        VERBOSE(VB_GENERAL, QString("Application binary version (%1) does not "
-                                    "match libraries (%2)")
-                                    .arg(d->m_appBinaryVersion)
-                                    .arg(MYTH_BINARY_VERSION));
+        LOG(VB_GENERAL, LOG_CRIT,
+            QString("Application binary version (%1) does not "
+                    "match libraries (%2)")
+                .arg(d->m_appBinaryVersion) .arg(MYTH_BINARY_VERSION));
 
         QString warning = QObject::tr(
             "This application is not compatible "
             "with the installed MythTV libraries. "
             "Please recompile after a make distclean");
-        VERBOSE(VB_IMPORTANT, warning);
+        LOG(VB_GENERAL, LOG_WARNING, warning);
 
         return false;
     }
@@ -209,8 +209,8 @@ bool MythCoreContext::SetupCommandSocket(MythSocket *serverSock,
 
     if (!serverSock->writeStringList(strlist))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Connecting server socket to "
-                "master backend, socket write failed");
+        LOG(VB_GENERAL, LOG_ERR, "Connecting server socket to "
+                                 "master backend, socket write failed");
         return false;
     }
 
@@ -218,11 +218,11 @@ bool MythCoreContext::SetupCommandSocket(MythSocket *serverSock,
         (strlist[0] == "ERROR"))
     {
         if (!strlist.empty())
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Problem connecting "
-                    "server socket to master backend");
+            LOG(VB_GENERAL, LOG_ERR, "Problem connecting "
+                                     "server socket to master backend");
         else
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Timeout connecting "
-                    "server socket to master backend");
+            LOG(VB_GENERAL, LOG_ERR, "Timeout connecting "
+                                     "server socket to master backend");
         return false;
     }
 
@@ -237,7 +237,7 @@ bool MythCoreContext::ConnectToMasterServer(bool blockingClient)
     {
         // Should never get here unless there is a bug in the code somewhere.
         // If this happens, it can cause endless event loops.
-        VERBOSE(VB_IMPORTANT, "ERROR: Master backend tried to connect back "
+        LOG(VB_GENERAL, LOG_ERR, "ERROR: Master backend tried to connect back "
                 "to itself!");
         return false;
     }
@@ -307,7 +307,7 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
     bool proto_mismatch = false;
     for (int cnt = 1; cnt <= maxConnTry; cnt++)
     {
-        VERBOSE(VB_GENERAL, LOC +
+        LOG(VB_GENERAL, LOG_INFO,
                 QString("Connecting to backend server: %1:%2 (try %3 of %4)")
                 .arg(hostname).arg(port).arg(cnt).arg(maxConnTry));
 
@@ -375,7 +375,7 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
 
     if (!m_serverSock && !proto_mismatch)
     {
-        VERBOSE(VB_IMPORTANT,
+        LOG(VB_GENERAL, LOG_ERR,
                 "Connection to master server timed out.\n\t\t\t"
                 "Either the server is down or the master server settings"
                 "\n\t\t\t"
@@ -404,8 +404,8 @@ MythSocket *MythCoreContext::ConnectEventSocket(const QString &hostname,
     // this one won't need multiple retries to work...
     if (!m_eventSock->connect(hostname, port))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to connect event "
-                "socket to master backend");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to connect event "
+                                 "socket to master backend");
         m_eventSock->DownRef();
         m_eventSock = NULL;
         return NULL;
@@ -421,11 +421,11 @@ MythSocket *MythCoreContext::ConnectEventSocket(const QString &hostname,
         (strlist[0] == "ERROR"))
     {
         if (!strlist.empty())
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Problem connecting "
-                    "event socket to master backend");
+            LOG(VB_GENERAL, LOG_ERR, "Problem connecting "
+                                     "event socket to master backend");
         else
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Timeout connecting "
-                    "event socket to master backend");
+            LOG(VB_GENERAL, LOG_ERR, "Timeout connecting "
+                                     "event socket to master backend");
 
         m_eventSock->DownRef();
         m_eventSock->Unlock();
@@ -603,7 +603,9 @@ QString MythCoreContext::GenMythURL(QString host, int port, QString path, QStrin
 
     ret = QString("myth://%1%2%3%4%5").arg(m_storageGroup).arg(m_host).arg(m_port).arg(seperator).arg(path);
 
-    //VERBOSE(VB_GENERAL, LOC + QString("GenMythURL returning %1").arg(ret));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("GenMythURL returning %1").arg(ret));
+#endif
 
     return ret;
 }
@@ -793,7 +795,7 @@ bool MythCoreContext::SendReceiveStringList(QStringList &strlist,
             msg += (i?",":"") + strlist[i];
         msg += (strlist.size() > 2) ? "...)" : ")";
         msg += " called from UI thread";
-        VERBOSE(VB_GENERAL|VB_EXTRA, msg);
+        LOG(VB_GENERAL, LOG_DEBUG, msg);
     }
 
     QString query_type = "UNKNOWN";
@@ -818,7 +820,8 @@ bool MythCoreContext::SendReceiveStringList(QStringList &strlist,
 
         if (!ok)
         {
-            VERBOSE(VB_IMPORTANT, QString("Connection to backend server lost"));
+            LOG(VB_GENERAL, LOG_CRIT,
+                QString("Connection to backend server lost"));
             d->m_serverSock->DownRef();
             d->m_serverSock = NULL;
 
@@ -842,7 +845,7 @@ bool MythCoreContext::SendReceiveStringList(QStringList &strlist,
         while (ok && strlist[0] == "BACKEND_MESSAGE")
         {
             // oops, not for us
-            VERBOSE(VB_IMPORTANT, "SRSL you shouldn't see this!!");
+            LOG(VB_GENERAL, LOG_EMERG, "SRSL you shouldn't see this!!");
             QString message = strlist[1];
             strlist.pop_front(); strlist.pop_front();
 
@@ -860,8 +863,8 @@ bool MythCoreContext::SendReceiveStringList(QStringList &strlist,
                 d->m_serverSock = NULL;
             }
 
-            VERBOSE(VB_IMPORTANT,
-                    QString("Reconnection to backend server failed"));
+            LOG(VB_GENERAL, LOG_CRIT,
+                QString("Reconnection to backend server failed"));
 
             QCoreApplication::postEvent(d->m_GUIcontext,
                                 new MythEvent("PERSISTENT_CONNECTION_FAILURE"));
@@ -875,13 +878,13 @@ bool MythCoreContext::SendReceiveStringList(QStringList &strlist,
         else if (strlist[0] == "ERROR")
         {
             if (strlist.size() == 2)
-                VERBOSE(VB_GENERAL, QString("Protocol query '%1' reponded "
-                                            "with the error '%2'")
-                                            .arg(query_type).arg(strlist[1]));
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Protocol query '%1' responded with the error '%2'")
+                        .arg(query_type).arg(strlist[1]));
             else
-                VERBOSE(VB_GENERAL, QString("Protocol query '%1' reponded "
-                                        "with an error, but no error message.")
-                                        .arg(query_type));
+                LOG(VB_GENERAL, LOG_INFO, 
+                    QString("Protocol query '%1' responded with an error, but "
+                            "no error message.") .arg(query_type));
 
             ok = false;
         }
@@ -907,15 +910,15 @@ void MythCoreContext::readyRead(MythSocket *sock)
         }
         else if (prefix != "BACKEND_MESSAGE")
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Received a: %1 message from the backend"
-                    "\n\t\t\tBut I don't know what to do with it.")
-                    .arg(prefix));
+            LOG(VB_GENERAL, LOG_ERR,
+                    QString("Received a: %1 message from the backend "
+                            "but I don't know what to do with it.")
+                        .arg(prefix));
         }
         else if (message == "CLEAR_SETTINGS_CACHE")
         {
             // No need to dispatch this message to ourself, so handle it
-            VERBOSE(VB_GENERAL, "Received a remote 'Clear Cache' request");
+            LOG(VB_GENERAL, LOG_INFO, "Received remote 'Clear Cache' request");
             ClearSettingsCache();
         }
         else
@@ -932,8 +935,8 @@ void MythCoreContext::connectionClosed(MythSocket *sock)
 {
     (void)sock;
 
-    VERBOSE(VB_IMPORTANT, QString("Event socket closed. "
-            "No connection to the backend."));
+    LOG(VB_GENERAL, LOG_CRIT, "Event socket closed.  No connection to the "
+                              "backend.");
 
     QMutexLocker locker(&d->m_sockLock);
     if (d->m_serverSock)
@@ -963,7 +966,7 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket, uint timeout_ms,
 
     if (!socket->readStringList(strlist, timeout_ms) || strlist.empty())
     {
-        VERBOSE(VB_IMPORTANT, "Protocol version check failure.\n\t\t\t"
+        LOG(VB_GENERAL, LOG_CRIT, "Protocol version check failure.\n\t\t\t"
                 "The response to MYTH_PROTO_VERSION was empty.\n\t\t\t"
                 "This happens when the backend is too busy to respond,\n\t\t\t"
                 "or has deadlocked in due to bugs or hardware failure.");
@@ -972,12 +975,11 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket, uint timeout_ms,
     }
     else if (strlist[0] == "REJECT" && strlist.size() >= 2)
     {
-        VERBOSE(VB_GENERAL, QString("Protocol version or token mismatch "
-                                    "(frontend=%1/%2,"
-                                    "backend=%3/\?\?)\n")
-                                    .arg(MYTH_PROTO_VERSION)
-                                    .arg(MYTH_PROTO_TOKEN)
-                                    .arg(strlist[1]));
+        LOG(VB_GENERAL, LOG_CRIT, QString("Protocol version or token mismatch "
+                                          "(frontend=%1/%2,backend=%3/\?\?)\n")
+                                      .arg(MYTH_PROTO_VERSION)
+                                      .arg(MYTH_PROTO_TOKEN)
+                                      .arg(strlist[1]));
 
         if (error_dialog_desired && d->m_GUIcontext)
         {
@@ -990,26 +992,27 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket, uint timeout_ms,
     }
     else if (strlist[0] == "ACCEPT")
     {
-        VERBOSE(VB_IMPORTANT, QString("Using protocol version %1")
-                               .arg(MYTH_PROTO_VERSION));
+        LOG(VB_GENERAL, LOG_INFO, QString("Using protocol version %1")
+                                      .arg(MYTH_PROTO_VERSION));
         return true;
     }
 
-    VERBOSE(VB_GENERAL, QString("Unexpected response to MYTH_PROTO_VERSION: %1")
-                               .arg(strlist[0]));
+    LOG(VB_GENERAL, LOG_ERR,
+        QString("Unexpected response to MYTH_PROTO_VERSION: %1")
+            .arg(strlist[0]));
     return false;
 }
 
 void MythCoreContext::dispatch(const MythEvent &event)
 {
-    VERBOSE(VB_NETWORK, QString("MythEvent: %1").arg(event.Message()));
+    LOG(VB_NETWORK, LOG_INFO, QString("MythEvent: %1").arg(event.Message()));
 
     MythObservable::dispatch(event);
 }
 
 void MythCoreContext::dispatchNow(const MythEvent &event)
 {
-    VERBOSE(VB_NETWORK, QString("MythEvent: %1").arg(event.Message()));
+    LOG(VB_NETWORK, LOG_INFO, QString("MythEvent: %1").arg(event.Message()));
 
     MythObservable::dispatchNow(event);
 }
@@ -1088,15 +1091,15 @@ void MythCoreContext::SaveLocaleDefaults(void)
 
     if (!d->m_locale->GetLocaleCode().isEmpty())
     {
-        VERBOSE(VB_GENERAL, QString("Current locale %1")
-                                        .arg(d->m_locale->GetLocaleCode()));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Current locale %1") .arg(d->m_locale->GetLocaleCode()));
 
         d->m_locale->SaveLocaleDefaults();
         return;
     }
 
-    VERBOSE(VB_IMPORTANT, QString("No locale defined! We weren't able to "
-                                    "set locale defaults."));
+    LOG(VB_GENERAL, LOG_ERR,
+        "No locale defined! We weren't able to set locale defaults.");
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

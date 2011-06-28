@@ -20,8 +20,6 @@ using namespace std;
 static MythDB *mythdb = NULL;
 static QMutex dbLock;
 
-unsigned int db_messages = VB_IMPORTANT | VB_GENERAL;
-
 // For thread safety reasons this is not a QString
 const char *kSentinelValue = "<settings_sentinel_value>";
 
@@ -107,7 +105,7 @@ MythDBPrivate::MythDBPrivate()
 
 MythDBPrivate::~MythDBPrivate()
 {
-    VERBOSE(VB_DATABASE, "Destroying MythDBPrivate");
+    LOG(VB_DATABASE, LOG_INFO, "Destroying MythDBPrivate");
     delete m_settings;
 }
 
@@ -177,7 +175,7 @@ void MythDB::DBError(const QString &where, const QSqlQuery& query)
         str += tmp;
     }
     str += DBErrorMessage(query.lastError());
-    VERBOSE(VB_IMPORTANT, QString("%1").arg(str));
+    LOG(VB_GENERAL, LOG_ERR, str);
 }
 
 QString MythDB::DBErrorMessage(const QSqlError& err)
@@ -257,7 +255,7 @@ bool MythDB::SaveSettingOnHost(const QString &key,
     QString LOC  = QString("SaveSettingOnHost('%1') ").arg(key);
     if (key.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, LOC + "- Illegal null key");
+        LOG(VB_GENERAL, LOG_ERR, "Illegal null key");
         return false;
     }
 
@@ -273,7 +271,7 @@ bool MythDB::SaveSettingOnHost(const QString &key,
         if (host.toLower() == d->m_localhostname)
             OverrideSettingForSession(key, newValue);
         if (!d->suppressDBMessages)
-            VERBOSE(VB_IMPORTANT, LOC + "- No database yet");
+            LOG(VB_GENERAL, LOG_ERR, "No database yet");
         SingleSetting setting;
         setting.host = host;
         setting.key = key;
@@ -321,7 +319,7 @@ bool MythDB::SaveSettingOnHost(const QString &key,
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC + "- database not open");
+        LOG(VB_GENERAL, LOG_ERR, "database not open");
     }
 
     ClearSettingsCache(host + ' ' + key);
@@ -364,7 +362,7 @@ QString MythDB::GetSetting(const QString &_key, const QString &defaultval)
     if (!query.isConnected())
     {
         if (!d->suppressDBMessages)
-            VERBOSE(VB_IMPORTANT,
+            LOG(VB_GENERAL, LOG_ERR,
                 QString("Database not open while trying to load setting: %1")
                 .arg(key));
         return d->m_settings->GetSetting(key, defaultval);
@@ -613,7 +611,7 @@ QString MythDB::GetSettingOnHost(const QString &_key, const QString &_host,
     if (!query.isConnected())
     {
         if (!d->suppressDBMessages)
-            VERBOSE(VB_IMPORTANT,
+            LOG(VB_GENERAL, LOG_ERR,
                 QString("Database not open while trying to "
                         "load setting: %1").arg(key));
         return value;
@@ -768,8 +766,8 @@ void MythDB::OverrideSettingForSession(
     QString mk = key.toLower(), mk2 = d->m_localhostname + ' ' + mk, mv = value;
     if ("dbschemaver" == mk)
     {
-        VERBOSE(VB_IMPORTANT, QString("ERROR: Refusing to allow override "
-                                      "for '%1'.").arg(key));
+        LOG(VB_GENERAL, LOG_ERR, 
+            QString("ERROR: Refusing to allow override for '%1'.").arg(key));
         return;
     }
     mk.squeeze();
@@ -793,13 +791,13 @@ static void clear(
         SettingsMap::const_iterator oit = overrides.find(myKey);
         if (oit == overrides.end())
         {
-            VERBOSE(VB_DATABASE,
+            LOG(VB_DATABASE, LOG_INFO,
                     QString("Clearing Settings Cache for '%1'.").arg(myKey));
             cache.erase(it);
         }
         else
         {
-            VERBOSE(VB_DATABASE,
+            LOG(VB_DATABASE, LOG_INFO,
                     QString("Clearing Cache of overridden '%1' ignored.")
                     .arg(myKey));
         }
@@ -812,7 +810,7 @@ void MythDB::ClearSettingsCache(const QString &_key)
 
     if (_key.isEmpty())
     {
-        VERBOSE(VB_DATABASE, "Clearing Settings Cache.");
+        LOG(VB_DATABASE, LOG_INFO, "Clearing Settings Cache.");
         d->settingsCache.clear();
         d->settingsCache.reserve(settings_reserve);
 
@@ -843,9 +841,9 @@ void MythDB::ClearSettingsCache(const QString &_key)
 void MythDB::ActivateSettingsCache(bool activate)
 {
     if (activate)
-        VERBOSE(VB_DATABASE, "Enabling Settings Cache.");
+        LOG(VB_DATABASE, LOG_INFO, "Enabling Settings Cache.");
     else
-        VERBOSE(VB_DATABASE, "Disabling Settings Cache.");
+        LOG(VB_DATABASE, LOG_INFO, "Disabling Settings Cache.");
 
     d->useSettingsCache = activate;
     ClearSettingsCache();
@@ -878,7 +876,7 @@ bool MythDB::LoadDatabaseParamsFromDisk(
     }
     else if (sanitize)
     {
-        VERBOSE(VB_IMPORTANT, "Unable to read configuration file mysql.txt");
+        LOG(VB_GENERAL, LOG_ERR, "Unable to read configuration file mysql.txt");
 
         // Sensible connection defaults.
         params.dbHostName    = "localhost";
@@ -904,15 +902,15 @@ bool MythDB::LoadDatabaseParamsFromDisk(
 
     if (params.dbHostName.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, "DBHostName is not set in mysql.txt");
-        VERBOSE(VB_IMPORTANT, "Assuming localhost");
+        LOG(VB_GENERAL, LOG_ERR, "DBHostName is not set in mysql.txt");
+        LOG(VB_GENERAL, LOG_ERR, "Assuming localhost");
     }
     if (params.dbUserName.isEmpty())
-        VERBOSE(VB_IMPORTANT, "DBUserName is not set in mysql.txt");
+        LOG(VB_GENERAL, LOG_ERR, "DBUserName is not set in mysql.txt");
     if (params.dbPassword.isEmpty())
-        VERBOSE(VB_IMPORTANT, "DBPassword is not set in mysql.txt");
+        LOG(VB_GENERAL, LOG_ERR, "DBPassword is not set in mysql.txt");
     if (params.dbName.isEmpty())
-        VERBOSE(VB_IMPORTANT, "DBName is not set in mysql.txt");
+        LOG(VB_GENERAL, LOG_ERR, "DBName is not set in mysql.txt");
 
     // If sanitize set, replace empty dbHostName with "localhost"
     if (sanitize && params.dbHostName.isEmpty())
@@ -939,19 +937,20 @@ bool MythDB::SaveDatabaseParamsToDisk(
     {
         if (!createDir.mkdir(dirpath))
         {
-            VERBOSE(VB_IMPORTANT, QString("Could not create %1").arg(dirpath));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Could not create %1").arg(dirpath));
             return false;
         }
     }
 
     if (!f->open(QIODevice::WriteOnly))
     {
-        VERBOSE(VB_IMPORTANT, QString("Could not open settings file %1 "
-                                      "for writing").arg(path));
+        LOG(VB_GENERAL, LOG_ERR, QString("Could not open settings file %1 "
+                                         "for writing").arg(path));
         return false;
     }
 
-    VERBOSE(VB_IMPORTANT, QString("Writing settings file %1").arg(path));
+    LOG(VB_GENERAL, LOG_NOTICE, QString("Writing settings file %1").arg(path));
     QTextStream s(f);
     s << "DBHostName=" << params.dbHostName << endl;
 

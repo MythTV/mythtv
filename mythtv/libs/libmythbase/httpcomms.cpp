@@ -135,15 +135,14 @@ void HttpComms::done(bool error)
 {
     if (error)
     {
-       VERBOSE(VB_IMPORTANT, QString("HttpComms::done() - NetworkOperation Error on Finish: "
-                                     "%1 (%2): url: '%3'")
-                                     .arg(http->errorString())
-                                     .arg(error)
-                                     .arg(m_url.toString()));
+       LOG(VB_GENERAL, LOG_ERR, 
+           QString("NetworkOperation Error on Finish: %1 (%2): url: '%3'")
+	       .arg(http->errorString()) .arg(error) .arg(m_url.toString()));
     }
     else if (m_authNeeded)
     {
-        VERBOSE(VB_NETWORK, QString("Authentication pending, ignoring done from first request."));
+        LOG(VB_NETWORK, LOG_ERR, QString("Authentication pending, ignoring "
+                                         "done from first request."));
         return;
     }
     else if (http->bytesAvailable())
@@ -152,7 +151,7 @@ void HttpComms::done(bool error)
         m_data = http->readAll();
     }
 
-    VERBOSE(VB_NETWORK, QString("done: %1 bytes").arg(m_data.size()));
+    LOG(VB_NETWORK, LOG_DEBUG, QString("done: %1 bytes").arg(m_data.size()));
 
     if (m_timer)
         m_timer->stop();
@@ -176,7 +175,7 @@ void HttpComms::stateChanged(int state)
         default: stateStr =  "unknown state: "; break;
     }
 
-    VERBOSE(VB_NETWORK, QString("HttpComms::stateChanged: %1 (%2)")
+    LOG(VB_NETWORK, LOG_DEBUG, QString("HttpComms::stateChanged: %1 (%2)")
                                 .arg(stateStr)
                                 .arg(state));
 }
@@ -196,15 +195,16 @@ void HttpComms::headerReceived(const QHttpResponseHeader &resp)
         if (rx.indexIn(resp.value(sidkey)) >= 0)
         {
             m_cookie = "PHPSESSID=" + rx.cap(1);
-            VERBOSE(VB_NETWORK, QString("HttpComms found cookie: %1").arg(m_cookie));
+            LOG(VB_NETWORK, LOG_DEBUG,
+                QString("HttpComms found cookie: %1").arg(m_cookie));
         }
     }
 
 
-    VERBOSE(VB_NETWORK, QString("Got HTTP response: %1:%2")
+    LOG(VB_NETWORK, LOG_DEBUG, QString("Got HTTP response: %1:%2")
                         .arg(m_statusCode)
                         .arg(m_responseReason));
-    VERBOSE(VB_NETWORK, QString("Keys: %1")
+    LOG(VB_NETWORK, LOG_DEBUG, QString("Keys: %1")
                         .arg(resp.keys().join(",") ));
 
 
@@ -212,7 +212,7 @@ void HttpComms::headerReceived(const QHttpResponseHeader &resp)
     {
         // redirection
         QString uri = resp.value("LOCATION");
-        VERBOSE(VB_NETWORK, QString("Redirection to: '%1'").arg(uri));
+        LOG(VB_NETWORK, LOG_DEBUG, QString("Redirection to: '%1'").arg(uri));
 
         m_redirectedURL = resp.value("LOCATION");
         m_authNeeded = false;
@@ -267,8 +267,8 @@ void HttpComms::headerReceived(const QHttpResponseHeader &resp)
 
 void HttpComms::timeout()
 {
-   VERBOSE(VB_IMPORTANT, QString("HttpComms::Timeout for url: %1")
-                               .arg(m_url.toString()));
+   LOG(VB_GENERAL, LOG_ERR, QString("HttpComms::Timeout for url: %1")
+                                .arg(m_url.toString()));
    m_timeout = true;
    m_done = true;
 }
@@ -304,7 +304,8 @@ QString HttpComms::getHttp(QString     &url,
         if (qurl.host().isEmpty())   // can occur on redirects to partial paths
             qurl.setHost(hostname);
         
-        VERBOSE(VB_NETWORK, QString("getHttp: grabbing: %1").arg(qurl.toString()));
+        LOG(VB_NETWORK, LOG_DEBUG, 
+            QString("getHttp: grabbing: %1").arg(qurl.toString()));
 
         delete httpGrabber;
         
@@ -326,17 +327,18 @@ QString HttpComms::getHttp(QString     &url,
         // Handle timeout
         if (httpGrabber->isTimedout())
         {
-            VERBOSE(VB_NETWORK, QString("timeout for url: %1").arg(url));
+            LOG(VB_NETWORK, LOG_INFO, QString("timeout for url: %1").arg(url));
 
             // Increment the counter and check we're not over the limit
             if (timeoutCount++ >= maxRetries)
             {
-                VERBOSE(VB_IMPORTANT, QString("Failed to contact server for url: %1").arg(url));
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("Failed to contact server for url: %1").arg(url));
                 break;
             }
 
             // Try again
-            VERBOSE(VB_NETWORK, QString("Attempt # %1/%2 for url: %3")
+            LOG(VB_NETWORK, LOG_DEBUG, QString("Attempt # %1/%2 for url: %3")
                                         .arg(timeoutCount + 1)
                                         .arg(maxRetries)
                                         .arg(url));
@@ -347,7 +349,8 @@ QString HttpComms::getHttp(QString     &url,
         // Check for redirection
         if (!httpGrabber->getRedirectedURL().isEmpty())
         {
-            VERBOSE(VB_NETWORK, QString("Redirection: %1, count: %2, max: %3")
+            LOG(VB_NETWORK, LOG_DEBUG,
+                QString("Redirection: %1, count: %2, max: %3")
                                 .arg(httpGrabber->getRedirectedURL())
                                 .arg(redirectCount)
                                 .arg(maxRedirects));
@@ -355,7 +358,9 @@ QString HttpComms::getHttp(QString     &url,
             // Increment the counter and check we're not over the limit
             if (redirectCount++ >= maxRedirects)
             {
-                VERBOSE(VB_IMPORTANT, QString("Maximum redirections reached for url: %1").arg(url));
+                LOG(VB_GENERAL, LOG_CRIT,
+                    QString("Maximum redirections reached for url: %1")
+                        .arg(url));
                 break;
             }
 
@@ -372,11 +377,10 @@ QString HttpComms::getHttp(QString     &url,
 
     delete httpGrabber;
 
-
-    VERBOSE(VB_NETWORK, QString("Got %1 bytes from url: '%2'")
+    LOG(VB_NETWORK, LOG_DEBUG, QString("Got %1 bytes from url: '%2'")
                                 .arg(res.length())
                                 .arg(url));
-    VERBOSE(VB_NETWORK, res);
+    LOG(VB_NETWORK, LOG_DEBUG, res);
 
     return res;
 }
@@ -403,7 +407,7 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
         if (qurl.host().isEmpty())   // can occur on redirects to partial paths
             qurl.setHost(hostname);
         
-        VERBOSE(VB_NETWORK, QString("getHttp: grabbing: '%1'")
+        LOG(VB_NETWORK, LOG_DEBUG, QString("getHttp: grabbing: '%1'")
                                     .arg(qurl.toString()));
 
         delete httpGrabber;
@@ -424,7 +428,8 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
         int statusCode = httpGrabber->getStatusCode();
         if (statusCode < 200 || statusCode > 401)
         {
-            VERBOSE(VB_IMPORTANT, QString("Server returned an error status code %1 for url: %2")
+            LOG(VB_GENERAL, LOG_CRIT,
+                QString("Server returned an error status code %1 for url: %2")
                                             .arg(statusCode)
                                             .arg(url));
             break;
@@ -433,19 +438,20 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
         // Handle timeout
         if (httpGrabber->isTimedout())
         {
-            VERBOSE(VB_NETWORK, QString("Timeout for url: '%1'")
+            LOG(VB_NETWORK, LOG_DEBUG, QString("Timeout for url: '%1'")
                                         .arg(url));
 
             // Increment the counter and check we're not over the limit
             if (timeoutCount++ >= maxRetries)
             {
-                VERBOSE(VB_IMPORTANT, QString("Failed to contact server for url: '%1'")
+                LOG(VB_GENERAL, LOG_CRIT,
+                    QString("Failed to contact server for url: '%1'")
                                               .arg(url));
                 break;
             }
 
             // Try again
-            VERBOSE(VB_NETWORK, QString("Attempt # %1/%2 for url: %3")
+            LOG(VB_NETWORK, LOG_DEBUG, QString("Attempt # %1/%2 for url: %3")
                                         .arg(timeoutCount + 1)
                                         .arg(maxRetries)
                                         .arg(url));
@@ -456,7 +462,8 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
         // Check for redirection
         if (!httpGrabber->getRedirectedURL().isEmpty())
         {
-            VERBOSE(VB_NETWORK, QString("redirection: '%1', count: %2, max: %3")
+            LOG(VB_NETWORK, LOG_DEBUG,
+                QString("redirection: '%1', count: %2, max: %3")
                                         .arg(httpGrabber->getRedirectedURL())
                                         .arg(redirectCount)
                                         .arg(maxRedirects));
@@ -464,7 +471,9 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
             // Increment the counter and check we're not over the limit
             if (redirectCount++ >= maxRedirects)
             {
-                VERBOSE(VB_IMPORTANT, QString("Maximum redirections reached for url: %1").arg(url));
+                LOG(VB_GENERAL, LOG_CRIT,
+                    QString("Maximum redirections reached for url: %1")
+                        .arg(url));
                 break;
             }
 
@@ -479,8 +488,8 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
 
         if (data.size() > 0)
         {
-            VERBOSE(VB_NETWORK, QString("getHttpFile: saving to file: '%1'")
-                                        .arg(filename));
+            LOG(VB_NETWORK, LOG_DEBUG,
+                QString("getHttpFile: saving to file: '%1'") .arg(filename));
 
             QFile file(filename);
             if (file.open( QIODevice::WriteOnly ))
@@ -489,20 +498,21 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
                 stream.writeRawData((const char*)(data), data.size() );
                 file.close();
                 res = true;
-                VERBOSE(VB_NETWORK, QString("getHttpFile: File saved OK"));
+                LOG(VB_NETWORK, LOG_DEBUG,
+                    QString("getHttpFile: File saved OK"));
             }
             else
-                VERBOSE(VB_NETWORK, QString("getHttpFile: Failed to open file for writing"));
+                LOG(VB_NETWORK, LOG_DEBUG,
+                    "getHttpFile: Failed to open file for writing");
         }
         else
-           VERBOSE(VB_NETWORK, QString("getHttpFile: nothing to save to file!"));
+           LOG(VB_NETWORK, LOG_DEBUG, "getHttpFile: nothing to save to file!");
 
         break;
     }
 
-    VERBOSE(VB_NETWORK, QString("Got %1 bytes from url: '%2'")
-                                .arg(data.size())
-                                .arg(url));
+    LOG(VB_NETWORK, LOG_DEBUG, QString("Got %1 bytes from url: '%2'")
+                                .arg(data.size()) .arg(url));
 
     delete httpGrabber;
 
@@ -565,7 +575,8 @@ QString HttpComms::postHttp(
         if (url.host().isEmpty())   // can occur on redirects to partial paths
             url.setHost(hostname);
         
-        VERBOSE(VB_NETWORK, QString("postHttp: grabbing: %1").arg(url.toString()));
+        LOG(VB_NETWORK, LOG_DEBUG,
+            QString("postHttp: grabbing: %1").arg(url.toString()));
 
         delete httpGrabber;
         
@@ -586,17 +597,20 @@ QString HttpComms::postHttp(
         // Handle timeout
         if (httpGrabber->isTimedout())
         {
-            VERBOSE(VB_NETWORK, QString("timeout for url: %1").arg(url.toString()));
+            LOG(VB_NETWORK, LOG_DEBUG,
+                QString("timeout for url: %1").arg(url.toString()));
 
             // Increment the counter and check we're not over the limit
             if (timeoutCount++ >= maxRetries)
             {
-                VERBOSE(VB_IMPORTANT, QString("Failed to contact server for url: %1").arg(url.toString()));
+                LOG(VB_GENERAL, LOG_CRIT, 
+                    QString("Failed to contact server for url: %1")
+                        .arg(url.toString()));
                 break;
             }
 
             // Try again
-            VERBOSE(VB_NETWORK, QString("Attempt # %1/%2 for url: %3")
+            LOG(VB_NETWORK, LOG_DEBUG, QString("Attempt # %1/%2 for url: %3")
                                         .arg(timeoutCount + 1)
                                         .arg(maxRetries)
                                         .arg(url.toString()));
@@ -607,7 +621,8 @@ QString HttpComms::postHttp(
         // Check for redirection
         if (!httpGrabber->getRedirectedURL().isEmpty())
         {
-            VERBOSE(VB_NETWORK, QString("Redirection: %1, count: %2, max: %3")
+            LOG(VB_NETWORK, LOG_DEBUG,
+                QString("Redirection: %1, count: %2, max: %3")
                                 .arg(httpGrabber->getRedirectedURL())
                                 .arg(redirectCount)
                                 .arg(maxRedirects));
@@ -615,7 +630,9 @@ QString HttpComms::postHttp(
             // Increment the counter and check we're not over the limit
             if (redirectCount++ >= maxRedirects)
             {
-                VERBOSE(VB_IMPORTANT, QString("Maximum redirections reached for url: %1").arg(url.toString()));
+                LOG(VB_GENERAL, LOG_CRIT, 
+                    QString("Maximum redirections reached for url: %1")
+                        .arg(url.toString()));
                 break;
             }
 
@@ -632,11 +649,10 @@ QString HttpComms::postHttp(
 
     delete httpGrabber;
 
-
-    VERBOSE(VB_NETWORK, QString("Got %1 bytes from url: '%2'")
+    LOG(VB_NETWORK, LOG_DEBUG, QString("Got %1 bytes from url: '%2'")
                                 .arg(res.length())
                                 .arg(url.toString()));
-    VERBOSE(VB_NETWORK, res);
+    LOG(VB_NETWORK, LOG_DEBUG, res);
 
     return res;
 }
@@ -782,12 +798,12 @@ bool HttpComms::createDigestAuth ( bool isForProxy, const QString& authStr, QHtt
     info.digestURI.append (m_url.path() + m_url.encodedQuery());
 
 #if 0
-    VERBOSE(VB_GENERAL, " RESULT OF PARSING:");
-    VERBOSE(VB_GENERAL, QString("   algorithm: ") .arg(info.algorithm));
-    VERBOSE(VB_GENERAL, QString("   realm:     ") .arg(info.realm));
-    VERBOSE(VB_GENERAL, QString("   nonce:     ") .arg(info.nonce));
-    VERBOSE(VB_GENERAL, QString("   opaque:    ") .arg(opaque));
-    VERBOSE(VB_GENERAL, QString("   qop:       ") .arg(info.qop));
+    LOG(VB_GENERAL, LOG_DEBUG, " RESULT OF PARSING:");
+    LOG(VB_GENERAL, LOG_DEBUG, QString("   algorithm: ") .arg(info.algorithm));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("   realm:     ") .arg(info.realm));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("   nonce:     ") .arg(info.nonce));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("   opaque:    ") .arg(opaque));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("   qop:       ") .arg(info.qop));
 #endif
 
     // Calculate the response...
@@ -830,10 +846,8 @@ bool HttpComms::createDigestAuth ( bool isForProxy, const QString& authStr, QHtt
 
     auth += "\"";
 
-
-    VERBOSE(VB_NETWORK, QString("Setting auth header %1 to '%2'")
+    LOG(VB_NETWORK, LOG_DEBUG, QString("Setting auth header %1 to '%2'")
                                 .arg(header).arg(auth));
-
 
     if (request)
         request->setValue(header, auth);
@@ -869,7 +883,10 @@ void HttpComms::calculateDigestResponse( DigestAuthInfo& info, QByteArray& Respo
 
     HA1 = md.hexDigest();
 
-    //VERBOSE(VB_GENERAL, QString(" calculateResponse(): A1 => %1") .arg(HA1));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString(" calculateResponse(): A1 => %1")
+                                   .arg(HA1));
+#endif
 
     QString sEncodedPathAndQuery = m_url.path() + m_url.encodedQuery();
 
@@ -888,7 +905,10 @@ void HttpComms::calculateDigestResponse( DigestAuthInfo& info, QByteArray& Respo
     md.update( authStr );
     HA2 = md.hexDigest();
 
-    //VERBOSE(VB_GENERAL, QString(" calculateResponse(): A2 => %1") .arg(HA2));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString(" calculateResponse(): A2 => %1")
+                                   .arg(HA2));
+#endif
 
     // Calculate the response.
     authStr = HA1;
@@ -910,7 +930,10 @@ void HttpComms::calculateDigestResponse( DigestAuthInfo& info, QByteArray& Respo
     md.update( authStr );
     Response = md.hexDigest();
 
-    //VERBOSE(VB_GENERAL, QString(" calculateResponse(): Response => %1") .arg(Response));
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG. QString(" calculateResponse(): Response => %1")
+                                   .arg(Response));
+#endif
 }
 
 

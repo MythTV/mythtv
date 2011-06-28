@@ -92,25 +92,26 @@ bool MythLocale::LoadDefaultsFromXML(void)
 
         if (!file.exists())
         {
-            VERBOSE(VB_GENERAL, QString("No locale defaults file for %1, "
-                                        "skipping").arg(m_localeCode));
+            LOG(VB_GENERAL, LOG_ERR, 
+                QString("No locale defaults file for %1, skipping")
+                    .arg(m_localeCode));
             return false;
         }
     }
 
     if (!file.open(QIODevice::ReadOnly))
     {
-        VERBOSE(VB_IMPORTANT, QString("Unable to open %1")
+        LOG(VB_GENERAL, LOG_ERR, QString("Unable to open %1")
                                                         .arg(file.fileName()));
         return false;
     }
 
-    VERBOSE(VB_GENERAL, QString("Reading locale defaults from %1")
+    LOG(VB_GENERAL, LOG_ERR, QString("Reading locale defaults from %1")
                                                         .arg(file.fileName()));
 
     if (!doc.setContent(&file))
     {
-        VERBOSE(VB_IMPORTANT, QString("Unable to parse %1")
+        LOG(VB_GENERAL, LOG_ERR, QString("Unable to parse %1")
                                                         .arg(file.fileName()));
 
         file.close();
@@ -147,8 +148,9 @@ bool MythLocale::LoadDefaultsFromXML(void)
 
     if (m_globalSettings.isEmpty() && m_hostSettings.isEmpty())
     {
-        VERBOSE(VB_GENERAL, QString("No locale defaults specified in %1, "
-                                    "skipping").arg(file.fileName()));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("No locale defaults specified in %1, skipping")
+                .arg(file.fileName()));
         return false;
     }
 
