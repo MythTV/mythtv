@@ -4027,7 +4027,7 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
 
     vw = video_dim.width();
     vh = video_dim.height();
-    ar = video_aspect;
+    ar = frame->aspect;
 
     DiscardVideoFrame(frame);
     return (char *)outputbuf;
