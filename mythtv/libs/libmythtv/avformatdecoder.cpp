@@ -1304,9 +1304,6 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 
     if (special_decode)
     {
-        if (special_decode & kAVSpecialDecode_SingleThreaded)
-            enc->thread_count = 1;
-
         enc->flags2 |= CODEC_FLAG2_FAST;
 
         if ((CODEC_ID_MPEG2VIDEO == codec->id) ||
@@ -1895,6 +1892,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 }
 
                 if (!codec_is_std(video_codec_id))
+                    thread_count = 1;
+
+                if (special_decode & kAVSpecialDecode_SingleThreaded)
                     thread_count = 1;
 
                 VERBOSE(VB_PLAYBACK, LOC + QString("Using %1 CPUs for decoding")
