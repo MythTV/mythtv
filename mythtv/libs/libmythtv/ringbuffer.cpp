@@ -173,7 +173,8 @@ RingBuffer *RingBuffer::Create(
         lfilename, write, usereadahead, timeout_ms);
 }
 
-RingBuffer::RingBuffer(void) :
+RingBuffer::RingBuffer(RingBufferType rbtype) :
+    type(rbtype),
     readpos(0),               writepos(0),
     internalreadpos(0),       ignorereadpos(-1),
     rbrpos(0),                rbwpos(0),

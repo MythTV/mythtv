@@ -79,6 +79,7 @@ bool DVDInfo::GetNameAndSerialNum(QString &name, QString &serial)
 }
 
 DVDRingBuffer::DVDRingBuffer(const QString &lfilename) :
+    RingBuffer(kRingBuffer_DVD),
     m_dvdnav(NULL),     m_dvdBlockReadBuf(NULL),
     m_dvdBlockRPos(0),  m_dvdBlockWPos(0),
     m_pgLength(0),      m_pgcLength(0),

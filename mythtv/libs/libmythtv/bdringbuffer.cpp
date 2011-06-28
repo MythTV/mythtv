@@ -39,7 +39,8 @@ static void file_opened_callback(void* bdr)
 }
 
 BDRingBuffer::BDRingBuffer(const QString &lfilename)
-  : bdnav(NULL), m_isHDMVNavigation(false), m_tryHDMVNavigation(false),
+  : RingBuffer(kRingBuffer_BD),
+    bdnav(NULL), m_isHDMVNavigation(false), m_tryHDMVNavigation(false),
     m_topMenuSupported(false), m_firstPlaySupported(false),
     m_numTitles(0), m_titleChanged(false), m_playerWait(false),
     m_ignorePlayerWait(true),

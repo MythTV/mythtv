@@ -43,6 +43,7 @@ static int posix_fadvise(int, off_t, off_t, int) { return 0; }
 
 FileRingBuffer::FileRingBuffer(const QString &lfilename,
                                bool write, bool readahead, int timeout_ms)
+  : RingBuffer(kRingBuffer_File)
 {
     startreadahead = readahead;
     safefilename = lfilename;
