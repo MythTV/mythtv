@@ -580,6 +580,15 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
             h = bForceSize.height();
     }
 
+    bool bPreferLoadInBackground =
+        ((filename.startsWith("myth://")) ||
+         (filename.startsWith("http://")) ||
+         (filename.startsWith("https://")) ||
+         (filename.startsWith("ftp://")));
+
+    if (getenv("DISABLETHREADEDMYTHUIIMAGE"))
+        allowLoadInBackground = false;
+
     QString imagelabel;
 
     int j = 0;
@@ -602,10 +611,9 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
             (ImageCacheMode) ((int)kCacheNormal | (int)kCacheForceStat);
 
         if ((allowLoadInBackground) &&
-            ((!filename.startsWith("/")) ||
+            ((bPreferLoadInBackground) ||
              (!GetMythUI()->LoadCacheImage(filename, imagelabel,
-                                           GetPainter(), cacheMode))) &&
-            (!getenv("DISABLETHREADEDMYTHUIIMAGE")))
+                                           GetPainter(), cacheMode))))
         {
             VERBOSE(VB_GUI|VB_FILE|VB_EXTRA, LOC + QString(
                         "Load(), spawning thread to load '%1'").arg(filename));
