@@ -30,6 +30,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "storagegroup.h"
 #include "programinfoupdater.h"
+#include "remotefile.h"
 
 #define LOC      QString("ProgramInfo(%1): ").arg(GetBasename())
 #define LOC_WARN QString("ProgramInfo(%1), Warning: ").arg(GetBasename())
@@ -1886,23 +1887,60 @@ QString ProgramInfo::CreateRecordBasename(const QString &ext) const
     return retval;
 }
 
-void ProgramInfo::SetPathname(const QString &pn) const
+static ProgramInfoType discover_program_info_type(
+    uint chanid, const QString &pathname, bool use_remote)
 {
-    pathname = pn;
-    pathname.detach();
-
+    QString fn_lower = pathname.toLower();
     ProgramInfoType pit = kProgramInfoTypeVideoFile;
     if (chanid)
         pit = kProgramInfoTypeRecording;
-    else if (myth_FileIsDVD(pathname))
-        pit = kProgramInfoTypeVideoDVD;
-    else if (pathname.toLower().startsWith("http:"))
+    else if (fn_lower.startsWith("http:"))
         pit = kProgramInfoTypeVideoStreamingHTML;
-    else if (pathname.toLower().startsWith("rtsp:"))
+    else if (fn_lower.startsWith("rtsp:"))
         pit = kProgramInfoTypeVideoStreamingRTSP;
-    else if (myth_FileIsBD(pathname))
-        pit = kProgramInfoTypeVideoBD;
+    else
+    {
+        if (fn_lower.startsWith("dvd:") ||
+            fn_lower.endsWith(".iso") ||
+            fn_lower.endsWith(".img") ||
+            ((pathname.left(1) == "/") &&
+             QDir(pathname + "/VIDEO_TS").exists()))
+        {
+            pit = kProgramInfoTypeVideoDVD;
+        }
+        else if (fn_lower.startsWith("bd:") ||
+                 ((pathname.left(1) == "/") &&
+                  QDir(pathname + "/BDMV").exists()))
+        {
+            pit = kProgramInfoTypeVideoBD;
+        }
+        else if (use_remote && fn_lower.startsWith("myth://"))
+        {
+            QString tmpFileDVD = pathname + "/VIDEO_TS";
+            QString tmpFileBD = pathname + "/BDMV";
+            if (RemoteFile::Exists(tmpFileDVD))
+                pit = kProgramInfoTypeVideoDVD;
+            else if (RemoteFile::Exists(tmpFileBD))
+                pit = kProgramInfoTypeVideoBD;
+        }
+    }
+    return pit;
+}
+
+void ProgramInfo::SetPathname(const QString &pn) const
+{
+    VERBOSE(VB_IMPORTANT, QString("SetPathname(%1)").arg(pn));
+
+    pathname = pn;
+    pathname.detach();
+
+    ProgramInfoType pit = discover_program_info_type(chanid, pathname, false);
     const_cast<ProgramInfo*>(this)->SetProgramInfoType(pit);
+}
+
+ProgramInfoType ProgramInfo::DiscoverProgramInfoType(void) const
+{
+    return discover_program_info_type(chanid, pathname, true);
 }
 
 void ProgramInfo::SetAvailableStatus(

@@ -1106,6 +1106,8 @@ static int internal_play_media(const QString &mrl, const QString &plot,
         mrl, plot, title, subtitle, director, season, episode,
         lenMins, (year.toUInt()) ? year.toUInt() : 1900);
 
+    pginfo->SetProgramInfoType(pginfo->DiscoverProgramInfoType());
+
     int64_t pos = 0;
 
     if (pginfo->IsVideoDVD())
@@ -1147,6 +1149,8 @@ static int internal_play_media(const QString &mrl, const QString &plot,
             delete pginfo;
             return res;
         }
+        else
+            delete pginfo;
     }
     else
     {

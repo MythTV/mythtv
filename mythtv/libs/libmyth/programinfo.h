@@ -534,6 +534,7 @@ class MPUBLIC ProgramInfo
     QString DiscoverRecordingDirectory(void) const;
     QString GetPlaybackURL(bool checkMaster = false,
                            bool forceCheckLocal = false) const;
+    ProgramInfoType DiscoverProgramInfoType(void) const;
 
     // Edit flagging map
     bool QueryCutList(frm_dir_map_t &, bool loadAutosave=false) const;
