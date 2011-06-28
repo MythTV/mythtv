@@ -1397,7 +1397,7 @@ void TVRec::RunTV(void)
     eitScanStartTime = QDateTime::currentDateTime();
     // check whether we should use the EITScanner in this TVRec instance
     if (CardUtil::IsEITCapable(genOpt.cardtype) &&
-        (!GetDTVChannel() || GetDTVChannel()->IsMaster()) && 
+        (!GetDVBChannel() || GetDVBChannel()->IsMaster()) && 
         (dvbOpt.dvb_eitscan && get_use_eit(cardid)))
     {
         scanner = new EITScanner(cardid);
