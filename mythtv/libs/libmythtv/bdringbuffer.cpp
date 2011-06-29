@@ -12,7 +12,7 @@
 #include "mythevent.h"
 #include "iso639.h"
 #include "bdringbuffer.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythcorecontext.h"
 #include "mythlocale.h"
 #include "mythdirs.h"
@@ -39,7 +39,8 @@ static void file_opened_callback(void* bdr)
 }
 
 BDRingBuffer::BDRingBuffer(const QString &lfilename)
-  : bdnav(NULL), m_isHDMVNavigation(false), m_tryHDMVNavigation(false),
+  : RingBuffer(kRingBuffer_BD),
+    bdnav(NULL), m_isHDMVNavigation(false), m_tryHDMVNavigation(false),
     m_topMenuSupported(false), m_firstPlaySupported(false),
     m_numTitles(0), m_titleChanged(false), m_playerWait(false),
     m_ignorePlayerWait(true),

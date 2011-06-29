@@ -148,7 +148,7 @@ void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre,
 
     *CRC32 = crcinfo(rom, handler->GameType(), &key, &romDB);
 
-    //cerr << "Key = " << key << endl;
+    //VERBOSE(VB_IMPORTANT, "Key = " + key);
 
     // Set our default values
     *Year = QObject::tr("19xx");

@@ -30,7 +30,7 @@ using namespace std;
 #include "mythdbcon.h"
 #include "mythfontproperties.h"
 #include "mythuihelper.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythcorecontext.h"
 
 #ifdef USING_MINGW
@@ -47,7 +47,8 @@ MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
     setObjectName(name);
     if (!parent)
     {
-        VERBOSE(VB_IMPORTANT, "Trying to create a dialog without a parent.");
+        LOG(VB_GENERAL, LOG_ALERT, 
+                 "Trying to create a dialog without a parent.");
         return;
     }
 
@@ -118,9 +119,9 @@ void MythDialog::setResult(DialogCode r)
     if ((r < kDialogCodeRejected) ||
         ((kDialogCodeAccepted < r) && (r < kDialogCodeListStart)))
     {
-        VERBOSE(VB_IMPORTANT, QString(
-                    "Programmer Error: MythDialog::setResult(%1) "
-                    "called with invalid DialogCode").arg(r));
+        LOG(VB_GENERAL, LOG_ALERT, 
+                 QString("MythDialog::setResult(%1) "
+                         "called with invalid DialogCode").arg(r));
     }
 
     rescode = r;
@@ -137,9 +138,9 @@ void MythDialog::AcceptItem(int i)
 {
     if (i < 0)
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("Programmer Error: MythDialog::AcceptItem(%1) "
-                        "called with negative index").arg(i));
+        LOG(VB_GENERAL, LOG_ALERT,
+                 QString("MythDialog::AcceptItem(%1) "
+                         "called with negative index").arg(i));
         reject();
         return;
     }
@@ -166,7 +167,8 @@ DialogCode MythDialog::exec(void)
 {
     if (in_loop)
     {
-        VERBOSE(VB_IMPORTANT, "MythDialog::exec: Recursive call detected.");
+        LOG(VB_GENERAL, LOG_ALERT, 
+                 "MythDialog::exec: Recursive call detected.");
         return kDialogCodeRejected;
     }
 
@@ -697,8 +699,7 @@ void MythPopupBox::defaultButtonPressedHandler(void)
         return;
     }
 
-    VERBOSE(VB_IMPORTANT, "MythPopupBox::defaultButtonPressedHandler(void)"
-            "\n\t\t\tWe should never get here!");
+    LOG(VB_GENERAL, LOG_ALERT, "We should never get here!");
     done(kDialogCodeRejected);
 }
 
@@ -1189,10 +1190,10 @@ void MythThemedDialog::loadWindow(QDomElement &element)
             }
             else
             {
-                VERBOSE(VB_IMPORTANT,
-                        QString("MythThemedDialog::loadWindow(): Do not "
-                                "understand DOM Element: '%1'. Ignoring.")
-                        .arg(e.tagName()));
+                LOG(VB_GENERAL, LOG_ALERT,
+                         QString("MythThemedDialog::loadWindow(): Do not "
+                                 "understand DOM Element: '%1'. Ignoring.")
+                             .arg(e.tagName()));
             }
         }
     }
@@ -1212,7 +1213,8 @@ void MythThemedDialog::parseContainer(QDomElement &element)
     theme->parseContainer(element, name, a_context, area);
     if (name.length() < 1)
     {
-        VERBOSE(VB_IMPORTANT, "Failed to parse a container. Ignoring.");
+        LOG(VB_GENERAL, LOG_ALERT, 
+                 "Failed to parse a container. Ignoring.");
         return;
     }
 
@@ -1236,8 +1238,8 @@ void MythThemedDialog::parsePopup(QDomElement &element)
     //  theme doesn't know how to do this yet
     //
     element = element;
-    VERBOSE(VB_IMPORTANT,
-            "MythThemedDialog cannot parse popups yet - ignoring");
+    LOG(VB_GENERAL, LOG_ALERT,
+             "MythThemedDialog cannot parse popups yet - ignoring");
 }
 
 void MythThemedDialog::initForeground()
@@ -1300,7 +1302,7 @@ void MythThemedDialog::updateForeground(const QRect &r)
     QRect rect_to_update = r;
     if (r.width() == 0 || r.height() == 0)
     {
-        VERBOSE(VB_IMPORTANT, ZeroSizedRect);
+        LOG(VB_GENERAL, LOG_ALERT, ZeroSizedRect);
         rect_to_update = this->geometry();
     }
 
@@ -1314,7 +1316,7 @@ void MythThemedDialog::ReallyUpdateForeground(const QRect &r)
     QRect rect_to_update = r;
     if (r.width() == 0 || r.height() == 0)
     {
-        VERBOSE(VB_IMPORTANT, ZeroSizedRect);
+        LOG(VB_GENERAL, LOG_ALERT, ZeroSizedRect);
         rect_to_update = this->geometry();
     }
 
@@ -1367,8 +1369,9 @@ void MythThemedDialog::UpdateForegroundRect(const QRect &inv_rect)
             //  Debugging
             //
 #if 0
-            VERBOSE(VB_GENERAL, QString("A container called \"%1\" said its "
-                                        "area is %2,%3 to %4,%5")
+            LOG(VB_GENERAL, LOG_DEBUG, 
+                     QString("A container called \"%1\" said its "
+                             "area is %2,%3 to %4,%5")
                 .arg(looper->GetName())
                 .arg(container_area.left())
                 .arg(container_area.top())
@@ -1511,8 +1514,8 @@ void MythThemedDialog::activateCurrent()
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedDialog::activateCurrent() - "
-                              "there is no current widget!");
+        LOG(VB_GENERAL, LOG_ALERT, "MythThemedDialog::activateCurrent() - "
+                                        "there is no current widget!");
     }
 }
 

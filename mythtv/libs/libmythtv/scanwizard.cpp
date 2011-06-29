@@ -37,7 +37,7 @@
 #include "videosource.h"
 #include "scaninfo.h"
 #include "channelimporter.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #define LOC QString("SWiz: ")
 #define LOC_ERR QString("SWiz, Error: ")

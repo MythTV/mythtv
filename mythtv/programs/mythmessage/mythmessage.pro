@@ -2,7 +2,7 @@ include ( ../../settings.pro )
 include ( ../../version.pro )
 include ( ../programs-libs.pro )
 
-QT += network
+QT += network sql
 
 TEMPLATE = app
 CONFIG += thread
@@ -16,6 +16,7 @@ INCLUDEPATH += ../../libs/libmythbase
 QMAKE_CLEAN += $(TARGET)
 
 # Input
-SOURCES += main.cpp
+HEADERS += commandlineparser.h
+SOURCES += main.cpp commandlineparser.cpp
 
 mingw: LIBS += -lwinmm -lws2_32

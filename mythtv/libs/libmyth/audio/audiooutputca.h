@@ -19,6 +19,7 @@ public:
     virtual ~AudioOutputCA();
     
     AudioOutputSettings* GetOutputSettings(bool digital);
+    static QMap<QString, QString> *GetDevices(const char *type = NULL);
 
     virtual int64_t GetAudiotime(void);
 

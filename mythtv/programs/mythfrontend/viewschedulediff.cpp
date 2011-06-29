@@ -1,6 +1,6 @@
 // myth
 #include "mythcorecontext.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "remoteutil.h"
 #include "recordinginfo.h"
 
@@ -305,14 +305,14 @@ void ViewScheduleDiff::updateUIList(void)
         item->SetTextFromMap(infoMap, state);
 
         if (s.before)
-            item->SetText(toQChar(s.before->GetRecordingStatus(),
-                                  s.before->GetCardID()), "statusbefore");
+            item->SetText(toString(s.before->GetRecordingStatus(),
+                                   s.before->GetCardID()), "statusbefore");
         else
             item->SetText("-", "statusbefore");
 
         if (s.after)
-            item->SetText(toQChar(s.after->GetRecordingStatus(),
-                                  s.after->GetCardID()), "statusafter");
+            item->SetText(toString(s.after->GetRecordingStatus(),
+                                   s.after->GetCardID()), "statusafter");
         else
             item->SetText("-", "statusafter");
     }

@@ -23,7 +23,7 @@
 
 #include <QDomDocument>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "servicehost.h"
 #include "wsdl.h"
 

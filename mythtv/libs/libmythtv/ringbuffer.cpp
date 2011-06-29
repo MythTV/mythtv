@@ -173,7 +173,8 @@ RingBuffer *RingBuffer::Create(
         lfilename, write, usereadahead, timeout_ms);
 }
 
-RingBuffer::RingBuffer(void) :
+RingBuffer::RingBuffer(RingBufferType rbtype) :
+    type(rbtype),
     readpos(0),               writepos(0),
     internalreadpos(0),       ignorereadpos(-1),
     rbrpos(0),                rbwpos(0),
@@ -853,6 +854,8 @@ void RingBuffer::run(void)
 
         int used = bufferSize - ReadBufFree();
 
+        bool reads_were_allowed = readsallowed;
+
         if ((0 == read_return) || (numfailures > 5) ||
             (readsallowed != (used >= fill_min || ateof ||
                               setswitchtonext || commserror)))
@@ -909,7 +912,7 @@ void RingBuffer::run(void)
         else
         {
             // yield if we have nothing to do...
-            if (!request_pause &&
+            if (!request_pause && reads_were_allowed &&
                 (used >= fill_threshold || ateof || setswitchtonext))
             {
                 generalWait.wait(&rwlock, 50);

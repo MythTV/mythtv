@@ -43,7 +43,6 @@
 #include <linux/joystick.h>
 
 // Myth headers
-#include "mythverbose.h"
 #include "mythlogging.h"
 
 // Mythui headers
@@ -89,9 +88,8 @@ int JoystickMenuThread::Init(QString &config_file)
     rc = ReadConfig(config_file);
     if (rc)
     {
-        VERBOSE(VB_GENERAL, LOC + QString("Joystick disabled - Failed "
-                                                "to read %1")
-                                                .arg(config_file));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Joystick disabled - Failed to read %1") .arg(config_file));
         return(rc);
     }
 
@@ -101,8 +99,8 @@ int JoystickMenuThread::Init(QString &config_file)
     m_fd = open(qPrintable(m_devicename), O_RDONLY);
     if (m_fd == -1)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERROR + QString("Joystick disabled - Failed "
-                                                  "to open device %1")
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Joystick disabled - Failed to open device %1")
                                                     .arg(m_devicename));
         return -1;
     }
@@ -110,16 +108,16 @@ int JoystickMenuThread::Init(QString &config_file)
     rc = ioctl(m_fd, JSIOCGAXES, &m_axesCount);
     if (rc == -1)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERROR + "Joystick disabled - ioctl "
-                                          "JSIOCGAXES failed");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Joystick disabled - ioctl JSIOCGAXES failed");
         return(rc);
     }
 
     ioctl(m_fd, JSIOCGBUTTONS, &m_buttonCount);
     if (rc == -1)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERROR + "Joystick disabled - ioctl "
-                                          "JSIOCGBUTTONS failed");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Joystick disabled - ioctl JSIOCGBUTTONS failed");
         return(rc);
     }
 
@@ -132,10 +130,9 @@ int JoystickMenuThread::Init(QString &config_file)
     m_axes = new int[m_axesCount];
     memset(m_axes, '\0', sizeof(*m_axes * m_axesCount));
 
-    VERBOSE(VB_GENERAL, LOC + QString("Initialization of %1 succeeded using "
-                                      "config file %2")
-                                        .arg(m_devicename)
-                                        .arg(config_file));
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("Initialization of %1 succeeded using config file %2")
+                                        .arg(m_devicename) .arg(config_file));
     return 0;
 }
 
@@ -184,12 +181,9 @@ int JoystickMenuThread::ReadConfig(QString config_file)
         else if (firstTok.startsWith("chord") && tokens.count() == 4)
             m_map.AddButton(tokens[2].toInt(), tokens[3], tokens[1].toInt());
         else
-            VERBOSE(VB_IMPORTANT, LOC_ERROR + QString("ReadConfig(%1) "
-                                        "unrecognized or malformed line "
-                                        "\"%2\" ")
-                                        .arg(line)
-                                        .arg(rawline));
-
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("ReadConfig(%1) unrecognized or malformed line \"%2\" ")
+                                        .arg(line) .arg(rawline));
     }
 
     fclose(fp);
@@ -231,7 +225,7 @@ void JoystickMenuThread::run(void)
             ** TODO:  In theory, we could recover from file errors
             **        (what happens when we unplug a joystick?)
             **--------------------------------------------------------------*/
-            perror("select");
+            LOG(VB_GENERAL, LOG_ERR, "select: " + ENO);
             return;
         }
 
@@ -243,7 +237,7 @@ void JoystickMenuThread::run(void)
             rc = read(m_fd, &js, sizeof(js));
             if (rc != sizeof(js))
             {
-                    perror("error reading js");
+                    LOG(VB_GENERAL, LOG_ERR, "error reading js:" + ENO);
                     return;
             }
 

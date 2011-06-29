@@ -204,12 +204,13 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
     switch (stat)
     {
         case UPnPResult_Success:
-            VERBOSE(VB_UPNP, QString("ConnectBackend() - success. New hostname: %1")
+            LOG(VB_UPNP, LOG_INFO, 
+                    QString("ConnectBackend() - success. New hostname: %1")
                     .arg(m_DBparams->dbHostName));
             return true;
 
         case UPnPResult_HumanInterventionRequired:
-            VERBOSE(VB_UPNP, error);
+            LOG(VB_UPNP, LOG_ERR, error);
             ShowOkPopup(message);
 
             if (TryDBfromURL("", dev->m_sLocation))
@@ -218,13 +219,15 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
             break;
 
         case UPnPResult_ActionNotAuthorized:
-            VERBOSE(VB_UPNP, QString("Access denied for %1. Wrong PIN?")
+            LOG(VB_UPNP, LOG_ERR, 
+                     QString("Access denied for %1. Wrong PIN?")
                     .arg(backendName));
             PromptForPassword();
             break;
 
         default:
-            VERBOSE(VB_UPNP, QString("GetConnectionInfo() failed for %1")
+            LOG(VB_UPNP, LOG_ERR, 
+                     QString("GetConnectionInfo() failed for %1")
                     .arg(backendName));
             ShowOkPopup(message);
     }
@@ -247,41 +250,16 @@ void BackendSelection::Load()
 
 void BackendSelection::Init(void)
 {
-    EntryMap::Iterator  it;
-    EntryMap            ourMap;
-    DeviceLocation     *pDevLoc;
-
-    SSDPCacheEntries *pEntries = SSDPCache::Instance()->Find( gBackendURI );
-
-    if (!pEntries)
+    SSDPCacheEntries *pEntries = SSDPCache::Instance()->Find(gBackendURI);
+    if (pEntries)
     {
-        VERBOSE(VB_GENERAL, "Found zero backends, bailing");
-        return;
-    }
+        EntryMap ourMap;
+        pEntries->GetEntryMap(ourMap);
+        pEntries->Release();
 
-    pEntries->AddRef();
-    pEntries->Lock();
-
-    EntryMap *pMap = pEntries->GetEntryMap();
-
-    for (it = pMap->begin(); it != pMap->end(); ++it)
-    {
-        pDevLoc = (DeviceLocation *)*it;
-
-        if (!pDevLoc)
-            continue;
-
-        pDevLoc->AddRef();
-        ourMap.insert(pDevLoc->m_sUSN, pDevLoc);
-    }
-
-    pEntries->Unlock();
-    pEntries->Release();
-
-    for (it = ourMap.begin(); it != ourMap.end(); ++it)
-    {
-        pDevLoc = (DeviceLocation *)*it;
-        AddItem(pDevLoc);   // this does a Release()
+        EntryMap::const_iterator it;
+        for (it = ourMap.begin(); it != ourMap.end(); ++it)
+            AddItem(*it);   // this does an (*it)->Release()
     }
 }
 
@@ -334,19 +312,16 @@ void BackendSelection::customEvent(QEvent *event)
         QString    URL     = me->ExtraData(2);
 
 
-        VERBOSE(VB_UPNP, QString("BackendSelection::customEvent(%1, %2, %3, %4)")
+        LOG(VB_UPNP, LOG_DEBUG, 
+                 QString("BackendSelection::customEvent(%1, %2, %3, %4)")
                 .arg(message).arg(URI).arg(URN).arg(URL));
 
         if (message.startsWith("SSDP_ADD") &&
             URI.startsWith("urn:schemas-mythtv-org:device:MasterMediaServer:"))
         {
             DeviceLocation *devLoc = SSDP::Instance()->Find(URI, URN);
-
             if (devLoc)
-            {
-                devLoc->AddRef();
                 AddItem(devLoc);   // this does a Release()
-            }
         }
         else if (message.startsWith("SSDP_REMOVE"))
         {

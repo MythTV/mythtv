@@ -22,7 +22,7 @@
 // MythTV headers
 #include "iptvmediasink.h"
 #include "mythcontext.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "tspacket.h"
 
 #define LOC QString("IPTVFeedUDP: ")

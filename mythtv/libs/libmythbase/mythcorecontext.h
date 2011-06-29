@@ -8,7 +8,7 @@
 #include "mythbaseexp.h"
 #include "mythobservable.h"
 #include "mythsocket_cb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythlocale.h"
 
 #define MYTH_APPNAME_MYTHBACKEND "mythbackend"
@@ -29,19 +29,6 @@
 class MDBManager;
 class MythCoreContextPrivate;
 class MythSocket;
-
-/// These are the database logging priorities used for filterig the logs.
-enum LogPriorities
-{
-    LP_EMERG     = 0,
-    LP_ALERT     = 1,
-    LP_CRITICAL  = 2,
-    LP_ERROR     = 3,
-    LP_WARNING   = 4,
-    LP_NOTICE    = 5,
-    LP_INFO      = 6,
-    LP_DEBUG     = 7
-};
 
 /** \class MythCoreContext
  *  \brief This class contains the runtime context for MythTV.

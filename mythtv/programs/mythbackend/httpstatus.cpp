@@ -123,7 +123,8 @@ bool HttpStatus::ProcessRequest( HttpWorkerThread * /* pThread */,
     }
     catch( ... )
     {
-        cerr << "HttpStatus::ProcessRequest() - Unexpected Exception" << endl;
+        VERBOSE(VB_GENERAL, "HttpStatus::ProcessRequest() - Unexpected "
+                            "Exception");
     }
 
     return( false );
@@ -289,14 +290,17 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     QDomElement frontends = pDoc->createElement("Frontends");
     root.appendChild(frontends);
 
-    SSDPCacheEntries* fes = SSDP::Find("urn:schemas-mythtv-org:service:MythFrontend:1");
+    SSDPCacheEntries *fes = SSDP::Find(
+        "urn:schemas-mythtv-org:service:MythFrontend:1");
     if (fes)
     {
-        fes->AddRef();
-        fes->Lock();
-        EntryMap* map = fes->GetEntryMap();
-        frontends.setAttribute( "count", map->size() );
-        QMapIterator< QString, DeviceLocation * > i(*map);
+        EntryMap map;
+        fes->GetEntryMap(map);
+        fes->Release();
+        fes = NULL;
+
+        frontends.setAttribute( "count", map.size() );
+        QMapIterator< QString, DeviceLocation * > i(map);
         while (i.hasNext())
         {
             i.next();
@@ -305,9 +309,8 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             QUrl url(i.value()->m_sLocation);
             fe.setAttribute("name", url.host());
             fe.setAttribute("url",  url.toString(QUrl::RemovePath));
+            i.value()->Release();
         }
-        fes->Unlock();
-        fes->Release();
     }
 
     // Other backends
@@ -330,7 +333,8 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         mbe.setAttribute("url" , masterip + ":" + masterport);
     }
 
-    SSDPCacheEntries* sbes = SSDP::Find("urn:schemas-mythtv-org:device:SlaveMediaServer:1");
+    SSDPCacheEntries *sbes = SSDP::Find(
+        "urn:schemas-mythtv-org:device:SlaveMediaServer:1");
     if (sbes)
     {
 
@@ -338,10 +342,12 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         if (!UPnp::g_IPAddrList.isEmpty())
             ipaddress = UPnp::g_IPAddrList.at(0);
 
-        sbes->AddRef();
-        sbes->Lock();
-        EntryMap* map = sbes->GetEntryMap();
-        QMapIterator< QString, DeviceLocation * > i(*map);
+        EntryMap map;
+        sbes->GetEntryMap(map);
+        sbes->Release();
+        sbes = NULL;
+
+        QMapIterator< QString, DeviceLocation * > i(map);
         while (i.hasNext())
         {
             i.next();
@@ -355,9 +361,8 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
                 mbe.setAttribute("name", url.host());
                 mbe.setAttribute("url" , url.toString(QUrl::RemovePath));
             }
+            i.value()->Release();
         }
-        sbes->Unlock();
-        sbes->Release();
     }
 
     backends.setAttribute("count", numbes);

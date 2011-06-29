@@ -5,7 +5,6 @@ using namespace std;
 #include "DeviceReadBuffer.h"
 #include "mythcorecontext.h"
 #include "mythbaseutil.h"
-#include "mythverbose.h"
 #include "tspacket.h"
 #include "compat.h"
 #include "mythlogging.h"

@@ -4,7 +4,7 @@
 #include <QString>
 
 // MythTV headers
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 // MythUI headers
 #include "mythuitext.h"

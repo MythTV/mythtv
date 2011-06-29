@@ -9,6 +9,7 @@
 // c
 //#include <assert.h>
 //#include "iostream"
+#include <string>
 
 // qt
 #include <QPair>
@@ -16,7 +17,7 @@
 #include <QMap>
 
 // mythtv
-#include <mythverbose.h>
+#include <mythlogging.h>
 
 // mythmusic
 #include "pls.h"

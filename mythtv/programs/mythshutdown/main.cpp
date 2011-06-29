@@ -11,7 +11,6 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdb.h"
 #include "mythsystem.h"
-#include "mythverbose.h"
 #include "mythversion.h"
 #include "programdetail.h"
 #include "jobqueue.h"
@@ -20,7 +19,7 @@ using namespace std;
 #include "tvremoteutil.h"
 #include "compat.h"
 #include "mythlogging.h"
-#include "mythcommandlineparser.h"
+#include "commandlineparser.h"
 
 static void setGlobalSetting(const QString &key, const QString &value)
 {
@@ -735,7 +734,7 @@ static int startup()
 int main(int argc, char **argv)
 {
     // by default we don't output any messages
-    print_verbose_messages = VB_NONE;
+    verboseMask = VB_NONE;
 
     QCoreApplication a(argc, argv);
 
@@ -747,7 +746,6 @@ int main(int argc, char **argv)
     bool bStartup = false;
     bool bShutdown = false;
     bool bGetStatus = false;
-    bool bSetWakeupTime = false;
     QString sWakeupTime = "";
     bool bSetScheduledWakeupTime = false;
     bool bCheckAndShutdown = false;
@@ -774,7 +772,7 @@ int main(int argc, char **argv)
     }
 
     if (cmdline.toBool("verbose"))
-        if (parse_verbose_arg(cmdline.toString("verbose")) ==
+        if (verboseArgParse(cmdline.toString("verbose")) ==
                         GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
 
@@ -783,13 +781,16 @@ int main(int argc, char **argv)
         quiet = cmdline.toUInt("quiet");
         if (quiet > 1)
         {
-            print_verbose_messages = VB_NONE;
-            parse_verbose_arg("none");
+            verboseMask = VB_NONE;
+            verboseArgParse("none");
         }
     }
 
     int facility = cmdline.GetSyslogFacility();
     bool dblog = !cmdline.toBool("nodblog");
+    LogLevel_t level = cmdline.GetLogLevel();
+    if (level == LOG_UNKNOWN)
+        return GENERIC_EXIT_INVALID_CMDLINE;
 
     if (cmdline.toBool("lock"))
         bLockShutdown = true;
@@ -818,7 +819,8 @@ int main(int argc, char **argv)
     }
 
     QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet, facility, dblog);
+    bool propagate = cmdline.toBool("islogpath");
+    logStart(logfile, quiet, facility, level, dblog, propagate);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
@@ -844,7 +846,7 @@ int main(int argc, char **argv)
         res = shutdown();
     else if (bGetStatus)
         res = getStatus(bWantRecStatus);
-    else if (bSetWakeupTime)
+    else if (!sWakeupTime.isEmpty())
         res = setWakeupTime(sWakeupTime);
     else if (bCheckAndShutdown)
     {

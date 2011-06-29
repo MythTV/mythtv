@@ -31,13 +31,16 @@
 #include <sys/utsname.h> 
 #endif
 
+// Qt headers
+#include <QScriptEngine>
+
 // MythTV headers
 #include "httpserver.h"
 #include "upnputil.h"
 #include "upnp.h" // only needed for Config... remove once config is moved.
 #include "compat.h"
 #include "mythdirs.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "htmlserver.h"
 
 /////////////////////////////////////////////////////////////////////////////

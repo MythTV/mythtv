@@ -22,9 +22,9 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mythxmlclient.h"
+#include "mythlogging.h"
 
 #include <QObject>
-#include "mythverbose.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -63,7 +63,8 @@ UPnPResultCode MythXMLClient::GetConnectionInfo( const QString &sPin, DatabasePa
 
     list.insert( "Pin", sPin );
 
-    QDomDocument xmlResults = SendSOAPRequest( "GetConnectionInfo", list, nErrCode, sErrDesc, m_bInQtThread );
+    QDomDocument xmlResults = SendSOAPRequest(
+        "GetConnectionInfo", list, nErrCode, sErrDesc, m_bInQtThread);
 
     // --------------------------------------------------------------
     // Is this a valid response?

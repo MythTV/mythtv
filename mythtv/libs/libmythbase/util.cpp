@@ -43,11 +43,10 @@ using namespace std;
 // Myth headers
 #include "mythcorecontext.h"
 #include "exitcodes.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "msocketdevice.h"
 #include "mythsocket.h"
 #include "mythcoreutil.h"
-#include "remotefile.h"
 #include "mythsystem.h"
 
 #include "mythconfig.h" // for CONFIG_DARWIN
@@ -401,9 +400,10 @@ static void print_timezone_info(QString master_zone_id, QString local_zone_id,
                                 int master_utc_offset, int local_utc_offset,
                                 QString master_time, QString local_time)
 {
-    VERBOSE(VB_IMPORTANT, QString("Detected time zone settings:\n"
-"    Master: Zone ID: '%1', UTC Offset: '%2', Current Time: '%3'\n"
-"     Local: Zone ID: '%4', UTC Offset: '%5', Current Time: '%6'\n")
+    LOG(VB_GENERAL, LOG_CRIT,
+        QString("Detected time zone settings:\n"
+            "    Master: Zone ID: '%1', UTC Offset: '%2', Current Time: '%3'\n"
+            "     Local: Zone ID: '%4', UTC Offset: '%5', Current Time: '%6'\n")
             .arg(master_zone_id).arg(master_utc_offset).arg(master_time)
             .arg(local_zone_id).arg(local_utc_offset).arg(local_time));
 }
@@ -420,9 +420,10 @@ bool checkTimeZone(void)
     QStringList master_settings(QString("QUERY_TIME_ZONE"));
     if (!gCoreContext->SendReceiveStringList(master_settings))
     {
-        VERBOSE(VB_IMPORTANT, "Unable to determine master backend time zone "
-                              "settings.  If those settings differ from local "
-                              "settings, some functionality will fail.");
+        LOG(VB_GENERAL, LOG_CRIT,
+            "Unable to determine master backend time zone "
+            "settings.  If those settings differ from local "
+            "settings, some functionality will fail.");
         return true;
     }
 
@@ -446,26 +447,27 @@ bool checkTimeZone(const QStringList &master_settings)
 
     if (master_time_zone_ID == "UNDEF")
     {
-        VERBOSE(VB_IMPORTANT, "Unable to determine master backend time zone "
-                              "settings. If local time zone settings differ "
-                              "from master backend settings, some "
-                              "functionality will fail.");
+        LOG(VB_GENERAL, LOG_CRIT,
+            "Unable to determine master backend time zone "
+            "settings. If local time zone settings differ "
+            "from master backend settings, some functionality will fail.");
         have_zone_IDs = false;
     }
     if (local_time_zone_ID == "UNDEF")
     {
-        VERBOSE(VB_IMPORTANT, "Unable to determine local time zone settings. "
-                              "If local time zone settings differ from "
-                              "master backend settings, some functionality "
-                              "will fail.");
+        LOG(VB_GENERAL, LOG_CRIT,
+             "Unable to determine local time zone settings. "
+             "If local time zone settings differ from "
+             "master backend settings, some functionality will fail.");
         have_zone_IDs = false;
     }
 
     if (have_zone_IDs &&
         !compare_zone_IDs(master_time_zone_ID, local_time_zone_ID))
     {
-        VERBOSE(VB_IMPORTANT, "Time zone settings on the master backend "
-                              "differ from those on this system.");
+        LOG(VB_GENERAL, LOG_CRIT, "Time zone settings on the master backend "
+                                  "differ from those on this system.");
+
         print_timezone_info(master_time_zone_ID, local_time_zone_ID,
                             master_utc_offset, local_utc_offset,
                             master_time_string, local_time_string);
@@ -475,8 +477,9 @@ bool checkTimeZone(const QStringList &master_settings)
     // Verify offset
     if (master_utc_offset != local_utc_offset)
     {
-        VERBOSE(VB_IMPORTANT, "UTC offset on the master backend differs "
-                              "from offset on this system.");
+        LOG(VB_GENERAL, LOG_CRIT, "UTC offset on the master backend differs "
+                                  "from offset on this system.");
+
         print_timezone_info(master_time_zone_ID, local_time_zone_ID,
                             master_utc_offset, local_utc_offset,
                             master_time_string, local_time_string);
@@ -486,10 +489,11 @@ bool checkTimeZone(const QStringList &master_settings)
     // Verify current time
     if (master_time_string == "UNDEF")
     {
-        VERBOSE(VB_IMPORTANT, "Unable to determine current time on the master "
-                              "backend . If local time or time zone settings "
-                              "differ from those on the master backend, some "
-                              "functionality will fail.");
+        LOG(VB_GENERAL, LOG_CRIT, 
+            "Unable to determine current time on the master "
+            "backend . If local time or time zone settings "
+            "differ from those on the master backend, some "
+            "functionality will fail.");
     }
     else
     {
@@ -498,8 +502,8 @@ bool checkTimeZone(const QStringList &master_settings)
         uint timediff = abs(master_time.secsTo(local_time));
         if (timediff > 300)
         {
-            VERBOSE(VB_IMPORTANT, "Current time on the master backend "
-                                  "differs from time on this system.");
+            LOG(VB_GENERAL, LOG_CRIT, "Current time on the master backend "
+                                      "differs from time on this system.");
             print_timezone_info(master_time_zone_ID, local_time_zone_ID,
                                 master_utc_offset, local_utc_offset,
                                 master_time_string, local_time_string);
@@ -507,7 +511,7 @@ bool checkTimeZone(const QStringList &master_settings)
         }
         else if (timediff > 20)
         {
-            VERBOSE(VB_IMPORTANT,
+            LOG(VB_GENERAL, LOG_CRIT,
                     QString("Warning! Time difference between the master "
                             "backend and this system is %1 seconds.")
                     .arg(timediff));
@@ -550,7 +554,7 @@ bool getUptime(time_t &uptime)
     struct sysinfo sinfo;
     if (sysinfo(&sinfo) == -1)
     {
-        VERBOSE(VB_IMPORTANT, "sysinfo() error");
+        LOG(VB_GENERAL, LOG_ERR, "sysinfo() error");
         return false;
     }
     else
@@ -569,7 +573,7 @@ bool getUptime(time_t &uptime)
     mib[1] = KERN_BOOTTIME;
     if (sysctl(mib, 2, &bootTime, &len, NULL, 0) == -1)
     {
-        VERBOSE(VB_IMPORTANT, "sysctl() error");
+        LOG(VB_GENERAL, LOG_ERR, "sysctl() error");
         return false;
     }
     else
@@ -578,7 +582,7 @@ bool getUptime(time_t &uptime)
     uptime = ::GetTickCount() / 1000;
 #else
     // Hmmm. Not Linux, not FreeBSD or Darwin. What else is there :-)
-    VERBOSE(VB_IMPORTANT, "Unknown platform. How do I get the uptime?");
+    LOG(VB_GENERAL, LOG_CRIT, "Unknown platform. How do I get the uptime?");
     return false;
 #endif
 
@@ -598,7 +602,8 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
     struct sysinfo sinfo;
     if (sysinfo(&sinfo) == -1)
     {
-        VERBOSE(VB_IMPORTANT, "getMemStats(): Error, sysinfo() call failed.");
+        LOG(VB_GENERAL, LOG_CRIT,
+            "getMemStats(): Error, sysinfo() call failed.");
         return false;
     }
     else
@@ -623,14 +628,14 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
     if (host_statistics(mp, HOST_VM_INFO,
                         (host_info_t)&s, &count) != KERN_SUCCESS)
     {
-        VERBOSE(VB_IMPORTANT, "getMemStats(): Error, "
-                "failed to get virtual memory statistics.");
+        LOG(VB_GENERAL, LOG_CRIT, "getMemStats(): Error, "
+                                  "failed to get virtual memory statistics.");
         return false;
     }
 
     pageSize >>= 10;  // This gives usages in KB
-    totalMB = (s.active_count + s.inactive_count
-               + s.wire_count + s.free_count) * pageSize / 1024;
+    totalMB = (s.active_count + s.inactive_count +
+               s.wire_count + s.free_count) * pageSize / 1024;
     freeMB  = s.free_count * pageSize / 1024;
 
 
@@ -639,11 +644,12 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
     // able to report what filesystem it is using for the swapfiles. So, we do:
     long long total, used, free;
     free = getDiskSpace("/private/var/vm", total, used);
-    totalVM = (int)(total/1024LL), freeVM = (int)(free/1024LL);
+    totalVM = (int)(total/1024LL);
+    freeVM = (int)(free/1024LL);
 
 #else
-    VERBOSE(VB_IMPORTANT, "getMemStats(): Unknown platform. "
-            "How do I get the memory stats?");
+    LOG(VB_GENERAL, LOG_CRIT, "getMemStats(): Unknown platform. "
+                              "How do I get the memory stats?");
     return false;
 #endif
 
@@ -787,7 +793,9 @@ long long copy(QFile &dst, QFile &src, uint block_size)
         return -1LL;
 
     if (!dst.isWritable() && !dst.isOpen())
-        odst = dst.open(QIODevice::Unbuffered|QIODevice::WriteOnly|QIODevice::Truncate);
+        odst = dst.open(QIODevice::Unbuffered |
+                        QIODevice::WriteOnly  |
+                        QIODevice::Truncate);
 
     if (!src.isReadable() && !src.isOpen())
         osrc = src.open(QIODevice::Unbuffered|QIODevice::ReadOnly);
@@ -800,7 +808,7 @@ long long copy(QFile &dst, QFile &src, uint block_size)
         rlen = src.read(buf, buflen);
         if (rlen<0)
         {
-            VERBOSE(VB_IMPORTANT, "util.cpp:copy: read error");
+            LOG(VB_GENERAL, LOG_ERR, "read error");
             ok = false;
             break;
         }
@@ -816,7 +824,7 @@ long long copy(QFile &dst, QFile &src, uint block_size)
                 off+= wlen;
             if (wlen<0)
             {
-                VERBOSE(VB_IMPORTANT, "util.cpp:copy: write error");
+                LOG(VB_GENERAL, LOG_ERR, "write error");
                 ok = false;
             }
         }
@@ -875,7 +883,7 @@ QString createTempFile(QString name_template, bool dir)
 
     if (ret == -1)
     {
-        VERBOSE(VB_IMPORTANT, QString("createTempFile(%1), Error ")
+        LOG(VB_GENERAL, LOG_ERR, QString("createTempFile(%1), Error ")
                 .arg(name_template) + ENO);
         return name_template;
     }
@@ -937,7 +945,7 @@ QString getResponse(const QString &query, const QString &def)
     if (!cin.good())
     {
         cout << endl;
-        VERBOSE(VB_IMPORTANT, "Read from stdin failed");
+        LOG(VB_GENERAL, LOG_ERR, "Read from stdin failed");
         return NULL;
     }
 
@@ -968,7 +976,7 @@ QString getSymlinkTarget(const QString &start_file,
                          unsigned       maxLinks)
 {
 #if 0
-    VERBOSE(VB_IMPORTANT,
+    LOG(VB_GENERAL, LOG_DEBUG,
             QString("getSymlinkTarget('%1', 0x%2, %3)")
             .arg(start_file).arg((uint64_t)intermediaries,0,16)
             .arg(maxLinks));
@@ -1005,12 +1013,12 @@ QString getSymlinkTarget(const QString &start_file,
     {
         for (uint i = 0; i < intermediaries->size(); i++)
         {
-            VERBOSE(VB_IMPORTANT, QString("    inter%1: %2")
+            LOG(VB_GENERAL, LOG_DEBUG, QString("    inter%1: %2")
                     .arg(i).arg((*intermediaries)[i]));
         }
     }
 
-    VERBOSE(VB_IMPORTANT,
+    LOG(VB_GENERAL, LOG_DEBUG,
             QString("getSymlinkTarget() -> '%1'")
             .arg((!fi.isSymLink()) ? cur_file : QString::null));
 #endif
@@ -1035,7 +1043,7 @@ bool IsMACAddress(QString MAC)
     QStringList tokens = MAC.split(':');
     if (tokens.size() != 6)
     {
-        VERBOSE(VB_NETWORK,
+        LOG(VB_NETWORK, LOG_ERR,
             QString("IsMACAddress(%1) = false, doesn't have 6 parts").arg(MAC));
         return false;
     }
@@ -1047,29 +1055,33 @@ bool IsMACAddress(QString MAC)
     {
         if (tokens[y].isEmpty())
         {
-            VERBOSE(VB_NETWORK, QString("IsMACAddress(%1) = false, part #%2 "
-                    "is empty.").arg(MAC).arg(y));
+            LOG(VB_NETWORK, LOG_ERR,
+                QString("IsMACAddress(%1) = false, part #%2 is empty.")
+                    .arg(MAC).arg(y));
             return false;
         }
 
         value = tokens[y].toInt(&ok, 16);
         if (!ok)
         {
-            VERBOSE(VB_NETWORK, QString("IsMACAddress(%1) = false, unable to "
-                    "convert part '%2' to integer.").arg(MAC).arg(tokens[y]));
+            LOG(VB_NETWORK, LOG_ERR,
+                QString("IsMACAddress(%1) = false, unable to "
+                        "convert part '%2' to integer.")
+                    .arg(MAC).arg(tokens[y]));
             return false;
         }
 
         if (value > 255)
         {
-            VERBOSE(VB_NETWORK, QString("IsMACAddress(%1) = false, part #%2 "
-                    "evaluates to %3 which is higher than 255.")
+            LOG(VB_NETWORK, LOG_ERR,
+                QString("IsMACAddress(%1) = false, part #%2 "
+                        "evaluates to %3 which is higher than 255.")
                     .arg(MAC).arg(y).arg(value));
             return false;
         }
     }
 
-    VERBOSE(VB_NETWORK, QString("IsMACAddress(%1) = true").arg(MAC));
+    LOG(VB_NETWORK, LOG_DEBUG, QString("IsMACAddress(%1) = true").arg(MAC));
     return true;
 }
 
@@ -1087,8 +1099,8 @@ QString FileHash(QString filename)
         hash = initialsize;
     else
     {
-        VERBOSE(VB_GENERAL, QString("Error: Unable to open "
-                "selected file, missing read permissions?"));
+        LOG(VB_GENERAL, LOG_ERR, 
+            "Error: Unable to open selected file, missing read permissions?");
         return QString("NULL");
     }
 
@@ -1125,7 +1137,7 @@ bool WakeOnLAN(QString MAC)
 
     if (tokens.size() != 6)
     {
-        VERBOSE(VB_IMPORTANT,
+        LOG(VB_GENERAL, LOG_ERR,
                 QString( "WakeOnLan(%1): Incorrect MAC length").arg(MAC));
         return false;
     }
@@ -1136,7 +1148,7 @@ bool WakeOnLAN(QString MAC)
 
         if (!ok)
         {
-            VERBOSE(VB_IMPORTANT,
+            LOG(VB_GENERAL, LOG_ERR,
                     QString( "WakeOnLan(%1): Invalid MAC address").arg(MAC));
             return false;
         }
@@ -1146,7 +1158,7 @@ bool WakeOnLAN(QString MAC)
         for (y = 0; y < 6; y++)
             msg[msglen++] = macaddr[y];
 
-    VERBOSE(VB_NETWORK,
+    LOG(VB_NETWORK, LOG_INFO,
             QString("WakeOnLan(): Sending WOL packet to %1").arg(MAC));
 
     MSocketDevice socket(MSocketDevice::Datagram);
@@ -1180,7 +1192,7 @@ bool myth_nice(int val)
 
     if ((-1 == ret) && (0 != errno) && (val >= 0))
     {
-        VERBOSE(VB_IMPORTANT, "Failed to nice process" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, "Failed to nice process" + ENO);
         return false;
     }
 
@@ -1279,40 +1291,6 @@ bool myth_ioprio(int) { return true; }
 
 #endif
 
-bool myth_FileIsDVD(const QString &filename)
-{
-    if ((filename.toLower().startsWith("dvd:")) ||
-        (filename.toLower().endsWith(".iso")) ||
-        (filename.toLower().endsWith(".img")) ||
-        (QDir(filename + "/VIDEO_TS").exists()))
-        return true;
-
-    if (filename.toLower().startsWith("myth://"))
-    {
-        QString tmpFile = filename + "/VIDEO_TS";
-        if (RemoteFile::Exists(tmpFile))
-            return true;
-    }
-
-    return false;
-}
-
-bool myth_FileIsBD(const QString &filename)
-{
-    if ((filename.toLower().startsWith("bd:")) ||
-        (QDir(filename + "/BDMV").exists()))
-        return true;
-
-    if (filename.toLower().startsWith("myth://"))
-    {
-        QString tmpFile = filename + "/BDMV";
-        if (RemoteFile::Exists(tmpFile))
-            return true;
-    }
-
-    return false;
-}
-
 bool MythRemoveDirectory(QDir &aDir)
 {
     if (!aDir.exists())//QDir::NoDotAndDotDot
@@ -1401,21 +1379,21 @@ bool MythRemoveDirectory(QDir &aDir)
             if (telnet(host, 8080))  // MS ISA
                 port = 8080;
 
-            VERBOSE(VB_NETWORK, (LOC + "assuming port %1 on host %2")
+            LOG(VB_NETWORK, LOG_INFO, QString("assuming port %1 on host %2")
                                 .arg(port).arg(host));
             url.setPort(port);
         }
         else if (!ping(host, 1))
-            VERBOSE(VB_IMPORTANT,
-                    (LOC + "cannot locate host %1").arg(host) +
+            LOG(VB_GENERAL, LOG_ERR,
+                    QString("cannot locate host %1").arg(host) +
                     "\n\t\t\tPlease check HTTP_PROXY environment variable!");
         else if (!telnet(host,port))
-            VERBOSE(VB_IMPORTANT,
-                    (LOC + "%1:%2 - cannot connect!").arg(host).arg(port) +
+            LOG(VB_GENERAL, LOG_ERR,
+                    QString("%1:%2 - cannot connect!").arg(host).arg(port) +
                     "\n\t\t\tPlease check HTTP_PROXY environment variable!");
 
 #if 0
-        VERBOSE(VB_NETWORK, (LOC + "using http://%1:%2@%3:%4")
+        LOG(VB_NETWORK, LOG_DEBUG, QString("using http://%1:%2@%3:%4")
                             .arg(url.userName()).arg(url.password())
                             .arg(host).arg(port));
 #endif
@@ -1425,16 +1403,12 @@ bool MythRemoveDirectory(QDir &aDir)
         return;
     }
 
-
-
-
-    VERBOSE(VB_NETWORK, LOC + "no HTTP_PROXY environment var.");
+    LOG(VB_NETWORK, LOG_DEBUG, "no HTTP_PROXY environment var.");
 
     // Use Qt to look for user proxy settings stored by the OS or browser:
 
     QList<QNetworkProxy> proxies;
     QNetworkProxyQuery   query(QUrl("http://www.mythtv.org"));
-
 
     proxies = QNetworkProxyFactory::systemProxyForQuery(query);
 
@@ -1448,11 +1422,11 @@ bool MythRemoveDirectory(QDir &aDir)
 
         if (!telnet(host, port))
         {
-            VERBOSE(VB_NETWORK, (LOC + "failed to contact proxy host ") + host);
+            LOG(VB_NETWORK, LOG_ERR, "failed to contact proxy host " + host);
             continue;
         }
 
-        VERBOSE(VB_NETWORK, (LOC + "using proxy host %1:%2")
+        LOG(VB_NETWORK, LOG_INFO, QString("using proxy host %1:%2")
                             .arg(host).arg(port));
         QNetworkProxy::setApplicationProxy(p);
 
@@ -1473,7 +1447,7 @@ bool MythRemoveDirectory(QDir &aDir)
         return;
     }
 
-    VERBOSE(VB_NETWORK, LOC + "failed to find a network proxy");
+    LOG(VB_NETWORK, LOG_ERR, "failed to find a network proxy");
 }
 
 MBASE_PUBLIC void wrapList(QStringList &list, int width)

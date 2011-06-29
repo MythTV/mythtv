@@ -438,6 +438,7 @@ namespace
 
        ~FanartLoader()
         {
+            m_fanartTimer.stop();
             m_fanartTimer.disconnect(this);
         }
 
@@ -1025,7 +1026,33 @@ VideoDialog::~VideoDialog()
     if (!m_d->m_switchingLayout)
         m_d->DelayVideoListDestruction(m_d->m_videoList);
 
+    SavePosition();
+
     delete m_d;
+}
+
+void VideoDialog::SavePosition(void)
+{
+    m_d->m_lastTreeNodePath = "";
+
+    if (m_d->m_type == DLG_TREE)
+    {
+        MythGenericTree *node = m_videoButtonTree->GetCurrentNode();
+        if (node)
+            m_d->m_lastTreeNodePath = node->getRouteByString().join("\n");
+    }
+    else if (m_d->m_type == DLG_BROWSER || m_d->m_type == DLG_GALLERY)
+    {
+        MythUIButtonListItem *item = m_videoButtonList->GetItemCurrent();
+        if (item)
+        {
+            MythGenericTree *node = GetNodePtrFromButton(item);
+            if (node)
+                 m_d->m_lastTreeNodePath = node->getRouteByString().join("\n");
+        }
+    }
+
+    gCoreContext->SaveSetting("mythvideo.VideoTreeLastActive", m_d->m_lastTreeNodePath);
 }
 
 bool VideoDialog::Create()
@@ -1233,6 +1260,7 @@ void VideoDialog::loadData()
     if (m_d->m_type == DLG_TREE)
     {
         m_videoButtonTree->AssignTree(m_d->m_rootNode);
+
         if (m_d->m_firstLoadPass)
         {
             m_d->m_firstLoadPass = false;
@@ -1260,6 +1288,52 @@ void VideoDialog::loadData()
             return;
 
         MythGenericTree *selectedNode = m_d->m_currentNode->getSelectedChild();
+
+        // restore the last saved position in the video tree if this is the first
+        // time this method is called and the option is set in the database
+        if (m_d->m_firstLoadPass)
+        {
+            if (m_d->m_rememberPosition)
+            {
+                QStringList lastTreeNodePath = gCoreContext->GetSetting("mythvideo.VideoTreeLastActive", "").split("\n");
+
+                if (m_d->m_type == DLG_GALLERY || m_d->m_type == DLG_BROWSER)
+                {
+                    if (lastTreeNodePath.size() > 0)
+                    {
+                        MythGenericTree *node;
+
+                        // go through the path list and set the current node
+                        for (int i = 0; i < lastTreeNodePath.size(); i++)
+                        {
+                            node = m_d->m_currentNode->getChildByName(lastTreeNodePath.at(i));
+                            if (node != NULL)
+                            {
+                                // check if the node name is the same as the currently selected
+                                // one in the saved tree list. if yes then we are on the right
+                                // way down the video tree to find the last saved position
+                                if (node->getString().compare(lastTreeNodePath.at(i)) == 0)
+                                {
+                                    // set the folder as the new node so we can travel further down
+                                    // dont do this if its the last part of the saved video path tree
+                                    if (node->getInt() == kSubFolder &&
+                                        node->childCount() > 1 &&
+                                        i < lastTreeNodePath.size()-1)
+                                    {
+                                        SetCurrentNode(node);
+                                    }
+                                    // in the last run the selectedNode will be the last
+                                    // entry of the saved tree node.
+                                    if (lastTreeNodePath.at(i) == lastTreeNodePath.last())
+                                        selectedNode = node;
+                                }
+                            }
+                        }
+                        m_d->m_firstLoadPass = false;
+                    }
+                }
+            }
+        }
 
         typedef QList<MythGenericTree *> MGTreeChildList;
         MGTreeChildList *lchildren = m_d->m_currentNode->getAllChildren();
@@ -2380,8 +2454,6 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
         CheckedSet(this, "foldername", m_d->m_currentNode->getString());
     }
 
-
-
     if (node && node->getInt() == kSubFolder)
         CheckedSet(this, "childcount",
                    QString("%1").arg(node->visibleChildCount()));
@@ -2946,14 +3018,8 @@ void VideoDialog::SwitchLayout(DialogType type, BrowseType browse)
 {
     m_d->m_switchingLayout = true;
 
-    if (m_d->m_rememberPosition && m_videoButtonTree)
-    {
-        MythGenericTree *node = m_videoButtonTree->GetCurrentNode();
-        if (node)
-        {
-            m_d->m_lastTreeNodePath = node->getRouteByString().join("\n");
-        }
-    }
+    // save current position so it can be restored after the switch
+    SavePosition();
 
     VideoDialog *mythvideo =
             new VideoDialog(GetMythMainWindow()->GetMainStack(), "mythvideo",

@@ -363,7 +363,7 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
 
     /* Check if name or description contains information
        to know if device can accept passthrough or not */
-    QMap<QString, QString> *alsadevs = GetALSADevices("pcm");
+    QMap<QString, QString> *alsadevs = GetDevices("pcm");
     while(1)
     {
         QString real_device = (((passthru || enc) && m_discretedigital) ?
@@ -913,7 +913,7 @@ bool AudioOutputALSA::OpenMixer(void)
     return true;
 }
 
-QMap<QString, QString> *AudioOutputALSA::GetALSADevices(const char *type)
+QMap<QString, QString> *AudioOutputALSA::GetDevices(const char *type)
 {
     QMap<QString, QString> *alsadevs = new QMap<QString, QString>();
     void **hints, **n;

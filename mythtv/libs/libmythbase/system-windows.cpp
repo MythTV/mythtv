@@ -26,7 +26,6 @@
 // libmythbase headers
 #include "mythcorecontext.h"
 #include "mythevent.h"
-#include "mythverbose.h"
 #include "exitcodes.h"
 #include "mythlogging.h"
 
@@ -74,7 +73,7 @@ MythSystemIOHandler::MythSystemIOHandler(bool read) :
 void MythSystemIOHandler::run(void)
 {
     threadRegister(QString("SystemIOHandler%1").arg(m_read ? "R" : "W"));
-    VERBOSE(VB_GENERAL|VB_SYSTEM, QString("Starting IO manager (%1)")
+    LOG(VB_GENERAL, LOG_INFO, QString("Starting IO manager (%1)")
         .arg(m_read ? "read" : "write"));
 
     QMutex mutex;
@@ -221,7 +220,7 @@ MythSystemManager::~MythSystemManager()
 void MythSystemManager::run(void)
 {
     threadRegister("SystemManager");
-    VERBOSE(VB_GENERAL|VB_SYSTEM, "Starting process manager");
+    LOG(VB_GENERAL, LOG_INFO, "Starting process manager");
 
     // gCoreContext is set to NULL during shutdown, and we need this thread to
     // exit during shutdown.
@@ -266,7 +265,7 @@ void MythSystemManager::run(void)
         GetExitCodeProcess( child, &status );
 
         ms->SetStatus(status);
-        VERBOSE(VB_SYSTEM, 
+        LOG(VB_SYSTEM, LOG_INFO,
                 QString("Managed child (Handle: %1) has exited! "
                         "command=%2, status=%3, result=%4")
                 .arg((long long)child) .arg(ms->GetLogCmd()) .arg(status) 
@@ -289,7 +288,7 @@ void MythSystemManager::run(void)
                 // issuing KILL signal after TERM failed in a timely manner
                 if( ms->GetStatus() == GENERIC_EXIT_TIMEOUT )
                 {
-                    VERBOSE(VB_SYSTEM, 
+                    LOG(VB_SYSTEM, LOG_INFO,
                         QString("Managed child (Handle: %1) timed out, "
                                 "issuing KILL signal").arg((long long)child));
                     // Prevent constant attempts to kill an obstinate child
@@ -300,7 +299,7 @@ void MythSystemManager::run(void)
                 // issuing TERM signal
                 else
                 {
-                    VERBOSE(VB_SYSTEM, 
+                    LOG(VB_SYSTEM, LOG_INFO,
                         QString("Managed child (Handle: %1) timed out"
                                 ", issuing TERM signal").arg((long long)child));
                     ms->SetStatus( GENERIC_EXIT_TIMEOUT );
@@ -400,7 +399,7 @@ MythSystemSignalManager::MythSystemSignalManager() : QThread()
 void MythSystemSignalManager::run(void)
 {
     threadRegister("SystemSignalManager");
-    VERBOSE(VB_GENERAL|VB_SYSTEM, "Starting process signal handler");
+    LOG(VB_GENERAL, LOG_INFO, "Starting process signal handler");
     while( gCoreContext )
     {
         usleep(50000); // sleep 50ms
@@ -508,7 +507,7 @@ void MythSystemWindows::Signal( int sig )
 {
     if( (GetStatus() != GENERIC_EXIT_RUNNING) || (!m_child) )
         return;
-    VERBOSE(VB_SYSTEM, QString("Child Handle %1 killed with %2")
+    LOG(VB_SYSTEM, LOG_INFO, QString("Child Handle %1 killed with %2")
                     .arg((long long)m_child).arg(sig));
     TerminateProcess( m_child, sig * 256 );
 }
@@ -524,7 +523,7 @@ void MythSystemWindows::Fork(time_t timeout)
     strncpy(locerr, (const char *)LOC_ERR.toUtf8().constData(), MAX_BUFLEN);
     locerr[MAX_BUFLEN-1] = '\0';
 
-    VERBOSE(VB_SYSTEM|VB_EXTRA, QString("Launching: %1").arg(GetLogCmd()));
+    LOG(VB_SYSTEM, LOG_DEBUG, QString("Launching: %1").arg(GetLogCmd()));
 
     GetBuffer(0)->setBuffer(0);
     GetBuffer(1)->setBuffer(0);
@@ -550,8 +549,7 @@ void MythSystemWindows::Fork(time_t timeout)
     {
         if (!CreatePipe(&p_stdin[0], &p_stdin[1], &saAttr, 0)) 
         {
-            VERBOSE(VB_IMPORTANT|VB_SYSTEM,
-                            (LOC_ERR + "stdin pipe() failed"));
+            LOG(VB_GENERAL, LOG_ERR, "stdin pipe() failed");
             SetStatus( GENERIC_EXIT_NOT_OK );
         }
         else
@@ -559,8 +557,7 @@ void MythSystemWindows::Fork(time_t timeout)
             // Ensure the write handle to the pipe for STDIN is not inherited. 
             if (!SetHandleInformation(p_stdin[1], HANDLE_FLAG_INHERIT, 0))
             {
-                VERBOSE(VB_SYSTEM|VB_IMPORTANT,
-                            (LOC_ERR + "stdin inheritance error"));
+                LOG(VB_SYSTEM, LOG_ERR, "stdin inheritance error");
                 SetStatus( GENERIC_EXIT_NOT_OK );
             }
             else
@@ -571,13 +568,11 @@ void MythSystemWindows::Fork(time_t timeout)
         }
     }
 
-
     if( GetSetting("UseStdout") )
     {
         if (!CreatePipe(&p_stdout[0], &p_stdout[1], &saAttr, 0)) 
         {
-            VERBOSE(VB_IMPORTANT|VB_SYSTEM,
-                            (LOC_ERR + "stdout pipe() failed"));
+            LOG(VB_SYSTEM, LOG_ERR, "stdout pipe() failed");
             SetStatus( GENERIC_EXIT_NOT_OK );
         }
         else
@@ -585,8 +580,7 @@ void MythSystemWindows::Fork(time_t timeout)
             // Ensure the read handle to the pipe for STDOUT is not inherited.
             if (!SetHandleInformation(p_stdout[0], HANDLE_FLAG_INHERIT, 0))
             {
-                VERBOSE(VB_IMPORTANT|VB_SYSTEM,
-                            (LOC_ERR + "stdout inheritance error"));
+                LOG(VB_SYSTEM, LOG_ERR, "stdout inheritance error");
                 SetStatus( GENERIC_EXIT_NOT_OK );
             }
             else
@@ -601,8 +595,7 @@ void MythSystemWindows::Fork(time_t timeout)
     {
         if (!CreatePipe(&p_stderr[0], &p_stderr[1], &saAttr, 0)) 
         {
-            VERBOSE(VB_IMPORTANT|VB_SYSTEM,
-                            (LOC_ERR + "stderr pipe() failed"));
+            LOG(VB_SYSTEM, LOG_ERR, "stderr pipe() failed");
             SetStatus( GENERIC_EXIT_NOT_OK );
         }
         else
@@ -610,8 +603,7 @@ void MythSystemWindows::Fork(time_t timeout)
             // Ensure the read handle to the pipe for STDERR is not inherited.
             if (!SetHandleInformation(p_stderr[0], HANDLE_FLAG_INHERIT, 0))
             {
-                VERBOSE(VB_IMPORTANT|VB_SYSTEM,
-                            (LOC_ERR + "stderr inheritance error"));
+                LOG(VB_SYSTEM, LOG_ERR, "stderr inheritance error");
                 SetStatus( GENERIC_EXIT_NOT_OK );
             }
             else
@@ -657,7 +649,7 @@ void MythSystemWindows::Fork(time_t timeout)
 
     if (!success)
     {
-        VERBOSE(VB_IMPORTANT|VB_SYSTEM, (LOC_ERR + "CreateProcess() failed"));
+        LOG(VB_SYSTEM, LOG_ERR, "CreateProcess() failed");
         SetStatus( GENERIC_EXIT_NOT_OK );
     }
     else
@@ -666,7 +658,7 @@ void MythSystemWindows::Fork(time_t timeout)
         m_child = pi.hProcess;
         SetStatus( GENERIC_EXIT_RUNNING );
 
-        VERBOSE(VB_SYSTEM,
+        LOG(VB_SYSTEM, LOG_INFO,
                 QString("Managed child (Handle: %1) has started! "
                         "%2%3 command=%4, timeout=%5")
                     .arg((long long)m_child) 

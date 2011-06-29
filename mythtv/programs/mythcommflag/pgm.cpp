@@ -4,12 +4,13 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 #include "frame.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "myth_imgconvert.h"
 #include "pgm.h"
 
+// TODO: verify this
 /*
- * N.B.: this is really C code, but VERBOSE, #define'd in mythverbose.h, is in
+ * N.B.: this is really C code, but VERBOSE, #define'd in mythlogging.h, is in
  * a C++ header file, so this has to be compiled with a C++ compiler, which
  * means this has to be a C++ source file.
  */

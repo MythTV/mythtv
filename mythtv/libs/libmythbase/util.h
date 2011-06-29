@@ -85,9 +85,6 @@ inline int   sq(int   a) { return a*a; }
  MBASE_PUBLIC  void myth_yield(void);
  MBASE_PUBLIC  bool myth_ioprio(int val); // range -1..8, smaller is higher priority
 
- MBASE_PUBLIC  bool myth_FileIsDVD(const QString &filename);
- MBASE_PUBLIC  bool myth_FileIsBD(const QString &filename);
-
  MBASE_PUBLIC  bool MythRemoveDirectory(QDir &aDir);
  MBASE_PUBLIC  QString &ShellEscape(QString &string);
 

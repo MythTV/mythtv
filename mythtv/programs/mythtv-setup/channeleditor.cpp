@@ -13,7 +13,7 @@
 #include "mythuibutton.h"
 #include "channelutil.h"
 #include "importicons.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythuitext.h"
 #include "mythwizard.h"
 #include "scanwizard.h"

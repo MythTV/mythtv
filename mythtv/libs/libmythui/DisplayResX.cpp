@@ -4,16 +4,13 @@
 
 #include <cmath>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythdb.h"
 #include "mythdisplay.h"
 #include "mythxdisplay.h"
 #include "util-nvctrl.h"
 
 #include <X11/extensions/Xrandr.h> // this has to be after util-x11.h (Qt bug)
-
-using std::cerr;
-using std::endl;
 
 static XRRScreenConfiguration *GetScreenConfig(MythXDisplay*& display);
 
@@ -62,12 +59,15 @@ bool DisplayResX::SwitchToVideoMode(int width, int height, double desired_rate)
         finalrate = (short) rate;
         for (uint i=0; i < m_video_modes.size(); i++)
         {
-            if ((m_video_modes[i].Width() == width) && (m_video_modes[i].Height() == height))
+            if ((m_video_modes[i].Width() == width) &&
+                (m_video_modes[i].Height() == height))
             {
                 if (m_video_modes[i].Custom())
                 {
                     finalrate = m_video_modes[i].realRates[rate];
-                    VERBOSE(VB_PLAYBACK, QString("Dynamic TwinView rate found, set %1Hz as XRandR %2") .arg(rate) .arg(finalrate));
+                    LOG(VB_PLAYBACK, LOG_INFO,
+                        QString("Dynamic TwinView rate found, set %1Hz as "
+                                "XRandR %2") .arg(rate) .arg(finalrate));
                 }
                 break;
             }
@@ -82,10 +82,11 @@ bool DisplayResX::SwitchToVideoMode(int width, int height, double desired_rate)
         delete display;
 
         if (RRSetConfigSuccess != status)
-            cerr<<"DisplaResX: XRRSetScreenConfigAndRate() call failed."<<endl;
+            LOG(VB_GENERAL, LOG_ERR, 
+                "XRRSetScreenConfigAndRate() call failed.");
         return RRSetConfigSuccess == status;
     }
-    cerr<<"DisplaResX: Desired Resolution and FrameRate not found."<<endl;
+    LOG(VB_GENERAL, LOG_ERR, "Desired Resolution and FrameRate not found.");
     return false;
 }
 
@@ -140,7 +141,11 @@ const DisplayResVector& DisplayResX::GetVideoModes(void) const
                     newrates.push_back(screenmap[key]);
                     realRates[screenmap[key]] = (int) round(*it);
                     found = true;
-                    // VERBOSE(VB_PLAYBACK, QString("CustomRate Found, set %1x%2@%3 as %4Hz") .arg(w) .arg(h) .arg(*it) .arg(screenmap[key]));
+#if 0
+                    LOG(VB_PLAYBACK, LOG_INFO,
+                        QString("CustomRate Found, set %1x%2@%3 as %4Hz")
+                            .arg(w) .arg(h) .arg(*it) .arg(screenmap[key]));
+#endif
                 }
             }
             if (found)
@@ -165,7 +170,7 @@ static XRRScreenConfiguration *GetScreenConfig(MythXDisplay*& display)
     display = OpenMythXDisplay();
     if (!display)
     {
-        VERBOSE(VB_IMPORTANT, "DisplaResX: MythXOpenDisplay call failed");
+        LOG(VB_GENERAL, LOG_ERR, "DisplaResX: MythXOpenDisplay call failed");
         return NULL;
     }
 
@@ -180,7 +185,7 @@ static XRRScreenConfiguration *GetScreenConfig(MythXDisplay*& display)
     {
         delete display;
         display = NULL;
-        VERBOSE(VB_IMPORTANT, "DisplaResX: Unable to XRRgetScreenInfo");
+        LOG(VB_GENERAL, LOG_ERR, "DisplaResX: Unable to XRRgetScreenInfo");
     }
 
     return cfg;

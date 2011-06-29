@@ -3,7 +3,7 @@
 using namespace std;
 
 #include "generictree.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #define LOC      QString("*TreeList: ")
 #define LOC_WARN QString("*TreeList, Warning: ")
@@ -83,10 +83,9 @@ static int compareItems(
     }
     else
     {
-        cerr << "generictree.o: SortableGenericTreeList was asked to "
-             << "compare items (probably inside a sort()), but the "
-             << "sort_type is not set to anything recognizable"
-             << endl;
+        LOG(VB_GENERAL, LOG_ALERT, "SortableGenericTreeList was asked to "
+                "compare items (probably inside a sort()), but the "
+                "sort_type is not set to anything recognizable");
         return 0;
     }
 }
@@ -335,7 +334,10 @@ GenericTree* GenericTree::getChildAt(uint reference, int ordering_index)
 {
     if (reference >= (uint)m_ordered_subnodes->size())
     {
-        // cerr << "GenericTree: out of bounds request to getChildAt()\n";
+#if 0
+        LOG(VB_GENERAL, LOG_ALERT,
+                 "GenericTree: out of bounds request to getChildAt()");
+#endif
         return NULL;
     }
 
@@ -363,7 +365,8 @@ void GenericTree::becomeSelectedChild()
     if (m_parent)
         m_parent->setSelectedChild(this);
     else
-        cerr << "Top level can't become selected child\n";
+        LOG(VB_GENERAL, LOG_ALERT, 
+                 "Top level can't become selected child");
 }
 
 GenericTree* GenericTree::prevSibling(int number_up, int ordering_index)
@@ -453,7 +456,8 @@ int GenericTree::getAttribute(uint which_one) const
 {
     if (m_attributes->size() < (int)(which_one + 1))
     {
-        cerr << "asked a GenericTree node for a nonexistent attribute\n";
+        LOG(VB_GENERAL, LOG_ALERT, 
+                 "asked a GenericTree node for a nonexistent attribute");
         return 0;
     }
 
@@ -512,7 +516,8 @@ GenericTree* GenericTree::nextPrevFromFlatList(bool forward_or_backward,
 
     if (it == m_flatened_subnodes->end())
     {
-        VERBOSE(VB_IMPORTANT, "Can't find active item on flattened list");
+        LOG(VB_GENERAL, LOG_ALERT,
+                 "Can't find active item on flattened list");
         return NULL;
     }
     int i = it - m_flatened_subnodes->begin();
@@ -639,9 +644,9 @@ void GenericTree::reOrderAsSorted()
 
     if (m_subnodes->size() != m_ordered_subnodes->size())
     {
-        cerr << "generictree.o: Can't reOrderAsSorted(), because the number "
-             << "of subnodes is different than the number of ordered subnodes"
-             << endl;
+        LOG(VB_GENERAL, LOG_ALERT, 
+                 "Can't reOrderAsSorted(), because the number of subnodes is "
+                 "different than the number of ordered subnodes");
         return;
     }
 

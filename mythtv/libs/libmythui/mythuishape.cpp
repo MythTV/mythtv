@@ -13,7 +13,7 @@ using namespace std;
 #include <QColor>
 
 // myth
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythpainter.h"
 #include "mythimage.h"
 #include "mythmainwindow.h"
@@ -146,7 +146,7 @@ void MythUIShape::CopyFrom(MythUIType *base)
     MythUIShape *shape = dynamic_cast<MythUIShape *>(base);
     if (!shape)
     {
-        VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
+        LOG(VB_GENERAL, LOG_ERR, "ERROR, bad parsing");
         return;
     }
 

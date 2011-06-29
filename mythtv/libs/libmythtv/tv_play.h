@@ -498,6 +498,8 @@ class MTV_PUBLIC TV : public QObject
         PictureAdjustType type, PictureAttribute attr, bool up);
     bool PictureAttributeHandleAction(PlayerContext*,
                                       const QStringList &actions);
+    static PictureAttribute NextPictureAdjustType(
+        PictureAdjustType type, MythPlayer *mp, PictureAttribute attr);
 
     // Channel editing support
     void StartChannelEditMode(PlayerContext*);

@@ -1,11 +1,13 @@
 #ifndef VIDEOVISUAL_H
 #define VIDEOVISUAL_H
 
-#include <QRect>
-#include <QList>
 #include "stdint.h"
 
-#include "mythverbose.h"
+#include <QRect>
+#include <QList>
+#include <QDateTime>
+
+#include "mythlogging.h"
 #include "visual.h"
 #include "mythpainter.h"
 #include "videovisualdefs.h"

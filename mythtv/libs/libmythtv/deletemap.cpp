@@ -1,7 +1,7 @@
 #include <cmath>
 #include <stdint.h>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythcontext.h"
 #include "osd.h"
 #include "deletemap.h"
@@ -645,7 +645,9 @@ void DeleteMap::SetMap(const frm_dir_map_t &map)
     Clear();
     m_deleteMap = map;
     m_deleteMap.detach();
-    Push(QObject::tr("Set New Cut List"));
+    // Can't save an undo point for SetMap() or transcodes fail.
+    // Leaving as a marker for refactor.
+    //Push(QObject::tr("Set New Cut List"));
 }
 
 /// Loads the given commercial break map into the deleteMap.

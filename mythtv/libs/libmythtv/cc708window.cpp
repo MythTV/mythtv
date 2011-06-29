@@ -6,7 +6,7 @@
 using namespace std;
 
 #include "cc708window.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 /************************************************************************
 

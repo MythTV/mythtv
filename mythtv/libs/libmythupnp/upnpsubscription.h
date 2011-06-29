@@ -6,7 +6,7 @@
 
 class Subscription;
 
-class MBASE_PUBLIC MythInfoMapEvent : public MythEvent
+class UPNP_PUBLIC MythInfoMapEvent : public MythEvent
 {
   public:
     MythInfoMapEvent(const QString &lmessage,

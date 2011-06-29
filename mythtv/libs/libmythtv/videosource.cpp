@@ -38,7 +38,7 @@ using namespace std;
 #include "compat.h"
 #include "mythdb.h"
 #include "mythdirs.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "libmythupnp/httprequest.h"    // for TestMimeType()
 #include "mythsystem.h"
 #include "exitcodes.h"
@@ -450,7 +450,7 @@ XMLTV_generic_config::XMLTV_generic_config(const VideoSource& _parent,
 void XMLTV_generic_config::Save()
 {
     VerticalConfigurationGroup::Save();
-/*
+#if 0
     QString err_msg = QObject::tr(
         "You MUST run 'mythfilldatabase --manual the first time,\n "
         "instead of just 'mythfilldatabase'.\nYour grabber does not provide "
@@ -462,7 +462,7 @@ void XMLTV_generic_config::Save()
         MythPopupBox::showOkPopup(
             GetMythMainWindow(), QObject::tr("Warning."), err_msg);
     }
-*/
+#endif
 }
 
 void XMLTV_generic_config::RunConfig(void)
@@ -1176,7 +1176,8 @@ FirewireModel::FirewireModel(const CaptureCard  &parent,
     guid(_guid)
 {
     setLabel(QObject::tr("Cable box model"));
-    addSelection(QObject::tr("Generic"), "GENERIC");
+    addSelection(QObject::tr("Motorola Generic"), "MOTO GENERIC");
+    addSelection(QObject::tr("SA/Cisco Generic"), "SA GENERIC");
     addSelection("DCH-3200");
     addSelection("DCX-3200");
     addSelection("DCT-3412");
@@ -1336,8 +1337,6 @@ HDHomeRunTunerIndex::HDHomeRunTunerIndex()
 {
     setLabel(QObject::tr("Tuner"));
     setEnabled(false);
-    addSelection("0");
-    addSelection("1");
     connect(this, SIGNAL(valueChanged( const QString&)),
             this, SLOT(  UpdateDevices(const QString&)));
     _oldValue = "";
@@ -1345,7 +1344,7 @@ HDHomeRunTunerIndex::HDHomeRunTunerIndex()
 
 void HDHomeRunTunerIndex::setEnabled(bool e)
 {
-    TransComboBoxSetting::setEnabled(e);
+    TransLineEditSetting::setEnabled(e);
     if (e) {
         if (!_oldValue.isEmpty())
             setValue(_oldValue);
@@ -1837,8 +1836,9 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
     {
         QString dev = *it;
         QStringList devinfo = dev.split(" ");
-        QString devid = devinfo.first();
-        QString devip = devinfo.last();
+        QString devid = devinfo.at(0);
+        QString devip = devinfo.at(1);
+        QString devtuner = devinfo.at(2);
 
         HDHomeRunDevice tmpdevice;
         tmpdevice.deviceid   = devid;
@@ -1846,13 +1846,7 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
         tmpdevice.cardip     = devip;
         tmpdevice.inuse      = false;
         tmpdevice.discovered = true;
-
-        tmpdevice.cardtuner = "0";
-        tmpdevice.mythdeviceid =
-            tmpdevice.deviceid + "-" + tmpdevice.cardtuner;
-        devicelist[tmpdevice.mythdeviceid] = tmpdevice;
-
-        tmpdevice.cardtuner = "1";
+        tmpdevice.cardtuner = devtuner;
         tmpdevice.mythdeviceid =
             tmpdevice.deviceid + "-" + tmpdevice.cardtuner;
         devicelist[tmpdevice.mythdeviceid] = tmpdevice;

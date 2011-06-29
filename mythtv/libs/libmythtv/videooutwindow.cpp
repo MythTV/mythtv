@@ -409,9 +409,12 @@ void VideoOutWindow::ApplyLetterboxing(void)
         // Video fills screen vertically. May be cropped left and right
         float factor = (float)display_visible_rect.height() /
                        (float)display_video_rect.height();
-        display_video_rect.moveTop(display_visible_rect.top());
-        display_video_rect.setHeight(display_video_rect.height() * factor);
-        display_video_rect.setWidth(display_video_rect.width() * factor);
+        QSize newsize = QSize((int) (display_video_rect.width() * factor),
+                              (int) (display_video_rect.height() * factor));
+        QSize temp = (display_video_rect.size() - newsize) / 2;
+        QPoint newloc = display_video_rect.topLeft() +
+                        QPoint(temp.width(), temp.height());
+        display_video_rect = QRect(newloc, newsize);
     }
     else if (adjustfill == kAdjustFill_HorizontalFill &&
              display_video_rect.width() > 0)
@@ -419,9 +422,12 @@ void VideoOutWindow::ApplyLetterboxing(void)
         // Video fills screen horizontally. May be cropped top and bottom
         float factor = (float)display_visible_rect.width() /
                        (float)display_video_rect.width();
-        display_video_rect.moveLeft(display_visible_rect.left());
-        display_video_rect.setHeight(display_video_rect.height() * factor);
-        display_video_rect.setWidth(display_video_rect.width() * factor);
+        QSize newsize = QSize((int) (display_video_rect.width() * factor),
+                              (int) (display_video_rect.height() * factor));
+        QSize temp = (display_video_rect.size() - newsize) / 2;
+        QPoint newloc = display_video_rect.topLeft() +
+                        QPoint(temp.width(), temp.height());
+        display_video_rect = QRect(newloc, newsize);
     }
 }
 

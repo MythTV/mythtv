@@ -6,7 +6,6 @@
 
 #include "mythdirs.h"
 #include "mythcontext.h"
-#include "mythverbose.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
 #include "util.h"
@@ -57,12 +56,14 @@ void GrabberScript::run()
     uint status = getTree.Wait();
 
     if( status == GENERIC_EXIT_CMD_NOT_FOUND )
-        VERBOSE(VB_IMPORTANT, LOC + QString("Internet Content Source %1 "
-                            "cannot run, file missing.").arg(m_title));
+        LOG(VB_GENERAL, LOG_CRIT, 
+                 QString("Internet Content Source %1 cannot run, file missing.")
+                     .arg(m_title));
     else if( status == GENERIC_EXIT_OK )
     {
-        VERBOSE(VB_IMPORTANT, LOC + QString("Internet Content Source %1 "
-                           "completed download, beginning processing...").arg(m_title));
+        LOG(VB_GENERAL, LOG_INFO,
+                 QString("Internet Content Source %1 completed download, "
+                         "beginning processing...").arg(m_title));
 
         QByteArray result = getTree.ReadAll();
 
@@ -79,12 +80,14 @@ void GrabberScript::run()
             channel = channel.nextSiblingElement("channel");
         }
         markTreeUpdated(this, QDateTime::currentDateTime());
-        VERBOSE(VB_IMPORTANT, LOC + QString("Internet Content Source %1 "
-                           "completed processing, marking as updated.").arg(m_title));
+        LOG(VB_GENERAL, LOG_INFO, 
+                 QString("Internet Content Source %1 completed processing, "
+                         "marking as updated.").arg(m_title));
     }
     else
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Internet Content Source "
-                           "%1 crashed while grabbing tree.").arg(m_title));
+        LOG(VB_GENERAL, LOG_ERR, 
+                 QString("Internet Content Source %1 crashed while grabbing "
+                         "tree.").arg(m_title));
 
     emit finished();
     threadDeregister();
@@ -225,8 +228,9 @@ void GrabberDownloadThread::run()
         GrabberScript *script = m_scripts.takeFirst();
         if (script && (needsUpdate(script, updateFreq) || m_refreshAll))
         {
-            VERBOSE(VB_IMPORTANT, LOC + QString("Internet Content Source %1 Updating...")
-                                  .arg(script->GetTitle()));
+            LOG(VB_GENERAL, LOG_INFO,
+                     QString("Internet Content Source %1 Updating...")
+                          .arg(script->GetTitle()));
             script->run();
         }
         delete script;
@@ -257,11 +261,13 @@ void Search::executeSearch(const QString &script, const QString &query, uint pag
 {
     resetSearch();
 
-VERBOSE(VB_IMPORTANT, "Search::executeSearch");
+    LOG(VB_GENERAL, LOG_DEBUG, "Search::executeSearch");
     m_searchProcess = new MythSystem();
 
-    connect(m_searchProcess, SIGNAL(finished()), this, SLOT(slotProcessSearchExit()));
-    connect(m_searchProcess, SIGNAL(error(uint)), this, SLOT(slotProcessSearchExit(uint)));
+    connect(m_searchProcess, SIGNAL(finished()),
+            this, SLOT(slotProcessSearchExit()));
+    connect(m_searchProcess, SIGNAL(error(uint)),
+            this, SLOT(slotProcessSearchExit(uint)));
 
     QString cmd = script;
 
@@ -277,8 +283,8 @@ VERBOSE(VB_IMPORTANT, "Search::executeSearch");
     QString term = query;
     args.append(ShellEscape(term));
 
-    VERBOSE(VB_GENERAL|VB_EXTRA, LOC + QString("Internet Search Query: %1 %2")
-                                        .arg(cmd).arg(args.join(" ")));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Internet Search Query: %1 %2")
+                                         .arg(cmd).arg(args.join(" ")));
 
     uint flags = kMSRunShell | kMSStdOut | kMSBuffered | kMSRunBackground;
     m_searchProcess->SetCommand(cmd, args, flags);
@@ -352,7 +358,7 @@ void Search::slotProcessSearchExit(uint exitcode)
 {
     if (exitcode == GENERIC_EXIT_TIMEOUT)
     {
-        VERBOSE(VB_GENERAL|VB_EXTRA, LOC_ERR + "Internet Search Timeout");
+        LOG(VB_GENERAL, LOG_WARNING, "Internet Search Timeout");
 
         if (m_searchProcess)
         {
@@ -370,7 +376,8 @@ void Search::slotProcessSearchExit(uint exitcode)
     }
     else
     {
-        VERBOSE(VB_GENERAL|VB_EXTRA, LOC_ERR + "Internet Search Successfully Completed");
+        LOG(VB_GENERAL, LOG_INFO, 
+                 "Internet Search Successfully Completed");
 
         m_data = m_searchProcess->ReadAll();
         m_document.setContent(m_data, true);

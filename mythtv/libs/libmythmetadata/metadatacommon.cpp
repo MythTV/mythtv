@@ -3,7 +3,7 @@
 #include "rssparse.h"
 #include "mythcorecontext.h"
 #include "metadatacommon.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 // null constructor
 MetadataLookup::MetadataLookup(void) :

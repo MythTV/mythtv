@@ -6,7 +6,7 @@
 #include <QDomDocument>
 
 // Mythdb headers
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 // Mythui Headers
 #include "mythmainwindow.h"
@@ -49,7 +49,7 @@ void MythUIButtonTree::Init()
 
     if (!m_listTemplate)
     {
-        VERBOSE(VB_IMPORTANT, QString("MythUIButtonList listtemplate is "
+        LOG(VB_GENERAL, LOG_ERR, QString("MythUIButtonList listtemplate is "
                                       "required in mythuibuttonlist: %1")
                                       .arg(objectName()));
         return;
@@ -96,10 +96,10 @@ void MythUIButtonTree::SetTreeState(bool refreshAll)
     QList<MythGenericTree*> route = m_currentNode->getRoute();
 
     // Sanity Checks
-    if (m_depthOffset > route.size())
+    if (m_depthOffset >= route.size())
         m_depthOffset = 0;
 
-    if (((int)m_currentDepth + m_depthOffset) > route.size())
+    if (((int)m_currentDepth + m_depthOffset) >= route.size())
         m_currentDepth = 0;
 
     MythGenericTree *node = route.at(m_currentDepth + m_depthOffset);

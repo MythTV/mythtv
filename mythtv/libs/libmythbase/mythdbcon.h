@@ -63,8 +63,15 @@ class MBASE_PUBLIC MDBManager
 
     MSqlDatabase *getSchedCon(void);
     MSqlDatabase *getDDCon(void);
+    MSqlDatabase *getLogCon(void);
+    void closeSchedCon(void);
+    void closeDDCon(void);
+    void closeLogCon(void);
 
   private:
+    MSqlDatabase *getStaticCon(MSqlDatabase **dbcon, QString name);
+    void closeStaticCon(MSqlDatabase **dbcon);
+
     QList<MSqlDatabase*> m_pool;
     QMutex m_lock;
     QSemaphore *m_sem;
@@ -73,6 +80,7 @@ class MBASE_PUBLIC MDBManager
 
     MSqlDatabase *m_schedCon;
     MSqlDatabase *m_DDCon;
+    MSqlDatabase *m_LogCon;
 };
 
 /// \brief MSqlDatabase Info, used by MSqlQuery. Do not use directly.
@@ -163,6 +171,13 @@ class MBASE_PUBLIC MSqlQuery : public QSqlQuery
 
     /// \brief Returns dedicated connection. (Required for using temporary SQL tables.)
     static MSqlQueryInfo DDCon();
+
+    /// \brief Returns dedicated connection.
+    static MSqlQueryInfo LogCon();
+    
+    static void CloseSchedCon();
+    static void CloseDDCon();
+    static void CloseLogCon();
 
   private:
     MSqlDatabase *m_db;

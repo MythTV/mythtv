@@ -2542,7 +2542,8 @@ class Tvdatabase(object):
         if len(tmp_cast):
             cast_members=''
             for cast in tmp_cast:
-                cast_members+=(cast['name']+u', ').encode('utf8')
+                if cast['name'] is not None:
+                    cast_members+=(cast['name']+u', ').encode('utf8')
             if cast_members != '':
                 try:
                     cast_members = cast_members[:-2].encode('utf8')

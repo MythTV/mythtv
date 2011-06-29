@@ -172,6 +172,16 @@ HostSlider *SetDVDDriveSpeed()
     return gs;
 }
 
+HostCheckBox *VideoTreeRemember()
+{
+    HostCheckBox *gc = new HostCheckBox("mythvideo.VideoTreeRemember");
+    gc->setLabel(QObject::tr("Video Tree remembers last selected position"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If set, the current position in the Video "
+                                "Tree is persistent."));
+    return gc;
+}
+
 struct ConfigPage
 {
     typedef std::vector<ConfigurationGroup *> PageList;
@@ -286,6 +296,7 @@ VideoGeneralSettings::VideoGeneralSettings()
     VConfigPage page2(pages, false);
     page2->addChild(SetOnInsertDVD());
     page2->addChild(SetDVDDriveSpeed());
+    page2->addChild(VideoTreeRemember());
 
     // page 3
     VerticalConfigurationGroup *pctrl =

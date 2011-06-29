@@ -8,7 +8,7 @@
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythdb.h"
 
 MythUIClock::MythUIClock(MythUIType *parent, const QString &name)
@@ -106,7 +106,7 @@ void MythUIClock::CopyFrom(MythUIType *base)
     MythUIClock *clock = dynamic_cast<MythUIClock *>(base);
     if (!clock)
     {
-        VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
+        LOG(VB_GENERAL, LOG_ERR, "ERROR, bad parsing");
         return;
     }
 

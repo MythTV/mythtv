@@ -120,6 +120,8 @@ Scheduler::~Scheduler()
         wait();
         locker.relock();
     }
+    else
+        MSqlQuery::CloseDDCon();
 
     while (!reclist.empty())
     {
@@ -521,7 +523,7 @@ void Scheduler::PrintRec(const RecordingInfo *p, const char *prefix)
         .arg(p->GetInputID());
     outstr += QString("%1 %2 %3")
         .arg(toQChar(p->GetRecordingRuleType()))
-        .arg(toQChar(p->GetRecordingStatus(), p->GetCardID()))
+        .arg(toString(p->GetRecordingStatus(), p->GetCardID()))
         .arg(p->GetRecordingPriority());
     if (p->GetRecordingPriority2())
         outstr += QString("/%1").arg(p->GetRecordingPriority2());
@@ -1103,7 +1105,7 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
             continue;
 
         if (samePriority &&
-            (q->GetRecordingPriority() != p->GetRecordingPriority()))
+            (q->GetRecordingPriority() < p->GetRecordingPriority()))
         {
             continue;
         }
@@ -1294,8 +1296,7 @@ void Scheduler::MoveHigherRecords(bool move_this)
         RecConstIter k = cardlist.begin();
         for ( ; FindNextConflict(cardlist, p, k ); ++k)
         {
-            if (p->GetRecordingPriority() != (*k)->GetRecordingPriority() ||
-                !TryAnotherShowing(*k, true))
+            if (!TryAnotherShowing(*k, true))
             {
                 RestoreRecStatus();
                 break;
@@ -1830,8 +1831,6 @@ void Scheduler::run(void)
                 schedRunTime = (firstRun) ? 0 : schedRunTime;
                 schedRunTime =
                     max((int)(((e + 999) / 1000) * 1.5f), schedRunTime);
-                VERBOSE(VB_IMPORTANT, QString("schedRunTime: %1 seconds (e %2)")
-                        .arg(schedRunTime).arg(e));
             }
 
             if (firstRun)
@@ -1904,6 +1903,8 @@ void Scheduler::run(void)
                                idleTimeoutSecs, idleWaitForRecordingTime);
         }
     }
+
+    MSqlQuery::CloseSchedCon();
     threadDeregister();
 }
 

@@ -32,18 +32,6 @@
 
 #include "hdhomerun.h"
 
-#if defined(__CYGWIN__) || defined(__WINDOWS__)
-#include <windows.h>
-#include <iphlpapi.h>
-#define USE_IPHLPAPI 1
-#else
-#include <net/if.h>
-#include <sys/ioctl.h>
-#ifndef _SIZEOF_ADDR_IFREQ
-#define _SIZEOF_ADDR_IFREQ(x) sizeof(x)
-#endif
-#endif
-
 #define HDHOMERUN_DISOCVER_MAX_SOCK_COUNT 16
 
 struct hdhomerun_discover_sock_t {
@@ -126,92 +114,6 @@ void hdhomerun_discover_destroy(struct hdhomerun_discover_t *ds)
 	free(ds);
 }
 
-#if defined(USE_IPHLPAPI)
-static void hdhomerun_discover_sock_detect_internal(struct hdhomerun_discover_t *ds)
-{
-	PIP_ADAPTER_INFO pAdapterInfo = (IP_ADAPTER_INFO *)malloc(sizeof(IP_ADAPTER_INFO));
-	ULONG ulOutBufLen = sizeof(IP_ADAPTER_INFO);
-
-	DWORD Ret = GetAdaptersInfo(pAdapterInfo, &ulOutBufLen);
-	if (Ret != NO_ERROR) {
-		free(pAdapterInfo);
-		if (Ret != ERROR_BUFFER_OVERFLOW) {
-			return;
-		}
-		pAdapterInfo = (IP_ADAPTER_INFO *)malloc(ulOutBufLen); 
-		Ret = GetAdaptersInfo(pAdapterInfo, &ulOutBufLen);
-		if (Ret != NO_ERROR) {
-			free(pAdapterInfo);
-			return;
-		}
-	}
-
-	PIP_ADAPTER_INFO pAdapter = pAdapterInfo;
-	while (pAdapter) {
-		IP_ADDR_STRING *pIPAddr = &pAdapter->IpAddressList;
-		while (pIPAddr) {
-			uint32_t local_ip = ntohl(inet_addr(pIPAddr->IpAddress.String));
-			uint32_t mask = ntohl(inet_addr(pIPAddr->IpMask.String));
-
-			if (local_ip == 0) {
-				pIPAddr = pIPAddr->Next;
-				continue;
-			}
-
-			hdhomerun_discover_sock_add(ds, local_ip, mask);
-			pIPAddr = pIPAddr->Next;
-		}
-
-		pAdapter = pAdapter->Next;
-	}
-
-	free(pAdapterInfo);
-}
-
-#else
-
-static void hdhomerun_discover_sock_detect_internal(struct hdhomerun_discover_t *ds)
-{
-	int sock = ds->socks[0].sock;
-
-	struct ifconf ifc;
-	uint8_t buf[8192];
-	ifc.ifc_len = sizeof(buf);
-	ifc.ifc_buf = (char *)buf;
-
-	memset(buf, 0, sizeof(buf));
-
-	if (ioctl(sock, SIOCGIFCONF, &ifc) != 0) {
-		return;
-	}
-
-	uint8_t *ptr = (uint8_t *)ifc.ifc_req;
-	uint8_t	*end = (uint8_t *)&ifc.ifc_buf[ifc.ifc_len];
-
-	while (ptr <= end) {
-		struct ifreq *ifr = (struct ifreq *)ptr;
-		ptr += _SIZEOF_ADDR_IFREQ(*ifr);
-
-		if (ioctl(sock, SIOCGIFADDR, ifr) != 0) {
-			continue;
-		}
-		struct sockaddr_in *addr_in = (struct sockaddr_in *)&(ifr->ifr_addr);
-		uint32_t local_ip = ntohl(addr_in->sin_addr.s_addr);
-		if (local_ip == 0) {
-			continue;
-		}
-
-		if (ioctl(sock, SIOCGIFNETMASK, ifr) != 0) {
-			continue;
-		}
-		struct sockaddr_in *mask_in = (struct sockaddr_in *)&(ifr->ifr_addr);
-		uint32_t mask = ntohl(mask_in->sin_addr.s_addr);
-
-		hdhomerun_discover_sock_add(ds, local_ip, mask);
-	}
-}
-#endif
-
 static void hdhomerun_discover_sock_detect(struct hdhomerun_discover_t *ds)
 {
 	unsigned int i;
@@ -220,11 +122,21 @@ static void hdhomerun_discover_sock_detect(struct hdhomerun_discover_t *ds)
 		dss->detected = FALSE;
 	}
 
-	hdhomerun_discover_sock_detect_internal(ds);
+	struct hdhomerun_local_ip_info_t ip_info_list[HDHOMERUN_DISOCVER_MAX_SOCK_COUNT];
+	int count = hdhomerun_local_ip_info(ip_info_list, HDHOMERUN_DISOCVER_MAX_SOCK_COUNT);
+	if (count < 0) {
+		count = 0;
+	}
+
+	int index;
+	for (index = 0; index < count; index++) {
+		struct hdhomerun_local_ip_info_t *ip_info = &ip_info_list[index];
+		hdhomerun_discover_sock_add(ds, ip_info->ip_addr, ip_info->subnet_mask);
+	}
 
 	struct hdhomerun_discover_sock_t *src = &ds->socks[1];
 	struct hdhomerun_discover_sock_t *dst = &ds->socks[1];
-	unsigned int count = 1;
+	count = 1;
 	for (i = 1; i < ds->sock_count; i++) {
 		if (!src->detected) {
 			hdhomerun_sock_destroy(src->sock);
@@ -347,6 +259,7 @@ static bool_t hdhomerun_discover_recv_internal(struct hdhomerun_discover_t *ds, 
 	result->ip_addr = remote_addr;
 	result->device_type = 0;
 	result->device_id = 0;
+	result->tuner_count = 0;
 
 	while (1) {
 		uint8_t tag;
@@ -371,11 +284,36 @@ static bool_t hdhomerun_discover_recv_internal(struct hdhomerun_discover_t *ds, 
 			result->device_id = hdhomerun_pkt_read_u32(rx_pkt);
 			break;
 
+		case HDHOMERUN_TAG_TUNER_COUNT:
+			if (len != 1) {
+				break;
+			}
+			result->tuner_count = hdhomerun_pkt_read_u8(rx_pkt);
+			break;
+
 		default:
 			break;
 		}
 
 		rx_pkt->pos = next;
+	}
+
+	/* Fixup for old firmware. */
+	if (result->tuner_count == 0) {
+		switch (result->device_id >> 20) {
+		case 0x102:
+			result->tuner_count = 1;
+			break;
+
+		case 0x100:
+		case 0x101:
+		case 0x121:
+			result->tuner_count = 2;
+			break;
+
+		default:
+			break;
+		}
 	}
 
 	return TRUE;
@@ -422,6 +360,7 @@ int hdhomerun_discover_find_devices(struct hdhomerun_discover_t *ds, uint32_t ta
 		uint64_t timeout = getcurrenttime() + 200;
 		while (1) {
 			struct hdhomerun_discover_device_t *result = &result_list[count];
+			memset(result, 0, sizeof(struct hdhomerun_discover_device_t));
 
 			if (!hdhomerun_discover_recv(ds, result)) {
 				if (getcurrenttime() >= timeout) {

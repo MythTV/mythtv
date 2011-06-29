@@ -77,7 +77,10 @@ static void vbi_event(struct VBIData *data, struct vt_event *ev)
             struct vt_page *vtp = (struct vt_page *) ev->p1;
             if (vtp->flags & PG_SUBTITLE)
             {
-                //printf("subtitle page %x.%x\n", vtp->pgno, vtp->subno);
+#if 0
+                LOG(VB_GENERAL, LOG_DEBUG, QString("subtitle page %1.%2")
+                      .arg(vtp->pgno, 0, 16) .arg(vtp->subno, 0, 16));
+#endif
                 data->foundteletextpage = true;
                 memcpy(&(data->teletextpage), vtp, sizeof(vt_page));
             }

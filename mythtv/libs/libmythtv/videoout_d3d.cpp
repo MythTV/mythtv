@@ -303,11 +303,12 @@ bool VideoOutputD3D::CreatePauseFrame(void)
     if (codec_is_dxva2(video_codec_id))
         return true;
 
-    m_pauseFrame.height = vbuffers.GetScratchFrame()->height;
-    m_pauseFrame.width  = vbuffers.GetScratchFrame()->width;
-    m_pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
-    m_pauseFrame.size   = vbuffers.GetScratchFrame()->size;
-    m_pauseFrame.buf    = new unsigned char[m_pauseFrame.size + 128];
+    init(&m_pauseFrame, FMT_YV12,
+         new unsigned char[vbuffers.GetScratchFrame()->size + 128],
+         vbuffers.GetScratchFrame()->width,
+         vbuffers.GetScratchFrame()->height,
+         vbuffers.GetScratchFrame()->size);
+
     m_pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
     return true;
 }
@@ -700,8 +701,10 @@ MythCodecID VideoOutputD3D::GetBestSupportedCodec(
 }
 
 
-void* VideoOutputD3D::GetDXVA2Decoder(void)
+void* VideoOutputD3D::GetDecoderContext(unsigned char* buf, uint8_t*& id)
 {
+    (void)buf;
+    (void)id;
 #ifdef USING_DXVA2
     if (m_decoder)
         return (void*)&m_decoder->m_context;

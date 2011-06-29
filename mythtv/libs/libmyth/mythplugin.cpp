@@ -15,7 +15,7 @@
 
 #include "mythdirs.h"
 #include "mythversion.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 using namespace std;
 
@@ -49,7 +49,7 @@ int MythPlugin::init(const char *libversion)
         error_msg = dlerror();
     }
 
-    VERBOSE(VB_IMPORTANT, QString("MythPlugin::init() dlerror: %1")
+    LOG(VB_GENERAL, LOG_EMERG, QString("MythPlugin::init() dlerror: %1")
             .arg(error_msg));
 
     return -1;
@@ -144,7 +144,7 @@ MythPluginManager::MythPluginManager()
 
         QStringList libraries = filterDir.entryList();
         if (libraries.isEmpty())
-            VERBOSE(VB_GENERAL,
+            LOG(VB_GENERAL, LOG_WARNING,
                     "No libraries in plugins directory " + filterDir.path());
 
         for (QStringList::iterator i = libraries.begin(); i != libraries.end();
@@ -160,7 +160,8 @@ MythPluginManager::MythPluginManager()
         }
     }
     else
-        VERBOSE(VB_GENERAL, "No plugins directory " + filterDir.path());
+        LOG(VB_GENERAL, LOG_WARNING,
+                 "No plugins directory " + filterDir.path());
 
     gContext->SetDisableLibraryPopup(false);
 
@@ -186,8 +187,8 @@ bool MythPluginManager::init_plugin(const QString &plugname)
     {
         delete m_dict[newname];
         m_dict.remove(newname);
-        VERBOSE(VB_IMPORTANT, QString("Unable to initialize plugin '%1'.")
-                .arg(plugname));
+        LOG(VB_GENERAL, LOG_ERR, 
+                 QString("Unable to initialize plugin '%1'.") .arg(plugname));
         return false;
     }
 
@@ -214,9 +215,9 @@ bool MythPluginManager::run_plugin(const QString &plugname)
 
     if (!m_dict[newname] && !init_plugin(plugname))
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("Unable to run plugin '%1': not initialized")
-                .arg(plugname));
+        LOG(VB_GENERAL, LOG_ALERT,
+                 QString("Unable to run plugin '%1': not initialized")
+                     .arg(plugname));
         return true;
     }
 
@@ -232,9 +233,9 @@ bool MythPluginManager::config_plugin(const QString &plugname)
 
     if (!m_dict[newname] && !init_plugin(plugname))
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("Unable to configure plugin '%1': not initialized")
-                .arg(plugname));
+        LOG(VB_GENERAL, LOG_ALERT,
+                 QString("Unable to configure plugin '%1': not initialized")
+                     .arg(plugname));
         return true;
     }
 
@@ -249,9 +250,9 @@ bool MythPluginManager::destroy_plugin(const QString &plugname)
 
     if (!m_dict[newname] && !init_plugin(plugname))
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("Unable to destroy plugin '%1': not initialized")
-                .arg(plugname));
+        LOG(VB_GENERAL, LOG_ALERT,
+                 QString("Unable to destroy plugin '%1': not initialized")
+                     .arg(plugname));
         return false;
     }
 

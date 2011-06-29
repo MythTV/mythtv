@@ -61,14 +61,15 @@ void MythTranslation::load(const QString &module_name)
     if (trans->load(GetTranslationsDir() + module_name
                     + "_" + lang + ".qm", "."))
     {
-        VERBOSE(VB_GENERAL, QString("Loading %1 translation for module %2")
-                                    .arg(lang).arg(module_name));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Loading %1 translation for module %2")
+                .arg(lang).arg(module_name));
         qApp->installTranslator(trans);
         d.m_translators[module_name] = trans;
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("Error Loading %1 translation for "
+        LOG(VB_GENERAL, LOG_ERR, QString("Error Loading %1 translation for "
                                         "module %2").arg(lang)
                                         .arg(module_name));
     }

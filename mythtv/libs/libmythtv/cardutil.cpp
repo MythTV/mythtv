@@ -20,7 +20,7 @@
 #include "diseqcsettings.h"
 #include "sourceutil.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"
@@ -301,7 +301,7 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
             return devs;
         }
 
-        if (result == 50)
+        if (result >= max_count)
         {
             VERBOSE(VB_IMPORTANT, "CardUtil::ProbeVideoDevices: "
                     "Warning: may be > 50 HDHomerun devices");
@@ -317,9 +317,11 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
                                  .arg((result_list[i].ip_addr>> 8) & 0xFF)
                                  .arg((result_list[i].ip_addr>> 0) & 0xFF);
 
-            QString hdhrdev = id.toUpper() + " " + ip;
-
-            devs.push_back(hdhrdev);
+            for (int tuner = 0; tuner < result_list[i].tuner_count; tuner++)
+            {
+                QString hdhrdev = id.toUpper() + " " + ip + " " + QString("%1").arg(tuner);
+                devs.push_back(hdhrdev);
+            }
         }
     }
 #endif // USING_HDHOMERUN

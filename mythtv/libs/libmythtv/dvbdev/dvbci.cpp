@@ -40,15 +40,15 @@
 
 #include <QString>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #ifndef MALLOC
 #define MALLOC(type, size)  (type *)malloc(sizeof(type) * (size))
 #endif
 
-#define esyslog(a...) VERBOSE(VB_IMPORTANT, QString().sprintf(a))
-#define isyslog(a...) VERBOSE(VB_DVBCAM, QString().sprintf(a))
-#define dsyslog(a...) VERBOSE(VB_DVBCAM, QString().sprintf(a))
+#define esyslog(a...) LOG(VB_GENERAL, LOG_ERR, QString().sprintf(a))
+#define isyslog(a...) LOG(VB_DVBCAM, LOG_INFO, QString().sprintf(a))
+#define dsyslog(a...) LOG(VB_DVBCAM, LOG_DEBUG, QString().sprintf(a))
 
 #define LOG_ERROR         esyslog("ERROR (%s,%d): %m", __FILE__, __LINE__)
 #define LOG_ERROR_STR(s)  esyslog("ERROR: %s: %m", s)
@@ -59,7 +59,7 @@ static bool DumpTPDUDataTransfer = false;
 static bool DebugProtocol = false;
 static bool _connected = false;
 
-#define dbgprotocol(a...) if (DebugProtocol) fprintf(stderr, a)
+#define dbgprotocol(a...) if (DebugProtocol) LOG(VB_DVBCAM, LOG_DEBUG, QString().sprintf(a))
 
 #define OK       0
 #define TIMEOUT -1
@@ -320,15 +320,19 @@ void cTPDU::Dump(bool Outgoing)
 {
   if (DumpTPDUDataTransfer) {
 #define MAX_DUMP 256
-     fprintf(stderr, "%s ", Outgoing ? "-->" : "<--");
+     QString msg = QString("%1 ").arg(Outgoing ? "-->" : "<--");
      for (int i = 0; i < size && i < MAX_DUMP; i++)
-         fprintf(stderr, "%02X ", data[i]);
-     fprintf(stderr, "%s\n", size >= MAX_DUMP ? "..." : "");
+         msg += QString("%1 ").arg((short int)data[i], 2, 16, QChar('0'));
+     if (size >= MAX_DUMP)
+         msg += "...";
+     LOG(VB_DVBCAM, LOG_INFO, msg);
      if (!Outgoing) {
-        fprintf(stderr, "   ");
+        msg = QString("   ");
         for (int i = 0; i < size && i < MAX_DUMP; i++)
-            fprintf(stderr, "%2c ", isprint(data[i]) ? data[i] : '.');
-        fprintf(stderr, "%s\n", size >= MAX_DUMP ? "..." : "");
+            msg += QString("%1 ").arg(isprint(data[i]) ? data[i] : '.', 2);
+        if (size >= MAX_DUMP)
+            msg += "...";
+        LOG(VB_DVBCAM, LOG_INFO, msg);
         }
      }
 }
@@ -1901,11 +1905,11 @@ bool cHlCiHandler::Process(void)
             if ((GetData(AOT_CA_INFO, &msg)) < 0) {
                 esyslog("HLCI communication failed");
             } else {
-                printf("Debug: ");
+                QString message("Debug: ");
                 for(int i = 0; i < 20; i++) {
-                    printf("%d ", msg.msg[i]);
+                    message += QString("%1 ").arg(msg.msg[i]);
                 }
-                printf("\n");
+                LOG(VB_GENERAL, LOG_DEBUG, message);
                 dbgprotocol("<== Ca Info");
                 int l = msg.msg[3];
                 const uint8_t *d = &msg.msg[4];

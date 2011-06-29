@@ -5,7 +5,7 @@
 using namespace std;
 
 #include "atscdescriptors.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "iso639.h"
 #include "atsc_huffman.h"
 
@@ -137,8 +137,10 @@ QString MultipleStringStructure::Uncompressed(
         (0x30<=mode && mode<=0x33)) { // basic runlength encoding
         int hb=mode<<8;
         for (int j=0; j<len; j++) {
-            //cerr<<"str.append(0x"<<hex<<mode<<":0x"<<int(buf[j])<<") -> "
-            //<<QChar(hb|buf[j])<<endl;
+#if 0
+            VERBOSE(VB_GENERAL, QString("str.append(0x%1:0x%2) -> %3")
+                .arg(mode, 0, 16) .arg(buf[j], 0, 16) .arg(QChar(hb|buf[j])));
+#endif
             str.append( QChar( hb|buf[j] ) );
         }
     } else if (mode==0x3e) {

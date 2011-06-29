@@ -1,6 +1,7 @@
 // C/C++
 #include <vector>
 #include <algorithm>
+#include <functional>
 using namespace std;
 
 // Qt

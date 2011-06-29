@@ -1196,7 +1196,10 @@ void BurnMenu::doBurn(int mode)
 
     commandline = "mytharchivehelper --burndvd --mediatype " + sArchiveFormat +
                   (bEraseDVDRW ? " --erasedvdrw" : "") + 
-                  (bNativeFormat ? " --nativeformat" : "") + " --quiet";
+                  (bNativeFormat ? " --nativeformat" : "");
+    commandline += logPropagateArgs;
+    if (!logPropagateQuiet())
+        commandline += " --quiet";
     commandline += " > "  + logDir + "/progress.log 2>&1 &";
 
     uint flags = kMSRunBackground | kMSDontBlockInputDevs | 

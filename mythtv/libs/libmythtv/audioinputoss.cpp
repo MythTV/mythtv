@@ -28,7 +28,7 @@
 #endif
 
 #include "audioinputoss.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include <fcntl.h>
 #include <sys/ioctl.h>
 

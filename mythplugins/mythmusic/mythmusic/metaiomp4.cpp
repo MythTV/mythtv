@@ -4,7 +4,7 @@
 #include "metadata.h"
 
 // Libmyth
-#include <mythverbose.h>
+#include <mythlogging.h>
 #include <mythcontext.h>
 
 // Libav*

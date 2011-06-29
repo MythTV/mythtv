@@ -11,7 +11,7 @@
 using namespace std;
 
 #include "audiooutputsettings.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythcorecontext.h"
 
 extern "C" {

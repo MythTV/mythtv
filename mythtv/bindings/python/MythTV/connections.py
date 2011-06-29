@@ -310,10 +310,20 @@ class BEConnection( object ):
         except MythError, e:
             if e.sockcode == 54:
                 # remote has closed connection, attempt reconnect
-                self.reconnect(True, True)
+                self.reconnect(True)
                 return self.backendCommand(data, deadline)
             else:
                 raise
+
+    def blockShutdown(self):
+        if not self.blockshutdown:
+            self.backendCommand('BLOCK_SHUTDOWN')
+            self.blockshutdown = True
+
+    def unblockShutdown(self):
+        if self.blockshutdown:
+            self.backendCommand('ALLOW_SHUTDOWN')
+            self.blockshutdown = False
 
 class BEEventConnection( BEConnection ):
     """

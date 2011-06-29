@@ -22,7 +22,7 @@
  */
 
 // MythTV headers
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 // MythContext headers
 #include "action.h"

@@ -718,9 +718,9 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
         {
             VideoAspectRatioChanged(aspect);
             MoveResize();
-            if (wasembedding)
-                EmbedInWidget(oldrect);
         }
+        if (wasembedding)
+            EmbedInWidget(oldrect);
         return true;
     }
 

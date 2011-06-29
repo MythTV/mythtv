@@ -6,7 +6,7 @@
 using namespace std;
 
 #include "managedlist.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "xmlparse.h"
 #include "mythfontproperties.h"
 
@@ -434,8 +434,11 @@ ManagedListItem* SelectManagedListItem::addSelection(const QString& label,
                 this,    SLOT(itemSelected(ManagedListItem*)));
     }
 
-    //cerr << "adding '" << label << "' value == "
-    //     << value << " curval == " << valueText << endl;
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, 
+             QString("adding '%1' value == %2 curval == %3")
+	             .arg(label) .arg(value) .arg(valueText));
+#endif
 
     // If we're adding an item with the same value as what we have selected
     // go trhough the selection process so the list gets updated.
@@ -443,7 +446,10 @@ ManagedListItem* SelectManagedListItem::addSelection(const QString& label,
     {
 
         int index = getValueIndex(value);
-        //cerr << "new item matches cur value and is at: " << index << endl;
+#if 0
+        LOG(VB_IMPORTANT, LOG_DEBUG,
+                QString("new item matches cur value and is at: %1").arg(index));
+#endif
         if (index > 0)
         {
             curItem = index;
@@ -800,7 +806,7 @@ bool ManagedList::init(XMLParse       *themeIn,
 
     if (!themeIn || containerNameIn.isEmpty() || listNameIn.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "sanity check failed");
+        LOG(VB_GENERAL, LOG_ALERT, "sanity check failed");
         return false;
     }
 
@@ -810,8 +816,8 @@ bool ManagedList::init(XMLParse       *themeIn,
     container = theme->GetSet(containerName);
     if (!container)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to get container %1")
-                                        .arg(containerName));
+        LOG(VB_GENERAL, LOG_ALERT, 
+                 QString("Failed to get container %1") .arg(containerName));
         return false;
     }
 
@@ -820,8 +826,8 @@ bool ManagedList::init(XMLParse       *themeIn,
     ltype = (UIListType *)container->GetType(listName);
     if (!ltype)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to get list %1")
-                                        .arg(listName));
+        LOG(VB_GENERAL, LOG_ALERT, 
+		 QString("Failed to get list %1") .arg(listName));
         return false;
     }
 

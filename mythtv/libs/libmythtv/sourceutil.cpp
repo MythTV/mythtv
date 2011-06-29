@@ -7,7 +7,7 @@
 #include "sourceutil.h"
 #include "cardutil.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "util.h"
 
 bool SourceUtil::HasDigitalChannel(uint sourceid)
@@ -344,11 +344,12 @@ bool SourceUtil::IsAnySourceScanable(void)
 
 bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString cardtype)
 {
-    QString cmd = "mythfilldatabase --only-update-channels ";
+    QString cmd = "mythfilldatabase --only-update-channels";
     if (sourceid)
-        cmd += QString("--sourceid %1 ").arg(sourceid);
+        cmd += QString(" --sourceid %1").arg(sourceid);
     if (!cardtype.isEmpty())
-        cmd += QString("--cardtype %1 ").arg(cardtype);
+        cmd += QString(" --cardtype %1").arg(cardtype);
+    cmd += logPropagateArgs;
 
     myth_system(cmd);
 

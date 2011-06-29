@@ -26,7 +26,6 @@ using namespace std;
 
 #include "mythdb.h"
 #include "mythdirs.h"
-#include "mythverbose.h"
 #include "mythlogging.h"
 
 #ifndef O_STREAMING
@@ -1768,7 +1767,7 @@ QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
         tmpInfo->SubstituteMatches(command);
 
         command.replace("%VERBOSELEVEL%",
-                        QString("%1").arg(print_verbose_messages));
+                        QString("%1").arg(verboseMask));
 
         uint transcoder = tmpInfo->QueryTranscoderID();
         command.replace("%TRANSPROFILE%",
@@ -1883,10 +1882,11 @@ void JobQueue::DoTranscodeThread(int jobID)
     if (runningJobs[jobID].command == "mythtranscode")
     {
         path = GetInstallPrefix() + "/bin/mythtranscode";
-        QByteArray parg = profilearg.toAscii();
-        command = QString("%1 -j %2 -V %3 -p %4 %5")
-          .arg(path).arg(jobID).arg(print_verbose_messages)
-          .arg(parg.constData()).arg(useCutlist ? "-l" : "");
+        command = QString("%1 -j %2 --profile %3")
+                  .arg(path).arg(jobID).arg(profilearg);
+        if (useCutlist)
+            command += " --honorcutlist";
+        command += logPropagateArgs;
     }
     else
     {
@@ -2123,8 +2123,9 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
     if (runningJobs[jobID].command == "mythcommflag")
     {
         path = GetInstallPrefix() + "/bin/mythcommflag";
-        command = QString("%1 -j %2 -V %3")
-                          .arg(path).arg(jobID).arg(print_verbose_messages);
+        command = QString("%1 -j %2 --noprogress")
+                          .arg(path).arg(jobID);
+        command += logPropagateArgs;
     }
     else
     {
@@ -2138,7 +2139,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
     VERBOSE(VB_JOBQUEUE, LOC + QString("Running command: '%1'").arg(command));
 
     breaksFound = myth_system(command);
-    int priority = LP_NOTICE;
+    int priority = LOG_NOTICE;
     QString comment;
 
     runningJobsLock->lock();
@@ -2148,25 +2149,25 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
     {
         comment = tr("Unable to find mythcommflag");
         ChangeJobStatus(jobID, JOB_ERRORED, comment);
-        priority = LP_WARNING;
+        priority = LOG_WARNING;
     }
     else if (runningJobs[jobID].flag == JOB_STOP)
     {
         comment = tr("Aborted by user");
         ChangeJobStatus(jobID, JOB_ABORTED, comment);
-        priority = LP_WARNING;
+        priority = LOG_WARNING;
     }
     else if (breaksFound == GENERIC_EXIT_NO_RECORDING_DATA)
     {
         comment = tr("Unable to open file or init decoder");
         ChangeJobStatus(jobID, JOB_ERRORED, comment);
-        priority = LP_WARNING;
+        priority = LOG_WARNING;
     }
     else if (breaksFound >= GENERIC_EXIT_NOT_OK) // 256 or above - error
     {
         comment = tr("Failed with exit status %1").arg(breaksFound);
         ChangeJobStatus(jobID, JOB_ERRORED, comment);
-        priority = LP_WARNING;
+        priority = LOG_WARNING;
     }
     else
     {
@@ -2195,7 +2196,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
         details = detailstr.toLocal8Bit();
     }
 
-    if (priority <= LP_WARNING)
+    if (priority <= LOG_WARNING)
         VERBOSE(VB_IMPORTANT, LOC_ERR + msg + ": " + details.constData());
 
     RemoveRunningJob(jobID);
@@ -2282,6 +2283,7 @@ void JobQueue::DoUserJobThread(int jobID)
         if (pginfo)
         {
             msg = QString("Finished %1 for %2 recorded from channel %3")
+                .arg(jobDesc)
                 .arg(pginfo->toString(ProgramInfo::kTitleSubtitle))
                 .arg(pginfo->toString(ProgramInfo::kRecordingKey));
         }

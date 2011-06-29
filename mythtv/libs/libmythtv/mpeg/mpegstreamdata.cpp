@@ -35,10 +35,12 @@ void init_sections(sections_t &sect, uint last_section)
     sect[endz] = init_bits[last_section & 0x7];
 
 #if 0
-    cerr<<"init_sections ls("<<last_section<<"): "<<hex;
-    for (uint i = 0 ; i < 32; i++)
-        cerr<<((int)sect[i])<<" ";
-    cerr<<dec<<endl;
+    {
+        QString msg = QString("init_sections ls(%1): ").arg(last_section);
+        for (uint i = 0 ; i < 32; i++)
+            msg += QString("%1 ").arg((int)sect[i], 0, 16);
+        VERBOSE(VB_GENERAL, msg);
+    }
 #endif
 }
 

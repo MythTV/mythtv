@@ -13,7 +13,6 @@ using namespace std;
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythdb.h"
-#include "mythverbose.h"
 #include "mythversion.h"
 #include "util.h"
 #include "mythtranslation.h"
@@ -21,7 +20,7 @@ using namespace std;
 #include "mythconfig.h"
 
 // libmythtv headers
-#include "mythcommandlineparser.h"
+#include "commandlineparser.h"
 #include "scheduledrecording.h"
 #include "remoteutil.h"
 #include "videosource.h" // for is_grabber..
@@ -112,6 +111,11 @@ int main(int argc, char *argv[])
         cmdline.PrintVersion();
         return GENERIC_EXIT_OK;
     }
+
+    if (cmdline.toBool("verbose"))
+        if (verboseArgParse(cmdline.toString("verbose")) ==
+                        GENERIC_EXIT_INVALID_CMDLINE)
+            return GENERIC_EXIT_INVALID_CMDLINE;
 
     if (cmdline.toBool("manual"))
     {
@@ -254,13 +258,16 @@ int main(int argc, char *argv[])
         quiet = cmdline.toUInt("quiet");
         if (quiet > 1)
         {
-            print_verbose_messages = VB_NONE;
-            parse_verbose_arg("none");
+            verboseMask = VB_NONE;
+            verboseArgParse("none");
         }
     }
 
     int facility = cmdline.GetSyslogFacility();
     bool dblog = !cmdline.toBool("nodblog");
+    LogLevel_t level = cmdline.GetLogLevel();
+    if (level == LOG_UNKNOWN)
+        return GENERIC_EXIT_INVALID_CMDLINE;
 
     mark_repeats = cmdline.toBool("markrepeats");
     if (cmdline.toBool("exporticonmap"))
@@ -283,7 +290,8 @@ int main(int argc, char *argv[])
     CleanupGuard callCleanup(cleanup);
 
     QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet, facility, dblog);
+    bool propagate = cmdline.toBool("islogpath");
+    logStart(logfile, quiet, facility, level, dblog, propagate);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))

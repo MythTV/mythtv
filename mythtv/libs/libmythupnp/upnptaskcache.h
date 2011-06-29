@@ -24,6 +24,9 @@
 #ifndef __UPNPTASKCACHE_H__
 #define __UPNPTASKCACHE_H__
 
+#include <QString>
+
+#include "mythlogging.h"
 #include "upnp.h"
 
 /////////////////////////////////////////////////////////////////////////////

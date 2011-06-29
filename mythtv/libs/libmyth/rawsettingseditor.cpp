@@ -1,6 +1,6 @@
 
 #include "mythcorecontext.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythuibutton.h"
 #include "mythuibuttonlist.h"
 #include "mythuitext.h"
@@ -51,7 +51,8 @@ bool RawSettingsEditor::Create(void)
 
     if (!m_settingsList || !m_textLabel || !m_saveButton || !m_cancelButton)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        LOG(VB_GENERAL, LOG_EMERG,
+                 "Theme is missing critical theme elements.");
         return false;
     }
 

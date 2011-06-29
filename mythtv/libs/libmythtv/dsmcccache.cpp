@@ -11,7 +11,7 @@
 #include "dsmccreceiver.h"
 #include "dsmcc.h"
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 /** \class DSMCCCache
  *

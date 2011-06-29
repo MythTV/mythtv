@@ -11,7 +11,6 @@
 #include "mythuiimage.h"
 #include "osd.h"
 #include "mythdirs.h"
-#include "mythverbose.h"
 #include "myth_imgconvert.h"
 #include "mythlogging.h"
 

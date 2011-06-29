@@ -17,23 +17,27 @@ QMAKE_CLEAN += version.cpp
 
 # Input
 
+HEADERS += mmulticastsocketdevice.h     mbroadcastsocketdevice.h
 HEADERS += httprequest.h upnp.h ssdp.h taskqueue.h upnpsubscription.h
 HEADERS += upnpdevice.h upnptasknotify.h upnptasksearch.h threadpool.h upnputil.h
 HEADERS += httpserver.h upnpcds.h upnpcdsobjects.h bufferedsocketdevice.h upnpmsrr.h
 HEADERS += eventing.h upnpcmgr.h upnptaskevent.h upnptaskcache.h ssdpcache.h
-HEADERS += upnpimpl.h multicast.h broadcast.h configuration.h
+HEADERS += configuration.h
 HEADERS += soapclient.h mythxmlclient.h mmembuf.h upnpexp.h
+HEADERS += upnpserviceimpl.h
 HEADERS += servicehost.h wsdl.h htmlserver.h serverSideScripting.h
 
 HEADERS += serializers/serializer.h     serializers/xmlSerializer.h 
 HEADERS += serializers/jsonSerializer.h serializers/soapSerializer.h
 
+SOURCES += mmulticastsocketdevice.cpp
 SOURCES += httprequest.cpp upnp.cpp ssdp.cpp taskqueue.cpp upnputil.cpp
 SOURCES += upnpdevice.cpp upnptasknotify.cpp upnptasksearch.cpp threadpool.cpp
 SOURCES += httpserver.cpp upnpcds.cpp upnpcdsobjects.cpp bufferedsocketdevice.cpp
 SOURCES += eventing.cpp upnpcmgr.cpp upnpmsrr.cpp upnptaskevent.cpp ssdpcache.cpp
 SOURCES += configuration.cpp soapclient.cpp mythxmlclient.cpp mmembuf.cpp
-SOURCES += multicast.cpp htmlserver.cpp serverSideScripting.cpp
+SOURCES += upnpserviceimpl.cpp
+SOURCES += htmlserver.cpp serverSideScripting.cpp
 SOURCES += servicehost.cpp wsdl.cpp upnpsubscription.cpp
 
 SOURCES += serializers/serializer.cpp     serializers/xmlSerializer.cpp
@@ -59,7 +63,7 @@ inc.files  = httprequest.h upnp.h ssdp.h taskqueue.h bufferedsocketdevice.h
 inc.files += upnpdevice.h upnptasknotify.h upnptasksearch.h threadpool.h upnputil.h
 inc.files += httpserver.h httpstatus.h upnpcds.h upnpcdsobjects.h
 inc.files += eventing.h upnpcmgr.h upnptaskevent.h upnptaskcache.h ssdpcache.h
-inc.files += upnpimpl.h multicast.h broadcast.h configuration.h
+inc.files += upnpimpl.h configuration.h
 inc.files += soapclient.h mythxmlclient.h mmembuf.h upnpsubscription.h
 inc.files += servicehost.h wsdl.h htmlserver.h serverSideScripting.h
 

@@ -16,7 +16,7 @@ using namespace std;
 // MythTV headers
 #include "compat.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythplayer.h"
 #include "programinfo.h"
 #include "channelutil.h"
@@ -481,7 +481,7 @@ void CommDetector2::reportState(int elapsedms, long long frameno,
     if (percentage % 10 == 0 && prevpercent != percentage)
     {
         prevpercent = percentage;
-        VERBOSE(VB_GENERAL|VB_EXTRA, QString("%1% Completed @ %2 fps.")
+        VERBOSE(VB_GENERAL|VB_EXTRA, QString("%1%% Completed @ %2 fps.")
             .arg(percentage) .arg(fps));
     }
 }

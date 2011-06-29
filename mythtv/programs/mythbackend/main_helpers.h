@@ -6,7 +6,7 @@
 #include <fstream>
 using namespace std;
 
-class MythCommandLineParser;
+class MythBackendCommandLineParser;
 class QString;
 class QSize;
 

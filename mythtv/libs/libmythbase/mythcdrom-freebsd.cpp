@@ -4,7 +4,7 @@
 
 #include "mythcdrom.h"
 #include "mythcdrom-freebsd.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 
 #define ASSUME_WANT_AUDIO 1
@@ -81,13 +81,15 @@ MythMediaError MythCDROMFreeBSD::unlock()
 {
     if (isDeviceOpen() || openDevice()) 
     { 
-        //VERBOSE(VB_GENERAL, "Unlocking CDROM door");
+#if 0
+        LOG(VB_GENERAL, LOG_DEBUG, "Unlocking CDROM door");
+#endif
         ioctl(m_DeviceHandle, CDIOCALLOW);
     }
     else
     {
-        VERBOSE(VB_GENERAL, "Failed to open device, CDROM try will remain "
-                            "locked.");
+        LOG(VB_GENERAL, LOG_INFO, "Failed to open device, CDROM try will "
+                                  "remain locked.");
     }
 
     return MythMediaDevice::unlock();

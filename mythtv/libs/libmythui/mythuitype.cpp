@@ -8,7 +8,7 @@
 #include <QDomDocument>
 
 // Mythdb headers
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 // MythUI headers
 #include "mythgesture.h"
@@ -588,6 +588,14 @@ void MythUIType::AdjustMinArea(int delta_x, int delta_y)
     m_MinArea.setWidth(bound.width());
     m_MinArea.setHeight(bound.height());
     m_Vanished = false;
+
+    QList<MythUIType*>::iterator it;
+
+    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+    {
+        if (!(*it)->m_Initiator)
+            (*it)->AdjustMinArea(delta_x, delta_y);
+    }
 }
 
 void MythUIType::VanishSibling(void)
@@ -600,6 +608,14 @@ void MythUIType::VanishSibling(void)
     m_MinArea.setWidth(0);
     m_MinArea.setHeight(0);
     m_Vanished = true;
+
+    QList<MythUIType*>::iterator it;
+
+    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+    {
+        if (!(*it)->m_Initiator)
+            (*it)->VanishSibling();
+    }
 }
 
 /**

@@ -10,7 +10,7 @@
 #include <sys/select.h>
 #endif
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythdbcon.h"
 #include "hdhrsignalmonitor.h"
 #include "atscstreamdata.h"

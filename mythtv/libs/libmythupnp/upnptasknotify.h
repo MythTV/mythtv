@@ -36,9 +36,10 @@
 #include <QMutex>
 
 // MythTV headers
-#include <msocketdevice.h>
-#include "multicast.h"
 #include "compat.h"
+
+class MSocketDevice;
+class UPnpDevice;
 
 /////////////////////////////////////////////////////////////////////////////
 // Typedefs
@@ -77,8 +78,8 @@ class UPnpNotifyTask : public Task
 
         virtual ~UPnpNotifyTask();
 
-        void     ProcessDevice( QMulticastSocket *pSocket, UPnpDevice *pDevice );
-        void     SendNotifyMsg( QMulticastSocket *pSocket, QString sNT, QString sUDN );
+        void     ProcessDevice( MSocketDevice *pSocket, UPnpDevice *pDevice );
+        void     SendNotifyMsg( MSocketDevice *pSocket, QString sNT, QString sUDN );
 
     public:
 

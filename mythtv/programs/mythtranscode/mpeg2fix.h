@@ -278,10 +278,10 @@ class MPEG2fixup
 
     using namespace std;
 
-    extern int print_verbose_messages;
+    extern int verboseMask;
     #define VERBOSE(mask,args...) \
     do { \
-        if ((print_verbose_messages & mask) != 0) \
+        if ((verboseMask & mask) != 0) \
         { \
             cout << args << endl; \
         } \

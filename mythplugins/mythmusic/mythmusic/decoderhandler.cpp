@@ -11,7 +11,7 @@
 // mythtv
 #include <mythdownloadmanager.h>
 #include <mythdirs.h>
-#include <mythverbose.h>
+#include <mythlogging.h>
 
 // mythmusic
 #include "decoderhandler.h"

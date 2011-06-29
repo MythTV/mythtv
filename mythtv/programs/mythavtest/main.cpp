@@ -10,11 +10,10 @@ using namespace std;
 
 #include "tv_play.h"
 #include "programinfo.h"
-#include "mythcommandlineparser.h"
+#include "commandlineparser.h"
 
 #include "exitcodes.h"
 #include "mythcontext.h"
-#include "mythverbose.h"
 #include "mythversion.h"
 #include "mythdbcon.h"
 #include "compat.h"
@@ -56,7 +55,7 @@ int main(int argc, char *argv[])
     QString filename = "";
 
     if (cmdline.toBool("verbose"))
-        if (parse_verbose_arg(cmdline.toString("verbose")) ==
+        if (verboseArgParse(cmdline.toString("verbose")) ==
                         GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
 
@@ -65,16 +64,20 @@ int main(int argc, char *argv[])
         quiet = cmdline.toUInt("quiet");
         if (quiet > 1)
         {
-            print_verbose_messages = VB_NONE;
-            parse_verbose_arg("none");
+            verboseMask = VB_NONE;
+            verboseArgParse("none");
         }
     }
 
     int facility = cmdline.GetSyslogFacility();
     bool dblog = !cmdline.toBool("nodblog");
+    LogLevel_t level = cmdline.GetLogLevel();
+    if (level == LOG_UNKNOWN)
+        return GENERIC_EXIT_INVALID_CMDLINE;
 
     QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet, facility, dblog);
+    bool propagate = cmdline.toBool("islogpath");
+    logStart(logfile, quiet, facility, level, dblog, propagate);
 
     if (!cmdline.toString("display").isEmpty())
     {

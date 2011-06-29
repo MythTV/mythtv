@@ -10,7 +10,11 @@
 #endif
 #include <stdint.h>
 #include <time.h>
+#include <unistd.h>
+#include <errno.h>
+
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
+#include "verbosedefs.h"
 
 #define LOGLINE_MAX 2048
 
@@ -40,12 +44,29 @@ const char *LogLevelNames[] =
     "LOG_DEBUG",
     "LOG_UNKNOWN"
 };
-int LogLevelNameCount = sizeof(LogLevelNames)/sizeof(LogLevelNames[0]);
+int LogLevelNameCount = sizeof(LogLevelNames) / sizeof(LogLevelNames[0]);
+
+const char LogLevelShortNames[] =
+{
+    '!',
+    'A',
+    'C',
+    'E',
+    'W',
+    'N',
+    'I',
+    'D',
+    '-'
+};
+int LogLevelShortNameCount = sizeof(LogLevelShortNames) / 
+                             sizeof(LogLevelShortNames[0]);
 #else
 extern MBASE_PUBLIC char *LogLevelNames[];
 extern MBASE_PUBLIC int LogLevelNameCount;
+extern MBASE_PUBLIC char *LogLevelShortNames[];
+extern MBASE_PUBLIC int LogLevelShortNameCount;
 #endif
-extern MBASE_PUBLIC LogLevel_t LogLevel;
+extern MBASE_PUBLIC LogLevel_t logLevel;
 
 typedef struct
 {
@@ -69,13 +90,15 @@ typedef struct
 extern "C" {
 #endif
 
-#define LogPrintQString(mask, level, string) \
+#ifdef __cplusplus
+#define LOG(mask, level, string) \
     LogPrintLine(mask, (LogLevel_t)level, __FILE__, __LINE__, __FUNCTION__, \
                  QString(string).toLocal8Bit().constData())
-
-#define LogPrint(mask, level, format, ...) \
+#else
+#define LOG(mask, level, format, ...) \
     LogPrintLine(mask, (LogLevel_t)level, __FILE__, __LINE__, __FUNCTION__, \
                  (const char *)format, ##__VA_ARGS__)
+#endif
 
 /* Define the external prototype */
 MBASE_PUBLIC void LogPrintLine( uint32_t mask, LogLevel_t level, 
@@ -85,14 +108,19 @@ MBASE_PUBLIC void LogPrintLine( uint32_t mask, LogLevel_t level,
 #ifdef __cplusplus
 }
 
+extern MBASE_PUBLIC QString logPropagateArgs;
+
 MBASE_PUBLIC void logStart(QString logfile, int quiet = 0, int facility = 0,
-                           bool dblog = true);
+                           LogLevel_t level = LOG_INFO, bool dblog = true, 
+                           bool propagate = false);
 MBASE_PUBLIC void logStop(void);
+MBASE_PUBLIC void logPropagateCalc(void);
+MBASE_PUBLIC bool logPropagateQuiet(void);
+
 MBASE_PUBLIC void threadRegister(QString name);
 MBASE_PUBLIC void threadDeregister(void);
 MBASE_PUBLIC int  syslogGetFacility(QString facility);
-
-void LogTimeStamp( time_t *epoch, uint32_t *usec );
+MBASE_PUBLIC LogLevel_t logLevelGet(QString level);
 
 typedef union {
     char   *string;
@@ -124,6 +152,7 @@ class FileLogger : public LoggerBase {
         int  m_fd;
 };
 
+#ifndef _WIN32
 class SyslogLogger : public LoggerBase {
     public:
         SyslogLogger(int facility);
@@ -134,6 +163,7 @@ class SyslogLogger : public LoggerBase {
         char *m_application;
         bool m_opened;
 };
+#endif
 
 class DBLoggerThread;
 
@@ -148,6 +178,7 @@ class DatabaseLogger : public LoggerBase {
         bool logqmsg(LoggingItem_t *item);
     private:
         bool isDatabaseReady();
+        bool tableExists(const QString &table);
 
         DBLoggerThread *m_thread;
         char *m_host;
@@ -193,6 +224,44 @@ class DBLoggerThread : public QThread {
 };
 #endif
 
+/// This global variable is set at startup with the flags
+/// of the verbose messages we want to see.
+extern MBASE_PUBLIC uint64_t verboseMask;
+
+// Helper for checking verbose flags outside of VERBOSE macro
+#define VERBOSE_LEVEL_NONE        (verboseMask == 0)
+#define VERBOSE_LEVEL_CHECK(mask) ((verboseMask & (mask)) == (mask))
+
+// There are two VERBOSE macros now.  One for use with Qt/C++, one for use
+// without Qt.
+//
+// Neither of them will lock the calling thread, but rather put the log message
+// onto a queue.
+
+#ifdef __cplusplus
+#define VERBOSE(mask, ...) \
+    LOG((uint64_t)(mask), LOG_INFO, QString(__VA_ARGS__))
+#else
+#define VERBOSE(mask, ...) \
+    LOG((uint64_t)(mask), LOG_INFO, __VA_ARGS__)
+#endif
+
+
+#ifdef  __cplusplus
+/// Verbose helper function for ENO macro
+extern MBASE_PUBLIC QString logStrerror(int errnum);
+
+extern MBASE_PUBLIC QString verboseString;
+
+MBASE_PUBLIC int verboseArgParse(QString arg);
+
+/// This can be appended to the LOG args with 
+/// "+".  Please do not use "<<".  It uses
+/// a thread safe version of strerror to produce the
+/// string representation of errno and puts it on the
+/// next line in the verbose output.
+#define ENO QString("\n\t\t\teno: ") + logStrerror(errno)
+#endif // __cplusplus
 
 #endif
 

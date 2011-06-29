@@ -31,7 +31,7 @@
 
             var embedPage = "http://www.bbc.co.uk/iplayer/episode/";
             embedPage = embedPage.concat(video_id);
-            embedPage = embedPage.concat("/Top_Gear_Series_13_Episode_1_(new_series)/?t=00m01s");
+<!--            embedPage = embedPage.concat("/Top_Gear_Series_13_Episode_1_(new_series)/?t=00m01s");-->
 
             var pl = "http://www.bbc.co.uk/iplayer/playlist/";
             pl = pl.concat(video_id);
@@ -95,7 +95,7 @@
 
             var attributes = { id: "mybbcplayer" };
 
-            swfobject.embedSWF("http://www.bbc.co.uk/emp/9player.swf?revision=10344_10570", "myth_player", window.innerWidth, window.innerHeight, "9.0.0", "expressInstall.swf", flashvars, params, attributes);
+            swfobject.embedSWF("http://www.bbc.co.uk/emp/10player.swf?revision=10344_10570", "myth_player", window.innerWidth, window.innerHeight, "9.0.0", "expressInstall.swf", flashvars, params, attributes);
 
             function onPlayerReady(playerId) {
                 myth_player = document.getElementById("mybbcplayer");

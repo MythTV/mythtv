@@ -10,7 +10,7 @@
 #include "mediamonitor-windows.h"
 #include "mythcdrom.h"
 #include "mythhdd.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 
 /**
@@ -44,7 +44,7 @@ MediaMonitorWindows::MediaMonitorWindows(QObject* par,
 
         if (!media)
         {
-            VERBOSE(VB_IMPORTANT,
+            LOG(VB_GENERAL, LOG_ALERT,
                     "Error. Couldn't create MythMediaDevice.");
             return;
         }
@@ -61,14 +61,15 @@ MediaMonitorWindows::MediaMonitorWindows(QObject* par,
         AddDevice(media);
     }
 
-    VERBOSE(VB_MEDIA, "Initial device list: " + listDevices());
+    LOG(VB_MEDIA, LOG_INFO, "Initial device list: " + listDevices());
 }
 
 bool MediaMonitorWindows::AddDevice(MythMediaDevice *pDevice)
 {
     if (!pDevice)
     {
-        VERBOSE(VB_IMPORTANT, "Error - MediaMonitorWindows::AddDevice(null)");
+        LOG(VB_GENERAL, LOG_ALERT, 
+                 "Error - MediaMonitorWindows::AddDevice(null)");
         return false;
     }
 
@@ -82,9 +83,10 @@ bool MediaMonitorWindows::AddDevice(MythMediaDevice *pDevice)
     {
         if ((*itr)->getDevicePath() == path)
         {
-            VERBOSE(VB_MEDIA, "MediamonitorWindows::AddDevice() -- " +
-                    QString("Not adding '%1', it appears to be a duplicate.")
-                    .arg(path));
+            LOG(VB_MEDIA, LOG_INFO, 
+                     "MediamonitorWindows::AddDevice() -- " +
+                     QString("Not adding '%1', it appears to be a duplicate.")
+                         .arg(path));
 
             return false;
         }

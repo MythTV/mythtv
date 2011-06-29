@@ -566,7 +566,7 @@
         </textarea>
 
         <textarea name="dirlbl" from="basetextarea">
-            <area>380,50,165,35</area>
+            <area>380,63,165,35</area>
             <value>Directed by</value>
         </textarea>
 
@@ -628,7 +628,7 @@
         </textarea>
 
         <textarea name="novideos" from="basetextarea">
-            <area>250,130,540,70</area>
+            <area>250,500,780,200</area>
             <multiline>yes</multiline>
             <align>hcenter,vcenter</align>
             <value>No videos in library, or no files found.  If you have configured a video directory, press "M" (or the MENU key) and select "Scan for Changes."</value>

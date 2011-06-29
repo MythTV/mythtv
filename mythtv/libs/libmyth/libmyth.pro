@@ -29,7 +29,7 @@ HEADERS += settings.h
 HEADERS += uilistbtntype.h uitypes.h
 HEADERS += volumebase.h visual.h xmlparse.h
 HEADERS += storagegroupeditor.h
-HEADERS += mythcommandlineparser.h mythterminal.h
+HEADERS += mythterminal.h
 HEADERS += remoteutil.h
 HEADERS += rawsettingseditor.h    hardwareprofile.h
 HEADERS += programinfo.h          programinfoupdater.h
@@ -59,7 +59,7 @@ SOURCES += output.cpp
 SOURCES += settings.cpp
 SOURCES += uilistbtntype.cpp uitypes.cpp
 SOURCES += storagegroupeditor.cpp
-SOURCES += mythcommandlineparser.cpp mythterminal.cpp
+SOURCES += mythterminal.cpp
 SOURCES += remoteutil.cpp
 SOURCES += rawsettingseditor.cpp  hardwareprofile.cpp
 SOURCES += programinfo.cpp        programinfoupdater.cpp
@@ -88,6 +88,7 @@ LIBS += -L../libmythbase           -lmythbase-$${LIBVERSION}
 LIBS += -L../libmythui           -lmythui-$${LIBVERSION}
 LIBS += -L../libmythupnp         -lmythupnp-$${LIBVERSION}
 LIBS += -L../libmythfreesurround -lmythfreesurround-$${LIBVERSION}
+LIBS += -L../libmythservicecontracts -lmythservicecontracts-$${LIBVERSION}
 LIBS += -L../../external/FFmpeg/libavcodec -lmythavcodec
 LIBS += -L../../external/FFmpeg/libavutil  -lmythavutil
 LIBS += -L../../external/FFmpeg/libavformat  -lmythavformat
@@ -115,7 +116,7 @@ inc.files += remoteutil.h         filesysteminfo.h
 inc.files += programinfo.h        hardwareprofile.h
 inc.files += programtypes.h       recordingtypes.h
 inc.files += mythrssmanager.h     netgrabbermanager.h
-inc.files += rssparse.h           netutils.h mythcommandlineparser.h
+inc.files += rssparse.h           netutils.h
 
 # remove when everything is switched to mythui
 inc.files += virtualkeyboard_qt.h
@@ -178,7 +179,7 @@ macx {
     }
 
     # Mac OS X Frameworks
-    FWKS = ApplicationServices AudioUnit Carbon CoreAudio IOKit
+    FWKS = ApplicationServices AudioUnit AudioToolbox Carbon CoreAudio IOKit
 
     darwin_da : FWKS += DiskArbitration
 

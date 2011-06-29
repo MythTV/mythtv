@@ -3,8 +3,9 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <stdio.h>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "cc708reader.h"
 #include "cc708decoder.h"
 
@@ -187,13 +188,13 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
         dlc_loc = blk_size - 1;
     }
 
-/*
-  av_log(NULL, AV_LOG_ERROR,
-  "cc_ss delayed(%i) blk_start(%i) blk_size(%i)\n",
-  cc->delayed, blk_start, blk_size);
-*/
+#if 0
+    LOG(VB_GENERAL, LOG_ERR,
+        QString("cc_ss delayed(%1) blk_start(%2) blk_size(%3)")
+            .arg(cc->delayed) .arg(blk_start) .arg(blk_size));
+#endif
 
-    for (int i = (cc->delayed[service_num]) ? blk_size : blk_start;
+    for (i = (cc->delayed[service_num]) ? blk_size : blk_start;
          i < blk_size; )
     {
         const int old_i = i;
@@ -229,21 +230,23 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
         }
 
 #if DEBUG_CC_SERVICE
-        fprintf(stderr, "i %i, blk_size %i\n", i, blk_size);
+        LOG(VB_GENERAL, LOG_DEBUG, QString("i %1, blk_size %2").arg(i)
+                .arg(blk_size));
 #endif
 
         // loop continuation check
         if (old_i == i)
         {
 #if DEBUG_CC_SERVICE
-            fprintf(stderr, "old_i == i == %i\n", i);
+            LOG(VB_GENERAL, LOG_DEBUG, QString("old_i == i == %1").arg(i));
+            QString msg;
             for (int j = 0; j < blk_size; j++)
-                fprintf(stderr, "0x%x ", cc->buf[service_num][j]);
-            fprintf(stderr, "\n");
+                msg += QString("0x%1 ").arg(cc->buf[service_num][j], 0, 16);
+            LOG(VB_GENERAL, LOG_DEBUG, msg);
 #endif
             if (blk_size - i > 10)
             {
-                fprintf(stderr, "eia-708 decoding error...");
+                LOG(VB_GENERAL, LOG_INFO, "eia-708 decoding error...");
                 cc->Reset(service_num);
                 cc->delayed[service_num] = 0;
                 i = cc->buf_size[service_num];
@@ -276,11 +279,12 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
     {
         if (0 != (blk_size - i))
         {
-            fprintf(stderr, "parse_cc_service_stream buffer error "
-                    "i(%i) buf_size(%i)\n", i, blk_size);
+            LOG(VB_GENERAL, LOG_ERR, QString("buffer error i(%1) buf_size(%2)")
+                .arg(i).arg(blk_size));
+            QString msg;
             for (i=0; i < blk_size; i++)
-                fprintf(stderr, "0x%x ", cc->buf[service_num][i]);
-            fprintf(stderr, "\n");
+                msg += QString("0x%1 ").arg(cc->buf[service_num][i], 0, 16);
+            LOG(VB_GENERAL, LOG_ERR, msg);
         }
         cc->buf_size[service_num] = 0;
     }
@@ -479,8 +483,9 @@ static int handle_cc_c1(CC708Reader* cc, uint service_num, int i)
 #if DEBUG_CC_SERVICE
     else
     {
-        fprintf(stderr, "handle_cc_c1: (NOT HANDLED) "
-                "code(0x%02x) i(%i) blk_size(%i)\n", code, i, blk_size);
+        LOG(VB_GENERAL, LOG_ERR, QString("handle_cc_c1: (NOT HANDLED) "
+                "code(0x%1) i(%2) blk_size(%3)").arg(code, 2, 16, '0')
+                .arg(i).arg(blk_size));
     }
 #endif
 
@@ -556,8 +561,8 @@ static void rightsize_buf(CC708Reader* cc, uint service_num, uint block_size)
         cc->buf_alloc[service_num] = (cc->buf[service_num]) ? new_alloc : 0;
 
 #if DEBUG_CC_SERVICE_2
-        fprintf(stderr, "rightsize_buf: srv %i to %i bytes",
-                service_num, cc->buf_alloc[service_num]);
+        LOG(VB_GENERAL, LOG_DEBUG, QString("rightsize_buf: srv %1 to %1 bytes")
+                .arg(service_num) .arg(cc->buf_alloc[service_num]));
 #endif
     }
     assert(min_new_size < cc->buf_alloc[service_num]);
@@ -576,10 +581,10 @@ static void append_cc(CC708Reader* cc, uint service_num,
 #if DEBUG_CC_SERVICE_2
     {
         uint i;
-        fprintf(stderr, "append_cc: ");
+	QString msg("append_cc: ");
         for (i = 0; i < cc->buf_size[service_num]; i++)
-            fprintf(stderr, "0x%x ", cc->buf[service_num][i]);
-        fprintf(stderr, "\n");
+            msg += QString("0x%1").arg(cc->buf[service_num][i], 0, 16);
+        LOG(VB_GENERAL, LOG_DEBUG, msg);
     }
 #endif
     parse_cc_service_stream(cc, service_num);
@@ -609,11 +614,11 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
     {
         int j;
         int srv = (pkt_buf[off]>>5) & 0x7;
-        fprintf(stderr, "CC708 len %2i srv0 %i seq %i ",
-                len, srv, seq_num);
+        QString msg = QString("CC708 len %1 srv0 %2 seq %3 ").arg(len, 2)
+                          .arg(srv) .arg(seq_num);
         for (j = 0; j < pkt_size; j++)
-            fprintf(stderr, "0x%x ", pkt_buf[j]);
-        fprintf(stderr, "\n");
+            msg += QString("0x%1").arg(pkt_buf[j], 0, 16);
+        LOG(VB_GENERAL, LOG_DEBUG, msg);
     }
 
     assert(pkt_size<127);
@@ -625,14 +630,16 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
         block_data_offset = (0x7==service_number && block_size!=0) ?
             off+2 : off+1;
 #if DEBUG_CC_SERVICE_BLOCK
-        fprintf(stderr, "service_block size(%i) num(%i) off(%i) ",
-                block_size, service_number, block_data_offset);
+        LOG(VB_GENERAL, LOG_DEBUG, 
+            QString("service_block size(%1) num(%2) off(%3)")
+                .arg(block_size) .arg(service_number) .arg(block_data_offset));
 #endif
         if (off+2 == block_data_offset)
         {
             int extended_service_number = pkt_buf[off+2] & 0x3f;
 #if DEBUG_CC_SERVICE_BLOCK
-            fprintf(stderr, "ext_svc_num(%i) ", extended_service_number);
+            LOG(VB_GENERAL, LOG_DEBUG, QString("ext_svc_num(%1)")
+                   .arg(extended_service_number));
 #endif
             service_number =  extended_service_number;
         }
@@ -644,10 +651,11 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
                   0==pkt_buf[block_data_offset] &&
                   0==pkt_buf[block_data_offset+1]))
             {
-                fprintf(stderr, "service %i: ", service_number);
+                QString msg = QString("service %1: ").arg(service_number);
                 for (i=0; i<block_size; i++)
-                    fprintf(stderr, "0x%x ", pkt_buf[block_data_offset+i]);
-                fprintf(stderr, "\n");
+                    msg += QString("0x%1 ")
+                               .arg(pkt_buf[block_data_offset+i], 0, 16);
+                LOG(VB_GENERAL, LOG_DEBUG, msg);
             }
 #endif
             append_cc(cb_cbs, service_number,

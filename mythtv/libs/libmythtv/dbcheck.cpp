@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdio.h>
 using namespace std;
 
 #include <QString>
@@ -10,7 +11,7 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "schemawizard.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "diseqcsettings.h" // for convert_diseqc_db()
 #include "videodbcheck.h"
 

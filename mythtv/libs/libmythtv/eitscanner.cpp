@@ -15,7 +15,6 @@
 #include "scheduledrecording.h"
 #include "util.h"
 #include "mythdb.h"
-#include "mythverbose.h"
 #include "mythlogging.h"
 
 #define LOC QString("EITScanner: ")

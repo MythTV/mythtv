@@ -63,7 +63,7 @@ using namespace std;
 
 #include "osd.h"
 #include "mythconfig.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "videodisplayprofile.h"
 
 #define LOC     QString("VideoOutputQuartz::")
@@ -1228,20 +1228,20 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
 }
 
 bool VideoOutputQuartz::Init(int width, int height, float aspect,
-                             WId winid, int winx, int winy,
-                             int winw, int winh, MythCodecID codec_id)
+                             WId winid, const QRect &win_rect,
+                             MythCodecID codec_id)
 {
     VERBOSE(VB_PLAYBACK, LOC +
             QString("Init(WxH %1x%2, aspect=%3, winid=%4\n\t\t\t"
                     "win_bounds(x %5, y%6, WxH %7x%8))")
             .arg(width).arg(height).arg(aspect).arg(winid)
-            .arg(winx).arg(winy).arg(winw).arg(winh));
+            .arg(win_rect.x()).arg(win_rect.y())
+            .arg(win_rect.width()).arg(win_rect.height()));
 
     vbuffers.Init(kNumBuffers, true, kNeedFreeFrames,
                   kPrebufferFramesNormal, kPrebufferFramesSmall,
                   kKeepPrebuffer);
-    VideoOutput::Init(width, height, aspect, winid,
-                      winx, winy, winw, winh, codec_id);
+    VideoOutput::Init(width, height, aspect, winid, win_rect, codec_id);
 
     const QSize video_dim = window.GetVideoDim();
     data->srcWidth  = video_dim.width();
@@ -1317,9 +1317,9 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     if (data->drawInWindow)
     {
         // display_aspect and _dim have to be scaled to actual window size
-        float winWidth  = size_in_mm.width  * winw
+        float winWidth  = size_in_mm.width  * win_rect.width()
                           / get_int_CF(m, kCGDisplayWidth);
-        float winHeight = size_in_mm.height * winh
+        float winHeight = size_in_mm.height * win_rect.height()
                           / get_int_CF(m, kCGDisplayHeight);
         window.SetDisplayDim(QSize(winWidth, winHeight));
         window.SetDisplayAspect(winWidth / winHeight);

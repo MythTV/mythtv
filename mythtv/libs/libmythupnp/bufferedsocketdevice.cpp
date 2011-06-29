@@ -26,7 +26,7 @@
 #include "mythtimer.h"
 #include "bufferedsocketdevice.h"
 #include "upnputil.h"
-#include "mythverbose.h"  // for VERBOSE
+#include "mythlogging.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -210,8 +210,12 @@ int BufferedSocketDevice::ReadBytes()
 
     if (a)
     {
-        // for( long n = 0; n < a->count(); n++ )
-        //    cerr << a->at( n );
+#if 0
+        QString msg;
+        for( long n = 0; n < a->count(); n++ )
+            msg += QString("%1").arg(a->at(n));
+        VERBOSE(VB_GENERAL, msg);
+#endif
 
         m_bufRead.append( a );
     }

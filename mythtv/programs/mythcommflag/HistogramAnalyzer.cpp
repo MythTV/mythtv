@@ -7,6 +7,7 @@
 // MythTV headers
 #include "mythcorecontext.h"
 #include "mythplayer.h"
+#include "mythlogging.h"
 
 // Commercial Flagging headers
 #include "CommDetector2.h"

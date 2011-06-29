@@ -23,7 +23,7 @@
 #include "dvbstreamdata.h"
 #include "dtvrecorder.h"
 #include "programinfo.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mpegtables.h"
 #include "ringbuffer.h"
 #include "tv_rec.h"

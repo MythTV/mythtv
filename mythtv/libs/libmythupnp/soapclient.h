@@ -30,44 +30,50 @@
 
 #include "httpcomms.h"
 #include "upnputil.h"
+#include "upnpexp.h"
 
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-//
-//
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-
-class SOAPClient
+/// \brief Subclass SOAPClient to perform actions using the command URL.
+class UPNP_PUBLIC SOAPClient
 {
-    protected:
+  public:
+    SOAPClient(const QUrl    &url,
+               const QString &sNamespace,
+               const QString &sControlPath);
+    /// \brief Empty SOAPClient constructor. When this is used, Init()
+    ///        Must be called before SendSOAPRequest().
+    SOAPClient() {}
+    virtual ~SOAPClient() {}
 
-        QString m_sNamespace;
-        QString m_sControlPath;
-        QUrl    m_url;
+    bool Init(const QUrl    &url,
+              const QString &sNamespace,
+              const QString &sControlPath);
 
-    public:
+  protected:
+    int      GetNodeValue(const QDomNode &node,
+                          const QString  &sName,
+                          int             nDefault) const;
+    bool     GetNodeValue(const QDomNode &node,
+                          const QString  &sName,
+                          bool            bDefault) const;
+    QString  GetNodeValue(const QDomNode &node,
+                          const QString  &sName,
+                          const QString  &sDefault) const;
 
-                 SOAPClient( const QUrl    &url,
-                             const QString &sNamespace,
-                             const QString &sControlPath );
-        virtual ~SOAPClient();
+    QDomNode FindNode(const QString  &sName,
+                      const QDomNode &baseNode) const;
 
-    protected:
-
-        int     GetNodeValue( QDomNode &node, const QString &sName, int  nDefault );
-        bool    GetNodeValue( QDomNode &node, const QString &sName, bool bDefault );
-        QString GetNodeValue( QDomNode &node, const QString &sName, const QString &sDefault );
-
-        QDomNode FindNode( const QString &sName , QDomNode &baseNode );
-        QDomNode FindNode( QStringList   &sParts, QDomNode &curNode  );
-
-        QDomDocument SendSOAPRequest( const QString    &sMethod,
-                                            QStringMap &list,
-                                            int        &nErrCode,
-                                            QString    &sErrDesc,
-                                            bool        bInQtThread );
+    QDomDocument SendSOAPRequest(const QString &sMethod,
+                                 QStringMap    &list,
+                                 int           &nErrCode,
+                                 QString       &sErrDesc,
+                                 bool           bInQtThread);
+  private:
+    QDomNode FindNodeInternal(QStringList    &sParts,
+                              const QDomNode &curNode) const;
+  protected:
+    QUrl    m_url;
+    QString m_sNamespace;
+    QString m_sControlPath;
 };
 
 #endif

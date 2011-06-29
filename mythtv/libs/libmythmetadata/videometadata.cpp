@@ -11,7 +11,7 @@
 #include "remotefile.h"
 #include "remoteutil.h"
 #include "util.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "globals.h"
 #include "dbaccess.h"
 #include "videometadatalistmanager.h"

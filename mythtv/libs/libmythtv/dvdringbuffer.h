@@ -63,6 +63,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     void GetPartAndTitle(int &_part, int &_title) const
         { _part  = m_part; _title = m_title; }
     uint GetTotalTimeOfTitle(void);
+    float GetAspectOverride(void)     { return m_forcedAspect; }
     virtual bool IsBookmarkAllowed(void);
     virtual bool IsStreamed(void)     { return true; }
     virtual int  BestBufferSize(void) { return 2048; }
@@ -190,6 +191,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     QMap<uint, QList<uint64_t> > m_chapterMap;
 
     MythDVDPlayer *m_parent;
+    float          m_forcedAspect;
 
     // Private menu/button stuff
     void ActivateButton(void);

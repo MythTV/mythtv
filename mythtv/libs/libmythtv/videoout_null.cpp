@@ -2,7 +2,7 @@
 #include <iostream>
 using namespace std;
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "videoout_null.h"
 #include "videodisplayprofile.h"
 

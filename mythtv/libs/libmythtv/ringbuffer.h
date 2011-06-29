@@ -31,6 +31,15 @@ class BDRingBuffer;
 class LiveTVChain;
 class RemoteFile;
 
+enum RingBufferType
+{
+    kRingBuffer_Unknown = 0,
+    kRingBuffer_File,
+    kRingBuffer_DVD,
+    kRingBuffer_BD,
+    kRingBuffer_HTTP,
+};
+
 class MTV_PUBLIC RingBuffer : protected QThread
 {
   public:
@@ -62,6 +71,7 @@ class MTV_PUBLIC RingBuffer : protected QThread
     QString GetDecoderRate(void);
     QString GetStorageRate(void);
     QString GetAvailableBuffer(void);
+    uint    GetBufferSize(void) { return bufferSize; }
     long long GetWritePosition(void) const;
     /// \brief Returns the size of the file we are reading/writing,
     ///        or -1 if the query fails.
@@ -77,8 +87,8 @@ class MTV_PUBLIC RingBuffer : protected QThread
 
     // DVD and bluray methods
     bool IsDisc(void) const { return IsDVD() || IsBD(); }
-    bool IsDVD(void)  const { return DVD() != NULL;     }
-    bool IsBD(void)   const { return BD()  != NULL;     }
+    bool IsDVD(void)  const { return type == kRingBuffer_DVD; }
+    bool IsBD(void)   const { return type == kRingBuffer_BD;  }
     const DVDRingBuffer *DVD(void) const;
     const BDRingBuffer  *BD(void)  const;
     DVDRingBuffer *DVD(void);
@@ -141,7 +151,7 @@ class MTV_PUBLIC RingBuffer : protected QThread
     static const int kLiveTVOpenTimeout;
 
   protected:
-    RingBuffer();
+    RingBuffer(RingBufferType rbtype);
 
     void run(void); // QThread
     void CreateReadAheadBuffer(void);
@@ -164,6 +174,7 @@ class MTV_PUBLIC RingBuffer : protected QThread
     uint64_t UpdateStorageRate(uint64_t latest = 0);
 
   protected:
+    RingBufferType type;
     mutable QReadWriteLock poslock;
     long long readpos;            // protected by poslock
     long long writepos;           // protected by poslock

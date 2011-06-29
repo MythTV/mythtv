@@ -34,7 +34,7 @@
 
 #define ATTR_ALIGN(align) __attribute__ ((__aligned__ (align)))
 
-#define SHOW_MSG(msg) (msg & print_verbose_messages)
+#define SHOW_MSG(msg) (msg & verboseMask)
 
 static void *my_malloc(unsigned size, mpeg2_alloc_t reason)
 {
@@ -2445,7 +2445,7 @@ int MPEG2fixup::Start()
 }
 
 #ifdef NO_MYTH
-int print_verbose_messages = MPF_GENERAL | MPF_IMPORTANT;
+int verboseMask = MPF_GENERAL | MPF_IMPORTANT;
 
 void usage(char *s)
 {
@@ -2518,7 +2518,7 @@ int main(int argc, char **argv)
                 break;
 
             case 'd':
-                print_verbose_messages = atoi(optarg);
+                verboseMask = atoi(optarg);
                 break;
 
             case 'm':

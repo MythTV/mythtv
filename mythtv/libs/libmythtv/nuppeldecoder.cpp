@@ -19,7 +19,7 @@ using namespace std;
 #include "nuppeldecoder.h"
 #include "mythplayer.h"
 #include "remoteencoder.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "myth_imgconvert.h"
 #include "programinfo.h"
 
@@ -226,9 +226,9 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         fileheader.aspect = 4.0 / 3;
     current_aspect = fileheader.aspect;
 
+    GetPlayer()->SetKeyframeDistance(fileheader.keyframedist);
     GetPlayer()->SetVideoParams(fileheader.width, fileheader.height,
-                             fileheader.fps, fileheader.keyframedist,
-                             fileheader.aspect);
+                                fileheader.fps);
 
     video_width = fileheader.width;
     video_height = fileheader.height;
@@ -638,8 +638,8 @@ void release_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic)
     assert(pic->type == FF_BUFFER_TYPE_USER);
 
     NuppelDecoder *nd = (NuppelDecoder *)(c->opaque);
-    if (nd && nd->GetPlayer() && nd->GetPlayer()->getVideoOutput())
-        nd->GetPlayer()->getVideoOutput()->DeLimboFrame((VideoFrame*)pic->opaque);
+    if (nd && nd->GetPlayer())
+        nd->GetPlayer()->DeLimboFrame((VideoFrame*)pic->opaque);
 
     int i;
     for (i = 0; i < 4; i++)
@@ -1185,13 +1185,14 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                 continue;
             }
 
+            buf->aspect = current_aspect;
             buf->frameNumber = framesPlayed;
             GetPlayer()->ReleaseNextVideoFrame(buf, frameheader.timecode);
 
             // We need to make the frame available ourselves
             // if we are not using ffmpeg/avlib.
             if (directframe)
-                GetPlayer()->getVideoOutput()->DeLimboFrame(buf);
+                GetPlayer()->DeLimboFrame(buf);
 
             decoded_video_frame = buf;
             gotvideo = 1;
@@ -1333,9 +1334,9 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                     fileheader.aspect = 4.0 / 3;
                 current_aspect = fileheader.aspect;
 
+                GetPlayer()->SetKeyframeDistance(fileheader.keyframedist);
                 GetPlayer()->SetVideoParams(fileheader.width, fileheader.height,
-                                         fileheader.fps, fileheader.keyframedist,
-                                         fileheader.aspect);
+                                            fileheader.fps);
             }
         }
     }

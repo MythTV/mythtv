@@ -4,7 +4,7 @@
 
 #include "compat.h"
 #include "spdifencoder.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #define LOC QString("SPDIFEncoder: ")
 #define LOC_ERR QString("SPDIFEncoder, Error: ")

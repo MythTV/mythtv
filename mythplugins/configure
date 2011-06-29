@@ -175,7 +175,7 @@ MythMusic related options:
   --enable-sdl             use SDL for the synaesthesia output [$sdl]
 
 MythNetvision related options:
-  --enable-mythnetvision      build the mythnetvision plugin [$netvision]
+  --enable-mythnetvision   build the mythnetvision plugin [$netvision]
 
 MythNews related options:
   --enable-mythnews        build the mythnews plugin [$news]
@@ -713,7 +713,7 @@ if test "$gallery" = "yes" ; then
             fi
         else
             if test x"$newexif" = x"yes" ; then
-		echo "#define NEW_LIB_EXIF 1" >> \
+                echo "#define NEW_LIB_EXIF 1" >> \
                     ./mythgallery/mythgallery/config.h
             else
                 echo

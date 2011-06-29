@@ -32,6 +32,20 @@
 
 #include "hdhomerun_os.h"
 
+uint32_t random_get32(void)
+{
+	HCRYPTPROV hProv;
+	if (!CryptAcquireContext(&hProv, 0, 0, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)) {
+		return (uint32_t)rand();
+	}
+
+	uint32_t Result;
+	CryptGenRandom(hProv, sizeof(Result), (BYTE*)&Result);
+
+	CryptReleaseContext(hProv, 0);
+	return Result;
+}
+
 uint64_t getcurrenttime(void)
 {
 	static pthread_mutex_t lock = INVALID_HANDLE_VALUE;

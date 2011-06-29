@@ -122,6 +122,7 @@ Advanced options (experts only):
   --disable-xv             disable XVideo   (X11 video output accel.)
   --enable-vdpau           enable NVidia VDPAU hardware acceleration.
   --enable-crystalhd       enable Broadcom CrystalHD hardware decoder support
+  --enable-vaapi           enable VAAPI hardware accelerated video decoding
   --enable-dxva2           enable hardware accelerated decoding on windows
   --disable-opengl-video   disable OpenGL based video display
   --disable-quartz-video   disable Mac OS X CoreVideo based video display
@@ -1399,6 +1400,7 @@ USING_LIST='
     dxva2
     opengl
     opengles
+    vaapi
     vdpau
 '
 
@@ -1775,6 +1777,7 @@ v4l1_deps="backend v4l2 linux_videodev_h"
 vdpau_deps="opengl vdpau_vdpau_h vdpau_vdpau_x11_h"
 xrandr_deps="x11"
 xv_deps="x11"
+vaapi_deps="x11 opengl"
 asi_deps="backend"
 
 <<BLOCKQUOTE
@@ -3635,6 +3638,9 @@ check_header sys/select.h
 check_header termios.h
 check_header vdpau/vdpau.h
 check_header vdpau/vdpau_x11.h
+check_header va/va.h
+check_header va/va_x11.h
+check_header va/va_glx.h
 
 check_struct dxva2api.h DXVA_PictureParameters wDecodedPictureIndex
 
@@ -3912,6 +3918,16 @@ fi
 if enabled crystalhd; then
     check_lib libcrystalhd/libcrystalhd_if.h DtsCrystalHDVersion -lcrystalhd ||
         disable crystalhd;
+fi
+
+if enabled vaapi; then
+    enabled va_va_h && enabled va_va_glx_h && enabled va_va_x11_h || disable vaapi
+    if enabled vaapi; then
+        check_cpp_condition va/va.h "VA_VERSION_HEX >= 0x001F0000" ||
+        { echolog "VAAPI requires libva >= 0.31.1" && disable vaapi; }
+    fi
+else
+    disable vaapi
 fi
 
 if enabled dxva2; then
@@ -4465,7 +4481,6 @@ if enabled frontend; then
     echo "Windows (DirectX)         yes"
   fi
   echo "libfftw3 support          ${libfftw3-no}"
-  echo "libxml2 support           ${libxml2-no} [$libxml2_path]"
   echo
   echo "# Video Output Support"
   echo "x11 support               ${x11-no}"
@@ -4473,6 +4488,7 @@ if enabled x11 ; then
   echo "xrandr support            ${xrandr-no}"
   echo "xv support                ${xv-no}"
   echo "VDPAU support             ${vdpau-no}"
+  echo "VAAPI support             ${vaapi-no}"
   echo "CrystalHD support         ${crystalhd-no}"
 fi
   echo "OpenGL video              ${opengl_video-no}"
@@ -4490,6 +4506,9 @@ fi
 
 echo "# Misc Features"
 echo "multi threaded libavcodec ${threads-no}"
+if enabled frontend; then
+  echo "libxml2 support           ${libxml2-no} [$libxml2_path]"
+fi
 echo "Frontend                  ${frontend-no}"
 echo "Backend                   ${backend-no}"
 echo "OpenGL ES 2.0             ${opengles-no}"

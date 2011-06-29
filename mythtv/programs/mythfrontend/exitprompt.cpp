@@ -12,7 +12,7 @@
 #include "mythmainwindow.h"
 #include "mythscreenstack.h"
 #include "mythsystem.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 void ExitPrompter::quit()
 {

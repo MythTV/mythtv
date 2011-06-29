@@ -12,7 +12,6 @@
 
 #include "fifowriter.h"
 #include "compat.h"
-#include "mythverbose.h"
 #include "mythlogging.h"
 
 #include "mythconfig.h"

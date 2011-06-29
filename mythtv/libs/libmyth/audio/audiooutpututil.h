@@ -1,7 +1,6 @@
-#ifndef AUDIOOUTPUTUTIL
-#define AUDIOOUTPUTUTIL
+#ifndef AUDIOOUTPUTUTIL_H_
+#define AUDIOOUTPUTUTIL_H_
 
-#include "mythverbose.h"
 #include "audiooutputsettings.h"
 extern "C" {
 #include "pink.h"

@@ -13,9 +13,10 @@
 #include "compat.h"
 #include "mythdbcon.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
+#include <unistd.h>
 
 static const uint kPurgeTimeout = 60 * 60;
 
@@ -61,12 +62,13 @@ bool TestDatabase(QString dbHostName,
 MSqlDatabase::MSqlDatabase(const QString &name)
 {
     m_name = name;
-    m_db = QSqlDatabase::addDatabase("QMYSQL3", name);
+    m_name.detach();
+    m_db = QSqlDatabase::addDatabase("QMYSQL", m_name);
+    LOG(VB_GENERAL, LOG_INFO, "Database connection created: " + m_name);
 
     if (!m_db.isValid())
     {
-        VERBOSE(VB_IMPORTANT,
-               "Unable to init db connection.");
+        LOG(VB_GENERAL, LOG_ERR, "Unable to init db connection.");
         return;
     }
     m_lastDBKick = QDateTime::currentDateTime().addSecs(-60);
@@ -81,6 +83,7 @@ MSqlDatabase::~MSqlDatabase()
                                 // removeDatabase() so that connections
                                 // and queries are cleaned up correctly
         QSqlDatabase::removeDatabase(m_name);
+        LOG(VB_GENERAL, LOG_INFO, "Database connection deleted: " + m_name);
     }
 }
 
@@ -98,7 +101,7 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
 {
     if (!m_db.isValid())
     {
-        VERBOSE(VB_IMPORTANT,
+        LOG(VB_GENERAL, LOG_ERR,
               "MSqlDatabase::OpenDatabase(), db object is not valid!");
         return false;
     }
@@ -139,13 +142,14 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
 
             while (!connected && trycount++ < m_dbparms.wolRetry)
             {
-                VERBOSE(VB_GENERAL, QString(
-                         "Using WOL to wakeup database server (Try %1 of %2)")
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Using WOL to wakeup database server (Try %1 of "
+                            "%2)")
                          .arg(trycount).arg(m_dbparms.wolRetry));
 
                 if (myth_system(m_dbparms.wolCommand) != GENERIC_EXIT_OK)
                 {
-                    VERBOSE(VB_IMPORTANT,
+                    LOG(VB_GENERAL, LOG_ERR,
                             QString("Failed to run WOL command '%1'")
                             .arg(m_dbparms.wolCommand));
                 }
@@ -156,12 +160,13 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
 
             if (!connected)
             {
-                VERBOSE(VB_IMPORTANT, "WOL failed, unable to connect to database!");
+                LOG(VB_GENERAL, LOG_ERR,
+                    "WOL failed, unable to connect to database!");
             }
         }
         if (connected)
         {
-            VERBOSE(VB_GENERAL,
+            LOG(VB_GENERAL, LOG_INFO,
                     QString("Connected to database '%1' at host: %2")
                             .arg(m_db.databaseName()).arg(m_db.hostName()));
 
@@ -197,8 +202,8 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
     if (!connected)
     {
         GetMythDB()->SetHaveDBConnection(false);
-        VERBOSE(VB_IMPORTANT, "Unable to connect to database!");
-        VERBOSE(VB_IMPORTANT, MythDB::DBErrorMessage(m_db.lastError()));
+        LOG(VB_GENERAL, LOG_ERR, "Unable to connect to database!");
+        LOG(VB_GENERAL, LOG_ERR, MythDB::DBErrorMessage(m_db.lastError()));
     }
 
     return connected;
@@ -243,7 +248,7 @@ bool MSqlDatabase::KickDatabase()
             m_db.open();
         }
         else
-            VERBOSE(VB_IMPORTANT, MythDB::DBErrorMessage(m_db.lastError()));
+            LOG(VB_GENERAL, LOG_ERR, MythDB::DBErrorMessage(m_db.lastError()));
     }
 
     m_lastDBKick = QDateTime::currentDateTime().addSecs(-60);
@@ -258,7 +263,7 @@ bool MSqlDatabase::Reconnect()
 
     bool open = m_db.isOpen();
     if (open)
-        VERBOSE(VB_IMPORTANT, "MySQL reconnected successfully");
+        LOG(VB_GENERAL, LOG_INFO, "MySQL reconnected successfully");
 
     return open;
 }
@@ -276,6 +281,7 @@ MDBManager::MDBManager()
 
     m_schedCon = NULL;
     m_DDCon = NULL;
+    m_LogCon = NULL;
 }
 
 MDBManager::~MDBManager()
@@ -284,8 +290,9 @@ MDBManager::~MDBManager()
         delete m_pool.takeFirst();
     delete m_sem;
 
-    delete m_schedCon;
-    delete m_DDCon;
+    closeStaticCon(&m_schedCon);
+    closeStaticCon(&m_DDCon);
+    closeStaticCon(&m_LogCon);
 }
 
 MSqlDatabase *MDBManager::popConnection()
@@ -301,7 +308,7 @@ MSqlDatabase *MDBManager::popConnection()
     {
         db = new MSqlDatabase("DBManager" + QString::number(m_nextConnID++));
         ++m_connCount;
-        VERBOSE(VB_IMPORTANT,
+        LOG(VB_GENERAL, LOG_INFO,
                 QString("New DB connection, total: %1").arg(m_connCount));
     }
     else
@@ -372,50 +379,79 @@ void MDBManager::PurgeIdleConnections(void)
             newDb = new MSqlDatabase("DBManager" +
                                      QString::number(m_nextConnID++));
             ++m_connCount;
-            VERBOSE(VB_IMPORTANT,
+            LOG(VB_GENERAL, LOG_INFO,
                     QString("New DB connection, total: %1").arg(m_connCount));
             newDb->m_lastDBKick = QDateTime::currentDateTime();
         }
 
-        VERBOSE(VB_DATABASE, "Deleting idle DB connection...");
+        LOG(VB_DATABASE, LOG_INFO, "Deleting idle DB connection...");
         delete entry;
-        VERBOSE(VB_DATABASE, "Done deleting idle DB connection.");
+        LOG(VB_DATABASE, LOG_INFO, "Done deleting idle DB connection.");
     }
     if (newDb)
         m_pool.push_front(newDb);
 
     if (purgedConnections)
     {
-        VERBOSE(VB_DATABASE,
+        LOG(VB_DATABASE, LOG_INFO,
                 QString("Purged %1 idle of %2 total DB connections.")
                 .arg(purgedConnections).arg(totalConnections));
     }
 }
 
-MSqlDatabase *MDBManager::getSchedCon()
+MSqlDatabase *MDBManager::getStaticCon(MSqlDatabase **dbcon, QString name)
 {
-    if (!m_schedCon)
+    if (!dbcon)
+        return NULL;
+
+    if (!*dbcon)
     {
-        m_schedCon = new MSqlDatabase("SchedCon");
-        VERBOSE(VB_IMPORTANT, "New DB scheduler connection");
+        *dbcon = new MSqlDatabase(name);
+        LOG(VB_GENERAL, LOG_INFO, "New static DB connection" + name);
     }
 
-    m_schedCon->OpenDatabase();
+    (*dbcon)->OpenDatabase();
 
-    return m_schedCon;
+    return *dbcon;
+}
+
+MSqlDatabase *MDBManager::getSchedCon()
+{
+    return getStaticCon(&m_schedCon, "SchedCon");
 }
 
 MSqlDatabase *MDBManager::getDDCon()
 {
-    if (!m_DDCon)
+    return getStaticCon(&m_DDCon, "DataDirectCon");
+}
+
+MSqlDatabase *MDBManager::getLogCon()
+{
+    return getStaticCon(&m_LogCon, "LogCon");
+}
+
+void MDBManager::closeStaticCon(MSqlDatabase **dbcon)
+{
+    if (dbcon && *dbcon)
     {
-        m_DDCon = new MSqlDatabase("DataDirectCon");
-        VERBOSE(VB_IMPORTANT, "New DB DataDirect connection");
+        delete *dbcon;
+        *dbcon = NULL;
     }
+}
 
-    m_DDCon->OpenDatabase();
+void MDBManager::closeSchedCon()
+{
+    closeStaticCon(&m_schedCon);
+}
 
-    return m_DDCon;
+void MDBManager::closeDDCon()
+{
+    closeStaticCon(&m_DDCon);
+}
+
+void MDBManager::closeLogCon()
+{
+    closeStaticCon(&m_LogCon);
 }
 
 // Dangerous. Should only be used when the database connection has errored?
@@ -430,8 +466,8 @@ void MDBManager::CloseDatabases()
     while (it != m_pool.end())
     {
         db = *it;
-        VERBOSE(VB_IMPORTANT,
-                "Closing DB connection named '" + db->m_name + '\'');
+        LOG(VB_GENERAL, LOG_INFO,
+                "Closing DB connection named '" + db->m_name + "'");
         db->m_db.close();
         ++it;
     }
@@ -547,6 +583,41 @@ MSqlQueryInfo MSqlQuery::DDCon()
     return qi;
 }
 
+MSqlQueryInfo MSqlQuery::LogCon()
+{
+    MSqlDatabase *db = GetMythDB()->GetDBManager()->getLogCon();
+    MSqlQueryInfo qi;
+
+    InitMSqlQueryInfo(qi);
+    qi.returnConnection = false;
+
+    if (db)
+    {
+        qi.db = db;
+        qi.qsqldb = db->db();
+
+        db->KickDatabase();
+    }
+
+    return qi;
+}
+
+void MSqlQuery::CloseSchedCon()
+{
+    GetMythDB()->GetDBManager()->closeSchedCon();
+}
+
+void MSqlQuery::CloseDDCon()
+{
+    GetMythDB()->GetDBManager()->closeDDCon();
+}
+
+void MSqlQuery::CloseLogCon()
+{
+    GetMythDB()->GetDBManager()->closeLogCon();
+}
+
+
 bool MSqlQuery::exec()
 {
     // Database connection down.  Try to restart it, give up if it's still
@@ -559,7 +630,7 @@ bool MSqlQuery::exec()
 
     if (!m_db->isOpen() && !m_db->Reconnect())
     {
-        VERBOSE(VB_IMPORTANT, "MySQL server disconnected");
+        LOG(VB_GENERAL, LOG_INFO, "MySQL server disconnected");
         return false;
     }
 
@@ -586,12 +657,11 @@ bool MSqlQuery::exec()
             str.replace(b.key(), '\'' + b.value().toString() + '\'');
         }
 
-        VERBOSE(VB_DATABASE,
+        LOG(VB_DATABASE, LOG_DEBUG,
                 QString("MSqlQuery::exec(%1) %2%3")
                         .arg(m_db->MSqlDatabase::GetConnectionName()).arg(str)
-                            .arg(isSelect() ? QString(" <<<< Returns %1 row(s)")
-                                                      .arg(size())
-                                            : QString()));
+                        .arg(isSelect() ? QString(" <<<< Returns %1 row(s)")
+                                              .arg(size()) : QString()));
     }
 
     return result;
@@ -603,7 +673,7 @@ bool MSqlQuery::exec(const QString &query)
     // down
     if (!m_db->isOpen() && !m_db->Reconnect())
     {
-        VERBOSE(VB_IMPORTANT, "MySQL server disconnected");
+        LOG(VB_GENERAL, LOG_INFO, "MySQL server disconnected");
         return false;
     }
 
@@ -615,12 +685,11 @@ bool MSqlQuery::exec(const QString &query)
     if (!result && QSqlQuery::lastError().number() == 2006 && m_db->Reconnect())
         result = QSqlQuery::exec(query);
 
-    VERBOSE(VB_DATABASE,
+    LOG(VB_DATABASE, LOG_DEBUG,
             QString("MSqlQuery::exec(%1) %2%3")
                     .arg(m_db->MSqlDatabase::GetConnectionName()).arg(query)
                     .arg(isSelect() ? QString(" <<<< Returns %1 row(s)")
-                                              .arg(size())
-                                    : QString()));
+                                          .arg(size()) : QString()));
 
     return result;
 }
@@ -642,7 +711,7 @@ bool MSqlQuery::next()
             str.append(record.fieldName(i) + " = " + value(i).toString());
         }
 
-        VERBOSE(VB_DATABASE+VB_EXTRA,
+        LOG(VB_DATABASE, LOG_DEBUG,
                 QString("MSqlQuery::next(%1) Result: \"%2\"")
                         .arg(m_db->MSqlDatabase::GetConnectionName())
                         .arg(str));
@@ -657,10 +726,12 @@ bool MSqlQuery::prepare(const QString& query)
 #ifdef DEBUG_QT4_PORT
     if (query.contains(m_testbindings))
     {
-        VERBOSE(VB_IMPORTANT,
+        LOG(VB_GENERAL, LOG_DEBUG,
                 QString("\n\nQuery contains bind value \"%1\" twice:\n\n\n")
                 .arg(m_testbindings.cap(1)) + query);
-        //exit(1);
+#if 0
+        exit(1);
+#endif
     }
 #endif
 
@@ -674,7 +745,7 @@ bool MSqlQuery::prepare(const QString& query)
 
     if (!m_db->isOpen() && !m_db->Reconnect())
     {
-        VERBOSE(VB_IMPORTANT, "MySQL server disconnected");
+        LOG(VB_GENERAL, LOG_INFO, "MySQL server disconnected");
         return false;
     }
 
@@ -688,8 +759,10 @@ bool MSqlQuery::prepare(const QString& query)
 
     if (!ok && !(GetMythDB()->SuppressDBMessages()))
     {
-        VERBOSE(VB_IMPORTANT, QString("Error preparing query: %1").arg(query));
-        VERBOSE(VB_IMPORTANT, MythDB::DBErrorMessage(QSqlQuery::lastError()));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Error preparing query: %1").arg(query));
+        LOG(VB_GENERAL, LOG_ERR,
+            MythDB::DBErrorMessage(QSqlQuery::lastError()));
     }
 
     return ok;
@@ -715,8 +788,8 @@ void MSqlQuery::bindValue (const QString  & placeholder,
     // qt4 doesn't like to bind values without occurrence in the prepared query
     if (!m_last_prepared_query.contains(placeholder))
     {
-        VERBOSE(VB_IMPORTANT, "Trying to bind a value to placeholder "
-                + placeholder + " without occurrence in the prepared query."
+        LOG(VB_GENERAL, LOG_ERR, "Trying to bind a value to placeholder " +
+                placeholder + " without occurrence in the prepared query."
                 " Ignoring it.\nQuery was: \"" + m_last_prepared_query + "\"");
         return;
     }

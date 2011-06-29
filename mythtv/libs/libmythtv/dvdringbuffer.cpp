@@ -10,7 +10,7 @@
 
 #include "mythdvdplayer.h"
 #include "compat.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythuihelper.h"
 
 #define LOC      QString("DVDRB: ")
@@ -79,6 +79,7 @@ bool DVDInfo::GetNameAndSerialNum(QString &name, QString &serial)
 }
 
 DVDRingBuffer::DVDRingBuffer(const QString &lfilename) :
+    RingBuffer(kRingBuffer_DVD),
     m_dvdnav(NULL),     m_dvdBlockReadBuf(NULL),
     m_dvdBlockRPos(0),  m_dvdBlockWPos(0),
     m_pgLength(0),      m_pgcLength(0),
@@ -107,6 +108,7 @@ DVDRingBuffer::DVDRingBuffer(const QString &lfilename) :
     m_seeking(false), m_seektime(0),
     m_currentTime(0),
     m_parent(NULL),
+    m_forcedAspect(-1.0f),
 
     // Menu/buttons
     m_inMenu(false), m_buttonVersion(1), m_buttonStreamID(0),
@@ -843,9 +845,13 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
 
                 // update player
                 int aspect = dvdnav_get_video_aspect(m_dvdnav);
+                if (aspect == 2) // 4:3
+                    m_forcedAspect = 4.0f / 3.0f;
+                else if (aspect == 3) // 16:9
+                    m_forcedAspect = 16.0f / 9.0f;
+                else
+                    m_forcedAspect = -1;
                 int permission = dvdnav_get_video_scale_permission(m_dvdnav);
-                if (m_parent)
-                    m_parent->SetForcedAspectRatio(aspect, permission);
 
                 // debug
                 VERBOSE(VB_PLAYBACK, LOC +
@@ -1240,9 +1246,7 @@ AVSubtitle *DVDRingBuffer::GetMenuSubtitle(uint &version)
     // this is unlocked by ReleaseMenuButton
     m_menuBtnLock.lock();
 
-    if ((m_menuBuflength > 4) && m_buttonExists && (NumMenuButtons() > 0) &&
-        (m_dvdMenuButton.rects[0]->h >= m_hl_button.height()) &&
-        (m_dvdMenuButton.rects[0]->w >= m_hl_button.width()))
+    if ((m_menuBuflength > 4) && m_buttonExists && (NumMenuButtons() > 0))
     {
         version = m_buttonVersion;
         return &(m_dvdMenuButton);
@@ -1265,15 +1269,8 @@ QRect DVDRingBuffer::GetButtonCoords(void)
     if (!m_buttonExists)
         return rect;
 
-    int x1, y1;
-    int x = 0; int y = 0;
-    x1 = m_dvdMenuButton.rects[0]->x;
-    y1 = m_dvdMenuButton.rects[0]->y;
-    if (m_hl_button.x() > x1)
-        x = m_hl_button.x() - x1;
-    if (m_hl_button.y() > y1)
-        y  = m_hl_button.y() - y1;
-    rect.setRect(x, y, m_hl_button.width(), m_hl_button.height());
+    rect.setRect(m_hl_button.x(), m_hl_button.y(), m_hl_button.width(),
+                 m_hl_button.height());
 
     return rect;
 }
@@ -1383,7 +1380,7 @@ bool DVDRingBuffer::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
             w = x2 - x1 + 1;
             if (w < 0)
                 w = 0;
-            h = y2 - y1 + 2;
+            h = y2 - y1 + 1;
             if (h < 0)
                 h = 0;
             if (w > 0 && h > 0)

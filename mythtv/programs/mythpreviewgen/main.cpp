@@ -35,7 +35,6 @@ using namespace std;
 
 #include "mythcontext.h"
 #include "mythcorecontext.h"
-#include "mythverbose.h"
 #include "mythversion.h"
 #include "mythdb.h"
 #include "exitcodes.h"
@@ -44,7 +43,7 @@ using namespace std;
 #include "programinfo.h"
 #include "dbcheck.h"
 #include "previewgenerator.h"
-#include "mythcommandlineparser.h"
+#include "commandlineparser.h"
 #include "mythsystemevent.h"
 #include "mythlogging.h"
 
@@ -201,13 +200,16 @@ int main(int argc, char **argv)
         quiet = cmdline.toUInt("quiet");
         if (quiet > 1)
         {
-            print_verbose_messages = VB_NONE;
-            parse_verbose_arg("none");
+            verboseMask = VB_NONE;
+            verboseArgParse("none");
         }
     }
 
     int facility = cmdline.GetSyslogFacility();
     bool dblog = !cmdline.toBool("nodblog");
+    LogLevel_t level = cmdline.GetLogLevel();
+    if (level == LOG_UNKNOWN)
+        return GENERIC_EXIT_INVALID_CMDLINE;
 
     ///////////////////////////////////////////////////////////////////////
 
@@ -217,7 +219,8 @@ int main(int argc, char **argv)
     CleanupGuard callCleanup(cleanup);
 
     QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet, facility, dblog);
+    bool propagate = cmdline.toBool("islogpath");
+    logStart(logfile, quiet, facility, level, dblog, propagate);
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to ignore SIGPIPE");

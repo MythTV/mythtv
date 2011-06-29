@@ -5,7 +5,7 @@
 
 #include "mythdirs.h"
 #include "mythcontext.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #include "mythrssmanager.h"
 #include "netutils.h"
@@ -52,8 +52,8 @@ void RSSManager::doUpdate()
     for (RSSSite::rssList::iterator i = m_sites.begin();
             i != m_sites.end(); ++i)
     {
-        VERBOSE(VB_GENERAL, LOC + QString("Updating RSS Feed %1")
-                                      .arg((*i)->GetTitle()));
+        LOG(VB_GENERAL, LOG_INFO,
+                 QString("Updating RSS Feed %1") .arg((*i)->GetTitle()));
 
         connect(*i, SIGNAL(finished(RSSSite*)),
                 this, SLOT(slotRSSRetrieved(RSSSite*)));
@@ -220,7 +220,8 @@ void RSSSite::process(void)
 
     if (!domDoc.setContent(m_data, true))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to set content from downloaded XML");
+        LOG(VB_GENERAL, LOG_ERR,
+                 "Failed to set content from downloaded XML");
         return;
     }
 
@@ -256,7 +257,7 @@ void RSSSite::process(void)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Data is not valid RSS-feed");
+        LOG(VB_GENERAL, LOG_ERR, "Data is not valid RSS-feed");
         emit finished(this);
     }
 }

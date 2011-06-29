@@ -5,7 +5,7 @@
 
 #include "mythconfiggroups.h"
 #include "mythcontext.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythuihelper.h"
 
 static void clear_widgets(vector<Configurable*> &children,
@@ -445,9 +445,10 @@ void StackedConfigurationGroup::raise(Configurable* child)
         }
     }
 
-    VERBOSE(VB_IMPORTANT, QString("BUG: StackedConfigurationGroup::raise(): "
-            "unrecognized child 0x%1 on setting %2/%3")
-            .arg((uint64_t)child,0,16).arg(getName()).arg(getLabel()));
+    LOG(VB_GENERAL, LOG_ALERT,
+             QString("BUG: StackedConfigurationGroup::raise(): "
+                     "unrecognized child 0x%1 on setting %2/%3")
+                 .arg((uint64_t)child,0,16).arg(getName()).arg(getLabel()));
 }
 
 void StackedConfigurationGroup::Save(void)
@@ -565,7 +566,8 @@ void TriggeredConfigurationGroup::triggerChanged(const QString &value)
 
     if (it == triggerMap.end())
     {
-        VERBOSE(VB_IMPORTANT, QString("TriggeredConfigurationGroup::") +
+        LOG(VB_GENERAL, LOG_ALERT, 
+                "TriggeredConfigurationGroup::" +
                 QString("triggerChanged(%1) Error:").arg(value) +
                 "Failed to locate value in triggerMap");
     }
@@ -585,9 +587,10 @@ void TriggeredConfigurationGroup::SetVertical(bool vert)
 {
     if (configLayout)
     {
-        VERBOSE(VB_IMPORTANT, "TriggeredConfigurationGroup::setVertical(): "
-                "Sorry, this must be called before any children are added "
-                "to the group.");
+        LOG(VB_GENERAL, LOG_ALERT, 
+                 "TriggeredConfigurationGroup::setVertical(): "
+                 "Sorry, this must be called before any children are added "
+                 "to the group.");
         return;
     }
 
@@ -599,19 +602,19 @@ void TriggeredConfigurationGroup::removeTarget(QString triggerValue)
     ComboBoxSetting *combobox = dynamic_cast<ComboBoxSetting*>(trigger);
     if (!combobox)
     {
-        VERBOSE(VB_IMPORTANT,
-                "TriggeredConfigurationGroup::removeTarget(): "
-                "Failed to cast trigger to ComboBoxSetting -- aborting");
+        LOG(VB_GENERAL, LOG_ALERT,
+                 "TriggeredConfigurationGroup::removeTarget(): "
+                 "Failed to cast trigger to ComboBoxSetting -- aborting");
         return;
     }
 
     QMap<QString,Configurable*>::iterator cit = triggerMap.find(triggerValue);
     if (cit == triggerMap.end())
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("TriggeredConfigurationGroup::removeTarget(): "
+        LOG(VB_GENERAL, LOG_ALERT,
+                 QString("TriggeredConfigurationGroup::removeTarget(): "
                         "Failed to find desired value(%1) -- aborting")
-                .arg(triggerValue));
+                     .arg(triggerValue));
         return;
     }
 
@@ -629,11 +632,10 @@ void TriggeredConfigurationGroup::removeTarget(QString triggerValue)
 
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT,
-                QString(
-                    "TriggeredConfigurationGroup::removeTarget(): "
-                    "Failed to remove '%1' from combobox -- aborting")
-                .arg(triggerValue));
+        LOG(VB_GENERAL, LOG_ALERT,
+                 QString("TriggeredConfigurationGroup::removeTarget(): "
+                         "Failed to remove '%1' from combobox -- aborting")
+                     .arg(triggerValue));
         return;
     }
 

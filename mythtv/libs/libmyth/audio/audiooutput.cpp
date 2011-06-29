@@ -115,7 +115,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
 
             device_name.remove(0, 5);
             QMap<QString, QString> *alsadevs =
-                AudioOutputALSA::GetALSADevices("pcm");
+                AudioOutputALSA::GetDevices("pcm");
             if (!alsadevs->empty() && alsadevs->contains(device_name))
             {
                 if (alsadevs->value(device_name).contains("pulse",
@@ -317,9 +317,9 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
     return adc;
 }
 
-static void fillSelectionsFromDir(
-    const QDir &dir,
-    AudioOutput::ADCVect *list)
+#ifdef USING_OSS
+static void fillSelectionsFromDir(const QDir &dir,
+                                  AudioOutput::ADCVect *list)
 {
     QFileInfoList il = dir.entryInfoList();
     for (QFileInfoList::Iterator it = il.begin();
@@ -336,6 +336,7 @@ static void fillSelectionsFromDir(
         delete adc;
     }
 }
+#endif
 
 AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
 {
@@ -347,7 +348,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
 #endif
 
 #ifdef USE_ALSA
-    QMap<QString, QString> *alsadevs = AudioOutputALSA::GetALSADevices("pcm");
+    QMap<QString, QString> *alsadevs = AudioOutputALSA::GetDevices("pcm");
 
     if (!alsadevs->empty())
     {
@@ -399,8 +400,26 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
 #if CONFIG_DARWIN
 
     {
-        QString name = "CoreAudio:";
-        QString desc = "CoreAudio output";
+        QMap<QString, QString> *devs = AudioOutputCA::GetDevices(NULL);
+        if (!devs->empty())
+        {
+            for (QMap<QString, QString>::const_iterator i = devs->begin();
+                 i != devs->end(); ++i)
+            {
+                QString key = i.key();
+                QString desc = i.value();
+                QString devname = QString("CoreAudio:%1").arg(key);
+                
+                adc = GetAudioDeviceConfig(devname, desc);
+                if (!adc)
+                    continue;
+                list->append(*adc);
+                delete adc;
+            }
+        }
+        delete devs;
+        QString name = "CoreAudio:Default Output Device";
+        QString desc = "CoreAudio default output";
         adc = GetAudioDeviceConfig(name, desc);
         if (adc)
         {

@@ -7,7 +7,7 @@
 #include <cmath>
 
 // Libmyth
-#include <mythverbose.h>
+#include <mythlogging.h>
 
 // Taglib
 #include <audioproperties.h>

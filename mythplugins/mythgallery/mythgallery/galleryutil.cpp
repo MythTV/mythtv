@@ -125,12 +125,12 @@ bool GalleryUtil::IsMovie(const QString &filePath)
 long GalleryUtil::GetNaturalRotation(const QString &filePathString)
 {
     long rotateAngle = 0;
+#ifdef EXIF_SUPPORT
     QByteArray filePathBA = filePathString.toLocal8Bit();
     const char *filePath = filePathBA.constData();
 
     try
     {
-#ifdef EXIF_SUPPORT
         char *exifvalue = new char[1024];
         ExifData *data = exif_data_new_from_file (filePath);
         if (data)
@@ -168,9 +168,9 @@ long GalleryUtil::GetNaturalRotation(const QString &filePathString)
         
         delete [] exifvalue;
         
-        /*
+#if 0
         Exiv2::ExifData exifData;
-         int rc = exifData.read(filePath);
+        int rc = exifData.read(filePath);
         if (!rc)
         {
             Exiv2::ExifKey key = Exiv2::ExifKey("Exif.Image.Orientation");
@@ -192,8 +192,7 @@ long GalleryUtil::GetNaturalRotation(const QString &filePathString)
                 }
             }
         }
-        */
-#endif // EXIF_SUPPORT
+#endif
     }
     catch (...)
     {
@@ -202,6 +201,10 @@ long GalleryUtil::GetNaturalRotation(const QString &filePathString)
                 .arg(filePathString));
     }
 
+#else
+    // Shut the compiler up about the unused argument
+    (void)filePathString;
+#endif // EXIF_SUPPORT
     return rotateAngle;
 }
 

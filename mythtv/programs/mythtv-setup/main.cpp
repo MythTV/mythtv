@@ -13,7 +13,7 @@
 #include "mythconfig.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythversion.h"
 #include "langsettings.h"
 #include "mythtranslation.h"
@@ -37,7 +37,7 @@
 #include "startprompt.h"
 #include "mythsystemevent.h"
 #include "expertsettingseditor.h"
-#include "mythcommandlineparser.h"
+#include "commandlineparser.h"
 
 using namespace std;
 
@@ -233,7 +233,7 @@ int main(int argc, char *argv[])
     {
         quiet = 1;
         use_display = false;
-        print_verbose_messages = VB_NONE;
+        verboseMask = VB_NONE;
         verboseString = "";
     }
 
@@ -254,7 +254,7 @@ int main(int argc, char *argv[])
                             .arg(MYTH_SOURCE_VERSION));
 
     if (cmdline.toBool("verbose"))
-        if (parse_verbose_arg(cmdline.toString("verbose")) ==
+        if (verboseArgParse(cmdline.toString("verbose")) ==
                     GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
 
@@ -263,13 +263,16 @@ int main(int argc, char *argv[])
         quiet = cmdline.toUInt("quiet");
         if (quiet > 1)
         {
-            print_verbose_messages = VB_NONE;
-            parse_verbose_arg("none");
+            verboseMask = VB_NONE;
+            verboseArgParse("none");
         }
     }
 
     int facility = cmdline.GetSyslogFacility();
     bool dblog = !cmdline.toBool("nodblog");
+    LogLevel_t level = cmdline.GetLogLevel();
+    if (level == LOG_UNKNOWN)
+        return GENERIC_EXIT_INVALID_CMDLINE;
 
     if (cmdline.toBool("overridesettings"))
         settingsOverride = cmdline.GetSettingsOverride();
@@ -311,7 +314,8 @@ int main(int argc, char *argv[])
         scanInputName = cmdline.toString("inputname");
 
     logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet, facility, dblog);
+    bool propagate = cmdline.toBool("islogpath");
+    logStart(logfile, quiet, facility, level, dblog, propagate);
 
     if (!display.isEmpty())
     {

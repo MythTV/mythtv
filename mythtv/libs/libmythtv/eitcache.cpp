@@ -10,7 +10,7 @@
 #include "eitcache.h"
 #include "mythcontext.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #define LOC QString("EITCache: ")
 

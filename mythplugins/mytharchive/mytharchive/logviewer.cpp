@@ -5,6 +5,7 @@
 // qt
 #include <QKeyEvent>
 #include <QFile>
+#include <QTextStream>
 
 // mythtv
 #include <mythcontext.h>

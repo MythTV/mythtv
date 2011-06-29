@@ -1,11 +1,11 @@
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #include "streamingringbuffer.h"
 
 #define LOC QString("StreamRingBuf(%1): ").arg(filename)
 
 StreamingRingBuffer::StreamingRingBuffer(const QString &lfilename)
-  : m_context(NULL)
+  : RingBuffer(kRingBuffer_HTTP), m_context(NULL)
 {
     startreadahead = true;
     OpenFile(lfilename);

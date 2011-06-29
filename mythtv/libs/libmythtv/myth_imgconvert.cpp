@@ -31,7 +31,7 @@ extern "C" {
 #include <QMutex>
 #include <QMutexLocker>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "myth_imgconvert.h"
 
 int myth_sws_img_convert(AVPicture *dst, PixelFormat dst_pix_fmt, AVPicture *src,

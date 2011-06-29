@@ -34,6 +34,8 @@ typedef struct VideoFrame_
 
     int width;
     int height;
+    float aspect;
+    double frame_rate;
     int bpp;
     int size;
 
@@ -65,7 +67,8 @@ typedef struct VideoFrame_
 static inline void init(VideoFrame *vf, VideoFrameType _codec,
                         unsigned char *_buf, int _width, int _height, int _size,
                         const int *p = 0,
-                        const int *o = 0) MUNUSED;
+                        const int *o = 0,
+                        float _aspect = -1.0f, double _rate = -1.0f) MUNUSED;
 static inline void clear(VideoFrame *vf) MUNUSED;
 static inline bool compatible(const VideoFrame *a,
                               const VideoFrame *b) MUNUSED;
@@ -73,13 +76,16 @@ static inline int  bitsperpixel(VideoFrameType type);
 
 static inline void init(VideoFrame *vf, VideoFrameType _codec,
                         unsigned char *_buf, int _width, int _height,
-                        int _size, const int *p, const int *o)
+                        int _size, const int *p, const int *o,
+                        float _aspect, double _rate)
 {
     vf->bpp    = bitsperpixel(_codec);
     vf->codec  = _codec;
     vf->buf    = _buf;
     vf->width  = _width;
     vf->height = _height;
+    vf->aspect = _aspect;
+    vf->frame_rate = _rate;
 
     vf->size         = _size;
     vf->frameNumber  = 0;

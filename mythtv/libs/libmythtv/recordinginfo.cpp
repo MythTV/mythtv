@@ -27,7 +27,7 @@ using namespace std;
 #include "tvremoteutil.h"
 #include "jobqueue.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "previewgenerator.h"
 #include "channelutil.h"
 

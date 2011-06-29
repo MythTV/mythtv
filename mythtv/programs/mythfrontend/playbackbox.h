@@ -48,9 +48,9 @@ typedef QMap<QString,ProgramList>       ProgramMap;
 typedef QMap<QString,QString>           Str2StrMap;
 
 enum {
-    kArtworkFanTimeout    = 0,//300,
-    kArtworkBannerTimeout = 0,//50,
-    kArtworkCoverTimeout  = 0,//50,
+    kArtworkFanTimeout    = 300,
+    kArtworkBannerTimeout = 50,
+    kArtworkCoverTimeout  = 50,
 };
 
 class PlaybackBox : public ScheduleCommon

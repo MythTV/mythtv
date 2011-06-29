@@ -27,12 +27,12 @@ class VideoOutputOpenGL : public VideoOutput
     virtual bool InputChanged(const QSize &input_size, float aspect,
                               MythCodecID  av_codec_id, void *codec_private,
                               bool &aspect_only);
-    void UpdatePauseFrame(void);
+    virtual void UpdatePauseFrame(void);
     void DrawUnusedRects(bool) { }
     void Zoom(ZoomDirection direction);
     void MoveResize(void);
-    int  SetPictureAttribute(PictureAttribute attribute, int newValue);
-    void InitPictureAttributes(void);
+    virtual int  SetPictureAttribute(PictureAttribute attribute, int newValue);
+    virtual void InitPictureAttributes(void);
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
     void EmbedInWidget(const QRect &rect);
@@ -56,6 +56,12 @@ class VideoOutputOpenGL : public VideoOutput
         { return VideoOutput::SetupVisualisation(audio, gl_context); }
 
   protected:
+    bool CreateCPUResources(void);
+    bool CreateGPUResources(void);
+    bool CreateVideoResources(void);
+    void DestroyCPUResources(void);
+    void DestroyVideoResources(void);
+    void DestroyGPUResources(void);
     virtual bool CreateBuffers(void);
     bool CreatePauseFrame(void);
     bool SetupContext(void);
@@ -64,6 +70,7 @@ class VideoOutputOpenGL : public VideoOutput
 
     QMutex            gl_context_lock;
     MythRenderOpenGL *gl_context;
+    bool              gl_valid;
     OpenGLVideo      *gl_videochain;
     QMap<MythPlayer*,OpenGLVideo*> gl_pipchains;
     QMap<MythPlayer*,bool>         gl_pip_ready;

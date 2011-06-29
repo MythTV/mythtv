@@ -16,7 +16,6 @@
 #include "remoteutil.h"
 #include "previewgenerator.h"
 #include "compat.h"
-#include "mythverbose.h"
 #include "mythsystemevent.h"
 #include "mythdirs.h"
 #include "mythlogging.h"
@@ -1019,7 +1018,7 @@ QString NetworkControl::processSet(NetworkCommand *nc)
         QString oldVerboseString = verboseString;
         QString result = "OK";
 
-        int pva_result = parse_verbose_arg(nc->getArg(2));
+        int pva_result = verboseArgParse(nc->getArg(2));
 
         if (pva_result != 0 /*GENERIC_EXIT_OK */)
             result = "Failed";
@@ -1028,9 +1027,8 @@ QString NetworkControl::processSet(NetworkCommand *nc)
         result += " Previous filter: " + oldVerboseString + "\r\n";
         result += "      New Filter: " + verboseString + "\r\n";
 
-        VERBOSE(VB_IMPORTANT, QString("Verbose level changed, new level is: %1")
+        VERBOSE(VB_IMPORTANT, QString("Verbose mask changed, new level is: %1")
                                       .arg(verboseString));
-
 
         return result;
     }

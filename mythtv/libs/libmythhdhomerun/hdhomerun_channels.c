@@ -32,13 +32,11 @@
 
 #include "hdhomerun.h"
 
-#define FREQUENCY_RESOLUTION 62500
-
 struct hdhomerun_channel_entry_t {
 	struct hdhomerun_channel_entry_t *next;
 	struct hdhomerun_channel_entry_t *prev;
 	uint32_t frequency;
-	uint8_t channel_number;
+	uint16_t channel_number;
 	char name[16];
 };
 
@@ -48,8 +46,8 @@ struct hdhomerun_channel_list_t {
 };
 
 struct hdhomerun_channelmap_range_t {
-	uint8_t channel_range_start;
-	uint8_t channel_range_end;
+	uint16_t channel_range_start;
+	uint16_t channel_range_end;
 	uint32_t frequency;
 	uint32_t spacing;
 };
@@ -61,32 +59,23 @@ struct hdhomerun_channelmap_record_t {
 	const char *countrycodes;
 };
 
-/* AU antenna channels. Channels {0, 1, 2, 6, 7, 8, 9, 9A} are numbered {2, 3, 4, 5, 6, 7, 8, 9} by the HDHomeRun. */
+/* AU antenna channels. Channels {6, 7, 8, 9, 9A} are numbered {5, 6, 7, 8, 9} by the HDHomeRun. */
 static const struct hdhomerun_channelmap_range_t hdhomerun_channelmap_range_au_bcast[] = {
-	{  2,   2,  48500000, 7000000},
-	{  3,   4,  59500000, 7000000},
 	{  5,  12, 177500000, 7000000},
-	{ 28,  69, 529500000, 7000000},
-	{  0,   0,         0,       0}
-};
-
-/* AU cable channels. TBD. */
-static const struct hdhomerun_channelmap_range_t hdhomerun_channelmap_range_au_cable[] = {
+	{ 21,  69, 480500000, 7000000},
 	{  0,   0,         0,       0}
 };
 
 /* EU antenna channels. */
 static const struct hdhomerun_channelmap_range_t hdhomerun_channelmap_range_eu_bcast[] = {
-	{  2,   4,  50500000, 7000000},
 	{  5,  12, 177500000, 7000000},
 	{ 21,  69, 474000000, 8000000},
 	{  0,   0,         0,       0}
 };
 
-/* EU cable channels. Channels do not have simple numbers - the HDHomeRun uses its own numbering scheme (subject to change). */
+/* EU cable channels. No common standard - use frequency in MHz for channel number. */
 static const struct hdhomerun_channelmap_range_t hdhomerun_channelmap_range_eu_cable[] = {
-	{  6,   7, 113000000, 8000000},
-	{  9, 100, 138000000, 8000000},
+	{ 50, 998,  50000000, 1000000},
 	{  0,   0,         0,       0}
 };
 
@@ -107,7 +96,7 @@ static const struct hdhomerun_channelmap_range_t hdhomerun_channelmap_range_us_c
 	{ 14,  22, 123000000, 6000000},
 	{ 23,  94, 219000000, 6000000},
 	{ 95,  99,  93000000, 6000000},
-	{100, 135, 651000000, 6000000},
+	{100, 158, 651000000, 6000000},
 	{  0,   0,         0,       0}
 };
 
@@ -119,7 +108,7 @@ static const struct hdhomerun_channelmap_range_t hdhomerun_channelmap_range_us_h
 	{ 14,  22, 121756000, 6000300},
 	{ 23,  94, 217760800, 6000300},
 	{ 95,  99,  91754500, 6000300},
-	{100, 135, 649782400, 6000300},
+	{100, 158, 649782400, 6000300},
 	{  0,   0,         0,       0}
 };
 
@@ -134,13 +123,13 @@ static const struct hdhomerun_channelmap_range_t hdhomerun_channelmap_range_us_i
 	{ 43,  94, 339012500, 6000000},
 	{ 95,  97,  93012500, 6000000},
 	{ 98,  99, 111025000, 6000000},
-	{100, 135, 651012500, 6000000},
+	{100, 158, 651012500, 6000000},
 	{  0,   0,         0,       0}
 };
 
 static const struct hdhomerun_channelmap_record_t hdhomerun_channelmap_table[] = {
 	{"au-bcast", hdhomerun_channelmap_range_au_bcast, "au-bcast",               "AU"},
-	{"au-cable", hdhomerun_channelmap_range_au_cable, "au-cable",               "AU"},
+	{"au-cable", hdhomerun_channelmap_range_eu_cable, "au-cable",               "AU"},
 	{"eu-bcast", hdhomerun_channelmap_range_eu_bcast, "eu-bcast",               "EU PA"},
 	{"eu-cable", hdhomerun_channelmap_range_eu_cable, "eu-cable",               "EU"},
 	{"tw-bcast", hdhomerun_channelmap_range_us_bcast, "tw-bcast",               "TW"},
@@ -193,7 +182,7 @@ const char *hdhomerun_channelmap_get_channelmap_scan_group(const char *channelma
 	return NULL;
 }
 
-uint8_t hdhomerun_channel_entry_channel_number(struct hdhomerun_channel_entry_t *entry)
+uint16_t hdhomerun_channel_entry_channel_number(struct hdhomerun_channel_entry_t *entry)
 {
 	return entry->channel_number;
 }
@@ -259,12 +248,18 @@ uint32_t hdhomerun_channel_list_frequency_count(struct hdhomerun_channel_list_t 
 	return count;
 }
 
-uint32_t hdhomerun_channel_frequency_truncate(uint32_t frequency)
+uint32_t hdhomerun_channel_frequency_round(uint32_t frequency, uint32_t resolution)
 {
-	return (frequency / FREQUENCY_RESOLUTION) * FREQUENCY_RESOLUTION;
+	frequency += resolution / 2;
+	return (frequency / resolution) * resolution;
 }
 
-uint32_t hdhomerun_channel_number_to_frequency(struct hdhomerun_channel_list_t *channel_list, uint8_t channel_number)
+uint32_t hdhomerun_channel_frequency_round_normal(uint32_t frequency)
+{
+	return hdhomerun_channel_frequency_round(frequency, 125000);
+}
+
+uint32_t hdhomerun_channel_number_to_frequency(struct hdhomerun_channel_list_t *channel_list, uint16_t channel_number)
 {
 	struct hdhomerun_channel_entry_t *entry = hdhomerun_channel_list_first(channel_list);
 	while (entry) {
@@ -278,9 +273,9 @@ uint32_t hdhomerun_channel_number_to_frequency(struct hdhomerun_channel_list_t *
 	return 0;
 }
 
-uint8_t hdhomerun_channel_frequency_to_number(struct hdhomerun_channel_list_t *channel_list, uint32_t frequency)
+uint16_t hdhomerun_channel_frequency_to_number(struct hdhomerun_channel_list_t *channel_list, uint32_t frequency)
 {
-	frequency = hdhomerun_channel_frequency_truncate(frequency);
+	frequency = hdhomerun_channel_frequency_round_normal(frequency);
 
 	struct hdhomerun_channel_entry_t *entry = hdhomerun_channel_list_first(channel_list);
 	while (entry) {
@@ -329,7 +324,7 @@ static void hdhomerun_channel_list_build_insert(struct hdhomerun_channel_list_t 
 
 static void hdhomerun_channel_list_build_range(struct hdhomerun_channel_list_t *channel_list, const char *channelmap, const struct hdhomerun_channelmap_range_t *range)
 {
-	uint8_t channel_number;
+	uint16_t channel_number;
 	for (channel_number = range->channel_range_start; channel_number <= range->channel_range_end; channel_number++) {
 		struct hdhomerun_channel_entry_t *entry = (struct hdhomerun_channel_entry_t *)calloc(1, sizeof(struct hdhomerun_channel_entry_t));
 		if (!entry) {
@@ -338,7 +333,7 @@ static void hdhomerun_channel_list_build_range(struct hdhomerun_channel_list_t *
 
 		entry->channel_number = channel_number;
 		entry->frequency = range->frequency + ((uint32_t)(channel_number - range->channel_range_start) * range->spacing);
-		entry->frequency = hdhomerun_channel_frequency_truncate(entry->frequency);
+		entry->frequency = hdhomerun_channel_frequency_round_normal(entry->frequency);
 		sprintf(entry->name, "%s:%u", channelmap, entry->channel_number);
 
 		hdhomerun_channel_list_build_insert(channel_list, entry);

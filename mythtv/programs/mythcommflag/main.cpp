@@ -26,7 +26,6 @@ using namespace std;
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythdb.h"
-#include "mythverbose.h"
 #include "mythversion.h"
 #include "mythcommflagplayer.h"
 #include "programinfo.h"
@@ -36,7 +35,7 @@ using namespace std;
 #include "jobqueue.h"
 #include "remoteencoder.h"
 #include "ringbuffer.h"
-#include "mythcommandlineparser.h"
+#include "commandlineparser.h"
 #include "mythtranslation.h"
 #include "mythlogging.h"
 
@@ -79,9 +78,9 @@ namespace
 }
 
 int  quiet = 0;
+bool progress = true;
 bool force = false;
 
-bool showPercentage = true;
 bool fullSpeed = true;
 bool rebuildSeekTable = false;
 bool beNice = true;
@@ -179,9 +178,9 @@ static int BuildVideoMarkup(ProgramInfo *program_info, bool useDB)
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(cfp);
     cfp->SetPlayerInfo(NULL, NULL, true, ctx);
-    cfp->RebuildSeekTable(!quiet);
+    cfp->RebuildSeekTable(progress);
 
-    if (!quiet)
+    if (progress)
         cerr << "Rebuilt" << endl;
 
     delete ctx;
@@ -196,7 +195,7 @@ static int QueueCommFlagJob(uint chanid, QString starttime)
 
     if (!pginfo.GetChanID())
     {
-        if (!quiet)
+        if (progress)
         {
             QString tmp = QString(
                 "Unable to find program info for chanid %1 @ %2")
@@ -211,7 +210,7 @@ static int QueueCommFlagJob(uint chanid, QString starttime)
 
     if (result)
     {
-        if (!quiet)
+        if (progress)
         {
             QString tmp = QString("Job Queued for chanid %1 @ %2")
                 .arg(chanid).arg(starttime);
@@ -221,7 +220,7 @@ static int QueueCommFlagJob(uint chanid, QString starttime)
     }
     else
     {
-        if (!quiet)
+        if (progress)
         {
             QString tmp = QString("Error queueing job for chanid %1 @ %2")
                 .arg(chanid).arg(starttime);
@@ -376,12 +375,12 @@ static int GetMarkupList(QString list, QString chanid, QString starttime)
 static void streamOutCommercialBreakList(
     ostream &output, const frm_dir_map_t &commercialBreakList)
 {
-    if (!quiet)
+    if (progress)
         output << "----------------------------" << endl;
 
     if (commercialBreakList.empty())
     {
-        if (!quiet)
+        if (progress)
             output << "No breaks" << endl;
     }
     else
@@ -394,7 +393,7 @@ static void streamOutCommercialBreakList(
         }
     }
 
-    if (!quiet)
+    if (progress)
         output << "----------------------------" << endl;
 }
 
@@ -415,7 +414,7 @@ static void print_comm_flag_output(
         out = new fstream(tmp.constData(), ios::app | ios::out );
     }
 
-    if (!quiet)
+    if (progress)
     {
         QString tmp = "";
         if (program_info->GetChanID())
@@ -439,7 +438,7 @@ static void print_comm_flag_output(
     }
 
     if (commDetect)
-        commDetect->PrintFullMap(*out, &commBreakList, !quiet);
+        commDetect->PrintFullMap(*out, &commBreakList, progress);
     else
         streamOutCommercialBreakList(*out, commBreakList);
 
@@ -722,32 +721,33 @@ static int FlagCommercials(
         return GENERIC_EXIT_OK;
     }
 
+    QString chanid = QString::number(program_info->GetChanID())
+        .leftJustified(6, ' ', true);
+    QString recstartts = program_info->GetRecordingStartTime(MythDate)
+        .leftJustified(14, ' ', true);
+    QString title = program_info->GetTitle()
+        .leftJustified(41, ' ', true);
 
-    if (!quiet)
+    QString outstr = QString("%1  %2  %3  ")
+        .arg(chanid).arg(recstartts).arg(title);
+
+    if (progress)
     {
-        QString chanid =
-            QString::number(program_info->GetChanID())
-            .leftJustified(6, ' ', true);
-        QString recstartts = program_info->GetRecordingStartTime(MythDate)
-            .leftJustified(14, ' ', true);
-        QString title = program_info->GetTitle()
-            .leftJustified(41, ' ', true);
-
-        QString outstr = QString("%1 %2 %3 ")
-            .arg(chanid).arg(recstartts).arg(title);
         QByteArray out = outstr.toLocal8Bit();
 
         cerr << out.constData() << flush;
     }
+    VERBOSE(VB_IMPORTANT, outstr);
 
     if (!force && JobQueue::IsJobRunning(JOB_COMMFLAG, *program_info))
     {
-        if (!quiet)
+        if (progress)
         {
             cerr << "IN USE\n";
             cerr << "                        "
                     "(the program is already being flagged elsewhere)\n";
         }
+        VERBOSE(VB_IMPORTANT, "Program is already being flagged elsewhere");
         global_program_info = NULL;
         return GENERIC_EXIT_IN_USE;
     }
@@ -835,9 +835,9 @@ static int FlagCommercials(
 
     if (rebuildSeekTable)
     {
-        cfp->RebuildSeekTable(!quiet);
+        cfp->RebuildSeekTable(progress);
 
-        if (!quiet)
+        if (progress)
             cerr << "Rebuilt\n";
 
         delete ctx;
@@ -892,7 +892,7 @@ static int FlagCommercials(
 
 
     breaksFound = DoFlagCommercials(
-        program_info, showPercentage, fullSpeed, inJobQueue,
+        program_info, progress, fullSpeed, inJobQueue,
         cfp, commDetectMethod, outputfilename, useDB);
 
     if (fakeJobID >= 0)
@@ -902,8 +902,11 @@ static int FlagCommercials(
             QObject::tr("Finished, %n break(s) found.", "", breaksFound));
     }
 
-    if (!quiet)
+    if (progress)
         cerr << breaksFound << "\n";
+
+    VERBOSE(VB_IMPORTANT, QString("Finished, %1 break(s) found.")
+        .arg(breaksFound));
 
     delete ctx;
     global_program_info = NULL;
@@ -955,7 +958,7 @@ int main(int argc, char *argv[])
 
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHCOMMFLAG);
 
-    print_verbose_messages = VB_IMPORTANT;
+    verboseMask = VB_IMPORTANT;
     verboseString = "important";
 
     MythCommFlagCommandLineParser cmdline;
@@ -978,7 +981,7 @@ int main(int argc, char *argv[])
     }
 
     if (cmdline.toBool("verbose"))
-        if (parse_verbose_arg(cmdline.toString("verbose")) ==
+        if (verboseArgParse(cmdline.toString("verbose")) ==
                         GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
 
@@ -1059,30 +1062,34 @@ int main(int argc, char *argv[])
         dontSubmitCommbreakListToDB = true;
         force = true;
     }
-    if (parse_verbose_arg(cmdline.toString("verbose")) ==
+    if (verboseArgParse(cmdline.toString("verbose")) ==
                         GENERIC_EXIT_INVALID_CMDLINE)
         return GENERIC_EXIT_INVALID_CMDLINE;
     if (cmdline.toBool("verboseint"))
-        print_verbose_messages = cmdline.toUInt("verboseint");
+        verboseMask = cmdline.toUInt("verboseint");
 
     if (cmdline.toBool("quiet"))
     {
         quiet = cmdline.toUInt("quiet");
-        showPercentage = false;
         if (quiet > 1)
         {
-            print_verbose_messages = VB_NONE;
-            parse_verbose_arg("none");
+            verboseMask = VB_NONE;
+            verboseArgParse("none");
         }
     }
 
+    progress = !cmdline.toBool("noprogress");
+    if (progress) 
+        quiet++;
+
     int facility = cmdline.GetSyslogFacility();
     bool dblog = !cmdline.toBool("nodblog");
+    LogLevel_t level = cmdline.GetLogLevel();
+    if (level == LOG_UNKNOWN)
+        return GENERIC_EXIT_INVALID_CMDLINE;
 
     if (cmdline.toBool("queue"))
         queueJobInstead = true;
-    if (cmdline.toBool("nopercent"))
-        showPercentage = false;
     if (cmdline.toBool("rebuild"))
     {
         rebuildSeekTable = true;
@@ -1103,7 +1110,8 @@ int main(int argc, char *argv[])
     CleanupGuard callCleanup(cleanup);
 
     QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet, facility, dblog);
+    bool propagate = cmdline.toBool("islogpath");
+    logStart(logfile, quiet, facility, level, dblog, propagate);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(
@@ -1195,9 +1203,8 @@ int main(int argc, char *argv[])
 
         fullSpeed = jobQueueCPU != 0;
 
-        quiet = true;
+        progress = false;
         isVideo = false;
-        showPercentage = false;
 
         int breaksFound = FlagCommercials(
             chanid, starttime, outputfilename, useDB);
@@ -1213,7 +1220,7 @@ int main(int argc, char *argv[])
     }
 
     time_now = time(NULL);
-    if (!quiet)
+    if (progress)
     {
         VERBOSE(VB_IMPORTANT, QString("%1 version: %2 www.mythtv.org")
                   .arg(MYTH_APPNAME_MYTHCOMMFLAG).arg(MYTH_BINARY_VERSION));
@@ -1409,11 +1416,14 @@ int main(int argc, char *argv[])
 
     time_now = time(NULL);
 
-    if (!quiet)
+    if (progress)
     {
         cerr << "\nFinished commercial break flagging at "
              << ctime(&time_now) << endl;
     }
+
+    VERBOSE(VB_IMPORTANT, QString("Finished commercial break flagging at %1")
+        .arg(ctime(&time_now)));
 
     return result;
 }

@@ -15,7 +15,6 @@
 #include "streamlisteners.h"
 #include "mpegstreamdata.h"
 #include "cardutil.h"
-#include "mythverbose.h"
 #include "mythlogging.h"
 
 #define LOC      QString("HDHRSH(%1): ").arg(_device)

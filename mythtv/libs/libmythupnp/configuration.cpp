@@ -25,9 +25,10 @@
 
 #include <QDir>
 #include <QFile>
+#include <QTextStream>
 
 #include "configuration.h"
-#include "mythverbose.h"  // for VERBOSE and GetConfDir()
+#include "mythlogging.h"
 #include "mythdb.h"
 #include "mythdirs.h"
 

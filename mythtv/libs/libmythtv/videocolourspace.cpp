@@ -2,7 +2,7 @@
 
 #include "compat.h"
 #include "mythcorecontext.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "videocolourspace.h"
 
 

@@ -211,6 +211,7 @@ void bd_psr_reset_backup_registers(BD_REGISTERS *);
 /* event types */
 #define BD_PSR_CHANGE  1
 #define BD_PSR_RESTORE 2
+#define BD_PSR_SAVE    3 /* single event, psr_idx and values undefined */
 
 /* event data */
 typedef struct {

@@ -19,7 +19,6 @@
 #include <QCoreApplication>
 
 // libmythbase
-#include "mythverbose.h"
 #include "mythlogging.h"
 
 // Mythui
@@ -581,6 +580,15 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
             h = bForceSize.height();
     }
 
+    bool bPreferLoadInBackground =
+        ((filename.startsWith("myth://")) ||
+         (filename.startsWith("http://")) ||
+         (filename.startsWith("https://")) ||
+         (filename.startsWith("ftp://")));
+
+    if (getenv("DISABLETHREADEDMYTHUIIMAGE"))
+        allowLoadInBackground = false;
+
     QString imagelabel;
 
     int j = 0;
@@ -602,14 +610,13 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
         ImageCacheMode cacheMode2 = (!forceStat) ? kCacheNormal :
             (ImageCacheMode) ((int)kCacheNormal | (int)kCacheForceStat);
 
-
         if ((allowLoadInBackground) &&
-            (!GetMythUI()->LoadCacheImage(filename, imagelabel,
-                                          GetPainter(), cacheMode)) &&
-            (!getenv("DISABLETHREADEDMYTHUIIMAGE")))
+            ((bPreferLoadInBackground) ||
+             (!GetMythUI()->LoadCacheImage(filename, imagelabel,
+                                           GetPainter(), cacheMode))))
         {
-            VERBOSE(VB_GUI|VB_FILE|VB_EXTRA, LOC + QString(
-                        "Load(), spawning thread to load '%1'").arg(filename));
+            LOG(VB_GUI | VB_FILE, LOG_DEBUG, 
+                QString("Load(), spawning thread to load '%1'").arg(filename));
             ImageLoadThread *bImgThread = new ImageLoadThread(
                 this, bFilename, filename, i, bForceSize, cacheMode2);
             GetMythUI()->GetImageThreadPool()->start(bImgThread);
@@ -617,8 +624,8 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
         else
         {
             // Perform a blocking load
-            VERBOSE(VB_GUI|VB_FILE|VB_EXTRA, LOC + QString(
-                        "Load(), loading '%1' in foreground").arg(filename));
+            LOG(VB_GUI | VB_FILE, LOG_DEBUG,
+                QString("Load(), loading '%1' in foreground").arg(filename));
             QString tmpFilename;
             if (!(filename.startsWith("myth://")))
                 tmpFilename = filename;
@@ -677,8 +684,8 @@ MythImage *MythUIImage::LoadImage(
     if ((m_loadingImages.contains(filename)) &&
         (m_loadingImages[filename] == this))
     {
-        VERBOSE(VB_GUI|VB_FILE|VB_EXTRA, LOC + QString(
-                    "MythUIImage::LoadImage(%1), this "
+        LOG(VB_GUI | VB_FILE, LOG_DEBUG,
+            QString("MythUIImage::LoadImage(%1), this "
                     "file is already being loaded by this same MythUIImage in "
                     "another thread.").arg(filename));
         m_loadingImagesLock.unlock();
@@ -692,7 +699,7 @@ MythImage *MythUIImage::LoadImage(
     m_loadingImages[filename] = this;
     m_loadingImagesLock.unlock();
 
-    VERBOSE(VB_GUI|VB_FILE, LOC + QString("LoadImage(%2) Object %3")
+    LOG(VB_GUI | VB_FILE, LOG_DEBUG, QString("LoadImage(%2) Object %3")
             .arg(filename).arg(objectName()));
 
     MythImage *image = NULL;
@@ -728,7 +735,7 @@ MythImage *MythUIImage::LoadImage(
     {
         image->UpRef();
 
-        VERBOSE(VB_GUI|VB_FILE, LOC +
+        LOG(VB_GUI | VB_FILE, LOG_INFO,
                 QString("LoadImage found in cache :%1: RefCount = %2")
                 .arg(imagelabel).arg(image->RefCount()));
 
@@ -739,7 +746,7 @@ MythImage *MythUIImage::LoadImage(
     }
     else
     {
-        VERBOSE(VB_GUI|VB_FILE, LOC +
+        LOG(VB_GUI | VB_FILE, LOG_INFO,
                 QString("LoadImage Not Found in cache. "
                         "Loading Directly :%1:").arg(filename));
 
@@ -803,7 +810,7 @@ MythImage *MythUIImage::LoadImage(
 
     if (image->isNull())
     {
-        VERBOSE(VB_GUI|VB_FILE, LOC + QString("LoadImage Image is NULL :%1:")
+        LOG(VB_GUI | VB_FILE, LOG_INFO, QString("LoadImage Image is NULL :%1:")
                 .arg(filename));
 
         image->DownRef();
@@ -841,8 +848,8 @@ bool MythUIImage::LoadAnimatedImage(
     if ((m_loadingImages.contains(imFile)) &&
         (m_loadingImages[imFile] == this))
     {
-        VERBOSE(VB_GUI|VB_FILE|VB_EXTRA, LOC + QString(
-                    "MythUIImage::LoadAnimatedImage(%1), this "
+        LOG(VB_GUI | VB_FILE, LOG_DEBUG,
+            QString("MythUIImage::LoadAnimatedImage(%1), this "
                     "file is already being loaded by this same MythUIImage in "
                     "another thread.").arg(imFile));
         m_loadingImagesLock.unlock();
@@ -1198,7 +1205,7 @@ void MythUIImage::CopyFrom(MythUIType *base)
     MythUIImage *im = dynamic_cast<MythUIImage *>(base);
     if (!im)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "bad parsing");
+        LOG(VB_GENERAL, LOG_ERR, "bad parsing");
         d->m_UpdateLock.unlock();
         return;
     }
@@ -1322,7 +1329,7 @@ void MythUIImage::customEvent(QEvent *event)
         {
             d->m_UpdateLock.unlock();
 #if 0
-            VERBOSE(VB_GUI|VB_FILE|VB_EXTRA, LOC +
+            LOG(VB_GUI | VB_FILE, LOG_DEBUG,
                     QString("customEvent(): Expecting '%2', got '%3'")
                     .arg(m_Filename).arg(le->GetBasefile()));
 #endif

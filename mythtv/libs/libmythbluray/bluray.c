@@ -1711,6 +1711,11 @@ static void _process_psr_event(void *handle, BD_PSR_EVENT *ev)
 {
     BLURAY *bd = (BLURAY*)handle;
 
+    if (ev->ev_type == BD_PSR_SAVE) {
+        BD_DEBUG(DBG_BLURAY, "PSR SAVE event (%p)\n", bd);
+        return;
+    }
+
     /* PSR restore events are handled internally */
 
     if (ev->ev_type == BD_PSR_RESTORE) {
@@ -1998,18 +2003,22 @@ int bd_menu_call(BLURAY *bd, int64_t pts)
     return _play_title(bd, BLURAY_TITLE_TOP_MENU);
 }
 
-static void _run_gc(BLURAY *bd, gc_ctrl_e msg, uint32_t param)
+static int _run_gc(BLURAY *bd, gc_ctrl_e msg, uint32_t param)
 {
+    int result = -1;
+
     if (bd && bd->graphics_controller && bd->hdmv_vm) {
         GC_NAV_CMDS cmds = {-1, NULL, -1};
 
-        gc_run(bd->graphics_controller, msg, param, &cmds);
+        result = gc_run(bd->graphics_controller, msg, param, &cmds);
 
         if (cmds.num_nav_cmds > 0) {
             hdmv_vm_set_object(bd->hdmv_vm, cmds.num_nav_cmds, cmds.nav_cmds);
             bd->hdmv_suspended = !hdmv_vm_running(bd->hdmv_vm);
         }
     }
+
+    return result;
 }
 
 static void _process_hdmv_vm_event(BLURAY *bd, HDMV_EVENT *hev)
@@ -2160,22 +2169,25 @@ int bd_get_event(BLURAY *bd, BD_EVENT *event)
  * user interaction
  */
 
-void bd_mouse_select(BLURAY *bd, int64_t pts, uint16_t x, uint16_t y)
+void bd_set_scr(BLURAY *bd, int64_t pts)
 {
     if (pts >= 0) {
         bd_psr_write(bd->regs, PSR_TIME, (uint32_t)(((uint64_t)pts) >> 1));
     }
-
-    _run_gc(bd, GC_CTRL_MOUSE_MOVE, (x << 16) | y);
 }
 
-void bd_user_input(BLURAY *bd, int64_t pts, uint32_t key)
+int bd_mouse_select(BLURAY *bd, int64_t pts, uint16_t x, uint16_t y)
 {
-    if (pts >= 0) {
-        bd_psr_write(bd->regs, PSR_TIME, (uint32_t)(((uint64_t)pts) >> 1));
-    }
+    bd_set_scr(bd, pts);
 
-    _run_gc(bd, GC_CTRL_VK_KEY, key);
+    return _run_gc(bd, GC_CTRL_MOUSE_MOVE, (x << 16) | y);
+}
+
+int bd_user_input(BLURAY *bd, int64_t pts, uint32_t key)
+{
+    bd_set_scr(bd, pts);
+
+    return _run_gc(bd, GC_CTRL_VK_KEY, key);
 }
 
 void bd_register_overlay_proc(BLURAY *bd, void *handle, bd_overlay_proc_f func)
@@ -2190,6 +2202,10 @@ void bd_register_overlay_proc(BLURAY *bd, void *handle, bd_overlay_proc_f func)
         bd->graphics_controller = gc_init(bd->regs, handle, func);
     }
 }
+
+/*
+ *
+ */
 
 struct meta_dl *bd_get_meta(BLURAY *bd)
 {

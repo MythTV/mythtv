@@ -7,7 +7,7 @@
 #include <QDomDocument>
 
 // MythDB
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 // MythUI
 
@@ -86,7 +86,7 @@ void MythUIProgressBar::CalculatePosition(void)
 
     if (!progressType)
     {
-        VERBOSE(VB_IMPORTANT, "Progress image doesn't exist");
+        LOG(VB_GENERAL, LOG_ERR, "Progress image doesn't exist");
         return;
     }
 

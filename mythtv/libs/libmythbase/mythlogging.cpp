@@ -5,18 +5,26 @@
 #include <QThread>
 #include <QHash>
 #include <QCoreApplication>
+#include <QFileInfo>
+#include <QStringList>
+#include <QMap>
+#include <iostream>
+
+using namespace std;
 
 #define _LogLevelNames_
 #include "mythlogging.h"
-#include "mythverbose.h"
 #include "mythconfig.h"
 #include "mythdb.h"
 #include "mythcorecontext.h"
 #include "dbutil.h"
+#include "exitcodes.h"
 
 #include <stdlib.h>
 #define SYSLOG_NAMES
+#ifndef _WIN32
 #include <syslog.h>
+#endif
 #include <stdarg.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -29,6 +37,16 @@
 #endif
 #include <signal.h>
 
+// Various ways to get to thread's tid
+#if defined(linux)
+#include <sys/syscall.h>
+#elif defined(__FreeBSD__)
+#include <sys/ucontext.h>
+#include <sys/thr.h>
+#elif CONFIG_DARWIN
+#include <mach/mach.h>
+#endif
+
 QMutex                  loggerListMutex;
 QList<LoggerBase *>     loggerList;
 
@@ -38,19 +56,69 @@ QQueue<LoggingItem_t *> logQueue;
 QMutex                  logThreadMutex;
 QHash<uint64_t, char *> logThreadHash;
 
+QMutex                   logThreadTidMutex;
+QHash<uint64_t, int64_t> logThreadTidHash;
+
 LoggerThread            logThread;
+bool                    logThreadFinished = false;
 bool                    debugRegistration = false;
+
+#ifdef _WIN32
+QMutex                  localtimeMutex;
+#endif
+
+typedef struct {
+    bool    propagate;
+    int     quiet;
+    int     facility;
+    bool    dblog;
+    QString path;
+} LogPropagateOpts;
+
+LogPropagateOpts        logPropagateOpts;
+QString                 logPropagateArgs;
 
 #define TIMESTAMP_MAX 30
 #define MAX_STRING_LENGTH 2048
 
-LogLevel_t LogLevel = LOG_UNKNOWN;  /**< The log level mask to apply, messages
-                                         must be at at least this priority to
-                                         be output */
+LogLevel_t logLevel = (LogLevel_t)LOG_INFO;
 
+typedef struct {
+    uint64_t    mask;
+    QString     name;
+    bool        additive;
+    QString     helpText;
+} VerboseDef;
+
+typedef QMap<QString, VerboseDef *> VerboseMap;
+
+bool verboseInitialized = false;
+VerboseMap verboseMap;
+QMutex verboseMapMutex;
+
+const uint64_t verboseDefaultInt = VB_IMPORTANT | VB_GENERAL;
+const char    *verboseDefaultStr = " important general";
+
+uint64_t verboseMask = verboseDefaultInt;
+QString verboseString = QString(verboseDefaultStr);
+
+unsigned int userDefaultValueInt = verboseDefaultInt;
+QString      userDefaultValueStr = QString(verboseDefaultStr);
+bool         haveUserDefaultValues = false;
+
+void verboseAdd(uint64_t mask, QString name, bool additive, QString helptext);
+void verboseInit(void);
+void verboseHelp();
+
+void LogTimeStamp( struct tm *tm, uint32_t *usec );
 char *getThreadName( LoggingItem_t *item );
+int64_t getThreadTid( LoggingItem_t *item );
+void setThreadTid( LoggingItem_t *item );
 void deleteItem( LoggingItem_t *item );
+#ifndef _WIN32
 void logSighup( int signum, siginfo_t *info, void *secret );
+#endif
+
 
 LoggerBase::LoggerBase(char *string, int number)
 {
@@ -88,36 +156,36 @@ LoggerBase::~LoggerBase()
 }
 
 
-FileLogger::FileLogger(char *filename) : LoggerBase(filename, 0), 
+FileLogger::FileLogger(char *filename) : LoggerBase(filename, 0),
                                          m_opened(false), m_fd(-1)
 {
     if( !strcmp(filename, "-") )
     {
         m_opened = true;
         m_fd = 1;
-        LogPrint( VB_IMPORTANT, LOG_INFO, "Added logging to the console" );
+        LOG(VB_GENERAL, LOG_INFO, "Added logging to the console");
     }
     else
     {
         m_fd = open(filename, O_WRONLY|O_CREAT|O_APPEND, 0664);
         m_opened = (m_fd != -1);
-        LogPrint( VB_IMPORTANT, LOG_INFO, "Added logging to %s", filename );
+        LOG(VB_GENERAL, LOG_INFO, QString("Added logging to %1")
+                 .arg(filename));
     }
 }
 
 FileLogger::~FileLogger()
 {
-    if( m_opened ) 
+    if( m_opened )
     {
         if( m_fd != 1 )
         {
-            LogPrint( VB_IMPORTANT, LOG_INFO, "Removed logging to %s", 
-                      m_handle.string );
+            LOG(VB_GENERAL, LOG_INFO, QString("Removed logging to %1")
+                     .arg(m_handle.string));
             close( m_fd );
         }
         else
-            LogPrint( VB_IMPORTANT, LOG_INFO,
-                      "Removed logging to the console" );
+            LOG(VB_GENERAL, LOG_INFO, "Removed logging to the console");
     }
 }
 
@@ -133,7 +201,8 @@ void FileLogger::reopen(void)
 
     m_fd = open(filename, O_WRONLY|O_CREAT|O_APPEND, 0664);
     m_opened = (m_fd != -1);
-    LogPrint( VB_IMPORTANT, LOG_INFO, "Rolled logging on %s", filename );
+    LOG(VB_GENERAL, LOG_INFO, QString("Rolled logging on %1")
+             .arg(filename));
 }
 
 bool FileLogger::logmsg(LoggingItem_t *item)
@@ -144,29 +213,40 @@ bool FileLogger::logmsg(LoggingItem_t *item)
     int                 length;
     char               *threadName = NULL;
     pid_t               pid = getpid();
+    pid_t               tid = 0;
 
     if (!m_opened)
         return false;
 
     strftime( timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
               (const struct tm *)&item->tm );
-    snprintf( usPart, 9, ".%06d ", (int)(item->usec) );
+    snprintf( usPart, 9, ".%06d", (int)(item->usec) );
     strcat( timestamp, usPart );
     length = strlen( timestamp );
 
-    if (m_fd == 1) 
+    if (m_fd == 1)
     {
         // Stdout
-        snprintf( line, MAX_STRING_LENGTH, "%s %s\n", timestamp, 
-                  item->message );
+        snprintf( line, MAX_STRING_LENGTH, "%s %c  %s\n", timestamp,
+                  LogLevelShortNames[item->level], item->message );
     }
-    else 
+    else
     {
         threadName = getThreadName(item);
+        tid = getThreadTid(item);
 
-        snprintf( line, MAX_STRING_LENGTH, "%s [%d] %s %s:%d (%s) - %s\n", 
-                  timestamp, pid, threadName, item->file, item->line, 
-                  item->function, item->message );
+        if( tid )
+            snprintf( line, MAX_STRING_LENGTH, 
+                      "%s %c [%d/%d] %s %s:%d (%s) - %s\n",
+                      timestamp, LogLevelShortNames[item->level], pid, tid,
+                      threadName, item->file, item->line, item->function,
+                      item->message );
+        else
+            snprintf( line, MAX_STRING_LENGTH,
+                      "%s %c [%d] %s %s:%d (%s) - %s\n",
+                      timestamp, LogLevelShortNames[item->level], pid,
+                      threadName, item->file, item->line, item->function,
+                      item->message );
     }
 
     int result = write( m_fd, line, strlen(line) );
@@ -177,9 +257,9 @@ bool FileLogger::logmsg(LoggingItem_t *item)
     }
 
     if( result == -1 )
-    {  
-        LogPrint( VB_IMPORTANT, LOG_UNKNOWN, 
-                  "Closed Log output on fd %d due to errors", m_fd );
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+                 QString("Closed Log output on fd %1 due to errors").arg(m_fd));
         m_opened = false;
         if( m_fd != 1 )
             close( m_fd );
@@ -189,7 +269,8 @@ bool FileLogger::logmsg(LoggingItem_t *item)
 }
 
 
-SyslogLogger::SyslogLogger(int facility) : LoggerBase(NULL, facility), 
+#ifndef _WIN32
+SyslogLogger::SyslogLogger(int facility) : LoggerBase(NULL, facility),
                                            m_opened(false)
 {
     CODE *name;
@@ -200,16 +281,16 @@ SyslogLogger::SyslogLogger(int facility) : LoggerBase(NULL, facility),
     openlog( m_application, LOG_NDELAY | LOG_PID, facility );
     m_opened = true;
 
-    for( name = &facilitynames[0]; 
+    for( name = &facilitynames[0];
          name->c_name && name->c_val != facility; name++ );
 
-    LogPrint(VB_IMPORTANT, LOG_INFO, "Added syslogging to facility %s",
-             name->c_name);
+    LOG(VB_GENERAL, LOG_INFO, QString("Added syslogging to facility %1")
+             .arg(name->c_name));
 }
 
 SyslogLogger::~SyslogLogger()
 {
-    LogPrint(VB_IMPORTANT, LOG_INFO, "Removing syslogging");
+    LOG(VB_GENERAL, LOG_INFO, "Removing syslogging");
     free(m_application);
     closelog();
 }
@@ -228,9 +309,10 @@ bool SyslogLogger::logmsg(LoggingItem_t *item)
 
     return true;
 }
+#endif
 
 
-DatabaseLogger::DatabaseLogger(char *table) : LoggerBase(table, 0), 
+DatabaseLogger::DatabaseLogger(char *table) : LoggerBase(table, 0),
                                               m_host(NULL), m_opened(false),
                                               m_loggingTableExists(false)
 {
@@ -239,8 +321,9 @@ DatabaseLogger::DatabaseLogger(char *table) : LoggerBase(table, 0),
         "msgtime, level, message) VALUES (:HOST, :APPLICATION, "
         ":PID, :THREAD, :MSGTIME, :LEVEL, :MESSAGE)";
 
-    LogPrint(VB_IMPORTANT, LOG_INFO, "Added database logging to table %s",
-             m_handle.string);
+    LOG(VB_GENERAL, LOG_INFO, 
+             QString("Added database logging to table %1")
+             .arg(m_handle.string));
 
     if (gCoreContext && !gCoreContext->GetHostName().isEmpty())
         m_host = strdup((char *)gCoreContext->GetHostName()
@@ -261,7 +344,7 @@ DatabaseLogger::DatabaseLogger(char *table) : LoggerBase(table, 0),
 
 DatabaseLogger::~DatabaseLogger()
 {
-    LogPrint(VB_IMPORTANT, LOG_INFO, "Removing database logging");
+    LOG(VB_GENERAL, LOG_INFO, "Removing database logging");
 
     if( m_thread )
     {
@@ -288,7 +371,7 @@ bool DatabaseLogger::logmsg(LoggingItem_t *item)
 bool DatabaseLogger::logqmsg(LoggingItem_t *item)
 {
     char        timestamp[TIMESTAMP_MAX];
-    char       *threadName = getThreadName(item);;
+    char       *threadName = getThreadName(item);
 
     if( !isDatabaseReady() )
         return false;
@@ -300,7 +383,7 @@ bool DatabaseLogger::logqmsg(LoggingItem_t *item)
         m_host = strdup((char *)gCoreContext->GetHostName()
                         .toLocal8Bit().constData());
 
-    MSqlQuery   query(MSqlQuery::InitCon());
+    MSqlQuery   query(MSqlQuery::LogCon());
     query.prepare( m_query );
     query.bindValue(":HOST",        m_host);
     query.bindValue(":APPLICATION", m_application);
@@ -316,7 +399,7 @@ bool DatabaseLogger::logqmsg(LoggingItem_t *item)
     }
 
     if (!query.exec())
-    {  
+    {
         MythDB::DBError("DBLogging", query);
         return false;
     }
@@ -358,6 +441,8 @@ void DBLoggerThread::run(void)
 
         qLock.relock();
     }
+    MSqlQuery::CloseLogCon();
+    threadDeregister();
 }
 
 bool DatabaseLogger::isDatabaseReady()
@@ -366,13 +451,43 @@ bool DatabaseLogger::isDatabaseReady()
     MythDB *db;
 
     if ( !m_loggingTableExists )
-        m_loggingTableExists = DBUtil::TableExists(m_handle.string);
+        m_loggingTableExists = tableExists(m_handle.string);
 
     if ( m_loggingTableExists && (db = GetMythDB()) && db->HaveValidDatabase() )
         ready = true;
 
     return ready;
 }
+
+/**
+ *  \brief Checks whether table exists
+ *
+ *  \param  table  The name of the table to check (without schema name)
+ *  \return true if table exists in schema or false if not
+ */
+bool DatabaseLogger::tableExists(const QString &table)
+{
+    bool result = false;
+    MSqlQuery query(MSqlQuery::LogCon());
+    if (query.isConnected())
+    {
+        QString sql = "SELECT INFORMATION_SCHEMA.TABLES.TABLE_NAME "
+                      "  FROM INFORMATION_SCHEMA.TABLES "
+                      " WHERE INFORMATION_SCHEMA.TABLES.TABLE_SCHEMA = "
+                      "       DATABASE() "
+                      "   AND INFORMATION_SCHEMA.TABLES.TABLE_NAME = "
+                      "       :TABLENAME ;";
+        if (query.prepare(sql))
+        {
+            query.bindValue(":TABLENAME", table);
+            if (query.exec() && query.next())
+                result = true;
+        }
+    }
+    return result;
+}
+
+
 
 char *getThreadName( LoggingItem_t *item )
 {
@@ -398,13 +513,49 @@ char *getThreadName( LoggingItem_t *item )
     return( threadName );
 }
 
+int64_t getThreadTid( LoggingItem_t *item )
+{
+    pid_t tid = 0;
+
+    if( !item )
+        return( 0 );
+
+    QMutexLocker locker(&logThreadTidMutex);
+    if( logThreadTidHash.contains(item->threadId) )
+        tid = logThreadTidHash[item->threadId];
+
+    return( tid );
+}
+
+void setThreadTid( LoggingItem_t *item )
+{
+    int64_t tid = 0;
+
+    QMutexLocker locker(&logThreadTidMutex);
+
+    if( ! logThreadTidHash.contains(item->threadId) )
+    {
+#if defined(linux)
+        tid = (int64_t)syscall(SYS_gettid);
+#elif defined(__FreeBSD__) && 0
+        long lwpid;
+        int dummy = thr_self( &lwpid );
+        tid = (int64_t)lwpid;
+#elif CONFIG_DARWIN
+        tid = (int64_t)mach_thread_self();
+#endif
+        logThreadTidHash[item->threadId] = tid;
+    }
+}
+
+
 LoggerThread::LoggerThread()
 {
     char *debug = getenv("VERBOSE_THREADS");
     if (debug != NULL)
     {
-        VERBOSE(VB_IMPORTANT, "Logging thread registration/deregistration "
-                              "enabled!");
+        LOG(VB_GENERAL, LOG_CRIT, "Logging thread registration/deregistration "
+                                  "enabled!");
         debugRegistration = true;
     }
 }
@@ -420,12 +571,13 @@ LoggerThread::~LoggerThread()
         (*it)->deleteLater();
     }
 }
- 
+
 void LoggerThread::run(void)
 {
     threadRegister("Logger");
     LoggingItem_t *item;
 
+    logThreadFinished = false;
     aborted = false;
 
     QMutexLocker qLock(&logQueueMutex);
@@ -448,22 +600,37 @@ void LoggerThread::run(void)
 
         if (item->registering)
         {
+            int64_t tid = getThreadTid(item);
+
             QMutexLocker locker(&logThreadMutex);
             logThreadHash[item->threadId] = strdup(item->threadName);
+
             if( debugRegistration )
             {
                 item->message   = (char *)malloc(LOGLINE_MAX+1);
                 if( item->message )
                 {
                     snprintf( item->message, LOGLINE_MAX,
-                              "Thread 0x%llX registered as \'%s\'", 
-                              (long long unsigned int)item->threadId, 
+                              "Thread 0x%llX (%lld) registered as \'%s\'",
+                              (long long unsigned int)item->threadId,
+                              (long long int)tid, 
                               logThreadHash[item->threadId] );
                 }
             }
         }
         else if (item->deregistering)
         {
+            int64_t tid = 0;
+
+            {
+                QMutexLocker locker(&logThreadTidMutex);
+                if( logThreadTidHash.contains(item->threadId) )
+                {
+                    tid = logThreadTidHash[item->threadId];
+                    logThreadTidHash.remove(item->threadId);
+                }
+            }
+
             QMutexLocker locker(&logThreadMutex);
             if( logThreadHash.contains(item->threadId) )
             {
@@ -473,8 +640,9 @@ void LoggerThread::run(void)
                     if( item->message )
                     {
                         snprintf( item->message, LOGLINE_MAX,
-                                  "Thread 0x%llX deregistered as \'%s\'", 
-                                  (long long unsigned int)item->threadId, 
+                                  "Thread 0x%llX (%lld) deregistered as \'%s\'",
+                                  (long long unsigned int)item->threadId,
+                                  (long long int)tid, 
                                   logThreadHash[item->threadId] );
                     }
                 }
@@ -502,6 +670,8 @@ void LoggerThread::run(void)
 
         qLock.relock();
     }
+
+    logThreadFinished = true;
 }
 
 void deleteItem( LoggingItem_t *item )
@@ -525,38 +695,48 @@ void deleteItem( LoggingItem_t *item )
     delete item;
 }
 
-void LogTimeStamp( time_t *epoch, uint32_t *usec )
+void LogTimeStamp( struct tm *tm, uint32_t *usec )
 {
-    if( !epoch || !usec )
+    if( !usec || !tm )
         return;
+
+    time_t epoch;
 
 #if HAVE_GETTIMEOFDAY
     struct timeval  tv;
     gettimeofday(&tv, NULL);
-    *epoch = tv.tv_sec; 
+    epoch = tv.tv_sec;
     *usec  = tv.tv_usec;
 #else
     /* Stupid system has no gettimeofday, use less precise QDateTime */
     QDateTime date = QDateTime::currentDateTime();
     QTime     time = date.time();
-    *epoch = date.toTime_t();
+    epoch = date.toTime_t();
     *usec = time.msec() * 1000;
+#endif
+
+#ifndef _WIN32
+    localtime_r(&epoch, tm);
+#else
+    {
+        QMutexLocker timeLock(&localtimeMutex);
+        struct tm *tmp = localtime(&epoch);
+        memcpy(tm, tmp, sizeof(struct tm));
+    }
 #endif
 }
 
-void LogPrintLine( uint32_t mask, LogLevel_t level, const char *file, int line, 
+void LogPrintLine( uint32_t mask, LogLevel_t level, const char *file, int line,
                    const char *function, const char *format, ... )
 {
     va_list         arguments;
     char           *message;
     LoggingItem_t  *item;
-    time_t          epoch;
-    uint32_t        usec;
 
     if( !VERBOSE_LEVEL_CHECK(mask) )
         return;
 
-    if( level > LogLevel )
+    if( level > logLevel )
         return;
 
     item = new LoggingItem_t;
@@ -573,25 +753,23 @@ void LogPrintLine( uint32_t mask, LogLevel_t level, const char *file, int line,
     vsnprintf(message, LOGLINE_MAX, format, arguments);
     va_end(arguments);
 
-    LogTimeStamp( &epoch, &usec );
-
-    localtime_r(&epoch, &item->tm);
-    item->usec     = usec;
-
+    LogTimeStamp( &item->tm, &item->usec );
     item->level    = level;
     item->file     = file;
     item->line     = line;
-    item->function = function; 
+    item->function = function;
     item->threadId = (uint64_t)QThread::currentThreadId();
     item->message  = message;
+    setThreadTid(item);
 
     QMutexLocker qLock(&logQueueMutex);
     logQueue.enqueue(item);
 }
 
+#ifndef _WIN32
 void logSighup( int signum, siginfo_t *info, void *secret )
 {
-    VERBOSE(VB_GENERAL, "SIGHUP received, rolling log files.");
+    LOG(VB_GENERAL, LOG_INFO, "SIGHUP received, rolling log files.");
 
     /* SIGHUP was sent.  Close and reopen debug logfiles */
     QMutexLocker locker(&loggerListMutex);
@@ -602,57 +780,120 @@ void logSighup( int signum, siginfo_t *info, void *secret )
         (*it)->reopen();
     }
 }
+#endif
 
+void logPropagateCalc(void)
+{
+    QString mask = verboseString.trimmed();
+    mask.replace(QRegExp(" "), ",");
+    mask.remove(QRegExp("^,"));
+    logPropagateArgs = " --verbose " + mask;
 
-void logStart(QString logfile, int quiet, int facility, bool dblog)
+    if (logPropagateOpts.propagate)
+        logPropagateArgs += " --logpath " + logPropagateOpts.path;
+
+    QString name = QString(LogLevelNames[logLevel]).toLower();
+    name.remove(0, 4);
+    logPropagateArgs += " --loglevel " + name;
+
+    if (logPropagateOpts.quiet)
+        logPropagateArgs += " --quiet";
+
+    if (!logPropagateOpts.dblog)
+        logPropagateArgs += " --nodblog";
+
+#ifndef _WIN32
+    if (logPropagateOpts.facility >= 0)
+    {
+        CODE *syslogname;
+
+        for( syslogname = &facilitynames[0];
+             (syslogname->c_name &&
+              syslogname->c_val != logPropagateOpts.facility); syslogname++ );
+
+        logPropagateArgs += QString(" --syslog %1").arg(syslogname->c_name);
+    }
+#endif
+}
+
+bool logPropagateQuiet(void)
+{
+    return logPropagateOpts.quiet;
+}
+
+void logStart(QString logfile, int quiet, int facility, LogLevel_t level,
+              bool dblog, bool propagate)
 {
     LoggerBase *logger;
-    struct sigaction sa;
 
     if (logThread.isRunning())
         return;
+ 
+    logLevel = level;
+    LOG(VB_GENERAL, LOG_CRIT, QString("Setting Log Level to %1")
+             .arg(LogLevelNames[logLevel]));
+
+    logPropagateOpts.propagate = propagate;
+    logPropagateOpts.quiet = quiet;
+    logPropagateOpts.facility = facility;
+    logPropagateOpts.dblog = dblog;
+
+    if (propagate)
+    {
+        QFileInfo finfo(logfile);
+        QString path = finfo.path();
+        logPropagateOpts.path = path;
+    }
+
+    logPropagateCalc();
 
     /* log to the console */
     if( !quiet )
         logger = new FileLogger((char *)"-");
 
     /* Debug logfile */
-    if( !logfile.isEmpty() ) 
+    if( !logfile.isEmpty() )
         logger = new FileLogger((char *)logfile.toLocal8Bit().constData());
 
+#ifndef _WIN32
     /* Syslog */
-    if( facility < 0 )
-        LogPrint(VB_IMPORTANT, LOG_CRIT, 
+    if( facility == -1 )
+        LOG(VB_GENERAL, LOG_CRIT,
                  "Syslogging facility unknown, disabling syslog output");
-    else if( facility > 0 )
+    else if( facility >= 0 )
         logger = new SyslogLogger(facility);
+#endif
 
     /* Database */
     if( dblog )
         logger = new DatabaseLogger((char *)"logging");
 
+#ifndef _WIN32
     /* Setup SIGHUP */
-    LogPrint(VB_IMPORTANT, LOG_CRIT, "Setting up SIGHUP handler");
+    LOG(VB_GENERAL, LOG_CRIT, "Setting up SIGHUP handler");
+    struct sigaction sa;
     sa.sa_sigaction = logSighup;
     sigemptyset( &sa.sa_mask );
     sa.sa_flags = SA_RESTART | SA_SIGINFO;
     sigaction( SIGHUP, &sa, NULL );
+#endif
 
     logThread.start();
 }
 
 void logStop(void)
 {
-    struct sigaction sa;
-
     logThread.stop();
     logThread.wait();
 
+#ifndef _WIN32
     /* Tear down SIGHUP */
+    struct sigaction sa;
     sa.sa_handler = SIG_DFL;
     sigemptyset( &sa.sa_mask );
     sa.sa_flags = SA_RESTART;
     sigaction( SIGHUP, &sa, NULL );
+#endif
 
     QMutexLocker locker(&loggerListMutex);
     QList<LoggerBase *>::iterator it;
@@ -669,20 +910,16 @@ void logStop(void)
 void threadRegister(QString name)
 {
     uint64_t id = (uint64_t)QThread::currentThreadId();
-    LoggingItem_t  *item;
-    time_t epoch;
-    uint32_t usec;
 
-    item = new LoggingItem_t;
+    LoggingItem_t *item = new LoggingItem_t;
     if (!item)
         return;
 
+    if (logThreadFinished)
+        return;
+
     memset( item, 0, sizeof(LoggingItem_t) );
-    LogTimeStamp( &epoch, &usec );
-
-    localtime_r(&epoch, &item->tm);
-    item->usec = usec;
-
+    LogTimeStamp( &item->tm, &item->usec );
     item->level = (LogLevel_t)LOG_DEBUG;
     item->threadId = id;
     item->line = __LINE__;
@@ -690,6 +927,7 @@ void threadRegister(QString name)
     item->function = (char *)__FUNCTION__;
     item->threadName = strdup((char *)name.toLocal8Bit().constData());
     item->registering = true;
+    setThreadTid(item);
 
     QMutexLocker qLock(&logQueueMutex);
     logQueue.enqueue(item);
@@ -699,19 +937,16 @@ void threadDeregister(void)
 {
     uint64_t id = (uint64_t)QThread::currentThreadId();
     LoggingItem_t  *item;
-    time_t epoch;
-    uint32_t usec;
 
     item = new LoggingItem_t;
     if (!item)
         return;
 
+    if (logThreadFinished)
+        return;
+
     memset( item, 0, sizeof(LoggingItem_t) );
-    LogTimeStamp( &epoch, &usec );
-
-    localtime_r(&epoch, &item->tm);
-    item->usec = usec;
-
+    LogTimeStamp( &item->tm, &item->usec );
     item->level = (LogLevel_t)LOG_DEBUG;
     item->threadId = id;
     item->line = __LINE__;
@@ -725,15 +960,205 @@ void threadDeregister(void)
 
 int syslogGetFacility(QString facility)
 {
+#ifdef _WIN32
+    LOG(VB_GENERAL, LOG_CRIT, "Windows does not support syslog,"
+                                   " disabling" );
+    return( -2 );
+#else
     CODE *name;
     int i;
     char *string = (char *)facility.toLocal8Bit().constData();
-    
-    for( i = 0, name = &facilitynames[0]; 
+
+    for( i = 0, name = &facilitynames[0];
          name->c_name && strcmp(name->c_name, string); i++, name++ );
 
     return( name->c_val );
+#endif
 }
+
+LogLevel_t logLevelGet(QString level)
+{
+    int i;
+
+    level = "LOG_" + level.toUpper();
+    for( i = LOG_EMERG; i < LOG_UNKNOWN; i++ )
+    {
+        if( level == LogLevelNames[i] )
+            return (LogLevel_t)i;
+    }
+
+    return LOG_UNKNOWN;
+}
+
+
+void verboseAdd(uint64_t mask, QString name, bool additive, QString helptext)
+{
+    VerboseDef *item = new VerboseDef;
+
+    item->mask = mask;
+    name.detach();
+    // VB_GENERAL -> general
+    name.remove(0, 3);
+    name = name.toLower();
+    item->name = name;
+    item->additive = additive;
+    helptext.detach();
+    item->helpText = helptext;
+
+    verboseMap.insert(name, item);
+}
+
+void verboseInit(void)
+{
+    QMutexLocker locker(&verboseMapMutex);
+    verboseMap.clear();
+
+    // This looks funky, so I'll put some explanation here.  The verbosedefs.h
+    // file gets included as part of the mythlogging.h include, and at that
+    // time, the normal (without _IMPLEMENT_VERBOSE defined) code case will
+    // define the VerboseMask enum.  At this point, we force it to allow us
+    // to include the file again, but with _IMPLEMENT_VERBOSE set so that the
+    // single definition of the VB_* values can be shared to define also the
+    // contents of verboseMap, via repeated calls to verboseAdd()
+
+#undef VERBOSEDEFS_H_
+#define _IMPLEMENT_VERBOSE
+#include "verbosedefs.h"
+    
+    verboseInitialized = true;
+}
+
+void verboseHelp()
+{
+    QString m_verbose = verboseString.trimmed();
+    m_verbose.replace(QRegExp(" "), ",");
+    m_verbose.remove(QRegExp("^,"));
+
+    cerr << "Verbose debug levels.\n"
+            "Accepts any combination (separated by comma) of:\n\n";
+
+    for (VerboseMap::Iterator vit = verboseMap.begin();
+         vit != verboseMap.end(); ++vit )
+    {
+        VerboseDef *item = vit.value();
+        QString name = QString("  %1").arg(item->name, -15, ' ');
+        cerr << name.toLocal8Bit().constData() << " - " << 
+                item->helpText.toLocal8Bit().constData() << endl;
+    }
+
+    cerr << endl <<
+      "The default for this program appears to be: '-v " <<
+      m_verbose.toLocal8Bit().constData() << "'\n\n"
+      "Most options are additive except for none, all, and important.\n"
+      "These three are semi-exclusive and take precedence over any\n"
+      "prior options given.  You can however use something like\n"
+      "'-v none,jobqueue' to get only JobQueue related messages\n"
+      "and override the default verbosity level.\n\n"
+      "The additive options may also be subtracted from 'all' by \n"
+      "prefixing them with 'no', so you may use '-v all,nodatabase'\n"
+      "to view all but database debug messages.\n\n"
+      "Some debug levels may not apply to this program.\n\n";
+}
+
+int verboseArgParse(QString arg)
+{
+    QString option;
+
+    if (!verboseInitialized)
+        verboseInit();
+
+    QMutexLocker locker(&verboseMapMutex);
+
+    verboseMask = verboseDefaultInt;
+    verboseString = QString(verboseDefaultStr);
+
+    if (arg.startsWith('-'))
+    {
+        cerr << "Invalid or missing argument to -v/--verbose option\n";
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+
+    QStringList verboseOpts = arg.split(',');
+    for (QStringList::Iterator it = verboseOpts.begin();
+         it != verboseOpts.end(); ++it )
+    {
+        option = (*it).toLower();
+        bool reverseOption = false;
+
+        if (option != "none" && option.left(2) == "no")
+        {
+            reverseOption = true;
+            option = option.right(option.length() - 2);
+        }
+
+        if (option == "help")
+        {
+            verboseHelp();
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
+        else if (option == "default")
+        {
+            if (haveUserDefaultValues)
+            {
+                verboseMask = userDefaultValueInt;
+                verboseString = userDefaultValueStr;
+            }
+            else
+            {
+                verboseMask = verboseDefaultInt;
+                verboseString = QString(verboseDefaultStr);
+            }
+        }
+        else 
+        {
+            VerboseDef *item = verboseMap.value(option);
+
+            if (item)
+            {
+                if (reverseOption)
+                {
+                    verboseMask &= ~(item->mask);
+                    verboseString += " no" + item->name;
+                }
+                else
+                {
+                    if (item->additive)
+                    {
+                        verboseMask |= item->mask;
+                        verboseString += ' ' + item->name;
+                    }
+                    else
+                    {
+                        verboseMask = item->mask;
+                        verboseString = item->name;
+                    }
+                }
+            }
+            else
+            {
+                cerr << "Unknown argument for -v/--verbose: " << 
+                        option.toLocal8Bit().constData() << endl;;
+                return GENERIC_EXIT_INVALID_CMDLINE;
+            }
+        }
+    }
+
+    if (!haveUserDefaultValues)
+    {
+        haveUserDefaultValues = true;
+        userDefaultValueInt = verboseMask;
+        userDefaultValueStr = verboseString;
+    }
+
+    return GENERIC_EXIT_OK;
+}
+
+// Verbose helper function for ENO macro
+QString logStrerror(int errnum)
+{
+    return QString("%1 (%2)").arg(strerror(errnum)).arg(errnum);
+}
+
 
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4

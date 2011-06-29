@@ -10,6 +10,7 @@
 using namespace std;
 
 // Qt headers
+#include <QWaitCondition>
 #include <QThread>
 #include <QMutex>
 
@@ -42,8 +43,6 @@ class SignalMonitor : protected QThread
 
     virtual void Start();
     virtual void Stop();
-    virtual void Kick();
-    virtual bool WaitForLock(int timeout = -1);
 
     // // // // // // // // // // // // // // // // // // // // // // // //
     // Flags // // // // // // // // // // // // // // // // // // // // //
@@ -62,7 +61,7 @@ class SignalMonitor : protected QThread
     bool GetNotifyFrontend() const { return notify_frontend; }
     /// \brief Returns milliseconds between signal monitoring events.
     int GetUpdateRate() const { return update_rate; }
-    virtual QStringList GetStatusList(bool kick = true);
+    virtual QStringList GetStatusList(void) const;
 
     /// \brief Returns true iff scriptStatus.IsGood() and signalLock.IsGood()
     ///        return true
@@ -197,8 +196,6 @@ class SignalMonitor : protected QThread
     volatile uint64_t flags;
     int          update_rate;
     uint         minimum_update_rate;
-    bool         running;
-    bool         exit;
     bool         update_done;
     bool         notify_frontend;
     bool         tablemon;
@@ -215,6 +212,10 @@ class SignalMonitor : protected QThread
     vector<SignalMonitorListener*> listeners;
 
     QMutex             startStopLock;
+    QWaitCondition     startStopWait; // protected by startStopLock
+    volatile bool      running;       // protected by startStopLock
+    volatile bool      exit;          // protected by startStopLock
+
     mutable QMutex     statusLock;
     mutable QMutex     listenerLock;
 };

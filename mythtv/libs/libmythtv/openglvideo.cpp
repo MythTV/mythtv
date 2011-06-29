@@ -835,11 +835,7 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
 
 void OpenGLVideo::SetDeinterlacing(bool deinterlacing)
 {
-    if (deinterlacing == hardwareDeinterlacing)
-        return;
-
     hardwareDeinterlacing = deinterlacing;
-
     OpenGLLocker ctx_lock(gl_context);
     CheckResize(hardwareDeinterlacing);
 }
@@ -940,8 +936,16 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         // invert if first filter
         if (it == filters.begin())
         {
-            vrect.setTop((visible.height()) - display.top());
-            vrect.setBottom(vrect.top() - (display.height()));
+            if (filters.size() > 1)
+            {
+                vrect.setTop((visible.height()) - display.top());
+                vrect.setBottom(vrect.top() - (display.height()));
+            }
+            else
+            {
+                vrect.setBottom(display.top());
+                vrect.setTop(display.top() + (display.height()));
+            }
         }
 
         // hardware bobdeint

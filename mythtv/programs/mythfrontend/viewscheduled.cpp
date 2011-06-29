@@ -7,7 +7,7 @@
 #include "recordinginfo.h"
 #include "tv_play.h"
 #include "recordingrule.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythcorecontext.h"
 #include "remoteutil.h"
 #include "mythuitext.h"

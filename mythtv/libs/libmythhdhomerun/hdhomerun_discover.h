@@ -37,6 +37,7 @@ struct hdhomerun_discover_device_t {
 	uint32_t ip_addr;
 	uint32_t device_type;
 	uint32_t device_id;
+	uint8_t tuner_count;
 };
 
 /*

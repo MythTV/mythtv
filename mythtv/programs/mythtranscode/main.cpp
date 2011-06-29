@@ -17,7 +17,6 @@ using namespace std;
 #include "jobqueue.h"
 #include "mythcontext.h"
 #include "mythdb.h"
-#include "mythverbose.h"
 #include "mythversion.h"
 #include "util.h"
 #include "transcode.h"
@@ -25,7 +24,8 @@ using namespace std;
 #include "remotefile.h"
 #include "mythtranslation.h"
 #include "mythlogging.h"
-#include "mythcommandlineparser.h"
+#include "commandlineparser.h"
+#include "recordinginfo.h"
 
 static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                         frm_dir_map_t *deleteMap, int &resultCode);
@@ -96,6 +96,31 @@ static int CheckJobQueue()
     return 0;
 }
 
+static int QueueTranscodeJob(ProgramInfo *pginfo, QString profile,
+                            QString hostname, bool usecutlist)
+{
+    RecordingInfo recinfo(*pginfo);
+    if (!profile.isEmpty())
+        recinfo.ApplyTranscoderProfileChange(profile);
+
+    if (JobQueue::QueueJob(JOB_TRANSCODE,
+            pginfo->GetChanID(),
+            pginfo->GetRecordingStartTime(),
+            hostname, "", "", 
+            usecutlist ? JOB_USE_CUTLIST : 0))
+    {
+        VERBOSE(VB_IMPORTANT, QString("Queued transcode job for chanid %1 @ %2")
+                    .arg(pginfo->GetChanID())
+                    .arg(pginfo->GetRecordingStartTime().toString("yyyyMMddhhmmss")));
+        return GENERIC_EXIT_OK;
+    }
+
+    VERBOSE(VB_IMPORTANT, QString("Error queuing job for chanid %1 @ %2")
+                .arg(pginfo->GetChanID())
+                .arg(pginfo->GetRecordingStartTime().toString("yyyyMMddhhmmss")));
+    return GENERIC_EXIT_DB_ERROR;
+}
+
 int main(int argc, char *argv[])
 {
     uint chanid;
@@ -107,7 +132,8 @@ int main(int argc, char *argv[])
     int jobType = JOB_NONE;
     int otype = REPLEX_MPEG2;
     bool useCutlist = false, keyframesonly = false;
-    bool build_index = false, fifosync = false, showprogress = false, mpeg2 = false;
+    bool build_index = false, fifosync = false, showprogress = false;
+    bool mpeg2 = false;
     QMap<QString, QString> settingsOverride;
     frm_dir_map_t deleteMap;
     frm_pos_map_t posMap;
@@ -118,7 +144,7 @@ int main(int argc, char *argv[])
 
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHTRANSCODE);
 
-    print_verbose_messages = VB_IMPORTANT;
+    verboseMask = VB_IMPORTANT;
     verboseString = "important";
 
     int found_starttime = 0;
@@ -149,11 +175,11 @@ int main(int argc, char *argv[])
     }
 
     if (cmdline.toBool("verbose"))
-        if (parse_verbose_arg(cmdline.toString("verbose")) == 
+        if (verboseArgParse(cmdline.toString("verbose")) == 
                 GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
     if (cmdline.toBool("verboseint"))
-        print_verbose_messages = cmdline.toUInt("verboseint");
+        verboseMask = cmdline.toUInt("verboseint");
 
     if (cmdline.toBool("starttime"))
     {
@@ -254,8 +280,6 @@ int main(int argc, char *argv[])
         fifosync = true;
     if (cmdline.toBool("recopt"))
         recorderOptions = cmdline.toString("recopt");
-    if (cmdline.toBool("showprogress"))
-        showprogress = true;
     if (cmdline.toBool("mpeg2"))
         mpeg2 = true;
     if (cmdline.toBool("ostream"))
@@ -280,23 +304,31 @@ int main(int argc, char *argv[])
         passthru = true;
 
     if (outfile == "-")
-        print_verbose_messages = VB_NONE;
+        verboseMask = VB_NONE;
 
     if (cmdline.toBool("quiet"))
     {
         quiet = cmdline.toUInt("quiet");
         if (quiet > 1)
         {
-            print_verbose_messages = VB_NONE;
-            parse_verbose_arg("none");
+            verboseMask = VB_NONE;
+            verboseArgParse("none");
         }
     }
 
+    showprogress = cmdline.toBool("showprogress");
+    if (showprogress)
+        quiet++;
+
     int facility = cmdline.GetSyslogFacility();
     bool dblog = !cmdline.toBool("nodblog");
+    LogLevel_t level = cmdline.GetLogLevel();
+    if (level == LOG_UNKNOWN)
+        return GENERIC_EXIT_INVALID_CMDLINE;
 
     QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet, facility, dblog);
+    bool propagate = cmdline.toBool("islogpath");
+    logStart(logfile, quiet, facility, level, dblog, propagate);
 
     //  Load the context
     MythContext context(MYTH_BINARY_VERSION);
@@ -418,6 +450,12 @@ int main(int argc, char *argv[])
     {
         VERBOSE(VB_IMPORTANT, "No program info found!");
         return GENERIC_EXIT_NO_RECORDING_DATA;
+    }
+
+    if (cmdline.toBool("queue"))
+    {
+        QString hostname = cmdline.toString("queue");
+        return QueueTranscodeJob(pginfo, profilename, hostname, useCutlist);
     }
 
     if (infile.left(7) == "myth://" && (outfile.isNull() || outfile != "-"))

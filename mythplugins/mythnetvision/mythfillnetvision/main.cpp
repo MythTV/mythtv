@@ -13,7 +13,6 @@ using namespace std;
 #include <exitcodes.h>
 #include <mythcontext.h>
 #include <mythdb.h>
-#include <mythverbose.h>
 #include <mythversion.h>
 #include <remoteutil.h>
 #include <util.h>
@@ -81,7 +80,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("mythfillnetvision");
 
     if (cmdline.toBool("verbose"))
-        if (parse_verbose_arg(cmdline.toString("verbose")) ==
+        if (verboseArgParse(cmdline.toString("verbose")) ==
                     GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
 
@@ -91,13 +90,16 @@ int main(int argc, char *argv[])
         quiet = cmdline.toUInt("quiet");
         if (quiet > 1)
         {
-            print_verbose_messages = VB_NONE;
-            parse_verbose_arg("none");
+            verboseMask = VB_NONE;
+            verboseArgParse("none");
         }
     }
 
     int facility = cmdline.GetSyslogFacility();
     bool dblog = !cmdline.toBool("nodblog");
+    LogLevel_t level = cmdline.GetLogLevel();
+    if (level == LOG_UNKNOWN)
+        return GENERIC_EXIT_INVALID_CMDLINE;
 
     ///////////////////////////////////////////////////////////////////////
     // Don't listen to console input
@@ -108,7 +110,8 @@ int main(int argc, char *argv[])
             .arg(MYTH_SOURCE_VERSION));
 
     QString logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet, facility, dblog);
+    bool propagate = cmdline.toBool("islogpath");
+    logStart(logfile, quiet, facility, level, dblog, propagate);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
@@ -147,7 +150,7 @@ int main(int argc, char *argv[])
 
     MythTranslation::load("mythfrontend");
 
-    if (refreshtree)
+    if (refreshall || refreshtree)
     {
         QEventLoop treeloop;
 
@@ -160,7 +163,7 @@ int main(int argc, char *argv[])
         treeloop.exec();
     }
 
-    if (refreshrss)
+    if (refreshall || refreshrss)
     {
         QEventLoop rssloop;
 

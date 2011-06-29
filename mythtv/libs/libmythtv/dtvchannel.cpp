@@ -8,7 +8,7 @@ using namespace std;
 #include "cardutil.h"
 #include "dtvchannel.h"
 #include "mpegtables.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #define LOC QString("DTVChan(%1): ").arg(GetDevice())
 #define LOC_WARN QString("DTVChan(%1) Warning: ").arg(GetDevice())
@@ -253,6 +253,11 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     }
 
     // If the frequency is zeroed out, don't use it directly.
+    if (frequency == 0)
+    {
+        frequency = (freqid.toUInt() + finetune) * 1000;
+        mplexid = 0;
+    }
     bool isFrequency = (frequency > 10000000);
     bool hasTuneToChan =
         !(*it)->tuneToChannel.isEmpty() && (*it)->tuneToChannel != "Undefined";

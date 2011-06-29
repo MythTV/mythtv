@@ -1,6 +1,6 @@
 #include <QStringList>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #include "mythuibuttonlist.h"
 #include "mythuitext.h"

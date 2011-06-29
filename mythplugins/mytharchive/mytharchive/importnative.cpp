@@ -426,7 +426,10 @@ void ImportNative::finishedPressed()
         QFile::remove(logDir + "/progress.log");
 
     commandline = "mytharchivehelper --importnative --infile \"" + m_xmlFile + 
-                  "\" --chanid " + chanID + " --quiet";
+                  "\" --chanid " + chanID;
+    commandline += logPropagateArgs;
+    if (!logPropagateQuiet())
+        commandline += " --quiet";
     commandline += " > "  + logDir + "/progress.log 2>&1 &";
 
     uint flags = kMSRunBackground | kMSDontBlockInputDevs | 

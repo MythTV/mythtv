@@ -6,7 +6,7 @@
 #include "virtualkeyboard_qt.h"
 #include "mythdialogs.h"
 #include "uitypes.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythcorecontext.h"
 
 #include "mythfontproperties.h"
@@ -33,7 +33,7 @@ void VirtualKeyboardQt::SwitchLayout(const QString &lang)
 {
     if (!m_parentEdit)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "No edit receiving output");
+        LOG(VB_GENERAL, LOG_ERR, "No edit receiving output");
         reject();
         return;
     }
@@ -44,14 +44,13 @@ void VirtualKeyboardQt::SwitchLayout(const QString &lang)
 
     if (!loadThemedWindow("keyboard", theme_file))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN +
-                QString("Cannot find layout for '%1'").arg(language));
+        LOG(VB_GENERAL, LOG_WARNING,
+                 QString("Cannot find layout for '%1'").arg(language));
 
         // cannot find layout so fallback to US English layout
         if (!loadThemedWindow("keyboard", "keyboard/en_us_"))
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Cannot find layout for US English");
+            LOG(VB_GENERAL, LOG_ERR, "Cannot find layout for US English");
 
             reject();
             return;
@@ -63,8 +62,8 @@ void VirtualKeyboardQt::SwitchLayout(const QString &lang)
 
     if (!container)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Cannot find the 'keyboard_container' in your theme");
+        LOG(VB_GENERAL, LOG_ERR,
+                 "Cannot find the 'keyboard_container' in your theme");
 
         reject();
         return;
@@ -164,8 +163,8 @@ void VirtualKeyboardQt::SwitchLayout(const QString &lang)
     m_keyboard = getUIKeyboardType("keyboard");
     if (!m_keyboard)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Cannot find the UIKeyboardType in your theme");
+        LOG(VB_GENERAL, LOG_ERR,
+                 "Cannot find the UIKeyboardType in your theme");
 
         reject();
         return;

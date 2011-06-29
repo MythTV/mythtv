@@ -27,7 +27,7 @@ using namespace std;
 #include <QPixmap>
 #include <QPainter>
 
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "lcddevice.h"
 
 #include "uilistbtntype.h"
@@ -244,7 +244,9 @@ void UIListTreeType::SetTree(UIListGenericTree *toplevel)
         //  Not really an error, as UIListTreeType is perfectly capable of drawing an empty list.
         //
 
-        // cerr << "No top-level children?\n";
+#if 0
+        LOG(VB_GENERAL, LOG_DEBUG, "No top-level children?");
+#endif
         return;
     }
 
@@ -256,7 +258,8 @@ void UIListTreeType::SetTree(UIListGenericTree *toplevel)
 
     if (!currentlevel)
     {
-        cerr << "Something is seriously wrong (currentlevel = NULL)\n";
+        LOG(VB_GENERAL, LOG_ALERT,
+                 "Something is seriously wrong (currentlevel = NULL)");
         return;
     }
 
@@ -459,7 +462,7 @@ UIListBtnType *UIListTreeType::GetLevel(int levelnum)
 {
     if ((uint)levelnum > (uint)listLevels.size())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "OOB GetLevel call");
+        LOG(VB_GENERAL, LOG_ERR, "OOB GetLevel call");
         return NULL;
     }
 
@@ -736,9 +739,8 @@ bool UIListTreeType::tryToSetCurrent(QStringList route)
             currentpos = (UIListGenericTree *)next_child;
             if (!currentlevel->MoveToNamedPosition(currentpos->getString()))
             {
-                cerr << "uilistbtntype.o: had problem finding "
-                     << "something it knows is there"
-                     << endl;
+                LOG(VB_GENERAL, LOG_CRIT,
+                         "had problem finding something it knows is there");
                 keep_going = false;
             }
         }
@@ -1418,7 +1420,7 @@ bool UIListBtnType::MoveItemUpDown(UIListBtnTypeItem *item, bool flag)
 
     if (item != m_selItem)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Can't move non-selected item");
+        LOG(VB_GENERAL, LOG_ERR, "Can't move non-selected item");
         return false;
     }
 

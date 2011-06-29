@@ -59,7 +59,7 @@ using namespace std;
 #include "lcddevice.h"
 #include "langsettings.h"
 #include "mythtranslation.h"
-#include "mythcommandlineparser.h"
+#include "commandlineparser.h"
 #include "channelgroupsettings.h"
 
 #include "myththemedmenu.h"
@@ -981,7 +981,7 @@ static void TVMenuCallback(void *data, QString &selection)
         if (fa->Create())
             mainStack->AddScreen(fa);
     }
-    if (sel == "manager")
+    else if (sel == "manager")
         RunVideoScreen(VideoDialog::DLG_MANAGER);
     else if (sel == "browser")
         RunVideoScreen(VideoDialog::DLG_BROWSER);
@@ -1000,7 +1000,7 @@ static void TVMenuCallback(void *data, QString &selection)
     else
         VERBOSE(VB_IMPORTANT, "Unknown menu action: " + selection);
 
-    if (sel.left(9) == "settings ")
+    if (sel.left(9) == "settings " || sel == "video_settings_general")
     {
         GetMythUI()->RemoveCurrentLocation();
 
@@ -1106,6 +1106,8 @@ static int internal_play_media(const QString &mrl, const QString &plot,
         mrl, plot, title, subtitle, director, season, episode,
         lenMins, (year.toUInt()) ? year.toUInt() : 1900);
 
+    pginfo->SetProgramInfoType(pginfo->DiscoverProgramInfoType());
+
     int64_t pos = 0;
 
     if (pginfo->IsVideoDVD())
@@ -1147,6 +1149,8 @@ static int internal_play_media(const QString &mrl, const QString &plot,
             delete pginfo;
             return res;
         }
+        else
+            delete pginfo;
     }
     else
     {
@@ -1413,7 +1417,7 @@ int main(int argc, char **argv)
     QString binname = finfo.baseName();
 
     if (cmdline.toBool("verbose"))
-        if (parse_verbose_arg(cmdline.toString("verbose")) ==
+        if (verboseArgParse(cmdline.toString("verbose")) ==
                         GENERIC_EXIT_INVALID_CMDLINE)
             return GENERIC_EXIT_INVALID_CMDLINE;
 
@@ -1422,13 +1426,16 @@ int main(int argc, char **argv)
         quiet = cmdline.toUInt("quiet");
         if (quiet > 1)
         {
-            print_verbose_messages = VB_NONE;
-            parse_verbose_arg("none");
+            verboseMask = VB_NONE;
+            verboseArgParse("none");
         }
     }
 
     int facility = cmdline.GetSyslogFacility();
     bool dblog = !cmdline.toBool("nodblog");
+    LogLevel_t level = cmdline.GetLogLevel();
+    if (level == LOG_UNKNOWN)
+        return GENERIC_EXIT_INVALID_CMDLINE;
 
     VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
                             .arg(MYTH_APPNAME_MYTHFRONTEND)
@@ -1463,7 +1470,8 @@ int main(int argc, char **argv)
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
     logfile = cmdline.GetLogFilePath();
-    logStart(logfile, quiet, facility, dblog);
+    bool propagate = cmdline.toBool("islogpath");
+    logStart(logfile, quiet, facility, level, dblog, propagate);
 
     if (!cmdline.toBool("noupnp"))
     {

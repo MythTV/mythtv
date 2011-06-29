@@ -3,7 +3,7 @@
 
 #include "mythpainter_yuva.h"
 #include "mythfontproperties.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #define MAX_FONT_CACHE 32
 

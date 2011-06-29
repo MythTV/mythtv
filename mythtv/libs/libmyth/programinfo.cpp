@@ -27,9 +27,10 @@ using namespace std;
 #include "dialogbox.h"
 #include "remoteutil.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "storagegroup.h"
 #include "programinfoupdater.h"
+#include "remotefile.h"
 
 #define LOC      QString("ProgramInfo(%1): ").arg(GetBasename())
 #define LOC_WARN QString("ProgramInfo(%1), Warning: ").arg(GetBasename())
@@ -1164,7 +1165,7 @@ void ProgramInfo::ToStringList(QStringList &list) const
 
 #define NEXT_STR()        do { if (it == listend)                    \
                                {                                     \
-                                   VERBOSE(VB_IMPORTANT, listerror); \
+                                   LOG(VB_GENERAL, LOG_ERR, listerror); \
                                    clear();                          \
                                    return false;                     \
                                }                                     \
@@ -1428,7 +1429,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     }
     progMap["rectypestatus"] = tmp_rec;
 
-    progMap["card"] = toQChar(GetRecordingStatus(), cardid);
+    progMap["card"] = ::toString(GetRecordingStatus(), cardid);
 
     progMap["recpriority"] = recpriority;
     progMap["recpriority2"] = recpriority2;
@@ -1657,9 +1658,9 @@ bool ProgramInfo::LoadProgramFromRecorded(
     {
         if (is_reload)
         {
-            VERBOSE(VB_FILE, LOC +
-                    QString("Updated pathname '%1':'%2' -> '%3'")
-                    .arg(pathname).arg(GetBasename()).arg(new_basename));
+            LOG(VB_FILE, LOG_INFO,
+                     QString("Updated pathname '%1':'%2' -> '%3'")
+                          .arg(pathname).arg(GetBasename()).arg(new_basename));
         }
         SetPathname(new_basename);
     }
@@ -1886,23 +1887,58 @@ QString ProgramInfo::CreateRecordBasename(const QString &ext) const
     return retval;
 }
 
+static ProgramInfoType discover_program_info_type(
+    uint chanid, const QString &pathname, bool use_remote)
+{
+    QString fn_lower = pathname.toLower();
+    ProgramInfoType pit = kProgramInfoTypeVideoFile;
+    if (chanid)
+        pit = kProgramInfoTypeRecording;
+    else if (fn_lower.startsWith("http:"))
+        pit = kProgramInfoTypeVideoStreamingHTML;
+    else if (fn_lower.startsWith("rtsp:"))
+        pit = kProgramInfoTypeVideoStreamingRTSP;
+    else
+    {
+        if (fn_lower.startsWith("dvd:") ||
+            fn_lower.endsWith(".iso") ||
+            fn_lower.endsWith(".img") ||
+            ((pathname.left(1) == "/") &&
+             QDir(pathname + "/VIDEO_TS").exists()))
+        {
+            pit = kProgramInfoTypeVideoDVD;
+        }
+        else if (fn_lower.startsWith("bd:") ||
+                 ((pathname.left(1) == "/") &&
+                  QDir(pathname + "/BDMV").exists()))
+        {
+            pit = kProgramInfoTypeVideoBD;
+        }
+        else if (use_remote && fn_lower.startsWith("myth://"))
+        {
+            QString tmpFileDVD = pathname + "/VIDEO_TS";
+            QString tmpFileBD = pathname + "/BDMV";
+            if (RemoteFile::Exists(tmpFileDVD))
+                pit = kProgramInfoTypeVideoDVD;
+            else if (RemoteFile::Exists(tmpFileBD))
+                pit = kProgramInfoTypeVideoBD;
+        }
+    }
+    return pit;
+}
+
 void ProgramInfo::SetPathname(const QString &pn) const
 {
     pathname = pn;
     pathname.detach();
 
-    ProgramInfoType pit = kProgramInfoTypeVideoFile;
-    if (chanid)
-        pit = kProgramInfoTypeRecording;
-    else if (myth_FileIsDVD(pathname))
-        pit = kProgramInfoTypeVideoDVD;
-    else if (pathname.toLower().startsWith("http:"))
-        pit = kProgramInfoTypeVideoStreamingHTML;
-    else if (pathname.toLower().startsWith("rtsp:"))
-        pit = kProgramInfoTypeVideoStreamingRTSP;
-    else if (myth_FileIsBD(pathname))
-        pit = kProgramInfoTypeVideoBD;
+    ProgramInfoType pit = discover_program_info_type(chanid, pathname, false);
     const_cast<ProgramInfo*>(this)->SetProgramInfoType(pit);
+}
+
+ProgramInfoType ProgramInfo::DiscoverProgramInfoType(void) const
+{
+    return discover_program_info_type(chanid, pathname, true);
 }
 
 void ProgramInfo::SetAvailableStatus(
@@ -1910,10 +1946,10 @@ void ProgramInfo::SetAvailableStatus(
 {
     if (status != availableStatus)
     {
-        VERBOSE(VB_GUI, toString(kTitleSubtitle) +
-                QString(": %1 -> %2")
-                .arg(::toString((AvailableStatusType)availableStatus))
-                .arg(::toString(status)));
+        LOG(VB_GUI, LOG_INFO, 
+                 toString(kTitleSubtitle) + QString(": %1 -> %2")
+                     .arg(::toString((AvailableStatusType)availableStatus))
+                     .arg(::toString(status)));
     }
     availableStatus = status;
 }
@@ -1976,9 +2012,9 @@ QString ProgramInfo::QueryBasename(void) const
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("QueryBasename found no entry "
-                                      "for %1 @ %2")
-                .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
+        LOG(VB_GENERAL, LOG_INFO, 
+                 QString("QueryBasename found no entry for %1 @ %2")
+                     .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
     }
 
     return QString();
@@ -2038,20 +2074,24 @@ QString ProgramInfo::GetPlaybackURL(
     {
         // Check to see if the file exists locally
         StorageGroup sgroup(storagegroup);
-        //VERBOSE(VB_FILE, LOC +QString("GetPlaybackURL: CHECKING SG : %1 : ").arg(tmpURL));
+#if 0
+        LOG(VB_FILE, LOG_DEBUG,
+                 QString("GetPlaybackURL: CHECKING SG : %1 : ").arg(tmpURL));
+#endif
         tmpURL = sgroup.FindFile(basename);
 
         if (!tmpURL.isEmpty())
         {
-            VERBOSE(VB_FILE, LOC +
-                    QString("GetPlaybackURL: File is local: '%1'").arg(tmpURL));
+            LOG(VB_FILE, LOG_INFO,
+                     QString("GetPlaybackURL: File is local: '%1'")
+                         .arg(tmpURL));
             return tmpURL;
         }
         else if (hostname == gCoreContext->GetHostName())
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("GetPlaybackURL: '%1' should be local, but it can "
-                            "not be found.").arg(basename));
+            LOG(VB_GENERAL, LOG_ERR,
+                     QString("GetPlaybackURL: '%1' should be local, but it can "
+                             "not be found.").arg(basename));
             // Note do not preceed with "/" that will cause existing code
             // to look for a local file with this name...
             return QString("GetPlaybackURL/UNABLE/TO/FIND/LOCAL/FILE/ON/%1/%2")
@@ -2068,8 +2108,8 @@ QString ProgramInfo::GetPlaybackURL(
                                           gCoreContext->GetSetting("MasterServerPort").toInt(),
                                           basename);
 
-        VERBOSE(VB_FILE, LOC +
-                QString("GetPlaybackURL: Found @ '%1'").arg(tmpURL));
+        LOG(VB_FILE, LOG_INFO,
+                 QString("GetPlaybackURL: Found @ '%1'").arg(tmpURL));
         return tmpURL;
         }
 
@@ -2078,8 +2118,9 @@ QString ProgramInfo::GetPlaybackURL(
                                       gCoreContext->GetSettingOnHost("BackendServerPort", hostname).toInt(),
                                       basename);
 
-    VERBOSE(VB_FILE, LOC + QString("GetPlaybackURL: Using default of: '%1'")
-            .arg(tmpURL));
+    LOG(VB_FILE, LOG_INFO,
+             QString("GetPlaybackURL: Using default of: '%1'")
+                 .arg(tmpURL));
 
     return tmpURL;
 }
@@ -3547,8 +3588,8 @@ QString ProgramInfo::ChannelText(const QString &format) const
 void ProgramInfo::UpdateInUseMark(bool force)
 {
 #ifdef DEBUG_IN_USE
-    VERBOSE(VB_IMPORTANT, LOC + QString("UpdateInUseMark(%1) '%2'")
-            .arg(force?"force":"no force").arg(inUseForWhat));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("UpdateInUseMark(%1) '%2'")
+             .arg(force?"force":"no force").arg(inUseForWhat));
 #endif
 
     if (!IsRecording())
@@ -3710,15 +3751,15 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
 #ifdef DEBUG_IN_USE
             if (!inUseForWhat.isEmpty())
             {
-                VERBOSE(VB_IMPORTANT,
-                        LOC + QString("MarkAsInUse(true, '%1'->'%2')")
-                        .arg(inUseForWhat).arg(usedFor) +
-                        " -- use has changed");
+                LOG(VB_GENERAL, LOG_INFO,
+                         QString("MarkAsInUse(true, '%1'->'%2')")
+                             .arg(inUseForWhat).arg(usedFor) +
+                         " -- use has changed");
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, LOC +
-                        QString("MarkAsInUse(true, ''->'%1')").arg(usedFor));
+                LOG(VB_GENERAL, LOG_INFO,
+                         QString("MarkAsInUse(true, ''->'%1')").arg(usedFor));
             }
 #endif // DEBUG_IN_USE
 
@@ -3729,9 +3770,9 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
             QString oldInUseForWhat = inUseForWhat;
             inUseForWhat = QString("%1 [%2]")
                 .arg(QObject::tr("Unknown")).arg(getpid());
-            VERBOSE(VB_IMPORTANT, LOC_WARN +
-                    QString("MarkAsInUse(true, ''->'%1')").arg(inUseForWhat) +
-                    " -- use was not explicitly set");
+            LOG(VB_GENERAL, LOG_WARNING,
+                     QString("MarkAsInUse(true, ''->'%1')").arg(inUseForWhat) +
+                     " -- use was not explicitly set");
         }
 
         notifyOfChange = true;
@@ -3739,16 +3780,16 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
 
     if (!inuse && !inUseForWhat.isEmpty() && usedFor != inUseForWhat)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                QString("MarkAsInUse(false, '%1'->'%2')")
-                .arg(inUseForWhat).arg(usedFor) +
-                " -- use has changed since first setting as in use.");
+        LOG(VB_GENERAL, LOG_WARNING,
+                 QString("MarkAsInUse(false, '%1'->'%2')")
+                     .arg(inUseForWhat).arg(usedFor) +
+                 " -- use has changed since first setting as in use.");
     }
 #ifdef DEBUG_IN_USE
     else if (!inuse)
     {
-        VERBOSE(VB_IMPORTANT, LOC + QString("MarkAsInUse(false, '%1')")
-                .arg(inUseForWhat));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("MarkAsInUse(false, '%1')")
+                 .arg(inUseForWhat));
     }
 #endif // DEBUG_IN_USE
 
@@ -3757,8 +3798,8 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
 
     if (!inuse && inUseForWhat.isEmpty())
     {
-        VERBOSE(VB_GENERAL, LOC_WARN +
-                "MarkAsInUse requires a key to delete in use mark");
+        LOG(VB_GENERAL, LOG_WARNING,
+                 "MarkAsInUse requires a key to delete in use mark");
         return; // can't delete if we don't have a key
     }
 
@@ -3807,7 +3848,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
     }
     else if (!query.next())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "MarkAsInUse -- select query failed");
+        LOG(VB_GENERAL, LOG_ERR, "MarkAsInUse -- select query failed");
     }
     else if (query.value(0).toUInt())
     {
@@ -4115,8 +4156,8 @@ QStringList ProgramInfo::LoadFromScheduler(
     QStringList slist;
     if (gCoreContext->IsBackend())
     {
-        VERBOSE(VB_IMPORTANT,
-                "LoadFromScheduler(): Error, called from backend.");
+        LOG(VB_GENERAL, LOG_ALERT,
+                 "LoadFromScheduler(): Error, called from backend.");
         return slist;
     }
 
@@ -4127,8 +4168,8 @@ QStringList ProgramInfo::LoadFromScheduler(
 
     if (!gCoreContext->SendReceiveStringList(slist) || slist.size() < 2)
     {
-        VERBOSE(VB_IMPORTANT,
-                "LoadFromScheduler(): Error querying master.");
+        LOG(VB_GENERAL, LOG_ALERT,
+                 "LoadFromScheduler(): Error querying master.");
         slist.clear();
     }
 

@@ -22,7 +22,7 @@ using namespace std;
 #include <QDir>
 
 #include "oldsettings.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 Settings::Settings(QString strSettingsFile)
 {
@@ -125,7 +125,7 @@ bool Settings::ReadSettings(QString pszFile)
 
     if (!fin.is_open())
     {
-        VERBOSE(VB_FILE, LOC + "No such file");
+        LOG(VB_FILE, LOG_ERR, "No such file " + pszFile);
         return false;
     }
 
@@ -157,7 +157,7 @@ bool Settings::ReadSettings(QString pszFile)
 
                 (*m_pSettings)[strKey] = strVal;
 
-                VERBOSE(VB_FILE, LOC + '\'' + strKey + "' = '" + strVal + "'.");
+                LOG(VB_FILE, LOG_DEBUG,'\'' + strKey + "' = '" + strVal + "'.");
             }
         }
     } // wend

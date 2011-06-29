@@ -29,7 +29,7 @@ using namespace std;
 #include "mythwidgets.h"
 #include "mythcontext.h"
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "DisplayRes.h"
 #include "mythuihelper.h"
 
@@ -49,8 +49,8 @@ QWidget* Configurable::configWidget(ConfigurationGroup *cg, QWidget* parent,
     (void)cg;
     (void)parent;
     (void)widgetName;
-    VERBOSE(VB_IMPORTANT, "BUG: Configurable is visible, but has no "
-            "configWidget");
+    LOG(VB_GENERAL, LOG_ALERT, 
+             "BUG: Configurable is visible, but has no configWidget");
     return NULL;
 }
 
@@ -199,8 +199,9 @@ void SelectSetting::setValue(int which)
 {
     if ((which >= ((int) values.size())) || (which < 0))
     {
-        VERBOSE(VB_IMPORTANT, QString("SelectSetting::setValue(): "
-                "invalid index: %1 size: ").arg(which).arg(values.size()));
+        LOG(VB_GENERAL, LOG_ERR,
+                 QString("SelectSetting::setValue(): invalid index: %1 size: ")
+                     .arg(which).arg(values.size()));
     }
     else
     {
@@ -991,8 +992,10 @@ void AutoIncrementDBSetting::Save(QString table)
                 setValue(lii);
             }
             else
-                VERBOSE(VB_IMPORTANT, "Can't determine the Id of the last insert"
-                        "QSqlQuery.lastInsertId() failed, the workaround failed too!");
+                LOG(VB_GENERAL, LOG_EMERG,
+                         "Can't determine the Id of the last insert "
+                         "QSqlQuery.lastInsertId() failed, the workaround "
+                         "failed too!");
         }
         // XXX -- HACK END:
     }

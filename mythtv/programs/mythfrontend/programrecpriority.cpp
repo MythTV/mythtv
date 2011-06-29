@@ -17,7 +17,7 @@ using namespace std;
 
 // libmythbase
 #include "mythdb.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "remoteutil.h"
 
 // libmythui

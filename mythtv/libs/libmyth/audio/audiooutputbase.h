@@ -17,8 +17,9 @@ using namespace std;
 // MythTV headers
 #include "audiooutput.h"
 #include "samplerate.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
+// TODO: get rid of this
 #define VBAUDIO(str)   VERBOSE(VB_AUDIO, LOC + str)
 #define VBAUDIOTS(str) VERBOSE(VB_AUDIO+VB_TIMESTAMP, LOC + str)
 #define VBGENERAL(str) VERBOSE(VB_GENERAL, LOC + str)

@@ -15,7 +15,7 @@ extern "C" {
 #include "audiooutputdigitalencoder.h"
 #include "audiooutpututil.h"
 #include "compat.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 
 #define LOC QString("DEnc: ")
 #define LOC_ERR QString("DEnc, Error: ")

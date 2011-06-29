@@ -540,7 +540,11 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
     {
         uint pnum = 0;
         QMap<uint, uint>::const_iterator it = currentEncryptionStatus.begin();
-        //cerr << currentEncryptionStatusChecked.size() << "/" << currentEncryptionStatus.size() << " checked" << endl;
+#if 0
+        VERBOSE(VB_GENERAL, QString("%1/%2 checked")
+            .arg(currentEncryptionStatusChecked.size())
+            .arg(currentEncryptionStatus.size()));
+#endif
         while (it != currentEncryptionStatus.end())
         {
             if (!currentEncryptionStatusChecked[it.key()])

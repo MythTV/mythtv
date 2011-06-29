@@ -13,7 +13,6 @@
 #include "mythcorecontext.h"
 #include "mythuihelper.h"
 #include "mythdirs.h"
-#include "mythverbose.h"
 #include "httpcomms.h"
 #include "metadataimagedownload.h"
 #include "remotefile.h"

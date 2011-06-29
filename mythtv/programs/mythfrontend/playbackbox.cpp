@@ -22,7 +22,7 @@
 #include "mythuihelper.h"
 #include "storagegroup.h"
 #include "mythuibutton.h"
-#include "mythverbose.h"
+#include "mythlogging.h"
 #include "mythuiimage.h"
 #include "programinfo.h"
 #include "mythplayer.h"
@@ -917,14 +917,14 @@ void PlaybackBox::HandlePreviewEvent(const QStringList &list)
         QString tokens("\n\t\t\ttokens: ");
         for (uint i = 4; i < (uint) list.size(); i++)
             tokens += list[i] + ", ";
-        VERBOSE(VB_GENERAL, LOC +
+        VERBOSE(VB_GENERAL|VB_EXTRA, LOC +
                 "Ignoring PREVIEW_SUCCESS, no matcing token" + tokens);
         return;
     }
 
     if (previewFile.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
+        VERBOSE(VB_IMPORTANT|VB_EXTRA, LOC_ERR +
                 "Ignoring PREVIEW_SUCCESS, no preview file.");
         return;
     }
@@ -937,7 +937,7 @@ void PlaybackBox::HandlePreviewEvent(const QStringList &list)
 
     if (!item)
     {
-        VERBOSE(VB_GENERAL, LOC +
+        VERBOSE(VB_GENERAL|VB_EXTRA, LOC +
                 "Ignoring PREVIEW_SUCCESS, item no longer on screen.");
     }
 
@@ -1221,7 +1221,8 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
 
     updateGroupInfo(groupname, grouplabel);
 
-    if ((m_currentGroup == groupname) && !m_needUpdate)
+    if (((m_currentGroup == groupname) && !m_needUpdate) ||
+        m_playingSomething)
         return;
 
     m_needUpdate = false;
@@ -1671,7 +1672,7 @@ bool PlaybackBox::UpdateUILists(void)
 
     if (sortedList.empty())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "SortedList is Empty");
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "SortedList is Empty");
         m_progLists[""];
         m_titleList << "";
         m_playList.clear();
@@ -2333,6 +2334,15 @@ bool PlaybackBox::Play(
         return false;
     }
 
+    for (uint i = 0; i < sizeof(m_artImage) / sizeof(MythUIImage*); i++)
+    {
+        if (!m_artImage[i])
+            continue;
+
+        m_artTimer[i]->stop();
+        m_artImage[i]->Reset();
+    }
+
     ProgramInfo tvrec(rec);
 
     m_playingSomething = true;
@@ -2360,6 +2370,9 @@ bool PlaybackBox::Play(
         if (pginfo)
             UpdateUIListItem(pginfo, true);
     }
+
+    if (m_needUpdate)
+        ScheduleUpdateUIList();
 
     return playCompleted;
 }
@@ -3863,8 +3876,13 @@ void PlaybackBox::customEvent(QEvent *event)
         }
         else if (message == "UPDATE_UI_LIST")
         {
-            UpdateUILists();
-            m_helper.ForceFreeSpaceUpdate();
+            if (m_playingSomething)
+                m_needUpdate = true;
+            else
+            {
+                UpdateUILists();
+                m_helper.ForceFreeSpaceUpdate();
+            }
         }
         else if (message == "UPDATE_USAGE_UI")
         {

@@ -464,7 +464,10 @@ void ExportNative::runScript()
 
     createConfigFile(configDir + "/mydata.xml");
     commandline = "mytharchivehelper --nativearchive --outfile " + configDir + 
-                  "/mydata.xml --quiet";  // job file
+                  "/mydata.xml";  // job file
+    commandline += logPropagateArgs;
+    if (!logPropagateQuiet())
+        commandline += " --quiet";
     commandline += " > "  + logDir + "/progress.log 2>&1 &";            // Logs
 
     uint flags = kMSRunBackground | kMSDontBlockInputDevs | 

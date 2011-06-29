@@ -9,9 +9,9 @@ target.path = $${PREFIX}/bin
 
 INSTALLS += target
 
-HEADERS += lcdserver.h  lcdprocclient.h
+HEADERS += lcdserver.h  lcdprocclient.h commandlineparser.h
 
-SOURCES += main.cpp lcdserver.cpp lcdprocclient.cpp 
+SOURCES += main.cpp lcdserver.cpp lcdprocclient.cpp commandlineparser.cpp
 
 QT += network xml sql
 
