@@ -322,7 +322,7 @@ void cTPDU::Dump(bool Outgoing)
 #define MAX_DUMP 256
      QString msg = QString("%1 ").arg(Outgoing ? "-->" : "<--");
      for (int i = 0; i < size && i < MAX_DUMP; i++)
-         msg += QString("%1 ").arg(data[i], 2, 16, '0');
+         msg += QString("%1 ").arg((short int)data[i], 2, 16, QChar('0'));
      if (size >= MAX_DUMP)
          msg += "...";
      LOG(VB_DVBCAM, LOG_INFO, msg);
