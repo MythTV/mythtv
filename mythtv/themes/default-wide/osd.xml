@@ -245,14 +245,16 @@
             <area>10,42,1060,7</area>
             <layout>horizontal</layout>
             <style>reveal</style>
-            <imagetype name="background">
+            <shape name="background">
                 <area>0,0,100%,100%</area>
-                <filename>progressbar_background.png</filename>
-            </imagetype>
-            <imagetype name="progressimage">
+                <fill color="#000000" />
+                <line color="#FFFFFF" width="1" />
+            </shape>
+            <shape name="progressimage">
                 <area>0,0,100%,100%</area>
-                <filename>progressbar_fill.png</filename>
-            </imagetype>
+                <fill color="#AAAAAA" />
+                <line color="#FFFFFF" width="1" />
+            </shape>
         </progressbar>
     </window>
 
