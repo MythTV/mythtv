@@ -22,12 +22,12 @@ void MythFrontendCommandLineParser::LoadArguments(void)
     addUPnP();
     addLogging();
 
-    add(QStringList( QStringList() << "-r" << "--reset" ), "reset",
+    add(QStringList( QStringList() << "-r" << "--reset" ), "reset", false,
         "Resets appearance, settings, and language.", "");
-    add(QStringList( QStringList() << "-p" << "--prompt" ), "prompt",
+    add(QStringList( QStringList() << "-p" << "--prompt" ), "prompt", false,
         "Always prompt for backend selection.", "");
     add(QStringList( QStringList() << "-d" << "--disable-autodiscovery" ),
-        "noautodiscovery", "Prevent frontend from using UPnP autodiscovery.", "");
+        "noautodiscovery", false, "Prevent frontend from using UPnP autodiscovery.", "");
 }
 
 QString MythFrontendCommandLineParser::GetHelpHeader(void) const

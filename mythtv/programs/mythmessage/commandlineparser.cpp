@@ -20,7 +20,7 @@ void MythMessageCommandLineParser::LoadArguments(void)
     add("--udpport", "port", 6948, "(optional) UDP Port to send to", "");
     add("--bcastaddr", "addr", "127.0.0.1",
             "(optional) IP address to send to", "");
-    add("--print-template", "printtemplate",
+    add("--print-template", "printtemplate", false,
             "Print the template to be sent to the frontend", "");
 }
 

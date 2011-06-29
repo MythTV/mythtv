@@ -24,7 +24,7 @@ void MythWelcomeCommandLineParser::LoadArguments(void)
     addVerbose();
     addLogging();
 
-    add(QStringList( QStringList() << "-s" << "--setup" ), "setup",
+    add(QStringList( QStringList() << "-s" << "--setup" ), "setup", false,
             "Run setup for mythshutdown.", "");
 }
 

@@ -31,25 +31,25 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
             "Specifies whether transcode should honor the cutlist and "
             "remove the marked off commercials. Optionally takes a "
             "a cutlist as an argument when used with --infile.");
-    add("--inversecut", "inversecut",
+    add("--inversecut", "inversecut", false,
             "Inverses the cutlist, leaving only the marked off sections.", "");
-    add(QStringList( QStringList() << "--allkeys" << "-k" ), "allkeys",
+    add(QStringList( QStringList() << "--allkeys" << "-k" ), "allkeys", false,
             "Specifies the outputfile should be entirely keyframes.", "");
     add(QStringList( QStringList() << "-f" << "--fifodir" ), "fifodir", "",
             "Directory in which to write fifos to.", "");
-    add("--fifosync", "fifosync", "Enforce fifo sync.", "");
-    add("--passthrough", "passthru", "Pass through raw, unprocessed audio.", "");
-    add(QStringList( QStringList() << "-b" << "--buildindex" ), "reindex",
+    add("--fifosync", "fifosync", false, "Enforce fifo sync.", "");
+    add("--passthrough", "passthru", false, "Pass through raw, unprocessed audio.", "");
+    add(QStringList( QStringList() << "-b" << "--buildindex" ), "reindex", false,
             "Build new keyframe index.", "");
-    add("--video", "video",
+    add("--video", "video", false,
             "Specifies video is not a recording, must use --infile.", "");
-    add("--showprogress", "showprogress", "Display status info in stdout", "");
+    add("--showprogress", "showprogress", false, "Display status info in stdout", "");
     add(QStringList( QStringList() << "-ro" << "--recorderOptions" ), "recopt",
             "", "Comma separated list of recordingprofile overrides.", "");
     add("--audiotrack", "audiotrack", 0, "Select specific audio track.", "");
-    add(QStringList( QStringList() << "-m" << "--mpeg2" ), "mpeg2",
+    add(QStringList( QStringList() << "-m" << "--mpeg2" ), "mpeg2", false,
             "Specifies that a lossless transcode should be used.", "");
-    add(QStringList( QStringList() << "-e" << "--ostream" ), "ostream", ""
+    add(QStringList( QStringList() << "-e" << "--ostream" ), "ostream", "",
             "Output stream type: dvd, ps", "");
     add("--queue", "queue", "",
             "Add a new transcoding job of the specified recording and "

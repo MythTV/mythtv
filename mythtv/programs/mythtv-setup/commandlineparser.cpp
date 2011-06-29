@@ -29,10 +29,10 @@ void MythTVSetupCommandLineParser::LoadArguments(void)
     addDisplay();
     addLogging();
 
-    add("--expert", "expert", "", "Expert mode.");
-    add("--scan-list", "scanlist", "", "no help");
-    add("--scan-save-only", "savescan", "", "no help");
-    add("--scan-non-interactive", "scannoninteractive", "", "nohelp");
+    add("--expert", "expert", false, "", "Expert mode.");
+    add("--scan-list", "scanlist", false, "", "no help");
+    add("--scan-save-only", "savescan", false, "", "no help");
+    add("--scan-non-interactive", "scannoninteractive", false, "", "no help");
 
     add("--scan", "scan", 0U, "", 
             "Run the command line channel scanner on a specified card "
@@ -49,7 +49,7 @@ void MythTVSetupCommandLineParser::LoadArguments(void)
             "to enumerate scans available for import.\n"
             "This option is mutually exclusive with --scan, and can "
             "be used with the options --FTAonly and --service-type.");
-    add("--FTAonly", "ftaonly", "", "Only import 'Free To Air' channels.");
+    add("--FTAonly", "ftaonly", false, "", "Only import 'Free To Air' channels.");
     add("--service-type", "servicetype", "all", "",
             "To be used with channel scanning or importing, specify "
             "the type of services to import. Select from the following, "

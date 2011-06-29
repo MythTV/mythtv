@@ -34,8 +34,6 @@ class MBASE_PUBLIC MythCommandLineParser
     virtual bool Parse(int argc, const char * const * argv);
 
 // overloaded add constructors for single string options
-    void add(QString arg, QString name, QString help, QString longhelp) // bool
-                { add(arg, name, false, help, longhelp); }
     void add(QString arg, QString name, bool def,                       // bool with default
              QString help, QString longhelp)
                 { add(QStringList(arg), name, QVariant::Bool,    
@@ -82,9 +80,6 @@ class MBASE_PUBLIC MythCommandLineParser
                       def, help, longhelp); }
 
 // overloaded add constructors for multi-string options
-    void add(QStringList arglist, QString name,                         // bool
-             QString help, QString longhelp)
-                { add(arglist, name, false, help, longhelp); }
     void add(QStringList arglist, QString name, bool def,               // bool with default
              QString help, QString longhelp)
                 { add(arglist, name, QVariant::Bool,

@@ -860,7 +860,7 @@ void MythCommandLineParser::addHelp(void)
 
 void MythCommandLineParser::addVersion(void)
 {
-    add("--version", "showversion", "Display version information.",
+    add("--version", "showversion", false, "Display version information.",
             "Display informtion about build, including:\n"
             " version, branch, protocol, library API, Qt "
             "and compiled options.");
@@ -869,16 +869,16 @@ void MythCommandLineParser::addVersion(void)
 void MythCommandLineParser::addWindowed(bool def)
 {
     if (def)
-        add(QStringList( QStringList() << "-nw" << "--no-windowed" ),
+        add(QStringList( QStringList() << "-nw" << "--no-windowed" ), false,
             "notwindowed", "Prevent application from running in window.", "");
     else
-        add(QStringList( QStringList() << "-w" << "--windowed" ), "windowed",
-            "Force application to run in a window.", "");
+        add(QStringList( QStringList() << "-w" << "--windowed" ), false,
+            "windowed", "Force application to run in a window.", "");
 }
 
 void MythCommandLineParser::addDaemon(void)
 {
-    add(QStringList( QStringList() << "-d" << "--daemon" ), "daemon",
+    add(QStringList( QStringList() << "-d" << "--daemon" ), "daemon", false,
             "Fork application into background after startup.",
             "Fork application into background, detatching from "
             "the local terminal.\nOften used with: "
@@ -933,7 +933,7 @@ void MythCommandLineParser::addDisplay(void)
 
 void MythCommandLineParser::addUPnP(void)
 {
-    add("--noupnp", "noupnp", "Disable use of UPnP.", "");
+    add("--noupnp", "noupnp", false, "Disable use of UPnP.", "");
 }
 
 void MythCommandLineParser::addLogging(void)
@@ -958,7 +958,7 @@ void MythCommandLineParser::addLogging(void)
     add("--syslog", "syslog", "none", 
             "Set the syslog logging facility.\nSet to \"none\" to disable, "
             "defaults to none", "");
-    add("--nodblog", "nodblog", "Disable database logging.", "");
+    add("--nodblog", "nodblog", false, "Disable database logging.", "");
 }
 
 void MythCommandLineParser::addPIDFile(void)

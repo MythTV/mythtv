@@ -20,12 +20,12 @@ void MythShutdownCommandLineParser::LoadArguments(void)
     add(QStringList( QStringList() << "-w" << "--setwakeup" ), "setwakeup", "",
             "Set the wakeup time (yyyy-MM-ddThh:mm:ss)", "");
     add(QStringList( QStringList() << "-t" << "--setscheduledwakeup" ), "setschedwakeup",
-            "Set wakeup time to the next scheduled recording", "");
-    add(QStringList( QStringList() << "-q" << "--shutdown" ), "shutdown",
+            false, "Set wakeup time to the next scheduled recording", "");
+    add(QStringList( QStringList() << "-q" << "--shutdown" ), "shutdown", false,
             "Apply wakeup time to nvram and shutdown.", "");
     add(QStringList( QStringList() << "-x" << "--safeshutdown" ), "safeshutdown",
-            "Check if shutdown is possible, and shutdown", "");
-    add(QStringList( QStringList() << "-p" << "--startup" ), "startup",
+            false, "Check if shutdown is possible, and shutdown", "");
+    add(QStringList( QStringList() << "-p" << "--startup" ), "startup", false,
             "Check startup status",
             "Check startup status\n"
             "   returns 0 - automatic startup\n"
@@ -37,9 +37,9 @@ void MythShutdownCommandLineParser::LoadArguments(void)
             "         1 - do check recording status\n\n"
             " returns 0 - ok to shut down\n"
             "         1 - not ok, idle check reset");
-    add(QStringList( QStringList() << "-l" << "--lock" ), "lock",
+    add(QStringList( QStringList() << "-l" << "--lock" ), "lock", false,
             "disable shutdown", "");
-    add(QStringList( QStringList() << "-u" << "--unlock" ), "unlock",
+    add(QStringList( QStringList() << "-u" << "--unlock" ), "unlock", false,
             "enable shutdown", "");
     add(QStringList( QStringList() << "-s" << "--status" ), "status", 1,
             "check current status",
