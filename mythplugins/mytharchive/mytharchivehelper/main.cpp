@@ -2475,11 +2475,11 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
 	    "Create one or more thumbnails\n"
             "Requires: --infile, --thumblist, --outfile\n"
             "Optional: --framecount", "");
-    add("--infile", "infile", ""
+    add("--infile", "infile", "",
             "Input file name\n"
             "Used with: --createthumbnail, --getfileinfo, --isremote, "
             "--sup2dast, --importarchive", "");
-    add("--outfile", "outfile", ""
+    add("--outfile", "outfile", "",
             "Output file name\n"
             "Used with: --createthumbnail, --getfileinfo, --getdbparameters, "
             "--nativearchive\n"
@@ -2550,7 +2550,7 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
             "sup2dast", 
             "Convert projectX subtitles to DVD subtitles\n"
             "Requires: --infile, --ifofile, --delay", "");
-    add("--ifofile", "ifofile", ""
+    add("--ifofile", "ifofile", "",
             "Filename of ifo file\n"
             "Used with: --sup2dast", "");
     add("--delay", "delay", 0, 
@@ -2633,7 +2633,7 @@ int main(int argc, char **argv)
 
     int res = 0;
     bool bGrabThumbnail   = cmdline.toBool("createthumbnail");
-    bool bGetDBParameters = cmdline.toBool("grabdbparameters");
+    bool bGetDBParameters = cmdline.toBool("getdbparameters");
     bool bNativeArchive   = cmdline.toBool("nativearchive");
     bool bImportArchive   = cmdline.toBool("importarchive");
     bool bGetFileInfo     = cmdline.toBool("getfileinfo");
