@@ -410,7 +410,8 @@ void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
         QVariant header = reply->header(QNetworkRequest::ContentTypeHeader);
 
         if (header != QVariant())
-            VERBOSE(VB_IMPORTANT, QString("MythWebView::handleUnsupportedContent - %1")
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("MythWebView::handleUnsupportedContent - %1")
                                           .arg(header.toString()));
 
         m_downloadReply = reply;
@@ -559,7 +560,9 @@ void MythWebView::customEvent(QEvent *event)
                 else if (isVideoFile(extension, mimeType))
                     GetMythMainWindow()->HandleMedia("Internal", m_downloadRequest.url().toString());
                 else
-                    VERBOSE(VB_IMPORTANT, QString("MythWebView: Asked to play a file with extension '%1' but don't know how")
+                    LOG(VB_GENERAL, LOG_ERR,
+                        QString("MythWebView: Asked to play a file with "
+                                "extension '%1' but don't know how")
                                                   .arg(extension));
             }
             else if (resulttext == tr("Download the file"))
@@ -838,7 +841,8 @@ void MythUIWebBrowser::Init(void)
     }
 
     if (!m_parentScreen)
-        VERBOSE(VB_IMPORTANT, "MythUIWebBrowser: failed to find our parent screen");
+        LOG(VB_GENERAL, LOG_ERR,
+            "MythUIWebBrowser: failed to find our parent screen");
 
     // connect to the topScreenChanged signals on each screen stack
     for (int x = 0; x < GetMythMainWindow()->GetStackCount(); x++)
@@ -862,13 +866,13 @@ void MythUIWebBrowser::Init(void)
 
     if (gCoreContext->GetNumSetting("WebBrowserEnablePlugins", 1) == 1)
     {
-        VERBOSE(VB_GENERAL, "MythUIWebBrowser: enabling plugins");
+        LOG(VB_GENERAL, LOG_INFO, "MythUIWebBrowser: enabling plugins");
         QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled,
                                                      true);
     }
     else
     {
-        VERBOSE(VB_GENERAL, "MythUIWebBrowser: disabling plugins");
+        LOG(VB_GENERAL, LOG_INFO, "MythUIWebBrowser: disabling plugins");
         QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled,
                                                      false);
     }
@@ -941,7 +945,8 @@ void MythUIWebBrowser::LoadUserStyleSheet(QUrl url)
     if (!m_browser)
         return;
 
-    VERBOSE(VB_IMPORTANT, "MythUIWebBrowser: Loading css from - " + url.toString());
+    LOG(VB_GENERAL, LOG_INFO,
+        "MythUIWebBrowser: Loading css from - " + url.toString());
 
     m_browser->page()->settings()->setUserStyleSheetUrl(url);
 }
@@ -1506,7 +1511,7 @@ void MythUIWebBrowser::CopyFrom(MythUIType *base)
     MythUIWebBrowser *browser = dynamic_cast<MythUIWebBrowser *>(base);
     if (!browser)
     {
-        VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
+        LOG(VB_GENERAL, LOG_ERR, "ERROR, bad parsing");
         return;
     }
 

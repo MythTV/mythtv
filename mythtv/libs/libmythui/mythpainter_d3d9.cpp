@@ -76,7 +76,7 @@ void MythD3D9Painter::Begin(QPaintDevice *parent)
     {
         if (!InitD3D9(parent))
         {
-            VERBOSE(VB_IMPORTANT, "Failed to create D3D9 render.");
+            LOG(VB_GENERAL, LOG_ERR, "Failed to create D3D9 render.");
             return;
         }
     }
@@ -90,7 +90,7 @@ void MythD3D9Painter::Begin(QPaintDevice *parent)
     }
     else if (!m_target->SetAsRenderTarget())
     {
-        VERBOSE(VB_IMPORTANT, "Failed to enable offscreen buffer.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to enable offscreen buffer.");
         return;
     }
 
@@ -118,7 +118,7 @@ void MythD3D9Painter::End(void)
 
 void MythD3D9Painter::ClearCache(void)
 {
-    VERBOSE(VB_GENERAL, LOC + "Clearing D3D9 painter cache.");
+    LOG(VB_GENERAL, LOG_INFO, "Clearing D3D9 painter cache.");
 
     QMutexLocker locker(&m_bitmapDeleteLock);
     QMapIterator<MythImage *, D3D9Image*> it(m_ImageBitmapMap);
@@ -238,7 +238,7 @@ D3D9Image* MythD3D9Painter::GetImageFromCache(MythImage *im)
     }
     else
     {
-       VERBOSE(VB_IMPORTANT, LOC + "Failed to create D3D9 UI bitmap.");
+       LOG(VB_GENERAL, LOG_ERR, "Failed to create D3D9 UI bitmap.");
        if (newimage)
            delete newimage;
     }

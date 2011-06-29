@@ -35,8 +35,9 @@ void MythUICheckBox::SetInitialStates()
     m_CheckState = dynamic_cast<MythUIStateType*>(GetChild("checkstate"));
 
     if (!m_CheckState || !m_BackgroundState)
-        VERBOSE(VB_IMPORTANT, QString("Checkbox %1 is missing required "
-                                      "elements").arg(objectName()));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Checkbox %1 is missing required elements")
+                .arg(objectName()));
 
     if (m_CheckState)
         m_CheckState->DisplayState(m_currentCheckState);
@@ -195,8 +196,7 @@ void MythUICheckBox::CopyFrom(MythUIType *base)
     MythUICheckBox *button = dynamic_cast<MythUICheckBox *>(base);
     if (!button)
     {
-        VERBOSE(VB_IMPORTANT, "MythUICheckBox::CopyFrom: Dynamic cast of base "
-                              "failed");
+        LOG(VB_GENERAL, LOG_ERR, "Dynamic cast of base failed");
         return;
     }
 

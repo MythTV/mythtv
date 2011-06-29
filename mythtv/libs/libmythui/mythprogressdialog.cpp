@@ -96,14 +96,14 @@ MythUIBusyDialog  *ShowBusyPopup(const QString &message)
             stk = win->GetStack("popup stack");
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC + "no main window?");
+            LOG(VB_GENERAL, LOG_ERR, "no main window?");
             return NULL;
         }
 
         if (!stk)
         {
-            VERBOSE(VB_IMPORTANT, LOC + "no popup stack?\n"
-                                        "Is there a MythThemeBase?");
+            LOG(VB_GENERAL, LOG_ERR, "no popup stack?\n"
+                                     "Is there a MythThemeBase?");
             return NULL;
         }
     }
@@ -172,7 +172,7 @@ void MythUIProgressDialog::customEvent(QEvent *event)
 
         if (!pue)
         {
-            VERBOSE(VB_IMPORTANT, "MythUIProgressDialog::customEvent() "
+            LOG(VB_GENERAL, LOG_ERR,
                     "Error, event claims to be a progress update but fails "
                     "to cast");
             return;
@@ -217,10 +217,9 @@ void MythUIProgressDialog::UpdateProgress()
 
     if (m_count > m_total)
     {
-        VERBOSE(VB_IMPORTANT, QString("Progress count (%1) is higher "
-                                      "than total (%2)")
-                                      .arg(m_count)
-                                      .arg(m_total));
+        LOG(VB_GENERAL, LOG_ERR, QString("Progress count (%1) is higher "
+                                         "than total (%2)")
+                                      .arg(m_count) .arg(m_total));
         return;
     }
 

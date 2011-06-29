@@ -54,9 +54,9 @@ class ScreenSaverX11Private
             QObject::connect(m_resetTimer, SIGNAL(timeout()),
                              outer, SLOT(resetSlot()));
             if (m_xscreensaverRunning)
-                VERBOSE(VB_GENERAL, LOC + "XScreenSaver support enabled");
+                LOG(VB_GENERAL, LOG_INFO, "XScreenSaver support enabled");
             if (m_gscreensaverRunning)
-                VERBOSE(VB_GENERAL, LOC + "Gnome screen saver support enabled");
+                LOG(VB_GENERAL, LOG_INFO, "Gnome screen saver support enabled");
         }
 
         m_display = OpenMythXDisplay();
@@ -68,7 +68,7 @@ class ScreenSaverX11Private
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to open connection to X11 server");
+            LOG(VB_GENERAL, LOG_ERR, "Failed to open connection to X11 server");
         }
 
         if (m_dpmsaware)
@@ -84,13 +84,13 @@ class ScreenSaverX11Private
             DPMSInfo(m_display->GetDisplay(), &power_level, &m_dpmsenabled);
 
             if (m_dpmsenabled)
-                VERBOSE(VB_GENERAL, "DPMS is active.");
+                LOG(VB_GENERAL, LOG_INFO, "DPMS is active.");
             else
-                VERBOSE(VB_GENERAL, "DPMS is disabled.");
+                LOG(VB_GENERAL, LOG_INFO, "DPMS is disabled.");
         }
         else
         {
-            VERBOSE(VB_GENERAL, "DPMS is not supported.");
+            LOG(VB_GENERAL, LOG_INFO, "DPMS is not supported.");
         }
     }
 
@@ -109,21 +109,21 @@ class ScreenSaverX11Private
 
     void StopTimer(void)
     {
-        VERBOSE(VB_PLAYBACK, LOC + "StopTimer");
+        LOG(VB_PLAYBACK, LOG_DEBUG, "StopTimer");
         if (m_resetTimer)
             m_resetTimer->stop();
     }
 
     void StartTimer(void)
     {
-        VERBOSE(VB_PLAYBACK, LOC + "StartTimer");
+        LOG(VB_PLAYBACK, LOG_DEBUG, "StartTimer");
         if (m_resetTimer)
             m_resetTimer->start(m_timeoutInterval);
     }
 
     void ResetTimer(void)
     {
-        VERBOSE(VB_PLAYBACK, LOC + "ResetTimer -- begin");
+        LOG(VB_PLAYBACK, LOG_DEBUG, "ResetTimer -- begin");
 
         StopTimer();
 
@@ -136,7 +136,7 @@ class ScreenSaverX11Private
         if (m_timeoutInterval > 0)
             StartTimer();
 
-        VERBOSE(VB_PLAYBACK, LOC + "ResetTimer -- end");
+        LOG(VB_PLAYBACK, LOG_DEBUG, "ResetTimer -- end");
     }
 
     // DPMS
@@ -152,7 +152,7 @@ class ScreenSaverX11Private
             m_dpmsdeactivated = true;
             Status status = DPMSDisable(m_display->GetDisplay());
             m_display->Sync();
-            VERBOSE(VB_GENERAL, LOC +
+            LOG(VB_GENERAL, LOG_INFO,
                 QString("DPMS Deactivated %1").arg(status));
         }
     }
@@ -164,7 +164,7 @@ class ScreenSaverX11Private
             m_dpmsdeactivated = false;
             Status status = DPMSEnable(m_display->GetDisplay());
             m_display->Sync();
-            VERBOSE(VB_GENERAL, LOC +
+            LOG(VB_GENERAL, LOG_INFO,
                 QString("DPMS Reactivated %1").arg(status));
         }
     }
@@ -203,7 +203,8 @@ class ScreenSaverX11Private
         {
             if (m_xscreensaverRunning)
             {
-                VERBOSE(VB_PLAYBACK, LOC + "Calling xscreensaver-command -deactivate");
+                LOG(VB_PLAYBACK, LOG_INFO,
+                    "Calling xscreensaver-command -deactivate");
                 myth_system("xscreensaver-command -deactivate >&- 2>&- &",
                             kMSDontBlockInputDevs |
                             kMSDontDisableDrawing |
@@ -211,7 +212,8 @@ class ScreenSaverX11Private
             }
             if (m_gscreensaverRunning)
             {
-                VERBOSE(VB_PLAYBACK, LOC + "Calling gnome-screensaver-command --poke");
+                LOG(VB_PLAYBACK, LOG_INFO,
+                    "Calling gnome-screensaver-command --poke");
                 myth_system("gnome-screensaver-command --poke >&- 2>&- &",
                             kMSDontBlockInputDevs |
                             kMSDontDisableDrawing |

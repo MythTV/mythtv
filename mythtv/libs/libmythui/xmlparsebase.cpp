@@ -43,18 +43,6 @@
 #define LOC_WARN QString("XMLParseBase, Warning: ")
 #define LOC_ERR  QString("XMLParseBase, Error: ")
 
-void VERBOSE_XML(
-    unsigned int verbose_type,
-    const QString &filename, const QDomElement &element, QString msg)
-{
-    VERBOSE(verbose_type,
-            QString("%1\n\t\t\t"
-                    "Location: %2 @ %3\n\t\t\t"
-                    "Name: '%4'\tType: '%5'")
-            .arg(msg).arg(filename).arg(element.lineNumber())
-            .arg(element.attribute("name", "")).arg(element.tagName()));
-}
-
 QString XMLParseBase::getFirstText(QDomElement &element)
 {
     for (QDomNode dname = element.firstChild(); !dname.isNull();
@@ -313,7 +301,7 @@ void XMLParseBase::ParseChildren(const QString &filename,
 {
     if (!parent)
     {
-        VERBOSE(VB_IMPORTANT, "Parent is NULL");
+        LOG(VB_GENERAL, LOG_ERR, "Parent is NULL");
         return;
     }
 
@@ -364,8 +352,8 @@ void XMLParseBase::ParseChildren(const QString &filename,
             }
             else
             {
-                VERBOSE_XML(VB_IMPORTANT, filename, info,
-                            LOC_ERR + "Unknown widget type");
+                VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, info,
+                            "Unknown widget type");
             }
         }
     }
@@ -381,8 +369,8 @@ MythUIType *XMLParseBase::ParseUIType(
     QString name = element.attribute("name", "");
     if (name.isEmpty())
     {
-        VERBOSE_XML(VB_IMPORTANT, filename, element,
-                    LOC_ERR + "This element requires a name");
+        VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
+                    "This element requires a name");
         return NULL;
     }
 
@@ -418,9 +406,8 @@ MythUIType *XMLParseBase::ParseUIType(
 
         if (!base)
         {
-            VERBOSE_XML(VB_IMPORTANT, filename, element,
-                        LOC_ERR + QString(
-                            "Couldn't find object '%1' to inherit '%2' from")
+            VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
+                       QString("Couldn't find object '%1' to inherit '%2' from")
                         .arg(inherits).arg(name));
             return NULL;
         }
@@ -464,15 +451,15 @@ MythUIType *XMLParseBase::ParseUIType(
         uitype = new MythScreenType(parent, name);
     else
     {
-        VERBOSE_XML(VB_IMPORTANT, filename, element,
-                    LOC_ERR + "Unknown widget type.");
+        VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
+                    "Unknown widget type.");
         return NULL;
     }
 
     if (!uitype)
     {
-        VERBOSE_XML(VB_IMPORTANT, filename, element,
-                    LOC_ERR + "Failed to instantiate widget type.");
+        VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
+                    "Failed to instantiate widget type.");
         return NULL;
     }
 
@@ -480,7 +467,7 @@ MythUIType *XMLParseBase::ParseUIType(
     {
         if (typeid(*olduitype) != typeid(*uitype))
         {
-            VERBOSE_XML(VB_IMPORTANT, filename, element, LOC_ERR +
+            VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
                         QString("Duplicate name: '%1' in parent '%2'")
                         .arg(name).arg(parent->objectName()));
             parent->DeleteChild(olduitype);
@@ -496,9 +483,8 @@ MythUIType *XMLParseBase::ParseUIType(
     {
         if (typeid(*base) != typeid(*uitype))
         {
-            VERBOSE_XML(VB_IMPORTANT, filename, element, LOC_ERR +
-                        QString("Type of new widget '%1' doesn't "
-                                "match old '%2'")
+            VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
+                      QString("Type of new widget '%1' doesn't match old '%2'")
                         .arg(name).arg(inherits));
             parent->DeleteChild(uitype);
             return NULL;
@@ -554,8 +540,8 @@ MythUIType *XMLParseBase::ParseUIType(
             }
             else
             {
-                VERBOSE_XML(VB_IMPORTANT, filename, info,
-                            LOC_ERR + "Unknown widget type.");
+                VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, info,
+                            "Unknown widget type.");
             }
         }
     }
@@ -584,7 +570,7 @@ bool XMLParseBase::WindowExists(const QString &xmlfile,
 
         if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
+            LOG(VB_GENERAL, LOG_ERR,
                     QString("Location: '%1' @ %2 column: %3"
                             "\n\t\t\tError: %4")
                     .arg(qPrintable(themefile)).arg(errorLine).arg(errorColumn)
@@ -628,7 +614,7 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
     for (; it != searchpath.end(); ++it)
     {
         QString themefile = *it + xmlfile;
-        VERBOSE(VB_GUI, LOC + "Loading window theme from " + themefile);
+        LOG(VB_GUI, LOG_INFO, "Loading window theme from " + themefile);
         if (doLoad(windowname, parent, themefile,
                    onlyLoadWindows, showWarnings))
         {
@@ -636,11 +622,11 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
         }
         else
         {
-            VERBOSE(VB_FILE+VB_EXTRA, LOC_ERR + "No theme file " + themefile);
+            LOG(VB_FILE, LOG_ERR, "No theme file " + themefile);
         }
     }
 
-    VERBOSE(VB_IMPORTANT, LOC_ERR +
+    LOG(VB_GENERAL, LOG_ERR,
             QString("Unable to load window '%1' from '%2'")
             .arg(windowname).arg(xmlfile));
 
@@ -665,7 +651,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
+        LOG(VB_GENERAL, LOG_ERR,
                 QString("Location: '%1' @ %2 column: %3"
                         "\n\t\t\tError: %4")
                 .arg(qPrintable(filename)).arg(errorLine).arg(errorColumn)
@@ -696,8 +682,8 @@ bool XMLParseBase::doLoad(const QString &windowname,
                 QString name = e.attribute("name", "");
                 if (name.isEmpty())
                 {
-                    VERBOSE_XML(VB_IMPORTANT, filename, e,
-                                LOC_ERR + "Window needs a name");
+                    VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, e,
+                                "Window needs a name");
                     return false;
                 }
 
@@ -748,8 +734,8 @@ bool XMLParseBase::doLoad(const QString &windowname,
                 }
                 else
                 {
-                    VERBOSE_XML(VB_IMPORTANT, filename, e,
-                                LOC_ERR + "Unknown widget type");
+                    VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, e,
+                                "Unknown widget type");
                 }
             }
         }
@@ -776,7 +762,7 @@ bool XMLParseBase::LoadBaseTheme(void)
         if (doLoad(QString(), GetGlobalObjectStore(), themefile,
                    loadOnlyWindows, showWarnings))
         {
-            VERBOSE(VB_GUI, LOC +
+            LOG(VB_GUI, LOG_INFO,
                     QString("Loaded base theme from '%1'").arg(themefile));
             // Don't complain about duplicate definitions after first
             // successful load (set showWarnings to false).
@@ -785,7 +771,7 @@ bool XMLParseBase::LoadBaseTheme(void)
         }
         else
         {
-            VERBOSE(VB_GUI|VB_FILE, LOC_WARN +
+            LOG(VB_GUI | VB_FILE, LOG_WARNING,
                     QString("No theme file '%1'").arg(themefile));
         }
     }
@@ -795,12 +781,12 @@ bool XMLParseBase::LoadBaseTheme(void)
 
 bool XMLParseBase::LoadBaseTheme(const QString &baseTheme)
 {
-    VERBOSE(VB_GUI, LOC +
+    LOG(VB_GUI, LOG_INFO,
             QString("Asked to load base file from '%1'").arg(baseTheme));
 
     if (loadedBaseFiles.contains(baseTheme))
     {
-        VERBOSE(VB_GUI, LOC +
+        LOG(VB_GUI, LOG_INFO,
                 QString("Base file already loaded '%1'").arg(baseTheme));
         return true;
     }
@@ -818,7 +804,7 @@ bool XMLParseBase::LoadBaseTheme(const QString &baseTheme)
         if (doLoad(QString(), GetGlobalObjectStore(), themefile,
                    loadOnlyWindows, showWarnings))
         {
-            VERBOSE(VB_GUI, LOC +
+            LOG(VB_GUI, LOG_INFO,
                     QString("Loaded base theme from '%1'").arg(themefile));
             // Don't complain about duplicate definitions after first
             // successful load (set showWarnings to false).
@@ -827,7 +813,7 @@ bool XMLParseBase::LoadBaseTheme(const QString &baseTheme)
         }
         else
         {
-            VERBOSE(VB_GUI|VB_FILE, LOC_WARN +
+            LOG(VB_GUI | VB_FILE, LOG_WARNING,
                     QString("No theme file '%1'").arg(themefile));
         }
     }
@@ -844,7 +830,7 @@ bool XMLParseBase::CopyWindowFromBase(const QString &windowname,
     MythUIType *ui = GetGlobalObjectStore()->GetChild(windowname);
     if (!ui)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
+        LOG(VB_GENERAL, LOG_ERR,
                 QString("Unable to load window '%1' from base")
                 .arg(windowname));
         return false;
@@ -853,7 +839,7 @@ bool XMLParseBase::CopyWindowFromBase(const QString &windowname,
     MythScreenType *st = dynamic_cast<MythScreenType *>(ui);
     if (!st)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
+        LOG(VB_GENERAL, LOG_ERR,
                 QString("UI Object '%1' is not a ScreenType")
                 .arg(windowname));
         return false;

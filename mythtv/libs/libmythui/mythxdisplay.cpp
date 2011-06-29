@@ -62,7 +62,7 @@ MythXDisplay *OpenMythXDisplay(void)
     if (disp && disp->Open())
         return disp;
 
-    VERBOSE(VB_IMPORTANT, "MythXOpenDisplay() failed");
+    LOG(VB_GENERAL, LOG_CRIT, "MythXOpenDisplay() failed");
     delete disp;
     return NULL;
 }
@@ -179,8 +179,7 @@ float MythXDisplay::GetRefreshRate(void)
 
     if (!XF86VidModeGetModeLine(m_disp, m_screen_num, &dot_clock, &mode_line))
     {
-        VERBOSE(VB_IMPORTANT, "MythXGetRefreshRate(): "
-                              "X11 ModeLine query failed");
+        LOG(VB_GENERAL, LOG_CRIT, "X11 ModeLine query failed");
         return -1;
     }
 
@@ -189,8 +188,7 @@ float MythXDisplay::GetRefreshRate(void)
     // Catch bad data from video drivers (divide by zero causes return of NaN)
     if (rate == 0.0 || dot_clock == 0)
     {
-        VERBOSE(VB_IMPORTANT, "MythXGetRefreshRate(): "
-                "X11 ModeLine query returned zeroes");
+        LOG(VB_GENERAL, LOG_CRIT, "X11 ModeLine query returned zeroes");
         return -1;
     }
 
@@ -199,7 +197,7 @@ float MythXDisplay::GetRefreshRate(void)
     if (((mode_line.flags & V_INTERLACE) != 0) &&
         rate > 24.5 && rate < 30.5)
     {
-        VERBOSE(VB_PLAYBACK, "MythXGetRefreshRate(): "
+        LOG(VB_PLAYBACK, LOG_INFO,
                 "Doubling refresh rate for interlaced display.");
         rate *= 2.0;
     }
@@ -256,19 +254,20 @@ bool MythXDisplay::CheckErrors(Display *disp)
     {
         char buf[200];
         XGetErrorText(d, events[i].error_code, buf, sizeof(buf));
-        VERBOSE(VB_IMPORTANT, QString("\n"
-                  "XError type: %1\n"
-                  "  serial no: %2\n"
-                  "   err code: %3 (%4)\n"
-                  "   req code: %5\n"
-                  " minor code: %6\n"
-                  "resource id: %7\n")
-                  .arg(events[i].type)
-                  .arg(events[i].serial)
-                  .arg(events[i].error_code).arg(buf)
-                  .arg(events[i].request_code)
-                  .arg(events[i].minor_code)
-                  .arg(events[i].resourceid));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("\n"
+                   "XError type: %1\n"
+                   "  serial no: %2\n"
+                   "   err code: %3 (%4)\n"
+                   "   req code: %5\n"
+                   " minor code: %6\n"
+                   "resource id: %7\n")
+                   .arg(events[i].type)
+                   .arg(events[i].serial)
+                   .arg(events[i].error_code).arg(buf)
+                   .arg(events[i].request_code)
+                   .arg(events[i].minor_code)
+                   .arg(events[i].resourceid));
     }
     xerrors.erase(d);
     return false;

@@ -84,7 +84,7 @@ bool MythDialogBox::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, QString("Cannot load screen '%1'")
+        LOG(VB_GENERAL, LOG_ERR, QString("Cannot load screen '%1'")
                                         .arg(windowName));
         return false;
     }
@@ -280,7 +280,7 @@ bool MythConfirmationDialog::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'MythConfirmationDialog'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'MythConfirmationDialog'");
         return false;
     }
 
@@ -382,14 +382,14 @@ MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent,
             stk = win->GetStack("popup stack");
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC + "no main window?");
+            LOG(VB_GENERAL, LOG_ERR, "no main window?");
             return NULL;
         }
 
         if (!stk)
         {
-            VERBOSE(VB_IMPORTANT, LOC + "no popup stack?\n"
-                                        "Is there a MythThemeBase?");
+            LOG(VB_GENERAL, LOG_ERR, "no popup stack? "
+                                     "Is there a MythThemeBase?");
             return NULL;
         }
     }
@@ -399,13 +399,14 @@ MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent,
     {
         stk->AddScreen(pop);
         if (parent && slot)
-            QObject::connect(pop, SIGNAL(haveResult(bool)), parent, slot, Qt::QueuedConnection);
+            QObject::connect(pop, SIGNAL(haveResult(bool)), parent, slot,
+                             Qt::QueuedConnection);
     }
     else
     {
         delete pop;
         pop = NULL;
-        VERBOSE(VB_IMPORTANT, LOC + "Couldn't Create() Dialog");
+        LOG(VB_GENERAL, LOG_ERR, "Couldn't Create() Dialog");
     }
 
     return pop;
@@ -447,7 +448,7 @@ bool MythTextInputDialog::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'MythTextInputDialog'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'MythTextInputDialog'");
         return false;
     }
 
@@ -544,7 +545,7 @@ bool MythUISearchDialog::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'MythSearchDialog'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'MythSearchDialog'");
         return false;
     }
 
@@ -553,7 +554,8 @@ bool MythUISearchDialog::Create(void)
 
     connect(okButton, SIGNAL(Clicked()), SLOT(slotSendResult()));
 
-    connect(m_itemList, SIGNAL(itemClicked(MythUIButtonListItem*)), SLOT(slotSendResult()));
+    connect(m_itemList, SIGNAL(itemClicked(MythUIButtonListItem*)),
+            SLOT(slotSendResult()));
 
     m_textEdit->SetText(m_defaultValue);
     connect(m_textEdit, SIGNAL(valueChanged()), SLOT(slotUpdateList()));

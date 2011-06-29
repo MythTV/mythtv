@@ -46,7 +46,7 @@ void MythUIButton::SetInitialStates()
     m_BackgroundState = dynamic_cast<MythUIStateType*>(GetChild("buttonstate"));
 
     if (!m_BackgroundState)
-        VERBOSE(VB_IMPORTANT, QString("Button %1 is missing required "
+        LOG(VB_GENERAL, LOG_ERR, QString("Button %1 is missing required "
                                       "elements").arg(objectName()));
 
     SetState("active");
@@ -285,8 +285,7 @@ void MythUIButton::CopyFrom(MythUIType *base)
     MythUIButton *button = dynamic_cast<MythUIButton *>(base);
     if (!button)
     {
-        VERBOSE(VB_IMPORTANT,
-                        "MythUIButton::CopyFrom: Dynamic cast of base failed");
+        LOG(VB_GENERAL, LOG_ERR, "Dynamic cast of base failed");
         return;
     }
 

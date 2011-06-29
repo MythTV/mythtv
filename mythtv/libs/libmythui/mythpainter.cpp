@@ -27,8 +27,9 @@ MythPainter::~MythPainter(void)
     if (m_allocatedImages.isEmpty())
         return;
 
-    VERBOSE(VB_GENERAL, QString("MythPainter: %1 images not yet de-allocated.")
-        .arg(m_allocatedImages.size()));
+    LOG(VB_GENERAL, LOG_WARNING,
+        QString("MythPainter: %1 images not yet de-allocated.")
+            .arg(m_allocatedImages.size()));
     while (!m_allocatedImages.isEmpty())
         m_allocatedImages.takeLast()->SetParent(NULL);
 }
@@ -49,7 +50,7 @@ void MythPainter::DrawImage(int x, int y, MythImage *im, int alpha)
 {
     if (!im)
     {
-        VERBOSE(VB_IMPORTANT,
+        LOG(VB_GENERAL, LOG_ERR,
                     "Null image pointer passed to MythPainter::DrawImage()");
         return;
     }
@@ -411,6 +412,7 @@ void MythPainter::SetMaximumCacheSizes(int hardware, int software)
 {
     m_MaxHardwareCacheSize = 1024 * 1024 * hardware;
     m_MaxSoftwareCacheSize = 1024 * 1024 * software;
-    VERBOSE(VB_GUI, QString("MythPainter cache sizes: Hardware %1Mb, Software %2Mb")
-        .arg(hardware).arg(software));
+    LOG(VB_GUI, LOG_INFO,
+        QString("MythPainter cache sizes: Hardware %1Mb, Software %2Mb")
+            .arg(hardware).arg(software));
 }

@@ -219,8 +219,8 @@ bool MythUIFileBrowser::Create()
 
     if (!m_fileList || !m_locationEdit || !m_okButton || !m_cancelButton)
     {
-        VERBOSE(VB_IMPORTANT, "MythUIFileBrowser: Your theme is missing"
-                              " some UI elements! Bailing out.");
+        LOG(VB_GENERAL, LOG_ERR, "MythUIFileBrowser: Your theme is missing"
+                                 " some UI elements! Bailing out.");
         return false;
     }
 
@@ -443,8 +443,8 @@ void MythUIFileBrowser::updateRemoteFileList()
                                      .arg(m_subDirectory);
     if (!GetRemoteFileList(m_baseDirectory, sgdir, sgdirlist))
     {
-        VERBOSE(VB_IMPORTANT, "GetRemoteFileList failed to get "
-                "Storage Group dirs");
+        LOG(VB_GENERAL, LOG_ERR, "GetRemoteFileList failed to get "
+                                 "Storage Group dirs");
         return;
     }
 
@@ -458,8 +458,9 @@ void MythUIFileBrowser::updateRemoteFileList()
 
     if (!GetRemoteFileList(dirURL, m_storageGroupDir, slist))
     {
-        VERBOSE(VB_IMPORTANT, QString("GetRemoteFileList failed for "
-                "'%1' in '%2' SG dir").arg(dirURL).arg(m_storageGroupDir));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("GetRemoteFileList failed for '%1' in '%2' SG dir")
+                .arg(dirURL).arg(m_storageGroupDir));
         return;
     }
 
@@ -517,9 +518,7 @@ void MythUIFileBrowser::updateRemoteFileList()
         QStringList tokens = (*it).split("::");
         if (tokens.size() < 2)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("MythUIFileBrowser::updateRemoteFileList(): ") +
-                    QString("failed to parse '%1'.").arg(*it));
+            LOG(VB_GENERAL, LOG_ERR, QString("failed to parse '%1'.").arg(*it));
             ++it;
             continue;
         }
@@ -599,7 +598,7 @@ void MythUIFileBrowser::updateLocalFileList()
 
     if (!d.exists())
     {
-        VERBOSE(VB_IMPORTANT,
+        LOG(VB_GENERAL, LOG_ERR,
                 "MythUIFileBrowser: current directory does not exist!");
         m_locationEdit->SetText("/");
         m_subDirectory = "/";

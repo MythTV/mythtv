@@ -176,14 +176,15 @@ MythFontProperties *MythFontProperties::ParseFromXml(
     newFont->Freeze();
 
     if (element.tagName() == "font")
-        VERBOSE(VB_GENERAL, LOC_WARN + "Use of 'font' is deprecated in favour "
-                                       "of 'fontdef'");
+        LOG(VB_GENERAL, LOG_WARNING, 
+            QString("File %1: Use of 'font' is deprecated in favour of "
+                    "'fontdef'") .arg(filename));
 
     QString name = element.attribute("name", "");
     if (name.isEmpty())
     {
-        VERBOSE_XML(VB_IMPORTANT,
-                    filename, element, LOC_ERR + "Font requires a name");
+        VERBOSE_XML(VB_GENERAL, LOG_ERR,
+                    filename, element, "Font requires a name");
         delete newFont;
         return NULL;
     }
@@ -202,8 +203,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
 
         if (!tmp)
         {
-            VERBOSE_XML(
-                VB_IMPORTANT, filename, element, LOC_ERR +
+            VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
                 QString("Specified base font '%1' does not exist.").arg(base));
 
             delete newFont;
@@ -222,8 +222,8 @@ MythFontProperties *MythFontProperties::ParseFromXml(
     {
         if (!fromBase)
         {
-            VERBOSE_XML(VB_IMPORTANT, filename, element,
-                        LOC_ERR + "Font needs a face");
+            VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
+                        "Font needs a face");
             delete newFont;
             return NULL;
         }
@@ -238,9 +238,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
         MythFontProperties *tmp = GetGlobalFontMap()->GetFont(name);
         if (showWarnings)
         {
-            VERBOSE_XML(
-                VB_GENERAL, filename, element,
-                LOC_WARN +
+            VERBOSE_XML(VB_GENERAL, LOG_WARNING, filename, element,
                 QString("Attempting to define '%1'\n\t\t\t"
                         "with face '%2', but it already "
                         "exists with face '%3'")
@@ -400,8 +398,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
             }
             else
             {
-                VERBOSE_XML(VB_IMPORTANT, filename, info,
-                            LOC_ERR +
+                VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, info,
                             QString("Unknown tag in font '%1'").arg(name));
                 delete newFont;
                 return NULL;
@@ -411,8 +408,8 @@ MythFontProperties *MythFontProperties::ParseFromXml(
 
     if (size <= 0 && pixelsize <= 0 && !fromBase)
     {
-        VERBOSE_XML(VB_IMPORTANT, filename, element,
-                    LOC_ERR + "Font size must be greater than 0.");
+        VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
+                    "Font size must be greater than 0.");
         delete newFont;
         return NULL;
     }
@@ -430,15 +427,14 @@ MythFontProperties *MythFontProperties::ParseFromXml(
     QFontInfo fi(newFont->m_face);
     if (newFont->m_face.family() != fi.family())
     {
-        VERBOSE_XML(
-            VB_IMPORTANT, filename, element,
-            LOC_ERR + QString("Failed to load '%1', got '%2' instead")
+        VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
+                    QString("Failed to load '%1', got '%2' instead")
             .arg(newFont->m_face.family()).arg(fi.family()));
     }
     else
     {
-        VERBOSE_XML(VB_GENERAL|VB_EXTRA, filename, element,
-                    LOC + QString("loaded '%1'").arg(fi.family()));
+        VERBOSE_XML(VB_GENERAL, LOG_DEBUG, filename, element,
+                    QString("loaded '%1'").arg(fi.family()));
     }
 
     if (addToGlobal)
@@ -469,7 +465,7 @@ bool FontMap::AddFont(const QString &text, MythFontProperties *font)
 
     if (m_FontMap.contains(text))
     {
-        VERBOSE(VB_IMPORTANT, QString("Already have a font: %1").arg(text));
+        LOG(VB_GENERAL, LOG_ERR, QString("Already have a font: %1").arg(text));
         return false;
     }
 

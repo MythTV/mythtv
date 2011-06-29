@@ -60,7 +60,7 @@ bool DisplayRes::Initialize(void)
     GetDisplayInfo(tW, tH, tW_mm, tH_mm, tRate, pixelAspectRatio);
     mode[DESKTOP].Init();
     mode[DESKTOP] = DisplayResScreen(tW, tH, tW_mm, tH_mm, -1.0, tRate);
-    VERBOSE(VB_GENERAL, QString("Desktop video mode: %1x%2 %3 Hz")
+    LOG(VB_GENERAL, LOG_NOTICE, QString("Desktop video mode: %1x%2 %3 Hz")
             .arg(tW).arg(tH).arg(tRate, 0, 'f', 3));
 
     // Initialize GUI mode
@@ -105,7 +105,7 @@ bool DisplayRes::Initialize(void)
         max_width = std::max(max_width, screens[i].Width());
         max_height = std::max(max_height, screens[i].Height());
     }
-    VERBOSE(VB_PLAYBACK, QString("max_width: %1 max_height: %2")
+    LOG(VB_PLAYBACK, LOG_INFO, QString("max_width: %1 max_height: %2")
             .arg(max_width).arg(max_height));
 
     return true;
@@ -123,14 +123,14 @@ bool DisplayRes::SwitchToVideo(int iwidth, int iheight, double frate)
     if (key != 0)
     {
         mode[next_mode = CUSTOM_VIDEO] = next = in_size_to_output_mode[key];
-        VERBOSE(VB_PLAYBACK, QString("Found custom screen override %1x%2")
+        LOG(VB_PLAYBACK, LOG_INFO, QString("Found custom screen override %1x%2")
                 .arg(next.Width()).arg(next.Height()));
     }
 
     // If requested refresh rate is 0, attempt to match video fps
     if ((int) next.RefreshRate() == 0)
     {
-        VERBOSE(VB_PLAYBACK,
+        LOG(VB_PLAYBACK, LOG_INFO,
                 QString("Trying to match best refresh rate %1Hz")
                 .arg(frate, 0, 'f', 3));
         next.AddRefreshRate(frate);
@@ -142,14 +142,14 @@ bool DisplayRes::SwitchToVideo(int iwidth, int iheight, double frate)
     bool chg = !(next == last) ||
         !(DisplayResScreen::compare_rates(last.RefreshRate(),target_rate));
 
-    VERBOSE(VB_PLAYBACK, QString("Trying %1x%2 %3 Hz")
+    LOG(VB_PLAYBACK, LOG_INFO, QString("Trying %1x%2 %3 Hz")
             .arg(next.Width()).arg(next.Height())
             .arg(target_rate, 0, 'f', 3));
 
     if (chg && !SwitchToVideoMode(next.Width(), next.Height(), target_rate))
     {
-        VERBOSE(VB_IMPORTANT, QString("SwitchToVideo: Video size %1 x %2: "
-                                      "xrandr failed for %3 x %4")
+        LOG(VB_GENERAL, LOG_ERR, QString("SwitchToVideo: Video size %1 x %2: "
+                                         "xrandr failed for %3 x %4")
                 .arg(iwidth).arg(iheight)
                 .arg(next.Width()).arg(next.Height()));
         return false;
@@ -158,7 +158,7 @@ bool DisplayRes::SwitchToVideo(int iwidth, int iheight, double frate)
     cur_mode = next_mode;
     last = next;
 
-    VERBOSE(VB_PLAYBACK,
+    LOG(VB_PLAYBACK, LOG_INFO,
             QString("SwitchToVideo: Video size %1 x %2: \n"
                     "    %7 displaying resolution %3 x %4, %5mm x %6mm")
             .arg(iwidth).arg(iheight).arg(GetWidth()).arg(GetHeight())
@@ -181,12 +181,12 @@ bool DisplayRes::SwitchToGUI(tmode next_mode)
                  && !(DisplayResScreen::compare_rates(last.RefreshRate(),
                                                       target_rate)))); 
 
-    VERBOSE(VB_GENERAL, QString("Trying %1x%2 %3 Hz")
+    LOG(VB_GENERAL, LOG_INFO, QString("Trying %1x%2 %3 Hz")
             .arg(next.Width()).arg(next.Height()).arg(target_rate, 0, 'f', 3));
 
     if (chg && !SwitchToVideoMode(next.Width(), next.Height(), target_rate))
     {
-        VERBOSE(VB_IMPORTANT,
+        LOG(VB_GENERAL, LOG_ERR,
                 QString("SwitchToGUI: xrandr failed for %1x%2 %3  Hz")
                 .arg(next.Width()).arg(next.Height())
                 .arg(next.RefreshRate(), 0, 'f', 3));
@@ -196,7 +196,7 @@ bool DisplayRes::SwitchToGUI(tmode next_mode)
     cur_mode = next_mode;
     last = next;
 
-    VERBOSE(VB_GENERAL, QString("SwitchToGUI: Switched to %1x%2 %3 Hz")
+    LOG(VB_GENERAL, LOG_INFO, QString("SwitchToGUI: Switched to %1x%2 %3 Hz")
             .arg(GetWidth()).arg(GetHeight()).arg(GetRefreshRate(), 0, 'f', 3));
 
     return chg;

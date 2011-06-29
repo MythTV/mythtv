@@ -24,8 +24,8 @@ void MythQImagePainter::Begin(QPaintDevice *parent)
 {
     if (!parent)
     {
-        VERBOSE(VB_IMPORTANT, "FATAL ERROR: No parent widget defined for "
-                              "QT Painter, bailing");
+        LOG(VB_GENERAL, LOG_ERR, 
+            "FATAL ERROR: No parent widget defined for QT Painter, bailing");
         return;
     }
 
@@ -144,7 +144,8 @@ void MythQImagePainter::DrawImage(const QRect &r, MythImage *im,
 {
     if (!painter)
     {
-        VERBOSE(VB_IMPORTANT, "FATAL ERROR: DrawImage called with no painter");
+        LOG(VB_GENERAL, LOG_ERR,
+            "FATAL ERROR: DrawImage called with no painter");
         return;
     }
 
