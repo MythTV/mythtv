@@ -603,7 +603,7 @@ void MythSystemWindows::Fork(time_t timeout)
             // Ensure the read handle to the pipe for STDERR is not inherited.
             if (!SetHandleInformation(p_stderr[0], HANDLE_FLAG_INHERIT, 0))
             {
-                LOG(LOG_SYSTEM, LOG_ERR, "stderr inheritance error");
+                LOG(VB_SYSTEM, LOG_ERR, "stderr inheritance error");
                 SetStatus( GENERIC_EXIT_NOT_OK );
             }
             else
