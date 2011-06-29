@@ -22,7 +22,9 @@ using namespace std;
 
 #include <stdlib.h>
 #define SYSLOG_NAMES
+#ifndef _WIN32
 #include <syslog.h>
+#endif
 #include <stdarg.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -800,6 +802,7 @@ void logPropagateCalc(void)
     if (!logPropagateOpts.dblog)
         logPropagateArgs += " --nodblog";
 
+#ifndef _WIN32
     if (logPropagateOpts.facility >= 0)
     {
         CODE *syslogname;
@@ -810,6 +813,7 @@ void logPropagateCalc(void)
 
         logPropagateArgs += QString(" --syslog %1").arg(syslogname->c_name);
     }
+#endif
 }
 
 bool logPropagateQuiet(void)
