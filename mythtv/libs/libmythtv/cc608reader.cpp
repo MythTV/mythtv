@@ -123,7 +123,9 @@ void CC608Reader::Update(unsigned char *inpos)
 
     if (subtitle.clr)
     {
-        //printf ("erase displayed memory\n");
+#if 0
+        LOG(VB_GENERAL, LOG_DEBUG, "erase displayed memory");
+#endif
         ClearBuffers(false, true);
         if (!subtitle.len)
             return;
@@ -192,11 +194,9 @@ void CC608Reader::Update(unsigned char *inpos)
                 ccbuf->push_back(tmpcc);
 #if 0
                 if (ccbuf->size() > 4)
-                {
-                    QByteArray ccl = m_outputText.toAscii();
-                    printf("CC overflow:  ");
-                    printf("%d %d %s\n", m_outputCol, m_outputRow, ccl.constData());
-                }
+                    LOG(VB_GENERAL, LOG_DEBUG, QString("CC overflow:  %1 %2 %3")
+                            .arg(m_outputCol) .arg(m_outputRow)
+                            .arg(m_outputText));
 #endif
             }
             subtitle.row++;

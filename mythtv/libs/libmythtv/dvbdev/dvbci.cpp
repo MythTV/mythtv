@@ -1905,11 +1905,11 @@ bool cHlCiHandler::Process(void)
             if ((GetData(AOT_CA_INFO, &msg)) < 0) {
                 esyslog("HLCI communication failed");
             } else {
-                printf("Debug: ");
+                QString message("Debug: ");
                 for(int i = 0; i < 20; i++) {
-                    printf("%d ", msg.msg[i]);
+                    message += QString("%1 ").arg(msg.msg[i]);
                 }
-                printf("\n");
+                LOG(VB_GENERAL, LOG_DEBUG, message);
                 dbgprotocol("<== Ca Info");
                 int l = msg.msg[3];
                 const uint8_t *d = &msg.msg[4];

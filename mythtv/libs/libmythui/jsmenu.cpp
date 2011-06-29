@@ -230,7 +230,7 @@ void JoystickMenuThread::run(void)
             ** TODO:  In theory, we could recover from file errors
             **        (what happens when we unplug a joystick?)
             **--------------------------------------------------------------*/
-            perror("select");
+            LOG(VB_GENERAL, LOG_ERR, "select: " + ENO);
             return;
         }
 
@@ -242,7 +242,7 @@ void JoystickMenuThread::run(void)
             rc = read(m_fd, &js, sizeof(js));
             if (rc != sizeof(js))
             {
-                    perror("error reading js");
+                    LOG(VB_GENERAL, LOG_ERR, "error reading js:" + ENO);
                     return;
             }
 

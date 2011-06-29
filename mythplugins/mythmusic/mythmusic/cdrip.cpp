@@ -754,7 +754,7 @@ void Ripper::scanCD(void)
     VERBOSE(VB_MEDIA, "Ripper::scanCD() - dev:" + m_CDdevice);
     if (cdrom_fd == -1)
     {
-        perror("Could not open cdrom_fd");
+        LOG(VB_GENERAL, LOG_ERR, "Could not open cdrom_fd: " + ENO);
         return;
     }
     cd_close(cdrom_fd);  //Close the CD tray
@@ -1224,12 +1224,12 @@ void Ripper::ejectCD()
         if (cdrom_fd != -1)
         {
             if (cd_eject(cdrom_fd) == -1)
-                perror("Failed on cd_eject");
+                LOG(VB_GENERAL, LOG_ERR, "Failed on cd_eject: " + ENO);
 
             cd_finish(cdrom_fd);
         }
         else
-            perror("Failed on cd_init_device");
+            LOG(VB_GENERAL, LOG_ERR, "Failed on cd_init_device: " + ENO);
 #else
         MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
         if (mon)

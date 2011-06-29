@@ -388,7 +388,10 @@ int BiopConnbinder::Process(const unsigned char *data)
     {
         /* UKProfile - only first tap read */
         ret = tap.Process(data + off);
-        //printf("Binder - assoc_tag %u\n", tap.assoc_tag);
+#if 0
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Binder - assoc_tag %1")
+                                       .arg(tap.assoc_tag));
+#endif
         if (ret > 0)
             off += ret;
         /* else TODO error */

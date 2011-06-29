@@ -2013,14 +2013,27 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 int      i = 1;
                 while (p)
                 {
-                    if (p->name[0] != '\0')  printf("Codec %s:", p->name);
-                    else                     printf("Codec %d, null name,", i);
-                    if (p->decode == NULL)   puts("decoder is null");
+                    QString msg;
+
+                    if (p->name[0] != '\0')
+                        msg = QString("Codec %1:").arg(p->name);
+                    else
+                        msg = QString("Codec %1, null name,").arg(i);
+
+                    if (p->decode == NULL)
+                        msg += "decoder is null";
+
+                    LOG(VB_LIBAV, LOG_DEBUG, msg);
 
                     if (p->id == enc->codec_id)
-                    {   codec = p; break;    }
+                    {
+                        codec = p;
+                        break;
+                    }
 
-                    printf("Codec 0x%x != 0x%x\n", p->id, enc->codec_id);
+                    LOG(VB_LIBAV, LOG_DEBUG,
+                        QString("Codec 0x%1 != 0x%2") .arg(p->id, 0, 16)
+                            .arg(enc->codec_id, 0, 16));
                     p = av_codec_next(p);
                     ++i;
                 }
