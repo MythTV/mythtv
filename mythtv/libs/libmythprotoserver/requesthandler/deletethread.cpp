@@ -40,7 +40,7 @@ void DeleteThread::run(void)
 {
     threadRegister("Delete");
 
-    VERBOSE(VB_FILE, "Spawning new delete thread.");
+    LOG(VB_FILE, LOG_DEBUG, "Spawning new delete thread.");
 
     while (gCoreContext && m_run)
     {
@@ -62,7 +62,7 @@ void DeleteThread::run(void)
         }
     }
     else
-        VERBOSE(VB_FILE, "Delete thread self-terminating due to idle.");
+        LOG(VB_FILE, LOG_DEBUG, "Delete thread self-terminating due to idle.");
 
     threadDeregister();
 }
@@ -117,8 +117,9 @@ void DeleteThread::ProcessNew(void)
 
                 if (unlink(cpath))
                 {
-                    VERBOSE(VB_IMPORTANT, QString("Error deleting '%1' "
-                            "-> '%2': ").arg(path).arg(tmppath) + ENO);
+                    LOG(VB_GENERAL, LOG_ERR, 
+                        QString("Error deleting '%1' -> '%2': ")
+                            .arg(path).arg(tmppath) + ENO);
                     emit unlinkFailed(path);
                     continue;
                 }
@@ -141,8 +142,9 @@ void DeleteThread::ProcessNew(void)
                 // itself and continue
                 if (unlink(cpath))
                 {
-                    VERBOSE(VB_IMPORTANT, QString("Error deleting '%1': "
-                                    "count not unlink ").arg(path) + ENO);
+                    LOG(VB_GENERAL, LOG_ERR,
+                        QString("Error deleting '%1': count not unlink ")
+                            .arg(path) + ENO);
                     emit unlinkFailed(path);
                 }
                 else
@@ -153,13 +155,14 @@ void DeleteThread::ProcessNew(void)
         }
 
         // open the file so it can be unlinked without immediate deletion
-        VERBOSE(VB_FILE, QString("About to unlink/delete file: '%1'")
+        LOG(VB_FILE, LOG_INFO, QString("About to unlink/delete file: '%1'")
                                 .arg(path));
         int fd = open(cpath, O_WRONLY);
         if (fd == -1)
         {
-            VERBOSE(VB_IMPORTANT, QString("Error deleting '%1': "
-                        "could not open ").arg(path) + ENO);
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Error deleting '%1': could not open ")
+                    .arg(path) + ENO);
             emit unlinkFailed(path);
             continue;
         }
@@ -168,8 +171,9 @@ void DeleteThread::ProcessNew(void)
         // delete it from the filesystem
         if (unlink(cpath))
         {
-            VERBOSE(VB_IMPORTANT, QString("Error deleting '%1': "
-                        "could not unlink ").arg(path) + ENO);
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Error deleting '%1': could not unlink ")
+                    .arg(path) + ENO);
             emit unlinkFailed(path);
             close(fd);
             continue;
@@ -217,7 +221,7 @@ void DeleteThread::ProcessOld(void)
 
             if (err)
             {
-                VERBOSE(VB_IMPORTANT, QString("Error truncating '%1'")
+                LOG(VB_GENERAL, LOG_ERR, QString("Error truncating '%1'")
                             .arg(ds->path) + ENO);
                 ds->size = 0;
             }

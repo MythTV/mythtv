@@ -49,9 +49,9 @@ bool BaseRequestHandler::HandleAnnounce(MythSocket *socket,
     handler->DownRef();
     handler = NULL;
 
-    VERBOSE(VB_GENERAL, QString("MainServer::ANN %1")
+    LOG(VB_GENERAL, LOG_DEBUG, QString("MainServer::ANN %1")
                                     .arg(commands[1]));
-    VERBOSE(VB_IMPORTANT, QString("adding: %1 as a client (events: %2)")
+    LOG(VB_GENERAL, LOG_NOTICE, QString("adding: %1 as a client (events: %2)")
                                .arg(commands[2]).arg(eventlevel));
     SendMythSystemEvent(QString("CLIENT_CONNECTED HOSTNAME %1")
                                     .arg(commands[2]));

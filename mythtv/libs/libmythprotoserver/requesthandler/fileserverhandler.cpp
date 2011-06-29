@@ -99,12 +99,13 @@ QString FileServerHandler::LocalFilePath(const QUrl &url,
             if (pburl.left(1) == "/")
             {
                 lpath = pburl.section('/', 0, -2) + "/" + lpath;
-                VERBOSE(VB_FILE, QString("Local file path: %1").arg(lpath));
+                LOG(VB_FILE, LOG_INFO,
+                    QString("Local file path: %1").arg(lpath));
             }
             else
             {
-                VERBOSE(VB_IMPORTANT,
-                        QString("ERROR: LocalFilePath unable to find local "
+                LOG(VB_GENERAL, LOG_ERR,
+                        QString("LocalFilePath unable to find local "
                                 "path for '%1', found '%2' instead.")
                                 .arg(lpath).arg(pburl));
                 lpath = "";
@@ -130,15 +131,15 @@ QString FileServerHandler::LocalFilePath(const QUrl &url,
             if (!tmpFile.isEmpty())
             {
                 lpath = tmpFile;
-                VERBOSE(VB_FILE,
+                LOG(VB_FILE, LOG_INFO,
                         QString("LocalFilePath(%1 '%2'), found through "
                                 "exhaustive search at '%3'")
                             .arg(url.toString()).arg(opath).arg(lpath));
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, QString("ERROR: LocalFilePath unable to "
-                                              "find local path for '%1'.")
+                LOG(VB_GENERAL, LOG_ERR, QString("LocalFilePath unable to "
+                                                 "find local path for '%1'.")
                                 .arg(opath));
                 lpath = "";
             }
@@ -237,8 +238,8 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
 
     slist.clear();
 
-    VERBOSE(VB_GENERAL, "FileServerHandler::HandleAnnounce");
-    VERBOSE(VB_IMPORTANT, QString("adding: %1 as remote file transfer")
+    LOG(VB_GENERAL, LOG_DEBUG, "FileServerHandler::HandleAnnounce");
+    LOG(VB_GENERAL, LOG_INFO, QString("adding: %1 as remote file transfer")
                             .arg(hostname));
 
     if (writemode)
@@ -250,7 +251,7 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
         QString dir = sgroup.FindNextDirMostFree();
         if (dir.isEmpty())
         {
-            VERBOSE(VB_IMPORTANT, "Unable to determine directory "
+            LOG(VB_GENERAL, LOG_ERR, "Unable to determine directory "
                     "to write to in FileTransfer write command");
 
             slist << "ERROR" << "filetransfer_directory_not_found";
@@ -261,7 +262,7 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
         QString basename = qurl.path();
         if (basename.isEmpty())
         {
-            VERBOSE(VB_IMPORTANT, QString("ERROR: FileTransfer write "
+            LOG(VB_GENERAL, LOG_ERR, QString("FileTransfer write "
                     "filename is empty in url '%1'.")
                     .arg(qurl.toString()));
 
@@ -273,7 +274,7 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
         if ((basename.contains("/../")) ||
             (basename.startsWith("../")))
         {
-            VERBOSE(VB_IMPORTANT, QString("ERROR: FileTransfer write "
+            LOG(VB_GENERAL, LOG_ERR, QString("FileTransfer write "
                     "filename '%1' does not pass sanity checks.")
                     .arg(basename));
 
@@ -290,7 +291,7 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
     QFileInfo finfo(filename);
     if (finfo.isDir())
     {
-        VERBOSE(VB_IMPORTANT, QString("ERROR: FileTransfer filename "
+        LOG(VB_GENERAL, LOG_ERR, QString("FileTransfer filename "
                 "'%1' is actually a directory, cannot transfer.")
                 .arg(filename));
 
@@ -307,7 +308,7 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
         {
             if (!qdir.mkpath(dirPath))
             {
-                VERBOSE(VB_IMPORTANT, QString("ERROR: FileTransfer "
+                LOG(VB_GENERAL, LOG_ERR, QString("FileTransfer "
                         "filename '%1' is in a subdirectory which does "
                         "not exist, but can not be created.")
                         .arg(filename));
@@ -579,7 +580,8 @@ bool FileServerHandler::HandleQueryFileExists(SocketHandler *socket,
         (filename.contains("/../")) || 
         (filename.startsWith("../")))
     {
-        VERBOSE(VB_IMPORTANT, QString("ERROR checking for file, filename '%1' "
+        LOG(VB_GENERAL, LOG_ERR, 
+            QString("ERROR checking for file, filename '%1' "
                     "fails sanity checks").arg(filename));
         res << "";
         socket->SendStringList(res);
@@ -648,7 +650,8 @@ bool FileServerHandler::HandleQueryFileHash(SocketHandler *socket,
         (filename.contains("/../")) || 
         (filename.startsWith("../")))
     {
-        VERBOSE(VB_IMPORTANT, QString("ERROR checking for file, filename '%1' "
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("ERROR checking for file, filename '%1' "
                     "fails sanity checks").arg(filename));
         res << "";
         socket->SendStringList(res);
@@ -689,8 +692,9 @@ bool FileServerHandler::HandleDeleteFile(SocketHandler *socket,
         (filename.contains("/../")) ||
         (filename.startsWith("../")))
     {
-        VERBOSE(VB_IMPORTANT, QString("ERROR deleting file, filename '%1' "
-                "fails sanity checks").arg(filename));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("ERROR deleting file, filename '%1' fails sanity checks")
+                .arg(filename));
         if (socket)
         {
             res << "0";
@@ -704,8 +708,8 @@ bool FileServerHandler::HandleDeleteFile(SocketHandler *socket,
 
     if (fullfile.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, QString("Unable to find %1 in HandleDeleteFile()")
-                .arg(filename));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Unable to find %1 in HandleDeleteFile()") .arg(filename));
         if (socket)
         {
             res << "0";
@@ -728,7 +732,7 @@ bool FileServerHandler::HandleDeleteFile(SocketHandler *socket,
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("Error deleting file: '%1'")
+        LOG(VB_GENERAL, LOG_ERR, QString("Error deleting file: '%1'")
                         .arg(fullfile));
         if (socket)
         {
@@ -750,8 +754,8 @@ bool FileServerHandler::HandleGetFileList(SocketHandler *socket,
         fileNamesOnly = slist[4].toInt();
     else if (slist.size() != 4)
     {
-        VERBOSE(VB_IMPORTANT, QString("HandleSGGetFileList: Invalid Request. "
-                                      "%1").arg(slist.join("[]:[]")));
+        LOG(VB_GENERAL, LOG_ERR, QString("Invalid Request. %1")
+                                     .arg(slist.join("[]:[]")));
         res << "EMPTY LIST";
         socket->SendStringList(res);
         return true;
@@ -762,15 +766,16 @@ bool FileServerHandler::HandleGetFileList(SocketHandler *socket,
     QString groupname = slist[2];
     QString path = slist[3];
 
-    VERBOSE(VB_FILE, QString("HandleSGGetFileList: group = %1  host = %2  "
-                             "path = %3 wanthost = %4").arg(groupname)
-                                .arg(host).arg(path).arg(wantHost));
+    LOG(VB_FILE, LOG_INFO,
+        QString("HandleSGGetFileList: group = %1  host = %2  "
+                "path = %3 wanthost = %4")
+            .arg(groupname).arg(host).arg(path).arg(wantHost));
 
     if ((host.toLower() == wantHost.toLower()) ||
         (gCoreContext->GetSetting("BackendServerIP") == wantHost))
     {
         StorageGroup sg(groupname, host);
-        VERBOSE(VB_FILE, "HandleSGGetFileList: Getting local info");
+        LOG(VB_FILE, LOG_INFO, "Getting local info");
         if (fileNamesOnly)
             res = sg.GetFileList(path);
         else
@@ -794,7 +799,7 @@ bool FileServerHandler::HandleGetFileList(SocketHandler *socket,
 
         if (remsock)
         {
-            VERBOSE(VB_FILE, "HandleSGGetFileList: Getting remote info");
+            LOG(VB_FILE, LOG_INFO, "Getting remote info");
             res << "QUERY_SG_GETFILELIST" << wantHost << groupname << path
                 << QString::number(fileNamesOnly);
             remsock->SendReceiveStringList(res);
@@ -802,8 +807,8 @@ bool FileServerHandler::HandleGetFileList(SocketHandler *socket,
         }
         else
         {
-            VERBOSE(VB_FILE, QString("HandleSGGetFileList: Failed to grab "
-                                     "slave socket : %1 :").arg(wantHost));
+            LOG(VB_FILE, LOG_ERR, QString("Failed to grab slave socket : %1 :")
+                     .arg(wantHost));
             res << "SLAVE UNREACHABLE: " << wantHost;
         }
     }
@@ -819,7 +824,7 @@ bool FileServerHandler::HandleFileQuery(SocketHandler *socket,
 
     if (slist.size() != 4)
     {
-        VERBOSE(VB_IMPORTANT, QString("HandleSGFileQuery: Invalid Request. %1")
+        LOG(VB_GENERAL, LOG_ERR, QString("Invalid Request. %1")
                 .arg(slist.join("[]:[]")));
         res << "EMPTY LIST";
         socket->SendStringList(res);
@@ -830,14 +835,14 @@ bool FileServerHandler::HandleFileQuery(SocketHandler *socket,
     QString groupname = slist[2];
     QString filename  = slist[3];
 
-    VERBOSE(VB_FILE, QString("HandleSGFileQuery: myth://%1@%2/%3")
+    LOG(VB_FILE, LOG_DEBUG, QString("HandleSGFileQuery: myth://%1@%2/%3")
                              .arg(groupname).arg(wantHost).arg(filename));
 
     if ((wantHost.toLower() == gCoreContext->GetHostName().toLower()) ||
         (wantHost == gCoreContext->GetSetting("BackendServerIP")))
     {
         // handle request locally
-        VERBOSE(VB_FILE, QString("HandleSGFileQuery: Getting local info"));
+        LOG(VB_FILE, LOG_DEBUG, QString("Getting local info"));
         StorageGroup sg(groupname, gCoreContext->GetHostName());
         res = sg.GetFileInfo(filename);
 
@@ -894,8 +899,8 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
                 res << "ok";
             else
             {
-                VERBOSE(VB_IMPORTANT, QString("Unknown file transfer "
-                                              "socket: %1").arg(recnum));
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("Unknown file transfer socket: %1").arg(recnum));
                 res << "ERROR"
                     << "unknown_file_transfer_socket";
             }
@@ -921,8 +926,8 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
     {
         if (slist.size() != 3)
         {
-            VERBOSE(VB_IMPORTANT, "Invalid QUERY_FILETRANSFER "
-                                  "REQUEST_BLOCK call");
+            LOG(VB_GENERAL, LOG_ERR, "Invalid QUERY_FILETRANSFER "
+                                     "REQUEST_BLOCK call");
             res << "ERROR" << "invalid_call";
         }
         else
@@ -935,8 +940,8 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
     {
         if (slist.size() != 3)
         {
-            VERBOSE(VB_IMPORTANT, "Invalid QUERY_FILETRANSFER "
-                                  "WRITE_BLOCK call");
+            LOG(VB_GENERAL, LOG_ERR, "Invalid QUERY_FILETRANSFER "
+                                     "WRITE_BLOCK call");
             res << "ERROR" << "invalid_call";
         }
         else
@@ -949,7 +954,7 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
     {
         if (slist.size() != 5)
         {
-            VERBOSE(VB_IMPORTANT, "Invalid QUERY_FILETRANSFER SEEK call");
+            LOG(VB_GENERAL, LOG_ERR, "Invalid QUERY_FILETRANSFER SEEK call");
             res << "ERROR" << "invalid_call";
         }
         else
@@ -965,8 +970,8 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
     {
         if (slist.size() != 3)
         {
-            VERBOSE(VB_IMPORTANT, "Invalid QUERY_FILETRANSFER "
-                                  "SET_TIMEOUT call");
+            LOG(VB_GENERAL, LOG_ERR, "Invalid QUERY_FILETRANSFER "
+                                     "SET_TIMEOUT call");
             res << "ERROR" << "invalid_call";
         }
         else
@@ -978,7 +983,7 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "Invalid QUERY_FILETRANSFER call");
+        LOG(VB_GENERAL, LOG_ERR, "Invalid QUERY_FILETRANSFER call");
         res << "ERROR" << "invalid_call";
     }
 
@@ -1016,7 +1021,7 @@ bool FileServerHandler::HandleDownloadFile(SocketHandler *socket,
 
     if (outDir.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, QString("Unable to determine directory "
+        LOG(VB_GENERAL, LOG_ERR, QString("Unable to determine directory "
                 "to write to in %1 write command").arg(slist[0]));
         res << "ERROR" << "downloadfile_directory_not_found";
         socket->SendStringList(res);
@@ -1026,7 +1031,7 @@ bool FileServerHandler::HandleDownloadFile(SocketHandler *socket,
     if ((filename.contains("/../")) ||
         (filename.startsWith("../")))
     {
-        VERBOSE(VB_IMPORTANT, QString("ERROR: %1 write "
+        LOG(VB_GENERAL, LOG_ERR, QString("ERROR: %1 write "
                 "filename '%2' does not pass sanity checks.")
                 .arg(slist[0]).arg(filename));
         res << "ERROR" << "downloadfile_filename_dangerous";
