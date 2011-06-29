@@ -1220,7 +1220,7 @@ void NuppelVideoRecorder::DoV4L1(void)
 
     if (vm.frames < 2)
     {
-        fprintf(stderr, "need a minimum of 2 capture buffers\n");
+        LOG(VB_GENERAL, LOG_CRIT, "need a minimum of 2 capture buffers");
         KillChildren();
         errored = true;
         return;
@@ -3101,7 +3101,9 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
     if (firsttc == -1)
     {
         firsttc = timecode;
-        //fprintf(stderr, "first timecode=%d\n", firsttc);
+#if 0
+        LOG(VB_GENERAL, LOG_DEBUG, QString("first timecode=%1").arg(firsttc));
+#endif
     }
     else
     {

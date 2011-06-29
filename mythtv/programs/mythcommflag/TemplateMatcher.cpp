@@ -16,6 +16,7 @@ using namespace std;
 // MythTV headers
 #include "mythplayer.h"
 #include "mythcorecontext.h"
+#include "mythlogging.h"
 
 // Commercial Flagging headers
 #include "CommDetector2.h"
