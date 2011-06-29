@@ -108,7 +108,7 @@ void verboseAdd(uint64_t mask, QString name, bool additive, QString helptext);
 void verboseInit(void);
 void verboseHelp();
 
-void LogTimeStamp( time_t *epoch, uint32_t *usec, struct tm *tm );
+void LogTimeStamp( struct tm *tm, uint32_t *usec );
 char *getThreadName( LoggingItem_t *item );
 int64_t getThreadTid( LoggingItem_t *item );
 void setThreadTid( LoggingItem_t *item );
@@ -693,30 +693,32 @@ void deleteItem( LoggingItem_t *item )
     delete item;
 }
 
-void LogTimeStamp( time_t *epoch, uint32_t *usec, struct tm *tm )
+void LogTimeStamp( struct tm *tm, uint32_t *usec )
 {
-    if( !epoch || !usec || !tm )
+    if( !usec || !tm )
         return;
+
+    time_t epoch;
 
 #if HAVE_GETTIMEOFDAY
     struct timeval  tv;
     gettimeofday(&tv, NULL);
-    *epoch = tv.tv_sec;
+    epoch = tv.tv_sec;
     *usec  = tv.tv_usec;
 #else
     /* Stupid system has no gettimeofday, use less precise QDateTime */
     QDateTime date = QDateTime::currentDateTime();
     QTime     time = date.time();
-    *epoch = date.toTime_t();
+    epoch = date.toTime_t();
     *usec = time.msec() * 1000;
 #endif
 
 #ifndef _WIN32
-    localtime_r(epoch, tm);
+    localtime_r(&epoch, tm);
 #else
     {
         QMutexLocker timeLock(&localtimeMutex);
-        struct tm *tmp = localtime(epoch);
+        struct tm *tmp = localtime(&epoch);
         memcpy(tm, tmp, sizeof(struct tm));
     }
 #endif
@@ -728,8 +730,6 @@ void LogPrintLine( uint32_t mask, LogLevel_t level, const char *file, int line,
     va_list         arguments;
     char           *message;
     LoggingItem_t  *item;
-    time_t          epoch;
-    uint32_t        usec;
 
     if( !VERBOSE_LEVEL_CHECK(mask) )
         return;
@@ -751,9 +751,7 @@ void LogPrintLine( uint32_t mask, LogLevel_t level, const char *file, int line,
     vsnprintf(message, LOGLINE_MAX, format, arguments);
     va_end(arguments);
 
-    LogTimeStamp( &epoch, &usec, &item->tm );
-    item->usec     = usec;
-
+    LogTimeStamp( &item->tm, &item->usec );
     item->level    = level;
     item->file     = file;
     item->line     = line;
@@ -908,11 +906,8 @@ void logStop(void)
 void threadRegister(QString name)
 {
     uint64_t id = (uint64_t)QThread::currentThreadId();
-    LoggingItem_t  *item;
-    time_t epoch;
-    uint32_t usec;
 
-    item = new LoggingItem_t;
+    LoggingItem_t *item = new LoggingItem_t;
     if (!item)
         return;
 
@@ -920,9 +915,7 @@ void threadRegister(QString name)
         return;
 
     memset( item, 0, sizeof(LoggingItem_t) );
-    LogTimeStamp( &epoch, &usec, &item->tm );
-    item->usec = usec;
-
+    LogTimeStamp( &item->tm, &item->usec );
     item->level = (LogLevel_t)LOG_DEBUG;
     item->threadId = id;
     item->line = __LINE__;
@@ -940,8 +933,6 @@ void threadDeregister(void)
 {
     uint64_t id = (uint64_t)QThread::currentThreadId();
     LoggingItem_t  *item;
-    time_t epoch;
-    uint32_t usec;
 
     item = new LoggingItem_t;
     if (!item)
@@ -951,9 +942,7 @@ void threadDeregister(void)
         return;
 
     memset( item, 0, sizeof(LoggingItem_t) );
-    LogTimeStamp( &epoch, &usec, &item->tm );
-    item->usec = usec;
-
+    LogTimeStamp( &item->tm, &item->usec );
     item->level = (LogLevel_t)LOG_DEBUG;
     item->threadId = id;
     item->line = __LINE__;
