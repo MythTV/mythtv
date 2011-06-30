@@ -70,9 +70,6 @@ namespace
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    bool daemonize = false;
-
-    QString filename;
 
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHMEDIASERVER);
 
@@ -95,7 +92,10 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_OK;
     }
 
-    cmdline.ConfigureLogging();
+    bool daemonize = cmdline.toBool("daemon");
+    int retval;
+    if ((retval = cmdline.ConfigureLogging(daemonize)) != GENERIC_EXIT_OK)
+        return retval;
 
     if (cmdline.toBool("pidfile"))
         pidfile = cmdline.toUInt("pidfile");
@@ -117,8 +117,6 @@ int main(int argc, char *argv[])
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to ignore SIGPIPE");
 
-    daemonize = cmdline.toBool("daemon");
-
     if (daemonize && (daemon(0, 1) < 0))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to daemonize" + ENO);
@@ -130,11 +128,6 @@ int main(int argc, char *argv[])
         pidfs << getpid() << endl;
         pidfs.close();
     }
-
-    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
-                            .arg(MYTH_APPNAME_MYTHMEDIASERVER)
-                            .arg(MYTH_SOURCE_PATH)
-                            .arg(MYTH_SOURCE_VERSION));
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))

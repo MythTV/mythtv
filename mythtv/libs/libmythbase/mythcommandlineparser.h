@@ -143,7 +143,7 @@ class MBASE_PUBLIC MythCommandLineParser
     QDateTime               toDateTime(QString key) const;
 
     bool                    SetValue(const QString &key, QVariant value);
-    int                     ConfigureLogging(void);
+    int                     ConfigureLogging(unsigned int quiet = 0);
     void                    ApplySettingsOverride(void);
 
   protected:

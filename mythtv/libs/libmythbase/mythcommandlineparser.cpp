@@ -1048,27 +1048,26 @@ bool MythCommandLineParser::SetValue(const QString &key, QVariant value)
     return true;
 }
 
-int MythCommandLineParser::ConfigureLogging(void)
+int MythCommandLineParser::ConfigureLogging(unsigned int quiet)
 {
-    int err = 0,
-        quiet = 0;
+    int err = 0;
 
-    verboseMask = VB_IMPORTANT;
-    verboseString = "important";
+    verboseMask = VB_GENERAL | VB_IMPORTANT;
+    verboseString = "important general";
 
     if (toBool("verbose"))
+    {
         if ((err = verboseArgParse(toString("verbose"))))
             return err;
+    }
     else if (toBool("verboseint"))
         verboseMask = toUInt("verboseint");
-    else if (toBool("quiet"))
+
+    quiet = MAX(quiet, toUInt("quiet"));
+    if (quiet > 1)
     {
-        quiet = toUInt("quiet");
-        if (quiet > 1)
-        {
-            verboseMask = VB_NONE;
-            verboseArgParse("none");
-        }
+        verboseMask = VB_NONE;
+        verboseArgParse("none");
     }
 
     int facility = GetSyslogFacility();
@@ -1077,11 +1076,15 @@ int MythCommandLineParser::ConfigureLogging(void)
     if (level == LOG_UNKNOWN)
         return GENERIC_EXIT_INVALID_CMDLINE;
 
+    LOG(VB_GENERAL, LOG_CRIT, QString("%1 version: %2 [%3] www.mythtv.org")
+            .arg(QCoreApplication::applicationName())
+            .arg(MYTH_SOURCE_PATH) .arg(MYTH_SOURCE_VERSION));
+
     QString logfile = GetLogFilePath();
     bool propogate = toBool("islogpath");
     logStart(logfile, quiet, facility, level, dblog, propogate);
 
-    return 0;
+    return GENERIC_EXIT_OK;
 }
 
 // WARNING: this must not be called until after MythContext is initialized
