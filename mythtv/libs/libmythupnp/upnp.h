@@ -88,7 +88,9 @@ typedef enum
     UPnPResult_CMGR_InvalidConnectionRef     = 706,
     UPnPResult_CMGR_NotInNetwork             = 707,
 
-    UPnPResult_MS_AccessDenied               = 801
+    UPnPResult_MS_AccessDenied               = 801,
+
+    UPnPResult_MythTV_NoNamespaceGiven       = 32001,
 
 } UPnPResultCode;
 
