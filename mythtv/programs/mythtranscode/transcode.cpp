@@ -831,6 +831,7 @@ int Transcode::TranscodeFile(
             first_loop = false;
         }
         VideoFrame *lastDecode = videoOutput->GetLastDecodedFrame();
+        float new_aspect = lastDecode->aspect;
 
         frame.timecode = lastDecode->timecode;
 
@@ -974,9 +975,9 @@ int Transcode::TranscodeFile(
             if (! player->WriteStoredData(outRingBuffer, (did_ff == 0),
                                        timecodeOffset))
             {
-                if (video_aspect != player->GetVideoAspect())
+                if (video_aspect != new_aspect)
                 {
-                    video_aspect = player->GetVideoAspect();
+                    video_aspect = new_aspect;
                     nvr->SetNewVideoParams(video_aspect);
                 }
 
@@ -1038,9 +1039,9 @@ int Transcode::TranscodeFile(
                     (frame.timecode - lasttimecode - (int)vidFrameTime);
             }
 
-            if (video_aspect != player->GetVideoAspect())
+            if (video_aspect != new_aspect)
             {
-                video_aspect = player->GetVideoAspect();
+                video_aspect = new_aspect;
                 nvr->SetNewVideoParams(video_aspect);
             }
 

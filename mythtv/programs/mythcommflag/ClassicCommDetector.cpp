@@ -412,7 +412,7 @@ bool ClassicCommDetector::go()
         //when the aspect ratio changes.
         //In order to not change too many things at a time, I"m using basic
         //polling for now.
-        newAspect = player->GetVideoAspect();
+        newAspect = currentFrame->aspect;
         if (newAspect != aspect)
         {
             SetVideoParams(aspect);
