@@ -608,7 +608,7 @@ void MythSystemWindows::Fork(time_t timeout)
             }
             else
             {
-                si.hStdError = p_stderr[2];
+                si.hStdError = p_stderr[1];
                 si.dwFlags |= STARTF_USESTDHANDLES;
             }
         }
