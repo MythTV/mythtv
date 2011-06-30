@@ -946,7 +946,7 @@ void MythRenderD3D9::ReleaseBuffer(IDirect3DSurface9* surface)
 
     HRESULT hr = surface->UnlockRect();
     if (FAILED(hr))
-        LGO(VB_GENERAL, LOG_ERR, "Failed to unlock picture surface.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to unlock picture surface.");
     m_lock.unlock();
 }
 
