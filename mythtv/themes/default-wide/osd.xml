@@ -76,22 +76,23 @@
             <font>medium</font>
             <area>260,55,150,25</area>
             <align>right,vcenter</align>
-            <value>Codec :</value>
+            <value>Codec/Dec :</value>
         </textarea>
         <textarea name="videocodec">
             <font>medium</font>
             <area>415,55,150,25</area>
             <align>left,vcenter</align>
+            <template>%VIDEOCODEC% %VIDEODECODER%</template>
         </textarea>
-        <textarea name="viddec">
+        <textarea name="cpuload">
             <font>medium</font>
             <area>260,80,150,25</area>
             <align>right,vcenter</align>
-            <value>Decoder :</value>
+            <value>CPUs :</value>
         </textarea>
-        <textarea name="videodecoder">
+        <textarea name="load">
             <font>medium</font>
-            <area>415,80,150,25</area>
+            <area>415,80,200,25</area>
             <align>left,vcenter</align>
         </textarea>
 

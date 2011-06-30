@@ -1,6 +1,8 @@
 #ifndef JITTEROMETER_H
 #define JITTEROMETER_H
 
+#include <QFile>
+
 /* Jitterometer usage. There are 2 ways to use this:
 ------------------------------------------------------------------
 
@@ -38,10 +40,12 @@ class Jitterometer
 
     float GetLastFPS(void) { return last_fps; }
     float GetLastSD(void)  { return last_sd;  }
+    QString GetLastCPUStats(void) { return lastcpustats; }
     void SetNumCycles(int cycles);
     bool RecordCycleTime();
     void RecordStartTime();
     bool RecordEndTime();
+    QString GetCPUStat(void);
 
  private:
     int count;
@@ -52,6 +56,9 @@ class Jitterometer
     float last_fps;
     float last_sd;
     QString name;
+    QFile *cpustat;
+    unsigned long long *laststats;
+    QString lastcpustats;
 };
 
 #endif // JITTEROMETER_H

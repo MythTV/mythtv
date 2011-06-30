@@ -4359,6 +4359,7 @@ void MythPlayer::GetPlaybackData(InfoMap &infoMap)
             .arg(output_jmeter->GetLastFPS(), 0, 'f', 2)
             .arg(QChar(0xB1, 0))
             .arg(output_jmeter->GetLastSD(), 0, 'f', 2);
+        infoMap["load"] = output_jmeter->GetLastCPUStats();
     }
     GetCodecDescription(infoMap);
 }
