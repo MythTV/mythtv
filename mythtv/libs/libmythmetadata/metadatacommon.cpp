@@ -427,6 +427,7 @@ MetadataLookup* ParseMetadataMovieNFO(const QDomElement& item,
             PersonInfo info;
             info.name = actor.firstChildElement("name").text();
             info.role = actor.firstChildElement("role").text();
+            info.thumbnail = actor.firstChildElement("thumb").text();
             people.insert(ACTOR, info);
             actor = actor.nextSiblingElement("actor");
         }

@@ -206,6 +206,70 @@ MetadataLookupList MetadataDownload::runGrabber(QString cmd, QStringList args,
     return list;
 }
 
+MetadataLookupList MetadataDownload::readMXML(QString MXMLpath,
+                                             MetadataLookup* lookup,
+                                             bool passseas)
+{
+    MetadataLookupList list;
+
+    VERBOSE(VB_GENERAL, QString("Matching MXML file found. "
+               "Parsing %1 for metadata...")
+               .arg(MXMLpath));
+
+    if (lookup->GetType() == VID)
+    {
+        QByteArray mxmlraw;
+        QDomElement item;
+        if (MXMLpath.startsWith("myth://"))
+        {
+            RemoteFile *rf = new RemoteFile(MXMLpath);
+            if (rf && rf->Open())
+            {
+                bool loaded = rf->SaveAs(mxmlraw);
+                if (loaded)
+                {
+                    QDomDocument doc;
+                    if (doc.setContent(mxmlraw, true))
+                    {
+                        lookup->SetStep(GETDATA);
+                        QDomElement root = doc.documentElement();
+                        item = root.firstChildElement("item");
+                    }
+                    else
+                        VERBOSE(VB_GENERAL, QString("Corrupt or invalid MXML file."));
+                }
+                rf->Close();
+            }
+
+            delete rf;
+            rf = NULL;
+        }
+        else
+        {
+            QFile file(MXMLpath);
+            if (file.open(QIODevice::ReadOnly))
+            {
+                mxmlraw = file.readAll();
+                QDomDocument doc;
+                if (doc.setContent(mxmlraw, true))
+                {
+                    lookup->SetStep(GETDATA);
+                    QDomElement root = doc.documentElement();
+                    item = root.firstChildElement("item");
+                }
+                else
+                    VERBOSE(VB_GENERAL, QString("Corrupt or invalid MXML file."));
+                file.close();
+            }
+        }
+
+        MetadataLookup *tmp = ParseMetadataItem(item, lookup, passseas);
+        list.append(tmp);
+    }
+
+    return list;
+}
+
 MetadataLookupList MetadataDownload::readNFO(QString NFOpath,
                                              MetadataLookup* lookup)
 {
@@ -308,9 +372,10 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup* lookup)
 {
     MetadataLookupList list;
 
+    QString mxml = getMXMLPath(lookup->GetFilename());
     QString nfo = getNFOPath(lookup->GetFilename());
 
-    if (nfo.isEmpty())
+    if (mxml.isEmpty() && nfo.isEmpty())
     {
         QString def_cmd = QDir::cleanPath(QString("%1/%2")
             .arg(GetShareDir())
@@ -342,7 +407,9 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup* lookup)
         }
         list = runGrabber(cmd, args, lookup);
     }
-    else
+    else if (!mxml.isEmpty())
+        list = readMXML(mxml, lookup);
+    else if (!nfo.isEmpty())
         list = readNFO(nfo, lookup);
 
     return list;
@@ -419,6 +486,30 @@ MetadataLookupList MetadataDownload::handleVideoUndetermined(
         list.at(0)->SetStep(GETDATA);
 
     return list;
+}
+
+QString MetadataDownload::getMXMLPath(QString filename)
+{
+    QString ret;
+    QString xmlname;
+    QUrl qurl(filename);
+    QString ext = QFileInfo(qurl.path()).suffix();
+    xmlname = filename.left(filename.size() - ext.size()) + "mxml";
+
+    VERBOSE(VB_GENERAL, QString("MXMLName = %1 ").arg(xmlname));
+
+    if (xmlname.startsWith("myth://"))
+    {
+        if (RemoteFile::Exists(xmlname))
+            ret = xmlname;
+    }
+    else
+    {
+        if (QFile::exists(xmlname))
+            ret = xmlname;
+    }
+
+    return ret;
 }
 
 QString MetadataDownload::getNFOPath(QString filename)
