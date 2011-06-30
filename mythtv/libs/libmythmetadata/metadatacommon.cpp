@@ -432,6 +432,14 @@ MetadataLookup* ParseMetadataMovieNFO(const QDomElement& item,
         }
     }
 
+    QString director = item.firstChildElement("director").text();
+    if (!director.isEmpty())
+    {
+        PersonInfo info;
+        info.name = director;
+        people.insert(DIRECTOR, info);
+    }
+
     return new MetadataLookup(lookup->GetType(), lookup->GetData(),
         lookup->GetStep(), lookup->GetAutomatic(), lookup->GetHandleImages(),
         lookup->GetAllowOverwrites(), lookup->GetPreferDVDOrdering(),
