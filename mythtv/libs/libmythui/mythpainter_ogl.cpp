@@ -23,9 +23,10 @@ MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *render,
     target(0), swapControl(true)
 {
     if (realRender)
-        VERBOSE(VB_GENERAL, "OpenGL painter using existing OpenGL context.");
+        LOG(VB_GENERAL, LOG_INFO,
+            "OpenGL painter using existing OpenGL context.");
     if (realParent)
-        VERBOSE(VB_GENERAL, "OpenGL painter using existing QGLWidget.");
+        LOG(VB_GENERAL, LOG_INFO, "OpenGL painter using existing QGLWidget.");
 }
 
 MythOpenGLPainter::~MythOpenGLPainter()
@@ -58,7 +59,7 @@ void MythOpenGLPainter::DeleteTextures(void)
 
 void MythOpenGLPainter::ClearCache(void)
 {
-    VERBOSE(VB_GENERAL, "Clearing OpenGL painter cache.");
+    LOG(VB_GENERAL, LOG_INFO, "Clearing OpenGL painter cache.");
 
     QMutexLocker locker(&m_textureDeleteLock);
     QMapIterator<MythImage *, unsigned int> it(m_ImageIntMap);
@@ -80,7 +81,8 @@ void MythOpenGLPainter::Begin(QPaintDevice *parent)
 
     if (!realParent)
     {
-        VERBOSE(VB_IMPORTANT, "FATAL ERROR: Failed to cast parent to QGLWidget");
+        LOG(VB_GENERAL, LOG_ERR,
+            "FATAL ERROR: Failed to cast parent to QGLWidget");
         return;
     }
 
@@ -89,7 +91,8 @@ void MythOpenGLPainter::Begin(QPaintDevice *parent)
         realRender = (MythRenderOpenGL*)(realParent->context());
         if (!realRender)
         {
-            VERBOSE(VB_IMPORTANT, "FATAL ERROR: Failed to get MythRenderOpenGL");
+            LOG(VB_GENERAL, LOG_ERR,
+                "FATAL ERROR: Failed to get MythRenderOpenGL");
             return;
         }
     }
@@ -111,7 +114,7 @@ void MythOpenGLPainter::End(void)
 {
     if (!realRender)
     {
-        VERBOSE(VB_IMPORTANT, "FATAL ERROR: No render device in 'End'");
+        LOG(VB_GENERAL, LOG_ERR, "FATAL ERROR: No render device in 'End'");
         return;
     }
     else
@@ -154,7 +157,7 @@ int MythOpenGLPainter::GetTextureFromCache(MythImage *im)
 
     if (!tx_id)
     {
-        VERBOSE(VB_IMPORTANT, "Failed to create OpenGL texture.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to create OpenGL texture.");
         return tx_id;
     }
 

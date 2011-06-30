@@ -49,7 +49,7 @@ void MythUIButtonTree::Init()
 
     if (!m_listTemplate)
     {
-        VERBOSE(VB_IMPORTANT, QString("MythUIButtonList listtemplate is "
+        LOG(VB_GENERAL, LOG_ERR, QString("MythUIButtonList listtemplate is "
                                       "required in mythuibuttonlist: %1")
                                       .arg(objectName()));
         return;

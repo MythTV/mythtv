@@ -15,6 +15,7 @@ MetadataLookup::MetadataLookup(void) :
     m_allowoverwrites(false),
     m_dvdorder(false),
     m_host(),
+    m_filename(),
     m_title(),
     m_categories(),
     m_userrating(0),
@@ -58,6 +59,7 @@ MetadataLookup::MetadataLookup(
     bool allowoverwrites,
     bool preferdvdorder,
     QString host,
+    QString filename,
     QString title,
     const QStringList categories,
     const float userrating,
@@ -98,6 +100,7 @@ MetadataLookup::MetadataLookup(
     m_allowoverwrites(allowoverwrites),
     m_dvdorder(preferdvdorder),
     m_host(host),
+    m_filename(filename),
     m_title(title),
     m_categories(categories),
     m_userrating(userrating),
@@ -152,6 +155,7 @@ ArtworkList MetadataLookup::GetArtwork(VideoArtworkType type) const
 
 void MetadataLookup::toMap(MetadataMap &metadataMap)
 {
+    metadataMap["filename"] = m_filename;
     metadataMap["title"] = m_title;
     metadataMap["category"] = m_categories.join(", ");
     metadataMap["userrating"] = QString::number(m_userrating);
@@ -362,11 +366,71 @@ MetadataLookup* ParseMetadataItem(const QDomElement& item,
     return new MetadataLookup(lookup->GetType(), lookup->GetData(),
         lookup->GetStep(), lookup->GetAutomatic(), lookup->GetHandleImages(),
         lookup->GetAllowOverwrites(), lookup->GetPreferDVDOrdering(),
-        lookup->GetHost(), title, categories, userrating, language, subtitle,
-        tagline, description, season, episode, certification, countries,
-        popularity, budget, revenue, album, tracknum, system, year,
+        lookup->GetHost(), lookup->GetFilename(), title, categories,
+        userrating, language, subtitle, tagline, description,
+        season, episode, certification, countries, popularity,
+        budget, revenue, album, tracknum, system, year,
         releasedate, lastupdated, runtime, runtimesecs, inetref,
         tmsref, imdb, people, studios, homepage, trailerURL, artwork,
+        DownloadMap());
+}
+
+MetadataLookup* ParseMetadataMovieNFO(const QDomElement& item,
+                                  MetadataLookup *lookup)
+{
+    if (!lookup)
+        return new MetadataLookup();
+
+    uint year = 0, runtime = 0, runtimesecs = 0,
+         season = 0, episode = 0;
+    QString title, subtitle, tagline, description,
+        inetref, trailer, certification;
+    float userrating = 0;
+    QDate releasedate;
+    QStringList categories;
+    PeopleMap people;
+    ArtworkMap artwork;
+
+    // Get the easy parses
+    QString titletmp;
+    if (item.tagName() == "movie")
+        title = Parse::UnescapeHTML(item.firstChildElement("title").text());
+    else if (item.tagName() == "episodedetails")
+        subtitle = Parse::UnescapeHTML(item.firstChildElement("title").text());
+    userrating = item.firstChildElement("rating").text().toFloat();
+    year = item.firstChildElement("year").text().toUInt();
+    season = item.firstChildElement("season").text().toUInt();
+    episode = item.firstChildElement("episode").text().toUInt();
+    description = Parse::UnescapeHTML(item.firstChildElement("plot").text());
+    tagline = Parse::UnescapeHTML(item.firstChildElement("tagline").text());
+    inetref = item.firstChildElement("id").text();
+    trailer = item.firstChildElement("trailer").text();
+    certification = item.firstChildElement("mpaa").text();
+    categories.append(item.firstChildElement("genre").text());
+
+    QString tmpDate = item.firstChildElement("releasedate").text();
+    if (!tmpDate.isEmpty())
+        releasedate = QDate::fromString(tmpDate, "yyyy-MM-dd");
+    else if (year > 0)
+        releasedate = QDate::fromString(QString::number(year), "yyyy");
+
+    runtime = item.firstChildElement("runtime").text()
+                                               .remove(QRegExp("[A-Za-z]"))
+                                               .trimmed().toUInt();
+    runtimesecs = runtime * 60;
+
+    return new MetadataLookup(lookup->GetType(), lookup->GetData(),
+        lookup->GetStep(), lookup->GetAutomatic(), lookup->GetHandleImages(),
+        lookup->GetAllowOverwrites(), lookup->GetPreferDVDOrdering(),
+        lookup->GetHost(), lookup->GetFilename(), title, categories,
+        userrating, QString() /*language*/, subtitle,
+        tagline, description, season, episode,
+        certification, QStringList() /*countries*/,
+        0 /*popularity*/, 0 /*budget*/, 0 /*revenue*/, QString() /*album*/,
+        0 /*tracknum*/, QString() /*system*/, year,
+        releasedate, QDateTime() /*lastupdated*/, runtime, runtimesecs,
+        inetref, QString() /*tmsref*/, QString() /*imdb*/, people,
+        QStringList() /*studios*/, QString() /*homepage*/, trailer, artwork,
         DownloadMap());
 }
 

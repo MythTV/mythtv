@@ -16,13 +16,14 @@ MythUDPListener::MythUDPListener()
     m_socket = new QUdpSocket(this);
     connect(m_socket, SIGNAL(readyRead()),
             this,     SLOT(ReadPending()));
-    if (m_socket->bind(QHostAddress(gCoreContext->MythHostAddressAny()),udp_port))
+    if (m_socket->bind(QHostAddress(gCoreContext->MythHostAddressAny()),
+                                    udp_port))
     {
-        VERBOSE(VB_GENERAL, LOC +  QString("bound to port %1").arg(udp_port));
+        LOG(VB_GENERAL, LOG_INFO, QString("bound to port %1").arg(udp_port));
     }
     else
     {
-        VERBOSE(VB_GENERAL, LOC +
+        LOG(VB_GENERAL, LOG_INFO,
             QString("failed to bind to port %1").arg(udp_port));
     }
 }
@@ -39,7 +40,7 @@ void MythUDPListener::TeardownAll(void)
     if (!m_socket)
         return;
 
-    VERBOSE(VB_GENERAL, LOC + "Disconnecting");
+    LOG(VB_GENERAL, LOG_INFO, "Disconnecting");
 
     m_socket->disconnect();
     m_socket->close();
@@ -71,7 +72,7 @@ void MythUDPListener::Process(const QByteArray &buf)
     QDomDocument doc;
     if (!doc.setContent(buf, false, &errorMsg, &errorLine, &errorColumn))
     {
-        VERBOSE(VB_IMPORTANT, ERR +
+        LOG(VB_GENERAL, LOG_ERR,
             QString("Parsing xml:\n\t\t\t at line: %1  column: %2\n\t\t\t%3")
             .arg(errorLine).arg(errorColumn).arg(errorMsg));
 
@@ -83,7 +84,7 @@ void MythUDPListener::Process(const QByteArray &buf)
     {
         if (docElem.tagName() != "mythmessage")
         {
-            VERBOSE(VB_IMPORTANT, ERR +
+            LOG(VB_GENERAL, LOG_ERR,
                 "Unknown UDP packet (not <mythmessage> XML)");
             return;
         }
@@ -91,7 +92,7 @@ void MythUDPListener::Process(const QByteArray &buf)
         QString version = docElem.attribute("version", "");
         if (version.isEmpty())
         {
-            VERBOSE(VB_IMPORTANT, ERR +
+            LOG(VB_GENERAL, LOG_ERR,
                 "<mythmessage> missing 'version' attribute");
             return;
         }
@@ -106,14 +107,14 @@ void MythUDPListener::Process(const QByteArray &buf)
             if (e.tagName() == "text")
             {
                 QString msg = e.text();
-                VERBOSE(VB_GENERAL, LOC + msg);
+                LOG(VB_GENERAL, LOG_INFO, msg);
                 MythMainWindow *window = GetMythMainWindow();
                 MythEvent* me = new MythEvent(MythEvent::MythUserMessage, msg);
                 qApp->postEvent(window, me);
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, ERR + QString("Unknown element: %1")
+                LOG(VB_GENERAL, LOG_ERR, QString("Unknown element: %1")
                     .arg(e.tagName()));
                 return;
             }

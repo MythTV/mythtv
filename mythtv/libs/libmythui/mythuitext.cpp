@@ -779,7 +779,7 @@ void MythUIText::CopyFrom(MythUIType *base)
     MythUIText *text = dynamic_cast<MythUIText *>(base);
     if (!text)
     {
-        VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
+        LOG(VB_GENERAL, LOG_ERR, "ERROR, bad parsing");
         return;
     }
 

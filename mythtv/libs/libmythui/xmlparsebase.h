@@ -10,9 +10,13 @@ class MythScreenType;
 class QDomElement;
 class QBrush;
 
-void VERBOSE_XML(
-    unsigned int verbose_type,
-    const QString &filename, const QDomElement &element, QString msg);
+#define VERBOSE_XML(type, level, filename, element, msg)                  \
+    LOG(type, level, QString("%1\n\t\t\t"                                 \
+                             "Location: %2 @ %3\n\t\t\t"                  \
+                             "Name: '%4'\tType: '%5'")                    \
+            .arg(msg).arg(filename).arg(element.lineNumber())             \
+            .arg(element.attribute("name", "")).arg(element.tagName()))
+
 
 class MUI_PUBLIC XMLParseBase
 {

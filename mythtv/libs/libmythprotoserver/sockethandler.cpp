@@ -26,11 +26,11 @@ bool SocketHandler::SendStringList(QStringList &strlist, bool lock)
     if (!m_socket)
         return false;
 
-    VERBOSE(VB_IMPORTANT, "Locking Socket for write");
+    LOG(VB_GENERAL, LOG_DEBUG, "Locking Socket for write");
     if (lock) m_socket->Lock();
     bool res = m_socket->writeStringList(strlist);
     if (lock) m_socket->Unlock();
-    VERBOSE(VB_IMPORTANT, "UnLocking Socket from write");
+    LOG(VB_GENERAL, LOG_DEBUG, "UnLocking Socket from write");
 
     return res;
 }

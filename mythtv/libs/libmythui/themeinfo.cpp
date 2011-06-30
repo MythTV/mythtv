@@ -31,7 +31,7 @@ ThemeInfo::ThemeInfo(QString theme)
 
     if (!parseThemeInfo())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
+        LOG(VB_GENERAL, LOG_ERR,
                 QString("The theme (%1) is missing a themeinfo.xml file.")
                 .arg(m_themeurl));
     }
@@ -59,9 +59,9 @@ bool ThemeInfo::parseThemeInfo()
 
         if (!doc.setContent(data))
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Unable to parse themeinfo.xml "
-                            "for %1").arg(m_themeurl));
+            LOG(VB_GENERAL, LOG_ERR,
+                    QString("Unable to parse themeinfo.xml for %1")
+                        .arg(m_themeurl));
             return false;
         }
     }
@@ -71,17 +71,17 @@ bool ThemeInfo::parseThemeInfo()
 
         if (!f.open(QIODevice::ReadOnly))
         {
-            VERBOSE(VB_IMPORTANT, LOC_WARN +
-                    QString("Unable to open themeinfo.xml "
-                            "for %1").arg(f.fileName()));
+            LOG(VB_GENERAL, LOG_WARNING,
+                    QString("Unable to open themeinfo.xml for %1")
+                        .arg(f.fileName()));
             return false;
         }
 
         if (!doc.setContent(&f))
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Unable to parse themeinfo.xml "
-                            "for %1").arg(f.fileName()));
+            LOG(VB_GENERAL, LOG_ERR,
+                    QString("Unable to parse themeinfo.xml for %1")
+                        .arg(f.fileName()));
 
             f.close();
             return false;
@@ -137,9 +137,9 @@ bool ThemeInfo::parseThemeInfo()
                             }
                             else
                             {
-                                VERBOSE_XML(VB_IMPORTANT,
-                                            m_theme.fileName(),
-                                            ce, LOC_ERR + "Invalid theme type");
+                                VERBOSE_XML(VB_IMPORTANT, LOG_ERR,
+                                            m_theme.fileName(), ce, 
+                                            "Invalid theme type");
                             }
                         }
                     }

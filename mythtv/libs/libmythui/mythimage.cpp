@@ -28,7 +28,7 @@ MythUIHelper *MythImage::m_ui = NULL;
 MythImage::MythImage(MythPainter *parent)
 {
     if (!parent)
-        VERBOSE(VB_IMPORTANT, "ERROR: Image created without parent!");
+        LOG(VB_GENERAL, LOG_ERR, "Image created without parent!");
 
     m_Parent = parent;
     m_RefCount = 0;
@@ -288,8 +288,12 @@ bool MythImage::Load(const QString &filename, bool scale)
 
             if (ret)
                 im->loadFromData(data);
-//            else
-//                VERBOSE(VB_GENERAL, QString("MythImage::Load failed to load remote image %1").arg(filename));
+#if 0
+            else
+                LOG(VB_GENERAL, LOG_ERR, 
+                    QString("MythImage::Load failed to load remote image %1")
+                        .arg(filename));
+#endif
 
         }
         else if ((filename.startsWith("http://")) ||

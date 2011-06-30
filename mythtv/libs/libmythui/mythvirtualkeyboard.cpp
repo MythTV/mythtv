@@ -195,29 +195,32 @@ void MythUIVirtualKeyboard::loadKeyDefinitions(const QString &lang)
 
     if (!GetMythUI()->FindThemeFile(defFile))
     {
-        VERBOSE(VB_IMPORTANT, "No keyboard definition file found for: " + language);
+        LOG(VB_GENERAL, LOG_ERR,
+            "No keyboard definition file found for: " + language);
 
         // default to US keyboard layout
         defFile = "keyboard/en_us.xml";
         if (!GetMythUI()->FindThemeFile(defFile))
         {
-            VERBOSE(VB_IMPORTANT, "Cannot find definitions file: " + defFile);
+            LOG(VB_GENERAL, LOG_ERR,
+                "Cannot find definitions file: " + defFile);
             return;
         }
     }
 
-    VERBOSE(VB_IMPORTANT, "Loading definitions from: " + defFile);
+    LOG(VB_GENERAL, LOG_NOTICE, "Loading definitions from: " + defFile);
 
     QDomDocument doc("keydefinitions");
     QFile file(defFile);
     if (!file.open(QIODevice::ReadOnly))
     {
-        VERBOSE(VB_IMPORTANT, "Failed to open definitions file: " + defFile);
+        LOG(VB_GENERAL, LOG_ERR, "Failed to open definitions file: " + defFile);
         return;
     }
     if (!doc.setContent(&file))
     {
-        VERBOSE(VB_IMPORTANT, "Failed to parse definitions file: " + defFile);
+        LOG(VB_GENERAL, LOG_ERR,
+            "Failed to parse definitions file: " + defFile);
         file.close();
         return;
     }
@@ -266,7 +269,7 @@ void MythUIVirtualKeyboard::parseKey(const QDomElement &element)
                 altshift = e.attribute("altshift");
             }
             else
-                VERBOSE(VB_IMPORTANT, "Unknown element in key definition");
+                LOG(VB_GENERAL, LOG_ERR, "Unknown element in key definition");
         }
         n = n.nextSibling();
     }
@@ -344,7 +347,9 @@ void MythUIVirtualKeyboard::updateKeys(bool connectSignals)
                 }
             }
             else
-                VERBOSE(VB_IMPORTANT, QString("WARNING - Key '%1' not found in map").arg(button->objectName()));
+                LOG(VB_GENERAL, LOG_WARNING,
+                    QString("WARNING - Key '%1' not found in map")
+                        .arg(button->objectName()));
         }
     }
 }
@@ -579,8 +584,7 @@ QString MythUIVirtualKeyboard::decodeChar(QString c)
                 res += QString(uc);
             }
             else
-                VERBOSE(VB_IMPORTANT,
-                        QString("MythUIVirtualKeyboard::decodeChar - bad char code (%1)")
+                LOG(VB_GENERAL, LOG_ERR, QString("bad char code (%1)")
                                 .arg(sCode));
         }
         else

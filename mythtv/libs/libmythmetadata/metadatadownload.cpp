@@ -2,6 +2,7 @@
 #include <QCoreApplication>
 #include <QEvent>
 #include <QDir>
+#include <QUrl>
 
 // myth
 #include "mythcorecontext.h"
@@ -10,6 +11,7 @@
 #include "mythsystem.h"
 #include "metadatadownload.h"
 #include "util.h"
+#include "remotefile.h"
 #include "mythlogging.h"
 
 QEvent::Type MetadataLookupEvent::kEventType =
@@ -204,6 +206,67 @@ MetadataLookupList MetadataDownload::runGrabber(QString cmd, QStringList args,
     return list;
 }
 
+MetadataLookupList MetadataDownload::readNFO(QString NFOpath,
+                                             MetadataLookup* lookup)
+{
+    MetadataLookupList list;
+
+    VERBOSE(VB_GENERAL, QString("Matching NFO file found. "
+               "Parsing %1 for metadata...")
+               .arg(NFOpath));
+
+    if (lookup->GetType() == VID)
+    {
+        QByteArray nforaw;
+        QDomElement item;
+        if (NFOpath.startsWith("myth://"))
+        {
+            RemoteFile *rf = new RemoteFile(NFOpath);
+            if (rf && rf->Open())
+            {
+                bool loaded = rf->SaveAs(nforaw);
+                if (loaded)
+                {
+                    QDomDocument doc;
+                    if (doc.setContent(nforaw, true))
+                    {
+                        lookup->SetStep(GETDATA);
+                        item = doc.documentElement();
+                    }
+                    else
+                        VERBOSE(VB_GENERAL, QString("PIRATE ERROR: Invalid NFO file found."));
+                }
+                rf->Close();
+            }
+
+            delete rf;
+            rf = NULL;
+        }
+        else
+        {
+            QFile file(NFOpath);
+            if (file.open(QIODevice::ReadOnly))
+            {
+                nforaw = file.readAll();
+                QDomDocument doc;
+                if (doc.setContent(nforaw, true))
+                {
+                    lookup->SetStep(GETDATA);
+                    item = doc.documentElement();
+                }
+                else
+                    VERBOSE(VB_GENERAL, QString("PIRATE ERROR: Invalid NFO file found."));
+                file.close();
+            }
+        }
+
+        MetadataLookup *tmp = ParseMetadataMovieNFO(item, lookup);
+        list.append(tmp);
+    }
+
+    return list;
+}
+
 MetadataLookupList MetadataDownload::handleGame(MetadataLookup* lookup)
 {
     MetadataLookupList list;
@@ -245,35 +308,42 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup* lookup)
 {
     MetadataLookupList list;
 
-    QString def_cmd = QDir::cleanPath(QString("%1/%2")
-        .arg(GetShareDir())
-        .arg("metadata/Movie/tmdb.py"));
+    QString nfo = getNFOPath(lookup->GetFilename());
 
-    QString cmd = gCoreContext->GetSetting("MovieGrabber", def_cmd);
-
-    QStringList args;
-    args.append(QString("-l")); // Language Flag
-    args.append(gCoreContext->GetLanguage()); // UI Language
-
-    // If the inetref is populated, even in search mode,
-    // become a getdata grab and use that.
-    if (lookup->GetStep() == SEARCH &&
-        (!lookup->GetInetref().isEmpty() &&
-         lookup->GetInetref() != "00000000"))
-        lookup->SetStep(GETDATA);
-
-    if (lookup->GetStep() == SEARCH)
+    if (nfo.isEmpty())
     {
-        args.append(QString("-M"));
-        QString title = lookup->GetTitle();
-        args.append(ShellEscape(title));
+        QString def_cmd = QDir::cleanPath(QString("%1/%2")
+            .arg(GetShareDir())
+            .arg("metadata/Movie/tmdb.py"));
+
+        QString cmd = gCoreContext->GetSetting("MovieGrabber", def_cmd);
+
+        QStringList args;
+        args.append(QString("-l")); // Language Flag
+        args.append(gCoreContext->GetLanguage()); // UI Language
+
+        // If the inetref is populated, even in search mode,
+        // become a getdata grab and use that.
+        if (lookup->GetStep() == SEARCH &&
+            (!lookup->GetInetref().isEmpty() &&
+             lookup->GetInetref() != "00000000"))
+            lookup->SetStep(GETDATA);
+
+        if (lookup->GetStep() == SEARCH)
+        {
+            args.append(QString("-M"));
+            QString title = lookup->GetTitle();
+            args.append(ShellEscape(title));
+        }
+        else if (lookup->GetStep() == GETDATA)
+        {
+            args.append(QString("-D"));
+            args.append(lookup->GetInetref());
+        }
+        list = runGrabber(cmd, args, lookup);
     }
-    else if (lookup->GetStep() == GETDATA)
-    {
-        args.append(QString("-D"));
-        args.append(lookup->GetInetref());
-    }
-    list = runGrabber(cmd, args, lookup);
+    else
+        list = readNFO(nfo, lookup);
 
     return list;
 }
@@ -351,3 +421,26 @@ MetadataLookupList MetadataDownload::handleVideoUndetermined(
     return list;
 }
 
+QString MetadataDownload::getNFOPath(QString filename)
+{
+    QString ret;
+    QString nfoname;
+    QUrl qurl(filename);
+    QString ext = QFileInfo(qurl.path()).suffix();
+    nfoname = filename.left(filename.size() - ext.size()) + "nfo";
+
+    VERBOSE(VB_GENERAL, QString("NFOName = %1 ").arg(nfoname));
+
+    if (nfoname.startsWith("myth://"))
+    {
+        if (RemoteFile::Exists(nfoname))
+            ret = nfoname;
+    }
+    else
+    {
+        if (QFile::exists(nfoname))
+            ret = nfoname;
+    }
+
+    return ret;
+}

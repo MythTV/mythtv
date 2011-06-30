@@ -82,7 +82,7 @@ void MythVDPAUPainter::Begin(QPaintDevice *parent)
     {
         if (!InitVDPAU(parent))
         {
-            VERBOSE(VB_IMPORTANT, "Failed to create VDPAU render.");
+            LOG(VB_GENERAL, LOG_ERR, "Failed to create VDPAU render.");
             return;
         }
     }
@@ -108,7 +108,7 @@ void MythVDPAUPainter::End(void)
 
 void MythVDPAUPainter::ClearCache(void)
 {
-    VERBOSE(VB_GENERAL, LOC + "Clearing VDPAU painter cache.");
+    LOG(VB_GENERAL, LOG_INFO, "Clearing VDPAU painter cache.");
 
     QMutexLocker locker(&m_bitmapDeleteLock);
     QMapIterator<MythImage *, uint32_t> it(m_ImageBitmapMap);
@@ -190,7 +190,7 @@ uint MythVDPAUPainter::GetTextureFromCache(MythImage *im)
     }
     else
     {
-       VERBOSE(VB_IMPORTANT, LOC + "Failed to create VDPAU UI bitmap.");
+       LOG(VB_GENERAL, LOG_ERR, "Failed to create VDPAU UI bitmap.");
     }
 
     return newbitmap;

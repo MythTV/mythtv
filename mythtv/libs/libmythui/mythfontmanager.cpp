@@ -54,7 +54,7 @@ void MythFontManager::LoadFonts(const QString &directory,
     (*maxDirs)--;
     if (*maxDirs < 1)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "Reached the maximum directory depth "
+        LOG(VB_GENERAL, LOG_WARNING, "Reached the maximum directory depth "
                 "for a font directory structure. Terminating font scan.");
         return;
     }
@@ -94,8 +94,7 @@ void MythFontManager::ReleaseFonts(const QString &registeredFor)
         MythFontReference *fontRef = it.value();
         if (registeredFor == fontRef->GetRegisteredFor())
         {
-            VERBOSE(VB_FILE|VB_EXTRA, LOC +
-                    QString("Removing application font '%1'")
+            LOG(VB_FILE, LOG_DEBUG, QString("Removing application font '%1'")
                     .arg(fontRef->GetFontPath()));
 
             it = m_fontPathToReference.erase(it);
@@ -103,14 +102,13 @@ void MythFontManager::ReleaseFonts(const QString &registeredFor)
             {
                 if (QFontDatabase::removeApplicationFont(fontRef->GetFontID()))
                 {
-                    VERBOSE(VB_FILE|VB_EXTRA, LOC +
-                            QString("Successfully removed "
-                                    "application font '%1'")
+                    LOG(VB_FILE, LOG_DEBUG, QString("Successfully removed "
+                                                    "application font '%1'")
                             .arg(fontRef->GetFontPath()));
                 }
                 else
                 {
-                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    LOG(VB_GENERAL, LOG_ERR,
                             QString("Unable to remove application font '%1'")
                             .arg(fontRef->GetFontPath()));
                 }
@@ -139,7 +137,7 @@ void MythFontManager::LoadFontsFromDirectory(const QString &directory,
     if (directory.isEmpty() || directory == "/" || registeredFor.isEmpty())
         return;
 
-    VERBOSE(VB_FILE|VB_EXTRA, LOC +
+    LOG(VB_FILE, LOG_DEBUG,
             QString("Scanning directory '%1' for font files.").arg(directory));
 
     QDir dir(directory);
@@ -167,25 +165,25 @@ void MythFontManager::LoadFontFile(const QString &fontPath,
     QMutexLocker locker(&m_lock);
     if (IsFontFileLoaded(fontPath))
     {
-        VERBOSE(VB_GUI|VB_FILE, LOC + QString("Font file '%1' already loaded")
+        LOG(VB_GUI | VB_FILE, LOG_INFO, QString("Font file '%1' already loaded")
                 .arg(fontPath));
 
         if (!RegisterFont(fontPath, registeredFor))
         {
-            VERBOSE(VB_GUI|VB_FILE, LOC +
+            LOG(VB_GUI | VB_FILE, LOG_INFO,
                     QString("Unable to load font(s) in file '%1'")
                     .arg(fontPath));
         }
     }
     else
     {
-        VERBOSE(VB_GUI|VB_FILE, LOC +
+        LOG(VB_GUI | VB_FILE, LOG_INFO,
                 QString("Loading font file: '%1'").arg(fontPath));
 
         int result = QFontDatabase::addApplicationFont(fontPath);
         if (result > -1)
         {
-            VERBOSE(VB_GUI|VB_FILE|VB_EXTRA, LOC +
+            LOG(VB_GUI | VB_FILE, LOG_DEBUG,
                     QString("In file '%1', found font(s) '%2'")
                     .arg(fontPath)
                     .arg(QFontDatabase::applicationFontFamilies(result)
@@ -193,14 +191,14 @@ void MythFontManager::LoadFontFile(const QString &fontPath,
 
             if (!RegisterFont(fontPath, registeredFor, result))
             {
-                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                LOG(VB_GENERAL, LOG_WARNING,
                         QString("Unable to register font(s) in file '%1'")
                         .arg(fontPath));
             }
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_WARN +
+            LOG(VB_GENERAL, LOG_WARNING,
                     QString("Unable to load font(s) in file '%1'")
                     .arg(fontPath));
         }

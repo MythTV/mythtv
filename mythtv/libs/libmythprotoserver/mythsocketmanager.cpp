@@ -61,14 +61,14 @@ class ProcessRequestThread : public QThread
         while (true)
         {
             m_waitCond.wait(locker.mutex());
-            VERBOSE(VB_SOCKET|VB_EXTRA, "ProcessRequestThread running.");
+            LOG(VB_SOCKET, LOG_DEBUG, "ProcessRequestThread running.");
 
             if (!m_threadlives)
                 break;
 
             if (!m_socket)
             {
-                VERBOSE(VB_SOCKET|VB_EXTRA, "ProcessRequestThread has no target.");
+                LOG(VB_SOCKET, LOG_ERR, "ProcessRequestThread has no target.");
                 continue;
             }
 
@@ -111,8 +111,8 @@ void MythSocketManager::SetThreadCount(uint count)
     if (m_threadPool.size() >= count)
         return;
 
-    VERBOSE(VB_IMPORTANT, QString("%1Increasing thread count to %2")
-                .arg(LOC).arg(count));
+    LOG(VB_GENERAL, LOG_ERR, QString("Increasing thread count to %2")
+               .arg(count));
     while (count > m_threadPool.size())
     {
         ProcessRequestThread *prt = new ProcessRequestThread(this);
@@ -126,13 +126,13 @@ void MythSocketManager::SetThreadCount(uint count)
 
 void MythSocketManager::MarkUnused(ProcessRequestThread *prt)
 {
-    VERBOSE(VB_SOCKET|VB_EXTRA, "Releasing ProcessRequestThread.");
+    LOG(VB_SOCKET, LOG_DEBUG, "Releasing ProcessRequestThread.");
 
     QMutexLocker locker(&m_threadPoolLock);
     m_threadPool.push_back(prt);
     m_threadPoolCond.wakeAll();
 
-    VERBOSE(VB_SOCKET|VB_EXTRA, QString("ProcessRequestThread pool size: %1")
+    LOG(VB_SOCKET, LOG_INFO, QString("ProcessRequestThread pool size: %1")
                                         .arg(m_threadPool.size()));
 }
 
@@ -146,9 +146,10 @@ bool MythSocketManager::Listen(int port)
     }
 
     m_server = new MythServer();
-    if (!m_server->listen(QHostAddress(gCoreContext->MythHostAddressAny()), port))
+    if (!m_server->listen(QHostAddress(gCoreContext->MythHostAddressAny()),
+                                       port))
     {
-        VERBOSE(VB_IMPORTANT, QString("Failed to bind port %1.").arg(port));
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to bind port %1.").arg(port));
         return false;
     }
 
@@ -164,14 +165,13 @@ void MythSocketManager::RegisterHandler(SocketRequestHandler *handler)
     QString name = handler->GetHandlerName();
     if (m_handlerMap.contains(name))
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN + name + 
-                                    " has already been registered.");
+        LOG(VB_GENERAL, LOG_WARNING, name + " has already been registered.");
         delete handler;
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Registering socket command handler " + 
-                                    name);
+        LOG(VB_GENERAL, LOG_INFO, 
+            "Registering socket command handler " + name);
         handler->SetParent(this);
         m_handlerMap.insert(name, handler);
     }
@@ -202,7 +202,7 @@ void MythSocketManager::readyRead(MythSocket *sock)
 {
     if (sock->isExpectingReply())
     {
-        VERBOSE(VB_SOCKET|VB_EXTRA, "Socket marked as expecting reply.");
+        LOG(VB_SOCKET, LOG_DEBUG, "Socket marked as expecting reply.");
         return;
     }
 
@@ -212,7 +212,8 @@ void MythSocketManager::readyRead(MythSocket *sock)
 
         if (m_threadPool.empty())
         {
-            VERBOSE(VB_GENERAL, "Waiting for a process request thread.. ");
+            LOG(VB_GENERAL, LOG_INFO,
+                "Waiting for a process request thread.. ");
             m_threadPoolCond.wait(&m_threadPoolLock, PRT_TIMEOUT);
         }
 
@@ -223,7 +224,7 @@ void MythSocketManager::readyRead(MythSocket *sock)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "Adding a new process request thread");
+            LOG(VB_GENERAL, LOG_INFO, "Adding a new process request thread");
             prt = new ProcessRequestThread(this);
             prt->m_lock.lock();
             prt->start();
@@ -302,8 +303,8 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
         }
         else
         {
-            VERBOSE(VB_SOCKET, LOC_ERR +
-                    "Use of socket attempted before protocol validation.");
+            LOG(VB_SOCKET, LOG_ERR,
+	        "Use of socket attempted before protocol validation.");
             listline.clear();
             listline << "ERROR" << "socket has not been validated";
             sock->writeStringList(listline);
@@ -323,7 +324,7 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
                             = m_handlerMap.constBegin();
             while (!handled && (i != m_handlerMap.constEnd()))
             {
-                VERBOSE(VB_SOCKET|VB_EXTRA, LOC +
+                LOG(VB_SOCKET, LOG_DEBUG,
                             QString("Attempting to handle annouce with: %1")
                                     .arg((*i)->GetHandlerName()));
                 handled = (*i)->HandleAnnounce(sock, tokens, listline);
@@ -333,7 +334,7 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
             if (handled)
             {
                 i--;
-                VERBOSE(VB_SOCKET, LOC +
+                LOG(VB_SOCKET, LOG_DEBUG,
                             QString("Socket announce handled by: %1")
                                     .arg((*i)->GetHandlerName()));
                 for (i = m_handlerMap.constBegin(); 
@@ -342,7 +343,7 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
             }
             else
             {
-                VERBOSE(VB_SOCKET, LOC_ERR + "Socket announce unhandled.");
+                LOG(VB_SOCKET, LOG_ERR, "Socket announce unhandled.");
                 listline.clear();
                 listline << "ERROR" << "unhandled announce";
                 sock->writeStringList(listline);
@@ -352,7 +353,7 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
         }
         else
         {
-            VERBOSE(VB_SOCKET, LOC_ERR +
+            LOG(VB_SOCKET, LOG_ERR,
                             "Use of socket attempted before announcement.");
             listline.clear();
             listline << "ERROR" << "socket has not been announced";
@@ -363,7 +364,7 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
 
     if (command == "ANN")
     {
-        VERBOSE(VB_SOCKET, LOC_ERR + "ANN sent out of sequence.");
+        LOG(VB_SOCKET, LOG_ERR, "ANN sent out of sequence.");
         listline.clear();
         listline << "ERROR" << "socket has already been announced";
         sock->writeStringList(listline);
@@ -377,7 +378,7 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
 
         if (!m_socketMap.contains(sock))
         {
-            VERBOSE(VB_SOCKET, LOC_ERR + "No handler found for socket.");
+            LOG(VB_SOCKET, LOG_ERR, "No handler found for socket.");
             listline.clear();
             listline << "ERROR" << "socket handler cannot be found";
             sock->writeStringList(listline);
@@ -396,7 +397,7 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
         }
 
         if (handled)
-            VERBOSE(VB_SOCKET, QString("Query handled by: %1")
+            LOG(VB_SOCKET, LOG_DEBUG, QString("Query handled by: %1")
                         .arg((*--i)->GetHandlerName()));
 
     }
@@ -416,9 +417,8 @@ void MythSocketManager::HandleVersion(MythSocket *socket,
     QString version = slist[1];
     if (version != MYTH_PROTO_VERSION)
     {
-        VERBOSE(VB_GENERAL,
-                "MainServer::HandleVersion - Client speaks protocol version "
-                + version + " but we speak " + MYTH_PROTO_VERSION + '!');
+        LOG(VB_GENERAL, LOG_ERR, "Client speaks protocol version " + version +
+                                 " but we speak " + MYTH_PROTO_VERSION + '!');
         retlist << "REJECT" << MYTH_PROTO_VERSION;
         socket->writeStringList(retlist);
         HandleDone(socket);
@@ -427,9 +427,8 @@ void MythSocketManager::HandleVersion(MythSocket *socket,
 
     if (slist.size() < 3)
     {
-        VERBOSE(VB_GENERAL,
-                "MainServer::HandleVersion - Client did not pass protocol "
-                "token. Refusing connection!");
+        LOG(VB_GENERAL, LOG_ERR, "Client did not pass protocol "
+                                 "token. Refusing connection!");
         retlist << "REJECT" << MYTH_PROTO_VERSION;
         socket->writeStringList(retlist);
         HandleDone(socket);
@@ -439,16 +438,15 @@ void MythSocketManager::HandleVersion(MythSocket *socket,
     QString token = slist[2];
     if (token != MYTH_PROTO_TOKEN)
     {
-        VERBOSE(VB_GENERAL,
-                "MainServer::HandleVersion - Client sent incorrect protocol"
-                " token for protocol version. Refusing connection!");
+        LOG(VB_GENERAL, LOG_ERR, "Client sent incorrect protocol token for "
+                                 "protocol version. Refusing connection!");
         retlist << "REJECT" << MYTH_PROTO_VERSION;
         socket->writeStringList(retlist);
         HandleDone(socket);
         return;
     }
 
-    VERBOSE(VB_SOCKET, "MainServer::HandlerVersion - Client validated");
+    LOG(VB_SOCKET, LOG_DEBUG, "Client validated");
     retlist << "ACCEPT" << MYTH_PROTO_VERSION;
     socket->writeStringList(retlist);
     socket->setValidated();

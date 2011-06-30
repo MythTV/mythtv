@@ -214,7 +214,7 @@ bool MythRenderOpenGL2::InitFeatures(void)
         check = false;
         glslshaders = !getenv("OPENGL_NOGLSL");
         if (!glslshaders)
-            VERBOSE(VB_GENERAL, LOC + "Disabling GLSL.");
+            LOG(VB_GENERAL, LOG_INFO, "Disabling GLSL.");
     }
 
     // These should all be present for a valid OpenGL2.0/ES installation
@@ -233,7 +233,7 @@ bool MythRenderOpenGL2::InitFeatures(void)
         m_glBindAttribLocation &&
         m_glVertexAttrib4f && glslshaders)
     {
-        VERBOSE(VB_GENERAL, LOC + QString("GLSL supported"));
+        LOG(VB_GENERAL, LOG_INFO, "GLSL supported");
         m_exts_supported += kGLSL;
     }
 
@@ -753,9 +753,9 @@ uint MythRenderOpenGL2::CreateShader(int type, const QString &source)
         {
             char *log = (char*)malloc(sizeof(char) * length);
             m_glGetShaderInfoLog(result, length, NULL, log);
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to compile shader.");
-            VERBOSE(VB_IMPORTANT, log);
-            VERBOSE(VB_IMPORTANT, source);
+            LOG(VB_GENERAL, LOG_ERR, "Failed to compile shader.");
+            LOG(VB_GENERAL, LOG_ERR, log);
+            LOG(VB_GENERAL, LOG_ERR, source);
             free(log);
         }
         m_glDeleteShader(result);
@@ -788,7 +788,7 @@ bool MythRenderOpenGL2::CheckObjectStatus(uint obj)
     if (ok > 0)
         return true;
 
-    VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to link shader object."));
+    LOG(VB_GENERAL, LOG_ERR, "Failed to link shader object.");
     int infologLength = 0;
     int charsWritten  = 0;
     char *infoLog;
@@ -797,7 +797,7 @@ bool MythRenderOpenGL2::CheckObjectStatus(uint obj)
     {
         infoLog = (char *)malloc(infologLength);
         m_glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog);
-        VERBOSE(VB_IMPORTANT, QString("\n\n%1").arg(infoLog));
+        LOG(VB_GENERAL, LOG_ERR, QString("\n\n%1").arg(infoLog));
         free(infoLog);
     }
     return false;
@@ -821,12 +821,12 @@ void MythRenderOpenGL2::OptimiseShaderSource(QString &source)
     source.replace("GLSL_TEXTURE", texture);
     source.replace("GLSL_DEFINES", version + extensions + m_qualifiers);
 
-    VERBOSE(VB_EXTRA, "\n" + source);
+    LOG(VB_GENERAL, LOG_DEBUG, "\n" + source);
 }
 
 void MythRenderOpenGL2::DeleteOpenGLResources(void)
 {
-    VERBOSE(VB_GENERAL, LOC + "Deleting OpenGL Resources");
+    LOG(VB_GENERAL, LOG_INFO, "Deleting OpenGL Resources");
     DeleteDefaultShaders();
     DeleteShaders();
     MythRenderOpenGL::DeleteOpenGLResources();

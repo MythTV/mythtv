@@ -178,7 +178,7 @@ IDirect3DDevice9* D3D9Locker::Acquire(void)
     if (m_render)
         result = m_render->AcquireDevice();
     if (!result)
-        VERBOSE(VB_IMPORTANT, "D3D9Locker: Failed to acquire device.");
+        LOG(VB_GENERAL, LOG_ERR, "D3D9Locker: Failed to acquire device.");
     return result;
 }
 
@@ -204,7 +204,7 @@ MythRenderD3D9::~MythRenderD3D9(void)
 {
     QMutexLocker locker(&m_lock);
 
-    VERBOSE(VB_GENERAL, D3DLOC + "Deleting D3D9 resources.");
+    LOG(VB_GENERAL, LOG_INFO, "Deleting D3D9 resources.");
 
     if (m_rect_vertexbuffer)
         m_rect_vertexbuffer->Release();
@@ -221,13 +221,13 @@ MythRenderD3D9::~MythRenderD3D9(void)
 
     if (m_rootD3DDevice)
     {
-        VERBOSE(VB_GENERAL, D3DLOC + "Deleting D3D9 device.");
+        LOG(VB_GENERAL, LOG_INFO, "Deleting D3D9 device.");
         m_rootD3DDevice->Release();
     }
 
     if (m_d3d)
     {
-        VERBOSE(VB_GENERAL, D3DLOC + "Deleting D3D9.");
+        LOG(VB_GENERAL, LOG_INFO, "Deleting D3D9.");
         m_d3d->Release();
     }
 }
@@ -274,14 +274,14 @@ bool MythRenderD3D9::Create(QSize size, HWND window)
     OurDirect3DCreate9 = (LPFND3DC)ResolveAddress("D3D9","Direct3DCreate9");
     if (!OurDirect3DCreate9)
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "FATAL :Failed to find Direct3DCreate9.");
+        LOG(VB_GENERAL, LOG_ERR, "FATAL :Failed to find Direct3DCreate9.");
         return false;
     }
 
     m_d3d = OurDirect3DCreate9(D3D_SDK_VERSION);
     if (!m_d3d)
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "Could not create Direct3D9 instance.");
+        LOG(VB_GENERAL, LOG_ERR, "Could not create Direct3D9 instance.");
         return false;
     }
 
@@ -290,13 +290,13 @@ bool MythRenderD3D9::Create(QSize size, HWND window)
     if (D3D_OK != m_d3d->GetDeviceCaps(
             D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &d3dCaps))
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "Could not read adapter capabilities.");
+        LOG(VB_GENERAL, LOG_ERR, "Could not read adapter capabilities.");
     }
 
     D3DDISPLAYMODE d3ddm;
     if (D3D_OK != m_d3d->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm))
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "Could not read adapter display mode.");
+        LOG(VB_GENERAL, LOG_ERR, "Could not read adapter display mode.");
         return false;
     }
 
@@ -315,12 +315,12 @@ bool MythRenderD3D9::Create(QSize size, HWND window)
     for (uint i = 0; i < sizeof(bfmt) / sizeof(bfmt[0]); i++)
         if (bfmt[i] == m_adaptor_fmt)
             is_reasonable = true;
-    VERBOSE(VB_GENERAL, D3DLOC + QString("Default adaptor format %1.")
+    LOG(VB_GENERAL, LOG_INFO, QString("Default adaptor format %1.")
                                          .arg(toString(m_adaptor_fmt)));
     if (!is_reasonable)
     {
-        VERBOSE(VB_GENERAL, D3DLOC +
-            QString("Warning: Default adaptor format may not work."));
+        LOG(VB_GENERAL, LOG_WARNING,
+            "Warning: Default adaptor format may not work.");
     }
 
     // Choose a surface format
@@ -336,13 +336,13 @@ bool MythRenderD3D9::Create(QSize size, HWND window)
 
     if (D3DFMT_UNKNOWN == m_surface_fmt)
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "Failed to choose surface format - "
-                                       "using default back buffer format.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to choose surface format - "
+                                 "using default back buffer format.");
         m_surface_fmt = m_adaptor_fmt;
     }
 
     m_texture_fmt = m_surface_fmt;
-    VERBOSE(VB_GENERAL, D3DLOC + QString("Chosen surface and texture format: %1")
+    LOG(VB_GENERAL, LOG_INFO, QString("Chosen surface and texture format: %1")
             .arg(toString(m_surface_fmt)));
 
 
@@ -359,9 +359,9 @@ bool MythRenderD3D9::Create(QSize size, HWND window)
         m_videosurface_fmt = m_surface_fmt;
     }
 
-    VERBOSE(VB_GENERAL, D3DLOC + QString("Chosen video surface format %1.")
+    LOG(VB_GENERAL, LOG_INFO, QString("Chosen video surface format %1.")
         .arg(toString(m_videosurface_fmt)));
-    VERBOSE(VB_GENERAL, D3DLOC + QString("Hardware YV12 to RGB conversion %1.")
+    LOG(VB_GENERAL, LOG_INFO, QString("Hardware YV12 to RGB conversion %1.")
         .arg(m_videosurface_fmt != mD3DFMT_YV12 ? "unavailable" : "available"));
 
     D3DPRESENT_PARAMETERS d3dpp;
@@ -383,7 +383,7 @@ bool MythRenderD3D9::Create(QSize size, HWND window)
                                       D3DCREATE_MULTITHREADED,
                                       &d3dpp, &m_rootD3DDevice))
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "Could not create the D3D device.");
+        LOG(VB_GENERAL, LOG_ERR, "Could not create the D3D device.");
         return false;
     }
 
@@ -394,9 +394,9 @@ bool MythRenderD3D9::Create(QSize size, HWND window)
         D3DADAPTER_IDENTIFIER9 ident;
         if (D3D_OK == m_d3d->GetAdapterIdentifier(D3DADAPTER_DEFAULT, 0, &ident))
         {
-            VERBOSE(VB_GENERAL, D3DLOC + QString("Device: %1")
+            LOG(VB_GENERAL, LOG_INFO, QString("Device: %1")
                     .arg(ident.Description));
-            VERBOSE(VB_GENERAL, D3DLOC + QString("Driver: %1.%2.%3.%4")
+            LOG(VB_GENERAL, LOG_INFO, QString("Driver: %1.%2.%3.%4")
                     .arg(HIWORD(ident.DriverVersion.HighPart))
                     .arg(LOWORD(ident.DriverVersion.HighPart))
                     .arg(HIWORD(ident.DriverVersion.LowPart))
@@ -428,29 +428,28 @@ bool MythRenderD3D9::Test(bool &reset)
         switch (hr)
         {
                 case D3DERR_DEVICENOTRESET:
-                    VERBOSE(VB_IMPORTANT, D3DLOC +
+                    LOG(VB_GENERAL, LOG_NOTICE,
                             "The device was lost and needs to be reset.");
                     result  = false;
                     reset  |= true;
                     break;
 
                 case D3DERR_DEVICELOST:
-                    VERBOSE(VB_IMPORTANT, D3DLOC +
+                    LOG(VB_GENERAL, LOG_NOTICE,
                             "The device has been lost and cannot be reset "
                             "at this time.");
                     result = false;
                     break;
 
                 case D3DERR_DRIVERINTERNALERROR:
-                    VERBOSE(VB_IMPORTANT, D3DERR +
+                    LOG(VB_GENERAL, LOG_ERR,
                             "Internal driver error. "
                             "Please shut down the application.");
                     result = false;
                     break;
 
                 default:
-                    VERBOSE(VB_IMPORTANT, D3DERR +
-                            "TestCooperativeLevel() failed.");
+                    LOG(VB_GENERAL, LOG_ERR, "TestCooperativeLevel() failed.");
                     result = false;
         }
     }
@@ -468,7 +467,7 @@ bool MythRenderD3D9::ClearBuffer(void)
                             D3DCOLOR_ARGB(0, 0, 0, 0), 1.0f, 0);
     if (FAILED(hr))
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "Clear() failed.");
+        LOG(VB_GENERAL, LOG_ERR, "Clear() failed.");
         return false;
     }
     return true;
@@ -484,7 +483,7 @@ bool MythRenderD3D9::Begin(void)
     HRESULT hr = dev->BeginScene();
     if (FAILED(hr))
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "BeginScene() failed.");
+        LOG(VB_GENERAL, LOG_ERR, "BeginScene() failed.");
         return false;
     }
     return true;
@@ -500,7 +499,7 @@ bool MythRenderD3D9::End(void)
     HRESULT hr = dev->EndScene();
     if (FAILED(hr))
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "EndScene() failed.");
+        LOG(VB_GENERAL, LOG_ERR, "EndScene() failed.");
         return false;
     }
     return true;
@@ -529,7 +528,7 @@ bool MythRenderD3D9::StretchRect(IDirect3DTexture9 *texture,
     HRESULT hr = texture->GetSurfaceLevel(0, &d3ddest);
     if (FAILED(hr))
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "GetSurfaceLevel() failed");
+        LOG(VB_GENERAL, LOG_ERR, "GetSurfaceLevel() failed");
         return false;
     }
 
@@ -538,7 +537,7 @@ bool MythRenderD3D9::StretchRect(IDirect3DTexture9 *texture,
     d3ddest->Release();
     if (FAILED(hr))
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "StretchRect() failed");
+        LOG(VB_GENERAL, LOG_ERR, "StretchRect() failed");
         return false;
     }
     return true;
@@ -567,14 +566,14 @@ bool MythRenderD3D9::DrawTexturedQuad(IDirect3DVertexBuffer9 *vertexbuffer)
                                               0, sizeof(TEXTUREVERTEX));
     if (FAILED(hr))
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "SetStreamSource() failed");
+        LOG(VB_GENERAL, LOG_ERR, "SetStreamSource() failed");
         return false;
     }
 
     hr = dev->DrawPrimitive(D3DPT_TRIANGLEFAN, 0, 2);
     if (FAILED(hr))
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "DrawPrimitive() failed");
+        LOG(VB_GENERAL, LOG_ERR, "DrawPrimitive() failed");
         return false;
     }
 
@@ -597,7 +596,7 @@ void MythRenderD3D9::DrawRect(const QRect &rect, const QColor &color, int alpha)
 
         if (FAILED(hr))
         {
-            VERBOSE(VB_IMPORTANT, D3DERR + "Failed to create vertex buffer");
+            LOG(VB_GENERAL, LOG_ERR, "Failed to create vertex buffer");
             return;
         }
     }
@@ -615,7 +614,7 @@ void MythRenderD3D9::DrawRect(const QRect &rect, const QColor &color, int alpha)
                                            D3DLOCK_DISCARD);
     if (FAILED(hr))
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "Failed to lock vertex buffer.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to lock vertex buffer.");
         return;
     }
 
@@ -643,7 +642,7 @@ void MythRenderD3D9::DrawRect(const QRect &rect, const QColor &color, int alpha)
     hr = m_rect_vertexbuffer->Unlock();
     if (FAILED(hr))
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "Failed to unlock vertex buffer");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to unlock vertex buffer");
         return;
     }
 
@@ -651,14 +650,14 @@ void MythRenderD3D9::DrawRect(const QRect &rect, const QColor &color, int alpha)
                                       0, sizeof(VERTEX));
     if (FAILED(hr))
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "SetStreamSource() failed");
+        LOG(VB_GENERAL, LOG_ERR, "SetStreamSource() failed");
         return;
     }
 
     hr = dev->DrawPrimitive(D3DPT_TRIANGLEFAN, 0, 2);
     if (FAILED(hr))
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "DrawPrimitive() failed");
+        LOG(VB_GENERAL, LOG_ERR, "DrawPrimitive() failed");
         return;
     }
 }
@@ -709,7 +708,7 @@ bool MythRenderD3D9::Present(HWND win)
     HRESULT hr = dev->Present(NULL, NULL, win, NULL);
     if (FAILED(hr))
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "Present() failed)");
+        LOG(VB_GENERAL, LOG_ERR, "Present() failed)");
         return false;
     }
     SetThreadExecutionState(ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
@@ -739,7 +738,7 @@ bool MythRenderD3D9::SetRenderTarget(IDirect3DTexture9 *texture)
             hr = dev->GetRenderTarget(0, &m_default_surface);
             if (FAILED(hr))
             {
-                VERBOSE(VB_IMPORTANT, QString("Failed to get default surface."));
+                LOG(VB_GENERAL, LOG_ERR, "Failed to get default surface.");
                 return false;
             }
         }
@@ -747,7 +746,7 @@ bool MythRenderD3D9::SetRenderTarget(IDirect3DTexture9 *texture)
         IDirect3DSurface9 *new_surface = NULL;
         hr = texture->GetSurfaceLevel(0, &new_surface);
         if (FAILED(hr))
-            VERBOSE(VB_IMPORTANT, QString("Failed to get surface level."));
+            LOG(VB_GENERAL, LOG_ERR, "Failed to get surface level.");
         else
         {
             if (m_current_surface && m_current_surface != new_surface)
@@ -755,7 +754,7 @@ bool MythRenderD3D9::SetRenderTarget(IDirect3DTexture9 *texture)
             m_current_surface = new_surface;
             hr = dev->SetRenderTarget(0, m_current_surface);
             if (FAILED(hr))
-                VERBOSE(VB_IMPORTANT, QString("Failed to set render target."));
+                LOG(VB_GENERAL, LOG_ERR, "Failed to set render target.");
         }
     }
     else if (!texture)
@@ -764,10 +763,10 @@ bool MythRenderD3D9::SetRenderTarget(IDirect3DTexture9 *texture)
         {
             hr = dev->SetRenderTarget(0, m_default_surface);
             if (FAILED(hr))
-                VERBOSE(VB_IMPORTANT, QString("Failed to set render target."));
+                LOG(VB_GENERAL, LOG_ERR, "Failed to set render target.");
         }
         else
-            VERBOSE(VB_IMPORTANT, QString("No default surface for render target."));
+            LOG(VB_GENERAL, LOG_ERR, "No default surface for render target.");
     }
     else
         ret = false;
@@ -783,7 +782,7 @@ bool MythRenderD3D9::SetTexture(IDirect3DDevice9* dev,
     HRESULT hr = dev->SetTexture(num, (LPDIRECT3DBASETEXTURE9)texture);
     if (FAILED(hr))
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "SetTexture() failed");
+        LOG(VB_GENERAL, LOG_ERR, "SetTexture() failed");
         return false;
     }
     return true;
@@ -804,7 +803,7 @@ IDirect3DTexture9* MythRenderD3D9::CreateTexture(const QSize &size)
 
     if (FAILED(hr) || !temp_texture)
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "Failed to create texture.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to create texture.");
         return NULL;
     }
 
@@ -847,7 +846,7 @@ IDirect3DSurface9* MythRenderD3D9::CreateSurface(const QSize &size, bool video)
 
     if (FAILED(hr)|| !temp_surface)
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "Failed to create surface.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to create surface.");
         return NULL;
     }
 
@@ -866,8 +865,7 @@ bool MythRenderD3D9::UpdateSurface(IDirect3DSurface9 *surface,
     if (m_surfaces[surface].m_size.width()  != image->width() ||
         m_surfaces[surface].m_size.height() != image->height())
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "Frame size does not equal "
-                                       "surface size.");
+        LOG(VB_GENERAL, LOG_ERR, "Frame size does not equal surface size.");
         return false;
     }
 
@@ -895,7 +893,7 @@ bool MythRenderD3D9::UpdateSurface(IDirect3DSurface9 *surface,
             }
             break;
         default:
-            VERBOSE(VB_IMPORTANT, D3DERR + "Surface format not supported.");
+            LOG(VB_GENERAL, LOG_ERR, "Surface format not supported.");
             break;
     }
 
@@ -932,7 +930,7 @@ uint8_t* MythRenderD3D9::GetBuffer(IDirect3DSurface9* surface, uint &pitch)
 
     if (FAILED(hr))
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "Failed to lock picture surface.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to lock picture surface.");
         m_lock.unlock();
         return false;
     }
@@ -948,7 +946,7 @@ void MythRenderD3D9::ReleaseBuffer(IDirect3DSurface9* surface)
 
     HRESULT hr = surface->UnlockRect();
     if (FAILED(hr))
-        VERBOSE(VB_IMPORTANT, D3DERR + "Failed to unlock picture surface.");
+        LGO(VB_GENERAL, LOG_ERR, "Failed to unlock picture surface.");
     m_lock.unlock();
 }
 
@@ -970,7 +968,7 @@ IDirect3DVertexBuffer9* MythRenderD3D9::CreateVertexBuffer(IDirect3DTexture9* te
 
     if (FAILED(hr))
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "Failed to create vertex buffer");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to create vertex buffer");
         return false;
     }
 
@@ -1035,7 +1033,7 @@ bool MythRenderD3D9::UpdateVertexBuffer(IDirect3DVertexBuffer9* vertexbuffer,
     D3DCOLOR color = D3DCOLOR_ARGB(alpha, 255, 255, 255);
     if (FAILED(hr))
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "Failed to lock vertex buffer.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to lock vertex buffer.");
         return false;
     }
 
@@ -1087,7 +1085,7 @@ bool MythRenderD3D9::UpdateVertexBuffer(IDirect3DVertexBuffer9* vertexbuffer,
     hr = vertexbuffer->Unlock();
     if (FAILED(hr))
     {
-        VERBOSE(VB_IMPORTANT, D3DERR + "Failed to unlock vertex buffer");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to unlock vertex buffer");
         return false;
     }
 
@@ -1171,7 +1169,7 @@ IDirect3DDevice9* MythRenderD3D9::AcquireDevice(void)
         if (SUCCEEDED(hr))
             return result;
 
-        VERBOSE(VB_IMPORTANT, D3DERR + "Failed to acquire D3D9 device.");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to acquire D3D9 device.");
         m_lock.unlock();
         return NULL;
     }
@@ -1186,7 +1184,7 @@ void MythRenderD3D9::ReleaseDevice(void)
     {
         HRESULT hr = IDirect3DDeviceManager9_UnlockDevice(m_deviceManager, m_deviceHandle, false);
         if (!SUCCEEDED(hr))
-            VERBOSE(VB_IMPORTANT, D3DERR + "Failed to release D3D9 device.");
+            LOG(VB_GENERAL, LOG_ERR, "Failed to release D3D9 device.");
     }
 #endif
     m_lock.unlock();
@@ -1212,29 +1210,29 @@ void MythRenderD3D9::CreateDeviceManager(void)
             IDirect3DDeviceManager9_ResetDevice(m_deviceManager, m_rootD3DDevice, resetToken);
             IDirect3DDeviceManager9_AddRef(m_deviceManager);
             m_deviceManagerToken = resetToken;
-            VERBOSE(VB_GENERAL, D3DLOC + "Created DXVA2 device manager.");
+            LOG(VB_GENERAL, LOG_INFO, "Created DXVA2 device manager.");
             hr = IDirect3DDeviceManager9_OpenDeviceHandle(m_deviceManager, &m_deviceHandle);
             if (SUCCEEDED(hr))
             {
-                VERBOSE(VB_GENERAL, D3DLOC + "Retrieved device handle.");
+                LOG(VB_GENERAL, LOG_INFO, "Retrieved device handle.");
                 return;
             }
-            VERBOSE(VB_IMPORTANT, D3DERR + "Failed to retrieve device handle.");
+            LOG(VB_GENERAL, LOG_ERR, "Failed to retrieve device handle.");
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, D3DERR + "Failed to create DXVA2 device manager.");
+            LOG(VB_GENERAL, LOG_ERR, "Failed to create DXVA2 device manager.");
         }
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, D3DERR +
+        LOG(VB_GENERAL, LOG_ERR,
             "Failed to get DXVA2CreateDirect3DDeviceManager9 proc address.");
     }
 #endif
     m_deviceManager = NULL;
     m_deviceManagerToken = 0;
-    VERBOSE(VB_IMPORTANT, D3DLOC +
+    LOG(VB_GENERAL, LOG_NOTICE,
         "DXVA2 support not available - not using device manager");
 }
 

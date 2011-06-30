@@ -194,7 +194,7 @@ bool MythUIGuideGrid::ParseElement(
             *m_font = fontcopy;
         }
         else
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Unknown font: " + fontname);
+            LOG(VB_GENERAL, LOG_ERR, "Unknown font: " + fontname);
     }
     else if (element.tagName() == "recordstatus")
     {
@@ -246,7 +246,7 @@ void MythUIGuideGrid::CopyFrom(MythUIType *base)
     MythUIGuideGrid *gg = dynamic_cast<MythUIGuideGrid *>(base);
     if (!gg)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "bad parsing");
+        LOG(VB_GENERAL, LOG_ERR, "bad parsing");
         return;
     }
 
@@ -575,7 +575,7 @@ bool MythUIGuideGrid::parseDefaultCategoryColors(QMap<QString, QString> &catColo
     }
     if (f.handle() == -1)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Unable to open '%1'")
+        LOG(VB_GENERAL, LOG_ERR, QString("Unable to open '%1'")
                 .arg(f.fileName()));
         return false;
     }
@@ -587,7 +587,7 @@ bool MythUIGuideGrid::parseDefaultCategoryColors(QMap<QString, QString> &catColo
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
+        LOG(VB_GENERAL, LOG_ERR,
                 QString("Parsing colors: %1 at line: %2 column: %3")
                 .arg(f.fileName()).arg(errorLine).arg(errorColumn) +
                 QString("\n\t\t\t%1").arg(errorMsg));

@@ -390,7 +390,7 @@ void MythGenericTree::becomeSelectedChild()
     if (m_parent)
         m_parent->setSelectedChild(this);
     else
-        VERBOSE(VB_IMPORTANT, "Top level can't become selected child");
+        LOG(VB_GENERAL, LOG_ERR, "Top level can't become selected child");
 }
 
 MythGenericTree* MythGenericTree::prevSibling(int number_up)
@@ -463,8 +463,8 @@ int MythGenericTree::getAttribute(uint which_one) const
 {
     if (m_attributes->size() < (int)(which_one + 1))
     {
-        VERBOSE(VB_IMPORTANT, "Asked a MythGenericTree node for a non-existent"
-                              "attribute");
+        LOG(VB_GENERAL, LOG_ERR,
+            "Asked a MythGenericTree node for a non-existent attribute");
         return 0;
     }
 
@@ -528,7 +528,7 @@ MythGenericTree* MythGenericTree::nextPrevFromFlatList(bool forward_or_backward,
     int i = m_flatenedSubnodes->indexOf(active);
     if (i < 0)
     {
-        VERBOSE(VB_IMPORTANT, "Can't find active item on flatened list");
+        LOG(VB_GENERAL, LOG_ERR, "Can't find active item on flatened list");
         return NULL;
     }
 
@@ -674,7 +674,7 @@ void MythGenericTree::reOrderAsSorted()
 
     if (m_subnodes->count() != m_ordered_subnodes->count())
     {
-        VERBOSE(VB_IMPORTANT, "Can't reOrderAsSorted(), because the number "
+        LOG(VB_GENERAL, LOG_ERR, "Can't reOrderAsSorted(), because the number "
              "of subnodes is different than the number of ordered subnodes");
         return;
     }

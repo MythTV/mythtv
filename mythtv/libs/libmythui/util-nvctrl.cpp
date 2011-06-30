@@ -60,7 +60,9 @@ int GetNvidiaRates(t_screenrate& screenmap)
 
     if (!XNVCTRLIsNvScreen(dpy, screen))
     {
-        VERBOSE(VB_PLAYBACK, QString("The NV-CONTROL X extension is not available on screen %1 of '%2'.")
+        LOG(VB_PLAYBACK, LOG_INFO,
+            QString("The NV-CONTROL X extension is not available on screen %1 "
+                    "of '%2'.")
                 .arg(screen) .arg(XDisplayName(NULL)));
         delete d;
         return -1;
@@ -69,7 +71,8 @@ int GetNvidiaRates(t_screenrate& screenmap)
     ret = XNVCTRLQueryVersion(dpy, &major, &minor);
     if (ret != True)
     {
-        VERBOSE(VB_PLAYBACK, QString("The NV-CONTROL X extension does not exist on '%1'.")
+        LOG(VB_PLAYBACK, LOG_INFO,
+            QString("The NV-CONTROL X extension does not exist on '%1'.")
                 .arg(XDisplayName(NULL)));
         delete d;
         return -1;
@@ -79,13 +82,14 @@ int GetNvidiaRates(t_screenrate& screenmap)
 
     if (!ret)
     {
-        VERBOSE(VB_PLAYBACK, QString("Failed to query if Dynamic Twinview is enabled"));
+        LOG(VB_PLAYBACK, LOG_ERR,
+             "Failed to query if Dynamic Twinview is enabled");
         XCloseDisplay(dpy);
         return -1;
     }
     if (!twinview)
     {
-        VERBOSE(VB_PLAYBACK, QString("Dynamic Twinview not enabled, ignoring"));
+        LOG(VB_PLAYBACK, LOG_ERR, "Dynamic Twinview not enabled, ignoring");
         delete d;
         return 0;
     }
@@ -100,7 +104,8 @@ int GetNvidiaRates(t_screenrate& screenmap)
 
     if (!ret)
     {
-        VERBOSE(VB_PLAYBACK, QString("Failed to query the enabled Display Devices."));
+        LOG(VB_PLAYBACK, LOG_ERR,
+            "Failed to query the enabled Display Devices.");
         delete d;
         return -1;
     }
@@ -112,7 +117,8 @@ int GetNvidiaRates(t_screenrate& screenmap)
                            (unsigned char **)&pMetaModes, &MetaModeLen);
     if (!ret)
     {
-        VERBOSE(VB_PLAYBACK, QString("Failed to query the metamode on selected display device."));
+        LOG(VB_PLAYBACK, LOG_ERR,
+            "Failed to query the metamode on selected display device.");
         delete d;
         return -1;
     }
@@ -133,7 +139,8 @@ int GetNvidiaRates(t_screenrate& screenmap)
                                (unsigned char **)&str, &len);
         if (!ret)
         {
-            VERBOSE(VB_PLAYBACK, QString("Unknown error. Failed to query the enabled Display Devices."));
+            LOG(VB_PLAYBACK, LOG_ERR,
+               "Unknown error. Failed to query the enabled Display Devices.");
             // Free Memory currently allocated
             for (j=0; j < nDisplayDevice; ++j)
             {

@@ -538,7 +538,7 @@ void MythScreenType::CopyFrom(MythUIType *base)
     MythScreenType *st = dynamic_cast<MythScreenType *>(base);
     if (!st)
     {
-        VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
+        LOG(VB_GENERAL, LOG_ERR, "ERROR, bad parsing");
         return;
     }
 
@@ -558,7 +558,7 @@ void MythScreenType::CopyFrom(MythUIType *base)
  */
 void MythScreenType::CreateCopy(MythUIType *)
 {
-    VERBOSE(VB_IMPORTANT, "CreateCopy called on screentype - bad.");
+    LOG(VB_GENERAL, LOG_ERR, "CreateCopy called on screentype - bad.");
 }
 
 MythPainter* MythScreenType::GetPainter(void)

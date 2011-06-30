@@ -65,7 +65,7 @@ bool MythRenderOpenGL1::InitFeatures(void)
         check = false;
         fragmentprog = !getenv("OPENGL_NOFRAGPROG");
         if (!fragmentprog)
-            VERBOSE(VB_GENERAL, LOC + "Disabling fragment programs.");
+            LOG(VB_GENERAL, LOG_INFO, "Disabling fragment programs.");
     }
 
     if (m_extensions.contains("GL_ARB_fragment_program") &&
@@ -75,7 +75,7 @@ bool MythRenderOpenGL1::InitFeatures(void)
         fragmentprog)
     {
         m_exts_supported += kGLExtFragProg;
-        VERBOSE(VB_GENERAL, LOC + QString("Fragment program support available"));
+        LOG(VB_GENERAL, LOG_INFO, "Fragment program support available");
     }
 
     return MythRenderOpenGL::InitFeatures();
@@ -134,7 +134,7 @@ uint MythRenderOpenGL1::CreateShaderObject(const QString &vert, const QString &f
     glGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &error);
     if (error != -1)
     {
-        VERBOSE(VB_PLAYBACK, LOC_ERR +
+        LOG(VB_PLAYBACK, LOG_ERR,
                 QString("Fragment Program compile error: position %1:'%2'")
                 .arg(error).arg(frag.mid(error)));
 
@@ -144,7 +144,7 @@ uint MythRenderOpenGL1::CreateShaderObject(const QString &vert, const QString &f
                            GL_PROGRAM_UNDER_NATIVE_LIMITS_ARB, &error);
     if (error != 1)
     {
-        VERBOSE(VB_PLAYBACK, LOC_ERR +
+        LOG(VB_PLAYBACK, LOG_ERR,
                 "Fragment program exceeds hardware capabilities.");
 
         success = false;
@@ -152,7 +152,7 @@ uint MythRenderOpenGL1::CreateShaderObject(const QString &vert, const QString &f
 
     if (success)
     {
-        VERBOSE(VB_PLAYBACK|VB_EXTRA, "\n" + frag + "\n");
+        LOG(VB_PLAYBACK, LOG_DEBUG, "\n" + frag + "\n");
         m_programs.push_back(glfp);
     }
     else
@@ -263,9 +263,8 @@ uint MythRenderOpenGL1::CreateHelperTexture(void)
     glBindTexture(m_textures[tmp_tex].m_type, tmp_tex);
     glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA16, width, 0, GL_RGBA, GL_FLOAT, buf);
 
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("Created bicubic helper texture (%1 samples)")
-            .arg(width));
+    LOG(VB_PLAYBACK, LOG_INFO,
+            QString("Created bicubic helper texture (%1 samples)") .arg(width));
     delete [] buf;
     doneCurrent();
     return tmp_tex;
@@ -273,7 +272,7 @@ uint MythRenderOpenGL1::CreateHelperTexture(void)
 
 void MythRenderOpenGL1::DeleteOpenGLResources(void)
 {
-    VERBOSE(VB_GENERAL, LOC + "Deleting OpenGL Resources");
+    LOG(VB_GENERAL, LOG_INFO, "Deleting OpenGL Resources");
     DeleteShaders();
     MythRenderOpenGL::DeleteOpenGLResources();
 }

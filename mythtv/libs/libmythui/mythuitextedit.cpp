@@ -61,13 +61,14 @@ MythUITextEdit::~MythUITextEdit()
 void MythUITextEdit::Select()
 {
     if (m_backgroundState && !m_backgroundState->DisplayState("selected"))
-        VERBOSE(VB_IMPORTANT, "MythUITextEdit: selected state doesn't exist");
+        LOG(VB_GENERAL, LOG_ERR,
+            "MythUITextEdit: selected state doesn't exist");
 }
 
 void MythUITextEdit::Deselect()
 {
     if (m_backgroundState && !m_backgroundState->DisplayState("active"))
-        VERBOSE(VB_IMPORTANT, "MythUITextEdit: active state doesn't exist");
+        LOG(VB_GENERAL, LOG_ERR, "MythUITextEdit: active state doesn't exist");
 }
 
 void MythUITextEdit::Reset()
@@ -128,7 +129,7 @@ bool MythUITextEdit::ParseElement(
             m_keyboardPosition = VK_POSCENTERDIALOG;
         else
         {
-            VERBOSE_XML(VB_IMPORTANT, filename, element, LOC_ERR +
+            VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
                         QString("Unknown popup position '%1'").arg(pos));
             m_keyboardPosition = VK_POSBELOWEDIT;
         }
@@ -159,11 +160,11 @@ void MythUITextEdit::SetInitialStates()
         dynamic_cast<MythUIStateType*>(GetChild("background"));
 
     if (!m_Text)
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Missing text element.");
+        LOG(VB_GENERAL, LOG_ERR, "Missing text element.");
     if (!m_cursorImage)
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Missing cursor element.");
+        LOG(VB_GENERAL, LOG_ERR, "Missing cursor element.");
     if (!m_backgroundState)
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "Missing background element.");
+        LOG(VB_GENERAL, LOG_WARNING, "Missing background element.");
 
     if (!m_Text || !m_cursorImage)
     {
@@ -174,7 +175,7 @@ void MythUITextEdit::SetInitialStates()
     }
 
     if (m_backgroundState && !m_backgroundState->DisplayState("active"))
-        VERBOSE(VB_IMPORTANT, "MythUITextEdit: active state doesn't exist");
+        LOG(VB_GENERAL, LOG_ERR, "MythUITextEdit: active state doesn't exist");
 
     QFontMetrics fm(m_Text->GetFontProperties()->face());
     int height = fm.height();
@@ -498,7 +499,7 @@ void MythUITextEdit::CopyFrom(MythUIType *base)
     MythUITextEdit *textedit = dynamic_cast<MythUITextEdit *>(base);
     if (!textedit)
     {
-        VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
+        LOG(VB_GENERAL, LOG_ERR, "ERROR, bad parsing");
         return;
     }
 

@@ -83,15 +83,15 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
         if (!debugged)
         {
             debugged = true;
-            VERBOSE(VB_GENERAL, LOC + QString("Vendor  : %1")
+            LOG(VB_GENERAL, LOG_INFO, QString("Vendor  : %1")
                     .arg((const char*) glGetString(GL_VENDOR)));
-            VERBOSE(VB_GENERAL, LOC + QString("Renderer: %1")
+            LOG(VB_GENERAL, LOG_INFO, QString("Renderer: %1")
                     .arg((const char*) glGetString(GL_RENDERER)));
-            VERBOSE(VB_GENERAL, LOC + QString("Version : %1")
+            LOG(VB_GENERAL, LOG_INFO, QString("Version : %1")
                     .arg((const char*) glGetString(GL_VERSION)));
-            VERBOSE(VB_GENERAL, LOC + QString("Max texture size: %1 x %2")
+            LOG(VB_GENERAL, LOG_INFO, QString("Max texture size: %1 x %2")
                     .arg(m_max_tex_size).arg(m_max_tex_size));
-            VERBOSE(VB_GENERAL, LOC + QString("Direct rendering: %1")
+            LOG(VB_GENERAL, LOG_INFO, QString("Direct rendering: %1")
                     .arg((this->format().directRendering()) ? "Yes" : "No"));
         }
 
@@ -106,12 +106,12 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
             m_glBindBuffer && m_glDeleteBuffers && m_glBufferData &&
             m_glActiveTexture))
         {
-            VERBOSE(VB_IMPORTANT,
+            LOG(VB_GENERAL, LOG_ERR,
                 "OpenGL2ES Error: Failed to find basic functionality.");
             return false;
         }
 
-        VERBOSE(VB_GENERAL, "OpenGL2ES: Found default functionality.");
+        LOG(VB_GENERAL, LOG_INFO, "OpenGL2ES: Found default functionality.");
         m_exts_supported += kGLSL | kGLExtVBO | kGLVertexArray |
                             kGLMultiTex;
         m_default_texture_type = GL_TEXTURE_2D;
@@ -122,7 +122,8 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
             m_glDeleteFramebuffers)
         {
             m_exts_supported += kGLExtFBufObj;
-            VERBOSE(VB_GENERAL, "OpenGL2ES: Framebuffer Objects available.");
+            LOG(VB_GENERAL, LOG_INFO,
+                "OpenGL2ES: Framebuffer Objects available.");
         }
 
         // GL_OES_mapbuffer
@@ -131,7 +132,8 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
             m_glMapBuffer && m_glUnmapBuffer)
         {
             m_exts_supported += kGLExtPBufObj;
-            VERBOSE(VB_GENERAL, "OpenGL2ES: Pixel Buffer Objects available.");
+            LOG(VB_GENERAL, LOG_INFO,
+                "OpenGL2ES: Pixel Buffer Objects available.");
         }
 
         m_exts_used = m_exts_supported;

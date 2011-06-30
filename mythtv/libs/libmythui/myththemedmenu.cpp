@@ -53,7 +53,7 @@ bool MythThemedMenuState::Create(void)
 
     if (!m_buttonList)
     {
-        VERBOSE(VB_IMPORTANT, "Missing 'menu' buttonlist.");
+        LOG(VB_GENERAL, LOG_ERR, "Missing 'menu' buttonlist.");
         return false;
     }
 
@@ -67,7 +67,7 @@ void MythThemedMenuState::CopyFrom(MythUIType *base)
     MythThemedMenuState *st = dynamic_cast<MythThemedMenuState *>(base);
     if (!st)
     {
-        VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
+        LOG(VB_GENERAL, LOG_INFO, "ERROR, bad parsing");
         return;
     }
 
@@ -555,21 +555,22 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("MythThemedMenu: Unknown tag %1 "
-                                            "in button").arg(info.tagName()));
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("MythThemedMenu: Unknown tag %1 in button")
+                        .arg(info.tagName()));
             }
         }
     }
 
     if (text.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenu: Missing 'text' in button");
+        LOG(VB_GENERAL, LOG_ERR, "MythThemedMenu: Missing 'text' in button");
         return;
     }
 
     if (action.empty())
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenu: Missing 'action' in button");
+        LOG(VB_GENERAL, LOG_ERR, "MythThemedMenu: Missing 'action' in button");
         return;
     }
 
@@ -599,7 +600,7 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
 
     if (!f.exists() || !f.open(QIODevice::ReadOnly))
     {
-        VERBOSE(VB_IMPORTANT, QString("MythThemedMenu: Couldn't read "
+        LOG(VB_GENERAL, LOG_ERR, QString("MythThemedMenu: Couldn't read "
                                       "menu file %1").arg(menuname));
 
         if (menuname != "mainmenu.xml")
@@ -614,7 +615,7 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        VERBOSE(VB_IMPORTANT,
+        LOG(VB_GENERAL, LOG_ERR,
                 QString("Error parsing: %1\nat line: %2  column: %3 msg: %4").
                 arg(filename).arg(errorLine).arg(errorColumn).arg(errorMsg));
         f.close();
@@ -627,7 +628,7 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
 
     f.close();
 
-    VERBOSE(VB_GUI, QString("Loading menu theme from %1").arg(filename));
+    LOG(VB_GUI, LOG_INFO, QString("Loading menu theme from %1").arg(filename));
 
     QDomElement docElem = doc.documentElement();
 
@@ -645,8 +646,9 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, QString("MythThemedMenu: Unknown "
-                                              "element %1").arg(e.tagName()));
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("MythThemedMenu: Unknown element %1")
+                        .arg(e.tagName()));
                 return false;
             }
         }
@@ -655,8 +657,8 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
 
     if (m_buttonList->GetCount() == 0)
     {
-        VERBOSE(VB_IMPORTANT, QString("MythThemedMenu: No buttons "
-                                      "for menu %1").arg(menuname));
+        LOG(VB_GENERAL, LOG_ERR, 
+            QString("MythThemedMenu: No buttons for menu %1").arg(menuname));
         return false;
     }
 
@@ -733,42 +735,42 @@ QString MythThemedMenu::findMenuFile(const QString &menuname)
     if (file.exists())
         return testdir;
     else
-        VERBOSE(VB_FILE+VB_EXTRA, "No menu file " + testdir);
+        LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
 
     testdir = GetMythUI()->GetMenuThemeDir() + '/' + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
     else
-        VERBOSE(VB_FILE+VB_EXTRA, "No menu file " + testdir);
+        LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
 
     testdir = GetMythUI()->GetThemeDir() + '/' + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
     else
-        VERBOSE(VB_FILE+VB_EXTRA, "No menu file " + testdir);
+        LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
 
     testdir = GetShareDir() + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
     else
-        VERBOSE(VB_FILE+VB_EXTRA, "No menu file " + testdir);
+        LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
 
     testdir = "../mythfrontend/" + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
     else
-        VERBOSE(VB_FILE+VB_EXTRA, "No menu file " + testdir);
+        LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
 
     testdir = GetShareDir() + "themes/defaultmenu/" + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
     else
-        VERBOSE(VB_FILE+VB_EXTRA, "No menu file " + testdir);
+        LOG(VB_FILE, LOG_DEBUG, "No menu file " + testdir);
 
     return QString();
 }
@@ -864,7 +866,7 @@ bool MythThemedMenu::handleAction(const QString &action, const QString &password
         if (m_state->m_callback)
             m_state->m_callback(m_state->m_callbackdata, m_selection);
         else
-            VERBOSE(VB_IMPORTANT, "Unknown menu action: " + action);
+            LOG(VB_GENERAL, LOG_ERR, "Unknown menu action: " + action);
     }
 
     return true;
@@ -912,7 +914,7 @@ bool MythThemedMenu::checkPinCode(const QString &password_setting)
 
     if (last_time_stamp.length() < 1)
     {
-        VERBOSE(VB_IMPORTANT,
+        LOG(VB_GENERAL, LOG_ERR,
                 "MythThemedMenu: Could not read password/pin time stamp.\n"
                 "This is only an issue if it happens repeatedly.");
     }
@@ -929,7 +931,8 @@ bool MythThemedMenu::checkPinCode(const QString &password_setting)
         }
     }
 
-    VERBOSE(VB_GENERAL, QString("Using Password: %1").arg(password_setting));
+    LOG(VB_GENERAL, LOG_INFO, QString("Using Password: %1")
+                                  .arg(password_setting));
 
     QString text = tr("Enter password:");
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
