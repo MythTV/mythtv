@@ -43,10 +43,16 @@ bool IPTVRecorder::Open(void)
         _channel->GetFeeder()->Close();
 
     IPTVChannelInfo chaninfo = _channel->GetCurrentChanInfo();
-    _error = (!chaninfo.isValid() ||
-              !_channel->GetFeeder()->Open(chaninfo.m_url));
 
-    VERBOSE(VB_RECORD, LOC + QString("Open() -- end err(%1)").arg(_error));
+    if (!chaninfo.isValid())
+        _error = "Channel Info is invalid";
+    else if (!_channel->GetFeeder()->Open(chaninfo.m_url))
+        _error = QString("Failed to open URL %1")
+            .arg(chaninfo.m_url);
+
+    VERBOSE(VB_RECORD, LOC + QString("Open() -- end err(%1)")
+            .arg(_error));
+
     return !IsErrored();
 }
 
@@ -98,7 +104,7 @@ void IPTVRecorder::StartRecording(void)
     VERBOSE(VB_RECORD, LOC + "StartRecording() -- begin");
     if (!Open())
     {
-        _error = true;
+        _error = "Failed to open IPTV stream";
         return;
     }
 
