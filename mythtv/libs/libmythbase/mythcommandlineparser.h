@@ -131,8 +131,6 @@ class MBASE_PUBLIC MythCommandLineParser
     LogLevel_t              GetLogLevel(void);
     QString                 GetPassthrough(void) const { return m_passthrough.join(" "); }
 
-    bool                    SetValue(const QString &key, QVariant value);
-
     bool                    toBool(QString key) const;
     int                     toInt(QString key) const;
     uint                    toUInt(QString key) const;
@@ -143,6 +141,10 @@ class MBASE_PUBLIC MythCommandLineParser
     QStringList             toStringList(QString key, QString sep = "") const;
     QMap<QString,QString>   toMap(QString key) const;
     QDateTime               toDateTime(QString key) const;
+
+    bool                    SetValue(const QString &key, QVariant value);
+    int                     ConfigureLogging(void);
+    void                    ApplySettingsOverride(void);
 
   protected:
     void allowExtras(bool allow=true) { m_allowExtras = allow; }
