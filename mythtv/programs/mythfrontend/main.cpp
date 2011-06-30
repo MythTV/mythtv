@@ -1149,8 +1149,6 @@ static int internal_play_media(const QString &mrl, const QString &plot,
             delete pginfo;
             return res;
         }
-        else
-            delete pginfo;
     }
     else
     {
