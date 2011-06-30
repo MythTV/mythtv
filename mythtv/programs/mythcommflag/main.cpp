@@ -977,7 +977,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHCOMMFLAG);
 
-    bool progress = !cmdline.toBool("noprogress");
+    progress = !cmdline.toBool("noprogress");
     int retval;
     QString mask("important general");
     if ((retval = cmdline.ConfigureLogging(mask, progress)) != GENERIC_EXIT_OK)
