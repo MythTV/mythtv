@@ -3578,6 +3578,13 @@ void VideoDialog::VideoSearch(MythGenericTree *node,
     lookup->SetSeason(metadata->GetSeason());
     lookup->SetEpisode(metadata->GetEpisode());
     lookup->SetInetref(metadata->GetInetRef());
+    QString fntmp;
+    if (metadata->GetHost().isEmpty())
+        fntmp = metadata->GetFilename();
+    else
+        fntmp = generate_file_url("Videos", metadata->GetHost(),
+                                      metadata->GetFilename());
+    lookup->SetFilename(fntmp);
     if (m_query->isRunning())
         m_query->prependLookup(lookup);
     else

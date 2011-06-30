@@ -94,6 +94,7 @@ class META_PUBLIC MetadataLookup : public QObject
         bool allowoverwrites,
         bool preferdvdorder,
         QString host,
+        QString filename,
         QString title,
         const QStringList categories,
         const float userrating,
@@ -147,6 +148,7 @@ class META_PUBLIC MetadataLookup : public QObject
 
     // General Sets
     void SetTitle(QString title) { m_title = title; };
+    void SetFilename(QString filename) { m_filename = filename; };
 
     // General Sets - Video
     void SetSubtitle(QString subtitle) { m_subtitle = subtitle; };
@@ -176,6 +178,7 @@ class META_PUBLIC MetadataLookup : public QObject
     bool GetAllowOverwrites() const { return m_allowoverwrites; };
 
     // General
+    QString GetFilename() const { return m_filename; };
     QString GetTitle() const { return m_title; };
     QStringList GetCategories() const { return m_categories; };
     float GetUserRating() const { return m_userrating; };
@@ -237,6 +240,7 @@ class META_PUBLIC MetadataLookup : public QObject
     bool m_dvdorder;
     QString m_host;
 
+    QString m_filename;
     QString m_title;
     const QStringList m_categories;
     float m_userrating;
@@ -290,6 +294,8 @@ Q_DECLARE_METATYPE(MetadataLookup*)
 META_PUBLIC MetadataLookup* ParseMetadataItem(const QDomElement& item,
                                           MetadataLookup *lookup,
                                           bool passseas = true);
+META_PUBLIC MetadataLookup* ParseMetadataMovieNFO(const QDomElement& item,
+                                          MetadataLookup *lookup);
 META_PUBLIC PeopleMap ParsePeople(QDomElement people);
 META_PUBLIC ArtworkMap ParseArtwork(QDomElement artwork);
 
