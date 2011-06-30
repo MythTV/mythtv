@@ -8,6 +8,7 @@
 #include <QFileInfo>
 #include <QStringList>
 #include <QMap>
+#include <QRegExp>
 #include <iostream>
 
 using namespace std;
@@ -1078,7 +1079,7 @@ int verboseArgParse(QString arg)
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    QStringList verboseOpts = arg.split(',');
+    QStringList verboseOpts = arg.split(QRegExp("\\W+"));
     for (QStringList::Iterator it = verboseOpts.begin();
          it != verboseOpts.end(); ++it )
     {
