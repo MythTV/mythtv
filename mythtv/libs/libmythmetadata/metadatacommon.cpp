@@ -419,6 +419,19 @@ MetadataLookup* ParseMetadataMovieNFO(const QDomElement& item,
                                                .trimmed().toUInt();
     runtimesecs = runtime * 60;
 
+    QDomElement actor = item.firstChildElement("actor");
+    if (!actor.isNull())
+    {
+        while (!actor.isNull())
+        {
+            PersonInfo info;
+            info.name = actor.firstChildElement("name").text();
+            info.role = actor.firstChildElement("role").text();
+            people.insert(ACTOR, info);
+            actor = actor.nextSiblingElement("actor");
+        }
+    }
+
     return new MetadataLookup(lookup->GetType(), lookup->GetData(),
         lookup->GetStep(), lookup->GetAutomatic(), lookup->GetHandleImages(),
         lookup->GetAllowOverwrites(), lookup->GetPreferDVDOrdering(),
