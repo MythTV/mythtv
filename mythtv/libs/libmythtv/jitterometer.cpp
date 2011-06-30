@@ -6,7 +6,8 @@
 #include "jitterometer.h"
 
 Jitterometer::Jitterometer(QString nname, int ncycles)
-  : count(0), num_cycles(ncycles), starttime_valid(0), last_fps(0), name(nname)
+  : count(0), num_cycles(ncycles), starttime_valid(0), last_fps(0),
+    last_sd(0), name(nname)
 {
     times = (unsigned*) malloc(num_cycles * sizeof(unsigned));
     memset(&starttime, 0, sizeof(struct timeval));
@@ -68,7 +69,8 @@ bool Jitterometer::RecordEndTime()
         tottime = mean;
         mean /= cycles;
 
-        last_fps = cycles / tottime * 1000000;
+        if (tottime > 0)
+            last_fps = cycles / tottime * 1000000;
 
         /* compute the sum of the squares of each deviation from the mean */
         for(i = 0; i < cycles; i++)
@@ -76,6 +78,8 @@ bool Jitterometer::RecordEndTime()
 
         /* compute standard deviation */
         standard_deviation = sqrt(sum_of_squared_deviations / (cycles - 1));
+        if (mean > 0)
+            last_sd = standard_deviation / mean;
 
         VERBOSE(VB_PLAYBACK, name + QString("Mean: %1 Std.Dev: %2 fps: %3")
             .arg((int)mean).arg((int)standard_deviation).arg(last_fps, 0, 'f', 2));

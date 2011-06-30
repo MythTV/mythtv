@@ -4354,7 +4354,12 @@ void MythPlayer::GetPlaybackData(InfoMap &infoMap)
     if (decoder)
         infoMap["videodecoder"] = decoder->GetCodecDecoderName();
     if (output_jmeter)
-        infoMap["framerate"] = QString::number(output_jmeter->GetLastFPS(), 'f', 2);
+    {
+        infoMap["framerate"] = QString("%1%2%3")
+            .arg(output_jmeter->GetLastFPS(), 0, 'f', 2)
+            .arg(QChar(0xB1, 0))
+            .arg(output_jmeter->GetLastSD(), 0, 'f', 2);
+    }
     GetCodecDescription(infoMap);
 }
 

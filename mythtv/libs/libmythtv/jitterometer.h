@@ -37,6 +37,7 @@ class Jitterometer
    ~Jitterometer();
 
     float GetLastFPS(void) { return last_fps; }
+    float GetLastSD(void)  { return last_sd;  }
     void SetNumCycles(int cycles);
     bool RecordCycleTime();
     void RecordStartTime();
@@ -49,6 +50,7 @@ class Jitterometer
     int starttime_valid;
     unsigned *times; // array of cycle lengths, in uS
     float last_fps;
+    float last_sd;
     QString name;
 };
 

@@ -95,26 +95,26 @@
             <align>left,vcenter</align>
         </textarea>
 
-        <textarea name="sync">
-            <font>medium</font>
-            <area>406,25,93,20</area>
-            <align>right,vcenter</align>
-            <value>A/V Sync :</value>
-        </textarea>
-        <textarea name="avsync">
-            <font>medium</font>
-            <area>503,25,93,20</area>
-            <align>left,vcenter</align>
-        </textarea>
         <textarea name="fps">
             <font>medium</font>
-            <area>375,45,125,20</area>
+            <area>375,25,125,20</area>
             <align>right,vcenter</align>
             <value>FPS :</value>
         </textarea>
         <textarea name="framerate">
             <font>medium</font>
-            <area>503,45,156,20</area>
+            <area>503,25,156,20</area>
+            <align>left,vcenter</align>
+        </textarea>
+        <textarea name="sync">
+            <font>medium</font>
+            <area>406,45,93,20</area>
+            <align>right,vcenter</align>
+            <value>A/V Sync :</value>
+        </textarea>
+        <textarea name="avsync">
+            <font>medium</font>
+            <area>503,45,93,20</area>
             <align>left,vcenter</align>
         </textarea>
         <textarea name="frames">
