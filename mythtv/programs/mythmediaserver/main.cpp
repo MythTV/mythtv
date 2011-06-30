@@ -69,10 +69,6 @@ namespace
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
-
-    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHMEDIASERVER);
-
     MythMediaServerCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {
@@ -92,9 +88,13 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_OK;
     }
 
+    QCoreApplication a(argc, argv);
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHMEDIASERVER);
+
     bool daemonize = cmdline.toBool("daemon");
     int retval;
-    if ((retval = cmdline.ConfigureLogging(daemonize)) != GENERIC_EXIT_OK)
+    QString mask("important general");
+    if ((retval = cmdline.ConfigureLogging(mask, daemonize)) != GENERIC_EXIT_OK)
         return retval;
 
     if (cmdline.toBool("pidfile"))
@@ -108,8 +108,7 @@ int main(int argc, char *argv[])
         pidfs.open(pidfile.toAscii().constData());
         if (!pidfs)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Could not open pid file" + ENO);
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not open pid file" + ENO);
             return GENERIC_EXIT_PERMISSIONS_ERROR;
         }
     }

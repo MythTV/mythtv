@@ -27,8 +27,6 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    int quiet = 0;
-
     MythAVTestCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {
@@ -49,35 +47,11 @@ int main(int argc, char *argv[])
     }
 
     QApplication a(argc, argv);
-
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHAVTEST);
 
-    QString filename = "";
-
-    if (cmdline.toBool("verbose"))
-        if (verboseArgParse(cmdline.toString("verbose")) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-            return GENERIC_EXIT_INVALID_CMDLINE;
-
-    if (cmdline.toBool("quiet"))
-    {
-        quiet = cmdline.toUInt("quiet");
-        if (quiet > 1)
-        {
-            verboseMask = VB_NONE;
-            verboseArgParse("none");
-        }
-    }
-
-    int facility = cmdline.GetSyslogFacility();
-    bool dblog = !cmdline.toBool("nodblog");
-    LogLevel_t level = cmdline.GetLogLevel();
-    if (level == LOG_UNKNOWN)
-        return GENERIC_EXIT_INVALID_CMDLINE;
-
-    QString logfile = cmdline.GetLogFilePath();
-    bool propagate = cmdline.toBool("islogpath");
-    logStart(logfile, quiet, facility, level, dblog, propagate);
+    int retval;
+    if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
+        return retval;
 
     if (!cmdline.toString("display").isEmpty())
     {
@@ -89,6 +63,7 @@ int main(int argc, char *argv[])
         MythUIHelper::ParseGeometryOverride(cmdline.toString("geometry"));
     }
 
+    QString filename = "";
     if (cmdline.GetArgs().size() >= 1)
         filename = cmdline.GetArgs()[0];
 
@@ -99,17 +74,7 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
-    QMap<QString, QString> settingsOverride = cmdline.GetSettingsOverride();
-    if (settingsOverride.size())
-    {
-        QMap<QString, QString>::iterator it;
-        for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
-        {
-            VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
-                                          .arg(it.key()).arg(*it));
-            gCoreContext->OverrideSettingForSession(it.key(), *it);
-        }
-    }
+    cmdline.ApplySettingsOverride();
 
     setuid(getuid());
 

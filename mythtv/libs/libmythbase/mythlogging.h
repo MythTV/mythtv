@@ -101,7 +101,7 @@ extern "C" {
 #endif
 
 /* Define the external prototype */
-MBASE_PUBLIC void LogPrintLine( uint32_t mask, LogLevel_t level, 
+MBASE_PUBLIC void LogPrintLine( uint64_t mask, LogLevel_t level, 
                                 const char *file, int line, 
                                 const char *function, const char *format, ... );
 

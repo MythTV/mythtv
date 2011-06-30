@@ -63,55 +63,28 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    if (cmdline.toBool("showversion"))
-    {
-        cmdline.PrintVersion();
-        return GENERIC_EXIT_OK;
-    }
-
     if (cmdline.toBool("showhelp"))
     {
         cmdline.PrintHelp();
         return GENERIC_EXIT_OK;
     }
 
-    QCoreApplication a(argc, argv);
-
-    QCoreApplication::setApplicationName("mythfillnetvision");
-
-    if (cmdline.toBool("verbose"))
-        if (verboseArgParse(cmdline.toString("verbose")) ==
-                    GENERIC_EXIT_INVALID_CMDLINE)
-            return GENERIC_EXIT_INVALID_CMDLINE;
-
-    int quiet = 0;
-    if (cmdline.toBool("quiet"))
+    if (cmdline.toBool("showversion"))
     {
-        quiet = cmdline.toUInt("quiet");
-        if (quiet > 1)
-        {
-            verboseMask = VB_NONE;
-            verboseArgParse("none");
-        }
+        cmdline.PrintVersion();
+        return GENERIC_EXIT_OK;
     }
 
-    int facility = cmdline.GetSyslogFacility();
-    bool dblog = !cmdline.toBool("nodblog");
-    LogLevel_t level = cmdline.GetLogLevel();
-    if (level == LOG_UNKNOWN)
-        return GENERIC_EXIT_INVALID_CMDLINE;
+    QCoreApplication a(argc, argv);
+    QCoreApplication::setApplicationName("mythfillnetvision");
 
+    int retval;
+    if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
+        return retval;
+    
     ///////////////////////////////////////////////////////////////////////
     // Don't listen to console input
     close(0);
-
-    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
-            .arg("mythfillnetvision").arg(MYTH_SOURCE_PATH)
-            .arg(MYTH_SOURCE_VERSION));
-
-    QString logfile = cmdline.GetLogFilePath();
-    bool propagate = cmdline.toBool("islogpath");
-    logStart(logfile, quiet, facility, level, dblog, propagate);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))

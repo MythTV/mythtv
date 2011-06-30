@@ -936,7 +936,6 @@ static int FlagCommercials(
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
     bool isVideo = false;
     int result = GENERIC_EXIT_OK;
 
@@ -955,11 +954,6 @@ int main(int argc, char *argv[])
     bool allRecorded = false;
     bool queueJobInstead = false;
     QString newCutList = QString::null;
-
-    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHCOMMFLAG);
-
-    verboseMask = VB_IMPORTANT;
-    verboseString = "important";
 
     MythCommFlagCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
@@ -980,10 +974,14 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_OK;
     }
 
-    if (cmdline.toBool("verbose"))
-        if (verboseArgParse(cmdline.toString("verbose")) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-            return GENERIC_EXIT_INVALID_CMDLINE;
+    QCoreApplication a(argc, argv);
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHCOMMFLAG);
+
+    bool progress = !cmdline.toBool("noprogress");
+    int retval;
+    QString mask("important general");
+    if ((retval = cmdline.ConfigureLogging(mask, progress)) != GENERIC_EXIT_OK)
+        return retval;
 
     if (!cmdline.toString("chanid").isEmpty())
         chanid = cmdline.toUInt("chanid");
@@ -1062,31 +1060,6 @@ int main(int argc, char *argv[])
         dontSubmitCommbreakListToDB = true;
         force = true;
     }
-    if (verboseArgParse(cmdline.toString("verbose")) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-        return GENERIC_EXIT_INVALID_CMDLINE;
-    if (cmdline.toBool("verboseint"))
-        verboseMask = cmdline.toUInt("verboseint");
-
-    if (cmdline.toBool("quiet"))
-    {
-        quiet = cmdline.toUInt("quiet");
-        if (quiet > 1)
-        {
-            verboseMask = VB_NONE;
-            verboseArgParse("none");
-        }
-    }
-
-    progress = !cmdline.toBool("noprogress");
-    if (progress) 
-        quiet++;
-
-    int facility = cmdline.GetSyslogFacility();
-    bool dblog = !cmdline.toBool("nodblog");
-    LogLevel_t level = cmdline.GetLogLevel();
-    if (level == LOG_UNKNOWN)
-        return GENERIC_EXIT_INVALID_CMDLINE;
 
     if (cmdline.toBool("queue"))
         queueJobInstead = true;
@@ -1109,30 +1082,17 @@ int main(int argc, char *argv[])
 
     CleanupGuard callCleanup(cleanup);
 
-    QString logfile = cmdline.GetLogFilePath();
-    bool propagate = cmdline.toBool("islogpath");
-    logStart(logfile, quiet, facility, level, dblog, propagate);
-
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(
-            false/*use gui*/, false/*prompt for backend*/,
-            false/*bypass auto discovery*/, !useDB/*ignoreDB*/))
+    if (!gContext->Init( false, /*use gui*/
+                         false, /*prompt for backend*/
+                         false, /*bypass auto discovery*/
+                         !useDB)) /*ignoreDB*/
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
-    QMap<QString, QString> settingsOverride = cmdline.GetSettingsOverride();
-    if (settingsOverride.size())
-    {
-        QMap<QString, QString>::iterator it;
-        for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
-        {
-            VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
-                                          .arg(it.key()).arg(*it));
-            gCoreContext->OverrideSettingForSession(it.key(), *it);
-        }
-    }
+    cmdline.ApplySettingsOverride();
 
     MythTranslation::load("mythfrontend");
 
@@ -1174,7 +1134,8 @@ int main(int argc, char *argv[])
         return SetCutList(QString::number(chanid), starttime, "");
 
     if (cmdline.toBool("setcutlist"))
-        return SetCutList(QString::number(chanid), starttime, cmdline.toString("setcutlist"));
+        return SetCutList(QString::number(chanid), starttime,
+                          cmdline.toString("setcutlist"));
 
     if (cmdline.toBool("getcutlist"))
         return GetMarkupList("cutlist", QString::number(chanid), starttime);
@@ -1222,11 +1183,6 @@ int main(int argc, char *argv[])
     time_now = time(NULL);
     if (progress)
     {
-        VERBOSE(VB_IMPORTANT, QString("%1 version: %2 www.mythtv.org")
-                  .arg(MYTH_APPNAME_MYTHCOMMFLAG).arg(MYTH_BINARY_VERSION));
-
-        VERBOSE(VB_IMPORTANT, QString("Enabled verbose msgs: %1").arg(verboseString));
-
         cerr << "\nMythTV Commercial Flagger, started at "
              << ctime(&time_now);
 

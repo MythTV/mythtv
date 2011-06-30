@@ -726,7 +726,7 @@ void LogTimeStamp( struct tm *tm, uint32_t *usec )
 #endif
 }
 
-void LogPrintLine( uint32_t mask, LogLevel_t level, const char *file, int line,
+void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
                    const char *function, const char *format, ... )
 {
     va_list         arguments;

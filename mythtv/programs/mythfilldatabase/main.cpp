@@ -60,7 +60,6 @@ namespace
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
     FillData fill_data;
     int fromfile_id = 1;
     int fromfile_offset = 0;
@@ -86,11 +85,6 @@ int main(int argc, char *argv[])
     bool from_dd_file = false;
     int sourceid = -1;
     QString fromddfile_lineupid;
-    int quiet = 0;
-
-    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFILLDATABASE);
-
-    myth_nice(19);
 
     MythFillDatabaseCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
@@ -112,10 +106,14 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_OK;
     }
 
-    if (cmdline.toBool("verbose"))
-        if (verboseArgParse(cmdline.toString("verbose")) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-            return GENERIC_EXIT_INVALID_CMDLINE;
+    QCoreApplication a(argc, argv);
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFILLDATABASE);
+
+    myth_nice(19);
+
+    int retval;
+    if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
+        return retval;
 
     if (cmdline.toBool("manual"))
     {
@@ -194,7 +192,8 @@ int main(int argc, char *argv[])
         if (!cmdline.toBool("sourceid") ||
             !cmdline.toBool("xawtvrcfile"))
         {
-            cerr << "The --xawchannels option must be used in combination" << endl
+            cerr << "The --xawchannels option must be used in combination"
+                 <<  endl
                  << "with both --sourceid and --xawtvrcfile" << endl;
         }
 
@@ -253,22 +252,6 @@ int main(int argc, char *argv[])
     if (cmdline.toBool("onlychannels"))
         fill_data.only_update_channels = true;
 
-    if (cmdline.toBool("quiet"))
-    {
-        quiet = cmdline.toUInt("quiet");
-        if (quiet > 1)
-        {
-            verboseMask = VB_NONE;
-            verboseArgParse("none");
-        }
-    }
-
-    int facility = cmdline.GetSyslogFacility();
-    bool dblog = !cmdline.toBool("nodblog");
-    LogLevel_t level = cmdline.GetLogLevel();
-    if (level == LOG_UNKNOWN)
-        return GENERIC_EXIT_INVALID_CMDLINE;
-
     mark_repeats = cmdline.toBool("markrepeats");
     if (cmdline.toBool("exporticonmap"))
         export_icon_data_filename = cmdline.toString("exporticonmap");
@@ -288,10 +271,6 @@ int main(int argc, char *argv[])
     }
 
     CleanupGuard callCleanup(cleanup);
-
-    QString logfile = cmdline.GetLogFilePath();
-    bool propagate = cmdline.toBool("islogpath");
-    logStart(logfile, quiet, facility, level, dblog, propagate);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
@@ -332,8 +311,9 @@ int main(int argc, char *argv[])
         if (query.exec() && query.next())
         {
             if (!query.isNull(0))
-                GuideDataBefore = QDateTime::fromString(query.value(0).toString(),
-                                                    Qt::ISODate);
+                GuideDataBefore =
+                    QDateTime::fromString(query.value(0).toString(),
+                                          Qt::ISODate);
         }
 
         if (!fill_data.GrabDataFromFile(fromfile_id, fromfile_name))
@@ -351,14 +331,15 @@ int main(int argc, char *argv[])
         if (query.exec() && query.next())
         {
             if (!query.isNull(0))
-                GuideDataAfter = QDateTime::fromString(query.value(0).toString(),
-                                                   Qt::ISODate);
+                GuideDataAfter =
+                    QDateTime::fromString(query.value(0).toString(),
+                                          Qt::ISODate);
         }
 
         if (GuideDataAfter == GuideDataBefore)
             status = QObject::tr("mythfilldatabase ran, but did not insert "
-                     "any new data into the Guide.  This can indicate a "
-                     "potential problem with the XML file used for the update.");
+                    "any new data into the Guide.  This can indicate a "
+                    "potential problem with the XML file used for the update.");
         else
             status = QObject::tr("Successful.");
 

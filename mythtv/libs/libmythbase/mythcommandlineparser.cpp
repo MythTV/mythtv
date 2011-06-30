@@ -1048,12 +1048,14 @@ bool MythCommandLineParser::SetValue(const QString &key, QVariant value)
     return true;
 }
 
-int MythCommandLineParser::ConfigureLogging(unsigned int quiet)
+int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int quiet)
 {
     int err = 0;
 
-    verboseMask = VB_GENERAL | VB_IMPORTANT;
-    verboseString = "important general";
+    // Setup the defaults
+    verboseString = "";
+    verboseMask   = 0;
+    verboseArgParse(mask);
 
     if (toBool("verbose"))
     {
@@ -1079,6 +1081,8 @@ int MythCommandLineParser::ConfigureLogging(unsigned int quiet)
     LOG(VB_GENERAL, LOG_CRIT, QString("%1 version: %2 [%3] www.mythtv.org")
             .arg(QCoreApplication::applicationName())
             .arg(MYTH_SOURCE_PATH) .arg(MYTH_SOURCE_VERSION));
+    LOG(VB_GENERAL, LOG_CRIT, QString("Enabled verbose msgs: %1")
+                                  .arg(verboseString));
 
     QString logfile = GetLogFilePath();
     bool propogate = toBool("islogpath");

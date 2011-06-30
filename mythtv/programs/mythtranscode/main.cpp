@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
     int jobType = JOB_NONE;
     int otype = REPLEX_MPEG2;
     bool useCutlist = false, keyframesonly = false;
-    bool build_index = false, fifosync = false, showprogress = false;
+    bool build_index = false, fifosync = false;
     bool mpeg2 = false;
     QMap<QString, QString> settingsOverride;
     frm_dir_map_t deleteMap;
@@ -140,20 +140,12 @@ int main(int argc, char *argv[])
     srand(time(NULL));
     int AudioTrackNo = -1;
 
-    QCoreApplication a(argc, argv);
-
-    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHTRANSCODE);
-
-    verboseMask = VB_IMPORTANT;
-    verboseString = "important";
-
     int found_starttime = 0;
     int found_chanid = 0;
     int found_infile = 0;
     int update_index = 1;
     int isVideo = 0;
     bool passthru = false;
-    int quiet = 0;
 
     MythTranscodeCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
@@ -174,12 +166,22 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_OK;
     }
 
-    if (cmdline.toBool("verbose"))
-        if (verboseArgParse(cmdline.toString("verbose")) == 
-                GENERIC_EXIT_INVALID_CMDLINE)
-            return GENERIC_EXIT_INVALID_CMDLINE;
-    if (cmdline.toBool("verboseint"))
-        verboseMask = cmdline.toUInt("verboseint");
+    QCoreApplication a(argc, argv);
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHTRANSCODE);
+
+    if (cmdline.toBool("outputfile"))
+    {
+        outfile = cmdline.toString("outputfile");
+        update_index = 0;
+    }
+
+    bool showprogress = cmdline.toBool("showprogress");
+
+    int retval;
+    QString mask("important general");
+    bool quiet = (outfile == "-") || showprogress;
+    if ((retval = cmdline.ConfigureLogging(mask, quiet)) != GENERIC_EXIT_OK)
+        return retval;
 
     if (cmdline.toBool("starttime"))
     {
@@ -197,11 +199,6 @@ int main(int argc, char *argv[])
     {
         infile = cmdline.toString("inputfile");
         found_infile = 1;
-    }
-    if (cmdline.toBool("outputfile"))
-    {
-        outfile = cmdline.toString("outputfile");
-        update_index = 0;
     }
     if (cmdline.toBool("video"))
         isVideo = true;
@@ -224,7 +221,8 @@ int main(int argc, char *argv[])
             QStringList::iterator it;
             for (it = cutlist.begin(); it != cutlist.end(); ++it)
             {
-                QStringList startend = (*it).split("-", QString::SkipEmptyParts);
+                QStringList startend =
+                    (*it).split("-", QString::SkipEmptyParts);
                 if (startend.size() == 2)
                 {
                     cerr << "Cutting from: " << startend.first().toULongLong()
@@ -296,43 +294,13 @@ int main(int argc, char *argv[])
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
-    if (cmdline.toBool("overridesettings"))
-        settingsOverride = cmdline.GetSettingsOverride();
     if (cmdline.toBool("audiotrack"))
         AudioTrackNo = cmdline.toInt("audiotrack");
     if (cmdline.toBool("passthru"))
         passthru = true;
 
-    if (outfile == "-")
-        verboseMask = VB_NONE;
-
-    if (cmdline.toBool("quiet"))
-    {
-        quiet = cmdline.toUInt("quiet");
-        if (quiet > 1)
-        {
-            verboseMask = VB_NONE;
-            verboseArgParse("none");
-        }
-    }
-
-    showprogress = cmdline.toBool("showprogress");
-    if (showprogress)
-        quiet++;
-
-    int facility = cmdline.GetSyslogFacility();
-    bool dblog = !cmdline.toBool("nodblog");
-    LogLevel_t level = cmdline.GetLogLevel();
-    if (level == LOG_UNKNOWN)
-        return GENERIC_EXIT_INVALID_CMDLINE;
-
-    QString logfile = cmdline.GetLogFilePath();
-    bool propagate = cmdline.toBool("islogpath");
-    logStart(logfile, quiet, facility, level, dblog, propagate);
-
     //  Load the context
-    MythContext context(MYTH_BINARY_VERSION);
-    gContext = &context;
+    gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
@@ -341,21 +309,11 @@ int main(int argc, char *argv[])
 
     MythTranslation::load("mythfrontend");
 
-    if (settingsOverride.size())
-    {
-        QMap<QString, QString>::iterator it;
-        for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
-        {
-            VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
-                                          .arg(it.key()).arg(*it));
-            gCoreContext->OverrideSettingForSession(it.key(), *it);
-        }
-    }
+    cmdline.ApplySettingsOverride();
 
     if (jobID != -1)
     {
-        if (JobQueue::GetJobInfoFromID(
-                jobID, jobType, chanid, startts))
+        if (JobQueue::GetJobInfoFromID(jobID, jobType, chanid, startts))
         {
             starttime = startts.toString(Qt::ISODate);
             found_starttime = 1;
@@ -369,7 +327,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    if ((! found_infile && !(found_chanid && found_starttime)) ||
+    if ((!found_infile && !(found_chanid && found_starttime)) ||
         (found_infile && (found_chanid || found_starttime)) )
     {
          cerr << "Must specify -i OR -c AND -s options!\n";
@@ -400,8 +358,6 @@ int main(int argc, char *argv[])
          cerr << "Must specify --fifodir to use --fifosync\n";
          return GENERIC_EXIT_INVALID_CMDLINE;
     }
-
-    VERBOSE(VB_IMPORTANT, QString("Enabled verbose msgs: %1").arg(verboseString));
 
     if (!MSqlQuery::testDBConnection())
     {

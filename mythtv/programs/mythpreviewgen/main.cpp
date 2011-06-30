@@ -153,8 +153,6 @@ int preview_helper(const QString &_chanid, const QString &starttime,
 
 int main(int argc, char **argv)
 {
-    int quiet = 0;
-
     MythPreviewGeneratorCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {
@@ -183,8 +181,11 @@ int main(int argc, char **argv)
     // such as socket notifications :[
     QApplication a(argc, argv);
 #endif
-
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHPREVIEWGEN);
+
+    int retval;
+    if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
+        return retval;
 
     if ((!cmdline.toBool("chanid") || !cmdline.toBool("starttime")) &&
         !cmdline.toBool("inputfile"))
@@ -195,22 +196,6 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    if (cmdline.toBool("quiet"))
-    {
-        quiet = cmdline.toUInt("quiet");
-        if (quiet > 1)
-        {
-            verboseMask = VB_NONE;
-            verboseArgParse("none");
-        }
-    }
-
-    int facility = cmdline.GetSyslogFacility();
-    bool dblog = !cmdline.toBool("nodblog");
-    LogLevel_t level = cmdline.GetLogLevel();
-    if (level == LOG_UNKNOWN)
-        return GENERIC_EXIT_INVALID_CMDLINE;
-
     ///////////////////////////////////////////////////////////////////////
 
     // Don't listen to console input
@@ -218,19 +203,8 @@ int main(int argc, char **argv)
 
     CleanupGuard callCleanup(cleanup);
 
-    QString logfile = cmdline.GetLogFilePath();
-    bool propagate = cmdline.toBool("islogpath");
-    logStart(logfile, quiet, facility, level, dblog, propagate);
-
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to ignore SIGPIPE");
-
-    {
-        QString versionStr = QString("%1 version: %2 [%3] www.mythtv.org")
-            .arg(MYTH_APPNAME_MYTHPREVIEWGEN).arg(MYTH_SOURCE_PATH)
-            .arg(MYTH_SOURCE_VERSION);
-        VERBOSE(VB_IMPORTANT, versionStr);
-    }
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
 

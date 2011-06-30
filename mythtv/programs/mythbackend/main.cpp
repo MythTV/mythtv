@@ -55,8 +55,6 @@ static void qt_exit(int)
 
 int main(int argc, char **argv)
 {
-    int quiet = 0;
-
     MythBackendCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {
@@ -64,15 +62,15 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    if (cmdline.toBool("showversion"))
-    {
-        cmdline.PrintVersion();
-        return GENERIC_EXIT_OK;
-    }
-
     if (cmdline.toBool("showhelp"))
     {
         cmdline.PrintHelp();
+        return GENERIC_EXIT_OK;
+    }
+
+    if (cmdline.toBool("showversion"))
+    {
+        cmdline.PrintVersion();
         return GENERIC_EXIT_OK;
     }
 
@@ -89,29 +87,11 @@ int main(int argc, char **argv)
 
     pidfile = cmdline.toString("pidfile");
 
-    if (cmdline.toBool("verbose"))
-        if (verboseArgParse(cmdline.toString("verbose")) ==
-                    GENERIC_EXIT_INVALID_CMDLINE)
-            return GENERIC_EXIT_INVALID_CMDLINE;
-
-    if (cmdline.toBool("quiet"))
-    {
-        quiet = cmdline.toUInt("quiet");
-        if (quiet > 1)
-        {
-            verboseMask = VB_NONE;
-            verboseArgParse("none");
-        }
-    }
-
-    if (cmdline.toBool("daemon") && !quiet)
-        quiet = 1;
-
-    int facility = cmdline.GetSyslogFacility();
-    bool dblog = !cmdline.toBool("nodblog");
-    LogLevel_t level = cmdline.GetLogLevel();
-    if (level == LOG_UNKNOWN)
-        return GENERIC_EXIT_INVALID_CMDLINE;
+    bool daemonize = cmdline.toBool("daemon");
+    int retval;
+    QString mask("important general");
+    if ((retval = cmdline.ConfigureLogging(mask, daemonize)) != GENERIC_EXIT_OK)
+        return retval;
 
     ///////////////////////////////////////////////////////////////////////
     // Don't listen to console input
@@ -125,20 +105,9 @@ int main(int argc, char **argv)
     if (exitCode != GENERIC_EXIT_OK)
         return exitCode;
 
-    {
-        QString versionStr = QString("%1 version: %2 [%3] www.mythtv.org")
-            .arg(MYTH_APPNAME_MYTHBACKEND).arg(MYTH_SOURCE_PATH)
-            .arg(MYTH_SOURCE_VERSION);
-        VERBOSE(VB_IMPORTANT, versionStr);
-    }
-
     setHttpProxy();
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
-
-    logfile = cmdline.GetLogFilePath();
-    bool propagate = cmdline.toBool("islogpath");
-    logStart(logfile, quiet, facility, level, dblog, propagate);
 
     if (cmdline.toBool("event")         || cmdline.toBool("systemevent") ||
         cmdline.toBool("setverbose")    || cmdline.toBool("printsched") ||

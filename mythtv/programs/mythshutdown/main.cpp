@@ -733,13 +733,6 @@ static int startup()
 
 int main(int argc, char **argv)
 {
-    // by default we don't output any messages
-    verboseMask = VB_NONE;
-
-    QCoreApplication a(argc, argv);
-
-    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHSHUTDOWN);
-
     bool bLockShutdown = false;
     bool bUnlockShutdown = false;
     bool bCheckOKShutdown = false;
@@ -750,7 +743,6 @@ int main(int argc, char **argv)
     bool bSetScheduledWakeupTime = false;
     bool bCheckAndShutdown = false;
     bool bWantRecStatus = true;
-    int quiet = 0;
 
     MythShutdownCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
@@ -771,26 +763,13 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_OK;
     }
 
-    if (cmdline.toBool("verbose"))
-        if (verboseArgParse(cmdline.toString("verbose")) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-            return GENERIC_EXIT_INVALID_CMDLINE;
+    QCoreApplication a(argc, argv);
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHSHUTDOWN);
 
-    if (cmdline.toBool("quiet"))
-    {
-        quiet = cmdline.toUInt("quiet");
-        if (quiet > 1)
-        {
-            verboseMask = VB_NONE;
-            verboseArgParse("none");
-        }
-    }
-
-    int facility = cmdline.GetSyslogFacility();
-    bool dblog = !cmdline.toBool("nodblog");
-    LogLevel_t level = cmdline.GetLogLevel();
-    if (level == LOG_UNKNOWN)
-        return GENERIC_EXIT_INVALID_CMDLINE;
+    int retval;
+    QString mask("none");
+    if ((retval = cmdline.ConfigureLogging(mask)) != GENERIC_EXIT_OK)
+        return retval;
 
     if (cmdline.toBool("lock"))
         bLockShutdown = true;
@@ -817,10 +796,6 @@ int main(int argc, char **argv)
         bGetStatus = true;
         bWantRecStatus = (bool)(cmdline.toInt("status") == 1);
     }
-
-    QString logfile = cmdline.GetLogFilePath();
-    bool propagate = cmdline.toBool("islogpath");
-    logStart(logfile, quiet, facility, level, dblog, propagate);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
@@ -851,8 +826,9 @@ int main(int argc, char **argv)
     else if (bCheckAndShutdown)
     {
         res = checkOKShutdown(true);
-        if (res == 0)     // Nothing to stop a shutdown (eg. recording in progress).
+        if (res == 0)
         {
+             // Nothing to stop a shutdown (eg. recording in progress).
              res = setScheduledWakeupTime();
              res = shutdown();
         }
