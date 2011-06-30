@@ -496,8 +496,8 @@ bool AudioOutputDX::OpenDevice(void)
     dsbdesc.dwBufferBytes = soundcard_buffer_size; // buffer size
     dsbdesc.lpwfxFormat = (WAVEFORMATEX *)&wf;
 
-    if FAILED(IDirectSound_CreateSoundBuffer(m_priv->dsobject, &dsbdesc,
-                                            &m_priv->dsbuffer, NULL))
+    if (FAILED(IDirectSound_CreateSoundBuffer(m_priv->dsobject, &dsbdesc,
+                                            &m_priv->dsbuffer, NULL)))
     {
         /* Vista does not support hardware mixing
            try without DSBCAPS_LOCHARDWARE */
@@ -505,7 +505,7 @@ bool AudioOutputDX::OpenDevice(void)
         HRESULT dsresult =
             IDirectSound_CreateSoundBuffer(m_priv->dsobject, &dsbdesc,
                                            &m_priv->dsbuffer, NULL);
-        if FAILED(dsresult)
+        if (FAILED(dsresult))
         {
             if (dsresult == DSERR_UNSUPPORTED)
                 Error(QString("Unsupported format for device %1:%2")
