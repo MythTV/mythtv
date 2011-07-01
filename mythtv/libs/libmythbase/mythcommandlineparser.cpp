@@ -1,8 +1,14 @@
 #include <iostream>
+#include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#ifndef _WIN32
+#include <pwd.h>
+#include <grp.h>
+#endif
 
 using namespace std;
 
@@ -34,6 +40,8 @@ const int kEnd          = 0,
           kInvalid      = 6;
 
 const char* NamedOptType(int type);
+bool openPidfile(ofstream &pidfs, const QString &pidfile);
+bool setUser(const QString &username);
 
 const char* NamedOptType(int type)
 {
@@ -1105,4 +1113,102 @@ void MythCommandLineParser::ApplySettingsOverride(void)
             gCoreContext->OverrideSettingForSession(it.key(), *it);
         }
     }
+}
+
+bool openPidfile(ofstream &pidfs, const QString &pidfile)
+{
+    if (!pidfile.isEmpty())
+    {
+        pidfs.open(pidfile.toAscii().constData());
+        if (!pidfs)
+        {
+            cerr << "Could not open pid file: " << ENO_STR << endl;
+            return false;
+        }
+    }
+    return true;
+}
+
+bool setUser(const QString &username)
+{
+    if (username.isEmpty())
+        return true;
+
+#ifdef _WIN32
+    cerr << "--user option is not supported on Windows" << endl;
+    return false;
+#else // ! _WIN32
+    struct passwd *user_info = getpwnam(username.toLocal8Bit().constData());
+    const uid_t user_id = geteuid();
+
+    if (user_id && (!user_info || user_id != user_info->pw_uid))
+    {
+        cerr << "You must be running as root to use the --user switch." << endl;
+        return false;
+    }
+    else if (user_info && user_id == user_info->pw_uid)
+    {
+        LOG(VB_GENERAL, LOG_WARNING,
+            QString("Already running as '%1'").arg(username));
+    }
+    else if (!user_id && user_info)
+    {
+        if (setenv("HOME", user_info->pw_dir,1) == -1)
+        {
+            cerr << "Error setting home directory." << endl;
+            return false;
+        }
+        if (setgid(user_info->pw_gid) == -1)
+        {
+            cerr << "Error setting effective group." << endl;
+            return false;
+        }
+        if (initgroups(user_info->pw_name, user_info->pw_gid) == -1)
+        {
+            cerr << "Error setting groups." << endl;
+            return false;
+        }
+        if (setuid(user_info->pw_uid) == -1)
+        {
+            cerr << "Error setting effective user." << endl;
+            return false;
+        }
+    }
+    else
+    {
+        cerr << QString("Invalid user '%1' specified with --user")
+                    .arg(username).toLocal8Bit().constData() << endl;
+        return false;
+    }
+    return true;
+#endif // ! _WIN32
+}
+
+
+int MythCommandLineParser::Daemonize(void)
+{
+    ofstream pidfs;
+    if (!openPidfile(pidfs, toString("pidfile")))
+        return GENERIC_EXIT_PERMISSIONS_ERROR;
+
+    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+        LOG(VB_GENERAL, LOG_WARNING, "Unable to ignore SIGPIPE");
+
+    if (toBool("daemon") && (daemon(0, 1) < 0))
+    {
+        cerr << "Failed to daemonize: " << ENO_STR << endl;
+        return GENERIC_EXIT_DAEMONIZING_ERROR;
+    }
+
+    QString username = toString("username");
+    if (!username.isEmpty() && !setUser(username))
+        return GENERIC_EXIT_PERMISSIONS_ERROR;
+
+    if (pidfs)
+    {
+        pidfs << getpid() << endl;
+        pidfs.close();
+    }
+
+    return GENERIC_EXIT_OK;
 }

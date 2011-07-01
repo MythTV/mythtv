@@ -6,10 +6,6 @@
 #include <fcntl.h>
 #include <libgen.h>
 #include <signal.h>
-#ifndef _WIN32
-#include <pwd.h>
-#include <grp.h>
-#endif
 
 #include "mythconfig.h"
 #if CONFIG_DARWIN
@@ -283,78 +279,6 @@ void showUsage(const MythBackendCommandLineParser &cmdlineparser, const QString 
          << endl << ahelp.constData() << endl;
 }
 
-bool openPidfile(ofstream &pidfs, const QString &pidfile)
-{
-    if (!pidfile.isEmpty())
-    {
-        pidfs.open(pidfile.toAscii().constData());
-        if (!pidfs)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Could not open pid file" + ENO);
-            return false;
-        }
-    }
-    return true;
-}
-
-bool setUser(const QString &username)
-{
-    if (username.isEmpty())
-        return true;
-
-#ifdef _WIN32
-    VERBOSE(VB_IMPORTANT, "--user option is not supported on Windows");
-    return false;
-#else // ! _WIN32
-    struct passwd *user_info = getpwnam(username.toLocal8Bit().constData());
-    const uid_t user_id = geteuid();
-
-    if (user_id && (!user_info || user_id != user_info->pw_uid))
-    {
-        VERBOSE(VB_IMPORTANT,
-                "You must be running as root to use the --user switch.");
-        return false;
-    }
-    else if (user_info && user_id == user_info->pw_uid)
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Already running as '%1'").arg(username));
-    }
-    else if (!user_id && user_info)
-    {
-        if (setenv("HOME", user_info->pw_dir,1) == -1)
-        {
-            VERBOSE(VB_IMPORTANT, "Error setting home directory.");
-            return false;
-        }
-        if (setgid(user_info->pw_gid) == -1)
-        {
-            VERBOSE(VB_IMPORTANT, "Error setting effective group.");
-            return false;
-        }
-        if (initgroups(user_info->pw_name, user_info->pw_gid) == -1)
-        {
-            VERBOSE(VB_IMPORTANT, "Error setting groups.");
-            return false;
-        }
-        if (setuid(user_info->pw_uid) == -1)
-        {
-            VERBOSE(VB_IMPORTANT, "Error setting effective user.");
-            return false;
-        }
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Invalid user '%1' specified with --user")
-                .arg(username));
-        return false;
-    }
-    return true;
-#endif // ! _WIN32
-}
-
 int handle_command(const MythBackendCommandLineParser &cmdline)
 {
     QString eventString;
@@ -550,33 +474,6 @@ int connect_to_master(void)
     return GENERIC_EXIT_OK;
 }
 
-int setup_basics(const MythBackendCommandLineParser &cmdline)
-{
-    ofstream pidfs;
-    if (!openPidfile(pidfs, cmdline.toString("pidfile")))
-        return GENERIC_EXIT_PERMISSIONS_ERROR;
-
-    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to ignore SIGPIPE");
-
-    if (cmdline.toBool("daemon") && (daemon(0, 1) < 0))
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to daemonize" + ENO);
-        return GENERIC_EXIT_DAEMONIZING_ERROR;
-    }
-
-    QString username = cmdline.toString("username");
-    if (!username.isEmpty() && !setUser(username))
-        return GENERIC_EXIT_PERMISSIONS_ERROR;
-
-    if (pidfs)
-    {
-        pidfs << getpid() << endl;
-        pidfs.close();
-    }
-
-    return GENERIC_EXIT_OK;
-}
 
 void print_warnings(const MythBackendCommandLineParser &cmdline)
 {

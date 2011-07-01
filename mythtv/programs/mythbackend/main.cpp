@@ -86,9 +86,11 @@ int main(int argc, char **argv)
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHBACKEND);
 
     pidfile = cmdline.toString("pidfile");
+    int retval = cmdline.Daemonize();
+    if (retval != GENERIC_EXIT_OK)
+        return retval;
 
     bool daemonize = cmdline.toBool("daemon");
-    int retval;
     QString mask("important general");
     if ((retval = cmdline.ConfigureLogging(mask, daemonize)) != GENERIC_EXIT_OK)
         return retval;
@@ -100,10 +102,6 @@ int main(int argc, char **argv)
     CleanupGuard callCleanup(cleanup);
     signal(SIGINT, qt_exit);
     signal(SIGTERM, qt_exit);
-
-    int exitCode = setup_basics(cmdline);
-    if (exitCode != GENERIC_EXIT_OK)
-        return exitCode;
 
     setHttpProxy();
 
@@ -120,17 +118,21 @@ int main(int argc, char **argv)
         return handle_command(cmdline);
     }
 
+#if 0
     /////////////////////////////////////////////////////////////////////////
     // Not sure we want to keep running the backend when there is an error.
     // Currently, it keeps repeating the same error over and over.
     // Removing loop until reason for having it is understood.
     //
-    //while (true)
-    //{
-        exitCode = run_backend(cmdline);
-    //}
+    while (true)
+    {
+#endif
+        retval = run_backend(cmdline);
+#if 0
+    }
+#endif
 
-    return exitCode;
+    return retval;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

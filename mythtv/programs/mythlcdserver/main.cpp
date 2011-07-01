@@ -57,8 +57,11 @@ int main(int argc, char **argv)
     QCoreApplication a(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHLCDSERVER);
 
+    int retval = cmdline.Daemonize();
+    if (retval != GENERIC_EXIT_OK)
+        return retval;
+
     bool daemonize = cmdline.toBool("daemon");
-    int retval;
     QString mask("important general");
     if ((retval = cmdline.ConfigureLogging(mask, daemonize)) != GENERIC_EXIT_OK)
         return retval;
@@ -91,21 +94,6 @@ int main(int argc, char **argv)
             VERBOSE(VB_IMPORTANT, "lcdserver: Bad debug level");
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
-    }
-
-    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
-        cerr << "Unable to ignore SIGPIPE\n";
-
-    //  Switch to daemon mode?
-    if (daemonize)
-    {
-        if (daemon(0, 1) < 0)
-        {
-            VERBOSE(VB_IMPORTANT, "lcdserver: Failed to run as a daemon. "
-                            "Bailing out.");
-            return GENERIC_EXIT_DAEMONIZING_ERROR;
-        }
-        cout << endl;
     }
 
     //  Get the MythTV context and db hooks

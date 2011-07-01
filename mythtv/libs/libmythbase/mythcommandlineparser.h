@@ -146,6 +146,7 @@ class MBASE_PUBLIC MythCommandLineParser
     int                     ConfigureLogging(QString mask = "important general",
                                              unsigned int quiet = 0);
     void                    ApplySettingsOverride(void);
+    int                     Daemonize(void);
 
   protected:
     void allowExtras(bool allow=true) { m_allowExtras = allow; }

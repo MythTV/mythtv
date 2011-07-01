@@ -260,7 +260,8 @@ MBASE_PUBLIC int verboseArgParse(QString arg);
 /// a thread safe version of strerror to produce the
 /// string representation of errno and puts it on the
 /// next line in the verbose output.
-#define ENO QString("\n\t\t\teno: ") + logStrerror(errno)
+#define ENO (QString("\n\t\t\teno: ") + logStrerror(errno))
+#define ENO_STR ENO.toLocal8Bit().constData()
 #endif // __cplusplus
 
 #endif

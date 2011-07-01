@@ -96,43 +96,16 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHJOBQUEUE);
 
+    int retval = cmdline.Daemonize();
+    if (retval != GENERIC_EXIT_OK)
+        return retval;
+
     bool daemonize = cmdline.toBool("daemon");
-    int retval;
     QString mask("important general");
     if ((retval = cmdline.ConfigureLogging(mask, daemonize)) != GENERIC_EXIT_OK)
         return retval;
 
-    if (cmdline.toBool("pidfile"))
-        pidfile = cmdline.toString("pidfile");
-
     CleanupGuard callCleanup(cleanup);
-
-    ofstream pidfs;
-    if (pidfile.size())
-    {
-        pidfs.open(pidfile.toAscii().constData());
-        if (!pidfs)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Could not open pid file" + ENO);
-            return GENERIC_EXIT_PERMISSIONS_ERROR;
-        }
-    }
-
-    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to ignore SIGPIPE");
-
-    if (daemonize && (daemon(0, 1) < 0))
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to daemonize" + ENO);
-        return GENERIC_EXIT_DAEMONIZING_ERROR;
-    }
-
-    if (pidfs)
-    {
-        pidfs << getpid() << endl;
-        pidfs.close();
-    }
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
