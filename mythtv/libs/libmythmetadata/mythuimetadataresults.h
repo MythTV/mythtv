@@ -8,7 +8,9 @@
 #include "metadatadownload.h"
 #include "metadatacommon.h"
 
-class MetadataResultsDialog : public MythScreenType
+#include "mythmetaexp.h"
+
+class META_PUBLIC MetadataResultsDialog : public MythScreenType
 {
     Q_OBJECT
 
