@@ -6,7 +6,6 @@
 
 #include "mythscreentype.h"
 
-#include "metadatacommon.h"
 #include "parentalcontrols.h"
 #include "quicksp.h"
 
@@ -19,8 +18,8 @@ class MythUIImage;
 class MythUIStateType;
 class MythDialogBox;
 class MythGenericTree;
-class MetadataDownload;
-class MetadataImageDownload;
+class MetadataLookup;
+class MetadataFactory;
 class VideoMetadata;
 class VideoScanner;
 
@@ -154,8 +153,6 @@ class VideoDialog : public MythScreenType
     QString GetBanner(MythGenericTree *node);
     QString GetFanart(MythGenericTree *node);
 
-    void handleDownloadedImages(MetadataLookup *lookup);
-
     VideoMetadata *GetMetadata(MythUIButtonListItem *item);
 
     void handleDirSelect(MythGenericTree *node);
@@ -168,9 +165,7 @@ class VideoDialog : public MythScreenType
 
     void SwitchLayout(DialogType type, BrowseType browse);
 
-    void StartVideoImageSet(MythGenericTree *node, QStringList coverart = QStringList(),
-                            QStringList fanart = QStringList(), QStringList banner = QStringList(),
-                            QStringList screenshot = QStringList());
+    void StartVideoImageSet(VideoMetadata *metadata);
 
     void SavePosition(void);
 
@@ -206,8 +201,7 @@ class VideoDialog : public MythScreenType
     MythUIStateType  *m_watchedState;
     MythUIStateType  *m_studioState;
 
-    MetadataDownload *m_query;
-    MetadataImageDownload *m_imageDownload;
+    MetadataFactory *m_metadataFactory;
 
     class VideoDialogPrivate *m_d;
 };

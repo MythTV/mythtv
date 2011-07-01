@@ -79,9 +79,6 @@ class VideoScannerThread : public QThread
         m_DBDataChanged(false)
     {
         m_dbmetadata = new VideoMetadataListManager;
-        VideoMetadataListManager::metadata_list ml;
-        VideoMetadataListManager::loadAllFromDatabase(ml);
-        m_dbmetadata->setList(ml);
         m_HasGUI = gCoreContext->HasGUI();
         m_ListUnknown = gCoreContext->GetNumSetting("VideoListUnknownFiletypes", 0);
     }
@@ -94,6 +91,11 @@ class VideoScannerThread : public QThread
     void run()
     {
         threadRegister("VideoScanner");
+
+        VideoMetadataListManager::metadata_list ml;
+        VideoMetadataListManager::loadAllFromDatabase(ml);
+        m_dbmetadata->setList(ml);
+
         QList<QByteArray> image_types = QImageReader::supportedImageFormats();
         QStringList imageExtensions;
         for (QList<QByteArray>::const_iterator p = image_types.begin();
