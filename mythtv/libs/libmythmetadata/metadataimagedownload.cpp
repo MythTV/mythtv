@@ -1,13 +1,9 @@
 // qt
 #include <QCoreApplication>
-#include <QTimer>
 #include <QImage>
 #include <QFileInfo>
 #include <QDir>
 #include <QEvent>
-#include <QImage>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
 
 // myth
 #include "mythcorecontext.h"
