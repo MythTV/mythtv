@@ -102,6 +102,17 @@ void MetadataFactory::Lookup(VideoMetadata *metadata, bool automatic,
         m_lookupthread->addLookup(lookup);
 }
 
+void MetadataFactory::Lookup(MetadataLookup *lookup)
+{
+    if (!lookup)
+        return;
+
+    if (m_lookupthread->isRunning())
+        m_lookupthread->prependLookup(lookup);
+    else
+        m_lookupthread->addLookup(lookup);
+}
+
 void MetadataFactory::OnMultiResult(MetadataLookupList list)
 {
     if (!list.size())

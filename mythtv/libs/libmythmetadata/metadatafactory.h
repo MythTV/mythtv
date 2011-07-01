@@ -59,6 +59,7 @@ class META_PUBLIC MetadataFactory : public QObject
            bool getimages = true);
     void Lookup(VideoMetadata *metadata, bool automatic = true,
            bool getimages = true);
+    void Lookup(MetadataLookup *lookup);
 
     bool IsRunning() { return m_lookupthread->isRunning() ||
                               m_imagedownload->isRunning(); };
