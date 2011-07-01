@@ -60,6 +60,7 @@ void MetadataFactory::Lookup(ProgramInfo *pginfo, bool automatic,
     lookup->SetData(qVariantFromValue(pginfo));
     lookup->SetAutomatic(automatic);
     lookup->SetHandleImages(getimages);
+    lookup->SetHost(pginfo->GetHostname());
     lookup->SetTitle(pginfo->GetTitle());
     lookup->SetSubtitle(pginfo->GetSubtitle());
 
@@ -81,6 +82,7 @@ void MetadataFactory::Lookup(VideoMetadata *metadata, bool automatic,
     lookup->SetData(qVariantFromValue(metadata));
     lookup->SetAutomatic(automatic);
     lookup->SetHandleImages(getimages);
+    lookup->SetHost(metadata->GetHost());
     lookup->SetTitle(metadata->GetTitle());
     lookup->SetSubtitle(metadata->GetSubtitle());
     lookup->SetSeason(metadata->GetSeason());
