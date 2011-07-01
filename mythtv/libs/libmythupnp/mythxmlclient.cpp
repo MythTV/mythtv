@@ -76,19 +76,19 @@ UPnPResultCode MythXMLClient::GetConnectionInfo( const QString &sPin, DatabasePa
     {
         QDomNode dbNode = oNode.namedItem( "Database" );
 
-        pParams->dbHostName     = GetNodeValue( dbNode, "Host"     , QString( ));
-        pParams->dbPort         = GetNodeValue( dbNode, "Port"     , 0         );
-        pParams->dbUserName     = GetNodeValue( dbNode, "UserName" , QString( ));
-        pParams->dbPassword     = GetNodeValue( dbNode, "Password" , QString( ));
-        pParams->dbName         = GetNodeValue( dbNode, "Name"     , QString( ));
-        pParams->dbType         = GetNodeValue( dbNode, "Type"     , QString( ));
+        pParams->dbHostName   = GetNodeValue( dbNode, "Host"     , QString());
+        pParams->dbPort       = GetNodeValue( dbNode, "Port"     , 0        );
+        pParams->dbUserName   = GetNodeValue( dbNode, "UserName" , QString());
+        pParams->dbPassword   = GetNodeValue( dbNode, "Password" , QString());
+        pParams->dbName       = GetNodeValue( dbNode, "Name"     , QString());
+        pParams->dbType       = GetNodeValue( dbNode, "Type"     , QString());
 
         QDomNode wolNode = oNode.namedItem( "WOL" );
 
-        pParams->wolEnabled     = GetNodeValue( wolNode, "Enabled"  , false     );
-        pParams->wolReconnect   = GetNodeValue( wolNode, "Reconnect", 0         );
-        pParams->wolRetry       = GetNodeValue( wolNode, "Retry"    , 0         );
-        pParams->wolCommand     = GetNodeValue( wolNode, "Command"  , QString( ));
+        pParams->wolEnabled   = GetNodeValue( wolNode, "Enabled"  , false    );
+        pParams->wolReconnect = GetNodeValue( wolNode, "Reconnect", 0        );
+        pParams->wolRetry     = GetNodeValue( wolNode, "Retry"    , 0        );
+        pParams->wolCommand   = GetNodeValue( wolNode, "Command"  , QString());
 
         return UPnPResult_Success;
     }
@@ -96,9 +96,9 @@ UPnPResultCode MythXMLClient::GetConnectionInfo( const QString &sPin, DatabasePa
     {
         sMsg = sErrDesc;
 
-        VERBOSE( VB_IMPORTANT, QString( "MythXMLClient::GetConnectionInfo Failed - (%1) %2" )
-                             .arg( nErrCode )
-                             .arg( sErrDesc ));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MythXMLClient::GetConnectionInfo Failed - (%1) %2")
+                .arg(nErrCode) .arg(sErrDesc));
     }
 
     if (( nErrCode == UPnPResult_HumanInterventionRequired ) || 

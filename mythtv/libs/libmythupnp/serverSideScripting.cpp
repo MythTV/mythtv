@@ -149,10 +149,11 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
 
             if ( m_engine.hasUncaughtException() )
             {
-                VERBOSE( VB_IMPORTANT, QString( "Error Loading QSP File: %1 - (%2)%3" )
-                                          .arg( sFileName )
-                                          .arg( m_engine.uncaughtExceptionLineNumber() )
-                                          .arg( m_engine.uncaughtException().toString() ));
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("Error Loading QSP File: %1 - (%2)%3")
+                        .arg(sFileName)
+                        .arg(m_engine.uncaughtExceptionLineNumber())
+                        .arg(m_engine.uncaughtException().toString()));
 
                 return false;
             }
@@ -184,17 +185,17 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
 
         if (m_engine.hasUncaughtException())
         {
-            VERBOSE( VB_IMPORTANT, QString( "Error calling QSP File: %1 - %2" )
-                                      .arg( sFileName )
-                                      .arg( m_engine.uncaughtException().toString() ));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Error calling QSP File: %1 - %2")
+                    .arg(sFileName)
+                    .arg(m_engine.uncaughtException().toString()));
             return false;
         }
-
     }
-    catch( ... )
+    catch(...)
     {
-        VERBOSE( VB_IMPORTANT, QString( "Exception while evaluating QSP File: %1" )
-                                  .arg( sFileName ));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Exception while evaluating QSP File: %1") .arg(sFileName));
 
         return false;
     }
@@ -233,10 +234,10 @@ QString ServerSideScripting::CreateMethodFromFile( const QString &sFileName )
     
         sCode << "})";
     }
-    catch( ... )
+    catch(...)
     {
-        VERBOSE( VB_IMPORTANT, QString( "Exception while reading QSP File: %1" )
-                                  .arg( sFileName ));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Exception while reading QSP File: %1") .arg(sFileName));
     }
 
     scriptFile.close();
@@ -346,7 +347,8 @@ bool ServerSideScripting::ProcessLine( QTextStream &sCode,
                 // Add Code
     
                 if (sSegment.startsWith( "=" ))
-                    sCode << "os.write( " << sSegment.mid( 1 ) << " ); " << "\n";
+                    sCode << "os.write( " << sSegment.mid( 1 ) << " ); "
+                          << "\n";
                 else
                     sCode << sSegment << "\n";
 

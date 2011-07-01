@@ -130,18 +130,32 @@ bool UPnpCMGR::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest 
 
         if ( pRequest->m_sBaseUrl != m_sControlUrl )
         {
-//            VERBOSE( VB_UPNP, QString("UPnpCMGR::ProcessRequest - BaseUrl (%1) not ours...").arg(pRequest->m_sBaseUrl ));
+#if 0
+            LOG(VB_UPNP, LOG_DEBUG,
+                QString("UPnpCMGR::ProcessRequest - BaseUrl (%1) not ours...")
+                    .arg(pRequest->m_sBaseUrl));
+#endif
             return false;
         }
 
-        VERBOSE( VB_UPNP, QString("UPnpCMGR::ProcessRequest - Method (%1)").arg(pRequest->m_sMethod ));
+        LOG(VB_UPNP, LOG_INFO, 
+            QString("UPnpCMGR::ProcessRequest - Method (%1)")
+                .arg(pRequest->m_sMethod));
 
         switch( GetMethod( pRequest->m_sMethod ) )
         {
-            case CMGRM_GetServiceDescription   : pRequest->FormatFileResponse  ( m_sServiceDescFileName ); break;
-            case CMGRM_GetProtocolInfo         : HandleGetProtocolInfo         ( pRequest ); break;
-            case CMGRM_GetCurrentConnectionInfo: HandleGetCurrentConnectionInfo( pRequest ); break;
-            case CMGRM_GetCurrentConnectionIDs : HandleGetCurrentConnectionIDs ( pRequest ); break;
+            case CMGRM_GetServiceDescription   :
+                pRequest->FormatFileResponse( m_sServiceDescFileName );
+                break;
+            case CMGRM_GetProtocolInfo         :
+                HandleGetProtocolInfo( pRequest );
+                break;
+            case CMGRM_GetCurrentConnectionInfo:
+                HandleGetCurrentConnectionInfo( pRequest );
+                break;
+            case CMGRM_GetCurrentConnectionIDs :
+                HandleGetCurrentConnectionIDs ( pRequest );
+                break;
             default:
                 UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidAction );
                 break;
@@ -178,7 +192,8 @@ void UPnpCMGR::HandleGetCurrentConnectionInfo( HTTPRequest *pRequest )
 
     if ( nId != 0)
     {
-        UPnp::FormatErrorResponse( pRequest, UPnPResult_CMGR_InvalidConnectionRef );
+        UPnp::FormatErrorResponse( pRequest,
+                                   UPnPResult_CMGR_InvalidConnectionRef );
         return;
     }
 

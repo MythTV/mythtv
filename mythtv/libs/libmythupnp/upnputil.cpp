@@ -58,15 +58,15 @@ QString LookupUDN( QString sDeviceType )
 
     if (sList.size() <= 2) 
     { 
-        VERBOSE(VB_IMPORTANT, sLoc + "- bad device type '" +
-                              sDeviceType + "', not enough tokens"); 
+        LOG(VB_GENERAL, LOG_ERR, sLoc + "- bad device type '" +
+                                 sDeviceType + "', not enough tokens"); 
         return QString();
     }
 
     sName = "UPnP/UDN/" + sList[ sList.size() - 2 ];
     sUDN  = UPnp::GetConfiguration()->GetValue( sName, "" );
 
-    VERBOSE(VB_UPNP, sLoc + " sName=" + sName + ", sUDN=" + sUDN);
+    LOG(VB_UPNP, LOG_INFO, sLoc + " sName=" + sName + ", sUDN=" + sUDN);
 
     if ( sUDN.length() == 0) 
     {
@@ -98,7 +98,7 @@ long GetIPAddressList(QStringList &sStrList)
 
     if (getifaddrs(&list) == -1)
     {
-        VERBOSE(VB_UPNP, (LOC + "getifaddrs failed: %1").arg(strerror(errno)));
+        LOG(VB_UPNP, LOG_ERR, "getifaddrs failed: " + ENO);
         return 0;
     }
 
@@ -120,14 +120,13 @@ long GetIPAddressList(QStringList &sStrList)
                       &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr,
                       address, sizeof(address)) == NULL)
         {
-            VERBOSE(VB_UPNP, (LOC + "inet_ntop failed: %1")
-                             .arg(strerror(errno)));
+            LOG(VB_UPNP, LOG_ERR, "inet_ntop failed: " + ENO);
             continue;
         }
 
         sStrList.append(address);
-        VERBOSE(VB_UPNP+VB_EXTRA, (LOC + "Added %1 as %2")
-                                  .arg(ifa->ifa_name).arg(address));
+        LOG(VB_UPNP, LOG_DEBUG, QString("Added %1 as %2")
+                                    .arg(ifa->ifa_name).arg(address));
     }
 
     freeifaddrs(list);
@@ -143,10 +142,9 @@ long GetIPAddressList(QStringList &sStrList)
 long GetIPAddressList( QStringList &sStrList )
 {
 #ifdef USING_MINGW
-    VERBOSE(VB_UPNP, QString("GetIPAddressList() not implemented in MinGW"));
+    LOG(VB_UPNP, LOG_CRIT, "GetIPAddressList() not implemented in MinGW");
     return 0;
 #else
-
     sStrList.clear();
 
     MSocketDevice socket( MSocketDevice::Datagram );

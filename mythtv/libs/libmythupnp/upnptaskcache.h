@@ -53,8 +53,8 @@ class SSDPCacheTask : public Task
         SSDPCacheTask()
         {
             m_nExecuteCount = 0;
-            m_nInterval     = UPnp::GetConfiguration()->GetValue( "UPnP/SSDP/CacheInterval", 30 ) * 1000;
-
+            m_nInterval     = 1000 *
+              UPnp::GetConfiguration()->GetValue("UPnP/SSDP/CacheInterval", 30);
         }
 
         virtual QString Name   ()
@@ -69,7 +69,9 @@ class SSDPCacheTask : public Task
             int nCount = SSDPCache::Instance()->RemoveStale();
 
             if (nCount > 0)
-                VERBOSE( VB_UPNP, QString( "SSDPCacheTask - Removed %1 stale entries." ).arg( nCount ));
+                LOG(VB_UPNP, LOG_INFO,
+                    QString("SSDPCacheTask - Removed %1 stale entries.")
+                        .arg(nCount));
 
             if ((m_nExecuteCount % 60) == 0)
                 SSDPCache::Instance()->Dump();

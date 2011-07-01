@@ -74,7 +74,7 @@ SSDP::SSDP() :
     m_bTermRequested       ( false ),
     m_lock                 ( QMutex::NonRecursive )
 {
-    VERBOSE(VB_UPNP, "SSDP::ctor - Starting up SSDP Thread..." );
+    LOG(VB_UPNP, LOG_NOTICE, "Starting up SSDP Thread..." );
 
     Configuration *pConfig = UPnp::GetConfiguration();
 
@@ -104,7 +104,7 @@ SSDP::SSDP() :
 
     start();
 
-    VERBOSE(VB_UPNP, "SSDP::ctor - SSDP Thread Starting soon" );
+    LOG(VB_UPNP, LOG_INFO, "SSDP Thread Starting soon" );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -113,7 +113,7 @@ SSDP::SSDP() :
 
 SSDP::~SSDP()
 {
-    VERBOSE(VB_UPNP, "SSDP::Destructor - Shutting Down SSDP Thread..." );
+    LOG(VB_UPNP, LOG_CRIT, "Shutting Down SSDP Thread..." );
 
     DisableNotifications();
 
@@ -134,7 +134,7 @@ SSDP::~SSDP()
     QMutexLocker locker(&g_pSSDPCreationLock);
     g_pSSDP = NULL;
 
-    VERBOSE(VB_UPNP, "SSDP::Destructor - SSDP Thread Terminated." );
+    LOG(VB_UPNP, LOG_INFO, "SSDP Thread Terminated." );
 
 }
 
@@ -148,7 +148,8 @@ void SSDP::EnableNotifications( int nServicePort )
     {
         m_nServicePort = nServicePort;
 
-        VERBOSE(VB_UPNP, "SSDP::EnableNotifications() - creating new task");
+        LOG(VB_UPNP, LOG_INFO,
+            "SSDP::EnableNotifications() - creating new task");
         m_pNotifyTask = new UPnpNotifyTask( m_nServicePort ); 
 
         // ------------------------------------------------------------------
@@ -161,7 +162,8 @@ void SSDP::EnableNotifications( int nServicePort )
         // First Send out Notification that we are leaving the network.
         // ------------------------------------------------------------------
 
-        VERBOSE(VB_UPNP, "SSDP::EnableNotifications() - sending NTS_byebye");
+        LOG(VB_UPNP, LOG_INFO,
+            "SSDP::EnableNotifications() - sending NTS_byebye");
         m_pNotifyTask->SetNTS( NTS_byebye );
         m_pNotifyTask->Execute( NULL );
 
@@ -172,13 +174,14 @@ void SSDP::EnableNotifications( int nServicePort )
     // Add Announcement Task to the Queue
     // ------------------------------------------------------------------
 
-    VERBOSE(VB_UPNP, "SSDP::EnableNotifications() - sending NTS_alive");
+    LOG(VB_UPNP, LOG_INFO, "SSDP::EnableNotifications() - sending NTS_alive");
 
     m_pNotifyTask->SetNTS( NTS_alive );
 
-    TaskQueue::Instance()->AddTask( m_pNotifyTask  );
+    TaskQueue::Instance()->AddTask(m_pNotifyTask);
 
-    VERBOSE(VB_UPNP, "SSDP::EnableNotifications() - Task added to UPnP queue");
+    LOG(VB_UPNP, LOG_INFO,
+        "SSDP::EnableNotifications() - Task added to UPnP queue");
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -204,13 +207,12 @@ void SSDP::DisableNotifications()
 void SSDP::PerformSearch(const QString &sST, uint timeout_secs)
 {
     timeout_secs = std::max(std::min(timeout_secs, 5U), 1U);
-    QString rRequest = QString(
-        "M-SEARCH * HTTP/1.1\r\n"
-        "HOST: 239.255.255.250:1900\r\n"
-        "MAN: \"ssdp:discover\"\r\n"
-        "MX: %1\r\n"
-        "ST: %2\r\n"
-        "\r\n")
+    QString rRequest = QString("M-SEARCH * HTTP/1.1\r\n"
+                               "HOST: 239.255.255.250:1900\r\n"
+                               "MAN: \"ssdp:discover\"\r\n"
+                               "MX: %1\r\n"
+                               "ST: %2\r\n"
+                               "\r\n")
         .arg(timeout_secs).arg(sST);
 
     VERBOSE(VB_UPNP, QString("\n\n%1\n").arg(rRequest));
@@ -231,16 +233,15 @@ void SSDP::PerformSearch(const QString &sST, uint timeout_secs)
 
     if ( pSocket->writeBlock( sRequest.data(),
                               sRequest.size(), address, SSDP_PORT ) != nSize)
-        VERBOSE(VB_GENERAL, "SSDP::PerformSearch - did not write entire "
-                            "buffer.");
+        LOG(VB_GENERAL, LOG_INFO,
+            "SSDP::PerformSearch - did not write entire buffer.");
 
     usleep( rand() % 250000 );
 
     if ( pSocket->writeBlock( sRequest.data(),
                               sRequest.size(), address, SSDP_PORT ) != nSize)
-        VERBOSE(VB_GENERAL, "SSDP::PerformSearch - did not write entire "
-                            "buffer.");
-
+        LOG(VB_GENERAL, LOG_INFO,
+            "SSDP::PerformSearch - did not write entire buffer.");
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -253,7 +254,7 @@ void SSDP::run()
     struct timeval  timeout;
 
     threadRegister("SSDP");
-    VERBOSE(VB_UPNP, "SSDP::Run - SSDP Thread Started." );
+    LOG(VB_UPNP, LOG_INFO, "SSDP::Run - SSDP Thread Started." );
 
     // ----------------------------------------------------------------------
     // Listen for new Requests
@@ -275,34 +276,30 @@ void SSDP::run()
 #if 0
                 if (m_Sockets[ nIdx ]->bytesAvailable() > 0)
                 {
-	            VERBOSE(VB_IMPORTANT, QString("Found Extra data before "
-                            "select: %1").arg(nIdx));
+	            LOG(VB_GENERAL, LOG_DEBUG,
+                        QString("Found Extra data before select: %1")
+                            .arg(nIdx));
                     ProcessData( m_Sockets[ nIdx ] );
                 }
 #endif
-
             }
         }
         
         timeout.tv_sec  = 1;
         timeout.tv_usec = 0;
 
-        if ( select( nMaxSocket + 1, &read_set, NULL, NULL, &timeout ) != -1)
+        int count;
+        count = select(nMaxSocket + 1, &read_set, NULL, NULL, &timeout);
+        for (int nIdx = 0; count && nIdx < (int)NumberOfSockets; nIdx++ )
         {
-            for (int nIdx = 0; nIdx < (int)NumberOfSockets; nIdx++ )
-            {
-                if (m_Sockets[nIdx] != NULL && m_Sockets[nIdx]->socket() >= 0)
-                {
-                    if (FD_ISSET( m_Sockets[ nIdx ]->socket(), &read_set ))
-                    {
+            if (m_Sockets[nIdx] != NULL && m_Sockets[nIdx]->socket() >= 0 &&
+                FD_ISSET(m_Sockets[nIdx]->socket(), &read_set))
+	    {
 #if 0
-                        VERBOSE(VB_IMPORTANT, QString("FD_ISSET( %1 )")
-                            .arg(nIdx));
+                VERBOSE(VB_IMPORTANT, QString("FD_ISSET( %1 )") .arg(nIdx));
 #endif
-
-                        ProcessData( m_Sockets[ nIdx ] );
-                    }
-                }
+                ProcessData(m_Sockets[nIdx]);
+                count--;
             }
         }
     }
@@ -339,9 +336,8 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
         // Parse request Type
         // ------------------------------------------------------------------
 
-        VERBOSE(VB_UPNP+VB_EXTRA,
-                QString( "SSDP::ProcessData - requestLine: %1" )
-                .arg( sRequestLine ));
+        LOG(VB_UPNP, LOG_DEBUG, QString("SSDP::ProcessData - requestLine: %1")
+                .arg(sRequestLine));
 
         SSDPRequestType eType = ProcessRequestLine( sRequestLine );
 
@@ -364,7 +360,9 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
                 headers.insert( sName.toLower(), sValue.trimmed() );
         }
 
-//        pSocket->SetDestAddress( peerAddress, peerPort );
+#if 0
+        pSocket->SetDestAddress( peerAddress, peerPort );
+#endif
 
         // --------------------------------------------------------------
         // See if this is a valid request
@@ -395,11 +393,11 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
 
             case SSDP_Unknown:
             default:
-                VERBOSE(VB_UPNP, "SSPD::ProcessData - Unknown request Type.");
+                LOG(VB_UPNP, LOG_ERR,
+                    "SSPD::ProcessData - Unknown request Type.");
                 break;
         }
     }
-
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -459,17 +457,18 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
     QString sMX  = GetHeaderValue( sHeaders, "MX" , "" );
     int     nMX  = 0;
 
-    VERBOSE( VB_UPNP+VB_EXTRA,
-             QString( "SSDP::ProcessSearchrequest : [%1] MX=%2" )
-             .arg( sST ).arg( sMX ));
+    LOG(VB_UPNP, LOG_DEBUG, QString("SSDP::ProcessSearchrequest : [%1] MX=%2")
+             .arg(sST).arg(sMX));
 
     // ----------------------------------------------------------------------
     // Validate Header Values...
     // ----------------------------------------------------------------------
 
-//    if ( pRequest->m_sMethod   != "*"                 ) return false;
-//    if ( pRequest->m_sProtocol != "HTTP"              ) return false;
-//    if ( pRequest->m_nMajor    != 1                   ) return false;
+#if 0
+    if ( pRequest->m_sMethod   != "*"                 ) return false;
+    if ( pRequest->m_sProtocol != "HTTP"              ) return false;
+    if ( pRequest->m_nMajor    != 1                   ) return false;
+#endif
     if ( sMAN                  != "\"ssdp:discover\"" ) return false;
     if ( sST.length()          == 0                   ) return false;
     if ( sMX.length()          == 0                   ) return false;
@@ -494,9 +493,11 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
             peerAddress, peerPort, sST, 
             UPnp::g_UPnpDeviceDesc.m_rootDevice.GetUDN());
 
+#if 0
         // Excute task now for fastest response, queue for time-delayed response
         // -=>TODO: To be trully uPnp compliant, this Execute should be removed.
-        //pTask->Execute( NULL );
+        pTask->Execute( NULL );
+#endif
 
         TaskQueue::Instance()->AddTask( nNewMX, pTask );
 
@@ -541,12 +542,12 @@ bool SSDP::ProcessSearchResponse( const QStringMap &headers )
     QString sUSN     = GetHeaderValue( headers, "USN"           , "" );
     QString sCache   = GetHeaderValue( headers, "CACHE-CONTROL" , "" );
 
-    VERBOSE( VB_UPNP+VB_EXTRA,
-             QString( "SSDP::ProcessSearchResponse ...\n"
-                      "DescURL=%1\n"
-                      "ST     =%2\n"
-                      "USN    =%3\n"
-                      "Cache  =%4")
+    LOG(VB_UPNP, LOG_DEBUG,
+        QString( "SSDP::ProcessSearchResponse ...\n"
+                 "DescURL=%1\n"
+                 "ST     =%2\n"
+                 "USN    =%3\n"
+                 "Cache  =%4")
              .arg(sDescURL).arg(sST).arg(sUSN).arg(sCache));
 
     int nPos = sCache.indexOf("max-age", 0, Qt::CaseInsensitive);
@@ -576,15 +577,14 @@ bool SSDP::ProcessNotify( const QStringMap &headers )
     QString sUSN     = GetHeaderValue( headers, "USN"           , "" );
     QString sCache   = GetHeaderValue( headers, "CACHE-CONTROL" , "" );
 
-    VERBOSE( VB_UPNP+VB_EXTRA,
-             QString( "SSDP::ProcessNotify ...\n"
-                      "DescURL=%1\n"
-                      "NTS    =%2\n"
-                      "NT     =%3\n"
-                      "USN    =%4\n"
-                      "Cache  =%5" )
-             .arg(sDescURL).arg(sNTS).arg(sNT).arg(sUSN).arg(sCache));
-
+    LOG(VB_UPNP, LOG_DEBUG,
+        QString( "SSDP::ProcessNotify ...\n"
+                 "DescURL=%1\n"
+                 "NTS    =%2\n"
+                 "NT     =%3\n"
+                 "USN    =%4\n"
+                 "Cache  =%5" )
+            .arg(sDescURL).arg(sNTS).arg(sNT).arg(sUSN).arg(sCache));
 
     if (sNTS.contains( "ssdp:alive"))
     {
@@ -699,11 +699,10 @@ void SSDPExtension::GetDeviceDesc( HTTPRequest *pRequest )
 
     QString sUserAgent = pRequest->GetHeaderValue( "User-Agent", "" );
 
-    VERBOSE( VB_UPNP, "SSDPExtension::GetDeviceDesc - "
-                       + QString( "Host=%1 Port=%2 UserAgent=%3" )
-                         .arg( pRequest->GetHostAddress() )
-                         .arg( m_nServicePort )
-                         .arg( sUserAgent ));
+    LOG(VB_UPNP, LOG_DEBUG, "SSDPExtension::GetDeviceDesc - " +
+        QString( "Host=%1 Port=%2 UserAgent=%3" )
+            .arg(pRequest->GetHostAddress()) .arg(m_nServicePort)
+            .arg(sUserAgent));
 
     QTextStream stream( &(pRequest->m_response) );
 
@@ -726,8 +725,9 @@ void SSDPExtension::GetFile( HTTPRequest *pRequest, QString sFileName )
 
     if (QFile::exists( pRequest->m_sFileName ))
     {
-        VERBOSE( VB_UPNP, QString( "SSDPExtension::GetFile( %1 ) - Exists" )
-                             .arg( pRequest->m_sFileName ));
+        LOG(VB_UPNP, LOG_DEBUG,
+            QString("SSDPExtension::GetFile( %1 ) - Exists")
+                .arg(pRequest->m_sFileName));
 
         pRequest->m_eResponseType   = ResponseTypeFile;
         pRequest->m_nResponseStatus = 200;
@@ -736,8 +736,9 @@ void SSDPExtension::GetFile( HTTPRequest *pRequest, QString sFileName )
     }
     else
     {
-        VERBOSE( VB_UPNP, QString( "SSDPExtension::GetFile( %1 ) - Not Found" )
-                             .arg( pRequest->m_sFileName ));
+        LOG(VB_UPNP, LOG_ERR,
+            QString("SSDPExtension::GetFile( %1 ) - Not Found")
+                .arg(pRequest->m_sFileName));
     }
 
 }
@@ -748,7 +749,7 @@ void SSDPExtension::GetFile( HTTPRequest *pRequest, QString sFileName )
 
 void SSDPExtension::GetDeviceList( HTTPRequest *pRequest )
 {
-    VERBOSE(VB_UPNP, "SSDPExtension::GetDeviceList");
+    LOG(VB_UPNP, LOG_DEBUG, "SSDPExtension::GetDeviceList");
 
     QString     sXML;
     QTextStream os(&sXML, QIODevice::WriteOnly);

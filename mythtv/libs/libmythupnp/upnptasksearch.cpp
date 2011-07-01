@@ -99,11 +99,11 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
                               .arg( sUSN );
 
 #if 0
-    VERBOSE(VB_UPNP, QString("UPnpSearchTask::SendMsg : %1 : %2 ")
-                        .arg( sST  ) .arg( sUSN ));
+    LOG(VB_UPNP, LOG_DEBUG, QString("UPnpSearchTask::SendMsg : %1 : %2 ")
+                        .arg(sST) .arg(sUSN));
 
-    VERBOSE(VB_UPNP, QString("UPnpSearchTask::SendMsg    m_PeerAddress = %1"
-                             " Port=%2")
+    LOG(VB_UPNP, LOG_DEBUG,
+        QString("UPnpSearchTask::SendMsg    m_PeerAddress = %1 Port=%2")
                         .arg(m_PeerAddress.toString()) .arg(m_nPeerPort));
 #endif
 
@@ -130,11 +130,12 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
         // Send Packet to UDP Socket (Send same packet twice)
         // ------------------------------------------------------------------
 
-        pSocket->writeBlock( scPacket, scPacket.length(), m_PeerAddress, m_nPeerPort );
+        pSocket->writeBlock( scPacket, scPacket.length(), m_PeerAddress,
+                             m_nPeerPort );
         usleep( rand() % 250000 );
-        pSocket->writeBlock( scPacket, scPacket.length(), m_PeerAddress, m_nPeerPort );
+        pSocket->writeBlock( scPacket, scPacket.length(), m_PeerAddress,
+                             m_nPeerPort );
     }
-
 }
 
 /////////////////////////////////////////////////////////////////////////////

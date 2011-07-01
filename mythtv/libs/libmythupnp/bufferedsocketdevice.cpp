@@ -42,8 +42,9 @@ BufferedSocketDevice::BufferedSocketDevice( int nSocket  )
 
     struct linger ling = {1, 1};
 
-    if ( setsockopt( socket(), SOL_SOCKET, SO_LINGER, &ling, sizeof( ling )) < 0) 
-        VERBOSE(VB_IMPORTANT, QString( "BufferedSocketDevice: setsockopt - SO_LINGER Error" ));
+    if ( setsockopt(socket(), SOL_SOCKET, SO_LINGER, &ling, sizeof(ling)) < 0) 
+        LOG(VB_GENERAL, LOG_ERR, 
+            "BufferedSocketDevice: setsockopt - SO_LINGER: " + ENO);
 
     m_nDestPort          = 0;
 
@@ -214,7 +215,7 @@ int BufferedSocketDevice::ReadBytes()
         QString msg;
         for( long n = 0; n < a->count(); n++ )
             msg += QString("%1").arg(a->at(n));
-        VERBOSE(VB_GENERAL, msg);
+        LOG(VB_GENERAL, LOG_DEBUG, msg);
 #endif
 
         m_bufRead.append( a );
@@ -661,16 +662,17 @@ QString BufferedSocketDevice::ReadLine( int msecs )
 
         while ( !CanReadLine() && !bTimeout )
         {
-//            VERBOSE( VB_UPNP, "BufferedSocketDevice::ReadLine - Can't Read Line... Waiting for more." );
+#if 0
+            LOG(VB_UPNP, LOG_DEBUG, "Can't Read Line... Waiting for more." );
+#endif
 
             WaitForMore( msecs, &bTimeout );
 
             if ( timer.elapsed() >= msecs ) 
             {
                 bTimeout = true;
-                VERBOSE( VB_UPNP, "BufferedSocketDeviceRequest::ReadLine - Exceeded Total Elapsed Wait Time." );
+                LOG(VB_UPNP, LOG_INFO, "Exceeded Total Elapsed Wait Time." );
             }
-
         }
             
         if (CanReadLine())

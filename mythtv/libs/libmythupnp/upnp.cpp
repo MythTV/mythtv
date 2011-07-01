@@ -49,7 +49,7 @@ Configuration   *UPnp::g_pConfig        = NULL;
 UPnp::UPnp()
     : m_pHttpServer(NULL), m_nServicePort(0)
 {
-    VERBOSE( VB_UPNP, "UPnp - Constructor" );
+    LOG(VB_UPNP, LOG_DEBUG, "UPnp - Constructor");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -58,7 +58,7 @@ UPnp::UPnp()
 
 UPnp::~UPnp()
 {
-    VERBOSE( VB_UPNP, "UPnp - Destructor" );
+    LOG(VB_UPNP, LOG_DEBUG, "UPnp - Destructor");
     CleanUp();
 }
 
@@ -108,18 +108,19 @@ bool UPnp::Initialize( int nServicePort, HttpServer *pHttpServer )
 
 bool UPnp::Initialize( QStringList &sIPAddrList, int nServicePort, HttpServer *pHttpServer )
 {
-    VERBOSE(VB_UPNP, "UPnp::Initialize - Begin");
+    LOG(VB_UPNP, LOG_DEBUG, "UPnp::Initialize - Begin");
 
     if (g_pConfig == NULL)
     {
-        VERBOSE(VB_IMPORTANT, "UPnp::Initialize - Must call SetConfiguration.");
+        LOG(VB_GENERAL, LOG_ERR,
+            "UPnp::Initialize - Must call SetConfiguration.");
         return false;
     }
 
     if ((m_pHttpServer = pHttpServer) == NULL)
     {
-        VERBOSE(VB_IMPORTANT,
-                "UPnp::Initialize - Invalid Parameter (pHttpServer == NULL)");
+        LOG(VB_GENERAL, LOG_ERR,
+            "UPnp::Initialize - Invalid Parameter (pHttpServer == NULL)");
         return false;
     }
 
@@ -133,7 +134,7 @@ bool UPnp::Initialize( QStringList &sIPAddrList, int nServicePort, HttpServer *p
     m_pHttpServer->RegisterExtension(
             new SSDPExtension( m_nServicePort, m_pHttpServer->m_sSharePath));
 
-    VERBOSE(VB_UPNP, "UPnp::Initialize - End");
+    LOG(VB_UPNP, LOG_DEBUG, "UPnp::Initialize - End");
 
     return true;
 }
@@ -144,7 +145,7 @@ bool UPnp::Initialize( QStringList &sIPAddrList, int nServicePort, HttpServer *p
 
 void UPnp::Start()
 {
-    VERBOSE(VB_UPNP, "UPnp::Start - Enabling SSDP Notifications");
+    LOG(VB_UPNP, LOG_DEBUG, "UPnp::Start - Enabling SSDP Notifications");
     // ----------------------------------------------------------------------
     // Turn on Device Announcements 
     // (this will also create/startup SSDP if not already done)
@@ -152,7 +153,7 @@ void UPnp::Start()
 
     SSDP::Instance()->EnableNotifications( m_nServicePort );
 
-    VERBOSE(VB_UPNP, "UPnp::Start - Returning");
+    LOG(VB_UPNP, LOG_DEBUG, "UPnp::Start - Returning");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -161,7 +162,7 @@ void UPnp::Start()
 
 void UPnp::CleanUp()
 {
-    VERBOSE(VB_UPNP, "UPnp::CleanUp() - disabling SSDP notifications");
+    LOG(VB_UPNP, LOG_INFO, "UPnp::CleanUp() - disabling SSDP notifications");
 
     SSDP::Instance()->DisableNotifications();
 
@@ -276,7 +277,7 @@ void UPnp::FormatErrorResponse( HTTPRequest   *pRequest,
                                         sDetails );
     }
     else
-        VERBOSE( VB_IMPORTANT, "UPnp::FormatErrorResponse : Response not created - pRequest == NULL" );
+        LOG(VB_GENERAL, LOG_ERR, "Response not created - pRequest == NULL" );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -290,16 +291,14 @@ void UPnp::FormatRedirectResponse( HTTPRequest   *pRequest,
     pRequest->m_nResponseStatus   = 301;
 
     QStringList sItems = pRequest->m_sRawRequest.split( ' ' );
-
     QString sUrl = "http://" + pRequest->m_mapHeaders[ "host" ] + sItems[1];
-
     QUrl url( sUrl );
-
     url.setHost( hostName );
 
     pRequest->m_mapRespHeaders[ "Location" ] = url.toString();
 
-    VERBOSE( VB_UPNP, QString( "Sending http redirect to: %1").arg( url.toString() ) );
+    LOG(VB_UPNP, LOG_INFO, QString("Sending http redirect to: %1")
+                               .arg(url.toString()));
 
     pRequest->SendResponse();
 }

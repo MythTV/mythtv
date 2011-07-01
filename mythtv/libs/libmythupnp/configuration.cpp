@@ -63,21 +63,18 @@ bool XmlConfiguration::Load( void )
         QString sErrMsg;
         int     nErrLine = 0;
         int     nErrCol  = 0;
-        bool    bSuccess = m_config.setContent( &file, false, &sErrMsg, &nErrLine, &nErrCol );
+        bool    bSuccess = m_config.setContent(&file, false, &sErrMsg,
+                                               &nErrLine, &nErrCol );
 
         file.close();
 
         if (!bSuccess)
         {
-            VERBOSE(VB_IMPORTANT, QString("Configuration::Load - "
-                                          "Error parsing: %1 "
-                                          "at line: %2  column: %3")
-                                     .arg( sName )
-                                     .arg( nErrLine )
-                                     .arg( nErrCol  ));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Error parsing: %1 at line: %2  column: %3")
+                    .arg( sName ) .arg( nErrLine ) .arg( nErrCol  ));
 
-            VERBOSE(VB_IMPORTANT, QString("Configuration::Load - Error Msg: %1" )
-                                     .arg( sErrMsg ));
+            LOG(VB_GENERAL, LOG_ERR, QString("Error Msg: %1" ) .arg( sErrMsg ));
             return false;
         }
 
@@ -113,7 +110,8 @@ bool XmlConfiguration::Save( void )
         {
             if (!createDir.mkdir(m_sPath))
             {
-                VERBOSE(VB_IMPORTANT, QString("Could not create %1").arg( m_sPath ));
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("Could not create %1").arg(m_sPath));
                 return false;
             }
         }
@@ -121,8 +119,8 @@ bool XmlConfiguration::Save( void )
 
     if (!file.open( QIODevice::WriteOnly | QIODevice::Truncate ))
     {
-        VERBOSE(VB_IMPORTANT, QString("Could not open settings file %1 "
-                                      "for writing").arg( sName ));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Could not open settings file %1 for writing").arg(sName));
 
         return false;
     }

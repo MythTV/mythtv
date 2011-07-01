@@ -51,7 +51,7 @@ int DeviceLocation::g_nAllocated   = 0;       // Debugging only
 
 UPnpDeviceDesc::UPnpDeviceDesc()
 {
-    VERBOSE( VB_UPNP, "UPnpDeviceDesc - Constructor" );
+    LOG(VB_UPNP, LOG_INFO, "UPnpDeviceDesc - Constructor");
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -61,7 +61,9 @@ UPnpDeviceDesc::UPnpDeviceDesc()
 UPnpDeviceDesc::~UPnpDeviceDesc()
 {
     // FIXME: Using this causes crashes
-    //VERBOSE( VB_UPNP, "UPnpDeviceDesc - Destructor" );
+#if 0
+    LOG(VB_UPNP, LOG_INFO, "UPnpDeviceDesc - Destructor");
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -90,15 +92,13 @@ bool UPnpDeviceDesc::Load( const QString &sFileName )
 
     if (!bSuccess)
     {
-        VERBOSE(VB_IMPORTANT, QString("UPnpDeviceDesc::Load - "
-                                      "Error parsing: %1 "
-                                      "at line: %2  column: %3")
-                                .arg( sFileName )
-                                .arg( nErrLine )
-                                .arg( nErrCol  ));
-
-        VERBOSE(VB_IMPORTANT, QString("UPnpDeviceDesc::Load - Error Msg: %1" )
-                                .arg( sErrMsg ));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("UPnpDeviceDesc::Load - Error parsing: %1 "
+                    "at line: %2  column: %3")
+                .arg(sFileName) .arg(nErrLine)
+                                .arg(nErrCol));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("UPnpDeviceDesc::Load - Error Msg: %1" ) .arg(sErrMsg));
         return false;
     }
 
@@ -133,60 +133,57 @@ bool UPnpDeviceDesc::Load( const QDomDocument &xmlDevDesc )
 void UPnpDeviceDesc::_InternalLoad( QDomNode oNode, UPnpDevice *pCurDevice )
 {
     QString pin = GetMythDB()->GetSetting( "SecurityPin", "");
-    pCurDevice->m_securityPin = (pin.isEmpty() || pin == "0000") ?
-                                false : true;
+    pCurDevice->m_securityPin = !(pin.isEmpty() || pin == "0000");
 
     for ( oNode = oNode.firstChild();
-                 !oNode.isNull();
-                  oNode = oNode.nextSibling() )
+          !oNode.isNull();
+          oNode = oNode.nextSibling() )
     {
         QDomElement e = oNode.toElement();
 
-        if (!e.isNull())
+        if (e.isNull())
+            continue;
+
+        // TODO: make this table driven (using offset within structure)
+        if ( e.tagName() == "deviceType" )
+            SetStrValue( e, pCurDevice->m_sDeviceType);
+        else if ( e.tagName() == "friendlyName" )
+            SetStrValue( e, pCurDevice->m_sFriendlyName );
+        else if ( e.tagName() == "manufacturer" )
+            SetStrValue( e, pCurDevice->m_sManufacturer );
+        else if ( e.tagName() == "manufacturerURL" )
+            SetStrValue( e, pCurDevice->m_sManufacturerURL );
+        else if ( e.tagName() == "modelDescription" )
+            SetStrValue( e, pCurDevice->m_sModelDescription);
+        else if ( e.tagName() == "modelName" )
+            SetStrValue( e, pCurDevice->m_sModelName );
+        else if ( e.tagName() == "modelNumber" )
+            SetStrValue( e, pCurDevice->m_sModelNumber );
+        else if ( e.tagName() == "modelURL" )
+            SetStrValue( e, pCurDevice->m_sModelURL );
+        else if ( e.tagName() == "serialNumber" )
+            SetStrValue( e, pCurDevice->m_sSerialNumber );
+        else if ( e.tagName() == "UPC" )
+            SetStrValue( e, pCurDevice->m_sUPC );
+        else if ( e.tagName() == "presentationURL" )
+            SetStrValue( e, pCurDevice->m_sPresentationURL );
+        else if ( e.tagName() == "UDN" )
+            SetStrValue( e, pCurDevice->m_sUDN );
+        else if ( e.tagName() == "iconList" )
+            ProcessIconList( oNode, pCurDevice );
+        else if ( e.tagName() == "serviceList" )
+            ProcessServiceList( oNode, pCurDevice );
+        else if ( e.tagName() == "deviceList" )
+            ProcessDeviceList ( oNode, pCurDevice );
+        else if ( e.tagName() == "mythtv:X_secure" )
+            SetBoolValue( e, pCurDevice->m_securityPin );
+        else if ( e.tagName() == "mythtv:X_protocol" )
+            SetStrValue( e, pCurDevice->m_protocolVersion );
+        else
         {
-            if ( e.tagName() == "deviceType"       )
-            { SetStrValue( e, pCurDevice->m_sDeviceType      ); continue; }
-            if ( e.tagName() == "friendlyName"     )
-            { SetStrValue( e, pCurDevice->m_sFriendlyName    ); continue; }
-            if ( e.tagName() == "manufacturer"     )
-            { SetStrValue( e, pCurDevice->m_sManufacturer    ); continue; }
-            if ( e.tagName() == "manufacturerURL"  )
-            { SetStrValue( e, pCurDevice->m_sManufacturerURL ); continue; }
-            if ( e.tagName() == "modelDescription" )
-            { SetStrValue( e, pCurDevice->m_sModelDescription); continue; }
-            if ( e.tagName() == "modelName"        )
-            { SetStrValue( e, pCurDevice->m_sModelName       ); continue; }
-            if ( e.tagName() == "modelNumber"      )
-            { SetStrValue( e, pCurDevice->m_sModelNumber     ); continue; }
-            if ( e.tagName() == "modelURL"         )
-            { SetStrValue( e, pCurDevice->m_sModelURL        ); continue; }
-            if ( e.tagName() == "serialNumber"     )
-            { SetStrValue( e, pCurDevice->m_sSerialNumber    ); continue; }
-            if ( e.tagName() == "UPC"              )
-            { SetStrValue( e, pCurDevice->m_sUPC             ); continue; }
-            if ( e.tagName() == "presentationURL"  )
-            { SetStrValue( e, pCurDevice->m_sPresentationURL ); continue; }
-            if ( e.tagName() == "UDN"              )
-            { SetStrValue( e, pCurDevice->m_sUDN             ); continue; }
-
-            if ( e.tagName() == "iconList"         )
-            { ProcessIconList   ( oNode, pCurDevice ); continue; }
-            if ( e.tagName() == "serviceList"      )
-            { ProcessServiceList( oNode, pCurDevice ); continue; }
-            if ( e.tagName() == "deviceList"       )
-            { ProcessDeviceList ( oNode, pCurDevice ); continue; }
-
-            if ( e.tagName() == "mythtv:X_secure"  )
-            { SetBoolValue( e, pCurDevice->m_securityPin ); continue; }
-            if ( e.tagName() == "mythtv:X_protocol"  )
-            { SetStrValue( e, pCurDevice->m_protocolVersion ); continue; }
-
             // Not one of the expected element names... add to extra list.
-
             QString sValue = "";
-
             SetStrValue( e, sValue );
-
             pCurDevice->m_lstExtra.push_back(NameValue(e.tagName(), sValue));
         }
     }
@@ -199,24 +196,24 @@ void UPnpDeviceDesc::_InternalLoad( QDomNode oNode, UPnpDevice *pCurDevice )
 void UPnpDeviceDesc::ProcessIconList( QDomNode oListNode, UPnpDevice *pDevice )
 {
     for ( QDomNode oNode = oListNode.firstChild();
-                  !oNode.isNull();
-                   oNode = oNode.nextSibling() )
+          !oNode.isNull();
+          oNode = oNode.nextSibling() )
     {
         QDomElement e = oNode.toElement();
 
-        if (!e.isNull())
-        {
-            if ( e.tagName() == "icon" )
-            {
-                UPnpIcon *pIcon = new UPnpIcon();
-                pDevice->m_listIcons.append( pIcon );
+        if (e.isNull())
+            continue;
 
-                SetStrValue( e.namedItem( "mimetype" ), pIcon->m_sMimeType );
-                SetNumValue( e.namedItem( "width"    ), pIcon->m_nWidth    );
-                SetNumValue( e.namedItem( "height"   ), pIcon->m_nHeight   );
-                SetNumValue( e.namedItem( "depth"    ), pIcon->m_nDepth    );
-                SetStrValue( e.namedItem( "url"      ), pIcon->m_sURL      );
-            }
+        if ( e.tagName() == "icon" )
+        {
+            UPnpIcon *pIcon = new UPnpIcon();
+            pDevice->m_listIcons.append( pIcon );
+
+            SetStrValue( e.namedItem( "mimetype" ), pIcon->m_sMimeType );
+            SetNumValue( e.namedItem( "width"    ), pIcon->m_nWidth    );
+            SetNumValue( e.namedItem( "height"   ), pIcon->m_nHeight   );
+            SetNumValue( e.namedItem( "depth"    ), pIcon->m_nDepth    );
+            SetStrValue( e.namedItem( "url"      ), pIcon->m_sURL      );
         }
     }
 }
@@ -228,34 +225,29 @@ void UPnpDeviceDesc::ProcessIconList( QDomNode oListNode, UPnpDevice *pDevice )
 void UPnpDeviceDesc::ProcessServiceList( QDomNode oListNode, UPnpDevice *pDevice )
 {
     for ( QDomNode oNode = oListNode.firstChild();
-                  !oNode.isNull();
-                   oNode = oNode.nextSibling() )
+          !oNode.isNull();
+          oNode = oNode.nextSibling() )
     {
         QDomElement e = oNode.toElement();
 
-        if (!e.isNull())
+        if (e.isNull())
+            continue;
+
+        if ( e.tagName() == "service" )
         {
-            if ( e.tagName() == "service" )
-            {
-                UPnpService *pService = new UPnpService();
-                pDevice->m_listServices.append( pService );
+            UPnpService *pService = new UPnpService();
+            pDevice->m_listServices.append( pService );
 
-                SetStrValue( e.namedItem( "serviceType" ),
-                             pService->m_sServiceType     );
-                SetStrValue( e.namedItem( "serviceId"   ),
-                             pService->m_sServiceId       );
-                SetStrValue( e.namedItem( "SCPDURL"     ),
-                             pService->m_sSCPDURL         );
-                SetStrValue( e.namedItem( "controlURL"  ),
-                             pService->m_sControlURL      );
-                SetStrValue( e.namedItem( "eventSubURL" ),
-                             pService->m_sEventSubURL     );
+            SetStrValue(e.namedItem( "serviceType" ), pService->m_sServiceType);
+            SetStrValue(e.namedItem( "serviceId" ),   pService->m_sServiceId);
+            SetStrValue(e.namedItem( "SCPDURL" ),     pService->m_sSCPDURL);
+            SetStrValue(e.namedItem( "controlURL" ),  pService->m_sControlURL);
+            SetStrValue(e.namedItem( "eventSubURL" ), pService->m_sEventSubURL);
 
-                VERBOSE(VB_UPNP,
-                        QString("ProcessServiceList adding service : %1 : %2 :")
-                        .arg(pService->m_sServiceType)
-                        .arg(pService->m_sServiceId ));
-            }
+            LOG(VB_UPNP, LOG_INFO,
+                QString("ProcessServiceList adding service : %1 : %2 :")
+                    .arg(pService->m_sServiceType)
+                    .arg(pService->m_sServiceId));
         }
     }
 }
@@ -268,20 +260,19 @@ void UPnpDeviceDesc::ProcessDeviceList( QDomNode    oListNode,
                                         UPnpDevice *pDevice )
 {
     for ( QDomNode oNode = oListNode.firstChild();
-                  !oNode.isNull();
-                   oNode = oNode.nextSibling() )
+          !oNode.isNull();
+          oNode = oNode.nextSibling() )
     {
         QDomElement e = oNode.toElement();
 
-        if (!e.isNull())
-        {
-            if ( e.tagName() == "device")
-            {
-                UPnpDevice *pNewDevice = new UPnpDevice();
-                pDevice->m_listDevices.append( pNewDevice );
+        if (e.isNull())
+            continue;
 
-                _InternalLoad( e, pNewDevice );
-            }
+        if ( e.tagName() == "device")
+        {
+            UPnpDevice *pNewDevice = new UPnpDevice();
+            pDevice->m_listDevices.append( pNewDevice );
+            _InternalLoad( e, pNewDevice );
         }
     }
 }
@@ -348,7 +339,9 @@ void UPnpDeviceDesc::GetValidXML(
     const QString &sBaseAddress, int nPort,
     QTextStream &os, const QString &sUserAgent )
 {
-//    os.setEncoding( QTextStream::UnicodeUTF8 );
+#if 0
+    os.setEncoding( QTextStream::UnicodeUTF8 );
+#endif
 
     QString BaseAddr;
     QHostAddress addr(sBaseAddress);
@@ -356,7 +349,8 @@ void UPnpDeviceDesc::GetValidXML(
     BaseAddr = sBaseAddress;
 
 #if !defined(QT_NO_IPV6)
-    // Basically if it appears to be an IPv6 IP surround the IP with [] otherwise don't bother
+    // Basically if it appears to be an IPv6 IP surround the IP with []
+    //  otherwise don't bother
     if (sBaseAddress.contains(":"))
         BaseAddr = "[" + sBaseAddress + "]";
 #endif
@@ -412,8 +406,8 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     // ----------------------------------------------------------------------
 
     bool bIsXbox360 =
-        sUserAgent.startsWith(QString("Xbox/2.0"), Qt::CaseInsensitive) ||
-        sUserAgent.startsWith( QString("Mozilla/4.0"), Qt::CaseInsensitive);
+        sUserAgent.startsWith(QString("Xbox/2.0"),    Qt::CaseInsensitive) ||
+        sUserAgent.startsWith(QString("Mozilla/4.0"), Qt::CaseInsensitive);
 
     os << FormatValue( "manufacturer" , pDevice->m_sManufacturer    );
     os << FormatValue( "modelURL"     , pDevice->m_sModelURL        );
@@ -436,7 +430,8 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     os << FormatValue( "presentationURL"  , pDevice->m_sPresentationURL );
 
     // MythTV Custom information
-    os << FormatValue( "mythtv:X_secure" , pDevice->m_securityPin ? "true" : "false");
+    os << FormatValue( "mythtv:X_secure" ,
+                       pDevice->m_securityPin ? "true" : "false");
     os << FormatValue( "mythtv:X_protocol", pDevice->m_protocolVersion );
 
     NameValues::const_iterator nit = pDevice->m_lstExtra.begin();
@@ -466,7 +461,6 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
         UPnpIconList::const_iterator it = pDevice->m_listIcons.begin();
         for (; it != pDevice->m_listIcons.end(); ++it)
         {
-
             os << "<icon>\n";
             os << FormatValue( "mimetype", (*it)->m_sMimeType );
             os << FormatValue( "width"   , (*it)->m_nWidth    );
@@ -499,7 +493,9 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
         //          Need to find out real fix and remove this code.
         // ------------------------------------------------------------------
 
-        //bool bDSM = sUserAgent.startsWith( "INTEL_NMPR/2.1 DLNADOC/1.00", false );
+#if 0
+        bool bDSM = sUserAgent.startsWith("INTEL_NMPR/2.1 DLNADOC/1.00", false);
+#endif
 
         os << "<serviceList>\n";
 
@@ -554,12 +550,13 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString UPnpDeviceDesc::FormatValue( const QString &sName, const QString &sValue )
+QString UPnpDeviceDesc::FormatValue( const QString &sName,
+                                     const QString &sValue )
 {
     QString sStr;
 
     if (sValue.length() > 0)
-        sStr = QString( "<%1>%2</%3>\n" ).arg( sName ).arg(sValue).arg( sName );
+        sStr = QString("<%1>%2</%1>\n") .arg(sName) .arg(sValue);
 
     return( sStr );
 }
@@ -568,7 +565,7 @@ QString UPnpDeviceDesc::FormatValue( const QString &sName, const QString &sValue
 
 QString UPnpDeviceDesc::FormatValue( const QString &sName, int nValue )
 {
-    return( QString( "<%1>%2</%1>\n" ).arg( sName ).arg(nValue) );
+    return( QString("<%1>%2</%1>\n") .arg(sName) .arg(nValue) );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -624,7 +621,6 @@ UPnpDevice *UPnpDeviceDesc::FindDevice( const QString &sURI )
 
 UPnpDevice *UPnpDeviceDesc::FindDevice( UPnpDevice    *pDevice,
                                         const QString &sURI )
-
 {
     if ( sURI == pDevice->m_sDeviceType )
         return pDevice;
@@ -653,8 +649,8 @@ UPnpDeviceDesc *UPnpDeviceDesc::Retrieve( QString &sURL, bool bInQtThread )
 {
     UPnpDeviceDesc *pDevice = NULL;
 
-    VERBOSE( VB_UPNP, QString( "UPnpDeviceDesc::Retrieve( %1, %2 )" )
-                      .arg( sURL ).arg( bInQtThread ));
+    LOG(VB_UPNP, LOG_DEBUG, QString("UPnpDeviceDesc::Retrieve( %1, %2 )")
+                      .arg(sURL) .arg(bInQtThread));
 
     QString sXml = HttpComms::getHttp( sURL,
                                        10000, // ms
@@ -673,22 +669,20 @@ UPnpDeviceDesc *UPnpDeviceDesc::Retrieve( QString &sURL, bool bInQtThread )
         if ( xml.setContent( sXml, false, &sErrorMsg ))
         {
             pDevice = new UPnpDeviceDesc();
-
             pDevice->Load( xml );
-
             pDevice->m_HostUrl   = sURL;
             pDevice->m_sHostName = pDevice->m_HostUrl.host();
         }
         else
         {
-            VERBOSE( VB_UPNP,
-                     QString( "... Error parsing device description xml [%1]" )
-                     .arg( sErrorMsg ));
+            LOG(VB_UPNP, LOG_ERR,
+                QString("Error parsing device description xml [%1]")
+                     .arg(sErrorMsg));
         }
     }
     else
     {
-        VERBOSE( VB_UPNP, QString( "... Invalid response '%1'" ).arg( sXml ));
+        LOG(VB_UPNP, LOG_ERR, QString("Invalid response '%1'").arg(sXml));
     }
 
     return pDevice;
@@ -707,12 +701,11 @@ QString UPnpDeviceDesc::GetHostName()
         char localHostName[1024];
 
         if (gethostname(localHostName, 1024))
-            VERBOSE(VB_IMPORTANT,
-                    "UPnpDeviceDesc: Error, could not determine host name."
-                    + ENO);
+            LOG(VB_GENERAL, LOG_ERR,
+                "UPnpDeviceDesc: Error, could not determine host name." + ENO);
 
-        return UPnp::GetConfiguration()->GetValue( "Settings/HostName",
-                                          QString( localHostName ));
+        return UPnp::GetConfiguration()->GetValue("Settings/HostName",
+                                                  QString(localHostName));
     }
 
     return m_sHostName;

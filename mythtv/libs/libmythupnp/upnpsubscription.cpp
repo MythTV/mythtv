@@ -44,7 +44,8 @@ UPNPSubscription::UPNPSubscription(const QString &share_path, int port)
     // taken from MythCoreContext
 #if !defined(QT_NO_IPV6)
     QHostAddress addr(host);
-    if ((addr.protocol() == QAbstractSocket::IPv6Protocol) || (host.contains(":")))
+    if ((addr.protocol() == QAbstractSocket::IPv6Protocol) ||
+        (host.contains(":")))
         host = "[" + host + "]";
 #endif
 
@@ -61,13 +62,13 @@ UPNPSubscription::~UPNPSubscription()
     m_subscriptions.clear();
     m_subscriptionLock.unlock();
 
-    VERBOSE(VB_UPNP, LOC + "Finished");
+    LOG(VB_UPNP, LOG_DEBUG, "Finished");
 }
 
 int UPNPSubscription::Subscribe(const QString &usn, const QUrl &url,
                                 const QString &path)
 {
-    VERBOSE(VB_UPNP, LOC + QString("Subscribe %1 %2 %3")
+    LOG(VB_UPNP, LOG_DEBUG, QString("Subscribe %1 %2 %3")
         .arg(usn).arg(url.toString()).arg(path));
 
     // N.B. this is called from the client object's thread. Hence we have to
@@ -81,7 +82,7 @@ int UPNPSubscription::Subscribe(const QString &usn, const QUrl &url,
         if (m_subscriptions[usn]->m_url != url ||
             m_subscriptions[usn]->m_path != path)
         {
-            VERBOSE(VB_IMPORTANT, WAR +
+            LOG(VB_GENERAL, LOG_WARNING,
                 "Re-subscribing with different url and path.");
             m_subscriptions[usn]->m_url  = url;
             m_subscriptions[usn]->m_path = path;
@@ -119,7 +120,7 @@ void UPNPSubscription::Unsubscribe(const QString &usn)
 
 int UPNPSubscription::Renew(const QString &usn)
 {
-    VERBOSE(VB_UPNP, LOC + QString("Renew: %1").arg(usn));
+    LOG(VB_UPNP, LOG_DEBUG, QString("Renew: %1").arg(usn));
 
     QUrl    url;
     QString path;
@@ -135,7 +136,7 @@ int UPNPSubscription::Renew(const QString &usn)
     }
     else
     {
-        VERBOSE(VB_UPNP, LOC + QString("Unrecognised renewal usn: %1")
+        LOG(VB_UPNP, LOG_ERR, QString("Unrecognised renewal usn: %1")
             .arg(usn));
         return 0;
     }
@@ -146,7 +147,7 @@ int UPNPSubscription::Renew(const QString &usn)
                                     m_subscriptions[usn]->m_uuid);
     }
 
-    VERBOSE(VB_UPNP, LOC + QString("No uuid - not renewing usn: %1"));
+    LOG(VB_UPNP, LOG_ERR, QString("No uuid - not renewing usn: %1") .arg(usn));
     return 0;
 }
 
@@ -159,7 +160,7 @@ void UPNPSubscription::Remove(const QString &usn)
     m_subscriptionLock.lock();
     if (m_subscriptions.contains(usn))
     {
-        VERBOSE(VB_UPNP, LOC + QString("Removing %1").arg(usn));
+        LOG(VB_UPNP, LOG_INFO, QString("Removing %1").arg(usn));
         delete m_subscriptions.value(usn);
         m_subscriptions.remove(usn);
     }
@@ -178,7 +179,7 @@ bool UPNPSubscription::ProcessRequest(HttpWorkerThread *pThread,
     if (pRequest->m_sMethod != "event")
         return false;
 
-    VERBOSE(VB_UPNP|VB_EXTRA, LOC + QString("%1\n%2")
+    LOG(VB_UPNP, LOG_DEBUG, QString("%1\n%2")
         .arg(pRequest->m_sRawRequest).arg(pRequest->m_sPayload));
 
     if (pRequest->m_sPayload.isEmpty())
@@ -219,7 +220,7 @@ bool UPNPSubscription::ProcessRequest(HttpWorkerThread *pThread,
     QString payload = (loc > -1) ? pRequest->m_sPayload.left(loc + 12) :
                                    pRequest->m_sPayload;
 
-    VERBOSE(VB_UPNP|VB_EXTRA, LOC + QString("Payload:\n%1").arg(payload));
+    LOG(VB_UPNP, LOG_DEBUG, QString("Payload:\n%1").arg(payload));
 
     pRequest->m_nResponseStatus = 400;
     QDomDocument body;
@@ -228,7 +229,7 @@ bool UPNPSubscription::ProcessRequest(HttpWorkerThread *pThread,
     int errorLine = 0;
     if (!body.setContent(payload, true, &error, &errorLine, &errorCol))
     {
-        VERBOSE(VB_GENERAL, ERR +
+        LOG(VB_GENERAL, LOG_ERR,
             QString("Failed to parse event: Line: %1 Col: %2 Error: '%3'")
             .arg(errorLine).arg(errorCol).arg(error));
         return true;
@@ -284,7 +285,7 @@ bool UPNPSubscription::SendUnsubscribeRequest(const QString &usn,
     data << "\r\n";
     data.flush();
 
-    VERBOSE(VB_UPNP|VB_EXTRA, "\n\n" + sub);
+    LOG(VB_UPNP, LOG_DEBUG, "\n\n" + sub);
 
     MSocketDevice *sockdev = new MSocketDevice(MSocketDevice::Stream);
     BufferedSocketDevice *sock = new BufferedSocketDevice(sockdev);
@@ -299,23 +300,24 @@ bool UPNPSubscription::SendUnsubscribeRequest(const QString &usn,
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, ERR + QString("Socket write error for %1:%2")
+            LOG(VB_GENERAL, LOG_ERR, QString("Socket write error for %1:%2")
                 .arg(host).arg(port));
         }
         sock->Close();
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, ERR + QString("Failed to open socket for %1:%2")
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to open socket for %1:%2")
             .arg(host).arg(port));
     }
 
     delete sock;
     delete sockdev;
     if (success)
-        VERBOSE(VB_GENERAL, LOC + QString("Unsubscribed to %1").arg(usn));
+        LOG(VB_GENERAL, LOG_INFO, QString("Unsubscribed to %1").arg(usn));
     else
-        VERBOSE(VB_UPNP, WAR + QString("Failed to unsubscribe to %1").arg(usn));
+        LOG(VB_UPNP, LOG_WARNING, QString("Failed to unsubscribe to %1")
+                                      .arg(usn));
     return success;
 }
 
@@ -350,7 +352,7 @@ int UPNPSubscription::SendSubscribeRequest(const QString &callback,
     data << "\r\n";
     data.flush();
 
-    VERBOSE(VB_UPNP|VB_EXTRA, "\n\n" + sub);
+    LOG(VB_UPNP, LOG_DEBUG, "\n\n" + sub);
 
     MSocketDevice *sockdev = new MSocketDevice(MSocketDevice::Stream);
     BufferedSocketDevice *sock = new BufferedSocketDevice(sockdev);
@@ -368,7 +370,7 @@ int UPNPSubscription::SendSubscribeRequest(const QString &callback,
             QString line = sock->ReadLine(MAX_WAIT);
             while (!line.isEmpty())
             {
-                VERBOSE(VB_UPNP|VB_EXTRA, line);
+                LOG(VB_UPNP, LOG_DEBUG, line);
                 if (line.contains("HTTP/1.1 200 OK", Qt::CaseInsensitive))
                     ok = true;
                 if (line.startsWith("SID:", Qt::CaseInsensitive))
@@ -387,20 +389,20 @@ int UPNPSubscription::SendSubscribeRequest(const QString &callback,
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, LOC +
+                LOG(VB_GENERAL, LOG_ERR,
                     QString("Failed to subscribe to %1").arg(usn));
             }
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, ERR + QString("Socket write error for %1:%2")
+            LOG(VB_GENERAL, LOG_ERR, QString("Socket write error for %1:%2")
                 .arg(host).arg(port));
         }
         sock->Close();
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, ERR + QString("Failed to open socket for %1:%2")
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to open socket for %1:%2")
             .arg(host).arg(port));
     }
 

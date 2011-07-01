@@ -35,7 +35,8 @@
 
 MethodInfo::MethodInfo()
 {
-    m_eRequestType = (RequestType)(RequestTypeGet | RequestTypePost | RequestTypeHead);
+    m_eRequestType = (RequestType)(RequestTypeGet | RequestTypePost |
+                                   RequestTypeHead);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -101,30 +102,33 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
             }
             else
             {
-                VERBOSE( VB_IMPORTANT, QString( "MethodInfo::Invoke - Type unknown '%1'" )
-                                          .arg( sParamType ));
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("MethodInfo::Invoke - Type unknown '%1'")
+                        .arg(sParamType));
             }
 
             types[nIdx+1] = nId;
-            param[nIdx+1] = pService->ConvertToParameterPtr( nId, sParamType, pParam, sValue );
+            param[nIdx+1] = pService->ConvertToParameterPtr( nId, sParamType,
+                                                             pParam, sValue );
         }
 
-        /* ******************************** 
+#if 0
         QThread *currentThread = QThread::currentThread();
         QThread *objectThread  = pService->thread();
 
         if (currentThread == objectThread)
-            VERBOSE( VB_UPNP, "*** Threads are same ***" );
+            LOG(VB_UPNP, LOG_DEBUG, "*** Threads are same ***");
         else
-            VERBOSE( VB_UPNP, "*** Threads are Different!!! ***" );
-         ******************************** */
+            LOG(VB_UPNP, LOG_DEBUG, "*** Threads are Different!!! ***");
+#endif
 
         pService->qt_metacall( QMetaObject::InvokeMetaMethod, 
                                m_nMethodIndex, 
                                param );
 
         // --------------------------------------------------------------
-        // Delete param array, skip return parameter since not dynamically created.
+        // Delete param array, skip return parameter since not dynamically
+        // created.
         // --------------------------------------------------------------
 
         for (int nIdx=1; nIdx < paramNames.length()+1; nIdx++)
@@ -133,24 +137,26 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
                 QMetaType::destroy( types[ nIdx ], param[ nIdx ] );
         }
     }
-    catch( QString sMsg)
+    catch(QString sMsg)
     {
-        VERBOSE( VB_IMPORTANT, QString( "MethodInfo::Invoke - An Exception Occurred: %1" )
-                                  .arg( sMsg ));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MethodInfo::Invoke - An Exception Occurred: %1")
+                 .arg(sMsg));
 
         if  ((types[ 0 ] != 0) && (param[ 0 ] != NULL ))
             QMetaType::destroy( types[ 0 ], param[ 0 ] );
 
         throw sMsg;
     }
-    catch( HttpRedirectException ex )
+    catch(HttpRedirectException ex)
     {
         bExceptionThrown = true;
         exception = ex;
     }
-    catch( ... )
+    catch(...)
     {
-        VERBOSE( VB_IMPORTANT, "MethodInfo::Invoke - An Exception Occurred" );
+        LOG(VB_GENERAL, LOG_INFO,
+            "MethodInfo::Invoke - An Exception Occurred" );
     }
 
     // --------------------------------------------------------------
@@ -165,7 +171,6 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
 
         if  (types[ 0 ] != 0)
             QMetaType::destroy( types[ 0 ], param[ 0 ] );
-
     }
 
     // --------------------------------------------------------------
@@ -186,8 +191,10 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-ServiceHost::ServiceHost( const QMetaObject &metaObject, const QString &sExtensionName,
-                          const QString     &sBaseUrl  , const QString &sSharePath ) 
+ServiceHost::ServiceHost(const QMetaObject &metaObject,
+                         const QString     &sExtensionName,
+                         const QString     &sBaseUrl,
+                         const QString     &sSharePath ) 
             : HttpServerExtension ( sExtensionName,   sSharePath )
 {
     m_oMetaObject = metaObject;
@@ -220,20 +227,25 @@ ServiceHost::ServiceHost( const QMetaObject &metaObject, const QString &sExtensi
             oInfo.m_nMethodIndex = nIdx;
             oInfo.m_sName        = sName.section( '(', 0, 0 );
             oInfo.m_oMethod      = method;
-            oInfo.m_eRequestType = (RequestType)(RequestTypeGet | RequestTypePost | RequestTypeHead);
+            oInfo.m_eRequestType = (RequestType)(RequestTypeGet |
+                                                 RequestTypePost |
+                                                 RequestTypeHead);
 
             QString sMethodClassInfo = oInfo.m_sName + "_Method";
 
-            int nClassIdx = m_oMetaObject.indexOfClassInfo( sMethodClassInfo.toAscii() );
+            int nClassIdx =
+                m_oMetaObject.indexOfClassInfo(sMethodClassInfo.toAscii());
 
             if (nClassIdx >=0)
             {
-                QString sRequestType = m_oMetaObject.classInfo( nClassIdx ).value();
+                QString sRequestType =
+                    m_oMetaObject.classInfo(nClassIdx).value();
 
                 if (sRequestType == "POST")
                     oInfo.m_eRequestType = RequestTypePost;
                 else if (sRequestType == "GET" )
-                    oInfo.m_eRequestType = (RequestType)(RequestTypeGet | RequestTypeHead);
+                    oInfo.m_eRequestType = (RequestType)(RequestTypeGet |
+                                                         RequestTypeHead);
             }
 
             m_Methods.insert( oInfo.m_sName, oInfo );
@@ -271,12 +283,12 @@ bool ServiceHost::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
     {
         if (pRequest)
         {
-            if (pRequest->m_sBaseUrl != m_sBaseUrl )
+            if (pRequest->m_sBaseUrl != m_sBaseUrl)
                 return false;
 
-            VERBOSE( VB_UPNP, QString("ServiceHost::ProcessRequest: %1 : %2")
-                                 .arg( pRequest->m_sMethod     )
-                                 .arg( pRequest->m_sRawRequest ));
+            LOG(VB_UPNP, LOG_INFO,
+                QString("ServiceHost::ProcessRequest: %1 : %2")
+                    .arg(pRequest->m_sMethod) .arg(pRequest->m_sRawRequest));
 
             // --------------------------------------------------------------
             // Check to see if they are requestion the WSDL service Definition
@@ -285,7 +297,7 @@ bool ServiceHost::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
             if (( pRequest->m_eType   == RequestTypeGet ) &&
                 ( pRequest->m_sMethod == "wsdl"         ))
             {
-                pService =  qobject_cast< Service* >( m_oMetaObject.newInstance());
+                pService =  qobject_cast<Service*>(m_oMetaObject.newInstance());
 
                 Wsdl wsdl( this );
 
@@ -303,7 +315,8 @@ bool ServiceHost::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
 
                 if (nClassIdx >=0)
                 {
-                    QString sVersion = m_oMetaObject.classInfo( nClassIdx ).value();
+                    QString sVersion =
+                        m_oMetaObject.classInfo(nClassIdx).value();
 
                     return FormatResponse( pRequest, QVariant( sVersion ));
                 }
@@ -318,18 +331,22 @@ bool ServiceHost::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
             QString sMethodName  = pRequest->m_sMethod;
             bool    bMethodFound = false;
 
-            if (m_Methods.contains( sMethodName ))
+            if (m_Methods.contains(sMethodName))
                 bMethodFound = true;
             else
             {
                 switch( pRequest->m_eType )
                 {
                     case RequestTypeHead:
-                    case RequestTypeGet : sMethodName = "Get" + sMethodName; break;
-                    case RequestTypePost: sMethodName = "Put" + sMethodName; break;
+                    case RequestTypeGet :
+                        sMethodName = "Get" + sMethodName;
+                        break;
+                    case RequestTypePost:
+                        sMethodName = "Put" + sMethodName;
+                        break;
                 }
 
-                if (m_Methods.contains( sMethodName ))
+                if (m_Methods.contains(sMethodName))
                     bMethodFound = true;
             }
 
@@ -341,13 +358,15 @@ bool ServiceHost::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
                 {
                     // ------------------------------------------------------
                     // Create new Instance of the Service Class so
-                    // it's guarenteed to be on the same thread
+                    // it's guaranteed to be on the same thread
                     // since we are making direct calls into it.
                     // ------------------------------------------------------
 
-                    pService =  qobject_cast< Service* >( m_oMetaObject.newInstance());
+                    pService = 
+                        qobject_cast<Service*>(m_oMetaObject.newInstance());
 
-                    QVariant vResult = oInfo.Invoke( pService, pRequest->m_mapParams );
+                    QVariant vResult = oInfo.Invoke(pService,
+                                                    pRequest->m_mapParams);
 
                     bHandled = FormatResponse( pRequest, vResult );
                 }
@@ -364,8 +383,7 @@ bool ServiceHost::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
     }
     catch( HttpException ex )
     {
-        VERBOSE( VB_IMPORTANT, ex.msg );
-
+        LOG(VB_GENERAL, LOG_ERR, ex.msg);
         UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, ex.msg );
 
         bHandled = true;
@@ -373,8 +391,7 @@ bool ServiceHost::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
     }
     catch( QString sMsg )
     {
-        VERBOSE( VB_IMPORTANT, sMsg );
-
+        LOG(VB_GENERAL, LOG_ERR, sMsg);
         UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, sMsg );
 
         bHandled = true;
@@ -383,8 +400,7 @@ bool ServiceHost::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
     {
         QString sMsg( "ServiceHost::ProcessRequest - Unexpected Exception" );
 
-        VERBOSE( VB_IMPORTANT, sMsg );
-
+        LOG(VB_GENERAL, LOG_ERR, sMsg);
         UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, sMsg );
 
         bHandled = true;

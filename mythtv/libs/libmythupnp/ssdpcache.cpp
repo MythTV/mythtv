@@ -123,7 +123,7 @@ void SSDPCacheEntries::Insert(const QString &sUSN, DeviceLocation *pEntry)
 
     m_mapEntries[usn] = pEntry;
 
-    VERBOSE(VB_UPNP, QString("SSDP Cache adding USN: %1 Location %2")
+    LOG(VB_UPNP, LOG_INFO, QString("SSDP Cache adding USN: %1 Location %2")
             .arg(pEntry->m_sUSN).arg(pEntry->m_sLocation));
 }
 
@@ -138,7 +138,8 @@ void SSDPCacheEntries::Remove( const QString &sUSN )
     {
         if (*it)
         {
-            VERBOSE(VB_UPNP, QString("SSDP Cache removing USN: %1 Location %2")
+            LOG(VB_UPNP, LOG_INFO,
+                QString("SSDP Cache removing USN: %1 Location %2")
                     .arg((*it)->m_sUSN).arg((*it)->m_sLocation));
             (*it)->Release();
         }
@@ -220,9 +221,8 @@ void SSDPCacheEntries::Dump(uint &nEntryCount) const
 
         // Note: AddRef,Release not required since SSDPCacheEntries
         // holds one reference to each entry and we are holding m_mutex.
-        VERBOSE(VB_UPNP, QString(" * \t\t%1\t | %2\t | %3 ")
-                .arg((*it)->m_sUSN)
-                .arg((*it)->ExpiresInSecs())
+        LOG(VB_UPNP, LOG_DEBUG, QString(" * \t\t%1\t | %2\t | %3 ")
+                .arg((*it)->m_sUSN) .arg((*it)->ExpiresInSecs())
                 .arg((*it)->m_sLocation));
 
         nEntryCount++;
@@ -259,7 +259,7 @@ SSDPCache* SSDPCache::Instance()
 
 SSDPCache::SSDPCache()
 {
-    VERBOSE( VB_UPNP, "SSDPCache - Constructor" );
+    LOG(VB_UPNP, LOG_DEBUG, "SSDPCache - Constructor");
 
     // ----------------------------------------------------------------------
     // Add Task to keep SSDPCache purged of stale entries.
@@ -276,7 +276,9 @@ SSDPCache::SSDPCache()
 SSDPCache::~SSDPCache()
 {
     // FIXME: Using this causes crashes
-    //VERBOSE( VB_UPNP, "SSDPCache - Destructor" );
+#if 0
+    LOG(VB_UPNP, LOG_DEBUG, "SSDPCache - Destructor");
+#endif
 
     Clear();
 }      
@@ -564,22 +566,20 @@ QTextStream &SSDPCache::OutputXML(
 /// Prints this device to the console in a human readable form
 void SSDPCache::Dump(void)
 {
-    if (!VERBOSE_LEVEL_CHECK(VB_UPNP))
+    if (!VERBOSE_LEVEL_CHECK(VB_UPNP) || logLevel > LOG_DEBUG)
         return;
 
     QMutexLocker locker(&m_mutex);
 
-    VERBOSE(VB_UPNP,
-            "========================================"
-            "=======================================" );
-    VERBOSE(VB_UPNP,
-            QString(" URI (type) - Found: %1 Entries - "
-                    "%2 have been Allocated. ")
+    LOG(VB_UPNP, LOG_DEBUG, "========================================"
+                            "=======================================");
+    LOG(VB_UPNP, LOG_DEBUG, QString(" URI (type) - Found: %1 Entries - "
+                                    "%2 have been Allocated. ")
             .arg(m_cache.count()).arg(SSDPCacheEntries::g_nAllocated));
-    VERBOSE(VB_UPNP, "   \t\tUSN (unique id)\t\t | Expires\t | Location");
-    VERBOSE(VB_UPNP,
-            "----------------------------------------"
-            "---------------------------------------");
+    LOG(VB_UPNP, LOG_DEBUG, "   \t\tUSN (unique id)\t\t | Expires"
+                            "\t | Location");
+    LOG(VB_UPNP, LOG_DEBUG, "----------------------------------------"
+                            "---------------------------------------");
 
     uint nCount = 0;
     SSDPCacheEntriesMap::const_iterator it  = m_cache.begin();
@@ -587,20 +587,17 @@ void SSDPCache::Dump(void)
     {
         if (*it != NULL)
         {
-            VERBOSE(VB_UPNP, it.key());
+            LOG(VB_UPNP, LOG_DEBUG, it.key());
             (*it)->Dump(nCount);
-            VERBOSE(VB_UPNP, " ");
+            LOG(VB_UPNP, LOG_DEBUG, " ");
         }
     }
 
-    VERBOSE(VB_UPNP,
-            "----------------------------------------"
-            "---------------------------------------");
-    VERBOSE(VB_UPNP,
+    LOG(VB_UPNP, LOG_DEBUG, "----------------------------------------"
+                            "---------------------------------------");
+    LOG(VB_UPNP, LOG_DEBUG,
             QString(" Found: %1 Entries - %2 have been Allocated. ")
-            .arg(nCount)
-            .arg(DeviceLocation::g_nAllocated));
-    VERBOSE(VB_UPNP,
-            "========================================"
-            "=======================================" );
+            .arg(nCount) .arg(DeviceLocation::g_nAllocated));
+    LOG(VB_UPNP, LOG_DEBUG, "========================================"
+                            "=======================================" );
 }

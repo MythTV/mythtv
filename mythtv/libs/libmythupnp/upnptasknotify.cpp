@@ -91,18 +91,16 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
                             .arg( sUSN         )
                             .arg( m_nMaxAge    );
 
-    VERBOSE(VB_UPNP, QString("UPnpNotifyTask::SendNotifyMsg : %1:%2 : %3 : %4")
-                        .arg( pSocket->address().toString() )
-                        .arg( pSocket->port() )
-                        .arg( sNT  )
-                        .arg( sUSN ));
+    LOG(VB_UPNP, LOG_INFO,
+        QString("UPnpNotifyTask::SendNotifyMsg : %1:%2 : %3 : %4")
+            .arg(pSocket->address().toString()) .arg(pSocket->port())
+            .arg(sNT) .arg(sUSN));
 
-    {
     QMutexLocker qml(&m_mutex); // for addressList
 
-    // ----------------------------------------------------------------------
+    // -------------------------------------------------------------------
     // Refresh IP Address List in case of changes
-    // ----------------------------------------------------------------------
+    // -------------------------------------------------------------------
 
     QStringList addressList = UPnp::g_IPAddrList;
 
@@ -112,8 +110,8 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
     {
         if ((*it).isEmpty())
         {
-            VERBOSE(VB_GENERAL,
-                    "UPnpNotifyTask::SendNotifyMsg - NULL in address list");
+            LOG(VB_GENERAL, LOG_ERR,
+                "UPnpNotifyTask::SendNotifyMsg - NULL in address list");
             continue;
         }
 
@@ -123,27 +121,25 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
         if (ipaddress.contains(":"))
             ipaddress = "[" + ipaddress + "]";
 
-        QString sHeader = QString( "NOTIFY * HTTP/1.1\r\n"
-                                   "HOST: %1:%2\r\n"    
-                                   "LOCATION: http://%3:%4/getDeviceDesc\r\n" )
-                             .arg( pSocket->address().toString() )
-                             .arg( pSocket->port() )
-                             .arg( ipaddress )
-                             .arg( m_nServicePort);
+        QString sHeader = QString("NOTIFY * HTTP/1.1\r\n"
+                                  "HOST: %1:%2\r\n"    
+                                  "LOCATION: http://%3:%4/getDeviceDesc\r\n")
+                    .arg(pSocket->address().toString()) .arg(pSocket->port())
+                    .arg(ipaddress) .arg(m_nServicePort);
 
         QString  sPacket  = sHeader + sData;
         QByteArray scPacket = sPacket.toUtf8();
 
-        // ------------------------------------------------------------------
+        // ---------------------------------------------------------------
         // Send Packet to Socket (Send same packet twice)
-        // ------------------------------------------------------------------
+        // ---------------------------------------------------------------
 
-        pSocket->writeBlock( scPacket, scPacket.length(), pSocket->address(), pSocket->port() );
+        pSocket->writeBlock( scPacket, scPacket.length(),
+                             pSocket->address(), pSocket->port() );
         usleep( rand() % 250000 );
-        pSocket->writeBlock( scPacket, scPacket.length(), pSocket->address(), pSocket->port() );
+        pSocket->writeBlock( scPacket, scPacket.length(),
+                             pSocket->address(), pSocket->port() );
     }
-    }
-
 }
 
 /////////////////////////////////////////////////////////////////////////////
