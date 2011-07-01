@@ -104,6 +104,24 @@ class META_PUBLIC MetadataLookup : public QObject
         const QString description,
         uint season,
         uint episode,
+        const uint chanid,
+        const QString channum,
+        const QString chansign,
+        const QString channame,
+        const QString chanplaybackfilters,
+        const QString recgroup,
+        const QString playgroup,
+        const QString seriesid,
+        const QString programid,
+        const QString storagegroup,
+        const QDateTime startts,
+        const QDateTime endts,
+        const QDateTime recstartts,
+        const QDateTime recendts,
+        const uint programflags,
+        const uint audioproperties,
+        const uint videoproperties,
+        const uint subtitletype,
         const QString certification,
         const QStringList countries,
         const uint popularity,
@@ -123,6 +141,76 @@ class META_PUBLIC MetadataLookup : public QObject
         const PeopleMap people,
         const QStringList studios,
         const QString homepage,
+        const QString trailerURL,
+        const ArtworkMap artwork,
+        DownloadMap downloads);
+
+    //ProgramInfo Constructor
+    MetadataLookup(
+        MetadataType type,
+        QVariant data,
+        LookupStep step,
+        bool automatic,
+        bool handleimages,
+        bool allowoverwrites,
+        bool preferdvdorder,
+        QString host,
+        QString filename,
+        QString title,
+        const QStringList categories,
+        const float userrating,
+        QString subtitle,
+        const QString description,
+        uint chanid,
+        const QString channum,
+        const QString chansign,
+        const QString channame,
+        const QString chanplaybackfilters,
+        const QString recgroup,
+        const QString playgroup,
+        const QString seriesid,
+        const QString programid,
+        const QString storagegroup,
+        const QDateTime startts,
+        const QDateTime endts,
+        const QDateTime recstartts,
+        const QDateTime recendts,
+        uint programflags,
+        uint audioproperties,
+        uint videoproperties,
+        uint subtitletype,
+        const uint year,
+        const QDate releasedate,
+        const QDateTime lastupdated,
+        const uint runtime,
+        const uint runtimesecs);
+
+    // XBMC NFO Constructor
+    MetadataLookup(
+        MetadataType type,
+        QVariant data,
+        LookupStep step,
+        bool automatic,
+        bool handleimages,
+        bool allowoverwrites,
+        bool preferdvdorder,
+        QString host,
+        QString filename,
+        QString title,
+        const QStringList categories,
+        const float userrating,
+        QString subtitle,
+        const QString tagline,
+        const QString description,
+        uint season,
+        uint episode,
+        const QString certification,
+        const uint year,
+        const QDate releasedate,
+        const uint runtime,
+        const uint runtimesecs,
+        QString inetref,
+        const PeopleMap people,
         const QString trailerURL,
         const ArtworkMap artwork,
         DownloadMap downloads);
@@ -185,13 +273,32 @@ class META_PUBLIC MetadataLookup : public QObject
     QString GetLanguage() const { return m_language; };
     QString GetHost() const { return m_host; };
 
-    // General - Video
+    // General - Video & ProgramInfo
     QString GetSubtitle() const { return m_subtitle; };
     QString GetTagline() const { return m_tagline; };
     QString GetDescription() const { return m_description; };
     bool GetPreferDVDOrdering() const { return m_dvdorder; };
     uint GetSeason() const { return m_season; };
     uint GetEpisode() const { return m_episode; };
+    uint GetChanId() const { return m_chanid; };
+    QString GetChanNum() const { return m_channum; };
+    QString GetChanSign() const { return m_chansign; };
+    QString GetChanName() const { return m_channame; };
+    QString GetChanPlaybackFilters() const { return m_chanplaybackfilters; };
+    QString GetRecGroup() const { return m_recgroup; };
+    QString GetPlayGroup() const { return m_playgroup; };
+    QString GetSeriesId() const { return m_seriesid; };
+    QString GetProgramId() const { return m_programid; };
+    QString GetStorageGroup() const { return m_storagegroup; };
+    QDateTime GetStartTS() const { return m_startts; };
+    QDateTime GetEndTS() const { return m_endts; };
+    QDateTime GetRecStartTS() const { return m_recstartts; };
+    QDateTime GetRecEndTS() const { return m_recendts; };
+    uint GetProgramFlags() const { return m_programflags; };
+    uint GetAudioProperties() const { return m_audioproperties; };
+    uint GetVideoProperties() const { return m_videoproperties; };
+    uint GetSubtitleType() const { return m_subtitletype; };
+
     QString GetCertification() const { return m_certification; };
     QStringList GetCountries() const { return m_countries; };
     uint GetPopularity() const { return m_popularity; };
@@ -246,12 +353,31 @@ class META_PUBLIC MetadataLookup : public QObject
     float m_userrating;
     const QString m_language;
 
-    // General - Video
+    // General - Video & ProgramInfo
     QString m_subtitle;
     const QString m_tagline;
     const QString m_description;
     uint m_season;
     uint m_episode;
+    uint m_chanid;
+    const QString m_channum;
+    const QString m_chansign;
+    const QString m_channame;
+    const QString m_chanplaybackfilters;
+    const QString m_recgroup;
+    const QString m_playgroup;
+    const QString m_seriesid;
+    const QString m_programid;
+    const QString m_storagegroup;
+    const QDateTime m_startts;
+    const QDateTime m_endts;
+    const QDateTime m_recstartts;
+    const QDateTime m_recendts;
+    uint m_programflags;
+    uint m_audioproperties;
+    uint m_videoproperties;
+    uint m_subtitletype;
+
     const QString m_certification;
     const QStringList m_countries;
     uint m_popularity;
