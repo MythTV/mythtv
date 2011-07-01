@@ -3250,15 +3250,11 @@ void VideoDialog::customEvent(QEvent *levent)
             m_busyPopup = NULL;
         }
 
-        MythGenericTree *node = qVariantValue<MythGenericTree *>(lookup->GetData());
-        if (node)
+        VideoMetadata *metadata = qVariantValue<VideoMetadata *>(lookup->GetData());
+        if (metadata)
         {
-            VideoMetadata *metadata = GetMetadataPtrFromNode(node);
-            if (metadata)
-            {
-                metadata->SetProcessed(true);
-                metadata->UpdateDatabase();
-            }
+            metadata->SetProcessed(true);
+            metadata->UpdateDatabase();
         }
         VERBOSE(VB_GENERAL,
             QString("No results found for %1 %2 %3").arg(lookup->GetTitle())
