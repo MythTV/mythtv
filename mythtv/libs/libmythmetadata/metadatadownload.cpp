@@ -496,8 +496,6 @@ QString MetadataDownload::getMXMLPath(QString filename)
     QString ext = QFileInfo(qurl.path()).suffix();
     xmlname = filename.left(filename.size() - ext.size()) + "mxml";
 
-    VERBOSE(VB_GENERAL, QString("MXMLName = %1 ").arg(xmlname));
-
     if (xmlname.startsWith("myth://"))
     {
         if (RemoteFile::Exists(xmlname))
@@ -519,8 +517,6 @@ QString MetadataDownload::getNFOPath(QString filename)
     QUrl qurl(filename);
     QString ext = QFileInfo(qurl.path()).suffix();
     nfoname = filename.left(filename.size() - ext.size()) + "nfo";
-
-    VERBOSE(VB_GENERAL, QString("NFOName = %1 ").arg(nfoname));
 
     if (nfoname.startsWith("myth://"))
     {

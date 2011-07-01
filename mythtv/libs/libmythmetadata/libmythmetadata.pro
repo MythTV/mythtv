@@ -15,13 +15,13 @@ QMAKE_CLEAN += version.cpp
 HEADERS += cleanup.h  dbaccess.h  dirscan.h  globals.h  parentalcontrols.h
 HEADERS += videoscan.h  videoutils.h  videometadata.h  videometadatalistmanager.h
 HEADERS += quicksp.h metadatacommon.h metadatadownload.h metadataimagedownload.h
-HEADERS += bluraymetadata.h mythmetaexp.h
+HEADERS += bluraymetadata.h mythmetaexp.h metadatafactory.h
 
 SOURCES += cleanup.cpp  dbaccess.cpp  dirscan.cpp  globals.cpp
 SOURCES += parentalcontrols.cpp  videoscan.cpp  videoutils.cpp
 SOURCES += videometadata.cpp  videometadatalistmanager.cpp
 SOURCES += metadatacommon.cpp metadatadownload.cpp metadataimagedownload.cpp
-SOURCES += bluraymetadata.cpp
+SOURCES += bluraymetadata.cpp metadatafactory.cpp
 
 INCLUDEPATH += ../libmythbase ../libmythtv
 INCLUDEPATH += ../.. ../ ./ ../libmythupnp ../libmythui

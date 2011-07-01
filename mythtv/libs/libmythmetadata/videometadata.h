@@ -245,6 +245,7 @@ class META_PUBLIC VideoMetadata
   private:
     class VideoMetadataImp *m_imp;
 };
+Q_DECLARE_METATYPE(VideoMetadata*)
 
 META_PUBLIC void ClearMap(MetadataMap &metadataMap);
 
