@@ -3,14 +3,13 @@
 
 // Needed to perform a lookup
 #include "metadatacommon.h"
+#include "metadataimagedownload.h"
 #include "metadatadownload.h"
 
 // Symbol visibility
 #include "mythmetaexp.h"
 
 class VideoMetadata;
-class MetadataDownload;
-class MetadataImageDownload;
 
 class META_PUBLIC MetadataFactoryMultiResult : public QEvent
 {
@@ -60,6 +59,9 @@ class META_PUBLIC MetadataFactory : public QObject
            bool getimages = true);
     void Lookup(VideoMetadata *metadata, bool automatic = true,
            bool getimages = true);
+
+    bool IsRunning() { return m_lookupthread->isRunning() ||
+                              m_imagedownload->isRunning(); };
 
   private:
 
