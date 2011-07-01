@@ -724,7 +724,7 @@ class VideoListImp
         MetadataPtr mp = m_metadata.byID(video_id);
         if (mp)
         {
-            ret = mp->DeleteFile(dummy);
+            ret = mp->DeleteFile();
             if (ret) ret = m_metadata.purgeByID(video_id);
         }
 

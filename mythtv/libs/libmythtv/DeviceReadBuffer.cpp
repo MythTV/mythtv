@@ -46,7 +46,7 @@ DeviceReadBuffer::DeviceReadBuffer(DeviceReaderCB *cb, bool use_poll)
         wake_pipe_flags[i] = 0;
     }
 
-#ifdef USING_MINGW
+#if defined( USING_MINGW ) && !defined( _MSC_VER )
 #warning mingw DeviceReadBuffer::Poll
     if (using_poll)
     {

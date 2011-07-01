@@ -326,7 +326,7 @@ class VideoMetadataImp
     void UpdateDatabase();
     bool DeleteFromDatabase();
 
-    bool DeleteFile(class VideoList &dummy);
+    bool DeleteFile();
 
     void Reset();
 
@@ -423,9 +423,8 @@ bool VideoMetadataImp::removeDir(const QString &dirName)
 }
 
 /// Deletes the file associated with a metadata entry
-bool VideoMetadataImp::DeleteFile(class VideoList &dummy)
+bool VideoMetadataImp::DeleteFile()
 {
-    (void) dummy;
     bool isremoved = false;
 
     if (!m_host.isEmpty())
@@ -1705,9 +1704,9 @@ bool VideoMetadata::FillDataFromFilename(const VideoMetadataListManager &cache)
     return false;
 }
 
-bool VideoMetadata::DeleteFile(class VideoList &dummy)
+bool VideoMetadata::DeleteFile()
 {
-    return m_imp->DeleteFile(dummy);
+    return m_imp->DeleteFile();
 }
 
 void VideoMetadata::Reset()

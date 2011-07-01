@@ -66,9 +66,6 @@ enum CoverFileFilter {
     kCoverFileFilterNone = 0
 };
 
-const unsigned int VideoFilterSettings::FILTER_MASK;
-const unsigned int VideoFilterSettings::SORT_MASK;
-
 VideoFilterSettings::VideoFilterSettings(bool loaddefaultsettings,
                                          const QString& _prefix) :
     category(kCategoryFilterAll), genre(kGenreFilterAll),
