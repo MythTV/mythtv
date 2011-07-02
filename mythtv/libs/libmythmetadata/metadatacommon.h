@@ -50,8 +50,9 @@ Q_DECLARE_METATYPE(ArtworkInfo)
 
 enum MetadataType {
     VID = 0,
-    MUSIC = 1,
-    GAME = 2
+    RECDNG = 1,
+    MUSIC = 2,
+    GAME = 3
 };
 
 enum PeopleType {

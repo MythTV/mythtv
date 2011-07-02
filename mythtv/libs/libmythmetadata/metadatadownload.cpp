@@ -68,12 +68,15 @@ void MetadataDownload::run()
     {
         MetadataLookupList list;
         // Go go gadget Metadata Lookup
-        if (lookup->GetType() == VID)
+        if (lookup->GetType() == VID || lookup->GetType() == RECDNG)
         {
             if (lookup->GetSeason() > 0 || lookup->GetEpisode() > 0)
                 list = handleTelevision(lookup);
-            else if (!lookup->GetSubtitle().isEmpty())
+            else if (!lookup->GetSubtitle().isEmpty() &&
+                     lookup->GetType() == VID)
                 list = handleVideoUndetermined(lookup);
+            else if (lookup->GetType() == RECDNG)
+                list = handleRecordingUndetermined(lookup);
             else
                 list = handleMovie(lookup);
         }
@@ -167,6 +170,17 @@ bool MetadataDownload::findBestMatch(MetadataLookupList list,
         {
             MetadataLookup *newlookup = (*i);
             newlookup->SetStep(GETDATA);
+
+            // If searching for TV without a subtitle, but we've found
+            // a series match, arbitrarily set season/episode to "1" to
+            // avoid looping forever trying to figure it out.
+
+            if (newlookup->GetType() == RECDNG)
+            {
+                newlookup->SetSeason(1);
+                newlookup->SetEpisode(1);
+            }
+
             prependLookup(newlookup);
             return true;
         }
@@ -476,6 +490,46 @@ MetadataLookupList MetadataDownload::handleVideoUndetermined(
     args.append(ShellEscape(subtitle));
 
     // Try to do a title/subtitle lookup
+    list = runGrabber(cmd, args, lookup, false);
+
+    // If there were no results for that, fall back to a movie lookup.
+    if (!list.size())
+        list = handleMovie(lookup);
+
+    if (list.count() == 1)
+        list.at(0)->SetStep(GETDATA);
+
+    return list;
+}
+
+MetadataLookupList MetadataDownload::handleRecordingUndetermined(
+                                                    MetadataLookup* lookup)
+{
+    MetadataLookupList list;
+
+    QString def_cmd = QDir::cleanPath(QString("%1/%2")
+        .arg(GetShareDir())
+        .arg("metadata/Television/ttvdb.py"));
+
+    QString cmd = gCoreContext->GetSetting("TelevisionGrabber", def_cmd);
+
+    QStringList args;
+    args.append(QString("-l")); // Language Flag
+    args.append(gCoreContext->GetLanguage()); // UI Language
+    if (!lookup->GetSubtitle().isEmpty())
+        args.append(QString("-N"));
+    else
+        args.append(QString("-M"));
+
+    QString title = lookup->GetTitle();
+    args.append(ShellEscape(title));
+
+    if (!lookup->GetSubtitle().isEmpty())
+    {
+        QString subtitle = lookup->GetSubtitle();
+        args.append(ShellEscape(subtitle));
+    }
+
     list = runGrabber(cmd, args, lookup, false);
 
     // If there were no results for that, fall back to a movie lookup.

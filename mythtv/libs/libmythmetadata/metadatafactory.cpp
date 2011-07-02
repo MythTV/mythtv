@@ -57,7 +57,7 @@ void MetadataFactory::Lookup(RecordingRule *recrule, bool automatic,
 
     MetadataLookup *lookup = new MetadataLookup();
     lookup->SetStep(SEARCH);
-    lookup->SetType(VID);
+    lookup->SetType(RECDNG);
     lookup->SetData(qVariantFromValue(recrule));
     lookup->SetAutomatic(automatic);
     lookup->SetHandleImages(getimages);
@@ -79,7 +79,7 @@ void MetadataFactory::Lookup(ProgramInfo *pginfo, bool automatic,
 
     MetadataLookup *lookup = new MetadataLookup();
     lookup->SetStep(SEARCH);
-    lookup->SetType(VID);
+    lookup->SetType(RECDNG);
     lookup->SetData(qVariantFromValue(pginfo));
     lookup->SetAutomatic(automatic);
     lookup->SetHandleImages(getimages);
