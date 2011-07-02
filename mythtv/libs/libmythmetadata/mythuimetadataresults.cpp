@@ -55,7 +55,15 @@ bool MetadataResultsDialog::Create()
         ArtworkList art = (*i)->GetArtwork(COVERART);
         if (art.count() > 0)
             coverartfile = art.takeFirst().thumbnail;
-        else
+
+        if (coverartfile.isEmpty())
+        {
+            art = (*i)->GetArtwork(BANNER);
+            if (art.count() > 0)
+               coverartfile = art.takeFirst().thumbnail;
+        }
+
+        if (coverartfile.isEmpty())
         {
             art = (*i)->GetArtwork(SCREENSHOT);
             if (art.count() > 0)
