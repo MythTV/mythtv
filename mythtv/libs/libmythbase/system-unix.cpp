@@ -378,8 +378,10 @@ void MythSystemManager::run(void)
     }
 
     // kick to allow them to close themselves cleanly
-    readThread->wake();
-    writeThread->wake();
+    if (readThread)
+        readThread->wake();
+    if (writeThread)
+        writeThread->wake();
     threadDeregister();
 }
 
