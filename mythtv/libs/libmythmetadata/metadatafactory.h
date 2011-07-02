@@ -10,6 +10,7 @@
 #include "mythmetaexp.h"
 
 class VideoMetadata;
+class RecordingRule;
 
 class META_PUBLIC MetadataFactoryMultiResult : public QEvent
 {
@@ -58,6 +59,8 @@ class META_PUBLIC MetadataFactory : public QObject
     void Lookup(ProgramInfo *pginfo, bool automatic = true,
            bool getimages = true);
     void Lookup(VideoMetadata *metadata, bool automatic = true,
+           bool getimages = true);
+    void Lookup(RecordingRule *recrule, bool automatic = true,
            bool getimages = true);
     void Lookup(MetadataLookup *lookup);
 

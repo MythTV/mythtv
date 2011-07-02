@@ -12,6 +12,7 @@
 // Input for a lookup
 #include "videometadata.h"
 #include "programinfo.h"
+#include "recordingrule.h"
 
 #include "metadatafactory.h"
 
@@ -48,6 +49,28 @@ MetadataFactory::~MetadataFactory()
     }
 }
 
+void MetadataFactory::Lookup(RecordingRule *recrule, bool automatic,
+                             bool getimages)
+{
+    if (!recrule)
+        return;
+
+    MetadataLookup *lookup = new MetadataLookup();
+    lookup->SetStep(SEARCH);
+    lookup->SetType(VID);
+    lookup->SetData(qVariantFromValue(recrule));
+    lookup->SetAutomatic(automatic);
+    lookup->SetHandleImages(getimages);
+    lookup->SetHost(gCoreContext->GetMasterHostName());
+    lookup->SetTitle(recrule->m_title);
+    lookup->SetSubtitle(recrule->m_subtitle);
+
+    if (m_lookupthread->isRunning())
+        m_lookupthread->prependLookup(lookup);
+    else
+        m_lookupthread->addLookup(lookup);
+}
+
 void MetadataFactory::Lookup(ProgramInfo *pginfo, bool automatic,
                              bool getimages)
 {
@@ -60,7 +83,7 @@ void MetadataFactory::Lookup(ProgramInfo *pginfo, bool automatic,
     lookup->SetData(qVariantFromValue(pginfo));
     lookup->SetAutomatic(automatic);
     lookup->SetHandleImages(getimages);
-    lookup->SetHost(pginfo->GetHostname());
+    lookup->SetHost(gCoreContext->GetMasterHostName());
     lookup->SetTitle(pginfo->GetTitle());
     lookup->SetSubtitle(pginfo->GetSubtitle());
 
