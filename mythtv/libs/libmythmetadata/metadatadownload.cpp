@@ -519,7 +519,17 @@ MetadataLookupList MetadataDownload::handleRecordingUndetermined(
     if (!lookup->GetSubtitle().isEmpty())
         args.append(QString("-N"));
     else
+    {
+        // The input lookup doesn't have Subtitle, Season or Episode information.
+        // We're going to "artificially" set Seas/Ep to 1 since the input
+        // isn't enough information to get conclusive metadata anyway.
+        // This is needed in case of a multi-result, so that on the second
+        // pass through, we definitely get the TV grabber and at least get
+        // an inetref.
+        lookup->SetSeason(1);
+        lookup->SetEpisode(1);
         args.append(QString("-M"));
+    }
 
     QString title = lookup->GetTitle();
     args.append(ShellEscape(title));
@@ -530,11 +540,15 @@ MetadataLookupList MetadataDownload::handleRecordingUndetermined(
         args.append(ShellEscape(subtitle));
     }
 
-    list = runGrabber(cmd, args, lookup, false);
+    list = runGrabber(cmd, args, lookup, true);
 
     // If there were no results for that, fall back to a movie lookup.
     if (!list.size())
+    {
+        lookup->SetSeason(0);
+        lookup->SetEpisode(0);
         list = handleMovie(lookup);
+    }
 
     if (list.count() == 1)
         list.at(0)->SetStep(GETDATA);
