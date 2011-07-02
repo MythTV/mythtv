@@ -103,9 +103,9 @@ int main(int argc, char **argv)
     signal(SIGINT, qt_exit);
     signal(SIGTERM, qt_exit);
 
-    setHttpProxy();
-
     gContext = new MythContext(MYTH_BINARY_VERSION);
+
+    setHttpProxy();
 
     if (cmdline.toBool("event")         || cmdline.toBool("systemevent") ||
         cmdline.toBool("setverbose")    || cmdline.toBool("printsched") ||
