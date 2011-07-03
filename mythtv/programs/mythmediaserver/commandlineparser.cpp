@@ -21,7 +21,6 @@ void MythMediaServerCommandLineParser::LoadArguments(void)
 {
     addHelp();
     addVersion();
-    addVerbose();
     addSettingsOverride();
     addPIDFile();
     addDaemon();

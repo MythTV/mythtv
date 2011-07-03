@@ -14,7 +14,6 @@ void MythPreviewGeneratorCommandLineParser::LoadArguments(void)
 {
     addHelp();
     addVersion();
-    addVerbose();
     addRecording();
     addLogging();
 

@@ -41,7 +41,6 @@ void MythFillNVCommandLineParser::LoadArguments(void)
 {
     addHelp();
     addVersion();
-    addVerbose();
     addLogging();
 
     add("--refresh-all", "refresh-all", false,

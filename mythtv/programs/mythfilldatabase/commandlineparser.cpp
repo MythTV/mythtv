@@ -14,7 +14,6 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
 {
     addHelp();
     addVersion();
-    addVerbose();
     addLogging();
 
     add("--manual", "manual", false, "Run interactive configuration",

@@ -15,7 +15,6 @@ void MythCommFlagCommandLineParser::LoadArguments(void)
     addHelp();
     addSettingsOverride();
     addVersion();
-    addVerbose();
     addJob();
     addRecording();
     addLogging();

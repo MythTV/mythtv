@@ -16,7 +16,6 @@ void MythBackendCommandLineParser::LoadArguments(void)
     addVersion();
     addDaemon();
     addSettingsOverride();
-    addVerbose();
     addUPnP();
     addLogging();
     addPIDFile();

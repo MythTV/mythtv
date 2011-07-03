@@ -22,7 +22,6 @@ void MythAVTestCommandLineParser::LoadArguments(void)
     addSettingsOverride();
     addVersion();
     addWindowed(false);
-    addVerbose();
     addGeometry();
     addDisplay();
     addLogging();

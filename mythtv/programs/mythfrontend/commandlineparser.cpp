@@ -16,7 +16,6 @@ void MythFrontendCommandLineParser::LoadArguments(void)
     addVersion();
     addWindowed(false);
     addSettingsOverride();
-    addVerbose();
     addGeometry();
     addDisplay();
     addUPnP();
