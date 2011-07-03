@@ -538,9 +538,10 @@ MetadataLookupList MetadataDownload::handleRecordingUndetermined(
     {
         QString subtitle = lookup->GetSubtitle();
         args.append(ShellEscape(subtitle));
+        list = runGrabber(cmd, args, lookup, false);
     }
-
-    list = runGrabber(cmd, args, lookup, true);
+    else
+        list = runGrabber(cmd, args, lookup, true);
 
     // If there were no results for that, fall back to a movie lookup.
     if (!list.size())
