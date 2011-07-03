@@ -86,6 +86,9 @@ void MetadataFactory::Lookup(ProgramInfo *pginfo, bool automatic,
     lookup->SetHost(gCoreContext->GetMasterHostName());
     lookup->SetTitle(pginfo->GetTitle());
     lookup->SetSubtitle(pginfo->GetSubtitle());
+    lookup->SetSeason(pginfo->GetSeason());
+    lookup->SetEpisode(pginfo->GetEpisode());
+    lookup->SetInetref(pginfo->GetInetRef());
 
     if (m_lookupthread->isRunning())
         m_lookupthread->prependLookup(lookup);

@@ -531,8 +531,16 @@ MetadataLookupList MetadataDownload::handleRecordingUndetermined(
         args.append(QString("-M"));
     }
 
-    QString title = lookup->GetTitle();
-    args.append(ShellEscape(title));
+    if (!lookup->GetInetref().isEmpty())
+    {
+        QString inetref = lookup->GetInetref();
+        args.append(ShellEscape(inetref));
+    }
+    else
+    {
+        QString title = lookup->GetTitle();
+        args.append(ShellEscape(title));
+    }
 
     if (!lookup->GetSubtitle().isEmpty())
     {
