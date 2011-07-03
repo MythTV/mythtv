@@ -100,15 +100,15 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
+    if (!refreshall && !usedchanid && !usedstarttime)
+    {
+        refreshall = true;
+    }
+
     if (!refreshall && !(usedchanid && usedstarttime))
     {
         VERBOSE(VB_IMPORTANT, "--chanid and --starttime must be used together.");
         return GENERIC_EXIT_INVALID_CMDLINE;
-    }
-
-    if (!refreshall && !usedchanid && !usedstarttime)
-    {
-        refreshall = true;
     }
 
     myth_nice(19);
