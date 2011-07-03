@@ -593,6 +593,8 @@ bool JobQueue::QueueJobs(int jobTypes, uint chanid, const QDateTime &recstartts,
 {
     if (gCoreContext->GetNumSetting("AutoTranscodeBeforeAutoCommflag", 0))
     {
+        if (jobTypes & JOB_METADATA)
+            QueueJob(JOB_METADATA, chanid, recstartts, args, comment, host);
         if (jobTypes & JOB_TRANSCODE)
             QueueJob(JOB_TRANSCODE, chanid, recstartts, args, comment, host);
         if (jobTypes & JOB_COMMFLAG)
@@ -600,6 +602,8 @@ bool JobQueue::QueueJobs(int jobTypes, uint chanid, const QDateTime &recstartts,
     }
     else
     {
+        if (jobTypes & JOB_METADATA)
+            QueueJob(JOB_METADATA, chanid, recstartts, args, comment, host);
         if (jobTypes & JOB_COMMFLAG)
             QueueJob(JOB_COMMFLAG, chanid, recstartts, args, comment, host);
         if (jobTypes & JOB_TRANSCODE)
@@ -1081,6 +1085,7 @@ QString JobQueue::JobText(int jobType)
     {
         case JOB_TRANSCODE:  return tr("Transcode");
         case JOB_COMMFLAG:   return tr("Flag Commercials");
+        case JOB_METADATA:   return tr("Look up Metadata");
     }
 
     if (jobType & JOB_USERJOB)
@@ -1293,7 +1298,8 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
 
         if ((query.value(12).toDateTime() > QDateTime::currentDateTime()) &&
             ((!commflagWhileRecording) ||
-             (thisJob.type != JOB_COMMFLAG)))
+             ((thisJob.type != JOB_COMMFLAG) &&
+              (thisJob.type != JOB_METADATA))))
         {
             VERBOSE(VB_JOBQUEUE, LOC +
                     QString("GetJobsInQueue: Ignoring '%1' Job "
@@ -1408,6 +1414,8 @@ bool JobQueue::AllowedToRun(JobQueueEntry job)
             case JOB_TRANSCODE:  allowSetting = "JobAllowTranscode";
                                  break;
             case JOB_COMMFLAG:   allowSetting = "JobAllowCommFlag";
+                                 break;
+            case JOB_METADATA:   allowSetting = "JobAllowMetadata";
                                  break;
             default:             return false;
         }
@@ -1684,6 +1692,11 @@ void JobQueue::ProcessJob(JobQueueEntry job)
              (runningJobs[jobID].command == "mythcommflag"))
     {
         StartChildJob(FlagCommercialsThread, jobID);
+    }
+    else if ((job.type == JOB_METADATA) ||
+             (runningJobs[jobID].command == "mythmetadatalookup"))
+    {
+        StartChildJob(MetadataLookupThread, jobID);
     }
     else if (job.type & JOB_USERJOB)
     {
@@ -2057,6 +2070,128 @@ void JobQueue::DoTranscodeThread(int jobID)
     }
 
     RemoveRunningJob(jobID);
+}
+
+void *JobQueue::MetadataLookupThread(void *param)
+{
+    JobThreadStruct *jts = (JobThreadStruct *)param;
+    JobQueue *jq = jts->jq;
+
+    threadRegister(QString("Metadata_%1").arg(jts->jobID));
+    jq->DoMetadataLookupThread(jts->jobID);
+    threadDeregister();
+
+    delete jts;
+
+    return NULL;
+}
+
+void JobQueue::DoMetadataLookupThread(int jobID)
+{
+    // We can't currently lookup non-recording files w/o a ProgramInfo
+    runningJobsLock->lock();
+    if (!runningJobs[jobID].pginfo)
+    {
+        VERBOSE(VB_JOBQUEUE, LOC_ERR +
+                "The JobQueue cannot currently perform lookups for items which do not "
+                "have a chanid/starttime in the recorded table.");
+        ChangeJobStatus(jobID, JOB_ERRORED, "ProgramInfo data not found");
+        RemoveRunningJob(jobID);
+        runningJobsLock->unlock();
+        return;
+    }
+
+    ProgramInfo *program_info = runningJobs[jobID].pginfo;
+    runningJobsLock->unlock();
+
+    QString detailstr = QString("%1 recorded from channel %3")
+        .arg(program_info->toString(ProgramInfo::kTitleSubtitle))
+        .arg(program_info->toString(ProgramInfo::kRecordingKey));
+    QByteArray details = detailstr.toLocal8Bit();
+
+    if (!MSqlQuery::testDBConnection())
+    {
+        QString msg = QString("Metadata Lookup failed.  Could not open "
+                              "new database connection for %1. "
+                              "Program cannot be looked up.")
+                              .arg(details.constData());
+        VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
+
+        ChangeJobStatus(jobID, JOB_ERRORED,
+                        "Could not open new database connection for "
+                        "metadata lookup.");
+
+        delete program_info;
+        return;
+    }
+
+    QString msg = tr("Metadata Lookup Starting");
+    VERBOSE(VB_GENERAL, LOC + "Metadata Lookup Starting for " + detailstr);
+
+    uint retVal = 0;
+    QString path;
+    QString command;
+
+    path = GetInstallPrefix() + "/bin/mythmetadatalookup";
+    command = QString("%1 -j %2")
+                      .arg(path).arg(jobID);
+    command += logPropagateArgs;
+
+    VERBOSE(VB_JOBQUEUE, LOC + QString("Running command: '%1'").arg(command));
+
+    retVal = myth_system(command);
+    int priority = LOG_NOTICE;
+    QString comment;
+
+    runningJobsLock->lock();
+
+    if ((retVal == GENERIC_EXIT_DAEMONIZING_ERROR) ||
+        (retVal == GENERIC_EXIT_CMD_NOT_FOUND))
+    {
+        comment = tr("Unable to find mythmetadatalookup");
+        ChangeJobStatus(jobID, JOB_ERRORED, comment);
+        priority = LOG_WARNING;
+    }
+    else if (runningJobs[jobID].flag == JOB_STOP)
+    {
+        comment = tr("Aborted by user");
+        ChangeJobStatus(jobID, JOB_ABORTED, comment);
+        priority = LOG_WARNING;
+    }
+    else if (retVal == GENERIC_EXIT_NO_RECORDING_DATA)
+    {
+        comment = tr("Unable to open file or init decoder");
+        ChangeJobStatus(jobID, JOB_ERRORED, comment);
+        priority = LOG_WARNING;
+    }
+    else if (retVal >= GENERIC_EXIT_NOT_OK) // 256 or above - error
+    {
+        comment = tr("Failed with exit status %1").arg(retVal);
+        ChangeJobStatus(jobID, JOB_ERRORED, comment);
+        priority = LOG_WARNING;
+    }
+    else
+    {
+        comment = tr("Metadata Lookup Complete.");
+        ChangeJobStatus(jobID, JOB_FINISHED, comment);
+
+        program_info->SendUpdateEvent();
+    }
+
+    msg = tr("Metadata Lookup %1", "Job ID")
+        .arg(StatusText(GetJobStatus(jobID)));
+
+    if (!comment.isEmpty())
+    {
+        detailstr += QString(" (%1)").arg(comment);
+        details = detailstr.toLocal8Bit();
+    }
+
+    if (priority <= LOG_WARNING)
+        VERBOSE(VB_IMPORTANT, LOC_ERR + msg + ": " + details.constData());
+
+    RemoveRunningJob(jobID);
+    runningJobsLock->unlock();
 }
 
 void *JobQueue::FlagCommercialsThread(void *param)

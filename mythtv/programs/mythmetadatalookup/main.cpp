@@ -15,12 +15,15 @@ using namespace std;
 #include "mythdb.h"
 #include "mythversion.h"
 #include "util.h"
+#include "jobqueue.h"
 #include "mythtranslation.h"
 #include "mythconfig.h"
 #include "mythcommandlineparser.h"
 #include "mythlogging.h"
 
 #include "lookup.h"
+
+bool inJobQueue = false;
 
 class MPUBLIC MythMetadataLookupCommandLineParser : public MythCommandLineParser
 {
@@ -38,6 +41,7 @@ void MythMetadataLookupCommandLineParser::LoadArguments(void)
     addHelp();
     addVersion();
     addRecording();
+    addJob();
     addLogging();
 
     add("--refresh-all", "refresh-all", false,
@@ -87,7 +91,9 @@ int main(int argc, char *argv[])
     bool refreshall     = cmdline.toBool("refresh-all");
     bool usedchanid     = cmdline.toBool("chanid");
     bool usedstarttime  = cmdline.toBool("starttime");
+    bool addjob         = cmdline.toBool("jobid");
 
+    int jobid           = cmdline.toInt("jobid");
     uint chanid         = cmdline.toUInt("chanid");
     QDateTime starttime = cmdline.toDateTime("starttime");
 
@@ -98,12 +104,18 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    if (!refreshall && !usedchanid && !usedstarttime)
+    if (!addjob && !refreshall && !usedchanid && !usedstarttime)
     {
         refreshall = true;
     }
 
-    if (!refreshall && !(usedchanid && usedstarttime))
+    if (addjob && (refreshall || usedchanid || usedstarttime))
+    {
+        VERBOSE(VB_IMPORTANT, "The jobqueue (-j) command cannot be use with other options.");
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+
+    if (!refreshall && !addjob && !(usedchanid && usedstarttime))
     {
         VERBOSE(VB_IMPORTANT, "--chanid and --starttime must be used together.");
         return GENERIC_EXIT_INVALID_CMDLINE;
@@ -114,6 +126,12 @@ int main(int argc, char *argv[])
     MythTranslation::load("mythfrontend");
 
     LookerUpper *lookup = new LookerUpper();
+
+    if (addjob)
+    {
+        int type = JOB_METADATA;
+        JobQueue::GetJobInfoFromID(jobid, type, chanid, starttime);
+    }
 
     if (refreshall)
         lookup->HandleAllRecordings();

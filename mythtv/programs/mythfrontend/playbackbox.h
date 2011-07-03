@@ -219,6 +219,7 @@ class PlaybackBox : public ScheduleCommon
     void doPlaylistJobQueueJob(int jobType, int jobFlags = 0);
     void stopPlaylistJobQueueJob(int jobType);
     void doBeginFlagging();
+    void doBeginLookup();
     void doBeginTranscoding()         {   doJobQueueJob(JOB_TRANSCODE,
                                                         JOB_USE_CUTLIST);      }
     void doBeginUserJob1()            {   doJobQueueJob(JOB_USERJOB1);         }
@@ -230,6 +231,8 @@ class PlaybackBox : public ScheduleCommon
     void stopPlaylistTranscoding()    { stopPlaylistJobQueueJob(JOB_TRANSCODE);}
     void doPlaylistBeginFlagging()    {   doPlaylistJobQueueJob(JOB_COMMFLAG); }
     void stopPlaylistFlagging()       { stopPlaylistJobQueueJob(JOB_COMMFLAG); }
+    void doPlaylistBeginLookup()      {   doPlaylistJobQueueJob(JOB_METADATA); }
+    void stopPlaylistLookup()         { stopPlaylistJobQueueJob(JOB_METADATA); }
     void doPlaylistBeginUserJob1()    {   doPlaylistJobQueueJob(JOB_USERJOB1); }
     void stopPlaylistUserJob1()       { stopPlaylistJobQueueJob(JOB_USERJOB1); }
     void doPlaylistBeginUserJob2()    {   doPlaylistJobQueueJob(JOB_USERJOB2); }

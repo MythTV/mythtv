@@ -2672,6 +2672,7 @@ void PlaybackBox::showPlaylistJobPopup(void)
     ProgramInfo *tmpItem;
     bool isTranscoding = true;
     bool isFlagging = true;
+    bool isMetadataLookup = true;
     bool isRunningUserJob1 = true;
     bool isRunningUserJob2 = true;
     bool isRunningUserJob3 = true;
@@ -2690,6 +2691,10 @@ void PlaybackBox::showPlaylistJobPopup(void)
                     JOB_COMMFLAG,
                     tmpItem->GetChanID(), tmpItem->GetRecordingStartTime()))
                 isFlagging = false;
+            if (!JobQueue::IsJobQueuedOrRunning(
+                    JOB_METADATA,
+                    tmpItem->GetChanID(), tmpItem->GetRecordingStartTime()))
+                isMetadataLookup = false;
             if (!JobQueue::IsJobQueuedOrRunning(
                     JOB_USERJOB1,
                     tmpItem->GetChanID(), tmpItem->GetRecordingStartTime()))
@@ -2723,6 +2728,13 @@ void PlaybackBox::showPlaylistJobPopup(void)
     else
         m_popupMenu->AddButton(tr("Stop Commercial Detection"),
                          SLOT(stopPlaylistFlagging()));
+
+    if (!isMetadataLookup)
+        m_popupMenu->AddButton(tr("Begin Metadata Lookup"),
+                         SLOT(doPlaylistBeginLookup()));
+    else
+        m_popupMenu->AddButton(tr("Stop Metadata Lookup"),
+                         SLOT(stopPlaylistLookup()));
 
     command = gCoreContext->GetSetting("UserJob1", "");
     if (!command.isEmpty())
@@ -2887,8 +2899,9 @@ void PlaybackBox::showJobPopup()
     QString jobTitle;
     QString command;
 
-    bool add[6] =
+    bool add[7] =
     {
+        true,
         true,
         true,
         !gCoreContext->GetSetting("UserJob1", "").isEmpty(),
@@ -2896,29 +2909,32 @@ void PlaybackBox::showJobPopup()
         !gCoreContext->GetSetting("UserJob3", "").isEmpty(),
         !gCoreContext->GetSetting("UserJob4", "").isEmpty(),
     };
-    int jobs[6] =
+    int jobs[7] =
     {
         JOB_TRANSCODE,
         JOB_COMMFLAG,
+        JOB_METADATA,
         JOB_USERJOB1,
         JOB_USERJOB2,
         JOB_USERJOB3,
         JOB_USERJOB4,
     };
-    QString desc[12] =
+    QString desc[14] =
     {
         // stop                         start
         tr("Stop Transcoding"),         tr("Begin Transcoding"),
         tr("Stop Commercial Detection"), tr("Begin Commercial Detection"),
+        tr("Stop Metadata Lookup"),      tr("Begin Metadata Lookup"),
         "1",                            "1",
         "2",                            "2",
         "3",                            "3",
         "4",                            "4",
     };
-    const char *myslots[12] =
+    const char *myslots[14] =
     {   // stop                         start
         SLOT(doBeginTranscoding()),     SLOT(showTranscodingProfiles()),
         SLOT(doBeginFlagging()),        SLOT(doBeginFlagging()),
+        SLOT(doBeginLookup()),          SLOT(doBeginLookup()),
         SLOT(doBeginUserJob1()),        SLOT(doBeginUserJob1()),
         SLOT(doBeginUserJob2()),        SLOT(doBeginUserJob2()),
         SLOT(doBeginUserJob3()),        SLOT(doBeginUserJob3()),
@@ -3242,6 +3258,11 @@ void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
 void PlaybackBox::doBeginFlagging()
 {
     doJobQueueJob(JOB_COMMFLAG);
+}
+
+void PlaybackBox::doBeginLookup()
+{
+    doJobQueueJob(JOB_METADATA);
 }
 
 void PlaybackBox::doPlaylistJobQueueJob(int jobType, int jobFlags)

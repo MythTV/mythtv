@@ -626,6 +626,16 @@ static GlobalLineEdit *UserJobDesc(uint job_num)
     return gc;
 };
 
+static HostCheckBox *JobAllowMetadata()
+{
+    HostCheckBox *gc = new HostCheckBox("JobAllowMetadata");
+    gc->setLabel(QObject::tr("Allow metadata lookup jobs"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("If enabled, allow jobs of this type to "
+                                "run on this backend."));
+    return gc;
+};
+
 static HostCheckBox *JobAllowCommFlag()
 {
     HostCheckBox *gc = new HostCheckBox("JobAllowCommFlag");
@@ -945,6 +955,7 @@ BackendSettings::BackendSettings() {
     group5a1->addChild(JobQueueWindowStart());
     group5a1->addChild(JobQueueWindowEnd());
     group5a1->addChild(JobQueueCPU());
+    group5a1->addChild(JobAllowMetadata());
     group5a1->addChild(JobAllowCommFlag());
     group5a1->addChild(JobAllowTranscode());
     group5a->addChild(group5a1);

@@ -3833,6 +3833,22 @@ static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
     if ((!autoTrans) || (autoTrans->getValue().toInt() == 0))
         JobQueue::RemoveJobsFromMask(JOB_TRANSCODE, jobs);
 
+    bool ml = JobQueue::JobIsInMask(JOB_METADATA, jobs);
+    if (ml)
+    {
+        // When allowed, metadata lookup should occur at the
+        // start of a recording to make the additional info
+        // available immediately (and for use in future jobs).
+        QString host = (on_host) ? gCoreContext->GetHostName() : "";
+        JobQueue::QueueJob(JOB_METADATA,
+                           rec->GetChanID(),
+                           rec->GetRecordingStartTime(), "", "",
+                           host, JOB_LIVE_REC);
+
+        // don't do regular metadata lookup, we won't need it.
+        JobQueue::RemoveJobsFromMask(JOB_METADATA, jobs);
+    }
+
     // is commercial flagging enabled, and is on-line comm flagging enabled?
     bool rt = JobQueue::JobIsInMask(JOB_COMMFLAG, jobs) && on_line_comm;
     // also, we either need transcoding to be disabled or

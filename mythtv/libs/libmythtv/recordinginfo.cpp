@@ -470,6 +470,8 @@ int RecordingInfo::GetAutoRunJobs(void) const
         result |= JOB_TRANSCODE;
     if (record->m_autoCommFlag)
         result |= JOB_COMMFLAG;
+    if (record->m_autoMetadataLookup)
+        result |= JOB_METADATA;
     if (record->m_autoUserJob1)
         result |= JOB_USERJOB1;
     if (record->m_autoUserJob2)
@@ -478,6 +480,7 @@ int RecordingInfo::GetAutoRunJobs(void) const
         result |= JOB_USERJOB3;
     if (record->m_autoUserJob4)
         result |= JOB_USERJOB4;
+
 
     return result;
 }

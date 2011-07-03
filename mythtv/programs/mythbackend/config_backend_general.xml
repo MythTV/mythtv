@@ -492,6 +492,14 @@
         <option display="Medium" data="1" />
         <option display="High"   data="2" />
       </setting>
+      <setting data_type="checkbox" value="JobAllowMetadata"
+               label="Allow metadata lookup jobs"
+               default_data="true"
+               setting_type="host"
+               help_text="If enabled, allow metadata lookup jobs to
+                          run on this backend. Metadata lookup jobs
+                          add information like season and episode to
+                          completed recordings." />
       <setting data_type="checkbox" value="JobAllowCommFlag"
                label="Allow commercial-detection jobs"
                default_data="true"
