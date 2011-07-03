@@ -287,7 +287,7 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
             break;
     }
 
-    LOG(VB_AUDIO | VB_TIMESTAMP, LOG_DEBUG
+    LOG(VB_AUDIO | VB_TIMESTAMP, LOG_DEBUG,
         QString("FreeSurround::putFrames %1 #ch %2 used %3 generated %4")
             .arg(numFrames).arg(numChannels).arg(i).arg(out_count));
 
