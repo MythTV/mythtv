@@ -13,6 +13,7 @@ using_frontend {
 
 using_backend {
     SUBDIRS += mythbackend mythfilldatabase mythtv-setup scripts
+    SUBDIRS += mythmetadatalookup
 }
 
 using_mythtranscode: SUBDIRS += mythtranscode
