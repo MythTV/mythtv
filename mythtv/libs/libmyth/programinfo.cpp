@@ -3653,6 +3653,41 @@ void ProgramInfo::UpdateInUseMark(bool force)
         MarkAsInUse(true);
 }
 
+void ProgramInfo::SaveSeasonEpisode(uint seas, uint ep)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "UPDATE recorded "
+        "SET season = :SEASON, episode = :EPISODE "
+        "WHERE chanid = :CHANID AND starttime = :STARTTIME");
+
+    query.bindValue(":SEASON",     seas);
+    query.bindValue(":EPISODE",    ep);
+    query.bindValue(":CHANID",     chanid);
+    query.bindValue(":STARTTIME",  recstartts);
+    query.exec();
+
+    SendUpdateEvent();
+}
+
+void ProgramInfo::SaveInetRef(const QString &inet)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "UPDATE recorded "
+        "SET inetref = :INETREF "
+        "WHERE chanid = :CHANID AND starttime = :STARTTIME");
+
+    query.bindValue(":INETREF",    inet);
+    query.bindValue(":CHANID",     chanid);
+    query.bindValue(":STARTTIME",  recstartts);
+    query.exec();
+
+    SendUpdateEvent();
+}
+
 /** \brief Attempts to ascertain if the main file for this ProgramInfo
  *         is readable.
  *  \note This method often initiates a QUERY_CHECKFILE MythProto

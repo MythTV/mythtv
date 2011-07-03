@@ -541,6 +541,8 @@ class MPUBLIC ProgramInfo
     void UpdateLastDelete(bool setTime) const;
     void MarkAsInUse(bool inuse, QString usedFor = "");
     void UpdateInUseMark(bool force = false);
+    void SaveSeasonEpisode(uint seas, uint ep);
+    void SaveInetRef(const QString &inet);
 
     // Extremely slow functions that cannot be called from the UI thread.
     QString DiscoverRecordingDirectory(void) const;
