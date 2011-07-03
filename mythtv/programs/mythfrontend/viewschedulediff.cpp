@@ -302,17 +302,20 @@ void ViewScheduleDiff::updateUIList(void)
 
         QString state = toUIState(pginfo->GetRecordingStatus());
 
+        item->DisplayState(state, "status");
         item->SetTextFromMap(infoMap, state);
 
         if (s.before)
             item->SetText(toString(s.before->GetRecordingStatus(),
-                                   s.before->GetCardID()), "statusbefore");
+                                   s.before->GetCardID()), "statusbefore",
+                          state);
         else
             item->SetText("-", "statusbefore");
 
         if (s.after)
             item->SetText(toString(s.after->GetRecordingStatus(),
-                                   s.after->GetCardID()), "statusafter");
+                                   s.after->GetCardID()), "statusafter",
+                          state);
         else
             item->SetText("-", "statusafter");
     }
