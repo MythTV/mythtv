@@ -188,10 +188,10 @@ static int BuildVideoMarkup(ProgramInfo *program_info, bool useDB)
     return GENERIC_EXIT_OK;
 }
 
-static int QueueCommFlagJob(uint chanid, QString starttime)
+static int QueueCommFlagJob(uint chanid, QDateTime starttime)
 {
-    QDateTime recstartts = myth_dt_from_string(starttime);
-    const ProgramInfo pginfo(chanid, recstartts);
+    QString startstring = starttime.toString("yyyyMMddhhmmss");
+    const ProgramInfo pginfo(chanid, starttime);
 
     if (!pginfo.GetChanID())
     {
@@ -199,7 +199,7 @@ static int QueueCommFlagJob(uint chanid, QString starttime)
         {
             QString tmp = QString(
                 "Unable to find program info for chanid %1 @ %2")
-                .arg(chanid).arg(starttime);
+                .arg(chanid).arg(startstring);
             cerr << tmp.toLocal8Bit().constData() << endl;
         }
         return GENERIC_EXIT_NO_RECORDING_DATA;
@@ -213,7 +213,7 @@ static int QueueCommFlagJob(uint chanid, QString starttime)
         if (progress)
         {
             QString tmp = QString("Job Queued for chanid %1 @ %2")
-                .arg(chanid).arg(starttime);
+                .arg(chanid).arg(startstring);
             cerr << tmp.toLocal8Bit().constData() << endl;
         }
         return GENERIC_EXIT_OK;
@@ -223,7 +223,7 @@ static int QueueCommFlagJob(uint chanid, QString starttime)
         if (progress)
         {
             QString tmp = QString("Error queueing job for chanid %1 @ %2")
-                .arg(chanid).arg(starttime);
+                .arg(chanid).arg(startstring);
             cerr << tmp.toLocal8Bit().constData() << endl;
         }
         return GENERIC_EXIT_DB_ERROR;
@@ -232,19 +232,19 @@ static int QueueCommFlagJob(uint chanid, QString starttime)
     return GENERIC_EXIT_OK;
 }
 
-static int CopySkipListToCutList(QString chanid, QString starttime)
+static int CopySkipListToCutList(QString chanid, QDateTime starttime)
 {
     frm_dir_map_t cutlist;
     frm_dir_map_t::const_iterator it;
 
-    QDateTime recstartts = myth_dt_from_string(starttime);
-    const ProgramInfo pginfo(chanid.toUInt(), recstartts);
+    QString startstring = starttime.toString("yyyyMMddhhmmss");
+    const ProgramInfo pginfo(chanid.toUInt(), starttime);
 
     if (!pginfo.GetChanID())
     {
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
-                .arg(chanid).arg(starttime));
+                .arg(chanid).arg(startstring));
         return GENERIC_EXIT_NO_RECORDING_DATA;
     }
 
@@ -259,16 +259,16 @@ static int CopySkipListToCutList(QString chanid, QString starttime)
     return GENERIC_EXIT_OK;
 }
 
-static int ClearSkipList(QString chanid, QString starttime)
+static int ClearSkipList(QString chanid, QDateTime starttime)
 {
-    QDateTime recstartts = myth_dt_from_string(starttime);
-    const ProgramInfo pginfo(chanid.toUInt(), recstartts);
+    QString startstring = starttime.toString("yyyyMMddhhmmss");
+    const ProgramInfo pginfo(chanid.toUInt(), starttime);
 
     if (!pginfo.GetChanID())
     {
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
-                .arg(chanid).arg(starttime));
+                .arg(chanid).arg(startstring));
         return GENERIC_EXIT_NO_RECORDING_DATA;
     }
 
@@ -280,7 +280,7 @@ static int ClearSkipList(QString chanid, QString starttime)
     return GENERIC_EXIT_OK;
 }
 
-static int SetCutList(QString chanid, QString starttime, QString newCutList)
+static int SetCutList(QString chanid, QDateTime starttime, QString newCutList)
 {
     frm_dir_map_t cutlist;
 
@@ -295,14 +295,14 @@ static int SetCutList(QString chanid, QString starttime, QString newCutList)
         cutlist[cutpair[1].toInt()] = MARK_CUT_END;
     }
 
-    QDateTime recstartts = myth_dt_from_string(starttime);
-    const ProgramInfo pginfo(chanid.toUInt(), recstartts);
+    QString startstring = starttime.toString("yyyyMMddhhmmss");
+    const ProgramInfo pginfo(chanid.toUInt(), starttime);
 
     if (!pginfo.GetChanID())
     {
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
-                .arg(chanid).arg(starttime));
+                .arg(chanid).arg(startstring));
         return GENERIC_EXIT_NO_RECORDING_DATA;
     }
 
@@ -313,20 +313,20 @@ static int SetCutList(QString chanid, QString starttime, QString newCutList)
     return GENERIC_EXIT_OK;
 }
 
-static int GetMarkupList(QString list, QString chanid, QString starttime)
+static int GetMarkupList(QString list, QString chanid, QDateTime starttime)
 {
     frm_dir_map_t cutlist;
     frm_dir_map_t::const_iterator it;
     QString result;
 
-    QDateTime recstartts = myth_dt_from_string(starttime);
-    const ProgramInfo pginfo(chanid.toUInt(), recstartts);
+    QString startstring = starttime.toString("yyyyMMddhhmmss");
+    const ProgramInfo pginfo(chanid.toUInt(), starttime);
 
     if (!pginfo.GetChanID())
     {
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
-                .arg(chanid).arg(starttime));
+                .arg(chanid).arg(startstring));
         return GENERIC_EXIT_NO_RECORDING_DATA;
     }
 
@@ -915,17 +915,17 @@ static int FlagCommercials(
 }
 
 static int FlagCommercials(
-    uint chanid, const QString &starttime,
+    uint chanid, const QDateTime &starttime,
     const QString &outputfilename, bool useDB)
 {
-    QDateTime recstartts = myth_dt_from_string(starttime);
-    ProgramInfo pginfo(chanid, recstartts);
+    QString startstring = starttime.toString("yyyyMMddhhmmss");
+    ProgramInfo pginfo(chanid, starttime);
 
     if (!pginfo.GetChanID())
     {
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
-                .arg(chanid).arg(starttime));
+                .arg(chanid).arg(startstring));
         return GENERIC_EXIT_NO_RECORDING_DATA;
     }
 
@@ -943,7 +943,7 @@ int main(int argc, char *argv[])
     QString outputfilename = QString::null;
 
     uint chanid = 0;
-    QString starttime;
+    QDateTime starttime;
     QString allStart = "19700101000000";
     QString allEnd   = QDateTime::currentDateTime().toString("yyyyMMddhhmmss");
     int jobID = -1;
@@ -986,7 +986,7 @@ int main(int argc, char *argv[])
     if (!cmdline.toString("chanid").isEmpty())
         chanid = cmdline.toUInt("chanid");
     if (!cmdline.toString("starttime").isEmpty())
-        starttime = cmdline.toString("starttime");
+        starttime = cmdline.toDateTime("starttime");
     if (!cmdline.toString("file").isEmpty())
     {
         filename = cmdline.toString("file");
@@ -1106,7 +1106,7 @@ int main(int argc, char *argv[])
         if (query.exec() && query.next())
         {
             chanid = query.value(0).toUInt();
-            starttime = query.value(1).toDateTime().toString("yyyyMMddhhmmss");
+            starttime = query.value(1).toDateTime();
         }
         else
         {
@@ -1116,8 +1116,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    if ((!chanid && !starttime.isEmpty()) ||
-        (chanid && starttime.isEmpty()))
+    if ((!chanid && starttime.isValid()) ||
+        (chanid && !starttime.isValid()))
     {
         VERBOSE(VB_IMPORTANT, "You must specify both the Channel ID "
                 "and the Start Time.");
@@ -1221,7 +1221,7 @@ int main(int argc, char *argv[])
         ProgramInfo pginfo(filename);
         result = BuildVideoMarkup(&pginfo, useDB);
     }
-    else if (chanid && !starttime.isEmpty())
+    else if (chanid && starttime.isValid())
     {
         if (queueJobInstead)
             QueueCommFlagJob(chanid, starttime);
@@ -1280,10 +1280,9 @@ int main(int argc, char *argv[])
         {
             while (query.next())
             {
-                QDateTime m_starttime =
+                starttime =
                     QDateTime::fromString(query.value(1).toString(),
                                           Qt::ISODate);
-                starttime = m_starttime.toString("yyyyMMddhhmmss");
 
                 chanid = query.value(0).toUInt();
 
@@ -1313,7 +1312,7 @@ int main(int argc, char *argv[])
                     mark_query.bindValue(":MARK_START", MARK_COMM_START);
                     mark_query.bindValue(":MARK_END", MARK_COMM_END);
                     mark_query.bindValue(":CHANID", chanid);
-                    mark_query.bindValue(":STARTTIME", m_starttime);
+                    mark_query.bindValue(":STARTTIME", starttime);
 
                     if (mark_query.exec() && mark_query.isActive() &&
                         mark_query.size() > 0)
@@ -1344,7 +1343,7 @@ int main(int argc, char *argv[])
                             VERBOSE(VB_COMMFLAG,
                                     QString("Status for chanid %1 @ %2 is '%3'")
                                             .arg(chanid)
-                                            .arg(starttime)
+                                            .arg(starttime.toString("yyyyMMddhhmmss"))
                                             .arg(flagStatusStr));
 
                             if ((flagStatus == COMM_FLAG_NOT_FLAGGED) &&

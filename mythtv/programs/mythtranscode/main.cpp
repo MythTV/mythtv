@@ -124,11 +124,11 @@ static int QueueTranscodeJob(ProgramInfo *pginfo, QString profile,
 int main(int argc, char *argv[])
 {
     uint chanid;
-    QString starttime, infile, outfile;
+    QDateTime starttime;
+    QString infile, outfile;
     QString profilename = QString("autodetect");
     QString fifodir = NULL;
     int jobID = -1;
-    QDateTime startts;
     int jobType = JOB_NONE;
     int otype = REPLEX_MPEG2;
     bool useCutlist = false, keyframesonly = false;
@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
 
     if (cmdline.toBool("starttime"))
     {
-        starttime = cmdline.toString("starttime");
+        starttime = cmdline.toDateTime("starttime");
         found_starttime = 1;
     }
     if (cmdline.toBool("chanid"))
@@ -313,9 +313,8 @@ int main(int argc, char *argv[])
 
     if (jobID != -1)
     {
-        if (JobQueue::GetJobInfoFromID(jobID, jobType, chanid, startts))
+        if (JobQueue::GetJobInfoFromID(jobID, jobType, chanid, starttime))
         {
-            starttime = startts.toString(Qt::ISODate);
             found_starttime = 1;
             found_chanid = 1;
         }
@@ -375,13 +374,12 @@ int main(int argc, char *argv[])
     }
     else if (!found_infile)
     {
-        QDateTime recstartts = myth_dt_from_string(starttime);
-        pginfo = new ProgramInfo(chanid, recstartts);
+        pginfo = new ProgramInfo(chanid, starttime);
 
         if (!pginfo->GetChanID())
         {
             QString msg = QString("Couldn't find recording for chanid %1 @ %2")
-                .arg(chanid).arg(starttime);
+                .arg(chanid).arg(starttime.toString("yyyyMMddhhmmss"));
             cerr << msg.toLocal8Bit().constData() << endl;
             delete pginfo;
             return GENERIC_EXIT_NO_RECORDING_DATA;

@@ -90,8 +90,7 @@ int main(int argc, char *argv[])
     bool usedstarttime  = cmdline.toBool("starttime");
 
     uint chanid         = cmdline.toUInt("chanid");
-    QString startstring = cmdline.toString("starttime");
-    QDateTime starttime = myth_dt_from_string(startstring);
+    QDateTime starttime = cmdline.toDateTime("starttime");
 
     if (refreshall && (usedchanid || usedstarttime))
     {

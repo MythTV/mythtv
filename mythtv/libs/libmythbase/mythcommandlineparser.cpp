@@ -474,6 +474,8 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
                 m_parsed[argdef.name] = QVariant(val.toLongLong());
             else if (argdef.type == QVariant::Double)
                 m_parsed[argdef.name] = QVariant(val.toDouble());
+            else if (argdef.type == QVariant::DateTime)
+                m_parsed[argdef.name] = QVariant(myth_dt_from_string(val));
             else if (argdef.type == QVariant::StringList)
             {
                 QStringList slist;
@@ -923,7 +925,7 @@ void MythCommandLineParser::addRecording(void)
 {
     add("--chanid", "chanid", 0U,
             "Specify chanid of recording to operate on.", "");
-    add("--starttime", "starttime", "",
+    add("--starttime", "starttime", QDateTime(),
             "Specify start time of recording to operate on.", "");
 }
 

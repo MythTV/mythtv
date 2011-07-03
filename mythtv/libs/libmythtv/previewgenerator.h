@@ -25,8 +25,8 @@ typedef QMap<QString,QDateTime> FileTimeStampMap;
 
 class MTV_PUBLIC PreviewGenerator : public QThread
 {
-    friend int preview_helper(const QString &chanid,
-                              const QString &starttime,
+    friend int preview_helper(uint           chanid,
+                              QDateTime      starttime,
                               long long      previewFrameNumber,
                               long long      previewSeconds,
                               const QSize   &previewSize,
