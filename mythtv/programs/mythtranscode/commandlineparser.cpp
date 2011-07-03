@@ -14,7 +14,6 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
 {
     addHelp();
     addVersion();
-    addVerbose();
     addJob();
     addRecording();
     addSettingsOverride();

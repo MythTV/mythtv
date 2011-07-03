@@ -910,17 +910,6 @@ void MythCommandLineParser::addSettingsOverride(void)
             "loaded for setting overrides.", "");
 }
 
-void MythCommandLineParser::addVerbose(void)
-{
-    add(QStringList( QStringList() << "-v" << "--verbose" ), "verbose",
-            "important,general",
-            "Specify log filtering. Use '-v help' for level info.", "");
-    add("-V", "verboseint", 0U, "",
-            "This option is intended for internal use only.\n"
-            "This option takes an unsigned value corresponding "
-            "to the bitwise log verbosity operator.");
-}
-
 void MythCommandLineParser::addRecording(void)
 {
     add("--chanid", "chanid", 0U,
@@ -949,6 +938,13 @@ void MythCommandLineParser::addUPnP(void)
 
 void MythCommandLineParser::addLogging(void)
 {
+    add(QStringList( QStringList() << "-v" << "--verbose" ), "verbose",
+            "important,general",
+            "Specify log filtering. Use '-v help' for level info.", "");
+    add("-V", "verboseint", 0U, "",
+            "This option is intended for internal use only.\n"
+            "This option takes an unsigned value corresponding "
+            "to the bitwise log verbosity operator.");
     add(QStringList( QStringList() << "-l" << "--logfile" << "--logpath" ), 
             "logpath", "",
             "Writes logging messages to a file at logpath.\n"

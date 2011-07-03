@@ -14,7 +14,6 @@ void MythShutdownCommandLineParser::LoadArguments(void)
 {
     addHelp();
     addVersion();
-    addVerbose();
     addLogging();
 
     add(QStringList( QStringList() << "-w" << "--setwakeup" ), "setwakeup", "",

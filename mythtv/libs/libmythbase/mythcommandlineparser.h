@@ -157,7 +157,6 @@ class MBASE_PUBLIC MythCommandLineParser
     void addWindowed(bool);
     void addDaemon(void);
     void addSettingsOverride(void);
-    void addVerbose(void);
     void addRecording(void);
     void addGeometry(void);
     void addDisplay(void);

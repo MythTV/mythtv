@@ -2467,7 +2467,6 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
 {
     addHelp();
     addVersion();
-    addVerbose();
     addLogging();
 
     add(QStringList( QStringList() << "-t" << "--createthumbnail" ),

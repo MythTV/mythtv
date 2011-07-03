@@ -37,7 +37,6 @@ void MythMetadataLookupCommandLineParser::LoadArguments(void)
 {
     addHelp();
     addVersion();
-    addVerbose();
     addRecording();
     addLogging();
 

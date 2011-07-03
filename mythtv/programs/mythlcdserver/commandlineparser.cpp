@@ -14,7 +14,6 @@ void MythLCDServerCommandLineParser::LoadArguments(void)
 {
     addHelp();
     addVersion();
-    addVerbose();
     addDaemon();
     addLogging();
     //addPIDFile();
