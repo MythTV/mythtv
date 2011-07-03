@@ -595,7 +595,7 @@ MetadataLookup* ParseMetadataItem(const QDomElement& item,
             season = item.firstChildElement("season").text().toUInt();
             episode = item.firstChildElement("episode").text().toUInt();
         }
-        VERBOSE(VB_GENERAL, QString("Parsing Season, %1 %2")
+        LOG(VB_GENERAL, LOG_INFO, QString("Parsing Season, %1 %2")
             .arg(season).arg(episode));
     }
 

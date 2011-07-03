@@ -256,14 +256,15 @@ class ParentalLevelChangeCheckerPrivate : public QObject
 
         // See if we recently (and successfully) asked for a password
         QString last_time_stamp = gCoreContext->GetSetting("VideoPasswordTime");
-        int last_parent_lvl = gCoreContext->GetNumSetting("VideoPasswordLevel", -1);
+        int last_parent_lvl = gCoreContext->GetNumSetting("VideoPasswordLevel",
+                                                          -1);
 
         if (!last_time_stamp.length() || last_parent_lvl == -1)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("%1: Could not read password/pin time "
-                            "stamp. This is only an issue if it "
-                            "happens repeatedly.").arg(__FILE__));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("%1: Could not read password/pin time "
+                        "stamp. This is only an issue if it "
+                        "happens repeatedly.").arg(__FILE__));
         }
         else
         {

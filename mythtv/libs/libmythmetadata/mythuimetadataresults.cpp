@@ -38,7 +38,7 @@ bool MetadataResultsDialog::Create()
     UIUtilE::Assign(this, m_resultsList, "results", &err);
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'MythMetadataResults'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'MythMetadataResults'");
         return false;
     }
 
@@ -112,7 +112,7 @@ void MetadataResultsDialog::cleanCacheDir()
         QDateTime lastmod = fi.lastModified();
         if (lastmod.addDays(2) < QDateTime::currentDateTime())
         {
-            VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting old cache file %1")
+            LOG(VB_GENERAL, LOG_DEBUG, QString("Deleting old cache file %1")
                   .arg(filename));
             QFile::remove(filename);
         }

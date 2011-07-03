@@ -38,7 +38,7 @@ bool ImageSearchResultsDialog::Create()
     UIUtilE::Assign(this, m_resultsList, "results", &err);
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'MythArtworkResults'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'MythArtworkResults'");
         return false;
     }
 
@@ -106,7 +106,7 @@ void ImageSearchResultsDialog::cleanCacheDir()
         QDateTime lastmod = fi.lastModified();
         if (lastmod.addDays(2) < QDateTime::currentDateTime())
         {
-            VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting file %1")
+            LOG(VB_GENERAL, LOG_DEBUG, QString("Deleting file %1")
                   .arg(filename));
             QFile::remove(filename);
         }

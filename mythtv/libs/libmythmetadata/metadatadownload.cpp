@@ -109,7 +109,8 @@ void MetadataDownload::run()
                 continue;
             }
 
-            VERBOSE(VB_GENERAL, QString("Returning Metadata Results: %1 %2 %3")
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Returning Metadata Results: %1 %2 %3")
                     .arg(lookup->GetTitle()).arg(lookup->GetSeason())
                     .arg(lookup->GetEpisode()));
             QCoreApplication::postEvent(m_parent,
@@ -153,13 +154,14 @@ bool MetadataDownload::findBestMatch(MetadataLookupList list,
     // If no "best" was chosen, give up.
     if (bestTitle.isEmpty())
     {
-        VERBOSE(VB_GENERAL, QString("No adequate match or multiple "
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("No adequate match or multiple "
                     "matches found for %1.  Update manually.")
                     .arg(originaltitle));
         return false;
     }
 
-    VERBOSE(VB_GENERAL, QString("Best Title Match For %1: %2")
+    LOG(VB_GENERAL, LOG_INFO, QString("Best Title Match For %1: %2")
                     .arg(originaltitle).arg(bestTitle));
 
     // Grab the one item that matches the besttitle (IMPERFECT)
@@ -196,7 +198,7 @@ MetadataLookupList MetadataDownload::runGrabber(QString cmd, QStringList args,
     MythSystem grabber(cmd, args, kMSRunShell | kMSStdOut | kMSBuffered);
     MetadataLookupList list;
 
-    VERBOSE(VB_GENERAL, QString("Running Grabber: %1 %2")
+    LOG(VB_GENERAL, LOG_INFO, QString("Running Grabber: %1 %2")
         .arg(cmd).arg(args.join(" ")));
 
     grabber.Run();
@@ -226,8 +228,8 @@ MetadataLookupList MetadataDownload::readMXML(QString MXMLpath,
 {
     MetadataLookupList list;
 
-    VERBOSE(VB_GENERAL, QString("Matching MXML file found. "
-               "Parsing %1 for metadata...")
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("Matching MXML file found. Parsing %1 for metadata...")
                .arg(MXMLpath));
 
     if (lookup->GetType() == VID)
@@ -250,7 +252,8 @@ MetadataLookupList MetadataDownload::readMXML(QString MXMLpath,
                         item = root.firstChildElement("item");
                     }
                     else
-                        VERBOSE(VB_GENERAL, QString("Corrupt or invalid MXML file."));
+                        LOG(VB_GENERAL, LOG_ERR,
+                            QString("Corrupt or invalid MXML file."));
                 }
                 rf->Close();
             }
@@ -272,7 +275,8 @@ MetadataLookupList MetadataDownload::readMXML(QString MXMLpath,
                     item = root.firstChildElement("item");
                 }
                 else
-                    VERBOSE(VB_GENERAL, QString("Corrupt or invalid MXML file."));
+                    LOG(VB_GENERAL, LOG_ERR,
+                        QString("Corrupt or invalid MXML file."));
                 file.close();
             }
         }
@@ -289,8 +293,8 @@ MetadataLookupList MetadataDownload::readNFO(QString NFOpath,
 {
     MetadataLookupList list;
 
-    VERBOSE(VB_GENERAL, QString("Matching NFO file found. "
-               "Parsing %1 for metadata...")
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("Matching NFO file found. Parsing %1 for metadata...")
                .arg(NFOpath));
 
     if (lookup->GetType() == VID)
@@ -312,7 +316,8 @@ MetadataLookupList MetadataDownload::readNFO(QString NFOpath,
                         item = doc.documentElement();
                     }
                     else
-                        VERBOSE(VB_GENERAL, QString("PIRATE ERROR: Invalid NFO file found."));
+                        LOG(VB_GENERAL, LOG_ERR,
+                            QString("PIRATE ERROR: Invalid NFO file found."));
                 }
                 rf->Close();
             }
@@ -333,7 +338,8 @@ MetadataLookupList MetadataDownload::readNFO(QString NFOpath,
                     item = doc.documentElement();
                 }
                 else
-                    VERBOSE(VB_GENERAL, QString("PIRATE ERROR: Invalid NFO file found."));
+                    LOG(VB_GENERAL, LOG_ERR,
+                        QString("PIRATE ERROR: Invalid NFO file found."));
                 file.close();
             }
         }

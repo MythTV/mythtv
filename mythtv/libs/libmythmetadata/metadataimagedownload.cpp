@@ -81,7 +81,7 @@ void MetadataImageDownload::run()
         // inform parent we have thumbnail ready for it
         if (QFile::exists(sFilename) && m_parent)
         {
-            VERBOSE(VB_GENERAL|VB_EXTRA,
+            LOG(VB_GENERAL, LOG_DEBUG,
                     QString("Threaded Image Thumbnail Download: %1")
                     .arg(sFilename));
             thumb->url = sFilename;
@@ -112,9 +112,9 @@ void MetadataImageDownload::run()
                 if (!dirPath.exists())
                     if (!dirPath.mkpath(path))
                     {
-                        VERBOSE(VB_GENERAL,
-                             QString("Metadata Image Download: Unable to create "
-                                     "path %1, aborting download.").arg(path));
+                        LOG(VB_GENERAL, LOG_ERR,
+                            QString("Metadata Image Download: Unable to create "
+                                    "path %1, aborting download.").arg(path));
                         continue;
                     }
                 QString finalfile = path + "/" + filename;
@@ -130,8 +130,8 @@ void MetadataImageDownload::run()
                         dest_file.remove();
                     }
 
-                    VERBOSE(VB_GENERAL,
-                         QString("Metadata Image Download: %1 ->%2")
+                    LOG(VB_GENERAL, LOG_INFO,
+                        QString("Metadata Image Download: %1 ->%2")
                          .arg(oldurl).arg(finalfile));
                     QByteArray *download = new QByteArray();
                     GetMythDownloadManager()->download(oldurl, download);
@@ -140,9 +140,9 @@ void MetadataImageDownload::run()
                     bool didLoad = testImage.loadFromData(*download);
                     if (!didLoad)
                     {
-                        VERBOSE(VB_IMPORTANT,QString("Tried to write %1, "
-                                "but it appears to be an HTML redirect "
-                                "(filesize %2).")
+                        LOG(VB_GENERAL, LOG_ERR,
+                            QString("Tried to write %1, but it appears to be "
+                                    "an HTML redirect (filesize %2).")
                                 .arg(oldurl).arg(download->size()));
                         delete download;
                         download = NULL;
@@ -151,12 +151,13 @@ void MetadataImageDownload::run()
 
                     if (dest_file.open(QIODevice::WriteOnly))
                     {
-                        off_t size = dest_file.write(*download, download->size());
+                        off_t size = dest_file.write(*download,
+                                                     download->size());
                         if (size != download->size())
                         {
-                            VERBOSE(VB_IMPORTANT,
-                            QString("Image Download: Error Writing Image "
-                                    "to file: %1").arg(finalfile));
+                            LOG(VB_GENERAL, LOG_ERR,
+                                QString("Image Download: Error Writing Image "
+                                        "to file: %1").arg(finalfile));
                         }
                         else
                             downloaded.insert(type, info);
@@ -183,9 +184,9 @@ void MetadataImageDownload::run()
                         RemoteFile::DeleteFile(finalfile);
                     }
 
-                    VERBOSE(VB_GENERAL,
+                    LOG(VB_GENERAL, LOG_INFO,
                         QString("Metadata Image Download: %1 -> %2")
-                        .arg(oldurl).arg(finalfile));
+                            .arg(oldurl).arg(finalfile));
                     QByteArray *download = new QByteArray();
                     GetMythDownloadManager()->download(oldurl, download);
 
@@ -193,9 +194,10 @@ void MetadataImageDownload::run()
                     bool didLoad = testImage.loadFromData(*download);
                     if (!didLoad)
                     {
-                        VERBOSE(VB_IMPORTANT,QString("Tried to write %1, "
-                                "but it appears to be an HTML redirect "
-                                "or corrupt file (filesize %2).")
+                        LOG(VB_GENERAL, LOG_ERR,
+                            QString("Tried to write %1, but it appears to be "
+                                    "an HTML redirect or corrupt file "
+                                    "(filesize %2).")
                                 .arg(oldurl).arg(download->size()));
                         delete download;
                         download = NULL;
@@ -205,7 +207,7 @@ void MetadataImageDownload::run()
                     RemoteFile *outFile = new RemoteFile(finalfile, true);
                     if (!outFile->isOpen())
                     {
-                        VERBOSE(VB_IMPORTANT,
+                        LOG(VB_GENERAL, LOG_ERR,
                             QString("Image Download: Failed to open "
                                     "remote file (%1) for write.  Does "
                                     "Storage Group Exist?")
@@ -219,9 +221,9 @@ void MetadataImageDownload::run()
                                                        download->size());
                         if (written != download->size())
                         {
-                            VERBOSE(VB_IMPORTANT,
-                            QString("Image Download: Error Writing Image "
-                                    "to file: %1").arg(finalfile));
+                            LOG(VB_GENERAL, LOG_ERR,
+                                QString("Image Download: Error Writing Image "
+                                        "to file: %1").arg(finalfile));
                         }
                         else
                             downloaded.insert(type, info);
@@ -411,7 +413,7 @@ void cleanThumbnailCacheDir()
         QDateTime lastmod = fi.lastModified();
         if (lastmod.addDays(2) < QDateTime::currentDateTime())
         {
-            VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting file %1")
+            LOG(VB_GENERAL, LOG_DEBUG, QString("Deleting file %1")
                   .arg(filename));
             QFile::remove(filename);
         }

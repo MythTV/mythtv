@@ -88,12 +88,15 @@ namespace
                 }
                 else
                 {
-                    //VERBOSE(VB_GENERAL, QString(" -- Dir : %1").arg(p->absoluteFilePath()));
+#if 0
+                    LOG(VB_GENERAL, LOG_DEBUG, 
+                        QString(" -- Dir : %1").arg(p->absoluteFilePath()));
+#endif
                     DirectoryHandler *dh =
                             handler->newDir(p->fileName(),
                                             p->absoluteFilePath());
 
-                    // Since we are dealing with a subdirectory a failure is fine,
+                    // Since we are dealing with a subdirectory failure is fine,
                     // so we'll just ignore the failue and continue
                     (void) scan_dir(p->absoluteFilePath(), dh, ext_settings);
                 }
@@ -101,7 +104,10 @@ namespace
 
             if (add_as_file)
             {
-		        //VERBOSE(VB_GENERAL, QString(" -- File : %1").arg(p->fileName()));
+#if 0
+                LOG(VB_GENERAL, LOG_DEBUG,
+                    QString(" -- File : %1").arg(p->fileName()));
+#endif
                 handler->handleFile(p->fileName(), p->absoluteFilePath(),
                                     p->suffix(), "");
             }
@@ -112,7 +118,7 @@ namespace
 
     bool scan_sg_dir(const QString &start_path, const QString &host,
                      const QString &base_path, DirectoryHandler *handler,
-		     const ext_lookup &ext_settings, bool isMaster = false)
+                     const ext_lookup &ext_settings, bool isMaster = false)
     {
         QString path = start_path;
 
@@ -139,8 +145,9 @@ namespace
 
         if (!ok || (!list.isEmpty() && list.at(0).startsWith("SLAVE UNREACHABLE")))
         {
-            VERBOSE(VB_GENERAL, QString("Backend : %1 : Is currently Unreachable. Skipping this one.")
-                                .arg(host));
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Backend : %1 : Is currently Unreachable. Skipping "
+                        "this one.") .arg(host));
             return false;
         }
 
@@ -165,14 +172,18 @@ namespace
                 !fileName.endsWith("VIDEO_TS") &&
                 !fileName.endsWith("BDMV"))
             {
-                //VERBOSE(VB_GENERAL, QString(" -- Dir : %1").arg(fileName));
+#if 0
+                LOG(VB_GENERAL, LOG_DEBUG,
+                    QString(" -- Dir : %1").arg(fileName));
+#endif
                 DirectoryHandler *dh =
                         handler->newDir(fileName,
                                         start_path);
 
-                // Same as a nomal scan_dir we don't care if we can't read subdirectories
-                // so ignore the results and continue. As long as we reached it once
-                // to make it this far than we know he SG/Path exists
+                // Same as a normal scan_dir we don't care if we can't read
+                // subdirectories so ignore the results and continue. As long
+                // as we reached it once to make it this far than we know the 
+                // SG/Path exists
                 (void) scan_sg_dir(start_path + "/" + fileName, host, base_path,
                              dh, ext_settings, isMaster);
             }
@@ -205,9 +216,11 @@ namespace
 
                 if (URL.startsWith("/"))
                     URL = URL.right(URL.length() - 1);
-                //VERBOSE(VB_GENERAL, QString(" -- File Filename: %1 URL: %2 Suffix: %3 Host: %4")
-                //                            .arg(fileName).arg(URL).arg(suffix).arg(QString(host)));
-
+#if 0
+                LOG(VB_GENERAL, LOG_GENERAL,
+                    QString(" -- File Filename: %1 URL: %2 Suffix: %3 Host: %4")
+                        .arg(fileName).arg(URL).arg(suffix).arg(QString(host)));
+#endif
                 handler->handleFile(fileName, URL, fi.suffix(), QString(host));
             }
         }
@@ -226,24 +239,34 @@ bool ScanVideoDirectory(const QString &start_path, DirectoryHandler *handler,
 
     if (!start_path.startsWith("myth://"))
     {
-        VERBOSE(VB_GENERAL, QString("MythVideo::ScanVideoDirectory Scanning (%1)").arg(start_path));
+        LOG(VB_GENERAL, LOG_INFO, 
+            QString("MythVideo::ScanVideoDirectory Scanning (%1)")
+                .arg(start_path));
 
         if (!scan_dir(start_path, handler, extlookup))
         {
-            VERBOSE(VB_GENERAL, QString("MythVideo::ScanVideoDirectory failed to scan %1").arg(start_path));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("MythVideo::ScanVideoDirectory failed to scan %1")
+                    .arg(start_path));
             pathScanned = false;
         }
     }
     else
     {
-        VERBOSE(VB_GENERAL, QString("MythVideo::ScanVideoDirectory Scanning Group (%1)").arg(start_path));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("MythVideo::ScanVideoDirectory Scanning Group (%1)")
+                .arg(start_path));
         QUrl sgurl = start_path;
         QString host = sgurl.host();
         QString path = sgurl.path();
 
-        if (!scan_sg_dir(path, host, path, handler, extlookup, (isHostMaster(host) && (gCoreContext->GetHostName().toLower() == host.toLower()))))
+        if (!scan_sg_dir(path, host, path, handler, extlookup, 
+                (isHostMaster(host) &&
+                 (gCoreContext->GetHostName().toLower() == host.toLower()))))
         {
-            VERBOSE(VB_GENERAL, QString("MythVideo::ScanVideoDirectory failed to scan %1 ").arg(host));
+            LOG(VB_GENERAL, LOG_ERR, 
+                QString("MythVideo::ScanVideoDirectory failed to scan %1 ")
+                    .arg(host));
             pathScanned = false;
         }
     }
