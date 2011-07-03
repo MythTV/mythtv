@@ -16,12 +16,14 @@ HEADERS += cleanup.h  dbaccess.h  dirscan.h  globals.h  parentalcontrols.h
 HEADERS += videoscan.h  videoutils.h  videometadata.h  videometadatalistmanager.h
 HEADERS += quicksp.h metadatacommon.h metadatadownload.h metadataimagedownload.h
 HEADERS += bluraymetadata.h mythmetaexp.h metadatafactory.h mythuimetadataresults.h
+HEADERS += mythuiimageresults.h
 
 SOURCES += cleanup.cpp  dbaccess.cpp  dirscan.cpp  globals.cpp
 SOURCES += parentalcontrols.cpp  videoscan.cpp  videoutils.cpp
 SOURCES += videometadata.cpp  videometadatalistmanager.cpp
 SOURCES += metadatacommon.cpp metadatadownload.cpp metadataimagedownload.cpp
 SOURCES += bluraymetadata.cpp metadatafactory.cpp mythuimetadataresults.cpp
+SOURCES += mythuiimageresults.cpp
 
 INCLUDEPATH += ../libmythbase ../libmythtv
 INCLUDEPATH += ../.. ../ ./ ../libmythupnp ../libmythui
@@ -61,6 +63,7 @@ inc.files = cleanup.h  dbaccess.h  dirscan.h  globals.h  parentalcontrols.h
 inc.files += videoscan.h  videoutils.h  videometadata.h  videometadatalistmanager.h
 inc.files += quicksp.h metadatacommon.h metadatadownload.h metadataimagedownload.h
 inc.files += bluraymetadata.h mythmetaexp.h metadatafactory.h mythuimetadataresults.h
+inc.files += mythuiimageresults.h
 
 INSTALLS += inc
 
