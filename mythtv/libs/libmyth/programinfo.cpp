@@ -1352,10 +1352,10 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         progMap["season"] = QString::number(season);
         progMap["episode"] = QString::number(episode);
 
-        progMap["s##e##"] = QString("s%1e%2").arg(GetDisplaySeasonEpisode
+        progMap["s00e00"] = QString("s%1e%2").arg(GetDisplaySeasonEpisode
                                              (GetSeason(), 2))
                         .arg(GetDisplaySeasonEpisode(GetEpisode(), 2));
-        progMap["##x##"] = QString("%1x%2").arg(GetDisplaySeasonEpisode
+        progMap["00x00"] = QString("%1x%2").arg(GetDisplaySeasonEpisode
                                              (GetSeason(), 1))
                         .arg(GetDisplaySeasonEpisode(GetEpisode(), 2));
     }
