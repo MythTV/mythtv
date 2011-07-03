@@ -20,9 +20,10 @@ using namespace std;
 #define LOC_WARN QString("AOJack, WARNING: ")
 #define LOC_ERR QString("AOJack, ERROR: ")
 
-#define VBAUDIO(str)  VERBOSE(VB_AUDIO, LOC + str)
-#define VBERROR(str)  VERBOSE(VB_IMPORTANT, LOC_ERR + str)
-#define JERROR(str) Error(LOC_ERR + str)
+// TODO: get rid of this
+#define VBAUDIO(str)  LOG(VB_AUDIO, LOG_INFO, str)
+#define VBERROR(str)  LOG(VB_GENERAL, LOG_ERR, str)
+#define JERROR(str)   VBERROR(str)
 
 AudioOutputJACK::AudioOutputJACK(const AudioSettings &settings) :
     AudioOutputBase(settings),
@@ -228,8 +229,8 @@ void AudioOutputJACK::CloseDevice()
 int AudioOutputJACK::GetBufferedOnSoundcard(void) const
 {
     int frames_played = jack_frames_since_cycle_start (this->client);
-    VERBOSE(VB_AUDIO+VB_TIMESTAMP,
-            QString("Stats: frames_since_cycle_start:%1 fragment_size:%2")
+    LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO,
+        QString("Stats: frames_since_cycle_start:%1 fragment_size:%2")
             .arg(frames_played).arg(fragment_size));
     return  (fragment_size * 2) - (frames_played * output_bytes_per_frame);
 }

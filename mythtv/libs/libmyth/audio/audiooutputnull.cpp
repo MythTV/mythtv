@@ -41,7 +41,7 @@ AudioOutputNULL::~AudioOutputNULL()
 
 bool AudioOutputNULL::OpenDevice()
 {
-    VERBOSE(VB_GENERAL, "Opening NULL audio device, will fail.");
+    LOG(VB_GENERAL, LOG_INFO, "Opening NULL audio device, will fail.");
 
     fragment_size = NULLAUDIO_OUTPUT_BUFFER_SIZE / 2;
     soundcard_buffer_size = NULLAUDIO_OUTPUT_BUFFER_SIZE;
@@ -87,8 +87,8 @@ void AudioOutputNULL::WriteAudio(unsigned char* aubuf, int size)
     {
         if (size + current_buffer_size > NULLAUDIO_OUTPUT_BUFFER_SIZE)
         {
-            VERBOSE(VB_IMPORTANT, "null audio output should not have just "
-                                  "had data written to it");
+            LOG(VB_GENERAL, LOG_ERR, "null audio output should not have just "
+                                     "had data written to it");
             return;
         }
         pcm_output_buffer_mutex.lock();

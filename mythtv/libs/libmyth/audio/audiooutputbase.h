@@ -20,10 +20,10 @@ using namespace std;
 #include "mythlogging.h"
 
 // TODO: get rid of this
-#define VBAUDIO(str)   VERBOSE(VB_AUDIO, LOC + str)
-#define VBAUDIOTS(str) VERBOSE(VB_AUDIO+VB_TIMESTAMP, LOC + str)
-#define VBGENERAL(str) VERBOSE(VB_GENERAL, LOC + str)
-#define VBERROR(str)   VERBOSE(VB_IMPORTANT, LOC_ERR + str)
+#define VBAUDIO(str)   LOG(VB_AUDIO, LOG_INFO, str)
+#define VBAUDIOTS(str) LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, str)
+#define VBGENERAL(str) LOG(VB_GENERAL, LOG_INFO, str)
+#define VBERROR(str)   LOG(VB_GENERAL, LOG_ERR, str)
 
 namespace soundtouch {
 class SoundTouch;

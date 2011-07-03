@@ -124,14 +124,15 @@ public:
     int  AudioStreamChangeFormat(AudioStreamID               s,
                                  AudioStreamBasicDescription format);
 
+    // TODO: Get rid of these!
     void  Debug(QString msg)
-    {   VERBOSE(VB_AUDIO,      "CoreAudioData::" + msg);   }
+    {   LOG(VB_AUDIO, LOG_INFO,      "CoreAudioData::" + msg);   }
 
     void  Error(QString msg)
-    {    VERBOSE(VB_IMPORTANT, "CoreAudioData Error:" + msg);   }
+    {    LOG(VB_GENERAL, LOG_ERR, "CoreAudioData Error:" + msg);   }
 
     void  Warn (QString msg)
-    {    VERBOSE(VB_IMPORTANT, "CoreAudioData Warning:" + msg);   }
+    {    LOG(VB_GENERAL, LOG_WARNING, "CoreAudioData Warning:" + msg);   }
 
     AudioOutputCA  *mCA;    // We could subclass, but this ends up tidier
 

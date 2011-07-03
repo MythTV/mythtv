@@ -289,8 +289,8 @@ int AudioOutputWin::GetVolumeChannel(int channel) const
             (HIWORD(dwVolume) / (0xffff / 100));
     }
 
-    VERBOSE(VB_AUDIO, QString("GetVolume(%1) %2 (%3)")
-                      .arg(channel).arg(Volume).arg(dwVolume));
+    LOG(VB_AUDIO, LOG_INFO, QString("GetVolume(%1) %2 (%3)")
+                                .arg(channel).arg(Volume).arg(dwVolume));
 
     return Volume;
 }

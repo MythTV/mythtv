@@ -24,7 +24,9 @@ using namespace std;
 #define LOC_WARN QString("AOOSS, Warning: ")
 #define LOC_ERR  QString("AOOSS, Error: ")
 
-#define OERROR(str) Error(str + QString(": %1").arg(strerror(errno)))
+// TODO: get rid of this
+#define OERROR(str) LOG(VB_GENERAL, LOG_ERR, QString("%1: %2") \
+                                                 .arg(str).arg(ENO))
 
 #include "mythcorecontext.h"
 #include "audiooutputoss.h"
@@ -215,9 +217,9 @@ bool AudioOutputOSS::OpenDevice()
     if (ioctl(audiofd, SNDCTL_DSP_GETCAPS, &caps) == 0)
     {
         if (!(caps & DSP_CAP_REALTIME))
-            VERBOSE(VB_IMPORTANT, LOC_WARN +
-                    "The audio device cannot report buffer state"
-                    " accurately! audio/video sync will be bad, continuing...");
+            LOG(VB_GENERAL, LOG_WARNING,
+                "The audio device cannot report buffer state"
+                " accurately! audio/video sync will be bad, continuing...");
     }
     else
         OERROR("Unable to get audio card capabilities");

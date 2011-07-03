@@ -1223,8 +1223,8 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
 
     if (!m_configure_succeeded)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "AddData called with audio framework not "
-                "initialised");
+        LOG(VB_GENERAL, LOG_ERR, "AddData called with audio framework not "
+                                 "initialised");
         m_length_last_data = 0;
         return false;
     }
@@ -1253,8 +1253,8 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
              * timestretch just got activated. So we will just drop the
              * data
              */
-            VERBOSE(VB_AUDIO, QString("Passthrough activated with audio "
-                                      "processing. Dropping audio"));
+            LOG(VB_AUDIO, LOG_INFO, QString("Passthrough activated with audio "
+                                            "processing. Dropping audio"));
             return false;
         }
         // mux into an IEC958 packet

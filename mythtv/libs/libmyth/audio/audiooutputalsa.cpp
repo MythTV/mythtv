@@ -519,7 +519,7 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
         ReorderSmpteToAlsa(aubuf, frames, output_format, channels - 6);
     }
 
-    VERBOSE(VB_AUDIO+VB_TIMESTAMP,
+    LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO,
             QString("WriteAudio: Preparing %1 bytes (%2 frames)")
             .arg(size).arg(frames));
 
