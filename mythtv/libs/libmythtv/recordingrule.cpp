@@ -48,6 +48,7 @@ RecordingRule::RecordingRule()
     m_autoUserJob2(gCoreContext->GetNumSetting("AutoRunUserJob2", 0)),
     m_autoUserJob3(gCoreContext->GetNumSetting("AutoRunUserJob3", 0)),
     m_autoUserJob4(gCoreContext->GetNumSetting("AutoRunUserJob4", 0)),
+    m_autoMetadataLookup(gCoreContext->GetNumSetting("AutoMetadataLookup", 1)),
     m_nextRecording(QDateTime::fromString("0000-00-00T00:00:00", Qt::ISODate)),
     m_lastRecorded(QDateTime::fromString("0000-00-00T00:00:00", Qt::ISODate)),
     m_lastDeleted(QDateTime::fromString("0000-00-00T00:00:00", Qt::ISODate)),
@@ -71,9 +72,9 @@ bool RecordingRule::Load()
     "inactive, profile, recgroup, storagegroup, playgroup, autoexpire, "
     "maxepisodes, maxnewest, autocommflag, autotranscode, transcoder, "
     "autouserjob1, autouserjob2, autouserjob3, autouserjob4, "
-    "parentid, title, subtitle, description, category, "
-    "starttime, startdate, endtime, enddate, seriesid, programid, "
-    "chanid, station, findday, findtime, findid, "
+    "autometadata, parentid, title, subtitle, description, season, episode, "
+    "category, starttime, startdate, endtime, enddate, seriesid, programid, "
+    "inetref, chanid, station, findday, findtime, findid, "
     "next_record, last_record, last_delete, avg_delay, filter "
     "FROM record WHERE recordid = :RECORDID ;");
 
@@ -115,31 +116,35 @@ bool RecordingRule::Load()
         m_autoUserJob2 = query.value(20).toBool();
         m_autoUserJob3 = query.value(21).toBool();
         m_autoUserJob4 = query.value(22).toBool();
+        m_autoMetadataLookup = query.value(23).toBool();
         // Original rule id for override rule
-        m_parentRecID = query.value(23).toInt();
+        m_parentRecID = query.value(24).toInt();
         // Recording metadata
-        m_title = query.value(24).toString();
-        m_subtitle = query.value(25).toString();
-        m_description = query.value(26).toString();
-        m_category = query.value(27).toString();
-        m_starttime = query.value(28).toTime();
-        m_startdate = query.value(29).toDate();
-        m_endtime = query.value(30).toTime();
-        m_enddate = query.value(31).toDate();
-        m_seriesid = query.value(32).toString();
-        m_programid = query.value(33).toString();
+        m_title = query.value(25).toString();
+        m_subtitle = query.value(26).toString();
+        m_description = query.value(27).toString();
+        m_season = query.value(28).toUInt();
+        m_episode = query.value(29).toUInt();
+        m_category = query.value(30).toString();
+        m_starttime = query.value(31).toTime();
+        m_startdate = query.value(32).toDate();
+        m_endtime = query.value(33).toTime();
+        m_enddate = query.value(34).toDate();
+        m_seriesid = query.value(35).toString();
+        m_programid = query.value(36).toString();
+        m_inetref = query.value(37).toString();
         // Associated data for rule types
-        m_channelid = query.value(34).toInt();
-        m_station = query.value(35).toString();
-        m_findday = query.value(36).toInt();
-        m_findtime = query.value(37).toTime();
-        m_findid = query.value(38).toInt();
+        m_channelid = query.value(38).toInt();
+        m_station = query.value(39).toString();
+        m_findday = query.value(40).toInt();
+        m_findtime = query.value(41).toTime();
+        m_findid = query.value(42).toInt();
         // Statistic fields - Used to generate statistics about particular rules
         // and influence watch list weighting
-        m_nextRecording = query.value(39).toDateTime();
-        m_lastRecorded = query.value(40).toDateTime();
-        m_lastDeleted = query.value(41).toDateTime();
-        m_averageDelay = query.value(42).toInt();
+        m_nextRecording = query.value(43).toDateTime();
+        m_lastRecorded = query.value(44).toDateTime();
+        m_lastDeleted = query.value(45).toDateTime();
+        m_averageDelay = query.value(46).toInt();
 
         m_isOverride = (m_type == kOverrideRecord || m_type == kDontRecord);
     }
@@ -302,12 +307,13 @@ bool RecordingRule::Save(bool sendSig)
                     "autouserjob2 = :AUTOUSERJOB2, "
                     "autouserjob3 = :AUTOUSERJOB3, "
                     "autouserjob4 = :AUTOUSERJOB4, "
+                    "autometadata = :AUTOMETADATA, "
                     "parentid = :PARENTID, title = :TITLE, "
-                    "subtitle = :SUBTITLE, description = :DESCRIPTION, "
-                    "category = :CATEGORY, starttime = :STARTTIME, "
-                    "startdate = :STARTDATE, endtime = :ENDTIME, "
-                    "enddate = :ENDDATE, seriesid = :SERIESID, "
-                    "programid = :PROGRAMID, chanid = :CHANID, "
+                    "subtitle = :SUBTITLE, season = :SEASON, episode = :EPISODE, "
+                    "description = :DESCRIPTION, category = :CATEGORY, "
+                    "starttime = :STARTTIME, startdate = :STARTDATE, "
+                    "endtime = :ENDTIME, enddate = :ENDDATE, seriesid = :SERIESID, "
+                    "programid = :PROGRAMID, inetref = :INETREF, chanid = :CHANID, "
                     "station = :STATION, findday = :FINDDAY, "
                     "findtime = :FINDTIME, findid = :FINDID, "
                     "next_record = :NEXTREC, last_record = :LASTREC, "
@@ -346,10 +352,13 @@ bool RecordingRule::Save(bool sendSig)
     query.bindValue(":AUTOUSERJOB2", m_autoUserJob2);
     query.bindValue(":AUTOUSERJOB3", m_autoUserJob3);
     query.bindValue(":AUTOUSERJOB4", m_autoUserJob4);
+    query.bindValue(":AUTOMETADATA", m_autoMetadataLookup);
     query.bindValue(":PARENTID", m_parentRecID);
     query.bindValue(":TITLE", m_title);
     query.bindValue(":SUBTITLE", m_subtitle);
     query.bindValue(":DESCRIPTION", m_description);
+    query.bindValue(":SEASON", m_season);
+    query.bindValue(":EPISODE", m_episode);
     query.bindValue(":CATEGORY", m_category);
     query.bindValue(":STARTTIME", m_starttime);
     query.bindValue(":STARTDATE", m_startdate);
@@ -357,6 +366,7 @@ bool RecordingRule::Save(bool sendSig)
     query.bindValue(":ENDDATE", m_enddate);
     query.bindValue(":SERIESID", m_seriesid);
     query.bindValue(":PROGRAMID", m_programid);
+    query.bindValue(":INETREF", m_inetref);
     query.bindValue(":CHANID", m_channelid);
     query.bindValue(":STATION", m_station);
     query.bindValue(":FINDDAY", m_findday);
@@ -430,6 +440,8 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
     infoMap["title"] = m_title;
     infoMap["subtitle"] = m_subtitle;
     infoMap["description"] = m_description;
+    infoMap["season"] = QString::number(m_season);
+    infoMap["episode"] = QString::number(m_episode);
 
     infoMap["category"] = m_category;
     infoMap["callsign"] = m_station;
@@ -439,6 +451,7 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
     infoMap["endtime"] = m_endtime.toString(timeFormat);
     infoMap["enddate"] = m_endtime.toString(dateFormat);
 
+    infoMap["inetref"] = m_inetref;
     infoMap["chanid"] = m_channelid;
     infoMap["channel"] = m_station;
 
@@ -560,6 +573,8 @@ void RecordingRule::AssignProgramInfo()
     m_title       = m_progInfo->GetTitle();
     m_subtitle    = m_progInfo->GetSubtitle();
     m_description = m_progInfo->GetDescription();
+    m_season      = m_progInfo->GetSeason();
+    m_episode     = m_progInfo->GetEpisode();
     m_channelid   = m_progInfo->GetChanID();
     m_station     = m_progInfo->GetChannelSchedulingID();
     m_startdate   = m_progInfo->GetScheduledStartTime().date();
@@ -568,6 +583,7 @@ void RecordingRule::AssignProgramInfo()
     m_endtime     = m_progInfo->GetScheduledEndTime().time();
     m_seriesid    = m_progInfo->GetSeriesID();
     m_programid   = m_progInfo->GetProgramID();
+    m_inetref     = m_progInfo->GetInetRef();
     if (m_findday < 0)
     {
         m_findday =

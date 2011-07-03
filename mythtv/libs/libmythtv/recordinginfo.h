@@ -61,6 +61,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         const QString &title,
         const QString &subtitle,
         const QString &description,
+        uint season,
+        uint episode,
         const QString &category,
 
         uint chanid,
@@ -78,6 +80,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
 
         const QString &seriesid,
         const QString &programid,
+        const QString &inetref,
         const QString &catType,
 
         int recpriority,
@@ -119,6 +122,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         const QString &title,
         const QString &subtitle,
         const QString &description,
+        uint season,
+        uint episode,
         const QString &category,
 
         uint chanid,
@@ -131,6 +136,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
 
         const QString &seriesid,
         const QString &programid,
+        const QString &inetref,
 
         int recpriority,
 

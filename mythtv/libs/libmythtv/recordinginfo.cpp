@@ -43,6 +43,8 @@ RecordingInfo::RecordingInfo(
     const QString &_title,
     const QString &_subtitle,
     const QString &_description,
+    uint _season,
+    uint _episode,
     const QString &_category,
 
     uint _chanid,
@@ -60,6 +62,7 @@ RecordingInfo::RecordingInfo(
 
     const QString &_seriesid,
     const QString &_programid,
+    const QString &_inetref,
     const QString &_catType,
 
     int _recpriority,
@@ -95,11 +98,11 @@ RecordingInfo::RecordingInfo(
     uint _audioproperties,
     bool _future) :
     ProgramInfo(
-        _title, _subtitle, _description, _category,
-        _chanid, _chanstr, _chansign, _channame, QString(),
-        _recgroup, _playgroup,
+        _title, _subtitle, _description, _season, _episode,
+        _category, _chanid, _chanstr, _chansign, _channame,
+        QString(), _recgroup, _playgroup,
         _startts, _endts, _recstartts, _recendts,
-        _seriesid, _programid),
+        _seriesid, _programid, _inetref),
     oldrecstatus(_oldrecstatus),
     savedrecstatus(rsUnknown),
     future(_future),
@@ -154,6 +157,8 @@ RecordingInfo::RecordingInfo(
     const QString &_title,
     const QString &_subtitle,
     const QString &_description,
+    uint _season,
+    uint _episode,
     const QString &_category,
 
     uint _chanid,
@@ -166,6 +171,7 @@ RecordingInfo::RecordingInfo(
 
     const QString &_seriesid,
     const QString &_programid,
+    const QString &_inetref,
 
     int _recpriority,
 
@@ -185,11 +191,11 @@ RecordingInfo::RecordingInfo(
 
     bool _commfree) :
     ProgramInfo(
-        _title, _subtitle, _description, _category,
-        _chanid, _chanstr, _chansign, _channame, QString(),
-        _recgroup, _playgroup,
+        _title, _subtitle, _description, _season, _episode,
+        _category, _chanid, _chanstr, _chansign, _channame,
+        QString(), _recgroup, _playgroup,
         _startts, _endts, _recstartts, _recendts,
-        _seriesid, _programid),
+        _seriesid, _programid, _inetref),
     oldrecstatus(rsUnknown),
     savedrecstatus(rsUnknown),
     future(false),
@@ -963,17 +969,19 @@ bool RecordingInfo::InsertProgram(const RecordingInfo *pg,
     query.prepare(
         "INSERT INTO recorded "
         "   (chanid,    starttime,   endtime,         title,            "
-        "    subtitle,  description, hostname,        category,         "
-        "    recgroup,  autoexpire,  recordid,        seriesid,         "
-        "    programid, stars,       previouslyshown, originalairdate,  "
+        "    subtitle,  description, season,          episode,          "
+        "    hostname,  category,    recgroup,        autoexpire,       "
+        "    recordid,  seriesid,    programid,       inetref,          "
+        "    stars,     previouslyshown,              originalairdate,  "
         "    findid,    transcoder,  playgroup,       recpriority,      "
         "    basename,  progstart,   progend,         profile,          "
         "    duplicate, storagegroup) "
         "VALUES"
         "  (:CHANID,   :STARTS,     :ENDS,           :TITLE,            "
-        "   :SUBTITLE, :DESC,       :HOSTNAME,       :CATEGORY,         "
-        "   :RECGROUP, :AUTOEXP,    :RECORDID,       :SERIESID,         "
-        "   :PROGRAMID,:STARS,      :REPEAT,         :ORIGAIRDATE,      "
+        "   :SUBTITLE, :DESC,       :SEASON,         :EPISODE,          "
+        "   :HOSTNAME, :CATEGORY,   :RECGROUP,       :AUTOEXP,          "
+        "   :RECORDID, :SERIESID,   :PROGRAMID,      :INETREF,          "
+        "   :STARS,    :REPEAT,                      :ORIGAIRDATE,      "
         "   :FINDID,   :TRANSCODER, :PLAYGROUP,      :RECPRIORITY,      "
         "   :BASENAME, :PROGSTART,  :PROGEND,        :PROFILE,          "
         "   0,         :STORGROUP) "
@@ -995,12 +1003,15 @@ bool RecordingInfo::InsertProgram(const RecordingInfo *pg,
     query.bindValue(":TITLE",       pg->title);
     query.bindValue(":SUBTITLE",    pg->subtitle);
     query.bindValue(":DESC",        pg->description);
+    query.bindValue(":SEASON",      pg->season);
+    query.bindValue(":EPISODE",     pg->episode);
     query.bindValue(":HOSTNAME",    pg->hostname);
     query.bindValue(":CATEGORY",    pg->category);
     query.bindValue(":RECGROUP",    pg->recgroup);
     query.bindValue(":AUTOEXP",     rule->m_autoExpire);
     query.bindValue(":SERIESID",    pg->seriesid);
     query.bindValue(":PROGRAMID",   pg->programid);
+    query.bindValue(":INETREF",     pg->inetref);
     query.bindValue(":FINDID",      pg->findid);
     query.bindValue(":STARS",       pg->stars);
     query.bindValue(":REPEAT",      pg->IsRepeat());
@@ -1156,22 +1167,25 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
     MSqlQuery result(MSqlQuery::InitCon());
 
     result.prepare("REPLACE INTO oldrecorded (chanid,starttime,"
-                   "endtime,title,subtitle,description,category,"
-                   "seriesid,programid,findid,recordid,station,"
-                   "rectype,recstatus,duplicate,reactivate,future) "
-                   "VALUES(:CHANID,:START,:END,:TITLE,:SUBTITLE,:DESC,"
-                   ":CATEGORY,:SERIESID,:PROGRAMID,:FINDID,:RECORDID,"
-                   ":STATION,:RECTYPE,:RECSTATUS,:DUPLICATE,:REACTIVATE,"
-                   ":FUTURE);");
+                   "endtime,title,subtitle,description,season,episode,"
+                   "category,seriesid,programid,inetref,findid,recordid,"
+                   "station,rectype,recstatus,duplicate,reactivate,future) "
+                   "VALUES(:CHANID,:START,:END,:TITLE,:SUBTITLE,:DESC,:SEASON,"
+                   ":EPISODE,:CATEGORY,:SERIESID,:PROGRAMID,:INETREF,"
+                   ":FINDID,:RECORDID,:STATION,:RECTYPE,:RECSTATUS,:DUPLICATE,"
+                   ":REACTIVATE,:FUTURE);");
     result.bindValue(":CHANID", chanid);
     result.bindValue(":START", startts);
     result.bindValue(":END", endts);
     result.bindValue(":TITLE", title);
     result.bindValue(":SUBTITLE", subtitle);
     result.bindValue(":DESC", description);
+    result.bindValue(":SEASON", season);
+    result.bindValue(":EPISODE", episode);
     result.bindValue(":CATEGORY", category);
     result.bindValue(":SERIESID", seriesid);
     result.bindValue(":PROGRAMID", programid);
+    result.bindValue(":INETREF", inetref);
     result.bindValue(":FINDID", findid);
     result.bindValue(":RECORDID", erecid);
     result.bindValue(":STATION", chansign);

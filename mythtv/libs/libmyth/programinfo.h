@@ -25,7 +25,7 @@
    mythtv/bindings/perl/MythTV/Program.pm
    mythtv/bindings/python/MythTV/MythData.py
 */
-#define NUMPROGRAMLINES 41
+#define NUMPROGRAMLINES 44
 
 class ProgramInfo;
 typedef AutoDeleteDeque<ProgramInfo*> ProgramList;
@@ -78,6 +78,8 @@ class MPUBLIC ProgramInfo
     ProgramInfo(const QString &title,
                 const QString &subtitle,
                 const QString &description,
+                uint season,
+                uint episode,
                 const QString &category,
 
                 uint chanid,
@@ -96,6 +98,7 @@ class MPUBLIC ProgramInfo
 
                 const QString &seriesid,
                 const QString &programid,
+                const QString &inetref,
 
                 int recpriority,
 
@@ -130,6 +133,8 @@ class MPUBLIC ProgramInfo
     ProgramInfo(const QString &title,
                 const QString &subtitle,
                 const QString &description,
+                uint season,
+                uint episode,
                 const QString &category,
 
                 uint chanid,
@@ -139,6 +144,7 @@ class MPUBLIC ProgramInfo
 
                 const QString &seriesid,
                 const QString &programid,
+                const QString &inetref,
 
                 const QDateTime &startts,
                 const QDateTime &endts,
@@ -193,6 +199,8 @@ class MPUBLIC ProgramInfo
     ProgramInfo(const QString &title,
                 const QString &subtitle,
                 const QString &description,
+                uint season,
+                uint episode,
                 const QString &category,
 
                 uint chanid,
@@ -210,7 +218,8 @@ class MPUBLIC ProgramInfo
                 const QDateTime &recendts,
 
                 const QString &seriesid,
-                const QString &programid);
+                const QString &programid,
+                const QString &inetref);
     /// Constructs a ProgramInfo for a pathname.
     ProgramInfo(const QString &pathname);
     /// Constructs a ProgramInfo for a pathname.
@@ -296,6 +305,8 @@ class MPUBLIC ProgramInfo
     QString GetTitle(void)        const { return title; }
     QString GetSubtitle(void)     const { return subtitle; }
     QString GetDescription(void)  const { return description; }
+    uint    GetSeason(void)       const { return season; }
+    uint    GetEpisode(void)      const { return episode; }
     QString GetCategory(void)     const { return category; }
     /// This is the unique key used in the database to locate tuning
     /// information. [1..2^32] are valid keys, 0 is not.
@@ -369,6 +380,7 @@ class MPUBLIC ProgramInfo
     uint64_t GetFilesize(void)            const { return filesize;     }
     QString GetSeriesID(void)             const { return seriesid;     }
     QString GetProgramID(void)            const { return programid;    }
+    QString GetInetRef(void)              const { return inetref;      }
     QString GetCategoryType(void)         const { return catType;      }
     int     GetRecordingPriority(void)    const { return recpriority;  }
     int     GetRecordingPriority2(void)   const { return recpriority2; }
@@ -605,6 +617,8 @@ class MPUBLIC ProgramInfo
     QString title;
     QString subtitle;
     QString description;
+    uint    season;
+    uint    episode;
     QString category;
 
     int32_t recpriority;
@@ -625,6 +639,7 @@ class MPUBLIC ProgramInfo
 
     QString seriesid;
     QString programid;
+    QString inetref;
     QString catType;
 
     uint64_t filesize;

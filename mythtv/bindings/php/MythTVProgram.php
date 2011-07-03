@@ -8,6 +8,8 @@ class MythTVProgram {
     public $title          = 'Untitled';
     public $subtitle       = 'Untitled';
     public $description    = 'No Description';
+    public $season;
+    public $episode;
     public $category;
     public $chanid;
     public $channum;
@@ -35,6 +37,7 @@ class MythTVProgram {
     public $outputfilters;
     public $seriesid;
     public $programid;
+    public $inetref;
     public $lastmodified;
     public $stars;
     public $airdate;

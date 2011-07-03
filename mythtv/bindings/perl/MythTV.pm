@@ -8,7 +8,7 @@
 #
 
 # Version
-    $VERSION = '.24svn';
+    $VERSION = '.25svn';
 
 # Load sub libraries
     use IO::Socket::INET::MythTV;
@@ -106,20 +106,20 @@ package MythTV;
 # Note: as of July 21, 2010, this is actually a string, to account for proto
 # versions of the form "58a".  This will get used if protocol versions are 
 # changed on a fixes branch ongoing.
-    our $PROTO_VERSION = "66";
-    our $PROTO_TOKEN = "0C0FFEE0";
+    our $PROTO_VERSION = "67";
+    our $PROTO_TOKEN = "0G0G0G0";
 
 # currentDatabaseVersion is defined in libmythtv in
 # mythtv/libs/libmythtv/dbcheck.cpp and should be the current MythTV core
 # schema version supported in the main code.  We need to check that the schema
 # version in the database is as expected by the bindings, which are expected
 # to be kept in sync with the main code.
-    our $SCHEMA_VERSION = "1277";
+    our $SCHEMA_VERSION = "1278";
 
 # NUMPROGRAMLINES is defined in mythtv/libs/libmythtv/programinfo.h and is
 # the number of items in a ProgramInfo QStringList group used by
 # ProgramInfo::ToSringList and ProgramInfo::FromStringList.
-    our $NUMPROGRAMLINES = 41;
+    our $NUMPROGRAMLINES = 44;
 
 # Reasons a recording wouldn't be happening (from libs/libmythtv/programinfo.h)
     our %RecStatus_Types = (

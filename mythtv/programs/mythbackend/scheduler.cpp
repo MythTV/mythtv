@@ -3688,15 +3688,15 @@ void Scheduler::AddNewRecords(void)
         "                                            p.previouslyshown, "//20
         "    RECTABLE.recgroup, RECTABLE.dupmethod,  c.commmethod,      "//21-23
         "    capturecard.cardid, cardinput.cardinputid,p.seriesid,      "//24-26
-        "    p.programid,      p.category_type,      p.airdate,         "//27-29
-        "    p.stars,          p.originalairdate,    RECTABLE.inactive, "//30-32
-        "    RECTABLE.parentid, ") + progfindid + ", RECTABLE.playgroup,"//33-35
-        "    oldrecstatus.recstatus, oldrecstatus.reactivate, "
-        "                                            p.videoprop+0,     "//36-38
-        "    p.subtitletypes+0, p.audioprop+0,   RECTABLE.storagegroup, "//39-41
+        "    p.programid,       RECTABLE.inetref,    p.category_type,   "//27-29
+        "    p.airdate,         p.stars,             p.originalairdate, "//30-32
+        "    RECTABLE.inactive, RECTABLE.parentid,") + progfindid + ",  "//33-35
+        "    RECTABLE.playgroup, oldrecstatus.recstatus, "//36-37
+        "    oldrecstatus.reactivate, p.videoprop+0,     "//38-39
+        "    p.subtitletypes+0, p.audioprop+0,   RECTABLE.storagegroup, "//40-42
         "    capturecard.hostname, recordmatch.oldrecstatus, "
-        "                                           RECTABLE.avg_delay, "//42-44
-        "    oldrecstatus.future, "                                      //45
+        "                                           RECTABLE.avg_delay, "//43-45
+        "    oldrecstatus.future, "                                      //46
         + pwrpri + QString(
         "FROM recordmatch "
         "INNER JOIN RECTABLE ON (recordmatch.recordid = RECTABLE.recordid) "
@@ -3744,6 +3744,8 @@ void Scheduler::AddNewRecords(void)
             result.value(4).toString(),//title
             result.value(5).toString(),//subtitle
             result.value(6).toString(),//description
+            0, // season
+            0, // episode
             result.value(11).toString(),//category
 
             result.value(0).toUInt(),//chanid
@@ -3752,16 +3754,17 @@ void Scheduler::AddNewRecords(void)
             result.value(9).toString(),//channame
 
             result.value(21).toString(),//recgroup
-            result.value(35).toString(),//playgroup
+            result.value(36).toString(),//playgroup
 
-            result.value(42).toString(),//hostname
-            result.value(41).toString(),//storagegroup
+            result.value(43).toString(),//hostname
+            result.value(42).toString(),//storagegroup
 
-            result.value(29).toUInt(),//year
+            result.value(30).toUInt(),//year
 
             result.value(26).toString(),//seriesid
             result.value(27).toString(),//programid
-            result.value(28).toString(),//catType
+            result.value(28).toString(),//inetref
+            result.value(29).toString(),//catType
 
             result.value(12).toInt(),//recpriority
 
@@ -3770,18 +3773,18 @@ void Scheduler::AddNewRecords(void)
             result.value(18).toDateTime(),//recstartts
             result.value(19).toDateTime(),//recendts
 
-            result.value(30).toDouble(),//stars
-            (result.value(31).isNull()) ? QDate() :
-            QDate::fromString(result.value(31).toString(), Qt::ISODate),
+            result.value(31).toDouble(),//stars
+            (result.value(32).isNull()) ? QDate() :
+            QDate::fromString(result.value(32).toString(), Qt::ISODate),
             //originalAirDate
 
             result.value(20).toInt(),//repeat
 
-            RecStatusType(result.value(36).toInt()),//oldrecstatus
-            result.value(37).toInt(),//reactivate
+            RecStatusType(result.value(37).toInt()),//oldrecstatus
+            result.value(38).toInt(),//reactivate
 
             result.value(17).toUInt(),//recordid
-            result.value(33).toUInt(),//parentid
+            result.value(34).toUInt(),//parentid
             RecordingType(result.value(16).toInt()),//rectype
             RecordingDupInType(result.value(13).toInt()),//dupin
             RecordingDupMethodType(result.value(22).toInt()),//dupmethod
@@ -3790,13 +3793,13 @@ void Scheduler::AddNewRecords(void)
             result.value(25).toUInt(),//inputid
             result.value(24).toUInt(),//cardid
 
-            result.value(34).toUInt(),//findid
+            result.value(35).toUInt(),//findid
 
             result.value(23).toInt() == COMM_DETECT_COMMFREE,//commfree
-            result.value(39).toUInt(),//subtitleType
-            result.value(38).toUInt(),//videoproperties
-            result.value(40).toUInt(),//audioproperties
-            result.value(45).toInt());//future
+            result.value(40).toUInt(),//subtitleType
+            result.value(39).toUInt(),//videoproperties
+            result.value(41).toUInt(),//audioproperties
+            result.value(46).toInt());//future
 
         if (!p->future && !p->IsReactivated() &&
             p->oldrecstatus != rsAborted &&
@@ -3813,9 +3816,9 @@ void Scheduler::AddNewRecords(void)
 
         p->SetRecordingPriority(
             p->GetRecordingPriority() + recTypeRecPriorityMap[p->GetRecordingRuleType()] +
-            result.value(46).toInt() +
+            result.value(47).toInt() +
             ((autopriority) ?
-             autopriority - (result.value(44).toInt() * autostrata / 200) : 0));
+             autopriority - (result.value(45).toInt() * autostrata / 200) : 0));
 
         // Check to see if the program is currently recording and if
         // the end time was changed.  Ideally, checking for a new end
@@ -3870,7 +3873,7 @@ void Scheduler::AddNewRecords(void)
 
             if ((dupin & kDupsInOldRecorded) && result.value(10).toInt())
             {
-                if (result.value(43).toInt() == rsNeverRecord)
+                if (result.value(44).toInt() == rsNeverRecord)
                     newrecstatus = rsNeverRecord;
                 else
                     newrecstatus = rsPreviousRecording;
@@ -3880,7 +3883,7 @@ void Scheduler::AddNewRecords(void)
                 newrecstatus = rsCurrentRecording;
         }
 
-        bool inactive = result.value(32).toInt();
+        bool inactive = result.value(33).toInt();
         if (inactive)
             newrecstatus = rsInactive;
 
@@ -3924,19 +3927,20 @@ void Scheduler::AddNotListed(void) {
 
     QString query = QString(
         "SELECT RECTABLE.title,       RECTABLE.subtitle,    " //  0,1
-        "       RECTABLE.description, RECTABLE.category,    " //  2,3
-        "       RECTABLE.chanid,      channel.channum,      " //  4,5
-        "       RECTABLE.station,     channel.name,         " //  6,7
-        "       RECTABLE.recgroup,    RECTABLE.playgroup,   " //  8,9
-        "       RECTABLE.seriesid,    RECTABLE.programid,   " // 10,11
-        "       RECTABLE.recpriority,                       " // 12
-        "       RECTABLE.startdate,   RECTABLE.starttime,   " // 13,14
-        "       RECTABLE.enddate,     RECTABLE.endtime,     " // 15,16
-        "       RECTABLE.recordid,    RECTABLE.type,        " // 17,18
-        "       RECTABLE.dupin,       RECTABLE.dupmethod,   " // 19,20
-        "       RECTABLE.findid,                            " // 21
-        "       RECTABLE.startoffset, RECTABLE.endoffset,   " // 22,23
-        "       channel.commmethod                          " // 24
+        "       RECTABLE.description, RECTABLE.season,       " //  2,3
+        "       RECTABLE.episode,     RECTABLE.category,    " //  4,5
+        "       RECTABLE.chanid,      channel.channum,      " //  6,7
+        "       RECTABLE.station,     channel.name,         " //  8,9
+        "       RECTABLE.recgroup,    RECTABLE.playgroup,   " // 10,11
+        "       RECTABLE.seriesid,    RECTABLE.programid,   " // 12,13
+        "       RECTABLE.inetref,     RECTABLE.recpriority, " // 14,15
+        "       RECTABLE.startdate,   RECTABLE.starttime,   " // 16,17
+        "       RECTABLE.enddate,     RECTABLE.endtime,     " // 18,19
+        "       RECTABLE.recordid,    RECTABLE.type,        " // 20,21
+        "       RECTABLE.dupin,       RECTABLE.dupmethod,   " // 22,23
+        "       RECTABLE.findid,                            " // 24
+        "       RECTABLE.startoffset, RECTABLE.endoffset,   " // 25,26
+        "       channel.commmethod                          " // 27
         "FROM RECTABLE "
         "INNER JOIN channel ON (channel.chanid = RECTABLE.chanid) "
         "LEFT JOIN recordmatch on RECTABLE.recordid = recordmatch.recordid "
@@ -4023,32 +4027,35 @@ void Scheduler::AddNotListed(void) {
             result.value(0).toString(),
             (sor) ? result.value(1).toString() : QString(),
             (sor) ? result.value(2).toString() : QString(),
+            result.value(3).toUInt(),
+            result.value(4).toUInt(),
             QString(),
 
-            result.value(4).toUInt(),
-            result.value(5).toString(),
-            result.value(6).toString(),
+            result.value(6).toUInt(),
             result.value(7).toString(),
+            result.value(8).toString(),
+            result.value(9).toString(),
 
-            result.value(8).toString(),  result.value(9).toString(),
+            result.value(10).toString(),  result.value(11).toString(),
 
-            result.value(10).toString(), result.value(11).toString(),
+            result.value(12).toString(), result.value(13).toString(),
+            result.value(14).toString(),
 
-            result.value(12).toInt(),
+            result.value(15).toInt(),
 
             startts,                     endts,
             recstartts,                  recendts,
 
             rsNotListed,
 
-            result.value(17).toUInt(),   RecordingType(result.value(18).toInt()),
+            result.value(20).toUInt(),   RecordingType(result.value(21).toInt()),
 
-            RecordingDupInType(result.value(19).toInt()),
-            RecordingDupMethodType(result.value(20).toInt()),
+            RecordingDupInType(result.value(22).toInt()),
+            RecordingDupMethodType(result.value(23).toInt()),
 
-            result.value(21).toUInt(),
+            result.value(24).toUInt(),
 
-            result.value(24).toInt() == COMM_DETECT_COMMFREE);
+            result.value(25).toInt() == COMM_DETECT_COMMFREE);
 
         tmpList.push_back(p);
     }
@@ -4062,18 +4069,19 @@ void Scheduler::findAllScheduledPrograms(RecList &proglist)
 {
     QString query = QString(
         "SELECT RECTABLE.title,       RECTABLE.subtitle,    " //  0,1
-        "       RECTABLE.description, RECTABLE.category,    " //  2,3
-        "       RECTABLE.chanid,      channel.channum,      " //  4,5
-        "       RECTABLE.station,     channel.name,         " //  6,7
-        "       RECTABLE.recgroup,    RECTABLE.playgroup,   " //  8,9
-        "       RECTABLE.seriesid,    RECTABLE.programid,   " // 10,11
-        "       RECTABLE.recpriority,                       " // 12
-        "       RECTABLE.startdate,   RECTABLE.starttime,   " // 13,14
-        "       RECTABLE.enddate,     RECTABLE.endtime,     " // 15,16
-        "       RECTABLE.recordid,    RECTABLE.type,        " // 17,18
-        "       RECTABLE.dupin,       RECTABLE.dupmethod,   " // 19,20
-        "       RECTABLE.findid,                            " // 21
-        "       channel.commmethod                          " // 22
+        "       RECTABLE.description, RECTABLE.season,      " //  2,3
+        "       RECTABLE.episode,     RECTABLE.category,    " //  4,5
+        "       RECTABLE.chanid,      channel.channum,      " //  6,7
+        "       RECTABLE.station,     channel.name,         " //  8,9
+        "       RECTABLE.recgroup,    RECTABLE.playgroup,   " // 10,11
+        "       RECTABLE.seriesid,    RECTABLE.programid,   " // 12,13
+        "       RECTABLE.inetref,     RECTABLE.recpriority, " // 14,15
+        "       RECTABLE.startdate,   RECTABLE.starttime,   " // 16,17
+        "       RECTABLE.enddate,     RECTABLE.endtime,     " // 18,19
+        "       RECTABLE.recordid,    RECTABLE.type,        " // 20,21
+        "       RECTABLE.dupin,       RECTABLE.dupmethod,   " // 22,23
+        "       RECTABLE.findid,                            " // 24
+        "       channel.commmethod                          " // 25
         "FROM RECTABLE "
         "LEFT JOIN channel ON channel.callsign = RECTABLE.station "
         "GROUP BY recordid "
@@ -4100,10 +4108,10 @@ void Scheduler::findAllScheduledPrograms(RecList &proglist)
             rectype == kTimeslotRecord ||
             rectype == kWeekslotRecord)
         {
-            startts = QDateTime(result.value(13).toDate(),
-                                result.value(14).toTime());
-            endts = QDateTime(result.value(15).toDate(),
-                              result.value(16).toTime());
+            startts = QDateTime(result.value(16).toDate(),
+                                result.value(17).toTime());
+            endts = QDateTime(result.value(18).toDate(),
+                              result.value(19).toTime());
         }
         else
         {
@@ -4116,29 +4124,31 @@ void Scheduler::findAllScheduledPrograms(RecList &proglist)
 
         proglist.push_back(new RecordingInfo(
             result.value(0).toString(),  result.value(1).toString(),
-            result.value(2).toString(),  result.value(3).toString(),
-
+            result.value(2).toString(),  result.value(3).toUInt(),
             result.value(4).toUInt(),    result.value(5).toString(),
-            result.value(6).toString(),  result.value(7).toString(),
 
+            result.value(6).toUInt(),    result.value(7).toString(),
             result.value(8).toString(),  result.value(9).toString(),
 
-            result.value(10).toString(), result.value(11).toString(),
+            result.value(10).toString(),  result.value(11).toString(),
 
-            result.value(12).toInt(),
+            result.value(12).toString(), result.value(13).toString(),
+            result.value(14).toString(),
+
+            result.value(15).toInt(),
 
             startts, endts,
             startts, endts,
 
             rsUnknown,
 
-            result.value(17).toUInt(),   rectype,
-            RecordingDupInType(result.value(19).toInt()),
-            RecordingDupMethodType(result.value(20).toInt()),
+            result.value(20).toUInt(),   rectype,
+            RecordingDupInType(result.value(22).toInt()),
+            RecordingDupMethodType(result.value(23).toInt()),
 
-            result.value(21).toUInt(),
+            result.value(24).toUInt(),
 
-            result.value(22).toInt() == COMM_DETECT_COMMFREE));
+            result.value(25).toInt() == COMM_DETECT_COMMFREE));
     }
 }
 

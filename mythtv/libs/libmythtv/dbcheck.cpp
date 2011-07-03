@@ -22,7 +22,7 @@ using namespace std;
    mythtv/bindings/perl/MythTV.pm
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1277";
+const QString currentDatabaseVersion = "1278";
 
 static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver);
 static bool performActualUpdate(
@@ -5743,6 +5743,26 @@ NULL
 };
 
         if (!performActualUpdate(updates, "1277", dbver))
+            return false;
+    }
+
+    if (dbver == "1277")
+    {
+        const char *updates[] = {
+"ALTER TABLE record ADD autometadata TINYINT(1) NOT NULL DEFAULT "
+"    0 AFTER autouserjob4;",
+"ALTER TABLE record ADD inetref VARCHAR(40) NOT NULL AFTER programid;",
+"ALTER TABLE record ADD season SMALLINT(5) NOT NULL AFTER description;",
+"ALTER TABLE record ADD episode SMALLINT(5) NOT NULL AFTER season;",
+"ALTER TABLE recorded ADD inetref VARCHAR(40) NOT NULL AFTER programid;",
+"ALTER TABLE recorded ADD season SMALLINT(5) NOT NULL AFTER description;",
+"ALTER TABLE recorded ADD episode SMALLINT(5) NOT NULL AFTER season;",
+"ALTER TABLE oldrecorded ADD inetref VARCHAR(40) NOT NULL AFTER programid;",
+"ALTER TABLE oldrecorded ADD season SMALLINT(5) NOT NULL AFTER description;",
+"ALTER TABLE oldrecorded ADD episode SMALLINT(5) NOT NULL AFTER season;",
+NULL
+};
+        if (!performActualUpdate(updates, "1278", dbver))
             return false;
     }
 
