@@ -15,6 +15,7 @@
 #include "mythuicheckbox.h"
 #include "mythuispinbox.h"
 #include "mythuifilebrowser.h"
+#include "mythuiimageresults.h"
 #include "mythuihelper.h"
 #include "mythprogressdialog.h"
 #include "remoteutil.h"
@@ -283,160 +284,6 @@ namespace
     const QString CEID_SCREENSHOTFILE = "screenshotfile";
     const QString CEID_TRAILERFILE = "trailerfile";
     const QString CEID_NEWCATEGORY = "newcategory";
-
-    class ImageSearchResultsDialog : public MythScreenType
-    {
-        Q_OBJECT
-
-      public:
-        ImageSearchResultsDialog(MythScreenStack *lparent,
-                const ArtworkList list, const VideoArtworkType type) :
-            MythScreenType(lparent, "videosearchresultspopup"),
-            m_list(list), m_type(type), m_resultsList(0)
-        {
-            m_imageDownload = new MetadataImageDownload(this);
-        }
-
-        ~ImageSearchResultsDialog()
-        {
-            cleanCacheDir();
-
-            if (m_imageDownload)
-            {
-                delete m_imageDownload;
-                m_imageDownload = NULL;
-            }
-        }
-
-        bool Create()
-        {
-            if (!LoadWindowFromXML("video-ui.xml", "artworksel", this))
-                return false;
-
-            bool err = false;
-            UIUtilE::Assign(this, m_resultsList, "results", &err);
-            if (err)
-            {
-                VERBOSE(VB_IMPORTANT, "Cannot load screen 'moviesel'");
-                return false;
-            }
-
-            for (ArtworkList::const_iterator i = m_list.begin();
-                    i != m_list.end(); ++i)
-            {
-                    ArtworkInfo info = (*i);
-                    MythUIButtonListItem *button =
-                        new MythUIButtonListItem(m_resultsList,
-                        QString());
-                    button->SetText(info.label, "label");
-                    button->SetText(info.thumbnail, "thumbnail");
-                    button->SetText(info.url, "url");
-                    QString width = QString::number(info.width);
-                    QString height = QString::number(info.height);
-                    button->SetText(width, "width");
-                    button->SetText(height, "height");
-                    if (info.width > 0 && info.height > 0)
-                        button->SetText(QString("%1x%2").arg(width).arg(height),
-                            "resolution");
-
-                    QString artfile = info.thumbnail;
-
-                    if (artfile.isEmpty())
-                        artfile = info.url;
-
-                    QString dlfile = getDownloadFilename(info.label,
-                        artfile);
-
-                    if (!artfile.isEmpty())
-                    {
-                        int pos = m_resultsList->GetItemPos(button);
-
-                        if (QFile::exists(dlfile))
-                            button->SetImage(dlfile);
-                        else
-                            m_imageDownload->addThumb(info.label,
-                                             artfile,
-                                             qVariantFromValue<uint>(pos));
-                    }
-
-                    button->SetData(qVariantFromValue<ArtworkInfo>(*i));
-                }
-
-            connect(m_resultsList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-                    SLOT(sendResult(MythUIButtonListItem *)));
-
-            BuildFocusList();
-
-            return true;
-        }
-
-        void cleanCacheDir()
-        {
-            QString cache = QString("%1/thumbcache")
-                       .arg(GetConfDir());
-            QDir cacheDir(cache);
-            QStringList thumbs = cacheDir.entryList(QDir::Files);
-
-            for (QStringList::const_iterator i = thumbs.end() - 1;
-                    i != thumbs.begin() - 1; --i)
-            {
-                QString filename = QString("%1/%2").arg(cache).arg(*i);
-                QFileInfo fi(filename);
-                QDateTime lastmod = fi.lastModified();
-                if (lastmod.addDays(2) < QDateTime::currentDateTime())
-                {
-                    VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting file %1")
-                          .arg(filename));
-                    QFile::remove(filename);
-                }
-            }
-        }
-
-        void customEvent(QEvent *event)
-        {
-            if (event->type() == ThumbnailDLEvent::kEventType)
-            {
-                ThumbnailDLEvent *tde = (ThumbnailDLEvent *)event;
-
-                ThumbnailData *data = tde->thumb;
-
-                QString file = data->url;
-                uint pos = qVariantValue<uint>(data->data);
-
-                if (file.isEmpty())
-                    return;
-
-                if (!((uint)m_resultsList->GetCount() >= pos))
-                    return;
-
-                MythUIButtonListItem *item =
-                          m_resultsList->GetItemAt(pos);
-
-                if (item)
-                {
-                    item->SetImage(file);
-                }
-                delete data;
-            }
-        }
-
-     signals:
-        void haveResult(ArtworkInfo, VideoArtworkType);
-
-      private:
-        ArtworkList            m_list;
-        VideoArtworkType            m_type;
-        MythUIButtonList      *m_resultsList;
-        MetadataImageDownload *m_imageDownload;
-
-      private slots:
-        void sendResult(MythUIButtonListItem* item)
-        {
-            emit haveResult(qVariantValue<ArtworkInfo>(item->GetData()),
-                            m_type);
-            Close();
-        }
-    };
 }
 
 void EditMetadataDialog::createBusyDialog(QString title)
@@ -1227,5 +1074,3 @@ void EditMetadataDialog::customEvent(QEvent *levent)
         handleDownloadedImages(lookup);
     }
 }
-
-#include "editvideometadata.moc"
