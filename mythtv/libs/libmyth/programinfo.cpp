@@ -26,6 +26,7 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "dialogbox.h"
 #include "remoteutil.h"
+#include "netutils.h"
 #include "mythdb.h"
 #include "mythlogging.h"
 #include "storagegroup.h"
@@ -1350,6 +1351,13 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     {
         progMap["season"] = QString::number(season);
         progMap["episode"] = QString::number(episode);
+
+        progMap["s##e##"] = QString("s%1e%2").arg(GetDisplaySeasonEpisode
+                                             (GetSeason(), 2))
+                        .arg(GetDisplaySeasonEpisode(GetEpisode(), 2));
+        progMap["##x##"] = QString("%1x%2").arg(GetDisplaySeasonEpisode
+                                             (GetSeason(), 1))
+                        .arg(GetDisplaySeasonEpisode(GetEpisode(), 2));
     }
     progMap["category"] = category;
     progMap["callsign"] = chansign;
