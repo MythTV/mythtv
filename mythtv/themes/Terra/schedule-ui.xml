@@ -1445,42 +1445,48 @@
         </buttonlist>
 
         <button name="schedoptions" from="basewidebutton">
-            <position>157,230</position>
+            <position>157,220</position>
             <helptext></helptext>
             <value>Schedule Options</value>
         </button>
 
         <button name="storeoptions" from="basewidebutton">
-            <position>157,295</position>
+            <position>157,285</position>
             <helptext></helptext>
             <value>Storage Options</value>
         </button>
 
         <button name="postprocessing" from="basewidebutton">
-            <position>157,360</position>
+            <position>157,350</position>
             <helptext></helptext>
             <value>Post Processing</value>
         </button>
 
         <button name="schedinfo" from="basewidebutton">
-            <position>157,425</position>
+            <position>157,415</position>
             <helptext></helptext>
             <value>Schedule Info</value>
         </button>
 
         <button name="preview" from="basewidebutton">
-            <position>157,490</position>
+            <position>157,480</position>
             <helptext></helptext>
             <value>Preview</value>
         </button>
 
+        <button name="metadata" from="basewidebutton">
+            <position>157,545</position>
+            <helptext></helptext>
+            <value>Metadata Options</value>
+        </button>
+
         <button name="cancel" from="basebutton">
-            <position>60,595</position>
+            <position>60,620</position>
             <value>Cancel</value>
         </button>
 
         <button name="save" from="basebutton">
-            <position>397,595</position>
+            <position>397,620</position>
             <value>Save</value>
         </button>
     </window>
@@ -1924,6 +1930,15 @@
 
         <textarea name="rectypestatus" from="basetextarea">
             <area>700,646,420,30</area>
+        </textarea>
+
+        <checkbox name="metadatalookup" from="basecheckbox">
+            <position>154,100</position>
+        </checkbox>
+
+        <textarea name="autometadatalabel" from="basetextarea">
+            <area>196,107,600,30</area>
+            <value>Automatically Look Up Metadata</value>
         </textarea>
 
         <checkbox name="autocommflag" from="basecheckbox">

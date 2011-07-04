@@ -1711,13 +1711,19 @@
             <helptext></helptext>
         </button>
 
+        <button name="metadata" from="baseverywidebutton">
+            <position>215,480</position>
+            <value>Metadata Options</value>
+            <helptext></helptext>
+        </button>
+
         <button name="cancel" from="basebutton">
-            <position>40,525</position>
+            <position>40,535</position>
             <value>Cancel</value>
         </button>
 
         <button name="save" from="basebutton">
-            <position>540,525</position>
+            <position>540,535</position>
             <value>Save</value>
         </button>
     </window>

@@ -1651,6 +1651,12 @@
             <helptext></helptext>
         </button>
 
+        <button name="metadata" from="baseverywidebutton">
+            <position>215,480</position>
+            <value>Metadata Options</value>
+            <helptext></helptext>
+        </button>
+
         <button name="cancel" from="basebutton">
             <position>40,525</position>
             <value>Cancel</value>
@@ -2072,6 +2078,49 @@
             <multiline>yes</multiline>
         </textarea>
 
+    </window>
+
+    <window name="metadataoptions">
+
+        <textarea name="inet" from="basetextarea">
+            <area>20,110,180,40</area>
+            <align>right,vcenter</align>
+            <value>TMDB/TVDB #:</value>
+        </textarea>
+
+        <textedit name="inetref_edit" from="basetextedit">
+            <position>215,110</position>
+        </textedit>
+
+        <textarea name="seas" from="basetextarea">
+            <area>20,165,180,40</area>
+            <align>right,vcenter</align>
+            <value>Season:</value>
+        </textarea>
+
+        <spinbox name="season_spinbox" from="basespinbox">
+            <position>215,165</position>
+        </spinbox>
+
+        <textarea name="ep" from="basetextarea">
+            <area>310,165,180,40</area>
+            <align>right,vcenter</align>
+            <value>Episode:</value>
+        </textarea>
+
+        <spinbox name="episode_spinbox" from="basespinbox">
+            <position>505,165</position>
+        </spinbox>
+
+        <button name="query_button" from="basewidebutton">
+            <position>215,220</position>
+            <value>Perform Query</value>
+        </button>
+
+        <button name="back" from="basebutton">
+            <position>40,525</position>
+            <value>Back</value>
+        </button>
     </window>
 
 </mythuitheme>
