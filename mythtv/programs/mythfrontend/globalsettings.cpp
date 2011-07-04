@@ -206,6 +206,17 @@ static HostComboBox *AutoCommercialSkip()
     return gc;
 }
 
+static GlobalCheckBox *AutoMetadataLookup()
+{
+    GlobalCheckBox *bc = new GlobalCheckBox("AutoMetadataLookup");
+    bc->setLabel(QObject::tr("Run metadata lookup"));
+    bc->setValue(true);
+    bc->setHelpText(QObject::tr("This is the default value used for the "
+                    "automatic metadata lookup setting when a new "
+                    "scheduled recording is created."));
+    return bc;
+}
+
 static GlobalCheckBox *AutoCommercialFlag()
 {
     GlobalCheckBox *bc = new GlobalCheckBox("AutoCommercialFlag");
@@ -3552,12 +3563,13 @@ GeneralSettings::GeneralSettings()
 
     VerticalConfigurationGroup* autogrp0 =
         new VerticalConfigurationGroup(false, false, true, true);
+    autogrp0->addChild(AutoMetadataLookup());
     autogrp0->addChild(AutoCommercialFlag());
     autogrp0->addChild(AutoTranscode());
-    autogrp0->addChild(AutoRunUserJob(1));
 
     VerticalConfigurationGroup* autogrp1 =
         new VerticalConfigurationGroup(false, false, true, true);
+    autogrp0->addChild(AutoRunUserJob(1));
     autogrp1->addChild(AutoRunUserJob(2));
     autogrp1->addChild(AutoRunUserJob(3));
     autogrp1->addChild(AutoRunUserJob(4));
